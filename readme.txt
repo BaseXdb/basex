@@ -33,7 +33,7 @@
  
  RUNNING BASEX --------------------------------------------------------
  
- Follow the following steps to start BaseX with Eclipse:
+ Apply the following steps to start BaseX with Eclipse:
  
  - Press Run -> Run...
  - Create a new "Java Application" launch configuration
