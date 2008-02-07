@@ -62,4 +62,3 @@
  BaseX team 2008
  
  =================================== DBIS Group, University of Konstanz
- 
