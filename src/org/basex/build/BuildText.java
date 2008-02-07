@@ -5,7 +5,7 @@ import org.basex.util.Token;
 /**
  * This interface organizes textual information for the builder package.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-07, ISC License
  * @author Christian Gruen
  */
 public interface BuildText {
@@ -101,6 +101,8 @@ public interface BuildText {
   byte[] DOCTYPE = Token.token("DOCTYPE");
   /** DTD: System. */
   byte[] SYSTEM = Token.token("SYSTEM");
+  /** DTD: Public. */
+  byte[] PUBLIC = Token.token("PUBLIC");
   /** DTD: Square Bracket Open. */
   byte[] SBRACKETO = Token.token("[");
   /** DTD: Square Bracket Close. */
@@ -109,16 +111,36 @@ public interface BuildText {
   byte[] BRACKETO = Token.token("(");
   /** DTD: Bracket Close. */
   byte[] BRACKETC = Token.token(")");
-  /** DTD: Element. */
-  byte[] ELEM = Token.token("!ELEMENT");
-  /** DTD: Attribute. */
-  byte[] ATTL = Token.token("ATTLIST");
-  /** DTD: Entity. */
-  byte[] ENT = Token.token("ENTITY");
+  /** DTD: ELEMENT. */
+  byte[] ELEM = Token.token("<!ELEMENT");
+  /** DTD: Wrong ELEMENT. */
+  byte[] WELEM1 = Token.token("<ELEMENT");
+  /** DTD: Wrong ELEMENT. */
+  byte[] WELEM2 = Token.token("<!Element");
+  /** DTD: Wrong ELEMENT. */
+  byte[] WELEM3 = Token.token("<!element");
+  /** DTD: ATTLIST. */
+  byte[] ATTL = Token.token("<!ATTLIST");
+  /** DTD: Wrong ATTLIST. */
+  byte[] WATTL1 = Token.token("<!Attlist");
+  /** DTD: Wrong ATTLIST. */
+  byte[] WATTL2 = Token.token("<ATTLIST");
+  /** DTD: ENTITY. */
+  byte[] ENT = Token.token("<!ENTITY");
+  /** DTD: XML. */
+  byte[] XML = Token.token("<?");
   /** DTD: EMPTY ELEMENT. */
   byte[] EMP = Token.token("EMPTY");
+  /** DTD: Wrong EMPTY ELEMENT. */
+  byte[] WEMP1 = Token.token("empty");
+  /** DTD: Wrong EMPTY ELEMENT. */
+  byte[] WEMP2 = Token.token("Empty");
   /** DTD: ANY ELEMENT. */
   byte[] ANY = Token.token("ANY");
+  /** DTD: Wrong ANY ELEMENT. */
+  byte[] WANY1 = Token.token("Any");
+  /** DTD: Wrong ANY ELEMENT. */
+  byte[] WANY2 = Token.token("any");
   /** DTD: #PCDATA ELEMENT. */
   byte[] PC = Token.token("#PCDATA");
   /** DTD: DASH ELEMENT. */
@@ -129,6 +151,8 @@ public interface BuildText {
   byte[] GREAT = Token.token(">");
   /** DTD: CDATA ELEMENT. */
   byte[] CD = Token.token("CDATA");
+  /** DTD: NDATA ELEMENT. */
+  byte[] ND = Token.token("NDATA");
   /** DTD: ID ELEMENT. */
   byte[] ID = Token.token("ID");
   /** DTD: IDREF ELEMENT. */
