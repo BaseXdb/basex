@@ -38,7 +38,7 @@
  - Press Run -> Run...
  - Create a new "Java Application" launch configuration
  - Select "basex" as "Project"
- - Choose a "Main class" (e.g. org.basex.BaseXWin
+ - Choose a "Main class" (e.g., org.basex.BaseXWin
    for the graphical user interface)
  - Launch the project via 'Run'
  
