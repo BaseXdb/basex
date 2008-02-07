@@ -1,0 +1,1231 @@
+<basex>
+  <html>
+  <!-- Created with BaseX WebServer. -->
+  <!--
+    Pristine 1.0
+
+    Design copyright Matt Dibb 2006 (thanx! modified by BaseX Team)
+    www.mdibb.net
+
+    Please feel free to use and modify this template for use on your site.  I
+    dont mind if you use it for your personal site or a commercial site, but I do
+    insist that it is not sold or given away in some "50,000 Templates!" package
+    or something like that.
+  -->
+  <header>
+    <meta http-equiv="Content-Language" content="en-us"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="author" content="BaseX Team"/>
+    <meta name="description" content="BaseX - Database for the XML addicted"/>
+    <meta name="keywords" content="BaseX,XML,XQuery,Database,Fulltext,Visualization"/>
+    <meta name="generator" content="BaseX 4.0"/>
+    <meta name="robots" content="all"/>
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+    <link rel="SHORTCUT ICON" href="gfx/BaseX.ico"/>
+  </header>
+
+  <top>
+    <div id="header">
+    <a href="index.xq"><img src="gfx/BaseX.png" alt="BaseX Logo"/></a>
+    <p>Visual exploration and querying of XML data</p>
+    </div>
+  </top>
+
+  <footer>
+    <div id="footer">BaseX WebServer - © 2008 DBIS Group. U Konstanz<br/><br/></div>
+  </footer>
+  </html>
+
+  <pages>
+    <page link="index" title="Home" sub="What's that BaseX thing?" alternative="Welcome to BaseX!"/>
+    <page link="download" title="Download" sub="Get it on your own system!"/>
+    <page link="documentation" title="Documentation" sub="How can I use it?"/>
+    <page link="code-xpath" menu="documentation" alternative="Documentation: Executing XPath"/>
+    <page link="code-xquery" menu="documentation" alternative="Documentation: Executing XQuery"/>
+    <page link="commands" menu="documentation" alternative="Documentation: Commands"/>
+    <page link="faq" menu="documentation" alternative="Documentation: FAQ"/>
+    <page link="visual" title="Visual BaseX" sub="Have a look."/>
+    <page link="guide-import" menu="visual" alternative="Visual BaseX: Import the Filesystem"/>
+    <page link="guide-create" menu="visual" alternative="Visual BaseX: Create a Database"/>
+    <page link="publications" title="Publications" sub="Reports and presentations"/>
+    <page link="contact" title="Contact" sub="Guys behind the project."/>
+  </pages>
+
+  <home>
+    BaseX is a native XML database.
+    <br/><br/>
+    It features compact storage structures, efficient XPath and XQuery
+    implementations and a visual <a href="visual.xq">frontend</a>,
+    facilitating visual access to the stored data.  BaseX is written in
+    Java and freely available for <a href="download.xq">download</a>.
+    It is developed by the Database and Information Systems Group at
+    the University of Konstanz.
+  </home>
+
+  <news>
+    <news-item title='Update of Web Site' date='13/01/2008'>
+      This web site is now completely generated via BaseX and XQuery.
+      The next release is scheduled for February.
+    </news-item>
+    <news-item title='New Release' date='23/11/2007'>
+      Release 4.0 of BaseX offers many new features such as...
+      <ul>
+        <li>Support of <b>XQuery 1.0</b>, reaching 99.3% of the
+        <a href="http://www.w3.org/XML/Query/test-suite/XQTSReportSimple.html">W3C
+        XQuery Test Suite</a></li>
+        <li>Partial support of <b>XQuery Full-Text</b>, based on the
+        <a href="http://www.w3.org/TR/xpath-full-text-10/">W3C Working Draft</a></li>
+        <li>Several <b>Indexes</b>, including a full-text index<br/>(currently only
+        applied by the XPath 1.0 implementation)</li>
+        <li>GUI interactions for <b>XML Updates</b></li>
+        <li>A <b>Query Panel</b> for entering XPath and XQuery</li>
+        <li>A <b>Table View</b> for a flat view of regular XML documents</li>
+        <li>A <b>Help View</b> for interactive feedback on the GUI features</li>
+        <li>A revised command syntax (try 'help' in the console or the GUI
+        command mode)</li>
+      </ul>
+    </news-item>
+  </news>
+
+  <downloads>
+    <files desc="Current Release (23.11.2007)"
+           path="http://downloads.sourceforge.net/basex/">
+      <file desc='Runnable JAR file (1.2 MB)'
+            name='BaseX 4.0' link='BaseX4.jar'/>
+      <file desc='Runnables, sources and documentation (5.7 MB)'
+            name='BaseX 4.0 Complete' link='BaseX4-Complete.zip'/>
+    </files>
+    <files desc="Latest Version (13.01.2008)" path="downloads/">
+      <file desc='Runnable JAR file (1.4 MB)'
+            name="BaseX-latest.jar" link="BaseX-latest.jar"/>
+    </files>
+    <files desc="Older Versions" path="downloads/">
+      <file desc="Released at 11.03.2007 (572 KB)"
+            name="BaseX 3.07" link="BaseX.jar"/>
+      <file desc="Released at 31.01.2007 (675 KB)"
+            name="BaseX 3.00" link="basex300.jar"/>
+      <file desc="Released at 13.12.2006 (489 KB)"
+            name="BaseX 2.21" link="basex220.jar"/>
+    </files>
+    <files desc="Sample XML Documents" path="downloads/">
+      <file desc="114 KB" name="xmark114kb.xml" link="xmark114kb.xml"/>
+      <file desc="1.7 MB" name="factbook.xml" link="factbook.xml"/>
+      <file desc="37 MB" name="xmark111mb.zip" link="xmark111mb.zip"/>
+    </files>
+    <files desc="Source Code">
+      <text>The BaseX sources are available in a Subversion repository via
+      <a href="http://sourceforge.net/projects/basex">Sourceforge</a>.
+      </text>
+    </files>
+  </downloads>
+
+  <documentation>
+    <section title="Quick Start">
+      BaseX comes as an executable <code>.jar</code> (Java Archive), which
+      automatically determines the correct system settings (i.e. paths and
+      environment variables).
+      <a href="http://java.sun.com/javase/downloads">Java 5</a> or later
+      is needed to run BaseX.<br/><br/>
+
+      By default, the graphical interface of BaseX is launched.
+      To manually start BaseX you have (at least) the following options:
+
+      <ul>
+        <li>Start the GUI, granting more memory to the virtual machine:<br/>
+          <code>java -Xmx512m -jar BaseX.jar</code>
+        </li>
+        <li>Start the console version:<br/>
+          <code>java -cp BaseX.jar org.basex.BaseX</code>
+        </li>
+      </ul>
+    </section>
+
+    <section title="Commands">
+      Typing <code>help</code> at the command prompt gives you a
+      list of the <a href="commands.xq">available database commands</a>.
+    </section>
+
+    <section title="FAQ">
+      Have a look into the <a href="faq.xq">FAQ</a> to get more info on BaseX.
+    </section>
+
+    <section title="Coding">
+      <ul>
+        <li>Two examples for <a href="code-xpath.xq">XPath</a> and
+          <a href="code-xquery.xq">XQuery</a> might help you to integrate
+          BaseX in your own project</li>
+        <li>You can also browse the
+          <a href="javadoc">JavaDocs</a> of the source code</li>
+        <li>We will soon support the XQuery API</li>
+      </ul>
+    </section>
+  </documentation>
+
+  <commands>
+    <text>
+    Here you find the BaseX commands which you can enter in the console
+    mode or in the Command text field in the GUI:
+    </text>
+
+    <command>
+      <name>Help</name>
+      <syntax>help [command]</syntax>
+      <desc>
+      Get help on BaseX commands.
+      If <code>[command]</code> is specified, information on the specific
+      command is printed; otherwise, all commands are listed.
+      If 'all' is specified, hidden commands are included.
+      </desc>
+    </command>
+
+    <command>
+      <name>Create</name>
+      <syntax>create [xml|fs|index] [...]</syntax>
+      <desc>
+      Create a database from XML or the filesystem, or create an index:
+      <ul>
+        <li><code>xml [file]</code><br/>
+          Create a new database for the the XML document specified with
+          <code>[file]</code>.<br/>
+          The database will be named after the document name, excluding the suffix.
+        </li>
+        <li><code>fs [database] [path]</code><br/>
+          Create a database for the specified file <code>[path]</code>.<br/>
+          The Database will be named <code>[database]</code>.</li>
+        <li><code>index [text|attribute|word|fulltext]</code><br/>
+          Create the specified index for the currently opened database.</li>
+      </ul>
+      </desc>
+    </command>
+
+    <command>
+      <name>Open</name>
+      <syntax>open [database]</syntax>
+      <desc>Open the specified [database].</desc>
+    </command>
+
+    <command>
+      <name>Info</name>
+      <syntax>info [database|index|table]?</syntax>
+      <desc>Show information on the currently opened database:
+      <ul>
+        <li>no argument<br/>
+          show global information</li>
+        <li><code>database</code><br/>
+          show database information</li>
+        <li><code>index</code><br/>
+          show information on the existing indexes.</li>
+        <li><code>table [start end | query]</code><br/>
+          show the internal XML table representation for the specified numeric
+          range <code>[start-end]</code>, or for the results of the specified
+          <code>[query]</code></li>
+      </ul>
+      </desc>
+    </command>
+
+    <command>
+      <name>Close</name>
+      <syntax>close</syntax>
+      <desc>Close the current database.</desc>
+    </command>
+
+    <command>
+      <name>List</name>
+      <syntax>list</syntax>
+      <desc>List all available databases.</desc>
+    </command>
+
+    <command>
+      <name>Drop</name>
+      <syntax>drop [database|index] [...]</syntax>
+      <desc>Drop a database or an index:
+      <ul>
+        <li><code>database [name]</code><br/>
+          Drop the database specified with <code>[name]</code>.</li>
+        <li><code>index [text|attribute|word|fulltext]</code><br/>
+          Drop the specified index in the currently opened database.</li>
+      </ul>
+      </desc>
+    </command>
+
+    <command>
+      <name>Export</name>
+      <syntax>export [file]</syntax>
+      <desc>Export the current database or node set to an XML document,
+      named <code>[file]</code>.</desc>
+    </command>
+
+    <command>
+      <name>XPath</name>
+      <syntax>xpath [query]</syntax>
+      <desc>Perform the specified XPath 1.0 <code>[query]</code> and print its
+      result.</desc>
+    </command>
+
+    <command>
+      <name>XQuery</name>
+      <syntax>xquery [query]</syntax>
+      <desc>Perform the specified XQuery 1.0 <code>[query]</code> and print its result.
+      The complete input is treated as XQuery, so no other commands are allowed
+      in the same line. If no query is specified after the command, the query is
+      created from the following inputs, finished by an empty.
+      </desc>
+    </command>
+
+    <command>
+      <name>Find</name>
+      <syntax>find [query]</syntax>
+      <desc>Evaluate a simple keyword <code>[query]</code> and print its results.
+      This command is used in the simple search mode in the GUI. The following
+      prefixes are supported:
+      <ul>
+        <li>(none): find any tags and substrings</li>
+        <li><code>=  </code>find exact text nodes</li>
+        <li><code>@  </code>find attributes and attribute values</li>
+        <li><code>@= </code>find exact attribute values</li>
+      </ul>
+      </desc>
+    </command>
+
+    <command>
+      <name>CD</name>
+      <syntax>cd [query]</syntax>
+      <desc>Evaluate the <code>[query]</code> as XPath 1.0 and set the result
+      as new context set.</desc>
+    </command>
+
+    <command>
+      <name>Copy</name>
+      <syntax>copy [pos] ["source"] ["target"]</syntax>
+      <desc>Copy database nodes.
+      Evaluate the XPath 1.0 <code>[source]</code> query and insert the
+      resulting nodes as child nodes into the <code>[target]</code> query.
+      <code>[pos]</code> specifies the child position; if <code>0</code>
+      is specified, the nodes are inserted as last child.
+      The queries should be enclosed by brackets.
+      </desc>
+    </command>
+
+    <command>
+      <name>Delete</name>
+      <syntax>delete ["target"]</syntax>
+      <desc>Delete database nodes resulting from the specified <code>[target]</code> query.
+      The query should be enclosed by brackets.
+      </desc>
+    </command>
+
+    <command>
+      <name>Insert</name>
+      <syntax>insert [fragment|element|attribute|text|comment|pi] [...]</syntax>
+      <desc>Insert database nodes.
+      Insert a fragment or a specific node at the specified
+      child <code>[pos]</code> of the specified <code>[target]</code> query:
+      <ul>
+        <li><code>element [name] [pos] [target]</code><br/>
+          Insert an element with the specified tag <code>[name]</code>.</li>
+        <li><code>text [text] [pos] [target]</code><br/>
+          Insert a text node with the specified <code>[text]</code>.</li>
+        <li><code>attribute [name] [value] [target]</code><br/>
+          Insert an attribute with the specified <code>[name]</code> and
+        <code>[value]</code></li>
+        <li><code>comment [text] [pos] [target]</code><br/>
+          Insert a comment with the specified <code>[text]</code>.</li>
+        <li><code>pi [name] [value] [pos] [target]</code><br/>
+          Insert a processing instruction with the specified
+          <code>[name]</code> and <code>[value]</code>.</li>
+        <li><code>fragment [frag] [pos] [target]</code><br/>
+          Insert an XML <code>[frag]</code>.</li>
+      </ul>
+      </desc>
+    </command>
+
+    <command>
+      <name>Update</name>
+      <syntax>update [element|attribute|text|comment|pi] [...]</syntax>
+      <desc>Update database nodes satisfying the specified <code>[target]</code> query.
+      <ul>
+        <li><code>element [name] [target]</code><br/>
+          Update the resulting elements with the specified tag <code>[name]</code>.</li>
+        <li><code>text [text] [target]</code><br/>
+          Update the resulting text nodes with the specified <code>[text]</code>.</li>
+        <li><code>attribute [name] [value] [target]</code><br/>
+          Update the resulting attributes with the specified <code>[name]</code>
+          and <code>[value]</code>.</li>
+        <li><code>comment [text] [target]</code><br/>
+          Update the resulting comments with the specified <code>[text]</code>.</li>
+        <li><code>pi [name] [value] [target]</code><br/>
+          Update the resulting processing instructions with the specified
+          <code>[name]</code> and <code>[value]</code>.</li>
+      </ul>
+      </desc>
+    </command>
+
+    <command>
+      <name>Set</name>
+      <syntax>set [option] [val]?</syntax>
+      <desc>Sets global options. The currently set values can be shown with the
+      <code>info</code> command. The following <code>[option]</code>s are
+      available and can be turned [on] or [off]:
+      <ul>
+        <li><code>debug</code><br/>
+          Show internal debug info.</li>
+        <li><code>mainmem</code><br/>
+          Use main-memory mode.</li>
+      </ul>
+      The following commands apply to the creation of new databases:
+      <ul>
+        <li><code>chop</code><br/>
+          Chop all XML whitespace nodes.</li>
+        <li><code>entity</code><br/>
+          Parse XML entities.</li>
+        <li><code>textindex</code><br/>
+          Index text nodes.</li>
+        <li><code>attrindex</code><br/>
+          Index attribute values.</li>
+        <li><code>wordindex</code><br/>
+          Index all words (simplified full-text)</li>
+        <li><code>ftindex</code><br/>
+          Index full-text</li>
+        <li><code>dbpath [path]</code>: Set a new database <code>[path]</code></li>
+      </ul>
+
+      The following commands apply to querying:
+      <ul>
+        <li><code>info [all]</code><br/>
+          Show (all) info on query evaluation.</li>
+        <li><code>serialize</code><br/>
+          Turn serialization of query results on/off.</li>
+        <li><code>xmloutput</code><br/>
+          Serialize query results as XML.</li>
+        <li><code>runs [nr]</code><br/>
+          Set the number of query runs.</li>
+      </ul>
+      Have a look into the <a href="faq.xq">FAQ</a> to find
+      more information on the available options.
+      </desc>
+    </command>
+
+    <command>
+      <name>Exit</name>
+      <syntax>exit/quit</syntax>
+      <desc>Leave the console mode of BaseX.
+      </desc>
+    </command>
+  </commands>
+
+  <faq>
+  <text>
+  If you can't find an answer on your question, please write to
+  <code>info@basex.org</code>.<br/><br/>
+  </text>
+
+  <entry title="Introduction">
+  <entry>
+    <question>What is BaseX?</question>
+    <answer>
+      BaseX is a native XML database. It features an XPath/XQuery
+      implementation, supports updates and has a visual frontend,
+      facilitating visual access to the stored data.
+    </answer>
+  </entry>
+
+  <entry>
+    <question>On what systems does BaseX run?</question>
+    <answer>
+      BaseX is completely written in Java. As such it is plattform-independant
+      and should run on any plattform that has a Java Virtual Machine available.
+      BaseX uses Java Version 1.5 or later, so this might be a limitation.
+      BaseX has been tested on Windows (2000, XP, Vista), Max OS X (10.4, 10.5),
+      Linux(SuSE xxx, Debian) and OpenBSD (4.2).
+    </answer>
+  </entry>
+
+  <entry>
+    <question>Who maintains BaseX?</question>
+    <answer>
+      BaseX is developed by the
+      <a href="http://www.inf.uni-konstanz.de/dbis">Database and Information
+      Systems Group</a> at the University of Konstanz. Main developer and project
+      leader is <a href="http://www.inf.uni-konstanz.de/~gruen">Christian
+      Grün</a>. Several <a href="contact.xq">students and other group members</a>
+      have contributed to the project.</answer>
+  </entry>
+
+  <entry>
+    <question>What is new in BaseX 4.0?</question>
+    <answer>
+      This version of BaseX offers many new features such as...<ul>
+      <li> Support of <b>XQuery 1.0</b>, reaching 99.3% of the W3C XQuery Test Suite</li>
+      <li> Partial support of <b>XQuery Full-Text</b>, based on the W3C working draft</li>
+      <li> Several <b>Indexes</b>, including a full-text index<br/>
+      (currently only applied by the XPath 1.0 implementation)</li>
+      <li> GUI interactions for <b>XML Updates</b></li>
+      <li> A <b>Query Panel</b> has been added for entering XPath and XQuery</li>
+      <li> A <b>Table View</b> allows a flat view of regular XML documents</li>
+      <li> A <b>Help View</b> offers interactive feedback on the GUI features</li>
+      <li> A revised <b>command syntax</b> (try 'help' in the console or the GUI command mode)</li>
+      </ul>
+    </answer>
+  </entry>
+
+  <entry>
+    <question>Where to get the latest version?</question>
+    <answer>
+      The latest version is found on the <a href="download.xq">download page</a> of this site.
+    </answer>
+  </entry>
+
+  <entry>
+    <question>Is there access to the source code?</question>
+    <answer>
+      The BaseX sources are available in a Subversion repository via Sourceforge:<br/>
+      <a href="http://sourceforge.net/projects/basex">Sourceforge Project Site</a><br/><br/>
+      You also find them as part of the complete, zipped distribution of BaseX:<br/>
+      <a href="http://sourceforge.net/projects/BaseX-Complete.zip">BaseX-Complete.zip</a>
+    </answer>
+  </entry>
+
+  <entry>
+    <question>How can I help/contribute?</question>
+      <answer>
+      BaseX is still work in progress. So we are definitely interested in all
+      kind of experiences you gain during usage. Please provide feedback, bug reports,
+      report about missing features, your application domain. This all can be done
+      by posting to <code>info@basex.org</code>.
+      </answer>
+    </entry>
+
+  <entry>
+    <question>I found a bug, how do I file bug report?</question>
+      <answer>
+      There is a bug reporting system on SourceForge. Feel free to send an email to
+      <code>info@basex.org</code>.</answer>
+    </entry>
+  </entry>
+
+  <entry title="BaseX Console">
+  <entry>
+    <question>How can I launch the console mode of BaseX?</question>
+    <answer>
+      Just enter <code>java -cp BaseX.jar org.base.BaseX</code> on the command
+      line. The Java option<code> -Xmx... </code>reserve more memory, and the
+      <code>-h</code> flag of BaseX lists all available flags:<blockquote><pre>
+java -Xmx512m -cp BaseX.jar org.basex.BaseX -h
+
+BaseX 4.0; DBIS, University of Konstanz
+Usage: BaseX [options] [query]
+  [query]    specify query file
+  -c         chop whitespaces
+  -d         debug mode
+  -e         skip entity parsing
+  -o [file]  specify output file
+  -p         handle query file as XPath
+  -q&lt;cmd&gt;    send BaseX commands
+  -v/V       show (all) process info
+  -x         print result as xml
+  -z         skip query output
+</pre>
+      </blockquote>
+    </answer>
+  </entry>
+
+  <entry>
+    <question>What can I do in the console mode?</question>
+    <answer>
+    Type in <code>help</code> to get a list of all <a href="commands.xq">BaseX
+    commands</a>. Several commands can be separated by semicolons. To evaluate
+    commands without entering the console mode, you can use the <code>-q</code>
+    option on the command line:<blockquote><pre>
+java -jar BaseX.jar -vq 'create xml input.xml; xpath /'
+
+Process Info ON
+Database created in 195.2 ms.
+&lt;html&gt;
+  &lt;!-- Header --&gt;
+  &lt;head id='0'&gt;
+    &lt;title&gt;XML&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;!-- Body --&gt;
+  &lt;body id='1' bgcolor='#FFFFFF' text='#000000'&gt;
+    &lt;h1&gt;Databases &amp; XML&lt;/h1&gt;
+    &lt;div align='right'&gt;
+      &lt;b&gt;Assignments&lt;/b&gt;
+      &lt;ul&gt;
+        &lt;li&gt;Exercise 1&lt;/li&gt;
+        &lt;li&gt;Exercise 2&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+
+Compiling : 43.28 ms
+Evaluating: 0.15 ms
+Printing  : 10.7 ms
+Total Time: 106.64 ms
+Results   : 1 Item
+Printed   : 360 Bytes
+</pre>
+      </blockquote>
+    </answer>
+  </entry>
+
+  <entry>
+    <question>What is XPath/XQuery?</question>
+    <answer>
+    <ul>
+    <li>XPath is a simple query language for finding information in an XML document.
+    XPath is used to navigate through elements and attributes in an XML document
+    (<a href='http://www.w3.org/TR/xpath'>XPath - W3C Website</a>).</li>
+    <li> XQuery is a complete query language from the W3C that provides an easy way
+    to query, transform, and integrate XML data.
+    (<a href='http://www.w3.org/TR/xquery'>XQuery - W3C Website</a>).</li>
+    </ul>
+    </answer>
+  </entry>
+
+  <entry>
+    <question>What is Whitespace Chopping?</question>
+    <answer>
+      This option removes all whitespaces between tags and contents.
+      In the current version of BaseX, there is no DTD or XML schema detection
+      which would make it possible to explicitly ignore special whitespaces.
+    </answer>
+  </entry>
+
+  <entry>
+    <question>What is Entity Parsing?</question>
+    <answer>
+      The parsing of entities in the document can be skipped or switched on
+      with this option. Entities are important for DTD declarations and definitions
+      of special characters.
+    </answer>
+  </entry>
+
+  <entry>
+    <question>How can i display the name of attributes?</question>
+    <answer>
+      There is an option in the Options/Preferences menu where it's possible
+      to choose, replace tags with @name attributes.
+    </answer>
+    </entry>
+  </entry>
+
+  <entry title="BaseX GUI">
+  <entry title="Views and Panels">
+  <entry>
+    <question>How many views are there and what do they do?</question>
+    <answer>
+      <dl><dt>Query View</dt>
+      <dd>Executes XPath, XQuery and simple queries to explore the xml document.</dd>
+      <dt>Query Info View</dt>
+      <dd>Displays information on the compilation and evaluation of an XPath or XQuery
+      request, including some simple profiling.</dd>
+      <dt>Text View</dt>
+      <dd>Displays query results and other textual output.</dd>
+      <dt>Map View</dt>
+      <dd>This visualization represents all data in a TreeMap. All nodes of the XML
+      document are represented as rectangles, filling the complete area.</dd>
+      <dt>Tree View</dt>
+      <dd>This visualization displays all XML nodes in a usual tree view.</dd>
+      <dt>Table View</dt>
+      <dd>This visualization displays all XML nodes in a table with rows and
+      columns.</dd>
+      <dt>Help View</dt>
+      <dd>This view provides context sensitive information to use all the BaseX
+      features.</dd>
+      </dl>
+    </answer>
+  </entry>
+
+  <entry>
+    <question>A Table View for hierachical data. Sorry, but sounds brain-damaged.</question>
+    <answer>
+      It sounds brain-damaged but it's really useful for many kinds of data.
+      It's just another visualization which provides an efficient and effective
+      way to display data. See the following example:<br/><br/>
+      <img border='1' src='gfx/TableView.png'/><br/><br/>
+      It's possible to edit/add/delete elements in the table view directly.
+    </answer>
+  </entry>
+  </entry>
+
+  <entry>
+    <question>What is Realtime Filtering?</question>
+    <answer>
+      If realtime filtering is enabled, all visualizations directly show the
+      query results while entering the query. If this feature is disabled, the
+      query results are highlighted in the visualizations and can be ecplicitly
+      filtered using the 'Filter' button.
+    </answer>
+  </entry>
+
+  <entry>
+    <question>What does the Filter button exactly do?</question>
+    <answer>
+      After pressing this button, the visualizations display the previously
+      highlighted XML nodes, omitting all the other nodes of the document.
+      If realtime filtering is enabled, the Filter button will be disabled,
+      and all results are automatically filtered.
+    </answer>
+  </entry>
+
+  <entry>
+    <question>How can I search without XPath/XQuery?</question>
+    <answer>
+      The Search field triggers a simple search query in the XML document.
+      The following syntax is supported:
+      <table border='0'>
+      <tr><th align='left'>Query</th><th align='left'>Description</th></tr>
+      <tr><td align='left'><i>foo</i></td>
+      <td align='left'>Find tags and texts containing <i>foo</i></td></tr>
+      <tr><td align='left'>=<i>foo</i></td>
+      <td align='left'>Find exact matching text nodes</td></tr>
+      <tr><td align='left'>@<i>foo</i></td>
+      <td align='left'>Find attributes and attribute values</td></tr>
+      <tr><td align='left'>@=<i>foo</i></td>
+      <td align='left'>Find exact attribute values</td></tr>
+      </table>
+    </answer>
+  </entry>
+
+  <entry>
+    <question>The search field in the query panel and the search field right
+      beyond the buttons, do they differ?</question>
+    <answer>
+      Not really, both offer the same functionality, but in the query panel
+      there is a dropdown menu where it's possible to choose tags or attributes
+      of the XML document.
+    </answer>
+  </entry>
+
+  <entry>
+    <question>How can I configure the look and feel of BaseX?</question>
+    <answer>
+      All panels are freely adjust- and dragable. Changing of colors, fonts and
+      the layout is possible via the 'Layout' entry in the 'Options' menu.
+    </answer>
+  </entry>
+
+  <entry>
+    <question>What is the Main-Memory Mode?</question>
+    <answer>
+      The Main-Memory Mode speeds up querying but disables updates. The table data
+      is kept in memory and the text of a document is still accesseed from disk.
+    </answer>
+  </entry>
+
+  <entry>
+    <question>How can I import my file system? What does that mean?</question>
+    <answer>
+      To import a file system, go to 'File/Import Filesystem...'. You will be
+      prompted for the next steps. A file hierarchy traversal is performed and the
+      directory structure of the filesystem is mapped into an XML representation.
+      Additionally some metadata is extracted from some known file types.
+      What you get is an 'XML view' of your current file system. You can query
+      the filesystem just as any other database instance. Manipulation (update,
+      deletion) of the XML database instance representing a file hierarchy has no
+      effect on the real filesystem.
+    </answer>
+  </entry>
+
+  <entry>
+    <question>How can I import my data aka how do i create a new database instance
+      aka how to shred an XML file?</question>
+    <answer>
+      <ol>
+      <li>If your input data is an XML file, you can use the 'New' command.
+      BaseX will create a new database with the name of your XML file. (GUI only)</li>
+      <li>You can use the <a href="commands.xq#Create">Create</a> command.
+      (GUI and console)</li>
+      </ol>
+    </answer>
+  </entry>
+  </entry>
+
+  <entry title="General Issues">
+  <entry>
+    <question>Where does BaseX store data and configuration files?</question>
+    <answer>
+      <ul>
+      <li>The databases are stored in a <code>BaseXData</code> directory in your
+      home directory. The path can be changed in the GUI via the Options/Preferences
+      menu.</li>
+      <li>The two configuration files <code>.basex</code>/<code>.basewin</code> are
+      stored in the same directory. This path can't be changed by the user.</li>
+      </ul>
+    </answer>
+  </entry>
+
+  <entry>
+    <question>How do you measure the performance of the queries?</question>
+    <answer>
+      The measurements include the compilation, evaluation and printing time of
+      a query. There are different ways to get the performance information:<ul>
+      <li>Console: use '-v' flag as command line argument</li>
+      <li>Console Mode: enter 'set info' or 'set info all' in the console mode</li>
+      <li>GUI Mode: display performance results in the QueryInfo view</li></ul>
+    </answer>
+  </entry>
+
+  <entry>
+    <question>What indexing techniques are available and what do they do?</question>
+    <answer>
+      Indexes can speedup queries by magnitudes. Currently, four indexes exist:<br/>
+      <ul>
+      <li>Text Index: All text nodes are indexed to speedup XPath predicates.</li>
+      <li>Attribute Value Index: All attributes are indexed to speedup XPath
+      predicates.</li>
+      <li>Word Index: All terms in text nodes are indexed to speedup word based
+      queries.</li>
+      <li>Fulltext Index: A full-fledged fulltext index is created to speedup
+      fulltext queries in XPath.</li>
+      </ul> Note that the indexes only speedup XPath and simple user queries.
+      Currently, XQuery does not make use of the indexes.
+    </answer>
+  </entry>
+
+  <entry>
+    <question>Is it possible to start BaseX as a Server?</question>
+    <answer>
+      In addition to the standalone version, it is possible to run BaseX in a
+      Client/Server environment:
+      <blockquote>
+      <h3>Server</h3> To start BaseX in server mode, just type:<br/><br/>
+      <code>java -cp BaseX.jar org.basex.BaseXServer</code><br/>
+      <h3>Client</h3> To run a BaseX client, please type:<br/><br/>
+      <code>java -cp BaseX.jar org.basex.BaseXClient -s server.org</code><br/><br/>
+      The <code>-s</code> flag specifies the computer on which the server is
+      running.<br/>
+      To list all available flags, just add<code> -h </code>to the call, e.g.:<pre>
+java -cp BaseX.jar org.basex.BaseXServer -h
+
+BaseX 4.0; DBIS, University of Konstanz
+Usage: java BaseXServer [options]
+  stop     stop server
+  -d       debug mode
+  -h       show this help
+  -p&lt;port&gt; specify server port
+</pre>
+      </blockquote>
+    </answer>
+  </entry>
+  </entry>
+
+  <entry title="Features">
+  <entry>
+    <question>Can I have more information on the XPath/XQuery implementations?</question>
+    <answer>
+      Note that, in BaseX, XPath and XQuery are based on different implementations.
+      Whereas XPath was especially tuned for efficient querying, XQuery strives
+      for a high conformity with the XQuery standard. As soon as our XQuery
+      implementation includes the optimizations that have been applied to XPath,
+      the XPath implementation might get obsolete.
+    </answer>
+  </entry>
+
+  <entry>
+    <question>OK, you support several Indexes. What exactly can I use and how?</question>
+    <answer>
+      Text indexes allow a speedup of order of magnitudes for text-based queries.
+      Currently, the indexes are only utilized by XPath queries. For example, the
+      following query will be internally rewritten to access the the text index
+      first:
+      <blockquote>
+      <h3>Text-Based Query</h3>
+      <pre>/descendant::node[text() = 'findme']</pre>
+      </blockquote>
+    </answer>
+  </entry>
+
+  <entry>
+    <question>Tell me more about XQuery Full-Text. How can I use it?</question>
+    <answer>
+      The full-text features can be used in XPath as well as in XQuery.
+      Again, queries will be evaluated much faster in XPath, and XQuery covers
+      more features of the language specification. In the following, two simple
+      examples for full-text queries are shown, based on the
+      <a href='http://www.w3.org/TR/xpath-full-text-10-use-cases/'>W3C Sample
+      Document</a>:<blockquote>
+      <h3>XPath Full-Text</h3>
+      Return all title tags which contain the word 'Usability':<br/>
+      <pre>//title[text() ftcontains 'Usability']</pre>
+      <h3>XQuery Full-Text</h3>
+      Return all authors, containing 'Marigold':<pre>
+for   $i in //author score $s
+where $i/text() ftcontains 'Marigold'
+return &lt;hit score='{ $s }'&gt;{ $i/text() }&lt;/hit&gt;
+</pre>
+      </blockquote>
+    </answer>
+  </entry>
+
+  <entry>
+    <question>How do you support XML Updates. Do you accomplish any standard?</question>
+    <answer>BaseX provides internal commands to perform updates on XML (see also
+    <a href="commands.xq">BaseX Commands</a>). Moreover, the GUI provides a
+    convenient way to perform updates on the data. Support of the
+    <a href="http://www.w3.org/TR/xqupdate/">W3C XQuery Update Facility</a>
+    is still on our (extensive) todo list..
+    </answer>
+  </entry>
+  </entry>
+  </faq>
+
+  <visual>
+    <section desc="Screenshots">
+      <table cellspacing="0" cellpadding="0"><tr>
+      <td><a href="gfx/basex-mac.png"><img border="0" src="gfx/basex-mac0.png"/></a></td>
+      <td width='16'></td>
+      <td><a href="gfx/basex-win.jpg"><img border="0" src="gfx/basex-win0.png"/></a></td>
+      </tr>
+      </table>
+      ...find more screenshots at <a href="http://sourceforge.net/project/screenshots.php?group_id=192179">Sourceforge</a>.
+    </section>
+    <section desc="Screencasts">
+      <files path="gfx/">
+        <file desc="800 x 600, 650 KB, avi video"
+              name="Evaluating XQuery" link="XQuery.avi"/>
+        <file desc="800 x 600, 2.4 MB, avi video"
+              name="Performing Updates" link="XQuery.avi"/>
+        <file desc="800 x 600, 3.3 MB, avi video"
+              name="Using the TreeMap" link="Browsing.avi"/>
+        <file desc="800 x 600, 5.8 MB, avi video"
+              name="Browsing the Filesystem (1)" link="Filesystem.avi"/>
+        <file desc="1024 x 768, 2.4 MB, avi video"
+              name="Browsing the Filesystem (2)" link="Media.avi"/>
+      </files>
+    </section>
+    <section desc="Step-by-Step Guides">
+      <ul>
+        <li><a href="guide-create.xq">How to create a new XML database</a></li>
+        <li><a href="guide-import.xq">How to construct an XML representation
+        of your filesystem</a></li>
+      </ul>
+    </section>
+  </visual>
+
+  <guide name="import">
+    <ol>
+    <li>Choose "File -&gt; Import Filesystem...".
+    <p><img src="gfx/Doc_ImportFS.gif"/></p></li>
+    <li>Now you should see this screen...<p>
+    <img src="gfx/Doc_FinishFS.png"/></p></li>
+    </ol>
+  </guide>
+
+  <guide name="create">
+    <ol>
+    <li>The easiest way for users to start experimenting with BaseX is to use an
+    existing XML file. Just click on "File -> New...".
+    <p><img src="gfx/Doc_New.gif"/></p></li>
+
+    <li>Choose one of your XML documents on disk. In this example we used the
+    111MB.xml file which you find in our <a href="download.xq">download section</a>.
+    <p><img src="gfx/Doc_FS.png"/></p></li>
+    <li>After you choose the XML file you can set some Options. You can use indexes
+    to speed up your queries. If you got some parsing problems try it again but
+    disable the option "Parsing entities".
+    <p><img src="gfx/Doc_Option.png"/></p></li>
+    <li>Now you should see this screen. If you need more information about how to
+    use BaseX, have a look into the <a href="documentation.xq">Documentation</a>
+    or use the help in the lower left of the BaseX window.
+    <p><img src="gfx/Doc_Finish.png"/></p></li>
+    </ol>
+  </guide>
+
+  <contact>
+    <section>
+      Feel free to send an email to <code>info@basex.org</code>
+      to get more information.<br/>
+      You find further information on the project on our <a
+      href="http://www.inf.uni-konstanz.de/dbis/research/basex">Research Page</a> and
+      on <a href="http://sourceforge.net/projects/basex/">Sourceforge</a>.
+    </section>
+    <section desc="Students @ BaseX" class='student'>
+      You can do your bachelor/master project/thesis in the scope of the BaseX
+      project. If you are interested or have additional ideas/interests/questions,
+      just drop an e-mail or come around.<br/><br/>
+      If you like to work with us, maybe it is of interest for you to get some
+      internal facts from your fellow students:
+    </section>
+    <section desc="Alumni" class='alumni'/>
+  </contact>
+
+  <persons>
+    <person id='gruen' class='dbis'>
+      <name>Christian Grün</name>
+    </person>
+    <person id='holupire' class='dbis'>
+      <name>Alexander Holupirek</name>
+    </person>
+    <person id='kramis' class='dbis'>
+      <name>Marc Kramis</name>
+    </person>
+    <person id='scholl' class='dbis'>
+      <name>Marc H. Scholl</name>
+    </person>
+    <person id='waldvoge' class='dbis'>
+      <name>Marcel Waldvogel</name>
+    </person>
+    <person id='Sebastian Gath' class='student'>
+      <name>Sebastian Gath</name>
+      <job>works on fulltext indexes</job>
+    </person>
+    <person id='Lukas Kircher' class='student'>
+      <name>Lukas Kircher</name>
+      <job>has written an e-mail extractor and is currently involved in frontend development</job>
+    </person>
+    <person id='Andreas Weiler' class='student'>
+      <name>Andreas Weiler</name>
+      <job>works on DTD support</job>
+    </person>
+    <person id='Hannes Schwarz' class='student'>
+      <name>Hannes Schwarz</name>
+      <job>works on BaseX Filesystem Commands</job>
+    </person>
+    <person id='Elmedin Dedovic' class='student'>
+      <name>Elmedin Dedovic</name>
+      <job>works on XQuery FS Commands</job>
+    </person>
+    <person id='Tino Gruse' class='student'>
+      <name>Tino Gruse</name>
+      <job>works on Namespaces</job>
+    </person>
+    <person id='Jörg Hauser' class='student'>
+      <name>Jörg Hauser</name>
+      <job>works on TreeMap Layouts</job>
+    </person>
+    <person id='Sebastian Faller' class='student'>
+      <name>Sebastian Faller</name>
+      <job>works on View Schemas, Layout Views</job>
+    </person>
+    <person id='Fatih Ulusoy' class='student'>
+      <name>Fatih Ulusoy</name>
+      <job>works on Backend (Opt./Indexes)</job>
+    </person>
+    <person id='Tim Petrowsky' class='alumni'>
+      <name>Tim Petrowsky</name>
+      <job>has implemented XPath and update facilities</job>
+    </person>
+    <person id='pflug' class='alumni'>
+      <name>Tobias Pflug</name>
+      <job>has worked on filesystem features</job>
+    </person>
+  </persons>
+
+  <publications href="http://www.inf.uni-konstanz.de/dbis/publications/download/">
+    <inproceedings id='HGS:BTW2007'>
+      <authors>
+        <author id='holupire'/>
+        <author id='gruen'/>
+        <author id='scholl'/>
+      </authors>
+      <title>
+        Melting Pot XML - Bringing File Systems and Databases One Step Closer
+      </title>
+      <conference>BTW 2007, GI</conference>
+      <abstract>
+      Evaluates the basic idea to regard a file system as semi-structured data and
+      to implement file system operations using XPath/XQuery.
+      </abstract>
+      <at-url>HGS:BTW2007.pdf</at-url>
+      <slides>HGS:BTW2007:slides.pdf</slides>
+    </inproceedings>
+
+    <inproceedings id='GHS:BTW07'>
+      <authors>
+        <author id='gruen'/>
+        <author id='holupire'/>
+        <author id='scholl'/>
+      </authors>
+      <title>Visually Exploring and Querying XML with BaseX</title>
+      <conference>BTW 2007 Demo Panel, GI</conference>
+      <abstract>
+      BaseX offers an intuitive, visual access to semi-structured data. Import
+      your file system and browse it on a treemap or try one of the several
+      others views (zoomable table, file explorer that navigates into the file
+      itself ...) It thus demonstrates the efficiency of the underlying storage.
+      </abstract>
+      <at-url>GHS:BTW07.pdf</at-url>
+      <poster>GHS:BTW07:poster.pdf</poster>
+    </inproceedings>
+
+    <inproceedings id='GHKSW:06'>
+      <authors>
+        <author id='gruen'/>
+        <author id='holupire'/>
+        <author id='kramis'/>
+        <author id='scholl'/>
+        <author id='waldvoge'/>
+      </authors>
+      <title>Pushing XPath Accelerator to its Limits</title>
+      <conference>EXPDB 2006, ACM</conference>
+      <at-url>GHKSW:EXPDB06.pdf</at-url>
+      <slides>GHKSW:EXPDB06:slides.pdf</slides>
+      <abstract>
+      First considerations and performance results for native XML storage
+      layouts based on the XPathAccelerator encoding scheme.
+      </abstract>
+    </inproceedings>
+  </publications>
+
+  <code name="code-xpath"><span class="orange">package</span> org.basex.test.examples;
+
+<span class="orange">import</span> java.io.FileOutputStream;
+<span class="orange">import</span> org.basex.core.Commands;
+<span class="orange">import</span> org.basex.core.proc.Create;
+<span class="orange">import</span> org.basex.core.proc.Proc;
+<span class="orange">import</span> org.basex.data.Data;
+<span class="orange">import</span> org.basex.data.Nodes;
+<span class="orange">import</span> org.basex.data.Result;
+<span class="orange">import</span> org.basex.io.ConsoleOutput;
+<span class="orange">import</span> org.basex.io.PrintOutput;
+<span class="orange">import</span> org.basex.query.QueryException;
+<span class="orange">import</span> org.basex.query.QueryProcessor;
+<span class="orange">import</span> org.basex.query.xpath.XPathProcessor;
+
+<span class="comment">/**
+ * This class serves an example for executing XPath requests.
+ */</span>
+<span class="orange">public final class</span> XPathExample {
+<span class="comment">  /** Input XML file. */</span>
+<span class="orange">  private static final</span> String XMLFILE = <span class="red">"input.xml"</span>;
+<span class="comment">  /** Name of the resulting database. */</span>
+<span class="orange">  private static final</span> String DBNAME = <span class="red">"input"</span>;
+<span class="comment">  /** Sample query. */</span>
+<span class="orange">  private static final</span> String QUERY = <span class="red">"//li"</span>;
+<span class="comment">  /** Result file. */</span>
+<span class="orange">  private static final</span> String RESULT = <span class="red">"result.txt"</span>;
+
+<span class="comment">  /** Private constructor. */</span>
+<span class="orange">  private</span> XPathExample() { }
+
+<span class="comment">   /**
+   * Main method of the example class.
+   * @param args (ignored) command-line arguments
+   * @throws Exception exception
+   */</span>
+  <span class="orange">public static void</span> main(<span class="orange">final</span> String[] args) <span class="orange">throws</span> Exception {
+<span class="comment">    // First example, creating a database and
+    // writing the query result to RESULT:</span>
+    System.out.println(<span class="red">"First example, writing result to "</span> + RESULT + <span class="red">":"</span>);
+
+<span class="comment">    // execute the specified command</span>
+    Proc.execute(Commands.CREATEXML, XMLFILE);
+<span class="comment">    // writing result as well-formed XML</span>
+    Proc.execute(Commands.SET, <span class="red">"xmloutput on"</span>);
+
+<span class="comment">    // create a process for the XPath command </span>
+    <span class="orange">final</span> Proc proc = Proc.get(Commands.XPATH, QUERY);
+
+<span class="comment">    // create standard output stream</span>
+    <span class="orange">final</span> PrintOutput file = <span class="orange">new</span> PrintOutput(<span class="orange">new</span> FileOutputStream(RESULT));
+
+<span class="comment">    // launch process</span>
+    <span class="orange">if</span>(proc.execute()) {
+<span class="comment">      // successful execution: print result</span>
+      proc.output(file);
+    } <span class="orange">else</span> {
+<span class="comment">      // execution failed: print result</span>
+      proc.info(file);
+    }
+<span class="comment">    // close output stream</span>
+    file.close();
+    System.out.println();
+
+<span class="comment">    // SECOND EXAMPLE:</span>
+    System.out.println(<span class="red">"Second example, writing result to standard output:"</span>);
+
+<span class="comment">    // Execute XPath request</span>
+    <span class="orange">try</span> {
+<span class="comment">      // create new database; "input" = database name, "input.xml" = source doc.</span>
+      <span class="orange">final</span> Data data = Create.xml(DBNAME, XMLFILE);
+
+<span class="comment">      // create query instance</span>
+      <span class="orange">final</span> QueryProcessor xpath = <span class="orange">new</span> XPathProcessor(QUERY);
+<span class="comment">      // create context set, referring to the root node (0)</span>
+      <span class="orange">final</span> Nodes nodes = <span class="orange">new</span> Nodes(0, data);
+<span class="comment">      // execute query</span>
+      <span class="orange">final</span> Result result = xpath.query(nodes);
+
+<span class="comment">      // print output to file</span>
+      <span class="orange">final</span> ConsoleOutput console = <span class="orange">new</span> ConsoleOutput(System.out);
+      result.serialize(console, <span class="orange">false</span>);
+      console.flush();
+    } <span class="orange">catch</span>(<span class="orange">final</span> QueryException e) {
+<span class="comment">      // dump stack trace</span>
+      e.printStackTrace();
+    }
+  }
+}
+  </code>
+
+  <code name="code-xquery"><span class="orange">package</span> org.basex.test.examples;
+
+<span class="orange">import</span> org.basex.core.Commands;
+<span class="orange">import</span> org.basex.core.proc.Proc;
+<span class="orange">import</span> org.basex.data.Result;
+<span class="orange">import</span> org.basex.io.ConsoleOutput;
+<span class="orange">import</span> org.basex.query.QueryException;
+<span class="orange">import</span> org.basex.query.QueryProcessor;
+<span class="orange">import</span> org.basex.query.xquery.XQueryProcessor;
+
+<span class="comment">/**
+ * This class serves an example for executing XQuery requests.
+ */</span>
+<span class="orange">public final</span> class XQueryExample {
+<span class="comment">  /** Sample query. */</span>
+  <span class="orange">private static final</span> String QUERY = <span class="red">"<xml>This is a test</xml>/text()"</span>;
+
+<span class="comment">  /** Private constructor. */</span>
+  <span class="orange">private</span> XQueryExample() }
+<span class="comment">  /**
+   * Main method of the example class.
+   * @param args (ignored) command-line arguments
+   * @throws Exception exception
+   */</span>
+  <span class="orange">public static void</span> main(<span class="orange">final</span> String[] args) <span class="orange">throws</span> Exception {
+
+<span class="comment">    // FIRST EXAMPLE:</span>
+    System.out.println(<span class="red">"First example:"</span>);
+
+<span class="comment">    // create standard output stream</span>
+    <span class="orange">final</span> ConsoleOutput out = <span class="orange">new</span> ConsoleOutput(System.out);
+
+<span class="comment">    // Create a BaseX process</span>
+    <span class="orange">final</span> Proc proc = Proc.get(Commands.XQUERY, QUERY);
+<span class="comment">    // launch process</span>
+    <span class="orange">if</span>(proc.execute()) {
+<span class="comment">      // successful execution: print result</span>
+      proc.output(out);
+    } <span class="orange">else</span> {
+<span class="comment">      // execution failed: print result</span>
+      proc.info(out);
+    }
+    out.flush();
+    System.out.println();
+
+<span class="comment">    // SECOND EXAMPLE (ALTERNATIVE):</span>
+    System.out.println(<span class="red">"Second example:"</span>);
+
+<span class="comment">    // Execute XQuery request</span>
+    <span class="orange">try</span> {
+<span class="comment">      // create query instance</span>
+      <span class="orange">final</span> QueryProcessor xquery = <span class="orange">new</span> XQueryProcessor(QUERY);
+<span class="comment">      // execute query; no initial context set is specified (null)</span>
+      <span class="orange">final</span> Result result = xquery.query(null);
+<span class="comment">      // print output</span>
+      result.serialize(out, <span class="orange">false</span>);
+      out.println();
+    } <span class="orange">catch</span>(<span class="orange">final</span> QueryException e) {
+<span class="comment">      // dump stack trace</span>
+      e.printStackTrace();
+    }
+
+<span class="comment">    // close output stream</span>
+    out.close();
+  }
+}
+  </code>
+
+</basex>

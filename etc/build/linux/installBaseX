@@ -1,0 +1,147 @@
+#!/usr/local/bin/bash
+
+### BaseX installation shell script
+###
+### Version: Mon 2006-Jul-17 15:24:47 CEST
+### Author: Stefan Klinger <klinger@inf.uni-konstanz.de>
+
+error () {
+  echo "installBaseX: $*";
+  exit 1;
+}
+
+ask-yn () {
+  local answer='';
+  until test "$answer"; do
+    read -s -p "${1} [yn]:" -n 1 answer;
+    if test "$answer" = y; then
+      echo ' yes';
+      return 0;
+    elif test "$answer" = n; then
+      echo ' no';
+      return 1;
+    else
+      answer='';
+      echo ' yes or no?';
+    fi;
+  done;
+}
+
+runDir="$PWD";
+
+cat <<EOF
+=====================================================================
+
+A 'basex' directory is checked out from subversion on phobos29. Then
+the sources are compiled: The class files are created below
+'basex/bin', documentation goes to 'basex/doc'.
+
+Choose where to put the 'basex' directory. You may specify a relative
+or absolute path. Default is the current directory.
+
+EOF
+
+if test "${1}"; then srcDir="${1}"; else srcDir="${runDir}"; fi;
+while test "${srcDir:0-1:1}" = '/'; do srcDir=${srcDir:0:${#srcDir}-1}; done;
+
+read -p "Directory for download and installation [$srcDir]: " answer;
+if test "$answer"; then
+  
+  ### substitute leading "~" with home directory
+  answer="${answer/#~/${HOME}}";
+
+  if test "${answer:0:1}" = '/'; then
+    srcDir="$answer";
+  else
+    srcDir="${srcDir}/${answer}";
+  fi;
+  
+fi;
+
+### remove trailing slashes from srcDir
+while test "${srcDir:0-1:1}" = '/'; do srcDir=${srcDir:0:${#srcDir}-1}; done;
+
+test -d  "$srcDir" || mkdirhier "$srcDir";
+
+pushd "$srcDir";
+
+if test -e "basex"; then
+  cat <<EOF
+---------------------------------------------------------------------
+
+There is a 'basex' directory already. This might be an old
+installation. You have to remove it, or cancel installation and
+choose another target directory.
+
+EOF
+  ask-yn "Remove existing basex?" || exit;
+  rm -rf "basex";
+fi;
+
+test -e basex && error "There still is a 'basex' in this directory.";
+
+svn co https://phobos29.inf.uni-konstanz.de/svn/basex/trunk/basex || error "svn checkout failed";
+
+pushd basex || error "could not find basex directory";
+make || error "make failed";
+popd;
+
+if test -e 'src'; then
+  echo "'src' already exists in ${srcDir}; no symlink created";
+else
+cat <<EOF
+---------------------------------------------------------------------
+
+For convenience I can create a symlink
+
+  src -> basex/org/basex
+  
+next to the basex directory. You will most likely operate in that
+subirectory.
+
+EOF
+  ask-yn "create 'src' symlink to source subdir?" && ln -s basex/src/org/basex src;
+fi;
+
+popd;
+
+cat <<EOF
+---------------------------------------------------------------------
+
+NOTE
+
+ *  You may use the convenience scripts 'basex(c|s|w)' from the
+    tools/linux directory for launching the standalone (basexc), the
+    gui (basexw), or the client/server (basexs/basexc) versions.
+    Note, however, that the CLASSPATH in those convenience scripts
+    has to be adapted to your needs if you don't add
+      ${srcDir}/basex/bin
+    to your global CLASSPATH.
+
+ *  Also have a look at the Emacs interface from the tools directory.
+ 
+ *  Class documentation is in
+      ${srcDir}/basex/doc/index.html
+ 
+EOF
+
+if cmp "$0" "${srcDir}/basex/tools/linux/installBaseX" >/dev/null 2>&1; then
+  cat<<EOF
+ *  Your version of installBaseX seems to be up to date.
+ 
+EOF
+else
+  cat<<EOF
+
+IMPORTANT
+  The version of installBaseX you just used seems to be different
+  from the one available in
+  
+    ${srcDir}/basex/tools .
+    
+ Generally this should not be a problem. Just consider updating
+ before your next Installation.
+
+=====================================================================
+EOF
+fi;

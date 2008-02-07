@@ -1,0 +1,351 @@
+package org.basex.data;
+
+import org.basex.BaseX;
+import org.basex.index.Index;
+import org.basex.index.MemValues;
+import org.basex.index.Names;
+import org.basex.io.PrintOutput;
+import org.basex.util.Array;
+import org.basex.util.Token;
+import org.basex.query.xpath.expr.FTOption;
+
+/**
+ * This class stores and organizes the database table and the index structures
+ * for textual content in a compressed memory structure.
+ * Each node occupies 64 bits. The current storage layout looks like follows:
+ * 
+ * <pre>
+ * ELEMENTS:
+ * - Bit 0-2   : Node kind (TAG)
+ * - Bit 3-7   : Number of attributes
+ * - Byte  1- 3: Number of descendants (size)
+ * - Byte  4   : Tag Reference
+ * - Byte  5- 7: Relative parent reference
+ * TEXT NODES:
+ * - Byte     0: Node kind (TEXT/PI/COMM)
+ * - Byte  0- 3: Text reference
+ * - Byte  4- 7: Parent Reference
+ * ATTRIBUTE NODES:
+ * - Byte     0: Node kind (ATTR)
+ * - Byte     1: Attribute name reference
+ * - Byte     2: Relative parent reference
+ * - Byte  4- 7: Attribute value Reference
+ * </pre>
+ *
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Christian Gruen
+ */
+public class MemData extends Data {
+  /** Value array. */
+  private long[] val;
+
+  /**
+   * Constructor.
+   * @param cap initial array capacity
+   * @param tag tag index
+   * @param att attribute name index
+   */
+  public MemData(final int cap, final Names tag, final Names att) {
+    val = new long[cap];
+    txtindex = new MemValues();
+    atvindex = new MemValues();
+    tags = tag;
+    atts = att;
+  }
+
+  @Override
+  public void flush() { }
+
+  @Override
+  public void close() { }
+
+  @Override
+  public void closeIndex(final Index.TYPE index) { }
+
+  @Override
+  public void openIndex(final Index.TYPE type, final Index ind) { }
+
+  @Override
+  public final int kind(final int pre) {
+    return (int) (val[pre] >>> 61);
+  }
+
+  @Override
+  public final int parent(final int pre, final int kind) {
+    return pre - (int) (val[pre] & 0xFFFFFF);
+  }
+
+  @Override
+  public final int size(final int pre, final int kind) {
+    return kind == ELEM || kind == DOC ? (int) (val[pre] >> 32 & 0xFFFFFF) : 1;
+  }
+
+  @Override
+  public final int tagID(final int pre) {
+    return (int) (val[pre] >>> 24) & 0xFF;
+  }
+
+  @Override
+  public final int attSize(final int pre, final int kind) {
+    return kind == ELEM ? (int) (val[pre] >> 56 & 0x1F) : 1;
+  }
+
+  @Override
+  public final int attNameID(final int pre) {
+    return (int) (val[pre] >>> 24) & 0xFF;
+  }
+
+  @Override
+  public final byte[] text(final int pre) {
+    return textToken((int) (val[pre] >> 32) & 0x1FFFFFFF);
+  }
+
+  @Override
+  public byte[] text(final int pre, final int off, final int len) {
+    BaseX.notimplemented();
+    return null;
+  }
+
+  @Override
+  public final int id(final int pre) {
+    return pre;
+  }
+
+  @Override
+  public final int pre(final int id) {
+    return id;
+  }
+
+  @Override
+  public final double textNum(final int pre) {
+    return Token.toDouble(text(pre));
+  }
+
+  @Override
+  public final byte[] attValue(final int pre) {
+    return attToken((int) (val[pre] >> 32) & 0x1FFFFFFF);
+  }
+
+  @Override
+  public final double attNum(final int pre) {
+    return Token.toDouble(attValue(pre));
+  }
+
+  @Override
+  public final int textLen(final int pre) {
+    return text(pre).length;
+  }
+
+  @Override
+  public final int attLen(final int pre) {
+    return attValue(pre).length;
+  }
+
+  /**
+   * Returns the id for the specified attribute value.
+   * @param v attribute value
+   * @return id
+   */
+  public final int attID(final byte[] v) {
+    return ((MemValues) atvindex).get(v);
+  }
+
+  /**
+   * Returns the index value for the specified attribute value id.
+   * @param id index id
+   * @return value
+   */
+  public final byte[] attToken(final int id) {
+    return ((MemValues) atvindex).token(id);
+  }
+
+  /**
+   * Indexes the specified attribute value and returns the index reference.
+   * @param t attribute value
+   * @return index reference
+   */
+  protected final int attIndex(final byte[] t) {
+    return ((MemValues) atvindex).index(t, size);
+  }
+
+  /**
+   * Indexes the specified text node and returns the index reference.
+   * @param t text node
+   * @return index reference
+   */
+  protected final int textIndex(final byte[] t) {
+    return ((MemValues) txtindex).index(t, size);
+  }
+
+  /**
+   * Returns the index value for the specified index id.
+   * @param id index id
+   * @return value
+   */
+  public final byte[] textToken(final int id) {
+    return ((MemValues) txtindex).token(id);
+  }
+
+  /**
+   * Convenience method for adding an element.
+   * @param t tag
+   * @param d distance
+   * @param a number of attributes
+   * @param s node size
+   * @param k node kind
+   */
+  public final void addElem(final byte[] t, final int d, final int a,
+      final int s, final int k) {
+    addElem(tags.index(t), d, a, s, k);
+  }
+
+  /**
+   * Adds an element.
+   * @param t tag
+   * @param d distance
+   * @param a number of attributes
+   * @param s node size
+   * @param k node kind
+   */
+  public final void addElem(final int t, final int d, final int a, final int s,
+      final int k) {
+
+    check();
+    val[size++] = ((long) k << 61) + ((long) a << 56) + ((long) s << 32) +
+      ((long) t << 24) + d;
+  }
+
+  /**
+   * Adds an attribute.
+   * @param a attribute name
+   * @param v attribute value
+   * @param d distance
+   */
+  public final void addAtt(final int a, final byte[] v, final int d) {
+    check();
+    final long ai = attIndex(v);
+    val[size++] = ((long) Data.ATTR << 61) + (ai << 32) + ((long) a << 24) + d;
+  }
+
+  /**
+   * Adds a text node.
+   * @param t text to be added
+   * @param d distance
+   * @param k node kind
+   */
+  public final void addText(final byte[] t, final int d, final int k) {
+    check();
+    final long ti = textIndex(t);
+    val[size++] = ((long) k << 61) + (ti << 32) + d;
+  }
+
+  /**
+   * Adds the size value to the table.
+   * @param pre closing pre tag
+   */
+  public final void finishTag(final int pre) {
+    val[pre] = (val[pre] & 0xFF000000FFFFFFFFL) + ((long) (size - pre) << 32);
+  }
+
+  /**
+   * Copies some data.
+   * @param d data reference
+   * @param p position
+   */
+  public final void append(final MemData d, final int p) {
+    check();
+    val[size++] = d.val[p];
+  }
+
+  /**
+   * Convenience method for adding an attribute.
+   * @param a attribute name
+   * @param v attribute value
+   * @param p parent
+   */
+  public final void addAtt(final byte[] a, final byte[] v, final int p) {
+    addAtt(atts.index(a), v, p);
+  }
+
+  /**
+   * Inserts a data instance at the specified position.
+   * Attention: get sure that both data instances are based on the same
+   * indexes as the references are simply copied and not checked at all...
+   * @param d data instance
+   * @param pos insertion position
+   */
+  public final void insert(final MemData d, final int pos) {
+    final int s = d.size;
+    while(size + s >= val.length) val = Array.extend(val);
+
+    check();
+    System.arraycopy(val, pos, val, pos + s, size - pos);
+    System.arraycopy(d.val, 0, val, pos, s);
+    size += s;
+  }
+
+  /**
+   * Checks the array sizes.
+   */
+  private void check() {
+    if(size == val.length) val = Array.extend(val);
+  }
+
+  @Override
+  public int[][] ftIDs(final byte[] word, final FTOption ftOption) {
+    BaseX.notimplemented();
+    return null;
+  }
+
+  @Override
+  public int[][] ftIDRange(final byte[] word0, final boolean iword0, 
+      final byte[] word1, final boolean iword1) {
+    BaseX.notimplemented();
+    return null;
+  }
+
+  @Override
+  public final int nrFTIDs(final byte[] token) {
+    BaseX.notimplemented();
+    return 0;
+  }
+
+  @Override
+  public final void info(final PrintOutput out) {
+    BaseX.notimplemented();
+  }
+
+  @Override
+  public final void delete(final int pre) {
+    BaseX.noupdates();
+  }
+
+  @Override
+  public final void update(final int pre, final byte[] attName,
+      final byte[] attValue) {
+    BaseX.noupdates();
+  }
+
+  @Override
+  public final void insert(final int pre, final int par, final byte[] tag,
+      final byte kind) {
+    BaseX.noupdates();
+  }
+
+  @Override
+  public void insert(final int pre, final int par, final byte[] name,
+      final byte[] v) {
+    BaseX.noupdates();
+  }
+
+  @Override
+  public final void insert(final int pre, final int par, final Data d) {
+    BaseX.noupdates();
+  }
+
+  @Override
+  public final void update(final int pre, final byte[] text) {
+    BaseX.noupdates();
+  }
+}
+

@@ -1,0 +1,460 @@
+package org.basex.gui.view;
+
+import static org.basex.Text.*;
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.util.StringTokenizer;
+import org.basex.BaseX;
+import org.basex.gui.GUI;
+import org.basex.gui.GUIProp;
+import org.basex.gui.GUIConstants;
+import org.basex.gui.GUIConstants.FILL;
+import org.basex.gui.layout.BaseXBack;
+import org.basex.gui.layout.BaseXLayout;
+import org.basex.util.Performance;
+
+/**
+ * This class manages all visible and invisible views and allows drag and
+ * drop operations inside the panel.
+ *
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Christian Gruen
+ */
+public final class ViewContainer extends BaseXBack implements Runnable {
+  /** Dragging stroke. */
+  private static final BasicStroke STROKE = new BasicStroke(2);
+  /** Thread counter. */
+  private static final int[] STEPS = {
+    100, 90, 81, 72, 74, 66, 59, 52, 46, 40, 35, 30, 26, 22, 19, 16,
+    14, 12, 10, 8, 7, 6, 5, 4, 3, 2, 2, 1, 1, 1, 0, 0
+  };
+  /** Thread counter. */
+  private int count;
+
+  /** Orientation enumerator. */
+  private enum Target {
+    /** North orientation. */ NORTH,
+    /** West orientation.  */ WEST,
+    /** East orientation.  */ EAST,
+    /** South orientation. */ SOUTH
+  };
+
+  /** States if component was moved out of the window. */
+  private boolean out;
+  /** View Layout. */
+  private ViewAlignment layout;
+  /** View panels. */
+  private final ViewPanel[][] panels;
+  /** View Array. */
+  private ViewPanel[] views;
+  /** Source View. */
+  private ViewPanel source;
+  /** Target View. */
+  private ViewPanel target;
+  /** Logo reference. */
+  private final Image logo;
+  /** Target orientation. */
+  private Target orient;
+  /** Temporary mouse position. */
+  private Point sp;
+  /** Temporary rectangle position. */
+  private int[] pos = new int[4];
+
+  /**
+   * Constructor.
+   * @param p panels
+   */
+  public ViewContainer(final ViewPanel[][] p) {
+    setMode(FILL.PLAIN);
+    setLayout(new BorderLayout());
+    logo = GUI.image(GUIConstants.IMGLOGO);
+    panels = p;
+  }
+
+  /**
+   * Sets the specified views.
+   * @param db database flag
+   */
+  public void setViews(final boolean db) {
+    views = panels[db ? 1 : 0];
+
+    // build layout or use default if something goes wrong
+    if(db) {
+      if(!buildLayout(GUIProp.layoutopened))
+        buildLayout(GUIConstants.LAYOUTOPENED);
+    } else {
+      if(!buildLayout(GUIProp.layoutclosed))
+        buildLayout(GUIConstants.LAYOUTCLOSED);
+    }
+  }
+
+  /**
+   * Updates and validates the views.
+   */
+  public void updateViews() {
+    removeAll();
+    layout.setVisibility();
+    layout.createView(this);
+    validate();
+    repaint();
+
+    String lay = layout.layoutString();
+    if(views == panels[0]) GUIProp.layoutclosed = lay;
+    else GUIProp.layoutopened = lay;
+  }
+
+  /** {@inheritDoc} */
+  public void run() {
+    Performance.sleep(1000);
+    while(++count < STEPS.length - 1) {
+      Performance.sleep(20);
+      repaint();
+    }
+  }
+
+  @Override
+  public void paintComponent(final Graphics g) {
+    super.paintComponent(g);
+    if(GUI.context.db()) return;
+
+    final int w = getWidth();
+    final int h = getHeight();
+    final int hh = Math.max(320, Math.min(700, h));
+    final Insets i = getInsets();
+    BaseXLayout.fill(g, FILL.DOWN, i.left, i.top, w - i.right, h - i.bottom);
+    if(w < 140 || h < 130) return;
+
+    BaseXLayout.antiAlias(g);
+
+    final int lw = logo.getWidth(this);
+    final int lh = logo.getHeight(this);
+
+    int y = lh + 100;
+    StringTokenizer st = new StringTokenizer(WELCOMETEXT, NL);
+    while(st.hasMoreTokens()) { st.nextToken(); y += 20; }
+    y = (hh - y) / 2;
+
+    g.drawImage(logo, (w - lw) / 2, y, this);
+    if(w < 250 || h < 260) return;
+
+    y -= STEPS[count] * hh / 200;
+
+    g.setColor(Color.black);
+    g.setFont(new Font(GUIProp.font, 0, 22));
+    y += 30 + lh + STEPS[count] * (hh - y) / 80;
+    BaseXLayout.drawCenter(g, WELCOME, w, y);
+    final int fh = 14;
+    g.setFont(new Font(GUIProp.font, 0, fh));
+
+    y += 10;
+    st = new StringTokenizer(WELCOMETEXT, NL);
+    while(st.hasMoreTokens()) {
+      BaseXLayout.drawCenter(g, st.nextToken(), w, y += fh + 4);
+    }
+  }
+
+  /**
+   * Drags the current view.
+   * @param panel panel to be dragged
+   * @param p absolute mouse position
+   */
+  void dragPanel(final ViewPanel panel, final Point p) {
+    source = panel;
+    sp = p;
+    calc();
+    repaint();
+  }
+
+  /**
+   * Drops a view and reorganizes the layout.
+   */
+  void dropPanel() {
+    if(source == null) return;
+
+    if(out) {
+      source.remove();
+    } else if(orient != null) {
+      if(layout.remove(source) && !(layout.comp[0] instanceof ViewPanel))
+        layout = (ViewAlignment) layout.comp[0];
+
+      if(target == null) layout = addView(layout);
+      else add(layout);
+      updateViews();
+    }
+    source = null;
+    repaint();
+  }
+
+  /**
+   * Re-adds the dragged view.
+   * @param lay layout instance
+   * @return true if component was successfully added
+   */
+  private boolean add(final ViewAlignment lay) {
+    for(int o = 0; o < lay.comp.length; o++) {
+      final ViewLayout comp = lay.comp[o];
+      if(comp instanceof ViewAlignment) {
+        if(add((ViewAlignment) comp)) return true;
+      } else if(comp == target) {
+        final boolean west = orient == Target.WEST;
+        final boolean east = orient == Target.EAST;
+
+        if(orient == Target.NORTH || west) {
+          if(lay.horiz == west) {
+            lay.add(source, o);
+          } else {
+            final ViewAlignment l = new ViewAlignment(west);
+            l.add(source);
+            l.add(target);
+            lay.comp[o] = l;
+          }
+        } else if(orient == Target.SOUTH || east) {
+          if(lay.horiz == east) {
+            lay.add(source, o + 1);
+          } else {
+            final ViewAlignment l = new ViewAlignment(east);
+            l.add(target);
+            l.add(source);
+            lay.comp[o] = l;
+          }
+        }
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Adds the dragged view into the specified layout instance.
+   * @param lay layout instance
+   * @return resulting layout
+   */
+  private ViewAlignment addView(final ViewAlignment lay) {
+    final boolean west = orient == Target.WEST;
+    final boolean east = orient == Target.EAST;
+    ViewAlignment l = lay;
+
+    if(orient == Target.NORTH || west) {
+      if(l.horiz == west) {
+        l.add(source, 0);
+      } else {
+        final ViewAlignment ll = new ViewAlignment(west);
+        ll.add(source);
+        ll.add(l);
+        l = ll;
+      }
+    } else if(orient == Target.SOUTH || east) {
+      if(l.horiz == east) {
+        l.add(source);
+      } else {
+        final ViewAlignment ll = new ViewAlignment(east);
+        ll.add(l);
+        ll.add(source);
+        l = ll;
+      }
+    }
+    return l;
+  }
+
+  /**
+   * Returns the view specified by its internal name. The view names
+   * are specified at the top of {@link GUIConstants}.
+   * @param name name of the view
+   * @return found view container
+   */
+  public ViewPanel getView(final String name) {
+    for(final ViewPanel view : views) {
+      if(view.toString().equals(name)) return view;
+    }
+    BaseX.debug("ViewContainer.getView: Unknown view \"%\"", name);
+    return null;
+  }
+
+  /**
+   * Finds the view under the mouse position and returns it as possible
+   * target for dropping the dragged view.
+   * @return view container
+   */
+  private ViewPanel getTarget() {
+    for(final ViewPanel view : views) {
+      if(view.isVisible() && new Rectangle(absoluteLocation(view),
+          view.getSize()).contains(sp)) return view;
+    }
+    return null;
+  }
+
+  /**
+   * Calculate absolute location for the specified point and component.
+   * @param comp component
+   * @return absolute location
+   */
+  private Point absoluteLocation(final Component comp) {
+    Component c = comp;
+    final Point p = c.getLocation();
+    do {
+      c = c.getParent();
+      p.x += c.getX();
+      p.y += c.getY();
+    } while(c.getParent() != this);
+    return p;
+  }
+
+
+  @Override
+  public void paint(final Graphics g) {
+    super.paint(g);
+    if(source == null) return;
+
+    out = sp.x < 0 || sp.y < 0 || sp.x > getWidth() || sp.y > getHeight();
+
+    final Point p = absoluteLocation(source);
+    ((Graphics2D) g).setStroke(STROKE);
+
+    if(!out) {
+      g.setColor(GUIConstants.COLORS[10]);
+      g.drawRect(p.x, p.y, source.getWidth() - 1, source.getHeight() - 1);
+    }
+    final int ac = AlphaComposite.SRC_OVER;
+    if(out) {
+      g.setColor(GUIConstants.colormark3);
+      ((Graphics2D) g).setComposite(AlphaComposite.getInstance(ac, 0.3f));
+      g.fillRect(p.x, p.y, source.getWidth(), source.getHeight());
+    } else if(orient != null) {
+      g.setColor(GUIConstants.COLORS[16]);
+      g.drawRect(pos[0], pos[1], pos[2] - 1, pos[3] - 1);
+      ((Graphics2D) g).setComposite(AlphaComposite.getInstance(ac, 0.3f));
+      g.setColor(GUIConstants.COLORS[8]);
+      g.fillRect(pos[0], pos[1], pos[2], pos[3]);
+    }
+  }
+  
+  /**
+   * Calculates the target position.
+   */
+  private void calc() {
+    final int hh = getHeight();
+    final int ww = getWidth();
+
+    pos[0] = 1;
+    pos[1] = 1;
+    pos[2] = ww - 2;
+    pos[3] = hh - 2;
+
+    orient = null;
+    target = getTarget();
+
+    // paint panel which is currently moved somewhere else
+    if(target != null && target != source) {
+      final Rectangle tr = new Rectangle(absoluteLocation(target),
+          target.getSize());
+      final int minx = tr.width >> 1;
+      final int miny = tr.height >> 1;
+
+      if(Math.abs(tr.x + tr.width / 2 - sp.x) < tr.width / 3) {
+        if(sp.y > tr.y && sp.y < tr.y + miny) {
+          pos[0] = tr.x;
+          pos[1] = tr.y;
+          pos[2] = tr.width;
+          pos[3] = miny;
+          orient = Target.NORTH;
+        } else if(sp.y > tr.y + tr.height - miny && sp.y < tr.y + tr.height) {
+          pos[0] = tr.x;
+          pos[1] = tr.y + tr.height - miny;
+          pos[2] = tr.width;
+          pos[3] = miny;
+          orient = Target.SOUTH;
+        }
+      } else if(Math.abs(tr.y + tr.height / 2 - sp.y) < tr.height / 3) {
+        if(sp.x > tr.x && sp.x < tr.x + minx) {
+          pos[0] = tr.x;
+          pos[1] = tr.y;
+          pos[2] = minx;
+          pos[3] = tr.height;
+          orient = Target.WEST;
+        } else if(sp.x > tr.x + tr.width - minx && sp.x < tr.x + tr.width) {
+          pos[0] = tr.x + tr.width - minx;
+          pos[1] = tr.y;
+          pos[2] = minx;
+          pos[3] = tr.height;
+          orient = Target.EAST;
+        }
+      }
+    }
+
+    if(orient == null) {
+      final int minx = ww >> 2;
+      final int miny = hh >> 2;
+      target = null;
+      if(sp.y < miny) {
+        pos[3] = miny;
+        orient = Target.NORTH;
+      } else if(sp.y > hh - miny) {
+        pos[3] = miny;
+        pos[1] = hh - miny;
+        orient = Target.SOUTH;
+      } else if(sp.x < minx) {
+        pos[2] = minx;
+        orient = Target.WEST;
+      } else if(sp.x > ww - minx) {
+        pos[2] = minx;
+        pos[0] = ww - minx;
+        orient = Target.EAST;
+      }
+    }
+  }
+
+  /**
+   * Builds the view layout by parsing the layout string.
+   * @param cnstr layout string
+   * @return true if everything went alright
+   */
+  private boolean buildLayout(final String cnstr) {
+    try {
+      int nv = 0;
+      layout = null;
+      int lvl = -1;
+      final ViewAlignment[] l = new ViewAlignment[16];
+      final StringTokenizer st = new StringTokenizer(cnstr);
+      while(st.hasMoreTokens()) {
+        final String t = st.nextToken();
+        if(t.equals("H") || t.equals("V")) {
+          l[lvl + 1] = new ViewAlignment(t.equals("H"));
+          if(layout == null) {
+            layout = l[0];
+          } else {
+            l[lvl].add(l[lvl + 1]);
+          }
+          lvl++;
+        } else if(t.equals("-")) {
+          lvl--;
+        } else {
+          final ViewPanel view = getView(t);
+          if(view == null) return false;
+          l[lvl].add(view);
+          nv++;
+        }
+      }
+      if(nv < views.length) {
+        BaseX.debug("ViewContainer.buildLayout: Views are missing in " +
+            "layout (\"" + cnstr + "\").");
+        return false;
+      }
+    } catch(final Exception e) {
+      BaseX.debug("ViewContainer.buildLayout: could not build layout " +
+          '(' + cnstr + ')');
+      e.printStackTrace();
+      return false;
+    }
+    return true;
+  }
+}

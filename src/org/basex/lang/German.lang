@@ -1,0 +1,327 @@
+# LANGUAGE FILE
+# The '%' character serves as dummy for internal replacements.
+
+# Start
+launch=Starte
+wait=Bitte Warten
+
+# Menu Commands
+m_file=Datei
+m_edit=Bearbeiten
+m_view=Ansicht
+m_options=Optionen
+m_help=Hilfe
+m_main=Hauptfenster
+m_views=Ansichten
+m_inter=Interaktion
+m_layout=Layout
+
+# Buttons
+b_ok=  OK  
+b_open=Öffnen
+b_cancel=Abbrechen
+b_drop=Löschen
+b_browse=Auswahl
+b_cmd=Befehl
+b_filter=Filtern
+b_simple=Einfach
+b_search=Suche
+
+# Status messages
+s_path=Pfad
+s_calcmap=Berechnung
+s_paintmap=Zeichnen
+s_ok=OK
+
+# Visualizations
+welcome1=Willkommen!
+welcome2=Eine kleine Einführung:\nKlicken Sie auf "Datei -> Neu..."\nund wählen Sie ein XML-Dokument aus.\nBestätigen Sie das folgende Dialogfenster\nund beachten Sie die Hilfe...
+text_clip=In Zwischenablage kopiert
+text_find=Finde
+table_no=Tabelle für aktuelle Daten nicht verfügbar
+map_binary=Binärdatei
+query_rt=Echtzeit-Filter
+
+# Dialog Windows
+d_info=Information
+d_fctitle=Verzeichnis
+
+dc_title=XML-Dokument öffnen
+dc_xmldesc=XML-Dokumente
+dc_advtitle=Datenbank-Optionen
+dc_advlabel=Auswahl der Datenbank-Optionen
+dc_chop=Whitespaces entfernen
+dc_entities=Parsen von Entities
+dc_txtindex=Text-Index erzeugen
+dc_attindex=Attribut-Index erzeugen
+dc_wordindex=Wort-Index erzeugen
+dc_ftindex=Volltext-Index erzeugen
+dc_mainmem=Hauptspeicher-Modus
+dc_chopinfo=Diese Option entfernt alle Whitespaces zwischen Tags und Textknoten
+dc_entitiesinfo=Unbekannte Entities können mit dieser Option ignoriert werden
+dc_txtinfo=Die Indexierung von Textknoten beschleunigt XPath-Anfragen
+dc_attinfo=Die Indexierung von Attributknoten beschleunigt XPath-Anfragen
+dc_wrdinfo=Wortbasierte XPath-Anfragen werden mit dieser Option beschleunigt
+dc_ftxinfo=Ein Volltext-Index beschleunigt XPath-FullText Anfragen
+dc_mminfo=Queries werden schneller ausgeführt, aber Updates sind deaktiviert
+
+do_title=Datenbank öffnen
+do_nodb=Es wurde keine Datenbank gefunden
+do_nodbquestion=Wollen Sie eine neue Datenbank erstellen?
+
+dfs_title=Filesystem-Import
+dfs_save=Speichern als
+dfs_dir=Verzeichnis
+dfs_all=Alles importieren
+dfs_allinfo=Import des kompletten Filesystems
+dfs_text=Verzeichnis & Name der Datenbank
+dfs_text1=Datei-Information & Meta-Daten
+dfs_text2=Datei-Inhalte
+dfs_types=Dateitypen
+dfs_maxinfo=Begrenze den Import auf eine maximale Dateigröße
+dfs_cont=Importiere Datei-Inhalte
+dfs_meta=Importiere Meta-Daten
+dfs_ftindex=Indexiere Dateiinhalte
+
+dd_title=Datenbank löschen
+dd_question=Die Datenbank '%' wird gelöscht.\nSind Sie sicher?
+
+dx_title=Knoten löschen
+dx_question=Sind Sie sicher?
+
+dp_title=Einstellungen
+dp_dbpath=Datenbank-Pfad
+dp_inter=GUI & Interaktionen
+dp_focus=Echtzeit Maus-Fokus
+dp_simplefd=Einfacher Datei-Dialog
+dp_names=Ersetze Tags durch @name-Attribute
+dp_lang=Sprache
+dp_langnew=...wird nach dem Neustart aktiv
+
+dn_title=Neue Daten einfügen
+dn_name=Name
+dn_value=Wert
+
+de_title=Daten bearbeiten
+de_text=% bearbeiten
+de_kind1=Root-Knoten
+de_kind2=Element
+de_kind3=Text
+de_kind4=Attribut
+de_kind5=Kommentar
+de_kind6=PI
+
+df_title=Schriftart
+df_aalias=Anti-Aliasing
+df_type1=Standard
+df_type2=Fett
+df_type3=Kursiv
+
+ds_title=Farbschema
+ds_red=Rot
+ds_green=Grün
+ds_blue=Blau
+
+dm_title=Map-Layout
+dm_simple=Einfaches Map-Layout
+dm_atts=Zeige Attribute
+dm_prop=Map-Proportionen
+dm_choice1=Keine Titel, keine Ränder
+dm_choice2=Keine Titel, minimale Ränder
+dm_choice3=Titel, keine Ränder
+dm_choice4=Titel, minimale Ränder
+dm_choice5=Titel, kleine Ränder
+dm_choice6=Titel, große Ränder
+
+di_title=Datenbank-Information
+di_index=Indizes
+di_build=Erstelle Indizes
+
+dz_title=Speicherverbrauch
+dz_total=Insgesamter Speicher
+dz_reserved=Reservierter Speicher
+dz_used=Genutzter Speicher
+dz_help=Der freie Speicher kann durch das\nJava-Flag -Xmx... erhöht werden.
+
+da_title=Info über
+da_license=BSD-Lizenz (ISC)
+da_dev=Hauptentwickler
+da_cont1=Team
+da_cont2=und viele andere
+
+c_about=Über
+c_abouttt=Zeigt allgemeine Projektinfos an.
+c_close=Schließen
+c_closett=Schließt die aktuelle Datenbank.
+c_color=Farben
+c_colortt=Stellt eine Farbpalette zur Auswahl.
+c_copy=Kopieren
+c_copytt=Kopiert die derzeit ausgewählten XML-Knoten.
+c_create=Neu
+c_creatett=Erzeugt eine Datenbank aus dem ausgewählten XML-Dokument.
+c_delete=Löschen
+c_deletett=Löscht XML-Knoten.
+c_drop=Löschen
+c_droptt=Löscht eine Datenbank.
+c_edit=Bearbeiten
+c_edittt=Bearbeitet den derzeit ausgewählten XML-Knoten.
+c_exit=Beenden
+c_exittt=Beendet die Anwendung.
+c_export=XML-Export
+c_exporttt=Exports die aktuelle Datenbank in ein XML-Dokument.
+c_filter=Filtern
+c_filtertt=Filtert die derzeit ausgewählten Knoten.
+c_fonts=Schriftart...
+c_fontstt=Stellt einen Schriftdialog zur Auswahl.
+c_full=Vollbild
+c_fulltt=Wechselt in den Vollbild-Modus.
+c_goback=Zurück
+c_gobacktt=Springt zurück zur vorherigen Anfrage.
+c_goforward=Weiter
+c_goforwardtt=Springt weiter zur nächsten Anfrage.
+c_goup=Hoch
+c_gouptt=Wechselt eine Ebene nach oben.
+c_importfs=Importiere Filesystem
+c_importfstt=Erstellt eine Datenbank aus der Filesystem-Struktur.
+c_info=Info
+c_infott=Zeigt Informationen über die aktuelle Datenbank an.
+c_inputmode=Befehlsmodus
+c_inputmodett=Wechselt zwischen dem Befehls- und Such-Modus.
+c_insert=Neu
+c_inserttt=Erzeugt einen neuen XML-Knoten.
+c_maplayout=Map-Layout...
+c_maplayouttt=Ändert das Map-Layout.
+c_open=Öffnen
+c_opentt=Öffnet eine Datenbank.
+c_paste=Einfügen
+c_pastett=Fügt zuvor kopierte Knoten in das Dokument ein.
+c_prefs=Einstellungen
+c_prefstt=Zeigt allgemeine Programmeinstellungen an.
+c_root=Wurzelknoten
+c_roottt=Springt zum Wurzelknoten des Dokuments.
+c_rtfilter=Echtzeit-Filter
+c_rtfiltertt=Wenn die Option aktiviert ist, werden Suchergebnisse automatisch gefiltert.
+c_select=Alles markieren
+c_selecttt=Wählt alle Wurzelknoten aus.
+c_showbuttons=Buttonleiste
+c_showbuttonstt=(De-)aktiviert die Buttonleiste.
+c_showhelp=Hilfe
+c_showhelptt=Zeigt die Hilfsansicht an. Diese Ansicht bietet interaktive Informationen über die derzeit ausgewählten Komponenten.
+c_showinfo=Suchinfo
+c_showinfott=Zeigt Informationen über die Anfrageausführung an.
+c_showinput=Eingabefeld
+c_showinputtt=(De-)aktiviert das Eingabefeld.
+c_showmap=Map
+c_showmaptt=Zeigt die TreeMap-Ansicht an.
+c_showmenu=Menü
+c_showmenutt=(De-)aktiviert die Menüleiste.
+c_showsearch=Suchen
+c_showsearchtt=Zeigt das Suchfenster an.
+c_showstatus=Statusleiste
+c_showstatustt=(De-)aktiviert die Statusleiste.
+c_showtable=Tabelle
+c_showtablett=Zeigt die tabellarische Ansicht an.
+c_showtext=Text
+c_showtexttt=Zeigt die Textansicht an.
+c_showtree=Baum
+c_showtreett=Zeigt die Baumansicht an.
+
+# Commands & Processes
+proc_time=Benötigte Zeit
+proc_syntax=Syntax
+proc_err='%' konnte nicht ausgeführt werden
+proc_nodb=Der Befehl benötigt eine Datenbank.
+proc_mm=Der Befehl ist im Hauptspeicher-Modus nicht verfügbar.
+cmd_unknown=Unbekannter Befehl "%"
+cmd_similar=Alternative: "%"
+cmd_ping=Verbindung erfolgreich.
+cmd_xmark=XMark-Anfrage muss zwischen 1 und 20 liegen.
+
+# Help Commands
+help_short="help" hilft weiter
+help_intro="help" zeigt die verfügbaren Befehle an.
+help_long=Detaillierte Infos: 'help [command]'.
+
+# Create Command
+pc_create=Datenbank wird erzeugt
+pc_index=Indizes werden erzeugt
+pc_update=Bitte erzeugen Sie eine neue Datenbank.
+pc_cancel=Der Prozess wurde abgebrochen.
+pc_indextxt=Indiziere Texte
+pc_indexatt=Indiziere Attribute
+pc_indexwrd=Indiziere Wörter
+pc_indexftx=Indiziere Volltext
+pc_parse=Knoten geparst
+pc_created=Datenbank erzeugt in %.
+pc_tbl=Tabelle erzeugt in %.
+pc_att=Attribute indiziert in %.
+pc_txt=Texte indiziert in %.
+pc_wrd=Wörter indiziert in %.
+pc_ftx=Volltext indiziert in %.
+pc_notfound=Die Datei "%" wurde nicht gefunden.
+pc_err="%" konnte nicht eingelesen werden.
+pc_pos=Zeile %, Spalte %
+
+# Database commands
+db_no=Datenbank '%' wurde nicht gefunden.
+db_open=Datenbank ist offen.
+db_nodb=Keine Datenbank im Speicher.
+db_closed=Datenbank wurde geschlossen.
+db_closeerr=Datenbank konnte nicht geschlossen werden.
+db_optimized=Databank optimiert in %.
+db_dropped=Datenbank wurde gelöscht.
+db_notdropped=Datenbank konnte nicht gelöscht werden.
+db_notopened=Datenbank konnte nicht geöffnet werden.
+db_opened=Datenbank geöffnet in %.
+db_exported=Database exportiert in %.
+
+# Index commands
+in_created=Index wurde erzeugt in %.
+in_err=Index konnte nicht erzeugt werden.
+in_dropped=Index wurde gelöscht.
+in_notdropped=Index konnte nicht gelöscht werden.
+
+# Console Info
+cs_local=Standalone
+cs_client=Client
+
+# Server Info
+srv_connect=Server ist nicht erreichbar.
+srv_port=Ungültige Port-Nummer: %
+srv_toomany=Zu viele Server-Anfragen.
+srv_bind=Server läuft, oder Zugriff wurde untersagt.
+srv_start=wurde gestartet.\nWartet auf Anfragen...
+srv_stop=wurde gestoppt.
+
+# Bye
+bye1=Schoenen Tag noch.
+bye2=Ciao.
+bye3=Bis dann.
+bye4=Viel Spass.
+
+# Query Commands
+qu_pars=Parsing
+qu_comp=Kompilierung
+qu_eval=Evaluation
+qu_time=Zeitmessung
+qu_result=Ergebnis
+qu_plan=Speichere Ausführungsplan in '%'...
+qu_hits=Treffer
+qu_ms=ms
+
+# Query Commands.. the following strings must have the same length
+qu_tabquery=Anfrage     
+qu_tabpars=Parsing     
+qu_tabcomp=Kompilierung
+qu_tabeval=Evaluation  
+qu_tabfinish=Abschluss   
+qu_tabprint=Ausgabe     
+qu_tabtotal=Gesamt      
+qu_tabmem=Speicher    
+qu_tabprinted=Gedruckt    
+qu_tabhits=Ergebnisse  
+
+# Help Texts
+h_filter=Die Suchtreffer können mit diesen Button gefiltert werden.
+h_queryrt=Wenn diese Checkbox aktiviert ist, werden Anfragen automatisch nach jedem Tastendruck ausgeführt.
+h_filterrt=Wenn diese Checkbox aktiviert ist, werden Anfragen automatisch nach jedem Tastendruck gefiltert.

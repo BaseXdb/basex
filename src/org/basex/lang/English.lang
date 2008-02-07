@@ -1,0 +1,328 @@
+# LANGUAGE FILE
+# The '%' character serves as dummy for internal replacements.
+
+# Start
+launch=Launching
+wait=Please Wait
+
+# Menu Commands
+m_file=File
+m_edit=Edit
+m_view=View
+m_options=Options
+m_help=Help
+m_main=Main Window
+m_views=Views
+m_inter=Interaction
+m_layout=Layout
+
+# Buttons
+b_ok=  OK  
+b_open= Open 
+b_cancel=Cancel
+b_drop=Drop
+b_cmd=Command
+b_browse=Browse
+b_filter=Filter
+b_simple=Simple
+b_search=Search
+
+# Status messages
+s_path=Path
+s_calcmap=Calculating Map
+s_paintmap=Painting
+s_ok=OK
+
+# Visualizations
+welcome1=Welcome!
+welcome2=The easiest way to get started:\nClick on "File -> New..." and choose\none of your XML documents on disk.\nNext, confirm the upcoming dialog\nwindow and check out the Help View...
+text_clip=Copied to Clipboard
+text_find=Find
+table_no=Table unavailable for this data
+map_binary=Binary File
+query_rt=Realtime Filtering
+
+# Dialog Windows
+d_info=Information
+d_fctitle=Choose Directory
+
+dc_title=Select XML document
+dc_xmldesc=XML Documents
+dc_advtitle=Database Options
+dc_advlabel=Choose some Database options
+dc_chop=Chop Whitespaces
+dc_entities=Parse Entities
+dc_attindex=Create Attribute Value Index
+dc_ftindex=Create Fulltext Index
+dc_txtindex=Create Text Index
+dc_wordindex=Create Word Index
+dc_mainmem=Main-Memory Mode
+dc_chopinfo=This option removes all whitespaces between tags and contents
+dc_entitiesinfo=Switch this option off to skip unknown entities
+dc_txtinfo=Text nodes can be indexed to speedup XPath queries
+dc_attinfo=Attribute values can be indexed to speedup XPath queries.
+dc_wrdinfo=All terms in text nodes are indexed to speedup word based queries
+dc_ftxinfo=A fulltext index can be created to speedup XPath Full-Text
+dc_mminfo=This mode speeds up querying, but updates are disabled
+
+do_title=Open Database
+do_nodb=No databases was found
+do_nodbquestion=Do you want to create a new one?
+
+dfs_title=Import Filesystem
+dfs_save=Save As
+dfs_dir=Directory
+dfs_all=Import All
+dfs_allinfo=Import complete filesystem
+dfs_text=Directory to import & name of database
+dfs_text1=File information & metadata
+dfs_text2=File contents
+dfs_types=File types
+dfs_maxinfo=Limit text inclusion to given size
+dfs_cont=Include textual file contents
+dfs_meta=Include metadata
+dfs_ftindex=Index file contents
+
+dd_title=Drop Database
+dd_question=Database '%' will be dropped.\nAre you sure?
+
+dx_title=Delete Nodes
+dx_question=Are you sure?
+
+dp_title=Preferences
+dp_dbpath=Database Path
+dp_inter=GUI & Interactions
+dp_focus=Realtime mouse focus
+dp_simplefd=Use simple file chooser
+dp_names=Replace tags with @name attributes
+dp_lang=Language
+dp_langnew=...requires a restart
+
+dn_title=Insert new data
+dn_name=Name
+dn_value=Value
+
+de_title=Edit data
+de_text=Edit %
+de_kind1=Root Node
+de_kind2=Element
+de_kind3=Text
+de_kind4=Attribute
+de_kind5=Comment
+de_kind6=PI
+
+df_title=Choose Font
+df_aalias=Anti-Aliasing
+df_type1=Standard
+df_type2=Bold
+df_type3=Italics
+
+ds_title=Color Schema
+ds_red=Red
+ds_green=Green
+ds_blue=Blue
+
+dm_title=Map Layout
+dm_simple=Simple Map Layout
+dm_atts=Show Attributes
+dm_prop=Map Proportions
+dm_choice1=No Title, no Borders
+dm_choice2=No Title, minimum Borders
+dm_choice3=Title, no Borders
+dm_choice4=Title, minimum Borders
+dm_choice5=Title, small Borders
+dm_choice6=Title, large Borders
+
+di_title=Database Information
+di_index=Indexes
+di_build=Building Indexes
+
+dz_title=Memory Usage
+dz_total=Total Memory
+dz_reserved=Reserved Memory
+dz_used=Used Memory
+dz_help=If memory is low, please launch\nBaseX with the Java flag -Xmx...
+
+da_title=About
+da_license=BSD license (ISC)
+da_dev=Main Developer
+da_cont1=Team
+da_cont2=and many others
+
+c_about=About
+c_abouttt=Displays general information on the project.
+c_close=Close
+c_closett=Closes the current database.
+c_color=Colors
+c_colortt=Allows to change the application colors.
+c_copy=Copy
+c_copytt=Copies the currently selected XML nodes.
+c_create=New
+c_creatett=Creates a database from the selected XML document.
+c_delete=Delete
+c_deletett=Deletes XML nodes.
+c_drop=Drop
+c_droptt=Drops a database.
+c_edit=Edit
+c_edittt=Edits XML nodes.
+c_exit=Exit
+c_exittt=Exits the application.
+c_export=Export XML
+c_exporttt=Exports the current database to an XML document.
+c_filter=Filter Selected
+c_filtertt=Filters the selected nodes.
+c_fonts=Fonts...
+c_fontstt=Allows to change the used fonts.
+c_full=Fullscreen
+c_fulltt=Switches to fullscreen.
+c_goback=Go Back
+c_gobacktt=Switch to the previously filtered query.
+c_goforward=Go Forward
+c_goforwardtt=Browse forward to the next query.
+c_goup=Go Up
+c_gouptt=Move one level up.
+c_importfs=Import Filesystem
+c_importfstt=Creates a database from the filesystem structure.
+c_info=Database Info
+c_infott=Show information on the currently opened database.
+c_inputmode=Command Mode
+c_inputmodett=Here you can toggle the command and search mode.
+c_insert=New
+c_inserttt=Creates a new XML node.
+c_maplayout=Map Layout...
+c_maplayouttt=Changes the map layout.
+c_open=Open
+c_opentt=Opens a database.
+c_paste=Paste
+c_pastett=Pastes previously copied nodes.
+c_prefs=Preferences
+c_prefstt=Displays general application preferences.
+c_root=Go Home
+c_roottt=Jumps to the root node.
+c_rtfilter=Realtime Filtering
+c_rtfiltertt=If this option is turned on, the query results are automatically filtered.
+c_select=Select All
+c_selecttt=Selects all root nodes.
+c_showbuttons=Buttons
+c_showbuttonstt=Switches the button bar on/off.
+c_showhelp=Help
+c_showhelptt=Shows the help view. which provides information on the currently focused component.
+c_showinfo=Query Info
+c_showinfott=Show the query info panel.
+c_showinput=Input Field
+c_showinputtt=Toggles the input field.
+c_showmap=Map
+c_showmaptt=Show the map visualization
+c_showmenu=Menu
+c_showmenutt=Switches the menu on/off.
+c_showsearch=Query Panel
+c_showsearchtt=Show the query panel.
+c_showstatus=Status Bar
+c_showstatustt=Switches the status bar on/off.
+c_showtable=Table
+c_showtablett=Show the table visualization.
+c_showtext=Text
+c_showtexttt=Show the text view.
+c_showtree=Tree
+c_showtreett=Show the tree visualization.
+
+# Commands & Processes
+proc_time=Time Needed
+proc_syntax=Syntax
+proc_err=Could not execute '%'
+proc_nodb=Please open a database first.
+proc_mm=Command is not available in main memory mode.
+cmd_unknown=Unknown command '%'
+cmd_similar=did you mean '%'?
+cmd_ping=Connection successful.
+cmd_xmark=XMark queries are limited from 1-20.
+
+# Help Commands
+help_short=try 'help'
+help_intro=Try "help" to get some information.
+help_long=Try 'help [...]' to get info on a specific command.
+
+# Create Command
+pc_create=Database is created
+pc_index=Creating Indexes
+pc_update=Please create a new database.
+pc_cancel=Building has been canceled.
+pc_indextxt=Indexing Text
+pc_indexatt=Indexing Attributes
+pc_indexwrd=Indexing Words
+pc_indexftx=Indexing Fulltext
+pc_parse=Nodes parsed
+pc_created=Database created in %.
+pc_tbl=Table created in %.
+pc_att=Attributes indexed in %.
+pc_txt=Texts indexed in %.
+pc_wrd=Words indexed in %.
+pc_ftx=Fulltext indexed in %.
+pc_notfound=Sorry, the file "%" was not found.
+pc_err="%" could not be parsed.
+pc_pos=Line %, Col %
+
+# Database commands
+db_no=Database '%' was not found.
+db_open=Database is open.
+db_nodb=No Database in memory.
+db_closed=Database was closed.
+db_closeerr=Database could not be closed.
+db_optimized=Database optimized in %.
+db_dropped=Database was dropped.
+db_notdropped=Database could not be dropped.
+db_notopened=Database could not be opened.
+db_opened=Database opened in %.
+db_exported=Database exported in %.
+
+# Index commands
+in_created=Index created in %.
+in_err=Index could not be created.
+in_dropped=Index dropped.
+in_notdropped=Index could not be dropped.
+
+# Console Info
+cs_local=Standalone
+cs_client=Client
+
+# Server Info
+srv_connect=Can't communicate with the server.
+srv_port=Invalid port number: %
+srv_toomany=Too many requests in progress.
+srv_bind=Server is running or permission was denied.
+srv_start=started.\nWaiting for requests...
+srv_stop=stopped.
+
+# Bye
+bye1=Have a nice day.
+bye2=See you.
+bye3=Have fun.
+bye4=Enjoy life.
+
+# Query Commands
+qu_pars=Parsing
+qu_comp=Compiling
+qu_eval=Evaluating
+qu_time=Timing
+qu_result=Result
+qu_plan=Saving query plan in '%'...
+qu_hits=Hit(s)
+qu_ms=ms
+
+# Query Commands.. the following strings must have the same length
+qu_tabquery=Query     
+qu_tabpars=Parsing   
+qu_tabcomp=Compiling 
+qu_tabeval=Evaluating
+qu_tabfinish=Finishing 
+qu_tabprint=Printing  
+qu_tabtotal=Total Time
+qu_tabmem=Memory    
+qu_tabprinted=Printed   
+qu_tabhits=Results   
+
+# Help Texts
+h_filter=Press this button to filter your query results.
+h_queryrt=If this checkbox is turned on, queries are automatically performed after each key-click.
+h_filterrt=If this checkbox is turned on, queries are automatically filtered after each key-click.
+

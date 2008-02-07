@@ -1,0 +1,70 @@
+=========================
+Building BaseX on the Mac
+=========================
+
+Content:
+
+	1. Launch_BaseX_with_icon_and_nice_title
+	2. Building_a_Java_Application_Bundle
+	3. Building_a_dmg_from_BaseX.app
+	4. How-to_create_a_Mac_icon_(.icns_file)
+
+
+----------------------------------------
+1. Launch_BaseX_with_icon_and_nice_title
+----------------------------------------
+java -Xdock:name="BaseX on Mac OS X" -Xdock:icon="tests/BaseX.icns" -cp bin org.basex.BaseXWin
+
+-------------------------------------
+2. Building_a_Java_Application_Bundle
+-------------------------------------
+
+(a) Using Eclipse:
+	- Export/Other/Mac OS X application bundle
+	- Main class      : org.basex.BaseXWin
+	- Arguments       : none 
+	- Application Name: BaseX
+	- Folder          : Desktop
+	- JVM version     : 1.5+
+	- Icon            : ../etc/images/BaseX.icns
+	- Add to classpath : ../basex/bin
+	- Identifier      : BaseX
+	- Signature       : ????
+	- VM Options      : -Xmx512m
+
+	An application named 'BaseX' should be at your Desktop.
+	When started the BaseX icon is in the dock and in the task
+	switch.  The icon in the Finder and an the Desktop is the
+	default one.
+
+(b) Change the default icon by using the Developer Tools (extra installation from
+Mac OS X DVD) and set the 'C'ustom flag for the BaseX.app:
+
+$ /Developer/Tools/SetFile -a C ~/Desktop/BaseX.app/
+
+(c) Links:
+	- Java Deployment Options for Mac OS X
+	http://developer.apple.com/documentation/Java/Conceptual/Java14Development/03-JavaDeployment/JavaDeployment.html
+	- Bringing your Java Application to Mac OS X
+	http://java.sun.com/developer/technicalArticles/JavaLP/JavaToMac/
+
+--------------------------------
+3. Building_a_dmg_from_BaseX.app
+--------------------------------
+
+(a) Create a dmg from basex/ folder containing BaseX.app
+
+$ hdiutil makehybrid -hfs -hfs-volume-name "BaseX" -hfs-openfolder /Volumes/BaseX basex/ -o BaseX.dmg
+
+(b) Links:
+	- Setting view options on .dmg files
+	http://jwz.livejournal.com/608927.html
+
+----------------------------------------
+4. How-to_create_a_Mac_icon_(.icns_file)
+----------------------------------------
+
+(a) Links:
+	- ICNS Dateien selbst gemacht	
+	http://www.moerkels.de/news/files/How_to_ICNS_Dateien_einfach_selbst_gemacht.html
+

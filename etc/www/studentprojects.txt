@@ -1,0 +1,9 @@
+Linux addicted people:
+- Construct a Debian GNU/Linux package of BaseX (HiWi Job)
+
+Mac OS X addicts:
+- Connect BaseX to the fsevents daemon (HiWi/Bachelor project)
+
+XHTML/XSLT/Web design:
+- Administrate the web presence, bug tracking etc.
+- Help writing and publishing the documentation.

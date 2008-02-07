@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- $Id: build.xml 993 2007-11-21 07:40:12Z gruen $ -->
+
+<project name="basex" default="jars" basedir=".">
+
+  <property file="etc/build/build.properties"/>
+
+  <target name="build_init">
+    <tstamp/>
+    <mkdir dir="${build}"/>
+  </target>
+
+  <!-- ===================================================================== -->
+  <!-- ===== BEGIN: Compile source ========================================= -->
+  <!-- ===================================================================== -->
+
+  <!-- ... Compile BaseXWin ... -->
+  <target name="build" 
+          depends="build_init" 
+          description="Compile all, especially with gui"> 
+    <copy todir="${build}/org/basex/gui/img">
+      <fileset dir="${src}/org/basex/gui/img"/>
+    </copy>
+    <javac srcdir="${src}" destdir="${build}"
+           excludes="${pfpath}/**"/>
+  </target>
+
+  <!-- ... Compile BaseXClient ... -->
+  <target name="build_client"
+          depends="build_init" 
+          description="Compile client only"> 
+    <!-- includesfile="${conf}/files4clientjar.inc" -->
+    <javac srcdir="${src}" destdir="${build}" 
+           excludes="${pfpath}/**,${guipath}/**"/>
+  </target>
+
+  <!-- ... Compile BaseXServer ... -->
+  <target name="build_server"
+          depends="build_init" 
+          description="Compile server only"> 
+    <javac srcdir="${src}" destdir="${build}" 
+           excludes="${pfpath}/**,${guipath}/**"/>
+  </target>
+
+  <!-- ... Compile Tests ... -->
+  <target name="build_tests"
+          depends="build_init,build" 
+          description="Compile all tests"> 
+    <javac srcdir="${test}" 
+           destdir="${build}"
+           excludes="${pfpath}/**"/>
+  </target>
+
+  <!-- ===================================================================== -->
+  <!-- ===== END: Compile source =========================================== -->
+  <!-- ===================================================================== -->
+
+
+  <!-- ===================================================================== -->
+  <!-- ===== BEGIN: Build jar files ======================================== -->
+  <!-- ===================================================================== -->
+
+  <!-- ..... BaseXWin ... -->
+  <target name="jar_gui"
+          depends="build"
+          description="Generates BaseXWin.jar">
+    <jar jarfile="${jar_dir}/BaseXWin.jar" 
+         basedir="${build}"
+         excludes="${pfpath}/**,${testpath}/**"
+         manifest="${conf}/meta-inf/MANIFEST_BaseXWin.MF"/>
+  </target>
+
+  <!-- ..... BaseXClient ... -->
+  <target name="jar_client"
+          depends="build_client"
+          description="Generates BaseXClient.jar">
+         <!-- includesfile="${conf}/files4clientjar.inc" -->
+    <jar jarfile="${jar_dir}/BaseXClient.jar" 
+         basedir="${build}"
+         excludes="${pfpath}/**,${guipath}/**,${testpath}/**"
+         manifest="${conf}/meta-inf/MANIFEST_BaseXClient.MF"/>
+  </target>
+
+  <!-- ..... BaseXServer ... -->
+  <target name="jar_server"
+          depends="build_server"
+          description="Generates BaseXServer.jar">
+    <jar jarfile="${jar_dir}/BaseXServer.jar" 
+         basedir="${build}"
+         excludes="${pfpath}/**,${guipath}/**,${testpath}/**"
+         manifest="${conf}/meta-inf/MANIFEST_BaseXServer.MF"/>
+  </target>
+
+  <!-- ..... BaseX (client & server, no gui)  ... -->
+  <target name="jar_basex"
+          depends="build_client,build_server"
+          description="Generates BaseX.jar (client &amp; server, no GUI)">
+    <jar jarfile="${jar_dir}/BaseX.jar" 
+         basedir="${build}"
+         excludes="${pfpath}/**,${guipath}/**,${testpath}/**"
+         manifest="${conf}/meta-inf/MANIFEST_BaseX.MF"/>
+  </target>
+
+  <!-- ..... Generate all jars ... -->
+  <target name="jars" 
+          depends="jar_gui,jar_client,jar_server,jar_basex"
+          description="Build all jars"/>
+
+  <!-- ===================================================================== -->
+  <!-- ===== END: Build jar files ========================================== -->
+  <!-- ===================================================================== -->
+
+
+  <!-- ===================================================================== -->
+  <!-- ===== BEGIN: Launching BaseX ======================================== -->
+  <!-- ===================================================================== -->
+
+  <!-- ..... BaseXClient ... -->
+  <target name="run_client"
+          depends="build_client"
+          description="Runs BaseXClient">
+    <java classname="org.basex.BaseXClient" 
+          classpath="${build}"/>
+  </target>
+
+  <!-- ..... BaseXServer ... -->
+  <target name="run_server"
+          depends="build_server"
+          description="Runs BaseXServer">
+    <java classname="org.basex.BaseXServer" 
+          classpath="${build}"/>
+  </target>
+
+  <!-- ..... BaseX ... -->
+  <target name="run"
+          depends="build_client,build_server"
+          description="Runs BaseX">
+    <java classname="org.basex.BaseX" 
+          classpath="${build}"
+          fork="true"/>
+  </target>
+
+  <!-- ..... BaseXWin ... -->
+  <target name="run_gui"
+          depends="build"
+          description="Runs BaseXWin">
+    <java classname="org.basex.gui.BaseXWin" 
+          classpath="${build}"
+          fork="true"/>
+  </target>
+
+  <!-- ===================================================================== -->
+  <!-- ===== END: Launching BaseX ========================================== -->
+  <!-- ===================================================================== -->
+
+  <!-- ===================================================================== -->
+  <!-- ===== BEGIN: Generate JNI header files ============================== -->
+  <!-- ===================================================================== -->
+  
+  <!-- ===================================================================== -->
+  <!-- ===== END: Generate JNI header files ================================ -->
+  <!-- ===================================================================== -->
+  <target name="lstatheader" 
+          depends="build"
+          description="C header file for native stat calls under linux.">
+    <!-- produces weird stuff, maybe jni.h issue
+    <javah classpath="${build}" destdir="lib" verbose="yes" old="yes" force="yes">
+      <class name="org.basex.build.fs.ShredUnixFSVisitor"/>
+    </javah>
+    -->
+    <exec executable="javah" dir="bin" failonerror="true">
+      <arg value="-jni"/>
+      <arg value="-d"/>
+      <arg value="../lib"/>
+      <arg line="org.basex.build.fs.ShredUnixFSVisitor"/>
+    </exec>
+  </target>
+
+  <!-- ===================================================================== -->
+  <!-- ===== BEGIN: Shared objects ========================================= -->
+  <!-- ===================================================================== -->
+
+  <!-- ..... libStat ... -->
+  <target name="lib" 
+          depends="build"
+          description="Shared object for native stat calls under linux.">
+
+     <exec executable="gcc" dir="lib" failonerror="true">
+        <arg value="-fPIC"/>
+        <arg value="-shared"/>
+        <arg value="-o"/>
+        <arg value="libShredUnixFSVisitor.so"/>
+        <arg line="org_basex_build_fs_ShredUnixFSVisitor.c"/>
+     </exec>
+
+  </target>
+
+  <!-- ===================================================================== -->
+  <!-- ===== END: Shared objects =========================================== -->
+  <!-- ===================================================================== -->
+
+
+
+  <!-- ===================================================================== -->
+  <!-- ===== BEGIN: Cleaning =============================================== -->
+  <!-- ===================================================================== -->
+  <target name="clean_lib"
+          description="Remove generated .so files">
+    <delete file="lib/libShredUnixFSVisitor.so"/>
+  </target>
+
+  <target name="clean_build"
+          description="Remove generated .class files and the build directory">
+    <delete dir="${build}"/>
+  </target>
+
+  <target name="clean_jars"
+          description="Remove generated jar files">
+    <delete file="${jar_dir}/BaseXWin.jar"/>
+    <delete file="${jar_dir}/BaseXClient.jar"/>
+    <delete file="${jar_dir}/BaseXServer.jar"/>
+    <delete file="${jar_dir}/BaseX.jar"/>
+  </target>
+
+  <target name="clean" depends="clean_build, clean_jars"
+          description="Removes all generated files (.class, .jar etc.)">
+  </target>
+  <!-- ===================================================================== -->
+  <!-- ===== END: Cleaning ================================================= -->
+  <!-- ===================================================================== -->
+
+</project>
