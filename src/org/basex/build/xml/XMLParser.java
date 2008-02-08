@@ -60,7 +60,7 @@ public final class XMLParser extends Parser {
         scanner.next();
       } else if(scanner.type == Type.DTD) {
         dtd = new DTDParser(scanner.token.finish(), file,
-            builder.tags, builder.atts, builder.ents);
+            builder.tags, builder.atts, scanner.ents);
         scanner.next();
       } else if(scanner.type == Type.PI) {
         builder.pi(scanner.token.finish()); 

@@ -27,8 +27,6 @@ public abstract class Builder extends Progress {
   public Names tags;
   /** Index for all tag and attribute names. */
   public Names atts;
-  /** Index for all entity names. */
-  public Names ents;
 
   /** Parser instance. */
   protected Parser parser;
@@ -59,7 +57,6 @@ public abstract class Builder extends Progress {
   protected Builder() {
     tags = new Names(true);
     atts = new Names(false);
-    ents = new Names(false);
   }
 
   // abstract methods

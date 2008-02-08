@@ -1,7 +1,11 @@
 package org.basex.test;
 
+import java.io.File;
+
+import org.basex.BaseX;
 import org.basex.core.Commands;
 import org.basex.core.Context;
+import org.basex.core.Prop;
 import org.basex.core.proc.Check;
 import org.basex.core.proc.Proc;
 import org.basex.data.Data;
@@ -45,32 +49,48 @@ public final class XMLTS {
       if(arg.equals("-v")) {
         verbose = true;
       } else {
-        System.out.println("\nXML Conformance Tests\n" +
-            " -v verbose output");
+        BaseX.outln("\nXML Conformance Tests\n -v verbose output");
         return;
       }
     }
-    
+
+    Prop.read();
+    Prop.textindex = false;
+    Prop.attrindex = false;
+    Prop.onthefly = true;
+    Prop.mainmem = true;
+
     data = Check.check(FILE);
-    Context ctx = new Context();
+    final Context ctx = new Context();
+
+    int ok = 0;
+    int wrong = 0;
 
     final Nodes root = new Nodes(0, data);
-    System.out.println("\nXML Conformance Tests\n");
-    System.out.println("file = (expected result) -> BaseX result");
+    BaseX.outln("\nXML Conformance Tests\n");
+    BaseX.outln("file = (expected result) -> BaseX result");
 
     for(final int t : nodes("//TEST", root).pre) {
       final Nodes srcRoot = new Nodes(t, data);
       final String uri = text("@URI", srcRoot);
-      boolean valid = text("@TYPE", srcRoot).equals("valid");
+      final boolean valid = text("@TYPE", srcRoot).equals("valid");
 
-      Proc proc = Proc.get(ctx, Commands.CREATEXML, PATH + uri);
-      boolean success = proc.execute();
-      
-      System.out.print(uri + " = " + (valid ? "correct" : "wrong") + " -> ");
-      System.out.print(success ? "correct" : "wrong");
-      System.out.println(valid == success ? " (OK)" : " (WRONG)");
-      if(verbose) System.out.println(proc.info() + "\n");
+      final Proc proc = Proc.get(ctx, Commands.CREATEXML, PATH + uri);
+      final boolean success = proc.execute();
+      final boolean correct = valid == success;
+
+      BaseX.out(uri + " = " + (valid ? "correct" : "wrong") + " -> ");
+      BaseX.out(success ? "correct" : "wrong");
+      BaseX.outln(correct ? " (OK)" : " (WRONG)");
+      if(verbose) BaseX.outln(proc.info() + "\n");
+
+      if(correct) ok++;
+      else wrong++;
     }
+
+    BaseX.outln("\nResult of Test \"" + new File(FILE).getName() + "\":");
+    BaseX.outln("Successful: " + ok);
+    BaseX.outln("Wrong: " + wrong);
   }
 
   /**

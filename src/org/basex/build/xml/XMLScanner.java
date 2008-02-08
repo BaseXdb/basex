@@ -9,6 +9,7 @@ import org.basex.build.BuildException;
 import org.basex.core.Prop;
 import org.basex.io.BufferInput;
 import org.basex.util.Array;
+import org.basex.util.Map;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -20,10 +21,6 @@ import org.basex.util.TokenBuilder;
 public final class XMLScanner {
   /** Verbose mode. */
   private static final boolean VERBOSE = false;
-  /** Sorted Standard Entities. */
-  private static final byte[][] ENTITIES = {
-    token("&amp"), token("'apos"), token(">gt"), token("<lt"), token("\"quot")
-  };
   /** Scanning states. */
   private static enum State {
     /** Content state.   */ CONTENT,
@@ -55,8 +52,10 @@ public final class XMLScanner {
   private int lp;
   /** Pointer to previously read byte. */
   private int pp;
-  /** Character buffer for the current entity. */
-  private final TokenBuilder entity = new TokenBuilder();
+
+  /** Index for all entity names. */
+  public Map ents;
+
   /** Current scanner state. */
   private State state = State.CONTENT;
   /** Finished flag. */
@@ -81,6 +80,12 @@ public final class XMLScanner {
    */
   public XMLScanner(final BufferInput in) {
     input = in;
+    ents = new Map();
+    ents.add(token("amp"), token("&"));
+    ents.add(token("apos"), token("'"));
+    ents.add(token("quot"), token("\""));
+    ents.add(token("gt"), token("<"));
+    ents.add(token("lt"), token(">"));
   }
 
   /**
@@ -179,8 +184,8 @@ public final class XMLScanner {
             prevChar(1);
           }
           chars |= !whitespace(c);
-          if(c == '&') c = getEntity();
-          if(c != 0 && c != 0x0d) token.addUTF(c);
+          if(c == '&') token.add(getEntity());
+          else if(c != 0x0d) token.addUTF(c);
         }
         c = nextValid();
       }
@@ -426,8 +431,8 @@ public final class XMLScanner {
         if(c == 0x0D) continue;
         if(c == '<') error(wrong ? ATTCLOSE : ATTCHAR, (char) c);
         if(c == 0x0A) c = ' ';
-        if(c == '&') c = getEntity();
-        if(c != 0) token.addUTF(c);
+        if(c == '&') token.add(getEntity());
+        else token.addUTF(c);
       } while((c = nextValid()) != quote);
       prevChar(1);
     }
@@ -457,17 +462,18 @@ public final class XMLScanner {
     }
     return false;
   }
-  
+
+  /** Character buffer for the current entity. */
+  private final TokenBuilder entity = new TokenBuilder();
+
   /**
    * Scans an entity.
-   * @return returns the decoded character representation.
+   * @return entity
    * @throws BuildException Build Exception
    */
-  private int getEntity() throws BuildException {
+  private byte[] getEntity() throws BuildException {
     entity.reset();
-    entity.add('&');
     byte ch = nextChar();
-    entity.add(ch);
 
     // scans numeric entities
     if(ch == '#') {
@@ -485,7 +491,7 @@ public final class XMLScanner {
         if(!m && !h) {
           completeEntity();
           if(Prop.entity) error(INVALIDENTITY, entity);
-          return 0;
+          return EMPTY;
         }
         n *= b;
         n += ch & 15;
@@ -494,34 +500,28 @@ public final class XMLScanner {
       } while(ch != ';');
       if(!valid(n)) {
         if(Prop.entity) error(XMLENT, entity);
-        return 0;
+        return EMPTY;
       }
-      return n;
+      entity.reset();
+      entity.addUTF(n);
+      return entity.finish();
     }
     
     // scans predefined entities
-    int p = 1;
-    int e = 0;
-    while(true) {
-      final byte ent = ENTITIES[e][p];
-      if(ent > ch) {
-        completeEntity();
-        if(Prop.entity) error(INVALIDENTITY, entity);
-        return 0;
-      }
-      if(ent == ch) {
-        entity.add(ch = nextChar());
-        if(++p < ENTITIES[e].length) continue;
-        if(ch == ';') return ENTITIES[e][0];
-      }
-      do {
-        if(++e == ENTITIES.length) {
-          completeEntity();
-          if(Prop.entity) error(INVALIDENTITY, entity);
-          return 0;
-        }
-      } while(ENTITIES[e].length <= p);
-    }
+    while(ch != ';') {
+      entity.add(ch);
+      ch = nextChar();
+    };
+
+    final byte[] en = ents.get(entity.finish());
+    if(en != null) return en;
+    if(Prop.entity) error(XMLENT, entity);
+    entity.reset();
+    return entity.finish();
+
+    //completeEntity();
+    //if(Prop.entity) error(INVALIDENTITY, entity);
+    //return 0;
   }
 
   /**

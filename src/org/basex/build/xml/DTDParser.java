@@ -8,6 +8,7 @@ import org.basex.BaseX;
 import org.basex.build.BuildException;
 import org.basex.index.Names;
 import org.basex.io.IOConstants;
+import org.basex.util.Map;
 
 /**
  * Parses the DTD to get the elements, attributes and entities.
@@ -22,8 +23,6 @@ public class DTDParser {
   private byte[] element;
   /** Attlist Type. */
   private byte[] attl;
-  /** Entity Type. */
-  private byte[] enti;
   /** Tokenizer Type. */
   private byte[] checkT;
   /** Root file. */
@@ -41,7 +40,7 @@ public class DTDParser {
   /** Index for all tag and attribute names. */
   Names atts;
   /** Index for all entity names. */
-  Names ents;
+  Map ents;
 
   /**
    * Constructor.
@@ -53,7 +52,7 @@ public class DTDParser {
    * @throws IOException I/O Exception
    */
   public DTDParser(final byte[] dtd, final String xml, final Names tag,
-      final Names att, final Names ent) throws IOException {
+      final Names att, final Map ent) throws IOException {
 
     xmlfile = xml;
     tags = tag;
@@ -128,19 +127,19 @@ public class DTDParser {
         if (!consumeWS()) error();
         if(percentage(next())) {
           if(!consumeWS()) error();
-          enti = consumeName();
-          ents.add(enti);
+          byte[] name = consumeName();
           BaseX.debug("----------------------");
-          BaseX.debug("- Entity: %", enti);
+          BaseX.debug("- Entity: %", name);
           if(!consumeWS()) error();
-          entDef();
+          final byte[] val = entDef();
+          ents.add(name, val);
         } else {
           prev();
-          enti = consumeName();
-          ents.add(enti);
+          byte[] name = consumeName();
           BaseX.debug("----------------------");
-          BaseX.debug("- Entity: %", enti);
-          entDef();
+          BaseX.debug("- Entity: %", name);
+          final byte[] val = entDef();
+          ents.add(name, val);
         }
       } else if(consume(NOT)) {
         if (!consumeWS()) error();
@@ -327,28 +326,33 @@ private void consumeBracketed2() throws BuildException  {
 
   /**
    * Checks the EntityDef and PEDef for Entity Objects.
+   * @return entity definition
    * @throws BuildException Build Exception
    */
-  private void entDef() throws BuildException {
+  private byte[] entDef() throws BuildException {
     consumeWS();
     if(consume(SYSTEM) || consume(PUBLIC)) {
       consumeWS();
-      BaseX.debug(consumeQuoted());
+      byte[] val = consumeQuoted();
+      BaseX.debug(val);
       if (!consumeWS()) error();
-        if(consume(ND)) {
-          BaseX.debug(ND);
-          if (!consumeWS()) error();
-          BaseX.debug(consumeName());
-        } else if(consume(GREAT)) {
-        } else {
-          BaseX.debug(consumeQuoted());
-        }
+      if(consume(ND)) {
+        BaseX.debug(ND);
+        if (!consumeWS()) error();
+        BaseX.debug(consumeName());
+      } else if(consume(GREAT)) {
+      } else {
+        BaseX.debug(consumeQuoted());
+      }
+      return val;
     } else {
       consumeWS();
-      BaseX.debug(consumeQuoted()); 
+      byte[] val = consumeQuoted();
+      BaseX.debug(val);
       if (consumeWS()) {
         if (consume(SYSTEM)) error();
       }
+      return val;
     }
   }
 
