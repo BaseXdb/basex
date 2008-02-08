@@ -27,6 +27,8 @@ public class DTDParser {
   private byte[] checkT;
   /** Root file. */
   private String xmlfile;
+  /** Check extern/intern DTD. */
+  private boolean extern = false;
   /** int Value for help. */
   private boolean check = true;
 
@@ -69,10 +71,14 @@ public class DTDParser {
     // check Whitespace
     if(!consumeWS()) error();
     // check for ExternDTD
-    if(consume(SYSTEM) && consumeWS()) {
+    if((consume(SYSTEM) || consume(PUBLIC)) && consumeWS()) {
       // check ExternalID in quotes
       byte[] extid = consumeQuoted();
       consumeWS();
+      if (checkQuoted()) {
+        BaseX.debug("PubidLiteral");
+        extid = consumeQuoted();
+      }
       if(consume(SBRACKETO)) {
         content = dtd;
         BaseX.debug("- Root Element Type: %", root);
@@ -82,11 +88,13 @@ public class DTDParser {
       // read external file
       String file = new File(xmlfile).getParent() + "\\" + string(extid);
       content = IOConstants.read(file);
+      extern = true;
       pos = 0;
       BaseX.debug("- Root Element Type: %", root);
       BaseX.debug("- Content:\n %", content);
       BaseX.debug("----------------");
       consumeContent();
+      extern = false;
     } else if (consume(SBRACKETO)) {
       content = dtd;
       BaseX.debug("- Root Element Type: %", root);
@@ -151,7 +159,9 @@ public class DTDParser {
       }
     }
     consumeWS();
+    if (!extern) {
     if(!consume(SBRACKETC)) error();
+    }
     BaseX.debug("----------------------");
     BaseX.debug("THE END");
   }
@@ -417,6 +427,20 @@ private void consumeBracketed2() throws BuildException  {
       if(c == 0) error();
     }
     return substring(content, p, pos - 1);
+  }
+  
+  /**
+   * Checks for a quoted part.
+   * @return boolean if quoted
+   */
+  private boolean checkQuoted() {
+    byte quote = next();
+    if(quote == '\'' || quote == '"') {
+      if (XMLScanner.isLetter(next()))
+        pos = pos - 2;
+      return true;
+    }
+    return false;
   }
 
   /**
