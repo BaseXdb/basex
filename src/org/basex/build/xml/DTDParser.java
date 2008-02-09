@@ -31,9 +31,8 @@ public class DTDParser {
   private String xmlfile;
   /** Check extern/intern DTD. */
   private boolean extern = false;
-  /** int Value for help. */
+  /** boolean Value for help. */
   private boolean check = true;
-
   /** Content of internal DTD. */
   private byte[] content;
   /** Current position. */
@@ -69,7 +68,7 @@ public class DTDParser {
     if(!consume(DOCTYPE) || !consumeWS()) error();
     // check NAME
     root = consumeName();
-    if (string(root).equals(string(SYSTEM))) error();
+    if(string(root).equals(string(SYSTEM))) error();
     // check Whitespace
     if(!consumeWS()) error();
     // check for ExternDTD
@@ -77,7 +76,7 @@ public class DTDParser {
       if(!consumeWS()) error();
       extid = consumeQuoted();
       starter();
-    } else if (consume(PUBLIC)) {
+    } else if(consume(PUBLIC)) {
       if(!consumeWS()) error();
       consumeQuoted();
       if(!consumeWS()) error();
@@ -93,67 +92,6 @@ public class DTDParser {
     }
   }
 
-  /**
-   * Method to consume the Content of Internal or/and External DTD.
-   * @throws BuildException Build Exception
-   */
-  private void consumeContent() throws BuildException {
-    // runs till the last character
-    while(next() != 0) {
-      check = true;
-      // checks for element, attlist and entity tags
-      if(consume(ELEM)) {
-        if (!consumeWS()) error();
-        element = consumeName();
-        tags.add(element);
-        BaseX.debug("----------------------");
-        BaseX.debug("- Element: %", element);
-        contentSpec();
-      } else if(consume(ATTL)) {
-        if (!consumeWS()) error();
-        attl = consumeName();
-        atts.add(attl);
-        BaseX.debug("----------------------");
-        BaseX.debug("- ATTLIST: %", attl);
-        if (!consume(GREAT)) {
-          attType();
-          dDecl();
-        }
-      } else if(consume(ENT)) {
-        if (!consumeWS()) error();
-        if(percentage(next())) {
-          if(!consumeWS()) error();
-          byte[] name = consumeName();
-          BaseX.debug("----------------------");
-          BaseX.debug("- Entity: %", name);
-          if(!consumeWS()) error();
-          final byte[] val = entDef();
-          ents.add(name, val);
-        } else {
-          prev();
-          byte[] name = consumeName();
-          BaseX.debug("----------------------");
-          BaseX.debug("- Entity: %", name);
-          final byte[] val = entDef();
-          ents.add(name, val);
-        }
-      } else if(consume(NOT)) {
-        if (!consumeWS()) error();
-        BaseX.debug("----------------------");
-        BaseX.debug(NOT);
-      } else if(consume(WELEM1) || consume(WELEM2) || consume(WELEM3)
-          || consume(WATTL1) || consume(WATTL2) || consume(XML)) {
-        error();
-      }
-    }
-    consumeWS1();
-    if (!extern) {
-    if(!consume(SBRACKETC)) error();
-    }
-    BaseX.debug("----------------------");
-    BaseX.debug("THE END");
-  }
-  
   /**
    * Starts the parsing of extern DTD.
    * @throws IOException I/O Exception
@@ -174,6 +112,72 @@ public class DTDParser {
     BaseX.debug("----------------");
     consumeContent();
     extern = false;
+  }
+
+  /**
+   * Method to consume the Content of Internal or/and External DTD.
+   * @throws BuildException Build Exception
+   */
+  private void consumeContent() throws BuildException {
+    // runs till the last character
+    while(next() != 0) {
+      check = true;
+      // checks for element, attlist and entity tags
+      if(consume(ELEM)) {
+        if(!consumeWS()) error();
+        element = consumeName();
+        tags.add(element);
+        BaseX.debug("----------------------");
+        BaseX.debug("- Element: %", element);
+        contentSpec();
+      } else if(consume(ATTL)) {
+        if(!consumeWS()) error();
+        attl = consumeName();
+        atts.add(attl);
+        BaseX.debug("----------------------");
+        BaseX.debug("- ATTLIST: %", attl);
+        consumeWS1();
+        if(!consume(GREAT)) {
+          attType();
+          dDecl();
+        }
+      } else if(consume(ENT)) {
+        if(!consumeWS()) error();
+        if(percentage(next())) {
+          if(!consumeWS()) error();
+          byte[] name = consumeName();
+          BaseX.debug("----------------------");
+          BaseX.debug("- Entity: %", name);
+          if(!consumeWS()) error();
+          final byte[] val = entDef();
+          ents.add(name, val);
+        } else {
+          prev();
+          byte[] name = consumeName();
+          BaseX.debug("----------------------");
+          BaseX.debug("- Entity: %", name);
+          final byte[] val = entDef();
+          ents.add(name, val);
+        }
+      } else if(consume(NOT)) {
+        if(!consumeWS()) error();
+        BaseX.debug("----------------------");
+        BaseX.debug(NOT);
+      } else if(consume(GQ)) {
+        BaseX.debug("NOT IMPLEMENTED");
+        while(!consume(GREAT))
+          next();
+      } else if(consume(WELEM1) || consume(WELEM2) || consume(WELEM3)
+          || consume(WATTL1) || consume(WATTL2) || consume(XML)) {
+        error();
+      }
+    }
+    consumeWS1();
+    if(!extern) {
+      if(!consume(SBRACKETC)) error();
+    }
+    BaseX.debug("----------------------");
+    BaseX.debug("THE END");
   }
 
   /**
@@ -207,30 +211,31 @@ public class DTDParser {
       consumeWS1();
     }
   }
-  
-    /**
-     * Consumes bracketed content.
-     * @throws BuildException Build Exception
-     */  
-  private void consumeBracketed() throws BuildException  {
+
+  /**
+   * Consumes bracketed content.
+   * @throws BuildException Build Exception
+   */
+  private void consumeBracketed() throws BuildException {
     while(!consume(BRACKETC)) {
       consumeWS1();
       if(consume(DASH) || consume(COLON)) {
         consumeWS1();
-        if (consume(BRACKETO)) {
+        if(consume(BRACKETO)) {
+          check = true;
           consumeBracketed();
         } else {
-        BaseX.debug(consumeName());
-        consumeWS1();
+          BaseX.debug(consumeName());
+          consumeWS1();
         }
-      } else if (consume(BRACKETO)) { 
+      } else if(consume(BRACKETO)) {
         consumeBracketed();
       } else {
-        if (check) {
-        consumeWS1();
-        BaseX.debug(consumeName());
-        consumeWS1();
-        check = false;
+        if(check) {
+          consumeWS1();
+          BaseX.debug(consumeName());
+          consumeWS1();
+          check = false;
         } else {
           error();
         }
@@ -238,16 +243,55 @@ public class DTDParser {
     }
     BaseX.debug(consumeQuantity());
     if(consumeWS()) {
-      if (consume(DASH) || consume(COLON)) {
+      if(consume(DASH) || consume(COLON)) {
         consumeWS1();
         if(consume(BRACKETO)) {
           consumeBracketed();
         }
       }
-    } 
+    }
   }
-  
-  
+
+  /**
+   * Consumes bracketed content.
+   * @throws BuildException Build Exception
+   */
+  private void consumeBracketed2() throws BuildException {
+    while(!consume(BRACKETC)) {
+      consumeWS1();
+      if(consume(DASH)) {
+        consumeWS1();
+        if(consume(BRACKETO)) {
+          consumeBracketed();
+        } else {
+          BaseX.debug(consumeName());
+          consumeWS1();
+        }
+      } else if(consume(BRACKETO)) {
+        consumeBracketed();
+      } else if(consume(COLON)) {
+        error();
+      } else {
+        if(check) {
+          consumeWS1();
+          BaseX.debug(consumeName());
+          consumeWS1();
+          check = false;
+        } else {
+          error();
+        }
+      }
+    }
+    BaseX.debug(consumeQuantity());
+    if(consumeWS()) {
+      if(consume(DASH) || consume(COLON)) {
+        consumeWS1();
+        if(consume(BRACKETO)) {
+          consumeBracketed();
+        }
+      }
+    }
+  }
 
   /**
    * Checks the attType for Attlist Objects.
@@ -260,86 +304,45 @@ public class DTDParser {
     if(consume(CD)) {
       BaseX.debug(CD);
     } else if(consume(BRACKETO)) {
-        consumeBracketed2();
+      consumeBracketed2();
     } else if(consume(NOT)) {
       if(!consumeWS() && !consume(BRACKETO)) error();
       consumeWS1();
       if(consume(BRACKETO)) {
         consumeBracketed2();
       } else {
-      BaseX.debug(consumeName());
+        BaseX.debug(consumeName());
       }
     } else if(checkTokenize()) {
       BaseX.debug(checkT);
     } else error();
   }
-  
-  /**
-   * Consumes bracketed content.
-   * @throws BuildException Build Exception
-   */  
-private void consumeBracketed2() throws BuildException  {
-  while(!consume(BRACKETC)) {
-    consumeWS1();
-    if(consume(DASH)) {
-      consumeWS1();
-      if (consume(BRACKETO)) {
-        consumeBracketed();
-      } else {
-      BaseX.debug(consumeName());
-      consumeWS1();
-      }
-    } else if (consume(BRACKETO)) { 
-      consumeBracketed();
-    } else if (consume(COLON)) {
-      error();
-    } else {
-      if (check) {
-      consumeWS1();
-      BaseX.debug(consumeName());
-      consumeWS1();
-      check = false;
-      } else {
-        error();
-      }
-    }
-  }
-  BaseX.debug(consumeQuantity());
-  if(consumeWS()) {
-    if (consume(DASH) || consume(COLON)) {
-      consumeWS1();
-      if(consume(BRACKETO)) {
-        consumeBracketed();
-      }
-    }
-  } 
-}
 
   /**
    * Checks the dDecl for Attlist Objects.
    * @throws BuildException Build Exception
    */
   private void dDecl() throws BuildException {
-    if (!consumeWS()) error();
+    consumeWS1();
     // checks for REQUIRED, IMPLIED or FIXED elements
     if(consume(REQ)) {
       BaseX.debug(REQ);
-      if (consumeWS()) {
-        if (consume(REQ) || consume(IMP) || consume(FIX)) error();
+      if(consumeWS()) {
+        if(consume(REQ) || consume(IMP) || consume(FIX)) error();
       }
     } else if(consume(IMP)) {
       BaseX.debug(IMP);
-      if (consumeWS()) {
-        if (consume(REQ) || consume(IMP) || consume(FIX)) error();
+      if(consumeWS()) {
+        if(consume(REQ) || consume(IMP) || consume(FIX)) error();
       }
     } else if(consume(FIX)) {
       BaseX.debug(FIX);
-      if (!consumeWS()) error();
+      if(!consumeWS()) error();
       BaseX.debug(consumeQuoted());
     } else {
       BaseX.debug(consumeQuoted());
-      if (consumeWS()) {
-        if (consume(REQ) || consume(IMP) || consume(FIX)) error();
+      if(consumeWS()) {
+        if(consume(REQ) || consume(IMP) || consume(FIX)) error();
       }
     }
   }
@@ -355,13 +358,12 @@ private void consumeBracketed2() throws BuildException  {
       consumeWS1();
       byte[] val = consumeQuoted();
       BaseX.debug(val);
-      if (!consumeWS()) error();
+      consumeWS1();
       if(consume(ND)) {
         BaseX.debug(ND);
-        if (!consumeWS()) error();
+        if(!consumeWS()) error();
         BaseX.debug(consumeName());
-      } else if(consume(GREAT)) {
-      } else {
+      } else if(!consume(GREAT)) {
         BaseX.debug(consumeQuoted());
       }
       return val;
@@ -369,8 +371,8 @@ private void consumeBracketed2() throws BuildException  {
       consumeWS1();
       byte[] val = consumeQuoted();
       BaseX.debug(val);
-      if (consumeWS()) {
-        if (consume(SYSTEM)) error();
+      if(consumeWS()) {
+        if(consume(SYSTEM)) error();
       }
       return val;
     }
@@ -392,7 +394,7 @@ private void consumeBracketed2() throws BuildException  {
     prev();
     return true;
   }
-  
+
   /**
    * Scans whitespace.
    */
@@ -473,7 +475,7 @@ private void consumeBracketed2() throws BuildException  {
     checkT = consumeName();
     String help = string(checkT);
     if(help.equals(string(ID)) || help.equals(string(IDR))
-        || help.equals(string(IDRS)) || help.equals(string(ENT))
+        || help.equals(string(IDRS)) || help.equals(string(ENT1))
         || help.equals(string(ENTS)) || help.equals(string(NMT))
         || help.equals(string(NMTS))) {
       return true;
