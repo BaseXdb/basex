@@ -111,6 +111,8 @@ public interface BuildText {
   byte[] BRACKETO = Token.token("(");
   /** DTD: Bracket Close. */
   byte[] BRACKETC = Token.token(")");
+  /** DTD: <?. */
+  byte[] GQ = Token.token("<?");
   /** DTD: ELEMENT. */
   byte[] ELEM = Token.token("<!ELEMENT");
   /** DTD: Wrong ELEMENT. */
@@ -161,6 +163,8 @@ public interface BuildText {
   byte[] IDRS = Token.token("IDREFS");
   /** DTD: ENTITIES ELEMENT. */
   byte[] ENTS = Token.token("ENTITIES");
+  /** DTD: ENTITY ELEMENT. */
+  byte[] ENT1 = Token.token("ENTITY");
   /** DTD: NMTOKEN ELEMENT. */
   byte[] NMT = Token.token("NMTOKEN");
   /** DTD: NMTOKENS ELEMENT. */
