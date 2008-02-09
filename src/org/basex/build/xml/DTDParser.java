@@ -452,20 +452,6 @@ private void consumeBracketed2() throws BuildException  {
     }
     return substring(content, p, pos - 1);
   }
-  
-  /**
-   * Checks for a quoted part.
-   * @return boolean if quoted
-   */
-  private boolean checkQuoted() {
-    byte quote = next();
-    if(quote == '\'' || quote == '"') {
-      if (XMLScanner.isLetter(next()))
-        pos = pos - 2;
-      return true;
-    }
-    return false;
-  }
 
   /**
    * Checks for quantity sign.
