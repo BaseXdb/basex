@@ -36,7 +36,7 @@ public final class QueryView extends View {
   /** Filter checkbox. */
   private BaseXCheckBox filterbox;
   /** Query panel. */
-  private transient QueryPanel search;
+  private QueryPanel search;
   /** Button box. */
   private final Box box;
 
@@ -62,17 +62,7 @@ public final class QueryView extends View {
       });
       box.add(input[i]);
       box.add(Box.createHorizontalStrut(6));
-      switch(i) {
-        case QueryPanel.XQUERY:
-          panels[i] = new QueryArea(this, i);
-          break;
-        case QueryPanel.XPATH:
-          panels[i] = new QueryArea(this, i);
-          break;
-        case QueryPanel.SIMPLE:
-          panels[i] = new QuerySimple(this);
-          break;
-      }
+      panels[i] = i == 0 ? new QueryArea(this) : new QuerySimple(this);
     }
     box.add(Box.createHorizontalStrut(6));
 
@@ -110,10 +100,8 @@ public final class QueryView extends View {
   @Override
   public void refreshContext(final boolean more, final boolean quick) { }
 
-  // <LK> renew statistics.
   @Override
   public void refreshUpdate() {
-//    ((QuerySimple) panels[2]).stats = null;
     refreshLayout();
   }
 
@@ -171,13 +159,13 @@ public final class QueryView extends View {
   }
 
   /**
-   * Handles info messages.
+   * Handles info messages resulting from a query execution.
    * @param info info message
-   * @param ok ok flag
+   * @param ok true if query was successful
    * @return true if info was processed
    */
   public boolean info(final String info, final boolean ok) {
     if(search != null) search.info(info, ok);
-    return search != null && mode != 2;
+    return search != null && mode == 0;
   }
 }

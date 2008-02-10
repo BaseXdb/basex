@@ -173,7 +173,7 @@ public final class GUI extends JFrame {
 
     hits = new BaseXLabel(" ");
     hits.setFont(fnt);
-    BaseXLayout.setWidth(hits, 150);
+    //BaseXLayout.setWidth(hits, 100);
     hits.setHorizontalAlignment(SwingConstants.RIGHT);
     p.add(hits);
     p.add(Box.createHorizontalStrut(4));
@@ -226,7 +226,7 @@ public final class GUI extends JFrame {
         browse(e);
         if(e.getKeyCode() != KeyEvent.VK_ENTER) return;
         
-        final boolean cmd = !GUIProp.searchmode || !context.db();
+        final boolean cmd = GUIProp.searchmode == 2 || !context.db();
         final String in = input.getText();
         
         if(cmd || in.startsWith("!")) {
@@ -244,10 +244,13 @@ public final class GUI extends JFrame {
 
         // skip commands
         final String in = input.getText();
-        if(!GUIProp.searchmode || !context.db() || in.startsWith("!")) return;
+        if(GUIProp.searchmode == 2 || !context.db() || in.startsWith("!"))
+          return;
         
         // create and execute XPath query 
-        execute(Commands.XPATH, Find.find(in, context, GUIProp.filterrt));
+        String qu = GUIProp.searchmode == 1 ? in :
+          Find.find(in, context, GUIProp.filterrt);
+        execute(Commands.XPATH, qu);
       }
     });
     nav.add(input);
@@ -336,8 +339,7 @@ public final class GUI extends JFrame {
    * Closes the database, writes the property files and quits.
    */
   void quit() {
-    if(context.db() && GUIProp.searchmode) GUIProp.search = input.history();
-    else GUIProp.commands = input.history();
+    saveMode();
 
     GUIProp.maxstate = getExtendedState() == MAXIMIZED_BOTH;
     if(!GUIProp.maxstate) {
@@ -477,12 +479,9 @@ public final class GUI extends JFrame {
             if(obsolete(thread)) return;
 
             // check if query feedback was evaluated in the query view
-            if(cc.printing() && data != null && GUIProp.showquery)
-              query.info(inf, ok);
+            if(cc.printing() && data != null && GUIProp.showquery &&
+                cc == Commands.XQUERY) query.info(inf, ok);
             
-            //final boolean feedback = cc.printing() && data != null &&
-            //  GUIProp.showquery && query.info(inf, ok);
-
             final Data ndata = context.data();
             if(ndata != data) {
               // database reference has changed - notify views
@@ -527,10 +526,7 @@ public final class GUI extends JFrame {
               status.setText(BaseX.info(PROCTIME, time));
             } else {
               // show error info
-              status.setText(STATUSOK);
-
-              //if(!feedback) JOptionPane.showMessageDialog(GUI.this, inf,
-              //    DIALOGINFO, JOptionPane.INFORMATION_MESSAGE);
+              status.setError(inf);
               break;
             }
           }
@@ -635,20 +631,35 @@ public final class GUI extends JFrame {
   protected void refreshMode() {
     final Data data = context.data();
     final boolean db = data != null;
-    final boolean search = db && GUIProp.searchmode;
+    int s = !db ? 2 : GUIProp.searchmode;
 
-    final String mod = search ? BUTTONSEARCH : BUTTONCMD;
+    final String mod = s == 2 ? BUTTONCMD : s == 1 ? BUTTONXPATH : BUTTONSEARCH;
     if(!mod.equals(mode.getText())) {
-      if(search) GUIProp.commands = input.history();
-      else GUIProp.search = input.history();
-      input.history(search ? GUIProp.search : GUIProp.commands);
+      saveMode();
+      input.history(s == 0 ? GUIProp.search : s == 1 ?  GUIProp.xpath :
+        GUIProp.commands);
       mode.setText(mod);
       input.setText("");
       input.requestFocusInWindow();
     }
-    input.help = search ? data.deepfs ? HELPSEARCHFS : HELPSEARCHXML : HELPCMD;
+    input.help = s == 0 ? data.deepfs ? HELPSEARCHFS : HELPSEARCHXML :
+      s == 1 ? HELPXPATH : HELPCMD;
     mode.setFocusable(db);
     mode.setRolloverEnabled(db);
+  }
+  
+  /**
+   * Saves the last input mode.
+   */
+  protected void saveMode() {
+    final String old = mode.getText();
+    if(old.equals(BUTTONCMD)) {
+      GUIProp.commands = input.history();
+    } else if(old.equals(BUTTONXPATH)) {
+      GUIProp.xpath = input.history();
+    } else if(old.equals(BUTTONSEARCH)) {
+      GUIProp.search = input.history();
+    }
   }
 
   /**

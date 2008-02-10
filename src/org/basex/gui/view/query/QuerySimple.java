@@ -101,7 +101,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     copy.addKeyListener(main);
     copy.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        main.panels[0].last = main.panels[2].last;
+        main.panels[0].last = main.panels[1].last;
         main.mode = 0;
         main.refreshLayout();
       }
@@ -140,6 +140,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     // <LK> initialize statistics
     //set.init();
     keys = keys(GUI.context.data().stats);
+    panel.removeAll();
     addKeys(0);
   }
 
@@ -182,7 +183,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
   }
 
   /**
-   * Adds a combo box.
+   * Adds a category combobox.
    * @param pos position
    */
   void addKeys(final int pos) {
@@ -194,8 +195,8 @@ final class QuerySimple extends QueryPanel implements ActionListener {
   }
 
   /**
-   * Adds a combo box.
-   * @param values combo box values
+   * Adds a combobox.
+   * @param values combobox values
    * @param pos position
    */
   void addCombo(final String[] values, final int pos) {
@@ -207,7 +208,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
   }
 
   /**
-   * Adds a combo box.
+   * Adds a combobox.
    * @param min minimum value
    * @param max maximum value
    * @param pos position

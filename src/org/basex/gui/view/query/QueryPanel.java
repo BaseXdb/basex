@@ -7,12 +7,6 @@ package org.basex.gui.view.query;
  * @author Christian Gruen
  */
 abstract class QueryPanel {
-  /** XPath Mode. */
-  static final int XPATH = 0; 
-  /** XQuery Mode. */
-  static final int XQUERY = 1; 
-  /** Simple query Mode. */
-  static final int SIMPLE = 2; 
   /** Last Query. */
   String last = "";
 

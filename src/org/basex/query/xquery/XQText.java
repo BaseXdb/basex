@@ -65,8 +65,6 @@ public interface XQText {
   Object[] COLLINV = { FODC, 2, "Collection name \"%\" is invalid." };
   /** FODC0004: Evaluation exception. */
   Object[] COLLDEF = { FODC, 2, "No default collection found." };
-  /** FODC0004: Evaluation exception. */
-  //Object[] FUNCOLL = { FODC, 4, "Collection \"%\" could not be loaded." };
   /** FODC0005: Evaluation exception. */
   Object[] INVDOC = { FODC, 5, "Invalid file path: \"%\"." };
 
@@ -76,15 +74,7 @@ public interface XQText {
   Object[] INVALZONE = { FODT, 3, "Invalid timezone: %." };
 
   /** FOER0000: Evaluation exception. */
-  String FUNERR = "FOER0000";
-  /** FOER0000: Evaluation exception. */
-  Object[] FUNERR1 = { FOER, 0, "Halted on error()." };
-  /** FOER0000: Evaluation exception. */
-  String FUNERR2 = "%: Halted on error.";
-  /** FOER0000: Evaluation exception. */
-  String FUNERR3 = "%: %";
-  /** FOER0000: Evaluation exception. */
-  String FUNERR4 = "%: % [%]";
+  String FUNERR1 = "Halted on error().";
 
   /** FONS0004: Evaluation exception. */
   Object[] NSDECL = { FONS, 4, "Namespace prefix not declared: \"%\"." };

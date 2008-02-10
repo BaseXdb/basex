@@ -3,8 +3,10 @@ package org.basex.query.xquery;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
+
 import java.io.File;
 import java.io.IOException;
+
 import org.basex.BaseX;
 import org.basex.io.IOConstants;
 import org.basex.query.xquery.expr.And;
@@ -160,7 +162,7 @@ public final class XQParser {
 
     try {
       file = f;
-      
+
       qu = q;
       ql = qu.length;
       if(ql == 0) Err.or(QUERYEMPTY);
@@ -189,16 +191,15 @@ public final class XQParser {
       }
       ctx.fun.check();
     } catch(final XQException ex) {
-      BaseX.debug(ex);
-      final String msg = ex.getMessage();
-      if(msg.startsWith(STOPPED)) throw ex;
+      if(ex.pos() != null) throw ex;
 
       int l = 1; int c = 1;
       for(int i = 0; i + 1 < qp && i < ql; i++) {
         if(qu[i] == 0x0A) { l++; c = 1; } else if(qu[i] != 0x0D) { c++; }
       }
-      Err.or((file == null ? BaseX.info(POSINFO, l, c) :
-        BaseX.info(POSFILEINFO, l, c, file)) + msg);
+      ex.pos(file == null ? BaseX.info(POSINFO, l, c) :
+        BaseX.info(POSFILEINFO, l, c, file));
+      throw ex;
     }
   }
 
@@ -638,7 +639,7 @@ public final class XQParser {
    */
   private Expr exprSingle() throws XQException {
     if(!consume(TRY)) return exprSingle2();
-    
+
     final Expr tr = enclosedExpr(NOENCLEXPR);
     check(CATCH);
     check(PAR1);
@@ -739,7 +740,7 @@ public final class XQParser {
 
       do {
         if(comma && !fr) score = consumeWS(SCORE);
-        
+
         final QNm name = varName();
         final SeqType type = !score && consumeWS(AS) ? sequenceType() : null;
         final Var var = new Var(name, type);
@@ -1591,7 +1592,7 @@ public final class XQParser {
   private Expr dirElemContent(final QNm tag) throws XQException {
     final TokenBuilder tb = new TokenBuilder();
     do {
-      byte c = curr();
+      final byte c = curr();
       if(c == '<') {
         if(consume(CDATA)) {
           tb.add(cDataSection());
@@ -1662,7 +1663,7 @@ public final class XQParser {
     final byte[] str = qName(PIWRONG);
     final Expr pi = Str.get(str);
     if(str.length == 0 || Token.eq(Token.lc(str), XML)) Err.or(PIXML, pi);
-    
+
     final boolean space = consumeWS();
     final TokenBuilder tb = new TokenBuilder();
     do {
@@ -2129,7 +2130,7 @@ public final class XQParser {
    */
   private boolean ftMatchOption(final FTOptions opt) throws XQException {
     // [CG] XQuery/FTMatchOptions: language, stemming, thesaurus, stopword, ...
-    
+
     if(consumeWS(LOWERCASE)) {
       if(opt.lowercase || opt.uppercase || opt.sensitive) Err.or(FTCASE);
       opt.lowercase = true;
@@ -2190,7 +2191,7 @@ public final class XQParser {
     }
     return true;
   }
-  
+
   /**
    * Parses an NCName.
    * @param err optional error message
@@ -2204,7 +2205,7 @@ public final class XQParser {
     if(err != null) Err.or(err);
     return Token.EMPTY;
   }
-  
+
   /**
    * Parses a QName.
    * @param err optional error message
@@ -2221,7 +2222,7 @@ public final class XQParser {
   }
 
   /**
-   * Helper method for parsing NCNames. 
+   * Helper method for parsing NCNames.
    * @param first flag for first call
    * @return true for success
    */
@@ -2511,9 +2512,9 @@ public final class XQParser {
     ctx.fun.funError((QNm) alter[0]);
     Err.or(FUNCUNKNOWN, ((QNm) alter[0]).str());
   }
-  
+
   /**
-   * Finds and returns the specified node type. 
+   * Finds and returns the specified node type.
    * @param type type as string
    * @return type or null
    */

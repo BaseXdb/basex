@@ -28,17 +28,6 @@ public final class Err {
   }
 
   /**
-   * Throws an exception.
-   * @param err error message
-   * @param x extended info
-   * @throws XQException evaluation exception
-   */
-  public static void or(final String err, final Object... x)
-      throws XQException {
-    throw new XQException(err, x);
-  }
-  
-  /**
    * Throws a type exception.
    * @param inf expression info
    * @param t expected type

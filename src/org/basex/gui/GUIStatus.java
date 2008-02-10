@@ -32,6 +32,12 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
   private String perf = "";
   /** Current focus on memory. */
   protected boolean memfocus;
+  /** Error flag. */
+  protected boolean error;
+  /** Maximum memory. */
+  protected long max = 1;
+  /** Used memory. */
+  protected long used;
 
   /**
    * Constructor.
@@ -44,15 +50,15 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
       public void mousePressed(final MouseEvent e) {
         if(memfocus) {
           final Runtime rt = Runtime.getRuntime();
-          final long mx = rt.maxMemory();
-          final long oc = rt.totalMemory();
-          final long fr = rt.freeMemory();
+          final long occ = rt.totalMemory();
+          max = rt.maxMemory();
+          used = occ - rt.freeMemory();
 
           Performance.gc(4);
           final String inf =
-            MEMTOTAL + Performance.formatSize(mx, true) + Prop.NL +
-            MEMRESERVED + Performance.formatSize(oc, true) + Prop.NL +
-            MEMUSED + Performance.formatSize(oc - fr, true) + Prop.NL +
+            MEMTOTAL + Performance.formatSize(max, true) + Prop.NL +
+            MEMRESERVED + Performance.formatSize(occ, true) + Prop.NL +
+            MEMUSED + Performance.formatSize(used, true) + Prop.NL +
             Prop.NL + MEMHELP;
 
           JOptionPane.showMessageDialog(GUI.get(), inf, MEMTITLE,
@@ -82,13 +88,35 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
    * @param stat the text to be set
    */
   public void setText(final String stat) {
-    status = stat;
-    oldStatus = status;
-    perf = "";
-    if(stat.equals(STATUSWAIT)) new Thread(this).start();
-    else repaint();
+    error = false;
+    refresh(stat);
   }
 
+  /**
+   * Sets the error status text.
+   * @param stat the text to be set
+   */
+  public void setError(final String stat) {
+    error = true;
+    refresh(stat);
+  }
+
+  /**
+   * Refreshes the status text.
+   * @param txt status text
+   */
+  private void refresh(final String txt) {
+    status = txt;
+    oldStatus = status;
+    perf = "";
+    
+    final Runtime rt = Runtime.getRuntime();
+    max = rt.maxMemory();
+    used = rt.totalMemory() - rt.freeMemory();
+    if(txt.equals(STATUSWAIT)) new Thread(this).start();
+    repaint();
+  }
+      
   /**
    * Sets performance information text.
    * @param info the text to be set
@@ -104,6 +132,7 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
    */
   public void setPath(final byte[] path) {
     status = path.length == 0 ? oldStatus : STATUSPATH + Token.string(path);
+    error = false;
     perf = "";
     repaint();
   }
@@ -123,21 +152,17 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
     final int ww = getWidth() - MEMW;
     final int hh = getHeight();
 
-    final Runtime rt = Runtime.getRuntime();
-    final long mx = rt.maxMemory();
-    final long oc = rt.totalMemory();
-
-    final boolean full = oc * 6 / 5 > mx;
+    final boolean full = used * 6 / 5 > max;
     g.setFont(getFont());
     g.setColor(GUIConstants.color1);
     g.fillRect(ww, 0, MEMW - 1, hh - 2);
     g.setColor(full ? GUIConstants.colormark4 : GUIConstants.color4);
-    g.fillRect(ww + 2, 2, (int) (oc * (MEMW - 7) / mx), hh - 5);
+    g.fillRect(ww + 2, 2, (int) (used * (MEMW - 7) / max), hh - 5);
     BaseXLayout.rect(g, true, ww, 0, ww + MEMW - 3, hh - 2);
     g.setColor(full ? GUIConstants.colormark3 : GUIConstants.color6);
 
     FontMetrics fm = g.getFontMetrics();
-    final String mem = Performance.formatSize(oc, true);
+    final String mem = Performance.formatSize(used, true);
     int fw = ww + (MEMW - 4 - fm.stringWidth(mem)) / 2;
     final int h = fm.getHeight() - 2;
     g.drawString(mem, fw, h);
@@ -156,6 +181,7 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
       if(fw > w) break;
       fw += fm.charWidth(st.charAt(i));
     }
+    g.setColor(error ? GUIConstants.COLORERROR : Color.black);
     g.drawString(st.substring(0, i), 4, h);
     if(fw > w) g.drawString("...", fw - 16, h);
   }

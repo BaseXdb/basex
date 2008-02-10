@@ -144,7 +144,9 @@ public final class XQContext extends QueryContext {
   public XQResult eval(final Nodes nodes) throws XQException {
     // evaluates the query and returns the result
     try {
-      return new XQResult(this, new SeqBuilder(iter(root)));
+      final Iter iter = iter(root);
+      finish();
+      return new XQResult(this, new SeqBuilder(iter));
     } catch(final StackOverflowError e) {
       if(Prop.debug) e.printStackTrace();
       Err.or(XPSTACK);
@@ -176,7 +178,7 @@ public final class XQContext extends QueryContext {
    */
   public Iter iter(final Expr expr) throws XQException {
     // cancel if query was interrupted
-    if(stopped()) Err.or("");
+    if(stopped()) throw new XQException();
 
     // skip query info for items
     final Iter iter = expr.iter(this);
@@ -224,6 +226,19 @@ public final class XQContext extends QueryContext {
     return addNS(docs[dl]);
   }
 
+  /**
+   * Finishes the query execution.
+   */
+  public void finish() {
+    /*try {
+      for(final DNode doc : docs) {
+        doc.data.close();
+      }
+    } catch(final IOException ex) {
+      BaseX.debug(ex);
+    }*/
+  }
+  
   /**
    * Adds namespaces from the specified document.
    * @param doc document

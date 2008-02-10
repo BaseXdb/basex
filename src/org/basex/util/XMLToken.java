@@ -16,16 +16,7 @@ public final class XMLToken {
   private XMLToken() { }
 
   /**
-   * Checks if the specified character is an XML whitespace.
-   * @param ch the letter to be checked
-   * @return result of comparison
-  public static boolean whitespace(final int ch) {
-    return ch == 0x09 || ch == 0x0A || ch == 0x0D || ch == 0x20;
-  }
-   */
-
-  /**
-   * Checks if the specified character is an XML whitespace.
+   * Checks if the specified character is a valid XML character.
    * @param ch the letter to be checked
    * @return result of comparison
    */

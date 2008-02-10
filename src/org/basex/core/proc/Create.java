@@ -197,8 +197,10 @@ public final class Create extends Proc {
       BaseX.debug(ex);
       err = ex.getMessage();
     } catch(final Exception ex) {
-      final String msg = ex.getMessage();
+      String msg = ex.getMessage();
+      if(msg == null) msg = ex.toString();
       BaseX.debug(ex);
+      System.out.println(ex);
       err = BaseX.info(CREATEERR, cmd.args(), msg.length() != 0 ? msg : "");
     }
     

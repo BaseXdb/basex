@@ -89,6 +89,7 @@ public abstract class Proc extends AbstractProcess {
       return error(PROCERR, cmd, ex);
     } catch(final Error ex) {
       // should not happen...
+      Performance.gc(2);
       ex.printStackTrace();
       return error(PROCERR, cmd, ex);
     }

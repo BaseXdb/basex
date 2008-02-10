@@ -21,20 +21,30 @@ final class FNOut extends Fun {
   public Iter iter(final XQContext ctx, final Iter[] arg) throws XQException {
     switch(func) {
       case ERROR:
-        if(arg.length == 0) Err.or(FUNERR1);
-        final Item it = arg[0].atomic(this, true);
-        if(it == null && arg.length == 1) Err.empty(this);
-        final byte[] n = it == null && arg.length != 1 ?
-            Token.token(FUNERR) : ((QNm) check(it, Type.QNM)).ln();
-        if(arg.length == 1) Err.or(FUNERR2, n);
-        final byte[] dsc = checkStr(arg[1]);
-        if(arg.length == 2) Err.or(FUNERR3, n, dsc);
-        Err.or(FUNERR4, n, dsc, checkStr(arg[2]));
+        final int al = arg.length;
+        String code = FOER;
+        Object num = 0;
+        String msg = FUNERR1;
+        
+        if(al != 0) {
+          final Item it = arg[0].atomic(this, true);
+          if(it == null) {
+            if(al == 1) Err.empty(this);
+          } else {
+            code = Token.string(((QNm) check(it, Type.QNM)).ln());
+            num = null;
+          }
+          if(al > 1) {
+            msg = Token.string(checkStr(arg[1]));
+            if(al > 2) msg += " (" + Token.string(checkStr(arg[2])) + ")";
+          }
+        }
+        Err.or(new Object[] { code, num, msg});
         return null;
       case TRACE:
-        final String msg = Token.string(checkStr(arg[1])) + ": " + arg[0];
+        msg = Token.string(checkStr(arg[1])) + ": " + arg[0];
         ctx.evalInfo(msg);
-        System.out.println(msg);
+        //System.out.println(msg);
         return arg[0];
       default:
         throw new RuntimeException("Not defined: " + func);

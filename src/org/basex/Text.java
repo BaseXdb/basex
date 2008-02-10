@@ -578,6 +578,8 @@ public interface Text {
   String BUTTONSEARCH = lang("b_search");
   /** Input field. */
   String BUTTONCMD = lang("b_cmd");
+  /** Input field. */
+  String BUTTONXPATH = lang("b_xpath");
   /** Button text for confirming actions. */
   String BUTTONOK = lang("b_ok");
   /** Button text for opening files. */
@@ -592,10 +594,10 @@ public interface Text {
   String BUTTONBROWSE = lang("b_browse") + DOTS;
   /** Interactive Filtering. */
   String BUTTONFILTER = lang("b_filter");
-  /** Title of XPath Button. */
-  String BUTTONTOXPATH = ">> XPath";
+  /** XQuery copy Button. */
+  String BUTTONTOXPATH = ">> XQuery";
   /** Text field mode - Search Modes. */
-  String[] SEARCHMODE = { "XPath", "XQuery", lang("b_simple") };
+  String[] SEARCHMODE = { "XQuery", lang("b_simple") };
 
   // STATUS BAR ===============================================================
 
@@ -1149,7 +1151,7 @@ public interface Text {
       "return to the main window.");
   /** Help String. */
   byte[] HELPMODE = token("Click on the button to switch between the " +
-      "command and search mode.\nThis button is only active if a " +
+      "search, XPath and command mode.\nThis button is only active if a " +
       "database has been opened.");
   /** Help String. */
   byte[] HELPOK =
@@ -1278,6 +1280,13 @@ public interface Text {
     "...=...  Find metadata (e.g. 'Album=Beatles')\n\n" +
     "You can enter BaseX commands by preceding your input with an " +
     "exclamation mark.");
+  /** Help Dialog. */
+  byte[] HELPXPATH = token(
+      "The XPath mode allows the input of simple XPath requests. " +
+      "XPath is often processed faster than XQuery. " +
+      "The XPath language is based on a tree representation " +
+      "of the XML document, and provides the ability to navigate " +
+      "around the tree, selecting nodes by a variety of criteria.");
   /** Help String. */
   String HELPHIST = "\n\nThe text area offers a history function: " +
     "You can store the current input with Ctrl+ENTER and retrieve " +
@@ -1325,11 +1334,6 @@ public interface Text {
 
   /** Help String. */
   byte[][] HELPSEARCH = {
-      token("The XPath mode allows the input of simple XPath requests. " +
-         "XPath is often processed faster than XQuery. " +
-         "The XPath language is based on a tree representation " +
-         "of the XML document, and provides the ability to navigate " +
-         "around the tree, selecting nodes by a variety of criteria."),
       token("The XQuery input mode offers the full range of query " +
          "features that is offered by the XQuery language. " +
          "XQuery uses XPath expression syntax to address specific " +
@@ -1341,20 +1345,14 @@ public interface Text {
         "XML document.")
   };
   /** Help String. */
-  byte[][] HELPQUERYMODE = {
-      token("In this text area, you can enter any XPath 1.0 query. " +
-          "The input is evaluated after each key click.\n\n" +
-          "For example, the query \"book[@price]\" would show all " +
-          "book elements with a price attribute:" + HELPHIST),
-      token("In this text area, you can enter any XQuery 1.0 query. " +
-          "The input is evaluated after each key click.\n\n" +
-          "The following example would show all book titles " +
-          " with the topic 'BaseX':\n\n" +
-          "  for $a IN //book\n" +
-          "  where $a/topic = \"BaseX\"\n" +
-          "  return $a/title" + HELPHIST),
-      null
-  };
+  byte[] HELPQUERYMODE =
+    token("In this text area, you can enter any XQuery 1.0 query. " +
+        "The input is evaluated after each key click.\n\n" +
+        "The following example would show all book titles " +
+        " with the topic 'BaseX':\n\n" +
+        "  for $a IN //book\n" +
+        "  where $a/topic = \"BaseX\"\n" +
+        "  return $a/title" + HELPHIST);
   /** Help String. */
   byte[] HELPSEARCHCAT =
     token("In this combo box, all tags and attribute names of the current " +

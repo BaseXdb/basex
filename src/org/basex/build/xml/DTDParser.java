@@ -3,7 +3,6 @@ package org.basex.build.xml;
 import static org.basex.build.BuildText.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.XMLToken.*;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.basex.BaseX;
@@ -71,9 +70,10 @@ public class DTDParser {
     if(!consume(DOCTYPE) || !consumeWS()) error();
     // check NAME
     root = consumeName();
-    if(string(root).equals(string(SYSTEM))) error();
+
     // check Whitespace
-    if(!consumeWS()) error();
+    consumeWS();
+    
     // check for ExternDTD
     if(consume(SYSTEM)) {
       if(!consumeWS()) error();
@@ -117,7 +117,7 @@ public class DTDParser {
     extern = true;
     pos = 0;
     BaseX.debug("- Root Element Type: %", root);
-    BaseX.debug("- Content:\n %", content);
+    BaseX.debug("- Content of %:\n %", dtd, content);
     BaseX.debug("----------------");
     consumeContent();
     extern = false;
@@ -134,14 +134,14 @@ public class DTDParser {
       // checks for element, attlist and entity tags
       if(consume(ELEM)) {
         if(!consumeWS()) error();
-        element = consumeName();
+        element = consumeName2();
         tags.add(element);
         BaseX.debug("----------------------");
         BaseX.debug("- Element: %", element);
         contentSpec();
       } else if(consume(ATTL)) {
         if(!consumeWS()) error();
-        attl = consumeName();
+        attl = consumeName2();
         atts.add(attl);
         BaseX.debug("----------------------");
         BaseX.debug("- ATTLIST: %", attl);
@@ -154,7 +154,7 @@ public class DTDParser {
         if(!consumeWS()) error();
         if(percentage(next())) {
           if(!consumeWS()) error();
-          byte[] name = consumeName();
+          byte[] name = consumeName2();
           BaseX.debug("----------------------");
           BaseX.debug("- Entity: %", name);
           if(!consumeWS()) error();
@@ -162,9 +162,9 @@ public class DTDParser {
           ents.add(name, val);
         } else {
           prev();
-          byte[] name = consumeName();
+          byte[] name = consumeName2();
           BaseX.debug("----------------------");
-          BaseX.debug("- Entity: %", name);
+          BaseX.debug("- Entity: '%'", name);
           final byte[] val = entDef();
           ents.add(name, val);
         }
@@ -174,7 +174,6 @@ public class DTDParser {
         BaseX.debug(NOT);
       } else if(consume(GQ)) {
         byte ch = next();
-        BaseX.outln((char) ch);
         if(!isFirstLetter(ch)) error(PINAME);
         while(isLetter(ch = next()));
         BaseX.debug("NOT IMPLEMENTED");
@@ -220,7 +219,7 @@ public class DTDParser {
       error();
     } else {
       consumeWS1();
-      BaseX.debug(consumeName());
+      BaseX.debug(consumeName2());
       consumeWS1();
     }
   }
@@ -238,7 +237,7 @@ public class DTDParser {
           check = true;
           consumeBracketed();
         } else {
-          BaseX.debug(consumeName());
+          BaseX.debug(consumeName2());
           consumeWS1();
         }
       } else if(consume(BRACKETO)) {
@@ -246,7 +245,7 @@ public class DTDParser {
       } else {
         if(check) {
           consumeWS1();
-          BaseX.debug(consumeName());
+          BaseX.debug(consumeName2());
           consumeWS1();
           check = false;
         } else {
@@ -277,7 +276,7 @@ public class DTDParser {
         if(consume(BRACKETO)) {
           consumeBracketed();
         } else {
-          BaseX.debug(consumeName());
+          BaseX.debug(consumeName2());
           consumeWS1();
         }
       } else if(consume(BRACKETO)) {
@@ -287,7 +286,7 @@ public class DTDParser {
       } else {
         if(check) {
           consumeWS1();
-          BaseX.debug(consumeName());
+          BaseX.debug(consumeName2());
           consumeWS1();
           check = false;
         } else {
@@ -312,7 +311,7 @@ public class DTDParser {
    */
   private void attType() throws BuildException {
     consumeWS1();
-    BaseX.debug(consumeName());
+    BaseX.debug(consumeName2());
     consumeWS1();
     if(consume(CD)) {
       BaseX.debug(CD);
@@ -324,7 +323,7 @@ public class DTDParser {
       if(consume(BRACKETO)) {
         consumeBracketed2();
       } else {
-        BaseX.debug(consumeName());
+        BaseX.debug(consumeName2());
       }
     } else if(checkTokenize()) {
       BaseX.debug(checkT);
@@ -375,7 +374,7 @@ public class DTDParser {
       if(consume(ND)) {
         BaseX.debug(ND);
         if(!consumeWS()) error();
-        BaseX.debug(consumeName());
+        BaseX.debug(consumeName2());
       } else if(!consume(GREAT)) {
         BaseX.debug(consumeQuoted());
       }
@@ -441,6 +440,22 @@ public class DTDParser {
   private byte[] consumeName() throws BuildException {
     int p = pos;
     byte c = next();
+    if(!XMLToken.isFirstLetter(c)) error();
+
+    do {
+      c = next();
+    } while(XMLToken.isLetter(c));
+    return substring(content, p, pos);
+  }
+
+  /**
+   * Consumes a name.
+   * @return consumed name
+   * @throws BuildException Build Exception
+   */
+  private byte[] consumeName2() throws BuildException {
+    int p = pos;
+    byte c = next();
     if(!XMLToken.isFirstLetter(c) && !percentage(c)) {
       error();
     }
@@ -485,7 +500,7 @@ public class DTDParser {
    */
   private boolean checkTokenize() throws BuildException {
     int p = pos;
-    checkT = consumeName();
+    checkT = consumeName2();
     byte[] help = checkT;
     if(eq(help, ID) || eq(help, IDR) || eq(help, IDRS) || eq(help, ENT1)
         || eq(help, ENTS) || eq(help, NMT) || eq(help, NMTS)) {

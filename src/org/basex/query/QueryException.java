@@ -23,7 +23,7 @@ public class QueryException extends Exception {
    * @param s message
    * @param e message extension
    */
-  public QueryException(final String s, final Object... e) {
+  public QueryException(final Object s, final Object... e) {
     super(BaseX.info(s, e));
   }
 }

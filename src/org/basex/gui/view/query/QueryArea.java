@@ -47,26 +47,22 @@ public final class QueryArea extends QueryPanel {
   JScrollPane sp;
   /** Scroll Pane. */
   BaseXBack south;
-  /** Query mode. */
-  int mode;
 
   /**
    * Default constructor.
    * @param view main panel
-   * @param m query mode
    */
-  QueryArea(final QueryView view, final int m) {
+  QueryArea(final QueryView view) {
     main = view;
-    area = new BaseXTextArea(HELPQUERYMODE[m]);
+    area = new BaseXTextArea(HELPQUERYMODE);
     area.setFont(GUIConstants.mfont);
     area.addKeyListener(main);
     sp = new JScrollPane(area);
     south = new BaseXBack(GUIConstants.FILL.NONE);
     south.setLayout(new BorderLayout(8, 8));
-    mode = m;
     
     initPanel();
-    area.init(mode == XQUERY ? GUIProp.xquerycmd : GUIProp.xpathcmd);
+    area.init(GUIProp.xquerycmd);
   }
 
   @Override
@@ -124,15 +120,14 @@ public final class QueryArea extends QueryPanel {
     final String text = area.getText();
     if(force || !text.equals(last)) {
       last = text;
-      final Commands cmd = mode == XQUERY ? Commands.XQUERY : Commands.XPATH;
-      GUI.get().execute(cmd, text.trim().length() == 0 ? "." : text);
+      GUI.get().execute(Commands.XQUERY,
+          text.trim().length() == 0 ? "." : text);
     }
   }
 
   @Override
   void quit() {
-    if(mode == XQUERY) GUIProp.xquerycmd = area.strings();
-    else GUIProp.xpathcmd = area.strings();
+    GUIProp.xquerycmd = area.strings();
   }
 
   @Override

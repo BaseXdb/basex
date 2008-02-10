@@ -5,6 +5,7 @@ import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Str;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Var;
+import org.basex.util.Token;
 
 /**
  * Project specific try/catch expression.
@@ -14,9 +15,9 @@ import org.basex.query.xquery.util.Var;
  */
 public final class Try extends Arr {
   /** Variable. */
-  private Var var1;
+  private final Var var1;
   /** Variable. */
-  private Var var2;
+  private final Var var2;
 
   /**
    * Constructor.
@@ -42,8 +43,8 @@ public final class Try extends Arr {
       return ctx.iter(expr[0]);
     } catch(final XQException e) {
       final int s = ctx.vars.size();
-      if(var1 != null) ctx.vars.add(var1.item(Str.get(e.msg())));
-      if(var2 != null) ctx.vars.add(var2.item(Str.get(e.code())));
+      if(var1 != null) ctx.vars.add(var1.item(Str.get(Token.token(e.msg()))));
+      if(var2 != null) ctx.vars.add(var2.item(Str.get(Token.token(e.code()))));
       final Iter iter = ctx.iter(expr[1]);
       ctx.vars.reset(s);
       return iter;

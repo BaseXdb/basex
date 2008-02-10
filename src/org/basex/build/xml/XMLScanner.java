@@ -515,13 +515,9 @@ public final class XMLScanner {
 
     final byte[] en = ents.get(entity.finish());
     if(en != null) return en;
-    if(Prop.entity) error(INVALIDENTITY, entity.finish());
+    if(Prop.entity) error(INVALIDENTITY, entity);
     entity.reset();
     return entity.finish();
-
-    //completeEntity();
-    //if(Prop.entity) error(INVALIDENTITY, entity);
-    //return 0;
   }
 
   /**

@@ -170,7 +170,7 @@ public enum FunDef {
   /* FNOut functions. */
   
   /** XQuery function. */
-  ERROR(Uri.FN, FNOut.class, 0, 3, "error(error?, desc?, object?)", null),
+  ERROR(Uri.FN, FNOut.class, 0, 3, "error(code?, desc?, object?)", null),
   /** XQuery function. */
   TRACE(Uri.FN, FNOut.class, 2, 2, "trace(item, message)", Type.ITEM),
 

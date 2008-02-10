@@ -502,18 +502,9 @@ public enum GUICommands {
   INPUTMODE(true, GUIINPUTMODE, null, GUIINPUTMODETT) {
     @Override
     public void execute() {
-      GUIProp.searchmode ^= true;
+      GUIProp.searchmode = ++GUIProp.searchmode % 3;
       GUI.get().refreshControls();
     }
-
-    @Override
-    public void refresh(final AbstractButton button, final boolean sel) {
-      super.refresh(button, sel);
-      BaseXLayout.select(button, !GUIProp.searchmode);
-    }
-
-    @Override
-    public boolean checked() { return true; }
   },
 
   /** Realtime filtering on/off. */
