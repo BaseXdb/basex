@@ -100,6 +100,7 @@ public class DTDParser {
    * @throws IOException I/O Exception
    */
   private void starter() throws IOException {
+    consumeWS1();
     if(consume(SBRACKETO)) {
       BaseX.debug("- Root Element Type: %", root);
       BaseX.debug("- Content:\n %", content);
@@ -346,14 +347,15 @@ public class DTDParser {
       consumeWS1();
       if(consume(DASH) || consume(COLON)) {
         consumeWS1();
+        check = true;
         if(consume(BRACKETO)) {
-          check = true;
           consumeBracketed();
         } else {
           BaseX.debug(consumeName2());
           consumeWS1();
         }
       } else if(consume(BRACKETO)) {
+        check = true;
         consumeBracketed();
       } else {
         if(check) {
@@ -596,7 +598,7 @@ public class DTDParser {
    * @throws BuildException Build Exception
    */
   private void error() throws BuildException {
-    //BaseX.debug(substring(content, pos, pos + 4));
+    BaseX.debug(substring(content, pos, pos + 4));
     throw new BuildException("Error while DTD parsing.");
   }
 }
