@@ -409,6 +409,10 @@ public interface Text {
   String MENUHELP = lang("m_help");
 
   /** Menu label. */
+  String MENUDB = lang("m_db") + COL;
+  /** Menu label. */
+  String MENUXQ = lang("m_xquery") + COL;
+  /** Menu label. */
   String MENUMAIN = lang("m_main") + COL;
   /** Menu label. */
   String MENUVIEWS = lang("m_views") + COL;
@@ -571,6 +575,14 @@ public interface Text {
   String GUISHOWTREE = lang("c_showtree");
   /** Command Info. */
   String GUISHOWTREETT = lang("c_showtreett");
+  /** Command Info. */
+  String GUIXQOPEN = lang("c_xqopen") + DOTS;
+  /** Command Info. */
+  String GUIXQOPENTT = lang("c_xqopentt");
+  /** Command Info. */
+  String GUIXQSAVE = lang("c_xqsave") + DOTS;
+  /** Command Info. */
+  String GUIXQSAVETT = lang("c_xqsavett");
 
   // BUTTONS ==================================================================
 
@@ -640,6 +652,8 @@ public interface Text {
   String CREATETITLE = lang("dc_title");
   /** XML File Description. */
   String CREATEXMLDESC = lang("dc_xmldesc") + " (*.xml)";
+  /** XQ File Description. */
+  String CREATEXQDESC = lang("dc_xqdesc") + " (*.xq)";
   /** Dialog Title for Database Options. */
   String CREATEADVTITLE = lang("dc_advtitle");
   /** Database Options. */
@@ -681,6 +695,15 @@ public interface Text {
   /** Dialog title for deleting nodes. */
   String NODBQUESTION = OPENNODBINFO + DOT + NL +
     lang("do_nodbquestion") + NL + " ";
+
+  /** Dialog title for creating a database. */
+  String XQOPENTITLE = lang("dq_open");
+  /** Dialog title for creating a database. */
+  String XQSAVETITLE = lang("dq_save");
+  /** Dialog title for creating a database. */
+  String XQOPERROR = lang("dq_notopened");
+  /** Dialog title for creating a database. */
+  String XQSAVERROR = lang("dq_notsaved");
 
   /** Dialog Title for Import Options. */
   String IMPORTFSTITLE = lang("dfs_title");

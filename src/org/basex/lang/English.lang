@@ -11,6 +11,8 @@ m_edit=Edit
 m_view=View
 m_options=Options
 m_help=Help
+m_db=Database
+m_xquery=XQuery
 m_main=Main Window
 m_views=Views
 m_inter=Interaction
@@ -50,6 +52,7 @@ d_fctitle=Choose Directory
 
 dc_title=Select XML document
 dc_xmldesc=XML Documents
+dc_xqdesc=XQuery files
 dc_advtitle=Database Options
 dc_advlabel=Choose some Database options
 dc_chop=Chop Whitespaces
@@ -70,6 +73,11 @@ dc_mminfo=This mode speeds up querying, but updates are disabled
 do_title=Open Database
 do_nodb=No databases was found
 do_nodbquestion=Do you want to create a new one?
+
+dq_open=Open XQuery file
+dq_save=Save XQuery file
+dq_notopened=File could not be opened.
+dq_notsaved=File could not be saved.
 
 dfs_title=Import Filesystem
 dfs_save=Save As
@@ -231,6 +239,10 @@ c_showtext=Text
 c_showtexttt=Show the text view.
 c_showtree=Tree
 c_showtreett=Show the tree visualization.
+c_xqopen=Open
+c_xqopentt=Opens an XQuery file
+c_xqsave=Save
+c_xqsavett=Saves the current XQuery
 
 # Commands & Processes
 proc_time=Time Needed

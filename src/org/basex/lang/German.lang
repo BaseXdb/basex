@@ -11,6 +11,8 @@ m_edit=Bearbeiten
 m_view=Ansicht
 m_options=Optionen
 m_help=Hilfe
+m_db=Datenbank
+m_xquery=XQuery
 m_main=Hauptfenster
 m_views=Ansichten
 m_inter=Interaktion
@@ -50,6 +52,7 @@ d_fctitle=Verzeichnis
 
 dc_title=XML-Dokument öffnen
 dc_xmldesc=XML-Dokumente
+dc_xqdesc=XQuery-Anfragen
 dc_advtitle=Datenbank-Optionen
 dc_advlabel=Auswahl der Datenbank-Optionen
 dc_chop=Whitespaces entfernen
@@ -70,6 +73,11 @@ dc_mminfo=Queries werden schneller ausgeführt, aber Updates sind deaktiviert
 do_title=Datenbank öffnen
 do_nodb=Es wurde keine Datenbank gefunden
 do_nodbquestion=Wollen Sie eine neue Datenbank erstellen?
+
+dq_open=XQuery-Datei öffnen
+dq_save=XQuery-Datei speichern
+dq_notopened=Die Datei konnte nicht geöffnet werden.
+dq_notsaved=Die Datei konnte nicht gespeichert werden.
 
 dfs_title=Filesystem-Import
 dfs_save=Speichern als
@@ -230,6 +238,10 @@ c_showtext=Text
 c_showtexttt=Zeigt die Textansicht an.
 c_showtree=Baum
 c_showtreett=Zeigt die Baumansicht an.
+c_xqopen=Öffnen
+c_xqopentt=Öffneet eine XQuery-Anfrage
+c_xqsave=Speichern
+c_xqsavett=Speichert die aktuelle XQuery-Anfrage
 
 # Commands & Processes
 proc_time=Benötigte Zeit

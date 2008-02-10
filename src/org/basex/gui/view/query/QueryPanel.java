@@ -18,15 +18,17 @@ abstract class QueryPanel {
   abstract void finish();
   /** Reacts on the GUI termination. */
   abstract void quit();
-  /** Runs a query.
+
+  /**
+   * Runs a query.
    * @param force force the execution of a new query.
    */
   abstract void query(boolean force);
   
   /**
-   * Handles info messages from the main window.
+   * Handles info messages resulting from a query execution.
    * @param info info message
-   * @param ok ok flag
+   * @param ok true if query was successful
    */
   abstract void info(final String info, final boolean ok);
 }

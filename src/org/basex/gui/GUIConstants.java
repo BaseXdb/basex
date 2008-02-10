@@ -82,7 +82,8 @@ public final class GUIConstants {
 
   /** Two-dimensional Menu entries, containing the menu item commands. */
   public static final Object[][] MENUITEMS = { {
-    CREATE, OPEN, DROP, CLOSE, null,
+    MENUDB, CREATE, OPEN, DROP, CLOSE, null,
+    MENUXQ, XQOPEN, XQSAVE, null,
     IMPORTFS, EXPORT, null, EXIT
   }, {
     COPY, PASTE, DELETE, INSERT, EDIT, null,
@@ -148,9 +149,11 @@ public final class GUIConstants {
   // COLORS ===================================================================
 
   /** Error color. */
-  public static final Color COLORERROR = new Color(224, 0, 0);
-  /** Quote Color. */
-  public static final Color COLORQUOTE = new Color(192, 0, 0);
+  public static final Color COLORERROR = new Color(208, 0, 0);
+  /** Error color. */
+  public static final Color COLORMARK = new Color(255, 200, 180);
+  /** Error color. */
+  public static final Color COLORQUOTE = new Color(0, 0, 224);
   /** Button color. */
   public static final Color COLORBUTTON = Color.gray;
 

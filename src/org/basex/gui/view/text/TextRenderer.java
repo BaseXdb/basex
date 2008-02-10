@@ -243,12 +243,12 @@ public final class TextRenderer {
     if(quote != 0) {
       if(ch == quote) color = color2;
     } else {
-      if(ch == '<') color = GUIConstants.color6;
+      if(ch == '<') color = GUIConstants.COLORQUOTE;
     }
 
     // print visible text
     if(y >= 0 && y < h) {
-      Color col = error ? GUIConstants.colormark3 : info ? Color.black : color;
+      Color col = error ? GUIConstants.COLORERROR : info ? Color.black : color;
       if(startW >= 0 && endW >= 0 &&
           (posW >= startW && posW <= endW || posW >= endW && posW <= startW)) {
         g.setColor(GUIConstants.color6);
@@ -268,10 +268,10 @@ public final class TextRenderer {
     }
 
     if(quote == 0) {
-      if(color == GUIConstants.color6 && (ch == '"' || ch == '\'')) {
+      if(color == GUIConstants.COLORQUOTE && (ch == '"' || ch == '\'')) {
         // colorize quotes
         color2 = color;
-        color = GUIConstants.COLORQUOTE;
+        color = GUIConstants.COLORERROR;
         quote = ch;
       } else if(ch == '>') {
         color = Color.black;

@@ -43,3 +43,7 @@ metadata
 klinger
 stefan
 namespaces
+attlist
+highlighter
+whitespaces
+filesystem

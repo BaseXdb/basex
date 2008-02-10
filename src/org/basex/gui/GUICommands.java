@@ -1,7 +1,9 @@
 package org.basex.gui;
 
 import static org.basex.Text.*;
+
 import java.awt.BorderLayout;
+import java.io.IOException;
 import javax.swing.AbstractButton;
 import javax.swing.JOptionPane;
 import org.basex.BaseX;
@@ -103,6 +105,54 @@ public enum GUICommands {
     @Override
     public void execute() {
       GUI.get().execute(Commands.CLOSE);
+    }
+  },
+
+  /** Open XQuery. */
+  XQOPEN(true, GUIXQOPEN, "ctrl R", GUIXQOPENTT) {
+    @Override
+    public void execute() {
+      // open file chooser for XML creation
+      final GUI main = GUI.get();
+
+      final BaseXFileChooser fc = new BaseXFileChooser(XQOPENTITLE,
+          GUIProp.createpath, main);
+      fc.setFilter(Create.XQSUFFIX, CREATEXQDESC);
+
+      if(fc.select(BaseXFileChooser.OPEN)) {
+        try {
+          main.query.setXQuery(IOConstants.read(fc.getFile()));
+        } catch(final IOException ex) {
+          JOptionPane.showMessageDialog(main, XQOPERROR,
+              DIALOGINFO, JOptionPane.ERROR_MESSAGE);
+        }
+      }
+      GUIProp.createpath = fc.getDir();
+    }
+  },
+
+  /** Save XQuery. */
+  XQSAVE(true, GUIXQSAVE, "ctrl S", GUIXQSAVETT) {
+    @Override
+    public void execute() {
+      // open file chooser for XML creation
+      final GUI main = GUI.get();
+
+      final BaseXFileChooser fc = new BaseXFileChooser(XQSAVETITLE,
+          GUIProp.createpath, main);
+      fc.setFilter(Create.XQSUFFIX, CREATEXQDESC);
+
+      if(fc.select(BaseXFileChooser.SAVE)) {
+        try {
+          String file = fc.getFile().replaceAll("\\\\", "/");
+          if(file.indexOf(".") == -1) file += Create.XQSUFFIX;
+          IOConstants.write(file, main.query.getXQuery());
+        } catch(final IOException ex) {
+          JOptionPane.showMessageDialog(main, XQSAVERROR,
+              DIALOGINFO, JOptionPane.ERROR_MESSAGE);
+        }
+      }
+      GUIProp.createpath = fc.getDir();
     }
   },
 

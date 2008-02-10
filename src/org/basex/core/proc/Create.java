@@ -35,6 +35,8 @@ import org.basex.util.Token;
 public final class Create extends Proc {
   /** XML Suffix. */
   public static final String XMLSUFFIX = ".xml";
+  /** XQuery Suffix. */
+  public static final String XQSUFFIX = ".xq";
 
   /** Create option. */
   public static final String XML = "xml";

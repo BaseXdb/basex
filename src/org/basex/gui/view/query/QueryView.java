@@ -27,12 +27,14 @@ import org.basex.util.Token;
  */
 public final class QueryView extends View {
   /** Input mode panels. */
-  QueryPanel[] panels = new QueryPanel[SEARCHMODE.length];
+  private static final int NPANELS = SEARCHMODE.length;
+  /** Input mode panels. */
+  QueryPanel[] panels = new QueryPanel[NPANELS];
   /** Input mode. */
   int mode;
 
   /** Input mode buttons. */
-  private final BaseXButton[] input = new BaseXButton[SEARCHMODE.length];
+  private final BaseXButton[] input = new BaseXButton[NPANELS];
   /** Filter checkbox. */
   private BaseXCheckBox filterbox;
   /** Query panel. */
@@ -51,7 +53,7 @@ public final class QueryView extends View {
 
     box = new Box(BoxLayout.X_AXIS);
     box.setBorder(new EmptyBorder(0, 0, 8, 0));
-    for(int i = 0; i < SEARCHMODE.length; i++) {
+    for(int i = 0; i < NPANELS; i++) {
       input[i] = new BaseXButton(SEARCHMODE[i], HELPSEARCH[i]);
       input[i].setActionCommand(Integer.toString(i));
       input[i].addActionListener(new ActionListener() {
@@ -62,7 +64,11 @@ public final class QueryView extends View {
       });
       box.add(input[i]);
       box.add(Box.createHorizontalStrut(6));
-      panels[i] = i == 0 ? new QueryArea(this) : new QuerySimple(this);
+      if(i == 0) {
+        panels[i] = new QueryArea(this);
+      } else if(i == 1) {
+        panels[i] = new QuerySimple(this);
+      }
     }
     box.add(Box.createHorizontalStrut(6));
 
@@ -83,7 +89,7 @@ public final class QueryView extends View {
   @Override
   public void refreshInit() {
     if(!GUI.context.db()) {
-      for(int i = 0; i < SEARCHMODE.length; i++) panels[i].finish();
+      for(int i = 0; i < NPANELS; i++) panels[i].finish();
     } else {
       refreshLayout();
     }
@@ -107,7 +113,7 @@ public final class QueryView extends View {
 
   @Override
   public void refreshLayout() {
-    for(int i = 0; i < SEARCHMODE.length; i++)
+    for(int i = 0; i < NPANELS; i++)
       BaseXLayout.select(input[i], mode == i);
 
     removeAll();
@@ -120,6 +126,7 @@ public final class QueryView extends View {
     repaint();
     search.query(true);
     filterbox.setSelected(GUIProp.filterrt);
+    filterbox.setEnabled(mode == 1);
   }
 
   /**
@@ -166,6 +173,24 @@ public final class QueryView extends View {
    */
   public boolean info(final String info, final boolean ok) {
     if(search != null) search.info(info, ok);
-    return search != null && mode == 0;
+    return search != null && mode != 1;
+  }
+
+  /**
+   * Sets a new XQuery request.
+   * @param xq XQuery
+   */
+  public void setXQuery(final byte[] xq) {
+    panels[0].last = Token.string(xq);
+    mode = 0;
+    refreshLayout();
+  }
+
+  /**
+   * Returns the last XQuery input..
+   * @return XQuery
+   */
+  public byte[] getXQuery() {
+    return Token.token(panels[0].last);
   }
 }

@@ -5,8 +5,6 @@ import static org.basex.Text.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.Box;
@@ -21,8 +19,8 @@ import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.layout.BaseXTextArea;
 import org.basex.gui.view.View;
+import org.basex.util.Token;
 
 /**
  * This class provides a text area for entering queries.
@@ -40,7 +38,7 @@ public final class QueryArea extends QueryPanel {
   /** Main panel. */
   QueryView main;
   /** Text Area. */
-  BaseXTextArea area;
+  QueryText area;
   /** Filter/Execute Button. */
   BaseXButton filter;
   /** Scroll Pane. */
@@ -54,13 +52,12 @@ public final class QueryArea extends QueryPanel {
    */
   QueryArea(final QueryView view) {
     main = view;
-    area = new BaseXTextArea(HELPQUERYMODE);
+    area = new QueryText(this, HELPQUERYMODE);
     area.setFont(GUIConstants.mfont);
     area.addKeyListener(main);
     sp = new JScrollPane(area);
     south = new BaseXBack(GUIConstants.FILL.NONE);
     south.setLayout(new BorderLayout(8, 8));
-    
     initPanel();
     area.init(GUIProp.xquerycmd);
   }
@@ -81,13 +78,6 @@ public final class QueryArea extends QueryPanel {
    * Initializes the components.
    */
   void initPanel() {
-    area.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyReleased(final KeyEvent e) {
-        query(false);
-      }
-    });
-
     final Box box = new Box(BoxLayout.X_AXIS);
 
     info = new BaseXLabel("");
@@ -125,6 +115,17 @@ public final class QueryArea extends QueryPanel {
     }
   }
 
+  /**
+   * Sets a new XQuery request.
+   * @param xq XQuery
+   */
+  public void setXQuery(final String xq) {
+    if(!xq.equals(last)) {
+      last = xq;
+      GUI.get().execute(Commands.XQUERY, xq.trim().length() == 0 ? "." : xq);
+    }
+  }
+
   @Override
   void quit() {
     GUIProp.xquerycmd = area.strings();
@@ -136,31 +137,35 @@ public final class QueryArea extends QueryPanel {
     info.setText(text);
     info.setToolTipText(ok ? null : text);
     BaseXLayout.enable(info, !ok);
-    if(ok) return;
 
-    final Matcher m = ERRPATTERN.matcher(inf);
-    int el = 0;
-    int ec = 0;
-    if(m.matches()) {
-      el = Integer.parseInt(m.group(1));
-      ec = Integer.parseInt(m.group(2));
-    }
-    int l = 1;
-    int c = 1;
-    final int ll = last.length();
-    for(int i = 0; i < ll; c++, i++) {
-      if(l == el && c == ec) {
-        if(i > 0 && i + 1 < ll && last.charAt(i) < ' ') i--;
-        final int p = i;
-        while(i < ll && last.charAt(i) >= ' ') i++;
-        area.mark(p, i + 1);
-        return;
+    int s = -1;
+    int e = -1;
+    if(!ok) {
+      final Matcher m = ERRPATTERN.matcher(inf);
+      int el = 0;
+      int ec = 0;
+      if(m.matches()) {
+        el = Integer.parseInt(m.group(1));
+        ec = Integer.parseInt(m.group(2));
       }
-      if(last.charAt(i) < ' ') {
-        l++;
-        c = 0;
+      int l = 1;
+      int c = 1;
+      final int ll = last.length();
+      for(int i = 0; i < ll; c++, i++) {
+        if(l == el && c == ec) {
+          while(i > 0 && Token.ws((byte) last.charAt(i))) i--;
+          while(--i > 0 && Token.letterOrDigit((byte) last.charAt(i)));
+          s = ++i;
+          while(i < ll && Token.letterOrDigit((byte) last.charAt(i))) i++;
+          e = Math.max(s + 3, i);
+          break;
+        }
+        if(last.charAt(i) < ' ') {
+          l++;
+          c = 0;
+        }
       }
     }
+    area.refresh(s, e);
   }
 }
-

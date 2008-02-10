@@ -141,7 +141,7 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
    * Thread.
    */
   public void run() {
-    Performance.sleep(50);
+    Performance.sleep(500);
     repaint();
   }
 

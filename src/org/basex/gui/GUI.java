@@ -422,7 +422,7 @@ public final class GUI extends JFrame {
         }
 
         cursor(CURSORWAIT);
-        status.setText(STATUSWAIT);
+        //status.setText(STATUSWAIT);
         textcache.reset();
 
         try {
@@ -479,8 +479,8 @@ public final class GUI extends JFrame {
             if(obsolete(thread)) return;
 
             // check if query feedback was evaluated in the query view
-            if(cc.printing() && data != null && GUIProp.showquery &&
-                cc == Commands.XQUERY) query.info(inf, ok);
+            final boolean feedback = cc.printing() && data != null &&
+              GUIProp.showquery && cc == Commands.XQUERY && query.info(inf, ok);
             
             final Data ndata = context.data();
             if(ndata != data) {
@@ -526,7 +526,8 @@ public final class GUI extends JFrame {
               status.setText(BaseX.info(PROCTIME, time));
             } else {
               // show error info
-              status.setError(inf);
+              if(feedback) status.setText(STATUSOK);
+              else status.setError(inf);
               break;
             }
           }
