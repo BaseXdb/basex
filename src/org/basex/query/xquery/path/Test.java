@@ -67,7 +67,7 @@ public final class Test {
       final int i = indexOf(nm, ',');
       if(i != -1) {
         final QNm test = new QNm(trim(substring(nm, i + 1)), ctx);
-        // <CG> XQuery/Node Test: check extended info
+        // [CG] XQuery/Node Test: check extended info
         if(Type.find(test, false) == null) Err.or(TESTINVALID, type, test);
         nm = substring(nm, 0, i);
       }

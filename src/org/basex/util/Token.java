@@ -39,24 +39,16 @@ public final class Token {
   public static final byte[] ONE = { '1' };
 
   /** Quote Entity. */
-  public static final byte[] E_QU = token("&quot;");
+  public static final byte[] E_QU = token("quot");
   /** Ampersand Entity. */
-  public static final byte[] E_AMP = token("&amp;");
+  public static final byte[] E_AMP = token("amp");
   /** Apostrophe Entity. */
-  public static final byte[] E_APOS = token("&apos;");
+  public static final byte[] E_APOS = token("apos");
   /** GreaterThan Entity. */
-  public static final byte[] E_GT = token("&gt;");
+  public static final byte[] E_GT = token("gt");
   /** LessThan Entity. */
-  public static final byte[] E_LT = token("&lt;");
-  /** NewLine Entity. */
-  public static final byte[] E_NL = token("&#xA;");
-  /** CarriageReturn Entity. */
-  public static final byte[] E_CR = token("&#xD;");
-  /** Tab Entity. */
-  public static final byte[] E_TAB = token("&#x9;");
+  public static final byte[] E_LT = token("lt");
 
-  /** Minimum integer. */
-  public static final byte[] MININT = token("-2147483648");
   /** UTF8 encoding string. */
   public static final String UTF8 = "UTF8";
   /** UTF8 encoding string (variant). */
@@ -160,8 +152,8 @@ public final class Token {
     if(enc == Token.UTF8 || Token.ascii(s)) return s;
     // convert to utf8
     try {
-      System.out.println(enc);
-      System.out.println("-> " + new String(s, enc));
+      System.out.println("[1] " + enc);
+      System.out.println("[2] " + new String(s, enc));
       return new String(s, enc).getBytes(UTF8);
     } catch(final Exception e) {
       e.printStackTrace();
@@ -265,6 +257,8 @@ public final class Token {
     for(int i = 0;; i++) if(x <= INTSIZE[i]) return i + 1;
   }
 
+  /** Minimum integer. */
+  private static final byte[] MININT = token("-2147483648");
   /** Table with integer sizes. */
   private static final int[] INTSIZE = { 9, 99, 999, 9999, 99999, 999999,
       9999999, 99999999, 999999999, Integer.MAX_VALUE };
@@ -959,11 +953,12 @@ public final class Token {
 
   /**
    * Checks if the specified character is a whitespace.
-   * @param c the letter to be checked
+   * @param ch the letter to be checked
    * @return result of comparison
    */
-  public static boolean ws(final byte c) {
-    return c >= 0 && c <= ' ';
+  public static boolean ws(final byte ch) {
+    return ch == 0x09 || ch == 0x0A || ch == 0x0D || ch == 0x20;
+    //return c >= 0 && c <= ' ';
   }
 
   /**

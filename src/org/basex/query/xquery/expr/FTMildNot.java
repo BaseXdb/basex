@@ -21,7 +21,7 @@ public final class FTMildNot extends Arr {
 
   @Override
   public Iter iter(final XQContext ctx) {
-    // <CG> XQuery/FTMildNot: not working yet
+    // [CG] XQuery/FTMildNot: not working yet
     return Dbl.iter(0);
   }
 

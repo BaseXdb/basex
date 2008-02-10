@@ -105,40 +105,6 @@ public class PrintOutput extends OutputStream {
   }
 
   /**
-   * Writes a token to the output stream and encodes standard entities
-   * if the entity flag is set.
-   * @param token token to be written
-   * @param entity entity encoding
-   * @throws IOException in case of write errors
-   */
-  public final void printToken(final byte[] token, final boolean entity)
-      throws IOException {
-    if(!entity) {
-      print(token);
-    } else {
-      for(final byte ch : token) {
-        final byte[] ent = entity(ch);
-        if(ent == null) write(ch);
-        else print(ent);
-      }
-    }
-  }
-  
-  /**
-   * Returns default entities.
-   * @param ch character to be checked
-   * @return entity or null if no entity is applicable
-   */
-  private static byte[] entity(final byte ch) {
-    if(ch == '&') return Token.E_AMP;
-    if(ch == '>') return Token.E_GT;
-    if(ch == '<') return Token.E_LT;
-    if(ch == '\'') return Token.E_APOS;
-    if(ch == '"') return Token.E_QU;
-    return null;
-  }
-
-  /**
    * Writes a token to the output stream.
    * @param token token to be written
    * @throws IOException in case of write errors

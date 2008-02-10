@@ -36,7 +36,7 @@ public final class FNNode extends Fun {
         if(empty) return Iter.EMPTY;
         final byte[] uri = checkNode(it).base();
         return uri == Token.EMPTY ? Iter.EMPTY : Uri.uri(uri).iter();
-      case NILLED: // <CG> XQuery/nilled flag
+      case NILLED: // [CG] XQuery/nilled flag
         if(empty) return Iter.EMPTY;
         checkNode(it);
         return it.type != Type.ELM ? Iter.EMPTY : Bln.FALSE.iter();

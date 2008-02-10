@@ -58,19 +58,21 @@ public final class XQTS {
   private static final String PATHLOG = "xqts.log";
 
   /** XQuery Test Suite Root Directory. */
-  private static final String ROOT = "h:/";
+  private static final String ROOT = "/";
+  //private static final String ROOT = "h:/";
   /** Path to the XQuery Test Suite. */
-  private String tests = ROOT + "xqts102/"; // "h:/xqts102/"
+  //private String tests = ROOT + "xqts102/"; // "h:/xqts102/"
+  private String tests = ROOT + "/home/dbis/xml/xqts102/";
   /** Query Path. */
-  private String queries = tests + "queries/XQuery/";
+  private String queries;
   /** Expected Results. */
-  private String expected = tests + "ExpectedTestResults/";
+  private String expected;
   /** Reported Results. */
-  private String results = tests + "ReportingResults/Results/";
+  private String results;
   /** Reports. */
-  private String report = tests + "ReportingResults/";
+  private String report;
   /** Test Sources. */
-  private String sources = tests + "TestSources/";
+  private String sources;
   /** Inspect flag. */
   private static final byte[] INSPECT = token("Inspect");
 
@@ -164,7 +166,7 @@ public final class XQTS {
       }
     }
     
-    queries = tests + "queries/XQuery/";
+    queries = tests + "Queries/XQuery/";
     expected = tests + "ExpectedTestResults/";
     results = tests + "ReportingResults/Results/";
     report = tests + "ReportingResults/";

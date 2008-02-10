@@ -96,8 +96,8 @@ public final class BaseXListChooser extends BaseXBack {
           text.setText(values[newpos]);
           text.selectAll();
           parent.action(null);
+          typed = false;
         }
-        typed = false;
       }
 
       @Override
@@ -110,26 +110,28 @@ public final class BaseXListChooser extends BaseXBack {
           typed = ch >= ' ' && ch != 127;
         }
       }
+      
       @Override
       public void keyReleased(final KeyEvent e) {
-        if(!typed) return;
-        typed = false;
-        
-        final String txt = text.getText().trim().toLowerCase();
-        int i = 0;
-        for(i = 0; i < values.length; i++) {
-          final String txt2 = values[i].toLowerCase();
-          if(txt2.startsWith(txt)) break;
+        if(typed) {
+          typed = false;
+          
+          final String txt = text.getText().trim().toLowerCase();
+          int i = 0;
+          for(i = 0; i < values.length; i++) {
+            final String txt2 = values[i].toLowerCase();
+            if(txt2.startsWith(txt)) break;
+          }
+          if(i < values.length) {
+            final int c = text.getCaretPosition();
+            list.setSelectedValue(values[i], true);
+            text.setText(values[i]);
+            text.select(c, values[i].length());
+          } else if(num) {
+            //parent.action(null);
+          }
         }
-        if(i < values.length) {
-          final int c = text.getCaretPosition();
-          list.setSelectedValue(values[i], true);
-          text.setText(values[i]);
-          text.select(c, values[i].length());
-          parent.action(null);
-        } else if(num) {
-          parent.action(null);
-        }
+        parent.action(null);
       }
     });
     add(text);

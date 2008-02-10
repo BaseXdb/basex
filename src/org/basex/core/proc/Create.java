@@ -357,9 +357,11 @@ public final class Create extends Proc {
 
     File f = new File(file.replace('\\', '/'));
     boolean found = f.exists();
+    
     if(!found && addXML) {
-      f = new File(file + XMLSUFFIX);
-      found = f.exists();
+      final File f2 = new File(file + XMLSUFFIX);
+      found = f2.exists();
+      if(found) f = f2;
     }
     if(!found) throw new FileNotFoundException(
         BaseX.info(FILEWHICH, f.getAbsoluteFile()));

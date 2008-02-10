@@ -1,11 +1,14 @@
 package org.basex.io;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import org.basex.core.Prop;
 import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 
 /**
  * Input/Output Constants.
@@ -47,13 +50,29 @@ public final class IOConstants {
   }
   
   /**
+   * Opens a file, dissolving the parent reference, and returns its contents.
+   * If the file references a URL, the parent reference is ignored.
+   * @param par parent reference
+   * @param file name of the file
+   * @return contents
+   * @throws IOException I/O exception
+   */
+  public static byte[] read(final String par, final String file)
+      throws IOException {
+
+    if(file.startsWith("http://")) return read(new URL(file));
+    return read(new File(par).getParent() + "/" + file);
+  }
+  
+  /**
    * Opens a file and returns its contents.
    * @param file name of the file
    * @return contents
    * @throws IOException I/O exception
    */
   public static byte[] read(final String file) throws IOException {
-    return read(new File(file));
+    return file.startsWith("http://") ? read(new URL(file)) :
+      read(new File(file));
   }
   
   /**
@@ -68,6 +87,21 @@ public final class IOConstants {
     in.read(cont);
     in.close();
     return cont;
+  }
+  
+  /**
+   * Opens a URL and returns its contents.
+   * @param url url reference
+   * @return contents
+   * @throws IOException I/O exception
+   */
+  public static byte[] read(final URL url) throws IOException {
+    final BufferedInputStream bis = new BufferedInputStream(url.openStream());
+    final TokenBuilder tb = new TokenBuilder();
+    int b = 0;
+    while((b = bis.read()) != -1) tb.add((byte) b);
+    bis.close();
+    return tb.finish();
   }
   
   /**

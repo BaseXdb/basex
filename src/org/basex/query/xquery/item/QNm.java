@@ -5,6 +5,7 @@ import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.util.Err;
 import org.basex.util.Token;
+import org.basex.util.XMLToken;
 
 /**
  * QName item.
@@ -28,7 +29,7 @@ public final class QNm extends Item {
    */
   public QNm(final byte[] n, final XQContext ctx) throws XQException {
     this(n);
-    if(!Type.isQName(val)) Err.value(type, val);
+    if(!XMLToken.isQName(val)) Err.value(type, val);
     if(ns()) uri = ctx.ns.uri(pre());
   }
 

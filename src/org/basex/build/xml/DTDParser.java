@@ -2,13 +2,16 @@ package org.basex.build.xml;
 
 import static org.basex.build.BuildText.*;
 import static org.basex.util.Token.*;
-import java.io.File;
+import static org.basex.util.XMLToken.*;
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.build.BuildException;
 import org.basex.index.Names;
 import org.basex.io.IOConstants;
 import org.basex.util.Map;
+import org.basex.util.XMLToken;
 
 /**
  * Parses the DTD to get the elements, attributes and entities.
@@ -93,7 +96,7 @@ public class DTDParser {
   }
 
   /**
-   * Starts the parsing of extern DTD.
+   * Starts the parsing of external DTD.
    * @throws IOException I/O Exception
    */
   private void starter() throws IOException {
@@ -102,9 +105,15 @@ public class DTDParser {
       BaseX.debug("- Content:\n %", content);
       consumeContent();
     }
+
     // read external file
-    String file = new File(xmlfile).getParent() + "\\" + string(extid);
-    content = IOConstants.read(file);
+    final String dtd = string(extid);
+    try {
+      content = IOConstants.read(xmlfile, dtd);
+    } catch(final FileNotFoundException ex) {
+      error(DTDNOTFOUND, dtd);
+    }
+    
     extern = true;
     pos = 0;
     BaseX.debug("- Root Element Type: %", root);
@@ -164,6 +173,10 @@ public class DTDParser {
         BaseX.debug("----------------------");
         BaseX.debug(NOT);
       } else if(consume(GQ)) {
+        byte ch = next();
+        BaseX.outln((char) ch);
+        if(!isFirstLetter(ch)) error(PINAME);
+        while(isLetter(ch = next()));
         BaseX.debug("NOT IMPLEMENTED");
         while(!consume(GREAT))
           next();
@@ -384,13 +397,13 @@ public class DTDParser {
    */
   private boolean consumeWS() {
     byte c = next();
-    if(!XMLScanner.whitespace(c)) {
+    if(!ws(c)) {
       prev();
       return false;
     }
     do {
       c = next();
-    } while(XMLScanner.whitespace(c) && c != 0);
+    } while(ws(c) && c != 0);
     prev();
     return true;
   }
@@ -400,12 +413,12 @@ public class DTDParser {
    */
   private void consumeWS1() {
     byte c = next();
-    if(!XMLScanner.whitespace(c)) {
+    if(!ws(c)) {
       prev();
     }
     do {
       c = next();
-    } while(XMLScanner.whitespace(c) && c != 0);
+    } while(ws(c) && c != 0);
     prev();
   }
 
@@ -428,12 +441,12 @@ public class DTDParser {
   private byte[] consumeName() throws BuildException {
     int p = pos;
     byte c = next();
-    if(!XMLScanner.isFirstLetter(c) && !percentage(c)) {
+    if(!XMLToken.isFirstLetter(c) && !percentage(c)) {
       error();
     }
     do {
       c = next();
-    } while(XMLScanner.isLetter(c) || percentage(c) || semicolon(c)
+    } while(XMLToken.isLetter(c) || percentage(c) || semicolon(c)
         || quantity(c));
     prev();
     return substring(content, p, pos);
@@ -473,11 +486,9 @@ public class DTDParser {
   private boolean checkTokenize() throws BuildException {
     int p = pos;
     checkT = consumeName();
-    String help = string(checkT);
-    if(help.equals(string(ID)) || help.equals(string(IDR))
-        || help.equals(string(IDRS)) || help.equals(string(ENT1))
-        || help.equals(string(ENTS)) || help.equals(string(NMT))
-        || help.equals(string(NMTS))) {
+    byte[] help = checkT;
+    if(eq(help, ID) || eq(help, IDR) || eq(help, IDRS) || eq(help, ENT1)
+        || eq(help, ENTS) || eq(help, NMT) || eq(help, NMTS)) {
       return true;
     }
     pos = p;
@@ -524,6 +535,18 @@ public class DTDParser {
    */
   private boolean quantity(final byte ch) {
     return ch == '?' || ch == '*' || ch == '+';
+  }
+
+  /**
+   * Throws an error.
+   * @param err error message
+   * @param arg error arguments
+   * @throws BuildException Build Exception
+   */
+  private void error(final String err, final Object... arg)
+      throws BuildException {
+
+    throw new BuildException(DTDERR, BaseX.inf(err, arg));
   }
 
   /**

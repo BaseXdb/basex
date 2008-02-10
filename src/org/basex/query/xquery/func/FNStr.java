@@ -3,7 +3,6 @@ package org.basex.query.xquery.func;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.util.Token.*;
 import java.util.regex.Pattern;
-import org.basex.build.xml.XMLScanner;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Bln;
@@ -15,6 +14,7 @@ import org.basex.query.xquery.iter.SeqIter;
 import org.basex.query.xquery.util.Err;
 import org.basex.util.Array;
 import org.basex.util.TokenBuilder;
+import org.basex.util.XMLToken;
 
 /**
  * String functions.
@@ -105,14 +105,14 @@ final class FNStr extends Fun {
    * Converts codepoints to a string.
    * @param iter iterator
    * @return iterator
-   * @throws XQException xquery exception
+   * @throws XQException query exception
    */
   private Iter cp2str(final Iter iter) throws XQException {
     final TokenBuilder tb = new TokenBuilder();
     Item i;
     while((i = iter.next()) != null) {
       final int n = (int) checkItr(i);
-      if(!XMLScanner.valid(n)) Err.or(INVCODE, i, this);
+      if(!XMLToken.valid(n)) Err.or(INVCODE, i, this);
       tb.addUTF(n);
     }
     return Str.iter(tb.finish());
@@ -122,7 +122,7 @@ final class FNStr extends Fun {
    * Converts a string to codepoints.
    * @param iter iterator
    * @return iterator
-   * @throws XQException xquery exception
+   * @throws XQException query exception
    */
   private Iter str2cp(final Iter iter) throws XQException {
     final Item it = iter.atomic(this, true);
@@ -235,7 +235,7 @@ final class FNStr extends Fun {
     } else {
       norm = NORM.C;
     }
-    // <CG> XQuery/normalize-unicode
+    // [CG] XQuery/normalize-unicode
     return Str.iter(str);
   }
 

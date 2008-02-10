@@ -15,7 +15,6 @@ import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCheckBox;
-import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.View;
 import org.basex.util.Token;
@@ -62,7 +61,7 @@ public final class QueryView extends View {
         }
       });
       box.add(input[i]);
-      box.add(new BaseXLabel("  "));
+      box.add(Box.createHorizontalStrut(6));
       switch(i) {
         case QueryPanel.XQUERY:
           panels[i] = new QueryArea(this, i);
@@ -75,7 +74,7 @@ public final class QueryView extends View {
           break;
       }
     }
-    box.add(new BaseXLabel("   "));
+    box.add(Box.createHorizontalStrut(6));
 
     final Box box2 = new Box(BoxLayout.Y_AXIS);
     filterbox = new BaseXCheckBox(CMDFILTERRT, HELPFILTERRT, GUIProp.filterrt);

@@ -46,7 +46,6 @@ public final class BaseXCombo extends JComboBox {
 
     super(choice);
     setMaximumRowCount(edit ? 5 : 12);
-    setOpaque(false);
     BaseXLayout.addDefaultKeys(this, list);
     help = hlp;
 

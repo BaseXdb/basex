@@ -36,11 +36,6 @@ public final class DialogInfo extends Dialog {
   public DialogInfo(final GUI gui) {
     super(gui, INFOTITLE);
 
-    // create database chooser
-    final String[] db = DialogOpen.getDatabases();
-
-    if(db.length == 0) return;
-
     final BaseXBack info = new BaseXBack();
     info.setLayout(new TableLayout(10, 2));
     info.setBorder(new CompoundBorder(new EtchedBorder(),

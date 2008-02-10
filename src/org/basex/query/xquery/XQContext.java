@@ -252,7 +252,7 @@ public final class XQContext extends QueryContext {
    * @throws XQException evaluation exception
    */
   public void addColl(final Node coll) throws XQException {
-    // <CG> XQuery/add collection; check validity of specified collection
+    // [CG] XQuery/add collection; check validity of specified collection
     final NodIter col = new NodIter();
     NodeIter ni = coll.child();
     ni = ni.next().child();

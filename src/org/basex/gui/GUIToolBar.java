@@ -1,15 +1,10 @@
 package org.basex.gui;
 
-import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.ImageIcon;
 import javax.swing.JToolBar;
-import javax.swing.border.EmptyBorder;
-import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
-import org.basex.gui.layout.BaseXLayout;
 import org.basex.util.Token;
 import static org.basex.gui.GUIConstants.*;
 
@@ -26,9 +21,7 @@ public final class GUIToolBar extends JToolBar implements ActionListener {
    */
   public GUIToolBar() {
     super();
-    setBorder(new EmptyBorder(4, 2, 0, 0));
     setFloatable(false);
-    setOpaque(false);
 
     for(final GUICommands cmd : TOOLBAR) {
       if(cmd == null) {
@@ -44,7 +37,6 @@ public final class GUIToolBar extends JToolBar implements ActionListener {
         add(button);
       }
     }
-
     refresh();
   }
 
@@ -64,23 +56,6 @@ public final class GUIToolBar extends JToolBar implements ActionListener {
     for(int b = 0; b < TOOLBAR.length; b++) {
       if(TOOLBAR[b] == null) continue;
       TOOLBAR[b].refresh((BaseXButton) getComponentAtIndex(b), db);
-    }
-  }
-
-  /** Separator implementation. */
-  static class Separator extends BaseXBack {
-    /** Constructor. */
-    Separator() {
-      BaseXLayout.setWidth(this, 8);
-    }
-
-    @Override
-    public void paintComponent(final Graphics g) {
-      super.paintComponent(g);
-      g.setColor(Color.gray);
-      g.drawLine(3, 0, 3, getHeight() - 4);
-      g.setColor(Color.white);
-      g.drawLine(4, 1, 4, getHeight() - 3);
     }
   }
 }

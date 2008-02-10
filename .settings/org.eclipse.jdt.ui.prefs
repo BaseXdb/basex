@@ -1,5 +1,6 @@
-#Wed Nov 21 08:46:12 CET 2007
+#Sun Feb 10 00:44:15 CET 2008
 eclipse.preferences.version=1
+formatter_settings_version=11
 org.eclipse.jdt.ui.ignorelowercasenames=true
 org.eclipse.jdt.ui.importorder=java;javax;org;com;
 org.eclipse.jdt.ui.ondemandthreshold=99

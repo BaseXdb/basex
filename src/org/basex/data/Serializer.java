@@ -251,6 +251,8 @@ public abstract class Serializer {
     // loop through all table entries
     final int s = data.size;
     while(p < s) {
+      if(finished()) return p;
+
       final int kind = data.kind(p);
       final int par = data.parent(p, kind);
       // skip writing if all sub nodes were processed

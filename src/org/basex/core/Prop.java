@@ -75,7 +75,7 @@ public final class Prop {
   /** Dots the Result. */
   public static boolean dotresult = false;
   /** Format XQuery output. */
-  public static boolean xqformat = false;
+  public static boolean xqformat = true;
   
   /** Number of query executions. */
   public static int runs = 1;

@@ -12,6 +12,7 @@ import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Err;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
+import org.basex.util.XMLToken;
 
 /**
  * PI fragment.
@@ -39,7 +40,7 @@ public final class CPI extends Arr {
 
     final byte[] nm = Token.trim(it.str());
     if(Token.eq(Token.lc(nm), XML)) Err.or(CPIXML, nm);
-    if(!Type.isNCName(nm)) Err.or(CPIINVAL, nm);
+    if(!XMLToken.isNCName(nm)) Err.or(CPIINVAL, nm);
 
     final Iter iter = ctx.iter(expr[1]);
     final TokenBuilder tb = new TokenBuilder();

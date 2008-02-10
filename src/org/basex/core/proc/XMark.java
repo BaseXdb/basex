@@ -1,6 +1,7 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
+import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.Prop;
@@ -13,7 +14,6 @@ import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPathProcessor;
 import org.basex.util.Array;
-import org.basex.util.Token;
 
 /**
  * Evaluates the 'xmark' command.
@@ -31,7 +31,7 @@ public final class XMark extends XPath {
 
   @Override
   protected boolean exec() {
-    xmark = Token.toInt(cmd.arg(0));
+    xmark = toInt(cmd.arg(0));
     return xmark < 1 || xmark > 20 ? error(XMARKWHICH) : true;
   }
 
@@ -97,8 +97,7 @@ public final class XMark extends XPath {
    * @throws Exception exception
    */
   private int xmark1() throws Exception {
-    final Nodes b = qu("/site/regions/namerica/item[@id='item0']" +
-        "/name/text()");
+    final Nodes b = qu("/site/regions/namerica/item[@id='item0']/name/text()");
     b.serialize(out);
     return b.size;
   }
@@ -113,11 +112,12 @@ public final class XMark extends XPath {
   private int xmark2() throws Exception {
     final Nodes b = qu("/site/open_auctions/open_auction");
     final XPathProcessor stepBidder1 = parse("bidder[1]/increase/text()");
+    final byte[] inc = token("increase");
 
     final int bs = b.size;
     for(int bi = 0; bi < bs; bi++) {
       writeSep(bi);
-      writeTag("increase", b, bi, stepBidder1);
+      writeTag(inc, b, bi, stepBidder1);
     }
     return b.size;
   }
@@ -135,16 +135,18 @@ public final class XMark extends XPath {
       "[bidder[1]/increase/text() * 2 <= bidder[last()]/increase/text()]");
     final XPathProcessor stepInc1 = parse("bidder[1]/increase/text()");
     final XPathProcessor stepInc2 = parse("bidder[last()]/increase/text()");
+    final byte[] inc = token("increase");
+    final byte[] first = token("first");
+    final byte[] last = token("last");
 
     int hits = 0;
     final int bs = b.size;
     for(int bi = 0; bi < bs; bi++) {
       writeSep(hits++);
-      out.out.print("<increase first=\"");
-      out.out.printToken(token(b, bi, stepInc1), data.meta.entity);
-      out.out.print("\" last=\"");
-      out.out.printToken(token(b, bi, stepInc2), data.meta.entity);
-      out.out.print("\"/>");
+      out.startElement(inc);
+      out.attribute(first, atom(b, bi, stepInc1));
+      out.attribute(last, atom(b, bi, stepInc2));
+      out.emptyElement();
     }
     return hits;
   }
@@ -164,6 +166,7 @@ public final class XMark extends XPath {
     final XPathProcessor stepRef2 = parse(
         "bidder/personref[@person = 'person10487']");
     final XPathProcessor stepReserve = parse("initial/text()");
+    final byte[] hist = token("history");
 
     int hits = 0;
     final int bs = b.size;
@@ -175,7 +178,7 @@ public final class XMark extends XPath {
 
       if(c1.pre[0] < c2.pre[0]) {
         writeSep(hits++);
-        writeTag("history", b, bi, stepReserve);
+        writeTag(hist, b, bi, stepReserve);
       }
     }
     return hits;
@@ -189,9 +192,9 @@ public final class XMark extends XPath {
    * @throws Exception exception
    */
   private int xmark5() throws Exception {
-    final Nodes i = qu("/site/closed_auctions/closed_auction[price/" +
-        "text() >= 40]/price");
-    out.out.print(Token.token(i.size));
+    final Nodes i = qu(
+        "/site/closed_auctions/closed_auction[price/text() >= 40]/price");
+    out.out.print(token(i.size));
     return 1;
   }
 
@@ -236,18 +239,16 @@ public final class XMark extends XPath {
     final Nodes c = qu("/site/closed_auctions/closed_auction");
     final XPathProcessor stepName = parse("name/text()");
     final XPathProcessor stepID   = parse("@id");
+    final byte[] item = token("item");
+    final byte[] person = token("person");
 
     final int ps = p.size;
     for(int pi = 0; pi < ps; pi++) {
       writeSep(pi);
-      out.out.print("<item person=\"");
-      out.out.printToken(token(p, pi, stepName), data.meta.entity);
-      out.out.print("\">");
-
-      final byte[] token = token(p, pi, stepID);
-      parse("count(.[buyer/@person = '" + Token.string(token) + "'])").
+      out.openElement(item, person, atom(p, pi, stepName));
+      parse("count(.[buyer/@person = '" + atom(p, pi, stepID) + "'])").
         eval(c).serialize(out);
-      out.out.print("</item>");
+      out.closeElement(item);
     }
     return p.size;
   }
@@ -267,36 +268,37 @@ public final class XMark extends XPath {
     final XPathProcessor stepName    = parse("name/text()");
     final XPathProcessor stepItemRef = parse("itemref/@item");
     final XPathProcessor stepID      = parse("@id");
+    final byte[] person = token("person");
+    final byte[] name = token("name");
+    final byte[] item = token("item");
 
     final int ps = p.size;
     for(int pi = 0; pi < ps; pi++) {
       writeSep(pi);
-      out.out.print("<person name=\"");
-      out.out.printToken(token(p, pi, stepName), data.meta.entity);
+      out.startElement(person);
+      out.attribute(name, atom(p, pi, stepName));
 
-      final byte[] token = token(p, pi, stepID);
+      final byte[] token = atom(p, pi, stepID);
       final Nodes a = eval(parse(".[buyer/@person = '" +
-          Token.string(token) + "']"), c);
+          string(token) + "']"), c);
       if(a.size == 0) {
-        out.out.print("\"/>");
+        out.emptyElement();
       } else {
-        out.out.print("\">");
+        out.finishElement();
         final int as = a.size;
         for(int ai = 0; ai < as; ai++) {
           final Nodes n = eval(parse(".[@id = '" +
-              Token.string(token(a, ai, stepItemRef)) + "']"), i);
+              string(atom(a, ai, stepItemRef)) + "']"), i);
           if(n.size == 0) {
-            out.out.print("<item/>");
+            out.emptyElement(item);
           } else {
-            out.out.print("<item>");
+            out.openElement(item);
             final int ns = n.size;
-            for(int ni = 0; ni < ns; ni++) {
-              out.out.printToken(token(n, ni, stepName), data.meta.entity);
-            }
-            out.out.print("</item>");
+            for(int ni = 0; ni < ns; ni++) out.text(atom(n, ni, stepName));
+            out.closeElement(item);
           }
         }
-        out.out.print("</person>");
+        out.closeElement(person);
       }
     }
     return p.size;
@@ -323,19 +325,36 @@ public final class XMark extends XPath {
     final XPathProcessor stepHomepage   = parse("homepage/text()");
     final XPathProcessor stepCreditcard = parse("creditcard/text()");
     final Nodes person = qu("/site/people/person");
+    final byte[] cat = token("categorie");
+    final byte[] id = token("id");
+    final byte[] pers = token("personne");
+    final byte[] stat = token("statistique");
+    final byte[] sexe = token("sexe");
+    final byte[] age = token("age");
+    final byte[] edu = token("education");
+    final byte[] rev = token("revenu");
+    final byte[] nom = token("nom");
+    final byte[] rue = token("rue");
+    final byte[] pays = token("pays");
+    final byte[] ville = token("ville");
+    final byte[] courrier = token("courrier");
+    final byte[] page = token("pageperso");
+    final byte[] carte = token("cartePaiement");
+    final byte[] cord = token("cordonnees");
+    final byte[] reseau = token("reseau");
 
     final byte[][] idist = distinctvalues(
         qu("/site/people/person/profile/interest/@category"));
 
     final int cs = idist.length;
     for(int ci = 0; ci < cs; ci++) {
-      final String category = Token.string(idist[ci]);
+      final String category = string(idist[ci]);
       writeSep(ci);
-      out.out.print("<categorie>");
+      out.openElement(cat);
       out.out.print(NL);
-      out.out.print("<id>");
+      out.openElement(id);
       out.out.print(category);
-      out.out.print("</id>");
+      out.closeElement(cat);
       out.out.print(NL);
 
       final Nodes p = eval(parse(".[profile/interest/@category = '" +
@@ -343,58 +362,58 @@ public final class XMark extends XPath {
 
       final int ps = p.size;
       for(int pi = 0; pi < ps; pi++) {
-        out.out.print("<personne>");
+        out.openElement(pers);
         out.out.print(NL);
-        out.out.print("  <statistiques>");
-        out.out.print(NL);
-        out.out.print("    ");
-        writeTag("sexe", p, pi, stepGender);
+        out.openElement(stat);
         out.out.print(NL);
         out.out.print("    ");
-        writeTag("age", p, pi, stepAge);
+        writeTag(sexe, p, pi, stepGender);
         out.out.print(NL);
         out.out.print("    ");
-        writeTag("education", p, pi, stepEducation);
+        writeTag(age, p, pi, stepAge);
         out.out.print(NL);
         out.out.print("    ");
-        writeTag("revenu", p, pi, stepIncome);
-        out.out.print(NL);
-        out.out.print("  </statistiques>");
-        out.out.print(NL);
-        out.out.print("  <coordonnees>");
+        writeTag(edu, p, pi, stepEducation);
         out.out.print(NL);
         out.out.print("    ");
-        writeTag("nom", p, pi, stepName);
+        writeTag(rev, p, pi, stepIncome);
+        out.out.print(NL);
+        out.closeElement(stat);
+        out.out.print(NL);
+        out.openElement(cord);
         out.out.print(NL);
         out.out.print("    ");
-        writeTag("rue", p, pi, stepStreet);
+        writeTag(nom, p, pi, stepName);
         out.out.print(NL);
         out.out.print("    ");
-        writeTag("ville", p, pi, stepCity);
+        writeTag(rue, p, pi, stepStreet);
         out.out.print(NL);
         out.out.print("    ");
-        writeTag("pays", p, pi, stepCountry);
+        writeTag(ville, p, pi, stepCity);
         out.out.print(NL);
         out.out.print("    ");
-        out.out.print("<reseau>");
+        writeTag(pays, p, pi, stepCountry);
+        out.out.print(NL);
+        out.out.print("    ");
+        out.openElement(reseau);
         out.out.print(NL);
         out.out.print("      ");
-        writeTag("courrier", p, pi, stepEmail);
+        writeTag(courrier, p, pi, stepEmail);
         out.out.print(NL);
         out.out.print("      ");
-        writeTag("pagePerso", p, pi, stepHomepage);
+        writeTag(page, p, pi, stepHomepage);
         out.out.print(NL);
-        out.out.print("    </reseau>");
+        out.closeElement(reseau);
         out.out.print(NL);
-        out.out.print("  </coordonnees>");
+        out.closeElement(cord);
         out.out.print(NL);
         out.out.print("  ");
-        writeTag("cartePaiement", p, pi, stepCreditcard);
+        writeTag(carte, p, pi, stepCreditcard);
         out.out.print(NL);
-        out.out.print("</personne>");
+        out.closeElement(pers);
         out.out.print(NL);
       }
-      out.out.print("</categorie>");
+      out.closeElement(cat);
     }
     return idist.length;
   }
@@ -411,15 +430,15 @@ public final class XMark extends XPath {
     final Nodes p = qu("/site/people/person");
     final Nodes i = qu("/site/open_auctions/open_auction/initial");
     final XPathProcessor stepIncome = parse("profile/@income");
+    final byte[] items = token("items");
+    final byte[] name = token("name");
 
     final int ps = p.size;
     for(int pi = 0; pi < ps; pi++) {
       writeSep(pi);
-      out.out.print("<items name=\"");
       final Nodes tmp = eval(stepIncome, p, pi);
-      if(tmp.size != 0) out.out.printToken(data.atom(tmp.pre[0]), 
-          data.meta.entity);
-      out.out.print("\">");
+      out.openElement(items, name, tmp.size != 0 ?
+          data.atom(tmp.pre[0]) : EMPTY);
 
       if(tmp.size != 0) {
         parse("count(.[" + data.atomNum(tmp.pre[0]) +
@@ -427,7 +446,7 @@ public final class XMark extends XPath {
       } else {
         out.out.print("0");
       }
-      out.out.print("</items>");
+      out.closeElement(items);
     }
     return p.size;
   }
@@ -444,20 +463,18 @@ public final class XMark extends XPath {
     final Nodes p = qu("/site/people/person[profile/@income > 50000]");
     final Nodes i = qu("/site/open_auctions/open_auction/initial");
     final XPathProcessor stepIncome = parse("profile/@income");
+    final byte[] items = token("items");
+    final byte[] pers = token("person");
 
     final int hits = 0;
     final int ps = p.size;
     for(int pi = 0; pi < ps; pi++) {
       writeSep(pi);
-      out.out.print("<items person=\"");
       final Nodes tmp = eval(stepIncome, p, pi);
-      out.out.printToken(data.atom(tmp.pre[0]), data.meta.entity);
-      out.out.print("\">");
-
+      out.openElement(items, pers, data.atom(tmp.pre[0]));
       parse("count(.[" + data.atomNum(tmp.pre[0]) +
           " > 5000 * text()])").eval(i).serialize(out);
-
-      out.out.print("</items>");
+      out.closeElement(items);
     }
     return hits;
   }
@@ -474,16 +491,16 @@ public final class XMark extends XPath {
     final Nodes i = qu("/site/regions/australia/item");
     final XPathProcessor stepName = parse("name/text()");
     final XPathProcessor stepDesc = parse("description");
+    final byte[] item = token("item");
+    final byte[] name = token("name");
 
     final int hits = 0;
     final int is = i.size;
     for(int ii = 0; ii < is; ii++) {
       writeSep(ii);
-      out.out.print("<item name=\"");
-      out.out.printToken(token(i, ii, stepName), data.meta.entity);
-      out.out.print("\">");
+      out.openElement(item, name, atom(i, ii, stepName));
       eval(stepDesc, i, ii).serialize(out);
-      out.out.print("</item>");
+      out.closeElement(item);
     }
     return hits;
   }
@@ -514,13 +531,14 @@ public final class XMark extends XPath {
     final Nodes a = qu("/site/closed_auctions/closed_auction/" +
         "annotation/description/parlist/listitem/parlist/listitem/text/" +
         "emph/keyword/text()");
+    final byte[] text = token("text");
 
     final int as = a.size;
     for(int ai = 0; ai < as; ai++) {
       writeSep(ai);
-      out.out.print("<text>");
-      out.out.printToken(data.atom(a.pre[ai]), data.meta.entity);
-      out.out.print("</text>");
+      out.openElement(text);
+      out.text(data.atom(a.pre[ai]));
+      out.closeElement(text);
     }
     return a.size;
   }
@@ -538,14 +556,13 @@ public final class XMark extends XPath {
         "annotation/description/parlist/listitem/parlist/listitem/text/" +
         "emph/keyword/text()]");
     final XPathProcessor stepPerson = parse("seller/@person");
+    final byte[] pers = token("person");
+    final byte[] id = token("id");
 
     final int as = a.size;
     for(int ai = 0; ai < as; ai++) {
       writeSep(ai);
-      out.out.print("<person id=\"");
-      final Nodes tmp = eval(stepPerson, a, ai);
-      out.out.printToken(data.atom(tmp.pre[0]), data.meta.entity);
-      out.out.print("\"/>");
+      out.emptyElement(pers, id, data.atom(eval(stepPerson, a, ai).pre[0]));
     }
     return a.size;
   }
@@ -560,13 +577,13 @@ public final class XMark extends XPath {
   private int xmark17() throws Exception {
     final Nodes p = qu("/site/people/person[not(homepage/text())]");
     final XPathProcessor stepName     = parse("name/text()");
+    final byte[] pers = token("person");
+    final byte[] name = token("name");
 
     final int ps = p.size;
     for(int pi = 0; pi != ps; pi++) {
       writeSep(pi);
-      out.out.print("<person name=\"");
-      out.out.printToken(token(p, pi, stepName), data.meta.entity);
-      out.out.print("\"/>");
+      out.emptyElement(pers, name, atom(p, pi, stepName));
     }
     return p.size;
   }
@@ -585,7 +602,7 @@ public final class XMark extends XPath {
     final int is = i.size;
     for(int ii = 0; ii != is; ii++) {
       writeSep(ii);
-      out.out.print(Token.token(convert(data.atomNum(i.pre[ii]))));
+      out.out.print(token(convert(data.atomNum(i.pre[ii]))));
     }
     return i.size;
   }
@@ -611,17 +628,18 @@ public final class XMark extends XPath {
     final Nodes b = qu("/site/regions//item");
     final XPathProcessor stepName     = parse("name/text()");
     final XPathProcessor stepLocation = parse("location/text()");
+    final byte[] item = token("item");
+    final byte[] name = token("name");
+
     final Nodes k = eval(stepName, b);
     sort(b, k);
 
     final int bs = b.size;
     for(int bi = 0; bi < bs; bi++) {
       writeSep(bi);
-      out.out.print("<item name=\"");
-      out.out.printToken(token(b, bi, stepName), data.meta.entity);
-      out.out.print("\">");
-      out.out.printToken(token(b, bi, stepLocation), data.meta.entity);
-      out.out.print("</item>");
+      out.openElement(item, name, atom(b, bi, stepName));
+      out.text(atom(b, bi, stepLocation));
+      out.closeElement(item);
     }
     return b.size;
   }
@@ -635,32 +653,38 @@ public final class XMark extends XPath {
    * @throws Exception exception
    */
   private int xmark20() throws Exception {
-    out.out.print("<result>");
+    final byte[] res = token("result");
+    final byte[] pref = token("preferred");
+    final byte[] std = token("standard");
+    final byte[] chal = token("challenge");
+    final byte[] na = token("na");
+    
+    out.openElement(res);
     out.out.print(NL);
-    out.out.print("  <preferred>");
+    out.openElement(pref);
     parse("count(/site/people/person/profile[@income >= 100000])").eval(
         new Nodes(0, data)).serialize(out);
-    out.out.print("</preferred>");
+    out.closeElement(pref);
     out.out.print(NL);
 
-    out.out.print("  <standard>");
+    out.openElement(std);
     parse("count(/site/people/person/profile[@income < 100000 and " +
       "@income >= 30000])").eval(new Nodes(0, data)).serialize(out);
-    out.out.print("</standard>");
+    out.closeElement(std);
     out.out.print(NL);
 
-    out.out.print("  <challenge>");
+    out.openElement(chal);
     parse("count(/site/people/person/profile[@income < 30000])").eval(
         new Nodes(0, data)).serialize(out);
-    out.out.print("</challenge>");
+    out.closeElement(chal);
     out.out.print(NL);
 
-    out.out.print("  <na>");
+    out.openElement(na);
     parse("count(/site/people/person[not(profile/@income)])").eval(
         new Nodes(0, data)).serialize(out);
-    out.out.print("</na>");
+    out.closeElement(na);
     out.out.print(NL);
-    out.out.print("</result>");
+    out.closeElement(res);
     return 1;
   }
 
@@ -672,7 +696,7 @@ public final class XMark extends XPath {
    * @return result set
    * @throws QueryException query exception
    */
-  private byte[] token(final Nodes in, final int pre,
+  private byte[] atom(final Nodes in, final int pre,
       final XPathProcessor xpath) throws QueryException {
     return data.atom(eval(xpath, in, pre).pre[0]);
   }
@@ -744,21 +768,16 @@ public final class XMark extends XPath {
    * @param steps xpath steps
    * @throws Exception exception
    */
-  private void writeTag(final String tag, final Nodes in, final int pre,
+  private void writeTag(final byte[] tag, final Nodes in, final int pre,
       final XPathProcessor steps) throws Exception {
     final Nodes tmp = eval(steps, in, pre);
-    out.out.print("<");
-    out.out.print(tag);
+    out.startElement(tag);
     if(tmp.size == 0) {
-      out.out.print("/>");
+      out.emptyElement();
     } else {
-      out.out.print(">");
-      for(int t = 0; t < tmp.size; t++) {
-        out.out.printToken(data.atom(tmp.pre[0]), data.meta.entity);
-      }
-      out.out.print("</");
-      out.out.print(tag);
-      out.out.print(">");
+      out.finishElement();
+      for(int t = 0; t < tmp.size; t++) out.text(data.atom(tmp.pre[0]));
+      out.closeElement(tag);
     }
   }
 

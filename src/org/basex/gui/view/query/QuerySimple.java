@@ -108,7 +108,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     });
     BaseXLayout.enable(copy, false);
     box.add(copy);
-    box.add(new BaseXLabel("   "));
+    box.add(Box.createHorizontalStrut(8));
 
     filter = new BaseXButton(BUTTONFILTER, HELPFILTER);
     filter.addKeyListener(main);

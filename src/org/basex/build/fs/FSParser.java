@@ -17,7 +17,6 @@ import org.basex.build.fs.metadata.MP3Extractor;
 import org.basex.build.fs.metadata.MetaDataException;
 import org.basex.build.fs.metadata.PNGExtractor;
 import org.basex.build.fs.metadata.TIFExtractor;
-import org.basex.build.xml.XMLScanner;
 import org.basex.core.Prop;
 import org.basex.core.proc.Create;
 import org.basex.util.Array;
@@ -142,7 +141,7 @@ public final class FSParser extends Parser implements FSVisitor {
         int s = -1;
         while(++s < size) {
           final byte b = cache[s];
-          if(b >= 0 && b < ' ' && !XMLScanner.whitespace(b)) break;
+          if(b >= 0 && b < ' ' && !ws(b)) break;
         }
         if(s == size) {
           while(--s >= 0 && cache[s] <= 0x20 && cache[s] >= 0);

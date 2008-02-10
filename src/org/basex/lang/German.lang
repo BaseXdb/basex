@@ -18,6 +18,7 @@ m_layout=Layout
 
 # Buttons
 b_ok=  OK  
+b_rename=Umbenennen...
 b_open=Öffnen
 b_cancel=Abbrechen
 b_drop=Löschen
@@ -83,6 +84,9 @@ dfs_cont=Importiere Datei-Inhalte
 dfs_meta=Importiere Meta-Daten
 dfs_ftindex=Indexiere Dateiinhalte
 
+dr_title=Datenbank umbenennen
+dr_exists=Databank existiert schon
+dr_invalid=Ungültiger Name
 dd_title=Datenbank löschen
 dd_question=Die Datenbank '%' wird gelöscht.\nSind Sie sicher?
 

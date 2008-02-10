@@ -153,7 +153,7 @@ public final class Path extends Arr {
     Item i = ir.next();
     if(i != null) {
       if(i.node()) {
-        // <CG> XQuery/evaluate path: verify when results might be ordered
+        // [CG] XQuery/evaluate path: verify when results might be ordered
         final NodeBuilder nb = new NodeBuilder(false);
         nb.add((Node) i);
         while((i = ir.next()) != null) {

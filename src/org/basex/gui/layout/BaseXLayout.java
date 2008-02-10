@@ -90,7 +90,7 @@ public final class BaseXLayout {
       } else {
         final BaseXButton b = (BaseXButton) c;
         final String text = b.getText();
-        if(text.equals(BUTTONOK) || text.equals(BUTTONOPEN)) enable(b, enabled);
+        if(!text.equals(BUTTONCANCEL)) enable(b, enabled);
       }
     }
   }

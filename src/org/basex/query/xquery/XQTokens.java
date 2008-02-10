@@ -13,11 +13,7 @@ public interface XQTokens {
   // PARSER TOKENS ============================================================
   
   /** Parser token. */
-  byte[] AMP = token("amp;");
-  /** Parser token. */
   byte[] AND = token("and");
-  /** Parser token. */
-  byte[] APOS = token("apos;");
   /** Parser token. */
   byte[] AS = token("as");
   /** Parser token. */
@@ -107,8 +103,6 @@ public interface XQTokens {
   /** Parser token. */
   byte[] GREATEST = token("greatest");
   /** Parser token. */
-  byte[] CLBRK = token("gt;");
-  /** Parser token. */
   byte[] IDIV = token("idiv");
   /** Parser token. */
   byte[] IF = token("if");
@@ -132,8 +126,6 @@ public interface XQTokens {
   byte[] LEAST = token("least");
   /** Parser token. */
   byte[] LET = token("let");
-  /** Parser token. */
-  byte[] OPBRK = token("lt;");
   /** Parser token. */
   byte[] MOD = token("mod");
   /** Parser token. */
@@ -178,8 +170,6 @@ public interface XQTokens {
   byte[] QUEST = token("?");
   /** Parser token. */
   byte[] QUMARK = token("\"");
-  /** Parser token. */
-  byte[] QUOT = token("quot;");
   /** Parser token. */
   byte[] QUOTE = token("quote");
   /** Parser token. */

@@ -1,6 +1,7 @@
 package org.basex.build.xml;
 
 import static org.basex.util.Token.*;
+import static org.basex.util.XMLToken.*;
 import static org.basex.build.BuildText.*;
 import static org.basex.Text.*;
 import java.io.IOException;
@@ -63,7 +64,7 @@ public final class XMLScanner {
   /** Opening tag found. */
   private boolean prolog = true;
   /** Current quote character. */
-  private byte quote;
+  private int quote;
 
   /**
    * Constructor.
@@ -81,11 +82,11 @@ public final class XMLScanner {
   public XMLScanner(final BufferInput in) {
     input = in;
     ents = new Map();
-    ents.add(token("amp"), token("&"));
-    ents.add(token("apos"), token("'"));
-    ents.add(token("quot"), token("\""));
-    ents.add(token("gt"), token("<"));
-    ents.add(token("lt"), token(">"));
+    ents.add(E_AMP, new byte[] { '&' });
+    ents.add(E_APOS, new byte[] { '\'' });
+    ents.add(E_QU, new byte[] { '"' });
+    ents.add(E_LT, new byte[] { '<' });
+    ents.add(E_GT, new byte[] { '>' });
   }
 
   /**
@@ -109,15 +110,14 @@ public final class XMLScanner {
    * @throws BuildException Build Exception
    */
   public void next() throws BuildException {
-
     // gets next character from the input stream
     token.reset();
-    byte ch = nextValid();
+    byte ch = consume();
     
     // UTF8 header?
     if(prolog && ch == -0x11) {
-      if(nextValid() != -0x45 || nextValid() != -0x41) error(INVALID);
-      ch = nextValid();
+      if(consume() != -0x45 || consume() != -0x41) error(INVALID);
+      ch = consume();
     }
     if(ch == 0) {
       more = false;
@@ -160,13 +160,13 @@ public final class XMLScanner {
    * @throws BuildException Build Exception
    */
   private void scanCONTENT(final byte ch) throws BuildException {
-    int c = ch;
+    byte c = ch;
     // parse TEXT
     chars = false;
     if(c != '<' || isCDATA()) {
       if(c == '<') {
         scanCDATA();
-        c = nextValid();
+        c = consume();
       }
       type = Type.TEXT;
 
@@ -177,17 +177,17 @@ public final class XMLScanner {
           scanCDATA();
         } else {
           if(c == ']') {
-            if((nextValid()) == ']') {
-              if((nextValid()) == '>') error(CONTCDATA);
+            if((consume()) == ']') {
+              if((consume()) == '>') error(CONTCDATA);
               prevChar(1);
             }
             prevChar(1);
           }
-          chars |= !whitespace(c);
+          chars |= !ws(c);
           if(c == '&') token.add(getEntity());
-          else if(c != 0x0d) token.addUTF(c);
+          else if(c != 0x0d) token.add(c);
         }
-        c = nextValid();
+        c = consume();
       }
       prevChar(1);
       return;
@@ -230,7 +230,7 @@ public final class XMLScanner {
     if(nextChar() != '!') p = 1;
     else if(nextChar() != '[') p = 2;
     else {
-      if(!nextToken(CDATA)) error(CDATASEC);
+      if(!consume(CDATA)) error(CDATASEC);
       return true;
     }
     prevChar(p);
@@ -309,20 +309,20 @@ public final class XMLScanner {
       // process document declaration...
       type = Type.DECL;
       scanWS(ch);
-      if(!nextToken(VERS)) error(DECLSTART);
+      if(!consume(VERS)) error(DECLSTART);
       scanWS();
       if(nextChar() != '=') error(DECLWRONG);
       scanWS();
-      if(!nextToken(VERS1) && !nextToken(VERS2)) error(DECLVERSION);
+      if(!consume(VERS1) && !consume(VERS2)) error(DECLVERSION);
       
       ch = nextChar();
       final TokenBuilder enc = new TokenBuilder();
       if(scanWS(ch)) {
-        if(nextToken(ENCOD)) {
+        if(consume(ENCOD)) {
           scanWS();
           if(nextChar() != '=') error(DECLWRONG);
           scanWS();
-          final byte d = nextChar();
+          final int d = nextChar();
           if(d == '\'' || d == '"') {
             ch = nextChar();
             if(letter(ch)) {
@@ -338,14 +338,14 @@ public final class XMLScanner {
           encoding = string(enc.finish());
           if(encoding.length() == 0) error(DECLENCODE);
         }
-        if(nextToken(STANDALONE)) {
+        if(consume(STANDALONE)) {
           scanWS();
           if(nextChar() != '=') error(DECLWRONG);
           scanWS();
-          final byte d = nextChar();
+          final int d = nextChar();
           if(d == '\'' || d == '"') {
-            if(nextToken(STANDYES)) standalone = string(STANDYES);
-            else if(nextToken(STANDNO)) standalone = string(STANDNO);
+            if(consume(STANDYES)) standalone = string(STANDYES);
+            else if(consume(STANDNO)) standalone = string(STANDNO);
             if(nextChar() != d) standalone = null;
           }
           if(standalone == null) error(DECLSTANDALONE);
@@ -356,7 +356,7 @@ public final class XMLScanner {
       if(ch != '?' || nextChar() != '>') error(DECLWRONG);
     } else {
       type = Type.PI;
-      if(ch != '?' && !whitespace(ch)) error(PITEXT);
+      if(ch != '?' && !ws(ch)) error(PITEXT);
       do {
         while(ch != '?') {
           token.add(ch);
@@ -418,7 +418,7 @@ public final class XMLScanner {
    * @throws BuildException Build Exception
    */
   private void scanATTVAL(final byte ch) throws BuildException {
-    int c = ch;
+    byte c = ch;
     if(c == quote) {
       type = Type.QUOTE;
       state = State.ATT;
@@ -432,8 +432,8 @@ public final class XMLScanner {
         if(c == '<') error(wrong ? ATTCLOSE : ATTCHAR, (char) c);
         if(c == 0x0A) c = ' ';
         if(c == '&') token.add(getEntity());
-        else token.addUTF(c);
-      } while((c = nextValid()) != quote);
+        else token.add(c);
+      } while((c = consume()) != quote);
       prevChar(1);
     }
   }
@@ -455,8 +455,8 @@ public final class XMLScanner {
    */
   private boolean scanWS(final byte ch) throws BuildException {
     byte c = ch;
-    if(whitespace(c)) {
-      do c = nextChar(); while(whitespace(c));
+    if(ws(c)) {
+      do c = nextChar(); while(ws(c));
       prevChar(1);
       return true;
     }
@@ -499,7 +499,7 @@ public final class XMLScanner {
         entity.add(ch = nextChar());
       } while(ch != ';');
       if(!valid(n)) {
-        if(Prop.entity) error(XMLENT, entity);
+        if(Prop.entity) error(INVALIDENTITY, entity);
         return EMPTY;
       }
       entity.reset();
@@ -515,7 +515,7 @@ public final class XMLScanner {
 
     final byte[] en = ents.get(entity.finish());
     if(en != null) return en;
-    if(Prop.entity) error(XMLENT, entity);
+    if(Prop.entity) error(INVALIDENTITY, entity.finish());
     entity.reset();
     return entity.finish();
 
@@ -529,11 +529,10 @@ public final class XMLScanner {
    * @throws BuildException Build Exception
    */
   private void completeEntity() throws BuildException {
-    byte ch = nextValid();
-    while(entity.size < 10 && ch >= ' ') {
+    byte ch = consume();
+    while(entity.size < 10 && ch >= ' ' && ch != ';') {
       entity.add(ch);
-      if(ch == ';') return;
-      ch = nextValid();
+      ch = consume();
     }
   }
 
@@ -543,7 +542,7 @@ public final class XMLScanner {
    * @throws BuildException Build Exception
    */
   private byte nextChar() throws BuildException {
-    final byte ch = nextValid();
+    final byte ch = consume();
     if(ch == 0) error(UNCLOSED, token);
     return ch;
   }
@@ -553,7 +552,7 @@ public final class XMLScanner {
    * @return next character
    * @throws BuildException Build Exception
    */
-  private byte nextValid() throws BuildException {
+  private byte consume() throws BuildException {
     byte ch;
     if(pp != 0) {
       ch = last[(lp + pp++) & 0x0F];
@@ -568,7 +567,7 @@ public final class XMLScanner {
         col++;
       }
     }
-    if(ch < ' ' && ch > 0 && !whitespace(ch)) error(XMLCHAR, (char) ch, ch);
+    if(ch < ' ' && ch > 0 && !ws(ch)) error(XMLCHAR, (char) ch, ch);
     return ch;
   }
 
@@ -578,7 +577,7 @@ public final class XMLScanner {
    * @return true if token was found
    * @throws BuildException Build Exception
    */
-  private boolean nextToken(final byte[] tok) throws BuildException {
+  private boolean consume(final byte[] tok) throws BuildException {
     for(int t = 0; t < tok.length; t++) {
       if(nextChar() != tok[t]) {
         prevChar(t + 1);
@@ -597,44 +596,6 @@ public final class XMLScanner {
   }
 
   /**
-   * Checks if the specified character is an XML whitespace.
-   * @param ch the letter to be checked
-   * @return result of comparison
-   */
-  public static boolean whitespace(final int ch) {
-    return ch == 0x09 || ch == 0x0A || ch == 0x0D || ch == 0x20;
-  }
-
-  /**
-   * Checks if the specified character is an XML whitespace.
-   * @param ch the letter to be checked
-   * @return result of comparison
-   */
-  public static boolean valid(final int ch) {
-    return ch >= 0x20 && ch <= 0xD7FF || ch == 0xA || ch == 0x9 || ch == 0xD ||
-      ch >= 0xE000 && ch <= 0xFFFD || ch >= 0x10000 && ch <= 0x10ffff;
-  }
-
-  /**
-   * Checks if the specified character is an XML first-letter.
-   * @param ch the letter to be checked
-   * @return result of comparison
-   */
-  public static boolean isFirstLetter(final byte ch) {
-    // <CG> XML/Scanning: check if characters < 0 are really valid
-    return letter(ch) || ch == ':' || ch < 0;
-  }
-  
-  /**
-   * Checks if the specified character is an XML letter.
-   * @param ch the letter to be checked
-   * @return result of comparison
-   */
-  public static boolean isLetter(final byte ch) {
-    return isFirstLetter(ch) || digit(ch) || ch == '-' || ch == '.';
-  }
-
-  /**
    * Throws an error.
    * @param err error message
    * @param arg error arguments
@@ -650,28 +611,6 @@ public final class XMLScanner {
     throw new BuildException(SCANPOS + ": " + err, tmp);
   }
   
-  /**
-   * Finds the name of the DTD (intern or extern).
-   * @param dtdHelp the String to be checked.
-   */
-  public void findDTD(final String dtdHelp) {
-    
-    String dtdName = dtdHelp.substring(8, dtdHelp.length());
-    int save = 0;
-    String filename = dtdName;
-    
-    // search for quotation mark --> extern DTD
-    if(dtdName.codePointAt(dtdName.length() - 1) == 34) {
-      for (int i = 0; i < dtdName.length() - 1; i++) {
-        if (dtdName.codePointAt(i) == 34) {
-          save = i;
-          filename = dtdName.substring(save + 1, dtdName.length() - 1);
-        }
-      }
-    }
-    System.out.println(filename);
-  }
-
   /**
    * Main method; used for testing purposes.
    * @param args command line arguments

@@ -21,7 +21,9 @@ import org.basex.util.TokenBuilder;
  */
 public final class XMLTS {
   /** Path to the XQuery Test Suite. */
-  private static  final String FILE = "h:/xmlts/ibm/ibm_oasis_not-wf.xml";
+  private static  final String FILE =
+    "/home/dbis/xml/xmlts/ibm/ibm_oasis_not-wf.xml";
+  //private static  final String FILE = "h:/xmlts/ibm/ibm_oasis_not-wf.xml";
   /** Path to the XQuery Test Suite. */
   private static  final String PATH = FILE.replaceAll("[^/]+$", "");
   /** Verbose flag. */

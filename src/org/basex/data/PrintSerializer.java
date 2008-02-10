@@ -13,6 +13,13 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public class PrintSerializer extends Serializer {
+  /** Tab Entity. */
+  private static final byte[] E_TAB = { '#', 'x', '9' }; // token("&#xA;");
+  /** NewLine Entity. */
+  private static final byte[] E_NL = { '#', 'x', 'A' }; // token("&#xA;");
+  /** CarriageReturn Entity. */
+  private static final byte[] E_CR = { '#', 'x', 'D' }; // token("&#xA;");
+
   /** Output stream. */
   public final PrintOutput out;
   /** Pretty printing flag. */
@@ -46,7 +53,7 @@ public class PrintSerializer extends Serializer {
   @Override
   public void open(final int size) throws IOException {
     if(xml) {
-      // <CG> XML/Serialize: convert back to original encoding
+      // [CG] XML/Serialize: convert back to original encoding
       // (data.meta.encoding)
       out.println("<?xml version='1.0' encoding='" + Token.UTF8 + "' ?>");
       startElement(RESULTS);
@@ -85,13 +92,13 @@ public class PrintSerializer extends Serializer {
     out.print(ATT1);
     for(final byte ch : v) {
       switch(ch) {
-        case '&': out.print(Token.E_AMP); break;
-        case '>': out.print(Token.E_GT);  break;
-        case '<': out.print(Token.E_LT);  break;
-        case '"': out.print(Token.E_QU);  break;
-        case 0x9: out.print(Token.E_TAB); break;
-        case 0xA: out.print(Token.E_NL);  break;
-        case 0xD: out.print(Token.E_CR);  break;
+        case '&': out.print('&'); out.print(Token.E_AMP); out.print(';'); break;
+        case '>': out.print('&'); out.print(Token.E_GT);  out.print(';'); break;
+        case '<': out.print('&'); out.print(Token.E_LT);  out.print(';'); break;
+        case '"': out.print('&'); out.print(Token.E_QU);  out.print(';'); break;
+        case 0x9: out.print('&'); out.print(E_TAB);  out.print(';'); break;
+        case 0xA: out.print('&'); out.print(E_NL);  out.print(';'); break;
+        case 0xD: out.print('&'); out.print(E_CR);  out.print(';'); break;
         default: out.write(ch);
       }
     }
@@ -123,25 +130,14 @@ public class PrintSerializer extends Serializer {
   public void text(final byte[] b) throws IOException {
     for(final byte ch : b) {
       switch(ch) {
-        case '&': out.print(Token.E_AMP); break;
-        case '>': out.print(Token.E_GT);  break;
-        case '<': out.print(Token.E_LT);  break;
-        case 0x0D: out.print(Token.E_CR); break;
+        case '&': out.print('&'); out.print(Token.E_AMP); out.print(';'); break;
+        case '>': out.print('&'); out.print(Token.E_GT);  out.print(';'); break;
+        case '<': out.print('&'); out.print(Token.E_LT);  out.print(';'); break;
+        case 0xD: out.print('&'); out.print(E_CR);  out.print(';'); break;
         default: out.write(ch);
       }
     }
     more = false;
-    
-    /*
-    if(ch == '&') { out.print(Token.E_AMP); }
-    else if(ch == '>') { out.print(Token.E_GT); }
-    else if(ch == '<') { out.print(Token.E_LT); }
-    else if(ch == 0x0D) { out.print(Token.E_CR); }
-    else if(ch == 0x7F) { out.print("&#127;"); }
-    else if(ch == -0x3E && v[i + 1] < -0x60) {
-      out.print("&#" + (v[++i] & 0xFF) + ";");
-    } else { out.write(ch); }
-    */
   }
 
   @Override
@@ -177,10 +173,10 @@ public class PrintSerializer extends Serializer {
         continue;
       }
       switch(ch) {
-        case '&': out.print(Token.E_AMP); break;
-        case '>': out.print(Token.E_GT);  break;
-        case '<': out.print(Token.E_LT);  break;
-        case 0xD: out.print(Token.E_CR);  break;
+        case '&': out.print('&'); out.print(Token.E_AMP); out.print(';'); break;
+        case '>': out.print('&'); out.print(Token.E_GT);  out.print(';'); break;
+        case '<': out.print('&'); out.print(Token.E_LT);  out.print(';'); break;
+        case 0xD: out.print('&'); out.print(E_CR);  out.print(';'); break;
         default: out.write(ch);
       }
     }

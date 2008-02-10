@@ -176,7 +176,7 @@ public final class GUI extends JFrame {
     BaseXLayout.setWidth(hits, 150);
     hits.setHorizontalAlignment(SwingConstants.RIGHT);
     p.add(hits);
-    p.add(new BaseXLabel(" "));
+    p.add(Box.createHorizontalStrut(4));
 
     filter = new BaseXButton(BUTTONFILTER, HELPFILTER, null);
     filter.setToolTipText(Token.string(HELPFILTER));
@@ -213,7 +213,7 @@ public final class GUI extends JFrame {
       }
     });
     nav.add(mode);
-    nav.add(new BaseXLabel("  "));
+    nav.add(Box.createHorizontalStrut(6));
 
     input = new BaseXCombo(GUIProp.commands, null, true); 
 

@@ -15,6 +15,7 @@ import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Err;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
+import org.basex.util.XMLToken;
 
 /**
  * Attribute fragment.
@@ -79,7 +80,7 @@ public final class CAttr extends Arr {
     } else {
       final byte[] nm = it.str();
       if(Token.contains(nm, ' ')) Err.or(INVAL, nm);
-      if(!Type.isQName(nm)) Err.or(NAMEWRONG, nm);
+      if(!XMLToken.isQName(nm)) Err.or(NAMEWRONG, nm);
       name = new QNm(nm);
     }
     if(name.ns() && name.uri == Uri.EMPTY) name.uri = ctx.ns.uri(name.pre());

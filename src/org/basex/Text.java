@@ -12,7 +12,7 @@ import org.basex.core.proc.Set;
 
 /**
  * This class organizes textual information for the project classes.
- * All texts are externalized and inernationalized.
+ * All texts are externalized and internationalized.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
@@ -38,7 +38,7 @@ public interface Text {
   /** URL. */
   String URL = "http://www.basex.org";
   /** Code version. */
-  String VERSION = "4.02";
+  String VERSION = "4.03";
   /** Company Info. */
   String COMPANY = "DBIS, University of Konstanz";
 
@@ -581,6 +581,8 @@ public interface Text {
   /** Button text for confirming actions. */
   String BUTTONOK = lang("b_ok");
   /** Button text for opening files. */
+  String BUTTONRENAME = lang("b_rename");
+  /** Button text for opening files. */
   String BUTTONOPEN = lang("b_open");
   /** Button text for canceling actions. */
   String BUTTONCANCEL = lang("b_cancel");
@@ -710,6 +712,13 @@ public interface Text {
   };
   /** Import Options. */
   int[] IMPORTFSMAXSIZE = { 1024, 10240, 102400, 1048576, 10485760 };
+
+  /** Dialog title for renaming a database. */
+  String RENAMETITLE = lang("dr_title");
+  /** Info for renaming a database. */
+  String RENAMEINVALID = lang("dr_invalid");
+  /** Info for renaming a database. */
+  String RENAMEEXISTS = lang("dr_exists");
 
   /** Dialog title for dropping a database. */
   String DROPTITLE = lang("dd_title");
@@ -1145,6 +1154,9 @@ public interface Text {
   /** Help String. */
   byte[] HELPOK =
     token("Press this button to start the process.");
+  /** Help String. */
+  byte[] HELPRENAMEDB =
+    token("Press this button to rename the chosen database.");
   /** Help String. */
   byte[] HELPOPENDB =
     token("Press this button to open the chosen database.");

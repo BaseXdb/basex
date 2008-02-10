@@ -1,4 +1,4 @@
-#Thu Dec 20 22:10:10 CET 2007
+#Sun Feb 10 01:00:01 CET 2008
 eclipse.preferences.version=1
 org.eclipse.jdt.core.compiler.codegen.inlineJsrBytecode=enabled
 org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.5
@@ -62,8 +62,8 @@ org.eclipse.jdt.core.compiler.problem.unusedParameterWhenOverridingConcrete=disa
 org.eclipse.jdt.core.compiler.problem.unusedPrivateMember=warning
 org.eclipse.jdt.core.compiler.source=1.5
 org.eclipse.jdt.core.compiler.taskCaseSensitive=disabled
-org.eclipse.jdt.core.compiler.taskPriorities=NORMAL,NORMAL,NORMAL,NORMAL,NORMAL,NORMAL,NORMAL,NORMAL,NORMAL,NORMAL,NORMAL
-org.eclipse.jdt.core.compiler.taskTags=TODO,<CG>,<AH>,<SG>,<HS>,<LK>,<AW>,<FU>,<JH>,<SF>,<TG>
+org.eclipse.jdt.core.compiler.taskPriorities=NORMAL,NORMAL,NORMAL,NORMAL,NORMAL,NORMAL,NORMAL,NORMAL,NORMAL,NORMAL,NORMAL,NORMAL
+org.eclipse.jdt.core.compiler.taskTags=TODO,<CG>,<AH>,<SG>,<HS>,<LK>,<AW>,<FU>,<JH>,<SF>,<TG>,[CG]
 org.eclipse.jdt.core.formatter.align_type_members_on_columns=false
 org.eclipse.jdt.core.formatter.alignment_for_arguments_in_allocation_expression=16
 org.eclipse.jdt.core.formatter.alignment_for_arguments_in_enum_constant=16

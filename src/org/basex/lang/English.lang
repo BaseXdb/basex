@@ -18,6 +18,7 @@ m_layout=Layout
 
 # Buttons
 b_ok=  OK  
+b_rename=Rename...
 b_open= Open 
 b_cancel=Cancel
 b_drop=Drop
@@ -82,6 +83,10 @@ dfs_maxinfo=Limit text inclusion to given size
 dfs_cont=Include textual file contents
 dfs_meta=Include metadata
 dfs_ftindex=Index file contents
+
+dr_title=Rename Database
+dr_exists=Database exists already.
+dr_invalid=Invalid name.
 
 dd_title=Drop Database
 dd_question=Database '%' will be dropped.\nAre you sure?

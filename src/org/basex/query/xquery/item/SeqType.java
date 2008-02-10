@@ -15,7 +15,7 @@ import org.basex.query.xquery.util.SeqBuilder;
  */
 public final class SeqType {
   /** Extended type info. */
-  // <CG> XQuery/SeqType: process extended info (currently ignored).
+  // [CG] XQuery/SeqType: process extended info (currently ignored).
   byte[] ext;
   /** Sequence type. */
   public Type type;

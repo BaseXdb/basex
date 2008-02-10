@@ -53,7 +53,7 @@ public final class Copy extends Updates {
         final int pre = Insert.pre(par, pos, data);
         
         // merge text nodes if necessary
-        // <CG> Copy.MergeText: might not cover all cases yet
+        // [CG] Copy.MergeText: might not cover all cases yet
         
         final int s = srcDocs[c].size - 1;
         final int up = s != 0 ? -1 :

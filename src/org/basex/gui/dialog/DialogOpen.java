@@ -15,7 +15,9 @@ import javax.swing.border.EtchedBorder;
 import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.core.proc.Drop;
+import org.basex.core.proc.List;
 import org.basex.data.MetaData;
+import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
@@ -54,8 +56,7 @@ public final class DialogOpen extends Dialog {
     super(parent, drop ? DROPTITLE : OPENTITLE);
 
     // create database chooser
-    final String[] db = DialogOpen.getDatabases();
-    
+    final String[] db = List.list();
     if(db.length == 0) return;
     
     choice = new BaseXListChooser(this, db, HELPOPEN);
@@ -68,16 +69,15 @@ public final class DialogOpen extends Dialog {
         new EmptyBorder(10, 10, 10, 10)));
 
     doc = new BaseXLabel(DIALOGINFO);
-    doc.setFont(new Font(GUIProp.font, 0, 20));
+    doc.setFont(new Font(GUIProp.font, 0, 18));
     doc.setBorder(0, 0, 5, 0);
     info.add(doc, BorderLayout.NORTH);
 
     detail = new BaseXTextArea(HELPOPENINFO);
-    detail.setFont(GUIConstants.mfont.deriveFont(13f));
+    detail.setFont(GUIConstants.mfont.deriveFont(12f));
     detail.setBorder(new EmptyBorder(5, 5, 5, 5));
     detail.setOpaque(false);
     detail.setFocusable(false);
-    if(db.length == 0) detail.setText(OPENNODBINFO);
 
     BaseXLayout.setWidth(detail, 480);
     info.add(detail, BorderLayout.CENTER);
@@ -95,15 +95,20 @@ public final class DialogOpen extends Dialog {
       p.add(mainmem, BorderLayout.WEST);
     }
 
-    buttons = BaseXLayout.newButtons(this, true,
-        new String[] { drop ? BUTTONDROP : BUTTONOPEN, BUTTONCANCEL },
-        new byte[][] { drop ? HELPDROP : HELPOPENDB, HELPCANCEL });
+    if(drop) {
+      buttons = BaseXLayout.newButtons(this, true,
+          new String[] { BUTTONDROP, BUTTONCANCEL },
+          new byte[][] { HELPDROP, HELPCANCEL });
+    } else {
+      buttons = BaseXLayout.newButtons(this, true,
+          new String[] { BUTTONRENAME, BUTTONOPEN, BUTTONCANCEL },
+          new byte[][] { HELPRENAMEDB, HELPOPENDB, HELPCANCEL });
+    }
     p.add(buttons, BorderLayout.EAST);
     pp.add(p, BorderLayout.SOUTH);
 
     set(pp, BorderLayout.EAST);
     setInfo();
-    
     finish(parent);
   }
 
@@ -127,7 +132,10 @@ public final class DialogOpen extends Dialog {
 
   @Override
   public void action(final String cmd) {
-    if(BUTTONOPEN.equals(cmd)) {
+    if(BUTTONRENAME.equals(cmd)) {
+      new DialogRename(GUI.get(), choice.getValue());
+      choice.setData(List.list());
+    } else if(BUTTONOPEN.equals(cmd)) {
       close();
     } else if(BUTTONDROP.equals(cmd)) {
       final String db = choice.getValue();
@@ -135,51 +143,35 @@ public final class DialogOpen extends Dialog {
       if(JOptionPane.showConfirmDialog(this, BaseX.info(DROPCONF, db),
           DIALOGINFO, JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
         Drop.drop(db);
-        choice.setData(DialogOpen.getDatabases());
+        choice.setData(List.list());
         choice.requestFocusInWindow();
       }
     } else {
-      setInfo();
+      ok = setInfo();
+      BaseXLayout.enableOK(buttons, ok);
     }
   }
 
   @Override
   public void close() {
+    if(!ok) return;
     if(mainmem == null) action(BUTTONDROP);
-    else if(ok) dispose();
-  }
-
-  /**
-   * Returns the list of available databases.
-   * @return available databases.
-   */
-  static String[] getDatabases() {
-    // create database list
-    int n = 0;
-    final File file = new File(Prop.dbpath);
-    // no database directory found...
-    if(!file.exists()) return new String[] {};
-
-    for(final File f : file.listFiles()) if(f.isDirectory()) n++;
-    final String[] db = new String[n];
-    n = 0;
-    for(final File f : file.listFiles()) {
-      if(f.isDirectory()) db[n++] = f.getName();
-    }
-    return db;
+    else dispose();
   }
 
   /**
    * Refreshes the database information panel.
+   * @return true if the current choice is valid. 
    */
-  void setInfo() {
+  boolean setInfo() {
     final String db = choice.getValue().trim();
-    if(db.length() == 0) return;
+    if(db.length() == 0) return false;
 
-    doc.setText(db);
+    // read the database version
+    final File dir = IOConstants.dbpath(db);
+    if(!dir.exists()) return false;
 
     // read the database version and stop reading when version differs
-    final File dir = IOConstants.dbpath(db);
     long len = 0;
     for(final File f : dir.listFiles()) len += f.length();
 
@@ -215,7 +207,9 @@ public final class DialogOpen extends Dialog {
       txt.append(e.getMessage());
       ok = false;
     }
+    doc.setText(db);
     detail.setText(txt.toString());
     BaseXLayout.enableOK(buttons, ok);
+    return true;
   }
 }

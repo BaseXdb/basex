@@ -4,6 +4,7 @@ import static org.basex.gui.GUIConstants.*;
 import static org.basex.Text.*;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import javax.swing.Box;
 import javax.swing.JFrame;
 import javax.swing.SwingConstants;
 import javax.swing.border.CompoundBorder;
@@ -48,12 +49,12 @@ public final class DialogAbout extends Dialog {
     label.setFont(getFont().deriveFont(1));
     pp.add(label);
     pp.add(new BaseXLabel(Text.URL));
-    pp.add(sep());
+    pp.add(Box.createVerticalStrut(7));
     pp.add(new BaseXLabel(COPYRIGHT));
     pp.add(new BaseXLabel(LICENSE));
-    pp.add(sep());
+    pp.add(Box.createVerticalStrut(7));
     pp.add(new BaseXLabel(DEVELOPER));
-    pp.add(sep());
+    pp.add(Box.createVerticalStrut(7));
     pp.add(new BaseXLabel(CONTRIBUTE1));
     pp.add(new BaseXLabel(CONTRIBUTE2));
 
@@ -65,15 +66,5 @@ public final class DialogAbout extends Dialog {
     add(p, BorderLayout.EAST);
 
     finish(parent, null);
-  }
-
-  /**
-   * Returns a separator.
-   * @return separator.
-   */
-  private BaseXLabel sep() {
-    final BaseXLabel label = new BaseXLabel(" ");
-    label.setFont(getFont().deriveFont((float) 5));
-    return label;
   }
 }

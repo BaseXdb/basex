@@ -8,6 +8,8 @@ import org.basex.BaseX;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.util.Err;
+import org.basex.util.XMLToken;
+
 import static org.basex.util.Token.*;
 
 /**
@@ -117,7 +119,7 @@ public enum Type {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
       final byte[] v = norm(it.str());
-      if(!isNMToken(v)) error(it);
+      if(!XMLToken.isNMToken(v)) error(it);
       return new Str(v, this);
     }
     
@@ -132,7 +134,7 @@ public enum Type {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
       final byte[] v = norm(it.str());
-      if(!isName(v)) error(it);
+      if(!XMLToken.isName(v)) error(it);
       return new Str(v, this);
     }
     
@@ -896,7 +898,7 @@ public enum Type {
    */
   protected byte[] checkName(final Item it) throws XQException {
     final byte[] v = norm(it.str());
-    if(!isNCName(v)) error(it);
+    if(!XMLToken.isNCName(v)) error(it);
     return v;
   }
   
@@ -946,80 +948,6 @@ public enum Type {
           (nodes || t.par != null && t != AAT)) return t;
     }
     return null;
-  }
-
-  /**
-   * Checks if the specified token is a valid NCName.
-   * @param v value to be checked
-   * @return result of check
-   */
-  public static boolean isNCName(final byte[] v) {
-    final int l = v.length;
-    if(l == 0) return false;
-    return ncName(v, -1) == l;
-  }
-
-  /**
-   * Checks the specified token as an NCName.
-   * @param v value to be checked
-   * @param p start position
-   * @return end position
-   */
-  public static int ncName(final byte[] v, final int p) {
-    int i = p;
-    while(++i < v.length) {
-      final byte c = v[i];
-      if(letter(c)) continue;
-      if(i == p + 1 || !digit(c) && c != '-' && c != '.') return i;
-    }
-    return i;
-  }
-  
-  /**
-   * Checks if the specified token is a valid Name.
-   * @param v value to be checked
-   * @return result of check
-   */
-  public static boolean isName(final byte[] v) {
-    if(v.length == 0) return false;
-    int i = -1;
-    while(++i != v.length) {
-      final byte c = v[i];
-      if(letter(c) || c == ':') continue;
-      if(i == 0 || !digit(c) && c != '-' && c != '.') return false;
-    }
-    return true;
-  }
-
-  /**
-   * Checks if the specified token is a valid NMToken.
-   * @param v value to be checked
-   * @return result of check
-   */
-  public static boolean isNMToken(final byte[] v) {
-    if(v.length == 0) return false;
-    int i = -1;
-    while(++i != v.length) {
-      final byte c = v[i];
-      if(!letterOrDigit(c) && c != ':' && c != '-' && c != '.') return false;
-    }
-    return true;
-  }
-
-  /**
-   * Checks if the specified token is a valid QName.
-   * @param val value to be checked
-   * @return result of check
-   */
-  public static boolean isQName(final byte[] val) {
-    final int l = val.length;
-    if(l == 0) return false;
-    final int i = Type.ncName(val, -1);
-    if(i == l) return true;
-    if(i == 0 || val[i] != ':') return false;
-    final int j = Type.ncName(val, i);
-    if(j == i + 1 || j != l) return false;
-    return true;
   }
 
   @Override

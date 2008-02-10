@@ -114,7 +114,7 @@ public final class DNode extends Node {
   @Override
   public QNm qname(final QNm nm) {
     nm.name(nname());
-    // <CG> DNode/Namespaces: introduce correct namespace handling
+    // [CG] DNode/Namespaces: introduce correct namespace handling
     if(data.xmlnsID != 0) {
       int s = pre + data.attSize(pre, data.kind(pre));
       int p = pre;

@@ -57,7 +57,7 @@ public abstract class LocPath extends Expr {
       final Preds preds = step.preds;
 
       // skip optimization if no preds are specified or if a pos.pred is found
-      // <CG> XPath/Path optimization: enough to check first predicate?
+      // [CG] XPath/Path optimization: enough to check first predicate?
       if(preds.size() == 0 || step.posPred() > 0) continue;
       
       // don't optimize non-forward axes

@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import java.io.File;
 import java.io.IOException;
 import org.basex.BaseX;
-import org.basex.build.xml.XMLScanner;
 import org.basex.io.IOConstants;
 import org.basex.query.xquery.expr.And;
 import org.basex.query.xquery.expr.CAttr;
@@ -79,6 +78,7 @@ import org.basex.util.Array;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
+import org.basex.util.XMLToken;
 
 /**
  * XQuery parser.
@@ -165,7 +165,7 @@ public final class XQParser {
       ql = qu.length;
       if(ql == 0) Err.or(QUERYEMPTY);
       for(qp = ql; qp > 0; qp--) {
-        if(!XMLScanner.valid(qu[qp - 1] & 0xFF))
+        if(!XMLToken.valid(qu[qp - 1] & 0xFF))
           Err.or(QUERYINV, (int) qu[qp - 1]);
       }
 
@@ -263,7 +263,7 @@ public final class XQParser {
    * @throws XQException xquery exception
    */
   private void prolog() throws XQException {
-    // <CG> XQuery/Prolog: separate prolog from setters
+    // [CG] XQuery/Prolog: separate prolog from setters
     while(true) {
       final int p = qp;
       if(consumeWS(DECLARE)) {
@@ -362,7 +362,7 @@ public final class XQParser {
    * @throws XQException xquery exception
    */
   private void optionDecl() throws XQException {
-    // <CG> XQuery/Option Declaration
+    // [CG] XQuery/Option Declaration
     final QNm name = new QNm(qName(QNAMEINV));
     final byte[] ns = stringLiteral();
     name.check(ctx);
@@ -937,7 +937,7 @@ public final class XQParser {
     final Expr expr = rangeExpr();
     if(!consumeWS(FTCONTAINS)) return expr;
     consumeWS();
-    // <CG> XQuery/FTIgnoreOption
+    // [CG] XQuery/FTIgnoreOption
     return new FTCont(expr, ftSelection());
   }
 
@@ -1127,7 +1127,7 @@ public final class XQParser {
     if(!consume(PRAGMA)) return null;
 
     do {
-      // <CG> XQuery/Pragmas
+      // [CG] XQuery/Pragmas
       final QNm name = new QNm(qName(PRAGMAINCOMPLETE));
       if(!name.ns()) Err.or(NSMISS, name);
       name.check(ctx);
@@ -2128,7 +2128,7 @@ public final class XQParser {
    * @throws XQException xquery exception
    */
   private boolean ftMatchOption(final FTOptions opt) throws XQException {
-    // <CG> XQuery/FTMatchOptions: language, stemming, thesaurus, stopword, ...
+    // [CG] XQuery/FTMatchOptions: language, stemming, thesaurus, stopword, ...
     
     if(consumeWS(LOWERCASE)) {
       if(opt.lowercase || opt.uppercase || opt.sensitive) Err.or(FTCASE);
@@ -2261,24 +2261,25 @@ public final class XQParser {
           if(n < 0) Err.or(ENTINVALID, invalidEnt(p));
           if(!m) n += 9;
         } while(!consume(';'));
-        if(!XMLScanner.valid(n)) Err.or(ENTINVALID, invalidEnt(p));
+        if(!XMLToken.valid(n)) Err.or(ENTINVALID, invalidEnt(p));
         tb.addUTF(n);
       } else {
         if(consumeWS()) Err.or(ENTINVALID, invalidEnt(p));
 
-        if(consume(OPBRK)) {
+        if(consume(E_LT)) {
           tb.add('<');
-        } else if(consume(CLBRK)) {
+        } else if(consume(E_GT)) {
           tb.add('>');
-        } else if(consume(AMP)) {
+        } else if(consume(E_AMP)) {
           tb.add('&');
-        } else if(consume(QUOT)) {
+        } else if(consume(E_QU)) {
           tb.add('"');
-        } else if(consume(APOS)) {
+        } else if(consume(E_APOS)) {
           tb.add('\'');
         } else {
           Err.or(ENTUNKNOWN, invalidEnt(p));
         }
+        check(';');
       }
       tb.ent = true;
     } else {

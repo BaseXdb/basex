@@ -58,7 +58,7 @@ public final class Namespaces {
    * @throws XQException evaluation exception
    */
   public Uri uri(final byte[] pre) throws XQException {
-    // <CG> XQuery/uri; add recursive namespace handling
+    // [CG] XQuery/uri; add recursive namespace handling
     Uri uri = find(pre);
     if(uri == null) uri = DEFAULT.uri(pre);
     if(uri == Uri.EMPTY) Err.or(PREUNKNOWN, pre);

@@ -114,7 +114,7 @@ final class FNId extends Fun {
     final NodeIter ni = nod.attr();
     Node att;
     while((att = ni.next()) != null) {
-      // <CG> XQuery/DTD Parsing
+      // [CG] XQuery/DTD Parsing
       for(final byte[] id : ids) {
         if(!eq(checkStr(att), id)) continue;
         final byte[] nm = lc(att.qname().str());
@@ -138,7 +138,7 @@ final class FNId extends Fun {
     final NodeIter ni = nod.attr();
     Node att;
     while((att = ni.next()) != null) {
-      // <CG> XQuery/DTD Parsing
+      // [CG] XQuery/DTD Parsing
       for(final byte[] id : ids) {
         if(!eq(checkStr(att), id)) continue;
         final byte[] nm = lc(att.qname().str());

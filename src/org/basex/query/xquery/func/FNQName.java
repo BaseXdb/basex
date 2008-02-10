@@ -16,6 +16,7 @@ import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
 import org.basex.query.xquery.util.Err;
 import org.basex.util.Token;
+import org.basex.util.XMLToken;
 
 /**
  * QName functions.
@@ -58,7 +59,7 @@ final class FNQName extends Fun {
         it = arg[1].atomic(this, true);
         it = it == null ? Str.ZERO : check(it, Type.STR);
         final byte[] str = it.str();
-        if(!Type.isQName(str)) Err.value(Type.QNM, it);
+        if(!XMLToken.isQName(str)) Err.value(Type.QNM, it);
         name = new QNm(str, uri);
 
         if(name.ns()) {
@@ -118,7 +119,7 @@ final class FNQName extends Fun {
     seq.add(new NCN(XML).iter());
     if(ctx.nsElem != Uri.EMPTY) seq.add(Str.ZERO);
 
-    // <CG> XQuery/inscope; nested namespace handling
+    // [CG] XQuery/inscope; nested namespace handling
     Node n = node;
     while(n != null) {
       final FAttr[] at = n.ns();

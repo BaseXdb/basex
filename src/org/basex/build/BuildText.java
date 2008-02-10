@@ -39,8 +39,6 @@ public interface BuildText {
   /** Scanner Error. */
   String XMLCHAR = "Invalid XML character found: '%' (#%)";
   /** Scanner Error. */
-  String XMLENT = "Invalid XML character found: '%'";
-  /** Scanner Error. */
   String CHARACTER = "Invalid character found: '%'";
   /** Scanner Error. */
   String CLOSING = "Tag was not properly closed.";
@@ -73,10 +71,13 @@ public interface BuildText {
   /** Scanner Error. */
   String DECLSTANDALONE = "Invalid standalone attribute in declaration.";
   /** Scanner Error. */
-  String INVALIDENTITY = "Unknown entity '%'; " +
-    "try the command 'set entity off'.";
+  String INVALIDENTITY = "Unknown entity '&%;'. Try 'set entity off'.";
   /** Scanner Error. */
   String TYPEAFTER = "Misplaced document type definition.";
+  /** Scanner Error. */
+  String DTDERR = "DTD parsing: %";
+  /** Scanner Error. */
+  String DTDNOTFOUND = "\"%\" not found.";
 
   /** CDATA token. */
   byte[] CDATA = Token.token("CDATA[");

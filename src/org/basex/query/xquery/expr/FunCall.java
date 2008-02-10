@@ -33,7 +33,7 @@ public final class FunCall extends Arr {
   public Iter iter(final XQContext ctx) throws XQException {
     final int s = ctx.vars.size();
 
-    // <CG> XQuery/Recursive Functions... fixed already?
+    // [CG] XQuery/Recursive Functions... fixed already?
     if(s > 1000) throw new RuntimeException("Too many recursions.");
 
     // add function variables

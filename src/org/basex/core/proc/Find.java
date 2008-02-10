@@ -84,7 +84,8 @@ public final class Find extends XPath {
         pre += "//*[" + ContainsLC.NAME + "(@name, \"" + term + "\")] | ";
       }
     }
-    if(pre.length() == 0) return root ? "/" : ".";
+    if(pre.length() == 0 && preds.length() == 0) return root ? "/" : ".";
+    
     return pre + (r ? "/" : "") + "descendant-or-self::" + tag + preds;
   }
 
