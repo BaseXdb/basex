@@ -73,7 +73,7 @@ public class DTDParser {
 
     // check Whitespace
     consumeWS();
-    
+
     // check for ExternDTD
     if(consume(SYSTEM)) {
       if(!consumeWS()) error();
@@ -113,7 +113,7 @@ public class DTDParser {
     } catch(final FileNotFoundException ex) {
       error(DTDNOTFOUND, dtd);
     }
-    
+
     extern = true;
     pos = 0;
     BaseX.debug("- Root Element Type: %", root);
@@ -171,7 +171,9 @@ public class DTDParser {
       } else if(consume(NOT)) {
         if(!consumeWS()) error();
         BaseX.debug("----------------------");
-        BaseX.debug(NOT);
+        BaseX.debug("- Notation: %", consumeName2());
+        if(!consumeWS()) error();
+        notationID();
       } else if(consume(GQ)) {
         byte ch = next();
         if(!isFirstLetter(ch)) error(PINAME);
@@ -179,6 +181,12 @@ public class DTDParser {
         BaseX.debug("NOT IMPLEMENTED");
         while(!consume(GREAT))
           next();
+      } else if(consume(COMS)) {
+        int tmp = pos;
+        while(!consume(COME)) {
+          next();
+        }
+        BaseX.debug("- Comment: %", substring(content, tmp, pos - 3));
       } else if(consume(WELEM1) || consume(WELEM2) || consume(WELEM3)
           || consume(WATTL1) || consume(WATTL2) || consume(XML)) {
         error();
@@ -221,87 +229,6 @@ public class DTDParser {
       consumeWS1();
       BaseX.debug(consumeName2());
       consumeWS1();
-    }
-  }
-
-  /**
-   * Consumes bracketed content.
-   * @throws BuildException Build Exception
-   */
-  private void consumeBracketed() throws BuildException {
-    while(!consume(BRACKETC)) {
-      consumeWS1();
-      if(consume(DASH) || consume(COLON)) {
-        consumeWS1();
-        if(consume(BRACKETO)) {
-          check = true;
-          consumeBracketed();
-        } else {
-          BaseX.debug(consumeName2());
-          consumeWS1();
-        }
-      } else if(consume(BRACKETO)) {
-        consumeBracketed();
-      } else {
-        if(check) {
-          consumeWS1();
-          BaseX.debug(consumeName2());
-          consumeWS1();
-          check = false;
-        } else {
-          error();
-        }
-      }
-    }
-    BaseX.debug(consumeQuantity());
-    if(consumeWS()) {
-      if(consume(DASH) || consume(COLON)) {
-        consumeWS1();
-        if(consume(BRACKETO)) {
-          consumeBracketed();
-        }
-      }
-    }
-  }
-
-  /**
-   * Consumes bracketed content.
-   * @throws BuildException Build Exception
-   */
-  private void consumeBracketed2() throws BuildException {
-    while(!consume(BRACKETC)) {
-      consumeWS1();
-      if(consume(DASH)) {
-        consumeWS1();
-        if(consume(BRACKETO)) {
-          consumeBracketed();
-        } else {
-          BaseX.debug(consumeName2());
-          consumeWS1();
-        }
-      } else if(consume(BRACKETO)) {
-        consumeBracketed();
-      } else if(consume(COLON)) {
-        error();
-      } else {
-        if(check) {
-          consumeWS1();
-          BaseX.debug(consumeName2());
-          consumeWS1();
-          check = false;
-        } else {
-          error();
-        }
-      }
-    }
-    BaseX.debug(consumeQuantity());
-    if(consumeWS()) {
-      if(consume(DASH) || consume(COLON)) {
-        consumeWS1();
-        if(consume(BRACKETO)) {
-          consumeBracketed();
-        }
-      }
     }
   }
 
@@ -391,6 +318,107 @@ public class DTDParser {
   }
 
   /**
+   * checks for External or Public ID in a Notation Object.
+   * @throws BuildException Build Exception
+   */
+  private void notationID() throws BuildException {
+    if(consume(SYSTEM)) {
+      if(!consumeWS()) error();
+      BaseX.debug(" - ExternID: '%'", consumeQuoted());
+    } else if(consume(PUBLIC)) {
+      if(!consumeWS()) error();
+      BaseX.debug(" - PUBID: '%'", consumeQuoted());
+      consumeWS1();
+      if(!consume(GREAT)) {
+        BaseX.debug(" - ExternID: '%'", consumeQuoted());
+      }
+    } else {
+      error();
+    }
+  }
+
+  /**
+   * Consumes bracketed content.
+   * @throws BuildException Build Exception
+   */
+  private void consumeBracketed() throws BuildException {
+    while(!consume(BRACKETC)) {
+      consumeWS1();
+      if(consume(DASH) || consume(COLON)) {
+        consumeWS1();
+        if(consume(BRACKETO)) {
+          check = true;
+          consumeBracketed();
+        } else {
+          BaseX.debug(consumeName2());
+          consumeWS1();
+        }
+      } else if(consume(BRACKETO)) {
+        consumeBracketed();
+      } else {
+        if(check) {
+          consumeWS1();
+          BaseX.debug(consumeName2());
+          consumeWS1();
+          check = false;
+        } else {
+          error();
+        }
+      }
+    }
+    BaseX.debug(consumeQuantity());
+    if(consumeWS()) {
+      if(consume(DASH) || consume(COLON)) {
+        consumeWS1();
+        if(consume(BRACKETO)) {
+          consumeBracketed();
+        }
+      }
+    }
+  }
+
+  /**
+   * Consumes bracketed content.
+   * @throws BuildException Build Exception
+   */
+  private void consumeBracketed2() throws BuildException {
+    while(!consume(BRACKETC)) {
+      consumeWS1();
+      if(consume(DASH)) {
+        consumeWS1();
+        if(consume(BRACKETO)) {
+          consumeBracketed();
+        } else {
+          BaseX.debug(consumeName2());
+          consumeWS1();
+        }
+      } else if(consume(BRACKETO)) {
+        consumeBracketed();
+      } else if(consume(COLON)) {
+        error();
+      } else {
+        if(check) {
+          consumeWS1();
+          BaseX.debug(consumeName2());
+          consumeWS1();
+          check = false;
+        } else {
+          error();
+        }
+      }
+    }
+    BaseX.debug(consumeQuantity());
+    if(consumeWS()) {
+      if(consume(DASH) || consume(COLON)) {
+        consumeWS1();
+        if(consume(BRACKETO)) {
+          consumeBracketed();
+        }
+      }
+    }
+  }
+
+  /**
    * Scans whitespace.
    * @return true if whitespace was found
    */
@@ -441,7 +469,6 @@ public class DTDParser {
     int p = pos;
     byte c = next();
     if(!XMLToken.isFirstLetter(c)) error();
-
     do {
       c = next();
     } while(XMLToken.isLetter(c));
