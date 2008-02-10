@@ -114,6 +114,10 @@ public interface BuildText {
   byte[] BRACKETC = Token.token(")");
   /** DTD: <?. */
   byte[] GQ = Token.token("<?");
+  /** DTD: <!--. */
+  byte[] COMS = Token.token("<!--");
+  /** DTD: -->. */
+  byte[] COME = Token.token("-->");
   /** DTD: ELEMENT. */
   byte[] ELEM = Token.token("<!ELEMENT");
   /** DTD: Wrong ELEMENT. */
