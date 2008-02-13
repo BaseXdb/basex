@@ -27,7 +27,7 @@ public class DTDParser {
   private byte[] attl;
   /** Tokenizer Type. */
   private byte[] checkT;
-  /** Extern id of the dtd file. */
+  /** Extern id of the DTD file. */
   private byte[] extid;
   /** Root file. */
   private String xmlfile;
@@ -39,6 +39,12 @@ public class DTDParser {
   private byte[] content;
   /** Current position. */
   private int pos;
+  /** Temporary saving of position. */
+  private int tmpPos;
+  /** Temporary saving of content. */
+  private byte[] tmpCont;
+  /** boolean Value for help. */
+  private boolean check2 = true;
 
   /** Index for all tag and attribute names. */
   Names tags;
@@ -78,18 +84,18 @@ public class DTDParser {
     if(consume(SYSTEM)) {
       if(!consumeWS()) error();
       extid = consumeQuoted();
-      starter();
+      externalID();
     } else if(consume(PUBLIC)) {
       if(!consumeWS()) error();
       consumeQuoted();
       if(!consumeWS()) error();
       extid = consumeQuoted();
-      starter();
+      externalID();
     } else if(consume(SBRACKETO)) {
       content = dtd;
       BaseX.debug("- Root Element Type: %", root);
-      BaseX.debug("- Content:\n %", content);
-      consumeContent();
+      BaseX.debug("- InternContent:\n %", content);
+      markupdecl();
     } else {
       error();
     }
@@ -99,14 +105,14 @@ public class DTDParser {
    * Starts the parsing of external DTD.
    * @throws IOException I/O Exception
    */
-  private void starter() throws IOException {
+  private void externalID() throws IOException {
     consumeWS1();
     if(consume(SBRACKETO)) {
-      BaseX.debug("- Root Element Type: %", root);
-      BaseX.debug("- Content:\n %", content);
-      consumeContent();
+      BaseX.debug("BINDA");
+      check2 = false;
+      tmpPos = pos;
+      tmpCont = content;
     }
-
     // read external file
     final String dtd = string(extid);
     try {
@@ -114,13 +120,18 @@ public class DTDParser {
     } catch(final FileNotFoundException ex) {
       error(DTDNOTFOUND, dtd);
     }
-
     extern = true;
     pos = 0;
     BaseX.debug("- Root Element Type: %", root);
-    BaseX.debug("- Content of %:\n %", dtd, content);
+    BaseX.debug("- ExternContent of %:\n %", dtd, content);
     BaseX.debug("----------------");
-    consumeContent();
+    markupdecl();
+    if(!check2) {
+      content = tmpCont;
+      pos = tmpPos;
+      BaseX.debug("- InternContent:\n %", content);
+      markupdecl();
+    }
     extern = false;
   }
 
@@ -128,66 +139,23 @@ public class DTDParser {
    * Method to consume the Content of Internal or/and External DTD.
    * @throws BuildException Build Exception
    */
-  private void consumeContent() throws BuildException {
+  private void markupdecl() throws BuildException {
     // runs till the last character
     while(next() != 0) {
       check = true;
       // checks for element, attlist and entity tags
       if(consume(ELEM)) {
-        if(!consumeWS()) error();
-        element = consumeName2();
-        tags.add(element);
-        BaseX.debug("----------------------");
-        BaseX.debug("- Element: %", element);
-        contentSpec();
+        elementDecl();
       } else if(consume(ATTL)) {
-        if(!consumeWS()) error();
-        attl = consumeName2();
-        atts.add(attl);
-        BaseX.debug("----------------------");
-        BaseX.debug("- ATTLIST: %", attl);
-        consumeWS1();
-        if(!consume(GREAT)) {
-          attType();
-          dDecl();
-        }
+        attlistDecl();
       } else if(consume(ENT)) {
-        if(!consumeWS()) error();
-        if(percentage(next())) {
-          if(!consumeWS()) error();
-          byte[] name = consumeName2();
-          BaseX.debug("----------------------");
-          BaseX.debug("- Entity: %", name);
-          if(!consumeWS()) error();
-          final byte[] val = entDef();
-          ents.add(name, val);
-        } else {
-          prev();
-          byte[] name = consumeName2();
-          BaseX.debug("----------------------");
-          BaseX.debug("- Entity: '%'", name);
-          final byte[] val = entDef();
-          ents.add(name, val);
-        }
+        entityDecl();
       } else if(consume(NOT)) {
-        if(!consumeWS()) error();
-        BaseX.debug("----------------------");
-        BaseX.debug("- Notation: %", consumeName2());
-        if(!consumeWS()) error();
-        notationID();
+        notationDecl();
       } else if(consume(GQ)) {
-        byte ch = next();
-        if(!isFirstLetter(ch)) error(PINAME);
-        while(isLetter(ch = next()));
-        BaseX.debug("NOT IMPLEMENTED");
-        while(!consume(GREAT))
-          next();
+        piDecl();
       } else if(consume(COMS)) {
-        int tmp = pos;
-        while(!consume(COME)) {
-          next();
-        }
-        BaseX.debug("- Comment: %", substring(content, tmp, pos - 3));
+        commentDecl();
       } else if(consume(WELEM1) || consume(WELEM2) || consume(WELEM3)
           || consume(WATTL1) || consume(WATTL2) || consume(XML)) {
         error();
@@ -199,6 +167,96 @@ public class DTDParser {
     }
     BaseX.debug("----------------------");
     BaseX.debug("THE END");
+  }
+  
+  /**
+   * Checks the ElementDeclaration.
+   * @throws BuildException Build Exception
+   */
+  private void elementDecl() throws BuildException {
+    if(!consumeWS()) error();
+    element = consumeName2();
+    tags.add(element);
+    BaseX.debug("----------------------");
+    BaseX.debug("- Element: '%'", element);
+    contentSpec();
+  }
+  
+  /**
+   * Checks the AttlistDeclaration.
+   * @throws BuildException Build Exception
+   */
+  private void attlistDecl() throws BuildException {
+    if(!consumeWS()) error();
+    attl = consumeName2();
+    atts.add(attl);
+    BaseX.debug("----------------------");
+    BaseX.debug("- ATTLIST: '%'", attl);
+    consumeWS1();
+    if(!consume(GREAT)) {
+      attType();
+      dDecl();
+    }
+  }
+  
+  /**
+   * Checks the EntityDeclaration.
+   * @throws BuildException Build Exception
+   */
+  private void entityDecl() throws BuildException {
+    if(!consumeWS()) error();
+    if(percentage(next())) {
+      if(!consumeWS()) error();
+      byte[] name = consumeName2();
+      BaseX.debug("----------------------");
+      BaseX.debug("- Entity: '%'", name);
+      if(!consumeWS()) error();
+      final byte[] val = entDef();
+      ents.add(name, val);
+    } else {
+      prev();
+      byte[] name = consumeName2();
+      BaseX.debug("----------------------");
+      BaseX.debug("- Entity: '%'", name);
+      final byte[] val = entDef();
+      ents.add(name, val);
+    }
+  }
+  
+  /**
+   * Checks the NotationDeclaration.
+   * @throws BuildException Build Exception
+   */
+  private void notationDecl() throws BuildException {
+    if(!consumeWS()) error();
+    BaseX.debug("----------------------");
+    BaseX.debug("- Notation: %", consumeName2());
+    if(!consumeWS()) error();
+    notationID();
+  }
+  
+  /**
+   * Checks the PIDeclaration.
+   * @throws BuildException Build Exception
+   */
+  private void piDecl() throws BuildException {
+    byte ch = next();
+    if(!isFirstLetter(ch)) error(PINAME);
+    while(isLetter(ch = next()));
+    BaseX.debug("NOT IMPLEMENTED");
+    while(!consume(GREAT))
+      next();
+  }
+  
+  /**
+   * Checks the CommentDeclaration.
+   */
+  private void commentDecl() {
+    int tmp = pos;
+    while(!consume(COME)) {
+      next();
+    }
+    BaseX.debug("- Comment: %", substring(content, tmp, pos - 3));
   }
 
   /**
@@ -589,7 +647,6 @@ public class DTDParser {
    */
   private void error(final String err, final Object... arg)
       throws BuildException {
-
     throw new BuildException(DTDERR, BaseX.inf(err, arg));
   }
 
