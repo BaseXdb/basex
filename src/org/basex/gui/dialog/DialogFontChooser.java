@@ -80,7 +80,9 @@ public final class DialogFontChooser extends Dialog {
     aalias = new BaseXCheckBox(FAALIAS, HELPFALIAS, GUIProp.fontalias, this);
     aalias.setBorder(new EmptyBorder(5, 4, 0, 0));
     aalias.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent e) { action(null); }
+      public void actionPerformed(final ActionEvent e) {
+        action(null);
+      }
     });
     set(aalias, BorderLayout.SOUTH);
 

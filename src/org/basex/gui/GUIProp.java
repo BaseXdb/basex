@@ -16,9 +16,9 @@ public final class GUIProp {
   public static String font = "SansSerif";
   /** Default GUI Monospace Font. */
   public static String monofont = "Monospaced";
-  /** Monospace font type = plain, bold, italics). */
+  /** Font type = plain, bold, italics). */
   public static int fonttype = 0;
-  /** Monospace font size. */
+  /** Font size. */
   public static int fontsize = 12;
   /** Flag for anti-aliasing results in GUI mode. */
   public static boolean fontalias = false;
@@ -110,14 +110,10 @@ public final class GUIProp {
 
   /** Last entered BaseX commands. */
   public static String[] commands = new String[0];
-  /** Last entered XQuery queries. */
-  public static String[] xquerycmd = new String[0];
   /** Last entered BaseX commands. */
   public static String[] search = new String[0];
   /** Last entered XPath queries. */
   public static String[] xpath = new String[0];
-  /** Last entered GUISearch commands. */
-  public static String[] guisearch = new String[0];
 
   // CONFIG OPTIONS ===========================================================
 

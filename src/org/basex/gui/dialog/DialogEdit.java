@@ -3,18 +3,15 @@ package org.basex.gui.dialog;
 import static org.basex.Text.*;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import javax.swing.JScrollPane;
-import javax.swing.text.JTextComponent;
 import org.basex.BaseX;
 import org.basex.core.Context;
 import org.basex.core.proc.Insert;
 import org.basex.data.Data;
 import org.basex.gui.GUI;
-import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.layout.BaseXTextArea;
+import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.util.Token;
@@ -29,9 +26,11 @@ public final class DialogEdit extends Dialog {
   /** Resulting query. */
   public String query;
   /** Text area. */
-  private JTextComponent input;
+  private BaseXTextField input;
   /** Text area. */
-  private JTextComponent input2;
+  private BaseXText input3;
+  /** Text area. */
+  private BaseXText input2;
   /** Old content. */
   private final String old1;
   /** Old content. */
@@ -64,35 +63,38 @@ public final class DialogEdit extends Dialog {
 
     if(kind == Data.ELEM || kind == Data.DOC) {
       input = new BaseXTextField(Token.string(data.tag(pre)), null, this);
+      old1 = input.getText();
       pp.add(input, BorderLayout.CENTER);
     } else if(kind == Data.TEXT || kind == Data.COMM) {
       setResizable(true);
-      input = new BaseXTextArea(Token.string(data.text(pre)), null, this);
-      input.setFont(GUIConstants.mfont);
-      final JScrollPane sp = new JScrollPane(input);
-      sp.setPreferredSize(new Dimension(400, 200));
-      pp.add(sp, BorderLayout.CENTER);
+      input3 = new BaseXText(null, true, this);
+      input3.setText(data.text(pre));
+      input3.setPreferredSize(new Dimension(400, 200));
+      old1 = Token.string(input3.getText());
+      pp.add(input3, BorderLayout.CENTER);
     } else {
-      String[] atts = new String[2];
+      byte[][] atts = new byte[2][];
       if(kind == Data.ATTR) {
-        atts[0] = Token.string(data.attName(pre));
-        atts[1] = Token.string(data.attValue(pre));
+        atts[0] = data.attName(pre);
+        atts[1] = data.attValue(pre);
       } else {
-        atts[0] = Token.string(data.text(pre));
-        atts[1] = "";
-        if(atts[0].contains(" ")) atts = atts[0].split(" ", 2);
+        atts[0] = data.text(pre);
+        atts[1] = Token.EMPTY;
+        if(Token.contains(atts[0], ' ')) atts = Token.split(atts[0], ' ');
       }
       final BaseXBack b = new BaseXBack();
       b.setLayout(new TableLayout(2, 1, 0, 8));
-      input = new BaseXTextField(atts[0], null, this);
+      input = new BaseXTextField(Token.string(atts[0]), null, this);
+      old1 = input.getText();
       b.add(input);
-      input2 = new BaseXTextField(atts[1], null, this);
-      old2 = atts[1];
+      input2 = new BaseXText(null);
+      input2.setText(atts[1]);
+      old2 = Token.string(atts[1]);
       b.add(input2);
       pp.add(b, BorderLayout.CENTER);
     }
-    input.selectAll();
-    old1 = input.getText();
+    if(input != null) input.selectAll();
+    else input3.selectAll();
     set(pp, BorderLayout.CENTER);
 
     // create buttons
@@ -109,7 +111,8 @@ public final class DialogEdit extends Dialog {
     final Context context = GUI.context;
     final Data data = context.data();
     final int kind = data.kind(pre);
-    final String in = input.getText().replaceAll("\"", "\\\"");
+    final String in = (input != null ? input.getText() :
+      Token.string(input3.getText())).replaceAll("\"", "\\\"");
 
     if(kind == Data.ELEM || kind == Data.DOC) {
       if(in.length() == 0 || in.equals(old1)) return;
@@ -118,7 +121,7 @@ public final class DialogEdit extends Dialog {
       if(in.equals(old2)) return;
       query = Insert.KINDS[kind] + " \"" + in + "\"";
     } else {
-      final String in2 = input2.getText();
+      final String in2 = Token.string(input2.getText());
       if(in.length() == 0 || in.equals(old1) && in2.equals(old2)) return;
       query = Insert.KINDS[kind] + " \"" + in + "\" \"" +
         in2.replaceAll("\"", "\\\"") + "\"";

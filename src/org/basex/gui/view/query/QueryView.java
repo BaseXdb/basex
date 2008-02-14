@@ -26,6 +26,8 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class QueryView extends View {
+  /** Reference to the simple query mode. */
+  private static final int SIMPLE = 1;
   /** Input mode panels. */
   private static final int NPANELS = SEARCHMODE.length;
   /** Input mode panels. */
@@ -66,7 +68,7 @@ public final class QueryView extends View {
       box.add(Box.createHorizontalStrut(6));
       if(i == 0) {
         panels[i] = new QueryArea(this);
-      } else if(i == 1) {
+      } else if(i == SIMPLE) {
         panels[i] = new QuerySimple(this);
       }
     }
@@ -124,9 +126,9 @@ public final class QueryView extends View {
     search.init();
     revalidate();
     repaint();
-    search.query(true);
+    search.query(GUIProp.showquery);
     filterbox.setSelected(GUIProp.filterrt);
-    filterbox.setEnabled(mode == 1);
+    filterbox.setEnabled(mode == SIMPLE);
   }
 
   /**
@@ -150,9 +152,6 @@ public final class QueryView extends View {
   }
 
   @Override
-  public void keyTyped(final KeyEvent e) { }
-
-  @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
     BaseXLayout.antiAlias(g);
@@ -173,7 +172,7 @@ public final class QueryView extends View {
    */
   public boolean info(final String info, final boolean ok) {
     if(search != null) search.info(info, ok);
-    return search != null && mode != 1;
+    return search != null && mode != SIMPLE;
   }
 
   /**

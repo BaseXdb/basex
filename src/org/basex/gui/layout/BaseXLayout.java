@@ -8,9 +8,12 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -19,6 +22,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.AbstractButton;
 import javax.swing.JComponent;
 import org.basex.gui.GUI;
+import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.dialog.Dialog;
 import org.basex.gui.view.map.MapRect;
@@ -137,8 +141,7 @@ public final class BaseXLayout {
       public void keyPressed(final KeyEvent e) {
         // process key events
         if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-          if(!(e.getSource() instanceof BaseXButton) &&
-              !((e.getSource() instanceof BaseXTextArea))) l.close();
+          if(!(e.getSource() instanceof BaseXButton)) l.close();
         } else if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
           l.cancel();
         }
@@ -264,15 +267,37 @@ public final class BaseXLayout {
   }
 
   /**
+   * Prints the specified text on the graphics panel.
+   * @param g graphics reference
+   * @param t text to be printed
+   * @param p printing position
+   */
+  public static void textBox(final Graphics g, final String t, final Point p) {
+    g.setFont(new Font(GUIProp.font, 0, GUIProp.fontsize));
+    final FontMetrics fm = g.getFontMetrics();
+    final int w = fm.stringWidth(t);
+    final int h = fm.getHeight();
+    final int x = p.x;
+    final int y = p.y;
+
+    g.setColor(GUIConstants.color6);
+    g.fillRect(x - 3, y - h + 1, w + 9, h + 3);
+    g.setColor(Color.white);
+    g.fillRect(x - 4, y - h, w + 8, h + 2);
+    g.setColor(GUIConstants.color6);
+    g.drawRect(x - 4, y - h, w + 8, h + 2);
+    g.drawString(t, x, y - 2);
+  }
+
+  /**
    * Enables/Disables anti-aliasing.
    * @param g graphics reference
    */
   public static void antiAlias(final Graphics g) {
-    final Object aa = GUIProp.fontalias ?
-        // RenderingHints.VALUE_TEXT_ANTIALIAS_GASP :  ...Java 6
-        RenderingHints.VALUE_TEXT_ANTIALIAS_ON :
-        RenderingHints.VALUE_TEXT_ANTIALIAS_OFF;
-    ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, aa);
+    ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+        GUIProp.fontalias ? RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB :
+        //GUIProp.fontalias ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON :
+          RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
   }
 
   /**

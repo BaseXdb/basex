@@ -12,9 +12,9 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
-import javax.swing.border.BevelBorder;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
 import org.basex.core.Commands;
 import org.basex.core.Prop;
 import org.basex.gui.GUI;
@@ -41,7 +41,7 @@ public final class BaseXWin {
 
     // show waiting panel and wait some time to allow repainting
     final JFrame wait = waitPanel();
-    Performance.sleep(50);    
+    Performance.sleep(50);
     
     GUIConstants.init();
     
@@ -72,8 +72,12 @@ public final class BaseXWin {
       // ..added to handle possible JDK 1.6 bug (thanks to Makoto)
       UIManager.getInstalledLookAndFeels();
       // set system specific look & feel
-      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-
+      // temporary: avoid GTK crash in Ubuntu 7.10
+      UIManager.setLookAndFeel(Prop.UNIX ?
+          //UIManager.getSystemLookAndFeelClassName() :
+          UIManager.getCrossPlatformLookAndFeelClassName() :
+          UIManager.getSystemLookAndFeelClassName());
+      
       // change tooltip handling
       ToolTipManager.sharedInstance().setDismissDelay(20000);
       // refresh views when window is resized
@@ -94,7 +98,7 @@ public final class BaseXWin {
     final JPanel panel = new JPanel();
     panel.setLayout(new GridLayout(2, 1));
     panel.setBackground(Color.white);
-    panel.setBorder(new CompoundBorder(new BevelBorder(BevelBorder.RAISED),
+    panel.setBorder(new CompoundBorder(new EtchedBorder(),
         new EmptyBorder(2, 15, 5, 15)));
 
     JLabel label = new JLabel(WAIT1);

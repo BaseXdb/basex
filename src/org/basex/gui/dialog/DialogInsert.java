@@ -7,16 +7,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.text.JTextComponent;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXRadio;
-import org.basex.gui.layout.BaseXTextArea;
+import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
+import org.basex.util.Token;
 
 /**
  * Dialog window for inserting new database nodes.
@@ -28,9 +27,9 @@ public final class DialogInsert extends Dialog {
   /** Resulting query. */
   public String query;
   /** Text area. */
-  protected JTextComponent input;
+  protected BaseXTextField input;
   /** Text area. */
-  protected JTextComponent input2;
+  protected BaseXText input2;
   /** Insert kind selection buttons. */
   protected BaseXRadio[] radio;
   /** Button panel. */
@@ -55,15 +54,13 @@ public final class DialogInsert extends Dialog {
     label2.setBorder(0, 0, 0, 0);
     label2.setEnabled(false);
 
-    input = new BaseXTextField(null, this);
+    input = new BaseXTextField(null);
     BaseXLayout.setWidth(input, 320);
 
-    input2 = new BaseXTextArea(null);
+    input2 = new BaseXText(null);
     input2.setFont(GUIConstants.mfont);
+    input2.setPreferredSize(new Dimension(400, 200));
     input2.setEnabled(false);
-    input2.setSelectionStart(0);
-    final JScrollPane sp = new JScrollPane(input2);
-    sp.setPreferredSize(new Dimension(320, 120));
     setResizable(true);
 
     final BaseXBack kind = new BaseXBack();
@@ -95,10 +92,10 @@ public final class DialogInsert extends Dialog {
     b.add(label);
     b.add(input);
     b.add(label2);
-    b.add(sp, BorderLayout.NORTH);
-    
     pp.add(b, BorderLayout.CENTER);
-    set(pp, BorderLayout.CENTER);
+
+    set(pp, BorderLayout.NORTH);
+    set(input2, BorderLayout.CENTER);
 
     buttons = BaseXLayout.okCancel(this);
     set(buttons, BorderLayout.SOUTH);
@@ -110,7 +107,7 @@ public final class DialogInsert extends Dialog {
     super.close();
 
     final String in1 = input.getText().replaceAll("\"", "\\\"");
-    final String in2 = input2.getText().replaceAll("\"", "\\\"");
+    final String in2 = Token.string(input2.getText()).replaceAll("\"", "\\\"");
     query = null;
 
     for(int i = 1; i < KINDS.length; i++) {

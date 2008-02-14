@@ -23,8 +23,6 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class BaseXListChooser extends BaseXBack {
-  /** Button help. */
-  //final byte[] help;
   /** List. */
   JList list;
   /** List Values. */
@@ -163,6 +161,7 @@ public final class BaseXListChooser extends BaseXBack {
     list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     list.addMouseListener(mouse);
     list.addMouseMotionListener(mouse);
+    text.setFont(list.getFont());
     BaseXLayout.addHelp(list, help);
     
     scroll = new JScrollPane(list,

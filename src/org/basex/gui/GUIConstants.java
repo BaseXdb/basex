@@ -274,6 +274,6 @@ public final class GUIConstants {
     if(f == mfont) return mfwidth;
     if(f == bfont) return bwidth;
     if(f == lfont) return lwidth;
-    return fwidth;
+    return new Container().getFontMetrics(f).getWidths();
   }
 }

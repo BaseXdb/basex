@@ -103,17 +103,27 @@ public final class TokenBuilder {
   }
 
   /**
-   * Adds a character array to the token.
+   * Adds a byte array to the token.
    * @param b the character array to be added
    */
   public void add(final byte[] b) {
-    final int bs = b.length;
+    add(b, 0, b.length);
+  }
+
+  /**
+   * Adds a partial byte array to the token.
+   * @param b the character array to be added
+   * @param s start position
+   * @param e end position
+   */
+  public void add(final byte[] b, final int s, final int e) {
+    final int bs = e - s;
     if(size + bs > chars.length) {
       int ns = chars.length << 1;
       while(size + bs > ns) ns <<= 1;
       chars = Array.resize(chars, size, size + ns);
     }
-    Array.copy(b, chars, size);
+    System.arraycopy(b, s, chars, size, bs);
     size += bs;
   }
 

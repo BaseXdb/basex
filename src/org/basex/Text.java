@@ -630,8 +630,6 @@ public interface Text {
   String WELCOME = lang("welcome1");
   /** Welcome Text. */
   String WELCOMETEXT = lang("welcome2");
-  /** Clipboard copy information. */
-  String RESULTCLIP = lang("text_clip") + DOT;
   /** Text find information. */
   String RESULTFIND = lang("text_find") + COLS;
   /** Help String. */

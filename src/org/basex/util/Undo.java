@@ -10,7 +10,7 @@ public final class Undo {
   /** Maximum number of strings to be stored. */
   private static final int MAX = 200;
   /** String history. */
-  private String[] hist = new String[MAX];
+  private byte[][] hist = new byte[MAX][];
   /** Cursor history. */
   private int[] cur = new int[MAX];
   /** Maximum of stored entries. */
@@ -22,14 +22,14 @@ public final class Undo {
    * Constructor.
    */
   public Undo() {
-    hist[pos] = "";
+    hist[pos] = Token.EMPTY;
   }
   
   /**
    * Returns the previous string.
    * @return previous string
    */
-  public String prev() {
+  public byte[] prev() {
     return hist[pos == 0 ? pos : --pos];
   }
   
@@ -37,7 +37,7 @@ public final class Undo {
    * Returns the next string.
    * @return previous string
    */
-  public String next() {
+  public byte[] next() {
     return hist[pos == max ? pos : ++pos];
   }
 
@@ -54,8 +54,8 @@ public final class Undo {
    * @param str string to be stored
    * @param c cursor position
    */
-  public void store(final String str, final int c) {
-    if(str.equals(hist[pos])) return;
+  public void store(final byte[] str, final int c) {
+    if(Token.eq(str, hist[pos])) return;
     if(pos + 1 == MAX) {
       Array.move(hist, 1, -1, pos);
       Array.move(cur, 1, -1, pos--);

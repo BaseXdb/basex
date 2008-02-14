@@ -18,7 +18,7 @@ import org.basex.util.TokenIterator;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class TextRenderer {
+final class TextRenderer {
   /** Current text color. */
   private Color color;
   /** Secondary text color. */
@@ -224,15 +224,6 @@ public final class TextRenderer {
     if(nl || x + wordW > w) { x = offset; y += fontH; }
 
     return startW == -1 ? y < h : y < h || posW < startW;
-  }
-
-  /**
-   * Returns the current character type.
-   * @param c character to be checked
-   * @return true for a delimiter character
-   */
-  boolean sep(final int c) {
-    return c <= ' ' || c == '<' || c == '>' || c == '"' || c == '\'';
   }
 
   /**

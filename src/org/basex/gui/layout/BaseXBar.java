@@ -91,8 +91,9 @@ public final class BaseXBar extends BaseXPanel {
    * @param p vertical position
    */
   public void pos(final int p) {
-    pos = Math.max(0, Math.min(height - getHeight(), p));
-    repaint();
+    final int pp = Math.max(0, Math.min(height - getHeight(), p));
+    if(pos != pp) repaint();
+    pos = pp;
   }
 
   /**
@@ -108,8 +109,8 @@ public final class BaseXBar extends BaseXPanel {
    * @param h panel height
    */
   public void height(final int h) {
+    if(height != h) repaint();
     height = h;
-    repaint();
   }
 
   /**
@@ -140,6 +141,7 @@ public final class BaseXBar extends BaseXPanel {
     // paint scrollbar background
     g.setColor(GUIConstants.color5);
     g.drawLine(0, 0, 0, hh);
+    g.drawLine(ww - 1, 0, ww - 1, hh);
 
     // draw scroll up button
     int x = 0;

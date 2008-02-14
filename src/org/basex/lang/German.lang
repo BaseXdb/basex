@@ -40,7 +40,6 @@ s_ok=OK
 # Visualizations
 welcome1=Willkommen!
 welcome2=Eine kleine Einführung:\nKlicken Sie auf "Datei -> Neu..."\nund wählen Sie ein XML-Dokument aus.\nBestätigen Sie das folgende Dialogfenster\nund beachten Sie die Hilfe...
-text_clip=In Zwischenablage kopiert
 text_find=Finde
 table_no=Tabelle für aktuelle Daten nicht verfügbar
 map_binary=Binärdatei

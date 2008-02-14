@@ -25,9 +25,10 @@ import org.basex.gui.layout.BaseXCheckBox;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXListChooser;
-import org.basex.gui.layout.BaseXTextArea;
+import org.basex.gui.layout.BaseXText;
 import org.basex.io.IOConstants;
 import org.basex.util.Performance;
+import org.basex.util.TokenBuilder;
 
 /**
  * Open Database Dialog.
@@ -41,7 +42,7 @@ public final class DialogOpen extends Dialog {
   /** Information panel. */
   private BaseXLabel doc;
   /** Information panel. */
-  private BaseXTextArea detail;
+  private BaseXText detail;
   /** Buttons. */
   private BaseXBack buttons;
   /** Main Memory flag. */
@@ -61,7 +62,7 @@ public final class DialogOpen extends Dialog {
     
     choice = new BaseXListChooser(this, db, HELPOPEN);
     set(choice, BorderLayout.CENTER);
-    choice.setSize(130, 348);
+    choice.setSize(130, 356);
 
     final BaseXBack info = new BaseXBack();
     info.setLayout(new BorderLayout());
@@ -73,11 +74,10 @@ public final class DialogOpen extends Dialog {
     doc.setBorder(0, 0, 5, 0);
     info.add(doc, BorderLayout.NORTH);
 
-    detail = new BaseXTextArea(HELPOPENINFO);
+    detail = new BaseXText(HELPOPENINFO, false, this);
     detail.setFont(GUIConstants.mfont.deriveFont(12f));
     detail.setBorder(new EmptyBorder(5, 5, 5, 5));
     detail.setOpaque(false);
-    detail.setFocusable(false);
 
     BaseXLayout.setWidth(detail, 480);
     info.add(detail, BorderLayout.CENTER);
@@ -175,7 +175,7 @@ public final class DialogOpen extends Dialog {
     long len = 0;
     for(final File f : dir.listFiles()) len += f.length();
 
-    final StringBuilder txt = new StringBuilder();
+    final TokenBuilder txt = new TokenBuilder();
     try {
       ok = true;
       final MetaData meta = new MetaData(db);
@@ -184,31 +184,31 @@ public final class DialogOpen extends Dialog {
       if(mainmem != null)
         BaseXLayout.enable(mainmem, meta.filesize < (1 << 30));
 
-      txt.append(INFODOC + meta.filename + NL);
-      txt.append(INFOTIME + new SimpleDateFormat(
+      txt.add(INFODOC + meta.filename + NL);
+      txt.add(INFOTIME + new SimpleDateFormat(
           "dd.MM.yyyy hh:mm:ss").format(new Date(meta.time)) + NL);
-      txt.append(INFODOCSIZE + (meta.filesize != 0 ?
+      txt.add(INFODOCSIZE + (meta.filesize != 0 ?
           Performance.formatSize(meta.filesize) : "-") + NL);
-      txt.append(INFODBSIZE + Performance.formatSize(len) + NL);
-      txt.append(INFOENCODING + meta.encoding + NL);
-      txt.append(INFONODES + size + NL);
-      txt.append(INFOHEIGHT + meta.height + NL + NL);
+      txt.add(INFODBSIZE + Performance.formatSize(len) + NL);
+      txt.add(INFOENCODING + meta.encoding + NL);
+      txt.add(INFONODES + size + NL);
+      txt.add(INFOHEIGHT + meta.height + NL + NL);
 
-      txt.append(INFOINDEXES + NL);
-      txt.append(" " + INFOTXTINDEX + meta.txtindex + NL);
-      txt.append(" " + INFOATVINDEX + meta.atvindex + NL);
-      txt.append(" " + INFOWORDINDEX + meta.wrdindex + NL);
-      txt.append(" " + INFOFTINDEX + meta.ftxindex + NL);
+      txt.add(INFOINDEXES + NL);
+      txt.add(" " + INFOTXTINDEX + meta.txtindex + NL);
+      txt.add(" " + INFOATVINDEX + meta.atvindex + NL);
+      txt.add(" " + INFOWORDINDEX + meta.wrdindex + NL);
+      txt.add(" " + INFOFTINDEX + meta.ftxindex + NL);
 
-      txt.append(NL + INFOCREATE + NL);
-      txt.append(" " + INFOCHOP + meta.chop + NL);
-      txt.append(" " + INFOENTITIES + meta.entity + NL + NL);
+      txt.add(NL + INFOCREATE + NL);
+      txt.add(" " + INFOCHOP + meta.chop + NL);
+      txt.add(" " + INFOENTITIES + meta.entity + NL);
     } catch(final IOException e) {
-      txt.append(e.getMessage());
+      txt.add(e.getMessage());
       ok = false;
     }
     doc.setText(db);
-    detail.setText(txt.toString());
+    detail.setText(txt.finish());
     BaseXLayout.enableOK(buttons, ok);
     return true;
   }

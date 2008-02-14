@@ -48,7 +48,7 @@ public class BaseXBack extends JPanel {
   }
 
   /**
-   * Set label borders.
+   * Set an empty border.
    * @param t top distance
    * @param l left distance
    * @param b bottom distance

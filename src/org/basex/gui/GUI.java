@@ -74,7 +74,7 @@ public final class GUI extends JFrame {
   private static GUI instance;
 
   /** Container for text outputs. */
-  public final CachedOutput textcache = new CachedOutput(1 << 20);
+  public final CachedOutput textcache = new CachedOutput(1 << 19);
   /** Container for text outputs. */
   protected final NullOutput nullcache = new NullOutput();
 
