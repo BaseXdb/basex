@@ -157,6 +157,7 @@ public final class BaseXTextRenderer extends BaseXBack {
     text.pos(ps);
     if(x + wordW > w) { x = off; y += fontH; }
 
+    // <CG> TODO... only check marks for copy operations
     return more && (y < h || text.start() != -1 && text.pos() < text.start());
   }
 
@@ -177,7 +178,6 @@ public final class BaseXTextRenderer extends BaseXBack {
    */
   private void write(final Graphics g) {
     // choose color (later: use variable syntax highlighter)
-    final int ch = text.curr();
     Color color = syntax.getColor(text);
 
     // return if current text is not visible.
@@ -192,6 +192,7 @@ public final class BaseXTextRenderer extends BaseXBack {
       int ps = text.pos();
       int xx = x;
       // whitespace flag
+      final int ch = text.curr();
       final boolean vis = ch < 0 || ch > ' ';
 
       if(text.markStart()) {

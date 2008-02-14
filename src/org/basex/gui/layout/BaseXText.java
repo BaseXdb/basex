@@ -440,7 +440,10 @@ public final class BaseXText extends BaseXPanel {
    */
   private boolean copy() {
     final String txt = text.copy();
-    if(txt.length() == 0) return false;
+    if(txt.length() == 0) {
+      text.noMark();
+      return false;
+    }
 
     // copy selection to clipboard
     final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
