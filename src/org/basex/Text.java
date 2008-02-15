@@ -1144,7 +1144,9 @@ public interface Text {
   String INFOINDEXES = "Indexing:";
   /** Database Info. */
   String INFOGENERAL = "General Information:";
-
+  /** Database Info. */
+  String RESULTCHOP = "\n...output was chopped.";
+  
   // HELP TEXTS ===============================================================
 
   /** Help String. */

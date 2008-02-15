@@ -37,6 +37,14 @@ public final class TokenBuilder {
   }
   
   /**
+   * Constructor, specifying an initial array.
+   * @param str initial string
+   */
+  public TokenBuilder(final byte[] str) { 
+    add(str);
+  }
+  
+  /**
    * Resets the token buffer.
    */
   public void reset() {
@@ -169,7 +177,6 @@ public final class TokenBuilder {
   public void replace(final byte b, final int pos) {
     chars[pos] = b;
   }
-
 
   /**
    * Returns the token as a byte array. Unused array bytes are chopped

@@ -10,6 +10,8 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.event.MouseInputAdapter;
+
+import org.basex.gui.GUI;
 import org.basex.gui.dialog.Dialog;
 import org.basex.util.Token;
 
@@ -136,9 +138,13 @@ public final class BaseXListChooser extends BaseXBack {
 
     final MouseInputAdapter mouse = new MouseInputAdapter() {
       @Override
+      public void mouseEntered(final MouseEvent e) {
+        GUI.get().focus(text, help);
+      }
+      @Override
       public void mousePressed(final MouseEvent e) {
         text.setText(list.getSelectedValue().toString());
-        text.requestFocusInWindow();
+        focus();
         text.selectAll();
         parent.action(null);
       }
@@ -169,14 +175,7 @@ public final class BaseXListChooser extends BaseXBack {
         ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     add(scroll);
     setIndex(0);
-    
-    addFocusListener(new FocusAdapter() {
-      @Override
-      public void focusGained(final FocusEvent e) {
-        text.requestFocusInWindow();
-      }
-    });
-   }
+  }
   
   /**
    * Chooses the specified value in the text field and list. 

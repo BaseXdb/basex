@@ -132,4 +132,9 @@ public final class Performance {
   public static void stack() {
     try { throw new Error(); } catch(final Error e) { e.printStackTrace(); }
   }
+
+  @Override
+  public String toString() {
+    return getTimer();
+  }
 }

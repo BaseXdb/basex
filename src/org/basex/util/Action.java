@@ -15,7 +15,7 @@ public abstract class Action {
    * Creates a new action thread.
    * @return thread
    */
-  public final Thread create() {
+  public final Thread single() {
     final int c = ++counter;
     
     return new Thread() {

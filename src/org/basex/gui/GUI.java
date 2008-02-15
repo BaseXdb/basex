@@ -56,7 +56,6 @@ import org.basex.gui.view.table.TableView;
 import org.basex.gui.view.text.TextView;
 import org.basex.gui.view.tree.TreeView;
 import org.basex.io.CachedOutput;
-import org.basex.io.NullOutput;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 
@@ -72,11 +71,6 @@ public final class GUI extends JFrame {
   public static Context context = new Context();
   /** Singleton Instance. */
   private static GUI instance;
-
-  /** Container for text outputs. */
-  public final CachedOutput textcache = new CachedOutput(1 << 19);
-  /** Container for text outputs. */
-  protected final NullOutput nullcache = new NullOutput();
 
   /** Status line. */
   public final GUIStatus status;
@@ -423,7 +417,6 @@ public final class GUI extends JFrame {
 
         cursor(CURSORWAIT);
         //status.setText(STATUSWAIT);
-        textcache.reset();
 
         try {
           // parse command string
@@ -463,7 +456,9 @@ public final class GUI extends JFrame {
               if(nod != null) result = nod;
             }*/
 
-            // open text view for textual results
+            // cached resulting text output
+            final CachedOutput out = new CachedOutput(TextView.MAX);
+
             if(cc.printing() && ok) {
               if(!GUIProp.showstarttext && data == null ||
                  !GUIProp.showtext && data != null &&
@@ -471,8 +466,11 @@ public final class GUI extends JFrame {
                 GUICommands.SHOWTEXT.execute();
               }
               // retrieve text result
-              p.output(text.isValid() ? textcache : nullcache);
-            }
+              if(text.isValid()) {
+                p.output(out);
+                out.addInfo();
+              }
+            }            
 
             final String time = perf.getTimer();
             final String inf = p.info();
@@ -509,9 +507,8 @@ public final class GUI extends JFrame {
             if(obsolete(thread)) return;
 
             // print result
-            final byte[] out = textcache.finish();
             if(ok && cc.printing() && !(result instanceof Nodes)) {
-              text.setText(out, false);
+              text.setText(out.buffer(), out.size(), false);
             }
 
             // show number of hits
@@ -689,7 +686,7 @@ public final class GUI extends JFrame {
     if(txt != null) {
       final boolean db = context.db();
       if(!db && GUIProp.showstarthelp || db && GUIProp.showhelp)
-        help.setText(txt, true);
+        help.setText(txt, txt.length, true);
     }
     if(GUIProp.mousefocus && comp != null && comp.isEnabled())
       comp.requestFocusInWindow();

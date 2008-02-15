@@ -8,19 +8,24 @@ import java.awt.Color;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class BaseXSyntax {
+public abstract class BaseXSyntax {
+  /** Static Syntax reference. */
+  public static final BaseXSyntax SIMPLE = new BaseXSyntax() {
+    @Override
+    public void init() { }
+    @Override
+    public Color getColor(final BaseXTextTokens text) { return Color.black; }
+  };
+  
   /** 
    * Initializes the method.
    */
-  public void init() { }
+  public abstract void init();
 
   /** 
    * Returns the color for the current token.
    * @param text text reference
    * @return color
    */
-  @SuppressWarnings("unused")
-  public Color getColor(final BaseXTextTokens text) {
-    return Color.black;
-  }
+  public abstract Color getColor(final BaseXTextTokens text);
 }

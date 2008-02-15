@@ -17,12 +17,14 @@ import org.basex.io.CachedOutput;
 import org.basex.util.Token;
 
 /**
- * This class offers a fast text view, using the {@link TextRenderer} class.
+ * This class offers a fast text view, using the {@link BaseXText} class.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public final class TextView extends View {
+  /** Maximum text size to be displayed. */
+  public static final int MAX = 1 << 20;
   /** Text Area. */
   final BaseXText area;
   /** Header string. */
@@ -77,16 +79,16 @@ public final class TextView extends View {
     if(!GUIProp.showtext ||
         !header.getText().equals(GUIConstants.TEXTVIEW)) return;
     if(!GUI.context.db() || nodes.size == 0) {
-      setText(Token.EMPTY);
+      setText(Token.EMPTY, 0, true);
       return;
     }
     
     try {
-      final CachedOutput out = GUI.get().textcache;
-      out.reset();
+      final CachedOutput out = new CachedOutput(MAX);
       final boolean chop = GUI.context.data().meta.chop;
       nodes.serialize(new PrintSerializer(out, false, chop));
-      setText(out.finish(), false);
+      out.addInfo();
+      setText(out.buffer(), out.size(), false);
     } catch(final Exception ex) {
       BaseX.debug(ex);
     }
@@ -106,19 +108,12 @@ public final class TextView extends View {
 
   /**
    * Sets the output text.
-   * @param t specified output text
-   */
-  void setText(final byte[] t) {
-    area.setText(t);
-  }
-
-  /**
-   * Sets the output text.
-   * @param t specified output text
+   * @param txt text
+   * @param s size
    * @param inf info flag
    */
-  public void setText(final byte[] t, final boolean inf) {
-    setText(t);
-    area.setSyntax(inf ? new BaseXSyntax() : new XMLSyntax());
+  public void setText(final byte[] txt, final int s, final boolean inf) {
+    area.setText(txt, s);
+    area.setSyntax(inf ? BaseXSyntax.SIMPLE : new XMLSyntax());
   }
 }

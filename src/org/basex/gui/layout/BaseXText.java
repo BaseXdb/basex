@@ -21,6 +21,7 @@ import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIConstants.FILL;
 import org.basex.gui.dialog.Dialog;
 import org.basex.util.Action;
+import org.basex.util.Array;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.Undo;
@@ -38,7 +39,7 @@ public final class BaseXText extends BaseXPanel {
   /** Renderer reference. */
   protected final BaseXTextRenderer rend;
   /** Undo history. */
-  protected final Undo undo = new Undo();
+  protected Undo undo;
 
   /** Scrollbar reference. */
   protected final BaseXBar scroll;
@@ -89,7 +90,7 @@ public final class BaseXText extends BaseXPanel {
       public void focusLost(final FocusEvent e) {
         cursor.stop();
         rend.cursor(false);
-        repaint();
+        rend.repaint();
       }
     });
 
@@ -105,6 +106,7 @@ public final class BaseXText extends BaseXPanel {
       //setBorder(UIManager.getBorder("TextField.border"));
       setBorder(new EtchedBorder());
       setMode(FILL.PLAIN);
+      undo = new Undo();
     } else {
       setMode(FILL.NONE);
     }
@@ -112,17 +114,38 @@ public final class BaseXText extends BaseXPanel {
 
   /**
    * Sets the output text.
-   * @param t specified output text
+   * @param t output text
    */
   public void setText(final byte[] t) {
-    final byte[] txt = Token.delete(t, 0x0D);
-    if(!Token.eq(txt, text.text)) {
-      text = new BaseXTextTokens(txt);
+    setText(t, t.length);
+  }
+    
+  /**
+   * Sets the output text.
+   * @param t output text
+   * @param s text size
+   */
+  public void setText(final byte[] t, final int s) {
+    // remove 0x0Ds (carriage return) and compare old with new string
+    int ns = 0;
+    int ts = text.size;
+    byte[] tt = text.text;
+    boolean eq = true;
+    for(int r = 0; r < s; r++) {
+      if(t[r] != 0x0D) t[ns++] = t[r];
+      eq &= ns < ts && t[ns] == tt[ns];
+    }
+    eq &= ns == ts;
+
+    // new text is different...
+    if(!eq) {
+      text = new BaseXTextTokens(t, ns);
       rend.setText(text);
       scroll.pos(0);
     }
-    undo.store(t, 0);
-    SwingUtilities.invokeLater(calc.create());
+
+    if(undo != null) undo.store(t.length != ns ? Array.finish(t, ns) : t, 0);
+    SwingUtilities.invokeLater(calc.single());
   }
 
   /**
@@ -147,7 +170,7 @@ public final class BaseXText extends BaseXPanel {
    * @return output text
    */
   public byte[] getText() {
-    return text.text;
+    return text.finish();
   }
 
   @Override
@@ -161,7 +184,7 @@ public final class BaseXText extends BaseXPanel {
    */
   public void error(final int s) {
     text.error(s);
-    repaint();
+    rend.repaint();
   }
 
   @Override
@@ -179,7 +202,7 @@ public final class BaseXText extends BaseXPanel {
     text.startMark();
     text.pos(text.size);
     text.endMark();
-    repaint();
+    rend.repaint();
   }
     
   // OVERRIDDEN METHODS =======================================================
@@ -252,7 +275,7 @@ public final class BaseXText extends BaseXPanel {
     } else if(e.getY() < 20) {
       scroll.pos(scroll.pos() + e.getY() - 20);
     }
-    repaint();
+    rend.repaint();
   }
   
   /** Last horizontal position. */
@@ -360,7 +383,7 @@ public final class BaseXText extends BaseXPanel {
           down = false;
         }
       }
-      
+
       // refresh scroll position
       if(shf) text.endMark();
     }
@@ -430,7 +453,7 @@ public final class BaseXText extends BaseXPanel {
     if(e.isControlDown() && (key == KeyEvent.VK_Z || key == KeyEvent.VK_Y))
       return;
 
-    undo.store(text.text, text.cursor());
+    if(undo != null) undo.store(text.finish(), text.cursor());
     if(editable) e.consume();
   }
 
@@ -475,7 +498,7 @@ public final class BaseXText extends BaseXPanel {
     @Override
     public void action() {
       rend.cursor(!rend.cursor());
-      repaint();
+      rend.repaint();
       Performance.sleep(500);
     }
   };
@@ -487,7 +510,6 @@ public final class BaseXText extends BaseXPanel {
   protected void cursor() {
     cursor.stop();
     if(!isFocusable() || !isEnabled()) return;
-    //if(!editable || !isFocusable() || !isEnabled()) return;
     rend.cursor(false);
     cursor.repeat().start();
   }
@@ -495,13 +517,13 @@ public final class BaseXText extends BaseXPanel {
   @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
     scroll.pos(scroll.pos() + e.getUnitsToScroll() * 20);
-    repaint();
+    rend.repaint();
   }
 
   @Override
   public void componentResized(final ComponentEvent e) {
     scroll.pos(0);
-    SwingUtilities.invokeLater(calc.create());
+    SwingUtilities.invokeLater(calc.single());
   }
 
   /** Calculation counter. */
@@ -509,7 +531,7 @@ public final class BaseXText extends BaseXPanel {
     @Override
     public void action() {
       rend.calc();
-      repaint();
+      rend.repaint();
     }
   };
 }

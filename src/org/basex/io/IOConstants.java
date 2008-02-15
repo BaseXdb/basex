@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import org.basex.core.Prop;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -17,8 +16,6 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class IOConstants {
-  /** Chopped output notice. */
-  static final byte[] RESULTCHOP = Token.token("\n...output was chopped.");
   /** BlockSize Power. */
   public static final int BLOCKPOWER = 12;
   /** Table NodeSize Power. */

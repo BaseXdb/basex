@@ -1,5 +1,6 @@
 package org.basex.gui.layout;
 
+import org.basex.util.Array;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -35,8 +36,17 @@ public final class BaseXTextTokens {
    * @param t text
    */
   public BaseXTextTokens(final byte[] t) {
+    this(t, t.length);
+  }
+
+  /**
+   * Constructor.
+   * @param t text
+   * @param s buffer size
+   */
+  public BaseXTextTokens(final byte[] t, final int s) {
     text = t;
-    size = t.length;
+    size = s;
   }
 
   /**
@@ -77,6 +87,14 @@ public final class BaseXTextTokens {
    */
   private boolean sep(final int c) {
     return !Token.letterOrDigit(c);
+  }
+
+  /**
+   * Returns the the byte array, chopping the unused bytes.
+   * @return character array
+   */
+  public byte[] finish() {
+    return text.length == size ? text : Array.finish(text, size);
   }
 
   // POSITION =================================================================
@@ -188,12 +206,13 @@ public final class BaseXTextTokens {
    * @param ch char array
    */
   public void add(final char[] ch) {
+    // <CG> Add Text in Text Field: use same array if some space is left 
     final TokenBuilder tb = new TokenBuilder();
     tb.add(text, 0, ps);
     for(final char c : ch) tb.addUTF(c);
     tb.add(text, ps, size);
     text = tb.finish();
-    size = text.length;
+    size = tb.size;
     for(final char c : ch) ps += Token.cl(c);
   }
 
@@ -204,12 +223,12 @@ public final class BaseXTextTokens {
   public void delete() {
     if(size == 0) return;
     final TokenBuilder tb = new TokenBuilder();
-    int s = ms != -1 ? Math.min(ms, me) : ps;
-    int e = ms != -1 ? Math.max(ms, me) : ps + Token.cl(ps);
+    final int s = ms != -1 ? Math.min(ms, me) : ps;
+    final int e = ms != -1 ? Math.max(ms, me) : ps + Token.cl(text[ps]);
     tb.add(text, 0, s);
     if(e < size) tb.add(text, e, size);
     text = tb.finish();
-    size = text.length;
+    size = tb.size;
     ps = s;
     noMark();
   }

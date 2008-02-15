@@ -1,5 +1,6 @@
 package org.basex.io;
 
+import static org.basex.Text.*;
 import org.basex.util.Array;
 import org.basex.util.Token;
 
@@ -27,6 +28,7 @@ public final class CachedOutput extends PrintOutput {
 
   /**
    * Constructor, specifying the maximum number of bytes to write.
+   * 256 is used as minimum value.
    * @param m maximum
    */
   public CachedOutput(final int m) {
@@ -52,8 +54,9 @@ public final class CachedOutput extends PrintOutput {
    * @return byte array
    */
   public byte[] finish() {
+    if(max == 0) return Token.EMPTY;
     if(finished()) {
-      final byte[] chop = IOConstants.RESULTCHOP;
+      final byte[] chop = Token.token(RESULTCHOP);
       Array.copy(chop, buf, max - chop.length);
     }
     return Array.finish(buf, size);
@@ -63,9 +66,27 @@ public final class CachedOutput extends PrintOutput {
   public boolean finished() {
     return size == max;
   }
+
+  /**
+   * Returns the internal buffer.
+   * @return buffer
+   */
+  public byte[] buffer() {
+    return buf;
+  }
   
   @Override
   public String toString() {
     return Token.string(finish());
+  }
+  
+  /**
+   * Adds a textual chopping info to the cached output.
+   */
+  public void addInfo() {
+    if(finished() && max > 256) {
+      final byte[] chop = Token.token(RESULTCHOP);
+      Array.copy(chop, buf, max - chop.length);
+    }
   }
 }
