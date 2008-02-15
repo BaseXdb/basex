@@ -78,6 +78,7 @@ public final class DialogOpen extends Dialog {
     detail.setFont(GUIConstants.mfont.deriveFont(12f));
     detail.setBorder(new EmptyBorder(5, 5, 5, 5));
     detail.setOpaque(false);
+    detail.setEnabled(false);
 
     BaseXLayout.setWidth(detail, 480);
     info.add(detail, BorderLayout.CENTER);

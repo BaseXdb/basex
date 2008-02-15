@@ -103,6 +103,7 @@ public class XQuery extends Proc {
         eval += per.getTime();
       }
       if(result instanceof NodeSet) {
+        // <SG> creating a final result set for further processing
         final NodeSet ns = (NodeSet) result;
         result = new Nodes(ns.nodes, ns.data);
       }

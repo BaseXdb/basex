@@ -133,7 +133,7 @@ public final class BaseXText extends BaseXPanel {
     boolean eq = true;
     for(int r = 0; r < s; r++) {
       if(t[r] != 0x0D) t[ns++] = t[r];
-      eq &= ns < ts && t[ns] == tt[ns];
+      eq &= ns < ts && ns < s && t[ns] == tt[ns];
     }
     eq &= ns == ts;
 
@@ -192,6 +192,7 @@ public final class BaseXText extends BaseXPanel {
     super.setEnabled(enabled);
     rend.setEnabled(enabled);
     scroll.setEnabled(enabled);
+    cursor();
   }
 
   /**
@@ -214,6 +215,7 @@ public final class BaseXText extends BaseXPanel {
     cursor();
 
     if(!SwingUtilities.isLeftMouseButton(e)) return;
+
     // <CG> double click...
     int c = e.getClickCount();
     if(c == 1) {
@@ -275,7 +277,6 @@ public final class BaseXText extends BaseXPanel {
     } else if(e.getY() < 20) {
       scroll.pos(scroll.pos() + e.getY() - 20);
     }
-    rend.repaint();
   }
   
   /** Last horizontal position. */
@@ -387,17 +388,9 @@ public final class BaseXText extends BaseXPanel {
       // refresh scroll position
       if(shf) text.endMark();
     }
-    setText(txt != text.text, down);
-  }
 
-  /**
-   * Sets a new text.
-   * @param c calculate new height of scroll bar
-   * @param down flag for cursor movement (up/down)
-   */
-  private void setText(final boolean c, final boolean down) {
     text.setCursor();
-    if(c) rend.calc();
+    if(txt != text.text) rend.calc();
 
     // updates the visible area
     final int p = scroll.pos();
@@ -417,12 +410,11 @@ public final class BaseXText extends BaseXPanel {
     if(!shf) text.noMark();
     int x = text.home(shf);
     if(col == -1) col = x;
-    text.next(shf);
-    text.end(Integer.MAX_VALUE, shf);
     for(int i = 0; i < l; i++) {
+      text.end(Integer.MAX_VALUE, shf);
       text.next(shf);
-      text.end(col, shf);
     }
+    text.end(col, shf);
   }
   
   /**

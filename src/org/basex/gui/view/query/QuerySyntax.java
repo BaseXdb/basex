@@ -3,7 +3,6 @@ package org.basex.gui.view.query;
 import java.awt.Color;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXSyntax;
-import org.basex.gui.layout.BaseXTextTokens;
 import org.basex.util.Token;
 
 /**
@@ -22,8 +21,7 @@ public final class QuerySyntax extends BaseXSyntax {
   }
 
   @Override
-  public Color getColor(final BaseXTextTokens text) {
-    final int ch = text.curr();
+  public Color getColor(final int ch) {
     final boolean qu = ch == '"' || ch == '\'';
     if(quote != 0 || qu) {
       if(qu) quote = quote == ch ? 0 : ch;

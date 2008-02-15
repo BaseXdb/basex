@@ -595,7 +595,7 @@ public final class MapView extends View implements Runnable {
       // right mouse button
       if(marked.find(pre) < 0) notifyMark(0);
     } else if(e.getClickCount() == 2) {
-      notifyContext(marked, false);
+      if(mainRects.size != 1) notifyContext(marked, false);
     } else if(e.isShiftDown()) {
       notifyMark(1);
     } else if(e.isControlDown()) {

@@ -173,14 +173,18 @@ public final class Token {
     int l = i;
     final int v = b[l] & 0xFF;
     final int c = v >> 4;
+
+    // 0xxxxxxx
+    if(c < 12) return v;
+    // 110xxxxx 10xxxxxx
     if(c == 12 || c == 13)
       return (v & 0x1F) << 6 | (b[++l] & 0x3F);
-    if(c == 14)
-      return (v & 0x0F) << 12 | (b[++l] & 0x3F) << 6 | (b[++l] & 0x3F);
-    if(c == 15)
-      return (v & 0x07) << 18 | (b[++l] & 0x3F) << 12 |
-        (b[++l] & 0x3F) << 6 | (b[++l] & 0x3F);
-    return v;
+    // 1110xxxx 10xxxxxx 10xxxxxx
+    if(c == 14) return (v & 0x0F) << 12 |
+      (b[++l] & 0x3F) << 6 | (b[++l] & 0x3F);
+    // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+    return (v & 0x07) << 18 | (b[++l] & 0x3F) << 12 |
+      (b[++l] & 0x3F) << 6 | (b[++l] & 0x3F);
   }
 
   /**

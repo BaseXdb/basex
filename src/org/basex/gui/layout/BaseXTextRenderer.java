@@ -155,21 +155,24 @@ public final class BaseXTextRenderer extends BaseXBack {
     final int ps = text.pos();
     while(text.more()) wordW += charW(g, text.next());
     text.pos(ps);
-    if(x + wordW > w) { x = off; y += fontH; }
+    if(x + wordW > w) {
+      x = off;
+      y += fontH;
+    }
 
-    // <CG> TODO... only check marks for copy operations
-    return more && (y < h || text.start() != -1 && text.pos() < text.start());
+    return more && y < h;
   }
 
 
   /**
-   * Moves to the next token.
+   * Finishes the current token.
    */
   private void next() {
-    // add word width and check newline at beginning/end of text
     x += wordW;
-    final boolean nl = text.pos() != text.size && text.curr() == '\n';
-    if(nl) { x = off; y += fontH; }
+    if(text.pos() != text.size && text.curr() == '\n') {
+      x = off;
+      y += fontH;
+    }
   }
   
   /**
@@ -178,7 +181,8 @@ public final class BaseXTextRenderer extends BaseXBack {
    */
   private void write(final Graphics g) {
     // choose color (later: use variable syntax highlighter)
-    Color color = syntax.getColor(text);
+    final int ch = text.curr();
+    Color color = syntax.getColor(ch);
 
     // return if current text is not visible.
     if(y > 0 && y < h) {
@@ -192,10 +196,10 @@ public final class BaseXTextRenderer extends BaseXBack {
       int ps = text.pos();
       int xx = x;
       // whitespace flag
-      final int ch = text.curr();
       final boolean vis = ch < 0 || ch > ' ';
 
       if(text.markStart()) {
+        char[] str = { ' ' };
         while(text.more()) {
           final boolean m = text.marked();
           final int c = text.next();
@@ -208,7 +212,8 @@ public final class BaseXTextRenderer extends BaseXBack {
             g.setColor(color);
           }
           if(c < 0 || c > ' ') {
-            g.drawChars(new char[] { (char) c }, 0, 1, xx, y);
+            str[0] = (char) c;
+            g.drawChars(str, 0, 1, xx, y);
           }
           xx += cw;
         }
@@ -248,24 +253,25 @@ public final class BaseXTextRenderer extends BaseXBack {
 
     final Graphics g = getGraphics();
     init(g, pos);
-    if(p.y < y - fontH) return;
-
-    while(more(g)) {
-      if(p.x > x && p.x <= x + wordW && p.y > y - fontH && p.y <= y ||
-          p.x > x && p.y < y - fontH || p.x <= x && p.y < y) {
-        while(text.more()) {
-          final int ww = charW(g, text.curr());
-          if(p.x < x + ww) break;
-          x += ww;
-          text.next();
+    if(p.y > y - fontH) {
+      while(more(g)) {
+        if(p.x > x && p.x <= x + wordW && p.y > y - fontH && p.y <= y ||
+            p.x > x && p.y < y - fontH || p.x <= x && p.y < y) {
+          while(text.more()) {
+            final int ww = charW(g, text.curr());
+            if(p.x < x + ww) break;
+            x += ww;
+            text.next();
+          }
+          break;
         }
-        break;
-      }
-      next();
-    };
-    if(!finish) text.startMark();
-    else text.endMark();
-    text.setCursor();
+        next();
+      };
+      if(!finish) text.startMark();
+      else text.endMark();
+      text.setCursor();
+    }
+    repaint();
   }
   
   /**
@@ -275,7 +281,7 @@ public final class BaseXTextRenderer extends BaseXBack {
    * @return width
    */
   private int charW(final Graphics g, final int ch) {
-    return ch > 255 ? g.getFontMetrics().charWidth(ch) :
+    return ch > 255 && g != null ? g.getFontMetrics().charWidth(ch) :
       ch == '\t' ? fwidth[' '] * BaseXTextTokens.TAB : fwidth[ch & 0xFF];
   }
 

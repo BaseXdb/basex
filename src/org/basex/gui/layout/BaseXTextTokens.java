@@ -10,7 +10,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class BaseXTextTokens {
+final class BaseXTextTokens {
   /** Tab width. */
   static final int TAB = 2;
   /** Text array to be written. */
@@ -35,7 +35,7 @@ public final class BaseXTextTokens {
    * Constructor.
    * @param t text
    */
-  public BaseXTextTokens(final byte[] t) {
+  BaseXTextTokens(final byte[] t) {
     this(t, t.length);
   }
 
@@ -44,7 +44,7 @@ public final class BaseXTextTokens {
    * @param t text
    * @param s buffer size
    */
-  public BaseXTextTokens(final byte[] t, final int s) {
+  BaseXTextTokens(final byte[] t, final int s) {
     text = t;
     size = s;
   }
@@ -66,9 +66,16 @@ public final class BaseXTextTokens {
     if(pe >= size) return false;
     ps = pe;
 
-    // parse next token boundaries; quit if text reference has been reset
-    if(sep(text[ps])) ++pe;
-    else while(++pe < size && !sep(text[pe]));
+    // find next token boundary
+    int ch = Token.cp(text, ps);
+    pe += Token.cl(text[ps]);
+    if(sep(ch)) return true;
+    
+    while(pe < size) {
+      ch = Token.cp(text, pe);
+      if(sep(ch)) break;
+      pe += Token.cl(text[pe]);
+    };
     return true;
   }
 
@@ -93,7 +100,7 @@ public final class BaseXTextTokens {
    * Returns the the byte array, chopping the unused bytes.
    * @return character array
    */
-  public byte[] finish() {
+  byte[] finish() {
     return text.length == size ? text : Array.finish(text, size);
   }
 
@@ -104,7 +111,7 @@ public final class BaseXTextTokens {
    * @param mark mark flag
    * @return number of moved characters
    */
-  public int home(final boolean mark) {
+  int home(final boolean mark) {
     int c = 0;
     do c += curr() == '\t' ? TAB : 1; while(prev(mark) != '\n');
     if(ps != 0) next(mark);
@@ -116,7 +123,7 @@ public final class BaseXTextTokens {
    * @param mark mark flag
    * @return character
    */
-  public int prev(final boolean mark) {
+  int prev(final boolean mark) {
     if(mark || ms == -1) return prev();
     ps = Math.min(ms, me);
     noMark();
@@ -127,7 +134,7 @@ public final class BaseXTextTokens {
    * Moves one character back and returns the found character.
    * @return character
    */
-  public int prev() {
+  int prev() {
     if(ps == 0) return '\n';
     final int p = ps--;
     while(ps > 0 && ps + Token.cl(text[ps]) > p) ps--;
@@ -139,7 +146,7 @@ public final class BaseXTextTokens {
    * @param p position to move to
    * @param mark mark flag
    */
-  public void end(final int p, final boolean mark) {
+  void end(final int p, final boolean mark) {
     int nc = 0;
     while(curr() != '\n') {
       if((nc += curr() == '\t' ? TAB : 1) >= p) return;
@@ -152,7 +159,7 @@ public final class BaseXTextTokens {
    * @param mark mark flag
    * @return character
    */
-  public int next(final boolean mark) {
+  int next(final boolean mark) {
     if(mark || ms == -1) return next();
     ps = Math.max(ms, me);
     noMark();
@@ -160,36 +167,36 @@ public final class BaseXTextTokens {
   }
 
   /**
-   * Moves one character forward.
-   * @return character
+   * Checks if the character position equals the word end.
+   * @return result of check
    */
-  public int next() {
-    final int c = curr();
-    if(ps < size) ps += Token.cl(text[ps]);
-    return c;
+  boolean more() {
+    return ps < pe;
   }
 
   /**
    * Returns the current character.
    * @return current character
    */
-  public int curr() {
-    return ps == size ? '\n' : Token.cp(text, ps);
+  int curr() {
+    return ps >= size ? '\n' : Token.cp(text, ps);
   }
 
   /**
-   * Checks if the character position equals the word end.
-   * @return result of check
+   * Moves one character forward.
+   * @return character
    */
-  public boolean more() {
-    return ps < pe;
+  int next() {
+    final int c = curr();
+    if(ps < size) ps += Token.cl(text[ps]);
+    return c;
   }
 
   /**
    * Sets the iterator position.
    * @param p iterator position
    */
-  public void pos(final int p) {
+  void pos(final int p) {
     ps = p;
   }
 
@@ -197,7 +204,7 @@ public final class BaseXTextTokens {
    * Returns the iterator position.
    * @return iterator position
    */
-  public int pos() {
+  int pos() {
     return ps;
   }
 
@@ -205,7 +212,7 @@ public final class BaseXTextTokens {
    * Adds a character array at the current position.
    * @param ch char array
    */
-  public void add(final char[] ch) {
+  void add(final char[] ch) {
     // <CG> Add Text in Text Field: use same array if some space is left 
     final TokenBuilder tb = new TokenBuilder();
     tb.add(text, 0, ps);
@@ -213,14 +220,14 @@ public final class BaseXTextTokens {
     tb.add(text, ps, size);
     text = tb.finish();
     size = tb.size;
-    for(final char c : ch) ps += Token.cl(c);
+    for(int c = 0; c < ch.length; c++) next();
   }
 
   /**
    * Deletes the current character.
    * Assumes that the current position allows a deletion.
    */
-  public void delete() {
+  void delete() {
     if(size == 0) return;
     final TokenBuilder tb = new TokenBuilder();
     final int s = ms != -1 ? Math.min(ms, me) : ps;
@@ -238,7 +245,7 @@ public final class BaseXTextTokens {
   /**
    * Resets the selection.
    */
-  public void noMark() {
+  void noMark() {
     ms = -1;
     me = -1;
   }
@@ -246,7 +253,7 @@ public final class BaseXTextTokens {
   /**
    * Sets the start of a text mark.
    */
-  public void startMark() {
+  void startMark() {
     ms = ps;
     me = ps;
   }
@@ -254,7 +261,7 @@ public final class BaseXTextTokens {
   /**
    * Sets the end of a text mark.
    */
-  public void endMark() {
+  void endMark() {
     me = ps;
   }
 
@@ -262,7 +269,7 @@ public final class BaseXTextTokens {
    * Returns the start of the text mark.
    * @return start mark
    */
-  public int start() {
+  int start() {
     return ms;
   }
 
@@ -270,7 +277,7 @@ public final class BaseXTextTokens {
    * Returns if the current position is marked.
    * @return result of check
    */
-  public boolean markStart() {
+  boolean markStart() {
     if(ms == -1) return false;
     return ms < me ? (ms >= ps && ms < pe || ps >= ms && ps < me ||
         ms >= ps && ms < pe) : (me >= ps && me < pe || ps >= me && ps < ms ||
@@ -281,7 +288,7 @@ public final class BaseXTextTokens {
    * Returns if the current position is marked.
    * @return result of check
    */
-  public boolean marked() {
+  boolean marked() {
     if(ms == -1) return false;
     return ms < me ? ps >= ms && ps < me : ps >= me && ps < ms;
   }
@@ -290,7 +297,7 @@ public final class BaseXTextTokens {
    * Returns the marked substring.
    * @return substring
    */
-  public String copy() {
+  String copy() {
     if(ms == -1) return "";
     return Token.string(text, ms < me ? ms : me, ms < me ? me - ms : ms - me);
   }
@@ -301,7 +308,7 @@ public final class BaseXTextTokens {
    * Returns if the current token is erroneous.
    * @return result of check
    */
-  public boolean error() {
+  boolean error() {
     return es >= ps && es <= pe;
   }
   
@@ -309,7 +316,7 @@ public final class BaseXTextTokens {
    * Returns if the cursor moves over the current token.
    * @param s start
    */
-  public void error(final int s) {
+  void error(final int s) {
     es = s;
   }
 
@@ -319,14 +326,14 @@ public final class BaseXTextTokens {
    * Returns if the cursor moves over the current token.
    * @return result of check
    */
-  public boolean edited() {
+  boolean edited() {
     return pc >= ps && pc <= pe;
   }
 
   /**
    * Sets the cursor position.
    */
-  public void setCursor() {
+  void setCursor() {
     pc = ps;
   }
 
@@ -334,7 +341,7 @@ public final class BaseXTextTokens {
    * Returns the cursor position.
    * @return cursor position
    */
-  public int cursor() {
+  int cursor() {
     return pc;
   }
 }
