@@ -69,18 +69,18 @@ public final class BaseXWin {
    */
   public static void init() {
     try {
-      // ..added to handle possible JDK 1.6 bug (thanks to Makoto)
+      // ..added to handle possible JDK 1.6 bug (thanks to Makoto Yui)
       UIManager.getInstalledLookAndFeels();
       // set system specific look & feel
-      // temporary: avoid GTK crash in Ubuntu 7.10
+      // temporary: avoid GTK problems in Ubuntu 7.10/other distributions
       UIManager.setLookAndFeel(Prop.UNIX ?
           //UIManager.getSystemLookAndFeelClassName() :
           UIManager.getCrossPlatformLookAndFeelClassName() :
           UIManager.getSystemLookAndFeelClassName());
       
-      // change tooltip handling
+      // delay tooltip disappearance
       ToolTipManager.sharedInstance().setDismissDelay(20000);
-      // refresh views when window is resized
+      // refresh views when windows are resized
       Toolkit.getDefaultToolkit().setDynamicLayout(true);
     } catch(final Exception e) {
       e.printStackTrace();

@@ -254,8 +254,8 @@ public final class GUI extends JFrame {
 
     // create views
     query = new QueryView(null);
-    text = new TextView(FILL.DOWN, TEXTVIEW, HELPTEXT);
-    help = new TextView(FILL.DOWN, HELPVIEW, null);
+    text = new TextView(FILL.DOWN, TEXTTIT, HELPTEXT);
+    help = new TextView(FILL.DOWN, HELPTIT, null);
     info = new InfoView(HELPINFO);
     final ViewPanel textpanel = new ViewPanel(text, TEXTVIEW);
     final ViewPanel helppanel = new ViewPanel(help, HELPVIEW);

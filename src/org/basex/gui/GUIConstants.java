@@ -6,7 +6,6 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Font;
-import java.awt.Image;
 import org.basex.Text;
 
 /**
@@ -114,15 +113,6 @@ public final class GUIConstants {
   /** Name of application logo. */
   public static final String IMGLOGO = "logo";
 
-  /** Up arrow. */
-  public static final Image ARROWUP = GUI.image("cmd-goup");
-  /** Down arrow. */
-  public static final Image ARROWDOWN = GUI.image("cmd-godown");
-  /** Up arrow. */
-  public static final Image ARROWUPIN = GUI.image("cmd-goup2");
-  /** Down arrow. */
-  public static final Image ARROWDOWNIN = GUI.image("cmd-godown2");
-
   // CURSORS ==================================================================
   
   /** Arrow cursor. */
@@ -153,7 +143,7 @@ public final class GUIConstants {
   /** Error color. */
   public static final Color COLORMARK = new Color(255, 200, 180);
   /** Error color. */
-  public static final Color COLORQUOTE = new Color(0, 0, 224);
+  public static final Color COLORQUOTE = new Color(0, 0, 192);
   /** Button color. */
   public static final Color COLORBUTTON = Color.gray;
 

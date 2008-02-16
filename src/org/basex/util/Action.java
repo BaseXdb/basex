@@ -1,8 +1,8 @@
 package org.basex.util;
 
 /**
- * This class defines an action which is offered as a thread.
- * If it is called several times, only the latest call is executed.
+ * This class defines an action which is executed as a thread.
+ * If it is called another time, the current thread is skipped.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
@@ -10,7 +10,7 @@ package org.basex.util;
 public abstract class Action {
   /** Counter. */
   protected int counter;
-
+  
   /**
    * Creates a new action thread.
    * @return thread
@@ -28,18 +28,37 @@ public abstract class Action {
   }
 
   /**
-   * Creates a new action thread.
-   * @return thread
+   * Creates a new repeated action thread.
+   * @param ms number of milliseconds to wait before executions
    */
-  public final Thread repeat() {
+  public final void repeat(final int ms) {
     final int c = ++counter;
     
-    return new Thread() {
+    new Thread() {
       @Override
       public void run() {
-        while(c == counter) action();
+        while(c == counter) {
+          action();
+          Performance.sleep(ms);
+        }
       }
-    };
+    }.start();
+  }
+
+  /**
+   * Sleeps for a while and executes the action afterwards.
+   * @param ms number of milliseconds to wait before executions
+   */
+  public final void sleep(final int ms) {
+    final int c = ++counter;
+    
+    new Thread() {
+      @Override
+      public void run() {
+        Performance.sleep(ms);
+        if(c == counter) action();
+      }
+    }.start();
   }
 
   /**

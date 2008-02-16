@@ -22,7 +22,6 @@ import org.basex.gui.GUIConstants.FILL;
 import org.basex.gui.dialog.Dialog;
 import org.basex.util.Action;
 import org.basex.util.Array;
-import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.Undo;
 
@@ -161,8 +160,18 @@ public final class BaseXText extends BaseXPanel {
    * @param p cursor position
    */
   public void setCursor(final int p) {
+    setCursor(p, 1);
+  }
+
+  /**
+   * Sets a new cursor position.
+   * @param p cursor position
+   * @param a vertical alignment
+   */
+  public void setCursor(final int p, final int a) {
     text.pos(p);
     text.setCursor();
+    showCursor(a);
   }
 
   /**
@@ -311,12 +320,25 @@ public final class BaseXText extends BaseXPanel {
       return;
     }
     if(editable && c == KeyEvent.VK_BACK_SPACE) {
-      if(text.pos() == 0) return;
-      if(text.start() == -1) text.prev(shf);
+      if(text.start() == -1) {
+        if(text.pos() == 0) return;
+        text.prev();
+      }
+      final boolean ch = Character.isLetterOrDigit(text.curr());
       text.delete();
+      if(ctrl) {
+        while(text.pos() > 0 &&
+            ch == Character.isLetterOrDigit(text.prev())) text.delete();
+        if(text.pos() != 0) text.next();
+      }
       down = false;
     } else if(editable && c == KeyEvent.VK_DELETE) {
+      final boolean ch = Character.isLetterOrDigit(text.curr());
       text.delete();
+      if(ctrl) {
+        while(text.pos() < text.size &&
+            ch == Character.isLetterOrDigit(text.curr())) text.delete();
+      }
     } else if(editable && key) {
       if(text.start() != -1) text.delete();
       text.add(new char[] { e.getKeyChar() });
@@ -391,14 +413,23 @@ public final class BaseXText extends BaseXPanel {
 
     text.setCursor();
     if(txt != text.text) rend.calc();
-
+    showCursor(down ? 2 : 0);
+  }
+  
+  /**
+   * Shows the currently edited text area.
+   * @param align vertical alignment
+   */
+  public void showCursor(final int align) {
     // updates the visible area
     final int p = scroll.pos();
     final int y = rend.cursorY();
-    final int m = y + rend.fontH() + 5 - getHeight();
-    if(y < p) scroll.pos(down ? m : y);
-    else if(m > p) scroll.pos(down ? m : y);
-    rend.repaint();
+    final int m = y + rend.fontH() + 8 - getHeight();
+    final int c = y - getHeight() / 2;
+    if(y < p || m > p) {
+      scroll.pos(align == 0 ? y : align == 1 ? c : m);
+      rend.repaint();
+    }
   }
   
   /**
@@ -484,14 +515,12 @@ public final class BaseXText extends BaseXPanel {
     return "";
   }
 
-
   /** Calculation counter. */
   protected Action cursor = new Action() {
     @Override
     public void action() {
       rend.cursor(!rend.cursor());
       rend.repaint();
-      Performance.sleep(500);
     }
   };
 
@@ -500,10 +529,12 @@ public final class BaseXText extends BaseXPanel {
    * new one has been started.
    */
   protected void cursor() {
-    cursor.stop();
-    if(!isFocusable() || !isEnabled()) return;
-    rend.cursor(false);
-    cursor.repeat().start();
+    if(!isFocusable() || !isEnabled()) {
+      cursor.stop();
+    } else {
+      rend.cursor(false);
+      cursor.repeat(500);
+    }
   }
 
   @Override

@@ -1,8 +1,8 @@
 package org.basex.gui.view.query;
 
 import static org.basex.Text.*;
+import static org.basex.gui.GUIConstants.*;
 import java.awt.BorderLayout;
-import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -13,8 +13,11 @@ import org.basex.gui.GUI;
 import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
+import org.basex.gui.GUIConstants.FILL;
+import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCheckBox;
+import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.View;
 import org.basex.util.Token;
@@ -41,8 +44,10 @@ public final class QueryView extends View {
   private BaseXCheckBox filterbox;
   /** Query panel. */
   private QueryPanel search;
+  /** Header string. */
+  final BaseXLabel header;
   /** Button box. */
-  private final Box box;
+  private final BaseXBack back;
 
   /**
    * Default constructor.
@@ -51,9 +56,14 @@ public final class QueryView extends View {
   public QueryView(final byte[] help) {
     super(help);
     setLayout(new BorderLayout(0, 4));
-    setBorder(38, 8, 8, 8);
+    setBorder(8, 8, 8, 8);
 
-    box = new Box(BoxLayout.X_AXIS);
+    back = new BaseXBack(FILL.NONE);
+    back.setLayout(new BorderLayout());
+    header = new BaseXLabel(GUIConstants.QUERYVIEW, 10);
+    back.add(header, BorderLayout.NORTH);
+    
+    Box box = new Box(BoxLayout.X_AXIS);
     box.setBorder(new EmptyBorder(0, 0, 8, 0));
     for(int i = 0; i < NPANELS; i++) {
       input[i] = new BaseXButton(SEARCHMODE[i], HELPSEARCH[i]);
@@ -74,7 +84,6 @@ public final class QueryView extends View {
     }
     box.add(Box.createHorizontalStrut(6));
 
-    final Box box2 = new Box(BoxLayout.Y_AXIS);
     filterbox = new BaseXCheckBox(CMDFILTERRT, HELPFILTERRT, GUIProp.filterrt);
     filterbox.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
@@ -82,8 +91,8 @@ public final class QueryView extends View {
       }
     });
     filterbox.setToolTipText(Token.string(HELPFILTERRT));
-    box2.add(filterbox);
-    box.add(box2);
+    box.add(filterbox);
+    back.add(box, BorderLayout.CENTER);
 
     refresh();
   }
@@ -115,20 +124,16 @@ public final class QueryView extends View {
 
   @Override
   public void refreshLayout() {
-    for(int i = 0; i < NPANELS; i++)
-      BaseXLayout.select(input[i], mode == i);
-
+    for(int i = 0; i < NPANELS; i++) BaseXLayout.select(input[i], mode == i);
     removeAll();
-    final int h = GUIConstants.lfont.getSize() + 24;
-    setBorder(new EmptyBorder(h, 8, 8, 8));
-    add(box, BorderLayout.NORTH);
+    add(back, BorderLayout.NORTH);
     search = panels[mode];
     search.init();
-    revalidate();
-    repaint();
     search.query(GUIProp.showquery);
     filterbox.setSelected(GUIProp.filterrt);
     filterbox.setEnabled(mode == SIMPLE);
+    revalidate();
+    repaint();
   }
 
   /**
@@ -144,24 +149,13 @@ public final class QueryView extends View {
   void refresh() {
     BaseXLayout.select(input[mode], true);
     BaseXLayout.select(filterbox, GUIProp.filterrt);
+    header.setFont(GUIConstants.lfont);
+    header.setForeground(COLORS[16]);
   }
 
   @Override
   public void keyPressed(final KeyEvent e) {
     if(e.isAltDown()) super.keyPressed(e);
-  }
-
-  @Override
-  public void paintComponent(final Graphics g) {
-    super.paintComponent(g);
-    BaseXLayout.antiAlias(g);
-
-    final int ys = GUIConstants.lfont.getSize() + 5;
-    g.setColor(GUIConstants.COLORS[16]);
-    g.setFont(GUIConstants.lfont);
-    g.drawString(GUIConstants.QUERYVIEW, 8, ys);
-
-    if(search != null) search.refresh();
   }
 
   /**

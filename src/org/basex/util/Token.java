@@ -74,6 +74,7 @@ public final class Token {
    * @return string
    */
   public static String string(final byte[] text, final int s, final int l) {
+    if(l <= 0) return "";
     final char[] str = new char[l];
     for(int i = 0; i < l; i++) {
       if(text[s + i] < 0) return utf8(text, s, l);

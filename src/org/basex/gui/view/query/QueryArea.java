@@ -7,6 +7,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.Box;
@@ -22,6 +24,7 @@ import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.View;
+import org.basex.util.Action;
 import org.basex.util.Token;
 
 /**
@@ -36,7 +39,6 @@ public final class QueryArea extends QueryPanel {
       ".* line ([0-9]+), column ([0-9]+).*", Pattern.DOTALL);
   /** Info label. */
   BaseXLabel info;
-
   /** Main panel. */
   QueryView main;
   /** Text Area. */
@@ -87,6 +89,15 @@ public final class QueryArea extends QueryPanel {
     info = new BaseXLabel("");
     info.setFont(info.getFont().deriveFont((float) 13));
     info.setIcon(GUI.icon(IMGERROR));
+    info.setName(Integer.toString(0));
+    info.setCursor(GUIConstants.CURSORHAND);
+    info.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(final MouseEvent e) {
+        area.setCursor(Integer.parseInt(info.getName()));
+        area.requestFocusInWindow();
+      }
+    });
     BaseXLayout.enable(info, false);
     south.add(info, BorderLayout.CENTER);
 
@@ -104,7 +115,7 @@ public final class QueryArea extends QueryPanel {
 
   @Override
   void refresh() {
-    Nodes nodes = GUI.context.marked();
+    final Nodes nodes = GUI.context.marked();
     final boolean marked = nodes != null && nodes.size != 0;
     BaseXLayout.enable(filter, !GUIProp.filterrt && marked);
   }
@@ -141,7 +152,7 @@ public final class QueryArea extends QueryPanel {
     info.setToolTipText(ok ? null : text);
     BaseXLayout.enable(info, !ok);
 
-    int s = -1;
+    err = -1;
     if(!ok) {
       final Matcher m = ERRPATTERN.matcher(inf);
       int el = 0;
@@ -155,9 +166,7 @@ public final class QueryArea extends QueryPanel {
       final int ll = last.length();
       for(int i = 0; i < ll; c++, i++) {
         if(l == el && c == ec) {
-          while(i > 0 && Token.ws((byte) last.charAt(i))) i--;
-          while(--i > 0 && Token.letterOrDigit((byte) last.charAt(i)));
-          s = ++i;
+          err = i;
           break;
         }
         if(last.charAt(i) < ' ') {
@@ -166,6 +175,20 @@ public final class QueryArea extends QueryPanel {
         }
       }
     }
-    area.error(s);
+    
+    area.error(-1);
+    info.setName(Integer.toString(err));
+    error.sleep(500);
   }
+  
+  /** Last error position. */
+  protected int err;
+  
+  /** Delays the display of error information. */
+  protected Action error = new Action() {
+    @Override
+    public void action() {
+      area.error(err);
+    }
+  };
 }

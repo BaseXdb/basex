@@ -44,6 +44,10 @@ text_find=Finde
 table_no=Tabelle für aktuelle Daten nicht verfügbar
 map_binary=Binärdatei
 query_rt=Echtzeit-Filter
+info_tit=Query-Info
+info_no=Bitte starten Sie eine Anfrage...
+help_tit=Hilfe
+text_tit=Text
 
 # Dialog Windows
 d_info=Information

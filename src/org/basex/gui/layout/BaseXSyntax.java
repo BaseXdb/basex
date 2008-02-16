@@ -15,7 +15,7 @@ public abstract class BaseXSyntax {
     @Override
     public void init() { }
     @Override
-    public Color getColor(final int ch) { return Color.black; }
+    public Color getColor(final String token) { return Color.black; }
   };
 
   /** 
@@ -24,9 +24,9 @@ public abstract class BaseXSyntax {
   public abstract void init();
 
   /** 
-   * Returns the color for the specified character.
-   * @param ch character to be checked
+   * Returns the color for the current token.
+   * @param token current token
    * @return color
    */
-  public abstract Color getColor(final int ch);
+  public abstract Color getColor(final String token);
 }

@@ -11,7 +11,7 @@ import static org.basex.util.Token.*;
 public interface XQTokens {
   
   // PARSER TOKENS ============================================================
-  
+
   /** Parser token. */
   byte[] AND = token("and");
   /** Parser token. */
@@ -19,25 +19,13 @@ public interface XQTokens {
   /** Parser token. */
   byte[] ASCENDING = token("ascending");
   /** Parser token. */
-  byte[] ASSIGN = token(":=");
-  /** Parser token. */
   byte[] AT = token("at");
-  /** Parser token. */
-  byte[] ATMARK = token("@");
   /** Parser token. */
   byte[] ATTRIBUTE = token("attribute");
   /** Parser token. */
   byte[] BASEURI = token("base-uri");
   /** Parser token. */
   byte[] BOUNDARY = token("boundary-space");
-  /** Parser token. */
-  byte[] BR1 = token("[");
-  /** Parser token. */
-  byte[] BR2 = token("]");
-  /** Parser token. */
-  byte[] BRACE1 = token("{");
-  /** Parser token. */
-  byte[] BRACE2 = token("}");
   /** Parser token. */
   byte[] BY = token("by");
   /** Parser token. */
@@ -49,21 +37,13 @@ public interface XQTokens {
   /** Parser token. */
   byte[] CATCH = token("catch");
   /** Parser token. */
-  byte[] CDATA = token("<![CDATA[");
-  /** Parser token. */
-  byte[] COL2 = token("::");
-  /** Parser token. */
   byte[] COLLATION = token("collation");
-  /** Parser token. */
-  byte[] COMMA = token(",");
   /** Parser token. */
   byte[] COMMENT = token("comment");
   /** Parser token. */
   byte[] CONSTRUCTION = token("construction");
   /** Parser token. */
   byte[] COPYNS = token("copy-namespaces");
-  /** Parser token. */
-  byte[] MINUS = token("-");
   /** Parser token. */
   byte[] DECLARE = token("declare");
   /** Parser token. */
@@ -75,10 +55,6 @@ public interface XQTokens {
   /** Parser token. */
   byte[] DOCUMENT = token("document");
   /** Parser token. */
-  byte[] DOLLAR = token("$");
-  /** Parser token. */
-  byte[] DOT2 = token("..");
-  /** Parser token. */
   byte[] ELEMENT = token("element");
   /** Parser token. */
   byte[] ELSE = token("else");
@@ -89,11 +65,7 @@ public interface XQTokens {
   /** Parser token. */
   byte[] EVERY = token("every");
   /** Parser token. */
-  byte[] EX = token("!");
-  /** Parser token. */
   byte[] EXCEPT = token("except");
-  /** Parser token. */
-  byte[] EXPRLIST = token("ExprList(");
   /** Parser token. */
   byte[] EXTERNAL = token("external");
   /** Parser token. */
@@ -117,11 +89,7 @@ public interface XQTokens {
   /** Parser token. */
   byte[] INTERSECT = token("intersect");
   /** Parser token. */
-  byte[] IS = token("=");
-  /** Parser token. */
   byte[] LAX = token("lax");
-  /** Parser token. */
-  byte[] LBRA = token("<");
   /** Parser token. */
   byte[] LEAST = token("least");
   /** Parser token. */
@@ -131,8 +99,6 @@ public interface XQTokens {
   /** Parser token. */
   byte[] MODULE = token("module");
   /** Parser token. */
-  byte[] MULT = token("*");
-  /** Parser token. */
   byte[] NAMESPACE = token("namespace");
   /** Parser token. */
   byte[] NOINHERIT = token("no-inherit");
@@ -140,8 +106,6 @@ public interface XQTokens {
   byte[] NOPRESERVE = token("no-preserve");
   /** Parser token. */
   byte[] OF = token("of");
-  /** Parser token. */
-  byte[] ONEZERO = token("1.0");
   /** Parser token. */
   byte[] OPTION = token("option");
   /** Parser token. */
@@ -153,23 +117,9 @@ public interface XQTokens {
   /** Parser token. */
   byte[] ORDERING = token("ordering");
   /** Parser token. */
-  byte[] PAR1 = token("(");
-  /** Parser token. */
-  byte[] PAR2 = token(")");
-  /** Parser token. */
   byte[] PI = token("processing-instruction");
   /** Parser token. */
-  byte[] PIPE = token("|");
-  /** Parser token. */
-  byte[] PLUS = token("+");
-  /** Parser token. */
-  byte[] PRAGMA = token("(#");
-  /** Parser token. */
   byte[] PRESERVE = token("preserve");
-  /** Parser token. */
-  byte[] QUEST = token("?");
-  /** Parser token. */
-  byte[] QUMARK = token("\"");
   /** Parser token. */
   byte[] QUOTE = token("quote");
   /** Parser token. */
@@ -178,10 +128,6 @@ public interface XQTokens {
   byte[] SATISFIES = token("satisfies");
   /** Parser token. */
   byte[] SCHEMA = token("schema");
-  /** Parser token. */
-  byte[] SEMI = token(";");
-  /** Parser token. */
-  byte[] SLASH = token("/");
   /** Parser token. */
   byte[] SOME = token("some");
   /** Parser token. */
@@ -305,6 +251,62 @@ public interface XQTokens {
   byte[] SCORE = token("score");
   /** Parser fulltext token. */
   byte[] WEIGHT = token("weight");
+
+  /** Skip flag for the syntax highlighter. */
+  byte[] SKIP = null;
+
+  /** Parser token. */
+  byte[] ASSIGN = token(":=");
+  /** Parser token. */
+  byte[] ATMARK = token("@");
+  /** Parser token. */
+  byte[] BR1 = token("[");
+  /** Parser token. */
+  byte[] BR2 = token("]");
+  /** Parser token. */
+  byte[] BRACE1 = token("{");
+  /** Parser token. */
+  byte[] BRACE2 = token("}");
+  /** Parser token. */
+  byte[] CDATA = token("<![CDATA[");
+  /** Parser token. */
+  byte[] COL2 = token("::");
+  /** Parser token. */
+  byte[] COMMA = token(",");
+  /** Parser token. */
+  byte[] MINUS = token("-");
+  /** Parser token. */
+  byte[] DOLLAR = token("$");
+  /** Parser token. */
+  byte[] DOT2 = token("..");
+  /** Parser token. */
+  byte[] EX = token("!");
+  /** Parser token. */
+  byte[] IS = token("=");
+  /** Parser token. */
+  byte[] LBRA = token("<");
+  /** Parser token. */
+  byte[] MULT = token("*");
+  /** Parser token. */
+  byte[] ONEZERO = token("1.0");
+  /** Parser token. */
+  byte[] PAR1 = token("(");
+  /** Parser token. */
+  byte[] PAR2 = token(")");
+  /** Parser token. */
+  byte[] PIPE = token("|");
+  /** Parser token. */
+  byte[] PLUS = token("+");
+  /** Parser token. */
+  byte[] PRAGMA = token("(#");
+  /** Parser token. */
+  byte[] QUEST = token("?");
+  /** Parser token. */
+  byte[] QUMARK = token("\"");
+  /** Parser token. */
+  byte[] SEMI = token(";");
+  /** Parser token. */
+  byte[] SLASH = token("/");
 
   // URIS =====================================================================
 

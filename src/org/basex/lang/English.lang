@@ -41,9 +41,13 @@ s_ok=OK
 welcome1=Welcome!
 welcome2=The easiest way to get started:\nClick on "File -> New..." and choose\none of your XML documents on disk.\nNext, confirm the upcoming dialog\nwindow and check out the Help View...
 text_find=Find
-table_no=Table unavailable for this data
+table_no=No table available for this data
 map_binary=Binary File
 query_rt=Realtime Filtering
+info_tit=Query Info
+info_no=Please launch a query...
+help_tit=Help
+text_tit=Text
 
 # Dialog Windows
 d_info=Information

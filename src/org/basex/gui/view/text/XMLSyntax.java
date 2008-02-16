@@ -22,7 +22,8 @@ public final class XMLSyntax extends BaseXSyntax {
   }
 
   @Override
-  public Color getColor(final int ch) {
+  public Color getColor(final String word) {
+    final char ch = word.charAt(0);
     final boolean qu = ch == '"' || ch == '\'';
     if(quote != 0 || qu) {
       if(qu) quote = quote == ch ? 0 : ch;

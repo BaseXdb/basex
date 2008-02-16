@@ -39,14 +39,13 @@ public final class TextView extends View {
   public TextView(final FILL mode, final String head, final byte[] help) {
     super(help);
     setMode(mode);
-    setBorder(10, 8, 8, 8);
+    setBorder(8, 8, 8, 8);
     setLayout(new BorderLayout());
     header = new BaseXLabel(head, 10);
-    header.setForeground(COLORS[16]);
-    header.setFont(GUIConstants.lfont);
     add(header, BorderLayout.NORTH);
     area = new BaseXText(help, false);
     add(area, BorderLayout.CENTER);
+    refreshLayout();
   }
 
   @Override
@@ -62,8 +61,7 @@ public final class TextView extends View {
 
   @Override
   public void refreshMark() {
-    final Nodes nodes = GUI.context.marked();
-    refreshDoc(nodes);
+    refreshDoc(GUI.context.marked());
   }
 
   @Override

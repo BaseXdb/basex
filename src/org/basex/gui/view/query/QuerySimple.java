@@ -43,8 +43,6 @@ import org.basex.util.Token;
 final class QuerySimple extends QueryPanel implements ActionListener {
   /** Component width. */
   private static final int COMPW = 150;
-//  /** Attribute token. */
-//  private static final byte[] ATT = { '@' };
   /** Exact search pattern. */
   private static final String PATEX = "[% = \"%\"]";
   /** Substring search pattern. */

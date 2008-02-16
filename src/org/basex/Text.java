@@ -38,7 +38,7 @@ public interface Text {
   /** URL. */
   String URL = "http://www.basex.org";
   /** Code version. */
-  String VERSION = "4.03";
+  String VERSION = "4.05";
   /** Company Info. */
   String COMPANY = "DBIS, University of Konstanz";
 
@@ -624,7 +624,7 @@ public interface Text {
   /** Default message. */
   String STATUSOK = lang("s_ok") + ". ";
 
-  // VISUALIZATION ============================================================
+  // VISUALIZATIONS ===========================================================
 
   /** Welcome Information. */
   String WELCOME = lang("welcome1");
@@ -638,6 +638,14 @@ public interface Text {
   String CMDFILTERRT = lang("query_rt");
   /** Binary file. */
   byte[] MAPBINARY = token(lang("map_binary"));
+  /** Query Info title. */
+  String INFOTIT = lang("info_tit");
+  /** No Query info. */
+  String INFONO = lang("info_no");
+  /** Help title. */
+  String HELPTIT = lang("help_tit");
+  /** Help title. */
+  String TEXTTIT = lang("text_tit");
 
   // DIALOG WINDOWS ===========================================================
 
