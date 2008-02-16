@@ -433,7 +433,7 @@ public final class BaseXText extends BaseXPanel {
   }
   
   /**
-   * Moves the cursor up.
+   * Moves the cursor down.
    * @param l number of lines to move cursor
    * @param shf shift flag
    */
@@ -446,6 +446,7 @@ public final class BaseXText extends BaseXPanel {
       text.next(shf);
     }
     text.end(col, shf);
+    if(text.pos() == text.size) col = -1;
   }
   
   /**
@@ -456,8 +457,11 @@ public final class BaseXText extends BaseXPanel {
   private void up(final int l, final boolean shf) {
     if(!shf) text.noMark();
     int x = text.home(shf);
-    if(text.pos() == 0) return;
     if(col == -1) col = x;
+    if(text.pos() == 0) {
+      col = -1;
+      return;
+    }
     for(int i = 0; i < l; i++) {
       text.prev(shf);
       text.home(shf);

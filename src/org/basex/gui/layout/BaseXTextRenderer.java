@@ -97,7 +97,7 @@ public final class BaseXTextRenderer extends BaseXBack {
    * Calculates the text height.
    */
   void calc() {
-    w = getWidth() - off / 2;
+    w = getWidth() - (off >> 1);
     h = Integer.MAX_VALUE;
     final Graphics g = getGraphics();
     init(g, 0);
@@ -116,7 +116,6 @@ public final class BaseXTextRenderer extends BaseXBack {
     final Graphics g = getGraphics();
     init(g, 0);
     while(more(g) && !text.edited()) next();
-    //next();
     h = hh;
     return y - fontH;
   }
@@ -134,7 +133,7 @@ public final class BaseXTextRenderer extends BaseXBack {
 
     if(cursor && text.cursor() == text.size) {
       g.setColor(Color.black);
-      g.drawLine(x, y - fontH + 3, x, y + 1);
+      g.drawLine(x, y - fontH + 4, x, y + 3);
     }
   }
 
@@ -192,38 +191,39 @@ public final class BaseXTextRenderer extends BaseXBack {
    */
   private void write(final Graphics g) {
     // choose color (later: use variable syntax highlighter)
-    char ch = word.charAt(0);
-    if(ch < 32) g.setFont(font);
-    Color color = syntax.getColor(word);
+    final char ch = word.charAt(0);
+    final Color color = syntax.getColor(word);
 
     // return if current text is not visible.
     if(y > 0 && y < h) {
       // mark error
       if(text.error()) {
         g.setColor(GUIConstants.COLORMARK);
-        g.fillRect(x, y - fontH + 3, wordW, fontH);
+        g.fillRect(x, y - fontH + 4, wordW, fontH);
       }
   
       // mark text
       int xx = x;
-
       if(text.markStart()) {
+        int p = text.pos();
         for(int c = 0; c < word.length(); c++) {
-          ch = word.charAt(c);
-          final boolean m = text.marked();
-          final int cw = charW(g, ch);
-          if(m) {
+          final int cw = charW(g, word.charAt(c));
+          if(text.marked()) {
             g.setColor(GUIConstants.COLORS[3]);
-            g.fillRect(xx, y - fontH + 3, cw, fontH);
+            g.fillRect(xx, y - fontH + 4, cw, fontH);
           }
-          g.setColor(color);
           xx += cw;
+          text.next();
         }
+        text.pos(p);
       }
-      // whitespace flag
+
+      // don't write whitespaces
       if(ch > ' ') {
         g.setColor(color);
-        g.drawString(text.nextWord(), x, y);
+        g.drawString(word, x, y);
+      } else if(ch < ' ') {
+        g.setFont(font);
       }
   
       // show cursor
@@ -232,7 +232,7 @@ public final class BaseXTextRenderer extends BaseXBack {
         for(int c = 0; c < word.length(); c++) {
           if(text.cursor() == text.pos() + c) {
             g.setColor(Color.black);
-            g.drawLine(xx, y - fontH + 3, xx, y + 2);
+            g.drawLine(xx, y - fontH + 4, xx, y + 3);
             break;
           }
           xx += charW(g, word.charAt(c));

@@ -113,8 +113,9 @@ final class BaseXTextTokens {
    */
   int home(final boolean mark) {
     int c = 0;
+    if(ps == 0) return 0;
     do c += curr() == '\t' ? TAB : 1; while(prev(mark) != '\n');
-    if(ps != 0) next(mark);
+    if(ps != 0 || curr() == '\n') next(mark);
     return c;
   }
 
@@ -279,9 +280,7 @@ final class BaseXTextTokens {
    */
   boolean markStart() {
     if(ms == -1) return false;
-    return ms < me ? (ms >= ps && ms < pe || ps >= ms && ps < me ||
-        ms >= ps && ms < pe) : (me >= ps && me < pe || ps >= me && ps < ms ||
-            me >= ps && me < pe);
+    return marked() || (ms < me ? ms >= ps && ms < pe : me >= ps && me < pe);
   }
 
   /**
@@ -289,7 +288,6 @@ final class BaseXTextTokens {
    * @return result of check
    */
   boolean marked() {
-    if(ms == -1) return false;
     return ms < me ? ps >= ms && ps < me : ps >= me && ps < ms;
   }
 
