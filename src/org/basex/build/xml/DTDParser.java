@@ -277,9 +277,9 @@ public class DTDParser {
         BaseX.debug(PC);
         check = false;
         consumeWS1();
-        consumeBracketed();
+        nestedELement();
       } else {
-        consumeBracketed();
+        nestedELement();
       }
     } else if(consume(WEMP1) || consume(WEMP2) || consume(WANY1)
         || consume(WANY2)) {
@@ -302,12 +302,12 @@ public class DTDParser {
     if(consume(CD)) {
       BaseX.debug(CD);
     } else if(consume(BRACKETO)) {
-      consumeBracketed2();
+      nestedAttlist();
     } else if(consume(NOT)) {
       if(!consumeWS() && !consume(BRACKETO)) error();
       consumeWS1();
       if(consume(BRACKETO)) {
-        consumeBracketed2();
+        nestedAttlist();
       } else {
         BaseX.debug(consumeName2());
       }
@@ -400,21 +400,21 @@ public class DTDParser {
    * Consumes bracketed content.
    * @throws BuildException Build Exception
    */
-  private void consumeBracketed() throws BuildException {
+  private void nestedELement() throws BuildException {
     while(!consume(BRACKETC)) {
       consumeWS1();
       if(consume(DASH) || consume(COLON)) {
         consumeWS1();
         check = true;
         if(consume(BRACKETO)) {
-          consumeBracketed();
+          nestedELement();
         } else {
           BaseX.debug(consumeName2());
           consumeWS1();
         }
       } else if(consume(BRACKETO)) {
         check = true;
-        consumeBracketed();
+        nestedELement();
       } else {
         if(check) {
           consumeWS1();
@@ -431,7 +431,7 @@ public class DTDParser {
       if(consume(DASH) || consume(COLON)) {
         consumeWS1();
         if(consume(BRACKETO)) {
-          consumeBracketed();
+          nestedELement();
         }
       }
     }
@@ -441,19 +441,21 @@ public class DTDParser {
    * Consumes bracketed content.
    * @throws BuildException Build Exception
    */
-  private void consumeBracketed2() throws BuildException {
+  private void nestedAttlist() throws BuildException {
     while(!consume(BRACKETC)) {
       consumeWS1();
       if(consume(DASH)) {
         consumeWS1();
+        check = true;
         if(consume(BRACKETO)) {
-          consumeBracketed();
+          nestedELement();
         } else {
           BaseX.debug(consumeName2());
           consumeWS1();
         }
       } else if(consume(BRACKETO)) {
-        consumeBracketed();
+        check = true;
+        nestedELement();
       } else if(consume(COLON)) {
         error();
       } else {
@@ -472,7 +474,7 @@ public class DTDParser {
       if(consume(DASH) || consume(COLON)) {
         consumeWS1();
         if(consume(BRACKETO)) {
-          consumeBracketed();
+          nestedAttlist();
         }
       }
     }
