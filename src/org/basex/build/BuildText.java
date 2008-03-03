@@ -112,12 +112,24 @@ public interface BuildText {
   byte[] BRACKETO = Token.token("(");
   /** DTD: Bracket Close. */
   byte[] BRACKETC = Token.token(")");
+  /** DTD: Bracket Close Star. */
+  byte[] BRACKETCS = Token.token(")*");
+  /** DTD: Question Mark. */
+  byte[] QUESTION = Token.token("?");
+  /** DTD: Plus. */
+  byte[] PLUS = Token.token("+");
+  /** DTD: Star. */
+  byte[] STAR = Token.token("*");
+  /** DTD: Percent. */
+  byte[] PERCENT = Token.token("%");
   /** DTD: <?. */
   byte[] GQ = Token.token("<?");
   /** DTD: <!--. */
   byte[] COMS = Token.token("<!--");
   /** DTD: -->. */
   byte[] COME = Token.token("-->");
+  /** DTD: NOTATION. */
+  byte[] NOTA = Token.token("<!NOTATION");
   /** DTD: ELEMENT. */
   byte[] ELEM = Token.token("<!ELEMENT");
   /** DTD: Wrong ELEMENT. */
