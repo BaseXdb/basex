@@ -147,6 +147,10 @@ public class DTDParser {
       markupdecl();
     } else if(consume(ATTL)) {
       attlistDecl();
+      consumeWS();
+      if(!consume(GREAT)) {
+        error();
+      }
       markupdecl();
     } else if(consume(ENT)) {
       entityDecl();
@@ -187,6 +191,8 @@ public class DTDParser {
     BaseX.debug("----------------------");
     BaseX.debug("- Element: '%'", element);
     contentSpec();
+    consumeWS();
+    if(!consume(GREAT)) error();
   }
 
   /**
@@ -199,31 +205,26 @@ public class DTDParser {
     // checks for empty, any or mixed elements
     if(consume(EMP)) {
       BaseX.debug(EMP);
-      consumeWS();
-      if(!consume(GREAT)) {
-        error();
-      }
     } else if(consume(ANY)) {
       BaseX.debug(ANY);
-      consumeWS();
-      if(!consume(GREAT)) {
-        error();
-      }
     } else if(consume(BRACKETO)) {
       consumeWS();
       if(consume(PC)) {
         BaseX.debug(PC);
+        consumeWS();
+        if (!consume(BRACKETC)) {
         mixedElement();
+        } else {
+          if (consume(STAR)) {
+            BaseX.debug("*");
+          }
+        }
       } else {
         childrenElement();
-        consumeWS();
-        if(!consume(GREAT)) error();
       }
     } else {
       consumeWS();
       BaseX.debug(consumeSpecName());
-      consumeWS();
-      if(!consume(GREAT)) error();
     }
   }
 
@@ -233,18 +234,12 @@ public class DTDParser {
    */
   private void mixedElement() throws BuildException {
     consumeWS();
-    if(consume(BRACKETC)) {
-      if(consume(STAR)) {
-        consumeWS();
-        if(!consume(GREAT)) error();
+    if(consume(BRACKETC) || consume(DASH)) {
+      if(!consume(STAR)) {
+        mixedElement();
       } else {
-        consumeWS();
-        if(!consume(GREAT)) error();
+        BaseX.debug("*");
       }
-    } else if(consume(DASH)) {
-      consumeWS();
-      BaseX.debug(consumeSpecName());
-      mixedElement();
     } else {
       BaseX.debug(consumeSpecName());
       mixedElement();
@@ -258,35 +253,23 @@ public class DTDParser {
   private void childrenElement() throws BuildException {
     consumeWS();
     if(consume(BRACKETC)) {
-      consumeWS();
-      if(consume(PLUS) || consume(QUESTION) || consume(STAR)) {
+      if(consume(STAR) || consume(QUESTION) || consume(PLUS)) {
+        BaseX.debug(substring(content, pos - 1, pos));
         consumeWS();
-        if(consume(DASH) || consume(COLON)) {
-          childrenElement();
-        } else if(consume(BRACKETC)) {
-          prev();
-          childrenElement();
-        }
-      } else {
-        if(consume(DASH) || consume(COLON)) {
+        if(!consume(GREAT)) {
           childrenElement();
         } else {
-          if (consume(GREAT)) {
-            prev();
-          } else {
-            childrenElement();
-          }
+          prev();
+        }
+      } else {
+        consumeWS();
+        if(!consume(GREAT)) {
+          childrenElement();
+        } else {
+          prev();
         }
       }
-    } else if(consume(DASH) || consume(COLON)) {
-      consumeWS();
-      if(consume(BRACKETO)) {
-        childrenElement();
-      } else {
-        BaseX.debug(consumeSpecName());
-        childrenElement();
-      }
-    } else if(consume(BRACKETO)) {
+    } else if(consume(DASH) || consume(COLON) || consume(BRACKETO)) {
       childrenElement();
     } else {
       BaseX.debug(consumeSpecName());
@@ -307,6 +290,8 @@ public class DTDParser {
     consumeWS();
     if(!consume(GREAT)) {
       attDef();
+    } else {
+      prev();
     }
   }
 
@@ -337,58 +322,37 @@ public class DTDParser {
       if(!consume(BRACKETO)) error();
       consumeWS();
       BaseX.debug(consumeSpecName());
-      notationType();
+      enumeratedAttlist();
       dDecl();
     } else if(tokenizedType()) {
       BaseX.debug(tokenizedType);
       dDecl();
     } else error();
   }
-
+  
+  /** Value if there is an open Bracket or not. */
+  private boolean bopen = false;
+  
   /**
    * Consumes bracketed content.
    * @throws BuildException Build Exception
    */
   private void enumeratedAttlist() throws BuildException {
     consumeWS();
-    if(consume(BRACKETC)) {
-      if(consume(PLUS) || consume(QUESTION) || consume(STAR)) {
-        consumeWS();
-        if(consume(DASH)) {
-          consumeWS();
-          BaseX.debug(consumeName());
-          enumeratedAttlist();
-        } else if(consume(DASH)) {
-          consumeWS();
-          if(consume(BRACKETO)) {
-            enumeratedAttlist();
-          } else {
-            BaseX.debug(consumeName());
-            enumeratedAttlist();
-          }
-        }
+    if (consume(BRACKETC)) {
+      if(bopen) {
+        enumeratedAttlist();
+        bopen = false;
       }
     } else if(consume(DASH)) {
-      consumeWS();
-      BaseX.debug(consumeName());
+      enumeratedAttlist();
+    } else if(consume(BRACKETO)) {
+      bopen = true;
       enumeratedAttlist();
     } else {
-      BaseX.debug(consumeName());
+      BaseX.debug(consumeSpecName());
       enumeratedAttlist();
     }
-  }
-
-  /**
-   * Checks the notationType for Attlist Objects.
-   * @throws BuildException Build Exception
-   */
-  private void notationType() throws BuildException {
-    consumeWS();
-    if(consume(DASH)) {
-      consumeWS();
-      BaseX.debug(consumeSpecName());
-      notationType();
-    } else if(consume(BRACKETC)) { }
   }
 
   /**
@@ -401,11 +365,19 @@ public class DTDParser {
     if(consume(REQ)) {
       BaseX.debug(REQ);
       consumeWS();
-      if(!consume(GREAT)) attDef();
+      if(!consume(GREAT)) {
+        attDef();
+      } else {
+        prev();
+      }
     } else if(consume(IMP)) {
       BaseX.debug(IMP);
       consumeWS();
-      if(!consume(GREAT)) attDef();
+      if(!consume(GREAT)) {
+        attDef();
+      } else {
+        prev();
+      }
     } else if(consume(FIX)) {
       BaseX.debug(FIX);
       consumeWS();
@@ -416,6 +388,8 @@ public class DTDParser {
         consumeWS();
         if(!consume(GREAT)) {
           attDef();
+        } else {
+          prev();
         }
       }
     } else {
@@ -423,6 +397,8 @@ public class DTDParser {
       consumeWS();
       if(!consume(GREAT)) {
         attDef();
+      } else {
+        prev();
       }
     }
   }
