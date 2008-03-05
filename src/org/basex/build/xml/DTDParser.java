@@ -120,8 +120,10 @@ public class DTDParser {
     BaseX.debug("- Root Element Type: %", root);
     BaseX.debug("- ExternContent of %:\n %", dtd, content);
     BaseX.debug("----------------");
+    if(content.length != 0) {
     markupdecl();
-    BaseX.debug("----------------------");
+    }
+    BaseX.debug("----------------");
     BaseX.debug("THE END");
     if(isIntern) {
       content = intSubset;
@@ -130,7 +132,7 @@ public class DTDParser {
       markupdecl();
       consumeWS();
       if(!consume(SBRACKETC)) error();
-      BaseX.debug("----------------------");
+      BaseX.debug("----------------");
       BaseX.debug("THE END");
     }
   }
@@ -235,10 +237,13 @@ public class DTDParser {
   private void mixedElement() throws BuildException {
     consumeWS();
     if(consume(BRACKETC) || consume(DASH)) {
-      if(!consume(STAR)) {
-        mixedElement();
-      } else {
+      consumeWS();
+      if(consume(STAR)) {
         BaseX.debug("*");
+      } else if(consume(GREAT)) {
+        prev();
+      } else {
+        mixedElement();  
       }
     } else {
       BaseX.debug(consumeSpecName());
