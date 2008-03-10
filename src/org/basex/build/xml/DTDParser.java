@@ -67,20 +67,20 @@ public class DTDParser {
     // cache content
     content = dtd;
     // check DOCTYPE S
-    if(!consume(DOCTYPE) || !consumeWS()) error();
+    if(!consume(DOCTYPE) || !consumeWS()) error("Error in DOCTYPE");
     // check NAME
     root = consumeName();
     // check Whitespace
     consumeWS();
     // check for ExternDTD
     if(consume(SYSTEM)) {
-      if(!consumeWS()) error();
+      if(!consumeWS()) error(WSERROR);
       extid = consumeQuoted();
       externalID();
     } else if(consume(PUBLIC)) {
-      if(!consumeWS()) error();
+      if(!consumeWS()) error(WSERROR);
       consumeQuoted();
-      if(!consumeWS()) error();
+      if(!consumeWS()) error(WSERROR);
       extid = consumeQuoted();
       externalID();
     } else if(consume(SBRACKETO)) {
@@ -89,7 +89,7 @@ public class DTDParser {
       BaseX.debug("- InternContent:\n %", content);
       markupdecl();
       consumeWS();
-      if(!consume(SBRACKETC)) error();
+      if(!consume(SBRACKETC)) error(SIGNERROR);
       BaseX.debug("----------------------");
       BaseX.debug("THE END");
     } else {
@@ -131,7 +131,7 @@ public class DTDParser {
       BaseX.debug("- InternContent:\n %", content);
       markupdecl();
       consumeWS();
-      if(!consume(SBRACKETC)) error();
+      if(!consume(SBRACKETC)) error(SIGNERROR);
       BaseX.debug("----------------");
       BaseX.debug("THE END");
     }
@@ -151,13 +151,13 @@ public class DTDParser {
       attlistDecl();
       consumeWS();
       if(!consume(GREAT)) {
-        error();
+        error(SIGNERROR);
       }
       markupdecl();
     } else if(consume(ENT)) {
       entityDecl();
       consumeWS();
-      if(!consume(GREAT)) error();
+      if(!consume(GREAT)) error(SIGNERROR);
       markupdecl();
     } else if(consume(NOTA)) {
       notationDecl();
@@ -176,7 +176,7 @@ public class DTDParser {
         markupdecl();
       } else {
         if(XMLToken.isLetter(next)) {
-          error();
+          error(SIGNERROR);
         }
       }
     }
@@ -187,14 +187,14 @@ public class DTDParser {
    * @throws BuildException Build Exception
    */
   private void elementDecl() throws BuildException {
-    if(!consumeWS()) error();
+    if(!consumeWS()) error(WSERROR);
     element = consumeSpecName();
     tags.add(element);
     BaseX.debug("----------------------");
     BaseX.debug("- Element: '%'", element);
     contentSpec();
     consumeWS();
-    if(!consume(GREAT)) error();
+    if(!consume(GREAT)) error(SIGNERROR);
   }
 
   /**
@@ -203,7 +203,7 @@ public class DTDParser {
    */
   private void contentSpec() throws BuildException {
     // sign after name has to be a whitespace
-    if(!consumeWS()) error();
+    if(!consumeWS()) error(WSERROR);
     // checks for empty, any or mixed elements
     if(consume(EMP)) {
       BaseX.debug(EMP);
@@ -287,7 +287,7 @@ public class DTDParser {
    * @throws BuildException Build Exception
    */
   private void attlistDecl() throws BuildException {
-    if(!consumeWS()) error();
+    if(!consumeWS()) error(WSERROR);
     attl = consumeSpecName();
     atts.add(attl);
     BaseX.debug("----------------------");
@@ -307,7 +307,7 @@ public class DTDParser {
   private void attDef() throws BuildException {
     consumeWS();
     BaseX.debug(consumeSpecName());
-    if(!consumeWS()) error();
+    if(!consumeWS()) error(WSERROR);
     attType();
   }
 
@@ -323,8 +323,8 @@ public class DTDParser {
       enumeratedAttlist();
       dDecl();
     } else if(consume(NOT)) {
-      if(!consumeWS()) error();
-      if(!consume(BRACKETO)) error();
+      if(!consumeWS()) error(WSERROR);
+      if(!consume(BRACKETO)) error(SIGNERROR);
       consumeWS();
       BaseX.debug(consumeSpecName());
       enumeratedAttlist();
@@ -332,7 +332,7 @@ public class DTDParser {
     } else if(tokenizedType()) {
       BaseX.debug(tokenizedType);
       dDecl();
-    } else error();
+    } else error(SIGNERROR);
   }
   
   /** Value if there is an open Bracket or not. */
@@ -365,7 +365,7 @@ public class DTDParser {
    * @throws BuildException Build Exception
    */
   private void dDecl() throws BuildException {
-    if(!consumeWS()) error();
+    if(!consumeWS()) error(WSERROR);
     // checks for REQUIRED, IMPLIED or FIXED elements
     if(consume(REQ)) {
       BaseX.debug(REQ);
@@ -413,9 +413,9 @@ public class DTDParser {
    * @throws BuildException Build Exception
    */
   private void entityDecl() throws BuildException {
-    if(!consumeWS()) error();
+    if(!consumeWS()) error(WSERROR);
     if(consume(PERCENT)) {
-      if(!consumeWS()) error();
+      if(!consumeWS()) error(WSERROR);
       byte[] name = consumeSpecName();
       BaseX.debug("----------------------");
       BaseX.debug("- Entity: '%'", name);
@@ -436,27 +436,27 @@ public class DTDParser {
    * @throws BuildException Build Exception
    */
   private byte[] entDef() throws BuildException {
-    if(!consumeWS()) error();
+    if(!consumeWS()) error(WSERROR);
     if(consume(SYSTEM)) {
-      if(!consumeWS()) error();
+      if(!consumeWS()) error(WSERROR);
       byte[] val = consumeQuoted();
       BaseX.debug(val);
       consumeWS();
       if(consume(ND)) {
         BaseX.debug(ND);
-        if(!consumeWS()) error();
+        if(!consumeWS()) error(WSERROR);
         BaseX.debug(consumeSpecName());
       }
       return val;
     } else if(consume(PUBLIC)) {
-      if(!consumeWS()) error();
+      if(!consumeWS()) error(WSERROR);
       consumeQuoted();
-      if(!consumeWS()) error();
+      if(!consumeWS()) error(WSERROR);
       byte[] val = consumeQuoted();
       BaseX.debug(val);
       if(consume(ND)) {
         BaseX.debug(ND);
-        if(!consumeWS()) error();
+        if(!consumeWS()) error(WSERROR);
         BaseX.debug(consumeSpecName());
       }
       return val;
@@ -473,10 +473,10 @@ public class DTDParser {
    * @throws BuildException Build Exception
    */
   private void notationDecl() throws BuildException {
-    if(!consumeWS()) error();
+    if(!consumeWS()) error(WSERROR);
     BaseX.debug("----------------------");
     BaseX.debug("- Notation: %", consumeSpecName());
-    if(!consumeWS()) error();
+    if(!consumeWS()) error(WSERROR);
     notationID();
   }
 
@@ -486,19 +486,19 @@ public class DTDParser {
    */
   private void notationID() throws BuildException {
     if(consume(SYSTEM)) {
-      if(!consumeWS()) error();
+      if(!consumeWS()) error(WSERROR);
       BaseX.debug(" - ExternID: '%'", consumeQuoted());
       consumeWS();
-      if(!consume(GREAT)) error();
+      if(!consume(GREAT)) error(SIGNERROR);
     } else if(consume(PUBLIC)) {
-      if(!consumeWS()) error();
+      if(!consumeWS()) error(WSERROR);
       BaseX.debug(" - PUBID: '%'", consumeQuoted());
       consumeWS();
       if(!consume(GREAT)) {
         BaseX.debug(" - ExternID: '%'", consumeQuoted());
       }
     } else {
-      error();
+      error(SIGNERROR);
     }
   }
 
@@ -563,7 +563,7 @@ public class DTDParser {
   private byte[] consumeName() throws BuildException {
     int p = pos;
     byte c = next();
-    if(!XMLToken.isFirstLetter(c)) error();
+    if(!XMLToken.isFirstLetter(c)) error(NAMEERROR);
     do {
       c = next();
       if(c == ')') {
@@ -600,7 +600,7 @@ public class DTDParser {
    */
   private byte[] consumeQuoted() throws BuildException {
     byte quote = next();
-    if(quote != '\'' && quote != '"') error();
+    if(quote != '\'' && quote != '"') error(QUOTEERROR);
     int p = pos;
     byte c;
     while((c = next()) != quote) {
