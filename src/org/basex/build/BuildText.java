@@ -78,6 +78,14 @@ public interface BuildText {
   String DTDERR = "DTD parsing: %";
   /** Scanner Error. */
   String DTDNOTFOUND = "\"%\" not found.";
+  /** DTD: SIGNERROR. */
+  String SIGNERROR = "WRONG OR MISSING SIGN";
+  /** DTD: WHITESPACEERROR. */
+  String WSERROR = "MISSING WHITESPACE";
+  /** DTD: NAMEERROR. */
+  String NAMEERROR = "ERROR IN NAME";
+  /** DTD: QUOTEERROR. */
+  String QUOTEERROR = "MISSING QUOTE";
 
   /** CDATA token. */
   byte[] CDATA = Token.token("CDATA[");
