@@ -188,7 +188,6 @@ public abstract class Builder extends Progress {
     if(t.length == 0) error(TAGEMPTY, parser.det());
     if(level == 1 && inDoc) error(MOREROOTS, parser.det(), t);
 
-    // so far no text nodes are added to statistics.
     // index tag to statistic
     if(tag != dbname) {
       stats.index(tag, null);
@@ -294,6 +293,7 @@ public abstract class Builder extends Progress {
   private void addText(final byte[] txt, final byte type) throws IOException {
     parStack[level] = size;
     final byte[] t = Token.utf8(txt, meta.encoding);
+    
     addText(t, level == 0 ? 1 : size - parStack[level - 1], type);
   }
 

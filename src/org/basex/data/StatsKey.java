@@ -12,9 +12,9 @@ import org.basex.util.Token;
  */
 public final class StatsKey {
   /** Maximum number of categories. */
-  private static final int MAXCATS = 50;
+  private static final int MAXCATS = 100;
   /** Maximum length of category entries. */
-  private static final int MAXCATLEN = 50;
+  private static final int MAXCATLEN = 100;
   /** Tag/Attribute flag. */
   public enum Kind {
     /** Text.     */ TEXT,
