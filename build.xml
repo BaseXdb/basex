@@ -9,6 +9,9 @@
   <target name="build_init">
     <tstamp/>
     <mkdir dir="${build}"/>
+    <copy todir="${build}/org/basex/lang">
+      <fileset dir="${src}/org/basex/lang"/>
+    </copy>
   </target>
 
   <!-- ===================================================================== -->
