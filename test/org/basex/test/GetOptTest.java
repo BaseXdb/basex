@@ -419,8 +419,6 @@ public class GetOptTest {
           assertEquals("Argument of " + command, "Test", g.getOptarg());
         } else {
           if(ch == 'h') {
-            System.out.println((char) ch + " " + g.getOptarg());
-            
             assertEquals("Argument of " + command, ":", g.getOptarg());
           } else {
             assertEquals("Argument of " + command, null, g.getOptarg());
@@ -459,8 +457,7 @@ public class GetOptTest {
         if(ch == 'i') {
           assertEquals("Argument of " + command, "Test", g.getOptarg());
         } else {
-          if(ch == 'R') {
-            System.out.println((char) ch + " " + g.getOptarg());            
+          if(ch == 'R') {   
 //            assertEquals("Argument of " + command, ":", g.getOptarg());
           } else {
             assertEquals("Argument of " + command, null, g.getOptarg());
