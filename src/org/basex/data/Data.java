@@ -326,12 +326,12 @@ public abstract class Data  {
   public abstract int nrFTIDs(byte[] token);
 
   /**
-   * Returns the decompressed ids for the specified range expression.
+   * Returns the ids for the specified range expression.
    * Each token between tok0 and tok1 is returned as result.
    * @param tok0 start token defining the range
-   * @param itok0 token included in rangebounderies
+   * @param itok0 token included in range boundaries
    * @param tok1 end token defining the range
-   * @param itok1 token included in rangebounderies
+   * @param itok1 token included in range boundaries
    * @return ids
    */
   public abstract int[][] ftIDRange(final byte[] tok0, final boolean itok0, 

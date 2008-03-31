@@ -46,6 +46,7 @@ public final class XPathTest {
     Prop.read();
     Prop.textindex = true;
     Prop.attrindex = true;
+    Prop.ftindex = true;
     Prop.chop = true;
 
     System.out.println("******** RUN TESTS ********\n");

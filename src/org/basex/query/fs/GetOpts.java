@@ -1,23 +1,16 @@
 package org.basex.query.fs;
 
-import static org.basex.Text.NL;
-
 import java.io.IOException;
 
-import org.basex.io.PrintOutput;
-
-/**************************************************************************
- * This class splits the input String into its arguments und checks if 
- * there is a pathexpression.
+/**
+ * This class splits the input String into its arguments and checks if 
+ * there is a path expression.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Hannes Schwarz - Hannes.Schwarz@gmail.com
  * @version 0.1
-/**************************************************************************/
+ */
 public class GetOpts {
-
-  /** Outputstream. */
-  private final PrintOutput out;
 
   /** Argument of an option is stored here. */
   private String optarg;
@@ -37,9 +30,6 @@ public class GetOpts {
   /** Arguments passed to the program. */ 
   private String[] args;
 
-  /** The name of the program. Is used in error messages.*/
-  private String progname;
-
   /** The variable optopt saves the last known option 
    * character returned by getopt(). */
   private int optopt = 0;
@@ -56,16 +46,11 @@ public class GetOpts {
    *             
    * @param options A String containing a description of the 
    *                  valid options
-   * @param output - the PrintOutputStream                   
    */
-  public GetOpts(final String arguments, 
-      final String options, final PrintOutput output) {
-
+  public GetOpts(final String arguments, final String options) {
     this.args = arguments.split(" ");
-    this.progname = this.args[0];
     this.optString = options;    
     this.optindex = 1;
-    this.out = output;
     this.optarg = null;
     this.path = null;
     this.multipleOptIndex = 1;
@@ -186,7 +171,7 @@ public class GetOpts {
       // path or nonvalid option
       path = args[optindex];
       if(optindex + 1 == args.length) { 
-        // all optiones parsed
+        // all options parsed
         return -1;
       } else {        
         // return next option

@@ -1,13 +1,9 @@
 package org.basex.test;
 
 import java.io.IOException;
-
-import org.basex.io.PrintOutput;
 import org.basex.query.fs.GetOpts;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import junit.framework.JUnit4TestAdapter;
-
 
 /**
  * GetOpt Test class.
@@ -16,9 +12,6 @@ import junit.framework.JUnit4TestAdapter;
  * @author Hannes Schwarz
  */
 public class GetOptTest {
-
-  /** OutputStream.*/
-  private PrintOutput out;
   /** OutputStream.*/
   private String returnedPath;
   /** OutputStream.*/
@@ -49,7 +42,7 @@ public class GetOptTest {
      *   aflag = 0, bflag = 0, cvalue = (null)
      *   Non-option argument arg1
      */
-    GetOpts g = new GetOpts("testopt", "ahR", out);
+    GetOpts g = new GetOpts("testopt", "ahR");
     assertEquals("No Options entered - return -1", -1, g.getopt());
     assertEquals("Path of fs testopt", null, g.getPath());
     /*
@@ -57,7 +50,7 @@ public class GetOptTest {
      *   aflag = 0, bflag = 0, cvalue = (null)
      *   Non-option argument /music/IckeUndEr
      */
-    g = new GetOpts("testopt /music/IckeUndEr", "ahR", out);
+    g = new GetOpts("testopt /music/IckeUndEr", "ahR");
     assertEquals("No Options entered - return -1", -1, g.getopt());
     assertEquals("Path of fs testopt /music/IckeUndEr", 
         "/music/IckeUndEr", g.getPath());
@@ -204,7 +197,7 @@ public class GetOptTest {
     String command = "testopt -d ickeUndEr -a";
     int[] enteredOptions =  {'d' , 'a'};    
     String args = "ahRbd:li";
-    GetOpts g = new GetOpts(command, args, out);
+    GetOpts g = new GetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
@@ -235,7 +228,7 @@ public class GetOptTest {
     String command = "testopt -dickeUndEr -R";
     int[] enteredOptions =  {'d', 'R'};    
     String args = "ahRbd:li";
-    GetOpts g = new GetOpts(command, args, out);
+    GetOpts g = new GetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
@@ -268,7 +261,7 @@ public class GetOptTest {
     String command = "testopt -d ickeUndEr -X";
     int[] enteredOptions =  {'d', '?'};    
     String args = "ahRbd:li";
-    GetOpts g = new GetOpts(command, args, out);
+    GetOpts g = new GetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
@@ -300,7 +293,7 @@ public class GetOptTest {
     String command = "test -d icke -u";
     int[] enteredOptions =  {'d', 'u'};   
     String args = "ahRbd:lu";
-    GetOpts g = new GetOpts(command, args, out);
+    GetOpts g = new GetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
@@ -334,7 +327,7 @@ public class GetOptTest {
     String command = "testopt -d ickeUndEr -iTest";
     int[] enteredOptions =  {'d', 'i'}; 
     String args = "ahRbd:li:";
-    GetOpts g = new GetOpts(command, args, out);
+    GetOpts g = new GetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
@@ -370,7 +363,7 @@ public class GetOptTest {
     String command = "testopt -d ickeUndEr -R -iTest -h";
     int[] enteredOptions =  {'d', 'R', 'i', 'h'}; 
     String args = "ahRbd:li:";
-    GetOpts g = new GetOpts(command, args, out);
+    GetOpts g = new GetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
@@ -405,7 +398,7 @@ public class GetOptTest {
     String command = "testopt -d ickeUndEr -R -iTest -h";
     int[] enteredOptions =  {'d', 'R', 'i', 'h'}; 
     String args = "ah:Rbd:li:";
-    GetOpts g = new GetOpts(command, args, out);
+    GetOpts g = new GetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
@@ -444,7 +437,7 @@ public class GetOptTest {
     String command = "testopt -d ickeUndEr -R -iTest -h";
     int[] enteredOptions =  {'d', 'R', 'h'}; 
     String args = "ahR:bd:li:";
-    GetOpts g = new GetOpts(command, args, out);
+    GetOpts g = new GetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
@@ -483,7 +476,7 @@ public class GetOptTest {
     String command = "testopt -d ickeUndEr -R -iTest /Itunes/music/";
     int[] enteredOptions =  {'d', 'R', 'i'};    
     String args = "ahRbd:li:";
-    GetOpts g = new GetOpts(command, args, out);
+    GetOpts g = new GetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
@@ -519,7 +512,7 @@ public class GetOptTest {
     String command = "testopt /Itunes/music/ -d ickeUndEr -R -iTest ";
     int[] enteredOptions =  {'d', 'R', 'i'};    
     String args = "ahRbd:li:";
-    GetOpts g = new GetOpts(command, args, out);
+    GetOpts g = new GetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
@@ -556,7 +549,7 @@ public class GetOptTest {
     String command = "testopt -d ickeUndEr /Itunes/music/ -R -iTest -X";
     int[] enteredOptions =  {'d', 'R', 'i', '?'}; 
     String args = "ahRbd:li:";
-    GetOpts g = new GetOpts(command, args, out);
+    GetOpts g = new GetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
@@ -593,7 +586,7 @@ public class GetOptTest {
 
     int[] getOptResult = new int[length]; 
     int index;
-    GetOpts g = new GetOpts(command, args, out);
+    GetOpts g = new GetOpts(command, args);
     int ch = g.getopt();
     index = 0;
     while (ch != -1) {      

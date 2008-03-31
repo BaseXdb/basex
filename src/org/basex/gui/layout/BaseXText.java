@@ -1,5 +1,6 @@
 package org.basex.gui.layout;
 
+import static org.basex.Text.*;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.Toolkit;
@@ -13,10 +14,12 @@ import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import javax.swing.AbstractButton;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 import org.basex.BaseX;
+import org.basex.gui.GUICommand;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIConstants.FILL;
 import org.basex.gui.dialog.Dialog;
@@ -44,7 +47,9 @@ public final class BaseXText extends BaseXPanel {
   protected final BaseXBar scroll;
   /** Editable flag. */
   protected final boolean editable;
-
+  /** Popup Menu. */
+  BaseXPopup popup;
+  
   /**
    * Default constructor.
    * @param help help text
@@ -109,6 +114,12 @@ public final class BaseXText extends BaseXPanel {
     } else {
       setMode(FILL.NONE);
     }
+    
+    final GUICommand[] pop = edit ?
+        new GUICommand[] { new UndoCmd(), new RedoCmd(), null, new CutCmd(),
+        new CopyCmd(), new PasteCmd(), new DelCmd(), null, new AllCmd() } :
+      new GUICommand[] { new CopyCmd(), null, new AllCmd() };
+    popup = new BaseXPopup(this, pop);
   }
 
   /**
@@ -223,9 +234,9 @@ public final class BaseXText extends BaseXPanel {
     requestFocusInWindow();
     cursor();
 
+    // <CG> right click: context menu
     if(!SwingUtilities.isLeftMouseButton(e)) return;
 
-    // <CG> double click...
     int c = e.getClickCount();
     if(c == 1) {
       // selection mode
@@ -240,7 +251,7 @@ public final class BaseXText extends BaseXPanel {
   /**
    * Selects the word at the cursor position.
    */
-  void selectWord() {
+  private void selectWord() {
     text.pos(text.cursor());
     final boolean ch = Character.isLetterOrDigit(text.prev(true));
     while(text.pos() > 0) {
@@ -343,18 +354,13 @@ public final class BaseXText extends BaseXPanel {
       if(text.start() != -1) text.delete();
       text.add(new char[] { e.getKeyChar() });
     } else if(editable && ctrl && c == 'X') {
-      if(copy()) text.delete();
+      cut();
     } else if(editable && ctrl && c == 'V') {
-      if(text.start() != -1) text.delete();
-      text.add(paste().toCharArray());
+      paste();
     } else if(editable && ctrl && c == KeyEvent.VK_Z) {
-      text = new BaseXTextTokens(undo.prev());
-      rend.setText(text);
-      text.pos(undo.cursor());
+      undo();
     } else if(editable && ctrl && c == KeyEvent.VK_Y) {
-      text = new BaseXTextTokens(undo.next());
-      rend.setText(text);
-      text.pos(undo.cursor());
+      redo();
     } else {
       if(shf && text.start() == -1) text.startMark();
   
@@ -424,10 +430,9 @@ public final class BaseXText extends BaseXPanel {
     // updates the visible area
     final int p = scroll.pos();
     final int y = rend.cursorY();
-    final int m = y + rend.fontH() + 8 - getHeight();
-    final int c = y - getHeight() / 2;
-    if(y < p || m > p) {
-      scroll.pos(align == 0 ? y : align == 1 ? c : m);
+    final int m = y + rend.fontH() * 3 - getHeight();
+    if(p < m || p > y) {
+      scroll.pos(align == 0 ? y : align == 1 ? y - getHeight() / 2 : m);
       rend.repaint();
     }
   }
@@ -485,10 +490,39 @@ public final class BaseXText extends BaseXPanel {
   }
 
   /**
+   * Undoes the text.
+   */
+  protected void undo() {
+    text = new BaseXTextTokens(undo.prev());
+    rend.setText(text);
+    text.pos(undo.cursor());
+  }
+
+  /**
+   * Redoes the text.
+   */
+  protected void redo() {
+    text = new BaseXTextTokens(undo.next());
+    rend.setText(text);
+    text.pos(undo.cursor());
+  }
+
+  /**
+   * Cuts the selected text to the clipboard.
+   */
+  protected void cut() {
+    text.pos(text.cursor());
+    if(copy()) {
+      text.delete();
+      if(undo != null) undo.store(text.finish(), text.cursor());
+    }
+  }
+
+  /**
    * Copies the selected text to the clipboard.
    * @return true if text was copied
    */
-  private boolean copy() {
+  protected boolean copy() {
     final String txt = text.copy();
     if(txt.length() == 0) {
       text.noMark();
@@ -502,10 +536,23 @@ public final class BaseXText extends BaseXPanel {
   }
 
   /**
+   * Pastes the clipboard text.
+   */
+  protected void paste() {
+    // copy selection to clipboard
+    final String txt = clip();
+    if(txt == null) return;
+    text.pos(text.cursor());
+    if(text.start() != -1) text.delete();
+    text.add(txt.toCharArray());
+    if(undo != null) undo.store(text.finish(), text.cursor());
+  }
+
+  /**
    * Returns the clipboard text.
    * @return text
    */
-  private String paste() {
+  public String clip() {
     // copy selection to clipboard
     final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
     final Transferable t = clip.getContents(null);
@@ -516,10 +563,10 @@ public final class BaseXText extends BaseXPanel {
     } catch(final Exception ex) {
       BaseX.debug(ex);
     }
-    return "";
+    return null;
   }
 
-  /** Calculation counter. */
+  /** Cursor action. */
   protected Action cursor = new Action() {
     @Override
     public void action() {
@@ -561,4 +608,126 @@ public final class BaseXText extends BaseXPanel {
       rend.repaint();
     }
   };
+  
+  /** Text Command. */
+  class TextCmd implements GUICommand {
+    public void execute() { cut(); }
+    public void refresh(final AbstractButton button) { }
+    public boolean checked() { return false; }
+    public String desc() { return null; }
+    public String help() { return null; }
+    public String key() { return null; }
+  }
+  
+  /** Undo Command. */
+  class UndoCmd extends TextCmd {
+    @Override
+    public void execute() {
+      undo();
+    }
+    @Override
+    public void refresh(final AbstractButton button) {
+      button.setEnabled(!undo.first());
+    }
+    @Override
+    public String desc() {
+      return GUIUNDO;
+    }
+  }
+  
+  /** Redo Command. */
+  class RedoCmd extends TextCmd {
+    @Override
+    public void execute() {
+      redo();
+    }
+    @Override
+    public void refresh(final AbstractButton button) {
+      button.setEnabled(!undo.last());
+    }
+    @Override
+    public String desc() {
+      return GUIREDO;
+    }
+  }
+  
+  /** Cut Command. */
+  class CutCmd extends TextCmd {
+    @Override
+    public void execute() {
+      cut();
+    }
+    @Override
+    public void refresh(final AbstractButton button) {
+      button.setEnabled(text.start() != -1);
+    }
+    @Override
+    public String desc() {
+      return GUICUT;
+    }
+  }
+  
+  /** Cut Command. */
+  class CopyCmd extends TextCmd {
+    @Override
+    public void execute() {
+      copy();
+    }
+    @Override
+    public void refresh(final AbstractButton button) {
+      button.setEnabled(text.start() != -1);
+    }
+    @Override
+    public String desc() {
+      return GUICOPY;
+    }
+  }
+  
+  /** Paste Command. */
+  class PasteCmd extends TextCmd {
+    @Override
+    public void execute() {
+      paste();
+    }
+    @Override
+    public void refresh(final AbstractButton button) {
+      button.setEnabled(clip() != null);
+    }
+    @Override
+    public String desc() {
+      return GUIPASTE;
+    }
+  }
+  
+  /** Delete Command. */
+  class DelCmd extends TextCmd {
+    @Override
+    public void execute() {
+      text.delete();
+    }
+    @Override
+    public void refresh(final AbstractButton button) {
+      button.setEnabled(text.start() != -1);
+    }
+    @Override
+    public String desc() {
+      return GUIDEL;
+    }
+  }
+  
+  /** Select all Command. */
+  class AllCmd extends TextCmd {
+    @Override
+    public void execute() {
+      selectAll();
+    }
+    @Override
+    public void refresh(final AbstractButton button) {
+      button.setEnabled(true);
+    }
+    @Override
+    public String desc() {
+      return GUISELECT;
+    }
+  }
 }

@@ -43,9 +43,9 @@ public final class SAXWrapper extends Parser implements ContentHandler,
   public void parse(final Builder build) throws IOException {
     builder = build;
     try {
-      final SAXParserFactory factory = SAXParserFactory.newInstance();
-      //factory.setValidating(true);
-      final XMLReader r = factory.newSAXParser().getXMLReader();
+      final SAXParserFactory f = SAXParserFactory.newInstance();
+      f.setValidating(true);
+      final XMLReader r = f.newSAXParser().getXMLReader();
       r.setContentHandler(this);
       r.setProperty("http://xml.org/sax/properties/lexical-handler", this);
       r.setErrorHandler(this);

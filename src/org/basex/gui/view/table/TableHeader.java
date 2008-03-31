@@ -281,7 +281,7 @@ public final class TableHeader extends BaseXPanel {
   
   @Override
   public void keyPressed(final KeyEvent e) {
-    GUI.get().browse(e);
+    GUI.get().addKeys(e);
     shift = e.isShiftDown();
     ctrl = e.isControlDown();
     alt = e.isAltDown();

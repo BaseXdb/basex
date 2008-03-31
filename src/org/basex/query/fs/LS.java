@@ -1,19 +1,18 @@
 package org.basex.query.fs;
 
 import static org.basex.Text.NL;
-
 import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.io.PrintOutput;
 import org.basex.util.Token;
 import org.basex.query.fs.Exception.PathNotFoundException;
+
 /**
  * Performs a ls command.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Hannes Schwarz - Hannes.Schwarz@gmail.com
- *
  */
 public class LS {
 
@@ -56,7 +55,7 @@ public class LS {
   public void lsMain(final String cmd) 
   throws IOException {
 
-    GetOpts g = new GetOpts(cmd, "ahR", out);
+    GetOpts g = new GetOpts(cmd, "ahR");
     // get all Options
     int ch = g.getopt();
     while (ch != -1) {

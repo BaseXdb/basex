@@ -1,10 +1,5 @@
 package org.basex.test;
 
-import org.basex.query.xpath.values.Bool;
-import org.basex.query.xpath.values.Literal;
-import org.basex.query.xpath.values.Num;
-import org.basex.util.Token;
-
 /**
  * XPathMark Simple Tests.
  *
@@ -40,17 +35,17 @@ public class XPathSimpleTest extends AbstractTest {
       "</html>";
 
     queries = new Object[][] {
-      { "Boolean 1", "false()", Bool.FALSE },
-      { "Boolean 2", "true()", Bool.TRUE },
-      { "Int 1", "1", new Num(1) },
-      { "Int 2", "1.0", new Num(1) },
-      { "Int 3", "-1.0", new Num(-1) },
-      { "Int 4", "1234567890", new Num(1234567890) },
-      { "Double 1", "1.1", new Num(1.1) },
-      { "Double 2", "-1.1", new Num(-1.1) },
-      { "Double 3", "1234567890.12", new Num(1234567890.12) },
-      { "String 1", "\"string\"", new Literal(Token.token("string")) },
-      { "String 2", "\"\"", new Literal(Token.token("")) },
+      { "Boolean 1", "false()", bool(false) },
+      { "Boolean 2", "true()", bool(true) },
+      { "Int 1", "1", num(1) },
+      { "Int 2", "1.0", num(1) },
+      { "Int 3", "-1.0", num(-1) },
+      { "Int 4", "1234567890", num(1234567890) },
+      { "Double 1", "1.1", num(1.1) },
+      { "Double 2", "-1.1", num(-1.1) },
+      { "Double 3", "1234567890.12", num(1234567890.12) },
+      { "String 1", "\"string\"", string("string") },
+      { "String 2", "\"\"", string("") },
       { "Root 1", "/", nodes(0) },
       { "Root 2", "/.", nodes(0) },
       { "Root 3", "/..", nodes() },
@@ -105,6 +100,11 @@ public class XPathSimpleTest extends AbstractTest {
       { "Func 2 Error", "count(1, 1)" },
       { "Func 3 Error", "contains(.)" },
       { "Func 3 Error", "contains(. .)" },
+      
+      // Full-Text queries
+      { "Fulltext 1", "'abc' ftcontains 'abc'", bool(true) },
+      { "Fulltext 2", "//li[text() ftcontains 'Exercise']", nodes(20, 22) },
+      { "Fulltext 3", "//li[text() ftcontains '1']", nodes(20) },
     };
 
     /** TABLE REPRESENTATION

@@ -14,7 +14,6 @@ import java.util.regex.Pattern;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import org.basex.core.Commands;
-import org.basex.data.Nodes;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
@@ -23,7 +22,8 @@ import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.view.View;
+import org.basex.query.QueryException;
+import org.basex.query.xquery.XQueryProcessor;
 import org.basex.util.Action;
 import org.basex.util.Token;
 
@@ -43,8 +43,8 @@ public final class QueryArea extends QueryPanel {
   QueryView main;
   /** Text Area. */
   BaseXText area;
-  /** Filter/Execute Button. */
-  BaseXButton filter;
+  /** Execute Button. */
+  BaseXButton exec;
   /** Scroll Pane. */
   BaseXBack south;
 
@@ -59,7 +59,22 @@ public final class QueryArea extends QueryPanel {
     area.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
-        query(false);
+        String xq = Token.string(area.getText());
+        if(!xq.equals(last)) {
+          last = xq;
+          if(xq.length() == 0) xq = ".";
+          if(GUIProp.execrt) {
+            GUI.get().execute(Commands.XQUERY, xq);
+          } else {
+            final XQueryProcessor proc = new XQueryProcessor(xq);
+            try {
+              proc.parse();
+              info("", true);
+            } catch(QueryException ex) {
+              info(ex.getMessage(), false);
+            }
+          }
+        }
       }
     });
     south = new BaseXBack(GUIConstants.FILL.NONE);
@@ -101,49 +116,34 @@ public final class QueryArea extends QueryPanel {
     BaseXLayout.enable(info, false);
     south.add(info, BorderLayout.CENTER);
 
-    filter = new BaseXButton(BUTTONFILTER, HELPFILTER, null);
-    filter.addKeyListener(main);
-    filter.addActionListener(new ActionListener() {
+    exec = new BaseXButton(BUTTONEXEC, HELPEXEC, null);
+    exec.addKeyListener(main);
+    exec.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        View.notifyContext(GUI.context.marked(), false);
+        query(true);
       }
     });
-    box.add(filter);
+    box.add(exec);
     
     south.add(box, BorderLayout.EAST);
   }
 
   @Override
   void refresh() {
-    final Nodes nodes = GUI.context.marked();
-    final boolean marked = nodes != null && nodes.size != 0;
-    BaseXLayout.enable(filter, !GUIProp.filterrt && marked);
+    BaseXLayout.enable(exec, !GUIProp.execrt);
   }
 
   @Override
   void query(final boolean force) {
-    final String text = Token.string(area.getText());
-    if(force || !text.equals(last)) {
-      last = text;
-      GUI.get().execute(Commands.XQUERY,
-          text.trim().length() == 0 ? "." : text);
-    }
-  }
-
-  /**
-   * Sets a new XQuery request.
-   * @param xq XQuery
-   */
-  public void setXQuery(final String xq) {
-    if(!xq.equals(last)) {
+    final String xq = Token.string(area.getText());
+    if(force || !xq.equals(last)) {
       last = xq;
-      GUI.get().execute(Commands.XQUERY, xq.trim().length() == 0 ? "." : xq);
+      GUI.get().execute(Commands.XQUERY, xq);
     }
   }
 
   @Override
-  void quit() {
-  }
+  void quit() { }
 
   @Override
   void info(final String inf, final boolean ok) {
@@ -161,6 +161,7 @@ public final class QueryArea extends QueryPanel {
         el = Integer.parseInt(m.group(1));
         ec = Integer.parseInt(m.group(2));
       }
+
       int l = 1;
       int c = 1;
       final int ll = last.length();
@@ -175,7 +176,7 @@ public final class QueryArea extends QueryPanel {
         }
       }
     }
-    
+
     area.error(-1);
     info.setName(Integer.toString(err));
     error.sleep(500);

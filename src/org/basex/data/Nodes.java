@@ -63,6 +63,20 @@ public final class Nodes implements Result {
   }
 
   /**
+   * Compares the node set with the specified node set.
+   * @param n node set
+   * @return result of check
+   */
+  public boolean sameAs(final Nodes n) {
+    if(data != n.data) return false;
+    if(size != n.size) return false;
+    for(int s = 0; s < size; s++) {
+      if(pre[s] != n.pre[s]) return false;
+    }
+    return true;
+  }
+
+  /**
    * The specified pre value is added to or removed from the context set.
    * @param p pre value
    * @return self reference

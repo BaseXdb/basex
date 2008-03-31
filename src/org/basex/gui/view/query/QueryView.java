@@ -10,13 +10,11 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.border.EmptyBorder;
 import org.basex.gui.GUI;
-import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants.FILL;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
-import org.basex.gui.layout.BaseXCheckBox;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.View;
@@ -40,8 +38,6 @@ public final class QueryView extends View {
 
   /** Input mode buttons. */
   private final BaseXButton[] input = new BaseXButton[NPANELS];
-  /** Filter checkbox. */
-  private BaseXCheckBox filterbox;
   /** Query panel. */
   private QueryPanel search;
   /** Header string. */
@@ -66,11 +62,11 @@ public final class QueryView extends View {
     Box box = new Box(BoxLayout.X_AXIS);
     box.setBorder(new EmptyBorder(0, 0, 8, 0));
     for(int i = 0; i < NPANELS; i++) {
+      final int m = i;
       input[i] = new BaseXButton(SEARCHMODE[i], HELPSEARCH[i]);
-      input[i].setActionCommand(Integer.toString(i));
       input[i].addActionListener(new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
-          mode = Integer.parseInt(e.getActionCommand());
+          mode = m;
           refreshLayout();
         }
       });
@@ -84,14 +80,6 @@ public final class QueryView extends View {
     }
     box.add(Box.createHorizontalStrut(6));
 
-    filterbox = new BaseXCheckBox(CMDFILTERRT, HELPFILTERRT, GUIProp.filterrt);
-    filterbox.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent e) {
-        GUICommands.RTFILTER.execute();
-      }
-    });
-    filterbox.setToolTipText(Token.string(HELPFILTERRT));
-    box.add(filterbox);
     back.add(box, BorderLayout.CENTER);
 
     refresh();
@@ -129,9 +117,8 @@ public final class QueryView extends View {
     add(back, BorderLayout.NORTH);
     search = panels[mode];
     search.init();
+    search.refresh();
     search.query(GUIProp.showquery);
-    filterbox.setSelected(GUIProp.filterrt);
-    filterbox.setEnabled(mode == SIMPLE);
     revalidate();
     repaint();
   }
@@ -148,7 +135,6 @@ public final class QueryView extends View {
    */
   void refresh() {
     BaseXLayout.select(input[mode], true);
-    BaseXLayout.select(filterbox, GUIProp.filterrt);
     header.setFont(GUIConstants.lfont);
     header.setForeground(COLORS[16]);
   }

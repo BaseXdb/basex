@@ -20,9 +20,9 @@ import static org.basex.gui.GUIConstants.*;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class GUIMenu extends JMenuBar implements ActionListener {
+public final class GUIMenu extends JMenuBar {
   /** Referenced menu items. */
-  private final JComponent[] menuItems;
+  private final JMenuItem[] items;
 
   /**
    * Initializes the menu bar.
@@ -32,7 +32,7 @@ public final class GUIMenu extends JMenuBar implements ActionListener {
     int c = 0;
     for(int i = 0; i < MENUBAR.length; i++)
       for(int j = 0; j < MENUITEMS[i].length; j++) c++;
-    menuItems = new JComponent[c];
+    items = new JMenuItem[c];
 
     c = 0;
     // loop through all menu entries
@@ -55,19 +55,22 @@ public final class GUIMenu extends JMenuBar implements ActionListener {
             comp.setFont(getFont());
             comp.setBorder(new EmptyBorder(2, 5, 2, 0));
           } else {
-            final GUICommands cmd = (GUICommands) subEntry;
+            final GUICommand cmd = (GUICommand) subEntry;
             final JMenuItem item = cmd.checked() ?
-                new JCheckBoxMenuItem(cmd.entry) : new JMenuItem(cmd.entry);
-            item.addActionListener(this);
-            item.setMnemonic(cmd.entry.charAt(0));
-            item.setActionCommand(cmd.toString());
-            item.setToolTipText(cmd.help);
+                new JCheckBoxMenuItem(cmd.desc()) : new JMenuItem(cmd.desc());
+            item.addActionListener(new ActionListener() {
+              public void actionPerformed(final ActionEvent e) {
+                cmd.execute();
+              }
+            });
+            item.setMnemonic(cmd.desc().charAt(0));
+            item.setToolTipText(cmd.help());
 
-            if(cmd.key != null) item.setAccelerator(
-                KeyStroke.getKeyStroke(cmd.key));
+            if(cmd.key() != null) item.setAccelerator(
+                KeyStroke.getKeyStroke(cmd.key()));
             comp = item;
+            items[c++] = item;
           }
-          menuItems[c++] = comp;
           menu.add(comp);
         }
       }
@@ -79,20 +82,13 @@ public final class GUIMenu extends JMenuBar implements ActionListener {
    * Refreshes the menu items.
    */
   public void refresh() {
-    final boolean db = GUI.context.db();
-    for(final JComponent comp : menuItems) {
-      if(comp instanceof JMenuItem) {
-        final JMenuItem item = (JMenuItem) comp;
-        GUICommands.get(item.getActionCommand()).refresh(item, db);
+    int c = 0;
+    for(int i = 0; i < MENUBAR.length; i++) {
+      for(int j = 0; j < MENUITEMS[i].length; j++) {
+        final Object item = MENUITEMS[i][j];
+        if(!(item instanceof GUICommand)) continue;
+        ((GUICommand) item).refresh(items[c++]);
       }
     }
-  }
-
-  /**
-   * Reacts on a menu choice.
-   * @param e action event
-   */
-  public void actionPerformed(final ActionEvent e) {
-    GUICommands.get(e.getActionCommand()).execute();
   }
 }

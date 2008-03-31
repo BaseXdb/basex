@@ -59,6 +59,7 @@ public final class Range extends ArrayExpr {
     } else {
       return null;
     }
+
     /*
     final Item v = ctx.eval(exprs[0]);
     if(v.size() == 0) return Bool.FALSE;
@@ -77,6 +78,7 @@ public final class Range extends ArrayExpr {
     final double d = v.num();
     return Bool.get(d >= min && d <= max);*/
   }
+
   /*
   @Override
   public String toString() {
@@ -86,18 +88,10 @@ public final class Range extends ArrayExpr {
 
   @Override
   public Expr indexEquivalent(final XPContext ctx, final Step curr) {
-    LocPath path = (LocPath) ((Comparison) exprs[0]).expr1;
-    final Comparison r1 = (Comparison) exprs[0];
-    final LocPath p1 = (LocPath) r1.expr1;
-    System.out.println(p1);
-    System.out.println(new Path(this, path.invertPath(curr)));
-    //LocPath path = (LocPath) expr;
-    
-    return new Path(this, 
-        path.invertPath(curr));
+    final LocPath path = (LocPath) ((Comparison) exprs[0]).expr1;
+    return new Path(this, path.invertPath(curr));
   }
 
-  
   @Override
   public int indexSizes(final XPContext ctx, final Step curr, final int mini) {
     return 1;

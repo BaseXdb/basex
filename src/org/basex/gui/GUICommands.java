@@ -1,7 +1,6 @@
 package org.basex.gui;
 
 import static org.basex.Text.*;
-
 import java.awt.BorderLayout;
 import java.io.IOException;
 import javax.swing.AbstractButton;
@@ -43,7 +42,7 @@ import org.basex.util.Performance;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public enum GUICommands {
+public enum GUICommands implements GUICommand {
 
   /* FILE MENU */
 
@@ -208,7 +207,7 @@ public enum GUICommands {
     }
 
     @Override
-    public void refresh(final AbstractButton button, final boolean sel) {
+    public void refresh(final AbstractButton button) {
       // disallow copy of empty node set or root node
       final Nodes nodes = GUI.context.marked();
       BaseXLayout.enable(button, !Prop.mainmem && nodes != null &&
@@ -224,7 +223,7 @@ public enum GUICommands {
     }
 
     @Override
-    public void refresh(final AbstractButton button, final boolean sel) {
+    public void refresh(final AbstractButton button) {
       final Context context = GUI.context;
       // disallow copy of empty node set or root node
       final Nodes nodes = context.marked();
@@ -253,7 +252,7 @@ public enum GUICommands {
     }
 
     @Override
-    public void refresh(final AbstractButton button, final boolean sel) {
+    public void refresh(final AbstractButton button) {
       // disallow deletion of empty node set or root node
       final Context context = GUI.context;
       final Nodes nodes = context.marked();
@@ -272,7 +271,7 @@ public enum GUICommands {
     }
 
     @Override
-    public void refresh(final AbstractButton button, final boolean sel) {
+    public void refresh(final AbstractButton button) {
       final Context context = GUI.context;
       final Nodes nodes = context.marked();
       final Data d = context.data();
@@ -293,7 +292,7 @@ public enum GUICommands {
     }
 
     @Override
-    public void refresh(final AbstractButton button, final boolean sel) {
+    public void refresh(final AbstractButton button) {
       final Context context = GUI.context;
       final Nodes nodes = context.marked();
       BaseXLayout.enable(button, !Prop.mainmem && nodes != null &&
@@ -309,9 +308,8 @@ public enum GUICommands {
     }
 
     @Override
-    public void refresh(final AbstractButton button, final boolean sel) {
-      final Nodes curr = GUI.context.current();
-      BaseXLayout.enable(button, curr != null);
+    public void refresh(final AbstractButton button) {
+      BaseXLayout.enable(button, GUI.context.current() != null);
     }
   },
 
@@ -330,8 +328,8 @@ public enum GUICommands {
     }
 
     @Override
-    public void refresh(final AbstractButton button, final boolean sel) {
-      BaseXLayout.enable(button, sel);
+    public void refresh(final AbstractButton button) {
+      BaseXLayout.enable(button, GUI.context.db());
     }
   },
 
@@ -344,8 +342,8 @@ public enum GUICommands {
     }
 
     @Override
-    public void refresh(final AbstractButton button, final boolean sel) {
-      super.refresh(button, sel);
+    public void refresh(final AbstractButton button) {
+      super.refresh(button);
       BaseXLayout.select(button, GUIProp.showquery);
     }
 
@@ -364,8 +362,8 @@ public enum GUICommands {
     }
 
     @Override
-    public void refresh(final AbstractButton button, final boolean sel) {
-      super.refresh(button, sel);
+    public void refresh(final AbstractButton button) {
+      super.refresh(button);
       BaseXLayout.select(button, GUIProp.showinfo);
     }
 
@@ -386,8 +384,8 @@ public enum GUICommands {
     }
 
     @Override
-    public void refresh(final AbstractButton button, final boolean sel) {
-      super.refresh(button, sel);
+    public void refresh(final AbstractButton button) {
+      super.refresh(button);
       BaseXLayout.select(button, GUIProp.showmenu);
     }
 
@@ -406,8 +404,8 @@ public enum GUICommands {
     }
 
     @Override
-    public void refresh(final AbstractButton button, final boolean sel) {
-      super.refresh(button, sel);
+    public void refresh(final AbstractButton button) {
+      super.refresh(button);
       BaseXLayout.select(button, GUIProp.showbuttons);
     }
 
@@ -425,8 +423,8 @@ public enum GUICommands {
     }
 
     @Override
-    public void refresh(final AbstractButton button, final boolean sel) {
-      super.refresh(button, sel);
+    public void refresh(final AbstractButton button) {
+      super.refresh(button);
       BaseXLayout.select(button, GUIProp.showinput);
     }
 
@@ -445,8 +443,8 @@ public enum GUICommands {
     }
 
     @Override
-    public void refresh(final AbstractButton button, final boolean sel) {
-      super.refresh(button, sel);
+    public void refresh(final AbstractButton button) {
+      super.refresh(button);
       BaseXLayout.select(button, GUIProp.showstatus);
     }
 
@@ -464,9 +462,9 @@ public enum GUICommands {
     }
 
     @Override
-    public void refresh(final AbstractButton button, final boolean sel) {
-      super.refresh(button, sel);
-      BaseXLayout.select(button, sel ? GUIProp.showtext :
+    public void refresh(final AbstractButton button) {
+      super.refresh(button);
+      BaseXLayout.select(button, GUI.context.db() ? GUIProp.showtext :
         GUIProp.showstarttext);
     }
 
@@ -484,8 +482,8 @@ public enum GUICommands {
     }
 
     @Override
-    public void refresh(final AbstractButton button, final boolean sel) {
-      super.refresh(button, sel);
+    public void refresh(final AbstractButton button) {
+      super.refresh(button);
       BaseXLayout.select(button, GUIProp.showmap);
     }
 
@@ -502,8 +500,8 @@ public enum GUICommands {
     }
 
     @Override
-    public void refresh(final AbstractButton button, final boolean sel) {
-      super.refresh(button, sel);
+    public void refresh(final AbstractButton button) {
+      super.refresh(button);
       BaseXLayout.select(button, GUIProp.showtree);
     }
 
@@ -520,8 +518,8 @@ public enum GUICommands {
     }
 
     @Override
-    public void refresh(final AbstractButton button, final boolean sel) {
-      super.refresh(button, sel);
+    public void refresh(final AbstractButton button) {
+      super.refresh(button);
       BaseXLayout.select(button, GUIProp.showtable);
     }
 
@@ -537,8 +535,8 @@ public enum GUICommands {
     }
 
     @Override
-    public void refresh(final AbstractButton button, final boolean sel) {
-      super.refresh(button, sel);
+    public void refresh(final AbstractButton button) {
+      super.refresh(button);
       BaseXLayout.select(button, GUIProp.fullscreen);
     }
 
@@ -555,6 +553,27 @@ public enum GUICommands {
       GUIProp.searchmode = ++GUIProp.searchmode % 3;
       GUI.get().refreshControls();
     }
+  },
+
+  /** Realtime filtering on/off. */
+  RTEXEC(true, GUIRTEXEC, null, GUIRTEXECTT) {
+    @Override
+    public void execute() {
+      final GUI gui = GUI.get();
+
+      GUIProp.execrt ^= true;
+      gui.refreshControls();
+      View.notifyLayout();
+    }
+
+    @Override
+    public void refresh(final AbstractButton button) {
+      super.refresh(button);
+      BaseXLayout.select(button, GUIProp.execrt);
+    }
+
+    @Override
+    public boolean checked() { return true; }
   },
 
   /** Realtime filtering on/off. */
@@ -588,8 +607,8 @@ public enum GUICommands {
     }
 
     @Override
-    public void refresh(final AbstractButton button, final boolean sel) {
-      super.refresh(button, sel);
+    public void refresh(final AbstractButton button) {
+      super.refresh(button);
       BaseXLayout.select(button, GUIProp.filterrt);
     }
 
@@ -641,9 +660,9 @@ public enum GUICommands {
     }
 
     @Override
-    public void refresh(final AbstractButton button, final boolean sel) {
-      super.refresh(button, sel);
-      BaseXLayout.select(button, sel ? GUIProp.showhelp :
+    public void refresh(final AbstractButton button) {
+      super.refresh(button);
+      BaseXLayout.select(button, GUI.context.db() ? GUIProp.showhelp :
         GUIProp.showstarthelp);
     }
 
@@ -700,13 +719,12 @@ public enum GUICommands {
     }
 
     @Override
-    public void refresh(final AbstractButton button, final boolean sel) {
+    public void refresh(final AbstractButton button) {
       final int h = View.hist;
       final boolean enabled = h > 0;
       BaseXLayout.enable(button, enabled);
-      String tt = enabled ? View.QUERYHIST[h - 1] : null;
-      if(enabled && tt.equals("")) tt = GUIGOBACKTT;
-      button.setToolTipText(tt);
+      final String tt = enabled ? View.QUERYHIST[h - 1] : null;
+      button.setToolTipText(enabled && tt.equals("") ? GUIGOBACKTT : tt);
     }
   },
 
@@ -718,13 +736,12 @@ public enum GUICommands {
     }
 
     @Override
-    public void refresh(final AbstractButton button, final boolean sel) {
+    public void refresh(final AbstractButton button) {
       final int h = View.hist;
       final boolean enabled = h < View.maxhist;
       BaseXLayout.enable(button, enabled);
-      String tt = enabled ? View.QUERYHIST[h + 1] : null;
-      if(enabled && tt.equals("")) tt = GUIGOFORWARDTT;
-      button.setToolTipText(tt);
+      final String tt = enabled ? View.QUERYHIST[h + 1] : null;
+      button.setToolTipText(enabled && tt.equals("") ? GUIGOFORWARDTT : tt);
     }
   },
 
@@ -736,13 +753,11 @@ public enum GUICommands {
     }
 
     @Override
-    public void refresh(final AbstractButton button, final boolean sel) {
-      final Context context = GUI.context;
-      final Nodes current = context.current();
+    public void refresh(final AbstractButton button) {
+      final Nodes current = GUI.context.current();
       final boolean enabled = current != null && (current.size != 1 ||
           current.pre[0] != 0);
       BaseXLayout.enable(button, enabled);
-      button.setToolTipText(enabled ? GUIGOUPTT : null);
     }
   },
 
@@ -752,16 +767,24 @@ public enum GUICommands {
     public void execute() {
       GUI.get().execute(Commands.CD, "/");
     }
+
+    @Override
+    public void refresh(final AbstractButton button) {
+      final Nodes current = GUI.context.current();
+      final boolean enabled = current != null && (current.size != 1 ||
+          current.pre[0] != 0);
+      BaseXLayout.enable(button, enabled);
+    }
   };
 
   /** States if the command needs a data reference. */
-  final boolean data;
+  private final boolean data;
   /** Menu entry. */
-  public final String entry;
+  private final String entry;
   /** Key shortcut. */
-  public final String key;
+  private final String key;
   /** Help string. */
-  public final String help;
+  private final String help;
 
   /**
    * Constructor.
@@ -777,39 +800,27 @@ public enum GUICommands {
     help = h;
   }
 
-  /**
-   * Executes the command.
-   */
+  /** {@inheritDoc} */
   public abstract void execute();
 
-  /**
-   * Enables or disables the specified button,
-   * depending on the command properties.
-   * @param button button to be modified
-   * @param sel selection flag
-   */
-  @SuppressWarnings("unused")
-  public void refresh(final AbstractButton button, final boolean sel) {
-    BaseXLayout.enable(button, !data || sel);
+  /** {@inheritDoc} */
+  public void refresh(final AbstractButton button) {
+    BaseXLayout.enable(button, !data || GUI.context.db());
   }
 
-  /**
-   * Returns if this command includes a menu checkbox.
-   * @return result of check
-   */
+  /** {@inheritDoc} */
   public boolean checked() { return false; }
 
-  // =========================================================================
+  /** {@inheritDoc} */
+  public String help() { return help; }
 
-  /**
-   * Return the command for the specified string.
-   * @param cmd command to be checked
-   * @return unique command
-   */
-  public static GUICommands get(final String cmd) {
-    for(final GUICommands c : values()) if(cmd.equals(c.name())) return c;
-    return null;
-  }
+  /** {@inheritDoc} */
+  public String desc() { return entry; }
+
+  /** {@inheritDoc} */
+  public String key() { return key; }
+
+  // =========================================================================
 
   /**
    * Runs a building progress.

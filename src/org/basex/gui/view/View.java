@@ -175,19 +175,10 @@ public abstract class View extends BaseXPanel {
     final Nodes n = new Nodes(context.data());
     final GUI gui = GUI.get();
 
+    // <CG> correct history handling?
     if(!quick) {
       final String input = gui.input.getText();
 
-      // check if current nodeset has already been cached
-      if(NODEHIST[hist] != context.current()) {
-        checkHist();
-        // add new entry
-        QUERYHIST[hist] = "";
-        MARKHIST[hist] = new Nodes(context.data());
-        NODEHIST[++hist] = context.current();
-        maxhist = hist;
-      }
-      
       // add new entry
       checkHist();
       QUERYHIST[hist] = input;
@@ -196,6 +187,16 @@ public abstract class View extends BaseXPanel {
       QUERYHIST[hist] = input;
       MARKHIST[hist] = n;
       maxhist = hist;
+    } else {
+      // check if current nodeset has already been cached
+      if(!NODEHIST[hist].sameAs(context.current())) {
+        checkHist();
+        // add new entry
+        QUERYHIST[hist] = "";
+        MARKHIST[hist] = new Nodes(context.data());
+        NODEHIST[++hist] = context.current();
+        maxhist = hist;
+      }
     }
     ViewData.init(nodes, n);
     
@@ -248,10 +249,10 @@ public abstract class View extends BaseXPanel {
 
   /**
    * Refreshes the popup instances.
-   */
   public static void refreshPopup() {
     for(final View v : view) if(v.popup != null) v.popup.refresh();
   }
+   */
 
   /**
    * Called when the data reference has changed.

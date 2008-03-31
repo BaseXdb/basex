@@ -62,7 +62,9 @@ final class QuerySimple extends QueryPanel implements ActionListener {
   BaseXCombo all;
   /** Filter button. */
   BaseXButton filter;
-  /** XPath button. */
+  /** Execute button. */
+  BaseXButton exec;
+  /** Copy to XQuery button. */
   BaseXButton copy;
   /** Query keys. */
   String[] keys;
@@ -81,7 +83,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     all.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {
-        query(false);
+        if(GUIProp.execrt) query(false);
       }
     });
 
@@ -106,7 +108,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     });
     BaseXLayout.enable(copy, false);
     box.add(copy);
-    box.add(Box.createHorizontalStrut(8));
+    box.add(Box.createHorizontalStrut(4));
 
     filter = new BaseXButton(BUTTONFILTER, HELPFILTER);
     filter.addKeyListener(main);
@@ -115,12 +117,19 @@ final class QuerySimple extends QueryPanel implements ActionListener {
         View.notifyContext(GUI.context.marked(), false);
       }
     });
-
-    BaseXLayout.enable(filter, !GUIProp.filterrt);
     box.add(filter);
+    box.add(Box.createHorizontalStrut(4));
+
+    exec = new BaseXButton(BUTTONEXEC, HELPEXEC, null);
+    exec.addKeyListener(main);
+    exec.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent e) {
+        query(true);
+      }
+    });
+    box.add(exec);
 
     p.add(box, BorderLayout.EAST);
-
     cont.add(p, BorderLayout.SOUTH);
   }
 
@@ -147,6 +156,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     final Nodes marked = GUI.context.marked();
     if(marked == null) return;
     BaseXLayout.enable(filter, !GUIProp.filterrt && marked.size != 0);
+    BaseXLayout.enable(exec, !GUIProp.execrt);
 
     all.help = GUI.context.data().deepfs ? HELPSEARCHFS : HELPSEARCHXML;
     if(GUIProp.showquery && panel.getComponentCount() == 0) {
@@ -352,6 +362,12 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     if(simple.length() != 0) {
       simple = Find.find(simple, GUI.context, GUIProp.filterrt);
       qu = qu.length() != 0 ? simple + " | " + qu : simple;
+    }
+
+    if(qu.length() == 0) {
+      final boolean root = GUIProp.filterrt;
+      final Nodes current = GUI.context.current();
+      qu = root || current.size == 1 && current.pre[0] < 1 ? "/" : ".";
     }
 
     if(!force && last.equals(qu)) return;

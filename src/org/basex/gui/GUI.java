@@ -101,6 +101,8 @@ public final class GUI extends JFrame {
 
   /** Button for text input field. */
   protected final BaseXButton mode;
+  /** Execution Button. */
+  protected final BaseXButton exec;
   /** Fullscreen Window. */
   private JFrame fullscr;
 
@@ -167,7 +169,7 @@ public final class GUI extends JFrame {
 
     hits = new BaseXLabel(" ");
     hits.setFont(fnt);
-    //BaseXLayout.setWidth(hits, 100);
+    BaseXLayout.setWidth(hits, 100);
     hits.setHorizontalAlignment(SwingConstants.RIGHT);
     p.add(hits);
     p.add(Box.createHorizontalStrut(4));
@@ -182,7 +184,7 @@ public final class GUI extends JFrame {
     filter.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
-        browse(e);
+        addKeys(e);
       }
     });
     p.add(filter);
@@ -192,18 +194,17 @@ public final class GUI extends JFrame {
 
     nav = new Box(BoxLayout.X_AXIS);
     nav.setBorder(new EmptyBorder(4, 2, 0, 2));
+
     mode = new BaseXButton("", HELPMODE);
     mode.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         if(context.db()) GUICommands.INPUTMODE.execute();
       }
     });
-    mode.setFocusable(false);
-    mode.setRolloverEnabled(false);
     mode.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
-        browse(e);
+        addKeys(e);
       }
     });
     nav.add(mode);
@@ -217,19 +218,8 @@ public final class GUI extends JFrame {
     input.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
-        browse(e);
-        if(e.getKeyCode() != KeyEvent.VK_ENTER) return;
-        
-        final boolean cmd = GUIProp.searchmode == 2 || !context.db();
-        final String in = input.getText();
-        
-        if(cmd || in.startsWith("!")) {
-          // run as command: command mode or exclamation mark as first character
-          final int i = cmd ? 0 : 1;
-          if(in.length() > i) execute(in.substring(i));
-        } else if(e.isControlDown()) {
-          View.notifyContext(context.marked(), false);
-        }
+        addKeys(e);
+        if(e.getKeyCode() == KeyEvent.VK_ENTER) execute();
       }
 
       @Override
@@ -237,18 +227,27 @@ public final class GUI extends JFrame {
         if(e.getKeyChar() == 0xFFFF || e.isControlDown()) return;
 
         // skip commands
-        final String in = input.getText();
-        if(GUIProp.searchmode == 2 || !context.db() || in.startsWith("!"))
-          return;
-        
-        // create and execute XPath query 
-        String qu = GUIProp.searchmode == 1 ? in :
-          Find.find(in, context, GUIProp.filterrt);
-        execute(Commands.XPATH, qu);
+        if(GUIProp.execrt && GUIProp.searchmode != 2 && context.db() &&
+            !input.getText().startsWith("!")) execute();
       }
     });
     nav.add(input);
 
+    exec = new BaseXButton(BUTTONEXEC, null);
+    exec.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent e) {
+        execute();
+      }
+    });
+    exec.addKeyListener(new KeyAdapter() {
+      @Override
+      public void keyPressed(final KeyEvent e) {
+        addKeys(e);
+      }
+    });
+    nav.add(Box.createHorizontalStrut(6));
+    nav.add(exec);
+    
     if(GUIProp.showinput) control.add(nav, BorderLayout.SOUTH);
     top.add(control, BorderLayout.NORTH);
 
@@ -313,7 +312,7 @@ public final class GUI extends JFrame {
    * Browse in views.
    * @param e key event
    */
-  public void browse(final KeyEvent e) {
+  public void addKeys(final KeyEvent e) {
     if(!e.isAltDown() || !context.db()) return;
     final int code = e.getKeyCode();
 
@@ -369,6 +368,25 @@ public final class GUI extends JFrame {
   }
 
   /**
+   * Queries the current input, depending on the current input mode.
+   */
+  protected void execute() {
+    final boolean cmd = GUIProp.searchmode == 2 || !context.db();
+    final String in = input.getText();
+    
+    if(cmd || in.startsWith("!")) {
+      // run as command: command mode or exclamation mark as first character
+      final int i = cmd ? 0 : 1;
+      if(in.length() > i) execute(in.substring(i));
+    //} else if(e.isControlDown()) {
+    //  View.notifyContext(context.marked(), false);
+    } else {
+      execute(Commands.XPATH, GUIProp.searchmode == 1 ? in :
+        Find.find(in, context, GUIProp.filterrt));
+    }
+  }
+  
+  /**
    * Launches the specified command.
    * @param cmd command to be launched
    * @param arg arguments
@@ -416,7 +434,6 @@ public final class GUI extends JFrame {
         }
 
         cursor(CURSORWAIT);
-        //status.setText(STATUSWAIT);
 
         try {
           // parse command string
@@ -619,7 +636,6 @@ public final class GUI extends JFrame {
     BaseXLayout.enable(filter, marked != null && marked.size != 0);
     refreshMode();
     toolbar.refresh();
-    View.refreshPopup();
     menu.refresh();
   }
   
@@ -644,6 +660,8 @@ public final class GUI extends JFrame {
       s == 1 ? HELPXPATH : HELPCMD;
     mode.setFocusable(db);
     mode.setRolloverEnabled(db);
+
+    exec.setEnabled(s == 2 || !GUIProp.execrt);
   }
   
   /**

@@ -153,8 +153,6 @@ public final class Token {
     if(enc == Token.UTF8 || Token.ascii(s)) return s;
     // convert to utf8
     try {
-      System.out.println("[1] " + enc);
-      System.out.println("[2] " + new String(s, enc));
       return new String(s, enc).getBytes(UTF8);
     } catch(final Exception e) {
       e.printStackTrace();

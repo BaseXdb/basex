@@ -436,6 +436,8 @@ public interface Text {
   /** Command Info. */
   String GUICOLORTT = lang("c_colortt");
   /** Command Info. */
+  String GUICUT = lang("c_cut");
+  /** Command Info. */
   String GUICOPY = lang("c_copy");
   /** Command Info. */
   String GUICOPYTT = lang("c_copytt");
@@ -445,6 +447,8 @@ public interface Text {
   String GUICREATETT = lang("c_creatett");
   /** Command Info. */
   String GUIDELETE = lang("c_delete") + DOTS;
+  /** Command Info. */
+  String GUIDEL = lang("c_delete");
   /** Command Info. */
   String GUIDELETETT = lang("c_deletett");
   /** Command Info. */
@@ -520,9 +524,15 @@ public interface Text {
   /** Command Info. */
   String GUIPREFSTT = lang("c_prefstt");
   /** Command Info. */
+  String GUIREDO = lang("c_redo");
+  /** Command Info. */
   String GUIROOT = lang("c_root");
   /** Command Info. */
   String GUIROOTTT = lang("c_roottt");
+  /** Command Info. */
+  String GUIRTEXEC = lang("c_rtexec");
+  /** Command Info. */
+  String GUIRTEXECTT = lang("c_rtexectt");
   /** Command Info. */
   String GUIRTFILTER = lang("c_rtfilter");
   /** Command Info. */
@@ -576,6 +586,8 @@ public interface Text {
   /** Command Info. */
   String GUISHOWTREETT = lang("c_showtreett");
   /** Command Info. */
+  String GUIUNDO = lang("c_undo");
+  /** Command Info. */
   String GUIXQOPEN = lang("c_xqopen") + DOTS;
   /** Command Info. */
   String GUIXQOPENTT = lang("c_xqopentt");
@@ -592,6 +604,8 @@ public interface Text {
   String BUTTONCMD = lang("b_cmd");
   /** Input field. */
   String BUTTONXPATH = lang("b_xpath");
+  /** Command Info. */
+  String BUTTONEXEC = lang("b_exec");
   /** Button text for confirming actions. */
   String BUTTONOK = lang("b_ok");
   /** Button text for opening files. */
@@ -634,8 +648,6 @@ public interface Text {
   String RESULTFIND = lang("text_find") + COLS;
   /** Help String. */
   String NOTABLE = lang("table_no") + DOT;
-  /** Interactive Filtering. */
-  String CMDFILTERRT = lang("query_rt");
   /** Binary file. */
   byte[] MAPBINARY = token(lang("map_binary"));
   /** Query Info title. */
@@ -1161,8 +1173,6 @@ public interface Text {
   byte[] HELPFILTER = token(lang("h_filter"));
   /** Help String. */
   byte[] HELPQUERYRT = token(lang("h_queryrt"));
-  /** Help String. */
-  byte[] HELPFILTERRT = token(lang("h_filterrt"));
   /** Help String. */
   byte[] HELPTOXQUERY =
     token("The current XPath query is copied to the XQuery search panel.");

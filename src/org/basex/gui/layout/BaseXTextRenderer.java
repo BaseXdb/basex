@@ -255,9 +255,22 @@ public final class BaseXTextRenderer extends BaseXBack {
     final Graphics g = getGraphics();
     init(g, pos);
     if(p.y > y - fontH) {
-      while(more(g)) {
-        if(p.x > x && p.x <= x + wordW && p.y > y - fontH && p.y <= y ||
-            p.x > x && p.y < y - fontH || p.x <= x && p.y < y) {
+      int s = text.pos();
+      while(true) {
+        // end of line
+        if(p.x > x && p.y < y - fontH) {
+          text.pos(s);
+          break;
+        }
+        // end of text - skip last characters
+        if(!more(g)) {
+          while(text.more()) text.next();
+          break;
+        }
+        // beginning of line
+        if(p.x <= x && p.y < y) break;
+        // middle of line
+        if(p.x > x && p.x <= x + wordW && p.y > y - fontH && p.y <= y) {
           while(text.more()) {
             final int ww = charW(g, text.curr());
             if(p.x < x + ww) break;
@@ -266,8 +279,10 @@ public final class BaseXTextRenderer extends BaseXBack {
           }
           break;
         }
+        s = text.pos();
         next();
       };
+
       if(!finish) text.startMark();
       else text.endMark();
       text.setCursor();

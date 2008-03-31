@@ -34,7 +34,6 @@ public final class BaseXButton extends JButton {
   public BaseXButton(final String l, final byte[] hlp, final Dialog d) {
     super(l);
     BaseXLayout.addHelp(this, hlp);
-    setOpaque(false);
     if(d == null) return;
       
     addActionListener(new ActionListener() {

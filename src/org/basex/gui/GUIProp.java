@@ -82,6 +82,8 @@ public final class GUIProp {
   public static boolean mousefocus = false;
   /** Flag for realtime context switch. */
   public static boolean filterrt = false;
+  /** Flag for realtime context switch. */
+  public static boolean execrt = true;
 
   /** Flag for using a simple map layout. */
   public static boolean mapsimple = false;

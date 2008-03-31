@@ -29,6 +29,22 @@ public final class Undo {
    * Returns the previous string.
    * @return previous string
    */
+  public boolean first() {
+    return pos == 0;
+  }
+  
+  /**
+   * Returns the previous string.
+   * @return previous string
+   */
+  public boolean last() {
+    return pos == max;
+  }
+  
+  /**
+   * Returns the previous string.
+   * @return previous string
+   */
   public byte[] prev() {
     return hist[pos == 0 ? pos : --pos];
   }

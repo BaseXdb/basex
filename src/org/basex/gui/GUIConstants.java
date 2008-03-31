@@ -66,8 +66,8 @@ public final class GUIConstants {
   // TOOLBAR ==================================================================
 
   /** Toolbar entries, containing the button commands. */
-  public static final GUICommands[] TOOLBAR = {
-      GOBACK, GOUP, GOFORWARD, null, CREATE, OPEN, null,
+  public static final GUICommand[] TOOLBAR = {
+    GOBACK, GOUP, GOFORWARD, ROOT, null, CREATE, OPEN, null,
       SHOWSEARCH, SHOWINFO, null, SHOWTEXT, SHOWMAP, SHOWTREE, SHOWTABLE, null,
       SHOWHELP, INFO
   };
@@ -91,14 +91,14 @@ public final class GUIConstants {
     MENUMAIN, SHOWMENU, SHOWBUTTONS, SHOWINPUT, SHOWSTATUS, null,
     MENUVIEWS, SHOWTEXT, SHOWMAP, SHOWTREE, SHOWTABLE, null, FULL
   }, {
-    MENUINTER, INPUTMODE,  RTFILTER, null,
+    MENUINTER, INPUTMODE, RTEXEC, RTFILTER, null,
     MENULAYOUT, COLOR, FONTS, MAPLAYOUT, null, PREFS
   }, {
     SHOWHELP, INFO, null, ABOUT
   }};
 
   /** Context menu entries. */
-  public static final GUICommands[] POPUP = {
+  public static final GUICommand[] POPUP = {
       GOBACK, null, COPY, PASTE, DELETE, INSERT, EDIT, null, SELECT, FILTER
   };
 

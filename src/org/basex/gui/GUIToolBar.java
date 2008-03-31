@@ -15,7 +15,7 @@ import static org.basex.gui.GUIConstants.*;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class GUIToolBar extends JToolBar implements ActionListener {
+public final class GUIToolBar extends JToolBar {
   /**
    * Default Constructor.
    */
@@ -23,17 +23,20 @@ public final class GUIToolBar extends JToolBar implements ActionListener {
     super();
     setFloatable(false);
 
-    for(final GUICommands cmd : TOOLBAR) {
+    for(final GUICommand cmd : TOOLBAR) {
       if(cmd == null) {
         addSeparator();
       } else {
         // the image equals the 'cmd-' prefix and the command in lower case
-        final ImageIcon icon = GUI.icon("cmd-" + cmd.name().toLowerCase());
-        final String info = cmd.help;
+        final ImageIcon icon = GUI.icon("cmd-" + cmd.toString().toLowerCase());
+        final String info = cmd.help();
         final BaseXButton button = new BaseXButton(icon, Token.token(info));
         button.setToolTipText(info);
-        button.setActionCommand(cmd.name());
-        button.addActionListener(this);
+        button.addActionListener(new ActionListener() {
+          public void actionPerformed(final ActionEvent e) {
+            cmd.execute();
+          }
+        });
         add(button);
       }
     }
@@ -41,21 +44,12 @@ public final class GUIToolBar extends JToolBar implements ActionListener {
   }
 
   /**
-   * Reacts on button clicks.
-   * @param e action event
-   */
-  public void actionPerformed(final ActionEvent e) {
-    GUICommands.get(e.getActionCommand()).execute();
-  }
-
-  /**
    * Refresh buttons.
    */
   void refresh() {
-    final boolean db = GUI.context.db();
     for(int b = 0; b < TOOLBAR.length; b++) {
       if(TOOLBAR[b] == null) continue;
-      TOOLBAR[b].refresh((BaseXButton) getComponentAtIndex(b), db);
+      TOOLBAR[b].refresh((BaseXButton) getComponent(b));
     }
   }
 }
