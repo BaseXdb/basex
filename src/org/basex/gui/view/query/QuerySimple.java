@@ -183,7 +183,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     text.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {
-        query(false);
+        if(GUIProp.execrt) query(false);
       }
     });
     text.addKeyListener(main);
@@ -238,7 +238,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
   /** {@inheritDoc} */
   public void actionPerformed(final ActionEvent e) {
     if(e == null) {
-      query(false);
+      if(GUIProp.execrt) query(false);
       return;
     }
 
@@ -291,7 +291,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
         }
       }
     }
-    query(false);
+    if(GUIProp.execrt) query(false);
   }
 
   @Override

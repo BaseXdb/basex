@@ -118,7 +118,7 @@ public final class QueryView extends View {
     search = panels[mode];
     search.init();
     search.refresh();
-    search.query(GUIProp.showquery);
+    if(GUIProp.execrt) search.query(GUIProp.showquery);
     revalidate();
     repaint();
   }

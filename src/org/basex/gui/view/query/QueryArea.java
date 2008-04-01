@@ -62,7 +62,7 @@ public final class QueryArea extends QueryPanel {
         String xq = Token.string(area.getText());
         if(!xq.equals(last)) {
           last = xq;
-          if(xq.length() == 0) xq = ".";
+          if(xq.trim().length() == 0) xq = ".";
           if(GUIProp.execrt) {
             GUI.get().execute(Commands.XQUERY, xq);
           } else {
@@ -135,9 +135,10 @@ public final class QueryArea extends QueryPanel {
 
   @Override
   void query(final boolean force) {
-    final String xq = Token.string(area.getText());
+    String xq = Token.string(area.getText());
     if(force || !xq.equals(last)) {
       last = xq;
+      if(xq.trim().length() == 0) return;
       GUI.get().execute(Commands.XQUERY, xq);
     }
   }

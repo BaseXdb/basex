@@ -93,8 +93,6 @@ public final class GUIProp {
   public static int maplayout = 4;
   /** Treemap Proportion. */
   public static int mapprop = 4;
-  /** Treemap uses Thumbnail Visualization. */
-  public static boolean thumbnail = false;
   
   /** Dialog location. */
   public static int[] maplayoutloc = { 100, 100 };
@@ -126,6 +124,8 @@ public final class GUIProp {
 
   /** Flag for displaying the menu in the GUI window. */
   public static boolean showmenu = true;
+  /** Treemap uses Thumbnail Visualization. */
+  public static boolean thumbnail = true;
 
   /** Flag for activated result view after starting. */
   public static boolean showstarttext = false;
