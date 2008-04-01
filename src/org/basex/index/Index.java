@@ -18,6 +18,7 @@ public interface Index {
     /** Attribute index. */ ATV,
     /** Word index.      */ WRD,
     /** Fulltext index.  */ FTX;
+    /** Fuzzy index.     */ //FUY;
   };
   
   /**
@@ -50,6 +51,18 @@ public interface Index {
    */
   int[][] idPos(final byte[] tok, final FTOption ftOption);
 
+  /**
+   * FUZZY SEARCH
+   * Returns the indexed id references for the specified fulltext token,
+   * with respect to number of errors (ne) that are allowed to occure.
+   * 
+   * @param fulltext token to be looked up
+   * @param ne int number of errors allowed
+   * @return id array
+   */
+  int[][] fuzzyIDs(byte[] fulltext, final int ne);
+
+  
   /**
    * Returns the decompressed ids for the specified range expression.
    * Each token between tok0 and tok1 is returned as result.

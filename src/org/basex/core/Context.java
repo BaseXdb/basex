@@ -23,7 +23,13 @@ public final class Context {
   private Nodes marked;
   /** Currently copied data set. */
   private Nodes copied;
-
+  /** Current FTPrePos values. **/
+  private int[][] ftData;
+  /** Current FTPointer on FTPrePos values. **/
+  private int[] ftPoi; 
+  /** FTSearchStrings out of query. **/
+  private byte[] ftss; 
+  
   /**
    * Returns true if a data reference has been set.
    * @return result of check
@@ -122,4 +128,47 @@ public final class Context {
   public void marked(final Nodes mark) {
     marked = mark;
   }
+  
+  /**
+   * Sets the ftdata.
+   * @param prepos int[][] prepos values
+   * @param poi int|[] pointer values
+   */
+  public void ftData(final int[][] prepos, final int[] poi) {
+    ftData = prepos;
+    ftPoi = poi;
+  }
+  
+  /**
+   * Getter for FTData.
+   * @return int[][] ftData.
+   */
+  public int[][] getFTData() {
+    return ftData;
+  }
+  
+  /**
+   * Getter for FTPointer.
+   * @return int[] ftPointer
+   */
+  public int[] getFTPointer() {
+    return ftPoi;
+  }
+  
+  /**
+   * Setter for FTSearchString, extracted out of query.
+   * @param ftSearchString fulltext search string
+   */
+  public void setFTSearchString(final byte[] ftSearchString) {
+    ftss = ftSearchString;
+  }
+ 
+  /**
+   * Setter for FTSearchString, extracted out of query.
+   * @return ftSearchString
+   */
+   public byte[] getFTSearchString() {
+     return ftss;
+   }
+  
 }

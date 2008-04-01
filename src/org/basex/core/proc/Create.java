@@ -327,6 +327,8 @@ public final class Create extends Proc {
           new WordBuilder(), d, Prop.allInfo ? CREATEWORD : null); break;
       case FTX: buildIndex(i,
           new FTBuilder(), d, Prop.allInfo ? CREATEFT : null);
+      //case FZY: buildIndex(i,
+      //buildIndex(i, new FuzzyBuilder(), d, Prop.allInfo ? CREATEFT : null);}
     }
   }
 

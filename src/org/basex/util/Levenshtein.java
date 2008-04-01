@@ -75,6 +75,52 @@ public final class Levenshtein {
   }
 
   /**
+   * Calculates a Levenshtein distance and returns it.
+   * @param tok token to be compared
+   * @param ts start position in token
+   * @param tl token length to be checked
+   * @param sub sub token to be compared
+   * @param er maximum accepted error
+   * @return int levenshtein distance 
+   */
+  public static int levenshtein(final byte[] tok, final int ts, final int tl, 
+      final byte[] sub, final int er) {
+
+    if(tl == 0) return 0;
+    final int sl = sub.length;
+
+    //final int qr = 80 / Math.max(1, (sl - 1) >> 2);
+
+    if(m == null) {
+      m = new int[32][32];
+      for(int i = 0; i < m.length; i++) { m[0][i] = i; m[i][0] = i; }
+    }
+    
+    int e2 = -1, f2 = -1;
+    for(int t = 0; t < tl; t++) {
+      final int e = ftNorm(tok[ts + t]);
+      int d = 64;
+      for(int q = 0; q < sl; q++) {
+        final int f = ftNorm(sub[q]);
+        int c = min(m[t][q + 1] + 1, m[t + 1][q] + 1,
+            m[t][q] + (e == f ? 0 : 1));
+        if(e == f2 && f == e2) c = m[t][q];
+        m[t + 1][q + 1] = c;
+        d = Math.min(d, c);
+        f2 = f;
+        // stop levenshtein if max. error occured
+        if (t == q && m[t + 1][q + 1] == er + 1) return er + 1; 
+      }
+      //if(qr * d > 100) return tl;
+      e2 = e;
+    }
+    //return qr * m[tl][sl];
+    return m[tl][sl];
+  }
+
+  
+  
+  /**
    * Gets the minimum of three values.
    * @param a 1st value
    * @param b 2nd value

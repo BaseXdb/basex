@@ -12,6 +12,7 @@ import org.basex.query.xpath.expr.Expr;
 import org.basex.query.xpath.expr.FTAnd;
 import org.basex.query.xpath.expr.FTArrayExpr;
 import org.basex.query.xpath.expr.FTContains;
+import org.basex.query.xpath.expr.FTFuzzy;
 import org.basex.query.xpath.expr.FTMildNot;
 import org.basex.query.xpath.expr.FTOption;
 import org.basex.query.xpath.expr.FTOr;
@@ -43,6 +44,7 @@ import org.basex.query.xpath.values.Item;
 import org.basex.query.xpath.values.Literal;
 import org.basex.query.xpath.values.NodeSet;
 import org.basex.query.xpath.values.Num;
+import org.basex.util.ByteList;
 import org.basex.util.ExprList;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -64,7 +66,8 @@ public final class XPathProcessor extends QueryProcessor {
   private int qp;
   /** Query length. */
   private int ql;
-
+  /** FTSearchstring list. **/
+  private ByteList ftss;
   /**
    * XPath Query Constructor.
    * @param q query
@@ -78,7 +81,9 @@ public final class XPathProcessor extends QueryProcessor {
     qu = query.length == 0 ? new byte[] { '.' } : query;
     ql = qu.length;
     qp = 0;
-
+    ftss = new ByteList();
+    
+    
     try {
       final Expr expr = parseOr();
       if(!finished()) error(QUERYEND, query(20, 0));
@@ -158,13 +163,13 @@ public final class XPathProcessor extends QueryProcessor {
    * @throws QueryException parsing exception
    */
   private Expr parseRelational() throws QueryException {
-    Expr e = parseFTContainsX();
+    Expr e = parseFTContains();
     consumeWS();
 
     while(true) {
       final Comp expr = cmp(new Comp[] { Comp.LE, Comp.LT, Comp.GE, Comp.GT });
       if(expr == null) return e;
-      e = new Relational(e, parseFTContainsX(), expr);
+      e = new Relational(e, parseFTContains(), expr);
     }
   }
 
@@ -180,178 +185,7 @@ public final class XPathProcessor extends QueryProcessor {
 
   // <SG> parseftcontains temporarily switched to default visibility
   //  (no private flag); strings moved to XPText class
-  
-  /**
-   * Parses an FTContainsExpr.
-   * @return resulting expression
-   * @throws QueryException parsing exception
-   */
-  /*
-  Expr parseFTContains() throws QueryException {
-    final Expr e = parseAdditive();
-    consumeWS();
-    if(!consume(FTCONTAINS)) return e;
-    //if(!context.data().meta.ftxindex) error(NOFT);
-    consumeWS();
-
-    Expr second = parseFTOr();
-    final FTOption option = new FTOption();
-
-    boolean fto = false;
-    if (second instanceof Literal) {
-      // parse optional FTTimes
-      if (curr('o')) {
-        parseFTTimes(option);
-        fto = true;
-      }
-    }
-    
-    parseFTMatchOption(option);
-
-    if (parseFTPosFilter(option)) {  
-      return new FTContains(e, second, option, true);
-    }
-    return new FTContains(e, second, option, fto);
-  }
-*/
-  /**
-   * Parses an FTOrExpr.
-   * @return resulting expression
-   * @throws QueryException parsing exception
-   */
- /* private Expr parseFTOr() throws QueryException {
-    
-    final Expr e = parseFTAnd();
-    consumeWS();
-   
-    if(!consume(FTOR)) return e;
-
-    // initialize list for all or'd expressions
-    final ExprList exprs = new ExprList();
-    exprs.add(e);
-
-    consumeWS();
-    // add initial two operands
-    exprs.add(parseFTAnd());
-    
-    // search for further operands
-    while(consume(FTOR)) {
-      consumeWS();
-      exprs.add(parseFTAnd());
-    }
-
-    // FTOption to be set for each FTContains
-    final FTOption fto = new FTOption();
-    parseFTMatchOption(fto);
-    final Expr[] ea = exprs.get();
-    for(int i = 0; i < ea.length; i++) {
-      if(ea[i] instanceof Literal) ea[i] = new FTContains(e, ea[i], fto);
-    }
  
-    return new FTOr(ea);
-  }
-*/
-  /**
-   * Parses an FTAndExpr.
-   * @return resulting expression
-   * @throws QueryException parsing exception
-   */
- /* private Expr parseFTAnd() throws QueryException {
-    final Expr e = parseFTMildNot();
-    consumeWS();
-
-    if(!consume(FTAND)) return e;
-    consumeWS();
-
-    // initialize list for all and'd expressions
-    final ExprList exprs = new ExprList();
-    exprs.add(e);
-
-    // add initial two operands
-    exprs.add(parseFTMildNot());
-    // search for further operands
-    consumeWS();
-
-    while(consume(FTAND)) {
-      consumeWS();
-      exprs.add(parseFTMildNot());
-    }
-
-    // FTOption to be set for each FTContains
-    final FTOption fto = new FTOption();
-    parseFTMatchOption(fto);
-    //parseFTPosFilter(fto);
-    
-    final Expr[] ea = exprs.get();
-    for(int i = 0; i < ea.length; i++) {
-      if(ea[i] instanceof Literal) ea[i] = new FTContains(e, ea[i], fto);
-    }
-
-    // exprs.add(parseFTProximity());
-    return new FTAnd(ea, fto);
-  }
-*/
-  /**
-   * Parses an FTMildNotexprs.
-   * @return resulting expression
-   * @throws QueryException parsing exception
-   */
- /* private Expr parseFTMildNot() throws QueryException {
-    //final Expr e = parseFTWords();
-    final Expr e = parseFTUnaryNot();
-    consumeWS();
-
-    if(!consume(NOTIN)) return e;
-    consumeWS();
-
-    // initialize list for all and'd expressions
-    final ExprList exprs = new ExprList();
-    exprs.add(e);
-
-    // add initial two operands
-    //exprs.add(parseFTWords());
-    exprs.add(parseFTUnaryNot());
-    // search for further operands
-    consumeWS();
-
-    while(consume(NOTIN)) {
-      consumeWS();
-      //exprs.add(parseFTWords());
-      exprs.add(parseFTUnaryNot());
-    }
-
-    // FTOption to be set for each FTContains
-    final FTOption fto = new FTOption();
-    parseFTMatchOption(fto);
-    final Expr[] ea = exprs.get();
-
-    for(int i = 0; i < ea.length; i++) {
-      if(ea[i] instanceof Literal) ea[i] = new FTContains(e, ea[i], fto);
-    }
-
-    return new FTMildNot(ea);
-    
-  }
-*/
-  /**
-   * Parses an FTUnaryNotexprs.
-   * @return resulting expression
-   * @throws QueryException parsing exception
-   */
-/*  private Expr parseFTUnaryNot() throws QueryException {
-    consumeWS();
-
-    final boolean ftnot = consume(FTNOT);
-    consumeWS();
-    final Expr e = parseFTWords();
-    if(!ftnot) return e;
-
-    // FTOption to be set for each FTContains
-    final FTOption fto = new FTOption();
-    parseFTMatchOption(fto);
-    return new FTUnaryNot(new Expr[] { new FTContains(e, e, fto) });
-  }
-*/
   /**
    * Parses an FTWords.
    * @return resulting expression
@@ -366,162 +200,9 @@ public final class XPathProcessor extends QueryProcessor {
     else if (curr('o')) return parseFTTimes();
       return error(WRONGTEXT, "quote", (char) curr());
     */
-    return curr('f') ? parseFTOrX() : error(WRONGTEXT, QUOTE, (char) curr());
+    return curr('f') ? parseFTOr() : error(WRONGTEXT, QUOTE, (char) curr());
   }
-  
-  /**
-   * Parses an FTTimes.
-   * @param opt FTOption
-   * @throws QueryException parsing exception
-   */
- /* private void parseFTTimes(final FTOption opt) throws QueryException {
-    if (consume(OCCURS)) {
-      consumeWS();
-      parseFTRange(opt);
-      consumeWS();
-      if (!consume(TIMES)) {
-        error(WRONGTEXT, TIMES, curr());
-      }
-      opt.ftTimes = FTOption.CARDSEL.FTTIMES;
-    } else {
-      error(WRONGTEXT, OCCURS, curr());
-    }
-  }
-*/
-  /**
-   * Parses an FTMatchOption.
-   * @param opt container for fulltext options
-   */
-  private void parseFTMatchOption(final FTOption opt) {
-    while(true) {
-      consumeWS();
-      if(consume(CASEINSENS))    opt.ftCase = FTOption.CASE.INSENSITIVE;
-      else if(consume(CASESENS)) opt.ftCase = FTOption.CASE.SENSITIVE;
-      else if(consume(LOWERCASE))   opt.ftCase = FTOption.CASE.LOWERCASE;
-      else if(consume(UPPERCASE))   opt.ftCase = FTOption.CASE.UPPERCASE;
-      else if(consume(WITHWILD))    opt.ftWild = FTOption.WILD.WITH;
-      else if(consume(WITHOUTWILD)) opt.ftWild = FTOption.WILD.WITHOUT;
-      else break;
-    }
-  }
-
-  
-  /**
-   * Parses an FTPosFilter.
-   * @param opt container for fulltext options
-   * @throws QueryException parse exception
-   * @return boolean position filter found
-   */
-/*  private boolean parseFTPosFilter(final FTOption opt) throws QueryException {
-    consumeWS();
-    
-    if(consume(ORDERED))  {
-      opt.ftPosFilt = FTOption.POSFILTER.ORDERED;
-    } else if(consume(WINDOW)) {
-      opt.ftPosFilt = FTOption.POSFILTER.WINDOW;
-      consumeWS();
-      parseFTRange(opt);
-      consumeWS();
-      parseFTUnit(opt);
-    } else if (consume(DISTANCE)) {
-      opt.ftPosFilt = FTOption.POSFILTER.DISTANCE;
-      consumeWS();
-      parseFTRange(opt);
-      consumeWS();
-      parseFTUnit(opt);
-    } else if (consume(SAME)) {
-      opt.ftPosFilt = FTOption.POSFILTER.SCOPE;
-      opt.ftScope = FTOption.SCOPE.SAME;
-      consumeWS();
-      parseFTBigUnit(opt);
-      consumeWS();
-    } else if (consume(DIFFERENT)) {
-      opt.ftPosFilt = FTOption.POSFILTER.SCOPE;
-      opt.ftScope = FTOption.SCOPE.DIFFERENT;
-      consumeWS();
-      parseFTBigUnit(opt);
-      consumeWS();     
-    } else if (consume(AT)) {
-      consumeWS();
-      if (consume(START)) {
-        opt.ftContent = FTOption.CONTENT.ATSTART;
-      } else if (consume(END)) {
-        opt.ftContent = FTOption.CONTENT.ATEND;
-      }
-    } else if (consume(ENTCONT)) {
-      opt.ftContent = FTOption.CONTENT.ENTIRECONTENT;
-    } else {
-      return false;
-    }
-    
-    return true;
-  }
-*/
-  /**
-   * Parses an FTUnit.
-   * @param opt container for fulltext options
-   */
-/*  public void parseFTUnit(final FTOption opt) {
-    if (consume(WORDS)) {
-      opt.ftUnit = FTOption.UNIT.WORDS;
-    } else if (consume(SENTENCES)) {
-      opt.ftUnit = FTOption.UNIT.SENTENCES;
-    } else if (consume(PARAGRAPHS)) {
-      opt.ftUnit = FTOption.UNIT.PARAGRAPHS;
-    }     
-  }
-  */
-  /**
-   * Parses an FTBigUnit.
-   * @param opt container for fulltext options
-   */
-/*  public void parseFTBigUnit(final FTOption opt) {
-    if (consume(SENTENCE)) {
-      opt.ftUnit = FTOption.UNIT.SENTENCES;
-    } else if (consume(PARAGRAPH)) {
-      opt.ftUnit = FTOption.UNIT.PARAGRAPHS;
-    }     
-  }
-  */
-  /**
-   * Parses an FTRange.
-   * @param opt container for fulltext options
-   * @throws QueryException parsing exception
-   */
-/*  public void parseFTRange(final FTOption opt) throws QueryException {
-    if (consume(EXACTLY)) {
-      consumeWS();
-      opt.from = (Num) parseNumber();
-      opt.to = opt.from;
-      opt.ftRange = FTOption.RANGE.EXACTLY; 
-    } else if (consume(ATLEAST)) {
-      consumeWS();
-      opt.from = (Num) parseNumber();
-      opt.ftRange = FTOption.RANGE.ATLEAST;
-    } else if (consume(ATMOST)) {
-      consumeWS();
-      opt.from = new Num(0);
-      opt.to = (Num) parseNumber();
-      opt.ftRange = FTOption.RANGE.ATMOST;
-    } else if (consume(FROM)) {
-      consumeWS();
-      opt.from = (Num) parseNumber();
-      consumeWS();
-      if (consume(TO)) {
-        consumeWS();
-        opt.to = (Num) parseNumber();
-      } else {
-        error("FTOption FTDistance: \"from\" without \"to\"");
-      }
-      opt.ftRange = FTOption.RANGE.FROMTO;
-    } else {
-      consumeWS();
-      opt.from = (Num) parseNumber();
-      opt.to = opt.from;
-      }
-    consumeWS();
-  }
-  */
+ 
   /**
    * Parses an AdditiveExpr.
    * @return resulting expression
@@ -1070,14 +751,27 @@ public final class XPathProcessor extends QueryProcessor {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  private Expr parseFTContainsX() throws QueryException {
+  private Expr parseFTContains() throws QueryException {
     final Expr e = parseAdditive();
     consumeWS();
+    if(consume("ftfuzzy".getBytes())) {
+      consumeWS();
+      Literal lit = parseLiteral();
+      consumeWS();
+      boolean fi = consume("fi".getBytes());
+      consume("fti".getBytes());
+      consumeWS();
+      Num error = (Num) parseNumber();
+      int ne = (int) error.num();
+      if (ne < 0) ne = 3;
+      return new FTFuzzy(e, lit, ne);
+      
+    }
     if(!consume(FTCONTAINS)) return e;
     //if(!context.data().meta.ftxindex) error(NOFT);
     consumeWS();
 
-    Expr second = parseFTSelectionX();
+    Expr second = parseFTSelection();
     FTContains ftc = new FTContains(e, second);
     return ftc;
     /*final FTOption option = new FTOption();
@@ -1097,10 +791,10 @@ public final class XPathProcessor extends QueryProcessor {
    * @return FTArrayExpr  
    * @throws QueryException parsing exception
    */
-  private Expr parseFTSelectionX() throws QueryException {
-    Expr e = parseFTOrX();
+  private Expr parseFTSelection() throws QueryException {
+    Expr e = parseFTOr();
     // optional
-    FTPositionFilter ftps = parseFTPosFilterX();
+    FTPositionFilter ftps = parseFTPosFilter();
     if (ftps != null) {
       return new FTPosFilter(new Expr[]{e}, ftps);
     }
@@ -1112,8 +806,8 @@ public final class XPathProcessor extends QueryProcessor {
    * @return FTArrayExpr  
    * @throws QueryException parsing exception
    */
-  private Expr parseFTOrX() throws QueryException {
-    Expr e = parseFTAndX();
+  private Expr parseFTOr() throws QueryException {
+    Expr e = parseFTAnd();
     consumeWS();
     
     if (!consume(FTOR)) return e;
@@ -1123,12 +817,12 @@ public final class XPathProcessor extends QueryProcessor {
     if (consume(FTNOT)) 
       error("An \"ftnot\" FTUnaryNot expression may only appear as " +
         "a direct right operand of an \"ftand\" (FTAnd) operation.");
-    el.add(parseFTAndX());
+    el.add(parseFTAnd());
     consumeWS();
     
     while (consume(FTOR)) {
       consumeWS();
-      el.add(parseFTAndX());
+      el.add(parseFTAnd());
     }
     
     return new FTOr(el.get());
@@ -1139,8 +833,8 @@ public final class XPathProcessor extends QueryProcessor {
    * @return FTArrayExpr  
    * @throws QueryException parsing exception
    */
-  private Expr parseFTAndX() throws QueryException {
-    Expr e = parseFTMildNotX();
+  private Expr parseFTAnd() throws QueryException {
+    Expr e = parseFTMildNot();
     consumeWS();
     
     if (!consume(FTAND)) return e;
@@ -1148,12 +842,12 @@ public final class XPathProcessor extends QueryProcessor {
  
     ExprList el = new ExprList();
     el.add(e);
-    el.add(parseFTMildNotX());
+    el.add(parseFTMildNot());
     consumeWS();
     
     while (consume(FTAND)) {
       consumeWS();
-      el.add(parseFTMildNotX());
+      el.add(parseFTMildNot());
     }
     
     return new FTAnd(el.get(), false);
@@ -1164,8 +858,8 @@ public final class XPathProcessor extends QueryProcessor {
    * @return FTArrayExpr  
    * @throws QueryException parsing exception
    */
-  private Expr parseFTMildNotX() throws QueryException {
-    Expr e = parseFTUnaryNotX();
+  private Expr parseFTMildNot() throws QueryException {
+    Expr e = parseFTUnaryNot();
     consumeWS();
     
     if (!consume(NOTIN)) return e;
@@ -1175,12 +869,12 @@ public final class XPathProcessor extends QueryProcessor {
     if (consume(FTNOT)) 
       error("An \"ftnot\" FTUnaryNot expression may only appear as " +
         "a direct right operand of an \"ftand\" (FTAnd) operation.");
-    el.add(parseFTUnaryNotX());
+    el.add(parseFTUnaryNot());
     consumeWS();
     
     while (consume(NOTIN)) {
       consumeWS();
-      el.add(parseFTUnaryNotX());
+      el.add(parseFTUnaryNot());
     }
     
     return new FTMildNot(el.get());
@@ -1191,17 +885,17 @@ public final class XPathProcessor extends QueryProcessor {
    * @return FTArrayExpr  
    * @throws QueryException parsing exception
    */
-  private Expr parseFTUnaryNotX() throws QueryException {
+  private Expr parseFTUnaryNot() throws QueryException {
     Expr e;
     // optional
     if (consume(FTNOT)) {
       consumeWS();
       
-      e = new FTUnaryNot(new Expr[]{parseFTPrimaryWithOptionsX()}); 
+      e = new FTUnaryNot(new Expr[]{parseFTPrimaryWithOptions()}); 
       return e;
     }
     
-    return parseFTPrimaryWithOptionsX();
+    return parseFTPrimaryWithOptions();
   }
   
   /**
@@ -1209,8 +903,8 @@ public final class XPathProcessor extends QueryProcessor {
    * @return FTArrayExpr  
    * @throws QueryException parsing exception
    */
-  private Expr parseFTPrimaryWithOptionsX() throws QueryException {
-    Expr e = parseFTPrimaryX();
+  private Expr parseFTPrimaryWithOptions() throws QueryException {
+    Expr e = parseFTPrimary();
     FTOption fto = new FTOption();
     parseFTMatchOption(fto);
     if (e instanceof FTArrayExpr)
@@ -1220,26 +914,44 @@ public final class XPathProcessor extends QueryProcessor {
   }
   
   /**
+   * Parses an FTMatchOption.
+   * @param opt container for fulltext options
+   */
+  private void parseFTMatchOption(final FTOption opt) {
+    while(true) {
+      consumeWS();
+      if(consume(CASEINSENS))    opt.ftCase = FTOption.CASE.INSENSITIVE;
+      else if(consume(CASESENS)) opt.ftCase = FTOption.CASE.SENSITIVE;
+      else if(consume(LOWERCASE))   opt.ftCase = FTOption.CASE.LOWERCASE;
+      else if(consume(UPPERCASE))   opt.ftCase = FTOption.CASE.UPPERCASE;
+      else if(consume(WITHWILD))    opt.ftWild = FTOption.WILD.WITH;
+      else if(consume(WITHOUTWILD)) opt.ftWild = FTOption.WILD.WITHOUT;
+      else break;
+    }
+  }
+  
+  /**
    * Parses an FTPrimary expression.
    * @return Expr  FTPrimary expression
    * @throws QueryException parsing exception
    */
-  private Expr parseFTPrimaryX() throws QueryException {
+  private Expr parseFTPrimary() throws QueryException {
     Expr e = null;
     if(curr('"') || curr('"')) {
       e = parseFTWords();
+      if (e instanceof Literal) ftss.add(((Literal) e).str());
       consumeWS();
       // optional
       // parseFTAnyallOptions();
       // optional 
-      FTPositionFilter ftps = parseFTTimesX();
+      FTPositionFilter ftps = parseFTTimes();
       if (ftps != null)
         return new FTPrimary(new Expr[]{e}, ftps);
       return new FTPrimary(new Expr[]{e});
       
     } else if (consume('(')) {
       consumeWS();
-      e = parseFTSelectionX();
+      e = parseFTSelection();
       consumeWS();
       if (!consume(')')) {
         error(") expected");
@@ -1255,11 +967,11 @@ public final class XPathProcessor extends QueryProcessor {
    * @return FTPositionFilter
    * @throws QueryException parsing exception
    */
-  private FTPositionFilter parseFTTimesX() throws QueryException {
+  private FTPositionFilter parseFTTimes() throws QueryException {
     if (consume(OCCURS)) {
       consumeWS();
       FTPositionFilter ftps = new FTPositionFilter();
-      parseFTRangeX(ftps);
+      parseFTRange(ftps);
       if(!consume(TIMES)) 
         error("times expected");
       ftps.ftTimes = FTPositionFilter.CARDSEL.FTTIMES;
@@ -1274,7 +986,7 @@ public final class XPathProcessor extends QueryProcessor {
    * @param ftpf FTPositionFilter saves unit information
    * @throws QueryException parsing exception
    */
-  private void parseFTRangeX(final FTPositionFilter ftpf) 
+  private void parseFTRange(final FTPositionFilter ftpf) 
   throws QueryException {
     if (consume(EXACTLY)) {
       consumeWS();
@@ -1315,7 +1027,7 @@ public final class XPathProcessor extends QueryProcessor {
    * @return FTPositionFilter ft position filter information
    * @throws QueryException parsing exception
    */
-  private FTPositionFilter parseFTPosFilterX() throws QueryException {
+  private FTPositionFilter parseFTPosFilter() throws QueryException {
     FTPositionFilter ftpf = new FTPositionFilter();
     if (consume(ORDERED)) {
       consumeWS();
@@ -1326,24 +1038,24 @@ public final class XPathProcessor extends QueryProcessor {
       // FTWindow
       ftpf.ftPosFilt = FTPositionFilter.POSFILTER.WINDOW;
       ftpf.from = (Num) parseNumber();
-      parseFTUnitX(ftpf);
+      parseFTUnit(ftpf);
     } else if (consume(DISTANCE)) {
       consumeWS();
       ftpf.ftPosFilt = FTPositionFilter.POSFILTER.DISTANCE;
-      parseFTRangeX(ftpf);
-      parseFTUnitX(ftpf);
+      parseFTRange(ftpf);
+      parseFTUnit(ftpf);
     } else if (consume(SAME)) {
       consumeWS();
       //FTScope
       ftpf.ftPosFilt = FTPositionFilter.POSFILTER.SCOPE;
       ftpf.ftScope = FTPositionFilter.SCOPE.SAME;
-      parseFTBigUnitX(ftpf);        
+      parseFTBigUnit(ftpf);        
     } else if (consume(DIFFERENT)) {
       consumeWS();
       //FTScope
       ftpf.ftPosFilt = FTPositionFilter.POSFILTER.SCOPE;
       ftpf.ftScope = FTPositionFilter.SCOPE.DIFFERENT;
-      parseFTBigUnitX(ftpf);
+      parseFTBigUnit(ftpf);
     } else if (consume(AT) || consume(ENTIRE)) {
       ftpf.ftPosFilt = FTPositionFilter.POSFILTER.CONTENT;
       consumeWS();
@@ -1368,7 +1080,7 @@ public final class XPathProcessor extends QueryProcessor {
    * @param ftpf FTPositionFilter saves unit information
    * @throws QueryException parsing exception
    */
-  private void parseFTUnitX(final FTPositionFilter ftpf) 
+  private void parseFTUnit(final FTPositionFilter ftpf) 
   throws QueryException {
     consumeWS();
     if (consume(WORDS)) {
@@ -1388,7 +1100,7 @@ public final class XPathProcessor extends QueryProcessor {
    * @param ftpf FTPositionFilter saves bigunit information
    * @throws QueryException parsing exception
    */
-  private void parseFTBigUnitX(final FTPositionFilter ftpf) 
+  private void parseFTBigUnit(final FTPositionFilter ftpf) 
     throws QueryException {
     consumeWS();
     if (consume(SENTENCE)) {
@@ -1398,5 +1110,13 @@ public final class XPathProcessor extends QueryProcessor {
     } else {
       error("sentece or paragraph expected.");
     }
+  }
+  
+  /**
+   * Getter for fulltext search strings out of query.
+   * @return ftsearchstring
+   */
+  public byte[][] getFTSearchStings() {
+    return ftss.finish();
   }
 }

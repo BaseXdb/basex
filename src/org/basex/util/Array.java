@@ -394,6 +394,25 @@ public final class Array {
   }
   
   /**
+   * Convert int to byte[4], does only work for values > 0.
+   * @param i int
+   * @return byte[] value
+   */
+  public static byte[] intToByteNN(final int i) {
+    if(i == 0) return new byte[] { 0 };
+
+    final int l = i < 0x100 ? 1 : i < 0x10000 ? 2 : i < 0x1000000 ? 3 : 4;
+    final byte[] b = new byte[l];
+    for(int c = 0, j = i; c < l; c++) {
+      b[c] = (byte) j;
+      j >>>= 8;
+    }
+    return b;
+  }
+ 
+
+  
+  /**
    * Extracts ids out of an int[2][]-array.
    * int[0] = ids
    * int[1] = position values
@@ -480,5 +499,36 @@ public final class Array {
      }
      return false;
    }
+
+   /**
+    * Checks whether p is contained in a. 
+    * returns 
+    *    -1 if i is not contained in a.
+    *    first index of p if it is contained.
+    *    
+    * @param p value to be found
+    * @param a array to be checked
+    * @return int index of p in a contained
+    */
+   public static int firstIndexOf(final int p, final int[] a) {
+     if (a == null || a.length == 0) return -1;
+     int f = 0;
+     int l = a.length - 1;
+
+     while(f <= l) {
+       int m = f + ((l - f) >> 1);
+       if (a[m] < p) {
+         f = m + 1;  // continue right
+       } else if (a[m] > p) {
+         l = m - 1;  // continue left
+       } else {
+         // find first index
+         while (m > -1 && a[m] == p) m--;
+         return m + 1;
+       }
+     }
+     return -1;
+   }
+
 }
 

@@ -515,6 +515,10 @@ public final class GUI extends JFrame {
                 Nodes nodes = context.marked();
                 if(result instanceof Nodes) {
                   nodes = (Nodes) result;
+                  if (GUIProp.thumbnail) {
+                    GUI.context.ftData(nodes.ftpre, nodes.ftpoin);
+                  }
+
                 } else if(nodes.size != 0) {
                   nodes = new Nodes(data);
                 }
@@ -526,6 +530,7 @@ public final class GUI extends JFrame {
             // print result
             if(ok && cc.printing() && !(result instanceof Nodes)) {
               text.setText(out.buffer(), out.size(), false);
+              text.updateHeader(null);
             }
 
             // show number of hits

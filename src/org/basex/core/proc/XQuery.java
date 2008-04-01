@@ -12,6 +12,7 @@ import org.basex.io.NullOutput;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
+import org.basex.query.xpath.XPathProcessor;
 import org.basex.query.xpath.values.NodeSet;
 import org.basex.query.xquery.XQueryProcessor;
 import org.basex.util.Performance;
@@ -106,6 +107,10 @@ public class XQuery extends Proc {
         // <SG> creating a final result set for further processing
         final NodeSet ns = (NodeSet) result;
         result = new Nodes(ns.nodes, ns.data);
+        if (ns.ftidpos != null) {
+          ((Nodes) result).setFTData(ns.ftidpos, ns.ftpointer, 
+              ((XPathProcessor) qu).getFTSearchStings());
+        }
       }
       if(Prop.info) {
         info(qu.getInfo());

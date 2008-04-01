@@ -1,6 +1,7 @@
 package org.basex.index;
 
 import org.basex.util.Array;
+import org.basex.util.IntArrayList;
 
 /**
  * Preserves an extended compressed trie index structure and useful
@@ -131,7 +132,21 @@ public final class CTArrayX {
     sizeData = new int[cta.countNodes];
     int count = 0;
     boolean sub;
-
+    
+  /*  
+    for (int i=0; i<cta.countNodes; i++) {
+      if (cta.next[i] != null) {
+        boolean f = false;
+        for (int k: cta.next[i]) if (k > cta.countNodes) {
+          f = true;
+          break;
+        }
+        if (f) {
+          System.out.println(i);
+        }
+      } 
+    }
+*/
     // copy root info
     nodes[0] = new byte[3];
     nodes[0][0] = 0;
@@ -156,8 +171,8 @@ public final class CTArrayX {
       sub = false;
       if(cta.next[i] != null) {
         // convert id to byte[]
-        final byte[] id = intToByte(count);
-
+        final byte[] id = Array.intToByteNN(count);
+        
         // space for nodeinfo
         nodes[i] = new byte[2 + cta.nodes[i].length + id.length];
 
@@ -166,28 +181,23 @@ public final class CTArrayX {
 
         // set number nextnodes
         nodes[i][cta.nodes[i].length + 1] = (byte) -cta.next[i].length;
-
+        
         // set pointer on data array (id) for nextPointer
         // and pre/pos data
         System.arraycopy(id, 0, nodes[i], cta.nodes[i].length + 2,
             id.length);
+        
         // copy all pointer next nodes
         if(cta.data[i] != null) {
           data[count] = new int[cta.next[i].length
                                 + ((int[][]) cta.data[i])[0].length * 2];
 
           // set size info
-          //System.out.println("sizeInfo for " + i+":" + data[count].length);
-          //System.out.println("sizeInfo for " + i+":" + data[i].length);
-          
           sizeData[count] = data[count].length;
-          //sum += cta.next[i].length
-          //  + ((int[][]) cta.data[i])[0].length * 2;
         } else {
           data[count] = new int[cta.next[i].length];
           // set size info
           sizeData[count] = data[count].length;
-          //sum += cta.next[i].length;
         }
         System.arraycopy(cta.next[i], 0, data[count], 0,
             cta.next[i].length);
@@ -206,7 +216,7 @@ public final class CTArrayX {
       if(cta.data[i] != null) {
         if(sub) {
 
-          // has no nextids
+          // has nextids
           //data[count-1] = new int[((int[][])cta.data[i]).length*2];
           // copy pre-value
           System.arraycopy(((int[][]) cta.data[i])[0], 0,
@@ -219,7 +229,7 @@ public final class CTArrayX {
               ((int[][]) cta.data[i])[0].length);
         } else {
           // convert id to byte[]
-          final byte[] id = intToByte(count);
+          final byte[] id =  Array.intToByteNN(count);
 
           // space nodevalue
           nodes[i] = new byte[cta.nodes[i].length + id.length + 2];
@@ -242,24 +252,20 @@ public final class CTArrayX {
           System.arraycopy(id, 0, nodes[i], cta.nodes[i].length + 2,
               id.length);
 
-          //data[count] = new int[((int[][])cta.data[i]).length*2];
           data[count] = new int[((int[][]) cta.data[i])[0].length * 2];
 
-          // set size info
+           // set size info
            sizeData[count] = data[count].length;
-          //sizeData[count] = ((int[][]) cta.data[i])[0].length;
-          //sum += ((int[][]) cta.data[i])[0].length * 2;
-
           // copy pre-value
           System.arraycopy(((int[][]) cta.data[i])[0], 0,
               data[count], 0, ((int[][]) cta.data[i])[0].length);
-          // copy position-value
+              // copy position-value
           System.arraycopy(((int[][]) cta.data[i])[1], 0,
               data[count], ((int[][]) cta.data[i])[0].length,
-              ((int[][]) cta.data[i])[0].length);
+                  ((int[][]) cta.data[i])[0].length);
           count++;
         }
-      }
+      } 
     }
     
     // clear reference
@@ -267,34 +273,43 @@ public final class CTArrayX {
     
     //System.out.println("sum="+sum);
     //System.out.println("cta.totDataSize="+cta.totDataSize);
-  }
-
-  /**
-   * Convert int to byte[4].
-   * @param i int
-   * @return byte[] value
-   */
-  private byte[] intToByte(final int i) {
-    if(i == 0) return new byte[] { 0 };
-
-    final int l = i < 0x100 ? 1 : i < 0x10000 ? 2 : i < 0x1000000 ? 3 : 4;
-    final byte[] b = new byte[l];
-    for(int c = 0, j = i; c < l; c++) {
-      b[c] = (byte) j;
-      j >>>= 8;
+/*    IntArrayList bl = new IntArrayList();
+    int[][] list = doPreOrderTravWI(0, new StringBuffer(), 
+        new IntArrayList(), bl);
+    // add dummy at the end of the index, that points on last data set in il
+    bl.add(new int[]{Integer.MAX_VALUE, list.length - 1});
+    int[][] ia = bl.finish();
+    
+    byte[] tmp;
+    int[] ndata;
+    for (int i = 0; i < ia.length; i++) 
+      System.out.println(ia[i][0] + ":" + ia[i][1]);
+    for(int[] i : list) {
+      tmp = new byte[i[0]];
+      for (int k = 0; k < tmp.length; k++) tmp[k] = (byte) i[k + 2];
+      System.out.print("length=" + i[0] + ": nb=" + i[1] + ":" 
+          + new String(tmp) + " s:" + i[i[0]+2] + ":");
+      ndata = new int[i[i[0]+2]];
+      System.arraycopy(i, 1 + tmp.length, ndata, 0, ndata.length);
+      for (int k:ndata) System.out.print(k + ",");
+      System.arraycopy(i, 1 + tmp.length + ndata.length, 
+          ndata, 0, ndata.length);
+      for (int k:ndata) System.out.print(k + ",");
+      System.out.println();
     }
-    return b;
-  }
-
-  /**
-   * Convert byte[4] to int.
-   * @param b byte[]
-   * @return int value
-   */
-  private int byteToInt(final byte[] b) {
-    int i = 0;
-    for(int j = 0, p = 0; j < b.length; j++, p += 8) i += b[j] << p;
-    return i;
+*/
+    /*
+    int[] index = bl.finish();
+    byte[] b;
+    for (int i=0; i < index.length; i++) {
+      b = new byte[index.length - 1]; 
+      System.arraycopy(index[i], 1, b, 0, b.length);
+      b = nodes[Array.byteToIntNN(b)];
+      byte[] v = new byte[b[0]];
+      System.arraycopy(b, 1, v, 0, v.length);
+      System.out.println((char)(index[i]) + ":" + new String(v)); 
+    }
+    */
   }
 
   /**
@@ -310,7 +325,7 @@ public final class CTArrayX {
    * @return int[] id array on nodes[][]
    */
   private int[] getNextNodes(final int node) {
-    if(nodes[node][nodes[node][0] + 1] > 0) {
+    if(nodes[node][nodes[node][0] + 1] >= 0) {
       return null;
     }
 
@@ -384,7 +399,7 @@ public final class CTArrayX {
     System.arraycopy(nodes[currentNode],
         nodes[currentNode].length - bId.length, bId, 0, bId.length);
 
-    return byteToInt(bId);
+    return Array.byteToIntNN(bId);
   }
 
   /**
@@ -1402,7 +1417,392 @@ public final class CTArrayX {
       return -2;
     }
   }
-  
+
+  /**
+   * Traverse trie and return found node for searchValue; returns data
+   * from node or null.
+   *
+   * @param cn int current node
+   * @param sn search nodes value
+   * @param d int number deletes occured
+   * @param p int number pastes occured
+   * @param r int number replaces occured
+   * @param c int sum number of errors 
+   * @return int[][] pre and pos values collected
+   */
+ /*  private int[][] getNodeFuzzy(final int cn, final byte[] sn, final int d, 
+       final int p, final int r, final int c) {
+    byte[] vsn = sn;
+
+    if(cn != 0) {
+      int i = 0;
+      
+      while(i < vsn.length && i < nodes[cn][0] && nodes[cn][i + 1] == vsn[i]) {
+        i++;
+      }
+      
+      if(nodes[cn][0] == i) {
+        // node entry complete processed 
+        if(vsn.length == i) {
+          // leafnode found with appropriate value
+          return getDataFromDataArray(cn);
+        } else {
+          // cut valueSearchNode for value current node
+          final byte[] tmp = new byte[vsn.length - i];
+          System.arraycopy(vsn, i, tmp, 0, tmp.length);
+          vsn = tmp;
+
+          // scan successors currentNode
+          final int position = getInsertingPositionLinear(cn, vsn[0]);
+          if(!found) {
+            // fuzzy search
+            if(nodes[cn][nodes[cn][0] + 1] > 0) {
+              // node has no successors
+              return null;
+            }
+            final int[] nn = getNextNodes(cn);
+            int[][] ld = null;
+            byte[] b;
+            for (int k = 0; k < nn.length; k++) {
+              if (c >= d + p + 2 * r) {
+                // delete char
+                b = new byte[vsn.length - 1];
+                System.arraycopy(vsn, 1, b, 0, b.length);
+                ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(nn[k], 
+                    b, d + 1, p, r, c));
+                // paste char
+                b = new byte[vsn.length + 1];
+                b[0] = nodes[nn[k]][1];
+                System.arraycopy(vsn, 1, b, 1, vsn.length);
+                ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(nn[k], 
+                    b, d, p + 1, r, c));
+                if (c >= d + p + 2 * (r + 1)) {
+                  // replace
+                  vsn[0] = nodes[nn[k]][1];
+                  ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(nn[k], 
+                      vsn, d, p, r + 1, c));
+                }
+              } else {
+                return ld;
+              }    
+            }
+            return ld;
+          } else {
+            final int id = getIdOnDataArray(cn);
+            return getNodeFuzzy(data[id][position], vsn, d, p, r, c);
+          }
+        }
+      } else {
+        // fuzz search
+
+        // cut valueSearchNode for value current node
+        final byte[] tmp = new byte[vsn.length - i];
+        System.arraycopy(vsn, i, tmp, 1, tmp.length);
+        vsn = tmp;
+        int[][] ld = null;
+        byte[] b;
+        if (c >= d + p + 2 * r) {
+          // delete char
+          b = new byte[vsn.length - 1];
+          System.arraycopy(vsn, 1, b, 0, b.length);
+          ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(cn, 
+              b, d + 1, p, r, c));
+          // paste char
+          b = new byte[vsn.length + 1];
+          b[0] = nodes[cn][i + 1];
+          System.arraycopy(vsn, 1, b, 1, vsn.length);
+          ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(cn, 
+              b, d, p + 1, r, c));
+          if (c >= d + p + 2 * (r + 1)) {
+            // replace
+            vsn[0] = nodes[cn][i + 1];
+            ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(cn, 
+                vsn, d, p, r + 1, c));
+          }
+        } else {
+          return ld;
+        }    
+        return ld;
+      }
+    } else {
+      // scan successors current node (root node)
+      final int position = getInsertingPositionLinear(cn,
+          vsn[0]);
+      if(!found) {
+        // fuzzy search
+        if(nodes[cn][nodes[cn][0] + 1] > 0) {
+          // node has no successors
+          return null;
+        }
+        
+        final int[] nn = getNextNodes(cn);
+        int[][] ld = null;
+        byte[] b;
+        for (int k = 0; k < nn.length; k++) {
+          if (c >= d + p + 2 * r) {
+            // delete char
+            b = new byte[vsn.length - 1];
+            System.arraycopy(vsn, 1, b, 0, b.length);
+            ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(nn[k], 
+                b, d + 1, p, r, c));
+            // paste char
+            b = new byte[vsn.length + 1];
+            b[0] = nodes[nn[k]][1];
+            System.arraycopy(vsn, 1, b, 1, vsn.length);
+            ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(nn[k], 
+                b, d, p + 1, r, c));
+            if (c >= d + p + 2 * (r + 1)) {
+              // replace
+              vsn[0] = nodes[nn[k]][1];
+              ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(nn[k], 
+                  vsn, d, p, r + 1, c));
+            }
+          } else {
+            return ld;
+          }    
+        }
+        return ld;
+      } else {
+        final int id = getIdOnDataArray(cn);
+        return getNodeFuzzy(data[id][position], vsn, d, p, r, c);
+      }
+    }
+  }
+  */ 
+   /**
+    * Does a preorder traversal of the trie and collectes each 
+    * nodevalue and its data.
+    * 
+    * [l, t, o, k, e, n, pre1, pre2, ..., pos1, pos2, ...]
+    * 
+    * @param nid int current node id
+    * @param sb StringBuffer token value 
+    * @param il IntArrayList collecting the results
+    * @return int[][] with the Results
+    */
+   public int[][] doPreOrderTrav(final int nid, final StringBuffer sb, 
+       final IntArrayList il) {
+     int[][] d;
+     int[] ds;
+     byte[] sbb = new byte[]{};
+     byte[] b;
+
+     if (nodes[nid][0] > 0) {
+       sbb = new byte[nodes[nid][0]];
+       System.arraycopy(nodes[nid], 1, sbb, 0, sbb.length);
+       sb.append(new String(sbb));
+     
+     }
+     d = getDataFromDataArray(nid);
+     if (d != null) {
+       ds = new int[1 + sb.length() + 2 * d[0].length];
+       ds[0] = sb.length();
+       b = sb.toString().getBytes();
+       for (int k = 0; k < b.length; k++) {
+         ds[k + 1] = b[k];
+       }
+       System.arraycopy(d[0], 0, ds, 1 + sb.length(), d[0].length);
+       System.arraycopy(d[1], 0, ds, 1 + sb.length() + d[0].length, 
+           d[1].length);
+       il.add(ds);
+       
+       ds = getNextNodes(nid);
+       if (ds != null) {
+         for (int i : ds) { 
+           doPreOrderTrav(i, sb, il);
+         }
+       } 
+       sb.delete(sb.length() - sbb.length, sb.length());
+     } else {
+       ds = getNextNodes(nid);
+       if (ds != null) {
+         for (int i : ds) {
+           doPreOrderTrav(i, sb, il);
+         }
+       } 
+       sb.delete(sb.length() - sbb.length, sb.length());
+     }
+     
+     return il.finish();
+   }
+
+   /**
+    * Does a preorder traversal of the trie and collectes each 
+    * nodevalue and its data.
+    * Result has the following format:
+    * {[L, NB, t1, t2, ..., tL, pre1, pre2, ..., preN, pos1, pos2, ..., posN],
+    *  ...}
+    * L = length of the token
+    * NB = number of int buckets used in result befor token
+    * t1, ..., tL Token
+    * pre1, ..., preN prevalues of the Token
+    * pos1, ..., posN position values of the Token (pre)
+    * 
+    * Index has the following format:
+    * {[v, s], ...}
+    * v = index value (first char of a token)
+    * s = number of entries befor current entry
+    * 
+    * @param nid int current node id
+    * @param sb StringBuffer token value 
+    * @param il IntArrayList collecting the results
+    * @param index IntArrayList collection for indexentries
+    * @return int[][] with the Results
+    */
+   public int[][] doPreOrderTravWI(final int nid, final StringBuffer sb, 
+       final IntArrayList il, final IntArrayList index) {
+     int[][] d;
+     int[] ds;
+     byte[] sbb = new byte[]{};
+     byte[] b;
+
+     if (nodes[nid][0] > 0) {
+       sbb = new byte[nodes[nid][0]];
+       System.arraycopy(nodes[nid], 1, sbb, 0, sbb.length);
+       sb.append(new String(sbb));
+     }
+     
+     d = getDataFromDataArray(nid);
+     if (d != null) {
+       ds = new int[3 + sb.length() + 2 * d[0].length];
+       // save tokenvalue length
+       ds[0] = sb.length();
+       // save number of ints written befor
+       ds[1] = il.nb;
+       // convert byte to int and save tokenvalue
+       b = sb.toString().getBytes();
+       for (int k = 0; k < b.length; k++) {
+         ds[k + 2] = b[k];
+       }
+       // save number pre values
+       ds[sb.length() + 2] = d[0].length;
+       System.arraycopy(d[0], 0, ds, 3 + sb.length(), d[0].length);
+       System.arraycopy(d[1], 0, ds, 3 + sb.length() + d[0].length, 
+           d[1].length);
+       il.add(ds);
+       
+       if (index.size == 0 || 
+           index.list[index.size - 1][0] != sb.charAt(0)) {
+         index.add(new int[]{sb.charAt(0), il.size - 1});
+       }
+       
+       ds = getNextNodes(nid);
+       if (ds != null) {
+         for (int i : ds) { 
+           doPreOrderTravWI(i, sb, il, index);
+         }
+       } 
+       sb.delete(sb.length() - sbb.length, sb.length());
+     } else {
+       ds = getNextNodes(nid);
+       if (ds != null) {
+         for (int i : ds) {
+           doPreOrderTravWI(i, sb, il, index);
+         }
+       } 
+       sb.delete(sb.length() - sbb.length, sb.length());
+     }
+     
+     return il.finish();
+   }
+
+   /**
+    * Does a preorder traversal of the trie and collectes each 
+    * nodevalue and its data, sorted by size, and chars
+    * Result has the following format:
+    * object[0] is an int, safing the number of used buckets of object.
+    * object[i] = int[][] collecting all tokens with legnth i.
+    * each int[][] entry looks like:
+    * {[t0, t1, ..., ti, N, pre1, pre2, ..., preN, pos1, pos2, ..., posN], ...}
+    * t0, t1, ... ti :  Token
+    * N : number of prevalues
+    * pre0, ..., preN prevalues of the Token
+    * pos0, ..., posN position values of the Token (pre)
+    * @param nid int current node id
+    * @param sb StringBuffer token value 
+    * @param index IntArrayList collection for indexentries
+    * @return Object with the Results
+    */
+   public Object[] doPreOrderTravWISS(final int nid, final StringBuffer sb, 
+       final Object[] index) {
+       Object[] ind = doPreOrderTravWISSRec(nid, sb, index);
+       
+       int c = 0;
+       int size = ((Integer) ind[0]).intValue();
+       for (int i = 1; i < ind.length; i++) {
+         if (ind[i] != null) {
+           c++;
+           ind[i] = ((IntArrayList) ind[i]).finish();
+           if (c == size) break;
+         }
+       }
+       
+       return ind;
+   }
+   
+   /**
+    * See doPreOrderTravWISS().
+    * 
+    * @param nid NodeId
+    * @param sb Stringbuffer for token
+    * @param index saves data
+    * @return index
+    */
+   public Object[] doPreOrderTravWISSRec(final int nid, final StringBuffer sb, 
+       final Object[] index) {
+     int[][] d;
+     int[] ds;
+     byte[] sbb = new byte[]{};
+     byte[] b;
+
+     if (nodes[nid][0] > 0) {
+       sbb = new byte[nodes[nid][0]];
+       System.arraycopy(nodes[nid], 1, sbb, 0, sbb.length);
+       sb.append(new String(sbb));
+     }
+     
+     d = getDataFromDataArray(nid);
+     if (d != null) {
+       if (sb.length() < index.length - 1 && index[sb.length()] == null) {
+         index[sb.length()] = new IntArrayList();
+         index[0] = ((Integer) index[0]).intValue() + 1;
+       }
+ 
+       // ds = (t,o,k,e,n,l,pre0,...,prel,pos0,...,posl)
+       ds = new int[1 + sb.length() + 2 * d[0].length];
+       // save tokenvalue length
+       //ds[0] = sb.length();
+       // save number of ints written befor
+       //ds[1] = il.nb;
+       // convert byte to int and save tokenvalue
+       b = sb.toString().getBytes();
+       for (int k = 0; k < b.length; k++) {
+         ds[k] = b[k];
+       }
+       // save number pre values
+       ds[sb.length()] = d[0].length;
+       System.arraycopy(d[0], 0, ds, 1 + sb.length(), d[0].length);
+       System.arraycopy(d[1], 0, ds, 1 + sb.length() + d[0].length, 
+           d[1].length);
+       ((IntArrayList) index[sb.length()]).add(ds);
+       ds = getNextNodes(nid);
+       if (ds != null) {
+         for (int i : ds) { 
+           doPreOrderTravWISSRec(i, sb, index);
+         }
+       } 
+       sb.delete(sb.length() - sbb.length, sb.length());
+     } else {
+       ds = getNextNodes(nid);
+       if (ds != null) {
+         for (int i : ds) {
+           doPreOrderTravWISSRec(i, sb, index);
+         }
+       } 
+       sb.delete(sb.length() - sbb.length, sb.length());
+     }
+     return index;
+   }
 
   /**
    * Extracts words from the specified byte array and returns its ids.

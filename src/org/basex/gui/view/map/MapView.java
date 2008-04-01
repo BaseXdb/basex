@@ -296,6 +296,7 @@ public final class MapView extends View implements Runnable {
     // call recursive TreeMap algorithm
     final Performance perf = new Performance();
     final Nodes nodes = GUI.context.current();
+     
     calcMap(rect, new IntList(nodes.pre), 0, nodes.size, true);
 
     // output timing information
@@ -389,6 +390,117 @@ public final class MapView extends View implements Runnable {
     }
   }
 
+
+  /**
+   * Recursively splits rectangles on one level.
+   * @param r parent rectangle
+   * @param l children array
+   * @param ns start array position
+   * @param ne end array position
+   * @param first first traversal
+   */
+  
+  /*
+  private void calcMapFT(final MapRect r, final IntList l,
+      final int ns, final int ne, final boolean first, final int po, 
+      final int[][] ftprepos, final int[] ftpoint) {
+
+    // one rectangle left.. continue with children
+    if(ne - ns == 1) {
+      // calculate rectangle sizes
+      MapRect t = new MapRect(r.x, r.y, r.w, r.h, l.get(ns), r.l);
+      
+      int id = l.get(ns);
+      if (ftprepos != null && ftprepos[0][po] == id) {
+        // add ftdata to recmap
+        int i = po;
+        IntList pos = new IntList();
+        while (i < ftprepos[0].length && ftprepos[0][i] == id) {
+          pos.add(ftprepos[1][i]);
+          i++;
+        }
+        pos.finish();
+        int[] poi = new int[pos.size + 1];
+        poi[0] = ftpoint[0];
+        System.arraycopy(ftpoint, po + 1, poi, 1, pos.size);
+        t.setFTData(pos.get(), poi);
+      }
+      
+      mainRects.add(t);
+      
+      final int x = t.x + layout.x;
+      final int y = t.y + layout.y;
+      final int w = t.w - layout.w;
+      final int h = t.h - layout.h;
+
+      // get children
+      final int o = GUIProp.fontsize + 4;
+      // skip too small rectangles and leaf nodes (= meta data in deepfs)
+      if((w >= o || h >= o) && w > 0 && h > 0 &&
+          !ViewData.isLeaf(GUI.context.data(), t.p)) {
+        final IntList ch = children(t.p);
+        if(ch.size != 0) {
+          id = l.get(ns);
+          if (ftprepos!= null && ftprepos[0][po] == id) {
+            // add ftdata to recmap
+            int i = po;
+            IntList pos = new IntList();
+            while (i < ftprepos[0].length && ftprepos[0][i] == id) {
+              pos.add(ftprepos[1][i]);
+              i++;
+            }
+            pos.finish();
+            int[] poi = new int[pos.size + 1];
+            poi[0] = ftpoint[0];
+            System.arraycopy(ftpoint, po + 1, poi, 1, pos.size);
+            calcMapFT(new MapRect(x, y, w, h,
+                l.get(ns), r.l + 1), ch, 0, ch.size - 1, false, po + pos.size, 
+                ftprepos, ftpoint);
+          }
+          calcMapFT(new MapRect(x, y, w, h,
+            l.get(ns), r.l + 1), ch, 0, ch.size - 1, false, -1, null, null);
+          }
+      }
+    } else {
+      // recursively split current nodes
+      int nn = ne - ns;
+      int ln = nn >> 1;
+      int ni = ns + ln;
+
+      // consider number of descendants to calculate split point
+      if(!GUIProp.mapsimple && !first) {
+        nn = l.get(ne) - l.get(ns);
+        ni = ns + 1;
+        for(; ni < ne - 1; ni++) if(l.get(ni) - l.get(ns) >= (nn >> 1)) break;
+        ln = l.get(ni) - l.get(ns);
+      }
+
+      // determine rectangle orientation (horizontal/vertical)
+      final int p = GUIProp.mapprop;
+      final boolean v = p > 4 ? r.w > r.h * (p + 4) / 8 :
+        r.w * (13 - p) / 8 > r.h;
+
+      int xx = r.x;
+      int yy = r.y;
+      int ww = !v ? r.w : (int) ((long) r.w * ln / nn);
+      int hh =  v ? r.h : (int) ((long) r.h * ln / nn);
+
+      // paint both rectangles if enough space is left
+      if(ww > 0 && hh > 0)  calcMapFT(new MapRect(xx, yy, ww, hh, 0, r.l),
+          l, ns, ni, first, -1, null, null);
+      if(v) {
+        xx += ww;
+        ww = r.w - ww;
+      } else {
+        yy += hh;
+        hh = r.h - hh;
+      }
+      if(ww > 0 && hh > 0) calcMapFT(new MapRect(xx, yy, ww, hh, 0, r.l),
+          l, ni, ne, first, -1, null, null);
+    }
+  }
+*/
+  
   /**
    * Returns all children of the specified node.
    * @param par parent node

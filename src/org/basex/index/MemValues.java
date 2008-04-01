@@ -114,6 +114,21 @@ public final class MemValues extends Set implements Index {
   public int nrIDs(final byte[] key) {
     return len[id(key)];
   }
+  
+  /**
+   * FUZZY SEARCH
+   * Returns the indexed id references for the specified fulltext token,
+   * with respect to number of errors (ne) that are allowed to occure.
+   * 
+   * @param tok token to be looked up
+   * @param ne int number of errors allowed
+   * @return id array
+   */
+  public int[][] fuzzyIDs(final byte[] tok, final int ne) {
+    BaseX.debug("Words: No fuzzy search support.");
+    return null;
+  }
+  
 
   @Override
   protected void rehash() {

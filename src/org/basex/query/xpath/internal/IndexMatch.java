@@ -52,7 +52,8 @@ public final class IndexMatch extends InternalExpr {
       tmp.set(res);
       if(found(loc.nodes, match.eval(ctx).nodes)) result.add(res);
     }
-    return new NodeSet(result.finish(), ctx);
+    return new NodeSet(result.finish(), ctx, ctx.local.ftidpos, 
+        ctx.local.ftpointer);
   }
 
   /**

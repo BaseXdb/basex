@@ -33,7 +33,9 @@ public final class Filter extends Expr {
   @Override
   public NodeSet eval(final XPContext ctx) throws QueryException {
     final NodeSet nodes = (NodeSet) ctx.eval(expr);
-    final NodeBuilder input = new NodeBuilder(nodes.nodes);
+    // <cg> maybe this causes problems???
+    final NodeBuilder input = new NodeBuilder(nodes.nodes, nodes.ftidpos, 
+        nodes.ftpointer);
     final NodeBuilder result = new NodeBuilder();
     preds.eval(ctx, input, result);
     return new NodeSet(result.finish(), ctx);

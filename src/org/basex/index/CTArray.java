@@ -79,23 +79,22 @@ final class CTArray {
   /**
    * Inserts a node into the trie.
    *
-   * @param currentCompressedTrieNode current node, which gets a new node
+   * @param cn current node, which gets a new node
    * appended; start with root (0)
-   * @param valueToInsert value, which is to be inserted
+   * @param v value, which is to be inserted
    * @param d int[][] data, which are to be added at new node
    * @return nodeId, parent node of new node
    */
-  private int insertNodeIntoTrie(final int currentCompressedTrieNode,
-      final byte[] valueToInsert, final int[][] d) {
+  private int insertNodeIntoTrie(final int cn,
+      final byte[] v, final int[][] d) {
     // currentNode is root node
-    if(currentCompressedTrieNode == 0) {
+    if(cn == 0) {
       // root has successors
       if(next[0] != null) {
 
         final int positionToInsert = getInsertingPosition(
-            currentCompressedTrieNode, valueToInsert[0]);
+            cn, v[0]);
         if(!found) {
-          // System.out.println("-1. Fall");
           // any child has an appropriate value to valueToInsert;
           //create new node and append it; save data
 
@@ -103,34 +102,34 @@ final class CTArray {
           if(!(countNodes < nodes.length - 1)) {
             reSize();
           }
-          nodes[countNodes] = valueToInsert;
+          nodes[countNodes] = v;
 
           if(d != null) {
             //addDataToNode(countNodes, data, data.length);
             addDataToNode(countNodes, d, d[0].length);
           }
-          insertNodeInNextArray(currentCompressedTrieNode, countNodes,
+          insertNodeInNextArray(cn, countNodes,
               positionToInsert);
           countNodes++;
           return countNodes - 1;
         } else {
           return insertNodeIntoTrie(
-              next[currentCompressedTrieNode][positionToInsert],
-              valueToInsert, d);
+              next[cn][positionToInsert],
+              v, d);
         }
       }
     }
 
     final byte[] intersection = calculateIntersection(
-        nodes[currentCompressedTrieNode], valueToInsert);
-    byte[] remain1 = nodes[currentCompressedTrieNode];
-    byte[] remain2 = valueToInsert;
+        nodes[cn], v);
+    byte[] remain1 = nodes[cn];
+    byte[] remain2 = v;
 
     if(intersection != null) {
-      remain1 = getBytes(nodes[currentCompressedTrieNode],
-          intersection.length, nodes[currentCompressedTrieNode].length);
-      remain2 = getBytes(valueToInsert,
-          intersection.length, valueToInsert.length);
+      remain1 = getBytes(nodes[cn],
+          intersection.length, nodes[cn].length);
+      remain2 = getBytes(v,
+          intersection.length, v.length);
     }
 
     if(intersection !=  null) {
@@ -143,16 +142,16 @@ final class CTArray {
 
           if(d != null) {
             //addDataToNode(currentCompressedTrieNode, data, data.length);
-            addDataToNode(currentCompressedTrieNode, d, d[0].length);
+            addDataToNode(cn, d, d[0].length);
           }
-          return currentCompressedTrieNode;
+          return cn;
         } else {
           // char1 == null && char2 != null
           // value of currentNode equals valueToInsert,
           //but valueToInset is longer
 
           final int positionToInsert =
-            getInsertingPosition(currentCompressedTrieNode, remain2[0]);
+            getInsertingPosition(cn, remain2[0]);
           if(!found) {
             // create new node and append it, because any child from curretnNode
             // start with the same letter than reamin2.
@@ -167,7 +166,7 @@ final class CTArray {
               //addDataToNode(countNodes, data, data.length);
               addDataToNode(countNodes, d, d[0].length);
             }
-            insertNodeInNextArray(currentCompressedTrieNode,
+            insertNodeInNextArray(cn,
                 countNodes, positionToInsert);
             countNodes++;
             // System.out.println("1. FAll->!found");
@@ -176,7 +175,7 @@ final class CTArray {
           } else {
             // System.out.println("1. FAll->found");
             return insertNodeIntoTrie(
-                next[currentCompressedTrieNode][positionToInsert],
+                next[cn][positionToInsert],
                 remain2, d);
           }
         }
@@ -187,18 +186,18 @@ final class CTArray {
           //but current has a longer value
 
           // update value of currentNode.value with intersection
-          nodes[currentCompressedTrieNode] = intersection;
+          nodes[cn] = intersection;
           // System.out.println("2. nodes=" + byteArrayToString(nodes));
 
           final int[][] dataCurrentNode = (int[][])
-            this.data[currentCompressedTrieNode];
+            this.data[cn];
           // save number of data from currentCompressedTrieNode
-          final int dataCurrentNodeSize = dataSize[currentCompressedTrieNode];
-          this.data[currentCompressedTrieNode] = null;
-          dataSize[currentCompressedTrieNode] = 0;
+          final int dataCurrentNodeSize = dataSize[cn];
+          this.data[cn] = null;
+          dataSize[cn] = 0;
           if(d != null) {
             //addDataToNode(currentCompressedTrieNode, data, data.length);
-            addDataToNode(currentCompressedTrieNode, d, d[0].length);
+            addDataToNode(cn, d, d[0].length);
           }
 
           if(!found) {
@@ -214,8 +213,8 @@ final class CTArray {
             addDataToNode(countNodes, dataCurrentNode, dataCurrentNodeSize);
 
             // next data from currentNode.next update
-            next[countNodes] = next[currentCompressedTrieNode];
-            next[currentCompressedTrieNode] = new int[] {countNodes};
+            next[countNodes] = next[cn];
+            next[cn] = new int[] {countNodes};
             totDataSize++;
 
 
@@ -234,16 +233,16 @@ final class CTArray {
             nodes[countNodes] = remain1;
             this.data[countNodes] = dataCurrentNode;
             this.dataSize[countNodes] = dataCurrentNodeSize;
-            next[countNodes] = next[currentCompressedTrieNode];
-            next[currentCompressedTrieNode] = new int[] {countNodes};
+            next[countNodes] = next[cn];
+            next[cn] = new int[] {countNodes};
             totDataSize++;
 
 
-            this.data[currentCompressedTrieNode] = null;
-            dataSize[currentCompressedTrieNode] = 0;
+            this.data[cn] = null;
+            dataSize[cn] = 0;
             if(d != null) {
               //addDataToNode(currentCompressedTrieNode, data, data.length);
-              addDataToNode(currentCompressedTrieNode, d, d[0].length);
+              addDataToNode(cn, d, d[0].length);
             }
 
             countNodes++;
@@ -255,13 +254,13 @@ final class CTArray {
           // letter update value of current node with intersection
 
           final int[][] dataCurrentNode = (int[][])
-            this.data[currentCompressedTrieNode];
+            this.data[cn];
 
-          final int dataCurrentNodeSize = dataSize[currentCompressedTrieNode];
-          this.data[currentCompressedTrieNode] = null;
-          dataSize[currentCompressedTrieNode] = 0;
+          final int dataCurrentNodeSize = dataSize[cn];
+          this.data[cn] = null;
+          dataSize[cn] = 0;
 
-          nodes[currentCompressedTrieNode] = intersection;
+          nodes[cn] = intersection;
           if(!(countNodes < nodes.length - 2)) {
             reSize();
           }
@@ -274,13 +273,13 @@ final class CTArray {
           nodes[countNodes + 1] = remain1;
           addDataToNode(countNodes + 1, dataCurrentNode, dataCurrentNodeSize);
 
-          next[countNodes + 1] = next[currentCompressedTrieNode];
-          next[currentCompressedTrieNode] = new int[] {countNodes + 1};
+          next[countNodes + 1] = next[cn];
+          next[cn] = new int[] {countNodes + 1};
           totDataSize++;
 
           final int insertingPos = getInsertingPosition(
-              currentCompressedTrieNode, nodes[countNodes][0]);
-          insertNodeInNextArray(currentCompressedTrieNode, countNodes,
+              cn, nodes[countNodes][0]);
+          insertNodeInNextArray(cn, countNodes,
               insertingPos);
           countNodes += 2;
           return countNodes - 1;
@@ -291,14 +290,14 @@ final class CTArray {
       // no intersection between current node an valuetoinsert
       // System.out.println("4. Fall");
 
-      nodes[countNodes] = valueToInsert;
+      nodes[countNodes] = v;
       if(d !=  null) {
         //addDataToNode(countNodes, data, data.length);
         addDataToNode(countNodes, d, d[0].length);
       }
-      final int insertingPos = getInsertingPosition(currentCompressedTrieNode,
-          valueToInsert[0]);
-      insertNodeInNextArray(currentCompressedTrieNode, countNodes,
+      final int insertingPos = getInsertingPosition(cn,
+          v[0]);
+      insertNodeInNextArray(cn, countNodes,
           insertingPos);
       countNodes++;
       return countNodes - 1;

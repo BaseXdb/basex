@@ -39,4 +39,5 @@ public final class XMLSyntax extends BaseXSyntax {
     }
     return Color.black;
   }
+
 }

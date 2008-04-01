@@ -1,5 +1,6 @@
 package org.basex.query.xpath.expr;
 
+import org.basex.gui.GUIProp;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.values.Item;
@@ -75,7 +76,14 @@ public final class FTIntersection extends FTArrayExpr {
           tmp = ((NodeSet) it).ftidpos;
           if (pres) {
             o = calculateFTAndOrderPreserving(res, tmp, pntr); 
-            if (o[0] == null && o[1] == null) {
+            if (o != null && o.length == 2 && o[0] == null && o[1] == null) {
+              return new NodeSet(ctx);
+            }
+            res = (int[][]) o[0];
+            pntr = (int[]) o[1];
+          } else if(GUIProp.thumbnail) {
+            o = calculateFTAnd(res, tmp, pntr); 
+            if (o != null && o.length == 2 && o[0] == null && o[1] == null) {
               return new NodeSet(ctx);
             }
             res = (int[][]) o[0];
@@ -85,7 +93,7 @@ public final class FTIntersection extends FTArrayExpr {
           }
         }
       }
-      if (pres) {
+      if (pres || GUIProp.thumbnail) {
         return new NodeSet(Array.extractIDsFromData(res), context, res, pntr);
       }
       return new NodeSet(Array.extractIDsFromData(res), context, res);
@@ -380,7 +388,7 @@ public final class FTIntersection extends FTArrayExpr {
         && v2[0][k] == v1[0][i - 1]) {
       maxResult[0][counter] = v2[0][k];
       maxResult[1][counter] = v2[1][k];
-      // coipy old pointer
+      // copy old pointer
       if (!changedOrder) {
         pointersnew[counter + 1] = p[k + 1];
       } else {
@@ -406,6 +414,202 @@ public final class FTIntersection extends FTArrayExpr {
     o[1] = p;
 
     return o;
+  }
+
+
+  /**
+   * Built join for value1 and value2; used key is id. 
+   * Servers pointer on searchstrings for each id.
+   * @param val1 input set int[][]
+   * @param val2 input set  int[][]
+   * @param p int[] pointer array, optional on val1
+   * @return result int[][]
+   */
+  public Object[] calculateFTAnd(final int[][] val1, final int[][] val2, 
+      final int[] p) {
+    int lastId = -1;
+    int[][] values1 = val1;
+    int[][] values2 = val2;
+    
+    if(values1 == null || values1[0].length == 0 || values2 == null
+        || values2[0].length == 0) {
+      return new Object[]{null, null};
+    }
+
+    int[] pn = new int[val1[0].length + val2[0].length + 1];
+    if(p != null) pn[0] = p[0] + 1;
+    else pn[0] = 1;
+    
+    // calculate minimum size
+    int min = Math.min(values1[0].length, values2[0].length);
+    int[][] maxResult;
+    // double space, because 2 values for each identical id
+    maxResult = new int[2][values1[0].length + values2[0].length];
+    boolean co = false;
+    
+    if(min == values2[0].length && min != values1[0].length) {
+      // change arrays
+      int[][] tmp = values2;
+      values2 = values1;
+      values1 = tmp;
+      co = true;
+    }
+
+    // run variable for values1
+    int i = 0;
+    // run variable for values2
+    int k = 0;
+    // count added elements
+    int counter = 0;
+    int cmpResult;
+
+    // each value from the smaller set are compared with the bigger set and
+    // added to result
+    while(i < values1[0].length && k < values2[0].length) {
+      cmpResult = Array.compareIntArrayEntry(values1[0][i], values1[1][i],
+          values2[0][k], values2[1][k]);
+      if(cmpResult == -1) {
+        // same Id, but pos1 < pos 2 values1[i] < values2[k]
+        maxResult[0][counter] = values1[0][i];
+        maxResult[1][counter] = values1[1][i];
+
+        // copy old pointer
+        if (!co) {
+          pn[counter + 1] = (p != null) ? p[i + 1] : 0;
+        } else {
+          pn[counter + 1] = pn[0];
+        }
+
+        lastId = values1[0][i];
+        counter++;
+
+        i++;
+      } else if(cmpResult == -2) {
+        // id1 < i2
+        if(lastId != values1[0][i]) {
+          i++;
+        } else {
+          // same value and Id == lastId have to be copied
+          while(i < values1[0].length && lastId == values1[0][i]) {
+
+            maxResult[0][counter] = values1[0][i];
+            maxResult[1][counter] = values1[1][i];
+
+            // copy old pointer
+            if (!co) {
+              pn[counter + 1] = (p != null) ? p[i + 1] : 0;
+            } else {
+              pn[counter + 1] = pn[0];
+            }
+
+            counter++;
+            i++;
+          }
+        }
+      } else if(cmpResult == 2) {
+        // id1 > i2
+        if(lastId != values2[0][k]) {
+
+          k++;
+        } else {
+          // all values with same Id == lastId have to be copied
+          while(k < values2[0].length && lastId == values2[0][k]) {
+
+            maxResult[0][counter] = values2[0][k];
+            maxResult[1][counter] = values2[1][k];
+
+            // copy old pointer
+            if (co) {
+              pn[counter + 1] = (p != null) ? p[k + 1] : 0;
+            } else {
+              pn[counter + 1] = pn[0];
+            }
+            
+            counter++;
+            k++;
+          }
+        }
+      } else if(cmpResult == 1) {
+        // same ids, aber pos1 > pos2 values1[i] > values2[k]
+        maxResult[0][counter] = values2[0][k];
+        maxResult[1][counter] = values2[1][k];
+
+        // copy old pointer
+        if (co) {
+          pn[counter + 1] = (p != null) ? p[k + 1] : 0;
+        } else {
+          pn[counter + 1] = pn[0];
+        }
+
+        
+        lastId = values2[0][k];
+        counter++;
+        k++;
+      } else {
+        // entry identical
+        maxResult[0][counter] = values2[0][k];
+        maxResult[1][counter] = values2[1][k];
+        counter++;
+        // copy old pointer
+        if (co) {
+          pn[counter + 1] = (p != null) ? p[k + 1] : 0;
+        } else {
+          pn[counter + 1] = pn[0];
+        }
+
+        i++;
+        k++;
+      }
+    }
+
+    // process left elements form values1, values2 done
+    while(k > 0 && values1[0].length > i &&
+        values1[0][i] == values2[0][k - 1]) {
+      maxResult[0][counter] = values1[0][i];
+      maxResult[1][counter] = values1[1][i];
+      
+      // copy old pointer
+      if (!co) {
+        pn[counter + 1] = (p != null) ? p[i + 1] : 0;
+      } else {
+        pn[counter + 1] = pn[0];
+      }
+
+      
+      counter++;
+      i++;
+    }
+
+    // process left elements form values2, values1 done
+    while(i > 0 && values2[0].length > k &&
+        values2[0][k] == values1[0][i - 1]) {
+      //maxResult[counter] = values2[k];
+      maxResult[0][counter] = values2[0][k];
+      maxResult[1][counter] = values2[1][k];
+      // copy old pointer
+      if (co) {
+        pn[counter + 1] = (p != null) ? p[k + 1] : 0;
+      } else {
+        pn[counter + 1] = pn[0];
+      }
+
+      counter++;
+      k++;
+    }
+
+    if(counter == 0) {
+      return new int[][]{};
+    }
+
+    int[][] returnArray;
+    returnArray = new int[2][counter];
+    System.arraycopy(maxResult[0], 0, returnArray[0], 0, counter);
+    System.arraycopy(maxResult[1], 0, returnArray[1], 0, counter);
+    
+    int[] poi = new int[counter + 1];
+    System.arraycopy(pn, 0, poi, 0, counter + 1);
+    
+    return new Object[]{returnArray, poi};
   }
 
  

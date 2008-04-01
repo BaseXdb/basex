@@ -2,6 +2,8 @@ package org.basex.gui.view.text;
 
 import static org.basex.gui.GUIConstants.*;
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+
 import org.basex.BaseX;
 import org.basex.data.Nodes;
 import org.basex.data.PrintSerializer;
@@ -9,6 +11,7 @@ import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIConstants.FILL;
+import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXSyntax;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.BaseXLabel;
@@ -29,6 +32,11 @@ public final class TextView extends View {
   final BaseXText area;
   /** Header string. */
   final BaseXLabel header;
+  /** Background for header.NORTH. **/
+  BaseXBack north;
+  /** Background for header.CENTER. **/
+  BaseXBack center;
+  
 
   /**
    * Default constructor.
@@ -41,13 +49,54 @@ public final class TextView extends View {
     setMode(mode);
     setBorder(8, 8, 8, 8);
     setLayout(new BorderLayout());
-    header = new BaseXLabel(head, 10);
-    add(header, BorderLayout.NORTH);
     area = new BaseXText(help, false);
     add(area, BorderLayout.CENTER);
+    north = new BaseXBack(FILL.NONE);
+    north.setLayout(new BorderLayout());
+    header = new BaseXLabel(head, 10);
+    initHeader();
     refreshLayout();
   }
 
+  /**
+   * Init header displaying ftsearch strings.
+   */
+  public void initHeader() {
+    north.add(header, BorderLayout.WEST);
+    //add(header, BorderLayout.NORTH);
+    add(north, BorderLayout.NORTH);
+  }
+  
+  
+ /**
+  * Updates header labels displaying ftsearch string.
+  * @param n nodes
+  */ 
+  public void updateHeader(final Nodes n) {
+    if (!GUIProp.thumbnail) return;
+    
+    if (n == null || n.size == 0 || n.ftss == null) {
+      if (north != null && center != null) {
+        // <cg> <sg> hack - find solution for removing north
+        remove(north);
+        north = new BaseXBack(FILL.NONE);
+        north.setLayout(new BorderLayout());
+        initHeader();
+      }
+      return;
+    }
+    center = new BaseXBack(FILL.NONE);
+    center.setLayout(new FlowLayout());
+    BaseXLabel l;
+    
+    for (int i = 0; i < n.ftss.length; i++) {
+      l = new BaseXLabel(new String(n.ftss[i]));
+      l.setForeground(GUIConstants.thumbnailcolor[i]);
+      center.add(l);
+    }
+    north.add(center, BorderLayout.CENTER);
+  }
+  
   @Override
   public void refreshInit() {
     area.setCursor(0);
@@ -74,10 +123,14 @@ public final class TextView extends View {
    * @param nodes nodes to display
    */
   private void refreshDoc(final Nodes nodes) {
+    
     if(!GUIProp.showtext ||
-        !header.getText().equals(GUIConstants.TEXTVIEW)) return;
+        !header.getText().equals(GUIConstants.TEXTVIEW)) {
+      return;
+    }
     if(!GUI.context.db() || nodes.size == 0) {
       setText(Token.EMPTY, 0, true);
+      updateHeader(null);
       return;
     }
     
@@ -87,6 +140,8 @@ public final class TextView extends View {
       nodes.serialize(new PrintSerializer(out, false, chop));
       out.addInfo();
       setText(out.buffer(), out.size(), false);
+      updateHeader(nodes);
+      
     } catch(final Exception ex) {
       BaseX.debug(ex);
     }

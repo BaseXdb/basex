@@ -32,6 +32,8 @@ public final class FTIndex extends InternalExpr {
   /** Flag for tokens containing only one single word, 
    * like 'usability' (not 'usability testing'). **/
   boolean single = false;
+  /** Number of errors allowed - used for fuzzy search. **/
+  int ne = -1;
 
   /**
    * Constructor.
@@ -65,6 +67,17 @@ public final class FTIndex extends InternalExpr {
     single = sing;
   }
 
+  /**
+   * Constructor used for fuzzy search.
+   * @param tok index token
+   * @param numErrors int number of errors allowed
+   */
+  public FTIndex(final byte[] tok, final int numErrors) {
+    token = tok;
+    ne = numErrors;
+  }
+
+  
   /**
    * Setter for FTPostion Filter - used for fTContent.
    * @param ftp FTPostionFilter
@@ -102,28 +115,36 @@ public final class FTIndex extends InternalExpr {
     return option;
   }
 
+  
+  
   @Override
   public NodeSet eval(final XPContext ctx) {
     final Data data = ctx.local.data;
 
+    if (ne > 0) {
+      ids = data.fuzzyIDs(token, ne);
+      if (ids == null) return new NodeSet(ctx);
+      return new NodeSet(Array.extractIDsFromData(ids), ctx, ids);
+    }
+    
     if(single) {
       ids = data.ftIDs(token, option);
       if (ids == null) return new NodeSet(ctx);
-      if(simple) {
+      /*if(simple) {
         // simple ftcontains don't need pos-values out of the index
         return new NodeSet(Array.extractIDsFromData(ids), ctx);
-      } else {
+      } else {*/
         return new NodeSet(Array.extractIDsFromData(ids), ctx, ids);
-      }
+      //}
     } else {
       evalNonSingle(data);
       if (ids == null) return new NodeSet(ctx);
-      if(simple) {
+      /*if(simple) {
         // simple ftcontains don't need pos-values out of the index
         return new NodeSet(Array.extractIDsFromData(ids), ctx);
-      } else {
+      } else {*/
         return new NodeSet(Array.extractIDsFromData(ids), ctx, ids);
-      }
+      //no}
     }
   }
 

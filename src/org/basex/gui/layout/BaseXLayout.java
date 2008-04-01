@@ -21,11 +21,15 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.AbstractButton;
 import javax.swing.JComponent;
+
+import org.basex.core.Context;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.dialog.Dialog;
 import org.basex.gui.view.map.MapRect;
+import org.basex.util.Array;
+import org.basex.util.Token;
 
 /**
  * This class assembles layout and paint methods which are frequently
@@ -373,7 +377,7 @@ public final class BaseXLayout {
    * horizontal start position. Otherwise, returns -1.
    * @param g graphics reference
    * @param s string to be checked
-   * @param ww maximum width
+   * @param ww maximum width 
    * @return result of check
    */
   public static int centerPos(final Graphics g, final byte[] s, final int ww) {
@@ -387,6 +391,24 @@ public final class BaseXLayout {
     return (ww - sw - 2) >> 1;
   }
 
+  /**
+   * Calculates the width of a string.
+   * @param g graphics reference
+   * @param s string to be checked
+   * @return result of check
+   */
+  public static int calculateWidth(final Graphics g, final byte[] s) {
+    final int[] cw = fontWidths(g.getFont());
+    int sw = 0;
+    final int j = s.length;
+    for(int k = 0; k < j; k += cl(s[k])) {
+      sw += width(g, cw, cp(s, k));
+    }
+    return sw;
+  }
+
+  
+  
   /**
    * Draws a text.
    * @param g graphics reference
@@ -402,6 +424,152 @@ public final class BaseXLayout {
   }
 
   /**
+   * Draws a text using thumbnail visualization.
+   * @param g graphics reference
+   * @param r rectangle
+   * @param s text to be drawn
+   * @param m length of text
+   * @param wrap number of lines after which text is wrapped
+   * @param draw draw text (otherwise: just calculate space)
+   * @return last height that was occupied
+   */
+  /*
+  public static int drawTextThumbnail(final Graphics g, final MapRect r,
+      final byte[] s, final int m, final int wrap, final boolean draw) {
+    
+    int xx = r.x;
+    int yy = r.y + GUIProp.fontsize;
+    int ww = r.w;
+    int f = 3; // number pixels per char
+    int ws = cl(' ');
+    int wl = 0; // word length
+    int ll = 0; // line length 
+    final int ys = yy;
+    for (byte b : s) {
+      if (Token.ws(b)) {       
+        // check if rec fits in line
+        if (f * (ll + wl) > ww) { 
+          yy += 0.8 * GUIProp.fontsize;
+          ll = 0;
+        } 
+          
+        if (yy >= r.y + r.h || xx + f * (ll + wl) >= r.x + r.w) return r.h;
+        // draw word
+        g.fillRect(xx + f * ll, yy, f * wl, (int) (0.5 * GUIProp.fontsize));
+         
+        ll += wl;
+        
+        if (b == '\n') {
+          yy += 1 * GUIProp.fontsize;
+          ll = 0;
+        } else {
+          // draw ws
+          if (ll + ws < ww) {
+             ll += ws;
+          } else {
+             yy += 1.2 * GUIProp.fontsize;
+             ll = ws;
+          }
+        }
+        wl = 0;
+      } else {
+        // add to current wordline
+        wl += cl(b);
+      }
+    }
+
+    if (yy > r.y + r.h || xx + f * (ll + wl) > r.x + r.w) return r.h;
+    // draw word
+    g.fillRect(xx + f * ll, yy, f * wl, (int) (0.5 * GUIProp.fontsize));
+    
+    return yy - ys;
+  }
+  */
+  /**
+   * Draws a text using thumbnail visualization.
+   * @param g graphics reference
+   * @param r rectangle
+   * @param s text to be drawn
+   * @param i0 index on first pre value in cont.getFTData()[1]
+   * @return last height that was occupied
+   */
+  public static int drawTextThumbnailwithFT(final Graphics g, final MapRect r,
+      final byte[] s, final int i0) {
+    //, final int[][] ftd, final int[] ftp) {
+ 
+    Context cont = GUI.context;
+    
+    int xx = r.x;
+    int yy = r.y + GUIProp.fontsize;
+    int ww = r.w;
+    int f = 3; // number pixels per char
+    int ws = cl(' ');
+    int wl = 0; // word length
+    int ll = 0; // line length 
+    final int ys = yy;
+    int k = i0;
+    Color textc = g.getColor();
+    boolean c = false;
+    for (int i = 0; i < s.length; i++) {
+      if (k > -1 && cont.getFTData() != null && k < cont.getFTData()[0].length 
+          && i == cont.getFTData()[1][k] 
+         && r.p == cont.getFTData()[0][k]) {
+         k++;
+         c = true;
+     }
+    
+      if (Token.ws(s[i])) {       
+        // check if rec fits in line
+        if (f * (ll + wl) > ww) { 
+          yy += 0.8 * GUIProp.fontsize;
+          ll = 0;
+        } 
+          
+        if (yy >= r.y + r.h || xx + f * (ll + wl) >= r.x + r.w) return r.h;
+        // draw word
+        //if (c) g.setColor((ftp != null) ? GUIConstants.COLORS[ftp[k]] 
+        if (c && k > -1)  {
+          g.setColor((cont.getFTPointer() != null) ? 
+            GUIConstants.thumbnailcolor[cont.getFTPointer()[k]] : 
+              GUIConstants.COLORERROR);
+        }
+        
+        g.fillRect(xx + f * ll, yy, f * wl, (int) (0.5 * GUIProp.fontsize));
+        if (c) {
+          c = false;
+          g.setColor(textc); 
+        }
+        ll += wl;
+        
+        if (s[i] == '\n') {
+          yy += 1 * GUIProp.fontsize;
+          ll = 0;
+        } else {
+          // draw ws
+          if (ll + ws < ww) {
+             ll += ws;
+          } else {
+             yy += 1.2 * GUIProp.fontsize;
+             ll = ws;
+          }
+        }
+        wl = 0;
+        
+
+      } else {
+        // add to current wordline
+        wl += cl(s[i]);
+      }
+    }
+
+    if (yy > r.y + r.h || xx + f * (ll + wl) > r.x + r.w) return r.h;
+    // draw word
+    g.fillRect(xx + f * ll, yy, f * wl, (int) (0.5 * GUIProp.fontsize));
+    return yy - ys;
+  }
+  
+  
+  /**
    * Draws a text.
    * @param g graphics reference
    * @param r rectangle
@@ -414,6 +582,17 @@ public final class BaseXLayout {
   public static int drawText(final Graphics g, final MapRect r,
       final byte[] s, final int m, final int wrap, final boolean draw) {
 
+    Context context = GUI.context;
+    if (GUIProp.thumbnail &&  context.marked().ftpre !=  null 
+        && context.marked().ftpre[0] != null 
+        && context.marked().ftpre[0].length != 0) {
+      int i = Array.firstIndexOf(r.p, context.marked().ftpre[0]);
+      if (i > -1) {
+        BaseXLayout.drawTextThumbnailwithFT(g, r, s, i);
+        //, context.marked().ftpre, context.marked().ftpoin);
+      }
+    } 
+    
     // limit string to given space
     final int[] cw = fontWidths(g.getFont());
     int i = 0;
@@ -450,6 +629,7 @@ public final class BaseXLayout {
       }
     } while(yy + GUIProp.fontsize < ys + hh && i < j);
     return yy - ys;
+    
   }
 
   /**

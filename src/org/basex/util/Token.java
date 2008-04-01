@@ -543,9 +543,14 @@ public final class Token {
    * @return 0 if tok equals tok2, -1 tok > tok0, 1 tok < tok2
    */
   public static int cmp(final byte[] tok, final byte[] tok2) {
-    final int l = (tok.length > tok2.length) ? tok2.length 
+    /*final int l = (tok.length > tok2.length) ? tok2.length 
         : tok.length;
-    for(int t = 0; t != l; t++) { 
+    */
+    if (tok.length > tok2.length) return -1;
+    if (tok.length < tok2.length) return 1;
+    
+    //for(int t = 0; t != l; t++) {
+    for(int t = 0; t != tok.length; t++) {
       if(tok2[t] > tok[t]) return 1;
       else if(tok2[t] < tok[t]) return -1;
     }

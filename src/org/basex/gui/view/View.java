@@ -130,6 +130,8 @@ public abstract class View extends BaseXPanel {
     Nodes nodes = context.marked();
     if(mode == 0) {
       nodes = new Nodes(pre, context.data());
+      // remove ftdata
+      context.ftData(null, null);
     } else if(mode == 1) {
       nodes.add(pre);
     } else {
@@ -172,6 +174,7 @@ public abstract class View extends BaseXPanel {
     final Context context = GUI.context;
     if(nodes.size == 0) return;
 
+    // <cg> why final Nodes n = new Nodes(context.data());
     final Nodes n = new Nodes(context.data());
     final GUI gui = GUI.get();
 
@@ -198,6 +201,8 @@ public abstract class View extends BaseXPanel {
         maxhist = hist;
       }
     }
+    // <SG> maybe hack - find general solution??
+    //n.setFTData(context.marked().ftpre, context.marked().ftpoin);
     ViewData.init(nodes, n);
     
     for(final View v : view) v.refreshContext(true, quick);

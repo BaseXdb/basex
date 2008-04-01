@@ -170,6 +170,9 @@ public final class GUIConstants {
   public static Color colormark4;
   /** Fifth mark color. */
   public static Color colormark5;
+  
+  /** Thumbnail colors. **/
+  public static Color[] thumbnailcolor;
 
   /** Cached treemap colors. */
   public static final Color[] COLORS = new Color[256];
@@ -227,6 +230,11 @@ public final class GUIConstants {
         Math.max(255 - l * GUIProp.colorgreen, 0),
         Math.max(255 - l * GUIProp.colorblue, 0));
     }
+    
+    // create thumbnailcolormap 
+    thumbnailcolor = new Color[]{Color.BLUE, Color.RED,  Color.ORANGE, 
+        Color.GREEN, Color.GRAY, Color.YELLOW, Color.DARK_GRAY, 
+        Color.PINK, Color.ORANGE};
   }
 
   /**

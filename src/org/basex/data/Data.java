@@ -52,8 +52,10 @@ public abstract class Data  {
   protected Index atvindex;
   /** Word index. */
   protected Index wrdindex;
-  /**  Fulltext index instance. **/
+  /** Fulltext index instance. **/
   protected Index ftxindex;
+  /** Fuzzy index instance. **/
+  protected Index fuzzyindex;
 
   /** File system indicator. */
   public boolean deepfs;
@@ -293,6 +295,8 @@ public abstract class Data  {
     }
   }
 
+  
+  
   /**
    * Returns the number of indexed id references for the specified token.
    * @param type index type.
@@ -310,6 +314,18 @@ public abstract class Data  {
     }
   }
 
+  /**
+   * FUZZY SEARCH
+   * Returns the indexed id references for the specified fulltext token,
+   * with respect to number of errors (ne) that are allowed to occure.
+   * 
+   * @param fulltext token to be looked up
+   * @param ne int number of errors allowed
+   * @return id array
+   */
+  public abstract int[][] fuzzyIDs(byte[] fulltext, final int ne);
+
+  
   /**
    * Returns the indexed id references for the specified fulltext token.
    * @param fulltext token to be looked up

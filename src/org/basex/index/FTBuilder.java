@@ -5,9 +5,10 @@ import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.core.Progress;
 import org.basex.data.Data;
+import org.basex.data.DiskData;
 import org.basex.io.DataOutput;
 import org.basex.util.Token;
-import org.basex.data.DiskData;
+
 
 /**
  * This class builds an index for text contents in a compressed trie.
@@ -41,6 +42,7 @@ public final class FTBuilder extends Progress implements IndexBuilder {
    * @throws IOException IO Exception
    */
   public WordsCTA build(final Data data) throws IOException {
+  //public Fuzzy build(final Data data) throws IOException {
     index = new CTArray();
     total = data.size;
     for(id = 0; id < total; id++) {
@@ -91,7 +93,11 @@ public final class FTBuilder extends Progress implements IndexBuilder {
       out = new DataOutput(db, DATAFTX + 'd');
       out.writeIntArray(indexX.data);
       out.close();
+      //FuzzyBuilder fb = new FuzzyBuilder(indexX);
+      //return fb.build(data);
+      
     }
+    //return null;
     return new WordsCTA(db, (DiskData) data);
   }
 

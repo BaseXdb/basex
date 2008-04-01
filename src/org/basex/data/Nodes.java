@@ -18,7 +18,12 @@ public final class Nodes implements Result {
   public int[] pre;
   /** Number of stored nodes. */
   public int size;
-
+  /** Fulltext data (prevalues and positions). */
+  public int[][] ftpre = null;
+  /** Fulltext pointer values, linking prevalues and query strings. */
+  public int[] ftpoin = null;
+  /** Fulltext search string from query. **/
+  public byte[][] ftss;
   /**
    * Node Set constructor.
    * @param d data reference
@@ -48,6 +53,8 @@ public final class Nodes implements Result {
     data = d;
   }
 
+  
+  
   /**
    * Returns the position of the specified node or the negative value - 1 of
    * the position where it should have been found.
@@ -97,6 +104,21 @@ public final class Nodes implements Result {
     return this;
   }
 
+  /**
+   * Setter for FTData. Used for visualization purpose.
+   * 
+   * @param ftprepos prevalues and positionvalues
+   * @param ftpointer pointer for prevalues
+   * @param ftsearchstrings byte[][] ftsearchstings out of query
+   */
+  public void setFTData(final int[][] ftprepos, final int[] ftpointer, 
+      final byte[][] ftsearchstrings) {
+    ftpre = ftprepos;
+    ftpoin = ftpointer;
+    ftss = ftsearchstrings;
+  }
+  
+  
   /**
    * The specified pre value is added to or removed from the context set.
    * @param p pre value

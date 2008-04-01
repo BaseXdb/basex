@@ -75,6 +75,8 @@ public final class WordsCTA implements Index {
    * @return number of ids
    */
   public int[][] idPos(final byte[] tok, final FTOption ftO) {
+    //return getNodesFuzzyWLev(0, new StringBuffer(), tok, 3, null);
+    //return getNodeFuzzy(0, null, tok, 0, 0, 0, 3);
     // init no wildcard included in token
     int posW = -1;
     //System.out.println("token:" + new String(tok));
@@ -279,6 +281,18 @@ public final class WordsCTA implements Index {
     return data;
   }
   
+  /**
+   * FUZZY SEARCH
+   * Returns the indexed id references for the specified fulltext token,
+   * with respect to number of errors (ne) that are allowed to occure.
+   * 
+   * @param tok token to be looked up
+   * @param ne int number of errors allowed
+   * @return id array
+   */
+  public int[][] fuzzyIDs(final byte[] tok, final int ne) {
+    return getNodeFuzzy(0, null, tok, 0, 0, 0, ne);
+  }
 
   /**
    * Returns all ids from trie stored for tok, with repsect to ftO.
@@ -296,7 +310,7 @@ public final class WordsCTA implements Index {
    * @return number of ids
    */
   public int[] ids(final byte[] tok) {
-    int nId = getNodeIdFromTrieRecursive(0, tok);
+    int nId = getNodeIdFromTrieRecursive(0, getNodeEntry(0), tok);
     // no entry found in trie
     if (nId == -1) return new int[0];
 
@@ -338,8 +352,9 @@ public final class WordsCTA implements Index {
    */
   private int[][] getNodeFromTrieRecursive(final int cNode,
       final byte[] searchNode) {
-
-    int nId = getNodeIdFromTrieRecursive(cNode, searchNode);
+    if (searchNode == null || searchNode.length == 0) return null;
+    int nId = getNodeIdFromTrieRecursive(cNode, getNodeEntry(cNode), 
+        searchNode);
     if (nId == -1) {
       // no entry found in trie
       return null;
@@ -353,85 +368,64 @@ public final class WordsCTA implements Index {
    * Traverse trie and return found node for searchValue.
    * Returns data from node or null.
    *
-   * @param currentCompressedTrieNode int
-   * @param searchNode search nodes value
+   * @param cn int
+   * @param ne byte[] node entry (cn)
+   * @param sn search nodes value
    * @return int id on node saving the data
    */
-  private int getNodeIdFromTrieRecursive(final int currentCompressedTrieNode,
-      final byte[] searchNode) {
-
-    byte[] valueSearchNode = searchNode;
+  private int getNodeIdFromTrieRecursive(final int cn, final byte[] ne, 
+      final byte[] sn) {
+    byte[] vsn = sn;
 
     // read data entry from disk
-    byte[] nodeEntry = getNodeEntry(currentCompressedTrieNode);
-    //int[] dataEntry;
+    //final byte[] ne = getNodeEntry(cn);
 
-    if(currentCompressedTrieNode != 0) {
+    if(cn != 0) {
       int i = 0;
-      // read data entry from disk
-      //dataEntry = getDataEntry(currentCompressedTrieNode);
-
-      while(i < valueSearchNode.length
-          //&& i < nodes[currentCompressedTrieNode][0]
-          && i < nodeEntry[0]
-          //&& nodes[currentCompressedTrieNode][i + 1] == valueSearchNode[i]) {
-          && nodeEntry[i + 1] == valueSearchNode[i]) {
+      while(i < vsn.length && i < ne[0] && ne[i + 1] == vsn[i]) {
         i++;
       }
 
-      //if (nodes[currentCompressedTrieNode][0] == i) {
-      if(nodeEntry[0] == i) {
-        if(valueSearchNode.length == i) {
+      if(ne[0] == i) {
+        if(vsn.length == i) {
           // leaf node found with appropriate value
-          //return getDataFromDataArray(currentCompressedTrieNode);
-          //return getDataFromDataArray(nodeEntry, dataEntry);
-          return currentCompressedTrieNode;
+          return cn;
         } else {
           // cut valueSearchNode for value current node
-          byte[] tmp = new byte[valueSearchNode.length - i];
-          for(int j = 0; j < tmp.length; j++) {
-            tmp[j] = valueSearchNode[i + j];
-          }
-          valueSearchNode = tmp;
+          byte[] tmp = new byte[vsn.length - i];
+          System.arraycopy(vsn, i, tmp, 0, tmp.length);
+          /*for(int j = 0; j < tmp.length; j++) {
+            tmp[j] = vsn[i + j];
+          }*/
+          vsn = tmp;
 
           // scan successors currentNode
-          int position = getInsertingPositionLinear(valueSearchNode[0],
-              nodeEntry);
+          int pos = getInsertingPositionLinear(vsn[0], ne);
           if(!found) {
             // node not contained
-            //System.out.println("1. Fall nicht gefunden");
             return -1;
           } else {
-            int id = getIdOnDataArray(nodeEntry);
-            //dataEntry = getDataEntry(id);
-            // return getNodeFromTrieRecursive(dataEntry[position],
-            //    valueSearchNode);
-            return getNodeIdFromTrieRecursive(getDataEntry(id, position),
-                valueSearchNode);
+            int id = getIdOnDataArray(ne);
+            id = getDataEntry(id, pos);
+            return getNodeIdFromTrieRecursive(id,
+                getNodeEntry(id), vsn);
           }
         }
       } else {
         // node not contained
-        //System.out.println("2. Fall nicht gefunden");
         return -1;
       }
     } else {
       // scan successors current node
-      //int position = getInsertingPositionLinear(currentCompressedTrieNode,
-      //    valueSearchNode[0]);
-
-      int position = getInsertingPositionLinear(valueSearchNode[0], nodeEntry);
+      int pos = getInsertingPositionLinear(vsn[0], ne);
       if(!found) {
         // node not contained
-        //System.out.println("3. Fall nicht gefunden");
         return -1;
       } else {
-        //int id = getIdOnDataArray(currentCompressedTrieNode);
-        int id = getIdOnDataArray(nodeEntry);
-        //dataEntry = getDataEntry(id);
-        //return getNodeFromTrieRecursive(dataEntry[position], valueSearchNode);
-        return getNodeIdFromTrieRecursive(getDataEntry(id, position),
-            valueSearchNode);
+        int id = getIdOnDataArray(ne);
+        id = getDataEntry(id, pos);
+        return getNodeIdFromTrieRecursive(id, getNodeEntry(id),
+            vsn);
       }
     }
   }
@@ -1494,6 +1488,241 @@ public final class WordsCTA implements Index {
       }
     }
   }
+  
+
+  /**
+   * Traverse trie and return found node for searchValue; returns data
+   * from node or null.
+   *
+   * @param cn int current node id
+   * @param crne byte[] current node entry (of cn)
+   * @param sn byte[] search nodes value
+   * @param d int counter for deletions
+   * @param p int counter for pastes
+   * @param r int counter for replacepments 
+   * @param c int counter sum of errors
+   * @return int[][]
+   */
+   private int[][] getNodeFuzzy(final int cn, final byte[] crne, 
+       final byte[] sn, final int d, final int p, final int r, final int c) {
+    byte[] vsn = sn;
+    byte[] cne = crne;
+    if (crne == null)
+      cne = getNodeEntry(cn);
+    int[] cde;
+      
+    if(cn != 0) {
+      // not root node
+      int i = 0;
+      while(i < vsn.length && i < cne[0] && cne[i + 1] == vsn[i]) {
+        i++;
+      }
+      
+      if(cne[0] == i) {
+        // node entry processed complete 
+        if(vsn.length == i) {
+          // leafnode found with appropriate value
+          cde = getDataEntry(cn);
+          if (c >= d + p + r) {
+            int[][] ld = null;
+            byte[] nne;
+            ld = getDataFromDataArray(cne, cde);
+            int[] nn = getNextNodes(cne);
+            if (nn != null) {
+              for (int t = 0; t < nn.length; t++) {
+                nne = getNodeEntry(nn[t]);
+                ld = FTUnion.calculateFTOr(ld, 
+                    getNodeFuzzy(nn[t], nne, new byte[]{nne[1]}, 
+                        d, p + 1, r, c));
+              }
+            }
+            return ld;
+          } else return null;
+        } else {
+          int[][] ld = null;
+          // cut valueSearchNode for value current node
+          final byte[] tmp = new byte[vsn.length - i];
+          System.arraycopy(vsn, i, tmp, 0, tmp.length);
+          vsn = tmp;
+
+          // scan successors currentNode
+          if(cne[cne[0] + 1] > 0) {
+            // node has no successors
+            return null;
+          }
+            
+          final int[] nn = getNextNodes(cne);
+          byte[] b;
+          byte[] ne;
+          for (int k = 0; k < nn.length; k++) {
+            if (c > d + p + r) {
+              ne = getNodeEntry(nn[k]);
+              if (ne[1] == vsn[0]) {
+                b = new byte[vsn.length];
+                System.arraycopy(vsn, 0, b, 0, vsn.length); 
+                ld = FTUnion.calculateFTOr(ld, 
+                    getNodeFuzzy(nn[k], ne, b, d, p, r, c));
+              }
+              
+              // paste char
+              b = new byte[vsn.length + 1];
+              b[0] = ne[1];
+              System.arraycopy(vsn, 0, b, 1, vsn.length);
+              ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(nn[k], ne,
+                  b, d, p + 1, r, c));
+              
+              if (vsn.length > 0) {
+                // delete char
+                b = new byte[vsn.length - 1];
+                System.arraycopy(vsn, 1, b, 0, b.length);
+                ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(nn[k], ne,
+                    b, d + 1, p, r, c));
+                // replace char
+                b = new byte[vsn.length];
+                System.arraycopy(vsn, 1, b, 1, vsn.length - 1);
+                b[0] = ne[1];
+                ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(nn[k], ne,
+                    b, d, p, r + 1, c));
+              }
+            } else {
+              return ld;
+            }    
+          }
+          return ld;
+        }
+      } else {
+        int[][] ld = null;
+        byte[] b;
+
+        if (c > d + p + r) {
+          // paste char
+          b = new byte[vsn.length + 1];
+          System.arraycopy(vsn, 0, b, 0, i);
+          b[i] = cne[i + 1];
+          System.arraycopy(vsn, i, b, i + 1, vsn.length - i);
+                 
+          ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(cn, cne,
+              b, d, p + 1, r, c));
+          
+          if (vsn.length > 0 && i < vsn.length) {
+            // replace
+            b = new byte[vsn.length];
+            System.arraycopy(vsn, 0, b, 0, vsn.length);
+            
+            b[i] = cne[i + 1];
+            ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(cn, cne,
+                b, d, p, r + 1, c));
+            if (vsn.length > 1) {
+              // delete char
+              b = new byte[vsn.length - 1];
+              System.arraycopy(vsn, 0, b, 0, i);
+              System.arraycopy(vsn, i + 1, b, i, vsn.length - i - 1);
+              ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(cn, cne,
+                  b, d + 1, p, r, c));
+            }
+           }
+          } else {
+          return ld;
+        }    
+        return ld;
+      }
+    } else {
+      // scan successors current node (root node)
+      if(cne[cne[0] + 1] > 0) {
+        // node has no successors
+        return null;
+      }
+        
+      final int[] nn = getNextNodes(cne);
+      byte[] ne;
+      int[][] ld = null;
+
+      byte[] b;
+      for (int k = 0; k < nn.length; k++) {
+        if (c > d + p + r) {
+          ne = getNodeEntry(nn[k]);
+          if (ne[1] == vsn[0]) {
+            b = new byte[vsn.length];
+            System.arraycopy(vsn, 0, b, 0, vsn.length);
+            ld = FTUnion.calculateFTOr(ld, 
+                getNodeFuzzy(nn[k], ne, b, d, p, r, c));
+          }
+          
+          // paste char
+          b = new byte[vsn.length + 1];
+          b[0] = ne[1];
+          System.arraycopy(vsn, 0, b, 1, vsn.length);
+          ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(nn[k], ne,
+              b, d, p + 1, r, c));
+          
+          if (vsn.length > 0) {
+            // delete char
+            b = new byte[vsn.length - 1];
+            System.arraycopy(vsn, 1, b, 0, b.length);
+            ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(nn[k], ne,
+                b, d + 1, p, r, c));
+              // replace
+            b = new byte[vsn.length];
+            System.arraycopy(vsn, 1, b, 1, vsn.length - 1);
+              b[0] = ne[1];
+              ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(nn[k], ne,
+                  b, d, p, r + 1, c));
+          }
+        } else {
+          return ld;
+        }    
+      }
+      return ld;
+    }
+  }
+
+   
+   /**
+    * Traveres the trie and evalutes for each token found, the
+    * levenshtein distance of tok and token from trie.
+    * 
+    * @param nid current node id
+    * @param sb stringbuffer - current token value
+    * @param tok token looking for
+    * @param e maxiumum number of errors
+    * @param dat data already found
+    * @return data found
+    */
+   public int[][] getNodesFuzzyWLev(final int nid, final StringBuffer sb, 
+       final byte[] tok, final int e, final int[][] dat) {
+     int[][] d = dat;
+     int[] ds;
+     byte[] sbb = new byte[]{};
+     byte[] tokt;
+     int ol = 0;
+
+     byte[] cne = getNodeEntry(nid);
+     
+     if (cne[0] > 0) {
+       sbb = new byte[cne[0]];
+       System.arraycopy(cne, 1, sbb, 0, sbb.length);
+       ol = sb.length();
+       sb.append(new String(sbb));
+     }
+     
+     tokt = sb.toString().getBytes();
+     if (Fuzzy.calcEQ(tok, ol, tokt, e)) {
+       final int[] cde = getDataEntry(nid);
+       d = FTUnion.calculateFTOr(d, getDataFromDataArray(cne, cde));
+     }
+     
+     ds = getNextNodes(cne);
+     if (ds != null && tok.length + e >= sb.length()) {
+       for (int i : ds) { 
+         d = FTUnion.calculateFTOr(d, getNodesFuzzyWLev(i, sb, tok, e, d));
+       }
+     } 
+       
+     sb.delete(sb.length() - sbb.length, sb.length());
+     
+     return d;
+   }
+
 
   /**
    * Traverse trie and return found node for searchValue.

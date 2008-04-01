@@ -74,6 +74,21 @@ public final class Words implements Index {
       idxl.length() + idxn.length() + idxt.length();
     out.println(SIZEDISK + Performance.formatSize(l, true) + Prop.NL);
   }
+  
+  /**
+   * FUZZY SEARCH
+   * Returns the indexed id references for the specified fulltext token,
+   * with respect to number of errors (ne) that are allowed to occure.
+   * 
+   * @param tok token to be looked up
+   * @param ne int number of errors allowed
+   * @return id array
+   */
+  public int[][] fuzzyIDs(final byte[] tok, final int ne) {
+    BaseX.debug("Words: No fuzzy search support.");
+    return null;
+  }
+  
     
   /**
    * Returns all ids from trie stored for token with respect to ftO.

@@ -11,6 +11,7 @@ import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.ViewData;
+import org.basex.util.Array;
 
 /**
  * Adds default paint operations to TreeMap.
@@ -40,7 +41,7 @@ public final class MapDefault extends MapPainter {
       // get rectangle information
       final MapRect r = rects.get(ri);
       final int pre = r.p;
-
+      
       // level 1: next context node, set marker pointer to 0
       final int lvl = r.l;
       if(lvl == 0) mpos = 0;
@@ -108,12 +109,65 @@ public final class MapDefault extends MapPainter {
       g.setColor(GUIConstants.COLORS[rect.l * 2 + 8]);
       g.setFont(GUIConstants.mfont);
       byte[] text = ViewData.content(data, pre, false);
+      
       final int p = BaseXLayout.centerPos(g, text, rect.w);
       if(p == -1) {
+        // text doesn't fit in one line
+        if (GUIProp.thumbnail) { 
+          int i = -1;
+          if (context.getFTData() !=  null 
+              && context.getFTData().length != 0) {
+            i = Array.firstIndexOf(pre, context.getFTData()[0]);
+            if (i > -1) { 
+              BaseXLayout.drawTextThumbnailwithFT(g, rect, text, i);
+            }
+          } 
+          
+          BaseXLayout.drawTextThumbnailwithFT(g, rect, text, i);
+          
+          /*else {
+            BaseXLayout.drawTextThumbnail(g, rect, text, 
+                Integer.MAX_VALUE, Integer.MAX_VALUE, true); 
+          }*/
+        } else 
         BaseXLayout.drawText(g, rect, text, Integer.MAX_VALUE, true);
+        
       } else {
-        g.drawString(string(text, 0, text.length), rect.x + p,
-            rect.y + (rect.h + GUIProp.fontsize) / 2 - 1);
+        if (GUIProp.thumbnail && context.getFTData() !=  null 
+            && context.getFTData().length != 0) {
+          int i = Array.firstIndexOf(pre, context.getFTData()[0]);
+          if (i > -1) {
+            BaseXLayout.drawTextThumbnailwithFT(g, rect, text, i);
+            /*   g.drawString(string(text, 0, i), rect.x + p,
+                rect.y + (rect.h + GUIProp.fontsize) / 2 - 1);
+            i++;
+            int k = 0;
+            byte[] s;
+            while (i < context.getFTData()[0].length 
+                && p == context.getFTData()[0][i]) {
+              k = context.getFTData()[1][i-1];
+              while(k < text.length && !Token.ws(text[k++]));
+              s = new byte[k];
+              System.arraycopy(text, context.getFTData()[1][i-1], s, 0, k);
+              Color o = g.getColor();
+              g.setColor(GUIConstants.COLORERROR);
+              g.drawString(new String(s), rect.x + p + 
+                 BaseXLayout.calculateWidth(g, s),
+                  rect.y + (rect.h + GUIProp.fontsize) / 2 - 1);
+              g.setColor(o);
+            }
+
+            g.drawString(string(text, 0, i), rect.x + p,
+                rect.y + (rect.h + GUIProp.fontsize) / 2 - 1);
+*/
+          } else {
+            g.drawString(string(text, 0, text.length), rect.x + p,
+              rect.y + (rect.h + GUIProp.fontsize) / 2 - 1);
+          }
+        } else {
+          g.drawString(string(text, 0, text.length), rect.x + p,
+              rect.y + (rect.h + GUIProp.fontsize) / 2 - 1);
+        }
       }
     }
   }

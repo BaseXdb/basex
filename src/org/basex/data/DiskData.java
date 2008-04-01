@@ -343,6 +343,11 @@ public final class DiskData extends Data {
   }
 
   @Override
+  public int[][] fuzzyIDs(final byte[] words, final int ne) {
+    return ftxindex.fuzzyIDs(words, ne);
+  }
+  
+  @Override
    public int[][] ftIDs(final byte[] word, final FTOption ftO) {
      return ftxindex.idPos(word, ftO);
    }
