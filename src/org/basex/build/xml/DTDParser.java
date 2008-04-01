@@ -7,9 +7,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.build.BuildException;
+import org.basex.core.Prop;
 import org.basex.index.Names;
 import org.basex.io.IOConstants;
 import org.basex.util.Map;
+import org.basex.util.TokenBuilder;
 import org.basex.util.XMLToken;
 
 /**
@@ -27,7 +29,7 @@ public class DTDParser {
   private byte[] attl;
   /** Tokenizer Type. */
   private byte[] tokenizedType;
-  /** Extern id of the DTD file. */
+  /** External id of the DTD file. */
   private byte[] extid;
   /** Root file. */
   private String xmlfile;
@@ -171,7 +173,7 @@ public class DTDParser {
     } else {
       consumeWS();
       byte next = next();
-      if(percentage(next)) {
+      if(next == '%') {
         BaseX.debug(consumeSpecName());
         markupdecl();
       } else {
@@ -441,7 +443,7 @@ public class DTDParser {
       if(!consumeWS()) error(WSERROR);
       byte[] val = consumeQuoted();
       BaseX.debug(val);
-      consumeWS();
+      if(!consumeWS()) error(WSERROR);
       if(consume(ND)) {
         BaseX.debug(ND);
         if(!consumeWS()) error(WSERROR);
@@ -582,13 +584,12 @@ public class DTDParser {
   private byte[] consumeSpecName() throws BuildException {
     int p = pos;
     byte c = next();
-    if(!XMLToken.isFirstLetter(c) && !percentage(c)) {
+    if(!XMLToken.isFirstLetter(c) && c != '%') {
       error();
     }
     do {
       c = next();
-    } while(XMLToken.isLetter(c) || percentage(c) || semicolon(c)
-        || quantity(c));
+    } while(XMLToken.isLetter(c) || c == '%' || c == ';' || quantity(c));
     prev();
     return substring(content, p, pos);
   }
@@ -601,12 +602,14 @@ public class DTDParser {
   private byte[] consumeQuoted() throws BuildException {
     byte quote = next();
     if(quote != '\'' && quote != '"') error(QUOTEERROR);
-    int p = pos;
     byte c;
+    final TokenBuilder tb = new TokenBuilder();
     while((c = next()) != quote) {
       if(c == 0) error();
+      if(c == '&') tb.add(getEntity());
+      else if(c != 0x0d) tb.add(c);
     }
-    return substring(content, p, pos - 1);
+    return tb.finish();
   }
 
   /**
@@ -641,22 +644,60 @@ public class DTDParser {
     --pos;
   }
 
-  /**
-   * Compares characters for percentage sign.
-   * @param ch the letter to be checked
-   * @return result of comparison
-   */
-  private boolean percentage(final byte ch) {
-    return ch == '%';
-  }
+  /** Character buffer for the current entity. */
+  private final TokenBuilder entity = new TokenBuilder();
 
   /**
-   * Compares characters for semicolon sign.
-   * @param ch the letter to be checked
-   * @return result of comparison
+   * Scans an entity.
+   * @return entity
+   * @throws BuildException Build Exception
    */
-  private boolean semicolon(final byte ch) {
-    return ch == ';';
+  private byte[] getEntity() throws BuildException {
+    entity.reset();
+    byte ch = next();
+
+    // scans numeric entities
+    if(ch == '#') {
+      int b = 10;
+      entity.add(ch = next());
+      if(ch == 'x') {
+        b = 16;
+        entity.add(ch = next());
+      }
+      int n = 0;
+      do {
+        final boolean m = ch >= '0' && ch <= '9';
+        final boolean h = b == 16 && (ch >= 'a' && ch <= 'f' ||
+            ch >= 'A' && ch <= 'F');
+        if(!m && !h) {
+          if(Prop.entity) error(INVALIDENTITY, entity);
+          return EMPTY;
+        }
+        n *= b;
+        n += ch & 15;
+        if(!m) n += 9;
+        entity.add(ch = next());
+      } while(ch != ';');
+      if(!valid(n)) {
+        if(Prop.entity) error(INVALIDENTITY, entity);
+        return EMPTY;
+      }
+      entity.reset();
+      entity.addUTF(n);
+      return entity.finish();
+    }
+    
+    // scans predefined entities
+    while(ch != ';' && ch != 0) {
+      entity.add(ch);
+      ch = next();
+    };
+
+    final byte[] en = ents.get(entity.finish());
+    if(en != null) return en;
+    if(Prop.entity) error(INVALIDENTITY, entity);
+    entity.reset();
+    return entity.finish();
   }
 
   /**

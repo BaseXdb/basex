@@ -125,7 +125,7 @@ public final class Performance {
   public static void gc(final int n) {
     for(int i = 0; i < n; i++) System.gc();
   }
-
+  
   /**
    * Throws and catches an error to display the current stack.
    */

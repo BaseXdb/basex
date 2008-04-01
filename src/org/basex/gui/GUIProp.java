@@ -97,9 +97,9 @@ public final class GUIProp {
   /** Dialog location. */
   public static int[] maplayoutloc = { 100, 100 };
   /** Dialog location. */
-  public static int[] fontsloc = { 100, 100 };
-  /** Dialog location. */
-  public static int[] colorsloc = { 100, 100 };
+   public static int[] fontsloc = { 100, 100 };
+   /** Dialog location. */
+   public static int[] colorsloc = { 100, 100 };
 
   /** Path for creating new XML Documents. */
   public static String createpath = Prop.WORK;

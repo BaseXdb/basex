@@ -79,13 +79,13 @@ public interface BuildText {
   /** Scanner Error. */
   String DTDNOTFOUND = "\"%\" not found.";
   /** DTD: SIGNERROR. */
-  String SIGNERROR = "WRONG OR MISSING SIGN";
+  String SIGNERROR = "Wrong or missing sign";
   /** DTD: WHITESPACEERROR. */
-  String WSERROR = "MISSING WHITESPACE";
+  String WSERROR = "Missing Whitespace";
   /** DTD: NAMEERROR. */
   String NAMEERROR = "ERROR IN NAME";
   /** DTD: QUOTEERROR. */
-  String QUOTEERROR = "MISSING QUOTE";
+  String QUOTEERROR = "Missing Quote";
 
   /** CDATA token. */
   byte[] CDATA = Token.token("CDATA[");
