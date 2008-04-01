@@ -50,7 +50,7 @@ public final class Fs extends Proc {
     } else if(comm.equals(LS)) {
       query.ls(cmd.args(), out);
     } else if(comm.equals(PWD)) {
-      query.pwd(out); 
+      query.pwd(cmd.args(), out); 
     } else if(comm.equals(CD)) {      
       query.cd(cmd.args(), out);    
     }
