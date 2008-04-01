@@ -28,29 +28,17 @@ public final class FSQuery {
 
   /**
    * The current working directory as set by the cd command.
+   * @param cmd options
    * @param out output stream
    * @throws IOException in case of problems with the PrintOutput
    */
-  public void pwd(final PrintOutput out) throws IOException {
-    pwd(out, context.current().pre[0]);
+  public void pwd(final String cmd, final PrintOutput out) throws IOException {
+    PWD pwd = new PWD(context, out);
+    pwd.pwdMain(cmd);
     out.print(NL);
   }
 
-  /**
-   * Construct name of current/working directory (cwd).
-   * @param out stream receiving cwd.
-   * @param n pre value of cwd
-   * @throws IOException in case of problems with the PrintOutput
-   */
-  private void pwd(final PrintOutput out, final int n) throws IOException {
-    final Data data = context.data();
-    if(n > 3) {
-      pwd(out, data.parent(n, data.kind(n)));
-      out.print(Token.string(FSUtils.getName(data, n)) + "/");
-    } else {
-      out.print(Token.string(FSUtils.getName(data, n)) + "/");
-    }    
-  }
+
 
   /**
    * Performs an ls command.
