@@ -54,8 +54,10 @@ public class LS {
    */
   public void lsMain(final String cmd) 
   throws IOException {
-
+    out.print("command " + cmd);
+    out.print(NL);
     GetOpts g = new GetOpts(cmd, "ahR");
+    
     // get all Options
     int ch = g.getopt();
     while (ch != -1) {
@@ -69,9 +71,13 @@ public class LS {
         case 'h':
           printHelp();
           return;
-        case '?':         
-          // ERROR handling -> GetOpts
+        case ':':         
           fError = true;
+          out.print("ls: missing argument");
+          return;  
+        case '?':         
+          fError = true;
+          out.print("ls: illegal option");
           return;
       }
       if(!fError) {
@@ -113,7 +119,7 @@ public class LS {
     print(dir);   
     for(int i = 0; allDir[i] != 0 && i < allDir.length; i++) {
       out.print(NL);
-      pwd(allDir[i]);
+      printPath(allDir[i]);
       out.print(NL);
       lsRecursive(allDir[i]);
     }
@@ -143,9 +149,9 @@ public class LS {
    * @param n pre value of cwd
    * @throws IOException in case of problems with the PrintOutput
    */
-  private void pwd(final int n) throws IOException {    
+  private void printPath(final int n) throws IOException {    
     if(n > 3) {
-      pwd(data.parent(n, data.kind(n)));
+      printPath(data.parent(n, data.kind(n)));
       out.print(FSUtils.getName(data, n));
       out.print("/");
     } else {      
@@ -161,6 +167,4 @@ public class LS {
     out.print("help");
    
   }
-
-
 }

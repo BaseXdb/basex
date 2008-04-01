@@ -18,8 +18,6 @@ public final class Fs extends Proc {
   /** Create option. */
   public static final String LS = "ls";
   /** Create option. */
-  public static final String LSR = "lsr";
-  /** Create option. */
   public static final String CD = "cd";
   /** Create option. */
   public static final String PWD = "pwd";
@@ -41,22 +39,20 @@ public final class Fs extends Proc {
     query = new FSQuery(context);
     comm = cmd.arg(0).toLowerCase();
     return comm.equals(DU) || comm.equals(LS) || comm.equals(PWD) ||
-      comm.equals(CD) || comm.equals(LSR);
+      comm.equals(CD);
   }
   
 
   @Override
   protected void out(final PrintOutput out) throws IOException {
     if(comm.equals(DU)) {
-      query.du(cmd.arg(1), out);
+      query.du(cmd.args(), out);
     } else if(comm.equals(LS)) {
-      query.ls(cmd.arg(1), out);
-    } else if(comm.equals(LSR)) {
-      query.lsr(cmd.args(), out);  
+      query.ls(cmd.args(), out);
     } else if(comm.equals(PWD)) {
       query.pwd(out); 
     } else if(comm.equals(CD)) {      
-      query.cd(cmd.arg(1), out);    
+      query.cd(cmd.args(), out);    
     }
     if(Prop.info) timer(PROCTIME);
   }

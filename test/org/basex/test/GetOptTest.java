@@ -5,6 +5,8 @@ import org.basex.query.fs.GetOpts;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+
+
 /**
  * GetOpt Test class.
  *
@@ -12,6 +14,7 @@ import static org.junit.Assert.*;
  * @author Hannes Schwarz
  */
 public class GetOptTest {
+
   /** OutputStream.*/
   private String returnedPath;
   /** OutputStream.*/
