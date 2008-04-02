@@ -1,4 +1,4 @@
-package org.basex.query.fs;
+package org.basex.util;
 
 import java.io.IOException;
 

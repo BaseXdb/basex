@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.io.PrintOutput;
 import org.basex.query.fs.Exception.PathNotFoundException;
+import org.basex.util.GetOpts;
 /**
  * Performs a cd command.
  * 
