@@ -92,30 +92,10 @@ public final class DiskBuilder extends Builder {
     
     IOConstants.dbfile(meta.dbname, DATATMP).delete();
 
-//    meta.write(size);
-//    stats.finish();
-//    stats.write();
-//    // return database instance, excluding indexes
-//    return new DiskData(meta.dbname, false);
-    
-    // <LK> now here's some shitty workaround to get text node values for 
-    // statistics ... can't be done in the builder because parent nodes are 
-    // needed for adding text values to hash map (parent tag is key)
-    // have to find better solution ... 
     meta.write(size);
-    Data data = new DiskData(meta.dbname, false);
-    
-    // get the text nodes and parents and add them to statistics
-    for (int i = 0; i < data.size; i++) {
-      if(data.kind(i) == Data.TEXT) {
-        byte[] key = data.tag(data.parent(i, Data.TEXT));
-        byte[] val = data.text(i);
-        stats.index(key, val);
-      }
-    }
     stats.finish();
     stats.write();
-    
+    // return database instance, excluding indexes
     return new DiskData(meta.dbname, false);
   }
   

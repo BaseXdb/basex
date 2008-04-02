@@ -294,6 +294,12 @@ public abstract class Builder extends Progress {
     parStack[level] = size;
     final byte[] t = Token.utf8(txt, meta.encoding);
     
+    // text node processing for statistics 
+    if(type == Data.TEXT) {
+      byte[] key = tags.key(tagStack[level - 1]);
+      stats.index(key, txt);
+    }
+    
     addText(t, level == 0 ? 1 : size - parStack[level - 1], type);
   }
 
