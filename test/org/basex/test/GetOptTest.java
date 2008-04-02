@@ -1,7 +1,8 @@
 package org.basex.test;
 
 import java.io.IOException;
-import org.basex.query.fs.GetOpts;
+
+import org.basex.util.GetOpts;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
