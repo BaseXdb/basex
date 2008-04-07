@@ -427,142 +427,73 @@ public final class BaseXLayout {
    * @param g graphics reference
    * @param r rectangle
    * @param s text to be drawn
-   * @param m length of text
-   * @param wrap number of lines after which text is wrapped
-   * @param draw draw text (otherwise: just calculate space)
-   * @return last height that was occupied
-   */
-  /*
-  public static int drawTextThumbnail(final Graphics g, final MapRect r,
-      final byte[] s, final int m, final int wrap, final boolean draw) {
-    
-    int xx = r.x;
-    int yy = r.y + GUIProp.fontsize;
-    int ww = r.w;
-    int f = 3; // number pixels per char
-    int ws = cl(' ');
-    int wl = 0; // word length
-    int ll = 0; // line length 
-    final int ys = yy;
-    for (byte b : s) {
-      if (Token.ws(b)) {       
-        // check if rec fits in line
-        if (f * (ll + wl) > ww) { 
-          yy += 0.8 * GUIProp.fontsize;
-          ll = 0;
-        } 
-          
-        if (yy >= r.y + r.h || xx + f * (ll + wl) >= r.x + r.w) return r.h;
-        // draw word
-        g.fillRect(xx + f * ll, yy, f * wl, (int) (0.5 * GUIProp.fontsize));
-         
-        ll += wl;
-        
-        if (b == '\n') {
-          yy += 1 * GUIProp.fontsize;
-          ll = 0;
-        } else {
-          // draw ws
-          if (ll + ws < ww) {
-             ll += ws;
-          } else {
-             yy += 1.2 * GUIProp.fontsize;
-             ll = ws;
-          }
-        }
-        wl = 0;
-      } else {
-        // add to current wordline
-        wl += cl(b);
-      }
-    }
-
-    if (yy > r.y + r.h || xx + f * (ll + wl) > r.x + r.w) return r.h;
-    // draw word
-    g.fillRect(xx + f * ll, yy, f * wl, (int) (0.5 * GUIProp.fontsize));
-    
-    return yy - ys;
-  }
-  */
-  /**
-   * Draws a text using thumbnail visualization.
-   * @param g graphics reference
-   * @param r rectangle
-   * @param s text to be drawn
-   * @param i0 index on first pre value in cont.getFTData()[1]
+   * @param i0 index on first pre value in ftData[1]
    * @return last height that was occupied
    */
   public static int drawTextThumbnailwithFT(final Graphics g, final MapRect r,
       final byte[] s, final int i0) {
-    //, final int[][] ftd, final int[] ftp) {
  
-    int xx = r.x;
-    int yy = r.y + GUIProp.fontsize;
-    int ww = r.w;
-    int f = 3; // number pixels per char
-    int ws = cl(' ');
+    final double xx = r.x;
+    final double ww = r.w;
+    final double f = 0.25 * GUIProp.fontsize; // number pixels per char
+    final int fh = (int) Math.max(1, 0.5 * GUIProp.fontsize);
+    final int lh = (int) Math.max(1, 0.8 * GUIProp.fontsize);
+    final double ys = r.y + 3;
+    final int ws = cl(' ');
+
+    double yy = ys;
+    
     int wl = 0; // word length
     int ll = 0; // line length 
-    final int ys = yy;
     int k = i0;
     Color textc = g.getColor();
     boolean c = false;
     int[][] ftData = View.ftData;
-    for (int i = 0; i < s.length; i++) {
+
+    // including i == s.length in loop to draw last string...
+    for (int i = 0; i <= s.length; i++) {
       if (k > -1 && ftData != null && k < ftData[0].length 
           && i == ftData[1][k] && r.p == ftData[0][k]) {
          k++;
          c = true;
       }
     
-      if (Token.ws(s[i])) {       
-        // check if rec fits in line
-        if (f * (ll + wl) > ww) { 
-          yy += 0.8 * GUIProp.fontsize;
+      if (i == s.length || Token.ws(s[i])) {       
+        // check if rectangle fits in line and if it's not the first word
+        if (f * (ll + wl) > ww && ll != 0) { 
+          yy += lh;
           ll = 0;
         } 
-          
-        if (yy >= r.y + r.h || xx + f * (ll + wl) >= r.x + r.w) return r.h;
+        if (yy + lh >= r.y + r.h) return r.h;
+
         // draw word
-        //if (c) g.setColor((ftp != null) ? GUIConstants.COLORS[ftp[k]] 
         if (c && k > -1)  {
           g.setColor(View.ftPoi != null ? 
             GUIConstants.thumbnailcolor[View.ftPoi[k]] : 
               GUIConstants.COLORERROR);
         }
         
-        g.fillRect(xx + f * ll, yy, f * wl, (int) (0.5 * GUIProp.fontsize));
+        final int xw = (int) Math.min(ww - f * ll, f * wl);
+        g.fillRect((int) (xx + f * ll), (int) yy, xw, fh);
         if (c) {
           c = false;
           g.setColor(textc); 
         }
         ll += wl;
         
-        if (s[i] == '\n') {
-          yy += 1 * GUIProp.fontsize;
+        if (i < s.length && s[i] == '\n' || ll + ws >= ww) {
+          yy += lh;
           ll = 0;
         } else {
-          // draw ws
-          if (ll + ws < ww) {
-             ll += ws;
-          } else {
-             yy += 1.2 * GUIProp.fontsize;
-             ll = ws;
-          }
+          ll += ws;
         }
         wl = 0;
-        
-
       } else {
         // add to current word length
         wl += cl(s[i]);
       }
     }
-
-    if (yy > r.y + r.h || xx + f * (ll + wl) > r.x + r.w) return r.h;
-    // draw word
-    g.fillRect(xx + f * ll, yy, f * wl, (int) (0.5 * GUIProp.fontsize));
-    return yy - ys;
+    return (int) (yy - ys);
   }
   
   
@@ -585,20 +516,8 @@ public final class BaseXLayout {
       int i = Array.firstIndexOf(r.p, ftpre[0]);
       if (i > -1) {
         drawTextThumbnailwithFT(g, r, s, i);
-        //, context.marked().ftpre, context.marked().ftpoin);
       }
     } 
-    
-    /*
-    Nodes marked = GUI.context.marked();
-    if (GUIProp.thumbnail && marked.ftpre !=  null && marked.ftpre.length != 0
-        && marked.ftpre[0] != null && marked.ftpre[0].length != 0) {
-      int i = Array.firstIndexOf(r.p, marked.ftpre[0]);
-      if (i > -1) {
-        drawTextThumbnailwithFT(g, r, s, i);
-        //, context.marked().ftpre, context.marked().ftpoin);
-      }
-    }*/
     
     // limit string to given space
     final int[] cw = fontWidths(g.getFont());
