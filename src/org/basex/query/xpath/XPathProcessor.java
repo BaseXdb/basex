@@ -66,8 +66,9 @@ public final class XPathProcessor extends QueryProcessor {
   private int qp;
   /** Query length. */
   private int ql;
-  /** FTSearchstring list. **/
+  /** Fulltext search strings. **/
   private ByteList ftss;
+  
   /**
    * XPath Query Constructor.
    * @param q query
@@ -758,7 +759,7 @@ public final class XPathProcessor extends QueryProcessor {
       consumeWS();
       Literal lit = parseLiteral();
       consumeWS();
-      boolean fi = consume("fi".getBytes());
+      consume("fi".getBytes());
       consume("fti".getBytes());
       consumeWS();
       Num error = (Num) parseNumber();
@@ -1097,7 +1098,7 @@ public final class XPathProcessor extends QueryProcessor {
   
   /**
    * Parses a BigUnit.
-   * @param ftpf FTPositionFilter saves bigunit information
+   * @param ftpf FTPositionFilter saves big unit information
    * @throws QueryException parsing exception
    */
   private void parseFTBigUnit(final FTPositionFilter ftpf) 
@@ -1114,9 +1115,9 @@ public final class XPathProcessor extends QueryProcessor {
   
   /**
    * Getter for fulltext search strings out of query.
-   * @return ftsearchstring
+   * @return fulltext search strings
    */
-  public byte[][] getFTSearchStings() {
+  public byte[][] ftSearchStrings() {
     return ftss.finish();
   }
 }

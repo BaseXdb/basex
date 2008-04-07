@@ -8,7 +8,6 @@ import org.basex.util.Levenshtein;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
-
 /**
  * XPath Value representing a NodeSet.
  * 
@@ -18,16 +17,16 @@ import org.basex.util.TokenBuilder;
 public final class NodeSet extends Item {
   /** Precedence. */
   protected static final int PREC = Integer.MAX_VALUE;
-  /** Current nodeset position. */
+  /** Current node set position. */
   public int currPos;
-  /** Current nodeset size. */
+  /** Current node set size. */
   public int currSize;
   /** Node array. */
   public int[] nodes;
   /** FTIdPos array. */
   public int[][] ftidpos;
   /** Pointer for FTQueries - each idpos has a pointer at 
-   * its searchstringposition in the xpath query. */
+   * its search string position in the xpath query. */
   public int[] ftpointer;
   /** Data reference.. */
   public Data data;
@@ -65,7 +64,7 @@ public final class NodeSet extends Item {
    * Constructor, creating a new node set from the specified node ids.
    * @param ids node ids
    * @param ctx query context
-   * @param ftIds ids and posvalues for fulltextqueries
+   * @param ftIds ids and pos values for fulltext queries
    * @param ftPointer Pointer for ftIds
    */
   public NodeSet(final int[] ids, final XPContext ctx, 

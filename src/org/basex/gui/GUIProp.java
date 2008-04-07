@@ -4,7 +4,8 @@ import org.basex.core.Prop;
 
 /**
  * This class contains properties which are used in the GUI. They are
- * initially read from and finally written to disk.
+ * initially read from and finally written to disk, except for the properties
+ * following the {@link #SKIP} flag. 
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen

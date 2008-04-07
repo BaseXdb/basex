@@ -21,12 +21,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.AbstractButton;
 import javax.swing.JComponent;
-
-import org.basex.core.Context;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.dialog.Dialog;
+import org.basex.gui.view.View;
 import org.basex.gui.view.map.MapRect;
 import org.basex.util.Array;
 import org.basex.util.Token;
@@ -497,8 +496,6 @@ public final class BaseXLayout {
       final byte[] s, final int i0) {
     //, final int[][] ftd, final int[] ftp) {
  
-    Context cont = GUI.context;
-    
     int xx = r.x;
     int yy = r.y + GUIProp.fontsize;
     int ww = r.w;
@@ -510,13 +507,13 @@ public final class BaseXLayout {
     int k = i0;
     Color textc = g.getColor();
     boolean c = false;
+    int[][] ftData = View.ftData;
     for (int i = 0; i < s.length; i++) {
-      if (k > -1 && cont.getFTData() != null && k < cont.getFTData()[0].length 
-          && i == cont.getFTData()[1][k] 
-         && r.p == cont.getFTData()[0][k]) {
+      if (k > -1 && ftData != null && k < ftData[0].length 
+          && i == ftData[1][k] && r.p == ftData[0][k]) {
          k++;
          c = true;
-     }
+      }
     
       if (Token.ws(s[i])) {       
         // check if rec fits in line
@@ -529,8 +526,8 @@ public final class BaseXLayout {
         // draw word
         //if (c) g.setColor((ftp != null) ? GUIConstants.COLORS[ftp[k]] 
         if (c && k > -1)  {
-          g.setColor((cont.getFTPointer() != null) ? 
-            GUIConstants.thumbnailcolor[cont.getFTPointer()[k]] : 
+          g.setColor(View.ftPoi != null ? 
+            GUIConstants.thumbnailcolor[View.ftPoi[k]] : 
               GUIConstants.COLORERROR);
         }
         
@@ -557,7 +554,7 @@ public final class BaseXLayout {
         
 
       } else {
-        // add to current wordline
+        // add to current word length
         wl += cl(s[i]);
       }
     }
@@ -582,16 +579,26 @@ public final class BaseXLayout {
   public static int drawText(final Graphics g, final MapRect r,
       final byte[] s, final int m, final int wrap, final boolean draw) {
 
-    Context context = GUI.context;
-    if (GUIProp.thumbnail &&  context.marked().ftpre !=  null 
-        && context.marked().ftpre[0] != null 
-        && context.marked().ftpre[0].length != 0) {
-      int i = Array.firstIndexOf(r.p, context.marked().ftpre[0]);
+    int[][] ftpre = View.ftData;
+    if (GUIProp.thumbnail && ftpre !=  null && ftpre.length != 0
+        && ftpre[0] != null && ftpre[0].length != 0) {
+      int i = Array.firstIndexOf(r.p, ftpre[0]);
       if (i > -1) {
-        BaseXLayout.drawTextThumbnailwithFT(g, r, s, i);
+        drawTextThumbnailwithFT(g, r, s, i);
         //, context.marked().ftpre, context.marked().ftpoin);
       }
     } 
+    
+    /*
+    Nodes marked = GUI.context.marked();
+    if (GUIProp.thumbnail && marked.ftpre !=  null && marked.ftpre.length != 0
+        && marked.ftpre[0] != null && marked.ftpre[0].length != 0) {
+      int i = Array.firstIndexOf(r.p, marked.ftpre[0]);
+      if (i > -1) {
+        drawTextThumbnailwithFT(g, r, s, i);
+        //, context.marked().ftpre, context.marked().ftpoin);
+      }
+    }*/
     
     // limit string to given space
     final int[] cw = fontWidths(g.getFont());

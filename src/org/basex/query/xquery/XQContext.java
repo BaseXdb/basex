@@ -143,10 +143,20 @@ public final class XQContext extends QueryContext {
   @Override
   public XQResult eval(final Nodes nodes) throws XQException {
     // evaluates the query and returns the result
+    return new XQResult(this, new SeqBuilder(iter()));
+  }
+
+  /**
+   * Returns a result iterator.
+   * @return result iterator
+   * @throws XQException query exception
+   */
+  public Iter iter() throws XQException {
+    // evaluates the query and returns the result
     try {
       final Iter iter = iter(root);
       finish();
-      return new XQResult(this, new SeqBuilder(iter));
+      return iter;
     } catch(final StackOverflowError e) {
       if(Prop.debug) e.printStackTrace();
       Err.or(XPSTACK);

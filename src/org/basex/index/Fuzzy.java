@@ -17,11 +17,11 @@ import org.basex.query.xpath.expr.FTUnion;
 /**
  * This class provides access to attribute values and text contents
  * stored on disk. The data is stored in two files, ftdata and sizes.
- * Sizes proviedes a kind of table of contents, using the first char 
- * of a token and a pointer on the data entry. Normaly there are chars from
+ * Sizes provides a kind of table of contents, using the first char 
+ * of a token and a pointer on the data entry. Normally there are chars from
  * a-z and 0-9 and the corresponding pointers on the first entry starting with
  * this char.
- * Each token has an entry in sizes, safing its length and a pointer on ftdata, 
+ * Each token has an entry in sizes, saving its length and a pointer on ftdata, 
  * where to find the token and its ftdata.
  * 
  * Structure of sizes:
@@ -39,19 +39,21 @@ import org.basex.query.xpath.expr.FTUnion;
  */
 public final class Fuzzy implements Index {
   /** Number of index entries. */
-  public int indexsize;
+  int indexsize;
   /** Number of ftdata entries. */
-  public int ftdatasize;
+  int ftdatasize;
   /** Values file. */
-  private final Data data;
+  final Data data;
+  
   /** FTdata lists. */
   private final DataAccess ftdata;
   /** FTdata lists. */
   private final DataAccess sizes;
   /** Index on diskdata. **/
   private int[][] index;
-  /** Index offset - nuber of bytes, used for the index. **/
+  /** Index offset - number of bytes, used for the index. **/
   private int ios;
+  
   /**
    * Constructor, initializing the index structure.
    * @param d data reference

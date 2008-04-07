@@ -42,6 +42,16 @@ public abstract class View extends BaseXPanel {
   public static boolean painting;
   /** Working flag. */
   public static boolean working;
+  
+  /** Currently marked node (pre value). */
+  public static int focused = -1;
+  /** Current FTPrePos values. **/
+  public static int[][] ftData;
+  /** Current FTPointer on FTPrePos values. **/
+  public static int[] ftPoi; 
+  /** FTSearchStrings out of query. **/
+  public static byte[] ftss; 
+  
   /** Popup reference. */
   public BaseXPopup popup;
 
@@ -68,12 +78,16 @@ public abstract class View extends BaseXPanel {
    * Notifies all views of a data reference change.
    */
   public static void notifyInit() {
-    ViewData.init();
     final Data data = GUI.context.data();
     if(data != null) {
       NODEHIST[0] = new Nodes(0, data);
       MARKHIST[0] = new Nodes(0, data);
     }
+    
+    focused = -1;
+    ftData = null;
+    ftPoi = null;
+    ftss = null;
     hist = 0;
     maxhist = 0;
     for(final View v : view) v.refreshInit();
@@ -94,8 +108,8 @@ public abstract class View extends BaseXPanel {
    * @param vw the calling view
    */
   public static void notifyFocus(final int id, final View vw) {
-    if(ViewData.focusedPre == id) return;
-    ViewData.focusedPre = id;
+    if(focused == id) return;
+    focused = id;
     for(final View v : view) if(v != vw && v.isValid()) v.refreshFocus();
     final Data data = GUI.context.data();
     GUI.get().status.setPath(id > 0 ? ViewData.path(data, id) : Token.EMPTY);
@@ -123,19 +137,20 @@ public abstract class View extends BaseXPanel {
    * @param mode mark mode
    */
   public static void notifyMark(final int mode) {
-    final int pre = ViewData.focusedPre;
-    if(pre == -1) return;
+    if(focused == -1) return;
 
     final Context context = GUI.context;
     Nodes nodes = context.marked();
     if(mode == 0) {
-      nodes = new Nodes(pre, context.data());
+      nodes = new Nodes(focused, context.data());
+      /* TEMP
       // remove ftdata
       context.ftData(null, null);
+      */
     } else if(mode == 1) {
-      nodes.add(pre);
+      nodes.add(focused);
     } else {
-      nodes.toggle(pre);
+      nodes.toggle(focused);
     }
     notifyMark(nodes);
   }
@@ -157,9 +172,9 @@ public abstract class View extends BaseXPanel {
       query = QUERYHIST[--hist];
     }
 
-    ViewData.init(NODEHIST[hist], MARKHIST[hist]);
-    final GUI gui = GUI.get();
+    init(GUI.context, NODEHIST[hist], MARKHIST[hist]);
 
+    final GUI gui = GUI.get();
     gui.input.setText(query);
     for(final View v : view) v.refreshContext(forward, false);
     gui.refreshControls();
@@ -171,14 +186,12 @@ public abstract class View extends BaseXPanel {
    * @param quick quick switch
    */
   public static void notifyContext(final Nodes nodes, final boolean quick) {
-    final Context context = GUI.context;
     if(nodes.size == 0) return;
 
-    // <cg> why final Nodes n = new Nodes(context.data());
-    final Nodes n = new Nodes(context.data());
     final GUI gui = GUI.get();
+    final Context context = GUI.context;
+    final Nodes n = new Nodes(context.data());
 
-    // <CG> correct history handling?
     if(!quick) {
       final String input = gui.input.getText();
 
@@ -191,7 +204,7 @@ public abstract class View extends BaseXPanel {
       MARKHIST[hist] = n;
       maxhist = hist;
     } else {
-      // check if current nodeset has already been cached
+      // check if current node set has already been cached
       if(!NODEHIST[hist].sameAs(context.current())) {
         checkHist();
         // add new entry
@@ -201,9 +214,7 @@ public abstract class View extends BaseXPanel {
         maxhist = hist;
       }
     }
-    // <SG> maybe hack - find general solution??
-    //n.setFTData(context.marked().ftpre, context.marked().ftpoin);
-    ViewData.init(nodes, n);
+    init(context, nodes, n);
     
     for(final View v : view) v.refreshContext(true, quick);
     gui.refreshControls();
@@ -229,7 +240,8 @@ public abstract class View extends BaseXPanel {
    */
   public static void notifySwitch(final Nodes nodes) {
     if(nodes.size == 0) return;
-    ViewData.init(nodes, new Nodes(GUI.context.data()));
+    final Context context = GUI.context;
+    init(context, nodes, new Nodes(context.data()));
     for(final View v : view) v.refreshContext(true, true);
     GUI.get().refreshControls();
   }
@@ -245,7 +257,7 @@ public abstract class View extends BaseXPanel {
   }
 
   /**
-   * Initializes Fonts.
+   * Notifies all views of layout changes.
    */
   public static void notifyLayout() {
     GUIConstants.initFonts();
@@ -253,11 +265,18 @@ public abstract class View extends BaseXPanel {
   }
 
   /**
-   * Refreshes the popup instances.
-  public static void refreshPopup() {
-    for(final View v : view) if(v.popup != null) v.popup.refresh();
-  }
+   * Initializes the current context and marked node set.
+   * @param ctx context reference
+   * @param curr context set
+   * @param mark marked nodes
    */
+  private static void init(final Context ctx, final Nodes curr,
+      final Nodes mark) {
+    ctx.current(curr);
+    ctx.marked(mark);
+    focused = -1;
+  }
+
 
   /**
    * Called when the data reference has changed.
@@ -343,7 +362,7 @@ public abstract class View extends BaseXPanel {
     final char key = e.getKeyChar();
     if(key == '+' || key == '-') {
       GUIProp.fontsize = Math.max(1, GUIProp.fontsize + (key == '+' ? 1 : -1));
-      View.notifyLayout();
+      notifyLayout();
     }
   }
 

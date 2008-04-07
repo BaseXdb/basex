@@ -10,6 +10,7 @@ import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
+import org.basex.gui.view.View;
 import org.basex.gui.view.ViewData;
 import org.basex.util.Array;
 
@@ -109,15 +110,15 @@ public final class MapDefault extends MapPainter {
       g.setColor(GUIConstants.COLORS[rect.l * 2 + 8]);
       g.setFont(GUIConstants.mfont);
       byte[] text = ViewData.content(data, pre, false);
+      int[][] ftData = View.ftData;
       
       final int p = BaseXLayout.centerPos(g, text, rect.w);
       if(p == -1) {
         // text doesn't fit in one line
         if (GUIProp.thumbnail) { 
           int i = -1;
-          if (context.getFTData() !=  null 
-              && context.getFTData().length != 0) {
-            i = Array.firstIndexOf(pre, context.getFTData()[0]);
+          if (ftData !=  null && ftData.length != 0) {
+            i = Array.firstIndexOf(pre, ftData[0]);
             if (i > -1) { 
               BaseXLayout.drawTextThumbnailwithFT(g, rect, text, i);
             }
@@ -133,33 +134,10 @@ public final class MapDefault extends MapPainter {
         BaseXLayout.drawText(g, rect, text, Integer.MAX_VALUE, true);
         
       } else {
-        if (GUIProp.thumbnail && context.getFTData() !=  null 
-            && context.getFTData().length != 0) {
-          int i = Array.firstIndexOf(pre, context.getFTData()[0]);
+        if (GUIProp.thumbnail && ftData !=  null && ftData.length != 0) {
+          int i = Array.firstIndexOf(pre, ftData[0]);
           if (i > -1) {
             BaseXLayout.drawTextThumbnailwithFT(g, rect, text, i);
-            /*   g.drawString(string(text, 0, i), rect.x + p,
-                rect.y + (rect.h + GUIProp.fontsize) / 2 - 1);
-            i++;
-            int k = 0;
-            byte[] s;
-            while (i < context.getFTData()[0].length 
-                && p == context.getFTData()[0][i]) {
-              k = context.getFTData()[1][i-1];
-              while(k < text.length && !Token.ws(text[k++]));
-              s = new byte[k];
-              System.arraycopy(text, context.getFTData()[1][i-1], s, 0, k);
-              Color o = g.getColor();
-              g.setColor(GUIConstants.COLORERROR);
-              g.drawString(new String(s), rect.x + p + 
-                 BaseXLayout.calculateWidth(g, s),
-                  rect.y + (rect.h + GUIProp.fontsize) / 2 - 1);
-              g.setColor(o);
-            }
-
-            g.drawString(string(text, 0, i), rect.x + p,
-                rect.y + (rect.h + GUIProp.fontsize) / 2 - 1);
-*/
           } else {
             g.drawString(string(text, 0, text.length), rect.x + p,
               rect.y + (rect.h + GUIProp.fontsize) / 2 - 1);
@@ -173,6 +151,12 @@ public final class MapDefault extends MapPainter {
   }
 
   @Override
+  boolean highlight(final MapRect rect, final int mx, final int my,
+      final boolean click) {
+    return false;
+  }
+
+  @Override
   void init(final MapRects rects) {
   }
 
@@ -181,8 +165,6 @@ public final class MapDefault extends MapPainter {
   }
 
   @Override
-  boolean highlight(final MapRect rect, final int mx, final int my,
-      final boolean click) {
-    return false;
+  void close() {
   }
 }

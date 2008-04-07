@@ -112,7 +112,7 @@ public final class TreeView extends View {
 
   @Override
   public void refreshMark() {
-    final int pre = ViewData.focusedPre;
+    final int pre = focused;
     if(pre == -1) return;
 
     // jump to the currently marked node
@@ -228,8 +228,8 @@ public final class TreeView extends View {
     final boolean file = data.deepfs && FSUtils.isFile(data, pre);
     final boolean dir = data.deepfs && FSUtils.isDir(data, pre);
 
-    int p = ViewData.focusedPre;
-    while(p > pre) p = ViewData.parent(p);
+    int p = focused;
+    while(p > pre) p = ViewData.parent(data, p);
     if(pre == p) {
       g.setColor(GUIConstants.color3);
       g.fillRect(0, y - boxW - boxMargin, totalW, lineH + 1);
@@ -268,7 +268,7 @@ public final class TreeView extends View {
     }
     BaseXLayout.chopString(g, name, xx, yy - GUIProp.fontsize, tw - xx - 10);
 
-    if(ViewData.focusedPre == pre) {
+    if(focused == pre) {
       g.setColor(GUIConstants.color6);
       g.drawRect(1, yy - boxW - boxMargin, totalW - 3, lineH + 1);
       g.drawRect(2, yy - boxW - boxMargin + 1, totalW - 5, lineH - 1);
@@ -316,7 +316,7 @@ public final class TreeView extends View {
       int p = pre;
       while(p != 0) {
         opened[p] = true;
-        p = ViewData.parent(p);
+        p = ViewData.parent(GUI.context.data(), p);
       }
       refreshHeight();
     }
@@ -401,7 +401,7 @@ public final class TreeView extends View {
     if(!focus(e.getX(), e.getY())) return;
 
     final boolean left = SwingUtilities.isLeftMouseButton(e);
-    final int pre = ViewData.focusedPre;
+    final int pre = focused;
 
     // add or remove marked node
     final Nodes marked = GUI.context.marked();
@@ -430,7 +430,7 @@ public final class TreeView extends View {
 
     // launch a program
     if(getCursor() == GUIConstants.CURSORHAND)
-      FSUtils.launch(GUI.context.data(), ViewData.focusedPre);
+      FSUtils.launch(GUI.context.data(), focused);
   }
 
   @Override
@@ -456,15 +456,15 @@ public final class TreeView extends View {
     if(working || opened == null) return;
 
     int focus = focusedPos == -1 ? 0 : focusedPos;
-    if(ViewData.focusedPre == -1) ViewData.focusedPre = 0;
-    final int focusPre = ViewData.focusedPre;
+    if(focused == -1) focused = 0;
+    final int focusPre = focused;
     final Data data = GUI.context.data();
     int kind = data.kind(focusPre);
     int key = e.getKeyCode();
 
     if(e.isShiftDown() && key == KeyEvent.VK_ENTER && focusPre != -1) {
       // launch file
-      FSUtils.launch(data, ViewData.focusedPre);
+      FSUtils.launch(data, focused);
     } else if(key == KeyEvent.VK_RIGHT || key == KeyEvent.VK_LEFT) {
       // open/close subtree
       final boolean open = key == KeyEvent.VK_RIGHT;
@@ -509,7 +509,7 @@ public final class TreeView extends View {
     if(focus == focusedPos) return;
 
     // calculate new tree position
-    ViewData.focusedPre = -1;
+    focused = -1;
     final Nodes curr = GUI.context.current();
     int pre = curr.pre[0];
     final TreeIterator it = new TreeIterator(this);

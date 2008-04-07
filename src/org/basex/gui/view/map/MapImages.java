@@ -1,8 +1,11 @@
 package org.basex.gui.view.map;
 
+import java.awt.Dimension;
 import java.awt.Image;
-import java.awt.MediaTracker;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.gui.GUI;
@@ -19,29 +22,30 @@ import org.basex.util.Token;
 public final class MapImages {
   /** Maximum number of cached images. */
   private static final int MAXNR = 5000;
-  /** Maximum number of pixels. */
-  private static final int MAXPIXELS = 15000000;
+  /** Cache size (will be multiplied with window size). */
+  private static final int CACHESIZE = 10;
   /** Reference to the treemap panel. */
-  MapView map;
+  protected MapView map;
   /** Image cache. */
-  Image[] imgs = new Image[MAXNR];
+  protected BufferedImage[] imgs = new BufferedImage[MAXNR];
   /** Maximum image size. */
-  boolean[] imgmax = new boolean[MAXNR];
+  protected boolean[] imgmax = new boolean[MAXNR];
   /** Image id cache. */
-  int[] imgid = new int[MAXNR];
+  protected int[] imgid = new int[MAXNR];
   /** Pointer to next cached image. */
-  int imgc;
+  protected int imgc;
 
   /** Image id cache. */
-  int[] idCache = new int[MAXNR];
+  protected int[] idCache = new int[MAXNR];
   /** Image width cache. */
-  int[] wCache = new int[MAXNR];
+  protected int[] wCache = new int[MAXNR];
   /** Image height cache. */
-  int[] hCache = new int[MAXNR];
+  protected int[] hCache = new int[MAXNR];
   /** Image id cache. */
-  int loaderC;
+  protected int loaderC;
   /** Image id cache. */
-  boolean running;
+  protected boolean running;
+
 
   /**
    * Default Constructor.
@@ -49,6 +53,14 @@ public final class MapImages {
    */
   MapImages(final MapView panel) {
     map = panel;
+  }
+
+  /**
+   * Resets the image cache.
+   */
+  void reset() {
+    loaderC = 0;
+    for(int i = 0; i < MAXNR; i++) imgs[i] = null;
   }
 
   /**
@@ -99,42 +111,40 @@ public final class MapImages {
 
           // check if the image exists already, or if the existing version
           // is bigger than the new one
-          if(ic != MAXNR && (imgmax[ic] ||
-              imgs[ic].getWidth(map) + 1 >= ww ||
-              imgs[ic].getHeight(map) + 1 >= hh)) continue;
+          if(ic != MAXNR && (imgmax[ic] || imgs[ic].getWidth() + 1 >= ww ||
+              imgs[ic].getHeight() + 1 >= hh)) continue;
 
           try {
-            // load image and wait until it's done
+            // database closed - quit
             final Data data = GUI.context.data();
             if(data == null) {
               running = false;
               loaderC = 0;
               return;
             }
-            Image image = map.getToolkit().getImage(
-                Token.string(FSUtils.getPath(data, id)));
-            final MediaTracker mt = new MediaTracker(map);
-            mt.addImage(image, 0);
-            mt.waitForAll();
-
+            
+            // load image and wait until it's done
+            File f = new File(Token.string(FSUtils.getPath(data, id)));
+            BufferedImage image = ImageIO.read(f);
+            
             // calculate optimal image size
-            final double iw = image.getWidth(map);
-            final double ih = image.getHeight(map);
+            final double iw = image.getWidth();
+            final double ih = image.getHeight();
             final double min = Math.min(ww / iw, hh / ih);
 
             // create scaled image instance
             if(min < 1) {
-              ww = Math.max(1, (int) (iw * min));
-              hh = Math.max(1, (int) (ih * min));
+              ww = (int) (iw * min);
+              hh = (int) (ih * min);
 
               final BufferedImage bi = new BufferedImage(ww, hh,
-                  BufferedImage.TYPE_3BYTE_BGR);
+                  BufferedImage.TYPE_INT_BGR);
               bi.createGraphics().drawImage(image, 0, 0, ww, hh, null);
               image = bi;
             }
 
+            // cache image
             if(ic == MAXNR) {
-              // image is new... remember id and increase counter
               ic = imgc;
               imgid[ic] = id;
               imgc = (ic + 1) % MAXNR;
@@ -142,27 +152,33 @@ public final class MapImages {
             imgs[ic] = image;
             imgmax[ic] = min >= 1;
 
-            if((loaderC & 3) == 0 && !View.painting) paint();
-          } catch(final InterruptedException ex) {
+            if((loaderC & 5) == 0 && !View.painting) paint();
+          } catch(final IOException ex) {
             BaseX.debug(ex);
           }
         }
+        
         paint();
         running = false;
       }
     }.start();
   }
-
+  
+  
   /**
    * Refreshes the map.
    */
   void paint() {
+    // determine maximum cache size, depending on window size
+    final Dimension size = GUI.get().getSize();
+    final int max = size.width * size.height * CACHESIZE;
+    
     // remove images if pixel limit is reached
     int imgSize = 0;
     for(int j = (imgc == 0 ? MAXNR : imgc) - 1; j != imgc;) {
       if(imgs[j] != null) {
-        if(imgSize < MAXPIXELS) {
-          imgSize += imgs[j].getWidth(map) * imgs[j].getHeight(map);
+        if(imgSize < max) {
+          imgSize += imgs[j].getWidth() * imgs[j].getHeight();
         } else {
           imgid[j] = 0;
           imgs[j] = null;

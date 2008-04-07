@@ -49,12 +49,14 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
       @Override
       public void mousePressed(final MouseEvent e) {
         if(memfocus) {
+          Performance.gc(4);
+          repaint();
+
           final Runtime rt = Runtime.getRuntime();
           final long occ = rt.totalMemory();
           max = rt.maxMemory();
           used = occ - rt.freeMemory();
-
-          Performance.gc(4);
+          
           final String inf =
             MEMTOTAL + Performance.formatSize(max, true) + Prop.NL +
             MEMRESERVED + Performance.formatSize(occ, true) + Prop.NL +

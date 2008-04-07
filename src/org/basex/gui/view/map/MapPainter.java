@@ -76,7 +76,12 @@ abstract class MapPainter {
   abstract void init(MapRects rects);
 
   /**
-   * Resets painter.
+   * Resets the painter.
    */
   abstract void reset();
+
+  /**
+   * Closes the painter.
+   */
+  abstract void close();
 }

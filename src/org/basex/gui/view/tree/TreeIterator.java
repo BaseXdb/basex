@@ -3,7 +3,7 @@ package org.basex.gui.view.tree;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
-import org.basex.gui.view.ViewData;
+import org.basex.gui.view.View;
 
 /**
  * This is an iterator for the tree nodes.
@@ -75,7 +75,7 @@ class TreeIterator {
     if(view.opened == null) return false;
     if(!found) {
       view.focusedPos++;
-      found = pre == ViewData.focusedPre;
+      found = pre == View.focused;
     }
     if(mode == 0) return moreCS();
     y += view.lineH;

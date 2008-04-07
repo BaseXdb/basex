@@ -1,10 +1,7 @@
 package org.basex.gui.view;
 
-import org.basex.core.Context;
 import org.basex.data.Data;
-import org.basex.data.Nodes;
 import org.basex.data.PrintSerializer;
-import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.query.fs.FSUtils;
 import org.basex.util.IntList;
@@ -20,32 +17,8 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class ViewData {
-  /** Current context set. */
-  public static int focusedPre = -1;
-
-  /**
-   * Preventing class instantiation.
-   */
+  /** Preventing class instantiation. */
   private ViewData() { }
-
-  /**
-   * Initializes the focus.
-   */
-  static void init() {
-    focusedPre = -1;
-  }
-
-  /**
-   * Initializes the root and marked context set.
-   * @param nodes context set
-   * @param mark marked nodes
-   */
-  static void init(final Nodes nodes, final Nodes mark) {
-    final Context context = GUI.context;
-    context.current(nodes);
-    context.marked(mark);
-    focusedPre = -1;
-  }
 
   /**
    * Checks if the specified node is a leaf node
@@ -126,11 +99,11 @@ public final class ViewData {
 
   /**
    * Returns the parent for the specified node.
+   * @param data data reference
    * @param pre child node
    * @return parent node
    */
-  public static int parent(final int pre) {
-    final Data data = GUI.context.data();
+  public static int parent(final Data data, final int pre) {
     return data.parent(pre, data.kind(pre));
   }
 }

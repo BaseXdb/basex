@@ -434,9 +434,7 @@ public final class Array {
       }
     }
 
-    int[] result = new int[counter];
-    System.arraycopy(maxResult, 0, result, 0, counter);
-    return result;
+    return finish(maxResult, counter);
   }
 
   /**

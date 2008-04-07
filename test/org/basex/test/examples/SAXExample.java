@@ -17,7 +17,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * and receiving the results via the SAX API. Note that the SAX output
  * doesn't support namespaces yet.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-07, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public final class SAXExample extends DefaultHandler {

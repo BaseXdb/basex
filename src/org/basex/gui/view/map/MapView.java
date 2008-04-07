@@ -4,7 +4,6 @@ import static org.basex.Text.*;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.Toolkit;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -96,12 +95,15 @@ public final class MapView extends View implements Runnable {
    * @return buffered image
    */
   private BufferedImage createImage() {
-    final Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-    final BufferedImage img = new BufferedImage(Math.max(1, screen.width),
-        Math.max(1, screen.height), BufferedImage.TYPE_INT_RGB);
+    final Dimension screen = getToolkit().getScreenSize();
+    final int w = Math.max(1, screen.width);
+    final int h = Math.max(1, screen.height);
+    
+    final BufferedImage img = new BufferedImage(w, h,
+        BufferedImage.TYPE_INT_BGR);
     final Graphics g = img.getGraphics();
     g.setColor(GUIConstants.COLORS[0]);
-    g.fillRect(0, 0, screen.width, screen.height);
+    g.fillRect(0, 0, w, h);
     return img;
   }
 
@@ -111,6 +113,7 @@ public final class MapView extends View implements Runnable {
     mainRects = null;
     zoomStep = 0;
     slide = false;
+    if(painter != null) painter.close();
 
     final Data data = GUI.context.data();
     if(data != null && getWidth() != 0) {
@@ -124,14 +127,14 @@ public final class MapView extends View implements Runnable {
   @Override
   public void refreshFocus() {
     if(mainRects == null || working) return;
-    if(ViewData.focusedPre == -1 && focusedRect != null) focusedRect = null;
+    if(focused == -1 && focusedRect != null) focusedRect = null;
 
     final MapRect m = focusedRect;
     int mi = 0;
     for(final int ms = mainRects.size; mi < ms; mi++) {
       final MapRect rect = mainRects.get(mi);
-      if(ViewData.focusedPre == rect.p || mi + 1 < ms &&
-          ViewData.focusedPre < mainRects.get(mi + 1).p) {
+      if(focused == rect.p || mi + 1 < ms &&
+          focused < mainRects.get(mi + 1).p) {
         focusedRect = rect;
         break;
       }
@@ -525,7 +528,8 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public void paintComponent(final Graphics g) {
-    if(!GUI.context.db()) return;
+    final Data data = GUI.context.data();
+    if(data == null) return;
 
     if(mainRects == null) {
       refreshInit();
@@ -556,7 +560,7 @@ public final class MapView extends View implements Runnable {
     if(GUIProp.maplayout == 0) {
       g.setColor(GUIConstants.COLORS[32]);
       int pre = mainRects.size;
-      int par = ViewData.parent(focusedRect.p);
+      int par = ViewData.parent(data, focusedRect.p);
       while(--pre >= 0) {
         final MapRect rect = mainRects.get(pre);
         if(rect.p == par) {
@@ -566,7 +570,7 @@ public final class MapView extends View implements Runnable {
           final int h = rect.h;
           g.drawRect(x, y, w, h);
           g.drawRect(x - 1, y - 1, w + 2, h + 2);
-          par = ViewData.parent(par);
+          par = ViewData.parent(data, par);
         }
       }
     }
@@ -587,7 +591,6 @@ public final class MapView extends View implements Runnable {
       g.drawRect(x - 1, y - 1, w + 2, h + 2);
 
       // draw tag label
-      final Data data = GUI.context.data();
       if(data.kind(focusedRect.p) == Data.ELEM) {
         g.setFont(GUIConstants.font);
         final byte[] tag = ViewData.tag(data, focusedRect.p);
@@ -695,11 +698,11 @@ public final class MapView extends View implements Runnable {
     mouseX = e.getX();
     mouseY = e.getY();
     dragTol = 0;
-    if(!focus() && ViewData.focusedPre == -1) return;
+    if(!focus() && focused == -1) return;
 
     // left/right mouse click?
     final boolean left = SwingUtilities.isLeftMouseButton(e);
-    final int pre = ViewData.focusedPre;
+    final int pre = focused;
 
     // add or remove marked node
     final Nodes marked = GUI.context.marked();
@@ -760,9 +763,9 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
-    if(working || ViewData.focusedPre == -1) return;
+    if(working || focused == -1) return;
     if(e.getWheelRotation() > 0) notifyContext(
-        new Nodes(ViewData.focusedPre, GUI.context.data()), false);
+        new Nodes(focused, GUI.context.data()), false);
     else notifyHist(false);
   }
 
@@ -786,8 +789,8 @@ public final class MapView extends View implements Runnable {
       do {
         pre = rnd.nextInt(size);
       } while(data.kind(pre) != Data.ELEM || !ViewData.isLeaf(data, pre));
-      ViewData.focusedPre = pre;
-      notifySwitch(new Nodes(ViewData.focusedPre, data));
+      focused = pre;
+      notifySwitch(new Nodes(focused, data));
     } else if(key == KeyEvent.VK_N || key == KeyEvent.VK_B) {
       // jump to next node
       int pre = (current.pre[0] + 1) % size;

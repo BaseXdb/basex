@@ -226,7 +226,7 @@ public final class TableView extends View implements Runnable {
     
     if(e.getY() < header.getHeight()) return;
     
-    final int pre = ViewData.focusedPre;
+    final int pre = focused;
     if(SwingUtilities.isLeftMouseButton(e)) {
       if(e.getClickCount() == 1) {
         final String str = content.focusedString;
@@ -262,7 +262,7 @@ public final class TableView extends View implements Runnable {
     final Data data = GUI.context.data();
     
     if(data.deepfs && tdata.mouseX < 20) {
-      FSUtils.launch(data, ViewData.parent(ViewData.focusedPre));
+      FSUtils.launch(data, ViewData.parent(data, focused));
     }
   }
   
@@ -281,8 +281,7 @@ public final class TableView extends View implements Runnable {
     final int key = e.getKeyCode();
     
     final int lines = (getHeight() - header.getHeight()) / tdata.rowH;
-    final int oldPre = tdata.getRoot(GUI.context.data(),
-        ViewData.focusedPre);
+    final int oldPre = tdata.getRoot(GUI.context.data(), focused);
     int pre = oldPre;
     
     final IntList rows = tdata.rows;

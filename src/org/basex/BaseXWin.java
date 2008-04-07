@@ -74,8 +74,8 @@ public final class BaseXWin {
       // set system specific look & feel
       // temporary: avoid GTK problems in Ubuntu 7.10/other distributions
       UIManager.setLookAndFeel(Prop.UNIX ?
-          //UIManager.getSystemLookAndFeelClassName() :
-          UIManager.getCrossPlatformLookAndFeelClassName() :
+          UIManager.getSystemLookAndFeelClassName() :
+          //UIManager.getCrossPlatformLookAndFeelClassName() :
           UIManager.getSystemLookAndFeelClassName());
       
       // delay tooltip disappearance

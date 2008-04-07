@@ -31,7 +31,6 @@ import org.basex.gui.dialog.DialogProgress;
 import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.View;
-import org.basex.gui.view.ViewData;
 import org.basex.io.IOConstants;
 import org.basex.util.Performance;
 
@@ -320,7 +319,7 @@ public enum GUICommands implements GUICommand {
       Context context = GUI.context;
       Nodes marked = context.marked();
       if(marked.size == 0) {
-        final int pre = ViewData.focusedPre;
+        final int pre = View.focused;
         if(pre == -1) return;
         marked = new Nodes(pre, context.data());
       }

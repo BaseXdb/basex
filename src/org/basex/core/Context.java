@@ -17,18 +17,12 @@ import org.basex.util.Performance;
 public final class Context {
   /** Central data reference. */
   private Data data;
-  /** Current context set. */
+  /** Current context. */
   private Nodes current;
-  /** Currently marked context nodes. */
+  /** Currently marked nodes. */
   private Nodes marked;
-  /** Currently copied data set. */
+  /** Currently copied nodes. */
   private Nodes copied;
-  /** Current FTPrePos values. **/
-  private int[][] ftData;
-  /** Current FTPointer on FTPrePos values. **/
-  private int[] ftPoi; 
-  /** FTSearchStrings out of query. **/
-  private byte[] ftss; 
   
   /**
    * Returns true if a data reference has been set.
@@ -58,6 +52,7 @@ public final class Context {
     data = d;
     current = new Nodes(0, d);
     marked = new Nodes(d);
+    copied = null;
   }
   
   /**
@@ -71,6 +66,7 @@ public final class Context {
         data = null;
         current = null;
         marked = null;
+        copied = null;
         d.close();
         if(Prop.mainmem) Performance.gc(1);
       }
@@ -128,47 +124,4 @@ public final class Context {
   public void marked(final Nodes mark) {
     marked = mark;
   }
-  
-  /**
-   * Sets the ftdata.
-   * @param prepos int[][] prepos values
-   * @param poi int|[] pointer values
-   */
-  public void ftData(final int[][] prepos, final int[] poi) {
-    ftData = prepos;
-    ftPoi = poi;
-  }
-  
-  /**
-   * Getter for FTData.
-   * @return int[][] ftData.
-   */
-  public int[][] getFTData() {
-    return ftData;
-  }
-  
-  /**
-   * Getter for FTPointer.
-   * @return int[] ftPointer
-   */
-  public int[] getFTPointer() {
-    return ftPoi;
-  }
-  
-  /**
-   * Setter for FTSearchString, extracted out of query.
-   * @param ftSearchString fulltext search string
-   */
-  public void setFTSearchString(final byte[] ftSearchString) {
-    ftss = ftSearchString;
-  }
- 
-  /**
-   * Setter for FTSearchString, extracted out of query.
-   * @return ftSearchString
-   */
-   public byte[] getFTSearchString() {
-     return ftss;
-   }
-  
 }

@@ -22,8 +22,6 @@ public final class XMLParser extends Parser {
   private XMLScanner scanner;
   /** Builder reference. */
   private Builder builder;
-  /** DTD Parser reference. */
-  DTDParser dtd;
 
   /**
    * Constructor.
@@ -59,8 +57,7 @@ public final class XMLParser extends Parser {
         builder.comment(scanner.token.finish());
         scanner.next();
       } else if(scanner.type == Type.DTD) {
-        dtd = new DTDParser(scanner.token.finish(), file,
-            builder.tags, builder.atts, scanner.ents);
+        new DTDParser(scanner, file, builder.tags, builder.atts, scanner.ents);
         scanner.next();
       } else if(scanner.type == Type.PI) {
         builder.pi(scanner.token.finish()); 

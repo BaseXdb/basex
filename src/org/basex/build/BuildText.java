@@ -5,7 +5,7 @@ import org.basex.util.Token;
 /**
  * This interface organizes textual information for the builder package.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-07, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public interface BuildText {
@@ -76,6 +76,8 @@ public interface BuildText {
   String TYPEAFTER = "Misplaced document type definition.";
   /** Scanner Error. */
   String DTDERR = "DTD parsing: %";
+  /** Scanner Error. */
+  String DTDERROR = "%, Line %, Col %: %";
   /** Scanner Error. */
   String DTDNOTFOUND = "\"%\" not found.";
   /** DTD: SIGNERROR. */

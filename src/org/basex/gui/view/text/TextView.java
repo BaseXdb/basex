@@ -2,8 +2,6 @@ package org.basex.gui.view.text;
 
 import static org.basex.gui.GUIConstants.*;
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-
 import org.basex.BaseX;
 import org.basex.data.Nodes;
 import org.basex.data.PrintSerializer;
@@ -68,10 +66,9 @@ public final class TextView extends View {
   }
   
   
- /**
+ /*
   * Updates header labels displaying ftsearch string.
   * @param n nodes
-  */ 
   public void updateHeader(final Nodes n) {
     if (!GUIProp.thumbnail) return;
     
@@ -96,6 +93,7 @@ public final class TextView extends View {
     }
     north.add(center, BorderLayout.CENTER);
   }
+  */ 
   
   @Override
   public void refreshInit() {
@@ -130,7 +128,7 @@ public final class TextView extends View {
     }
     if(!GUI.context.db() || nodes.size == 0) {
       setText(Token.EMPTY, 0, true);
-      updateHeader(null);
+      //updateHeader(null);
       return;
     }
     
@@ -140,7 +138,7 @@ public final class TextView extends View {
       nodes.serialize(new PrintSerializer(out, false, chop));
       out.addInfo();
       setText(out.buffer(), out.size(), false);
-      updateHeader(nodes);
+      //updateHeader(nodes);
       
     } catch(final Exception ex) {
       BaseX.debug(ex);

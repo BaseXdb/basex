@@ -14,6 +14,7 @@ import org.basex.gui.GUIFS;
 import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXLayout;
+import org.basex.gui.view.View;
 import org.basex.gui.view.ViewData;
 import org.basex.io.BufferInput;
 import org.basex.query.fs.FSUtils;
@@ -45,6 +46,12 @@ public final class MapFS extends MapPainter {
   MapFS(final MapView m) {
     super(m);
     if(images == null) images = new MapImages(m);
+  }
+
+  @Override
+  public void finalize() throws Throwable {
+    super.finalize();
+    images.reset();
   }
 
   @Override
@@ -336,7 +343,7 @@ public final class MapFS extends MapPainter {
       mx - r.x < 16 && FSUtils.isFile(data, r.p) &&
       GUIFS.mime(FSUtils.getName(data, r.p)) != GUIFS.Type.IMAGE;
 
-    if(active && click) FSUtils.launch(data, ViewData.focusedPre);
+    if(active && click) FSUtils.launch(data, View.focused);
     return active;
   }
 
@@ -361,5 +368,10 @@ public final class MapFS extends MapPainter {
   @Override
   void reset() {
     images.stop();
+  }
+
+  @Override
+  void close() {
+    images.reset();
   }
 }

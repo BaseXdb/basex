@@ -17,7 +17,6 @@ import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXBar;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.View;
-import org.basex.gui.view.ViewData;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -65,8 +64,8 @@ public final class TableContent extends BaseXBack {
     final int w = getWidth() - scroll.getWidth();
     final int h = getHeight();
 
-    final int rfocus = tdata.getRoot(data, ViewData.focusedPre);
-    final int focus = ViewData.focusedPre;
+    final int rfocus = tdata.getRoot(data, View.focused);
+    final int focus = View.focused;
     
     final boolean fs = data.deepfs;
     int mpos = 0;

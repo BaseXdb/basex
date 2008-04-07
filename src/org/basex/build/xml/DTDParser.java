@@ -17,7 +17,7 @@ import org.basex.util.XMLToken;
 /**
  * Parses the DTD to get the elements, attributes and entities.
  * 
- * @author Workgroup DBIS, University of Konstanz 2005-07, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler
  */
 public class DTDParser {
@@ -33,15 +33,19 @@ public class DTDParser {
   private byte[] extid;
   /** Root file. */
   private String xmlfile;
+  /** External file. */
+  private String extfile;
   /** Content of internal DTD. */
   private byte[] content;
   /** Current position. */
   private int pos;
   /** Temporary saving of content. */
   private byte[] intSubset;
-  /** boolean Value for checking if there is an intern DTD. */
+  /** boolean value for checking if there is an intern DTD. */
   private boolean isIntern = false;
 
+  /** Scanner reference. */
+  XMLScanner scanner;
   /** Index for all tag and attribute names. */
   Names tags;
   /** Index for all tag and attribute names. */
@@ -51,23 +55,24 @@ public class DTDParser {
 
   /**
    * Constructor.
-   * @param dtd contents
+   * @param scan scanner reference
    * @param xml input xml file
    * @param tag tag index
    * @param att attribute index
    * @param ent entity index
    * @throws IOException I/O Exception
    */
-  public DTDParser(final byte[] dtd, final String xml, final Names tag,
+  public DTDParser(final XMLScanner scan, final String xml, final Names tag,
       final Names att, final Map ent) throws IOException {
 
+    scanner = scan;
     xmlfile = xml;
     tags = tag;
     atts = att;
     ents = ent;
 
     // cache content
-    content = dtd;
+    content = scan.token.finish();
     // check DOCTYPE S
     if(!consume(DOCTYPE) || !consumeWS()) error("Error in DOCTYPE");
     // check NAME
@@ -86,7 +91,7 @@ public class DTDParser {
       extid = consumeQuoted();
       externalID();
     } else if(consume(SBRACKETO)) {
-      content = dtd;
+      content = scan.token.finish();
       BaseX.debug("- Root Element Type: %", root);
       BaseX.debug("- InternContent:\n %", content);
       markupdecl();
@@ -112,19 +117,17 @@ public class DTDParser {
       intSubset = substring(content, pos, content.length);
     }
     // read external file
-    final String dtd = string(extid);
-    try {
-      content = IOConstants.read(xmlfile, dtd);
-    } catch(final FileNotFoundException ex) {
-      error(DTDNOTFOUND, dtd);
-    }
+    extfile = string(extid);
     pos = 0;
-    BaseX.debug("- Root Element Type: %", root);
-    BaseX.debug("- ExternContent of %:\n %", dtd, content);
-    BaseX.debug("----------------");
-    if(content.length != 0) {
-    markupdecl();
+    try {
+      content = IOConstants.read(xmlfile, extfile);
+    } catch(final FileNotFoundException ex) {
+      error(DTDNOTFOUND, extfile);
     }
+    BaseX.debug("- Root Element Type: %", root);
+    BaseX.debug("----------------");
+    if(content.length != 0) markupdecl();
+    extfile = null;
     BaseX.debug("----------------");
     BaseX.debug("THE END");
     if(isIntern) {
@@ -145,41 +148,38 @@ public class DTDParser {
    */
   private void markupdecl() throws BuildException {
     // checks for element, attlist and entity tags
-    consumeWS();
-    if(consume(ELEM)) {
-      elementDecl();
-      markupdecl();
-    } else if(consume(ATTL)) {
-      attlistDecl();
+    while(true) {
       consumeWS();
-      if(!consume(GREAT)) {
-        error(SIGNERROR);
-      }
-      markupdecl();
-    } else if(consume(ENT)) {
-      entityDecl();
-      consumeWS();
-      if(!consume(GREAT)) error(SIGNERROR);
-      markupdecl();
-    } else if(consume(NOTA)) {
-      notationDecl();
-      markupdecl();
-    } else if(consume(GQ)) {
-      piDecl();
-      markupdecl();
-    } else if(consume(COMS)) {
-      commentDecl();
-      markupdecl();
-    } else {
-      consumeWS();
-      byte next = next();
-      if(next == '%') {
-        BaseX.debug(consumeSpecName());
-        markupdecl();
-      } else {
-        if(XMLToken.isLetter(next)) {
+      if(consume(ELEM)) {
+        elementDecl();
+      } else if(consume(ATTL)) {
+        attlistDecl();
+        consumeWS();
+        if(!consume(GREAT)) {
           error(SIGNERROR);
         }
+      } else if(consume(ENT)) {
+        entityDecl();
+        consumeWS();
+        if(!consume(GREAT)) error(SIGNERROR);
+      } else if(consume(NOTA)) {
+        notationDecl();
+      } else if(consume(GQ)) {
+        piDecl();
+      } else if(consume(COMS)) {
+        commentDecl();
+      } else {
+        consumeWS();
+        byte next = next();
+        if(next == '%') {
+          BaseX.debug(consumeSpecName());
+          markupdecl();
+        } else {
+          if(XMLToken.isLetter(next)) {
+            error(SIGNERROR);
+          }
+        }
+        break;
       }
     }
   }
@@ -522,11 +522,7 @@ public class DTDParser {
    * Checks the CommentDeclaration.
    */
   private void commentDecl() {
-    int tmp = pos;
-    while(!consume(COME)) {
-      next();
-    }
-    BaseX.debug("- Comment: '%'", substring(content, tmp, pos - 3));
+    while(!consume(COME)) next();
   }
 
   /**
@@ -717,7 +713,25 @@ public class DTDParser {
    */
   private void error(final String err, final Object... arg)
       throws BuildException {
-    throw new BuildException(DTDERR, BaseX.inf(err, arg));
+
+    String file = "DTD";
+    int col = scanner.col;
+    int line = scanner.line;
+
+    if(extfile != null) {
+      file = extfile;
+      col = 0;
+      line = 0;
+    }
+    
+    for(int p = 0; p < pos; p++) {
+      if(content[p] == '\n') {
+        col = 0;
+        line++;
+      }
+      col++;
+    }
+    throw new BuildException(DTDERROR, file, line, col, BaseX.inf(err, arg));
   }
 
   /**

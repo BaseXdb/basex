@@ -512,17 +512,20 @@ public final class GUI extends JFrame {
                 }
               } else if(context.marked() != null) {
                 // refresh highlight
-                Nodes nodes = context.marked();
+                Nodes marked = context.marked();
+                // nodes as result?
                 if(result instanceof Nodes) {
-                  nodes = (Nodes) result;
-                  if (GUIProp.thumbnail) {
-                    GUI.context.ftData(nodes.ftpre, nodes.ftpoin);
-                  }
-
-                } else if(nodes.size != 0) {
-                  nodes = new Nodes(data);
+                  marked = (Nodes) result;
+                } else if(marked.size != 0) {
+                  // any other result - remove old marks
+                  marked = new Nodes(data);
                 }
-                if(!context.marked().same(nodes)) View.notifyMark(nodes);
+                // highlights have changed.. refresh views
+                if(marked != context.marked()) {
+                  View.ftData = marked.ftpre;
+                  View.ftPoi = marked.ftpoin;
+                  View.notifyMark(marked);
+                }
               }
             }
             if(obsolete(thread)) return;
@@ -530,7 +533,7 @@ public final class GUI extends JFrame {
             // print result
             if(ok && cc.printing() && !(result instanceof Nodes)) {
               text.setText(out.buffer(), out.size(), false);
-              text.updateHeader(null);
+              //text.updateHeader(null);
             }
 
             // show number of hits
@@ -696,8 +699,7 @@ public final class GUI extends JFrame {
    * @param comp component to be focused
    */
   public void checkFocus(final JComponent comp) {
-    if(!GUIProp.mousefocus || comp.hasFocus()) return;
-    comp.requestFocusInWindow();
+    if(GUIProp.mousefocus) comp.requestFocusInWindow();
   }
 
   /**
@@ -785,6 +787,7 @@ public final class GUI extends JFrame {
       setJMenuBar(menu);
       add(top);
     }
+
     GUIProp.showmenu = !full;
     GUIProp.showbuttons = !full;
     GUIProp.showinput = !full;

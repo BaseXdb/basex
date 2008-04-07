@@ -103,15 +103,15 @@ public class XQuery extends Proc {
         result = qu.eval(nodes);
         eval += per.getTime();
       }
+      // convert query NodeSet to visualization node set
       if(result instanceof NodeSet) {
-        // <SG> creating a final result set for further processing
         final NodeSet ns = (NodeSet) result;
-        result = new Nodes(ns.nodes, ns.data);
-        if (ns.ftidpos != null) {
-          ((Nodes) result).setFTData(ns.ftidpos, ns.ftpointer, 
-              ((XPathProcessor) qu).getFTSearchStings());
-        }
+        final Nodes nodes = new Nodes(ns.nodes, ns.data);
+        nodes.setFTData(ns.ftidpos, ns.ftpointer, 
+            ((XPathProcessor) qu).ftSearchStrings());
+        result = nodes;
       }
+      // dump some query info
       if(Prop.info) {
         info(qu.getInfo());
         info(QUERYPARSE + Performance.getTimer(pars, Prop.runs) + NL);
