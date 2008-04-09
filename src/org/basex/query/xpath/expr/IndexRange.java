@@ -9,14 +9,12 @@ import org.basex.query.xpath.values.Item;
 import org.basex.util.Array;
 
 /**
- * RangeExpr Able to perform numeric range queries.
+ * IndexRange, performing index-based numeric range queries.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Range extends ArrayExpr {
-  /** Expression. */
-  //final Expr expr;
+public final class IndexRange extends ArrayExpr {
   /** Minimum Value. */
   final Item min;
   /** Maximum Value. */
@@ -34,7 +32,7 @@ public final class Range extends ArrayExpr {
    * @param mx maximum value
    * @param mxinclude maximum included in range
    */
-  public Range(final Expr[] e, final Item mn, final boolean mninclude,
+  public IndexRange(final Expr[] e, final Item mn, final boolean mninclude,
       final Item mx, final boolean mxinclude) {
     exprs = e;
     min = mn; //.num();
@@ -45,9 +43,6 @@ public final class Range extends ArrayExpr {
 
   @Override
   public Expr compile(final XPContext ctx) {
-    /*for(int i = 0; i != exprs.length; i++) {
-      exprs[i] = exprs[i].compile(ctx);
-    }*/
     return this;
   }
   
@@ -59,32 +54,7 @@ public final class Range extends ArrayExpr {
     } else {
       return null;
     }
-
-    /*
-    final Item v = ctx.eval(exprs[0]);
-    if(v.size() == 0) return Bool.FALSE;
-
-    if(v instanceof NodeSet) {
-      final NodeSet nodes = (NodeSet) v;
-      final Data data = nodes.data;
-      for(int n = 0; n < nodes.size; n++) {
-        final double d = data.atomNum(nodes.nodes[n]);
-        
-        if(((d >= min && mni) || (d > min && !mni)) && 
-            ((d <= max && mxi) || (d < max && !mxi))) return Bool.TRUE;
-      }
-      return Bool.FALSE;
-    }
-    final double d = v.num();
-    return Bool.get(d >= min && d <= max);*/
   }
-
-  /*
-  @Override
-  public String toString() {
-    return "Range(" + min + (mni ? " <= " : "<") + expr 
-      + (mxi ? " >= " : ">")  + max + ")";
-  }*/
 
   @Override
   public Expr indexEquivalent(final XPContext ctx, final Step curr) {

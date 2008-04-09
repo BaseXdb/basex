@@ -13,7 +13,7 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * This class serves an example for evaluating XQuery requests
+ * This class serves as an example for evaluating XQuery requests
  * and receiving the results via the SAX API. Note that the SAX output
  * doesn't support namespaces yet.
  *

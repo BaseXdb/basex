@@ -4,6 +4,7 @@ import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.XPOptimizer;
 import org.basex.query.xpath.internal.AllOf;
+import org.basex.query.xpath.internal.Range;
 import org.basex.query.xpath.locpath.LocPath;
 import org.basex.query.xpath.locpath.Step;
 import org.basex.query.xpath.values.Bool;
@@ -68,16 +69,21 @@ public final class And extends ArrayExpr {
       final LocPath p1 = (LocPath) r1.expr1;
       final LocPath p2 = (LocPath) r2.expr1;
       
-     /* if(r1.type == Comp.GE && r2.type == Comp.LE && p1.sameAs(p2)) {
+      if(r1.type == Comp.GE && r2.type == Comp.LE && p1.sameAs(p2)) {
         ctx.compInfo(OPTRANGE);
         return new Range(p1, (Item) r1.expr2, (Item) r2.expr2);
-      } else */
-      if ((r1.type == Comp.GT || r1.type == Comp.GE) 
+      }
+
+      // <SG> comment added.. open issues:
+      // - double values?
+      // - check for existence of index
+      /* 
+      if((r1.type == Comp.GT || r1.type == Comp.GE) 
           && (r2.type == Comp.LT || r2.type == Comp.LE) && p1.sameAs(p2)) {
         ctx.compInfo(OPTRANGE);
-        return new Range(exprs, (Item) r1.expr2, r1.type == Comp.GE, 
+        return new IndexRange(exprs, (Item) r1.expr2, r1.type == Comp.GE, 
             (Item) r2.expr2, r2.type == Comp.LE);
-      }
+      }*/
     }
     return allOf(ctx);
   }

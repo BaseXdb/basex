@@ -58,11 +58,11 @@ public final class XQTS {
   private static final String PATHLOG = "xqts.log";
 
   /** XQuery Test Suite Root Directory. */
-  private static final String ROOT = "/";
-  //private static final String ROOT = "h:/";
+  //private static final String ROOT = "/";
+  private static final String ROOT = "h:/";
   /** Path to the XQuery Test Suite. */
-  //private String tests = ROOT + "xqts102/"; // "h:/xqts102/"
-  private String tests = ROOT + "/home/dbis/xml/xqts102/";
+  private String tests = ROOT + "xqts102/";
+  //private String tests = ROOT + "/home/dbis/xml/xqts102/";
   /** Query Path. */
   private String queries;
   /** Expected Results. */

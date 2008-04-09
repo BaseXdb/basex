@@ -23,13 +23,13 @@ public final class Union extends ArrayExpr {
 
   @Override
   public NodeSet eval(final XPContext ctx) throws QueryException {
-    int[] result = ((NodeSet) exprs[0].eval(ctx)).nodes;
+    int[] result = ((NodeSet) (ctx.eval(exprs[0]))).nodes;
     final NodeBuilder tmp = new NodeBuilder();
 
     for(int i = 1; i != exprs.length; i++) {
       final int rl = result.length;
 
-      final int[] merge = ((NodeSet) exprs[i].eval(ctx)).nodes;
+      final int[] merge = ((NodeSet) (ctx.eval(exprs[i]))).nodes;
       final int ml = merge.length;
 
       int m = 0;

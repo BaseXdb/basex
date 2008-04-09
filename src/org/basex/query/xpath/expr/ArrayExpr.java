@@ -1,6 +1,7 @@
 package org.basex.query.xpath.expr;
 
 import org.basex.data.Serializer;
+import org.basex.util.TokenBuilder;
 
 /**
  * This is an abstract class for array expressions.
@@ -37,14 +38,14 @@ public abstract class ArrayExpr extends Expr {
 
   @Override
   public final String toString() {
-    // <cg> i have changed name() to new String(name()), 
-    // because name() doesn't return a string in every case SG
-    final StringBuilder sb = new StringBuilder(new String(name()) + "(");
+    // <SG> ..TokenBuilder used, so the added byte array is treated as token
+    final TokenBuilder sb = new TokenBuilder(name());
+    sb.add('(');
     for(int i = 0; i != exprs.length; i++) {
-      if(i != 0) sb.append(", ");
-      sb.append(exprs[i]);
+      if(i != 0) sb.add(", ");
+      sb.add(exprs[i]);
     }
-    sb.append(')');
+    sb.add(')');
     return sb.toString();
   }
 

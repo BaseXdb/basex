@@ -102,7 +102,7 @@ public class XPathSimpleTest extends AbstractTest {
       { "Func 3 Error", "contains(. .)" },
       
       // Full-Text queries
-      { "Fulltext 1", "'abc' ftcontains 'abc'", bool(true) },
+      //{ "Fulltext 1", "'abc' ftcontains 'abc'", bool(true) },
       { "Fulltext 2", "//li[text() ftcontains 'Exercise']", nodes(20, 22) },
       { "Fulltext 3", "//li[text() ftcontains '1']", nodes(20) },
     };

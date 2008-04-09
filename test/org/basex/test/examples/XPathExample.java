@@ -16,7 +16,7 @@ import org.basex.query.QueryProcessor;
 import org.basex.query.xpath.XPathProcessor;
 
 /**
- * This class serves an example for executing XPath requests.
+ * This class serves as an example for executing XPath requests.
  * [...]
  *
  * @author Workgroup DBIS, University of Konstanz 2005-07, ISC License

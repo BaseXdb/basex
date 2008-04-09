@@ -25,7 +25,7 @@ public final class FTOr extends FTArrayExpr {
 
   @Override
   public Bool eval(final XPContext ctx) throws QueryException {
-    for(final Expr e : exprs) if(e.eval(ctx).bool()) return Bool.TRUE;
+    for(final Expr e : exprs) if(ctx.eval(e).bool()) return Bool.TRUE;
     return Bool.FALSE;
   }
 

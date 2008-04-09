@@ -11,7 +11,7 @@ import org.basex.query.xpath.values.Item;
 import org.basex.util.Token;
 
 /**
- * RangeExpr Able to perform numeric range queries.
+ * IndexRange, performing numeric range queries.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen

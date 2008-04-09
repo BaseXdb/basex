@@ -12,7 +12,7 @@ import org.basex.query.QueryProcessor;
 import org.basex.query.xquery.XQueryProcessor;
 
 /**
- * This class serves an example for executing XQuery requests.
+ * This class serves as an example for executing XQuery requests.
  * [...]
  *
  * @author Workgroup DBIS, University of Konstanz 2005-07, ISC License

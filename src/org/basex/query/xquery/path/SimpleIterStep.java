@@ -44,13 +44,19 @@ public final class SimpleIterStep extends Step {
         while(true) {
           if(ir == null) {
             final Item it = iter.next();
-            if(it == null) return null;
+            if(it == null) {
+              ctx.item = item;
+              return null;
+            }
             if(!it.node()) Err.or(NODESPATH, this, it);
             ir = axis.init((Node) it);
           }
           final Node nod = ir.next();
           if(nod == null) ir = null;
-          else if(test.e(nod, ctx)) return nod.finish();
+          else if(test.e(nod, ctx)) {
+            ctx.item = item;
+            return nod.finish();
+          }
         }
       }
 

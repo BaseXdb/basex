@@ -177,6 +177,7 @@ public abstract class Step extends ExprInfo {
    * @return false if no Position predicate
    */
   public final boolean sameAs(final Step step) {
+    if(axis != Axis.CHILD && axis != Axis.SELF) return false;
     if(axis != step.axis || !step.test.sameAs(test)) return false;
     return preds.sameAs(step.preds);
   }

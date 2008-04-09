@@ -938,7 +938,7 @@ public final class XPathProcessor extends QueryProcessor {
    */
   private Expr parseFTPrimary() throws QueryException {
     Expr e = null;
-    if(curr('"') || curr('"')) {
+    if(curr('"') || curr('\'')) {
       e = parseFTWords();
       if (e instanceof Literal) ftss.add(((Literal) e).str());
       consumeWS();

@@ -117,6 +117,7 @@ public abstract class LocPath extends Expr {
         if(j == 0) {
           if(this instanceof LocPathRel || axis == Axis.PARENT) {
             invPath.steps.add(Axis.get(axis, TestNode.NODE));
+            //invPath.steps.add(Axis.get(axis, curr.test));
           } else {
             indexMatch = false;
           }

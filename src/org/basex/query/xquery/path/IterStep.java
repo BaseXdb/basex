@@ -44,7 +44,10 @@ public final class IterStep extends Step {
         while(true) {
           if(ir == null) {
             final Item it = iter.next();
-            if(it == null) return null;
+            if(it == null) {
+              ctx.item = item;
+              return null;
+            }
             if(!it.node()) Err.or(NODESPATH, this, it);
             ir = axis.init((Node) it);
           }
@@ -64,7 +67,10 @@ public final class IterStep extends Step {
                   break;
                 }
               }
-              if(add) return nod.finish();
+              if(add) {
+                ctx.item = item;
+                return nod.finish();
+              }
             }
           } else {
             ir = null;
