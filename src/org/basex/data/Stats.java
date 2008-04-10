@@ -1,9 +1,7 @@
 package org.basex.data;
 
-import static org.basex.data.DataText.DATASTAT;
-
+import static org.basex.data.DataText.*;
 import java.io.IOException;
-
 import org.basex.BaseX;
 import org.basex.data.StatsKey.Kind;
 import org.basex.io.DataInput;
@@ -22,7 +20,7 @@ public final class Stats extends Set {
   /** Hash values. */
   private StatsKey[] values = new StatsKey[CAP];
   /** Database name. */
-  private String dbname;
+  private final String dbname;
   /** Node kind Integer. */
   public static final byte INT = 0x01;
   /** Node kind Double. */
@@ -35,7 +33,7 @@ public final class Stats extends Set {
   public static final byte NONE = 0x05;
 
   /**
-   * Constructor using given database name. 
+   * Constructor using given database name.
    * @param db database name
    */
   public Stats(final String db) {
@@ -52,7 +50,7 @@ public final class Stats extends Set {
     if(i > 0) {
       values[i] = new StatsKey();
     } else {
-      i = 0 - i;
+      i = -i;
     }
     if(val != null) values[i].add(val);
   }
@@ -63,7 +61,7 @@ public final class Stats extends Set {
    * @return value or null if nothing was found
    */
   public StatsKey get(final byte[] tok) {
-    return tok != null ? values[id(tok)] : null;
+    return values[id(tok)];
   }
 
   /**
@@ -79,8 +77,7 @@ public final class Stats extends Set {
    * Finishes the statistics.
    */
   public void finish() {
-    for(int k = 1; k < size; k++)
-      values[k].finish();
+    for(int k = 1; k < size; k++) values[k].finish();
   }
 
   @Override
@@ -99,13 +96,13 @@ public final class Stats extends Set {
 
       for(int i = 0; i < l; i++) {
         final byte kind = in.readByte();
-        byte[] tag = in.readBytes();
-        StatsKey toAdd = new StatsKey();
+        final byte[] tag = in.readBytes();
+        final StatsKey toAdd = new StatsKey();
         toAdd.kind = Kind.INT;
         final int j = add(tag);
 
-        boolean kInt = false;
-        if((kInt = kind == INT) || kind == DBL) {
+        boolean kInt = kind == INT;
+        if(kInt || kind == DBL) {
           toAdd.kind = kInt ? Kind.INT : Kind.DBL;
           toAdd.min = Token.toDouble(in.readBytes());
           toAdd.max = Token.toDouble(in.readBytes());
@@ -117,15 +114,13 @@ public final class Stats extends Set {
           }
         } else if(kind == TEXT) {
           toAdd.kind = Kind.TEXT;
-
         } else {
           toAdd.kind = Kind.NONE;
         }
         values[j] = toAdd;
       }
       in.close();
-
-    } catch(Exception ex) {
+    } catch(final Exception ex) {
       BaseX.debug(ex);
     }
   }
@@ -139,11 +134,7 @@ public final class Stats extends Set {
 
     int l = 0;
     final int vl = values.length;
-    for(int i = 0; i < vl; i++) {
-      if(values[i] != null) {
-        l++;
-      }
-    }
+    for(int i = 0; i < vl; i++) if(values[i] != null) l++;
     sta.writeInt(l);
 
     for(int i = 0; i < vl; i++) {
@@ -157,14 +148,11 @@ public final class Stats extends Set {
           final byte[] min = Token.token(key.min);
           final byte[] max = Token.token(key.max);
           writeOrdInfo(sta, tag, kInt ? INT : DBL, min, max);
-
         } else if(kind == Kind.CAT) {
           final byte[][] cats = key.cats.keys();
           writeCatInfo(sta, CAT, tag, cats);
-
         } else if(kind == Kind.TEXT) {
           writeInfo(sta, TEXT, tag);
-
         } else {
           writeInfo(sta, NONE, tag);
         }
@@ -183,13 +171,12 @@ public final class Stats extends Set {
    */
   private void writeCatInfo(final DataOutput out, final byte kind,
       final byte[] tag, final byte[][] cats) throws IOException {
+
     final int cl = cats.length;
     out.write(kind);
     out.writeBytes(tag);
     out.writeInt(cl);
-    for(int i = 0; i < cl; i++) {
-      out.writeBytes(cats[i]);
-    }
+    for(int i = 0; i < cl; i++) out.writeBytes(cats[i]);
   }
 
   /**
@@ -197,12 +184,13 @@ public final class Stats extends Set {
    * @param out DataOutput reference
    * @param tag tag name
    * @param kind node kind
-   * @param min min value the key
+   * @param min min value of the key
    * @param max max value of the key
    * @throws IOException in case of writing problems
    */
   private void writeOrdInfo(final DataOutput out, final byte[] tag,
       final byte kind, final byte[] min, final byte[] max) throws IOException {
+
     out.write(kind);
     out.writeBytes(tag);
     out.writeBytes(min);
@@ -218,6 +206,7 @@ public final class Stats extends Set {
    */
   private void writeInfo(final DataOutput out, final byte kind,
       final byte[] name) throws IOException {
+
     out.write(kind);
     out.writeBytes(name);
   }

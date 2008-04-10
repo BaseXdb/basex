@@ -271,7 +271,6 @@ final class QuerySimple extends QueryPanel implements ActionListener {
             addInput(cp + 1);
             break;
           case NONE:
-            //final BaseXLabel label = new BaseXLabel("(no texts available)");
             final BaseXLabel label = new BaseXLabel("");
             label.setBorder(new EmptyBorder(3, 0, 0, 0));
             panel.add(label, cp + 1);

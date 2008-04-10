@@ -1,14 +1,9 @@
 package org.basex.build;
 
-import static org.basex.data.DataText.DATAATV;
-import static org.basex.data.DataText.DATATBL;
-import static org.basex.data.DataText.DATATMP;
-import static org.basex.data.DataText.DATATXT;
+import static org.basex.data.DataText.*;
 import static org.basex.io.IOConstants.BLOCKPOWER;
-
 import java.io.File;
 import java.io.IOException;
-
 import org.basex.BaseX;
 import org.basex.build.xml.XMLParser;
 import org.basex.core.Prop;

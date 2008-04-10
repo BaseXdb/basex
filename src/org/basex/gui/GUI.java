@@ -465,6 +465,7 @@ public final class GUI extends JFrame {
             if(obsolete(thread)) return;
 
             Result result = p.result();
+            Nodes nodes = result instanceof Nodes ? (Nodes) result : null;
             
             /* convert xquery result to a flat nodeset
              * solve problems with TextView first
@@ -478,8 +479,7 @@ public final class GUI extends JFrame {
 
             if(cc.printing() && ok) {
               if(!GUIProp.showstarttext && data == null ||
-                 !GUIProp.showtext && data != null &&
-                 !(result instanceof Nodes)) {
+                 !GUIProp.showtext && data != null && nodes == null) {
                 GUICommands.SHOWTEXT.execute();
               }
               // retrieve text result
@@ -507,15 +507,19 @@ public final class GUI extends JFrame {
             } else if(result != null) {
               if(context.current() != current || GUIProp.filterrt) {
                 // refresh context
-                if(result instanceof Nodes) {
+                if(nodes != null) {
+                  if(GUIProp.filterrt) {
+                    View.ftPos = nodes.ftpos;
+                    View.ftPoi = nodes.ftpoin;
+                  }
                   View.notifyContext((Nodes) result, GUIProp.filterrt);
                 }
               } else if(context.marked() != null) {
                 // refresh highlight
                 Nodes marked = context.marked();
                 // nodes as result?
-                if(result instanceof Nodes) {
-                  marked = (Nodes) result;
+                if(nodes != null) {
+                  marked = nodes;
                 } else if(marked.size != 0) {
                   // any other result - remove old marks
                   marked = new Nodes(data);
@@ -531,7 +535,7 @@ public final class GUI extends JFrame {
             if(obsolete(thread)) return;
 
             // print result
-            if(ok && cc.printing() && !(result instanceof Nodes)) {
+            if(ok && cc.printing() && nodes == null) {
               text.setText(out.buffer(), out.size(), false);
               //text.updateHeader(null);
             }
