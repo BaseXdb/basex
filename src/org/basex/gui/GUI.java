@@ -522,7 +522,7 @@ public final class GUI extends JFrame {
                 }
                 // highlights have changed.. refresh views
                 if(marked != context.marked()) {
-                  View.ftData = marked.ftpre;
+                  View.ftPos = marked.ftpos;
                   View.ftPoi = marked.ftpoin;
                   View.notifyMark(marked);
                 }

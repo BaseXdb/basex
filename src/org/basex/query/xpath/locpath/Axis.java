@@ -8,33 +8,28 @@ package org.basex.query.xpath.locpath;
  * @author Christian Gruen
  */
 public enum Axis {
-  /** Anc.        */ ANC(StepAnc.class, "ancestor"),
-  /** AnceOrSelf. */ ANCORSELF(StepAncOrSelf.class, "ancestor-or-self"),
-  /** Attr.       */ ATTR(StepAttr.class, "attribute"),
-  /** Child.      */ CHILD(StepChild.class, "child"),
-  /** Desc.       */ DESC(StepDesc.class, "descendant"),
-  /** DescOrSelf. */ DESCORSELF(StepDescOrSelf.class, "descendant-or-self"),
-  /** Foll.       */ FOLL(StepFoll.class, "following"),
-  /** FollSibl.   */ FOLLSIBL(StepFollSibl.class, "following-sibling"),
-  /** NameSpace.  */ NAMESPACE(null, "namespace"),
-  /** Parent.     */ PARENT(StepParent.class, "parent"),
-  /** Prec.       */ PREC(StepPrec.class, "preceding"),
-  /** PrecSibl.   */ PRECSIBL(StepPrecSibl.class, "preceding-sibling"),
-  /** Step.       */ SELF(StepSelf.class, "self");
-
-  /** Axis string. */
-  private Class<? extends Step> step;
+  /** Ancestor.   */ ANC("ancestor"),
+  /** AncOrSelf.  */ ANCORSELF("ancestor-or-self"),
+  /** Attribute.  */ ATTR("attribute"),
+  /** Child.      */ CHILD("child"),
+  /** Descendant. */ DESC("descendant"),
+  /** DescOrSelf. */ DESCORSELF("descendant-or-self"),
+  /** Following.  */ FOLL("following"),
+  /** FollSibl.   */ FOLLSIBL("following-sibling"),
+  /** Parent.     */ PARENT("parent"),
+  /** Preceding.  */ PREC("preceding"),
+  /** PrecSibl.   */ PRECSIBL("preceding-sibling"),
+  /** Self.       */ SELF("self");
+  // NameSpace.  NAMESPACE(null, "namespace"),
 
   /** Axis string. */
   protected final String name;
 
   /**
    * Constructor, initializing the enum constants.
-   * @param s step class
    * @param n axis string
    */
-  Axis(final Class<? extends Step> s, final String n) {
-    step = s;
+  Axis(final String n) {
     name = n;
   }
 
@@ -54,17 +49,8 @@ public enum Axis {
    * @param test node test
    * @return step
    */
-  public static Step get(final Axis a, final Test test) {
-    try {
-      final Step step = a.step.newInstance();
-      step.axis = a;
-      step.test = test;
-      step.preds = new Preds();
-      return step;
-    } catch(final Exception e) {
-      e.printStackTrace();
-      return null;
-    }
+  public static Step create(final Axis a, final Test test) {
+    return create(a, test, new Preds());
   }
 
   /**
@@ -74,9 +60,23 @@ public enum Axis {
    * @param preds predicates
    * @return step
    */
-  public static Step get(final Axis a, final Test test, final Preds preds) {
+  public static Step create(final Axis a, final Test test, final Preds preds) {
     try {
-      final Step step = a.step.newInstance();
+      Step step = null;
+      switch(a) {
+        case ANC: step = new StepAnc(); break;
+        case ANCORSELF: step = new StepAncOrSelf(); break;
+        case ATTR: step = new StepAttr(); break;
+        case CHILD: step = new StepChild(); break;
+        case DESC: step = new StepDesc(); break;
+        case DESCORSELF: step = new StepDescOrSelf(); break;
+        case FOLL: step = new StepFoll(); break;
+        case FOLLSIBL: step = new StepFollSibl(); break;
+        case PARENT: step = new StepParent(); break;
+        case PREC: step = new StepPrec(); break;
+        case PRECSIBL: step = new StepPrecSibl(); break;
+        case SELF: step = new StepSelf(); break;
+      }
       step.axis = a;
       step.test = test;
       step.preds = preds;

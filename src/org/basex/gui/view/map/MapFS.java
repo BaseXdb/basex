@@ -135,7 +135,7 @@ public final class MapFS extends MapPainter {
           p += data.attSize(p, k);
         }
         g.setFont(GUIConstants.mfont);
-        BaseXLayout.drawText(g, cr, tb.finish(), Integer.MAX_VALUE, true);
+        BaseXLayout.drawText(g, cr, tb.finish());
       }
     }
   }
@@ -216,17 +216,17 @@ public final class MapFS extends MapPainter {
           rect.w -= off;
         }
 
-        final int h = BaseXLayout.drawText(g, rect, text, 1, false);
+        final int h = BaseXLayout.calcHeight(g, rect, text);
         if(img != null) {
           if(!mark) {
             g.setColor(GUIConstants.COLORS[rect.l + 1]);
-            g.fillRect(x + 1, rect.y + 1, w - 2, h + 2);
+            g.fillRect(x + 1, rect.y + 1, w - 2, h - GUIProp.fontsize);
           }
           g.drawImage(img, x, rect.y + 2, view);
         }
 
         g.setColor(Color.black);
-        BaseXLayout.drawText(g, rect, text, tag ? 1 : Integer.MAX_VALUE, true);
+        BaseXLayout.drawText(g, rect, text);
         if(h == GUIProp.fontsize && img != null) {
           final long size = FSUtils.getSize(data, pre);
           final byte[] info = Token.token(Performance.formatSize(size, false));
@@ -279,7 +279,7 @@ public final class MapFS extends MapPainter {
         rect.w -= 24;
         rect.h -= 24;
         g.setColor(GUIConstants.COLORS[16]);
-        BaseXLayout.drawText(g, rect, data.text(pre), Integer.MAX_VALUE, true);
+        BaseXLayout.drawText(g, rect, data.text(pre));
       }
     }
 
@@ -330,7 +330,7 @@ public final class MapFS extends MapPainter {
     }
 
     g.setFont(GUIConstants.mfont);
-    BaseXLayout.drawText(g, rect, fileBuf, (int) b, Integer.MAX_VALUE, true);
+    BaseXLayout.drawText(g, rect, fileBuf, (int) b, true);
     return false;
   }
 

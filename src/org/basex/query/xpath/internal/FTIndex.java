@@ -22,18 +22,18 @@ public final class FTIndex extends InternalExpr {
   /** Token to be found in the index. */
   private final byte[] token;
   /** FullText options. */
-  FTOption option;
+  private FTOption option;
   /** FullText options. */
-  FTPositionFilter ftpos;
+  private FTPositionFilter ftpos;
   /** Ids as result of index request with tok. */
-  int[][] ids;
+  private int[][] ids;
   /** Flag for simple ftcontains queries. **/
-  boolean simple = true;
+  private boolean simple = true;
   /** Flag for tokens containing only one single word, 
    * like 'usability' (not 'usability testing'). **/
-  boolean single = false;
+  private boolean single = false;
   /** Number of errors allowed - used for fuzzy search. **/
-  int ne = -1;
+  private int ne = -1;
 
   /**
    * Constructor.
@@ -248,6 +248,7 @@ public final class FTIndex extends InternalExpr {
     ser.item(token);
     ser.closeElement(this);
   }
+
   @Override
   public int indexSizes(final XPContext ctx, final Step curr,
       final int min) {

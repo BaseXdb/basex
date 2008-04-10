@@ -148,7 +148,7 @@ public final class Steps {
       if(step.simple(Axis.DESCORSELF) && next.axis == Axis.CHILD &&
           !next.hasPosPreds()) {
         remove(i);
-        steps[i] = Axis.get(Axis.DESC, next.test, next.preds);
+        steps[i] = Axis.create(Axis.DESC, next.test, next.preds);
         ctx.compInfo(OPTMERGE);
       }
     }

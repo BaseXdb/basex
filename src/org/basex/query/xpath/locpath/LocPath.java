@@ -36,7 +36,7 @@ public abstract class LocPath extends Expr {
 
     // replacing self::node() with child::text() for possible index integration
     if(ctx.leaf && steps.size() == 1 && steps.get(0).simple(Axis.SELF)) {
-      steps.set(0, Axis.get(Axis.CHILD, TestNode.TEXT));
+      steps.set(0, Axis.create(Axis.CHILD, TestNode.TEXT));
       ctx.compInfo(OPTTEXT);
     }
 
@@ -116,7 +116,7 @@ public abstract class LocPath extends Expr {
 
         if(j == 0) {
           if(this instanceof LocPathRel || axis == Axis.PARENT) {
-            invPath.steps.add(Axis.get(axis, TestNode.NODE));
+            invPath.steps.add(Axis.create(axis, TestNode.NODE));
             //invPath.steps.add(Axis.get(axis, curr.test));
           } else {
             indexMatch = false;
@@ -124,7 +124,7 @@ public abstract class LocPath extends Expr {
         } else {
           final Step prev = steps.get(j - 1);
           if(prev.preds.size() != 0) break;
-          invPath.steps.add(Axis.get(axis, prev.test));
+          invPath.steps.add(Axis.create(axis, prev.test));
         }
         steps.remove(j);
       }
@@ -249,11 +249,11 @@ public abstract class LocPath extends Expr {
     Axis lastAxis = invertAxis(stps.last().axis);
     for(int k = stps.size() - 2; k >= 0; k--) {
       final Step step = stps.get(k);
-      final Step inv = Axis.get(lastAxis, step.test, step.preds);
+      final Step inv = Axis.create(lastAxis, step.test, step.preds);
       lastAxis = invertAxis(step.axis);
       path.steps.add(inv);
     }
-    path.steps.add(Axis.get(lastAxis, curr.test));
+    path.steps.add(Axis.create(lastAxis, curr.test));
     return path;
   }
 

@@ -231,10 +231,13 @@ public final class GUIConstants {
         Math.max(255 - l * GUIProp.colorblue, 0));
     }
     
-    // create thumbnail color map 
-    thumbnailcolor = new Color[] { Color.BLUE, Color.RED,  Color.ORANGE, 
-        Color.GREEN, Color.GRAY, Color.YELLOW, Color.DARK_GRAY, 
-        Color.PINK, Color.ORANGE };
+    // create thumbnail colors
+    thumbnailcolor = new Color[] {
+        new Color(224, 64, 64), new Color(0, 224, 0), new Color(255, 128, 0), 
+        new Color(224, 0, 224), new Color(0, 192, 192), new Color(96, 0, 224), 
+        new Color(64, 64, 255), new Color(224, 0, 96), new Color(128, 128, 128),
+        new Color(240, 240, 0)
+    };
   }
 
   /**

@@ -258,8 +258,6 @@ public interface XQTokens {
   /** Parser token. */
   byte[] ASSIGN = token(":=");
   /** Parser token. */
-  byte[] ATMARK = token("@");
-  /** Parser token. */
   byte[] BR1 = token("[");
   /** Parser token. */
   byte[] BR2 = token("]");
@@ -274,19 +272,11 @@ public interface XQTokens {
   /** Parser token. */
   byte[] COMMA = token(",");
   /** Parser token. */
-  byte[] MINUS = token("-");
-  /** Parser token. */
   byte[] DOLLAR = token("$");
   /** Parser token. */
   byte[] DOT2 = token("..");
   /** Parser token. */
-  byte[] EX = token("!");
-  /** Parser token. */
   byte[] IS = token("=");
-  /** Parser token. */
-  byte[] LBRA = token("<");
-  /** Parser token. */
-  byte[] MULT = token("*");
   /** Parser token. */
   byte[] ONEZERO = token("1.0");
   /** Parser token. */
@@ -296,17 +286,7 @@ public interface XQTokens {
   /** Parser token. */
   byte[] PIPE = token("|");
   /** Parser token. */
-  byte[] PLUS = token("+");
-  /** Parser token. */
   byte[] PRAGMA = token("(#");
-  /** Parser token. */
-  byte[] QUEST = token("?");
-  /** Parser token. */
-  byte[] QUMARK = token("\"");
-  /** Parser token. */
-  byte[] SEMI = token(";");
-  /** Parser token. */
-  byte[] SLASH = token("/");
 
   // URIS =====================================================================
 

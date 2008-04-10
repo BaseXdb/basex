@@ -95,8 +95,11 @@ public final class Prop {
   public static boolean mainmem = false;
   /** Flag for creating databases on-the-fly (in memory). */
   public static boolean onthefly = false;
+
   /** Flow for showing the XQuery error code. */
   public static boolean xqerrcode = true;
+  /** Fulltext details. */
+  public static boolean ftdetails = true;
 
   // FILE SYSTEM OPTIONS ======================================================
   

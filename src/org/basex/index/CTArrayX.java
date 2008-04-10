@@ -399,7 +399,7 @@ public final class CTArrayX {
     System.arraycopy(nodes[currentNode],
         nodes[currentNode].length - bId.length, bId, 0, bId.length);
 
-    return Array.byteToIntNN(bId);
+    return Array.byteToInt(bId);
   }
 
   /**

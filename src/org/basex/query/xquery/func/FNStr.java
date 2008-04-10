@@ -177,8 +177,8 @@ final class FNStr extends Fun {
    */
   private Iter trans(final Iter[] arg) throws XQException {
     final byte[] str = checkStr(arg[0]);
-    final byte[] sea = checkStr(arg[1]);
-    final byte[] rep = checkStr(arg[2]);
+    final byte[] sea = checkStr(arg[1].atomic(this, false));
+    final byte[] rep = checkStr(arg[2].atomic(this, false));
     return Str.iter(ascii(str) && ascii(sea) && ascii(rep) ?
         translate(str, sea, rep) : token(Pattern.compile(string(sea),
             Pattern.LITERAL).matcher(string(str)).replaceAll(string(rep))));
@@ -191,9 +191,7 @@ final class FNStr extends Fun {
    * @throws XQException xquery exception
    */
   private Iter strjoin(final Iter[] arg) throws XQException {
-    final Item it = arg[1].atomic(this, true);
-    if(it == null) return Iter.EMPTY;
-    final byte[] sep = checkStr(it);
+    final byte[] sep = checkStr(arg[1].atomic(this, false));
     final TokenBuilder tb = new TokenBuilder();
     final Iter iter = arg[0];
     int c = 0;

@@ -1,6 +1,5 @@
 package org.basex.gui.view.map;
 
-import static org.basex.util.Token.string;
 import java.awt.Color;
 import java.awt.Graphics;
 import org.basex.core.Context;
@@ -10,9 +9,7 @@ import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.view.View;
 import org.basex.gui.view.ViewData;
-import org.basex.util.Array;
 
 /**
  * Adds default paint operations to TreeMap.
@@ -79,7 +76,7 @@ public final class MapDefault extends MapPainter {
       // skip drawing of string when left space is too small
       if(r.w < GUIProp.fontsize || r.h < GUIProp.fontsize) continue;
 
-      drawRectangle(g, r.clone());
+      r.thumb = drawRectangle(g, r.clone());
     }
   }
 
@@ -87,8 +84,9 @@ public final class MapDefault extends MapPainter {
    * Draws a single rectangle.
    * @param g graphics reference
    * @param rect rectangle
+   * @return if the current rectangle is shown as thumbnail
    */
-  void drawRectangle(final Graphics g, final MapRect rect) {
+  boolean drawRectangle(final Graphics g, final MapRect rect) {
     rect.x += 3;
     rect.w -= 3;
     final int pre = rect.p;
@@ -109,45 +107,23 @@ public final class MapDefault extends MapPainter {
     } else {
       g.setColor(GUIConstants.COLORS[rect.l * 2 + 8]);
       g.setFont(GUIConstants.mfont);
-      byte[] text = ViewData.content(data, pre, false);
-      int[][] ftData = View.ftData;
+      final byte[] text = ViewData.content(data, pre, false);
       
-      final int p = BaseXLayout.centerPos(g, text, rect.w);
-      if(p == -1) {
-        // text doesn't fit in one line
-        if (GUIProp.thumbnail) { 
-          int i = -1;
-          if (ftData !=  null && ftData.length != 0) {
-            i = Array.firstIndexOf(pre, ftData[0]);
-            if (i > -1) { 
-              BaseXLayout.drawTextThumbnailwithFT(g, rect, text, i);
-            }
-          } 
-          
-          BaseXLayout.drawTextThumbnailwithFT(g, rect, text, i);
-          
-          /*else {
-            BaseXLayout.drawTextThumbnail(g, rect, text, 
-                Integer.MAX_VALUE, Integer.MAX_VALUE, true); 
-          }*/
-        } else 
-        BaseXLayout.drawText(g, rect, text, Integer.MAX_VALUE, true);
-        
+      int p = BaseXLayout.centerPos(g, text, rect.w);
+      if(p != -1) {
+        rect.x += p;
+        rect.y += (rect.h - GUIProp.fontsize) / 2 - 1;
+        BaseXLayout.drawText(g, rect, text);
       } else {
-        if (GUIProp.thumbnail && ftData !=  null && ftData.length != 0) {
-          int i = Array.firstIndexOf(pre, ftData[0]);
-          if (i > -1) {
-            BaseXLayout.drawTextThumbnailwithFT(g, rect, text, i);
-          } else {
-            g.drawString(string(text, 0, text.length), rect.x + p,
-              rect.y + (rect.h + GUIProp.fontsize) / 2 - 1);
-          }
+        if(BaseXLayout.calcHeight(g, rect, text) < rect.h) {
+          BaseXLayout.drawText(g, rect, text);
         } else {
-          g.drawString(string(text, 0, text.length), rect.x + p,
-              rect.y + (rect.h + GUIProp.fontsize) / 2 - 1);
+          BaseXLayout.drawThumbnails(g, rect, text);
+          return true;
         }
       }
     }
+    return false;
   }
 
   @Override

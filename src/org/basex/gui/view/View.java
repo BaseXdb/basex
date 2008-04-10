@@ -46,7 +46,7 @@ public abstract class View extends BaseXPanel {
   /** Currently marked node (pre value). */
   public static int focused = -1;
   /** Current FTPrePos values. **/
-  public static int[][] ftData;
+  public static int[][] ftPos;
   /** Current FTPointer on FTPrePos values. **/
   public static int[] ftPoi; 
   /** FTSearchStrings out of query. **/
@@ -85,7 +85,7 @@ public abstract class View extends BaseXPanel {
     }
     
     focused = -1;
-    ftData = null;
+    ftPos = null;
     ftPoi = null;
     ftss = null;
     hist = 0;

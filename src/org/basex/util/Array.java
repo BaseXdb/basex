@@ -369,34 +369,20 @@ public final class Array {
   }
 
   /**
-   * Convert byte[4] to int.
-   * @param b byte[]
-   * @return int value
+   * Convert a byte array to a positive integer value.
+   * @param b byte array
+   * @return result
    */
   public static int byteToInt(final byte[] b) {
     int i = 0;
-    for(int j = 0, p = 0; j < b.length; j++, p += 8) i += b[j] << p;
-    return i;
-  }
-
-  /**
-   * Convert byte[4] to int with a range from 0 to 2^32.
-   * @param b byte[]
-   * @return int value
-   */
-  public static int byteToIntNN(final byte[] b) {
-    int i = 0;
-    // <SG> pimp me
-    for (int j = 0; j < b.length; j++) {
-      i = i + (int) Math.pow(256, j) * (b[j] & 0xff);
-    }
+    for(int j = 0, p = 0; j < b.length; j++, p += 8) i += (b[j] & 0xff) << p;
     return i;
   }
   
   /**
-   * Convert int to byte[4], does only work for values > 0.
-   * @param i int
-   * @return byte[] value
+   * Convert integer to byte array, does only work for values > 0.
+   * @param i integer
+   * @return result
    */
   public static byte[] intToByteNN(final int i) {
     if(i == 0) return new byte[] { 0 };
@@ -410,8 +396,6 @@ public final class Array {
     return b;
   }
  
-
-  
   /**
    * Extracts ids out of an int[2][]-array.
    * int[0] = ids
@@ -421,20 +405,17 @@ public final class Array {
    */
   public static int[] extractIDsFromData(final int[][] data) {
     if(data == null || data.length == 0 || data[0] == null 
-        || data[0].length == 0) 
-      return NOINTS;
+        || data[0].length == 0) return NOINTS;
 
-    int[] maxResult = new int[data[0].length];
-    int counter = 1;
-    maxResult[0] = data[0][0];
-    for(int i = 1; i < data[0].length; i++) {
-      if(maxResult[counter - 1] != data[0][i]) {
-        maxResult[counter] = data[0][i];
-        counter++;
-      }
+    final int l = data[0].length;
+    final int[] max = new int[l];
+    max[0] = data[0][0];
+    int c = 1;
+    for(int i = 1; i < l; i++) {
+      final int j = data[0][i];
+      if(max[c - 1] != j) max[c++] = j;
     }
-
-    return finish(maxResult, counter);
+    return finish(max, c);
   }
 
   /**
@@ -445,33 +426,19 @@ public final class Array {
     * * 2  real bigger (different id)
     * * -2 real smaller (different id)
     *
-    * @param data1ID int
-    * @param data1Pos int
-    * @param data2ID int
-    * @param data2Pos int
-    * @return int result [0|-1|1|2|-2]
+    * @param id1 first id
+    * @param p1 first position
+    * @param id2 second id
+    * @param p2 second position
+    * @return result [0|-1|1|2|-2]
     */
-   public static int compareIntArrayEntry(final int data1ID, 
-       final int data1Pos, final int data2ID, final int data2Pos) {
+   public static int compareIntArrayEntry(final int id1, 
+       final int p1, final int id2, final int p2) {
 
-     if(data1ID == data2ID) {
-       if(data1Pos == data2Pos) {
-         // equal
-         return 0;
-       } else if(data1Pos > data2Pos) {
-         // equal Id, data1 behind data2
-         return 1;
-       } else {
-         // equal Id, insert data1 before data2
-         return -1;
-       }
-     } else if(data1ID > data2ID) {
-       // real bigger
-       return 2;
-     } else {
-       // real smaller
-       return -2;
-     }
+     // equal ID, equal pos or data1 behind/before data2
+     if(id1 == id2) return p1 == p2 ? 0 : p1 > p2 ? 1 : -1;
+     // real bigger/smaller
+     return id1 > id2 ? 2 : -2;
    }
 
    /**
@@ -481,21 +448,7 @@ public final class Array {
     * @return boolean contained
     */
    public static boolean contains(final int i, final int[] a) {
-     if (a == null || a.length == 0) return false;
-     int f = 0;
-     int l = a.length - 1;
-
-     while(f <= l) {
-       final int m = f + ((l - f) >> 1);
-       if (a[m] < i) {
-         f = m + 1;  // continue right
-       } else if (a[m] > i) {
-         l = m - 1;  // continue left
-       } else {
-         return true;
-       }
-     }
-     return false;
+     return firstIndexOf(i, a) != -1;
    }
 
    /**

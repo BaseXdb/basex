@@ -21,13 +21,11 @@ import static org.basex.query.xpath.XPText.*;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class FTContains extends Comparison {
+public final class FTContains extends Comparison {
   /** FullText options. */
-  FTOption option;
-  /** Result of index request - currently only pre values are saved. */
-  int[] ids;
+  private FTOption option;
   /** Flag for FTPosFilter queries.*/
-  boolean ftpos = false;
+  protected boolean ftpos = false;
  
   /**
    * Constructor.
@@ -71,8 +69,6 @@ public class FTContains extends Comparison {
   
   @Override
   public Expr compile(final XPContext ctx) throws QueryException {
-    
-
     if (expr2 instanceof Literal && expr1 instanceof Literal) {
       final byte[] lit = ((Literal)  expr2).str();
 

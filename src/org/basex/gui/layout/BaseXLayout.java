@@ -1,7 +1,7 @@
 package org.basex.gui.layout;
 
-import static org.basex.gui.GUIConstants.*;
 import static org.basex.Text.*;
+import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -24,6 +24,7 @@ import javax.swing.JComponent;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
+import org.basex.gui.GUIConstants.FILL;
 import org.basex.gui.dialog.Dialog;
 import org.basex.gui.view.View;
 import org.basex.gui.view.map.MapRect;
@@ -151,7 +152,7 @@ public final class BaseXLayout {
       }
     });
   }
-  
+
   /**
    * Adds a help notifier to the specified component.
    * @param comp component
@@ -376,7 +377,7 @@ public final class BaseXLayout {
    * horizontal start position. Otherwise, returns -1.
    * @param g graphics reference
    * @param s string to be checked
-   * @param ww maximum width 
+   * @param ww maximum width
    * @return result of check
    */
   public static int centerPos(final Graphics g, final byte[] s, final int ww) {
@@ -396,7 +397,7 @@ public final class BaseXLayout {
    * @param s string to be checked
    * @return result of check
    */
-  public static int calculateWidth(final Graphics g, final byte[] s) {
+  public static int calcWidth(final Graphics g, final byte[] s) {
     final int[] cw = fontWidths(g.getFont());
     int sw = 0;
     final int j = s.length;
@@ -406,20 +407,111 @@ public final class BaseXLayout {
     return sw;
   }
 
-  
-  
+  /**
+   * Calculates the height of the specified text.
+   * @param g graphics reference
+   * @param r rectangle
+   * @param s text to be drawn
+   * @return last height that was occupied
+   */
+  public static int calcHeight(final Graphics g, final MapRect r,
+      final byte[] s) {
+    return drawText(g, r, s, s.length, false);
+  }
+
   /**
    * Draws a text.
    * @param g graphics reference
    * @param r rectangle
    * @param s text to be drawn
-   * @param wrap number of lines after which text is wrapped
+   * @return last height that was occupied
+   */
+  public static int drawText(final Graphics g, final MapRect r,
+      final byte[] s) {
+
+    return drawText(g, r, s, s.length, true);
+  }
+
+  /**
+   * Draws a text.
+   * @param g graphics reference
+   * @param r rectangle
+   * @param s text to be drawn
+   * @param m length of text
    * @param draw draw text (otherwise: just calculate space)
    * @return last height that was occupied
    */
   public static int drawText(final Graphics g, final MapRect r,
-      final byte[] s, final int wrap, final boolean draw) {
-    return drawText(g, r, s, s.length, wrap, draw);
+      final byte[] s, final int m, final boolean draw) {
+
+    // limit string to given space
+    final int[] cw = fontWidths(g.getFont());
+    final int fh = (int) (1.2 * GUIProp.fontsize);
+    final int ws = cw[' '];
+    int i = 0;
+    int j = m;
+    int xx = r.x;
+    int yy = r.y + fh;
+    int ww = r.w;
+    final Color textc = g.getColor();
+    boolean c = false;
+
+    // get index on first pre value
+    final int[][] ft = View.ftPos;
+    int k = ft != null && ft.length != 0 ? Array.firstIndexOf(r.p, ft[0]) : -1;
+    
+    do {
+      int sw = 0;
+      int l = i;
+      for(int n = i; n < j; n += cl(s[n])) {
+        if(draw && k > -1 && k < ft[0].length &&
+            i == ft[1][k] && r.p == ft[0][k]) {
+           k++;
+           c = true;
+        }
+        sw += width(g, cw, cp(s, n));
+        if(sw >= ww) {
+          j = Math.max(i + 1, l);
+          ww = r.w;
+          break;
+        }
+        if(s[n] == '\n') {
+          j = n + 1;
+          ww = r.w;
+          break;
+        }
+        if(Token.ws(s[n])) {
+          j = n + 1;
+          ww -= sw;
+          break;
+        }
+        l = n;
+      }
+      // draw string
+      if(draw) {
+        // draw word
+        if(c && k > -1)  {
+          g.setColor(View.ftPoi != null ?
+            GUIConstants.thumbnailcolor[View.ftPoi[k]] :
+              GUIConstants.COLORERROR);
+          c = ww == r.w;
+        } else {
+          g.setColor(textc);
+        }
+        g.drawString(string(s, i, j - i), xx, yy);
+      }
+      if(ww < ws) ww = r.w;
+      if(ww == r.w) {
+        xx = r.x;
+        yy += fh;
+      } else {
+        xx += sw;
+      }
+      i = j;
+      j = m;
+    } while(i < j && yy - (draw ? 0 : GUIProp.fontsize) < r.y + r.h);
+    
+    return yy - r.y;
   }
 
   /**
@@ -427,65 +519,62 @@ public final class BaseXLayout {
    * @param g graphics reference
    * @param r rectangle
    * @param s text to be drawn
-   * @param i0 index on first pre value in ftData[1]
-   * @return last height that was occupied
    */
-  public static int drawTextThumbnailwithFT(final Graphics g, final MapRect r,
-      final byte[] s, final int i0) {
- 
+  public static void drawThumbnails(final Graphics g, final MapRect r,
+      final byte[] s) {
+
     final double xx = r.x;
     final double ww = r.w;
-    final double f = 0.25 * GUIProp.fontsize; // number pixels per char
+    final double f = 0.25 * GUIProp.fontsize;
     final int fh = (int) Math.max(1, 0.5 * GUIProp.fontsize);
     final int lh = (int) Math.max(1, 0.8 * GUIProp.fontsize);
     final double ys = r.y + 3;
-    final int ws = cl(' ');
-
     double yy = ys;
-    
+
     int wl = 0; // word length
-    int ll = 0; // line length 
-    int k = i0;
-    Color textc = g.getColor();
+    int ll = 0; // line length
+
+    // get index on first pre value
+    final int[][] ft = View.ftPos;
+    int k = ft != null && ft.length != 0 ? Array.firstIndexOf(r.p, ft[0]) : -1;
+
+    final Color textc = g.getColor();
     boolean c = false;
-    int[][] ftData = View.ftData;
 
     // including i == s.length in loop to draw last string...
-    for (int i = 0; i <= s.length; i++) {
-      if (k > -1 && ftData != null && k < ftData[0].length 
-          && i == ftData[1][k] && r.p == ftData[0][k]) {
+    for(int i = 0; i <= s.length; i++) {
+      if(k > -1 && k < ft[0].length && i == ft[1][k] && r.p == ft[0][k]) {
          k++;
          c = true;
       }
-    
-      if (i == s.length || Token.ws(s[i])) {       
+
+      if(i == s.length || Token.ws(s[i])) {
         // check if rectangle fits in line and if it's not the first word
-        if (f * (ll + wl) > ww && ll != 0) { 
+        if(f * (ll + wl) > ww && ll != 0) {
           yy += lh;
           ll = 0;
-        } 
-        if (yy + lh >= r.y + r.h) return r.h;
+        }
+        if(yy + lh >= r.y + r.h) return;
 
         // draw word
-        if (c && k > -1)  {
-          g.setColor(View.ftPoi != null ? 
-            GUIConstants.thumbnailcolor[View.ftPoi[k]] : 
+        if(c && k > -1)  {
+          g.setColor(View.ftPoi != null ?
+            GUIConstants.thumbnailcolor[View.ftPoi[k]] :
               GUIConstants.COLORERROR);
-        }
-        
-        final int xw = (int) Math.min(ww - f * ll, f * wl);
-        g.fillRect((int) (xx + f * ll), (int) yy, xw, fh);
-        if (c) {
           c = false;
-          g.setColor(textc); 
+        } else {
+          g.setColor(textc);
         }
+
+        final int xw = (int) Math.min(ww - f * ll - 4, f * wl);
+        g.fillRect((int) (xx + f * ll), (int) yy, xw, fh);
         ll += wl;
-        
-        if (i < s.length && s[i] == '\n' || ll + ws >= ww) {
+
+        if (i < s.length && s[i] == '\n' || ll + 1 >= ww) {
           yy += lh;
           ll = 0;
         } else {
-          ll += ws;
+          ll++;
         }
         wl = 0;
       } else {
@@ -493,69 +582,6 @@ public final class BaseXLayout {
         wl += cl(s[i]);
       }
     }
-    return (int) (yy - ys);
-  }
-  
-  
-  /**
-   * Draws a text.
-   * @param g graphics reference
-   * @param r rectangle
-   * @param s text to be drawn
-   * @param m length of text
-   * @param wrap number of lines after which text is wrapped
-   * @param draw draw text (otherwise: just calculate space)
-   * @return last height that was occupied
-   */
-  public static int drawText(final Graphics g, final MapRect r,
-      final byte[] s, final int m, final int wrap, final boolean draw) {
-
-    int[][] ftpre = View.ftData;
-    if (GUIProp.thumbnail && ftpre !=  null && ftpre.length != 0
-        && ftpre[0] != null && ftpre[0].length != 0) {
-      int i = Array.firstIndexOf(r.p, ftpre[0]);
-      if (i > -1) {
-        drawTextThumbnailwithFT(g, r, s, i);
-      }
-    } 
-    
-    // limit string to given space
-    final int[] cw = fontWidths(g.getFont());
-    int i = 0;
-    int j = m;
-    int xx = r.x;
-    int yy = r.y;
-    int ww = r.w;
-    int p = wrap;
-    final int hh = r.h;
-    final int ys = yy;
-    do {
-      int sw = 0;
-      int l = i;
-      for(int k = i; k < j; k += cl(s[k])) {
-        sw += width(g, cw, cp(s, k));
-        if(sw >= ww) {
-          j = Math.max(1, l);
-          break;
-        }
-        if(s[k] == '\n') {
-          j = k + 1;
-          break;
-        }
-        l = k;
-      }
-      yy += GUIProp.fontsize;
-      // draw string
-      if(draw) g.drawString(string(s, i, j - i), xx, yy);
-      i = j;
-      j = m;
-      if(--p == 0) {
-        xx -= 16;
-        ww += 16;
-      }
-    } while(yy + GUIProp.fontsize < ys + hh && i < j);
-    return yy - ys;
-    
   }
 
   /**

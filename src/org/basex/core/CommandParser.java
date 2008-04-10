@@ -51,7 +51,7 @@ public final class CommandParser {
       while(++c < cl) {
         final char ch = input.charAt(c);
         if(qu != 0 && ch == '\\') {
-          if(c < cl) ++c;
+          if(c + 1 < cl) ++c;
         } else {
           if(ch == ';' && qu == 0) break;
           if(ch == '\'' || ch == '"') {

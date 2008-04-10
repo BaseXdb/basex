@@ -30,7 +30,7 @@ public class Str extends Item {
    * @param v value
    * @param t data type
    */
-  public Str(final byte[] v, final Type t) {
+  protected Str(final byte[] v, final Type t) {
     super(t);
     val = v;
   }

@@ -21,12 +21,8 @@ public final class MapRect implements Cloneable {
   int l;
   /** File Type. */
   int type = -1;
-  /** Fulltext pre and position values for visualizing ftquery results. **/
-  public int[][] ftpos;
-  /** Poiner on ftpos; linking each position value to a query-search string. **/
-  public int[] ftposPointer;
-  /** Pointer on ftprepos table. **/
-  public int i;
+  /** Thumbnail view. */
+  boolean thumb;
   
   /**
    * Simple rectangle constructor.
@@ -57,16 +53,6 @@ public final class MapRect implements Cloneable {
     this(xx, yy, ww, hh);
     p = i0;
     l = ll;
-  }
-
-  /**
-   * Setter for FTData (positions and pointer).
-   * @param pos position values as result of a query
-   * @param poi pointer linking each position value to a query-search string
-   */
-  public void setFTData(final int[][] pos, final int[] poi) {
-    ftpos = pos;
-    ftposPointer = poi;
   }
   
   /**

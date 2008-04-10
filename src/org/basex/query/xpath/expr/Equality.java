@@ -68,7 +68,7 @@ public final class Equality extends Comparison {
     ctx.compInfo(indexType == Index.TYPE.TXT ? OPTINDEX :
       indexType == Index.TYPE.ATV ? OPTATTINDEX : OPTWORDINDEX);
     if(indexType == Index.TYPE.ATV) {
-      inv.steps.add(0, Axis.get(Axis.SELF, path.steps.last().test));
+      inv.steps.add(0, Axis.create(Axis.SELF, path.steps.last().test));
     }
     return new Path(new IndexAccess(indexType, lit), inv);
   }

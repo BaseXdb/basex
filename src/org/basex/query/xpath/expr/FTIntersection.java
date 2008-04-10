@@ -1,6 +1,6 @@
 package org.basex.query.xpath.expr;
 
-import org.basex.gui.GUIProp;
+import org.basex.core.Prop;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.values.Item;
@@ -15,7 +15,7 @@ import org.basex.util.Array;
  * @author Sebastian Gath
  */
 public final class FTIntersection extends FTArrayExpr {
-  /** Flag for order peserving at intersection determination. */
+  /** Flag for order preserving at intersection determination. */
   boolean pres;
   /** Query context. */
   public XPContext ctx;
@@ -23,16 +23,7 @@ public final class FTIntersection extends FTArrayExpr {
   /**
    * Constructor.
    * @param e operands joined with the union operator
-   * @Deprecated
-   */
-/*  public FTIntersection(final Expr[] e) {
-    exprs = e;
-  }
-*/
-  /**
-   * Constructor.
-   * @param e operands joined with the union operator
-   * @param opres used to preserve order of querystrings
+   * @param opres used to preserve order of query strings
    * @param context XPathContext
    * @Deprecated
    */
@@ -40,23 +31,21 @@ public final class FTIntersection extends FTArrayExpr {
       final XPContext context) {
     exprs = e;
     pres = opres;
-    this.ctx = context;
+    ctx = context;
   }
-
 
   /**
    * Constructor.
    * @param e operands joined with the union operator
-   * @param option FTOption with special features for the evalutaion
+   * @param option FTOption with special features for the evaluation
    * @param context XPathContext
    */
   public FTIntersection(final Expr[] e, final FTOption option, 
       final XPContext context) {
     exprs = e;
     fto = option;
-    this.ctx = context;
+    ctx = context;
   }
-
   
   @Override
   public NodeSet eval(final XPContext context) throws QueryException {
@@ -81,7 +70,7 @@ public final class FTIntersection extends FTArrayExpr {
             }
             res = (int[][]) o[0];
             pntr = (int[]) o[1];
-          } else if(GUIProp.thumbnail) {
+          } else if(Prop.ftdetails) {
             o = calculateFTAnd(res, tmp, pntr); 
             if (o != null && o.length == 2 && o[0] == null && o[1] == null) {
               return new NodeSet(ctx);
@@ -93,7 +82,7 @@ public final class FTIntersection extends FTArrayExpr {
           }
         }
       }
-      if (pres || GUIProp.thumbnail) {
+      if (pres || Prop.ftdetails) {
         return new NodeSet(Array.extractIDsFromData(res), context, res, pntr);
       }
       return new NodeSet(Array.extractIDsFromData(res), context, res);
@@ -126,9 +115,8 @@ public final class FTIntersection extends FTArrayExpr {
 
     // calculate minimum size
     int min = Math.min(values1[0].length, values2[0].length);
-    int[][] maxResult;
     // double space, because 2 values for each identical id
-    maxResult = new int[2][values1[0].length + values2[0].length];
+    int[][] maxResult = new int[2][values1[0].length + values2[0].length];
 
     //if (min == values2.length && min != values1.length) {
     if(min == values2[0].length && min != values1[0].length) {
@@ -160,15 +148,13 @@ public final class FTIntersection extends FTArrayExpr {
 
         lastId = values1[0][i];
         counter++;
-
         i++;
       } else if(cmpResult == -2) {
         // id1 < i2
         if(lastId != values1[0][i]) {
-
           i++;
         } else {
-          // same value and Id == lastId have to bi copied
+          // same value and Id == lastId have to be copied
           while(i < values1[0].length && lastId == values1[0][i]) {
 
             maxResult[0][counter] = values1[0][i];
@@ -184,7 +170,7 @@ public final class FTIntersection extends FTArrayExpr {
 
           k++;
         } else {
-          // all values with same Id == lastId have to bi copied
+          // all values with same Id == lastId have to be copied
           while(k < values2[0].length && lastId == values2[0][k]) {
 
             maxResult[0][counter] = values2[0][k];
@@ -195,7 +181,7 @@ public final class FTIntersection extends FTArrayExpr {
           }
         }
       } else if(cmpResult == 1) {
-        // same ids, aber pos1 > pos2 values1[i] > values2[k]
+        // same ids, but pos1 > pos2 values1[i] > values2[k]
         maxResult[0][counter] = values2[0][k];
         maxResult[1][counter] = values2[1][k];
 
@@ -231,12 +217,9 @@ public final class FTIntersection extends FTArrayExpr {
       k++;
     }
 
-    if(counter == 0) {
-      return new int[][]{};
-    }
+    if(counter == 0) return new int[][]{};
 
-    int[][] returnArray;
-    returnArray = new int[2][counter];
+    int[][] returnArray = new int[2][counter];
     System.arraycopy(maxResult[0], 0, returnArray[0], 0, counter);
     System.arraycopy(maxResult[1], 0, returnArray[1], 0, counter);
 
@@ -292,9 +275,9 @@ public final class FTIntersection extends FTArrayExpr {
     // first element in pointers shows the maximum level
     pointersnew[0] = p[0] + 1;
 
-    // runvariable for values1
+    // run variable for values1
     int i = 0;
-    // runvariable for values2
+    // run variable for values2
     int k = 0;
     // number inserted elements
     int counter = 0;
@@ -371,7 +354,7 @@ public final class FTIntersection extends FTArrayExpr {
       //maxResult[counter] = values1[i];
       maxResult[0][counter] = v1[0][i];
       maxResult[1][counter] = v1[1][i];
-      // neues Element
+      // new element
       if (!changedOrder) {
         pointersnew[counter + 1] = pointersnew[0];
       } else {
@@ -399,9 +382,7 @@ public final class FTIntersection extends FTArrayExpr {
       k++;
     }
 
-    if (counter == 0) {
-      return new Object[]{null, null};
-    }
+    if (counter == 0) return new Object[]{null, null};
 
     int[][] rnArray = new int[2][counter];
     System.arraycopy(maxResult[0], 0, rnArray[0], 0, counter);
@@ -419,7 +400,7 @@ public final class FTIntersection extends FTArrayExpr {
 
   /**
    * Built join for value1 and value2; used key is id. 
-   * Servers pointer on searchstrings for each id.
+   * Servers pointer on search strings for each id.
    * @param val1 input set int[][]
    * @param val2 input set  int[][]
    * @param p int[] pointer array, optional on val1
@@ -442,9 +423,8 @@ public final class FTIntersection extends FTArrayExpr {
     
     // calculate minimum size
     int min = Math.min(values1[0].length, values2[0].length);
-    int[][] maxResult;
     // double space, because 2 values for each identical id
-    maxResult = new int[2][values1[0].length + values2[0].length];
+    int[][] maxResult = new int[2][values1[0].length + values2[0].length];
     boolean co = false;
     
     if(min == values2[0].length && min != values1[0].length) {
@@ -474,11 +454,7 @@ public final class FTIntersection extends FTArrayExpr {
         maxResult[1][counter] = values1[1][i];
 
         // copy old pointer
-        if (!co) {
-          pn[counter + 1] = (p != null) ? p[i + 1] : 0;
-        } else {
-          pn[counter + 1] = pn[0];
-        }
+        pn[counter + 1] = co ? pn[0] : p != null ? p[i + 1] : 0;
 
         lastId = values1[0][i];
         counter++;
@@ -496,11 +472,7 @@ public final class FTIntersection extends FTArrayExpr {
             maxResult[1][counter] = values1[1][i];
 
             // copy old pointer
-            if (!co) {
-              pn[counter + 1] = (p != null) ? p[i + 1] : 0;
-            } else {
-              pn[counter + 1] = pn[0];
-            }
+            pn[counter + 1] = co ? pn[0] : p != null ? p[i + 1] : 0;
 
             counter++;
             i++;
@@ -519,28 +491,19 @@ public final class FTIntersection extends FTArrayExpr {
             maxResult[1][counter] = values2[1][k];
 
             // copy old pointer
-            if (co) {
-              pn[counter + 1] = (p != null) ? p[k + 1] : 0;
-            } else {
-              pn[counter + 1] = pn[0];
-            }
+            pn[counter + 1] = !co ? pn[0] : p != null ? p[k + 1] : 0;
             
             counter++;
             k++;
           }
         }
       } else if(cmpResult == 1) {
-        // same ids, aber pos1 > pos2 values1[i] > values2[k]
+        // same ids, but pos1 > pos2 values1[i] > values2[k]
         maxResult[0][counter] = values2[0][k];
         maxResult[1][counter] = values2[1][k];
 
         // copy old pointer
-        if (co) {
-          pn[counter + 1] = (p != null) ? p[k + 1] : 0;
-        } else {
-          pn[counter + 1] = pn[0];
-        }
-
+        pn[counter + 1] = !co ? pn[0] : p != null ? p[k + 1] : 0;
         
         lastId = values2[0][k];
         counter++;
@@ -551,11 +514,7 @@ public final class FTIntersection extends FTArrayExpr {
         maxResult[1][counter] = values2[1][k];
         counter++;
         // copy old pointer
-        if (co) {
-          pn[counter + 1] = (p != null) ? p[k + 1] : 0;
-        } else {
-          pn[counter + 1] = pn[0];
-        }
+        pn[counter + 1] = !co ? pn[0] : p != null ? p[k + 1] : 0;
 
         i++;
         k++;
@@ -569,12 +528,7 @@ public final class FTIntersection extends FTArrayExpr {
       maxResult[1][counter] = values1[1][i];
       
       // copy old pointer
-      if (!co) {
-        pn[counter + 1] = (p != null) ? p[i + 1] : 0;
-      } else {
-        pn[counter + 1] = pn[0];
-      }
-
+      pn[counter + 1] = co ? pn[0] : p != null ? p[i + 1] : 0;
       
       counter++;
       i++;
@@ -587,22 +541,15 @@ public final class FTIntersection extends FTArrayExpr {
       maxResult[0][counter] = values2[0][k];
       maxResult[1][counter] = values2[1][k];
       // copy old pointer
-      if (co) {
-        pn[counter + 1] = (p != null) ? p[k + 1] : 0;
-      } else {
-        pn[counter + 1] = pn[0];
-      }
+      pn[counter + 1] = !co ? pn[0] : p != null ? p[k + 1] : 0;
 
       counter++;
       k++;
     }
 
-    if(counter == 0) {
-      return new int[][]{};
-    }
+    if(counter == 0) return new int[][]{};
 
-    int[][] returnArray;
-    returnArray = new int[2][counter];
+    int[][] returnArray = new int[2][counter];
     System.arraycopy(maxResult[0], 0, returnArray[0], 0, counter);
     System.arraycopy(maxResult[1], 0, returnArray[1], 0, counter);
     

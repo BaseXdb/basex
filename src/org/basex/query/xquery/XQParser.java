@@ -3,10 +3,8 @@ package org.basex.query.xquery;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
-
 import java.io.File;
 import java.io.IOException;
-
 import org.basex.BaseX;
 import org.basex.io.IOConstants;
 import org.basex.query.xquery.expr.And;
@@ -162,7 +160,6 @@ public final class XQParser {
 
     try {
       file = f;
-
       qu = q;
       ql = qu.length;
       if(ql == 0) Err.or(QUERYEMPTY);
@@ -208,8 +205,11 @@ public final class XQParser {
    * @throws XQException xquery exception
    */
   private void versionDecl() throws XQException {
-    if(!consumeWS(XQUERY)) return;
-    check(VERSION);
+    final int p = qp;
+    if(!consumeWS(XQUERY) || !consume(VERSION)) {
+      qp = p;
+      return;
+    }
     final byte[] ver = stringLiteral();
 
     final byte[] enc = consume(ENCODING) ? lc(stringLiteral()) : null;
@@ -220,7 +220,8 @@ public final class XQParser {
       if(!v) Err.or(XQUERYENC2, enc);
     }
     ctx.encoding = enc;
-    check(SEMI);
+    consumeWS();
+    check(';');
     if(!eq(ver, ONEZERO)) Err.or(XQUERYVER, ver);
   }
 
@@ -254,7 +255,8 @@ public final class XQParser {
     if(module.uri == Uri.EMPTY) Err.or(NSMODURI);
     if(!u.eq(module.uri)) Err.or(WRONGMODULE, module.uri, file);
     ctx.ns.index(module);
-    check(SEMI);
+    consumeWS();
+    check(';');
     prolog();
   }
 
@@ -309,7 +311,8 @@ public final class XQParser {
       } else {
         break;
       }
-      check(SEMI);
+      consumeWS();
+      check(';');
     }
   }
 
@@ -588,7 +591,7 @@ public final class XQParser {
       for(final Var v : args) if(v.name.eq(arg)) Err.or(FUNCDUPL, arg);
 
       args = Array.add(args, var);
-      if(!consumeWS(COMMA)) break;
+      if(!consume(',')) break;
       consumeWS();
     }
     check(PAR2);
@@ -917,14 +920,14 @@ public final class XQParser {
    */
   private Expr comparisonExpr() throws XQException {
     final Expr expr = ftContainsExpr();
-    if(expr == null) return expr;
+    if(expr == null) return null;
 
     for(final CmpV.COMP c : CmpV.COMP.values()) if(consumeWS(c.name))
-      return new CmpV(expr, check(ftContainsExpr(), CMPEXPR), c);
+        return new CmpV(expr, check(ftContainsExpr(), CMPEXPR), c);
     for(final CmpN.COMP c : CmpN.COMP.values()) if(consumeWS(c.name))
-      return new CmpN(expr, check(ftContainsExpr(), CMPEXPR), c);
-    for(final CmpG.COMP c : CmpG.COMP.values()) if(consumeWS(c.name))
-      return new CmpG(expr, check(ftContainsExpr(), CMPEXPR), c);
+        return new CmpN(expr, check(ftContainsExpr(), CMPEXPR), c);
+    for(final CmpG.COMP c : CmpG.COMP.values()) if(consume(c.name))
+        return new CmpG(expr, check(ftContainsExpr(), CMPEXPR), c);
 
     return expr;
   }
@@ -962,7 +965,7 @@ public final class XQParser {
     Expr expr = multiplicativeExpr();
 
     while(true) {
-      final Calc c = consume(PLUS) ? Calc.PLUS : consume(MINUS) ? Calc.MINUS :
+      final Calc c = consume('+') ? Calc.PLUS : consume('-') ? Calc.MINUS :
         null;
       if(c == null) break;
       expr = new Clc(expr, check(multiplicativeExpr(), CALCEXPR), c);
@@ -977,10 +980,10 @@ public final class XQParser {
    */
   private Expr multiplicativeExpr() throws XQException {
     Expr expr = unionExpr();
-    if(expr == null) return expr;
+    if(expr == null) return null;
 
     while(true) {
-      final Calc c = consume(MULT) ? Calc.MULT : consumeWS(DIV) ?
+      final Calc c = consume('*') ? Calc.MULT : consumeWS(DIV) ?
         Calc.DIV : consumeWS(IDIV) ? Calc.IDIV : consumeWS(MOD) ?
         Calc.MOD : null;
       if(c == null) break;
@@ -1082,10 +1085,11 @@ public final class XQParser {
     boolean minus = false;
     boolean found = false;
     do {
-      if(consume(MINUS)) {
+      consumeWS();
+      if(consume('-')) {
         minus ^= true;
         found = true;
-      } else if(consume(PLUS)) {
+      } else if(consume('+')) {
         found = true;
       } else {
         final Expr e = valueExpr();
@@ -1155,7 +1159,7 @@ public final class XQParser {
    * @throws XQException xquery exception
    */
   private Expr pathExpr() throws XQException {
-    final int s = consume(SLASH) ? consume('/') ? 2 : 1 : 0;
+    final int s = consume('/') ? consume('/') ? 2 : 1 : 0;
 
     Expr ex = stepExpr();
     if(ex == null) {
@@ -1163,7 +1167,7 @@ public final class XQParser {
       return s == 0 ? null : new Root();
     }
 
-    final boolean slash = consume(SLASH);
+    final boolean slash = consume('/');
     if(!slash && s == 0) return ex;
 
     Expr[] list = {};
@@ -1176,10 +1180,9 @@ public final class XQParser {
         if(consume('/')) list = add(list, new Step(Axis.DESCORSELF,
             Test.NODE, new Expr[0]));
         list = add(list, check(stepExpr(), PATHMISS));
-      } while(consume(SLASH));
+      } while(consume('/'));
     }
-    if(s > 0) ex = new Root();
-    return new Path(ex, list);
+    return new Path(s > 0 ? new Root() : ex, list);
   }
 
   /**
@@ -1204,7 +1207,7 @@ public final class XQParser {
     if(consume(DOT2)) {
       ax = Axis.PARENT;
       test = Test.NODE;
-    } else if(consume(ATMARK)) {
+    } else if(consume('@')) {
       ax = Axis.ATTR;
       test = nodeTest();
     } else {
@@ -1271,7 +1274,7 @@ public final class XQParser {
           return new Test(name, false, ctx);
         }
       }
-    } else if(consume(MULT)) {
+    } else if(consume('*')) {
       // nametest *
       if(!consume(':')) return new Test();
       // nametest *:abcde
@@ -1437,20 +1440,12 @@ public final class XQParser {
 
   /**
    * [ 94] Parses a Constructor.
-   * @return query expression
-   * @throws XQException xquery exception
-   */
-  private Expr constructor() throws XQException {
-    return directConstructor();
-  }
-
-  /**
    * [ 95] Parses a DirectConstructor.
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr directConstructor() throws XQException {
-    check(LBRA);
+  private Expr constructor() throws XQException {
+    check('<');
     return consume('!') ? dirCommentConstructor() :
       consume('?') ? dirPIConstructor() : dirElemConstructor();
   }
@@ -1464,7 +1459,7 @@ public final class XQParser {
   private Expr dirElemConstructor() throws XQException {
     if(consumeWS()) Err.or(NOTAGNAME);
     final QNm open = new QNm(qName(NOTAGNAME));
-    foundWSS();
+    consumeWSS();
 
     Expr[] cont = {};
     Uri taguri = null;
@@ -1475,9 +1470,9 @@ public final class XQParser {
       final QNm atn = new QNm(qName(null));
       Expr[] attv = {};
 
-      foundWSS();
+      consumeWSS();
       check('=');
-      foundWSS();
+      consumeWSS();
       final byte delim = consume();
       if(delim != '\'' && delim != '"') Err.or(WRONGCHAR, QUOTE, found());
       final TokenBuilder tb = new TokenBuilder();
@@ -1541,7 +1536,7 @@ public final class XQParser {
       } else {
         cont = add(cont, new CAttr(atn, atts, false));
       }
-      if(!foundWSS()) break;
+      if(!consumeWSS()) break;
     }
 
     // ...parse function arguments
@@ -1561,7 +1556,7 @@ public final class XQParser {
 
       if(consumeWS()) Err.or(NOTAGNAME);
       final byte[] close = qName(NOTAGNAME);
-      foundWSS();
+      consumeWSS();
       check('>');
       if(!eq(open.str(), close)) Err.or(TAGWRONG, open.str(), close);
     }
@@ -1600,7 +1595,7 @@ public final class XQParser {
         } else {
           final byte[] txt = text(tb);
           if(txt != null) return Str.get(txt);
-          return next() == '/' ? null : directConstructor();
+          return next() == '/' ? null : constructor();
         }
       } else if(c == '{') {
         if(next() == '{') {
@@ -1659,7 +1654,7 @@ public final class XQParser {
    * @throws XQException xquery exception
    */
   private Expr dirPIConstructor() throws XQException {
-    if(foundWSS()) Err.or(PIXML, EMPTY);
+    if(consumeWSS()) Err.or(PIXML, EMPTY);
     final byte[] str = qName(PIWRONG);
     final Expr pi = Str.get(str);
     if(str.length == 0 || Token.eq(Token.lc(str), XML)) Err.or(PIXML, pi);
@@ -1826,7 +1821,8 @@ public final class XQParser {
   private SeqType simpleType() throws XQException {
     final QNm type = new QNm(qName(TYPEINVALID));
     ctx.ns.uri(type);
-    final SeqType seq = new SeqType(type, consume(QUEST) ? 1 : 0, null);
+    consumeWS();
+    final SeqType seq = new SeqType(type, consume('?') ? 1 : 0, null);
 
     if(seq.type == null) {
       final byte[] uri = type.uri.str();
@@ -1856,8 +1852,9 @@ public final class XQParser {
         tok.add(consume());
       }
     }
-    final int mode = consume(QUEST) ? 1 : consume(PLUS) ? 2 :
-      consume(MULT) ? 3 : 0;
+    consumeWS();
+    final int mode = consume('?') ? 1 : consume('+') ? 2 :
+      consume('*') ? 3 : 0;
     if(type.ns()) type.uri = ctx.ns.uri(type.pre());
 
     final SeqType seq = new SeqType(type, mode, tok.finish());
@@ -1908,14 +1905,14 @@ public final class XQParser {
     if(delim != '\'' && delim != '"') Err.or(WRONGCHAR, QUOTE, found());
     consume();
     tok.reset();
-    do {
+    while(true) {
       while(!consume(delim)) {
         if(curr() == 0) Err.or(QUOTECLOSE, (char) delim);
         ent(tok);
       }
       if(!consume(delim)) break;
       tok.add(delim);
-    } while(true);
+    }
     return tok.finish();
   }
 
@@ -2390,7 +2387,7 @@ public final class XQParser {
   }
 
   /**
-   * Consumes whitespaces and the token if it equals the specified one.
+   * Consumes the specified token and surrounding whitespaces.
    * @param t token to consume
    * @return true if token was found
    * @throws XQException xquery exception
@@ -2445,12 +2442,11 @@ public final class XQParser {
    */
   private boolean consume(final byte[] str) throws XQException {
     consumeWS();
-    final int l = qp + str.length;
-    if(l <= ql && indexOf(qu, str, qp) == qp) {
-      qp = l;
-      return true;
-    }
-    return false;
+    int p = qp;
+    if(p + str.length > ql) return false;
+    for(final byte b : str) if(qu[p++] != b) return false;
+    qp = p;
+    return true;
   }
 
   /**
@@ -2461,15 +2457,15 @@ public final class XQParser {
   private boolean consumeWS() throws XQException {
     final int p = qp;
     while(qp < ql) {
-      final int c = curr();
+      final int c = qu[qp];
       if(c == '(' && next() == ':') {
         comment();
       } else {
-        if(c <= 0 || c > ' ') break;
+        if(c <= 0 || c > ' ') return p != qp;
         qp++;
       }
     }
-    return p != qp;
+    return true;
   }
 
   /**
@@ -2479,7 +2475,7 @@ public final class XQParser {
   private void comment() throws XQException {
     qp++;
     while(++qp < ql) {
-      if(curr() == '(' && next() == ':') comment();
+      if(qu[qp] == '(' && next() == ':') comment();
       if(curr() == ':' && next() == ')') {
         qp += 2;
         return;
@@ -2492,11 +2488,11 @@ public final class XQParser {
    * Consumes all following whitespace characters.
    * @return true if whitespaces were found
    */
-  private boolean foundWSS() {
+  private boolean consumeWSS() {
     final int p = qp;
     while(qp < ql) {
-      final int c = curr();
-      if(c < 0 || c > ' ') return p != qp;
+      final int c = qu[qp];
+      if(c <= 0 || c > ' ') return p != qp;
       qp++;
     }
     return true;
@@ -2522,8 +2518,7 @@ public final class XQParser {
     final byte[] ln = type.ln();
     final byte[] uri = type.uri.str();
     for(final Type t : Type.values()) {
-      if(eq(t.name, ln) && eq(uri, t.uri) &&
-          (t == Type.NOD || t.par == Type.NOD)) return t;
+      if(t.node() && eq(ln, t.name) && eq(uri, t.uri)) return t;
     }
     return null;
   }

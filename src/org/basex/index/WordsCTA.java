@@ -828,8 +828,7 @@ public final class WordsCTA implements Index {
     System.arraycopy(nodeEntry,
         nodeEntry.length - bId.length, bId, 0, bId.length);
 
-    //return Array.byteToInt(bId);
-    return Array.byteToIntNN(bId);
+    return Array.byteToInt(bId);
   }
 
   /**

@@ -317,7 +317,7 @@ public final class XPathProcessor extends QueryProcessor {
     final LocPath path = new LocPathRel();
     if(peek(1) == '/') {
       consume('/');
-      path.steps.add(Axis.get(Axis.DESCORSELF, TestNode.NODE));
+      path.steps.add(Axis.create(Axis.DESCORSELF, TestNode.NODE));
     }
     return new Path(e, parseRelLocPath(path));
   }
@@ -373,7 +373,7 @@ public final class XPathProcessor extends QueryProcessor {
     if(curr('/')) {
       final byte c = peek(1);
       if(letter(c) || c == '@' || c == '*' || c == '.') {
-        return Axis.get(Axis.DESCORSELF, TestNode.NODE);
+        return Axis.create(Axis.DESCORSELF, TestNode.NODE);
       }
       error(NOLOCSTEP);
     }
@@ -416,7 +416,7 @@ public final class XPathProcessor extends QueryProcessor {
       consumeWS();
     }
 
-    return Axis.get(axis, nodetest, preds);
+    return Axis.create(axis, nodetest, preds);
   }
 
   /**
@@ -680,7 +680,7 @@ public final class XPathProcessor extends QueryProcessor {
    * @return current character
    */
   private byte curr() {
-    return peek(0);
+    return qp >= ql ? 0 : qu[qp];
   }
 
   /**
@@ -689,7 +689,7 @@ public final class XPathProcessor extends QueryProcessor {
    * @return result of check
    */
   private boolean curr(final int ch) {
-    return peek(0) == ch;
+    return curr() == ch;
   }
 
   /**

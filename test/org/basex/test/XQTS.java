@@ -52,17 +52,19 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class XQTS {
+  // Try "ulimit -n 65536" if Linux tells you "Too many open files."
+  
   /** History Path. */
   private static final String PATHHIST = "xqts.hist";
   /** Log File. */
   private static final String PATHLOG = "xqts.log";
 
   /** XQuery Test Suite Root Directory. */
-  //private static final String ROOT = "/";
-  private static final String ROOT = "h:/";
+  private static final String ROOT = "/";
+  //private static final String ROOT = "h:/";
   /** Path to the XQuery Test Suite. */
-  private String tests = ROOT + "xqts102/";
-  //private String tests = ROOT + "/home/dbis/xml/xqts102/";
+  //private String tests = ROOT + "xqts102/";
+  private String tests = ROOT + "/home/dbis/xml/xqts102/";
   /** Query Path. */
   private String queries;
   /** Expected Results. */

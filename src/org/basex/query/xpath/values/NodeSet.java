@@ -52,8 +52,7 @@ public final class NodeSet extends Item {
    * @param ctx query context
    * @param ftIds ids and pos values for full-text queries
    */
-  public NodeSet(final int[] ids, final XPContext ctx, 
-      final int[][] ftIds) {
+  public NodeSet(final int[] ids, final XPContext ctx, final int[][] ftIds) {
     data = ctx.local.data;
     nodes = ids;
     size = ids.length;

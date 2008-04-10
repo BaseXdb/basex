@@ -125,8 +125,6 @@ public final class GUIProp {
 
   /** Flag for displaying the menu in the GUI window. */
   public static boolean showmenu = true;
-  /** Treemap uses Thumbnail Visualization. */
-  public static boolean thumbnail = true;
 
   /** Flag for activated result view after starting. */
   public static boolean showstarttext = false;

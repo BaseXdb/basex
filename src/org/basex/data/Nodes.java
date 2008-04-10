@@ -19,7 +19,7 @@ public final class Nodes implements Result {
   /** Number of stored nodes. */
   public int size;
   /** Fulltext data (pre values and positions). */
-  public int[][] ftpre = null;
+  public int[][] ftpos = null;
   /** Fulltext pointer values, linking pre values and query strings. */
   public int[] ftpoin = null;
   /** Fulltext search string from query. **/
@@ -114,7 +114,7 @@ public final class Nodes implements Result {
    */
   public void setFTData(final int[][] ftprepos, final int[] ftpointer, 
       final byte[][] ftsearchstrings) {
-    ftpre = ftprepos;
+    ftpos = ftprepos;
     ftpoin = ftpointer;
     ftss = ftsearchstrings;
   }

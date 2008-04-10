@@ -61,7 +61,7 @@ public final class XPOptimizer {
         step.test instanceof TestName &&
         ((TestName) step.test).id != TestName.ALL &&
         !ctx.local.data.noLeaf(((TestName) step.test).id)) {
-      path.steps.add(Axis.get(Axis.CHILD, TestNode.TEXT));
+      path.steps.add(Axis.create(Axis.CHILD, TestNode.TEXT));
       ctx.compInfo(OPTTEXT);
     }
   }
