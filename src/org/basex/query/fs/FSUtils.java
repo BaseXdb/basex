@@ -114,16 +114,17 @@ public final class FSUtils {
     // Wie weit das Verzeichnis reicht
     int size = data.size(n, kind) + n;
     // Zu erstem file/dir springen
-    n += data.attSize(n, data.kind(n));
+    n += data.attSize(n, kind);
     // Ergebnisarray 
-    int[] res = new int[((size - n) / 5) + 1];
-    int i = 0;
+    // <HS> ..calculation size/5 is dubious as XML structure might change,
+    //    (e.g. if file contents are included)..
+    IntList res = new IntList();
     while(n < size) {
       // pre speichern
-      res[i++] = n;
+      res.add(n);
       n += data.size(n, data.kind(n));
     }    
-    return res;        
+    return res.finish();
   }
 
   /**
@@ -140,18 +141,17 @@ public final class FSUtils {
     // Wie weit das Verzeichnis reicht
     int size = data.size(n, kind) + n;
     // Zu erstem file/dir springen
-    n += data.attSize(n, data.kind(n));
+    n += data.attSize(n, kind);
     // Ergebnisarray 
-    int[] res = new int[((size - n) / 5) + 1];
-    int i = 0;
+    IntList res = new IntList();
     while(n < size) {
       if(isFile(data , n)) {
         // pre speichern
-        res[i++] = n;        
+        res.add(n);
       }
       n += data.size(n, data.kind(n));
     }    
-    return res;
+    return res.finish();
   }
 
   /**
@@ -170,16 +170,15 @@ public final class FSUtils {
     // Zu erstem file/dir springen
     n += data.attSize(n, kind);
     // Ergebnisarray 
-    int[] res = new int[((size - n) / 5) + 1];
-    int i = 0;
+    IntList res = new IntList();
     while(n < size) {
       if(isDir(data , n)) {
         // pre speichern
-        res[i++] = n;        
+        res.add(n);
       }
       n += data.size(n, kind);
     }    
-    return res;
+    return res.finish();
   }
   
   /**
@@ -192,7 +191,7 @@ public final class FSUtils {
    * @return -  all pre values of all files
    */
   public static int getSpecificFile(final Data data, final int pre,
-      final String dir, final int kind) {
+      final byte[] dir, final int kind) {
     int n = pre;        
     // Wie weit das Verzeichnis reicht
     int size = data.size(n, kind) + n;
@@ -202,7 +201,7 @@ public final class FSUtils {
     while(n < size) {
       if(isFile(data , n)) {
         // pre speichern
-        if(Token.string(getName(data, n)).equals(dir)) {
+        if(Token.eq(getName(data, n), dir)) {
          return n; 
         }
       }
@@ -221,7 +220,7 @@ public final class FSUtils {
    * @return -  all pre values of all files
    */
   public static int getSpecificDir(final Data data, final int pre,
-      final String dir, final int kind) {
+      final byte[] dir, final int kind) {
     int n = pre;        
     // Wie weit das Verzeichnis reicht
     int size = data.size(n, kind) + n;
@@ -231,8 +230,9 @@ public final class FSUtils {
     while(n < size) {
       if(isDir(data , n)) {
         // pre speichern
-        if(Token.string(getName(data, n)).equals(dir)) {
-         return n; 
+        // <CG> using byte comparison to avoid byte/string conversion
+        if(Token.eq(getName(data, n), dir)) {
+          return n;
         }
       }
       n += data.size(n, kind);
@@ -263,14 +263,14 @@ public final class FSUtils {
 
     for(String p : paths) {
       // Parent directory
-      if(p.equalsIgnoreCase("..")) {
+      if(p.equals("..")) {
         n = data.parent(n, kind);
       // / was first char of the path - after split it's ""  
-      } else if(p.equalsIgnoreCase("")) {
+      } else if(p.equals("")) {
         n = 3;
       // if path equals "." do nothing else getDir  
-      } else if(!p.equalsIgnoreCase(".")) {
-        n = getSpecificDir(data, n, p, kind);
+      } else if(!p.equals(".")) {
+        n = getSpecificDir(data, n, Token.token(p), kind);
       }
       // if there is no such dir return -1
       if(n == -1) {
@@ -286,8 +286,8 @@ public final class FSUtils {
    * @param options - Options
    * @return String[] - all options stored in an array
    */
-    public static String[] readOptions(final String options) {
-      
+  public static String[] readOptions(final String options) {
+
       String[] opt = options.split(" ");
       if(opt.length < 2) {
         return null;
