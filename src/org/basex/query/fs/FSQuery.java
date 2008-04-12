@@ -82,5 +82,20 @@ public final class FSQuery {
     cd.cdMain(cmd);    
     out.print(NL);
   }
+  
+  /**
+   * Perform locate.
+   * 
+   * @param cmd options
+   * @param out output stream
+   * @throws IOException in case of problems with the PrintOutput
+   */
+  public void locate(final String cmd, final PrintOutput out) 
+  throws IOException {
+    LOCATE locate = new LOCATE(context, out);
+    locate.locateMain(cmd);    
+    out.print(NL);
+  }
+
 
 }

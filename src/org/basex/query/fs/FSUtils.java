@@ -13,9 +13,13 @@ import org.basex.util.TokenBuilder;
  * Preliminary collection of file system methods.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
- * @author Christian Gruen
+ * @author Christian Gruen & Hannes Schwarz
  */
 public final class FSUtils {
+  
+  /** Root dir. */
+  private static final int ROOTDIR = 2;
+  
   /** Private constructor, preventing class instances. */
   private FSUtils() { }
 
@@ -86,6 +90,23 @@ public final class FSUtils {
   public static byte[] getName(final Data data, final int pre) {
     final byte[] att = data.attValue(data.nameID, pre);
     return att != null ? att : EMPTY;
+  }
+  
+  /**
+   * Returns the name of a file.
+   * @param data data reference
+   * @param pre pre value
+   * @return file name.
+   */
+  public static String getFileName(final Data data, final int pre) {
+    final byte[] att = data.attValue(data.nameID, pre);    
+    if(att == null)
+      return "";    
+    String filename = "";
+    for(byte i : att) {
+      filename += (char) i;
+    }
+    return filename;
   }
 
   /**
@@ -319,5 +340,14 @@ public final class FSUtils {
       BaseX.debug("Could not open \"%\"", path);
       ex.printStackTrace();
     }
+  }
+
+  /**
+   * Returns int value of the root dir.
+   * 
+   * @return the rOOTDIR
+   */
+  public static int getROOTDIR() {
+    return ROOTDIR;
   }
 }

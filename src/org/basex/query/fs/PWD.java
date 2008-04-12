@@ -7,7 +7,6 @@ import org.basex.data.Data;
 import org.basex.io.PrintOutput;
 import org.basex.query.fs.Exception.PathNotFoundException;
 import org.basex.util.GetOpts;
-import org.basex.util.Token;
 
 /**
  * Performs a pwd command.
@@ -76,29 +75,16 @@ public class PWD {
     }
 
     // if there is path expression go to dir
-    if(g.getPath() != null) {
-      curDirPre = FSUtils.goToDir(context.data(), curDirPre, g.getPath());
+    Data data = context.data();
+    if(g.getPath() != null) {      
+      curDirPre = FSUtils.goToDir(data, curDirPre, g.getPath());      
       if(curDirPre == -1) {
         throw new PathNotFoundException("cd", g.getPath());
       }
     }
-    pwd(curDirPre);
+    out.print(FSUtils.getPath(data, curDirPre));
   }
   
-  /**
-   * Construct name of current/working directory (cwd).
-   * @param n pre value of cwd
-   * @throws IOException in case of problems with the PrintOutput
-   */
-  private void pwd(final int n) throws IOException {
-    final Data data = context.data();
-    if(n > 3) {
-      pwd(data.parent(n, data.kind(n)));
-      out.print(Token.string(FSUtils.getName(data, n)) + "/");
-    } else {
-      out.print(Token.string(FSUtils.getName(data, n)) + "/");
-    }    
-  }
   
   /**
    * Print the help.

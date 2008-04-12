@@ -25,23 +25,25 @@ public final class Fs extends Proc {
   public static final String TOUCH = "touch";
   /** Create option. */
   public static final String RM = "rm";
-  
-  
+  /** Create option. */
+  public static final String LOCATE = "locate";
 
-  
+
+
+
   /** Filesystem query reference. */
   FSQuery query;
   /** Filesystem command. */
   String comm;
-  
+
   @Override
   protected boolean exec() {
     query = new FSQuery(context);
     comm = cmd.arg(0).toLowerCase();
     return comm.equals(DU) || comm.equals(LS) || comm.equals(PWD) ||
-      comm.equals(CD);
+    comm.equals(CD) || comm.equals(LOCATE);
   }
-  
+
 
   @Override
   protected void out(final PrintOutput out) throws IOException {
@@ -52,7 +54,9 @@ public final class Fs extends Proc {
     } else if(comm.equals(PWD)) {
       query.pwd(cmd.args(), out); 
     } else if(comm.equals(CD)) {      
-      query.cd(cmd.args(), out);    
+      query.cd(cmd.args(), out);     
+    } else if(comm.equals(LOCATE)) {      
+      query.locate(cmd.args(), out);    
     }
     if(Prop.info) timer(PROCTIME);
   }

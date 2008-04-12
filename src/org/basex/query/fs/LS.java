@@ -54,9 +54,7 @@ public class LS {
    * @throws IOException - in case of problems with the PrintOutput 
    */
   public void lsMain(final String cmd) 
-  throws IOException {
-    out.print("command " + cmd);
-    out.print(NL);
+  throws IOException {    
     GetOpts g = new GetOpts(cmd, "ahR");
     
     // get all Options
@@ -120,7 +118,7 @@ public class LS {
     print(dir);   
     for(int i = 0; allDir[i] != 0 && i < allDir.length; i++) {
       out.print(NL);
-      printPath(allDir[i]);
+      out.print(FSUtils.getPath(data, allDir[i]));
       out.print(NL);
       lsRecursive(allDir[i]);
     }
@@ -145,20 +143,6 @@ public class LS {
     out.print(NL);
   }
 
-  /**
-   * Construct name of current/working directory (cwd).
-   * @param n pre value of cwd
-   * @throws IOException in case of problems with the PrintOutput
-   */
-  private void printPath(final int n) throws IOException {    
-    if(n > 3) {
-      printPath(data.parent(n, data.kind(n)));
-      out.print(FSUtils.getName(data, n));
-      out.print("/");
-    } else {      
-      out.print("./");
-    }    
-  }
   /**
    * Print the help.
    * 
