@@ -444,6 +444,64 @@ ch_xpath1= Evaluate XPath query.
 ch_xpath2= Evaluate the specified XPath [query] and print the result.
 ch_xpathmv0= [hits] [subhits] [\"query\"]
 ch_xpathmv1= Evaluate MedioVis query.
+ch_xpathmv2=Evaluate the specified XPath [query] and limit the \n number of top elements to [hits] and the number of \n subordinate elements to [subhits].
+ch_xquery0=[query]
+ch_xquery1=Evaluate XQuery [query].
+ch_xquery2=Evaluate an XQuery and show its result. No other commands \n are allowed in the same line. In interactive mode, if no \n query is specified, all following lines are added to the \n query until an empty line is typed in.
+ch_find0=[query]
+ch_find1=Evaluate a keyword query.
+ch_find2=The following modifiers can be used:\n =  : look for exact text nodes" \n @= : look for exact attributes \n @  : look for attributes
+ch_pf1=Evaluate XQuery [query] via Pathfinder.
+ch_pf2=Evaluate an XQuery via Pathfinder and show its result.\nIf [ 
+ch_pf21= ] is set, the pipelined version is applied.
+ch_xmark1=Launch XMark query
+ch_xmark2=Launch internal implementation of XMark query [nr] (1-20).
+ch_cd0=[query]
+ch_cd1=Evaluate XPath query and set result as new context set.
+ch_cd2=Evaluate the specified XPath [query] and set the result \nl as newcontext set.
+ch_fs1=Perform a filesystem command.
+ch_fs2=Perform a filesystem command
+ch_fs21= [path]?: Calculate directory usage
+ch_fs22= [path]?: List directory
+ch_fs23= [file]: Change access and modification times
+ch_fs24= [option] [file]: Remove a file
+ch_fs25=: Print the current working directory
+ch_dummyupdate0=Update Commands:
+ch_copy0=[pos] [\"source\"] [\"target\"]
+ch_copy1=Copy database nodes.
+ch_copy2=Evaluate [source] and copy the result to [target] \n at the specified child [pos] (0=last child).
+ch_delete0=[\"target\"]
+ch_delete1=Delete database nodes.
+ch_delete2=Delete nodes satifying the specified [target] query.
+ch_insert1=Insert database nodes.
+ch_insert2=Insert a fragment or specific node at the specified \n child [pos] (0=last child) of the given [target] query:
+ch_update1=Update database nodes.
+ch_update2=Update nodes satisfying the specified [target] query.
+ch_dummygeneral0=General Commands:
+ch_set0=[option] [val]?
+ch_set1=Sets global options (current values: try 'info').
+ch_set2=Available [option]s with [val=on|off]:
+ch_set21= [all?]: Show (all) process info
+ch_set22=: Show debug info
+ch_set23=: Serialize query results
+ch_set24=: Serialize results as XML
+ch_set25=: Use main memory mode
+ch_set26=: Chop XML whitespaces
+ch_set27=: Parse XML entities
+ch_set28=: Index text nodes
+ch_set29=: Index attributes
+ch_set30=: Index document words
+ch_set31=: Index full text
+ch_set32=Additional options:
+ch_set33= [path]: Set new database path
+ch_set34= [nr]: Set number of query runs
+ch_help1=Get help on 
+ch_help11= commands.
+ch_help2=If [command] is specified, information on the specific\n command is printed; otherwise, all commands are listed.\nIf 'all' is specified, hidden commands are included.
+ch_ping1=Test database connectivity.
+ch_ping2=If the connection works, an info string is returned.
+ch_prompt1=Get prompt message.
+ch_prompt2=Get prompt message, representing the current context node.
 
 # Help Texts
 h_filter=Press this button to filter your query results.

@@ -443,6 +443,64 @@ ch_xpath1= Evaluiere XPath Anfrage.
 ch_xpath2= Evaluiere die spezifizierte XPath [Anfrage] und zeige Ergebnis an.
 ch_xpathmv0= [hits] [subhits] [\"query\"]
 ch_xpathmv1= Evaluiere MedioVis Anfrage.
+ch_xpathmv2=Evaluiere die spezifizierte XPath [Anfrage] und begrenze die \n Anzahl von Topelementen auf [hits] und die Anzahl \n an untergeordneten Elementen auf [subhits].
+ch_xquery0=[Anfrage]
+ch_xquery1=Evaluiere XQuery [Anfrage].
+ch_xquery2=Evaluiere eine XQuery und zeige ihre Ergebnisse. Keine anderen Befehle \n sind in der gleichen Zeile erlaubt. Im interaktiven Modus, werden wenne keine \n Anfrage spezifiziert wurde, alle nachfolgenden Zeilen zur Anfrage hinzugefügt \n bis eine leere Zeile eingegeben wird.
+ch_find0=[Anfrage]
+ch_find1=Evaluiere eine Schlüsselwort Anfrage.
+ch_find2=Die folgenden Modifikatioren können benutzt werden:\n =  : schaue nach exakten Textknoten \n @= : schaue nach exakten Attributen \n @  : schaue nach Attributen
+ch_pf1=Evaluiere XQuery [Anfrage] mit Pathfinder.
+ch_pf2=Evaluiere an XQuery mit Pathfinder und zeige die Ergebnisse.\nWenn[ 
+ch_pf21= ] gesetzt wurde, wurde die pipelined Version benutzt.
+ch_xmark1=Starte XMark Anfrage
+ch_xmark2=Starte interne Implementation von XMark query [nr] (1-20).
+ch_cd0=[query]
+ch_cd1=Evaluiere XPath Anfrage und setze Ergebnis als neues Kontextset.
+ch_cd2=Evaluiere die spezifizierte XPath [Anfrage] und setze das Ergebnis \n als neues Kontextset.
+ch_fs1=Führe ein Dateisystem Befehl durch.
+ch_fs2=Führe ein Dateisystem Befehl durch
+ch_fs21= [path]?: Berechne Verzeichnisverbrauch
+ch_fs22= [path]?: Liste Verzeichnisse auf
+ch_fs23= [file]: Ändere Zugriff- und Änderungszeiten
+ch_fs24= [option] [file]: Entferne eine Datei
+ch_fs25=: Zeige das aktuelle Arbeitsverzeichnis an
+ch_dummyupdate0=Update Befehle:
+ch_copy0=[pos] [\"source\"] [\"target\"]
+ch_copy1=Kopiere die Datenbankknoten.
+ch_copy2=Evaluiere [source] und kopiere das Ergebnis in [target] \n zum spezifiziereten Kind [pos] (0=last child).
+ch_delete0=[\"target\"]
+ch_delete1=Lösche Datenbankknoten.
+ch_delete2=Lösche Knoten, welche der spezifizierten [target] Anfrage unterliegen.
+ch_insert1=Füge Datenbankknoten ein.
+ch_insert2=Füge ein Fragment oder einen spezifizierten Knoten beim spezifizierten Kind \n der gegebenen [target] Anfrage ein [pos] (0=last child):
+ch_update1=Aktualisiere Datenbankknoten.
+ch_update2=Aktualisiere Knoten, welche der spezifizierten [target] Anfrage unterliegen.
+ch_dummygeneral0=Allgemeine Befehle:
+ch_set0=[option] [val]?
+ch_set1=Setzt allgemeine Optionen (aktuelle Werte: versuche 'info').
+ch_set2=Verfuegbare [option]en mit [val=on|off]:
+ch_set21= [all?]: Zeige (alle) Prozess informationen
+ch_set22=: Zeige Debug Informationen
+ch_set23=: Serialisiere Anfrageergebnisse
+ch_set24=: Serialisiere Ergebnisse als XML
+ch_set25=: Benutze Hauptspeicher-Modus
+ch_set26=: Entferne XML Leerstellen
+ch_set27=: Analysiere XML Entititäten
+ch_set28=: Indexiere Textknoten
+ch_set29=: Indexiere Attribute
+ch_set30=: Indexiere Dokumentwörter
+ch_set31=: Indexiere Fulltext
+ch_set32=Zusätzliche Optionen:
+ch_set33= [path]: Setze neuen Datenbankpfad
+ch_set34= [nr]: Setze die Anzahl von Anfragedurchläufen
+ch_help1=Beziehe Hilfe für 
+ch_help11= Befehle.
+ch_help2=Wenn [command] spezifiziert wurde, wird Information zum spezifizierten\n Befehl dargestellt; Sonst werden alle Befehle aufgelistet.\nWenn 'all' spezifiziert wurde, werden versteckte Befehle mit angezeigt.
+ch_ping1=Teste Verbindung zur Datenbank.
+ch_ping2=Wenn die Datenbankverbindung funktioniert, wird eine Infomeldung zurückgegeben.
+ch_prompt1=Get prompt message.
+ch_prompt2=Get prompt message, representing the current context node.
 
 # Help Texts
 h_filter=Die Suchtreffer können mit diesen Button gefiltert werden.

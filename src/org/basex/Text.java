@@ -228,85 +228,72 @@ public interface Text {
   /** Command help. */
   String XPATHMV1 = lang("ch_xpathmv1");
   /** Command help. */
-  String XPATHMV2 = "Evaluate the specified XPath [query] and limit the " + NL +
-    "number of top elements to [hits] and the number of " + NL +
-    "subordinate elements to [subhits].";
+  String XPATHMV2 = lang("ch_xpathmv2");
   /** Command Help. */
-  String XQUERY0 = "[query]";
+  String XQUERY0 = lang("ch_xquery0");
   /** Command Help. */
-  String XQUERY1 = "Evaluate XQuery [query].";
+  String XQUERY1 = lang("ch_xquery1");
   /** Command Help. */
-  String XQUERY2 =
-    "Evaluate an XQuery and show its result. No other commands" + NL +
-    "are allowed in the same line. In interactive mode, if no" + NL +
-    "query is specified, all following lines are added to the" + NL +
-    "query until an empty line is typed in.";
+  String XQUERY2 = lang("ch_xquery2");
   /** Command Help. */
-  String FIND0 = "[query]";
+  String FIND0 = lang("ch_find0");
   /** Command Help. */
-  String FIND1 = "Evaluate a keyword query.";
+  String FIND1 = lang("ch_find1");
   /** Command Help. */
-  String FIND2 = "The following modifiers can be used:" + NL +
-    " =  : look for exact text nodes" + NL +
-    " @= : look for exact attributes" + NL +
-    " @  : look for attributes";
+  String FIND2 = lang("ch_find2");
   /** Command Help. */
   String PF0 = "[" + PFinder.PIPE + "]? [\"query\"]";
   /** Command Help. */
-  String PF1 = "Evaluate XQuery [query] via Pathfinder.";
+  String PF1 = lang("ch_pf1");
   /** Command Help. */
-  String PF2 = "Evaluate an XQuery via Pathfinder and show its result." + NL +
-    "If [" + PFinder.PIPE + "] is set, the pipelined version is applied.";
+  String PF2 = lang("ch_pf2") + PFinder.PIPE + lang("ch_pf21");
   /** Command Help. */
   String XMARK0 = "[nr]";
   /** Command Help. */
-  String XMARK1 = "Launch XMark query";
+  String XMARK1 = lang("ch_xmark1");
   /** Command Help. */
-  String XMARK2 = "Launch internal implementation of XMark query [nr] (1-20).";
+  String XMARK2 = lang("ch_xmark2");
   /** Command Help. */
-  String CD0 = "[query]";
+  String CD0 = lang("ch_cd0");
   /** Command Help. */
-  String CD1 = "Evaluate XPath query and set result as new context set.";
+  String CD1 = lang("ch_cd1");
   /** Command Help. */
-  String CD2 = "Evaluate the specified XPath [query] and set the result " + NL +
-    "as newcontext set.";
+  String CD2 = lang("ch_cd2");
   /** Command Help. */
   String FS0 = "[" + Fs.DU + "|" + Fs.LS + "|" + Fs.PWD + "]";
   /** Command Help. */
-  String FS1 = "Perform a filesystem command.";
+  String FS1 = lang("ch_fs1");
   /** Command Help. */
-  String FS2 = "Perform a filesystem command:" + NL +
-    "- " + Fs.DU    + " [path]?: Calculate directory usage" + NL +
-    "- " + Fs.LS    + " [path]?: List directory" + NL +
-    "- " + Fs.TOUCH + " [file]: Change access and modification times" + NL +
-    "- " + Fs.RM + " [option] [file]: Remove a file" + NL +
-    "- " + Fs.PWD   + ": Print the current working directory";
+  String FS2 = lang("ch_fs2") + NL +
+    "- " + Fs.DU    + lang("ch_fs21") + NL +
+    "- " + Fs.LS    + lang("ch_fs22") + NL +
+    "- " + Fs.TOUCH + lang("ch_fs23") + NL +
+    "- " + Fs.RM + lang("ch_fs24") + NL +
+    "- " + Fs.PWD   + lang("ch_fs25");
 
   /** Command Help. */
-  String DUMMYUPDATE0 = "Update Commands:";
+  String DUMMYUPDATE0 = lang("ch_dummyupdate0");
 
   /** Command Help. */
-  String COPY0 = "[pos] [\"source\"] [\"target\"]";
+  String COPY0 = lang("ch_copy0");
   /** Command Help. */
-  String COPY1 = "Copy database nodes.";
+  String COPY1 = lang("ch_copy1");
   /** Command Help. */
-  String COPY2 = "Evaluate [source] and copy the result to [target]" + NL +
-  "at the specified child [pos] (0=last child).";
+  String COPY2 = lang("ch_copy2");
   /** Command Help. */
-  String DELETE0 = "[\"target\"]";
+  String DELETE0 = lang("ch_delete0");
   /** Command Help. */
-  String DELETE1 = "Delete database nodes.";
+  String DELETE1 = lang("ch_delete1");
   /** Command Help. */
-  String DELETE2 = "Delete nodes satifying the specified [target] query.";
+  String DELETE2 = lang("ch_delete2");
 
   /** Command Help. */
   String INSERT0 = "[" + Insert.FRG + "|" + Insert.ELEM + "|" + Insert.ATT +
     "|" + Insert.TXT + "|" + Insert.COM + "|" + Insert.PI + "] [...]";
   /** Command Help. */
-  String INSERT1 = "Insert database nodes.";
+  String INSERT1 = lang("ch_insert1");
   /** Command Help. */
-  String INSERT2 = "Insert a fragment or specific node at the specified" + NL +
-    "child [pos] (0=last child) of the given [target] query:" + NL + NL +
+  String INSERT2 = lang("ch_insert2") + NL + NL +
     "- " + Insert.ELEM + " [name] [pos] [target]: Insert [name]" + NL +
     "- " + Insert.TXT + " [text] [pos] [target]: Insert [text]" + NL +
     "- " + Insert.ATT + " [name] [value] [target]: Insert [name] and " +
@@ -319,9 +306,9 @@ public interface Text {
   String UPDATE0 = "[" + Insert.ELEM + "|" + Insert.ATT + "|" + Insert.TXT +
     "|" + Insert.COM + "|" + Insert.PI + "] [...]";
   /** Command Help. */
-  String UPDATE1 = "Update database nodes.";
+  String UPDATE1 = lang("ch_update1");
   /** Command Help. */
-  String UPDATE2 = "Update nodes satisfying the specified [target] query." +
+  String UPDATE2 = lang("ch_update2") +
     NL + NL +
     "- " + Insert.ELEM + " [name] [target]: Update with [name]" + NL +
     "- " + Insert.TXT + " [text] [target]: Update with [text]" + NL +
@@ -332,47 +319,45 @@ public interface Text {
     "Update with [name] and [value]";
 
   /** Command Help. */
-  String DUMMYGENERAL0 = "General Commands:";
+  String DUMMYGENERAL0 = lang("ch_dummygeneral0");
 
   /** Command Help. */
-  String SET0 = "[option] [val]?";
+  String SET0 = lang("ch_set0");
   /** Command Help. */
-  String SET1 = "Sets global options (current values: try 'info').";
+  String SET1 = lang("ch_set1");
   /** Command Help. */
-  String SET2 = "Available [option]s with [val=on|off]:" + NL + NL +
-    "- " + Set.INFO + " [all?]: Show (all) process info" + NL +
-    "- " + Set.DEBUG + ": Show debug info" + NL +
-    "- " + Set.SERIALIZE + ": Serialize query results" + NL +
-    "- " + Set.XMLOUTPUT + ": Serialize results as XML" + NL +
-    "- " + Set.MAINMEM + ": Use main memory mode" + NL +
-    "- " + Set.CHOP + ": Chop XML whitespaces" + NL +
-    "- " + Set.ENTITY + ": Parse XML entities" + NL +
-    "- " + Set.TXTINDEX + ": Index text nodes" + NL +
-    "- " + Set.ATTRINDEX + ": Index attributes" + NL +
-    "- " + Set.WORDINDEX + ": Index document words" + NL +
-    "- " + Set.FTINDEX + ": Index full text" + NL + NL +
-    "Additional options:" + NL + NL +
-    "- " + Set.DBPATH + " [path]: Set new database path" + NL +
-    "- " + Set.RUNS + " [nr]: Set number of query runs";
+  String SET2 = lang("ch_set2") + NL + NL +
+    "- " + Set.INFO + lang("ch_set21") + NL +
+    "- " + Set.DEBUG + lang("ch_set22") + NL +
+    "- " + Set.SERIALIZE + lang("ch_set23") + NL +
+    "- " + Set.XMLOUTPUT + lang("ch_set24") + NL +
+    "- " + Set.MAINMEM + lang("ch_set25") + NL +
+    "- " + Set.CHOP + lang("ch_set26") + NL +
+    "- " + Set.ENTITY + lang("ch_set27") + NL +
+    "- " + Set.TXTINDEX + lang("ch_set28") + NL +
+    "- " + Set.ATTRINDEX + lang("ch_set29") + NL +
+    "- " + Set.WORDINDEX + lang("ch_set30") + NL +
+    "- " + Set.FTINDEX + lang("ch_set31") + NL + NL +
+    lang("ch_set32") + NL + NL +
+    "- " + Set.DBPATH + lang("ch_set33") + NL +
+    "- " + Set.RUNS + lang("ch_set34");
 
   /** Command Help. */
   String HELP0 = "[command]?";
   /** Command Help. */
-  String HELP1 = "Get help on " + NAME + " commands.";
+  String HELP1 = lang("ch_help1") + NAME + lang("ch_help11");
   /** Command Help. */
-  String HELP2 = "If [command] is specified, information on the specific" + NL +
-    "command is printed; otherwise, all commands are listed." + NL +
-    "If 'all' is specified, hidden commands are included.";
+  String HELP2 = lang("ch_help2");
   /** Command Help. */
   String PING0 = "";
   /** Command Help. */
-  String PING1 = "Test database connectivity.";
+  String PING1 = lang("ch_ping1");
   /** Command Help. */
-  String PING2 = "If the connection works, an info string is returned.";
+  String PING2 = lang("ch_ping2");
   /** Command Help. */
-  String PROMPT1 = "Get prompt message.";
+  String PROMPT1 = lang("ch_prompt1");
   /** Command Help. */
-  String PROMPT2 = "Get prompt message, representing the current context node.";
+  String PROMPT2 = lang("ch_prompt2");
   /** Command Help. */
   String EXIT0 = "";
   /** Command Help. */
