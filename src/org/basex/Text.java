@@ -140,95 +140,93 @@ public interface Text {
    */
 
   /** Database separator. */
-  String DUMMYDATABASE0 = "Database Commands:";
+  String DUMMYDATABASE0 = lang("ch_dummydatabase0");
 
   /** Command help. */
   String CREATE0 = "[" + Create.XML + "|" + Create.FS + "|" + Create.INDEX +
     "] [...]";
   /** Command help. */
-  String CREATE1 = "Create database or index.";
+  String CREATE1 = lang("ch_create1");
   /** Command help. */
-  String CREATE2 = "Create database from XML or filesystem or create " +
-    "index:" + NL + NL +
-    "- " + Create.XML + " [file]: " + NL +
-    "  create database for the XML [file]" + NL +
-    "- " + Create.FS + " [database] [path]: " + NL +
-    "  create [database] for the file [path]" + NL +
+  String CREATE2 = lang("ch_create2") +
+     NL + NL +
+    "- " + Create.XML + lang("ch_file") + NL +
+    lang("ch_create3") + NL +
+    "- " + Create.FS + lang("ch_create4") + NL +
+    lang("ch_create5") + NL +
     "- " + Create.INDEX + " [" + Create.TXT + "|" + Create.ATV +
     "|" + Create.WRD + "|" + Create.FTX + "]: " + NL +
-    "  create the specified index";
+    lang("ch_create6");
   /** Command help. */
-  String OPEN0 = "[database]";
+  String OPEN0 = lang("ch_open0");
   /** Command help. */
-  String OPEN1 = "Open [database].";
+  String OPEN1 = lang("ch_open1");
   /** Command help. */
-  String OPEN2 = "Open the specified [database].";
+  String OPEN2 = lang("ch_open2");
   /** Command help. */
   String INFO0 = "[" + Info.DB + "|" + Info.IDX + "|" + Info.TBL + "]?";
   /** Command help. */
-  String INFO1 = "Show information on current database.";
+  String INFO1 = lang("ch_info1");
   /** Command help. */
-  String INFO2 = "Show information on the currently opened structure:" + NL +
-    "- no argument: show global information" + NL +
-    "- " + Info.DB + ": show database information" + NL +
-    "- " + Info.IDX + ": show index information" + NL +
-    "- " + Info.TBL + " [start end]|[query]: show XML table";
+  String INFO2 = lang("ch_info21") + NL +
+    lang("ch_info22") + NL +
+    "- " + Info.DB + lang("ch_info23") + NL +
+    "- " + Info.IDX + lang("ch_info24") + NL +
+    "- " + Info.TBL + lang("ch_info25");
   /** Command help. */
-  String CHECK0 = "[database]";
+  String CHECK0 = lang("ch_check0");
   /** Command help. */
-  String CHECK1 = "Open [database] if it exists, or create new database.";
+  String CHECK1 = lang("ch_check1");
   /** Command help. */
-  String CHECK2 = "Check if the specified [database] is in memory. " + NL +
-    "If not, the database file is opened. If there is no such database," + NL +
-    "the argument is interpreted as a filename, and a new" + NL +
-    "database is created.";
+  String CHECK2 = lang("ch_check2");
   /** Command help. */
   String CLOSE0 = "";
   /** Command help. */
-  String CLOSE1 = "Close current database.";
+  String CLOSE1 = lang("ch_close1");
   /** Command help. */
-  String CLOSE2 = "Close the current database and reset main memory.";
+  String CLOSE2 = lang("ch_close2");
   /** Command help. */
   String LIST0 = "";
   /** Command help. */
-  String LIST1 = "List available databases.";
+  String LIST1 = lang("ch_list1");
   /** Command help. */
-  String LIST2 = "List all available databases.";
+  String LIST2 = lang("ch_list2");
   /** Command help. */
   String DROP0 = "[" + Drop.DB + "|" + Drop.INDEX + "] [...]";
   /** Command help. */
-  String DROP1 = "Drop database or index.";
+  String DROP1 = lang("ch_drop1");
   /** Command help. */
-  String DROP2 = "The following arguments can be specified:" + NL +
-    "- " + Drop.DB + " [name]: " + NL + "  drop the database [name]" + NL +
+  String DROP2 = lang("ch_drop2") + NL +
+    "- " + Drop.DB + lang("ch_drop21") + NL +
+    lang("ch_drop22") + NL +
     "- " + Create.INDEX + " [" + Create.TXT + "|" + Create.ATV + "|" +
-    Create.WRD + "|" + Create.FTX + "]:" + NL + "  drop the specified index";
+    Create.WRD + "|" + Create.FTX + "]:" + NL + lang("ch_drop23");
   /** Command help. */
   String OPTIMIZE0 = "";
   /** Command help. */
-  String OPTIMIZE1 = "Optimize the database.";
+  String OPTIMIZE1 = lang("ch_optimize1");
   /** Command help. */
-  String OPTIMIZE2 = "Optimize the current database structures.";
+  String OPTIMIZE2 = lang("ch_optimize2");
   /** Command help. */
-  String EXPORT0 = "[file]";
+  String EXPORT0 = lang("ch_export0");
   /** Command help. */
-  String EXPORT1 = "Export database as XML.";
+  String EXPORT1 = lang("ch_export1");
   /** Command help. */
-  String EXPORT2 = "Export the current context set to an XML [file].";
+  String EXPORT2 = lang("ch_export2");
 
   /** Command help. */
-  String DUMMYQUERY0 = "Query Commands:";
+  String DUMMYQUERY0 = lang("ch_dummyquery0");
 
   /** Command help. */
-  String XPATH0 = "[query]";
+  String XPATH0 = lang("ch_xpath0");
   /** Command help. */
-  String XPATH1 = "Evaluate XPath query.";
+  String XPATH1 = lang("ch_xpath1");
   /** Command help. */
-  String XPATH2 = "Evaluate the specified XPath [query] and print the result.";
+  String XPATH2 = lang("ch_xpath2");
   /** Command help. */
-  String XPATHMV0 = "[hits] [subhits] [\"query\"]";
+  String XPATHMV0 = lang("ch_xpathmv0");
   /** Command help. */
-  String XPATHMV1 = "Evaluate MedioVis query.";
+  String XPATHMV1 = lang("ch_xpathmv1");
   /** Command help. */
   String XPATHMV2 = "Evaluate the specified XPath [query] and limit the " + NL +
     "number of top elements to [hits] and the number of " + NL +
