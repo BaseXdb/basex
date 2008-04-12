@@ -1055,117 +1055,117 @@ public interface Text {
   // UPDATE COMMANDS ==========================================================
 
   /** Insert query info. */
-  String QUERYNODESERR = "Query must yield a nodeset.";
+  String QUERYNODESERR = lang("uc_querynodeserr");
 
   /** Deletion info. */
-  String DELETEINFO = "% node(s) deleted in %.";
+  String DELETEINFO = lang("uc_deletinfo");
   /** Deletion error. */
-  String DELETEROOT = "Cannot delete document node.";
+  String DELETEROOT = lang("uc_deleteroot");
   /** Insert query info. */
-  String COPYROOT = "Cannot insert after root node.";
+  String COPYROOT = lang("uc_copyroot");
 
   /** Copy query info. */
-  String COPYINFO = "% node(s) copied in %.";
+  String COPYINFO = lang("uc_copyinfo");
   /** Insert query info. */
-  String INSERTINFO = "% node(s) inserted in %.";
+  String INSERTINFO = lang("uc_insertinfo");
   /** Update query info. */
-  String UPDATEINFO = "% node(s) updated in %.";
+  String UPDATEINFO = lang("uc_updateinfo");
   /** Update node info. */
-  String UPDATENODE = "Node to be updated must be a %.";
+  String UPDATENODE = lang("uc_updatenode");
   /** Update element info. */
-  String UPDATEELEM = "Node to be updated must be an element.";
+  String UPDATEELEM = lang("uc_updateelem");
   /** Update attribute info. */
-  String UPDATEATTR = "Node to be updated must be an attribute.";
+  String UPDATEATTR = lang("uc_updateattr");
   /** Insert query info. */
-  String COPYTAGS = "Target nodes must be elements.";
+  String COPYTAGS = lang("uc_copytags");
   /** Insert query info. */
-  String INSERTTEXT = "Cannot insert text node after/before another text node.";
+  String INSERTTEXT = lang("uc_inserttext");
   /** Update element info. */
-  String TAGINVALID = "\"%\" is not a valid tag name.";
+  String TAGINVALID = lang("uc_taginvalid");
   /** Update element info. */
-  String ATTINVALID = "\"%\" is not a valid attribute name.";
+  String ATTINVALID = lang("uc_attinvalid");
   /** Duplicate attribute info. */
-  String ATTDUPL = "Attribute \"%\" is already defined.";
+  String ATTDUPL = lang("uc_attdupl");
   /** Invalid position. */
-  String POSINVALID = "Invalid position value \"%\".";
+  String POSINVALID = lang("uc_poinvalid");
   /** Update PI info. */
-  String PIINVALID = "PI name \"%\" is invalid.";
+  String PIINVALID = lang("uc_piinvalid");
   /** Update text info. */
-  String TXTINVALID = "Text nodes cannot be empty.";
+  String TXTINVALID = lang("uc_txtinvalid");
 
   // INFO STRINGS =============================================================
 
   /** Info on source document. */
-  String INFODBNAME = "Database Name: ";
+  String INFODBNAME = lang("info_dbname");
   /** Info on document size. */
-  String INFODOCSIZE = "XML Doc.Size : ";
+  String INFODOCSIZE = lang("info_docsize");
   /** Info on database size. */
-  String INFODBSIZE = "Database Size: ";
+  String INFODBSIZE = lang("info_dbsize");
   /** Info on source document. */
-  String INFODOC = "Source Path  : ";
+  String INFODOC = lang("info_doc");
   /** Info on document path. */
-  String INFOPATH = "Path: ";
+  String INFOPATH = lang("info_path");
   /** Info on database time stamp. */
-  String INFOTIME = "Time Stamp   : ";
+  String INFOTIME = lang("info_time");
   /** Info on used main memory. */
-  String INFOMEM = "Used Main Memory: ";
+  String INFOMEM = lang("info_mem");
   /** Info on database table size. */
-  String INFONODES = "Table Nodes  : ";
+  String INFONODES = lang("info_nodes");
   /** Maximum tree height. */
-  String INFOHEIGHT = "Tree Height  : ";
+  String INFOHEIGHT = lang("info_height");
   /** Document encoding. */
-  String INFOENCODING = "Encoding     : ";
+  String INFOENCODING = lang("info_encoding");
   /** Info on execution times. */
-  String INFORUNS = "Number of runs";
+  String INFORUNS = lang("info_runs");
 
   /** Info on database path. */
-  String INFODBPATH = "Database Path: ";
+  String INFODBPATH = lang("info_dbpath");
   /** Info on database. */
-  String INFONODB = "No database found.";
+  String INFONODB = lang("info_nodb");
   /** Info on database. */
-  String INFODBLIST = " Databases found.";
+  String INFODBLIST = lang("info_dblist");
   /** Info on database. */
-  String INFODBERR = "could not be opened.";
+  String INFODBERR = lang("info_dberr");
 
   /** Info on database path. */
-  String INFONEWPATH = "New Database Path: ";
+  String INFONEWPATH = lang("info_newpath");
   /** Info on database path. */
-  String INFOPATHERR = "Database Path not found: ";
+  String INFOPATHERR = lang("info_patherr");
   /** Info on Query Verbosity. */
-  String INFOINFO = "Process Info ";
+  String INFOINFO = lang("info_info");
   /** Info on Query Verbosity. */
-  String INFOALL = "(All) ";
+  String INFOALL = lang("info_all");
   /** Info on Debug Mode. */
-  String INFODEBUG = "Debug Mode ";
+  String INFODEBUG = lang("info_debug");
   /** Info on Whitespace Chopping. */
-  String INFOCHOP = "Whitespace Chopping ";
+  String INFOCHOP = lang("info_chop");
   /** Info on Entity Parsing. */
-  String INFOENTITIES = "Entity Parsing ";
+  String INFOENTITIES = lang("info_entities");
   /** Info on result serialization. */
-  String INFOSERIALIZE = "Serialize ";
+  String INFOSERIALIZE = lang("info_serialize");
   /** Info on well formed XML serialization. */
-  String INFOXMLOUTPUT = "XML Output ";
+  String INFOXMLOUTPUT = lang("info_xmloutput");
   /** Info on Main Memory mode. */
-  String INFOMAINMEM = "Main Memory Mode ";
+  String INFOMAINMEM = lang("info_mainmem");
   /** Info on Text Indexing. */
-  String INFOTXTINDEX = "Text Indexing ";
+  String INFOTXTINDEX = lang("info_txtindex");
   /** Info on Attribute Indexing. */
-  String INFOATVINDEX = "Attribute Indexing ";
+  String INFOATVINDEX = lang("info_atvindex");
   /** Info on Word Indexing. */
-  String INFOWORDINDEX = "Word Indexing ";
+  String INFOWORDINDEX = lang("info_wordindex");
   /** Info on Fulltext Indexing. */
-  String INFOFTINDEX = "Fulltext Indexing ";
+  String INFOFTINDEX = lang("info_ftindex");
 
   /** Info on Document Creation. */
-  String INFODB = "Database Information:";
+  String INFODB = lang("info_db");
   /** Info on Document Creation. */
-  String INFOCREATE = "Document Creation:";
+  String INFOCREATE = lang("info_create");
   /** Info on Index Creation. */
-  String INFOINDEXES = "Indexing:";
+  String INFOINDEXES = lang("info_indexes");
   /** Database Info. */
-  String INFOGENERAL = "General Information:";
+  String INFOGENERAL = lang("info_general");
   /** Database Info. */
-  String RESULTCHOP = "\n...output was chopped.";
+  String RESULTCHOP = lang("info_resultchop");
   
   // HELP TEXTS ===============================================================
 
@@ -1174,265 +1174,113 @@ public interface Text {
   /** Help String. */
   byte[] HELPQUERYRT = token(lang("h_queryrt"));
   /** Help String. */
-  byte[] HELPTOXQUERY =
-    token("The current XPath query is copied to the XQuery search panel.");
+  byte[] HELPTOXQUERY = token(lang("h_toxquery"));
   /** Help String. */
-  byte[] HELPTOXPATH =
-    token("By modifying the search widgets, XPath queries are internally " +
-        "built and executed. You can display and change the current query " +
-        "by pressing this button.");
+  byte[] HELPTOXPATH = token(lang("h_toxpath"));
   /** Help String. */
-  byte[] HELPEXEC =
-    token("The entered commands will be executed by pressing this button.");
+  byte[] HELPEXEC = token(lang("h_exec"));
   /** Help String. */
-  byte[] HELPSTOP =
-    token("Press this button to stop the database build process.");
+  byte[] HELPSTOP = token(lang("h_stop"));
   /** Help String. */
-  byte[] HELPCANCEL = token("Press this button to close the dialog and " +
-      "return to the main window.");
+  byte[] HELPCANCEL = token(lang("h_cancel"));
   /** Help String. */
-  byte[] HELPMODE = token("Click on the button to switch between the " +
-      "search, XPath and command mode.\nThis button is only active if a " +
-      "database has been opened.");
+  byte[] HELPMODE = token(lang("h_mode"));
   /** Help String. */
-  byte[] HELPOK =
-    token("Press this button to start the process.");
+  byte[] HELPOK = token(lang("h_ok"));
   /** Help String. */
-  byte[] HELPRENAMEDB =
-    token("Press this button to rename the chosen database.");
+  byte[] HELPRENAMEDB = token(lang("h_renamedb"));
   /** Help String. */
-  byte[] HELPOPENDB =
-    token("Press this button to open the chosen database.");
+  byte[] HELPOPENDB = token(lang("h_opendb"));
   /** Help string. */
-  byte[] HELPOPENINFO = token("This panel displays some information on " +
-      "the currently selected database.");
+  byte[] HELPOPENINFO = token(lang("h_openinfo"));
   /** Help String. */
-  byte[] HELPFALIAS =
-    token("All texts can be anti-aliased by choosing this checkbox.");
+  byte[] HELPFALIAS = token(lang("h_falias"));
   /** Help String. */
-  byte[] HELPBROWSE =
-    token("You can use the file chooser to choose a directory.");
+  byte[] HELPBROWSE = token(lang("h_browse"));
   /** Help String. */
-  byte[] HELPFSPATH =
-    token("Use this text field to enter or modify the directory to be parsed.");
+  byte[] HELPFSPATH = token(lang("h_fspath"));
   /** Help String. */
-  byte[] HELPDBPATH =
-    token("Here you can modify the current database path.");
+  byte[] HELPDBPATH = token(lang("h_dbpath"));
   /** Help String. */
-  byte[] HELPLANG =
-    token("Here you can switch to another language. Note that BaseX must " +
-        "be restarted to activate the chosen language.");
+  byte[] HELPLANG = token(lang("h_lang"));
   /** Help String. */
-  byte[] HELPNAMES =
-    token("This option checks if tags contain a 'name' attribute. " +
-      "If the attribute exists, the value of the attribute is " +
-      "shown instead of the tag. You can't change this option " +
-      "if the current database has no 'name' attributes");
+  byte[] HELPNAMES = token(lang("h_names"));
   /** Help String. */
-  byte[] HELPFSNAME =
-    token("Enter the name of the new database in this text field.");
+  byte[] HELPFSNAME = token(lang("h_fsname"));
   /** Help String. */
-  byte[] HELPFSALL =
-    token("If this checkbox is chosen, the whole file system will be parsed.");
+  byte[] HELPFSALL = token(lang("h_fsall"));
   /** Help String. */
-  byte[] HELPMETA =
-    token("By choosing this checkbox, meta-data will be extracted from " +
-      "numerous file types. Meta-data includes e.g. the dimensions of " +
-      "images, ID3 tags of MP3 files or contents of email files.");
+  byte[] HELPMETA = token(lang("h_meta"));
   /** Help String. */
-  byte[] HELPSTAT =
-    token("If this checkbox is chosen, 'stat' information will be extracted " +
-      "from files and directories. This includes e.g. the owner rights, " +
-      "time stamps or the unique node IDs of files and directories.");
+  byte[] HELPSTAT = token(lang("h_stat"));
   /** Help String. */
-  byte[] HELPCONT =
-    token("The textual contents of files can be included in the database by " +
-      "choosing this checkbox. If the contents are included, they can " +
-      "be searched via XPath or XQuery.");
+  byte[] HELPCONT = token(lang("h_cont"));
   /** Help String. */
-  byte[] HELPFSMAX =
-    token("Here you can choose a size limit for the included text files.");
+  byte[] HELPFSMAX = token(lang("h_fsmax"));
   /** Help String. */
-  byte[] HELPMAPSIMPLE =
-    token("If this checkbox is turned on, a simpler algorithm will be " +
-      "used to calculate the TreeMap.");
+  byte[] HELPMAPSIMPLE = token(lang("h_mapsimple"));
   /** Help String. */
-  byte[] HELPMAPATTS =
-    token("If this checkbox is turned on, attributes are shown inside " +
-        "the TreeMap.");
+  byte[] HELPMAPATTS = token(lang("h_mapatts"));
   /** Help String. */
-  byte[] HELPMAPLAYOUT =
-    token("Here you can modify the layout algorithm which is used in the " +
-      "Map visualization. The changes can be immediately seen if a " +
-      "database is opened.");
+  byte[] HELPMAPLAYOUT = token(lang("h_maplayout"));
   /** Help String. */
-  byte[] HELPMAPALIGN =
-    token("Here you can modify the alignment of the rectangles in the " +
-      "Map visualization. The changes can be immediately seen if a " +
-      "database is opened.");
+  byte[] HELPMAPALIGN = token(lang("h_mapalign"));
   /** Help String. */
-  byte[] HELPDROP = token("Choose the button to drop the currently " +
-      "chosen database");
+  byte[] HELPDROP = token(lang("h_drop"));
   /** Help String. */
-  byte[] HELPDROPDB = token("Choose the database you want to drop.");
+  byte[] HELPDROPDB = token(lang("h_dropdb"));
   /** Help String. */
-  byte[] HELPFOCUS =
-    token("If this checkbox is chosen, input components are focused " +
-      "as soon as the cursor is moved over them.");
+  byte[] HELPFOCUS = token(lang("h_focus"));
   /** Help String. */
-  byte[] HELPSIMPLEFD =
-    token("If you have troubles using the default file chooser, you can " +
-      "switch to a simple, but faster one.");
+  byte[] HELPSIMPLEFD = token(lang("h_simplefd"));
   /** Help String. */
-  byte[] HELPOPEN = token("Choose the database you want to open.");
+  byte[] HELPOPEN = token(lang("h_open"));
   /** Help String. */
-  byte[] HELPFONT =
-    token("Here you can choose the fonts which are used in the views.");
+  byte[] HELPFONT = token(lang("h_font"));
   /** Help string. */
-  byte[] HELPMMEM = token("In main-memory mode, queries will be executed " +
-      "50-80% faster. As a drawback, main-memory consumption increases, " +
-      "and updates on the database are disabled.");
+  byte[] HELPMMEM = token(lang("h_mmem"));
   /** Help string. */
-  byte[] HELPCOLORS = token("Move the sliders to change the colors of " +
-      "the visual interface.");
+  byte[] HELPCOLORS = token(lang("h_colors"));
   /** Help Dialog. */
-  byte[] HELPCMD = token("Here you can enter BaseX commands. " +
-    "Try 'help' to get a survey on all available commands.\n\n" +
-    "You can retrieve previous inputs with the cursor keys UP and DOWN.");
+  byte[] HELPCMD = token(lang("h_cmd"));
   /** Help Dialog. */
-  byte[] HELPSEARCHXML = token("Just type something in the text field to " +
-    "search in your XML document. The following syntax is supported:\n\n" +
-    "...     Find tags and texts\n" +
-    "=...    Find exact text nodes\n" +
-    "@ ...   Find attributes and attribute values\n" +
-    "@=      Find exact attribute values\n" +
-    "/...    Evaluate input as XPath\n\n" +
-    "You can enter BaseX commands by preceding your input with an " +
-    "exclamation mark.");
+  byte[] HELPSEARCHXML = token(lang("h_searchxml"));
   /** Help Dialog. */
-  byte[] HELPSEARCHFS = token("Just type something in the text field to " +
-    "search in your filesystem. The following syntax is supported:\n\n" +
-    "...      Find any files or directories\n" +
-    "= ...    Find exact names\n" +
-    "~ ...    Find approximate names\n" +
-    ". ..     Find file extensions\n" +
-    "< ...    Find files smaller than the specified size\n" +
-    "> ...    Find files larger than the specified size\n" +
-    "...=...  Find metadata (e.g. 'Album=Beatles')\n\n" +
-    "You can enter BaseX commands by preceding your input with an " +
-    "exclamation mark.");
+  byte[] HELPSEARCHFS = token(lang("h_searchfs"));
   /** Help Dialog. */
-  byte[] HELPXPATH = token(
-      "The XPath mode allows the input of simple XPath requests. " +
-      "XPath is often processed faster than XQuery. " +
-      "The XPath language is based on a tree representation " +
-      "of the XML document, and provides the ability to navigate " +
-      "around the tree, selecting nodes by a variety of criteria.");
+  byte[] HELPXPATH = token(lang("h_xpath"));
   /** Help String. */
-  String HELPHIST = "\n\nThe text area offers a history function: " +
-    "You can store the current input with Ctrl+ENTER and retrieve " +
-    "previous inputs with Ctrl+UP/DOWN.";
+  String HELPMODEFILT = lang("h_modefilt");
   /** Help String. */
-  String HELPMODEFILT = "If real-time filtering is deactivated, press " +
-    "Ctrl+ENTER to filter the query results.";
-
+  byte[] HELPMAP = token(lang("h_map"));
   /** Help String. */
-  byte[] HELPMAP =
-    token("This visualization is called TreeMap. All nodes of the XML " +
-        "document are represented as rectangles, filling the complete " +
-        "area. Nodes can be highlighted by single clicks and filtered " +
-        "by double clicks. A popup menu will be shown by right-clicking " +
-        "on an element");
+  byte[] HELPTREE = token(lang("h_tree"));
   /** Help String. */
-  byte[] HELPTREE =
-    token("This visualization displays all XML nodes in a usual tree view. " +
-        "Nodes can be expanded or closed by clicks on the arrows. " +
-        "Although they can be highlighted by single clicks and zoomed in " +
-        "by double clicks. This is an efficient way to explore the " +
-        "XML document. A popup menu will be shown by right-clicking " +
-        "on an element.");
+  byte[] HELPTABLE = token(lang("h_table"));
   /** Help String. */
-  byte[] HELPTABLE =
-    token("This visualization displays XML nodes in a table. " +
-        "If you click on a text, all nodes with the same text are " +
-        "highlighted. By double-clicking on a text, the query results " +
-        "are filtered. A popup menu will be shown by right-clicking on an " +
-        "element\n\n" +
-        "Note that many XML documents are pretty hierarchic, so this view " +
-        "works only for highly regular documents.");
+  byte[] HELPTEXT = token(lang("h_text"));
   /** Help String. */
-  byte[] HELPTEXT =
-    token("This panel displays query results and other textual output.\n" +
-        "\nKey Shortcuts: " +
-        "Press '-' and '+' to change the font size of all panels. " +
-        "Type in any text into the find popup to launch an incremental " +
-        "search for it. It's an easy way to find special text points.");
+  byte[] HELPINFO = token(lang("h_info"));
   /** Help String. */
-  byte[] HELPINFO =
-    token("This panel displays information on the compilation and " +
-        "evaluation of an XPath or XQuery request, including some " +
-        "simple profiling");
-
-  /** Help String. */
-  byte[][] HELPSEARCH = {
-      token("The XQuery input mode offers the full range of query " +
-         "features that is offered by the XQuery language. " +
-         "XQuery uses XPath expression syntax to address specific " +
-         "parts of an XML document. It supplements this with a SQL-like " +
-         "FLWOR expression for performing joins. A FLWOR expression is " +
-         "constructed from the five clauses after which it is named: " +
-         "FOR, LET, WHERE, ORDER BY, RETURN."),
-      token("The simple search mode allows simple queries in the " +
-        "XML document.")
+  byte[][] HELPSEARCH = { token(lang("h_search1")),
+      token(lang("h_search2"))
   };
   /** Help String. */
-  byte[] HELPQUERYMODE =
-    token("In this text area, you can enter any XQuery 1.0 query. " +
-        "The input is evaluated after each key click.\n\n" +
-        "The following example would show all book titles " +
-        " with the topic 'BaseX':\n\n" +
-        "  for $a IN //book\n" +
-        "  where $a/topic = \"BaseX\"\n" +
-        "  return $a/title" + HELPHIST);
+  byte[] HELPQUERYMODE = token(lang("h_querymode"));
   /** Help String. */
-  byte[] HELPSEARCHCAT =
-    token("In this combo box, all tags and attribute names of the current " +
-        "XML document are listed. If an entry is chosen, the " +
-        "query results are marked in the visualizations. If the chosen entry " +
-        "contains textual values, an additional widget pops up, which " +
-        "allows a further specification of the query.");
+  byte[] HELPSEARCHCAT = token(lang("h_searchcat"));
   /** Help String. */
-  byte[] HELPCAT =
-    token("This combo box lists all values of the current category. If you " +
-        "choose one of the values, the query is further refined.");
+  byte[] HELPCAT = token(lang("h_cat"));
   /** Help String. */
-  byte[] HELPDS =
-    token("Drag the left and right arrow of this double slider to restrict " +
-        "the values of the current query category. If you have changed " +
-        "the range, you can also click inside the slider to move it " +
-        "left and right.");
+  byte[] HELPDS = token(lang("h_ds"));
   /** Help String. */
-  byte[] HELPCATINPUT =
-    token("Here you can further limit your query by entering substrings. " +
-        "To find exact matches and speedup search, you can enclose your " +
-        "input with quotes (\"...\").");
+  byte[] HELPCATINPUT = token(lang("h_catinput"));
   /** Help String. */
-  byte[] HELPMOVER =
-    token("You can change the position of a view by dragging the bar on " +
-        "top of all view panels to any other place inside the main window.\n" +
-        "If you move a view outside the main window, it will be closed.");
+  byte[] HELPMOVER = token(lang("h_mover"));
   /** Help String. */
-  byte[] HELPTABLEHEAD =
-    token("You can sort the table by  on the corresponding " +
-        "column in the table header. Moreover, you can directly query " +
-        "inside the table by entering something into the text fields.");
+  byte[] HELPTABLEHEAD = token(lang("h_tablehead"));
   /** Help String. */
-  byte[] HELPMEM =
-    token("This box displays the reserved memory of BaseX. " +
-        "By clicking on the box, you can enforce garbage collection.\n\n" +
-        "The display turns red if free memory is low. If this happens " +
-        "regularly, just launch BaseX with the Java flag -Xmx... " +
-        "('java -X' gives you more information).");
+  byte[] HELPMEM = token(lang("h_mem"));
 
   /** Dummy string to check if all language strings have been assigned. */
   String CHECK = lang(null);
