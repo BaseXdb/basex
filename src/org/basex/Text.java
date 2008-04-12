@@ -1058,7 +1058,7 @@ public interface Text {
   String QUERYNODESERR = lang("uc_querynodeserr");
 
   /** Deletion info. */
-  String DELETEINFO = lang("uc_deletinfo");
+  String DELETEINFO = lang("uc_deleteinfo");
   /** Deletion error. */
   String DELETEROOT = lang("uc_deleteroot");
   /** Insert query info. */
@@ -1087,7 +1087,7 @@ public interface Text {
   /** Duplicate attribute info. */
   String ATTDUPL = lang("uc_attdupl");
   /** Invalid position. */
-  String POSINVALID = lang("uc_poinvalid");
+  String POSINVALID = lang("uc_posinvalid");
   /** Update PI info. */
   String PIINVALID = lang("uc_piinvalid");
   /** Update text info. */
@@ -1125,7 +1125,7 @@ public interface Text {
   /** Info on database. */
   String INFODBLIST = lang("info_dblist");
   /** Info on database. */
-  String INFODBERR = lang("info_dberr");
+  String INFODBERR = lang("info_dberror");
 
   /** Info on database path. */
   String INFONEWPATH = lang("info_newpath");
