@@ -4,7 +4,6 @@ import org.basex.core.Commands;
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.proc.Proc;
-import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.query.QueryException;
@@ -40,10 +39,6 @@ public final class ASTTest {
       System.out.println(proc.info());
       return;
     }
-
-    final Data data = CONTEXT.data();
-    System.out.println("Read " + data.size + " nodes (tree height "
-        + data.meta.height + ')');
   }
 
   /**

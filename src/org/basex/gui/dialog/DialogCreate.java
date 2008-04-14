@@ -3,6 +3,7 @@ package org.basex.gui.dialog;
 import static org.basex.Text.*;
 import java.awt.BorderLayout;
 import javax.swing.JFrame;
+import javax.swing.JTabbedPane;
 import org.basex.core.Prop;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXCheckBox;
@@ -18,6 +19,8 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class DialogCreate extends Dialog {
+  /** Internal XML parsing. */
+  private BaseXCheckBox intparse;
   /** Whitespace chopping. */
   private BaseXCheckBox chop;
   /** Entities mode. */
@@ -40,48 +43,62 @@ public final class DialogCreate extends Dialog {
   public DialogCreate(final JFrame parent) {
     super(parent, CREATEADVTITLE);
 
-    final BaseXLabel label = new BaseXLabel(CREATEADVLABEL, true);
-    set(label, BorderLayout.NORTH);
-
     // create checkboxes
-    final BaseXBack p = new BaseXBack();
-    p.setLayout(new TableLayout(14, 1, 0, 0));
+    final BaseXBack p1 = new BaseXBack();
+    p1.setBorder(8, 8, 8, 8);
+    p1.setLayout(new TableLayout(8, 1, 0, 0));
 
-    chop = new BaseXCheckBox(CREATECHOP, Token.token(CHOPPINGINFO),
-        Prop.chop, 0, this);
-    p.add(chop);
-    p.add(new BaseXLabel(CHOPPINGINFO, 10));
+    intparse = new BaseXCheckBox(CREATEINTPARSE, Token.token(INTPARSEINFO),
+        Prop.intparse, 0, this);
+    p1.add(intparse);
+    p1.add(new BaseXLabel(INTPARSEINFO, 8));
 
     entities = new BaseXCheckBox(CREATEENTITIES, Token.token(ENTITIESINFO),
         Prop.entity, 0, this);
-    p.add(entities);
-    p.add(new BaseXLabel(ENTITIESINFO, 10));
+    p1.add(entities);
+    p1.add(new BaseXLabel(ENTITIESINFO, 8));
+
+    chop = new BaseXCheckBox(CREATECHOP, Token.token(CHOPPINGINFO),
+        Prop.chop, 0, this);
+    p1.add(chop);
+    p1.add(new BaseXLabel(CHOPPINGINFO, 16));
+
+    mainmem = new BaseXCheckBox(CREATEMAINMEM, HELPMMEM, Prop.mainmem, 0, this);
+    p1.add(mainmem);
+    p1.add(new BaseXLabel(MMEMINFO, 8));
+
+
+    // create checkboxes
+    final BaseXBack p2 = new BaseXBack();
+    p2.setLayout(new TableLayout(8, 1, 0, 0));
+    p2.setBorder(8, 8, 8, 8);
 
     txtindex = new BaseXCheckBox(CREATETXTINDEX, Token.token(TXTINDEXINFO),
         Prop.textindex, 0, this);
-    p.add(txtindex);
-    p.add(new BaseXLabel(TXTINDEXINFO, 10));
+    p2.add(txtindex);
+    p2.add(new BaseXLabel(TXTINDEXINFO, 8));
 
     atvindex = new BaseXCheckBox(CREATEATTINDEX, Token.token(ATTINDEXINFO),
         Prop.attrindex, 0, this);
-    p.add(atvindex);
-    p.add(new BaseXLabel(ATTINDEXINFO, 10));
+    p2.add(atvindex);
+    p2.add(new BaseXLabel(ATTINDEXINFO, 8));
 
     wrdindex = new BaseXCheckBox(CREATEWORDINDEX, Token.token(WORDINDEXINFO),
         Prop.wordindex, 0, this);
-    p.add(wrdindex);
-    p.add(new BaseXLabel(WORDINDEXINFO, 10));
+    p2.add(wrdindex);
+    p2.add(new BaseXLabel(WORDINDEXINFO, 8));
 
     ftxindex = new BaseXCheckBox(CREATEFTINDEX, Token.token(FTINDEXINFO),
         Prop.ftindex, 0, this);
-    p.add(ftxindex);
-    p.add(new BaseXLabel(FTINDEXINFO, 20));
+    p2.add(ftxindex);
+    p2.add(new BaseXLabel(FTINDEXINFO, 8));
 
-    mainmem = new BaseXCheckBox(CREATEMAINMEM, HELPMMEM, Prop.mainmem, 0, this);
-    p.add(mainmem);
-    p.add(new BaseXLabel(MMEMINFO, 10));
+    final JTabbedPane tabs = new JTabbedPane();
+    BaseXLayout.addDefaultKeys(tabs, this);
+    tabs.addTab(GENERALINFO, p1);
+    tabs.addTab(INDEXINFO, p2);
 
-    set(p, BorderLayout.CENTER);
+    set(tabs, BorderLayout.CENTER);
 
     // create buttons
     set(BaseXLayout.okCancel(this), BorderLayout.SOUTH);
@@ -99,5 +116,6 @@ public final class DialogCreate extends Dialog {
     Prop.wordindex = wrdindex.isSelected();
     Prop.ftindex = ftxindex.isSelected();
     Prop.mainmem  = mainmem.isSelected();
+    Prop.intparse = intparse.isSelected();
   }
 }

@@ -378,8 +378,6 @@ public final class GUI extends JFrame {
       // run as command: command mode or exclamation mark as first character
       final int i = cmd ? 0 : 1;
       if(in.length() > i) execute(in.substring(i));
-    //} else if(e.isControlDown()) {
-    //  View.notifyContext(context.marked(), false);
     } else {
       execute(Commands.XPATH, GUIProp.searchmode == 1 ? in :
         Find.find(in, context, GUIProp.filterrt));
@@ -460,8 +458,12 @@ public final class GUI extends JFrame {
 
             // execute command
             final boolean ok = p.execute();
+            if(!ok && p.info().length() == 0) {
+              proc = null;
+              return;
+            }
+            
             if(cc.updating()) View.working = false;
-
             if(obsolete(thread)) return;
 
             Result result = p.result();

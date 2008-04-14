@@ -1,13 +1,8 @@
 package org.basex.data;
 
-import static org.basex.Text.ATTINDEX;
-import static org.basex.Text.TAGINDEX;
-import static org.basex.data.DataText.DATAATV;
-import static org.basex.data.DataText.DATATBL;
-import static org.basex.data.DataText.DATATXT;
-
+import static org.basex.Text.*;
+import static org.basex.data.DataText.*;
 import java.io.IOException;
-
 import org.basex.core.Prop;
 import org.basex.index.Index;
 import org.basex.index.Names;
@@ -60,11 +55,11 @@ import org.basex.util.Token;
  */
 public final class DiskData extends Data {
   /** Table access file. */
-  private TableAccess table;
+  private final TableAccess table;
   /** Texts access file. */
-  private DataAccess texts;
+  private final DataAccess texts;
   /** Values access file. */
-  private DataAccess values;
+  private final DataAccess values;
 
   /**
    * Default Constructor.
@@ -86,11 +81,11 @@ public final class DiskData extends Data {
     size = meta.read();
     stats = new Stats(db);
     stats.read();
-    
+
     // read indexes
     tags = new Names(db, true);
     atts = new Names(db, false);
-    
+
     // main memory mode.. keep table in memory
     table = Prop.mainmem ? new TableMemAccess(db, DATATBL, size) :
       new TableDiskAccess(db, DATATBL);
@@ -116,8 +111,8 @@ public final class DiskData extends Data {
 //      <LK> writing / refreshing stats after updates?
       tags.finish(meta.dbname);
       atts.finish(meta.dbname);
-      
-    } catch(IOException e) {
+
+    } catch(final IOException e) {
       e.printStackTrace();
     }
   }
@@ -125,8 +120,8 @@ public final class DiskData extends Data {
   @Override
   public synchronized void close() throws IOException {
     meta.write(size);
-    stats.write();  
-    
+    stats.write();
+
     tags.finish(meta.dbname);
     atts.finish(meta.dbname);
     cls();
@@ -230,12 +225,12 @@ public final class DiskData extends Data {
       return Token.substring(t, Math.min(t.length, off),
           Math.min(t.length, off + len));
     }
-    byte[] t = texts.readToken(off);
+    final byte[] t = texts.readToken(off);
     return Token.substring(t, Math.min(t.length, off),
         Math.min(t.length, off + len));
   }
 
-  
+
   @Override
   public byte[] attValue(final int pre) {
     return txt(pre, values);
@@ -346,24 +341,24 @@ public final class DiskData extends Data {
   public int[][] fuzzyIDs(final byte[] words, final int ne) {
     return ftxindex.fuzzyIDs(words, ne);
   }
-  
+
   @Override
    public int[][] ftIDs(final byte[] word, final FTOption ftO) {
      return ftxindex.idPos(word, ftO);
    }
-  
+
   @Override
-  public int[][] ftIDRange(final byte[] word1, final boolean itok0, 
+  public int[][] ftIDRange(final byte[] word1, final boolean itok0,
       final byte[] word2, final boolean itok1) {
     return ftxindex.idPosRange(word1, itok0, word2, itok1);
   }
-  
+
   @Override
   public int nrFTIDs(final byte[] token) {
      return ftxindex.nrIDs(token);
   }
 
-  
+
   @Override
   public void update(final int pre, final byte[] val) {
     if(kind(pre) == ELEM) {
@@ -378,7 +373,7 @@ public final class DiskData extends Data {
     update(pre, val, false);
     attNameID(pre, atts.index(name));
   }
-  
+
   /**
    * Updates the specified text or attribute value.
    * @param pre pre value
@@ -386,7 +381,7 @@ public final class DiskData extends Data {
    * @param txt text flag
    */
   private void update(final int pre, final byte[] val, final boolean txt) {
-    long v = Token.toSimpleInt(val);
+    final long v = Token.toSimpleInt(val);
     if(v != Integer.MIN_VALUE) {
       textOff(pre, v | 0x8000000000L);
     } else {
@@ -410,14 +405,16 @@ public final class DiskData extends Data {
 
   @Override
   public void delete(final int pre) {
+    int kind = kind(pre);
+
     // size of the subtree to delete
-    final int siz = size(pre, kind(pre));
+    final int siz = size(pre, kind);
 
     // reduce size of ancestors
     int par = pre;
 
     // check if we are an attribute (different size counters)
-    if(kind(pre) == ATTR) {
+    if(kind == ATTR) {
       par = parent(par, ATTR);
       attSize(par, ELEM, attSize(par, ELEM) - 1);
       size(par, ELEM, size(par, ELEM) - 1);
@@ -434,15 +431,10 @@ public final class DiskData extends Data {
     size -= siz;
 
     // correct parent values of following nodes
-    // we only need to do this once for every following subtree
     int p = pre;
     while(p < size) {
-      final int kind = kind(p);
-      if(kind == ATTR) {
-        dist(p, ATTR, dist(p, ATTR) - siz);
-      } else {
-        dist(p, ELEM, dist(p, ELEM) - siz);
-      }
+      kind = kind(p);
+      dist(p, kind, dist(p, kind) - siz);
       p += size(p, kind);
     }
   }
@@ -450,6 +442,7 @@ public final class DiskData extends Data {
   @Override
   public void insert(final int pre, final int par, final byte[] val,
       final byte kind) {
+
     if(kind == ELEM) {
       insertElem(pre - 1, pre - par, val, 1, 1);
     } else {
@@ -502,7 +495,7 @@ public final class DiskData extends Data {
   }
 
   /**
-   * Increase size of ancestors and parent references of following nodes.
+   * Updates the ancestor sizes and parent references of the following nodes.
    * @param pre root node
    * @param par parent node
    * @param s size to be added
@@ -524,7 +517,7 @@ public final class DiskData extends Data {
   }
 
   /**
-   * Insert tag name without updating the table.
+   * Inserts a tag name without updating the table.
    * @param pre insert position
    * @param dis parent distance
    * @param tag tag name index
@@ -611,7 +604,7 @@ public final class DiskData extends Data {
     if(kind == ATTR) table.write1(pre, 11, v);
     else table.write4(pre, 8, v);
   }
-  
+
   /**
    * Writes the tag ID.
    * @param pre pre value

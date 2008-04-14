@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import org.basex.util.Array;
 import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 
 /**
  * This is an output stream for project specific data types.
@@ -85,7 +86,19 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
-   * Finishes the file.
+   * Writes the specified token to the output stream.
+   * @param text text to be written
+   * @return length of written bytes
+   * @throws IOException in case of write errors
+   */
+  public int writeToken(final TokenBuilder text) throws IOException {
+    final int s = writeNum(text.size);
+    for(int i = 0; i < text.size; i++) write(text.chars[i]);
+    return s + text.size;
+  }
+
+  /**
+   * Writes the specified token to the output stream.
    * @param text text to be written
    * @return length of written bytes
    * @throws IOException in case of write errors

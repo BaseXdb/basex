@@ -21,6 +21,6 @@ public final class CachedInput extends BufferInput {
    */
   @Override
   public byte readByte() {
-    return pos < buffer.length ? buffer[pos++] : 0;
+    return pos < length ? buffer[pos++] : 0;
   }
 }

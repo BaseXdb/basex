@@ -101,13 +101,13 @@ public class DialogImportFS  extends Dialog {
     pp.add(p);
 
     BaseXLabel label = new BaseXLabel(IMPORTFSTEXT1, true);
-    label.setBorder(15, 0, 10, 0);
+    label.setBorder(15, 0, 8, 0);
     pp.add(label);
     meta = new BaseXCheckBox(IMPORTMETA, HELPMETA, Prop.fsmeta, this);
     pp.add(meta);
 
     label = new BaseXLabel(IMPORTFSTEXT2, true);
-    label.setBorder(15, 0, 10, 0);
+    label.setBorder(10, 0, 8, 0);
     pp.add(label);
 
     p = new BaseXBack();

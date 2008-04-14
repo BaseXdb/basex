@@ -76,6 +76,8 @@ public final class Prop {
   public static boolean dotresult = false;
   /** Format XQuery output. */
   public static boolean xqformat = true;
+  /** Use internal XML parser. */
+  public static boolean intparse = false;
   
   /** Number of query executions. */
   public static int runs = 1;

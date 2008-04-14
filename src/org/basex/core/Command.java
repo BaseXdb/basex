@@ -145,6 +145,6 @@ public final class Command {
 
   @Override
   public String toString() {
-    return name + args;
+    return name + " " + args;
   }
 }

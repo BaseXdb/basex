@@ -96,6 +96,8 @@ public final class Set extends Proc {
       Prop.xqerrcode = toggle(Prop.xqerrcode, option + " ", ext);
     } else if(option.equals("onthefly")) {
       Prop.onthefly = toggle(Prop.onthefly, option + " ", ext);
+    } else if(option.equals("intparse")) {
+      Prop.intparse = toggle(Prop.intparse, option + " ", ext);
     } else if(option.equals("language")) {
       Prop.language = ext;
       info(option + ": " + ext);
@@ -126,6 +128,6 @@ public final class Set extends Proc {
    * @return ON/OFF message
    */
   protected static String flag(final String feature, final boolean flag) {
-    return feature + (flag ? ON : OFF);
+    return feature + (flag ? INFOON : INFOOFF);
   }
 }

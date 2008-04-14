@@ -87,9 +87,11 @@ public abstract class Proc extends AbstractProcess {
       // should not happen...
       ex.printStackTrace();
       return error(PROCERR, cmd, ex);
-    } catch(final Error ex) {
+    } catch(final OutOfMemoryError ex) {
       // should not happen...
       Performance.gc(2);
+      return error(PROCOUTMEM, cmd, ex);
+    } catch(final Error ex) {
       ex.printStackTrace();
       return error(PROCERR, cmd, ex);
     }

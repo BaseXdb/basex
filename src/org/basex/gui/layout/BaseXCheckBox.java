@@ -1,9 +1,9 @@
 package org.basex.gui.layout;
 
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JCheckBox;
-import javax.swing.border.EmptyBorder;
 import org.basex.gui.dialog.Dialog;
 
 /**
@@ -47,8 +47,7 @@ public final class BaseXCheckBox extends JCheckBox {
       final int dist, final Dialog list) {
 
     super(label, sel);
-    setOpaque(false);
-    setBorder(new EmptyBorder(0, 0, dist, 0));
+    setMargin(new Insets(0, 0, dist, 0));
     BaseXLayout.addHelp(this, hlp);
     if(list == null) return;
 

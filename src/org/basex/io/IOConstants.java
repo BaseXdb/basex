@@ -57,8 +57,8 @@ public final class IOConstants {
   public static byte[] read(final String par, final String file)
       throws IOException {
 
-    if(file.startsWith("http://")) return read(new URL(file));
-    return read(new File(par).getParent() + "/" + file);
+    return file.startsWith("http://") ? read(new URL(file)) :
+      read(merge(par, file));
   }
   
   /**
@@ -70,6 +70,16 @@ public final class IOConstants {
   public static byte[] read(final String file) throws IOException {
     return file.startsWith("http://") ? read(new URL(file)) :
       read(new File(file));
+  }
+  
+  /**
+   * Merges two filenames.
+   * @param par parent file
+   * @param file name of the file
+   * @return contents
+   */
+  public static String merge(final String par, final String file) {
+    return new File(par).getParent() + "/" + file;
   }
   
   /**

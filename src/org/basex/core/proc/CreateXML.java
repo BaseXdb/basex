@@ -12,6 +12,6 @@ public final class CreateXML extends Proc {
   @Override
   protected boolean exec() {
     final String path = cmd.args().replace('\\', '/');
-    return exec(Commands.CREATE, Create.XML + " " + path);
+    return exec(Commands.CREATE, Create.XML + ' ' + path);
   }
 }

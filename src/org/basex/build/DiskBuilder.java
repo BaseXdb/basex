@@ -5,6 +5,7 @@ import static org.basex.io.IOConstants.BLOCKPOWER;
 import java.io.File;
 import java.io.IOException;
 import org.basex.BaseX;
+import org.basex.build.xml.SAXWrapper;
 import org.basex.build.xml.XMLParser;
 import org.basex.core.Prop;
 import org.basex.core.proc.Drop;
@@ -18,10 +19,12 @@ import org.basex.io.IOConstants;
 import org.basex.io.TableAccess;
 import org.basex.io.TableDiskAccess;
 import org.basex.io.TableOutput;
+import org.basex.util.Performance;
 import org.basex.util.Token;
 
 /**
- * This class creates a disk based database instance.
+ * This class creates a disk based database instance. The disk layout is
+ * described in the {@link DiskData} class.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
@@ -57,7 +60,7 @@ public final class DiskBuilder extends Builder {
     Drop.drop(db);
     IOConstants.dbpath(db).mkdirs();
 
-    // calculate output buffer sizes: (1 << 12) < bs < (1 << 22)
+    // calculate output buffer sizes: (1 << BLOCKPOWER) < bs < (1 << 22)
     int bs = 1 << BLOCKPOWER;
     while(bs < meta.filesize && bs < (1 << 22)) bs <<= 1;
 
@@ -75,6 +78,7 @@ public final class DiskBuilder extends Builder {
     atts.finish(meta.dbname);
     close();
     
+    // write size attribute into main table
     final TableAccess ta = new TableDiskAccess(meta.dbname, DATATBL);
     final DataInput in = new DataInput(meta.dbname, DATATMP);
     for(int pre = 0; pre < ssize; pre++) {
@@ -121,8 +125,8 @@ public final class DiskBuilder extends Builder {
 
     // attributes
     for(int a = 0; a < attl; a++) {
-      // inline integer values...
       final byte[] val = atr[(a << 1) + 1];
+      // inline integer value?
       long v = Token.toSimpleInt(val);
       if(v != Integer.MIN_VALUE) {
         v |= 0x8000000000L;
@@ -171,27 +175,55 @@ public final class DiskBuilder extends Builder {
   }
 
   /**
-   * Test method for the, building the database and storing the table to disk.
+   * Test method for building the database and storing the table to disk.
    * @param args files to be built
    */
   public static void main(final String[] args) {
     Prop.read();
-
+    
     // get filename(s) or use default
-    final String[] fn = args.length > 0 ? args : new String[] { "input.xml" };
+    //final String[] fn = args.length > 0 ? args : new String[] { "input.xml" };
+    final String[] fn = new String[] { "/home/dbis/xml/11mb.xml" };    
+    int runs = 2;
+    run(runs, fn, false);
+    run(runs, fn, true);
+    runs = 10;
+    run(runs, fn, false);
+    run(runs, fn, true);
+    run(runs, fn, false);
+    run(runs, fn, true);
+    runs = 30;
+    run(runs, fn, false);
+    run(runs, fn, true);
+    
+  }
+
+  /**
+   * Runs the test.
+   * @param r number of runs
+   * @param fn files
+   * @param s sax flag
+   */
+  public static void run(final int r, final String[] fn, final boolean s) {
     int c = 0;
     int w = 0;
-    for(final String f : fn) {
-      try {
-        new DiskBuilder().build(new XMLParser(f), "tmp");
-        c++;
-      } catch(final IOException e) {
-        w++;
+
+    Performance p = new Performance();
+    for(int i = 0; i < r; i++) {
+      for(final String f : fn) {
+        try {
+          Parser parser = s ? new SAXWrapper(f) : new XMLParser(f);
+          new DiskBuilder().build(parser, "tmp");
+          c++;
+        } catch(final IOException e) {
+          w++;
+        }
       }
     }
 
-    BaseX.outln("\n% documents built.", fn.length);
+    BaseX.outln((s ? "Xerces" : "BaseX") + " Parser, " + r + " runs.");
+    BaseX.outln("% documents built in %.", fn.length, p.getTimer(r));
     BaseX.outln("% documents accepted.", c);
-    BaseX.outln("% documents rejected.", w);
+    BaseX.outln("% documents rejected.\n", w);
   }
 }

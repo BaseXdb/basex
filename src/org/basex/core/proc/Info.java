@@ -67,11 +67,11 @@ public final class Info extends XPath {
    */
   private void general(final PrintOutput out) throws IOException {
     prop(out, INFOGENERAL, false);
-    prop(out, INFOMEM + Performance.getMem(), true);
     prop(out, INFODBPATH + Prop.dbpath, true);
+    prop(out, INFOMEM + Performance.getMem(), true);
     prop(out, Set.flag(INFOMAINMEM, Prop.mainmem), true);
-    prop(out, Set.flag(INFOINFO + (Prop.allInfo ? INFOALL : ""),
-        Prop.info), true);
+    prop(out, Set.flag(INFOINFO, Prop.info) +
+        (Prop.allInfo ? INFOALL : ""), true);
 
     prop(out, NL + INFOINDEXES, false);
     prop(out, Set.flag(INFOTXTINDEX, Prop.textindex), true);

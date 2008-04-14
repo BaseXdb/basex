@@ -3,7 +3,6 @@ package org.basex.build.xml;
 import static org.basex.build.BuildText.*;
 import static org.basex.Text.*;
 import java.io.IOException;
-import org.basex.BaseX;
 import org.basex.build.BuildException;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
@@ -26,10 +25,11 @@ public final class XMLParser extends Parser {
   /**
    * Constructor.
    * @param in input stream
+   * @throws IOException I/O Exception
    */
-  public XMLParser(final BufferInput in) {
+  public XMLParser(final BufferInput in) throws IOException {
     super("tmp");
-    scanner = new XMLScanner(in);
+    scanner = new XMLScanner(in, file);
   }
 
   /**
@@ -45,28 +45,24 @@ public final class XMLParser extends Parser {
   @Override
   public void parse(final Builder build) throws IOException {
     builder = build;
+    builder.encoding(scanner.encoding);
 
-    // start scanning
-    scanner.next();
     // loop until all tokens have been processed
-    while(scanner.more()) {
+    scanner.more();
+    while(true) {
       if(scanner.type == Type.TEXT) {
-        builder.text(scanner.token.finish(), scanner.chars);
-        scanner.next();
+        builder.text(scanner.token.finish(), scanner.ws);
+        if(!scanner.more()) break;
       } else if(scanner.type == Type.COMMENT) {
         builder.comment(scanner.token.finish());
-        scanner.next();
+        if(!scanner.more()) break;
       } else if(scanner.type == Type.DTD) {
-        new DTDParser(scanner, file, builder.tags, builder.atts, scanner.ents);
-        scanner.next();
+        if(!scanner.more()) break;
       } else if(scanner.type == Type.PI) {
         builder.pi(scanner.token.finish()); 
-        scanner.next();
-      } else if(scanner.type == Type.DECL) {
-        builder.encoding(scanner.encoding);
-        scanner.next();
+        if(!scanner.more()) break;
       } else {
-        parseTag();
+        if(!parseTag()) break;
       }
     }
     scanner.finish();
@@ -75,18 +71,19 @@ public final class XMLParser extends Parser {
   /**
    * Parses an XML tag.
    * @throws IOException in case of parse or write problems
+   * @return result of scanner step
    */
-  private void parseTag() throws IOException {
+  private boolean parseTag() throws IOException {
     // find opening tag
     if(scanner.type == Type.L_BR_CLOSE) {
-      scanner.next();
+      scanner.more();
       
       // get tag name
       final byte[] tag = consumeToken(Type.TAGNAME);
       skipSpace();
 
-      consume(Type.R_BR);
       builder.endNode(tag);
+      return consume(Type.R_BR);
     } else {
       consume(Type.L_BR);
 
@@ -108,7 +105,7 @@ public final class XMLParser extends Parser {
         byte[] attValue = Token.EMPTY;
         if(scanner.type == Type.ATTVALUE) {
           attValue = scanner.token.finish();
-          scanner.next();
+          scanner.more();
         }
         consume(Type.QUOTE);
 
@@ -126,11 +123,11 @@ public final class XMLParser extends Parser {
 
       // send start tag to the xml builder
       if(scanner.type == Type.CLOSE_R_BR) {
-        scanner.next();
         builder.emptyNode(tag, atts);
+        return scanner.more();
       } else {
-        consume(Type.R_BR);
         builder.startNode(tag, atts);
+        return consume(Type.R_BR);
       }
     }
   }
@@ -138,12 +135,13 @@ public final class XMLParser extends Parser {
   /**
    * Checks if the current token matches the specified type.
    * @param t token type to be checked
+   * @return result of scanner step
    * @throws BuildException build exception
    */
-  private void consume(final Type t) throws BuildException {
+  private boolean consume(final Type t) throws BuildException {
     if(scanner.type != t) throw new BuildException(PARSEINVALID, det(),
         t.string, scanner.type.string);
-    scanner.next();
+    return scanner.more();
   }
   
   /**
@@ -159,7 +157,7 @@ public final class XMLParser extends Parser {
           scanner.type.string);
     }
     final byte[] tok = scanner.token.finish();
-    scanner.next();
+    scanner.more();
     return tok;
   }
   
@@ -168,7 +166,7 @@ public final class XMLParser extends Parser {
    * @throws BuildException build exception
    */
   private void skipSpace() throws BuildException {
-    if(scanner.type == Type.WS) scanner.next();
+    if(scanner.type == Type.WS) scanner.more();
   }
 
   @Override
@@ -178,11 +176,11 @@ public final class XMLParser extends Parser {
 
   @Override
   public String det() {
-    return BaseX.info(SCANPOS, scanner.line, scanner.col);
+    return scanner.det();
   }
 
   @Override
   public double percent() {
-    return (double) scanner.input.size() / scanner.input.length();
+    return scanner.percent();
   }
 }

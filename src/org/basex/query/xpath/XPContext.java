@@ -83,7 +83,7 @@ public final class XPContext extends QueryContext {
    * @throws QueryException evaluation exception
    */
   public Item eval(final Expr e) throws QueryException {
-    if(stopped()) throw new QueryException("");
+    checkStop();
 
     final Item v = e.eval(this);
     if(!Prop.allInfo || cc >= MAXDUMP) return v;

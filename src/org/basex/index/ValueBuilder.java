@@ -66,7 +66,7 @@ public final class ValueBuilder extends Progress implements IndexBuilder {
     total = data.size;
     final int type = text ? Data.TEXT : Data.ATTR;
     for(id = 0; id < total; id++) {
-      if(stopped()) throw new IOException(CANCELCREATE);
+      checkStop();
       if(data.kind(id) != type) continue;
       index(text ? data.text(id) : data.attValue(id), id);
     }

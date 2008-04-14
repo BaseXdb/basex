@@ -19,12 +19,6 @@ public final class Close extends Proc {
     // no database in memory?
     if(context.data() == null) return Prop.info ? info(DBEMPTY) : true;
 
-//    for testing purposes ...
-    try {
-//      context.data().stats.write();
-    } catch(Exception e) {
-      e.printStackTrace();
-    }
     // close database
     return context.close() ? Prop.info ? info(DBCLOSED) : true :
       error(DBCLOSEERR);

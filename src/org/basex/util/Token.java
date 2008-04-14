@@ -48,11 +48,25 @@ public final class Token {
   public static final byte[] E_GT = token("gt");
   /** LessThan Entity. */
   public static final byte[] E_LT = token("lt");
+  /** Quote Entity. */
+  public static final byte[] QU = token("\"");
+  /** Ampersand Entity. */
+  public static final byte[] AMP = token("&");
+  /** Apostrophe Entity. */
+  public static final byte[] APOS = token("'");
+  /** GreaterThan Entity. */
+  public static final byte[] GT = token(">");
+  /** LessThan Entity. */
+  public static final byte[] LT = token("<");
 
   /** UTF8 encoding string. */
   public static final String UTF8 = "UTF8";
   /** UTF8 encoding string (variant). */
   public static final String UTF82 = "UTF-8";
+  /** UTF16 encoding string. */
+  public static final String UTF16LE = "UTF-16LE";
+  /** UTF16 encoding string. */
+  public static final String UTF16BE = "UTF-16BE";
 
   /** Hidden Constructor. */
   private Token() { }
@@ -377,9 +391,10 @@ public final class Token {
     final int tl = to.length;
     if(tl > 9) return toDouble(string(to));
     for(int i = 0; i < tl; i++) {
-      if(!digit(i) && to[i] > ' ') return toDouble(string(to));
+      if(!digit(to[i]) && to[i] > ' ') return toDouble(string(to));
     }
-    return toInt(to);
+    final int d = toInt(to);
+    return d == Integer.MIN_VALUE ? Double.NaN : d;
   }
 
   /**
@@ -966,7 +981,6 @@ public final class Token {
    */
   public static boolean ws(final byte ch) {
     return ch == 0x09 || ch == 0x0A || ch == 0x0D || ch == 0x20;
-    //return c >= 0 && c <= ' ';
   }
 
   /**

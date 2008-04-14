@@ -295,6 +295,8 @@ public enum Commands {
     } else if(args != null && (!hidden || detail || all)) {
       sb.append(name().toLowerCase() + " " + args + NL + "  " + help(1) + NL);
       if(detail) sb.append(NL + help(2) + NL);
+    } else {
+      if(detail) sb.append(NOHELP + NL);
     }
     return sb.toString();
   }
@@ -330,7 +332,7 @@ public enum Commands {
   }
 
   /**
-   * Returns the an enum reference to the specified command or an
+   * Returns the a reference to the specified command or an
    * error if the command was not found.
    * @param c command to be found
    * @return command
@@ -340,11 +342,11 @@ public enum Commands {
       if(!c.startsWith("DUMMY")) return valueOf(c.toUpperCase());
     } catch(final IllegalArgumentException e) { }
 
-    final byte[] nm = Token.uc(Token.token(c));
+    final byte[] nm = Token.lc(Token.token(c));
     for(Commands cmd : values()) {
-      if(Levenshtein.similar(nm, Token.token(cmd.name()))) {
-        throw new IllegalArgumentException(
-            BaseX.info(CMDSIMILAR, c, cmd.name()));
+      final byte[] sim = Token.lc(Token.token(cmd.name()));
+      if(Levenshtein.similar(nm, sim)) {
+        throw new IllegalArgumentException(BaseX.info(CMDSIMILAR, c, sim));
       }
     }
     throw new IllegalArgumentException(BaseX.info(CMDWHICH, c));

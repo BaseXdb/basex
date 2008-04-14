@@ -69,6 +69,7 @@ public class DialogPrefs extends Dialog {
     p.setLayout(new TableLayout(1, 2, 6, 0));
     
     path = new BaseXTextField(Prop.dbpath, HELPDBPATH, this);
+    BaseXLayout.setWidth(path, 250);
     p.add(path);
     
     button = new BaseXButton(BUTTONBROWSE, HELPBROWSE, this);
@@ -81,7 +82,7 @@ public class DialogPrefs extends Dialog {
     pp.add(p);
 
     BaseXLabel label = new BaseXLabel(PREFINTER, true);
-    label.setBorder(10, 0, 10, 0);
+    label.setBorder(10, 0, 8, 0);
     pp.add(label);
 
     // checkbox for realtime mouse focus

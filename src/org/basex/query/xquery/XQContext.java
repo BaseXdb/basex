@@ -187,8 +187,7 @@ public final class XQContext extends QueryContext {
    * @throws XQException evaluation exception
    */
   public Iter iter(final Expr expr) throws XQException {
-    // cancel if query was interrupted
-    if(stopped()) throw new XQException();
+    checkStop();
 
     // skip query info for items
     final Iter iter = expr.iter(this);

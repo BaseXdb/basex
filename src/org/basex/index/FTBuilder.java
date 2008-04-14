@@ -46,7 +46,7 @@ public final class FTBuilder extends Progress implements IndexBuilder {
     index = new CTArray();
     total = data.size;
     for(id = 0; id < total; id++) {
-      if(stopped()) throw new IOException(CANCELCREATE);
+      checkStop();
       if(data.kind(id) == Data.TEXT) index(data.text(id), id);
     }
 

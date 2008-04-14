@@ -1,7 +1,6 @@
 package org.basex.build;
 
 import static org.basex.build.BuildText.*;
-import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.core.Progress;
 import org.basex.data.Data;
@@ -167,7 +166,7 @@ public abstract class Builder extends Progress {
    * @throws IOException in case of parsing or writing problems 
    */
   public final void endNode(final byte[] tag) throws IOException {
-    if(stopped()) error(CANCELCREATE);
+    checkStop();
     final byte[] t = Token.utf8(tag, meta.encoding);
     if(level-- == 0 || tags.id(t) != tagStack[level])
       error(CLOSINGTAG, parser.det(), t, tags.key(tagStack[level]));
@@ -228,32 +227,27 @@ public abstract class Builder extends Progress {
 
   /**
    * Stores text nodes; called by the building instance.
-   * @param tok the text to be processed
-   * @param chars indicates if the text node is not a pure whitespace node
+   * @param t the text to be processed
+   * @param w whitespace flag
    * @throws IOException in case of parsing or writing problems 
    */
-  public final void text(final byte[] tok, final boolean chars)
-      throws IOException {
+  public final void text(final byte[] t, final boolean w) throws IOException {
     // checks if text appears before or after root node
-    if(chars) {
+    if(!w) {
       if(inDoc) {
-        if(level == 1) error(AFTERROOT, parser.det(), tok.length > 20 ?
-            Token.concat(Token.substring(tok, 0 , 20), Token.DOTS) : tok);
+        if(level == 1) error(AFTERROOT, parser.det(), t.length > 20 ?
+            Token.concat(Token.substring(t, 0 , 20), Token.DOTS) : t);
       } else {
-        if(chars) {
-          error(BEFOREROOT, parser.det(), tok.length > 20 ?
-              Token.concat(Token.substring(tok, 0 , 20), Token.DOTS) : tok);
-        }
-        return;
+        error(BEFOREROOT, parser.det(), t.length > 20 ?
+            Token.concat(Token.substring(t, 0 , 20), Token.DOTS) : t);
       }
-    } else if(tok == Token.EMPTY || (!inDoc || level == 1)) {
+    } else if(t.length == 0 || (!inDoc || level == 1)) {
       return;
     }
-    
 
     // chop whitespaces in text nodes
-    final byte[] t = meta.chop ? Token.trim(tok) : tok;
-    if(t.length != 0) addText(t, Data.TEXT);
+    final byte[] tok = meta.chop ? Token.trim(t) : t;
+    if(tok.length != 0) addText(tok, Data.TEXT);
   }
   
   /**
@@ -319,7 +313,7 @@ public abstract class Builder extends Progress {
   public final void nodeAndText(final byte[] tag, final byte[] txt)
       throws IOException {
     startNode(tag, null);
-    text(txt, true);
+    text(txt, false);
     endNode(tag);
   }
 

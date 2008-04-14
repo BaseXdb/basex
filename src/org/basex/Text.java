@@ -7,7 +7,6 @@ import org.basex.core.proc.Drop;
 import org.basex.core.proc.Fs;
 import org.basex.core.proc.Info;
 import org.basex.core.proc.Insert;
-import org.basex.core.proc.PFinder;
 import org.basex.core.proc.Set;
 
 /**
@@ -139,6 +138,9 @@ public interface Text {
    * initialization of the {@link Lang} class.
    */
 
+  /** Help String. */
+  String NOHELP = lang("ch_nohelp");
+
   /** Database separator. */
   String DUMMYDATABASE0 = lang("ch_dummydatabase0");
 
@@ -241,12 +243,6 @@ public interface Text {
   String FIND1 = lang("ch_find1");
   /** Command Help. */
   String FIND2 = lang("ch_find2");
-  /** Command Help. */
-  String PF0 = "[" + PFinder.PIPE + "]? [\"query\"]";
-  /** Command Help. */
-  String PF1 = lang("ch_pf1");
-  /** Command Help. */
-  String PF2 = lang("ch_pf2") + PFinder.PIPE + lang("ch_pf21");
   /** Command Help. */
   String XMARK0 = "[nr]";
   /** Command Help. */
@@ -657,12 +653,12 @@ public interface Text {
   String CREATEXQDESC = lang("dc_xqdesc") + " (*.xq)";
   /** Dialog Title for Database Options. */
   String CREATEADVTITLE = lang("dc_advtitle");
-  /** Database Options. */
-  String CREATEADVLABEL = lang("dc_advlabel") + COL;
   /** Whitespaces information. */
   String CREATECHOP = lang("dc_chop");
   /** Entities information. */
   String CREATEENTITIES = lang("dc_entities");
+  /** SAX parsing information. */
+  String CREATEINTPARSE = lang("dc_intparse");
   /** Value Index information. */
   String CREATETXTINDEX = lang("dc_txtindex");
   /** Value Index information. */
@@ -676,6 +672,8 @@ public interface Text {
 
   /** Whitespaces information. */
   String CHOPPINGINFO = lang("dc_chopinfo") + DOT;
+  /** Whitespaces information. */
+  String INTPARSEINFO = lang("dc_intparseinfo") + DOT;
   /** Entities information. */
   String ENTITIESINFO = lang("dc_entitiesinfo") + " (&...;).";
   /** Value Index information. */
@@ -689,6 +687,11 @@ public interface Text {
   /** Main-Memory Mode. */
   String MMEMINFO =  lang("dc_mminfo") + DOT;
 
+  /** General info. */
+  String GENERALINFO =  lang("dc_general");
+  /** Indexing info. */
+  String INDEXINFO =  lang("dc_index");
+  
   /** Dialog title for opening a database. */
   String OPENTITLE = lang("do_title");
   /** Open Dialog - No database information. */
@@ -867,6 +870,8 @@ public interface Text {
   String PROCNODB = lang("proc_nodb");
   /** Update Error. */
   String PROCMM = lang("proc_mm");
+  /** Update Error. */
+  String PROCOUTMEM = lang("proc_outmem");
 
   /** Unknown Command error. */
   String CMDUNKNOWN = lang("cmd_unknown");
@@ -1149,6 +1154,12 @@ public interface Text {
   String INFOGENERAL = lang("info_general");
   /** Database Info. */
   String RESULTCHOP = lang("info_resultchop");
+  /** Option flag. */
+  String INFOON = lang("info_on");
+  /** Option flag. */
+  String INFOOFF = lang("info_off");
+  /** Error info. */
+  String INFOERROR = lang("info_error");
   
   // HELP TEXTS ===============================================================
 

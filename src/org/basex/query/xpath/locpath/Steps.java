@@ -91,7 +91,7 @@ public final class Steps {
     final NodeSet tmp = ctx.local;
     for(int s = 0; s < size; s++) {
       ctx.local = steps[s].eval(ctx);
-      if(ctx.stopped()) throw new QueryException("");
+      ctx.checkStop();
     }
     final NodeSet res = ctx.local;
     ctx.local = tmp;

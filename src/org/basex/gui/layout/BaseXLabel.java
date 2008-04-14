@@ -43,7 +43,7 @@ public final class BaseXLabel extends JLabel {
    * @param dist add some distance below
    */
   public BaseXLabel(final String label, final boolean dist) {
-    this(label, dist ? 10 : 0);
+    this(label, dist ? 8 : 0);
     if(dist) setFont(getFont().deriveFont(1));
   }
 

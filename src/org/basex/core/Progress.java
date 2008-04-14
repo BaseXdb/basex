@@ -57,7 +57,7 @@ public abstract class Progress {
   protected abstract double prog();
   
   /**
-   * Sets a sub progress.
+   * Sets a new sub progress.
    * @param prog progress
    */
   public final void progress(final Progress prog) {
@@ -74,10 +74,9 @@ public abstract class Progress {
   }
 
   /**
-   * Returns the stop flag.
-   * @return stop flag
+   * Checks if the progress was interrupted; if yes, sends a runtime exception.
    */
-  public final boolean stopped() {
-    return stopped;
+  public final void checkStop() {
+    if(stopped) throw new RuntimeException();
   }
 }

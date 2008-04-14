@@ -389,7 +389,7 @@ public class BaseXClient {
    * @param msg message
    */
   protected final void error(final Exception ex, final String msg) {
-    BaseX.errln((console ? "" : "Error: ") + msg);
+    BaseX.errln((console ? "" : INFOERROR + ": ") + msg);
     BaseX.debug(ex);
   }
 }

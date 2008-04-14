@@ -13,7 +13,7 @@ public final class TokenBuilder {
   /** Entity flag. */
   public boolean ent;
   /** Character array. */
-  private byte[] chars = new byte[8];
+  public byte[] chars = new byte[8];
   
   /**
    * Empty constructor.

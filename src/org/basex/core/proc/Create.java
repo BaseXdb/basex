@@ -41,8 +41,6 @@ public final class Create extends Proc {
   /** Create option. */
   public static final String XML = "xml";
   /** Create option. */
-  public static final String SAX = "sax";
-  /** Create option. */
   public static final String MAB2 = "mab2";
   /** Create option. */
   public static final String FS = "fs";
@@ -62,11 +60,14 @@ public final class Create extends Proc {
   protected boolean exec() {
     final String type = cmd.arg(0).toLowerCase();
 
-    if(type.equals(XML)) return xml();
-    if(type.equals(SAX)) return sax();
-    if(type.equals(MAB2)) return mab2();
-    if(type.equals(FS)) return fs();
-    if(type.equals(INDEX)) return index();
+    try {
+      if(type.equals(XML)) return Prop.intparse ? xml() : sax();
+      if(type.equals(MAB2)) return mab2();
+      if(type.equals(FS)) return fs();
+      if(type.equals(INDEX)) return index();
+    } catch(final RuntimeException e) {
+      return error(CANCELCREATE);
+    }
     throw new IllegalArgumentException();
   }
 
@@ -78,13 +79,13 @@ public final class Create extends Proc {
     if(cmd.nrArgs() != 2) throw new IllegalArgumentException();
 
     final String file = cmd.arg(1);
-    if(file.startsWith("<")) {
-      // interpret input as XML document and show document
-      return build(new XMLParser(new CachedInput(Token.token(file))), "temp");
-    }
-    // determine file path and create database
     String path = file;
     try {
+      // interpret input as XML document...
+      if(file.startsWith("<")) {
+        return build(new XMLParser(new CachedInput(Token.token(file))), "temp");
+      }
+      // determine file path and create database
       path = filePath(path, true);
       return build(new XMLParser(path), path);
     } catch(final IOException e) {
@@ -192,6 +193,8 @@ public final class Create extends Proc {
       context.data(data);
       
       return Prop.info ? timer(DBCREATED) : true;
+    } catch(final RuntimeException ex) {
+      throw ex;
     } catch(final FileNotFoundException ex) {
       BaseX.debug(ex);
       err = BaseX.info(FILEWHICH, file);

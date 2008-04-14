@@ -1,12 +1,10 @@
 package org.basex.test;
 
 import java.io.File;
-
 import org.basex.BaseX;
 import org.basex.core.Commands;
 import org.basex.core.Context;
 import org.basex.core.Prop;
-import org.basex.core.proc.Check;
 import org.basex.core.proc.Proc;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
@@ -20,10 +18,15 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class XMLTS {
+  /** Root directory. */
+  private static  final String ROOT = "/home/dbis/xml/xmlts/";
+    //  "h:/xmlts/";
   /** Path to the XQuery Test Suite. */
-  private static  final String FILE =
-  //  "h:/xmlts/ibm/ibm_oasis_not-wf.xml";
-    "/home/dbis/xml/xmlts/xmltest/xmltest.xml";
+  private static  final String FILE = ROOT +
+    //"oasis/oasis.xml";
+    //"sun/sun-not-wf.xml";
+    //"ibm/ibm_oasis_not-wf.xml";
+    "xmltest/xmltest.xml";
   /** Path to the XQuery Test Suite. */
   private static  final String PATH = FILE.replaceAll("[^/]+$", "");
   /** Verbose flag. */
@@ -62,14 +65,14 @@ public final class XMLTS {
     Prop.onthefly = true;
     Prop.mainmem = true;
 
-    data = Check.check(FILE);
-    if(data == null) {
-      BaseX.outln("File not found: " + FILE);
+    final Context ctx = new Context();
+    final Proc pr = Proc.get(ctx, Commands.CHECK, FILE);
+    if(!pr.execute()) {
+      BaseX.outln(pr.info());
       return;
     }
+    data = ctx.data();
     
-    final Context ctx = new Context();
-
     int ok = 0;
     int wrong = 0;
 
@@ -82,17 +85,29 @@ public final class XMLTS {
       final String uri = text("@URI", srcRoot);
       final boolean valid = text("@TYPE", srcRoot).equals("valid");
 
-      final Proc proc = Proc.get(ctx, Commands.CREATEXML, PATH + uri);
+      Prop.intparse = true;
+      Proc proc = Proc.get(ctx, Commands.CREATEXML, PATH + uri);
       final boolean success = proc.execute();
       final boolean correct = valid == success;
 
-      BaseX.out(uri + " = " + (valid ? "correct" : "wrong") + " -> ");
-      BaseX.out(success ? "correct" : "wrong");
-      BaseX.outln(correct ? " (OK)" : " (WRONG)");
-      if(verbose) BaseX.outln(proc.info() + "\n");
-
+      if(verbose || !correct) {
+        BaseX.outln(uri + " = " + (valid ? "correct" : "wrong") + " -> " +
+            (success ? "correct" : "wrong") + (correct ? " (OK)" : " (WRONG)"));
+        if(verbose) {
+          String inf = proc.info();
+          if(inf.length() != 0) BaseX.outln("[BASEX ] " + inf);
+          Prop.intparse = false;
+          Proc.execute(ctx, Commands.CLOSE);
+          proc = Proc.get(ctx, Commands.CREATEXML, PATH + uri);
+          proc.execute();
+          inf = proc.info();
+          if(inf.length() != 0) BaseX.outln("[XERCES] " + inf);
+        }
+      }
       if(correct) ok++;
       else wrong++;
+
+      Proc.execute(ctx, Commands.CLOSE);
     }
 
     BaseX.outln("\nResult of Test \"" + new File(FILE).getName() + "\":");
