@@ -16,6 +16,7 @@ import javax.xml.xquery.XQPreparedExpression;
 import javax.xml.xquery.XQSequence;
 import javax.xml.xquery.XQSequenceType;
 import javax.xml.xquery.XQStaticContext;
+import javax.xml.xquery.XQException;
 import org.basex.core.Context;
 import org.basex.query.xquery.XQueryProcessor;
 import org.w3c.dom.Node;
@@ -30,6 +31,10 @@ import org.xml.sax.XMLReader;
 public class BXQConnection implements XQConnection {
   /** BaseX context. */
   Context ctx;
+  /** Boolean Value if connection is closed. */
+  private boolean closed;
+  /** Boolean Value if autoCommit is enabled. Default disabled */
+  private boolean autoCommit = false;
 
   /**
    * Constructor.
@@ -40,13 +45,11 @@ public class BXQConnection implements XQConnection {
   }
 
   public void close() {
-    // TODO Auto-generated method stub
-    
+    closed = true;
   }
 
   public void commit() {
-    // TODO Auto-generated method stub
-    
+    // TODO Auto-generated method stub  
   }
 
   public XQItemType createAtomicType(int arg0, QName arg1, URI arg2) {
@@ -265,8 +268,7 @@ public class BXQConnection implements XQConnection {
   }
 
   public boolean getAutoCommit() {
-    // TODO Auto-generated method stub
-    return false;
+    return autoCommit;
   }
 
   public XQMetaData getMetaData() {
@@ -280,8 +282,7 @@ public class BXQConnection implements XQConnection {
   }
 
   public boolean isClosed() {
-    // TODO Auto-generated method stub
-    return false;
+    return closed;
   }
 
   public XQPreparedExpression prepareExpression(InputStream arg0,
@@ -321,12 +322,14 @@ public class BXQConnection implements XQConnection {
     return null;
   }
 
-  public void rollback() {
-    // TODO Auto-generated method stub
+  public void rollback() throws XQException {
+    if (closed) {
+      throw new XQException("Connection has been closed");
+      }
   }
 
   public void setAutoCommit(boolean arg0) {
-    // TODO Auto-generated method stub
+    autoCommit = arg0;
   }
 
   public void setStaticContext(XQStaticContext arg0) {

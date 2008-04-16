@@ -32,6 +32,10 @@ public class BXQResultSequence implements XQResultSequence {
   Iter result;
   /** Current result. */
   Item item;
+  /** Position of the iterator. */
+  private int position;
+  /** Boolean value if closed. */
+  private boolean closed;
   
   /**
    * Constructor.
@@ -49,24 +53,22 @@ public class BXQResultSequence implements XQResultSequence {
   }
 
   public void afterLast() {
-    // TODO Auto-generated method stub
+    position = -1;
   }
 
   public void beforeFirst() {
-    // TODO Auto-generated method stub
+    position = 0;
   }
 
   public void close() {
-    // TODO Auto-generated method stub
+    closed = true;
   }
 
   public int count() {
-    // TODO Auto-generated method stub
     return 0;
   }
 
   public boolean first() {
-    // TODO Auto-generated method stub
     return false;
   }
 
@@ -164,8 +166,7 @@ public class BXQResultSequence implements XQResultSequence {
   }
 
   public int getPosition() {
-    // TODO Auto-generated method stub
-    return 0;
+    return position;
   }
 
   public XMLStreamReader getSequenceAsStream() {
@@ -199,8 +200,7 @@ public class BXQResultSequence implements XQResultSequence {
   }
 
   public boolean isClosed() {
-    // TODO Auto-generated method stub
-    return false;
+    return closed;
   }
 
   public boolean isFirst() {
