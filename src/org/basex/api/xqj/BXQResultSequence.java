@@ -4,6 +4,7 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URI;
 import java.util.Properties;
+import java.net.URISyntaxException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Result;
 import javax.xml.xquery.XQConnection;
@@ -36,6 +37,8 @@ public class BXQResultSequence implements XQResultSequence {
   private int position;
   /** Boolean value if closed. */
   private boolean closed;
+  /** BXQConnection. */
+  private BXQConnection connection;
   
   /**
    * Constructor.
@@ -47,29 +50,29 @@ public class BXQResultSequence implements XQResultSequence {
     result = item;
   }
 
-  public boolean absolute(int arg0) {
-    // TODO Auto-generated method stub
-    return false;
+  public boolean absolute(int arg0) throws BXQException {
+    throw new BXQException("Sequence is forwards-only");
   }
 
-  public void afterLast() {
+  public void afterLast() throws BXQException {
+    checkIfClosed();
     position = -1;
   }
 
-  public void beforeFirst() {
-    position = 0;
+  public void beforeFirst() throws BXQException {
+    throw new BXQException("Sequence is forwards-only");
   }
 
   public void close() {
     closed = true;
   }
 
-  public int count() {
-    return 0;
+  public int count() throws BXQException {
+    throw new BXQException("Sequence is forwards-only");
   }
 
-  public boolean first() {
-    return false;
+  public boolean first() throws BXQException {
+    throw new BXQException("Sequence is forwards-only");
   }
 
   public String getAtomicValue() throws BXQException {
@@ -94,8 +97,7 @@ public class BXQResultSequence implements XQResultSequence {
   }
 
   public XQConnection getConnection() {
-    // TODO Auto-generated method stub
-    return null;
+    return connection;
   }
 
   public double getDouble() throws BXQException {
@@ -132,9 +134,9 @@ public class BXQResultSequence implements XQResultSequence {
     return null;
   }
 
-  public String getItemAsString(Properties arg0) {
-    // TODO Auto-generated method stub
-    return null;
+  public String getItemAsString(Properties arg0) throws BXQException {
+      checkIfClosed();
+      return new String(item.str());
   }
 
   public XQItemType getItemType() {
@@ -151,12 +153,21 @@ public class BXQResultSequence implements XQResultSequence {
   }
 
   public Node getNode() {
-    // TODO Auto-generated method stub
+    if(item.node()) {
+      return (Node) item;
+    }
     return null;
   }
 
-  public URI getNodeUri() {
-    // TODO Auto-generated method stub
+  public URI getNodeUri() throws BXQException {
+    if(item.node()) {
+      Node node = (Node) item;
+      try {
+        return new URI(node.getBaseURI());
+      } catch(URISyntaxException ex) {
+        throw new BXQException(ex.toString());
+      }
+    }
     return null;
   }
 
@@ -189,33 +200,29 @@ public class BXQResultSequence implements XQResultSequence {
     return false;
   }
 
-  public boolean isAfterLast() {
-    // TODO Auto-generated method stub
-    return false;
-  }
+  public boolean isAfterLast() throws BXQException {
+    throw new BXQException("Sequence is forwards-only");
+   }
 
-  public boolean isBeforeFirst() {
-    // TODO Auto-generated method stub
-    return false;
+  public boolean isBeforeFirst() throws BXQException {
+    throw new BXQException("Sequence is forwards-only");
   }
 
   public boolean isClosed() {
     return closed;
   }
 
-  public boolean isFirst() {
-    // TODO Auto-generated method stub
-    return false;
+  public boolean isFirst() throws BXQException {
+    throw new BXQException("Sequence is forwards-only");
   }
 
-  public boolean isLast() {
-    // TODO Auto-generated method stub
-    return false;
+  public boolean isLast() throws BXQException {
+    throw new BXQException("Sequence is forwards-only");
   }
 
-  public boolean isOnItem() {
-    // TODO Auto-generated method stub
-    return false;
+  public boolean isOnItem() throws BXQException {
+    checkIfClosed();
+    return position > 0;
   }
 
   public boolean isScrollable() {
@@ -229,22 +236,30 @@ public class BXQResultSequence implements XQResultSequence {
   }
 
   public boolean next() throws BXQException {
-    try {
-      item = result.next();
-      return item != null;
+    
+    checkIfClosed();
+    if (position < 0) {
+      return false; 
+      } try {
+        item = result.next();
+        if (item == null) {
+          position = -1;
+          return false; 
+          } else {
+            position++;
+            return true;
+            }
     } catch(XQException ex) {
       throw new BXQException(ex);
     }
   }
 
-  public boolean previous() {
-    // TODO Auto-generated method stub
-    return false;
+  public boolean previous() throws BXQException {
+    throw new BXQException("Sequence is forwards-only");
   }
 
-  public boolean relative(int arg0) {
-    // TODO Auto-generated method stub
-    return false;
+  public boolean relative(int arg0) throws BXQException {
+    throw new BXQException("Sequence is forwards-only");
   }
 
   public void writeItem(OutputStream arg0, Properties arg1) {
@@ -286,4 +301,9 @@ public class BXQResultSequence implements XQResultSequence {
     // TODO Auto-generated method stub
     
   }
+  
+  private void checkIfClosed() throws BXQException {
+    if (closed) { throw new BXQException("The XQSequence has been closed");
+      }
+    }
 }
