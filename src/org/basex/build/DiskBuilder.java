@@ -187,15 +187,6 @@ public final class DiskBuilder extends Builder {
     int runs = 2;
     run(runs, fn, false);
     run(runs, fn, true);
-    runs = 10;
-    run(runs, fn, false);
-    run(runs, fn, true);
-    run(runs, fn, false);
-    run(runs, fn, true);
-    runs = 30;
-    run(runs, fn, false);
-    run(runs, fn, true);
-    
   }
 
   /**

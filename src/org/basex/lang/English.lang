@@ -261,7 +261,7 @@ proc_syntax=Syntax
 proc_err=Could not execute '%'
 proc_nodb=Please open a database first.
 proc_mm=Command is not available in main memory mode.
-proc_outmem=Out of Main Memory.\nThe following hints might help you:\n- You can increase Java's heap size with the flag -Xmx<size>.\n- You can use BaseX's internal XML parser with 'set intparse on'\n- You can save memory by deactivating some indexes (try 'help set').
+proc_outmem=Out of Main Memory.\nThe following hints might help you:\n- You can increase Java's heap size with the flag -Xmx<size>.\n- You can try BaseX's internal XML parser with 'set intparse on'\n- You can save memory by deactivating some indexes.
 
 cmd_unknown=Unknown command '%'
 cmd_similar=did you mean '%'?
@@ -338,7 +338,6 @@ qu_time=Timing
 qu_result=Result
 qu_plan=Saving query plan in '%'...
 qu_hits=Hit(s)
-qu_ms=ms
 
 # Query Commands.. the following strings must have the same length
 qu_tabquery=Query     
@@ -351,6 +350,7 @@ qu_tabtotal=Total Time
 qu_tabmem=Memory    
 qu_tabprinted=Printed   
 qu_tabhits=Results
+qu_ms=ms
 
 # Update Commands
 uc_querynodeserr=Query must yield a nodeset.

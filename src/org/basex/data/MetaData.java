@@ -110,7 +110,7 @@ public final class MetaData {
 
       if(key.equals(DBSTORAGE)) storage = val;
       else if(key.equals(DBFNAME)) filename = val;
-      else if(key.equals(DBFSIZE)) filesize = Token.toInt(val);
+      else if(key.equals(DBFSIZE)) filesize = Token.toLong(val);
       else if(key.equals(DBENCODING)) encoding = val;
       else if(key.equals(DBHEIGHT)) height = Token.toInt(val);
       else if(key.equals(DBSIZE)) size = Token.toInt(val);

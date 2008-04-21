@@ -19,6 +19,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 import org.basex.BaseX;
+import org.basex.gui.GUI;
 import org.basex.gui.GUICommand;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIConstants.FILL;
@@ -170,8 +171,8 @@ public final class BaseXText extends BaseXPanel {
    * Sets a new cursor position.
    * @param p cursor position
    */
-  public void setCursor(final int p) {
-    setCursor(p, 1);
+  public void setCaret(final int p) {
+    setCaret(p, 1);
   }
 
   /**
@@ -179,9 +180,9 @@ public final class BaseXText extends BaseXPanel {
    * @param p cursor position
    * @param a vertical alignment
    */
-  public void setCursor(final int p, final int a) {
+  public void setCaret(final int p, final int a) {
     text.pos(p);
-    text.setCursor();
+    text.setCaret();
     showCursor(a);
   }
 
@@ -227,7 +228,17 @@ public final class BaseXText extends BaseXPanel {
   }
     
   // OVERRIDDEN METHODS =======================================================
-    
+
+  @Override
+  public void mouseEntered(final MouseEvent e) {
+    GUI.get().cursor(GUIConstants.CURSORTEXT);
+  }
+
+  @Override
+  public void mouseExited(final MouseEvent e) {
+    GUI.get().cursor(GUIConstants.CURSORARROW);
+  }
+
   @Override
   public void mousePressed(final MouseEvent e) {
     super.mousePressed(e);
@@ -417,7 +428,7 @@ public final class BaseXText extends BaseXPanel {
       if(shf) text.endMark();
     }
 
-    text.setCursor();
+    text.setCaret();
     if(txt != text.text) rend.calc();
     showCursor(down ? 2 : 0);
   }

@@ -63,25 +63,30 @@ public final class WordBuilder extends Progress implements IndexBuilder {
     DataOutput out = new DataOutput(db, DATAWRD + 'b');
     out.writeInts(bucket);
     out.close();
+    bucket = null;
 
     out = new DataOutput(db, DATAWRD + 'n');
     out.writeInts(next);
     out.close();
+    next = null;
 
     out = new DataOutput(db, DATAWRD + 't');
     out.writeInts(token);
     out.close();
+    token = null;
 
     out = new DataOutput(db, DATAWRD + 'c');
     for(final byte c : cont) out.write(c);
     out.close();
+    cont = null;
 
     out = new DataOutput(db, DATAWRD + 'l');
-    out.writeInt(bucket.length);
+    out.writeInt(ids.length);
     final DataOutput out2 = new DataOutput(db, DATAWRD + 'i');
     for(int i = 0; i < size; i++) {
       out2.writeInt(out.size());
       out.writeBytes(ids[i] == null ? Token.EMPTY : Num.finish(ids[i]));
+      ids[i] = null;
     }
     out.close();
     out2.close();

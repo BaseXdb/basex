@@ -85,13 +85,13 @@ public final class XMLScanner {
     ents.add(E_LT, LT);
     ents.add(E_GT, GT);
     pents = new Map();
-    
+
     if(consume(DOCDECL)) {
       // process document declaration...
       checkS();
       if(!version()) error(DECLSTART);
       boolean s = s();
-      String enc = encoding();
+      final String enc = encoding();
       if(enc != null) {
         if(!s) error(WSERROR);
         encoding = enc;
@@ -99,7 +99,7 @@ public final class XMLScanner {
       }
       if(sddecl() != null && !s) error(WSERROR);
       s();
-      byte ch = nextChar();
+      final int ch = nextChar();
       if(ch != '?' || nextChar() != '>') error(DECLWRONG);
     }
   }
@@ -120,7 +120,7 @@ public final class XMLScanner {
   public boolean more() throws BuildException {
     // gets next character from the input stream
     token.reset();
-    byte ch = consume();
+    final int ch = consume();
     if(ch == 0) {
       type = Type.EOF;
       return false;
@@ -162,7 +162,7 @@ public final class XMLScanner {
    * @param ch current character
    * @throws BuildException Build Exception
    */
-  private void scanCONTENT(final byte ch) throws BuildException {
+  private void scanCONTENT(final int ch) throws BuildException {
     // parse TEXT
     if(!tag && (ch != '<' || isCDATA())) {
       content(ch);
@@ -171,7 +171,7 @@ public final class XMLScanner {
 
     // parse a TAG
     tag = false;
-    final byte c = nextChar();
+    final int c = nextChar();
 
     // parse comments etc...
     if(c == '!') {
@@ -210,8 +210,8 @@ public final class XMLScanner {
    * @param ch current character
    * @throws BuildException Build Exception
    */
-  private void scanTAG(final byte ch) throws BuildException {
-    byte c = ch;
+  private void scanTAG(final int ch) throws BuildException {
+    int c = ch;
     // scan tag end...
     if(c == '>') {
       type = Type.R_BR;
@@ -230,7 +230,7 @@ public final class XMLScanner {
       if((c = nextChar()) == '>') {
         state = State.CONTENT;
       } else {
-        token.add(c);
+        token.addUTF(c);
         error(CLOSING);
       }
     } else if(s(c)) {
@@ -240,7 +240,7 @@ public final class XMLScanner {
     } else if(isFirstLetter(c)) {
       // scan tag name...
       type = state == State.ATT ? Type.ATTNAME : Type.TAGNAME;
-      do token.add(c); while(isLetter(c = nextChar()));
+      do token.addUTF(c); while(isLetter(c = nextChar()));
       prev(1);
       state = State.ATT;
     } else {
@@ -254,8 +254,8 @@ public final class XMLScanner {
    * @param ch current character
    * @throws BuildException Build Exception
    */
-  private void scanATTVALUE(final byte ch) throws BuildException {
-    byte c = ch;
+  private void scanATTVALUE(final int ch) throws BuildException {
+    final int c = ch;
     if(c == quote) {
       type = Type.QUOTE;
       state = State.ATT;
@@ -265,15 +265,15 @@ public final class XMLScanner {
       prev(1);
     }
   }
-  
+
   /**
    * Scans an attribute value. [10]
    * @param ch current character
    * @throws BuildException Build Exception
    */
-  private void attValue(final byte ch) throws BuildException {
+  private void attValue(final int ch) throws BuildException {
     boolean wrong = false;
-    byte c = ch;
+    int c = ch;
     do {
       if(c == 0) error(ATTCLOSE , (char) c);
       wrong |= c == '\'' || c == '"';
@@ -285,7 +285,7 @@ public final class XMLScanner {
         if(r.length == 1) token.add(r);
         else if(!input.add(r, false)) error(RECENT);
       } else {
-        token.add(c);
+        token.addUTF(c);
       }
     } while((c = consume()) != quote);
   }
@@ -295,11 +295,11 @@ public final class XMLScanner {
    * @param ch current character
    * @throws BuildException Build Exception
    */
-  private void content(final byte ch) throws BuildException {
+  private void content(final int ch) throws BuildException {
     type = Type.TEXT;
     ws = true;
     boolean f = true;
-    byte c = ch;
+    int c = ch;
     while(c != 0) {
       if(c != '<') {
         ws &= ws(c);
@@ -316,7 +316,7 @@ public final class XMLScanner {
             }
             prev(1);
           }
-          token.add(c);
+          token.addUTF(c);
         }
       } else {
         if(!f && !isCDATA()) {
@@ -352,31 +352,31 @@ public final class XMLScanner {
    * @throws BuildException Build Exception
    */
   private void cDATA() throws BuildException {
-    byte ch;
+    int ch;
     while(true) {
-      while((ch = nextChar()) != ']') token.add(ch);
+      while((ch = nextChar()) != ']') token.addUTF(ch);
       if(consume(']')) {
         if(consume('>')) return;
         prev(1);
       }
-      token.add(ch);
+      token.addUTF(ch);
     }
   }
-  
+
   /**
    * Scans a comment.
    * @throws BuildException Build Exception
    */
   private void comment() throws BuildException {
     do {
-      byte ch = nextChar();
+      final int ch = nextChar();
       if(ch == '-') {
         if(consume('-')) {
           check('>');
           return;
         }
       }
-      token.add(ch);
+      token.addUTF(ch);
     } while(true);
   }
 
@@ -388,11 +388,11 @@ public final class XMLScanner {
     final byte[] tok = name(true);
     if(eq(lc(tok), XMLDECL)) error(PIRES);
 
-    byte ch = nextChar();
+    int ch = nextChar();
     if(ch != '?' && !ws(ch)) error(PITEXT);
     do {
       while(ch != '?') {
-        token.add(ch);
+        token.addUTF(ch);
         ch = nextChar();
       }
       if((ch = consume()) == '>') return;
@@ -406,7 +406,7 @@ public final class XMLScanner {
    * @throws BuildException Build Exception
    */
   private boolean s() throws BuildException {
-    final byte ch = consume();
+    final int ch = consume();
     if(s(ch)) return true;
     prev(1);
     return false;
@@ -426,7 +426,7 @@ public final class XMLScanner {
    * @throws BuildException Build Exception
    */
   private void check(final char ch) throws BuildException {
-    final byte c = consume();
+    final int c = consume();
     if(c != ch) error(WRONGCHAR, ch, (char) c);
   }
 
@@ -445,8 +445,8 @@ public final class XMLScanner {
    * @return true for whitespaces
    * @throws BuildException Build Exception
    */
-  private boolean s(final byte ch) throws BuildException {
-    byte c = ch;
+  private boolean s(final int ch) throws BuildException {
+    int c = ch;
     if(ws(c)) {
       do c = consume(); while(ws(c));
       prev(1);
@@ -460,8 +460,8 @@ public final class XMLScanner {
    * @return found quote
    * @throws BuildException Build Exception
    */
-  public byte qu() throws BuildException {
-    byte qu = consume();
+  public int qu() throws BuildException {
+    final int qu = consume();
     if(qu != '\'' && qu != '"') error(SCANQUOTE, (char) qu);
     return qu;
   }
@@ -477,11 +477,11 @@ public final class XMLScanner {
     if(consume('#')) { // [66]
       final TokenBuilder entity = new TokenBuilder();
       int b = 10;
-      byte ch = nextChar();
-      entity.add(ch);
+      int ch = nextChar();
+      entity.addUTF(ch);
       if(ch == 'x') {
         b = 16;
-        entity.add(ch = nextChar());
+        entity.addUTF(ch = nextChar());
       }
       int n = 0;
       do {
@@ -496,7 +496,7 @@ public final class XMLScanner {
         n *= b;
         n += ch & 15;
         if(!m) n += 9;
-        entity.add(ch = nextChar());
+        entity.addUTF(ch = nextChar());
       } while(ch != ';');
 
       if(!valid(n)) {
@@ -509,7 +509,7 @@ public final class XMLScanner {
     }
 
     // scans predefined entities // [68]
-    byte[] name = name(Prop.entity);
+    final byte[] name = name(Prop.entity);
     if(!consume(';')) {
       if(Prop.entity) error(INVALIDENTITY, name);
       return EMPTY;
@@ -530,7 +530,7 @@ public final class XMLScanner {
    */
   private byte[] peRef() throws BuildException {
     // scans predefined entities
-    byte[] name = name(true);
+    final byte[] name = name(true);
     if(!consume(';')) error(INVALIDENTITY, name);
 
     final byte[] en = pents.get(name);
@@ -545,9 +545,9 @@ public final class XMLScanner {
    * @throws BuildException Build Exception
    */
   private void completeRef(final TokenBuilder entity) throws BuildException {
-    byte ch = consume();
+    int ch = consume();
     while(entity.size < 10 && ch >= ' ' && ch != ';') {
-      entity.add(ch);
+      entity.addUTF(ch);
       ch = consume();
     }
   }
@@ -557,8 +557,8 @@ public final class XMLScanner {
    * @return next character
    * @throws BuildException Build Exception
    */
-  private byte nextChar() throws BuildException {
-    final byte ch = consume();
+  private int nextChar() throws BuildException {
+    final int ch = consume();
     if(ch == 0) error(UNCLOSED, token);
     return ch;
   }
@@ -576,14 +576,14 @@ public final class XMLScanner {
    * @return next character
    * @throws BuildException Build Exception
    */
-  private byte consume() throws BuildException {
+  private int consume() throws BuildException {
     while(true) {
-      byte ch = input.next();
+      final int ch = input.next();
       if(ch < ' ' && ch > 0 && !ws(ch)) error(XMLCHAR, (char) ch, ch);
 
       if(ch == '%' && pe) { // [69]
-        byte[] key = name(true);
-        byte[] val = pents.get(key);
+        final byte[] key = name(true);
+        final byte[] val = pents.get(key);
         if(val == null) error(UNKNOWNPE, key);
         check(';');
         input.add(val, true);
@@ -599,7 +599,7 @@ public final class XMLScanner {
    * @throws BuildException Build Exception
    */
   char curr() throws BuildException {
-    byte ch = consume();
+    final int ch = consume();
     prev(1);
     return (char) ch;
   }
@@ -624,7 +624,7 @@ public final class XMLScanner {
    */
   private boolean consume(final byte[] tok) throws BuildException {
     for(int t = 0; t < tok.length; t++) {
-      final byte ch = consume();
+      final int ch = consume();
       if(ch != tok[t]) {
         prev(t + 1);
         return false;
@@ -641,13 +641,13 @@ public final class XMLScanner {
    */
   private byte[] name(final boolean f) throws BuildException {
     final TokenBuilder name = new TokenBuilder();
-    byte c = consume();
+    int c = consume();
     if(!isFirstLetter(c)) {
       if(f) error(INVNAME);
       prev(1);
       return null;
     }
-    do name.add(c); while(isLetter(c = nextChar()));
+    do name.addUTF(c); while(isLetter(c = nextChar()));
     prev(1);
     return name.finish();
   }
@@ -659,8 +659,8 @@ public final class XMLScanner {
    */
   private byte[] nmtoken() throws BuildException {
     final TokenBuilder name = new TokenBuilder();
-    byte c;
-    while(isLetter(c = nextChar())) name.add(c);
+    int c;
+    while(isLetter(c = nextChar())) name.addUTF(c);
     prev(1);
     if(name.size == 0) error(INVNAME);
     return name.finish();
@@ -676,7 +676,7 @@ public final class XMLScanner {
 
     name(true); // parse root tag
     s(); externalID(true, true); s();
-    
+
     while(consume('[')) {
       s();
       while(markupDecl());
@@ -703,14 +703,14 @@ public final class XMLScanner {
         pubidLit();
         if(f) checkS();
       }
-      byte qu = consume(); // [11]
+      final int qu = consume(); // [11]
       if(qu == '\'' || qu == '"') {
-        byte ch = 0;
+        int ch = 0;
         final TokenBuilder tok = new TokenBuilder();
-        while((ch = nextChar()) != qu) tok.add(ch);
+        while((ch = nextChar()) != qu) tok.addUTF(ch);
         if(!f) return null;
-        byte[] name = tok.finish();
-        
+        final byte[] name = tok.finish();
+
         final XMLInput tin = input;
         try {
           final String fn = IOConstants.merge(input.file, string(name));
@@ -728,12 +728,12 @@ public final class XMLScanner {
           ch = nextChar();
           if(s(ch)) ch = nextChar();
           if(ch != '?' || nextChar() != '>') error(DECLWRONG);
-          
+
           c = new byte[cont.length - input.pos()];
           System.arraycopy(cont, input.pos(), c, 0, c.length);
           cont = c;
         }
-        
+
         s();
         if(r) {
           extSubsetDecl();
@@ -748,7 +748,7 @@ public final class XMLScanner {
     return cont;
   }
 
-  
+
   /** PublicID characters. */
   private static final byte[] PUBIDTOK = token(" \n'()+,/=?;!*#@$%");
 
@@ -757,13 +757,13 @@ public final class XMLScanner {
    * @throws BuildException Build Exception
    */
   private void pubidLit() throws BuildException {
-    byte qu = qu();
-    byte ch;
+    final int qu = qu();
+    int ch;
     while((ch = nextChar()) != qu) {
       if(!isLetter(ch) && !contains(PUBIDTOK, ch)) error(PUBID, (char) ch);
     }
   }
-  
+
   /**
    * Scans an external subset declaration. [31]
    * @return true if a declaration was found
@@ -786,7 +786,7 @@ public final class XMLScanner {
       if(!incl) check(IGNO);
       s();
       check('[');
-      
+
       if(incl) {
         extSubsetDecl();
         check(CONE);
@@ -870,7 +870,7 @@ public final class XMLScanner {
       s();
       while(name(false) != null) { // [53]
         checkS();
-        if(!consume(CD) && !consume(IDRS) && !consume(IDR) && !consume(ID) && 
+        if(!consume(CD) && !consume(IDRS) && !consume(IDR) && !consume(ID) &&
             !consume(ENTS) && !consume(ENT1) && !consume(NMTS) &&
             !consume(NMT)) { // [56]
           if(consume(NOT)) { // [57,58]
@@ -883,7 +883,7 @@ public final class XMLScanner {
             check(')');
           }
         }
-        
+
         // [54]
         pe = true;
         checkS();
@@ -911,29 +911,27 @@ public final class XMLScanner {
     pe = false;
     return true;
   }
-  
+
   /**
    * Scans a mixed value and children. [47-50]
    * @throws BuildException Build Exception
    */
   private void cp() throws BuildException {
     s();
-    byte[] name = name(false);
-    if(name == null) { check('('); s(); cp(); }
-    boolean s = s();
+    final byte[] name = name(false);
+    if(name == null) { check('('); s(); cp(); } else { occ(); }
+
+    s();
     if(consume('|') || consume(',')) {
       cp();
       s();
-    } else if(s) {
-      //error(UNEXP, ' ');
     }
-    occ();
     if(name == null) {
       check(')');
       occ();
     }
   }
-  
+
   /**
    * Scans occurrences.
    * @throws BuildException Build Exception
@@ -941,7 +939,7 @@ public final class XMLScanner {
   private void occ() throws BuildException {
     if(consume('+') || consume('?') || consume('*'));
   }
-  
+
   /**
    * Scans an entity value. [9]
    * @param p pe reference flag
@@ -949,17 +947,17 @@ public final class XMLScanner {
    * @throws BuildException Build Exception
    */
   private byte[] entityValue(final boolean p) throws BuildException {
-    byte qu = consume();
+    final int qu = consume();
     if(qu != '\'' && qu != '"') { prev(1); return null; }
     TokenBuilder tok = new TokenBuilder();
-    byte ch;
+    int ch;
     while((ch = nextChar()) != qu) {
       if(ch == '&') tok.add(ref(false));
       else if(ch == '%') {
         if(!p) error(INVPE);
         tok.add(peRef());
       } else {
-        tok.add(ch);
+        tok.addUTF(ch);
       }
     }
 
@@ -968,7 +966,7 @@ public final class XMLScanner {
     tok = new TokenBuilder();
     while((ch = consume()) != 0) {
       if(ch == '&') tok.add(ref(false));
-      else tok.add(ch);
+      else tok.addUTF(ch);
     }
     input = tmp;
     return tok.finish();
@@ -982,7 +980,7 @@ public final class XMLScanner {
   private boolean version() throws BuildException {
     if(!consume(VERS)) return false;
     s(); check('='); s();
-    final byte d = qu();
+    final int d = qu();
     if(!consume(VERS10) && !consume(VERS11)) error(DECLVERSION);
     check((char) d);
     return true;
@@ -997,11 +995,11 @@ public final class XMLScanner {
     if(!consume(ENCOD)) return null;
     s(); check('='); s();
     final TokenBuilder enc = new TokenBuilder();
-    final byte d = qu();
-    byte ch = nextChar();
+    final int d = qu();
+    int ch = nextChar();
     if(letter(ch) && ch != '_') {
       while(letterOrDigit(ch) || ch == '.' || ch == '-') {
-        enc.add(ch);
+        enc.addUTF(ch);
         ch = nextChar();
       }
       prev(1);
@@ -1019,7 +1017,7 @@ public final class XMLScanner {
   private byte[] sddecl() throws BuildException {
     if(!consume(STANDALONE)) return null;
     s(); check('='); s();
-    final byte d = qu();
+    final int d = qu();
     boolean yes = consume(STANDYES);
     boolean no = !yes && consume(STANDNO);
     check((char) d);

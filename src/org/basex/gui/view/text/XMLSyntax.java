@@ -19,15 +19,19 @@ public final class XMLSyntax extends BaseXSyntax {
   @Override
   public void init() {
     quote = 0;
+    tag = false;
   }
 
   @Override
   public Color getColor(final String word) {
     final char ch = word.charAt(0);
     if(tag) {
-      final boolean qu = ch == '"' || ch == '\'';
-      if(quote != 0 || qu) {
-        if(qu) quote = quote == ch ? 0 : ch;
+      if(quote != 0) {
+        if(quote == ch) quote = 0;
+        return GUIConstants.COLORERROR;
+      }
+      if(ch == '"' || ch == '\'') {
+        quote = ch;
         return GUIConstants.COLORERROR;
       }
       if(ch == '>') tag = false;  
@@ -39,5 +43,4 @@ public final class XMLSyntax extends BaseXSyntax {
     }
     return Color.black;
   }
-
 }

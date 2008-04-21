@@ -219,13 +219,7 @@ public final class DiskData extends Data {
 
   @Override
   public byte[] text(final int pre, final int off, final int len) {
-    final long o = textOff(pre);
-    if((o & 0x8000000000L) != 0) {
-      final byte[] t = token(o);
-      return Token.substring(t, Math.min(t.length, off),
-          Math.min(t.length, off + len));
-    }
-    final byte[] t = texts.readToken(off);
+    final byte[] t = text(pre);
     return Token.substring(t, Math.min(t.length, off),
         Math.min(t.length, off + len));
   }
@@ -243,8 +237,8 @@ public final class DiskData extends Data {
    * @return disk offset
    */
   private byte[] txt(final int pre, final DataAccess da) {
-    final long off = textOff(pre);
-    return (off & 0x8000000000L) != 0 ? token(off) : da.readToken(off);
+    final long o = textOff(pre);
+    return (o & 0x8000000000L) != 0 ? token(o) : da.readToken(o);
   }
 
   @Override

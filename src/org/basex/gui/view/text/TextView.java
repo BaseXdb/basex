@@ -97,7 +97,7 @@ public final class TextView extends View {
   
   @Override
   public void refreshInit() {
-    area.setCursor(0);
+    area.setCaret(0);
     refreshDoc(GUI.context.current());
   }
 

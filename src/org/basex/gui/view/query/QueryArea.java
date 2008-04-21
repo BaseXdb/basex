@@ -87,7 +87,7 @@ public final class QueryArea extends QueryPanel {
     main.add(area, BorderLayout.CENTER);
     main.add(south, BorderLayout.SOUTH);
     area.setText(Token.token(last));
-    area.setCursor(0);
+    area.setCaret(0);
     area.setFont(GUIConstants.mfont);
     refresh();
   }
@@ -109,7 +109,7 @@ public final class QueryArea extends QueryPanel {
     info.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(final MouseEvent e) {
-        area.setCursor(Integer.parseInt(info.getName()));
+        area.setCaret(Integer.parseInt(info.getName()));
         area.requestFocusInWindow();
       }
     });

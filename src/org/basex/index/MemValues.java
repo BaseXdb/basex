@@ -46,17 +46,6 @@ public final class MemValues extends Set implements Index {
    * @param ftO FTOption for tok
    * @return number of ids
    */
-  public int[] ids(final byte[] tok, final FTOption ftO) {
-    if(ftO != null) BaseX.debug("Values: No fulltext option support.");
-    return null;
-  }
-
-  /**
-   * Returns all ids from index stored for tok with respect to ftO.
-   * @param tok token to be found
-   * @param ftO FTOption for tok
-   * @return number of ids
-   */
   public int[][] idPos(final byte[] tok, final FTOption ftO) {
     if(ftO != null) BaseX.debug("Values: No fulltext option support.");
     return null;

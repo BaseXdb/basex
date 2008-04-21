@@ -32,7 +32,7 @@ public final class SAXWrapper extends Parser {
     // needed for XMLEntityManager: increase entity limit
     System.setProperty("entityExpansionLimit", "536870912");
   }
-  
+
   /**
    * Constructor.
    * @param in input file
@@ -75,7 +75,7 @@ public final class SAXWrapper extends Parser {
   public String head() {
     return PROGCREATE;
   }
-  
+
   @Override
   public String det() {
     return nodes + NODESPARSED;
@@ -117,14 +117,14 @@ public final class SAXWrapper extends Parser {
         error(ex);
       }
     }
-    
+
     @Override
     public void characters(final char[] ch, final int s, final int l) {
       for(int i = s, e = s + l; i < e; i++) tb.addUTF(ch[i]);
     }
 
     @Override
-    public void processingInstruction(final String name, final String val) 
+    public void processingInstruction(final String name, final String val)
         throws SAXException {
       try {
         checkText();
@@ -134,9 +134,9 @@ public final class SAXWrapper extends Parser {
         error(ex);
       }
     }
-    
+
     /** {@inheritDoc} */
-    public void comment(final char[] ch, final int s, final int l) 
+    public void comment(final char[] ch, final int s, final int l)
         throws SAXException {
       try {
         checkText();
@@ -148,7 +148,7 @@ public final class SAXWrapper extends Parser {
     }
 
     /** Temporary string builder. */
-    private TokenBuilder tb = new TokenBuilder();
+    private final TokenBuilder tb = new TokenBuilder();
 
     /**
      * Checks if a text node has to be written.
@@ -160,7 +160,7 @@ public final class SAXWrapper extends Parser {
       tb.reset();
       nodes++;
     }
-    
+
     /**
      * Creates and throws a SAX exception for the specified exception.
      * @param ex exception

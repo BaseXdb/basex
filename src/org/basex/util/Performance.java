@@ -1,7 +1,5 @@
 package org.basex.util;
 
-import static org.basex.Text.*;
-
 /**
  * This class contains methods for performance measurements.
  *
@@ -66,7 +64,7 @@ public final class Performance {
    * @return execution time
    */
   public static String getTimer(final long time, final int runs) {
-    return (time / runs / 10000) / 100.0 + MS + (runs > 1 ? " (avg)" : "");
+    return (time / runs / 10000) / 100.0 + " ms" + (runs > 1 ? " (avg)" : "");
   }
 
   /**

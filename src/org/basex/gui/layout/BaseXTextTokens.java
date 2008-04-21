@@ -329,9 +329,9 @@ final class BaseXTextTokens {
   }
 
   /**
-   * Sets the cursor position.
+   * Sets the caret position.
    */
-  void setCursor() {
+  void setCaret() {
     pc = ps;
   }
 

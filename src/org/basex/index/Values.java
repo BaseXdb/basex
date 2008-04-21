@@ -61,7 +61,7 @@ public final class Values implements Index {
     out.println(text ? TEXTINDEX : VALUEINDEX);
     out.println(DISKHASH);
     out.println(HASHBUCKETS + size);
-    final long l = idxb.length() + idxi.length() + idxn.length();
+    final long l = id.length() + idxb.length() + idxi.length() + idxn.length();
     out.println(SIZEDISK + Performance.formatSize(l, true) + Prop.NL);
   }
 
@@ -70,26 +70,6 @@ public final class Values implements Index {
     final int pos = get(tok);
     return pos > 0 ? ids(pos) : Array.NOINTS;
   }
-
-  /** {@inheritDoc} */
-  public int[] ids(final byte[] tok, final FTOption ftO) {
-    if(ftO != null) BaseX.debug("Values: No fulltext option support.");
-    final int pos = get(tok);
-    return pos > 0 ? ids(pos) : Array.NOINTS;
-  }
-
-  /** {@inheritDoc} */
-  public int[][] idPos(final byte[] tok, final FTOption ftO) {
-    BaseX.debug("Values: No fulltextposition support.");
-    return null;
-  }
-  
-  /** {@inheritDoc} */
-   public int[][]  idPosRange(final byte[] tok0, final boolean itok0, 
-       final byte[] tok1, final boolean itok1) {
-    BaseX.debug("Words: No fulltext range query support.");
-    return null;
-   }
 
   /**
    * Returns the id offset for the specified token or a negative value
@@ -131,22 +111,26 @@ public final class Values implements Index {
     }
     return Array.finish(tmp, s);
   }
-  
-  /**
-   * FUZZY SEARCH
-   * Returns the indexed id references for the specified fulltext token,
-   * with respect to number of errors (ne) that are allowed to occure.
-   * 
-   * @param tok token to be looked up
-   * @param ne int number of errors allowed
-   * @return id array
-   */
-  public int[][] fuzzyIDs(final byte[] tok, final int ne) {
-    BaseX.debug("Words: No fuzzy search support.");
+
+  /** {@inheritDoc} */
+  public int[][] idPos(final byte[] tok, final FTOption ftO) {
+    BaseX.notimplemented();
     return null;
   }
   
-
+  /** {@inheritDoc} */
+  public int[][]  idPosRange(final byte[] tok0, final boolean itok0,
+      final byte[] tok1, final boolean itok1) {
+    BaseX.notimplemented();
+    return null;
+  }
+  
+  /** {@inheritDoc} */
+  public int[][] fuzzyIDs(final byte[] tok, final int ne) {
+    BaseX.notimplemented();
+    return null;
+  }
+  
   /** {@inheritDoc} */
   public synchronized void close() throws IOException {
     id.close();

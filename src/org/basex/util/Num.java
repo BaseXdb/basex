@@ -69,7 +69,7 @@ public final class Num {
   }
 
   /**
-   * Creates a new num array.
+   * Creates a new number array.
    * @param val initial value to be written
    * @return new array
    */
@@ -91,15 +91,44 @@ public final class Num {
     final int len = len(val);
     final int pos = size(array);
     byte[] a = array;
-    if(pos + len >= a.length) a = Array.extend(a);
+    final int s = array.length;
+    if(pos + len >= s) {
+      a = new byte[s + Math.max(len, s >> 3)];
+      System.arraycopy(array, 0, a, 0, s);
+    }
     add(a, val, pos, len);
     size(a, pos + len);
     return a;
   }
 
   /**
+   * Creates a compressed array from the specified integer array.
+   * The first value in the specified array denotes the number of entries.
+   * @param vals values to be written
+   * @return new array
+   */
+  public static byte[] create(final int[] vals) {
+    byte[] tmp = new byte[vals.length << 2];
+    int vs = vals[0];
+    int pos = 4;
+    for(int i = 1; i <= vs; i++) {
+      final int len = len(vals[i]);
+      final int s = tmp.length;
+      if(pos + len >= s) {
+        byte[] t = new byte[s + Math.max(len, s >> 3)];
+        System.arraycopy(tmp, 0, t, 0, s);
+        tmp = t;
+      }
+      add(tmp, vals[i], pos, len);
+      pos += len;
+    }
+    size(tmp, pos);
+    return pos == tmp.length ? tmp : Array.finish(tmp, pos);
+  }
+
+  /**
    * Adds a byte array to the specified array.
-   * @param array array to be mofified
+   * @param array array to be modified
    * @param v array to be added
    * @return modified array
    */

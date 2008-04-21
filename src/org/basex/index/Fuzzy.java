@@ -257,12 +257,6 @@ public final class Fuzzy implements Index {
   public int[][] fuzzyIDs(final byte[] tok, final int ne) {
     return getFuzzy(tok, ne);
   }
-  
-  /** {@inheritDoc} */
-  public int[] ids(final byte[] tok, final FTOption ftO) {
-    if(ftO != null) BaseX.debug("Values: No fulltext option support.");
-    return ids(tok);
-  }
 
   /** {@inheritDoc} */
   public int[][] idPos(final byte[] tok, final FTOption ftO) {

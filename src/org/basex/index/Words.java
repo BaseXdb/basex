@@ -89,42 +89,30 @@ public final class Words implements Index {
     return null;
   }
   
-    
   /**
    * Returns all ids from trie stored for token with respect to ftO.
    * @param tok token to be found
    * @param ftO FTOption for token
    * @return number of ids
    */
-   public int[] ids(final byte[] tok, final FTOption ftO) {
-    if(ftO != null) BaseX.debug("Words: No fulltext option support.");
-    return ids(tok);
+  public int[][] idPos(final byte[] tok, final FTOption ftO) {
+    BaseX.debug("Words: No fulltext position support.");
+    return null;
   }
- 
-   /**
-    * Returns all ids from trie stored for token with respect to ftO.
-    * @param tok token to be found
-    * @param ftO FTOption for token
-    * @return number of ids
-    */
-    public int[][] idPos(final byte[] tok, final FTOption ftO) {
-     BaseX.debug("Words: No fulltext position support.");
-     return null;
-    }
    
-    /**
-     * Returns all ids that are in the range of tok0 and tok1.
-     * @param tok0 token defining range start
-     * @param itok0 token included in rangebounderies
-     * @param tok1 token defining range end
-     * @param itok1 token included in rangebounderies
-     * @return number of ids
-     */
-     public int[][]  idPosRange(final byte[] tok0, final boolean itok0,
-         final byte[] tok1, final boolean itok1) {
-      BaseX.debug("Words: No fulltext range query support.");
-      return null;
-     }
+  /**
+   * Returns all ids that are in the range of tok0 and tok1.
+   * @param tok0 token defining range start
+   * @param itok0 token included in rangebounderies
+   * @param tok1 token defining range end
+   * @param itok1 token included in rangebounderies
+   * @return number of ids
+   */
+  public int[][]  idPosRange(final byte[] tok0, final boolean itok0,
+      final byte[] tok1, final boolean itok1) {
+    BaseX.debug("Words: No fulltext range query support.");
+    return null;
+  }
    
   /**
    * Returns all ids from index stored for token.

@@ -134,7 +134,7 @@ public class BufferInput {
    * Returns the next character.
    * @return next character
    */
-  public byte readChar() {
+  public int readChar() {
     // support encodings..
     byte ch = readByte();
     if(encoding == Token.UTF16LE) readByte();

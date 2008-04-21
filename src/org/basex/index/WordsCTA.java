@@ -295,16 +295,6 @@ public final class WordsCTA implements Index {
   }
 
   /**
-   * Returns all ids from trie stored for tok, with repsect to ftO.
-   * @param tok token to be found
-   * @param ftO FTOption for tok
-   * @return number of ids
-   */
-  public int[] ids(final byte[] tok, final FTOption ftO) {
-    return CTArrayX.getIDsFromData(idPos(tok, ftO));
-  }
-
-  /**
    * Returns all ids from trie stored for token.
    * @param tok token to be found
    * @return number of ids

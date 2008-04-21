@@ -53,7 +53,6 @@ public final class BaseXTextRenderer extends BaseXBack {
    */
   BaseXTextRenderer(final BaseXTextTokens t, final BaseXBar b) {
     setMode(FILL.NONE);
-    setCursor(GUIConstants.CURSORTEXT);
     setText(t);
     bar = b;
   }
@@ -285,7 +284,7 @@ public final class BaseXTextRenderer extends BaseXBack {
 
       if(!finish) text.startMark();
       else text.endMark();
-      text.setCursor();
+      text.setCaret();
     }
     repaint();
   }

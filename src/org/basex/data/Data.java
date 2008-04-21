@@ -294,8 +294,6 @@ public abstract class Data  {
       default:  return null;
     }
   }
-
-  
   
   /**
    * Returns the number of indexed id references for the specified token.
@@ -324,7 +322,6 @@ public abstract class Data  {
    * @return id array
    */
   public abstract int[][] fuzzyIDs(byte[] fulltext, final int ne);
-
   
   /**
    * Returns the indexed id references for the specified fulltext token.

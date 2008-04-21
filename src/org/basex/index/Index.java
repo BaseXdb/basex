@@ -34,14 +34,6 @@ public interface Index {
    * @return ids
    */
   int[] ids(final byte[] tok);
-   
-  /**
-   * Returns the node ids for the specified token.
-   * @param tok token to be found
-   * @param ftOption ftoption for token to be found
-   * @return ids
-   */
-  int[] ids(final byte[] tok, final FTOption ftOption);
 
   /**
    * Returns the decompressed ids for the specified token.

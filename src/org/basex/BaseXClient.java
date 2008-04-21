@@ -73,7 +73,7 @@ public class BaseXClient {
   }
 
   /**
-   * Runs BaseX, dependant on the command-line arguments.
+   * Runs the application, dependent on the command-line arguments.
    */
   final void run() {
     if(allInfo || info) {

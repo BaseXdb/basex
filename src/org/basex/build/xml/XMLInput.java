@@ -25,7 +25,7 @@ final class XMLInput {
   int col = 1;
 
   /** Buffer with most current characters. */
-  private final byte[] last = new byte[16];
+  private final int[] last = new int[16];
   /** Read position. */
   private int lp = 0;
   /** Backward pointer. */
@@ -55,10 +55,10 @@ final class XMLInput {
    * Reads the next character from the cached input buffers.
    * @return next character
    */
-  byte next() {
+  int next() {
     if(pp != 0) return last[(lp + pp++) & 0x0F];
 
-    byte ch = in[ip].readChar();
+    int ch = in[ip].readChar();
     while(ch == 0 && ip != 0) ch = in[--ip].readChar();
     last[lp++] = ch;
     lp &= 0x0F;

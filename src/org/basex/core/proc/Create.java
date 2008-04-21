@@ -65,7 +65,8 @@ public final class Create extends Proc {
       if(type.equals(MAB2)) return mab2();
       if(type.equals(FS)) return fs();
       if(type.equals(INDEX)) return index();
-    } catch(final RuntimeException e) {
+    } catch(final RuntimeException ex) {
+      BaseX.debug(ex);
       return error(CANCELCREATE);
     }
     throw new IllegalArgumentException();

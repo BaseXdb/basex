@@ -79,7 +79,8 @@ public final class IOConstants {
    * @return contents
    */
   public static String merge(final String par, final String file) {
-    return new File(par).getParent() + "/" + file;
+    return file.startsWith("http://") ? file :
+      new File(par).getParent() + "/" + file;
   }
   
   /**

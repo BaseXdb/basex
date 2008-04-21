@@ -72,13 +72,13 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
         memfocus = e.getX() > getWidth() - MEMW;
         if(memfocus) GUI.get().focus(GUIStatus.this, HELPMEM);
 
-        GUI.get().setCursor(memfocus ? GUIConstants.CURSORHAND :
+        GUI.get().cursor(memfocus ? GUIConstants.CURSORHAND :
           GUIConstants.CURSORARROW);
       }
       @Override
       public void mouseExited(final MouseEvent e) {
         memfocus = false;
-        GUI.get().setCursor(GUIConstants.CURSORARROW);
+        GUI.get().cursor(GUIConstants.CURSORARROW);
       }
     };
     addMouseListener(mouse);

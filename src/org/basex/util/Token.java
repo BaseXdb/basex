@@ -979,7 +979,7 @@ public final class Token {
    * @param ch the letter to be checked
    * @return result of comparison
    */
-  public static boolean ws(final byte ch) {
+  public static boolean ws(final int ch) {
     return ch == 0x09 || ch == 0x0A || ch == 0x0D || ch == 0x20;
   }
 
