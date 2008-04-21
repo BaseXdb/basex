@@ -230,9 +230,8 @@ public class BXQResultSequence implements XQResultSequence {
     return false;
   }
 
-  public boolean last() {
-    // TODO Auto-generated method stub
-    return false;
+  public boolean last() throws BXQException {
+    throw new BXQException("Sequence is forwards-only");
   }
 
   public boolean next() throws BXQException {
