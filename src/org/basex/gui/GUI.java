@@ -225,6 +225,62 @@ public final class GUI extends JFrame {
       @Override
       public void keyReleased(final KeyEvent e) {
         if(e.getKeyChar() == 0xFFFF || e.isControlDown()) return;
+        
+        if(GUIProp.searchmode == 2 || !context.db()) {
+          char ch = e.getKeyChar();
+          if (ch == 'c') {
+            input.removeAllItems();
+            input.addItem(Commands.CD.name());
+            input.addItem(Commands.CLOSE.name());
+            input.addItem(Commands.COPY.name());
+            input.addItem(Commands.CREATE.name());
+            input.showPopup();
+          } else if(ch == 'd') {
+            input.removeAllItems();
+            input.addItem(Commands.DELETE.name());
+            input.addItem(Commands.DROP.name());
+            input.showPopup();
+          } else if(ch == 'e') {
+            input.removeAllItems();
+            input.addItem(Commands.EXIT.name());
+            input.addItem(Commands.EXPORT.name());
+            input.showPopup();
+          } else if(ch == 'f') {
+            input.removeAllItems();
+            input.addItem(Commands.FIND.name());
+            input.showPopup();
+          } else if(ch == 'h') {
+            input.removeAllItems();
+            input.addItem(Commands.HELP.name());
+            input.showPopup();
+          } else if(ch == 'i') {
+            input.removeAllItems();
+            input.addItem(Commands.INFO.name());
+            input.addItem(Commands.INSERT.name());
+            input.showPopup();
+          } else if(ch == 'l') {
+            input.removeAllItems();
+            input.addItem(Commands.LIST.name());
+            input.showPopup();
+          } else if(ch == 'o') {
+            input.removeAllItems();
+            input.addItem(Commands.OPEN.name());
+            input.showPopup();
+          } else if(ch == 's') {
+            input.removeAllItems();
+            input.addItem(Commands.SET.name());
+            input.showPopup();
+          } else if(ch == 'u') {
+            input.removeAllItems();
+            input.addItem(Commands.UPDATE.name());
+            input.showPopup();
+          } else if(ch == 'x') {
+            input.removeAllItems();
+            input.addItem(Commands.XQUERY.name());
+            input.addItem(Commands.XPATH.name());
+            input.showPopup();
+          }
+        }
 
         // skip commands
         if(GUIProp.execrt && GUIProp.searchmode != 2 && context.db() &&
