@@ -579,7 +579,8 @@ public final class Fuzzy implements Index {
    * Returns the pointer on the lasten token saved in ti.
    * @return int pointer
    */
-  private int getPointerOnLastToken() {
+ /* private int getPointerOnLastToken() {
     return li.readInt(1L + li.readBytes(0, 1L)[0] * 5L + 1L);
   }
+  */
 }

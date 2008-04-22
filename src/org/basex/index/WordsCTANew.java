@@ -971,6 +971,7 @@ public final class WordsCTANew implements Index {
    * @param toin value to be inserted
    * @return inserting position
    */
+/*
   private int getInsertingPositionBinary(final int[] cne, final int toin) {
     found = false;
     int l = cne[0] + 1;
@@ -993,7 +994,7 @@ public final class WordsCTANew implements Index {
     }
     return l;
   }
-
+*/
   
   
   

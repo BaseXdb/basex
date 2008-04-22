@@ -540,7 +540,7 @@ public final class CTArrayNew {
    * @param toi value to be inserted
    * @return inserting position
    */
-  private int getInsertingPositionBinaryF(final int cn, final byte toi) {
+/*  private int getInsertingPositionBinaryF(final int cn, final byte toi) {
     found = false;
     int l = 1;
     int r = next[cn].length - 2;
@@ -563,7 +563,7 @@ public final class CTArrayNew {
     }
     return l;
   }
-
+*/
   /**
    * Lookup for nodes.
    * @param valueSearchNode search nodes value
