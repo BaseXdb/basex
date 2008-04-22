@@ -226,61 +226,50 @@ public final class GUI extends JFrame {
       public void keyReleased(final KeyEvent e) {
         if(e.getKeyChar() == 0xFFFF || e.isControlDown()) return;
         
-        if(GUIProp.searchmode == 2 || !context.db()) {
+        /*if(GUIProp.searchmode == 2 || !context.db()) {
           char ch = e.getKeyChar();
           if (ch == 'c') {
-            input.removeAllItems();
-            input.addItem(Commands.CD.name());
-            input.addItem(Commands.CLOSE.name());
-            input.addItem(Commands.COPY.name());
-            input.addItem(Commands.CREATE.name());
+            input.insertItemAt(Commands.CD.name(), 0);
+            input.insertItemAt(Commands.CLOSE.name(), 1);
+            input.insertItemAt(Commands.COPY.name(), 2);
+            input.insertItemAt(Commands.CREATE.name(), 3);
             input.showPopup();
           } else if(ch == 'd') {
-            input.removeAllItems();
-            input.addItem(Commands.DELETE.name());
-            input.addItem(Commands.DROP.name());
+            input.insertItemAt(Commands.DELETE.name(), 0);
+            input.insertItemAt(Commands.DROP.name(), 1);
             input.showPopup();
           } else if(ch == 'e') {
-            input.removeAllItems();
-            input.addItem(Commands.EXIT.name());
-            input.addItem(Commands.EXPORT.name());
+            input.insertItemAt(Commands.EXIT.name(), 0);
+            input.insertItemAt(Commands.EXPORT.name(), 1);
             input.showPopup();
           } else if(ch == 'f') {
-            input.removeAllItems();
-            input.addItem(Commands.FIND.name());
+            input.insertItemAt(Commands.FIND.name(), 0);
             input.showPopup();
           } else if(ch == 'h') {
-            input.removeAllItems();
-            input.addItem(Commands.HELP.name());
+            input.insertItemAt(Commands.HELP.name(), 0);
             input.showPopup();
           } else if(ch == 'i') {
-            input.removeAllItems();
-            input.addItem(Commands.INFO.name());
-            input.addItem(Commands.INSERT.name());
+            input.insertItemAt(Commands.INFO.name(), 0);
+            input.insertItemAt(Commands.INSERT.name(), 1);
             input.showPopup();
           } else if(ch == 'l') {
-            input.removeAllItems();
-            input.addItem(Commands.LIST.name());
+            input.insertItemAt(Commands.LIST.name(), 0);
             input.showPopup();
           } else if(ch == 'o') {
-            input.removeAllItems();
-            input.addItem(Commands.OPEN.name());
+            input.insertItemAt(Commands.OPEN.name(), 0);
             input.showPopup();
           } else if(ch == 's') {
-            input.removeAllItems();
-            input.addItem(Commands.SET.name());
+            input.insertItemAt(Commands.SET.name(), 0);
             input.showPopup();
           } else if(ch == 'u') {
-            input.removeAllItems();
-            input.addItem(Commands.UPDATE.name());
+            input.insertItemAt(Commands.UPDATE.name(), 0);
             input.showPopup();
           } else if(ch == 'x') {
-            input.removeAllItems();
-            input.addItem(Commands.XQUERY.name());
-            input.addItem(Commands.XPATH.name());
+            input.insertItemAt(Commands.XQUERY.name(), 0);
+            input.insertItemAt(Commands.XPATH.name(), 1);
             input.showPopup();
           }
-        }
+        }*/
 
         // skip commands
         if(GUIProp.execrt && GUIProp.searchmode != 2 && context.db() &&
