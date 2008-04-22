@@ -5,7 +5,7 @@ import javax.xml.xquery.XQStaticContext;
 import org.basex.core.Context;
 
 /**
- * BaseX static context.
+ * BaseX XQuery static context.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler

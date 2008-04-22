@@ -10,7 +10,7 @@ import org.basex.core.Context;
 import org.basex.core.Prop;
 
 /**
- * BaseX data source.
+ * BaseX  XQuery data source.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler

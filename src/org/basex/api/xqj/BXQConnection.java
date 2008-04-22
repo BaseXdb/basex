@@ -23,7 +23,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.XMLReader;
 
 /**
- * BaseX connection.
+ * BaseX XQuery connection.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler

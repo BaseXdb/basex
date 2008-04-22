@@ -19,7 +19,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
 
 /**
- * BaseX result item.
+ * BaseX XQuery result item.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler
@@ -153,7 +153,7 @@ public class BXQResultItem implements XQResultItem {
 
   public void writeItemToResult(Result result) {
   // TODO Auto-generated method stub
-
+    
   }
 
   public void writeItemToSAX(ContentHandler saxhdlr) {

@@ -23,7 +23,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.XMLReader;
 
 /**
- * BaseX prepared expression.
+ * BaseX XQuery prepared expression.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler
@@ -31,6 +31,7 @@ import org.xml.sax.XMLReader;
 public class BXQPreparedExpression implements XQPreparedExpression  {
   private XQueryProcessor query;
   private Nodes nodes;
+  private boolean closed;
   
   /**
    * Constructor.
@@ -146,8 +147,7 @@ public class BXQPreparedExpression implements XQPreparedExpression  {
   }
 
   public void close() {
-    // TODO Auto-generated method stub
-    
+    closed = true;
   }
 
   public BXQResultSequence executeQuery() throws XQException {
@@ -192,8 +192,7 @@ public class BXQPreparedExpression implements XQPreparedExpression  {
   }
 
   public boolean isClosed() {
-    // TODO Auto-generated method stub
-    return false;
+    return closed;
   }
 
   public void setImplicitTimeZone(TimeZone arg0) {

@@ -21,7 +21,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
 
 /**
- * BaseX result sequence.
+ * BaseX XQuery result sequence.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler
