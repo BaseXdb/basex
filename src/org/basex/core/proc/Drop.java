@@ -7,9 +7,11 @@ import java.io.File;
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.Commands;
+import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.index.Index;
 import org.basex.io.IOConstants;
+
 
 /**
  * Evaluates the 'drop' command. Deletes a database or index structure.
@@ -78,6 +80,8 @@ public final class Drop extends Proc {
     }
     if(type.equals(Create.FTX)) {
       data.meta.ftxindex = false;
+      if (Prop.fuzzyindex)
+        return dropIndex(Index.TYPE.FUY, DATAFTX);
       return dropIndex(Index.TYPE.FTX, DATAFTX);
     }
     throw new IllegalArgumentException();

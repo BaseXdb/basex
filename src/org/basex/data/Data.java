@@ -291,6 +291,7 @@ public abstract class Data  {
       case ATV: return atvindex.ids(token);
       case WRD: return wrdindex.ids(token);
       case FTX: return ftxindex.ids(token);
+      case FUY: return ftxindex.ids(token);
       default:  return null;
     }
   }

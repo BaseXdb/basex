@@ -759,9 +759,9 @@ public final class XPathProcessor extends QueryProcessor {
       consumeWS();
       Literal lit = parseLiteral();
       consumeWS();
-      consume("fi".getBytes());
-      consume("fti".getBytes());
-      consumeWS();
+      //boolean fi = consume("fi".getBytes());
+      //consume("fti".getBytes());
+      //consumeWS();
       Num error = (Num) parseNumber();
       int ne = (int) error.num();
       if (ne < 0) ne = 3;

@@ -4,9 +4,11 @@ import static org.basex.data.DataText.*;
 import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.core.Progress;
+import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
 import org.basex.io.DataOutput;
+import org.basex.util.Performance;
 import org.basex.util.Token;
 
 
@@ -17,7 +19,7 @@ import org.basex.util.Token;
  * @author Sebastian Gath
  * @author Christian Gruen
  */
-public final class FTBuilder extends Progress implements IndexBuilder {
+public final class FTBuilderOld extends Progress implements IndexBuilder {
   /** Temporary token reference. */
   private byte[] tmptok;
   /** Temporary token start. */
@@ -50,15 +52,33 @@ public final class FTBuilder extends Progress implements IndexBuilder {
       if(data.kind(id) == Data.TEXT) index(data.text(id), id);
     }
 
+    if (Prop.debug) {
+      System.out.println("Trie in Hauptspeicher gehalten:");
+      Performance.gc(5);
+      System.out.println(Performance.getMem());
+    }
     // document contains any textnodes -> empty index created;
     //only root node is kept
     final String db = data.meta.dbname;
     if(index != null && index.countNodes != 1) {
       final CTArrayX indexX = new CTArrayX(index);
       indexX.finish();
+      
+      if (Prop.debug) {
+        System.out.println("Trie in komprimierte Form überführt.");
+        Performance.gc(5);
+        System.out.println(Performance.getMem());
+      }
+      
       indexX.doTransport();
       index = null;
-
+      
+      if (Prop.debug) {
+        System.out.println("Trie auf Platte geschrieben.");
+        Performance.gc(5);
+        System.out.println(Performance.getMem());
+      }
+      
       /*System.out.println("***** direkt vor dem schreiben auf platte: ******");
       
       System.out.println("sizeData:" + indexX.sizeData.length);

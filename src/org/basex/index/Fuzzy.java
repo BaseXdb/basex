@@ -4,12 +4,10 @@ import static org.basex.data.DataText.*;
 import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.BaseX;
-import org.basex.core.Prop;
-import org.basex.data.Data;
+import org.basex.data.DiskData;
 import org.basex.io.DataAccess;
 import org.basex.io.PrintOutput;
 import org.basex.util.Levenshtein;
-import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.query.xpath.expr.FTOption;
 import org.basex.query.xpath.expr.FTUnion;
@@ -23,16 +21,22 @@ import org.basex.query.xpath.expr.FTUnion;
  * this char.
  * Each token has an entry in sizes, saving its length and a pointer on ftdata, 
  * where to find the token and its ftdata.
- * 
- * Structure of sizes:
- * #indexsize (int)
- * [(byte b, int p), ...] b = first char of a searchsting, p pointer  
- * #indexedtokens (int)
- * [(byte l, int n), ...] l = length of the token, n position in ftdata
- * 
- * Structure of ftdata:
- * [(t,o,k,e,n, C, pre0, ..., preC, pos0,..., posC), ...] 
- * t,o,k,e,n as byte[], C as int, pre and pos as int
+ *
+ * The structure of li:
+ *    [l, p] ... where l is the length of a token an p the pointer of
+ *                the first token with length l; there's an entry for 
+ *                each tokenlength [byte, int]
+ *
+ * The structure of lt:
+ *    [t0, t1, ... tl, z, s] ... where t0, t1, ... tl are the byte values 
+ *                           of the token (byte[l]); z is the pointer on
+ *                           the data entries of the token (int) and s is
+ *                           the number of pre values, saved in data (int)
+ *
+ *
+ * The structure of dat:
+ *    [pre0, ..., pres, pos0, pos1, ..., poss] where pre and pos are the 
+ *                          ft data [int[]]             
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Sebastian Gath
@@ -42,56 +46,52 @@ public final class Fuzzy implements Index {
   int indexsize;
   /** Number of ftdata entries. */
   int ftdatasize;
-  /** Values file. */
-  final Data data;
-  
-  /** FTdata lists. */
-  private final DataAccess ftdata;
-  /** FTdata lists. */
-  private final DataAccess sizes;
-  /** Index on diskdata. **/
-  private int[][] index;
-  /** Index offset - number of bytes, used for the index. **/
-  private int ios;
-  
+  /** Index storing each unique tokenlength and pointer 
+   * on the first token with this length. */
+  private final DataAccess li;
+  /** Index storing each token, its data size and pointer
+   * on then data. */
+  private final DataAccess ti;
+  /** Storing pre and pos values for each token. */ 
+  private DataAccess dat;
+  /** DataBase reference. */
+  private final DiskData dd;
+    
   /**
    * Constructor, initializing the index structure.
-   * @param d data reference
    * @param db name of the database
+   * @param d disk data reference
    * @throws IOException IO Exception
    */
-  public Fuzzy(final Data d, final String db)
-      throws IOException {
-    data = d;
-    final String file = DATATXT;
-    ftdata = new DataAccess(db, file + "z");
-    sizes = new DataAccess(db, file + "x");
+  public Fuzzy(final String db, final DiskData d) throws IOException {
+    final String file = DATAFTX;
+    li = new DataAccess(db, file + "x");
+    ti = new DataAccess(db, file + "y");
+    dat = new DataAccess(db, file + "z");
+    dd = d;
+  }
 
-    // index size stored as byte
-    indexsize = sizes.read4(0);
-    index = new int[indexsize][2];
-    for (int z = 0; z < indexsize; z++) {
-      index[z][0] = sizes.readBytes(4L + z * 5L, 4L + z * 5L + 1)[0];
-      index[z][1] = sizes.readInt(4L + z * 5L + 1);
-      //System.out.println("i:" + index[z][0] + "," + index[z][1]);
-    }
-    
-    /*
-    // index size stored as byte
-    indexsize = sizes.read4(0);
-    index = new int[indexsize][2];
-    for (int z=0; z<indexsize; z++) {
-      //System.out.println((sizes.readBytes(4L + z * 5L, 4L + z * 5L + 1)[0]) 
-      //    + "," + sizes.readInt(4L + z * 5L + 1));
-      index[z][0] = sizes.readBytes(4L + z * 5L, 4L + z * 5L + 1)[0];
-      index[z][1] = sizes.readInt(4L + z * 5L + 1);
-    }
-    index[indexsize-1][0] = Integer.MAX_VALUE;
-    // {[v, p]} v value stores as byte, p pointer stored as int
-    // data size stored as int
-    ftdatasize = sizes.readInt(4L + indexsize * 1L + 4L * indexsize);
-    ios = (int) (4L + indexsize * 1L + 4L * indexsize + 4L);
-  */
+  /**
+   * Constructor, initializing the index structure.
+   * @param db name of the database
+   * @throws IOException IO Exception
+   */ 
+  public Fuzzy(final String db) throws IOException {
+    final String file = DATAFTX;
+    li = new DataAccess(db, file + "x");
+    ti = new DataAccess(db, file + "y");
+    dat = null;
+    dd = null;
+  }
+
+  /**
+   * Method for opening the dat stream.
+   * Used to read ftdata from disk.
+   * @param db name of the database
+   * @throws IOException if file is not found
+   */
+  public void openDataFile(final String db) throws IOException  {
+    dat = new DataAccess(db, DATAFTX + "z");
   }
 
   /** {@inheritDoc} */
@@ -99,30 +99,185 @@ public final class Fuzzy implements Index {
     out.println(TEXTINDEX);
     out.println("FUZZY TABLE");
     //out.println("SIZE" + ftdatasize);
-    final long l = ftdata.length();
-    out.println(SIZEDISK + Performance.formatSize(l, true) + Prop.NL);
+    //final long l = ftdata.length();
+    //out.println(SIZEDISK + Performance.formatSize(l, true) + Prop.NL);
   }
 
   /** {@inheritDoc} */
   public int[] ids(final byte[] tok) {
-    int i = 0;
-    while (i < index.length && tok.length != (byte) index[i][0]) i++;
-    if (i == index.length) return null;
-    
-    return CTArrayX.getIDsFromData(
-        get(tok, index[i][1], index[i + 1][1]));
-    
-    //return CTArrayX.getIDsFromData(getFuzzy(tok, 3));
-    
-    /*int i = 0;
-    while (i < index.length && tok[0] > (byte) index[i][0]) i++;
-    if (i == index.length || index[i][0] > tok[0]) return null;
-    return CTArrayX.getIDsFromData(
-        getBinary(tok, (int) (index[i][1] * 5L + ios), 
-            (int) (index[i + 1][1] * 5L + ios)));
-    */
+    return CTArrayX.getIDsFromData(get(tok));
   }
 
+  /**
+   * Determines the pointer on a token.
+   * @param tok token looking for.
+   * @return int pointer 
+   */
+  public int getPointerOnToken(final byte[] tok) {
+    int i = 0;
+    int is = li.readBytes(0, 1L)[0];
+    int ts = li.readBytes(1L, 2L)[0];
+    while (i < is && tok.length > ts) {
+      i++;
+      ts = li.readBytes(1L + i * 5L, 1L + i * 5L + 1L)[0];
+    }
+    
+    if (i == is || ts > tok.length) return -1;
+    int l = li.readInt(1L + i * 5L + 1L);
+    int r = li.readInt(1L + (i + 1) * 5L + 1L);
+    int m = (int) (l + ((int) ((r - l) 
+        / (tok.length * 1L + 8L) / 2)) * (tok.length * 1L + 8L));
+    int res = -2;
+    byte[] dtok = new byte[tok.length];
+    while (l < r) {
+      m = (int) (l + ((int) ((r - l) 
+          / (tok.length * 1L + 8L) / 2)) * (tok.length * 1L + 8L));
+      dtok = ti.readBytes(m, m + dtok.length);
+      res = Token.cmp(dtok, tok);
+      if (res == 0) return m; 
+      else if (res > 0) l = (int) (m + tok.length * 1L + 8L);
+      else r = (int) (m - (tok.length * 1L + 8L));
+    }
+    
+    if (r == l) { 
+      if (res == 0) {
+        return l;
+      }
+      dtok = ti.readBytes(l, l + dtok.length);
+      res = Token.cmp(dtok, tok);
+      if (res == 0) return l; 
+      
+    }
+    return -1;
+  }
+
+  
+  /**
+   * Determines the pointer on the token, found last.
+   * Token could be null, but the length has to be set.
+   * 
+   * @param tok token looking for.
+   * @param length tokens length, number of bytes filled
+   * @return int pointer 
+   */
+  public int getPointerOnTokenLastFound(final byte[] tok, final int length) {
+    int i = 0;
+    int is = li.readBytes(0, 1L)[0];
+    int ts = li.readBytes(1L, 2L)[0];
+    while (i < is && length > ts) {
+      i++;
+      ts = li.readBytes(1L + i * 5L, 1L + i * 5L + 1L)[0];
+    }
+    
+    if (i == is || ts > length) return -1;
+    // used for leading wildcards
+    if (tok == null) return i;
+    
+    int l = li.readInt(1L + i * 5L + 1L);
+    int r = li.readInt(1L + (i + 1) * 5L + 1L);
+    int m = (int) (l + ((int) ((r - l) 
+        / (length * 1L + 8L) / 2)) * (length * 1L + 8L));
+    int res = -2;
+    byte[] dtok = new byte[length];
+    while (l < r) {
+      m = (int) (l + ((int) ((r - l) 
+          / (length * 1L + 8L) / 2)) * (length * 1L + 8L));
+      dtok = ti.readBytes(m, m + dtok.length);
+      res = cmp(dtok, tok);
+      if (res == 0) return m; 
+      else if (res > 0) l = (int) (m + length * 1L + 8L);
+      else r = (int) (m - (length * 1L + 8L));
+    }
+    
+    if (r == l) { 
+      if (res == 0) {
+        return l;
+      }
+      dtok = ti.readBytes(l, l + dtok.length);
+      res = Token.cmp(dtok, tok);
+      if (res == 0) return l; 
+      
+    }
+    return -1;
+  }
+
+  /** Saves the last pointer on the index. Used for wildcardsearch. */
+  private int lastIndex = -1;
+  /**
+   * Returns the pointer on the first token with minimum length 
+   * tokl and the first pointer on the token with minimum length
+   * tokl + 1.
+   * 
+   * @param tokl token length
+   * @return int[][] pointer on token
+   */
+  private int[][] getBoundPointer(final int tokl) {
+      int i = 0;
+      indexsize = li.readBytes(0, 1L)[0];
+      int ts = li.readBytes(1L, 2L)[0];
+      while (i < indexsize && tokl > ts) {
+        i++;
+        ts = li.readBytes(1L + i * 5L, 1L + i * 5L + 1L)[0];
+      }
+      
+      if (i == indexsize) return null;
+
+      // back up last pointer on index
+      lastIndex = (int) (1L + (i + 1) * 5L);
+      return new int[][] {
+          // token length, pointer on the first token with this length
+          {li.readBytes(1L + i * 5L, 1L + i * 5L + 1L)[0], 
+            li.readInt(1L + i * 5L + 1L)}, 
+          {li.readBytes(1L + (i + 1) * 5L, 1L + (i + 1) * 5L + 1L)[0], 
+              li.readInt(1L + (i + 1) * 5L + 1L)} };
+  }
+  
+  /**
+   * Gets next pointer on a entry in length index.
+   * @return entry from li
+   */
+  private int[] getNextBoundPointer() {
+    if ((lastIndex - 1L) / 5L + 1 == indexsize) return null;
+    lastIndex += 5L;
+    
+    return new int[] {li.readBytes(lastIndex, lastIndex + 1L)[0], 
+        li.readInt(lastIndex + 1L)};
+  }
+  
+  /**
+   * Get the pointer on ftdata for a token.
+   * @param pt pointer on token
+   * @param lt length of the token
+   * @return int pointer on ftdata
+   */
+  public int getPointerOnData(final int pt, final int lt) {
+    return ti.readInt(pt + lt * 1L);
+  }
+
+  /**
+   * Reads the size of ftdata from disk.
+   * @param pt pointer on token
+   * @param lt length of the token
+   * @return size of the ftdata
+   */
+  public int getDataSize(final int pt, final int lt) {
+    return ti.readInt(pt + lt * 1L + 4L);
+  }
+  
+  /**
+   * Reads the ftdata from disk.
+   * @param p pointer of ftdata
+   * @param s size of pre values
+   * @return int[][] with ftdata
+   */
+  public int[][] getData(final int p, final int s) {
+    int[][] d = new int[2][];
+    d[0] = dat.readInts(p, p + s * 4L);
+    d[1] = dat.readInts(p + s * 4L, p + 2 * s * 4L);
+    return d;
+    
+  }
+ 
   /**
    * Performes a fuzzy search for token, with e maximal number
    * of errors e.
@@ -132,127 +287,63 @@ public final class Fuzzy implements Index {
    * @return int[][] data
    */
   public int[][] getFuzzy(final byte[] tok, final int e) {
-    int[][] dat = null;
-    int[][] td;
+    int[][] ft = null;
     byte[] to;
+    
+    int dif;
+    
+    int i = 0;
+    int is = li.readBytes(0, 1L)[0];
+    int ts = li.readBytes(1L, 2L)[0];
+    
+    dif = (tok.length - ts < 0) ? 
+        ts - tok.length : tok.length - ts; 
+    while (i < is && dif > e) {
+      i++;
+      ts = li.readBytes(1L + i * 5L, 1L + i * 5L + 1L)[0];
+      dif = (tok.length - ts < 0) ? 
+          ts - tok.length : tok.length - ts;       
+    }
+    
+    if (i == is) return null;
+
     int p;
     int pe;
-    int dif;
-    for (int i = 0; i < index.length; i++) {
-      dif = (tok.length - index[i][0] < 0) ? 
-          index[i][0] - tok.length : tok.length - index[i][0]; 
-      if (dif <= e) {
-        p = index[i][1];
-        pe = index[i + 1][1];
-        //System.out.println("p:" + p + " pe:" + pe);
-        while(p < pe) {
-          to = ftdata.readBytes(p, p + index[i][0]);
-          if (calcEQ(to, 0, tok, e)) {
-            // read data
-            td = new int[2][ftdata.readInt(p + index[i][0])];
-            p += index[i][0] + (int) 4L;
-            System.arraycopy(ftdata.readInts(p, p + td[0].length * 4L), 
-                0, td[0], 0, td[0].length);
-            p += td[0].length * 4L;
-            System.arraycopy(ftdata.readInts(p, p + td[0].length * 4L), 
-                0, td[1], 0, td[0].length);
-            p += td[0].length * 4L;
-            dat = FTUnion.calculateFTOr(dat, td);
-          } else {
-            p += index[i][0] + (int) 4L 
-            + (ftdata.readInt(p + index[i][0]) * 4L) * 2; 
-          }
-       }
+    while (i < is && dif <= e) {
+      p = li.readInt(1L + i * 5L + 1L);
+      pe = li.readInt(1L + (i + 1) * 5L + 1L);
+
+      while(p < pe) {
+        to = ti.readBytes(p, p + ts);
+        if (calcEQ(to, 0, tok, e)) {
+          System.out.println(new String(to));
+          // read data
+          ft = FTUnion.calculateFTOr(ft, 
+              getData(getPointerOnData(p, ts), getDataSize(p, ts)));
+        } 
+        p += ts + (int) 4L * 2;
+     }
+      i++;
+      ts = li.readBytes(1L + i * 5L, 1L + i * 5L + 1L)[0];
+      dif = (tok.length - ts < 0) ? 
+          ts - tok.length : tok.length - ts;       
     }
-      }
-    return dat;
-  }
- 
-  /**
-   * Get token out of index structure.
-   * 
-   * @param tok token looking for
-   * @param pt pointer on first token in index with tok.length
-   * @param pe pointer on first token in index wiht tok.length + 1
-   * @return data
-   */
-  public int[][] get(final byte[] tok, final int pt, final int pe) {
-    int p = pt;
-    byte[] to;
-    int[][] d;
-    int c;
-    while(p < pe) {
-      to = ftdata.readBytes(p, p + tok.length);
-      c = Token.cmp(to, tok);
-      if (c == 0) {
-        // read data
-        d = new int[2][ftdata.readInt(p + tok.length)];
-        System.out.println("d.length:" + d[0].length);
-        p += tok.length + (int) 4L;
-        System.arraycopy(ftdata.readInts(p, p + d[0].length * 4L), 0, 
-            d[0], 0, d[0].length);
-        p += d[0].length * 4L;
-        System.arraycopy(ftdata.readInts(p, p + d[0].length * 4L), 0, d[1], 
-            0, d[0].length);
-        return d;
-      } else if (c > 0) {
-        // read next token from db
-        p = (int) (p + tok.length 
-            + ftdata.readInt(p + tok.length) * 2 * 4L + 4L);
-      } else {
-        return null;
-      }
-    }
-    return null;
-    
-  }
-  
-  
-  
-  /**
-   * Get token form the fuzzy structure. Uses binary search on the 
-   * ordered list.
-   * 
-   * @param tok byte[]token looking for
-   * @param l int left bound
-   * @param r int right bound
-   * @return int[][] data pre and pos values
-   */
-  public int[][] getBinaryWS(final byte[] tok, final int l, final int r) {
-    int m;
-    if (l == r) {
-      m = l;
-    } else {
-      m = (((l + r - 2 * ios) / 2) / (int) 5L * (int) 5L) + ios;
-    }
-    
-    int mtp = sizes.readInt(m + 1L);
-    int mts = sizes.readBytes(m, m + 1L)[0];
-    
-    byte[] b = ftdata.readBytes(mtp, mtp + mts);
-    int i = Token.cmp(tok, b);
-    
-    if (l != r) {
-      if (i < 0) return getBinaryWS(tok, (int) (m + 5L), r);
-      else if (i > 0) return getBinaryWS(tok, l, (int) (m - 5L));
-    }
-    
-    if (i == 0) {
-      // read data from disk
-      int[][] d = new int[2][ftdata.readInt(mts + mtp)];
-      System.out.println("datasize=" + d[0].length);
-      System.arraycopy(ftdata.readInts(mts + mtp + 4L, 
-          mts + mtp + 4L + d[0].length * 4L), 
-          0, d[0], 0, d[0].length);
-      
-      System.arraycopy(ftdata.readInts(mts + mtp + 4L + d[0].length * 4L,
-          mts + mtp + 4L + d[0].length * 8L), 
-          0, d[1], 0, d[0].length);
-      return d;
-    }
-    return null;
+    return ft;
   }
 
+  /**
+   * Get pre- and posvalues, stored for token out of index.
+   * @param tok token looking for
+   * @return int[][] ftdata
+   */
+  public int[][] get(final byte[] tok) {
+    final int p = getPointerOnToken(tok);
+
+    if (p == -1) return null;
+    return getData(getPointerOnData(p, tok.length), getDataSize(p, tok.length));
+    
+  } 
+ 
   /** {@inheritDoc} */
   public int[][] fuzzyIDs(final byte[] tok, final int ne) {
     return getFuzzy(tok, ne);
@@ -260,21 +351,97 @@ public final class Fuzzy implements Index {
 
   /** {@inheritDoc} */
   public int[][] idPos(final byte[] tok, final FTOption ftO) {
-    BaseX.debug("Values: No fulltext option support.");
-/*    int i = 0;
-    while (i < index.length && tok.length != (byte) index[i][0]) i++;
-    if (i == index.length) return null;
+    // init no wildcard included in token
+    int posW = -1;
+
+    // backup original token
+    byte[] bTok = new byte[tok.length];
+    System.arraycopy(tok, 0, bTok, 0, tok.length);
+
+    // token to lower case
+    for (int i = 0; i < tok.length; i++) {
+      tok[i] = (byte) Token.lc(tok[i]);
+      // check for wildcards
+      if (tok[i] == '.') {
+        posW = i;
+      }
+    }
+
+    // check wildcards
+    if (ftO.ftWild.equals(FTOption.WILD.WITH) && posW > -1)  {
+      return getTokenWildCard(tok, posW);
+    }
+
+
+    if (ftO.ftCase.equals(FTOption.CASE.INSENSITIVE)) {
+      // index request with pre-values as result
+      return get(tok);
+    }
+
+    // index request with pre-values and positions as result
+    int[][] ids = get(tok);
+    if (ids == null) {
+      return null;
+    }
+
+    if (ftO.ftCase.equals(FTOption.CASE.UPPERCASE)) {
+      // convert search string to upper case and use case sensitive search
+      bTok = Token.uc(bTok);
+    } else if (ftO.ftCase.equals(FTOption.CASE.LOWERCASE)) {
+      // carry search string to upper case and use case sensitive search
+      bTok = Token.lc(bTok);
+    }
+
+    byte[] tokenFromDB;
+    byte[] textFromDB;
+    int[][] rIds = new int[2][ids[0].length];
+    int count = 0;
+    int readId;
+
+    if (dd == null) {
+      BaseX.debug("Values: No fulltext option support.");
+      return null;
+    }
     
-    return get(tok, index[i][1], index[i + 1][1]);
-*/
-    return getFuzzy(tok, 3);
+    int i = 0;
+    // check real case of each result node
+    while(i < ids[0].length) {
+      // get date from disk
+      readId = ids[0][i];
+      textFromDB = dd.text(ids[0][i]);
+      tokenFromDB = new byte[tok.length];
+
+      System.arraycopy(textFromDB, ids[1][i], tokenFromDB, 0, tok.length);
+
+      readId = ids[0][i];
+
+      // check unique node ones
+      while (i < ids[0].length && readId == ids[0][i]) {
+        System.arraycopy(textFromDB, ids[1][i], tokenFromDB, 0, tok.length);
+
+        readId = ids[0][i];
+
+        // check unique node ones
+        // compare token from db with token from query
+        if (Token.eq(tokenFromDB, bTok)) {
+          rIds[0][count] = ids[0][i];
+          rIds[1][count++] = ids[1][i];
+
+          // jump over same ids
+          while (i < ids[0].length && readId == ids[0][i]) i++;
+          break;
+        }
+        i++;
+      }
+    }
+
+    if (count == 0) return null;
     
-    /*  int i = 0;
-    while (i < index.length && tok[0] > (byte) index[i][0]) i++;
-    if (i == index.length || index[i][0] > tok[0]) return null;
-    return getBinary(tok, (int) (index[i][1] * 5L + ios), 
-        (int) (index[i + 1][1] * 5L + ios));    
-  */
+    int[][] tmp = new int[2][count];
+    System.arraycopy(rIds[0], 0, tmp[0], 0, count);
+    System.arraycopy(rIds[1], 0, tmp[1], 0, count);
+
+    return tmp;
   }
   
   /** {@inheritDoc} */
@@ -291,8 +458,9 @@ public final class Fuzzy implements Index {
 
    /** {@inheritDoc} */
   public synchronized void close() throws IOException {
-    sizes.close();
-    ftdata.close();
+    li.close();
+    ti.close();
+    dat.close();
   }
   
   /**
@@ -317,5 +485,101 @@ public final class Fuzzy implements Index {
         Levenshtein.levenshtein(tok1, sp, tok1.length, tok2, e) : 
       Levenshtein.levenshtein(tok2, sp, tok2.length, tok1, e);
     return d <= e;
+  }
+  
+  /**
+   * Performces a wildcard search. Only one '.*' is supported.
+   *  
+   * @param tok token containing a wildcard
+   * @param posw position of the wildcard in tok
+   * @return data found
+   */
+  private int[][] getTokenWildCard(final byte[] tok, final int posw) {
+    if (tok[posw] == '.' && tok.length > posw + 1 && tok[posw + 1] == '*') {
+      int[][] b;
+      int[][] data = null;
+      byte[] dtok;
+      b = getBoundPointer(tok.length - 2);
+        while (true) {
+          if (b[0][1] >= b[1][1]) {
+            // set new bounds
+            b[0] = b[1];
+            b[1] = getNextBoundPointer();
+            if (b[1] == null) break; //return data;
+          }
+          dtok = ti.readBytes(b[0][1], b[0][0] + b[0][1]);
+          //System.out.println(new String(dtok));
+          if (contains(tok, posw, dtok)) data = FTUnion.calculateFTOr(data, 
+                  getData(getPointerOnData(b[0][1], b[0][0]), 
+                  getDataSize(b[0][1], b[0][0])));
+          b[0][1] += b[0][0] * 1L + 8L;
+        //}
+      }
+        dtok = ti.readBytes(b[0][1], b[0][0] + b[0][1]);
+        if (contains(tok, posw, dtok)) data = FTUnion.calculateFTOr(data, 
+            getData(getPointerOnData(b[0][1], b[0][0]), 
+            getDataSize(b[0][1], b[0][0])));
+        return data;
+        
+    } else {
+      BaseX.debug("Sorry, FuzzyIndex supports only \'.*\' as wildcard.");
+      return null;
     }
+  }
+  
+  /**
+   * Compares two character arrays for equality and 
+   * checks if a is contained in b.
+   * Tokens abc and abcde are calculated as equal!
+   * 
+   * @param tok token to be compared
+   * @param tok2 second token to be compared
+   * @return 0 if tok equals tok2, -1 tok > tok0, 1 tok < tok2
+   */
+  public static int cmp(final byte[] tok, final byte[] tok2) {
+    final int l = (tok.length > tok2.length) ? tok2.length 
+        : tok.length;
+    
+   for(int t = 0; t != l; t++) {
+      if(tok2[t] > tok[t]) return 1;
+      else if(tok2[t] < tok[t]) return -1;
+    }
+    return 0;
+  }
+
+  /**
+   * Compares two character arrays for equality and 
+   * checks if a is contained in b.
+   * Tokens abc and abcde are calculated as equal!
+   * 
+   * @param tokww token with the wildcard
+   * @param posw position of the wildcard in tokww
+   * @param tok2 second token to be compared
+   * @return true if tok2 is contained in tokww
+   */
+  public static boolean contains(final byte[] tokww, final int posw, 
+      final byte[] tok2) {
+    if (tokww.length - 2 > tok2.length) return false;
+
+    // check token befor wildcard
+    for(int t = 0; t < posw; t++) {
+      if (tokww[t] != tok2[t]) return false; 
+    }
+    
+    // check token after wildcard
+    for(int t = tokww.length - posw - 2; t > 0; t--) {
+      if (tokww[tokww.length - t] != tok2[tok2.length - t]) return false; 
+    }
+
+    return true;
+  }
+
+  
+  /**
+   * Returns the pointer on the lasten token saved in ti.
+   * @return int pointer
+   */
+  private int getPointerOnLastToken() {
+    return li.readInt(1L + li.readBytes(0, 1L)[0] * 5L + 1L);
+  }
 }

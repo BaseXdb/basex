@@ -17,6 +17,7 @@ import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.index.FTBuilder;
+import org.basex.index.FuzzyBuilder;
 import org.basex.index.Index;
 import org.basex.index.IndexBuilder;
 import org.basex.index.ValueBuilder;
@@ -190,7 +191,10 @@ public final class Create extends Proc {
       if(data.meta.txtindex) buildIndex(Index.TYPE.TXT, data);
       if(data.meta.atvindex) buildIndex(Index.TYPE.ATV, data);
       if(data.meta.wrdindex) buildIndex(Index.TYPE.WRD, data);
-      if(data.meta.ftxindex) buildIndex(Index.TYPE.FTX, data);
+      if(data.meta.ftxindex) {
+        if (Prop.fuzzyindex) buildIndex(Index.TYPE.FUY, data);
+        else buildIndex(Index.TYPE.FTX, data); 
+      }
       context.data(data);
       
       return Prop.info ? timer(DBCREATED) : true;
@@ -239,9 +243,11 @@ public final class Create extends Proc {
         data.openIndex(Index.TYPE.ATV, new ValueBuilder(false).build(data));
       if(data.meta.wrdindex)
         data.openIndex(Index.TYPE.WRD, new WordBuilder().build(data));
-      if(data.meta.ftxindex)
-        data.openIndex(Index.TYPE.FTX, new FTBuilder().build(data));
-
+      if(data.meta.ftxindex) {
+        if (Prop.fuzzyindex) 
+          data.openIndex(Index.TYPE.FUY, new FTBuilder().build(data));
+        else data.openIndex(Index.TYPE.FTX, new FTBuilder().build(data));
+      }
       return data;
     } catch(final IOException ex) {
       BaseX.debug(ex);
@@ -301,7 +307,8 @@ public final class Create extends Proc {
         index = Index.TYPE.WRD;
       } else if(type.equals(FTX)) {
         data.meta.ftxindex = true;
-        index = Index.TYPE.FTX;
+        if (Prop.fuzzyindex) index = Index.TYPE.FUY;
+        else index = Index.TYPE.FTX;
       } else {
         throw new IllegalArgumentException();
       }
@@ -329,10 +336,10 @@ public final class Create extends Proc {
           new ValueBuilder(false), d, Prop.allInfo ? CREATEATTR : null); break;
       case WRD: buildIndex(i,
           new WordBuilder(), d, Prop.allInfo ? CREATEWORD : null); break;
+      case FUY: buildIndex(i,
+          new FuzzyBuilder(), d, Prop.allInfo ? CREATEFT : null); break;
       case FTX: buildIndex(i,
-          new FTBuilder(), d, Prop.allInfo ? CREATEFT : null);
-      //case FZY: buildIndex(i,
-      //buildIndex(i, new FuzzyBuilder(), d, Prop.allInfo ? CREATEFT : null);}
+            new FTBuilder(), d, Prop.allInfo ? CREATEFT : null); 
     }
   }
 

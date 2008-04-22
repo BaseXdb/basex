@@ -4,11 +4,12 @@ import static org.basex.Text.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
 import org.basex.core.Prop;
+import org.basex.index.Fuzzy;
 import org.basex.index.Index;
 import org.basex.index.Names;
 import org.basex.index.Values;
 import org.basex.index.Words;
-import org.basex.index.WordsCTA;
+import org.basex.index.WordsCTANew;
 import org.basex.io.DataAccess;
 import org.basex.io.PrintOutput;
 import org.basex.io.TableAccess;
@@ -96,7 +97,11 @@ public final class DiskData extends Data {
       if(meta.txtindex) openIndex(Index.TYPE.TXT, new Values(this, db, true));
       if(meta.atvindex) openIndex(Index.TYPE.ATV, new Values(this, db, false));
       if(meta.wrdindex) openIndex(Index.TYPE.WRD, new Words(db));
-      if(meta.ftxindex) openIndex(Index.TYPE.FTX, new WordsCTA(db, this));
+      if(meta.ftxindex) {
+        if (Prop.fuzzyindex) openIndex(Index.TYPE.FUY, new Fuzzy(db, this));
+        else openIndex(Index.TYPE.FTX, new WordsCTANew(db, this));
+      }
+      
     }
     initNames();
   }
@@ -145,6 +150,7 @@ public final class DiskData extends Data {
     closeIndex(Index.TYPE.ATV);
     closeIndex(Index.TYPE.WRD);
     closeIndex(Index.TYPE.FTX);
+    closeIndex(Index.TYPE.FUY);
   }
 
   @Override
@@ -154,7 +160,8 @@ public final class DiskData extends Data {
       case TXT: if(txtindex != null) txtindex.close(); break;
       case ATV: if(atvindex != null) atvindex.close(); break;
       case WRD: if(wrdindex != null) wrdindex.close(); break;
-      case FTX: if(ftxindex != null) ftxindex.close();
+      case FTX: if(ftxindex != null) ftxindex.close(); break;
+      case FUY: if(ftxindex != null) ftxindex.close(); break;
     }
   }
 
@@ -164,7 +171,8 @@ public final class DiskData extends Data {
       case TXT: if(meta.txtindex) txtindex = index; break;
       case ATV: if(meta.atvindex) atvindex = index; break;
       case WRD: if(meta.wrdindex) wrdindex = index; break;
-      case FTX: if(meta.ftxindex) ftxindex = index;
+      case FTX: if(meta.ftxindex) ftxindex = index; break;
+      case FUY: if(meta.ftxindex) ftxindex = index;
     }
   }
 
@@ -344,6 +352,7 @@ public final class DiskData extends Data {
   @Override
   public int[][] ftIDRange(final byte[] word1, final boolean itok0,
       final byte[] word2, final boolean itok1) {
+    
     return ftxindex.idPosRange(word1, itok0, word2, itok1);
   }
 

@@ -54,9 +54,12 @@ public final class Levenshtein {
       m = new int[32][32];
       for(int i = 0; i < m.length; i++) { m[0][i] = i; m[i][0] = i; }
     }
-    
+
     int e2 = -1, f2 = -1;
+    // in my opinion, t = ts would avoid this trouble -> SG
     for(int t = 0; t < tl; t++) {
+      // <cg> maybe here is a bug, if ts > 0, 
+      // this causes an array out of bounds exception.
       final int e = ftNorm(tok[ts + t]);
       int d = 64;
       for(int q = 0; q < sl; q++) {
@@ -97,8 +100,8 @@ public final class Levenshtein {
     }
     
     int e2 = -1, f2 = -1;
-    for(int t = 0; t < tl; t++) {
-      final int e = ftNorm(tok[ts + t]);
+    for(int t = ts; t < tl; t++) {
+      final int e = ftNorm(tok[t]);
       int d = 64;
       for(int q = 0; q < sl; q++) {
         final int f = ftNorm(sub[q]);

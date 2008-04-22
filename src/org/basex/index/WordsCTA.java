@@ -1529,6 +1529,15 @@ public final class WordsCTA implements Index {
           } else return null;
         } else {
           int[][] ld = null;
+          byte[] b;
+          if (c > d + p + r) {
+              // delete char
+              b = new byte[vsn.length - 1];
+              System.arraycopy(vsn, 0, b, 0, i);
+              ld = getNodeFuzzy(cn, cne, b, d + 1, p, r, c);
+            }
+          
+          
           // cut valueSearchNode for value current node
           final byte[] tmp = new byte[vsn.length - i];
           System.arraycopy(vsn, i, tmp, 0, tmp.length);
@@ -1541,10 +1550,9 @@ public final class WordsCTA implements Index {
           }
             
           final int[] nn = getNextNodes(cne);
-          byte[] b;
           byte[] ne;
           for (int k = 0; k < nn.length; k++) {
-            if (c > d + p + r) {
+            //if (c > d + p + r) {
               ne = getNodeEntry(nn[k]);
               if (ne[1] == vsn[0]) {
                 b = new byte[vsn.length];
@@ -1553,6 +1561,7 @@ public final class WordsCTA implements Index {
                     getNodeFuzzy(nn[k], ne, b, d, p, r, c));
               }
               
+            if (c > d + p + r) {
               // paste char
               b = new byte[vsn.length + 1];
               b[0] = ne[1];
@@ -1573,9 +1582,9 @@ public final class WordsCTA implements Index {
                 ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(nn[k], ne,
                     b, d, p, r + 1, c));
               }
-            } else {
+            } /* else {
               return ld;
-            }    
+            } */   
           }
           return ld;
         }
@@ -1590,8 +1599,7 @@ public final class WordsCTA implements Index {
           b[i] = cne[i + 1];
           System.arraycopy(vsn, i, b, i + 1, vsn.length - i);
                  
-          ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(cn, cne,
-              b, d, p + 1, r, c));
+          ld = getNodeFuzzy(cn, cne, b, d, p + 1, r, c);
           
           if (vsn.length > 0 && i < vsn.length) {
             // replace
@@ -1628,7 +1636,7 @@ public final class WordsCTA implements Index {
 
       byte[] b;
       for (int k = 0; k < nn.length; k++) {
-        if (c > d + p + r) {
+        //if (c > d + p + r) {
           ne = getNodeEntry(nn[k]);
           if (ne[1] == vsn[0]) {
             b = new byte[vsn.length];
@@ -1636,7 +1644,7 @@ public final class WordsCTA implements Index {
             ld = FTUnion.calculateFTOr(ld, 
                 getNodeFuzzy(nn[k], ne, b, d, p, r, c));
           }
-          
+        if (c > d + p + r) { 
           // paste char
           b = new byte[vsn.length + 1];
           b[0] = ne[1];
@@ -1657,9 +1665,9 @@ public final class WordsCTA implements Index {
               ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(nn[k], ne,
                   b, d, p, r + 1, c));
           }
-        } else {
+        } /* else {
           return ld;
-        }    
+        }   */ 
       }
       return ld;
     }

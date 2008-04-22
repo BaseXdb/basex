@@ -216,7 +216,7 @@ final class CTArray {
             next[countNodes] = next[cn];
             next[cn] = new int[] {countNodes};
             totDataSize++;
-
+            
 
             // System.out.println("2. FAll->!found");
             countNodes++;

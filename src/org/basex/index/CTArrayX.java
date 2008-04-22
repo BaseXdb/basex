@@ -147,6 +147,8 @@ public final class CTArrayX {
       } 
     }
 */
+    
+    int[] stats = new int[3];
     // copy root info
     nodes[0] = new byte[3];
     nodes[0][0] = 0;
@@ -194,10 +196,12 @@ public final class CTArrayX {
 
           // set size info
           sizeData[count] = data[count].length;
+          stats[2]++;
         } else {
           data[count] = new int[cta.next[i].length];
           // set size info
           sizeData[count] = data[count].length;
+          stats[1]++;
         }
         System.arraycopy(cta.next[i], 0, data[count], 0,
             cta.next[i].length);
@@ -264,52 +268,13 @@ public final class CTArrayX {
               data[count], ((int[][]) cta.data[i])[0].length,
                   ((int[][]) cta.data[i])[0].length);
           count++;
+          stats[0]++;
         }
       } 
     }
     
     // clear reference
     cta = null;
-    
-    //System.out.println("sum="+sum);
-    //System.out.println("cta.totDataSize="+cta.totDataSize);
-/*    IntArrayList bl = new IntArrayList();
-    int[][] list = doPreOrderTravWI(0, new StringBuffer(), 
-        new IntArrayList(), bl);
-    // add dummy at the end of the index, that points on last data set in il
-    bl.add(new int[]{Integer.MAX_VALUE, list.length - 1});
-    int[][] ia = bl.finish();
-    
-    byte[] tmp;
-    int[] ndata;
-    for (int i = 0; i < ia.length; i++) 
-      System.out.println(ia[i][0] + ":" + ia[i][1]);
-    for(int[] i : list) {
-      tmp = new byte[i[0]];
-      for (int k = 0; k < tmp.length; k++) tmp[k] = (byte) i[k + 2];
-      System.out.print("length=" + i[0] + ": nb=" + i[1] + ":" 
-          + new String(tmp) + " s:" + i[i[0]+2] + ":");
-      ndata = new int[i[i[0]+2]];
-      System.arraycopy(i, 1 + tmp.length, ndata, 0, ndata.length);
-      for (int k:ndata) System.out.print(k + ",");
-      System.arraycopy(i, 1 + tmp.length + ndata.length, 
-          ndata, 0, ndata.length);
-      for (int k:ndata) System.out.print(k + ",");
-      System.out.println();
-    }
-*/
-    /*
-    int[] index = bl.finish();
-    byte[] b;
-    for (int i=0; i < index.length; i++) {
-      b = new byte[index.length - 1]; 
-      System.arraycopy(index[i], 1, b, 0, b.length);
-      b = nodes[Array.byteToIntNN(b)];
-      byte[] v = new byte[b[0]];
-      System.arraycopy(b, 1, v, 0, v.length);
-      System.out.println((char)(index[i]) + ":" + new String(v)); 
-    }
-    */
   }
 
   /**

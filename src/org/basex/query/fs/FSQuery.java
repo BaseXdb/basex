@@ -5,8 +5,6 @@ import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.io.PrintOutput;
 
-
-
 /**
  * This class simulates some file system operations.
  *

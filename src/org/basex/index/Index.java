@@ -17,8 +17,8 @@ public interface Index {
     /** Text index.      */ TXT,
     /** Attribute index. */ ATV,
     /** Word index.      */ WRD,
-    /** Fulltext index.  */ FTX;
-    /** Fuzzy index.     */ //FUY;
+    /** Fulltext index.  */ FTX,
+    /** Fuzzy index.     */ FUY;
   };
   
   /**
