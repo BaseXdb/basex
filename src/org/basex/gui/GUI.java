@@ -22,6 +22,8 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JPopupMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
@@ -114,6 +116,10 @@ public final class GUI extends JFrame {
   private final GUIToolBar toolbar;
   /** Menu panel height. */
   private int menuHeight;
+  /** Boolean value for check. */
+  public boolean done = false;
+  /** JPopupMenu. */
+  public JPopupMenu pop;
 
   /**
    * Singleton Constructor.
@@ -219,57 +225,34 @@ public final class GUI extends JFrame {
       @Override
       public void keyPressed(final KeyEvent e) {
         addKeys(e);
-        if(e.getKeyCode() == KeyEvent.VK_ENTER) execute();
+        if(done && input.getText().length() == 0) {
+          pop.setVisible(false);
+          done = false;
+        }
+        if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+          execute();
+          pop.setVisible(false);
+          done = false;
+        }
       }
 
       @Override
       public void keyReleased(final KeyEvent e) {
         if(e.getKeyChar() == 0xFFFF || e.isControlDown()) return;
         
-        /*if(GUIProp.searchmode == 2 || !context.db()) {
+        if(GUIProp.searchmode == 2 || !context.db()) {
+          if(!done) {
+          String[] all = {"cd", "close", "copy", "create",
+              "delete", "drop", "exit", "export", "find",
+              "help", "info", "insert", "list", "open", "set",
+              "update", "xquery", "xpath"};
           char ch = e.getKeyChar();
-          if (ch == 'c') {
-            input.insertItemAt(Commands.CD.name(), 0);
-            input.insertItemAt(Commands.CLOSE.name(), 1);
-            input.insertItemAt(Commands.COPY.name(), 2);
-            input.insertItemAt(Commands.CREATE.name(), 3);
-            input.showPopup();
-          } else if(ch == 'd') {
-            input.insertItemAt(Commands.DELETE.name(), 0);
-            input.insertItemAt(Commands.DROP.name(), 1);
-            input.showPopup();
-          } else if(ch == 'e') {
-            input.insertItemAt(Commands.EXIT.name(), 0);
-            input.insertItemAt(Commands.EXPORT.name(), 1);
-            input.showPopup();
-          } else if(ch == 'f') {
-            input.insertItemAt(Commands.FIND.name(), 0);
-            input.showPopup();
-          } else if(ch == 'h') {
-            input.insertItemAt(Commands.HELP.name(), 0);
-            input.showPopup();
-          } else if(ch == 'i') {
-            input.insertItemAt(Commands.INFO.name(), 0);
-            input.insertItemAt(Commands.INSERT.name(), 1);
-            input.showPopup();
-          } else if(ch == 'l') {
-            input.insertItemAt(Commands.LIST.name(), 0);
-            input.showPopup();
-          } else if(ch == 'o') {
-            input.insertItemAt(Commands.OPEN.name(), 0);
-            input.showPopup();
-          } else if(ch == 's') {
-            input.insertItemAt(Commands.SET.name(), 0);
-            input.showPopup();
-          } else if(ch == 'u') {
-            input.insertItemAt(Commands.UPDATE.name(), 0);
-            input.showPopup();
-          } else if(ch == 'x') {
-            input.insertItemAt(Commands.XQUERY.name(), 0);
-            input.insertItemAt(Commands.XPATH.name(), 1);
-            input.showPopup();
+          pop = createJPop(all, ch);
+          input.add(pop);
+          pop.show(input, 0, 25);
+          done = true;
           }
-        }*/
+        }
 
         // skip commands
         if(GUIProp.execrt && GUIProp.searchmode != 2 && context.db() &&
@@ -351,6 +334,38 @@ public final class GUI extends JFrame {
         views.run();
       }
     }.start();
+  }
+  
+  /**
+   * Creates the JPopupMenu.
+   * @return JPopupMenu.
+   * @param all JMenuItem to add.
+   * @param ch for checking which items to make.
+   */
+  public JPopupMenu createJPop(final String[] all, final char ch) {
+    pop = new JPopupMenu();
+    pop.setVisible(true);
+    for (int i = 0; i < all.length; i++) {
+      if(all[i].charAt(0) == ch) {
+      JMenuItem jmi = new JMenuItem(all[i]);
+    jmi.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent ac) {
+        setInputTxt(ac.getActionCommand());
+        pop.setVisible(false);
+      }
+    });
+    pop.add(jmi);
+    }
+    }
+    return pop;
+  }
+  
+  /**
+   * Sets the text in the combobox after choice in JPopup.
+   * @param txt Text for the Combobox.
+   */
+  public void setInputTxt(final String txt) {
+    this.input.setText(txt);
   }
 
   /**
