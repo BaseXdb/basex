@@ -11,6 +11,8 @@ import org.basex.query.QueryException;
 import org.basex.query.xpath.XPathProcessor;
 import org.basex.data.Nodes;
 import org.basex.util.GetOpts;
+import org.basex.util.IntList;
+import org.basex.util.Token;
 
 /**
  * Performs a locate command.
@@ -152,13 +154,19 @@ public class LOCATE {
   private void locateTable(final int pre, final int limit) throws IOException {
 
     if(!lFlag || filesfound < limit) {            
-      int[] dir = FSUtils.getAllOfDir(data, pre);        
-      int[] allDir = new int[dir.length];
-      int j = 0;
-      for(int i : dir) {        
-        if(FSUtils.isDir(data, i))
-          allDir[j++] = i;         
-        if(FSUtils.isFile(data, i)) {
+      int[] contentDir = FSUtils.getAllOfDir(data, pre);  
+
+      IntList res = new IntList();
+
+      for(int i : contentDir) {        
+        if(FSUtils.isDir(data, i)) {
+          String filefound = FSUtils.getFileName(data, i);
+          if(fileToFind.equalsIgnoreCase(filefound)) {
+            printDir(i);
+          } else {
+            res.add(i);
+          }
+        } else if(FSUtils.isFile(data, i)) {
           // if found print with path      
           String filefound = FSUtils.getFileName(data, i);
           if(fileToFind.equalsIgnoreCase(filefound)) {
@@ -170,8 +178,9 @@ public class LOCATE {
           }
         }
       }
+      int[] allDir = res.finish(); 
       // repeat for all dirs
-      for(int i = 0; allDir[i] != 0 && i < allDir.length; i++) {
+      for(int i = 0; i < allDir.length; i++) {
         locateTable(allDir[i], limit);
       }      
     }
@@ -203,6 +212,27 @@ public class LOCATE {
       e.printStackTrace();
     }
   }
+
+  /**
+   * Print the number of files found.
+   * 
+   * @throws IOException in case of problems with the PrintOutput
+   */  
+  private void printDir(final int i) throws IOException {
+    int toScan = i;
+    int[] subContentDir = FSUtils.getAllOfDir(data, toScan);  
+    int[] allDir = FSUtils.getAllDir(data, toScan);
+    for(int j : subContentDir) {              
+      out.print(FSUtils.getPath(data, j));
+      out.print(NL);
+    }
+    for(int x = 0; x < allDir.length; x++) {
+      out.print(FSUtils.getPath(data, allDir[x]));
+      out.print(NL);
+      printDir(allDir[x]);
+    }
+  }
+
 
   /**
    * Print the number of files found.

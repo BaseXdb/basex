@@ -107,16 +107,17 @@ public class LS {
    */
   private void lsRecursive(final int pre) throws IOException {         
 
-    int[] dir = FSUtils.getAllOfDir(data, pre);        
-    int[] allDir = new int[dir.length];
-    int j = 0;
-    for(int i : dir) {
-      if(FSUtils.isDir(data, i))
-        allDir[j++] = i; 
-    }
-    // print dir
-    print(dir);   
-    for(int i = 0; allDir[i] != 0 && i < allDir.length; i++) {
+    int[] contentDir = FSUtils.getAllOfDir(data, pre);  
+    int[] allDir = FSUtils.getAllDir(data, pre);
+    print(contentDir);   
+
+    for(int i = 0; i < allDir.length; i++) {
+      if(!fListDot) {    
+        // don´t crawl dirs starting with ´.´
+        byte[] name = FSUtils.getName(data, allDir[i]);
+        if(Token.startsWith(name, '.'))
+          continue;
+      }
       out.print(NL);
       out.print(FSUtils.getPath(data, allDir[i]));
       out.print(NL);
