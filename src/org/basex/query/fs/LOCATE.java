@@ -12,7 +12,6 @@ import org.basex.query.xpath.XPathProcessor;
 import org.basex.data.Nodes;
 import org.basex.util.GetOpts;
 import org.basex.util.IntList;
-import org.basex.util.Token;
 
 /**
  * Performs a locate command.
@@ -196,7 +195,29 @@ public class LOCATE {
    * @throws IOException in case of problems with the PrintOutput 
    */
   private void locateXQuery(final int limit) throws IOException {
-    String query = "//file[@name='" + fileToFind + "']";    
+    String query;
+    int slash = fileToFind.indexOf('/'); 
+    int lastSlash = 0;
+    int lastrIndexOfSlash = fileToFind.lastIndexOf('/');
+    if(slash != 0) {
+      query = "//[@name='" + fileToFind.substring(lastSlash, slash) + "']";
+      while(slash < lastrIndexOfSlash) {
+        query += "/[@name='" + fileToFind.substring(lastSlash, slash) + "']";
+        lastSlash = slash;
+        slash = fileToFind.indexOf('/', lastSlash);      
+        out.print(query);
+        out.print(NL);
+      }
+      
+      query += "/[@name='" + 
+        fileToFind.substring(lastrIndexOfSlash + 1, fileToFind.length()) + "']";
+      out.print(query);
+      out.print(NL);
+    } else {
+      query = "//[@name='" + fileToFind + "']";  
+    }
+    
+        
     XPathProcessor qu = new XPathProcessor(query);
     try {
       Nodes result = qu.queryNodes(input);
@@ -214,8 +235,8 @@ public class LOCATE {
   }
 
   /**
-   * Print the number of files found.
-   * 
+   * Print recursive all content of the dir.
+   * @param i pre value of the dir to print
    * @throws IOException in case of problems with the PrintOutput
    */  
   private void printDir(final int i) throws IOException {
