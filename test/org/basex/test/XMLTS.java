@@ -23,10 +23,10 @@ public final class XMLTS {
     //  "h:/xmlts/";
   /** Path to the XQuery Test Suite. */
   private static  final String FILE = ROOT +
-    //"oasis/oasis.xml";
+    "oasis/oasis.xml";
     //"sun/sun-not-wf.xml";
     //"ibm/ibm_oasis_not-wf.xml";
-    "xmltest/xmltest.xml";
+    //"xmltest/xmltest.xml";
   /** Path to the XQuery Test Suite. */
   private static  final String PATH = FILE.replaceAll("[^/]+$", "");
   /** Verbose flag. */

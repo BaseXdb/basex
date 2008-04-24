@@ -198,7 +198,6 @@ public final class DialogOpen extends Dialog {
       txt.add(INFOINDEXES + NL);
       txt.add(" " + INFOTXTINDEX + meta.txtindex + NL);
       txt.add(" " + INFOATVINDEX + meta.atvindex + NL);
-      txt.add(" " + INFOWORDINDEX + meta.wrdindex + NL);
       txt.add(" " + INFOFTINDEX + meta.ftxindex + NL);
 
       txt.add(NL + INFOCREATE + NL);

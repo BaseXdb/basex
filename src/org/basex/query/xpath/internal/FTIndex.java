@@ -213,12 +213,11 @@ public final class FTIndex extends InternalExpr {
 
         if (j == tok.length) {
           if (ftpos != null && ftpos.ftContent != null) {
-            if ((ftpos.ftContent.equals(FTPositionFilter.CONTENT.ATSTART) 
+            if ((ftpos.ftContent == FTPositionFilter.CONTENT.ATSTART 
                 && tmp[1][i] == 0) 
-                || (ftpos.ftContent.equals(FTPositionFilter.CONTENT.ATEND) 
+                || (ftpos.ftContent == FTPositionFilter.CONTENT.ATEND 
                     && tmp[1][i] + k == db.length)
-                || (ftpos.ftContent.equals(
-                    FTPositionFilter.CONTENT.ENTIRECONTENT) 
+                || (ftpos.ftContent ==  FTPositionFilter.CONTENT.ENTIRECONTENT
                     && tmp[1][i] == 0 && db.length == k)) {              
               res[0][count] = tmp[0][i];
               res[1][count++] = tmp[1][i];

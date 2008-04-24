@@ -1,7 +1,5 @@
 package org.basex.util;
 
-import java.util.Arrays;
-
 /**
  * This is a simple container for string values.
  *
@@ -41,12 +39,5 @@ public final class StringList {
   public boolean contains(final String v) {
     for(int i = 0; i < size; i++) if(list[i].equals(v)) return true;
     return false;
-  }
-
-  /**
-   * Sorts the array.
-   */
-  public void sort() {
-    Arrays.sort(list, 0, size);
   }
 }

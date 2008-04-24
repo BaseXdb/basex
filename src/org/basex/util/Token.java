@@ -1114,15 +1114,12 @@ public final class Token {
   }
   
   /**
-   * Returns a lowercase ASCII character of the specified character.
+   * Returns a lowercase ASCII character of the specified fulltext character.
    * Note that this method does not support unicode characters.
    * @param ch character to be converted
    * @return converted character
    */
   public static int ftNorm(final int ch) {
-    // Problem with digits in ft, 
-    // because 0 has value 48, 1 has value 49, ...
-    //if (ftdigit(ch)) return ch - 48;
     return lc(ft(ch));
   }
 

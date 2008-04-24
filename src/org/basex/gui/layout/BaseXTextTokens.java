@@ -214,7 +214,7 @@ final class BaseXTextTokens {
    * @param ch char array
    */
   void add(final char[] ch) {
-    // <CG> Add Text in Text Field: use same array if some space is left 
+    // [CG] Add Text in Text Field: use same array if some space is left
     final TokenBuilder tb = new TokenBuilder();
     tb.add(text, 0, ps);
     for(final char c : ch) tb.addUTF(c);

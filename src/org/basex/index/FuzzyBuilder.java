@@ -2,7 +2,6 @@ package org.basex.index;
 
 import static org.basex.data.DataText.*;
 import static org.basex.Text.*;
-
 import java.io.IOException;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
@@ -18,43 +17,22 @@ import org.basex.util.Token;
  * in an ordered table.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
- * @author Christian Gruen
  * @author Sebastian Gath
+ * @author Christian Gruen
  */
 public final class FuzzyBuilder extends Progress implements IndexBuilder {
-  /** IDs of a token entry. */ // [l,t,o,k,e,n,pre1,pre2,...,pos1,pos2,...]
-  private int[][] ftdata;
-  /** CTArrayX used to fill the fuzzy index. **/
-  private CTArrayX cta;
-  /** Runvariable over the index. **/
-  private int i;
   /** Current parsing value. */
   private int id;
   /** Current parsing value. */
   private int total;
-  /** Temporary token reference. */
-  private byte[] tmptok;
-  /** Temporary token start. */
-  private int tmps;
-  /** Temporary token end. */
-  private int tmpe;
-  /** Temporary token length. */
-  private int tmpl;
+  /** Word parser. */
+  private final FTTokenizer wp = new FTTokenizer();
   /** Tokens, saved temp. in building process. **/
   public IntArrayList[] token;
-  /** DataOuput for token index information. */
-  private DataOutput outi;
-  /** DataOuput for the tokens. */
-  private DataOutput outt;
-  /** DataOuput for the ftdata of a token. */
-  private DataOutput outd;
-  /** Temp. space for ftdata information. */
-  private int[] ftd;
   /** Tokens, saved temp. in building process. **/
   private IntArrayList[] ftpre;
   /** Tokens, saved temp. in building process. **/
   private IntArrayList[] ftpos;
-  
   
   /**
    * Builds the index structure and returns an index instance.
@@ -63,7 +41,7 @@ public final class FuzzyBuilder extends Progress implements IndexBuilder {
    *    fill DataOutput(db, f + 'x') looks like:
    *    [l, p] ... where l is the length of a token an p the pointer of
    *                the first token with length l; there's an entry for 
-   *                each tokenlength [byte, int]
+   *                each token length [byte, int]
    *    fill DataOutput(db, f + 'y') looks like:
    *    [t0, t1, ... tl, z, s] ... where t0, t1, ... tl are the byte values 
    *                           of the token (byte[l]); z is the pointer on
@@ -80,38 +58,41 @@ public final class FuzzyBuilder extends Progress implements IndexBuilder {
    */
   public Fuzzy build(final Data data) throws IOException {
     // to save the tokens
-    token = new IntArrayList[128];
+    token = new IntArrayList[Token.MAXLEN];
     token[0] = new IntArrayList();
     token[0].add(new int[]{0});
-    ftpre = new IntArrayList[128];
+    ftpre = new IntArrayList[Token.MAXLEN];
     ftpre[0] = new IntArrayList();
     ftpre[0].add(new int[]{0});
-    ftpos = new IntArrayList[128];
+    ftpos = new IntArrayList[Token.MAXLEN];
     ftpos[0] = new IntArrayList();
     ftpos[0].add(new int[]{0});   
 
-    
+    Performance p = new Performance();
     
     total = data.size;
     for(id = 0; id < total; id++) {
-      checkStop(); //if(stopped()) throw new IOException(CANCELCREATE);
-      //if(data.kind(id) == Data.TEXT) index(data.text(id), id, false, null);
-      if(data.kind(id) == Data.TEXT) index(data.text(id), id); //, false, null);
+      checkStop();
+      if(data.kind(id) == Data.TEXT) index(data.text(id), id);
     }
        
+    if(Prop.debug) {
+      Performance.gc(5);
+      System.out.println("Indexed: " + Performance.getMem() + ", " + p);
+    }
+
     int isize = token[0].list[0][0];
     final String db = data.meta.dbname;
     final String f = DATAFTX;
     
-    outi = new DataOutput(db, f + 'x');
-    outt = new DataOutput(db, f + 'y');
-    outd = new DataOutput(db, f + 'z');
+    DataOutput outi = new DataOutput(db, f + 'x');
+    DataOutput outt = new DataOutput(db, f + 'y');
+    DataOutput outd = new DataOutput(db, f + 'z');
  
     // write index size
     outi.write((byte) (isize + 1));
     int[][] ind = new int[isize + 1][2];
-    int[] dtmp;
-    int c = 0, tr = 0, dr = 0, ct = 0, j = 1;
+    int c = 0, tr = 0, dr = 0, j = 1;
     for (; j < token.length; j++) {
       if (c == isize) break;
       
@@ -134,16 +115,13 @@ public final class FuzzyBuilder extends Progress implements IndexBuilder {
           // write pointer on data
           outt.writeInt(dr);
           // write data size
-          outt.writeInt(token[j].list[t][token[j].list[t].length - 1]);
-          // write data
-          dtmp = new int[token[j].list[t][token[j].list[t].length - 1]];
-          System.arraycopy(ftpre[j].list[t], 0, dtmp, 0, dtmp.length);
-          outd.writeInts(dtmp); // pre values
-          System.arraycopy(ftpos[j].list[t], 0, dtmp, 0, dtmp.length);
-          outd.writeInts(dtmp); // pos values
-          dr += 2 * 4L * token[j].list[t][token[j].list[t].length - 1];
-          tr += ind[c][0] * 1L + 4L + 4L;
-          ct++;
+          int ds = token[j].list[t][token[j].list[t].length - 1];
+          outt.writeInt(ds);
+          // write pre and pos values
+          for(int d = 0; d < ds; d++) outd.writeInt(ftpre[j].list[t][d]);
+          for(int d = 0; d < ds; d++) outd.writeInt(ftpos[j].list[t][d]);
+          dr += 8L * ds;
+          tr += ind[c][0] + 8L;
           t++;
         }
         c++;
@@ -151,51 +129,24 @@ public final class FuzzyBuilder extends Progress implements IndexBuilder {
     }
     
     outi.write((byte) (j - 1));
-    outi.writeInt((int) (tr - (j - 1) * 1L - 4L - 4L));
+    outi.writeInt((int) (tr - j - 7L));
     ind[c][0] = j - 1;
-    ind[c][1] = (int) (tr - (j - 1) * 1L - 4L - 4L);            
+    ind[c][1] = (int) (tr - j - 7L);
 
-    if (Prop.debug) {
-      System.out.println("Token Index, Tokens und FTData " +
-         "im Hauptspeicher:");
-      Performance.gc(5);
-      System.out.println(Performance.getMem());
-    }
-    
     token = null;
+    ftpre = null;
+    ftpos = null;
+    
     outi.close();
     outt.close();
     outd.close();
-    ftd = new int[dr / 4];
 
-    if (Prop.debug) {
-      System.out.println("Platz für ftdata in Hauptspeicher alokiert.");
+    if(Prop.debug) {
       Performance.gc(5);
-      System.out.println(Performance.getMem());
+      System.out.println("Written: " + Performance.getMem() + ", " + p);
     }
-    
-    Fuzzy index = new Fuzzy(data.meta.dbname);
-    
-    if (Prop.debug) {
-      System.out.println("FTData im Hauptspeicher:");
-      Performance.gc(5);
-      System.out.println(Performance.getMem());
-    }
-/*
-    ind = null;
 
-    for(id = 0; id < total; id++) {
-      if(stopped()) throw new IOException(CANCELCREATE);
-      if(data.kind(id) == Data.TEXT) index(data.text(id), id, true, index);
-    }
-    
-    // write ftdata
-    outd.writeInts(ftd);
-    outd.close();
-    ftd = null;
-    */
-    index.openDataFile(data.meta.dbname);
-    return index;
+    return new Fuzzy(data.meta.dbname);
   }
   
   /**
@@ -203,54 +154,9 @@ public final class FuzzyBuilder extends Progress implements IndexBuilder {
    * @param tok token to be extracted and indexed
    * @param pre int pre value
    */
-  private void index(final byte[] tok, final int pre) { //, 
-      //final boolean addData, final Fuzzy index) {
-    tmptok = tok;
-    tmpe = -1;
-    tmpl = tok.length;
-    while(parse()) //index(pre, addData, index);
-      index(pre);
-  }
-  
-  /**
-   * Parses the input byte array and calculates start and end positions
-   * for single words. False is returned as soon as all tokens are parsed.
-   * @return true if more tokens exist
-   */
-  private boolean parse() {
-    tmps = -1;
-    while(++tmpe <= tmpl) {
-      if(tmps == -1) {
-        if(tmpe < tmpl && Token.ftChar(tmptok[tmpe])) tmps = tmpe;
-      } else if(tmpe == tmpl || !Token.ftChar(tmptok[tmpe])) {
-        return true;
-      }
-    }
-    tmptok = null;
-    return false;
-  }
-
-
-  /**
-   * Indexes a single token.
-   * @param pre pre value
-   */
-//private void index(final int pre, final boolean addData, final Fuzzy index) {
-  private void index(final int pre) {
-    if(tmpe - tmps > Token.MAXLEN) return;
-
-    final byte[] tok = new byte[tmpe - tmps];
-    for(int t = 0; t < tok.length; t++) {
-      tok[t] = (byte) Token.ftNorm(tmptok[tmps + t]);
-    }
-    
-    index(tok, pre, tmps);
-    //if (addData) indexData(tok, pre, tmps, index);
-    //else index(tok);
-
-    /**cont = Num.add(cont, tok);
-    BaseX.debug("cont:" + Token.toString(cont));
-    **/
+  private void index(final byte[] tok, final int pre) {
+    wp.init(tok);
+    while(wp.more()) index(wp.finish(), pre, wp.off());
   }
  
   /**
@@ -259,184 +165,40 @@ public final class FuzzyBuilder extends Progress implements IndexBuilder {
    * @param pre pre value of the token
    * @param pos position value of the token
    */
-  public void index(final byte[] tok, final int pre, final int pos) {
-    if (token[tok.length] == null) {
+  private void index(final byte[] tok, final int pre, final int pos) {
+    int tl = tok.length;
+    if (token[tl] == null) {
       token[0].list[0][0]++;
       IntArrayList ial = new IntArrayList();
-      int[] itok = new int[tok.length + 1];
-      for (int t = 0; t < tok.length; t++) itok[t] = tok[t];
-      itok[tok.length] = 1;
+      int[] itok = new int[tl + 1];
+      for (int t = 0; t < tl; t++) itok[t] = tok[t];
+      itok[tl] = 1;
       ial.add(itok);
-      token[tok.length] = ial;
-      ftpre[tok.length] = new IntArrayList();
-      ftpre[tok.length].add(new int[]{pre});
-      ftpos[tok.length] = new IntArrayList();
-      ftpos[tok.length].add(new int[]{pos});
+      token[tl] = ial;
+      ftpre[tl] = new IntArrayList();
+      ftpre[tl].add(new int[]{pre});
+      ftpos[tl] = new IntArrayList();
+      ftpos[tl].add(new int[]{pos});
     } else {
-      int[] itok = new int[tok.length];
-      for (int t = 0; t < tok.length; t++) itok[t] = tok[t];
-      int m = token[tok.length].addSorted(itok, itok.length);
-      if (token[tok.length].found) {
-        token[tok.length].list[m][tok.length]++;
-        int n = 
-          token[tok.length].list[m][token[tok.length].list[m].length - 1] - 1;
-        if (n == ftpre[tok.length].list[m].length) {
-          int[] tmp = Array.resize(ftpre[tok.length].list[m], 
-              ftpre[tok.length].list[m].length, 
-              ftpos[tok.length].list[m].length << 1);
-          //tmp[tmp.length - 1] = tmp[ftpre[tok.length].list[m].length - 1] + 1;
-          tmp[n] = pre;
-          ftpre[tok.length].list[m] = tmp;
-          
-          tmp = Array.resize(ftpos[tok.length].list[m], 
-              ftpos[tok.length].list[m].length, 
-              ftpos[tok.length].list[m].length << 1);
-          tmp[n] = pos;
-          ftpos[tok.length].list[m] = tmp;
-        } else {
-          ftpre[tok.length].list[m] [n] = pre;
-          ftpos[tok.length].list[m] [n] = pos;
-         // ftpre[tok.length].list[m] [ftpre[tok.length].list[m].length - 1]++; 
+      int[] itok = new int[tl];
+      for (int t = 0; t < tl; t++) itok[t] = tok[t];
+      int m = token[tl].addSorted(itok, itok.length);
+      if (token[tl].found) {
+        token[tl].list[m][tl]++;
+        int n = token[tl].list[m][token[tl].list[m].length - 1] - 1;
+        if (n == ftpre[tl].list[m].length) {
+          ftpre[tl].list[m] = Array.extend(ftpre[tl].list[m]);
+          ftpos[tl].list[m] = Array.extend(ftpos[tl].list[m]);
         }
+        ftpre[tl].list[m][n] = pre;
+        ftpos[tl].list[m][n] = pos;
       } else {
-        ftpre[tok.length].addAt(new int[]{pre}, m);
-        ftpos[tok.length].addAt(new int[]{pos}, m);          
+        ftpre[tl].addAt(new int[]{pre}, m);
+        ftpos[tl].addAt(new int[]{pos}, m);          
       }
     }
   }
 
-  
-
-  
-  /**
-   * Indexes a single token.
-   * @param tok token to be indexed
-   */
-  public void index(final byte[] tok) {
-    if (token[tok.length] == null) {
-      token[0].list[0][0]++;
-      IntArrayList ial = new IntArrayList();
-      int[] itok = new int[tok.length + 1];
-      for (int t = 0; t < tok.length; t++) itok[t] = tok[t];
-      itok[tok.length] = 1;
-      ial.add(itok);
-      token[tok.length] = ial;
-    } else {
-      int[] itok = new int[tok.length];
-      for (int t = 0; t < tok.length; t++) itok[t] = tok[t];
-      int m = token[tok.length].addSorted(itok, itok.length);
-      if (token[tok.length].found) 
-        token[tok.length].list[m][tok.length]++;
-    }
-  }
-  
-  /**
-   * Index ftdata to an existing token.
-   * 
-   * @param tok token where to add the ftdata
-   * @param pre pre value to add
-   * @param pos position value to add
-   * @param index index, where to add the data
-   */
-  public void indexData(final byte[] tok, final int pre, final int pos, 
-      final Fuzzy index) {
-    int p = index.getPointerOnToken(tok);
-    
-    if(p != -1) {
-      int pd = index.getPointerOnData(p, tok.length);
-      int sd = index.getDataSize(p, tok.length);
-      // read how many values are written
-      int r = ftd[pd / 4 + sd - 1];
-      // write pre value
-      ftd[pd / 4 + r] = pre;
-      // write pos value
-      ftd[pd / 4 + sd + r] = pos;
-      if (r < sd - 1) ftd[pd / 4 + sd - 1]++;
-    }
-  }
-  
-  
-  /**
-   * Build a fuzzy structure, using an index with the first chars of a token.
-   * @param data diskdata
-   * @return index
-   * @throws IOException IOException
-   */
-  public Fuzzy buildWS(final Data data) throws IOException {
-    IntArrayList index  = new IntArrayList();
-    // ftdata :
-    // {[L, NB, t1, t2, ..., #pre, pre1, pre2, ..., preN, pos1, pos2, ..., posN]
-    //  , ...}
-    // bl: {[v, s], ...}
-
-    ftdata = cta.doPreOrderTravWI(0, new StringBuffer(), 
-        new IntArrayList(true), index);
-    Object[] o = new Object[128];
-    o[0] = 0;
-    o = cta.doPreOrderTravWISS(0, new StringBuffer(), o);
-    
-    index.add(new int[]{Integer.MAX_VALUE, ftdata.length - 1});
-    index.finish();
-    
-    final String db = data.meta.dbname;
-    final String f = DATATXT;
-    
-    DataOutput out = new DataOutput(db, f + 'z');
-    DataOutput outs = new DataOutput(db, f + 'x');
-    
-    // [v, pointer]
-    int[][] ind = index.finish();
-    // write index size
-    outs.writeInt(ind.length);
-    System.out.println("indessize=" + ind.length);
-    System.out.println("Indexvalues:");
-    // write index to file: {[v, pointer], ...}
-    for (int[] in : ind) {
-      System.out.println((byte) in[0] + "," + in[1]);
-      outs.write((byte) in[0]); // value v (first char)
-      outs.writeInt(in[1]); // pointer
-    }
-    
-    // write ftdata size
-    outs.writeInt(ftdata.length);
-    System.out.println("ftdatasize=" + ftdata.length);
-    // write index on ftdata and ftdata
-    for(i = 0; i < ftdata.length; i++) {
-      System.out.print("ts=" + ftdata[i][0]);
-      // write token size
-      outs.write((byte) ftdata[i][0]);
-      System.out.print(";nb=" + ftdata[i][1]);
-      // write pointer on token
-      outs.writeInt(ftdata[i][1]);
-      
-      //System.out.println((byte)ftdata[i][0] + "," + ftdata[i][1]);
-     
-      byte[] t = new byte[ftdata[i][0]];
-      // write token as byte
-      for (int j = 0; j < ftdata[i][0]; j++) {
-        t[j] = (byte) ftdata[i][j + 2];
-        out.write((byte) ftdata[i][j + 2]);
-      }
-      
-      // write number pre values
-      //out.writeInt(ftdata[i][ftdata[i][0]+2]);
-      System.out.print("\"" + new String(t) 
-      + "\";s=" + ftdata[i][ftdata[i][0] + 2] + ";");
-      // write ftdata as int, including number of pre values as first value
-      for (int j = ftdata[i][0] + 2; j < ftdata[i].length; j++) {
-        out.writeInt(ftdata[i][j]);
-        System.out.print(ftdata[i][j] + ",");
-      }
-      System.out.println();
-    }
-    outs.close();
-    out.close();
-    
-    // 
-    return new Fuzzy(db);
-  }
-  
-  
   @Override
   public String tit() {
     return PROGINDEX;
@@ -444,11 +206,11 @@ public final class FuzzyBuilder extends Progress implements IndexBuilder {
 
   @Override
   public String det() {
-    return INDEXTXT;
+    return INDEXFTX;
   }
 
   @Override
   public double prog() {
-    return 1; //return (double) i / ftdata.length;
+    return (double) id / total;
   }
 }

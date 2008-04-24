@@ -2,7 +2,6 @@ package org.basex.query.xpath;
 
 import static org.basex.query.xpath.XPText.*;
 import static org.basex.util.Token.*;
-import org.basex.BaseX;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.xpath.expr.And;
@@ -90,12 +89,13 @@ public final class XPathProcessor extends QueryProcessor {
       if(!finished()) error(QUERYEND, query(20, 0));
       return new XPContext(expr);
     } catch(final QueryException ex) {
-      BaseX.debug(ex);
       int l = 1; int c = 1;
       for(int i = 0; i + 1 < qp; c++, i++) {
         if(qu[i] == 0x0A || qu[i] == 0x0D) { l++; c = 0; }
       }
-      throw new QueryException(POSINFO + ex.getMessage(), l, c);
+      QueryException qe = new QueryException(POSINFO + ex.getMessage(), l, c);
+      qe.setStackTrace(ex.getStackTrace());
+      throw qe;
     }
   }
 

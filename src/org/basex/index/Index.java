@@ -2,6 +2,7 @@ package org.basex.index;
 
 import java.io.IOException;
 import org.basex.query.xpath.expr.FTOption;
+import org.basex.data.Data;
 import org.basex.io.PrintOutput;
 
 /**
@@ -16,7 +17,6 @@ public interface Index {
   public enum TYPE {
     /** Text index.      */ TXT,
     /** Attribute index. */ ATV,
-    /** Word index.      */ WRD,
     /** Fulltext index.  */ FTX,
     /** Fuzzy index.     */ FUY;
   };
@@ -38,10 +38,11 @@ public interface Index {
   /**
    * Returns the decompressed ids for the specified token.
    * @param tok token to be found
-   * @param ftOption ftoption for token to be found
+   * @param ftO ftoption for token to be found
+   * @param d data reference
    * @return ids
    */
-  int[][] idPos(final byte[] tok, final FTOption ftOption);
+  int[][] idPos(final byte[] tok, final FTOption ftO, final Data d);
 
   /**
    * FUZZY SEARCH

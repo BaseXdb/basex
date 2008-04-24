@@ -4,7 +4,7 @@ import static org.basex.data.DataText.*;
 import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.BaseX;
-import org.basex.data.DiskData;
+import org.basex.data.Data;
 import org.basex.io.DataAccess;
 import org.basex.io.PrintOutput;
 import org.basex.util.Levenshtein;
@@ -25,7 +25,7 @@ import org.basex.query.xpath.expr.FTUnion;
  * The structure of li:
  *    [l, p] ... where l is the length of a token an p the pointer of
  *                the first token with length l; there's an entry for 
- *                each tokenlength [byte, int]
+ *                each token length [byte, int]
  *
  * The structure of lt:
  *    [t0, t1, ... tl, z, s] ... where t0, t1, ... tl are the byte values 
@@ -46,7 +46,7 @@ public final class Fuzzy implements Index {
   int indexsize;
   /** Number of ftdata entries. */
   int ftdatasize;
-  /** Index storing each unique tokenlength and pointer 
+  /** Index storing each unique token length and pointer 
    * on the first token with this length. */
   private final DataAccess li;
   /** Index storing each token, its data size and pointer
@@ -54,44 +54,17 @@ public final class Fuzzy implements Index {
   private final DataAccess ti;
   /** Storing pre and pos values for each token. */ 
   private DataAccess dat;
-  /** DataBase reference. */
-  private final DiskData dd;
     
   /**
    * Constructor, initializing the index structure.
    * @param db name of the database
-   * @param d disk data reference
    * @throws IOException IO Exception
    */
-  public Fuzzy(final String db, final DiskData d) throws IOException {
-    final String file = DATAFTX;
-    li = new DataAccess(db, file + "x");
-    ti = new DataAccess(db, file + "y");
-    dat = new DataAccess(db, file + "z");
-    dd = d;
-  }
-
-  /**
-   * Constructor, initializing the index structure.
-   * @param db name of the database
-   * @throws IOException IO Exception
-   */ 
   public Fuzzy(final String db) throws IOException {
     final String file = DATAFTX;
     li = new DataAccess(db, file + "x");
     ti = new DataAccess(db, file + "y");
-    dat = null;
-    dd = null;
-  }
-
-  /**
-   * Method for opening the dat stream.
-   * Used to read ftdata from disk.
-   * @param db name of the database
-   * @throws IOException if file is not found
-   */
-  public void openDataFile(final String db) throws IOException  {
-    dat = new DataAccess(db, DATAFTX + "z");
+    dat = new DataAccess(db, file + "z");
   }
 
   /** {@inheritDoc} */
@@ -113,7 +86,7 @@ public final class Fuzzy implements Index {
    * @param tok token looking for.
    * @return int pointer 
    */
-  public int getPointerOnToken(final byte[] tok) {
+  private int getPointerOnToken(final byte[] tok) {
     int i = 0;
     int is = li.readBytes(0, 1L)[0];
     int ts = li.readBytes(1L, 2L)[0];
@@ -152,55 +125,6 @@ public final class Fuzzy implements Index {
   }
 
   
-  /**
-   * Determines the pointer on the token, found last.
-   * Token could be null, but the length has to be set.
-   * 
-   * @param tok token looking for.
-   * @param length tokens length, number of bytes filled
-   * @return int pointer 
-   */
-  public int getPointerOnTokenLastFound(final byte[] tok, final int length) {
-    int i = 0;
-    int is = li.readBytes(0, 1L)[0];
-    int ts = li.readBytes(1L, 2L)[0];
-    while (i < is && length > ts) {
-      i++;
-      ts = li.readBytes(1L + i * 5L, 1L + i * 5L + 1L)[0];
-    }
-    
-    if (i == is || ts > length) return -1;
-    // used for leading wildcards
-    if (tok == null) return i;
-    
-    int l = li.readInt(1L + i * 5L + 1L);
-    int r = li.readInt(1L + (i + 1) * 5L + 1L);
-    int m = (int) (l + ((int) ((r - l) 
-        / (length * 1L + 8L) / 2)) * (length * 1L + 8L));
-    int res = -2;
-    byte[] dtok = new byte[length];
-    while (l < r) {
-      m = (int) (l + ((int) ((r - l) 
-          / (length * 1L + 8L) / 2)) * (length * 1L + 8L));
-      dtok = ti.readBytes(m, m + dtok.length);
-      res = cmp(dtok, tok);
-      if (res == 0) return m; 
-      else if (res > 0) l = (int) (m + length * 1L + 8L);
-      else r = (int) (m - (length * 1L + 8L));
-    }
-    
-    if (r == l) { 
-      if (res == 0) {
-        return l;
-      }
-      dtok = ti.readBytes(l, l + dtok.length);
-      res = Token.cmp(dtok, tok);
-      if (res == 0) return l; 
-      
-    }
-    return -1;
-  }
-
   /** Saves the last pointer on the index. Used for wildcardsearch. */
   private int lastIndex = -1;
   /**
@@ -250,7 +174,7 @@ public final class Fuzzy implements Index {
    * @param lt length of the token
    * @return int pointer on ftdata
    */
-  public int getPointerOnData(final int pt, final int lt) {
+  private int getPointerOnData(final int pt, final int lt) {
     return ti.readInt(pt + lt * 1L);
   }
 
@@ -260,7 +184,7 @@ public final class Fuzzy implements Index {
    * @param lt length of the token
    * @return size of the ftdata
    */
-  public int getDataSize(final int pt, final int lt) {
+  private int getDataSize(final int pt, final int lt) {
     return ti.readInt(pt + lt * 1L + 4L);
   }
   
@@ -270,7 +194,7 @@ public final class Fuzzy implements Index {
    * @param s size of pre values
    * @return int[][] with ftdata
    */
-  public int[][] getData(final int p, final int s) {
+  private int[][] getData(final int p, final int s) {
     int[][] d = new int[2][];
     d[0] = dat.readInts(p, p + s * 4L);
     d[1] = dat.readInts(p + s * 4L, p + 2 * s * 4L);
@@ -279,14 +203,14 @@ public final class Fuzzy implements Index {
   }
  
   /**
-   * Performes a fuzzy search for token, with e maximal number
+   * Performs a fuzzy search for token, with e maximal number
    * of errors e.
    * 
    * @param tok token looking for
    * @param e number of errors allowed
    * @return int[][] data
    */
-  public int[][] getFuzzy(final byte[] tok, final int e) {
+  private int[][] getFuzzy(final byte[] tok, final int e) {
     int[][] ft = null;
     byte[] to;
     
@@ -336,7 +260,7 @@ public final class Fuzzy implements Index {
    * @param tok token looking for
    * @return int[][] ftdata
    */
-  public int[][] get(final byte[] tok) {
+  private int[][] get(final byte[] tok) {
     final int p = getPointerOnToken(tok);
 
     if (p == -1) return null;
@@ -350,7 +274,7 @@ public final class Fuzzy implements Index {
   }
 
   /** {@inheritDoc} */
-  public int[][] idPos(final byte[] tok, final FTOption ftO) {
+  public int[][] idPos(final byte[] tok, final FTOption ftO, final Data dd) {
     // init no wildcard included in token
     int posW = -1;
 
@@ -368,12 +292,12 @@ public final class Fuzzy implements Index {
     }
 
     // check wildcards
-    if (ftO.ftWild.equals(FTOption.WILD.WITH) && posW > -1)  {
+    if (ftO.ftWild == FTOption.WILD.WITH && posW > -1)  {
       return getTokenWildCard(tok, posW);
     }
 
 
-    if (ftO.ftCase.equals(FTOption.CASE.INSENSITIVE)) {
+    if (ftO.ftCase == FTOption.CASE.INSENSITIVE) {
       // index request with pre-values as result
       return get(tok);
     }
@@ -384,10 +308,10 @@ public final class Fuzzy implements Index {
       return null;
     }
 
-    if (ftO.ftCase.equals(FTOption.CASE.UPPERCASE)) {
+    if (ftO.ftCase == FTOption.CASE.UPPERCASE) {
       // convert search string to upper case and use case sensitive search
       bTok = Token.uc(bTok);
-    } else if (ftO.ftCase.equals(FTOption.CASE.LOWERCASE)) {
+    } else if (ftO.ftCase == FTOption.CASE.LOWERCASE) {
       // carry search string to upper case and use case sensitive search
       bTok = Token.lc(bTok);
     }
@@ -398,11 +322,6 @@ public final class Fuzzy implements Index {
     int count = 0;
     int readId;
 
-    if (dd == null) {
-      BaseX.debug("Values: No fulltext option support.");
-      return null;
-    }
-    
     int i = 0;
     // check real case of each result node
     while(i < ids[0].length) {
@@ -447,7 +366,7 @@ public final class Fuzzy implements Index {
   /** {@inheritDoc} */
    public int[][]  idPosRange(final byte[] tok0, final boolean itok0, 
        final byte[] tok1, final boolean itok1) {
-    BaseX.debug("Words: No fulltext range query support.");
+    BaseX.notimplemented();
     return null;
    }
 
@@ -465,7 +384,7 @@ public final class Fuzzy implements Index {
   
   /**
    * Calculates the equality of tok1 and tok2, with respect to the 
-   * number or error e, using the Levenshtein Algorithem.
+   * number or error e, using the Levenshtein algorithm.
    * 
    * @param tok1 token1 to compare 
    * @param sp start position in token
@@ -473,22 +392,23 @@ public final class Fuzzy implements Index {
    * @param e number of errors allowed
    * @return boolean as result
    */
-  public static boolean calcEQ(final byte[] tok1, final int sp, 
+  private static boolean calcEQ(final byte[] tok1, final int sp, 
       final byte[] tok2, final int e) {
     final int df = (tok1.length - tok2.length < 0) ? 
         tok2.length - tok1.length : 
       tok1.length - tok2.length;
     if (df > e) return false;
+
+    System.out.println("!");
     
-    int d;
-    d = (tok1.length > tok2.length) ? 
-        Levenshtein.levenshtein(tok1, sp, tok1.length, tok2, e) : 
-      Levenshtein.levenshtein(tok2, sp, tok2.length, tok1, e);
+    int d = (tok1.length > tok2.length) ? 
+        Levenshtein.ls(tok1, sp, tok1.length, tok2, e) : 
+      Levenshtein.ls(tok2, sp, tok2.length, tok1, e);
     return d <= e;
   }
   
   /**
-   * Performces a wildcard search. Only one '.*' is supported.
+   * Performs a wildcard search. Only one '.*' is supported.
    *  
    * @param tok token containing a wildcard
    * @param posw position of the wildcard in tok
@@ -526,27 +446,6 @@ public final class Fuzzy implements Index {
       return null;
     }
   }
-  
-  /**
-   * Compares two character arrays for equality and 
-   * checks if a is contained in b.
-   * Tokens abc and abcde are calculated as equal!
-   * 
-   * @param tok token to be compared
-   * @param tok2 second token to be compared
-   * @return 0 if tok equals tok2, -1 tok > tok0, 1 tok < tok2
-   */
-  public static int cmp(final byte[] tok, final byte[] tok2) {
-    final int l = (tok.length > tok2.length) ? tok2.length 
-        : tok.length;
-    
-   for(int t = 0; t != l; t++) {
-      if(tok2[t] > tok[t]) return 1;
-      else if(tok2[t] < tok[t]) return -1;
-    }
-    return 0;
-  }
-
   /**
    * Compares two character arrays for equality and 
    * checks if a is contained in b.
@@ -557,7 +456,7 @@ public final class Fuzzy implements Index {
    * @param tok2 second token to be compared
    * @return true if tok2 is contained in tokww
    */
-  public static boolean contains(final byte[] tokww, final int posw, 
+  private static boolean contains(final byte[] tokww, final int posw, 
       final byte[] tok2) {
     if (tokww.length - 2 > tok2.length) return false;
 
@@ -576,7 +475,7 @@ public final class Fuzzy implements Index {
 
   
   /**
-   * Returns the pointer on the lasten token saved in ti.
+   * Returns the pointer on the last token saved in ti.
    * @return int pointer
    */
  /* private int getPointerOnLastToken() {

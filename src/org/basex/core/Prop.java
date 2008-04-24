@@ -59,7 +59,7 @@ public final class Prop {
   public static final boolean SKIP = true;
 
   /** Debug mode. */
-  public static boolean debug = true;
+  public static boolean debug = false;
   /** Short query info. */
   public static boolean info = false;
   /** Detailed query info. */
@@ -85,12 +85,10 @@ public final class Prop {
   public static boolean chop = false;
   /** Flag for entity parsing. */
   public static boolean entity = true;
-  /** Flag for creating a word index. */
-  public static boolean wordindex = false;
   /** Flag for creating a fulltext index. */
   public static boolean ftindex = false;
   /** Flag for creating a fuzzy index. */
-  public static boolean fuzzyindex = false;
+  public static boolean fuzzyindex = true;
   /** Flag for creating a text index. */
   public static boolean textindex = true;
   /** Flag for creating an attribute value index. */

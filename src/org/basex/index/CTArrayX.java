@@ -1,7 +1,6 @@
 package org.basex.index;
 
 import org.basex.util.Array;
-import org.basex.util.IntArrayList;
 
 /**
  * Preserves an extended compressed trie index structure and useful
@@ -40,29 +39,29 @@ public final class CTArrayX {
   /**
    * Returns index statistics.
    * @return statistics string
-   */
-  String info() {
+  private String info() {
     //System.exit(0);
     return "Number nodes=" + nodes.length + "\n number index entries="
     + nodes.length;
   }
+   */
 
   /**
    * Returns the number of index entries.
    * @return number of index entries
-   */
-  int size() {
+  private int size() {
     return nodes.length;
   }
+   */
 
   /**
    * Extracts words from the specified byte array and returns its ids and pos.
    * @param tok token to be extracted and indexed
    * @return ids
-   */
-  int[][] getIDPos(final byte[] tok) {
+  private int[][] getIDPos(final byte[] tok) {
     return getNodeFromTrieRecursive(0, tok);
   }
+   */
 
   /**
    * Extracts words from the specified byte array and returns its ids and
@@ -71,10 +70,10 @@ public final class CTArrayX {
    * @param tok token
    * @param posWildCard wildcard has position
    * @return ids and pos
-   */
-  int[][] getIDWithWildcard(final byte[] tok, final int posWildCard) {
+  private int[][] getIDWithWildcard(final byte[] tok, final int posWildCard) {
     return getNodeFromTrieWithWildCard(tok, posWildCard);
   }
+   */
 
   /**
    *  Is called from BaseXData and saves content values in the compressed trie.
@@ -105,8 +104,7 @@ public final class CTArrayX {
    * Reduce memory usage for node entry.
    * @param nodeEntry value of node entry
    * @return nodeEntry shrinked value of node entry
-   */
-  byte[] shrinkNodeEntry(final byte[] nodeEntry) {
+  private byte[] shrinkNodeEntry(final byte[] nodeEntry) {
     final byte[] b = calculateFirst2Byte(nodeEntry[0], nodeEntry[1],
         nodeEntry[nodeEntry[0] + 1]);
     final byte[] newEntry = new byte[nodeEntry.length - 1];
@@ -119,7 +117,7 @@ public final class CTArrayX {
         nodeEntry[0] + 1, nodeEntry.length - nodeEntry[0] - 2);
     return newEntry;
   }
-
+   */
 
   /**
    * Transport a compressedTrieArray to compressedTrieArrayX.
@@ -133,7 +131,7 @@ public final class CTArrayX {
     int count = 0;
     boolean sub;
     
-  /*  
+    /*
     for (int i=0; i<cta.countNodes; i++) {
       if (cta.next[i] != null) {
         boolean f = false;
@@ -146,7 +144,7 @@ public final class CTArrayX {
         }
       } 
     }
-*/
+   */
     
     int[] stats = new int[3];
     // copy root info
@@ -706,8 +704,7 @@ public final class CTArrayX {
    * @param resultFTContent ids not contained in result
    * @return result Ids out of trie
    *
-   */
-  int[][] getAllIDPos(final int[][] resultFTContent) {
+  private int[][] getAllIDPos(final int[][] resultFTContent) {
     int[][] maxResult = null;
     int[][] tmpResult;
     int k = 1;
@@ -718,6 +715,7 @@ public final class CTArrayX {
     }
     return maxResult;
   }
+   */
 
 
   /**
@@ -1009,7 +1007,6 @@ public final class CTArrayX {
    * @param length old length
    * @param b7b8 last two bits
    * @return length new length
-   */
   private byte calculateValueLength(final byte length, final byte b7b8) {
     if(length > 63) {
       System.out.println("error - can't index word longer than 63 bytes!!!!");
@@ -1019,31 +1016,31 @@ public final class CTArrayX {
     // extract first 6 bit
     return (byte) ((length & 0x3f) | b7b8);
   }
+   */
 
   /**
    * Extract first 6 bits from byte k.
    * @param k value
    * @return length number used bit
-   */
   int getValueLength(final byte k) {
     return k & 0x3f;
   }
+   */
 
   /**
    * Extract first 5 bits out of byte v1.
    * @param v1 value
    * @return value value out of v1
-   */
   byte getValueFromV1(final byte v1) {
     return (byte) ((v1 & 0x1f) + 97);
   }
+   */
 
   /**
    * Extract first 5 bits from byte v1.
    * @param k number values
    * @param v1 value
    * @return number number next nodes
-   */
   byte getNumberNextNodes(final byte k, final byte v1) {
     // cut bit7 and bit8 form k
     int length = k & 0xc0;
@@ -1055,13 +1052,13 @@ public final class CTArrayX {
     length1 = length1 >> 3;
     return (byte) (length | length1);
   }
+   */
 
   /**
    * Calculates value v1 from input data.
    * @param value input value
    * @param b6b7b8 three last bits
    * @return v1 first value
-   */
   private byte calculateValueV1(final byte value, final byte b6b7b8) {
     if(value > 'z' || value < 'a') {
       System.out.println("can't index word - no alphanumeric digit");
@@ -1072,12 +1069,12 @@ public final class CTArrayX {
     // get bit6, bit7, bit8 are free
     return (byte) ((value - 97) | b6b7b8);
   }
+   */
 
   /**
    * Calculates the bytes, saving the number of next nodes for a node.
    * @param numberNextNodes number of next nodes
    * @return byte[2] byte[0] = first 2 bits; byte[1] = bit6 bit7 bit8 are filled
-   */
   private byte[] calculateBytesNumberNextNodes(final byte numberNextNodes) {
     if(numberNextNodes > 26) {
       System.out.println("can't index word - " +
@@ -1099,6 +1096,7 @@ public final class CTArrayX {
     returnByte[1] = (byte) (returnByte[1] | tmp);
     return returnByte;
   }
+   */
 
   /**
    * Calculates the first 2 bytes.
@@ -1106,7 +1104,6 @@ public final class CTArrayX {
    * @param v1 value v1
    * @param numberNextNodes number of next nodes
    * @return byte[2]: byte[0] = length; byte[1] = v1
-   */
   private byte[] calculateFirst2Byte(final byte valueLength, final byte v1,
       final byte numberNextNodes) {
     final byte[] t = calculateBytesNumberNextNodes(numberNextNodes);
@@ -1114,6 +1111,7 @@ public final class CTArrayX {
     return new byte[] {calculateValueLength(valueLength, t[0]),
         calculateValueV1(v1, t[1])};
   }
+   */
 
   /**
    * Extracts ids out of data array.
@@ -1157,7 +1155,6 @@ public final class CTArrayX {
    * @param resultWordA result allowed to be contained
    * @param resultWordB result not allowed to be contained
    * @return data []
-   */
   private static int[][] ftUnaryNot(final int[][] resultWordA,
       final int[][] resultWordB) {
     if((resultWordA == null && resultWordB == null) || resultWordA == null) {
@@ -1240,25 +1237,23 @@ public final class CTArrayX {
     }
     return result;
   }
+   */
 
 
   /**
-   * Buils an or-conjunction of values1 and values2.
+   * Builds an or-conjunction of values1 and values2.
    *
    * @param values1 inputset
    * @param values2 inputset
    * @return unionset int[][]
    */
   // <SG> use fulltext function later on
-  public static int[][] ftOR(final int[][] values1, final int[][] values2) {
+  static int[][] ftOR(final int[][] values1, final int[][] values2) {
     int[][] val1 = values1;
     int[][] val2 = values2;
 
-    if(val1 == null) {
-      return val2;
-    } else if(val2 == null) {
-      return val1;
-    }
+    if(val1 == null) return val2;
+    if(val2 == null) return val1;
 
     final int[][] maxResult = new int[2][val1[0].length + val2[0].length];
 
@@ -1534,18 +1529,18 @@ public final class CTArrayX {
     }
   }
   */ 
-   /**
-    * Does a preorder traversal of the trie and collectes each 
-    * nodevalue and its data.
-    * 
-    * [l, t, o, k, e, n, pre1, pre2, ..., pos1, pos2, ...]
-    * 
-    * @param nid int current node id
-    * @param sb StringBuffer token value 
-    * @param il IntArrayList collecting the results
-    * @return int[][] with the Results
-    */
-   public int[][] doPreOrderTrav(final int nid, final StringBuffer sb, 
+  
+  /**
+   * Does a preorder traversal of the trie and collectes each
+   * nodevalue and its data.
+   *
+   * [l, t, o, k, e, n, pre1, pre2, ..., pos1, pos2, ...]
+   * 
+   * @param nid int current node id
+   * @param sb StringBuilder token value 
+   * @param il IntArrayList collecting the results
+   * @return int[][] with the Results
+  private int[][] doPreOrderTrav(final int nid, final StringBuilder sb, 
        final IntArrayList il) {
      int[][] d;
      int[] ds;
@@ -1555,7 +1550,7 @@ public final class CTArrayX {
      if (nodes[nid][0] > 0) {
        sbb = new byte[nodes[nid][0]];
        System.arraycopy(nodes[nid], 1, sbb, 0, sbb.length);
-       sb.append(new String(sbb));
+       sb.append(Token.string(sbb));
      
      }
      d = getDataFromDataArray(nid);
@@ -1590,6 +1585,7 @@ public final class CTArrayX {
      
      return il.finish();
    }
+   */
 
    /**
     * Does a preorder traversal of the trie and collectes each 
@@ -1609,12 +1605,11 @@ public final class CTArrayX {
     * s = number of entries befor current entry
     * 
     * @param nid int current node id
-    * @param sb StringBuffer token value 
+    * @param sb StringBuilder token value 
     * @param il IntArrayList collecting the results
     * @param index IntArrayList collection for indexentries
     * @return int[][] with the Results
-    */
-   public int[][] doPreOrderTravWI(final int nid, final StringBuffer sb, 
+   private int[][] doPreOrderTravWI(final int nid, final StringBuilder sb, 
        final IntArrayList il, final IntArrayList index) {
      int[][] d;
      int[] ds;
@@ -1624,7 +1619,7 @@ public final class CTArrayX {
      if (nodes[nid][0] > 0) {
        sbb = new byte[nodes[nid][0]];
        System.arraycopy(nodes[nid], 1, sbb, 0, sbb.length);
-       sb.append(new String(sbb));
+       sb.append(Token.string(sbb));
      }
      
      d = getDataFromDataArray(nid);
@@ -1670,6 +1665,7 @@ public final class CTArrayX {
      
      return il.finish();
    }
+    */
 
    /**
     * Does a preorder traversal of the trie and collectes each 
@@ -1684,11 +1680,10 @@ public final class CTArrayX {
     * pre0, ..., preN prevalues of the Token
     * pos0, ..., posN position values of the Token (pre)
     * @param nid int current node id
-    * @param sb StringBuffer token value 
+    * @param sb StringBuilder token value 
     * @param index IntArrayList collection for indexentries
     * @return Object with the Results
-    */
-   public Object[] doPreOrderTravWISS(final int nid, final StringBuffer sb, 
+   private Object[] doPreOrderTravWISS(final int nid, final StringBuilder sb, 
        final Object[] index) {
        Object[] ind = doPreOrderTravWISSRec(nid, sb, index);
        
@@ -1701,20 +1696,19 @@ public final class CTArrayX {
            if (c == size) break;
          }
        }
-       
        return ind;
    }
+    */
    
    /**
     * See doPreOrderTravWISS().
     * 
     * @param nid NodeId
-    * @param sb Stringbuffer for token
+    * @param sb StringBuilder for token
     * @param index saves data
     * @return index
-    */
-   public Object[] doPreOrderTravWISSRec(final int nid, final StringBuffer sb, 
-       final Object[] index) {
+   private Object[] doPreOrderTravWISSRec(final int nid,
+       final StringBuilder sb, final Object[] index) {
      int[][] d;
      int[] ds;
      byte[] sbb = new byte[]{};
@@ -1723,7 +1717,7 @@ public final class CTArrayX {
      if (nodes[nid][0] > 0) {
        sbb = new byte[nodes[nid][0]];
        System.arraycopy(nodes[nid], 1, sbb, 0, sbb.length);
-       sb.append(new String(sbb));
+       sb.append(Token.string(sbb));
      }
      
      d = getDataFromDataArray(nid);
@@ -1768,6 +1762,7 @@ public final class CTArrayX {
      }
      return index;
    }
+    */
 
   /**
    * Extracts words from the specified byte array and returns its ids.

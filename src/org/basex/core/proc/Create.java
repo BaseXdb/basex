@@ -17,11 +17,10 @@ import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.index.FTBuilder;
-import org.basex.index.FuzzyBuilder;
+import org.basex.index.FZBuilder;
 import org.basex.index.Index;
 import org.basex.index.IndexBuilder;
 import org.basex.index.ValueBuilder;
-import org.basex.index.WordBuilder;
 import org.basex.io.CachedInput;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -53,8 +52,6 @@ public final class Create extends Proc {
   /** Create index option. */
   public static final String ATV = "attribute";
   /** Create index option. */
-  public static final String WRD = "word";
-  /** Create index option. */
   public static final String FTX = "fulltext";
 
   @Override
@@ -66,6 +63,8 @@ public final class Create extends Proc {
       if(type.equals(MAB2)) return mab2();
       if(type.equals(FS)) return fs();
       if(type.equals(INDEX)) return index();
+    } catch(final IllegalArgumentException ex) {
+      throw ex;
     } catch(final RuntimeException ex) {
       BaseX.debug(ex);
       return error(CANCELCREATE);
@@ -129,7 +128,6 @@ public final class Create extends Proc {
       Prop.entity   = true;
       Prop.textindex = true;
       Prop.attrindex = true;
-      Prop.wordindex = true;
       Prop.ftindex = false;
       return build(new MAB2Parser(file), db + XMLSUFFIX);
     } catch(final IOException e) {
@@ -190,7 +188,6 @@ public final class Create extends Proc {
 
       if(data.meta.txtindex) buildIndex(Index.TYPE.TXT, data);
       if(data.meta.atvindex) buildIndex(Index.TYPE.ATV, data);
-      if(data.meta.wrdindex) buildIndex(Index.TYPE.WRD, data);
       if(data.meta.ftxindex) {
         if (Prop.fuzzyindex) buildIndex(Index.TYPE.FUY, data);
         else buildIndex(Index.TYPE.FTX, data); 
@@ -241,8 +238,6 @@ public final class Create extends Proc {
         data.openIndex(Index.TYPE.TXT, new ValueBuilder(true).build(data));
       if(data.meta.atvindex)
         data.openIndex(Index.TYPE.ATV, new ValueBuilder(false).build(data));
-      if(data.meta.wrdindex)
-        data.openIndex(Index.TYPE.WRD, new WordBuilder().build(data));
       if(data.meta.ftxindex) {
         if (Prop.fuzzyindex) 
           data.openIndex(Index.TYPE.FUY, new FTBuilder().build(data));
@@ -302,9 +297,6 @@ public final class Create extends Proc {
       } else if(type.equals(ATV)) {
         data.meta.atvindex = true;
         index = Index.TYPE.ATV;
-      } else if(type.equals(WRD)) {
-        data.meta.wrdindex = true;
-        index = Index.TYPE.WRD;
       } else if(type.equals(FTX)) {
         data.meta.ftxindex = true;
         if (Prop.fuzzyindex) index = Index.TYPE.FUY;
@@ -334,10 +326,9 @@ public final class Create extends Proc {
           new ValueBuilder(true), d, Prop.allInfo ? CREATETEXT : null);  break;
       case ATV: buildIndex(i,
           new ValueBuilder(false), d, Prop.allInfo ? CREATEATTR : null); break;
-      case WRD: buildIndex(i,
-          new WordBuilder(), d, Prop.allInfo ? CREATEWORD : null); break;
       case FUY: buildIndex(i,
-          new FuzzyBuilder(), d, Prop.allInfo ? CREATEFT : null); break;
+          new FZBuilder(), d, Prop.allInfo ? CREATEFT : null); break;
+          //new FuzzyBuilder(), d, Prop.allInfo ? CREATEFT : null); break;
       case FTX: buildIndex(i,
             new FTBuilder(), d, Prop.allInfo ? CREATEFT : null); 
     }

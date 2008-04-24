@@ -76,6 +76,13 @@ public final class ValueBuilder extends Progress implements IndexBuilder {
       if(data.kind(id) != type) continue;
       index(text ? data.text(id) : data.attValue(id), id);
     }
+    
+    /* temporary..
+    if(Prop.debug) {
+      Performance.gc(4);
+      BaseX.outln(Performance.getMem()); 
+    }*/
+//    
     texts = null;
     pos = null;
 

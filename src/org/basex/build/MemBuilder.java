@@ -20,7 +20,6 @@ public final class MemBuilder extends Builder {
     meta = new MetaData(db);
     meta.txtindex = true;
     meta.atvindex = true;
-    meta.wrdindex = false;
     meta.ftxindex = false;
     meta.filename = parser.file;
     stats = new Stats(db);

@@ -44,16 +44,16 @@ public final class FTPosFilter extends FTArrayExpr {
     if (i instanceof NodeSet) {
       n = (NodeSet) i;
       if (ftpos.ftPosFilt != null) {
-        if (ftpos.ftPosFilt.equals(FTPositionFilter.POSFILTER.ORDERED)) {
+        if (ftpos.ftPosFilt == FTPositionFilter.POSFILTER.ORDERED) {
           res = calculateFTOrdered(n.ftidpos, n.ftpointer);
-        } else if (ftpos.ftPosFilt.equals(FTPositionFilter.POSFILTER.WINDOW)) {
+        } else if (ftpos.ftPosFilt == FTPositionFilter.POSFILTER.WINDOW) {
           res = calculateFTWindow(n.ftidpos, n.ftpointer);
         } else if (ftpos.ftPosFilt.equals(
             FTPositionFilter.POSFILTER.DISTANCE)) {
           res = calculateFTDistance(n.ftidpos, n.ftpointer);
-        } else if (ftpos.ftPosFilt.equals(FTPositionFilter.POSFILTER.SCOPE)) {
+        } else if (ftpos.ftPosFilt == FTPositionFilter.POSFILTER.SCOPE) {
           res = calculateFTScope(n.ftidpos, n.ftpointer);
-        } else if (ftpos.ftPosFilt.equals(FTPositionFilter.POSFILTER.CONTENT)) {
+        } else if (ftpos.ftPosFilt == FTPositionFilter.POSFILTER.CONTENT) {
           return n;
         } else {
           return new NodeSet(ctx);
@@ -63,7 +63,7 @@ public final class FTPosFilter extends FTArrayExpr {
         return new NodeSet(Array.extractIDsFromData(res), context, res);
 
       } else if (ftpos.ftTimes != null 
-          && ftpos.ftTimes.equals(FTPositionFilter.CARDSEL.FTTIMES)) { 
+          && ftpos.ftTimes == FTPositionFilter.CARDSEL.FTTIMES) { 
         res = calculateFTTimes(n.ftidpos);
         return new NodeSet(Array.extractIDsFromData(res), context, res);
       } else {
@@ -104,16 +104,15 @@ public final class FTPosFilter extends FTArrayExpr {
       
       FTPositionFilter ftposfil = new  FTPositionFilter();
       ftposfil.ftPosFilt = ftpos.ftPosFilt;
-      if (ftposfil.ftPosFilt.equals(FTPositionFilter.POSFILTER.WINDOW)) {
+      if (ftposfil.ftPosFilt == FTPositionFilter.POSFILTER.WINDOW) {
         ftposfil.ftUnit = ftpos.ftUnit;
         ftposfil.from = ftpos.from;
-      } else if (ftposfil.ftPosFilt.equals(
-          FTPositionFilter.POSFILTER.DISTANCE)) {
+      } else if (ftposfil.ftPosFilt == FTPositionFilter.POSFILTER.DISTANCE) {
         ftposfil.ftRange = ftpos.ftRange;
         ftposfil.ftUnit = ftpos.ftUnit;
         ftposfil.from = ftpos.from;
         ftposfil.to = ftpos.to;
-      } else if (ftposfil.ftPosFilt.equals(FTPositionFilter.POSFILTER.SCOPE)) {
+      } else if (ftposfil.ftPosFilt == FTPositionFilter.POSFILTER.SCOPE) {
         ftposfil.ftScope = ftpos.ftScope;
         ftposfil.ftUnit = ftpos.ftUnit;
       }
@@ -127,7 +126,7 @@ public final class FTPosFilter extends FTArrayExpr {
       ((FTIndex) exprs[0]).setFTPosFilter(ftpos); 
       ((FTIndex) exprs[0]).setSingle(false);
     } else if (!(ftpos.ftTimes != null 
-        && ftpos.ftTimes.equals(FTPositionFilter.CARDSEL.FTTIMES)        
+        && ftpos.ftTimes == FTPositionFilter.CARDSEL.FTTIMES        
     )) { 
       throw new QueryException("FTPosFilter only supported for FTOr and " +
           "FTAnd or FTContent with a single searchstring.");
@@ -369,7 +368,7 @@ public final class FTPosFilter extends FTArrayExpr {
     int n = nn; 
     int sp = s;
 
-    if (ftpos.ftUnit.equals(FTPositionFilter.UNIT.WORDS)) {
+    if (ftpos.ftUnit == FTPositionFilter.UNIT.WORDS) {
       // skip n words in Array
       while (sp < data.length && n > 0) {
         v = (byte) ((data[sp] & 0x7F) + (data[sp] < 0 ? 128 : 0));
@@ -411,8 +410,8 @@ public final class FTPosFilter extends FTArrayExpr {
       }
 
       return sp;
-    } else if (ftpos.ftUnit.equals(FTPositionFilter.UNIT.SENTENCES) 
-        || ftpos.ftUnit.equals(FTPositionFilter.UNIT.PARAGRAPHS)) {
+    } else if (ftpos.ftUnit == FTPositionFilter.UNIT.SENTENCES 
+        || ftpos.ftUnit == FTPositionFilter.UNIT.PARAGRAPHS) {
       int ep = getSEPositions(data, sp, false)[1] + 1;
 
       while (ep < data.length && n > 0) {
@@ -444,9 +443,9 @@ public final class FTPosFilter extends FTArrayExpr {
     int cp = cpo;
     int intValue;
     if (ftpos.ftUnit != null 
-          && ftpos.ftUnit.equals(FTPositionFilter.UNIT.SENTENCES) || 
+          && ftpos.ftUnit == FTPositionFilter.UNIT.SENTENCES || 
         ftpos.ftBigUnit != null 
-          && ftpos.ftBigUnit.equals(FTPositionFilter.BIGUNIT.SENTENCE)    
+          && ftpos.ftBigUnit == FTPositionFilter.BIGUNIT.SENTENCE    
     ) {
       if (s) {
         intValue = (data[cp] & 0x7F) + (data[cp] < 0 ? 128 : 0);
@@ -478,9 +477,9 @@ public final class FTPosFilter extends FTArrayExpr {
       sep[1] = cp;
       return sep;
     } else if(ftpos.ftUnit != null 
-          && ftpos.ftUnit.equals(FTPositionFilter.UNIT.PARAGRAPHS) || 
+          && ftpos.ftUnit == FTPositionFilter.UNIT.PARAGRAPHS || 
         ftpos.ftBigUnit != null 
-          && ftpos.ftBigUnit.equals(FTPositionFilter.BIGUNIT.PARAGRAPH)) {
+          && ftpos.ftBigUnit == FTPositionFilter.BIGUNIT.PARAGRAPH) {
       if (s) {
         intValue = data[cp];
         // paragraph branded through further \n
@@ -605,7 +604,7 @@ public final class FTPosFilter extends FTArrayExpr {
 
           // calculte maximum position
           // in case of at least, to == res[0].length
-          if (!ftpos.ftRange.equals(FTPositionFilter.RANGE.EXACTLY)
+          if (ftpos.ftRange != FTPositionFilter.RANGE.EXACTLY
               && ftpos.to == null) {
             ftpos.to = new Num(dataFromDB.length - 1);
           }
@@ -642,7 +641,7 @@ public final class FTPosFilter extends FTArrayExpr {
               j++;
 
             } else {
-              if (ftpos.ftRange.equals(FTPositionFilter.RANGE.EXACTLY)) {
+              if (ftpos.ftRange == FTPositionFilter.RANGE.EXACTLY) {
                 nextId = j;
                 level = 0;
                 break;
@@ -712,12 +711,12 @@ public final class FTPosFilter extends FTArrayExpr {
         while (i < e) {
           startEndPos = getSEPositions(dataFromDB, res[1][i], true);
 
-          if (ftpos.ftScope.equals(FTPositionFilter.SCOPE.SAME)) { 
+          if (ftpos.ftScope == FTPositionFilter.SCOPE.SAME) { 
             while (j < res[1].length - 1 && res[1][j] < startEndPos[0]) j++;
             if (startEndPos[0] <= res[1][j] && startEndPos[1] >= res[1][j]) {
               h = true;
             }
-          } else if (ftpos.ftScope.equals(FTPositionFilter.SCOPE.DIFFERENT)) { 
+          } else if (ftpos.ftScope == FTPositionFilter.SCOPE.DIFFERENT) { 
             if (startEndPos[0] > res[1][j] || startEndPos[1] < res[1][j]) {
               h = true;
             }
@@ -748,11 +747,11 @@ public final class FTPosFilter extends FTArrayExpr {
           j++;
           while ((j < res[0].length && res[0][j] == lid 
               && p[j + 1] == p[stack.get(stack.size - 1) + 1]) 
-              && ((ftpos.ftScope.equals(FTPositionFilter.SCOPE.SAME) 
+              && ((ftpos.ftScope == FTPositionFilter.SCOPE.SAME 
                       && startEndPos[0] <= res[1][j] 
                       && startEndPos[1] >= res[1][j]
                   ) || (
-                      ftpos.ftScope.equals(FTPositionFilter.SCOPE.DIFFERENT)
+                      ftpos.ftScope == FTPositionFilter.SCOPE.DIFFERENT
                       && startEndPos[0] > res[1][j] 
                       && startEndPos[1] < res[1][j])
                   )    
@@ -808,7 +807,7 @@ public final class FTPosFilter extends FTArrayExpr {
       }
 
       if (ftpos.to == null 
-          && ftpos.ftRange.equals(FTPositionFilter.RANGE.ATLEAST)) {
+          && ftpos.ftRange == FTPositionFilter.RANGE.ATLEAST) {
         ftpos.to = new Num(res[0].length);
       }
       
@@ -880,27 +879,26 @@ public final class FTPosFilter extends FTArrayExpr {
   @Override
   public void plan(final Serializer ser) throws Exception {
     if (ftpos.ftPosFilt != null) {
-      if (ftpos.ftPosFilt.equals(FTPositionFilter.POSFILTER.ORDERED)) {
+      if (ftpos.ftPosFilt == FTPositionFilter.POSFILTER.ORDERED) {
         ser.openElement(this, Token.token(fto.ftPosFilt.toString()),  
             Token.token("FTOrdered"));
-      } else if (ftpos.ftPosFilt.equals(FTPositionFilter.POSFILTER.WINDOW)) {
+      } else if (ftpos.ftPosFilt == FTPositionFilter.POSFILTER.WINDOW) {
         ser.openElement(this, Token.token(fto.ftPosFilt.toString()),  
             Token.token("FTWindow"), Token.token("from"), 
             Token.token(ftpos.from.num()), Token.token("FTUnit"), 
             Token.token(ftpos.ftUnit.toString()));
-      } else if (ftpos.ftPosFilt.equals(
-          FTPositionFilter.POSFILTER.DISTANCE)) {
+      } else if (ftpos.ftPosFilt == FTPositionFilter.POSFILTER.DISTANCE) {
         ser.openElement(this, Token.token(fto.ftPosFilt.toString()),  
             Token.token("FTDistance"), Token.token("exactly"), 
             Token.token(ftpos.from.num()), Token.token("FTRange"), 
             Token.token(ftpos.ftRange.toString()), Token.token("FTUnit"), 
             Token.token(ftpos.ftUnit.toString()));
-      } else if (ftpos.ftPosFilt.equals(FTPositionFilter.POSFILTER.SCOPE)) {
+      } else if (ftpos.ftPosFilt == FTPositionFilter.POSFILTER.SCOPE) {
         ser.openElement(this, Token.token(fto.ftPosFilt.toString()), 
             Token.token("FTRange"), 
             Token.token(ftpos.ftRange.toString()), Token.token("FTBigUnit"), 
             Token.token(ftpos.ftBigUnit.toString()));
-      } else if (ftpos.ftPosFilt.equals(FTPositionFilter.POSFILTER.CONTENT)) {
+      } else if (ftpos.ftPosFilt == FTPositionFilter.POSFILTER.CONTENT) {
         ser.openElement(this, Token.token(fto.ftPosFilt.toString()), 
             Token.token("FTContent"), 
             Token.token("FTContent"), Token.token(fto.ftContent.toString()));   
@@ -908,7 +906,7 @@ public final class FTPosFilter extends FTArrayExpr {
         ser.openElement(this);
       }
     } else if (ftpos.ftTimes != null 
-        && ftpos.ftTimes.equals(FTPositionFilter.CARDSEL.FTTIMES)) { 
+        && ftpos.ftTimes == FTPositionFilter.CARDSEL.FTTIMES) { 
       ser.openElement(this, Token.token(fto.ftTimes.toString()), 
           Token.token("FTTimes"), 
           Token.token("occures"), 

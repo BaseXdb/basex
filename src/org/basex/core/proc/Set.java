@@ -35,8 +35,6 @@ public final class Set extends Proc {
   /** Set option. */
   public static final String XMLOUTPUT = "xmloutput";
   /** Set option. */
-  public static final String WORDINDEX = "wordindex";
-  /** Set option. */
   public static final String DBPATH = "dbpath";
   /** All flag. */
   public static final String ALL = "ALL";
@@ -76,8 +74,6 @@ public final class Set extends Proc {
       Prop.info = Prop.allInfo ? true : toggle(Prop.info, INFOINFO, ext);
     } else if(option.equals(XMLOUTPUT)) {
       Prop.xmloutput = toggle(Prop.xmloutput, INFOXMLOUTPUT, ext);
-    } else if(option.equals(WORDINDEX)) {
-      Prop.wordindex = toggle(Prop.wordindex, INFOWORDINDEX, ext);
     } else if(option.equals(DBPATH)) {
       if(!new File(ext).exists()) return error(INFOPATHERR + ext);
       Prop.dbpath = ext;

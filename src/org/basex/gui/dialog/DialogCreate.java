@@ -31,8 +31,6 @@ public final class DialogCreate extends Dialog {
   private BaseXCheckBox atvindex;
   /** Word Indexing mode. */
   private BaseXCheckBox ftxindex;
-  /** Fulltext Indexing mode. */
-  private BaseXCheckBox wrdindex;
   /** Main Memory mode. */
   private BaseXCheckBox mainmem;
 
@@ -83,11 +81,6 @@ public final class DialogCreate extends Dialog {
     p2.add(atvindex);
     p2.add(new BaseXLabel(ATTINDEXINFO, 8));
 
-    wrdindex = new BaseXCheckBox(CREATEWORDINDEX, Token.token(WORDINDEXINFO),
-        Prop.wordindex, 0, this);
-    p2.add(wrdindex);
-    p2.add(new BaseXLabel(WORDINDEXINFO, 8));
-
     ftxindex = new BaseXCheckBox(CREATEFTINDEX, Token.token(FTINDEXINFO),
         Prop.ftindex, 0, this);
     p2.add(ftxindex);
@@ -113,7 +106,6 @@ public final class DialogCreate extends Dialog {
     Prop.entity   = entities.isSelected();
     Prop.textindex = txtindex.isSelected();
     Prop.attrindex = atvindex.isSelected();
-    Prop.wordindex = wrdindex.isSelected();
     Prop.ftindex = ftxindex.isSelected();
     Prop.mainmem  = mainmem.isSelected();
     Prop.intparse = intparse.isSelected();

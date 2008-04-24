@@ -134,13 +134,8 @@ public final class IntList {
    * @param asc ascending
    */
   public void sort(final byte[][] tok, final boolean num, final boolean asc) {
-    t = tok;
-    if(size > 1) sort(0, size, num, asc);
-    t = null;
+    if(size > 1) sort(0, size, num, asc, tok);
   }
-
-  /** Temporary token array. */
-  private byte[][] t;
 
   /**
    * Sorts the array.
@@ -148,16 +143,17 @@ public final class IntList {
    * @param e length
    * @param g numeric sort
    * @param f ascending/descending sort
+   * @param t sort tokens
    */
   private void sort(final int s, final int e, final boolean g,
-      final boolean f) {
+      final boolean f, final byte[][] t) {
 
     if(e < 7) {
       for(int i = s; i < e + s; i++) {
         for(int j = i; j > s; j--) {
-          final int h = g ? s(t[j - 1], t[j]) : Token.diff(t[j - 1], t[j]);
+          final int h = g ? s(t[j - 1], t[j]) : d(t[j - 1], t[j]);
           if(f ? h < 0 : h > 0) break;
-          s(j, j - 1);
+          s(j, j - 1, t);
         }
       }
       return;
@@ -180,30 +176,30 @@ public final class IntList {
     int a = s, b = a, c = s + e - 1, d = c;
     while(true) {
       while(b <= c) {
-        final int h = g ? s(t[b], v) : Token.diff(t[b], v);
+        final int h = g ? s(t[b], v) : d(t[b], v);
         if(f ? h > 0 : h < 0) break;
-        if(h == 0) s(a++, b);
+        if(h == 0) s(a++, b, t);
         b++;
       }
       while(c >= b) {
-        final int h = g ? s(t[c], v) : Token.diff(t[c], v);
+        final int h = g ? s(t[c], v) : d(t[c], v);
         if(f ? h < 0 : h > 0) break;
-        if(h == 0) s(c, d--);
+        if(h == 0) s(c, d--, t);
         c--;
       }
       if(b > c) break;
-      s(b++, c--);
+      s(b++, c--, t);
     }
 
     int k;
     final int n = s + e;
     k = Math.min(a - s, b - a);
-    s(s, b - k, k);
+    s(s, b - k, k, t);
     k = Math.min(d - c, n - d - 1);
-    s(b, n - k, k);
+    s(b, n - k, k, t);
 
-    if((k = b - a) > 1) sort(s, k, g, f);
-    if((k = d - c) > 1) sort(n - k, k, g, f);
+    if((k = b - a) > 1) sort(s, k, g, f, t);
+    if((k = d - c) > 1) sort(n - k, k, g, f, t);
   }
 
   /**
@@ -216,13 +212,24 @@ public final class IntList {
     final long n = Token.toLong(a) - Token.toLong(b);
     return n > 0 ? 1 : n < 0 ? -1 : 0;
   }
+
+  /**
+   * Compares two tokens and returns an integer.
+   * @param a first token
+   * @param b second token
+   * @return result
+   */
+  private int d(final byte[] a, final byte[] b) {
+    return a == null ? b == null ? 0 : -1 : b == null ? 1 : Token.diff(a, b);
+  }
     
   /**
    * Swaps two array values.
    * @param a first offset
    * @param b second offset
+   * @param t sort tokens
    */
-  private void s(final int a, final int b) {
+  private void s(final int a, final int b, final byte[][] t) {
     final int l = list[a];
     list[a] = list[b];
     list[b] = l;
@@ -236,9 +243,10 @@ public final class IntList {
    * @param a first offset
    * @param b second offset
    * @param n number of values
+   * @param t sort tokens
    */
-  private void s(final int a, final int b, final int n) {
-    for(int i = 0; i < n; i++) s(a + i, b + i);
+  private void s(final int a, final int b, final int n, final byte[][] t) {
+    for(int i = 0; i < n; i++) s(a + i, b + i, t);
   }
 
   /**

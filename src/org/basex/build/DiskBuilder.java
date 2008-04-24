@@ -82,8 +82,8 @@ public final class DiskBuilder extends Builder {
     final TableAccess ta = new TableDiskAccess(meta.dbname, DATATBL);
     final DataInput in = new DataInput(meta.dbname, DATATMP);
     for(int pre = 0; pre < ssize; pre++) {
-      final int pp = in.readInt();
-      final int sz = in.readInt() - pp;
+      final int pp = in.readNum();
+      final int sz = in.readNum();
       ta.write4(pp, 4, sz);
     }
     in.close();
@@ -169,8 +169,8 @@ public final class DiskBuilder extends Builder {
 
   @Override
   public void addSize(final int pre) throws IOException {
-    sout.writeInt(pre);
-    sout.writeInt(size);
+    sout.writeNum(pre);
+    sout.writeNum(size - pre);
     ssize++;
   }
 

@@ -35,7 +35,6 @@ public final class DataUpdateTestDeletes {
   public static void setUpBeforeClass() {
     Prop.textindex = false;
     Prop.attrindex = false;
-    Prop.wordindex = false;
     Prop.ftindex = false;
     Prop.chop = true;
     Prop.mainmem = false;

@@ -3,6 +3,8 @@ package org.basex.index;
 import static org.basex.data.DataText.*;
 import static org.basex.Text.*;
 import java.io.IOException;
+
+import org.basex.data.Data;
 import org.basex.data.DiskData;
 import org.basex.io.DataAccess;
 import org.basex.io.PrintOutput;
@@ -20,10 +22,6 @@ import org.basex.util.Token;
  * @author Sebastian Gath
  */
 public final class WordsCTA implements Index {
-  /** Number of hash entries. */
-  public int size;
-  /** last/current number of ids. **/
-  public int nrIds = 1;
   /** Values file. */
   //private DataDiskAccess txt;
   /** Index file. */
@@ -56,11 +54,7 @@ public final class WordsCTA implements Index {
     //size = id.read4(0);
   }
 
-  /**
-   * Returns information on the index structure.
-   * @param out output stream
-   * @throws IOException in case of write errors
-   */
+  /** {@inheritDoc} */
   public void info(final PrintOutput out) throws IOException {
     out.println(FTINDEX);
     out.println(TRIE);
@@ -68,14 +62,9 @@ public final class WordsCTA implements Index {
     out.println(SIZEDISK + Performance.formatSize(l, true) + NL);
   }
 
-  /**
-   * Returns all ids from trie stored for tok, with repsect to ftO.
-   * @param tok token to be found
-   * @param ftO FTOption for tok
-   * @return number of ids
-   */
-  public int[][] idPos(final byte[] tok, final FTOption ftO) {
-    //return getNodesFuzzyWLev(0, new StringBuffer(), tok, 3, null);
+  /** {@inheritDoc} */
+  public int[][] idPos(final byte[] tok, final FTOption ftO, final Data d) {
+    //return getNodesFuzzyWLev(0, new StringBuilder(), tok, 3, null);
     //return getNodeFuzzy(0, null, tok, 0, 0, 0, 3);
     // init no wildcard included in token
     int posW = -1;
@@ -94,12 +83,12 @@ public final class WordsCTA implements Index {
     }
 
     // check wildcards
-    if (ftO.ftWild.equals(FTOption.WILD.WITH) && posW > -1)  {
+    if (ftO.ftWild == FTOption.WILD.WITH && posW > -1)  {
       return getNodeFromTrieWithWildCard(tok, posW);
     }
 
 
-    if (ftO.ftCase.equals(FTOption.CASE.INSENSITIVE)) {
+    if (ftO.ftCase == FTOption.CASE.INSENSITIVE) {
       // index request with pre-values as result
       return getNodeFromTrieRecursive(0, tok);
       //ids(tok);
@@ -111,13 +100,13 @@ public final class WordsCTA implements Index {
       return null;
     }
 
-    if (ftO.ftCase.equals(FTOption.CASE.UPPERCASE)) {
+    if (ftO.ftCase == FTOption.CASE.UPPERCASE) {
       // convert search string to upper case and use case sensitive search
       //System.out.println("newToken:" + new String(bTok));
       bTok = Token.uc(bTok);
       //System.out.println("newToken:" + new String(bTok));
       //for (int i = 0; i < tok.length; i++) bTok[i] = (byte) Token.uc(bTok[i]);
-    } else if (ftO.ftCase.equals(FTOption.CASE.LOWERCASE)) {
+    } else if (ftO.ftCase == FTOption.CASE.LOWERCASE) {
       // carry search string to upper case and use case sensitive search
       //System.out.println("newToken:" + new String(bTok));
       bTok = Token.lc(bTok);
@@ -171,15 +160,7 @@ public final class WordsCTA implements Index {
     return tmp;
   }
   
-
-  /**
-   * Returns all ids that are in the range of tok0 and tok1.
-   * @param tokFrom token defining range start
-   * @param itok0 token included in rangebounderies
-   * @param tokTo token defining range end
-   * @param itok1 token included in rangebounderies
-   * @return number of ids
-   */
+  /** {@inheritDoc} */
   public int[][] idPosRange(final byte[] tokFrom, final boolean itok0,
       final byte[] tokTo, final boolean itok1) {
     int[][] data = null;
@@ -214,6 +195,7 @@ public final class WordsCTA implements Index {
     }
     return data;  
   }
+
   /** Count current level. */
   private int cl = 0;
   /** Maximum level, equals the length of the upper bound of a range. */
@@ -221,15 +203,13 @@ public final class WordsCTA implements Index {
   /** Minimum level, equals the length of the lowerbound of a range. */
   //private int mnl = 0;
 
-
-  
   /**
    * Returns all ids that are in the range of tok0 and tok1.
    * @param tokFrom token defining range start
    * @param tokTo token defining range end
    * @return number of ids
    */
-  public int[][] idPosRangeText(final byte[] tokFrom, final byte[] tokTo) {
+  private int[][] idPosRangeText(final byte[] tokFrom, final byte[] tokTo) {
     // you have to backup all passed nodes 
     // and maybe the next child of the current node.
     int[][] idNNF = new int[2][tokFrom.length + 1];
@@ -281,24 +261,12 @@ public final class WordsCTA implements Index {
     return data;
   }
   
-  /**
-   * FUZZY SEARCH
-   * Returns the indexed id references for the specified fulltext token,
-   * with respect to number of errors (ne) that are allowed to occure.
-   * 
-   * @param tok token to be looked up
-   * @param ne int number of errors allowed
-   * @return id array
-   */
+  /** {@inheritDoc} */
   public int[][] fuzzyIDs(final byte[] tok, final int ne) {
     return getNodeFuzzy(0, null, tok, 0, 0, 0, ne);
   }
 
-  /**
-   * Returns all ids from trie stored for token.
-   * @param tok token to be found
-   * @return number of ids
-   */
+  /** {@inheritDoc} */
   public int[] ids(final byte[] tok) {
     int nId = getNodeIdFromTrieRecursive(0, getNodeEntry(0), tok);
     // no entry found in trie
@@ -309,19 +277,12 @@ public final class WordsCTA implements Index {
     return getPreValues(nodeEntry, dataEntry);
   }
 
-  /**
-   * Returns the decompressed ids for the specified token.
-   * @param tok token to be found
-   * @return ids
-   */
+  /** {@inheritDoc} */
   public int nrIDs(final byte[] tok) {
     return ids(tok).length;
   }
 
-  /**
-   * Close the index.
-   * @throws IOException in case of write errors
-   */
+  /** {@inheritDoc} */
   public synchronized void close() throws IOException {
     //id.close();
     idxv.close();
@@ -513,7 +474,6 @@ public final class WordsCTA implements Index {
   boolean fromi = false;
   /** Upper bound included in bound range. */
   boolean toi = false;
-    
   
   /**
    * Parses the trie and backups each passed node that has a value
@@ -527,7 +487,7 @@ public final class WordsCTA implements Index {
    * @param data data found in the trie
    * @return int id on node saving the data
    */
-  public int[][] getAllNodesWithinBounds(final int id, final byte[] v, 
+  private int[][] getAllNodesWithinBounds(final int id, final byte[] v, 
       final byte[] ub, final byte[] lb, final int c, final int[][] data) {
     int[][] dn = data;
     byte[] ne = getNodeEntry(id);
@@ -573,7 +533,7 @@ public final class WordsCTA implements Index {
    * @param data data found in the trie
    * @return int[][] data
    */ 
-  public int[][] getAllNodesWithLevel(final int id, final int l1, 
+  private int[][] getAllNodesWithLevel(final int id, final int l1, 
       final int l2, final int[][] data) {
     int[][] dn = data;
     byte[] ne = getNodeEntry(id);
@@ -654,7 +614,7 @@ public final class WordsCTA implements Index {
    * @param data data found in trie in earlier recursionsteps
    * @return int[][] idpos
    */
-  public int [][] getAllNodes(final int cn, final int b, final int[][] data) {
+  private int [][] getAllNodes(final int cn, final int b, final int[][] data) {
     if (cn !=  b) {
       int[][] newData = data;
       byte[] ne = getNodeEntry(cn);
@@ -1492,7 +1452,7 @@ public final class WordsCTA implements Index {
    * @param c int counter sum of errors
    * @return int[][]
    */
-   private int[][] getNodeFuzzy(final int cn, final byte[] crne, 
+  private int[][] getNodeFuzzy(final int cn, final byte[] crne, 
        final byte[] sn, final int d, final int p, final int r, final int c) {
     byte[] vsn = sn;
     byte[] cne = crne;
@@ -1672,169 +1632,4 @@ public final class WordsCTA implements Index {
       return ld;
     }
   }
-
-   
-   /**
-    * Traveres the trie and evalutes for each token found, the
-    * levenshtein distance of tok and token from trie.
-    * 
-    * @param nid current node id
-    * @param sb stringbuffer - current token value
-    * @param tok token looking for
-    * @param e maxiumum number of errors
-    * @param dat data already found
-    * @return data found
-    */
-   public int[][] getNodesFuzzyWLev(final int nid, final StringBuffer sb, 
-       final byte[] tok, final int e, final int[][] dat) {
-     int[][] d = dat;
-     int[] ds;
-     byte[] sbb = new byte[]{};
-     byte[] tokt;
-     int ol = 0;
-
-     byte[] cne = getNodeEntry(nid);
-     
-     if (cne[0] > 0) {
-       sbb = new byte[cne[0]];
-       System.arraycopy(cne, 1, sbb, 0, sbb.length);
-       ol = sb.length();
-       sb.append(new String(sbb));
-     }
-     
-     tokt = sb.toString().getBytes();
-     if (Fuzzy.calcEQ(tok, ol, tokt, e)) {
-       final int[] cde = getDataEntry(nid);
-       d = FTUnion.calculateFTOr(d, getDataFromDataArray(cne, cde));
-     }
-     
-     ds = getNextNodes(cne);
-     if (ds != null && tok.length + e >= sb.length()) {
-       for (int i : ds) { 
-         d = FTUnion.calculateFTOr(d, getNodesFuzzyWLev(i, sb, tok, e, d));
-       }
-     } 
-       
-     sb.delete(sb.length() - sbb.length, sb.length());
-     
-     return d;
-   }
-
-
-  /**
-   * Traverse trie and return found node for searchValue.
-   * Returns data from node or null.
-   *
-   * @param currentCompressedTrieNode int
-   * @param searchNode searchnodes value
-   * @return int[][]
-  private int[][] getNodeFromTrieRecursiveOld(final int
-      currentCompressedTrieNode,  final byte[] searchNode) {
-
-    byte[] valueSearchNode = searchNode;
-
-    // read data entry from disk
-    final byte[] nodeEntry = getNodeEntry(currentCompressedTrieNode);
-    int[] dataEntry;
-
-    if(currentCompressedTrieNode != 0) {
-      int i = 0;
-      // read data entry from disk
-      dataEntry = getDataEntry(currentCompressedTrieNode);
-
-      while(i < valueSearchNode.length
-          //&& i < nodes[currentCompressedTrieNode][0]
-          && i < nodeEntry[0]
-          //&& nodes[currentCompressedTrieNode][i + 1] == valueSearchNode[i]) {
-          && nodeEntry[i + 1] == valueSearchNode[i]) {
-        i++;
-      }
-
-      //if (nodes[currentCompressedTrieNode][0] == i) {
-      if(nodeEntry[0] == i) {
-        if(valueSearchNode.length == i) {
-          // leaf node found with appropriate value
-          //return getDataFromDataArray(currentCompressedTrieNode);
-          return getDataFromDataArray(nodeEntry, dataEntry);
-        } else {
-          // cut valueSearchNode for value current node
-          final byte[] tmp = new byte[valueSearchNode.length - i];
-          for(int j = 0; j < tmp.length; j++) {
-            tmp[j] = valueSearchNode[i + j];
-          }
-          valueSearchNode = tmp;
-
-          // scan successors currentNode
-          final int position = getInsertingPositionLinear(valueSearchNode[0],
-              nodeEntry);
-          if(!found) {
-            // node not contained
-            //System.out.println("1. Fall nicht gefunden");
-            return null;
-          } else {
-            final int id = getIdOnDataArray(nodeEntry);
-
-            //dataEntry = getDataEntry(id);
-            // return getNodeFromTrieRecursive(dataEntry[position],
-            //   valueSearchNode);
-            return getNodeFromTrieRecursive(getDataEntry(id, position),
-            //  valueSearchNode);
-          }
-        }
-      } else {
-        // node not contained
-        //System.out.println("2. Fall nicht gefunden");
-        return null;
-      }
-    } else {
-      // scan successors current node
-      //int position = getInsertingPositionLinear(currentCompressedTrieNode,
-      //    valueSearchNode[0]);
-
-      final int position = getInsertingPositionLinear(valueSearchNode[0],
-          nodeEntry);
-      if(!found) {
-        // node not contained
-        //System.out.println("3. Fall nicht gefunden");
-        return null;
-      } else {
-        //int id = getIdOnDataArray(currentCompressedTrieNode);
-        final int id = getIdOnDataArray(nodeEntry);
-        //dataEntry = getDataEntry(id);
-        //return getNodeFromTrieRecursive(dataEntry[position], valueSearchNode);
-        return getNodeFromTrieRecursive(getDataEntry(id, position),
-            valueSearchNode);
-      }
-    }
-  }
-   */
-
-  /**
-  public void printTables() {
-     System.out.println("nodesSize:");
-     System.out.println(java.util.Arrays.toString(idxx.readInts(0, 32)));
-     System.out.println("nodes:");
-     System.out.println(java.util.Arrays.toString(idxv.readBytes(0, 56)));
-     System.out.println(idxv.readBytes(0, 224).length);
-     System.out.println("dataSize:");
-     System.out.println(java.util.Arrays.toString(idxy.readInts(0, 32)));
-     System.out.println("data:");
-     System.out.println(java.util.Arrays.toString(idxd.readInts(0, 84)));
-  }
-  */
-  
-  /**
-   * Determines and returns position of '.' in token tok. Return -1 if '.'
-   * wasn't found.
-   * @param tok token with wildcard
-   * @return pos position of wildcard
-  private int getPosWildCard(final byte[] tok) {
-    for(int i = 0; i < tok.length; i++) {
-      if (tok[i] == '.') {
-        return i;
-      }
-    }
-    return -1;
-  }
-   */
 }

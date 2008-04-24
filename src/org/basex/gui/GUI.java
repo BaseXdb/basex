@@ -116,10 +116,8 @@ public final class GUI extends JFrame {
   private final GUIToolBar toolbar;
   /** Menu panel height. */
   private int menuHeight;
-  /** Boolean value for check. */
-  public boolean done = false;
   /** JPopupMenu. */
-  public JPopupMenu pop;
+  public JPopupMenu pop = new JPopupMenu();
 
   /**
    * Singleton Constructor.
@@ -225,14 +223,12 @@ public final class GUI extends JFrame {
       @Override
       public void keyPressed(final KeyEvent e) {
         addKeys(e);
-        if(done && input.getText().length() == 0) {
-          pop.setVisible(false);
-          done = false;
-        }
         if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+          /* <AW> Here you could set the current popup menu entry
+           * as input text (input.setText(...))
+          if(pop.isVisible()) {
+          }*/
           execute();
-          pop.setVisible(false);
-          done = false;
         }
       }
 
@@ -241,17 +237,7 @@ public final class GUI extends JFrame {
         if(e.getKeyChar() == 0xFFFF || e.isControlDown()) return;
         
         if(GUIProp.searchmode == 2 || !context.db()) {
-          if(!done) {
-          String[] all = {"cd", "close", "copy", "create",
-              "delete", "drop", "exit", "export", "find",
-              "help", "info", "insert", "list", "open", "set",
-              "update", "xquery", "xpath"};
-          char ch = e.getKeyChar();
-          pop = createJPop(all, ch);
-          input.add(pop);
-          pop.show(input, 0, 25);
-          done = true;
-          }
+          refreshPop(e.getKeyCode());
         }
 
         // skip commands
@@ -338,34 +324,34 @@ public final class GUI extends JFrame {
   
   /**
    * Creates the JPopupMenu.
-   * @return JPopupMenu.
-   * @param all JMenuItem to add.
-   * @param ch for checking which items to make.
+   * @param c current key
    */
-  public JPopupMenu createJPop(final String[] all, final char ch) {
-    pop = new JPopupMenu();
-    pop.setVisible(true);
+  public void refreshPop(final int c) {
+    if(pop.isVisible()) pop.setVisible(false);
+    if(c == KeyEvent.VK_ESCAPE || c == KeyEvent.VK_ENTER) return;
+    
+    final String in = input.getText().toLowerCase();
+    if(in.length() == 0) return;
+    
+    pop.removeAll();
+    final String[] all = Commands.list();
     for (int i = 0; i < all.length; i++) {
-      if(all[i].charAt(0) == ch) {
-      JMenuItem jmi = new JMenuItem(all[i]);
-    jmi.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent ac) {
-        setInputTxt(ac.getActionCommand());
-        pop.setVisible(false);
+      if(all[i].startsWith(in)) {
+        final JMenuItem jmi = new JMenuItem(all[i]);
+        jmi.addActionListener(new ActionListener() {
+          public void actionPerformed(final ActionEvent ac) {
+            input.setText(ac.getActionCommand());
+            pop.setVisible(false);
+          }
+        });
+        pop.add(jmi);
       }
-    });
-    pop.add(jmi);
     }
+    if(pop.getComponentCount() != 0) {
+      input.add(pop);
+      pop.show(input, 0, input.getHeight());
+      input.requestFocusInWindow();
     }
-    return pop;
-  }
-  
-  /**
-   * Sets the text in the combobox after choice in JPopup.
-   * @param txt Text for the Combobox.
-   */
-  public void setInputTxt(final String txt) {
-    this.input.setText(txt);
   }
 
   /**
@@ -711,6 +697,7 @@ public final class GUI extends JFrame {
     refreshMode();
     toolbar.refresh();
     menu.refresh();
+    pop.setVisible(false);
   }
   
   /**

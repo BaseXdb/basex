@@ -9,7 +9,6 @@ import org.basex.data.Data;
 import org.basex.data.DiskData;
 import org.basex.io.DataOutput;
 import org.basex.util.Performance;
-import org.basex.util.Token;
 
 
 /**
@@ -20,14 +19,8 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class FTBuilderOld extends Progress implements IndexBuilder {
-  /** Temporary token reference. */
-  private byte[] tmptok;
-  /** Temporary token start. */
-  private int tmps;
-  /** Temporary token end. */
-  private int tmpe;
-  /** Temporary token length. */
-  private int tmpl;
+  /** Word parser. */
+  private final FTTokenizer wp = new FTTokenizer();
 
   /** CTArray for tokens. **/
   private CTArray index;
@@ -135,10 +128,8 @@ public final class FTBuilderOld extends Progress implements IndexBuilder {
    * @param pre pre value
    */
   private void index(final byte[] tok, final int pre) {
-    tmptok = tok;
-    tmpe = -1;
-    tmpl = tok.length;
-    while(parse()) index(pre);
+    wp.init(tok);
+    while(wp.more()) index(pre);
   }
 
   /**
@@ -146,35 +137,13 @@ public final class FTBuilderOld extends Progress implements IndexBuilder {
    * @param pre pre value
    */
   private void index(final int pre) {
-    if(tmpe - tmps > Token.MAXLEN) return;
-
-    final byte[] tok = new byte[tmpe - tmps];
-    for(int t = 0; t < tok.length; t++) {
-      tok[t] = (byte) Token.ftNorm(tmptok[tmps + t]);
-    }
-    index.index(tok, pre, tmps);
+    final byte[] tok = wp.finish();
+    final int pos = wp.off();
+    index.index(tok, pre, pos);
 
     /**cont = Num.add(cont, tok);
     BaseX.debug("cont:" + Token.toString(cont));
     **/
-  }
-
-  /**
-   * Parses the input byte array and calculates start and end positions
-   * for single words. False is returned as soon as all tokens are parsed.
-   * @return true if more tokens exist
-   */
-  private boolean parse() {
-    tmps = -1;
-    while(++tmpe <= tmpl) {
-      if(tmps == -1) {
-        if(tmpe < tmpl && Token.ftChar(tmptok[tmpe])) tmps = tmpe;
-      } else if(tmpe == tmpl || !Token.ftChar(tmptok[tmpe])) {
-        return true;
-      }
-    }
-    tmptok = null;
-    return false;
   }
 
   @Override

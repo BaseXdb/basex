@@ -3,7 +3,7 @@ package org.basex.index;
 import static org.basex.data.DataText.*;
 import static org.basex.Text.*;
 import java.io.IOException;
-import org.basex.data.DiskData;
+import org.basex.data.Data;
 import org.basex.io.DataAccess;
 import org.basex.io.PrintOutput;
 import org.basex.util.Array;
@@ -20,10 +20,6 @@ import org.basex.util.Token;
  * @author Sebastian Gath
  */
 public final class WordsCTANew implements Index {
-  /** Number of entries. */
-  public int size;
-  /** last/current number of ids. **/
-  public int nrIds = 1;
   // save each node: l, t1, ..., tl, u, n1, v1, ..., nu, vu, s, p
   // l = length of the token t1, ..., tl
   // u = number of next nodes n1, ..., nu
@@ -38,28 +34,20 @@ public final class WordsCTANew implements Index {
   // each nodeetries size is stored here
   /** FTData sizes on disk. */
   private final DataAccess inS;
-  /** Reference on disk data. **/
-  private final DiskData dd;
 
   /**
    * Constructor, initializing the index structure.
    * @param db name of the database
-   * @param d disk data reference
    * @throws IOException IO Exception
    */
-  public WordsCTANew(final String db, final DiskData d) throws IOException {
+  public WordsCTANew(final String db) throws IOException {
     final String file = DATAFTX;
     inN = new DataAccess(db, file + 'a');
     inD = new DataAccess(db, file + 'b');
     inS = new DataAccess(db, file + 'c');
-    dd = d;
   }
 
-  /**
-   * Returns information on the index structure.
-   * @param out output stream
-   * @throws IOException in case of write errors
-   */
+  /** {@inheritDoc} */
   public void info(final PrintOutput out) throws IOException {
     out.println(FTINDEX);
     out.println(TRIE);
@@ -67,13 +55,8 @@ public final class WordsCTANew implements Index {
     out.println(SIZEDISK + Performance.formatSize(l, true) + NL);
   }
 
-  /**
-   * Returns all ids from trie stored for tok, with repsect to ftO.
-   * @param tok token to be found
-   * @param ftO FTOption for tok
-   * @return number of ids
-   */
-  public int[][] idPos(final byte[] tok, final FTOption ftO) {
+  /** {@inheritDoc} */
+  public int[][] idPos(final byte[] tok, final FTOption ftO, final Data dd) {
     // init no wildcard included in token
     int posW = -1;
 
@@ -91,12 +74,12 @@ public final class WordsCTANew implements Index {
     }
 
     // check wildcards
-    if (ftO.ftWild.equals(FTOption.WILD.WITH) && posW > -1)  {
+    if (ftO.ftWild == FTOption.WILD.WITH && posW > -1)  {
       return getNodeFromTrieWithWildCard(tok, posW);
     }
 
 
-    if (ftO.ftCase.equals(FTOption.CASE.INSENSITIVE)) {
+    if (ftO.ftCase == FTOption.CASE.INSENSITIVE) {
       // index request with pre-values as result
       return getNodeFromTrieRecursive(0, tok);
       //ids(tok);
@@ -108,13 +91,13 @@ public final class WordsCTANew implements Index {
       return null;
     }
 
-    if (ftO.ftCase.equals(FTOption.CASE.UPPERCASE)) {
+    if (ftO.ftCase == FTOption.CASE.UPPERCASE) {
       // convert search string to upper case and use case sensitive search
       //System.out.println("newToken:" + new String(bTok));
       bTok = Token.uc(bTok);
       //System.out.println("newToken:" + new String(bTok));
       //for (int i = 0; i < tok.length; i++) bTok[i] = (byte) Token.uc(bTok[i]);
-    } else if (ftO.ftCase.equals(FTOption.CASE.LOWERCASE)) {
+    } else if (ftO.ftCase == FTOption.CASE.LOWERCASE) {
       // carry search string to upper case and use case sensitive search
       //System.out.println("newToken:" + new String(bTok));
       bTok = Token.lc(bTok);
@@ -168,15 +151,7 @@ public final class WordsCTANew implements Index {
     return tmp;
   }
   
-
-  /**
-   * Returns all ids that are in the range of tok0 and tok1.
-   * @param tokFrom token defining range start
-   * @param itok0 token included in rangebounderies
-   * @param tokTo token defining range end
-   * @param itok1 token included in rangebounderies
-   * @return number of ids
-   */
+  /** {@inheritDoc} */
   public int[][] idPosRange(final byte[] tokFrom, final boolean itok0,
       final byte[] tokTo, final boolean itok1) {
     int[] tokF = new int[tokFrom.length];
@@ -238,7 +213,6 @@ public final class WordsCTANew implements Index {
     return data;
   }
   
- 
   /** Count current level. */
   private int cl = 0;
   /** Maximum level, equals the length of the upper bound of a range. */
@@ -246,15 +220,13 @@ public final class WordsCTANew implements Index {
   /** Minimum level, equals the length of the lowerbound of a range. */
   //private int mnl = 0;
 
-
-  
   /**
    * Returns all ids that are in the range of tok0 and tok1.
    * @param tokFrom token defining range start
    * @param tokTo token defining range end
    * @return number of ids
    */
-  public int[][] idPosRangeText(final int[] tokFrom, final int[] tokTo) {
+  private int[][] idPosRangeText(final int[] tokFrom, final int[] tokTo) {
     // you have to backup all passed nodes 
     // and maybe the next child of the current node.
     int[][] idNNF = new int[2][tokFrom.length + 1];
@@ -311,35 +283,13 @@ public final class WordsCTANew implements Index {
     return data;
   }
   
-  /**
-   * FUZZY SEARCH
-   * Returns the indexed id references for the specified fulltext token,
-   * with respect to number of errors (ne) that are allowed to occure.
-   * 
-   * @param tok token to be looked up
-   * @param ne int number of errors allowed
-   * @return id array
-   */
+  /** {@inheritDoc} */
   public int[][] fuzzyIDs(final byte[] tok, final int ne) {
     return getNodeFuzzy(0, null, tok, 0, 0, 0, ne);
-    //return getNodesFuzzyWLev(0, new StringBuffer(), tok, 3, null);
+    //return getNodesFuzzyWLev(0, new StringBuilder(), tok, 3, null);
   }
 
-  /**
-   * Returns all ids from trie stored for tok, with repsect to ftO.
-   * @param tok token to be found
-   * @param ftO FTOption for tok
-   * @return number of ids
-   */
-  public int[] ids(final byte[] tok, final FTOption ftO) {
-    return CTArrayX.getIDsFromData(idPos(tok, ftO));
-  }
-
-  /**
-   * Returns all ids from trie stored for token.
-   * @param tok token to be found
-   * @return number of ids
-   */
+  /** {@inheritDoc} */
   public int[] ids(final byte[] tok) {
     int[] ne = getNodeIdFromTrieRecursive(0, getNodeEntry(0), 
         tok);
@@ -351,19 +301,12 @@ public final class WordsCTANew implements Index {
     
   }
 
-  /**
-   * Returns the decompressed ids for the specified token.
-   * @param tok token to be found
-   * @return ids
-   */
+  /** {@inheritDoc} */
   public int nrIDs(final byte[] tok) {
     return ids(tok).length;
   }
 
-  /**
-   * Close the index.
-   * @throws IOException in case of write errors
-   */
+  /** {@inheritDoc} */
   public synchronized void close() throws IOException {
     inD.close();
     inS.close();
@@ -549,7 +492,7 @@ public final class WordsCTANew implements Index {
    * @param data data found in the trie
    * @return int id on node saving the data
    */
-  public int[][] getAllNodesWithinBounds(final int id, final int[] v,
+  private int[][] getAllNodesWithinBounds(final int id, final int[] v,
       final int[] ub, final int ubid, final int[] lb, final int lbid, 
       final int c, final int[][] data) {
     int[][] dn = data;
@@ -624,7 +567,7 @@ public final class WordsCTANew implements Index {
    * @param dotFound boolean flag to be set if dot was found (doubel values)
    * @return int[][] data
    */ 
-  public int[][] getAllNodesWithLevel(final int id, final int l1, 
+  private int[][] getAllNodesWithLevel(final int id, final int l1, 
       final int l2, final int[][] data, final boolean dotFound) {
     int[][] dn = data;
     int[] ne = getNodeEntry(id);
@@ -797,7 +740,7 @@ public final class WordsCTANew implements Index {
    * @param data data found in trie in earlier recursionsteps
    * @return int[][] idpos
    */
-  public int [][] getAllNodes(final int cn, final int b, final int[][] data) {
+  private int [][] getAllNodes(final int cn, final int b, final int[][] data) {
     if (cn !=  b) {
       int[][] newData = data;
       int[] ne = getNodeEntry(cn);
@@ -1672,55 +1615,4 @@ public final class WordsCTANew implements Index {
       return ld;
     }
   }
-
-   
-   /**
-    * Traveres the trie and evalutes for each token found, the
-    * levenshtein distance of tok and token from trie.
-    * 
-    * @param nid current node id
-    * @param sb stringbuffer - current token value
-    * @param tok token looking for
-    * @param e maxiumum number of errors
-    * @param dat data already found
-    * @return data found
-    */
-   public int[][] getNodesFuzzyWLev(final int nid, final StringBuffer sb, 
-       final byte[] tok, final int e, final int[][] dat) {
-     int[][] d = dat;
-     byte[] sbb = new byte[]{};
-     byte[] tokt;
-     int ol = 0;
-
-     int[] cne = getNodeEntry(nid);
-     if (nid > 0) {
-       if (cne[0] > 0) {
-         sbb = new byte[cne[0]];
-         for(int i = 0; i < cne[0]; i++) {
-           sbb[i] = (byte) cne[i + 1];
-         }
-         ol = sb.length();
-         sb.append(new String(sbb));
-       }
-       
-       tokt = sb.toString().getBytes();
-       if (Fuzzy.calcEQ(tok, ol, tokt, e)) {
-         d = FTUnion.calculateFTOr(d, 
-             getDataFromDataArray(cne[cne.length - 2], cne[cne.length - 1]));
-       }
-     }
-   
-     //ds = getNextNodes(cne);
-     if (hasNextNodes(cne) && tok.length + e >= sb.length()) {
-       for (int i = cne[0] + 1; i < cne.length - 2; i += 2) { 
-         d = FTUnion.calculateFTOr(d, getNodesFuzzyWLev(cne[i], sb, tok, e, d));
-       }
-     } 
-       
-     sb.delete(sb.length() - sbb.length, sb.length());
-     
-     return d;
-   }
-
-
 }

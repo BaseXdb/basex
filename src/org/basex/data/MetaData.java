@@ -35,8 +35,6 @@ public final class MetaData {
   public boolean chop = Prop.chop;
   /** Flag for entity parsing. */
   public boolean entity = Prop.entity;
-  /** Flag for creating a word index. */
-  public boolean wrdindex = Prop.wordindex;
   /** Flag for creating a fulltext index. */
   public boolean ftxindex = Prop.ftindex;
   /** Flag for creating a text index. */
@@ -90,7 +88,6 @@ public final class MetaData {
   public void noIndex() {
     txtindex = false;
     atvindex = false;
-    wrdindex = false;
     ftxindex = false;
   }
 
@@ -118,11 +115,9 @@ public final class MetaData {
       else if(key.equals(DBENTITY)) entity = val.equals("ON");
       else if(key.equals(DBTXTINDEX)) txtindex = val.equals("ON");
       else if(key.equals(DBATVINDEX)) atvindex = val.equals("ON");
-      else if(key.equals(DBWRDINDEX)) wrdindex = val.equals("ON");
       else if(key.equals(DBFTXINDEX)) ftxindex = val.equals("ON");
       else if(key.equals(DBTIME)) time = Token.toLong(val);
       else if(key.equals(DBLASTID)) lastid = Token.toLong(val);
-      
     }
     in.close();
 
@@ -149,7 +144,6 @@ public final class MetaData {
     writeInfo(inf, DBENTITY, entity);
     writeInfo(inf, DBTXTINDEX, txtindex);
     writeInfo(inf, DBATVINDEX, atvindex);
-    writeInfo(inf, DBWRDINDEX, wrdindex);
     writeInfo(inf, DBFTXINDEX, ftxindex);
     writeInfo(inf, DBTIME, Long.toString(time));
     writeInfo(inf, DBLASTID, Long.toString(lastid));

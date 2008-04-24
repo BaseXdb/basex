@@ -118,6 +118,8 @@ public class XQuery extends Proc {
         info(QUERYCOMPILE + Performance.getTimer(comp, Prop.runs) + NL);
         info(QUERYEVALUATE + Performance.getTimer(eval, Prop.runs) + NL);
       }
+    } catch(final IllegalArgumentException ex) {
+      throw ex;
     } catch(final RuntimeException ex) {
       return false;
     } catch(final QueryException ex) {

@@ -2,6 +2,7 @@ package org.basex.index;
 
 import java.io.IOException;
 import org.basex.BaseX;
+import org.basex.data.Data;
 import org.basex.io.PrintOutput;
 import org.basex.query.xpath.expr.FTOption;
 import org.basex.util.Array;
@@ -40,32 +41,18 @@ public final class MemValues extends Set implements Index {
     return i;
   }
 
-  /**
-   * Returns all ids from index stored for tok with respect to ftO.
-   * @param tok token to be found
-   * @param ftO FTOption for tok
-   * @return number of ids
-   */
-  public int[][] idPos(final byte[] tok, final FTOption ftO) {
-    if(ftO != null) BaseX.debug("Values: No fulltext option support.");
+  /** {@inheritDoc} */
+  public int[][] idPos(final byte[] tok, final FTOption ftO, final Data d) {
+    BaseX.notimplemented();
     return null;
   }
   
-  /**
-   * Returns all ids that are in the range of tok0 and tok1.
-   * @param tok0 token defining range start
-   * @param itok0 token included in rangebounderies
-   * @param tok1 token defining range end
-   * @param itok1 token included in rangebounderies
-   * @return number of ids
-   */
+  /** {@inheritDoc} */
   public int[][]  idPosRange(final byte[] tok0, final boolean itok0, 
       final byte[] tok1, final boolean itok1) {
-   BaseX.debug("Words: No fulltext range query support.");
+    BaseX.notimplemented();
    return null;
   }
-
-
   
   /**
    * Returns the id for the specified key.
@@ -85,36 +72,20 @@ public final class MemValues extends Set implements Index {
     return keys[id];
   }
   
-  /**
-   * Returns the value for the specified key.
-   * @param key key to be found
-   * @return value or null if nothing was found
-   */
+  /** {@inheritDoc} */
   public int[] ids(final byte[] key) {
     final int i = id(key);
     return i == 0 ? Array.NOINTS : Array.finish(ids[i], len[i]);
   }
   
-  /**
-   * Returns the value for the specified key.
-   * @param key key to be found
-   * @return value or null if nothing was found
-   */
+  /** {@inheritDoc} */
   public int nrIDs(final byte[] key) {
     return len[id(key)];
   }
   
-  /**
-   * FUZZY SEARCH
-   * Returns the indexed id references for the specified fulltext token,
-   * with respect to number of errors (ne) that are allowed to occure.
-   * 
-   * @param tok token to be looked up
-   * @param ne int number of errors allowed
-   * @return id array
-   */
+  /** {@inheritDoc} */
   public int[][] fuzzyIDs(final byte[] tok, final int ne) {
-    BaseX.debug("Words: No fuzzy search support.");
+    BaseX.notimplemented();
     return null;
   }
   
@@ -126,17 +97,11 @@ public final class MemValues extends Set implements Index {
     len = Array.extend(len);
   }
 
-  /**
-   * Returns information on the index structure.
-   * @param out output stream
-   * @throws IOException in case of write errors
-   */
+  /** {@inheritDoc} */
   public void info(final PrintOutput out) throws IOException {
     out.print("MemValues");
   }
 
-  /**
-   * Close the index.
-   */
+  /** {@inheritDoc} */
   public void close() { }
 }

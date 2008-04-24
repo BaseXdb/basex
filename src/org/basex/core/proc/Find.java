@@ -68,9 +68,7 @@ public final class Find extends XPath {
           pre += (r ? "" : ".") + "//@" + term + " | ";
         }
       } else {
-        if(data.meta.wrdindex) {
-          preds += "[text() contains \"" + term + "\"]";
-        } else if(data.meta.ftxindex) {
+        if(data.meta.ftxindex) {
           preds += "[text() ftcontains \"" + term + "\"]";
         } else {
           preds += "[" + ContainsLC.NAME + "(text(), \"" + term + "\")]";
@@ -186,16 +184,14 @@ public final class Find extends XPath {
     } while(qu.indexOf(' ') > -1);
 
     final Data data = context.data();
-    if(data.meta.wrdindex || data.meta.ftxindex) {
+    if(data.meta.ftxindex) {
       xpath.add(" | ");
       if(!r) xpath.add(".");
       xpath.add("//file");
       for(final String t : split(query)) {
         xpath.add("[");
         final String pred = ".//text()";
-        if(data.meta.wrdindex) {
-          xpath.add(pred + " contains \"" + t + "\"");
-        } else if(data.meta.ftxindex) {
+        if(data.meta.ftxindex) {
           xpath.add(pred + " ftcontains \"" + t + "\"");
         }
         xpath.add("]");
@@ -248,8 +244,7 @@ public final class Find extends XPath {
           } else {
             if(data.meta.ftxindex) {
               tb.add(" ftcontains ");
-            } else if(spl.length > 1 || data.meta.wrdindex ||
-                (!data.meta.txtindex && !att)) {
+            } else if(spl.length > 1 || !data.meta.txtindex && !att) {
               tb.add(" contains ");
             } else {
               tb.add(" = ");

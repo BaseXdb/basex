@@ -289,7 +289,6 @@ public abstract class Data  {
     switch(type) {
       case TXT: return txtindex.ids(token);
       case ATV: return atvindex.ids(token);
-      case WRD: return wrdindex.ids(token);
       case FTX: return ftxindex.ids(token);
       case FUY: return ftxindex.ids(token);
       default:  return null;
@@ -308,7 +307,6 @@ public abstract class Data  {
     switch(type) {
       case TXT: return txtindex.nrIDs(token);
       case ATV: return atvindex.nrIDs(token);
-      case WRD: return wrdindex.nrIDs(token);
       default:  return Integer.MAX_VALUE;
     }
   }

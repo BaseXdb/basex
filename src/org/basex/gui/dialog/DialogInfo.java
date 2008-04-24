@@ -27,7 +27,7 @@ import org.basex.util.Performance;
  */
 public final class DialogInfo extends Dialog {
   /** Index Checkbox. */
-  private final BaseXCheckBox[] indexes = new BaseXCheckBox[4];
+  private final BaseXCheckBox[] indexes = new BaseXCheckBox[3];
 
   /**
    * Default Constructor.
@@ -71,9 +71,8 @@ public final class DialogInfo extends Dialog {
     check.add(new BaseXLabel(INFOINDEX, true));
     check.add(new BaseXLabel(""));
     indexes[0] = add(check, INFOTXTINDEX, meta.txtindex);
-    indexes[2] = add(check, INFOWORDINDEX, meta.wrdindex);
+    indexes[2] = add(check, INFOFTINDEX, meta.ftxindex);
     indexes[1] = add(check, INFOATVINDEX, meta.atvindex);
-    indexes[3] = add(check, INFOFTINDEX, meta.ftxindex);
     pp.add(check, BorderLayout.CENTER);
 
     set(pp, BorderLayout.CENTER);

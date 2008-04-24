@@ -11,7 +11,7 @@ import org.basex.util.IntArrayList;
  */
 public final class CTArrayNew {
   /** counts all nodes in the trie. **/
-  public int count;
+  int count;
   /** Flag for finishing the trie. **/
   private boolean finished;
  
@@ -29,15 +29,15 @@ public final class CTArrayNew {
   private IntArrayList posL;
   /** THE ARRAYS ARE USED TO KEEP THE STRUCTURE IN MAINMEMORY. **/
   /** Indexed tokens. */
-  public byte[][] tokens;
+  byte[][] tokens;
   /** Trie structure. */
-  public int[][] next;
+  int[][] next;
   /** FTData: Pre values. */
-  public int[][] pre;
+  int[][] pre;
   /** FTData: Position values. */
-  public int[][] pos;
+  int[][] pos;
   /** Flag for bulkload option. */
-  public boolean bl = true;
+  boolean bl = true;
  
   /**
    * Constructor.
@@ -56,7 +56,7 @@ public final class CTArrayNew {
   /**
    * Finish the structure arrays.
    */
-  public void finish() {
+  void finish() {
     finished = true;
     tokens = tokensL.finish();
     tokensL = null;
@@ -71,18 +71,17 @@ public final class CTArrayNew {
   /**
    * Finish the structure arrays.
    * tokens and next
-   */
-  public void finishTN() {
+  private void finishTN() {
     tokens = tokensL.finish();
     tokensL = null;
     next = nextL.finish();
     nextL = null;
   }
+   */
   
   /**
    * Finish the structure arrays.
    * pre and pos
-   */
   public void finishPP() {
     finished = true;
     pre = preL.finish();
@@ -90,8 +89,8 @@ public final class CTArrayNew {
     pos = posL.finish();
     posL = null;   
   }
+   */
   
-
   /**
    * Inserts a node in the next array.
    *
@@ -331,11 +330,10 @@ public final class CTArrayNew {
    * @param token token to be indexex
    * @param data  int[][] pre and pos value of the token
    */
-  public void index(final byte[] token, final int[][] data) {
+  void index(final byte[] token, final int[][] data) {
     count++;
     insertNodeIntoTrie(0, token, data);
   }
-  
   
   /**
    * Adds data to node.
@@ -698,7 +696,7 @@ public final class CTArrayNew {
    * @param sn search nodes value
    * @param data int[][] data to add
    */
-  public void loadData(final int cn, final byte[] sn, final int[][] data) {
+  void loadData(final int cn, final byte[] sn, final int[][] data) {
     byte[] vsn = sn;
     if(cn != 0) {
       int i = 0;
@@ -820,12 +818,10 @@ public final class CTArrayNew {
     //System.out.println(intArrayToString(d[0]));
     //System.out.println(intArrayToString(d[1]));
   }
-  */
   
   /**
    * Prints the struture arrays.
-   */
-  public void printTrie() {
+  private void printTrie() {
     System.out.println("NextN:");
     for(int[] i : nextL.list) {
       if (i == null) break;
@@ -852,14 +848,15 @@ public final class CTArrayNew {
     }
     System.out.println();
   }
+  */
   
   /**
    * Converts an int array to string.
    * @param i array to convert
    * @return string with the values from i
    */
-  public static String  intArrayToString(final int[] i) {
-    StringBuffer sb = new StringBuffer();
+  public static String intArrayToString(final int[] i) {
+    StringBuilder sb = new StringBuilder();
     sb.append('[');
     for(int in : i) sb.append(in + ",");
     sb.deleteCharAt(sb.length() - 1);

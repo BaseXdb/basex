@@ -38,6 +38,7 @@ import org.basex.core.proc.XPathMV;
 import org.basex.core.proc.XQEnv;
 import org.basex.core.proc.XQuery;
 import org.basex.util.Levenshtein;
+import org.basex.util.StringList;
 import org.basex.util.Token;
 
 /**
@@ -351,5 +352,18 @@ public enum Commands {
     }
     throw new IllegalArgumentException(BaseX.info(CMDWHICH, c));
   }
-}
 
+  /**
+   * Returns an array with all commands.
+   * @return command array
+   */
+  public static String[] list() {
+    final StringList list = new StringList();
+    for(Commands cmd : values()) {
+      String name = cmd.name();
+      if(name.startsWith("DUMMY") || cmd.hidden || cmd.server()) continue;
+      list.add(name.toLowerCase());
+    }
+    return list.finish();
+  }
+}

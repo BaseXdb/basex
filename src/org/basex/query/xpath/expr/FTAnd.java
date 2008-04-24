@@ -99,9 +99,9 @@ public final class FTAnd extends FTArrayExpr {
     ctx.compInfo(OPTAND4);
 /*
     if (option.ftPosFilt != null) { 
-      if (option.ftPosFilt.equals(FTOption.POSFILTER.ORDERED)) {
+      if (option.ftPosFilt == FTOption.POSFILTER.ORDERED) {
         return new FTIntersection(indexExprs, true);
-      } else if (option.ftPosFilt.equals(FTOption.POSFILTER.WINDOW)) {
+      } else if (option.ftPosFilt == FTOption.POSFILTER.WINDOW) {
       
       }
     }

@@ -29,6 +29,7 @@ public final class Delete extends Updates {
       nodes = query(cmd.arg(0), null);
     }
     if(nodes == null) return false;
+    if(nodes.size == 0) return true;
     
     // reset indexes
     data.meta.noIndex();

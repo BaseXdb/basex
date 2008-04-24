@@ -23,7 +23,7 @@ import org.basex.query.xpath.expr.FTOption;
  */
 public final class Values implements Index {
   /** Number of hash entries. */
-  public int size;
+  private int size;
   /** Values file. */
   private final Data data;
   /** Hash table buckets. */
@@ -113,7 +113,7 @@ public final class Values implements Index {
   }
 
   /** {@inheritDoc} */
-  public int[][] idPos(final byte[] tok, final FTOption ftO) {
+  public int[][] idPos(final byte[] tok, final FTOption ftO, final Data d) {
     BaseX.notimplemented();
     return null;
   }

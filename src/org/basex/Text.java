@@ -157,7 +157,7 @@ public interface Text {
     "- " + Create.FS + lang("ch_create4") + NL +
     lang("ch_create5") + NL +
     "- " + Create.INDEX + " [" + Create.TXT + "|" + Create.ATV +
-    "|" + Create.WRD + "|" + Create.FTX + "]: " + NL +
+    "|" + Create.FTX + "]: " + NL +
     lang("ch_create6");
   /** Command help. */
   String OPEN0 = lang("ch_open0");
@@ -202,7 +202,7 @@ public interface Text {
     "- " + Drop.DB + lang("ch_drop21") + NL +
     lang("ch_drop22") + NL +
     "- " + Create.INDEX + " [" + Create.TXT + "|" + Create.ATV + "|" +
-    Create.WRD + "|" + Create.FTX + "]:" + NL + lang("ch_drop23");
+    Create.FTX + "]:" + NL + lang("ch_drop23");
   /** Command help. */
   String OPTIMIZE0 = "";
   /** Command help. */
@@ -332,7 +332,6 @@ public interface Text {
     "- " + Set.ENTITY + lang("ch_set27") + NL +
     "- " + Set.TXTINDEX + lang("ch_set28") + NL +
     "- " + Set.ATTRINDEX + lang("ch_set29") + NL +
-    "- " + Set.WORDINDEX + lang("ch_set30") + NL +
     "- " + Set.FTINDEX + lang("ch_set31") + NL + NL +
     lang("ch_set32") + NL + NL +
     "- " + Set.DBPATH + lang("ch_set33") + NL +
@@ -345,21 +344,11 @@ public interface Text {
   /** Command Help. */
   String HELP2 = lang("ch_help2");
   /** Command Help. */
-  String PING0 = "";
-  /** Command Help. */
-  String PING1 = lang("ch_ping1");
-  /** Command Help. */
-  String PING2 = lang("ch_ping2");
-  /** Command Help. */
-  String PROMPT1 = lang("ch_prompt1");
-  /** Command Help. */
-  String PROMPT2 = lang("ch_prompt2");
-  /** Command Help. */
   String EXIT0 = "";
   /** Command Help. */
-  String EXIT1 = "Exit " + NAME + DOT;
+  String EXIT1 = lang("ch_exit1") + ' ' + NAME + DOT;
   /** Command Help. */
-  String EXIT2 = "Exit " + NAME + DOT;
+  String EXIT2 = EXIT1;
   /** Command Help. */
   String QUIT0 = "";
   /** Command Help. */
@@ -664,8 +653,6 @@ public interface Text {
   /** Value Index information. */
   String CREATEATTINDEX = lang("dc_attindex");
   /** Word Index information. */
-  String CREATEWORDINDEX = lang("dc_wordindex");
-  /** Word Index information. */
   String CREATEFTINDEX = lang("dc_ftindex");
   /** Main-Memory Mode. */
   String CREATEMAINMEM = lang("dc_mainmem");
@@ -680,8 +667,6 @@ public interface Text {
   String TXTINDEXINFO =  lang("dc_txtinfo") + DOT;
   /** Value Index information. */
   String ATTINDEXINFO = lang("dc_attinfo") + DOT;
-  /** Fulltext Index information. */
-  String WORDINDEXINFO = lang("dc_wrdinfo") + DOT;
   /** Fulltext Index information. */
   String FTINDEXINFO = lang("dc_ftxinfo") + DOT;
   /** Main-Memory Mode. */
@@ -907,8 +892,6 @@ public interface Text {
   /** Create Database information. */
   String INDEXATT = lang("pc_indexatt") + DOTS;
   /** Create Database information. */
-  String INDEXWRD = lang("pc_indexwrd") + DOTS;
-  /** Create Database information. */
   String INDEXFTX = lang("pc_indexftx") + DOTS;
 
   /** Database created. */
@@ -920,8 +903,6 @@ public interface Text {
   String CREATEATTR = lang("pc_att");
   /** Create information. */
   String CREATETEXT = lang("pc_txt");
-  /** Create information. */
-  String CREATEWORD = lang("pc_wrd");
   /** Create information. */
   String CREATEFT = lang("pc_ftx");
   /** Parse error. */
@@ -1139,8 +1120,6 @@ public interface Text {
   String INFOTXTINDEX = lang("info_txtindex");
   /** Info on Attribute Indexing. */
   String INFOATVINDEX = lang("info_atvindex");
-  /** Info on Word Indexing. */
-  String INFOWORDINDEX = lang("info_wordindex");
   /** Info on Fulltext Indexing. */
   String INFOFTINDEX = lang("info_ftindex");
 

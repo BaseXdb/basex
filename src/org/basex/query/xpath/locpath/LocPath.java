@@ -207,16 +207,15 @@ public abstract class LocPath extends Expr {
     final Data data = ctx.local.data;
     final boolean txt = data.meta.txtindex && cmp == Comp.EQ;
     final boolean atv = data.meta.atvindex && cmp == Comp.EQ;
-    final boolean wrd = data.meta.wrdindex && cmp == Comp.WORD;
     
     final Step step = steps.last();
-    final boolean text = (txt || wrd) && step.test == TestNode.TEXT &&
+    final boolean text = txt && step.test == TestNode.TEXT &&
       step.preds.size() == 0;
     final boolean attr = atv && step.simpleName(Axis.ATTR, false) !=
       Integer.MIN_VALUE;
     if(!text && !attr || !checkAxes()) return null;
 
-    return attr ? Index.TYPE.ATV : wrd ? Index.TYPE.WRD : Index.TYPE.TXT;
+    return attr ? Index.TYPE.ATV : Index.TYPE.TXT;
   }
 
   /**

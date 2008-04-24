@@ -87,7 +87,7 @@ public final class TextView extends View {
     BaseXLabel l;
     
     for (int i = 0; i < n.ftss.length; i++) {
-      l = new BaseXLabel(new String(n.ftss[i]));
+      l = new BaseXLabel(n.ftss[i]);
       l.setForeground(GUIConstants.thumbnailcolor[i]);
       center.add(l);
     }

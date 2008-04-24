@@ -8,7 +8,6 @@ import org.basex.index.Fuzzy;
 import org.basex.index.Index;
 import org.basex.index.Names;
 import org.basex.index.Values;
-import org.basex.index.Words;
 import org.basex.index.WordsCTANew;
 import org.basex.io.DataAccess;
 import org.basex.io.PrintOutput;
@@ -96,10 +95,9 @@ public final class DiskData extends Data {
     if(index) {
       if(meta.txtindex) openIndex(Index.TYPE.TXT, new Values(this, db, true));
       if(meta.atvindex) openIndex(Index.TYPE.ATV, new Values(this, db, false));
-      if(meta.wrdindex) openIndex(Index.TYPE.WRD, new Words(db));
       if(meta.ftxindex) {
-        if (Prop.fuzzyindex) openIndex(Index.TYPE.FUY, new Fuzzy(db, this));
-        else openIndex(Index.TYPE.FTX, new WordsCTANew(db, this));
+        if (Prop.fuzzyindex) openIndex(Index.TYPE.FUY, new Fuzzy(db));
+        else openIndex(Index.TYPE.FTX, new WordsCTANew(db));
       }
       
     }
@@ -113,7 +111,6 @@ public final class DiskData extends Data {
       texts.flush();
       values.flush();
       meta.write(size);
-//      <LK> writing / refreshing stats after updates?
       tags.finish(meta.dbname);
       atts.finish(meta.dbname);
 
@@ -148,7 +145,6 @@ public final class DiskData extends Data {
     values.close();
     closeIndex(Index.TYPE.TXT);
     closeIndex(Index.TYPE.ATV);
-    closeIndex(Index.TYPE.WRD);
     closeIndex(Index.TYPE.FTX);
     closeIndex(Index.TYPE.FUY);
   }
@@ -159,7 +155,6 @@ public final class DiskData extends Data {
     switch(index) {
       case TXT: if(txtindex != null) txtindex.close(); break;
       case ATV: if(atvindex != null) atvindex.close(); break;
-      case WRD: if(wrdindex != null) wrdindex.close(); break;
       case FTX: if(ftxindex != null) ftxindex.close(); break;
       case FUY: if(ftxindex != null) ftxindex.close(); break;
     }
@@ -170,7 +165,6 @@ public final class DiskData extends Data {
     switch(type) {
       case TXT: if(meta.txtindex) txtindex = index; break;
       case ATV: if(meta.atvindex) atvindex = index; break;
-      case WRD: if(meta.wrdindex) wrdindex = index; break;
       case FTX: if(meta.ftxindex) ftxindex = index; break;
       case FUY: if(meta.ftxindex) ftxindex = index;
     }
@@ -335,7 +329,6 @@ public final class DiskData extends Data {
     out.println(atts.info());
     if(meta.txtindex) txtindex.info(out);
     if(meta.atvindex) atvindex.info(out);
-    if(meta.wrdindex) wrdindex.info(out);
     if(meta.ftxindex) ftxindex.info(out);
   }
 
@@ -346,7 +339,7 @@ public final class DiskData extends Data {
 
   @Override
    public int[][] ftIDs(final byte[] word, final FTOption ftO) {
-     return ftxindex.idPos(word, ftO);
+     return ftxindex.idPos(word, ftO, this);
    }
 
   @Override

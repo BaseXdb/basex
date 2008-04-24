@@ -67,7 +67,7 @@ public final class FTPositionFilter {
   
   /** Wildcard search (default: without wildcards). */ 
   public WILD ftWild = WILD.WITHOUT;
-  /** Position Filter (defautl: without filters). */
+  /** Position Filter (default: without filters). */
   public POSFILTER ftPosFilt; 
   /** Use for lowerbound in posfilter expression. */
   public Num from;

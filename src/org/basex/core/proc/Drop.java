@@ -74,10 +74,6 @@ public final class Drop extends Proc {
       data.meta.atvindex = false;
       return dropIndex(Index.TYPE.ATV, DATAATV);
     }
-    if(type.equals(Create.WRD)) {
-      data.meta.wrdindex = false;
-      return dropIndex(Index.TYPE.WRD, DATAWRD);
-    }
     if(type.equals(Create.FTX)) {
       data.meta.ftxindex = false;
       if (Prop.fuzzyindex)

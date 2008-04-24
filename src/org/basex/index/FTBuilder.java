@@ -2,19 +2,15 @@ package org.basex.index;
 
 import static org.basex.data.DataText.*;
 import static org.basex.Text.*;
-
 import java.io.IOException;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.data.Data;
-import org.basex.data.DiskData;
 import org.basex.io.DataOutput;
 import org.basex.util.Array;
 import org.basex.util.ByteArrayList;
 import org.basex.util.IntArrayList;
 import org.basex.util.Performance;
-import org.basex.util.Token;
-
 
 /**
  * This class builds an index for text contents in a compressed trie.
@@ -24,14 +20,8 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class FTBuilder extends Progress implements IndexBuilder {
-  /** Temporary token reference. */
-  private byte[] tmptok;
-  /** Temporary token start. */
-  private int tmps;
-  /** Temporary token end. */
-  private int tmpe;
-  /** Temporary token length. */
-  private int tmpl;
+  /** Word parser. */
+  private final FTTokenizer wp = new FTTokenizer();
   /** CTArray for tokens. **/
   private CTArrayNew index;
   /** Current parsing value. */
@@ -44,7 +34,6 @@ public final class FTBuilder extends Progress implements IndexBuilder {
   private IntArrayList[] ftpre;
   /** Tokens, saved temp. in building process. **/
   private IntArrayList[] ftpos;
-
 
   /**
    * Builds the index structure and returns an index instance.
@@ -70,7 +59,7 @@ public final class FTBuilder extends Progress implements IndexBuilder {
     total = data.size;
     for(id = 0; id < total; id++) {
       checkStop();
-      if(data.kind(id) == Data.TEXT) index(data.text(id), id);
+      if(data.kind(id) == Data.TEXT) index(data.text(id));
     }
     
     if (Prop.debug) {
@@ -161,12 +150,11 @@ public final class FTBuilder extends Progress implements IndexBuilder {
     outD.close();
     outN.close();
     outS.close();
-    return new WordsCTANew(db, (DiskData) data);
+    return new WordsCTANew(db);
   }
 
   /**
    * Adds the data to each token.
-   * 
    * @param isize size of the index
    */
   private void bulkLoad(final int isize)  {   
@@ -194,39 +182,24 @@ public final class FTBuilder extends Progress implements IndexBuilder {
       }
     }
   }
-  /**
-   * Returns current progress value.
-   * @return progress information
-   */
-  public int value() {
-    return id;
-  }
 
   /**
    * Extracts and indexes words from the specified byte array.
    * @param tok token to be extracted and indexed
-   * @param pre pre value
    */
-  private void index(final byte[] tok, final int pre) {
-    tmptok = tok;
-    tmpe = -1;
-    tmpl = tok.length;
-    while(parse()) index(pre);
+  private void index(final byte[] tok) {
+    wp.init(tok);
+    while(wp.more()) index();
   }
 
   /**
    * Indexes a single token and returns its unique id.
-   * @param pre pre value
    */
-  private void index(final int pre) {
-    if(tmpe - tmps > Token.MAXLEN) return;
-
-    final byte[] tok = new byte[tmpe - tmps];
-    for(int t = 0; t < tok.length; t++) {
-      tok[t] = (byte) Token.ftNorm(tmptok[tmps + t]);
-    }
-    if (index.bl) index(tok, pre, tmps);
-    else index.index(tok, pre, tmps);
+  private void index() {
+    final byte[] tok = wp.finish();
+    final int pos = wp.off();
+    if (index.bl) index(tok, id, pos);
+    else index.index(tok, id, pos);
 
     /**cont = Num.add(cont, tok);
     BaseX.debug("cont:" + Token.toString(cont));
@@ -234,36 +207,12 @@ public final class FTBuilder extends Progress implements IndexBuilder {
   }
 
   /**
-   * Parses the input byte array and calculates start and end positions
-   * for single words. False is returned as soon as all tokens are parsed.
-   * @return true if more tokens exist
-   */
-  private boolean parse() {
-    tmps = -1;
-    while(++tmpe <= tmpl) {
-      if(tmps == -1) {
-        if(tmpe < tmpl && Token.ftChar(tmptok[tmpe])) tmps = tmpe;
-      } else if(tmpe == tmpl) {
-        return true;
-      } else if (!Token.ftChar(tmptok[tmpe]) 
-          && !(Token.digit(tmptok[tmpe - 1])  
-          && tmptok[tmpe] == '.' && tmpe + 1 < tmpl  
-          && Token.digit(tmptok[tmpe + 1]))) {
-        return true;
-      }
-    }
-    tmptok = null;
-    return false;
-  }
-
-  
-  /**
    * Indexes a single token.
    * @param tok token to be indexed
    * @param pre pre value of the token
    * @param pos value position value of the token
    */
-  public void index(final byte[] tok, final int pre, final int pos) {
+  private void index(final byte[] tok, final int pre, final int pos) {
     if (token[tok.length] == null) {
       total++;
       ByteArrayList bal = new ByteArrayList();
@@ -302,13 +251,12 @@ public final class FTBuilder extends Progress implements IndexBuilder {
     }
   }
   
-  /**
+  /*
    * Index a token. 
    * @param tok token to index
    * @param pre pre value of the token
    * @param pos pos value of the token
-   */
-  public void index2(final byte[] tok, final int pre, final int pos) {
+  private void index2(final byte[] tok, final int pre, final int pos) {
     if (token[tok.length] == null) {
       total++;
       ByteArrayList bal = new ByteArrayList();
@@ -335,6 +283,7 @@ public final class FTBuilder extends Progress implements IndexBuilder {
       }
     }
   }
+   */
   
   @Override
   public String tit() {
@@ -350,6 +299,4 @@ public final class FTBuilder extends Progress implements IndexBuilder {
   public double prog() {
     return (double) id / total;
   }
-  
-  
 }
