@@ -106,7 +106,7 @@ public final class Values implements Index {
     final int[] tmp = new int[bytes.length];
     int s = 0;
     while(num.more()) {
-      tmp[s++] = num.id();
+      tmp[s++] = num.num();
       num.next();
     }
     return Array.finish(tmp, s);
