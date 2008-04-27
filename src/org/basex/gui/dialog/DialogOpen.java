@@ -196,13 +196,18 @@ public final class DialogOpen extends Dialog {
       txt.add(INFOHEIGHT + meta.height + NL + NL);
 
       txt.add(INFOINDEXES + NL);
-      txt.add(" " + INFOTXTINDEX + meta.txtindex + NL);
-      txt.add(" " + INFOATVINDEX + meta.atvindex + NL);
-      txt.add(" " + INFOFTINDEX + meta.ftxindex + NL);
+      if(meta.newindex) {
+        txt.add(" " + INDUPDATE + NL);
+      } else {
+        txt.add(" " + INFOTXTINDEX + meta.txtindex + NL);
+        txt.add(" " + INFOATVINDEX + meta.atvindex + NL);
+        txt.add(" " + INFOFTINDEX + meta.ftxindex + NL);
+      }
 
       txt.add(NL + INFOCREATE + NL);
       txt.add(" " + INFOCHOP + meta.chop + NL);
       txt.add(" " + INFOENTITIES + meta.entity + NL);
+
     } catch(final IOException e) {
       txt.add(e.getMessage());
       ok = false;

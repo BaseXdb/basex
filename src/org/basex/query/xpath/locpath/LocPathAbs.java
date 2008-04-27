@@ -26,7 +26,7 @@ public final class LocPathAbs extends LocPath {
     }
     return nodeset;
   }
-  
+ 
   @Override
   public String toString() {
     return steps.toString();

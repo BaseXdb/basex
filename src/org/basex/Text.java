@@ -31,6 +31,10 @@ public interface Text {
   String DOT = ".";
   /** Dots. */
   String DOTS = "...";
+  /** On flag. */
+  String ON = "ON";
+  /** Off flag. */
+  String OFF = "OFF";
 
   /** Project name. */
   String NAME = "BaseX";
@@ -880,6 +884,8 @@ public interface Text {
   String PROGINDEX = lang("pc_index");
   /** Database Update. */
   String DBUPDATE = lang("pc_update");
+  /** Index Update. */
+  String INDUPDATE = lang("pc_indupdate");
   /** Builder error. */
   String CANCELCREATE = lang("pc_cancel");
   /** Create Database information. */
@@ -936,13 +942,13 @@ public interface Text {
   /** Database exported. */
   String DBEXPORTED = lang("db_exported");
 
-  /** Database Opened. */
+  /** Index created. */
   String DBINDEXED = lang("in_created");
-  /** Database Opened. */
+  /** Index error. */
   String DBINDEXERR = lang("in_err");
-  /** Database Opened. */
+  /** Index dropped. */
   String DBDROP = lang("in_dropped");
-  /** Database Opened. */
+  /** Index not dropped. */
   String DBDROPERR = lang("in_notdropped");
 
   // DATABASE/INDEX INFORMATION ===============================================
@@ -963,6 +969,8 @@ public interface Text {
   String TRIE = "- Compressed Trie";
   /** Index info. */
   String DISKHASH = "- Disk-Based Hash";
+  /** Index info. */
+  String IDXENTRIES = "- Entries: ";
   /** Index info. */
   String HASHBUCKETS = "- Buckets: ";
   /** Index info. */

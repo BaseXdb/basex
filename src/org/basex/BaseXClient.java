@@ -77,8 +77,7 @@ public class BaseXClient {
    */
   final void run() {
     if(allInfo || info) {
-      execute(Commands.SET, Set.INFO + " " +
-          (allInfo ? Set.ALL : Set.ON), false);
+      execute(Commands.SET, Set.INFO + " " + (allInfo ? Set.ALL : ON), false);
     }
 
     try {
@@ -235,8 +234,8 @@ public class BaseXClient {
           }
         }
 
-        if(name == Commands.SET && (cmd.args().startsWith(Set.INFO))) {
-          info = inf.contains(" ON");
+        if(name == Commands.SET && cmd.args().startsWith(Set.INFO)) {
+          info = inf.contains(INFOON);
         }
       }
       return ok;
@@ -287,7 +286,7 @@ public class BaseXClient {
             ok = true;
           } else if(c == 'e' && standalone) {
             // skip parsing of XML entities
-            execute(Commands.SET, Set.ENTITY  + Set.OFF, false);
+            execute(Commands.SET, Set.ENTITY  + OFF, false);
             ok = true;
           } else if(c == 'o') {
             // specify file for result output
@@ -358,7 +357,7 @@ public class BaseXClient {
             ok = true;
           } else if(c == 'x') {
             // activate well-formed XML output
-            execute(Commands.SET, Set.XMLOUTPUT + " " + Set.ON, false);
+            execute(Commands.SET, Set.XMLOUTPUT + " " + ON, false);
             ok = true;
           } else if(c == 'y' && standalone) {
             // hidden option: activate main memory mode
@@ -370,7 +369,7 @@ public class BaseXClient {
             ok = true;
           } else if(c == 'z') {
             // turn off result serialization
-            execute(Commands.SET, Set.SERIALIZE + " " + Set.OFF, false);
+            execute(Commands.SET, Set.SERIALIZE + " " + OFF, false);
             ok = true;
           } else {
             break;

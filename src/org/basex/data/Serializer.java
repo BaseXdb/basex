@@ -269,7 +269,7 @@ public abstract class Serializer {
       } else if(kind == Data.COMM) {
         comment(data.text(p++));
       } else if(kind == Data.PI) {
-        pi(Token.EMPTY, data.text(p++));
+        pi(data.text(p++));
       } else {
         // add element node
         final byte[] tok = data.tag(p);

@@ -580,13 +580,12 @@ public final class Token {
    * positive if first token is bigger
    */
   public static int diff(final byte[] tok, final byte[] tok2) {
-    if(!ascii(tok) || !ascii(tok2)) return string(tok).compareTo(string(tok2));
+    //if(!ascii(tok) || !ascii(tok2))
+    //  return string(tok).compareTo(string(tok2));
 
     final int l = Math.min(tok.length, tok2.length);
-    int i = -1;
-    while(++i < l) {
-      final int c = tok[i] - tok2[i];
-      if(c != 0) return c;
+    for(int i = 0; i != l; i++) {
+      if(tok[i] != tok2[i]) return (tok[i] & 0xFF) - (tok2[i] & 0xFF);
     }
     return tok.length - tok2.length;
   }

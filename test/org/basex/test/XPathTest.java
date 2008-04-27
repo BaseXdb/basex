@@ -75,7 +75,7 @@ public final class XPathTest {
       err("\n", proc.info());
       return false;
     }
-
+    
     out("\nRunning Tests...\n");
 
     for(final Object[] qu : test.queries) {

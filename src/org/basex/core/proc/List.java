@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
-
 import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.MetaData;

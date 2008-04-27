@@ -21,16 +21,6 @@ final class FZHash extends Set {
   int[] ns = new int[CAP];
 
   /**
-   * Constructor.
-   * @param k token
-   * @param pr pre value
-   * @param po position
-   */
-  FZHash(final byte[] k, final int pr, final int po) {
-    index(k, pr, po);
-  }
-
-  /**
    * Indexes the specified token.
    * @param key token
    * @param pr id

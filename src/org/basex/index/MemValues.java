@@ -1,12 +1,9 @@
 package org.basex.index;
 
 import java.io.IOException;
-import org.basex.BaseX;
-import org.basex.data.Data;
 import org.basex.io.PrintOutput;
-import org.basex.query.xpath.expr.FTOption;
 import org.basex.util.Array;
-import org.basex.util.Set;
+import org.basex.util.Token;
 
 /**
  * This class provides a main-memory access to attribute values and
@@ -15,11 +12,21 @@ import org.basex.util.Set;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class MemValues extends Set implements Index {
+public final class MemValues extends Index {
+  /** Initial hash capacity. */
+  protected static final int CAP = 1 << 3;
+  /** Hash keys. */
+  protected byte[][] keys;
+  /** Pointers to the next token. */
+  protected int[] next;
+  /** Hash table buckets. */
+  protected int[] bucket;
   /** IDs. */
   private int[][] ids = new int[CAP][];
   /** ID array lengths. */
   private int[] len = new int[CAP];
+  /** Hash entries. Actual hash size is <code>size - 1</code>. */
+  public int size;
   
   /**
    * Indexes the specified keys and values.
@@ -41,19 +48,25 @@ public final class MemValues extends Set implements Index {
     return i;
   }
 
-  /** {@inheritDoc} */
-  public int[][] idPos(final byte[] tok, final FTOption ftO, final Data d) {
-    BaseX.notimplemented();
-    return null;
+  /**
+   * Indexes the specified key.
+   * @param key key
+   * @return offset of added key, negative offset otherwise
+   */
+  private int add(final byte[] key) {
+    if(size == next.length) rehash();
+
+    final int p = Token.hash(key) & bucket.length - 1;
+    for(int id = bucket[p]; id != 0; id = next[id]) {
+      if(Token.eq(key, keys[id])) return -id;
+    }
+
+    next[size] = bucket[p];
+    keys[size] = key;
+    bucket[p] = size;
+    return size++;
   }
-  
-  /** {@inheritDoc} */
-  public int[][]  idPosRange(final byte[] tok0, final boolean itok0, 
-      final byte[] tok1, final boolean itok1) {
-    BaseX.notimplemented();
-   return null;
-  }
-  
+
   /**
    * Returns the id for the specified key.
    * @param key key
@@ -72,36 +85,57 @@ public final class MemValues extends Set implements Index {
     return keys[id];
   }
   
-  /** {@inheritDoc} */
+  @Override
   public int[] ids(final byte[] key) {
     final int i = id(key);
     return i == 0 ? Array.NOINTS : Array.finish(ids[i], len[i]);
   }
+
+  /**
+   * Returns the id of the specified key or 0 if key was not found.
+   * @param key key to be found
+   * @return id or 0 if nothing was found
+   */
+  private int id(final byte[] key) {
+    final int p = Token.hash(key) & bucket.length - 1;
+    for(int id = bucket[p]; id != 0; id = next[id]) {
+      if(Token.eq(key, keys[id])) return id;
+    }
+    return 0;
+  }
   
-  /** {@inheritDoc} */
+  @Override
   public int nrIDs(final byte[] key) {
     return len[id(key)];
   }
   
-  /** {@inheritDoc} */
-  public int[][] fuzzyIDs(final byte[] tok, final int ne) {
-    BaseX.notimplemented();
-    return null;
-  }
-  
+  /**
+   * Rehashes the hash contents.
+   */
+  private void rehash() {
+    final int s = size << 1;
+    final int[] tmp = new int[s];
 
-  @Override
-  protected void rehash() {
-    super.rehash();
+    final int l = bucket.length;
+    for(int i = 0; i != l; i++) {
+      int id = bucket[i];
+      while(id != 0) {
+        final int p = Token.hash(keys[id]) & s - 1;
+        final int nx = next[id];
+        next[id] = tmp[p];
+        tmp[p] = id;
+        id = nx;
+      }
+    }
+    bucket = tmp;
+    next = Array.extend(next);
+    keys = Array.extend(keys);
     ids = Array.extend(ids);
     len = Array.extend(len);
   }
 
-  /** {@inheritDoc} */
+  @Override
   public void info(final PrintOutput out) throws IOException {
     out.print("MemValues");
   }
-
-  /** {@inheritDoc} */
-  public void close() { }
 }

@@ -272,7 +272,7 @@ public final class DataAccess {
    * Reads the next compressed number and returns it as integer.
    * @return next integer
    */
-  private synchronized int readNum() {
+  public synchronized int readNum() {
     final int v = read();
     switch(v & 0xC0) {
     case 0:

@@ -3,7 +3,6 @@ package org.basex.index;
 import static org.basex.data.DataText.*;
 import static org.basex.Text.*;
 import java.io.IOException;
-
 import org.basex.data.Data;
 import org.basex.data.DiskData;
 import org.basex.io.DataAccess;
@@ -21,7 +20,7 @@ import org.basex.util.Token;
  * @author Christian Gruen
  * @author Sebastian Gath
  */
-public final class WordsCTA implements Index {
+public final class WordsCTA extends Index {
   /** Values file. */
   //private DataDiskAccess txt;
   /** Index file. */
@@ -54,7 +53,7 @@ public final class WordsCTA implements Index {
     //size = id.read4(0);
   }
 
-  /** {@inheritDoc} */
+  @Override
   public void info(final PrintOutput out) throws IOException {
     out.println(FTINDEX);
     out.println(TRIE);
@@ -62,7 +61,7 @@ public final class WordsCTA implements Index {
     out.println(SIZEDISK + Performance.formatSize(l, true) + NL);
   }
 
-  /** {@inheritDoc} */
+  @Override
   public int[][] idPos(final byte[] tok, final FTOption ftO, final Data d) {
     //return getNodesFuzzyWLev(0, new StringBuilder(), tok, 3, null);
     //return getNodeFuzzy(0, null, tok, 0, 0, 0, 3);
@@ -160,7 +159,7 @@ public final class WordsCTA implements Index {
     return tmp;
   }
   
-  /** {@inheritDoc} */
+  @Override
   public int[][] idPosRange(final byte[] tokFrom, final boolean itok0,
       final byte[] tokTo, final boolean itok1) {
     int[][] data = null;
@@ -261,12 +260,12 @@ public final class WordsCTA implements Index {
     return data;
   }
   
-  /** {@inheritDoc} */
+  @Override
   public int[][] fuzzyIDs(final byte[] tok, final int ne) {
     return getNodeFuzzy(0, null, tok, 0, 0, 0, ne);
   }
 
-  /** {@inheritDoc} */
+  @Override
   public int[] ids(final byte[] tok) {
     int nId = getNodeIdFromTrieRecursive(0, getNodeEntry(0), tok);
     // no entry found in trie
@@ -277,12 +276,12 @@ public final class WordsCTA implements Index {
     return getPreValues(nodeEntry, dataEntry);
   }
 
-  /** {@inheritDoc} */
+  @Override
   public int nrIDs(final byte[] tok) {
     return ids(tok).length;
   }
 
-  /** {@inheritDoc} */
+  @Override
   public synchronized void close() throws IOException {
     //id.close();
     idxv.close();

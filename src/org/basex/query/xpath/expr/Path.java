@@ -25,14 +25,18 @@ public final class Path extends DualExpr {
   }
 
   @Override
-  public NodeSet eval(final XPContext ctx) throws QueryException {
+  public Item eval(final XPContext ctx) throws QueryException {
     final Item val = ctx.eval(expr1);
     final NodeSet local = ctx.local;
-    if(val instanceof NodeSet) ctx.local = (NodeSet) val;
+    ctx.local = (NodeSet) val;
+    int[][] ftprepos =  ctx.local.ftidpos;
+    int[] ftpoin = ctx.local.ftpointer;
     final NodeSet ns = (NodeSet) ctx.eval(expr2);
+    ns.ftidpos = ftprepos;
+    ns.ftpointer = ftpoin;
     ctx.local = local;
     return ns;
-    
+
     /* <SG> hm, yes, seems it causes errors ;)
     final Item val = ctx.eval(expr1);
     int[][] ftprepos = null;

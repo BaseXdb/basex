@@ -33,14 +33,11 @@ public final class Open extends Proc {
     // set new global data reference
     context.data(data);
     
-//    for testing purposes ...
-    try {
-//      context.data().stats.stats(data);
-//      context.data().stats.read();
-    } catch(Exception e) {
-      e.printStackTrace();
+    if(Prop.info) {
+      if(data.meta.newindex) info(INDUPDATE + NL);
+      timer(DBOPENED);
     }
-    return Prop.info ? timer(DBOPENED) : true;
+    return true;
   }
 
   /**

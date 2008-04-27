@@ -96,7 +96,7 @@ public final class MapImages {
   void load() {
     if(running || loaderC == 0) return;
     running = true;
-
+    
     new Thread() {
       @Override
       public void run() {

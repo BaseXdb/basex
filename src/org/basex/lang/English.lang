@@ -274,7 +274,8 @@ help_long=Try 'help [...]' to get info on a specific command.
 # Create Command
 pc_create=Database is created
 pc_index=Creating Indexes
-pc_update=Please create a new database.
+pc_update=The database format has changed; please create a new database.
+pc_indupdate=The index format has changed; please create new indexes.
 pc_cancel=Building has been canceled.
 pc_indextxt=Indexing Text
 pc_indexatt=Indexing Attributes

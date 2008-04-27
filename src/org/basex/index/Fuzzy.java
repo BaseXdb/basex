@@ -41,7 +41,7 @@ import org.basex.query.xpath.expr.FTUnion;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Sebastian Gath
  */
-public final class Fuzzy implements Index {
+public final class Fuzzy extends Index {
   /** Number of index entries. */
   int indexsize;
   /** Number of ftdata entries. */
@@ -67,16 +67,13 @@ public final class Fuzzy implements Index {
     dat = new DataAccess(db, file + "z");
   }
 
-  /** {@inheritDoc} */
+  @Override
   public void info(final PrintOutput out) throws IOException {
     out.println(TEXTINDEX);
     out.println("FUZZY TABLE");
-    //out.println("SIZE" + ftdatasize);
-    //final long l = ftdata.length();
-    //out.println(SIZEDISK + Performance.formatSize(l, true) + Prop.NL);
   }
 
-  /** {@inheritDoc} */
+  @Override
   public int[] ids(final byte[] tok) {
     return CTArrayX.getIDsFromData(get(tok));
   }
@@ -268,12 +265,12 @@ public final class Fuzzy implements Index {
     
   } 
  
-  /** {@inheritDoc} */
+  @Override
   public int[][] fuzzyIDs(final byte[] tok, final int ne) {
     return getFuzzy(tok, ne);
   }
 
-  /** {@inheritDoc} */
+  @Override
   public int[][] idPos(final byte[] tok, final FTOption ftO, final Data dd) {
     // init no wildcard included in token
     int posW = -1;
@@ -363,19 +360,12 @@ public final class Fuzzy implements Index {
     return tmp;
   }
   
-  /** {@inheritDoc} */
-   public int[][]  idPosRange(final byte[] tok0, final boolean itok0, 
-       final byte[] tok1, final boolean itok1) {
-    BaseX.notimplemented();
-    return null;
-   }
-
-  /** {@inheritDoc} */
+  @Override
   public int nrIDs(final byte[] tok) {
     return -1;
   }
 
-   /** {@inheritDoc} */
+  @Override
   public synchronized void close() throws IOException {
     li.close();
     ti.close();
@@ -394,13 +384,9 @@ public final class Fuzzy implements Index {
    */
   private static boolean calcEQ(final byte[] tok1, final int sp, 
       final byte[] tok2, final int e) {
-    final int df = (tok1.length - tok2.length < 0) ? 
-        tok2.length - tok1.length : 
-      tok1.length - tok2.length;
+    final int df = Math.abs(tok1.length - tok2.length);
     if (df > e) return false;
 
-    System.out.println("!");
-    
     int d = (tok1.length > tok2.length) ? 
         Levenshtein.ls(tok1, sp, tok1.length, tok2, e) : 
       Levenshtein.ls(tok2, sp, tok2.length, tok1, e);
@@ -472,14 +458,4 @@ public final class Fuzzy implements Index {
 
     return true;
   }
-
-  
-  /**
-   * Returns the pointer on the last token saved in ti.
-   * @return int pointer
-   */
- /* private int getPointerOnLastToken() {
-    return li.readInt(1L + li.readBytes(0, 1L)[0] * 5L + 1L);
-  }
-  */
 }

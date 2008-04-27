@@ -35,7 +35,7 @@ public final class Nodes implements Result {
 
   /**
    * Node Set constructor.
-   * @param n node set
+   * @param n single node
    * @param d data reference
    */
   public Nodes(final int n, final Data d) {
@@ -53,8 +53,6 @@ public final class Nodes implements Result {
     size = n.length;
     data = d;
   }
-
-  
   
   /**
    * Returns the position of the specified node or the negative value - 1 of
@@ -118,7 +116,6 @@ public final class Nodes implements Result {
     ftpoin = ftpointer;
     ftss = ftsearchstrings;
   }
-  
   
   /**
    * The specified pre value is added to or removed from the context set.

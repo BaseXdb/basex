@@ -1,6 +1,7 @@
 package org.basex.index;
 
 import java.io.IOException;
+import org.basex.BaseX;
 import org.basex.query.xpath.expr.FTOption;
 import org.basex.data.Data;
 import org.basex.io.PrintOutput;
@@ -12,7 +13,7 @@ import org.basex.io.PrintOutput;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public interface Index {
+public abstract class Index {
   /** Index types. */
   public enum TYPE {
     /** Text index.      */ TXT,
@@ -26,14 +27,21 @@ public interface Index {
    * @param out output stream
    * @throws IOException in case of write errors
    */
-  void info(PrintOutput out) throws IOException;
+  public abstract void info(PrintOutput out) throws IOException;
 
   /**
    * Returns the node ids for the specified token.
    * @param tok token to be found
    * @return ids
    */
-  int[] ids(final byte[] tok);
+  public abstract int[] ids(final byte[] tok);
+
+  /**
+   * Returns the (approximate/estimated) number of ids for the specified token.
+   * @param tok token to be found
+   * @return number of ids
+   */
+  public abstract int nrIDs(final byte[] tok);
 
   /**
    * Returns the decompressed ids for the specified token.
@@ -42,43 +50,48 @@ public interface Index {
    * @param d data reference
    * @return ids
    */
-  int[][] idPos(final byte[] tok, final FTOption ftO, final Data d);
+  @SuppressWarnings("unused")
+  public int[][] idPos(final byte[] tok, final FTOption ftO,
+      final Data d) {
+    BaseX.notimplemented();
+    return null;
+  }
 
-  /**
-   * FUZZY SEARCH
-   * Returns the indexed id references for the specified fulltext token,
-   * with respect to number of errors (ne) that are allowed to occure.
-   * 
-   * @param fulltext token to be looked up
-   * @param ne int number of errors allowed
-   * @return id array
-   */
-  int[][] fuzzyIDs(byte[] fulltext, final int ne);
-
-  
   /**
    * Returns the decompressed ids for the specified range expression.
    * Each token between tok0 and tok1 is returned as result.
    * @param tok0 start token defining the range
-   * @param itok0 token included in rangebounderies
+   * @param itok0 token included in range boundaries
    * @param tok1 end token defining the range
-   * @param itok1 token included in rangebounderies
+   * @param itok1 token included in range boundaries
    * @return ids
    */
-  int[][] idPosRange(final byte[] tok0, final boolean itok0, 
-      final byte[] tok1, final boolean itok1);
-
+  @SuppressWarnings("unused")
+  public int[][] idPosRange(final byte[] tok0, final boolean itok0, 
+      final byte[] tok1, final boolean itok1) {
+    BaseX.notimplemented();
+    return null;
+  }
 
   /**
-   * Returns the (approximate/estimated) number of ids for the specified token.
-   * @param tok token to be found
-   * @return number of ids
+   * FUZZY SEARCH
+   * Returns the indexed id references for the specified fulltext token,
+   * with respect to number of errors (ne) that are allowed to occur.
+   * 
+   * @param tok token to look up
+   * @param ne int number of errors allowed
+   * @return id array
    */
-  int nrIDs(final byte[] tok);
+  @SuppressWarnings("unused")
+  public int[][] fuzzyIDs(final byte[] tok, final int ne) {
+    BaseX.notimplemented();
+    return null;
+  }
 
   /**
    * Close the index.
    * @throws IOException in case of write errors
    */
-  void close() throws IOException;
+  @SuppressWarnings("unused")
+  public void close() throws IOException { }
 }

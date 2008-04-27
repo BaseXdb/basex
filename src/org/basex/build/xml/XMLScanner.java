@@ -387,6 +387,7 @@ public final class XMLScanner {
   private void pi() throws BuildException {
     final byte[] tok = name(true);
     if(eq(lc(tok), XMLDECL)) error(PIRES);
+    token.add(tok);
 
     int ch = nextChar();
     if(ch != '?' && !ws(ch)) error(PITEXT);

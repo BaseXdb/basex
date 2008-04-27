@@ -93,10 +93,9 @@ public final class FZBuilder extends Progress implements IndexBuilder {
     final int tl = tok.length;
     if(tree[tl] == null) {
       isize++;
-      tree[tl] = new FZHash(tok, id, pos);
-    } else {
-      tree[tl].index(tok, id, pos);
+      tree[tl] = new FZHash();
     }
+    tree[tl].index(tok, id, pos);
   }
 
   /**

@@ -273,7 +273,8 @@ help_long=Detaillierte Infos: 'help [command]'.
 # Create Command
 pc_create=Datenbank wird erzeugt
 pc_index=Indizes werden erzeugt
-pc_update=Bitte erzeugen Sie eine neue Datenbank.
+pc_update=Das Datenbankformat has sich geändert; bitte erstellen Sie eine neue Datenbank.
+pc_indupdate=Das Indexformat hat sich geändert; bitte erstellen Sie neue Indizes.
 pc_cancel=Der Prozess wurde abgebrochen.
 pc_indextxt=Indiziere Texte
 pc_indexatt=Indiziere Attribute

@@ -38,10 +38,6 @@ public final class Set extends Proc {
   public static final String DBPATH = "dbpath";
   /** All flag. */
   public static final String ALL = "ALL";
-  /** On flag. */
-  public static final String ON = "ON";
-  /** Off flag. */
-  public static final String OFF = "OFF";
 
 
   @Override
@@ -70,7 +66,7 @@ public final class Set extends Proc {
       Prop.serialize = toggle(Prop.serialize, INFOSERIALIZE, ext);
     } else if(option.equals(INFO)) {
       Prop.allInfo = ext.equalsIgnoreCase(ALL);
-      if(Prop.allInfo) info(INFOINFO + ON + INFOALL);
+      if(Prop.allInfo) info(INFOINFO + INFOON + INFOALL);
       Prop.info = Prop.allInfo ? true : toggle(Prop.info, INFOINFO, ext);
     } else if(option.equals(XMLOUTPUT)) {
       Prop.xmloutput = toggle(Prop.xmloutput, INFOXMLOUTPUT, ext);

@@ -3,16 +3,13 @@ package org.basex.index;
 import static org.basex.data.DataText.*;
 import static org.basex.Text.*;
 import java.io.IOException;
-import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataAccess;
 import org.basex.io.PrintOutput;
 import org.basex.util.Array;
-import org.basex.util.Num;
 import org.basex.util.Performance;
 import org.basex.util.Token;
-import org.basex.query.xpath.expr.FTOption;
 
 /**
  * This class provides access to attribute values and text contents
@@ -21,19 +18,15 @@ import org.basex.query.xpath.expr.FTOption;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Values implements Index {
+public final class Values extends Index {
   /** Number of hash entries. */
   private int size;
   /** Values file. */
   private final Data data;
-  /** Hash table buckets. */
-  private final DataAccess idxb;
-  /** ID array references. */
-  private final DataAccess idxi;
-  /** Next pointers. */
-  private final DataAccess idxn;
+  /** ID references. */
+  private final DataAccess idxr;
   /** ID lists. */
-  private final DataAccess id;
+  private final DataAccess idxl;
   /** Value type (texts/attributes). */
   private final boolean text;
 
@@ -49,93 +42,67 @@ public final class Values implements Index {
     data = d;
     text = txt;
     final String file = txt ? DATATXT : DATAATV;
-    id   = new DataAccess(db, file + 'l');
-    idxb = new DataAccess(db, file + 'b');
-    idxn = new DataAccess(db, file + 'n');
-    idxi = new DataAccess(db, file + 'i');
-    size = id.read4(0);
+    idxl  = new DataAccess(db, file + 'l');
+    idxr = new DataAccess(db, file + 'r');
+    size = idxl.readNum();
   }
 
-  /** {@inheritDoc} */
+  @Override
   public void info(final PrintOutput out) throws IOException {
     out.println(text ? TEXTINDEX : VALUEINDEX);
     out.println(DISKHASH);
-    out.println(HASHBUCKETS + size);
-    final long l = id.length() + idxb.length() + idxi.length() + idxn.length();
+    out.println(IDXENTRIES + size);
+    final long l = idxl.length() + idxr.length();
     out.println(SIZEDISK + Performance.formatSize(l, true) + Prop.NL);
   }
 
-  /** {@inheritDoc} */
+  @Override
   public int[] ids(final byte[] tok) {
     final int pos = get(tok);
-    return pos > 0 ? ids(pos) : Array.NOINTS;
+    if(pos == 0) return Array.NOINTS;
+    
+    final int ds = idxl.readNum(pos);
+    final int[] ids = new int[ds];
+    int p = 0;
+    for(int d = 0; d < ds; d++) {
+      ids[d] = p + idxl.readNum();
+      p = ids[d];
+    }
+    return ids;
+  }
+
+  @Override
+  public int nrIDs(final byte[] tok) {
+    final long pos = get(tok);
+    return pos > 0 ? idxl.readNum(pos) : 0;
   }
 
   /**
-   * Returns the id offset for the specified token or a negative value
-   * if the token is not found.
-   * @param tok token to be found
+   * Returns the id offset for the specified token or
+   * 0 if the token is not found.
+   * @param key token to be found
    * @return id offset
    */
-  private int get(final byte[] tok) {
-    final int p = Token.hash(tok) & size - 1;
+  private int get(final byte[] key) {
+    int l = 0, h = size - 1;
+    while(l <= h) {
+      int m = (l + h) >>> 1;
 
-    for(int tid = idxb.read4(p); tid != 0; tid = idxn.read4(tid)) {
-      final int pos = idxi.read4(tid);
-      final int pre = id.firstID(pos);
+      final int pos = idxr.read4(m);
+      idxl.readNum(pos);
+      final int pre = idxl.readNum();
       final byte[] txt = text ? data.text(pre) : data.attValue(pre);
-      if(Token.eq(tok, txt)) return pos;
+      int d = Token.diff(txt, key);
+      if(d == 0) return pos;
+      if(d < 0) l = m + 1;
+      else h = m - 1;
     }
     return 0;
   }
 
-  /** {@inheritDoc} */
-  public int nrIDs(final byte[] tok) {
-    final long pos = get(tok);
-    return pos > 0 ? id.readNum(pos) >> 2 : 0;
-  }
-
-  /**
-   * Returns the decompressed ids for the specified file position.
-   * @param pos id position
-   * @return position ids
-   */
-  private int[] ids(final int pos) {
-    final byte[] bytes = id.readToken(pos);
-    final Num num = new Num(bytes, false);
-    final int[] tmp = new int[bytes.length];
-    int s = 0;
-    while(num.more()) {
-      tmp[s++] = num.num();
-      num.next();
-    }
-    return Array.finish(tmp, s);
-  }
-
-  /** {@inheritDoc} */
-  public int[][] idPos(final byte[] tok, final FTOption ftO, final Data d) {
-    BaseX.notimplemented();
-    return null;
-  }
-  
-  /** {@inheritDoc} */
-  public int[][]  idPosRange(final byte[] tok0, final boolean itok0,
-      final byte[] tok1, final boolean itok1) {
-    BaseX.notimplemented();
-    return null;
-  }
-  
-  /** {@inheritDoc} */
-  public int[][] fuzzyIDs(final byte[] tok, final int ne) {
-    BaseX.notimplemented();
-    return null;
-  }
-  
-  /** {@inheritDoc} */
+  @Override
   public synchronized void close() throws IOException {
-    id.close();
-    idxb.close();
-    idxn.close();
-    idxi.close();
+    idxl.close();
+    idxr.close();
   }
 }

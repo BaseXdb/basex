@@ -104,6 +104,8 @@ public final class Create extends Proc {
 
     // determine file path and create database
     String path = cmd.arg(1);
+    if(path.startsWith("<")) return xml();
+    
     try {
       path = filePath(path, true);
       return build(new SAXWrapper(path), path);
