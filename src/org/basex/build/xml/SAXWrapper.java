@@ -55,7 +55,7 @@ public final class SAXWrapper extends Parser {
       r.setContentHandler(p);
       r.setProperty("http://xml.org/sax/properties/lexical-handler", p);
       r.setErrorHandler(p);
-      r.parse(file);
+      r.parse("file:///" + file);
     } catch(final SAXParseException ex) {
       final String msg = "Line " + ex.getLineNumber() + ", Col " +
           ex.getColumnNumber() + ": " + ex.getMessage();

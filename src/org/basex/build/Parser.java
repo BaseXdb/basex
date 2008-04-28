@@ -18,7 +18,7 @@ public abstract class Parser {
    * @param fn input filename.
    */
   public Parser(final String fn) {
-    file = fn;
+    file = fn.replace('\\', '/');
   }
 
   /**
