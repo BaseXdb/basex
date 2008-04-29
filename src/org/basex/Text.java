@@ -260,16 +260,17 @@ public interface Text {
   /** Command Help. */
   String CD2 = lang("ch_cd2");
   /** Command Help. */
-  String FS0 = "[" + Fs.DU + "|" + Fs.LS + "|" + Fs.PWD + "]";
+  String FS0 = "[" + Fs.DU + "|" + Fs.LS + "|" + "|" + Fs.CD +
+    "|" + Fs.PWD + "|" + Fs.LOCATE + "]";
   /** Command Help. */
   String FS1 = lang("ch_fs1");
   /** Command Help. */
   String FS2 = lang("ch_fs2") + NL +
-    "- " + Fs.DU    + lang("ch_fs21") + NL +
-    "- " + Fs.LS    + lang("ch_fs22") + NL +
-    "- " + Fs.TOUCH + lang("ch_fs23") + NL +
-    "- " + Fs.RM + lang("ch_fs24") + NL +
-    "- " + Fs.PWD   + lang("ch_fs25");
+    "- " + Fs.DU      + lang("ch_fs21") + NL +
+    "- " + Fs.LS      + lang("ch_fs22") + NL +
+    "- " + Fs.CD      + lang("ch_fs23") + NL +
+    "- " + Fs.LOCATE  + lang("ch_fs24") + NL +
+    "- " + Fs.PWD     + lang("ch_fs25");
 
   /** Command Help. */
   String DUMMYUPDATE0 = lang("ch_dummyupdate0");

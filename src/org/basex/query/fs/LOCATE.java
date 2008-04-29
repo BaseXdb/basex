@@ -12,6 +12,7 @@ import org.basex.query.xpath.XPathProcessor;
 import org.basex.data.Nodes;
 import org.basex.util.GetOpts;
 import org.basex.util.IntList;
+import org.basex.util.Performance;
 
 /**
  * Performs a locate command.
@@ -21,7 +22,6 @@ import org.basex.util.IntList;
  *
  */
 public class LOCATE {
-
 
   /** Data reference. */
   private final Data data;
@@ -134,7 +134,7 @@ public class LOCATE {
         out.print("Not yet implemented");
         break;
       default:
-        locateTable(FSUtils.getROOTDIR(), limit);
+        locateXQuery(limit);
       break;        
     }
 
@@ -151,7 +151,7 @@ public class LOCATE {
    * @throws IOException in case of problems with the PrintOutput 
    */
   private void locateTable(final int pre, final int limit) throws IOException {
-
+    
     if(!lFlag || filesfound < limit) {            
       int[] contentDir = FSUtils.getAllOfDir(data, pre);  
 
@@ -195,40 +195,37 @@ public class LOCATE {
    * @throws IOException in case of problems with the PrintOutput 
    */
   private void locateXQuery(final int limit) throws IOException {
-    String query;
+
+    String query = "";
     int slash = fileToFind.indexOf('/'); 
     int lastSlash = 0;
     int lastrIndexOfSlash = fileToFind.lastIndexOf('/');
-    if(slash != 0) {
-      query = "//[@name='" + fileToFind.substring(lastSlash, slash) + "']";
+
+    if(slash > 0) {
+      query = "//*[@name='" + fileToFind.substring(lastSlash, slash) + "']";
       while(slash < lastrIndexOfSlash) {
-        query += "/[@name='" + fileToFind.substring(lastSlash, slash) + "']";
+        query += "/*[@name='" + fileToFind.substring(lastSlash, slash) + "']";
         lastSlash = slash;
         slash = fileToFind.indexOf('/', lastSlash);      
-        out.print(query);
-        out.print(NL);
       }
-      
-      query += "/[@name='" + 
-        fileToFind.substring(lastrIndexOfSlash + 1, fileToFind.length()) + "']";
-      out.print(query);
-      out.print(NL);
+      query += "/*[@name='" + 
+      fileToFind.substring(lastrIndexOfSlash + 1, 
+          fileToFind.length()) + "']/descendant-or-self::*";
     } else {
-      query = "//[@name='" + fileToFind + "']";  
+      query = "//*[@name='" + fileToFind + "']/descendant-or-self::*";  
     }
-    
-        
     XPathProcessor qu = new XPathProcessor(query);
     try {
       Nodes result = qu.queryNodes(input);
       filesfound = result.size;
       if(!cFlag) {
         for(int i = 0; i < filesfound && 
-        (!lFlag || i < limit); i++) {                
+        (!lFlag || i < limit); i++) {        
           out.print(FSUtils.getPath(data, result.pre[i]));
+          
           out.print(NL);
         }
-      }      
+      }
     } catch(QueryException e) {
       e.printStackTrace();
     }
