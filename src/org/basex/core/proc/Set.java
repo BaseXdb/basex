@@ -1,8 +1,8 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
-import java.io.File;
 import org.basex.core.Prop;
+import org.basex.io.IO;
 import org.basex.util.Token;
 
 /**
@@ -71,12 +71,10 @@ public final class Set extends Proc {
     } else if(option.equals(XMLOUTPUT)) {
       Prop.xmloutput = toggle(Prop.xmloutput, INFOXMLOUTPUT, ext);
     } else if(option.equals(DBPATH)) {
-      if(!new File(ext).exists()) return error(INFOPATHERR + ext);
+      if(!new IO(ext).exists()) return error(INFOPATHERR + ext);
       Prop.dbpath = ext;
       info(INFONEWPATH + ext);
       // the following options are kinda hidden
-    } else if(option.equals("fsstat")) {
-      Prop.fsstat = toggle(Prop.fsstat, option + " ", ext);
     } else if(option.equals("fscont")) {
       Prop.fscont = toggle(Prop.fscont, option + " ", ext);
     } else if(option.equals("fsmeta")) {

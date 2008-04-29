@@ -1,6 +1,5 @@
 package org.basex.io;
 
-import static org.basex.io.IOConstants.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -13,7 +12,7 @@ import java.io.RandomAccessFile;
  */
 public final class RandomAccess {
   /** Default buffer size - must be a power of two. */
-  private static final int BUFSIZE = 1 << BLOCKPOWER;
+  private static final int BUFSIZE = 1 << IO.BLOCKPOWER;
   /** Buffer limit (buffer size - 1). */
   private static final int BUFLIMIT = BUFSIZE - 1;
   /** Reference to the data input stream. */

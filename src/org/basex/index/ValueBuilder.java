@@ -3,14 +3,11 @@ package org.basex.index;
 import static org.basex.data.DataText.*;
 import static org.basex.Text.*;
 import java.io.IOException;
-import org.basex.BaseX;
 import org.basex.core.Progress;
-import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
-import org.basex.io.IOConstants;
+import org.basex.io.IO;
 import org.basex.util.Num;
-import org.basex.util.Performance;
 import org.basex.util.Token;
 
 /**
@@ -45,14 +42,11 @@ public final class ValueBuilder extends Progress implements IndexBuilder {
    * @throws IOException IO Exception
    */
   public Values build(final Data data) throws IOException {
-    // calculate approximate final hash capacity to reduce rehashings
     final String db = data.meta.dbname;
     final String f = text ? DATATXT : DATAATV;
     int cap = 1 << 2;
-    final int max = (int) (IOConstants.dbfile(db, f).length() >>> 7);
+    final int max = (int) (IO.dbfile(db, f).length() >>> 7);
     while(cap < max && cap < (1 << 24)) cap <<= 1;
-
-    Performance perf = new Performance();
 
     total = data.size;
     final int type = text ? Data.TEXT : Data.ATTR;
@@ -61,19 +55,7 @@ public final class ValueBuilder extends Progress implements IndexBuilder {
       if(data.kind(id) != type) continue;
       index(text ? data.text(id) : data.attValue(id), id);
     }
-    
-    // temporary..
-    if(Prop.debug) {
-      BaseX.outln("Indexed: " + Performance.getMem() + ", " + perf);
-      Performance.gc(4);
-      BaseX.outln("Tokens: " + index.size);
-      perf.getTime();
-    }
-    
     index.init();
-    if(Prop.debug) {
-      BaseX.outln("Sorted: " + Performance.getMem() + ", " + perf);
-    }
 
     int hs = index.size;
     final DataOutput outl = new DataOutput(db, f + 'l');

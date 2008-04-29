@@ -8,8 +8,8 @@ import org.basex.data.Nodes;
 import org.basex.data.PrintSerializer;
 import org.basex.data.Result;
 import org.basex.data.Serializer;
+import org.basex.io.IO;
 import org.basex.io.CachedOutput;
-import org.basex.io.IOConstants;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -120,7 +120,7 @@ public abstract class QueryContext extends Progress {
     ser.openElement(PLAN);
     plan(ser);
     ser.closeElement(PLAN);
-    IOConstants.write(fn, out.finish());
+    new IO(fn).write(out.finish());
   }
   
   /**
@@ -158,7 +158,7 @@ public abstract class QueryContext extends Progress {
    * @throws Exception exception
    */
   protected void dot(final String file, final byte[] cont) throws Exception {
-    IOConstants.write(file, cont);
+    new IO(file).write(cont);
     new ProcessBuilder(Prop.dotty, file).start().waitFor();
   }
 }

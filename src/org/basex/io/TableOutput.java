@@ -2,7 +2,6 @@ package org.basex.io;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import static org.basex.io.IOConstants.*;
 
 /**
  * This class allows a blockwise output of the database table.
@@ -12,15 +11,15 @@ import static org.basex.io.IOConstants.*;
  */
 public final class TableOutput extends FileOutputStream {
   /** Buffer Threshold. */
-  private static final int BUFFERTHRESHOLD = (int) Math.floor(BLOCKFILL
-      * ((1 << BLOCKPOWER) >>> NODEPOWER)) << NODEPOWER;
+  private static final int THRESHOLD = (int) Math.floor(IO.BLOCKFILL
+      * ((1 << IO.BLOCKPOWER) >>> IO.NODEPOWER)) << IO.NODEPOWER;
   /** Buffer. **/
-  private final byte[] buffer = new byte[BUFFERTHRESHOLD];
+  private final byte[] buffer = new byte[THRESHOLD];
   /** Position inside buffer. **/
   private int pos;
   /** Block Filler. */
-  private static final byte[] BLOCKFILLER = new byte[(1 << BLOCKPOWER)
-      - BUFFERTHRESHOLD];
+  private static final byte[] BLOCKFILLER = new byte[(1 << IO.BLOCKPOWER)
+      - THRESHOLD];
   /** Block Count. */
   private int blockCount;
   /** First pre value of current block. */
@@ -40,7 +39,7 @@ public final class TableOutput extends FileOutputStream {
    * @throws IOException IO Exception
    */
   public TableOutput(final String db, final String fn) throws IOException {
-    super(IOConstants.dbfile(db, fn));
+    super(IO.dbfile(db, fn));
     indexFile = new DataOutput(db, fn + 'x');
     database = db;
     filename = fn;
@@ -48,7 +47,7 @@ public final class TableOutput extends FileOutputStream {
   
   @Override
   public void write(final int b) throws IOException {
-    if(pos == BUFFERTHRESHOLD) flush();
+    if(pos == THRESHOLD) flush();
     buffer[pos++] = (byte) b;
   }
 
@@ -60,9 +59,9 @@ public final class TableOutput extends FileOutputStream {
 
     indexFile.writeInt(firstPre);
     indexFile.writeInt(blockCount++);
-    firstPre += pos >>> NODEPOWER;
+    firstPre += pos >>> IO.NODEPOWER;
 
-    while(pos++ < BUFFERTHRESHOLD) super.write(0);
+    while(pos++ < THRESHOLD) super.write(0);
     super.write(BLOCKFILLER);
     pos = 0;
   }

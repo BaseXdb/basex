@@ -3,10 +3,9 @@ package org.basex.query.xquery;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
-import java.io.File;
 import java.io.IOException;
 import org.basex.BaseX;
-import org.basex.io.IOConstants;
+import org.basex.io.IO;
 import org.basex.query.xquery.expr.And;
 import org.basex.query.xquery.expr.CAttr;
 import org.basex.query.xquery.expr.CComm;
@@ -98,7 +97,7 @@ public final class XQParser {
   private QNm module;
 
   /** Optional name of input file. */
-  private File file;
+  private IO file;
 
   /** Current xpath query. */
   private byte[] qu;
@@ -155,7 +154,7 @@ public final class XQParser {
    * @param u module uri
    * @throws XQException xquery exception
    */
-  private void parse(final byte[] q, final File f, final Uri u)
+  private void parse(final byte[] q, final IO f, final Uri u)
       throws XQException {
 
     try {
@@ -513,14 +512,14 @@ public final class XQParser {
   private void module(final String f, final Uri u) throws XQException {
     if(ctx.modLoaded.contains(f)) return;
     // check specified path and path relative to query file
-    File fl = new File(f);
-    if(!fl.exists() && file != null) fl = new File(file.getParent() + "/" + f);
+    IO fl = new IO(f);
+    if(!fl.exists() && file != null) fl = file.merge(fl);
 
     byte[] query = null;
     try {
-      query = IOConstants.read(fl);
+      query = fl.content();
     } catch(final IOException ex) {
-      Err.or(NOMODULEFILE, fl.getAbsolutePath());
+      Err.or(NOMODULEFILE, fl);
     }
 
     final Namespaces ns = ctx.ns;
@@ -2166,12 +2165,12 @@ public final class XQParser {
             do opt.stopwords.add(stringLiteral()); while(consume(COMMA));
             check(PAR2);
           } else if(consume(AT)) {
-            final File fl = new File(string(stringLiteral()));
+            final IO fl = new IO(string(stringLiteral()));
             try {
               opt.stopwords = new TokenList();
-              opt.stopwords.add(split(norm(IOConstants.read(fl)), ' '));
+              opt.stopwords.add(split(norm(fl.content()), ' '));
             } catch(final IOException ex) {
-              Err.or(NOSTOPFILE, fl.getAbsolutePath());
+              Err.or(NOSTOPFILE, fl);
             }
           }
         }

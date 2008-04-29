@@ -1,9 +1,7 @@
 package org.basex.query.fs;
 
 import static org.basex.Text.*;
-
 import java.io.IOException;
-
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.io.PrintOutput;
@@ -12,7 +10,6 @@ import org.basex.query.xpath.XPathProcessor;
 import org.basex.data.Nodes;
 import org.basex.util.GetOpts;
 import org.basex.util.IntList;
-import org.basex.util.Performance;
 
 /**
  * Performs a locate command.

@@ -219,11 +219,18 @@ public enum Calc {
       checkNum(a, b);
       final Type t = type(a, b);
       if(t == Type.DBL) return Dbl.get(a.dbl() % b.dbl());
-      if(t == Type.ITR) return Itr.get(a.itr() % b.itr());
       if(t == Type.FLT) return Flt.get(a.flt() % b.flt());
+
+      if(t == Type.ITR) {
+        final long b1 = a.itr();
+        final long b2 = b.itr();
+        if(b2 == 0) Err.or(DIVZERO, a);
+        return Itr.get(b1 % b2);
+      }
 
       final BigDecimal b1 = a.dec();
       final BigDecimal b2 = b.dec();
+      if(b2.signum() == 0) Err.or(DIVZERO, a);
       final BigDecimal q = b1.divide(b2, 0, BigDecimal.ROUND_DOWN);
       return Dec.get(b1.subtract(q.multiply(b2)));       
     }

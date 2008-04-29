@@ -1,13 +1,13 @@
 package org.basex.build;
 
 import static org.basex.build.BuildText.*;
+import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.core.Progress;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.data.Stats;
 import org.basex.index.Names;
-import org.basex.util.Token;
 
 /**
  * This class provides an interface for building database instances.
@@ -36,6 +36,8 @@ public abstract class Builder extends Progress {
   /** Table size. */
   protected int size;
 
+  /** Maximum level depth. */
+  private NSBuilder ns = new NSBuilder();
   /** Parent stack. */
   private final int[] parStack = new int[CAP];
   /** Tag stack. */
@@ -47,8 +49,6 @@ public abstract class Builder extends Progress {
   
   /** Attribute token. */
   private static final byte[] ATT = { '@' };
-  /** DBname. */
-  private byte[] dbname;
 
   /**
    * Constructor.
@@ -87,11 +87,11 @@ public abstract class Builder extends Progress {
    * @param par relative parent value (distance)
    * @param at optional attribute tokens
    * @param atr numeric attribute references
-   * @param type node type
+   * @param kind node type
    * @throws IOException in case of parsing or writing problems 
    */
   protected abstract void addNode(int tok, int par, byte[][] at, int[] atr,
-      int type) throws IOException;
+      byte kind) throws IOException;
   
   /**
    * Adds the size value to the table.
@@ -104,14 +104,14 @@ public abstract class Builder extends Progress {
    * Adds a simple node to the database.
    * @param tok the token to be added (tag name or content)
    * @param par relative parent value (distance)
-   * @param type the node type
+   * @param kind the node kind
    * @throws IOException in case of parsing or writing problems 
    */
-  protected abstract void addText(byte[] tok, int par, int type)
+  protected abstract void addText(byte[] tok, int par, byte kind)
     throws IOException;
 
 
-  // implemented methods
+  // Final Methods ============================================================
     
   /**
    * Builds the database by running the specified parser.
@@ -125,15 +125,31 @@ public abstract class Builder extends Progress {
     init(db);
 
     // add document node and parse document
-    final byte[] name = Token.token(db);
-    dbname = name;
-    addNode(name, null, true);
+    final byte[] name = token(db);
+    addNode(Data.DOC, name, null, true);
     parser.parse(this);
     endNode(name);
 
     // check if the document was regularly closed
     if(level != 0) error(CLOSEMISS, meta.dbname);
     return finish();
+  }
+
+  /**
+   * Adds a new namespace; called by the building instance.
+   * @param name the attribute name to be processed
+   * @param val attribute value
+   */
+  public final void startNS(final byte[] name, final byte[] val) {
+    ns.add(name, val);
+  }
+
+  /**
+   * Removes a namespace; called by the building instance.
+   * @param name the attribute name to be processed
+   */
+  public final void endNS(final byte[] name) {
+    ns.delete(name);
   }
 
   /**
@@ -145,7 +161,7 @@ public abstract class Builder extends Progress {
   public final void startNode(final byte[] tag, final byte[][] att)
       throws IOException {
 
-    addNode(tag, att, true);
+    addNode(Data.ELEM, tag, att, true);
   }
 
   /**
@@ -157,7 +173,7 @@ public abstract class Builder extends Progress {
   public final void emptyNode(final byte[] tag, final byte[][] att)
       throws IOException {
 
-    addNode(tag, att, false);
+    addNode(Data.ELEM, tag, att, false);
   }
   
   /**
@@ -167,7 +183,7 @@ public abstract class Builder extends Progress {
    */
   public final void endNode(final byte[] tag) throws IOException {
     checkStop();
-    final byte[] t = Token.utf8(tag, meta.encoding);
+    final byte[] t = utf8(tag, meta.encoding);
     if(level-- == 0 || tags.id(t) != tagStack[level])
       error(CLOSINGTAG, parser.det(), t, tags.key(tagStack[level]));
 
@@ -176,30 +192,34 @@ public abstract class Builder extends Progress {
 
   /**
    * Stores an node.
+   * @param kind node type
    * @param tag the tag to be processed
    * @param att the tag attributes
    * @param open opening tag
    * @throws IOException in case of parsing or writing problems 
    */
-  protected final void addNode(final byte[] tag, final byte[][] att,
-      final boolean open) throws IOException {
-    final byte[] t = Token.utf8(tag, meta.encoding);
+  protected final void addNode(final byte kind, final byte[] tag,
+      final byte[][] att, final boolean open) throws IOException {
+    
+    final byte[] t = utf8(tag, meta.encoding);
     if(t.length == 0) error(TAGEMPTY, parser.det());
-    if(level == 1 && inDoc) error(MOREROOTS, parser.det(), t);
 
-    // index tag to statistic
-    if(tag != dbname) {
+    // set leaf node information in index and add tag and atts to statistics 
+    if(level != 0) {
+      if(level == 1 && inDoc) error(MOREROOTS, parser.det(), t);
+      
+      tags.noleaf(tagStack[level - 1], true);
       stats.index(tag, null);
-    }
-    // index atts to statistic
-    if(att != null) {
-      for(int i = 0; i < att.length; i += 2) {
-        byte[] a = Token.concat(ATT, att[i]);
-        byte[] v = att[i + 1];
-        stats.index(a, v);
+
+      if(att != null) {
+        for(int i = 0; i < att.length; i += 2) {
+          byte[] a = concat(ATT, att[i]);
+          byte[] v = att[i + 1];
+          stats.index(a, v);
+        }
       }
     }
-    
+
     // create numeric attribute references and check if they appear only once
     final int attl = att != null ? att.length >> 1 : 0;
     final int[] at = new int[attl];
@@ -210,16 +230,12 @@ public abstract class Builder extends Progress {
       }
     }
 
-    // set leaf node information in index
-    if(level != 0) tags.noleaf(tagStack[level - 1], true);
-    
     final int tok = tags.index(t);
     tagStack[level] = tok;
     parStack[level] = size;
 
     final int par = level != 0 ? size - parStack[level - 1] : 1;
-    final byte typ = level == 0 ? Data.DOC : Data.ELEM;
-    addNode(tok, par, att, at, typ);
+    addNode(tok, par, att, at, kind);
 
     if(open && meta.height < ++level) meta.height = level;
     if(size != 1) inDoc = true;
@@ -235,18 +251,16 @@ public abstract class Builder extends Progress {
     // checks if text appears before or after root node
     if(!w) {
       if(inDoc) {
-        if(level == 1) error(AFTERROOT, parser.det(), t.length > 20 ?
-            Token.concat(Token.substring(t, 0 , 20), Token.DOTS) : t);
+        if(level == 1) error(AFTERROOT, parser.det(), cut(t, 20));
       } else {
-        error(BEFOREROOT, parser.det(), t.length > 20 ?
-            Token.concat(Token.substring(t, 0 , 20), Token.DOTS) : t);
+        error(BEFOREROOT, parser.det(), cut(t, 20));
       }
     } else if(t.length == 0 || (!inDoc || level == 1)) {
       return;
     }
 
     // chop whitespaces in text nodes
-    final byte[] tok = meta.chop ? Token.trim(t) : t;
+    final byte[] tok = meta.chop ? trim(t) : t;
     if(tok.length != 0) addText(tok, Data.TEXT);
   }
   
@@ -256,7 +270,8 @@ public abstract class Builder extends Progress {
    * @param e message extension
    * @throws BuildException in case of parsing or writing problems 
    */
-  private void error(final String m, final Object... e) throws BuildException {
+  private void error(final String m, final Object... e)
+      throws BuildException {
     throw new BuildException(m, e);
   }
 
@@ -279,14 +294,14 @@ public abstract class Builder extends Progress {
   }
 
   /**
-   * Adds a simple node to the database.
-   * @param txt the token to be added (tag name or content)
+   * Adds a simple text, command or pi node to the database.
+   * @param txt the token to be added
    * @param type the node type
    * @throws IOException in case of parsing or writing problems 
    */
   private void addText(final byte[] txt, final byte type) throws IOException {
     parStack[level] = size;
-    final byte[] t = Token.utf8(txt, meta.encoding);
+    final byte[] t = utf8(txt, meta.encoding);
     
     // text node processing for statistics 
     if(type == Data.TEXT) stats.index(tags.key(tagStack[level - 1]), txt);
@@ -299,8 +314,7 @@ public abstract class Builder extends Progress {
    * @param enc encoding
    */
   public final void encoding(final String enc) {
-    meta.encoding = enc.equals(Token.UTF8) || enc.equals(Token.UTF82) ?
-        Token.UTF8 : enc;
+    meta.encoding = enc.equals(UTF8) || enc.equals(UTF82) ? UTF8 : enc;
   }
 
   /**

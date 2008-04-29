@@ -6,8 +6,8 @@ import org.basex.core.Prop;
 import org.basex.data.DOTSerializer;
 import org.basex.data.Nodes;
 import org.basex.data.PrintSerializer;
+import org.basex.io.IO;
 import org.basex.io.CachedOutput;
-import org.basex.io.IOConstants;
 import org.basex.io.NullOutput;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
@@ -57,7 +57,7 @@ public class XQuery extends Proc {
     if(Prop.dotresult) {
       final CachedOutput out = new CachedOutput();
       result.serialize(new DOTSerializer(out));
-      IOConstants.write(RESULTDOT, out.finish());
+      new IO(RESULTDOT).write(out.finish());
       new ProcessBuilder(Prop.dotty, RESULTDOT).start().waitFor();
     }
   }
@@ -118,19 +118,19 @@ public class XQuery extends Proc {
         info(QUERYCOMPILE + Performance.getTimer(comp, Prop.runs) + NL);
         info(QUERYEVALUATE + Performance.getTimer(eval, Prop.runs) + NL);
       }
+      return true;
     } catch(final IllegalArgumentException ex) {
       throw ex;
-    } catch(final RuntimeException ex) {
-      return false;
     } catch(final QueryException ex) {
       BaseX.debug(ex);
       return error(ex.getMessage());
+    } catch(final RuntimeException ex) {
+      if(ex.getClass() == RuntimeException.class) return false;
+      ex.printStackTrace();
+      return error("Implementation Bug? " +  ex.getClass().getSimpleName());
     } catch(final Exception ex) {
-      BaseX.debug(ex);
-      final String msg = ex.getMessage();
-      return error("Implementation Bug? " +  ex.getClass().getSimpleName() +
-          (msg != null ? ": " + msg : ""));
+      ex.printStackTrace();
+      return error("Implementation Bug? " +  ex.getClass().getSimpleName());
     }
-    return true;
   }
 }

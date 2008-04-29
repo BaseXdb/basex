@@ -744,7 +744,7 @@ public final class GUI extends JFrame {
    * @param n number of hits
    */
   public void setHits(final int n) {
-    hits.setText(n == 0 ? "" : n + " " + HITS);
+    hits.setText(n + " " + HITS);
   }
 
   /**

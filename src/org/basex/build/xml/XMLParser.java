@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.basex.build.BuildException;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
-import org.basex.io.BufferInput;
+import org.basex.io.IO;
 import org.basex.util.Token;
 
 /**
@@ -24,22 +24,12 @@ public final class XMLParser extends Parser {
 
   /**
    * Constructor.
-   * @param in input stream
+   * @param f file reference
    * @throws IOException I/O Exception
    */
-  public XMLParser(final BufferInput in) throws IOException {
-    super("tmp");
-    scanner = new XMLScanner(in, file);
-  }
-
-  /**
-   * Constructor.
-   * @param fn input file
-   * @throws IOException I/O Exception
-   */
-  public XMLParser(final String fn) throws IOException {
-    super(fn);
-    scanner = new XMLScanner(file);
+  public XMLParser(final IO f) throws IOException {
+    super(f);
+    scanner = new XMLScanner(f);
   }
 
   @Override
@@ -52,18 +42,16 @@ public final class XMLParser extends Parser {
     while(true) {
       if(scanner.type == Type.TEXT) {
         builder.text(scanner.token.finish(), scanner.ws);
-        if(!scanner.more()) break;
       } else if(scanner.type == Type.COMMENT) {
         builder.comment(scanner.token.finish());
-        if(!scanner.more()) break;
       } else if(scanner.type == Type.DTD) {
-        if(!scanner.more()) break;
       } else if(scanner.type == Type.PI) {
         builder.pi(scanner.token.finish()); 
-        if(!scanner.more()) break;
       } else {
         if(!parseTag()) break;
+        continue;
       }
+      if(!scanner.more()) break;
     }
     scanner.finish();
   }

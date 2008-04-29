@@ -7,8 +7,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.data.PrintSerializer;
+import org.basex.io.IO;
 import org.basex.io.CachedOutput;
-import org.basex.io.IOConstants;
 import org.basex.query.xquery.XQueryProcessor;
 
 /**
@@ -90,7 +90,7 @@ public final class PFTest {
         parse(file);
       } else {
         if(!file.getName().equals("All")) continue;
-        scan(file);
+        scan(new IO(file));
       }
     }
   }
@@ -100,10 +100,9 @@ public final class PFTest {
    * @param file query file
    * @throws IOException I/O exception
    */
-  private void scan(final File file) throws IOException {
-    final BufferedReader br = new BufferedReader(new FileReader(file));
-    String path = file.getCanonicalPath().replaceAll("\\\\", "/");
-    path = path.substring(0, path.lastIndexOf("/") + 1);
+  private void scan(final IO file) throws IOException {
+    final BufferedReader br = new BufferedReader(new FileReader(file.path()));
+    final String path = file.path();
     String name;
     while((name = br.readLine()) != null) {
       test(name.replaceAll(".*\\?", ""), path);
@@ -118,7 +117,7 @@ public final class PFTest {
    * @throws IOException I/O exception
    */
   private void test(final String name, final String path) throws IOException {
-    final File in = new File(path + name + ".xq");
+    final IO in = new IO(path + name + ".xq");
     final boolean f = in.exists();
     if(f) found++;
     else unknown++;
@@ -130,7 +129,7 @@ public final class PFTest {
       qu = token(string(qu).replaceAll("doc\\(\\\"", "doc(\"" + path));
     }
 
-    byte[] out = read(new File(path + name + ".stable.out"));
+    byte[] out = read(new IO(path + name + ".stable.out"));
     i = indexOf(out, RESOPEN);
     if(i != -1) {
       out = substring(out, i + RESOPEN.length + 1);
@@ -140,7 +139,7 @@ public final class PFTest {
       out = null;
     }
 
-    byte[] err = read(new File(path + name + ".stable.err"));
+    byte[] err = read(new IO(path + name + ".stable.err"));
     i = indexOf(err, RESERR);
     if(i != -1) {
       err = substring(err, i + RESERR.length);
@@ -209,11 +208,8 @@ public final class PFTest {
    * @return content
    * @throws IOException I/O exception
    */
-  private byte[] read(final File file) throws IOException {
-    final byte[] qu = IOConstants.read(file);
-    for(int i = 0; i < qu.length; i++) {
-      if(qu[i] == 0x0A || qu[i] == 0x0D) qu[i] = ' ';
-    }
-    return qu;
+  private byte[] read(final IO file) throws IOException {
+    final byte[] qu = file.content();
+    return replace(replace(qu, 0x0A, ' '), 0x0D, ' ');
   }
 }

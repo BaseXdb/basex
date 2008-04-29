@@ -36,7 +36,7 @@ public final class List extends Proc {
       try {
         final MetaData md = new MetaData(name);
         md.read();
-        sb.append(md.filename);
+        sb.append(md.file);
         c++;
       } catch(final IOException ex) {
         BaseX.debug(ex);

@@ -4,13 +4,13 @@ import static org.basex.Text.*;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
-import java.io.File;
 import org.basex.core.Prop;
 import org.basex.core.proc.Check;
 import org.basex.data.DOTSerializer;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.Serializer;
+import org.basex.io.IO;
 import org.basex.io.CachedOutput;
 import org.basex.query.QueryContext;
 import org.basex.query.xquery.expr.Expr;
@@ -52,7 +52,7 @@ public final class XQContext extends QueryContext {
   public Variables vars = new Variables();
 
   /** Reference to the query file. */
-  public File file;
+  public IO file;
 
   /** Current context. */
   public Item item;
@@ -208,26 +208,16 @@ public final class XQContext extends QueryContext {
    * @throws XQException evaluation exception
    */
   public DNode doc(final byte[] db) throws XQException {
-    String path = string(replace(db, '\\', '/'));
-    if(contains(db, '<') || contains(db, '>')) Err.or(INVDOC, path);
+    if(contains(db, '<') || contains(db, '>')) Err.or(INVDOC, db);
 
-    // check if a database with the same name has already been read
-    for(final DNode doc : docs) {
-      if(doc.data.meta.dbname.equals(path)) return doc;
-    }
-    // check if a database with the same file path has already been read
-    final String p = new File(path).getAbsolutePath();
-    for(final DNode doc : docs) {
-      if(doc.data.meta.filename.equals(p)) return doc;
-    }
+    // check if the database has already been read
+    final IO bxw = new IO(string(db));
+    for(final DNode d : docs) if(d.data.meta.file.eq(bxw)) return d;
 
     // get database instance
-    Data data = Check.check(path);
-    if(data == null && file != null) {
-      path = file.getParent() + "/" + path;
-      data = Check.check(path);
-    }
-    if(data == null) Err.or(NODOC, p);
+    Data data = Check.check(bxw);
+    if(data == null && file != null) data = Check.check(file.merge(bxw));
+    if(data == null) Err.or(NODOC, bxw);
 
     // add document to array
     final int dl = docs.length;

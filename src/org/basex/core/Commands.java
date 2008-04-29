@@ -26,7 +26,6 @@ import org.basex.core.proc.Link;
 import org.basex.core.proc.List;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.Optimize;
-import org.basex.core.proc.PFinder;
 import org.basex.core.proc.Ping;
 import org.basex.core.proc.Proc;
 import org.basex.core.proc.Prompt;
@@ -136,8 +135,6 @@ public enum Commands {
   FIND(Find.class, DATAREF | PRINTING, 0, -1, false),
   /** Evaluate XQuery and show result. */
   XQENV(XQEnv.class, PRINTING, 0, -1, true),
-  /** Evaluate XQuery via Pathfinder and show result. */
-  PF(PFinder.class, PRINTING, 0, -1, true),
   /** launches XMark query. */
   XMARK(XMark.class, DATAREF | PRINTING, 1, 1, true),
   /** Switch context set. */

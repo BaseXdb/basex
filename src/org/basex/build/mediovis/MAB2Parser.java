@@ -8,6 +8,7 @@ import org.basex.build.BuildException;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.core.Prop;
+import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.io.RandomAccess;
 import org.basex.util.Array;
@@ -97,14 +98,14 @@ public final class MAB2Parser extends Parser {
    * Constructor.
    * @param fn filename of the XML document
    */
-  public MAB2Parser(final String fn) {
+  public MAB2Parser(final IO fn) {
     super(fn);
   }
 
   @Override
   public void parse(final Builder b) throws IOException {
     // read in indexes
-    final File f = new File(file);
+    final File f = file.file();
     final String dir = f.getAbsoluteFile().getParent();
     index(mediatypes, dir + "/mediatypes.dat");
     index(subjects, dir + "/subjects.dat");

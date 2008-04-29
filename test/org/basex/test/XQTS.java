@@ -16,12 +16,15 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.regex.Pattern;
+import org.basex.core.Commands;
+import org.basex.core.Context;
 import org.basex.core.Prop;
-import org.basex.core.proc.Check;
+import org.basex.core.proc.Proc;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.PrintSerializer;
 import org.basex.data.Result;
+import org.basex.io.IO;
 import org.basex.io.CachedOutput;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPathProcessor;
@@ -181,7 +184,9 @@ public final class XQTS {
 
     final Performance perf = new Performance();
 
-    data = Check.check(tests + "XQTSCatalog.xml");
+    final Context context = new Context();
+    Proc.execute(context, Commands.CHECK, tests + "XQTSCatalog.xml");
+    data = context.data();
 
     final Nodes root = new Nodes(0, data);
     System.out.println("\nBaseX vs. XQuery Test Suite " +
@@ -294,7 +299,7 @@ public final class XQTS {
 
     if(single != null && !outname.startsWith(single)) return true;
 
-    final File file = new File(queries + path + inname + ".xq");
+    final IO file = new IO(queries + path + inname + ".xq");
     final String input = read(file);
 
     String output = "";
@@ -303,10 +308,12 @@ public final class XQTS {
 
     final TokenBuilder files = new TokenBuilder();
     try {
+      final Context context = new Context();
+      
       final XQueryProcessor xq = new XQueryProcessor(input, file);
       final Nodes cont = nodes("contextItem", root);
-      final Nodes nodes = cont.size == 0 ? null : new Nodes(0, Check.check(
-          sources + string(data.atom(cont.pre[0]))));
+      if(cont.size != 0) Proc.execute(context, Commands.CHECK,
+          sources + string(data.atom(cont.pre[0])) + IO.XMLSUFFIX);
 
       final XQContext ctx = xq.ctx;
       files.add(file(nodes("input-file", root),
@@ -326,7 +333,7 @@ public final class XQTS {
       }
 
       final CachedOutput out = new CachedOutput();
-      res = xq.query(nodes);
+      res = xq.query(context.current());
       res.serialize(new PrintSerializer(out));
       output = norm(out.finish());
     } catch(final QueryException ex) {
@@ -356,7 +363,7 @@ public final class XQTS {
     for(int o = 0; o < outFiles.size; o++) {
       if(o != 0) tb.append(DELIM);
       final String resFile = string(data.atom(outFiles.pre[o]));
-      tb.append(read(new File(expected + path + resFile)));
+      tb.append(read(new IO(expected + path + resFile)));
     }
     String result = tb.toString();
     String expError = text("expected-error/text()", root);
@@ -569,7 +576,7 @@ public final class XQTS {
 
     for(int c = 0; c < nod.size; c++) {
       final String file = path + string(data.atom(nod.pre[c])) + ".xq";
-      final String input = read(new File(queries + file));
+      final String input = read(new IO(queries + file));
       final XQueryProcessor qu = new XQueryProcessor(input);
       final XQResult result = (XQResult) qu.query(null);
       final Var v = new Var(new QNm(data.atom(var.pre[c])));
@@ -630,7 +637,7 @@ public final class XQTS {
    */
   private String error(final String name, final String error) throws Exception {
     final String error2 = expected + name + ".log";
-    final File file  = new File(error2);
+    final IO file  = new IO(error2);
     return file.exists() ? error + "/" + read(file) : error;
   }
 
@@ -700,10 +707,10 @@ public final class XQTS {
    * @return content
    * @throws IOException I/O exception
    */
-  private String read(final File f) throws IOException {
+  private String read(final IO f) throws IOException {
     final StringBuilder sb = new StringBuilder();
     final BufferedReader br = new BufferedReader(new
-        InputStreamReader(new FileInputStream(f), UTF8));
+        InputStreamReader(new FileInputStream(f.path()), UTF8));
     String l;
     while((l = br.readLine()) != null) {
       l = l.trim();

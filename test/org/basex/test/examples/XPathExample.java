@@ -10,6 +10,7 @@ import org.basex.data.Nodes;
 import org.basex.data.PrintSerializer;
 import org.basex.data.Result;
 import org.basex.io.ConsoleOutput;
+import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
@@ -80,7 +81,7 @@ public final class XPathExample {
     // Execute XPath request
     try {
       // create new database; "input" = database name, "input.xml" = source doc.
-      Data data = Create.xml(DBNAME, XMLFILE);
+      Data data = Create.xml(new IO(XMLFILE), DBNAME);
 
       // create query instance
       QueryProcessor xpath = new XPathProcessor(QUERY);

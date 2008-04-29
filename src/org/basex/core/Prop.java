@@ -105,8 +105,6 @@ public final class Prop {
 
   // FILE SYSTEM OPTIONS ======================================================
   
-  /** Flag for creating fs stat info. */
-  public static boolean fsstat = false;
   /** Flag for importing file contents. */
   public static boolean fscont = false;
   /** Flag for importing file metadata. */

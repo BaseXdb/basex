@@ -26,7 +26,7 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXListChooser;
 import org.basex.gui.layout.BaseXText;
-import org.basex.io.IOConstants;
+import org.basex.io.IO;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 
@@ -169,7 +169,7 @@ public final class DialogOpen extends Dialog {
     if(db.length() == 0) return false;
 
     // read the database version
-    final File dir = IOConstants.dbpath(db);
+    final File dir = IO.dbpath(db);
     if(!dir.exists()) return false;
 
     // read the database version and stop reading when version differs
@@ -185,7 +185,7 @@ public final class DialogOpen extends Dialog {
       if(mainmem != null)
         BaseXLayout.enable(mainmem, meta.filesize < (1 << 30));
 
-      txt.add(INFODOC + meta.filename + NL);
+      txt.add(INFODOC + meta.file + NL);
       txt.add(INFOTIME + new SimpleDateFormat(
           "dd.MM.yyyy hh:mm:ss").format(new Date(meta.time)) + NL);
       txt.add(INFODOCSIZE + (meta.filesize != 0 ?

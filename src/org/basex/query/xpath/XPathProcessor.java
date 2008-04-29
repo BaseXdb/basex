@@ -655,7 +655,7 @@ public final class XPathProcessor extends QueryProcessor {
   }
 
   /**
-   * Returns the unscanned query substring.
+   * Returns an unscanned query substring.
    * @param max maximum characters to print
    * @param off jumping some characters back
    * @return query substring

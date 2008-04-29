@@ -9,9 +9,7 @@ import org.basex.BaseX;
 import org.basex.build.BuildException;
 import org.basex.build.BuildText.Type;
 import org.basex.core.Prop;
-import org.basex.io.BufferInput;
-import org.basex.io.CachedInput;
-import org.basex.io.IOConstants;
+import org.basex.io.IO;
 import org.basex.util.Map;
 import org.basex.util.TokenBuilder;
 
@@ -61,23 +59,12 @@ public final class XMLScanner {
   private XMLInput input;
 
   /**
-   * Constructor.
-   * @param f input file
-   * @throws IOException I/O Exception
-   */
-  public XMLScanner(final String f) throws IOException {
-    this(new BufferInput(f), f);
-  }
-
-  /**
    * Initializes the scanner.
-   * @param in input stream
    * @param f input file
    * @throws BuildException Build Exception
    */
-  public XMLScanner(final BufferInput in, final String f)
-      throws BuildException {
-    input = new XMLInput(in, f);
+  public XMLScanner(final IO f) throws BuildException {
+    input = new XMLInput(f);
     ents = new Map();
     ents.add(E_AMP, AMP);
     ents.add(E_APOS, APOS);
@@ -714,9 +701,9 @@ public final class XMLScanner {
 
         final XMLInput tin = input;
         try {
-          final String fn = IOConstants.merge(input.file, string(name));
-          cont = IOConstants.read(fn);
-          input = new XMLInput(new CachedInput(cont), fn);
+          final IO file = input.file.merge(new IO(string(name)));
+          cont = file.content();
+          input = new XMLInput(new IO(cont));
         } catch(final IOException ex) {
           error(DTDNP, string(name));
         }
@@ -963,7 +950,7 @@ public final class XMLScanner {
     }
 
     final XMLInput tmp = input;
-    input = new XMLInput(new CachedInput(tok.finish()), input.file);
+    input = new XMLInput(new IO(tok.finish()));
     tok = new TokenBuilder();
     while((ch = consume()) != 0) {
       if(ch == '&') tok.add(ref(false));
@@ -1041,9 +1028,8 @@ public final class XMLScanner {
    * @return info string
    */
   public String det() {
-    final String f = input.file.replaceAll(".*(\\\\|/)", "");
     int c = input.col; if(c != 1) c--;
-    return BaseX.info(SCANPOS, f, input.line, c);
+    return BaseX.info(SCANPOS, input.file.name(), input.line, c);
   }
 
   /**
@@ -1066,7 +1052,8 @@ public final class XMLScanner {
     final long time = System.nanoTime();
     for(final String f : fn) {
       try {
-        new XMLScanner(f).scan();
+        final IO bxf = new IO(f);
+        new XMLScanner(bxf).scan();
         sb.append(f + "\n");
       } catch(final IOException e) {
         BaseX.errln("%: %", f, e.getMessage());

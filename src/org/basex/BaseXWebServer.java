@@ -20,8 +20,8 @@ import java.util.regex.Pattern;
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.data.PrintSerializer;
+import org.basex.io.IO;
 import org.basex.io.BufferedOutput;
-import org.basex.io.IOConstants;
 import org.basex.io.PrintOutput;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQueryProcessor;
@@ -137,7 +137,7 @@ public final class BaseXWebServer {
         @Override
         public void run() {
           try {
-            final File file = req.file;
+            final IO file = req.file;
             final String path = absPath(file);
 
             // no file specified - try alternatives
@@ -147,7 +147,7 @@ public final class BaseXWebServer {
             } else if(req.code == 302) {
               send("302 Found", "Location: " + path,
                 "Redirecting to <a href='" + path + "'>" + path + "</a>.", s);
-            } else if(file.isDirectory()) {
+            } else if(file.isDir()) {
               sendDir(file, s);
             } else if(req.suf.equals(XQSUFFIX)) {
               evalXQuery(req, s);
@@ -161,7 +161,7 @@ public final class BaseXWebServer {
             if(verbose) {
               final InetAddress addr = s.getInetAddress();
               BaseX.outln("%:% => % [%]", addr.getHostAddress(),
-                  s.getPort(), req.file.getName(), p.getTimer());
+                  s.getPort(), req.file, p.getTimer());
             }
           } catch(final Exception ex) {
             if(ex instanceof IOException) BaseX.errln(SERVERERR);
@@ -204,14 +204,13 @@ public final class BaseXWebServer {
    * @param s socket reference
    * @throws IOException I/O exception
    */
-  protected void send(final File file, final Socket s) throws IOException {
+  protected void send(final IO file, final Socket s) throws IOException {
     final OutputStream os = s.getOutputStream();
-    final byte[] cont = IOConstants.read(file);
-    os.write(cont);
+    os.write(file.content());
     os.close();
     
     /*
-    final FileInputStream is = new FileInputStream(file);
+    final FileInputStream is = new FileInputStream(file.name);
     byte[] buf = new byte[s.getSendBufferSize()];
     int i;
     while((i = is.read(buf)) != -1) {
@@ -263,19 +262,19 @@ public final class BaseXWebServer {
     out.println(DOCTYPE);
 
     try {
-      final String key = req.file + "/" + req.file.lastModified();
       XQueryProcessor xq = null;
 
       // cache compiled query or create new one
       if(cache) {
+        final String key = req.file + "/" + req.file.date();
         xq = map.get(key);
         if(xq == null) {
-          final String query = new String(IOConstants.read(req.file), "UTF-8");
+          final String query = new String(req.file.content(), "UTF-8");
           xq = new XQueryProcessor(query, req.file);
           map.put(key, xq);
         }
       } else {
-        final String query = new String(IOConstants.read(req.file), "UTF-8");
+        final String query = new String(req.file.content(), "UTF-8");
         xq = new XQueryProcessor(query, req.file);
       }
 
@@ -310,15 +309,14 @@ public final class BaseXWebServer {
     // using a helper script to pass arguments
     final String phphelp = "<?$f=$argv[1];$s=preg_split('/ /',$argv[2]);" +
       "for($i=0;$i<sizeof($s);$i+=2){$_GET[$s[$i]]=$s[$i+1];}include($f);?>";
-    final File tmp = new File(Prop.webpath + "/php.tmp");
-    IOConstants.write(tmp, Token.token(phphelp));
+    final IO file = new IO(Prop.webpath + "/php.tmp");
+    file.write(Token.token(phphelp));
 
-    final String file = req.file.getAbsolutePath();
     final StringBuilder args = new StringBuilder();
     for(final String[] arg : req.args) args.append(arg[0] + " " + arg[1] + " ");
 
-    eval(s, Prop.phppath, tmp.getAbsolutePath(), file, args.toString());
-    tmp.delete();
+    eval(s, Prop.phppath, file.path(), req.file.path(), args.toString());
+    file.delete();
   }
 
   /**
@@ -360,7 +358,9 @@ public final class BaseXWebServer {
    * @param s socket reference
    * @throws IOException I/O exception
    */
-  protected void sendDir(final File dir, final Socket s) throws IOException {
+  protected void sendDir(final IO dir, final Socket s)
+      throws IOException {
+
     final OutputStream os = s.getOutputStream();
     final PrintOutput out = new PrintOutput(new BufferedOutput(os));
     String col = " style='background-color:grey; height:1px;'";
@@ -373,7 +373,7 @@ public final class BaseXWebServer {
     out.println("<td align='right'><b>Size</b></td></tr>");
     out.println("<tr><td colspan='5'" + col + "></td></tr>");
 
-    for(final File f : dir.listFiles()) {
+    for(final File f : dir.file().listFiles()) {
       out.print("<tr><td><a" + dec + " href='" + f.getName());
       if(f.isDirectory()) out.print("/");
       out.println("'>" + f.getName() + "</a></td><td></td>");
@@ -394,9 +394,8 @@ public final class BaseXWebServer {
    * @param f file reference
    * @return path
    */
-  protected String absPath(final File f) {
-    return f.getAbsolutePath().replace('\\', '/').
-      replace(Prop.webpath.replace('\\', '/'), "");
+  protected String absPath(final IO f) {
+    return f.path().replace(Prop.webpath.replace('\\', '/'), "");
   }
   
   /**
@@ -463,7 +462,7 @@ public final class BaseXWebServer {
   /** This class provides information on a client request. */
   class Request {
     /** File. */
-    File file;
+    IO file;
     /** Suffix. */
     String suf;
     /** Arguments. */
@@ -485,11 +484,11 @@ public final class BaseXWebServer {
      */
     Request(final String fn) {
       // no file specified - try alternatives
-      file = new File(Prop.webpath + "/" + fn);
+      file = new IO(Prop.webpath + "/" + fn);
       
-      if(file.isDirectory()) {
+      if(file.isDir()) {
         for(final String index : INDEXFILES) {
-          File f = new File(Prop.webpath + "/" + fn + "/" + index);
+          IO f = new IO(Prop.webpath + "/" + fn + "/" + index);
           if(f.exists()) {
             code = 302;
             file = f;
@@ -512,7 +511,7 @@ public final class BaseXWebServer {
       }
 
       i = f.indexOf(".");
-      file = new File(Prop.webpath + "/" + f);
+      file = new IO(Prop.webpath + "/" + f);
       suf = i != -1 ? f.substring(i + 1) : "";
       
       if(!file.exists()) code = 404;

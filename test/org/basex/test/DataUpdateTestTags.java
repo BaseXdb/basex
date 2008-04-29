@@ -6,6 +6,7 @@ import org.basex.core.proc.Create;
 import org.basex.core.proc.Drop;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
+import org.basex.io.IO;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -46,7 +47,7 @@ public final class DataUpdateTestTags {
    */
   @Before
   public void setUp() throws Exception {
-    data = Create.xml(DBNAME, TESTFILE);
+    data = Create.xml(new IO(TESTFILE), DBNAME);
     size = data.size;
   }
 

@@ -1,6 +1,5 @@
 package org.basex.io;
 
-import static org.basex.io.IOConstants.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -14,7 +13,7 @@ import org.basex.util.Num;
  */
 public final class DataAccess {
   /** Default buffer size - must be a power of two. */
-  private static final int BUFSIZE = 1 << BLOCKPOWER;
+  private static final int BUFSIZE = 1 << IO.BLOCKPOWER;
   /** Buffer limit (buffer size - 1). */
   private static final int BUFLIMIT = BUFSIZE - 1;
   /** Number of buffers. */
@@ -45,7 +44,7 @@ public final class DataAccess {
    * @throws IOException IO Exception
    */
   public DataAccess(final String db, final String fn) throws IOException {
-    this(IOConstants.dbfile(db, fn));
+    this(IO.dbfile(db, fn));
   }
 
   /**

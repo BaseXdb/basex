@@ -3,7 +3,6 @@ package org.basex.io;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import org.basex.BaseX;
-import static org.basex.io.IOConstants.*;
 
 /**
  * This class allows main memory access to the database table representation.
@@ -30,20 +29,19 @@ public final class TableMemAccess extends TableAccess {
     buf1 = new long[size];
     buf2 = new long[size];
 
-    final byte[] array = new byte[1 << BLOCKPOWER];
-    final RandomAccessFile f = new RandomAccessFile(
-        IOConstants.dbfile(db, fn), "r");
+    final byte[] array = new byte[1 << IO.BLOCKPOWER];
+    final RandomAccessFile f = new RandomAccessFile(IO.dbfile(db, fn), "r");
     final DataInput in = new DataInput(db, fn + 'x');
 
     int nextPre = in.readInt();
-    long nextBlock = in.readInt() << BLOCKPOWER;
+    long nextBlock = in.readInt() << IO.BLOCKPOWER;
     for(int i = 0, k = 0, l = 0; i != size; i++, k++) {
       while(k == nextPre) {
         f.seek(nextBlock);
         f.read(array);
         nextPre = in.readInt();
         if(nextPre == 0) nextPre = Integer.MAX_VALUE;
-        nextBlock = in.readInt() << BLOCKPOWER;
+        nextBlock = in.readInt() << IO.BLOCKPOWER;
         l = 0;
       }
       buf1[i] = getLong(array, l++);

@@ -27,8 +27,8 @@ public abstract class Iter {
   };
   
   /**
-   * Returns the next item.
-   * @return item
+   * Returns the next item or null if no other items are found.
+   * @return resulting item
    * @throws XQException evaluation exception
    */
   public abstract Item next() throws XQException;

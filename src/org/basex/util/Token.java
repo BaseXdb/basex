@@ -133,6 +133,7 @@ public final class Token {
    */
   public static byte[] token(final String s) {
     final int l = s.length();
+    if(l == 0) return EMPTY;
     final byte[] bytes = new byte[l];
     for(int i = 0; i < l; i++) {
       final char c = s.charAt(i);
@@ -580,9 +581,6 @@ public final class Token {
    * positive if first token is bigger
    */
   public static int diff(final byte[] tok, final byte[] tok2) {
-    //if(!ascii(tok) || !ascii(tok2))
-    //  return string(tok).compareTo(string(tok2));
-
     final int l = Math.min(tok.length, tok2.length);
     for(int i = 0; i != l; i++) {
       if(tok[i] != tok2[i]) return (tok[i] & 0xFF) - (tok2[i] & 0xFF);
@@ -844,6 +842,17 @@ public final class Token {
     while(--e > s) if(t[e] > ' ' || t[e] < 0) break;
     if(++e == t.length && s == 0) return t;
     return s == e ? EMPTY : Array.create(t, s, e - s);
+  }
+
+  /**
+   * Cuts the token if it's too long, and adds dots. Otherwise, returns the
+   * original string
+   * @param t tokens
+   * @param m maximal length
+   * @return resulting array
+   */
+  public static byte[] cut(final byte[] t, final int m) {
+    return t.length > m ? concat(substring(t, 0 , m), DOTS) : t;
   }
 
   /**

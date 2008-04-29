@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import org.basex.BaseX;
 import org.basex.core.Prop;
+import org.basex.io.IO;
 
 /**
  * Performs a file hierarchy traversal.
@@ -44,12 +45,12 @@ public final class FSWalker {
    * @param path the traversal starts from.
    * @throws IOException I/O exception
    */
-  public void fileHierarchyTraversal(final String path) throws IOException {
-    File r = new File(path).getCanonicalFile();
+  public void fileHierarchyTraversal(final IO path) throws IOException {
+    File r = path.file().getCanonicalFile();
     if(Prop.UNIX && isSymlink(r)) {
       r = r.getCanonicalFile();
       roots = new File[] { r };
-    } else if(path.equals("/") || path.trim().length() == 0) {
+    } else if(path.equals("/") || path.path().length() == 0) {
       roots = Prop.UNIX ? new File[] { new File("/") } : File.listRoots();
     } else {
       roots = new File[] { r };

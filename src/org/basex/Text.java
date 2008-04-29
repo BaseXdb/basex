@@ -890,7 +890,7 @@ public interface Text {
   /** Builder error. */
   String CANCELCREATE = lang("pc_cancel");
   /** Create Database information. */
-  String NODESPARSED = " " + lang("pc_parse") + DOTS;
+  String NODESPARSED = " " + lang("pc_parse");
   /** Scanner Position. */
   String SCANPOS = lang("pc_pos");
 

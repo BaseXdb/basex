@@ -44,7 +44,7 @@ public final class DataOutput extends OutputStream {
   
   /**
    * Convenience constructor with underlying.
-   * The specified buffersize is used.
+   * The specified buffer size is used.
    * DBSUFFIX will be added to the filename.
    * @param db name of the database
    * @param fn name of the file to write to
@@ -53,7 +53,7 @@ public final class DataOutput extends OutputStream {
    */
   public DataOutput(final String db, final String fn, final int bufs)
       throws IOException {
-    final File path = IOConstants.dbfile(db, fn);
+    final File path = IO.dbfile(db, fn);
     os = new BufferedOutput(new FileOutputStream(path), bufs);
   }
   

@@ -7,6 +7,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileFilter;
 import org.basex.gui.GUIProp;
+import org.basex.io.IO;
 
 /**
  * Project specific File Chooser implementation.
@@ -91,9 +92,9 @@ public final class BaseXFileChooser {
    * Returns the selected file.
    * @return file
    */
-  public String getFile() {
-    return fc != null ? fc.getSelectedFile().getPath() :
-      fd.getDirectory() + "/" + fd.getFile();
+  public IO getFile() {
+    return new IO(fc != null ? fc.getSelectedFile().getPath() :
+      fd.getDirectory() + "/" + fd.getFile());
   }
   
   /**
@@ -102,7 +103,7 @@ public final class BaseXFileChooser {
    */
   public String getDir() {
     if(fd != null) return fd.getDirectory();
-    return mode == DIR ? getFile() : fc.getCurrentDirectory().getPath();
+    return mode == DIR ? getFile().path() : fc.getCurrentDirectory().getPath();
   }
 
 

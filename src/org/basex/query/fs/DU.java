@@ -1,7 +1,6 @@
 package org.basex.query.fs;
 
 import java.io.IOException;
-
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.io.PrintOutput;

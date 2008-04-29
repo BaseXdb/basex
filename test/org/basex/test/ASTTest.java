@@ -28,17 +28,15 @@ public final class ASTTest {
 
   /**
    * Initialize XML Storage for tests.
+   * @throws Exception exception
    */
   @BeforeClass
-  public static void initData() {
+  public static void initData() throws Exception {
     Prop.read();
     Prop.chop = true;
 
     final Proc proc = Proc.get(CONTEXT, Commands.CREATEXML, TEST_FILE);
-    if(!proc.execute()) {
-      System.out.println(proc.info());
-      return;
-    }
+    if(!proc.execute()) throw new Exception(proc.info());
   }
 
   /**
@@ -361,8 +359,6 @@ public final class ASTTest {
    */
   @AfterClass
   public static void tearDown() {
-    final Proc proc = Proc.get(CONTEXT, Commands.DROP, "database test");
-    //proc.execute();
-    System.out.println(proc.info());
+    Proc.execute(CONTEXT, Commands.DROP, "database test");
   }
 }

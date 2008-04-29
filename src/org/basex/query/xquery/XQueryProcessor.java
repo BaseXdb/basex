@@ -1,6 +1,6 @@
 package org.basex.query.xquery;
 
-import java.io.File;
+import org.basex.io.IO;
 import org.basex.query.QueryProcessor;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -28,7 +28,7 @@ public final class XQueryProcessor extends QueryProcessor {
    * @param qu query
    * @param f query file reference
    */
-  public XQueryProcessor(final String qu, final File f) {
+  public XQueryProcessor(final String qu, final IO f) {
     this(qu);
     ctx.file = f;
   }

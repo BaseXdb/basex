@@ -81,7 +81,7 @@ public final class DNode extends Node {
         return type + "(" + Token.string(data.attName(pre)) + "=\"" +
         Token.string(data.attValue(pre)) + "\")";
       case DOC:
-        return type + "(" + data.meta.filename + ")";
+        return type + "(" + data.meta.file + ")";
       case ELM:
         return type + "(" + Token.string(data.tag(pre)) + "/" + pre + ")";
       default:
@@ -130,7 +130,7 @@ public final class DNode extends Node {
 
   @Override
   public byte[] base() {
-    return type != Type.DOC ? Token.EMPTY : Token.token(data.meta.filename);
+    return type != Type.DOC ? Token.EMPTY : Token.token(data.meta.file.path());
   }
 
   @Override

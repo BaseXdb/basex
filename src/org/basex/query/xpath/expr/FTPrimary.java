@@ -1,7 +1,6 @@
 package org.basex.query.xpath.expr;
 
 import static org.basex.query.xpath.XPText.OPTFTINDEX;
-
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.internal.FTIndex;
 import org.basex.query.xpath.locpath.Step;

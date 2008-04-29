@@ -6,7 +6,7 @@ import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
-import org.basex.io.IOConstants;
+import org.basex.io.IO;
 
 /**
  * Evaluates the 'open' command. Opens the specified database.
@@ -17,8 +17,8 @@ import org.basex.io.IOConstants;
 public final class Open extends Proc {
   @Override
   protected boolean exec() {
-    final String db = Create.chopPath(cmd.arg(0));
-    if(!IOConstants.dbpath(db).exists()) return error(DBNOTFOUND, db);
+    final String db = new IO(cmd.arg(0)).dbname();
+    if(!IO.dbpath(db).exists()) return error(DBNOTFOUND, db);
 
     context.close();
     Data data = null;
@@ -48,7 +48,7 @@ public final class Open extends Proc {
    */
   public static Data open(final String db) {
     try {
-      return new DiskData(Create.chopPath(db));
+      return new DiskData(db);
     } catch(final IOException ex) {
       BaseX.debug(ex);
       return null;

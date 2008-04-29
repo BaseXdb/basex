@@ -16,7 +16,7 @@ import org.basex.gui.layout.BaseXCheckBox;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.TableLayout;
-import org.basex.io.IOConstants;
+import org.basex.io.IO;
 import org.basex.util.Performance;
 
 /**
@@ -45,12 +45,12 @@ public final class DialogInfo extends Dialog {
     final MetaData meta = data.meta;
 
     // get size of database
-    final File dir = IOConstants.dbpath(meta.dbname);
+    final File dir = IO.dbpath(meta.dbname);
     long len = 0;
     for(final File f : dir.listFiles()) len += f.length();
 
     add(info, INFODBNAME, meta.dbname);
-    add(info, INFODOC, meta.filename);
+    add(info, INFODOC, meta.file.path());
     add(info, INFOTIME, new SimpleDateFormat(
         "dd.MM.yyyy hh:mm:ss").format(new Date(meta.time)));
     add(info, INFODOCSIZE, meta.filesize != 0 ?

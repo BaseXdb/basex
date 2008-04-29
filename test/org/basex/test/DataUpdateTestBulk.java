@@ -8,6 +8,7 @@ import org.basex.core.proc.Drop;
 import org.basex.core.proc.Insert;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
+import org.basex.io.IO;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -52,9 +53,10 @@ public final class DataUpdateTestBulk {
    */
   @Before
   public void setUp() throws Exception {
-    data = Create.xml(DBNAME, TESTFILE);
+    data = Create.xml(new IO(TESTFILE), DBNAME);
     size = data.size;
-    insertData = new MemBuilder().build(new XMLParser(INSERTFILE), INSERTFILE);
+    final IO file = new IO(INSERTFILE);
+    insertData = new MemBuilder().build(new XMLParser(file), INSERTFILE);
   }
 
   /**

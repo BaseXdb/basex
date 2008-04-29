@@ -46,7 +46,7 @@ public final class CommandParser {
     final String arg;
 
     // disallow several commands per line for XQueries
-    if(com != Commands.XQENV && com != Commands.XQUERY && com != Commands.PF) {
+    if(com != Commands.XQENV && com != Commands.XQUERY) {
       char qu = 0;
       while(++c < cl) {
         final char ch = input.charAt(c);

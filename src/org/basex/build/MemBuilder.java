@@ -21,11 +21,9 @@ public final class MemBuilder extends Builder {
     meta.txtindex = true;
     meta.atvindex = true;
     meta.ftxindex = false;
-    meta.filename = parser.file;
+    meta.file = parser.file;
     stats = new Stats(db);
-    
-    final int bs = Math.max(8, (int) (meta.filesize >>> 5));
-    data = new MemData(bs, tags, atts);
+    data = new MemData(64, tags, atts);
     data.meta = meta;
     return this;
   }
@@ -41,11 +39,11 @@ public final class MemBuilder extends Builder {
 
   @Override
   public void addNode(final int tag, final int par, final byte[][] atr,
-      final int[] attRef, final int type) {
+      final int[] attRef, final byte kind) {
 
     // element node
     final int attl = attRef != null ? attRef.length : 0;
-    data.addElem(tag, par, attl + 1, attl + 1, (byte) type);
+    data.addElem(tag, par, attl + 1, attl + 1, kind);
 
     // attributes
     for(int a = 0; a < attl; a++) {
@@ -55,8 +53,8 @@ public final class MemBuilder extends Builder {
   }
 
   @Override
-  protected void addText(final byte[] x, final int p, final int t) {
-    data.addText(x, p, t);
+  protected void addText(final byte[] tok, final int par, final byte kind) {
+    data.addText(tok, par, kind);
     size = data.size;
   }
 

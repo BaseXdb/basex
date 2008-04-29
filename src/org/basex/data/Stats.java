@@ -15,6 +15,7 @@ import org.basex.util.Token;
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
+ * @author Lukas Kircher
  */
 public final class Stats extends Set {
   /** Hash values. */

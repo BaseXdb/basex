@@ -11,7 +11,7 @@ import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTextField;
-import org.basex.io.IOConstants;
+import org.basex.io.IO;
 import org.basex.util.Token;
 
 /**
@@ -79,6 +79,6 @@ public final class DialogRename extends Dialog {
     super.close();
     
     final String nm = name.getText();
-    IOConstants.dbpath(old).renameTo(IOConstants.dbpath(nm));
+    IO.dbpath(old).renameTo(IO.dbpath(nm));
   }
 }

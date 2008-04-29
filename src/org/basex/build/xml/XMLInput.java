@@ -1,6 +1,7 @@
 package org.basex.build.xml;
 
 import java.io.IOException;
+import org.basex.io.IO;
 import org.basex.io.BufferInput;
 import org.basex.io.CachedInput;
 import org.basex.util.Token;
@@ -18,7 +19,7 @@ final class XMLInput {
   /** Input pointer. */
   int ip = 0;
   /** Input file. */
-  String file;
+  IO file;
   /** Current line. */
   int line = 1;
   /** Current column. */
@@ -33,12 +34,11 @@ final class XMLInput {
   
   /**
    * Constructor.
-   * @param i buffer input reference
-   * @param f input file
+   * @param f file reference
    */
-  XMLInput(final BufferInput i, final String f) {
-    i.encoding();
-    in[0] = i;
+  XMLInput(final IO f) {
+    in[0] = f.buffer();
+    in[0].encoding();
     file = f;
   }
 

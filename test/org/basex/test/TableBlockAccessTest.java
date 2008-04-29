@@ -9,7 +9,7 @@ import org.basex.build.DiskBuilder;
 import org.basex.build.xml.XMLParser;
 import org.basex.core.proc.Drop;
 import org.basex.core.proc.Open;
-import org.basex.io.IOConstants;
+import org.basex.io.IO;
 import org.basex.io.TableDiskAccess;
 import static org.junit.Assert.*;
 import static org.basex.data.DataText.*;
@@ -52,20 +52,20 @@ public final class TableBlockAccessTest {
    */
   @Before
   public void setUp() throws IOException {
-    new DiskBuilder().build(new XMLParser(TESTFILE), DBNAME);
+    final IO file = new IO(TESTFILE);
+    new DiskBuilder().build(new XMLParser(file), DBNAME);
     size = Open.open(DBNAME).size;
     tba = new TableDiskAccess(DBNAME, DATATBL);
-    final int bytecount = size * (1 << IOConstants.NODEPOWER);
+    final int bytecount = size * (1 << IO.NODEPOWER);
     storage = new byte[bytecount];
     for(int i = 0; i < bytecount; i++) {
-      storage[i] = (byte) tba.read1(i >> IOConstants.NODEPOWER, i
-          % (1 << IOConstants.NODEPOWER));
+      storage[i] = (byte) tba.read1(i >> IO.NODEPOWER, i % (1 << IO.NODEPOWER));
     }
     maxEntriesPerBlock =
-      (1 << IOConstants.BLOCKPOWER) >>> IOConstants.NODEPOWER;
-    blocks = (int) Math.ceil(size
-        / Math.floor(maxEntriesPerBlock * IOConstants.BLOCKFILL));
-    nodesPerBlock = (int) (maxEntriesPerBlock * IOConstants.BLOCKFILL);
+      (1 << IO.BLOCKPOWER) >>> IO.NODEPOWER;
+    blocks = (int) Math.ceil(size /
+        Math.floor(maxEntriesPerBlock * IO.BLOCKFILL));
+    nodesPerBlock = (int) (maxEntriesPerBlock * IO.BLOCKFILL);
   }
 
   /**
@@ -89,19 +89,18 @@ public final class TableBlockAccessTest {
    */
   private void assertEntrysEqual(final int startNodeNumber,
       final int currentNodeNumber, final int count) {
-    final int startOffset = startNodeNumber << IOConstants.NODEPOWER;
-    final int currentOffset = currentNodeNumber << IOConstants.NODEPOWER;
-    for(int i = 0; i < (count << IOConstants.NODEPOWER); i++) {
+    final int startOffset = startNodeNumber << IO.NODEPOWER;
+    final int currentOffset = currentNodeNumber << IO.NODEPOWER;
+    for(int i = 0; i < (count << IO.NODEPOWER); i++) {
       final int startByteNum = startOffset + i;
       final int currentByteNum = currentOffset + i;
       final byte startByte = storage[startByteNum];
-      final byte currentByte = (byte) tba.read1(
-          currentByteNum >> IOConstants.NODEPOWER, currentByteNum
-              % (1 << IOConstants.NODEPOWER));
-      assertEquals("Old entry " + (startByteNum >> IOConstants.NODEPOWER)
-          + " (byte " + (startByteNum % (1 << IOConstants.NODEPOWER))
-          + ") and new entry " + (currentByteNum >> IOConstants.NODEPOWER)
-          + " (byte " + (currentByteNum % (1 << IOConstants.NODEPOWER)) + ")",
+      final byte currentByte = (byte) tba.read1(currentByteNum >> IO.NODEPOWER,
+        currentByteNum % (1 << IO.NODEPOWER));
+      assertEquals("Old entry " + (startByteNum >> IO.NODEPOWER)
+          + " (byte " + (startByteNum % (1 << IO.NODEPOWER))
+          + ") and new entry " + (currentByteNum >> IO.NODEPOWER)
+          + " (byte " + (currentByteNum % (1 << IO.NODEPOWER)) + ")",
           startByte, currentByte);
     }
   }
@@ -310,29 +309,26 @@ public final class TableBlockAccessTest {
     assertEntrysEqual(nodesPerBlock, 2 * nodesPerBlock, size - nodesPerBlock);
   }
 
-
-
   /**
-   * Assert that the chosen entries are inserted by a testcase.
+   * Assert that the chosen entries are inserted by a test case.
    * @param startNum first entry
    * @param count number of entries
    */
   private void assertAreInserted(final int startNum, final int count) {
     for(int i = 0; i < count; i++)
-      for(int j = 0; j < (1 << IOConstants.NODEPOWER); j++)
+      for(int j = 0; j < (1 << IO.NODEPOWER); j++)
         assertEquals(5, tba.read1(startNum + i, j));
   }
 
   /**
-   * Create a test-bytearray containing the specified number of entries. All
+   * Create a test-byte array containing the specified number of entries. All
    * bytes are set to (byte)5.
    * @param entries number of Entries to create
-   * @return bytearray containing the number of entries (all bytes 5)
+   * @return byte array containing the number of entries (all bytes 5)
    */
   private byte[] getTestEntries(final int entries) {
-    final byte[] result = new byte[entries << IOConstants.NODEPOWER];
-    for(int i = 0; i < result.length; i++)
-      result[i] = (byte) 5;
+    final byte[] result = new byte[entries << IO.NODEPOWER];
+    for(int i = 0; i < result.length; i++) result[i] = (byte) 5;
     return result;
   }
 

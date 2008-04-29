@@ -3,8 +3,10 @@ package org.basex.build.xml;
 import static org.basex.Text.*;
 import java.io.IOException;
 import javax.xml.parsers.SAXParserFactory;
+import org.basex.BaseX;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
+import org.basex.io.IO;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.xml.sax.Attributes;
@@ -37,7 +39,7 @@ public final class SAXWrapper extends Parser {
    * Constructor.
    * @param in input file
    */
-  public SAXWrapper(final String in) {
+  public SAXWrapper(final IO in) {
     super(in);
   }
 
@@ -55,7 +57,7 @@ public final class SAXWrapper extends Parser {
       r.setContentHandler(p);
       r.setProperty("http://xml.org/sax/properties/lexical-handler", p);
       r.setErrorHandler(p);
-      r.parse("file:///" + file);
+      r.parse(file.source());
     } catch(final SAXParseException ex) {
       final String msg = "Line " + ex.getLineNumber() + ", Col " +
           ex.getColumnNumber() + ": " + ex.getMessage();
@@ -78,7 +80,7 @@ public final class SAXWrapper extends Parser {
 
   @Override
   public String det() {
-    return nodes + NODESPARSED;
+    return BaseX.info(NODESPARSED, file.name(), nodes);
   }
 
   @Override
@@ -88,12 +90,12 @@ public final class SAXWrapper extends Parser {
 
   /** SAX Parser. */
   class SAXParser extends DefaultHandler implements LexicalHandler {
-
     @Override
     public void startElement(final String uri, final String ln, final String qn,
         final Attributes at) throws SAXException {
-      try {
-        checkText();
+      
+     try {
+        finishText();
         final int as = at.getLength();
         final byte[][] atts = new byte[as << 1][];
         for(int a = 0; a < as; a++) {
@@ -110,8 +112,9 @@ public final class SAXWrapper extends Parser {
     @Override
     public void endElement(final String uri, final String ln, final String qn)
         throws SAXException {
+
       try {
-        checkText();
+        finishText();
         builder.endNode(Token.token(qn));
       } catch(final IOException ex) {
         error(ex);
@@ -126,8 +129,9 @@ public final class SAXWrapper extends Parser {
     @Override
     public void processingInstruction(final String name, final String val)
         throws SAXException {
+      
       try {
-        checkText();
+        finishText();
         builder.pi(Token.token(name + ' ' + val));
         nodes++;
       } catch(final IOException ex) {
@@ -138,8 +142,9 @@ public final class SAXWrapper extends Parser {
     /** {@inheritDoc} */
     public void comment(final char[] ch, final int s, final int l)
         throws SAXException {
+      
       try {
-        checkText();
+        finishText();
         builder.comment(Token.token(new String(ch, s, l)));
         nodes++;
       } catch(final IOException ex) {
@@ -154,7 +159,7 @@ public final class SAXWrapper extends Parser {
      * Checks if a text node has to be written.
      * @throws IOException I/O exception
      */
-    private void checkText() throws IOException {
+    private void finishText() throws IOException {
       if(tb.size == 0) return;
       builder.text(tb.finish(), false);
       tb.reset();
@@ -172,6 +177,37 @@ public final class SAXWrapper extends Parser {
       throw ioe;
     }
 
+    // Entity Resolver
+    /* public InputSource resolveEntity(String pub, String sys) { } */
+
+    // DTDHandler
+    /* public void notationDecl(String name, String pub, String sys) { */
+    /* public void unparsedEntityDecl(final String name, final String pub,
+        final String sys, final String not) { */
+
+    // ContentHandler
+    /*public void setDocumentLocator(final Locator locator) { } */
+    /*public void startDocument() { } */
+    /*public void endDocument() { */
+
+    @Override
+    public void startPrefixMapping(final String prefix, final String uri) {
+      builder.startNS(Token.token(prefix), Token.token(uri));
+    }
+    
+    @Override
+    public void endPrefixMapping(final String prefix) {
+      builder.endNS(Token.token(prefix));
+    }
+    
+    /*public void ignorableWhitespace(char[] ch, int s, int l) { */
+    /*public void skippedEntity(final String name) { } */
+    
+    // ErrorHandler
+    /* public void warning(final SAXParseException e) { } */
+    /* public void fatalError(final SAXParseException e) { } */
+
+    // LexicalHandler
     public void endCDATA() { }
     public void endDTD() { }
     public void endEntity(final String name) { }

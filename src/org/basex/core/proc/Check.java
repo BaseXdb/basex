@@ -5,6 +5,7 @@ import org.basex.core.Commands;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
+import org.basex.io.IO;
 
 /**
  * Evaluates the 'check' command. Checks if the specified XML document is in
@@ -19,10 +20,9 @@ public final class Check extends Proc {
   protected boolean exec() {
     // file in memory?
     final Data data = context.data();
-    final String db = Create.chopPath(cmd.arg(0));
-    if(data != null && Create.chopPath(data.meta.filename).equals(db)) {
+    final String db = new IO(cmd.arg(0)).dbname();
+    if(data != null && data.meta.dbname.equals(db))
       return Prop.info ? info(DBINMEM) : true;
-    }
 
     // streaming mode - create new database instance in main memory
     if(Prop.onthefly) return exec(Commands.CREATEXML);
@@ -36,9 +36,8 @@ public final class Check extends Proc {
    * @param path file path
    * @return data instance
    */
-  public static Data check(final String path) {
-    final String db = Create.chopPath(path);
-    return MetaData.found(path, db) ? Open.open(path) : Create.xml(db, path);
+  public static Data check(final IO path) {
+    final String db = path.dbname();
+    return MetaData.found(path, db) ? Open.open(db) : Create.xml(path, db);
   }
 }
-

@@ -18,7 +18,7 @@ public final class DataInput extends BufferInput {
    * @throws IOException IO Exception
    */
   public DataInput(final String db, final String file) throws IOException {
-    super(IOConstants.dbfile(db, file));
+    super(IO.dbfile(db, file));
   }
 
   /**

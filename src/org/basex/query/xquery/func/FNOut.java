@@ -44,7 +44,7 @@ final class FNOut extends Fun {
       case TRACE:
         msg = Token.string(checkStr(arg[1])) + ": " + arg[0];
         ctx.evalInfo(msg);
-        //System.out.println(msg);
+        //BaseX.outln(msg);
         return arg[0];
       default:
         throw new RuntimeException("Not defined: " + func);

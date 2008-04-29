@@ -1,7 +1,6 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.basex.BaseX;
@@ -21,9 +20,8 @@ import org.basex.index.FZBuilder;
 import org.basex.index.Index;
 import org.basex.index.IndexBuilder;
 import org.basex.index.ValueBuilder;
-import org.basex.io.CachedInput;
+import org.basex.io.IO;
 import org.basex.util.Performance;
-import org.basex.util.Token;
 
 /**
  * Evaluates the 'create' command. Creates a new database instance for the
@@ -33,8 +31,6 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class Create extends Proc {
-  /** XML Suffix. */
-  public static final String XMLSUFFIX = ".xml";
   /** XQuery Suffix. */
   public static final String XQSUFFIX = ".xq";
 
@@ -66,8 +62,8 @@ public final class Create extends Proc {
     } catch(final IllegalArgumentException ex) {
       throw ex;
     } catch(final RuntimeException ex) {
-      BaseX.debug(ex);
-      return error(CANCELCREATE);
+      if(ex.getClass() == RuntimeException.class) return error(CANCELCREATE);
+      throw ex;
     }
     throw new IllegalArgumentException();
   }
@@ -79,18 +75,14 @@ public final class Create extends Proc {
   private boolean xml() {
     if(cmd.nrArgs() != 2) throw new IllegalArgumentException();
 
-    final String file = cmd.arg(1);
-    String path = file;
+    final IO file = new IO(cmd.arg(1));
+    if(!file.exists()) return error(FILEWHICH, file);
+    final String db = file.dbname();
+    
     try {
-      // interpret input as XML document...
-      if(file.startsWith("<")) {
-        return build(new XMLParser(new CachedInput(Token.token(file))), "temp");
-      }
-      // determine file path and create database
-      path = filePath(path, true);
-      return build(new XMLParser(path), path);
+      return build(new XMLParser(file), db);
     } catch(final IOException e) {
-      return error(e.getMessage(), path);
+      return error(e.getMessage(), db);
     }
   }
 
@@ -103,15 +95,11 @@ public final class Create extends Proc {
     if(cmd.nrArgs() != 2) throw new IllegalArgumentException();
 
     // determine file path and create database
-    String path = cmd.arg(1);
-    if(path.startsWith("<")) return xml();
-    
-    try {
-      path = filePath(path, true);
-      return build(new SAXWrapper(path), path);
-    } catch(final IOException e) {
-      return error(e.getMessage(), path);
-    }
+    final IO file = new IO(cmd.arg(1));
+    if(!file.exists()) return error(FILEWHICH, file);
+    final String db = file.dbname();
+
+    return build(new SAXWrapper(file), db);
   }
 
   /**
@@ -121,20 +109,17 @@ public final class Create extends Proc {
   private boolean mab2() {
     if(cmd.nrArgs() != 2) throw new IllegalArgumentException();
 
-    try {
-      // check if file exists
-      final String file = filePath(cmd.arg(1), false);
-      String db = file.replace('\\', '/');
-      if(db.contains("/")) db = db.replaceAll("^.*/(.*)\\..*", "$1");
-      Prop.chop  = true;
-      Prop.entity   = true;
-      Prop.textindex = true;
-      Prop.attrindex = true;
-      Prop.ftindex = false;
-      return build(new MAB2Parser(file), db + XMLSUFFIX);
-    } catch(final IOException e) {
-      return error(e.getMessage());
-    }
+    // check if file exists
+    final IO file = new IO(cmd.arg(1));
+    if(!file.exists()) return error(FILEWHICH, cmd.arg(1));
+
+    Prop.chop  = true;
+    Prop.entity   = true;
+    Prop.textindex = true;
+    Prop.attrindex = true;
+    Prop.ftindex = false;
+    
+    return build(new MAB2Parser(file), file.dbname().replaceAll("\\..*", ""));
   }
 
   /**
@@ -145,7 +130,7 @@ public final class Create extends Proc {
   private boolean fs() {
     if(cmd.nrArgs() != 3) throw new IllegalArgumentException();
     final String db = cmd.arg(1);
-    final String path = cmd.arg(2);
+    final IO path = new IO(cmd.arg(2));
 
     Prop.chop = true;
     Prop.entity = true;
@@ -167,12 +152,11 @@ public final class Create extends Proc {
   /**
    * Builds and creates a new database instance.
    * @param p parser instance
-   * @param file file to be parsed
+   * @param db name of database
    * @return success of operation
    */
-  private boolean build(final Parser p, final String file) {
+  private boolean build(final Parser p, final String db) {
     String err = "";
-    final String db = chopPath(file);
     Builder builder = null;
     try {
       if(Prop.onthefly) {
@@ -197,14 +181,18 @@ public final class Create extends Proc {
       context.data(data);
       
       return Prop.info ? timer(DBCREATED) : true;
-    } catch(final RuntimeException ex) {
-      throw ex;
     } catch(final FileNotFoundException ex) {
       BaseX.debug(ex);
-      err = BaseX.info(FILEWHICH, file);
+      err = BaseX.info(FILEWHICH, p.file);
     } catch(final IOException ex) {
       BaseX.debug(ex);
       err = ex.getMessage();
+    } catch(final RuntimeException ex) {
+      if(ex.getClass() == RuntimeException.class) throw ex;
+      String msg = ex.getMessage();
+      if(msg == null) msg = ex.toString();
+      BaseX.debug(ex);
+      err = BaseX.info(CREATEERR, cmd.args(), msg.length() != 0 ? msg : "");
     } catch(final Exception ex) {
       String msg = ex.getMessage();
       if(msg == null) msg = ex.toString();
@@ -228,53 +216,24 @@ public final class Create extends Proc {
    * @param fn database name
    * @return database instance
    */
-  public static Data xml(final String db, final String fn) {
+  public static Data xml(final IO fn, final String db) {
     try {
-      final String f = Create.filePath(fn, true);
-      final XMLParser p = new XMLParser(f);
+      if(!fn.exists()) return null;
+
+      final Parser p = Prop.intparse ? new XMLParser(fn) : new SAXWrapper(fn);
       if(Prop.onthefly) return new MemBuilder().build(p, db);
 
-      Drop.drop(db);
       final Data data = new DiskBuilder().build(p, db);
       if(data.meta.txtindex)
         data.openIndex(Index.TYPE.TXT, new ValueBuilder(true).build(data));
       if(data.meta.atvindex)
         data.openIndex(Index.TYPE.ATV, new ValueBuilder(false).build(data));
       if(data.meta.ftxindex) {
-        if (Prop.fuzzyindex) 
-          data.openIndex(Index.TYPE.FUY, new FTBuilder().build(data));
+        if(Prop.fuzzyindex)
+          data.openIndex(Index.TYPE.FUY, new FZBuilder().build(data));
         else data.openIndex(Index.TYPE.FTX, new FTBuilder().build(data));
       }
       return data;
-    } catch(final IOException ex) {
-      BaseX.debug(ex);
-      return null;
-    }
-  }
-
-  /**
-   * Creates an empty database without indexes.
-   * @param db name of the database to be created
-   * @return database instance
-   */
-  public static Data empty(final String db) {
-    try {
-      Prop.textindex = false;
-      Prop.attrindex = false;
-      Prop.chop = true;
-
-      /** Empty Parser */
-      final Parser parser = new Parser("") {
-        @Override
-        public void parse(final Builder build) { }
-        @Override
-        public String head() { return ""; }
-        @Override
-        public double percent() { return 0; }
-        @Override
-        public String det() { return ""; }
-      };
-      return new DiskBuilder().build(parser, db);
     } catch(final IOException ex) {
       BaseX.debug(ex);
       return null;
@@ -352,42 +311,5 @@ public final class Create extends Proc {
     data.closeIndex(index);
     data.openIndex(index, builder.build(data));
     if(inf != null) info(inf + NL, pp.getTimer());
-  }
-
-  /**
-   * Returns the filename if the specified file exists, or throws an exception.
-   * @param file file to be checked
-   * @param addXML add xml suffix if file was not found
-   * @return null or error string
-   * @throws FileNotFoundException file not found exception
-   */
-  public static String filePath(final String file, final boolean addXML)
-      throws FileNotFoundException {
-
-    File f = new File(file.replace('\\', '/'));
-    boolean found = f.exists();
-    
-    if(!found && addXML) {
-      final File f2 = new File(file + XMLSUFFIX);
-      found = f2.exists();
-      if(found) f = f2;
-    }
-    if(!found) throw new FileNotFoundException(
-        BaseX.info(FILEWHICH, f.getAbsoluteFile()));
-
-    return f.getAbsolutePath();
-  }
-
-  /**
-   * Chops the path and the XML suffix of the specified filename.
-   * @param name filename
-   * @return chopped filename
-   */
-  public static String chopPath(final String name) {
-    String n = name.replace('\\', '/');
-    final int c = n.lastIndexOf('/');
-    if(c > -1) n = n.substring(c + 1);
-    return n.endsWith(XMLSUFFIX) ? n.substring(0, n.length() -
-        XMLSUFFIX.length()) : n;
   }
 }

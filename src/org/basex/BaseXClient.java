@@ -1,7 +1,6 @@
 package org.basex;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Random;
@@ -12,9 +11,9 @@ import org.basex.core.CommandParser;
 import org.basex.core.Commands;
 import org.basex.core.Prop;
 import org.basex.core.proc.Set;
+import org.basex.io.IO;
 import org.basex.io.CachedOutput;
 import org.basex.io.ConsoleOutput;
-import org.basex.io.IOConstants;
 import org.basex.io.PrintOutput;
 import org.basex.util.Token;
 import static org.basex.Text.*;
@@ -179,12 +178,10 @@ public class BaseXClient {
   private String content() {
     // open file
     try {
-      return Token.string(IOConstants.read(query)).trim();
-    } catch(final FileNotFoundException ex) {
-      error(null, BaseX.info(FILEWHICH, query));
-      BaseX.debug(ex);
+      return Token.string(new IO(query).content()).trim();
     } catch(final IOException ex) {
       error(ex, ex.getMessage());
+      BaseX.debug(ex);
     }
     return null;
   }

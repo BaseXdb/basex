@@ -1,6 +1,7 @@
 package org.basex.query.xpath.func;
 
 import org.basex.core.proc.Check;
+import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
@@ -26,7 +27,7 @@ public final class Doc extends Func {
   @Override
   public NodeSet eval(final XPContext ctx) throws QueryException {
     final Item arg = evalArgs(ctx)[0];
-    String db = Token.string(arg.str());
+    final IO db = new IO(Token.string(arg.str()));
     ctx.local = new NodeSet(Check.check(db));
     return ctx.local;
   }

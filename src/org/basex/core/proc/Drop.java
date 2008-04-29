@@ -2,16 +2,13 @@ package org.basex.core.proc;
 
 import static org.basex.data.DataText.*;
 import static org.basex.Text.*;
-
-import java.io.File;
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.Commands;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.index.Index;
-import org.basex.io.IOConstants;
-
+import org.basex.io.IO;
 
 /**
  * Evaluates the 'drop' command. Deletes a database or index structure.
@@ -44,7 +41,7 @@ public final class Drop extends Proc {
     if(data != null && data.meta.dbname.equals(db))
       execute(context, Commands.CLOSE);
 
-    if(!IOConstants.dbpath(db).exists()) return error(DBNOTFOUND, db);
+    if(!IO.dbpath(db).exists()) return error(DBNOTFOUND, db);
     return drop(db) ? info(DBDROPPED) : error(DBNOTDROPPED);
   }
 
@@ -94,7 +91,7 @@ public final class Drop extends Proc {
       final Data data = context.data();
       data.meta.write(data.size);
       data.closeIndex(index);
-      return delete(data.meta.dbname, pat + "..basex") ? info(DBDROP) :
+      return IO.dbdelete(data.meta.dbname, pat + "..basex") ? info(DBDROP) :
         error(DBDROPERR);
     } catch(final IOException ex) {
       BaseX.debug(ex);
@@ -108,23 +105,6 @@ public final class Drop extends Proc {
    * @return success of operation
    */
   public static boolean drop(final String db) {
-    return delete(Create.chopPath(db), null);
-  }
-  
-  /**
-   * Delete a directory recursively.
-   * @param db database to delete recursively
-   * @param pat file pattern
-   * @return success of operation
-   */
-  private static boolean delete(final String db, final String pat) {
-    final File path = IOConstants.dbpath(db);
-    if(!path.exists()) return false;
-    for(final File sub : path.listFiles()) {
-      if((pat == null || sub.getName().matches(pat)) && !sub.delete()) {
-        return false;
-      }
-    }
-    return pat == null ? path.delete() : true;
+    return IO.dbdelete(new IO(db).dbname(), null);
   }
 }

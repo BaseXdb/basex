@@ -126,7 +126,6 @@ public final class FTSelect extends Single implements Cloneable {
 
     // ...to be revised...
     if(dunit != 0) {
-      System.out.println("!");
       final long mn = checkItr(ctx.iter(dist[0]));
       final long mx = checkItr(ctx.iter(dist[1]));
       int l = -1;

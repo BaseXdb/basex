@@ -41,7 +41,7 @@ final class FNBaseX extends Fun {
           Bln.get(containslc(checkStr(arg[0]), checkStr(it))).iter();
       case FILENAME:
         if(ctx.file == null) return Str.ZERO.iter();
-        return Str.iter(token(ctx.file.getName()));
+        return Str.iter(token(ctx.file.name()));
       default:
         throw new RuntimeException("Not defined: " + func);
     }

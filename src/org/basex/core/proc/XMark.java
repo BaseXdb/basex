@@ -875,22 +875,4 @@ public final class XMark extends XPath {
     }
     return true;
   }
-
-  /**
-   * Calculates the difference between two tokens.
-   * @param to first token
-   * @param qu second token
-   * @return difference
-   */
-  private int diff(final byte[] to, final byte[] qu) {
-    final int tl = to.length;
-    final int ql = qu.length;
-    final int l = tl < ql ? tl : ql;
-    int i = -1;
-    while(++i < l) {
-      final int c = to[i] - qu[i];
-      if(c != 0) return c;
-    }
-    return tl - ql;
-  }
 }

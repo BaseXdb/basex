@@ -27,7 +27,7 @@ public final class FZBuilder extends Progress implements IndexBuilder {
   /** Word parser. */
   private final FTTokenizer wp = new FTTokenizer();
   /** Word parser. */
-  private FZHash[] tree = new FZHash[Token.MAXLEN];
+  private FZHash[] tree = new FZHash[Token.MAXLEN + 1];
   /** Number of indexed words. */
   private byte isize = 1;
 

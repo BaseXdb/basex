@@ -1,8 +1,8 @@
 package org.basex.io;
 
-import static org.basex.io.IOConstants.*;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import org.basex.BaseX;
 import org.basex.util.Array;
 
 /**
@@ -13,9 +13,9 @@ import org.basex.util.Array;
  */
 public final class TableDiskAccess extends TableAccess {
   /** Max entries per block. */
-  private static final int ENTRIES = (1 << BLOCKPOWER) >>> NODEPOWER;
+  private static final int ENTRIES = (1 << IO.BLOCKPOWER) >>> IO.NODEPOWER;
   /** Entries per new block. */
-  private static final int NEWENTRIES = (int) (BLOCKFILL * ENTRIES);
+  private static final int NEWENTRIES = (int) (IO.BLOCKFILL * ENTRIES);
 
   /** File storing all blocks. */
   private final RandomAccessFile file;
@@ -71,7 +71,7 @@ public final class TableDiskAccess extends TableAccess {
     info.close();
 
     // INITIALIZE CURRENT BLOCK
-    buffer = new byte[1 << BLOCKPOWER];
+    buffer = new byte[1 << IO.BLOCKPOWER];
 
     // READ INDEX
     firstPres = new int[indexSize];
@@ -85,7 +85,7 @@ public final class TableDiskAccess extends TableAccess {
     in.close();
 
     // INITIALIZE FILE
-    file = new RandomAccessFile(IOConstants.dbfile(nm, f), "rw");
+    file = new RandomAccessFile(IO.dbfile(nm, f), "rw");
 
     // READ FIRST BLOCK
     readBlock(0, 0, indexSize > 1 ? firstPres[1] : count);
@@ -100,22 +100,24 @@ public final class TableDiskAccess extends TableAccess {
   public synchronized int cursor(final int pre) {
     int fp = firstPre;
     int np = nextPre;
-    if(pre >= fp && pre < np) return (pre - fp) << NODEPOWER;
+    if(pre >= fp && pre < np) return (pre - fp) << IO.NODEPOWER;
 
     final int last = indexSize - 1;
     int low = 0;
     int high = last;
-    int next = index;
-    while(true) {
-      if(pre < fp) high = next - 1;
-      else if(pre >= np) low = next + 1;
+    int mid = index;
+    while(low <= high) {
+      if(pre < fp) high = mid - 1;
+      else if(pre >= np) low = mid + 1;
       else break;
-      next = (high + low) >>> 1;
-      fp = firstPres[next];
-      np = next == last ? fp + ENTRIES : firstPres[next + 1];
+      mid = (high + low) >>> 1;
+      fp = firstPres[mid];
+      np = mid == last ? fp + ENTRIES : firstPres[mid + 1];
     }
-    readBlock(next, fp, np);
-    return (pre - firstPre) << NODEPOWER;
+    if(low > high) BaseX.notexpected();
+    
+    readBlock(mid, fp, np);
+    return (pre - firstPre) << IO.NODEPOWER;
   }
 
   /**
@@ -131,7 +133,7 @@ public final class TableDiskAccess extends TableAccess {
     try {
       final int b = blocks[ind];
       writeBlock();
-      file.seek((long) b << BLOCKPOWER);
+      file.seek((long) b << IO.BLOCKPOWER);
       file.read(buffer);
       block = b;
       index = ind;
@@ -148,7 +150,7 @@ public final class TableDiskAccess extends TableAccess {
    */
   private synchronized void writeBlock() throws IOException {
     if(dirty) {
-      file.seek((long) block << BLOCKPOWER);
+      file.seek((long) block << IO.BLOCKPOWER);
       file.write(buffer);
       dirty = false;
     }
@@ -323,7 +325,7 @@ public final class TableDiskAccess extends TableAccess {
   @Override
   public synchronized void insert(final int pre, final byte[] entries) {
     indexdirty = true;
-    final int nr = entries.length >>> NODEPOWER;
+    final int nr = entries.length >>> IO.NODEPOWER;
     count += nr;
     cursor(pre);
 
@@ -346,7 +348,7 @@ public final class TableDiskAccess extends TableAccess {
 
     // save entries to be added into new block after inserted blocks
     final int move = nextPre - pre - 1;
-    final byte[] rest = new byte[move << NODEPOWER];
+    final byte[] rest = new byte[move << IO.NODEPOWER];
 
     copy(buffer, ins, rest, 0, move);
 
@@ -418,7 +420,8 @@ public final class TableDiskAccess extends TableAccess {
    */
   private synchronized void copy(final Object s, final int sp, final Object d,
       final int dp, final int l) {
-    System.arraycopy(s, sp << NODEPOWER, d, dp << NODEPOWER, l << NODEPOWER);
+    System.arraycopy(s, sp << IO.NODEPOWER, d, dp << IO.NODEPOWER,
+        l << IO.NODEPOWER);
   }
 
   /**

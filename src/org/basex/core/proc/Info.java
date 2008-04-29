@@ -9,7 +9,7 @@ import java.util.Date;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.io.IOConstants;
+import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -93,14 +93,14 @@ public final class Info extends XPath {
 
     final Data data = context.data();
     long fl = 0;
-    final File file = IOConstants.dbpath(data.meta.dbname);
+    final File file = IO.dbpath(data.meta.dbname);
     if(file.exists()) {
       for(final File f : file.listFiles()) fl += f.length();
     }
 
     prop(out, INFODB, false);
     prop(out, INFODBNAME + data.meta.dbname, true);
-    prop(out, INFODOC + data.meta.filename, true);
+    prop(out, INFODOC + data.meta.file, true);
     prop(out, INFOTIME + new SimpleDateFormat("dd.MM.yyyy hh:mm:ss").format(
         new Date(data.meta.time)), true);
     if(data.meta.filesize != 0) prop(out, INFODOCSIZE +

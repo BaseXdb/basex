@@ -7,7 +7,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JComboBox;
-
 import org.basex.gui.GUI;
 import org.basex.gui.dialog.Dialog;
 
@@ -132,45 +131,4 @@ public final class BaseXCombo extends JComboBox {
     if(isEditable()) getEditor().getEditorComponent().addKeyListener(l);
     else super.addKeyListener(l);
   } 
-  /*
-  class ComboBoxRenderer extends JLabel implements ListCellRenderer {
-    BaseXCombo b;
-    
-    public ComboBoxRenderer(BaseXCombo box) {
-      b = box;   
-    }
-
-  public Component getListCellRendererComponent(
-                    JList list,
-                    Object value,
-                    int index,
-                    boolean isSelected,
-                    boolean cellHasFocus) {
-
-    if (index == 0) {
-      JLabel b = new JLabel();
-      b.setText("bla");
-      return b;
-    }
-    return this;
-    
-    }
-  
-  protected void paintComponent(Graphics g) 
-  { 
-    String[] t = b.getText().split(" ");
-    for (int i=0; i<t.length; i++) {
-      if ((t[i].startsWith("\"") || t[i].startsWith("\'"))) {
-        g.setColor(Color.RED); 
-        g.drawString(t[i], 100 + 10*i, 100);
-         System.out.println(t[i]);
-
-      } else {
-        System.out.println(t[i]);
-        g.setColor(Color.BLACK);
-        g.drawString(t[i], 100 + 10*i, 100);
-        
-      }
-    }
-  }   */
 }

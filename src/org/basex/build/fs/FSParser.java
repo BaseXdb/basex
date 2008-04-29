@@ -19,6 +19,7 @@ import org.basex.build.fs.metadata.PNGExtractor;
 import org.basex.build.fs.metadata.TIFExtractor;
 import org.basex.core.Prop;
 import org.basex.core.proc.Create;
+import org.basex.io.IO;
 import org.basex.util.Array;
 
 /** Imports/shreds/parses a file hierarchy into a BaseX database.
@@ -68,7 +69,7 @@ public final class FSParser extends Parser implements FSVisitor {
    * @param path the traversal starts from (enter "/" or leave empty to parse
    * all partitions (C:, D: ...) on Windows)
    */
-  public FSParser(final String path) {
+  public FSParser(final IO path) {
     super(path);
 
     // initialize cache for textual contents

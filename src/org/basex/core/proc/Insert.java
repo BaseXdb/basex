@@ -9,7 +9,7 @@ import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.data.Nodes;
-import org.basex.io.CachedInput;
+import org.basex.io.IO;
 import org.basex.util.Token;
 
 /**
@@ -83,8 +83,8 @@ public final class Insert extends Updates {
     // create temporary instance of document to be inserted
     try {
       // parse xml input or filename
-      final XMLParser parser = val.startsWith("<") ? new XMLParser(
-          new CachedInput(Token.token(val))) : new XMLParser(val);
+      final IO file = new IO(val);
+      final XMLParser parser = new XMLParser(file);
       final Data tmp = new MemBuilder().build(parser, "tmp");
       final Data data = context.data();
 

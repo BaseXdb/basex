@@ -22,8 +22,6 @@ import org.basex.util.Token;
 public final class MapImages {
   /** Maximum number of cached images. */
   private static final int MAXNR = 5000;
-  /** Cache size (will be multiplied with window size). */
-  private static final int CACHESIZE = 10;
   /** Reference to the treemap panel. */
   protected MapView map;
   /** Image cache. */
@@ -171,7 +169,8 @@ public final class MapImages {
   void paint() {
     // determine maximum cache size, depending on window size
     final Dimension size = GUI.get().getSize();
-    final int max = size.width * size.height * CACHESIZE;
+    final Runtime rt = Runtime.getRuntime();
+    long max = Math.max(size.width * size.height * 10, rt.maxMemory() / 5);
     
     // remove images if pixel limit is reached
     int imgSize = 0;

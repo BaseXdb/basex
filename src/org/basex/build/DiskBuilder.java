@@ -1,8 +1,6 @@
 package org.basex.build;
 
 import static org.basex.data.DataText.*;
-import static org.basex.io.IOConstants.BLOCKPOWER;
-import java.io.File;
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.build.xml.SAXWrapper;
@@ -13,9 +11,9 @@ import org.basex.data.Data;
 import org.basex.data.DiskData;
 import org.basex.data.MetaData;
 import org.basex.data.Stats;
+import org.basex.io.IO;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
-import org.basex.io.IOConstants;
 import org.basex.io.TableAccess;
 import org.basex.io.TableDiskAccess;
 import org.basex.io.TableOutput;
@@ -50,18 +48,16 @@ public final class DiskBuilder extends Builder {
   @Override
   public DiskBuilder init(final String db) throws IOException {
     meta = new MetaData(db);
-    meta.filename = parser.file;
-    final File f = new File(parser.file);
-    meta.filesize = f.length();
-    meta.time = f.lastModified();
-
+    meta.file = parser.file;
+    meta.filesize = meta.file.length();
+    meta.time = meta.file.date();
     stats = new Stats(db);
     
     Drop.drop(db);
-    IOConstants.dbpath(db).mkdirs();
+    IO.dbpath(db).mkdirs();
 
     // calculate output buffer sizes: (1 << BLOCKPOWER) < bs < (1 << 22)
-    int bs = 1 << BLOCKPOWER;
+    int bs = 1 << IO.BLOCKPOWER;
     while(bs < meta.filesize && bs < (1 << 22)) bs <<= 1;
 
     tout = new DataOutput(new TableOutput(db, DATATBL));
@@ -89,7 +85,7 @@ public final class DiskBuilder extends Builder {
     in.close();
     ta.close();
     
-    IOConstants.dbfile(meta.dbname, DATATMP).delete();
+    IO.dbfile(meta.dbname, DATATMP).delete();
 
     meta.write(size);
     stats.finish();
@@ -112,11 +108,11 @@ public final class DiskBuilder extends Builder {
   
   @Override
   protected void addNode(final int tag, final int par, final byte[][] atr,
-      final int[] attRef, final int type) throws IOException {
+      final int[] attRef, final byte kind) throws IOException {
 
     // element node
     final int attl = attRef != null ? attRef.length : 0;
-    tout.write(type);
+    tout.write(kind);
     tout.write2(tag);
     tout.write(attl + 1);
     tout.writeInt(attl + 1);
@@ -147,7 +143,7 @@ public final class DiskBuilder extends Builder {
   }
 
   @Override
-  public void addText(final byte[] txt, final int par, final int type)
+  public void addText(final byte[] txt, final int par, final byte kind)
       throws IOException {
     
     // inline integer values...
@@ -159,7 +155,7 @@ public final class DiskBuilder extends Builder {
       txtlen += xout.writeToken(txt);
     }
     
-    tout.write(type);
+    tout.write(kind);
     tout.write(0);
     tout.write(0);
     tout.write5(v);
@@ -203,7 +199,8 @@ public final class DiskBuilder extends Builder {
     for(int i = 0; i < r; i++) {
       for(final String f : fn) {
         try {
-          Parser parser = s ? new SAXWrapper(f) : new XMLParser(f);
+          final IO bxf = new IO(f);
+          Parser parser = s ? new SAXWrapper(bxf) : new XMLParser(bxf);
           new DiskBuilder().build(parser, "tmp");
           c++;
         } catch(final IOException e) {

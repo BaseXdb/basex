@@ -1,6 +1,7 @@
 package org.basex.build;
 
 import java.io.IOException;
+import org.basex.io.IO;
 
 /**
  * This is class defines methods for parser implementations.
@@ -11,14 +12,14 @@ import java.io.IOException;
  */
 public abstract class Parser {
   /** Input file. */
-  public String file;
+  public IO file;
 
   /**
    * Constructor.
-   * @param fn input filename.
+   * @param f file reference.
    */
-  public Parser(final String fn) {
-    file = fn.replace('\\', '/');
+  public Parser(final IO f) {
+    file = f;
   }
 
   /**

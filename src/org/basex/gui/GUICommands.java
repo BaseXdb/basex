@@ -31,7 +31,7 @@ import org.basex.gui.dialog.DialogProgress;
 import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.View;
-import org.basex.io.IOConstants;
+import org.basex.io.IO;
 import org.basex.util.Performance;
 
 /**
@@ -54,12 +54,12 @@ public enum GUICommands implements GUICommand {
 
       final BaseXFileChooser fc = new BaseXFileChooser(CREATETITLE,
           GUIProp.createpath, main);
-      fc.setFilter(Create.XMLSUFFIX, CREATEXMLDESC);
+      fc.setFilter(IO.XMLSUFFIX, CREATEXMLDESC);
 
       if(fc.select(BaseXFileChooser.OPEN)) {
         if(!new DialogCreate(main).ok()) return;
-        final String file = fc.getFile().replace('\\', '/');
-        build(CREATETITLE, Commands.CREATEXML + " \"" + file + "\"");
+        final IO file = fc.getFile();
+        build(CREATETITLE, Commands.CREATEXML + " \"" + file.path() + "\"");
       }
       GUIProp.createpath = fc.getDir();
     }
@@ -74,7 +74,7 @@ public enum GUICommands implements GUICommand {
       if(dialog.ok()) {
         final String db = dialog.db();
         if(db == null) return;
-        if(IOConstants.dbpath(db).exists()) {
+        if(IO.dbpath(db).exists()) {
           Proc.execute(GUI.context, Commands.CLOSE);
           View.notifyInit();
         }
@@ -119,7 +119,7 @@ public enum GUICommands implements GUICommand {
 
       if(fc.select(BaseXFileChooser.OPEN)) {
         try {
-          main.query.setXQuery(IOConstants.read(fc.getFile()));
+          main.query.setXQuery(fc.getFile().content());
         } catch(final IOException ex) {
           JOptionPane.showMessageDialog(main, XQOPERROR,
               DIALOGINFO, JOptionPane.ERROR_MESSAGE);
@@ -142,9 +142,9 @@ public enum GUICommands implements GUICommand {
 
       if(fc.select(BaseXFileChooser.SAVE)) {
         try {
-          String file = fc.getFile().replaceAll("\\\\", "/");
-          if(file.indexOf(".") == -1) file += Create.XQSUFFIX;
-          IOConstants.write(file, main.query.getXQuery());
+          final IO file = fc.getFile();
+          file.suffix(Create.XQSUFFIX);
+          file.write(main.query.getXQuery());
         } catch(final IOException ex) {
           JOptionPane.showMessageDialog(main, XQSAVERROR,
               DIALOGINFO, JOptionPane.ERROR_MESSAGE);
@@ -175,11 +175,11 @@ public enum GUICommands implements GUICommand {
 
       final BaseXFileChooser fc = new BaseXFileChooser(CREATETITLE,
           GUIProp.createpath, main);
-      fc.setFilter(Create.XMLSUFFIX, CREATEXMLDESC);
+      fc.setFilter(IO.XMLSUFFIX, CREATEXMLDESC);
 
       if(fc.select(BaseXFileChooser.SAVE)) {
-        String file = fc.getFile().replaceAll("\\\\", "/");
-        if(file.indexOf(".") == -1) file += Create.XMLSUFFIX;
+        final IO file = fc.getFile();
+        file.suffix(IO.XMLSUFFIX);
         main.execute(Commands.EXPORT, "\"" + file + "\"");
       }
       GUIProp.createpath = fc.getDir();

@@ -2,12 +2,11 @@ package org.basex.data;
 
 import static org.basex.data.DataText.*;
 import static org.basex.Text.*;
-import java.io.File;
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.build.BuildException;
 import org.basex.core.Prop;
-import org.basex.core.proc.Create;
+import org.basex.io.IO;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.util.Token;
@@ -24,7 +23,7 @@ public final class MetaData {
   /** Encoding of XML document. */
   public String encoding = Token.UTF8;
   /** Original filename of XML document. */
-  public String filename = "";
+  public IO file;
   /** Original file size of XML document. */
   public long filesize;
   /** Maximum document height. */
@@ -60,24 +59,20 @@ public final class MetaData {
    * @param db database name
    * @return result of check
    */
-  public static boolean found(final String path, final String db) {
+  public static boolean found(final IO path, final String db) {
     try {
-      // no .xml suffix and database specified - check existence of database
-      if(!path.endsWith(Create.XMLSUFFIX) && !path.contains("/"))
-        return new File(Prop.dbpath + '/' + db).exists();
-
       // match filename of database instance
       final DataInput in = new DataInput(db, DATAINFO);
       String key;
-      File f = null;
+      IO f = null;
       long t = 0;
       while((key = in.readString()).length() != 0) {
         final String val = in.readString();
-        if(key.equals(DBFNAME)) f = new File(val);
+        if(key.equals(DBFNAME)) f = new IO(val);
         if(key.equals(DBTIME)) t = Token.toLong(val);
       }
       in.close();
-      return f != null && f.equals(new File(path)) && f.lastModified() == t;
+      return f != null && f.eq(path) && f.date() == t;
     } catch(final IOException ex) {
       BaseX.debug(ex);
       return false;
@@ -111,7 +106,7 @@ public final class MetaData {
 
       if(k.equals(DBSTORAGE)) storage = v;
       else if(k.equals(IDBSTORAGE)) istorage = v;
-      else if(k.equals(DBFNAME)) filename = v;
+      else if(k.equals(DBFNAME)) file = new IO(v);
       else if(k.equals(DBFSIZE)) filesize = Token.toLong(v);
       else if(k.equals(DBENCODING)) encoding = v;
       else if(k.equals(DBHEIGHT)) height = Token.toInt(v);
@@ -140,7 +135,7 @@ public final class MetaData {
     final DataOutput inf = new DataOutput(dbname, DATAINFO);
     writeInfo(inf, DBSTORAGE, STORAGE);
     writeInfo(inf, IDBSTORAGE, ISTORAGE);
-    writeInfo(inf, DBFNAME, filename);
+    writeInfo(inf, DBFNAME, file.path());
     writeInfo(inf, DBFSIZE, Long.toString(filesize));
     writeInfo(inf, DBENCODING, encoding);
     writeInfo(inf, DBHEIGHT, Integer.toString(height));
