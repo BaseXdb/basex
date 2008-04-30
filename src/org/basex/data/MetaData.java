@@ -54,12 +54,15 @@ public final class MetaData {
   }
 
   /**
-   * Checks if the specified database refers to the specified file.
-   * @param path file path (incl. file name)
+   * Checks if the specified file path refers to the specified database.
+   * @param path file path
    * @param db database name
    * @return result of check
    */
-  public static boolean found(final IO path, final String db) {
+  public static boolean found(final String path, final String db) {
+    // true is returned if path and database name are equal and if the db exists
+    if(path.equals(db) && IO.dbpath(db).exists()) return true; 
+    
     try {
       // match filename of database instance
       final DataInput in = new DataInput(db, DATAINFO);
@@ -72,7 +75,7 @@ public final class MetaData {
         if(key.equals(DBTIME)) t = Token.toLong(val);
       }
       in.close();
-      return f != null && f.eq(path) && f.date() == t;
+      return f != null && f.path().equals(path) && f.date() == t;
     } catch(final IOException ex) {
       BaseX.debug(ex);
       return false;

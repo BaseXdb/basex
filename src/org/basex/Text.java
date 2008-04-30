@@ -41,7 +41,7 @@ public interface Text {
   /** URL. */
   String URL = "http://www.basex.org";
   /** Code version. */
-  String VERSION = "4.05";
+  String VERSION = "4.06";
   /** Company Info. */
   String COMPANY = "DBIS, University of Konstanz";
 

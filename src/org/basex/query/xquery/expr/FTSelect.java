@@ -19,12 +19,12 @@ import org.basex.util.TokenList;
  * @author Christian Gruen
  */
 public final class FTSelect extends Single implements Cloneable {
-  /** Word unit. */
-  public static final int WORDS = 1;
-  /** Sentences unit. */
-  public static final int SENTENCES = 2;
-  /** Paragraphs unit. */
-  public static final int PARAGRAPHS = 3;
+  /** Units. */
+  public enum Unit {
+    /** Word unit. */      WORDS,
+    /** Sentence unit. */  SENTENCES,
+    /** Paragraph unit. */ PARAGRAPHS
+  };
 
   /** Ordered flag. */
   public boolean ordered;
@@ -37,17 +37,17 @@ public final class FTSelect extends Single implements Cloneable {
   /** Window. */
   public Expr window;
   /** Window unit. */
-  public int wunit;
+  public Unit wunit;
   /** Distance occurrences. */
   public Expr[] dist;
   /** Distance unit. */
-  public int dunit;
+  public Unit dunit;
   /** Same flag. */
   public boolean same;
   /** Different flag. */
   public boolean different;
   /** Same/different unit. */
-  public int sdunit;
+  public Unit sdunit;
   /** Weight. */
   public Expr weight;
 
@@ -75,8 +75,11 @@ public final class FTSelect extends Single implements Cloneable {
 
     final Item it = ctx.iter(expr).next();
     ctx.ftselect = tmp;
-    if(size == 0) return Dbl.iter(it.dbl());
+    double s = it.dbl();
     
+    // ...s == 0 correct?
+    if(size == 0 || s == 0) return Dbl.iter(s);
+
     if(ordered) {
       int c = -1;
       int d = -1;
@@ -125,15 +128,17 @@ public final class FTSelect extends Single implements Cloneable {
     }
 
     // ...to be revised...
-    if(dunit != 0) {
+    if(dunit != null) {
       final long mn = checkItr(ctx.iter(dist[0]));
       final long mx = checkItr(ctx.iter(dist[1]));
+      
       int l = -1;
       for(int i = 0; i < size; i++) {
         boolean o = false;
         for(int j = 0; j < pos[i].size; j++) {
           final int p = calc(ctx, pos[i].get(j), dunit);
-          if(i != 0 && (mn <= p - l && mx >= p - l)) {
+          int d = Math.abs(p - l) - 1;
+          if(i == 0 || (d >= mn && d <= mx)) {
             o = true;
             l = p;
             break;
@@ -144,14 +149,14 @@ public final class FTSelect extends Single implements Cloneable {
     }
 
     // ...to be revised...
-    if(wunit != 0) {
+    if(wunit != null) {
       final long c = checkItr(ctx.iter(window));
       int l = -1;
       for(int i = 0; i < size; i++) {
         boolean o = false;
         for(int j = 0; j < pos[i].size; j++) {
           final int p = calc(ctx, pos[i].get(j), wunit);
-          if(i != 0 && (Math.abs(p - l) < c)) {
+          if(i == 0 || (Math.abs(p - l) - 1 < c)) {
             o = true;
             l = p;
             break;
@@ -176,7 +181,7 @@ public final class FTSelect extends Single implements Cloneable {
       }
       if(p != q) return Dbl.iter(0);
     }
-
+    
     // ...to be revised...
     if(different) {
       int l = -1;
@@ -219,14 +224,16 @@ public final class FTSelect extends Single implements Cloneable {
   /**
    * Calculates a new position value, dependent on the specified unit.
    * @param ctx query context
-   * @param p position
+   * @param p word position
    * @param u unit
    * @return new position
    */
-  private int calc(final XQContext ctx, final int p, final int u) {
-    if(u == SENTENCES) return sentence(ctx.ftitem, p);
-    if(u == PARAGRAPHS) return paragraph(ctx.ftitem, p);
-    return u;
+  private int calc(final XQContext ctx, final int p, final Unit u) {
+    switch(u) {
+      case SENTENCES : return sentence(ctx.ftitem, p);
+      case PARAGRAPHS: return paragraph(ctx.ftitem, p);
+      default:         return p;
+    }
   }
 
   /**
@@ -303,6 +310,19 @@ public final class FTSelect extends Single implements Cloneable {
 
   @Override
   public String toString() {
-    return expr.toString();
+    final StringBuilder sb = new StringBuilder();
+    sb.append(expr);
+    if(ordered) sb.append(" ordered");
+    if(start) sb.append(" at start");
+    if(end) sb.append(" at end");
+    if(content) sb.append(" entire content");
+    if(dunit != null) {
+      sb.append(" distance(");
+      sb.append(dist[0]);
+      sb.append(",");
+      sb.append(dist[1]);
+      sb.append(")");
+    }
+    return sb.toString();
   }
 }

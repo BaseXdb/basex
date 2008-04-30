@@ -67,7 +67,7 @@ public final class XQTS {
   //private static final String ROOT = "h:/";
   /** Path to the XQuery Test Suite. */
   //private String tests = ROOT + "xqts102/";
-  private String tests = ROOT + "/home/dbis/xml/xqts102/";
+  private String tests = ROOT + "home/db/xml/xqts102/";
   /** Query Path. */
   private String queries;
   /** Expected Results. */
@@ -185,7 +185,10 @@ public final class XQTS {
     final Performance perf = new Performance();
 
     final Context context = new Context();
-    Proc.execute(context, Commands.CHECK, tests + "XQTSCatalog.xml");
+    if(!Proc.execute(context, Commands.CHECK, tests + "XQTSCatalog.xml")) {
+      System.out.println("XQTSCatalog.xml not found.");
+      return;
+    }
     data = context.data();
 
     final Nodes root = new Nodes(0, data);

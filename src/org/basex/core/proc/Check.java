@@ -36,8 +36,9 @@ public final class Check extends Proc {
    * @param path file path
    * @return data instance
    */
-  public static Data check(final IO path) {
-    final String db = path.dbname();
-    return MetaData.found(path, db) ? Open.open(db) : Create.xml(path, db);
+  public static Data check(final String path) {
+    final IO file = new IO(path);
+    final String db = file.dbname();
+    return MetaData.found(path, db) ? Open.open(db) : Create.xml(file, db);
   }
 }

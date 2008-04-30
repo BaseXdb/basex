@@ -211,12 +211,16 @@ public final class XQContext extends QueryContext {
     if(contains(db, '<') || contains(db, '>')) Err.or(INVDOC, db);
 
     // check if the database has already been read
+    final String dbname = string(db);
+    for(final DNode d : docs) if(d.data.meta.dbname.equals(dbname)) return d;
+
+    // check if the database has already been read
     final IO bxw = new IO(string(db));
     for(final DNode d : docs) if(d.data.meta.file.eq(bxw)) return d;
 
     // get database instance
-    Data data = Check.check(bxw);
-    if(data == null && file != null) data = Check.check(file.merge(bxw));
+    Data data = Check.check(dbname);
+    if(data == null && file != null) data = Check.check(file.merge(bxw).path());
     if(data == null) Err.or(NODOC, bxw);
 
     // add document to array
