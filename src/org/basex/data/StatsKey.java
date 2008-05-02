@@ -1,21 +1,23 @@
 package org.basex.data;
 
+import java.io.IOException;
+import org.basex.io.DataInput;
+import org.basex.io.DataOutput;
 import org.basex.util.Set;
 import org.basex.util.Token;
 
 /**
- * This class defines a key (tag/attribute name) for the {@link Stats}
- * panel.
+ * This class contains statistics for the tag or attribute name of a document.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public final class StatsKey {
   /** Maximum number of categories. */
-  private static final int MAXCATS = 100;
+  private static final int MAXCATS = 50;
   /** Maximum length of category entries. */
-  private static final int MAXCATLEN = 100;
-  /** Tag/Attribute flag. */
+  private static final int MAXCATLEN = 50;
+  /** Kind of Contents. */
   public enum Kind {
     /** Text.     */ TEXT,
     /** Category. */ CAT,
@@ -24,20 +26,68 @@ public final class StatsKey {
     /** No Texts. */ NONE
   };
   /** Node kind. */
-  public Kind kind = Kind.INT;
+  public Kind kind;
   /** Categories. */
-  public Set cats = new Set();
+  public Set cats;
   /** Minimum value. */
-  public double min = Double.MAX_VALUE;
+  public double min;
   /** Maximum value. */
-  public double max = Double.MIN_VALUE;
+  public double max;
   
   /**
-   * Adds a value.
+   * Default Constructor.
+   */
+  public StatsKey() {
+    cats = new Set();
+    kind = Kind.INT;
+    min = Double.MAX_VALUE;
+    max = Double.MIN_VALUE;
+  }
+  
+  /**
+   * Constructor, specifying an input stream.
+   * @param in input stream
+   */
+  public StatsKey(final DataInput in) {
+    kind = Kind.values()[in.readNum()];
+    if(kind == Kind.INT || kind == Kind.DBL) {
+      min = Token.toDouble(in.readBytes());
+      max = Token.toDouble(in.readBytes());
+    } else if(kind == Kind.CAT) {
+      cats = new Set();
+      final int cl = in.readNum();
+      for(int i = 0; i < cl; i++) cats.add(in.readBytes());
+    }
+  }
+
+  /**
+   * Writes the key statistics to the specified output stream.
+   * @param out output stream
+   * @throws IOException I/O exception
+   */
+  public void write(final DataOutput out) throws IOException {
+    if(cats != null && cats.size() == 0) kind = Kind.NONE;
+    out.writeNum(kind.ordinal());
+    if(kind == Kind.INT || kind == Kind.DBL) {
+      out.writeBytes(Token.token(min));
+      out.writeBytes(Token.token(max));
+    } else if(kind == Kind.CAT) {
+      final int cl = cats.size();
+      out.writeNum(cl);
+      for(int i = 1; i <= cl; i++) out.writeBytes(cats.key(i));
+    }
+  }
+  
+  /**
+   * Adds a value. All values are first treated as integer values. If a value
+   * can't be converted to an integer, it is treated as double value. If
+   * conversion fails again, it is handled as string category. Next, all values
+   * are cached. As soon as their number exceeds {@link #MAXCATS}, the cached
+   * values are skipped, and contents are treated as arbitrary strings.
    * @param val value to be added
    */
-  void add(final byte[] val) {
-    if(val.length == 0 || kind == Kind.TEXT) return;
+  public void add(final byte[] val) {
+    if(val == null || val.length == 0 || kind == Kind.TEXT) return;
     
     if(cats != null && cats.size < MAXCATS) {
       if(val.length > MAXCATLEN) {
@@ -72,8 +122,15 @@ public final class StatsKey {
     }
   }
 
-  /** Finishes the key. */
-  public void finish() {
-    if(cats != null && cats.size() == 0) kind = Kind.NONE;
+  @Override
+  public String toString() {
+    switch(kind) {
+      case CAT:  return ", " + cats.size + " values";
+      case DBL:  return ", numeric(" + min + " - " + max + ")";
+      case INT:  return ", numeric(" + (int) min + " - " + (int) max + ")";
+      case TEXT: return ", strings";
+      case NONE: return "";
+    }
+    return null;
   }
 }

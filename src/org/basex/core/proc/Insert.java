@@ -18,7 +18,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Insert extends Updates {
+public final class Insert extends Proc {
   /** Insert option. */
   public static final String FRG = "fragment";
   /** Insert option. */

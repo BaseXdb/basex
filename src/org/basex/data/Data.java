@@ -43,8 +43,6 @@ public abstract class Data  {
   public Names tags;
   /** Attribute name index. */
   public Names atts;
-  /** Statistic data. */
-  public Stats stats;
 
   /** Text index. */
   protected Index txtindex;

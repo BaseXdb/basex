@@ -8,9 +8,13 @@ import org.basex.core.Command;
 import org.basex.core.Commands;
 import org.basex.core.Context;
 import org.basex.core.Prop;
+import org.basex.data.Data;
+import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.io.CachedOutput;
 import org.basex.io.PrintOutput;
+import org.basex.query.QueryException;
+import org.basex.query.xpath.XPathProcessor;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 
@@ -220,6 +224,36 @@ public abstract class Proc extends AbstractProcess {
    */
   protected final boolean timer(final String inf) {
     return info(inf, perf.getTimer());
+  }
+
+  /**
+   * Performs a query for update operations.
+   * @param query query to be performed
+   * @param err if this string is specified, it is thrown if the results
+   * don't yield element nodes
+   * @return resulting node set
+   */
+  protected final Nodes query(final String query, final String err) {
+    try {
+      final XPathProcessor qu = new XPathProcessor(query);
+      progress(qu);
+      final Nodes nodes = qu.queryNodes(context.current());
+      // check if all result nodes are tags
+      if(err != null) {
+        final Data data = context.data();
+        for(int i = nodes.size - 1; i >= 0; i--) {
+          if(data.kind(nodes.pre[i]) != Data.ELEM) {
+            error(err);
+            return null;
+          }
+        }
+      }
+      return nodes;
+    } catch(final QueryException ex) {
+      BaseX.debug(ex);
+      error(ex.getMessage());
+      return null;
+    }
   }
 
   @Override

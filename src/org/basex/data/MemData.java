@@ -196,7 +196,7 @@ public class MemData extends Data {
    */
   public final void addElem(final byte[] t, final int d, final int a,
       final int s, final int k) {
-    addElem(tags.index(t), d, a, s, k);
+    addElem(tags.index(t, null), d, a, s, k);
   }
 
   /**
@@ -264,7 +264,7 @@ public class MemData extends Data {
    * @param p parent
    */
   public final void addAtt(final byte[] a, final byte[] v, final int p) {
-    addAtt(atts.index(a), v, p);
+    addAtt(atts.index(a, v), v, p);
   }
 
   /**

@@ -581,6 +581,8 @@ public interface Text {
   String BUTTONEXEC = lang("b_exec");
   /** Button text for confirming actions. */
   String BUTTONOK = lang("b_ok");
+  /** Button text for confirming actions. */
+  String BUTTONOPT = lang("b_opt");
   /** Button text for opening files. */
   String BUTTONRENAME = lang("b_rename");
   /** Button text for opening files. */
@@ -930,8 +932,6 @@ public interface Text {
   String DBCLOSED = lang("db_closed");
   /** Database not closed. */
   String DBCLOSEERR = lang("db_closeerr");
-  /** Database Optimized. */
-  String DBOPTIMIZED = lang("db_optimized");
   /** Database Dropped. */
   String DBDROPPED = lang("db_dropped");
   /** Database not dropped. */
@@ -942,6 +942,13 @@ public interface Text {
   String DBOPENED = lang("db_opened");
   /** Database exported. */
   String DBEXPORTED = lang("db_exported");
+
+  /** Database Optimized. */
+  String DBOPTIMIZED = lang("db_optimized");
+  /** Database Optimization. */
+  String DBOPT1 = "Statistics rebuilt in %.";
+  /** Database Optimization. */
+  String DBOPTERR1 = "Could not write statistics...";
 
   /** Index created. */
   String DBINDEXED = lang("in_created");
@@ -1148,6 +1155,8 @@ public interface Text {
   String INFOOFF = lang("info_off");
   /** Error info. */
   String INFOERROR = lang("info_error");
+  /** Info on database size. */
+  String INFOSTAT = lang("info_stat");
   
   // HELP TEXTS ===============================================================
 
@@ -1169,6 +1178,8 @@ public interface Text {
   byte[] HELPMODE = token(lang("h_mode"));
   /** Help String. */
   byte[] HELPOK = token(lang("h_ok"));
+  /** Help String. */
+  byte[] HELPOPT = token(lang("h_opt"));
   /** Help String. */
   byte[] HELPRENAMEDB = token(lang("h_renamedb"));
   /** Help String. */

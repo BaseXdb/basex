@@ -11,7 +11,6 @@ import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.border.EmptyBorder;
 import org.basex.BaseX;
 import org.basex.core.Commands;
 import org.basex.core.proc.Find;
@@ -30,8 +29,10 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.gui.view.View;
+import org.basex.index.Names;
 import org.basex.query.xpath.func.ContainsLC;
 import org.basex.util.Set;
+import org.basex.util.StringList;
 import org.basex.util.Token;
 
 /**
@@ -144,9 +145,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
    * Create search categories.
    */
   private void create() {
-    // <LK> initialize statistics
-    //set.init();
-    keys = keys(GUI.context.data().stats);
+    keys = keys(GUI.context.data());
     panel.removeAll();
     addKeys(0);
   }
@@ -253,26 +252,31 @@ final class QuerySimple extends QueryPanel implements ActionListener {
       final BaseXCombo combo = (BaseXCombo) source;
 
       panel.remove(cp + 1);
+
       if(combo.getSelectedIndex() != 0) {
         final String item = combo.getSelectedItem().toString();
-        final StatsKey key = GUI.context.data().stats.get(Token.token(item));
-        switch(key.kind) {
+        final Data data = GUI.context.data();
+        final boolean att = item.startsWith("@");
+        final Names names = att ? data.atts : data.tags;
+        final byte[] key = Token.token(att ? item.substring(1) : item);
+        final StatsKey stat = names.stat(key);
+        switch(stat.kind) {
           case INT:
-            addSlider(key.min, key.max, cp + 1, item.equals("@size"),
+            addSlider(stat.min, stat.max, cp + 1, item.equals("@size"),
                 item.equals("@mtime"), true);
             break;
           case DBL:
-            addSlider(key.min, key.max, cp + 1, false, false, false);
+            addSlider(stat.min, stat.max, cp + 1, false, false, false);
             break;
           case CAT:
-            addCombo(keys(key.cats), cp + 1);
+            addCombo(keys(stat.cats), cp + 1);
             break;
           case TEXT:
             addInput(cp + 1);
             break;
           case NONE:
             final BaseXLabel label = new BaseXLabel("");
-            label.setBorder(new EmptyBorder(3, 0, 0, 0));
+            label.setBorder(3, 0, 0, 0);
             panel.add(label, cp + 1);
             break;
         }
@@ -382,9 +386,30 @@ final class QuerySimple extends QueryPanel implements ActionListener {
   void info(final String info, final boolean ok) { }
 
   /**
-   * Returns a string array with the number of distinct keys
+   * Returns a string array with all distinct keys
    * and the keys of the specified set.
-   * @param set set structure
+   * @param data data reference
+   * @return key array
+   */
+  String[] keys(final Data data) {
+    final StringList sl = new StringList();
+    sl.add("");
+    for(int i = 1; i <= data.tags.size(); i++) {
+      sl.add(Token.string(data.tags.key(i)));
+    }
+    for(int i = 1; i <= data.atts.size(); i++) {
+      sl.add("@" + Token.string(data.atts.key(i)));
+    }
+    final String[] vals = sl.finish();
+    Arrays.sort(vals);
+    vals[0] = "(" + (vals.length - 1) + " entries)";
+    return vals;
+  }
+
+  /**
+   * Returns a string array with all distinct keys
+   * and the keys of the specified set.
+   * @param set keys
    * @return key array
    */
   String[] keys(final Set set) {

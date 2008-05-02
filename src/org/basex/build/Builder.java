@@ -6,7 +6,6 @@ import java.io.IOException;
 import org.basex.core.Progress;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
-import org.basex.data.Stats;
 import org.basex.index.Names;
 
 /**
@@ -31,12 +30,10 @@ public abstract class Builder extends Progress {
   protected Parser parser;
   /** Meta data on built database. */
   protected MetaData meta;
-  /** Document statistics. */
-  protected Stats stats;
   /** Table size. */
   protected int size;
 
-  /** Maximum level depth. */
+  /** Namespace Builder. */
   private NSBuilder ns = new NSBuilder();
   /** Parent stack. */
   private final int[] parStack = new int[CAP];
@@ -46,9 +43,6 @@ public abstract class Builder extends Progress {
   private boolean inDoc;
   /** Current tree height. */
   private int level;
-  
-  /** Attribute token. */
-  private static final byte[] ATT = { '@' };
 
   /**
    * Constructor.
@@ -130,8 +124,6 @@ public abstract class Builder extends Progress {
     parser.parse(this);
     endNode(name);
 
-    // check if the document was regularly closed
-    if(level != 0) error(CLOSEMISS, meta.dbname);
     return finish();
   }
 
@@ -202,35 +194,26 @@ public abstract class Builder extends Progress {
       final byte[][] att, final boolean open) throws IOException {
     
     final byte[] t = utf8(tag, meta.encoding);
-    if(t.length == 0) error(TAGEMPTY, parser.det());
+    final int tok = tags.index(t, null);
 
     // set leaf node information in index and add tag and atts to statistics 
     if(level != 0) {
       if(level == 1 && inDoc) error(MOREROOTS, parser.det(), t);
-      
       tags.noleaf(tagStack[level - 1], true);
-      stats.index(tag, null);
-
-      if(att != null) {
-        for(int i = 0; i < att.length; i += 2) {
-          byte[] a = concat(ATT, att[i]);
-          byte[] v = att[i + 1];
-          stats.index(a, v);
-        }
-      }
     }
 
     // create numeric attribute references and check if they appear only once
     final int attl = att != null ? att.length >> 1 : 0;
     final int[] at = new int[attl];
-    for(int a = 0; a < attl; a++) at[a] = atts.index(att[a << 1]);
+    for(int a = 0; a < attl; a++) {
+      at[a] = atts.index(att[a << 1], att[(a << 1) + 1]);
+    }
     for(int a = 0; a < attl - 1; a++) {
       for(int b = a + 1; b < attl; b++) {
-        if(at[a] == at[b]) error(DUPLATT, parser.det());
+        if(at[a] == at[b]) error(DUPLATT, parser.det(), att[a << 1]);
       }
     }
 
-    final int tok = tags.index(t);
     tagStack[level] = tok;
     parStack[level] = size;
 
@@ -300,11 +283,11 @@ public abstract class Builder extends Progress {
    * @throws IOException in case of parsing or writing problems 
    */
   private void addText(final byte[] txt, final byte type) throws IOException {
-    parStack[level] = size;
+    parStack[level] = size; // ...necessary?
     final byte[] t = utf8(txt, meta.encoding);
     
     // text node processing for statistics 
-    if(type == Data.TEXT) stats.index(tags.key(tagStack[level - 1]), txt);
+    if(type == Data.TEXT) tags.index(tagStack[level - 1], t);
     
     addText(t, level == 0 ? 1 : size - parStack[level - 1], type);
   }

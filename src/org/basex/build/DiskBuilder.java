@@ -10,7 +10,6 @@ import org.basex.core.proc.Drop;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
 import org.basex.data.MetaData;
-import org.basex.data.Stats;
 import org.basex.io.IO;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
@@ -51,7 +50,6 @@ public final class DiskBuilder extends Builder {
     meta.file = parser.file;
     meta.filesize = meta.file.length();
     meta.time = meta.file.date();
-    stats = new Stats(db);
     
     Drop.drop(db);
     IO.dbpath(db).mkdirs();
@@ -88,8 +86,6 @@ public final class DiskBuilder extends Builder {
     IO.dbfile(meta.dbname, DATATMP).delete();
 
     meta.write(size);
-    stats.finish();
-    stats.write();
     // return database instance, excluding indexes
     return new DiskData(meta.dbname, false);
   }

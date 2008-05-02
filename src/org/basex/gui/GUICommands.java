@@ -115,7 +115,7 @@ public enum GUICommands implements GUICommand {
 
       final BaseXFileChooser fc = new BaseXFileChooser(XQOPENTITLE,
           GUIProp.createpath, main);
-      fc.setFilter(Create.XQSUFFIX, CREATEXQDESC);
+      fc.setFilter(IO.XQSUFFIX, CREATEXQDESC);
 
       if(fc.select(BaseXFileChooser.OPEN)) {
         try {
@@ -138,12 +138,12 @@ public enum GUICommands implements GUICommand {
 
       final BaseXFileChooser fc = new BaseXFileChooser(XQSAVETITLE,
           GUIProp.createpath, main);
-      fc.setFilter(Create.XQSUFFIX, CREATEXQDESC);
+      fc.setFilter(IO.XQSUFFIX, CREATEXQDESC);
 
       if(fc.select(BaseXFileChooser.SAVE)) {
         try {
           final IO file = fc.getFile();
-          file.suffix(Create.XQSUFFIX);
+          file.suffix(IO.XQSUFFIX);
           file.write(main.query.getXQuery());
         } catch(final IOException ex) {
           JOptionPane.showMessageDialog(main, XQSAVERROR,

@@ -2,7 +2,6 @@ package org.basex.build;
 
 import org.basex.data.MemData;
 import org.basex.data.MetaData;
-import org.basex.data.Stats;
 
 /**
  * This class creates a memory based database instance.
@@ -22,7 +21,6 @@ public final class MemBuilder extends Builder {
     meta.atvindex = true;
     meta.ftxindex = false;
     meta.file = parser.file;
-    stats = new Stats(db);
     data = new MemData(64, tags, atts);
     data.meta = meta;
     return this;

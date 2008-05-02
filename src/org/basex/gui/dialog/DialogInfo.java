@@ -8,6 +8,7 @@ import java.util.Date;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
+import org.basex.core.Commands;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.gui.GUI;
@@ -78,8 +79,8 @@ public final class DialogInfo extends Dialog {
     set(pp, BorderLayout.CENTER);
 
     set(BaseXLayout.newButtons(this, true,
-        new String[] { BUTTONOK, BUTTONCANCEL },
-        new byte[][] { HELPOK, HELPCANCEL }), BorderLayout.SOUTH);
+        new String[] { BUTTONOPT, BUTTONOK, BUTTONCANCEL },
+        new byte[][] { HELPOPT, HELPOK, HELPCANCEL }), BorderLayout.SOUTH);
 
     //setInfo();
     finish(gui);
@@ -121,5 +122,10 @@ public final class DialogInfo extends Dialog {
     final boolean[] ind = new boolean[indexes.length];
     for(int i = 0; i < indexes.length; i++) ind[i] = indexes[i].isSelected();
     return ind;
+  }
+  
+  @Override
+  public void action(final String cmd) {
+    if(BUTTONOPT.equals(cmd)) GUI.get().execute(Commands.OPTIMIZE);
   }
 }

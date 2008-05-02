@@ -14,7 +14,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Copy extends Updates {
+public final class Copy extends Proc {
   @Override
   protected boolean exec() {
     final Data data = context.data();

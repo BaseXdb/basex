@@ -79,8 +79,6 @@ public final class DiskData extends Data {
   public DiskData(final String db, final boolean index) throws IOException {
     meta = new MetaData(db);
     size = meta.read();
-    stats = new Stats(db);
-    stats.read();
 
     // read indexes
     tags = new Names(db, true);
@@ -122,8 +120,6 @@ public final class DiskData extends Data {
   @Override
   public synchronized void close() throws IOException {
     meta.write(size);
-    stats.write();
-
     tags.finish(meta.dbname);
     atts.finish(meta.dbname);
     cls();
@@ -358,7 +354,7 @@ public final class DiskData extends Data {
   @Override
   public void update(final int pre, final byte[] val) {
     if(kind(pre) == ELEM) {
-      tagID(pre, tags.index(val));
+      tagID(pre, tags.index(val, null));
     } else {
       update(pre, val, true);
     }
@@ -367,7 +363,7 @@ public final class DiskData extends Data {
   @Override
   public void update(final int pre, final byte[] name, final byte[] val) {
     update(pre, val, false);
-    attNameID(pre, atts.index(name));
+    attNameID(pre, atts.index(name, val));
   }
 
   /**
@@ -524,7 +520,7 @@ public final class DiskData extends Data {
       final byte[] tag, final int as, final int s) {
 
     final long id = ++meta.lastid;
-    final int t = tags.index(tag);
+    final int t = tags.index(tag, null);
     table.insert(pre, new byte[] { ELEM, (byte) (t >> 8),
         (byte) t, (byte) as, (byte) (s >> 24), (byte) (s >> 16),
         (byte) (s >> 8), (byte) s, (byte) (dis >> 24),
@@ -570,7 +566,7 @@ public final class DiskData extends Data {
     values.writeBytes(len, val);
 
     // build and insert new entry
-    final int att = atts.index(name);
+    final int att = atts.index(name, val);
     final long id = ++meta.lastid;
     table.insert(pre, new byte[] { ATTR, (byte) (att >> 8), (byte) att,
         (byte) (len >> 32), (byte) (len >> 24), (byte) (len >> 16),

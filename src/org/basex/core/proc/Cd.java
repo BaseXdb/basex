@@ -1,8 +1,6 @@
 package org.basex.core.proc;
 
-import org.basex.core.Prop;
 import org.basex.data.Nodes;
-import org.basex.io.PrintOutput;
 
 /**
  * CD command.
@@ -10,20 +8,13 @@ import org.basex.io.PrintOutput;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Cd extends XPath {
+public final class Cd extends Proc {
   @Override
   protected boolean exec() {
-    final boolean ok = super.exec();
+    final Nodes nodes = query(cmd.args(), null);
+    if(nodes == null) return false;
 
-    if(ok && !(result instanceof Nodes))
-      return error("Result must be a NodeSet.");
-
-    if(result.size() != 0) context.current((Nodes) result);
-    // remove query info
-    if(!Prop.allInfo) error("");
-    return ok;
+    if(nodes.size() != 0) context.current(nodes);
+    return true;
   }
-
-  @Override
-  protected void out(final PrintOutput out) { }
 }

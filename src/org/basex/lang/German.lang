@@ -20,6 +20,7 @@ m_layout=Layout
 
 # Buttons
 b_ok=  OK  
+b_opt=Optimieren...
 b_rename=Umbenennen...
 b_open=Öffnen
 b_cancel=Abbrechen
@@ -405,6 +406,7 @@ info_resultchop=\n...Ausgabe wurde beschnitten.
 info_on=AN
 info_off=AUS
 info_error=Fehler
+info_stat=Datenbank-Statisiken:
 
 # Command Help
 ch_nohelp=Keine Hilfe verfügbar.
@@ -422,8 +424,8 @@ ch_open2=Öffne die spezifizierte [Datenbank].
 ch_info1=Zeige Informationen zur aktuellen Datenbank.
 ch_info21=Zeige Informationen zur aktuell geöffneten Datenbank:
 ch_info22=- kein Argument: zeige allgemeine Information
-ch_info23=: zeige Datenbank Information
-ch_info24=: zeige Index Information
+ch_info23=: zeige Datenbank-Informationen
+ch_info24=: zeige Index-Informationen
 ch_info25= [Start Ende]|[Anfrage]: zeige XML Tabelle
 ch_check0=[Datenbank]
 ch_check1=Öffne existierende [Datenbank], oder erstelle eine neue Datenbank.
@@ -509,7 +511,8 @@ h_exec=Button zur Ausführung von eingegebenen Befehlen.
 h_stop=Button um den Datenbank-Erstellungs Prozess zu stoppen.
 h_cancel=Button zum Schließen des Dialogs und zurückkehren zum Hauptfenster.
 h_mode=Button zum Wechseln zwischen Such-, XPath- und Kommandomodus.\nDieser Button ist nur aktiviert nachdem eine Datenbank geöffnet bzw. erstellt wurde.
-h_ok=Button zum Starten des Prozesses.
+h_ok=Mit diesem Button bestätigen Sie Ihre Auswahl.
+h_opt=Button zum Optimieren der Datenbank.
 h_renamedb=Button zum Umbenennen der Datenbank.
 h_opendb=Button zum Öffnen der ausgewählten Datenbank.
 h_openinfo=Hier werden diverse Informationen über die aktuell ausgewählte Datenbank angezeigt.

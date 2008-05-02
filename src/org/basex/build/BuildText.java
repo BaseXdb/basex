@@ -10,24 +10,20 @@ import org.basex.util.Token;
  */
 public interface BuildText {
   /** Builder error. */
-  String CLOSEMISS = "%: Closing end tag missing.";
-  /** Builder error. */
   String BEFOREROOT = "%: No text allowed before root tag: '%'";
   /** Builder error. */
   String AFTERROOT = "%: No text allowed after closed root tag: '%'";
-  /** Builder error. */
-  String DOCEMPTY = "Document is empty.";
-  /** Tag Mismatch. */
+  /** Builder error: Tag Mismatch. */
   String CLOSINGTAG = "%: </%> found, </%> expected.";
-  /** Tag Mismatch. */
+  /** Builder error: Tag Mismatch. */
   String MOREROOTS = "%: More than one root node: '<%>'";
-  /** Attribute Duplicates. */
-  String DUPLATT = "%: Tag contains duplicate attribute.";
-  /** Empty Tag. */
-  String TAGEMPTY = "%: Empty tag found.";
+  /** Builder error: Attribute Duplicates. */
+  String DUPLATT = "%: Tag contains duplicate attribute '%'.";
   /** Parser Error. */
   String PARSEINVALID = "%: % expected, % found.";
 
+  /** Scanner error. */
+  String DOCEMPTY = "Document is empty.";
   /** Scanner Error. */
   String UNCLOSED = "Unclosed tokens found.";
   /** Scanner Error. */
@@ -77,8 +73,6 @@ public interface BuildText {
   String NOWS = "Whitespace expected, '%' found.";
   /** Scanner Error. */
   String WRONGCHAR = "'%' expected, '%' found.";
-  /** Scanner Error. */
-  String UNEXP = "Unexpected character '%' found.";
   /** Scanner Error. */
   String INVNAME = "Invalid name.";
   /** Scanner Error. */

@@ -7,19 +7,19 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 
 /**
- * Evaluates the 'delete' command. Deletes a node from the table.
+ * Evaluates the 'delete' command. Deletes nodes from the database.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Delete extends Updates {
+public final class Delete extends Proc {
   @Override
   protected boolean exec() {
     final Data data = context.data();
 
-    // retrieve nodes to be deleted...
-    Nodes nodes;
+    // gui mode: use currently marked nodes
     final boolean gui = cmd.nrArgs() == 0;
+    Nodes nodes;
     if(gui) {
       // ...from marked node set
       nodes = context.marked();
@@ -41,8 +41,9 @@ public final class Delete extends Updates {
       data.delete(nodes.pre[i]);
     }
 
-    if(gui && context.current().size > 1 || 
-        context.current().pre[0] == nodes.pre[0]) {
+    // refresh current context
+    final Nodes curr = context.current();
+    if(gui && curr.size > 1 || curr.pre[0] == nodes.pre[0]) {
       context.current(new Nodes(0, data));
     }
     data.flush();

@@ -34,11 +34,11 @@ public final class Info extends XPath {
   protected boolean exec() {
     type = cmd.nrArgs() != 0 ? cmd.arg(0).toLowerCase() : null;
     if(type == null) return true;
+    if(context.data() == null) return error(DBEMPTY);
 
     final int args = cmd.nrArgs();
 
     if(type.equals(TBL)) {
-      if(context.data() == null) return error(DBEMPTY);
       if(args < 2 || Token.toInt(cmd.arg(1)) != Integer.MIN_VALUE) return true;
 
       // evaluate input as xpath
@@ -46,9 +46,8 @@ public final class Info extends XPath {
       return super.exec();
     }
 
-    if(type.equals(IDX) || type.equals(DB)) {
-      return context.data() == null ? error(DBEMPTY) : true;
-    }
+    if(type.equals(IDX) || type.equals(DB)) return true;
+
     throw new IllegalArgumentException();
   }
 

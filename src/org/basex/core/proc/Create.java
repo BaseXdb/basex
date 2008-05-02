@@ -31,9 +31,6 @@ import org.basex.util.Performance;
  * @author Christian Gruen
  */
 public final class Create extends Proc {
-  /** XQuery Suffix. */
-  public static final String XQSUFFIX = ".xq";
-
   /** Create option. */
   public static final String XML = "xml";
   /** Create option. */

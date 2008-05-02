@@ -21,8 +21,11 @@ import org.xml.sax.InputSource;
  * @author Christian Gruen
  */
 public class IO {
+  /** XQuery Suffix. */
+  public static final String XQSUFFIX = ".xq";
   /** XML Suffix. */
   public static final String XMLSUFFIX = ".xml";
+
   /** BlockSize Power. */
   public static final int BLOCKPOWER = 12;
   /** Table NodeSize Power. */

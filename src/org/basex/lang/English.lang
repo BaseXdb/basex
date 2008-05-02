@@ -20,6 +20,7 @@ m_layout=Layout
 
 # Buttons
 b_ok=  OK  
+b_opt=Optimize...
 b_rename=Rename...
 b_open= Open 
 b_cancel=Cancel
@@ -406,6 +407,7 @@ info_resultchop=\n...output was chopped.
 info_on=ON
 info_off=OFF
 info_error=Error
+info_stat=Database Statistics:
 
 # Command Help
 ch_nohelp=Sorry, no help available.
@@ -511,6 +513,7 @@ h_stop=Press this button to stop the database build process.
 h_cancel=Press this button to close the dialog and return to the main window.
 h_mode=Click on the button to switch between the search, XPath and command mode.\nThis button is only active if a database has been opened.
 h_ok=Press this button to start the process.
+h_opt=Press this button to optimize the database.
 h_renamedb=Press this button to rename the chosen database.
 h_opendb=Press this button to open the chosen database.
 h_openinfo=This panel displays some information on the currently selected database.
