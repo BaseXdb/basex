@@ -89,7 +89,7 @@ public final class Drop extends Proc {
   private boolean dropIndex(final Index.TYPE index, final String pat) {
     try {
       final Data data = context.data();
-      data.meta.write(data.size);
+      data.meta.finish(data.size);
       data.closeIndex(index);
       return IO.dbdelete(data.meta.dbname, pat + "..basex") ? info(DBDROP) :
         error(DBDROPERR);

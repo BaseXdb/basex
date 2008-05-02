@@ -284,6 +284,7 @@ public abstract class Data  {
    * @return id array
    */
   public final int[] ids(final Index.TYPE type, final byte[] token) {
+    if(token.length > Token.MAXLEN) return null;
     switch(type) {
       case TXT: return txtindex.ids(token);
       case ATV: return atvindex.ids(token);
@@ -301,7 +302,6 @@ public abstract class Data  {
    */
   public final int nrIDs(final Index.TYPE type, final byte[] token) {
     if(token.length > Token.MAXLEN) return Integer.MAX_VALUE;
-
     switch(type) {
       case TXT: return txtindex.nrIDs(token);
       case ATV: return atvindex.nrIDs(token);
@@ -461,4 +461,13 @@ public abstract class Data  {
    * @param d data instance to copy from
    */
   public abstract void insert(int pre, int par, Data d);
+  
+  /**
+   * Resets indexes and statistics.
+   */
+  public void noIndex() {
+    meta.noIndex();
+    tags.noStats();
+    atts.noStats();
+  }
 }

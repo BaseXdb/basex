@@ -15,8 +15,6 @@ import org.basex.util.Token;
 public final class StatsKey {
   /** Maximum number of categories. */
   private static final int MAXCATS = 50;
-  /** Maximum length of category entries. */
-  private static final int MAXCATLEN = 50;
   /** Kind of Contents. */
   public enum Kind {
     /** Text.     */ TEXT,
@@ -65,8 +63,9 @@ public final class StatsKey {
    * @param out output stream
    * @throws IOException I/O exception
    */
-  public void write(final DataOutput out) throws IOException {
+  public void finish(final DataOutput out) throws IOException {
     if(cats != null && cats.size() == 0) kind = Kind.NONE;
+    
     out.writeNum(kind.ordinal());
     if(kind == Kind.INT || kind == Kind.DBL) {
       out.writeBytes(Token.token(min));
@@ -87,10 +86,11 @@ public final class StatsKey {
    * @param val value to be added
    */
   public void add(final byte[] val) {
-    if(val == null || val.length == 0 || kind == Kind.TEXT) return;
+    if(val == null || val.length == 0 || kind == Kind.TEXT ||
+        Token.ws(val)) return;
     
-    if(cats != null && cats.size < MAXCATS) {
-      if(val.length > MAXCATLEN) {
+    if(cats != null && cats.size() < MAXCATS) {
+      if(val.length > Token.MAXLEN) {
         kind = Kind.TEXT;
         cats = null;
       } else {
@@ -109,13 +109,13 @@ public final class StatsKey {
     if(kind == Kind.DBL) {
       final double d = Token.toDouble(val);
       if(d != d) {
-        kind = cats.size < 10 ? Kind.CAT : Kind.TEXT;
+        kind = cats.size() < MAXCATS ? Kind.CAT : Kind.TEXT;
       } else {
         if(min > d) min = d;
         if(max < d) max = d;
       }
     } else if(kind == Kind.CAT) {
-      if(cats.size == MAXCATS) {
+      if(cats.size() == MAXCATS) {
         kind = Kind.TEXT;
         cats = null;
       }
@@ -125,7 +125,7 @@ public final class StatsKey {
   @Override
   public String toString() {
     switch(kind) {
-      case CAT:  return ", " + cats.size + " values";
+      case CAT:  return ", " + cats.size() + " values";
       case DBL:  return ", numeric(" + min + " - " + max + ")";
       case INT:  return ", numeric(" + (int) min + " - " + (int) max + ")";
       case TEXT: return ", strings";

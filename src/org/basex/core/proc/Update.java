@@ -38,7 +38,7 @@ public final class Update extends Proc {
     }
     if(nodes == null) return false;
 
-    data.meta.noIndex();
+    data.noIndex();
 
     if(kind == Data.ELEM) return tag(nodes, cmd.arg(1));
     if(kind == Data.ATTR) return attribute(nodes, cmd.arg(1), cmd.arg(2));

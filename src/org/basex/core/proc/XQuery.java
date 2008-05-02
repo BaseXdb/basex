@@ -124,11 +124,8 @@ public class XQuery extends Proc {
     } catch(final QueryException ex) {
       BaseX.debug(ex);
       return error(ex.getMessage());
-    } catch(final RuntimeException ex) {
-      if(ex.getClass() == RuntimeException.class) return false;
-      ex.printStackTrace();
-      return error("Implementation Bug? " +  ex.getClass().getSimpleName());
     } catch(final Exception ex) {
+      if(ex.getClass() == RuntimeException.class) return false;
       ex.printStackTrace();
       return error("Implementation Bug? " +  ex.getClass().getSimpleName());
     }

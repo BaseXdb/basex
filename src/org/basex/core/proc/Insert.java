@@ -60,7 +60,7 @@ public final class Insert extends Proc {
     }
     if(nodes == null) return false;
 
-    data.meta.noIndex();
+    data.noIndex();
 
     final String spos = kind == Data.PI ? cmd.arg(3) : cmd.arg(2);
     final int pos = gui || kind == Data.ATTR ? 0 : Token.toInt(spos);

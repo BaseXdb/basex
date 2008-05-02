@@ -35,7 +35,7 @@ public final class Copy extends Proc {
     }
     if(source == null || target == null) return false;
 
-    data.meta.noIndex();
+    data.noIndex();
 
     final int size = source.size;
     final Data[] srcDocs = new Data[source.size];

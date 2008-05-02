@@ -14,6 +14,7 @@ import javax.swing.BoxLayout;
 import org.basex.BaseX;
 import org.basex.core.Commands;
 import org.basex.core.proc.Find;
+import org.basex.core.proc.Optimize;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.StatsKey;
@@ -307,7 +308,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     boolean first = true;
     for(int c = 0; c < cs; c += 2) {
       final int k = ((BaseXCombo) panel.getComponent(c)).getSelectedIndex();
-      if(k == 0) continue;
+      if(k <= 0) continue;
       String key = keys[k];
       final boolean attr = keys[k].startsWith("@");
 
@@ -392,12 +393,16 @@ final class QuerySimple extends QueryPanel implements ActionListener {
    * @return key array
    */
   String[] keys(final Data data) {
+    if(!data.tags.stats()) Optimize.stats(data);
+    
     final StringList sl = new StringList();
     sl.add("");
     for(int i = 1; i <= data.tags.size(); i++) {
+      if(data.tags.counter(i) == 0) continue;
       sl.add(Token.string(data.tags.key(i)));
     }
     for(int i = 1; i <= data.atts.size(); i++) {
+      if(data.atts.counter(i) == 0) continue;
       sl.add("@" + Token.string(data.atts.key(i)));
     }
     final String[] vals = sl.finish();

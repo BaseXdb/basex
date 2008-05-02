@@ -108,10 +108,9 @@ public final class DiskData extends Data {
       table.flush();
       texts.flush();
       values.flush();
-      meta.write(size);
+      meta.finish(size);
       tags.finish(meta.dbname);
       atts.finish(meta.dbname);
-
     } catch(final IOException e) {
       e.printStackTrace();
     }
@@ -119,7 +118,7 @@ public final class DiskData extends Data {
 
   @Override
   public synchronized void close() throws IOException {
-    meta.write(size);
+    meta.finish(size);
     tags.finish(meta.dbname);
     atts.finish(meta.dbname);
     cls();

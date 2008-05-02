@@ -2,7 +2,6 @@ package org.basex.index;
 
 import static org.basex.data.DataText.*;
 import java.io.IOException;
-
 import org.basex.data.StatsKey;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
@@ -28,7 +27,7 @@ public final class Names extends Set {
   /** Index type (tags/attribute names). */
   private final boolean tag;
   /** Statistics flag. */
-  private final boolean stats;
+  private boolean stats;
 
   /**
    * Empty Constructor.
@@ -56,8 +55,8 @@ public final class Names extends Set {
     counter = in.readNums();
     noleaf = in.readBooleans();
     size = in.readNum();
-    stat = new StatsKey[size];
     stats = in.readBool();
+    stat = new StatsKey[size];
     for(int s = 1; s < size; s++) stat[s] = new StatsKey(in);
     tag = t;
     in.close();
@@ -101,7 +100,7 @@ public final class Names extends Set {
     out.writeBooleans(noleaf);
     out.writeNum(size);
     out.writeBool(stats);
-    for(int s = 1; s < size; s++) stat[s].write(out);
+    for(int s = 1; s < size; s++) stat[s].finish(out);
     out.close();
   }
 
@@ -129,6 +128,17 @@ public final class Names extends Set {
    */
   public boolean stats() {
     return stats;
+  }
+
+  /**
+   * Removes the statistics.
+   */
+  public void noStats() {
+    stats = false;
+    for(int i = 1; i < size; i++) {
+      stat[i] = new StatsKey();
+      counter[i] = 0;
+    }
   }
 
   /**
@@ -164,6 +174,7 @@ public final class Names extends Set {
     // print all entries in descending number of occurrences
     for(int i = 1; i < size; i++) {
       final int s = ids[i];
+      if(counter[s] == 0) continue;
       final byte[] key = keys[s];
       sb.append(i + ": " + Token.string(key));
       for(int j = 0; j < len - key.length; j++) sb.append(' ');

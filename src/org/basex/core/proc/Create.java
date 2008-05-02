@@ -263,7 +263,7 @@ public final class Create extends Proc {
         throw new IllegalArgumentException();
       }
 
-      data.meta.write(data.size);
+      data.meta.finish(data.size);
       buildIndex(index, data);
       return inf ? timer(DBINDEXED) : true;
     } catch(final IOException ex) {

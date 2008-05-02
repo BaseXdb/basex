@@ -134,7 +134,7 @@ public final class MetaData {
    * @param siz current database size
    * @throws IOException IO Exception
    */
-  public synchronized void write(final int siz) throws IOException {
+  public synchronized void finish(final int siz) throws IOException {
     final DataOutput inf = new DataOutput(dbname, DATAINFO);
     writeInfo(inf, DBSTORAGE, STORAGE);
     writeInfo(inf, IDBSTORAGE, ISTORAGE);
@@ -150,7 +150,6 @@ public final class MetaData {
     writeInfo(inf, DBFTXINDEX, ftxindex);
     writeInfo(inf, DBTIME, Long.toString(time));
     writeInfo(inf, DBLASTID, Long.toString(lastid));
-    
     inf.writeString("");
     inf.close();
   }

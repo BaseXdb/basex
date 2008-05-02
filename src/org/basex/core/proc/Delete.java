@@ -32,7 +32,7 @@ public final class Delete extends Proc {
     if(nodes.size == 0) return true;
     
     // reset indexes
-    data.meta.noIndex();
+    data.noIndex();
 
     // delete all nodes
     final int size = nodes.size;

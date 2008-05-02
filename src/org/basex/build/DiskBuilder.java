@@ -85,7 +85,7 @@ public final class DiskBuilder extends Builder {
     
     IO.dbfile(meta.dbname, DATATMP).delete();
 
-    meta.write(size);
+    meta.finish(size);
     // return database instance, excluding indexes
     return new DiskData(meta.dbname, false);
   }
