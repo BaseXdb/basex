@@ -8,7 +8,7 @@ import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.io.IO;
 import org.basex.util.Token;
-
+ 
 /**
  * This class parses the tokens that are delivered by the
  * {@link XMLScanner} and sends them to the specified database builder.

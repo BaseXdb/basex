@@ -188,7 +188,7 @@ public final class FSUtils {
     int n = pre;    
     // Wie weit das Verzeichnis reicht
     int size = data.size(n, kind) + n;
-    // Zu erstem file/dir springen
+    // Zu erstem file/dir springen    
     n += data.attSize(n, kind);
     // Ergebnisarray 
     IntList res = new IntList();

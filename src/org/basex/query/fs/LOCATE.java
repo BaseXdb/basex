@@ -10,6 +10,7 @@ import org.basex.query.xpath.XPathProcessor;
 import org.basex.data.Nodes;
 import org.basex.util.GetOpts;
 import org.basex.util.IntList;
+import org.basex.util.Token;
 
 /**
  * Performs a locate command.
@@ -43,6 +44,9 @@ public class LOCATE {
 
   /** filename to search for. */
   private String fileToFind;
+  
+  /** filename to search for. */
+  private byte[] fileToFindByte;
 
   /** Counter of files found. */
   private int filesfound;
@@ -110,8 +114,9 @@ public class LOCATE {
       }
       ch = g.getopt();
     }
-
     fileToFind = g.getPath();
+    fileToFindByte = fileToFind.getBytes();
+    
     if(fileToFind == null) {
       out.print("usage: locate  [-l limit] [-c] [-h] -V 1 ...");
       out.print(NL);
@@ -156,16 +161,16 @@ public class LOCATE {
 
       for(int i : contentDir) {        
         if(FSUtils.isDir(data, i)) {
-          String filefound = FSUtils.getFileName(data, i);
-          if(fileToFind.equalsIgnoreCase(filefound)) {
+          byte[] name = FSUtils.getName(data, i);
+          if(Token.eq(name, fileToFindByte)) {
             printDir(i);
           } else {
             res.add(i);
           }
         } else if(FSUtils.isFile(data, i)) {
           // if found print with path      
-          String filefound = FSUtils.getFileName(data, i);
-          if(fileToFind.equalsIgnoreCase(filefound)) {
+          byte[] name = FSUtils.getName(data, i);                 
+          if(Token.eq(name, fileToFindByte)) {
             ++filesfound;
             if(!cFlag) {
               out.print(FSUtils.getPath(data, i));
