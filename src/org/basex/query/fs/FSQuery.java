@@ -118,8 +118,8 @@ public final class FSQuery {
    */
   public void rm(final String cmd, final PrintOutput out) 
   throws IOException {
-    RM rm = new RM(context, out);
-    rm.rmMain(cmd);    
+ //  RM rm = new RM(context, out);
+//   rm.rmMain(cmd);    
     out.print(NL);
   }
 }
