@@ -203,16 +203,41 @@ public final class FSUtils {
   }
   
   /**
-   * Returns the pre value of a dir.
+   * Returns the pre value of a file or a dir.
    *  
    * @param data - the data table
    * @param pre - pre value of the "parent" directory
-   * @param dir - directory name
+   * @param file - directory name
+   * @param kind - kind value of dir (elem)
+   * @return -  all pre values of all files
+   */
+  public static int getSpecificFileOrDir(final Data data, final int pre,
+      final byte[] file, final int kind) {
+    int n = pre;        
+    // Wie weit das Verzeichnis reicht
+    int size = data.size(n, kind) + n;
+    // Zu erstem file/dir springen
+    n += data.attSize(n, data.kind(n));
+    while(n < size) {
+      if(Token.eq(getName(data, n), file)) {
+         return n; 
+        }
+      n += data.size(n, kind);
+    }    
+    return -1;
+  }
+  
+  /**
+   * Returns the pre value of a file.
+   *  
+   * @param data - the data table
+   * @param pre - pre value of the "parent" directory
+   * @param file - directory name
    * @param kind - kind value of dir (elem)
    * @return -  all pre values of all files
    */
   public static int getSpecificFile(final Data data, final int pre,
-      final byte[] dir, final int kind) {
+      final byte[] file, final int kind) {
     int n = pre;        
     // Wie weit das Verzeichnis reicht
     int size = data.size(n, kind) + n;
@@ -222,7 +247,7 @@ public final class FSUtils {
     while(n < size) {
       if(isFile(data , n)) {
         // pre speichern
-        if(Token.eq(getName(data, n), dir)) {
+        if(Token.eq(getName(data, n), file)) {
          return n; 
         }
       }

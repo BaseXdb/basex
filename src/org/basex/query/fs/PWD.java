@@ -78,7 +78,7 @@ public class PWD {
     if(g.getPath() != null) {      
       curDirPre = FSUtils.goToDir(data, curDirPre, g.getPath());      
       if(curDirPre == -1) {
-        throw new PathNotFoundException("cd", g.getPath());
+        throw new PathNotFoundException("pwd", g.getPath());
       }
     }
     out.print(FSUtils.getPath(data, curDirPre));

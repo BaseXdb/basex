@@ -17,7 +17,7 @@ public class GREP {
 
   /** Data reference. */
   private final Context context;
-  
+
   /** Data reference. */
   private final Data data;
 
@@ -33,7 +33,7 @@ public class GREP {
   /** Shows if an error occurs. */
   private boolean fAccomplished;
 
-  
+
   /**
    * Simplified Constructor.
    * @param ctx data context
@@ -86,7 +86,7 @@ public class GREP {
       ch = g.getopt();
     }
 
-    
+
     // Version -  1 = use table
     //            2 = use xquery
     //            3 = use xquery + index
@@ -98,9 +98,12 @@ public class GREP {
         break;
       case '3':
         break;
+      default:
+        grepTable();
+      break;
     }
   }
-  
+
   /**
    *  Performs a grep command.
    *   
@@ -108,9 +111,10 @@ public class GREP {
    */
   private void grepTable() throws IOException {
     out.print("Perform grep: " + curDirPre + " " + data.size);
+    
   }
 
-  
+
   /**
    * Print the help.
    * 

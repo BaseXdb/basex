@@ -75,30 +75,31 @@ public class LOCATE {
   public void locateMain(final String cmd) 
   throws IOException {
 
-    GetOpts g = new GetOpts(cmd, "l:chV:");
+    GetOpts g = new GetOpts(cmd, "chl:V:");
     char version = (char) -1;
     int limit = -1;
     // get all Options
     int ch = g.getopt();
     while (ch != -1) {
       switch (ch) {
-        case 'l':
-          // Limit output to number of file names and exit.
-          limit = Integer.parseInt(g.getOptarg());
-          lFlag = true;
-          break;
         case 'c':
           //Suppress normal output; instead print a 
           //count of matching file names.
           cFlag = true;
           break;
-        case 'V':
-          version = g.getOptarg().charAt(0);
-          break;          
         case 'h':
           printHelp();
           fAccomplished = true;
           break;
+
+        case 'l':
+          // Limit output to number of file names and exit.
+          limit = Integer.parseInt(g.getOptarg());
+          lFlag = true;
+          break;          
+        case 'V':
+          version = g.getOptarg().charAt(0);
+          break;          
         case ':':         
           fError = true;
           out.print("ls: missing argument");
@@ -203,6 +204,8 @@ public class LOCATE {
     int lastSlash = 0;
     int lastrIndexOfSlash = fileToFind.lastIndexOf('/');
 
+    
+    
     if(slash > 0) {
       query = "//*[@name='" + fileToFind.substring(lastSlash, slash) + "']";
       while(slash < lastrIndexOfSlash) {

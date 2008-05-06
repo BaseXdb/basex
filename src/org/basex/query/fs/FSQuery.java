@@ -95,5 +95,31 @@ public final class FSQuery {
     out.print(NL);
   }
 
-
+  /**
+   * Perform grep.
+   * 
+   * @param cmd options
+   * @param out output stream
+   * @throws IOException in case of problems with the PrintOutput
+   */
+  public void grep(final String cmd, final PrintOutput out) 
+  throws IOException {
+    GREP grep = new GREP(context, out);
+    grep.grepMain(cmd);    
+    out.print(NL);
+  }
+  
+  /**
+   * Perform rm.
+   * 
+   * @param cmd options
+   * @param out output stream
+   * @throws IOException in case of problems with the PrintOutput
+   */
+  public void rm(final String cmd, final PrintOutput out) 
+  throws IOException {
+    RM rm = new RM(context, out);
+    rm.rmMain(cmd);    
+    out.print(NL);
+  }
 }

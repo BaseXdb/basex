@@ -23,10 +23,11 @@ public final class Fs extends Proc {
   /** Create option. */
   public static final String TOUCH = "touch";
   /** Create option. */
-  public static final String RM = "rm";
+  public static final String GREP = "grep";
   /** Create option. */
   public static final String LOCATE = "locate";
-
+  /** Create option. */
+  public static final String RM = "rm";
 
 
 
@@ -40,7 +41,8 @@ public final class Fs extends Proc {
     query = new FSQuery(context);
     comm = cmd.arg(0).toLowerCase();
     return comm.equals(DU) || comm.equals(LS) || comm.equals(PWD) ||
-    comm.equals(CD) || comm.equals(LOCATE);
+    comm.equals(CD) || comm.equals(LOCATE) || comm.equals(GREP) || 
+    comm.equals(RM);
   }
 
 
@@ -55,7 +57,11 @@ public final class Fs extends Proc {
     } else if(comm.equals(CD)) {      
       query.cd(cmd.args(), out);     
     } else if(comm.equals(LOCATE)) {      
-      query.locate(cmd.args(), out);    
+      query.locate(cmd.args(), out);
+    } else if(comm.equals(GREP)) {      
+      query.grep(cmd.args(), out);  
+    } else if(comm.equals(RM)) { 
+      query.rm(cmd.args(), out); 
     }
     if(Prop.info) timer(PROCTIME);
   }
