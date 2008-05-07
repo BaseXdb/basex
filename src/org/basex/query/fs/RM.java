@@ -3,7 +3,6 @@ package org.basex.query.fs;
 import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.data.Data;
-import org.basex.data.StatsKey.Kind;
 import org.basex.io.PrintOutput;
 import org.basex.util.GetOpts;
 
@@ -73,19 +72,17 @@ public class RM {
       ch = g.getopt();
     }
 
-    // if there is path expression go to dir
-    Data data = context.data();
+    // if there is path expression remove it     
     if(g.getPath() != null) {      
       remove(g.getPath());
-    }
+    } 
   }
 
   /**
    * Performs an rm command.
    *  
-   *  @param pre Value of the dir 
    *  @param path The name of the file
-   * @throws IOException 
+   *  @throws IOException in case of problems with the PrintOutput 
    */
   private void remove(final String path) throws IOException {
 

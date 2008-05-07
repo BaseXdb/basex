@@ -65,7 +65,7 @@ public final class FSQuery {
     out.print(NL);
   }
 
- 
+
 
   /**
    * Perform cd.
@@ -80,7 +80,7 @@ public final class FSQuery {
     cd.cdMain(cmd);    
     out.print(NL);
   }
-  
+
   /**
    * Perform locate.
    * 
@@ -108,7 +108,7 @@ public final class FSQuery {
     grep.grepMain(cmd);    
     out.print(NL);
   }
-  
+
   /**
    * Perform rm.
    * 
@@ -118,8 +118,8 @@ public final class FSQuery {
    */
   public void rm(final String cmd, final PrintOutput out) 
   throws IOException {
- //  RM rm = new RM(context, out);
-//   rm.rmMain(cmd);    
+    RM rm = new RM(context, out);
+    rm.rmMain(cmd);    
     out.print(NL);
   }
 }
