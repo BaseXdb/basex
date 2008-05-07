@@ -1,5 +1,8 @@
 package org.basex.build;
 
+import static org.basex.Text.*;
+
+import java.io.IOException;
 import org.basex.data.MemData;
 import org.basex.data.MetaData;
 
@@ -21,13 +24,18 @@ public final class MemBuilder extends Builder {
     meta.atvindex = true;
     meta.ftxindex = false;
     meta.file = parser.file;
-    data = new MemData(64, tags, atts);
+    data = new MemData(64, tags, atts, ns);
     data.meta = meta;
     return this;
   }
 
   @Override
-  public MemData finish() {
+  public MemData finish() throws IOException {
+    // check if data ranges exceed database limits
+    if(size > 0x1FFFFF) throw new IOException(LIMITRANGE);
+    if(tags.size() > 0xFF) throw new IOException(LIMITTAGS);
+    if(atts.size() > 0xFF) throw new IOException(LIMITATTS);
+
     data.initNames();
     return data;
   }
@@ -58,6 +66,6 @@ public final class MemBuilder extends Builder {
 
   @Override
   protected void addSize(final int pre) {
-    data.finishTag(pre);
+    data.finishElem(pre);
   }
 }

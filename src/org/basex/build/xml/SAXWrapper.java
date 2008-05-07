@@ -93,14 +93,17 @@ public final class SAXWrapper extends Parser {
     @Override
     public void startElement(final String uri, final String ln, final String qn,
         final Attributes at) throws SAXException {
-      
+
      try {
         finishText();
         final int as = at.getLength();
-        final byte[][] atts = new byte[as << 1][];
-        for(int a = 0; a < as; a++) {
-          atts[a << 1] = Token.token(at.getQName(a));
-          atts[(a << 1) + 1] = Token.token(at.getValue(a));
+        byte[][] atts = null;
+        if(as != 0) {
+          atts = new byte[as << 1][];
+          for(int a = 0; a < as; a++) {
+            atts[a << 1] = Token.token(at.getQName(a));
+            atts[(a << 1) + 1] = Token.token(at.getValue(a));
+          }
         }
         builder.startNode(Token.token(qn), atts);
         nodes++;
@@ -132,7 +135,7 @@ public final class SAXWrapper extends Parser {
       
       try {
         finishText();
-        builder.pi(Token.token(name + ' ' + val));
+        builder.pi(new TokenBuilder(name + ' ' + val));
         nodes++;
       } catch(final IOException ex) {
         error(ex);
@@ -145,7 +148,7 @@ public final class SAXWrapper extends Parser {
       
       try {
         finishText();
-        builder.comment(Token.token(new String(ch, s, l)));
+        builder.comment(new TokenBuilder(new String(ch, s, l)));
         nodes++;
       } catch(final IOException ex) {
         error(ex);
@@ -161,7 +164,7 @@ public final class SAXWrapper extends Parser {
      */
     private void finishText() throws IOException {
       if(tb.size == 0) return;
-      builder.text(tb.finish(), false);
+      builder.text(tb, false);
       tb.reset();
       nodes++;
     }
@@ -181,26 +184,22 @@ public final class SAXWrapper extends Parser {
     /* public InputSource resolveEntity(String pub, String sys) { } */
 
     // DTDHandler
-    /* public void notationDecl(String name, String pub, String sys) { */
+    /* public void notationDecl(String name, String pub, String sys) { } */
     /* public void unparsedEntityDecl(final String name, final String pub,
-        final String sys, final String not) { */
+        final String sys, final String not) { } */
 
     // ContentHandler
     /*public void setDocumentLocator(final Locator locator) { } */
     /*public void startDocument() { } */
-    /*public void endDocument() { */
+    /*public void endDocument() { } */
 
     @Override
     public void startPrefixMapping(final String prefix, final String uri) {
       builder.startNS(Token.token(prefix), Token.token(uri));
     }
     
-    @Override
-    public void endPrefixMapping(final String prefix) {
-      builder.endNS(Token.token(prefix));
-    }
-    
-    /*public void ignorableWhitespace(char[] ch, int s, int l) { */
+    /*public void endPrefixMapping(final String prefix) { } */
+    /*public void ignorableWhitespace(char[] ch, int s, int l) { } */
     /*public void skippedEntity(final String name) { } */
     
     // ErrorHandler

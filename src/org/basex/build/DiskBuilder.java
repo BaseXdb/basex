@@ -1,5 +1,6 @@
 package org.basex.build;
 
+import static org.basex.Text.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
 import org.basex.BaseX;
@@ -67,27 +68,33 @@ public final class DiskBuilder extends Builder {
 
   @Override
   protected Data finish() throws IOException {
+    // check if data ranges exceed database limits
+    if(tags.size() > 0xFFFF) throw new IOException(LIMITTAGS);
+    if(atts.size() > 0xFFFF) throw new IOException(LIMITATTS);
+    
     // close files
-    tags.finish(meta.dbname);
-    atts.finish(meta.dbname);
+    final String db = meta.dbname;
+    tags.finish(db);
+    atts.finish(db);
+    ns.finish(db);
+    meta.finish(size);
     close();
     
     // write size attribute into main table
-    final TableAccess ta = new TableDiskAccess(meta.dbname, DATATBL);
-    final DataInput in = new DataInput(meta.dbname, DATATMP);
+    final TableAccess ta = new TableDiskAccess(db, DATATBL);
+    final DataInput in = new DataInput(db, DATATMP);
     for(int pre = 0; pre < ssize; pre++) {
       final int pp = in.readNum();
       final int sz = in.readNum();
       ta.write4(pp, 4, sz);
     }
-    in.close();
     ta.close();
+    in.close();
     
-    IO.dbfile(meta.dbname, DATATMP).delete();
+    IO.dbfile(db, DATATMP).delete();
 
-    meta.finish(size);
-    // return database instance, excluding indexes
-    return new DiskData(meta.dbname, false);
+    // return database instance
+    return new DiskData(db, false);
   }
   
   @Override
@@ -136,6 +143,7 @@ public final class DiskBuilder extends Builder {
       tout.write(a + 1);
       tout.writeInt(size++);
     }
+    if(size < 0) throw new IOException(LIMITRANGE);
   }
 
   @Override
@@ -175,10 +183,10 @@ public final class DiskBuilder extends Builder {
     
     // get filename(s) or use default
     //final String[] fn = args.length > 0 ? args : new String[] { "input.xml" };
-    final String[] fn = new String[] { "/home/dbis/xml/11mb.xml" };    
+    final String[] fn = new String[] { "/home/db/xml/11mb.xml" };    
     int runs = 2;
-    run(runs, fn, false);
     run(runs, fn, true);
+    run(runs, fn, false);
   }
 
   /**

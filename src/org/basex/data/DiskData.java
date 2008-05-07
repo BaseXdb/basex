@@ -3,10 +3,12 @@ package org.basex.data;
 import static org.basex.Text.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
+
 import org.basex.core.Prop;
 import org.basex.index.Fuzzy;
 import org.basex.index.Index;
 import org.basex.index.Names;
+import org.basex.index.Namespaces;
 import org.basex.index.Values;
 import org.basex.index.WordsCTANew;
 import org.basex.io.DataAccess;
@@ -30,7 +32,7 @@ import org.basex.util.Token;
  *
  * <pre>
  *  ELEMENTS:
- * - Byte     0: Node kind (TAG)
+ * - Byte     0: Node kind (ELEM/DOC)
  * - Byte   1-2: Tag Reference
  * - Byte     3: Number of attributes
  * - Byte  4- 7: Number of descendants (size)
@@ -83,6 +85,7 @@ public final class DiskData extends Data {
     // read indexes
     tags = new Names(db, true);
     atts = new Names(db, false);
+    ns = new Namespaces(db);
 
     // main memory mode.. keep table in memory
     table = Prop.mainmem ? new TableMemAccess(db, DATATBL, size) :
@@ -97,7 +100,6 @@ public final class DiskData extends Data {
         if (Prop.fuzzyindex) openIndex(Index.TYPE.FUY, new Fuzzy(db));
         else openIndex(Index.TYPE.FTX, new WordsCTANew(db));
       }
-      
     }
     initNames();
   }

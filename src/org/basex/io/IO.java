@@ -109,6 +109,7 @@ public class IO {
       if(content || url) return new CachedInput(content());
       return new BufferInput(name);
     } catch(final IOException ex) {
+      ex.printStackTrace();
       BaseX.notexpected();
       return null;
     }

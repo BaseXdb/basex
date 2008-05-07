@@ -41,12 +41,12 @@ public final class XMLParser extends Parser {
     scanner.more();
     while(true) {
       if(scanner.type == Type.TEXT) {
-        builder.text(scanner.token.finish(), scanner.ws);
+        builder.text(scanner.token, scanner.ws);
       } else if(scanner.type == Type.COMMENT) {
-        builder.comment(scanner.token.finish());
+        builder.comment(scanner.token);
       } else if(scanner.type == Type.DTD) {
       } else if(scanner.type == Type.PI) {
-        builder.pi(scanner.token.finish()); 
+        builder.pi(scanner.token); 
       } else {
         if(!parseTag()) break;
         continue;

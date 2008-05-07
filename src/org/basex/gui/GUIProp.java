@@ -125,6 +125,8 @@ public final class GUIProp {
 
   /** Flag for displaying the menu in the GUI window. */
   public static boolean showmenu = true;
+  /** Flag for activated real tree view. */
+  public static boolean showreal = false;
 
   /** Flag for activated result view after starting. */
   public static boolean showstarttext = false;

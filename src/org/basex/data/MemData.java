@@ -4,6 +4,7 @@ import org.basex.BaseX;
 import org.basex.index.Index;
 import org.basex.index.MemValues;
 import org.basex.index.Names;
+import org.basex.index.Namespaces;
 import org.basex.io.PrintOutput;
 import org.basex.util.Array;
 import org.basex.util.Token;
@@ -16,20 +17,20 @@ import org.basex.query.xpath.expr.FTOption;
  * 
  * <pre>
  * ELEMENTS:
- * - Bit 0-2   : Node kind (TAG)
+ * - Bit 0-2   : Node kind (ELEM/DOC)
  * - Bit 3-7   : Number of attributes
  * - Byte  1- 3: Number of descendants (size)
- * - Byte  4   : Tag Reference
+ * - Byte  4   : Tag name
  * - Byte  5- 7: Relative parent reference
  * TEXT NODES:
- * - Byte     0: Node kind (TEXT/PI/COMM)
+ * - Bit 0-2   : Node kind (TEXT/PI/COMM)
  * - Byte  0- 3: Text reference
- * - Byte  4- 7: Parent Reference
+ * - Byte  5- 7: Relative parent reference
  * ATTRIBUTE NODES:
- * - Byte     0: Node kind (ATTR)
- * - Byte     1: Attribute name reference
- * - Byte     2: Relative parent reference
- * - Byte  4- 7: Attribute value Reference
+ * - Bit 0-2   : Node kind (ATTR)
+ * - Byte  0- 3: Attribute value
+ * - Byte     4: Attribute name
+ * - Byte     7: Relative parent reference
  * </pre>
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
@@ -44,13 +45,16 @@ public class MemData extends Data {
    * @param cap initial array capacity
    * @param tag tag index
    * @param att attribute name index
+   * @param n namespaces
    */
-  public MemData(final int cap, final Names tag, final Names att) {
+  public MemData(final int cap, final Names tag, final Names att,
+      final Namespaces n) {
     val = new long[cap];
     txtindex = new MemValues();
     atvindex = new MemValues();
     tags = tag;
     atts = att;
+    ns = n;
   }
 
   @Override
@@ -243,7 +247,7 @@ public class MemData extends Data {
    * Adds the size value to the table.
    * @param pre closing pre tag
    */
-  public final void finishTag(final int pre) {
+  public final void finishElem(final int pre) {
     val[pre] = (val[pre] & 0xFF000000FFFFFFFFL) + ((long) (size - pre) << 32);
   }
 

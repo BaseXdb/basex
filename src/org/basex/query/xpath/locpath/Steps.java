@@ -99,7 +99,7 @@ public final class Steps {
   }
 
   /**
-   * Optimizes the predicates.
+   * Optimizes the location steps.
    * @param ctx query context
    * @return false if location step yields no results
    * @throws QueryException evaluation exception

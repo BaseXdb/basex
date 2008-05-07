@@ -4,6 +4,7 @@ import java.io.IOException;
 import org.basex.build.fs.FSText;
 import org.basex.index.Index;
 import org.basex.index.Names;
+import org.basex.index.Namespaces;
 import org.basex.io.PrintOutput;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -43,6 +44,8 @@ public abstract class Data  {
   public Names tags;
   /** Attribute name index. */
   public Names atts;
+  /** Attribute name index. */
+  public Namespaces ns;
 
   /** Text index. */
   protected Index txtindex;

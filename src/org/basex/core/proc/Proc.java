@@ -79,7 +79,7 @@ public abstract class Proc extends AbstractProcess {
     // database does not exist...
     final Commands comm = cmd.name;
     if(comm.data() && context.data() == null) return error(PROCNODB);
-    if(comm.updating() && Prop.mainmem) return error(PROCMM);
+    if(comm.updating() && (Prop.mainmem || Prop.onthefly)) return error(PROCMM);
 
     try {
       // wrong number of arguments...

@@ -43,7 +43,7 @@ public abstract class View extends BaseXPanel {
   /** Working flag. */
   public static boolean working;
   
-  /** Currently marked node (pre value). */
+  /** Currently focused node (pre value). */
   public static int focused = -1;
   /** Current FTPrePos values. **/
   public static int[][] ftPos;

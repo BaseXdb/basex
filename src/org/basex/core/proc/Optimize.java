@@ -1,9 +1,7 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
-
 import java.io.IOException;
-
 import org.basex.data.Data;
 
 /**
@@ -20,7 +18,7 @@ public final class Optimize extends Proc {
     if(!stats(data)) return error(DBOPTERR1);
     timer(DBOPT1 + NL);
 
-    // rebuild indexes, minimize data files... not quite finished
+    // minimize and rewrite textual database contents... not quite finished
     return true;
   }
 
@@ -62,9 +60,9 @@ public final class Optimize extends Proc {
       data.tags.finish(data.meta.dbname);
       data.atts.finish(data.meta.dbname);
       data.meta.finish(data.size);
-      return true;
     } catch(final IOException ex) {
       return false;
     }
+    return true;
   }
 }

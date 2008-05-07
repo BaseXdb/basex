@@ -891,6 +891,12 @@ public interface Text {
   String INDUPDATE = lang("pc_indupdate");
   /** Builder error. */
   String CANCELCREATE = lang("pc_cancel");
+  /** Builder error. */
+  String LIMITRANGE = lang("pc_range");
+  /** Builder error. */
+  String LIMITTAGS = lang("pc_tags");
+  /** Builder error. */
+  String LIMITATTS = lang("pc_atts");
   /** Create Database information. */
   String NODESPARSED = " " + lang("pc_parse");
   /** Scanner Position. */

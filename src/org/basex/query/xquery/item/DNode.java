@@ -255,6 +255,7 @@ public final class DNode extends Node {
           }
           int p2 = pp;
           while(p2 != 0) {
+            System.out.println(pp + "/" + p2);
             pp = p2;
             p2 = data.parent(p2, data.kind(p2));
           }

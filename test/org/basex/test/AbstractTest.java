@@ -4,6 +4,7 @@ import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.data.Nodes;
 import org.basex.index.Names;
+import org.basex.index.Namespaces;
 import org.basex.query.xpath.values.Bool;
 import org.basex.query.xpath.values.Literal;
 import org.basex.query.xpath.values.Num;
@@ -17,7 +18,8 @@ import org.basex.util.Token;
  */
 abstract class AbstractTest {
   /** Dummy data reference. */
-  static final Data DATA = new MemData(1, new Names(true), new Names(false));
+  static final Data DATA = new MemData(1, new Names(true), new Names(false),
+      new Namespaces());
   /** Title. */
   String title;
   /** Document. */

@@ -133,6 +133,8 @@ public interface DataText {
   String DATAFTX = "ftx";
   /** Database - Documents statistic. */
   String DATASTAT = "sta";
+  /** Database - Namespaces. */
+  String DATANS = "nsp";
 
   // Document Statistics ======================================================
 

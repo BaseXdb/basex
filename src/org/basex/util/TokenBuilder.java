@@ -168,6 +168,17 @@ public final class TokenBuilder {
   public void trim() {
     while(size > 0 && Token.ws(chars[size - 1])) size--;
   }
+  
+  /**
+   * Chops trailing whitespaces.
+   */
+  public void chop() {
+    trim();
+    int s = -1;
+    while(++s < size && Token.ws(chars[s]));
+    if(s != 0 && s != size) Array.move(chars, s, -s, size - s);
+    size -= s;
+  }
 
   /**
    * Replaces a character at the specified position.

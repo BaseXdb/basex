@@ -126,7 +126,8 @@ public final class EMLExtractor extends AbstractExtractor {
     // write body tag & content
     listener.startNode(EMLBODY, mBodyType == null ? null : new byte[][] { TYPE,
         token(mBodyType) });
-    listener.text(quotePrint ? decodeQP(tb.finish()) : tb.finish(), false);
+    listener.text(quotePrint ?
+        new TokenBuilder(decodeQP(tb.finish())) : tb, false);
     listener.endNode(EMLBODY);
 
     // reset encoding flag

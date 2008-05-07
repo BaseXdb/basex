@@ -248,9 +248,8 @@ public final class Insert extends Proc {
   public static Data copy(final Data data, final int pre) {
     // size of the data instance
     final int size = data.size(pre, data.kind(pre));
-    // create temporary data instance, adopting the tag and attribute indexes
-    // of the source data
-    final MemData tmp = new MemData(size, data.tags, data.atts);
+    // create temporary data instance, adopting the indexes of the source data
+    final MemData tmp = new MemData(size, data.tags, data.atts, data.ns);
 
     // copy all nodes
     for(int p = pre; p < pre + size; p++) {

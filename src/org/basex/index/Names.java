@@ -20,9 +20,9 @@ import org.basex.util.Token;
 public final class Names extends Set {
   /** Number of token occurrences. */
   private int[] counter;
-  /** Flag pointing to non-leaves. */
+  /** Flag referencing non-leaves. */
   private boolean[] noleaf;
-  /** Hash values. */
+  /** Statistic information. */
   private StatsKey[] stat;
   /** Index type (tags/attribute names). */
   private final boolean tag;

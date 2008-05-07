@@ -19,18 +19,19 @@ public final class GUIConstants {
    *
    * All views have unique names, which are defined below.
    * The following steps are necessary to add a new view
-   * (the definition of the existing views might help you):
+   * (the implementation of the existing views might help you):
    *
    * - define a new name for your view (no spaces; e.g. "Flup")
    * - add a string for your view, as shown below
-   * - add the string in the DEFAULTLAYOUT below
-   * - add a constructor for your view in the constructor of the GUI class
+   * - add the string in the LAYOUTOPENED below
+   * - add a new ViewPanel instance for your view in the GUI class constructor
    *
    * Add some more code to allow switching on/off your view:
    *
    * - add a boolean visibility flag in the GUIProp class (e.g. "showflup")
    * - add a corresponding line in the ViewPanel.setVisibility() method
-   * - add a corresponding command in GUICommand and in MENUITEMS below
+   * - add a corresponding command in the GUICommands class and in
+   *   MENUITEMS below
    */
   
   /** Internal name of the Map View. */
@@ -47,6 +48,8 @@ public final class GUIConstants {
   public static final String QUERYVIEW = "Query";
   /** Internal name of the Help View. */
   public static final String HELPVIEW = "Help";
+  /** Internal name of the Real Tree View. */
+  public static final String REALVIEW = "Real";
   
    /**
    * Default GUI Layout. The layout is formatted as follows:
@@ -57,7 +60,7 @@ public final class GUIConstants {
    */
   public static final String LAYOUTOPENED = "H V " + QUERYVIEW + " " + TREEVIEW
       + " " + TEXTVIEW + " " + HELPVIEW + " - V " + MAPVIEW + " " + TABLEVIEW
-      + " " + INFOVIEW + " - -";
+      + " " + INFOVIEW + " " + REALVIEW + " - -";
 
   /** This layout is shown when no database is opened. */
   public static final String LAYOUTCLOSED = "V " + TEXTVIEW + " " + HELPVIEW
