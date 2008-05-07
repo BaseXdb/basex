@@ -128,23 +128,9 @@ public final class FSUtils {
    * @return -  all pre values of the dirs and files
    */
   public static int[] getAllOfDir(final Data data, final int pre) {
-
-    // Den Elementtyp einmal speichern
-    int kind = data.kind(pre);    
-    int n = pre;    
-    // Wie weit das Verzeichnis reicht
-    int size = data.size(n, kind) + n;
-    // Zu erstem file/dir springen
-    n += data.attSize(n, kind);
-    // Ergebnisarray 
-    // <HS> ..calculation size/5 is dubious as XML structure might change,
-    //    (e.g. if file contents are included)..
-    IntList res = new IntList();
-    while(n < size) {
-      // pre speichern
-      res.add(n);
-      n += data.size(n, data.kind(n));
-    }    
+    final IntList res = new IntList();
+    final DirIterator it = new DirIterator(data, pre);
+    while(it.more()) res.add(it.next());
     return res.finish();
   }
 
@@ -156,22 +142,12 @@ public final class FSUtils {
    * @return -  all pre values of all files
    */
   public static int[] getAllFiles(final Data data, final int pre) {
-    // Den Elementtyp einmal speichern
-    int kind = data.kind(pre);    
-    int n = pre;    
-    // Wie weit das Verzeichnis reicht
-    int size = data.size(n, kind) + n;
-    // Zu erstem file/dir springen
-    n += data.attSize(n, kind);
-    // Ergebnisarray 
-    IntList res = new IntList();
-    while(n < size) {
-      if(isFile(data , n)) {
-        // pre speichern
-        res.add(n);
-      }
-      n += data.size(n, data.kind(n));
-    }    
+    final IntList res = new IntList();
+    final DirIterator it = new DirIterator(data, pre);
+    while(it.more()) {
+      final int n = it.next();
+      if(isFile(data, n)) res.add(n);
+    }
     return res.finish();
   }
 
@@ -183,22 +159,12 @@ public final class FSUtils {
    * @return -  all pre values of all files
    */
   public static int[] getAllDir(final Data data, final int pre) {
-    // Den Elementtyp einmal speichern
-    int kind = data.kind(pre);    
-    int n = pre;    
-    // Wie weit das Verzeichnis reicht
-    int size = data.size(n, kind) + n;
-    // Zu erstem file/dir springen    
-    n += data.attSize(n, kind);
-    // Ergebnisarray 
-    IntList res = new IntList();
-    while(n < size) {
-      if(isDir(data , n)) {
-        // pre speichern
-        res.add(n);
-      }
-      n += data.size(n, kind);
-    }    
+    final IntList res = new IntList();
+    final DirIterator it = new DirIterator(data, pre);
+    while(it.more()) {
+      final int n = it.next();
+      if(isDir(data, n)) res.add(n);
+    }
     return res.finish();
   }
   
@@ -208,22 +174,16 @@ public final class FSUtils {
    * @param data - the data table
    * @param pre - pre value of the "parent" directory
    * @param file - directory name
-   * @param kind - kind value of dir (elem)
    * @return -  all pre values of all files
    */
   public static int getSpecificFileOrDir(final Data data, final int pre,
-      final byte[] file, final int kind) {
-    int n = pre;        
-    // Wie weit das Verzeichnis reicht
-    int size = data.size(n, kind) + n;
-    // Zu erstem file/dir springen
-    n += data.attSize(n, data.kind(n));
-    while(n < size) {
-      if(Token.eq(getName(data, n), file)) {
-         return n; 
-        }
-      n += data.size(n, kind);
-    }    
+      final byte[] file) {
+
+    final DirIterator it = new DirIterator(data, pre);
+    while(it.more()) {
+      final int n = it.next();
+      if(Token.eq(getName(data, n), file)) return n;
+    }
     return -1;
   }
   
@@ -233,26 +193,16 @@ public final class FSUtils {
    * @param data - the data table
    * @param pre - pre value of the "parent" directory
    * @param file - directory name
-   * @param kind - kind value of dir (elem)
    * @return -  all pre values of all files
    */
   public static int getSpecificFile(final Data data, final int pre,
-      final byte[] file, final int kind) {
-    int n = pre;        
-    // Wie weit das Verzeichnis reicht
-    int size = data.size(n, kind) + n;
-    // Zu erstem file/dir springen
-    n += data.attSize(n, data.kind(n));
+      final byte[] file) {
 
-    while(n < size) {
-      if(isFile(data , n)) {
-        // pre speichern
-        if(Token.eq(getName(data, n), file)) {
-         return n; 
-        }
-      }
-      n += data.size(n, kind);
-    }    
+    final DirIterator it = new DirIterator(data, pre);
+    while(it.more()) {
+      final int n = it.next();
+      if(isFile(data, n) && Token.eq(getName(data, n), file)) return n;
+    }
     return -1;
   }
   
@@ -262,32 +212,21 @@ public final class FSUtils {
    * @param data - the data table
    * @param pre - pre value of the "parent" directory
    * @param dir - directory name
-   * @param kind - kind value of dir (elem)
    * @return -  all pre values of all files
    */
   public static int getSpecificDir(final Data data, final int pre,
-      final byte[] dir, final int kind) {
-    int n = pre;        
-    // Wie weit das Verzeichnis reicht
-    int size = data.size(n, kind) + n;
-    // Zu erstem file/dir springen
-    n += data.attSize(n, data.kind(n));
+      final byte[] dir) {
 
-    while(n < size) {
-      if(isDir(data , n)) {
-        // pre speichern
-        // <CG> using byte comparison to avoid byte/string conversion
-        if(Token.eq(getName(data, n), dir)) {
-          return n;
-        }
-      }
-      n += data.size(n, kind);
-    }    
+    final DirIterator it = new DirIterator(data, pre);
+    while(it.more()) {
+      final int n = it.next();
+      if(isDir(data, n) && Token.eq(getName(data, n), dir)) return n;
+    }
     return -1;
   }
   
   /**
-   *  Test pathexpression.
+   *  Test path expression.
    * 
    * @param data - data table 
    * @param pre - pre value
@@ -316,7 +255,7 @@ public final class FSUtils {
         n = 3;
       // if path equals "." do nothing else getDir  
       } else if(!p.equals(".")) {
-        n = getSpecificDir(data, n, Token.token(p), kind);
+        n = getSpecificDir(data, n, Token.token(p));
       }
       // if there is no such dir return -1
       if(n == -1) {

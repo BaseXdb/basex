@@ -2,7 +2,6 @@ package org.basex.query.fs;
 
 import java.io.IOException;
 import org.basex.core.Context;
-import org.basex.data.Data;
 import org.basex.io.PrintOutput;
 import org.basex.util.GetOpts;
 
@@ -101,7 +100,7 @@ public class RM {
       }
     }
     int del = FSUtils.getSpecificFileOrDir(context.data(), curDirPre, 
-        file.getBytes(), Data.ELEM);
+        file.getBytes());
 
     if(del == -1) {
       out.print("rm: " + file + " No such file or directory");
