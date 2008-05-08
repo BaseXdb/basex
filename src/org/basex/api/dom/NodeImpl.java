@@ -91,7 +91,7 @@ public abstract class NodeImpl implements Node {
   }
 
   public String getBaseURI() {
-    return url(data.meta.filename);
+    return url(data.meta.file.path());
   }
 
   public NodeList getChildNodes() {
