@@ -53,10 +53,11 @@ public final class TableIterator {
    * @return result of check
    */
   boolean more() {
-    do {
+    while(true) {
       // skip attributes or descendant nodes
       pre += data.deepfs ? 1 : data.attSize(pre, data.kind(pre));
-
+      if(pre >= last) return false;
+      
       final int k = data.kind(pre);
       elem = k == Data.TEXT;
 
@@ -73,8 +74,6 @@ public final class TableIterator {
         tag = data.tagID(pre);
         if(tag == rootTag) return false;
       }
-    } while(pre < last);
-
-    return false;
+    }
   }
 }
