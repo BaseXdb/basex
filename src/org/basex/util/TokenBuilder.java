@@ -149,9 +149,10 @@ public final class TokenBuilder {
    * @param ext text text extensions
    */
   public void add(final Object str, final Object... ext) {
+    final byte[] t = str == null ? Token.NULL : str instanceof byte[] ?
+        (byte[]) str : Token.token(str.toString());
     int e = 0;
-    for(final byte c : str instanceof byte[] ? (byte[]) str :
-        Token.token(str.toString())) {
+    for(final byte c : t) {
       if(e < ext.length && c == '%') {
         if(ext[e] instanceof byte[]) add((byte[]) ext[e++]);
         else if(ext[e] == null) add("null");

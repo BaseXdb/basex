@@ -54,7 +54,7 @@ public final class BaseXFileChooser {
    * @param suf suffix
    * @param dsc description
    */
-  public void setFilter(final String suf, final String dsc) {
+  public void addFilter(final String suf, final String dsc) {
     if(fc != null) fc.addChoosableFileFilter(new Filter(suf, dsc));
     else fd.setFile("*" + suf);
   }

@@ -32,20 +32,20 @@ import org.basex.util.Token;
  *
  * <pre>
  *  ELEMENTS:
- * - Byte     0: Node kind (ELEM/DOC)
- * - Byte   1-2: Tag Reference
+ * - Byte     0: Node kind ({@link Data#ELEM}/{@link Data#DOC})
+ * - Byte   1-2: Namespace and Tag Reference
  * - Byte     3: Number of attributes
  * - Byte  4- 7: Number of descendants (size)
  * - Byte  8-11: Relative parent reference
  * - Byte 12-15: Unique Node ID
  * TEXT NODES:
- * - Byte     0: Node kind (TEXT/PI/COMM)
+ * - Byte     0: Node kind ({@link Data#TEXT}/{@link Data#PI}/{@link Data#COMM})
  * - Byte  3- 7: Text reference
  * - Byte  8-11: Relative parent reference
  * - Byte 12-15: Unique Node ID
  * ATTRIBUTE NODES:
- * - Byte     0: Node kind (ATTR)
- * - Byte   1-2: Attribute name reference
+ * - Byte     0: Node kind ({@link Data#ATTR})
+ * - Byte   1-2: Namespace and Attribute name reference
  * - Byte  3- 7: Attribute value reference
  * - Byte    11: Relative parent reference
  * - Byte 12-15: Unique Node ID
@@ -113,6 +113,7 @@ public final class DiskData extends Data {
       meta.finish(size);
       tags.finish(meta.dbname);
       atts.finish(meta.dbname);
+      ns.finish(meta.dbname);
     } catch(final IOException e) {
       e.printStackTrace();
     }
@@ -120,9 +121,12 @@ public final class DiskData extends Data {
 
   @Override
   public synchronized void close() throws IOException {
+    /*
     meta.finish(size);
     tags.finish(meta.dbname);
     atts.finish(meta.dbname);
+    ns.finish(meta.dbname);
+    */
     cls();
   }
 
@@ -203,12 +207,22 @@ public final class DiskData extends Data {
 
   @Override
   public int tagID(final int pre) {
-    return table.read2(pre, 1);
+    return table.read2(pre, 1) & 0x0FFF;
+  }
+
+  @Override
+  public int tagNS(final int pre) {
+    return (table.read2(pre, 1) >>> 12) & 0x0F;
   }
 
   @Override
   public int attNameID(final int pre) {
-    return table.read2(pre, 1);
+    return table.read2(pre, 1) & 0x0FFF;
+  }
+
+  @Override
+  public int attNS(final int pre) {
+    return (table.read2(pre, 1) >>> 12) & 0x0F;
   }
 
   @Override

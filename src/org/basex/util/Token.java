@@ -27,6 +27,8 @@ public final class Token {
   public static final byte[] NINF = token("-INF");
   /** Dots. */
   public static final byte[] DOTS = token("...");
+  /** Dots. */
+  public static final byte[] NULL = token("null");
   /** Empty token. */
   public static final byte[] EMPTY = {};
   /** Space token. */

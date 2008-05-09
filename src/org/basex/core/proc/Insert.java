@@ -258,11 +258,11 @@ public final class Insert extends Proc {
       switch(k) {
         case Data.DOC:
         case Data.ELEM:
-          tmp.addElem(data.tagID(p), par, data.attSize(p, k),
+          tmp.addElem(data.tagID(p), data.tagNS(p), par, data.attSize(p, k),
               data.size(p, k), k);
           break;
         case Data.ATTR:
-          tmp.addAtt(data.attNameID(p), data.attValue(p), par);
+          tmp.addAtt(data.attNameID(p), data.attNS(p), data.attValue(p), par);
           break;
         case Data.TEXT:
         case Data.COMM:

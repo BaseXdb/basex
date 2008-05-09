@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import org.basex.BaseX;
+import org.basex.io.IO;
 
 /**
  * This class assembles properties which are used all around the
@@ -77,7 +78,7 @@ public final class Prop {
   /** Format XQuery output. */
   public static boolean xqformat = true;
   /** Use internal XML parser. */
-  public static boolean intparse = false;
+  public static boolean intparse = true;
   
   /** Number of query executions. */
   public static int runs = 1;
@@ -127,7 +128,7 @@ public final class Prop {
   private static final String PROPUSER = "# User defined section";
 
   /** Default path to the BaseX configuration file. */
-  private static final String CONFIGFILE = HOME + "/.basex";
+  private static final String CONFIGFILE = HOME + "/" + IO.BASEXSUFFIX;
   /** Remembers if the config file has already been read. */
   private static boolean read;
 

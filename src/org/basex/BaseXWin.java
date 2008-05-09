@@ -20,6 +20,7 @@ import org.basex.core.Prop;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
+import org.basex.io.IO;
 import org.basex.util.Performance;
 
 /**
@@ -55,7 +56,9 @@ public final class BaseXWin {
         // open specified document or database
         if(args.length != 0) {
           String db = args[0].replace('\\', '/');
-          if(db.endsWith(".basex")) db = db.replaceAll("^.*/(.*)/.*", "$1");
+          if(db.endsWith(IO.BASEXSUFFIX)) {
+            db = db.replaceAll("^.*/(.*)/.*", "$1");
+          }
           GUI.get().execute(Commands.CHECK, db);
         }
         // close wait panel

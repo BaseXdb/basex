@@ -52,8 +52,8 @@ public final class DialogInfo extends Dialog {
 
     add(info, INFODBNAME, meta.dbname);
     add(info, INFODOC, meta.file.path());
-    add(info, INFOTIME, new SimpleDateFormat(
-        "dd.MM.yyyy hh:mm:ss").format(new Date(meta.time)));
+    add(info, INFOTIME, new SimpleDateFormat("dd.MM.yyyy hh:mm:ss").format(
+        new Date(meta.time)));
     add(info, INFODOCSIZE, meta.filesize != 0 ?
         Performance.formatSize(meta.filesize) : "-");
     add(info, INFODBSIZE, Performance.formatSize(len));

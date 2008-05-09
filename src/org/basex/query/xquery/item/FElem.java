@@ -1,12 +1,14 @@
 package org.basex.query.xquery.item;
 
 import static org.basex.query.xquery.XQTokens.*;
+import static org.basex.util.Token.*;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.iter.NodIter;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
+import org.basex.util.TokenList;
 
 /**
  * Element Node.
@@ -79,8 +81,30 @@ public final class FElem extends FNode {
     final byte[] nm = name.str();
     ser.startElement(nm);
 
-    for(final FAttr ns : names) ser.attribute(ns.nname(), ns.str());
+    final TokenList nms = new TokenList();
+    final TokenList vls = new TokenList();
 
+    // add namespace attributes
+    for(final FAttr ns : names) {
+      nms.add(ns.nname());
+      vls.add(ns.str());
+    }
+
+    // add attributes
+    for(int n = 0; n < atts.size; n++) {
+      final Node a = atts.list[n];
+      final byte[] at = a.nname();
+      if(level == 0 && a.qname().ns()) {
+        final byte[] pref = substring(at, 0, indexOf(at, ':'));
+        final byte[] atr = concat(XMLNSCOL, pref);
+        boolean f = Token.eq(pref, XML);
+        for(final FAttr ns : names) f |= Token.eq(ns.nname(), atr);
+        if(!f) ser.attribute(atr, a.qname().uri.str());
+      }
+      ser.attribute(at, atts.list[n].str());
+    }
+    
+    // add global namespaces
     if(level == 0) {
       byte[] pre = name.pre();
       final Uri uri = name.uri;
@@ -89,16 +113,21 @@ public final class FElem extends FNode {
         final byte[] p = ctx.ns.prefix(uri);
         if(!Token.eq(p, XML)) {
           pre = p.length == 0 ? XMLNS : Token.concat(XMLNSCOL, pre);
-          ser.attribute(pre, uri.str());
+          if(!nms.contains(pre)) {
+            nms.add(pre);
+            vls.add(uri.str());
+          }
         }
       } else if(ctx.nsElem != Uri.EMPTY) {
-        ser.attribute(XMLNS, ctx.nsElem.str());
+        nms.add(XMLNS);
+        vls.add(ctx.nsElem.str());
       }
     }
 
-    for(int n = 0; n < atts.size; n++) {
-      ser.attribute(atts.list[n].nname(), atts.list[n].str());
-    }
+    // serialize attributes
+    for(int n = 0; n < nms.size; n++) ser.attribute(nms.list[n], vls.list[n]);
+    
+    // serialize children
     if(children.size == 0) {
       ser.emptyElement();
     } else {

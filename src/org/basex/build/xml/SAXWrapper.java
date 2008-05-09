@@ -9,6 +9,7 @@ import org.basex.build.Parser;
 import org.basex.io.IO;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
+import org.basex.util.TokenList;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -130,12 +131,12 @@ public final class SAXWrapper extends Parser {
     }
 
     @Override
-    public void processingInstruction(final String name, final String val)
+    public void processingInstruction(final String name, final String cont)
         throws SAXException {
       
       try {
         finishText();
-        builder.pi(new TokenBuilder(name + ' ' + val));
+        builder.pi(new TokenBuilder(name + ' ' + cont));
         nodes++;
       } catch(final IOException ex) {
         error(ex);
@@ -157,16 +158,24 @@ public final class SAXWrapper extends Parser {
 
     /** Temporary string builder. */
     private final TokenBuilder tb = new TokenBuilder();
+    /** Temporary namespace prefix. */
+    private TokenList np = new TokenList();
+    /** Temporary namespace value. */
+    private TokenList nv = new TokenList();
 
     /**
      * Checks if a text node has to be written.
      * @throws IOException I/O exception
      */
     private void finishText() throws IOException {
-      if(tb.size == 0) return;
-      builder.text(tb, false);
-      tb.reset();
-      nodes++;
+      if(tb.size != 0) {
+        builder.text(tb, false);
+        tb.reset();
+        nodes++;
+      }
+      for(int i = 0; i < np.size; i++) builder.startNS(np.list[i], nv.list[i]);
+      np.reset();
+      nv.reset();
     }
 
     /**
@@ -195,7 +204,8 @@ public final class SAXWrapper extends Parser {
 
     @Override
     public void startPrefixMapping(final String prefix, final String uri) {
-      builder.startNS(Token.token(prefix), Token.token(uri));
+      np.add(Token.token(prefix));
+      nv.add(Token.token(uri));
     }
     
     /*public void endPrefixMapping(final String prefix) { } */

@@ -1,8 +1,15 @@
 package org.basex.index;
 
+import static org.basex.data.DataText.*;
+import static org.basex.util.Token.*;
+import java.io.IOException;
 import org.basex.BaseX;
+import org.basex.io.DataInput;
+import org.basex.io.DataOutput;
+import org.basex.io.IO;
 import org.basex.util.Array;
 import org.basex.util.Set;
+import org.basex.util.Token;
 
 /**
  * This class stores namespaces during the creation of a database.
@@ -11,6 +18,8 @@ import org.basex.util.Set;
  * @author Christian Gruen
  */
 public final class Namespaces extends Set {
+  /** XML Token. */
+  private static final byte[] XML = Token.token("xml");
   /** Prefixes. */
   private byte[][] pref = new byte[CAP][];
   /** Values. */
@@ -28,10 +37,12 @@ public final class Namespaces extends Set {
   /**
    * Constructor, specifying an input file.
    * @param db name of the database
+   * @throws IOException I/O exception
    */
-  public Namespaces(final String db) {
-    if(db == db) return; // dummy stuff
-  /*public Namespaces(final String db) throws IOException {
+  public Namespaces(final String db) throws IOException {
+    // ignore missing namespace input
+    if(!IO.dbfile(db, DATANS).exists()) return;
+    
     final DataInput in = new DataInput(db, DATANS);
     keys = in.readBytesArray();
     next = in.readNums();
@@ -42,7 +53,6 @@ public final class Namespaces extends Set {
     size = in.readNum();
     sz = in.readNum();
     in.close();
-    */
   }
 
   /**
@@ -62,6 +72,45 @@ public final class Namespaces extends Set {
   }
 
   /**
+   * Returns the namespace for the specified qname and pre value.
+   * @param n tag/attribute name
+   * @param p pre value
+   * @return namespace
+   */
+  public int get(final byte[] n, final int p) {
+    final int s = indexOf(n, ':');
+    if(s == -1) return 0;
+    int i = sz - 1;
+    while(i >= 0 && p > pre[i]) i--;
+    return ns(n, s, i + 1);
+  }
+
+  /**
+   * Returns the namespace for the specified qname.
+   * @param n tag/attribute name
+   * @return namespace
+   */
+  public int get(final byte[] n) {
+    return ns(n, indexOf(n, ':'), sz - 1);
+  }
+
+  /**
+   * Returns the namespace for the specified qname.
+   * @param n prefix
+   * @param s prefix index
+   * @param p index offset to start with
+   * @return namespace
+   */
+  private int ns(final byte[] n, final int s, final int p) {
+    if(s == -1) return 0;
+    final byte[] pr = substring(n, 0, s);
+    if(eq(XML, pr)) return 0;
+    for(int i = p; i >= 0; i--) if(eq(pref[i], pr)) return vals[i];
+    BaseX.notexpected();
+    return 0;
+  }
+
+  /**
    * Checks the array sizes.
    */
   private void check() {
@@ -75,10 +124,9 @@ public final class Namespaces extends Set {
   /**
    * Finishes the index structure and optimizes its memory usage.
    * @param db name of the database
+   * @throws IOException I/O exception
    */
-  public synchronized void finish(final String db) {
-    if(db == db) return; // dummy stuff
-    /*
+  public synchronized void finish(final String db) throws IOException {
     final DataOutput out = new DataOutput(db, DATANS);
     out.writeBytesArray(keys);
     out.writeNums(next);
@@ -89,26 +137,6 @@ public final class Namespaces extends Set {
     out.writeNum(size);
     out.writeNum(sz);
     out.close();
-    */
   }
 }
-  
-  /**
-   * Removes the specified namespace.
-   * @param p namespace prefix
-  void delete(final byte[] p) {
-    BaseX.debug("Delete Namespace " + Token.string(p));
-
-    for(int i = size - 1; i >= 0; i--) {
-      if(Token.eq(pref[i], p)) {
-        Array.move(pref, i + 1, -1, size - i);
-        Array.move(vals, i + 1, -1, size - i);
-        Array.move(id, i + 1, -1, size - i);
-        size--;
-        return;
-      }
-    }
-    BaseX.notexpected();
-  }
-   */
   

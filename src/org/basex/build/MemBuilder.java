@@ -13,6 +13,8 @@ import org.basex.data.MetaData;
  * @author Christian Gruen
  */
 public final class MemBuilder extends Builder {
+  // [CG] namespaces are currently ignored...
+  
   /** Data reference. */
   protected MemData data;
 
@@ -44,16 +46,17 @@ public final class MemBuilder extends Builder {
   public void close() { }
 
   @Override
-  public void addNode(final int tag, final int par, final byte[][] atr,
-      final int[] attRef, final byte kind) {
-
+  public void addNode(final int tag, final int tns, final int par,
+      final byte[][] atr, final int[] attRef, final byte kind) {
+    
     // element node
-    final int attl = attRef != null ? attRef.length : 0;
-    data.addElem(tag, par, attl + 1, attl + 1, kind);
+    final int attl = attRef != null ? attRef.length >> 1 : 0;
+    data.addElem(tag, tns, par, attl + 1, attl + 1, kind);
 
     // attributes
     for(int a = 0; a < attl; a++) {
-      data.addAtt(attRef[a], atr[(a << 1) + 1], a + 1);
+      data.addAtt(attRef[a << 1], attRef[(a << 1) + 1],
+          atr[(a << 1) + 1], a + 1);
     }
     size = data.size;
   }

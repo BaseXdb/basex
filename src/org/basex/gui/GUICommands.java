@@ -54,7 +54,9 @@ public enum GUICommands implements GUICommand {
 
       final BaseXFileChooser fc = new BaseXFileChooser(CREATETITLE,
           GUIProp.createpath, main);
-      fc.setFilter(IO.XMLSUFFIX, CREATEXMLDESC);
+      fc.addFilter(IO.GZSUFFIX, CREATEGZDESC);
+      fc.addFilter(IO.ZIPSUFFIX, CREATEZIPDESC);
+      fc.addFilter(IO.XMLSUFFIX, CREATEXMLDESC);
 
       if(fc.select(BaseXFileChooser.OPEN)) {
         if(!new DialogCreate(main).ok()) return;
@@ -115,7 +117,7 @@ public enum GUICommands implements GUICommand {
 
       final BaseXFileChooser fc = new BaseXFileChooser(XQOPENTITLE,
           GUIProp.createpath, main);
-      fc.setFilter(IO.XQSUFFIX, CREATEXQDESC);
+      fc.addFilter(IO.XQSUFFIX, CREATEXQDESC);
 
       if(fc.select(BaseXFileChooser.OPEN)) {
         try {
@@ -138,7 +140,7 @@ public enum GUICommands implements GUICommand {
 
       final BaseXFileChooser fc = new BaseXFileChooser(XQSAVETITLE,
           GUIProp.createpath, main);
-      fc.setFilter(IO.XQSUFFIX, CREATEXQDESC);
+      fc.addFilter(IO.XQSUFFIX, CREATEXQDESC);
 
       if(fc.select(BaseXFileChooser.SAVE)) {
         try {
@@ -175,7 +177,7 @@ public enum GUICommands implements GUICommand {
 
       final BaseXFileChooser fc = new BaseXFileChooser(CREATETITLE,
           GUIProp.createpath, main);
-      fc.setFilter(IO.XMLSUFFIX, CREATEXMLDESC);
+      fc.addFilter(IO.XMLSUFFIX, CREATEXMLDESC);
 
       if(fc.select(BaseXFileChooser.SAVE)) {
         final IO file = fc.getFile();

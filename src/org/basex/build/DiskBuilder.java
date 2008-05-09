@@ -110,13 +110,15 @@ public final class DiskBuilder extends Builder {
   }
   
   @Override
-  protected void addNode(final int tag, final int par, final byte[][] atr,
-      final int[] attRef, final byte kind) throws IOException {
+  protected void addNode(final int tag, final int tns, final int par,
+      final byte[][] atr, final int[] attRef, final byte kind)
+        throws IOException {
 
     // element node
-    final int attl = attRef != null ? attRef.length : 0;
+    final int attl = attRef != null ? attRef.length >> 1 : 0;
+    final int t = tag + (tns << 12);
     tout.write(kind);
-    tout.write2(tag);
+    tout.write2(t);
     tout.write(attl + 1);
     tout.writeInt(attl + 1);
     tout.writeInt(par);
@@ -124,7 +126,9 @@ public final class DiskBuilder extends Builder {
 
     // attributes
     for(int a = 0; a < attl; a++) {
+      final int n = attRef[a << 1] + (attRef[(a << 1) + 1] << 12);
       final byte[] val = atr[(a << 1) + 1];
+      
       // inline integer value?
       long v = Token.toSimpleInt(val);
       if(v != Integer.MIN_VALUE) {
@@ -135,7 +139,7 @@ public final class DiskBuilder extends Builder {
       }
       
       tout.write(Data.ATTR);
-      tout.write2(attRef[a]);
+      tout.write2(n);
       tout.write5(v);
       tout.write(0);
       tout.write(0);

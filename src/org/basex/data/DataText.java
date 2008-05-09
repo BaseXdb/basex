@@ -51,6 +51,31 @@ public interface DataText {
   /** Last (highest) id. */
   String DBLASTID = "LASTID";
 
+  // TAGS/ATTRIBUTE NAMES ====================================================
+
+  /** DeepFS tag. */
+  byte[] DEEPFS = token("deepfs");
+  /** Directory tag. */
+  byte[] DIR = token("dir");
+  /** File tag. */
+  byte[] FILE = token("file");
+  /** Name attribute. */
+  byte[] NAME = token("name");
+  /** Size attribute. */
+  byte[] SIZE = token("size");
+  /** Size attribute. */
+  byte[] STAT = token("stat");
+  /** Time of last modification. */
+  byte[] MTIME = token("mtime");
+  /** Suffix attribute. */
+  byte[] SUFFIX = token("suffix");
+  /** Suffix attribute. */
+  byte[] CONTENT = token("content");
+  /** XMLNS attribute. */
+  byte[] XMLNS = token("xmlns");
+  /** XMLNS attribute. */
+  byte[] XMLNSC = token("xmlns:");
+
   // XML SERIALIZATION ========================================================
 
   /** Opening results tag. */

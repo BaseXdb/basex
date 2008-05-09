@@ -1,16 +1,15 @@
 package org.basex.query.xquery.item;
 
+import static org.basex.util.Token.*;
 import static org.basex.query.xquery.XQTokens.*;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
-import org.basex.query.xquery.XQTokens;
 import org.basex.query.xquery.iter.NodIter;
 import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.iter.NodeMore;
 import org.basex.query.xquery.iter.NodeNext;
-import org.basex.util.Token;
 import org.basex.util.TokenList;
 
 /**
@@ -58,10 +57,10 @@ public final class DNode extends Node {
         ser.comment(str());
         break;
       case DOC:
-        serElem(ser, ctx, 1, level);
+        serElem(ser, 1, level);
         break;
       case ELM:
-        serElem(ser, ctx, pre, level);
+        serElem(ser, pre, level);
         break;
       case PI:
         ser.pi(str());
@@ -78,14 +77,14 @@ public final class DNode extends Node {
   public String toString() {
     switch(type) {
       case ATT:
-        return type + "(" + Token.string(data.attName(pre)) + "=\"" +
-        Token.string(data.attValue(pre)) + "\")";
+        return type + "(" + string(data.attName(pre)) + "=\"" +
+        string(data.attValue(pre)) + "\")";
       case DOC:
         return type + "(" + data.meta.file + ")";
       case ELM:
-        return type + "(" + Token.string(data.tag(pre)) + "/" + pre + ")";
+        return type + "(" + string(data.tag(pre)) + "/" + pre + ")";
       default:
-        return type + "(" + Token.string(str()) + ")";
+        return type + "(" + string(str()) + ")";
     }
   }
 
@@ -98,11 +97,11 @@ public final class DNode extends Node {
         return data.tag(pre);
       case PI:
         byte[] name = data.text(pre);
-        final int i = Token.indexOf(name, ' ');
-        if(i != -1) name = Token.substring(name, 0, i);
+        final int i = indexOf(name, ' ');
+        if(i != -1) name = substring(name, 0, i);
         return name;
       default:
-        return Token.EMPTY;
+        return EMPTY;
     }
   }
 
@@ -130,7 +129,7 @@ public final class DNode extends Node {
 
   @Override
   public byte[] base() {
-    return type != Type.DOC ? Token.EMPTY : Token.token(data.meta.file.path());
+    return type != Type.DOC ? EMPTY : token(data.meta.file.path());
   }
 
   @Override
@@ -181,14 +180,16 @@ public final class DNode extends Node {
   /**
    * Serializes the specified node, starting from the specified pre value.
    * @param ser result reader
-   * @param ctx xquery context
    * @param pos pre value
    * @param level current level
    * @throws Exception exception
    */
-  public void serElem(final Serializer ser, final XQContext ctx,
-      final int pos, final int level) throws Exception {
+  public void serElem(final Serializer ser, final int pos,
+      final int level) throws Exception {
 
+    // attribute lists
+    final TokenList names = new TokenList();
+    final TokenList values = new TokenList();
     // stacks
     final int[] parent = new int[256];
     final byte[][] token = new byte[256][];
@@ -229,44 +230,42 @@ public final class DNode extends Node {
         final int as = p + data.attSize(p, kind);
 
         if(level != 0 || l != 0) {
-          while(++p != as) {
-            ser.attribute(data.attName(p), data.attValue(p));
-          }
+          while(++p != as) ser.attribute(data.attName(p), data.attValue(p));
         } else {
-          final TokenList names = new TokenList();
-          final TokenList values = new TokenList();
+          names.reset();
+          values.reset();
           
-          int pp = p;
           while(++p != as) {
-            byte[] at = data.attName(p);
+            final byte[] at = data.attName(p);
             names.add(at);
             values.add(data.attValue(p));
+            
+            // add xmlns attribute for tag
+            final int i = data.ns.get(at, pre);
+            if(i != 0) {
+              final byte[] pref = substring(at, 0, indexOf(at, ':'));
+              final byte[] atr = concat(XMLNSCOL, pref);
+              if(!names.contains(atr)) {
+                names.add(atr);
+                values.add(data.ns.key(i));
+              }
+            }
           }
           
-          final int i = Token.indexOf(name, ':');
-          if(i != -1) {
-            final byte[] pref = Token.substring(name, 0, i);
-            final byte[] uri = ctx.ns.uri(pref).str();
-            final byte[] at = Token.concat(XMLNSCOL, pref);
+          // add xmlns attribute for tag
+          final int i = data.ns.get(name, pre);
+          if(i != 0) {
+            // [CG] check namespace handling..
+            final byte[] uri = data.ns.key(i);
+            final byte[] pref = substring(name, 0, indexOf(name, ':'));
+            //final byte[] uri = ctx.ns.uri(pref).str();
+            final byte[] at = concat(XMLNSCOL, pref);
             if(!names.contains(at)) {
               names.add(at);
               values.add(uri);
             }
           }
-          int p2 = pp;
-          while(p2 != 0) {
-            System.out.println(pp + "/" + p2);
-            pp = p2;
-            p2 = data.parent(p2, data.kind(p2));
-          }
-          final int pps = pp + data.attSize(pp, data.kind(pp));
-          while(++pp != pps) {
-            byte[] at = data.attName(pp);
-            if(Token.startsWith(at, XQTokens.XMLNS) && !names.contains(at)) {
-              names.add(at);
-              values.add(data.attValue(pp));
-            }
-          }
+          
           for(int n = 0; n < names.size; n++) {
             ser.attribute(names.list[n], values.list[n]);
           }
@@ -587,6 +586,6 @@ public final class DNode extends Node {
 
   @Override
   public void plan(final Serializer ser) throws Exception {
-    ser.emptyElement(this, PRE, Token.token(pre));
+    ser.emptyElement(this, PRE, token(pre));
   }
 }

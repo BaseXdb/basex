@@ -20,7 +20,7 @@ import org.basex.query.xpath.expr.FTOption;
  * - Bit 0-2   : Node kind (ELEM/DOC)
  * - Bit 3-7   : Number of attributes
  * - Byte  1- 3: Number of descendants (size)
- * - Byte  4   : Tag name
+ * - Byte  4   : Namespace and tag name
  * - Byte  5- 7: Relative parent reference
  * TEXT NODES:
  * - Bit 0-2   : Node kind (TEXT/PI/COMM)
@@ -29,7 +29,7 @@ import org.basex.query.xpath.expr.FTOption;
  * ATTRIBUTE NODES:
  * - Bit 0-2   : Node kind (ATTR)
  * - Byte  0- 3: Attribute value
- * - Byte     4: Attribute name
+ * - Byte     4: Namespace and attribute name
  * - Byte     7: Relative parent reference
  * </pre>
  *
@@ -86,7 +86,12 @@ public class MemData extends Data {
 
   @Override
   public final int tagID(final int pre) {
-    return (int) (val[pre] >>> 24) & 0xFF;
+    return (int) (val[pre] >>> 24) & 0x3F;
+  }
+
+  @Override
+  public final int tagNS(final int pre) {
+    return (int) (val[pre] >>> 30) & 0x3;
   }
 
   @Override
@@ -96,7 +101,12 @@ public class MemData extends Data {
 
   @Override
   public final int attNameID(final int pre) {
-    return (int) (val[pre] >>> 24) & 0xFF;
+    return (int) (val[pre] >>> 24) & 0x3F;
+  }
+
+  @Override
+  public final int attNS(final int pre) {
+    return (int) (val[pre] >>> 30) & 0x3;
   }
 
   @Override
@@ -200,35 +210,40 @@ public class MemData extends Data {
    */
   public final void addElem(final byte[] t, final int d, final int a,
       final int s, final int k) {
-    addElem(tags.index(t, null), d, a, s, k);
+    addElem(tags.index(t, null), ns.get(t), d, a, s, k);
   }
 
   /**
    * Adds an element.
    * @param t tag
+   * @param n namespace
    * @param d distance
    * @param a number of attributes
    * @param s node size
    * @param k node kind
    */
-  public final void addElem(final int t, final int d, final int a, final int s,
-      final int k) {
+  public final void addElem(final int t, final int n, final int d, final int a,
+      final int s, final int k) {
 
     check();
-    val[size++] = ((long) k << 61) + ((long) a << 56) + ((long) s << 32) +
-      ((long) t << 24) + d;
+    val[size++] = ((long) k << 61) + ((long) a << 56) + ((long) n << 38) +
+      ((long) s << 32) + ((long) t << 24) + d;
   }
 
   /**
    * Adds an attribute.
    * @param a attribute name
+   * @param n namespace
    * @param v attribute value
    * @param d distance
    */
-  public final void addAtt(final int a, final byte[] v, final int d) {
+  public final void addAtt(final int a, final int n, final byte[] v,
+      final int d) {
+
     check();
     final long ai = attIndex(v);
-    val[size++] = ((long) Data.ATTR << 61) + (ai << 32) + ((long) a << 24) + d;
+    val[size++] = ((long) Data.ATTR << 61) + (n << 38) + (ai << 32) +
+      ((long) a << 24) + d;
   }
 
   /**
@@ -268,7 +283,7 @@ public class MemData extends Data {
    * @param p parent
    */
   public final void addAtt(final byte[] a, final byte[] v, final int p) {
-    addAtt(atts.index(a, v), v, p);
+    addAtt(atts.index(a, v), ns.get(a), v, p);
   }
 
   /**

@@ -114,9 +114,10 @@ public final class Test {
         final byte[] nm = tmp.nname();
         return Token.eq(ln, Token.substring(nm, Token.indexOf(nm, ':') + 1));
       }
-
+      
       final QNm nm = tmp.qname(qname);
       if(!pre && !nm.ns()) return Token.eq(nm.str(), ln);
+      
       ctx.ns.uri(nm);
       return Token.eq(ln, nm.ln()) && (name.uri.eq(nm.uri) ||
         name.uri == Uri.EMPTY && nm.uri == Uri.XMLNS);

@@ -1,6 +1,7 @@
 package org.basex.build.fs;
 
 import static org.basex.build.fs.FSText.*;
+import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.File;
 import java.io.FileInputStream;

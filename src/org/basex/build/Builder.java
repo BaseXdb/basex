@@ -79,15 +79,16 @@ public abstract class Builder extends Progress {
   
   /**
    * Adds a complex node to the database.
-   * @param tok the token to be added (tag name or content)
+   * @param tok the tag name reference
+   * @param tns the tag namespace
    * @param par relative parent value (distance)
    * @param at optional attribute tokens
    * @param atr numeric attribute references
    * @param kind node type
    * @throws IOException in case of parsing or writing problems 
    */
-  protected abstract void addNode(int tok, int par, byte[][] at, int[] atr,
-      byte kind) throws IOException;
+  protected abstract void addNode(int tok, int tns, int par, byte[][] at,
+      int[] atr, byte kind) throws IOException;
   
   /**
    * Adds the size value to the table.
@@ -139,14 +140,6 @@ public abstract class Builder extends Progress {
   }
 
   /**
-   * Removes a namespace; called by the building instance.
-   * @param name the attribute name to be processed
-  public final void endNS(final byte[] name) {
-    ns.delete(name);
-  }
-   */
-
-  /**
    * Opens a new tag; called by the building instance.
    * @param tag the tag to be processed
    * @param att the tag attributes
@@ -195,9 +188,8 @@ public abstract class Builder extends Progress {
   protected final void addNode(final byte kind, final byte[] name,
       final byte[][] att, final boolean open) throws IOException {
     
-    // convert and index tag
+    // convert tag to utf8
     final byte[] tag = utf8(name, meta.encoding);
-    final int tid = tags.index(tag, null);
 
     // set leaf node information in index and add tag and atts to statistics 
     if(level != 0) {
@@ -206,16 +198,21 @@ public abstract class Builder extends Progress {
     }
 
     // create numeric attribute references and check if they appear only once
-    final int al = att != null ? att.length >> 1 : 0;
+    final int al = att != null ? att.length : 0;
     final int[] at = al != 0 ? new int[al] : null;
-    for(int a = 0; a < al; a++) {
-      at[a] = atts.index(att[a << 1], att[(a << 1) + 1]);
+    for(int a = 0; a < al; a += 2) {
+      at[a] = atts.index(att[a], att[a + 1]);
+      at[a + 1] = ns.get(att[a]);
     }
-    for(int a = 0; a < al - 1; a++) {
-      for(int b = a + 1; b < al; b++) {
-        if(at[a] == at[b]) error(DUPLATT, parser.det(), att[a << 1]);
+    for(int a = 0; a < al - 1; a += 2) {
+      for(int b = a + 2; b < al; b += 2) {
+        if(at[a] == at[b]) error(DUPLATT, parser.det(), att[a]);
       }
     }
+
+    // get tag and namespaces references
+    final int tid = tags.index(tag, null);
+    final int tns = ns.get(tag);
 
     // remember tag id and parent reference
     tagStack[level] = tid;
@@ -223,7 +220,7 @@ public abstract class Builder extends Progress {
 
     // add node
     final int par = level != 0 ? size - parStack[level - 1] : 1;
-    addNode(tid, par, att, at, kind);
+    addNode(tid, tns, par, att, at, kind);
 
     if(open && meta.height < ++level) meta.height = level;
     if(size != 1) inDoc = true;

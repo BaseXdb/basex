@@ -1,7 +1,7 @@
 package org.basex.core.proc;
 
-import static org.basex.data.DataText.*;
 import static org.basex.Text.*;
+import static org.basex.data.DataText.*;
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.Commands;
@@ -12,14 +12,14 @@ import org.basex.io.IO;
 
 /**
  * Evaluates the 'drop' command. Deletes a database or index structure.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public final class Drop extends Proc {
-  /** Create option. */
+  /** Drop option. */
   public static final String DB = "database";
-  /** Create option. */
+  /** Drop option. */
   public static final String INDEX = "index";
 
   @Override
@@ -29,7 +29,7 @@ public final class Drop extends Proc {
     if(type.equals(INDEX)) return index();
     throw new IllegalArgumentException();
   }
-  
+
   /**
    * Drops the specified database.
    * @return success of operation
@@ -73,13 +73,12 @@ public final class Drop extends Proc {
     }
     if(type.equals(Create.FTX)) {
       data.meta.ftxindex = false;
-      if (Prop.fuzzyindex)
-        return dropIndex(Index.TYPE.FUY, DATAFTX);
-      return dropIndex(Index.TYPE.FTX, DATAFTX);
+      final Index.TYPE typ = Prop.fuzzyindex ? Index.TYPE.FUY : Index.TYPE.FTX;
+      return dropIndex(typ, DATAFTX);
     }
     throw new IllegalArgumentException();
   }
-  
+
   /**
    * Drops the specified index.
    * @param index index type
@@ -91,8 +90,8 @@ public final class Drop extends Proc {
       final Data data = context.data();
       data.meta.finish(data.size);
       data.closeIndex(index);
-      return IO.dbdelete(data.meta.dbname, pat + "..basex") ? info(DBDROP) :
-        error(DBDROPERR);
+      return IO.dbdelete(data.meta.dbname, pat + "." + IO.BASEXSUFFIX) ?
+          info(DBDROP) : error(DBDROPERR);
     } catch(final IOException ex) {
       BaseX.debug(ex);
       return error(ex.getMessage());

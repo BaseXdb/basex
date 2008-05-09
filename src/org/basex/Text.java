@@ -645,6 +645,10 @@ public interface Text {
   String CREATETITLE = lang("dc_title");
   /** XML File Description. */
   String CREATEXMLDESC = lang("dc_xmldesc") + " (*.xml)";
+  /** ZIP File Description. */
+  String CREATEZIPDESC = lang("dc_zipdesc") + " (*.zip)";
+  /** GZ File Description. */
+  String CREATEGZDESC = lang("dc_gzdesc") + " (*.gz)";
   /** XQ File Description. */
   String CREATEXQDESC = lang("dc_xqdesc") + " (*.xq)";
   /** Dialog Title for Database Options. */

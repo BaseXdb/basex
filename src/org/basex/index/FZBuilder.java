@@ -3,6 +3,8 @@ package org.basex.index;
 import static org.basex.Text.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
+
+import org.basex.BaseX;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.data.Data;
@@ -64,13 +66,13 @@ public final class FZBuilder extends Progress implements IndexBuilder {
 
     if(Prop.debug) {
       Performance.gc(5);
-      System.out.println("Indexed: " + Performance.getMem() + ", " + p);
+      BaseX.outln("Indexed: %, %", Performance.getMem(), p);
     }
     write(data);
 
     if(Prop.debug) {
       Performance.gc(5);
-      System.out.println("Written: " + Performance.getMem() + ", " + p);
+      BaseX.outln("Written: %, %", Performance.getMem(), p);
     }
     return new Fuzzy(data.meta.dbname);
   }

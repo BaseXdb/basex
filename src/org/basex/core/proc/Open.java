@@ -17,27 +17,26 @@ import org.basex.io.IO;
 public final class Open extends Proc {
   @Override
   protected boolean exec() {
-    final String db = new IO(cmd.arg(0)).dbname();
+    final String db = cmd.arg(0);
     if(!IO.dbpath(db).exists()) return error(DBNOTFOUND, db);
 
+    // close old database
     context.close();
-    Data data = null;
+    
     try {
-      data = new DiskData(db);
+      // open new database instance
+      final Data data = new DiskData(db);
+      context.data(data);
+      if(Prop.info) {
+        if(data.meta.newindex) info(INDUPDATE + NL);
+        timer(DBOPENED);
+      }
+      return true;
     } catch(final IOException ex) {
       BaseX.debug(ex);
       final String msg = ex.getMessage();
       return error(msg.length() != 0 ? msg : DBOPENERR);
     }
-    
-    // set new global data reference
-    context.data(data);
-    
-    if(Prop.info) {
-      if(data.meta.newindex) info(INDUPDATE + NL);
-      timer(DBOPENED);
-    }
-    return true;
   }
 
   /**

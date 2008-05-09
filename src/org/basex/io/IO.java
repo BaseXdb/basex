@@ -7,6 +7,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.util.Token;
@@ -21,10 +24,16 @@ import org.xml.sax.InputSource;
  * @author Christian Gruen
  */
 public class IO {
+  /** BaseX Suffix. */
+  public static final String BASEXSUFFIX = ".basex";
   /** XQuery Suffix. */
   public static final String XQSUFFIX = ".xq";
   /** XML Suffix. */
   public static final String XMLSUFFIX = ".xml";
+  /** ZIP Suffix. */
+  public static final String ZIPSUFFIX = ".zip";
+  /** GZIP Suffix. */
+  public static final String GZSUFFIX = ".gz";
 
   /** BlockSize Power. */
   public static final int BLOCKPOWER = 12;
@@ -35,8 +44,8 @@ public class IO {
   
   /** File reference. */
   private File file;
-  /** File name. */
-  private String name;
+  /** File path and name. */
+  private String path;
   /** URL flag. */
   private boolean url;
   /** Content flag. */
@@ -50,7 +59,7 @@ public class IO {
    */
   public IO(final File f) {
     file = f;
-    name = f.getAbsolutePath().replace('\\', '/');
+    path = f.getAbsolutePath().replace('\\', '/');
   }
   
   /**
@@ -61,7 +70,7 @@ public class IO {
     content = f.startsWith("<");
     if(content) cont = Token.token(f);
     url = !content && f.startsWith("http://");
-    name = content ? "tmp" : url ? f :
+    path = content ? "tmp" : url ? f :
       new File(f).getAbsolutePath().replace('\\', '/');
   }
   
@@ -72,7 +81,7 @@ public class IO {
   public IO(final byte[] f) {
     content = true;
     cont = f;
-    name = "tmp";
+    path = "tmp";
   }
   
   /**
@@ -83,7 +92,7 @@ public class IO {
   public byte[] content() throws IOException {
     if(cont != null) return cont;
     if(url) {
-      final URL u = new URL(name);
+      final URL u = new URL(path);
       final BufferedInputStream bis = new BufferedInputStream(u.openStream());
       final TokenBuilder tb = new TokenBuilder();
       int b = 0;
@@ -106,8 +115,25 @@ public class IO {
    */
   public BufferInput buffer() {
     try {
+      // return cached content
       if(content || url) return new CachedInput(content());
-      return new BufferInput(name);
+
+      // support for zipped files; the first file will be chosen
+      if(path.endsWith(ZIPSUFFIX)) {
+        ZipInputStream zip = new ZipInputStream(new FileInputStream(file));
+        ZipEntry entry = zip.getNextEntry();
+        final BufferInput in = new BufferInput(zip);
+        in.length(entry.getSize());
+        return in;
+      }
+      // support for gzipped files
+      if(path.endsWith(GZSUFFIX)) {
+        GZIPInputStream zip = new GZIPInputStream(new FileInputStream(file));
+        return new BufferInput(zip);
+      }
+      
+      // return file content
+      return new BufferInput(path);
     } catch(final IOException ex) {
       ex.printStackTrace();
       BaseX.notexpected();
@@ -124,7 +150,7 @@ public class IO {
     if(!url) return file().exists();
     try {
       // enough?...
-      new URL(name).openConnection();
+      new URL(path).openConnection();
       //new URL(file).openStream();
       return true;
     } catch(IOException ex) {
@@ -165,10 +191,25 @@ public class IO {
   /**
    * Returns a buffered reader for the file.
    * @return buffered reader
+   * @throws IOException I/O exception
    */
-  public InputSource source() {
-    return content ? new InputSource(new ByteArrayInputStream(cont)) :
-      new InputSource(url ? name : "file:///" + name);
+  public InputSource source() throws IOException {
+    // return cached content
+    if(content) return new InputSource(new ByteArrayInputStream(cont));
+    
+    // support for zipped files; the first file will be chosen
+    if(path.endsWith(ZIPSUFFIX)) {
+      ZipInputStream zip = new ZipInputStream(new FileInputStream(file));
+      zip.getNextEntry();
+      return new InputSource(zip);
+    }
+    // support for gzipped files
+    if(path.endsWith(GZSUFFIX)) {
+      GZIPInputStream zip = new GZIPInputStream(new FileInputStream(file));
+      return new InputSource(zip);
+    }
+    // return file content...
+    return new InputSource(url ? path : "file:///" + path);
   }
   
   /**
@@ -185,7 +226,7 @@ public class IO {
    * @param suf suffix
    */
   public void suffix(final String suf) {
-    if(name.indexOf(".") == -1) name += suf;
+    if(path.indexOf(".") == -1) path += suf;
   }
 
   /**
@@ -194,8 +235,7 @@ public class IO {
    */
   public String dbname() {
     final String n = name();
-    return n.endsWith(IO.XMLSUFFIX) ?
-        n.substring(0, n.length() - IO.XMLSUFFIX.length()) : n;
+    return n.contains(".") ? n.substring(0, n.lastIndexOf(".")) : n;
   }
 
   /**
@@ -203,7 +243,7 @@ public class IO {
    * @return chopped filename
    */
   public String name() {
-    return name.substring(name.lastIndexOf('/') + 1);
+    return path.substring(path.lastIndexOf('/') + 1);
   }
 
   /**
@@ -211,7 +251,7 @@ public class IO {
    * @return chopped filename
    */
   public String path() {
-    return name;
+    return path;
   }
 
   /**
@@ -219,7 +259,7 @@ public class IO {
    * @return chopped filename
    */
   public File file() {
-    if(file == null) file = new File(name);
+    if(file == null) file = new File(path);
     return file;
   }
 
@@ -230,7 +270,7 @@ public class IO {
    */
   public void write(final byte[] c) throws IOException {
     if(content || url) BaseX.notexpected();
-    final FileOutputStream out = new FileOutputStream(name);
+    final FileOutputStream out = new FileOutputStream(path);
     out.write(c);
     out.close();
     cont = c;
@@ -251,12 +291,12 @@ public class IO {
    * @return result of check
    */
   public boolean eq(final IO io) {
-    return name.equals(io.name);
+    return path.equals(io.path);
   }
 
   @Override
   public String toString() {
-    return name;
+    return path;
   }
 
   // STATIC METHODS ===========================================================
@@ -269,7 +309,7 @@ public class IO {
    * @return database filename
    */
   public static File dbfile(final String db, final String file) {
-    return new File(Prop.dbpath + '/' + db + '/' + file + ".basex");
+    return new File(Prop.dbpath + '/' + db + '/' + file + BASEXSUFFIX);
   }
   
   /**

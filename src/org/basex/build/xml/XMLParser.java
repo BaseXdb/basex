@@ -2,12 +2,13 @@ package org.basex.build.xml;
 
 import static org.basex.build.BuildText.*;
 import static org.basex.Text.*;
+import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.build.BuildException;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
+import org.basex.data.DataText;
 import org.basex.io.IO;
-import org.basex.util.Token;
  
 /**
  * This class parses the tokens that are delivered by the
@@ -90,19 +91,28 @@ public final class XMLParser extends Parser {
         consume(Type.EQ);
         skipSpace();
         consume(Type.QUOTE);
-        byte[] attValue = Token.EMPTY;
+        byte[] attValue = EMPTY;
         if(scanner.type == Type.ATTVALUE) {
           attValue = scanner.token.finish();
           scanner.more();
         }
         consume(Type.QUOTE);
 
-        // add attribute
-        final byte[][] tmp = new byte[as + 2][];
-        if(as > 0) System.arraycopy(atts, 0, tmp, 0, as);
-        atts = tmp;
-        atts[as++] = attName;
-        atts[as++] = attValue;
+        final int s = indexOf(attName, ':');
+        if(s != -1 && startsWith(attName, DataText.XMLNSC)) {
+          // open namespace...
+          builder.startNS(substring(attName, s + 1), attValue);
+        } else if(eq(attName, DataText.XMLNS)) {
+          // open namespace...
+          builder.startNS(EMPTY, attValue);
+        } else {
+          // add attribute
+          final byte[][] tmp = new byte[as + 2][];
+          if(as > 0) System.arraycopy(atts, 0, tmp, 0, as);
+          atts = tmp;
+          atts[as++] = attName;
+          atts[as++] = attValue;
+        }
 
         if(scanner.type != Type.R_BR && scanner.type != Type.CLOSE_R_BR) {
           consume(Type.WS);

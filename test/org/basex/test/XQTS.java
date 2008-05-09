@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.regex.Pattern;
+import org.basex.BaseX;
 import org.basex.core.Commands;
 import org.basex.core.Context;
 import org.basex.core.Prop;
@@ -81,8 +82,8 @@ public final class XQTS {
   /** Inspect flag. */
   private static final byte[] INSPECT = token("Inspect");
 
-  /** Maximum output. */
-  private static int maxout = 100;
+  /** Maximum length of result output. */
+  private static int maxout = 500;
 
   /** Delimiter. */
   private static final String DELIM = "#~%~#";
@@ -161,7 +162,7 @@ public final class XQTS {
         single = arg;
         maxout *= 10;
       } else {
-        System.out.println("\nBaseX vs. XQuery Test Suite\n" +
+        BaseX.outln("\nBaseX vs. XQuery Test Suite\n" +
             " [pat] perform only tests with the specified pattern\n" +
             " -s[tests] performs the specified tests\n" + 
             " -h show this help\n" +
@@ -186,16 +187,16 @@ public final class XQTS {
 
     final Context context = new Context();
     if(!Proc.execute(context, Commands.CHECK, tests + "XQTSCatalog.xml")) {
-      System.out.println("XQTSCatalog.xml not found.");
+      BaseX.outln("XQTSCatalog.xml not found.");
       return;
     }
     data = context.data();
 
     final Nodes root = new Nodes(0, data);
-    System.out.println("\nBaseX vs. XQuery Test Suite " +
+    BaseX.outln("\nBaseX vs. XQuery Test Suite " +
         text("/test-suite/@version", root));
 
-    System.out.println("\nCaching Sources...");
+    BaseX.outln("\nCaching Sources...");
     for(final int s : nodes("//source", root).pre) {
       final Nodes srcRoot = new Nodes(s, data);
       final String source = (tests +
@@ -203,7 +204,7 @@ public final class XQTS {
       srcFiles.put(text("@ID", srcRoot), source);
     }
 
-    System.out.println("Caching Modules...");
+    BaseX.outln("Caching Modules...");
     for(final int s : nodes("//module", root).pre) {
       final Nodes srcRoot = new Nodes(s, data);
       final String module = (tests +
@@ -211,7 +212,7 @@ public final class XQTS {
       modules.put(text("@ID", srcRoot), module);
     }
 
-    System.out.println("Caching Collections...");
+    BaseX.outln("Caching Collections...");
     for(final int c : nodes("//collection", root).pre) {
       final Nodes nodes = new Nodes(c, data);
       final String cname = text("@ID", nodes);
@@ -220,23 +221,23 @@ public final class XQTS {
     }
 
     if(reporting) {
-      System.out.println("Delete old results...");
+      BaseX.outln("Delete old results...");
       delete(new File[] { new File(results) });
     }
 
-    System.out.print("Parsing Queries");
+    BaseX.out("Parsing Queries");
     final Nodes nodes = nodes("//test-case | //ts:test-case", root);
     for(int t = 0; t < nodes.size; t++) {
       if(!parse(new Nodes(nodes.pre[t], data))) break;
-      if(t % 1000 == 0) System.out.print(".");
+      if(t % 1000 == 0) BaseX.out(".");
     }
-    System.out.println();
+    BaseX.outln("");
 
     final String time = perf.getTimer();
 
     final int total = ok + ok2 + err + err2;
 
-    System.out.println("Writing log file...\n");
+    BaseX.outln("Writing log file...\n");
     BufferedWriter bw = new BufferedWriter(
         new OutputStreamWriter(new FileOutputStream(PATHLOG), UTF8));
     bw.write("TEST RESULTS ==================================================");
@@ -270,11 +271,11 @@ public final class XQTS {
       bw.close();
     }
 
-    System.out.println("Total #Queries: " + total);
-    System.out.println("Correct / Empty results: " + ok + " / " + ok2);
-    System.out.print("Conformance (w/empty results): ");
-    System.out.println(pc(ok, total) + " / " + pc(ok + ok2, total));
-    System.out.println("Total Time: " + time);
+    BaseX.outln("Total #Queries: " + total);
+    BaseX.outln("Correct / Empty results: " + ok + " / " + ok2);
+    BaseX.out("Conformance (w/empty results): ");
+    BaseX.outln(pc(ok, total) + " / " + pc(ok + ok2, total));
+    BaseX.outln("Total Time: " + time);
   }
 
   /**
@@ -298,7 +299,7 @@ public final class XQTS {
     final String outname = text("@name", root);
     String inname = text("query/@name", root);
     if(inname == null) inname = outname;
-    if(verbose) System.out.println(inname);
+    if(verbose) BaseX.outln(inname);
 
     if(single != null && !outname.startsWith(single)) return true;
 
@@ -765,4 +766,3 @@ public final class XQTS {
     return sb.toString().trim();
   }
 }
-

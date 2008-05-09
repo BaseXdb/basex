@@ -33,13 +33,16 @@ public final class Info extends XPath {
   @Override
   protected boolean exec() {
     type = cmd.nrArgs() != 0 ? cmd.arg(0).toLowerCase() : null;
+    
+    // no argument specified; show general info
     if(type == null) return true;
+    // no database instance open...
     if(context.data() == null) return error(DBEMPTY);
 
-    final int args = cmd.nrArgs();
-
     if(type.equals(TBL)) {
-      if(args < 2 || Token.toInt(cmd.arg(1)) != Integer.MIN_VALUE) return true;
+      // evaluate input as number range
+      if(cmd.nrArgs() < 2 || Token.toInt(cmd.arg(1)) != Integer.MIN_VALUE)
+        return true;
 
       // evaluate input as xpath
       cmd.arg(cmd.args().substring(TBL.length() + 1));
@@ -48,6 +51,7 @@ public final class Info extends XPath {
 
     if(type.equals(IDX) || type.equals(DB)) return true;
 
+    // no command argument found...
     throw new IllegalArgumentException();
   }
 
@@ -91,19 +95,18 @@ public final class Info extends XPath {
     Performance.gc(4);
 
     final Data data = context.data();
-    long fl = 0;
+    // calculate database size
     final File file = IO.dbpath(data.meta.dbname);
-    if(file.exists()) {
-      for(final File f : file.listFiles()) fl += f.length();
-    }
+    long fl = 0;
+    if(file.exists()) for(final File f : file.listFiles()) fl += f.length();
 
     prop(out, INFODB, false);
     prop(out, INFODBNAME + data.meta.dbname, true);
     prop(out, INFODOC + data.meta.file, true);
     prop(out, INFOTIME + new SimpleDateFormat("dd.MM.yyyy hh:mm:ss").format(
         new Date(data.meta.time)), true);
-    if(data.meta.filesize != 0) prop(out, INFODOCSIZE +
-        Performance.formatSize(data.meta.filesize), true);
+    prop(out, INFODOCSIZE + (data.meta.filesize != 0 ?
+        Performance.formatSize(data.meta.filesize) : "-"), true);
     if(fl != 0) prop(out, INFODBSIZE + Performance.formatSize(fl), true);
     prop(out, INFOENCODING + data.meta.encoding, true);
     prop(out, INFONODES + data.size, true);

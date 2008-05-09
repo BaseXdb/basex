@@ -1,7 +1,6 @@
 package org.basex.data;
 
 import java.io.IOException;
-import org.basex.build.fs.FSText;
 import org.basex.index.Index;
 import org.basex.index.Names;
 import org.basex.index.Namespaces;
@@ -81,16 +80,16 @@ public abstract class Data  {
    * Dissolves the references to often used tag names and attributes.
    */
   public final void initNames() {
-    deepfs = tags.id(FSText.DEEPFS) != 0;
-    xmlnsID = atts.id(FSText.XMLNS);
-    nameID = atts.id(FSText.NAME);    
+    deepfs = tags.id(DataText.DEEPFS) != 0;
+    xmlnsID = atts.id(DataText.XMLNS);
+    nameID = atts.id(DataText.NAME);    
     if(deepfs) {
-      fileID = tags.id(FSText.FILE);
-      dirID = tags.id(FSText.DIR);
-      contentID = tags.id(FSText.CONTENT);
-      sizeID = atts.id(FSText.SIZE);
-      suffixID = atts.id(FSText.SUFFIX);
-      timeID = atts.id(FSText.MTIME);
+      fileID = tags.id(DataText.FILE);
+      dirID = tags.id(DataText.DIR);
+      contentID = tags.id(DataText.CONTENT);
+      sizeID = atts.id(DataText.SIZE);
+      suffixID = atts.id(DataText.SUFFIX);
+      timeID = atts.id(DataText.MTIME);
     }
   }
   
@@ -184,6 +183,13 @@ public abstract class Data  {
   }
 
   /**
+   * Returns a tag namespace (reference to the tag namespace).
+   * @param pre pre value
+   * @return token reference
+   */
+  public abstract int tagNS(int pre);
+
+  /**
    * Returns a text.
    * @param pre pre value
    * @return atomized value
@@ -237,6 +243,13 @@ public abstract class Data  {
   public final int attNameID(final byte[] tok) {
     return atts.id(tok);
   }
+
+  /**
+   * Returns an attribute namespace (reference to the attribute namespace).
+   * @param pre pre value
+   * @return token reference
+   */
+  public abstract int attNS(int pre);
 
   /**
    * Returns an attribute value.

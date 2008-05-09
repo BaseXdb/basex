@@ -14,7 +14,7 @@ import org.basex.util.Token;
  */
 public class BufferInput {
   /** Byte buffer. */
-  protected final byte[] buffer;
+  protected byte[] buffer;
   /** Current buffer position. */
   protected int pos;
   /** Input length. */
@@ -27,6 +27,11 @@ public class BufferInput {
   private InputStream in;
   /** Default encoding for text files. */
   private String encoding = Token.UTF8;
+
+  /**
+   * Empty constructor.
+   */
+  protected BufferInput() { }
 
   /**
    * Initializes the file reader.
@@ -43,7 +48,15 @@ public class BufferInput {
    * @throws IOException IO Exception
    */
   public BufferInput(final File file) throws IOException {
-    this(file, new byte[4096]);
+    this(new FileInputStream(file));
+  }
+
+  /**
+   * Initializes the file reader.
+   * @param is input stream
+   */
+  public BufferInput(final InputStream is) {
+    this(is, new byte[4096]);
   }
 
   /**
@@ -53,19 +66,18 @@ public class BufferInput {
    * @throws IOException IO Exception
    */
   public BufferInput(final String file, final byte[] buf) throws IOException {
-    this(new File(file), buf);
+    this(new FileInputStream(file), buf);
+    length = file.length();
   }
 
   /**
    * Initializes the file reader.
-   * @param file the file to be read
+   * @param is input stream
    * @param buf input buffer
-   * @throws IOException IO Exception
    */
-  public BufferInput(final File file, final byte[] buf) throws IOException {
+  public BufferInput(final InputStream is, final byte[] buf) {
     this(buf);
-    in = new FileInputStream(file);
-    length = file.length();
+    in = is;
     next();
   }
   
@@ -120,7 +132,7 @@ public class BufferInput {
   /**
    * Reads the next buffer entry.
    */
-  private void next() {
+  protected void next() {
     try {
       pos = 0;
       len += size;
@@ -146,7 +158,7 @@ public class BufferInput {
    * Closes the input stream.
    * @throws IOException IO Exception
    */
-  public final void close() throws IOException {
+  public void close() throws IOException {
     if(in != null) in.close();
   }
 
@@ -164,5 +176,13 @@ public class BufferInput {
    */
   public final long length() {
     return length;
+  }
+
+  /**
+   * Set input length.
+   * @param l input length
+   */
+  public final void length(final long l) {
+    length = l;
   }
 }

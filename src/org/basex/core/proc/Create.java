@@ -59,7 +59,8 @@ public final class Create extends Proc {
     } catch(final IllegalArgumentException ex) {
       throw ex;
     } catch(final RuntimeException ex) {
-      if(ex.getClass() == RuntimeException.class) return error(CANCELCREATE);
+      if(ex.getClass() == RuntimeException.class &&
+          ex.getMessage().length() == 0) return error(CANCELCREATE);
       throw ex;
     }
     throw new IllegalArgumentException();
