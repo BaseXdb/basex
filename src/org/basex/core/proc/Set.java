@@ -88,6 +88,8 @@ public final class Set extends Proc {
       Prop.onthefly = toggle(Prop.onthefly, option + " ", ext);
     } else if(option.equals("intparse")) {
       Prop.intparse = toggle(Prop.intparse, option + " ", ext);
+    } else if(option.equals("lserr")) {
+      Prop.lserr = Math.max(1, Token.toInt(ext));
     } else if(option.equals("language")) {
       Prop.language = ext;
       info(option + ": " + ext);
