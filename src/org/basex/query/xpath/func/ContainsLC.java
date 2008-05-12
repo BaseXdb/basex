@@ -36,16 +36,17 @@ public final class ContainsLC extends Func {
     final int s1 = v[0].size();
     final int s2 = v[1].size();
     if(s1 == 0 || s2 == 0) return Bool.FALSE;
+    
+    final byte[] lit = v[1].str();
     if(v[0] instanceof NodeSet && s2 == 1) {
       final NodeSet nodes = (NodeSet) v[0];
       final Data data = nodes.data;
-      final byte[] lit = v[1].str();
       for(int n = 0; n < nodes.size; n++) {
         if(Token.containslc(data.atom(nodes.nodes[n]), lit)) return Bool.TRUE;
       }
       return Bool.FALSE;
     }
-    return Bool.get(Token.containslc(v[0].str(), v[1].str()));
+    return Bool.get(Token.containslc(v[0].str(), lit));
   }
 
   @Override

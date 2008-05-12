@@ -44,6 +44,7 @@ public final class XPathContext {
     addFunction("contains", Contains.class);
     addFunction("count", Count.class);
     addFunction("doc", Doc.class);
+    addFunction("ends-with", EndsWith.class);
     addFunction("false", False.class);
     addFunction("floor", Floor.class);
     addFunction("id", Id.class);
@@ -68,6 +69,7 @@ public final class XPathContext {
     addFunction("true", True.class);
     // BaseX specific functions
     addFunction(ContainsLC.NAME, ContainsLC.class);
+    addFunction("basex:matches", Matches.class);
     addFunction("basex:distinct", Distinct.class);
     addFunction("basex:sort", Sort.class);
     addFunction("basex:random", Random.class);
