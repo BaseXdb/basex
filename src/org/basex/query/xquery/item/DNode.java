@@ -10,6 +10,7 @@ import org.basex.query.xquery.iter.NodIter;
 import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.iter.NodeMore;
 import org.basex.query.xquery.iter.NodeNext;
+import org.basex.query.xquery.util.Namespaces;
 import org.basex.util.TokenList;
 
 /**
@@ -107,13 +108,26 @@ public final class DNode extends Node {
 
   @Override
   public QNm qname() {
-    return new QNm(nname());
+    final byte[] nm = nname();
+    final int i = data.ns.get(nm, pre);
+    Uri uri = Uri.EMPTY;
+    if(i > 0) {
+      uri = Uri.uri(data.ns.key(i));
+    } else if(i == 0) {
+      uri = Namespaces.DEFAULT.uri(substring(nm, 0, indexOf(nm, ':')));
+    }
+    return new QNm(nm, uri);
   }
   
   @Override
   public QNm qname(final QNm nm) {
-    nm.name(nname());
-    // [CG] DNode/Namespaces: introduce correct namespace handling
+    final byte[] name = nname();
+    nm.name(name);
+    // [CG] next line slows it down pretty much...
+    int n = data.ns.get(name, pre);
+    if(n > 0) nm.uri = Uri.uri(data.ns.key(n));
+    
+    /* [CG] DNode/Namespaces: introduce correct namespace handling
     if(data.xmlnsID != 0) {
       int s = pre + data.attSize(pre, data.kind(pre));
       int p = pre;
@@ -123,7 +137,7 @@ public final class DNode extends Node {
           break;
         }
       }
-    }
+    }*/
     return nm;
   }
 
@@ -164,6 +178,7 @@ public final class DNode extends Node {
   public Node parent() {
     if(par != null) return par;
     final int p = data.parent(pre, data.kind(pre));
+    
     // check if parent constructor exists; if not, include document root node
     if(p == (root != null ? 0 : -1)) return root;
     final DNode node = copy();
@@ -242,7 +257,7 @@ public final class DNode extends Node {
             
             // add xmlns attribute for tag
             final int i = data.ns.get(at, pre);
-            if(i != 0) {
+            if(i > 0) {
               final byte[] pref = substring(at, 0, indexOf(at, ':'));
               final byte[] atr = concat(XMLNSCOL, pref);
               if(!names.contains(atr)) {
@@ -254,12 +269,13 @@ public final class DNode extends Node {
           
           // add xmlns attribute for tag
           final int i = data.ns.get(name, pre);
-          if(i != 0) {
+          if(i > 0) {
             // [CG] check namespace handling..
+            final int j = indexOf(name, ':');
             final byte[] uri = data.ns.key(i);
-            final byte[] pref = substring(name, 0, indexOf(name, ':'));
+            final byte[] pref = j == -1 ? null : substring(name, 0, j);
             //final byte[] uri = ctx.ns.uri(pref).str();
-            final byte[] at = concat(XMLNSCOL, pref);
+            final byte[] at = j == -1 ? XMLNS : concat(XMLNSCOL, pref);
             if(!names.contains(at)) {
               names.add(at);
               values.add(uri);

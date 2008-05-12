@@ -58,7 +58,7 @@ public final class Values extends Index {
 
   @Override
   public int[] ids(final byte[] tok) {
-    final int pos = get(tok);
+    final long pos = get(tok);
     if(pos == 0) return Array.NOINTS;
     
     final int ds = idxl.readNum(pos);
@@ -83,12 +83,12 @@ public final class Values extends Index {
    * @param key token to be found
    * @return id offset
    */
-  private int get(final byte[] key) {
+  private long get(final byte[] key) {
     int l = 0, h = size - 1;
     while(l <= h) {
       int m = (l + h) >>> 1;
 
-      final int pos = idxr.read4(m);
+      final long pos = idxr.read5(m * 5);
       idxl.readNum(pos);
       final int pre = idxl.readNum();
       final byte[] txt = text ? data.text(pre) : data.attValue(pre);

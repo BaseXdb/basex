@@ -67,22 +67,29 @@ public final class Namespaces extends Set {
     pref[sz] = p;
     vals[sz] = i < 0 ? -i : i;
     pre[sz++] = s;
-    
-    BaseX.debug("Add Namespace % {%}, %", sz, u, p);
   }
 
   /**
    * Returns the namespace for the specified qname and pre value.
    * @param n tag/attribute name
    * @param p pre value
-   * @return namespace
+   * @return namespace reference, -1 if no prefix was found or 0 if no
+   * namespace was found
    */
   public int get(final byte[] n, final int p) {
-    final int s = indexOf(n, ':');
-    if(s == -1) return 0;
-    int i = sz - 1;
-    while(i >= 0 && p > pre[i]) i--;
-    return ns(n, s, i + 1);
+    if(sz == 0) return 0;
+    
+    // too slow.. binary search!..
+    int i = sz;
+    while(--i > 0 && p < pre[i]);
+    
+    i = Math.min(sz - 1, i + 1);
+    int s = indexOf(n, ':');
+    if(s == -1) {
+      for(s = i; i >= 0; i--) if(pref[i].length == 0) return vals[i];
+      return -1;
+    }
+    return ns(n, s, i);
   }
 
   /**
@@ -91,7 +98,9 @@ public final class Namespaces extends Set {
    * @return namespace
    */
   public int get(final byte[] n) {
-    return ns(n, indexOf(n, ':'), sz - 1);
+    final int s = indexOf(n, ':');
+    if(s == -1) return 0;
+    return ns(n, s, sz - 1);
   }
 
   /**
@@ -102,9 +111,9 @@ public final class Namespaces extends Set {
    * @return namespace
    */
   private int ns(final byte[] n, final int s, final int p) {
-    if(s == -1) return 0;
     final byte[] pr = substring(n, 0, s);
     if(eq(XML, pr)) return 0;
+    
     for(int i = p; i >= 0; i--) if(eq(pref[i], pr)) return vals[i];
     BaseX.notexpected();
     return 0;

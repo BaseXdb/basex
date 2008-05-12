@@ -62,7 +62,7 @@ public final class ValueBuilder extends Progress implements IndexBuilder {
     outl.writeNum(hs);
     final DataOutput outr = new DataOutput(db, f + 'r');
     while(index.more()) {
-      outr.writeInt(outl.size());
+      outr.write5(outl.size());
       int p = index.next();
       int ds = index.ns[p];
       outl.writeNum(ds);

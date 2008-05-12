@@ -242,7 +242,7 @@ public class MemData extends Data {
 
     check();
     final long ai = attIndex(v);
-    val[size++] = ((long) Data.ATTR << 61) + (n << 38) + (ai << 32) +
+    val[size++] = ((long) Data.ATTR << 61) + ((long) n << 38) + (ai << 32) +
       ((long) a << 24) + d;
   }
 

@@ -136,7 +136,8 @@ public final class FTBuilder extends Progress implements IndexBuilder {
           outN.writeInt(index.next[i][j + 1]);
         } else {
           // write data
-          outN.writeInt(outD.size()); // pointer on data
+          // <SG> int -> long...
+          outN.writeInt((int) outD.size()); // pointer on data
           outD.writeInts(index.pre[index.next[i][j + 1]]); // pre values
           outD.writeInts(index.pos[index.next[i][j + 1]]); // pos values
         }

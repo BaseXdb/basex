@@ -16,7 +16,7 @@ import org.basex.util.Array;
  */
 public final class Namespaces {
   /** Default namespaces. */
-  private static final NSIndex DEFAULT = NSIndex.get();
+  public static final NSIndex DEFAULT = NSIndex.get();
   /** Namespaces. */
   private QNm[] names = new QNm[1];
   /** Number of stored namespaces. */

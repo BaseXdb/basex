@@ -114,7 +114,7 @@ public final class Test {
         final byte[] nm = tmp.nname();
         return Token.eq(ln, Token.substring(nm, Token.indexOf(nm, ':') + 1));
       }
-      
+
       final QNm nm = tmp.qname(qname);
       if(!pre && !nm.ns()) return Token.eq(nm.str(), ln);
       

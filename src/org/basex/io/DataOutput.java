@@ -19,7 +19,7 @@ public final class DataOutput extends OutputStream {
   /** The underlying output stream. */
   private final OutputStream os;
   /** Number of written bytes. */
-  private int size;
+  private long size;
   
   /**
    * Constructor writing to an output stream.
@@ -57,10 +57,6 @@ public final class DataOutput extends OutputStream {
     os = new BufferedOutput(new FileOutputStream(path), bufs);
   }
   
-  /*
-   * Writes a single byte, wrapped in an integer, to the output stream
-   * @see java.io.OutputStream#write(int)
-   */
   @Override
   public void write(final int b) throws IOException {
     os.write(b);
@@ -284,10 +280,10 @@ public final class DataOutput extends OutputStream {
  
   /**
    * Return the number of written bytes.
-   * This is not necessary e.g. the file size.
+   * This is not necessarily e.g. the file size.
    * @return number of written bytes
    */
-  public int size() {
+  public long size() {
     return size;
   }
   
