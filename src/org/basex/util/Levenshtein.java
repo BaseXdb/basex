@@ -2,6 +2,8 @@ package org.basex.util;
 
 import static org.basex.util.Token.*;
 
+import org.basex.core.Prop;
+
 /**
  * This class assembles methods for fuzzy token matching.
  * 
@@ -50,10 +52,11 @@ public final class Levenshtein {
     if(sl < 4 || tl > 30 || sl > 30) return equals(tok, ts, tl, sub);
 
     // skip different tokens with too different lengths
-    final int k = Math.max(1, sl >> 2);
+    int k = Prop.lserr;
+    if(k == 0) k = Math.max(1, sl >> 2);
     if(Math.abs(sl - tl) > k) return false;
     
-    return ls(tok, ts, tl, sub, k) < k;
+    return ls(tok, ts, tl, sub, k) <= k;
   }      
   
   /**

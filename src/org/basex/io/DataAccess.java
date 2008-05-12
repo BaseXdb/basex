@@ -226,7 +226,7 @@ public final class DataAccess {
    * Sets the disk cursor.
    * @param p read position
    */
-  private synchronized void cursor(final long p) {
+  public synchronized void cursor(final long p) {
     off = (short) (p & BUFLIMIT);
     
     final long ps = p - off;
@@ -270,7 +270,7 @@ public final class DataAccess {
    * Reads the next byte.
    * @return next byte
    */
-  private synchronized int read() {
+  public synchronized int read() {
     if(off == BUFSIZE) {
       nextBlock();
       off = 0;

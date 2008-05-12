@@ -112,6 +112,8 @@ public final class Prop {
   public static boolean fsmeta = false;
   /** Maximum size for textual imports. */
   public static int fstextmax = 10240;
+  /** Levenshtein default error. */
+  public static int lserr = 0;
 
   // WEBSERVER OPTIONS ========================================================
 
