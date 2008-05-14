@@ -36,7 +36,8 @@ public class BaseXBack extends JPanel {
    */
   public final void setMode(final FILL m) {
     mode = m;
-    setOpaque(mode != FILL.NONE);
+    final boolean o = mode != FILL.NONE;
+    if(isOpaque() != o) setOpaque(o);
   }
   
   @Override

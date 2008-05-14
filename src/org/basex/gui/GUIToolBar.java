@@ -4,6 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.ImageIcon;
 import javax.swing.JToolBar;
+import javax.swing.border.EmptyBorder;
+
 import org.basex.gui.layout.BaseXButton;
 import org.basex.util.Token;
 import static org.basex.gui.GUIConstants.*;
@@ -22,6 +24,8 @@ public final class GUIToolBar extends JToolBar {
   public GUIToolBar() {
     super();
     setFloatable(false);
+    setOpaque(false);
+    setBorder(new EmptyBorder(2, 2, 0, 0));
 
     for(final GUICommand cmd : TOOLBAR) {
       if(cmd == null) {

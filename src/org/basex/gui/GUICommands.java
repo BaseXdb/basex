@@ -551,7 +551,7 @@ public enum GUICommands implements GUICommand {
   INPUTMODE(true, GUIINPUTMODE, null, GUIINPUTMODETT) {
     @Override
     public void execute() {
-      GUIProp.searchmode = ++GUIProp.searchmode % 3;
+      //GUIProp.searchmode = ++GUIProp.searchmode % 3;
       GUI.get().refreshControls();
     }
   },

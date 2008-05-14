@@ -18,7 +18,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.net.URL;
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -92,7 +91,7 @@ public final class GUI extends JFrame {
   /** Button panel. */
   final BaseXBack buttons;
   /** Query panel. */
-  final Box nav;
+  final BaseXBack nav;
 
   /** Search view. */
   protected final QueryView query;
@@ -103,8 +102,8 @@ public final class GUI extends JFrame {
   /** Help view. */
   protected final TextView help;
 
-  /** Button for text input field. */
-  protected final BaseXButton mode;
+  /** Current input Mode. */
+  protected final BaseXCombo mode;
   /** Execution Button. */
   protected final BaseXButton exec;
   /** Fullscreen Window. */
@@ -162,7 +161,6 @@ public final class GUI extends JFrame {
     // add menu bar
     menu = new GUIMenu();
     if(GUIProp.showmenu) setJMenuBar(menu);
-    //if(GUIProp.showmenu) control.add(menu, BorderLayout.NORTH);
 
     final Font fnt = new Font(GUIProp.font, 1, 15);
 
@@ -175,7 +173,7 @@ public final class GUI extends JFrame {
 
     hits = new BaseXLabel(" ");
     hits.setFont(fnt);
-    BaseXLayout.setWidth(hits, 100);
+    BaseXLayout.setWidth(hits, 150);
     hits.setHorizontalAlignment(SwingConstants.RIGHT);
     p.add(hits);
     p.add(Box.createHorizontalStrut(4));
@@ -198,13 +196,30 @@ public final class GUI extends JFrame {
     buttons.add(p, BorderLayout.EAST);
     if(GUIProp.showbuttons) control.add(buttons, BorderLayout.CENTER);
 
-    nav = new Box(BoxLayout.X_AXIS);
-    nav.setBorder(new EmptyBorder(4, 2, 0, 2));
+    nav = new BaseXBack();
+    nav.setLayout(new BorderLayout(6, 0));
+    nav.setBorder(2, 2, 0, 4);
 
-    mode = new BaseXButton("", HELPMODE);
+    mode = new BaseXCombo(new String[] {
+        BUTTONSEARCH, BUTTONXPATH, BUTTONCMD }, HELPMODE, false);
+    mode.setSelectedIndex(2);
+    
     mode.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        if(context.db()) GUICommands.INPUTMODE.execute();
+        final int t = GUIProp.searchmode;
+        final int i = mode.getSelectedIndex();
+        if(i == t || !mode.isEnabled()) return;
+
+        saveMode(t);
+        input.history(i == 0 ? GUIProp.search : i == 1 ?  GUIProp.xpath :
+          GUIProp.commands);
+        input.setText("");
+
+        input.help = i == 0 ? context.data().deepfs ? HELPSEARCHFS :
+          HELPSEARCHXML : i == 1 ? HELPXPATH : HELPCMD;
+
+        exec.setEnabled(i == 2 || !GUIProp.execrt);
+        GUIProp.searchmode = i;
       }
     });
     mode.addKeyListener(new KeyAdapter() {
@@ -213,8 +228,8 @@ public final class GUI extends JFrame {
         addKeys(e);
       }
     });
-    nav.add(mode);
-    nav.add(Box.createHorizontalStrut(6));
+    
+    nav.add(mode, BorderLayout.WEST);
 
     input = new BaseXCombo(GUIProp.commands, null, true); 
 
@@ -247,7 +262,7 @@ public final class GUI extends JFrame {
             !input.getText().startsWith("!")) execute();
       }
     });
-    nav.add(input);
+    nav.add(input, BorderLayout.CENTER);
 
     exec = new BaseXButton(BUTTONEXEC, null);
     exec.addActionListener(new ActionListener() {
@@ -261,8 +276,8 @@ public final class GUI extends JFrame {
         addKeys(e);
       }
     });
-    nav.add(Box.createHorizontalStrut(6));
-    nav.add(exec);
+    //nav.add(Box.createHorizontalStrut(6));
+    nav.add(exec, BorderLayout.EAST);
     
     if(GUIProp.showinput) control.add(nav, BorderLayout.SOUTH);
     top.add(control, BorderLayout.NORTH);
@@ -382,7 +397,7 @@ public final class GUI extends JFrame {
    * Closes the database, writes the property files and quits.
    */
   void quit() {
-    saveMode();
+    saveMode(context.db() ? GUIProp.searchmode : 2);
 
     GUIProp.maxstate = getExtendedState() == MAXIMIZED_BOTH;
     if(!GUIProp.maxstate) {
@@ -710,37 +725,32 @@ public final class GUI extends JFrame {
   protected void refreshMode() {
     final Data data = context.data();
     final boolean db = data != null;
-    int s = !db ? 2 : GUIProp.searchmode;
+    final int t = mode.getSelectedIndex();
+    final int s = !db ? 2 : GUIProp.searchmode;
 
-    final String mod = s == 2 ? BUTTONCMD : s == 1 ? BUTTONXPATH : BUTTONSEARCH;
-    if(!mod.equals(mode.getText())) {
-      saveMode();
+    input.help = s == 0 ? data.deepfs ? HELPSEARCHFS : HELPSEARCHXML :
+      s == 1 ? HELPXPATH : HELPCMD;
+    mode.setEnabled(db);
+    exec.setEnabled(s == 2 || !GUIProp.execrt);
+
+    if(s != t) {
+      saveMode(t);
       input.history(s == 0 ? GUIProp.search : s == 1 ?  GUIProp.xpath :
         GUIProp.commands);
-      mode.setText(mod);
+      mode.setSelectedIndex(s);
       input.setText("");
       input.requestFocusInWindow();
     }
-    input.help = s == 0 ? data.deepfs ? HELPSEARCHFS : HELPSEARCHXML :
-      s == 1 ? HELPXPATH : HELPCMD;
-    mode.setFocusable(db);
-    mode.setRolloverEnabled(db);
-
-    exec.setEnabled(s == 2 || !GUIProp.execrt);
   }
   
   /**
    * Saves the last input mode.
+   * @param i input mode
    */
-  protected void saveMode() {
-    final String old = mode.getText();
-    if(old.equals(BUTTONCMD)) {
-      GUIProp.commands = input.history();
-    } else if(old.equals(BUTTONXPATH)) {
-      GUIProp.xpath = input.history();
-    } else if(old.equals(BUTTONSEARCH)) {
-      GUIProp.search = input.history();
-    }
+  protected void saveMode(final int i) {
+    if(i == 0) GUIProp.search = input.history();
+    else if(i == 1) GUIProp.xpath = input.history();
+    else GUIProp.commands = input.history();
   }
 
   /**

@@ -85,9 +85,6 @@ public final class BaseXCombo extends JComboBox {
         setSelectedIndex(0);
       }
     });
-    
-    //ComboBoxRenderer renderer = new ComboBoxRenderer(this);
-    //setRenderer(renderer);
   }
 
   /**
