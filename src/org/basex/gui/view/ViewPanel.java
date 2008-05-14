@@ -42,6 +42,7 @@ public final class ViewPanel extends BaseXBack implements ViewLayout {
     else if(name.equals(INFOVIEW))  setVisible(GUIProp.showinfo);
     else if(name.equals(QUERYVIEW)) setVisible(GUIProp.showquery);
     else if(name.equals(REALVIEW))  setVisible(GUIProp.showreal);
+    else if(name.equals(XPATHVIEW))  setVisible(GUIProp.showxpath);
     else if(name.equals(HELPVIEW))  setVisible(db ?
         GUIProp.showhelp : GUIProp.showstarthelp);
     else if(name.equals(TEXTVIEW))  setVisible(db ?
@@ -66,6 +67,8 @@ public final class ViewPanel extends BaseXBack implements ViewLayout {
       GUIProp.showquery = false;
     } else if(name.equals(REALVIEW)) {
       GUIProp.showreal = false;
+    } else if(name.equals(XPATHVIEW)) {
+      GUIProp.showxpath = false;
     } else if(name.equals(TEXTVIEW)) {
       if(db) GUIProp.showtext = false;
       else GUIProp.showstarttext = false;

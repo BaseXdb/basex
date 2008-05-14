@@ -58,6 +58,7 @@ import org.basex.gui.view.real.RealView;
 import org.basex.gui.view.table.TableView;
 import org.basex.gui.view.text.TextView;
 import org.basex.gui.view.tree.TreeView;
+import org.basex.gui.view.xpath.XPathView;
 import org.basex.io.CachedOutput;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -279,6 +280,7 @@ public final class GUI extends JFrame {
       textpanel, helppanel }, {
         new ViewPanel(new TreeView(HELPTREE), TREEVIEW),
         new ViewPanel(new RealView(), REALVIEW),
+        new ViewPanel(new XPathView(), XPATHVIEW),
         new ViewPanel(new TableView(HELPTABLE), TABLEVIEW),
         new ViewPanel(new MapView(HELPMAP), MAPVIEW),
         new ViewPanel(query, QUERYVIEW),
