@@ -58,7 +58,7 @@ public final class QueryArea extends QueryPanel {
     area.setSyntax(new QuerySyntax());
     area.addKeyListener(new KeyAdapter() {
       @Override
-      public void keyPressed(final KeyEvent e) {
+      public void keyReleased(final KeyEvent e) {
         String xq = Token.string(area.getText());
         if(!xq.equals(last)) {
           last = xq;

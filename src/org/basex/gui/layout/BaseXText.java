@@ -341,6 +341,7 @@ public final class BaseXText extends BaseXPanel {
       copy();
       return;
     }
+    
     if(editable && c == KeyEvent.VK_BACK_SPACE) {
       if(text.start() == -1) {
         if(text.pos() == 0) return;
@@ -361,9 +362,6 @@ public final class BaseXText extends BaseXPanel {
         while(text.pos() < text.size &&
             ch == Character.isLetterOrDigit(text.curr())) text.delete();
       }
-    } else if(editable && key) {
-      if(text.start() != -1) text.delete();
-      text.add(new char[] { e.getKeyChar() });
     } else if(editable && ctrl && c == 'X') {
       cut();
     } else if(editable && ctrl && c == 'V') {
@@ -372,6 +370,8 @@ public final class BaseXText extends BaseXPanel {
       undo();
     } else if(editable && ctrl && c == KeyEvent.VK_Y) {
       redo();
+    } else if(editable && key) {
+      return;
     } else {
       if(shf && text.start() == -1) text.startMark();
   
@@ -487,7 +487,19 @@ public final class BaseXText extends BaseXPanel {
 
   @Override
   public void keyTyped(final KeyEvent e) {
-    if(editable) e.consume();
+    final char ch = e.getKeyChar();
+    if(ch == KeyEvent.VK_BACK_SPACE || ch == KeyEvent.VK_DELETE) return;
+    
+    if(editable) {
+      if(!e.isControlDown() && !e.isActionKey()) {
+        if(text.start() != -1) text.delete();
+        text.add(new char[] { ch });
+      }
+      e.consume();
+      text.setCaret();
+      rend.calc();
+      showCursor(0);
+    }
   }
 
   @Override
