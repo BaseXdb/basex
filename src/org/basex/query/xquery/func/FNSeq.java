@@ -41,8 +41,9 @@ final class FNSeq extends Fun {
         return seq;
       case DISTINCT:
         if(arg.length == 2) checkColl(arg[1]);
-        while((i = iter.next()) != null) distinct(seq, i);
-        return seq;
+        return distinct2(iter);
+        //while((i = iter.next()) != null) distinct(seq, i);
+        //return seq;
       case INSBEF:
         final Iter sub = arg[2];
         long r = Math.max(1, checkItr(arg[1]));
@@ -89,7 +90,7 @@ final class FNSeq extends Fun {
    * @param i item to be found
    * @throws XQException evaluation exception
    */
-  private void distinct(final SeqIter sq, final Item i)
+  void distinct(final SeqIter sq, final Item i)
       throws XQException {
     
     final boolean nan = i.n() && i.dbl() != i.dbl();
@@ -99,6 +100,22 @@ final class FNSeq extends Fun {
       if(CmpV.valCheck(i, c) && CmpV.COMP.EQ.e(i, c)) return;
     }
     sq.add(FNGen.atom(i));
+  }
+
+  /**
+   * Looks for the specified item in the sequence.
+   * @param iter input iterator
+   * @return distinct iterator
+   */
+  Iter distinct2(final Iter iter) {
+    return new Iter() {
+      //SeqIter sq = new SeqIter();
+      
+      @Override
+      public Item next() throws XQException {
+        return iter.next();
+      }
+    };
   }
 
   /**
