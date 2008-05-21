@@ -32,17 +32,18 @@ final class FNSeq extends Fun {
         Item it = arg[1].atomic(this, false);
         if(arg.length == 3) checkColl(arg[2]);
 
-        int p = 1;
-        while((i = iter.next()) != null) {
-          if(CmpV.valCheck(i, it) && CmpV.COMP.EQ.e(i, it))
-            seq.add(Itr.iter(p));
-          p++;
-        }
-        return seq;
+        //int p = 1;
+        //while((i = iter.next()) != null) {
+        //  if(CmpV.valCheck(i, it) && CmpV.COMP.EQ.e(i, it))
+        //    seq.add(Itr.iter(p));
+        //  p++;
+        //}
+        //return seq;
+        return indexOf(iter, it);
       case DISTINCT:
+        if(arg.length == 2) checkColl(arg[1]);
         //while((i = iter.next()) != null) distinct(seq, i);
         //return seq;
-        if(arg.length == 2) checkColl(arg[1]);
         return distinctPipelined(iter);
       case INSBEF:
         final Iter sub = arg[2];
@@ -63,20 +64,22 @@ final class FNSeq extends Fun {
         return seq;
       case REMOVE:
         final long pos = checkItr(arg[1]);
-        long c = 0;
-        while((i = iter.next()) != null) if(++c != pos) seq.add(i);
-        return seq;
+        //long c = 0;
+        //while((i = iter.next()) != null) if(++c != pos) seq.add(i);
+        //return seq;
+        return remove(iter, pos);
       case SUBSEQ:
         final long start = checkItr(arg[1]);
         final long end = arg.length > 2 ? start + checkItr(arg[2]) :
           Long.MAX_VALUE;
-        c = 0;
-        while((i = iter.next()) != null) {
-          if(++c < start) continue;
-          if(c >= end) break;
-          seq.add(i);
-        }
-        return seq;
+        //c = 0;
+        //while((i = iter.next()) != null) {
+        //  if(++c < start) continue;
+        //  if(c >= end) break;
+        //  seq.add(i);
+        //}
+        //return seq;
+        return subseq(iter, start, end);
       case DEEPEQ:
         return Bln.get(deep(arg)).iter();
       default:
@@ -85,12 +88,40 @@ final class FNSeq extends Fun {
   }
 
   /**
+   * Looks for the index of an specified input item (pipelined).
+   * @param iter input iterator
+   * @param it item to searched for in iterator
+   * @return position(s) of item
+   */
+  private Iter indexOf(final Iter iter, final Item it) {
+    return new Iter() {
+      SeqIter sq = new SeqIter();
+      Item i;
+      int index = 0;
+      int position = -1;
+
+      @Override
+      public Item next() throws XQException {
+        while ((i = iter.next()) != null) {
+          index++;
+          if(CmpV.valCheck(i, it) && CmpV.COMP.EQ.e(i, it)) {
+            position++;
+            sq.add(Itr.iter(index));
+            return sq.item[position];
+          }
+        }
+        return null;
+      }
+    };
+  }
+  
+  /**
    * Looks for the specified item in the sequence.
    * @param sq sequence to be parsed
    * @param i item to be found
    * @throws XQException evaluation exception
    */
-  void distinct(final SeqIter sq, final Item i)
+  private void distinct(final SeqIter sq, final Item i)
       throws XQException {
     
     final boolean nan = i.n() && i.dbl() != i.dbl();
@@ -107,7 +138,7 @@ final class FNSeq extends Fun {
    * @param iter input iterator
    * @return distinct iterator
    */
-  Iter distinctPipelined(final Iter iter) {
+  private Iter distinctPipelined(final Iter iter) {
     return new Iter() {
       SeqIter sq = new SeqIter();
       Item i;
@@ -123,6 +154,53 @@ final class FNSeq extends Fun {
             if(CmpV.valCheck(i, c) && CmpV.COMP.EQ.e(i, c)) continue loop1;
           }
           sq.add(FNGen.atom(i));
+          return i;
+        }
+        return null;
+      }
+    };
+  }
+  
+  /**
+   * Removes an Item at a specified position in a sequence (pipelined).
+   * @param iter input iterator
+   * @param pos position of item to be removed
+   * @return iterator without Item
+   */
+  private Iter remove(final Iter iter, final long pos) {
+    return new Iter() {
+      long c = 0;
+      
+      @Override
+      public Item next() throws XQException {
+        Item i;
+        
+        while((i = iter.next()) != null) if(++c != pos) return i;
+        return null;
+      }
+    };
+  }
+  
+  /**
+   * Creates a subsequence out of a sequence, starting with start and 
+   * ending with end (pipelined).
+   * @param iter input iterator
+   * @param start starting position
+   * @param end ending position
+   * @return subsequence
+   */
+  private Iter subseq(final Iter iter, final long start, final long end) {
+    return new Iter() {
+
+      long c = 0;
+      
+      @Override
+      public Item next() throws XQException {
+        Item i;
+        
+        while((i = iter.next()) != null) {
+          if(++c < start) continue;
+          if(c >= end) break;
           return i;
         }
         return null;
