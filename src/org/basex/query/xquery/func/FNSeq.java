@@ -40,10 +40,10 @@ final class FNSeq extends Fun {
         }
         return seq;
       case DISTINCT:
-        if(arg.length == 2) checkColl(arg[1]);
-        return distinct2(iter);
         //while((i = iter.next()) != null) distinct(seq, i);
         //return seq;
+        if(arg.length == 2) checkColl(arg[1]);
+        return distinctPipelined(iter);
       case INSBEF:
         final Iter sub = arg[2];
         long r = Math.max(1, checkItr(arg[1]));
@@ -101,23 +101,35 @@ final class FNSeq extends Fun {
     }
     sq.add(FNGen.atom(i));
   }
-
+  
   /**
-   * Looks for the specified item in the sequence.
+   * Looks for the specified item in the sequence (pipelined).
    * @param iter input iterator
    * @return distinct iterator
    */
-  Iter distinct2(final Iter iter) {
+  Iter distinctPipelined(final Iter iter) {
     return new Iter() {
-      //SeqIter sq = new SeqIter();
-      
+      SeqIter sq = new SeqIter();
+      Item i;
+
       @Override
       public Item next() throws XQException {
-        return iter.next();
+        loop1: while((i = iter.next()) != null) {
+          
+          final boolean nan = i.n() && i.dbl() != i.dbl();
+          for(int r = 0; r < sq.size; r++) {
+            final Item c = sq.item[r];
+            if(nan && c.dbl() != c.dbl()) continue loop1;
+            if(CmpV.valCheck(i, c) && CmpV.COMP.EQ.e(i, c)) continue loop1;
+          }
+          sq.add(FNGen.atom(i));
+          return i;
+        }
+        return null;
       }
     };
   }
-
+  
   /**
    * Checks items for deep equality.
    * @param arg arguments
