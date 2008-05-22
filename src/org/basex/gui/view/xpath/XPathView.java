@@ -10,6 +10,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.JComboBox;
 import javax.swing.plaf.basic.BasicComboPopup;
+import javax.swing.JCheckBox;
 import org.basex.core.Commands;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
@@ -48,6 +49,8 @@ public final class XPathView extends View {
   public int slashC = 0;
   /** Boolean value if BasicComboPopup is initialized. */
   public boolean popInit = false;
+  /** Checkbox if popup will be shown. */
+  public JCheckBox checkPop = new JCheckBox("Helpmode", false);
 
   /**
    * Default Constructor.
@@ -64,6 +67,7 @@ public final class XPathView extends View {
       @Override
       public void keyReleased(final KeyEvent e) {
         int c = e.getKeyCode();
+        if(checkPop.isSelected()) {
         if(c == KeyEvent.VK_SLASH) {
           slashC++;
           showPopAll();
@@ -85,6 +89,7 @@ public final class XPathView extends View {
             }
           }
         }
+        }
         if(c == KeyEvent.VK_ESCAPE || c == KeyEvent.VK_ENTER) return;
         final String query = input.getText();
         GUI.get().execute(Commands.XPATH, query);
@@ -93,7 +98,9 @@ public final class XPathView extends View {
 
     setBorder(10, 10, 10, 10);
     setLayout(new BorderLayout(0, 4));
-    back.add(input, BorderLayout.CENTER);
+    checkPop.setContentAreaFilled(false);
+    back.add(checkPop, BorderLayout.CENTER);
+    back.add(input, BorderLayout.SOUTH);
 
     add(back, BorderLayout.NORTH);
 
@@ -104,7 +111,6 @@ public final class XPathView extends View {
    * Shows the BasicComboPopup with all Entries.
    */
   public void showPopAll() {
-    System.out.println(slashC);
     tmpIn = input.getText();
     box = new JComboBox(cmdList);
     popInit = true;
