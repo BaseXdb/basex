@@ -17,6 +17,22 @@ public final class IntArrayList {
   public boolean found = false;
   
   /**
+   * Default constructor.
+   */
+  public IntArrayList() {
+  }
+  
+  /**
+   * Constructor.
+   * 
+   * @param is initial size of the list
+   */
+  public IntArrayList(final int is) {
+    list = new int[is][];
+  }
+  
+  
+  /**
    * Adds next value.
    * @param v value to be added
    */

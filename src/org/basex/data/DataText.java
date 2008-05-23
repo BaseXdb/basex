@@ -50,7 +50,9 @@ public interface DataText {
   String DBFTXINDEX = "FTXINDEX";
   /** Last (highest) id. */
   String DBLASTID = "LASTID";
-
+  /** Number of words in table. */
+  String DBTXTNUMWORDS = "TXTNUMWORDS";
+  
   // TAGS/ATTRIBUTE NAMES ====================================================
 
   /** DeepFS tag. */

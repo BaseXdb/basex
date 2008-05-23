@@ -87,13 +87,15 @@ public final class Prop {
   /** Flag for entity parsing. */
   public static boolean entity = true;
   /** Flag for creating a fulltext index. */
-  public static boolean ftindex = false;
+  public static boolean ftindex = true;
   /** Flag for creating a fuzzy index. */
-  public static boolean fuzzyindex = true;
+  public static boolean fuzzyindex = false;
+  /** Flag for compressing ft-values on disk. */
+  public static boolean ftcompress = true;
   /** Flag for creating a text index. */
-  public static boolean textindex = true;
+  public static boolean textindex = false;
   /** Flag for creating an attribute value index. */
-  public static boolean attrindex = true;
+  public static boolean attrindex = false;
   /** Flag for loading database table into main memory. */
   public static boolean mainmem = false;
   /** Flag for creating databases on-the-fly (in memory). */

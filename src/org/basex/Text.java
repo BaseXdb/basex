@@ -1148,6 +1148,8 @@ public interface Text {
   String INFOATVINDEX = lang("info_atvindex");
   /** Info on Fulltext Indexing. */
   String INFOFTINDEX = lang("info_ftindex");
+  /** Info on Fulltext Fuzzyindexing. */
+  String INFOFUZZYINDEX = lang("info_fuzzyindex");
 
   /** Info on Document Creation. */
   String INFODB = lang("info_db");

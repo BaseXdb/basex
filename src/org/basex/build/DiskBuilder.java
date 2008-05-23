@@ -39,6 +39,8 @@ public final class DiskBuilder extends Builder {
   protected long txtlen;
   /** Attribute value pointer. */
   protected long vallen;
+  /** Number of words written. */
+  protected int[] numw = new int[32];
 
   /** Database size stream (temporary). */
   protected DataOutput sout;
@@ -136,6 +138,10 @@ public final class DiskBuilder extends Builder {
       } else {
         v = vallen;
         vallen += vout.writeToken(val);
+        //int[] tmp = vout.writeToken(val, numw);
+        //System.out.println(numw + " " + new String(val));
+        //vallen += tmp[0];
+        //numw = tmp[1];
       }
       
       tout.write(Data.ATTR);
@@ -161,6 +167,10 @@ public final class DiskBuilder extends Builder {
     } else {
       v = txtlen;
       txtlen += xout.writeToken(txt);
+      //numw = xout.writeToken(txt, numw);
+      //System.out.println(Array.intArrayToString(numw,1));
+      //System.out.println(new String(txt));
+      //txtlen += numw[0];
     }
     
     tout.write(kind);

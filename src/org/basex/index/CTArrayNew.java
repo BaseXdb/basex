@@ -2,6 +2,7 @@ package org.basex.index;
 
 import org.basex.util.ByteArrayList;
 import org.basex.util.IntArrayList;
+import org.basex.util.Token;
 
 /**
  * Preserves a compressed trie index structure and useful functionality.
@@ -18,9 +19,10 @@ public final class CTArrayNew {
   /** THE LISTS ARE USED TO CREATE THE STRUCTURE. **/
   /** List saving the token values. **/
   private ByteArrayList tokensL;
-  /** List saving the structure: [t, n1, ..., nk, s, p] 
+  /** List saving the structure: [t, n1, ..., nk, s, p0, p1] 
    * t = pointer on tokens; n1, ..., nk are the children of the node
    * saved as pointer on nextN; s = size of pre values; p = pointer 
+   * if p is a long value, it is splitted into 2 ints with p0 < 0
    * on pre/pos where the data is stored. t, s, p are saved for every node. */
   private IntArrayList nextL;
   /** List with pre values. */
@@ -38,15 +40,16 @@ public final class CTArrayNew {
   int[][] pos;
   /** Flag for bulkload option. */
   boolean bl = true;
- 
+
   /**
    * Constructor.
+   * @param is index size, number of tokens to index.
    */
-  public CTArrayNew() {
-    nextL = new IntArrayList();
-    preL = new IntArrayList();
-    posL = new IntArrayList();
-    tokensL = new ByteArrayList();
+  public CTArrayNew(final int is) {
+    nextL = new IntArrayList(is);
+    preL = new IntArrayList(is);
+    posL = new IntArrayList(is);
+    tokensL = new ByteArrayList(is);
     // add root node with k, t, s
     nextL.add(new int[]{-1, 0, 0});
     count = 1;
@@ -308,6 +311,201 @@ public final class CTArrayNew {
     }
   }
 
+  
+  /**
+   * Inserts a token into the trie. The tokens have to be sorted!!
+   *
+   * @param v value, which is to be inserted
+   * @param s size of the data the node will have
+   * @param offset file offset where to read the data 
+   */
+
+  public void insertSorted(final byte[] v, final int s, final long offset) {
+    count++;
+
+    insertNodeSorted(0, v, s, Token.longToInt(offset));
+    return;
+  }
+
+  /**
+   * Inserts a node into the trie.
+   *
+   * @param cn current node, which gets a new node
+   * appended; start with root (0)
+   * @param v value, which is to be inserted
+   * @param s size of the data the node will have
+   * @param offset file offset where to read the data
+   * @return nodeId, parent node of new node
+   */
+  public int insertNodeSorted(final int cn, final byte[] v, final int s, 
+      final int[] offset) {
+    // currentNode is root node
+    if(cn == 0) {
+      // root has successors
+      if(nextL.list[cn].length > 3) {
+        final int p = getPointer(cn); //nextL.list[cn].length - 3; 
+        if(tokensL.list[nextL.list[nextL.list[cn][p]][0]][0] != v[0]) {
+          //System.out.println("fall1");
+          //if(!found) {
+          // any child has an appropriate value to valueToInsert;
+          // create new node and append it; save data
+          
+          int[] e;
+          e = new int[2 + offset.length]; //new int[3];
+          e[0] = tokensL.size;
+          tokensL.add(v);
+          e[1] = s;
+          System.arraycopy(offset, 0, e, 2, offset.length);
+          //e[2] = offset;
+          
+          nextL.add(e);
+          //insertNodeInNextArray(cn, nextL.size - 1, p);
+          insertNodeInNextArray(cn, nextL.size - 1, p + 1);
+          //System.out.println("fall1");
+          return nextL.size - 1;
+        } else {
+          //System.out.println("fall1a");
+          return insertNodeSorted(nextL.list[cn][p], v, s, offset);
+        }
+      }
+    }
+
+    final byte[] is = (nextL.list[cn][0] == -1) ? 
+        null : calculateIntersection(tokensL.list[nextL.list[cn][0]], v);
+    byte[] r1 = (nextL.list[cn][0] == -1) ? 
+        null : tokensL.list[nextL.list[cn][0]]; 
+    byte[] r2 = v;
+
+    if(is != null) {
+      r1 = getBytes(r1, is.length, r1.length);
+      r2 = getBytes(v, is.length, v.length);
+    }
+
+    if(is !=  null) {
+      if(r1 == null) {
+        if(r2 != null) {
+          // char1 == null && char2 != null
+          // value of currentNode equals valueToInsert,
+          //but valueToInset is longer
+          final int p = getPointer(cn); //nextL.list[cn].length - 3;
+          if(p == 0 || //nextL.list[nextL.list[cn][p]][0] == -1 || 
+              tokensL.list[nextL.list[nextL.list[cn][p]][0]][0] != r2[0]) {
+            //System.out.println("fall2");
+            //(!found) {
+            // create new node and append it, because any child from curretnNode
+            // start with the same letter than reamin2.
+            int[] e;
+            e = new int[2 + offset.length]; // new int[3];
+            e[0] = tokensL.size;
+            tokensL.add(r2);
+            e[1] = s;
+            //e[2] = offset;
+            System.arraycopy(offset, 0, e, 2, offset.length);
+            
+            nextL.add(e);
+            insertNodeInNextArray(cn, nextL.size - 1, p + 1); //posti);
+            //System.out.println("fall2");
+            return nextL.size - 1;
+          } else {
+            //System.out.println("fall2a");
+            //return insertNodeIntoTrie(nextL.list[cn][posti], r2, d);
+            return insertNodeSorted(nextL.list[cn][p], r2, s, offset);
+          }
+        }
+      
+      } else {
+        if(r2 == null) {
+          //System.out.println("fall3");
+          // char1 != null &&  char2 == null
+          // value of currentNode equals valuteToInsert,
+          // but current has a longer value
+          // update value of currentNode.value with intersection
+          int[] oe = new int [3 + offset.length]; //new int[4];
+          tokensL.list[nextL.list[cn][0]] = is;
+          oe[0] = nextL.list[cn][0];
+          //int did = nextL.list[cn][nextL.list[cn].length - 1];
+          //oe[3] = offset;
+          System.arraycopy(offset, 0, oe, 3, offset.length);
+          oe[2] = s; 
+          
+          //int[] ne = new int[nextL.list[cn].length];
+          //System.arraycopy(nextL.list[cn], 0, ne, 0, ne.length);
+          nextL.list[cn][0] = tokensL.size; 
+          tokensL.add(r1);
+          //ne[ne.length - 1] = did;
+          //ne[ne.length - 2] = preL.list[did].length;
+          
+          //next[countNodes] = next[cn];
+          //nextL.add(ne);
+          nextL.add(nextL.list[cn]);
+          oe[1] = nextL.size - 1;
+          nextL.list[cn] = oe;
+          //System.out.println("fall3");
+          return nextL.size - 1;
+        } else {
+          //System.out.println("fall3a");
+          // char1 != null && char2 != null
+          // value of current node and value to insert have only one common
+          // letter update value of current node with intersection
+          tokensL.list[nextL.list[cn][0]] = is;
+          int[] one = nextL.list[cn];
+          int[] ne = new int[5];
+          ne[0] = one[0];
+          if (r2[0] < r1[0]) {
+            ne[1] = nextL.size;
+            ne[2] = nextL.size + 1;
+          } else {
+            ne[1] = nextL.size + 1;
+            ne[2] = nextL.size;
+          }
+          ne[3] = 0;
+          ne[4] = 0;
+          nextL.list[cn] = ne;
+
+          ne = new int[2 + offset.length]; //new int[3];
+          ne[0] = tokensL.size;
+          tokensL.add(r2);
+
+          ne[1] = s; 
+          //ne[2] = offset; 
+          System.arraycopy(offset, 0, ne, 2, offset.length);
+          
+          nextL.add(ne);
+          
+          ne = new int[one.length];
+          System.arraycopy(one, 0, ne, 0, ne.length);
+          ne[0] = tokensL.size;
+          tokensL.add(r1);
+          nextL.add(ne);
+          //System.out.println("fall3a");
+          return nextL.size - 1;
+          
+        }
+      }
+    }  else {
+      //System.out.println("fall4");
+      // abort recursion
+      // no intersection between current node an valuetoinsert
+      int[] ne = new int[2 + offset.length]; //new int[3];
+      ne[0] = tokensL.size;
+      tokensL.add(v);
+      System.arraycopy(offset, 0, ne, 2, offset.length);
+      //ne[2] = offset;
+      ne[1] = s; 
+      
+      nextL.add(ne);
+      final int p = nextL.list[cn].length - 2;
+      //final int ip = getInsertingPosition(cn, v[0]);
+      insertNodeInNextArray(cn, nextL.size - 1, p);
+          
+      //System.out.println("fall4");
+      return nextL.size - 1;
+    }
+    return -1;
+  }
+
+  
+  
   /**
    * Indexes the specified token.
    * 
@@ -800,13 +998,39 @@ public final class CTArrayNew {
     return newByte;
   }
   
+  /**
+   * Returns the index of the last next pointer in the current node entry. 
+   * @param cn current node
+   * @return index of the data pointer
+   */
+  private int getPointer(final int cn) {
+    return ((nextL.list[cn][nextL.list[cn].length - 2] >= 0)) ? 
+        nextL.list[cn].length - 3 : nextL.list[cn].length - 4;
+  }
+  
   /*
   public static void main(final String[] args) {
-    CTArrayNew c = new CTArrayNew();
-    c.insertNodeIntoTrie(0, "q".getBytes(), new int[][]{{3},{30}});
-    c.insertNodeIntoTrie(0, "qqa".getBytes(), new int[][]{{1},{10}});
-    c.insertNodeIntoTrie(0, "bqgwqc".getBytes(), new int[][]{{2},{20}});
-    c.insertNodeIntoTrie(0, "zqgwqc".getBytes(), new int[][]{{2},{20}});
+    CTArrayNew c = new CTArrayNew(2);
+    long l = 444749632;
+    l +=    2000000000;
+    c.insertNodeSorted(0, "a".getBytes(), 1,  Token.longToInt(1));
+    System.out.println("intArray:"+ intArrayToString(Token.longToInt(l)));
+    System.out.println(l + "=" + Token.intArrayToLong(Token.longToInt(l)));
+    c.insertNodeSorted(0, "s".getBytes(), 3807, Token.longToInt(l));
+    l = 444768667;
+    l +=    2000000000;
+    System.out.println("intArray:"+ intArrayToString(Token.longToInt(l)));
+    System.out.println(l + "=" + Token.intArrayToLong(Token.longToInt(l)));
+    c.insertNodeSorted(0, "saad".getBytes(), 5, Token.longToInt(l));
+    l = 444768947;
+    l +=    2000000000;
+    System.out.println("intArray:"+ intArrayToString(Token.longToInt(l)));
+    System.out.println(l + "=" + Token.intArrayToLong(Token.longToInt(l)));
+    c.insertNodeSorted(0, "saadia".getBytes(), 575, Token.longToInt(l));
+    //c.insertNodeIntoTrie(0, "a".getBytes(), new int[][]{{3},{30}});
+    //c.insertNodeIntoTrie(0, "s".getBytes(), new int[][]{{1},{10}});
+    //c.insertNodeIntoTrie(0, "bqgwqc".getBytes(), new int[][]{{2},{20}});
+    //c.insertNodeIntoTrie(0, "zqgwqc".getBytes(), new int[][]{{2},{20}});
  //   c.insertNodeIntoTrie(0, "qvzdcttc".getBytes(), new int[][]{{4},{40}});
  //   c.insertNodeIntoTrie(0, "qudvt".getBytes(), new int[][]{{5},{50}});
  //   c.insertNodeIntoTrie(0, "q".getBytes(), new int[][]{{6},{60}});
@@ -821,7 +1045,9 @@ public final class CTArrayNew {
   
   /**
    * Prints the struture arrays.
-  private void printTrie() {
+   * 
+   */
+ /* private void printTrie() {
     System.out.println("NextN:");
     for(int[] i : nextL.list) {
       if (i == null) break;
@@ -848,7 +1074,7 @@ public final class CTArrayNew {
     }
     System.out.println();
   }
-  */
+ */
   
   /**
    * Converts an int array to string.

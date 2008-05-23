@@ -21,6 +21,8 @@ public final class Set extends Proc {
   /** Set option. */
   public static final String FTINDEX = "ftindex";
   /** Set option. */
+  public static final String FUZZYINDEX = "fuzzyindex";
+  /** Set option. */
   public static final String TXTINDEX = "textindex";
   /** Set option. */
   public static final String ATTRINDEX = "attrindex";
@@ -53,6 +55,8 @@ public final class Set extends Proc {
       Prop.entity = toggle(Prop.entity, INFOENTITIES, ext);
     } else if(option.equals(FTINDEX)) {
       Prop.ftindex = toggle(Prop.ftindex, INFOFTINDEX, ext);
+    } else if(option.equals(FUZZYINDEX)) {
+      Prop.fuzzyindex = toggle(Prop.fuzzyindex, INFOFUZZYINDEX, ext);     
     } else if(option.equals(TXTINDEX)) {
       Prop.textindex = toggle(Prop.textindex, INFOTXTINDEX, ext);
     } else if(option.equals(ATTRINDEX)) {

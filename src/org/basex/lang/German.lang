@@ -403,6 +403,7 @@ info_mainmem=Hauptspeicher-Modus
 info_txtindex=Text Indexierung 
 info_atvindex=Attribut Indexierung 
 info_ftindex=Fulltext Indexierung 
+info_fuzzyindex=Fulltext Unscharfeindexierung
 info_db=Datenbank Information:
 info_create=Dokument Erstellung:
 info_indexes=Indexierung:

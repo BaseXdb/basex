@@ -83,7 +83,7 @@ public final class Fuzzy extends Index {
    * @param tok token looking for.
    * @return int pointer 
    */
-  private int getPointerOnToken(final byte[] tok) {
+  public int getPointerOnToken(final byte[] tok) {
     int i = 0;
     int is = li.readBytes(0, 1L)[0];
     int ts = li.readBytes(1L, 2L)[0];
@@ -96,17 +96,21 @@ public final class Fuzzy extends Index {
     int l = li.readInt(1L + i * 5L + 1L);
     int r = li.readInt(1L + (i + 1) * 5L + 1L);
     int m = (int) (l + ((int) ((r - l) 
-        / (tok.length * 1L + 8L) / 2)) * (tok.length * 1L + 8L));
+        /// (tok.length * 1L + 8L) / 2)) * (tok.length * 1L + 8L));
+        / (tok.length * 1L + 9L) / 2)) * (tok.length * 1L + 9L));
     int res = -2;
     byte[] dtok = new byte[tok.length];
     while (l < r) {
       m = (int) (l + ((int) ((r - l) 
-          / (tok.length * 1L + 8L) / 2)) * (tok.length * 1L + 8L));
+          /// (tok.length * 1L + 8L) / 2)) * (tok.length * 1L + 8L));
+          / (tok.length * 1L + 9L) / 2)) * (tok.length * 1L + 9L));
       dtok = ti.readBytes(m, m + dtok.length);
       res = Token.cmp(dtok, tok);
       if (res == 0) return m; 
-      else if (res > 0) l = (int) (m + tok.length * 1L + 8L);
-      else r = (int) (m - (tok.length * 1L + 8L));
+      //else if (res > 0) l = (int) (m + tok.length * 1L + 8L);
+      else if (res > 0) l = (int) (m + tok.length * 1L + 9L);
+      //else r = (int) (m - (tok.length * 1L + 8L));
+      else r = (int) (m - (tok.length * 1L + 9L));
     }
     
     if (r == l) { 
@@ -171,8 +175,9 @@ public final class Fuzzy extends Index {
    * @param lt length of the token
    * @return int pointer on ftdata
    */
-  private int getPointerOnData(final int pt, final int lt) {
-    return ti.readInt(pt + lt * 1L);
+  public long getPointerOnData(final int pt, final int lt) {
+    //return ti.readInt(pt + lt * 1L);
+    return ti.read5(pt + lt * 1L);
   }
 
   /**
@@ -181,8 +186,8 @@ public final class Fuzzy extends Index {
    * @param lt length of the token
    * @return size of the ftdata
    */
-  private int getDataSize(final int pt, final int lt) {
-    return ti.readInt(pt + lt * 1L + 4L);
+  public int getDataSize(final int pt, final int lt) {
+    return ti.readInt(pt + lt * 1L + 5L);
   }
   
   /**
@@ -191,10 +196,19 @@ public final class Fuzzy extends Index {
    * @param s size of pre values
    * @return int[][] with ftdata
    */
-  private int[][] getData(final int p, final int s) {
-    int[][] d = new int[2][];
-    d[0] = dat.readInts(p, p + s * 4L);
-    d[1] = dat.readInts(p + s * 4L, p + 2 * s * 4L);
+  private int[][] getData(final long p, final int s) {
+    int[][] d = new int[2][s];
+    d[0][0] = dat.readNum(p);
+    for (int i = 1; i < s; i++) {
+      d[0][i] = dat.readNum();
+    }
+    
+    for (int i = 0; i < s; i++) {
+      d[1][i] = dat.readNum();
+    }
+
+    //d[0] = dat.readInts(p, p + s * 4L);
+    //d[1] = dat.readInts(p + s * 4L, p + 2 * s * 4L);
     return d;
     
   }
@@ -237,12 +251,12 @@ public final class Fuzzy extends Index {
       while(p < pe) {
         to = ti.readBytes(p, p + ts);
         if (calcEQ(to, 0, tok, e)) {
-          System.out.println(new String(to));
+          //System.out.println(new String(to));
           // read data
           ft = FTUnion.calculateFTOr(ft, 
               getData(getPointerOnData(p, ts), getDataSize(p, ts)));
         } 
-        p += ts + (int) 4L * 2;
+        p += ts + 4L  + 5L;
      }
       i++;
       ts = li.readBytes(1L + i * 5L, 1L + i * 5L + 1L)[0];
@@ -457,5 +471,5 @@ public final class Fuzzy extends Index {
     }
 
     return true;
+    }
   }
-}

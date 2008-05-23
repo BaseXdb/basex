@@ -3,6 +3,8 @@ package org.basex.index;
 import static org.basex.data.DataText.*;
 import static org.basex.Text.*;
 import java.io.IOException;
+
+import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataAccess;
 import org.basex.io.PrintOutput;
@@ -20,12 +22,12 @@ import org.basex.util.Token;
  * @author Sebastian Gath
  */
 public final class WordsCTANew extends Index {
-  // save each node: l, t1, ..., tl, u, n1, v1, ..., nu, vu, s, p
+  // save each node: l, t1, ..., tl, n1, v1, ..., nu, vu, s, p
   // l = length of the token t1, ..., tl
   // u = number of next nodes n1, ..., nu
   // v1= the first byte of each token n1 points, ...
   // s = size of pre values saved at pointer p
-  // [byte, byte[l], byte, int, byte, ..., int, int]
+  // [byte, byte[l], byte, int, byte, ..., int, long]
   /** Trie structure on disk. */
   private final DataAccess inN;
   // ftdata is stored here, with pre1, ..., preu, pos1, ..., posu
@@ -34,7 +36,8 @@ public final class WordsCTANew extends Index {
   // each nodeetries size is stored here
   /** FTData sizes on disk. */
   private final DataAccess inS;
-
+  /** Id on data, corresponding to the current node entry. */
+  private long did;
   /**
    * Constructor, initializing the index structure.
    * @param db name of the database
@@ -45,6 +48,7 @@ public final class WordsCTANew extends Index {
     inN = new DataAccess(db, file + 'a');
     inD = new DataAccess(db, file + 'b');
     inS = new DataAccess(db, file + 'c');
+    did = -1;
   }
 
   @Override
@@ -82,7 +86,6 @@ public final class WordsCTANew extends Index {
     if (ftO.ftCase == FTOption.CASE.INSENSITIVE) {
       // index request with pre-values as result
       return getNodeFromTrieRecursive(0, tok);
-      //ids(tok);
     }
 
     // index request with pre-values and positions as result
@@ -93,15 +96,10 @@ public final class WordsCTANew extends Index {
 
     if (ftO.ftCase == FTOption.CASE.UPPERCASE) {
       // convert search string to upper case and use case sensitive search
-      //System.out.println("newToken:" + new String(bTok));
       bTok = Token.uc(bTok);
-      //System.out.println("newToken:" + new String(bTok));
-      //for (int i = 0; i < tok.length; i++) bTok[i] = (byte) Token.uc(bTok[i]);
     } else if (ftO.ftCase == FTOption.CASE.LOWERCASE) {
       // carry search string to upper case and use case sensitive search
-      //System.out.println("newToken:" + new String(bTok));
       bTok = Token.lc(bTok);
-      //System.out.println("newToken:" + new String(bTok));
     }
 
     byte[] tokenFromDB;
@@ -176,7 +174,8 @@ public final class WordsCTANew extends Index {
       int td = tokTo.length - tokFrom.length;
       int[] ne = getNodeEntry(0);
       if (hasNextNodes(ne)) {
-        for (int i = ne[0] + 1; i < ne.length - 2; i += 2) {
+        //for (int i = ne[0] + 1; i < ne.length - 2; i += 2) {
+        for (int i = ne[0] + 1; i < ne.length - 1; i += 2) {
           if (Token.letter(ne[i + 1])) return data;
           if (ne[i + 1] != tokFrom[0] && ne[i + 1] != tokTo[0]) {
             if (tokTID == tokFID) {
@@ -235,6 +234,7 @@ public final class WordsCTANew extends Index {
     int b; 
     int[][] data = null;
     int[] ne;
+    long ldid;
     
     cl = 0;
     // find bound node at upper range 
@@ -249,7 +249,9 @@ public final class WordsCTANew extends Index {
       else b = -1;
     } else if (toi) {
       ne = getNodeEntry(b);
-      data = getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]);
+      //data = getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]);
+      ldid = did;
+      data = getDataFromDataArray(ne[ne.length - 1], ldid);
       data = getAllNodes(b, b, data);
     }
     
@@ -263,17 +265,21 @@ public final class WordsCTANew extends Index {
     // with same or bigger length than tokFrom
     if (id > -1 && fromi) {
       ne = getNodeEntry(id);
-      int[][] tmp = getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]);
+      ldid = did;
+      //int[][] tmp 
+      //= getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]);
+      int[][] tmp = getDataFromDataArray(ne[ne.length - 1], ldid);
       data = FTUnion.calculateFTOr(data, getAllNodes(id, b, tmp));
     } 
     
     for (int i = 0; i < idNNF[0].length; i++) {
       if (i > 0 && idNNF[0][i] == 0 && idNNF[1][i] == 0) break;
       ne = getNodeEntry(idNNF[0][i]);
-      //if (-1 * ne[ne[0] + 1] >= idNNF[1][i]) {
-      if (ne.length - 3 - ne[0] / 2 >= idNNF[1][i]) {
-        //for (int k = idNNF[1][i]; k < -1 * ne[ne[0] + 1]; k++)
-        for (int k = idNNF[1][i]; k < ne.length - 3 - ne[0]; k += 2)
+      ldid = did;
+      //if (ne.length - 3 - ne[0] / 2 >= idNNF[1][i]) {
+      if (ne.length - 2 - ne[0] / 2 >= idNNF[1][i]) {
+        //for (int k = idNNF[1][i]; k < ne.length - 3 - ne[0]; k += 2)
+        for (int k = idNNF[1][i]; k < ne.length - 2 - ne[0]; k += 2)
           data = FTUnion.calculateFTOr(data, 
               //getAllNodes(getDataEntry(idNNF[0][i], k), b, data));
               getAllNodes(ne[k], b, data));
@@ -285,16 +291,18 @@ public final class WordsCTANew extends Index {
   
   @Override
   public int[][] fuzzyIDs(final byte[] tok, final int ne) {
-    return getNodeFuzzy(0, null, tok, 0, 0, 0, ne);
+    return getNodeFuzzy(0, null, -1, tok, 0, 0, 0, ne);
     //return getNodesFuzzyWLev(0, new StringBuilder(), tok, 3, null);
   }
 
   @Override
   public int[] ids(final byte[] tok) {
-    int[] ne = getNodeIdFromTrieRecursive(0, getNodeEntry(0), tok);
+    int[] ne = getNodeIdFromTrieRecursive(0, tok);
+    long ldid = did;
     if (ne == null) return null;
     return Array.extractIDsFromData(
-        getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]));
+        //getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]));
+        getDataFromDataArray(ne[ne.length - 1], ldid));
   }
 
   @Override
@@ -321,12 +329,15 @@ public final class WordsCTANew extends Index {
   private int[][] getNodeFromTrieRecursive(final int cNode,
       final byte[] searchNode) {
     if (searchNode == null || searchNode.length == 0) return null;
-    int[] ne = getNodeIdFromTrieRecursive(cNode, getNodeEntry(cNode), 
+    int[] ne = getNodeIdFromTrieRecursive(cNode, 
         searchNode);
     if (ne == null) {
       return null;
     }
-    return getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]);
+    
+    long ldid = did;
+    //return getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]);
+    return getDataFromDataArray(ne[ne.length - 1], ldid);
   }
 
   /**
@@ -334,16 +345,14 @@ public final class WordsCTANew extends Index {
    * Returns data from node or null.
    *
    * @param cn int
-   * @param ne byte[] node entry (cn)
    * @param sn search nodes value
    * @return int id on node saving the data
    */
-  private int[] getNodeIdFromTrieRecursive(final int cn, final int[] ne, 
-      final byte[] sn) {
+  private int[] getNodeIdFromTrieRecursive(final int cn, final byte[] sn) {
     byte[] vsn = sn;
 
     // read data entry from disk
-    //final byte[] ne = getNodeEntry(cn);
+    int[] ne = getNodeEntry(cn);
 
     if(cn != 0) {
       int i = 0;
@@ -368,7 +377,7 @@ public final class WordsCTANew extends Index {
             return null;
           } else {
             return getNodeIdFromTrieRecursive(
-                ne[pos], getNodeEntry(ne[pos]), vsn);
+                ne[pos], vsn);
           }
         }
       } else {
@@ -382,7 +391,7 @@ public final class WordsCTANew extends Index {
         // node not contained
         return null;
       } else {
-        return getNodeIdFromTrieRecursive(ne[pos], getNodeEntry(ne[pos]), vsn);
+        return getNodeIdFromTrieRecursive(ne[pos], vsn);
       }
     }
   }
@@ -493,6 +502,7 @@ public final class WordsCTANew extends Index {
       final int c, final int[][] data) {
     int[][] dn = data;
     int[] ne = getNodeEntry(id);
+    long ldid = did;
     int in = getIndexDotNE(ne);
     
     //if (ne[0] + c < lb.length) {
@@ -500,7 +510,8 @@ public final class WordsCTANew extends Index {
       // process children
       if (!hasNextNodes(ne)) return dn;
       System.arraycopy(ne, 1, v, c, ne[0]);
-      for (int i = ne[0] + 1; i < ne.length - 2; i += 2) {
+      //for (int i = ne[0] + 1; i < ne.length - 2; i += 2) {
+      for (int i = ne[0] + 1; i < ne.length - 1; i += 2) {
         dn = getAllNodesWithinBounds(
             ne[i], v, ub, ubid, lb, lbid, c + ne[0], dn);
       }
@@ -518,19 +529,22 @@ public final class WordsCTANew extends Index {
         if (checkLBConstrain(vn, vid, lb, lbid) 
             && checkUBConstrain(vn, vid, ub, ubid)) {
           dn = FTUnion.calculateFTOr(dn, 
-              getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]));
+              //getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]));
+              getDataFromDataArray(ne[ne.length - 1], ldid));
         }        
       } else {
         if (checkLBConstrainDbl(vn, vid, lb, lbid) 
             && checkUBConstrainDbl(vn, vid, ub, ubid)) {
           dn = FTUnion.calculateFTOr(dn, 
-              getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]));
+              //getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]));
+              getDataFromDataArray(ne[ne.length - 1], ldid));
         }
       }
 
       if (!hasNextNodes(ne)) 
         return dn;
-      for (int i = ne[0] + 1; i < ne.length - 2; i += 2) {
+      //for (int i = ne[0] + 1; i < ne.length - 2; i += 2) {
+      for (int i = ne[0] + 1; i < ne.length - 1; i += 2) {
         dn = FTUnion.calculateFTOr(dn, 
           getAllNodesWithinBounds(ne[i], vn, ub, ubid, lb, 
               lbid, c + ne[0], dn));
@@ -567,9 +581,11 @@ public final class WordsCTANew extends Index {
       final int l2, final int[][] data, final boolean dotFound) {
     int[][] dn = data;
     int[] ne = getNodeEntry(id);
+    long tdid = did;
     if(dotFound) {
       dn = FTUnion.calculateFTOr(dn, 
-          getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]));
+          //getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]));
+          getDataFromDataArray(ne[ne.length - 1], tdid));
       //int[] nn = getNextNodes(ne);
       if (!hasNextNodes(ne)) return dn;
       for (int i = ne[0] + 1; i < ne.length - 2; i += 2) {
@@ -587,10 +603,12 @@ public final class WordsCTANew extends Index {
     //if (l1 <= ne[0] && ne[0] <= l2)  {
     if (l1 <= neID && neID <= l2)  {
       dn = FTUnion.calculateFTOr(dn, 
-          getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]));
+          //getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]));
+          getDataFromDataArray(ne[ne.length - 1], tdid));
       //int[] nn = getNextNodes(ne);
       if (!hasNextNodes(ne)) return dn;
-      for (int i = ne[0] + 1; i < ne.length - 2; i += 2) {
+      //for (int i = ne[0] + 1; i < ne.length - 2; i += 2) {
+      for (int i = ne[0] + 1; i < ne.length - 1; i += 2) {
         dn = FTUnion.calculateFTOr(dn, 
           getAllNodesWithLevel(ne[i], l1 - ne[0], 
               l2 - ne[0], dn, ne[0] > neID));
@@ -598,7 +616,8 @@ public final class WordsCTANew extends Index {
     } else if (ne[0] < l1 && ne [0] == neID) {
       //int[] nn = getNextNodes(ne);
       if (!hasNextNodes(ne)) return dn;
-      for (int i = ne[0] + 1; i < ne.length - 2; i += 2) {
+      //for (int i = ne[0] + 1; i < ne.length - 2; i += 2) {
+      for (int i = ne[0] + 1; i < ne.length - 1; i += 2) {
         dn = FTUnion.calculateFTOr(dn, 
             getAllNodesWithLevel(ne[i], l1 - ne[0], l2 - ne[0], dn, false));
       }  
@@ -740,7 +759,10 @@ public final class WordsCTANew extends Index {
     if (cn !=  b) {
       int[][] newData = data;
       int[] ne = getNodeEntry(cn);
-      int[][] tmp = getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]);
+      long tdid = did;
+      //int[][] tmp 
+      //= getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]);
+      int[][] tmp = getDataFromDataArray(ne[ne.length - 1], tdid);
       if (tmp != null) {
         newData = FTUnion.calculateFTOr(data, tmp); 
       }
@@ -752,7 +774,7 @@ public final class WordsCTANew extends Index {
         //final int[] nn = new int[ne[ne[0] + 1] * -1];
         //System.arraycopy(getDataEntry(id), 0, nn, 0, nn.length);
           
-        for (int i = ne[0] + 1; i < ne.length - 2; i += 2) {
+        for (int i = ne[0] + 1; i < ne.length - 1; i += 2) {
           //newData = FTUnion.calculateFTOr(newData, 
           newData = getAllNodes(ne[i], b, newData);
         }
@@ -770,7 +792,7 @@ public final class WordsCTANew extends Index {
   private int[] getNodeEntry(final int id) {
     int sp = inS.readInt(id * 4L);
     final int ep = inS.readInt((id + 1) * 4L);
-    int[] ne = new int [ep - sp];
+    int[] ne = new int [ep - sp - (int) 5L];
     int c = 0;
     ne[c++] = inN.readBytes(sp, sp + 1L)[0];
     sp += 1L;
@@ -778,17 +800,17 @@ public final class WordsCTANew extends Index {
       ne[c++] = inN.readBytes(sp + 1L * j, sp + 1L * j + 1L)[0];
     
     sp += ne[0];
-    if (sp + 8L < ep) {
+    if (sp + 9L < ep) {
       // inner node
-      while(sp < ep - 8L) {
+      while(sp < ep - 9L) {
         ne[c++] = inN.readInt(sp);
         sp += 4L;
         ne[c++] = inN.readBytes(sp, sp + 1L)[0];
         sp += 1L;
       }
     }
-    ne[c++] = inN.readInt(ep - 8L);
-    ne[c++] = inN.readInt(ep - 4L);
+    ne[c++] = inN.readInt(ep - 9L);
+    did = inN.read5(ep - 5L);
     int[] r = new int[c];
     System.arraycopy(ne, 0, r, 0, c);
     return r;
@@ -800,48 +822,29 @@ public final class WordsCTANew extends Index {
    * [[pre1, ..., pres], [pos1, ..., poss]] representation.
    *
    * @param s number of pre/pos values
-   * @param p pointer on data
+   * @param ldid pointer on data
    * @return  int[][] data
    */
-  private int[][] getDataFromDataArray(final int s, final int p) {
-    if (s == 0 && p == 0) return null;
+  private int[][] getDataFromDataArray(final int s, final long ldid) {
+    if (s == 0 && ldid <= 0) return null;
     int[][] data = new int[2][s];
-    data[0] = inD.readInts(p, p + 4L * s);
-    data[1] = inD.readInts(p + 4L * s, p + 8L * s);
+   
+    if (Prop.ftcompress) {
+      data[0][0] = inD.readNum(ldid);
+      for (int i = 1; i < s; i++) {
+        data[0][i] = inD.readNum();
+      }
+      for (int i = 0; i < s; i++) {
+        data[1][i] = inD.readNum();
+      }
+    } else {
+      data[0] = inD.readInts(ldid, s * 4L + ldid);
+      data[1] = inD.readInts(s * 4L + ldid, 2 * s * 4L + ldid);
+    }
+    
     return data;
-  }
-
-  /**
-   * Gets all pre-values from trie for node with nodeEntry as value.
-   *
-   * @param nodeEntry pointer array storing node entry
-   * @param dataEntry pointer array storing all data
-   * @return  int[] pre-values
-   */
- /* private int[] getPreValues(final byte[] nodeEntry,
-      final int[] dataEntry) {
-    // extract id on data array form nodearray
-    byte jumpOver = 0;
-
-    // extract id on data array
-    if(nodeEntry[nodeEntry[0] + 1] < 0) {
-      // next nodes existing
-      jumpOver = (byte) (-1 * nodeEntry[nodeEntry[0] + 1]);
-    }
-
-    if(dataEntry.length == jumpOver) {
-      return new int[]{};
-    }
-
-    int[] pre = new int[(dataEntry.length - jumpOver) / 2];
-    System.arraycopy(dataEntry, jumpOver, pre, 0, pre.length);
-
-    pre = CTArrayX.getIDsFromData(new int[][]{pre, {}});
-
-    return  pre;
-  }
-*/
-
+ }
+ 
   /**
    * Save whether a corresponding node was found in method getInsertingPosition.
    */
@@ -853,7 +856,8 @@ public final class WordsCTANew extends Index {
    * @return boolean leaf node or inner node
    */
   private boolean hasNextNodes(final int[] ne) {
-    return ne[0] + 1 < ne.length - 2;
+    //return ne[0] + 1 < ne.length - 2;
+    return ne[0] + 1 < ne.length - 1;
   }
   
   /**
@@ -887,7 +891,8 @@ public final class WordsCTANew extends Index {
       final int toInsert) {
     found = false;
     int i = cne[0] + 1;
-    int s = cne.length - 2;
+    //int s = cne.length - 2;
+    int s = cne.length - 1;
     if (s == i) 
       return i;
 
@@ -967,21 +972,19 @@ public final class WordsCTANew extends Index {
     int i = pointerNode;
     boolean last = lastFound;
     final int[] ne = getNodeEntry(node);
-    //final int[] curDataEntry = getDataEntry(node);
-
+    final long tdid = did;
+    
     // wildcard at the end
     if(ending == null || ending.length == 0) {
       // save data current node
       adata = FTUnion.calculateFTOr(adata, 
-          getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]));
-          //getDataFromDataArray(ne, curDataEntry));
+          //getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]));
+          getDataFromDataArray(ne[ne.length - 1], tdid));
       
-      //final int[] nextNodes = getNextNodes(ne);
-      //if(nextNodes != null) {
       if (hasNextNodes(ne)) {
         // preorder traversal through trie
-        for (int t = ne[0] + 1; t < ne.length - 2; t += 2) {
-        //for(final int n : nextNodes) {
+        //for (int t = ne[0] + 1; t < ne.length - 2; t += 2) {
+        for (int t = ne[0] + 1; t < ne.length - 1; t += 2) {
           astericsWildCardTraversing(ne[t], null, last, 0, 0);
         }
       }
@@ -1025,7 +1028,8 @@ public final class WordsCTANew extends Index {
       //final int[] nextNodes = getNextNodes(ne);
       // preorder search in trie
       //for(final int n : nextNodes) {
-      for (int t = ne[0] + 1; t < ne.length - 2; t += 2) {
+      //for (int t = ne[0] + 1; t < ne.length - 2; t += 2) {
+      for (int t = ne[0] + 1; t < ne.length - 1; t += 2) {
         astericsWildCardTraversing(ne[t], ending, false, 1, 0);
       }
       countSkippedChars = 0;
@@ -1037,7 +1041,8 @@ public final class WordsCTANew extends Index {
         adata = CTArrayX.ftOR(adata, d);
       }*/
       adata = FTUnion.calculateFTOr(adata, 
-          getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]));
+          //getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]));
+          getDataFromDataArray(ne[ne.length - 1], tdid));
       
       countSkippedChars = 0;
   
@@ -1046,8 +1051,8 @@ public final class WordsCTANew extends Index {
       //if(nextNodes != null) {
       if (hasNextNodes(ne)) {
         // preorder search in trie
-        //for(final int n : nextNodes) {
-        for (int t = ne[0] + 1; t < ne.length - 2; t += 2) {
+        //for (int t = ne[0] + 1; t < ne.length - 2; t += 2) {
+        for (int t = ne[0] + 1; t < ne.length - 1; t += 2) {
           if(j == 1) {
             astericsWildCardTraversing(ne[t], ending, false, 0, 0);
           }
@@ -1082,7 +1087,8 @@ public final class WordsCTANew extends Index {
   
       // preorder search in trie
       //for(final int n : nextNodes) {
-      for (int t = ne[0] + 1; t < ne.length - 2; t += 2) {
+      //for (int t = ne[0] + 1; t < ne.length - 2; t += 2) {
+      for (int t = ne[0] + 1; t < ne.length - 1; t += 2) {
         // compare only first char from ending
         if(j == 1) {
           astericsWildCardTraversing(ne[t], ending, last, 1, 0);
@@ -1303,6 +1309,7 @@ public final class WordsCTANew extends Index {
       return d;
     } else {
       final int[] rne = getNodeEntry(resultNode);
+      //final long rdid = did;
       // append 1 symbol
       // not completely processed (value current node)
       if(rne[0] > counter[0]) {
@@ -1334,7 +1341,8 @@ public final class WordsCTANew extends Index {
 
         // simple method call
         if(!recCall) {
-          for (int t = rne[0] + 1; t < rne.length - 2; t += 2) {
+          //for (int t = rne[0] + 1; t < rne.length - 2; t += 2) {
+          for (int t = rne[0] + 1; t < rne.length - 1; t += 2) {
           //for(final int n : nextNodes) {
             // replace first letter
             //ne = getNodeEntry(n);
@@ -1348,10 +1356,11 @@ public final class WordsCTANew extends Index {
           return tmpNode;
         } else {
           // method call for .+ wildcard
-          //valuesFound = new byte[nextNodes.length];
-          valuesFound = new byte[rne.length - 2 - rne[0] - 1];
+          valuesFound = new byte[rne.length - 1 - rne[0] - 1];
+          //valuesFound = new byte[rne.length - 2 - rne[0] - 1];
           //for(int i = 0; i < nextNodes.length; i++) {
-          for (int t = rne[0] + 1; t < rne.length - 2; t += 2) {
+          //for (int t = rne[0] + 1; t < rne.length - 2; t += 2) {
+          for (int t = rne[0] + 1; t < rne.length - 1; t += 2) {
             // replace first letter
             //ne = getNodeEntry(nextNodes[i]);
             aw[0] = (byte) rne[t + 1]; //ne[1];
@@ -1361,7 +1370,6 @@ public final class WordsCTANew extends Index {
             tmpNode = FTUnion.calculateFTOr(tmpNode,
                 getNodeFromTrieRecursive(rne[t], aw));
           }
-
         }
       }
     }
@@ -1440,6 +1448,7 @@ public final class WordsCTANew extends Index {
    *
    * @param cn int current node id
    * @param crne byte[] current node entry (of cn)
+   * @param crdid long current pointer on data
    * @param sn byte[] search nodes value
    * @param d int counter for deletions
    * @param p int counter for pastes
@@ -1448,12 +1457,16 @@ public final class WordsCTANew extends Index {
    * @return int[][]
    */
    private int[][] getNodeFuzzy(final int cn, final int[] crne, 
-       final byte[] sn, final int d, final int p, final int r, final int c) {
+       final long crdid, final byte[] sn, final int d, final int p, 
+       final int r, final int c) {
     byte[] vsn = sn;
     int[] cne = crne;
-    if (crne == null)
+    long cdid = crdid;
+    if (cne == null) {
       cne = getNodeEntry(cn);
-      
+      cdid = did;
+    }
+
     if(cn != 0) {
       // not root node
       int i = 0;
@@ -1467,12 +1480,14 @@ public final class WordsCTANew extends Index {
           // leafnode found with appropriate value
           if (c >= d + p + r) {
             int[][] ld = null;
-            ld = getDataFromDataArray(cne[cne.length - 2], cne[cne.length - 1]);
+            //ld = 
+            //getDataFromDataArray(cne[cne.length - 2], cne[cne.length - 1]);
+            ld = getDataFromDataArray(cne[cne.length - 1], cdid);
             if (hasNextNodes(cne)) {
-              for (int t = cne[0] + 1; t < cne.length - 2; t++) {
-                ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(cne[t], 
-                    getNodeEntry(cne[t]), new byte[]{(byte) cne[t + 1]}, 
-                    d, p + 1, r, c));
+              //for (int t = cne[0] + 1; t < cne.length - 2; t++) {
+              for (int t = cne[0] + 1; t < cne.length - 1; t++) {
+                ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(cne[t], null, -1,
+                    new byte[]{(byte) cne[t + 1]}, d, p + 1, r, c));
                 t++;
               }
             }
@@ -1485,7 +1500,7 @@ public final class WordsCTANew extends Index {
               // delete char
               b = new byte[vsn.length - 1];
               System.arraycopy(vsn, 0, b, 0, i);
-              ld = getNodeFuzzy(cn, cne, b, d + 1, p, r, c);
+              ld = getNodeFuzzy(cn, cne, cdid, b, d + 1, p, r, c);
             }
           
           // cut valueSearchNode for value current node
@@ -1495,37 +1510,43 @@ public final class WordsCTANew extends Index {
 
           // scan successors currentNode
           int[] ne = null;
+          long tdid = -1;
           if (hasNextNodes(cne)) {
-            for (int k = cne[0] + 1; k < cne.length - 2; k += 2) {
+            //for (int k = cne[0] + 1; k < cne.length - 2; k += 2) {
+            for (int k = cne[0] + 1; k < cne.length - 1; k += 2) {
               //if (c > d + p + r) {
                 if (cne[k + 1] == vsn[0]) {
                   ne = getNodeEntry(cne[k]);
+                  tdid = did;
                   b = new byte[vsn.length];
                   System.arraycopy(vsn, 0, b, 0, vsn.length); 
                   ld = FTUnion.calculateFTOr(ld, 
-                      getNodeFuzzy(cne[k], ne, b, d, p, r, c));
+                      getNodeFuzzy(cne[k], ne, tdid, b, d, p, r, c));
                 }
                 
               if (c > d + p + r) {
-                if (ne == null) ne = getNodeEntry(cne[k]); 
+                if (ne == null) {
+                  ne = getNodeEntry(cne[k]);
+                  tdid = did;
+                }
                 // paste char
                 b = new byte[vsn.length + 1];
                 b[0] = (byte) cne[k + 1];
                 System.arraycopy(vsn, 0, b, 1, vsn.length);
-                ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(cne[k], ne,
+                ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(cne[k], ne, tdid,
                     b, d, p + 1, r, c));
                 
                 if (vsn.length > 0) {
                   // delete char
                   b = new byte[vsn.length - 1];
                   System.arraycopy(vsn, 1, b, 0, b.length);
-                  ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(cne[k], ne,
+                  ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(cne[k], ne, tdid,
                       b, d + 1, p, r, c));
                   // replace char
                   b = new byte[vsn.length];
                   System.arraycopy(vsn, 1, b, 1, vsn.length - 1);
                   b[0] = (byte) ne[1];
-                  ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(cne[k], ne,
+                  ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(cne[k], ne, tdid,
                       b, d, p, r + 1, c));
                 }
               }    
@@ -1544,7 +1565,7 @@ public final class WordsCTANew extends Index {
           b[i] = (byte) cne[i + 1];
           System.arraycopy(vsn, i, b, i + 1, vsn.length - i);
                  
-          ld = getNodeFuzzy(cn, cne, b, d, p + 1, r, c);
+          ld = getNodeFuzzy(cn, cne, cdid, b, d, p + 1, r, c);
           
           if (vsn.length > 0 && i < vsn.length) {
             // replace
@@ -1552,14 +1573,14 @@ public final class WordsCTANew extends Index {
             System.arraycopy(vsn, 0, b, 0, vsn.length);
             
             b[i] = (byte) cne[i + 1];
-            ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(cn, cne,
+            ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(cn, cne, cdid,
                 b, d, p, r + 1, c));
             if (vsn.length > 1) {
               // delete char
               b = new byte[vsn.length - 1];
               System.arraycopy(vsn, 0, b, 0, i);
               System.arraycopy(vsn, i + 1, b, i, vsn.length - i - 1);
-              ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(cn, cne,
+              ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(cn, cne, cdid,
                   b, d + 1, p, r, c));
             }
            }
@@ -1570,39 +1591,45 @@ public final class WordsCTANew extends Index {
       }
     } else {
       int[] ne = null;
+      long tdid = -1;
       int[][] ld = null;
 
       byte[] b;
       if(hasNextNodes(cne)) {
-        for (int k = cne[0] + 1; k < cne.length - 2; k += 2) {
+        //for (int k = cne[0] + 1; k < cne.length - 2; k += 2) {
+          for (int k = cne[0] + 1; k < cne.length - 1; k += 2) {
           //if (c > d + p + r) {
             if (cne[k + 1] == vsn[0]) {
               ne = getNodeEntry(cne[k]);
+              tdid = did;
               b = new byte[vsn.length];
               System.arraycopy(vsn, 0, b, 0, vsn.length);
               ld = FTUnion.calculateFTOr(ld, 
-                  getNodeFuzzy(cne[k], ne, b, d, p, r, c));
+                  getNodeFuzzy(cne[k], ne, tdid, b, d, p, r, c));
             }
           if (c > d + p + r) {
-            if (ne == null) ne = getNodeEntry(cne[k]);
+            if (ne == null) {
+              ne = getNodeEntry(cne[k]);
+              tdid = did;
+            }
             // paste char
             b = new byte[vsn.length + 1];
             b[0] = (byte) ne[1];
             System.arraycopy(vsn, 0, b, 1, vsn.length);
-            ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(cne[k], ne,
+            ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(cne[k], ne, tdid,
                 b, d, p + 1, r, c));
             
             if (vsn.length > 0) {
               // delete char
               b = new byte[vsn.length - 1];
               System.arraycopy(vsn, 1, b, 0, b.length);
-              ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(cne[k], ne,
+              ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(cne[k], ne, tdid,
                   b, d + 1, p, r, c));
                 // replace
               b = new byte[vsn.length];
               System.arraycopy(vsn, 1, b, 1, vsn.length - 1);
                 b[0] = (byte) ne[1];
-                ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(cne[k], ne,
+                ld = FTUnion.calculateFTOr(ld, getNodeFuzzy(cne[k], ne, tdid,
                     b, d, p, r + 1, c));
             }
           } 

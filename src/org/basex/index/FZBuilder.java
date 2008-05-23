@@ -9,7 +9,6 @@ import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
-import org.basex.util.Num;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 
@@ -76,7 +75,7 @@ public final class FZBuilder extends Progress implements IndexBuilder {
     }
     return new Fuzzy(data.meta.dbname);
   }
-
+ 
   /**
    * Extracts and indexes words from the specified byte array.
    * @param tok token to be extracted and indexed
@@ -113,8 +112,8 @@ public final class FZBuilder extends Progress implements IndexBuilder {
 
     // write index size
     outx.write(isize);
-
-    int c = 0, tr = 0, dr = 0;
+    long dr = 0;
+    int c = 0, tr = 0;
     byte j = 1;
     for (; j < tree.length; j++) {
       if(c == isize - 1) break;
@@ -135,23 +134,28 @@ public final class FZBuilder extends Progress implements IndexBuilder {
         for(int x = 0; x != j; x++) outy.write(key[x]);
 
         // write pointer on data
-        outy.writeInt(dr);
+        //outy.writeInt(dr);
+        outy.write5(dr);
         // write data size
         final int ds = tre.ns[p];
         outy.writeInt(ds);
 
         // decompress and write pre and pos values
         byte[] val = tre.pre[p];
+        for (int z = 4; z < val.length; z++) outz.write(val[z]);
+        /*
         for(int v = 0, ip = 4; v < ds; ip += Num.len(val, ip), v++) {
           outz.writeInt(Num.read(val, ip));
         }
+        */
         val = tre.pos[p];
-        for(int v = 0, ip = 4; v < ds; ip += Num.len(val, ip), v++) {
+        /*for(int v = 0, ip = 4; v < ds; ip += Num.len(val, ip), v++) {
           outz.writeInt(Num.read(val, ip));
-        }
+        }*/
+        for (int z = 4; z < val.length; z++) outz.write(val[z]);
 
-        dr += ds << 3;
-        tr += j + 8L;
+        dr = outz.size(); //+= ds << 3; // compression
+        tr = (int) outy.size(); //+= j + 8L;
       }
       c++;
     }

@@ -101,10 +101,45 @@ public final class DataOutput extends OutputStream {
    */
   public int writeToken(final byte[] text) throws IOException {
     final int s = writeNum(text.length);
-    for(final byte t : text) write(t);
+    for(final byte t : text) {
+      write(t);
+    }
+
     return s + text.length;
   }
 
+  /**
+   * Writes the specified token to the output stream.
+   * @param text text to be written
+   * @param numWords number of words written
+   * @return int[] {length of written bytes, number of words written}
+   * @throws IOException in case of write errors
+   */
+  public int[] writeToken(final byte[] text, final int[] numWords)
+  throws IOException {
+    int[] nw = numWords;
+    int l = 0;
+    final int s = writeNum(text.length);
+    for(final byte t : text) {
+      write(t);
+      
+     if (!Token.ftChar(t)) {
+       if (l > 0) {
+         nw[l]++;
+         l = 0;
+        }
+     } else {
+       l++;
+     }
+    }
+
+    nw[0] = s + text.length;
+    if (l > 0)
+      nw[l]++;
+    return nw;
+  }
+
+  
   /**
    * Writes the specified array to the output stream.
    * @param array array to be written

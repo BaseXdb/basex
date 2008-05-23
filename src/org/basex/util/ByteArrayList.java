@@ -13,11 +13,22 @@ public final class ByteArrayList {
   public int size;
   /** Flag for found values in list. **/
   public boolean found = false;
+  
   /**
    * Default constructor.
    */
   public ByteArrayList() { }
-
+  
+  /**
+   * Constructor.
+   * 
+   * @param is initial size of the list
+   */
+  public ByteArrayList(final int is) {
+    list = new byte[is][];
+  }
+  
+  
   /**
    * Adds next value.
    * @param v value to be added

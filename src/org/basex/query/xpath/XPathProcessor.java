@@ -764,7 +764,7 @@ public final class XPathProcessor extends QueryProcessor {
       //consumeWS();
       Num error = (Num) parseNumber();
       int ne = (int) error.num();
-      if (ne < 0) ne = 3;
+      if (ne == 0) ne = 3;
       return new FTFuzzy(e, lit, ne);
       
     }

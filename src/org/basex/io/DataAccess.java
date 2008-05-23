@@ -100,9 +100,9 @@ public final class DataAccess {
   /**
    * Reads an 5-byte value from the specified file offset.
    * @param p position
-   * @return integer value
+   * @return long value
    */
-  public synchronized long read5(final int p) {
+  public synchronized long read5(final long p) {
     cursor(p);
     return ((long) read() << 32) + ((long) read() << 24) +
       (read() << 16) + (read() << 8) + read();
@@ -212,7 +212,7 @@ public final class DataAccess {
     writeNum(v.length);
     for(final byte b : v) write(b);
   }
-
+  
   // private methods...
 
   /**

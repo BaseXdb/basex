@@ -9,6 +9,7 @@ import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
+import org.basex.util.Array;
 import org.basex.util.Token;
 
 /**
@@ -44,7 +45,9 @@ public final class MetaData {
   public boolean newindex = false;
   /** Last (highest) id assigned to a node. */
   public long lastid = -1;
-
+  /** Number of written words. */
+  public int[] numw = new int[32];
+  
   /**
    * Constructor, specifying the database name.
    * @param db database name
@@ -121,6 +124,7 @@ public final class MetaData {
       else if(k.equals(DBFTXINDEX)) ftxindex = v.equals(ON) || v.equals("1");
       else if(k.equals(DBTIME)) time = Token.toLong(v);
       else if(k.equals(DBLASTID)) lastid = Token.toLong(v);
+      //else if(k.equals(DBTXTNUMWORDS)) numw = Array.stringToIntArray(v);
     }
     in.close();
 
@@ -150,6 +154,7 @@ public final class MetaData {
     writeInfo(inf, DBFTXINDEX, ftxindex);
     writeInfo(inf, DBTIME, Long.toString(time));
     writeInfo(inf, DBLASTID, Long.toString(lastid));
+
     inf.writeString("");
     inf.close();
   }

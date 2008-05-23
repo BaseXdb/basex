@@ -462,6 +462,33 @@ public final class Token {
   }
 
   /**
+   * Converts a long value to a int-array.
+   * @param l long value to convert
+   * @return int-array with the long value
+   */
+  public static int[] longToInt(final long l) {
+    int[] i = new int[2];
+    i[1] = (int) (l & 0x7FFFFFFF);
+    if (l < 0x7FFFFFFF) return new int[]{i[1]};
+    i[0] = (int) (l >> 31) * -1;
+    return i;
+  }
+  
+  
+  /**
+   * Converts an int-array to a long value.
+   * @param i int-array with the long value
+   * @return long value
+   */
+  public static long intArrayToLong(final int[] i) {
+    if (i.length == 1) return i[0];
+    long l = i[0] * -1; // & 0x7FFFFFFF;
+    l = l << 31;
+    l = i[1] | l;
+    return l;
+ }
+  
+  /**
    * Converts the specified string into an integer value.
    * {@link Integer#MIN_VALUE} is returned when the input is invalid.
    * @param to character array to be converted
@@ -1171,4 +1198,42 @@ public final class Token {
     'O', ' ', 'O', 'U', 'U', 'U', 'U', 'Y', 'D', 'S', 'a', 'a', 'a', 'a', 'a',
     'a', 'a', 'c', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i', 'd', 'n', 'o',
     'o', 'o', 'o', 'o', ' ', 'o', 'u', 'u', 'u', 'u', 'y', 'd', 's' };
+    /*
+    public static void main(String[] args) {
+      int[] i = longToInt(Integer.MAX_VALUE - 1);
+      System.out.println("Input:" + (Integer.MAX_VALUE - 1));
+      //for (int k=0; k < i.length; k++) System.out.println(i[k]);
+      System.out.println("=" + intArrayToLong(i));
+      
+      i = longToInt(Integer.MAX_VALUE);
+      System.out.println("Input:" + Integer.MAX_VALUE);
+      //for (int k=0; k < i.length; k++) System.out.println(i[k]);      
+      System.out.println("=" + intArrayToLong(i));
+      
+      i = longToInt((long)Integer.MAX_VALUE + 1);
+      System.out.println("Input:" + ((long)Integer.MAX_VALUE + 1));
+      //for (int k=0; k < i.length; k++) System.out.println(i[k]);
+      System.out.println("=" + intArrayToLong(i));
+      
+      i = longToInt((long)Integer.MAX_VALUE + 2);
+      System.out.println("Input:" + ((long)Integer.MAX_VALUE + 2));
+      //for (int k=0; k < i.length; k++) System.out.println(i[k]);
+      System.out.println("=" + intArrayToLong(i));
+      
+      i = longToInt(Integer.MAX_VALUE * (long)2 - 1);
+      System.out.println("Input:" + (Integer.MAX_VALUE* (long)2 - 1));
+      //for (int k=0; k < i.length; k++) System.out.println(i[k]);
+      System.out.println("=" + intArrayToLong(i));
+      
+      i = longToInt(Integer.MAX_VALUE* (long)2);
+      System.out.println("Input:" + (Integer.MAX_VALUE* (long)2));
+      //for (int k=0; k < i.length; k++) System.out.println(i[k]);
+      System.out.println("=" + intArrayToLong(i));
+      
+      i = longToInt(Integer.MAX_VALUE*(long)2 + 1);
+      System.out.println("Input" + (Integer.MAX_VALUE * (long) 2+ 1));
+      //for (int k=0; k < i.length; k++) System.out.println(i[k]);
+      System.out.println("=" + intArrayToLong(i));
+    }
+    */
 }
