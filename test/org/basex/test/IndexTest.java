@@ -69,7 +69,7 @@ public class IndexTest {
     //initTimer();
 
     // create instance of token index
-    CTArrayNew index = new CTArrayNew();
+    CTArrayNew index = new CTArrayNew(nrTokens);
     // index all tokens and get their reference
     for(int i = 0; i < nrTokens; i++) {
       //System.out.println(indexed[i]);
