@@ -98,7 +98,8 @@ public final class MapView extends View implements Runnable {
     final Dimension screen = getToolkit().getScreenSize();
     final int w = Math.max(1, screen.width);
     final int h = Math.max(1, screen.height);
-    
+    // Screenshot version: int w = {width}, h = {height}...
+
     final BufferedImage img = new BufferedImage(w, h,
         BufferedImage.TYPE_INT_BGR);
     final Graphics g = img.getGraphics();
@@ -275,8 +276,8 @@ public final class MapView extends View implements Runnable {
    */
   private String calc() {
     // calculate initial rectangle
-    final int w = getWidth();
-    final int h = getHeight();
+    final int w = getWidth(), h = getHeight();
+    // Screenshots: int w = mainMap.getWidth(), h = mainMap.getHeight();
     final MapRect rect = new MapRect(0, 0, w, h, 0, 0);
 
     // calculate new main rectangles
@@ -312,15 +313,16 @@ public final class MapView extends View implements Runnable {
     sb.append(STATUSMAP2);
     sb.append(perf.getTimer());
     focus();
-    return sb.toString();
 
-    /* temporary.. save map in screenshot
+    /* Screenshots:
     try {
       File file = new File("screenshot.png");
       ImageIO.write(mainMap, "png", file);
     } catch(IOException e) {
       e.printStackTrace();
     }*/
+    
+    return sb.toString();
   }
 
   /**
