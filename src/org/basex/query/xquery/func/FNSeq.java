@@ -95,19 +95,15 @@ final class FNSeq extends Fun {
    */
   private Iter indexOf(final Iter iter, final Item it) {
     return new Iter() {
-      SeqIter sq = new SeqIter();
       Item i;
       int index = 0;
-      int position = -1;
 
       @Override
       public Item next() throws XQException {
         while ((i = iter.next()) != null) {
           index++;
           if(CmpV.valCheck(i, it) && CmpV.COMP.EQ.e(i, it)) {
-            position++;
-            sq.add(Itr.iter(index));
-            return sq.item[position];
+            return Itr.get(index);
           }
         }
         return null;
