@@ -337,7 +337,8 @@ public interface Text {
     "- " + Set.ENTITY + lang("ch_set27") + NL +
     "- " + Set.TXTINDEX + lang("ch_set28") + NL +
     "- " + Set.ATTRINDEX + lang("ch_set29") + NL +
-    "- " + Set.FTINDEX + lang("ch_set31") + NL + NL +
+    "- " + Set.FTINDEX + lang("ch_set31") + NL +
+    "- " + Set.FUZZYINDEX + lang("ch_set30") + NL + NL +
     lang("ch_set32") + NL + NL +
     "- " + Set.DBPATH + lang("ch_set33") + NL +
     "- " + Set.RUNS + lang("ch_set34");
@@ -659,14 +660,17 @@ public interface Text {
   String CREATEENTITIES = lang("dc_entities");
   /** SAX parsing information. */
   String CREATEINTPARSE = lang("dc_intparse");
+  /** Main-Memory Mode. */
+  String CREATEMAINMEM = lang("dc_mainmem");
+
   /** Value Index information. */
   String CREATETXTINDEX = lang("dc_txtindex");
   /** Value Index information. */
   String CREATEATTINDEX = lang("dc_attindex");
   /** Word Index information. */
   String CREATEFTINDEX = lang("dc_ftindex");
-  /** Main-Memory Mode. */
-  String CREATEMAINMEM = lang("dc_mainmem");
+  /** Word Index information. */
+  String CREATEFZINDEX = lang("dc_fzindex");
 
   /** Whitespaces information. */
   String CHOPPINGINFO = lang("dc_chopinfo") + DOT;
@@ -674,14 +678,17 @@ public interface Text {
   String INTPARSEINFO = lang("dc_intparseinfo") + DOT;
   /** Entities information. */
   String ENTITIESINFO = lang("dc_entitiesinfo") + " (&...;).";
+  /** Main-Memory Mode. */
+  String MMEMINFO =  lang("dc_mminfo") + DOT;
+
   /** Value Index information. */
   String TXTINDEXINFO =  lang("dc_txtinfo") + DOT;
   /** Value Index information. */
   String ATTINDEXINFO = lang("dc_attinfo") + DOT;
   /** Fulltext Index information. */
   String FTINDEXINFO = lang("dc_ftxinfo") + DOT;
-  /** Main-Memory Mode. */
-  String MMEMINFO =  lang("dc_mminfo") + DOT;
+  /** Fulltext Index information. */
+  String FZINDEXINFO = lang("dc_fzinfo") + DOT;
 
   /** General info. */
   String GENERALINFO =  lang("dc_general");
@@ -1150,8 +1157,10 @@ public interface Text {
   String INFOATVINDEX = lang("info_atvindex");
   /** Info on Fulltext Indexing. */
   String INFOFTINDEX = lang("info_ftindex");
-  /** Info on Fulltext Fuzzyindexing. */
-  String INFOFUZZYINDEX = lang("info_fuzzyindex");
+  /** Info on Fuzzy Indexing. */
+  String INFOFZINDEX = lang("info_fzindex");
+  /** Info on Fuzzy Fulltext Indexing. */
+  String INFOFTFZINDEX = lang("info_ftfzindex");
 
   /** Info on Document Creation. */
   String INFODB = lang("info_db");

@@ -25,14 +25,18 @@ public final class DialogCreate extends Dialog {
   private BaseXCheckBox chop;
   /** Entities mode. */
   private BaseXCheckBox entities;
+  /** Main Memory mode. */
+  private BaseXCheckBox mainmem;
   /** Indexing mode. */
   private BaseXCheckBox txtindex;
   /** Indexing mode. */
   private BaseXCheckBox atvindex;
   /** Word Indexing mode. */
   private BaseXCheckBox ftxindex;
-  /** Main Memory mode. */
-  private BaseXCheckBox mainmem;
+  /** Fuzzy indexing. */
+  private BaseXCheckBox fuzzyindex;
+  /** Fuzzy indexing label. */
+  private BaseXLabel fuzzylabel;
 
   /**
    * Default Constructor.
@@ -65,10 +69,9 @@ public final class DialogCreate extends Dialog {
     p1.add(mainmem);
     p1.add(new BaseXLabel(MMEMINFO, 8));
 
-
     // create checkboxes
     final BaseXBack p2 = new BaseXBack();
-    p2.setLayout(new TableLayout(8, 1, 0, 0));
+    p2.setLayout(new TableLayout(10, 1, 0, 0));
     p2.setBorder(8, 8, 8, 8);
 
     txtindex = new BaseXCheckBox(CREATETXTINDEX, Token.token(TXTINDEXINFO),
@@ -86,6 +89,12 @@ public final class DialogCreate extends Dialog {
     p2.add(ftxindex);
     p2.add(new BaseXLabel(FTINDEXINFO, 8));
 
+    fuzzyindex = new BaseXCheckBox(CREATEFZINDEX, Token.token(FZINDEXINFO),
+        Prop.fzindex, 0, this);
+    p2.add(fuzzyindex);
+    fuzzylabel = new BaseXLabel(FZINDEXINFO, 8);
+    p2.add(fuzzylabel);
+
     final JTabbedPane tabs = new JTabbedPane();
     BaseXLayout.addDefaultKeys(tabs, this);
     tabs.addTab(GENERALINFO, p1);
@@ -95,8 +104,17 @@ public final class DialogCreate extends Dialog {
 
     // create buttons
     set(BaseXLayout.okCancel(this), BorderLayout.SOUTH);
+    action(null);
 
     finish(parent);
+  }
+  
+
+  @Override
+  public void action(final String cmd) {
+    final boolean ftx = ftxindex.isSelected();
+    fuzzyindex.setEnabled(ftx);
+    fuzzylabel.setEnabled(ftx);
   }
 
   @Override
@@ -109,5 +127,6 @@ public final class DialogCreate extends Dialog {
     Prop.ftindex = ftxindex.isSelected();
     Prop.mainmem  = mainmem.isSelected();
     Prop.intparse = intparse.isSelected();
+    Prop.fzindex = fuzzyindex.isSelected();
   }
 }

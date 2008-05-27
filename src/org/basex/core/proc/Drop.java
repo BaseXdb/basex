@@ -5,7 +5,6 @@ import static org.basex.data.DataText.*;
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.Commands;
-import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.index.Index;
 import org.basex.io.IO;
@@ -73,7 +72,7 @@ public final class Drop extends Proc {
     }
     if(type.equals(Create.FTX)) {
       data.meta.ftxindex = false;
-      final Index.TYPE typ = Prop.fuzzyindex ? Index.TYPE.FUY : Index.TYPE.FTX;
+      Index.TYPE typ = data.meta.fzindex ? Index.TYPE.FUY : Index.TYPE.FTX;
       return dropIndex(typ, DATAFTX);
     }
     throw new IllegalArgumentException();

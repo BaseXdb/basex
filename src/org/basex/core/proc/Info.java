@@ -79,7 +79,8 @@ public final class Info extends XPath {
     prop(out, NL + INFOINDEXES, false);
     prop(out, Set.flag(INFOTXTINDEX, Prop.textindex), true);
     prop(out, Set.flag(INFOATVINDEX, Prop.attrindex), true);
-    prop(out, Set.flag(INFOFTINDEX, Prop.ftindex), true);
+    prop(out, Set.flag(INFOFTINDEX, Prop.ftindex)  +
+        (Prop.fzindex ? INFOFZINDEX : ""), true);
 
     prop(out, NL + INFOCREATE, false);
     prop(out, Set.flag(INFOCHOP, Prop.chop), true);
@@ -115,7 +116,8 @@ public final class Info extends XPath {
     prop(out, NL + INFOINDEX, false);
     prop(out, Set.flag(INFOTXTINDEX, data.meta.txtindex), true);
     prop(out, Set.flag(INFOATVINDEX, data.meta.atvindex), true);
-    prop(out, Set.flag(INFOFTINDEX, data.meta.ftxindex), true);
+    prop(out, Set.flag(INFOFTINDEX, data.meta.ftxindex) +
+        (data.meta.fzindex ? INFOFZINDEX : ""), true);
 
     prop(out, NL + INFOCREATE, false);
     prop(out, Set.flag(INFOCHOP, data.meta.chop), true);

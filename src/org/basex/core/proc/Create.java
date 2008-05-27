@@ -172,10 +172,8 @@ public final class Create extends Proc {
 
       if(data.meta.txtindex) buildIndex(Index.TYPE.TXT, data);
       if(data.meta.atvindex) buildIndex(Index.TYPE.ATV, data);
-      if(data.meta.ftxindex) {
-        if (Prop.fuzzyindex) buildIndex(Index.TYPE.FUY, data);
-        else buildIndex(Index.TYPE.FTX, data); 
-      }
+      if(data.meta.ftxindex) buildIndex(
+          data.meta.fzindex ? Index.TYPE.FUY : Index.TYPE.FTX, data);
       context.data(data);
       
       return Prop.info ? timer(DBCREATED) : true;
@@ -227,7 +225,7 @@ public final class Create extends Proc {
       if(data.meta.atvindex)
         data.openIndex(Index.TYPE.ATV, new ValueBuilder(false).build(data));
       if(data.meta.ftxindex) {
-        if(Prop.fuzzyindex)
+        if(data.meta.fzindex)
           data.openIndex(Index.TYPE.FUY, new FZBuilder().build(data));
         else data.openIndex(Index.TYPE.FTX, new FTBuilder().build(data));
       }
@@ -258,8 +256,7 @@ public final class Create extends Proc {
         index = Index.TYPE.ATV;
       } else if(type.equals(FTX)) {
         data.meta.ftxindex = true;
-        if (Prop.fuzzyindex) index = Index.TYPE.FUY;
-        else index = Index.TYPE.FTX;
+        index = data.meta.fzindex ? Index.TYPE.FUY : Index.TYPE.FTX;
       } else {
         throw new IllegalArgumentException();
       }

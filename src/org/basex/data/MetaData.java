@@ -34,12 +34,14 @@ public final class MetaData {
   public boolean chop = Prop.chop;
   /** Flag for entity parsing. */
   public boolean entity = Prop.entity;
-  /** Flag for creating a fulltext index. */
-  public boolean ftxindex = Prop.ftindex;
   /** Flag for creating a text index. */
   public boolean txtindex = Prop.textindex;
   /** Flag for creating a attribute value index. */
   public boolean atvindex = Prop.attrindex;
+  /** Flag for creating a fulltext index. */
+  public boolean ftxindex = Prop.ftindex;
+  /** Flag for creating a fuzzy fulltext index. */
+  public boolean fzindex = Prop.fzindex;
   /** Flag for removing the index structures. */
   public boolean newindex = false;
   /** Last (highest) id assigned to a node. */
@@ -116,11 +118,12 @@ public final class MetaData {
       else if(k.equals(DBENCODING)) encoding = v;
       else if(k.equals(DBHEIGHT)) height = Token.toInt(v);
       else if(k.equals(DBSIZE)) size = Token.toInt(v);
-      else if(k.equals(DBCHOPPED)) chop = v.equals(ON) || v.equals("1");
-      else if(k.equals(DBENTITY)) entity = v.equals(ON) || v.equals("1");
-      else if(k.equals(DBTXTINDEX)) txtindex = v.equals(ON) || v.equals("1");
-      else if(k.equals(DBATVINDEX)) atvindex = v.equals(ON) || v.equals("1");
-      else if(k.equals(DBFTXINDEX)) ftxindex = v.equals(ON) || v.equals("1");
+      else if(k.equals(DBCHOPPED)) chop = toBool(v);
+      else if(k.equals(DBENTITY)) entity = toBool(v);
+      else if(k.equals(DBTXTINDEX)) txtindex = toBool(v);
+      else if(k.equals(DBATVINDEX)) atvindex = toBool(v);
+      else if(k.equals(DBFTXINDEX)) ftxindex = toBool(v);
+      else if(k.equals(DBFZINDEX)) fzindex = toBool(v);
       else if(k.equals(DBTIME)) time = Token.toLong(v);
       else if(k.equals(DBLASTID)) lastid = Token.toLong(v);
       //else if(k.equals(DBTXTNUMWORDS)) numw = Array.stringToIntArray(v);
@@ -130,6 +133,15 @@ public final class MetaData {
     if(!storage.equals(STORAGE)) throw new BuildException(DBUPDATE, storage);
     if(!istorage.equals(ISTORAGE)) noIndex();
     return size;
+  }
+
+  /**
+   * Converts the specified string to a boolean value.
+   * @param v value
+   * @return result
+   */
+  private boolean toBool(final String v) {
+    return v.equals(ON) || v.equals("1");
   }
 
   /**
@@ -151,6 +163,7 @@ public final class MetaData {
     writeInfo(inf, DBTXTINDEX, txtindex);
     writeInfo(inf, DBATVINDEX, atvindex);
     writeInfo(inf, DBFTXINDEX, ftxindex);
+    writeInfo(inf, DBFZINDEX, fzindex);
     writeInfo(inf, DBTIME, Long.toString(time));
     writeInfo(inf, DBLASTID, Long.toString(lastid));
 

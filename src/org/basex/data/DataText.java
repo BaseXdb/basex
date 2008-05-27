@@ -48,6 +48,8 @@ public interface DataText {
   String DBWRDINDEX = "WRDINDEX";
   /** Fulltext indexing. */
   String DBFTXINDEX = "FTXINDEX";
+  /** Fuzzy indexing. */
+  String DBFZINDEX = "FZINDEX";
   /** Last (highest) id. */
   String DBLASTID = "LASTID";
   /** Number of words in table. */

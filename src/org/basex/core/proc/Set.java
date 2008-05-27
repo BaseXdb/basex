@@ -56,7 +56,7 @@ public final class Set extends Proc {
     } else if(option.equals(FTINDEX)) {
       Prop.ftindex = toggle(Prop.ftindex, INFOFTINDEX, ext);
     } else if(option.equals(FUZZYINDEX)) {
-      Prop.fuzzyindex = toggle(Prop.fuzzyindex, INFOFUZZYINDEX, ext);     
+      Prop.fzindex = toggle(Prop.fzindex, INFOFTFZINDEX, ext);
     } else if(option.equals(TXTINDEX)) {
       Prop.textindex = toggle(Prop.textindex, INFOTXTINDEX, ext);
     } else if(option.equals(ATTRINDEX)) {

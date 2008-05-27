@@ -96,7 +96,7 @@ public final class DiskData extends Data {
       if(meta.txtindex) openIndex(Index.TYPE.TXT, new Values(this, db, true));
       if(meta.atvindex) openIndex(Index.TYPE.ATV, new Values(this, db, false));
       if(meta.ftxindex) {
-        if (Prop.fuzzyindex) openIndex(Index.TYPE.FUY, new Fuzzy(db));
+        if(meta.fzindex) openIndex(Index.TYPE.FUY, new Fuzzy(db));
         else openIndex(Index.TYPE.FTX, new WordsCTANew(db));
       }
     }
