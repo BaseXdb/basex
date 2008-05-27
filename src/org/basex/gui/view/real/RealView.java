@@ -202,7 +202,7 @@ public class RealView extends View {
         pointerx = space - childframewidth / 2;
         pointery = 20 + level * lvdistance;
         drawNode(g, pre, pointerx, pointery, elementColor);
-        drawTree(g, pre, level, 0, space);
+        drawTree(g, pre, level, space - childframewidth, space);
       }
     }
   }
