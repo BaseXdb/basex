@@ -116,7 +116,7 @@ public class LOCATE {
       ch = g.getopt();
     }
     fileToFind = g.getPath();
-    fileToFindByte = fileToFind.getBytes();
+    fileToFindByte = Token.token(fileToFind);
     
     if(fileToFind == null) {
       out.print("usage: locate  [-l limit] [-c] [-h] -V 1 ...");

@@ -86,7 +86,7 @@ public final class Namespaces extends Set {
     i = Math.min(sz - 1, i + 1);
     int s = indexOf(n, ':');
     if(s == -1) {
-      for(s = i; i >= 0; i--) if(pref[i].length == 0) return vals[i];
+      for(; i >= 0; i--) if(pref[i].length == 0) return vals[i];
       return -1;
     }
     return ns(n, s, i);

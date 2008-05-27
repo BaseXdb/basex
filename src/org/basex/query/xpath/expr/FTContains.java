@@ -25,7 +25,7 @@ public final class FTContains extends Comparison {
   /** FullText options. */
   private FTOption option;
   /** Flag for FTPosFilter queries.*/
-  protected boolean ftpos = false;
+  boolean ftpos = false;
  
   /**
    * Constructor.

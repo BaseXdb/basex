@@ -31,13 +31,13 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
   /** Current performance info. */
   private String perf = "";
   /** Current focus on memory. */
-  protected boolean memfocus;
+  boolean memfocus;
   /** Error flag. */
-  protected boolean error;
+  boolean error;
   /** Maximum memory. */
-  protected long max = 1;
+  long max = 1;
   /** Used memory. */
-  protected long used;
+  long used;
 
   /**
    * Constructor.

@@ -246,7 +246,7 @@ public final class XMark extends XPath {
     for(int pi = 0; pi < ps; pi++) {
       writeSep(pi);
       out.openElement(item, person, atom(p, pi, stepName));
-      parse("count(.[buyer/@person = '" + atom(p, pi, stepID) + "'])").
+      parse("count(.[buyer/@person = '" + string(atom(p, pi, stepID)) + "'])").
         eval(c).serialize(out);
       out.closeElement(item);
     }

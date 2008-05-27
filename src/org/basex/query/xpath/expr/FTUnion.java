@@ -41,7 +41,7 @@ public final class FTUnion extends FTArrayExpr {
   public NodeSet eval(final XPContext ctx) throws QueryException {
     int[][] res = null;
     int[][] tmp;
-    int[] pntr = null;
+    int[] pntr;
     Object[] o;
       
     Item it = exprs[0].eval(ctx);
@@ -303,9 +303,9 @@ public final class FTUnion extends FTArrayExpr {
                     {1, 3, 4, 6, 7, 8, 10, 11, 13, 15}}, 
         new int[][]{{5, 5, 5}, {2, 5, 9}}, 
         new int[]{1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1});
-    String s1 = new String("  ");
-    String s2 = new String("  ");
-    String s3 = new String(((int[]) o[1])[0] + "|");
+    String s1 = "  ";
+    String s2 = "  ";
+    String s3 = ((int[]) o[1])[0] + "|";
     for (int i = 0; i < ((int[][]) o[0])[1].length; i++) {
       s1 = s1 + (((int[][]) o[0]) [0][i] + ",");
       s2 = s2 + (((int[][]) o[0]) [1][i] + ",");

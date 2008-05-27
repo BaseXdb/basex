@@ -12,10 +12,10 @@ import org.basex.util.Token;
  * @author Tim Petrowsky
  */
 public final class Num extends Item {
-  /** Precedence. */
-  protected static final int PREC = 3;
   /** Static number. */
   public static final Num ONE = new Num(1);
+  /** Precedence. */
+  private static final int PREC = 3;
   /** Number value. */
   private final double num;
 

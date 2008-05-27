@@ -43,6 +43,10 @@ public class DialogPrefs extends Dialog {
   private BaseXCheckBox names;
   /** Simple file dialog checkbox. */
   private BaseXCheckBox simpfd;
+  /** Simple file dialog checkbox. */
+  private BaseXCheckBox javalook;
+  /** Focus flag. */
+  private boolean lf;
   /** Focus flag. */
   private boolean foc;
   /** Show names flag. */
@@ -59,10 +63,11 @@ public class DialogPrefs extends Dialog {
     foc = GUIProp.mousefocus;
     nam = GUIProp.shownames;
     fd = GUIProp.simplefd;
+    lf = GUIProp.javalook;
 
     // create checkboxes
     final BaseXBack pp = new BaseXBack();
-    pp.setLayout(new TableLayout(8, 1, 0, 0));
+    pp.setLayout(new TableLayout(10, 1, 0, 0));
     pp.add(new BaseXLabel(DATABASEPATH, true));
 
     BaseXBack p = new BaseXBack();
@@ -84,6 +89,10 @@ public class DialogPrefs extends Dialog {
     BaseXLabel label = new BaseXLabel(PREFINTER, true);
     label.setBorder(10, 0, 8, 0);
     pp.add(label);
+
+    // checkbox for realtime mouse focus
+    javalook = new BaseXCheckBox(PREFLF, HELPLF, lf, this);
+    pp.add(javalook);
 
     // checkbox for realtime mouse focus
     focus = new BaseXCheckBox(PREFFOCUS, HELPFOCUS, foc, this);
@@ -133,6 +142,7 @@ public class DialogPrefs extends Dialog {
     GUIProp.mousefocus = focus.isSelected();
     GUIProp.shownames = names.isSelected();
     GUIProp.simplefd = simpfd.isSelected();
+    GUIProp.javalook = javalook.isSelected();
     if(GUI.context.db()) View.notifyUpdate();
   }
 
@@ -142,6 +152,7 @@ public class DialogPrefs extends Dialog {
     GUIProp.mousefocus = foc;
     GUIProp.shownames = nam;
     GUIProp.simplefd = fd;
+    GUIProp.javalook = lf;
     if(GUI.context.db()) View.notifyUpdate();
   }
 

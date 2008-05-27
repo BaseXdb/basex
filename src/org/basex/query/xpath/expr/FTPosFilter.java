@@ -229,6 +229,7 @@ public final class FTPosFilter extends FTArrayExpr {
         if (lpo != p[j + 1] && lpo != p[0]) {
           s = e;
           e = j;
+          // <SG> pold not used in this loop?
           pold = p[s + 1];
           lpo = p[e + 1];
           lid = res[0][s];
@@ -331,9 +332,7 @@ public final class FTPosFilter extends FTArrayExpr {
         }
       }
     }
-    if (c == 0) {
-      return null;
-    }
+    if(c == 0) return null;
 
     int[][] result = new int[2][c];
     System.arraycopy(mres[0], 0, result[0], 0, c);
@@ -427,14 +426,14 @@ public final class FTPosFilter extends FTArrayExpr {
 
   /**
    * Calculate start and end position for a sentence or paragraph; 
-   * Return the position of the first symbole and the punctuation mark.
-   * If any punctuation mark was found, the position of the last symbole 
+   * Return the position of the first symbol and the punctuation mark.
+   * If any punctuation mark was found, the position of the last symbol
    * is returned.
    *
    * @param data byte[]
    * @param cpo current position
-   * @param s boolean deactivates the startposition detection
-   * @return int[2] start and endposition
+   * @param s boolean deactivates the start position detection
+   * @return int[2] start and end position
    */
   public int[] getSEPositions(final byte[] data, final int cpo, 
       final boolean s) {
@@ -517,20 +516,12 @@ public final class FTPosFilter extends FTArrayExpr {
         }
       }
 
-      if (cp == data.length) {
-        cp = cp - 1;
-      }
+      if(cp == data.length) cp--;
       sep[1] = cp;
       return sep;
-
-
-    } else {
-      return null;
     }
-
+    return null;
   }
-
-
 
   /**
    * Calulcates the distance between two positions (pos1 and pos2), 
@@ -580,7 +571,6 @@ public final class FTPosFilter extends FTArrayExpr {
       return new int[][]{};
     }
 
-    byte[] dataFromDB = null;
     int level = 0;
     int nextId = 0;
     int[][] maxResult = new int[2][res[0].length * 2];
@@ -592,16 +582,14 @@ public final class FTPosFilter extends FTArrayExpr {
     for (int i = 0; i < res[0].length; i++) {
       // same Id
       if (lastId == res[0][i]) {
-        // all pointer prozessed and last not equal 0
-        if (i + 1 == p.length) {
-          break;
-        }
+        // all pointer processed and last not equal 0
+        if (i + 1 == p.length) break;
 
         if (p[i + 1] == 0) {
           // load data for id (res[0][i]) from db
-          dataFromDB = ctx.local.data.text(res[0][i]);
+          byte[] dataFromDB = ctx.local.data.text(res[0][i]);
 
-          // calculte maximum position
+          // calculate maximum position
           // in case of at least, to == res[0].length
           if (ftpos.ftRange != FTPositionFilter.RANGE.EXACTLY
               && ftpos.to == null) {
@@ -615,11 +603,9 @@ public final class FTPosFilter extends FTArrayExpr {
           j = i;
 
           // skip following ids with  level = 0
-          while (j + 1 < p.length && p[j + 1] == 0) {
-            j++;
-          }
+          while (j + 1 < p.length && p[j + 1] == 0) j++;
 
-          // attend follwing ids with greater level
+          // attend following ids with greater level
           while (j < res[0].length && lastId == res[0][j]) {
             distance = calculateDistance(dataFromDB, res[1][i], res[1][j]);
             if (ftpos.from.num() <= distance && distance <= ftpos.to.num()) {
@@ -800,52 +786,46 @@ public final class FTPosFilter extends FTArrayExpr {
    * @return int[][] results
    */
   public int[][] calculateFTTimes(final int[][] res) {
-      if(res == null || res[0] == null || res[0].length == 0 
-          || ftpos.from == null) {
-          return new int[][]{};
-      }
+    if(res == null || res[0] == null || res[0].length == 0  ||
+        ftpos.from == null) return new int[][]{};
 
-      if (ftpos.to == null 
-          && ftpos.ftRange == FTPositionFilter.RANGE.ATLEAST) {
-        ftpos.to = new Num(res[0].length);
-      }
-      
-      int[][] maxResult = new int[2][res[0].length];
-      int count = 0;
-      int times = 1;
-      int[] stack = new int[res[0].length];
-      
-      for(int i = 1; i <= res[0].length; i++) {
-          // count same ids
-          if (i < res[0].length && res[0][i - 1] == res[0][i]) {
-            stack[times] = res[1][i - 1];
-            times++;
-          } else {
-              // different ids
-              if (ftpos.from.num() <= times && times <= ftpos.to.num()) {
-                  // backup id
-                for (int t = 0; t < times; t++) {
-                  maxResult[0][count] = res[0][i - 1];
-                  maxResult[1][count++] = stack[t];                 
-                }
-                maxResult[0][count] = res[0][i - 1];
-                maxResult[1][count] = res[1][i - 1];
-                count++;
-              }
-              stack = new int[res[0].length];
-              times = 1;
+    if (ftpos.to == null && ftpos.ftRange == FTPositionFilter.RANGE.ATLEAST) {
+      ftpos.to = new Num(res[0].length);
+    }
+    
+    int[][] maxResult = new int[2][res[0].length];
+    int count = 0;
+    int times = 1;
+    int[] stack = new int[res[0].length];
+    
+    for(int i = 1; i <= res[0].length; i++) {
+      // count same ids
+      if (i < res[0].length && res[0][i - 1] == res[0][i]) {
+        stack[times] = res[1][i - 1];
+        times++;
+      } else {
+        // different ids
+        if (ftpos.from.num() <= times && times <= ftpos.to.num()) {
+          // backup id
+          for (int t = 0; t < times; t++) {
+            maxResult[0][count] = res[0][i - 1];
+            maxResult[1][count++] = stack[t];                 
           }
+          maxResult[0][count] = res[0][i - 1];
+          maxResult[1][count] = res[1][i - 1];
+          count++;
+        }
+        stack = new int[res[0].length];
+        times = 1;
       }
+    }
 
-      if (count == 0) {
-          return null;
-      }
-      int[][] returnResult = new int[2][count];
-      
-      System.arraycopy(maxResult[0], 0, returnResult[0], 0, count);
-      System.arraycopy(maxResult[1], 0, returnResult[1], 0, count);
+    if (count == 0) return null;
 
-      return returnResult;
+    int[][] returnResult = new int[2][count];
+    System.arraycopy(maxResult[0], 0, returnResult[0], 0, count);
+    System.arraycopy(maxResult[1], 0, returnResult[1], 0, count);
+    return returnResult;
   }
 
 
@@ -855,24 +835,21 @@ public final class FTPosFilter extends FTArrayExpr {
    */
   public static void main(final String[] args) {
 
-    int[][] res = calculateFTOrdered(new int[][]
-                                               {{5, 5,  5,  5,  5,  5,  
-                                                 5,  5,   
-                                                 6,  6,  6,  6,  6,  6, 6,  6},
-        {30, 87, 88, 31, 96, 97, 51, 105, 30, 87, 88, 89, 90, 0, 96, 97}}, 
-        new int[]{2, 0, 0,  0,  1,  1,  1,  2,  
-        2,   0,  0,  0,  0,  1,  2, 2,  2});
-
+    int[][] res = calculateFTOrdered(new int[][] {{
+      5, 5,  5,  5,  5,  5, 5,  5, 6,  6,  6,  6,  6,  6, 6,  6},
+      { 30, 87, 88, 31, 96, 97, 51, 105, 30, 87, 88, 89, 90, 0, 96, 97 } }, 
+      new int[] { 2, 0, 0,  0,  1,  1,  1,  2,  2,   0,  0,  0,  0,
+        1,  2, 2,  2 });
 
     /*  res = calculateFTOrdered(new int[][]{{5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5},
         {4,97,15,25,69,87,86,99,4,97,15,25,69,87,86,99}}, 
         new int[]{2,0,0,1,1,1,1,2,2,0,0,1,1,1,1,2,2});
      */
-    for (int[] e : res) {
-      for (int i : e) System.out.print(i + ",");
+    
+    for(int[] e : res) {
+      for(int i : e) System.out.print(i + ",");
       System.out.println();
     }
-
   }
   
   @Override

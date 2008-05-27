@@ -49,7 +49,7 @@ public final class MapFS extends MapPainter {
   }
 
   @Override
-  public void finalize() throws Throwable {
+  protected void finalize() throws Throwable {
     super.finalize();
     images.reset();
   }

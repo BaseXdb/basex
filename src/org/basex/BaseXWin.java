@@ -76,8 +76,7 @@ public final class BaseXWin {
       UIManager.getInstalledLookAndFeels();
       // set system specific look & feel
       // temporary: avoid GTK problems in Ubuntu 7.10/other distributions
-      UIManager.setLookAndFeel(Prop.UNIX ?
-          //UIManager.getSystemLookAndFeelClassName() :
+      UIManager.setLookAndFeel(GUIProp.javalook ?
           UIManager.getCrossPlatformLookAndFeelClassName() :
           UIManager.getSystemLookAndFeelClassName());
       

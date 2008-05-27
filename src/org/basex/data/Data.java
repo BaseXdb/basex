@@ -304,7 +304,7 @@ public abstract class Data  {
     switch(type) {
       case TXT: return txtindex.ids(token);
       case ATV: return atvindex.ids(token);
-      case FTX: return ftxindex.ids(token);
+      case FTX:
       case FUY: return ftxindex.ids(token);
       default:  return null;
     }

@@ -1,7 +1,6 @@
 package org.basex.util;
 
 import static org.basex.util.Token.*;
-
 import org.basex.core.Prop;
 
 /**
@@ -12,7 +11,10 @@ import org.basex.core.Prop;
  */
 public final class Levenshtein {
   /** Static matrix for Levenshtein distance. */
-  private static int[][] m;
+  private static int[][] m = new int[32][32];
+  
+  // lazy matrix initialization
+  static { for(int i = 0; i < m.length; i++) { m[0][i] = i; m[i][0] = i; } }
 
   /** Private constructor, preventing class instantiation. */
   private Levenshtein() { }
@@ -70,11 +72,6 @@ public final class Levenshtein {
    */
   public static int ls(final byte[] tok, final int ts, final int tl, 
       final byte[] sub, final int k) {
-
-    if(m == null) {
-      m = new int[32][32];
-      for(int i = 0; i < m.length; i++) { m[0][i] = i; m[i][0] = i; }
-    }
 
     int e2 = -1, f2 = -1;
     int sl = sub.length;

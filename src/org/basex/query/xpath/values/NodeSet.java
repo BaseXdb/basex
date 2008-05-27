@@ -16,7 +16,7 @@ import org.basex.util.TokenBuilder;
  */
 public final class NodeSet extends Item {
   /** Precedence. */
-  protected static final int PREC = Integer.MAX_VALUE;
+  static final int PREC = Integer.MAX_VALUE;
   /** Current node set position. */
   public int currPos;
   /** Current node set size. */

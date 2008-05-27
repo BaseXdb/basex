@@ -20,14 +20,13 @@ public final class NSIndex {
       new QNm(BASEX, Uri.BX)
   };
   /** Singleton instance. */
-  private static NSIndex instance;
+  private static NSIndex instance = new NSIndex();
 
   /**
    * Gets the function instance.
    * @return instance
    */
   public static NSIndex get() {
-    if(instance == null) instance = new NSIndex();
     return instance;
   }
 

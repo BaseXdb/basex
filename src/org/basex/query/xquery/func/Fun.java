@@ -162,7 +162,7 @@ public abstract class Fun extends Expr {
 
   @Override
   public void plan(final Serializer ser) throws Exception {
-    ser.openElement(this, NAM, Token.token(func.desc.toString()));
+    ser.openElement(this, NAM, Token.token(func.desc));
     for(Expr arg : args) arg.plan(ser);
     ser.closeElement(this);
   }

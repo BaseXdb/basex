@@ -18,7 +18,7 @@ public final class XPathTest {
   private final Context context = new Context();
 
   /** Test Information. */
-  protected static final String TESTINFO =
+  static final String TESTINFO =
     "\nUsage: Test [options]" +
     "\n -h  show this help" +
     "\n -v  show query information";

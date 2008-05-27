@@ -22,7 +22,7 @@ public final class Undo {
    * Constructor.
    */
   public Undo() {
-    hist[pos] = Token.EMPTY;
+    hist[0] = Token.EMPTY;
   }
   
   /**

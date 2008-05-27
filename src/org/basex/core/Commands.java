@@ -307,7 +307,7 @@ public enum Commands {
   private String help(final int n) {
     try {
       return Text.class.getField(name() + n).get(null).toString();
-    } catch(Exception e) {
+    } catch(final Exception ex) {
       return null;
     }
   }

@@ -77,7 +77,7 @@ public final class GUIProp {
 
   // LAYOUT & INPUT OPTIONS ===================================================
 
-  /** Current input mode in global text field (search, XPath, command). */
+  /** Current input mode in global text field (Search, XPath, Command). */
   public static int searchmode = 0;
   /** Focus follows mouse. */
   public static boolean mousefocus = false;
@@ -85,6 +85,8 @@ public final class GUIProp {
   public static boolean filterrt = false;
   /** Flag for realtime context switch. */
   public static boolean execrt = true;
+  /** Flag for Java look and feel. */
+  public static boolean javalook = false;
 
   /** Flag for using a simple map layout. */
   public static boolean mapsimple = false;

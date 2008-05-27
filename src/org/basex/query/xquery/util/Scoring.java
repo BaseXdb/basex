@@ -7,7 +7,7 @@ package org.basex.query.xquery.util;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Scoring implements Cloneable {
+public final class Scoring {
   /** Default scoring value. */
   public static final double DEFAULT = 0;
   /** Logarithmic base for calculating the score value. */

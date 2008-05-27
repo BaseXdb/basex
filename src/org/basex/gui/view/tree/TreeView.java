@@ -37,11 +37,11 @@ import org.basex.util.Performance;
  */
 public final class TreeView extends View {
   /** References closed nodes. */
-  protected boolean[] opened;
+  boolean[] opened;
   /** Line Height. */
-  protected int lineH;
+  int lineH;
   /** Focused tree position. */
-  protected int focusedPos;
+  int focusedPos;
 
   /** Closed Box. */
   private BufferedImage closedBox;

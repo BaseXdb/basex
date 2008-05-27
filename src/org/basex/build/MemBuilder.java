@@ -16,7 +16,7 @@ public final class MemBuilder extends Builder {
   // [CG] namespaces are currently ignored...
   
   /** Data reference. */
-  protected MemData data;
+  MemData data;
 
   @Override
   public MemBuilder init(final String db) {

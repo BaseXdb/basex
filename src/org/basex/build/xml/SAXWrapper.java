@@ -27,9 +27,9 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public final class SAXWrapper extends Parser {
   /** Element counter. */
-  protected int nodes;
+  int nodes;
   /** Builder reference. */
-  protected Builder builder;
+  Builder builder;
 
   static {
     // needed for XMLEntityManager: increase entity limit

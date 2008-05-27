@@ -23,7 +23,7 @@ public enum Axis {
   // NameSpace.  NAMESPACE(null, "namespace"),
 
   /** Axis string. */
-  protected final String name;
+  final String name;
 
   /**
    * Constructor, initializing the enum constants.

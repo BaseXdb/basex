@@ -9,7 +9,6 @@ import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
-import org.basex.util.Array;
 import org.basex.util.Token;
 
 /**
@@ -46,7 +45,7 @@ public final class MetaData {
   /** Last (highest) id assigned to a node. */
   public long lastid = -1;
   /** Number of written words. */
-  public int[] numw = new int[32];
+  //public int[] numw = new int[32];
   
   /**
    * Constructor, specifying the database name.

@@ -1257,20 +1257,16 @@ final class CTArray {
       returnArray = new int[2][counter + val1[0].length - i];
       // copy left values (bigger than last element values2) from values1
       //System.arraycopy(values1,i,returnArray,counter,values1.length-i);
-      System.arraycopy(val1[0], i, returnArray[0], counter,
-          val1[0].length - i);
-      System.arraycopy(val1[1], i, returnArray[1], counter,
-          val1[0].length - i);
+      System.arraycopy(val1[0], i, returnArray[0], counter, val1[0].length - i);
+      System.arraycopy(val1[1], i, returnArray[1], counter, val1[0].length - i);
     } else {
       // all elements form values1 are processed
       //returnArray = new int[counter+values2.length-k][2];
       returnArray = new int[2][counter + val2[0].length - k];
       // copy left values (bigger than last element values1) from values2
       //System.arraycopy(values2,k,returnArray,counter,values2.length-k);
-      System.arraycopy(val2[0], k, returnArray[0], counter,
-          val2[0].length - k);
-      System.arraycopy(val2[1], k, returnArray[1], counter,
-          val2[0].length - k);
+      System.arraycopy(val2[0], k, returnArray[0], counter, val2[0].length - k);
+      System.arraycopy(val2[1], k, returnArray[1], counter, val2[0].length - k);
     }
 
     //System.arraycopy(maxResult,0,returnArray,0,counter);

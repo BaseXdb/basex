@@ -34,7 +34,7 @@ public final class Link extends XPath {
 
     final Data data = context.data();
     final Nodes nodes = (Nodes) result;
-    if(nodes == null || count != counter) return false;
+    if(count != counter) return false;
 
     final int len = Integer.toString(MAXLINKS).length();
     int c = 0;

@@ -122,6 +122,7 @@ public final class WordsCTA extends Index {
     // check real case of each result node
     while(i < ids[0].length) {
       // get date from disk
+      // <SG> readId is overwritten again some lines later... 
       readId = ids[0][i];
       textFromDB = dd.text(ids[0][i]);
       tokenFromDB = new byte[tok.length];
@@ -856,7 +857,7 @@ public final class WordsCTA extends Index {
 
   /** saves astericsWildCardTraversing result
   has to be re-init each time (before calling method). */
-  private int[][] astericsWildCardData;
+  private int[][] adata;
 
   /** counts number of chars skip per astericsWildCardTraversing. */
   private int countSkippedChars;
@@ -883,18 +884,18 @@ public final class WordsCTA extends Index {
     int j = pointerEnding;
     int i = pointerNode;
     boolean last = lastFound;
-    final byte[] curNodeEntry = getNodeEntry(node);
+    final byte[] ne = getNodeEntry(node);
     final int[] curDataEntry = getDataEntry(node);
 
     // wildcard at the end
     if(ending == null || ending.length == 0) {
       // save data current node
-      astericsWildCardData = CTArrayX.ftOR(astericsWildCardData,
+      adata = ftOR(adata,
           //getDataFromDataArray(node));
-          getDataFromDataArray(curNodeEntry, curDataEntry));
+          getDataFromDataArray(ne, curDataEntry));
       
       //int[] nextNodes = getNextNodes(node);
-      final int[] nextNodes = getNextNodes(curNodeEntry);
+      final int[] nextNodes = getNextNodes(ne);
       if(nextNodes != null) {
         //if (next[node] != null) {
         // preorder traversal through trie
@@ -907,37 +908,27 @@ public final class WordsCTA extends Index {
 
     // compare chars current node and ending
     //if(nodes[node] != null) {
-    if(curNodeEntry != null) {
+    // <SG> can't be null?
+    if(ne != null) {
       // skip all unlike chars, if any suitable was found
       //while(!last && i < nodes[node][0] + 1
       //    && nodes[node][i] != ending[j]) {
-      while(!last && i < curNodeEntry[0] + 1
-          && curNodeEntry[i] != ending[j]) {
-  
-        i++;
-      }
+      while(!last && i < ne[0] + 1 && ne[i] != ending[j]) i++;
   
       // skip all chars, equal to first char
       //while(i + ending.length < nodes[node][0] + 1
       //    && nodes[node][i + 1] == ending[0]) {
-      while(i + ending.length < curNodeEntry[0] + 1
-          && curNodeEntry[i + 1] == ending[0]) {
-        i++;
-      }
+      while(i + ending.length < ne[0] + 1 && ne[i + 1] == ending[0]) i++;
   
       countSkippedChars = countSkippedChars + i - pointerNode - 1;
   
       //while(i < nodes[node][0] + 1 && j < ending.length
       //    && nodes[node][i] == ending[j]) {
-      while(i < curNodeEntry[0] + 1 && j < ending.length
-          && curNodeEntry[i] == ending[j]) {
+      while(i < ne[0] + 1 && j < ending.length && ne[i] == ending[j]) {
         i++;
         j++;
-        if(!last) {
-          last = true;
-        }
+        last = true;
       }
-  
     } else {
       countSkippedChars = 0;
       return;
@@ -946,16 +937,16 @@ public final class WordsCTA extends Index {
     // not processed all chars from node, but all chars from
     // ending were processed or root
     //if(node == 0 || j == ending.length && i < nodes[node][0] + 1) {
-    if(node == 0 || j == ending.length && i < curNodeEntry[0] + 1) {
+    if(node == 0 || j == ending.length && i < ne[0] + 1) {
       // pointer = 0; restart search
       //if(nodes[node][nodes[node][0] + 1] > 0) {
-      if(curNodeEntry[curNodeEntry[0] + 1] > 0) {
+      if(ne[ne[0] + 1] > 0) {
         countSkippedChars = 0;
         return;
       }
   
       //int[] nextNodes = getNextNodes(node);
-      final int[] nextNodes = getNextNodes(curNodeEntry);
+      final int[] nextNodes = getNextNodes(ne);
       // preorder search in trie
       for(final int n : nextNodes) {
         astericsWildCardTraversing(n, ending, false, 1, 0);
@@ -963,17 +954,17 @@ public final class WordsCTA extends Index {
       countSkippedChars = 0;
       return;
     //} else if(j == ending.length && i == nodes[node][0] + 1) {
-    } else if(j == ending.length && i == curNodeEntry[0] + 1) {
+    } else if(j == ending.length && i == ne[0] + 1) {
       // all chars form node and all chars from ending done
       //int[][] d = getDataFromDataArray(node);
-      final int[][] d = getDataFromDataArray(curNodeEntry, curDataEntry);
+      final int[][] d = getDataFromDataArray(ne, curDataEntry);
       if(d != null) {
-        astericsWildCardData = CTArrayX.ftOR(astericsWildCardData, d);
+        adata = ftOR(adata, d);
       }
       countSkippedChars = 0;
   
       //int[] nextNodes = getNextNodes(node);
-      final int[] nextNodes = getNextNodes(curNodeEntry);
+      final int[] nextNodes = getNextNodes(ne);
       // node has successors and is leaf node
       if(nextNodes != null) {
         // preorder search in trie
@@ -987,11 +978,11 @@ public final class WordsCTA extends Index {
   
       return;
     //} else if(j < ending.length && i < nodes[node][0] + 1) {
-    } else if(j < ending.length && i < curNodeEntry[0] + 1) {
+    } else if(j < ending.length && i < ne[0] + 1) {
       // still chars from node and still chars from ending left, pointer = 0 and
       // restart searching
       //if(nodes[node][nodes[node][0] + 1] > 0) {
-      if(curNodeEntry[curNodeEntry[0] + 1] > 0) {
+      if(ne[ne[0] + 1] > 0) {
         countSkippedChars = 0;
         return;
       }
@@ -1001,19 +992,19 @@ public final class WordsCTA extends Index {
       return;
   
     //} else if(j < ending.length &&  i == nodes[node][0] + 1) {
-    } else if(j < ending.length &&  i == curNodeEntry[0] + 1) {
+    } else if(j < ending.length &&  i == ne[0] + 1) {
       // all chars form node processed, but not all chars from processed
   
       // move pointer and go on
       //if(nodes[node][nodes[node][0] + 1] > 0) {
-      if(curNodeEntry[curNodeEntry[0] + 1] > 0) {
+      if(ne[ne[0] + 1] > 0) {
         //if (next[node] == null) {
         countSkippedChars = 0;
         return;
       }
   
       //int[] nextNodes = getNextNodes(node);
-      final int[] nextNodes = getNextNodes(curNodeEntry);
+      final int[] nextNodes = getNextNodes(ne);
   
       // preorder search in trie
       for(final int n : nextNodes) {
@@ -1067,29 +1058,29 @@ public final class WordsCTA extends Index {
    *
    * @param currentCompressedTrieNode current node
    * @param searchNode value looking for
-   * @param posWildcard wildcards position
+   * @param posw wildcards position
    * @param recCall first call??
    * @return data result ids
    */
   private int[][] getNodeFromTrieWithWildCard(
       final int currentCompressedTrieNode, final byte[] searchNode,
-      final int posWildcard, final boolean recCall) {
+      final int posw, final boolean recCall) {
 
-    final byte[] valueSearchNode = searchNode;
-    byte[] afterWildcard = null;
-    byte[] beforeWildcard = null;
+    final byte[] vsn = searchNode;
+    byte[] aw = null;
+    byte[] bw = null;
     //byte[] searchValue = null;
     final int currentLength = 0;
     int resultNode;
     //int workerNode;
     int[][] d = null;
     // wildcard not at beginning
-    if(posWildcard > 0) {
+    if(posw > 0) {
       // copy part before wildcard
-      beforeWildcard = new byte[posWildcard];
-      System.arraycopy(valueSearchNode, 0, beforeWildcard, 0, posWildcard);
+      bw = new byte[posw];
+      System.arraycopy(vsn, 0, bw, 0, posw);
       resultNode = getNodeFromTrieRecursiveWildcard(currentCompressedTrieNode,
-          beforeWildcard);
+          bw);
       if(resultNode == -1) {
         return null;
       }
@@ -1098,210 +1089,193 @@ public final class WordsCTA extends Index {
     }
 
     byte wildcard;
-    if(posWildcard + 1 >= valueSearchNode.length) {
+    if(posw + 1 >= vsn.length) {
       wildcard = '.';
     } else {
-      wildcard = valueSearchNode[posWildcard + 1];
+      wildcard = vsn[posw + 1];
     }
 
     if(wildcard == '?') {
       // append 0 or 1 symbols
 
       // look in trie without wildcard
-      byte[] searchChar = new byte[valueSearchNode.length - 2 - currentLength];
+      byte[] searchChar = new byte[vsn.length - 2 - currentLength];
       // copy unprocessed part before wildcard
-      if(beforeWildcard != null) {
-        System.arraycopy(beforeWildcard, 0, searchChar, 0,
-            beforeWildcard.length);
+      if(bw != null) {
+        System.arraycopy(bw, 0, searchChar, 0,
+            bw.length);
       }
       // copy part after wildcard
-      if(beforeWildcard == null) {
-        System.arraycopy(valueSearchNode, posWildcard + 2, searchChar,
+      if(bw == null) {
+        System.arraycopy(vsn, posw + 2, searchChar,
             0, searchChar.length);
       } else {
-        System.arraycopy(valueSearchNode, posWildcard + 2, searchChar,
-            beforeWildcard.length, searchChar.length - beforeWildcard.length);
+        System.arraycopy(vsn, posw + 2, searchChar,
+            bw.length, searchChar.length - bw.length);
       }
 
       d = getNodeFromTrieRecursive(0, searchChar);
       //System.out.println("searchChar:" + new String(searchChar));
 
       // lookup in trie with . as wildcard
-      searchChar = new byte[valueSearchNode.length - 1];
-      if(beforeWildcard != null) {
+      searchChar = new byte[vsn.length - 1];
+      if(bw != null) {
         // copy unprocessed part before wildcard
-        System.arraycopy(beforeWildcard, 0, searchChar, 0,
-            beforeWildcard.length);
-        searchChar[beforeWildcard.length] = '.';
+        System.arraycopy(bw, 0, searchChar, 0,
+            bw.length);
+        searchChar[bw.length] = '.';
 
         // copy part after wildcard
-        System.arraycopy(valueSearchNode, posWildcard + 2, searchChar,
-            beforeWildcard.length + 1, searchChar.length -
-            beforeWildcard.length - 1);
+        System.arraycopy(vsn, posw + 2, searchChar,
+            bw.length + 1, searchChar.length -
+            bw.length - 1);
       } else {
         // copy unprocessed part before wildcard
         searchChar[0] = '.';
 
         // copy part after wildcard
-        System.arraycopy(valueSearchNode, posWildcard + 2, searchChar, 1,
+        System.arraycopy(vsn, posw + 2, searchChar, 1,
             searchChar.length - 1);
       }
 
       // attach both result
       //d = ftOR(d, getNodeFromTrieWithWildCard(0, searchChar,
-      d = CTArrayX.ftOR(d, getNodeFromTrieWithWildCard(0, searchChar,
-          posWildcard, false));
+      d = ftOR(d, getNodeFromTrieWithWildCard(0, searchChar,
+          posw, false));
       return d;
     } else if(wildcard == '*') {
       // append 0 or n symbols
 
       // valueSearchNode == .*
-      if(!(posWildcard == 0 && valueSearchNode.length == 2)) {
+      if(!(posw == 0 && vsn.length == 2)) {
         // lookup in trie without wildcard
-        final byte[] searchChar = new byte[valueSearchNode.length
+        final byte[] searchChar = new byte[vsn.length
                                      - 2 - currentLength];
         // copy unprocessed part before wildcard
-        if(beforeWildcard != null) {
-          System.arraycopy(beforeWildcard, 0, searchChar, 0,
-              beforeWildcard.length);
+        if(bw != null) {
+          System.arraycopy(bw, 0, searchChar, 0,
+              bw.length);
         }
         // copy part after wildcard
-        if(beforeWildcard == null) {
-          afterWildcard = new byte[searchChar.length];
-          System.arraycopy(valueSearchNode, posWildcard + 2, searchChar, 0,
-              searchChar.length);
-          System.arraycopy(valueSearchNode, posWildcard + 2, afterWildcard, 0,
-              searchChar.length);
+        if(bw == null) {
+          aw = new byte[searchChar.length];
+          System.arraycopy(vsn, posw + 2, searchChar, 0, searchChar.length);
+          System.arraycopy(vsn, posw + 2, aw, 0, searchChar.length);
         } else {
-          afterWildcard = new byte[searchChar.length - beforeWildcard.length];
-          System.arraycopy(valueSearchNode, posWildcard + 2, searchChar,
-              beforeWildcard.length, searchChar.length - beforeWildcard.length);
-          System.arraycopy(valueSearchNode, posWildcard + 2, afterWildcard,
-              0, searchChar.length - beforeWildcard.length);
+          aw = new byte[searchChar.length - bw.length];
+          System.arraycopy(vsn, posw + 2, searchChar,
+              bw.length, searchChar.length - bw.length);
+          System.arraycopy(vsn, posw + 2, aw,
+              0, searchChar.length - bw.length);
         }
-
         d = getNodeFromTrieRecursive(0, searchChar);
         //System.out.println("searchChar:" + new String(searchChar));
-
         // all chars from valueSearchNode are contained in trie
-        if(beforeWildcard != null && counter[1] != beforeWildcard.length) {
+        if(bw != null && counter[1] != bw.length) {
           return d;
         }
       }
 
       // delete data
-      astericsWildCardData = null;
-
-      astericsWildCardTraversing(resultNode, afterWildcard, false,
-          counter[0], 0);
+      adata = null;
+      astericsWildCardTraversing(resultNode, aw, false, counter[0], 0);
       //return ftOR(d, astericsWildCardData);
-      return CTArrayX.ftOR(d, astericsWildCardData);
+      return ftOR(d, adata);
     } else if(wildcard == '+') {
       // append 1 or more symbols
       // lookup in trie with . as wildcard
-      final byte[] searchChar = new byte[valueSearchNode.length - 1 -
-                                         currentLength];
+      final byte[] searchChar = new byte[vsn.length - 1 - currentLength];
       // copy unprocessed part before wildcard
-      if(beforeWildcard != null) {
-        System.arraycopy(beforeWildcard, 0, searchChar, 0,
-            beforeWildcard.length);
+      if(bw != null) {
+        System.arraycopy(bw, 0, searchChar, 0, bw.length);
       }
       // set . as wildcard
-      searchChar[posWildcard] = '.';
+      searchChar[posw] = '.';
 
       // copy part after wildcard
-      if(beforeWildcard == null) {
-        // valueSearchNode == .+
-        if(!(posWildcard == 0 && valueSearchNode.length == 2)) {
-          afterWildcard = new byte[searchChar.length];
-          System.arraycopy(valueSearchNode, posWildcard + 2, searchChar, 1,
-              searchChar.length);
-          System.arraycopy(valueSearchNode, posWildcard + 2, afterWildcard, 1,
-              searchChar.length);
+      if(bw == null) {
+        // <SG> Out of Bounds exception: [... ftcontains ".+X" with wildcards]
+        if(!(posw == 0 && vsn.length == 2)) {
+          aw = new byte[searchChar.length];
+          System.arraycopy(vsn, posw + 2, searchChar, 1, searchChar.length);
+          System.arraycopy(vsn, posw + 2, aw, 1, searchChar.length);
         }
       } else {
-        afterWildcard = new byte[searchChar.length - beforeWildcard.length - 1];
-        System.arraycopy(valueSearchNode, posWildcard + 2, searchChar,
-            beforeWildcard.length +  1,
-            searchChar.length - beforeWildcard.length - 1);
-        System.arraycopy(valueSearchNode, posWildcard + 2,
-            afterWildcard, 0, searchChar.length - beforeWildcard.length - 1);
+        aw = new byte[searchChar.length - bw.length - 1];
+        System.arraycopy(vsn, posw + 2, searchChar, bw.length +  1,
+            searchChar.length - bw.length - 1);
+        System.arraycopy(vsn, posw + 2,
+            aw, 0, searchChar.length - bw.length - 1);
       }
 
       // wildcard search with . as wildcard
-      d = getNodeFromTrieWithWildCard(0, searchChar, posWildcard, true);
+      d = getNodeFromTrieWithWildCard(0, searchChar, posw, true);
 
       // at least one char has to be added
-      if (d == null) {
-        return null;
-      }
+      if (d == null) return null;
 
       byte[] newValue;
-      if(afterWildcard != null) {
-        newValue = new byte[beforeWildcard.length + 3 + afterWildcard.length];
-        System.arraycopy(afterWildcard, 0, newValue, beforeWildcard.length + 3,
-            afterWildcard.length);
+      if(aw != null) {
+        newValue = new byte[bw.length + 3 + aw.length];
+        System.arraycopy(aw, 0, newValue, bw.length + 3, aw.length);
       } else {
-        if (beforeWildcard == null)
-          newValue = new byte[3];
-        else
-          newValue = new byte[beforeWildcard.length + 3];
+        newValue = new byte[3 + (bw == null ? 0 : bw.length)];
       }
-      newValue[beforeWildcard.length + 1] = '.';
-      newValue[beforeWildcard.length + 2] = '*';
+      // <SG> bw could be null here.. (?)
+      newValue[bw.length + 1] = '.';
+      newValue[bw.length + 2] = '*';
 
-      System.arraycopy(beforeWildcard, 0, newValue, 0, beforeWildcard.length);
+      System.arraycopy(bw, 0, newValue, 0, bw.length);
       // take resultNodes from wildcard search with . as wildcard and start
       // new wildcard search with * as wildcard
       for(final byte v : valuesFound) {
         if(v != 0) {
-          newValue[beforeWildcard.length] = v;
+          newValue[bw.length] = v;
           //System.out.println(Token.string(newValue));
-          d = CTArrayX.ftOR(d, getNodeFromTrieWithWildCard(newValue,
-              beforeWildcard.length + 1));
+          d = ftOR(d, getNodeFromTrieWithWildCard(newValue,
+              bw.length + 1));
         }
       }
 
       return d;
     } else {
-      final byte[] resNodeEntry = getNodeEntry(resultNode);
+      final byte[] rne = getNodeEntry(resultNode);
       //System.out.println(Token.string(resNodeEntry));
       // append 1 symbol
       // not completely processed (value current node)
       //if(nodes[resultNode][0] > counter[0]) {
-      if(resNodeEntry[0] > counter[0]) {
+      if(rne[0] > counter[0]) {
         // replace wildcard with value from currentCompressedTrieNode
         //valueSearchNode[posWildcard] = nodes[resultNode][counter[0] + 1];
-        valueSearchNode[posWildcard] = resNodeEntry[counter[0] + 1];
+        vsn[posw] = rne[counter[0] + 1];
 
         // . wildcards left
-        final int [][] resultData = getNodeFromTrieRecursive(0,
-            valueSearchNode);
+        final int [][] resultData = getNodeFromTrieRecursive(0, vsn);
         // save nodeValues for recursive method call
         if(resultData != null && recCall) {
           //valuesFound = new byte[] {nodes[resultNode][counter[0] + 1]};
-          valuesFound = new byte[] {resNodeEntry[counter[0] + 1]};
+          valuesFound = new byte[] {rne[counter[0] + 1]};
         }
         return resultData;
 
       //} else if(nodes[resultNode][0] == counter[0]) {
-      } else if(resNodeEntry[0] == counter[0]) {
+      } else if(rne[0] == counter[0]) {
         // all chars from nodes[resultNode] are computed
 
         // any next values existing
 
         //if(nodes[resultNode][nodes[resultNode][0] + 1] > 0) {
-        if(resNodeEntry[resNodeEntry[0] + 1] > 0) {
+        if(rne[rne[0] + 1] > 0) {
           return null;
         }
 
         int[][] tmpNode = null;
-        afterWildcard = new byte[valueSearchNode.length - posWildcard];
-        System.arraycopy(valueSearchNode, posWildcard + 1, afterWildcard,
-            1, afterWildcard.length - 1);
+        aw = new byte[vsn.length - posw];
+        System.arraycopy(vsn, posw + 1, aw,
+            1, aw.length - 1);
 
         //int[] nextNodes = getNextNodes(resultNode);
-        final int[] nextNodes = getNextNodes(resNodeEntry);
+        final int[] nextNodes = getNextNodes(rne);
 
         // simple method call
         if(!recCall) {
@@ -1310,12 +1284,12 @@ public final class WordsCTA extends Index {
             // replace first letter
             //afterWildcard[0] = nodes[nextNodes[i]][1];
             ne = getNodeEntry(n);
-            afterWildcard[0] = ne[1];
+            aw[0] = ne[1];
 
             //tmpNode = ftOR(tmpNode, getNodeFromTrieRecursive(nextNodes[i],
-            tmpNode = CTArrayX.ftOR(tmpNode,
+            tmpNode = ftOR(tmpNode,
                 getNodeFromTrieRecursive(n,
-                afterWildcard));
+                aw));
           }
 
           return tmpNode;
@@ -1328,12 +1302,12 @@ public final class WordsCTA extends Index {
             ne = getNodeEntry(nextNodes[i]);
             //afterWildcard[0] = nodes[nextNodes[i]][1];
             //valuesFound[i] = nodes[nextNodes[i]][1];
-            afterWildcard[0] = ne[1];
+            aw[0] = ne[1];
             valuesFound[i] = ne[1];
 
-            tmpNode = CTArrayX.ftOR(tmpNode,
+            tmpNode = ftOR(tmpNode,
                 getNodeFromTrieRecursive(nextNodes[i],
-                afterWildcard));
+                aw));
           }
 
         }
@@ -1353,7 +1327,7 @@ public final class WordsCTA extends Index {
   private int getNodeFromTrieRecursiveWildcard(
       final int currentCompressedTrieNode, final byte[] searchNode) {
 
-    byte[]valueSearchNode = searchNode;
+    byte[] valueSearchNode = searchNode;
     final byte[] curNodeEntry = getNodeEntry(currentCompressedTrieNode);
     if(currentCompressedTrieNode != 0) {
       //counter[1] += nodes[currentCompressedTrieNode][0];
@@ -1629,6 +1603,144 @@ public final class WordsCTA extends Index {
         }   */ 
       }
       return ld;
+    }
+  }
+
+  /**
+   * Builds an or-conjunction of values1 and values2.
+   *
+   * @param values1 inputset
+   * @param values2 inputset
+   * @return unionset int[][]
+   */
+  // <SG> use fulltext function later on
+  static int[][] ftOR(final int[][] values1, final int[][] values2) {
+    int[][] val1 = values1;
+    int[][] val2 = values2;
+
+    if(val1 == null) return val2;
+    if(val2 == null) return val1;
+
+    final int[][] maxResult = new int[2][val1[0].length + val2[0].length];
+
+    // calculate maximum
+    final int max = Math.max(val1[0].length, val2[0].length);
+    if(max == val1.length) {
+      final int[][] tmp = val1;
+      val1 = val2;
+      val2 = tmp;
+    }
+
+    // runvariable for values1
+    int i = 0;
+    // runvariable for values2
+    int k = 0;
+    // count inserted elements
+    int counter = 0;
+
+    int cmpResult;
+    // process smaller set
+    while(val1[0].length > i) {
+      if(k >= val2[0].length) {
+        break;
+      }
+      cmpResult = compareIntArrayEntry(val1[0][i],
+          val1[1][i], val2[0][k], val2[1][k]);
+      if(cmpResult == 1 || cmpResult == 2) {
+        // same Id, pos0 < pos1 oder id0 < id1
+        //maxResult[counter] = values2[k];
+        maxResult[0][counter] = val2[0][k];
+        maxResult[1][counter] = val2[1][k];
+        counter++;
+        k++;
+      } else if(cmpResult == -1 || cmpResult == -2) {
+        // same Id, pos0 > pos1 oder id0 > id1
+        //maxResult[counter] = values1[i];
+        maxResult[0][counter] = val1[0][i];
+        maxResult[1][counter] = val1[1][i];
+        counter++;
+        i++;
+        //k++;
+      } else {
+        // ids and pos identical
+        //maxResult[counter] = values1[i];
+        maxResult[0][counter] = val1[0][i];
+        maxResult[1][counter] = val1[1][i];
+        counter++;
+        i++;
+        k++;
+      }
+    }
+
+
+    if(counter == 0) {
+      return null;
+    }
+
+    int[][] returnArray;
+
+    // all elements form values2 are processed
+    //if (k==values2.length && i < values1.length) {
+    if(k == val2[0].length && i < val1[0].length) {
+      //returnArray = new int[counter+values1.length-i][2];
+      returnArray = new int[2][counter + val1[0].length - i];
+      // copy left values (bigger than last element values2) from values1
+      //System.arraycopy(values1,i,returnArray,counter,values1.length-i);
+      System.arraycopy(val1[0], i, returnArray[0], counter,
+          val1[0].length - i);
+      System.arraycopy(val1[1], i, returnArray[1], counter,
+          val1[0].length - i);
+    } else {
+      // all elements form values1 are processed
+      //returnArray = new int[counter+values2.length-k][2];
+      returnArray = new int[2][counter + val2[0].length - k];
+      // copy left values (bigger than last element values1) from values2
+      //System.arraycopy(values2,k,returnArray,counter,values2.length-k);
+      System.arraycopy(val2[0], k, returnArray[0], counter,
+          val2[0].length - k);
+      System.arraycopy(val2[1], k, returnArray[1], counter,
+          val2[0].length - k);
+    }
+
+    //System.arraycopy(maxResult,0,returnArray,0,counter);
+    System.arraycopy(maxResult[0], 0, returnArray[0], 0, counter);
+    System.arraycopy(maxResult[1], 0, returnArray[1], 0, counter);
+    return returnArray;
+  }
+
+  /**
+   * Compares 2 int[1][2] arrayentries and returns.
+   * * 0 for equality
+   * * -1 if intArrayEntry1 < intArrayEntry2 (same id) or
+   * * 1  if intArrayEntry1 > intArrayEntry2 (same id)
+   * * 2  real bigger (different id)
+   * * -2 real smaller (different id)
+   *
+   * @param data1ID int
+   * @param data1Pos int
+   * @param data2ID int
+   * @param data2Pos int
+   * @return int result [0|-1|1|2|-2]
+   */
+  private static int compareIntArrayEntry(final int data1ID, final int data1Pos,
+      final int data2ID, final int data2Pos) {
+    if(data1ID == data2ID) {
+      if(data1Pos == data2Pos) {
+        // equal
+        return 0;
+      } else if(data1Pos > data2Pos) {
+        // equal Id, data1 behind data2
+        return 1;
+      } else {
+        // equal Id, insert data1 before data2
+        return -1;
+      }
+    } else if(data1ID > data2ID) {
+      // real bigger
+      return 2;
+    } else {
+      // real smaller
+      return -2;
     }
   }
 }

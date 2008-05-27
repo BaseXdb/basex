@@ -16,7 +16,7 @@ import org.basex.util.Token;
  */
 public final class QuerySyntax extends BaseXSyntax {
   /** Error color. */
-  public static HashSet<String> keys;
+  public static HashSet<String> keys = new HashSet<String>();
   /** Variable color. */
   public static final Color VAR = new Color(0, 160, 0);
   /** Keyword. */
@@ -27,12 +27,8 @@ public final class QuerySyntax extends BaseXSyntax {
   /** Variable flag. */
   private boolean var;
 
-  /**
-   * Constructor.
-   */
-  public QuerySyntax() {
-    if(keys != null) return;
-    keys = new HashSet<String>();
+  // initialize xquery keys
+  static {
     try {
       for(final Field f : XQTokens.class.getFields()) {
         final String name = f.getName();

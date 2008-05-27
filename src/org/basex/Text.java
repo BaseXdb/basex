@@ -756,6 +756,8 @@ public interface Text {
   String DATABASEPATH = lang("dp_dbpath");
   /** Interactions. */
   String PREFINTER = lang("dp_inter");
+  /** Look and Feel. */
+  String PREFLF = lang("dp_lf");
   /** Focus. */
   String PREFFOCUS = lang("dp_focus");
   /** Simple File Dialog. */
@@ -1234,6 +1236,8 @@ public interface Text {
   byte[] HELPDROP = token(lang("h_drop"));
   /** Help String. */
   byte[] HELPDROPDB = token(lang("h_dropdb"));
+  /** Help String. */
+  byte[] HELPLF = token(lang("h_lf"));
   /** Help String. */
   byte[] HELPFOCUS = token(lang("h_focus"));
   /** Help String. */

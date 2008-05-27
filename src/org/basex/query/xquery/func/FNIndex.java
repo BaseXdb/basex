@@ -20,14 +20,13 @@ public final class FNIndex extends Set {
   /** Function classes. */
   private FunDef[] funcs;
   /** Singleton instance. */
-  private static FNIndex instance;
+  private static FNIndex instance = new FNIndex();
 
   /**
    * Gets the function instance.
    * @return instance
    */
   public static FNIndex get() {
-    if(instance == null) instance = new FNIndex();
     return instance;
   }
 

@@ -21,9 +21,9 @@ import org.basex.query.xquery.util.Var;
  */
 public final class For extends ForLet {
   /** Positional variable. */
-  protected Var pos;
+  Var pos;
   /** Fulltext score. */
-  protected Var score;
+  Var score;
 
   /**
    * Constructor.

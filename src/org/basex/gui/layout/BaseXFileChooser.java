@@ -112,24 +112,23 @@ public final class BaseXFileChooser {
    */
   static class Filter extends FileFilter {
     /** Suffix. */
-    private String suffix;
+    private String suf;
     /** Description. */
     private String desc;
     
     /**
      * Constructor.
-     * @param suf suffix
-     * @param dsc description
+     * @param s suffix
+     * @param d description
      */
-    Filter(final String suf, final String dsc) {
-      suffix = suf;
-      desc = dsc;
+    Filter(final String s, final String d) {
+      suf = s;
+      desc = d;
     }
     
     @Override
     public boolean accept(final File file) {
-      return file.isDirectory()
-          || file.getName().toLowerCase().endsWith(suffix);
+      return file.isDirectory() || file.getName().toLowerCase().endsWith(suf);
     }
     @Override
     public String getDescription() {

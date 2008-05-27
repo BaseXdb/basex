@@ -40,44 +40,34 @@ public final class FTBuilder extends Progress implements IndexBuilder {
   public WordsCTANew build(final Data data) throws IOException {
     int s = 0;
     index = new CTArrayNew(128);
-    index.bl = data.meta.filesize > 1073741824 || index.bl;
-    if (index.bl) {
-      hash = new FZHash();
-    }
+    index.bl |= data.meta.filesize > 1073741824;
+    if(index.bl) hash = new FZHash();
     
     total = data.size;
-    //double p = 0.1;
     for(id = 0; id < total; id++) {
-/*      if ((double)id / (double)total >= p) {
-        System.out.println(p*100 + "%");
-        p += 0.1;
-      }
-*/      checkStop();
+      checkStop();
       if(data.kind(id) == Data.TEXT) index(data.text(id));
     }
     
-    if (Prop.debug) {
+    if(Prop.debug) {
       System.out.println("Hash in Hauptspeicher gehalten:");
       Performance.gc(5);
       System.out.println(Performance.getMem());
     }
     
     final String db = data.meta.dbname;
+    if(index.bl) bulkLoad(db);
     
-    if (index.bl) {
-      bulkLoad(db);
-    }
-    
-    if (Prop.debug) {
+    if(Prop.debug) {
       System.out.println("Hash und Trie in Hauptspeicher gehalten:");
       Performance.gc(5);
       System.out.println(Performance.getMem());
     }
 
-    hash =  null;    
+    hash = null;
     index.finish();
     
-    if (Prop.debug) {
+    if(Prop.debug) {
       System.out.println("Trie in komprimierte Form überführt.");
       Performance.gc(5);
       System.out.println(Performance.getMem());

@@ -27,25 +27,25 @@ import org.basex.gui.view.View;
  */
 public final class TableHeader extends BaseXPanel {
   /** View reference. */
-  protected TableView view;
+  TableView view;
   /** Table Data. */
-  protected TableData tdata;
+  TableData tdata;
   /** Clicked column. */
-  protected int clickCol = -1;
+  int clickCol = -1;
   /** Input column. */
-  protected int inputCol = -1;
+  int inputCol = -1;
   /** Moved column. */
-  protected int moveC = -1;
+  int moveC = -1;
   /** Moved X position. */
-  protected int mouseX = -1;
+  int mouseX = -1;
   /** Shift flag. */
-  protected boolean shift;
+  boolean shift;
   /** Ctrl flag. */
-  protected boolean ctrl;
+  boolean ctrl;
   /** Alt flag. */
-  protected boolean alt;
+  boolean alt;
   /** Input Box. */
-  protected transient TableInput box;
+  TableInput box;
 
   /**
    * Constructor.

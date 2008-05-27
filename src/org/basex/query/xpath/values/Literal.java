@@ -13,7 +13,7 @@ import org.basex.util.Token;
  */
 public final class Literal extends Item {
   /** Precedence. */
-  protected static final int PREC = 1;
+  private static final int PREC = 1;
   /** byte[] value. */
   private final byte[] bytes;
   /** Cached double value. */

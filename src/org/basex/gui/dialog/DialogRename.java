@@ -22,9 +22,9 @@ import org.basex.util.Token;
  */
 public final class DialogRename extends Dialog {
   /** Old name. */
-  protected final String old;
+  final String old;
   /** New name. */
-  protected final BaseXTextField name;
+  final BaseXTextField name;
 
   /**
    * Default Constructor.

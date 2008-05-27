@@ -58,8 +58,8 @@ public final class QueryView extends View {
     back.setLayout(new BorderLayout());
     header = new BaseXLabel(GUIConstants.QUERYVIEW, 10);
     back.add(header, BorderLayout.NORTH);
-    
-    Box box = new Box(BoxLayout.X_AXIS);
+
+    final Box box = new Box(BoxLayout.X_AXIS);
     box.setBorder(new EmptyBorder(0, 0, 8, 0));
     for(int i = 0; i < NPANELS; i++) {
       final int m = i;

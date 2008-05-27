@@ -27,11 +27,11 @@ public final class DialogInsert extends Dialog {
   /** Resulting query. */
   public String query;
   /** Text area. */
-  protected BaseXTextField input;
+  BaseXTextField input;
   /** Text area. */
-  protected BaseXText input2;
+  BaseXText input2;
   /** Insert kind selection buttons. */
-  protected BaseXRadio[] radio;
+  BaseXRadio[] radio;
   /** Button panel. */
   private final BaseXBack buttons;
 

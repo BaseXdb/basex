@@ -1,7 +1,6 @@
 package org.basex.test;
 
 import java.io.*;
-
 import org.basex.util.Performance;
 import org.basex.index.CTArrayNew;
 
@@ -55,7 +54,7 @@ public class IndexTest {
     copy = new String[nrTokens];
     for(int i = 0; i < nrTokens; i++) {
       indexed[i] = randomToken();
-      copy[i] = new String(indexed[i].toString());
+      copy[i] = indexed[i];
     }
     // show performance results
     System.out.println(nrTokens + " tokens created.");
@@ -87,9 +86,9 @@ public class IndexTest {
     
     // if size of array and index are equal, tokens might have been stored
     // several times
-    if(nrTokens > 100) {
-      System.out.println("- Index might contain duplicate tokens.");
-    }
+    //if(nrTokens > 100) {
+    //  System.out.println("- Index might contain duplicate tokens.");
+    //}
     
     // request all existing tokens
     System.out.println("\nRequesting indexed tokens...");
@@ -102,8 +101,8 @@ public class IndexTest {
         System.out.println("- Token " + indexed[i] + " was not found.");
         break;
       } else if (data[0][0] != i && data[1][0] != i * nrTokens) {
-        System.out.println(CTArrayNew.intArrayToString(data[0]));
-        System.out.println(CTArrayNew.intArrayToString(data[1]));
+        //System.out.println(CTArrayNew.intArrayToString(data[0]));
+        //System.out.println(CTArrayNew.intArrayToString(data[1]));
       }
     }
     // show performance results & reinitialize timer

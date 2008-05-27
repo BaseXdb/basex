@@ -37,11 +37,11 @@ public final class BaseXServer {
   private static final long TIMEOUT = 180 * 1000000000;
 
   /** Database Context. */
-  protected final Context context = new Context();
+  final Context context = new Context();
   /** Flag for server activity. */
-  protected boolean running = true;
+  boolean running = true;
   /** Verbose mode. */
-  protected boolean verbose = false;
+  boolean verbose = false;
   
   /** Client ip addresses. */
   private final String[] client = new String[MAX];

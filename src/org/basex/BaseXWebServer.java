@@ -41,36 +41,36 @@ import org.basex.util.TokenBuilder;
  */
 public final class BaseXWebServer {
   /** Header key. */
-  protected static final Pattern QUERY = Pattern.compile("GET (.*) HTTP.*");
+  static final Pattern QUERY = Pattern.compile("GET (.*) HTTP.*");
   /** Index file. */
-  protected static final String XQSUFFIX = "xq";
+  static final String XQSUFFIX = "xq";
   /** Index file. */
-  protected static final String PHPSUFFIX = "php";
+  static final String PHPSUFFIX = "php";
   /** Index file. */
-  protected static final String[] INDEXFILES = {
+  static final String[] INDEXFILES = {
     "index." + XQSUFFIX, "index." + PHPSUFFIX, "index.html", "index.htm",
   };
   
   /** Document header. */
-  protected static final String DOCTYPE =
+  static final String DOCTYPE =
     "<!DOCTYPE html PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN'" +
         " 'http://www.w3.org/TR/html4/loose.dtd'>";
   /** Document header. */
-  protected static final String HEADER = DOCTYPE +
+  static final String HEADER = DOCTYPE +
     "\n<html>\n<head><title>BaseX WebServer</title>\n" +
     "<meta http-equiv='Content-Type' content='text/html;charset=utf-8'n" +
     "</head>\n<body style='font-family:sans-serif;'>";
   /** Document footer. */
-  protected static final String FOOTER = "</body></html>";
+  static final String FOOTER = "</body></html>";
 
   /** Database Context. */
-  protected final Context context = new Context();
+  final Context context = new Context();
   /** Flag for server activity. */
-  protected boolean running = true;
+  boolean running = true;
   /** Verbose mode. */
-  protected boolean verbose = false;
+  boolean verbose = false;
   /** Flag for caching queries. */
-  protected boolean cache = false;
+  boolean cache = false;
 
   /** XQuery Cache. */
   final HashMap<String, XQueryProcessor> map =
@@ -186,13 +186,14 @@ public final class BaseXWebServer {
     String input = null;
     String line;
     boolean stop = false;
-    while((line = br.readLine()).length() != 0) {
+    while((line = br.readLine()) != null) {
+      if(line.length() == 0) break;
       final Matcher m = QUERY.matcher(line);
       if(m.matches()) input = m.group(1);
       stop |= line.equals("STOP"); 
     }
     if(stop) return new Request(0);
-    if(input == null) new Request(400);
+    if(input == null) return new Request(400);
     
     // decode input...
     return new Request(URLDecoder.decode(input.replaceAll("&", "|"), "UTF-8"));
@@ -460,7 +461,7 @@ public final class BaseXWebServer {
   }
 
   /** This class provides information on a client request. */
-  class Request {
+  static final class Request {
     /** File. */
     IO file;
     /** Suffix. */

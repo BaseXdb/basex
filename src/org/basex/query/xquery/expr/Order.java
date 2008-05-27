@@ -16,7 +16,7 @@ import org.basex.query.xquery.iter.SeqIter;
  */
 public final class Order {
   /** Sort list. */
-  protected Ord[] ord;
+  Ord[] ord;
   
  /**
    * Constructor.

@@ -512,11 +512,10 @@ public final class DNode extends Node {
       public Node next() throws XQException {
         if(!more) {
           final NodIter ch = new NodIter();
-          NodIter tmp = new NodIter();
           Node nod = DNode.this;
           Node r = nod.parent();
           while(r != null) {
-            tmp = new NodIter();
+            NodIter tmp = new NodIter();
             final NodeIter itr = r.child();
             Node n;
             while((n = itr.next()) != null) {

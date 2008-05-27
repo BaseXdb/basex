@@ -23,26 +23,26 @@ public final class MapImages {
   /** Maximum number of cached images. */
   private static final int MAXNR = 5000;
   /** Reference to the treemap panel. */
-  protected MapView map;
+  MapView map;
   /** Image cache. */
-  protected BufferedImage[] imgs = new BufferedImage[MAXNR];
+  BufferedImage[] imgs = new BufferedImage[MAXNR];
   /** Maximum image size. */
-  protected boolean[] imgmax = new boolean[MAXNR];
+  boolean[] imgmax = new boolean[MAXNR];
   /** Image id cache. */
-  protected int[] imgid = new int[MAXNR];
+  int[] imgid = new int[MAXNR];
   /** Pointer to next cached image. */
-  protected int imgc;
+  int imgc;
 
   /** Image id cache. */
-  protected int[] idCache = new int[MAXNR];
+  int[] idCache = new int[MAXNR];
   /** Image width cache. */
-  protected int[] wCache = new int[MAXNR];
+  int[] wCache = new int[MAXNR];
   /** Image height cache. */
-  protected int[] hCache = new int[MAXNR];
+  int[] hCache = new int[MAXNR];
   /** Image id cache. */
-  protected int loaderC;
+  int loaderC;
   /** Image id cache. */
-  protected boolean running;
+  boolean running;
 
 
   /**
@@ -170,7 +170,7 @@ public final class MapImages {
     // determine maximum cache size, depending on window size
     final Dimension size = GUI.get().getSize();
     final Runtime rt = Runtime.getRuntime();
-    long max = Math.max(size.width * size.height * 10, rt.maxMemory() / 5);
+    long max = Math.max(size.width * size.height * 10L, rt.maxMemory() / 5);
     
     // remove images if pixel limit is reached
     int imgSize = 0;

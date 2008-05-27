@@ -19,7 +19,7 @@ import org.basex.query.xquery.util.Var;
  */
 public final class Let extends ForLet {
   /** Scoring flag. */
-  protected boolean score;
+  boolean score;
 
   /**
    * Constructor.

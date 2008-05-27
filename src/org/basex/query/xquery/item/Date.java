@@ -243,8 +243,8 @@ public abstract class Date extends Item {
   @Override
   public final boolean eq(final Item it) {
     final Date d = (Date) it;
-    return minus == d.minus && mon == d.mon && sec - zshift * 60 ==
-      d.sec - d.zshift * 60 && mil == d.mil;
+    return minus == d.minus && mon == d.mon && sec - zshift * 60L ==
+      d.sec - d.zshift * 60L && mil == d.mil;
   }
 
   @Override
@@ -262,8 +262,8 @@ public abstract class Date extends Item {
     final int m1 = minus ? -mon : mon;
     final int m2 = d.minus ? -d.mon : d.mon;
     if(m1 != m2) return m1 < m2 ? -1 : 1;
-    final long s1 = sec - zshift * 60;
-    final long s2 = d.sec - d.zshift * 60;
+    final long s1 = sec - zshift * 60L;
+    final long s2 = d.sec - d.zshift * 60L;
     if(s1 != s2) return s1 < s2 ? -1 : 1;
     if(mil != d.mil) return mil < d.mil ? -1 : 1;
     return 0;

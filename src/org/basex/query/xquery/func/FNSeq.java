@@ -24,12 +24,11 @@ final class FNSeq extends Fun {
   @Override
   public Iter iter(final XQContext ctx, final Iter[] arg) throws XQException {
     final Iter iter = arg[0];
-    SeqIter seq = new SeqIter();
     Item i;
 
     switch(func) {
       case INDEXOF:
-        Item it = arg[1].atomic(this, false);
+        final Item it = arg[1].atomic(this, false);
         if(arg.length == 3) checkColl(arg[2]);
 
         //int p = 1;
@@ -49,19 +48,21 @@ final class FNSeq extends Fun {
         final Iter sub = arg[2];
         long r = Math.max(1, checkItr(arg[1]));
 
+        final SeqIter si = new SeqIter();
         while((i = iter.next()) != null) {
-          if(--r == 0) seq.add(sub);
-          seq.add(i.iter());
+          if(--r == 0) si.add(sub);
+          si.add(i.iter());
         }
-        if(r > 0) seq.add(sub);
-        return seq;
+        if(r > 0) si.add(sub);
+        return si;
       case REVERSE:
         if(iter instanceof RangeIter) {
           ((RangeIter) iter).reverse();
           return iter;
         }
-        while((i = iter.next()) != null) seq.insert(i, 0);
-        return seq;
+        final SeqIter sr = new SeqIter();
+        while((i = iter.next()) != null) sr.insert(i, 0);
+        return sr;
       case REMOVE:
         final long pos = checkItr(arg[1]);
         //long c = 0;
@@ -95,11 +96,11 @@ final class FNSeq extends Fun {
    */
   private Iter indexOf(final Iter iter, final Item it) {
     return new Iter() {
-      Item i;
       int index = 0;
 
       @Override
       public Item next() throws XQException {
+        Item i;
         while ((i = iter.next()) != null) {
           index++;
           if(CmpV.valCheck(i, it) && CmpV.COMP.EQ.e(i, it)) {
@@ -110,16 +111,15 @@ final class FNSeq extends Fun {
       }
     };
   }
-  
+
   /**
    * Looks for the specified item in the sequence.
    * @param sq sequence to be parsed
    * @param i item to be found
    * @throws XQException evaluation exception
-   */
   private void distinct(final SeqIter sq, final Item i)
       throws XQException {
-    
+
     final boolean nan = i.n() && i.dbl() != i.dbl();
     for(int r = 0; r < sq.size; r++) {
       final Item c = sq.item[r];
@@ -128,7 +128,8 @@ final class FNSeq extends Fun {
     }
     sq.add(FNGen.atom(i));
   }
-  
+   */
+
   /**
    * Looks for the specified item in the sequence (pipelined).
    * @param iter input iterator
@@ -137,12 +138,12 @@ final class FNSeq extends Fun {
   private Iter distinctPipelined(final Iter iter) {
     return new Iter() {
       SeqIter sq = new SeqIter();
-      Item i;
 
       @Override
       public Item next() throws XQException {
+        Item i;
         loop1: while((i = iter.next()) != null) {
-          
+
           final boolean nan = i.n() && i.dbl() != i.dbl();
           for(int r = 0; r < sq.size; r++) {
             final Item c = sq.item[r];
@@ -156,7 +157,7 @@ final class FNSeq extends Fun {
       }
     };
   }
-  
+
   /**
    * Removes an Item at a specified position in a sequence (pipelined).
    * @param iter input iterator
@@ -166,19 +167,18 @@ final class FNSeq extends Fun {
   private Iter remove(final Iter iter, final long pos) {
     return new Iter() {
       long c = 0;
-      
+
       @Override
       public Item next() throws XQException {
         Item i;
-        
         while((i = iter.next()) != null) if(++c != pos) return i;
         return null;
       }
     };
   }
-  
+
   /**
-   * Creates a subsequence out of a sequence, starting with start and 
+   * Creates a subsequence out of a sequence, starting with start and
    * ending with end (pipelined).
    * @param iter input iterator
    * @param start starting position
@@ -187,13 +187,11 @@ final class FNSeq extends Fun {
    */
   private Iter subseq(final Iter iter, final long start, final long end) {
     return new Iter() {
-
       long c = 0;
-      
+
       @Override
       public Item next() throws XQException {
         Item i;
-        
         while((i = iter.next()) != null) {
           if(++c < start) continue;
           if(c >= end) break;
@@ -203,7 +201,7 @@ final class FNSeq extends Fun {
       }
     };
   }
-  
+
   /**
    * Checks items for deep equality.
    * @param arg arguments
@@ -218,6 +216,7 @@ final class FNSeq extends Fun {
 
     Item it1 = null;
     Item it2 = null;
+    // non-short-circuit logic (one & sign) to run both iterators..
     while((it1 = iter1.next()) != null & (it2 = iter2.next()) != null) {
       if(it1.n() && it2.n() && it1.dbl() != it1.dbl() && it2.dbl() != it2.dbl())
         continue;
@@ -231,6 +230,7 @@ final class FNSeq extends Fun {
       final NodeIter niter2 = ((Node) it2).descOrSelf();
 
       Node n1 = null, n2 = null;
+      // non-short-circuit logic (one & sign) to run both iterators..
       while((n1 = niter1.next()) != null & (n2 = niter2.next()) != null) {
         if(n1.type != n2.type) return false;
         if((n1.type == Type.ELM || n1.type == Type.PI) &&
@@ -241,7 +241,7 @@ final class FNSeq extends Fun {
             return false;
           continue;
         }
-        
+
         NodeIter att1 = n1.attr();
         int s1 = 0;
         while(att1.next() != null) s1++;
@@ -249,7 +249,7 @@ final class FNSeq extends Fun {
         int s2 = 0;
         while(att2.next() != null) s2++;
         if(s1 != s2) return false;
-        
+
         Node a1 = null, a2 = null;
         att1 = n1.attr();
         while((a1 = att1.next()) != null) {

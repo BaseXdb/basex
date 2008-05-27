@@ -81,7 +81,7 @@ public class Dur extends Date {
     final int s = mt.group(13) != null ? Token.toInt(mt.group(14)) : 0;
 
     mon = y * 12 + m;
-    sec = d * (long) DAYSECONDS + h * 3600 + n * 60 + s;
+    sec = d * (long) DAYSECONDS + h * 3600L + n * 60L + s;
     mil = mt.group(15) != null ? Double.parseDouble(mt.group(15)) : 0;
     minus = mt.group(1).length() != 0 && (mon != 0 || sec != 0 ||
         mil != 0);

@@ -12,7 +12,7 @@ import org.basex.util.Token;
  */
 public final class Bool extends Item {
   /** Precedence. */
-  protected static final int PREC = 4;
+  private static final int PREC = 4;
   /** Static true value. */
   public static final Bool TRUE = new Bool(true);
   /** Static false value. */

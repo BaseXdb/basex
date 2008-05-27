@@ -112,6 +112,7 @@ public final class WordsCTANew extends Index {
     // check real case of each result node
     while(i < ids[0].length) {
       // get date from disk
+      // <SG> readId is overwritten again some lines later... 
       readId = ids[0][i];
       textFromDB = dd.text(ids[0][i]);
       tokenFromDB = new byte[tok.length];
@@ -826,24 +827,19 @@ public final class WordsCTANew extends Index {
    * @return  int[][] data
    */
   private int[][] getDataFromDataArray(final int s, final long ldid) {
-    if (s == 0 && ldid <= 0) return null;
+    if(s == 0 && ldid <= 0) return null;
     int[][] data = new int[2][s];
    
     if (Prop.ftcompress) {
       data[0][0] = inD.readNum(ldid);
-      for (int i = 1; i < s; i++) {
-        data[0][i] = inD.readNum();
-      }
-      for (int i = 0; i < s; i++) {
-        data[1][i] = inD.readNum();
-      }
+      for(int i = 1; i < s; i++) data[0][i] = inD.readNum();
+      for(int i = 0; i < s; i++) data[1][i] = inD.readNum();
     } else {
       data[0] = inD.readInts(ldid, s * 4L + ldid);
-      data[1] = inD.readInts(s * 4L + ldid, 2 * s * 4L + ldid);
+      data[1] = inD.readInts(s * 4L + ldid, s * 8L + ldid);
     }
-    
     return data;
- }
+  }
  
   /**
    * Save whether a corresponding node was found in method getInsertingPosition.
@@ -992,24 +988,20 @@ public final class WordsCTANew extends Index {
     }
 
     // compare chars current node and ending
+    // <SG> can't be null?
     if(ne != null) {
       // skip all unlike chars, if any suitable was found
-      while(!last && i < ne[0] + 1 && ne[i] != ending[j]) {
-        i++;
-      }
+      while(!last && i < ne[0] + 1 && ne[i] != ending[j]) i++;
   
       // skip all chars, equal to first char
-      while(i + ending.length < ne[0] + 1 && ne[i + 1] == ending[0]) {
-        i++;
-      }
+      while(i + ending.length < ne[0] + 1 && ne[i + 1] == ending[0]) i++;
   
       countSkippedChars = countSkippedChars + i - pointerNode - 1;
+
       while(i < ne[0] + 1 && j < ending.length && ne[i] == ending[j]) {
         i++;
         j++;
-        if(!last) {
-          last = true;
-        }
+        last = true;
       }
     } else {
       countSkippedChars = 0;
@@ -1161,9 +1153,7 @@ public final class WordsCTANew extends Index {
       bw = new byte[posw];
       System.arraycopy(vsn, 0, bw, 0, posw);
       resultNode = getNodeFromTrieRecursiveWildcard(cn, bw);
-      if(resultNode == -1) {
-        return null;
-      }
+      if(resultNode == -1) return null;
     } else {
       resultNode = 0;
     }
@@ -1259,7 +1249,7 @@ public final class WordsCTANew extends Index {
 
       // copy part after wildcard
       if(bw == null) {
-        // valueSearchNode == .+
+        // <SG> Out of Bounds exception: [... ftcontains ".+X" with wildcards]
         if(!(posw == 0 && vsn.length == 2)) {
           aw = new byte[searchChar.length];
           System.arraycopy(vsn, posw + 2, searchChar, 1, searchChar.length);
@@ -1277,20 +1267,16 @@ public final class WordsCTANew extends Index {
       d = getNodeFromTrieWithWildCard(0, searchChar, posw, true);
 
       // at least one char has to be added
-      if (d == null) {
-        return null;
-      }
+      if (d == null) return null;
 
       byte[] newValue;
       if(aw != null) {
         newValue = new byte[bw.length + 3 + aw.length];
         System.arraycopy(aw, 0, newValue, bw.length + 3, aw.length);
       } else {
-        if (bw == null)
-          newValue = new byte[3];
-        else
-          newValue = new byte[bw.length + 3];
+        newValue = new byte[3 + (bw == null ? 0 : bw.length)];
       }
+      // <SG> bw could be null here.. (?)
       newValue[bw.length + 1] = '.';
       newValue[bw.length + 2] = '*';
 

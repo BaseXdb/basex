@@ -85,7 +85,7 @@ public final class DTd extends Dur {
   public DTd(final Date it, final Date sub) {
     super(Type.DTD);
 
-    sec = (sub.zshift - it.zshift) * 60;
+    sec = (sub.zshift - it.zshift) * 60L;
 
     minus = false;
     if(it.type == Type.DAT || it.type == Type.DTM) {
@@ -125,7 +125,7 @@ public final class DTd extends Dur {
     final int n = mt.group(7) != null ? Token.toInt(mt.group(8)) : 0;
     final int s = mt.group(9) != null ? Token.toInt(mt.group(10)) : 0;
 
-    sec = d * (long) DAYSECONDS + h * 3600 + n * 60 + s;
+    sec = d * (long) DAYSECONDS + h * 3600L + n * 60L + s;
     mil = mt.group(11) != null ? Double.parseDouble(mt.group(11)) : 0;
     minus = mt.group(1).length() != 0 && (sec != 0 || mil != 0);
   }

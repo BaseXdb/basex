@@ -7,7 +7,6 @@ import org.basex.query.xpath.internal.FTIndex;
 import org.basex.query.xpath.locpath.LocPath;
 import org.basex.query.xpath.locpath.LocPathRel;
 import org.basex.query.xpath.locpath.Step;
-import org.basex.query.xpath.values.Bool;
 import org.basex.query.xpath.values.Literal;
 import static org.basex.query.xpath.XPText.*;
 
@@ -59,12 +58,6 @@ public class FTFuzzy extends Comparison {
     XPOptimizer.addText(expr2, ctx);
 
    return this;
-  }
-
-  @Override
-  public Bool eval(final XPContext ctx) throws QueryException {
-    // not used
-    return super.eval(ctx);
   }
 
   @Override

@@ -95,6 +95,7 @@ public final class Fuzzy extends Index {
     if (i == is || ts > tok.length) return -1;
     int l = li.readInt(1L + i * 5L + 1L);
     int r = li.readInt(1L + (i + 1) * 5L + 1L);
+    // <SG> m is overwritten again in while(l < r) loop & not used afterwards...
     int m = (int) (l + ((int) ((r - l) 
         /// (tok.length * 1L + 8L) / 2)) * (tok.length * 1L + 8L));
         / (tok.length * 1L + 9L) / 2)) * (tok.length * 1L + 9L));
@@ -315,9 +316,7 @@ public final class Fuzzy extends Index {
 
     // index request with pre-values and positions as result
     int[][] ids = get(tok);
-    if (ids == null) {
-      return null;
-    }
+    if (ids == null) return null;
 
     if (ftO.ftCase == FTOption.CASE.UPPERCASE) {
       // convert search string to upper case and use case sensitive search
@@ -337,6 +336,7 @@ public final class Fuzzy extends Index {
     // check real case of each result node
     while(i < ids[0].length) {
       // get date from disk
+      // <SG> readId is overwritten again some lines later... 
       readId = ids[0][i];
       textFromDB = dd.text(ids[0][i]);
       tokenFromDB = new byte[tok.length];

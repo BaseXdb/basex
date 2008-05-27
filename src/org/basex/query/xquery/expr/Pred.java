@@ -17,7 +17,7 @@ import org.basex.util.Token;
  */
 public final class Pred extends Arr {
   /** Expression. */
-  protected Expr root;
+  Expr root;
 
   /**
    * Constructor.

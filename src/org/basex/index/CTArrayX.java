@@ -37,55 +37,6 @@ public final class CTArrayX {
   }
 
   /**
-   * Returns index statistics.
-   * @return statistics string
-  private String info() {
-    //System.exit(0);
-    return "Number nodes=" + nodes.length + "\n number index entries="
-    + nodes.length;
-  }
-   */
-
-  /**
-   * Returns the number of index entries.
-   * @return number of index entries
-  private int size() {
-    return nodes.length;
-  }
-   */
-
-  /**
-   * Extracts words from the specified byte array and returns its ids and pos.
-   * @param tok token to be extracted and indexed
-   * @return ids
-  private int[][] getIDPos(final byte[] tok) {
-    return getNodeFromTrieRecursive(0, tok);
-  }
-   */
-
-  /**
-   * Extracts words from the specified byte array and returns its ids and
-   * positions. The use of wildcard in tok at position posWildCard is supplied.
-   *
-   * @param tok token
-   * @param posWildCard wildcard has position
-   * @return ids and pos
-  private int[][] getIDWithWildcard(final byte[] tok, final int posWildCard) {
-    return getNodeFromTrieWithWildCard(tok, posWildCard);
-  }
-   */
-
-  /**
-   *  Is called from BaseXData and saves content values in the compressed trie.
-   *
-   * @param content content of token
-   * @param id id of token
-  void index(final byte[] content, final int id) {
-    cta.index(content, id);
-  }
-   */
-
-  /**
    * Finish compressed trie and do transport for compressed trie X.
    */
   void finish() {
@@ -99,25 +50,6 @@ public final class CTArrayX {
         System.gc();*/
     //printNewTrie();
   }
-
-  /**
-   * Reduce memory usage for node entry.
-   * @param nodeEntry value of node entry
-   * @return nodeEntry shrinked value of node entry
-  private byte[] shrinkNodeEntry(final byte[] nodeEntry) {
-    final byte[] b = calculateFirst2Byte(nodeEntry[0], nodeEntry[1],
-        nodeEntry[nodeEntry[0] + 1]);
-    final byte[] newEntry = new byte[nodeEntry.length - 1];
-    newEntry[0] = b[0];
-    newEntry[1] = b[1];
-    if(nodeEntry[0] > 1)
-      System.arraycopy(nodeEntry, 2, newEntry, 2, nodeEntry[0] - 1);
-
-    System.arraycopy(nodeEntry, nodeEntry[0] + 2, newEntry,
-        nodeEntry[0] + 1, nodeEntry.length - nodeEntry[0] - 2);
-    return newEntry;
-  }
-   */
 
   /**
    * Transport a compressedTrieArray to compressedTrieArrayX.
@@ -276,17 +208,117 @@ public final class CTArrayX {
   }
 
   /**
+   * Extracts ids out of data array.
+   * @param data data
+   * @return ids int[]
+   */
+  static int[] getIDsFromData(final int[][] data) {
+    //if (data == null || data.length == 0) {
+    if(data == null || data[0].length == 0) {
+      return Array.NOINTS;
+    }
+
+    //int[] maxResult = new int[data.length];
+    final int[] maxResult = new int[data[0].length];
+    int counter = 1;
+    maxResult[0] = data[0][0];
+    //for (int i=1; i<data.length; i++) {
+    for(int i = 1; i < data[0].length; i++) {
+      //if(maxResult[counter-1] != data[i][0]){
+      //  maxResult[counter] = data[i][0];
+      //  counter++;
+      //}
+
+      if(maxResult[counter - 1] != data[0][i]) {
+        maxResult[counter] = data[0][i];
+        counter++;
+      }
+    }
+
+    final int[] result = new int[counter];
+    System.arraycopy(maxResult, 0, result, 0, counter);
+    return result;
+  }
+
+  /*
+   * Returns index statistics.
+   * @return statistics string
+  private String info() {
+    //System.exit(0);
+    return "Number nodes=" + nodes.length + "\n number index entries="
+    + nodes.length;
+  }
+   */
+
+  /*
+   * Returns the number of index entries.
+   * @return number of index entries
+  private int size() {
+    return nodes.length;
+  }
+   */
+
+  /*
+   * Extracts words from the specified byte array and returns its ids and pos.
+   * @param tok token to be extracted and indexed
+   * @return ids
+  private int[][] getIDPos(final byte[] tok) {
+    return getNodeFromTrieRecursive(0, tok);
+  }
+   */
+
+  /*
+   * Extracts words from the specified byte array and returns its ids and
+   * positions. The use of wildcard in tok at position posWildCard is supplied.
+   *
+   * @param tok token
+   * @param posWildCard wildcard has position
+   * @return ids and pos
+  private int[][] getIDWithWildcard(final byte[] tok, final int posWildCard) {
+    return getNodeFromTrieWithWildCard(tok, posWildCard);
+  }
+   */
+
+  /*
+   *  Is called from BaseXData and saves content values in the compressed trie.
+   *
+   * @param content content of token
+   * @param id id of token
+  void index(final byte[] content, final int id) {
+    cta.index(content, id);
+  }
+   */
+
+  /*
+   * Reduce memory usage for node entry.
+   * @param nodeEntry value of node entry
+   * @return nodeEntry shrinked value of node entry
+  private byte[] shrinkNodeEntry(final byte[] nodeEntry) {
+    final byte[] b = calculateFirst2Byte(nodeEntry[0], nodeEntry[1],
+        nodeEntry[nodeEntry[0] + 1]);
+    final byte[] newEntry = new byte[nodeEntry.length - 1];
+    newEntry[0] = b[0];
+    newEntry[1] = b[1];
+    if(nodeEntry[0] > 1)
+      System.arraycopy(nodeEntry, 2, newEntry, 2, nodeEntry[0] - 1);
+
+    System.arraycopy(nodeEntry, nodeEntry[0] + 2, newEntry,
+        nodeEntry[0] + 1, nodeEntry.length - nodeEntry[0] - 2);
+    return newEntry;
+  }
+   */
+
+  /*
    * Save, whether an corresponding node was found in method
    * getInsertingPosition.
-   */
   private boolean found;
+   */
 
 
-  /**
+  /*
    * Get nextNodes for node.
    * @param node  int id on nodes[][]
    * @return int[] id array on nodes[][]
-   */
   private int[] getNextNodes(final int node) {
     if(nodes[node][nodes[node][0] + 1] >= 0) {
       return null;
@@ -297,8 +329,9 @@ public final class CTArrayX {
     System.arraycopy(data[id], 0, nextNodes, 0, nextNodes.length);
     return nextNodes;
   }
+   */
 
-  /**
+  /*
    * Uses linear search for finding inserting position.
    * returns:
    * 0 if any successor exists, or 0 is inserting position
@@ -308,7 +341,6 @@ public final class CTArrayX {
    * @param currentPosition current Position
    * @param toInsert first byte of inserted value
    * @return inserting position
-   */
   private int getInsertingPositionLinear(final int currentPosition,
       final byte toInsert) {
     // init value
@@ -320,10 +352,10 @@ public final class CTArrayX {
       return 0;
     }
 
-    /*if (nodes[currentPosition]
-             return 0;
-         }
-     */
+    //if (nodes[currentPosition]
+    //       return 0;
+    //   }
+    //
     // load existing successors
     final int[] nextNodes = getNextNodes(currentPosition);
     // first successors > toInsert
@@ -344,14 +376,14 @@ public final class CTArrayX {
     // next free space in node[]
     return i;
   }
+*/
 
 
-  /**
+  /*
    * Extracts the id on data[][] for a given id on node[][].
    *
    * @param currentNode current node
    * @return id on dataArray
-   */
   private int getIdOnDataArray(final int currentNode) {
     byte[] bId;
 
@@ -364,14 +396,14 @@ public final class CTArrayX {
 
     return Array.byteToInt(bId);
   }
+   */
 
-  /**
+  /*
    * Extracts data form data[][] in
    * [[pre1, pos1], [pre2, pos2], ...] representation.
    *
    * @param currentNode id on node Array
    * @return  int[][] data
-   */
   private int[][] getDataFromDataArray(final int currentNode) {
     // extract id on data array form node array
 
@@ -397,15 +429,15 @@ public final class CTArrayX {
       return prePos;
     }
   }
+   */
 
-  /**
+  /*
    * Traverse trie and return found node for searchValue; returns data
    * from node or null.
    *
    * @param currentCompressedTrieNode int
    * @param searchNode search nodes value
    * @return int[][]
-   */
   private int[][] getNodeFromTrieRecursive(final int currentCompressedTrieNode,
       final byte[] searchNode) {
     byte[] valueSearchNode = searchNode;
@@ -462,16 +494,16 @@ public final class CTArrayX {
       }
     }
   }
+   */
 
+  // saves astericsWildCardTraversing result
+  //    has to be reinitialized each time (before calling method). */
+  //private int[][] astericsWildCardData;
 
-  /** saves astericsWildCardTraversing result
-      has to be reinitialized each time (before calling method). */
-  private int[][] astericsWildCardData;
+  // counts number of chars skip per astericsWildCardTraversing. */
+  //private int countSkippedChars;
 
-  /** counts number of chars skip per astericsWildCardTraversing. */
-  private int countSkippedChars;
-
-  /**
+  /*
    * Looking up node with value, which match ending.
    * The parameter lastFound shows, whether chars were found in last recursive
    * call, which correspond to the ending, consequently those chars are
@@ -486,7 +518,6 @@ public final class CTArrayX {
    * @param lastFound boolean if value was found in last run
    * @param pointerNode pointer on current node
    * @param pointerEnding pointer on value ending
-   */
   private void astericsWildCardTraversing(final int node, final byte[] ending,
       final boolean lastFound, final int pointerNode, final int pointerEnding) {
     int j = pointerEnding;
@@ -613,22 +644,22 @@ public final class CTArrayX {
       }
     }
   }
+   */
 
-  /**
+  /*
    * Save number compared chars at wildcard search.
    * counter[0] = total number compared chars
    * counter[1] = number current method call (gets inited before each call)
+  private int[] counter;
    */
-  int[] counter;
 
-  /**
+  /*
    * Traverses trie and returns found node for searchValue; returns last
    * touched node.
    *
    * @param currentCompressedTrieNode int
    * @param searchNode int
    * @return id int last touched node
-   */
   private int getNodeFromTrieRecursiveWildcard(
       final int currentCompressedTrieNode, final byte[] searchNode) {
     byte[]valueSearchNode = searchNode;
@@ -697,8 +728,9 @@ public final class CTArrayX {
       }
     }
   }
+   */
 
-  /**
+  /*
    * Returns all ids, saved in the trie, less those out of resultFTContent.
    *
    * @param resultFTContent ids not contained in result
@@ -718,7 +750,7 @@ public final class CTArrayX {
    */
 
 
-  /**
+  /*
    * Method for wildcards search in trie.
    *
    * getNodeFromTrieWithWildCard(char[] valueSearchNode, int pos) is called
@@ -732,20 +764,20 @@ public final class CTArrayX {
    * @param valueSearchNode search nodes value
    * @param pos position
    * @return data int[][]
-   */
   private int[][] getNodeFromTrieWithWildCard(
       final byte[] valueSearchNode, final int pos) {
     // init counter
     counter = new int[2];
     return getNodeFromTrieWithWildCard(0, valueSearchNode, pos, false);
   }
-
-  /**
-   * Saves node values from .-wildcard search according to records in id-array.
    */
-  private byte[] valuesFound;
 
-  /**
+  /*
+   * Saves node values from .-wildcard search according to records in id-array.
+  private byte[] valuesFound;
+   */
+
+  /*
    * Support different wildcard operators: ., .+, .* and .?.
    * PosWildCard points on bytes[], at position, where .  is situated
    * recCall flags recursive calls
@@ -755,7 +787,6 @@ public final class CTArrayX {
    * @param posWildcard wildcards position
    * @param recCall first call??
    * @return data result ids
-   */
   private int[][] getNodeFromTrieWithWildCard(
       final int currentCompressedTrieNode, final byte[] searchNode,
       final int posWildcard, final boolean recCall) {
@@ -1001,8 +1032,9 @@ public final class CTArrayX {
     }
     return null;
   }
+   */
 
-  /**
+  /*
    * Calculate value length.
    * @param length old length
    * @param b7b8 last two bits
@@ -1018,7 +1050,7 @@ public final class CTArrayX {
   }
    */
 
-  /**
+  /*
    * Extract first 6 bits from byte k.
    * @param k value
    * @return length number used bit
@@ -1027,7 +1059,7 @@ public final class CTArrayX {
   }
    */
 
-  /**
+  /*
    * Extract first 5 bits out of byte v1.
    * @param v1 value
    * @return value value out of v1
@@ -1036,7 +1068,7 @@ public final class CTArrayX {
   }
    */
 
-  /**
+  /*
    * Extract first 5 bits from byte v1.
    * @param k number values
    * @param v1 value
@@ -1054,7 +1086,7 @@ public final class CTArrayX {
   }
    */
 
-  /**
+  /*
    * Calculates value v1 from input data.
    * @param value input value
    * @param b6b7b8 three last bits
@@ -1071,7 +1103,7 @@ public final class CTArrayX {
   }
    */
 
-  /**
+  /*
    * Calculates the bytes, saving the number of next nodes for a node.
    * @param numberNextNodes number of next nodes
    * @return byte[2] byte[0] = first 2 bits; byte[1] = bit6 bit7 bit8 are filled
@@ -1098,7 +1130,7 @@ public final class CTArrayX {
   }
    */
 
-  /**
+  /*
    * Calculates the first 2 bytes.
    * @param valueLength length of value
    * @param v1 value v1
@@ -1113,40 +1145,7 @@ public final class CTArrayX {
   }
    */
 
-  /**
-   * Extracts ids out of data array.
-   * @param data data
-   * @return ids int[]
-   */
-  static int[] getIDsFromData(final int[][] data) {
-    //if (data == null || data.length == 0) {
-    if(data == null || data[0].length == 0) {
-      return Array.NOINTS;
-    }
-
-    //int[] maxResult = new int[data.length];
-    final int[] maxResult = new int[data[0].length];
-    int counter = 1;
-    maxResult[0] = data[0][0];
-    //for (int i=1; i<data.length; i++) {
-    for(int i = 1; i < data[0].length; i++) {
-      //if(maxResult[counter-1] != data[i][0]){
-      //  maxResult[counter] = data[i][0];
-      //  counter++;
-      //}
-
-      if(maxResult[counter - 1] != data[0][i]) {
-        maxResult[counter] = data[0][i];
-        counter++;
-      }
-    }
-
-    final int[] result = new int[counter];
-    System.arraycopy(maxResult, 0, result, 0, counter);
-    return result;
-  }
-
-  /**
+  /*
    * Each result wordA, is not allowed to be contained in result wordB.
    * Each result for wordA, that is not contained in result set wordB,
    * is added to returned.
@@ -1240,145 +1239,7 @@ public final class CTArrayX {
    */
 
 
-  /**
-   * Builds an or-conjunction of values1 and values2.
-   *
-   * @param values1 inputset
-   * @param values2 inputset
-   * @return unionset int[][]
-   */
-  // <SG> use fulltext function later on
-  static int[][] ftOR(final int[][] values1, final int[][] values2) {
-    int[][] val1 = values1;
-    int[][] val2 = values2;
-
-    if(val1 == null) return val2;
-    if(val2 == null) return val1;
-
-    final int[][] maxResult = new int[2][val1[0].length + val2[0].length];
-
-    // calculate maximum
-    final int max = Math.max(val1[0].length, val2[0].length);
-    if(max == val1.length) {
-      final int[][] tmp = val1;
-      val1 = val2;
-      val2 = tmp;
-    }
-
-    // runvariable for values1
-    int i = 0;
-    // runvariable for values2
-    int k = 0;
-    // count inserted elements
-    int counter = 0;
-
-    int cmpResult;
-    // process smaller set
-    while(val1[0].length > i) {
-      if(k >= val2[0].length) {
-        break;
-      }
-      cmpResult = compareIntArrayEntry(val1[0][i],
-          val1[1][i], val2[0][k], val2[1][k]);
-      if(cmpResult == 1 || cmpResult == 2) {
-        // same Id, pos0 < pos1 oder id0 < id1
-        //maxResult[counter] = values2[k];
-        maxResult[0][counter] = val2[0][k];
-        maxResult[1][counter] = val2[1][k];
-        counter++;
-        k++;
-      } else if(cmpResult == -1 || cmpResult == -2) {
-        // same Id, pos0 > pos1 oder id0 > id1
-        //maxResult[counter] = values1[i];
-        maxResult[0][counter] = val1[0][i];
-        maxResult[1][counter] = val1[1][i];
-        counter++;
-        i++;
-        //k++;
-      } else {
-        // ids and pos identical
-        //maxResult[counter] = values1[i];
-        maxResult[0][counter] = val1[0][i];
-        maxResult[1][counter] = val1[1][i];
-        counter++;
-        i++;
-        k++;
-      }
-    }
-
-
-    if(counter == 0) {
-      return null;
-    }
-
-    int[][] returnArray;
-
-    // all elements form values2 are processed
-    //if (k==values2.length && i < values1.length) {
-    if(k == val2[0].length && i < val1[0].length) {
-      //returnArray = new int[counter+values1.length-i][2];
-      returnArray = new int[2][counter + val1[0].length - i];
-      // copy left values (bigger than last element values2) from values1
-      //System.arraycopy(values1,i,returnArray,counter,values1.length-i);
-      System.arraycopy(val1[0], i, returnArray[0], counter,
-          val1[0].length - i);
-      System.arraycopy(val1[1], i, returnArray[1], counter,
-          val1[0].length - i);
-    } else {
-      // all elements form values1 are processed
-      //returnArray = new int[counter+values2.length-k][2];
-      returnArray = new int[2][counter + val2[0].length - k];
-      // copy left values (bigger than last element values1) from values2
-      //System.arraycopy(values2,k,returnArray,counter,values2.length-k);
-      System.arraycopy(val2[0], k, returnArray[0], counter,
-          val2[0].length - k);
-      System.arraycopy(val2[1], k, returnArray[1], counter,
-          val2[0].length - k);
-    }
-
-    //System.arraycopy(maxResult,0,returnArray,0,counter);
-    System.arraycopy(maxResult[0], 0, returnArray[0], 0, counter);
-    System.arraycopy(maxResult[1], 0, returnArray[1], 0, counter);
-    return returnArray;
-  }
-
-  /**
-   * Compares 2 int[1][2] arrayentries and returns.
-   * * 0 for equality
-   * * -1 if intArrayEntry1 < intArrayEntry2 (same id) or
-   * * 1  if intArrayEntry1 > intArrayEntry2 (same id)
-   * * 2  real bigger (different id)
-   * * -2 real smaller (different id)
-   *
-   * @param data1ID int
-   * @param data1Pos int
-   * @param data2ID int
-   * @param data2Pos int
-   * @return int result [0|-1|1|2|-2]
-   */
-  private static int compareIntArrayEntry(final int data1ID, final int data1Pos,
-      final int data2ID, final int data2Pos) {
-    if(data1ID == data2ID) {
-      if(data1Pos == data2Pos) {
-        // equal
-        return 0;
-      } else if(data1Pos > data2Pos) {
-        // equal Id, data1 behind data2
-        return 1;
-      } else {
-        // equal Id, insert data1 before data2
-        return -1;
-      }
-    } else if(data1ID > data2ID) {
-      // real bigger
-      return 2;
-    } else {
-      // real smaller
-      return -2;
-    }
-  }
-
-  /**
+  /*
    * Traverse trie and return found node for searchValue; returns data
    * from node or null.
    *
@@ -1389,8 +1250,7 @@ public final class CTArrayX {
    * @param r int number replaces occured
    * @param c int sum number of errors 
    * @return int[][] pre and pos values collected
-   */
- /*  private int[][] getNodeFuzzy(final int cn, final byte[] sn, final int d, 
+  private int[][] getNodeFuzzy(final int cn, final byte[] sn, final int d, 
        final int p, final int r, final int c) {
     byte[] vsn = sn;
 
@@ -1530,7 +1390,7 @@ public final class CTArrayX {
   }
   */ 
   
-  /**
+  /*
    * Does a preorder traversal of the trie and collectes each
    * nodevalue and its data.
    *
@@ -1587,7 +1447,7 @@ public final class CTArrayX {
    }
    */
 
-   /**
+   /*
     * Does a preorder traversal of the trie and collectes each 
     * nodevalue and its data.
     * Result has the following format:
@@ -1667,7 +1527,7 @@ public final class CTArrayX {
    }
     */
 
-   /**
+   /*
     * Does a preorder traversal of the trie and collectes each 
     * nodevalue and its data, sorted by size, and chars
     * Result has the following format:
@@ -1700,7 +1560,7 @@ public final class CTArrayX {
    }
     */
    
-   /**
+   /*
     * See doPreOrderTravWISS().
     * 
     * @param nid NodeId
@@ -1764,7 +1624,7 @@ public final class CTArrayX {
    }
     */
 
-  /**
+  /*
    * Extracts words from the specified byte array and returns its ids.
    * @param tok token to be extracted and indexed
    * @return ids
@@ -1822,7 +1682,7 @@ public final class CTArrayX {
     }
    */
   
-  /**
+  /*
    * Print whole trie on sysout.
   private void printNewTrie() {
     int j;
@@ -1854,7 +1714,7 @@ public final class CTArrayX {
   }
    */
 
-  /**
+  /*
    * Print entry with id i on sysout.
    * @param i id on nodes[][]
   private void printTrieEntry(final int i) {
@@ -1885,8 +1745,7 @@ public final class CTArrayX {
   }
    */
   
-
-  /**
+  /*
    * Print byte out on sysout.
    * @param in byte
   private void printByte(final byte in) {
@@ -1912,8 +1771,7 @@ public final class CTArrayX {
   }
    */
 
-
-  /**
+  /*
    * Transform byte array to lowercase.
    * @param input byte[] in uppercase
    * @return byte[] in lowercase
@@ -1923,7 +1781,7 @@ public final class CTArrayX {
   }
    */
 
-  /**
+  /*
    * Converts an int[2][*] to string [v0, v1, ...].
    * @param input int array
    * @return string int array as string
@@ -1941,7 +1799,7 @@ public final class CTArrayX {
   }
    */
 
-  /**
+  /*
    * Converts an int[2][*] to string [v00,v01][v10,v11] ...
    * @param input int[2][*]
    * @return String result string

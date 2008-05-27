@@ -1,7 +1,7 @@
 package org.basex.gui.view.query;
 
-import static org.basex.gui.GUIConstants.*;
 import static org.basex.Text.*;
+import static org.basex.gui.GUIConstants.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,9 +19,9 @@ import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
-import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
+import org.basex.gui.layout.BaseXText;
 import org.basex.query.QueryException;
 import org.basex.query.xquery.XQueryProcessor;
 import org.basex.util.Action;
@@ -70,7 +70,7 @@ public final class QueryArea extends QueryPanel {
             try {
               proc.parse();
               info("", true);
-            } catch(QueryException ex) {
+            } catch(final QueryException ex) {
               info(ex.getMessage(), false);
             }
           }
@@ -124,7 +124,7 @@ public final class QueryArea extends QueryPanel {
       }
     });
     box.add(exec);
-    
+
     south.add(box, BorderLayout.EAST);
   }
 
@@ -135,7 +135,7 @@ public final class QueryArea extends QueryPanel {
 
   @Override
   void query(final boolean force) {
-    String xq = Token.string(area.getText());
+    final String xq = Token.string(area.getText());
     if(force || !xq.equals(last)) {
       last = xq;
       if(xq.trim().length() == 0) return;
@@ -182,12 +182,12 @@ public final class QueryArea extends QueryPanel {
     info.setName(Integer.toString(err));
     error.sleep(500);
   }
-  
+
   /** Last error position. */
-  protected int err;
-  
+  int err;
+
   /** Delays the display of error information. */
-  protected Action error = new Action() {
+  Action error = new Action() {
     @Override
     public void action() {
       area.error(err);

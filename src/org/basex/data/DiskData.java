@@ -3,7 +3,6 @@ package org.basex.data;
 import static org.basex.Text.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
-
 import org.basex.core.Prop;
 import org.basex.index.Fuzzy;
 import org.basex.index.Index;
@@ -151,12 +150,11 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public void closeIndex(final Index.TYPE index)
-      throws IOException {
+  public void closeIndex(final Index.TYPE index) throws IOException {
     switch(index) {
       case TXT: if(txtindex != null) txtindex.close(); break;
       case ATV: if(atvindex != null) atvindex.close(); break;
-      case FTX: if(ftxindex != null) ftxindex.close(); break;
+      case FTX: 
       case FUY: if(ftxindex != null) ftxindex.close(); break;
     }
   }
@@ -166,7 +164,7 @@ public final class DiskData extends Data {
     switch(type) {
       case TXT: if(meta.txtindex) txtindex = index; break;
       case ATV: if(meta.atvindex) atvindex = index; break;
-      case FTX: if(meta.ftxindex) ftxindex = index; break;
+      case FTX: 
       case FUY: if(meta.ftxindex) ftxindex = index;
     }
   }

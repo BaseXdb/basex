@@ -370,6 +370,7 @@ public final class XQParser {
     final byte[] ns = stringLiteral();
     name.check(ctx);
     if(!name.ns()) Err.or(NSMISS, name);
+    // will never be null...
     if(ns == null) Err.or(DECLINCOMPLETE);
   }
 

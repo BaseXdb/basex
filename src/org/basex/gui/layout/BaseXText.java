@@ -38,16 +38,16 @@ import org.basex.util.Undo;
  */
 public final class BaseXText extends BaseXPanel {
   /** Text array to be written. */
-  protected BaseXTextTokens text = new BaseXTextTokens(Token.EMPTY);
+  BaseXTextTokens text = new BaseXTextTokens(Token.EMPTY);
   /** Renderer reference. */
-  protected final BaseXTextRenderer rend;
+  final BaseXTextRenderer rend;
   /** Undo history. */
-  protected Undo undo;
+  Undo undo;
 
   /** Scrollbar reference. */
-  protected final BaseXBar scroll;
+  final BaseXBar scroll;
   /** Editable flag. */
-  protected final boolean editable;
+  final boolean editable;
   /** Popup Menu. */
   BaseXPopup popup;
   
@@ -139,8 +139,8 @@ public final class BaseXText extends BaseXPanel {
   public void setText(final byte[] t, final int s) {
     // remove 0x0Ds (carriage return) and compare old with new string
     int ns = 0;
-    int ts = text.size;
-    byte[] tt = text.text;
+    final int ts = text.size;
+    final byte[] tt = text.text;
     boolean eq = true;
     for(int r = 0; r < s; r++) {
       if(t[r] != 0x0D) t[ns++] = t[r];
@@ -248,7 +248,7 @@ public final class BaseXText extends BaseXPanel {
     // <CG> right click: context menu
     if(!SwingUtilities.isLeftMouseButton(e)) return;
 
-    int c = e.getClickCount();
+    final int c = e.getClickCount();
     if(c == 1) {
       // selection mode
       rend.select(scroll.pos(), e.getPoint(), false);
@@ -266,13 +266,13 @@ public final class BaseXText extends BaseXPanel {
     text.pos(text.cursor());
     final boolean ch = Character.isLetterOrDigit(text.prev(true));
     while(text.pos() > 0) {
-      int c = text.prev(true);
+      final int c = text.prev(true);
       if(c == '\n' || ch != Character.isLetterOrDigit(c)) break;
     }
     if(text.pos() != 0) text.next(true);
     text.startMark();
     while(text.pos() < text.size) {
-      int c = text.curr();
+      final int c = text.curr();
       if(c == '\n' || ch != Character.isLetterOrDigit(c)) break;
       text.next(true);
     }
@@ -316,117 +316,100 @@ public final class BaseXText extends BaseXPanel {
   @Override
   public void keyPressed(final KeyEvent e) {
     final int c = e.getKeyCode();
-    if(e.isAltDown() || e.isMetaDown() || c == KeyEvent.VK_SHIFT ||
-        c == KeyEvent.VK_CONTROL || c == KeyEvent.VK_ESCAPE) return;
-    
-    final byte[] txt = text.text;
     text.pos(text.cursor());
     cursor();
+
+    if(e.isAltDown() || e.isMetaDown() || c == KeyEvent.VK_SHIFT ||
+        c == KeyEvent.VK_CONTROL || c == KeyEvent.VK_ESCAPE) return;
+
+    final byte[] txt = text.text;
+    final boolean ctrl = e.isControlDown();
+    final boolean shf = e.isShiftDown();
+    
+    boolean down = true;
+    if(!ctrl && !e.isActionKey()) return;
+    
+    if(c != KeyEvent.VK_DOWN && c != KeyEvent.VK_UP) col = -1;
+
+    if(ctrl && !shf) {
+      if(c == 'A') {
+        selectAll();
+        return;
+      }
+      if(c == 'C') {
+        copy();
+        return;
+      }
+    
+      if(editable) {
+        if(c == 'X') {
+          cut();
+        } else if(c == 'V') {
+          paste();
+        } else if(c == 'Z') {
+          undo();
+        } else if(c == 'Y') {
+          redo();
+        }
+      }
+    }
+    
+    if(shf && text.start() == -1) text.startMark();
 
     final int fh = rend.fontH();
     final int h = getHeight();
 
-    final boolean ctrl = e.isControlDown();
-    final boolean shf = e.isShiftDown();
-    boolean down = true;
-    boolean key = !ctrl && !e.isActionKey();
-    if(c != KeyEvent.VK_DOWN && c != KeyEvent.VK_UP && !key) col = -1;
-
-    if(ctrl && c == 'A') {
-      selectAll();
-      e.consume();
-      return;
-    }
-    if(ctrl && c == 'C') {
-      copy();
-      return;
-    }
-    
-    if(editable && c == KeyEvent.VK_BACK_SPACE) {
-      if(text.start() == -1) {
-        if(text.pos() == 0) return;
-        text.prev();
-      }
-      final boolean ch = Character.isLetterOrDigit(text.curr());
-      text.delete();
+    if(c == KeyEvent.VK_RIGHT) {
       if(ctrl) {
-        while(text.pos() > 0 &&
-            ch == Character.isLetterOrDigit(text.prev())) text.delete();
-        if(text.pos() != 0) text.next();
+        final boolean ch = Character.isLetterOrDigit(text.next(shf));
+        while(text.pos() < text.size && ch ==
+          Character.isLetterOrDigit(text.curr())) text.next(shf);
+      } else {
+        text.next(shf);
+      }
+    } else if(c == KeyEvent.VK_LEFT) {
+      if(ctrl) {
+        final boolean ch = Character.isLetterOrDigit(text.prev(shf));
+        while(text.pos() > 0 && ch ==
+          Character.isLetterOrDigit(text.prev(shf)));
+        if(text.pos() != 0) text.next(shf);
+      } else {
+        text.prev(shf);
       }
       down = false;
-    } else if(editable && c == KeyEvent.VK_DELETE) {
-      final boolean ch = Character.isLetterOrDigit(text.curr());
-      text.delete();
+    } else if(c == KeyEvent.VK_DOWN) {
       if(ctrl) {
-        while(text.pos() < text.size &&
-            ch == Character.isLetterOrDigit(text.curr())) text.delete();
+        scroll.pos(scroll.pos() + fh);
+        return;
       }
-    } else if(editable && ctrl && c == 'X') {
-      cut();
-    } else if(editable && ctrl && c == 'V') {
-      paste();
-    } else if(editable && ctrl && c == KeyEvent.VK_Z) {
-      undo();
-    } else if(editable && ctrl && c == KeyEvent.VK_Y) {
-      redo();
-    } else if(editable && key) {
-      return;
+      down(1, shf);
+    } else if(c == KeyEvent.VK_UP) {
+      if(ctrl) {
+        scroll.pos(scroll.pos() - fh);
+        return;
+      }
+      up(1, shf);
+      down = false;
     } else {
-      if(shf && text.start() == -1) text.startMark();
-  
-      if(c == KeyEvent.VK_RIGHT) {
-        if(ctrl) {
-          final boolean ch = Character.isLetterOrDigit(text.next(shf));
-          while(text.pos() < text.size && ch ==
-            Character.isLetterOrDigit(text.curr())) text.next(shf);
-        } else {
-          text.next(shf);
-        }
-      } else if(c == KeyEvent.VK_LEFT) {
-        if(ctrl) {
-          final boolean ch = Character.isLetterOrDigit(text.prev(shf));
-          while(text.pos() > 0 && ch ==
-            Character.isLetterOrDigit(text.prev(shf)));
-          if(text.pos() != 0) text.next(shf);
-        } else {
-          text.prev(shf);
-        }
-        down = false;
-      } else if(c == KeyEvent.VK_DOWN) {
-        if(ctrl) {
-          scroll.pos(scroll.pos() + fh);
-          return;
-        }
-        down(1, shf);
-      } else if(c == KeyEvent.VK_UP) {
-        if(ctrl) {
-          scroll.pos(scroll.pos() - fh);
-          return;
-        }
-        up(1, shf);
-        down = false;
-      } else {
-        if(!shf) text.noMark();
-  
-        if(c == KeyEvent.VK_HOME) {
-          if(ctrl) text.pos(0);
-          else text.home(shf);
-          down = false;
-        } else if(c == KeyEvent.VK_END) {
-          if(ctrl) text.pos(text.size);
-          else text.end(Integer.MAX_VALUE, shf);
-        } else if(c == KeyEvent.VK_PAGE_DOWN) {
-          down(h / fh, shf);
-        } else if(c == KeyEvent.VK_PAGE_UP) {
-          up(h / fh, shf);
-          down = false;
-        }
-      }
+      if(!shf) text.noMark();
 
-      // refresh scroll position
-      if(shf) text.endMark();
+      if(c == KeyEvent.VK_HOME) {
+        if(ctrl) text.pos(0);
+        else text.home(shf);
+        down = false;
+      } else if(c == KeyEvent.VK_END) {
+        if(ctrl) text.pos(text.size);
+        else text.end(Integer.MAX_VALUE, shf);
+      } else if(c == KeyEvent.VK_PAGE_DOWN) {
+        down(h / fh, shf);
+      } else if(c == KeyEvent.VK_PAGE_UP) {
+        up(h / fh, shf);
+        down = false;
+      }
     }
+
+    // refresh scroll position
+    if(shf) text.endMark();
 
     text.setCaret();
     if(txt != text.text) rend.calc();
@@ -434,7 +417,7 @@ public final class BaseXText extends BaseXPanel {
   }
   
   /**
-   * Shows the currently edited text area.
+   * Displays the currently edited text area.
    * @param align vertical alignment
    */
   public void showCursor(final int align) {
@@ -455,7 +438,7 @@ public final class BaseXText extends BaseXPanel {
    */
   private void down(final int l, final boolean shf) {
     if(!shf) text.noMark();
-    int x = text.home(shf);
+    final int x = text.home(shf);
     if(col == -1) col = x;
     for(int i = 0; i < l; i++) {
       text.end(Integer.MAX_VALUE, shf);
@@ -472,7 +455,7 @@ public final class BaseXText extends BaseXPanel {
    */
   private void up(final int l, final boolean shf) {
     if(!shf) text.noMark();
-    int x = text.home(shf);
+    final int x = text.home(shf);
     if(col == -1) col = x;
     if(text.pos() == 0) {
       col = -1;
@@ -487,25 +470,47 @@ public final class BaseXText extends BaseXPanel {
 
   @Override
   public void keyTyped(final KeyEvent e) {
+    if(!editable) return;
+
     final char ch = e.getKeyChar();
-    if(ch == KeyEvent.VK_BACK_SPACE || ch == KeyEvent.VK_DELETE) return;
-    
-    if(editable) {
-      if(!e.isControlDown() && !e.isActionKey()) {
-        if(text.start() != -1) text.delete();
-        text.add(new char[] { ch });
+    final byte[] txt = text.text;
+    boolean down = true;
+
+    final boolean ctrl = e.isControlDown();
+    if(ch == KeyEvent.VK_BACK_SPACE) {
+      if(text.start() == -1) {
+        if(text.pos() == 0) return;
+        text.prev();
       }
-      e.consume();
-      text.setCaret();
-      rend.calc();
-      showCursor(0);
+      final boolean ld = Character.isLetterOrDigit(text.curr());
+      text.delete();
+      if(ctrl) {
+        while(text.pos() > 0 &&
+            ld == Character.isLetterOrDigit(text.prev())) text.delete();
+        if(text.pos() != 0) text.next();
+      }
+      down = false;
+    } else if(ch == KeyEvent.VK_DELETE) {
+      final boolean ld = Character.isLetterOrDigit(text.curr());
+      text.delete();
+      if(ctrl) {
+        while(text.pos() < text.size &&
+            ld == Character.isLetterOrDigit(text.curr())) text.delete();
+      }
+    } else if(!e.isControlDown() && !e.isActionKey()) {
+      if(text.start() != -1) text.delete();
+      text.add(new char[] { ch });
     }
+    e.consume();
+    text.setCaret();
+    if(txt != text.text) rend.calc();
+    showCursor(down ? 2 : 0);
   }
 
   @Override
   public void keyReleased(final KeyEvent e) {
-    final int key = e.getKeyCode();
-    if(e.isControlDown() && (key == KeyEvent.VK_Z || key == KeyEvent.VK_Y))
+    final int c = e.getKeyCode();
+    if(e.isControlDown() && (c == KeyEvent.VK_Z || c == KeyEvent.VK_Y))
       return;
 
     if(undo != null) undo.store(text.finish(), text.cursor());
@@ -590,7 +595,7 @@ public final class BaseXText extends BaseXPanel {
   }
 
   /** Cursor action. */
-  protected Action cursor = new Action() {
+  Action cursor = new Action() {
     @Override
     public void action() {
       rend.cursor(!rend.cursor());
@@ -624,7 +629,7 @@ public final class BaseXText extends BaseXPanel {
   }
 
   /** Calculation counter. */
-  protected Action calc = new Action() {
+  Action calc = new Action() {
     @Override
     public void action() {
       rend.calc();

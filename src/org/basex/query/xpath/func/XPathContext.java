@@ -23,14 +23,13 @@ public final class XPathContext {
   private XPathIndex<Item> variables =
     new XPathIndex<Item>();
   /** Singleton instance. */
-  private static XPathContext instance;
-
+  private static XPathContext instance = new XPathContext();
+  
   /**
    * Returns single instance of this class.
    * @return class instance
    */
   public static XPathContext get() {
-    if(instance == null) instance = new XPathContext();
     return instance;
   }
   

@@ -138,7 +138,7 @@ public final class MAB2Parser extends Parser {
     final Performance p = new Performance();
 
     int i = 0;
-    byte[] id = null;
+    byte[] id;
     while((id = id(input)) != null) {
       final long pos = off;
       final byte[] par = par(input);

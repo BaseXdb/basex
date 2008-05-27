@@ -44,11 +44,11 @@ public final class MapView extends View implements Runnable {
   private static final int MAXZS = ZS[ZOOMSIZE];
 
   /** Layout rectangle. */
-  protected MapRect layout;
+  MapRect layout;
   /** Array of current rectangles. */
-  private transient MapRects mainRects;
+  private MapRects mainRects;
   /** Data specific map layout. */
-  private transient MapPainter painter;
+  private MapPainter painter;
 
   /** Rectangle history. */
   private final MapRect[] rectHist = new MapRect[MAXHIST];

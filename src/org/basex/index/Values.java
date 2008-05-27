@@ -88,7 +88,7 @@ public final class Values extends Index {
     while(l <= h) {
       int m = (l + h) >>> 1;
 
-      final long pos = idxr.read5(m * 5);
+      final long pos = idxr.read5(m * 5L);
       idxl.readNum(pos);
       final int pre = idxl.readNum();
       final byte[] txt = text ? data.text(pre) : data.attValue(pre);

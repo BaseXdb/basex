@@ -50,7 +50,7 @@ public final class FSWalker {
     if(Prop.UNIX && isSymlink(r)) {
       r = r.getCanonicalFile();
       roots = new File[] { r };
-    } else if(path.equals("/") || path.path().length() == 0) {
+    } else if(path.path().equals("/") || path.path().length() == 0) {
       roots = Prop.UNIX ? new File[] { new File("/") } : File.listRoots();
     } else {
       roots = new File[] { r };

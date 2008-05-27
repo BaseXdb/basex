@@ -1,9 +1,7 @@
 package org.basex.gui.view.xpath;
 
 import static org.basex.gui.GUIConstants.*;
-
 import java.awt.BorderLayout;
-import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -36,11 +34,11 @@ public final class XPathView extends View {
   /** Database Context. */
   public static Context context = new Context();
   /** Input field for XPath queries. */
-  protected final BaseXTextField input;
+  final BaseXTextField input;
   /** Header string. */
-  protected final BaseXLabel header;
+  final BaseXLabel header;
   /** Button box. */
-  protected final BaseXBack back;
+  final BaseXBack back;
   /** BasicComboPopup Menu. */
   public BasicComboPopup pop;
   /** StringList with all entries. */
@@ -166,11 +164,6 @@ public final class XPathView extends View {
       pop = new BasicComboPopup(box);
       pop.show(input, 0, input.getHeight());
     }
-  }
-
-  @Override
-  public void paintComponent(final Graphics g) {
-    super.paintComponent(g);
   }
 
   @Override

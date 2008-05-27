@@ -29,23 +29,23 @@ import org.basex.util.Token;
  */
 public final class DiskBuilder extends Builder {
   /** Database table. */
-  protected DataOutput tout;
+  DataOutput tout;
   /** Database texts. */
-  protected DataOutput xout;
+  DataOutput xout;
   /** Database values. */
-  protected DataOutput vout;
+  DataOutput vout;
 
   /** Text pointer. */
-  protected long txtlen;
+  long txtlen;
   /** Attribute value pointer. */
-  protected long vallen;
+  long vallen;
   /** Number of words written. */
-  protected int[] numw = new int[32];
+  int[] numw = new int[32];
 
   /** Database size stream (temporary). */
-  protected DataOutput sout;
+  DataOutput sout;
   /** Database size stream (counter). */
-  protected int ssize;
+  int ssize;
 
   @Override
   public DiskBuilder init(final String db) throws IOException {

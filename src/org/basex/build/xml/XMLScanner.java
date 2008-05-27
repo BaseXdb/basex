@@ -708,7 +708,6 @@ public final class XMLScanner {
           error(DTDNP, string(name));
         }
 
-        byte[] c = cont;
         if(consume(XML)) {
           check(XMLDECL); s();
           if(version()) checkS();
@@ -717,7 +716,7 @@ public final class XMLScanner {
           if(s(ch)) ch = nextChar();
           if(ch != '?' || nextChar() != '>') error(DECLWRONG);
 
-          c = new byte[cont.length - input.pos()];
+          byte[] c = new byte[cont.length - input.pos()];
           System.arraycopy(cont, input.pos(), c, 0, c.length);
           cont = c;
         }
@@ -925,7 +924,7 @@ public final class XMLScanner {
    * @throws BuildException Build Exception
    */
   private void occ() throws BuildException {
-    if(consume('+') || consume('?') || consume('*'));
+    if(!consume('+') && !consume('?')) consume('*');
   }
 
   /**
