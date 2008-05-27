@@ -23,7 +23,7 @@ public class DirIterator {
    * @param d data reference
    * @param p value of directory node
    */
-  DirIterator(final Data d, final int p) {
+  public DirIterator(final Data d, final int p) {
     data = d;
     final int k = d.kind(p);
     size = p + data.size(p, k);
@@ -47,4 +47,5 @@ public class DirIterator {
     pre += data.size(pre, data.kind(pre));
     return p;
   }
+  
 }
