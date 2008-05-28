@@ -115,15 +115,6 @@ public class RealView extends View {
     drawNode(g, 0, pointerx, pointery, elementColor);
     drawTree(g, 0, 0, 0, this.getWidth());
 
-//    maxTextWidth = 0;
-//    topBorder = 20;
-//
-//    int textWidth = BaseXLayout.width(g, Token.string(root));
-//    
-//    middleY = this.getHeight() / 2;
-//    rightBorder = this.getWidth();
-
-
     System.out.println("Perf: " + perf.getTime());    
   }
   
