@@ -6,10 +6,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.FontMetrics;
+import java.awt.Dimension;
 import java.util.Arrays;
 import javax.swing.JComboBox;
 import javax.swing.plaf.basic.BasicComboPopup;
-import javax.swing.JCheckBox;
 import org.basex.core.Commands;
 import org.basex.core.Context;
 import org.basex.core.proc.Optimize;
@@ -51,8 +52,6 @@ public final class XPathView extends View {
   public int slashC = 0;
   /** Boolean value if BasicComboPopup is initialized. */
   public boolean popInit = false;
-  /** Checkbox if popup will be shown. */
-  public JCheckBox checkPop = new JCheckBox("Helpmode", false);
 
   /**
    * Default Constructor.
@@ -70,7 +69,6 @@ public final class XPathView extends View {
       @Override
       public void keyReleased(final KeyEvent e) {
         int c = e.getKeyCode();
-        if(checkPop.isSelected()) {
           if(all.size == 0) {
             String[] test = keys(GUI.context.data());
             for(int i = 1; i < test.length; i++) {
@@ -92,11 +90,28 @@ public final class XPathView extends View {
             if(input.getText().length() == 0) {
               slashC = 0;
               tmpIn = "";
+              if(popInit) {
+              pop.hide();
+              }
+            }
+          } else if(c == KeyEvent.VK_DOWN) {
+            if(box.getSelectedItem() == null) {
+              box.setSelectedIndex(0);
+            } else {
+              int tmp = box.getSelectedIndex();
+              box.setSelectedIndex(tmp + 1);
+            } 
+          } else if(c == KeyEvent.VK_UP) {
+            if(box.getSelectedItem() != null) {
+              int tmp = box.getSelectedIndex();
+              box.setSelectedIndex(tmp - 1);
+            }
+          } else if(c == KeyEvent.VK_ENTER) {
+            if(box.getSelectedItem() != null) {
+              input.setText(tmpIn + box.getSelectedItem().toString());
               pop.hide();
             }
-          } else if(c == KeyEvent.VK_UP || c == KeyEvent.VK_DOWN
-              || c == KeyEvent.VK_RIGHT || c == KeyEvent.VK_LEFT) return;
-          else {
+          } else {
             if(popInit) {
               if(tmpIn.length() == 0) {
                 pop.hide();
@@ -105,9 +120,8 @@ public final class XPathView extends View {
                 showSpecPop();
               }
             }
-          }
         }
-        if(c == KeyEvent.VK_ESCAPE || c == KeyEvent.VK_ENTER) return;
+        if(c == KeyEvent.VK_ESCAPE) return;
         final String query = input.getText();
         GUI.get().execute(Commands.XPATH, query);
       }
@@ -115,9 +129,7 @@ public final class XPathView extends View {
 
     setBorder(10, 10, 10, 10);
     setLayout(new BorderLayout(0, 4));
-    checkPop.setContentAreaFilled(false);
-    back.add(checkPop, BorderLayout.CENTER);
-    back.add(input, BorderLayout.SOUTH);
+    back.add(input, BorderLayout.CENTER);
 
     add(back, BorderLayout.NORTH);
 
@@ -141,8 +153,10 @@ public final class XPathView extends View {
       }
     });
     if(slashC <= 2) {
+      FontMetrics fm = input.getFontMetrics(input.getFont());
+      int width = fm.stringWidth(input.getText());
       pop = new BasicComboPopup(box);
-      pop.show(input, 0, input.getHeight());
+      pop.show(input, width, input.getHeight());
     } else {
       pop.hide();
     }
@@ -160,9 +174,13 @@ public final class XPathView extends View {
         box.addItem(all.finish()[i]);
       }
     }
-    if(box.getComponentCount() != 0) {
+    if(box.getItemCount() != 0) {
+      FontMetrics fm = input.getFontMetrics(input.getFont());
+      int width = fm.stringWidth(input.getText());
       pop = new BasicComboPopup(box);
-      pop.show(input, 0, input.getHeight());
+      pop.setPreferredSize(new Dimension(pop.getPreferredSize().width,
+          box.getItemCount() * 20));
+      pop.show(input, width, input.getHeight());
     }
   }
 
