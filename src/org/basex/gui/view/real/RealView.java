@@ -31,6 +31,8 @@ public class RealView extends View {
   private final int arcWH = 10;
   /** Vertical Distance between node levels. */
   private final int lvdistance = 30;
+  /** Distance of the tree from the top border. */
+  private final int topdistance = 20;
   /** Color for element node. */
   private final Color elementColor = Color.BLACK;
   /** Color for attribute node. */
@@ -107,7 +109,7 @@ public class RealView extends View {
     
     /** Initialise the pointer */
     pointerx = this.getWidth() / 2;
-    pointery = 20;
+    pointery = topdistance;
     
     /** Paint the root */
     drawNode(g, 0, pointerx, pointery, elementColor);
@@ -153,11 +155,11 @@ public class RealView extends View {
    * @param g graphics reference
    * @param root pre value of the current virtual root
    * @param lv current level
-   * @param framex1 virtual width from parent
-   * @param framex2 virtual width from parent
+   * @param frameleft left border of the parent frame
+   * @param space width of the parent frame
    */
   void drawTree(final Graphics g, final int root, final int lv, 
-      final int framex1, final int framex2) {
+      final int frameleft, final int space) {
     final Data data = GUI.context.data();
     DirIterator iterator = new DirIterator(data, root);
     
@@ -165,21 +167,30 @@ public class RealView extends View {
     int nodetype = Data.ELEM;
     int rootsize = data.size(root, nodetype);
     int pre;
-    int space = framex1;
+    /** The x-value of the left frameboarder. */
+    int border = frameleft;
+    /** To engage inaccuracies during the meassure method, this meassures 
+     * the size that is left after a child got it's space. */
+    int sizeleft = space;
     
     while(iterator.more()) {
       pre = iterator.next();
-      if(data.kind(pre) == nodetype) {      
-        /** Benötigten Platz berechnen */
+      
+      if(data.kind(pre) == nodetype) {
+        /** Meassures the required space by the size value. */
         double percent = (double) (data.size(pre, nodetype) + 1) /
           (double) rootsize;
-        int childframewidth = (int) ((framex2 - framex1) * percent);
-        space += childframewidth;
+        int childframewidth = (int) (sizeleft * percent);   
         
-        pointerx = space - childframewidth / 2;
-        pointery = 20 + level * lvdistance;
+        pointerx = border + childframewidth / 2;
+        pointery = topdistance + level * lvdistance;
         drawNode(g, pre, pointerx, pointery, elementColor);
-        drawTree(g, pre, level, space - childframewidth, space);
+        System.out.println(Token.string(data.tag(pre)) + "; Percent: " + percent + "; Framewidth: " + this.getWidth() + "; framex1: " + (space - childframewidth) + "; space: " + space);
+        drawTree(g, pre, level, border, childframewidth);
+        
+        border += childframewidth;
+        rootsize = rootsize - data.size(pre, nodetype) + 1;
+        sizeleft = sizeleft - childframewidth;
       }
     }
   }
