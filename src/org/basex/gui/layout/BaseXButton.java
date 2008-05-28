@@ -1,6 +1,7 @@
 package org.basex.gui.layout;
 
 import static org.basex.Text.*;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -8,6 +9,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import org.basex.gui.dialog.Dialog;
+import org.basex.util.Token;
 
 /**
  * Project specific button implementation.
@@ -59,7 +61,16 @@ public final class BaseXButton extends JButton {
    */
   public BaseXButton(final ImageIcon image, final byte[] hlp) {
     super(image);
-    setFocusable(false);
     BaseXLayout.addHelp(this, hlp);
+    if(hlp != null) setToolTipText(Token.string(hlp));
+  }
+
+  /**
+   * Trims the horizontal button margins.
+   */
+  public void trim() {
+    final Insets in = getMargin();
+    if(in.left < 1 || in.right < 1) return;
+    setMargin(new Insets(1, 1, 1, 1));
   }
 }

@@ -56,7 +56,7 @@ public final class Names extends Set {
     noleaf = in.readBooleans();
     size = in.readNum();
     stats = in.readBool();
-    stat = new StatsKey[size];
+    stat = new StatsKey[next.length];
     for(int s = 1; s < size; s++) stat[s] = new StatsKey(in);
     tag = t;
     in.close();

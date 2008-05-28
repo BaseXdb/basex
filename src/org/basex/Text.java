@@ -295,29 +295,24 @@ public interface Text {
   String INSERT1 = lang("ch_insert1");
   /** Command Help. */
   String INSERT2 = lang("ch_insert2") + NL + NL +
-    "- " + Insert.ELEM + " [name] [pos] [target]: Insert [name]" + NL +
-    "- " + Insert.TXT + " [text] [pos] [target]: Insert [text]" + NL +
-    "- " + Insert.ATT + " [name] [value] [target]: Insert [name] and " +
-    "[value]" + NL +
-    "- " + Insert.COM + " [text] [pos] [target]: Insert [text]" + NL +
-    "- " + Insert.PI + " [name] [value] [pos] [target]: Insert [name] and " +
-    "[value]" + NL +
-    "- " + Insert.FRG + " [frag] [pos] [target]: Insert [frag]";
+    "- " + Insert.ELEM + " " + lang("ch_insert21") + NL +
+    "- " + Insert.TXT + " " + lang("ch_insert22") + NL +
+    "- " + Insert.ATT + " " + lang("ch_insert23") + NL +
+    "- " + Insert.COM + " " + lang("ch_insert24") + NL +
+    "- " + Insert.PI + " " + lang("ch_insert25") + NL +
+    "- " + Insert.FRG + " " + lang("ch_insert26");
   /** Command Help. */
   String UPDATE0 = "[" + Insert.ELEM + "|" + Insert.ATT + "|" + Insert.TXT +
     "|" + Insert.COM + "|" + Insert.PI + "] [...]";
   /** Command Help. */
   String UPDATE1 = lang("ch_update1");
   /** Command Help. */
-  String UPDATE2 = lang("ch_update2") +
-    NL + NL +
-    "- " + Insert.ELEM + " [name] [target]: Update with [name]" + NL +
-    "- " + Insert.TXT + " [text] [target]: Update with [text]" + NL +
-    "- " + Insert.ATT + " [name] [value] [target]: " +
-    "Update with [name] and [value]" + NL +
-    "- " + Insert.COM + " [text] [target]: Update with [text]" + NL +
-    "- " + Insert.PI + " [name] [value] [target]: " +
-    "Update with [name] and [value]";
+  String UPDATE2 = lang("ch_update2") + NL + NL +
+    "- " + Insert.ELEM + " " + lang("ch_update21") + NL +
+    "- " + Insert.TXT + " " + lang("ch_update22") + NL +
+    "- " + Insert.ATT + " " + lang("ch_update23") + NL +
+    "- " + Insert.COM + " " + lang("ch_update24") + NL +
+    "- " + Insert.PI + " " + lang("ch_update25");
 
   /** Command Help. */
   String DUMMYGENERAL0 = lang("ch_dummygeneral0");
@@ -578,8 +573,6 @@ public interface Text {
   String BUTTONCMD = lang("b_cmd");
   /** Input field. */
   String BUTTONXPATH = lang("b_xpath");
-  /** Command Info. */
-  String BUTTONEXEC = lang("b_exec");
   /** Button text for confirming actions. */
   String BUTTONOK = lang("b_ok");
   /** Button text for confirming actions. */
@@ -594,8 +587,6 @@ public interface Text {
   String BUTTONDROP = lang("b_drop") + DOTS;
   /** Button text for browsing files/directories. */
   String BUTTONBROWSE = lang("b_browse") + DOTS;
-  /** Interactive Filtering. */
-  String BUTTONFILTER = lang("b_filter");
   /** XQuery copy Button. */
   String BUTTONTOXPATH = ">> XQuery";
   /** Text field mode - Search Modes. */
@@ -1184,15 +1175,17 @@ public interface Text {
   // HELP TEXTS ===============================================================
 
   /** Help String. */
-  byte[] HELPFILTER = token(lang("h_filter"));
-  /** Help String. */
   byte[] HELPQUERYRT = token(lang("h_queryrt"));
   /** Help String. */
   byte[] HELPTOXQUERY = token(lang("h_toxquery"));
   /** Help String. */
   byte[] HELPTOXPATH = token(lang("h_toxpath"));
   /** Help String. */
+  byte[] HELPFILTER = token(lang("h_filter"));
+  /** Help String. */
   byte[] HELPEXEC = token(lang("h_exec"));
+  /** Help String. */
+  byte[] HELPHIST = token(lang("h_hist"));
   /** Help String. */
   byte[] HELPSTOP = token(lang("h_stop"));
   /** Help String. */

@@ -18,7 +18,7 @@ import org.basex.gui.dialog.Dialog;
  */
 public final class BaseXCombo extends JComboBox {
   /** Maximum number of strings to be stored. */
-  private static final int MAX = 30;
+  public static final int MAX = 30;
   /** Last Input. */
   public String last = "";
   /** Button help. */

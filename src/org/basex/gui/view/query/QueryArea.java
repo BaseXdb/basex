@@ -116,7 +116,8 @@ public final class QueryArea extends QueryPanel {
     BaseXLayout.enable(info, false);
     south.add(info, BorderLayout.CENTER);
 
-    exec = new BaseXButton(BUTTONEXEC, HELPEXEC, null);
+    exec = new BaseXButton(GUI.icon("go"), HELPEXEC);
+    exec.trim();
     exec.addKeyListener(main);
     exec.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {

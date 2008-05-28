@@ -2,7 +2,10 @@ package org.basex.gui.layout;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.JTextField;
+import org.basex.gui.GUI;
 import org.basex.gui.dialog.Dialog;
 
 /**
@@ -13,7 +16,9 @@ import org.basex.gui.dialog.Dialog;
  */
 public final class BaseXTextField extends JTextField {
   /** Last Input. */
-  public String last = "";
+  String last = "";
+  /** Button help. */
+  byte[] help;
 
   /**
    * Default Constructor.
@@ -41,12 +46,18 @@ public final class BaseXTextField extends JTextField {
   public BaseXTextField(final String txt, final byte[] hlp, final Dialog list) {
     BaseXLayout.addDefaultKeys(this, list);
     BaseXLayout.setWidth(this, 200);
+    help = hlp;
 
     if(txt != null) {
       setText(txt);
       selectAll();
     }
-    BaseXLayout.addHelp(this, hlp);
+    addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseEntered(final MouseEvent e) {
+        GUI.get().focus(e.getComponent(), help);
+      }
+    });
     addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
@@ -71,5 +82,13 @@ public final class BaseXTextField extends JTextField {
   public void setEnabled(final boolean sel) {
     super.setEnabled(sel);
     setOpaque(sel);
+  }
+
+  /**
+   * Sets the text field help text.
+   * @param hlp help text
+   */
+  public void help(final byte[] hlp) {
+    help = hlp;
   }
 }

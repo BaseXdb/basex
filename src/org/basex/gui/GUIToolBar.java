@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 import javax.swing.ImageIcon;
 import javax.swing.JToolBar;
 import javax.swing.border.EmptyBorder;
-
 import org.basex.gui.layout.BaseXButton;
 import org.basex.util.Token;
 import static org.basex.gui.GUIConstants.*;
@@ -35,7 +34,7 @@ public final class GUIToolBar extends JToolBar {
         final ImageIcon icon = GUI.icon("cmd-" + cmd.toString().toLowerCase());
         final String info = cmd.help();
         final BaseXButton button = new BaseXButton(icon, Token.token(info));
-        button.setToolTipText(info);
+        button.setFocusable(false);
         button.addActionListener(new ActionListener() {
           public void actionPerformed(final ActionEvent e) {
             cmd.execute();

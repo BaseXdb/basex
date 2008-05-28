@@ -1,6 +1,7 @@
 package org.basex.gui.view.query;
 
 import static org.basex.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Insets;
@@ -85,6 +86,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     all.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {
+        BaseXLayout.enable(copy, all.getText().length() != 0);
         if(GUIProp.execrt) query(false);
       }
     });
@@ -99,6 +101,27 @@ final class QuerySimple extends QueryPanel implements ActionListener {
 
     final Box box = new Box(BoxLayout.X_AXIS);
 
+    exec = new BaseXButton(GUI.icon("go"), HELPEXEC);
+    exec.trim();
+    exec.addKeyListener(main);
+    exec.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent e) {
+        query(true);
+      }
+    });
+    box.add(exec);
+
+    filter = new BaseXButton(GUI.icon("filter"), HELPFILTER);
+    filter.trim();
+    filter.addKeyListener(main);
+    filter.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent e) {
+        View.notifyContext(GUI.context.marked(), false);
+      }
+    });
+    box.add(filter);
+    box.add(Box.createHorizontalStrut(6));
+
     copy = new BaseXButton(BUTTONTOXPATH, HELPTOXPATH);
     copy.addKeyListener(main);
     copy.addActionListener(new ActionListener() {
@@ -110,26 +133,6 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     });
     BaseXLayout.enable(copy, false);
     box.add(copy);
-    box.add(Box.createHorizontalStrut(4));
-
-    filter = new BaseXButton(BUTTONFILTER, HELPFILTER);
-    filter.addKeyListener(main);
-    filter.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent e) {
-        View.notifyContext(GUI.context.marked(), false);
-      }
-    });
-    box.add(filter);
-    box.add(Box.createHorizontalStrut(4));
-
-    exec = new BaseXButton(BUTTONEXEC, HELPEXEC, null);
-    exec.addKeyListener(main);
-    exec.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent e) {
-        query(true);
-      }
-    });
-    box.add(exec);
 
     p.add(box, BorderLayout.EAST);
     cont.add(p, BorderLayout.SOUTH);
