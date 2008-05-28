@@ -28,7 +28,7 @@ public class RealView extends View {
   /** Distance from the node to the border. */
   private final int margin = 3;
   /** Arc Measures for the box. */
-  private final int arcWH = 10;
+  //private final int arcWH = 10;
   /** Vertical Distance between node levels. */
   private final int lvdistance = 30;
   /** Distance of the tree from the top border. */
@@ -137,8 +137,10 @@ public class RealView extends View {
     
     /** Draw String and Box */
     g.drawString(node, xstart, y);
-    g.drawRoundRect(xstart - margin, y - fontHeight, textWidth + 2 * margin, 
-        fontHeight + margin, arcWH, arcWH);
+    g.drawRect(xstart - margin, y - fontHeight, textWidth + 2 * margin, 
+      fontHeight + margin);
+//    g.drawRoundRect(xstart - margin, y - fontHeight, textWidth + 2 * margin, 
+//        fontHeight + margin, arcWH, arcWH);
   }
   
   /**
