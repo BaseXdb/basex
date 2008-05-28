@@ -162,11 +162,10 @@ public class RealView extends View {
     int border = frameleft;
     /** To engage inaccuracies during the meassure method, this meassures 
      * the size that is left after a child got it's space. */
-    int sizeleft = space;
+    int sizeleft = space;    
     
     while(iterator.more()) {
-      pre = iterator.next();
-      
+      pre = iterator.next();      
       if(data.kind(pre) == nodetype) {
         /** Meassures the required space by the size value. */
         double percent = (double) (data.size(pre, nodetype) + 1) /
