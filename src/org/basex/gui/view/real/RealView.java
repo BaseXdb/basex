@@ -197,20 +197,7 @@ public class RealView extends View {
       }
     }
   }
-  
-  /**
-   * Rounds the double.
-   * @param value the double
-   * @param decimalPlace how many places after ,
-   * @return the rounded double
-   */
-  public static double round(final double value, final int decimalPlace) {
-    double poweroften = 1;
-    int decimal = decimalPlace;
-    while (decimal-- > 0)
-       poweroften *= 10.0;
-    return Math.round(value * poweroften) / poweroften;
-  }
+ 
 }
 
 
