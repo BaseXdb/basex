@@ -185,7 +185,10 @@ public class RealView extends View {
         pointerx = border + childframewidth / 2;
         pointery = topdistance + level * lvdistance;
         drawNode(g, pre, pointerx, pointery, elementColor);
-        System.out.println(Token.string(data.tag(pre)) + "; Percent: " + percent + "; Framewidth: " + this.getWidth() + "; framex1: " + (space - childframewidth) + "; space: " + space);
+        /** System.out.println(Token.string(data.tag(pre))
+         *  + "; Percent: " + percent + "; Framewidth: "
+         *  + this.getWidth() + "; framex1: " + (space - childframewidth)
+         *  + "; space: " + space); */
         drawTree(g, pre, level, border, childframewidth);
         
         border += childframewidth;
