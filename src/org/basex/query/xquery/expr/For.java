@@ -12,6 +12,7 @@ import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Scoring;
 import org.basex.query.xquery.util.Var;
+import org.basex.util.Token;
 
 /**
  * For Clause.
@@ -106,7 +107,7 @@ public final class For extends ForLet {
     ser.startElement(this);
     ser.attribute(VAR, var.name.str());
     if(pos != null) ser.attribute(POS, pos.name.str());
-    if(score != null) ser.attribute(SCORE, score.name.str());
+    if(score != null) ser.attribute(Token.token(SCORE), score.name.str());
     ser.finishElement();
     expr.plan(ser);
     ser.closeElement(this);

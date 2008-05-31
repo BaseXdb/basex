@@ -56,7 +56,7 @@ public final class TokenBuilder {
    * @param ch the character to be added
    */
   public void add(final char ch) {
-    add((byte) ch);
+    addUTF(ch);
   }
 
   /**
@@ -91,7 +91,7 @@ public final class TokenBuilder {
   }
 
   /**
-   * Inserts a single character at the beginning of the token.
+   * Inserts a single character at the specified position.
    * Use it carefully; might get pretty slow.
    * @param b the character to be added
    */

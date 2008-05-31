@@ -10,6 +10,7 @@ import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Scoring;
 import org.basex.query.xquery.util.Var;
+import org.basex.util.Token;
 
 /**
  * Let Clause.
@@ -91,7 +92,7 @@ public final class Let extends ForLet {
 
   @Override
   public void plan(final Serializer ser) throws Exception {
-    ser.openElement(this, score ? SCORE : VAR, var.name.str());
+    ser.openElement(this, score ? Token.token(SCORE) : VAR, var.name.str());
     expr.plan(ser);
     ser.closeElement(this);
   }

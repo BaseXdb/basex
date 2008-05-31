@@ -21,7 +21,7 @@ final class FNBaseX extends Fun {
   public Iter iter(final XQContext ctx, final Iter[] arg) throws XQException {
     switch(func) {
       case EVAL:
-        new XQParser(ctx).parse(checkStr(arg[0]));
+        new XQParser(ctx).parse(string(checkStr(arg[0])));
         return ctx.eval(null).item().iter();
       case RANDOM:
         Iter iter = arg[0];

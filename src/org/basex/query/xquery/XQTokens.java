@@ -13,280 +13,280 @@ public interface XQTokens {
   // PARSER TOKENS ============================================================
 
   /** Parser token. */
-  byte[] AND = token("and");
+  String AND = "and";
   /** Parser token. */
-  byte[] AS = token("as");
+  String AS = "as";
   /** Parser token. */
-  byte[] ASCENDING = token("ascending");
+  String ASCENDING = "ascending";
   /** Parser token. */
-  byte[] AT = token("at");
+  String AT = "at";
   /** Parser token. */
-  byte[] ATTRIBUTE = token("attribute");
+  String ATTRIBUTE = "attribute";
   /** Parser token. */
-  byte[] BASEURI = token("base-uri");
+  String BASEURI = "base-uri";
   /** Parser token. */
-  byte[] BOUNDARY = token("boundary-space");
+  String BOUNDARY = "boundary-space";
   /** Parser token. */
-  byte[] BY = token("by");
+  String BY = "by";
   /** Parser token. */
-  byte[] CASE = token("case");
+  String CASE = "case";
   /** Parser token. */
-  byte[] CAST = token("cast");
+  String CAST = "cast";
   /** Parser token. */
-  byte[] CASTABLE = token("castable");
+  String CASTABLE = "castable";
   /** Parser token. */
-  byte[] CATCH = token("catch");
+  String CATCH = "catch";
   /** Parser token. */
-  byte[] COLLATION = token("collation");
+  String COLLATION = "collation";
   /** Parser token. */
-  byte[] COMMENT = token("comment");
+  String COMMENT = "comment";
   /** Parser token. */
-  byte[] CONSTRUCTION = token("construction");
+  String CONSTRUCTION = "construction";
   /** Parser token. */
-  byte[] COPYNS = token("copy-namespaces");
+  String COPYNS = "copy-namespaces";
   /** Parser token. */
-  byte[] DECLARE = token("declare");
+  String DECLARE = "declare";
   /** Parser token. */
-  byte[] DEFAULT = token("default");
+  String DEFAULT = "default";
   /** Parser token. */
-  byte[] DESCENDING = token("descending");
+  String DESCENDING = "descending";
   /** Parser token. */
-  byte[] DIV = token("div");
+  String DIV = "div";
   /** Parser token. */
-  byte[] DOCUMENT = token("document");
+  String DOCUMENT = "document";
   /** Parser token. */
-  byte[] ELEMENT = token("element");
+  String ELEMENT = "element";
   /** Parser token. */
-  byte[] ELSE = token("else");
+  String ELSE = "else";
   /** Parser token. */
-  byte[] EMPTYORD = token("empty");
+  String EMPTYORD = "empty";
   /** Parser token. */
-  byte[] ENCODING = token("encoding");
+  String ENCODING = "encoding";
   /** Parser token. */
-  byte[] EVERY = token("every");
+  String EVERY = "every";
   /** Parser token. */
-  byte[] EXCEPT = token("except");
+  String EXCEPT = "except";
   /** Parser token. */
-  byte[] EXTERNAL = token("external");
+  String EXTERNAL = "external";
   /** Parser token. */
-  byte[] FOR = token("for");
+  String FOR = "for";
   /** Parser token. */
-  byte[] FUNCTION = token("function");
+  String FUNCTION = "function";
   /** Parser token. */
-  byte[] GREATEST = token("greatest");
+  String GREATEST = "greatest";
   /** Parser token. */
-  byte[] IDIV = token("idiv");
+  String IDIV = "idiv";
   /** Parser token. */
-  byte[] IF = token("if");
+  String IF = "if";
   /** Parser token. */
-  byte[] IMPORT = token("import");
+  String IMPORT = "import";
   /** Parser token. */
-  byte[] IN = token("in");
+  String IN = "in";
   /** Parser token. */
-  byte[] INHERIT = token("inherit");
+  String INHERIT = "inherit";
   /** Parser token. */
-  byte[] INSTANCE = token("instance");
+  String INSTANCE = "instance";
   /** Parser token. */
-  byte[] INTERSECT = token("intersect");
+  String INTERSECT = "intersect";
   /** Parser token. */
-  byte[] LAX = token("lax");
+  String LAX = "lax";
   /** Parser token. */
-  byte[] LEAST = token("least");
+  String LEAST = "least";
   /** Parser token. */
-  byte[] LET = token("let");
+  String LET = "let";
   /** Parser token. */
-  byte[] MOD = token("mod");
+  String MOD = "mod";
   /** Parser token. */
-  byte[] MODULE = token("module");
+  String MODULE = "module";
   /** Parser token. */
-  byte[] NAMESPACE = token("namespace");
+  String NAMESPACE = "namespace";
   /** Parser token. */
-  byte[] NOINHERIT = token("no-inherit");
+  String NOINHERIT = "no-inherit";
   /** Parser token. */
-  byte[] NOPRESERVE = token("no-preserve");
+  String NOPRESERVE = "no-preserve";
   /** Parser token. */
-  byte[] OF = token("of");
+  String OF = "of";
   /** Parser token. */
-  byte[] OPTION = token("option");
+  String OPTION = "option";
   /** Parser token. */
-  byte[] OR = token("or");
+  String OR = "or";
   /** Parser token. */
-  byte[] EMPTYORDER = token("order");
+  String EMPTYORDER = "order";
   /** Parser token. */
-  byte[] ORDERED = token("ordered");
+  String ORDERED = "ordered";
   /** Parser token. */
-  byte[] ORDERING = token("ordering");
+  String ORDERING = "ordering";
   /** Parser token. */
-  byte[] PI = token("processing-instruction");
+  String PI = "processing-instruction";
   /** Parser token. */
-  byte[] PRESERVE = token("preserve");
+  String PRESERVE = "preserve";
   /** Parser token. */
-  byte[] QUOTE = token("quote");
+  String QUOTE = "quote";
   /** Parser token. */
-  byte[] RETURN = token("return");
+  String RETURN = "return";
   /** Parser token. */
-  byte[] SATISFIES = token("satisfies");
+  String SATISFIES = "satisfies";
   /** Parser token. */
-  byte[] SCHEMA = token("schema");
+  String SCHEMA = "schema";
   /** Parser token. */
-  byte[] SOME = token("some");
+  String SOME = "some";
   /** Parser token. */
-  byte[] STABLE = token("stable");
+  String STABLE = "stable";
   /** Parser token. */
-  byte[] STRICT = token("strict");
+  String STRICT = "strict";
   /** Parser token. */
-  byte[] STRIP = token("strip");
+  String STRIP = "strip";
   /** Parser token. */
-  byte[] TEXT = token("text");
+  String TEXT = "text";
   /** Parser token. */
-  byte[] THEN = token("then");
+  String THEN = "then";
   /** Parser token. */
-  byte[] TO = token("to");
+  String TO = "to";
   /** Parser token. */
-  byte[] TREAT = token("treat");
+  String TREAT = "treat";
   /** Parser token. */
-  byte[] TRY = token("try");
+  String TRY = "try";
   /** Parser token. */
-  byte[] TYPESWITCH = token("typeswitch");
+  String TYPESWITCH = "typeswitch";
   /** Parser token. */
-  byte[] UNION = token("union");
+  String UNION = "union";
   /** Parser token. */
-  byte[] UNORDERED = token("unordered");
+  String UNORDERED = "unordered";
   /** Parser token. */
-  byte[] VALIDATE = token("validate");
+  String VALIDATE = "validate";
   /** Parser token. */
-  byte[] VARIABLE = token("variable");
+  String VARIABLE = "variable";
   /** Parser token. */
-  byte[] VERSION = token("version");
+  String VERSION = "version";
   /** Parser token. */
-  byte[] WHERE = token("where");
+  String WHERE = "where";
   /** Parser token. */
-  byte[] XQUERY = token("xquery");
+  String XQUERY = "xquery";
 
   /** Parser fulltext token. */
-  byte[] FTOPTION = token("ft-option");
+  String FTOPTION = "ft-option";
   /** Parser fulltext token. */
-  byte[] FTCONTAINS = token("ftcontains");
+  String FTCONTAINS = "ftcontains";
   /** Parser fulltext token. */
-  byte[] ALL = token("all");
+  String ALL = "all";
   /** Parser fulltext token. */
-  byte[] ANY = token("any");
+  String ANY = "any";
   /** Parser fulltext token. */
-  byte[] WORD = token("word");
+  String WORD = "word";
   /** Parser fulltext token. */
-  byte[] WORDS = token("words");
+  String WORDS = "words";
   /** Parser fulltext token. */
-  byte[] PHRASE = token("phrase");
+  String PHRASE = "phrase";
   /** Parser fulltext token. */
-  byte[] OCCURS = token("occurs");
+  String OCCURS = "occurs";
   /** Parser fulltext token. */
-  byte[] TIMES = token("times");
+  String TIMES = "times";
   /** Parser fulltext token. */
-  byte[] EXACTLY = token("exactly");
+  String EXACTLY = "exactly";
   /** Parser fulltext token. */
-  byte[] MOST = token("most");
+  String MOST = "most";
   /** Parser fulltext token. */
-  byte[] FROM = token("from");
+  String FROM = "from";
   /** Parser fulltext token. */
-  byte[] NOT = token("not");
+  String NOT = "not";
   /** Parser fulltext token. */
-  byte[] FTOR = token("ftor");
+  String FTOR = "ftor";
   /** Parser fulltext token. */
-  byte[] FTAND = token("ftand");
+  String FTAND = "ftand";
   /** Parser fulltext token. */
-  byte[] FTNOT = token("ftnot");
+  String FTNOT = "ftnot";
   /** Parser fulltext token. */
-  byte[] LOWERCASE = token("lowercase");
+  String LOWERCASE = "lowercase";
   /** Parser fulltext token. */
-  byte[] UPPERCASE = token("uppercase");
+  String UPPERCASE = "uppercase";
   /** Parser fulltext token. */
-  byte[] SENSITIVE = token("sensitive");
+  String SENSITIVE = "sensitive";
   /** Parser fulltext token. */
-  byte[] INSENSITIVE = token("insensitive");
+  String INSENSITIVE = "insensitive";
   /** Parser fulltext token. */
-  byte[] WITH = token("with");
+  String WITH = "with";
   /** Parser fulltext token. */
-  byte[] CONTENT = token("content");
+  String CONTENT = "content";
   /** Parser fulltext token. */
-  byte[] DIACRITICS = token("diacritics");
+  String DIACRITICS = "diacritics";
   /** Parser fulltext token. */
-  byte[] DIFFERENT = token("different");
+  String DIFFERENT = "different";
   /** Parser fulltext token. */
-  byte[] DISTANCE = token("distance");
+  String DISTANCE = "distance";
   /** Parser fulltext token. */
-  byte[] END = token("end");
+  String END = "end";
   /** Parser fulltext token. */
-  byte[] ENTIRE = token("entire");
+  String ENTIRE = "entire";
   /** Parser fulltext token. */
-  byte[] LANGUAGE = token("language");
+  String LANGUAGE = "language";
   /** Parser fulltext token. */
-  byte[] LEVELS = token("levels");
+  String LEVELS = "levels";
   /** Parser fulltext token. */
-  byte[] PARAGRAPH = token("paragraph");
+  String PARAGRAPH = "paragraph";
   /** Parser fulltext token. */
-  byte[] PARAGRAPHS = token("paragraphs");
+  String PARAGRAPHS = "paragraphs";
   /** Parser fulltext token. */
-  byte[] RELATIONSHIP = token("relationship");
+  String RELATIONSHIP = "relationship";
   /** Parser fulltext token. */
-  byte[] SAME = token("same");
+  String SAME = "same";
   /** Parser fulltext token. */
-  byte[] SENTENCE = token("sentence");
+  String SENTENCE = "sentence";
   /** Parser fulltext token. */
-  byte[] SENTENCES = token("sentences");
+  String SENTENCES = "sentences";
   /** Parser fulltext token. */
-  byte[] START = token("start");
+  String START = "start";
   /** Parser fulltext token. */
-  byte[] STEMMING = token("stemming");
+  String STEMMING = "stemming";
   /** Parser fulltext token. */
-  byte[] STOP = token("stop");
+  String STOP = "stop";
   /** Parser fulltext token. */
-  byte[] THESAURUS = token("thesaurus");
+  String THESAURUS = "thesaurus";
   /** Parser fulltext token. */
-  byte[] WILDCARDS = token("wildcards");
+  String WILDCARDS = "wildcards";
   /** Parser fulltext token. */
-  byte[] WINDOW = token("window");
+  String WINDOW = "window";
   /** Parser fulltext token. */
-  byte[] WITHOUT = token("without");
+  String WITHOUT = "without";
   /** Parser fulltext token. */
-  byte[] SCORE = token("score");
+  String SCORE = "score";
   /** Parser fulltext token. */
-  byte[] WEIGHT = token("weight");
+  String WEIGHT = "weight";
 
   /** Skip flag for the syntax highlighter. */
-  byte[] SKIP = null;
+  String SKIP = null;
 
   /** Parser token. */
-  byte[] ASSIGN = token(":=");
+  String ASSIGN = ":=";
   /** Parser token. */
-  byte[] BR1 = token("[");
+  String BR1 = "[";
   /** Parser token. */
-  byte[] BR2 = token("]");
+  String BR2 = "]";
   /** Parser token. */
-  byte[] BRACE1 = token("{");
+  String BRACE1 = "{";
   /** Parser token. */
-  byte[] BRACE2 = token("}");
+  String BRACE2 = "}";
   /** Parser token. */
-  byte[] CDATA = token("<![CDATA[");
+  String CDATA = "<![CDATA[";
   /** Parser token. */
-  byte[] COL2 = token("::");
+  String COL2 = "::";
   /** Parser token. */
-  byte[] COMMA = token(",");
+  String COMMA = ",";
   /** Parser token. */
-  byte[] DOLLAR = token("$");
+  String DOLLAR = "$";
   /** Parser token. */
-  byte[] DOT2 = token("..");
+  String DOT2 = "..";
   /** Parser token. */
-  byte[] IS = token("=");
+  String IS = "=";
   /** Parser token. */
-  byte[] ONEZERO = token("1.0");
+  String ONEZERO = "1.0";
   /** Parser token. */
-  byte[] PAR1 = token("(");
+  String PAR1 = "(";
   /** Parser token. */
-  byte[] PAR2 = token(")");
+  String PAR2 = ")";
   /** Parser token. */
-  byte[] PIPE = token("|");
+  String PIPE = "|";
   /** Parser token. */
-  byte[] PRAGMA = token("(#");
+  String PRAGMA = "(#";
 
   // URIS =====================================================================
 
@@ -308,7 +308,7 @@ public interface XQTokens {
   byte[] JAVAPRE = token("java:");
   /** Default collation. */
   byte[] URLCOLL = concat(FNURI, token("/collation/codepoint"));
-
+//
   // PREFIXES =================================================================
 
   /** XML token. */

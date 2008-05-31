@@ -6,7 +6,7 @@ package org.basex.test;
  * @author Workgroup DBIS, University of Konstanz 2005-07, ISC License
  * @author Christian Gruen
  */
-public class XPathMarkFTTest extends AbstractTest {
+public final class XPathMarkFTTest extends AbstractTest {
   /** Constructor. */
   XPathMarkFTTest() {
     title = "XPathMark-FT";

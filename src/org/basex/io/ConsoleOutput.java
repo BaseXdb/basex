@@ -11,7 +11,7 @@ import java.io.PrintStream;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class ConsoleOutput extends PrintOutput {
+public final class ConsoleOutput extends PrintOutput {
   /**
    * Constructor given a print stream.
    * @param out the PrintStream to operate on

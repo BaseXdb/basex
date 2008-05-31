@@ -10,7 +10,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class Jav extends Item {
+public final class Jav extends Item {
   /** Java object. */
   public Object val;
 
@@ -24,7 +24,7 @@ public class Jav extends Item {
   }
 
   @Override
-  public final byte[] str() {
+  public byte[] str() {
     return Token.token(val.toString());
   }
 
@@ -39,7 +39,7 @@ public class Jav extends Item {
   }
 
   @Override
-  public final float flt() throws XQException {
+  public float flt() throws XQException {
     return Flt.parse(str());
   }
 

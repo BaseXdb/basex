@@ -86,13 +86,13 @@ public final class Values extends Index {
   private long get(final byte[] key) {
     int l = 0, h = size - 1;
     while(l <= h) {
-      int m = (l + h) >>> 1;
+      final int m = (l + h) >>> 1;
 
       final long pos = idxr.read5(m * 5L);
       idxl.readNum(pos);
       final int pre = idxl.readNum();
       final byte[] txt = text ? data.text(pre) : data.attValue(pre);
-      int d = Token.diff(txt, key);
+      final int d = Token.diff(txt, key);
       if(d == 0) return pos;
       if(d < 0) l = m + 1;
       else h = m - 1;

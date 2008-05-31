@@ -9,7 +9,7 @@ import org.basex.gui.layout.BaseXSplit;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-class ViewAlignment implements ViewLayout {
+final class ViewAlignment implements ViewLayout {
   /** Alignment (horizontal/vertical). */
   boolean horiz;
   /** Layout Components. */

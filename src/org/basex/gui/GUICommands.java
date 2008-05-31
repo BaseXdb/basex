@@ -318,7 +318,7 @@ public enum GUICommands implements GUICommand {
   FILTER(false, GUIFILTER, null, GUIFILTERTT) {
     @Override
     public void execute() {
-      Context context = GUI.context;
+      final Context context = GUI.context;
       Nodes marked = context.marked();
       if(marked.size == 0) {
         final int pre = View.focused;

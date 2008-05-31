@@ -10,7 +10,7 @@ import org.basex.util.Array;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class SeqIter extends Iter {
+public final class SeqIter extends Iter {
   /** Items. */
   public Item[] item;
   /** Size. */

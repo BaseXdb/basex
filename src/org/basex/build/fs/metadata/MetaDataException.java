@@ -9,7 +9,7 @@ import org.basex.BaseX;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Alexander Holupirek
  */
-public class MetaDataException extends IOException {
+public final class MetaDataException extends IOException {
   /**
    * Constructor.
    * @param message message

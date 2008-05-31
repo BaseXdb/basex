@@ -9,7 +9,7 @@ import org.basex.BaseX;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class BuildException extends IOException {
+public final class BuildException extends IOException {
   /**
    * Constructs an exception with the specified message.
    * @param s message

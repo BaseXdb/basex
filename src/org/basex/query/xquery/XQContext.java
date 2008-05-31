@@ -6,12 +6,10 @@ import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
 import org.basex.core.Prop;
 import org.basex.core.proc.Check;
-import org.basex.data.DOTSerializer;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.Serializer;
 import org.basex.io.IO;
-import org.basex.io.CachedOutput;
 import org.basex.query.QueryContext;
 import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.expr.FTOptions;
@@ -308,12 +306,6 @@ public final class XQContext extends QueryContext {
       return new NodIter(collect[c].list, collect[c].size);
     }
     return null;
-  }
-  
-  @Override
-  public void planDot(final String fn) throws Exception {
-    final CachedOutput out = new CachedOutput();
-    planDot(fn, out, new DOTSerializer(out));
   }
   
   @Override

@@ -41,7 +41,7 @@ public final class BaseXServer {
   /** Flag for server activity. */
   boolean running = true;
   /** Verbose mode. */
-  boolean verbose = false;
+  boolean verbose;
   
   /** Client ip addresses. */
   private final String[] client = new String[MAX];

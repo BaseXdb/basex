@@ -168,7 +168,7 @@ public abstract class Fun extends Expr {
   }
 
   @Override
-  public String color() {
+  public final String color() {
     return "9999FF";
   }
 }

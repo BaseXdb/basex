@@ -15,7 +15,7 @@ import org.basex.query.fs.Exception.PathNotFoundException;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Hannes Schwarz - Hannes.Schwarz@gmail.com
  */
-public class LS {
+public final class LS {
 
   /** BaseX table. */
   private final Data data;

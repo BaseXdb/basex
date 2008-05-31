@@ -11,10 +11,6 @@ public final class IntArrayList {
   public int[][] list = new int[8][];
   /** Current array size. */
   public int size;
-  /** Current used buckets - SPECIAL COUNT, NOT GENERAL. **/
-  public int nb = 0;
-  /** Flag for found values in list. **/
-  public boolean found = false;
   
   /**
    * Default constructor.
@@ -31,7 +27,6 @@ public final class IntArrayList {
     list = new int[is][];
   }
   
-  
   /**
    * Adds next value.
    * @param v value to be added
@@ -39,20 +34,6 @@ public final class IntArrayList {
   public void add(final int[] v) {
     if(size == list.length) list = Array.extend(list);
     list[size++] = v;
-    nb += v.length;
-  }
-  
-  /**
-   * Adds next value.
-   * @param v value to be added
-   * @param index int index where to add v
-   */
-  public void addAt(final int[] v, final int index) {
-    if(size == list.length) list = Array.extend(list);
-    System.arraycopy(list, index, list, index + 1, size - index);
-    list[index] = v;
-    size++;
-    nb += v.length;
   }
   
   /**

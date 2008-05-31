@@ -10,7 +10,7 @@ import org.basex.index.CTArrayNew;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class IndexTest {
+public final class IndexTest {
   /** Number of tokens to create. */
   private int nrTokens = 50000;
 

@@ -357,7 +357,7 @@ public enum Commands {
   public static String[] list() {
     final StringList list = new StringList();
     for(Commands cmd : values()) {
-      String name = cmd.name();
+      final String name = cmd.name();
       if(name.startsWith("DUMMY") || cmd.hidden || cmd.server()) continue;
       list.add(name.toLowerCase());
     }

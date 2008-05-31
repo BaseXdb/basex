@@ -44,7 +44,7 @@ public abstract class Serializer {
    * @param expr expression info
    * @throws Exception exception
    */
-  public void startElement(final ExprInfo expr) throws Exception {
+  public final void startElement(final ExprInfo expr) throws Exception {
     startElement(name(expr));
   }
 
@@ -96,7 +96,7 @@ public abstract class Serializer {
    * @param a attributes
    * @throws Exception exception
    */
-  public void emptyElement(final ExprInfo expr, final byte[]... a)
+  public final void emptyElement(final ExprInfo expr, final byte[]... a)
       throws Exception {
     emptyElement(name(expr), a);
   }
@@ -107,7 +107,8 @@ public abstract class Serializer {
    * @param a attributes
    * @throws Exception exception
    */
-  public void emptyElement(final byte[] t, final byte[]... a) throws Exception {
+  public final void emptyElement(final byte[] t, final byte[]... a)
+      throws Exception {
     startElement(t);
     for(int i = 0; i < a.length; i += 2) attribute(a[i], a[i + 1]);
     emptyElement();
@@ -130,7 +131,7 @@ public abstract class Serializer {
    * @param expr expression info
    * @throws Exception exception
    */
-  public void closeElement(final ExprInfo expr) throws Exception {
+  public final void closeElement(final ExprInfo expr) throws Exception {
     closeElement(name(expr));
   }
 
@@ -168,7 +169,7 @@ public abstract class Serializer {
    * @param c content
    * @throws Exception exception
    */
-  public void pi(final byte[] c) throws Exception {
+  public final void pi(final byte[] c) throws Exception {
     byte[] n = c;
     byte[] v = Token.EMPTY;
     final int i = Token.indexOf(n, ' ');
@@ -210,7 +211,7 @@ public abstract class Serializer {
    * @return last p value
    * @throws Exception exception
    */
-  public int xml(final Data data, final int pre) throws Exception {
+  public final int xml(final Data data, final int pre) throws Exception {
     int p = pre;
     final int kind = data.kind(p);
     if(kind == Data.TEXT) {
@@ -237,7 +238,7 @@ public abstract class Serializer {
    * @return last p value
    * @throws Exception exception
    */
-  public int elem(final Data data, final int pos) throws Exception {
+  public final int elem(final Data data, final int pos) throws Exception {
     // stacks
     final int[] parent = new int[256];
     final byte[][] token = new byte[256][];

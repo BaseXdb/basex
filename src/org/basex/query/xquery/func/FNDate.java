@@ -265,7 +265,7 @@ final class FNDate extends Fun {
       Token.toInt(Token.substring(zone, 3));
 
     if(zon == null) {
-      if(date.zone) date.sec -= (date.zshift - cshift) * 60;
+      if(date.zone) date.sec -= 60L * (date.zshift - cshift);
       date.zone = true;
       date.zshift = cshift;
     } else {

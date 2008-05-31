@@ -51,7 +51,7 @@ public final class XMLScanner {
   /** Opening tag found. */
   private boolean prolog = true;
   /** Tag flag. */
-  private boolean tag = false;
+  private boolean tag;
   /** Current quote character. */
   private int quote;
 
@@ -227,7 +227,7 @@ public final class XMLScanner {
     } else if(isFirstLetter(c)) {
       // scan tag name...
       type = state == State.ATT ? Type.ATTNAME : Type.TAGNAME;
-      do token.addUTF(c); while(isLetter(c = nextChar()));
+      do token.addUTF(c); while(isLetterOrDigit(c = nextChar()));
       prev(1);
       state = State.ATT;
     } else {
@@ -635,7 +635,7 @@ public final class XMLScanner {
       prev(1);
       return null;
     }
-    do name.addUTF(c); while(isLetter(c = nextChar()));
+    do name.addUTF(c); while(isLetterOrDigit(c = nextChar()));
     prev(1);
     return name.finish();
   }
@@ -648,7 +648,7 @@ public final class XMLScanner {
   private byte[] nmtoken() throws BuildException {
     final TokenBuilder name = new TokenBuilder();
     int c;
-    while(isLetter(c = nextChar())) name.addUTF(c);
+    while(isLetterOrDigit(c = nextChar())) name.addUTF(c);
     prev(1);
     if(name.size == 0) error(INVNAME);
     return name.finish();
@@ -716,7 +716,7 @@ public final class XMLScanner {
           if(s(ch)) ch = nextChar();
           if(ch != '?' || nextChar() != '>') error(DECLWRONG);
 
-          byte[] c = new byte[cont.length - input.pos()];
+          final byte[] c = new byte[cont.length - input.pos()];
           System.arraycopy(cont, input.pos(), c, 0, c.length);
           cont = c;
         }
@@ -747,7 +747,8 @@ public final class XMLScanner {
     final int qu = qu();
     int ch;
     while((ch = nextChar()) != qu) {
-      if(!isLetter(ch) && !contains(PUBIDTOK, ch)) error(PUBID, (char) ch);
+      if(!isLetterOrDigit(ch) && !contains(PUBIDTOK, ch))
+        error(PUBID, (char) ch);
     }
   }
 
@@ -769,7 +770,7 @@ public final class XMLScanner {
       //pe = true;
 
       s(); // [61
-      boolean incl = consume(INCL);
+      final boolean incl = consume(INCL);
       if(!incl) check(IGNO);
       s();
       check('[');
@@ -1005,8 +1006,8 @@ public final class XMLScanner {
     if(!consume(STANDALONE)) return null;
     s(); check('='); s();
     final int d = qu();
-    boolean yes = consume(STANDYES);
-    boolean no = !yes && consume(STANDNO);
+    final boolean yes = consume(STANDYES);
+    final boolean no = !yes && consume(STANDNO);
     check((char) d);
     if(!yes && !no) error(DECLSTANDALONE);
     return yes ? STANDYES : STANDNO;
@@ -1036,6 +1037,7 @@ public final class XMLScanner {
    * @return per cent
    */
   public double percent() {
+    System.out.println(input.pos() + "/" + input.length());
     return (double) input.pos() / input.length();
   }
 

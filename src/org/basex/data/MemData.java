@@ -36,7 +36,7 @@ import org.basex.query.xpath.expr.FTOption;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class MemData extends Data {
+public final class MemData extends Data {
   /** Value array. */
   private long[] val;
 
@@ -70,47 +70,47 @@ public class MemData extends Data {
   public void openIndex(final Index.TYPE type, final Index ind) { }
 
   @Override
-  public final int kind(final int pre) {
+  public int kind(final int pre) {
     return (int) (val[pre] >>> 61);
   }
 
   @Override
-  public final int parent(final int pre, final int kind) {
+  public int parent(final int pre, final int kind) {
     return pre - (int) (val[pre] & 0xFFFFFF);
   }
 
   @Override
-  public final int size(final int pre, final int kind) {
+  public int size(final int pre, final int kind) {
     return kind == ELEM || kind == DOC ? (int) (val[pre] >> 32 & 0xFFFFFF) : 1;
   }
 
   @Override
-  public final int tagID(final int pre) {
+  public int tagID(final int pre) {
     return (int) (val[pre] >>> 24) & 0x3F;
   }
 
   @Override
-  public final int tagNS(final int pre) {
+  public int tagNS(final int pre) {
     return (int) (val[pre] >>> 30) & 0x3;
   }
 
   @Override
-  public final int attSize(final int pre, final int kind) {
+  public int attSize(final int pre, final int kind) {
     return kind == ELEM ? (int) (val[pre] >> 56 & 0x1F) : 1;
   }
 
   @Override
-  public final int attNameID(final int pre) {
+  public int attNameID(final int pre) {
     return (int) (val[pre] >>> 24) & 0x3F;
   }
 
   @Override
-  public final int attNS(final int pre) {
+  public int attNS(final int pre) {
     return (int) (val[pre] >>> 30) & 0x3;
   }
 
   @Override
-  public final byte[] text(final int pre) {
+  public byte[] text(final int pre) {
     return textToken((int) (val[pre] >> 32) & 0x1FFFFFFF);
   }
 
@@ -121,37 +121,37 @@ public class MemData extends Data {
   }
 
   @Override
-  public final int id(final int pre) {
+  public int id(final int pre) {
     return pre;
   }
 
   @Override
-  public final int pre(final int id) {
+  public int pre(final int id) {
     return id;
   }
 
   @Override
-  public final double textNum(final int pre) {
+  public double textNum(final int pre) {
     return Token.toDouble(text(pre));
   }
 
   @Override
-  public final byte[] attValue(final int pre) {
+  public byte[] attValue(final int pre) {
     return attToken((int) (val[pre] >> 32) & 0x1FFFFFFF);
   }
 
   @Override
-  public final double attNum(final int pre) {
+  public double attNum(final int pre) {
     return Token.toDouble(attValue(pre));
   }
 
   @Override
-  public final int textLen(final int pre) {
+  public int textLen(final int pre) {
     return text(pre).length;
   }
 
   @Override
-  public final int attLen(final int pre) {
+  public int attLen(final int pre) {
     return attValue(pre).length;
   }
 
@@ -160,7 +160,7 @@ public class MemData extends Data {
    * @param v attribute value
    * @return id
    */
-  public final int attID(final byte[] v) {
+  public int attID(final byte[] v) {
     return ((MemValues) atvindex).get(v);
   }
 
@@ -169,7 +169,7 @@ public class MemData extends Data {
    * @param id index id
    * @return value
    */
-  public final byte[] attToken(final int id) {
+  public byte[] attToken(final int id) {
     return ((MemValues) atvindex).token(id);
   }
 
@@ -178,7 +178,7 @@ public class MemData extends Data {
    * @param t attribute value
    * @return index reference
    */
-  protected final int attIndex(final byte[] t) {
+  protected int attIndex(final byte[] t) {
     return ((MemValues) atvindex).index(t, size);
   }
 
@@ -187,7 +187,7 @@ public class MemData extends Data {
    * @param t text node
    * @return index reference
    */
-  protected final int textIndex(final byte[] t) {
+  protected int textIndex(final byte[] t) {
     return ((MemValues) txtindex).index(t, size);
   }
 
@@ -196,7 +196,7 @@ public class MemData extends Data {
    * @param id index id
    * @return value
    */
-  public final byte[] textToken(final int id) {
+  public byte[] textToken(final int id) {
     return ((MemValues) txtindex).token(id);
   }
 
@@ -208,7 +208,7 @@ public class MemData extends Data {
    * @param s node size
    * @param k node kind
    */
-  public final void addElem(final byte[] t, final int d, final int a,
+  public void addElem(final byte[] t, final int d, final int a,
       final int s, final int k) {
     addElem(tags.index(t, null), ns.get(t), d, a, s, k);
   }
@@ -222,7 +222,7 @@ public class MemData extends Data {
    * @param s node size
    * @param k node kind
    */
-  public final void addElem(final int t, final int n, final int d, final int a,
+  public void addElem(final int t, final int n, final int d, final int a,
       final int s, final int k) {
 
     check();
@@ -237,7 +237,7 @@ public class MemData extends Data {
    * @param v attribute value
    * @param d distance
    */
-  public final void addAtt(final int a, final int n, final byte[] v,
+  public void addAtt(final int a, final int n, final byte[] v,
       final int d) {
 
     check();
@@ -252,7 +252,7 @@ public class MemData extends Data {
    * @param d distance
    * @param k node kind
    */
-  public final void addText(final byte[] t, final int d, final int k) {
+  public void addText(final byte[] t, final int d, final int k) {
     check();
     final long ti = textIndex(t);
     val[size++] = ((long) k << 61) + (ti << 32) + d;
@@ -262,7 +262,7 @@ public class MemData extends Data {
    * Adds the size value to the table.
    * @param pre closing pre tag
    */
-  public final void finishElem(final int pre) {
+  public void finishElem(final int pre) {
     val[pre] = (val[pre] & 0xFF000000FFFFFFFFL) + ((long) (size - pre) << 32);
   }
 
@@ -271,7 +271,7 @@ public class MemData extends Data {
    * @param d data reference
    * @param p position
    */
-  public final void append(final MemData d, final int p) {
+  public void append(final MemData d, final int p) {
     check();
     val[size++] = d.val[p];
   }
@@ -282,7 +282,7 @@ public class MemData extends Data {
    * @param v attribute value
    * @param p parent
    */
-  public final void addAtt(final byte[] a, final byte[] v, final int p) {
+  public void addAtt(final byte[] a, final byte[] v, final int p) {
     addAtt(atts.index(a, v), ns.get(a), v, p);
   }
 
@@ -293,7 +293,7 @@ public class MemData extends Data {
    * @param d data instance
    * @param pos insertion position
    */
-  public final void insert(final MemData d, final int pos) {
+  public void insert(final MemData d, final int pos) {
     final int s = d.size;
     while(size + s >= val.length) val = Array.extend(val);
 
@@ -331,29 +331,29 @@ public class MemData extends Data {
   }
 
   @Override
-  public final int nrFTIDs(final byte[] token) {
+  public int nrFTIDs(final byte[] token) {
     BaseX.notimplemented();
     return 0;
   }
 
   @Override
-  public final void info(final PrintOutput out) {
+  public void info(final PrintOutput out) {
     BaseX.notimplemented();
   }
 
   @Override
-  public final void delete(final int pre) {
+  public void delete(final int pre) {
     BaseX.noupdates();
   }
 
   @Override
-  public final void update(final int pre, final byte[] attName,
+  public void update(final int pre, final byte[] attName,
       final byte[] attValue) {
     BaseX.noupdates();
   }
 
   @Override
-  public final void insert(final int pre, final int par, final byte[] tag,
+  public void insert(final int pre, final int par, final byte[] tag,
       final byte kind) {
     BaseX.noupdates();
   }
@@ -365,12 +365,12 @@ public class MemData extends Data {
   }
 
   @Override
-  public final void insert(final int pre, final int par, final Data d) {
+  public void insert(final int pre, final int par, final Data d) {
     BaseX.noupdates();
   }
 
   @Override
-  public final void update(final int pre, final byte[] text) {
+  public void update(final int pre, final byte[] text) {
     BaseX.noupdates();
   }
 }

@@ -36,7 +36,7 @@ public final class XMLParser extends Parser {
   @Override
   public void parse(final Builder build) throws IOException {
     builder = build;
-    builder.encoding(scanner.encoding);
+    //builder.encoding(scanner.encoding);
 
     // loop until all tokens have been processed
     scanner.more();

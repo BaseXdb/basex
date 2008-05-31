@@ -13,7 +13,7 @@ import org.basex.util.GetOpts;
  * @author Hannes Schwarz - Hannes.Schwarz@gmail.com
  *
  */
-public class GREP {
+public final class GREP {
 
   /** Data reference. */
   private final Context context;

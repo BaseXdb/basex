@@ -36,7 +36,7 @@ public final class CmpG extends Arr {
     NE("!=", CmpV.COMP.NE);
 
     /** String representation. */
-    public final byte[] name;
+    public final String name;
     /** Comparator. */
     public final CmpV.COMP cmp;
 
@@ -46,12 +46,12 @@ public final class CmpG extends Arr {
      * @param c comparator
      */
     COMP(final String n, final CmpV.COMP c) {
-      name = Token.token(n);
+      name = n;
       cmp = c;
     }
     
     @Override
-    public String toString() { return Token.string(name); }
+    public String toString() { return name; }
   };
 
   /** Comparator. */
@@ -154,7 +154,7 @@ public final class CmpG extends Arr {
 
   @Override
   public void plan(final Serializer ser) throws Exception {
-    ser.openElement(this, TYPE, cmp.name, EVAL, ITER);
+    ser.openElement(this, TYPE, Token.token(cmp.name), EVAL, ITER);
     for(final Expr e : expr) e.plan(ser);
     ser.closeElement(this);
   }

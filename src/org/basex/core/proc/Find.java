@@ -166,7 +166,7 @@ public final class Find extends XPath {
         final long time = new GregorianCalendar(y, m, d).getTime().getTime();
         t = Long.toString(time / 60000);
       } else {
-        int d = t.lastIndexOf(".");
+        final int d = t.lastIndexOf(".");
         // dot found... add suffix check
         if(d != -1) xpath.add("[@suffix = \"" + t.substring(d + 1) + "\"]");
         t = "\"" + t + "\"";

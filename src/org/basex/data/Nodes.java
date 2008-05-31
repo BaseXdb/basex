@@ -19,9 +19,9 @@ public final class Nodes implements Result {
   /** Number of stored nodes. */
   public int size;
   /** Fulltext data (pre values and positions). */
-  public int[][] ftpos = null;
+  public int[][] ftpos;
   /** Fulltext pointer values, linking pre values and query strings. */
-  public int[] ftpoin = null;
+  public int[] ftpoin;
   /** Fulltext search string from query. **/
   public byte[][] ftss;
   
@@ -108,13 +108,10 @@ public final class Nodes implements Result {
    * 
    * @param ftprepos pre values and position values
    * @param ftpointer pointer for pre values
-   * @param ftsearchstrings byte[][] search strings out of query
    */
-  public void setFTData(final int[][] ftprepos, final int[] ftpointer, 
-      final byte[][] ftsearchstrings) {
+  public void setFTData(final int[][] ftprepos, final int[] ftpointer) {
     ftpos = ftprepos;
     ftpoin = ftpointer;
-    ftss = ftsearchstrings;
   }
   
   /**
@@ -173,7 +170,7 @@ public final class Nodes implements Result {
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(getClass().getSimpleName());
-    tb.add("[");
+    tb.add('[');
     for(int i = 0; i < size; i++) {
       if(i > 0) tb.add(',');
       tb.add(pre[i]);

@@ -25,7 +25,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class FunJava extends Arr {
+public final class FunJava extends Arr {
   /** Java class. */
   public final Class<?> cls;
   /** Java method. */
@@ -196,12 +196,12 @@ public class FunJava extends Arr {
   }
 
   @Override
-  public final String toString() {
+  public String toString() {
     return cls + "." + mth + "(" + toString(", ") + ")";
   }
 
   @Override
-  public final String info() {
+  public String info() {
     return cls + "." + mth + "(...)";
   }
 

@@ -15,7 +15,7 @@ import org.basex.util.Token;
  * @author Hannes Schwarz - Hannes.Schwarz@gmail.com
  *
  */
-public class DU {
+public final class DU {
 
   /** Data reference. */
   private final Context context;

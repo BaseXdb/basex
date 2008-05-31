@@ -204,7 +204,7 @@ public class BaseXClient {
    * @param v verbose flag
    * @return true if operation was successful
    */
-  protected boolean process(final Command cmd, final boolean v) {
+  protected final boolean process(final Command cmd, final boolean v) {
     final AbstractProcess proc = getProcess(cmd);
     try {
       final boolean ok = proc.execute();

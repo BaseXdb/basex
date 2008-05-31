@@ -10,7 +10,7 @@ import org.basex.data.Data;
  * @author Christian Gruen
  *
  */
-public class DirIterator {
+public final class DirIterator {
   /** Data reference. */
   final Data data;
   /** Maximum size. */

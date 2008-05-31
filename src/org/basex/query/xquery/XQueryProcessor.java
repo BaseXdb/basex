@@ -44,7 +44,7 @@ public final class XQueryProcessor extends QueryProcessor {
    * @param in input to be parsed
    * @throws QueryException query exception
    */
-  public void parse(final byte[] in) throws QueryException {
+  public void parse(final String in) throws QueryException {
     new XQParser(ctx).parse(in);
   }
 

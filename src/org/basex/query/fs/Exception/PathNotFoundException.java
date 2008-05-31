@@ -8,7 +8,7 @@ import static org.basex.Text.NL;
  * @author Hannes Schwarz - Hannes.Schwarz@gmail.com
  *
  */
-public class PathNotFoundException extends RuntimeException {
+public final class PathNotFoundException extends RuntimeException {
 
   /** path expression. */ 
   private String path;

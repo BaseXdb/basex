@@ -9,7 +9,7 @@ import org.basex.query.xquery.item.Itr;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class RangeIter extends Iter {
+public final class RangeIter extends Iter {
   /** Minimum value. */
   private long min;
   /** Maximum value. */

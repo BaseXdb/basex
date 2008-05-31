@@ -118,7 +118,7 @@ public final class DOTSerializer extends Serializer {
   public void closeElement(final byte[] t) throws IOException {
     level--;
     if(level == -1) return;
-    int c = nodes.get(level);
+    final int c = nodes.get(level);
     for(int i = 0; i < children[level].size; i++) {
       out.println(BaseX.info(LINK, c, children[level].get(i)));
     }
@@ -152,7 +152,7 @@ public final class DOTSerializer extends Serializer {
    * @throws IOException exception
    */
   protected void print(final byte[] t, final String col) throws IOException {
-    byte[] text = t.length > 60 ? Token.concat(
+    final byte[] text = t.length > 60 ? Token.concat(
         Token.substring(t, 0, 60), Token.DOTS) : t;
     out.println(BaseX.info(NODE, count, text, col));
     nodes.set(count, level);

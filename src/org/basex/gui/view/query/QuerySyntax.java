@@ -6,7 +6,7 @@ import java.util.HashSet;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXSyntax;
 import org.basex.query.xquery.XQTokens;
-import org.basex.util.Token;
+import org.basex.util.XMLToken;
 
 /**
  * This abstract class defines syntax highlighting of text panels.
@@ -33,7 +33,7 @@ public final class QuerySyntax extends BaseXSyntax {
       for(final Field f : XQTokens.class.getFields()) {
         final String name = f.getName();
         if(name.equals("SKIP")) break;
-        keys.add(Token.string((byte[]) f.get(null)));
+        keys.add((String) f.get(null));
       }
     } catch(final Exception ex) {
       ex.printStackTrace();
@@ -48,12 +48,12 @@ public final class QuerySyntax extends BaseXSyntax {
 
   @Override
   public Color getColor(final String word) {
-    char ch = word.charAt(0);
+    final char ch = word.charAt(0);
 
     // quotes
     if(quote == 0 && (ch == '"' || ch == '\'')) {
       quote = ch;
-      ch = 0;
+      return GUIConstants.COLORERROR;
     }
     if(quote != 0) {
       if(ch == quote) quote = 0;
@@ -63,11 +63,10 @@ public final class QuerySyntax extends BaseXSyntax {
     // variables
     if(ch == '$') {
       var = true;
-      ch = '.';
+      return VAR;
     }
     if(var) {
-      var &= Character.isLetterOrDigit(ch) ||
-        ch == ':' || ch == '.' || ch == '-';
+      var &= XMLToken.isLetterOrDigit(ch);
       return VAR;
     }
 
@@ -75,7 +74,7 @@ public final class QuerySyntax extends BaseXSyntax {
     if(keys.contains(word)) return GUIConstants.COLORQUOTE;
 
     // special characters
-    if(!Token.letterOrDigit(ch)) return KEY;
+    if(!XMLToken.isXMLLetterOrDigit(ch)) return KEY;
 
     // letters and numbers
     return Color.black;

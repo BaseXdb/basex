@@ -100,7 +100,7 @@ public class FLWR extends Single {
   }
 
   @Override
-  public String color() {
+  public final String color() {
     return "99FF99";
   }
 

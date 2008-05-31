@@ -41,7 +41,7 @@ public interface Text {
   /** URL. */
   String URL = "http://www.basex.org";
   /** Code version. */
-  String VERSION = "4.06";
+  String VERSION = "4.07";
   /** Company Info. */
   String COMPANY = "DBIS, University of Konstanz";
 
@@ -764,8 +764,6 @@ public interface Text {
   String PREFNAMES = lang("dp_names");
   /** Name Attributes. */
   String PREFLANG = lang("dp_lang");
-  /** Name Attributes. */
-  String PREFLANGNEW = lang("dp_langnew");
 
   /** Dialog title for deleting nodes. */
   String DELETETITLE = lang("dx_title");

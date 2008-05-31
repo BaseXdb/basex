@@ -128,8 +128,8 @@ public final class FSParser extends Parser implements FSVisitor {
         if(index != null && f.length() != 0) {
           try {
             index.extract(builder, f);
-          } catch(MetaDataException e) {
-            BaseX.debug(e);
+          } catch(final MetaDataException ex) {
+            BaseX.debug(ex);
           }
         }
       }

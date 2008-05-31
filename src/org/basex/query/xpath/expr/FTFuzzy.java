@@ -16,7 +16,7 @@ import static org.basex.query.xpath.XPText.*;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class FTFuzzy extends Comparison {
+public final class FTFuzzy extends Comparison {
   /** Result of index request - currently only pre values are saved. */
   int[] ids;
   /** Flag for FuzzyIndex use. */

@@ -114,7 +114,7 @@ public abstract class QueryContext extends Progress {
    * @param fn name of xml file
    * @throws Exception exception
    */
-  public void planXML(final String fn) throws Exception {
+  public final void planXML(final String fn) throws Exception {
     final CachedOutput out = new CachedOutput();
     final PrintSerializer ser = new PrintSerializer(out, true, true);
     ser.openElement(PLAN);
@@ -128,10 +128,9 @@ public abstract class QueryContext extends Progress {
    * @param fn name of dot file
    * @throws Exception exception
    */
-  public void planDot(final String fn) throws Exception {
+  public final void planDot(final String fn) throws Exception {
     final CachedOutput out = new CachedOutput();
-    final DOTSerializer ser = new DOTSerializer(out);
-    planDot(fn, out, ser);
+    planDot(fn, out, new DOTSerializer(out));
   }
   
   /**
@@ -141,7 +140,7 @@ public abstract class QueryContext extends Progress {
    * @param ser serializer
    * @throws Exception exception
    */
-  protected void planDot(final String fn, final CachedOutput out,
+  protected final void planDot(final String fn, final CachedOutput out,
       final DOTSerializer ser) throws Exception {
     ser.open(1);
     ser.openElement(PLAN);
@@ -157,7 +156,8 @@ public abstract class QueryContext extends Progress {
    * @param cont content
    * @throws Exception exception
    */
-  protected void dot(final String file, final byte[] cont) throws Exception {
+  protected final void dot(final String file, final byte[] cont)
+      throws Exception {
     new IO(file).write(cont);
     new ProcessBuilder(Prop.dotty, file).start().waitFor();
   }

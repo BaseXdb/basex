@@ -26,7 +26,7 @@ public class BufferInput {
   /** Reference to the data input stream. */
   private InputStream in;
   /** Default encoding for text files. */
-  private String encoding = Token.UTF8;
+  private String enc = Token.UTF8;
 
   /**
    * Empty constructor.
@@ -49,6 +49,7 @@ public class BufferInput {
    */
   public BufferInput(final File file) throws IOException {
     this(new FileInputStream(file));
+    length = file.length();
   }
 
   /**
@@ -67,7 +68,6 @@ public class BufferInput {
    */
   public BufferInput(final String file, final byte[] buf) throws IOException {
     this(new FileInputStream(file), buf);
-    length = file.length();
   }
 
   /**
@@ -84,16 +84,16 @@ public class BufferInput {
   /**
    * Determines the file encoding.
    */
-  public void encoding() {
+  public final void encoding() {
     final byte a = length > 0 ? buffer[0] : 0;
     final byte b = length > 1 ? buffer[1] : 0;
     final byte c = length > 2 ? buffer[2] : 0;
     final byte d = length > 3 ? buffer[3] : 0;
     if(a == -1 && b == -2 || a == '<' && b == 0 && c == '?' && d == 0) {
-      encoding = Token.UTF16LE;
+      enc = Token.UTF16LE;
       if(a == -1) pos = 2;
     } else if(a == -2 && b == -1 || a == 0 && b == '<' && c == 0 && d == '?') {
-      encoding = Token.UTF16BE;
+      enc = Token.UTF16BE;
       if(a == -2) pos = 2;
     } else if(a == -0x11 && b == -0x45 && c == -0x41) {
       pos = 3;
@@ -132,7 +132,7 @@ public class BufferInput {
   /**
    * Reads the next buffer entry.
    */
-  protected void next() {
+  protected final void next() {
     try {
       pos = 0;
       len += size;
@@ -146,19 +146,29 @@ public class BufferInput {
    * Returns the next character.
    * @return next character
    */
-  public int readChar() {
+  public final int readChar() {
     // support encodings..
     byte ch = readByte();
-    if(encoding == Token.UTF16LE) readByte();
-    if(encoding == Token.UTF16BE) ch = readByte();
-    return ch;
+    if(enc == Token.UTF16LE) return (ch & 0xFF) | (readByte() << 8) & 0xFF;
+    if(enc == Token.UTF16BE) return ((ch & 0xFF) << 8) | readByte() & 0xFF;
+    if(enc == Token.UTF8) {
+      final int cl = Token.cl(ch);
+      if(cl == 1) return ch & 0xFF;
+      CACHE[0] = ch;
+      for(int c = 1; c < cl; c++) CACHE[c] = readByte();
+      return Token.cp(CACHE, 0);
+    }
+    return ch & 0xFF;
   }
+  
+  /** UTF8 cache. */
+  private static final byte[] CACHE = new byte[4];
 
   /**
    * Closes the input stream.
    * @throws IOException IO Exception
    */
-  public void close() throws IOException {
+  public final void close() throws IOException {
     if(in != null) in.close();
   }
 

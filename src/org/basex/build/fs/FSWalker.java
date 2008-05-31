@@ -92,8 +92,8 @@ public final class FSWalker {
         else if(f.isDirectory()) descend(f);
         else for(final FSVisitor v : visitors)
           v.regfileEvent(f);
-      } catch(IOException e) {
-        BaseX.debug(f + FSText.IOEXSKIP + e.getMessage());
+      } catch(final IOException ex) {
+        BaseX.debug(f + FSText.IOEXSKIP + ex.getMessage());
       }
     }
   }

@@ -49,7 +49,7 @@ public final class BaseXText extends BaseXPanel {
   /** Editable flag. */
   final boolean editable;
   /** Popup Menu. */
-  BaseXPopup popup;
+  final BaseXPopup popup;
   
   /**
    * Default constructor.
@@ -196,7 +196,10 @@ public final class BaseXText extends BaseXPanel {
 
   @Override
   public void setFont(final Font f) {
-    if(rend != null) rend.setFont(f);
+    if(rend != null) {
+      rend.setFont(f);
+      rend.repaint();
+    }
   }
 
   /**
@@ -316,11 +319,11 @@ public final class BaseXText extends BaseXPanel {
   @Override
   public void keyPressed(final KeyEvent e) {
     final int c = e.getKeyCode();
-    text.pos(text.cursor());
-    cursor();
-
     if(e.isAltDown() || e.isMetaDown() || c == KeyEvent.VK_SHIFT ||
         c == KeyEvent.VK_CONTROL || c == KeyEvent.VK_ESCAPE) return;
+
+    text.pos(text.cursor());
+    cursor();
 
     final byte[] txt = text.text;
     final boolean ctrl = e.isControlDown();
@@ -328,7 +331,7 @@ public final class BaseXText extends BaseXPanel {
     
     boolean down = true;
     if(!ctrl && !e.isActionKey()) return;
-    
+
     if(c != KeyEvent.VK_DOWN && c != KeyEvent.VK_UP) col = -1;
 
     if(ctrl && !shf) {
@@ -477,6 +480,10 @@ public final class BaseXText extends BaseXPanel {
     boolean down = true;
 
     final boolean ctrl = e.isControlDown();
+    if(e.isAltDown() || e.isMetaDown() || e.isActionKey() ||
+        ch == KeyEvent.VK_ESCAPE) return;
+
+    text.pos(text.cursor());
     if(ch == KeyEvent.VK_BACK_SPACE) {
       if(text.start() == -1) {
         if(text.pos() == 0) return;
@@ -497,7 +504,8 @@ public final class BaseXText extends BaseXPanel {
         while(text.pos() < text.size &&
             ld == Character.isLetterOrDigit(text.curr())) text.delete();
       }
-    } else if(!e.isControlDown() && !e.isActionKey()) {
+    } else {
+      if(ctrl) return;
       if(text.start() != -1) text.delete();
       text.add(new char[] { ch });
     }
@@ -629,7 +637,7 @@ public final class BaseXText extends BaseXPanel {
   }
 
   /** Calculation counter. */
-  Action calc = new Action() {
+  final Action calc = new Action() {
     @Override
     public void action() {
       rend.calc();

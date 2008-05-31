@@ -23,7 +23,7 @@ import org.xml.sax.InputSource;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class IO {
+public final class IO {
   /** BaseX Suffix. */
   public static final String BASEXSUFFIX = ".basex";
   /** XQuery Suffix. */

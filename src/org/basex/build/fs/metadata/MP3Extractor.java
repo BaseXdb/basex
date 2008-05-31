@@ -302,8 +302,8 @@ public final class MP3Extractor extends AbstractExtractor {
       } else {
         BaseX.debug(ID3INVALID, file.getName());
       }
-    } catch(MetaDataException e) {
-      BaseX.debug(e);
+    } catch(final MetaDataException ex) {
+      BaseX.debug(ex);
     }
 
     if(found) builder.endNode(AUDIO);

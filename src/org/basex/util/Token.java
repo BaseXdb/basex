@@ -208,7 +208,7 @@ public final class Token {
    * @param v first character byte
    * @return character length
    */
-  public static int cl(final int v) {
+  public static int cl(final byte v) {
     return CHLEN[(v & 0xFF) >> 4];
   }
 

@@ -1,8 +1,6 @@
 package org.basex.query.xpath;
 
-import static org.basex.util.Token.*;
 import org.basex.core.Prop;
-import org.basex.util.Token;
 
 /**
  * This class assembles textual information of the XPath package.
@@ -17,97 +15,96 @@ public interface XPText {
   // XPath Parser =============================================================
   
   /** Node Test. */
-  byte[] NODE = Token.token("node");
+  String NODE = "node";
   /** Node Test. */
-  byte[] TEXT = Token.token("text");
+  String TEXT = "text";
   /** Node Test. */
-  byte[] COMMENT = Token.token("comment");
+  String COMMENT = "comment";
   /** Node Test. */
-  byte[] PI = Token.token("processing-instruction");
+  String PI = "processing-instruction";
   /** Element Test. */
-  byte[] ELEM = Token.token("*");
+  String ELEM = "*";
   /** Attribute name. */
-  byte[] TYPE = token("type");
+  String TYPE = "type";
   /** Parser token. */
-  byte[] QUOTE = token("quote");
+  String QUOTE = "quote";
 
   /** Parser token. */
-  byte[] DBLCOLON = token("::");
+  String DBLCOLON = "::";
   /** Parser token. */
-  byte[] OR = token("or");
+  String OR = "or";
   /** Parser token. */
-  byte[] AND = token("and");
+  String AND = "and";
   /** Parser token. */
-  byte[] FTCONTAINS = token("ftcontains");
+  String FTCONTAINS = "ftcontains";
   /** Parser token. */
-  byte[] FTOR = token("ftor");
+  String FTOR = "ftor";
   /** Parser token. */
-  byte[] FTAND = token("ftand");
+  String FTAND = "ftand";
   /** Parser token. */
-  byte[] NOTIN = token("not in");
+  String NOTIN = "not in";
   /** Parser token. */
-  byte[] FTNOT = token("ftnot");
+  String FTNOT = "ftnot";
   /** Parser token. */
-  byte[] OCCURS = token("occurs");
+  String OCCURS = "occurs";
   /** Parser token. */
-  byte[] TIMES = token("times");
+  String TIMES = "times";
   /** Parser token. */
-  byte[] CASEINSENS = token("case insensitive");
+  String CASEINSENS = "case insensitive";
   /** Parser token. */
-  byte[] CASESENS = token("case sensitive");
+  String CASESENS = "case sensitive";
   /** Parser token. */
-  byte[] LOWERCASE = token("lowercase");
+  String LOWERCASE = "lowercase";
   /** Parser token. */
-  byte[] UPPERCASE = token("uppercase");
+  String UPPERCASE = "uppercase";
   /** Parser token. */
-  byte[] WITHWILD = token("with wildcards");
+  String WITHWILD = "with wildcards";
   /** Parser token. */
-  byte[] WITHOUTWILD = token("without wildcards");
+  String WITHOUTWILD = "without wildcards";
   /** Parser token. */
-  byte[] ORDERED = token("ordered");
+  String ORDERED = "ordered";
   /** Parser token. */
-  byte[] WINDOW = token("window");
+  String WINDOW = "window";
   /** Parser token. */
-  byte[] DISTANCE = token("distance");
+  String DISTANCE = "distance";
   /** Parser token. */
-  byte[] SAME = token("same");
+  String SAME = "same";
   /** Parser token. */
-  byte[] DIFFERENT = token("different");
+  String DIFFERENT = "different";
   /** Parser token. */
-  byte[] AT = token("at");
+  String AT = "at";
   /** Parser token. */
-  byte[] START = token("start");
+  String START = "start";
   /** Parser token. */
-  byte[] END = token("end");
+  String END = "end";
   /** Parser token. */
-  byte[] ENTIRE = token("entire");
+  String ENTIRE = "entire";
   /** Parser token. */
-  byte[] CONTENT = token("content");
+  String CONTENT = "content";
   /** Parser token. */
-  byte[] ENTCONT = token("entire content");
+  String ENTCONT = "entire content";
   /** Parser token. */
-  byte[] WORDS = token("words");
+  String WORDS = "words";
   /** Parser token. */
-  byte[] SENTENCES = token("sentences");
+  String SENTENCES = "sentences";
   /** Parser token. */
-  byte[] PARAGRAPHS = token("paragraphs");
+  String PARAGRAPHS = "paragraphs";
   /** Parser token. */
-  byte[] SENTENCE = token("sentence");
+  String SENTENCE = "sentence";
   /** Parser token. */
-  byte[] PARAGRAPH = token("paragraph");
+  String PARAGRAPH = "paragraph";
   /** Parser token. */
-  byte[] EXACTLY = token("exactly");
+  String EXACTLY = "exactly";
   /** Parser token. */
-  byte[] ATLEAST = token("at least");
+  String ATLEAST = "at least";
   /** Parser token. */
-  byte[] ATMOST = token("at most");
+  String ATMOST = "at most";
   /** Parser token. */
-  byte[] FROM = token("from");
+  String FROM = "from";
   /** Parser token. */
-  byte[] TO = token("to");
+  String TO = "to";
   /** Parser token. */
-  byte[] RANGE = token("range");
-  
+  String RANGE = "range";
   
   /** Parsing exception. */
   String QUERYDATA = "Please create database first.";

@@ -105,7 +105,7 @@ public final class OneOf extends InternalExpr {
 
   @Override
   public void plan(final Serializer ser) throws Exception {
-    ser.openElement(this, TYPE, Token.token(cmp.toString()));
+    ser.openElement(this, Token.token(TYPE), Token.token(cmp.toString()));
     path.plan(ser);
     for(final Expr val : vals) val.plan(ser);
     ser.closeElement(this);

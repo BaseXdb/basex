@@ -72,8 +72,8 @@ public final class Drop extends Proc {
     }
     if(type.equals(Create.FTX)) {
       data.meta.ftxindex = false;
-      Index.TYPE typ = data.meta.fzindex ? Index.TYPE.FUY : Index.TYPE.FTX;
-      return dropIndex(typ, DATAFTX);
+      return dropIndex(data.meta.fzindex ? Index.TYPE.FUY : Index.TYPE.FTX,
+          DATAFTX);
     }
     throw new IllegalArgumentException();
   }

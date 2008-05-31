@@ -111,14 +111,13 @@ dx_title=Delete Nodes
 dx_question=Are you sure?
 
 dp_title=Preferences
-dp_dbpath=Database Path
+dp_dbpath=Database Path (databases must be manually moved)
 dp_inter=GUI & Interactions
 dp_lf=Use Java Look & Feel (requires a restart)
 dp_focus=Realtime mouse focus
 dp_simplefd=Use simple file chooser
 dp_names=Replace tags with @name attributes
-dp_lang=Language
-dp_langnew=...requires a restart
+dp_lang=Language (requires a restart)
 
 dn_title=Insert new data
 dn_name=Name

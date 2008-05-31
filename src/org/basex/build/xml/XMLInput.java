@@ -17,7 +17,7 @@ final class XMLInput {
   BufferInput[] in = new BufferInput[1];
 
   /** Input pointer. */
-  int ip = 0;
+  int ip;
   /** Input file. */
   IO file;
   /** Current line. */
@@ -28,9 +28,9 @@ final class XMLInput {
   /** Buffer with most current characters. */
   private final int[] last = new int[16];
   /** Read position. */
-  private int lp = 0;
+  private int lp;
   /** Backward pointer. */
-  private int pp = 0;
+  private int pp;
   
   /**
    * Constructor.

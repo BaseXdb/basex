@@ -45,7 +45,7 @@ public final class DialogInsert extends Dialog {
     final BaseXBack pp = new BaseXBack();
     pp.setLayout(new BorderLayout());
 
-    BaseXBack b = new BaseXBack();
+    final BaseXBack b = new BaseXBack();
     b.setLayout(new TableLayout(5, 1, 0, 8));
 
     final BaseXLabel label = new BaseXLabel(INSERTNAME, true);

@@ -69,7 +69,7 @@ public abstract class Proc extends AbstractProcess {
    * @param ctx query context
    * @param comm command to be executed
    */
-  public void init(final Context ctx, final Command comm) {
+  public final void init(final Context ctx, final Command comm) {
     context = ctx;
     cmd = comm;
   }

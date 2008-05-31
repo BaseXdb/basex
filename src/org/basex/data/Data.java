@@ -481,7 +481,7 @@ public abstract class Data  {
   /**
    * Resets indexes and statistics.
    */
-  public void noIndex() {
+  public final void noIndex() {
     meta.noIndex();
     tags.noStats();
     atts.noStats();

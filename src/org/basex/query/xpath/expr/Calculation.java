@@ -7,6 +7,7 @@ import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.values.Calc;
 import org.basex.query.xpath.values.Num;
 import org.basex.query.xpath.values.Item;
+import org.basex.util.Token;
 
 /**
  * Calculation Expression.
@@ -54,7 +55,7 @@ public final class Calculation extends DualExpr {
 
   @Override
   public void plan(final Serializer ser) throws Exception {
-    ser.openElement(this, TYPE, type.name);
+    ser.openElement(this, Token.token(TYPE), Token.token(type.name));
     expr1.plan(ser);
     expr2.plan(ser);
     ser.closeElement(this);

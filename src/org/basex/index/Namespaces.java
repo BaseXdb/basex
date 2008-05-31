@@ -84,7 +84,7 @@ public final class Namespaces extends Set {
     while(--i > 0 && p < pre[i]);
     
     i = Math.min(sz - 1, i + 1);
-    int s = indexOf(n, ':');
+    final int s = indexOf(n, ':');
     if(s == -1) {
       for(; i >= 0; i--) if(pref[i].length == 0) return vals[i];
       return -1;
@@ -99,7 +99,7 @@ public final class Namespaces extends Set {
    */
   public int get(final byte[] n) {
     final int s = indexOf(n, ':');
-    if(s == -1) return 0;
+    if(s <= 0) return 0;
     return ns(n, s, sz - 1);
   }
 

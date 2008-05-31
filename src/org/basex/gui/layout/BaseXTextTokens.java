@@ -137,8 +137,9 @@ final class BaseXTextTokens {
    */
   int prev() {
     if(ps == 0) return '\n';
-    final int p = ps--;
-    while(ps > 0 && ps + Token.cl(text[ps]) > p) ps--;
+    final int p = ps;
+    ps = Math.max(0, ps - 5);
+    while(ps < p && ps + Token.cl(text[ps]) < p) ps++;
     return curr();
   }
 
@@ -214,7 +215,6 @@ final class BaseXTextTokens {
    * @param ch char array
    */
   void add(final char[] ch) {
-    // [CG] Add Text in Text Field: use same array if some space is left
     final TokenBuilder tb = new TokenBuilder();
     tb.add(text, 0, ps);
     for(final char c : ch) tb.addUTF(c);

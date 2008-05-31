@@ -107,7 +107,7 @@ public abstract class Pred extends ExprInfo {
   abstract boolean sameAs(final Pred pred);
 
   @Override
-  public String color() {
+  public final String color() {
     return "FF6666";
   }
 }

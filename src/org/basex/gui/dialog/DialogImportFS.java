@@ -26,7 +26,7 @@ import org.basex.gui.layout.TableLayout;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class DialogImportFS  extends Dialog {
+public final class DialogImportFS  extends Dialog {
   /** Directory path. */
   protected BaseXTextField path;
   /** Parsing complete filesystem. */
@@ -148,7 +148,7 @@ public class DialogImportFS  extends Dialog {
    * Checks data, disables/enables the OK button and returns validity.
    * @return true if data is valid
    */
-  final boolean check() {
+  boolean check() {
     final boolean sel = !all.isSelected();
     BaseXLayout.enable(path, sel);
     BaseXLayout.enable(button, sel);
@@ -161,12 +161,12 @@ public class DialogImportFS  extends Dialog {
   }
 
   @Override
-  public final void cancel() {
+  public void cancel() {
     super.cancel();
   }
 
   @Override
-  public final void close() {
+  public void close() {
     if(!check()) return;
 
     super.close();

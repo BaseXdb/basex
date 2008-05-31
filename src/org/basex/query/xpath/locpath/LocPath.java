@@ -276,14 +276,14 @@ public abstract class LocPath extends Expr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public final void plan(final Serializer ser) throws Exception {
     ser.openElement(this);
     steps.plan(ser);
     ser.closeElement(this);
   }
 
   @Override
-  public String color() {
+  public final String color() {
     return "FFCC33";
   }
 }

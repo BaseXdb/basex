@@ -13,7 +13,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class Dec extends Num {
+public final class Dec extends Num {
   /** Zero value. */
   public static final Dec ZERO = new Dec(BigDecimal.ZERO);
   /** Decimal value. */

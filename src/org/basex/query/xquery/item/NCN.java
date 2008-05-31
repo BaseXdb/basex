@@ -11,7 +11,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class NCN extends Str {
+public final class NCN extends Str {
   /**
    * Constructor.
    * @param v value

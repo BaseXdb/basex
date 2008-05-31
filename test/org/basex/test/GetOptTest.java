@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Hannes Schwarz
  */
-public class GetOptTest {
+public final class GetOptTest {
 
   /** OutputStream.*/
   private String returnedPath;

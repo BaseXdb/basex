@@ -76,7 +76,7 @@ final class ValueTree {
   /** Integer list. */
   private int[] stack = new int[1];
   /** Current iterator. */
-  private int spos = 0;
+  private int spos;
 
   /**
    * Initializes the tree iterator. Note that the index structure will be

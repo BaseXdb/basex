@@ -198,7 +198,7 @@ public final class DiskBuilder extends Builder {
     // get filename(s) or use default
     //final String[] fn = args.length > 0 ? args : new String[] { "input.xml" };
     final String[] fn = new String[] { "/home/db/xml/11mb.xml" };    
-    int runs = 2;
+    final int runs = 2;
     run(runs, fn, true);
     run(runs, fn, false);
   }
@@ -213,12 +213,12 @@ public final class DiskBuilder extends Builder {
     int c = 0;
     int w = 0;
 
-    Performance p = new Performance();
+    final Performance p = new Performance();
     for(int i = 0; i < r; i++) {
       for(final String f : fn) {
         try {
           final IO bxf = new IO(f);
-          Parser parser = s ? new SAXWrapper(bxf) : new XMLParser(bxf);
+          final Parser parser = s ? new SAXWrapper(bxf) : new XMLParser(bxf);
           new DiskBuilder().build(parser, "tmp");
           c++;
         } catch(final IOException e) {

@@ -54,7 +54,7 @@ public abstract class Comparison extends DualExpr {
 
   @Override
   public void plan(final Serializer ser) throws Exception {
-    ser.openElement(this, TYPE, Token.token(type.toString()));
+    ser.openElement(this, Token.token(TYPE), Token.token(type.toString()));
     expr1.plan(ser);
     expr2.plan(ser);
     ser.closeElement(this);

@@ -43,10 +43,8 @@ import org.basex.query.xpath.values.Item;
 import org.basex.query.xpath.values.Literal;
 import org.basex.query.xpath.values.NodeSet;
 import org.basex.query.xpath.values.Num;
-import org.basex.util.ByteList;
 import org.basex.util.ExprList;
 import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
 
 /**
  * XPath Processor, containing the XPath parser. The {@link #parse()} method
@@ -58,15 +56,13 @@ import org.basex.util.TokenBuilder;
  */
 public final class XPathProcessor extends QueryProcessor {
   /** TokenBuilder instance. */
-  private final TokenBuilder tok = new TokenBuilder();
+  private final StringBuilder tok = new StringBuilder();
   /** Current xpath query. */
-  private byte[] qu;
+  private String qu;
   /** Current position in xpath query. */
   private int qp;
   /** Query length. */
   private int ql;
-  /** Fulltext search strings. **/
-  private ByteList ftss;
   
   /**
    * XPath Query Constructor.
@@ -78,11 +74,9 @@ public final class XPathProcessor extends QueryProcessor {
 
   @Override
   public XPContext create() throws QueryException {
-    qu = query.length == 0 ? new byte[] { '.' } : query;
-    ql = qu.length;
+    qu = query.length() == 0 ? "." : query;
+    ql = qu.length();
     qp = 0;
-    ftss = new ByteList();
-    
     
     try {
       final Expr expr = parseOr();
@@ -91,7 +85,8 @@ public final class XPathProcessor extends QueryProcessor {
     } catch(final QueryException ex) {
       int l = 1; int c = 1;
       for(int i = 0; i + 1 < qp; c++, i++) {
-        if(qu[i] == 0x0A || qu[i] == 0x0D) { l++; c = 0; }
+        final int ch = qu.charAt(i);
+        if(ch == 0x0A || ch == 0x0D) { l++; c = 0; }
       }
       QueryException qe = new QueryException(POSINFO + ex.getMessage(), l, c);
       qe.setStackTrace(ex.getStackTrace());
@@ -201,7 +196,7 @@ public final class XPathProcessor extends QueryProcessor {
     else if (curr('o')) return parseFTTimes();
       return error(WRONGTEXT, "quote", (char) curr());
     */
-    return curr('f') ? parseFTOr() : error(WRONGTEXT, QUOTE, (char) curr());
+    return curr('f') ? parseFTOr() : error(WRONGTEXT, QUOTE, curr());
   }
  
   /**
@@ -295,17 +290,17 @@ public final class XPathProcessor extends QueryProcessor {
     consumeWS();
 
     // simple LocationPath cases
-    final byte c = curr();
+    final char c = curr();
     if(c == '@' || c == '*' || c == '.' || c == '/') return parseLocPath();
 
     // other possible LocationPath cases
-    final byte[] name = name();
-    final int i = name.length;
+    final String name = name();
+    final int i = name.length();
     back(i);
 
     // if name is following
-    if(i > 0 && (peek(i) != '(' || eq(name, NODE) || eq(name, TEXT) ||
-        eq(name, COMMENT) || eq(name, PI))) {
+    if(i > 0 && (peek(i) != '(' || name.equals(NODE) || name.equals(TEXT) ||
+        name.equals(COMMENT) || name.equals(PI))) {
       return parseLocPath();
     }
 
@@ -341,7 +336,7 @@ public final class XPathProcessor extends QueryProcessor {
   private LocPath parseAbsLocPath(final LocPath path) throws QueryException {
     boolean more = false;
     while(consume('/')) {
-      final byte c = curr();
+      final char c = curr();
       if(c != 0 && c != ' ' && c != ']' && c != ')' && c != '|' && c != ',') {
         path.steps.add(parseStep());
         more = true;
@@ -371,7 +366,7 @@ public final class XPathProcessor extends QueryProcessor {
    */
   private Step parseStep() throws QueryException {
     if(curr('/')) {
-      final byte c = peek(1);
+      final char c = peek(1);
       if(letter(c) || c == '@' || c == '*' || c == '.') {
         return Axis.create(Axis.DESCORSELF, TestNode.NODE);
       }
@@ -394,9 +389,9 @@ public final class XPathProcessor extends QueryProcessor {
     } else if(curr('@')) {
       consume('@');
       axis = Axis.ATTR;
-      final byte[] test = name();
-      if(test.length != 0) {
-        nodetest = new TestName(test, false);
+      final String test = name();
+      if(test.length() != 0) {
+        nodetest = new TestName(Token.token(test), false);
       } else if(consume('*')) {
         nodetest = new TestName(false);
       } else {
@@ -426,10 +421,10 @@ public final class XPathProcessor extends QueryProcessor {
    * @throws QueryException parsing exception
    */
   private Test parseNodeTest(final Axis axis) throws QueryException {
-    final byte[] test = name();
+    final String test = name();
 
     // all elements/attributes
-    if(test.length == 0) {
+    if(test.length() == 0) {
       if(consume('*')) return new TestName(true);
       error(NOTEST);
     }
@@ -437,24 +432,24 @@ public final class XPathProcessor extends QueryProcessor {
     if(consume('(')) {
       TestNode result = null;
 
-      if(eq(test, PI)) {
+      if(test.equals(PI)) {
         if(curr(0)) error(PIBRACKETS);
 
-        final byte delim = curr();
+        final char delim = curr();
         if(delim != ')') {
           if(delim != '"' && delim != '\'') error(PIQUOTE);
           consume(delim);
-          final byte[] pi = name();
+          final String pi = name();
           if(!consume(delim)) error(PIQUOTE);
           if(!consume(')')) error(PIBRACKETS);
-          return new TestPI(pi);
+          return new TestPI(token(pi));
         }
         result = TestNode.PI;
-      } else if(eq(test, NODE)) {
+      } else if(test.equals(NODE)) {
         result = TestNode.NODE;
-      } else if(eq(test, COMMENT)) {
+      } else if(test.equals(COMMENT)) {
         result = TestNode.COMM;
-      } else if(eq(test, TEXT)) {
+      } else if(test.equals(TEXT)) {
         result = TestNode.TEXT;
       } else {
         error(UNKNOWNKIND, test);
@@ -464,7 +459,7 @@ public final class XPathProcessor extends QueryProcessor {
     }
 
     // NameTest
-    return new TestName(test, axis != Axis.ATTR);
+    return new TestName(token(test), axis != Axis.ATTR);
   }
 
   /**
@@ -474,17 +469,17 @@ public final class XPathProcessor extends QueryProcessor {
    */
   private Axis parseAxis() throws QueryException {
     // AxisName '::' or default axis (child)
-    final byte[] name = name();
+    final String name = name();
 
     // Axis Specifier
     if(consume(DBLCOLON)) {
       // try to get axis reference
-      final Axis ax = Axis.find(Token.string(name));
+      final Axis ax = Axis.find(name);
       if(ax == null) error(UNKNOWNAXIS, name);
       return ax;
     }
     // default axis
-    back(name.length);
+    back(name.length());
     return Axis.CHILD;
   }
 
@@ -542,9 +537,9 @@ public final class XPathProcessor extends QueryProcessor {
    * @throws QueryException query exception
    */
   private Item parseVarReference() throws QueryException {
-    final byte[] var = name();
-    if(var.length == 0) error(NOVARNAME);
-    return XPathContext.get().evalVariable(var);
+    final String var = name();
+    if(var.length() == 0) error(NOVARNAME);
+    return XPathContext.get().evalVariable(token(var));
   }
 
   /**
@@ -553,11 +548,11 @@ public final class XPathProcessor extends QueryProcessor {
    * @throws QueryException query exception
    */
   private Literal parseLiteral() throws QueryException {
-    final byte delim = next();
-    tok.reset();
-    while(!curr(0) && !curr(delim)) tok.add(next());
+    final char delim = next();
+    tok.setLength(0);
+    while(!curr(0) && !curr(delim)) tok.append(next());
     if(!consume(delim)) error(QUOTECLOSE);
-    return new Literal(tok.finish());
+    return new Literal(token(tok.toString()));
   }
 
   /**
@@ -565,10 +560,10 @@ public final class XPathProcessor extends QueryProcessor {
    * @return resulting expression
    */
   private Item parseNumber() {
-    tok.reset();
+    tok.setLength(0);
     boolean dot = true;
     boolean exp = true;
-    byte curr = curr();
+    char curr = curr();
     while(curr != 0 && (digit(curr) || dot && exp && curr == '.' ||
         exp && (curr == 'E' || curr == 'e'))) {
       if(curr == '.') {
@@ -576,10 +571,10 @@ public final class XPathProcessor extends QueryProcessor {
       } else if(curr == 'e' || curr == 'E') {
         exp = false;
       }
-      tok.add(next());
+      tok.append(next());
       curr = curr();
     }
-    return new Num(toDouble(tok.finish()));
+    return new Num(toDouble(token(tok.toString())));
   }
 
   /**
@@ -588,7 +583,7 @@ public final class XPathProcessor extends QueryProcessor {
    * @throws QueryException query exception
    */
   private Func parseFunction() throws QueryException {
-    final byte[] func = name();
+    final String func = name();
     if(!consume('(')) error(UNEXPECTEDEND);
 
     // name and opening bracket found
@@ -597,7 +592,7 @@ public final class XPathProcessor extends QueryProcessor {
     while(!curr(0)) {
       consumeWS();
       if(consume(')')) {
-        return XPathContext.get().getFunction(func, exprs.get());
+        return XPathContext.get().getFunction(token(func), exprs.get());
       }
       if(more && !consume(',')) error(UNFINISHEDFUNC);
       exprs.add(parseOr());
@@ -611,18 +606,18 @@ public final class XPathProcessor extends QueryProcessor {
    * Parses a name.
    * @return string
    */
-  private byte[] name() {
-    tok.reset();
+  private String name() {
+    tok.setLength(0);
     // '-' not allowed as first char in name
     if(letter(curr())) {
       while(!curr(0)) {
-        tok.add(next());
-        final byte c = curr();
+        tok.append(next());
+        final char c = curr();
         if(c == ':' && peek(1) != ':') continue;
         if(!letterOrDigit(c) && c != '-') break;
       }
     }
-    return tok.finish();
+    return tok.toString();
   }
 
   /**
@@ -660,11 +655,11 @@ public final class XPathProcessor extends QueryProcessor {
    * @param off jumping some characters back
    * @return query substring
    */
-  private byte[] query(final int max, final int off) {
+  private String query(final int max, final int off) {
     qp -= off;
     final int end = Math.min(ql, qp + max);
-    final byte[] bytes = substring(qu, qp, end);
-    return end < ql ? concat(bytes, DOTS) : bytes;
+    final String bytes = qu.substring(qp, end);
+    return end < ql ? bytes + "..." : bytes;
   }
 
   /**
@@ -679,8 +674,8 @@ public final class XPathProcessor extends QueryProcessor {
    * Returns the current character.
    * @return current character
    */
-  private byte curr() {
-    return qp >= ql ? 0 : qu[qp];
+  private char curr() {
+    return qp >= ql ? 0 : qu.charAt(qp);
   }
 
   /**
@@ -697,16 +692,16 @@ public final class XPathProcessor extends QueryProcessor {
    * @param off peek offset (0 for next character)
    * @return char at offset
    */
-  private byte peek(final int off) {
-    return qp + off >= ql ? 0 : qu[qp + off];
+  private char peek(final int off) {
+    return qp + off >= ql ? 0 : qu.charAt(qp + off);
   }
 
   /**
    * Returns next character.
    * @return next character
    */
-  private byte next() {
-    return qu[qp++];
+  private char next() {
+    return qu.charAt(qp++);
   }
 
   /**
@@ -715,7 +710,7 @@ public final class XPathProcessor extends QueryProcessor {
    * @return true if character was found
    */
   private boolean consume(final int ch) {
-    final boolean next = (qp == ql ? 0 : qu[qp]) == ch;
+    final boolean next = (qp == ql ? 0 : qu.charAt(qp)) == ch;
     if(next) qp++;
     return next;
   }
@@ -725,10 +720,10 @@ public final class XPathProcessor extends QueryProcessor {
    * @param str string to consume
    * @return true if string was found
    */
-  private boolean consume(final byte[] str) {
-    final boolean next = qp + str.length <= ql
-        && eq(substring(qu, qp, qp + str.length), str);
-    if(next) qp += str.length;
+  private boolean consume(final String str) {
+    final int sl = str.length();
+    final boolean next = qp + sl <= ql && str.equals(qu.substring(qp, qp + sl));
+    if(next) qp += sl;
     return next;
   }
 
@@ -740,7 +735,8 @@ public final class XPathProcessor extends QueryProcessor {
   private boolean consumeWS() {
     final int p = qp;
     while(qp < ql) {
-      if(qu[qp] < 0 || qu[qp] > ' ') return p != qp;
+      char ch = qu.charAt(qp);
+      if(ch > ' ') return p != qp;
       qp++;
     }
     return p != qp;
@@ -755,7 +751,7 @@ public final class XPathProcessor extends QueryProcessor {
   private Expr parseFTContains() throws QueryException {
     final Expr e = parseAdditive();
     consumeWS();
-    if(consume("ftfuzzy".getBytes())) {
+    if(consume("ftfuzzy")) {
       consumeWS();
       Literal lit = parseLiteral();
       consumeWS();
@@ -940,7 +936,6 @@ public final class XPathProcessor extends QueryProcessor {
     Expr e = null;
     if(curr('"') || curr('\'')) {
       e = parseFTWords();
-      if (e instanceof Literal) ftss.add(((Literal) e).str());
       consumeWS();
       // optional
       // parseFTAnyallOptions();
@@ -1111,13 +1106,5 @@ public final class XPathProcessor extends QueryProcessor {
     } else {
       error("sentece or paragraph expected.");
     }
-  }
-  
-  /**
-   * Getter for fulltext search strings out of query.
-   * @return fulltext search strings
-   */
-  public byte[][] ftSearchStrings() {
-    return ftss.finish();
   }
 }

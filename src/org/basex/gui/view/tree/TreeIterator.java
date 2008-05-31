@@ -11,7 +11,7 @@ import org.basex.gui.view.View;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-class TreeIterator {
+final class TreeIterator {
   /** Tree visualization reference. */
   private final TreeView view;
 

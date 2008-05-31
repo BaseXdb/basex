@@ -110,7 +110,7 @@ public final class BaseXTextRenderer extends BaseXBack {
    * @return new position
    */
   int cursorY() {
-    int hh = h;
+    final int hh = h;
     h = Integer.MAX_VALUE;
     final Graphics g = getGraphics();
     init(g, 0);
@@ -150,7 +150,7 @@ public final class BaseXTextRenderer extends BaseXBack {
 
     // calculate word width
     for(int c = 0; c < word.length(); c++) {
-      char ch = word.charAt(c);
+      final char ch = word.charAt(c);
       // internal special codes...
       if(ch == 0x02) {
         setFont(GUIConstants.bfont);
@@ -204,7 +204,7 @@ public final class BaseXTextRenderer extends BaseXBack {
       // mark text
       int xx = x;
       if(text.markStart()) {
-        int p = text.pos();
+        final int p = text.pos();
         for(int c = 0; c < word.length(); c++) {
           final int cw = charW(g, word.charAt(c));
           if(text.marked()) {

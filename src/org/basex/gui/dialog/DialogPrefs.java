@@ -4,8 +4,6 @@ import static org.basex.Text.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import org.basex.core.Prop;
 import org.basex.data.Data;
@@ -28,7 +26,7 @@ import org.basex.gui.view.View;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class DialogPrefs extends Dialog {
+public final class DialogPrefs extends Dialog {
   /** Browse button. */
   private BaseXButton button;
   /** Combo box. */
@@ -70,11 +68,11 @@ public class DialogPrefs extends Dialog {
     pp.setLayout(new TableLayout(10, 1, 0, 0));
     pp.add(new BaseXLabel(DATABASEPATH, true));
 
-    BaseXBack p = new BaseXBack();
+    final BaseXBack p = new BaseXBack();
     p.setLayout(new TableLayout(1, 2, 6, 0));
     
     path = new BaseXTextField(Prop.dbpath, HELPDBPATH, this);
-    BaseXLayout.setWidth(path, 250);
+    BaseXLayout.setWidth(path, 300);
     p.add(path);
     
     button = new BaseXButton(BUTTONBROWSE, HELPBROWSE, this);
@@ -86,7 +84,7 @@ public class DialogPrefs extends Dialog {
     p.add(button);
     pp.add(p);
 
-    BaseXLabel label = new BaseXLabel(PREFINTER, true);
+    final BaseXLabel label = new BaseXLabel(PREFINTER, true);
     label.setBorder(10, 0, 8, 0);
     pp.add(label);
 
@@ -111,12 +109,9 @@ public class DialogPrefs extends Dialog {
     // checkbox for simple file dialog
     pp.add(new BaseXLabel(PREFLANG, true));
 
-    final Box box = new Box(BoxLayout.X_AXIS);
     lang = new BaseXCombo(Prop.LANGUAGES, HELPLANG, false, this);
     lang.setSelectedItem(Prop.language);
-    box.add(lang);
-    box.add(new BaseXLabel("   " + PREFLANGNEW));
-    pp.add(box);
+    pp.add(lang);
 
     set(pp, BorderLayout.CENTER);
 
@@ -131,14 +126,14 @@ public class DialogPrefs extends Dialog {
    * Opens the directory chooser and sets the new path.
    * @param parent parent reference
    */
-  final void chooseDir(final JFrame parent) {
+  void chooseDir(final JFrame parent) {
     final BaseXFileChooser fc = new BaseXFileChooser(DIALOGFC, path.getText(),
         parent);
     if(fc.select(BaseXFileChooser.DIR)) path.setText(fc.getDir());
   }
 
   @Override
-  public final void action(final String cmd) {
+  public void action(final String cmd) {
     GUIProp.mousefocus = focus.isSelected();
     GUIProp.shownames = names.isSelected();
     GUIProp.simplefd = simpfd.isSelected();
@@ -147,7 +142,7 @@ public class DialogPrefs extends Dialog {
   }
 
   @Override
-  public final void cancel() {
+  public void cancel() {
     super.cancel();
     GUIProp.mousefocus = foc;
     GUIProp.shownames = nam;
@@ -157,7 +152,7 @@ public class DialogPrefs extends Dialog {
   }
 
   @Override
-  public final void close() {
+  public void close() {
     super.close();
     Prop.dbpath = path.getText();
     Prop.language = lang.getSelectedItem().toString();

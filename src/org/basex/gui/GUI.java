@@ -218,30 +218,6 @@ public final class GUI extends JFrame {
     b = new BaseXBack();
     b.setLayout(new BorderLayout());
 
-    hist = new BaseXButton(icon("hist"), HELPHIST);
-    hist.trim();
-    hist.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent e) {
-        final JPopupMenu popup = new JPopupMenu("History");
-        final ActionListener al = new ActionListener() {
-          public void actionPerformed(final ActionEvent ac) {
-            input.setText(ac.getActionCommand());
-            input.requestFocusInWindow();
-            popup.setVisible(false);
-          }
-        };
-        final int i = !context.db() ? 2 : GUIProp.searchmode;
-        final String[] hs = i == 0 ? GUIProp.search : i == 1 ?  GUIProp.xpath :
-          GUIProp.commands;
-        for(final String en : hs) {
-          final JMenuItem jmi = new JMenuItem(en);
-          jmi.addActionListener(al);
-          popup.add(jmi);
-        }
-        popup.show(hist, 0, hist.getHeight());
-      }
-    });
-
     input = new BaseXTextField(null);
 
     final Font f = input.getFont();
@@ -281,6 +257,30 @@ public final class GUI extends JFrame {
         // skip commands
         if(GUIProp.execrt && GUIProp.searchmode != 2 && context.db() &&
             !input.getText().startsWith("!")) execute();
+      }
+    });
+
+    hist = new BaseXButton(icon("hist"), HELPHIST);
+    hist.trim();
+    hist.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent e) {
+        final JPopupMenu popup = new JPopupMenu("History");
+        final ActionListener al = new ActionListener() {
+          public void actionPerformed(final ActionEvent ac) {
+            input.setText(ac.getActionCommand());
+            input.requestFocusInWindow();
+            popup.setVisible(false);
+          }
+        };
+        final int i = !context.db() ? 2 : GUIProp.searchmode;
+        final String[] hs = i == 0 ? GUIProp.search : i == 1 ?  GUIProp.xpath :
+          GUIProp.commands;
+        for(final String en : hs) {
+          final JMenuItem jmi = new JMenuItem(en);
+          jmi.addActionListener(al);
+          popup.add(jmi);
+        }
+        popup.show(hist, 0, hist.getHeight());
       }
     });
 

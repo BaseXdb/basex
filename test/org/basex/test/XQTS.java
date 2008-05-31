@@ -324,7 +324,6 @@ public final class XQTS {
           nodes("input-file/@variable", root), ctx));
       files.add(file(nodes("input-URI", root),
           nodes("input-URI/@variable", root), ctx));
-      // treating default collection like normal collections..
       file(nodes("defaultCollection", root), null, ctx);
 
       var(nodes("input-query/@name", root),
@@ -657,7 +656,7 @@ public final class XQTS {
     final Nodes n = nodes(qu, root);
     final TokenBuilder sb = new TokenBuilder();
     for(int i = 0; i < n.size; i++) {
-      if(i != 0) sb.add("/");
+      if(i != 0) sb.add('/');
       sb.add(data.atom(n.pre[i]));
     }
     return sb.toString();

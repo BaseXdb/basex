@@ -57,21 +57,21 @@ public final class ValueBuilder extends Progress implements IndexBuilder {
     }
     index.init();
 
-    int hs = index.size;
+    final int hs = index.size;
     final DataOutput outl = new DataOutput(db, f + 'l');
     outl.writeNum(hs);
     final DataOutput outr = new DataOutput(db, f + 'r');
     while(index.more()) {
       outr.write5(outl.size());
-      int p = index.next();
-      int ds = index.ns[p];
+      final int p = index.next();
+      final int ds = index.ns[p];
       outl.writeNum(ds);
       
       // write id lists
-      byte[] tmp = index.pre[p];
+      final byte[] tmp = index.pre[p];
       index.pre[p] = null;
       for(int v = 0, ip = 4, o = 0; v < ds; ip += Num.len(tmp, ip), v++) {
-        int pre = Num.read(tmp, ip);
+        final int pre = Num.read(tmp, ip);
         outl.writeNum(pre - o);
         o = pre;
       }

@@ -7,7 +7,6 @@ import org.basex.data.Nodes;
 import org.basex.query.QueryException;
 import org.basex.query.xquery.XQueryProcessor;
 import org.basex.util.Performance;
-import org.basex.util.Token;
 
 /**
  * Evaluates the (undocumented) 'xqenv' command.
@@ -36,7 +35,7 @@ public final class XQEnv extends XQuery {
           query = "()";
         }
   
-        qu.query = Token.token(query);
+        qu.query = query;
         progress(qu);
   
         final Nodes nodes = context.current();

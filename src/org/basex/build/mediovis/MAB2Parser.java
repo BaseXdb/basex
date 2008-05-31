@@ -240,8 +240,9 @@ public final class MAB2Parser extends Parser {
    * @throws IOException I/O exception
    */
   private byte[] text(final RandomAccess in) throws IOException {
-    int b = in.read();
+    in.read();
     int l = 0;
+    int b;
     while((b = in.read()) >= ' ') CACHE[l++] = (byte) b;
     return Array.finish(CACHE, l);
   }

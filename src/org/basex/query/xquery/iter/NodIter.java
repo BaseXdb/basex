@@ -8,7 +8,7 @@ import org.basex.query.xquery.item.Node;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class NodIter extends NodeIter {
+public final class NodIter extends NodeIter {
   /** Items. */
   public Node[] list;
   /** Size. */

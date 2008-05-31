@@ -46,13 +46,13 @@ public final class CmpN extends Arr {
     };
 
     /** String representation. */
-    public final byte[] name;
+    public final String name;
 
     /**
      * Constructor.
      * @param n string representation
      */
-    COMP(final String n) { name = Token.token(n); }
+    COMP(final String n) { name = n; }
 
     /**
      * Evaluates the expression.
@@ -64,7 +64,7 @@ public final class CmpN extends Arr {
     public abstract boolean e(Item a, Item b) throws XQException;
 
     @Override
-    public String toString() { return Token.string(name); }
+    public String toString() { return name; }
   }
 
   
@@ -101,7 +101,7 @@ public final class CmpN extends Arr {
 
   @Override
   public void plan(final Serializer ser) throws Exception {
-    ser.openElement(this, TYPE, cmp.name);
+    ser.openElement(this, TYPE, Token.token(cmp.name));
     for(final Expr e : expr) e.plan(ser);
     ser.closeElement(this);
   }

@@ -12,7 +12,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class PrintSerializer extends Serializer {
+public final class PrintSerializer extends Serializer {
   /** Tab Entity. */
   private static final byte[] E_TAB = { '#', 'x', '9' }; // token("&#xA;");
   /** NewLine Entity. */
@@ -68,12 +68,12 @@ public class PrintSerializer extends Serializer {
   }
 
   @Override
-  public final void openResult() throws Exception {
+  public void openResult() throws Exception {
     if(xml) openElement(RESULT);
   }
 
   @Override
-  public final void closeResult() throws IOException {
+  public void closeResult() throws IOException {
     if(xml) closeElement(RESULT);
   }
 

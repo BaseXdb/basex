@@ -110,14 +110,13 @@ dx_title=Knoten löschen
 dx_question=Sind Sie sicher?
 
 dp_title=Einstellungen
-dp_dbpath=Datenbank-Pfad
+dp_dbpath=Datenbank-Pfad (Dateien müssen manuell verschoben werden)
 dp_inter=GUI & Interaktionen
-dp_lf=Verwende Java Look & Feel beim nächsten Start
+dp_lf=Verwende Java Look & Feel (nach Neustart)
 dp_focus=Echtzeit Maus-Fokus
 dp_simplefd=Einfacher Datei-Dialog
 dp_names=Ersetze Tags durch @name-Attribute
-dp_lang=Sprache
-dp_langnew=...wird nach dem Neustart aktiv
+dp_lang=Sprache (nach Neustart)
 
 dn_title=Neue Daten einfügen
 dn_name=Name
@@ -205,7 +204,7 @@ c_goup=Hoch
 c_gouptt=Wechselt eine Ebene nach oben.
 c_importfs=Importiere Filesystem
 c_importfstt=Erstellt eine Datenbank aus der Filesystem-Struktur.
-c_info=Info
+c_info=Datenbank-Information
 c_infott=Zeigt Informationen über die aktuelle Datenbank an.
 c_inputmode=Wechsle Eingabemodus
 c_inputmodett=Wechselt zwischen dem Befehls- und Such-Modus.

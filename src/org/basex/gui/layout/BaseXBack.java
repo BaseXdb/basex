@@ -55,7 +55,8 @@ public class BaseXBack extends JPanel {
    * @param b bottom distance
    * @param r right distance
    */
-  public void setBorder(final int t, final int l, final int b, final int r) {
+  public final void setBorder(final int t, final int l, final int b,
+      final int r) {
     setBorder(new EmptyBorder(t, l, b, r));
   }
 }

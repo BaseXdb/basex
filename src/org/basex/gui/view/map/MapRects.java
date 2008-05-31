@@ -8,7 +8,7 @@ import org.basex.util.Array;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-class MapRects {
+final class MapRects {
   /** Rectangle Array. */
   MapRect[] rect = new MapRect[8];
   /** Number of stored rectangles. */

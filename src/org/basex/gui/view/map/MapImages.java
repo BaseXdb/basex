@@ -122,7 +122,7 @@ public final class MapImages {
             }
             
             // load image and wait until it's done
-            File f = new File(Token.string(FSUtils.getPath(data, id)));
+            final File f = new File(Token.string(FSUtils.getPath(data, id)));
             BufferedImage image = ImageIO.read(f);
             
             // calculate optimal image size
@@ -170,7 +170,8 @@ public final class MapImages {
     // determine maximum cache size, depending on window size
     final Dimension size = GUI.get().getSize();
     final Runtime rt = Runtime.getRuntime();
-    long max = Math.max(size.width * size.height * 10L, rt.maxMemory() / 5);
+    final long max = Math.max(size.width * size.height * 10L,
+        rt.maxMemory() / 5);
     
     // remove images if pixel limit is reached
     int imgSize = 0;

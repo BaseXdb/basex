@@ -109,7 +109,7 @@ public final class MapDefault extends MapPainter {
       g.setFont(GUIConstants.mfont);
       final byte[] text = ViewData.content(data, pre, false);
       
-      int p = BaseXLayout.centerPos(g, text, rect.w);
+      final int p = BaseXLayout.centerPos(g, text, rect.w);
       if(p != -1) {
         rect.x += p;
         rect.y += (rect.h - GUIProp.fontsize) / 2 - 1;

@@ -16,7 +16,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Wolfgang Miller, Philipp Ziemer
  */
-public class RealView extends View { 
+public final class RealView extends View { 
   /** Var to show the scrollbar. */
   //private BaseXBar scroll = null;
   /** Horizontal Coords of the pointer. */

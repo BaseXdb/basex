@@ -19,7 +19,7 @@ import org.basex.util.Token;
  * @author Hannes Schwarz - Hannes.Schwarz@gmail.com
  *
  */
-public class LOCATE {
+public final class LOCATE {
 
   /** Data reference. */
   private final Data data;

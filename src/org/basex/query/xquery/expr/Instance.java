@@ -31,11 +31,6 @@ public final class Instance extends Single {
   }
   
   @Override
-  public Expr comp(final XQContext ctx) throws XQException {
-    return super.comp(ctx);
-  }
-  
-  @Override
   public Iter iter(final XQContext ctx) throws XQException {
     return Bln.get(seq.instance(ctx.iter(expr), true)).iter();
   }

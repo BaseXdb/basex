@@ -1,7 +1,5 @@
 package org.basex.query.xpath.values;
 
-import org.basex.util.Token;
-
 /**
  * This enumeration assembles different value comparisons.
  * 
@@ -90,13 +88,13 @@ public enum Comp {
   };
   
   /** String representation. */
-  public final byte[] name;
+  public final String name;
   
   /**
    * Constructor.
    * @param n string representation
    */
-  Comp(final String n) { name = Token.token(n); }
+  Comp(final String n) { name = n; }
 
   /**
    * Evaluates the expression.
@@ -107,5 +105,5 @@ public enum Comp {
   public abstract boolean eval(Item v1, Item v2);
   
   @Override
-  public String toString() { return Token.string(name); }
+  public String toString() { return name; }
 }

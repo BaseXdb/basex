@@ -2,7 +2,6 @@ package org.basex.query.xquery.path;
 
 import org.basex.query.xquery.item.Node;
 import org.basex.query.xquery.iter.NodeIter;
-import org.basex.util.Token;
 
 /**
  * XPath Axes Enumeration.
@@ -111,14 +110,14 @@ public enum Axis {
   };
 
   /** Axis string. */
-  public final byte[] name;
+  public final String name;
 
   /**
    * Constructor, initializing the enum constants.
    * @param n axis string
    */
   Axis(final String n) {
-    name = Token.token(n);
+    name = n;
   }
 
   /**
@@ -130,6 +129,6 @@ public enum Axis {
   
   @Override
   public String toString() {
-    return Token.string(name);
+    return name;
   }
 }

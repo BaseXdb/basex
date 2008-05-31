@@ -11,8 +11,6 @@ public final class ByteArrayList {
   public byte[][] list = new byte[8][];
   /** Current array size. */
   public int size;
-  /** Flag for found values in list. **/
-  public boolean found = false;
   
   /**
    * Default constructor.

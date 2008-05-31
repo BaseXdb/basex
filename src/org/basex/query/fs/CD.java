@@ -12,7 +12,7 @@ import org.basex.util.GetOpts;
  * @author Hannes Schwarz - Hannes.Schwarz@gmail.com
  *
  */
-public class CD {
+public final class CD {
 
   /** Data reference. */
   private final Context context;

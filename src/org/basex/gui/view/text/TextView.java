@@ -65,36 +65,6 @@ public final class TextView extends View {
     add(north, BorderLayout.NORTH);
   }
   
-  
- /*
-  * Updates header labels displaying ftsearch string.
-  * @param n nodes
-  public void updateHeader(final Nodes n) {
-    if (!GUIProp.thumbnail) return;
-    
-    if (n == null || n.size == 0 || n.ftss == null) {
-      if (north != null && center != null) {
-        // <cg> <sg> hack - find solution for removing north
-        remove(north);
-        north = new BaseXBack(FILL.NONE);
-        north.setLayout(new BorderLayout());
-        initHeader();
-      }
-      return;
-    }
-    center = new BaseXBack(FILL.NONE);
-    center.setLayout(new FlowLayout());
-    BaseXLabel l;
-    
-    for (int i = 0; i < n.ftss.length; i++) {
-      l = new BaseXLabel(n.ftss[i]);
-      l.setForeground(GUIConstants.thumbnailcolor[i]);
-      center.add(l);
-    }
-    north.add(center, BorderLayout.CENTER);
-  }
-  */ 
-  
   @Override
   public void refreshInit() {
     area.setCaret(0);
@@ -121,14 +91,12 @@ public final class TextView extends View {
    * @param nodes nodes to display
    */
   private void refreshDoc(final Nodes nodes) {
-    
     if(!GUIProp.showtext ||
         !header.getText().equals(GUIConstants.TEXTVIEW)) {
       return;
     }
     if(!GUI.context.db() || nodes.size == 0) {
       setText(Token.EMPTY, 0, true);
-      //updateHeader(null);
       return;
     }
     
@@ -138,8 +106,6 @@ public final class TextView extends View {
       nodes.serialize(new PrintSerializer(out, false, chop));
       out.addInfo();
       setText(out.buffer(), out.size(), false);
-      //updateHeader(nodes);
-      
     } catch(final Exception ex) {
       BaseX.debug(ex);
     }

@@ -10,7 +10,7 @@ import java.io.IOException;
  * @author Hannes Schwarz - Hannes.Schwarz@gmail.com
  * @version 0.1
  */
-public class GetOpts {
+public final class GetOpts {
 
   /** Argument of an option is stored here. */
   private String optarg;

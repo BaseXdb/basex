@@ -211,7 +211,7 @@ public abstract class Step extends ExprInfo {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public final void plan(final Serializer ser) throws Exception {
     ser.startElement(this);
     ser.attribute(Token.token("test"), Token.token(test.toString()));
     if(preds.size() != 0) {
@@ -224,7 +224,7 @@ public abstract class Step extends ExprInfo {
   }
 
   @Override
-  public String color() {
+  public final String color() {
     return "FFFF66";
   }
 }

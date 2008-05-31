@@ -7,12 +7,11 @@ import org.basex.core.Prop;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.query.xpath.values.NodeSet;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
  * This abstract class contains various methods which allow querying in
- * the database. A variety of hierarchic parsers (XPath, XQuery, etc..)
+ * the database. A variety of hierarchical parsers (XPath, XQuery, etc..)
  * can be implemented on top of this class.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
@@ -20,7 +19,7 @@ import org.basex.util.TokenBuilder;
  */
 public abstract class QueryProcessor extends Progress {
   /** Initial node set. */
-  public byte[] query;
+  public String query;
   /** Expression context. */
   protected QueryContext context;
   /** Compilation flag. */
@@ -31,7 +30,7 @@ public abstract class QueryProcessor extends Progress {
    * @param q query
    */
   public QueryProcessor(final String q) {
-    query = Token.token(q);
+    query = q;
   }
 
   /**

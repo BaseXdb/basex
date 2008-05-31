@@ -108,7 +108,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     validate();
     repaint();
 
-    String lay = layout.layoutString();
+    final String lay = layout.layoutString();
     if(views == panels[0]) GUIProp.layoutclosed = lay;
     else GUIProp.layoutopened = lay;
   }

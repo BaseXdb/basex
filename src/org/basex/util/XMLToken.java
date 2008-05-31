@@ -26,13 +26,30 @@ public final class XMLToken {
   }
 
   /**
+   * Checks if the specified character is an XML letter.
+   * @param ch character
+   * @return result of check
+   */
+  public static boolean isXMLLetter(final int ch) {
+    return ch == '_' || Character.isLetter(ch);
+  }
+
+  /**
+   * Checks if the specified character is an XML letter.
+   * @param ch character
+   * @return result of check
+   */
+  public static boolean isXMLLetterOrDigit(final int ch) {
+    return isXMLLetter(ch) || digit(ch);
+  }
+
+  /**
    * Checks if the specified character is an XML first-letter.
    * @param ch the letter to be checked
    * @return result of comparison
    */
   public static boolean isFirstLetter(final int ch) {
-    // [CG] XML/Scanning: Unicode support
-    return letter(ch) || ch == ':' || ch < 0;
+    return isXMLLetter(ch) || ch == ':';
   }
   
   /**
@@ -40,7 +57,7 @@ public final class XMLToken {
    * @param ch the letter to be checked
    * @return result of comparison
    */
-  public static boolean isLetter(final int ch) {
+  public static boolean isLetterOrDigit(final int ch) {
     return isFirstLetter(ch) || digit(ch) || ch == '-' || ch == '.';
   }
 
@@ -58,17 +75,17 @@ public final class XMLToken {
   /**
    * Checks the specified token as an NCName.
    * @param v value to be checked
-   * @param p start position
+   * @param p start position minus 1
    * @return end position
    */
-  public static int ncName(final byte[] v, final int p) {
-    int i = p;
-    while(++i < v.length) {
-      final byte c = v[i];
-      if(letter(c)) continue;
+  private static int ncName(final byte[] v, final int p) {
+    final int l = v.length;
+    for(int i = p + 1; i < l; i += cl(v[i])) {
+      final int c = cp(v, i);
+      if(isXMLLetter(c)) continue;
       if(i == p + 1 || !digit(c) && c != '-' && c != '.') return i;
     }
-    return i;
+    return l;
   }
   
   /**
@@ -78,7 +95,7 @@ public final class XMLToken {
    */
   public static boolean isName(final byte[] v) {
     if(v.length == 0 || !isFirstLetter(v[0])) return false;
-    for(int i = 1; i < v.length; i++) if(!isLetter(v[i])) return false;
+    for(int i = 1; i < v.length; i++) if(!isLetterOrDigit(v[i])) return false;
     return true;
   }
 
@@ -89,7 +106,7 @@ public final class XMLToken {
    */
   public static boolean isNMToken(final byte[] v) {
     if(v.length == 0) return false;
-    for(byte c : v) if(!isLetter(c)) return false;
+    for(byte c : v) if(!isLetterOrDigit(c)) return false;
     return true;
   }
 

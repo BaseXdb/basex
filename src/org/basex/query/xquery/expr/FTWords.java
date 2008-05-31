@@ -69,41 +69,44 @@ public final class FTWords extends Single {
     final long mn = checkItr(ctx.iter(occ[0]));
     final long mx = checkItr(ctx.iter(occ[1]));
     int len = 0;
+    int o = 0;
     Item i;
 
     switch(mode) {
       case ALL:
         while((i = iter.next()) != null) {
           final byte[] txt = norm(i.str());
-          final int oc = cont(ctx, txt, mn, mx);
-          if(oc == -1) return 0;
+          final int oc = cont(ctx, txt);
           len += txt.length * oc;
+          o += oc;
         }
-        return len;
+        break;
       case ALLWORDS:
         while((i = iter.next()) != null) {
           for(final byte[] txt : split(norm(i.str()), ' ')) {
-            final int oc = cont(ctx, txt, mn, mx);
-            if(oc == -1) return 0;
+            final int oc = cont(ctx, txt);
             len += txt.length * oc;
+            o += oc;
           }
         }
-        return len;
+        break;
       case ANY:
         while((i = iter.next()) != null) {
           final byte[] txt = norm(i.str());
-          final int oc = cont(ctx, txt, mn, mx);
-          if(oc != -1) len += txt.length * oc;
+          final int oc = cont(ctx, txt);
+          len += txt.length * oc;
+          o += oc;
         }
-        return len;
+        break;
       case ANYWORD:
         while((i = iter.next()) != null) {
           for(final byte[] txt : split(norm(i.str()), ' ')) {
-            final int oc = cont(ctx, txt, mn, mx);
-            if(oc != -1) len += txt.length * oc;
+            final int oc = cont(ctx, txt);
+            len += txt.length * oc;
+            o += oc;
           }
         }
-        return len;
+        break;
       case PHRASE:
         final TokenBuilder tb = new TokenBuilder();
         boolean more = false;
@@ -112,26 +115,22 @@ public final class FTWords extends Single {
           tb.add(norm(i.str()));
           more = true;
         }
-        final byte[] txt = tb.finish();
-        final int oc = cont(ctx, txt, mn, mx);
-        return oc != -1 ? txt.length * oc : 0;
+        final int oc = cont(ctx, tb.finish());
+        len += tb.size * oc;
+        o += oc;
+        break;
     }
-    throw new RuntimeException();
+    return o < mn || o > mx ? 0 : len;
   }
 
   /**
    * Checks if the first token contains the second fulltext term.
    * @param ctx query context
    * @param sub second token
-   * @param mn minimum number of occurrences
-   * @param mx minimum number of occurrences
    * @return result of check
    */
-  private static int cont(final XQContext ctx, final byte[] sub,
-      final long mn, final long mx) {
-
+  private static int cont(final XQContext ctx, final byte[] sub) {
     final FTOptions opt = ctx.ftopt;
-    int occ = 0;
 
     byte[] tok = ctx.ftitem;
     byte[] sb = opt.wildcards ? sub :
@@ -160,8 +159,7 @@ public final class FTWords extends Single {
       final String cmp = string(sb);
       for(final String s : string(tok).split("[^A-Za-z0-9_]")) {
         p++;
-        if(s.matches(cmp) && ++occ >= mn) {
-          if(occ > mx) break;
+        if(s.matches(cmp)) {
           if(il == null) il = new IntList();
           il.add(p);
         }
@@ -177,7 +175,7 @@ public final class FTWords extends Single {
         if(opt.stopwords == null) {
           while((++t < tl & ++s < sl) && sb[s] == tok[t]);
         } else {
-          // parsing stopwords (inefficient)
+          // parsing stop words (inefficient)
           while(s < sl) {
             final TokenBuilder st1 = new TokenBuilder();
             final TokenBuilder st2 = new TokenBuilder();
@@ -192,20 +190,15 @@ public final class FTWords extends Single {
         }
         if(s == sl && (t == tl || !letterOrDigit(tok[t])) ||
             opt.stemming) {
-          if(++occ >= mn) {
-            if(occ > mx) break;
-            if(il == null) il = new IntList();
-            il.add(p);
-          }
+          if(il == null) il = new IntList();
+          il.add(p);
         }
       }
     }
 
-    if(occ < mn || occ > mx) return -1;
     // "occurs 0 times" ..returning 1?
-    if(il == null) return 1;
-    ctx.ftselect.add(sub, il);
-    return il.size;
+    if(il != null) ctx.ftselect.add(sub, il);
+    return il == null ? 0 : il.size;
   }
 
   @Override

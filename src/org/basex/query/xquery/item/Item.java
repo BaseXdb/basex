@@ -231,7 +231,7 @@ public abstract class Item extends Expr {
   }
 
   @Override
-  public String color() {
+  public final String color() {
     return "66CCFF";
   }
 

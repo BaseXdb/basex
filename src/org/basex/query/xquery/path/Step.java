@@ -125,7 +125,7 @@ public class Step extends Arr {
   @Override
   public void plan(final Serializer ser) throws Exception {
     ser.startElement(this);
-    ser.attribute(AXIS, axis.name);
+    ser.attribute(AXIS, Token.token(axis.name));
     ser.attribute(TEST, Token.token(test.toString()));
 
     if(expr.length != 0) {
@@ -138,7 +138,7 @@ public class Step extends Arr {
   }
 
   @Override
-  public String color() {
+  public final String color() {
     return "FFFF66";
   }
 

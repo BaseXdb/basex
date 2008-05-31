@@ -14,7 +14,7 @@ import org.basex.util.GetOpts;
  * @author Hannes Schwarz - Hannes.Schwarz@gmail.com
  *
  */
-public class PWD {
+public final class PWD {
 
   /** Data reference. */
   private final Context context;

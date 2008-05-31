@@ -195,7 +195,7 @@ public final class TableView extends View implements Runnable {
     if(valid) {
       final int pre = tdata.rows.get(l);
       final Context context = GUI.context;
-      TableIterator it = new TableIterator(context.data(), tdata);
+      final TableIterator it = new TableIterator(context.data(), tdata);
       final int c = tdata.column(getWidth() - BaseXBar.SIZE, tdata.mouseX);
       it.init(pre);
       while(it.more()) {
@@ -244,7 +244,7 @@ public final class TableView extends View implements Runnable {
     } else {
       if(pre != -1) {
         final Context context = GUI.context;
-        TableIterator it = new TableIterator(context.data(), tdata);
+        final TableIterator it = new TableIterator(context.data(), tdata);
         final int c = tdata.column(getWidth() - BaseXBar.SIZE, e.getX());
         it.init(pre);
         while(it.more()) {

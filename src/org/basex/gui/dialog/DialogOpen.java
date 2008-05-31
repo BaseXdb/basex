@@ -28,7 +28,7 @@ import org.basex.gui.layout.BaseXListChooser;
 import org.basex.gui.layout.BaseXText;
 import org.basex.io.IO;
 import org.basex.util.Performance;
-import org.basex.util.TokenBuilder;
+import org.basex.util.Token;
 
 /**
  * Open Database Dialog.
@@ -176,7 +176,7 @@ public final class DialogOpen extends Dialog {
     long len = 0;
     for(final File f : dir.listFiles()) len += f.length();
 
-    final TokenBuilder txt = new TokenBuilder();
+    final StringBuilder txt = new StringBuilder();
     try {
       ok = true;
       final MetaData meta = new MetaData(db);
@@ -185,35 +185,35 @@ public final class DialogOpen extends Dialog {
       if(mainmem != null)
         BaseXLayout.enable(mainmem, meta.filesize < (1 << 30));
 
-      txt.add(INFODOC + meta.file + NL);
-      txt.add(INFOTIME + new SimpleDateFormat(
+      txt.append(INFODOC + meta.file + NL);
+      txt.append(INFOTIME + new SimpleDateFormat(
           "dd.MM.yyyy hh:mm:ss").format(new Date(meta.time)) + NL);
-      txt.add(INFODOCSIZE + (meta.filesize != 0 ?
+      txt.append(INFODOCSIZE + (meta.filesize != 0 ?
           Performance.formatSize(meta.filesize) : "-") + NL);
-      txt.add(INFODBSIZE + Performance.formatSize(len) + NL);
-      txt.add(INFOENCODING + meta.encoding + NL);
-      txt.add(INFONODES + size + NL);
-      txt.add(INFOHEIGHT + meta.height + NL + NL);
+      txt.append(INFODBSIZE + Performance.formatSize(len) + NL);
+      txt.append(INFOENCODING + meta.encoding + NL);
+      txt.append(INFONODES + size + NL);
+      txt.append(INFOHEIGHT + meta.height + NL + NL);
 
-      txt.add(INFOINDEXES + NL);
+      txt.append(INFOINDEXES + NL);
       if(meta.newindex) {
-        txt.add(" " + INDUPDATE + NL);
+        txt.append(" " + INDUPDATE + NL);
       } else {
-        txt.add(" " + INFOTXTINDEX + meta.txtindex + NL);
-        txt.add(" " + INFOATVINDEX + meta.atvindex + NL);
-        txt.add(" " + INFOFTINDEX + meta.ftxindex + NL);
+        txt.append(" " + INFOTXTINDEX + meta.txtindex + NL);
+        txt.append(" " + INFOATVINDEX + meta.atvindex + NL);
+        txt.append(" " + INFOFTINDEX + meta.ftxindex + NL);
       }
 
-      txt.add(NL + INFOCREATE + NL);
-      txt.add(" " + INFOCHOP + meta.chop + NL);
-      txt.add(" " + INFOENTITIES + meta.entity + NL);
+      txt.append(NL + INFOCREATE + NL);
+      txt.append(" " + INFOCHOP + meta.chop + NL);
+      txt.append(" " + INFOENTITIES + meta.entity + NL);
 
     } catch(final IOException e) {
-      txt.add(e.getMessage());
+      txt.append(e.getMessage());
       ok = false;
     }
     doc.setText(db);
-    detail.setText(txt.finish());
+    detail.setText(Token.token(txt.toString()));
     BaseXLayout.enableOK(buttons, ok);
     return true;
   }

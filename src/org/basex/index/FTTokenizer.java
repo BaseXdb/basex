@@ -8,7 +8,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class FTTokenizer {
+public final class FTTokenizer {
   /** Temporary token reference. */
   private byte[] tok;
   /** Temporary token start. */
