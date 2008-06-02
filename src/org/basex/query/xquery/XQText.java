@@ -141,14 +141,14 @@ public interface XQText {
   Object[] FTSTEMMING = { FTST, 0, "Stemming not supported yet." };
   /** FTST0000: Parsing exception. */
   Object[] FTTHES = { FTST, 0, "Thesaurus not supported yet." };
-  /** FTST0000: Parsing exception. */
-  Object[] FTLAN = { FTST, 0, "Languages not supported yet." };
   /** FTST0001: Parsing exception. */
   Object[] FTMILD = { FTST, 1, "'mild not' operator not supported yet." };
   /** FTST0007: Parsing exception. */
   Object[] FTIGNORE = { FTST, 7, "Ignore option not supported yet." };
   /** FTST0008: Parsing exception. */
   Object[] NOSTOPFILE = { FTST, 8, "Stop word file not found: \"%\"." };
+  /** FTST0000: Parsing exception. */
+  Object[] FTLAN = { FTST, 9, "Language '%' not supported." };
 
   /** XPDY0002: Evaluation Exception. */
   Object[] XPNOCTX = { XPDY, 2, "No context item set for '%'." };

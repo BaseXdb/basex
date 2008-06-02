@@ -100,7 +100,8 @@ public final class FTSelect extends Single implements Cloneable {
       if(start || content) {
         for(int i = 0; i < size; i++) {
           boolean o = false;
-          for(int j = 0; j < pos[i].size; j++) {
+          final int ts = pos[i].size;
+          for(int j = 0; j < (ordered ? Math.min(1, s) : ts); j++) {
             if(pos[i].get(j) == l) {
               l += words(term.list[i]);
               o = true;

@@ -94,7 +94,7 @@ public final class XQContext extends QueryContext {
   byte[][] collName = new byte[0][];
 
   /** Default fulltext options. */
-  public final FTOptions ftoptions = new FTOptions(null);
+  private final FTOptions ftoptions = new FTOptions(null);
   /** Default boundary-space. */
   public Bln spaces = Bln.FALSE;
   /** Empty Order mode. */
@@ -131,6 +131,8 @@ public final class XQContext extends QueryContext {
     if(inf) compInfo(QUERYCOMP);
     fun.comp(this);
     vars.comp(this);
+    ftoptions.comp(this);
+    ftopt = ftoptions;
     root = root.comp(this);
     if(inf) compInfo(QUERYRESULT + "%", root);
 

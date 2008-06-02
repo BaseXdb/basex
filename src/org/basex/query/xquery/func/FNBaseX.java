@@ -20,30 +20,65 @@ final class FNBaseX extends Fun {
   @Override
   public Iter iter(final XQContext ctx, final Iter[] arg) throws XQException {
     switch(func) {
-      case EVAL:
-        new XQParser(ctx).parse(string(checkStr(arg[0])));
-        return ctx.eval(null).item().iter();
-      case RANDOM:
-        Iter iter = arg[0];
-        long s = iter.size();
-        if(s == -1) {
-          iter = new SeqIter(iter);
-          s = iter.size();
-        }
-        Item i = null;
-        long r = (long) (Math.random() * s);
-        while(r-- != 0) i = iter.next();
-        return i.iter();
-      case CONTAINSLC:
-        if(arg.length == 3) checkColl(arg[2]);
-        Item it = arg[1].atomic(this, true);
-        return it == null ? Bln.TRUE.iter() :
-          Bln.get(containslc(checkStr(arg[0]), checkStr(it))).iter();
-      case FILENAME:
-        if(ctx.file == null) return Str.ZERO.iter();
-        return Str.iter(token(ctx.file.name()));
-      default:
-        throw new RuntimeException("Not defined: " + func);
+      case EVAL:       return eval(arg);
+      case RANDOM:     return random(arg);
+      case CONTAINSLC: return contains(arg);
+      case FILENAME:   return filename(ctx);
+      default: throw new RuntimeException("Not defined: " + func);
     }
+  }
+
+  /**
+   * Performs the eval function.
+   * @param arg arguments
+   * @return iterator
+   * @throws XQException query exception
+   */
+  private Iter eval(final Iter[] arg) throws XQException {
+    final XQContext ct = new XQContext();
+    new XQParser(ct).parse(string(checkStr(arg[0])));
+    return ct.compile(null).eval(null).item().iter();
+  }
+
+  /**
+   * Performs the random function.
+   * @param arg arguments
+   * @return iterator
+   * @throws XQException query exception
+   */
+  private Iter random(final Iter[] arg) throws XQException {
+    Iter iter = arg[0];
+    long s = iter.size();
+    if(s == -1) {
+      iter = new SeqIter(iter);
+      s = iter.size();
+    }
+    Item i = null;
+    long r = (long) (Math.random() * s);
+    while(r-- != 0) i = iter.next();
+    return i.iter();
+  }
+
+  /**
+   * Performs the contains lower case function.
+   * @param arg arguments
+   * @return iterator
+   * @throws XQException query exception
+   */
+  private Iter contains(final Iter[] arg) throws XQException {
+    if(arg.length == 3) checkColl(arg[2]);
+    final Item it = arg[1].atomic(this, true);
+    return it == null ? Bln.TRUE.iter() :
+      Bln.get(containslc(checkStr(arg[0]), checkStr(it))).iter();
+  }
+
+  /**
+   * Performs the contains lower case function.
+   * @param ctx query context
+   * @return iterator
+   */
+  private Iter filename(final XQContext ctx) {
+    return ctx.file == null ? Str.ZERO.iter() :
+      Str.iter(token(ctx.file.name()));
   }
 }

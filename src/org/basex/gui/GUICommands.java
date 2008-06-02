@@ -680,6 +680,7 @@ public enum GUICommands implements GUICommand {
         final MetaData meta = GUI.context.data().meta;
         final boolean[] indexes = info.indexes();
         final StringBuilder sb = new StringBuilder();
+        meta.fzindex = indexes[3];
         if(indexes[0] != meta.txtindex) cmd(indexes[0], Create.TXT, sb);
         if(indexes[1] != meta.atvindex) cmd(indexes[1], Create.ATV, sb);
         if(indexes[2] != meta.ftxindex) cmd(indexes[2], Create.FTX, sb);

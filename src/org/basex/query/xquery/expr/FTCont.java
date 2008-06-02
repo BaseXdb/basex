@@ -18,11 +18,10 @@ import org.basex.util.TokenBuilder;
 public final class FTCont extends Arr {
   /**
    * Constructor.
-   * @param e1 first expression
-   * @param e2 second expression
+   * @param ex contains, select and optional ignore expression
    */
-  public FTCont(final Expr e1, final Expr e2) {
-    super(e1, e2);
+  public FTCont(final Expr... ex) {
+    super(ex);
   }
 
   @Override
@@ -46,22 +45,23 @@ public final class FTCont extends Arr {
 
   /**
    * Normalizes the token by removing multiple whitespaces.
+   * Sentences and Paragraphs are preserved.
    * @param tb token builder
    * @param tok token
    * @return token builder
    */
-  public static TokenBuilder norm(final TokenBuilder tb, final byte[] tok) {
+  static TokenBuilder norm(final TokenBuilder tb, final byte[] tok) {
     final int l = tok.length;
     boolean ws1 = true;
     for(int i = 0; i < l; i += cl(tok[i])) {
       final int t = cp(tok, i);
       final boolean ws2 = !Character.isLetterOrDigit(t) && t != '.' &&
         t != '!' && t != '?';
-      final boolean nl = t == '\n';
+      final boolean nl = t == '\n' || t == '\r';
       if(ws2 && ws1) {
         if(nl) {
           if(i == 0) tb.addUTF(t);
-          else if(tb.size != 0) tb.replace((byte) '\n', tb.size - 1);
+          else if(tb.size != 0) tb.replace((byte) t, tb.size - 1);
         }
       } else {
         tb.addUTF(ws2 && !nl ? (byte) ' ' : t);

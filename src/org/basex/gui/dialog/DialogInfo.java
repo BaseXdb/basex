@@ -28,7 +28,7 @@ import org.basex.util.Performance;
  */
 public final class DialogInfo extends Dialog {
   /** Index Checkbox. */
-  private final BaseXCheckBox[] indexes = new BaseXCheckBox[3];
+  private final BaseXCheckBox[] indexes = new BaseXCheckBox[4];
 
   /**
    * Default Constructor.
@@ -74,6 +74,7 @@ public final class DialogInfo extends Dialog {
     indexes[0] = add(check, INFOTXTINDEX, meta.txtindex);
     indexes[2] = add(check, INFOFTINDEX, meta.ftxindex);
     indexes[1] = add(check, INFOATVINDEX, meta.atvindex);
+    indexes[3] = add(check, CREATEFZINDEX, meta.fzindex);
     pp.add(check, BorderLayout.CENTER);
 
     set(pp, BorderLayout.CENTER);
@@ -82,7 +83,7 @@ public final class DialogInfo extends Dialog {
         new String[] { BUTTONOPT, BUTTONOK, BUTTONCANCEL },
         new byte[][] { HELPOPT, HELPOK, HELPCANCEL }), BorderLayout.SOUTH);
 
-    //setInfo();
+    action(null);
     finish(gui);
   }
 
@@ -126,6 +127,7 @@ public final class DialogInfo extends Dialog {
   
   @Override
   public void action(final String cmd) {
+    indexes[3].setEnabled(indexes[2].isSelected());
     if(BUTTONOPT.equals(cmd)) GUI.get().execute(Commands.OPTIMIZE);
   }
 }

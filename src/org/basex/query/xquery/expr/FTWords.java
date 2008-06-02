@@ -17,38 +17,32 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class FTWords extends Single {
-  /** All option. */
-  public static final int ALL = 0;
-  /** All words option. */
-  public static final int ALLWORDS = 1;
-  /** Any option. */
-  public static final int ANY = 2;
-  /** Any words option. */
-  public static final int ANYWORD = 3;
-  /** Phrase search option. */
-  public static final int PHRASE = 4;
+  /** Words mode. */
+  public enum Mode {
+    /** All option. */       ALL,
+    /** All words option. */ ALLWORDS,
+    /** Any option. */       ANY,
+    /** Any words option. */ ANYWORD,
+    /** Phrase search. */    PHRASE
+  };
 
+  /** Stemming instance. */
+  private static final FTStemming STEM = new FTStemming();
   /** Minimum and maximum occurrences. */
   Expr[] occ;
   /** Search mode. */
-  int mode;
-
+  Mode mode;
+  
   /**
    * Constructor.
    * @param e expression
    * @param m search mode
    * @param o occurrences
    */
-  public FTWords(final Expr e, final int m, final Expr[] o) {
+  public FTWords(final Expr e, final Mode m, final Expr[] o) {
     super(e);
     mode = m;
     occ = o;
-  }
-
-  @Override
-  public Iter iter(final XQContext ctx) throws XQException {
-    final int len = contains(ctx);
-    return Dbl.iter(len == 0 ? 0 : Scoring.word(ctx.ftitem.length, len));
   }
 
   @Override
@@ -56,6 +50,12 @@ public final class FTWords extends Single {
     occ[0] = occ[0].comp(ctx);
     occ[1] = occ[1].comp(ctx);
     return super.comp(ctx);
+  }
+
+  @Override
+  public Iter iter(final XQContext ctx) throws XQException {
+    final int len = contains(ctx);
+    return Dbl.iter(len == 0 ? 0 : Scoring.word(ctx.ftitem.length, len));
   }
 
   /**
@@ -132,32 +132,39 @@ public final class FTWords extends Single {
   private static int cont(final XQContext ctx, final byte[] sub) {
     final FTOptions opt = ctx.ftopt;
 
-    byte[] tok = ctx.ftitem;
-    byte[] sb = opt.wildcards ? sub :
+    byte[] tk = ctx.ftitem;
+    byte[] sb = opt.wc.bool() ? sub :
       FTCont.norm(new TokenBuilder(), sub).finish();
 
-    if(!opt.diacritics) {
+    if(opt.stem.bool()) {
+      sb = STEM.stem(sb);
+      tk = STEM.stem(tk);
+    }
+
+    if(!opt.diacr.bool()) {
       sb = dc(sb);
-      tok = dc(tok);
+      tk = dc(tk);
     }
 
-    if(opt.uppercase) {
+    if(opt.uc.bool()) {
       sb = uc(sb);
-    } else if(!opt.sensitive || opt.lowercase) {
+    } else if(!opt.sens.bool() || opt.lc.bool()) {
       sb = lc(sb);
-      if(!opt.lowercase) tok = lc(tok);
+      if(!opt.lc.bool()) tk = lc(tk);
     }
-
+    
     final int sl = sb.length;
-    final int tl = tok.length;
+    final int tl = tk.length;
+    final TokenBuilder st = new TokenBuilder();
+    final TokenBuilder tt = new TokenBuilder();
 
     IntList il = null;
     int p = -1;
 
-    if(opt.wildcards) {
-      // performs a wildcard search
+    if(opt.wc.bool()) {
+      // [CG] performs a wildcard search - support wildcard phrases
       final String cmp = string(sb);
-      for(final String s : string(tok).split("[^A-Za-z0-9_]")) {
+      for(final String s : string(tk).split("[\\p{Punct}\\s]")) {
         p++;
         if(s.matches(cmp)) {
           if(il == null) il = new IntList();
@@ -167,29 +174,32 @@ public final class FTWords extends Single {
     } else {
       // compare tokens character wise
       for(int i = 0; i <= tl - sl; i++) {
-        if(i > 0 && tok[i] > ' ') continue;
-        while(i < tl - sl && !letterOrDigit(tok[i])) i++;
+        if(i > 0 && (tk[i] < 0 || tk[i] > ' ')) continue;
+        while(i < tl - sl && !letterOrDigit(tk[i])) i++;
         p++;
         int s = -1;
         int t = i - 1;
-        if(opt.stopwords == null) {
-          while((++t < tl & ++s < sl) && sb[s] == tok[t]);
+        if(opt.sw == null) {
+          while(++t < tl & ++s < sl) {
+            byte sv = sb[s];
+            byte tv = tk[t];
+            if(sv != tv && (sv < 0 || sv > ' ' || tv < 0 || tv > ' ')) break;
+          }
         } else {
           // parsing stop words (inefficient)
           while(s < sl) {
-            final TokenBuilder st1 = new TokenBuilder();
-            final TokenBuilder st2 = new TokenBuilder();
-            while(++s < sl && letterOrDigit(sb[s])) st1.add(sb[s]);
-            while(++t < tl && letterOrDigit(tok[t])) st2.add(tok[t]);
-            final byte[] s1 = st1.finish();
-            if(!opt.stopwords.contains(s1) && !eq(s1, st2.finish())) {
+            st.reset();
+            tt.reset();
+            while(++s < sl && letterOrDigit(sb[s])) st.add(sb[s]);
+            while(++t < tl && letterOrDigit(tk[t])) tt.add(tk[t]);
+            final byte[] s1 = st.finish();
+            if(!opt.sw.contains(s1) && !eq(s1, tt.finish())) {
               s = 0;
               break;
             }
           }
         }
-        if(s == sl && (t == tl || !letterOrDigit(tok[t])) ||
-            opt.stemming) {
+        if(s == sl && (t == tl || !letterOrDigit(tk[t]))) {
           if(il == null) il = new IntList();
           il.add(p);
         }

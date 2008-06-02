@@ -292,7 +292,7 @@ public final class XQParser {
           if(!defaultNamespaceDecl() && !defaultCollationDecl() &&
               !emptyOrderDecl()) Err.or(DECLINCOMPLETE);
         } else if(consumeWS(FTOPTION)) {
-          ftMatchOption(ctx.ftoptions);
+          ftMatchOption(ctx.ftopt);
         } else {
           //alter = DECLINCOMPLETE;
           qp = p;
@@ -941,9 +941,16 @@ public final class XQParser {
   private Expr ftContainsExpr() throws XQException {
     final Expr expr = rangeExpr();
     if(!consumeWS(FTCONTAINS)) return expr;
-    consumeWS();
+    
     // [CG] XQuery/FTIgnoreOption
-    return new FTCont(expr, ftSelection());
+    final Expr select = ftSelection();
+    //Expr ignore = null;
+    if(consume(WITHOUT) && consume(CONTENT)) {
+      //ignore = unionExpr();
+      unionExpr();
+      Err.or(FTIGNORE);
+    }
+    return new FTCont(expr, select);
   }
 
   /**
@@ -2020,8 +2027,7 @@ public final class XQParser {
    * @throws XQException xquery exception
    */
   private Expr ftPrimaryWithOptions() throws XQException {
-    final FTOptions opt = ctx.ftoptions.clone();
-    opt.expr = ftPrimary();
+    final FTOptions opt = new FTOptions(ftPrimary());
     while(ftMatchOption(opt));
     return opt;
   }
@@ -2051,13 +2057,13 @@ public final class XQParser {
     final Expr expr = ftWordsValue();
 
     // FTAnyAllOption
-    int mode = FTWords.ANY;
+    FTWords.Mode mode = FTWords.Mode.ANY;
     if(consumeWS(ALL)) {
-      mode = consumeWS(WORDS) ? FTWords.ALLWORDS : FTWords.ALL;
+      mode = consumeWS(WORDS) ? FTWords.Mode.ALLWORDS : FTWords.Mode.ALL;
     } else if(consumeWS(ANY)) {
-      mode = consumeWS(WORD) ? FTWords.ANYWORD : FTWords.ANY;
+      mode = consumeWS(WORD) ? FTWords.Mode.ANYWORD : FTWords.Mode.ANY;
     } else if(consumeWS(PHRASE)) {
-      mode = FTWords.PHRASE;
+      mode = FTWords.Mode.PHRASE;
     }
 
     // FTTimes
@@ -2121,7 +2127,6 @@ public final class XQParser {
   }
 
   /**
-   * [FT144] Parses an FTSelection.
    * [FT154] Parses an FTMatchOption.
    * @param opt options instance
    * @return false if no options were found
@@ -2131,61 +2136,84 @@ public final class XQParser {
     // [CG] XQuery/FTMatchOptions: language, stemming, thesaurus, stopword, ...
 
     if(consumeWS(LOWERCASE)) {
-      if(opt.lowercase || opt.uppercase || opt.sensitive) Err.or(FTCASE);
-      opt.lowercase = true;
-      opt.sensitive = true;
+      if(opt.lc != null || opt.uc != null ||
+          opt.sens != null) Err.or(FTCASE);
+      opt.lc = Bln.TRUE;
+      opt.sens = Bln.TRUE;
     } else if(consumeWS(UPPERCASE)) {
-      if(opt.lowercase || opt.uppercase || opt.sensitive) Err.or(FTCASE);
-      opt.uppercase = true;
-      opt.sensitive = true;
+      if(opt.lc != null || opt.uc != null ||
+          opt.sens != null) Err.or(FTCASE);
+      opt.uc = Bln.TRUE;
+      opt.sens = Bln.TRUE;
     } else if(consumeWS(CASE)) {
-      if(opt.lowercase || opt.uppercase || opt.sensitive) Err.or(FTCASE);
-      opt.sensitive = consumeWS(SENSITIVE);
-      if(!opt.sensitive) check(INSENSITIVE);
+      if(opt.lc != null || opt.uc != null ||
+          opt.sens != null) Err.or(FTCASE);
+      opt.sens = Bln.get(consumeWS(SENSITIVE));
+      if(opt.sens == null) check(INSENSITIVE);
     } else if(consumeWS(DIACRITICS)) {
-      if(opt.diacritics) Err.or(FTDIA);
-      opt.diacritics = consumeWS(SENSITIVE);
-      if(!opt.diacritics) check(INSENSITIVE);
+      if(opt.diacr != null) Err.or(FTDIA);
+      opt.diacr = Bln.get(consumeWS(SENSITIVE));
+      if(opt.diacr == null) check(INSENSITIVE);
     } else if(consumeWS(LANGUAGE)) {
-      opt.language = stringLiteral();
-      Err.or(FTLAN);
+      opt.lng = stringLiteral();
+      Err.or(FTLAN, opt.lng);
     } else {
+      final int p = qp;
       final boolean with = consumeWS(WITH);
       if(!with && !consumeWS(WITHOUT)) return false;
 
       if(consume(STEMMING)) {
-        opt.stemming = with;
-        if(with) Err.or(FTSTEMMING);
+        opt.stem = Bln.get(with);
+        //if(with) Err.or(FTSTEMMING);
       } else if(consume(THESAURUS)) {
-        opt.thesaurus = with;
+        opt.thes = Bln.get(with);
         if(with) Err.or(FTTHES);
       } else if(consume(STOP)) {
         // add union/except
         check(WORDS);
-        if(with) {
-          if(with && consume(PAR1)) {
-            opt.stopwords = new TokenList();
-            do opt.stopwords.add(stringLiteral()); while(consume(COMMA));
+        opt.sw = new TokenList();
+        boolean union = false;
+        boolean except = false;
+        while(with) {
+          if(consume(PAR1)) {
+            do {
+              final byte[] sl = stringLiteral();
+              if(except) {
+                final int i = opt.sw.indexOf(sl);
+                if(i != -1) opt.sw.remove(i);
+              } else if(!union || !opt.sw.contains(sl)) {
+                opt.sw.add(sl);
+              }
+            } while(consume(COMMA));
             check(PAR2);
           } else if(consume(AT)) {
             final IO fl = new IO(string(stringLiteral()));
             try {
-              opt.stopwords = new TokenList();
-              opt.stopwords.add(split(norm(fl.content()), ' '));
+              final byte[][] sl = split(norm(fl.content()), ' ');
+              if(union) {
+                opt.sw.union(sl);
+              } else if(except) {
+                opt.sw.except(sl);
+              } else {
+                opt.sw.add(sl);
+              }
             } catch(final IOException ex) {
               Err.or(NOSTOPFILE, fl);
             }
           }
+          
+          union = consume(UNION);
+          except = !union && consume(EXCEPT);
+          if(!union && !except) break;
         }
       } else if(consume(DEFAULT)) {
         check(STOP);
         check(WORDS);
       } else if(consume(WILDCARDS)) {
-        opt.wildcards = with;
-      } else if(!with && consume(CONTENT)) {
-        Err.or(FTIGNORE);
+        opt.wc = Bln.get(with);
       } else {
-        Err.or(FTMATCH, with ? WITH : WITHOUT);
+        qp = p;
+        return false;
       }
     }
     return true;

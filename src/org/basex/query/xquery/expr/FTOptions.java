@@ -1,8 +1,11 @@
 package org.basex.query.xquery.expr;
 
+import org.basex.data.Serializer;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
+import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.iter.Iter;
+import org.basex.util.Token;
 import org.basex.util.TokenList;
 
 /**
@@ -13,23 +16,23 @@ import org.basex.util.TokenList;
  */
 public final class FTOptions extends Single implements Cloneable {
   /** Sensitive flag. */
-  public boolean sensitive;
+  public Bln sens;
   /** Lowercase flag. */
-  public boolean lowercase;
+  public Bln lc;
   /** Uppercase flag. */
-  public boolean uppercase;
+  public Bln uc;
   /** Diacritics flag. */
-  public boolean diacritics;
+  public Bln diacr;
   /** Stemming flag (currently ignored). */
-  public boolean stemming;
+  public Bln stem;
   /** Thesaurus flag (currently ignored). */
-  public boolean thesaurus;
+  public Bln thes;
   /** Wildcards flag. */
-  public boolean wildcards;
+  public Bln wc;
   /** Stopwords flag. */
-  public TokenList stopwords;
+  public TokenList sw;
   /** Language (currently ignored). */
-  public byte[] language;
+  public byte[] lng;
 
   /**
    * Constructor.
@@ -37,6 +40,38 @@ public final class FTOptions extends Single implements Cloneable {
    */
   public FTOptions(final Expr e) {
     super(e);
+  }
+
+  @Override
+  public Expr comp(final XQContext ctx) throws XQException {
+    final FTOptions tmp = ctx.ftopt;
+    
+    if(tmp == null) {
+      sens = Bln.FALSE;
+      lc = Bln.FALSE;
+      uc = Bln.FALSE;
+      diacr = Bln.FALSE;
+      stem = Bln.FALSE;
+      thes = Bln.FALSE;
+      wc = Bln.FALSE;
+    } else {
+      if(sens == null) sens = tmp.sens;
+      if(lc == null) lc = tmp.lc;
+      if(uc == null) uc = tmp.uc;
+      if(diacr == null) diacr = tmp.diacr;
+      if(stem == null) stem = tmp.stem;
+      if(thes == null) thes = tmp.thes;
+      if(wc == null) wc = tmp.wc;
+      if(sw == null) sw = tmp.sw;
+      if(lng == null) lng = tmp.lng;
+    }
+    
+    if(expr != null) {
+      ctx.ftopt = this;
+      expr = expr.comp(ctx);
+      ctx.ftopt = tmp;
+    }
+    return this;
   }
 
   @Override
@@ -58,7 +93,21 @@ public final class FTOptions extends Single implements Cloneable {
   }
 
   @Override
+  public void plan(final Serializer ser) throws Exception {
+    ser.startElement(this);
+    if(stem.bool()) ser.attribute(Token.token("stemming"), Token.TRUE);
+    if(wc.bool()) ser.attribute(Token.token("wildcards"), Token.TRUE);
+    ser.finishElement();
+    expr.plan(ser);
+    ser.closeElement(this);
+  }
+
+  @Override
   public String toString() {
-    return expr.toString();
+    final StringBuilder sb = new StringBuilder();
+    sb.append(expr != null ? expr.toString() : "FTOptions");
+    if(stem.bool()) sb.append(" with stemming");
+    if(wc.bool()) sb.append(" with wildcards");
+    return sb.toString();
   }
 }

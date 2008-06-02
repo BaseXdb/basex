@@ -95,3 +95,6 @@ xmlns
 ftcontains
 logarithmic
 textfield
+thesaurus
+stopwords
+uppercase

@@ -1037,7 +1037,6 @@ public final class XMLScanner {
    * @return per cent
    */
   public double percent() {
-    System.out.println(input.pos() + "/" + input.length());
     return (double) input.pos() / input.length();
   }
 
