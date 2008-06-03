@@ -48,6 +48,7 @@ import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTextField;
+import org.basex.gui.layout.TableLayout;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewContainer;
 import org.basex.gui.view.ViewPanel;
@@ -170,15 +171,15 @@ public final class GUI extends JFrame {
 
     buttons = new BaseXBack();
     buttons.setLayout(new BorderLayout());
-    toolbar = new GUIToolBar();
+    toolbar = new GUIToolBar(TOOLBAR);
     buttons.add(toolbar, BorderLayout.WEST);
-
-    BaseXBack b = new BaseXBack();
 
     hits = new BaseXLabel(" ");
     hits.setFont(fnt);
     BaseXLayout.setWidth(hits, 150);
     hits.setHorizontalAlignment(SwingConstants.RIGHT);
+    
+    BaseXBack b = new BaseXBack();
     b.add(hits);
     b.add(Box.createHorizontalStrut(4));
 
@@ -214,9 +215,6 @@ public final class GUI extends JFrame {
       }
     });
     nav.add(mode, BorderLayout.WEST);
-
-    b = new BaseXBack();
-    b.setLayout(new BorderLayout());
 
     input = new BaseXTextField(null);
 
@@ -284,12 +282,11 @@ public final class GUI extends JFrame {
       }
     });
 
+    b = new BaseXBack();
+    b.setLayout(new BorderLayout());
     b.add(hist, BorderLayout.WEST);
     b.add(input, BorderLayout.CENTER);
     nav.add(b, BorderLayout.CENTER);
-
-    b = new BaseXBack();
-    b.setLayout(new BorderLayout());
 
     exec = new BaseXButton(icon("go"), HELPEXEC);
     exec.trim();
@@ -305,23 +302,19 @@ public final class GUI extends JFrame {
       }
     });
 
-    filter = new BaseXButton(icon("filter"), HELPFILTER);
-    filter.trim();
-    filter.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent e) {
-        GUICommands.FILTER.execute();
-      }
-    });
+    filter = GUIToolBar.newButton(GUICommands.FILTER);
     filter.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
         checkKeys(e);
       }
     });
-    b.add(filter);
 
-    b.add(exec, BorderLayout.CENTER);
-    b.add(filter, BorderLayout.EAST);
+    b = new BaseXBack();
+    b.setLayout(new TableLayout(1, 3));
+    b.add(exec);
+    b.add(Box.createHorizontalStrut(4));
+    b.add(filter);
     nav.add(b, BorderLayout.EAST);
 
     if(GUIProp.showinput) control.add(nav, BorderLayout.SOUTH);

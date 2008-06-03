@@ -121,7 +121,8 @@ public enum GUICommands implements GUICommand {
 
       if(fc.select(BaseXFileChooser.OPEN)) {
         try {
-          main.query.setXQuery(fc.getFile().content());
+          final IO file = fc.getFile();
+          main.query.setXQuery(file.content(), file.path());
         } catch(final IOException ex) {
           JOptionPane.showMessageDialog(main, XQOPERROR,
               DIALOGINFO, JOptionPane.ERROR_MESSAGE);
@@ -138,8 +139,9 @@ public enum GUICommands implements GUICommand {
       // open file chooser for XML creation
       final GUI main = GUI.get();
 
+      final String fn = main.query.getFilename();
       final BaseXFileChooser fc = new BaseXFileChooser(XQSAVETITLE,
-          GUIProp.createpath, main);
+          fn == null ? GUIProp.createpath : fn, main);
       fc.addFilter(IO.XQSUFFIX, CREATEXQDESC);
 
       if(fc.select(BaseXFileChooser.SAVE)) {
@@ -315,7 +317,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Filter currently marked nodes. */
-  FILTER(false, GUIFILTER, null, GUIFILTERTT) {
+  FILTER(true, GUIFILTER, null, GUIFILTERTT) {
     @Override
     public void execute() {
       final Context context = GUI.context;
@@ -330,7 +332,8 @@ public enum GUICommands implements GUICommand {
 
     @Override
     public void refresh(final AbstractButton button) {
-      BaseXLayout.enable(button, GUI.context.db());
+      final Nodes marked = GUI.context.marked();
+      BaseXLayout.enable(button, marked != null && marked.size != 0);
     }
   },
 

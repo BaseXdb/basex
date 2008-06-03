@@ -44,6 +44,7 @@ public final class BaseXFileChooser {
       fd.setDirectory(path);
     } else {
       fc = new JFileChooser(path);
+      if(path.contains(".")) fc.setSelectedFile(new File(path));
       fc.setDialogTitle(title);
       parent = par;
     }

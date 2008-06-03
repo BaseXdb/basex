@@ -77,6 +77,11 @@ public final class GUIConstants {
       SHOWHELP, INFO
   };
 
+  /** Toolbar entries, containing the xquery button commands. */
+  public static final GUICommand[] TOOLXQ = {
+    XQOPEN, XQSAVE
+  };
+
   // MENUBARS =================================================================
 
   /** Top menu entries. */

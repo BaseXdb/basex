@@ -1,6 +1,7 @@
 package org.basex.gui.layout;
 
 import static org.basex.Text.*;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -68,8 +69,9 @@ public final class BaseXButton extends JButton {
    * Trims the horizontal button margins.
    */
   public void trim() {
-    //final Insets in = getMargin();
-    //if(in.left < 1 || in.right < 1) return;
-    //setMargin(new Insets(1, 1, 1, 1));
+    final Insets in = getMargin();
+    in.left /= 4;
+    in.right /= 4;
+    if(in.top < in.left) setMargin(in);
   }
 }

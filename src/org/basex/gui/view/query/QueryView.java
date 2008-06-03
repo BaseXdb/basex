@@ -10,8 +10,10 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.border.EmptyBorder;
 import org.basex.gui.GUI;
+import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
+import org.basex.gui.GUIToolBar;
 import org.basex.gui.GUIConstants.FILL;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
@@ -44,6 +46,12 @@ public final class QueryView extends View {
   final BaseXLabel header;
   /** Button box. */
   private final BaseXBack back;
+  /** Open button. */
+  private final BaseXButton open;
+  /** Save button. */
+  private final BaseXButton save;
+  /** Query file. */
+  String file;
 
   /**
    * Default constructor.
@@ -61,6 +69,7 @@ public final class QueryView extends View {
 
     final Box box = new Box(BoxLayout.X_AXIS);
     box.setBorder(new EmptyBorder(0, 0, 8, 0));
+    
     for(int i = 0; i < NPANELS; i++) {
       final int m = i;
       input[i] = new BaseXButton(SEARCHMODE[i], HELPSEARCH[i]);
@@ -71,14 +80,20 @@ public final class QueryView extends View {
         }
       });
       box.add(input[i]);
-      box.add(Box.createHorizontalStrut(6));
+      box.add(Box.createHorizontalStrut(4));
       if(i == 0) {
         panels[i] = new QueryArea(this);
       } else if(i == SIMPLE) {
         panels[i] = new QuerySimple(this);
       }
     }
-    box.add(Box.createHorizontalStrut(6));
+
+    open = GUIToolBar.newButton(GUICommands.XQOPEN);
+    save = GUIToolBar.newButton(GUICommands.XQSAVE);
+    box.add(Box.createHorizontalGlue());
+    box.add(open);
+    box.add(Box.createHorizontalStrut(4));
+    box.add(save);
 
     back.add(box, BorderLayout.CENTER);
 
@@ -118,9 +133,12 @@ public final class QueryView extends View {
     search = panels[mode];
     search.init();
     search.refresh();
+    open.setEnabled(mode == 0);
+    save.setEnabled(mode == 0);
     if(GUIProp.execrt) search.query(GUIProp.showquery);
     revalidate();
     repaint();
+    refresh();
   }
 
   /**
@@ -158,10 +176,12 @@ public final class QueryView extends View {
   /**
    * Sets a new XQuery request.
    * @param xq XQuery
+   * @param f file name
    */
-  public void setXQuery(final byte[] xq) {
+  public void setXQuery(final byte[] xq, final String f) {
     panels[0].last = Token.string(xq);
     mode = 0;
+    file = f;
     refreshLayout();
   }
 
@@ -171,5 +191,13 @@ public final class QueryView extends View {
    */
   public byte[] getXQuery() {
     return Token.token(panels[0].last);
+  }
+
+  /**
+   * Returns the query file name.
+   * @return file name
+   */
+  public String getFilename() {
+    return file;
   }
 }

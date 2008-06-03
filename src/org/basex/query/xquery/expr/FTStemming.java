@@ -254,6 +254,7 @@ public class FTStemming {
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
+    if(args.length == 0) return;
      final byte[] cont = new IO(args[0]).content();
      int p = -1;
 

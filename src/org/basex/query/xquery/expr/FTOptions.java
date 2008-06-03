@@ -46,25 +46,16 @@ public final class FTOptions extends Single implements Cloneable {
   public Expr comp(final XQContext ctx) throws XQException {
     final FTOptions tmp = ctx.ftopt;
     
-    if(tmp == null) {
-      sens = Bln.FALSE;
-      lc = Bln.FALSE;
-      uc = Bln.FALSE;
-      diacr = Bln.FALSE;
-      stem = Bln.FALSE;
-      thes = Bln.FALSE;
-      wc = Bln.FALSE;
-    } else {
-      if(sens == null) sens = tmp.sens;
-      if(lc == null) lc = tmp.lc;
-      if(uc == null) uc = tmp.uc;
-      if(diacr == null) diacr = tmp.diacr;
-      if(stem == null) stem = tmp.stem;
-      if(thes == null) thes = tmp.thes;
-      if(wc == null) wc = tmp.wc;
-      if(sw == null) sw = tmp.sw;
-      if(lng == null) lng = tmp.lng;
-    }
+    final boolean emp = tmp == null;
+    if(sens == null) sens = emp ? Bln.FALSE : tmp.sens;
+    if(lc == null) lc = emp ? Bln.FALSE : tmp.lc;
+    if(uc == null) uc = emp ? Bln.FALSE : tmp.uc;
+    if(diacr == null) diacr = emp ? Bln.FALSE : tmp.diacr;
+    if(stem == null) stem = emp ? Bln.FALSE : tmp.stem;
+    if(thes == null) thes = emp ? Bln.FALSE : tmp.thes;
+    if(wc == null) wc = emp ? Bln.FALSE : tmp.wc;
+    if(sw == null) sw = emp ? null : tmp.sw;
+    if(lng == null) lng = emp ? null : tmp.lng;
     
     if(expr != null) {
       ctx.ftopt = this;

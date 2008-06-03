@@ -4,10 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.ImageIcon;
 import javax.swing.JToolBar;
-import javax.swing.border.EmptyBorder;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.util.Token;
-import static org.basex.gui.GUIConstants.*;
 
 /**
  * This is the toolbar of the main window.
@@ -17,29 +15,24 @@ import static org.basex.gui.GUIConstants.*;
  * @author Christian Gruen
  */
 public final class GUIToolBar extends JToolBar {
+  /** Toolbar commands. */
+  private final GUICommand[] toolbar;
+  
   /**
    * Default Constructor.
+   * @param tb toolbar commands
    */
-  public GUIToolBar() {
+  public GUIToolBar(final GUICommand[] tb) {
     super();
     setFloatable(false);
-    setOpaque(false);
-    setBorder(new EmptyBorder(2, 2, 0, 0));
+    toolbar = tb;
 
-    for(final GUICommand cmd : TOOLBAR) {
+    for(final GUICommand cmd : toolbar) {
       if(cmd == null) {
         addSeparator();
       } else {
-        // the image equals the 'cmd-' prefix and the command in lower case
-        final ImageIcon icon = GUI.icon("cmd-" + cmd.toString().toLowerCase());
-        final String info = cmd.help();
-        final BaseXButton button = new BaseXButton(icon, Token.token(info));
+        final BaseXButton button = newButton(cmd);
         button.setFocusable(false);
-        button.addActionListener(new ActionListener() {
-          public void actionPerformed(final ActionEvent e) {
-            cmd.execute();
-          }
-        });
         add(button);
       }
     }
@@ -49,10 +42,29 @@ public final class GUIToolBar extends JToolBar {
   /**
    * Refresh buttons.
    */
-  void refresh() {
-    for(int b = 0; b < TOOLBAR.length; b++) {
-      if(TOOLBAR[b] == null) continue;
-      TOOLBAR[b].refresh((BaseXButton) getComponent(b));
+  public void refresh() {
+    for(int b = 0; b < toolbar.length; b++) {
+      if(toolbar[b] == null) continue;
+      toolbar[b].refresh((BaseXButton) getComponent(b));
     }
+  }
+
+  /**
+   * Creates a new button.
+   * @param cmd command
+   * @return button
+   */
+  public static BaseXButton newButton(final GUICommand cmd) {
+    // the image equals the 'cmd-' prefix and the command in lower case
+    final ImageIcon icon = GUI.icon("cmd-" + cmd.toString().toLowerCase());
+    final String info = cmd.help();
+    final BaseXButton button = new BaseXButton(icon, Token.token(info));
+    button.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent e) {
+        cmd.execute();
+      }
+    });
+    button.trim();
+    return button;
   }
 }

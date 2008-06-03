@@ -1,7 +1,6 @@
 package org.basex.gui.view.query;
 
 import static org.basex.Text.*;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Insets;
@@ -20,8 +19,10 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.StatsKey;
 import org.basex.gui.GUI;
+import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
+import org.basex.gui.GUIToolBar;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCombo;
@@ -30,7 +31,6 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
-import org.basex.gui.view.View;
 import org.basex.index.Names;
 import org.basex.query.xpath.func.ContainsLC;
 import org.basex.util.Set;
@@ -62,7 +62,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
   /** Main panel. */
   BaseXBack panel;
   /** Query field. */
-  BaseXCombo all;
+  BaseXTextField all;
   /** Filter button. */
   BaseXButton filter;
   /** Execute button. */
@@ -81,7 +81,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     panel = new BaseXBack(GUIConstants.FILL.NONE);
     panel.setLayout(new TableLayout(20, 2, 10, 5));
 
-    all = new BaseXCombo(new String[] {}, null, true);
+    all = new BaseXTextField(null);
     all.addKeyListener(main);
     all.addKeyListener(new KeyAdapter() {
       @Override
@@ -99,8 +99,6 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     final BaseXBack p = new BaseXBack(GUIConstants.FILL.NONE);
     p.setLayout(new BorderLayout());
 
-    final Box box = new Box(BoxLayout.X_AXIS);
-
     exec = new BaseXButton(GUI.icon("go"), HELPEXEC);
     exec.trim();
     exec.addKeyListener(main);
@@ -109,18 +107,9 @@ final class QuerySimple extends QueryPanel implements ActionListener {
         query(true);
       }
     });
-    box.add(exec);
 
-    filter = new BaseXButton(GUI.icon("filter"), HELPFILTER);
-    filter.trim();
+    filter = GUIToolBar.newButton(GUICommands.FILTER);
     filter.addKeyListener(main);
-    filter.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent e) {
-        View.notifyContext(GUI.context.marked(), false);
-      }
-    });
-    box.add(filter);
-    box.add(Box.createHorizontalStrut(6));
 
     copy = new BaseXButton(BUTTONTOXPATH, HELPTOXPATH);
     copy.addKeyListener(main);
@@ -132,6 +121,12 @@ final class QuerySimple extends QueryPanel implements ActionListener {
       }
     });
     BaseXLayout.enable(copy, false);
+    
+    final Box box = new Box(BoxLayout.X_AXIS);
+    box.add(exec);
+    box.add(Box.createHorizontalStrut(4));
+    box.add(filter);
+    box.add(Box.createHorizontalStrut(6));
     box.add(copy);
 
     p.add(box, BorderLayout.EAST);
@@ -161,7 +156,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     BaseXLayout.enable(filter, !GUIProp.filterrt && marked.size != 0);
     BaseXLayout.enable(exec, !GUIProp.execrt);
 
-    all.help = GUI.context.data().deepfs ? HELPSEARCHFS : HELPSEARCHXML;
+    all.help(GUI.context.data().deepfs ? HELPSEARCHFS : HELPSEARCHXML);
     if(GUIProp.showquery && panel.getComponentCount() == 0) {
       create();
       main.revalidate();
