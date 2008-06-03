@@ -2,14 +2,20 @@ package org.basex.gui.view.text;
 
 import static org.basex.gui.GUIConstants.*;
 import java.awt.BorderLayout;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+
 import org.basex.BaseX;
 import org.basex.data.Nodes;
 import org.basex.data.PrintSerializer;
 import org.basex.gui.GUI;
+import org.basex.gui.GUICommands;
 import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants;
+import org.basex.gui.GUIToolBar;
 import org.basex.gui.GUIConstants.FILL;
-import org.basex.gui.layout.BaseXBack;
+import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXSyntax;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.BaseXLabel;
@@ -27,15 +33,12 @@ public final class TextView extends View {
   /** Maximum text size to be displayed. */
   public static final int MAX = 1 << 20;
   /** Text Area. */
-  final BaseXText area;
+  private final BaseXText area;
   /** Header string. */
-  final BaseXLabel header;
-  /** Background for header.NORTH. **/
-  BaseXBack north;
-  /** Background for header.CENTER. **/
-  BaseXBack center;
+  private final BaseXLabel header;
+  /** Open button. */
+  private BaseXButton export;
   
-
   /**
    * Default constructor.
    * @param mode panel design
@@ -45,24 +48,23 @@ public final class TextView extends View {
   public TextView(final FILL mode, final String head, final byte[] help) {
     super(help);
     setMode(mode);
-    setBorder(8, 8, 8, 8);
+    setBorder(4, 8, 8, 8);
     setLayout(new BorderLayout());
     area = new BaseXText(help, false);
     add(area, BorderLayout.CENTER);
-    north = new BaseXBack(FILL.NONE);
-    north.setLayout(new BorderLayout());
+    
     header = new BaseXLabel(head, 10);
-    initHeader();
-    refreshLayout();
-  }
+    export = GUIToolBar.newButton(GUICommands.EXPORT);
 
-  /**
-   * Init header displaying ftsearch strings.
-   */
-  public void initHeader() {
-    north.add(header, BorderLayout.WEST);
-    //add(header, BorderLayout.NORTH);
-    add(north, BorderLayout.NORTH);
+    final Box box = new Box(BoxLayout.X_AXIS);
+    box.add(header);
+    if(head.equals(GUIConstants.TEXTVIEW)) {
+      box.add(Box.createHorizontalGlue());
+      box.add(export);
+    }
+    add(box, BorderLayout.NORTH);
+
+    refreshLayout();
   }
   
   @Override
@@ -132,5 +134,13 @@ public final class TextView extends View {
   public void setText(final byte[] txt, final int s, final boolean inf) {
     area.setText(txt, s);
     area.setSyntax(inf ? BaseXSyntax.SIMPLE : new XMLSyntax());
+  }
+
+  /**
+   * Returns the text.
+   * @return XQuery
+   */
+  public byte[] getText() {
+    return area.getText();
   }
 }

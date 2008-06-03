@@ -51,7 +51,7 @@ public abstract class Index {
    * @return ids
    */
   @SuppressWarnings("unused")
-  public int[][] idPos(final byte[] tok, final FTOption ftO,
+  public int[][] ftIDs(final byte[] tok, final FTOption ftO,
       final Data d) {
     BaseX.notimplemented();
     return null;
@@ -67,7 +67,7 @@ public abstract class Index {
    * @return ids
    */
   @SuppressWarnings("unused")
-  public int[][] idPosRange(final byte[] tok0, final boolean itok0, 
+  public int[][] idRange(final byte[] tok0, final boolean itok0, 
       final byte[] tok1, final boolean itok1) {
     BaseX.notimplemented();
     return null;

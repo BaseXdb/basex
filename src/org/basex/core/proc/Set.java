@@ -65,7 +65,7 @@ public final class Set extends Proc {
       Prop.mainmem = toggle(Prop.mainmem, INFOMAINMEM, ext);
     } else if(option.equals(RUNS)) {
       Prop.runs = Math.max(1, Token.toInt(ext));
-      info(INFORUNS + ": " + Prop.runs);
+      info(INFORUNS + Prop.runs);
     } else if(option.equals(SERIALIZE)) {
       Prop.serialize = toggle(Prop.serialize, INFOSERIALIZE, ext);
     } else if(option.equals(INFO)) {

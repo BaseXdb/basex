@@ -286,7 +286,7 @@ public final class Fuzzy extends Index {
   }
 
   @Override
-  public int[][] idPos(final byte[] tok, final FTOption ftO, final Data dd) {
+  public int[][] ftIDs(final byte[] tok, final FTOption ftO, final Data dd) {
     // init no wildcard included in token
     int posW = -1;
 

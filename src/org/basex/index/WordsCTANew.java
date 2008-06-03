@@ -60,7 +60,7 @@ public final class WordsCTANew extends Index {
   }
 
   @Override
-  public int[][] idPos(final byte[] tok, final FTOption ftO, final Data dd) {
+  public int[][] ftIDs(final byte[] tok, final FTOption ftO, final Data dd) {
     // init no wildcard included in token
     int posW = -1;
 
@@ -151,7 +151,7 @@ public final class WordsCTANew extends Index {
   }
   
   @Override
-  public int[][] idPosRange(final byte[] tokFrom, final boolean itok0,
+  public int[][] idRange(final byte[] tokFrom, final boolean itok0,
       final byte[] tokTo, final boolean itok1) {
     int[] tokF = new int[tokFrom.length];
     int tokFID = tokFrom.length;

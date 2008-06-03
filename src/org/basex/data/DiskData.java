@@ -348,14 +348,14 @@ public final class DiskData extends Data {
 
   @Override
    public int[][] ftIDs(final byte[] word, final FTOption ftO) {
-     return ftxindex.idPos(word, ftO, this);
+     return ftxindex.ftIDs(word, ftO, this);
    }
 
   @Override
   public int[][] ftIDRange(final byte[] word1, final boolean itok0,
       final byte[] word2, final boolean itok1) {
     
-    return ftxindex.idPosRange(word1, itok0, word2, itok1);
+    return ftxindex.idRange(word1, itok0, word2, itok1);
   }
 
   @Override

@@ -62,7 +62,7 @@ public final class WordsCTA extends Index {
   }
 
   @Override
-  public int[][] idPos(final byte[] tok, final FTOption ftO, final Data d) {
+  public int[][] ftIDs(final byte[] tok, final FTOption ftO, final Data d) {
     //return getNodesFuzzyWLev(0, new StringBuilder(), tok, 3, null);
     //return getNodeFuzzy(0, null, tok, 0, 0, 0, 3);
     // init no wildcard included in token
@@ -161,7 +161,7 @@ public final class WordsCTA extends Index {
   }
   
   @Override
-  public int[][] idPosRange(final byte[] tokFrom, final boolean itok0,
+  public int[][] idRange(final byte[] tokFrom, final boolean itok0,
       final byte[] tokTo, final boolean itok1) {
     int[][] data = null;
     fromi = itok0;

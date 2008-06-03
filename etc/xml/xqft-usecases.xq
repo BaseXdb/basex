@@ -1,5 +1,5 @@
-declare variable $specs := "xqft-usecases.xml";
-declare variable $sample := "xqft.xml";
+declare variable $specs := "xqft-usecases";
+declare variable $sample := "xqft";
 declare variable $stopwords := "xqft-sw.txt";
 
 declare function local:getQueries() {
@@ -24,7 +24,7 @@ declare function local:getQuery($node, $version) {
   for $query in local:getQueries()
   let $xquery := $query/xquery/text()
   return
-    <result query="{ $query/@section }">
+    <result section="{ $query/@section }">
     <query>{
       $xquery
     }</query>{

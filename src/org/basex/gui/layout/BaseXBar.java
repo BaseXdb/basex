@@ -163,7 +163,7 @@ public final class BaseXBar extends BaseXPanel {
     x = 0;
     y = Math.max(SIZE, hh - ww);
 
-    BaseXLayout.drawCell(g, 0, ww, y, y + ww - 1, false);
+    BaseXLayout.drawCell(g, 0, ww, y, y + ww, false);
 
     xx = x + SIZE / 2 - 3;
     yy = y + SIZE / 2 - 3;

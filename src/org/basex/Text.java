@@ -694,14 +694,16 @@ public interface Text {
   String NODBQUESTION = OPENNODBINFO + DOT + NL +
     lang("do_nodbquestion") + NL + " ";
 
-  /** Dialog title for creating a database. */
+  /** File Dialog title. */
   String XQOPENTITLE = lang("dq_open");
-  /** Dialog title for creating a database. */
+  /** File Dialog title. */
   String XQSAVETITLE = lang("dq_save");
-  /** Dialog title for creating a database. */
+  /** File Dialog error. */
   String XQOPERROR = lang("dq_notopened");
-  /** Dialog title for creating a database. */
+  /** File Dialog error. */
   String XQSAVERROR = lang("dq_notsaved");
+  /** File Dialog replace information. */
+  String FILEREPLACE = lang("dq_replace");
 
   /** Dialog Title for Import Options. */
   String IMPORTFSTITLE = lang("dfs_title");

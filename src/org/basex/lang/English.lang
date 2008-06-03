@@ -52,7 +52,7 @@ text_tit=Text
 d_info=Information
 d_fctitle=Choose Directory
 
-dc_title=Select XML document
+dc_title=Save XML document
 dc_xmldesc=XML Documents
 dc_zipdesc=Zipped XML Documents
 dc_gzdesc=GZipped XML Documents
@@ -85,6 +85,7 @@ dq_open=Open XQuery file
 dq_save=Save XQuery file
 dq_notopened=File could not be opened.
 dq_notsaved=File could not be saved.
+dq_replace=The file "%" already exists.\nDo you want to replace it?
 
 dfs_title=Import Filesystem
 dfs_save=Save As
@@ -262,7 +263,7 @@ proc_syntax=Syntax
 proc_err=Could not execute '%'
 proc_nodb=Please open a database first.
 proc_mm=Command is not available in main memory mode.
-proc_outmem=Out of Main Memory.\nThe following hints might help you:\n- You can increase Java's heap size with the flag -Xmx<size>.\n- You can try BaseX's internal XML parser with 'set intparse on'\n- You can save memory by deactivating some indexes.
+proc_outmem=Out of Main Memory.\nThe following hints might help you:\n- you can increase Java's heap size with the flag -Xmx<size>\n- you can try BaseX's internal XML parser with 'set intparse on'\n- you can save memory by deactivating some indexes
 
 cmd_unknown=Unknown command '%'
 cmd_similar=did you mean '%'?
@@ -352,7 +353,7 @@ qu_tabprint=Printing
 qu_tabtotal=Total Time
 qu_tabmem=Memory    
 qu_tabprinted=Printed   
-qu_tabhits=Results
+qu_tabhits=Results   
 qu_ms=ms
 
 # Update Commands
@@ -386,7 +387,7 @@ info_mem=Used Main Memory:
 info_nodes=Table Nodes  : 
 info_height=Tree Height  : 
 info_encoding=Encoding     : 
-info_runs=Number of runs:
+info_runs=Number of runs: 
 info_dbpath=Database Path: 
 info_nodb=No database found.
 info_dblist= Databases found.

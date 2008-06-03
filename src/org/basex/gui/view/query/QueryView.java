@@ -59,8 +59,8 @@ public final class QueryView extends View {
    */
   public QueryView(final byte[] help) {
     super(help);
-    setLayout(new BorderLayout(0, 4));
-    setBorder(8, 8, 8, 8);
+    setLayout(new BorderLayout());
+    setBorder(4, 8, 8, 8);
 
     back = new BaseXBack(FILL.NONE);
     back.setLayout(new BorderLayout());

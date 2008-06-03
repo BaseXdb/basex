@@ -58,7 +58,7 @@ public enum GUICommands implements GUICommand {
       fc.addFilter(IO.ZIPSUFFIX, CREATEZIPDESC);
       fc.addFilter(IO.XMLSUFFIX, CREATEXMLDESC);
 
-      if(fc.select(BaseXFileChooser.OPEN)) {
+      if(fc.select(BaseXFileChooser.MODE.OPEN)) {
         if(!new DialogCreate(main).ok()) return;
         final IO file = fc.getFile();
         build(CREATETITLE, Commands.CREATEXML + " \"" + file.path() + "\"");
@@ -119,7 +119,7 @@ public enum GUICommands implements GUICommand {
           GUIProp.createpath, main);
       fc.addFilter(IO.XQSUFFIX, CREATEXQDESC);
 
-      if(fc.select(BaseXFileChooser.OPEN)) {
+      if(fc.select(BaseXFileChooser.MODE.OPEN)) {
         try {
           final IO file = fc.getFile();
           main.query.setXQuery(file.content(), file.path());
@@ -144,7 +144,7 @@ public enum GUICommands implements GUICommand {
           fn == null ? GUIProp.createpath : fn, main);
       fc.addFilter(IO.XQSUFFIX, CREATEXQDESC);
 
-      if(fc.select(BaseXFileChooser.SAVE)) {
+      if(fc.select(BaseXFileChooser.MODE.SAVE)) {
         try {
           final IO file = fc.getFile();
           file.suffix(IO.XQSUFFIX);
@@ -181,10 +181,16 @@ public enum GUICommands implements GUICommand {
           GUIProp.createpath, main);
       fc.addFilter(IO.XMLSUFFIX, CREATEXMLDESC);
 
-      if(fc.select(BaseXFileChooser.SAVE)) {
+      if(fc.select(BaseXFileChooser.MODE.SAVE)) {
         final IO file = fc.getFile();
         file.suffix(IO.XMLSUFFIX);
-        main.execute(Commands.EXPORT, "\"" + file + "\"");
+        try {
+          file.write(main.text.getText());
+        } catch(final IOException ex) {
+          JOptionPane.showMessageDialog(main, XQSAVERROR,
+              DIALOGINFO, JOptionPane.ERROR_MESSAGE);
+        }
+        //main.execute(Commands.EXPORT, "\"" + file + "\"");
       }
       GUIProp.createpath = fc.getDir();
     }

@@ -57,39 +57,32 @@ public final class RealView extends View {
 
   @Override
   protected void refreshContext(final boolean more, final boolean quick) {
-  // TODO Auto-generated method stub
-
+    repaint();
   }
 
   @Override
   protected void refreshFocus() {
     repaint();
-    // TODO Auto-generated method stub
-
   }
 
   @Override
   protected void refreshInit() {
-  // TODO Auto-generated method stub
-
+    repaint();
   }
 
   @Override
   protected void refreshLayout() {
-  // TODO Auto-generated method stub
-
+    repaint();
   }
 
   @Override
   protected void refreshMark() {
-  // TODO Auto-generated method stub
-
+    repaint();
   }
 
   @Override
   protected void refreshUpdate() {
-  // TODO Auto-generated method stub
-
+    repaint();
   }  
 
   @Override
