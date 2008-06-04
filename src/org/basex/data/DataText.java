@@ -52,8 +52,6 @@ public interface DataText {
   String DBFZINDEX = "FZINDEX";
   /** Last (highest) id. */
   String DBLASTID = "LASTID";
-  /** Number of words in table. */
-  String DBTXTNUMWORDS = "TXTNUMWORDS";
   
   // TAGS/ATTRIBUTE NAMES ====================================================
 

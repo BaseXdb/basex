@@ -42,9 +42,7 @@ public final class DataUpdateTestBulk {
   public static void setUpBeforeClass() {
     Prop.textindex = false;
     Prop.attrindex = false;
-    Prop.ftindex = false;
     Prop.chop = true;
-    Prop.mainmem = false;
   }
 
   /**
@@ -155,7 +153,7 @@ public final class DataUpdateTestBulk {
     insert(6, 2, Insert.copy(insertData, 5));
     assertEquals(size + 2, data.size);
     assertNodesDeepEqual(insertData, 5, data, 11);
-    assertEquals(26, data.parent(26, Data.ELEM));
+    assertEquals(21, data.parent(22, Data.ELEM));
   }
 
   /**

@@ -120,12 +120,11 @@ public final class DiskData extends Data {
 
   @Override
   public synchronized void close() throws IOException {
-    /*
+    // [CG] necessary to always write meta data when closing db?
     meta.finish(size);
     tags.finish(meta.dbname);
     atts.finish(meta.dbname);
     ns.finish(meta.dbname);
-    */
     cls();
   }
 

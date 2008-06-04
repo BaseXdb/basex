@@ -36,14 +36,12 @@ public final class DataUpdateTestAttributes {
   public static void setUpBeforeClass() {
     Prop.textindex = false;
     Prop.attrindex = false;
-    Prop.ftindex = false;
     Prop.chop = true;
-    Prop.mainmem = false;
   }
 
   /**
    * Create the database.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Before
   public void setUp() throws Exception {
@@ -53,7 +51,7 @@ public final class DataUpdateTestAttributes {
 
   /**
    * Delete the test-database.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @After
   public void tearDown() throws Exception {
@@ -63,7 +61,7 @@ public final class DataUpdateTestAttributes {
 
   /**
    * Reload Data class.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   private void reload() throws Exception {
     data.close();
@@ -85,7 +83,7 @@ public final class DataUpdateTestAttributes {
 
   /**
    * Test for correct data size.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Test
   public void testSize() throws Exception {
@@ -96,7 +94,7 @@ public final class DataUpdateTestAttributes {
 
   /**
    * Test the update of an existing attribute.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Test
   public void testUpdateAttribute() throws Exception {
@@ -112,7 +110,7 @@ public final class DataUpdateTestAttributes {
 
   /**
    * Test the update of an existing attribute.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Test
   public void testUpdateAttribute2() throws Exception {
@@ -126,7 +124,7 @@ public final class DataUpdateTestAttributes {
 
   /**
    * Test the insertion of a new attribute.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Test
   public void testAddAttribute() throws Exception {
@@ -142,7 +140,9 @@ public final class DataUpdateTestAttributes {
     assertEquals(nextid + 1, data.meta.lastid);
     assertByteArraysEqual(token("foo"), data.attName(9));
     assertByteArraysEqual(token("junit"), data.attValue(9));
+    System.out.println(size + "/" + data.size);
     reload();
+    System.out.println(size + "/" + data.size);
     assertEquals(size + 1, data.size);
     assertEquals(size + 1, data.size(0, Data.DOC));
     assertEquals((int) Data.ATTR, data.kind(9));

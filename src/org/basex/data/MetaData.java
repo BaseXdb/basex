@@ -45,9 +45,7 @@ public final class MetaData {
   /** Flag for removing the index structures. */
   public boolean newindex = false;
   /** Last (highest) id assigned to a node. */
-  public long lastid = -1;
-  /** Number of written words. */
-  //public int[] numw = new int[32];
+  public int lastid = -1;
   
   /**
    * Constructor, specifying the database name.
@@ -125,8 +123,7 @@ public final class MetaData {
       else if(k.equals(DBFTXINDEX)) ftxindex = toBool(v);
       else if(k.equals(DBFZINDEX)) fzindex = toBool(v);
       else if(k.equals(DBTIME)) time = Token.toLong(v);
-      else if(k.equals(DBLASTID)) lastid = Token.toLong(v);
-      //else if(k.equals(DBTXTNUMWORDS)) numw = Array.stringToIntArray(v);
+      else if(k.equals(DBLASTID)) lastid = Token.toInt(v);
     }
     in.close();
 
@@ -165,7 +162,7 @@ public final class MetaData {
     writeInfo(inf, DBFTXINDEX, ftxindex);
     writeInfo(inf, DBFZINDEX, fzindex);
     writeInfo(inf, DBTIME, Long.toString(time));
-    writeInfo(inf, DBLASTID, Long.toString(lastid));
+    writeInfo(inf, DBLASTID, Integer.toString(lastid));
 
     inf.writeString("");
     inf.close();

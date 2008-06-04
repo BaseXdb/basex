@@ -126,7 +126,8 @@ public abstract class Builder extends Progress {
     addNode(Data.DOC, name, null, true);
     parser.parse(this);
     endNode(name);
-
+    
+    meta.lastid = size;
     return finish();
   }
 
