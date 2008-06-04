@@ -95,16 +95,19 @@ public final class XPathView extends View {
               }
             }
           } else if(c == KeyEvent.VK_DOWN) {
-            if(box.getSelectedItem() == null) {
-              box.setSelectedIndex(0);
-            } else {
+            if(box.getSelectedItem() != null &&
+                box.getSelectedIndex() < box.getItemCount() - 1) {
               int tmp = box.getSelectedIndex();
               box.setSelectedIndex(tmp + 1);
+            } else {
+              box.setSelectedIndex(0);
             } 
           } else if(c == KeyEvent.VK_UP) {
             if(box.getSelectedItem() != null) {
               int tmp = box.getSelectedIndex();
               box.setSelectedIndex(tmp - 1);
+            } else {
+              box.setSelectedIndex(box.getItemCount() - 1);
             }
           } else if(c == KeyEvent.VK_ENTER) {
             if(box.getSelectedItem() != null) {
