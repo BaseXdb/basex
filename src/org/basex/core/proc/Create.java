@@ -13,6 +13,7 @@ import org.basex.build.mediovis.MAB2Parser;
 import org.basex.build.xml.SAXWrapper;
 import org.basex.build.xml.XMLParser;
 import org.basex.core.Progress;
+import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.index.FTBuilder;
@@ -58,10 +59,8 @@ public final class Create extends Proc {
       if(type.equals(INDEX)) return index();
     } catch(final IllegalArgumentException ex) {
       throw ex;
-    } catch(final RuntimeException ex) {
-      if(ex.getClass() == RuntimeException.class &&
-          ex.getMessage().length() == 0) return error(CANCELCREATE);
-      throw ex;
+    } catch(final ProgressException ex) {
+      return error(CANCELCREATE);
     }
     throw new IllegalArgumentException();
   }
@@ -183,12 +182,8 @@ public final class Create extends Proc {
     } catch(final IOException ex) {
       BaseX.debug(ex);
       err = ex.getMessage();
-    } catch(final RuntimeException ex) {
-      if(ex.getClass() == RuntimeException.class) throw ex;
-      String msg = ex.getMessage();
-      if(msg == null) msg = ex.toString();
-      BaseX.debug(ex);
-      err = BaseX.info(CREATEERR, cmd.args(), msg.length() != 0 ? msg : "");
+    } catch(final ProgressException ex) {
+      throw ex;
     } catch(final Exception ex) {
       String msg = ex.getMessage();
       if(msg == null) msg = ex.toString();

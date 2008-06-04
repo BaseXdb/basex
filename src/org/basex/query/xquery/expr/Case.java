@@ -1,5 +1,6 @@
 package org.basex.query.xquery.expr;
 
+import org.basex.BaseX;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Type;
@@ -34,7 +35,8 @@ public final class Case extends Single {
 
   @Override
   public Iter iter(final XQContext ctx) {
-    throw new RuntimeException();
+    BaseX.notexpected();
+    return null;
   }
 
   /**

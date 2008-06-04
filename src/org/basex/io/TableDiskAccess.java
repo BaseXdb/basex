@@ -2,7 +2,6 @@ package org.basex.io;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import org.basex.BaseX;
 import org.basex.util.Array;
 
 /**
@@ -114,7 +113,11 @@ public final class TableDiskAccess extends TableAccess {
       fp = firstPres[mid];
       np = mid == last ? fp + ENTRIES : firstPres[mid + 1];
     }
-    if(low > high) BaseX.notexpected();
+    if(low > high) {
+      throw new RuntimeException("Possible Bug in Table DiskAccess:\n" +
+          "IndexSize: " + indexSize + ", Access: " + mid + " (" + low + ")");
+      //BaseX.notexpected();
+    }
     
     readBlock(mid, fp, np);
     return (pre - firstPre) << IO.NODEPOWER;

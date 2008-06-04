@@ -6,6 +6,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.basex.BaseX;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
+import org.basex.core.ProgressException;
 import org.basex.io.IO;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -65,7 +66,7 @@ public final class SAXWrapper extends Parser {
       final IOException ioe = new IOException(msg);
       ioe.setStackTrace(ex.getStackTrace());
       throw ioe;
-    } catch(final RuntimeException ex) {
+    } catch(final ProgressException ex) {
       throw ex;
     } catch(final Exception ex) {
       final IOException ioe = new IOException(ex.getMessage());

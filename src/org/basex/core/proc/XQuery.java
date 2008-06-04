@@ -2,6 +2,7 @@ package org.basex.core.proc;
 
 import static org.basex.Text.*;
 import org.basex.BaseX;
+import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.data.DOTSerializer;
 import org.basex.data.Nodes;
@@ -122,9 +123,10 @@ public class XQuery extends Proc {
     } catch(final QueryException ex) {
       BaseX.debug(ex);
       return error(ex.getMessage());
+    } catch(final ProgressException ex) {
+      return false;
     } catch(final Exception ex) {
-      if(ex.getClass() == RuntimeException.class) return false;
-      ex.printStackTrace();
+      BaseX.debug(ex);
       return error("Implementation Bug? " +  ex.getClass().getSimpleName());
     }
   }

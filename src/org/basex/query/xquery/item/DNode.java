@@ -2,6 +2,8 @@ package org.basex.query.xquery.item;
 
 import static org.basex.util.Token.*;
 import static org.basex.query.xquery.XQTokens.*;
+
+import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQException;
@@ -70,7 +72,7 @@ public final class DNode extends Node {
         ser.text(str());
         break;
       default:
-        throw new RuntimeException("Unknown node type: " + type);
+        BaseX.notexpected();
     }
   }
 
