@@ -2,23 +2,20 @@ package org.basex.test;
 
 import java.util.regex.Pattern;
 
-
 /**
- * Beschreibung.
- * @author schwarz
+ * Test class for regular patterns.
  *
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Hannes Schwarz
  */
-public class PatternMatchesTest {
+public final class PatternMatchesTest {
+  
+  /** Private constructor. */
+  private PatternMatchesTest() { }
   
   /**
-   * Be.
-   */
-  public PatternMatchesTest() {
-    
-  }
-  /**
-   * Beschreibung.
-   * @param args Beschreibung
+   * Main method.
+   * @param args command-line arguments (ignored)
    */
   public static void main(final String[] args) {
 
