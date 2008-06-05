@@ -47,7 +47,9 @@ public final class XPathView extends View {
   /** JComboBox. */
   public JComboBox box;
   /** String for temporary input. */
-  public String tmpIn;
+  public String tempIn;
+  /** String for temporary input. */
+  public String temp;
   /** Int value to count slashes. */
   public int slashC = 0;
   /** Boolean value if BasicComboPopup is initialized. */
@@ -85,14 +87,31 @@ public final class XPathView extends View {
           }
           if(c == KeyEvent.VK_SLASH) {
             slashC++;
+            if(slashC <= 2) {
             showPopAll();
+            } else {
+              pop.hide();
+            }
           } else if(c == KeyEvent.VK_DELETE || c == KeyEvent.VK_BACK_SPACE) {
             if(input.getText().length() == 0) {
               slashC = 0;
-              tmpIn = "";
+              tempIn = "";
               if(popInit) {
               pop.hide();
               }
+            } else if(input.getText().endsWith("/")) {
+              if ('/' ==
+                input.getText().charAt(input.getText().length() - 1)) {
+                slashC = 1;
+                showPopAll();
+            } else if ('/' ==
+              input.getText().charAt(input.getText().length() - 2)) {
+              slashC = 2;
+              showPopAll();
+              }
+            } else {
+              slashC = 0;
+              pop.hide();
             }
           } else if(c == KeyEvent.VK_DOWN) {
             if(box.getSelectedItem() != null &&
@@ -111,12 +130,15 @@ public final class XPathView extends View {
             }
           } else if(c == KeyEvent.VK_ENTER) {
             if(box.getSelectedItem() != null) {
-              input.setText(tmpIn + box.getSelectedItem().toString());
+              input.setText(tempIn + box.getSelectedItem().toString());
+              slashC = 0;
               pop.hide();
             }
+          } else if(c == KeyEvent.VK_SHIFT) {
+            return;
           } else {
             if(popInit) {
-              if(tmpIn.length() == 0) {
+              if(tempIn.length() == 0) {
                 pop.hide();
               } else {
                 slashC = 0;
@@ -143,26 +165,22 @@ public final class XPathView extends View {
    * Shows the BasicComboPopup with all Entries.
    */
   public void showPopAll() {
-    tmpIn = input.getText();
+    tempIn = input.getText();
     box = new JComboBox(all.finish());
     popInit = true;
     box.setSelectedItem(null);
     box.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {        
         if(e.getModifiers() == 16) {
-          input.setText(tmpIn + box.getSelectedItem());
+          input.setText(tempIn + box.getSelectedItem());
           pop.hide();
         }
       }
     });
-    if(slashC <= 2) {
       FontMetrics fm = input.getFontMetrics(input.getFont());
       int width = fm.stringWidth(input.getText());
       pop = new BasicComboPopup(box);
       pop.show(input, width, input.getHeight());
-    } else {
-      pop.hide();
-    }
   }
 
   /**
@@ -171,9 +189,9 @@ public final class XPathView extends View {
   public void showSpecPop() {
     pop.hide();
     box.removeAllItems();
-    String tmp = input.getText().substring(tmpIn.length());
+    temp = input.getText().substring(tempIn.length());
     for(int i = 0; i < all.finish().length; i++) {
-      if(all.finish()[i].startsWith(tmp)) {
+      if(all.finish()[i].startsWith(temp)) {
         box.addItem(all.finish()[i]);
       }
     }
