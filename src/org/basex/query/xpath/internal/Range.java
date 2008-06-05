@@ -1,10 +1,20 @@
 package org.basex.query.xpath.internal;
 
+import static org.basex.query.xpath.XPText.*;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
+import org.basex.data.StatsKey;
+import org.basex.index.Index;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
+import org.basex.query.xpath.expr.Path;
+import org.basex.query.xpath.locpath.Axis;
+import org.basex.query.xpath.locpath.LocPath;
+import org.basex.query.xpath.locpath.LocPathRel;
+import org.basex.query.xpath.locpath.Step;
+import org.basex.query.xpath.locpath.TestName;
+import org.basex.query.xpath.locpath.TestNode;
 import org.basex.query.xpath.values.Bool;
 import org.basex.query.xpath.values.NodeSet;
 import org.basex.query.xpath.values.Item;
@@ -57,16 +67,79 @@ public final class Range extends InternalExpr {
     return Bool.get(d >= min && d <= max);
   }
   
+  /** Index type. */
+  private Index.TYPE indexType;
+  /** Range Key. */
+  private StatsKey key;
+  
   @Override
-  public String toString() {
-    return "Range(" + min + " <= " + expr + " <= " + max + ")";
+  public Path indexEquivalent(final XPContext ctx, final Step curr) {
+    final LocPath path = (LocPath) expr;
+    final LocPath inv = path.invertPath(curr);
+
+    ctx.compInfo(indexType == Index.TYPE.TXT ? OPTINDEX :
+      indexType == Index.TYPE.ATV ? OPTATTINDEX : OPTWORDINDEX);
+    if(indexType == Index.TYPE.ATV) {
+      inv.steps.add(0, Axis.create(Axis.SELF, path.steps.last().test));
+    }
+    return new Path(new RangeAccess(indexType, key, min, max), inv);
+  }
+  
+  @Override
+  public int indexSizes(final XPContext ctx, final Step curr, final int mn) {
+    // check which expression is a location path
+    if(!(expr instanceof LocPathRel)) return Integer.MAX_VALUE;
+    final LocPathRel path = (LocPathRel) expr;
+    
+    final Data data = ctx.local.data;
+    final boolean txt = data.meta.txtindex;
+    final boolean atv = data.meta.atvindex;
+    
+    final Step step = path.steps.last();
+    final boolean text = txt && step.test == TestNode.TEXT &&
+      step.preds.size() == 0;
+    if(!text && !atv || !path.checkAxes() || !data.meta.chop)
+      return Integer.MAX_VALUE;
+
+    indexType = text ? Index.TYPE.TXT : Index.TYPE.ATV;
+    getKey(path, data, text);
+    
+    return key == null || key.kind != StatsKey.Kind.DBL && key.kind !=
+      StatsKey.Kind.INT ? Integer.MAX_VALUE : 1;
+  }
+  
+  /**
+   * Retrieves the statistics key for the tag/attribute name.
+   * @param path location path
+   * @param data data reference
+   * @param text text flag
+   */
+  private void getKey(final LocPathRel path, final Data data,
+      final boolean text) {
+    
+    final int st = path.steps.size();
+    if(text) {
+      if(st == 1) return;
+      final Step step = path.steps.get(st - 2);
+      if(!(step.test instanceof TestName)) return;
+      key = data.tags.stat(((TestName) step.test).id);
+    } else {
+      final int id = path.steps.last().simpleName(Axis.ATTR, true);
+      if(id == Integer.MIN_VALUE) return;
+      key = data.atts.stat(id);
+    }
   }
 
   @Override
   public void plan(final Serializer ser) throws Exception {
-    ser.openElement(this, Token.token("min"), Token.token(min),
-        Token.token("max"), Token.token(max));
+    ser.openElement(this, Token.token(MIN), Token.token(min),
+        Token.token(MAX), Token.token(max));
     expr.plan(ser);
     ser.closeElement(this);
+  }
+  
+  @Override
+  public String toString() {
+    return "Range(" + min + " <= " + expr + " <= " + max + ")";
   }
 }

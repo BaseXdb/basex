@@ -67,8 +67,8 @@ public abstract class Index {
    * @return ids
    */
   @SuppressWarnings("unused")
-  public int[][] idRange(final byte[] tok0, final boolean itok0, 
-      final byte[] tok1, final boolean itok1) {
+  public int[] idRange(final double tok0, final boolean itok0, 
+      final double tok1, final boolean itok1) {
     BaseX.notimplemented();
     return null;
   }

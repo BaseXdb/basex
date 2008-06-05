@@ -354,14 +354,15 @@ public abstract class Data  {
   /**
    * Returns the ids for the specified range expression.
    * Each token between tok0 and tok1 is returned as result.
+   * @param type index type
    * @param tok0 start token defining the range
    * @param itok0 token included in range boundaries
    * @param tok1 end token defining the range
    * @param itok1 token included in range boundaries
    * @return ids
    */
-  public abstract int[][] ftIDRange(final byte[] tok0, final boolean itok0, 
-      final byte[] tok1, final boolean itok1);
+  public abstract int[] idRange(final Index.TYPE type, final double tok0,
+      final boolean itok0, final double tok1, final boolean itok1);
   
   /**
    * Returns info on the index structures.

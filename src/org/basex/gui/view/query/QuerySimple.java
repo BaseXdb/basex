@@ -258,7 +258,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
         final boolean att = item.startsWith("@");
         final Names names = att ? data.atts : data.tags;
         final byte[] key = Token.token(att ? item.substring(1) : item);
-        final StatsKey stat = names.stat(key);
+        final StatsKey stat = names.stat(names.id(key));
         switch(stat.kind) {
           case INT:
             addSlider(stat.min, stat.max, cp + 1, item.equals("@size"),

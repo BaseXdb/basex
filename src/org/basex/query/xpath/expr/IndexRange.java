@@ -1,12 +1,11 @@
 package org.basex.query.xpath.expr;
 
-
+import org.basex.index.Index;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.locpath.LocPath;
 import org.basex.query.xpath.locpath.Step;
 import org.basex.query.xpath.values.NodeSet;
 import org.basex.query.xpath.values.Item;
-import org.basex.util.Array;
 
 /**
  * IndexRange, performing index-based numeric range queries.
@@ -48,12 +47,9 @@ public final class IndexRange extends ArrayExpr {
   
   @Override
   public NodeSet eval(final XPContext ctx) {
-    int[][] res = ctx.local.data.ftIDRange(min.str(), mni, max.str(), mxi);
-    if (res != null) {
-      return new NodeSet(Array.extractIDsFromData(res), ctx, res);
-    } else {
-      return null;
-    }
+    final int[] res = ctx.local.data.idRange(Index.TYPE.TXT,
+        min.num(), mni, max.num(), mxi);
+    return new NodeSet(res, ctx);
   }
 
   @Override

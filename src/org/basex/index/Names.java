@@ -142,12 +142,12 @@ public final class Names extends Set {
   }
 
   /**
-   * Returns the statistics for the specified key.
-   * @param key key
+   * Returns the statistics for the specified key id.
+   * @param id id
    * @return statistics
    */
-  public StatsKey stat(final byte[] key) {
-    return stat[id(key)];
+  public StatsKey stat(final int id) {
+    return stat[id];
   }
 
   /**

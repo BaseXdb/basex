@@ -324,8 +324,8 @@ public final class MemData extends Data {
 
   
   @Override
-  public int[][] ftIDRange(final byte[] word0, final boolean iword0, 
-      final byte[] word1, final boolean iword1) {
+  public int[] idRange(final Index.TYPE type, final double word0,
+      final boolean iword0, final double word1, final boolean iword1) {
     BaseX.notimplemented();
     return null;
   }

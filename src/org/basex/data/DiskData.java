@@ -351,10 +351,10 @@ public final class DiskData extends Data {
    }
 
   @Override
-  public int[][] ftIDRange(final byte[] word1, final boolean itok0,
-      final byte[] word2, final boolean itok1) {
-    
-    return ftxindex.idRange(word1, itok0, word2, itok1);
+  public int[] idRange(final Index.TYPE type, final double word1,
+      final boolean itok0, final double word2, final boolean itok1) {
+    final Index index = type == Index.TYPE.TXT ? txtindex : atvindex;
+    return index.idRange(word1, itok0, word2, itok1);
   }
 
   @Override

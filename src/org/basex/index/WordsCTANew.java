@@ -151,8 +151,11 @@ public final class WordsCTANew extends Index {
   }
   
   @Override
-  public int[][] idRange(final byte[] tokFrom, final boolean itok0,
-      final byte[] tokTo, final boolean itok1) {
+  public int[] idRange(final double from, final boolean itok0,
+      final double to, final boolean itok1) {
+    
+    final byte[] tokFrom = Token.token(from);
+    final byte[] tokTo = Token.token(to);
     int[] tokF = new int[tokFrom.length];
     int tokFID = tokFrom.length;
     int[] tokT = new int[tokTo.length];
@@ -177,7 +180,7 @@ public final class WordsCTANew extends Index {
       if (hasNextNodes(ne)) {
         //for (int i = ne[0] + 1; i < ne.length - 2; i += 2) {
         for (int i = ne[0] + 1; i < ne.length - 1; i += 2) {
-          if (Token.letter(ne[i + 1])) return data;
+          if (Token.letter(ne[i + 1])) return Array.extractIDsFromData(data);
           if (ne[i + 1] != tokFrom[0] && ne[i + 1] != tokTo[0]) {
             if (tokTID == tokFID) {
             //if (tokTo.length == tokFrom.length) {
@@ -210,7 +213,7 @@ public final class WordsCTANew extends Index {
     } else if (Token.letterOrDigit(tokFrom) && Token.letterOrDigit(tokTo)) {
       data = idPosRangeText(tokF, tokT);
     }
-    return data;
+    return Array.extractIDsFromData(data);
   }
   
   /** Count current level. */

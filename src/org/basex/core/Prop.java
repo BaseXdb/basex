@@ -60,7 +60,7 @@ public final class Prop {
   public static final boolean SKIP = true;
 
   /** Debug mode. */
-  public static boolean debug = true;
+  public static boolean debug = false;
   /** Short query info. */
   public static boolean info = false;
   /** Detailed query info. */

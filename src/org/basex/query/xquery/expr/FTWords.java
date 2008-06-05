@@ -173,6 +173,8 @@ public final class FTWords extends Single {
       }
     } else {
       // compare tokens character wise
+      if(tl < sl || sl == 0) return 0;
+      
       for(int i = 0; i <= tl - sl; i++) {
         if(i > 0 && (tk[i] < 0 || tk[i] > ' ')) continue;
         while(i < tl - sl && !letterOrDigit(tk[i])) i++;

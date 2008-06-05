@@ -124,6 +124,17 @@ public final class IntList {
   public int next() {
     return list[pos];
   }
+  
+  /*
+   * Sorts and removes double values.
+  public void sort() {
+    if(size < 2) return;
+    Arrays.sort(list, 0, size);
+    int v = list[0];
+    int c = 1;
+    for(int i = c; i < size; i++) if(list[i] != v) list[c++] = list[i];
+    size = c;
+  }*/
 
   /**
    * Sorts the array in the order of the specified token array.

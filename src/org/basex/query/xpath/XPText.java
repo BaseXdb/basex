@@ -28,6 +28,10 @@ public interface XPText {
   String TYPE = "type";
   /** Parser token. */
   String QUOTE = "quote";
+  /** Minimum . */
+  String MIN = "min";
+  /** Attribute name. */
+  String MAX = "max";
 
   /** Parser token. */
   String DBLCOLON = "::";

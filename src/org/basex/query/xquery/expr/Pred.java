@@ -82,7 +82,7 @@ public final class Pred extends Arr {
 
   @Override
   public String toString() {
-    return Token.string(name()) + "(" + root + "[" + toString("][") + "])";
+    return Token.string(name()) + "(" + root + ", " + toString(", ") + ")";
   }
 
   @Override
