@@ -15,7 +15,6 @@ import javax.xml.xquery.XQStaticContext;
  * @author Andreas Weiler
  */
 public final class XQJTest {
-  
   /**
    * Starts the xquery module.
    * @param args command line arguments.
@@ -23,18 +22,10 @@ public final class XQJTest {
    */
   private XQJTest(final String[] args) throws Exception {   
 
-    // <AW> As XML documents can be defined as part of the query,
-    // I removed the filename request from here..
+    String query = "doc('/home/db/xml/input.xml')//li";
     
-    // XQuery examples:
-    // 1+2
-    // (1, 2 + 3, 4 * 5)
-    // string(doc('input.xml')/html/body/@bgcolor)
-    // for $text in doc('input.xml')//text() order by $text return string($text)
-
-    String query = "";
-    if(args.length != 0) {
-      for(String a : args) query += a + " ";
+    if(args.length != 0 || query.length() != 0) {
+      for(final String a : args) query += a + " ";
     } else {
       System.out.println("Query please:");
       BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
@@ -60,7 +51,8 @@ public final class XQJTest {
 
     // output of result sequence
     while(result.next()) {
-      System.out.println(result.getAtomicValue());
+      System.out.println(result.getItemAsString(null));
+      //System.out.println(result.getAtomicValue());
     }
   }
   

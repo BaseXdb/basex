@@ -5,6 +5,7 @@ import java.net.URI;
 import javax.xml.namespace.QName;
 import javax.xml.xquery.XQItemType;
 import org.basex.query.xquery.item.Type;
+import org.basex.util.Token;
 
 /**
  * BaseX  XQuery item type.
@@ -49,7 +50,7 @@ public class BXQItemType implements XQItemType {
   }
 
   public QName getTypeName() {
-    return new QName(new String(itemType.name));
+    return new QName(Token.string(itemType.name));
   }
 
   public boolean isAnonymousType() {
