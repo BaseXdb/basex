@@ -230,22 +230,22 @@ public final class Path extends Arr {
         final QNm name = step.test.name;
         final QNm name0 = step0.test.name;
 
-        if(step0.axis == Axis.ATTR) warning(step0, step);
+        if(step0.axis == Axis.ATTR) warning(step);
         if(step0.test.type == Type.TXT && step.test.type != Type.TXT)
-          warning(step0, step);
+          warning(step);
 
         if(name0 == null || name == null) continue;
-        if(!name.eq(name0)) warning(step0, step);
+        if(!name.eq(name0)) warning(step);
 
       } else if(step.axis == Axis.DESCORSELF) {
         if(step.test == Test.NODE) continue;
-        if(step0.axis == Axis.ATTR) warning(step0, step);
+        if(step0.axis == Axis.ATTR) warning(step);
 
         if(step0.test.type == Type.TXT && step.test.type != Type.TXT)
-          warning(step0, step);
+          warning(step);
       } else if(step.axis == Axis.DESC || step.axis == Axis.CHILD) {
         if(step0.axis == Axis.ATTR || step0.test.type == Type.TXT)
-          warning(step0, step);
+          warning(step);
       }
     }
   }
@@ -262,13 +262,11 @@ public final class Path extends Arr {
 
   /**
    * Throws a static warning.
-   * @param s1 first step
-   * @param s2 second step
+   * @param s step
    * @throws XQException evaluation exception
    */
-  protected void warning(final Expr s1, final Expr s2)
-      throws XQException {
-    Err.or(COMPSELF, s1, s2);
+  protected void warning(final Expr s) throws XQException {
+    Err.or(COMPSELF, s);
   }
 
   /**

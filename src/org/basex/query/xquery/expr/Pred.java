@@ -39,31 +39,37 @@ public final class Pred extends Arr {
   public Iter iter(final XQContext ctx) throws XQException {
     Iter iter = ctx.iter(root);
 
-    final Item c = ctx.item;
+    final Item ci = ctx.item;
     final int cs = ctx.size;
     final int cp = ctx.pos;
+    
+    // cache results to support last() function
+    final SeqIter sb = new SeqIter();
+    Item i;
+    while((i = iter.next()) != null) sb.add(i);
 
-    for(final Expr e : expr) {
-      ctx.size = (int) iter.size();
+    // evaluates predicates
+    for(final Expr p : expr) {
+      ctx.size = sb.size;
       ctx.pos = 1;
-      final SeqIter seq = new SeqIter();
-      Item it;
-      while((it = iter.next()) != null) {
-        ctx.item = it;
-        final Item i = ctx.iter(e).ebv();
+      int c = 0;
+      for(int s = 0; s < sb.size; s++) {
+        ctx.item = sb.item[s];
+        i = ctx.iter(p).ebv();
         if(i.n() ? i.dbl() == ctx.pos : i.bool()) {
-          it.score(Scoring.add(i.score(), it.score()));
-          seq.add(it);
+          // assign score value
+          i.score(Scoring.add(i.score(), i.score()));
+          sb.item[c++] = sb.item[s];
         }
         ctx.pos++;
       }
-      iter = seq;
+      sb.size = c;
     }
 
-    ctx.item = c;
+    ctx.item = ci;
     ctx.size = cs;
     ctx.pos = cp;
-    return iter;
+    return sb;
   }
 
   @Override

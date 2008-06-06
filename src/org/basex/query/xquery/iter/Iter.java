@@ -41,7 +41,9 @@ public abstract class Iter {
   }
 
   /**
-   * Returns the number of entries or -1 if number cannot be evaluated.
+   * Returns the number of entries. Warning: -1 is returned if the number
+   * cannot be evaluated, so each method has to check and react on the
+   * returned value.
    * @return number of entries
    */
   public long size() {

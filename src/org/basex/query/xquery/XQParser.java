@@ -368,11 +368,11 @@ public final class XQParser {
   private void optionDecl() throws XQException {
     // [CG] XQuery/Option Declaration
     final QNm name = new QNm(qName(QNAMEINV));
-    stringLiteral();
+    final byte[] ns = stringLiteral();
     name.check(ctx);
     if(!name.ns()) Err.or(NSMISS, name);
     // will never be null...
-    Err.or(DECLINCOMPLETE);
+    if(ns == null) Err.or(DECLINCOMPLETE);
   }
 
   /**

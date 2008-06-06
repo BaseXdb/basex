@@ -153,7 +153,7 @@ public interface XQText {
   /** XPDY0002: Evaluation Exception. */
   Object[] XPNOCTX = { XPDY, 2, "No context item set for '%'." };
   /** XPDY0002: Evaluation exception. */
-  Object[] XPNODES = { XPDY, 2, "No context item set for '%' step." };
+  Object[] XPNODES = { XPDY, 2, "No context item set for %." };
   /** XPDY0050: Evaluation exception. */
   Object[] ROOTDOC = { XPDY, 50, "Context item must be a document node." };
   /** XPDY0050: Evaluation exception. */
@@ -174,8 +174,7 @@ public interface XQText {
   /** XPST0003: Parsing exception. */
   Object[] QUERYEND = { XPST, 3, "Unexpected end of query: '%'" };
   /** XPST0003: Parsing exception. */
-  Object[] QUERYSTEP = { XPST, 3,
-      "Unexpected tokens after location step '%'." };
+  Object[] QUERYSTEP = { XPST, 3, "Unexpected tokens after %." };
   /** XPST0003: Parsing exception. */
   Object[] CMPEXPR = { XPST, 3, "Comparison is incomplete." };
   /** XPST0003: Parsing exception. */
@@ -294,11 +293,11 @@ public interface XQText {
   Object[] FTDIA = { XPST, 3, "Only one diacritics option allowed." };
 
   /** XPST0005: Parsing exception. */
-  Object[] COMPSELF = { XPST, 5, "Note: %/% won't yield any results." };
-  /** XPST0005: Parsing exception (keep it like that?). */
-  Object[] DOCATTR = { XPST, 5, "Note: doc nodes can't have attributes." };
-  /** XPST0005: Parsing exception (keep it like that?). */
-  Object[] ATTRCHILD = { XPST, 5, "Note: attributes can't have children." };
+  Object[] COMPSELF = { XPST, 5, "Warning: % won't yield any results." };
+  /** XPST0005: Parsing exception. */
+  Object[] DOCATTR = { XPST, 5, "Warning: doc nodes can't have attributes." };
+  /** XPST0005: Parsing exception. */
+  Object[] ATTRCHILD = { XPST, 5, "Warning: attributes can't have children." };
 
   /** XPST0008: Parsing exception. */
   Object[] VARNOTDEFINED = { XPST, 8, "Undefined variable \"%\"." };
@@ -395,7 +394,7 @@ public interface XQText {
   Object[] EVALNODES = { XPTY, 19, "Nodes needed for expression '%'." };
   /** XPTY0019: Typing exception. */
   Object[] NODESPATH = { XPTY, 19,
-    "Context node required for '%'; % found." };
+    "Context node required for %; '%' found." };
 
   /** XQDY0026: Evaluation exception. */
   Object[] CPICONT = { XQDY, 26, "Invalid PI content: \"%\"" };

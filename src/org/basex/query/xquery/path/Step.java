@@ -50,12 +50,12 @@ public class Step extends Arr {
 
   @Override
   public NodeIter iter(final XQContext ctx) throws XQException {
-    final Item item = ctx.item;
+    final Item ci = ctx.item;
 
-    if(item == null) Err.or(XPNODES, this);
-    final Iter iter = item.iter();
+    if(ci == null) Err.or(XPNODES, this);
+    final Iter iter = ci.iter();
 
-    final NodIter res = new NodIter();
+    final NodIter ni = new NodIter();
     NodIter nb = new NodIter();
     Item it;
     while((it = iter.next()) != null) {
@@ -71,27 +71,27 @@ public class Step extends Arr {
       }
 
       // evaluates predicates
-      for(final Expr e : expr) {
+      for(final Expr p : expr) {
         ctx.size = nb.size;
         ctx.pos = 1;
-        int p = 0;
+        int c = 0;
         for(int s = 0; s < nb.size; s++) {
           ctx.item = nb.list[s];
-          final Item i = ctx.iter(e).ebv();
+          final Item i = ctx.iter(p).ebv();
           if(i.n() ? i.dbl() == ctx.pos : i.bool()) {
             // assign score value
             nb.list[s].score(i.score());
-            nb.list[p++] = nb.list[s];
+            nb.list[c++] = nb.list[s];
           }
           ctx.pos++;
         }
-        nb.size = p;
+        nb.size = c;
       }
-      res.add(nb.list, nb.size);
+      ni.add(nb.list, nb.size);
       nb = new NodIter();
     }
-    ctx.item = item;
-    return res;
+    //ctx.item = ci;
+    return ni;
   }
 
   /**
@@ -144,7 +144,7 @@ public class Step extends Arr {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder("Step(");
     if(test.type == Type.NOD) {
       if(axis == Axis.PARENT) return "..";
       if(axis == Axis.SELF) return ".";
@@ -153,6 +153,6 @@ public class Step extends Arr {
     else if(axis != Axis.CHILD) sb.append(axis + "::");
     sb.append(test);
     for(final Expr e : expr) sb.append("[" + e + "]");
-    return sb.toString();
+    return sb.append(")").toString();
   }
 }

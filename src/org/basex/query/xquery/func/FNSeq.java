@@ -12,6 +12,7 @@ import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.iter.RangeIter;
 import org.basex.query.xquery.iter.SeqIter;
+import org.basex.query.xquery.util.SeqBuilder;
 import org.basex.util.Token;
 
 /**
@@ -23,126 +24,59 @@ import org.basex.util.Token;
 final class FNSeq extends Fun {
   @Override
   public Iter iter(final XQContext ctx, final Iter[] arg) throws XQException {
-    final Iter iter = arg[0];
-    Item i;
-
     switch(func) {
-      case INDEXOF:
-        final Item it = arg[1].atomic(this, false);
-        if(arg.length == 3) checkColl(arg[2]);
-
-        //int p = 1;
-        //while((i = iter.next()) != null) {
-        //  if(CmpV.valCheck(i, it) && CmpV.COMP.EQ.e(i, it))
-        //    seq.add(Itr.iter(p));
-        //  p++;
-        //}
-        //return seq;
-        return indexOf(iter, it);
-      case DISTINCT:
-        if(arg.length == 2) checkColl(arg[1]);
-        //while((i = iter.next()) != null) distinct(seq, i);
-        //return seq;
-        return distinctPipelined(iter);
-      case INSBEF:
-        final Iter sub = arg[2];
-        long r = Math.max(1, checkItr(arg[1]));
-
-        final SeqIter si = new SeqIter();
-        while((i = iter.next()) != null) {
-          if(--r == 0) si.add(sub);
-          si.add(i.iter());
-        }
-        if(r > 0) si.add(sub);
-        return si;
-      case REVERSE:
-        if(iter instanceof RangeIter) {
-          ((RangeIter) iter).reverse();
-          return iter;
-        }
-        final SeqIter sr = new SeqIter();
-        while((i = iter.next()) != null) sr.insert(i, 0);
-        return sr;
-      case REMOVE:
-        final long pos = checkItr(arg[1]);
-        //long c = 0;
-        //while((i = iter.next()) != null) if(++c != pos) seq.add(i);
-        //return seq;
-        return remove(iter, pos);
-      case SUBSEQ:
-        final long start = checkItr(arg[1]);
-        final long end = arg.length > 2 ? start + checkItr(arg[2]) :
-          Long.MAX_VALUE;
-        //c = 0;
-        //while((i = iter.next()) != null) {
-        //  if(++c < start) continue;
-        //  if(c >= end) break;
-        //  seq.add(i);
-        //}
-        //return seq;
-        return subseq(iter, start, end);
-      case DEEPEQ:
-        return Bln.get(deep(arg)).iter();
-      default:
-        throw new RuntimeException("Not defined: " + func);
+      case INDEXOF:  return indexOf(arg);
+      case DISTINCT: return distinct(arg);
+      case INSBEF:   return insbef(arg);
+      case REVERSE:  return reverse(arg);
+      case REMOVE:   return remove(arg);
+      case SUBSEQ:   return subseq(arg);
+      case DEEPEQ:   return Bln.get(deep(arg)).iter();
+      default: throw new RuntimeException("Not defined: " + func);
     }
   }
 
   /**
    * Looks for the index of an specified input item (pipelined).
-   * @param iter input iterator
-   * @param it item to searched for in iterator
+   * @param arg arguments
    * @return position(s) of item
+   * @throws XQException evaluation exception
    */
-  private Iter indexOf(final Iter iter, final Item it) {
+  private Iter indexOf(final Iter[] arg) throws XQException {
+    final Item it = arg[1].atomic(this, false);
+    if(arg.length == 3) checkColl(arg[2]);
+
     return new Iter() {
-      int index = 0;
+      int c = 0;
 
       @Override
       public Item next() throws XQException {
-        Item i;
-        while ((i = iter.next()) != null) {
-          index++;
-          if(CmpV.valCheck(i, it) && CmpV.COMP.EQ.e(i, it)) {
-            return Itr.get(index);
-          }
+        while(true) {
+          final Item i = arg[0].next();
+          if(i == null) return null;
+          c++;
+          if(CmpV.valCheck(i, it) && CmpV.COMP.EQ.e(i, it)) return Itr.get(c);
         }
-        return null;
       }
     };
   }
 
   /**
-   * Looks for the specified item in the sequence.
-   * @param sq sequence to be parsed
-   * @param i item to be found
-   * @throws XQException evaluation exception
-  private void distinct(final SeqIter sq, final Item i)
-      throws XQException {
-
-    final boolean nan = i.n() && i.dbl() != i.dbl();
-    for(int r = 0; r < sq.size; r++) {
-      final Item c = sq.item[r];
-      if(nan && c.dbl() != c.dbl()) return;
-      if(CmpV.valCheck(i, c) && CmpV.COMP.EQ.e(i, c)) return;
-    }
-    sq.add(FNGen.atom(i));
-  }
-   */
-
-  /**
    * Looks for the specified item in the sequence (pipelined).
-   * @param iter input iterator
+   * @param arg arguments
    * @return distinct iterator
+   * @throws XQException evaluation exception
    */
-  private Iter distinctPipelined(final Iter iter) {
+  private Iter distinct(final Iter[] arg) throws XQException {
+    if(arg.length == 2) checkColl(arg[1]);
+    
     return new Iter() {
       SeqIter sq = new SeqIter();
 
       @Override
       public Item next() throws XQException {
         Item i;
-        loop1: while((i = iter.next()) != null) {
+        loop1: while((i = arg[0].next()) != null) {
 
           final boolean nan = i.n() && i.dbl() != i.dbl();
           for(int r = 0; r < sq.size; r++) {
@@ -153,25 +87,54 @@ final class FNSeq extends Fun {
           sq.add(FNGen.atom(i));
           return i;
         }
+        sq = null;
         return null;
       }
     };
   }
 
   /**
-   * Removes an Item at a specified position in a sequence (pipelined).
-   * @param iter input iterator
-   * @param pos position of item to be removed
-   * @return iterator without Item
+   * Inserts items before the specified position.
+   * @param arg arguments
+   * @return iterator
+   * @throws XQException evaluation exception
    */
-  private Iter remove(final Iter iter, final long pos) {
+  private Iter insbef(final Iter[] arg) throws XQException {
+    final long pos = Math.max(1, checkItr(arg[1]));
+    
+    return new Iter() {
+      long p = pos;
+      boolean last;
+
+      @Override
+      public Item next() throws XQException {
+        if(last) return p > 0 ? arg[2].next() : null;
+        boolean sub = p == 0 || --p == 0;
+        final Item i = arg[sub ? 2 : 0].next();
+        if(i != null) return i;
+        if(sub) --p;
+        else last = true;
+        return next();
+      }
+    };
+  }
+
+  /**
+   * Removes an Item at a specified position in a sequence (pipelined).
+   * @param arg arguments
+   * @return iterator without Item
+   * @throws XQException evaluation exception
+   */
+  private Iter remove(final Iter[] arg) throws XQException {
+    final long pos = checkItr(arg[1]);
+
     return new Iter() {
       long c = 0;
 
       @Override
       public Item next() throws XQException {
         Item i;
-        while((i = iter.next()) != null) if(++c != pos) return i;
+        while((i = arg[0].next()) != null) if(++c != pos) return i;
         return null;
       }
     };
@@ -180,27 +143,58 @@ final class FNSeq extends Fun {
   /**
    * Creates a subsequence out of a sequence, starting with start and
    * ending with end (pipelined).
-   * @param iter input iterator
-   * @param start starting position
-   * @param end ending position
+   * @param arg arguments
    * @return subsequence
+   * @throws XQException evaluation exception
    */
-  private Iter subseq(final Iter iter, final long start, final long end) {
+  private Iter subseq(final Iter[] arg) throws XQException {
+    final long start = checkItr(arg[1]);
+    final long end = arg.length > 2 ? start + checkItr(arg[2]) : Long.MAX_VALUE;
+    
     return new Iter() {
       long c = 0;
 
       @Override
       public Item next() throws XQException {
-        Item i;
-        while((i = iter.next()) != null) {
-          if(++c < start) continue;
-          if(c >= end) break;
-          return i;
+        while(true) {
+          final Item i = arg[0].next();
+          if(i == null || ++c >= end) return null;
+          if(c >= start) return i;
         }
-        return null;
       }
     };
   }
+
+  /**
+   * Reverses a sequence.
+   * @param arg arguments
+   * @return iterator
+   * @throws XQException evaluation exception
+   */
+  private Iter reverse(final Iter[] arg) throws XQException {
+    final Iter iter = arg[0];
+    
+    // process numeric iterator...
+    if(iter instanceof RangeIter) {
+      ((RangeIter) iter).reverse();
+      return iter;
+    }
+    
+    // process any other iterator...
+    final SeqBuilder sb = new SeqBuilder();
+    Item i;
+    while((i = iter.next()) != null) sb.a(i);
+    
+    return new Iter() {
+      int c = sb.size;
+
+      @Override
+      public long size() { return sb.size; }
+      @Override
+      public Item next() { return --c < 0 ? null : sb.item[c]; }
+    };
+  }
+
 
   /**
    * Checks items for deep equality.
