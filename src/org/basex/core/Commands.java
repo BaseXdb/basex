@@ -130,7 +130,7 @@ public enum Commands {
   /** Evaluate a MedioVis query. */
   XPATHMV(XPathMV.class, DATAREF | PRINTING, 3, 3, true),
   /** Evaluate XQuery and show result. */
-  XQUERY(XQuery.class, PRINTING, 0, -1, false),
+  XQUERY(XQuery.class, PRINTING, 1, -1, false),
   /** Launch a simplified query. */
   FIND(Find.class, DATAREF | PRINTING, 0, -1, false),
   /** Evaluate XQuery and show result. */

@@ -42,16 +42,6 @@ public final class Scoring {
    * @param s2 second value
    * @return result
    */
-  public static double add(final double s1, final double s2) {
-    return 1 - ((1 - s1) * (1 - s2));
-  }
-
-  /**
-   * Combines two scoring values.
-   * @param s1 first value
-   * @param s2 second value
-   * @return result
-   */
   public static double and(final double s1, final double s2) {
     return 1 - ((1 - s1) * (1 - s2));
   }

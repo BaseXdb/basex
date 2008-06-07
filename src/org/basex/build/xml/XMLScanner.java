@@ -61,9 +61,9 @@ public final class XMLScanner {
   /**
    * Initializes the scanner.
    * @param f input file
-   * @throws BuildException Build Exception
+   * @throws IOException I/O Exception
    */
-  public XMLScanner(final IO f) throws BuildException {
+  public XMLScanner(final IO f) throws IOException {
     input = new XMLInput(f);
     ents = new Map();
     ents.add(E_AMP, AMP);
@@ -93,18 +93,18 @@ public final class XMLScanner {
 
   /**
    * Read and interpret all tokens from the input stream.
-   * @throws BuildException Build Exception
+   * @throws IOException I/O Exception
    */
-  public void scan() throws BuildException {
+  public void scan() throws IOException {
     while(more());
   }
 
   /**
    * Reads and interprets the next token from the input stream.
-   * @throws BuildException Build Exception
    * @return true if the document scanning has been completed.
+   * @throws IOException I/O Exception
    */
-  public boolean more() throws BuildException {
+  public boolean more() throws IOException {
     // gets next character from the input stream
     token.reset();
     final int ch = consume();
@@ -141,15 +141,15 @@ public final class XMLScanner {
    */
   public void finish() throws IOException {
     input.finish();
-    if(prolog) throw new BuildException(DOCEMPTY);
+    if(prolog) error(DOCEMPTY);
   }
 
   /**
    * Scans XML content.
    * @param ch current character
-   * @throws BuildException Build Exception
+   * @throws IOException I/O Exception
    */
-  private void scanCONTENT(final int ch) throws BuildException {
+  private void scanCONTENT(final int ch) throws IOException {
     // parse TEXT
     if(!tag && (ch != '<' || isCDATA())) {
       content(ch);
@@ -656,9 +656,9 @@ public final class XMLScanner {
 
   /**
    * Scans doc type definitions. [28]
-   * @throws BuildException Build Exception
+   * @throws IOException I/O Exception
    */
-  private void dtd() throws BuildException {
+  private void dtd() throws IOException {
     if(!prolog) error(TYPEAFTER);
     if(!s()) error(ERRDT);
 
@@ -678,10 +678,10 @@ public final class XMLScanner {
    * @param f full flag
    * @param r root flag
    * @return id
-   * @throws BuildException Build Exception
+   * @throws IOException I/O Exception
    */
   private byte[] externalID(final boolean f, final boolean r)
-      throws BuildException {
+      throws IOException {
     byte[] cont = null;
 
     final boolean pub = consume(PUBLIC);
@@ -705,6 +705,7 @@ public final class XMLScanner {
           cont = file.content();
           input = new XMLInput(new IO(cont));
         } catch(final IOException ex) {
+          BaseX.debug(ex);
           error(DTDNP, string(name));
         }
 
@@ -755,9 +756,9 @@ public final class XMLScanner {
   /**
    * Scans an external subset declaration. [31]
    * @return true if a declaration was found
-   * @throws BuildException Build Exception
+   * @throws IOException I/O Exception
    */
-  private boolean extSubsetDecl() throws BuildException {
+  private boolean extSubsetDecl() throws IOException {
     boolean found = false;
     while(true) {
       s();
@@ -792,9 +793,9 @@ public final class XMLScanner {
   /**
    * Scans a markup declaration. [29]
    * @return true if a declaration was found
-   * @throws BuildException Build Exception
+   * @throws IOException I/O Exception
    */
-  private boolean markupDecl() throws BuildException {
+  private boolean markupDecl() throws IOException {
     if(consume(ENT)) { // [70]
       checkS();
       if(consume('%')) { // [72] PEDecl
@@ -932,9 +933,9 @@ public final class XMLScanner {
    * Scans an entity value. [9]
    * @param p pe reference flag
    * @return value
-   * @throws BuildException Build Exception
+   * @throws IOException I/O Exception
    */
-  private byte[] entityValue(final boolean p) throws BuildException {
+  private byte[] entityValue(final boolean p) throws IOException {
     final int qu = consume();
     if(qu != '\'' && qu != '"') { prev(1); return null; }
     TokenBuilder tok = new TokenBuilder();

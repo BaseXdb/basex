@@ -1,6 +1,7 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.util.Token.*;
+import java.util.regex.Pattern;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Dbl;
@@ -77,6 +78,7 @@ public final class FTWords extends Single {
         while((i = iter.next()) != null) {
           final byte[] txt = norm(i.str());
           final int oc = cont(ctx, txt);
+          if(oc == 0) return 0;
           len += txt.length * oc;
           o += oc;
         }
@@ -85,6 +87,7 @@ public final class FTWords extends Single {
         while((i = iter.next()) != null) {
           for(final byte[] txt : split(norm(i.str()), ' ')) {
             final int oc = cont(ctx, txt);
+            if(oc == 0) return 0;
             len += txt.length * oc;
             o += oc;
           }
@@ -152,6 +155,8 @@ public final class FTWords extends Single {
       sb = lc(sb);
       if(!opt.lc.bool()) tk = lc(tk);
     }
+
+    // [CG] introduce tokenizer...
     
     final int sl = sb.length;
     final int tl = tk.length;
@@ -162,11 +167,11 @@ public final class FTWords extends Single {
     int p = -1;
 
     if(opt.wc.bool()) {
-      // [CG] performs a wildcard search - support wildcard phrases
-      final String cmp = string(sb);
-      for(final String s : string(tk).split("[\\p{Punct}\\s]")) {
+      final String t = string(tk);
+      for(final String s : string(sb).split("\\s")) {
         p++;
-        if(s.matches(cmp)) {
+        final String ss = ".*\\b" + s + "\\b.*";
+        if(Pattern.compile(ss, Pattern.DOTALL).matcher(t).matches()) {
           if(il == null) il = new IntList();
           il.add(p);
         }

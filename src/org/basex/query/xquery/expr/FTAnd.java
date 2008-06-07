@@ -28,7 +28,7 @@ public final class FTAnd extends Arr {
     for(final Expr e : expr) {
       final Item it = ctx.iter(e).next();
       if(!it.bool()) return Dbl.iter(0);
-      d = Scoring.add(d, it.dbl());
+      d = Scoring.and(d, it.dbl());
     }
     return Dbl.iter(d);
   }

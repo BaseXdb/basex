@@ -48,6 +48,8 @@ public final class Try extends Arr {
       final Iter iter = ctx.iter(expr[1]);
       ctx.vars.reset(s);
       return iter;
+    } catch(final Exception e) {
+      return Str.ZERO.iter();
     }
   }
 

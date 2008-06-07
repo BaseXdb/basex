@@ -96,8 +96,8 @@ public final class MetaData {
 
   /**
    * Opens the metadata for the current database and returns the table size.
-   * @throws IOException IO Exception
    * @return table size
+   * @throws IOException I/O Exception
    */
   public int read() throws IOException {
     final DataInput in = new DataInput(dbname, DATAINFO);

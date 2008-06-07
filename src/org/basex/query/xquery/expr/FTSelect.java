@@ -101,14 +101,15 @@ public final class FTSelect extends Single implements Cloneable {
         for(int i = 0; i < size; i++) {
           boolean o = false;
           final int ts = pos[i].size;
-          for(int j = 0; j < (ordered ? Math.min(1, s) : ts); j++) {
+          for(int j = 0; j < (ordered ? Math.min(1, ts) : ts); j++) {
             if(pos[i].get(j) == l) {
               l += words(term.list[i]);
               o = true;
-              break;
             }
+            if(ordered && !content) break;
           }
           if(!o) return Dbl.iter(0);
+          if(o) break;
         }
       }
       if(content && l != c) return Dbl.iter(0);
@@ -117,13 +118,16 @@ public final class FTSelect extends Single implements Cloneable {
         for(int i = 0; i < size; i++) l += words(term.list[i]);
         for(int i = 0; i < size; i++) {
           boolean o = false;
-          for(int j = 0; j < pos[i].size; j++) {
+          final int ts = pos[i].size;
+          for(int j = ordered ? Math.max(0, ts - 1) : 0; j < ts; j++) {
             if(l + pos[i].get(j) == c) {
               o = true;
               break;
             }
+            if(ordered) break;
           }
           if(!o) return Dbl.iter(0);
+          if(o) break;
         }
       }
     }

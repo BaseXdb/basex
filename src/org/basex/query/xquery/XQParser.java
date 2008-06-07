@@ -1943,6 +1943,7 @@ public final class XQParser {
         sel.wunit = ftUnit();
       } else if(consumeWS(DISTANCE)) {
         sel.dist = ftRange();
+        if(sel.dist == null) Err.or(FTRANGE);
         sel.dunit = ftUnit();
       } else if(consumeWS(AT)) {
         sel.start = consumeWS(START);
@@ -2070,6 +2071,7 @@ public final class XQParser {
     Expr[] occ = { Itr.get(1), Itr.get(Long.MAX_VALUE) };
     if(consumeWS(OCCURS)) {
       occ = ftRange();
+      if(occ == null) Err.or(FTRANGE);
       consumeWS(TIMES);
     }
     return new FTWords(expr, mode, occ);
@@ -2098,6 +2100,8 @@ public final class XQParser {
       occ[0] = unionExpr();
       check(TO);
       occ[1] = unionExpr();
+    } else {
+      return null;
     }
     return occ;
   }
@@ -2136,27 +2140,24 @@ public final class XQParser {
     // [CG] XQuery/FTMatchOptions: language, stemming, thesaurus, stopword, ...
 
     if(consumeWS(LOWERCASE)) {
-      if(opt.lc != null || opt.uc != null ||
-          opt.sens != null) Err.or(FTCASE);
+      if(opt.lc != null || opt.uc != null || opt.sens != null) Err.or(FTCASE);
       opt.lc = Bln.TRUE;
       opt.sens = Bln.TRUE;
     } else if(consumeWS(UPPERCASE)) {
-      if(opt.lc != null || opt.uc != null ||
-          opt.sens != null) Err.or(FTCASE);
+      if(opt.lc != null || opt.uc != null || opt.sens != null) Err.or(FTCASE);
       opt.uc = Bln.TRUE;
       opt.sens = Bln.TRUE;
     } else if(consumeWS(CASE)) {
-      if(opt.lc != null || opt.uc != null ||
-          opt.sens != null) Err.or(FTCASE);
+      if(opt.lc != null || opt.uc != null || opt.sens != null) Err.or(FTCASE);
       opt.sens = Bln.get(consumeWS(SENSITIVE));
-      if(opt.sens == null) check(INSENSITIVE);
+      if(!opt.sens.bool()) check(INSENSITIVE);
     } else if(consumeWS(DIACRITICS)) {
       if(opt.diacr != null) Err.or(FTDIA);
       opt.diacr = Bln.get(consumeWS(SENSITIVE));
-      if(opt.diacr == null) check(INSENSITIVE);
+      if(!opt.diacr.bool()) check(INSENSITIVE);
     } else if(consumeWS(LANGUAGE)) {
-      opt.lng = stringLiteral();
-      Err.or(FTLAN, opt.lng);
+      opt.lng = lc(stringLiteral());
+      if(!eq(opt.lng, EN)) Err.or(FTLAN, opt.lng);
     } else {
       final int p = qp;
       final boolean with = consumeWS(WITH);
@@ -2164,11 +2165,20 @@ public final class XQParser {
 
       if(consume(STEMMING)) {
         opt.stem = Bln.get(with);
-        //if(with) Err.or(FTSTEMMING);
       } else if(consume(THESAURUS)) {
         opt.thes = Bln.get(with);
-        if(with) Err.or(FTTHES);
-      } else if(consume(STOP)) {
+        if(with) {
+          boolean par = consume(PAR1);
+          if(consume(AT)) {
+            ftThesaurusID();
+          } else {
+            check(DEFAULT);
+          }
+          while(par && consume(COMMA)) ftThesaurusID();
+          if(par) check(PAR2);
+          Err.or(FTTHES);
+        }
+      } else if(consumeWS(STOP)) {
         // add union/except
         check(WORDS);
         opt.sw = new TokenList();
@@ -2187,7 +2197,12 @@ public final class XQParser {
             } while(consume(COMMA));
             check(PAR2);
           } else if(consume(AT)) {
-            final IO fl = new IO(string(stringLiteral()));
+            IO fl = new IO(string(stringLiteral()));
+            if(!fl.exists() && ctx.file != null) {
+              fl = file.merge(fl);
+              if(!fl.exists()) Err.or(NOSTOPFILE, fl);
+            }
+            
             try {
               final byte[][] sl = split(norm(fl.content()), ' ');
               if(union) {
@@ -2201,12 +2216,11 @@ public final class XQParser {
               Err.or(NOSTOPFILE, fl);
             }
           }
-          
           union = consume(UNION);
           except = !union && consume(EXCEPT);
           if(!union && !except) break;
         }
-      } else if(consume(DEFAULT)) {
+      } else if(consumeWS(DEFAULT)) {
         check(STOP);
         check(WORDS);
       } else if(consume(WILDCARDS)) {
@@ -2217,6 +2231,16 @@ public final class XQParser {
       }
     }
     return true;
+  }
+  
+  /**
+   * [FT171] Parses an FTThesaurusID.
+   * @throws XQException xquery exception
+   */
+  private void ftThesaurusID() throws XQException {
+    stringLiteral();
+    if(consume(RELATIONSHIP)) stringLiteral();
+    if(ftRange() != null) check(LEVELS);
   }
 
   /**

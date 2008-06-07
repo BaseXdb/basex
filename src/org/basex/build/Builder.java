@@ -253,10 +253,9 @@ public abstract class Builder extends Progress {
    * Throws an error message.
    * @param m message
    * @param e message extension
-   * @throws BuildException in case of parsing or writing problems 
+   * @throws IOException I/O Exception
    */
-  private void error(final String m, final Object... e)
-      throws BuildException {
+  private void error(final String m, final Object... e) throws IOException {
     throw new BuildException(m, e);
   }
 

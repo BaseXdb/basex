@@ -78,8 +78,9 @@ public final class Create extends Proc {
     
     try {
       return build(new XMLParser(file), db);
-    } catch(final IOException e) {
-      return error(e.getMessage(), db);
+    } catch(final IOException ex) {
+      BaseX.debug(ex);
+      return error(ex.getMessage(), db);
     }
   }
 
@@ -209,7 +210,7 @@ public final class Create extends Proc {
    */
   public static Data xml(final IO fn, final String db) {
     try {
-      if(!fn.exists()) return null;
+      //if(!fn.exists()) return null;
 
       final Parser p = Prop.intparse ? new XMLParser(fn) : new SAXWrapper(fn);
       if(Prop.onthefly) return new MemBuilder().build(p, db);

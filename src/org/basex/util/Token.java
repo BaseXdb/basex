@@ -110,8 +110,8 @@ public final class Token {
     try {
       return new String(text, s, l, UTF8);
     } catch(final Exception ex) {
-      org.basex.BaseX.debug(ex);
-      throw new RuntimeException(ex.getMessage());
+      ex.printStackTrace();
+      return "";
     }
   }
 
@@ -155,7 +155,7 @@ public final class Token {
       return s.getBytes(UTF8);
     } catch(final Exception e) {
       e.printStackTrace();
-      throw new RuntimeException(e.getMessage());
+      return EMPTY;
     }
   }
 
@@ -1172,15 +1172,14 @@ public final class Token {
 
   /**
    * Removes diacritics from the specified token.
-   * Note that this method does only support the characters
-   * defined in ISO-8859-1.
+   * Note that this method does only support ISO-8859-1.
    * @param t token to be converted
    * @return converted token
    */
   public static byte[] dc(final byte[] t) {
     if(ascii(t)) return t;
 
-    final String s = string(t);
+    final String s = utf8(t, 0, t.length);
     final StringBuilder sb = new StringBuilder();
     for(int j = 0; j < s.length(); j++) {
       final char c = s.charAt(j);
@@ -1198,42 +1197,4 @@ public final class Token {
     'O', ' ', 'O', 'U', 'U', 'U', 'U', 'Y', 'D', 'S', 'a', 'a', 'a', 'a', 'a',
     'a', 'a', 'c', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i', 'd', 'n', 'o',
     'o', 'o', 'o', 'o', ' ', 'o', 'u', 'u', 'u', 'u', 'y', 'd', 's' };
-    /*
-    public static void main(String[] args) {
-      int[] i = longToInt(Integer.MAX_VALUE - 1);
-      System.out.println("Input:" + (Integer.MAX_VALUE - 1));
-      //for (int k=0; k < i.length; k++) System.out.println(i[k]);
-      System.out.println("=" + intArrayToLong(i));
-      
-      i = longToInt(Integer.MAX_VALUE);
-      System.out.println("Input:" + Integer.MAX_VALUE);
-      //for (int k=0; k < i.length; k++) System.out.println(i[k]);      
-      System.out.println("=" + intArrayToLong(i));
-      
-      i = longToInt((long)Integer.MAX_VALUE + 1);
-      System.out.println("Input:" + ((long)Integer.MAX_VALUE + 1));
-      //for (int k=0; k < i.length; k++) System.out.println(i[k]);
-      System.out.println("=" + intArrayToLong(i));
-      
-      i = longToInt((long)Integer.MAX_VALUE + 2);
-      System.out.println("Input:" + ((long)Integer.MAX_VALUE + 2));
-      //for (int k=0; k < i.length; k++) System.out.println(i[k]);
-      System.out.println("=" + intArrayToLong(i));
-      
-      i = longToInt(Integer.MAX_VALUE * (long)2 - 1);
-      System.out.println("Input:" + (Integer.MAX_VALUE* (long)2 - 1));
-      //for (int k=0; k < i.length; k++) System.out.println(i[k]);
-      System.out.println("=" + intArrayToLong(i));
-      
-      i = longToInt(Integer.MAX_VALUE* (long)2);
-      System.out.println("Input:" + (Integer.MAX_VALUE* (long)2));
-      //for (int k=0; k < i.length; k++) System.out.println(i[k]);
-      System.out.println("=" + intArrayToLong(i));
-      
-      i = longToInt(Integer.MAX_VALUE*(long)2 + 1);
-      System.out.println("Input" + (Integer.MAX_VALUE * (long) 2+ 1));
-      //for (int k=0; k < i.length; k++) System.out.println(i[k]);
-      System.out.println("=" + intArrayToLong(i));
-    }
-    */
 }

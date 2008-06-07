@@ -6,7 +6,6 @@ import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
-import org.basex.query.xquery.util.Scoring;
 import org.basex.util.Token;
 
 /**
@@ -56,11 +55,7 @@ public final class Pred extends Arr {
       for(int s = 0; s < sb.size; s++) {
         ctx.item = sb.item[s];
         i = ctx.iter(p).ebv();
-        if(i.n() ? i.dbl() == ctx.pos : i.bool()) {
-          // assign score value
-          i.score(Scoring.add(i.score(), i.score()));
-          sb.item[c++] = sb.item[s];
-        }
+        if(i.n() ? i.dbl() == ctx.pos : i.bool()) sb.item[c++] = sb.item[s];
         ctx.pos++;
       }
       sb.size = c;

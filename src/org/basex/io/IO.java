@@ -112,33 +112,28 @@ public final class IO {
   /**
    * Returns a buffered reader for the file.
    * @return buffered reader
+   * @throws IOException I/O exception
    */
-  public BufferInput buffer() {
-    try {
-      // return cached content
-      if(content || url) return new CachedInput(content());
+  public BufferInput buffer() throws IOException {
+    // return cached content
+    if(content || url) return new CachedInput(content());
 
-      // support for zipped files; the first file will be chosen
-      if(path.endsWith(ZIPSUFFIX)) {
-        ZipInputStream zip = new ZipInputStream(new FileInputStream(file));
-        ZipEntry entry = zip.getNextEntry();
-        final BufferInput in = new BufferInput(zip);
-        in.length(entry.getSize());
-        return in;
-      }
-      // support for gzipped files
-      if(path.endsWith(GZSUFFIX)) {
-        GZIPInputStream zip = new GZIPInputStream(new FileInputStream(file));
-        return new BufferInput(zip);
-      }
-      
-      // return file content
-      return new BufferInput(path);
-    } catch(final IOException ex) {
-      ex.printStackTrace();
-      BaseX.notexpected();
-      return null;
+    // support for zipped files; the first file will be chosen
+    if(path.endsWith(ZIPSUFFIX)) {
+      ZipInputStream zip = new ZipInputStream(new FileInputStream(file));
+      ZipEntry entry = zip.getNextEntry();
+      final BufferInput in = new BufferInput(zip);
+      in.length(entry.getSize());
+      return in;
     }
+    // support for gzipped files
+    if(path.endsWith(GZSUFFIX)) {
+      GZIPInputStream zip = new GZIPInputStream(new FileInputStream(file));
+      return new BufferInput(zip);
+    }
+    
+    // return file content
+    return new BufferInput(path);
   }
   
   /**
@@ -150,8 +145,8 @@ public final class IO {
     if(!url) return file().exists();
     try {
       // enough?...
-      new URL(path).openConnection();
-      //new URL(file).openStream();
+      //new URL(path).openConnection();
+      new URL(path).openStream();
       return true;
     } catch(IOException ex) {
       BaseX.debug(ex);
@@ -173,8 +168,7 @@ public final class IO {
    * @return modification date
    */
   public long date() {
-    if(content) return System.currentTimeMillis();
-    if(url) BaseX.notexpected();
+    if(content || url) return System.currentTimeMillis();
     return file().lastModified();
   }
   
@@ -218,7 +212,7 @@ public final class IO {
    * @return contents
    */
   public IO merge(final IO f) {
-    return url ? this : new IO(file().getParent() + "/" + f.name());
+    return f.url ? f : url ? this : new IO(file().getParent() + "/" + f.name());
   }
   
   /**

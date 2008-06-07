@@ -50,7 +50,7 @@ public final class XQContext extends QueryContext {
   public Variables vars = new Variables();
 
   /** Reference to the query file. */
-  public IO file;
+  public IO file = Prop.xquery;
 
   /** Current context. */
   public Item item;

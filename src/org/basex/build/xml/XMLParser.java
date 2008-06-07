@@ -134,9 +134,9 @@ public final class XMLParser extends Parser {
    * Checks if the current token matches the specified type.
    * @param t token type to be checked
    * @return result of scanner step
-   * @throws BuildException build exception
+   * @throws IOException I/O Exception
    */
-  private boolean consume(final Type t) throws BuildException {
+  private boolean consume(final Type t) throws IOException {
     if(scanner.type != t) throw new BuildException(PARSEINVALID, det(),
         t.string, scanner.type.string);
     return scanner.more();
@@ -147,9 +147,9 @@ public final class XMLParser extends Parser {
    * type is wrong, a null reference is returned.
    * @param t token type
    * @return token or null if the token type is wrong
-   * @throws BuildException build exception
+   * @throws IOException I/O Exception
    */
-  private byte[] consumeToken(final Type t) throws BuildException {
+  private byte[] consumeToken(final Type t) throws IOException {
     if(scanner.type != t) {
       throw new BuildException(PARSEINVALID, det(), t.string,
           scanner.type.string);
@@ -161,9 +161,9 @@ public final class XMLParser extends Parser {
   
   /**
    * Skips optional whitespaces.
-   * @throws BuildException build exception
+   * @throws IOException I/O Exception
    */
-  private void skipSpace() throws BuildException {
+  private void skipSpace() throws IOException {
     if(scanner.type == Type.WS) scanner.more();
   }
 

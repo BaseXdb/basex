@@ -24,13 +24,13 @@ public final class And extends Arr {
 
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
-    double d = 1;
+    double d = 0;
     for(final Expr e : expr) {
       final Item it = ctx.iter(e).ebv();
       if(!it.bool()) return Bln.FALSE.iter();
-      if(it.score() != 0) d = Scoring.or(d, it.score());
+      d = Scoring.and(d, it.score());
     }
-    return (d == 1 ? Bln.TRUE : new Bln(true, 1 - d)).iter();
+    return new Bln(true, d).iter();
   }
 
   @Override

@@ -35,8 +35,9 @@ final class XMLInput {
   /**
    * Constructor.
    * @param f file reference
+   * @throws IOException I/O Exception
    */
-  XMLInput(final IO f) {
+  XMLInput(final IO f) throws IOException {
     in[0] = f.buffer();
     in[0].encoding();
     file = f;

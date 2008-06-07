@@ -122,7 +122,8 @@ public enum GUICommands implements GUICommand {
       if(fc.select(BaseXFileChooser.MODE.OPEN)) {
         try {
           final IO file = fc.getFile();
-          main.query.setXQuery(file.content(), file.path());
+          main.query.setXQuery(file.content());
+          Prop.xquery = file;
         } catch(final IOException ex) {
           JOptionPane.showMessageDialog(main, XQOPERROR,
               DIALOGINFO, JOptionPane.ERROR_MESSAGE);
@@ -139,7 +140,7 @@ public enum GUICommands implements GUICommand {
       // open file chooser for XML creation
       final GUI main = GUI.get();
 
-      final String fn = main.query.getFilename();
+      final String fn = Prop.xquery == null ? null : Prop.xquery.path();
       final BaseXFileChooser fc = new BaseXFileChooser(XQSAVETITLE,
           fn == null ? GUIProp.createpath : fn, main);
       fc.addFilter(IO.XQSUFFIX, CREATEXQDESC);
@@ -149,6 +150,7 @@ public enum GUICommands implements GUICommand {
           final IO file = fc.getFile();
           file.suffix(IO.XQSUFFIX);
           file.write(main.query.getXQuery());
+          Prop.xquery = file;
         } catch(final IOException ex) {
           JOptionPane.showMessageDialog(main, XQSAVERROR,
               DIALOGINFO, JOptionPane.ERROR_MESSAGE);

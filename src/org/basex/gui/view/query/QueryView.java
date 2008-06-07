@@ -50,8 +50,6 @@ public final class QueryView extends View {
   private final BaseXButton open;
   /** Save button. */
   private final BaseXButton save;
-  /** Query file. */
-  String file;
 
   /**
    * Default constructor.
@@ -176,12 +174,10 @@ public final class QueryView extends View {
   /**
    * Sets a new XQuery request.
    * @param xq XQuery
-   * @param f file name
    */
-  public void setXQuery(final byte[] xq, final String f) {
+  public void setXQuery(final byte[] xq) {
     panels[0].last = Token.string(xq);
     mode = 0;
-    file = f;
     refreshLayout();
   }
 
@@ -191,13 +187,5 @@ public final class QueryView extends View {
    */
   public byte[] getXQuery() {
     return Token.token(panels[0].last);
-  }
-
-  /**
-   * Returns the query file name.
-   * @return file name
-   */
-  public String getFilename() {
-    return file;
   }
 }

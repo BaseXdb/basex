@@ -58,9 +58,9 @@ public final class FunJava extends Arr {
       Err.or(FUNJAVA, info());
     }
 
-    if(result == null) Err.or(FUNJAVA, info());
-    //return result == null ? Iter.EMPTY : iter(result);
-    return iter(result);
+    //if(result == null) Err.or(FUNJAVA, info());
+    return result == null ? Iter.EMPTY : iter(result);
+    //return iter(result);
   }
   
   /**

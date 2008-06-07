@@ -105,6 +105,8 @@ public final class Prop {
   public static boolean xqerrcode = true;
   /** Fulltext details. */
   public static boolean ftdetails = true;
+  /** Last XQuery file. */
+  public static IO xquery;
 
   // FILE SYSTEM OPTIONS ======================================================
   

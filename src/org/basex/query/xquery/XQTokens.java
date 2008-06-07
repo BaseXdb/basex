@@ -335,6 +335,8 @@ public interface XQTokens {
   byte[] LOCAL = token("local");
   /** Language attribute. */
   byte[] LANG = token("xml:lang");
+  /** Default language. */
+  byte[] EN = token("en");
 
   // QUERY PLAN ===============================================================
   

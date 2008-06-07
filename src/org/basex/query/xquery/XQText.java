@@ -138,8 +138,6 @@ public interface XQText {
   Object[] REGERR = { FORX, 4, "Regular expression: '%'" };
 
   /** FTST0000: Parsing exception. */
-  Object[] FTSTEMMING = { FTST, 0, "Stemming not supported yet." };
-  /** FTST0000: Parsing exception. */
   Object[] FTTHES = { FTST, 0, "Thesaurus not supported yet." };
   /** FTST0001: Parsing exception. */
   Object[] FTMILD = { FTST, 1, "'mild not' operator not supported yet." };
@@ -291,6 +289,8 @@ public interface XQText {
   Object[] FTCASE = { XPST, 3, "Only one case option allowed." };
   /** XPST0003: Parsing exception. */
   Object[] FTDIA = { XPST, 3, "Only one diacritics option allowed." };
+  /** XPST0003: Parsing exception. */
+  Object[] FTRANGE = { XPST, 3, "Expecting full-text range." };
 
   /** XPST0005: Parsing exception. */
   Object[] COMPSELF = { XPST, 5, "Warning: % won't yield any results." };

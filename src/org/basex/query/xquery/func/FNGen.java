@@ -42,9 +42,10 @@ final class FNGen extends Fun {
         it = iter.next();
         if(it == null) return Iter.EMPTY;
         if(it.type == Type.DOC) return it.iter();
-        if(docName == it) return doc.iter();
-        docName = it;
-        doc = ctx.doc(checkStr(it));
+        if(docName != it) {
+          docName = it;
+          doc = ctx.doc(checkStr(it));
+        }
         return doc.iter();
       case DOCAVAIL:
         it = iter.next();

@@ -29,12 +29,13 @@ public final class Or extends Arr {
     for(final Expr e : expr) {
       final Item it = ctx.iter(e).ebv();
       if(it.bool()) {
-        if(it.score() == 0) return Bln.TRUE.iter();
-        d = Scoring.or(d, it.score());
+        final double s = it.score();
+        if(s == 0) return Bln.TRUE.iter();
+        d = Scoring.or(d, s);
         found = true;
       }
     }
-    return (!found ? Bln.FALSE : new Bln(found, d)).iter();
+    return new Bln(found, d).iter();
   }
 
   @Override
