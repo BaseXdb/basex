@@ -1,9 +1,8 @@
 package org.basex.index;
 
-import java.io.IOException;
-import org.basex.io.PrintOutput;
 import org.basex.util.Array;
 import org.basex.util.Set;
+import org.basex.util.Token;
 
 /**
  * This class provides a main-memory access to attribute values and
@@ -55,8 +54,8 @@ public final class MemValues extends Index {
   }
 
   @Override
-  public void info(final PrintOutput out) throws IOException {
-    out.print("MemValues");
+  public byte[] info() {
+    return Token.token("MemValues");
   }
   
   /** MemValue Index. */

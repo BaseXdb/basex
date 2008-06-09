@@ -6,9 +6,10 @@ import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.io.DataAccess;
-import org.basex.io.PrintOutput;
 import org.basex.util.Levenshtein;
+import org.basex.util.Performance;
 import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 import org.basex.query.xpath.expr.FTOption;
 import org.basex.query.xpath.expr.FTUnion;
 
@@ -46,6 +47,8 @@ public final class Fuzzy extends Index {
   int indexsize;
   /** Number of ftdata entries. */
   int ftdatasize;
+  /** Values file. */
+  private final Data data;
   /** Index storing each unique token length and pointer 
    * on the first token with this length. */
   private final DataAccess li;
@@ -57,20 +60,28 @@ public final class Fuzzy extends Index {
     
   /**
    * Constructor, initializing the index structure.
+   * @param d data reference
    * @param db name of the database
    * @throws IOException IO Exception
    */
-  public Fuzzy(final String db) throws IOException {
+  public Fuzzy(final Data d, final String db) throws IOException {
     final String file = DATAFTX;
+    data = d;
     li = new DataAccess(db, file + "x");
     ti = new DataAccess(db, file + "y");
     dat = new DataAccess(db, file + "z");
   }
 
   @Override
-  public void info(final PrintOutput out) throws IOException {
-    out.println(TEXTINDEX);
-    out.println("FUZZY TABLE");
+  public byte[] info() {
+    final TokenBuilder tb = new TokenBuilder();
+    tb.add(FUZZY + NL);
+    tb.add("- %: %\n", CREATESTEM, BaseX.flag(data.meta.ftstem));
+    tb.add("- %: %\n", CREATECS, BaseX.flag(data.meta.ftcs));
+    tb.add("- %: %\n", CREATEDC, BaseX.flag(data.meta.ftdc));
+    final long l = li.length() + ti.length() + dat.length();
+    tb.add(SIZEDISK + Performance.formatSize(l, true) + NL);
+    return tb.finish();
   }
 
   @Override
@@ -286,7 +297,7 @@ public final class Fuzzy extends Index {
   }
 
   @Override
-  public int[][] ftIDs(final byte[] tok, final FTOption ftO, final Data dd) {
+  public int[][] ftIDs(final byte[] tok, final FTOption ftO) {
     // init no wildcard included in token
     int posW = -1;
 
@@ -338,7 +349,7 @@ public final class Fuzzy extends Index {
       // get date from disk
       // <SG> readId is overwritten again some lines later... 
       readId = ids[0][i];
-      textFromDB = dd.text(ids[0][i]);
+      textFromDB = data.text(ids[0][i]);
       tokenFromDB = new byte[tok.length];
 
       System.arraycopy(textFromDB, ids[1][i], tokenFromDB, 0, tok.length);
@@ -417,7 +428,7 @@ public final class Fuzzy extends Index {
   private int[][] getTokenWildCard(final byte[] tok, final int posw) {
     if (tok[posw] == '.' && tok.length > posw + 1 && tok[posw + 1] == '*') {
       int[][] b;
-      int[][] data = null;
+      int[][] dt = null;
       byte[] dtok;
       b = getBoundPointer(tok.length - 2);
         while (true) {
@@ -429,17 +440,17 @@ public final class Fuzzy extends Index {
           }
           dtok = ti.readBytes(b[0][1], b[0][0] + b[0][1]);
           //System.out.println(new String(dtok));
-          if (contains(tok, posw, dtok)) data = FTUnion.calculateFTOr(data, 
+          if (contains(tok, posw, dtok)) dt = FTUnion.calculateFTOr(dt, 
                   getData(getPointerOnData(b[0][1], b[0][0]), 
                   getDataSize(b[0][1], b[0][0])));
           b[0][1] += b[0][0] * 1L + 8L;
         //}
       }
         dtok = ti.readBytes(b[0][1], b[0][0] + b[0][1]);
-        if (contains(tok, posw, dtok)) data = FTUnion.calculateFTOr(data, 
+        if (contains(tok, posw, dtok)) dt = FTUnion.calculateFTOr(dt, 
             getData(getPointerOnData(b[0][1], b[0][0]), 
             getDataSize(b[0][1], b[0][0])));
-        return data;
+        return dt;
         
     } else {
       BaseX.debug("Sorry, FuzzyIndex supports only \'.*\' as wildcard.");
@@ -460,7 +471,7 @@ public final class Fuzzy extends Index {
       final byte[] tok2) {
     if (tokww.length - 2 > tok2.length) return false;
 
-    // check token befor wildcard
+    // check token before wildcard
     for(int t = 0; t < posw; t++) {
       if (tokww[t] != tok2[t]) return false; 
     }

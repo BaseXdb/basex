@@ -77,7 +77,6 @@ public abstract class Dialog extends JDialog {
    */
   public final void finish(final JFrame parent, final int[] loc) {
     pack();
-
     if(loc == null) setLocationRelativeTo(parent);
     else setLocation(parent.getX() + loc[0], parent.getY() + loc[1]);
     setVisible(true);

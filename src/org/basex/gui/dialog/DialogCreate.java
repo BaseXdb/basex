@@ -33,10 +33,10 @@ public final class DialogCreate extends Dialog {
   private BaseXCheckBox atvindex;
   /** Word Indexing mode. */
   private BaseXCheckBox ftxindex;
-  /** Fuzzy indexing. */
-  private BaseXCheckBox fuzzyindex;
-  /** Fuzzy indexing label. */
-  private BaseXLabel fuzzylabel;
+  /** Fulltext indexing. */
+  private BaseXCheckBox[] ft = new BaseXCheckBox[4];
+  /** Fulltext labels. */
+  private BaseXLabel[] fl = new BaseXLabel[4];
 
   /**
    * Default Constructor.
@@ -48,7 +48,7 @@ public final class DialogCreate extends Dialog {
     // create checkboxes
     final BaseXBack p1 = new BaseXBack();
     p1.setBorder(8, 8, 8, 8);
-    p1.setLayout(new TableLayout(8, 1, 0, 0));
+    p1.setLayout(new TableLayout(8, 1));
 
     intparse = new BaseXCheckBox(CREATEINTPARSE, Token.token(INTPARSEINFO),
         Prop.intparse, 0, this);
@@ -74,31 +74,41 @@ public final class DialogCreate extends Dialog {
     p2.setLayout(new TableLayout(10, 1, 0, 0));
     p2.setBorder(8, 8, 8, 8);
 
-    txtindex = new BaseXCheckBox(CREATETXTINDEX, Token.token(TXTINDEXINFO),
+    txtindex = new BaseXCheckBox(INFOTXTINDEX, Token.token(TXTINDEXINFO),
         Prop.textindex, 0, this);
     p2.add(txtindex);
     p2.add(new BaseXLabel(TXTINDEXINFO, 8));
 
-    atvindex = new BaseXCheckBox(CREATEATTINDEX, Token.token(ATTINDEXINFO),
+    atvindex = new BaseXCheckBox(INFOATVINDEX, Token.token(ATTINDEXINFO),
         Prop.attrindex, 0, this);
     p2.add(atvindex);
     p2.add(new BaseXLabel(ATTINDEXINFO, 8));
 
-    ftxindex = new BaseXCheckBox(CREATEFTINDEX, Token.token(FTINDEXINFO),
-        Prop.ftindex, 0, this);
-    p2.add(ftxindex);
-    p2.add(new BaseXLabel(FTINDEXINFO, 8));
+    // create checkboxes
+    final BaseXBack p3 = new BaseXBack();
+    p3.setLayout(new TableLayout(10, 1, 0, 0));
+    p3.setBorder(8, 8, 8, 8);
 
-    fuzzyindex = new BaseXCheckBox(CREATEFZINDEX, Token.token(FZINDEXINFO),
-        Prop.fzindex, 0, this);
-    p2.add(fuzzyindex);
-    fuzzylabel = new BaseXLabel(FZINDEXINFO, 8);
-    p2.add(fuzzylabel);
+    ftxindex = new BaseXCheckBox(INFOFTINDEX, Token.token(FTINDEXINFO),
+        Prop.ftindex, 0, this);
+    p3.add(ftxindex);
+    p3.add(new BaseXLabel(FTINDEXINFO, 8));
+
+    final String[] cb = { CREATEFZ, CREATESTEM, CREATEDC, CREATECS };
+    final String[] desc = { FZINDEXINFO, FTSTEMINFO, FTDCINFO, FTCSINFO };
+    final boolean[] val = { Prop.ftfuzzy, Prop.ftstem, Prop.ftdc, Prop.ftcs };
+    for(int f = 0; f < ft.length; f++) {
+      ft[f] = new BaseXCheckBox(cb[f], Token.token(desc[f]), val[f], 0, this);
+      fl[f] = new BaseXLabel(desc[f], 8);
+      p3.add(ft[f]);
+      p3.add(fl[f]);
+    }
 
     final JTabbedPane tabs = new JTabbedPane();
     BaseXLayout.addDefaultKeys(tabs, this);
     tabs.addTab(GENERALINFO, p1);
     tabs.addTab(INDEXINFO, p2);
+    tabs.addTab(FTINFO, p3);
 
     set(tabs, BorderLayout.CENTER);
 
@@ -113,8 +123,10 @@ public final class DialogCreate extends Dialog {
   @Override
   public void action(final String cmd) {
     final boolean ftx = ftxindex.isSelected();
-    fuzzyindex.setEnabled(ftx);
-    fuzzylabel.setEnabled(ftx);
+    for(int f = 0; f < ft.length; f++) {
+      ft[f].setEnabled(ftx);
+      fl[f].setEnabled(ftx);
+    }
   }
 
   @Override
@@ -127,6 +139,9 @@ public final class DialogCreate extends Dialog {
     Prop.ftindex = ftxindex.isSelected();
     Prop.mainmem  = mainmem.isSelected();
     Prop.intparse = intparse.isSelected();
-    Prop.fzindex = fuzzyindex.isSelected();
+    Prop.ftfuzzy = ft[0].isSelected();
+    Prop.ftstem = ft[1].isSelected();
+    Prop.ftcs = ft[2].isSelected();
+    Prop.ftdc = ft[3].isSelected();
   }
 }

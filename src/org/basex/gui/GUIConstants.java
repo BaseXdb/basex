@@ -6,6 +6,9 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Font;
+
+import javax.swing.UIManager;
+
 import org.basex.Text;
 
 /**
@@ -189,6 +192,11 @@ public final class GUIConstants {
 
   // FONTS ====================================================================
 
+  /** Default monospace font. */
+  public static Font dfont;
+  /** Default monospace font widths. */
+  public static int[] dwidth;
+  
   /** Large font. */
   public static Font lfont;
   /** Character large character widths. */
@@ -281,10 +289,16 @@ public final class GUIConstants {
    * @return character widths
    */
   public static int[] fontWidths(final Font f) {
+    if(dfont == null) {
+      dfont = new Font("Monospaced", 0,
+          UIManager.getFont("TextArea.font").getSize());
+      dwidth  = new Container().getFontMetrics(dfont).getWidths();
+    }
     if(f == font) return fwidth;
     if(f == mfont) return mfwidth;
     if(f == bfont) return bwidth;
     if(f == lfont) return lwidth;
+    if(f == dfont) return dwidth;
     return new Container().getFontMetrics(f).getWidths();
   }
 }

@@ -22,6 +22,7 @@ import org.basex.core.Prop;
 import org.basex.core.proc.Create;
 import org.basex.io.IO;
 import org.basex.util.Array;
+import org.basex.util.Map;
 
 /** Imports/shreds/parses a file hierarchy into a BaseX database.
  *
@@ -54,7 +55,7 @@ public final class FSParser extends Parser implements FSVisitor {
   /** The current File being processed. */
   private String guimsg = "Importing files ...";
   /** Meta data index. */
-  private final ExtractorIndex meta = new ExtractorIndex();
+  private final Map<AbstractExtractor> meta = new Map<AbstractExtractor>();
   /** Cache for content indexing. */
   private byte[] cache;
   /** Reference to the database builder. */
@@ -76,16 +77,16 @@ public final class FSParser extends Parser implements FSVisitor {
     // initialize cache for textual contents
     if(Prop.fscont) cache = new byte[Prop.fstextmax];
 
-    meta.put(TYPEGIF, new GIFExtractor());
-    meta.put(TYPEPNG, new PNGExtractor());
-    meta.put(TYPEJPG, new JPGExtractor());
-    meta.put(TYPEJPEG, new JPGExtractor());
-    meta.put(TYPEBMP, new BMPExtractor());
-    meta.put(TYPEGIF, new TIFExtractor());
-    meta.put(TYPEMP3, new MP3Extractor());
-    meta.put(TYPEEML, new EMLExtractor());
-    meta.put(TYPEMBS, new EMLExtractor());
-    meta.put(TYPEMBX, new EMLExtractor());
+    meta.add(TYPEGIF, new GIFExtractor());
+    meta.add(TYPEPNG, new PNGExtractor());
+    meta.add(TYPEJPG, new JPGExtractor());
+    meta.add(TYPEJPEG, new JPGExtractor());
+    meta.add(TYPEBMP, new BMPExtractor());
+    meta.add(TYPEGIF, new TIFExtractor());
+    meta.add(TYPEMP3, new MP3Extractor());
+    meta.add(TYPEEML, new EMLExtractor());
+    meta.add(TYPEMBS, new EMLExtractor());
+    meta.add(TYPEMBX, new EMLExtractor());
   }
 
   /**

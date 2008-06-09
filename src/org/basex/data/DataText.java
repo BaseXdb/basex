@@ -50,6 +50,12 @@ public interface DataText {
   String DBFTXINDEX = "FTXINDEX";
   /** Fuzzy indexing. */
   String DBFZINDEX = "FZINDEX";
+  /** Fulltext stemming. */
+  String DBFTSTEM = "FTSTEM";
+  /** Fulltext case sensitivity. */
+  String DBFTCS = "FTCS";
+  /** Fulltext diacritics removal. */
+  String DBFTDC = "FTDC";
   /** Last (highest) id. */
   String DBLASTID = "LASTID";
   

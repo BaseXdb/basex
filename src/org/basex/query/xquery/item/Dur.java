@@ -118,6 +118,11 @@ public class Dur extends Date {
   }
 
   @Override
+  public int hash() {
+    return (int) ((3 + mon) * (5 + sec) * (7 + mil));
+  }
+
+  @Override
   public int diff(final Item it) throws XQException {
     Err.cmp(it, this);
     return 0;

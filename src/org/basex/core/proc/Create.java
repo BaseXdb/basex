@@ -172,8 +172,7 @@ public final class Create extends Proc {
 
       if(data.meta.txtindex) buildIndex(Index.TYPE.TXT, data);
       if(data.meta.atvindex) buildIndex(Index.TYPE.ATV, data);
-      if(data.meta.ftxindex) buildIndex(
-          data.meta.fzindex ? Index.TYPE.FUY : Index.TYPE.FTX, data);
+      if(data.meta.ftxindex) buildIndex(Index.TYPE.FTX, data);
       context.data(data);
       
       return Prop.info ? timer(DBCREATED) : true;
@@ -221,9 +220,8 @@ public final class Create extends Proc {
       if(data.meta.atvindex)
         data.openIndex(Index.TYPE.ATV, new ValueBuilder(false).build(data));
       if(data.meta.ftxindex) {
-        if(data.meta.fzindex)
-          data.openIndex(Index.TYPE.FUY, new FZBuilder().build(data));
-        else data.openIndex(Index.TYPE.FTX, new FTBuilder().build(data));
+        data.openIndex(Index.TYPE.FTX, data.meta.ftfuzzy ?
+            new FZBuilder().build(data) : new FTBuilder().build(data));
       }
       return data;
     } catch(final IOException ex) {
@@ -252,7 +250,7 @@ public final class Create extends Proc {
         index = Index.TYPE.ATV;
       } else if(type.equals(FTX)) {
         data.meta.ftxindex = true;
-        index = data.meta.fzindex ? Index.TYPE.FUY : Index.TYPE.FTX;
+        index = Index.TYPE.FTX;
       } else {
         throw new IllegalArgumentException();
       }
@@ -278,11 +276,10 @@ public final class Create extends Proc {
           new ValueBuilder(true), d, Prop.allInfo ? CREATETEXT : null);  break;
       case ATV: buildIndex(i,
           new ValueBuilder(false), d, Prop.allInfo ? CREATEATTR : null); break;
-      case FUY: buildIndex(i,
-          new FZBuilder(), d, Prop.allInfo ? CREATEFT : null); break;
-          //new FuzzyBuilder(), d, Prop.allInfo ? CREATEFT : null); break;
       case FTX: buildIndex(i,
-            new FTBuilder(), d, Prop.allInfo ? CREATEFT : null); 
+          d.meta.ftfuzzy ? new FZBuilder() : new FTBuilder(), d,
+              Prop.allInfo ? CREATEFT : null); break;
+      default: break;
     }
   }
 

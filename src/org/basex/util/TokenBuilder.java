@@ -144,6 +144,16 @@ public final class TokenBuilder {
   }
 
   /**
+   * Adds a string and fills up with spaces.
+   * @param s the string to be added
+   * @param l maximum string length
+   */
+  public void add(final String s, final int l) {
+    add(s);
+    for(int i = 0; i < l - s.length(); i++) add(' ');
+  }
+
+  /**
    * Adds some query information.
    * @param str query information
    * @param ext text text extensions

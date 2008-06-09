@@ -32,7 +32,7 @@ public final class DialogFontChooser extends Dialog {
   /** Anti-Aliasing mode. */
   private BaseXCheckBox aalias;
   /** Singleton instance. */
-  private static Dialog instance;
+  private static DialogFontChooser instance;
 
   /**
    * Returns singleton instance.
@@ -41,6 +41,7 @@ public final class DialogFontChooser extends Dialog {
    */
   public static Dialog get(final JFrame parent) {
     if(instance == null) instance = new DialogFontChooser(parent);
+    instance.size.setValue(Integer.toString(GUIProp.fontsize));
     return instance;
   }
   

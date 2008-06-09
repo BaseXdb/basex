@@ -14,7 +14,7 @@ import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.EtchedBorder;
+import javax.swing.border.MatteBorder;
 import org.basex.core.Commands;
 import org.basex.core.Prop;
 import org.basex.gui.GUI;
@@ -87,6 +87,15 @@ public final class BaseXWin {
     } catch(final Exception e) {
       e.printStackTrace();
     }
+    
+    /*
+    UIDefaults def = UIManager.getDefaults();
+    Enumeration<?> en = def.keys();
+    while(en.hasMoreElements()) {
+      Object o = en.nextElement();
+      System.out.println(o + ": " + def.get(o));
+    }
+     */
   }
 
   /**
@@ -100,8 +109,8 @@ public final class BaseXWin {
     final JPanel panel = new JPanel();
     panel.setLayout(new GridLayout(2, 1));
     panel.setBackground(Color.white);
-    panel.setBorder(new CompoundBorder(new EtchedBorder(),
-        new EmptyBorder(2, 15, 5, 15)));
+    panel.setBorder(new CompoundBorder(new MatteBorder(1, 1, 1, 1,
+        Color.GRAY), new EmptyBorder(3, 16, 6, 16)));
 
     JLabel label = new JLabel(WAIT1);
     label.setFont(label.getFont().deriveFont(0));

@@ -107,7 +107,7 @@ public interface Text {
   /** Connection error. */
   String SERVERERR = lang("srv_connect");
   /** Port error. */
-  String SERVERPORT = lang("srv_port");
+  String SERVERPORT = lang("srv_port") + COLS;
 
   /** Start Information. */
   String SERVERINFO = CONSOLEINFO + NL +
@@ -154,15 +154,11 @@ public interface Text {
   /** Command help. */
   String CREATE1 = lang("ch_create1");
   /** Command help. */
-  String CREATE2 = lang("ch_create2") +
-     NL + NL +
-    "- " + Create.XML + lang("ch_file") + NL +
-    lang("ch_create3") + NL +
-    "- " + Create.FS + lang("ch_create4") + NL +
-    lang("ch_create5") + NL +
+  String CREATE2 = lang("ch_create2") + NL + NL +
+    "- " + Create.XML + lang("ch_file") + NL + lang("ch_create3") + NL +
+    "- " + Create.FS + lang("ch_create4") + NL + lang("ch_create5") + NL +
     "- " + Create.INDEX + " [" + Create.TXT + "|" + Create.ATV +
-    "|" + Create.FTX + "]: " + NL +
-    lang("ch_create6");
+    "|" + Create.FTX + "]: " + NL + lang("ch_create6");
   /** Command help. */
   String OPEN0 = lang("ch_open0");
   /** Command help. */
@@ -174,8 +170,7 @@ public interface Text {
   /** Command help. */
   String INFO1 = lang("ch_info1");
   /** Command help. */
-  String INFO2 = lang("ch_info21") + NL +
-    lang("ch_info22") + NL +
+  String INFO2 = lang("ch_info21") + NL + lang("ch_info22") + NL +
     "- " + Info.DB + lang("ch_info23") + NL +
     "- " + Info.IDX + lang("ch_info24") + NL +
     "- " + Info.TBL + lang("ch_info25");
@@ -322,7 +317,7 @@ public interface Text {
   /** Command Help. */
   String SET1 = lang("ch_set1");
   /** Command Help. */
-  String SET2 = lang("ch_set2") + NL + NL +
+  String SET2 = lang("ch_set2") + NL +
     "- " + Set.INFO + lang("ch_set21") + NL +
     "- " + Set.DEBUG + lang("ch_set22") + NL +
     "- " + Set.SERIALIZE + lang("ch_set23") + NL +
@@ -332,16 +327,15 @@ public interface Text {
     "- " + Set.ENTITY + lang("ch_set27") + NL +
     "- " + Set.TXTINDEX + lang("ch_set28") + NL +
     "- " + Set.ATTRINDEX + lang("ch_set29") + NL +
-    "- " + Set.FTINDEX + lang("ch_set31") + NL +
-    "- " + Set.FUZZYINDEX + lang("ch_set30") + NL + NL +
-    lang("ch_set32") + NL + NL +
+    "- " + Set.FTINDEX + lang("ch_set31") + NL + NL +
+    lang("ch_set32") + NL +
     "- " + Set.DBPATH + lang("ch_set33") + NL +
     "- " + Set.RUNS + lang("ch_set34");
 
   /** Command Help. */
   String HELP0 = "[command]?";
   /** Command Help. */
-  String HELP1 = lang("ch_help1") + NAME + lang("ch_help11");
+  String HELP1 = lang("ch_help1") + ' ' + NAME + lang("ch_help11");
   /** Command Help. */
   String HELP2 = lang("ch_help2");
   /** Command Help. */
@@ -654,37 +648,47 @@ public interface Text {
   /** Main-Memory Mode. */
   String CREATEMAINMEM = lang("dc_mainmem");
 
-  /** Value Index information. */
-  String CREATETXTINDEX = lang("dc_txtindex");
-  /** Value Index information. */
-  String CREATEATTINDEX = lang("dc_attindex");
   /** Word Index information. */
-  String CREATEFTINDEX = lang("dc_ftindex");
+  String CREATEFZ = lang("dc_fzindex");
   /** Word Index information. */
-  String CREATEFZINDEX = lang("dc_fzindex");
+  String CREATESTEM = lang("dc_ftstem");
+  /** Word Index information. */
+  String CREATECS = lang("dc_ftcs");
+  /** Word Index information. */
+  String CREATEDC = lang("dc_ftdc");
 
   /** Whitespaces information. */
-  String CHOPPINGINFO = lang("dc_chopinfo") + DOT;
+  String CHOPPINGINFO = lang("dc_chopinfo");
   /** Whitespaces information. */
-  String INTPARSEINFO = lang("dc_intparseinfo") + DOT;
+  String INTPARSEINFO = lang("dc_intparseinfo");
   /** Entities information. */
   String ENTITIESINFO = lang("dc_entitiesinfo") + " (&...;).";
   /** Main-Memory Mode. */
-  String MMEMINFO =  lang("dc_mminfo") + DOT;
+  String MMEMINFO =  lang("dc_mminfo");
 
   /** Value Index information. */
-  String TXTINDEXINFO =  lang("dc_txtinfo") + DOT;
+  String TXTINDEXINFO =  lang("dc_txtinfo");
   /** Value Index information. */
-  String ATTINDEXINFO = lang("dc_attinfo") + DOT;
+  String ATTINDEXINFO = lang("dc_attinfo");
   /** Fulltext Index information. */
-  String FTINDEXINFO = lang("dc_ftxinfo") + DOT;
+  String FTINDEXINFO = lang("dc_ftxinfo");
   /** Fulltext Index information. */
-  String FZINDEXINFO = lang("dc_fzinfo") + DOT;
+  String FZINDEXINFO = lang("dc_fzinfo");
+  /** Fulltext Index information. */
+  String FTSTEMINFO = lang("dc_ftsteminfo");
+  /** Fulltext Index information. */
+  String FTCSINFO = lang("dc_ftcsinfo");
+  /** Fulltext Index information. */
+  String FTDCINFO = lang("dc_ftdcinfo");
 
   /** General info. */
   String GENERALINFO =  lang("dc_general");
   /** Indexing info. */
+  String NAMESINFO =  lang("dc_names");
+  /** Indexing info. */
   String INDEXINFO =  lang("dc_index");
+  /** Indexing info. */
+  String FTINFO =  lang("dc_ft");
   
   /** Dialog title for opening a database. */
   String OPENTITLE = lang("do_title");
@@ -821,13 +825,6 @@ public interface Text {
       lang("dm_choice1"), lang("dm_choice2"), lang("dm_choice3"),
       lang("dm_choice4"), lang("dm_choice5"), lang("dm_choice6")
   };
-
-  /** Title of Information Dialog. */
-  String INFOTITLE = lang("di_title");
-  /** Index information. */
-  String INFOINDEX = lang("di_index");
-  /** Index information. */
-  String INFOBUILD = lang("di_build") + DOTS;
 
   /** Title of Memory Dialog. */
   String MEMTITLE = lang("dz_title");
@@ -972,25 +969,21 @@ public interface Text {
   // DATABASE/INDEX INFORMATION ===============================================
 
   /** Data info. */
-  String TAGINDEX = "TAG NAMES:";
+  String TAGINDEX = "Tag Names";
   /** Data info. */
-  String ATTINDEX = "ATTRIBUTE NAMES:";
+  String ATTINDEX = "Attribute Names";
   /** Data info. */
-  String TEXTINDEX = "TEXTS:";
+  String TEXTINDEX = "Texts";
   /** Data info. */
-  String VALUEINDEX = "ATTRIBUTE VALUES:";
-  /** Data info. */
-  String WORDINDEX = "WORDS:";
-  /** Data info. */
-  String FTINDEX = "FULLTEXT:";
+  String VALUEINDEX = "Attribute Values";
   /** Index info. */
   String TRIE = "- Compressed Trie";
   /** Index info. */
-  String DISKHASH = "- Disk-Based Hash";
+  String FUZZY = "- Fuzzy Index";
+  /** Index info. */
+  String TXTINDEX = "- Tree Structure";
   /** Index info. */
   String IDXENTRIES = "- Entries: ";
-  /** Index info. */
-  String HASHBUCKETS = "- Buckets: ";
   /** Index info. */
   String SIZEDISK = "- Size on Disk: ";
 
@@ -1090,6 +1083,20 @@ public interface Text {
 
   // INFO STRINGS =============================================================
 
+  /** Process information. */
+  String INFOWAIT = lang("wait");
+  /** Title of Information Dialog. */
+  String INFOTITLE = lang("info_title");
+  /** Index information. */
+  String INFOINDEX = lang("info_index");
+  /** Index information. */
+  String INFOBUILD = lang("info_build") + DOTS;
+  /** Optimize information. */
+  String INFOOPT = lang("info_opt") + DOTS;
+  /** Optimize information. */
+  String INFOOPTIM = lang("info_optim");
+  /** Statistics information. */
+  String INFOSTATS = lang("info_stats") + DOTS;
   /** Info on source document. */
   String INFODBNAME = lang("info_dbname");
   /** Info on document size. */
@@ -1123,9 +1130,9 @@ public interface Text {
   String INFODBERR = lang("info_dberror");
 
   /** Info on database path. */
-  String INFONEWPATH = lang("info_newpath");
+  String INFONEWPATH = lang("info_newpath") + COLS;
   /** Info on database path. */
-  String INFOPATHERR = lang("info_patherr");
+  String INFOPATHERR = lang("info_patherr") + COLS;
   /** Info on Query Verbosity. */
   String INFOINFO = lang("info_info");
   /** Info on Query Verbosity. */
@@ -1141,7 +1148,11 @@ public interface Text {
   /** Info on well formed XML serialization. */
   String INFOXMLOUTPUT = lang("info_xmloutput");
   /** Info on Main Memory mode. */
-  String INFOMAINMEM = lang("info_mainmem");
+  String INFOMM = lang("info_mainmem");
+  /** Info on Text Indexing. */
+  String INFOTAGINDEX = lang("info_tagindex");
+  /** Info on Text Indexing. */
+  String INFOATNINDEX = lang("info_atnindex");
   /** Info on Text Indexing. */
   String INFOTXTINDEX = lang("info_txtindex");
   /** Info on Attribute Indexing. */
@@ -1150,15 +1161,13 @@ public interface Text {
   String INFOFTINDEX = lang("info_ftindex");
   /** Info on Fuzzy Indexing. */
   String INFOFZINDEX = lang("info_fzindex");
-  /** Info on Fuzzy Fulltext Indexing. */
-  String INFOFTFZINDEX = lang("info_ftfzindex");
 
   /** Info on Document Creation. */
   String INFODB = lang("info_db");
   /** Info on Document Creation. */
   String INFOCREATE = lang("info_create");
   /** Info on Index Creation. */
-  String INFOINDEXES = lang("info_indexes");
+  //String INFOINDEXES = lang("info_indexes");
   /** Database Info. */
   String INFOGENERAL = lang("info_general");
   /** Database Info. */
@@ -1169,8 +1178,6 @@ public interface Text {
   String INFOOFF = lang("info_off");
   /** Error info. */
   String INFOERROR = lang("info_error");
-  /** Info on database size. */
-  String INFOSTAT = lang("info_stat");
   
   // HELP TEXTS ===============================================================
 
@@ -1220,8 +1227,6 @@ public interface Text {
   byte[] HELPFSALL = token(lang("h_fsall"));
   /** Help String. */
   byte[] HELPMETA = token(lang("h_meta"));
-  /** Help String. */
-  byte[] HELPSTAT = token(lang("h_stat"));
   /** Help String. */
   byte[] HELPCONT = token(lang("h_cont"));
   /** Help String. */

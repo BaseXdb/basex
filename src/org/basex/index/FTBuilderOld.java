@@ -8,6 +8,7 @@ import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
 import org.basex.io.DataOutput;
+import org.basex.util.FTTokenizer;
 import org.basex.util.Performance;
 
 
@@ -21,7 +22,6 @@ import org.basex.util.Performance;
 public final class FTBuilderOld extends Progress implements IndexBuilder {
   /** Word parser. */
   private final FTTokenizer wp = new FTTokenizer();
-
   /** CTArray for tokens. **/
   private CTArray index;
 
@@ -137,13 +137,9 @@ public final class FTBuilderOld extends Progress implements IndexBuilder {
    * @param pre pre value
    */
   private void index(final int pre) {
-    final byte[] tok = wp.finish();
-    final int pos = wp.off();
+    final byte[] tok = wp.next();
+    final int pos = wp.s;
     index.index(tok, pre, pos);
-
-    /**cont = Num.add(cont, tok);
-    BaseX.debug("cont:" + Token.toString(cont));
-    **/
   }
 
   @Override

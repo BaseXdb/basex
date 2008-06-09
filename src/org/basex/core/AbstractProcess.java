@@ -1,5 +1,6 @@
 package org.basex.core;
 
+import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.io.PrintOutput;
 
@@ -37,17 +38,17 @@ public abstract class AbstractProcess extends Progress {
   public abstract void info(final PrintOutput out) throws IOException;
 
   @Override
-  public final String tit() {
-    return "Processing...";
+  public String tit() {
+    return INFOWAIT;
   }
 
   @Override
-  public final String det() {
-    return "Processing...";
+  public String det() {
+    return INFOWAIT;
   }
 
   @Override
-  public final double prog() {
+  public double prog() {
     return 0;
   }
 }

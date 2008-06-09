@@ -54,6 +54,7 @@ public final class BaseXTextRenderer extends BaseXBack {
   BaseXTextRenderer(final BaseXTextTokens t, final BaseXBar b) {
     setMode(FILL.NONE);
     setText(t);
+    setFont(GUIConstants.dfont);
     bar = b;
   }
 
@@ -191,7 +192,7 @@ public final class BaseXTextRenderer extends BaseXBack {
   private void write(final Graphics g) {
     // choose color (later: use variable syntax highlighter)
     final char ch = word.charAt(0);
-    final Color color = syntax.getColor(word);
+    final Color color = isEnabled() ? syntax.getColor(word) : Color.gray;
 
     // return if current text is not visible.
     if(y > 0 && y < h) {

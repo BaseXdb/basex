@@ -34,8 +34,10 @@ public final class DialogProgress extends Dialog {
    * @param par parent frame
    * @param msg waiting message.
    * @param prg showing a progress bar
+   * @param cnc cancel flag
    */
-  public DialogProgress(final JFrame par, final String msg, final boolean prg) {
+  public DialogProgress(final JFrame par, final String msg,
+      final boolean prg, final boolean cnc) {
     super(par, msg, false);
 
     info = new BaseXLabel(" ", true);
@@ -53,7 +55,9 @@ public final class DialogProgress extends Dialog {
     final BaseXBack p = new BaseXBack();
     p.setLayout(new BorderLayout());
     p.setBorder(10, 0, 0, 0);
-    p.add(new BaseXButton(BUTTONCANCEL, HELPSTOP, this), BorderLayout.EAST);
+    if(cnc) {
+      p.add(new BaseXButton(BUTTONCANCEL, HELPSTOP, this), BorderLayout.EAST);
+    }
     set(p, BorderLayout.SOUTH);
     finish(par);
   }

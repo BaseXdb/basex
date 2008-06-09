@@ -249,7 +249,7 @@ public final class XPathView extends View {
    * @return key array
    */
   String[] keys(final Data data) {
-    if(!data.tags.stats()) Optimize.stats(data);
+    if(!data.tags.stats()) new Optimize().stats(data);
 
     final StringList sl = new StringList();
     sl.add("");

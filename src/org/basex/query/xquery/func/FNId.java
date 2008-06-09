@@ -97,7 +97,9 @@ final class FNId extends Fun {
   private byte[][] ids(final Iter iter) throws XQException {
     final TokenList tl = new TokenList();
     Item id;
-    while((id = iter.next()) != null) tl.add(split(norm(checkStr(id)), ' '));
+    while((id = iter.next()) != null) {
+      for(final byte[] i : split(norm(checkStr(id)), ' ')) tl.add(i);
+    }
     return tl.finish();
   }
 

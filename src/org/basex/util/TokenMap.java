@@ -8,7 +8,7 @@ package org.basex.util;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Map extends Set {
+public final class TokenMap extends Set {
   /** Hash values. */
   private byte[][] values = new byte[CAP][];
 

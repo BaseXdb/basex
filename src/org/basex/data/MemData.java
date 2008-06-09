@@ -5,7 +5,6 @@ import org.basex.index.Index;
 import org.basex.index.MemValues;
 import org.basex.index.Names;
 import org.basex.index.Namespaces;
-import org.basex.io.PrintOutput;
 import org.basex.util.Array;
 import org.basex.util.Token;
 import org.basex.query.xpath.expr.FTOption;
@@ -334,11 +333,6 @@ public final class MemData extends Data {
   public int nrFTIDs(final byte[] token) {
     BaseX.notimplemented();
     return 0;
-  }
-
-  @Override
-  public void info(final PrintOutput out) {
-    BaseX.notimplemented();
   }
 
   @Override

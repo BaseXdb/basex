@@ -2,8 +2,8 @@ package org.basex.query.xpath.expr;
 
 import static org.basex.query.xpath.XPText.OPTOR4;
 import org.basex.query.QueryException;
+import org.basex.query.xpath.ExprList;
 import org.basex.query.xpath.XPContext;
-import org.basex.util.ExprList;
 import org.basex.query.xpath.locpath.PredSimple;
 import org.basex.query.xpath.locpath.Step;
 import org.basex.query.xpath.values.Bool;

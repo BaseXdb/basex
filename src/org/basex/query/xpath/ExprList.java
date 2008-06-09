@@ -1,4 +1,4 @@
-package org.basex.util;
+package org.basex.query.xpath;
 
 import org.basex.query.xpath.expr.Expr;
 

@@ -38,7 +38,6 @@ public abstract class ArrayExpr extends Expr {
 
   @Override
   public final String toString() {
-    // <SG> ..TokenBuilder used, so the added byte array is treated as token
     final TokenBuilder sb = new TokenBuilder(name());
     sb.add('(');
     for(int i = 0; i != exprs.length; i++) {

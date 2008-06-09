@@ -4,14 +4,13 @@ import static org.basex.data.DataText.*;
 import static org.basex.Text.*;
 import java.io.IOException;
 import java.util.Arrays;
-import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataAccess;
-import org.basex.io.PrintOutput;
 import org.basex.util.Array;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 
 /**
  * This class provides access to attribute values and text contents
@@ -50,12 +49,14 @@ public final class Values extends Index {
   }
 
   @Override
-  public void info(final PrintOutput out) throws IOException {
-    out.println(text ? TEXTINDEX : VALUEINDEX);
-    out.println(DISKHASH);
-    out.println(IDXENTRIES + size);
+  public byte[] info() {
+    final TokenBuilder tb = new TokenBuilder();
+    //tb.add(text ? TEXTINDEX : VALUEINDEX);
+    tb.add(TXTINDEX + NL);
+    tb.add(IDXENTRIES + size + NL);
     final long l = idxl.length() + idxr.length();
-    out.println(SIZEDISK + Performance.formatSize(l, true) + Prop.NL);
+    tb.add(SIZEDISK + Performance.formatSize(l, true) + NL);
+    return tb.finish();
   }
 
   @Override

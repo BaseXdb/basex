@@ -3,8 +3,6 @@ package org.basex.index;
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.query.xpath.expr.FTOption;
-import org.basex.data.Data;
-import org.basex.io.PrintOutput;
 
 /**
  * This interface defines the methods which have to be implemented
@@ -16,18 +14,18 @@ import org.basex.io.PrintOutput;
 public abstract class Index {
   /** Index types. */
   public enum TYPE {
+    /** Attribute index. */ ATN,
+    /** Tag index.       */ TAG,
     /** Text index.      */ TXT,
     /** Attribute index. */ ATV,
     /** Fulltext index.  */ FTX,
-    /** Fuzzy index.     */ FUY;
   };
   
   /**
    * Returns information on the index structure.
-   * @param out output stream
-   * @throws IOException in case of write errors
+   * @return info
    */
-  public abstract void info(PrintOutput out) throws IOException;
+  public abstract byte[] info();
 
   /**
    * Returns the node ids for the specified token.
@@ -47,12 +45,10 @@ public abstract class Index {
    * Returns the decompressed ids for the specified token.
    * @param tok token to be found
    * @param ftO ftoption for token to be found
-   * @param d data reference
    * @return ids
    */
   @SuppressWarnings("unused")
-  public int[][] ftIDs(final byte[] tok, final FTOption ftO,
-      final Data d) {
+  public int[][] ftIDs(final byte[] tok, final FTOption ftO) {
     BaseX.notimplemented();
     return null;
   }

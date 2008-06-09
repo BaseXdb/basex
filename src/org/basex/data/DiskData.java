@@ -1,6 +1,5 @@
 package org.basex.data;
 
-import static org.basex.Text.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
 import org.basex.core.Prop;
@@ -11,7 +10,6 @@ import org.basex.index.Namespaces;
 import org.basex.index.Values;
 import org.basex.index.WordsCTANew;
 import org.basex.io.DataAccess;
-import org.basex.io.PrintOutput;
 import org.basex.io.TableAccess;
 import org.basex.io.TableDiskAccess;
 import org.basex.io.TableMemAccess;
@@ -95,10 +93,8 @@ public final class DiskData extends Data {
     if(index) {
       if(meta.txtindex) openIndex(Index.TYPE.TXT, new Values(this, db, true));
       if(meta.atvindex) openIndex(Index.TYPE.ATV, new Values(this, db, false));
-      if(meta.ftxindex) {
-        if(meta.fzindex) openIndex(Index.TYPE.FUY, new Fuzzy(db));
-        else openIndex(Index.TYPE.FTX, new WordsCTANew(db));
-      }
+      if(meta.ftxindex) openIndex(Index.TYPE.FTX, meta.ftfuzzy ?
+          new Fuzzy(this, db) : new WordsCTANew(this, db));
     }
     initNames();
   }
@@ -145,7 +141,6 @@ public final class DiskData extends Data {
     closeIndex(Index.TYPE.TXT);
     closeIndex(Index.TYPE.ATV);
     closeIndex(Index.TYPE.FTX);
-    closeIndex(Index.TYPE.FUY);
   }
 
   @Override
@@ -153,8 +148,8 @@ public final class DiskData extends Data {
     switch(index) {
       case TXT: if(txtindex != null) txtindex.close(); break;
       case ATV: if(atvindex != null) atvindex.close(); break;
-      case FTX: 
-      case FUY: if(ftxindex != null) ftxindex.close(); break;
+      case FTX: if(ftxindex != null) ftxindex.close(); break;
+      default: break;
     }
   }
 
@@ -163,8 +158,8 @@ public final class DiskData extends Data {
     switch(type) {
       case TXT: if(meta.txtindex) txtindex = index; break;
       case ATV: if(meta.atvindex) atvindex = index; break;
-      case FTX: 
-      case FUY: if(meta.ftxindex) ftxindex = index;
+      case FTX: if(meta.ftxindex) ftxindex = index; break;
+      default: break;
     }
   }
 
@@ -330,24 +325,13 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public void info(final PrintOutput out) throws IOException {
-    out.println(TAGINDEX);
-    out.println(tags.info());
-    out.println(ATTINDEX);
-    out.println(atts.info());
-    if(meta.txtindex) txtindex.info(out);
-    if(meta.atvindex) atvindex.info(out);
-    if(meta.ftxindex) ftxindex.info(out);
-  }
-
-  @Override
   public int[][] fuzzyIDs(final byte[] words, final int ne) {
     return ftxindex.fuzzyIDs(words, ne);
   }
 
   @Override
    public int[][] ftIDs(final byte[] word, final FTOption ftO) {
-     return ftxindex.ftIDs(word, ftO, this);
+     return ftxindex.ftIDs(word, ftO);
    }
 
   @Override

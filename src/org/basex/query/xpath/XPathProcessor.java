@@ -43,7 +43,6 @@ import org.basex.query.xpath.values.Item;
 import org.basex.query.xpath.values.Literal;
 import org.basex.query.xpath.values.NodeSet;
 import org.basex.query.xpath.values.Num;
-import org.basex.util.ExprList;
 import org.basex.util.Token;
 
 /**
@@ -179,9 +178,6 @@ public final class XPathProcessor extends QueryProcessor {
     return null;
   }
 
-  // <SG> parseftcontains temporarily switched to default visibility
-  //  (no private flag); strings moved to XPText class
- 
   /**
    * Parses an FTWords.
    * @return resulting expression

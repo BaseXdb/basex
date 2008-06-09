@@ -688,14 +688,17 @@ public enum GUICommands implements GUICommand {
     public void execute() {
       final DialogInfo info = new DialogInfo(GUI.get());
       if(info.ok()) {
-        final MetaData meta = GUI.context.data().meta;
-        final boolean[] indexes = info.indexes();
-        final StringBuilder sb = new StringBuilder();
-        meta.fzindex = indexes[3];
-        if(indexes[0] != meta.txtindex) cmd(indexes[0], Create.TXT, sb);
-        if(indexes[1] != meta.atvindex) cmd(indexes[1], Create.ATV, sb);
-        if(indexes[2] != meta.ftxindex) cmd(indexes[2], Create.FTX, sb);
-        build(INFOBUILD, sb.toString());
+        if(info.opt) {
+          build(INFOOPT, Commands.OPTIMIZE.toString());
+        } else {
+          final MetaData meta = GUI.context.data().meta;
+          final boolean[] indexes = info.indexes();
+          final StringBuilder sb = new StringBuilder();
+          if(indexes[0] != meta.txtindex) cmd(indexes[0], Create.TXT, sb);
+          if(indexes[1] != meta.atvindex) cmd(indexes[1], Create.ATV, sb);
+          if(indexes[2] != meta.ftxindex) cmd(indexes[2], Create.FTX, sb);
+          build(INFOBUILD, sb.toString());
+        }
       }
     }
 
@@ -708,7 +711,7 @@ public enum GUICommands implements GUICommand {
     private void cmd(final boolean create, final String index,
         final StringBuilder sb) {
       final Commands cmd = create ? Commands.CREATEINDEX : Commands.DROPINDEX;
-      if(sb.length() != 0) sb.append(";");
+      if(sb.length() != 0) sb.append(';');
       sb.append(cmd + " " + index);
     }
   },
@@ -852,12 +855,13 @@ public enum GUICommands implements GUICommand {
           final Commands cc = cmd.name;
           final Proc proc = cmd.proc(GUI.context);
 
-          if(cc != Commands.CREATEINDEX && cc != Commands.DROPINDEX)
-            main.execute(Commands.CLOSE);
+          if(cc != Commands.CREATEINDEX && cc != Commands.DROPINDEX  &&
+              cc != Commands.OPTIMIZE) main.execute(Commands.CLOSE);
 
           Performance.sleep(100);
           final DialogProgress wait = cc == Commands.DROPINDEX ? null :
-              new DialogProgress(main, title, cc != Commands.CREATEFS);
+              new DialogProgress(main, title, cc != Commands.CREATEFS,
+                  cc != Commands.OPTIMIZE);
 
           // start dialog window thread
           if(wait != null) {
@@ -886,6 +890,9 @@ public enum GUICommands implements GUICommand {
           // return user information
           if(ok) {
             main.status.setText(BaseX.info(PROCTIME, perf.getTimer()));
+            if(cc == Commands.OPTIMIZE)
+              JOptionPane.showMessageDialog(GUI.get(), INFOOPTIM, DIALOGINFO,
+                  JOptionPane.INFORMATION_MESSAGE);
           } else {
             JOptionPane.showMessageDialog(main, inf,
                 DIALOGINFO, JOptionPane.WARNING_MESSAGE);

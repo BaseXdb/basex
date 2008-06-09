@@ -132,6 +132,10 @@ public final class Dec extends Num {
       d != d ? Integer.MIN_VALUE : val.compareTo(it.dec());
   }
 
+  @Override
+  public int hash() {
+    return val.intValue();
+  }
   
   /**
    * Converts the given double into a decimal value.

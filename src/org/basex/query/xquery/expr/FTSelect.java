@@ -1,7 +1,7 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQText.*;
-import static org.basex.util.Token.*;
+
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Dbl;
@@ -9,6 +9,7 @@ import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Err;
 import org.basex.util.Array;
+import org.basex.util.FTTokenizer;
 import org.basex.util.IntList;
 import org.basex.util.TokenList;
 
@@ -52,7 +53,7 @@ public final class FTSelect extends Single implements Cloneable {
   public Expr weight;
 
   /** Term list. */
-  private TokenList term = new TokenList();
+  private final TokenList term = new TokenList();
   /** Position list. */
   private IntList[] pos = new IntList[0];
   /** Number of entries. */
@@ -75,8 +76,8 @@ public final class FTSelect extends Single implements Cloneable {
 
     final Item it = ctx.iter(expr).next();
     ctx.ftselect = tmp;
-    double s = it.dbl();
-    
+    final double s = it.dbl();
+
     // ...s == 0 correct?
     if(size == 0 || s == 0) return Dbl.iter(s);
 
@@ -103,7 +104,7 @@ public final class FTSelect extends Single implements Cloneable {
           final int ts = pos[i].size;
           for(int j = 0; j < (ordered ? Math.min(1, ts) : ts); j++) {
             if(pos[i].get(j) == l) {
-              l += words(term.list[i]);
+              l += words(new FTTokenizer(term.list[i]));
               o = true;
             }
             if(ordered && !content) break;
@@ -115,7 +116,7 @@ public final class FTSelect extends Single implements Cloneable {
       if(content && l != c) return Dbl.iter(0);
 
       if(end) {
-        for(int i = 0; i < size; i++) l += words(term.list[i]);
+        for(int i = 0; i < size; i++) l += words(new FTTokenizer(term.list[i]));
         for(int i = 0; i < size; i++) {
           boolean o = false;
           final int ts = pos[i].size;
@@ -136,13 +137,13 @@ public final class FTSelect extends Single implements Cloneable {
     if(dunit != null) {
       final long mn = checkItr(ctx.iter(dist[0]));
       final long mx = checkItr(ctx.iter(dist[1]));
-      
+
       int l = -1;
       for(int i = 0; i < size; i++) {
         boolean o = false;
         for(int j = 0; j < pos[i].size; j++) {
           final int p = calc(ctx, pos[i].get(j), dunit);
-          int d = Math.abs(p - l) - 1;
+          final int d = Math.abs(p - l) - 1;
           if(i == 0 || (d >= mn && d <= mx)) {
             o = true;
             l = p;
@@ -186,7 +187,7 @@ public final class FTSelect extends Single implements Cloneable {
       }
       if(p != q) return Dbl.iter(0);
     }
-    
+
     // ...to be revised...
     if(different) {
       int l = -1;
@@ -234,74 +235,23 @@ public final class FTSelect extends Single implements Cloneable {
    * @return new position
    */
   private int calc(final XQContext ctx, final int p, final Unit u) {
-    switch(u) {
-      case SENTENCES : return sentence(ctx.ftitem, p);
-      case PARAGRAPHS: return paragraph(ctx.ftitem, p);
-      default:         return p;
-    }
+    if(u == Unit.WORDS) return p;
+
+    final FTTokenizer iter = ctx.ftitem;
+    iter.init();
+    while(iter.more() && iter.pos != p);
+    return u == Unit.SENTENCES ? iter.sent : iter.para;
   }
 
   /**
    * Returns the number of tokens of the specified item.
-   * @param tok token
+   * @param iter full-text iterator
    * @return word position
    */
-  private static int words(final byte[] tok) {
-    final int tl = tok.length;
-
-    // compare tokens character wise
-    int p = 0;
-    boolean l = false;
-    for(int t = 0; t < tl; t++) {
-      final boolean lod = letterOrDigit(tok[t]);
-      if(!l && lod) p++;
-      l = lod;
-    }
-    return p;
-  }
-
-  /**
-   * Returns the sentence number for the specified position.
-   * @param tok token
-   * @param pos token position
-   * @return word position
-   */
-  private static int sentence(final byte[] tok, final int pos) {
-    final int tl = tok.length;
-
-    int p = 0;
-    int s = 0;
-    boolean l = false;
-    for(int t = 0; t < tl && p <= pos; t++) {
-      final byte c = tok[t];
-      final boolean ld = letterOrDigit(c);
-      if(!l && ld) p++;
-      if(c == '.' || c == '!' || c == '?') s++;
-      l = ld;
-    }
-    return s;
-  }
-
-  /**
-   * Returns the paragraph number for the specified position.
-   * @param tok token
-   * @param pos token position
-   * @return word position
-   */
-  private static int paragraph(final byte[] tok, final int pos) {
-    final int tl = tok.length;
-
-    int p = 0;
-    int s = 0;
-    boolean l = false;
-    for(int t = 0; t < tl && p < pos; t++) {
-      final byte c = tok[t];
-      final boolean ld = letterOrDigit(c);
-      if(!l && ld) p++;
-      if(c == '\n') s++;
-      l = ld;
-    }
-    return s;
+  private static int words(final FTTokenizer iter) {
+    iter.init();
+    while(iter.more());
+    return iter.pos;
   }
 
   @Override

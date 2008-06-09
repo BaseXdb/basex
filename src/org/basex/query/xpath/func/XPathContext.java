@@ -7,6 +7,7 @@ import org.basex.query.xpath.expr.Expr;
 import org.basex.query.xpath.values.Literal;
 import org.basex.query.xpath.values.Num;
 import org.basex.query.xpath.values.Item;
+import org.basex.util.Map;
 import org.basex.util.Token;
 
 /**
@@ -17,11 +18,9 @@ import org.basex.util.Token;
  */
 public final class XPathContext {
   /** HashMap with XPath functions. */
-  private XPathIndex<Class<? extends Func>> functions =
-    new XPathIndex<Class<? extends Func>>();
+  private Map<Class<? extends Func>> funcs = new Map<Class<? extends Func>>();
   /** HashMap with XPath variables. */
-  private XPathIndex<Item> variables =
-    new XPathIndex<Item>();
+  private Map<Item> vars = new Map<Item>();
   /** Singleton instance. */
   private static XPathContext instance = new XPathContext();
   
@@ -84,7 +83,7 @@ public final class XPathContext {
    */
   public Func getFunction(final byte[] name, final Expr[] args)
       throws QueryException {
-    final Class<? extends Func> functionClass = functions.get(name);
+    final Class<? extends Func> functionClass = funcs.get(name);
     if(null == functionClass) throw new QueryException(UNKNOWNFUNC, name);
 
     try {
@@ -106,7 +105,7 @@ public final class XPathContext {
    * @throws QueryException query exception
    */
   public Item evalVariable(final byte[] name) throws QueryException {
-    final Item v = variables.get(name);
+    final Item v = vars.get(name);
     if(v == null) throw new QueryException(UNKNOWNVAR, name);
     return v;
   }
@@ -118,7 +117,7 @@ public final class XPathContext {
    */
   private void addFunction(final String name,
       final Class<? extends Func> function) {
-    functions.index(Token.token(name), function);
+    funcs.add(Token.token(name), function);
   }
 
   /**
@@ -145,6 +144,6 @@ public final class XPathContext {
    * @param value variable instance.
    */
   private void addVariable(final String name, final Item value) {
-    variables.index(Token.token(name), value);
+    vars.add(Token.token(name), value);
   }
 }

@@ -71,6 +71,14 @@ public abstract class Item extends Expr {
   }
 
   /**
+   * Returns a hash code.
+   * @return hash code
+   */
+  public int hash() {
+    return Token.hash(str());
+  }
+
+  /**
    * Returns a boolean representation of the item.
    * @return boolean value
    * @throws XQException evaluation exception

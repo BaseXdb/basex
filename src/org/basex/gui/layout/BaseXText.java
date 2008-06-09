@@ -102,7 +102,8 @@ public final class BaseXText extends BaseXPanel {
     setLayout(new BorderLayout(4, 0));
     scroll = new BaseXBar(this);
     rend = new BaseXTextRenderer(text, scroll);
-    rend.setFont(GUIConstants.mfont);
+    //rend.setFont(GUIConstants.mfont);
+
     add(rend, BorderLayout.CENTER);
     add(scroll, BorderLayout.EAST);
 
@@ -248,7 +249,6 @@ public final class BaseXText extends BaseXPanel {
     requestFocusInWindow();
     cursor();
 
-    // <CG> right click: context menu
     if(!SwingUtilities.isLeftMouseButton(e)) return;
 
     final int c = e.getClickCount();

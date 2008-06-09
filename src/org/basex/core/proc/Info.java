@@ -6,13 +6,17 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.Data;
+import org.basex.data.MetaData;
 import org.basex.data.Nodes;
+import org.basex.index.Index;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.util.Performance;
 import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 
 /**
  * Evaluates the 'info' command.
@@ -21,6 +25,10 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class Info extends XPath {
+  /** Date Format. */
+  private static final SimpleDateFormat DATE =
+    new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
+
   /** Info option. */
   public static final String DB = "database";
   /** Info option. */
@@ -69,22 +77,29 @@ public final class Info extends XPath {
    * @throws IOException I/O exception
    */
   private void general(final PrintOutput out) throws IOException {
-    prop(out, INFOGENERAL, false);
-    prop(out, INFODBPATH + Prop.dbpath, true);
-    prop(out, INFOMEM + Performance.getMem(), true);
-    prop(out, Set.flag(INFOMAINMEM, Prop.mainmem), true);
-    prop(out, Set.flag(INFOINFO, Prop.info) +
-        (Prop.allInfo ? INFOALL : ""), true);
+    Performance.gc(4);
+    final int l = BaseX.max(new String[] {
+        INFODBPATH, INFOMEM, INFOMM, INFOINFO
+    });
 
-    prop(out, NL + INFOINDEXES, false);
-    prop(out, Set.flag(INFOTXTINDEX, Prop.textindex), true);
-    prop(out, Set.flag(INFOATVINDEX, Prop.attrindex), true);
-    prop(out, Set.flag(INFOFTINDEX, Prop.ftindex)  +
-        (Prop.fzindex ? INFOFZINDEX : ""), true);
+    final TokenBuilder tb = new TokenBuilder();
+    tb.add(INFOGENERAL + NL);
+    format(tb, INFODBPATH, Prop.dbpath, true, l);
+    format(tb, INFOMEM, Performance.getMem(), true, l);
+    format(tb, INFOMM, BaseX.flag(Prop.mainmem), true, l);
+    format(tb, INFOINFO, BaseX.flag(Prop.info) +
+        (Prop.allInfo ? " (" + INFOALL + ")" : ""), true, l);
+    
+    tb.add(NL + INFOCREATE + NL);
+    format(tb, INFOCHOP, BaseX.flag(Prop.chop), true, 0);
+    format(tb, INFOENTITIES, BaseX.flag(Prop.entity), true, 0);
 
-    prop(out, NL + INFOCREATE, false);
-    prop(out, Set.flag(INFOCHOP, Prop.chop), true);
-    prop(out, Set.flag(INFOENTITIES, Prop.entity), true);
+    tb.add(NL + INFOINDEX + NL);
+    format(tb, INFOTXTINDEX, BaseX.flag(Prop.textindex), true, 0);
+    format(tb, INFOATVINDEX, BaseX.flag(Prop.attrindex), true, 0);
+    format(tb, INFOFTINDEX, BaseX.flag(Prop.ftindex) +
+        (Prop.ftfuzzy ? " (" + INFOFZINDEX + ")" : ""), true, 0);
+    out.print(tb.finish());
   }
 
   /**
@@ -93,48 +108,75 @@ public final class Info extends XPath {
    * @throws IOException I/O exception
    */
   private void db(final PrintOutput out) throws IOException {
-    Performance.gc(4);
-
     final Data data = context.data();
-    // calculate database size
-    final File file = IO.dbpath(data.meta.dbname);
-    long fl = 0;
-    if(file.exists()) for(final File f : file.listFiles()) fl += f.length();
-
-    prop(out, INFODB, false);
-    prop(out, INFODBNAME + data.meta.dbname, true);
-    prop(out, INFODOC + data.meta.file, true);
-    prop(out, INFOTIME + new SimpleDateFormat("dd.MM.yyyy hh:mm:ss").format(
-        new Date(data.meta.time)), true);
-    prop(out, INFODOCSIZE + (data.meta.filesize != 0 ?
-        Performance.formatSize(data.meta.filesize) : "-"), true);
-    if(fl != 0) prop(out, INFODBSIZE + Performance.formatSize(fl), true);
-    prop(out, INFOENCODING + data.meta.encoding, true);
-    prop(out, INFONODES + data.size, true);
-    prop(out, INFOHEIGHT + data.meta.height, true);
-
-    prop(out, NL + INFOINDEX, false);
-    prop(out, Set.flag(INFOTXTINDEX, data.meta.txtindex), true);
-    prop(out, Set.flag(INFOATVINDEX, data.meta.atvindex), true);
-    prop(out, Set.flag(INFOFTINDEX, data.meta.ftxindex) +
-        (data.meta.fzindex ? INFOFZINDEX : ""), true);
-
-    prop(out, NL + INFOCREATE, false);
-    prop(out, Set.flag(INFOCHOP, data.meta.chop), true);
-    prop(out, Set.flag(INFOENTITIES, data.meta.entity), true);
+    out.print(db(data.meta, data.size, true, true));
   }
 
   /**
-   * Adds a single property to the output.
-   * @param out output stream
-   * @param prop property to be printed
-   * @param indent indentation flag
-   * @throws IOException I/O exception
+   * Creates a database information string.
+   * @param meta meta data
+   * @param size database size
+   * @param header add header flag
+   * @param index add index information
+   * @return info string
    */
-  private void prop(final PrintOutput out, final String prop,
-      final boolean indent) throws IOException {
-    if(indent) out.print("  ");
-    out.println(prop);
+  public static byte[] db(final MetaData meta, final int size,
+      final boolean header, final boolean index) {
+    
+    final File dir = IO.dbpath(meta.dbname);
+    long len = 0;
+    for(final File f : dir.listFiles()) len += f.length();
+
+    final TokenBuilder tb = new TokenBuilder();
+    final int l = BaseX.max(new String[] {
+        INFODBNAME, INFODOC, INFOTIME, INFODOCSIZE, INFODBSIZE,
+        INFOENCODING, INFONODES, INFOHEIGHT
+    });
+
+    if(header) {
+      tb.add(INFODB + NL);
+      format(tb, INFODBNAME, meta.dbname, header, l);
+    }
+    format(tb, INFODOC, meta.file.path(), header, l);
+    format(tb, INFOTIME, DATE.format(new Date(meta.time)), header, l);
+    format(tb, INFODOCSIZE, meta.filesize != 0 ?
+        Performance.formatSize(meta.filesize) : "-", header, l);
+    format(tb, INFODBSIZE, Performance.formatSize(len), header, l);
+    format(tb, INFOENCODING, meta.encoding, header, l);
+    format(tb, INFONODES, Integer.toString(size), header, l);
+    format(tb, INFOHEIGHT, Integer.toString(meta.height), header, l);
+
+    tb.add(NL + INFOCREATE + NL);
+    format(tb, INFOCHOP, BaseX.flag(meta.chop), true, 0);
+    format(tb, INFOENTITIES, BaseX.flag(meta.chop), true, 0);
+    
+    if(index) {
+      tb.add(NL + INFOINDEX + NL);
+      if(meta.newindex) {
+        tb.add(" " + INDUPDATE + NL);
+      } else {
+        format(tb, INFOTXTINDEX, BaseX.flag(meta.txtindex), true, 0);
+        format(tb, INFOATVINDEX, BaseX.flag(meta.atvindex), true, 0);
+        format(tb, INFOFTINDEX, BaseX.flag(meta.ftxindex) +
+            (meta.ftfuzzy ? " (" + INFOFZINDEX + ")" : ""), true, 0);
+      }
+    }
+    return tb.finish();
+  }
+
+  /**
+   * Formats the specified input.
+   * @param tb token builder
+   * @param key key
+   * @param val value
+   * @param h header flag
+   * @param i maximum indent
+   */
+  private static void format(final TokenBuilder tb, final String key,
+      final String val, final boolean h, final int i) {
+    if(h) tb.add(' ');
+    tb.add(key, i);
+    tb.add(": " + val + NL);
   }
 
   /**
@@ -143,7 +185,24 @@ public final class Info extends XPath {
    * @throws IOException I/O exception
    */
   private void index(final PrintOutput out) throws IOException {
-    context.data().info(out);
+    final Data data = context.data();
+    
+    out.println(INFOTAGINDEX);
+    out.println(data.info(Index.TYPE.TAG));
+    out.println(INFOATNINDEX);
+    out.println(data.info(Index.TYPE.ATN));
+    if(data.meta.txtindex) {
+      out.println(INFOTXTINDEX);
+      out.println(data.info(Index.TYPE.TXT));
+    }
+    if(data.meta.atvindex) {
+      out.println(INFOATVINDEX);
+      out.println(data.info(Index.TYPE.ATV));
+    }
+    if(data.meta.ftxindex) {
+      out.println(INFOFTINDEX);
+      out.println(data.info(Index.TYPE.FTX));
+    }
   }
 
   /**
@@ -254,8 +313,7 @@ public final class Info extends XPath {
    */
   private static void format(final PrintOutput out, final byte[] t,
       final int s) throws IOException {
-    int l = s - t.length;
-    while(l-- > 0) out.print(' ');
+    for(int i = 0; i < s - t.length; i++) out.print(' ');
     out.print(t);
   }
 }

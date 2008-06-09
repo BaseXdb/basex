@@ -1,8 +1,8 @@
 package org.basex.index;
 
-import org.basex.util.ByteArrayList;
 import org.basex.util.IntArrayList;
 import org.basex.util.Token;
+import org.basex.util.TokenList;
 
 /**
  * Preserves a compressed trie index structure and useful functionality.
@@ -18,7 +18,7 @@ public final class CTArrayNew {
  
   /** THE LISTS ARE USED TO CREATE THE STRUCTURE. **/
   /** List saving the token values. **/
-  private ByteArrayList tokensL;
+  private TokenList tokensL;
   /** List saving the structure: [t, n1, ..., nk, s, p0, p1] 
    * t = pointer on tokens; n1, ..., nk are the children of the node
    * saved as pointer on nextN; s = size of pre values; p = pointer 
@@ -49,7 +49,7 @@ public final class CTArrayNew {
     nextL = new IntArrayList(is);
     preL = new IntArrayList(is);
     posL = new IntArrayList(is);
-    tokensL = new ByteArrayList(is);
+    tokensL = new TokenList(is);
     // add root node with k, t, s
     nextL.add(new int[]{-1, 0, 0});
     count = 1;

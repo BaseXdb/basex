@@ -291,6 +291,8 @@ public interface XQText {
   Object[] FTDIA = { XPST, 3, "Only one diacritics option allowed." };
   /** XPST0003: Parsing exception. */
   Object[] FTRANGE = { XPST, 3, "Expecting full-text range." };
+  /** XPST0003: Parsing exception. */
+  Object[] FTSTOP = { XPST, 3, "Stop words expected." };
 
   /** XPST0005: Parsing exception. */
   Object[] COMPSELF = { XPST, 5, "Warning: % won't yield any results." };

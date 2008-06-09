@@ -33,6 +33,7 @@ import org.basex.query.xquery.util.Namespaces;
 import org.basex.query.xquery.util.SeqBuilder;
 import org.basex.query.xquery.util.Variables;
 import org.basex.util.Array;
+import org.basex.util.FTTokenizer;
 import org.basex.util.StringList;
 
 /**
@@ -60,7 +61,7 @@ public final class XQContext extends QueryContext {
   public int size;
 
   /** Current fulltext item. */
-  public byte[] ftitem;
+  public FTTokenizer ftitem;
   /** Current fulltext options. */
   public FTOptions ftopt;
   /** Current fulltext selections. */

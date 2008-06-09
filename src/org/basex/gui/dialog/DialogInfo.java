@@ -2,23 +2,26 @@ package org.basex.gui.dialog;
 
 import static org.basex.Text.*;
 import java.awt.BorderLayout;
+import java.awt.Font;
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import javax.swing.JTabbedPane;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
-import org.basex.core.Commands;
+import org.basex.core.proc.Info;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.gui.GUI;
+import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXCheckBox;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
+import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.TableLayout;
+import org.basex.index.Index;
 import org.basex.io.IO;
-import org.basex.util.Performance;
+import org.basex.util.Token;
 
 /**
  * Info Database Dialog.
@@ -28,7 +31,15 @@ import org.basex.util.Performance;
  */
 public final class DialogInfo extends Dialog {
   /** Index Checkbox. */
-  private final BaseXCheckBox[] indexes = new BaseXCheckBox[4];
+  private final BaseXCheckBox[] indexes = new BaseXCheckBox[3];
+  /** Fulltext indexing. */
+  private BaseXCheckBox[] ft = new BaseXCheckBox[4];
+  /** Fulltext labels. */
+  private BaseXLabel[] fl = new BaseXLabel[4];
+  /** Editable fulltext options. */
+  private boolean edit;
+  /** Optimize flag. */
+  public boolean opt;
 
   /**
    * Default Constructor.
@@ -36,48 +47,115 @@ public final class DialogInfo extends Dialog {
    */
   public DialogInfo(final GUI gui) {
     super(gui, INFOTITLE);
-
-    final BaseXBack info = new BaseXBack();
-    info.setLayout(new TableLayout(10, 2));
-    info.setBorder(new CompoundBorder(new EtchedBorder(),
-        new EmptyBorder(10, 10, 10, 10)));
+    
+    // create checkboxes
+    final BaseXBack p1 = new BaseXBack();
+    p1.setBorder(new CompoundBorder(new EtchedBorder(),
+        new EmptyBorder(8, 8, 8, 8)));
+    p1.setLayout(new BorderLayout());
 
     final Data data = GUI.context.data();
     final MetaData meta = data.meta;
+
+    final BaseXLabel doc = new BaseXLabel(meta.dbname);
+    doc.setFont(new Font(GUIProp.font, 0, 18));
+    doc.setBorder(0, 0, 5, 0);
+    p1.add(doc, BorderLayout.NORTH);
+
+    BaseXText text = text();
+    BaseXLayout.setHeight(text, 220);
 
     // get size of database
     final File dir = IO.dbpath(meta.dbname);
     long len = 0;
     for(final File f : dir.listFiles()) len += f.length();
 
-    add(info, INFODBNAME, meta.dbname);
-    add(info, INFODOC, meta.file.path());
-    add(info, INFOTIME, new SimpleDateFormat("dd.MM.yyyy hh:mm:ss").format(
-        new Date(meta.time)));
-    add(info, INFODOCSIZE, meta.filesize != 0 ?
-        Performance.formatSize(meta.filesize) : "-");
-    add(info, INFODBSIZE, Performance.formatSize(len));
-    add(info, INFOENCODING, meta.encoding);
-    add(info, INFONODES, Integer.toString(data.size));
-    add(info, INFOHEIGHT, Integer.toString(meta.height));
+    text.setText(Info.db(meta, data.size, false, false));
+    p1.add(text, BorderLayout.CENTER);
 
-    final BaseXBack pp = new BaseXBack();
-    pp.setLayout(new BorderLayout());
-    pp.add(info, BorderLayout.NORTH);
+    final BaseXBack p2 = new BaseXBack();
+    p2.setLayout(new TableLayout(4, 1, 0, 0));
+    p2.setBorder(8, 8, 0, 8);
 
-    final BaseXBack check = new BaseXBack();
-    check.setLayout(new TableLayout(3, 2, 0, 5));
-    check.setBorder(10, 10, 10, 10);
+    p2.add(new BaseXLabel(INFOTAGINDEX));
+    text = text();
+    text.setText(data.info(Index.TYPE.TAG));
+    BaseXLayout.setHeight(text, 110);
+    p2.add(text);
+    
+    final BaseXLabel label = new BaseXLabel(INFOATNINDEX); 
+    label.setBorder(8, 0, 0, 0);
+    p2.add(label);
+    text = text();
+    text.setText(data.info(Index.TYPE.ATN));
+    BaseXLayout.setHeight(text, 110);
+    p2.add(text);
 
-    check.add(new BaseXLabel(INFOINDEX, true));
-    check.add(new BaseXLabel(""));
-    indexes[0] = add(check, INFOTXTINDEX, meta.txtindex);
-    indexes[2] = add(check, INFOFTINDEX, meta.ftxindex);
-    indexes[1] = add(check, INFOATVINDEX, meta.atvindex);
-    indexes[3] = add(check, CREATEFZINDEX, meta.fzindex);
-    pp.add(check, BorderLayout.CENTER);
+    final BaseXBack p3 = new BaseXBack();
+    p3.setLayout(new TableLayout(6, 1, 0, 0));
+    p3.setBorder(8, 8, 8, 8);
 
-    set(pp, BorderLayout.CENTER);
+    indexes[0] = new BaseXCheckBox(INFOTXTINDEX, Token.token(TXTINDEXINFO),
+        meta.txtindex, 0, this);
+    p3.add(indexes[0]);
+
+    if(meta.txtindex) {
+      text = text();
+      text.setText(data.info(Index.TYPE.TXT));
+      BaseXLayout.setHeight(text, 75);
+      p3.add(text);
+    } else {
+      p3.add(new BaseXLabel(TXTINDEXINFO, 8));
+    }
+
+    indexes[1] = new BaseXCheckBox(INFOATVINDEX, Token.token(ATTINDEXINFO),
+        meta.atvindex, 0, this);
+    p3.add(indexes[1]);
+    
+    if(meta.atvindex) {
+      text = text();
+      text.setText(data.info(Index.TYPE.ATV));
+      BaseXLayout.setHeight(text, 75);
+      p3.add(text);
+    } else {
+      p3.add(new BaseXLabel(ATTINDEXINFO, 8));
+    }
+
+    final BaseXBack p4 = new BaseXBack();
+    p4.setLayout(new TableLayout(10, 1, 0, 0));
+    p4.setBorder(8, 8, 8, 8);
+
+    edit = !meta.ftxindex;
+    indexes[2] = new BaseXCheckBox(INFOFTINDEX, Token.token(FTINDEXINFO),
+        meta.ftxindex, 0, this);
+    p4.add(indexes[2]);
+
+    if(edit) {
+      p4.add(new BaseXLabel(FTINDEXINFO, edit ? 8 : 0));
+      final String[] cb = { CREATEFZ, CREATESTEM, CREATEDC, CREATECS };
+      final String[] desc = { FZINDEXINFO, FTSTEMINFO, FTDCINFO, FTCSINFO };
+      final boolean[] val = { meta.ftfuzzy, meta.ftstem, meta.ftdc, meta.ftcs };
+      for(int f = 0; f < ft.length; f++) {
+        ft[f] = new BaseXCheckBox(cb[f], Token.token(desc[f]), val[f], 0, this);
+        fl[f] = new BaseXLabel(desc[f], 8);
+        p4.add(ft[f]);
+        p4.add(fl[f]);
+      }
+    } else {
+      text = text();
+      text.setText(data.info(Index.TYPE.FTX));
+      BaseXLayout.setHeight(text, 150);
+      p4.add(text);
+    }
+    
+    final JTabbedPane tabs = new JTabbedPane();
+    BaseXLayout.addDefaultKeys(tabs, this);
+    tabs.addTab(GENERALINFO, p1);
+    tabs.addTab(NAMESINFO, p2);
+    tabs.addTab(INDEXINFO, p3);
+    tabs.addTab(FTINFO, p4);
+
+    set(tabs, BorderLayout.CENTER);
 
     set(BaseXLayout.newButtons(this, true,
         new String[] { BUTTONOPT, BUTTONOK, BUTTONCANCEL },
@@ -86,33 +164,17 @@ public final class DialogInfo extends Dialog {
     action(null);
     finish(gui);
   }
-
+  
   /**
-   * Adds two labels to the specified panel.
-   * @param back panel reference
-   * @param s1 first string
-   * @param s2 second string
+   * Returns a text box.
+   * @return text box
    */
-  private void add(final BaseXBack back, final String s1, final String s2) {
-    final BaseXLabel label = new BaseXLabel(s1.replace(":", "       "));
-    label.setFont(getFont().deriveFont(1));
-    back.add(label);
-    back.add(new BaseXLabel(s2));
-  }
-
-  /**
-   * Adds a checkbox to the specified panel.
-   * @param back panel reference
-   * @param s first string
-   * @param v value
-   * @return check box
-   */
-  private BaseXCheckBox add(final BaseXBack back, final String s,
-      final boolean v) {
-    final BaseXCheckBox check = new BaseXCheckBox(s + "        ",
-        null, v, 0, this);
-    back.add(check);
-    return check;
+  private BaseXText text() {
+    final BaseXText text = new BaseXText(null, false, this);
+    text.setBorder(new EmptyBorder(5, 5, 5, 5));
+    text.setFocusable(false);
+    BaseXLayout.setWidth(text, 450);
+    return text;
   }
 
   /**
@@ -120,14 +182,35 @@ public final class DialogInfo extends Dialog {
    * @return check box
    */
   public boolean[] indexes() {
-    final boolean[] ind = new boolean[indexes.length];
-    for(int i = 0; i < indexes.length; i++) ind[i] = indexes[i].isSelected();
-    return ind;
+    final boolean[] in = new boolean[indexes.length];
+    for(int i = 0; i < indexes.length; i++) in[i] = indexes[i].isSelected();
+    return in;
   }
   
   @Override
   public void action(final String cmd) {
-    indexes[3].setEnabled(indexes[2].isSelected());
-    if(BUTTONOPT.equals(cmd)) GUI.get().execute(Commands.OPTIMIZE);
+    if(BUTTONOPT.equals(cmd)) {
+      //GUI.get().execute(Commands.OPTIMIZE);
+      opt = true;
+      close();
+    }
+    if(!edit) return;
+    final boolean ftx = indexes[2].isSelected();
+    for(int f = 0; f < ft.length; f++) {
+      ft[f].setEnabled(ftx);
+      fl[f].setEnabled(ftx);
+    }
+  }
+
+  @Override
+  public void close() {
+    super.close();
+    final Data data = GUI.context.data();
+    final MetaData meta = data.meta;
+    if(!edit) return;
+    meta.ftfuzzy = ft[0].isSelected();
+    meta.ftstem = ft[1].isSelected();
+    meta.ftcs = ft[2].isSelected();
+    meta.ftdc = ft[3].isSelected();
   }
 }

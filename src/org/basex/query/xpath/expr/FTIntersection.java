@@ -75,6 +75,8 @@ public final class FTIntersection extends FTArrayExpr {
             if (o != null && o.length == 2 && o[0] == null && o[1] == null) {
               return new NodeSet(ctx);
             }
+            // <SG> throws ArrayIndexOutOfBound: 0 for some queries;
+            // example: input.xml,  //*[text() ftcontains 'X' ftand 'Databases']
             res = (int[][]) o[0];
             pntr = (int[]) o[1];
           } else {

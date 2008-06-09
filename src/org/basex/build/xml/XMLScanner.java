@@ -10,7 +10,7 @@ import org.basex.build.BuildException;
 import org.basex.build.BuildText.Type;
 import org.basex.core.Prop;
 import org.basex.io.IO;
-import org.basex.util.Map;
+import org.basex.util.TokenMap;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -38,9 +38,9 @@ public final class XMLScanner {
   /** Current token type. */
   Type type;
   /** Index for all entity names. */
-  Map ents;
+  TokenMap ents;
   /** Index for all PEReferences. */
-  Map pents;
+  TokenMap pents;
   /** Whitespace flag. */
   boolean ws;
   /** Parameter entity parsing. */
@@ -65,13 +65,13 @@ public final class XMLScanner {
    */
   public XMLScanner(final IO f) throws IOException {
     input = new XMLInput(f);
-    ents = new Map();
+    ents = new TokenMap();
     ents.add(E_AMP, AMP);
     ents.add(E_APOS, APOS);
     ents.add(E_QU, QU);
     ents.add(E_LT, LT);
     ents.add(E_GT, GT);
-    pents = new Map();
+    pents = new TokenMap();
 
     if(consume(DOCDECL)) {
       // process document declaration...

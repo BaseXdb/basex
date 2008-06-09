@@ -1,6 +1,10 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
+
+import java.lang.reflect.Field;
+
+import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.util.Token;
@@ -20,8 +24,6 @@ public final class Set extends Proc {
   public static final String ENTITY = "entity";
   /** Set option. */
   public static final String FTINDEX = "ftindex";
-  /** Set option. */
-  public static final String FUZZYINDEX = "fuzzyindex";
   /** Set option. */
   public static final String TXTINDEX = "textindex";
   /** Set option. */
@@ -55,14 +57,12 @@ public final class Set extends Proc {
       Prop.entity = toggle(Prop.entity, INFOENTITIES, ext);
     } else if(option.equals(FTINDEX)) {
       Prop.ftindex = toggle(Prop.ftindex, INFOFTINDEX, ext);
-    } else if(option.equals(FUZZYINDEX)) {
-      Prop.fzindex = toggle(Prop.fzindex, INFOFTFZINDEX, ext);
     } else if(option.equals(TXTINDEX)) {
       Prop.textindex = toggle(Prop.textindex, INFOTXTINDEX, ext);
     } else if(option.equals(ATTRINDEX)) {
       Prop.attrindex = toggle(Prop.attrindex, INFOATVINDEX, ext);
     } else if(option.equals(MAINMEM)) {
-      Prop.mainmem = toggle(Prop.mainmem, INFOMAINMEM, ext);
+      Prop.mainmem = toggle(Prop.mainmem, INFOMM, ext);
     } else if(option.equals(RUNS)) {
       Prop.runs = Math.max(1, Token.toInt(ext));
       info(INFORUNS + Prop.runs);
@@ -70,7 +70,7 @@ public final class Set extends Proc {
       Prop.serialize = toggle(Prop.serialize, INFOSERIALIZE, ext);
     } else if(option.equals(INFO)) {
       Prop.allInfo = ext.equalsIgnoreCase(ALL);
-      if(Prop.allInfo) info(INFOINFO + INFOON + INFOALL);
+      if(Prop.allInfo) info(INFOINFO + ": " + INFOON + " (" + INFOALL + ")");
       Prop.info = Prop.allInfo ? true : toggle(Prop.info, INFOINFO, ext);
     } else if(option.equals(XMLOUTPUT)) {
       Prop.xmloutput = toggle(Prop.xmloutput, INFOXMLOUTPUT, ext);
@@ -79,26 +79,24 @@ public final class Set extends Proc {
       Prop.dbpath = ext;
       info(INFONEWPATH + ext);
       // the following options are kinda hidden
-    } else if(option.equals("fscont")) {
-      Prop.fscont = toggle(Prop.fscont, option + " ", ext);
-    } else if(option.equals("fsmeta")) {
-      Prop.fsmeta = toggle(Prop.fsmeta, option + " ", ext);
-    } else if(option.equals("fstextmax")) {
-      Prop.fstextmax = Math.max(1, Token.toInt(ext));
-      info(option + ": " + Prop.fstextmax);
-    } else if(option.equals("xqerrcode")) {
-      Prop.xqerrcode = toggle(Prop.xqerrcode, option + " ", ext);
-    } else if(option.equals("onthefly")) {
-      Prop.onthefly = toggle(Prop.onthefly, option + " ", ext);
-    } else if(option.equals("intparse")) {
-      Prop.intparse = toggle(Prop.intparse, option + " ", ext);
-    } else if(option.equals("lserr")) {
-      Prop.lserr = Math.max(1, Token.toInt(ext));
-    } else if(option.equals("language")) {
-      Prop.language = ext;
-      info(option + ": " + ext);
     } else {
-      throw new IllegalArgumentException();
+      try {
+        final Field f = Prop.class.getField(option);
+        final Object o = f.get(null);
+        if(o instanceof Boolean) {
+          f.setBoolean(null, toggle(((Boolean) o).booleanValue(), option, ext));
+        } else if(o instanceof String) {
+          f.set(null, ((String) o).toString());
+          info(option + ": " + ext);
+        } else if(o instanceof Integer) {
+          f.setInt(null, ((Integer) o).intValue());
+          info(option + ": " + ext);
+        } else {
+          throw new Exception();
+        }
+      } catch(final Exception ex) {
+        throw new IllegalArgumentException();
+      }
     }
     return true;
   }
@@ -113,17 +111,7 @@ public final class Set extends Proc {
   private boolean toggle(final boolean f, final String m, final String e) {
     final boolean val = e.length() == 0 ? !f :
       e.equalsIgnoreCase(ON) || !e.equalsIgnoreCase(OFF);
-    info(flag(m, val));
+    info("%: %", m, BaseX.flag(val));
     return val;
-  }
-
-  /**
-   * Returns an info message for the specified flag.
-   * @param feature name of feature
-   * @param flag current flag status
-   * @return ON/OFF message
-   */
-  protected static String flag(final String feature, final boolean flag) {
-    return feature + (flag ? INFOON : INFOOFF);
   }
 }

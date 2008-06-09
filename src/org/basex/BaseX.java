@@ -1,5 +1,7 @@
 package org.basex;
 
+import static org.basex.Text.*;
+
 import org.basex.core.AbstractProcess;
 import org.basex.core.Command;
 import org.basex.core.Context;
@@ -128,6 +130,26 @@ public final class BaseX extends BaseXClient {
    */
   public static void out(final Object str, final Object... ext) {
     System.out.print(info(str, ext));
+  }
+  
+  /**
+   * Returns the length of the longest string.
+   * @param str strings
+   * @return maximum length
+   */
+  public static int max(final String[] str) {
+    int max = 0;
+    for(final String s : str) if(max < s.length()) max = s.length();
+    return max;
+  }
+
+  /**
+   * Returns an info message for the specified flag.
+   * @param flag current flag status
+   * @return ON/OFF message
+   */
+  public static String flag(final boolean flag) {
+    return flag ? INFOON : INFOOFF;
   }
 
   /**

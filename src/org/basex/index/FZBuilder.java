@@ -3,12 +3,12 @@ package org.basex.index;
 import static org.basex.Text.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
-
 import org.basex.BaseX;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
+import org.basex.util.FTTokenizer;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 
@@ -73,7 +73,7 @@ public final class FZBuilder extends Progress implements IndexBuilder {
       Performance.gc(5);
       BaseX.outln("Written: %, %", Performance.getMem(), p);
     }
-    return new Fuzzy(data.meta.dbname);
+    return new Fuzzy(data, data.meta.dbname);
   }
  
   /**
@@ -89,8 +89,8 @@ public final class FZBuilder extends Progress implements IndexBuilder {
    * Indexes a single token.
    */
   private void index() {
-    final byte[] tok = wp.finish();
-    final int pos = wp.off();
+    final byte[] tok = wp.next();
+    final int pos = wp.s;
     final int tl = tok.length;
     if(tree[tl] == null) {
       isize++;

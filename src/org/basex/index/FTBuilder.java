@@ -7,6 +7,7 @@ import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
+import org.basex.util.FTTokenizer;
 import org.basex.util.Num;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -154,7 +155,7 @@ public final class FTBuilder extends Progress implements IndexBuilder {
     //outD.close();
     outN.close();
     outS.close();
-    return new WordsCTANew(db);
+    return new WordsCTANew(data, db);
   }
   
   
@@ -208,14 +209,10 @@ public final class FTBuilder extends Progress implements IndexBuilder {
    * Indexes a single token and returns its unique id.
    */
   private void index() {
-    final byte[] tok = wp.finish();
-    final int pos = wp.off();
-    if (index.bl) index(tok, id, pos);
+    final byte[] tok = wp.next();
+    final int pos = wp.pos;
+    if(index.bl) index(tok, id, pos);
     else index.index(tok, id, pos);
-
-    /**cont = Num.add(cont, tok);
-    BaseX.debug("cont:" + Token.toString(cont));
-    **/
   }
 
   /**

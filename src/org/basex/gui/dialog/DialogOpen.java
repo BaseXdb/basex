@@ -5,8 +5,6 @@ import java.awt.BorderLayout;
 import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.border.CompoundBorder;
@@ -15,10 +13,10 @@ import javax.swing.border.EtchedBorder;
 import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.core.proc.Drop;
+import org.basex.core.proc.Info;
 import org.basex.core.proc.List;
 import org.basex.data.MetaData;
 import org.basex.gui.GUI;
-import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXCheckBox;
@@ -27,7 +25,6 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXListChooser;
 import org.basex.gui.layout.BaseXText;
 import org.basex.io.IO;
-import org.basex.util.Performance;
 import org.basex.util.Token;
 
 /**
@@ -46,7 +43,7 @@ public final class DialogOpen extends Dialog {
   /** Buttons. */
   private BaseXBack buttons;
   /** Main Memory flag. */
-  private BaseXCheckBox mainmem;
+  private BaseXCheckBox mm;
 
   /**
    * Default Constructor.
@@ -75,10 +72,8 @@ public final class DialogOpen extends Dialog {
     info.add(doc, BorderLayout.NORTH);
 
     detail = new BaseXText(HELPOPENINFO, false, this);
-    detail.setFont(GUIConstants.mfont.deriveFont(12f));
     detail.setBorder(new EmptyBorder(5, 5, 5, 5));
-    detail.setOpaque(false);
-    detail.setEnabled(false);
+    detail.setFocusable(false);
 
     BaseXLayout.setWidth(detail, 480);
     info.add(detail, BorderLayout.CENTER);
@@ -92,8 +87,8 @@ public final class DialogOpen extends Dialog {
     final BaseXBack p = new BaseXBack();
     p.setLayout(new BorderLayout());
     if(!drop) {
-      mainmem = new BaseXCheckBox(CREATEMAINMEM, HELPMMEM, Prop.mainmem, this);
-      p.add(mainmem, BorderLayout.WEST);
+      mm = new BaseXCheckBox(CREATEMAINMEM, HELPMMEM, Prop.mainmem, this);
+      p.add(mm, BorderLayout.WEST);
     }
 
     if(drop) {
@@ -118,7 +113,7 @@ public final class DialogOpen extends Dialog {
    * @return database name
    */
   public String db() {
-    Prop.mainmem = mainmem.isEnabled() && mainmem.isSelected();
+    Prop.mainmem = mm.isEnabled() && mm.isSelected();
     final String db = choice.getValue();
     return ok && db.length() > 0 ? db : null;
   }
@@ -156,7 +151,7 @@ public final class DialogOpen extends Dialog {
   @Override
   public void close() {
     if(!ok) return;
-    if(mainmem == null) action(BUTTONDROP);
+    if(mm == null) action(BUTTONDROP);
     else dispose();
   }
 
@@ -171,49 +166,18 @@ public final class DialogOpen extends Dialog {
     // read the database version
     final File dir = IO.dbpath(db);
     if(!dir.exists()) return false;
+    doc.setText(db);
 
-    // read the database version and stop reading when version differs
-    long len = 0;
-    for(final File f : dir.listFiles()) len += f.length();
-
-    final StringBuilder txt = new StringBuilder();
     try {
       ok = true;
       final MetaData meta = new MetaData(db);
       final int size = meta.read();
-
-      if(mainmem != null)
-        BaseXLayout.enable(mainmem, meta.filesize < (1 << 30));
-
-      txt.append(INFODOC + meta.file + NL);
-      txt.append(INFOTIME + new SimpleDateFormat(
-          "dd.MM.yyyy hh:mm:ss").format(new Date(meta.time)) + NL);
-      txt.append(INFODOCSIZE + (meta.filesize != 0 ?
-          Performance.formatSize(meta.filesize) : "-") + NL);
-      txt.append(INFODBSIZE + Performance.formatSize(len) + NL);
-      txt.append(INFOENCODING + meta.encoding + NL);
-      txt.append(INFONODES + size + NL);
-      txt.append(INFOHEIGHT + meta.height + NL + NL);
-
-      txt.append(INFOINDEXES + NL);
-      if(meta.newindex) {
-        txt.append(" " + INDUPDATE + NL);
-      } else {
-        txt.append(" " + INFOTXTINDEX + meta.txtindex + NL);
-        txt.append(" " + INFOATVINDEX + meta.atvindex + NL);
-        txt.append(" " + INFOFTINDEX + meta.ftxindex + NL);
-      }
-
-      txt.append(NL + INFOCREATE + NL);
-      txt.append(" " + INFOCHOP + meta.chop + NL);
-      txt.append(" " + INFOENTITIES + meta.entity + NL);
-
-    } catch(final IOException e) {
-      txt.append(e.getMessage());
+      detail.setText(Info.db(meta, size, false, true));
+      if(mm != null) BaseXLayout.enable(mm, meta.filesize < (1 << 30));
+    } catch(final IOException ex) {
+      detail.setText(Token.token(ex.getMessage()));
       ok = false;
     }
-    doc.setText(db);
-    detail.setText(Token.token(txt.toString()));
     BaseXLayout.enableOK(buttons, ok);
     return true;
   }

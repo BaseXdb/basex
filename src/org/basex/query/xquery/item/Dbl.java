@@ -107,6 +107,11 @@ public final class Dbl extends Num {
     return val < n ? -1 : val > n ? 1 : 0;
   }
 
+  @Override
+  public int hash() {
+    return (int) val;
+  }
+
   /**
    * Converts the given token into a double value.
    * @param val value to be converted

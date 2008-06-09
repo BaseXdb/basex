@@ -1,9 +1,4 @@
-package org.basex.query.xquery.expr;
-
-import org.basex.BaseX;
-import org.basex.io.IO;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
+package org.basex.util;
 
 /**
  * Simple stemming algorithm, derived from
@@ -12,7 +7,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class FTStemming {
+public class Stemming {
   /** Step 2. */
   private static final String[][] ST2 = { { "ational", "ate" },
     { "tional", "tion" }, { "enci", "ence" }, { "anci", "ance" },
@@ -40,31 +35,6 @@ public class FTStemming {
   private int te;
   /** String stemming length. */
   private int tt;
-
-  /**
-   * Stems the specified text.
-   * @param str word to be stemmed
-   * @return result
-   */
-  public byte[] stem(final byte[] str) {
-    final TokenBuilder tb = new TokenBuilder();
-    tok = str;
-    final int l = str.length;
-    for(ts = 0; ts < l; ts++) {
-      if(str[ts] < 0 || str[ts] > ' ') {
-        te = ts;
-        while(++te < l && (str[te] < 0 || str[te] > ' '));
-        final int e = te;
-        word();
-        for(; ts < te; ts++) tb.add(tok[ts]);
-        ts = e - 1;
-      } else {
-        tb.add(str[ts]);
-      }
-    }
-    return tb.finish();
-  }
-
 
   /**
    * Stems the specified word.
@@ -246,34 +216,5 @@ public class FTStemming {
   private void a(final String s) {
     te = tt;
     for(int i = 0; i < s.length(); i++) tok[te++] = (byte) s.charAt(i);
-  }
-
-  /**
-   * Test method.
-   * @param args command-line arguments
-   * @throws Exception exception
-   */
-  public static void main(final String[] args) throws Exception {
-    if(args.length == 0) return;
-     final byte[] cont = new IO(args[0]).content();
-     int p = -1;
-
-     final FTStemming stem = new FTStemming();
-     final TokenBuilder tb = new TokenBuilder();
-     while(++p < cont.length) {
-       byte ch = cont[p];
-       if(Character.isLetter(ch)) {
-         tb.reset();
-         while(true) {
-           if(tb.size < 500) tb.add(ch);
-           ch = cont[++p];
-           if(!Character.isLetter(ch)) {
-             BaseX.out(Token.lc(stem.word(tb.finish())));
-             break;
-           }
-         }
-       }
-       BaseX.out((char) ch);
-     }
   }
 }

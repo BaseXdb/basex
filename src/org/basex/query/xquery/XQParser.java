@@ -3,7 +3,9 @@ package org.basex.query.xquery;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
+
 import org.basex.BaseX;
 import org.basex.io.IO;
 import org.basex.query.xquery.expr.And;
@@ -74,6 +76,7 @@ import org.basex.query.xquery.util.Err;
 import org.basex.query.xquery.util.Namespaces;
 import org.basex.query.xquery.util.Var;
 import org.basex.util.Array;
+import org.basex.util.Set;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
@@ -941,7 +944,7 @@ public final class XQParser {
   private Expr ftContainsExpr() throws XQException {
     final Expr expr = rangeExpr();
     if(!consumeWS(FTCONTAINS)) return expr;
-    
+
     // [CG] XQuery/FTIgnoreOption
     final Expr select = ftSelection();
     //Expr ignore = null;
@@ -1169,7 +1172,7 @@ public final class XQParser {
   private Expr pathExpr() throws XQException {
     final int s = consume('/') ? consume('/') ? 2 : 1 : 0;
 
-    Expr ex = stepExpr();
+    final Expr ex = stepExpr();
     if(ex == null) {
       if(s > 1) Err.or(PATHMISS);
       return s == 0 ? null : new Root();
@@ -2140,35 +2143,35 @@ public final class XQParser {
     // [CG] XQuery/FTMatchOptions: language, stemming, thesaurus, stopword, ...
 
     if(consumeWS(LOWERCASE)) {
-      if(opt.lc != null || opt.uc != null || opt.sens != null) Err.or(FTCASE);
+      if(opt.lc != null || opt.uc != null || opt.cs != null) Err.or(FTCASE);
       opt.lc = Bln.TRUE;
-      opt.sens = Bln.TRUE;
+      opt.cs = Bln.TRUE;
     } else if(consumeWS(UPPERCASE)) {
-      if(opt.lc != null || opt.uc != null || opt.sens != null) Err.or(FTCASE);
+      if(opt.lc != null || opt.uc != null || opt.cs != null) Err.or(FTCASE);
       opt.uc = Bln.TRUE;
-      opt.sens = Bln.TRUE;
+      opt.cs = Bln.TRUE;
     } else if(consumeWS(CASE)) {
-      if(opt.lc != null || opt.uc != null || opt.sens != null) Err.or(FTCASE);
-      opt.sens = Bln.get(consumeWS(SENSITIVE));
-      if(!opt.sens.bool()) check(INSENSITIVE);
+      if(opt.lc != null || opt.uc != null || opt.cs != null) Err.or(FTCASE);
+      opt.cs = Bln.get(consumeWS(SENSITIVE));
+      if(!opt.cs.bool()) check(INSENSITIVE);
     } else if(consumeWS(DIACRITICS)) {
-      if(opt.diacr != null) Err.or(FTDIA);
-      opt.diacr = Bln.get(consumeWS(SENSITIVE));
-      if(!opt.diacr.bool()) check(INSENSITIVE);
+      if(opt.dc != null) Err.or(FTDIA);
+      opt.dc = Bln.get(consumeWS(SENSITIVE));
+      if(!opt.dc.bool()) check(INSENSITIVE);
     } else if(consumeWS(LANGUAGE)) {
-      opt.lng = lc(stringLiteral());
-      if(!eq(opt.lng, EN)) Err.or(FTLAN, opt.lng);
+      opt.ln = lc(stringLiteral());
+      if(!eq(opt.ln, EN)) Err.or(FTLAN, opt.ln);
     } else {
       final int p = qp;
       final boolean with = consumeWS(WITH);
       if(!with && !consumeWS(WITHOUT)) return false;
 
       if(consume(STEMMING)) {
-        opt.stem = Bln.get(with);
+        opt.st = Bln.get(with);
       } else if(consume(THESAURUS)) {
-        opt.thes = Bln.get(with);
+        opt.ts = Bln.get(with);
         if(with) {
-          boolean par = consume(PAR1);
+          final boolean par = consume(PAR1);
           if(consume(AT)) {
             ftThesaurusID();
           } else {
@@ -2181,19 +2184,15 @@ public final class XQParser {
       } else if(consumeWS(STOP)) {
         // add union/except
         check(WORDS);
-        opt.sw = new TokenList();
+        opt.sw = new Set();
         boolean union = false;
         boolean except = false;
         while(with) {
           if(consume(PAR1)) {
             do {
               final byte[] sl = stringLiteral();
-              if(except) {
-                final int i = opt.sw.indexOf(sl);
-                if(i != -1) opt.sw.remove(i);
-              } else if(!union || !opt.sw.contains(sl)) {
-                opt.sw.add(sl);
-              }
+              if(except) opt.sw.delete(sl);
+              else if(!union || opt.sw.id(sl) == 0) opt.sw.add(sl);
             } while(consume(COMMA));
             check(PAR2);
           } else if(consume(AT)) {
@@ -2202,19 +2201,16 @@ public final class XQParser {
               fl = file.merge(fl);
               if(!fl.exists()) Err.or(NOSTOPFILE, fl);
             }
-            
             try {
-              final byte[][] sl = split(norm(fl.content()), ' ');
-              if(union) {
-                opt.sw.union(sl);
-              } else if(except) {
-                opt.sw.except(sl);
-              } else {
-                opt.sw.add(sl);
+              for(final byte[] sl : split(norm(fl.content()), ' ')) {
+                if(except) opt.sw.delete(sl);
+                else if(!union || opt.sw.id(sl) == 0) opt.sw.add(sl);
               }
             } catch(final IOException ex) {
               Err.or(NOSTOPFILE, fl);
             }
+          } else if(!union && !except) {
+            Err.or(FTSTOP);
           }
           union = consume(UNION);
           except = !union && consume(EXCEPT);
@@ -2232,7 +2228,7 @@ public final class XQParser {
     }
     return true;
   }
-  
+
   /**
    * [FT171] Parses an FTThesaurusID.
    * @throws XQException xquery exception

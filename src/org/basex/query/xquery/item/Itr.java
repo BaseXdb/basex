@@ -104,6 +104,11 @@ public class Itr extends Num {
     return n != n ? Integer.MIN_VALUE : val < n ? -1 : val > n ? 1 : 0;
   }
 
+  @Override
+  public int hash() {
+    return (int) val;
+  }
+
   /**
    * Converts the given item into a long value.
    * @param val value to be converted

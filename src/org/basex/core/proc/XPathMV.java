@@ -232,7 +232,8 @@ public final class XPathMV extends XPath {
       if(i < 0) {
         i = -i;
       } else {
-        values[i] = new IntList(pre);
+        values[i] = new IntList();
+        values[i].add(pre);
       }
       return i;
     }

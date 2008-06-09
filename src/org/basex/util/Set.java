@@ -2,7 +2,7 @@ package org.basex.util;
 
 /**
  * This is a simple hash set, storing keys in byte arrays.
- * The {@link Map} class extends it to a hash map.
+ * The {@link TokenMap} class extends it to a hash map.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
@@ -34,7 +34,7 @@ public class Set {
    * @param key key
    * @return offset of added key, negative offset otherwise
    */
-  public final int add(final byte[] key) {
+  public int add(final byte[] key) {
     if(size == next.length) rehash();
 
     final int p = Token.hash(key) & bucket.length - 1;
@@ -46,6 +46,26 @@ public class Set {
     keys[size] = key;
     bucket[p] = size;
     return size++;
+  }
+
+  /**
+   * Deletes the specified key.
+   * @param key key
+   * @return deleted key or 0
+   */
+  public final int delete(final byte[] key) {
+    final int p = Token.hash(key) & bucket.length - 1;
+    for(int id = bucket[p]; id != 0; id = next[id]) {
+      System.out.println("ID: " + id);
+      if(Token.eq(key, keys[id])) {
+        System.out.println("DELETE");
+        if(bucket[p] == id) bucket[p] = next[id];
+        else next[id] = next[next[id]];
+        keys[id] = null;
+        return id;
+      }
+    }
+    return 0;
   }
 
   /**

@@ -78,13 +78,11 @@ public final class FTOption {
     /** entire content */ ENTIRECONTENT;
   }
   
-
-
-  /** Position Filter (defautl: without filters). */
+  /** Position Filter (default: without filters). */
   public POSFILTER ftPosFilt; 
-  /** Use for lowerbound in posfilter expression. */
+  /** Use for lower bound in posfilter expression. */
   public Num from;
-  /** use for upperbound in posfilter expression. */
+  /** Use for upper bound in posfilter expression. */
   public Num to;
   /** Unit for Position Filter with distance. */
   public UNIT ftUnit;

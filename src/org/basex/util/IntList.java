@@ -9,8 +9,6 @@ package org.basex.util;
 public final class IntList {
   /** Value array. */
   private int[] list = new int[8];
-  /** Iterator. */
-  private int pos = -1;
   /** Current array size. */
   public int size;
 
@@ -18,15 +16,6 @@ public final class IntList {
    * Default constructor.
    */
   public IntList() { }
-  
-  /**
-   * Default constructor.
-   * @param v initial list value
-   */
-  public IntList(final int v) {
-    list[0] = v;
-    size = 1;
-  }
 
   /**
    * Default constructor.
@@ -80,9 +69,7 @@ public final class IntList {
    * @return true if value is found
    */
   public boolean contains(final int v) {
-    for(int i = 0; i < size; i++) {
-      if(list[i] == v) return true;
-    }
+    for(int i = 0; i < size; i++) if(list[i] == v) return true;
     return false;
   }
 
@@ -99,42 +86,7 @@ public final class IntList {
    */
   public void reset() {
     size = 0;
-    init();
   }
-
-  /**
-   * Initializes the iterator.
-   */
-  public void init() {
-    pos = -1;
-  }
-
-  /**
-   * Checks if the iterator offers more values.
-   * @return true/false
-   */
-  public boolean more() {
-    return ++pos < size;
-  }
-
-  /**
-   * Returns next iterated value.
-   * @return next value
-   */
-  public int next() {
-    return list[pos];
-  }
-  
-  /*
-   * Sorts and removes double values.
-  public void sort() {
-    if(size < 2) return;
-    Arrays.sort(list, 0, size);
-    int v = list[0];
-    int c = 1;
-    for(int i = c; i < size; i++) if(list[i] != v) list[c++] = list[i];
-    size = c;
-  }*/
 
   /**
    * Sorts the array in the order of the specified token array.

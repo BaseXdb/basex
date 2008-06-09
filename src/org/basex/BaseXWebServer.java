@@ -421,8 +421,8 @@ public final class BaseXWebServer {
             }
             if(a == args.length) break;
             final int p = Token.toInt(args[a].substring(i));
-            if(p < 0) {
-              BaseX.errln(SERVERPORT, args[a].substring(i));
+            if(p <= 0) {
+              BaseX.errln(SERVERPORT + args[a].substring(i));
               break;
             }
             Prop.webport = p;

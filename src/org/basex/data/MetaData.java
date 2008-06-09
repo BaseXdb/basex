@@ -41,8 +41,15 @@ public final class MetaData {
   /** Flag for creating a fulltext index. */
   public boolean ftxindex = Prop.ftindex;
   /** Flag for creating a fuzzy fulltext index. */
-  public boolean fzindex = Prop.fzindex;
-  /** Flag for removing the index structures. */
+  public boolean ftfuzzy = Prop.ftfuzzy;
+  /** Flag for fulltext stemming. */
+  public boolean ftstem = Prop.ftstem;
+  /** Flag for fulltext case sensitivity. */
+  public boolean ftcs = Prop.ftcs;
+  /** Flag for fulltext diacritics removal. */
+  public boolean ftdc = Prop.ftdc;
+
+  /** Flag for removed index structures. */
   public boolean newindex = false;
   /** Last (highest) id assigned to a node. */
   public int lastid = -1;
@@ -121,7 +128,10 @@ public final class MetaData {
       else if(k.equals(DBTXTINDEX)) txtindex = toBool(v);
       else if(k.equals(DBATVINDEX)) atvindex = toBool(v);
       else if(k.equals(DBFTXINDEX)) ftxindex = toBool(v);
-      else if(k.equals(DBFZINDEX)) fzindex = toBool(v);
+      else if(k.equals(DBFZINDEX)) ftfuzzy = toBool(v);
+      else if(k.equals(DBFTSTEM)) ftstem = toBool(v);
+      else if(k.equals(DBFTCS)) ftcs = toBool(v);
+      else if(k.equals(DBFTDC)) ftdc = toBool(v);
       else if(k.equals(DBTIME)) time = Token.toLong(v);
       else if(k.equals(DBLASTID)) lastid = Token.toInt(v);
     }
@@ -160,7 +170,10 @@ public final class MetaData {
     writeInfo(inf, DBTXTINDEX, txtindex);
     writeInfo(inf, DBATVINDEX, atvindex);
     writeInfo(inf, DBFTXINDEX, ftxindex);
-    writeInfo(inf, DBFZINDEX, fzindex);
+    writeInfo(inf, DBFZINDEX, ftfuzzy);
+    writeInfo(inf, DBFTSTEM, ftstem);
+    writeInfo(inf, DBFTCS, ftcs);
+    writeInfo(inf, DBFTDC, ftdc);
     writeInfo(inf, DBTIME, Long.toString(time));
     writeInfo(inf, DBLASTID, Integer.toString(lastid));
 

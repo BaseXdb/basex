@@ -13,6 +13,7 @@ import org.basex.io.PrintOutput;
 import org.basex.io.RandomAccess;
 import org.basex.util.Array;
 import org.basex.util.Map;
+import org.basex.util.TokenMap;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -27,21 +28,21 @@ public final class MAB2Parser extends Parser {
   /** Temporary token builder. */
   private final TokenBuilder buffer = new TokenBuilder();
   /** Subject assignments. */
-  private final Map subjects = new Map();
+  private final TokenMap subjects = new TokenMap();
   /** Media type assignments. */
-  private final Map mediatypes = new Map();
+  private final TokenMap mediatypes = new TokenMap();
   /** MedioVis ID assignments. */
-  private final Map mvids = new Map();
+  private final TokenMap mvids = new TokenMap();
   /** Image assignments. */
-  private final Map posters = new Map();
+  private final TokenMap posters = new TokenMap();
   /** Genre assignments. */
-  private final Map genres = new Map();
+  private final TokenMap genres = new TokenMap();
+  /** MAB2 index. */
+  private final Map<MAB2Entry> ids = new Map<MAB2Entry>();
   /** Builder listener. */
   private Builder builder;
   /** MAB2 input. */
   private RandomAccess input;
-  /** MAB2 index. */
-  private MAB2IDs ids;
 
   /** Temporary build data. */
   private final byte[][] sig = new byte[500][];
@@ -121,7 +122,6 @@ public final class MAB2Parser extends Parser {
 
     // create input reference
     input = new RandomAccess(f);
-    ids = new MAB2IDs();
 
     // check beginning of input file
     if(input.read() != '#' || input.read() != '#' || input.read() != '#') {
@@ -144,7 +144,7 @@ public final class MAB2Parser extends Parser {
       final byte[] par = par(input);
 
       final boolean child = par != null;
-      final MAB2Entry entry = ids.index(child ? par : id);
+      final MAB2Entry entry = ids.value(ids.add(child ? par : id));
       if(child) entry.add(pos);
       else entry.pos(pos);
 
@@ -163,7 +163,7 @@ public final class MAB2Parser extends Parser {
     // create all titles
     final int is = ids.size;
     for(i = 1; i < is; i++) {
-      final MAB2Entry entry = ids.get(i);
+      final MAB2Entry entry = ids.value(i);
       final long pos = entry.pos;
       if(pos != 0) {
         addEntry(input, pos, entry.size);
@@ -586,7 +586,7 @@ public final class MAB2Parser extends Parser {
    * @param hash hash to be filled.
    * @param fn file to be read
    */
-  private void index(final Map hash, final String fn) {
+  private void index(final TokenMap hash, final String fn) {
     try {
       final RandomAccess in = new RandomAccess(new File(fn));
       while(true) {

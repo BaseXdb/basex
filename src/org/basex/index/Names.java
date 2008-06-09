@@ -7,7 +7,7 @@ import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.util.Array;
 import org.basex.util.Set;
-import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 
 /**
  * This class indexes and organizes the tags or attribute names,
@@ -163,9 +163,8 @@ public final class Names extends Set {
    * Returns index information.
    * @return statistics string
    */
-  public String info() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append("- Main-Memory Hash\n\n");
+  public byte[] info() {
+    final TokenBuilder sb = new TokenBuilder();
     final int[] ids = sort();
     int len = 0;
     for(int i = 1; i < size; i++) if(len < keys[i].length) len = keys[i].length;
@@ -176,13 +175,14 @@ public final class Names extends Set {
       final int s = ids[i];
       if(counter[s] == 0) continue;
       final byte[] key = keys[s];
-      sb.append(i + ": " + Token.string(key));
-      for(int j = 0; j < len - key.length; j++) sb.append(' ');
-      sb.append(counter[s] + "x" + stat[s]);
-      if(!noleaf[s]) sb.append(", leaf");
-      sb.append("\n");
+      sb.add("- ");
+      sb.add(key);
+      for(int j = 0; j < len - key.length; j++) sb.add(' ');
+      sb.add(counter[s] + "x" + stat[s]);
+      if(!noleaf[s]) sb.add(", leaf");
+      sb.add("\n");
     }
-    return sb.toString();
+    return sb.finish();
   }
 
   /**

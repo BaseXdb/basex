@@ -4,7 +4,6 @@ import java.io.IOException;
 import org.basex.index.Index;
 import org.basex.index.Names;
 import org.basex.index.Namespaces;
-import org.basex.io.PrintOutput;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.query.xpath.expr.FTOption;
@@ -304,8 +303,7 @@ public abstract class Data  {
     switch(type) {
       case TXT: return txtindex.ids(token);
       case ATV: return atvindex.ids(token);
-      case FTX:
-      case FUY: return ftxindex.ids(token);
+      case FTX: return ftxindex.ids(token);
       default:  return null;
     }
   }
@@ -365,11 +363,20 @@ public abstract class Data  {
       final boolean itok0, final double tok1, final boolean itok1);
   
   /**
-   * Returns info on the index structures.
-   * @param out output stream
-   * @throws IOException I/O exception
+   * Returns info on the specified index structure.
+   * @param type index type
+   * @return info
    */
-  public abstract void info(PrintOutput out) throws IOException;
+  public final byte[] info(final Index.TYPE type) {
+    switch(type) {
+      case TAG: return tags.info();
+      case ATN: return atts.info();
+      case TXT: return txtindex.info();
+      case ATV: return atvindex.info();
+      case FTX: return ftxindex.info();
+      default: return Token.EMPTY;
+    }
+  }
 
   /**
    * Returns if the specified tag is no leaf element.

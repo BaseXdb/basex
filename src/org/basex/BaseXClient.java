@@ -303,8 +303,8 @@ public class BaseXClient {
             }
             if(a == args.length) break;
             final int p = Token.toInt(args[a].substring(i));
-            if(p < 0) {
-              error(null, BaseX.info(SERVERPORT, args[a].substring(i)));
+            if(p <= 0) {
+              error(null, SERVERPORT + args[a].substring(i));
               break;
             }
             port = p;

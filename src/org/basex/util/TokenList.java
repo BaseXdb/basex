@@ -13,39 +13,25 @@ public final class TokenList {
   public int size;
   
   /**
+   * Default constructor.
+   */
+  public TokenList() { }
+  
+  /**
+   * Constructor.
+   * @param is initial size of the list
+   */
+  public TokenList(final int is) {
+    list = new byte[is][];
+  }
+  
+  /**
    * Adds next value.
    * @param v value to be added
    */
   public void add(final byte[] v) {
     if(size == list.length) list = Array.extend(list);
     list[size++] = v;
-  }
-  
-  /**
-   * Adds several values.
-   * @param val values to be added
-   */
-  public void add(final byte[][] val) {
-    for(byte[] v : val) add(v);
-  }
-  
-  /**
-   * Adds several values via union.
-   * @param val values to be added
-   */
-  public void union(final byte[][] val) {
-    for(byte[] v : val) if(!contains(v)) add(v);
-  }
-  
-  /**
-   * Removes the specified values.
-   * @param val values to be added
-   */
-  public void except(final byte[][] val) {
-    for(byte[] v : val) {
-      final int i = indexOf(v);
-      if(i != -1) remove(i);
-    }
   }
   
   /**
@@ -56,24 +42,6 @@ public final class TokenList {
   public boolean contains(final byte[] v) {
     for(int i = 0; i < size; i++) if(Token.eq(list[i], v)) return true;
     return false;
-  }
-  
-  /**
-   * Finds the position of the specified token.
-   * @param v token to be checked
-   * @return position
-   */
-  public int indexOf(final byte[] v) {
-    for(int i = 0; i < size; i++) if(Token.eq(list[i], v)) return i;
-    return -1;
-  }
-  
-  /**
-   * Removes the specified token.
-   * @param i token to be removed
-   */
-  public void remove(final int i) {
-    Array.move(list, i + 1, -1, size-- - i);
   }
 
   /**

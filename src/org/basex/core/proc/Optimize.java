@@ -11,6 +11,12 @@ import org.basex.data.Data;
  * @author Christian Gruen
  */
 public final class Optimize extends Proc {
+  /** Current pre value. */
+  int pre;
+  /** Data size. */
+  int size;
+  
+  
   @Override
   protected boolean exec() {
     // rebuild statistics
@@ -27,7 +33,7 @@ public final class Optimize extends Proc {
    * @param data data reference
    * @return true if operation was successful
    */
-  public static boolean stats(final Data data) {
+  public boolean stats(final Data data) {
     data.noIndex();
 
     final int[] parStack = new int[256];
@@ -35,8 +41,8 @@ public final class Optimize extends Proc {
     int h = 0;
     int l = 0;
 
-    // todo.. calculate tree height
-    for(int pre = 0; pre < data.size; pre++) {
+    size = data.size;
+    for(pre = 0; pre < size; pre++) {
       final int kind = data.kind(pre);
       final int par = data.parent(pre, kind);
       while(l > 0 && parStack[l - 1] > par) --l;
@@ -64,5 +70,15 @@ public final class Optimize extends Proc {
       return false;
     }
     return true;
+  }
+
+  @Override
+  public double prog() {
+    return pre / (double) size;
+  }
+
+  @Override
+  public String det() {
+    return INFOSTATS;
   }
 }

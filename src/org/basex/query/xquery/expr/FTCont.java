@@ -1,12 +1,15 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.util.Token.*;
+
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
+import org.basex.query.xquery.util.Scoring;
+import org.basex.util.FTTokenizer;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -16,6 +19,9 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class FTCont extends Arr {
+  /** Fulltext parser. */
+  private final FTTokenizer ft = new FTTokenizer();
+
   /**
    * Constructor.
    * @param ex contains, select and optional ignore expression
@@ -27,30 +33,28 @@ public final class FTCont extends Arr {
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
     final Iter iter = ctx.iter(expr[0]);
-    final TokenBuilder tb = new TokenBuilder();
+    final FTTokenizer tmp = ctx.ftitem;
+
+    double d = 0;
     Item i;
-
-    boolean more = false;
+    ctx.ftitem = ft;
     while((i = iter.next()) != null) {
-      if(more) tb.add(' ');
-      norm(tb, i.str());
-      more = true;
+      ft.init(i.str());
+      final Item it = ctx.iter(expr[1]).next();
+      d = Scoring.and(d, it.dbl());
     }
-    ctx.ftitem = tb.finish();
-    if(ctx.ftitem.length == 0) return Bln.FALSE.iter();
-
-    final Item it = ctx.iter(expr[1]).next();
-    return new Bln(it.bool(), it.dbl()).iter();
+    ctx.ftitem = tmp;
+    return new Bln(d != 0, d).iter();
   }
 
   /**
    * Normalizes the token by removing multiple whitespaces.
    * Sentences and Paragraphs are preserved.
-   * @param tb token builder
    * @param tok token
    * @return token builder
    */
-  static TokenBuilder norm(final TokenBuilder tb, final byte[] tok) {
+  static byte[] norm(final byte[] tok) {
+    final TokenBuilder tb = new TokenBuilder();
     final int l = tok.length;
     boolean ws1 = true;
     for(int i = 0; i < l; i += cl(tok[i])) {
@@ -69,14 +73,14 @@ public final class FTCont extends Arr {
       }
     }
     tb.trim();
-    return tb;
+    return tb.finish();
   }
 
   @Override
   public String toString() {
     return toString(" ftcontains ");
   }
-  
+
   @Override
   public Type returned() {
     return Type.BLN;

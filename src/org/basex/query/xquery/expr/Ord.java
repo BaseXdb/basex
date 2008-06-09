@@ -66,7 +66,7 @@ public final class Ord {
       if(it != null) {
         if(iter.next() != null) Err.or(XPSORT);
         if(it.node()) it = Str.get(it.str());
-        else if(it.n() && it.dbl() != it.dbl()) it = null;
+        else if(it.n() && Double.isNaN(it.dbl())) it = null;
       }
       seq.a(it);
     }

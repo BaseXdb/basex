@@ -132,9 +132,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     final int hh = Math.max(320, Math.min(700, h));
     final Insets i = getInsets();
     BaseXLayout.fill(g, FILL.DOWN, i.left, i.top, w - i.right, h - i.bottom);
-    if(w < 140 || h < 130) return;
-
-    BaseXLayout.antiAlias(g);
+    if(w < 150 || h < 125) return;
 
     final int lw = logo.getWidth(this);
     final int lh = logo.getHeight(this);
@@ -145,10 +143,11 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     y = (hh - y) / 2;
 
     g.drawImage(logo, (w - lw) / 2, y, this);
-    if(w < 250 || h < 260) return;
+    if(w < 270 || h < 250) return;
 
     y -= STEPS[count] * hh / 200;
 
+    BaseXLayout.antiAlias(g);
     g.setColor(Color.black);
     g.setFont(new Font(GUIProp.font, 0, 22));
     y += 30 + lh + STEPS[count] * (hh - y) / 80;

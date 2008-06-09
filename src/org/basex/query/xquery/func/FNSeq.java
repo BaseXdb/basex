@@ -11,7 +11,7 @@ import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.iter.RangeIter;
-import org.basex.query.xquery.iter.SeqIter;
+import org.basex.query.xquery.util.ItemSet;
 import org.basex.query.xquery.util.SeqBuilder;
 import org.basex.util.Token;
 
@@ -37,7 +37,7 @@ final class FNSeq extends Fun {
   }
 
   /**
-   * Looks for the index of an specified input item (pipelined).
+   * Looks for the index of an specified input item.
    * @param arg arguments
    * @return position(s) of item
    * @throws XQException evaluation exception
@@ -62,7 +62,7 @@ final class FNSeq extends Fun {
   }
 
   /**
-   * Looks for the specified item in the sequence (pipelined).
+   * Looks for distinct values in the sequence.
    * @param arg arguments
    * @return distinct iterator
    * @throws XQException evaluation exception
@@ -71,23 +71,13 @@ final class FNSeq extends Fun {
     if(arg.length == 2) checkColl(arg[1]);
     
     return new Iter() {
-      SeqIter sq = new SeqIter();
+      ItemSet map = new ItemSet();
 
       @Override
       public Item next() throws XQException {
         Item i;
-        loop1: while((i = arg[0].next()) != null) {
-
-          final boolean nan = i.n() && i.dbl() != i.dbl();
-          for(int r = 0; r < sq.size; r++) {
-            final Item c = sq.item[r];
-            if(nan && c.dbl() != c.dbl()) continue loop1;
-            if(CmpV.valCheck(i, c) && CmpV.COMP.EQ.e(i, c)) continue loop1;
-          }
-          sq.add(FNGen.atom(i));
-          return i;
-        }
-        sq = null;
+        while((i = arg[0].next()) != null) if(map.index(i)) return i;
+        map = null;
         return null;
       }
     };
@@ -120,7 +110,7 @@ final class FNSeq extends Fun {
   }
 
   /**
-   * Removes an Item at a specified position in a sequence (pipelined).
+   * Removes an Item at a specified position in a sequence.
    * @param arg arguments
    * @return iterator without Item
    * @throws XQException evaluation exception
@@ -142,7 +132,7 @@ final class FNSeq extends Fun {
 
   /**
    * Creates a subsequence out of a sequence, starting with start and
-   * ending with end (pipelined).
+   * ending with end.
    * @param arg arguments
    * @return subsequence
    * @throws XQException evaluation exception
@@ -212,8 +202,8 @@ final class FNSeq extends Fun {
     Item it2 = null;
     // non-short-circuit logic (one & sign) to run both iterators..
     while((it1 = iter1.next()) != null & (it2 = iter2.next()) != null) {
-      if(it1.n() && it2.n() && it1.dbl() != it1.dbl() && it2.dbl() != it2.dbl())
-        continue;
+      if(it1.n() && it2.n() && Double.isNaN(it1.dbl()) &&
+          Double.isNaN(it2.dbl())) continue;
 
       if(!CmpV.valCheck(it1, it2) || CmpV.COMP.NE.e(it1, it2)) return false;
       if(!it1.node() && !it2.node()) continue;

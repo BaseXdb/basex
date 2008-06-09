@@ -936,33 +936,15 @@ public final class Token {
   public static byte[] delete(final byte[] t, final byte[] c) {
     final int cl = c.length;
     byte[] res = t;
-    int i = indexOf(res, c);
-    while(i != -1) {
+    int i;
+    while((i = indexOf(res, c)) != -1) {
       final int rl = res.length;
       final byte[] tmp = new byte[rl - cl];
       System.arraycopy(res, 0, tmp, 0, i);
       System.arraycopy(res, i + cl, tmp, i, rl - cl - i);
       res = tmp;
-      i = indexOf(res, c);
     }
     return res;
-  }
-
-  /**
-   * Inserts the specified characters at the specified position.
-   * @param t token to be modified
-   * @param i insert position
-   * @param c characters to be inserted
-   * @return new instance
-   */
-  public static byte[] insert(final byte[] t, final int i, final byte[] c) {
-    final int tl = t.length;
-    final int cl = c.length;
-    final byte[] tmp = new byte[tl + cl];
-    System.arraycopy(t, 0, tmp, 0, i);
-    System.arraycopy(c, 0, tmp, i, cl);
-    System.arraycopy(t, i, tmp, i + cl, tl - i);
-    return tmp;
   }
 
   /**
@@ -1093,9 +1075,7 @@ public final class Token {
   public static byte[] uc(final byte[] t) {
     if(ascii(t)) {
       final byte[] tok = new byte[t.length];
-      for(int i = 0; i < t.length; i++) {
-        tok[i] = t[i] < 'a' || t[i] > 'z' ? t[i] : (byte) (t[i] - 32);
-      }
+      for(int i = 0; i < t.length; i++) tok[i] = (byte) uc(t[i]);
       return tok;
     }
     return token(string(t).toUpperCase());
@@ -1120,9 +1100,7 @@ public final class Token {
   public static byte[] lc(final byte[] t) {
     if(ascii(t)) {
       final byte[] tok = new byte[t.length];
-      for(int i = 0; i < t.length; i++) {
-        tok[i] = t[i] < 'A' || t[i] > 'Z' ? t[i] : (byte) (t[i] | 0x20);
-      }
+      for(int i = 0; i < t.length; i++) tok[i] = (byte) lc(t[i]);
       return tok;
     }
     return token(string(t).toLowerCase());
