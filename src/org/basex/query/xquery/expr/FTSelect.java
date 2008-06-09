@@ -1,7 +1,6 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQText.*;
-
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Dbl;
@@ -248,7 +247,7 @@ public final class FTSelect extends Single implements Cloneable {
    * @param iter full-text iterator
    * @return word position
    */
-  private static int words(final FTTokenizer iter) {
+  private int words(final FTTokenizer iter) {
     iter.init();
     while(iter.more());
     return iter.pos;

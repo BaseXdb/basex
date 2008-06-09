@@ -156,6 +156,7 @@ public final class FTWords extends Single {
       boolean f = true;
       boolean c = false;
       sb.init();
+      final int tpos = tk.pos;
       while(f && sb.more()) {
         final byte[] s = sb.next();
         if(c) {
@@ -176,7 +177,7 @@ public final class FTWords extends Single {
 
       if(f) {
         if(il == null) il = new IntList();
-        il.add(tk.pos);
+        il.add(tpos);
       }
       tk.p = tp;
     }

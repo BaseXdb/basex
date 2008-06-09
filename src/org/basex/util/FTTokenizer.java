@@ -33,7 +33,7 @@ public final class FTTokenizer {
   /** Current paragraph. */
   public int para;
   /** Current token. */
-  public int pos;
+  public int pos = -1;
   /** Current character position. */
   public int p;
   /** Character start position. */
@@ -67,7 +67,7 @@ public final class FTTokenizer {
   public void init() {
     sent = 0;
     para = 0;
-    pos = 0;
+    pos = -1;
     p = 0;
   }
   
@@ -77,6 +77,7 @@ public final class FTTokenizer {
    */
   public boolean more() {
     final int l = text.length;
+    pos++;
 
     // parse whitespaces
     boolean sn = false;
