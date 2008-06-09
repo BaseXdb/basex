@@ -8,6 +8,7 @@ import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
+import org.basex.util.Num;
 import org.basex.util.FTTokenizer;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -55,6 +56,8 @@ public final class FZBuilder extends Progress implements IndexBuilder {
    * @throws IOException IO Exception
    */
   public Fuzzy build(final Data data) throws IOException {
+    data.meta.fcompress = Prop.fcompress;
+    
     final Performance p = new Performance();
 
     total = data.size;
@@ -96,6 +99,7 @@ public final class FZBuilder extends Progress implements IndexBuilder {
       isize++;
       tree[tl] = new FZHash();
     }
+    //System.out.println(new String(tok) + "," + id + "," + pos);
     tree[tl].index(tok, id, pos);
   }
 
@@ -140,20 +144,25 @@ public final class FZBuilder extends Progress implements IndexBuilder {
         final int ds = tre.ns[p];
         outy.writeInt(ds);
 
-        // decompress and write pre and pos values
+        //System.out.println(new String(key) + "," + ds);
+        
         byte[] val = tre.pre[p];
-        for (int z = 4; z < val.length; z++) outz.write(val[z]);
-        /*
-        for(int v = 0, ip = 4; v < ds; ip += Num.len(val, ip), v++) {
+        if (Prop.fcompress) {
+          for (int z = 4; z < val.length; z++) 
+            outz.write(val[z]);
+        } else {
+          for(int v = 0, ip = 4; v < ds; ip += Num.len(val, ip), v++)
+            outz.writeInt(Num.read(val, ip));  
+        }
+        
+        val = tre.pos[p];
+        if (Prop.fcompress) {
+          for (int z = 4; z < val.length; z++) outz.write(val[z]);
+        } else {
+          for(int v = 0, ip = 4; v < ds; ip += Num.len(val, ip), v++) 
           outz.writeInt(Num.read(val, ip));
         }
-        */
-        val = tre.pos[p];
-        /*for(int v = 0, ip = 4; v < ds; ip += Num.len(val, ip), v++) {
-          outz.writeInt(Num.read(val, ip));
-        }*/
-        for (int z = 4; z < val.length; z++) outz.write(val[z]);
-
+        
         dr = outz.size(); //+= ds << 3; // compression
         tr = (int) outy.size(); //+= j + 8L;
       }

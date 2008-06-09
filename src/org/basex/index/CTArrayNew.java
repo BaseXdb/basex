@@ -1,5 +1,6 @@
 package org.basex.index;
 
+
 import org.basex.util.IntArrayList;
 import org.basex.util.Token;
 import org.basex.util.TokenList;
@@ -322,7 +323,6 @@ public final class CTArrayNew {
 
   public void insertSorted(final byte[] v, final int s, final long offset) {
     count++;
-
     insertNodeSorted(0, v, s, Token.longToInt(offset));
     return;
   }

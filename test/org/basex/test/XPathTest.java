@@ -51,8 +51,9 @@ public final class XPathTest {
 
     System.out.println("******** RUN TESTS ********\n");
     boolean ok = true;
-    ok &= test(new XPathSimpleTest());
-    ok &= test(new XPathMarkFTTest());
+    //ok &= test(new XPathSimpleTest());
+    //ok &= test(new XPathMarkFTTest());
+    ok &= test(new XPathFTTest());
 
     if(ok) System.out.println("All tests successfully passed.");
     else System.out.println("Check your parser..");

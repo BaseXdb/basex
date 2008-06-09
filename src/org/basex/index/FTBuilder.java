@@ -39,11 +39,12 @@ public final class FTBuilder extends Progress implements IndexBuilder {
    * @throws IOException IO Exception
    */
   public WordsCTANew build(final Data data) throws IOException {
+    data.meta.fcompress = Prop.fcompress;
     int s = 0;
     index = new CTArrayNew(128);
     index.bl |= data.meta.filesize > 1073741824;
     if(index.bl) hash = new FZHash();
-    
+        
     total = data.size;
     for(id = 0; id < total; id++) {
       checkStop();
@@ -57,7 +58,9 @@ public final class FTBuilder extends Progress implements IndexBuilder {
     }
     
     final String db = data.meta.dbname;
-    if(index.bl) bulkLoad(db);
+    if(index.bl) {
+      bulkLoad(db);
+    }
     
     if(Prop.debug) {
       System.out.println("Hash und Trie in Hauptspeicher gehalten:");
@@ -95,15 +98,20 @@ public final class FTBuilder extends Progress implements IndexBuilder {
       // first root node
       // write token size as byte
       outN.write((byte) 1);
+      //System.out.print("1,-1,");
       // write token
       outN.write((byte) -1);
       // write next pointer
       int j = 1;
       for (; j < index.next[0].length - 2; j++) {
+        //System.out.print(index.next[0][j] + "," + 
+        //(char) index.tokens[index.next[index.next[0][j]][0]][0] + ",");
         outN.writeInt(index.next[0][j]); // pointer
         // first char of next node
         outN.write(index.tokens[index.next[index.next[0][j]][0]][0]);
       }
+      //System.out.print("0,-1");
+      //System.out.println();
       
       outN.writeInt(index.next[0][j]); // data size
       outN.write5(-1); // pointer on data - root has no data
@@ -113,41 +121,50 @@ public final class FTBuilder extends Progress implements IndexBuilder {
       int[] tmp;
       // all other nodes
       for (int i = 1; i < index.next.length; i++) {
+        //System.out.println("id:" + i);
         // check pointer on data needs 1 or 2 ints
         lp = (index.next[i][index.next[i].length - 2] > -1) ? 
             0 : -1;
         // write token size as byte
+    //System.out.print((byte) index.tokens[index.next[i][0]].length + ",");
         outN.write((byte) index.tokens[index.next[i][0]].length);
         // write token
         outN.write(index.tokens[index.next[i][0]]);
-    //System.out.println(new String(index.tokens[index.next[i][0]]));
+    //System.out.print(new String(index.tokens[index.next[i][0]]) + ",");
         // write next pointer
         j = 1;
         for (; j < index.next[i].length - 2 + lp; j++) {
+          //System.out.print(index.next[i][j] +",");
           outN.writeInt(index.next[i][j]); // pointer
           // first char of next node
           outN.write(index.tokens[index.next[index.next[i][j]][0]][0]);
+          //System.out.print((char)
+          //index.tokens[index.next[index.next[i][j]][0]][0] + ",");
         }
-        
         outN.writeInt(index.next[i][j]); // data size
-        
+        //System.out.print(index.next[i][j] + ",");
         if (index.next[i][j] == 0 && index.next[i][j + 1] == 0) {
           // node has no data
           outN.write5(index.next[i][j + 1]);
+          //System.out.print(index.next[i][j + 1]);
         } else {
           // write pointer on data
-          if (lp == 0)
+          if (lp == 0) {
+            //System.out.print(index.next[i][j + 1]);
             outN.write5(index.next[i][j + 1]);
-          else {
+          } else {
             tmp = new int[2];
             System.arraycopy(index.next[i], index.next[i].length - 2, 
                 tmp, 0, tmp.length);
             outN.write5(Token.intArrayToLong(tmp));
+            //System.out.print(Token.intArrayToLong(tmp));
           }
         }
+        //System.out.println();
         outS.writeInt(s);
         s += 1L + index.tokens[index.next[i][0]].length * 1L 
-             + (index.next[i].length - 3) * 5L + 9L;
+             //+ (index.next[i].length - 3) * 5L + 9L;
+        + (index.next[i].length - 3 + lp) * 5L + 9L;
       }
     }
     
@@ -170,13 +187,14 @@ public final class FTBuilder extends Progress implements IndexBuilder {
     hash.init();
     long c;
     int ds, p;
-    byte[] val, tok;  
+    byte[] val, tok;
     while(hash.more()) {
       p = hash.next();
       tok = hash.key();
+      //System.out.println("<w>" + new String(tok) + "</w>");
       ds = hash.ns[p];
       c = outD.size();
-      if (Prop.ftcompress) {
+      if (Prop.fcompress) {
         val = Num.finish(hash.pre[p]);
         for (int z = 4; z < val.length; z++) outD.write(val[z]); 
         val = Num.finish(hash.pos[p]);
@@ -193,6 +211,7 @@ public final class FTBuilder extends Progress implements IndexBuilder {
       }
       index.insertSorted(tok, ds, c);
     }
+    //System.out.println("</words>");
     outD.close();
    }
 

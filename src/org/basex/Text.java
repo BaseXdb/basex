@@ -330,7 +330,9 @@ public interface Text {
     "- " + Set.FTINDEX + lang("ch_set31") + NL + NL +
     lang("ch_set32") + NL +
     "- " + Set.DBPATH + lang("ch_set33") + NL +
-    "- " + Set.RUNS + lang("ch_set34");
+    "- " + Set.RUNS + lang("ch_set34") + NL +
+  "- " + Set.FCOMPRESS + lang("ch_set35") + NL + NL +
+  lang("ch_set32");
 
   /** Command Help. */
   String HELP0 = "[command]?";
@@ -1161,7 +1163,10 @@ public interface Text {
   String INFOFTINDEX = lang("info_ftindex");
   /** Info on Fuzzy Indexing. */
   String INFOFZINDEX = lang("info_fzindex");
+  /** Info on Fulltext Fuzzyindexing. */
+  String INFOFTCOMPRESS = lang("info_fcompress");
 
+  
   /** Info on Document Creation. */
   String INFODB = lang("info_db");
   /** Info on Document Creation. */

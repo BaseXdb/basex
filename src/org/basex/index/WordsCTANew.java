@@ -4,11 +4,9 @@ import static org.basex.data.DataText.*;
 import static org.basex.Text.*;
 
 import java.io.IOException;
-
 import org.basex.BaseX;
-import org.basex.core.Prop;
 import org.basex.data.Data;
-import org.basex.io.DataAccess;
+import org.basex.io.DataAccessPerf;
 import org.basex.util.Array;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
@@ -34,15 +32,16 @@ public final class WordsCTANew extends Index {
   /** Values file. */
   private final Data data;
   /** Trie structure on disk. */
-  private final DataAccess inN;
+  private final DataAccessPerf inN;
   // ftdata is stored here, with pre1, ..., preu, pos1, ..., posu
   /** FTData on disk. */
-  private final DataAccess inD;
+  private final DataAccessPerf inD;
   // each node entries size is stored here
   /** FTData sizes on disk. */
-  private final DataAccess inS;
+  private final DataAccessPerf inS;
   /** Id on data, corresponding to the current node entry. */
   private long did;
+  
   /**
    * Constructor, initializing the index structure.
    * @param d data reference
@@ -51,10 +50,10 @@ public final class WordsCTANew extends Index {
    */
   public WordsCTANew(final Data d, final String db) throws IOException {
     final String file = DATAFTX;
+    inN = new DataAccessPerf(db, file + 'a', "NodeData");
+    inD = new DataAccessPerf(db, file + 'b', "FT-Data");
+    inS = new DataAccessPerf(db, file + 'c', "Size");
     data = d;
-    inN = new DataAccess(db, file + 'a');
-    inD = new DataAccess(db, file + 'b');
-    inS = new DataAccess(db, file + 'c');
     did = -1;
   }
 
@@ -74,7 +73,6 @@ public final class WordsCTANew extends Index {
   public int[][] ftIDs(final byte[] tok, final FTOption ftO) {
     // init no wildcard included in token
     int posW = -1;
-
     // backup original token
     byte[] bTok = new byte[tok.length];
     System.arraycopy(tok, 0, bTok, 0, tok.length);
@@ -113,6 +111,7 @@ public final class WordsCTANew extends Index {
       bTok = Token.lc(bTok);
     }
 
+
     byte[] tokenFromDB;
     byte[] textFromDB;
     int[][] rIds = new int[2][ids[0].length];
@@ -123,14 +122,11 @@ public final class WordsCTANew extends Index {
     // check real case of each result node
     while(i < ids[0].length) {
       // get date from disk
-      // <SG> readId is overwritten again some lines later... 
       readId = ids[0][i];
       textFromDB = data.text(ids[0][i]);
       tokenFromDB = new byte[tok.length];
 
       System.arraycopy(textFromDB, ids[1][i], tokenFromDB, 0, tok.length);
-
-      readId = ids[0][i];
 
       // check unique node ones
       while (i < ids[0].length && readId == ids[0][i]) {
@@ -844,7 +840,7 @@ public final class WordsCTANew extends Index {
     if(s == 0 && ldid <= 0) return null;
     int[][] dt = new int[2][s];
    
-    if (Prop.ftcompress) {
+    if (data.meta.fcompress) {
       dt[0][0] = inD.readNum(ldid);
       for(int i = 1; i < s; i++) dt[0][i] = inD.readNum();
       for(int i = 0; i < s; i++) dt[1][i] = inD.readNum();
@@ -1002,8 +998,7 @@ public final class WordsCTANew extends Index {
     }
 
     // compare chars current node and ending
-    // <SG> can't be null?
-    if(ne != null) {
+    //if(ne != null) {
       // skip all unlike chars, if any suitable was found
       while(!last && i < ne[0] + 1 && ne[i] != ending[j]) i++;
   
@@ -1017,11 +1012,12 @@ public final class WordsCTANew extends Index {
         j++;
         last = true;
       }
-    } else {
+/*    } 
+    else {
       countSkippedChars = 0;
       return;
     }
-  
+  */
     // not processed all chars from node, but all chars from
     // ending were processed or root
     if(node == 0 || j == ending.length && i < ne[0] + 1) {
@@ -1088,9 +1084,8 @@ public final class WordsCTANew extends Index {
         countSkippedChars = 0;
         return;
       }
-  
+
       //final int[] nextNodes = getNextNodes(ne);
-  
       // preorder search in trie
       //for(final int n : nextNodes) {
       //for (int t = ne[0] + 1; t < ne.length - 2; t += 2) {
@@ -1251,68 +1246,50 @@ public final class WordsCTANew extends Index {
       astericsWildCardTraversing(resultNode, aw, false, counter[0], 0);
       return FTUnion.calculateFTOr(d, adata);
     } else if(wildcard == '+') {
+      
+      
       // append 1 or more symbols
-      // lookup in trie with . as wildcard
-      final byte[] searchChar = new byte[vsn.length - 1 - currentLength];
-      // copy unprocessed part before wildcard
-      if(bw != null) {
-        System.arraycopy(bw, 0, searchChar, 0, bw.length);
+      final int[] rne = getNodeEntry(resultNode);
+      byte[] nvsn = new byte[vsn.length + 1];
+      int l = 0;
+      if (bw != null) {
+        System.arraycopy(bw, 0, nvsn, 0, bw.length);
+        l = bw.length;
       }
-      // set . as wildcard
-      searchChar[posw] = '.';
-
-      // copy part after wildcard
-      if(bw == null) {
-        // <SG> Out of Bounds exception: [... ftcontains ".+X" with wildcards]
-        if(!(posw == 0 && vsn.length == 2)) {
-          aw = new byte[searchChar.length];
-          System.arraycopy(vsn, posw + 2, searchChar, 1, searchChar.length);
-          System.arraycopy(vsn, posw + 2, aw, 1, searchChar.length);
+      
+      if (0 < vsn.length - posw - 2) {
+        System.arraycopy(vsn, posw + 2, nvsn, posw + 3, vsn.length - posw - 2);
+      }
+      
+      nvsn[l + 1] = '.';
+      nvsn[l + 2] = '*';  
+      int[][] tmpres = null;
+      // append 1 symbol
+      // not completely processed (value current node)
+      if(rne[0] > counter[0] && resultNode > 0) {
+        // replace wildcard with value from currentCompressedTrieNode
+        nvsn[l] = (byte) rne[counter[0] + 1];
+        tmpres = getNodeFromTrieWithWildCard(nvsn, l + 1);
+      } else if(rne[0] == counter[0] || resultNode == 0) {
+        // all chars from nodes[resultNode] are computed
+        // any next values existing
+        if(!hasNextNodes(rne)) {
+          return null;
         }
-      } else {
-        aw = new byte[searchChar.length - bw.length - 1];
-        System.arraycopy(vsn, posw + 2, searchChar, bw.length +  1,
-            searchChar.length - bw.length - 1);
-        System.arraycopy(vsn, posw + 2,
-            aw, 0, searchChar.length - bw.length - 1);
-      }
 
-      // wildcard search with . as wildcard
-      d = getNodeFromTrieWithWildCard(0, searchChar, posw, true);
-
-      // at least one char has to be added
-      if (d == null) return null;
-
-      byte[] newValue;
-      if(aw != null) {
-        newValue = new byte[bw.length + 3 + aw.length];
-        System.arraycopy(aw, 0, newValue, bw.length + 3, aw.length);
-      } else {
-        newValue = new byte[3 + (bw == null ? 0 : bw.length)];
-      }
-      // <SG> bw could be null here.. (?)
-      newValue[bw.length + 1] = '.';
-      newValue[bw.length + 2] = '*';
-
-      System.arraycopy(bw, 0, newValue, 0, bw.length);
-      // take resultNodes from wildcard search with . as wildcard and start
-      // new wildcard search with * as wildcard
-      for(final byte v : valuesFound) {
-        if(v != 0) {
-          newValue[bw.length] = v;
-          //System.out.println(Token.string(newValue));
-          d = FTUnion.calculateFTOr(d, getNodeFromTrieWithWildCard(newValue,
-              bw.length + 1));
+        for (int t = rne[0] + 1; t < rne.length - 1; t += 2) {
+          nvsn[l] = (byte) rne[t + 1];
+          tmpres = FTUnion.calculateFTOr(
+              getNodeFromTrieWithWildCard(nvsn, l + 1), tmpres);
         }
-      }
-
-      return d;
+      } 
+      return tmpres;
     } else {
       final int[] rne = getNodeEntry(resultNode);
       //final long rdid = did;
       // append 1 symbol
       // not completely processed (value current node)
-      if(rne[0] > counter[0]) {
+      if(rne[0] > counter[0] && resultNode > 0) {
         // replace wildcard with value from currentCompressedTrieNode
         //valueSearchNode[posWildcard] = nodes[resultNode][counter[0] + 1];
         vsn[posw] = (byte) rne[counter[0] + 1];
@@ -1325,7 +1302,7 @@ public final class WordsCTANew extends Index {
         }
         return resultData;
 
-      } else if(rne[0] == counter[0]) {
+      } else if(rne[0] == counter[0] || resultNode == 0) {
         // all chars from nodes[resultNode] are computed
         // any next values existing
         if(!hasNextNodes(rne)) {

@@ -5,7 +5,7 @@ import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.data.Data;
-import org.basex.io.DataAccess;
+import org.basex.io.DataAccessPerf;
 import org.basex.util.Levenshtein;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -51,25 +51,26 @@ public final class Fuzzy extends Index {
   private final Data data;
   /** Index storing each unique token length and pointer 
    * on the first token with this length. */
-  private final DataAccess li;
+  private final DataAccessPerf li;
   /** Index storing each token, its data size and pointer
    * on then data. */
-  private final DataAccess ti;
+  private final DataAccessPerf ti;
   /** Storing pre and pos values for each token. */ 
-  private DataAccess dat;
-    
+  private DataAccessPerf dat;  
+
   /**
    * Constructor, initializing the index structure.
    * @param d data reference
    * @param db name of the database
+ 
    * @throws IOException IO Exception
    */
   public Fuzzy(final Data d, final String db) throws IOException {
     final String file = DATAFTX;
+    li = new DataAccessPerf(db, file + "x", "TokenLengthIndex");
+    ti = new DataAccessPerf(db, file + "y" , "Token");
+    dat = new DataAccessPerf(db, file + "z", "FTData");
     data = d;
-    li = new DataAccess(db, file + "x");
-    ti = new DataAccess(db, file + "y");
-    dat = new DataAccess(db, file + "z");
   }
 
   @Override
@@ -106,7 +107,6 @@ public final class Fuzzy extends Index {
     if (i == is || ts > tok.length) return -1;
     int l = li.readInt(1L + i * 5L + 1L);
     int r = li.readInt(1L + (i + 1) * 5L + 1L);
-    // <SG> m is overwritten again in while(l < r) loop & not used afterwards...
     int m = (int) (l + ((int) ((r - l) 
         /// (tok.length * 1L + 8L) / 2)) * (tok.length * 1L + 8L));
         / (tok.length * 1L + 9L) / 2)) * (tok.length * 1L + 9L));
@@ -210,17 +210,22 @@ public final class Fuzzy extends Index {
    */
   private int[][] getData(final long p, final int s) {
     int[][] d = new int[2][s];
-    d[0][0] = dat.readNum(p);
-    for (int i = 1; i < s; i++) {
-      d[0][i] = dat.readNum();
+    if (data.meta.fcompress) {
+      d[0] = dat.readNums(p, s);
+      d[1] = dat.readNums(s);
+      /*d[0][0] = dat.readNum(p);
+      for (int i = 1; i < s; i++) {
+        d[0][i] = dat.readNum();
+      }
+      
+      for (int i = 0; i < s; i++) {
+        d[1][i] = dat.readNum();
+      }*/
+    } else {
+      d[0] = dat.readInts(p, p + s * 4L);
+      d[1] = dat.readInts(p + s * 4L, p + 2 * s * 4L);
     }
     
-    for (int i = 0; i < s; i++) {
-      d[1][i] = dat.readNum();
-    }
-
-    //d[0] = dat.readInts(p, p + s * 4L);
-    //d[1] = dat.readInts(p + s * 4L, p + 2 * s * 4L);
     return d;
     
   }
@@ -443,7 +448,8 @@ public final class Fuzzy extends Index {
           if (contains(tok, posw, dtok)) dt = FTUnion.calculateFTOr(dt, 
                   getData(getPointerOnData(b[0][1], b[0][0]), 
                   getDataSize(b[0][1], b[0][0])));
-          b[0][1] += b[0][0] * 1L + 8L;
+          // b[0][1] += b[0][0] * 1L + 8L;
+          b[0][1] += b[0][0] * 1L + 9L;
         //}
       }
         dtok = ti.readBytes(b[0][1], b[0][0] + b[0][1]);

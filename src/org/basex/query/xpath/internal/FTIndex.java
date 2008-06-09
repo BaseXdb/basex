@@ -163,7 +163,7 @@ public final class FTIndex extends InternalExpr {
     if (i == -1) i = token.length; 
     tok = new byte[i];
     System.arraycopy(token, 0, tok, 0, i);
-    int[][] tmp = data.ftIDs(Token.lc(tok), option);
+    int[][] tmp = data.ftIDs(tok, option);
 
     if(tmp == null) return;
 
@@ -176,6 +176,14 @@ public final class FTIndex extends InternalExpr {
 
     tok = token;
 
+    if(option.ftCase == FTOption.CASE.UPPERCASE) {
+      tok = Token.uc(tok);
+    } else if(option.ftCase == FTOption.CASE.INSENSITIVE ||
+        option.ftCase == FTOption.CASE.LOWERCASE) {
+      tok = Token.lc(tok);
+      
+    }
+    
     for(i = 0; i < tmp[0].length; i++) {
       j = 0;
       k = 0;
@@ -183,22 +191,14 @@ public final class FTIndex extends InternalExpr {
         lastpre = tmp[0][i];
         db = data.text(lastpre);
       }
-
-      // <SG> ..rewritten to support UTF8 characters (hope it's correct)
-      if(option.ftCase == FTOption.CASE.UPPERCASE) {
-        tok = Token.uc(tok);
-      } else if(option.ftCase == FTOption.CASE.INSENSITIVE ||
-          option.ftCase == FTOption.CASE.LOWERCASE) {
-        tok = Token.lc(tok);
-        if(option.ftCase == FTOption.CASE.INSENSITIVE) db = Token.lc(db);
-      }
-
-      // "usability" not in "usability testing"
+      
+          // "usability" not in "usability testing"
       // "mexico" not in "new mexico"
       // "mexico" not in "new mexico city"
       if(db.length >= tmp[1][i] + tok.length) {
-        if(option.ftCase == FTOption.CASE.INSENSITIVE) {
-          while(j < tok.length && tmp[1][i] + k < db.length) { 
+        //if(option.ftCase == FTOption.CASE.INSENSITIVE) {
+        if(option.ftCase == FTOption.CASE.INSENSITIVE) db = Token.lc(db);
+        while(j < tok.length && tmp[1][i] + k < db.length) { 
             if(db[tmp[1][i] + k] == tok[j]) {
               j++;
               k++;
@@ -208,7 +208,7 @@ public final class FTIndex extends InternalExpr {
             } else {
               break;
             }
-          }       
+          //}       
         }
 
         if (j == tok.length) {

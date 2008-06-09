@@ -11,7 +11,7 @@ import org.basex.util.Num;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class DataAccess {
+public class DataAccess {
   /** Default buffer size - must be a power of two. */
   private static final int BUFSIZE = 1 << IO.BLOCKPOWER;
   /** Buffer limit (buffer size - 1). */
@@ -118,6 +118,36 @@ public final class DataAccess {
     return readNum();
   }
 
+
+  /**
+   * Reads a {@link Num} value from disk.
+   * @param p text position
+   * @param s number of num values
+   * @return read num
+   */
+  public synchronized int[] readNums(final long p, final int s) {
+    int[] r = new int[s];
+    cursor(p);
+    for (int i = 0; i < s; i++) {
+      r[i] = readNum();
+    }
+    return r;
+  }
+
+  /**
+   * Reads a {@link Num} value from disk.
+   * @param s number of num values
+   * @return read num
+   */
+  public synchronized int[] readNums(final int s) {
+    int[] r = new int[s];
+    for (int i = 0; i < s; i++) {
+      r[i] = readNum();
+    }
+    return r;
+  }
+
+  
   /**
    * Reads a token from disk.
    * @param p text position

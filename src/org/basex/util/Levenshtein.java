@@ -76,8 +76,6 @@ public final class Levenshtein {
     int e2 = -1, f2 = -1;
     int sl = sub.length;
     for(int t = 0; t < tl; t++) {
-      // <SG> tok[ts + t] should be correct as ts + tl refer to tok.length;
-      // ts + tl is always supposed to be <= tok.length..
       final int e = ftNorm(tok[ts + t]);
       int d = 32;
       for(int q = 0; q < sl; q++) {

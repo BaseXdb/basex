@@ -60,7 +60,7 @@ public final class Prop {
   public static final boolean SKIP = true;
 
   /** Debug mode. */
-  public static boolean debug = false;
+  public static boolean debug = true;
   /** Short query info. */
   public static boolean info = false;
   /** Detailed query info. */
@@ -87,7 +87,11 @@ public final class Prop {
   /** Flag for entity parsing. */
   public static boolean entity = true;
   /** Flag for creating a fulltext index. */
-  public static boolean ftindex = false;
+  public static boolean ftindex = true;
+  /** Flag for creating a fuzzy index. */
+  public static boolean fzindex = false;
+  /** Flag for compressing ft-values on disk. */
+  public static boolean fcompress = false;
   /** Flag for creating a text index. */
   public static boolean textindex = true;
   /** Flag for creating an attribute value index. */

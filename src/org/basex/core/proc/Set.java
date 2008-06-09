@@ -25,6 +25,8 @@ public final class Set extends Proc {
   /** Set option. */
   public static final String FTINDEX = "ftindex";
   /** Set option. */
+  public static final String FCOMPRESS = "fcompress";
+  /** Set option. */
   public static final String TXTINDEX = "textindex";
   /** Set option. */
   public static final String ATTRINDEX = "attrindex";
@@ -61,6 +63,8 @@ public final class Set extends Proc {
       Prop.textindex = toggle(Prop.textindex, INFOTXTINDEX, ext);
     } else if(option.equals(ATTRINDEX)) {
       Prop.attrindex = toggle(Prop.attrindex, INFOATVINDEX, ext);
+    } else if(option.equals(FCOMPRESS)) {
+      Prop.fcompress = toggle(Prop.fcompress, INFOFTCOMPRESS, ext);  
     } else if(option.equals(MAINMEM)) {
       Prop.mainmem = toggle(Prop.mainmem, INFOMM, ext);
     } else if(option.equals(RUNS)) {

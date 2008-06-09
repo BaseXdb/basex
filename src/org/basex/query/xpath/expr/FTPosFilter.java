@@ -57,7 +57,7 @@ public final class FTPosFilter extends FTArrayExpr {
         } else {
           return new NodeSet(ctx);
         }
-        
+
         if (res == null) return new NodeSet(ctx);
         return new NodeSet(Array.extractIDsFromData(res), context, res);
 
@@ -87,7 +87,7 @@ public final class FTPosFilter extends FTArrayExpr {
     for (int i = 0; i < exprs.length; i++) {
       exprs[i] = exprs[i].indexEquivalent(context, curr);
     }
-    
+
     if (exprs[0] instanceof FTIntersection) {
       FTIntersection e = (FTIntersection) exprs[0];
       e.pres = true;
@@ -100,7 +100,7 @@ public final class FTPosFilter extends FTArrayExpr {
       Expr e = not.exprs[0];
       FTIntersection fti1 = new FTIntersection(not.exprs, true, context);
       //FTIntersection fti2 = new FTIntersection(not.exprs, true, context);
-      
+
       FTPositionFilter ftposfil = new  FTPositionFilter();
       ftposfil.ftPosFilt = ftpos.ftPosFilt;
       if (ftposfil.ftPosFilt == FTPositionFilter.POSFILTER.WINDOW) {
@@ -128,7 +128,7 @@ public final class FTPosFilter extends FTArrayExpr {
         && ftpos.ftTimes == FTPositionFilter.CARDSEL.FTTIMES        
     )) { 
       throw new QueryException("FTPosFilter only supported for FTOr and " +
-          "FTAnd or FTContent with a single searchstring.");
+      "FTAnd or FTContent with a single searchstring.");
     } 
     return this;
   }
@@ -180,7 +180,7 @@ public final class FTPosFilter extends FTArrayExpr {
       while (j < res[0].length && res[0][j] == lid && p[j + 1] == pold) {
         j++;
       }
-      
+
       e = j;
       if (j == res[0].length) break;
       lpo = p[j + 1];
@@ -229,7 +229,6 @@ public final class FTPosFilter extends FTArrayExpr {
         if (lpo != p[j + 1] && lpo != p[0]) {
           s = e;
           e = j;
-          // <SG> pold not used in this loop?
           pold = p[s + 1];
           lpo = p[e + 1];
           lid = res[0][s];
@@ -441,9 +440,9 @@ public final class FTPosFilter extends FTArrayExpr {
     int cp = cpo;
     int intValue;
     if (ftpos.ftUnit != null 
-          && ftpos.ftUnit == FTPositionFilter.UNIT.SENTENCES || 
+        && ftpos.ftUnit == FTPositionFilter.UNIT.SENTENCES || 
         ftpos.ftBigUnit != null 
-          && ftpos.ftBigUnit == FTPositionFilter.BIGUNIT.SENTENCE    
+        && ftpos.ftBigUnit == FTPositionFilter.BIGUNIT.SENTENCE    
     ) {
       if (s) {
         intValue = (data[cp] & 0x7F) + (data[cp] < 0 ? 128 : 0);
@@ -475,9 +474,9 @@ public final class FTPosFilter extends FTArrayExpr {
       sep[1] = cp;
       return sep;
     } else if(ftpos.ftUnit != null 
-          && ftpos.ftUnit == FTPositionFilter.UNIT.PARAGRAPHS || 
+        && ftpos.ftUnit == FTPositionFilter.UNIT.PARAGRAPHS || 
         ftpos.ftBigUnit != null 
-          && ftpos.ftBigUnit == FTPositionFilter.BIGUNIT.PARAGRAPH) {
+        && ftpos.ftBigUnit == FTPositionFilter.BIGUNIT.PARAGRAPH) {
       if (s) {
         intValue = data[cp];
         // paragraph branded through further \n
@@ -733,13 +732,13 @@ public final class FTPosFilter extends FTArrayExpr {
           while ((j < res[0].length && res[0][j] == lid 
               && p[j + 1] == p[stack.get(stack.size - 1) + 1]) 
               && ((ftpos.ftScope == FTPositionFilter.SCOPE.SAME 
-                      && startEndPos[0] <= res[1][j] 
-                      && startEndPos[1] >= res[1][j]
-                  ) || (
-                      ftpos.ftScope == FTPositionFilter.SCOPE.DIFFERENT
-                      && startEndPos[0] > res[1][j] 
-                      && startEndPos[1] < res[1][j])
-                  )    
+                  && startEndPos[0] <= res[1][j] 
+                                              && startEndPos[1] >= res[1][j]
+              ) || (
+                  ftpos.ftScope == FTPositionFilter.SCOPE.DIFFERENT
+                  && startEndPos[0] > res[1][j] 
+                                             && startEndPos[1] < res[1][j])
+              )    
           ) {
             maxRes[0][c] = res[0][j];
             maxRes[1][c++] = res[1][j++];
@@ -769,14 +768,14 @@ public final class FTPosFilter extends FTArrayExpr {
     }
 
     if (c == 0) return null;
-    
+
     if (c == 0) return null;
     int[][] ret = new int[2][c];
     System.arraycopy(maxRes[0], 0, ret[0], 0, c);
     System.arraycopy(maxRes[1], 0, ret[1], 0, c);
     return ret; 
   }
-  
+
   /**
    * FTTimes compares the appearance and bounds (from, to). 
    * If the form-to codition is satisfied, the
@@ -792,12 +791,12 @@ public final class FTPosFilter extends FTArrayExpr {
     if (ftpos.to == null && ftpos.ftRange == FTPositionFilter.RANGE.ATLEAST) {
       ftpos.to = new Num(res[0].length);
     }
-    
+
     int[][] maxResult = new int[2][res[0].length];
     int count = 0;
     int times = 1;
     int[] stack = new int[res[0].length];
-    
+
     for(int i = 1; i <= res[0].length; i++) {
       // count same ids
       if (i < res[0].length && res[0][i - 1] == res[0][i]) {
@@ -845,13 +844,13 @@ public final class FTPosFilter extends FTArrayExpr {
         {4,97,15,25,69,87,86,99,4,97,15,25,69,87,86,99}}, 
         new int[]{2,0,0,1,1,1,1,2,2,0,0,1,1,1,1,2,2});
      */
-    
+
     for(int[] e : res) {
       for(int i : e) System.out.print(i + ",");
       System.out.println();
     }
   }
-  
+
   @Override
   public void plan(final Serializer ser) throws Exception {
     if (ftpos.ftPosFilt != null) {
@@ -888,9 +887,9 @@ public final class FTPosFilter extends FTArrayExpr {
           Token.token("occures"), 
           Token.token(fto.ftRange.toString() + " times"));   
     } 
-  
+
     for (Expr e : exprs) e.plan(ser);
     ser.closeElement(this);
   }
-   
+
 }

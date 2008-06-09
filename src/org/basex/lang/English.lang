@@ -399,6 +399,28 @@ info_dbpath=Database Path
 info_nodb=No database found.
 info_dblist= Databases found.
 info_dberror=could not be opened.
+<<<<<<< .mine
+info_newpath=New Database Path: 
+info_patherr=Database Path not found: 
+info_info=Process Info 
+info_all= (verbose)
+info_debug=Debug Mode 
+info_chop=Whitespace Chopping 
+info_entities=Entity Parsing 
+info_serialize=Serialize 
+info_xmloutput=XML Output 
+info_mainmem=Main Memory Mode 
+info_txtindex=Text Indexing 
+info_atvindex=Attribute Indexing 
+info_fcompress=Fulltext Data Compression 
+info_ftindex=Fulltext Indexing 
+info_ftfzindex=Fuzzy Fulltext Indexing 
+info_fzindex= (fuzzy) 
+info_db=Database Information:
+info_create=Document Creation:
+info_indexes=Indexing:
+info_general=General Information:
+=======
 info_newpath=New Database Path
 info_patherr=Database Path not found
 info_info=Process Info
@@ -418,6 +440,7 @@ info_fzindex=fuzzy
 info_db=Database Information
 info_create=Document Creation
 info_general=General Information
+>>>>>>> .r153
 info_resultchop=\n...output was chopped.
 info_on=ON
 info_off=OFF
@@ -523,7 +546,12 @@ ch_set31=: Fulltext indexing
 ch_set32=Additional options:
 ch_set33= [path]: Set new database path
 ch_set34= [nr]: Number of query runs
+<<<<<<< .mine
+ch_set35=: Full text data compression
+ch_help1=Get help on 
+=======
 ch_help1=Get help on
+>>>>>>> .r153
 ch_help11= commands.
 ch_help2=If [command] is specified, information on the specific\n command is printed; otherwise, all commands are listed.\nIf 'all' is specified, hidden commands are included.
 ch_exit1=Exit
