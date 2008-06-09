@@ -41,7 +41,8 @@ public final class FTCont extends Arr {
       d = Scoring.and(d, it.dbl());
     }
     ctx.ftitem = tmp;
-    return d == 0 ? Iter.EMPTY : new Bln(true, d).iter();
+    //return d == 0 ? Iter.EMPTY : new Bln(true, d).iter();
+    return new Bln(d != 0, d).iter();
   }
 
   @Override

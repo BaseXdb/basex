@@ -6,6 +6,7 @@ import java.util.HashSet;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXSyntax;
 import org.basex.query.xquery.XQTokens;
+import org.basex.query.xquery.func.FunDef;
 import org.basex.util.XMLToken;
 
 /**
@@ -17,10 +18,14 @@ import org.basex.util.XMLToken;
 public final class QuerySyntax extends BaseXSyntax {
   /** Error color. */
   public static HashSet<String> keys = new HashSet<String>();
+  /** Error color. */
+  public static HashSet<String> funs = new HashSet<String>();
   /** Variable color. */
-  public static final Color VAR = new Color(0, 160, 0);
+  private static final Color VAR = new Color(0, 160, 0);
   /** Keyword. */
-  public static final Color KEY = new Color(0, 144, 144);
+  private static final Color KEY = new Color(0, 144, 144);
+  /** Keyword. */
+  private static final Color FUNS = new Color(160, 0, 160);
 
   /** Last quote. */
   private int quote;
@@ -34,6 +39,10 @@ public final class QuerySyntax extends BaseXSyntax {
         final String name = f.getName();
         if(name.equals("SKIP")) break;
         keys.add((String) f.get(null));
+      }
+      for(final FunDef f : FunDef.values()) {
+        final String s = f.toString();
+        for(String ss : s.substring(0, s.indexOf("(")).split("-")) funs.add(ss);
       }
     } catch(final Exception ex) {
       ex.printStackTrace();
@@ -72,6 +81,8 @@ public final class QuerySyntax extends BaseXSyntax {
 
     // special characters
     if(keys.contains(word)) return GUIConstants.COLORQUOTE;
+    // special characters
+    if(funs.contains(word)) return FUNS;
 
     // special characters
     if(!XMLToken.isXMLLetterOrDigit(ch)) return KEY;

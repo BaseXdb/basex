@@ -185,6 +185,7 @@ public final class Path extends Arr {
         ctx.item = it;
         iter(l + 1, ni, ctx);
       } else {
+        ctx.checkStop();
         ni.add(it);
       }
     }

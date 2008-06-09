@@ -178,8 +178,7 @@ public final class IO {
    */
   public long length() {
     if(cont != null) return cont.length;
-    if(url) BaseX.notexpected();
-    return file().length();
+    return url ? 0 : file().length();
   }
   
   /**

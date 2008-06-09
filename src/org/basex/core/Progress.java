@@ -55,7 +55,7 @@ public abstract class Progress {
    * @return header information
    */
   protected abstract double prog();
-  
+
   /**
    * Sets a new sub progress.
    * @param prog progress

@@ -155,9 +155,7 @@ public final class XQContext extends QueryContext {
   public Iter iter() throws XQException {
     // evaluates the query and returns the result
     try {
-      final Iter iter = iter(root);
-      finish();
-      return iter;
+      return iter(root);
     } catch(final StackOverflowError e) {
       if(Prop.debug) e.printStackTrace();
       Err.or(XPSTACK);
@@ -230,18 +228,11 @@ public final class XQContext extends QueryContext {
     return addNS(docs[dl]);
   }
 
-  /**
-   * Finishes the query execution.
-   */
+  /** Finishes the query execution.
   public void finish() {
-    /*try {
-      for(final DNode doc : docs) {
-        doc.data.close();
-      }
-    } catch(final IOException ex) {
-      BaseX.debug(ex);
-    }*/
-  }
+    try { for(final DNode doc : docs) doc.data.close(); }
+    catch(final IOException ex) { BaseX.debug(ex); }
+  }*/
   
   /**
    * Adds namespaces from the specified document.
