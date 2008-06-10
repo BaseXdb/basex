@@ -96,7 +96,7 @@ public final class LS {
       lsRecursive(curDirPre);
     } else {
       print(FSUtils.getAllOfDir(data, curDirPre));
-    }
+    }    
   }
 
   /**

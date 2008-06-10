@@ -16,10 +16,10 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen & Hannes Schwarz
  */
 public final class FSUtils {
-  
+
   /** Root dir. */
   private static final int ROOTDIR = 2;
-  
+
   /** Private constructor, preventing class instances. */
   private FSUtils() { }
 
@@ -91,7 +91,7 @@ public final class FSUtils {
     final byte[] att = data.attValue(data.nameID, pre);
     return att != null ? att : EMPTY;
   }
-  
+
   /**
    * Returns the name of a file.
    * @param data data reference
@@ -167,7 +167,7 @@ public final class FSUtils {
     }
     return res.finish();
   }
-  
+
   /**
    * Returns the pre value of a file or a dir.
    *  
@@ -186,7 +186,7 @@ public final class FSUtils {
     }
     return -1;
   }
-  
+
   /**
    * Returns the pre value of a file.
    *  
@@ -205,7 +205,7 @@ public final class FSUtils {
     }
     return -1;
   }
-  
+
   /**
    * Returns the pre value of a dir.
    *  
@@ -224,7 +224,7 @@ public final class FSUtils {
     }
     return -1;
   }
-  
+
   /**
    *  Test path expression.
    * 
@@ -242,7 +242,6 @@ public final class FSUtils {
     if(path.length() < 1) {
       return pre;
     }
-
     // Seperate path expression 
     String[] paths = path.split("/");
 
@@ -250,10 +249,10 @@ public final class FSUtils {
       // Parent directory
       if(p.equals("..")) {
         n = data.parent(n, kind);
-      // / was first char of the path - after split it's ""  
+        // / was first char of the path - after split it's ""  
       } else if(p.equals("")) {
         n = 3;
-      // if path equals "." do nothing else getDir  
+        // if path equals "." do nothing else getDir  
       } else if(!p.equals(".")) {
         n = getSpecificDir(data, n, Token.token(p));
       }
@@ -264,7 +263,7 @@ public final class FSUtils {
     }
     return n;
   }
-  
+
   /**
    * Splits the Options.
    * 
@@ -273,17 +272,17 @@ public final class FSUtils {
    */
   public static String[] readOptions(final String options) {
 
-      String[] opt = options.split(" ");
-      if(opt.length < 2) {
-        return null;
-      }
-      String[] res = new String[opt.length - 1];             
-      for(int i = 0; i < res.length; i++) {
-        res[i] = opt[i + 1];
-      }
-      return res;      
-    } 
-  
+    String[] opt = options.split(" ");
+    if(opt.length < 2) {
+      return null;
+    }
+    String[] res = new String[opt.length - 1];             
+    for(int i = 0; i < res.length; i++) {
+      res[i] = opt[i + 1];
+    }
+    return res;      
+  } 
+
   /**
    * Opens the file which is defined by the specified pre value.
    * @param data data reference
@@ -306,12 +305,6 @@ public final class FSUtils {
     }
   }
 
-//  regex[0] = ".*\\.pdf";  // uebersetzung von *.pdf
-//  regex[1] = "a.d\\.pdf"; // uebersetzung von a?d.pdf  
-//  regex[2] = "[abc]dd.pdf";  // uebersetzung von [abc]dd.pdf  
-//  regex[3] = "[a-c]dd.pdf"; // uebersetzung von [a-c]dd.pdf
-//  regex[4] = "[a-c].d\\.p.*"; // uebersetzung von [a-c]?d.p*
-  
   /**
    * Tests if wildcards are used. If true it returns
    * the regular expression. If not null will be returned.
@@ -320,16 +313,26 @@ public final class FSUtils {
    * @return If a wildcard is used a regular expression is
    *         returned otherwise null
    */
-  public static String isRegex(final String expr) {
-    
-    if(expr.indexOf('*') > 0 && expr.indexOf('?') > 0 &&
-        expr.indexOf('[') > 0) {
-      // wildcard is used
-      
-      return "";
-    } else {
-      return null;
+  public static String transformToRegex(final String expr) {
+
+    String result = "";
+    for(int i = 0; i < expr.length(); i++) {
+      switch (expr.charAt(i)) {
+        case '*':
+          result += ".*";
+          break;
+        case '?':
+          result += ".";
+          break;
+        case '.':
+          result += "\\.";
+          break;
+        default:
+          result += expr.charAt(i);
+        break;
+      }
     }
+    return result;
   }
   /**
    * Returns int value of the root dir.

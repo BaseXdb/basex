@@ -2,6 +2,8 @@ package org.basex.query.fs;
 
 import static org.basex.Text.*;
 import java.io.IOException;
+import java.util.regex.Pattern;
+
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.io.PrintOutput;
@@ -44,7 +46,7 @@ public final class LOCATE {
 
   /** filename to search for. */
   private String fileToFind;
-  
+
   /** filename to search for. */
   private byte[] fileToFindByte;
 
@@ -116,18 +118,20 @@ public final class LOCATE {
       ch = g.getopt();
     }
     fileToFind = g.getPath();
-    fileToFindByte = Token.token(fileToFind);
-    
+
     if(fileToFind == null) {
       out.print("usage: locate  [-l limit] [-c] [-h] -V 1 ...");
       out.print(NL);
+      return; 
     }
 
+    fileToFindByte = Token.token(fileToFind);    
     // Version -  1 = use table
     //            2 = use xquery
     //            3 = use xquery + index
     switch (version) {
       case '1':
+        fileToFind = FSUtils.transformToRegex(fileToFind);
         locateTable(FSUtils.getROOTDIR(), limit);
         break;
       case '2':
@@ -157,13 +161,19 @@ public final class LOCATE {
     
     if(!lFlag || filesfound < limit) {            
       int[] contentDir = FSUtils.getAllOfDir(data, pre);  
-
       IntList res = new IntList();
 
       for(int i : contentDir) {        
         if(FSUtils.isDir(data, i)) {
           byte[] name = FSUtils.getName(data, i);
-          if(Token.eq(name, fileToFindByte)) {
+          FSUtils.transformToRegex(fileToFind);
+          //if(Token.eq(name, fileToFindByte)) {
+          if(Pattern.matches(fileToFind, Token.string(name))) {          
+            if(!cFlag) {
+              out.print(FSUtils.getPath(data, i));
+              out.print(NL);
+            }
+            ++filesfound;
             printDir(i);
           } else {
             res.add(i);
@@ -171,7 +181,8 @@ public final class LOCATE {
         } else if(FSUtils.isFile(data, i)) {
           // if found print with path      
           byte[] name = FSUtils.getName(data, i);                 
-          if(Token.eq(name, fileToFindByte)) {
+          //if(Token.eq(name, fileToFindByte)) {
+          if(Pattern.matches(fileToFind, Token.string(name))) {
             ++filesfound;
             if(!cFlag) {
               out.print(FSUtils.getPath(data, i));
@@ -204,8 +215,8 @@ public final class LOCATE {
     int lastSlash = 0;
     int lastrIndexOfSlash = fileToFind.lastIndexOf('/');
 
-    
-    
+
+
     if(slash > 0) {
       query = "//*[@name='" + fileToFind.substring(lastSlash, slash) + "']";
       while(slash < lastrIndexOfSlash) {
@@ -227,7 +238,7 @@ public final class LOCATE {
         for(int i = 0; i < filesfound && 
         (!lFlag || i < limit); i++) {        
           out.print(FSUtils.getPath(data, result.pre[i]));
-          
+
           out.print(NL);
         }
       }
@@ -245,13 +256,15 @@ public final class LOCATE {
     int toScan = i;
     int[] subContentDir = FSUtils.getAllOfDir(data, toScan);  
     int[] allDir = FSUtils.getAllDir(data, toScan);
-    for(int j : subContentDir) {              
-      out.print(FSUtils.getPath(data, j));
-      out.print(NL);
+
+    for(int j : subContentDir) {   
+      if(!cFlag) {
+        out.print(FSUtils.getPath(data, j));
+        out.print(NL);
+      }
+      ++filesfound;
     }
     for(int x = 0; x < allDir.length; x++) {
-      out.print(FSUtils.getPath(data, allDir[x]));
-      out.print(NL);
       printDir(allDir[x]);
     }
   }
