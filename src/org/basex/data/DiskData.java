@@ -330,9 +330,9 @@ public final class DiskData extends Data {
   }
 
   @Override
-   public int[][] ftIDs(final byte[] word, final FTOption ftO) {
-     return ftxindex.ftIDs(word, ftO);
-   }
+  public int[][] ftIDs(final byte[] word, final FTOption ftO) {
+    return ftxindex.ftIDs(word, ftO);
+  }
 
   @Override
   public int[] idRange(final Index.TYPE type, final double word1,
