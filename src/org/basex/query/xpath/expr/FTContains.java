@@ -69,9 +69,13 @@ public final class FTContains extends Comparison {
   
   @Override
   public Expr compile(final XPContext ctx) throws QueryException {
+    if (!ctx.local.data.meta.ftxindex) 
+      throw new QueryException("Please create full-text index first.");
+
     if (expr2 instanceof Literal && expr1 instanceof Literal) {
       final byte[] lit = ((Literal)  expr2).str();
-
+      
+      
       ctx.compInfo(OPTFTINDEX);
       
 //    <SG> to be change if ftnot is combined with further options like order...
@@ -127,6 +131,7 @@ public final class FTContains extends Comparison {
   @Override
   public Expr indexEquivalent(final XPContext ctx, final Step curr)
     throws QueryException {
+    
     LocPath path = (LocPath) expr1;;
     
     
