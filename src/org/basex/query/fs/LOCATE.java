@@ -48,7 +48,7 @@ public final class LOCATE {
   private String fileToFind;
 
   /** filename to search for. */
-  private byte[] fileToFindByte;
+//  private byte[] fileToFindByte;
 
   /** Counter of files found. */
   private int filesfound;
@@ -125,7 +125,7 @@ public final class LOCATE {
       return; 
     }
 
-    fileToFindByte = Token.token(fileToFind);    
+//    fileToFindByte = Token.token(fileToFind);    
     // Version -  1 = use table
     //            2 = use xquery
     //            3 = use xquery + index
