@@ -57,7 +57,7 @@ public final class GREP {
   public void grepMain(final String cmd) 
   throws IOException {
 
-    GetOpts g = new GetOpts(cmd, "l:chV:");
+    GetOpts g = new GetOpts(cmd, "l:chV:", 1);
     char version = (char) -1;
     // get all Options
     int ch = g.getopt();

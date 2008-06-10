@@ -306,6 +306,33 @@ public final class FSUtils {
     }
   }
 
+//  regex[0] = ".*\\.pdf";  // uebersetzung von *.pdf
+//  regex[1] = "a.d\\.pdf"; // uebersetzung von a?d.pdf  
+//  regex[2] = "[abc]dd.pdf";  // uebersetzung von [abc]dd.pdf  
+//  regex[3] = "[a-c]dd.pdf"; // uebersetzung von [a-c]dd.pdf
+//  regex[4] = "[a-c].d\\.p.*"; // uebersetzung von [a-c]?d.p*
+  
+  /**
+   * Tests if wildcards are used. If true it returns
+   * the regular expression. If not null will be returned.
+   * 
+   * @param expr - the expression of the user 
+   * @return If a wildcard is used a regular expression is
+   *         returned otherwise null
+   */
+  public static String isRegex(final String expr) {
+    
+    String result = "";
+
+    if(expr.indexOf('*') > 0 && expr.indexOf('?') > 0 &&
+        expr.indexOf('[') > 0) {
+      // wildcard is used
+      
+      return "";
+    } else {
+      return null;
+    }
+  }
   /**
    * Returns int value of the root dir.
    * 

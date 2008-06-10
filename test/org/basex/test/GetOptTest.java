@@ -45,7 +45,7 @@ public final class GetOptTest {
      *   aflag = 0, bflag = 0, cvalue = (null)
      *   Non-option argument arg1
      */
-    GetOpts g = new GetOpts("testopt", "ahR");
+    GetOpts g = new GetOpts("", "ahR");
     assertEquals("No Options entered - return -1", -1, g.getopt());
     assertEquals("Path of fs testopt", null, g.getPath());
     /*
@@ -53,7 +53,7 @@ public final class GetOptTest {
      *   aflag = 0, bflag = 0, cvalue = (null)
      *   Non-option argument /music/IckeUndEr
      */
-    g = new GetOpts("testopt /music/IckeUndEr", "ahR");
+    g = new GetOpts("/music/IckeUndEr", "ahR");
     assertEquals("No Options entered - return -1", -1, g.getopt());
     assertEquals("Path of fs testopt /music/IckeUndEr", 
         "/music/IckeUndEr", g.getPath());
@@ -68,7 +68,7 @@ public final class GetOptTest {
    */
   @Test
   public void testOption1() throws IOException {
-    String command = "ls -a";
+    String command = "-a";
     int[] enteredOptions =  {'a'};    
     int[] getOptResult = optionHelp(command, enteredOptions.length, "ahRli");
 
@@ -89,7 +89,7 @@ public final class GetOptTest {
    */
   @Test
   public void testOption2() throws IOException {
-    String command = "testopt -a -b";
+    String command = "-a -b";
     int[] enteredOptions =  {'a', 'b'};    
     int[] getOptResult = optionHelp(command, enteredOptions.length, "ahRbli");
 
@@ -110,7 +110,7 @@ public final class GetOptTest {
    */
   @Test
   public void testOption3() throws IOException {
-    String command = "testopt -ab";
+    String command = "-ab";
     int[] enteredOptions =  {'a', 'b'};    
     int[] getOptResult = optionHelp(command, enteredOptions.length, "ahRbli");
 
@@ -131,7 +131,7 @@ public final class GetOptTest {
    */
   @Test
   public void testOption4() throws IOException {
-    String command = "testopt -a -X";
+    String command = "-a -X";
     int[] enteredOptions =  {'a', '?'};    
     int[] getOptResult = optionHelp(command, enteredOptions.length, "ahRbli");
 
@@ -154,7 +154,7 @@ public final class GetOptTest {
    */
   @Test
   public void testOption5() throws IOException {
-    String command = "testopt -ab -c";
+    String command = "-ab -c";
     int[] enteredOptions =  {'a', 'b' , 'c'};    
     int[] getOptResult = optionHelp(command, enteredOptions.length, "ahRblci");
 
@@ -176,7 +176,7 @@ public final class GetOptTest {
    */
   @Test
   public void testOption6() throws IOException {
-    String command = "testopt -YXb";
+    String command = "-YXb";
     int[] enteredOptions =  {'Y', '?', 'b'};    
     int[] getOptResult = optionHelp(command, enteredOptions.length, "YahRbli");
 
@@ -197,7 +197,7 @@ public final class GetOptTest {
    */
   @Test
   public void testOptionArgument1() throws IOException {
-    String command = "testopt -d ickeUndEr -a";
+    String command = "-d ickeUndEr -a";
     int[] enteredOptions =  {'d' , 'a'};    
     String args = "ahRbd:li";
     GetOpts g = new GetOpts(command, args);
@@ -228,7 +228,7 @@ public final class GetOptTest {
    */
   @Test
   public void testOptionArgument2() throws IOException {
-    String command = "testopt -dickeUndEr -R";
+    String command = "-dickeUndEr -R";
     int[] enteredOptions =  {'d', 'R'};    
     String args = "ahRbd:li";
     GetOpts g = new GetOpts(command, args);
@@ -261,7 +261,7 @@ public final class GetOptTest {
    */
   @Test
   public void testOptionArgument3() throws IOException {
-    String command = "testopt -d ickeUndEr -X";
+    String command = "-d ickeUndEr -X";
     int[] enteredOptions =  {'d', '?'};    
     String args = "ahRbd:li";
     GetOpts g = new GetOpts(command, args);
@@ -293,7 +293,7 @@ public final class GetOptTest {
    */
   @Test
   public void testOptionArgument4() throws IOException {
-    String command = "test -d icke -u";
+    String command = "-d icke -u";
     int[] enteredOptions =  {'d', 'u'};   
     String args = "ahRbd:lu";
     GetOpts g = new GetOpts(command, args);
@@ -327,7 +327,7 @@ public final class GetOptTest {
    */
   @Test
   public void testOptionArgument5() throws IOException {
-    String command = "testopt -d ickeUndEr -iTest";
+    String command = "-d ickeUndEr -iTest";
     int[] enteredOptions =  {'d', 'i'}; 
     String args = "ahRbd:li:";
     GetOpts g = new GetOpts(command, args);
@@ -363,7 +363,7 @@ public final class GetOptTest {
    */
   @Test
   public void testOptionArgument6() throws IOException {
-    String command = "testopt -d ickeUndEr -R -iTest -h";
+    String command = "-d ickeUndEr -R -iTest -h";
     int[] enteredOptions =  {'d', 'R', 'i', 'h'}; 
     String args = "ahRbd:li:";
     GetOpts g = new GetOpts(command, args);
@@ -398,7 +398,7 @@ public final class GetOptTest {
    */
   @Test
   public void testOptionArgument7() throws IOException {
-    String command = "testopt -d ickeUndEr -R -iTest -h";
+    String command = "-d ickeUndEr -R -iTest -h";
     int[] enteredOptions =  {'d', 'R', 'i', 'h'}; 
     String args = "ah:Rbd:li:";
     GetOpts g = new GetOpts(command, args);
@@ -437,7 +437,7 @@ public final class GetOptTest {
    */
   @Test
   public void testOptionArgument8() throws IOException {
-    String command = "testopt -d ickeUndEr -R -iTest -h";
+    String command = "-d ickeUndEr -R -iTest -h";
     int[] enteredOptions =  {'d', 'R', 'h'}; 
     String args = "ahR:bd:li:";
     GetOpts g = new GetOpts(command, args);
@@ -476,7 +476,7 @@ public final class GetOptTest {
    */
   @Test
   public void testAll1() throws IOException {
-    String command = "testopt -d ickeUndEr -R -iTest /Itunes/music/";
+    String command = "-d ickeUndEr -R -iTest /Itunes/music/";
     int[] enteredOptions =  {'d', 'R', 'i'};    
     String args = "ahRbd:li:";
     GetOpts g = new GetOpts(command, args);
@@ -512,7 +512,7 @@ public final class GetOptTest {
    */
   @Test
   public void testAll2() throws IOException {
-    String command = "testopt /Itunes/music/ -d ickeUndEr -R -iTest ";
+    String command = "/Itunes/music/ -d ickeUndEr -R -iTest ";
     int[] enteredOptions =  {'d', 'R', 'i'};    
     String args = "ahRbd:li:";
     GetOpts g = new GetOpts(command, args);
@@ -549,7 +549,7 @@ public final class GetOptTest {
    */
   @Test
   public void testAll3() throws IOException {
-    String command = "testopt -d ickeUndEr /Itunes/music/ -R -iTest -X";
+    String command = "-d ickeUndEr /Itunes/music/ -R -iTest -X";
     int[] enteredOptions =  {'d', 'R', 'i', '?'}; 
     String args = "ahRbd:li:";
     GetOpts g = new GetOpts(command, args);

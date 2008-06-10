@@ -55,7 +55,7 @@ public final class LS {
    */
   public void lsMain(final String cmd) 
   throws IOException {    
-    GetOpts g = new GetOpts(cmd, "ahR");
+    GetOpts g = new GetOpts(cmd, "ahR", 1);
     
     // get all Options
     int ch = g.getopt();

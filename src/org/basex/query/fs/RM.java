@@ -47,7 +47,7 @@ public final class RM {
   public void rmMain(final String cmd) 
   throws IOException {
 
-    GetOpts g = new GetOpts(cmd, "h");
+    GetOpts g = new GetOpts(cmd, "Rh");
     // get all Options
     int ch = g.getopt();
     while (ch != -1) {
@@ -99,9 +99,11 @@ public final class RM {
         file = path.substring(beginIndex + 1);
       }
     }
+    
     int del = FSUtils.getSpecificFileOrDir(context.data(), curDirPre, 
         file.getBytes());
 
+    // TODO HS: Test ob Datei oder File - Option -R bei Verzeichnis
     if(del == -1) {
       out.print("rm: " + file + " No such file or directory");
       return;
@@ -123,7 +125,7 @@ public final class RM {
    * @throws IOException in case of problems with the PrintOutput
    */
   private void printHelp() throws IOException {
-    out.print("rm file ...");
+    out.print("rm [-R] file ...");
 
   }
 

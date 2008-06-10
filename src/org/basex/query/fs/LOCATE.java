@@ -75,7 +75,7 @@ public final class LOCATE {
   public void locateMain(final String cmd) 
   throws IOException {
 
-    GetOpts g = new GetOpts(cmd, "chl:V:");
+    GetOpts g = new GetOpts(cmd, "chl:V:", 1);
     char version = (char) -1;
     int limit = -1;
     // get all Options

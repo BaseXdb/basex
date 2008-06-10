@@ -50,12 +50,28 @@ public final class GetOpts {
   public GetOpts(final String arguments, final String options) {
     this.args = arguments.split(" ");
     this.optString = options;    
-    this.optindex = 1;
+    this.optindex = 0;
     this.optarg = null;
     this.path = null;
     this.multipleOptIndex = 1;
   }
-
+  /**
+   * Construct a basic Getopt instance with the given input data.
+   * 
+   * @param arguments The String passed from the command line
+   * @param options A String containing a description of the 
+   *                  valid options
+   * @param firstOptionIndex start scanning at this index                  
+   */
+  public GetOpts(final String arguments, final String options,
+      final int firstOptionIndex) {
+    this.args = arguments.split(" ");
+    this.optString = options;    
+    this.optindex = firstOptionIndex;
+    this.optarg = null;
+    this.path = null;
+    this.multipleOptIndex = 1;
+  }
   /**
    * Getter of the index.
    * 
@@ -168,8 +184,10 @@ public final class GetOpts {
         return '?';
       }             
     } else {      
-      // path or nonvalid option
-      path = args[optindex];
+      if(args.length > 0 && args[0].length() > 0) {
+        // path or nonvalid option
+        path = args[optindex];        
+      }
       if(optindex + 1 == args.length) { 
         // all options parsed
         return -1;

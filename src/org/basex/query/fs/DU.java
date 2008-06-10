@@ -50,7 +50,7 @@ public final class DU {
   public void duMain(final String cmd) 
   throws IOException {
 
-    GetOpts g = new GetOpts(cmd, "h");
+    GetOpts g = new GetOpts(cmd, "h", 1);
     // get all Options
     int ch = g.getopt();
     while (ch != -1) {
