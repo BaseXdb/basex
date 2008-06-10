@@ -30,6 +30,8 @@ public final class FTOptions extends Single implements Cloneable {
   public Bln ts;
   /** Wildcards flag. */
   public Bln wc;
+  /** Fuzzy flag. */
+  public Bln fz;
   /** Stopwords. */
   public Set sw;
   /** Language (currently ignored). */
@@ -55,6 +57,7 @@ public final class FTOptions extends Single implements Cloneable {
     if(st == null) st = emp ? Bln.FALSE : tmp.st;
     if(ts == null) ts = emp ? Bln.FALSE : tmp.ts;
     if(wc == null) wc = emp ? Bln.FALSE : tmp.wc;
+    if(fz == null) fz = emp ? Bln.FALSE : tmp.fz;
     if(sw == null) sw = emp ? null : tmp.sw;
     if(ln == null) ln = emp ? null : tmp.ln;
     
@@ -89,6 +92,7 @@ public final class FTOptions extends Single implements Cloneable {
     ser.startElement(this);
     if(st.bool()) ser.attribute(Token.token(STEMMING), Token.TRUE);
     if(wc.bool()) ser.attribute(Token.token(WILDCARDS), Token.TRUE);
+    if(fz.bool()) ser.attribute(Token.token(FUZZY), Token.TRUE);
     if(dc.bool()) ser.attribute(Token.token(DIACRITICS), Token.TRUE);
     ser.finishElement();
     expr.plan(ser);
@@ -101,6 +105,7 @@ public final class FTOptions extends Single implements Cloneable {
     sb.append(expr != null ? expr.toString() : "FTOptions");
     if(st.bool()) sb.append(" " + WITH + " " + STEMMING);
     if(wc.bool()) sb.append(" " + WITH + " " + WILDCARDS);
+    if(fz.bool()) sb.append(" " + WITH + " " + FUZZY);
     if(dc.bool()) sb.append(" " + DIACRITICS + " " + SENSITIVE);
     if(uc.bool()) sb.append(" " + UPPERCASE);
     if(lc.bool()) sb.append(" " + LOWERCASE);

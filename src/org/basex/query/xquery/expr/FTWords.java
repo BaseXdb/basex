@@ -9,6 +9,7 @@ import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Scoring;
 import org.basex.util.FTTokenizer;
 import org.basex.util.IntList;
+import org.basex.util.Levenshtein;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -148,6 +149,7 @@ public final class FTWords extends Single {
     sb.uc = opt.uc.bool();
     sb.lc = opt.lc.bool();
     sb.wc = opt.wc.bool();
+    sb.fz = opt.fz.bool();
 
     IntList il = null;
     while(tk.more()) {
@@ -172,7 +174,8 @@ public final class FTWords extends Single {
           f = !(s1 ^ s2);
           if(s1 || s2) continue;
         }
-        f = sb.wc ? string(t).matches(string(s)) : eq(t, s);
+        f = sb.fz ? Levenshtein.similar(t, s) : sb.wc ?
+            string(t).matches(string(s)) : eq(t, s);
       }
 
       if(f) {

@@ -244,6 +244,8 @@ public interface XQTokens {
   /** Parser fulltext token. */
   String WILDCARDS = "wildcards";
   /** Parser fulltext token. */
+  String FUZZY = "fuzzy";
+  /** Parser fulltext token. */
   String WINDOW = "window";
   /** Parser fulltext token. */
   String WITHOUT = "without";

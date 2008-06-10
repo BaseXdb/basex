@@ -27,6 +27,8 @@ public final class FTTokenizer {
   public boolean lc;
   /** Wildcard flag. */
   public boolean wc;
+  /** Fuzzy flag. */
+  public boolean fz;
   
   /** Current sentence. */
   public int sent;

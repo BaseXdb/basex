@@ -2220,7 +2220,11 @@ public final class XQParser {
         check(STOP);
         check(WORDS);
       } else if(consume(WILDCARDS)) {
+        if(opt.fz != null) Err.or(FTFZWC);
         opt.wc = Bln.get(with);
+      } else if(consume(FUZZY)) {
+        if(opt.wc != null) Err.or(FTFZWC);
+        opt.fz = Bln.get(with);
       } else {
         qp = p;
         return false;
