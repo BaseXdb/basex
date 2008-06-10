@@ -198,7 +198,7 @@ public final class RealView extends View {
    */
   private int calcPost(final int pre, final int level) {
     final Data data = GUI.context.data();
-    return data.size(pre, data.kind(pre)) - level + pre;
+    return (data.size(pre, data.kind(pre)) - level) + pre;
   }
 
   /**
@@ -245,29 +245,29 @@ public final class RealView extends View {
       case Data.ELEM:
         String s = Token.string(data.tag(pre));
         g.drawString(s, x, y);
-        parTextWidth = BaseXLayout.width(g, s);
+        preTextWidth = BaseXLayout.width(g, s);
         break;
       case Data.ATTR:
         g.setColor(attributeColor);
         g.drawString("A", x, y);
-        parTextWidth = BaseXLayout.width(g, "A");
+        preTextWidth = BaseXLayout.width(g, "A");
         break;
       case Data.COMM:
         g.setColor(commentColor);
         g.drawString("C", x, y);
-        parTextWidth = BaseXLayout.width(g, "C");
+        preTextWidth = BaseXLayout.width(g, "C");
         break;
       case Data.PI:
         g.setColor(piColor);
         g.drawString("PI", x, y);
-        parTextWidth = BaseXLayout.width(g, "PI");
+        preTextWidth = BaseXLayout.width(g, "PI");
         break;
       case Data.TEXT:
         g.setColor(textColor);
         g.drawString("T", x, y);
-        parTextWidth = BaseXLayout.width(g, "T");
+        preTextWidth = BaseXLayout.width(g, "T");
     }
-    drawPreAndPostValues(g, pre, post, parTextWidth);
+    drawPreAndPostValues(g, pre, post, preTextWidth);
     g.setColor(Color.BLACK);
 
     int par = data.parent(pre, data.kind(pre));
@@ -310,8 +310,8 @@ public final class RealView extends View {
   private void drawPrePost(final Graphics g, final int pre, final int level) {
     final Data data = GUI.context.data();
     int post = calcPost(pre, level);
-    //    System.out.println("pre: " + pre + " | post: " + post + " | tag: "
-    //        + Token.string(data.tag(pre)) + " | level: " + level);
+        System.out.println("pre: " + pre + " | post: " + post + " | tag: "
+            + Token.string(data.tag(pre)) + " | level: " + level);
     int lv = level;
 
     drawPrePostNode(g, pre, post, lv);
