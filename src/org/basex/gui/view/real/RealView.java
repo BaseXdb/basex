@@ -1,6 +1,7 @@
 package org.basex.gui.view.real;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import org.basex.data.Data;
 import org.basex.gui.GUI;
@@ -36,11 +37,15 @@ public final class RealView extends View {
   /** Color for element node. */
   private final Color elementColor = Color.BLACK;
   /** Color for attribute node. */
-  //private final Color attributeColor = Color.RED;
+  private final Color attributeColor = Color.GREEN;
+  /** Color for attribute node. */
+  private final Color commentColor = Color.MAGENTA;
+  /** Color for process instruction node. */
+  private final Color piColor = Color.ORANGE;
   /** Color for text node. */
-  //private final Color textColor = Color.BLUE;
-  /** Color for comment node. */
-  //private final Color commentColor = Color.GREEN;
+  private final Color textColor = Color.CYAN;
+  /** multiplier for pre/post values. */
+  private final int prePostMulti = 17;
   
   //
   //  /**
@@ -104,9 +109,12 @@ public final class RealView extends View {
     pointerx = this.getWidth() / 2;
     pointery = topdistance;
     
+//  TODO: choose visualization here
     /** Paint the root */
-    drawNode(g, 0, pointerx, pointery, elementColor);
-    drawTree(g, 0, 0, 0, this.getWidth());
+//    drawNode(g, 0, pointerx, pointery, elementColor);
+//    drawTree(g, 0, 0, 0, this.getWidth());
+    
+    drawPrePost(g, 1, 1);
 
     System.out.println("Perf: " + perf.getTime());    
   }
@@ -181,6 +189,141 @@ public final class RealView extends View {
         sizeleft = sizeleft - childframewidth;
       }
     }
+  }
+  /**
+   * calculates the post value of a node.
+   * @param pre the pre value of the node
+   * @param level the level of the node
+   * @return calculated post value
+   */
+  private int calcPost(final int pre, final int level) {
+    final Data data = GUI.context.data();
+    return data.size(pre, data.kind(pre)) - level + pre;
+  }
+
+  /**
+   * draws pre and post vlaues next to the node they belong to.
+   * @param g graphics reference
+   * @param pre the pre value
+   * @param post the post value
+   * @param textWidth the textWidth
+   */
+  void drawPreAndPostValues(final Graphics g, final int pre, final int post,
+      final int textWidth) {
+    int x = pre * prePostMulti;
+    int y = post * prePostMulti;
+    int preStrLen = BaseXLayout.width(g, Integer.toString(pre) + " ");
+    int postStrLen = BaseXLayout.width(g, " ") + textWidth;
+    Font temp = this.getFont();
+    Font little = new Font(temp.getFontName(), Font.TRUETYPE_FONT,
+        (int) (fontHeight / 1.5f));
+    g.setFont(little);
+    g.setColor(Color.BLUE);
+    g.drawString(Integer.toString(pre), x - preStrLen, y + fontHeight / 4);
+    g.setColor(Color.RED);
+    g.drawString(Integer.toString(post), x + postStrLen, y + fontHeight / 4);
+    g.setFont(temp);
+
+  }
+
+  /**
+   * draws the nodes for given pre and post value.
+   * @param g graphics reference
+   * @param pre the pre value for the node to draw
+   * @param post the par value for the node to draw
+   * @param level the level for the node to draw
+   */
+  private void drawPrePostNode(final Graphics g, final int pre, final int post,
+      final int level) {
+    final Data data = GUI.context.data();
+    int x = pre * prePostMulti;
+    int y = post * prePostMulti;
+    int preTextWidth = -1;
+    int parTextWidth = -1;
+    
+    switch(data.kind(pre)) {
+      case Data.ELEM:
+        String s = Token.string(data.tag(pre));
+        g.drawString(s, x, y);
+        parTextWidth = BaseXLayout.width(g, s);
+        break;
+      case Data.ATTR:
+        g.setColor(attributeColor);
+        g.drawString("A", x, y);
+        parTextWidth = BaseXLayout.width(g, "A");
+        break;
+      case Data.COMM:
+        g.setColor(commentColor);
+        g.drawString("C", x, y);
+        parTextWidth = BaseXLayout.width(g, "C");
+        break;
+      case Data.PI:
+        g.setColor(piColor);
+        g.drawString("PI", x, y);
+        parTextWidth = BaseXLayout.width(g, "PI");
+        break;
+      case Data.TEXT:
+        g.setColor(textColor);
+        g.drawString("T", x, y);
+        parTextWidth = BaseXLayout.width(g, "T");
+    }
+    drawPreAndPostValues(g, pre, post, parTextWidth);
+    g.setColor(Color.BLACK);
+
+    int par = data.parent(pre, data.kind(pre));
+    
+    if(par > 0) {
+      int parPost = calcPost(par, level - 1);
+      
+      switch(data.kind(par)) {
+        case Data.ELEM:
+          String s = Token.string(data.tag(pre));
+          parTextWidth = BaseXLayout.width(g, s);
+          break;
+        case Data.ATTR:
+          parTextWidth = BaseXLayout.width(g, "A");
+          break;
+        case Data.COMM:
+          parTextWidth = BaseXLayout.width(g, "C");
+          break;
+        case Data.PI:
+          parTextWidth = BaseXLayout.width(g, "PI");
+          break;
+        case Data.TEXT:
+          parTextWidth = BaseXLayout.width(g, "T");
+      }
+      
+      int parX = par * prePostMulti;
+      int parY = parPost * prePostMulti;
+//TODO: improve line connection between nodes.
+      g.drawLine(parX, parY, x, y);
+    }
+
+  }
+
+  /** 
+   * draws pre-post-tree.
+   * @param g graphics reference
+   * @param pre the pre value of the current node
+   * @param level the level of the current node
+   */
+  private void drawPrePost(final Graphics g, final int pre, final int level) {
+    final Data data = GUI.context.data();
+    int post = calcPost(pre, level);
+    //    System.out.println("pre: " + pre + " | post: " + post + " | tag: "
+    //        + Token.string(data.tag(pre)) + " | level: " + level);
+    int lv = level;
+
+    drawPrePostNode(g, pre, post, lv);
+
+    DirIterator iterator = new DirIterator(data, pre);
+
+    while(iterator.more()) {
+      int newPre = iterator.next();
+
+      drawPrePost(g, newPre, lv + 1);
+    }
+
   }
  
 }
