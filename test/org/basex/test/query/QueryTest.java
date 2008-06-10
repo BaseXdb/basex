@@ -1,4 +1,4 @@
-package org.basex.test;
+package org.basex.test.query;
 
 import org.basex.core.Commands;
 import org.basex.core.Context;
@@ -6,6 +6,7 @@ import org.basex.core.Prop;
 import org.basex.core.proc.Proc;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
+import org.basex.query.xquery.XQResult;
 
 /**
  * XPath Test class.
@@ -13,7 +14,7 @@ import org.basex.data.Result;
  * @author Workgroup DBIS, University of Konstanz 2005-07, ISC License
  * @author Christian Gruen
  */
-public final class XPathTest {
+public final class QueryTest {
   /** Database Context. */
   private final Context context = new Context();
 
@@ -23,7 +24,7 @@ public final class XPathTest {
     "\n -h  show this help" +
     "\n -v  show query information";
   /** Verbose flag. */
-  private static boolean verbose;
+  private static boolean verbose = false;
 
   /**
    * Main method of the test class.
@@ -36,39 +37,52 @@ public final class XPathTest {
       System.out.println(TESTINFO);
       return;
     }
-    new XPathTest();
+    new QueryTest();
   }
 
   /**
    * Constructor.
    */
-  private XPathTest() {
+  private QueryTest() {
     Prop.read();
     Prop.textindex = true;
     Prop.attrindex = true;
     Prop.ftindex = true;
+    //Prop.ftfuzzy = false;
     Prop.chop = true;
 
-    System.out.println("******** RUN TESTS ********\n");
-    boolean ok = true;
-    //ok &= test(new XPathSimpleTest());
-    //ok &= test(new XPathMarkFTTest());
-    ok &= test(new XPathFTTest());
+    test(Commands.XPATH);
+    test(Commands.XQUERY);
+  }
+  
 
-    if(ok) System.out.println("All tests successfully passed.");
-    else System.out.println("Check your parser..");
+  /**
+   * Tests the specified query implementation.
+   * @param cmd query command
+   * @return true if everything went alright
+   */
+  private boolean test(final Commands cmd) {
+    System.out.println("Testing " + cmd);
+    boolean ok = true;
+    //ok &= test(cmd, new XPathSimpleTest());
+    //ok &= test(cmd, new XPathMarkFTTest());
+    ok &= test(cmd, new XPathFTTest());
+    System.out.println(ok ? "All tests correct.\n" : "Errors found.\n");
+    return ok;
   }
 
   /**
    * Tests the specified instance.
+   * @param cmd query command
    * @param test instance
    * @return true if everything went alright
    */
-  private boolean test(final AbstractTest test) {
+  private boolean test(final Commands cmd, final AbstractTest test) {
     boolean ok = true;
 
-    System.out.println(test.queries.length + " " + test.title + " Tests...");
-    out("\nBuilding \"" + test.title + "\"...\n");
+    String name = test.getClass().getSimpleName();
+    System.out.println(name + " (" + test.queries.length + " queries)...");
+    out("\nBuilding database...\n");
 
     final String file = test.doc.replaceAll("\\\"", "\\\\\"");
     Proc proc = Proc.get(context, Commands.CREATEXML, "\"" + file + "\"");
@@ -76,22 +90,26 @@ public final class XPathTest {
       err("\n", proc.info());
       return false;
     }
-    
-    out("\nRunning Tests...\n");
+
+    out("\nRunning tests...\n");
 
     for(final Object[] qu : test.queries) {
       out("- " + qu[0] + ": ");
 
-      proc = Proc.get(context, Commands.XPATH, qu[1].toString());
+      proc = Proc.get(context, cmd, qu[1].toString());
       if(proc.execute()) {
-        final Result value = proc.result();
+        Result value = proc.result();
+        if(cmd == Commands.XQUERY) 
+          value = ((XQResult) value).xpResult(context.data());
+        
         final Result cmp = (Result) qu[2];
         if(value instanceof Nodes && cmp instanceof Nodes) {
           ((Nodes) cmp).data = ((Nodes) value).data;
         }
         if(qu.length == 2 || !value.same(cmp)) {
-          err("\"" + qu[1] + "\":  " + value + " found, " +  (qu.length == 2
-              ? "error" : qu[2]) + " expected.\n", qu[0].toString());
+          err("\"" + qu[1] + "\":\n  Expected: " +
+              (qu.length == 2 ? "error" : qu[2]) +
+              "\n  Found: " + value + "\n", qu[0]);
           ok = false;
           continue;
         }
@@ -124,7 +142,7 @@ public final class XPathTest {
    * @param string string to be printed
    * @param info additional info
    */
-  private void err(final String string, final String info) {
+  private void err(final String string, final Object info) {
     System.out.print((verbose ? "" : "- " + info + ", ") + string);
   };
 }

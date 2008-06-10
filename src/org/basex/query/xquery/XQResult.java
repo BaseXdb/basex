@@ -6,10 +6,14 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.data.Serializer;
+import org.basex.query.xpath.values.Bool;
+import org.basex.query.xpath.values.Literal;
 import org.basex.query.xpath.values.NodeBuilder;
+import org.basex.query.xpath.values.Num;
 import org.basex.query.xquery.item.DNode;
 import org.basex.query.xquery.item.FNode;
 import org.basex.query.xquery.item.Item;
+import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.util.SeqBuilder;
 import org.basex.util.Token;
@@ -79,34 +83,43 @@ public final class XQResult implements Result {
   }
 
   /**
-   * Converts nodes of a XQuery result into a BaseX nodeset.
-   * If that's not possible, <pre>null</pre> is returned.
-   * This method is only called by the GUI to allow visualization of
-   * XQuery results.
+   * Converts nodes to an XPath result.
+   * If that's not possible, the XQuery value is returned.
    * @param data data reference
    * @return BaseX node set
-   * @throws XQException evaluation exception
    */
-  public Nodes nodes(final Data data) throws XQException {
-    final NodeBuilder nb = new NodeBuilder();
-
-    for(int i = 0; i < seq.size; i++) {
-      final Item it = seq.item[i];
-      if(!it.node()) return null;
-      if(it instanceof DNode) {
-        if(((DNode) it).data != data) return null;
-        nb.add(((DNode) it).pre);
-      } else {
-        final FNode node = (FNode) it;
-        final NodeIter ch = node.child();
-        Item c;
-        while((c = ch.next()) != null) {
-          if(c instanceof DNode && ((DNode) c).data == data)
-            nb.add(((DNode) c).pre);
+  public Result xpResult(final Data data) {
+    try {
+      if(seq.size == 0) return new Nodes(data);
+      if(seq.size == 1) {
+        final Item it = seq.item[0];
+        if(it.type == Type.BLN) return Bool.get(it.bool());
+        if(it.n()) return new Num(it.dbl());
+        if(it.s()) return new Literal(it.str());
+      }
+    
+      final NodeBuilder nb = new NodeBuilder();
+      for(int i = 0; i < seq.size; i++) {
+        final Item it = seq.item[i];
+        if(!it.node()) return this;
+        if(it instanceof DNode) {
+          if(((DNode) it).data != data) return this;
+          nb.add(((DNode) it).pre);
+        } else {
+          final FNode node = (FNode) it;
+          final NodeIter ch = node.child();
+          Item c;
+          while((c = ch.next()) != null) {
+            if(c instanceof DNode && ((DNode) c).data == data)
+              nb.add(((DNode) c).pre);
+          }
         }
       }
+      return nb.size != 0 ? new Nodes(nb.finish(), data) : this;
+    } catch(final XQException ex) {
+      BaseX.debug(ex);
+      return this;
     }
-    return nb.size != 0 ? new Nodes(nb.finish(), data) : null;
   }
 
   /**
@@ -119,6 +132,6 @@ public final class XQResult implements Result {
 
   @Override
   public String toString() {
-    return "XQueryResult[\"" + seq + "\"]";
+    return getClass().getSimpleName() + "[" + seq + "]";
   }
 }

@@ -1,4 +1,4 @@
-package org.basex.test;
+package org.basex.test.w3c;
 
 import java.io.File;
 import org.basex.BaseX;

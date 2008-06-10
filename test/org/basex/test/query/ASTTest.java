@@ -1,4 +1,4 @@
-package org.basex.test;
+package org.basex.test.query;
 
 import org.basex.core.Commands;
 import org.basex.core.Context;

@@ -1,4 +1,4 @@
-package org.basex.test;
+package org.basex.test.query;
 
 /**
  * XPathMark Functional Tests.
@@ -9,8 +9,6 @@ package org.basex.test;
 public final class XPathMarkFTTest extends AbstractTest {
   /** Constructor. */
   XPathMarkFTTest() {
-    title = "XPathMark-FT";
-    
     doc =
       "<?xml version='1.0' encoding='UTF-8'?>" +
       //"<!DOCTYPE A SYSTEM 'alphabet.dtd'>" +

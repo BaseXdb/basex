@@ -1,4 +1,4 @@
-package org.basex.test;
+package org.basex.test.query;
 
 /**
  * XPathMark Simple Tests.
@@ -7,12 +7,8 @@ package org.basex.test;
  * @author Christian Gruen
  */
 public class XPathFTTest extends AbstractTest {
-  /**
-   * Constructor.
-   */
+  /** Constructor. */
   XPathFTTest() {
-    title = "Simple";
-
     doc =
       "<?xml version='1.0' encoding='iso-8859-1'?>\n" +
       "<fttest>\n" +
@@ -65,7 +61,6 @@ public class XPathFTTest extends AbstractTest {
           nodes(14) },
         { "FTWildCard", "/fttest/wc/w [text() ftcontains '.+' with wildcards]", 
           nodes(14) }
-
     };
 
     /** TABLE REPRESENTATION

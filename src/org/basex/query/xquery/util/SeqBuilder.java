@@ -90,4 +90,9 @@ public final class SeqBuilder {
   public Iter iter() {
     return size == 0 ? Iter.EMPTY : new SeqIter(item, size);
   }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "[" + size + " items]";
+  }
 }

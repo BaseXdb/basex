@@ -1,4 +1,4 @@
-package org.basex.test;
+package org.basex.test.query;
 
 /**
  * XPathMark Simple Tests.
@@ -7,12 +7,8 @@ package org.basex.test;
  * @author Christian Gruen
  */
 public final class XPathSimpleTest extends AbstractTest {
-  /**
-   * Constructor.
-   */
+  /** Constructor. */
   XPathSimpleTest() {
-    title = "Simple";
-
     doc =
       "<?xml version='1.0' encoding='iso-8859-1'?>\n" +
       "<html>\n" +

@@ -43,8 +43,6 @@ public final class Prop {
   public static String dbpath = HOME + "/BaseXData";
   /** Web Server path. */
   public static String webpath = WORK + "/web";
-  /** Path to pathfinder. */
-  public static String pfpath = "pf";
   /** Path to dotty. */
   public static String dotty = "dotty";  
   /** Language Name (currently: English or German). */
@@ -60,7 +58,7 @@ public final class Prop {
   public static final boolean SKIP = true;
 
   /** Debug mode. */
-  public static boolean debug = true;
+  public static boolean debug = false;
   /** Short query info. */
   public static boolean info = false;
   /** Detailed query info. */

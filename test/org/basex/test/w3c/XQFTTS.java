@@ -1,4 +1,4 @@
-package org.basex.test;
+package org.basex.test.w3c;
 
 import static org.basex.util.Token.*;
 import java.io.BufferedReader;

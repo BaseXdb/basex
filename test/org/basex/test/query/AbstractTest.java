@@ -1,4 +1,4 @@
-package org.basex.test;
+package org.basex.test.query;
 
 import org.basex.data.Data;
 import org.basex.data.MemData;
@@ -20,8 +20,6 @@ abstract class AbstractTest {
   /** Dummy data reference. */
   static final Data DATA = new MemData(1, new Names(true), new Names(false),
       new Namespaces());
-  /** Title. */
-  String title;
   /** Document. */
   String doc;
   /** Queries. */

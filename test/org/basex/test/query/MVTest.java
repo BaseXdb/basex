@@ -1,4 +1,4 @@
-package org.basex.test;
+package org.basex.test.query;
 
 import java.io.BufferedReader;
 import java.io.File;

@@ -322,8 +322,6 @@ public final class FSUtils {
    */
   public static String isRegex(final String expr) {
     
-    String result = "";
-
     if(expr.indexOf('*') > 0 && expr.indexOf('?') > 0 &&
         expr.indexOf('[') > 0) {
       // wildcard is used

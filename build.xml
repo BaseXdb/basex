@@ -25,8 +25,7 @@
     <copy todir="${build}/org/basex/gui/img">
       <fileset dir="${src}/org/basex/gui/img"/>
     </copy>
-    <javac srcdir="${src}" destdir="${build}"
-           excludes="${pfpath}/**"/>
+    <javac srcdir="${src}" destdir="${build}"/>
   </target>
 
   <!-- ... Compile BaseXClient ... -->
@@ -35,7 +34,7 @@
           description="Compile client only"> 
     <!-- includesfile="${conf}/files4clientjar.inc" -->
     <javac srcdir="${src}" destdir="${build}" 
-           excludes="${pfpath}/**,${guipath}/**"/>
+           excludes="${guipath}/**"/>
   </target>
 
   <!-- ... Compile BaseXServer ... -->
@@ -43,7 +42,7 @@
           depends="build_init" 
           description="Compile server only"> 
     <javac srcdir="${src}" destdir="${build}" 
-           excludes="${pfpath}/**,${guipath}/**"/>
+           excludes="${guipath}/**"/>
   </target>
 
   <!-- ... Compile Tests ... -->
@@ -51,8 +50,7 @@
           depends="build_init,build" 
           description="Compile all tests"> 
     <javac srcdir="${test}" 
-           destdir="${build}"
-           excludes="${pfpath}/**"/>
+           destdir="${build}"/>
   </target>
 
   <!-- ===================================================================== -->
@@ -70,7 +68,7 @@
           description="Generates BaseXWin.jar">
     <jar jarfile="${jar_dir}/BaseXWin.jar" 
          basedir="${build}"
-         excludes="${pfpath}/**,${testpath}/**"
+         excludes="${testpath}/**"
          manifest="${conf}/meta-inf/MANIFEST_BaseXWin.MF"/>
   </target>
 
@@ -81,7 +79,7 @@
          <!-- includesfile="${conf}/files4clientjar.inc" -->
     <jar jarfile="${jar_dir}/BaseXClient.jar" 
          basedir="${build}"
-         excludes="${pfpath}/**,${guipath}/**,${testpath}/**"
+         excludes="${guipath}/**,${testpath}/**"
          manifest="${conf}/meta-inf/MANIFEST_BaseXClient.MF"/>
   </target>
 
@@ -91,7 +89,7 @@
           description="Generates BaseXServer.jar">
     <jar jarfile="${jar_dir}/BaseXServer.jar" 
          basedir="${build}"
-         excludes="${pfpath}/**,${guipath}/**,${testpath}/**"
+         excludes="${guipath}/**,${testpath}/**"
          manifest="${conf}/meta-inf/MANIFEST_BaseXServer.MF"/>
   </target>
 
@@ -101,7 +99,7 @@
           description="Generates BaseX.jar (client &amp; server, no GUI)">
     <jar jarfile="${jar_dir}/BaseX.jar" 
          basedir="${build}"
-         excludes="${pfpath}/**,${guipath}/**,${testpath}/**"
+         excludes="${guipath}/**,${testpath}/**"
          manifest="${conf}/meta-inf/MANIFEST_BaseX.MF"/>
   </target>
 

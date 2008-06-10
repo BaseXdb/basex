@@ -1,4 +1,4 @@
-package org.basex.test;
+package org.basex.test.query;
 
 import org.basex.core.Commands;
 import org.basex.core.Context;
@@ -70,7 +70,7 @@ public final class XQueryTest {
     if(args.length == 1 && args[0].equals("-v")) {
       verbose = true;
     } else if(args.length > 0) {
-      System.out.println(XPathTest.TESTINFO);
+      System.out.println(QueryTest.TESTINFO);
       return;
     }
     new XQueryTest();
