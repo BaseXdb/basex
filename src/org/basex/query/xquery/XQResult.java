@@ -53,8 +53,10 @@ public final class XQResult implements Result {
     final int s = seq.size;
     if(s != sb.size) return false;
     try {
-      for(int i = 0; i < s; i++) if(seq.item[i].type != sb.item[s].type ||
-          !seq.item[i].eq(sb.item[s])) return false;
+      for(int i = 0; i < s; i++) {
+        if(seq.item[i].type != sb.item[i].type ||
+            !seq.item[i].eq(sb.item[i])) return false;
+      }
     } catch(final XQException e) {
       return false;
     }

@@ -48,7 +48,7 @@ public final class QueryTest {
     Prop.textindex = true;
     Prop.attrindex = true;
     Prop.ftindex = true;
-    //Prop.ftfuzzy = false;
+    Prop.ftfuzzy = false;
     Prop.chop = true;
 
     test(Commands.XPATH);
@@ -66,7 +66,7 @@ public final class QueryTest {
     boolean ok = true;
     //ok &= test(cmd, new XPathSimpleTest());
     //ok &= test(cmd, new XPathMarkFTTest());
-    ok &= test(cmd, new XPathFTTest());
+    ok &= test(cmd, new FTTest());
     System.out.println(ok ? "All tests correct.\n" : "Errors found.\n");
     return ok;
   }
@@ -95,20 +95,22 @@ public final class QueryTest {
 
     for(final Object[] qu : test.queries) {
       out("- " + qu[0] + ": ");
+      boolean correct = qu.length == 3;
+      String query = qu[correct ? 2 : 1].toString();
 
-      proc = Proc.get(context, cmd, qu[1].toString());
+      proc = Proc.get(context, cmd, query);
       if(proc.execute()) {
         Result value = proc.result();
         if(cmd == Commands.XQUERY) 
           value = ((XQResult) value).xpResult(context.data());
         
-        final Result cmp = (Result) qu[2];
+        final Result cmp = correct ? (Result) qu[1] : null;
         if(value instanceof Nodes && cmp instanceof Nodes) {
           ((Nodes) cmp).data = ((Nodes) value).data;
         }
-        if(qu.length == 2 || !value.same(cmp)) {
-          err("\"" + qu[1] + "\":\n  Expected: " +
-              (qu.length == 2 ? "error" : qu[2]) +
+        if(!correct || !value.same(cmp)) {
+          err("\"" + query + "\":\n  Expected: " +
+              (correct ? qu[1] : "error") +
               "\n  Found: " + value + "\n", qu[0]);
           ok = false;
           continue;
@@ -116,7 +118,7 @@ public final class QueryTest {
         out("ok\n");
       } else {
         final String info = proc.info();
-        if(qu.length == 3) {
+        if(correct) {
           err(info + "\n", qu[0].toString());
           ok = false;
         } else {
