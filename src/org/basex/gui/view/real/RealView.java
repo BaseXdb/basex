@@ -102,10 +102,10 @@ public final class RealView extends View {
     Performance perf = new Performance();
     perf.initTimer();
 
-    /** Initialise sizes */    
+    /** Initialize sizes */    
     fontHeight = g.getFontMetrics().getHeight();
     
-    /** Initialise the pointer */
+    /** Initialize the pointer */
     pointerx = this.getWidth() / 2;
     pointery = topdistance;
     
@@ -161,16 +161,16 @@ public final class RealView extends View {
     int nodetype = Data.ELEM;
     int rootsize = data.size(root, nodetype);
     int pre;
-    /** The x-value of the left frameboarder. */
+    /** The x-value of the left frame border. */
     int border = frameleft;
-    /** To engage inaccuracies during the meassure method, this meassures 
+    /** To engage inaccuracies during the measure method, this measures 
      * the size that is left after a child got it's space. */
     int sizeleft = space;    
     
     while(iterator.more()) {
       pre = iterator.next();      
       if(data.kind(pre) == nodetype) {
-        /** Meassures the required space by the size value. */
+        /** Measures the required space by the size value. */
         double percent = (double) (data.size(pre, nodetype) + 1) /
           (double) rootsize;
         int childframewidth = (int) (sizeleft * percent);   
@@ -190,8 +190,9 @@ public final class RealView extends View {
       }
     }
   }
+  
   /**
-   * calculates the post value of a node.
+   * Calculates the post value of a node.
    * @param pre the pre value of the node
    * @param level the level of the node
    * @return calculated post value
@@ -202,7 +203,7 @@ public final class RealView extends View {
   }
 
   /**
-   * draws pre and post vlaues next to the node they belong to.
+   * Draws pre and post values next to the node they belong to.
    * @param g graphics reference
    * @param pre the pre value
    * @param post the post value
@@ -227,7 +228,7 @@ public final class RealView extends View {
   }
 
   /**
-   * draws the nodes for given pre and post value.
+   * Draws the nodes for given pre and post value.
    * @param g graphics reference
    * @param pre the pre value for the node to draw
    * @param post the par value for the node to draw
@@ -239,7 +240,7 @@ public final class RealView extends View {
     int x = pre * prePostMulti;
     int y = post * prePostMulti;
     int preTextWidth = -1;
-    int parTextWidth = -1;
+    //int parTextWidth = -1;
     
     switch(data.kind(pre)) {
       case Data.ELEM:
@@ -277,32 +278,32 @@ public final class RealView extends View {
       
       switch(data.kind(par)) {
         case Data.ELEM:
-          String s = Token.string(data.tag(pre));
-          parTextWidth = BaseXLayout.width(g, s);
+          //String s = Token.string(data.tag(pre));
+          //parTextWidth = BaseXLayout.width(g, s);
           break;
         case Data.ATTR:
-          parTextWidth = BaseXLayout.width(g, "A");
+          //parTextWidth = BaseXLayout.width(g, "A");
           break;
         case Data.COMM:
-          parTextWidth = BaseXLayout.width(g, "C");
+          //parTextWidth = BaseXLayout.width(g, "C");
           break;
         case Data.PI:
-          parTextWidth = BaseXLayout.width(g, "PI");
+          //parTextWidth = BaseXLayout.width(g, "PI");
           break;
         case Data.TEXT:
-          parTextWidth = BaseXLayout.width(g, "T");
+          //parTextWidth = BaseXLayout.width(g, "T");
       }
       
       int parX = par * prePostMulti;
       int parY = parPost * prePostMulti;
-//TODO: improve line connection between nodes.
+      //TODO: improve line connection between nodes.
       g.drawLine(parX, parY, x, y);
     }
 
   }
 
   /** 
-   * draws pre-post-tree.
+   * Draws pre-post-tree.
    * @param g graphics reference
    * @param pre the pre value of the current node
    * @param level the level of the current node
