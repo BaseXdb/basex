@@ -13,13 +13,9 @@ public interface XQTokens {
   // PARSER TOKENS ============================================================
 
   /** Parser token. */
-  String AND = "and";
-  /** Parser token. */
   String AS = "as";
   /** Parser token. */
   String ASCENDING = "ascending";
-  /** Parser token. */
-  String AT = "at";
   /** Parser token. */
   String ATTRIBUTE = "attribute";
   /** Parser token. */
@@ -29,8 +25,6 @@ public interface XQTokens {
   /** Parser token. */
   String BY = "by";
   /** Parser token. */
-  String CASE = "case";
-  /** Parser token. */
   String CAST = "cast";
   /** Parser token. */
   String CASTABLE = "castable";
@@ -38,8 +32,6 @@ public interface XQTokens {
   String CATCH = "catch";
   /** Parser token. */
   String COLLATION = "collation";
-  /** Parser token. */
-  String COMMENT = "comment";
   /** Parser token. */
   String CONSTRUCTION = "construction";
   /** Parser token. */
@@ -71,6 +63,8 @@ public interface XQTokens {
   /** Parser token. */
   String FOR = "for";
   /** Parser token. */
+  String FTOPTION = "ft-option";
+  /** Parser token. */
   String FUNCTION = "function";
   /** Parser token. */
   String GREATEST = "greatest";
@@ -81,8 +75,6 @@ public interface XQTokens {
   /** Parser token. */
   String IMPORT = "import";
   /** Parser token. */
-  String IN = "in";
-  /** Parser token. */
   String INHERIT = "inherit";
   /** Parser token. */
   String INSTANCE = "instance";
@@ -90,8 +82,6 @@ public interface XQTokens {
   String INTERSECT = "intersect";
   /** Parser token. */
   String LAX = "lax";
-  /** Parser token. */
-  String LEAST = "least";
   /** Parser token. */
   String LET = "let";
   /** Parser token. */
@@ -109,25 +99,19 @@ public interface XQTokens {
   /** Parser token. */
   String OPTION = "option";
   /** Parser token. */
-  String OR = "or";
-  /** Parser token. */
   String EMPTYORDER = "order";
-  /** Parser token. */
-  String ORDERED = "ordered";
   /** Parser token. */
   String ORDERING = "ordering";
   /** Parser token. */
-  String PI = "processing-instruction";
-  /** Parser token. */
   String PRESERVE = "preserve";
-  /** Parser token. */
-  String QUOTE = "quote";
   /** Parser token. */
   String RETURN = "return";
   /** Parser token. */
   String SATISFIES = "satisfies";
   /** Parser token. */
   String SCHEMA = "schema";
+  /** Parser token. */
+  String SCORE = "score";
   /** Parser token. */
   String SOME = "some";
   /** Parser token. */
@@ -137,11 +121,7 @@ public interface XQTokens {
   /** Parser token. */
   String STRIP = "strip";
   /** Parser token. */
-  String TEXT = "text";
-  /** Parser token. */
   String THEN = "then";
-  /** Parser token. */
-  String TO = "to";
   /** Parser token. */
   String TREAT = "treat";
   /** Parser token. */
@@ -159,100 +139,11 @@ public interface XQTokens {
   /** Parser token. */
   String VERSION = "version";
   /** Parser token. */
+  String WEIGHT = "weight";
+  /** Parser token. */
   String WHERE = "where";
   /** Parser token. */
   String XQUERY = "xquery";
-
-  /** Parser fulltext token. */
-  String FTOPTION = "ft-option";
-  /** Parser fulltext token. */
-  String FTCONTAINS = "ftcontains";
-  /** Parser fulltext token. */
-  String ALL = "all";
-  /** Parser fulltext token. */
-  String ANY = "any";
-  /** Parser fulltext token. */
-  String WORD = "word";
-  /** Parser fulltext token. */
-  String WORDS = "words";
-  /** Parser fulltext token. */
-  String PHRASE = "phrase";
-  /** Parser fulltext token. */
-  String OCCURS = "occurs";
-  /** Parser fulltext token. */
-  String TIMES = "times";
-  /** Parser fulltext token. */
-  String EXACTLY = "exactly";
-  /** Parser fulltext token. */
-  String MOST = "most";
-  /** Parser fulltext token. */
-  String FROM = "from";
-  /** Parser fulltext token. */
-  String NOT = "not";
-  /** Parser fulltext token. */
-  String FTOR = "ftor";
-  /** Parser fulltext token. */
-  String FTAND = "ftand";
-  /** Parser fulltext token. */
-  String FTNOT = "ftnot";
-  /** Parser fulltext token. */
-  String LOWERCASE = "lowercase";
-  /** Parser fulltext token. */
-  String UPPERCASE = "uppercase";
-  /** Parser fulltext token. */
-  String SENSITIVE = "sensitive";
-  /** Parser fulltext token. */
-  String INSENSITIVE = "insensitive";
-  /** Parser fulltext token. */
-  String WITH = "with";
-  /** Parser fulltext token. */
-  String CONTENT = "content";
-  /** Parser fulltext token. */
-  String DIACRITICS = "diacritics";
-  /** Parser fulltext token. */
-  String DIFFERENT = "different";
-  /** Parser fulltext token. */
-  String DISTANCE = "distance";
-  /** Parser fulltext token. */
-  String END = "end";
-  /** Parser fulltext token. */
-  String ENTIRE = "entire";
-  /** Parser fulltext token. */
-  String LANGUAGE = "language";
-  /** Parser fulltext token. */
-  String LEVELS = "levels";
-  /** Parser fulltext token. */
-  String PARAGRAPH = "paragraph";
-  /** Parser fulltext token. */
-  String PARAGRAPHS = "paragraphs";
-  /** Parser fulltext token. */
-  String RELATIONSHIP = "relationship";
-  /** Parser fulltext token. */
-  String SAME = "same";
-  /** Parser fulltext token. */
-  String SENTENCE = "sentence";
-  /** Parser fulltext token. */
-  String SENTENCES = "sentences";
-  /** Parser fulltext token. */
-  String START = "start";
-  /** Parser fulltext token. */
-  String STEMMING = "stemming";
-  /** Parser fulltext token. */
-  String STOP = "stop";
-  /** Parser fulltext token. */
-  String THESAURUS = "thesaurus";
-  /** Parser fulltext token. */
-  String WILDCARDS = "wildcards";
-  /** Parser fulltext token. */
-  String FUZZY = "fuzzy";
-  /** Parser fulltext token. */
-  String WINDOW = "window";
-  /** Parser fulltext token. */
-  String WITHOUT = "without";
-  /** Parser fulltext token. */
-  String SCORE = "score";
-  /** Parser fulltext token. */
-  String WEIGHT = "weight";
 
   /** Skip flag for the syntax highlighter. */
   String SKIP = null;

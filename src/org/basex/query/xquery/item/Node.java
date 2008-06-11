@@ -163,14 +163,38 @@ public abstract class Node extends Item {
    * Returns an ancestor axis iterator.
    * @return iterator
    */
-  public abstract NodeIter anc();
-  
+  public final NodeIter anc() {
+    return new NodeIter() {
+      /** Temporary node. */
+      private Node node = Node.this;
+
+      @Override
+      public Node next() {
+        node = node.parent();
+        return node;
+      }
+    };
+  }
+
   /**
    * Returns an ancestor-or-self axis iterator.
    * @return iterator
    */
-  public abstract NodeIter ancOrSelf();
-  
+  public final NodeIter ancOrSelf() {
+    return new NodeIter() {
+      /** Temporary node. */
+      private Node node = Node.this;
+
+      @Override
+      public Node next() {
+        if(node == null) return null;
+        final Node n = node;
+        node = n.parent();
+        return n;
+      }
+    };
+  }
+
   /**
    * Returns an attribute axis iterator.
    * @return iterator
@@ -199,37 +223,170 @@ public abstract class Node extends Item {
    * Returns a following axis iterator.
    * @return iterator
    */
-  public abstract NodeIter foll();
+  public final NodeIter foll() {
+    return new NodeIter() {
+      /** Iterator. */
+      private NodIter it;
+      /** First call. */
+      private boolean more;
+
+      @Override
+      public Node next() throws XQException {
+        if(!more) {
+          it = new NodIter();
+          Node n = Node.this;
+          Node p = n.parent();
+          while(p != null) {
+            final NodeIter i = p.child();
+            Node c;
+            while((c = i.next()) != null && !c.is(n));
+            while((c = i.next()) != null) {
+              it.add(c.finish());
+              addDesc(c.child(), it);
+            }
+            n = p;
+            p = p.parent();
+          }
+          more = true;
+        }
+        
+        return it.next();
+      }
+    };
+  }
   
   /**
    * Returns a following-sibling axis iterator.
    * @return iterator
    */
-  public abstract NodeIter follSibl();
+  public final NodeIter follSibl() {
+    return new NodeIter() {
+      /** Iterator. */
+      private NodeIter it;
+      /** First call. */
+      private boolean more;
+
+      @Override
+      public Node next() throws XQException {
+        if(!more) {
+          final Node r = parent();
+          if(r == null) {
+            it = NodeIter.NONE;
+          } else {
+            it = r.child();
+            Node n;
+            while((n = it.next()) != null && !n.is(Node.this));
+          }
+          more = true;
+        }
+        return it.next();
+      }
+    };
+  }
   
   /**
    * Returns a parent axis iterator.
    * @return iterator
    */
-  public abstract NodeIter par();
+  public NodeIter par() {
+    return new NodeIter() {
+      /** First call. */
+      private boolean more;
+
+      @Override
+      public Node next() {
+        more ^= true;
+        return more ? parent() : null;
+      }
+    };
+  }
   
   /**
    * Returns a preceding axis iterator.
    * @return iterator
    */
-  public abstract NodeIter prec();
+  public final NodeIter prec() {
+    return new NodeIter() {
+      /** Iterator. */
+      private NodIter it;
+      /** First call. */
+      private boolean more;
+
+      @Override
+      public Node next() throws XQException {
+        if(!more) {
+          it = new NodIter(); 
+          Node n = Node.this;
+          Node p = n.parent();
+          while(p != null) {
+            final NodIter tmp = new NodIter();
+            final NodeIter i = p.child();
+            Node c;
+            while((c = i.next()) != null && !c.is(n)) {
+              tmp.add(c.finish());
+              addDesc(c.child(), tmp);
+            }
+            for(int t = tmp.size - 1; t >= 0; t--) it.add(tmp.list[t]);
+            n = p;
+            p = p.parent();
+          }
+          more = true;
+        }
+        return it.next();
+      }
+    };
+  }
   
   /**
    * Returns a preceding-sibling axis iterator.
    * @return iterator
    */
-  public abstract NodeIter precSibl();
+  public final NodeIter precSibl() {
+    return new NodeIter() {
+      /** Children nodes. */
+      private NodIter ch;
+      /** Counter. */
+      private int c;
+      /** First call. */
+      private boolean more;
+
+      @Override
+      public Node next() throws XQException {
+        if(!more) {
+          final Node r = parent();
+          if(r == null) return null;
+
+          ch = new NodIter();
+          final NodeIter iter = r.child();
+          Node n;
+          while((n = iter.next()) != null) {
+            if(n.is(Node.this)) break;
+            ch.add(n.finish());
+          }
+          c = ch.size;
+          more = true;
+        }
+        return c > 0 ? ch.list[--c] : null;
+      }
+    };
+  }
   
   /**
    * Returns an self axis iterator.
    * @return iterator
    */
-  public abstract NodeIter self();
+  public final NodeIter self() {
+    return new NodeIter() {
+      /** First call. */
+      private boolean first;
+      
+      @Override
+      public Node next() {
+        first ^= true;
+        return first ? Node.this : null;
+      }
+    };
+  }
 
   /**
    * Adds children of a sub node.

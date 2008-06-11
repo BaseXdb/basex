@@ -127,15 +127,15 @@ public interface XQText {
   Object[] FUNZONE = { FORG, 8, "% and % have different timezones." };
 
   /** FORX0001: Evaluation exception. */
-  Object[] REGMOD = { FORX, 1, "Invalid regular modifier: '%'" };
+  Object[] REGMOD = { FORX, 1, "Invalid regular modifier: '%'." };
   /** FORX0002: Evaluation exception. */
-  Object[] REGINV = { FORX, 2, "Invalid regular expression: '%'" };
+  Object[] REGINV = { FORX, 2, "Invalid regular expression: '%'." };
   /** FORX0003: Evaluation exception. */
   Object[] REGROUP = { FORX, 3, "Pattern matches empty string." };
   /** FORX0004: Evaluation exception. */
   Object[] FUNREGREP = { FORX, 4, "Invalid replacement expression." };
   /** FORX0004: Evaluation exception. */
-  Object[] REGERR = { FORX, 4, "Regular expression: '%'" };
+  Object[] REGERR = { FORX, 4, "Regular expression: '%'." };
 
   /** FTST0000: Parsing exception. */
   Object[] FTTHES = { FTST, 0, "Thesaurus not supported yet." };
@@ -152,8 +152,6 @@ public interface XQText {
 
   /** XPDY0002: Evaluation Exception. */
   Object[] XPNOCTX = { XPDY, 2, "No context item set for '%'." };
-  /** XPDY0002: Evaluation exception. */
-  Object[] XPNODES = { XPDY, 2, "No context item set for %." };
   /** XPDY0050: Evaluation exception. */
   Object[] ROOTDOC = { XPDY, 50, "Context item must be a document node." };
   /** XPDY0050: Evaluation exception. */
@@ -172,7 +170,7 @@ public interface XQText {
   /** XPST0003: Parsing exception. */
   Object[] NUMBERINC = { XPST, 3, "Incomplete double value." };
   /** XPST0003: Parsing exception. */
-  Object[] QUERYEND = { XPST, 3, "Unexpected end of query: '%'" };
+  Object[] QUERYEND = { XPST, 3, "Unexpected end of query: '%'." };
   /** XPST0003: Parsing exception. */
   Object[] QUERYSTEP = { XPST, 3, "Unexpected tokens after %." };
   /** XPST0003: Parsing exception. */
@@ -186,16 +184,14 @@ public interface XQText {
   /** XPST0003: Parsing exception. */
   Object[] WRONGCHAR = { XPST, 3, "Expecting %%." };
   /** XPST0003: Parsing exception. */
-  String FOUND = ", found \"%\"";
+  String FOUND = ", found \"%\".";
   /** FTST0000: Parsing exception. */
   Object[] FTMATCH = { XPST, 3, "Missing ftcontains option after '%'." };
   
   /** XPST0003: Parsing exception. */
   Object[] WRONGEND = { XPST, 3, "Expecting %." };
   /** XPST0003: Parsing exception. */
-  Object[] ENTUNKNOWN = { XPST, 3, "Unknown entity \"%\"." };
-  /** XPST0003: Parsing exception. */
-  Object[] ENTINVALID = { XPST, 3, "Invalid entity \"%\"." };
+  Object[] ENTINVALID = { XPST, 3, "%" };
   /** XPST0003: Parsing exception. */
   Object[] INCOMPLETE = { XPST, 3, "Incomplete expression." };
   /** XPST0003: Evaluation exception. */
@@ -277,11 +273,11 @@ public interface XQText {
   /** XPST0003: Parsing exception. */
   Object[] NOTYPE = { XPST, 3, "Unknown type %." };
   /** XPST0003: Parsing exception. */
-  Object[] PIXML = { XPST, 3, "Illegal PI name: %" };
+  Object[] PIXML = { XPST, 3, "Illegal PI name: %." };
   /** XPST0003: Parsing exception. */
   Object[] EMPTYSEQOCC = { XPST, 3, "No occurrence indicator defined for %." };
   /** XPST0003: Parsing exception. */
-  Object[] TESTINVALID = { XPST, 3, "Invalid % test: \"%\"" };
+  Object[] TESTINVALID = { XPST, 3, "Invalid % test: \"%\"." };
   /** XPST0003: Parsing exception. */
   Object[] BOUNDS = { XPST, 3, "Integer value % out of bounds." };
   /** XPQST0003: Evaluation exception. */
@@ -297,7 +293,7 @@ public interface XQText {
   Object[] FTSTOP = { XPST, 3, "Stop words expected." };
 
   /** XPST0005: Parsing exception. */
-  Object[] COMPSELF = { XPST, 5, "Warning: % won't yield any results." };
+  Object[] COMPSELF = { XPST, 5, "Warning: '%' won't yield any results." };
   /** XPST0005: Parsing exception. */
   Object[] DOCATTR = { XPST, 5, "Warning: doc nodes can't have attributes." };
   /** XPST0005: Parsing exception. */
@@ -320,7 +316,7 @@ public interface XQText {
   /** XPST0080: Parsing exception. */
   Object[] CASTUNKNOWN = { XPST, 80, "Unknown cast type %." };
   /** XPST0081: Parsing exception. */
-  Object[] PREUNKNOWN = { XPST, 81, "Unknown prefix: \"%\"" };
+  Object[] PREUNKNOWN = { XPST, 81, "Unknown prefix: \"%\"." };
   /** XPST0081: Parsing exception. */
   Object[] NSMISS = { XPST, 81, "Namespace missing." };
 
@@ -352,7 +348,7 @@ public interface XQText {
   /** XPTY0004: Typing exception. */
   Object[] XPSINGLE = { XPTY, 4, "% expects single nodes as input." };
   /** XPTY0004: Typing exception. */
-  Object[] XPINVNAME = { XPTY, 4, "Invalid name: %" };
+  Object[] XPINVNAME = { XPTY, 4, "Invalid name: %." };
   /** XPTY0004: Typing exception. */
   Object[] XPNAME = { XPTY, 4, "Expecting name." };
   /** XPTY0004: Typing exception. */
@@ -360,9 +356,9 @@ public interface XQText {
   /** XPTY0004: Typing exception. */
   Object[] XPUNARY = { XPTY, 4, "Unary operator expects a numeric value." };
   /** XPTY0004: Typing exception. */
-  Object[] CPIWRONG = { XPTY, 4, "% not allowed as PI name: \"%\"" };
+  Object[] CPIWRONG = { XPTY, 4, "% not allowed as PI name: \"%\"." };
   /** XPTY0004: Typing exception. */
-  Object[] NAMEWRONG = { XPTY, 4, "Invalid value for name: \"%\"" };
+  Object[] NAMEWRONG = { XPTY, 4, "Invalid value for name: \"%\"." };
   /** XPTY0004: Typing exception. */
   Object[] NOSCORE = { XPTY, 4, "Variable % needs a scores as result." };
   /** XPTY0004: Typing exception. */

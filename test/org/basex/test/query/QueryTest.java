@@ -64,10 +64,10 @@ public final class QueryTest {
   private boolean test(final Commands cmd) {
     System.out.println("Testing " + cmd);
     boolean ok = true;
-    //ok &= test(cmd, new XPathSimpleTest());
-    //ok &= test(cmd, new XPathMarkFTTest());
+    ok &= test(cmd, new SimpleTest());
+    ok &= test(cmd, new XPathMarkFTTest());
     ok &= test(cmd, new FTTest());
-    System.out.println(ok ? "All tests correct.\n" : "Errors found.\n");
+    System.out.println(ok ? "All tests correct.\n" : "Wrong results...\n");
     return ok;
   }
 
@@ -117,7 +117,7 @@ public final class QueryTest {
         }
         out("ok\n");
       } else {
-        final String info = proc.info();
+        String info = proc.info().replaceAll("Stopped.*\\n(\\[.*?\\] )?", "");
         if(correct) {
           err(info + "\n", qu[0].toString());
           ok = false;
@@ -145,6 +145,6 @@ public final class QueryTest {
    * @param info additional info
    */
   private void err(final String string, final Object info) {
-    System.out.print((verbose ? "" : "- " + info + ", ") + string);
+    System.out.print((verbose ? "" : "- " + info + ": ") + string);
   };
 }

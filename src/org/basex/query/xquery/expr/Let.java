@@ -87,7 +87,7 @@ public final class Let extends ForLet {
   
   @Override
   public String toString() {
-    return "let " + var + " := " + expr;
+    return LET + " " + var + " := " + expr;
   }
 
   @Override

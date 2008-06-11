@@ -10,13 +10,6 @@ import org.basex.query.QueryException;
  * @author Christian Gruen
  */
 public final class XQException extends QueryException {
-  /** Position information. */
-  private String pos;
-  /** Error code. */
-  private Object code;
-  /** Error code. */
-  private Object num;
-
   /**
    * Empty constructor; used for interrupting a query.
    */
@@ -31,48 +24,7 @@ public final class XQException extends QueryException {
    */
   public XQException(final Object[] s, final Object... e) {
     super(s[2], e);
-    code = s[0];
-    num = s[1];
-  }
-
-  /**
-   * Returns the error message.
-   * @return string
-   */
-  public String msg() {
-    return super.getMessage();
-  }
-
-  /**
-   * Returns the error code.
-   * @return string
-   */
-  public String code() {
-    return num == null ? code.toString() : String.format("%s%04d", code, num);
-  }
-
-  /**
-   * Returns the error position.
-   * @return position
-   */
-  public String pos() {
-    return pos;
-  }
-
-  /**
-   * Sets the error position.
-   * @param p position
-   */
-  public void pos(final String p) {
-    pos = p;
-  }
-
-  @Override
-  public String getMessage() {
-    final StringBuilder sb = new StringBuilder();
-    if(pos != null) sb.append(pos);
-    if(Prop.xqerrcode) sb.append("[" + code() + "] ");
-    sb.append(super.getMessage());
-    return sb.toString();
+    if(!Prop.xqerrcode) return;
+    code = s[1] == null ? s[0].toString() : String.format("%s%04d", s[0], s[1]);
   }
 }

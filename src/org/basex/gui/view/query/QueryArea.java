@@ -23,7 +23,9 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXText;
 import org.basex.query.QueryException;
-import org.basex.query.xquery.XQueryProcessor;
+import org.basex.query.xquery.XQContext;
+import org.basex.query.xquery.XQParser;
+import org.basex.query.xquery.item.Uri;
 import org.basex.util.Action;
 import org.basex.util.Token;
 
@@ -62,13 +64,15 @@ public final class QueryArea extends QueryPanel {
         String xq = Token.string(area.getText());
         if(!xq.equals(last)) {
           last = xq;
+          boolean module = xq.trim().startsWith("module namespace ");
           if(xq.trim().length() == 0) xq = ".";
-          if(GUIProp.execrt) {
+          if(GUIProp.execrt && !module) {
             GUI.get().execute(Commands.XQUERY, xq);
           } else {
-            final XQueryProcessor proc = new XQueryProcessor(xq);
+            final XQContext ctx = new XQContext();
+            final XQParser parser = new XQParser(ctx);
             try {
-              proc.parse();
+              parser.parse(xq, ctx.file, module ? Uri.EMPTY : null);
               info("", true);
             } catch(final QueryException ex) {
               info(ex.getMessage(), false);

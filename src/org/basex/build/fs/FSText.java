@@ -9,9 +9,6 @@ import static org.basex.util.Token.*;
  * @author Christian Gruen
  */
 public interface FSText {
-  /** Window title during FS import. */
-  String TRAVERSE = "File hierarchy traversal ...";
-
   /** Image tag. */
   byte[] IMAGE = token("Image");
   /** Audio tag. */

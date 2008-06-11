@@ -420,65 +420,65 @@ public final class Array {
 
   /**
    * Compares 2 int[1][2] array entries and returns.
-    * * 0 for equality
-    * * -1 if intArrayEntry1 < intArrayEntry2 (same id) or
-    * * 1  if intArrayEntry1 > intArrayEntry2 (same id)
-    * * 2  real bigger (different id)
-    * * -2 real smaller (different id)
-    *
-    * @param id1 first id
-    * @param p1 first position
-    * @param id2 second id
-    * @param p2 second position
-    * @return result [0|-1|1|2|-2]
-    */
-   public static int compareIntArrayEntry(final int id1, 
-       final int p1, final int id2, final int p2) {
+   *  0 for equality
+   * -1 if intArrayEntry1 < intArrayEntry2 (same id) or
+   *  1  if intArrayEntry1 > intArrayEntry2 (same id)
+   *  2  real bigger (different id)
+   * -2 real smaller (different id)
+   *
+   * @param id1 first id
+   * @param p1 first position
+   * @param id2 second id
+   * @param p2 second position
+   * @return result [0|-1|1|2|-2]
+   */
+  public static int compareIntArrayEntry(final int id1, final int p1,
+      final int id2, final int p2) {
 
-     // equal ID, equal pos or data1 behind/before data2
-     if(id1 == id2) return p1 == p2 ? 0 : p1 > p2 ? 1 : -1;
-     // real bigger/smaller
-     return id1 > id2 ? 2 : -2;
-   }
+    // equal ID, equal pos or data1 behind/before data2
+    if(id1 == id2) return p1 == p2 ? 0 : p1 > p2 ? 1 : -1;
+    // real bigger/smaller
+    return id1 > id2 ? 2 : -2;
+  }
 
-   /**
-    * Checks whether i is contained in a. 
-    * @param i value to be found
-    * @param a array to be checked
-    * @return boolean contained
-    */
-   public static boolean contains(final int i, final int[] a) {
-     return firstIndexOf(i, a) != -1;
-   }
+  /**
+   * Checks whether i is contained in a. 
+   * @param i value to be found
+   * @param a array to be checked
+   * @return boolean contained
+   */
+  public static boolean contains(final int i, final int[] a) {
+    return firstIndexOf(i, a) != -1;
+  }
 
-   /**
-    * Checks whether p is contained in a. 
-    * returns 
-    *    -1 if i is not contained in a.
-    *    first index of p if it is contained.
-    *    
-    * @param p value to be found
-    * @param a array to be checked
-    * @return int index of p in a contained
-    */
-   public static int firstIndexOf(final int p, final int[] a) {
-     if (a == null || a.length == 0) return -1;
-     int f = 0;
-     int l = a.length - 1;
+  /**
+   * Checks whether p is contained in a. 
+   * returns 
+   *    -1 if i is not contained in a.
+   *    first index of p if it is contained.
+   *    
+   * @param p value to be found
+   * @param a array to be checked
+   * @return int index of p in a contained
+   */
+  public static int firstIndexOf(final int p, final int[] a) {
+    if(a == null || a.length == 0) return -1;
+    int f = 0;
+    int l = a.length - 1;
 
-     while(f <= l) {
-       int m = f + ((l - f) >> 1);
-       if (a[m] < p) {
-         f = m + 1;  // continue right
-       } else if (a[m] > p) {
-         l = m - 1;  // continue left
-       } else {
-         // find first index
-         while (m > -1 && a[m] == p) m--;
-         return m + 1;
-       }
-     }
-     return -1;
-   }
+    while(f <= l) {
+      int m = f + ((l - f) >> 1);
+      if(a[m] < p) {
+        f = m + 1; // continue right
+      } else if(a[m] > p) {
+        l = m - 1; // continue left
+      } else {
+        // find first index
+        while(m > -1 && a[m] == p) m--;
+        return m + 1;
+      }
+    }
+    return -1;
+  }
 }
 

@@ -21,6 +21,7 @@ import org.basex.build.fs.metadata.TIFExtractor;
 import org.basex.core.Prop;
 import org.basex.core.proc.Create;
 import org.basex.io.IO;
+import org.basex.Text;
 import org.basex.util.Array;
 import org.basex.util.Map;
 
@@ -53,7 +54,7 @@ import org.basex.util.Map;
  */
 public final class FSParser extends Parser implements FSVisitor {
   /** The current File being processed. */
-  private String guimsg = "Importing files ...";
+  private String guimsg = "";
   /** Meta data index. */
   private final Map<AbstractExtractor> meta = new Map<AbstractExtractor>();
   /** Cache for content indexing. */
@@ -170,7 +171,7 @@ public final class FSParser extends Parser implements FSVisitor {
 
   @Override
   public String head() {
-    return TRAVERSE;
+    return Text.IMPORTPROG;
   }
 
   @Override

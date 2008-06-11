@@ -711,6 +711,8 @@ public interface Text {
   /** File Dialog replace information. */
   String FILEREPLACE = lang("dq_replace");
 
+  /** Progress text for FS import. */
+  String IMPORTPROG = "Parse filesystem...";
   /** Dialog Title for Import Options. */
   String IMPORTFSTITLE = lang("dfs_title");
   /** Import Options. */

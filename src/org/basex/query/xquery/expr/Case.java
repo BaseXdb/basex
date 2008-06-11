@@ -1,5 +1,7 @@
 package org.basex.query.xquery.expr;
 
+import static org.basex.query.QueryTokens.*;
+import static org.basex.query.xquery.XQTokens.*;
 import org.basex.BaseX;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
@@ -64,6 +66,6 @@ public final class Case extends Single {
 
   @Override
   public String toString() {
-    return "case " + var.type + " return " + expr;
+    return CASE + " " + var.type + " " + RETURN + " " + expr;
   }
 }

@@ -2,16 +2,12 @@ package org.basex.query.xquery.item;
 
 import static org.basex.util.Token.*;
 import static org.basex.query.xquery.XQTokens.*;
-
 import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
-import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
-import org.basex.query.xquery.iter.NodIter;
 import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.iter.NodeMore;
-import org.basex.query.xquery.iter.NodeNext;
 import org.basex.query.xquery.util.Namespaces;
 import org.basex.util.TokenList;
 
@@ -304,36 +300,6 @@ public final class DNode extends Node {
   }
 
   @Override
-  public NodeIter anc() {
-    return new NodeIter() {
-      /** Temporary node. */
-      private Node node = DNode.this;
-
-      @Override
-      public Node next() {
-        node = node.parent();
-        return node;
-      }
-    };
-  }
-
-  @Override
-  public NodeIter ancOrSelf() {
-    return new NodeIter() {
-      /** Temporary node. */
-      private Node node = DNode.this;
-
-      @Override
-      public Node next() {
-        if(node == null) return null;
-        final Node n = node;
-        node = n.parent();
-        return n;
-      }
-    };
-  }
-
-  @Override
   public NodeIter attr() {
     return new NodeIter() {
       /** Temporary node. */
@@ -424,163 +390,6 @@ public final class DNode extends Node {
         node.set(p, k);
         p += data.attSize(p, k);
         return node;
-      }
-    };
-  }
-
-  @Override
-  public NodeIter foll() {
-    return new NodeIter() {
-      /** Iterator. */
-      private NodeNext it;
-      /** First call. */
-      private boolean more;
-
-      @Override
-      public Node next() throws XQException {
-        if(!more) {
-          final NodIter ch = new NodIter();
-          final Node nod = DNode.this;
-          Node p = nod.parent();
-          while(p != null) {
-            final NodeIter i = p.child();
-            Node nn;
-            while((nn = i.next()) != null) {
-              if(nn.is(nod)) break;
-            }
-            while((nn = i.next()) != null) {
-              ch.add(nn.finish());
-              addDesc(nn.child(), ch);
-            }
-            p = p.parent();
-          }
-          it = new NodeNext(ch);
-          more = true;
-        }
-        return it.next();
-      }
-    };
-  }
-
-  @Override
-  public NodeIter follSibl() {
-    return new NodeIter() {
-      /** Iterator. */
-      private NodeIter it;
-      /** First call. */
-      private boolean more;
-
-      @Override
-      public Node next() throws XQException {
-        if(!more) {
-          final Node r = parent();
-          if(r == null) {
-            it = NodeIter.NONE;
-          } else {
-            it = r.child();
-            Node n;
-            while((n = it.next()) != null && !n.is(DNode.this));
-          }
-          more = true;
-        }
-        return it.next();
-      }
-    };
-  }
-
-  @Override
-  public NodeIter par() {
-    return new NodeIter() {
-      /** First call. */
-      private boolean more;
-
-      @Override
-      public Node next() {
-        more ^= true;
-        return more ? parent() : null;
-      }
-    };
-  }
-
-  @Override
-  public NodeIter prec() {
-    return new NodeIter() {
-      /** Iterator. */
-      private NodeIter it;
-      /** First call. */
-      private boolean more;
-
-      @Override
-      public Node next() throws XQException {
-        if(!more) {
-          final NodIter ch = new NodIter();
-          Node nod = DNode.this;
-          Node r = nod.parent();
-          while(r != null) {
-            NodIter tmp = new NodIter();
-            final NodeIter itr = r.child();
-            Node n;
-            while((n = itr.next()) != null) {
-              if(!n.is(nod)) tmp.add(n.finish());
-              else break;
-            }
-            int i = tmp.size;
-            while(--i >= 0) {
-              ch.add(tmp.list[i]);
-              addDesc(tmp.list[i].child(), ch);
-            }
-            nod = r;
-            r = r.parent();
-          }
-          it = new NodeNext(ch);
-          more = true;
-        }
-        return it.next();
-      }
-    };
-  }
-
-  @Override
-  public NodeIter precSibl() {
-    return new NodeIter() {
-      /** Children nodes. */
-      private NodIter ch;
-      /** Counter. */
-      private int c;
-      /** First call. */
-      private boolean more;
-
-      @Override
-      public Node next() throws XQException {
-        if(!more) {
-          final Node r = parent();
-          if(r == null) return null;
-
-          ch = new NodIter();
-          final NodeIter iter = r.child();
-          Node n;
-          while((n = iter.next()) != null) {
-            if(!n.is(DNode.this)) ch.add(n.finish());
-            else break;
-          }
-          c = ch.size;
-          more = true;
-        }
-        return c == 0 ? null : ch.list[--c];
-      }
-    };
-  }
-
-  @Override
-  public NodeIter self() {
-    return new NodeIter() {
-      /** First call. */
-      private boolean more;
-
-      @Override
-      public Node next() {
-        more ^= true;
-        return more ? DNode.this : null;
       }
     };
   }

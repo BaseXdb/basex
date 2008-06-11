@@ -1,13 +1,12 @@
 package org.basex.query.xquery;
 
+import static org.basex.query.QueryTokens.*;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
-
-import org.basex.BaseX;
 import org.basex.io.IO;
+import org.basex.query.QueryParser;
 import org.basex.query.xquery.expr.And;
 import org.basex.query.xquery.expr.CAttr;
 import org.basex.query.xquery.expr.CComm;
@@ -88,7 +87,7 @@ import org.basex.util.XMLToken;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class XQParser {
+public final class XQParser extends QueryParser {
   /** Resulting XQuery expression. */
   private final XQContext ctx;
   /** Temporary token builder. */
@@ -99,15 +98,6 @@ public final class XQParser {
   /** Module name. */
   private QNm module;
 
-  /** Optional name of input file. */
-  private IO file;
-
-  /** Current xpath query. */
-  private String qu;
-  /** Current position in xpath query. */
-  private int qp;
-  /** Current position in xpath query. */
-  private int ql;
   /** Alternative error output. */
   private Object[] alter;
   /** Alternative position. */
@@ -134,10 +124,10 @@ public final class XQParser {
 
   /***
    * Constructor.
-   * @param expr xquery expression
+   * @param c query context
    */
-  public XQParser(final XQContext expr) {
-    ctx = expr;
+  public XQParser(final XQContext c) {
+    ctx = c;
   }
 
   /**
@@ -157,13 +147,12 @@ public final class XQParser {
    * @param u module uri
    * @throws XQException xquery exception
    */
-  private void parse(final String q, final IO f, final Uri u)
+  public void parse(final String q, final IO f, final Uri u)
       throws XQException {
 
     try {
       file = f;
-      qu = q;
-      ql = qu.length();
+      init(q);
       if(ql == 0) Err.or(QUERYEMPTY);
       for(qp = ql; qp > 0; qp--) {
         if(!XMLToken.valid(qu.charAt(qp - 1)))
@@ -190,15 +179,7 @@ public final class XQParser {
       }
       ctx.fun.check();
     } catch(final XQException ex) {
-      if(ex.pos() != null) throw ex;
-
-      int l = 1; int c = 1;
-      for(int i = 0; i + 1 < qp && i < ql; i++) {
-        final char ch = qu.charAt(i);
-        if(ch == 0x0A) { l++; c = 1; } else if(ch != 0x0D) { c++; }
-      }
-      ex.pos(file == null ? BaseX.info(POSINFO, l, c) :
-        BaseX.info(POSFILEINFO, l, c, file));
+      ex.pos(this);
       throw ex;
     }
   }
@@ -209,13 +190,13 @@ public final class XQParser {
    */
   private void versionDecl() throws XQException {
     final int p = qp;
-    if(!consumeWS(XQUERY) || !consume(VERSION)) {
+    if(!consumeWS(XQUERY) || !consumeWS2(VERSION)) {
       qp = p;
       return;
     }
     final String ver = string(stringLiteral());
 
-    final byte[] enc = consume(ENCODING) ? lc(stringLiteral()) : null;
+    final byte[] enc = consumeWS2(ENCODING) ? lc(stringLiteral()) : null;
     if(enc != null) {
       boolean v = true;
       for(final byte e : enc)
@@ -223,7 +204,7 @@ public final class XQParser {
       if(!v) Err.or(XQUERYENC2, enc);
     }
     ctx.encoding = enc;
-    consumeWS();
+    skipWS();
     check(';');
     if(!ver.equals(ONEZERO)) Err.or(XQUERYVER, ver);
   }
@@ -256,9 +237,11 @@ public final class XQParser {
     check(IS);
     module.uri = Uri.uri(stringLiteral());
     if(module.uri == Uri.EMPTY) Err.or(NSMODURI);
-    if(!u.eq(module.uri)) Err.or(WRONGMODULE, module.uri, file);
+    // skip uri check for empty input uri...
+    if(u != Uri.EMPTY && !u.eq(module.uri))
+      Err.or(WRONGMODULE, module.uri, file);
     ctx.ns.index(module);
-    consumeWS();
+    skipWS();
     check(';');
     prolog();
   }
@@ -314,7 +297,7 @@ public final class XQParser {
       } else {
         break;
       }
-      consumeWS();
+      skipWS();
       check(';');
     }
   }
@@ -336,7 +319,7 @@ public final class XQParser {
    */
   private void boundarySpaceDecl() throws XQException {
     if(declSpaces) Err.or(DUPLBOUND);
-    final boolean spaces = consume(PRESERVE);
+    final boolean spaces = consumeWS2(PRESERVE);
     if(!spaces) check(STRIP);
     ctx.spaces = Bln.get(spaces);
     declSpaces = true;
@@ -384,7 +367,7 @@ public final class XQParser {
    */
   private void orderingModeDecl() throws XQException {
     if(declOrder) Err.or(DUPLORD);
-    final boolean ordered = consume(ORDERED);
+    final boolean ordered = consumeWS2(ORDERED);
     if(!ordered) check(UNORDERED);
     ctx.ordered = Bln.get(ordered);
     declOrder = true;
@@ -396,10 +379,10 @@ public final class XQParser {
    * @throws XQException xquery exception
    */
   private boolean emptyOrderDecl() throws XQException {
-    if(!consume(EMPTYORDER)) return false;
+    if(!consumeWS2(EMPTYORDER)) return false;
     check(EMPTYORD);
     if(declGreat) Err.or(DUPLORDEMP);
-    final boolean order = consume(GREATEST);
+    final boolean order = consumeWS2(GREATEST);
     if(!order) check(LEAST);
     ctx.orderGreatest = Bln.get(order);
     declGreat = true;
@@ -430,7 +413,7 @@ public final class XQParser {
    * @throws XQException xquery exception
    */
   private boolean defaultCollationDecl() throws XQException {
-    if(!consume(COLLATION)) return false;
+    if(!consumeWS2(COLLATION)) return false;
     ctx.collation = Uri.uri(stringLiteral());
     if(declColl) Err.or(DUPLCOLL);
     declColl = true;
@@ -545,7 +528,7 @@ public final class XQParser {
     final SeqType type = consumeWS(AS) ? sequenceType() : null;
     final Var var = new Var(name, type);
 
-    if(consume(EXTERNAL)) {
+    if(consumeWS2(EXTERNAL)) {
       final Var ext = ctx.vars.get(var);
       if(ext != null && type != null) {
         ext.type = type;
@@ -564,7 +547,7 @@ public final class XQParser {
    */
   private void constructionDecl() throws XQException {
     if(declConstr) Err.or(DUPLCONS);
-    final boolean cons = consume(PRESERVE);
+    final boolean cons = consumeWS2(PRESERVE);
     if(!cons) check(STRIP);
     ctx.construct = Bln.get(cons);
     declConstr = true;
@@ -583,7 +566,7 @@ public final class XQParser {
     if(module != null && !name.uri.eq(module.uri)) Err.or(MODNS, name);
 
     check(PAR1);
-    consumeWS();
+    skipWS();
     Var[] args = new Var[0];
     final int s = ctx.vars.size();
     while(curr() == '$') {
@@ -596,7 +579,7 @@ public final class XQParser {
 
       args = Array.add(args, var);
       if(!consume(',')) break;
-      consumeWS();
+      skipWS();
     }
     check(PAR2);
 
@@ -633,9 +616,9 @@ public final class XQParser {
       if(alter != null) error(); else Err.or(NOEXPR);
     }
 
-    if(!consume(COMMA)) return expr;
+    if(!consumeWS2(COMMA)) return expr;
     Expr[] list = { expr };
-    do list = add(list, exprSingle()); while(consume(COMMA));
+    do list = add(list, exprSingle()); while(consumeWS2(COMMA));
     return new List(list);
   }
 
@@ -645,7 +628,7 @@ public final class XQParser {
    * @throws XQException xquery exception
    */
   private Expr exprSingle() throws XQException {
-    if(!consume(TRY)) return exprSingle2();
+    if(!consumeWS2(TRY)) return exprSingle2();
 
     final Expr tr = enclosedExpr(NOENCLEXPR);
     check(CATCH);
@@ -656,7 +639,7 @@ public final class XQParser {
     if(curr() == '$') {
       var1 = new Var(varName());
       ctx.vars.add(var1);
-      if(consume(COMMA)) {
+      if(consumeWS2(COMMA)) {
         var2 = new Var(varName());
         if(var1.name.eq(var2.name)) Err.or(VARDEFINED, var2);
         ctx.vars.add(var2);
@@ -711,7 +694,7 @@ public final class XQParser {
     if(stable || consumeWS(EMPTYORDER)) {
       check(BY);
       ap = qp;
-      do order = orderSpec(order); while(consume(COMMA));
+      do order = orderSpec(order); while(consumeWS2(COMMA));
       if(order != null) order = Array.add(order, new Ord());
       alter = ORDERBY;
     }
@@ -774,7 +757,7 @@ public final class XQParser {
           new Let(e, var, score);
         score = false;
         comma = true;
-      } while(consume(COMMA));
+      } while(consumeWS2(COMMA));
       comma = false;
     } while(true);
   }
@@ -821,7 +804,7 @@ public final class XQParser {
       final Expr expr = check(exprSingle(), NOSOME);
       ctx.vars.add(var);
       fl = Array.add(fl, new For(expr, var, null, null));
-    } while(consume(COMMA));
+    } while(consumeWS2(COMMA));
 
     check(SATISFIES);
     final Expr expr = check(exprSingle(), NOSOME);
@@ -844,7 +827,7 @@ public final class XQParser {
     Case[] list = new Case[0];
     while(consumeWS(CASE)) {
       final int s = ctx.vars.size();
-      consumeWS();
+      skipWS();
       QNm name = null;
       if(curr() == '$') {
         name = varName();
@@ -860,7 +843,7 @@ public final class XQParser {
     if(list.length == 0) Err.or(NOTYPESWITCH);
 
     check(DEFAULT);
-    consumeWS();
+    skipWS();
     final int s = ctx.vars.size();
     final QNm name = curr() == '$' ? varName() : null;
     final Var var = new Var(name, null);
@@ -930,7 +913,7 @@ public final class XQParser {
         return new CmpV(expr, check(ftContainsExpr(), CMPEXPR), c);
     for(final CmpN.COMP c : CmpN.COMP.values()) if(consumeWS(c.name))
         return new CmpN(expr, check(ftContainsExpr(), CMPEXPR), c);
-    for(final CmpG.COMP c : CmpG.COMP.values()) if(consume(c.name))
+    for(final CmpG.COMP c : CmpG.COMP.values()) if(consumeWS2(c.name))
         return new CmpG(expr, check(ftContainsExpr(), CMPEXPR), c);
 
     return expr;
@@ -948,7 +931,7 @@ public final class XQParser {
     // [CG] XQuery/FTIgnoreOption
     final Expr select = ftSelection();
     //Expr ignore = null;
-    if(consume(WITHOUT) && consume(CONTENT)) {
+    if(consumeWS2(WITHOUT) && consumeWS2(CONTENT)) {
       //ignore = unionExpr();
       unionExpr();
       Err.or(FTIGNORE);
@@ -1010,11 +993,11 @@ public final class XQParser {
    */
   private Expr unionExpr() throws XQException {
     final Expr expr = intersectExpr();
-    if(!consumeWS(UNION) && !consume(PIPE)) return expr;
+    if(!consumeWS(UNION) && !consumeWS2(PIPE)) return expr;
 
     Expr[] list = { expr };
     do list = add(list, intersectExpr());
-    while(consumeWS(UNION) || consume(PIPE));
+    while(consumeWS(UNION) || consumeWS2(PIPE));
     return new Union(list);
   }
 
@@ -1096,7 +1079,7 @@ public final class XQParser {
     boolean minus = false;
     boolean found = false;
     do {
-      consumeWS();
+      skipWS();
       if(consume('-')) {
         minus ^= true;
         found = true;
@@ -1127,7 +1110,7 @@ public final class XQParser {
    * @throws XQException xquery exception
    */
   private void validateExpr() throws XQException {
-    if(!consume(LAX)) consume(STRICT);
+    if(!consumeWS2(LAX)) consumeWS2(STRICT);
     check(BRACE1);
     check(exprSingle(), NOVALIDATE);
     check(BRACE2);
@@ -1140,7 +1123,7 @@ public final class XQParser {
    * @throws XQException xquery exception
    */
   private Expr extensionExpr() throws XQException {
-    if(!consume(PRAGMA)) return null;
+    if(!consumeWS2(PRAGMA)) return null;
 
     do {
       // [CG] XQuery/Pragmas
@@ -1215,7 +1198,7 @@ public final class XQParser {
     Axis ax = null;
     Test test = null;
 
-    if(consume(DOT2)) {
+    if(consumeWS2(DOT2)) {
       ax = Axis.PARENT;
       test = Test.NODE;
     } else if(consume('@')) {
@@ -1224,7 +1207,7 @@ public final class XQParser {
     } else {
       for(final Axis a : Axis.values()) {
         if(consumeWS(a.name, COL2, NOLOCSTEP)) {
-          consume(COL2);
+          consumeWS2(COL2);
           alter = NOLOCSTEP;
           ap = qp;
           ax = a;
@@ -1241,7 +1224,7 @@ public final class XQParser {
     if(test == null) return null;
 
     Expr[] pred = {};
-    while(consume(BR1)) {
+    while(consumeWS2(BR1)) {
       pred = add(pred, expr());
       check(BR2);
     }
@@ -1260,7 +1243,7 @@ public final class XQParser {
     final char ch = curr();
     if(XMLToken.isXMLLetter(ch)) {
       final byte[] name = qName(null);
-      consumeWS();
+      skipWS();
       if(consume('(')) {
         tok.reset();
         while(!consume(')')) {
@@ -1269,16 +1252,16 @@ public final class XQParser {
         }
         final Type type = node(new QNm(name));
         if(type == Type.NOD) return Test.NODE;
-        if(type != null) return new Test(type, tok.finish(), ctx);
+        if(type != null) return new Test(type, trim(tok.finish()), ctx);
       } else {
         // nametest abcde:abcde
         if(contains(name, ':')) {
-          consumeWS();
+          skipWS();
           return new Test(name, false, ctx);
         }
         // nametest abcde
         if(!consume(':')) {
-          consumeWS();
+          skipWS();
           return new Test(name, false, ctx);
         }
         // nametest abcde:*
@@ -1305,11 +1288,11 @@ public final class XQParser {
    */
   private Expr filterExpr() throws XQException {
     final Expr expr = primary();
-    if(!consume(BR1)) return expr;
+    if(!consumeWS2(BR1)) return expr;
 
     if(expr == null) Err.or(PREDMISSING);
     Expr[] pred = {};
-    do { pred = add(pred, expr()); check(BR2); } while(consume(BR1));
+    do { pred = add(pred, expr()); check(BR2); } while(consumeWS2(BR1));
     return new Pred(expr, pred);
   }
 
@@ -1322,7 +1305,7 @@ public final class XQParser {
    * @throws XQException xquery exception
    */
   private Expr primary() throws XQException {
-    consumeWS();
+    skipWS();
     // numbers
     final char c = curr();
     if(digit(c)) return numericLiteral();
@@ -1421,7 +1404,7 @@ public final class XQParser {
   private Expr functionCall() throws XQException {
     final int p = qp;
     final QNm name = new QNm(qName(null));
-    if(!consume(PAR1) || node(name) != null) {
+    if(!consumeWS2(PAR1) || node(name) != null) {
       qp = p;
       return null;
     }
@@ -1429,7 +1412,7 @@ public final class XQParser {
     // name and opening bracket found
     Expr[] exprs = {};
     while(curr() != 0) {
-      if(consume(PAR2)) {
+      if(consumeWS2(PAR2)) {
         alter = new Object[] { name };
         ap = qp;
         ctx.ns.uri(name);
@@ -1469,7 +1452,7 @@ public final class XQParser {
    * @throws XQException xquery exception
    */
   private Expr dirElemConstructor() throws XQException {
-    if(consumeWS()) Err.or(NOTAGNAME);
+    if(skipWS()) Err.or(NOTAGNAME);
     final QNm open = new QNm(qName(NOTAGNAME));
     consumeWSS();
 
@@ -1520,7 +1503,7 @@ public final class XQParser {
             qp++;
             tb.add(' ');
           } else {
-            ent(tb);
+            entity(tb);
           }
         }
         if(!consume(delim)) break;
@@ -1566,7 +1549,7 @@ public final class XQParser {
       }
       qp += 2;
 
-      if(consumeWS()) Err.or(NOTAGNAME);
+      if(skipWS()) Err.or(NOTAGNAME);
       final byte[] close = qName(NOTAGNAME);
       consumeWSS();
       check('>');
@@ -1601,7 +1584,7 @@ public final class XQParser {
     do {
       final char c = curr();
       if(c == '<') {
-        if(consume(CDATA)) {
+        if(consumeWS2(CDATA)) {
           tb.add(cDataSection());
           tb.ent = true;
         } else {
@@ -1624,7 +1607,7 @@ public final class XQParser {
       } else if(c == 0) {
         Err.or(NOCLOSING, tag);
       } else {
-        ent(tb);
+        entity(tb);
       }
     } while(true);
   }
@@ -1671,7 +1654,7 @@ public final class XQParser {
     final Expr pi = Str.get(str);
     if(str.length == 0 || Token.eq(Token.lc(str), XML)) Err.or(PIXML, pi);
 
-    final boolean space = consumeWS();
+    final boolean space = skipWS();
     final TokenBuilder tb = new TokenBuilder();
     do {
       while(not('?')) {
@@ -1724,9 +1707,9 @@ public final class XQParser {
    * @throws XQException xquery exception
    */
   private Expr compDocConstructor() throws XQException {
-    if(!consume(BRACE1)) return null;
+    if(!consumeWS2(BRACE1)) return null;
     final Expr expr = check(expr(), NODOCCONS);
-    consume(BRACE2);
+    consumeWS2(BRACE2);
     return new CDoc(expr);
   }
 
@@ -1737,13 +1720,13 @@ public final class XQParser {
    * @throws XQException xquery exception
    */
   private Expr compElemConstructor() throws XQException {
-    consumeWS();
+    skipWS();
 
     Expr name;
     if(XMLToken.isXMLLetter(curr())) {
       name = Str.get(qName(null));
     } else {
-      if(!consume(BRACE1)) return null;
+      if(!consumeWS2(BRACE1)) return null;
       name = check(expr(), NOTAGNAME);
       check(BRACE2);
     }
@@ -1761,13 +1744,13 @@ public final class XQParser {
    * @throws XQException xquery exception
    */
   private Expr compAttrConstructor() throws XQException {
-    consumeWS();
+    skipWS();
 
     Expr nm;
     if(XMLToken.isXMLLetter(curr())) {
       nm = Str.get(qName(null));
     } else {
-      if(!consume(BRACE1)) return null;
+      if(!consumeWS2(BRACE1)) return null;
       nm = expr();
       check(BRACE2);
     }
@@ -1784,7 +1767,7 @@ public final class XQParser {
    * @throws XQException xquery exception
    */
   private Expr compTextConstructor() throws XQException {
-    if(!consume(BRACE1)) return null;
+    if(!consumeWS2(BRACE1)) return null;
     final Expr expr = check(expr(), NOTXTCONS);
     check(BRACE2);
     return new CText(expr);
@@ -1796,9 +1779,9 @@ public final class XQParser {
    * @throws XQException xquery exception
    */
   private Expr compCommentConstructor() throws XQException {
-    if(!consume(BRACE1)) return null;
+    if(!consumeWS2(BRACE1)) return null;
     final Expr expr = check(expr(), NOCOMCONS);
-    consume(BRACE2);
+    consumeWS2(BRACE2);
     return new CComm(expr);
   }
 
@@ -1808,12 +1791,12 @@ public final class XQParser {
    * @throws XQException xquery exception
    */
   private Expr compPIConstructor() throws XQException {
-    consumeWS();
+    skipWS();
     Expr name;
     if(XMLToken.isXMLLetter(curr())) {
       name = Str.get(ncName(null));
     } else {
-      if(!consume(BRACE1)) return null;
+      if(!consumeWS2(BRACE1)) return null;
       name = check(expr(), PIWRONG);
       check(BRACE2);
     }
@@ -1833,7 +1816,7 @@ public final class XQParser {
   private SeqType simpleType() throws XQException {
     final QNm type = new QNm(qName(TYPEINVALID));
     ctx.ns.uri(type);
-    consumeWS();
+    skipWS();
     final SeqType seq = new SeqType(type, consume('?') ? 1 : 0, null);
 
     if(seq.type == null) {
@@ -1856,15 +1839,15 @@ public final class XQParser {
   private SeqType sequenceType() throws XQException {
     final QNm type = new QNm(qName(TYPEINVALID));
     tok.reset();
-    final boolean par = consume(PAR1);
+    final boolean par = consumeWS2(PAR1);
     if(par) {
-      while(!consume(PAR2)) {
+      while(!consumeWS2(PAR2)) {
         if(curr() == 0) Err.or(FUNCMISS, type.str());
-        consumeWS();
+        skipWS();
         tok.add(consume());
       }
     }
-    consumeWS();
+    skipWS();
     final int mode = consume('?') ? 1 : consume('+') ? 2 :
       consume('*') ? 3 : 0;
     if(type.ns()) type.uri = ctx.ns.uri(type.pre());
@@ -1912,15 +1895,15 @@ public final class XQParser {
    * @throws XQException xquery exception
    */
   private byte[] stringLiteral() throws XQException {
-    consumeWS();
+    skipWS();
     final char delim = curr();
-    if(delim != '\'' && delim != '"') Err.or(WRONGCHAR, QUOTE, found());
+    if(!quote(delim)) Err.or(WRONGCHAR, QUOTE, found());
     consume();
     tok.reset();
     while(true) {
       while(!consume(delim)) {
         if(curr() == 0) Err.or(QUOTECLOSE, delim);
-        ent(tok);
+        entity(tok);
       }
       if(!consume(delim)) break;
       tok.add(delim);
@@ -2128,7 +2111,7 @@ public final class XQParser {
    * @throws XQException xquery exception
    */
   private Expr ftWordsValue() throws XQException {
-    consumeWS();
+    skipWS();
     return curr() == '\'' || curr() == '"' ? Str.get(stringLiteral()) :
       enclosedExpr(NOENCLEXPR);
   }
@@ -2166,18 +2149,18 @@ public final class XQParser {
       final boolean with = consumeWS(WITH);
       if(!with && !consumeWS(WITHOUT)) return false;
 
-      if(consume(STEMMING)) {
+      if(consumeWS2(STEMMING)) {
         opt.st = Bln.get(with);
-      } else if(consume(THESAURUS)) {
+      } else if(consumeWS2(THESAURUS)) {
         opt.ts = Bln.get(with);
         if(with) {
-          final boolean par = consume(PAR1);
-          if(consume(AT)) {
+          final boolean par = consumeWS2(PAR1);
+          if(consumeWS2(AT)) {
             ftThesaurusID();
           } else {
             check(DEFAULT);
           }
-          while(par && consume(COMMA)) ftThesaurusID();
+          while(par && consumeWS2(COMMA)) ftThesaurusID();
           if(par) check(PAR2);
           Err.or(FTTHES);
         }
@@ -2188,14 +2171,14 @@ public final class XQParser {
         boolean union = false;
         boolean except = false;
         while(with) {
-          if(consume(PAR1)) {
+          if(consumeWS2(PAR1)) {
             do {
               final byte[] sl = stringLiteral();
               if(except) opt.sw.delete(sl);
               else if(!union || opt.sw.id(sl) == 0) opt.sw.add(sl);
-            } while(consume(COMMA));
+            } while(consumeWS2(COMMA));
             check(PAR2);
-          } else if(consume(AT)) {
+          } else if(consumeWS2(AT)) {
             IO fl = new IO(string(stringLiteral()));
             if(!fl.exists() && ctx.file != null) {
               fl = file.merge(fl);
@@ -2212,17 +2195,17 @@ public final class XQParser {
           } else if(!union && !except) {
             Err.or(FTSTOP);
           }
-          union = consume(UNION);
-          except = !union && consume(EXCEPT);
+          union = consumeWS2(UNION);
+          except = !union && consumeWS2(EXCEPT);
           if(!union && !except) break;
         }
       } else if(consumeWS(DEFAULT)) {
         check(STOP);
         check(WORDS);
-      } else if(consume(WILDCARDS)) {
+      } else if(consumeWS2(WILDCARDS)) {
         if(opt.fz != null) Err.or(FTFZWC);
         opt.wc = Bln.get(with);
-      } else if(consume(FUZZY)) {
+      } else if(consumeWS2(FUZZY)) {
         if(opt.wc != null) Err.or(FTFZWC);
         opt.fz = Bln.get(with);
       } else {
@@ -2239,7 +2222,7 @@ public final class XQParser {
    */
   private void ftThesaurusID() throws XQException {
     stringLiteral();
-    if(consume(RELATIONSHIP)) stringLiteral();
+    if(consumeWS2(RELATIONSHIP)) stringLiteral();
     if(ftRange() != null) check(LEVELS);
   }
 
@@ -2250,7 +2233,7 @@ public final class XQParser {
    * @throws XQException xquery exception
    */
   private byte[] ncName(final Object[] err) throws XQException {
-    consumeWS();
+    skipWS();
     tok.reset();
     if(ncName(true)) return tok.finish();
     if(err != null) Err.or(err);
@@ -2264,7 +2247,7 @@ public final class XQParser {
    * @throws XQException xquery exception
    */
   private byte[] qName(final Object[] err) throws XQException {
-    consumeWS();
+    skipWS();
     tok.reset();
     final boolean ok = ncName(true);
     if(ok && consume(':')) ncName(false);
@@ -2298,58 +2281,9 @@ public final class XQParser {
    * @param tb token builder
    * @throws XQException xquery exception
    */
-  void ent(final TokenBuilder tb) throws XQException {
-    final int p = qp;
-    if(consume('&')) {
-      if(consume('#')) {
-        final int b = consume('x') ? 16 : 10;
-        int n = 0;
-        do {
-          final char c = curr();
-          final boolean m = digit(c);
-          final boolean h = b == 16 && (c >= 'a' && c <= 'f' ||
-              c >= 'A' && c <= 'F');
-          if(!m && !h) Err.or(ENTINVALID, invalidEnt(p));
-          n = n * b + (consume() & 15);
-          if(n < 0) Err.or(ENTINVALID, invalidEnt(p));
-          if(!m) n += 9;
-        } while(!consume(';'));
-        if(!XMLToken.valid(n)) Err.or(ENTINVALID, invalidEnt(p));
-        tb.addUTF(n);
-      } else {
-        if(consumeWS()) Err.or(ENTINVALID, invalidEnt(p));
-
-        if(consume("lt")) {
-          tb.add('<');
-        } else if(consume("gt")) {
-          tb.add('>');
-        } else if(consume("amp")) {
-          tb.add('&');
-        } else if(consume("quot")) {
-          tb.add('"');
-        } else if(consume("apos")) {
-          tb.add('\'');
-        } else {
-          Err.or(ENTUNKNOWN, invalidEnt(p));
-        }
-        check(';');
-      }
-      tb.ent = true;
-    } else {
-      final char c = consume();
-      if(c != 0x0d) tb.add(c);
-    }
-  }
-
-  /**
-   * Returns the current entity snippet.
-   * @param p start position
-   * @return entity
-   */
-  private String invalidEnt(final int p) {
-    final String sub = qu.substring(p, Math.min(p + 20, ql));
-    final int sc = sub.indexOf(';');
-    return sc != -1 ? sub.substring(0, sc + 1) : sub;
+  void entity(final TokenBuilder tb) throws XQException {
+    final String ent = ent(tb);
+    if(ent != null)  Err.or(ENTINVALID, ent);
   }
 
   /**
@@ -2381,39 +2315,7 @@ public final class XQParser {
    * @throws XQException xquery exception
    */
   private void check(final String s) throws XQException {
-    if(!consume(s)) Err.or(WRONGCHAR, "\"" + s + "\"", found());
-  }
-
-  /**
-   * Returns a "found" string, containing the current character.
-   * @return completion
-   */
-  private byte[] found() {
-    return curr() == 0 ? EMPTY : BaseX.inf(FOUND, curr());
-  }
-
-  /**
-   * Returns the current character.
-   * @return current character
-   */
-  private char curr() {
-    return qp >= ql ? 0 : qu.charAt(qp);
-  }
-
-  /**
-   * Returns the next character.
-   * @return result of check
-   */
-  private int next() {
-    return qp + 1 >= ql ? 0 : qu.charAt(qp + 1);
-  }
-
-  /**
-   * Consumes the next character.
-   * @return next character
-   */
-  private char consume() {
-    return qp >= ql ? 0 : qu.charAt(qp++);
+    if(!consumeWS2(s)) Err.or(WRONGCHAR, "\"" + s + "\"", found());
   }
 
   /**
@@ -2449,10 +2351,10 @@ public final class XQParser {
    */
   private boolean consumeWS(final String t) throws XQException {
     final int p = qp;
-    final boolean ok = consume(t);
+    final boolean ok = consumeWS2(t);
     final int q = qp;
     final int c = curr();
-    final boolean ok2 = consumeWS() || (!XMLToken.isFirstLetter(t.charAt(0)) ||
+    final boolean ok2 = skipWS() || (!XMLToken.isFirstLetter(t.charAt(0)) ||
         !XMLToken.isXMLLetterOrDigit(c) && c != '-');
     qp = ok2 ? q : p;
     return ok && ok2;
@@ -2473,20 +2375,9 @@ public final class XQParser {
     alter = expr;
     ap = qp;
     final int p2 = qp;
-    final boolean ok = consume(s2);
+    final boolean ok = consumeWS2(s2);
     qp = ok ? p2 : p;
     return ok;
-  }
-
-  /**
-   * Peeks forward and consumes the character if it equals the specified one.
-   * @param ch character to consume
-   * @return true if character was found
-   */
-  private boolean consume(final int ch) {
-    final boolean found = curr() == ch;
-    if(found) qp++;
-    return found;
   }
 
   /**
@@ -2495,16 +2386,9 @@ public final class XQParser {
    * @return true if string was found
    * @throws XQException xquery exception
    */
-  private boolean consume(final String str) throws XQException {
-    consumeWS();
-    int p = qp;
-    final int sl = str.length();
-    if(p + sl > ql) return false;
-    for(int s = 0; s < sl; s++) {
-      if(qu.charAt(p++) != str.charAt(s)) return false;
-    }
-    qp = p;
-    return true;
+  private boolean consumeWS2(final String str) throws XQException {
+    skipWS();
+    return consume(str);
   }
 
   /**
@@ -2512,7 +2396,7 @@ public final class XQParser {
    * @return true if whitespaces were found
    * @throws XQException xquery exception
    */
-  private boolean consumeWS() throws XQException {
+  private boolean skipWS() throws XQException {
     final int p = qp;
     while(qp < ql) {
       final int c = qu.charAt(qp);

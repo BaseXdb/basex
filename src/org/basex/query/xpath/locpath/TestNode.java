@@ -1,7 +1,7 @@
 package org.basex.query.xpath.locpath;
 
 import org.basex.data.Data;
-import org.basex.query.xpath.XPText;
+import org.basex.query.QueryTokens;
 
 /**
  * Node Test testing for a specific NodeType.
@@ -20,7 +20,7 @@ public abstract class TestNode extends Test {
 
     @Override
     public String toString() {
-      return XPText.NODE + "()";
+      return QueryTokens.NODE + "()";
     }
   };
 
@@ -33,7 +33,7 @@ public abstract class TestNode extends Test {
 
     @Override
     public String toString() {
-      return XPText.TEXT + "()";
+      return QueryTokens.TEXT + "()";
     }
   };
 
@@ -46,7 +46,7 @@ public abstract class TestNode extends Test {
 
     @Override
     public String toString() {
-      return XPText.COMMENT + "()";
+      return QueryTokens.COMMENT + "()";
     }
   };
 
@@ -59,7 +59,7 @@ public abstract class TestNode extends Test {
 
     @Override
     public String toString() {
-      return XPText.PI + "()";
+      return QueryTokens.PI + "()";
     }
   };
 

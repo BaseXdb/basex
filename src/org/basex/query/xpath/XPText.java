@@ -14,102 +14,6 @@ public interface XPText {
   
   // XPath Parser =============================================================
   
-  /** Node Test. */
-  String NODE = "node";
-  /** Node Test. */
-  String TEXT = "text";
-  /** Node Test. */
-  String COMMENT = "comment";
-  /** Node Test. */
-  String PI = "processing-instruction";
-  /** Element Test. */
-  String ELEM = "*";
-  /** Attribute name. */
-  String TYPE = "type";
-  /** Parser token. */
-  String QUOTE = "quote";
-  /** Minimum . */
-  String MIN = "min";
-  /** Attribute name. */
-  String MAX = "max";
-
-  /** Parser token. */
-  String DBLCOLON = "::";
-  /** Parser token. */
-  String OR = "or";
-  /** Parser token. */
-  String AND = "and";
-  /** Parser token. */
-  String FTCONTAINS = "ftcontains";
-  /** Parser token. */
-  String FTOR = "ftor";
-  /** Parser token. */
-  String FTAND = "ftand";
-  /** Parser token. */
-  String NOTIN = "not in";
-  /** Parser token. */
-  String FTNOT = "ftnot";
-  /** Parser token. */
-  String OCCURS = "occurs";
-  /** Parser token. */
-  String TIMES = "times";
-  /** Parser token. */
-  String CASEINSENS = "case insensitive";
-  /** Parser token. */
-  String CASESENS = "case sensitive";
-  /** Parser token. */
-  String LOWERCASE = "lowercase";
-  /** Parser token. */
-  String UPPERCASE = "uppercase";
-  /** Parser token. */
-  String WITHWILD = "with wildcards";
-  /** Parser token. */
-  String WITHOUTWILD = "without wildcards";
-  /** Parser token. */
-  String ORDERED = "ordered";
-  /** Parser token. */
-  String WINDOW = "window";
-  /** Parser token. */
-  String DISTANCE = "distance";
-  /** Parser token. */
-  String SAME = "same";
-  /** Parser token. */
-  String DIFFERENT = "different";
-  /** Parser token. */
-  String AT = "at";
-  /** Parser token. */
-  String START = "start";
-  /** Parser token. */
-  String END = "end";
-  /** Parser token. */
-  String ENTIRE = "entire";
-  /** Parser token. */
-  String CONTENT = "content";
-  /** Parser token. */
-  String ENTCONT = "entire content";
-  /** Parser token. */
-  String WORDS = "words";
-  /** Parser token. */
-  String SENTENCES = "sentences";
-  /** Parser token. */
-  String PARAGRAPHS = "paragraphs";
-  /** Parser token. */
-  String SENTENCE = "sentence";
-  /** Parser token. */
-  String PARAGRAPH = "paragraph";
-  /** Parser token. */
-  String EXACTLY = "exactly";
-  /** Parser token. */
-  String ATLEAST = "at least";
-  /** Parser token. */
-  String ATMOST = "at most";
-  /** Parser token. */
-  String FROM = "from";
-  /** Parser token. */
-  String TO = "to";
-  /** Parser token. */
-  String RANGE = "range";
-  
   /** Parsing exception. */
   String QUERYDATA = "Please create database first.";
   /** Parsing exception. */
@@ -153,8 +57,6 @@ public interface XPText {
   /** Parsing exception. */
   String UNKNOWNTOKEN = "Cannot recognize token: \"%\".";
   /** Parsing exception. */
-  String EXPREND = "Unexpected end of expression.";
-  /** Parsing exception. */
   String UNKNOWNVAR = "Unknown variable $%.";
   /** Parsing exception. */
   String UNKNOWNFUNC = "Unknown function %(...).";
@@ -187,6 +89,21 @@ public interface XPText {
   String LASTEXC = "Invalid use of last().";
   /** Evaluation Exception. */
   String INVALIDPRE = "'%' is no valid pre value.";
+  /** Evaluation Exception. */
+  String FTNOTEXC = "\"ftnot\" may only appear as right operand of \"ftand\"."; 
+  /** Evaluation Exception. */
+  String FTCASE = "Case sensitivity flag expected (sensitive/insensitive)."; 
+  /** Evaluation Exception. */
+  String FTRANGE = "Incomplete range expression."; 
+  /** Evaluation Exception. */
+  String FTSCOPE = "Incomplete scope expression."; 
+
+  /** Attribute name. */
+  String TYPE = "type";
+  /** Minimum . */
+  String MIN = "min";
+  /** Attribute name. */
+  String MAX = "max";
 
   // XPath Optimizer ==========================================================
 

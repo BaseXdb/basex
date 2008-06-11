@@ -31,7 +31,7 @@ public final class IterStep extends Step {
   public NodeIter iter(final XQContext ctx) throws XQException {
     final Item item = ctx.item;
 
-    if(item == null) Err.or(XPNODES, this);
+    if(item == null) Err.or(XPNOCTX, this);
     final Iter iter = item.iter();
 
     // no special predicate treatment?

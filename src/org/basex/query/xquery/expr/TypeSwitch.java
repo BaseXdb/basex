@@ -73,12 +73,12 @@ public final class TypeSwitch extends Single {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("typeswitch(" + ts + ") ");
+    final StringBuilder sb = new StringBuilder(TYPESWITCH + "(" + ts + ") ");
     for(int l = 0; l != cs.length; l++) {
       if(l != 0) sb.append(", ");
       sb.append(cs[l]);
     }
-    return sb + " default " + expr;
+    return sb + " " + DEFAULT + " " + expr;
   }
 
   @Override

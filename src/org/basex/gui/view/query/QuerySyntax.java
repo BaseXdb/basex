@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.util.HashSet;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXSyntax;
+import org.basex.query.QueryTokens;
 import org.basex.query.xquery.XQTokens;
 import org.basex.query.xquery.func.FunDef;
 import org.basex.util.XMLToken;
@@ -36,9 +37,14 @@ public final class QuerySyntax extends BaseXSyntax {
   static {
     try {
       for(final Field f : XQTokens.class.getFields()) {
-        final String name = f.getName();
-        if(name.equals("SKIP")) break;
-        keys.add((String) f.get(null));
+        if(f.getName().equals("SKIP")) break;
+        final String s = (String) f.get(null);
+        for(String ss : s.substring(0, s.indexOf("(")).split("-")) keys.add(ss);
+      }
+      for(final Field f : QueryTokens.class.getFields()) {
+        if(f.getName().equals("SKIP")) break;
+        final String s = (String) f.get(null);
+        for(String ss : s.substring(0, s.indexOf("(")).split("-")) keys.add(ss);
       }
       for(final FunDef f : FunDef.values()) {
         final String s = f.toString();
