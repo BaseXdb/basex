@@ -25,7 +25,6 @@ import org.basex.gui.layout.BaseXText;
 import org.basex.query.QueryException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQParser;
-import org.basex.query.xquery.item.Uri;
 import org.basex.util.Action;
 import org.basex.util.Token;
 
@@ -69,10 +68,10 @@ public final class QueryArea extends QueryPanel {
           if(GUIProp.execrt && !module) {
             GUI.get().execute(Commands.XQUERY, xq);
           } else {
-            final XQContext ctx = new XQContext();
-            final XQParser parser = new XQParser(ctx);
+            final XQParser parser = new XQParser(new XQContext());
             try {
-              parser.parse(xq, ctx.file, module ? Uri.EMPTY : null);
+              if(module) parser.module(xq);
+              else parser.parse(xq);
               info("", true);
             } catch(final QueryException ex) {
               info(ex.getMessage(), false);
@@ -143,7 +142,8 @@ public final class QueryArea extends QueryPanel {
     final String xq = Token.string(area.getText());
     if(force || !xq.equals(last)) {
       last = xq;
-      if(xq.trim().length() == 0) return;
+      final String xqt = xq.trim();
+      if(xqt.length() == 0 || xqt.startsWith("module namespace ")) return;
       GUI.get().execute(Commands.XQUERY, xq);
     }
   }

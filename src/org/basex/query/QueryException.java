@@ -80,8 +80,11 @@ public class QueryException extends Exception {
   public final String getMessage() {
     final StringBuilder sb = new StringBuilder();
     if(line != 0) {
-      sb.append(file == null ? BaseX.info(POSINFO, line, col) :
-        BaseX.info(POSFILEINFO, line, col, file));
+      sb.append(STOPPED);
+      sb.append(BaseX.info(LINEINFO, line));
+      if(col != 0) sb.append(BaseX.info(COLINFO, col));
+      if(file != null) sb.append(BaseX.info(FILEINFO, file));
+      sb.append(": \n");
     }
     if(code != null) sb.append("[" + code + "] ");
     sb.append(super.getMessage());

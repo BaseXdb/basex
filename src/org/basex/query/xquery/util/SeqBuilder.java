@@ -80,7 +80,7 @@ public final class SeqBuilder {
    * @return sequence
    */
   public Item finish() {
-    return size == 0 ? Seq.EMPTY : size == 1 ? item[0] : new Seq(item, size);
+    return Seq.get(item, size);
   }
 
   /**
@@ -88,7 +88,7 @@ public final class SeqBuilder {
    * @return sequence
    */
   public Iter iter() {
-    return size == 0 ? Iter.EMPTY : new SeqIter(item, size);
+    return SeqIter.get(item, size);
   }
 
   @Override

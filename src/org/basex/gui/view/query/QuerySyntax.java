@@ -39,12 +39,12 @@ public final class QuerySyntax extends BaseXSyntax {
       for(final Field f : XQTokens.class.getFields()) {
         if(f.getName().equals("SKIP")) break;
         final String s = (String) f.get(null);
-        for(String ss : s.substring(0, s.indexOf("(")).split("-")) keys.add(ss);
+        for(String ss : s.split("-")) keys.add(ss);
       }
       for(final Field f : QueryTokens.class.getFields()) {
         if(f.getName().equals("SKIP")) break;
         final String s = (String) f.get(null);
-        for(String ss : s.substring(0, s.indexOf("(")).split("-")) keys.add(ss);
+        for(String ss : s.split("-")) keys.add(ss);
       }
       for(final FunDef f : FunDef.values()) {
         final String s = f.toString();

@@ -17,13 +17,13 @@ public abstract class QueryParser {
   /** Temporary token constructions. */
   protected final TokenBuilder tok = new TokenBuilder();
   /** Optional name of input file. */
-  protected IO file;
+  public IO file;
   /** Input query. */
-  protected String qu;
+  public String qu;
   /** Current query position. */
-  protected int qp;
+  public int qp;
   /** Query length. */
-  protected int ql;
+  public int ql;
 
   /**
    * Initializes the query.

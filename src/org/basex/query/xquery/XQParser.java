@@ -136,7 +136,18 @@ public final class XQParser extends QueryParser {
    * @throws XQException xquery exception
    */
   public void parse(final String q) throws XQException {
+    ctx.query = q;
     parse(q, ctx.file, null);
+  }
+
+  /**
+   * Parses the specified module.
+   * @param q input query
+   * @throws XQException xquery exception
+   */
+  public void module(final String q) throws XQException {
+    ctx.query = q;
+    parse(q, ctx.file, Uri.EMPTY);
   }
 
   /**
@@ -1316,7 +1327,7 @@ public final class XQParser extends QueryParser {
           new TokenBuilder('.'));
     }
     // strings
-    if(c == '\'' || c == '"') return Str.get(stringLiteral());
+    if(quote(c)) return Str.get(stringLiteral());
     // variables
     if(c == '$') {
       final Var var = new Var(varName());
@@ -1469,7 +1480,7 @@ public final class XQParser extends QueryParser {
       check('=');
       consumeWSS();
       final char delim = consume();
-      if(delim != '\'' && delim != '"') Err.or(WRONGCHAR, QUOTE, found());
+      if(!quote(delim)) Err.or(NOQUOTE, QUOTE, found());
       final TokenBuilder tb = new TokenBuilder();
 
       boolean simple = true;
@@ -1495,10 +1506,8 @@ public final class XQParser extends QueryParser {
             qp++;
             check('}');
             tb.add('}');
-          } else if(c == '<') {
-            Err.or(WRONGCHAR, delim, found());
-          } else if(c == 0) {
-            Err.or(QUOTECLOSE, delim);
+          } else if(c == '<' || c == 0) {
+            Err.or(NOQUOTE, found());
           } else if(c == 0x0A || c == 0x09) {
             qp++;
             tb.add(' ');
@@ -1897,12 +1906,12 @@ public final class XQParser extends QueryParser {
   private byte[] stringLiteral() throws XQException {
     skipWS();
     final char delim = curr();
-    if(!quote(delim)) Err.or(WRONGCHAR, QUOTE, found());
+    if(!quote(delim)) Err.or(NOQUOTE, found());
     consume();
     tok.reset();
     while(true) {
       while(!consume(delim)) {
-        if(curr() == 0) Err.or(QUOTECLOSE, delim);
+        if(curr() == 0) Err.or(NOQUOTE, found());
         entity(tok);
       }
       if(!consume(delim)) break;
@@ -2112,8 +2121,7 @@ public final class XQParser extends QueryParser {
    */
   private Expr ftWordsValue() throws XQException {
     skipWS();
-    return curr() == '\'' || curr() == '"' ? Str.get(stringLiteral()) :
-      enclosedExpr(NOENCLEXPR);
+    return quote(curr()) ? Str.get(stringLiteral()) : enclosedExpr(NOENCLEXPR);
   }
 
   /**
@@ -2305,7 +2313,7 @@ public final class XQParser extends QueryParser {
    * @throws XQException xquery exception
    */
   private void check(final int ch) throws XQException {
-    if(!consume(ch)) Err.or(WRONGCHAR, "\"" + (char) ch + "\"", found());
+    if(!consume(ch)) Err.or(WRONGCHAR, (char) ch, found());
   }
 
   /**
@@ -2315,7 +2323,7 @@ public final class XQParser extends QueryParser {
    * @throws XQException xquery exception
    */
   private void check(final String s) throws XQException {
-    if(!consumeWS2(s)) Err.or(WRONGCHAR, "\"" + s + "\"", found());
+    if(!consumeWS2(s)) Err.or(WRONGCHAR, s, found());
   }
 
   /**
@@ -2326,8 +2334,8 @@ public final class XQParser extends QueryParser {
    * @throws XQException xquery exception
    */
   private boolean not(final int ch) throws XQException {
-    final int c = curr();
-    if(c == 0) Err.or(WRONGEND, "\"" + (char) ch + "\"");
+    final char c = curr();
+    if(c == 0) Err.or(WRONGEND, ch);
     return c != ch;
   }
 

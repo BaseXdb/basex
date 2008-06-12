@@ -77,7 +77,7 @@ public final class Err {
   public static void empty(final Expr ex) throws XQException {
     or(XPEMPTY, ex.info());
   }
-  
+
   /**
    * Throws a comparison exception.
    * @param it1 first item

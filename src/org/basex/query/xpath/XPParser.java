@@ -73,7 +73,7 @@ public final class XPParser extends QueryParser {
     try {
       final Expr expr = parseOr();
       if(qp != ql) error(QUERYEND, rest());
-      return new XPContext(expr);
+      return new XPContext(expr, qu);
     } catch(final QueryException ex) {
       ex.pos(this);
       throw ex;

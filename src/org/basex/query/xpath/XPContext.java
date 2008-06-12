@@ -34,14 +34,15 @@ public final class XPContext extends QueryContext {
   private int cc;
   /** Current evaluation time. */
   private long evalTime;
- 
 
   /**
    * Constructor.
    * @param expr root expression
+   * @param qu input query
    */
-  public XPContext(final Expr expr) {
+  public XPContext(final Expr expr, final String qu) {
     root = expr;
+    query = qu;
   }
 
   // below, the current node set is passed on as argument; if the doc(...)

@@ -39,8 +39,18 @@ public final class SeqIter extends Iter {
    * Constructor.
    * @param it item array
    * @param s size
+   * @return iterator
    */
-  public SeqIter(final Item[] it, final int s) {
+  public static Iter get(final Item[] it, final int s) {
+    return s == 0 ? Iter.EMPTY : new SeqIter(it, s);
+  }
+
+  /**
+   * Constructor.
+   * @param it item array
+   * @param s size
+   */
+  private SeqIter(final Item[] it, final int s) {
     item = it;
     size = s;
   }

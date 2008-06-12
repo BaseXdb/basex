@@ -71,9 +71,7 @@ public final class NodeBuilder {
    * @return result
    */
   public Item finish() {
-    if(size == 0) return Seq.EMPTY;
-    if(size == 1) return list[0];
-    if(ordered) new Seq(list, size);
+    if(size < 2 || ordered) return Seq.get(list, size);
     
     if(sort) sort(0, size - 1);
     final SeqBuilder sq = new SeqBuilder();

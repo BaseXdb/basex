@@ -4,7 +4,6 @@ import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.iter.NodIter;
 import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.iter.NodeMore;
-import org.basex.query.xquery.iter.NodeNext;
 
 /**
  * Node Type.
@@ -92,17 +91,16 @@ public abstract class FNode extends Node {
   public final NodeIter descOrSelf() {
     return new NodeIter() {
       /** Iterator. */
-      private NodeNext it;
+      private NodIter it;
       /** First call. */
       private boolean more;
 
       @Override
       public Node next() throws XQException {
         if(!more) {
-          final NodIter ch = new NodIter();
-          ch.add(FNode.this);
-          addDesc(child(), ch);
-          it = new NodeNext(ch);
+          it = new NodIter();
+          it.add(FNode.this);
+          addDesc(child(), it);
           more = true;
         }
         return it.next();

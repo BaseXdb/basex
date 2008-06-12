@@ -114,8 +114,6 @@ public interface XPText {
   /** Optimization info. */
   String OPTRELATIONAL = "pre-evaluating relational expression";
   /** Optimization info. */
-  String OPTUNARY = "pre-evaluating unary expression";
-  /** Optimization info. */
   String OPTLOC = "removing location path with no index results";
   /** Optimization info. */
   String OPTNAME = "removing unknown tag/attribute \"%\"";
@@ -146,13 +144,7 @@ public interface XPText {
   /** Optimization info. */
   String OPTEQ2 = "removing EQUALITY expression for constant comparison";
   /** Optimization info. */
-  String OPTFT1 = "removing FTCONTAINS expression for empty nodeset";
-  /** Optimization info. */
-  String OPTFT2 = "removing FTCONTAINS expression for constant comparison";
-  /** Optimization info. */
   String OPTSELF = "removing superfluous self axes";
-  /** Optimization info. */
-  String OPTPATHEXPR = "removing PATH for empty nodeset";
   /** Optimization info. */
   String OPTPRED = "removing always true predicate";
   /** Optimization info. */

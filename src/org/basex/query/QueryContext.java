@@ -23,6 +23,11 @@ import org.basex.util.TokenBuilder;
 public abstract class QueryContext extends Progress {
   /** Query Info: Plan. */
   public static final byte[] PLAN = Token.token("QueryPlan");
+  /** Reference to the query file. */
+  public IO file = Prop.xquery;
+  /** Query string. */
+  public String query;
+  
   /** String container for query background information. */
   protected final TokenBuilder info = new TokenBuilder();
   /** Optimization flag. */
@@ -152,13 +157,13 @@ public abstract class QueryContext extends Progress {
   
   /**
    * Shows the dot output via dotty.
-   * @param file name of temporary dot file
+   * @param f name of temporary dot file
    * @param cont content
    * @throws Exception exception
    */
-  protected final void dot(final String file, final byte[] cont)
+  protected final void dot(final String f, final byte[] cont)
       throws Exception {
-    new IO(file).write(cont);
-    new ProcessBuilder(Prop.dotty, file).start().waitFor();
+    new IO(f).write(cont);
+    new ProcessBuilder(Prop.dotty, f).start().waitFor();
   }
 }

@@ -162,7 +162,7 @@ public interface XQText {
   /** XPST0003: Parsing exception. */
   Object[] QUERYINV = { XPST, 3, "Query contains an illegal character (#%)." };
   /** XPST0003: Parsing exception. */
-  Object[] QUOTECLOSE = { XPST, 3, "Expecting closing quote (%)." };
+  Object[] NOQUOTE = { XPST, 3, "Expecting quote%." };
   /** XPST0003: Parsing exception. */
   Object[] NOVALIDATE = { XPST, 3, "Invalid validation expression." };
   /** XPST0003: Parsing exception. */
@@ -182,14 +182,14 @@ public interface XQText {
   /** XPST0003: Parsing exception. */
   Object[] NOEXPR = { XPST, 3, "Expecting expression." };
   /** XPST0003: Parsing exception. */
-  Object[] WRONGCHAR = { XPST, 3, "Expecting %%." };
+  Object[] WRONGCHAR = { XPST, 3, "Expecting \"%\"%." };
   /** XPST0003: Parsing exception. */
   String FOUND = ", found \"%\".";
   /** FTST0000: Parsing exception. */
   Object[] FTMATCH = { XPST, 3, "Missing ftcontains option after '%'." };
   
   /** XPST0003: Parsing exception. */
-  Object[] WRONGEND = { XPST, 3, "Expecting %." };
+  Object[] WRONGEND = { XPST, 3, "Expecting \"%\"." };
   /** XPST0003: Parsing exception. */
   Object[] ENTINVALID = { XPST, 3, "%" };
   /** XPST0003: Parsing exception. */

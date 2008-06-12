@@ -33,7 +33,7 @@ public final class XQueryTest {
     { "Dec 1", "0.123", Str.get(Token.token("0.123")) },
     { "Dbl 1", ".456E2", Dbl.get(45.6) },
     { "String 1", "\"Hallo\"", Str.get(Token.token("Hallo")) },
-    { "Seq 1", "17,31", new Seq(new Item[] { Itr.get(17), Itr.get(31) }) },
+    { "Seq 1", "17,31", Seq.get(new Item[] { Itr.get(17), Itr.get(31) }, 2) },
     { "Par 1", "(17)", Itr.get(17) },
     { "Par 2", "(((17)))", Itr.get(17) },
     { "Or 1", "1 or 2", Bln.TRUE },

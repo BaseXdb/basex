@@ -16,9 +16,12 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Seq extends Item {
+public class Seq extends Item {
   /** Empty sequence. */
-  public static final Seq EMPTY = new Seq();
+  public static final Seq EMPTY = new Seq() {
+    @Override
+    public Iter iter() { return Iter.EMPTY; }
+  };
   /** Item array. */
   public Item[] val;
   /** Number of entries. */
@@ -27,16 +30,18 @@ public final class Seq extends Item {
   /**
    * Constructor.
    */
-  private Seq() {
+  protected Seq() {
     super(Type.EMP);
   }
   
   /**
    * Constructor.
    * @param v value
+   * @param s size
+   * @return resulting item or sequence
    */
-  public Seq(final Item[] v) {
-    this(v, v.length);
+  public static Item get(final Item[] v, final int s) {
+    return s == 0 ? EMPTY : s == 1 ? v[0] : new Seq(v, s);
   }
   
   /**
@@ -44,18 +49,10 @@ public final class Seq extends Item {
    * @param v value
    * @param s size
    */
-  public Seq(final Item[] v, final int s) {
-    this(Type.SEQ);
+  private Seq(final Item[] v, final int s) {
+    this();
     val = v;
     size = s;
-  }
-  
-  /**
-   * Constructor.
-   * @param t data type
-   */
-  public Seq(final Type t) {
-    super(t);
   }
 
   @Override
@@ -83,7 +80,7 @@ public final class Seq extends Item {
 
   @Override
   public Iter iter() {
-    return size == 0 ? Iter.EMPTY : new SeqIter(val, size);
+    return SeqIter.get(val, size);
   }
 
   @Override
