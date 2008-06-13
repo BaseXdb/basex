@@ -122,4 +122,18 @@ public final class FSQuery {
     rm.rmMain(cmd);    
     out.print(NL);
   }
+  
+  /**
+   * Perform touch.
+   * 
+   * @param cmd options
+   * @param out output stream
+   * @throws IOException in case of problems with the PrintOutput
+   */
+  public void touch(final String cmd, final PrintOutput out) 
+  throws IOException {
+    TOUCH touch = new TOUCH(context, out);
+    touch.touchMain(cmd);    
+    out.print(NL);
+  }
 }

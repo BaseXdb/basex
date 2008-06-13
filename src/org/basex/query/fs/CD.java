@@ -57,11 +57,11 @@ public final class CD {
           break;
         case ':':         
           fError = true;
-          out.print("ls: missing argument");
+          out.print("cd: missing argument");
           break;  
         case '?':         
           fError = true;
-          out.print("ls: illegal option");
+          out.print("cd: illegal option");
           break;
       }      
       if(fError) {
@@ -72,14 +72,17 @@ public final class CD {
     }
 
     // if there is path expression go to work
-    if(g.getPath() != null) {
+    if(g.getPath() != null) {    
       curDirPre = FSUtils.goToDir(context.data(), curDirPre, g.getPath());
       if(curDirPre == -1) {
         throw new PathNotFoundException("cd", g.getPath());
       } else {
+
         context.current().pre[0] = curDirPre;
       }
-    }
+    } else {
+      context.current().pre[0] = FSUtils.getROOTDIR();
+    } 
   }
 
   
@@ -89,7 +92,7 @@ public final class CD {
    * @throws IOException in case of problems with the PrintOutput
    */
   private void printHelp() throws IOException {
-    out.print("help");
+    out.print("cd ...");
    
   }
 

@@ -35,7 +35,7 @@ public final class LOCATE {
   /** Shows if an error occurs. */
   private boolean fError;
 
-  /** Shows if an error occurs. */
+  /** Shows if job is done. */
   private boolean fAccomplished;
 
   /** limit output. */
@@ -93,7 +93,6 @@ public final class LOCATE {
           printHelp();
           fAccomplished = true;
           break;
-
         case 'l':
           // Limit output to number of file names and exit.
           limit = Integer.parseInt(g.getOptarg());
@@ -285,7 +284,7 @@ public final class LOCATE {
    * @throws IOException in case of problems with the PrintOutput
    */
   private void printHelp() throws IOException {
-    out.print("help");
+    out.print("locate -ch -l arg1 -V [1|2]");
 
   }
 

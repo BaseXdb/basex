@@ -29,6 +29,12 @@ public final class DU {
   /** Shows if an error occurs. */
   private boolean fError;
 
+  /** Shows if job is done. */
+  private boolean fAccomplished;
+
+  /** Display an entry for each file in the file hierarchy. */
+  private boolean fPrintAll;
+
 
   /**
    * Simplified Constructor.
@@ -50,13 +56,17 @@ public final class DU {
   public void duMain(final String cmd) 
   throws IOException {
 
-    GetOpts g = new GetOpts(cmd, "h", 1);
+    GetOpts g = new GetOpts(cmd, "ah", 1);
     // get all Options
     int ch = g.getopt();
     while (ch != -1) {
       switch (ch) {
+        case 'a':         
+          fPrintAll = true;
+          break;
         case 'h':
           printHelp();
+          fAccomplished = true;
           break;
         case ':':         
           fError = true;
@@ -67,13 +77,12 @@ public final class DU {
           out.print("ls: illegal option");
           break;
       }      
-      if(fError) {
+      if(fError || fAccomplished) {
         // more options ?
         return;
       }
       ch = g.getopt();
     }
-
     // if there is path expression go to dir
     if(g.getPath() != null) {
       curDirPre = FSUtils.goToDir(context.data(), curDirPre, g.getPath());
@@ -83,7 +92,7 @@ public final class DU {
     }
     du(".", curDirPre);
   }
-  
+
   /**
    * The du utility displays the file system block usage for each file argu-
    * ment and for each directory in the file hierarchy rooted in each direc-
@@ -100,31 +109,36 @@ public final class DU {
     final Data data = context.data();
     int n = pre;    
     long diskusage = FSUtils.getSize(data, n);
-
     int size = data.size(n, data.kind(n)) + n;               
     n += data.attSize(n, data.kind(n));
 
     while(n < size) {      
       if(FSUtils.isDir(data, n)) {  
-        diskusage += du(path + "/" + Token.string(FSUtils.getName(data, n)), n);
+        diskusage += du(path + "/" + 
+            Token.string(FSUtils.getName(data, n)), n);      
         n += data.size(n, data.kind(n));
-      } else {
-        diskusage += FSUtils.getSize(data, n);
+      } else {      
+        long diskuse = FSUtils.getSize(data, n);
+        if(fPrintAll) {
+          out.print(diskuse + "\t" + path + "/" + 
+              Token.string(FSUtils.getName(data, n)) + "\r");        
+        }
+        diskusage += diskuse;
         n += data.attSize(n, data.kind(n));
       }
     }
     out.println(diskusage + "\t" + path);
     return diskusage;
   }
-  
+
   /**
    * Print the help.
    * 
    * @throws IOException in case of problems with the PrintOutput
    */
   private void printHelp() throws IOException {
-    out.print("help");
-   
+    out.print("du -ah ...");
+
   }
 
 }

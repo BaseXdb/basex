@@ -2,17 +2,18 @@ package org.basex.query.fs;
 
 import java.io.IOException;
 import org.basex.core.Context;
+import org.basex.data.Data;
 import org.basex.io.PrintOutput;
 import org.basex.util.GetOpts;
 
 /**
- * Performs a rm command.
+ * Performs a touch command.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Hannes Schwarz - Hannes.Schwarz@gmail.com
  *
  */
-public final class RM {
+public final class TOUCH {
 
   /** Data reference. */
   private final Context context;
@@ -23,33 +24,25 @@ public final class RM {
   /** PrintOutPutStream. */
   private PrintOutput out;
 
-  /** Shows if an error occurs. */
-  private boolean fError;
-  
-  /** Shows if job is done. */
-  private boolean fAccomplished;
 
-  /** Remove the all. */
-  private boolean fRecursive;
-  
   /**
    * Simplified Constructor.
    * @param ctx data context
    * @param output output stream
    */
-  public RM(final Context ctx, final PrintOutput output) {
+  public TOUCH(final Context ctx, final PrintOutput output) {
     this.context = ctx;
     curDirPre = ctx.current().pre[0];
     this.out = output;
   }
 
   /**
-   * Performs an rm command.
+   * Performs a touch command.
    * 
    * @param cmd - command line
    * @throws IOException - in case of problems with the PrintOutput 
    */
-  public void rmMain(final String cmd) 
+  public void touchMain(final String cmd) 
   throws IOException {
 
     GetOpts g = new GetOpts(cmd, "Rh");
@@ -59,29 +52,19 @@ public final class RM {
       switch (ch) {
         case 'h':
           printHelp();
-          fAccomplished = true;
-          break;
-        case 'R':
-          fRecursive = true;
-          break;          
+          return;
         case ':':         
-          fError = true;
-          out.print("rm: missing argument");
-          break;  
+          out.print("touch: missing argument");
+          return;  
         case '?':         
-          fError = true;
-          out.print("rm: illegal option");
-          break;
+          out.print("touch: illegal option");
+          return;
       }      
-      if(fError || fAccomplished) {
-        return;
-      }
       ch = g.getopt();
     }
-
     // if there is path expression remove it     
     if(g.getPath() != null) {      
-      remove(g.getPath());
+      touch(g.getPath());
     } 
   }
 
@@ -91,41 +74,42 @@ public final class RM {
    *  @param path The name of the file
    *  @throws IOException in case of problems with the PrintOutput 
    */
-  private void remove(final String path) throws IOException {
+  private void touch(final String path) throws IOException {
 
     String file = "";
     int beginIndex = path.lastIndexOf('/');
     if(beginIndex == -1) {
       file = path;
     } else {
-      // noch zu machen...
       curDirPre = FSUtils.goToDir(context.data(), curDirPre, 
           path.substring(0, beginIndex));   
       if(curDirPre == -1) {
-        out.print("rm: '" + path + "' No such file or directory");
+        out.print("rm: " + path + " No such file or directory");
       } else {
         file = path.substring(beginIndex + 1);
       }
     }
-    
-    int del = FSUtils.getSpecificFileOrDir(context.data(), curDirPre, 
-        file.getBytes());
-
-    if(del == -1) {
-      out.print("rm: '" + file + "' No such file or directory");
-      return;
-    } else {
-      if((FSUtils.isDir(context.data(), del) && fRecursive) ||
-         (FSUtils.isFile(context.data(), del))) {
-        try {
-          context.data().delete(del);
-          context.data().flush();
-        } catch(Exception e) {
-          e.printStackTrace();
-        }     
-      } else {
-        out.print("rm: cannot remove '" + file + "': Is a directory");
+    //TODO<HS>: Debug !!!!  
+    try {
+      int preNewFile = 4;
+      if(!(curDirPre == FSUtils.getROOTDIR())) {
+        preNewFile = curDirPre + 5;
       }
+      int time = 20178009;
+      context.data().insert(preNewFile, 
+          curDirPre, "file".getBytes(), Data.ELEM);
+      context.data().insert(preNewFile + 1, preNewFile, 
+          "name".getBytes(), file.getBytes());
+      context.data().insert(preNewFile + 2, 
+          preNewFile, "suffix".getBytes(), 
+"text".getBytes());
+      context.data().insert(preNewFile + 3, 
+          preNewFile, "size".getBytes(), (byte) 0);
+      context.data().insert(preNewFile + 4, 
+          preNewFile, "mtime".getBytes(), (byte) time);
+      context.data().flush();
+      } catch(Exception e) {
+      e.printStackTrace();
     }
   }
 
@@ -136,7 +120,7 @@ public final class RM {
    * @throws IOException in case of problems with the PrintOutput
    */
   private void printHelp() throws IOException {
-    out.print("rm [-Rh] file ...");
+    out.print("touch  ...");
 
   }
 

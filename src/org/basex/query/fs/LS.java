@@ -35,7 +35,6 @@ public final class LS {
   /** Shows if an error occurs. */
   private boolean fError;
 
-
   /**
    * Simplified Constructor.
    * @param ctx data context
@@ -80,7 +79,6 @@ public final class LS {
           return;
       }
       if(!fError) {
-        // more options ?
         ch = g.getopt();
       }
     }
@@ -150,7 +148,7 @@ public final class LS {
    * @throws IOException in case of problems with the PrintOutput
    */
   private void printHelp() throws IOException {
-    out.print("help");
+    out.print("ls -ahR ...");
    
   }
 }

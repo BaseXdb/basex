@@ -28,6 +28,8 @@ public final class PWD {
   /** Shows if an error occurs. */
   private boolean fError;
 
+  /** Shows if job is done. */
+  private boolean fAccomplished;
 
   /**
    * Simplified Constructor.
@@ -56,6 +58,7 @@ public final class PWD {
       switch (ch) {
         case 'h':
           printHelp();
+          fAccomplished = true;
           break;
         case ':':         
           fError = true;
@@ -66,8 +69,7 @@ public final class PWD {
           out.print("ls: illegal option");
           break;
       }      
-      if(fError) {
-        // more options ?
+      if(fError || fAccomplished) {
         return;
       }
       ch = g.getopt();
@@ -91,7 +93,7 @@ public final class PWD {
    * @throws IOException in case of problems with the PrintOutput
    */
   private void printHelp() throws IOException {
-    out.print("help");
+    out.print("pwd");
    
   }
 
