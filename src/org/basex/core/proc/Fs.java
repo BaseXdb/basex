@@ -23,6 +23,8 @@ public final class Fs extends Proc {
   /** Create option. */
   public static final String LS = "ls";
   /** Create option. */
+  public static final String MKDIR = "mkdir";  
+  /** Create option. */
   public static final String PWD = "pwd";
   /** Create option. */
   public static final String RM = "rm";
@@ -40,8 +42,8 @@ public final class Fs extends Proc {
     query = new FSQuery(context);
     comm = cmd.arg(0).toLowerCase();
     return comm.equals(CD) || comm.equals(DU) || comm.equals(GREP) ||
-    comm.equals(LOCATE) || comm.equals(LS) || comm.equals(PWD) || 
-    comm.equals(RM) || comm.equals(TOUCH);
+    comm.equals(LOCATE) || comm.equals(LS) || comm.equals(MKDIR) || 
+    comm.equals(PWD) || comm.equals(RM) || comm.equals(TOUCH);
   }
 
 
@@ -57,6 +59,8 @@ public final class Fs extends Proc {
       query.locate(cmd.args(), out);
     } else if(comm.equals(LS)) {
       query.ls(cmd.args(), out);
+    } else if(comm.equals(MKDIR)) {
+      query.mkdir(cmd.args(), out);
     } else if(comm.equals(PWD)) {
       query.pwd(cmd.args(), out); 
     } else if(comm.equals(RM)) { 

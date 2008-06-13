@@ -23,49 +23,6 @@ public final class FSQuery {
     context = ctx;
   }
 
-  /**
-   * The current working directory as set by the cd command.
-   * @param cmd options
-   * @param out output stream
-   * @throws IOException in case of problems with the PrintOutput
-   */
-  public void pwd(final String cmd, final PrintOutput out) throws IOException {
-    PWD pwd = new PWD(context, out);
-    pwd.pwdMain(cmd);
-    out.print(NL);
-  }
-
-
-
-  /**
-   * Performs an ls command.
-   * @param cmd directory path
-   * @param out output stream
-   * @throws IOException in case of problems with the PrintOutput
-   */
-  public void ls(final String cmd, final PrintOutput out) 
-  throws IOException {        
-    LS ls = new LS(context, out);
-    ls.lsMain(cmd);
-    out.print(NL);
-  }
-
-
-
-  /**
-   * Performs a du command.
-   * @param cmd options
-   * @param out output stream
-   * @throws IOException in case of problems with the PrintOutput
-   */
-  public void du(final String cmd, final PrintOutput out)
-  throws IOException {
-    DU du = new DU(context, out);
-    du.duMain(cmd);    
-    out.print(NL);
-  }
-
-
 
   /**
    * Perform cd.
@@ -82,16 +39,15 @@ public final class FSQuery {
   }
 
   /**
-   * Perform locate.
-   * 
+   * Performs a du command.
    * @param cmd options
    * @param out output stream
    * @throws IOException in case of problems with the PrintOutput
    */
-  public void locate(final String cmd, final PrintOutput out) 
+  public void du(final String cmd, final PrintOutput out)
   throws IOException {
-    LOCATE locate = new LOCATE(context, out);
-    locate.locateMain(cmd);    
+    DU du = new DU(context, out);
+    du.duMain(cmd);    
     out.print(NL);
   }
 
@@ -108,7 +64,60 @@ public final class FSQuery {
     grep.grepMain(cmd);    
     out.print(NL);
   }
+  
+  /**
+   * Perform locate.
+   * 
+   * @param cmd options
+   * @param out output stream
+   * @throws IOException in case of problems with the PrintOutput
+   */
+  public void locate(final String cmd, final PrintOutput out) 
+  throws IOException {
+    LOCATE locate = new LOCATE(context, out);
+    locate.locateMain(cmd);    
+    out.print(NL);
+  }
 
+  /**
+   * Performs an ls command.
+   * @param cmd directory path
+   * @param out output stream
+   * @throws IOException in case of problems with the PrintOutput
+   */
+  public void ls(final String cmd, final PrintOutput out) 
+  throws IOException {        
+    LS ls = new LS(context, out);
+    ls.lsMain(cmd);
+    out.print(NL);
+  }
+
+  /**
+   * Perform mkdir.
+   * 
+   * @param cmd options
+   * @param out output stream
+   * @throws IOException in case of problems with the PrintOutput
+   */
+  public void mkdir(final String cmd, final PrintOutput out) 
+  throws IOException {
+    MKDIR mkdir = new MKDIR(context, out);
+    mkdir.mkdirMain(cmd);    
+    out.print(NL);
+  }
+
+  /**
+   * The current working directory as set by the cd command.
+   * @param cmd options
+   * @param out output stream
+   * @throws IOException in case of problems with the PrintOutput
+   */
+  public void pwd(final String cmd, final PrintOutput out) throws IOException {
+    PWD pwd = new PWD(context, out);
+    pwd.pwdMain(cmd);
+    out.print(NL);
+  }
+  
   /**
    * Perform rm.
    * 

@@ -45,7 +45,7 @@ public final class TOUCH {
   public void touchMain(final String cmd) 
   throws IOException {
 
-    GetOpts g = new GetOpts(cmd, "Rh");
+    GetOpts g = new GetOpts(cmd, "h");
     // get all Options
     int ch = g.getopt();
     while (ch != -1) {
@@ -69,7 +69,7 @@ public final class TOUCH {
   }
 
   /**
-   * Performs an rm command.
+   * Performs a touch command.
    *  
    *  @param path The name of the file
    *  @throws IOException in case of problems with the PrintOutput 
@@ -89,31 +89,50 @@ public final class TOUCH {
         file = path.substring(beginIndex + 1);
       }
     }
-    //TODO<HS>: Debug !!!!  
-    try {
-      int preNewFile = 4;
-      if(!(curDirPre == FSUtils.getROOTDIR())) {
-        preNewFile = curDirPre + 5;
-      }
-      int time = 20178009;
-      context.data().insert(preNewFile, 
-          curDirPre, "file".getBytes(), Data.ELEM);
-      context.data().insert(preNewFile + 1, preNewFile, 
-          "name".getBytes(), file.getBytes());
-      context.data().insert(preNewFile + 2, 
-          preNewFile, "suffix".getBytes(), 
-"text".getBytes());
-      context.data().insert(preNewFile + 3, 
-          preNewFile, "size".getBytes(), (byte) 0);
-      context.data().insert(preNewFile + 4, 
-          preNewFile, "mtime".getBytes(), (byte) time);
-      context.data().flush();
+    int filePre =  FSUtils.getSpecificFile(context.data(), 
+        curDirPre, file.getBytes());
+    if(filePre > 0) {
+      // file found - update timestamp  
+    } else {   
+      // add new file  
+      try {
+        int preNewFile = 4;
+        if(!(curDirPre == FSUtils.getROOTDIR())) {
+          preNewFile = curDirPre + 5;
+        }
+
+        context.data().insert(preNewFile, 
+            curDirPre, "file".getBytes(), Data.ELEM);
+        context.data().insert(preNewFile + 1, preNewFile, 
+            "name".getBytes(), file.getBytes());
+        context.data().insert(preNewFile + 2, 
+            preNewFile, "suffix".getBytes(), 
+            getSuffix(file));
+        context.data().insert(preNewFile + 3, 
+            preNewFile, "size".getBytes(), 
+            "0".getBytes());
+        context.data().insert(preNewFile + 4, 
+            preNewFile, "mtime".getBytes(), 
+            "222222".getBytes());   
+        context.data().flush();
       } catch(Exception e) {
-      e.printStackTrace();
+        e.printStackTrace();
+      }
     }
   }
 
-
+  /**
+   * Extracts the suffix of a file.
+   * 
+   * @param file the filename
+   * @return the suffix of the file
+   */
+  private byte[] getSuffix(final String file) {
+    int point = file.lastIndexOf('.');
+    if(point > 0)
+      return file.substring(point + 1).getBytes();
+    return "".getBytes();
+  }
   /**
    * Print the help.
    * 

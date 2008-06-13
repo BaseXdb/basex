@@ -44,7 +44,7 @@ public final class RM {
   }
 
   /**
-   * Performs an rm command.
+   * Performs a rm command.
    * 
    * @param cmd - command line
    * @throws IOException - in case of problems with the PrintOutput 
@@ -86,7 +86,7 @@ public final class RM {
   }
 
   /**
-   * Performs an rm command.
+   * Performs a rm command.
    *  
    *  @param path The name of the file
    *  @throws IOException in case of problems with the PrintOutput 
@@ -98,12 +98,13 @@ public final class RM {
     if(beginIndex == -1) {
       file = path;
     } else {
-      // noch zu machen...
+      // go to Path
       curDirPre = FSUtils.goToDir(context.data(), curDirPre, 
           path.substring(0, beginIndex));   
       if(curDirPre == -1) {
         out.print("rm: '" + path + "' No such file or directory");
       } else {
+        // file to delete
         file = path.substring(beginIndex + 1);
       }
     }
