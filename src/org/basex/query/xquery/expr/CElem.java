@@ -90,7 +90,7 @@ public final class CElem extends Arr {
      * @return element
      */
     public Iter construct(final XQContext ctx) throws XQException {
-      final Item it = ctx.iter(tag).atomic(CElem.this, false);
+      final Item it = ctx.atomic(tag, CElem.this, false);
       final QNm tname = CAttr.name(ctx, it);
 
       for(final Expr e : expr) {

@@ -61,6 +61,11 @@ public class Seq extends Item {
   }
 
   @Override
+  public final boolean i() {
+    return false;
+  }
+
+  @Override
   public int size() {
     return size;
   }

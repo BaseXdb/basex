@@ -50,7 +50,7 @@ public final class CAttr extends Arr {
 
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
-    final QNm name = name(ctx, ctx.iter(atn).atomic(this, false));
+    final QNm name = name(ctx, ctx.atomic(atn, this, false));
     final byte[] pre = name.pre();
     final byte[] ln = name.ln();
     if(comp && (Token.eq(name.str(), XMLNS) || Token.eq(pre, XMLNS)))

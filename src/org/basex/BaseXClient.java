@@ -323,14 +323,16 @@ public class BaseXClient {
             for(++a; a < args.length; a++) input += ' ' + args[a];
             commands = input.trim();
             return true;
-          } else if(c == 'r' && standalone) {
+          } else if(c == 'r') {
             // hidden option: parse number of runs
             if(++i == args[a].length()) {
               a++;
               i = 0;
             }
             if(a == args.length) break;
-            Prop.runs = Math.max(1, Token.toInt(args[a].substring(i)));
+            // turn off result serialization
+            int runs = Math.max(1, Token.toInt(args[a].substring(i)));
+            execute(Commands.SET, Set.RUNS + " " + runs, false);
             i = args[a].length();
             ok = true;
           } else if(c == 's' && !standalone) {

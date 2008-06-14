@@ -34,24 +34,21 @@ public final class Clc extends Arr {
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
     super.comp(ctx);
-    if(expr[0].e() || expr[1].e()) {
-      ctx.compInfo(OPTPREEVAL, this);
-      return Seq.EMPTY;
-    }
-    if(expr[0].i() && expr[1].i()) {
-      final Item it1 = iter(expr[0]).atomic(this, true);
-      final Item it2 = iter(expr[1]).atomic(this, true);
-      ctx.compInfo(OPTPREEVAL, this);
-      return calc.ev(it1, it2);
-    }
-    return this;
+
+    final Expr e1 = expr[0];
+    final Expr e2 = expr[1];
+    final boolean empty = e1.e() || e2.e();
+    if(!(empty || e1.i() && e2.i())) return this;
+    
+    ctx.compInfo(OPTPREEVAL, this);
+    return empty ? Seq.EMPTY : calc.ev((Item) e1, (Item) e2);
   }
 
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
-    final Item a = ctx.iter(expr[0]).atomic(this, true);
+    final Item a = ctx.atomic(expr[0], this, true);
     if(a == null) return Iter.EMPTY;
-    final Item b = ctx.iter(expr[1]).atomic(this, true);
+    final Item b = ctx.atomic(expr[1], this, true);
     if(b == null) return Iter.EMPTY;
     return calc.ev(a, b).iter();
   }

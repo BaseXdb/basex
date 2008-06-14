@@ -42,7 +42,7 @@ public final class Unary extends Single {
   
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
-    final Item it = ctx.iter(expr).atomic(this, true);
+    final Item it = ctx.atomic(expr, this, true);
     if(it == null) return Iter.EMPTY;
     if(!it.u() && !it.n()) Err.num(info(), it);
     final double d = it.dbl();

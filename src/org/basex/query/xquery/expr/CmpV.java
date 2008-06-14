@@ -114,25 +114,25 @@ public final class CmpV extends Arr {
   public Expr comp(final XQContext ctx) throws XQException {
     super.comp(ctx);
 
-    if(expr[0].e() || expr[1].e()) {
-      ctx.compInfo(OPTPREEVAL, this);
-      return Seq.EMPTY;
-    }
-    if(expr[0].i() && expr[1].i()) {
-      final Item i1 = iter(expr[0]).atomic(this, true);
-      final Item i2 = iter(expr[1]).atomic(this, true);
-      if(!valCheck(i1, i2)) Err.cmp(i1, i2);
-      ctx.compInfo(OPTPREEVAL, this);
-      return Bln.get(cmp.e(i1, i2));
-    }
-    return this;
+    final Expr e1 = expr[0];
+    final Expr e2 = expr[1];
+    final boolean empty = e1.e() || e2.e();
+    if(!(empty || e1.i() && e2.i())) return this;
+    
+    ctx.compInfo(OPTPREEVAL, this);
+    if(empty) return Seq.EMPTY;
+
+    final Item i1 = (Item) expr[0];
+    final Item i2 = (Item) expr[1];
+    if(!valCheck(i1, i2)) Err.cmp(i1, i2);
+    return Bln.get(cmp.e(i1, i2));
   }
 
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
-    final Item a = ctx.iter(expr[0]).atomic(this, true);
+    final Item a = ctx.atomic(expr[0], this, true);
     if(a == null) return Iter.EMPTY;
-    final Item b = ctx.iter(expr[1]).atomic(this, true);
+    final Item b = ctx.atomic(expr[1], this, true);
     if(b == null) return Iter.EMPTY;
 
     if(!valCheck(a, b)) Err.cmp(a, b);

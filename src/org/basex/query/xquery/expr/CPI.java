@@ -35,7 +35,7 @@ public final class CPI extends Arr {
 
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
-    Item it = ctx.iter(expr[0]).atomic(this, false);
+    Item it = ctx.atomic(expr[0], this, false);
     if(!it.u() && !it.s() && it.type != Type.QNM) Err.or(CPIWRONG, it.type, it);
 
     final byte[] nm = Token.trim(it.str());

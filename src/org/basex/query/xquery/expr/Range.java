@@ -25,9 +25,9 @@ public final class Range extends Arr {
 
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
-    final Item i1 = ctx.iter(expr[0]).atomic(this, true);
+    final Item i1 = ctx.atomic(expr[0], this, true);
     if(i1 == null) return Iter.EMPTY;
-    final Item i2 = ctx.iter(expr[1]).atomic(this, true);
+    final Item i2 = ctx.atomic(expr[1], this, true);
     if(i2 == null) return Iter.EMPTY;
     
     final long l1 = checkItr(i1);

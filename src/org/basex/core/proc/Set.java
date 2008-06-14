@@ -69,19 +69,19 @@ public final class Set extends Proc {
       Prop.mainmem = toggle(Prop.mainmem, INFOMM, ext);
     } else if(option.equals(RUNS)) {
       Prop.runs = Math.max(1, Token.toInt(ext));
-      info(INFORUNS + Prop.runs);
+      info(INFORUNS + " " + Prop.runs);
     } else if(option.equals(SERIALIZE)) {
       Prop.serialize = toggle(Prop.serialize, INFOSERIALIZE, ext);
     } else if(option.equals(INFO)) {
       Prop.allInfo = ext.equalsIgnoreCase(ALL);
-      if(Prop.allInfo) info(INFOINFO + ": " + INFOON + " (" + INFOALL + ")");
+      if(Prop.allInfo) info(INFOINFO + " " + INFOON + " (" + INFOALL + ")");
       Prop.info = Prop.allInfo ? true : toggle(Prop.info, INFOINFO, ext);
     } else if(option.equals(XMLOUTPUT)) {
       Prop.xmloutput = toggle(Prop.xmloutput, INFOXMLOUTPUT, ext);
     } else if(option.equals(DBPATH)) {
       if(!new IO(ext).exists()) return error(INFOPATHERR + ext);
       Prop.dbpath = ext;
-      info(INFONEWPATH + ext);
+      info(INFONEWPATH + " " + ext);
       // the following options are kinda hidden
     } else {
       try {

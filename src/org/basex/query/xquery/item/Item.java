@@ -36,7 +36,7 @@ public abstract class Item extends Expr {
   }
 
   @Override
-  public final boolean i() {
+  public boolean i() {
     return true;
   }
 

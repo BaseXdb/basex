@@ -2,6 +2,7 @@ package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.query.xquery.XQText.*;
+
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
@@ -72,15 +73,13 @@ public final class CmpG extends Arr {
   public Expr comp(final XQContext ctx) throws XQException {
     super.comp(ctx);
 
-    if(expr[0].e() || expr[1].e()) {
-      ctx.compInfo(OPTPREEVAL, this);
-      return Bln.FALSE;
-    }
-    if(expr[0].i() && expr[1].i()) {
-      ctx.compInfo(OPTPREEVAL, this);
-      return Bln.get(ev(iter(expr[0]), iter(expr[1])));
-    }
-    return this;
+    final Expr e1 = expr[0];
+    final Expr e2 = expr[1];
+    final boolean e = e1.e() || e2.e();
+    if(!(e || e1.i() && e2.i())) return this;
+
+    ctx.compInfo(OPTPREEVAL, this);
+    return e ? Bln.FALSE : Bln.get(ev((Item) expr[0], (Item) expr[1], cmp.cmp));
   }
 
   @Override
@@ -90,8 +89,11 @@ public final class CmpG extends Arr {
       private boolean more;
       @Override
       public Item next() throws XQException {
-        return (more ^= true) ?
-            Bln.get(ev(ctx.iter(expr[0]), ctx.iter(expr[1]))) : null;
+        if(!(more ^= true)) return null;
+        final Expr e1 = expr[0];
+        final Expr e2 = expr[1];
+        final Iter i1 = ctx.iter(e1);
+        return Bln.get(e2.i() ? ev(i1, (Item) e2) : ev(i1, ctx.iter(e2)));
       }
       @Override
       public String toString() {
@@ -101,16 +103,17 @@ public final class CmpG extends Arr {
   }
 
   /**
-   * Performs a general comparison on the specified items and comparator.
-   * @param ir1 first item
+   * Performs a general comparison on the specified iterators and comparator.
+   * @param ir1 first iterator
    * @param ir2 second iterator
    * @return result of check
    * @throws XQException evaluation exception
    */
   protected boolean ev(final Iter ir1, final Iter ir2) throws XQException {
+    if(ir1.size() == 0 || ir2.size() == 0) return false;
+    
     Item it1, it2;
-
-    final SeqIter seq = new SeqIter();
+    SeqIter seq = new SeqIter();
     if((it1 = ir1.next()) != null) {
       while((it2 = ir2.next()) != null) {
         if(ev(it1, it2, cmp.cmp)) return true;
@@ -126,6 +129,19 @@ public final class CmpG extends Arr {
   }
 
   /**
+   * Performs a general comparison on the specified iterator and item.
+   * @param ir iterator
+   * @param it item
+   * @return result of check
+   * @throws XQException evaluation exception
+   */
+  protected boolean ev(final Iter ir, final Item it) throws XQException {
+    Item i;
+    while((i = ir.next()) != null) if(ev(i, it, cmp.cmp)) return true;
+    return false;
+  }
+
+  /**
    * Compares a single item.
    * @param c comparator
    * @param a first item to be compared
@@ -136,9 +152,8 @@ public final class CmpG extends Arr {
   private static boolean ev(final Item a, final Item b, final CmpV.COMP c)
       throws XQException {
 
-    if(a.type != b.type && !a.u() && !b.u() && (a.n() && !b.n() ||
-        b.n() && !a.n() || !a.n() && !b.n()) && !(a.s() && b.s()))
-      Err.cmp(a, b);
+    if(a.type != b.type && !(a.s() && b.s()) && !a.u() && !b.u() &&
+        (a.n() && !b.n() || b.n() && !a.n() || !a.n() && !b.n())) Err.cmp(a, b);
     return c.e(a, b);
   }
   

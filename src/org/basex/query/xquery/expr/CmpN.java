@@ -84,9 +84,9 @@ public final class CmpN extends Arr {
 
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
-    final Item a = ctx.iter(expr[0]).atomic(this, true);
+    final Item a = ctx.atomic(expr[0], this, true);
     if(a == null) return Iter.EMPTY;
-    final Item b = ctx.iter(expr[1]).atomic(this, true);
+    final Item b = ctx.atomic(expr[1], this, true);
     if(b == null) return Iter.EMPTY;
 
     if(!a.node()) Err.type(info(), Type.NOD, a);

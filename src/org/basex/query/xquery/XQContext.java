@@ -198,6 +198,26 @@ public final class XQContext extends QueryContext {
   }
 
   /**
+   * Returns the specified expression as an item. Empty sequences are
+   * handled by the empty flag.
+   * @param expr expression to be evaluated
+   * @param call calling expression
+   * @param empty if set to true, empty sequences are returned as null.
+   * Otherwise, an error is thrown
+   * @return iterator
+   * @throws XQException evaluation exception
+   */
+  public Item atomic(final Expr expr, final Expr call, final boolean empty)
+      throws XQException {
+
+    if(expr.e()) {
+      if(!empty) Err.empty(call);
+      return null;
+    }
+    return expr.i() ? (Item) expr : iter(expr).atomic(call, empty);
+  }
+
+  /**
    * Adds a database instance or returns an existing one.
    * @param db database name or file path
    * @return database instance
