@@ -6,7 +6,6 @@ import org.basex.index.Names;
 import org.basex.index.Namespaces;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
-import org.basex.query.xpath.expr.FTOption;
 
 /**
  * This class provides access to the database. The storage
@@ -337,10 +336,24 @@ public abstract class Data  {
   /**
    * Returns the indexed id references for the specified fulltext token.
    * @param fulltext token to be looked up
-   * @param ftOption fulltext options
+   * @param cs boolean flag for case sensitive search
    * @return id array
    */
-  public abstract int[][] ftIDs(byte[] fulltext, FTOption ftOption);
+  public abstract int[][] ftIDs(byte[] fulltext, final boolean cs);
+
+  /**
+   * WILDCARD SEARCH
+   * Returns the indexed id references for the specified fulltext token,
+   * with respect to the wildcard contained in the token.
+   * 
+   * @param tok token to look up
+   * @param posw int position of the wildcard in tok
+   * @return id array
+   */
+ 
+  public abstract int[][] wildcardIDs(final byte[] tok, final int posw);
+  
+  
   
   /**
    * Returns the number of indexed id references for the specified token.

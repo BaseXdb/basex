@@ -40,10 +40,16 @@ public final class FTBuilder extends Progress implements IndexBuilder {
    */
   public WordsCTANew build(final Data data) throws IOException {
     data.meta.fcompress = Prop.fcompress;
+    wp.sens = data.meta.ftcs;
     int s = 0;
-    index = new CTArrayNew(128);
+    index = new CTArrayNew(128, data.meta.ftcs);
     index.bl |= data.meta.filesize > 1073741824;
-    if(index.bl) hash = new FZHash();
+    if(index.bl) {
+      if (wp.sens) {
+        // bulk loader doesn't support case sensitivity
+        index.bl = false; 
+      } else hash = new FZHash();
+    }
         
     total = data.size;
     for(id = 0; id < total; id++) {
@@ -58,8 +64,9 @@ public final class FTBuilder extends Progress implements IndexBuilder {
     }
     
     final String db = data.meta.dbname;
+    DataOutput outD = new DataOutput(db, DATAFTX + 'b');
     if(index.bl) {
-      bulkLoad(db);
+      bulkLoad(outD);
     }
     
     if(Prop.debug) {
@@ -149,15 +156,18 @@ public final class FTBuilder extends Progress implements IndexBuilder {
           //System.out.print(index.next[i][j + 1]);
         } else {
           // write pointer on data
-          if (lp == 0) {
-            //System.out.print(index.next[i][j + 1]);
-            outN.write5(index.next[i][j + 1]);
+          if (index.bl) {
+            if (lp == 0) {
+              outN.write5(index.next[i][j + 1]);
+            } else {
+              tmp = new int[2];
+              System.arraycopy(index.next[i], index.next[i].length - 2, 
+                  tmp, 0, tmp.length);
+              outN.write5(Token.intArrayToLong(tmp));
+            }
           } else {
-            tmp = new int[2];
-            System.arraycopy(index.next[i], index.next[i].length - 2, 
-                tmp, 0, tmp.length);
-            outN.write5(Token.intArrayToLong(tmp));
-            //System.out.print(Token.intArrayToLong(tmp));
+            writeData(outD, index.pre[index.next[i][index.next[i].length - 1]]);
+            writeData(outD, index.pos[index.next[i][index.next[i].length - 1]]);
           }
         }
         //System.out.println();
@@ -168,22 +178,29 @@ public final class FTBuilder extends Progress implements IndexBuilder {
       }
     }
     
+    if (!index.bl) {
+      // write data
+      for (int i = 0; i < index.pre.length; i++) {
+        writeData(outD, index.pre[i]);
+        writeData(outD, index.pos[i]);
+      }
+    }
+    
     outS.writeInt(s);
-    //outD.close();
+    outD.close();
     outN.close();
-    outS.close();
+    outS.close();    
     return new WordsCTANew(data, db);
   }
   
   
   /**
    * Adds the data to each token.
-   * @param db name of the databaseinstance
+   * @param outD DataOutput
    * @throws IOException IOEXception
    */
-  private void bulkLoad(final String db)  throws IOException {   
+  private void bulkLoad(final DataOutput outD)  throws IOException {   
     // ftdata is stored here, with pre1, ..., preu, pos1, ..., posu
-    DataOutput outD = new DataOutput(db, DATAFTX + 'b');
     hash.init();
     long c;
     int ds, p;
@@ -212,8 +229,24 @@ public final class FTBuilder extends Progress implements IndexBuilder {
       index.insertSorted(tok, ds, c);
     }
     //System.out.println("</words>");
-    outD.close();
    }
+  
+  /**
+   * Writes data to output stream.
+   * 
+   * @param out DataOutput  stream for the data
+   * @param d data to write
+   * @throws IOException File not found
+   */
+  private void writeData(final DataOutput out, final int[] d) 
+    throws IOException {
+    if (Prop.fcompress) {
+      byte[] val = Num.create(d);
+      for (int z = 4; z < val.length; z++) out.write(val[z]); 
+    } else {
+      out.writeInts(d);
+    }
+  }
 
   /**
    * Extracts and indexes words from the specified byte array.
@@ -229,6 +262,7 @@ public final class FTBuilder extends Progress implements IndexBuilder {
    */
   private void index() {
     final byte[] tok = wp.next();
+    
     final int pos = wp.pos;
     if(index.bl) index(tok, id, pos);
     else index.index(tok, id, pos);

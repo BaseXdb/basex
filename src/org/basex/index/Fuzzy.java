@@ -10,7 +10,6 @@ import org.basex.util.Levenshtein;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
-import org.basex.query.xpath.expr.FTOption;
 import org.basex.query.xpath.expr.FTUnion;
 
 /**
@@ -57,6 +56,8 @@ public final class Fuzzy extends Index {
   private final DataAccessPerf ti;
   /** Storing pre and pos values for each token. */ 
   private DataAccessPerf dat;  
+  /** Flag for case sensitve index. FUZZYINDEX is always insensitive!.*/
+  protected boolean cs = false;
 
   /**
    * Constructor, initializing the index structure.
@@ -302,45 +303,21 @@ public final class Fuzzy extends Index {
   }
 
   @Override
-  public int[][] ftIDs(final byte[] tok, final FTOption ftO) {
-    // init no wildcard included in token
-    int posW = -1;
-
-    // backup original token
-    byte[] bTok = new byte[tok.length];
-    System.arraycopy(tok, 0, bTok, 0, tok.length);
-
-    // token to lower case
-    for (int i = 0; i < tok.length; i++) {
-      tok[i] = (byte) Token.lc(tok[i]);
-      // check for wildcards
-      if (tok[i] == '.') {
-        posW = i;
-      }
-    }
-
-    // check wildcards
-    if (ftO.ftWild == FTOption.WILD.WITH && posW > -1)  {
-      return getTokenWildCard(tok, posW);
-    }
-
-
-    if (ftO.ftCase == FTOption.CASE.INSENSITIVE) {
+  public int[][] wildcardIDs(final byte[] tok, final int pw) {
+    byte[] btok = Token.lc(tok);
+    return getTokenWildCard(btok, pw);
+  }
+  
+  @Override
+  public int[][] ftIDs(final byte[] tok, final boolean casesen) {
+    if (!casesen) {
       // index request with pre-values as result
-      return get(tok);
+      return get(Token.lc(tok));
     }
 
     // index request with pre-values and positions as result
-    int[][] ids = get(tok);
+    int[][] ids = get(Token.lc(tok));
     if (ids == null) return null;
-
-    if (ftO.ftCase == FTOption.CASE.UPPERCASE) {
-      // convert search string to upper case and use case sensitive search
-      bTok = Token.uc(bTok);
-    } else if (ftO.ftCase == FTOption.CASE.LOWERCASE) {
-      // carry search string to upper case and use case sensitive search
-      bTok = Token.lc(bTok);
-    }
 
     byte[] tokenFromDB;
     byte[] textFromDB;
@@ -369,7 +346,7 @@ public final class Fuzzy extends Index {
 
         // check unique node ones
         // compare token from db with token from query
-        if (Token.eq(tokenFromDB, bTok)) {
+        if (Token.eq(tokenFromDB, tok)) {
           rIds[0][count] = ids[0][i];
           rIds[1][count++] = ids[1][i];
 

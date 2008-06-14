@@ -9,6 +9,7 @@ import org.basex.query.xpath.expr.FTPositionFilter;
 import org.basex.query.xpath.locpath.Step;
 import org.basex.query.xpath.values.NodeSet;
 import org.basex.util.Array;
+import org.basex.util.FTTokenizer;
 import org.basex.util.Token;
 
 /**
@@ -120,32 +121,44 @@ public final class FTIndex extends InternalExpr {
   @Override
   public NodeSet eval(final XPContext ctx) {
     final Data data = ctx.local.data;
-
+    
     if (ne > 0) {
       ids = data.fuzzyIDs(token, ne);
       if (ids == null) return new NodeSet(ctx);
       return new NodeSet(Array.extractIDsFromData(ids), ctx, ids);
     }
     
-    if(single) {
-      ids = data.ftIDs(token, option);
-      if (ids == null) return new NodeSet(ctx);
-      /*if(simple) {
-        // simple ftcontains don't need pos-values out of the index
-        return new NodeSet(Array.extractIDsFromData(ids), ctx);
-      } else {*/
-        return new NodeSet(Array.extractIDsFromData(ids), ctx, ids);
-      //}
-    } else {
-      evalNonSingle(data);
-      if (ids == null) return new NodeSet(ctx);
-      /*if(simple) {
-        // simple ftcontains don't need pos-values out of the index
-        return new NodeSet(Array.extractIDsFromData(ids), ctx);
-      } else {*/
-        return new NodeSet(Array.extractIDsFromData(ids), ctx, ids);
-      //no}
+    FTTokenizer ftt = new FTTokenizer();
+    ftt.init(token);
+    ftt.sens = option.ftCasesen;
+    ftt.wc = option.ftWild;
+    ftt.lc = option.ftlc | !ftt.sens;
+    ftt.uc = option.ftuc;
+    
+    int c = 0;
+    int pos;
+    int[][] d = null;
+    byte[] b;
+    while (ftt.more()) {
+      b = ftt.next();
+      c++;
+      if (ftt.wc) {
+        pos = Token.indexOf(b, '.');
+        if (pos > -1) {
+          d = data.wildcardIDs(b, pos);
+        } else {
+          d = data.ftIDs(b, ftt.sens);
+        }
+      } else {
+        d = data.ftIDs(b, ftt.sens);
+      }
+      break; // <SG> remove me
     }
+    
+    if (d != null) 
+      return new NodeSet(Array.extractIDsFromData(d), ctx, d);
+    else 
+      return new NodeSet(ctx);
   }
 
   @Override
@@ -153,10 +166,7 @@ public final class FTIndex extends InternalExpr {
     return Token.string(name()) + "(" + Token.string(token) + ")";
   }
 
-  /**
-   * Evaluation of non single word queries.
-   * @param data data reference
-   */
+/*  
   private void evalNonSingle(final Data data) {
     byte[] tok;
     int i = Token.indexOf(token, ' ');
@@ -239,6 +249,7 @@ public final class FTIndex extends InternalExpr {
     ids[0] = Array.finish(res[0], count);
     ids[1] = Array.finish(res[1], count);
   }
+  */
 
   @Override
   public void plan(final Serializer ser) throws Exception {

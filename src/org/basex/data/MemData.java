@@ -7,7 +7,6 @@ import org.basex.index.Names;
 import org.basex.index.Namespaces;
 import org.basex.util.Array;
 import org.basex.util.Token;
-import org.basex.query.xpath.expr.FTOption;
 
 /**
  * This class stores and organizes the database table and the index structures
@@ -310,13 +309,19 @@ public final class MemData extends Data {
   }
 
   @Override
-  public int[][] ftIDs(final byte[] word, final FTOption ftOption) {
+  public int[][] ftIDs(final byte[] word, final boolean cs) {
     BaseX.notimplemented();
     return null;
   }
 
   @Override
   public int[][] fuzzyIDs(final byte[] word, final int ne) {
+    BaseX.notimplemented();
+    return null;
+  }
+
+  @Override
+  public int[][] wildcardIDs(final byte[] word, final int posw) {
     BaseX.notimplemented();
     return null;
   }

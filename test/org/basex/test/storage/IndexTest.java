@@ -2,6 +2,7 @@ package org.basex.test.storage;
 
 import java.io.*;
 import org.basex.util.Performance;
+import org.basex.util.Token;
 import org.basex.index.CTArrayNew;
 
 /**
@@ -53,7 +54,8 @@ public final class IndexTest {
     indexed = new String[nrTokens];
     copy = new String[nrTokens];
     for(int i = 0; i < nrTokens; i++) {
-      indexed[i] = randomToken();
+      //indexed[i] = randomToken();
+      indexed[i] = randomCSToken();
       copy[i] = indexed[i];
     }
     // show performance results
@@ -68,13 +70,14 @@ public final class IndexTest {
     //initTimer();
 
     // create instance of token index
-    CTArrayNew index = new CTArrayNew(nrTokens);
+    CTArrayNew index = new CTArrayNew(nrTokens, true);
     // index all tokens and get their reference
     for(int i = 0; i < nrTokens; i++) {
-      //System.out.println(indexed[i]);
+      System.out.println(indexed[i]);
       index.index(indexed[i].getBytes(), i, i * nrTokens);
     }
     
+    index.finish();
     //int indexSize = index.size();
 
     // show performance results & reinitialize timer
@@ -96,7 +99,7 @@ public final class IndexTest {
     int[][] data;
     for(int i = 0; i < nrTokens; i++) {
       //System.out.println(copy[i]);
-      data = index.getNodeFromTrie(copy[i].getBytes());
+      data = index.getNodeFromTrie(Token.lc(copy[i].getBytes()), false);
       if(data == null) {
         System.out.println("- Token " + indexed[i] + " was not found.");
         break;
@@ -124,19 +127,19 @@ public final class IndexTest {
     }
     */
     // create new random tokens
-    indexed = null;
+/*    indexed = null;
     for(int i = 0; i < nrTokens; i++) {
-      copy[i] = randomToken();
+      copy[i] = randomCSToken();
     }
-
+*/
     // request random tokens
-    System.out.println("\nRequesting random tokens...");
+//    System.out.println("\nRequesting random tokens...");
     //initTimer();
 
-    for(int i = 0; i < nrTokens; i++) {
+//    for(int i = 0; i < nrTokens; i++) {
       // find token in index (ignore result)
-      index.getNodeFromTrie(copy[i].getBytes());
-    }
+//      index.getNodeFromTrie(copy[i].getBytes(), false);
+//    }
     // show performance results & reinitialize timer
     //printTimer();
     
@@ -203,4 +206,22 @@ public final class IndexTest {
     }
     return sb.toString();
   }
+
+  /**
+   * Returns a randomly created token.
+   * @return random token
+   */
+  String randomCSToken() {
+    StringBuilder sb = new StringBuilder();
+    // calculate random token length (1 - 10 characters)
+    int len = (int) (Math.random() * 10 + 1);
+    for(int k = 0; k < len; k++) {
+      // add random letter
+      sb.append((char) ((Math.random() <= 0.5) ? 
+          (Math.random() * 26 + 65) : (Math.random() * 26 + 97)));
+      //sb.append((char) (Math.random() * 26 + 65));
+    }
+    return sb.toString();
+  }
+
 }

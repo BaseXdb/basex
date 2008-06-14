@@ -828,19 +828,19 @@ public final class XPParser extends QueryParser {
       consumeWS();
       if(consume(CASE)) {
         consumeWS();
-        if(consume(SENSITIVE))        opt.ftCase = FTOption.CASE.INSENSITIVE;
-        else if(consume(INSENSITIVE)) opt.ftCase = FTOption.CASE.SENSITIVE;
+        if(consume(SENSITIVE))        opt.ftCasesen = true;
+        else if(consume(INSENSITIVE)) opt.ftCasesen = false;
         else error(FTCASE);
       } else if(consume(LOWERCASE)) {
-        opt.ftCase = FTOption.CASE.LOWERCASE;
+        opt.ftlc = true;
       } else if(consume(UPPERCASE)) {
-        opt.ftCase = FTOption.CASE.UPPERCASE;
+        opt.ftuc = true;
       } else if(consume(WITH)) {
         consumeWS();
-        if(consume(WILDCARDS)) opt.ftWild = FTOption.WILD.WITH;
+        if(consume(WILDCARDS)) opt.ftWild = true;
       } else if(consume(WITHOUT)) {
         consumeWS();
-        if(consume(WILDCARDS)) opt.ftWild = FTOption.WILD.WITHOUT;
+        if(consume(WILDCARDS)) opt.ftWild = false;
       } else {
         break;
       }

@@ -10,7 +10,6 @@ import org.basex.io.DataAccessPerf;
 import org.basex.util.Array;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
-import org.basex.query.xpath.expr.FTOption;
 import org.basex.query.xpath.expr.FTUnion;
 import org.basex.util.Token;
 
@@ -41,6 +40,8 @@ public final class WordsCTANew extends Index {
   private final DataAccessPerf inS;
   /** Id on data, corresponding to the current node entry. */
   private long did;
+  /** Flag for case sensitive index. */
+  private boolean cs = false;
   
   /**
    * Constructor, initializing the index structure.
@@ -55,6 +56,7 @@ public final class WordsCTANew extends Index {
     inS = new DataAccessPerf(db, file + 'c', "Size");
     data = d;
     did = -1;
+    cs = data.meta.ftcs;
   }
 
   @Override
@@ -70,8 +72,71 @@ public final class WordsCTANew extends Index {
   }
 
   @Override
-  public int[][] ftIDs(final byte[] tok, final FTOption ftO) {
-    // init no wildcard included in token
+  public int[][] wildcardIDs(final byte[] tok, final int posw) {
+    if (cs) return null;
+    return getNodeFromTrieWithWildCard(tok, posw);
+  }
+  
+  @Override
+  public int[][] ftIDs(final byte[] tok, final boolean casesen) {
+    if (!cs && casesen) {
+        // case insensitive index create - check real case with dbdata
+        int[][] ids = getNodeFromTrieRecursive(0, Token.lc(tok), false);
+        if (ids == null) {
+          return null;
+        }
+        
+        byte[] tokenFromDB;
+        byte[] textFromDB;
+        int[][] rIds = new int[2][ids[0].length];
+        int count = 0;
+        int readId;
+
+        int i = 0;
+        // check real case of each result node
+        while(i < ids[0].length) {
+          // get date from disk
+          readId = ids[0][i];
+          textFromDB = data.text(ids[0][i]);
+          tokenFromDB = new byte[tok.length];
+
+          System.arraycopy(textFromDB, ids[1][i], tokenFromDB, 0, tok.length);
+
+          // check unique node ones
+          while (i < ids[0].length && readId == ids[0][i]) {
+            System.arraycopy(textFromDB, ids[1][i], tokenFromDB, 0, tok.length);
+
+            readId = ids[0][i];
+
+            // check unique node ones
+            // compare token from db with token from query
+            if (Token.eq(tokenFromDB, tok)) {
+              rIds[0][count] = ids[0][i];
+              rIds[1][count++] = ids[1][i];
+
+              // jump over same ids
+              while (i < ids[0].length && readId == ids[0][i]) i++;
+              break;
+            }
+            i++;
+          }
+        }
+
+        if (count == 0) return null;
+        
+        int[][] tmp = new int[2][count];
+        System.arraycopy(rIds[0], 0, tmp[0], 0, count);
+        System.arraycopy(rIds[1], 0, tmp[1], 0, count);
+
+        return tmp;
+        
+    } else {
+        return getNodeFromTrieRecursive(0, tok, casesen);         
+    }
+    
+    
+    
+    /*// init no wildcard included in token
     int posW = -1;
     // backup original token
     byte[] bTok = new byte[tok.length];
@@ -154,7 +219,7 @@ public final class WordsCTANew extends Index {
     System.arraycopy(rIds[0], 0, tmp[0], 0, count);
     System.arraycopy(rIds[1], 0, tmp[1], 0, count);
 
-    return tmp;
+    return tmp;*/
   }
   
   @Override
@@ -334,20 +399,24 @@ public final class WordsCTANew extends Index {
    *
    * @param cNode int
    * @param searchNode search nodes value
+   * @param casesen flag for case sensitve search
    * @return int[][] array with pre-values and corresponding positions
    * for each pre-value
    */
   private int[][] getNodeFromTrieRecursive(final int cNode,
-      final byte[] searchNode) {
+      final byte[] searchNode, final boolean casesen) {
     if (searchNode == null || searchNode.length == 0) return null;
-    int[] ne = getNodeIdFromTrieRecursive(cNode, 
-        searchNode);
+    int[] ne = null;
+    if (cs) {
+      if (casesen) ne = getNodeIdFromTrieRecursive(cNode, searchNode); 
+      else  return getNodeFromCSTrie(cNode, searchNode);
+    } else if (!casesen) ne = getNodeIdFromTrieRecursive(cNode, searchNode);
+
     if (ne == null) {
       return null;
     }
     
     long ldid = did;
-    //return getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]);
     return getDataFromDataArray(ne[ne.length - 1], ldid);
   }
 
@@ -406,8 +475,136 @@ public final class WordsCTANew extends Index {
       }
     }
   }
+ 
   
-  
+  /**
+   * Traverse trie and return found node for searchValue.
+   * Searches case insensitive in a case sensitive trie.
+   * Returns data from node or null.
+   *
+   * @param cn int
+   * @param sn search nodes value
+   * @return int id on node saving the data
+   */
+  private int[][] getNodeFromCSTrie(final int cn, final byte[] sn) {
+    byte[] vsn = sn;
+    long ldid;
+    
+    // read data entry from disk
+    int[] ne = getNodeEntry(cn);
+
+    if(cn != 0) {
+      int i = 0;
+      while(i < vsn.length && i < ne[0] && Token.lc(ne[i + 1]) == vsn[i]) {
+        i++;
+      }
+
+      if(ne[0] == i) {
+        if(vsn.length == i) {
+          // leaf node found with appropriate value
+          ldid = did; 
+          return getDataFromDataArray(ne[ne.length - 1], ldid);
+        } else {
+          // cut valueSearchNode for value current node
+          byte[] tmp = new byte[vsn.length - i];
+          System.arraycopy(vsn, i, tmp, 0, tmp.length);
+          vsn = tmp;
+
+          // scan successors currentNode
+          final int p = getInsPosLinCSF(ne, vsn[0]);
+          if(!found) {
+            if (Token.lc(ne[p + 1]) != vsn[0])
+              return null;
+            else 
+              return getNodeFromCSTrie(ne[p], vsn);
+          } else {
+            int[][] d = getNodeFromCSTrie(ne[p], vsn);
+            if (Token.lc(ne[p + 3]) == vsn[0]) {
+              d = FTUnion.calculateFTOr(d, 
+                  getNodeFromCSTrie(ne[p + 2], vsn));
+            }
+            return d;
+          }
+        }
+      } else {
+        // node not contained
+        return null;
+      }
+    } else {
+      // scan successors currentNode
+      final int p = getInsPosLinCSF(ne, vsn[0]);
+      if(!found) {
+        if (Token.lc(ne[p + 1]) != vsn[0])
+          return null;
+        else 
+          return getNodeFromCSTrie(ne[p], vsn);
+      } else {
+        int[][] d = getNodeFromCSTrie(ne[p], vsn);
+        if (Token.lc(ne[p + 3]) == vsn[0]) {
+          d = FTUnion.calculateFTOr(d, 
+              getNodeFromCSTrie(ne[p + 2], vsn));
+        }
+        return d;
+      }
+    }
+  }
+  /**
+   * Traverse case sentsitive trie and search case sensitive.
+   * Returns data from node or null.
+   *
+   * @param cn int
+   * @param sn search nodes value
+   * @return int id on node saving the data
+   */
+ /* private int[] getNodeFromSensitiveTrie(final int cn, final byte[] sn) {
+    byte[] vsn = sn;
+
+    // read data entry from disk
+    int[] ne = getNodeEntry(cn);
+
+    if(cn != 0) {
+      int i = 0;
+      while(i < vsn.length && i < ne[0] && Token.lc(ne[i + 1]) == vsn[i]) {
+        i++;
+      }
+
+      if(ne[0] == i) {
+        if(vsn.length == i) {
+          // leaf node found with appropriate value
+          return ne;
+        } else {
+          // cut valueSearchNode for value current node
+          byte[] tmp = new byte[vsn.length - i];
+          System.arraycopy(vsn, i, tmp, 0, tmp.length);
+          vsn = tmp;
+
+          // scan successors currentNode
+          int pos = getInsertingPosition(ne, vsn[0]);
+          if(!found) {
+            // node not contained
+            return null;
+          } else {
+            return getNodeIdFromTrieRecursive(
+                ne[pos], vsn);
+          }
+        }
+      } else {
+        // node not contained
+        return null;
+      }
+    } else {
+      // scan successors current node
+      int pos = getInsertingPosition(ne, vsn[0]);
+      if(!found) {
+        // node not contained
+        return null;
+      } else {
+        return getNodeIdFromTrieRecursive(ne[pos], vsn);
+      }
+    }
+  }
+
+ */ 
 
   /**
    * Parses the trie and backups each passed node its first/next child node 
@@ -878,7 +1075,9 @@ public final class WordsCTANew extends Index {
    * @return inserting position
    */
   private int getInsertingPosition(final int[] cne, final int toInsert) {
-    return getInsertingPositionLinear(cne, toInsert);
+    if (cs)
+      return getInsPosLinCSF(cne, toInsert);
+    else return getInsertingPositionLinear(cne, toInsert);
     //return getInsertingPositionBinary(cne, toInsert);
   }
   
@@ -903,13 +1102,92 @@ public final class WordsCTANew extends Index {
       return i;
 
     while (i < s && cne[i + 1] < toInsert) i += 2;
-    
     if (i < s && cne[i + 1] == toInsert) {
       found = true;
     }
     return i;
   }
 
+  
+  /**
+   * Uses linear search for finding inserting position.
+   * values are order like this:
+   * a,A,b,B,r,T,s,y,Y
+   * returns:
+   * 0 if any successor exists, or 0 is inserting position
+   * n here to insert
+   * n and found = true, if nth item is occupied and here to insert
+   * BASED ON FINISHED STRUCTURE ARRAYS!!!!
+   * 
+   * @param cne current node entry
+   * @param toInsert value to be inserted
+   * @return inserting position
+   */
+
+  private int getInsPosLinCSF(final int[] cne,
+      final int toInsert) {
+    found = false;
+
+    int i = cne[0] + 1;
+    int s = cne.length - 1;
+    if (s == i) 
+      return i;
+    while (i < s && Token.lc(cne[i + 1]) < Token.lc(toInsert)) i += 2;
+    
+    if (i < s) {
+      if(cne[i + 1] == toInsert) {
+        found = true;
+        return i;
+      } else if(Token.lc(cne[i + 1]) 
+          == Token.lc(toInsert)) {
+        if (cne[i + 1] == Token.uc(toInsert)) {
+          return i;
+          }
+        if (i + 3 < s && cne[i + 3] == toInsert) { 
+          found = true;
+        }
+        return i + 2;
+      }
+    }
+    return i;
+  }
+
+  
+  
+  
+  /**
+   * Uses linear search for finding inserting positions in a 
+   * casesensitive trie.
+   * returns:
+   * null if any successor exists, 
+   * an int[1] if one successor exists and an int[2] if 2 succsessors exists
+   * n if nth item is occupied
+   *
+   * @param cne current node entry
+   * @param toInsert byte looking for
+   * @return inserting position
+   */
+  private int[] getSuccessorPosSensitiveTrie(final int[] cne,
+      final int toInsert) {
+    int r = -1;
+    int i = cne[0] + 1;
+    int s = cne.length - 1;
+    if (s == i)  return null;
+
+    while (i < s && Token.lc(cne[i + 1]) < toInsert) i += 2;
+    if (i == s) return null;
+    if (Token.lc(cne[i + 1]) == toInsert)  r = i;
+
+    while (i > s && Token.lc(cne[s - 1]) < toInsert) s -= 2;
+    if (i == s) return new int[]{r};
+    if (Token.lc(cne[i + 1]) == toInsert) return new int[]{r , i};
+    if (r > -1) return new int[]{r};
+    
+    return null;
+
+  }
+
+  
   /**
    * Uses linear search for finding inserting position.
    * returns:
@@ -1189,7 +1467,7 @@ public final class WordsCTANew extends Index {
         System.arraycopy(vsn, posw + 2, sc, bw.length, sc.length - bw.length);
       }
 
-      d = getNodeFromTrieRecursive(0, sc);
+      d = getNodeFromTrieRecursive(0, sc, false);
 
       // lookup in trie with . as wildcard
       sc = new byte[vsn.length - 1];
@@ -1233,7 +1511,7 @@ public final class WordsCTANew extends Index {
           System.arraycopy(vsn, posw + 2, aw,
               0, searchChar.length - bw.length);
         }
-        d = getNodeFromTrieRecursive(0, searchChar);
+        d = getNodeFromTrieRecursive(0, searchChar, false);
         //System.out.println("searchChar:" + new String(searchChar));
         // all chars from valueSearchNode are contained in trie
         if(bw != null && counter[1] != bw.length) {
@@ -1295,7 +1573,7 @@ public final class WordsCTANew extends Index {
         vsn[posw] = (byte) rne[counter[0] + 1];
 
         // . wildcards left
-        final int [][] resultData = getNodeFromTrieRecursive(0, vsn);
+        final int [][] resultData = getNodeFromTrieRecursive(0, vsn, false);
         // save nodeValues for recursive method call
         if(resultData != null && recCall) {
           valuesFound = new byte[] {(byte) rne[counter[0] + 1]};
@@ -1327,7 +1605,7 @@ public final class WordsCTANew extends Index {
             aw[0] = (byte) rne[t + 1];
 
             tmpNode = FTUnion.calculateFTOr(tmpNode, 
-                getNodeFromTrieRecursive(rne[t], aw));
+                getNodeFromTrieRecursive(rne[t], aw, false));
           }
 
           return tmpNode;
@@ -1345,7 +1623,7 @@ public final class WordsCTANew extends Index {
             valuesFound[t - rne[0] - 1] = (byte) rne[t + 1];
 
             tmpNode = FTUnion.calculateFTOr(tmpNode,
-                getNodeFromTrieRecursive(rne[t], aw));
+                getNodeFromTrieRecursive(rne[t], aw, false));
           }
         }
       }

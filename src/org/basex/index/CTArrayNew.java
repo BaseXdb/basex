@@ -1,6 +1,7 @@
 package org.basex.index;
 
 
+import org.basex.query.xpath.expr.FTUnion;
 import org.basex.util.IntArrayList;
 import org.basex.util.Token;
 import org.basex.util.TokenList;
@@ -40,13 +41,16 @@ public final class CTArrayNew {
   /** FTData: Position values. */
   int[][] pos;
   /** Flag for bulkload option. */
-  boolean bl = true;
+  boolean bl = false;
+  /** Flag for creating a case sensitive index. */
+  boolean cs = false;
 
   /**
    * Constructor.
    * @param is index size, number of tokens to index.
+   * @param sens flag for case sensitive index 
    */
-  public CTArrayNew(final int is) {
+  public CTArrayNew(final int is, final boolean sens) {
     nextL = new IntArrayList(is);
     preL = new IntArrayList(is);
     posL = new IntArrayList(is);
@@ -55,12 +59,13 @@ public final class CTArrayNew {
     nextL.add(new int[]{-1, 0, 0});
     count = 1;
     finished = false;
+    cs = sens;
   }
   
   /**
    * Finish the structure arrays.
    */
-  void finish() {
+  public void finish() {
     finished = true;
     tokens = tokensL.finish();
     tokensL = null;
@@ -254,7 +259,10 @@ public final class CTArrayNew {
           int[] one = nextL.list[cn];
           int[] ne = new int[5];
           ne[0] = one[0];
-          if (r2[0] < r1[0]) {
+          //if (r2[0] < r1[0]) {
+          if (Token.lc(r2[0]) < Token.lc(r1[0]) || 
+              (Token.lc(r2[0]) == Token.lc(r1[0]) 
+                  && Token.uc(r2[0]) == r1[0])) {
             ne[1] = nextL.size;
             ne[2] = nextL.size + 1;
           } else {
@@ -587,7 +595,11 @@ public final class CTArrayNew {
     
     //i = getInsertingPositionBinary(currentPosition, toInsert);
     if (bl) i = getInsertingPositionLinearUFBack(currentPosition, toInsert);
-    else i = getInsertingPositionBinaryUF(currentPosition, toInsert);
+    else {
+      if (cs) i = getInsPosLinCSUF(currentPosition, toInsert);
+      else 
+        i = getInsertingPositionBinaryUF(currentPosition, toInsert);
+    }
     return i;
   }
 
@@ -603,6 +615,7 @@ public final class CTArrayNew {
    * @param toInsert value to be inserted
    * @return inserting position
    */
+  /*
   private int getInsertingPositionLinearUF(final int cn,
       final byte toInsert) {
     // init value
@@ -621,8 +634,108 @@ public final class CTArrayNew {
       found = true;
     }
     return i;
+  }*/
+
+  
+  /**
+   * Uses linear search for finding inserting position.
+   * values are order like this:
+   * a,A,b,B,r,T,s,y,Y
+   * returns:
+   * 0 if any successor exists, or 0 is inserting position
+   * n here to insert
+   * n and found = true, if nth item is occupied and here to insert
+   * BASED ON UNFINISHED STRUCTURE ARRAYS!!!!
+   * 
+   * @param cn pointer on next array
+   * @param toInsert value to be inserted
+   * @return inserting position
+   */
+
+  private int getInsPosLinCSUF(final int cn,
+      final byte toInsert) {
+    // init value
+    found = false;
+
+    int i = 1;
+    int s = nextL.list[cn].length - 2;
+    if (s == i) 
+      return i;
+    while (i < s 
+        && Token.lc(tokensL.list[nextL.list[nextL.list[cn][i]][0]][0]) 
+        < Token.lc(toInsert)) {
+      i++;
+    }
+
+    if (i < s) {
+      if(tokensL.list[nextL.list[nextL.list[cn][i]][0]][0] == toInsert) {
+        found = true;
+        return i;
+      } else if(Token.lc(tokensL.list[nextL.list[nextL.list[cn][i]][0]][0]) 
+          == Token.lc(toInsert)) {
+        if (tokensL.list[nextL.list[nextL.list[cn][i]][0]][0] 
+           == Token.uc(toInsert))
+          return i;
+        if (i + 1 < s && 
+            tokensL.list[nextL.list[nextL.list[cn][i + 1]][0]][0] == toInsert) {
+          found = true;
+        }
+        return i + 1;
+      }
+    }
+    return i;
   }
 
+
+  /**
+   * Uses linear search for finding inserting position.
+   * values are order like this:
+   * a,A,b,B,r,T,s,y,Y
+   * returns:
+   * 0 if any successor exists, or 0 is inserting position
+   * n here to insert
+   * n and found = true, if nth item is occupied and here to insert
+   * BASED ON FINISHED STRUCTURE ARRAYS!!!!
+   * 
+   * @param cn pointer on next array
+   * @param toInsert value to be inserted
+   * @return inserting position
+   */
+
+  private int getInsPosLinCSF(final int cn,
+      final byte toInsert) {
+    // init value
+    found = false;
+
+    int i = 1;
+    int s = next[cn].length - 2;
+    if (s == i) 
+      return i;
+    while (i < s 
+        && Token.lc(tokens[next[next[cn][i]][0]][0]) 
+        < Token.lc(toInsert)) {
+      i++;
+    }
+
+    if (i < s) {
+      if(tokens[next[next[cn][i]][0]][0] == toInsert) {
+        found = true;
+        return i;
+      } else if(Token.lc(tokens[next[next[cn][i]][0]][0]) 
+          == Token.lc(toInsert)) {
+        if (tokens[next[next[cn][i]][0]][0] == Token.uc(toInsert)) {
+          return i;
+          }
+        if (i + 1 < s && tokens[next[next[cn][i + 1]][0]][0] == toInsert) { 
+          found = true;
+        }
+        return i + 1;
+      }
+    }
+    return i;
+  }
+
+  
   /**
    * Uses binary search for finding inserting position.
    * returns:
@@ -640,7 +753,6 @@ public final class CTArrayNew {
     int l = 1;
     int r = nextL.list[cn].length - 3;
     int m = l + (r - l) / 2;
-    //if (r > 2) {
       while (l <= r) {
         m = l + (r - l) / 2;
         m = (m == 0) ? 1 : m;
@@ -652,16 +764,6 @@ public final class CTArrayNew {
           return m;
         }
       }
-   /* } else if (r == 1) return 1;
-    else {
-      if (tokensL.list[nextL.list[nextL.list[cn][l]][0]][0] < toi) return 1;
-      else if (tokensL.list[nextL.list[nextL.list[cn][l]][0]][0] == toi) {
-        found = true;
-        return 1;
-      }
-      else return 1;
-    }
-    */
     if (l < nextL.list[cn].length - 2 
         && tokensL.list[nextL.list[nextL.list[cn][m]][0]][0] == toi) {
       found = true;
@@ -763,11 +865,20 @@ public final class CTArrayNew {
   /**
    * Lookup for nodes.
    * @param valueSearchNode search nodes value
+   * @param casesens flag for case sensitive search
    * @return int[][] dataResultNode data of result node
    */
-  public int[][] getNodeFromTrie(final byte[] valueSearchNode) {
-    if (finished) return getNodeFromTrieRecursiveF(0, valueSearchNode);
-    else return getNodeFromTrieRecursiveUF(0, valueSearchNode);
+  public int[][] getNodeFromTrie(final byte[] valueSearchNode, 
+      final boolean casesens) {
+    if (!finished) finish();
+    if (casesens) {
+      if (cs) return getNodeFromCSTrieRecursiveCSF(0, valueSearchNode);
+      else return null;
+    } else {
+      if (cs) return getNodeFromCSTrieRecursiveF(0, valueSearchNode);
+      else return getNodeFromTrieRecursiveF(0, valueSearchNode); 
+    }
+      
   }
 
   /**
@@ -779,6 +890,7 @@ public final class CTArrayNew {
    * @param sn search nodes value
    * @return int[][]
    */
+  /*
   private int[][] getNodeFromTrieRecursiveUF(final int cn, final byte[] sn) {
     byte[] vsn = sn;
     if(cn != 0) {
@@ -827,7 +939,143 @@ public final class CTArrayNew {
       }
     }
   }
+*/
+  
+  /**
+   * Traverse trie and return found node for searchValue.
+   * Searches case sensitive on a case sensitive trie
+   * Returns data from node or null
+   * BASED ON FINISHED STRUCTURE ARRAYS!!!!
+   *
+   * @param cn int
+   * @param sn search nodes value
+   * @return int[][]
+   */
+  private int[][] getNodeFromCSTrieRecursiveCSF(final int cn, final byte[] sn) {
+    byte[] vsn = sn;
+    if(cn != 0) {
+      int i = 0;
+      while(i < vsn.length && i < tokens[next[cn][0]].length 
+          && tokens[next[cn][0]][i] == vsn[i]) {
+        i++;
+      }
 
+      if(tokens[next[cn][0]].length == i) {  
+        if(vsn.length == i) {
+          // leaf node found with appropriate value
+          int[][] tmp = new int[2][];
+          tmp[0] = pre[next[cn][next[cn].length - 1]];
+          tmp[1] = pos[next[cn][next[cn].length - 1]];
+          return tmp;
+        } else {
+          // cut valueSearchNode for value current node
+          final byte[] tmp = new byte[vsn.length - i];
+          for(int j = 0; j < tmp.length; j++) {
+            tmp[j] = vsn[i + j];
+          }
+          vsn = tmp;
+
+          // scan successors currentNode
+          final int p = getInsPosLinCSF(cn, vsn[0]);
+          if(!found) {
+            // node not contained
+            return null;
+          } else {
+            return getNodeFromCSTrieRecursiveCSF(next[cn][p], vsn);
+          }
+        }
+      } else {
+        // node not contained
+        return null;
+      }
+    } else {
+      // scan successors current node
+      final int p = getInsPosLinCSF(cn, vsn[0]);
+      if(!found) {
+        // node not contained
+        return null;
+      } else {
+        return getNodeFromCSTrieRecursiveCSF(next[cn][p], vsn);
+      }
+    }
+  }
+
+  /**
+   * Traverse trie and return found node for searchValue.
+   * Searches case insensitive on a case sensitive trie
+   * Returns data from node or null
+   * BASED ON FINISHED STRUCTURE ARRAYS!!!!
+   *
+   * @param cn int
+   * @param sn search nodes value
+   * @return int[][]
+   */
+  private int[][] getNodeFromCSTrieRecursiveF(final int cn, final byte[] sn) {
+    byte[] vsn = sn;
+    if(cn != 0) {
+      int i = 0;
+      while(i < vsn.length && i < tokens[next[cn][0]].length 
+          && Token.lc(tokens[next[cn][0]][i]) == vsn[i]) {
+        i++;
+      }
+
+      if(tokens[next[cn][0]].length == i) {  
+        if(vsn.length == i) {
+          // leaf node found with appropriate value
+          int[][] tmp = new int[2][];
+          tmp[0] = pre[next[cn][next[cn].length - 1]];
+          tmp[1] = pos[next[cn][next[cn].length - 1]];
+          return tmp;
+        } else {
+          // cut valueSearchNode for value current node
+          final byte[] tmp = new byte[vsn.length - i];
+          for(int j = 0; j < tmp.length; j++) {
+            tmp[j] = vsn[i + j];
+          }
+          vsn = tmp;
+
+          // scan successors currentNode
+          final int p = getInsPosLinCSF(cn, vsn[0]);
+          if(!found) {
+            if (Token.lc(tokens[next[next[cn][p]][0]][0]) != vsn[0])
+              return null;
+            else 
+              return getNodeFromCSTrieRecursiveF(next[cn][p], vsn);
+          } else {
+            int[][] d = getNodeFromCSTrieRecursiveF(next[cn][p], vsn);
+            if (Token.lc(tokens[next[next[cn][p + 1]][0]][0]) == vsn[0]) {
+              d = FTUnion.calculateFTOr(d, 
+                  getNodeFromCSTrieRecursiveF(next[cn][p + 1], vsn));
+            }
+            return d;
+          }
+        }
+      } else {
+        // node not contained
+        return null;
+      }
+    } else {
+      // scan successors currentNode
+      final int p = getInsPosLinCSF(cn, vsn[0]);
+      if(!found) {
+        if (Token.lc(tokens[next[next[cn][p]][0]][0]) != vsn[0])
+          return null;
+        else 
+          return getNodeFromCSTrieRecursiveF(next[cn][p], vsn);
+      } else {
+        int[][] d = getNodeFromCSTrieRecursiveF(next[cn][p], vsn);
+        if (Token.lc(tokens[next[next[cn][p + 1]][0]][0]) == vsn[0]) {
+          d = FTUnion.calculateFTOr(d, 
+              getNodeFromCSTrieRecursiveF(next[cn][p + 1], vsn));
+        }
+        return d;
+      }
+    }
+  }
+
+  
+  
+  
   /**
    * Traverse trie and return found node for searchValue.
    * Returns data from node or null
@@ -1008,25 +1256,20 @@ public final class CTArrayNew {
         nextL.list[cn].length - 3 : nextL.list[cn].length - 4;
   }
   
-  /*
+ /* 
   public static void main(final String[] args) {
-    CTArrayNew c = new CTArrayNew(2);
-    long l = 444749632;
-    l +=    2000000000;
-    c.insertNodeSorted(0, "a".getBytes(), 1,  Token.longToInt(1));
-    System.out.println("intArray:"+ intArrayToString(Token.longToInt(l)));
-    System.out.println(l + "=" + Token.intArrayToLong(Token.longToInt(l)));
-    c.insertNodeSorted(0, "s".getBytes(), 3807, Token.longToInt(l));
-    l = 444768667;
-    l +=    2000000000;
-    System.out.println("intArray:"+ intArrayToString(Token.longToInt(l)));
-    System.out.println(l + "=" + Token.intArrayToLong(Token.longToInt(l)));
-    c.insertNodeSorted(0, "saad".getBytes(), 5, Token.longToInt(l));
-    l = 444768947;
-    l +=    2000000000;
-    System.out.println("intArray:"+ intArrayToString(Token.longToInt(l)));
-    System.out.println(l + "=" + Token.intArrayToLong(Token.longToInt(l)));
-    c.insertNodeSorted(0, "saadia".getBytes(), 575, Token.longToInt(l));
+    CTArrayNew c = new CTArrayNew(6, true);
+    //c.insertNodeIntoTrie(0, "o".getBytes(), new int[][]{{1},{1}});
+    c.insertNodeIntoTrie(0, "ga".getBytes(), new int[][]{{1},{1}});
+    c.insertNodeIntoTrie(0, "gA".getBytes(), new int[][]{{2},{1}});
+    c.insertNodeIntoTrie(0, "Ga".getBytes(), new int[][]{{3},{1}});
+    c.insertNodeIntoTrie(0, "GA".getBytes(), new int[][]{{4},{1}});
+    //c.insertNodeIntoTrie(0, "QQb".getBytes(), new int[][]{{1},{1}});
+    //c.insertNodeIntoTrie(0, "OF".getBytes(), new int[][]{{1},{1}});
+    //c.insertNodeIntoTrie(0, "ORO".getBytes(), new int[][]{{1},{1}});
+   //c.insertNodeIntoTrie(0, "oS".getBytes(), new int[][]{{1},{1}});
+    //c.insertNodeIntoTrie(0, "OR".getBytes(), new int[][]{{1},{1}});
+   // c.insertNodeIntoTrie(0, "HlM".getBytes(), new int[][]{{2},{2}});
     //c.insertNodeIntoTrie(0, "a".getBytes(), new int[][]{{3},{30}});
     //c.insertNodeIntoTrie(0, "s".getBytes(), new int[][]{{1},{10}});
     //c.insertNodeIntoTrie(0, "bqgwqc".getBytes(), new int[][]{{2},{20}});
@@ -1036,12 +1279,13 @@ public final class CTArrayNew {
  //   c.insertNodeIntoTrie(0, "q".getBytes(), new int[][]{{6},{60}});
     //c.insertNodeIntoTrie(0, "kt".getBytes(), new int[][]{{3},{30}});
     //c.insertNodeIntoTrie(0, "ktblxzziw".getBytes(), new int[][]{{2},{20}});
-    System.out.println();
-    c.printTrie();
+    c.finish();
+    int[][] ids = c.getNodeFromTrie("ga".getBytes(), false);
+    System.out.println(ids[0].length);
     //int[][] d = c.getNodeFromTrie("ka".getBytes());
     //System.out.println(intArrayToString(d[0]));
     //System.out.println(intArrayToString(d[1]));
-  }
+  }*/
   
   /**
    * Prints the struture arrays.

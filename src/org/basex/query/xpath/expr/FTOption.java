@@ -9,24 +9,14 @@ import org.basex.query.xpath.values.Num;
  * @author Christian Gruen
  */
 public final class FTOption {
-  /** Case sensitivity enumeration. */
-  public enum CASE {
-    /** Insensitive search. */ INSENSITIVE,
-    /** Sensitive search.   */ SENSITIVE,
-    /** Lowercase search.   */ LOWERCASE,
-    /** Uppercase search.   */ UPPERCASE;
-  };
-  
-  /** Case sensitivity enumeration. */
-  public enum WILD {
-    /** Using wildcards. */ WITH,
-    /** No wildcards.    */ WITHOUT;
-  };
-  
+  /** Convert searchstrings in upper case. */
+  public boolean ftuc = false;
+  /** Convert searchstring in lower case. */
+  public boolean ftlc = false;
   /** Case sensitivity (default: case insensitive). */ 
-  public CASE ftCase = CASE.INSENSITIVE;
+  public boolean ftCasesen = false;
   /** Wildcard search (default: without wildcards). */ 
-  public WILD ftWild = WILD.WITHOUT;
+  public boolean ftWild = false;
 
 
   /** Cardinality Selection. */

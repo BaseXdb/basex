@@ -2,7 +2,6 @@ package org.basex.index;
 
 import java.io.IOException;
 import org.basex.BaseX;
-import org.basex.query.xpath.expr.FTOption;
 
 /**
  * This interface defines the methods which have to be implemented
@@ -44,11 +43,11 @@ public abstract class Index {
   /**
    * Returns the decompressed ids for the specified token.
    * @param tok token to be found
-   * @param ftO ftoption for token to be found
+   * @param cs case sensitive search
    * @return ids
    */
   @SuppressWarnings("unused")
-  public int[][] ftIDs(final byte[] tok, final FTOption ftO) {
+  public int[][] ftIDs(final byte[] tok, final boolean cs) {
     BaseX.notimplemented();
     return null;
   }
@@ -83,6 +82,22 @@ public abstract class Index {
     BaseX.notimplemented();
     return null;
   }
+  
+  /**
+   * WILDCARD SEARCH
+   * Returns the indexed id references for the specified fulltext token,
+   * with respect to the wildcard contained in the token.
+   * 
+   * @param tok token to look up
+   * @param posw int position of the wildcard in tok
+   * @return id array
+   */
+  @SuppressWarnings("unused")
+  public int[][] wildcardIDs(final byte[] tok, final int posw) {
+    BaseX.notimplemented();
+    return null;
+  }
+  
 
   /**
    * Close the index.

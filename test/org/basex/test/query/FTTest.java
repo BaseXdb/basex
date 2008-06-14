@@ -26,6 +26,11 @@ public class FTTest extends AbstractTest {
       "     <s>diat-joghurt</s>\n" +
       "  </sc>\n" +
       "  <at><b>B</b>ad one</at>\n" +
+      "  <fti>adfas wordt ook wel eens</fti>" + 
+      "  <fti>wordt ook wel een s</fti>" +
+      "  <fti>adfad wordt ook wel eens a</fti>" +
+      "  <fti>adfad wordt ook wel een s adf</fti>" +
+      "  <fti>adfad wordt ook wel een s</fti>" +
       "</fttest>";
 
     queries = new Object[][] {
@@ -90,7 +95,6 @@ public class FTTest extends AbstractTest {
           "/fttest/co/w [text() ftcontains 'xml' all words]" },
         { "FTAnyAllOption 5", nodes(3, 5, 7, 9, 11),
           "/fttest/co/w [text() ftcontains 'xml' phrase]" },
-          
         { "FTTimes 1", nodes(7, 9, 11),
           "//w [text() ftcontains 'DaTaBaSeS' occurs exactly 1 times]" },
         { "FTTimes 2", nodes(5),
@@ -156,6 +160,8 @@ public class FTTest extends AbstractTest {
         { "FTSelection 10", nodes(9, 11),
           "//w [. ftcontains 'xml databases' entire content]" },
 
+        { "FTIndex1", nodes(26, 30),
+          "/fttest/fti [text() ftcontains 'wordt ook wel eens']" },
     };
 
     /** TABLE REPRESENTATION

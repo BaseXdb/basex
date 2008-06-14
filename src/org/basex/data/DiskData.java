@@ -2,6 +2,7 @@ package org.basex.data;
 
 import static org.basex.data.DataText.*;
 import java.io.IOException;
+
 import org.basex.core.Prop;
 import org.basex.index.Fuzzy;
 import org.basex.index.Index;
@@ -13,7 +14,6 @@ import org.basex.io.DataAccess;
 import org.basex.io.TableAccess;
 import org.basex.io.TableDiskAccess;
 import org.basex.io.TableMemAccess;
-import org.basex.query.xpath.expr.FTOption;
 import org.basex.util.Token;
 
 /**
@@ -330,8 +330,14 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public int[][] ftIDs(final byte[] word, final FTOption ftO) {
-    return ftxindex.ftIDs(word, ftO);
+  public int[][] wildcardIDs(final byte[] tok, final int posw) {
+    return ftxindex.wildcardIDs(tok, posw);
+  }
+
+  
+  @Override
+  public int[][] ftIDs(final byte[] word, final boolean cs) {
+    return ftxindex.ftIDs(word, cs);
   }
 
   @Override
