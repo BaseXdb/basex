@@ -7,7 +7,7 @@ import org.basex.core.proc.Create;
 import org.basex.core.proc.Proc;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.data.PrintSerializer;
+import org.basex.data.XMLSerializer;
 import org.basex.data.Result;
 import org.basex.io.ConsoleOutput;
 import org.basex.io.IO;
@@ -92,7 +92,7 @@ public final class XPathExample {
 
       // print output to file
       ConsoleOutput console = new ConsoleOutput(System.out);
-      result.serialize(new PrintSerializer(console));
+      result.serialize(new XMLSerializer(console));
       console.flush();
 
     } catch(QueryException e) {

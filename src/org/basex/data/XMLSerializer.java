@@ -1,9 +1,9 @@
 package org.basex.data;
 
+import static org.basex.util.Token.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
 import org.basex.io.PrintOutput;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -12,20 +12,30 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class PrintSerializer extends Serializer {
+public final class XMLSerializer extends Serializer {
+  /** Ampersand Entity. */
+  private static final byte[] E_AMP = token("&amp;");
+  /** Quote Entity. */
+  private static final byte[] E_QU = token("&quot;");
+  /** GreaterThan Entity. */
+  private static final byte[] E_GT = token("&gt;");
+  /** LessThan Entity. */
+  private static final byte[] E_LT = token("&lt;");
   /** Tab Entity. */
-  private static final byte[] E_TAB = { '#', 'x', '9' }; // token("&#xA;");
+  private static final byte[] E_TAB = token("&#x9;");
   /** NewLine Entity. */
-  private static final byte[] E_NL = { '#', 'x', 'A' }; // token("&#xA;");
+  private static final byte[] E_NL = token("&#xA;");
   /** CarriageReturn Entity. */
-  private static final byte[] E_CR = { '#', 'x', 'D' }; // token("&#xA;");
+  private static final byte[] E_CR = token("&#xD;");
+  /** Indentation. */
+  private static final String INDENT = "  ";
 
   /** Output stream. */
   public final PrintOutput out;
   /** Pretty printing flag. */
   private final boolean pretty;
-  /** Node flag. */
-  private boolean more;
+  /** Indent flag. */
+  private boolean indent;
   /** Current level. */
   private int level;
 
@@ -33,7 +43,7 @@ public final class PrintSerializer extends Serializer {
    * Constructor.
    * @param o output stream
    */
-  public PrintSerializer(final PrintOutput o) {
+  public XMLSerializer(final PrintOutput o) {
     this(o, false, false);
   }
 
@@ -43,7 +53,7 @@ public final class PrintSerializer extends Serializer {
    * @param x xml output 
    * @param p pretty printing
    */
-  public PrintSerializer(final PrintOutput o, final boolean x, 
+  public XMLSerializer(final PrintOutput o, final boolean x, 
       final boolean p) {
     out = o;
     xml = x;
@@ -53,9 +63,9 @@ public final class PrintSerializer extends Serializer {
   @Override
   public void open(final int size) throws IOException {
     if(xml) {
-      // [CG] XML/Serialize: convert back to original encoding
+      // [CG] XML/Serialize: convert back to original/specified encoding
       // (data.meta.encoding)
-      out.println("<?xml version='1.0' encoding='" + Token.UTF8 + "' ?>");
+      out.println("<?xml version='1.0' encoding='" + UTF8 + "' ?>");
       startElement(RESULTS);
       if(size == 0) emptyElement();
       else finishElement();
@@ -79,10 +89,10 @@ public final class PrintSerializer extends Serializer {
 
   @Override
   public void startElement(final byte[] t) throws IOException {
-    if(more) { out.println(); indent(); }
+    if(indent) indent();
     out.print(ELEM1);
     out.print(t);
-    more = pretty;
+    indent = pretty;
   }
 
   @Override
@@ -92,14 +102,14 @@ public final class PrintSerializer extends Serializer {
     out.print(ATT1);
     for(final byte ch : v) {
       switch(ch) {
-        case '&': out.print('&'); out.print(Token.E_AMP); out.print(';'); break;
-        case '>': out.print('&'); out.print(Token.E_GT);  out.print(';'); break;
-        case '<': out.print('&'); out.print(Token.E_LT);  out.print(';'); break;
-        case '"': out.print('&'); out.print(Token.E_QU);  out.print(';'); break;
-        case 0x9: out.print('&'); out.print(E_TAB);  out.print(';'); break;
-        case 0xA: out.print('&'); out.print(E_NL);  out.print(';'); break;
-        case 0xD: out.print('&'); out.print(E_CR);  out.print(';'); break;
-        default: out.write(ch);
+        case '&': out.print(E_AMP); break;
+        case '>': out.print(E_GT);  break;
+        case '<': out.print(E_LT);  break;
+        case '"': out.print(E_QU);  break;
+        case 0x9: out.print(E_TAB); break;
+        case 0xA: out.print(E_NL); break;
+        case 0xD: out.print(E_CR); break;
+        default:  out.write(ch);
       }
     }
     out.print(ATT2);
@@ -119,30 +129,30 @@ public final class PrintSerializer extends Serializer {
   @Override
   public void closeElement(final byte[] t) throws IOException {
     level--;
-    if(more) { out.println(); indent(); }
+    if(indent) indent();
     out.print(ELEM3);
     out.print(t);
     out.print(ELEM2);
-    more = pretty;
+    indent = pretty;
   }
 
   @Override
   public void text(final byte[] b) throws IOException {
     for(final byte ch : b) {
       switch(ch) {
-        case '&': out.print('&'); out.print(Token.E_AMP); out.print(';'); break;
-        case '>': out.print('&'); out.print(Token.E_GT);  out.print(';'); break;
-        case '<': out.print('&'); out.print(Token.E_LT);  out.print(';'); break;
-        case 0xD: out.print('&'); out.print(E_CR);  out.print(';'); break;
+        case '&': out.print(E_AMP); break;
+        case '>': out.print(E_GT); break;
+        case '<': out.print(E_LT); break;
+        case 0xD: out.print(E_CR); break;
         default: out.write(ch);
       }
     }
-    more = false;
+    indent = false;
   }
 
   @Override
   public void comment(final byte[] n) throws IOException {
-    if(more) { out.println(); indent(); }
+    if(indent) indent();
     out.print(COM1);
     out.print(n);
     out.print(COM2);
@@ -150,7 +160,7 @@ public final class PrintSerializer extends Serializer {
 
   @Override
   public void pi(final byte[] n, final byte[] v) throws IOException {
-    if(more) { out.println(); indent(); }
+    if(indent) indent();
     out.print(PI1);
     out.print(n);
     out.print(' ');
@@ -160,7 +170,7 @@ public final class PrintSerializer extends Serializer {
 
   @Override
   public void item(final byte[] b) throws IOException {
-    if(more) out.print(' ');
+    if(indent) out.print(' ');
     for(int l = 0; l < b.length; l++) {
       final byte ch = b[l];
       if((ch & 0xF0) == 0xF0 && (b[l + 1] & 0x30) != 0) {
@@ -168,19 +178,19 @@ public final class PrintSerializer extends Serializer {
           (b[++l] & 0x3F) << 6 | (b[++l] & 0x3F);
         out.print('&');
         out.print('#');
-        out.print(Token.token(v));
+        out.print(token(v));
         out.print(';');
         continue;
       }
       switch(ch) {
-        case '&': out.print('&'); out.print(Token.E_AMP); out.print(';'); break;
-        case '>': out.print('&'); out.print(Token.E_GT);  out.print(';'); break;
-        case '<': out.print('&'); out.print(Token.E_LT);  out.print(';'); break;
-        case 0xD: out.print('&'); out.print(E_CR);  out.print(';'); break;
+        case '&': out.print(E_AMP); break;
+        case '>': out.print(E_GT); break;
+        case '<': out.print(E_LT); break;
+        case 0xD: out.print(E_CR); break;
         default: out.write(ch);
       }
     }
-    more = true;
+    indent = true;
   }
 
   @Override
@@ -193,7 +203,8 @@ public final class PrintSerializer extends Serializer {
    * @throws IOException in case of problems with the PrintOutput
    */
   public void indent() throws IOException {
-    for(int l = 0; l < level; l++) out.print("  ");
+    out.println();
+    for(int l = 0; l < level; l++) out.print(INDENT);
   }
   
   /**
@@ -210,9 +221,9 @@ public final class PrintSerializer extends Serializer {
     } else if(kind == Data.TEXT) {
       return s ? TEXT : data.text(p);
     } else if(kind == Data.COMM) {
-      return s ? COMM : Token.concat(COM1, data.text(p), COM2);
+      return s ? COMM : concat(COM1, data.text(p), COM2);
     } else if(kind == Data.PI) {
-      return s ? PI : Token.concat(PI1, data.text(p), PI2);
+      return s ? PI : concat(PI1, data.text(p), PI2);
     }
     final TokenBuilder tb = new TokenBuilder();
     tb.add(ATT);

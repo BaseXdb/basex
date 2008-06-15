@@ -21,6 +21,8 @@ import org.basex.util.Token;
 public abstract class Item extends Expr {
   /** Score value. */
   protected double score = Scoring.DEFAULT;
+  /** Data type. */
+  public Type type;
   
   /**
    * Constructor.

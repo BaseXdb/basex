@@ -64,7 +64,7 @@ final class FNAcc extends Fun {
         return arg[0].s() && !arg[0].u() ? arg[0] : this;
       case NUMBER:
         if(arg[0].e()) return Dbl.NAN;
-        return arg[0].type == Type.DBL ? arg[0] : this;
+        return arg[0] instanceof Dbl ? arg[0] : this;
       default:
         return this;
     }

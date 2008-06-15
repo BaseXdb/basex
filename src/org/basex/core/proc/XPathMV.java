@@ -7,7 +7,7 @@ import org.basex.build.mediovis.MAB2;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.data.PrintSerializer;
+import org.basex.data.XMLSerializer;
 import org.basex.io.NullOutput;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
@@ -124,7 +124,7 @@ public final class XPathMV extends XPath {
 
     for(int i = 0; i < Prop.runs; i++) {
       if(i != 0) out = new NullOutput();
-      show(new PrintSerializer(out, false, false));
+      show(new XMLSerializer(out, false, false));
     }
     if(Prop.info) outInfo(o, maxhits);
   }
@@ -134,7 +134,7 @@ public final class XPathMV extends XPath {
    * @param ser serializer
    * @throws Exception exception
    */
-  private void show(final PrintSerializer ser) throws Exception {
+  private void show(final XMLSerializer ser) throws Exception {
     // get index references for mediovis attributes
     final Data data = context.data();
     final int bibid = data.attNameID(MAB2.BIB_ID);

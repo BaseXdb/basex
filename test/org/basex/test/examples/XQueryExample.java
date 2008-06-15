@@ -4,7 +4,7 @@ import org.basex.core.Commands;
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.proc.Proc;
-import org.basex.data.PrintSerializer;
+import org.basex.data.XMLSerializer;
 import org.basex.data.Result;
 import org.basex.io.ConsoleOutput;
 import org.basex.query.QueryException;
@@ -66,7 +66,7 @@ public final class XQueryExample {
       // execute query; no initial context set is specified (null)
       Result result = xquery.query(null);
       // print output
-      result.serialize(new PrintSerializer(out));
+      result.serialize(new XMLSerializer(out));
       out.println();
     } catch(QueryException e) {
       // dump stack trace

@@ -23,7 +23,7 @@ import org.basex.core.Prop;
 import org.basex.core.proc.Proc;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.data.PrintSerializer;
+import org.basex.data.XMLSerializer;
 import org.basex.data.Result;
 import org.basex.io.IO;
 import org.basex.io.CachedOutput;
@@ -337,7 +337,7 @@ public final class XQTS {
 
       final CachedOutput out = new CachedOutput();
       res = xq.query(context.current());
-      res.serialize(new PrintSerializer(out));
+      res.serialize(new XMLSerializer(out));
       output = norm(out.finish());
     } catch(final QueryException ex) {
       error = ex.getMessage();

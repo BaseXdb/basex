@@ -5,7 +5,7 @@ import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.data.PrintSerializer;
+import org.basex.data.XMLSerializer;
 import org.basex.io.PrintOutput;
 import org.basex.util.Token;
 
@@ -30,9 +30,9 @@ public final class Export extends Proc {
       
       if(current.size == 1 && current.pre[0] == 0) {
         out.println(BaseX.info(DOCDECL, Token.UTF8));
-        new Nodes(0, data).serialize(new PrintSerializer(out));
+        new Nodes(0, data).serialize(new XMLSerializer(out));
       } else {
-        current.serialize(new PrintSerializer(out, true, false));
+        current.serialize(new XMLSerializer(out, true, false));
       }
       out.close();
 

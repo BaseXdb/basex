@@ -8,7 +8,7 @@ import javax.swing.BoxLayout;
 
 import org.basex.BaseX;
 import org.basex.data.Nodes;
-import org.basex.data.PrintSerializer;
+import org.basex.data.XMLSerializer;
 import org.basex.gui.GUI;
 import org.basex.gui.GUICommands;
 import org.basex.gui.GUIProp;
@@ -105,7 +105,7 @@ public final class TextView extends View {
     try {
       final CachedOutput out = new CachedOutput(MAX);
       final boolean chop = GUI.context.data().meta.chop;
-      nodes.serialize(new PrintSerializer(out, false, chop));
+      nodes.serialize(new XMLSerializer(out, false, chop));
       out.addInfo();
       setText(out.buffer(), out.size(), false);
     } catch(final Exception ex) {

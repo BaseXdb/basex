@@ -1480,7 +1480,7 @@ public final class XQParser extends QueryParser {
       check('=');
       consumeWSS();
       final char delim = consume();
-      if(!quote(delim)) Err.or(NOQUOTE, QUOTE, found());
+      if(!quote(delim)) Err.or(NOQUOTE, found());
       final TokenBuilder tb = new TokenBuilder();
 
       boolean simple = true;
@@ -1490,7 +1490,6 @@ public final class XQParser extends QueryParser {
           if(c == '{') {
             if(next() == '{') {
               tb.add(consume());
-              simple = false;
               consume();
             } else {
               final byte[] text = tb.finish();
@@ -1519,26 +1518,22 @@ public final class XQParser extends QueryParser {
         tb.add(delim);
       } while(true);
 
-      final byte[] text = tb.finish();
-      if(text.length != 0) attv = add(attv, Str.get(text));
-      final Expr[] atts = attv;
-
-      final byte[] pre = atn.pre();
+      if(tb.size != 0) attv = add(attv, Str.get(tb.finish()));
 
       if(eq(atn.str(), XMLNS)) {
         if(!simple) Err.or(NSCONS);
         if(taguri != null) Err.or(DUPLNSDEF, atn);
-        final byte[] v = atts.length == 0 ? EMPTY : atts[0].str();
+        final byte[] v = attv.length == 0 ? EMPTY : attv[0].str();
         taguri = Uri.uri(v);
-      } else if(eq(pre, XMLNS)) {
+      } else if(eq(atn.pre(), XMLNS)) {
         if(!simple) Err.or(NSCONS);
-        final byte[] v = atts.length == 0 ? EMPTY : atts[0].str();
+        final byte[] v = attv.length == 0 ? EMPTY : attv[0].str();
         if(v.length == 0) Err.or(NSEMPTYURI);
         atn.uri = Uri.uri(v);
         ctx.ns.index(atn);
         ns = checkNS(ns, atn, v);
       } else {
-        cont = add(cont, new CAttr(atn, atts, false));
+        cont = add(cont, new CAttr(atn, attv, false));
       }
       if(!consumeWSS()) break;
     }

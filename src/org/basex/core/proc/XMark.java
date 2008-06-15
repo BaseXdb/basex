@@ -7,7 +7,7 @@ import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.data.PrintSerializer;
+import org.basex.data.XMLSerializer;
 import org.basex.data.Result;
 import org.basex.io.NullOutput;
 import org.basex.io.PrintOutput;
@@ -25,7 +25,7 @@ public final class XMark extends XPath {
   /** Data reference. */
   private Data data;
   /** Serializer. */
-  private PrintSerializer out;
+  private XMLSerializer out;
   /** XMark reference. */
   private int xmark;
 
@@ -38,12 +38,12 @@ public final class XMark extends XPath {
   @Override
   protected void out(final PrintOutput o) throws IOException {
     data = context.data();
-    out = new PrintSerializer(o);
+    out = new XMLSerializer(o);
     try {
       int hits = 0;
-      if(!Prop.serialize) out = new PrintSerializer(new NullOutput());
+      if(!Prop.serialize) out = new XMLSerializer(new NullOutput());
       for(int i = 0; i < Prop.runs; i++) {
-        if(i != 0) out = new PrintSerializer(new NullOutput(!Prop.serialize));
+        if(i != 0) out = new XMLSerializer(new NullOutput(!Prop.serialize));
         hits = process(xmark);
         out.out.print(NL);
       }

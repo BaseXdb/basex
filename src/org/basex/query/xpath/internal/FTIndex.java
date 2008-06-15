@@ -25,7 +25,8 @@ public final class FTIndex extends InternalExpr {
   /** FullText options. */
   private FTOption option;
   /** FullText options. */
-  private FTPositionFilter ftpos;
+  FTPositionFilter ftpos;
+  
   /** Ids as result of index request with tok. */
   private int[][] ids;
   /** Flag for simple ftcontains queries. **/

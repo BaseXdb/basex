@@ -5,7 +5,7 @@ import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.data.DOTSerializer;
 import org.basex.data.Nodes;
-import org.basex.data.PrintSerializer;
+import org.basex.data.XMLSerializer;
 import org.basex.data.Result;
 import org.basex.data.Serializer;
 import org.basex.io.IO;
@@ -121,7 +121,7 @@ public abstract class QueryContext extends Progress {
    */
   public final void planXML(final String fn) throws Exception {
     final CachedOutput out = new CachedOutput();
-    final PrintSerializer ser = new PrintSerializer(out, true, true);
+    final XMLSerializer ser = new XMLSerializer(out, true, true);
     ser.openElement(PLAN);
     plan(ser);
     ser.closeElement(PLAN);

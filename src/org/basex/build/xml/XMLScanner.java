@@ -23,6 +23,17 @@ import org.basex.util.TokenBuilder;
 public final class XMLScanner {
   /** Verbose mode. */
   private static final boolean VERBOSE = false;
+  /** Quote Entity. */
+  private static final byte[] E_QU = token("quot");
+  /** Ampersand Entity. */
+  private static final byte[] E_AMP = token("amp");
+  /** Apostrophe Entity. */
+  private static final byte[] E_APOS = token("apos");
+  /** GreaterThan Entity. */
+  private static final byte[] E_GT = token("gt");
+  /** LessThan Entity. */
+  private static final byte[] E_LT = token("lt");
+  
   /** Scanning states. */
   private static enum State {
     /** Content state.   */ CONTENT,

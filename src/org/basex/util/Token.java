@@ -41,16 +41,6 @@ public final class Token {
   public static final byte[] ONE = { '1' };
 
   /** Quote Entity. */
-  public static final byte[] E_QU = token("quot");
-  /** Ampersand Entity. */
-  public static final byte[] E_AMP = token("amp");
-  /** Apostrophe Entity. */
-  public static final byte[] E_APOS = token("apos");
-  /** GreaterThan Entity. */
-  public static final byte[] E_GT = token("gt");
-  /** LessThan Entity. */
-  public static final byte[] E_LT = token("lt");
-  /** Quote Entity. */
   public static final byte[] QU = token("\"");
   /** Ampersand Entity. */
   public static final byte[] AMP = token("&");
@@ -62,9 +52,9 @@ public final class Token {
   public static final byte[] LT = token("<");
 
   /** UTF8 encoding string. */
-  public static final String UTF8 = "UTF8";
+  public static final String UTF8 = "UTF-8";
   /** UTF8 encoding string (variant). */
-  public static final String UTF82 = "UTF-8";
+  public static final String UTF82 = "UTF8";
   /** UTF16 encoding string. */
   public static final String UTF16LE = "UTF-16LE";
   /** UTF16 encoding string. */

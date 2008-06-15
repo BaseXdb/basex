@@ -6,7 +6,7 @@ import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.data.DOTSerializer;
 import org.basex.data.Nodes;
-import org.basex.data.PrintSerializer;
+import org.basex.data.XMLSerializer;
 import org.basex.io.IO;
 import org.basex.io.CachedOutput;
 import org.basex.io.NullOutput;
@@ -44,11 +44,11 @@ public class XQuery extends Proc {
    * @throws Exception exception
    */
   protected void out(final PrintOutput o, final boolean p) throws Exception {
-    final PrintSerializer ser = new PrintSerializer(Prop.serialize ? o :
+    final XMLSerializer ser = new XMLSerializer(Prop.serialize ? o :
       new NullOutput(), Prop.xmloutput, p);
 
     for(int i = 0; i < Prop.runs; i++) {
-      result.serialize(i == 0 ? ser : new PrintSerializer(
+      result.serialize(i == 0 ? ser : new XMLSerializer(
           new NullOutput(!Prop.serialize), Prop.xmloutput, Prop.xqformat));
     }
     o.print(Prop.NL);

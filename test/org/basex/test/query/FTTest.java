@@ -38,9 +38,9 @@ public class FTTest extends AbstractTest {
           "//w [text() ftcontains 'HELLO']" },
         { "FT 2", nodes(14),
           "//w [text() ftcontains 'hello']" },
-        { "FT 4", nodes(14),
+        { "FT 3", nodes(14),
           "//w [text() ftcontains '    hello!...   ']" },
-        { "FT 5", nodes(),
+        { "FT 4", nodes(),
           "//w [  text  (   )  ftcontains  '  crap  '  ]  " },
 
         { "Phrase 1", nodes(7, 9, 11),
@@ -160,14 +160,14 @@ public class FTTest extends AbstractTest {
         { "FTSelection 10", nodes(9, 11),
           "//w [. ftcontains 'xml databases' entire content]" },
 
-        { "FTIndex1", nodes(26, 30),
+        { "FTIndex1", nodes(25, 29),
           "/fttest/fti [text() ftcontains 'wordt ook wel eens']" },
     };
 
     /** TABLE REPRESENTATION
     PRE DIS SIZ ATS  KIND  CONTENT
-      0   1  25   1  DOC   tmp
-      1   1  24   1  ELEM  fttest
+      0   1  35   1  DOC   tmp
+      1   1  34   1  ELEM  fttest
       2   1  11   1  ELEM  co
       3   1   2   1  ELEM  w
       4   1   1   1  TEXT  xml
@@ -191,6 +191,16 @@ public class FTTest extends AbstractTest {
      22   1   2   1  ELEM  b
      23   1   1   1  TEXT  B
      24   3   1   1  TEXT  ad one
+     25  24   2   1  ELEM  fti
+     26   1   1   1  TEXT  adfas wordt ook wel eens
+     27  26   2   1  ELEM  fti
+     28   1   1   1  TEXT  wordt ook wel een s
+     29  28   2   1  ELEM  fti
+     30   1   1   1  TEXT  adfad wordt ook wel eens a
+     31  30   2   1  ELEM  fti
+     32   1   1   1  TEXT  adfad wordt ook wel een s adf
+     33  32   2   1  ELEM  fti
+     34   1   1   1  TEXT  adfad wordt ook wel een s
      **/
   }
 }

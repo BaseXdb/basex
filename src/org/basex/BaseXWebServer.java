@@ -19,7 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.basex.core.Context;
 import org.basex.core.Prop;
-import org.basex.data.PrintSerializer;
+import org.basex.data.XMLSerializer;
 import org.basex.io.IO;
 import org.basex.io.BufferedOutput;
 import org.basex.io.PrintOutput;
@@ -285,7 +285,7 @@ public final class BaseXWebServer {
         final String val = arg.length == 2 ? arg[1] : "";
         xq.ctx.vars.addGlobal(v.item(Str.get(Token.token(val))));
       }
-      xq.query(null).serialize(new PrintSerializer(out));
+      xq.query(null).serialize(new XMLSerializer(out));
     } catch(final Exception ex) {
       if(ex instanceof IOException) {
         out.println(SERVERERR);

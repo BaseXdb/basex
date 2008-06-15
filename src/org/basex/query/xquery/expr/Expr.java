@@ -26,8 +26,6 @@ public abstract class Expr extends ExprInfo {
   public enum Return {
     /** Numeric value.    */ NUM,
   };
-  /** Data type. */
-  public Type type;
 
   /**
    * Optimizes and compiles the expression tree.

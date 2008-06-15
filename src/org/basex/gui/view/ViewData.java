@@ -1,7 +1,7 @@
 package org.basex.gui.view;
 
 import org.basex.data.Data;
-import org.basex.data.PrintSerializer;
+import org.basex.data.XMLSerializer;
 import org.basex.gui.GUIProp;
 import org.basex.query.fs.FSUtils;
 import org.basex.util.IntList;
@@ -74,7 +74,7 @@ public final class ViewData {
     final int kind = data.kind(p);
 
     return kind == Data.ELEM || kind == Data.DOC ? tag(data, p) :
-      PrintSerializer.content(data, p, s);
+      XMLSerializer.content(data, p, s);
   }
 
   /**

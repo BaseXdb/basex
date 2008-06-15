@@ -6,7 +6,6 @@ import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
 import org.basex.query.xquery.util.Err;
@@ -53,7 +52,7 @@ public final class FNSimple extends Fun {
     switch(func) {
       case TRUE:  return Bln.TRUE;
       case FALSE: return Bln.FALSE;
-      case BOOL:  return arg[0].type == Type.BLN ? arg[0] : this;
+      case BOOL:  return arg[0] instanceof Bln ? arg[0] : this;
       case NOT:
         if(arg[0] instanceof Fun) {
           Fun fs = (Fun) arg[0];

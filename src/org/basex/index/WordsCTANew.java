@@ -1166,7 +1166,6 @@ public final class WordsCTANew extends Index {
    * @param cne current node entry
    * @param toInsert byte looking for
    * @return inserting position
-   */
   private int[] getSuccessorPosSensitiveTrie(final int[] cne,
       final int toInsert) {
     int r = -1;
@@ -1186,7 +1185,7 @@ public final class WordsCTANew extends Index {
     return null;
 
   }
-
+   */
   
   /**
    * Uses linear search for finding inserting position.

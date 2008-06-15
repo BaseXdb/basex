@@ -67,8 +67,8 @@ public abstract class Iter {
 
   /**
    * Checks if the iterator can be dissolved into an effective boolean value.
-   * If not, returns an error. If yes, returns the first value (this makes
-   * sense to evaluate position predicates).
+   * If not, returns an error. If yes, returns the first value - which can be
+   * also be e.g. an integer, which is later evaluated as position predicate.
    * Must be called before {@link #next} was called.
    * @return item
    * @throws XQException evaluation exception
