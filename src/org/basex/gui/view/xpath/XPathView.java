@@ -73,20 +73,6 @@ public final class XPathView extends View {
       @Override
       public void keyReleased(final KeyEvent e) {
         int c = e.getKeyCode();
-          if(all.size == 0) {
-            String[] test = keys(GUI.context.data());
-            for(int i = 1; i < test.length; i++) {
-              all.add(test[i]);
-            }
-            String[] cmdList = { "ancestor-or-self::", "ancestor::",
-                "attribute::", "child::", "comment()", "descendant-or-self::",
-                "following-sibling::", "following::", "namespace::", "node()",
-                "parent::", "preceding-sibling::", "preceding::",
-                "processing-instruction()", "self::", "text()" };
-            for(int j = 0; j < cmdList.length; j++) {
-              all.add(cmdList[j]);
-            }
-          }
           if(c == KeyEvent.VK_SLASH) {
             slashC++;
             if(slashC <= 2) {
@@ -112,6 +98,7 @@ public final class XPathView extends View {
               showPopAll();
               }
             } else {
+              tempIn = input.getText();
               slashC = 0;
               pop.hide();
             }
@@ -153,10 +140,10 @@ public final class XPathView extends View {
         final XPParser parser = new XPParser(query);
         try {
           parser.parse();
+          GUI.get().execute(Commands.XPATH, query);
         } catch(final QueryException ex) {
           System.out.println(ex.getMessage());
         }
-        GUI.get().execute(Commands.XPATH, query);
       }
     });
 
@@ -184,9 +171,12 @@ public final class XPathView extends View {
         }
       }
     });
+      pop = new BasicComboPopup(box);
       FontMetrics fm = input.getFontMetrics(input.getFont());
       int width = fm.stringWidth(input.getText());
-      pop = new BasicComboPopup(box);
+      if(width >= back.getWidth()) {
+        width = back.getWidth();
+      }
       pop.show(input, width, input.getHeight());
   }
 
@@ -196,15 +186,20 @@ public final class XPathView extends View {
   public void showSpecPop() {
     pop.hide();
     box.removeAllItems();
+    if(tempIn.endsWith("/")) {
     temp = input.getText().substring(tempIn.length());
     for(int i = 0; i < all.finish().length; i++) {
       if(all.finish()[i].startsWith(temp)) {
         box.addItem(all.finish()[i]);
       }
     }
+    }
     if(box.getItemCount() != 0) {
       FontMetrics fm = input.getFontMetrics(input.getFont());
       int width = fm.stringWidth(input.getText());
+      if(width >= back.getWidth()) {
+        width = back.getWidth();
+      }
       pop = new BasicComboPopup(box);
       pop.setPreferredSize(new Dimension(pop.getPreferredSize().width,
           box.getItemCount() * 20));
@@ -227,8 +222,21 @@ public final class XPathView extends View {
 
   @Override
   protected void refreshInit() {
-  // TODO Auto-generated method stub
-
+    all = new StringList();
+    if(GUI.context.data() != null) {
+      String[] test = keys(GUI.context.data());
+      for(int i = 1; i < test.length; i++) {
+        all.add(test[i]);
+      }
+      String[] cmdList = { "ancestor-or-self::", "ancestor::",
+          "attribute::", "child::", "comment()", "descendant-or-self::",
+          "following-sibling::", "following::", "namespace::", "node()",
+          "parent::", "preceding-sibling::", "preceding::",
+          "processing-instruction()", "self::", "text()" };
+      for(int j = 0; j < cmdList.length; j++) {
+        all.add(cmdList[j]);
+      }
+    }
   }
 
   @Override
