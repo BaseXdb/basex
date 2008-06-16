@@ -24,6 +24,8 @@ import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.view.View;
 import org.basex.util.StringList;
 import org.basex.util.Token;
+import org.basex.query.QueryException;
+import org.basex.query.xpath.XPParser;
 
 /**
  * This class offers a real tree view.
@@ -81,7 +83,7 @@ public final class XPathView extends View {
                 "following-sibling::", "following::", "namespace::", "node()",
                 "parent::", "preceding-sibling::", "preceding::",
                 "processing-instruction()", "self::", "text()" };
-            for(int j = 0; j < test.length; j++) {
+            for(int j = 0; j < cmdList.length; j++) {
               all.add(cmdList[j]);
             }
           }
@@ -148,6 +150,12 @@ public final class XPathView extends View {
         }
         if(c == KeyEvent.VK_ESCAPE) return;
         final String query = input.getText();
+        final XPParser parser = new XPParser(query);
+        try {
+          parser.parse();
+        } catch(final QueryException ex) {
+          System.out.println(ex.getMessage());
+        }
         GUI.get().execute(Commands.XPATH, query);
       }
     });
@@ -168,9 +176,8 @@ public final class XPathView extends View {
     tempIn = input.getText();
     box = new JComboBox(all.finish());
     popInit = true;
-    box.setSelectedItem(null);
     box.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent e) {        
+      public void actionPerformed(final ActionEvent e) {
         if(e.getModifiers() == 16) {
           input.setText(tempIn + box.getSelectedItem());
           pop.hide();
