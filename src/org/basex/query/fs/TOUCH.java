@@ -100,7 +100,7 @@ public final class TOUCH {
         if(!(curDirPre == FSUtils.getROOTDIR())) {
           preNewFile = curDirPre + 5;
         }
-
+        
         context.data().insert(preNewFile, 
             curDirPre, "file".getBytes(), Data.ELEM);
         context.data().insert(preNewFile + 1, preNewFile, 

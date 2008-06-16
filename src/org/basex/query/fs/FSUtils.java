@@ -2,6 +2,8 @@ package org.basex.query.fs;
 
 import static org.basex.util.Token.*;
 import java.io.IOException;
+import java.util.regex.Pattern;
+
 import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.Data;
@@ -98,6 +100,17 @@ public final class FSUtils {
    * @param pre pre value
    * @return file name.
    */
+  public static byte[] getMtime(final Data data, final int pre) {
+    final byte[] att = data.attValue(data.timeID, pre);
+    return att != null ? att : EMPTY;
+  }
+  
+  /**
+   * Returns the name of a file.
+   * @param data data reference
+   * @param pre pre value
+   * @return file name.
+   */
   public static String getFileName(final Data data, final int pre) {
     final byte[] att = data.attValue(data.nameID, pre);    
     if(att == null)
@@ -185,6 +198,29 @@ public final class FSUtils {
       if(Token.eq(getName(data, n), file)) return n;
     }
     return -1;
+  }
+  
+  /**
+   * Returns the pre values of files or dir. The names are described
+   * by a pattern.
+   *  
+   * @param data - the data table
+   * @param pre - pre value of the "parent" directory
+   * @param file - directory name
+   * @return -  all pre values of all files
+   */
+  public static int[] getSpecificFilesOrDirs(final Data data, final int pre,
+      final byte[] file) {    
+    final IntList res = new IntList();
+    final DirIterator it = new DirIterator(data, pre);
+    
+    String fileToFind = FSUtils.transformToRegex(Token.string(file));
+    while(it.more()) {
+      final int n = it.next();
+      if(Pattern.matches(fileToFind, Token.string(getName(data, n)))) 
+        res.add(n);
+    }
+    return res.finish();
   }
 
   /**

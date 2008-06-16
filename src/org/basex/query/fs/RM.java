@@ -25,13 +25,13 @@ public final class RM {
 
   /** Shows if an error occurs. */
   private boolean fError;
-  
+
   /** Shows if job is done. */
   private boolean fAccomplished;
 
   /** Remove the all. */
   private boolean fRecursive;
-  
+
   /**
    * Simplified Constructor.
    * @param ctx data context
@@ -108,26 +108,31 @@ public final class RM {
         file = path.substring(beginIndex + 1);
       }
     }
-    
-    int del = FSUtils.getSpecificFileOrDir(context.data(), curDirPre, 
+
+    int[] del = FSUtils.getSpecificFilesOrDirs(context.data(), curDirPre, 
         file.getBytes());
 
-    if(del == -1) {
-      out.print("rm: '" + file + "' No such file or directory");
-      return;
-    } else {
-      if((FSUtils.isDir(context.data(), del) && fRecursive) ||
-         (FSUtils.isFile(context.data(), del))) {
-        try {
-          context.data().delete(del);
-          context.data().flush();
-        } catch(Exception e) {
-          e.printStackTrace();
-        }     
+    for(int toDel : del) {
+      if(toDel == -1) {
+        out.print("rm: '" + file + "' No such file or directory");
+        return;
       } else {
-        out.print("rm: cannot remove '" + file + "': Is a directory");
+        out.println(toDel + " zu loeschen ");
+        if((FSUtils.isDir(context.data(), toDel) && fRecursive) ||
+            (FSUtils.isFile(context.data(), toDel))) {
+          try {
+            context.data().delete(toDel);
+            context.data().flush();     
+          } catch(Exception e) {
+            e.printStackTrace();
+          }     
+        } else {
+          out.print("rm: cannot remove '" + 
+              FSUtils.getFileName(context.data(), toDel) + "': Is a directory");
+        }
       }
     }
+    
   }
 
 

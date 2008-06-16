@@ -32,6 +32,9 @@ public final class LS {
   /** list files beginning with . */
   private boolean fListDot;
 
+  /** print long version. */
+  private boolean fPrintLong;
+
   /** Shows if an error occurs. */
   private boolean fError;
 
@@ -54,8 +57,8 @@ public final class LS {
    */
   public void lsMain(final String cmd) 
   throws IOException {    
-    GetOpts g = new GetOpts(cmd, "ahR", 1);
-    
+    GetOpts g = new GetOpts(cmd, "ahlR", 1);
+
     // get all Options
     int ch = g.getopt();
     while (ch != -1) {
@@ -69,6 +72,9 @@ public final class LS {
         case 'h':
           printHelp();
           return;
+        case 'l':
+          fPrintLong = true; 
+          break;
         case ':':         
           fError = true;
           out.print("ls: missing argument");
@@ -107,6 +113,7 @@ public final class LS {
 
     int[] contentDir = FSUtils.getAllOfDir(data, pre);  
     int[] allDir = FSUtils.getAllDir(data, pre);
+   
     print(contentDir);   
 
     for(int i = 0; i < allDir.length; i++) {
@@ -128,20 +135,49 @@ public final class LS {
    * @param result - array to print
    * @throws IOException in case of problems with the PrintOutput
    */
-  private void print(final int[] result) throws IOException {
+  private void printLong(final int[] result) throws IOException {
     for(int j : result) {
       byte[] name = FSUtils.getName(data, j);
+      long size = FSUtils.getSize(data, j);
+      byte[] time = FSUtils.getMtime(data, j);
       if(!fListDot) {
         // do not print files starting with .
         if(Token.startsWith(name, '.'))
           continue;
       }
       out.print(name);
-      out.print("\t");        
+      out.print("\t"); 
+      out.print("" + size);
+      out.print("\t"); 
+      out.print(time);
+      out.print(NL);
     }
     out.print(NL);
   }
 
+
+  /**
+   * Print the result.
+   * @param result - array to print
+   * @throws IOException in case of problems with the PrintOutput
+   */
+  private void print(final int[] result) throws IOException {
+    if(fPrintLong) {
+      printLong(result);
+    } else {
+      for(int j : result) {
+        byte[] name = FSUtils.getName(data, j);
+        if(!fListDot) {
+          // do not print files starting with .
+          if(Token.startsWith(name, '.'))
+            continue;
+        }
+        out.print(name);
+        out.print("\t");        
+      }
+      out.print(NL);
+    }
+  }
   /**
    * Print the help.
    * 
@@ -149,6 +185,6 @@ public final class LS {
    */
   private void printHelp() throws IOException {
     out.print("ls -ahR ...");
-   
+
   }
 }
