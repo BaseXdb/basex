@@ -119,23 +119,30 @@ public class CAT {
     if(io.exists()) {
       byte[] content = io.content();
       byte lastChar = 0;
-
-      for(byte c : content) {
+      for(int i = 0; i < content.length; ++i) {
+        byte c = content[i];
         if(fnumberLines || fnumberNonBlankLines) {          
           // Firstline
-          if(fnumberNonBlankLines && lastChar == 0 && c != cr) { 
+          if(fnumberNonBlankLines && lastChar == 0 && c != cr && c != lf) { 
             out.print(numberLines++ + " ");
             out.print((char) c);
             lastChar = c;
           } else if(fnumberLines && numberLines == 1) {
-            out.print(numberLines++ + " ");
-            out.print((char) c);
-            //  File after line 1
-          } else if (fnumberNonBlankLines && lastChar == lf && c != cr) {
+            if(c == lf) {
+              out.print(numberLines++ + " ");
+              out.print((char) c);
+              out.print(numberLines++ + " ");
+            } else {
+              out.print(numberLines++ + " ");
+              out.print((char) c);
+            }
+            //  after line 1
+          } else if (fnumberNonBlankLines && lastChar == lf &&
+              c != cr && c != lf) {
             out.print(numberLines++ + " ");
             out.print((char) c);
             lastChar = c;
-          } else if (fnumberLines && c == lf) {
+          } else if (fnumberLines && c == lf && i < content.length - 1) {
             out.print((char) c);
             out.print(numberLines++ + " ");            
           } else {
@@ -145,6 +152,7 @@ public class CAT {
         } else {
           out.print((char) c);
         }
+
       }
       out.print(NL);
     } else {
