@@ -484,7 +484,13 @@ ch_fs21= [Pfad]?: berechnet den Speicherverbrauch eines Verzeichnis-[Pfads]
 ch_fs22= [Pfad]?: listet Einträge eines Verzeichnis-[Pfads] auf
 ch_fs23= [Datei]: ändert Zugriffs- und Änderungszeiten einer [Datei]
 ch_fs24= [Option] [Datei]: entfernt eine [Datei]
-ch_fs25=: zeigt das aktuelle Arbeitsverzeichnis an
+ch_fs24= [-h] : zeigt das aktuelle Arbeitsverzeichnis an
+ch_fs25=: [-bnh] : concatenate and print files
+ch_fs26=: locate [-chl] arg1 -V [1|2] : find filenames quickly
+ch_fs27=: [-h] : make directories
+ch_fs28=: [-Rh] file : remove directory entries
+ch_fs29=: [-h] : change file access and modification times
+
 ch_dummyupdate0=Update-Befehle:
 ch_copy0=[Pos] ["Quelle"] ["Ziel"]
 ch_copy1=Kopieren von XML-Knoten.

@@ -167,7 +167,7 @@ public class CAT {
    * @throws IOException in case of problems with the PrintOutput
    */
   private void printHelp() throws IOException {
-    out.print("cat ...");
+    out.print("cat [-bn] ...");
 
   }
 }

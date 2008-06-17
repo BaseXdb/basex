@@ -71,28 +71,28 @@ public interface Text {
 
   /** Start Information. */
   String CLIENTINFO = CONSOLEINFO + NL +
-    "Usage: BaseXClient [options] [query]" + NL +
-    "  -d         debug mode" + NL +
-    "  -o [file]  specify output file" + NL +
-    "  -p<port>   specify server port" + NL +
-    "  -q<cmd>    send BaseX commands" + NL +
-    "  -s<name>   specify server name" + NL +
-    "  -v/V       show (all) process info" + NL +
-    "  -x         print result as xml" + NL +
-    "  -z         skip query output";
+  "Usage: BaseXClient [options] [query]" + NL +
+  "  -d         debug mode" + NL +
+  "  -o [file]  specify output file" + NL +
+  "  -p<port>   specify server port" + NL +
+  "  -q<cmd>    send BaseX commands" + NL +
+  "  -s<name>   specify server name" + NL +
+  "  -v/V       show (all) process info" + NL +
+  "  -x         print result as xml" + NL +
+  "  -z         skip query output";
 
   /** Start Information. */
   String LOCALINFO = CONSOLEINFO + NL +
-    "Usage: BaseX [options] [query]" + NL +
-    "  [query]    specify query file" + NL +
-    "  -c         chop whitespaces" + NL +
-    "  -d         debug mode" + NL +
-    "  -e         skip entity parsing" + NL +
-    "  -o [file]  specify output file" + NL +
-    "  -q<cmd>    send BaseX commands" + NL +
-    "  -v/V       show (all) process info" + NL +
-    "  -x         print result as xml" + NL +
-    "  -z         skip query output";
+  "Usage: BaseX [options] [query]" + NL +
+  "  [query]    specify query file" + NL +
+  "  -c         chop whitespaces" + NL +
+  "  -d         debug mode" + NL +
+  "  -e         skip entity parsing" + NL +
+  "  -o [file]  specify output file" + NL +
+  "  -q<cmd>    send BaseX commands" + NL +
+  "  -v/V       show (all) process info" + NL +
+  "  -x         print result as xml" + NL +
+  "  -z         skip query output";
 
   // SERVER ===================================================================
 
@@ -111,12 +111,12 @@ public interface Text {
 
   /** Start Information. */
   String SERVERINFO = CONSOLEINFO + NL +
-    "Usage: java BaseXServer [options]" + NL +
-    " stop     stop server" + NL +
-    " -d       debug mode" + NL +
-    " -h       show this help" + NL +
-    " -p<port> specify server port" + NL +
-    " -v       verbose mode";
+  "Usage: java BaseXServer [options]" + NL +
+  " stop     stop server" + NL +
+  " -d       debug mode" + NL +
+  " -h       show this help" + NL +
+  " -p<port> specify server port" + NL +
+  " -v       verbose mode";
 
   // WEB SERVER ===============================================================
 
@@ -127,13 +127,13 @@ public interface Text {
 
   /** Start Information. */
   String WSERVERINFO = CONSOLEINFO + NL +
-    "Usage: java BaseXWebServer [options]" + NL +
-    " stop     stop server" + NL +
-    " -c       cache XQuery requests" + NL +
-    " -d       debug mode" + NL +
-    " -h       show this help" + NL +
-    " -p<port> specify server port" + NL +
-    " -v       verbose mode";
+  "Usage: java BaseXWebServer [options]" + NL +
+  " stop     stop server" + NL +
+  " -c       cache XQuery requests" + NL +
+  " -d       debug mode" + NL +
+  " -h       show this help" + NL +
+  " -p<port> specify server port" + NL +
+  " -v       verbose mode";
 
   /* COMMANDS =================================================================
    *
@@ -150,15 +150,15 @@ public interface Text {
 
   /** Command help. */
   String CREATE0 = "[" + Create.XML + "|" + Create.FS + "|" + Create.INDEX +
-    "] [...]";
+  "] [...]";
   /** Command help. */
   String CREATE1 = lang("ch_create1");
   /** Command help. */
   String CREATE2 = lang("ch_create2") + NL + NL +
-    "- " + Create.XML + lang("ch_file") + NL + lang("ch_create3") + NL +
-    "- " + Create.FS + lang("ch_create4") + NL + lang("ch_create5") + NL +
-    "- " + Create.INDEX + " [" + Create.TXT + "|" + Create.ATV +
-    "|" + Create.FTX + "]: " + NL + lang("ch_create6");
+  "- " + Create.XML + lang("ch_file") + NL + lang("ch_create3") + NL +
+  "- " + Create.FS + lang("ch_create4") + NL + lang("ch_create5") + NL +
+  "- " + Create.INDEX + " [" + Create.TXT + "|" + Create.ATV +
+  "|" + Create.FTX + "]: " + NL + lang("ch_create6");
   /** Command help. */
   String OPEN0 = lang("ch_open0");
   /** Command help. */
@@ -171,9 +171,9 @@ public interface Text {
   String INFO1 = lang("ch_info1");
   /** Command help. */
   String INFO2 = lang("ch_info21") + NL + lang("ch_info22") + NL +
-    "- " + Info.DB + lang("ch_info23") + NL +
-    "- " + Info.IDX + lang("ch_info24") + NL +
-    "- " + Info.TBL + lang("ch_info25");
+  "- " + Info.DB + lang("ch_info23") + NL +
+  "- " + Info.IDX + lang("ch_info24") + NL +
+  "- " + Info.TBL + lang("ch_info25");
   /** Command help. */
   String CHECK0 = lang("ch_check0");
   /** Command help. */
@@ -198,10 +198,10 @@ public interface Text {
   String DROP1 = lang("ch_drop1");
   /** Command help. */
   String DROP2 = lang("ch_drop2") + NL +
-    "- " + Drop.DB + lang("ch_drop21") + NL +
-    lang("ch_drop22") + NL +
-    "- " + Create.INDEX + " [" + Create.TXT + "|" + Create.ATV + "|" +
-    Create.FTX + "]:" + NL + lang("ch_drop23");
+  "- " + Drop.DB + lang("ch_drop21") + NL +
+  lang("ch_drop22") + NL +
+  "- " + Create.INDEX + " [" + Create.TXT + "|" + Create.ATV + "|" +
+  Create.FTX + "]:" + NL + lang("ch_drop23");
   /** Command help. */
   String OPTIMIZE0 = "";
   /** Command help. */
@@ -255,17 +255,22 @@ public interface Text {
   /** Command Help. */
   String CD2 = lang("ch_cd2");
   /** Command Help. */
-  String FS0 = "[" + Fs.DU + "|" + Fs.LS + "|" + "|" + Fs.CD +
-    "|" + Fs.PWD + "|" + Fs.LOCATE + "]";
+  String FS0 = "[" + Fs.CAT + "|" + Fs.CD + "|" + Fs.DU +
+  "|" + Fs.LOCATE + "|" + Fs.LS + "|" + Fs.MKDIR + "|" +
+   Fs.PWD + "|" + Fs.RM + "|" + Fs.TOUCH + "]";
   /** Command Help. */
   String FS1 = lang("ch_fs1");
   /** Command Help. */
   String FS2 = lang("ch_fs2") + NL +
-    "- " + Fs.DU      + lang("ch_fs21") + NL +
-    "- " + Fs.LS      + lang("ch_fs22") + NL +
-    "- " + Fs.CD      + lang("ch_fs23") + NL +
-    "- " + Fs.LOCATE  + lang("ch_fs24") + NL +
-    "- " + Fs.PWD     + lang("ch_fs25");
+  "- " + Fs.CAT      + lang("ch_fs25") + NL +
+  "- " + Fs.CD       + lang("ch_fs23") + NL +  
+  "- " + Fs.DU       + lang("ch_fs21") + NL +
+  "- " + Fs.LOCATE   + lang("ch_fs26") + NL +
+  "- " + Fs.LS       + lang("ch_fs22") + NL +
+  "- " + Fs.MKDIR    + lang("ch_fs27") + NL +
+  "- " + Fs.PWD      + lang("ch_fs24") + NL +
+  "- " + Fs.RM       + lang("ch_fs28") + NL +  
+  "- " + Fs.TOUCH    + lang("ch_fs29");
 
   /** Command Help. */
   String DUMMYUPDATE0 = lang("ch_dummyupdate0");
@@ -285,29 +290,29 @@ public interface Text {
 
   /** Command Help. */
   String INSERT0 = "[" + Insert.FRG + "|" + Insert.ELEM + "|" + Insert.ATT +
-    "|" + Insert.TXT + "|" + Insert.COM + "|" + Insert.PI + "] [...]";
+  "|" + Insert.TXT + "|" + Insert.COM + "|" + Insert.PI + "] [...]";
   /** Command Help. */
   String INSERT1 = lang("ch_insert1");
   /** Command Help. */
   String INSERT2 = lang("ch_insert2") + NL + NL +
-    "- " + Insert.ELEM + " " + lang("ch_insert21") + NL +
-    "- " + Insert.TXT + " " + lang("ch_insert22") + NL +
-    "- " + Insert.ATT + " " + lang("ch_insert23") + NL +
-    "- " + Insert.COM + " " + lang("ch_insert24") + NL +
-    "- " + Insert.PI + " " + lang("ch_insert25") + NL +
-    "- " + Insert.FRG + " " + lang("ch_insert26");
+  "- " + Insert.ELEM + " " + lang("ch_insert21") + NL +
+  "- " + Insert.TXT + " " + lang("ch_insert22") + NL +
+  "- " + Insert.ATT + " " + lang("ch_insert23") + NL +
+  "- " + Insert.COM + " " + lang("ch_insert24") + NL +
+  "- " + Insert.PI + " " + lang("ch_insert25") + NL +
+  "- " + Insert.FRG + " " + lang("ch_insert26");
   /** Command Help. */
   String UPDATE0 = "[" + Insert.ELEM + "|" + Insert.ATT + "|" + Insert.TXT +
-    "|" + Insert.COM + "|" + Insert.PI + "] [...]";
+  "|" + Insert.COM + "|" + Insert.PI + "] [...]";
   /** Command Help. */
   String UPDATE1 = lang("ch_update1");
   /** Command Help. */
   String UPDATE2 = lang("ch_update2") + NL + NL +
-    "- " + Insert.ELEM + " " + lang("ch_update21") + NL +
-    "- " + Insert.TXT + " " + lang("ch_update22") + NL +
-    "- " + Insert.ATT + " " + lang("ch_update23") + NL +
-    "- " + Insert.COM + " " + lang("ch_update24") + NL +
-    "- " + Insert.PI + " " + lang("ch_update25");
+  "- " + Insert.ELEM + " " + lang("ch_update21") + NL +
+  "- " + Insert.TXT + " " + lang("ch_update22") + NL +
+  "- " + Insert.ATT + " " + lang("ch_update23") + NL +
+  "- " + Insert.COM + " " + lang("ch_update24") + NL +
+  "- " + Insert.PI + " " + lang("ch_update25");
 
   /** Command Help. */
   String DUMMYGENERAL0 = lang("ch_dummygeneral0");
@@ -318,19 +323,19 @@ public interface Text {
   String SET1 = lang("ch_set1");
   /** Command Help. */
   String SET2 = lang("ch_set2") + NL +
-    "- " + Set.INFO + lang("ch_set21") + NL +
-    "- " + Set.DEBUG + lang("ch_set22") + NL +
-    "- " + Set.SERIALIZE + lang("ch_set23") + NL +
-    "- " + Set.XMLOUTPUT + lang("ch_set24") + NL +
-    "- " + Set.MAINMEM + lang("ch_set25") + NL +
-    "- " + Set.CHOP + lang("ch_set26") + NL +
-    "- " + Set.ENTITY + lang("ch_set27") + NL +
-    "- " + Set.TXTINDEX + lang("ch_set28") + NL +
-    "- " + Set.ATTRINDEX + lang("ch_set29") + NL +
-    "- " + Set.FTINDEX + lang("ch_set31") + NL + NL +
-    lang("ch_set32") + NL +
-    "- " + Set.DBPATH + lang("ch_set33") + NL +
-    "- " + Set.RUNS + lang("ch_set34") + NL +
+  "- " + Set.INFO + lang("ch_set21") + NL +
+  "- " + Set.DEBUG + lang("ch_set22") + NL +
+  "- " + Set.SERIALIZE + lang("ch_set23") + NL +
+  "- " + Set.XMLOUTPUT + lang("ch_set24") + NL +
+  "- " + Set.MAINMEM + lang("ch_set25") + NL +
+  "- " + Set.CHOP + lang("ch_set26") + NL +
+  "- " + Set.ENTITY + lang("ch_set27") + NL +
+  "- " + Set.TXTINDEX + lang("ch_set28") + NL +
+  "- " + Set.ATTRINDEX + lang("ch_set29") + NL +
+  "- " + Set.FTINDEX + lang("ch_set31") + NL + NL +
+  lang("ch_set32") + NL +
+  "- " + Set.DBPATH + lang("ch_set33") + NL +
+  "- " + Set.RUNS + lang("ch_set34") + NL +
   "- " + Set.FCOMPRESS + lang("ch_set35") + NL + NL +
   lang("ch_set32");
 
@@ -691,14 +696,14 @@ public interface Text {
   String INDEXINFO =  lang("dc_index");
   /** Indexing info. */
   String FTINFO =  lang("dc_ft");
-  
+
   /** Dialog title for opening a database. */
   String OPENTITLE = lang("do_title");
   /** Open Dialog - No database information. */
   String OPENNODBINFO = lang("do_nodb") + DOT;
   /** Dialog title for deleting nodes. */
   String NODBQUESTION = OPENNODBINFO + DOT + NL +
-    lang("do_nodbquestion") + NL + " ";
+  lang("do_nodbquestion") + NL + " ";
 
   /** File Dialog title. */
   String XQOPENTITLE = lang("dq_open");
@@ -851,7 +856,7 @@ public interface Text {
   String DEVELOPER = lang("da_dev") + ": Christian Grün";
   /** BaseX Contributors Info. */
   String CONTRIBUTE1 = lang("da_cont1") +
-    ": Alexander Holupirek, Tim Petrowsky,";
+  ": Alexander Holupirek, Tim Petrowsky,";
   /** BaseX Developer Names. */
   String CONTRIBUTE2 = "Sebastian Gath, Lukas Kircher " + lang("da_cont2");
 
@@ -883,7 +888,7 @@ public interface Text {
   String PINGINFO = lang("cmd_ping") + NL;
   /** XMark Error. */
   String XMARKWHICH = lang("cmd_xmark");
-  
+
   // CREATE COMMAND ===========================================================
 
   /** Create Database information. */
@@ -1168,7 +1173,7 @@ public interface Text {
   /** Info on Fulltext Fuzzyindexing. */
   String INFOFTCOMPRESS = lang("info_fcompress");
 
-  
+
   /** Info on Document Creation. */
   String INFODB = lang("info_db");
   /** Info on Document Creation. */
@@ -1185,7 +1190,7 @@ public interface Text {
   String INFOOFF = lang("info_off");
   /** Error info. */
   String INFOERROR = lang("info_error");
-  
+
   // HELP TEXTS ===============================================================
 
   /** Help String. */
