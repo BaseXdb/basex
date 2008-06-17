@@ -2,6 +2,7 @@ package org.basex.query.fs;
 
 import java.io.IOException;
 import org.basex.core.Context;
+import org.basex.data.Data;
 import org.basex.io.PrintOutput;
 import org.basex.util.GetOpts;
 
@@ -92,14 +93,14 @@ public final class RM {
    *  @throws IOException in case of problems with the PrintOutput 
    */
   private void remove(final String path) throws IOException {
-
+    Data data = context.data();
     String file = "";
     int beginIndex = path.lastIndexOf('/');
     if(beginIndex == -1) {
       file = path;
     } else {
       // go to Path
-      curDirPre = FSUtils.goToDir(context.data(), curDirPre, 
+      curDirPre = FSUtils.goToDir(data, curDirPre, 
           path.substring(0, beginIndex));   
       if(curDirPre == -1) {
         out.print("rm: '" + path + "' No such file or directory");
@@ -109,26 +110,31 @@ public final class RM {
       }
     }
 
-    int[] del = FSUtils.getSpecificFilesOrDirs(context.data(), curDirPre, 
+    int[] del = FSUtils.getSpecificFilesOrDirs(data, curDirPre, 
         file.getBytes());
-
+    long sizeOfNode = 0;
     for(int toDel : del) {
       if(toDel == -1) {
         out.print("rm: '" + file + "' No such file or directory");
         return;
       } else {
-        out.println(toDel + " zu loeschen ");
-        if((FSUtils.isDir(context.data(), toDel) && fRecursive) ||
-            (FSUtils.isFile(context.data(), toDel))) {
-          try {
-            context.data().delete(toDel);
-            context.data().flush();     
+        /* 
+         * Pre Value of all nodes changes if one node is deleted.
+         * This is the adjustment of the former 
+         */
+        toDel -= sizeOfNode;
+        if((FSUtils.isDir(data, toDel) && fRecursive) ||
+            (FSUtils.isFile(data, toDel))) {
+          try {            
+            sizeOfNode += data.size(toDel, data.ELEM);
+            data.delete(toDel);
+            data.flush();  
           } catch(Exception e) {
             e.printStackTrace();
           }     
         } else {
           out.print("rm: cannot remove '" + 
-              FSUtils.getFileName(context.data(), toDel) + "': Is a directory");
+              FSUtils.getFileName(data, toDel) + "': Is a directory");
         }
       }
     }

@@ -13,6 +13,8 @@ import org.basex.query.fs.FSQuery;
  */
 public final class Fs extends Proc {
   /** Create option. */
+  public static final String CAT = "cat";
+  /** Create option. */
   public static final String CD = "cd";
   /** Create option. */
   public static final String DU = "du";
@@ -41,18 +43,21 @@ public final class Fs extends Proc {
   protected boolean exec() {
     query = new FSQuery(context);
     comm = cmd.arg(0).toLowerCase();
-    return comm.equals(CD) || comm.equals(DU) || comm.equals(GREP) ||
-    comm.equals(LOCATE) || comm.equals(LS) || comm.equals(MKDIR) || 
-    comm.equals(PWD) || comm.equals(RM) || comm.equals(TOUCH);
+    return comm.equals(CAT) || comm.equals(CD) || comm.equals(DU) ||
+    comm.equals(GREP) || comm.equals(LOCATE) || comm.equals(LS) || 
+    comm.equals(MKDIR) || comm.equals(PWD) || comm.equals(RM) || 
+    comm.equals(TOUCH);
   }
 
 
   @Override
   protected void out(final PrintOutput out) throws IOException {
-    if(comm.equals(CD)) {
-      query.cd(cmd.args(), out);
+    if(comm.equals(CAT)) {
+      query.cat(cmd.args(), out);
+    } else if(comm.equals(CD)) {      
+      query.cd(cmd.args(), out);  
     } else if(comm.equals(DU)) {      
-      query.cd(cmd.args(), out);     
+      query.du(cmd.args(), out);     
     } else if(comm.equals(GREP)) {      
       query.grep(cmd.args(), out);  
     } else if(comm.equals(LOCATE)) {      

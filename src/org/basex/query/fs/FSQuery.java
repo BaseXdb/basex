@@ -145,4 +145,19 @@ public final class FSQuery {
     touch.touchMain(cmd);    
     out.print(NL);
   }
+
+
+  /**
+   * Perform cat.
+   * 
+   * @param cmd options
+   * @param out output stream
+   * @throws IOException in case of problems with the PrintOutput
+   */
+  public void cat(final String cmd, final PrintOutput out) 
+  throws IOException {
+    CAT cat = new CAT(context, out);
+    cat.catMain(cmd);    
+    out.print(NL);
+  }
 }
