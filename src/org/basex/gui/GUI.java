@@ -99,13 +99,13 @@ public final class GUI extends JFrame {
   final BaseXBack nav;
 
   /** Search view. */
-  final QueryView query;
+  public final QueryView query;
   /** Text view. */
-  final TextView text;
+  public final TextView text;
   /** Info view. */
-  final InfoView info;
+  public final InfoView info;
   /** Help view. */
-  final TextView help;
+  public final TextView help;
 
   /** Current input Mode. */
   final BaseXCombo mode;

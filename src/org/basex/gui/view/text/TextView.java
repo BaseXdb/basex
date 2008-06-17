@@ -1,11 +1,10 @@
 package org.basex.gui.view.text;
 
+import static org.basex.Text.*;
 import static org.basex.gui.GUIConstants.*;
 import java.awt.BorderLayout;
-
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-
 import org.basex.BaseX;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
@@ -58,7 +57,7 @@ public final class TextView extends View {
 
     final Box box = new Box(BoxLayout.X_AXIS);
     box.add(header);
-    if(head.equals(GUIConstants.TEXTVIEW)) {
+    if(head.equals(TEXTTIT)) {
       box.add(Box.createHorizontalGlue());
       box.add(export);
     }
@@ -93,10 +92,8 @@ public final class TextView extends View {
    * @param nodes nodes to display
    */
   private void refreshDoc(final Nodes nodes) {
-    if(!GUIProp.showtext ||
-        !header.getText().equals(GUIConstants.TEXTVIEW)) {
-      return;
-    }
+    if(!GUIProp.showtext || !header.getText().equals(TEXTTIT)) return;
+
     if(!GUI.context.db() || nodes.size == 0) {
       setText(Token.EMPTY, 0, true);
       return;
