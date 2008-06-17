@@ -35,7 +35,7 @@ public final class Prop {
 
   /** Available languages (should be retrieved dynamically, but leads to
    * problems with JAR file. Someone knows what to do?) */
-  public static final String[] LANGUAGES = { "English", "German" };
+  public static final String[] LANGUAGES = { "English", "German", "Japanese" };
 
   // DATABASE & PROGRAM PATHS =================================================
   

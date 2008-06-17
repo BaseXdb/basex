@@ -1,0 +1,362 @@
+# LANGUAGE FILE
+# The '%' character serves as dummy for internal replacements.
+
+# Start
+launch=起動中
+wait=お待ち下さい
+
+# Menu Commands
+m_file=ファイル
+m_edit=編集
+m_view=ビュー
+m_options=オプション
+m_help=ヘルプ
+m_db=データベース
+m_xquery=XQuery
+m_main=メインウィンドウ
+m_views=Views
+m_inter=Interaction
+m_layout=レイアウト
+
+# Buttons
+b_ok=  OK  
+b_rename=名前の変更...
+b_open= 開く
+b_cancel=中止
+b_drop=削除
+b_cmd=コマンド
+b_xpath=XPath
+b_browse=参照
+b_filter=フィルター
+b_simple=簡易
+b_search=検索
+
+# Status messages
+s_path=パス
+s_calcmap=Mapを計算中
+s_paintmap=描画中
+s_ok=OK
+
+# Visualizations
+welcome1=ようこそ!
+welcome2=簡単な始め方:\n\"ファイル -> 新規...\" をクリックし\nディスク上にあるXML文書を選択します。\n次に、ダイアログウィンドウの内容を確認し、\nヘルプビューをチェックしましょう。
+text_find=検索
+table_no=No table available for this data
+map_binary=バイナリーファイル
+query_rt=リアルタイムフィルタリング
+info_tit=クエリー情報
+info_no=クエリーを実行して下さい。
+help_tit=ヘルプ
+text_tit=テキスト
+
+# Dialog Windows
+d_info=情報
+d_fctitle=ディレクトリの選択
+
+dc_title=XML文書の選択
+dc_xmldesc=XML文書
+dc_xqdesc=XQueryファイル
+dc_advtitle=データベースオプション
+dc_advlabel=データベースオプションを選択して下さい。
+dc_chop=空白を取り除く
+dc_entities=実体のパース
+dc_attindex=属性値インデックスを作成
+dc_ftindex=全文インデックスを作成
+dc_txtindex=テキストインデックスを作成
+dc_wordindex=単語インデックスを作成
+dc_mainmem=メインメモリモード
+dc_chopinfo=このオプションはタグとコンテンツの間にある全ての空白を削除します。
+dc_entitiesinfo=このオプションをオフにすると、未知の実体のパースを省略します。
+dc_txtinfo=XPathクエリーを高速化するためにテキストノードにインデックスが作成されます。
+dc_attinfo=XPathクエリーを高速化するために属性値にインデックスが作成されます。
+dc_wrdinfo=テキストノード中の全ての単語は、単語検索を高速化するためにインデックス化されます。
+dc_ftxinfo=XPath全文検索を高速化するために全文インデックスを作成します。
+dc_mminfo=このモードではクエリーは高速化されますが、更新は行えません。
+
+do_title=データベースを開く
+do_nodb=データベースがありません。
+do_nodbquestion=新しいデータベースを作成しますか。
+
+dq_open=XQueryファイルを開く
+dq_save=XQueryファイルを保存
+dq_notopened=ファイルが開けませんでした。
+dq_notsaved=ファイルを保存できませんでした。
+
+dfs_title=ファイルシステムからインポート
+dfs_save=別名で保存
+dfs_dir=ディレクトリ
+dfs_all=全てインポートする
+dfs_allinfo=ファイルシステム全体をインポートします
+dfs_text=インポートするディレクトリ名、出力データベース名
+dfs_text1=ファイル情報、メタデータ
+dfs_text2=ファイルの内容
+dfs_types=ファイルタイプ
+dfs_maxinfo=テキスト情報の取り込みを指定されたサイズに制限
+dfs_cont=ファイル内のテキスト情報を含める
+dfs_meta=メタデータを含める
+dfs_ftindex=ファイルの内容にインデックスを作成する
+
+dr_title=データベースの名前を変更
+dr_exists=同じ名前のデータベースが存在します。
+dr_invalid=不正な名前です。
+
+dd_title=データベースの削除
+dd_question=データベース '%' を削除します。\nよろしいですか。
+
+dx_title=ノードの削除
+dx_question=よろしいですか。
+
+dp_title=設定
+dp_dbpath=データベースパス
+dp_inter=ユーザーインターフェース
+dp_focus=リアルタイムマウスフォーカス
+dp_simplefd=簡易版ファイル選択画面を使用
+dp_names=タグを@name属性で置き換え
+dp_lang=言語
+dp_langnew=再起動が必要です
+
+dn_title=新規データの作成
+dn_name=名前
+dn_value=値
+
+de_title=データの編集
+de_text=% の編集
+de_kind1=ルートノード
+de_kind2=要素
+de_kind3=テキスト
+de_kind4=属性
+de_kind5=コメント
+de_kind6=PI
+
+df_title=フォントの選択
+df_aalias=アンチエイリアス
+df_type1=通常
+df_type2=太字
+df_type3=斜体
+
+ds_title=Color Schema
+ds_red=赤
+ds_green=緑
+ds_blue=青
+
+dm_title=マップレイアウト
+dm_simple=簡易マップレイアウト
+dm_atts=属性の表示
+dm_prop=マップの整列
+dm_choice1=タイトル、枠線無し
+dm_choice2=タイトル無し、枠線最細
+dm_choice3=タイトル有り、枠線無し
+dm_choice4=タイトル有り、枠線最細
+dm_choice5=タイトル有り、枠線細
+dm_choice6=タイトル有り、枠線太
+
+di_title=データベース情報
+di_index=インデックス
+di_build=インデックス構築中
+
+dz_title=メモリ使用量
+dz_total=メモリ合計
+dz_reserved=予約メモリ量
+dz_used=メモリ使用量
+dz_help=メモリが少ない場合はBaseXを起動する際に、\nJavaのコマンドライン引数 -Xmx を付けて下さい。
+
+da_title=BaseXについて
+da_license=BSD license (ISC)
+da_dev=メイン開発者
+da_cont1=チーム
+da_cont2=その他の貢献者
+
+c_about=BaseXについて
+c_abouttt=このプロジェクトについての概要を表示します。
+c_close=閉じる
+c_closett=現在のデータベースを閉じます。
+c_color=色
+c_colortt=アプリケーションの配色を変更します。
+c_copy=コピー
+c_copytt=現在選択中のXMLノードをコピーします。
+c_create=新規
+c_creatett=選択されたXML文書からデータベースを作成します。
+c_delete=ノードの削除
+c_deletett=XMLノードを削除します。
+c_drop=DBの削除
+c_droptt=データベースを削除します。
+c_edit=編集
+c_edittt=XMLノードの編集
+c_exit=終了
+c_exittt=アプリケーションを終了します。
+c_export=XMLの出力
+c_exporttt=現在のデータベースをXML文書として出力します。
+c_filter=Filter Selected
+c_filtertt=Filters the selected nodes.
+c_fonts=フォント
+c_fontstt=フォントを変更します。
+c_full=全画面表示
+c_fulltt=全画面表示します。
+c_goback=戻る
+c_gobacktt=以前実行されたクエリー戻ります。
+c_goforward=進む
+c_goforwardtt=次のクエリーに進みます。
+c_goup=上へ
+c_gouptt=1階層上に行きます。
+c_importfs=ファイルシステムからインポート
+c_importfstt=ファイルシステムの構造からデータベースを作成します。
+c_info=データベース情報
+c_infott=現在選択されているデータベースについての情報を表示します。
+c_inputmode=入力モードの変更
+c_inputmodett=コマンドモードと検索モードを切り替えます。
+c_insert=新規
+c_inserttt=新しいXMLノードを作成します。
+c_maplayout=マップレイアウト
+c_maplayouttt=マップレイアウトを変更します。
+c_open=開く
+c_opentt=データベースを開きます。
+c_paste=貼付け
+c_pastett=以前コピーしたノードを貼付けます。
+c_prefs=設定
+c_prefstt=アプリケーションの設定を表示します。
+c_root=ホームへ
+c_roottt=ルートノードへ戻ります。
+c_rtfilter=リアルタイムフィルタリング
+c_rtfiltertt=この選択肢が有効な場合、クエリー結果が自動的にフィルターされます。
+c_select=全て選択
+c_selecttt=全てのルート（？）ノードを選択します。
+c_showbuttons=ボタン
+c_showbuttonstt=ボタンバーのオン・オフを切り替えます。
+c_showhelp=ヘルプ
+c_showhelptt=ヘルプビューを表示します。現在フォーカスが当たっているコンポーネントに関するヘルプを表示します。
+c_showinfo=クエリー情報
+c_showinfott=クエリー情報パネルを表示します。
+c_showinput=入力フィールド
+c_showinputtt=入力フィールドの表示を切り替えます。
+c_showmap=マップ
+c_showmaptt=マップビューを表示します。
+c_showmenu=メニュー
+c_showmenutt=メニューの表示・非表示を切り替えます。
+c_showsearch=クエリーパネル
+c_showsearchtt=クエリーパネルを表示します。
+c_showstatus=ステータスバー
+c_showstatustt=ステータスバーの表示・非表示を切り替えます。
+c_showtable=テーブル
+c_showtablett=テーブルビューを表示します。
+c_showtext=テキストビュー
+c_showtexttt=テキストビューを表示します。
+c_showtree=ツリー
+c_showtreett=ツリービューを表示します。
+c_xqopen=開く
+c_xqopentt=XQueryファイルを開きます。
+c_xqsave=保存
+c_xqsavett=現在のXQueryを保存します。
+
+# Commands & Processes
+proc_time=所要時間
+proc_syntax=文法
+proc_err='%'を実行できませんでした。
+proc_nodb=データベースを先に開いて下さい。
+proc_mm=メインメモリモードでは（この？）コマンドは使用できません。
+cmd_unknown=不明なコマンドです '%'
+cmd_similar='%' の間違いではないですか。
+cmd_ping=接続に成功しました。
+cmd_xmark=XMarkクエリーは1から20に限定されています。
+
+# Help Commands
+help_short=try 'help'
+help_intro="help" と入力すると全般的な情報が得られます。
+help_long='help [...]' と入力すると、コマンドについての情報が得られます。
+
+# Create Command
+pc_create=データベースが作成されました。
+pc_index=インデックスを作成中です。
+pc_update=新しいデータベースを作成して下さい。
+pc_cancel=作成処理はキャンセルされました。
+pc_indextxt=テキストインデックスを作成中です。
+pc_indexatt=属性インデックスを作成中です。
+pc_indexwrd=単語インデックスを作成中です。
+pc_indexftx=全文インデックスを作成中です。
+pc_parse=ノードがパースされました。
+pc_created=% にデータベースが作成されました。
+pc_tbl=% にテーブルが作成されました。
+pc_att=% に属性インデックスが作成されました。
+pc_txt=% にテキストインデックスが作成されました。
+pc_wrd=% に単語インデックスが作成されました。
+pc_ftx=% に全文インデックスが作成されました。
+pc_notfound=ファイル "%" が見付かりませんでした。
+pc_err="%" をパースできませんでした。
+pc_pos=%行、%列
+
+# Database commands
+db_no=データベース '%' が見付かりませんでした。
+db_open=データベースを開きました。
+db_nodb=メモリー上にデータベースはありません。
+db_closed=データベースを閉じました。
+db_closeerr=データベースを閉じる事が出来ませんでした。
+db_optimized=データベース % 最適化されました。（？）
+db_dropped=データベースは削除されました。
+db_notdropped=データベースを削除できませんでした。
+db_notopened=データベースを開けませんでした。
+db_opened=データベース % を開きました。
+db_exported=データベースを % に出力しました。
+
+# Index commands
+in_created=% にインデックスが作成されました。
+in_err=インデックスを作成できませんでした。
+in_dropped=インデックスを削除しました。
+in_notdropped=インデックスを削除できませんでした。
+
+# Console Info
+cs_local=スタンドアローン
+cs_client=クライアント
+
+# Server Info
+srv_connect=サーバーと通信できません。
+srv_port=ポート番号が不正です: %
+srv_toomany=実行中のリクエストが多すぎます。
+srv_bind=Server is running or permission was denied.
+srv_start=開始しました。\nリクエストを待っています。
+srv_stop=停止しました。
+
+# Bye
+bye1=バイバイ
+bye2=またね。
+bye3=また次回。
+bye4=じゃーね。
+
+# Query Commands
+qu_pars=パース中
+qu_comp=コンパイル中 
+qu_eval=計算中
+qu_time=タイミング
+qu_result=結果
+qu_plan='%' のクエリー計画を保存しています。
+qu_hits=ヒット
+qu_ms=ミリ秒
+
+# Query Commands.. the following strings must have the same length
+# qu_tabquery=Query     
+# qu_tabpars=Parsing   
+# qu_tabcomp=Compiling 
+# qu_tabeval=Evaluating
+# qu_tabfinish=Finishing 
+# qu_tabprint=Printing  
+# qu_tabtotal=Total Time
+# qu_tabmem=Memory    
+# qu_tabprinted=Printed   
+# qu_tabhits=Results   
+qu_tabquery=クエリー　　
+qu_tabpars=パース中　　
+qu_tabcomp=コンパイル中
+qu_tabeval=計算中　　　
+qu_tabfinish=終了処理中　
+qu_tabprint=印刷中　　　
+qu_tabtotal=合計時間　　
+qu_tabmem=メモリー　　
+qu_tabprinted=印刷しました
+qu_tabhits=結果　　　　
+
+
+
+
+# Help Texts
+h_filter=Press this button to filter your query results.
+h_queryrt=このチェックボックスがチェックされている場合、キー入力を行うたびにクエリーが自動的に実行されます。
+h_filterrt=このチェックボックスがチェックされている場合、キー入力を行うたびにクエリー結果が表示されます。
+
