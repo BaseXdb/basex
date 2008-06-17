@@ -126,7 +126,7 @@ public final class RM {
         if((FSUtils.isDir(data, toDel) && fRecursive) ||
             (FSUtils.isFile(data, toDel))) {
           try {            
-            sizeOfNode += data.size(toDel, data.ELEM);
+            sizeOfNode += data.size(toDel, Data.ELEM);
             data.delete(toDel);
             data.flush();  
           } catch(Exception e) {
