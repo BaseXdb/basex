@@ -140,11 +140,16 @@ public final class LS {
       byte[] name = FSUtils.getName(data, j);
       long size = FSUtils.getSize(data, j);
       byte[] time = FSUtils.getMtime(data, j);
+      char file = 'd';
+      if(FSUtils.isFile(data, j))
+          file = 'f';
       if(!fListDot) {
         // do not print files starting with .
         if(Token.startsWith(name, '.'))
           continue;
       }
+      out.print(file);
+      out.print("\t");
       out.print(name);
       out.print("\t"); 
       out.print("" + size);
