@@ -56,6 +56,8 @@ public final class XPathView extends View {
   public int slashC = 0;
   /** Boolean value if BasicComboPopup is initialized. */
   public boolean popInit = false;
+  /** Boolean value for atts only. */
+  public boolean atts = false;
 
   /**
    * Default Constructor.
@@ -142,7 +144,7 @@ public final class XPathView extends View {
           parser.parse();
           GUI.get().execute(Commands.XPATH, query);
         } catch(final QueryException ex) {
-          System.out.println(ex.getMessage());
+          //System.out.println(ex.getMessage());
         }
       }
     });
@@ -162,12 +164,20 @@ public final class XPathView extends View {
   public void showPopAll() {
     tempIn = input.getText();
     box = new JComboBox(all.finish());
+    box.setSelectedItem(null);
     popInit = true;
     box.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         if(e.getModifiers() == 16) {
           input.setText(tempIn + box.getSelectedItem());
+          if(box.getSelectedItem().toString().equals("attribute::")) {
+            tempIn = input.getText();
+            atts = true;
+            showSpecPop();
+          }
+          if(box.getSelectedItem() != null) {
           pop.hide();
+          }
         }
       }
     });
@@ -186,15 +196,23 @@ public final class XPathView extends View {
   public void showSpecPop() {
     pop.hide();
     box.removeAllItems();
-    if(tempIn.endsWith("/")) {
+    if(tempIn.endsWith("/") || !atts) {
     temp = input.getText().substring(tempIn.length());
     for(int i = 0; i < all.finish().length; i++) {
       if(all.finish()[i].startsWith(temp)) {
         box.addItem(all.finish()[i]);
       }
     }
+    } else if(atts) {
+      for(int i = 0; i < all.finish().length; i++) {
+        if(all.finish()[i].startsWith("@")) {
+          box.addItem(all.finish()[i]);
+        }
+        atts = false;
+      }
     }
     if(box.getItemCount() != 0) {
+      box.setSelectedItem(null);
       FontMetrics fm = input.getFontMetrics(input.getFont());
       int width = fm.stringWidth(input.getText());
       if(width >= back.getWidth()) {
