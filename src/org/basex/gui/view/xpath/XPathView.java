@@ -58,6 +58,8 @@ public final class XPathView extends View {
   public boolean popInit = false;
   /** Boolean value for atts only. */
   public boolean atts = false;
+  /** Boolean value for node-tests only. */
+  public boolean nodes = false;
 
   /**
    * Default Constructor.
@@ -122,8 +124,21 @@ public final class XPathView extends View {
           } else if(c == KeyEvent.VK_ENTER) {
             if(box.getSelectedItem() != null) {
               input.setText(tempIn + box.getSelectedItem().toString());
+              if(box.getSelectedItem().toString().endsWith("::")) {
+                if(box.getSelectedItem().toString().equals("attribute::")) {
+                  tempIn = input.getText();
+                  atts = true;
+                  showSpecPop();
+                } else {
+                  tempIn = input.getText();
+                  nodes = true;
+                  showSpecPop();
+                }
+                }
               slashC = 0;
-              pop.hide();
+              if(box.getSelectedItem() != null) {
+                pop.hide();
+                }
             }
           } else if(c == KeyEvent.VK_SHIFT) {
             return;
@@ -170,10 +185,16 @@ public final class XPathView extends View {
       public void actionPerformed(final ActionEvent e) {
         if(e.getModifiers() == 16) {
           input.setText(tempIn + box.getSelectedItem());
+          if(box.getSelectedItem().toString().endsWith("::")) {
           if(box.getSelectedItem().toString().equals("attribute::")) {
             tempIn = input.getText();
             atts = true;
             showSpecPop();
+          } else {
+            tempIn = input.getText();
+            nodes = true;
+            showSpecPop();
+          }
           }
           if(box.getSelectedItem() != null) {
           pop.hide();
@@ -196,7 +217,7 @@ public final class XPathView extends View {
   public void showSpecPop() {
     pop.hide();
     box.removeAllItems();
-    if(tempIn.endsWith("/") || !atts) {
+    if(tempIn.endsWith("/") || (!atts && !nodes)) {
     temp = input.getText().substring(tempIn.length());
     for(int i = 0; i < all.finish().length; i++) {
       if(all.finish()[i].startsWith(temp)) {
@@ -210,6 +231,13 @@ public final class XPathView extends View {
         }
         atts = false;
       }
+    } else if(nodes) {
+      for(int i = 0; i < all.finish().length; i++) {
+        if(!all.finish()[i].endsWith("::")) {
+          box.addItem(all.finish()[i]);
+        }
+        nodes = false;
+      }
     }
     if(box.getItemCount() != 0) {
       box.setSelectedItem(null);
@@ -219,8 +247,10 @@ public final class XPathView extends View {
         width = back.getWidth();
       }
       pop = new BasicComboPopup(box);
+      if(box.getItemCount() < 10) {
       pop.setPreferredSize(new Dimension(pop.getPreferredSize().width,
           box.getItemCount() * 20));
+      }
       pop.show(input, width, input.getHeight());
     }
   }
