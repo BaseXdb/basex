@@ -1309,6 +1309,8 @@ public interface Text {
   byte[] HELPTABLEHEAD = token(lang("h_tablehead"));
   /** Help String. */
   byte[] HELPMEM = token(lang("h_mem"));
+  /** Help String. */
+  byte[] HELPXPATHV = token(lang("h_xpathm"));
 
   /** Dummy string to check if all language strings have been assigned. */
   String CHECK = lang(null);

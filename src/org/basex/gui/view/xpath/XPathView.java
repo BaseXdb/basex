@@ -1,6 +1,8 @@
 package org.basex.gui.view.xpath;
 
 import static org.basex.gui.GUIConstants.*;
+import static org.basex.Text.*;
+import static org.basex.util.Token.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -52,8 +54,6 @@ public final class XPathView extends View {
   public String tempIn;
   /** String for temporary input. */
   public String temp;
-  /** Int value to count slashes. */
-  public int slashC = 0;
   /** Boolean value if BasicComboPopup is initialized. */
   public boolean popInit = false;
   /** Boolean value for atts only. */
@@ -72,21 +72,15 @@ public final class XPathView extends View {
     header = new BaseXLabel(GUIConstants.XPATHVIEW, 10);
     back.add(header, BorderLayout.NORTH);
     input = new BaseXTextField(null);
-
+    input.setToolTipText(string(HELPXPATHV));
     input.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {
         int c = e.getKeyCode();
           if(c == KeyEvent.VK_SLASH) {
-            slashC++;
-            if(slashC <= 2) {
             showPopAll();
-            } else {
-              pop.hide();
-            }
           } else if(c == KeyEvent.VK_DELETE || c == KeyEvent.VK_BACK_SPACE) {
             if(input.getText().length() == 0) {
-              slashC = 0;
               tempIn = "";
               if(popInit) {
               pop.hide();
@@ -94,16 +88,13 @@ public final class XPathView extends View {
             } else if(input.getText().endsWith("/")) {
               if ('/' ==
                 input.getText().charAt(input.getText().length() - 1)) {
-                slashC = 1;
                 showPopAll();
             } else if ('/' ==
               input.getText().charAt(input.getText().length() - 2)) {
-              slashC = 2;
               showPopAll();
               }
             } else {
               tempIn = input.getText();
-              slashC = 0;
               pop.hide();
             }
           } else if(c == KeyEvent.VK_DOWN) {
@@ -135,7 +126,6 @@ public final class XPathView extends View {
                   showSpecPop();
                 }
                 }
-              slashC = 0;
               if(box.getSelectedItem() != null) {
                 pop.hide();
                 }
@@ -147,7 +137,6 @@ public final class XPathView extends View {
               if(tempIn.length() == 0) {
                 pop.hide();
               } else {
-                slashC = 0;
                 showSpecPop();
               }
             }
