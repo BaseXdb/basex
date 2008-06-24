@@ -1310,7 +1310,7 @@ public interface Text {
   /** Help String. */
   byte[] HELPMEM = token(lang("h_mem"));
   /** Help String. */
-  byte[] HELPXPATHV = token(lang("h_xpathm"));
+  byte[] HELPXPATHV = token(lang("h_xpathv"));
 
   /** Dummy string to check if all language strings have been assigned. */
   String CHECK = lang(null);
