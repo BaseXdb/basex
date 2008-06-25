@@ -716,6 +716,9 @@ public interface Text {
   /** File Dialog replace information. */
   String FILEREPLACE = lang("dq_replace");
 
+  /** Dialog title for exporting XML. */
+  String EXPORTTITLE = lang("d_export");
+
   /** Progress text for FS import. */
   String IMPORTPROG = "Parse filesystem...";
   /** Dialog Title for Import Options. */

@@ -2126,7 +2126,7 @@ public final class XQParser extends QueryParser {
    * @throws XQException xquery exception
    */
   private boolean ftMatchOption(final FTOptions opt) throws XQException {
-    // [CG] XQuery/FTMatchOptions: language, stemming, thesaurus, stopword, ...
+    // [CG] XQuery/FTMatchOptions: language, thesaurus
 
     if(consumeWS(LOWERCASE)) {
       if(opt.lc != null || opt.uc != null || opt.cs != null) Err.or(FTCASE);

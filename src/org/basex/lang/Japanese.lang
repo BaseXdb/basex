@@ -52,6 +52,7 @@ text_tit=テキスト
 # Dialog Windows
 d_info=情報
 d_fctitle=ディレクトリの選択
+d_export=Save XML Document
 
 dc_title=XML文書の選択
 dc_xmldesc=XML文書

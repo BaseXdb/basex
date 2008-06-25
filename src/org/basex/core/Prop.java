@@ -36,6 +36,9 @@ public final class Prop {
   /** Available languages (should be retrieved dynamically, but leads to
    * problems with JAR file. Someone knows what to do?) */
   public static final String[] LANGUAGES = { "English", "German", "Japanese" };
+  /** Translation credits. */
+  public static final String[] LANGCREDS = {
+    "BaseX Team", "Andreas Weiler, BaseX Team", "Kazuo Kashima" };
 
   // DATABASE & PROGRAM PATHS =================================================
   

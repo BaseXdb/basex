@@ -51,8 +51,9 @@ text_tit=Text
 # Dialog Windows
 d_info=Information
 d_fctitle=Choose Directory
+d_export=Save XML Document
 
-dc_title=Save XML document
+dc_title=Choose XML document
 dc_xmldesc=XML Documents
 dc_zipdesc=Zipped XML Documents
 dc_gzdesc=GZipped XML Documents

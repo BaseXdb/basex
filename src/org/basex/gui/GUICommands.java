@@ -179,7 +179,7 @@ public enum GUICommands implements GUICommand {
       // open file chooser for XML creation
       final GUI main = GUI.get();
 
-      final BaseXFileChooser fc = new BaseXFileChooser(CREATETITLE,
+      final BaseXFileChooser fc = new BaseXFileChooser(EXPORTTITLE,
           GUIProp.createpath, main);
       fc.addFilter(IO.XMLSUFFIX, CREATEXMLDESC);
 

@@ -4,6 +4,9 @@ import static org.basex.Text.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+
 import javax.swing.JFrame;
 import org.basex.core.Prop;
 import org.basex.data.Data;
@@ -27,10 +30,12 @@ import org.basex.gui.view.View;
  * @author Christian Gruen
  */
 public final class DialogPrefs extends Dialog {
+  /** Language label. */
+  protected BaseXLabel creds;
+  /** Language Combo Box. */
+  protected BaseXCombo lang;
   /** Browse button. */
   private BaseXButton button;
-  /** Combo box. */
-  private BaseXCombo lang;
   /** Directory path. */
   private BaseXTextField path;
   /** Button panel. */
@@ -68,7 +73,7 @@ public final class DialogPrefs extends Dialog {
     pp.setLayout(new TableLayout(10, 1, 0, 0));
     pp.add(new BaseXLabel(DATABASEPATH, true));
 
-    final BaseXBack p = new BaseXBack();
+    BaseXBack p = new BaseXBack();
     p.setLayout(new TableLayout(1, 2, 6, 0));
     
     path = new BaseXTextField(Prop.dbpath, HELPDBPATH, this);
@@ -109,9 +114,22 @@ public final class DialogPrefs extends Dialog {
     // checkbox for simple file dialog
     pp.add(new BaseXLabel(PREFLANG, true));
 
+    p = new BaseXBack();
+    p.setLayout(new TableLayout(1, 2, 12, 0));
+
     lang = new BaseXCombo(Prop.LANGUAGES, HELPLANG, false, this);
     lang.setSelectedItem(Prop.language);
-    pp.add(lang);
+    lang.addItemListener(new ItemListener() {
+      public void itemStateChanged(final ItemEvent ie) {
+        creds.setText(credits(lang.getSelectedItem().toString()));
+      }
+      
+    });
+    p.add(lang);
+    creds = new BaseXLabel(credits(Prop.language));
+    p.add(creds);
+    
+    pp.add(p);
 
     set(pp, BorderLayout.CENTER);
 
@@ -130,6 +148,19 @@ public final class DialogPrefs extends Dialog {
     final BaseXFileChooser fc = new BaseXFileChooser(DIALOGFC, path.getText(),
         parent);
     if(fc.select(BaseXFileChooser.MODE.DIR)) path.setText(fc.getDir());
+  }
+  
+  /**
+   * Returns the translation credits for the specified language.
+   * @param lng language
+   * @return credits
+   */
+  protected String credits(final String lng) {
+    for(int i = 0; i < Prop.LANGUAGES.length; i++) {
+      if(lng.equals(Prop.LANGUAGES[i]))
+        return "Translated by " + Prop.LANGCREDS[i];
+    }
+    return "";
   }
 
   @Override
