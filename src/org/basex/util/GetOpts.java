@@ -1,6 +1,7 @@
 package org.basex.util;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * This class splits the input String into its arguments and checks if 
@@ -26,6 +27,9 @@ public final class GetOpts {
 
   /** The valid short options. */
   private String optString;
+  
+  /** Arguments found. */ 
+  private ArrayList<String> foundArgs;  
 
   /** Arguments passed to the program. */ 
   private String[] args;
@@ -54,6 +58,7 @@ public final class GetOpts {
     this.optarg = null;
     this.path = null;
     this.multipleOptIndex = 1;
+    this.foundArgs = new ArrayList<String>();
   }
   /**
    * Construct a basic Getopt instance with the given input data.
@@ -71,6 +76,7 @@ public final class GetOpts {
     this.optarg = null;
     this.path = null;
     this.multipleOptIndex = 1;
+    this.foundArgs = new ArrayList<String>();
   }
   /**
    * Getter of the index.
@@ -93,6 +99,16 @@ public final class GetOpts {
     return optarg;
   }
 
+  /**
+   * getFoundArgs is used to return all parsed
+   * arguments like source_file target_file.
+   * 
+   * @return all parsed arguments
+   */
+  public ArrayList<String> getFoundArgs() {
+    return foundArgs;
+  }
+  
   /**
    * getPath is used to store a path expression.
    * 
@@ -184,16 +200,17 @@ public final class GetOpts {
         return '?';
       }             
     } else {      
-      if(args.length > 0 && args[0].length() > 0) {
+      if(args.length > 0 && args[optindex].length() > 0) {
         // path or nonvalid option
-        path = args[optindex];        
+        path = args[optindex];  
+        foundArgs.add(args[optindex]);
       }
       if(optindex + 1 == args.length) { 
         // all options parsed
         return -1;
-      } else {        
+      } else {                
         // return next option
-        ++optindex;
+        ++optindex;        
         return getopt();
       }
     }        

@@ -112,7 +112,7 @@ public class MKDIR {
             "0".getBytes());
         context.data().insert(preNewFile + 4, 
             preNewFile, "mtime".getBytes(), 
-            "222222".getBytes());   
+            ("" + System.currentTimeMillis()).getBytes());   
         context.data().flush();
       } catch(Exception e) {
         e.printStackTrace();

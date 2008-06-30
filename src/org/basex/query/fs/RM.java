@@ -53,7 +53,7 @@ public final class RM {
   public void rmMain(final String cmd) 
   throws IOException {
 
-    GetOpts g = new GetOpts(cmd, "Rh");
+    GetOpts g = new GetOpts(cmd, "Rh", 1);
     // get all Options
     int ch = g.getopt();
     while (ch != -1) {

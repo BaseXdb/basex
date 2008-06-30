@@ -1,19 +1,21 @@
 package org.basex.query.fs;
 
 import java.io.IOException;
+import java.util.ArrayList;
+
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.io.PrintOutput;
 import org.basex.util.GetOpts;
 
 /**
- * Performs a touch command.
+ * Performs a cp command.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Hannes Schwarz - Hannes.Schwarz@gmail.com
  *
  */
-public final class TOUCH {
+public final class CP {
 
   /** Data reference. */
   private final Context context;
@@ -30,19 +32,19 @@ public final class TOUCH {
    * @param ctx data context
    * @param output output stream
    */
-  public TOUCH(final Context ctx, final PrintOutput output) {
+  public CP(final Context ctx, final PrintOutput output) {
     this.context = ctx;
     curDirPre = ctx.current().pre[0];
     this.out = output;
   }
 
   /**
-   * Performs a touch command.
+   * Performs a cp command.
    * 
    * @param cmd - command line
    * @throws IOException - in case of problems with the PrintOutput 
    */
-  public void touchMain(final String cmd) 
+  public void cpMain(final String cmd) 
   throws IOException {
 
     GetOpts g = new GetOpts(cmd, "h", 1);
@@ -54,71 +56,102 @@ public final class TOUCH {
           printHelp();
           return;
         case ':':         
-          out.print("touch: missing argument");
+          out.print("cp: missing argument");
           return;  
         case '?':         
-          out.print("touch: illegal option");
+          out.print("cp: illegal option");
           return;
       }      
       ch = g.getopt();
     }
     // if there is path expression remove it     
     if(g.getPath() != null) {      
-      touch(g.getPath());
+      cp(g.getFoundArgs());
     } 
   }
 
   /**
-   * Performs a touch command.
+   * Performs a cp command.
    *  
-   *  @param path The name of the file
+   *  @param args The name of the file
    *  @throws IOException in case of problems with the PrintOutput 
    */
-  private void touch(final String path) throws IOException {
+  private void cp(final ArrayList<String> args) throws IOException {
 
-    String file = "";
-    int beginIndex = path.lastIndexOf('/');
+    if(args.size() != 2) {
+      printHelp();
+      return;
+    }
+    String sourcefile = args.remove(0);
+    String targetfile = args.remove(0);
+
+    String file = "";   
+    int beginIndex = sourcefile.lastIndexOf('/');
     if(beginIndex == -1) {
-      file = path;
+      file = sourcefile;
     } else {
       curDirPre = FSUtils.goToDir(context.data(), curDirPre, 
-          path.substring(0, beginIndex));   
+          sourcefile.substring(0, beginIndex));   
       if(curDirPre == -1) {
-        out.print("touch: " + path + " No such file or directory");
+        out.print("cp: " + sourcefile + " No such file or directory");
       } else {
-        file = path.substring(beginIndex + 1);
+        file = sourcefile.substring(beginIndex + 1);
       }
     }
-    int filePre =  FSUtils.getSpecificFile(context.data(), 
+    int sourceFilePre =  FSUtils.getSpecificFile(context.data(), 
         curDirPre, file.getBytes());
-    if(filePre > 0) {
-      // file found - update timestamp  
-      context.data().update(filePre + 4, "mtime".getBytes(), 
-          ("" + System.currentTimeMillis()).getBytes());      
-    } else {   
-      // add new file  
-      try {
+    
+    if(sourceFilePre > 0) {
+      // source_file found       
+      
+      Data data = context.data();
+      
+      beginIndex = targetfile.lastIndexOf('/');
+      if(beginIndex == -1) {
+        file = targetfile;
+      } else {
+        curDirPre = FSUtils.goToDir(context.data(), curDirPre, 
+            targetfile.substring(0, beginIndex));   
+        if(curDirPre == -1) {
+          out.print("cp: " + targetfile + " No such file or directory");
+        } else {
+          file = targetfile.substring(beginIndex + 1);
+        }
+      }
+      int targetfilePre =  FSUtils.getSpecificFile(context.data(), 
+          curDirPre, file.getBytes());
+      
+      long size = FSUtils.getSize(data, sourceFilePre);      
+      
+      if(targetfilePre > 0) {
+        // update
+        data.update(targetfilePre + 3, "size".getBytes(), 
+            ("" + size).getBytes());
+        context.data().update(targetfilePre + 4, "mtime".getBytes(), 
+            ("" + System.currentTimeMillis()).getBytes()); 
+      } else {
+        // insert
         int preNewFile = 4;
         if(!(curDirPre == FSUtils.getROOTDIR())) {
           preNewFile = curDirPre + 5;
-        }
-        context.data().insert(preNewFile, 
+        }        
+        data.insert(preNewFile, 
             curDirPre, "file".getBytes(), Data.ELEM);
-        context.data().insert(preNewFile + 1, preNewFile, 
+        data.insert(preNewFile + 1, preNewFile, 
             "name".getBytes(), file.getBytes());
-        context.data().insert(preNewFile + 2, 
+        data.insert(preNewFile + 2, 
             preNewFile, "suffix".getBytes(), 
             getSuffix(file));
-        context.data().insert(preNewFile + 3, 
+        data.insert(preNewFile + 3, 
             preNewFile, "size".getBytes(), 
-            "0".getBytes());
-        context.data().insert(preNewFile + 4, 
+            ("" + size).getBytes());
+        data.insert(preNewFile + 4, 
             preNewFile, "mtime".getBytes(), 
             ("" + System.currentTimeMillis()).getBytes());   
-        context.data().flush();
-      } catch(Exception e) {
-        e.printStackTrace();
-      }
+      }      
+    } else {   
+      //cp: XXX: No such file or directory
+      out.print("cp: " + targetfile + " No such file or directory");
     }
   }
 
@@ -140,7 +173,7 @@ public final class TOUCH {
    * @throws IOException in case of problems with the PrintOutput
    */
   private void printHelp() throws IOException {
-    out.print("touch  ...");
+    out.print("cp  source_file target_file");
 
   }
 

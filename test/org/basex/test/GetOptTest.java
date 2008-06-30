@@ -1,6 +1,8 @@
 package org.basex.test;
 
 import java.io.IOException;
+import java.util.ArrayList;
+
 import org.basex.util.GetOpts;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -574,6 +576,29 @@ public final class GetOptTest {
     assertEquals("Path of " + command, "/Itunes/music/", g.getPath());
   }
 
+  /**
+   * Test of GetOpt.
+   * 
+   * Testcase:
+   *  % fs testopt /Itunes/music/ -d ickeUndEr -R -iTest
+   *  X is a nonvalid option
+   * 
+   * @throws IOException - Input/Output failure.
+   */
+  @Test
+  public void testSourceAndTarget() throws IOException {
+    String command = "ickeUndEr.txt icke.txt";    
+    String args = "ahRbd:li:";
+    GetOpts g = new GetOpts(command, args);
+    g.getopt();   
+    ArrayList<String> argsOfGetopt = g.getFoundArgs();    
+    if(argsOfGetopt.size() == 2) {
+      assertEquals("Path of " + command,
+          "ickeUndEr.txt", argsOfGetopt.remove(0));
+      assertEquals("Path of " + command, 
+          "icke.txt", argsOfGetopt.remove(0));
+    }
+  }
 
   /**
    * Performs a getopt command and returns the arguments returned by getopt.

@@ -113,7 +113,7 @@ public final class LS {
 
     int[] contentDir = FSUtils.getAllOfDir(data, pre);  
     int[] allDir = FSUtils.getAllDir(data, pre);
-   
+
     print(contentDir);   
 
     for(int i = 0; i < allDir.length; i++) {
@@ -133,31 +133,23 @@ public final class LS {
   /**
    * Print the result.
    * @param result - array to print
-   * @throws IOException in case of problems with the PrintOutput
    */
-  private void printLong(final int[] result) throws IOException {
+  private void printLong(final int[] result) {
     for(int j : result) {
       byte[] name = FSUtils.getName(data, j);
       long size = FSUtils.getSize(data, j);
       byte[] time = FSUtils.getMtime(data, j);
       char file = 'd';
       if(FSUtils.isFile(data, j))
-          file = 'f';
+        file = 'f';
       if(!fListDot) {
         // do not print files starting with .
         if(Token.startsWith(name, '.'))
           continue;
-      }
-      out.print(file);
-      out.print("\t");
-      out.print(name);
-      out.print("\t"); 
-      out.print("" + size);
-      out.print("\t"); 
-      out.print(time);
-      out.print(NL);
-    }
-    out.print(NL);
+      }      
+      System.out.printf("%-3s %-30s %10s %20s\n", file, 
+          Token.string(name), size, Token.string(time));
+    }   
   }
 
 

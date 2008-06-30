@@ -39,6 +39,20 @@ public final class FSQuery {
   }
 
   /**
+   * Perform cp.
+   * 
+   * @param cmd options
+   * @param out output stream
+   * @throws IOException in case of problems with the PrintOutput
+   */
+  public void cp(final String cmd, final PrintOutput out) 
+  throws IOException {
+    CP cp = new CP(context, out);
+    cp.cpMain(cmd);    
+    out.print(NL);
+  }
+  
+  /**
    * Performs a du command.
    * @param cmd options
    * @param out output stream
@@ -88,8 +102,7 @@ public final class FSQuery {
   public void ls(final String cmd, final PrintOutput out) 
   throws IOException {        
     LS ls = new LS(context, out);
-    ls.lsMain(cmd);
-    out.print(NL);
+    ls.lsMain(cmd);    
   }
 
   /**
@@ -142,8 +155,7 @@ public final class FSQuery {
   public void touch(final String cmd, final PrintOutput out) 
   throws IOException {
     TOUCH touch = new TOUCH(context, out);
-    touch.touchMain(cmd);    
-    out.print(NL);
+    touch.touchMain(cmd);        
   }
 
 
