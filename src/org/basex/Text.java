@@ -263,7 +263,8 @@ public interface Text {
   /** Command Help. */
   String FS2 = lang("ch_fs2") + NL +
   "- " + Fs.CAT      + lang("ch_fs25") + NL +
-  "- " + Fs.CD       + lang("ch_fs23") + NL +  
+  "- " + Fs.CD       + lang("ch_fs23") + NL +
+  "- " + Fs.CP       + lang("ch_fs30") + NL +
   "- " + Fs.DU       + lang("ch_fs21") + NL +
   "- " + Fs.LOCATE   + lang("ch_fs26") + NL +
   "- " + Fs.LS       + lang("ch_fs22") + NL +
