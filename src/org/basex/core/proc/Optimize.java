@@ -61,6 +61,9 @@ public final class Optimize extends Proc {
       }
     }
     data.meta.height = h;
+    data.meta.newindex = false;
+    data.tags.stats = true;
+    data.atts.stats = true;
 
     try {
       data.tags.finish(data.meta.dbname);

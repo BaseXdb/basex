@@ -263,8 +263,7 @@ public interface Text {
   /** Command Help. */
   String FS2 = lang("ch_fs2") + NL +
   "- " + Fs.CAT      + lang("ch_fs25") + NL +
-  "- " + Fs.CD       + lang("ch_fs23") + NL +
-  "- " + Fs.CP       + lang("ch_fs30") + NL +
+  "- " + Fs.CD       + lang("ch_fs23") + NL +  
   "- " + Fs.DU       + lang("ch_fs21") + NL +
   "- " + Fs.LOCATE   + lang("ch_fs26") + NL +
   "- " + Fs.LS       + lang("ch_fs22") + NL +
@@ -471,9 +470,9 @@ public interface Text {
   /** Command Info. */
   String GUIINFOTT = lang("c_infott");
   /** Command Info. */
-  String GUIINPUTMODE = lang("c_inputmode");
+  //String GUIINPUTMODE = lang("c_inputmode");
   /** Command Info. */
-  String GUIINPUTMODETT = lang("c_inputmodett");
+  //String GUIINPUTMODETT = lang("c_inputmodett");
   /** Command Info. */
   String GUIINSERT = lang("c_insert") + DOTS;
   /** Command Info. */
@@ -1314,7 +1313,7 @@ public interface Text {
   /** Help String. */
   byte[] HELPMEM = token(lang("h_mem"));
   /** Help String. */
-  byte[] HELPXPATHV = token(lang("h_xpathv"));
+  String HELPXPATHV = lang("h_xpathv");
 
   /** Dummy string to check if all language strings have been assigned. */
   String CHECK = lang(null);

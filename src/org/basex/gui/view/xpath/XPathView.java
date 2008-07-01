@@ -1,24 +1,20 @@
 package org.basex.gui.view.xpath;
 
-import static org.basex.gui.GUIConstants.*;
 import static org.basex.Text.*;
-import static org.basex.util.Token.*;
+import static org.basex.gui.GUIConstants.*;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.FontMetrics;
-import java.awt.Dimension;
-import java.util.Arrays;
 import javax.swing.JComboBox;
 import javax.swing.plaf.basic.BasicComboPopup;
 import org.basex.core.Commands;
-import org.basex.core.Context;
-import org.basex.core.proc.Optimize;
 import org.basex.data.Data;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
+import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants.FILL;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLabel;
@@ -26,40 +22,34 @@ import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.view.View;
 import org.basex.util.StringList;
 import org.basex.util.Token;
-import org.basex.query.QueryException;
-import org.basex.query.xpath.XPParser;
 
 /**
- * This class offers a real tree view.
+ * This class offers a text field for XPath input.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author ...
  */
 public final class XPathView extends View {
-  /** Database Context. */
-  public static Context context = new Context();
+  /** Input completions. */
+  private static final String[] COMP = { "*", "comment()", "node()",
+    "processing-instruction()", "text()", "ancestor-or-self::", "ancestor::",
+      "attribute::", "child::", "descendant-or-self::", "descendant::",
+      "following-sibling::", "following::", "parent::", "preceding-sibling::",
+      "preceding::", "self::" };
+  
   /** Input field for XPath queries. */
-  final BaseXTextField input;
-  /** Header string. */
-  final BaseXLabel header;
-  /** Button box. */
-  final BaseXBack back;
+  protected final BaseXTextField input;
   /** BasicComboPopup Menu. */
-  public BasicComboPopup pop;
-  /** StringList with all entries. */
-  public StringList all = new StringList();
+  protected ComboPopup pop;
   /** JComboBox. */
-  public JComboBox box;
+  protected final JComboBox box;
   /** String for temporary input. */
-  public String tempIn;
-  /** String for temporary input. */
-  public String temp;
-  /** Boolean value if BasicComboPopup is initialized. */
-  public boolean popInit = false;
-  /** Boolean value for atts only. */
-  public boolean atts = false;
-  /** Boolean value for node-tests only. */
-  public boolean nodes = false;
+  protected String tempIn;
+
+  /** Header string. */
+  private final BaseXLabel header;
+  /** Button box. */
+  private final BaseXBack back;
 
   /**
    * Default Constructor.
@@ -71,85 +61,60 @@ public final class XPathView extends View {
     back.setLayout(new BorderLayout());
     header = new BaseXLabel(GUIConstants.XPATHVIEW, 10);
     back.add(header, BorderLayout.NORTH);
+
+    box = new JComboBox();
+    box.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent e) {
+        if(e.getModifiers() == 16) completeInput();
+      }
+    });
+    pop = new ComboPopup(box);
+
     input = new BaseXTextField(null);
-    input.setToolTipText(string(HELPXPATHV));
+    input.setToolTipText(HELPXPATHV);
     input.addKeyListener(new KeyAdapter() {
       @Override
-      public void keyReleased(final KeyEvent e) {
-        int c = e.getKeyCode();
-          if(c == KeyEvent.VK_SLASH) {
-            showPopAll();
-          } else if(c == KeyEvent.VK_DELETE || c == KeyEvent.VK_BACK_SPACE) {
-            if(input.getText().length() == 0) {
-              tempIn = "";
-              if(popInit) {
-              pop.hide();
-              }
-            } else if(input.getText().endsWith("/")) {
-              if ('/' ==
-                input.getText().charAt(input.getText().length() - 1)) {
-                showPopAll();
-            } else if ('/' ==
-              input.getText().charAt(input.getText().length() - 2)) {
-              showPopAll();
-              }
-            } else {
-              tempIn = input.getText();
-              pop.hide();
-            }
-          } else if(c == KeyEvent.VK_DOWN) {
-            if(box.getSelectedItem() != null &&
-                box.getSelectedIndex() < box.getItemCount() - 1) {
-              int tmp = box.getSelectedIndex();
-              box.setSelectedIndex(tmp + 1);
-            } else {
-              box.setSelectedIndex(0);
-            } 
-          } else if(c == KeyEvent.VK_UP) {
-            if(box.getSelectedItem() != null) {
-              int tmp = box.getSelectedIndex();
-              box.setSelectedIndex(tmp - 1);
-            } else {
-              box.setSelectedIndex(box.getItemCount() - 1);
-            }
-          } else if(c == KeyEvent.VK_ENTER) {
-            if(box.getSelectedItem() != null) {
-              input.setText(tempIn + box.getSelectedItem().toString());
-              if(box.getSelectedItem().toString().endsWith("::")) {
-                if(box.getSelectedItem().toString().equals("attribute::")) {
-                  tempIn = input.getText();
-                  atts = true;
-                  showSpecPop();
-                } else {
-                  tempIn = input.getText();
-                  nodes = true;
-                  showSpecPop();
-                }
-                }
-              if(box.getSelectedItem() != null) {
-                pop.hide();
-                }
-            }
-          } else if(c == KeyEvent.VK_SHIFT) {
-            return;
-          } else {
-            if(popInit) {
-              if(tempIn.length() == 0) {
-                pop.hide();
-              } else {
-                showSpecPop();
-              }
-            }
+      public void keyPressed(final KeyEvent e) {
+        final int count = box.getItemCount();
+        if(count == 0) return;
+        int p = box.getSelectedIndex();
+        
+        final int c = e.getKeyCode();
+        if(c == KeyEvent.VK_DOWN) {
+          if(++p == count) p = 0;
+          box.setSelectedIndex(p);
+        } else if(c == KeyEvent.VK_UP) {
+          if(--p < 0) p = count - 1;
+          box.setSelectedIndex(p);
+        } else if(c == KeyEvent.VK_ENTER) {
+          if(box.getSelectedItem() != null) completeInput();
         }
-        if(c == KeyEvent.VK_ESCAPE) return;
-        final String query = input.getText();
+      }
+
+      @Override
+      public void keyReleased(final KeyEvent e) {
+        final int c = e.getKeyCode();
+        if(c == KeyEvent.VK_DOWN || c == KeyEvent.VK_UP) return;
+
+        if(c == KeyEvent.VK_ESCAPE) {
+          pop.setVisible(false);
+          return;
+        }
+        
+        final boolean enter = c == KeyEvent.VK_ENTER;
+        if(!enter) showPopup();
+
+        if(GUIProp.execrt || enter) {
+          GUI.get().execute(Commands.XPATH, input.getText());
+        }
+
+        /*
         final XPParser parser = new XPParser(query);
         try {
           parser.parse();
-          GUI.get().execute(Commands.XPATH, query);
         } catch(final QueryException ex) {
           //System.out.println(ex.getMessage());
-        }
+        }*/
       }
     });
 
@@ -163,148 +128,49 @@ public final class XPathView extends View {
   }
 
   /**
-   * Shows the BasicComboPopup with all Entries.
+   * Shows the popup menu with correct entries only.
    */
-  public void showPopAll() {
-    tempIn = input.getText();
-    box = new JComboBox(all.finish());
-    box.setSelectedItem(null);
-    popInit = true;
-    box.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent e) {
-        if(e.getModifiers() == 16) {
-          input.setText(tempIn + box.getSelectedItem());
-          if(box.getSelectedItem().toString().endsWith("::")) {
-          if(box.getSelectedItem().toString().equals("attribute::")) {
-            tempIn = input.getText();
-            atts = true;
-            showSpecPop();
-          } else {
-            tempIn = input.getText();
-            nodes = true;
-            showSpecPop();
-          }
-          }
-          if(box.getSelectedItem() != null) {
-          pop.hide();
-          }
-        }
-      }
-    });
-      pop = new BasicComboPopup(box);
-      FontMetrics fm = input.getFontMetrics(input.getFont());
-      int width = fm.stringWidth(input.getText());
-      if(width >= back.getWidth()) {
-        width = back.getWidth();
-      }
-      pop.show(input, width, input.getHeight());
-  }
-
-  /**
-   * Shows the special BasicComboPopup with correct entries only.
-   */
-  public void showSpecPop() {
-    pop.hide();
-    box.removeAllItems();
-    if(tempIn.endsWith("/") || (!atts && !nodes)) {
-    temp = input.getText().substring(tempIn.length());
-    for(int i = 0; i < all.finish().length; i++) {
-      if(all.finish()[i].startsWith(temp)) {
-        box.addItem(all.finish()[i]);
-      }
-    }
-    } else if(atts) {
-      for(int i = 0; i < all.finish().length; i++) {
-        if(all.finish()[i].startsWith("@")) {
-          box.addItem(all.finish()[i]);
-        }
-        atts = false;
-      }
-    } else if(nodes) {
-      for(int i = 0; i < all.finish().length; i++) {
-        if(!all.finish()[i].endsWith("::")) {
-          box.addItem(all.finish()[i]);
-        }
-        nodes = false;
-      }
-    }
-    if(box.getItemCount() != 0) {
-      box.setSelectedItem(null);
-      FontMetrics fm = input.getFontMetrics(input.getFont());
-      int width = fm.stringWidth(input.getText());
-      if(width >= back.getWidth()) {
-        width = back.getWidth();
-      }
-      pop = new BasicComboPopup(box);
-      if(box.getItemCount() < 10) {
-      pop.setPreferredSize(new Dimension(pop.getPreferredSize().width,
-          box.getItemCount() * 20));
-      }
-      pop.show(input, width, input.getHeight());
-    }
-  }
-
-  @Override
-  protected void refreshContext(final boolean more, final boolean quick) {
-  // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  protected void refreshFocus() {
-    repaint();
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  protected void refreshInit() {
-    all = new StringList();
-    if(GUI.context.data() != null) {
-      String[] test = keys(GUI.context.data());
-      for(int i = 1; i < test.length; i++) {
-        all.add(test[i]);
-      }
-      String[] cmdList = { "ancestor-or-self::", "ancestor::",
-          "attribute::", "child::", "comment()", "descendant-or-self::",
-          "following-sibling::", "following::", "namespace::", "node()",
-          "parent::", "preceding-sibling::", "preceding::",
-          "processing-instruction()", "self::", "text()" };
-      for(int j = 0; j < cmdList.length; j++) {
-        all.add(cmdList[j]);
-      }
-    }
-  }
-
-  @Override
-  protected void refreshLayout() {
-    header.setFont(GUIConstants.lfont);
-    header.setForeground(COLORS[16]);
-  }
-
-  @Override
-  protected void refreshMark() {
-  // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  protected void refreshUpdate() {
-  // TODO Auto-generated method stub
-
-  }
-
-  /**
-   * Returns a string array with all distinct keys
-   * and the keys of the specified set.
-   * @param data data reference
-   * @return key array
-   */
-  String[] keys(final Data data) {
-    if(!data.tags.stats()) new Optimize().stats(data);
-
+  protected void showPopup() {
     final StringList sl = new StringList();
-    sl.add("");
+    
+    final String query = input.getText();
+    final int slash = Math.max(query.lastIndexOf('/'),
+        Math.max(query.lastIndexOf('['), query.lastIndexOf('(')));
+    final int axis = query.lastIndexOf("::");
+    final boolean test = axis > slash;
+
+    tempIn = "";
+    if(test) tempIn = query.substring(0, axis + 2);
+    else if(slash != -1) tempIn = query.substring(0, slash + 1);
+
+    if(query.length() != 0) {
+      String suf = input.getText().substring(tempIn.length());
+      final String[] all = createList();
+      if(test) {
+        final boolean attest = tempIn.endsWith("attribute::");
+        for(final String a : all) {
+          if(a.endsWith("::")) continue;
+          if(attest ^ a.startsWith("@")) continue;
+          final String at = a.substring(attest ? 1 : 0);
+          if(at.startsWith(suf) && !at.equals(suf)) sl.add(at);
+        }
+      } else {
+        for(final String a : all) {
+          if(a.startsWith(suf) && !a.equals(suf)) sl.add(a);
+        }
+      }
+    }
+    createCombo(sl);
+  }
+
+  /**
+   * Creates a combo box list.
+   * @return list
+   */
+  private String[] createList() {
+    final StringList sl = new StringList();
+    final Data data = GUI.context.data();
+
     for(int i = 1; i <= data.tags.size(); i++) {
       if(data.tags.counter(i) == 0) continue;
       sl.add(Token.string(data.tags.key(i)));
@@ -313,9 +179,88 @@ public final class XPathView extends View {
       if(data.atts.counter(i) == 0) continue;
       sl.add("@" + Token.string(data.atts.key(i)));
     }
-    final String[] vals = sl.finish();
-    Arrays.sort(vals);
-    vals[0] = "(" + (vals.length - 1) + " entries)";
-    return vals;
+    sl.sort();
+
+    for(final String c : COMP) sl.add(c);
+    return sl.finish();
+  }
+
+  /**
+   * Creates and shows the combo box.
+   * @param sl strings to be added
+   */
+  public void createCombo(final StringList sl) {
+    if(sl.size == 0) {
+      box.setSelectedItem(null);
+      pop.setVisible(false);
+      return;
+    }
+    
+    if(comboChanged(sl)) {
+      box.setSelectedItem(null);
+      box.removeAllItems();
+      for(int i = 0; i < sl.size; i++) box.addItem(sl.list[i]);
+      pop = new ComboPopup(box);
+    }
+    final int width = Math.min(getWidth(),
+        input.getFontMetrics(input.getFont()).stringWidth(tempIn));
+    pop.show(input, width, input.getHeight());
+  }
+
+  /**
+   * Tests if the combo box entries have changed.
+   * @param sl strings to be compared
+   * @return result of check
+   */
+  public boolean comboChanged(final StringList sl) {
+    if(sl.size != box.getItemCount()) return true;
+    for(int i = 0; i < sl.size; i++) {
+      if(!sl.list[i].equals(box.getItemAt(i))) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Completes the input with the current combo box choice.
+   */
+  public void completeInput() {
+    final String sel = box.getSelectedItem().toString();
+    input.setText(tempIn + sel);
+    showPopup();
+  }
+
+  @Override
+  protected void refreshInit() { }
+
+  @Override
+  protected void refreshFocus() { }
+
+  @Override
+  protected void refreshContext(final boolean more, final boolean quick) { }
+
+  @Override
+  protected void refreshLayout() {
+    header.setFont(GUIConstants.lfont);
+    header.setForeground(COLORS[16]);
+  }
+
+  @Override
+  protected void refreshMark() { }
+
+  @Override
+  protected void refreshUpdate() { }
+
+  /** Combo Popupmenu class, overriding the default constructor. */
+  class ComboPopup extends BasicComboPopup {
+    /**
+     * Constructor.
+     * @param combo combo box reference
+     */
+    ComboPopup(final JComboBox combo) {
+      super(combo);
+      final int h = combo.getMaximumRowCount();
+      setPreferredSize(new Dimension(getPreferredSize().width,
+          getPopupHeightForRowCount(h) + 2));
+    }
   }
 }

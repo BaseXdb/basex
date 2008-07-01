@@ -559,15 +559,6 @@ public enum GUICommands implements GUICommand {
   /* OPTION MENU */
 
   /** Realtime filtering on/off. */
-  INPUTMODE(true, GUIINPUTMODE, null, GUIINPUTMODETT) {
-    @Override
-    public void execute() {
-      //GUIProp.searchmode = ++GUIProp.searchmode % 3;
-      GUI.get().refreshControls();
-    }
-  },
-
-  /** Realtime filtering on/off. */
   RTEXEC(true, GUIRTEXEC, null, GUIRTEXECTT) {
     @Override
     public void execute() {

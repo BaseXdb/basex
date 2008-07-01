@@ -27,7 +27,7 @@ public final class Names extends Set {
   /** Index type (tags/attribute names). */
   private final boolean tag;
   /** Statistics flag. */
-  private boolean stats;
+  public boolean stats;
 
   /**
    * Empty Constructor.
