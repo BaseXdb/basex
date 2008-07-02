@@ -262,9 +262,9 @@ public interface Text {
   String FS1 = lang("ch_fs1");
   /** Command Help. */
   String FS2 = lang("ch_fs2") + NL +
-  "- " + Fs.CP       + lang("ch_fs30") + NL +
   "- " + Fs.CAT      + lang("ch_fs25") + NL +
   "- " + Fs.CD       + lang("ch_fs23") + NL +  
+  "- " + Fs.CP       + lang("ch_fs30") + NL +    
   "- " + Fs.DU       + lang("ch_fs21") + NL +
   "- " + Fs.LOCATE   + lang("ch_fs26") + NL +
   "- " + Fs.LS       + lang("ch_fs22") + NL +
@@ -272,6 +272,12 @@ public interface Text {
   "- " + Fs.PWD      + lang("ch_fs24") + NL +
   "- " + Fs.RM       + lang("ch_fs28") + NL +  
   "- " + Fs.TOUCH    + lang("ch_fs29");
+  /** Command Help. */
+  String FSCAT = lang("ch_fscat");
+  /** Command Help. */
+  String FSCD = lang("ch_fscd");
+  /** Command Help. */
+  String FSCP = lang("ch_fscp");
 
   /** Command Help. */
   String DUMMYUPDATE0 = lang("ch_dummyupdate0");

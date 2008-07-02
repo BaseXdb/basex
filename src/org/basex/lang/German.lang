@@ -489,7 +489,9 @@ ch_fs27=: [-h] : make directories
 ch_fs28=: [-Rh] file : remove directory entries
 ch_fs29=: [-h] : change file access and modification times
 ch_fs30=: [-h] source_file target_file : copy files
-
+ch_fscat=CAT(1)      deepFS General Commands Manual      CAT(1) \n\n  NAME\n     cat -- concatenate and print files  \n\n  SYNOPSIS\n     cat [-bhn] [file ...]  \n\n  DESCRIPTION\n     The cat utility reads files, writing them to the standard output.    \n\n     The options are as follows:\n     -b    Number the non-blank output lines, starting at 1.\n     -h    Print this page.\n     -n    Number the output lines, starting at 1.\n
+ch_fscd=CD(1)      deepFS General Commands Manual      CD(1) \n\n  NAME\n     cd -- changes the working directory\n\n  SYNOPSIS\n     cd [-h] dir  \n\n  DESCRIPTION\n     Changes the working directory.    \n\n     The options are as follows:\n     -h    Print this page.
+ch_fscp=CP(1)      deepFS General Commands Manual      CP(1)\n\n  NAME\n     cp -- copy files\n\n  SYNOPSIS\n     cp source_file target_file\n     cp  source_file ... target_directory\n\nDESCRIPTION\n     In the first synopsis form, the cp utility copies the contents of the\n     source_file to the target_file.  In the second synopsis form, the con-\n     tents of each named source_file is copied to the destination\n     target_directory. The names of the files themselves are not changed.  If\n     cp detects an attempt to copy a file to itself, the copy will fail.
 ch_dummyupdate0=Update-Befehle:
 ch_copy0=[Pos] ["Quelle"] ["Ziel"]
 ch_copy1=Kopieren von XML-Knoten.

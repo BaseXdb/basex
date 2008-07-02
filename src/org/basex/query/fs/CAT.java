@@ -174,7 +174,6 @@ public class CAT {
    * @throws IOException in case of problems with the PrintOutput
    */
   private void printHelp() throws IOException {
-    out.print("cat [-bhn] ...");
-
+    out.print(FSCAT);
   }
 }

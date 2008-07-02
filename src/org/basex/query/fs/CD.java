@@ -1,5 +1,6 @@
 package org.basex.query.fs;
 
+import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.io.PrintOutput;
@@ -90,7 +91,7 @@ public final class CD {
    * @throws IOException in case of problems with the PrintOutput
    */
   private void printHelp() throws IOException {
-    out.print("cd ...");
+    out.print(FSCD);
    
   }
 

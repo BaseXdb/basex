@@ -1,5 +1,6 @@
 package org.basex.query.fs;
 
+import static org.basex.Text.*;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -173,7 +174,7 @@ public final class CP {
    * @throws IOException in case of problems with the PrintOutput
    */
   private void printHelp() throws IOException {
-    out.print("cp  source_file target_file");
+    out.print(FSCP);
 
   }
 
