@@ -387,7 +387,6 @@ public final class GUI extends JFrame {
   public void refreshPop(final int c) {
     if(pop.isVisible()) pop.setVisible(false);
     if(c == KeyEvent.VK_ESCAPE || c == KeyEvent.VK_ENTER) return;
-    System.out.println(input.getSelectedText());
     final String in = input.getText().toLowerCase();
     if(in.length() == 0) return;
 
