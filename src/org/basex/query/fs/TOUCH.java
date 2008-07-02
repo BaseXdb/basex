@@ -71,37 +71,22 @@ public final class TOUCH {
   /**
    * Performs a touch command.
    *  
-   *  @param path The name of the file
-   *  @throws IOException in case of problems with the PrintOutput 
+   *  @param path The name of the file 
    */
-  private void touch(final String path) throws IOException {
+  private void touch(final String path) {
 
-    String file = "";
-    int beginIndex = path.lastIndexOf('/');
-    if(beginIndex == -1) {
-      file = path;
-    } else {
-      curDirPre = FSUtils.goToDir(context.data(), curDirPre, 
-          path.substring(0, beginIndex));   
-      if(curDirPre == -1) {
-        out.print("touch: " + path + " No such file or directory");
-      } else {
-        file = path.substring(beginIndex + 1);
+    String file = path.substring(path.lastIndexOf('/') + 1);
+
+    int[] preFound =  FSUtils.getSpecificFilesOrDirs(context.data(), 
+        curDirPre, path);
+    System.out.println(preFound.length);
+    if(preFound.length  > 0) {
+      for(int i : preFound) {
+        if(FSUtils.isFile(context.data(), i)) {
+          context.data().update(i + 4, "mtime".getBytes(), 
+              ("" + System.currentTimeMillis()).getBytes());
+        }
       }
-    }
-
-//  int[] preFound =  FSUtils.getSpecificFilesOrDirs(context.data(), 
-//  curDirPre, path);
-
-    int filePre = FSUtils.getSpecificFile(context.data(), 
-        curDirPre, file.getBytes());
-    // if directory - go to next pre value
-    //   if(!FSUtils.isFile(context.data(), filePre)) continue;       
-
-    if(filePre > 0) {
-      // file found - update timestamp  
-      context.data().update(filePre + 4, "mtime".getBytes(), 
-          ("" + System.currentTimeMillis()).getBytes());      
     } else {   
       // add new file  
       try {

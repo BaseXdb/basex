@@ -145,8 +145,9 @@ public final class FSUtils {
    */
   public static int[] getSpecificFilesOrDirs(final Data data, final int pre,
       final String path) {   
+    
     String file = path;  
-    int curDirPre = 0;
+    int curDirPre = pre;
     int lastSlash = path.lastIndexOf('/');
     if(lastSlash != -1) {
       curDirPre = FSUtils.goToDir(data, pre, 
