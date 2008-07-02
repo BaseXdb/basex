@@ -255,13 +255,14 @@ public interface Text {
   /** Command Help. */
   String CD2 = lang("ch_cd2");
   /** Command Help. */
-  String FS0 = "[" + Fs.CAT + "|" + Fs.CD + "|" + Fs.DU +
+  String FS0 = "[" + Fs.CAT + "|" + Fs.CP + "|" + Fs.CD + "|" + Fs.DU +
   "|" + Fs.LOCATE + "|" + Fs.LS + "|" + Fs.MKDIR + "|" +
-   Fs.PWD + "|" + Fs.RM + "|" + Fs.TOUCH + "]";
+  Fs.PWD + "|" + Fs.RM + "|" + Fs.TOUCH + "]";
   /** Command Help. */
   String FS1 = lang("ch_fs1");
   /** Command Help. */
   String FS2 = lang("ch_fs2") + NL +
+  "- " + Fs.CP       + lang("ch_fs30") + NL +
   "- " + Fs.CAT      + lang("ch_fs25") + NL +
   "- " + Fs.CD       + lang("ch_fs23") + NL +  
   "- " + Fs.DU       + lang("ch_fs21") + NL +
@@ -1314,6 +1315,39 @@ public interface Text {
   byte[] HELPMEM = token(lang("h_mem"));
   /** Help String. */
   String HELPXPATHV = lang("h_xpathv");
+
+  //FILESYSTEM ERROR MESSAGES===================================================
+  
+  /** FS Error Message. */
+  String EUND = lang("fs_error0"); 
+  /** FS Error Message. */
+  String EPERM = lang("fs_error1");
+  /** FS Error Message. */
+  String ENOENT = lang("fs_error2");
+  /** FS Error Message. */
+  String EIO = lang("fs_error5");
+  /** FS Error Message. */
+  String EACCES = lang("fs_error13");
+  /** FS Error Message. */
+  String EEXIST = lang("fs_error17");
+  /** FS Error Message. */
+  String ENOTDIR = lang("fs_error20");
+  /** FS Error Message. */
+  String EISDIR = lang("fs_error21");
+  /** FS Error Message. */
+  String EINVAL = lang("fs_error22");
+  /** FS Error Message. */
+  String EROFS = lang("fs_error30");
+  /** FS Error Message. */
+  String ERANGE = lang("fs_error34");
+  /** FS Error Message. */
+  String ENAMETOOLONG = lang("fs_error63");
+  /** FS Error Message. */
+  String ENOTEMPTY = lang("fs_error66");
+  /** FS Error Message. */
+  String EFTYPE = lang("fs_error79");
+  /** FS Error Message. */
+  String EMISSARG = lang("fs_error99");
 
   /** Dummy string to check if all language strings have been assigned. */
   String CHECK = lang(null);

@@ -72,14 +72,14 @@ public final class TOUCH {
    * Performs a touch command.
    *  
    *  @param path The name of the file 
+   * @throws IOException - in case of problems with the PrintOutput 
    */
-  private void touch(final String path) {
+  private void touch(final String path) throws IOException {
 
     String file = path.substring(path.lastIndexOf('/') + 1);
 
     int[] preFound =  FSUtils.getSpecificFilesOrDirs(context.data(), 
         curDirPre, path);
-    System.out.println(preFound.length);
     if(preFound.length  > 0) {
       for(int i : preFound) {
         if(FSUtils.isFile(context.data(), i)) {
@@ -88,7 +88,12 @@ public final class TOUCH {
         }
       }
     } else {   
-      // add new file  
+      // add new file 
+      if(file.indexOf('?') > 0 || file.indexOf('*') > 0 
+          || file.indexOf('[') > 0) {
+        out.print("touch: " + file + ": filename not allowed.\n");
+        return;
+      } 
       try {
         int preNewFile = 4;
         if(!(curDirPre == FSUtils.getROOTDIR())) {

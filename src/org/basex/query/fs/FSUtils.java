@@ -10,6 +10,8 @@ import org.basex.data.Data;
 import org.basex.util.IntList;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
+import org.basex.io.PrintOutput;
+import static org.basex.Text.*;
 
 /**
  * Preliminary collection of file system methods.
@@ -355,6 +357,64 @@ public final class FSUtils {
     }
     return -1;
   }
-
-
+  /**
+   * Returns the pre value of a dir.
+   *  
+   * @param out - the Outputstream
+   * @param programm - name of the programm
+   * @param arg - passed by the console
+   * @param error - error code
+   * @throws IOException - in case of problems with the PrintOutput 
+   */
+  public static void printError(final PrintOutput out, final String programm, 
+      final String arg, final int error) throws IOException {
+    switch(error) {
+      case 1:
+        out.print(programm + ": " + arg + ": " + EPERM);
+        break;
+      case 2:
+        out.print(programm + ": " + arg + ": " + ENOENT);
+        break;
+      case 5:
+        out.print(programm + ": " + arg + ": " + EIO);
+        break;
+      case 13:
+        out.print(programm + ": " + arg + ": " + EACCES);
+        break;
+      case 17:
+        out.print(programm + ": " + arg + ": " + EEXIST);
+        break;
+      case 20:
+        out.print(programm + ": " + arg + ": " + ENOTDIR);
+        break;
+      case 21:
+        out.print(programm + ": " + arg + ": " + EISDIR);
+        break;
+      case 22:
+        out.print(programm + ": " + arg + ": " + EACCES);
+        break;
+      case 30:
+        out.print(programm + ": " + arg + ": " + EROFS);
+        break;
+      case 34:
+        out.print(programm + ": " + arg + ": " + ERANGE);
+        break;
+      case 63:
+        out.print(programm + ": " + arg + ": " + ENAMETOOLONG);
+        break;
+      case 66:
+        out.print(programm + ": " + arg + ": " + ENOTEMPTY);
+        break;
+      case 79:
+        out.print(programm + ": " + arg + ": " + EFTYPE);
+        break;
+      case 99:
+        out.print(programm + ": " + arg + ": " + EMISSARG);
+        break;
+      default:
+        out.print(programm + ": " + arg + ": " + EUND);
+        break;
+    }
+    out.print(NL);
+  }
 }

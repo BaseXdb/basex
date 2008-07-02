@@ -78,11 +78,11 @@ public class CAT {
           break;          
         case ':':         
           fError = true;
-          out.print("cat: missing argument");
+          FSUtils.printError(out, "cat", g.getPath(), 99);
           break;  
         case '?':         
           fError = true;
-          out.print("cat: illegal option");
+          FSUtils.printError(out, "cat", g.getPath(), 22);
           break;
       }      
       if(fError) {
@@ -97,11 +97,11 @@ public class CAT {
       nodeToPrint = FSUtils.getSpecificFilesOrDirs(context.data(), 
           curDirPre, g.getPath()); 
       if(nodeToPrint.length < 1) {
-        out.print("cat:" + g.getPath() + ": No such file or directory");
+        FSUtils.printError(out, "cat", g.getPath(), 2);
       } else {
         if(nodeToPrint.length == 1 && 
             FSUtils.isDir(context.data(), nodeToPrint[0])) {
-          out.print("cat:" + g.getPath() + ": Is a directory");
+          FSUtils.printError(out, "cat", g.getPath(), 21);
         } else {
           cat(nodeToPrint);
         }
@@ -162,8 +162,8 @@ public class CAT {
         }
         out.print(NL);
       } else {
-        out.print("cat:" + FSUtils.getFileName(context.data(), nodeToPrint) +
-        ": Is a directory");
+        FSUtils.printError(out, "cat", 
+            FSUtils.getFileName(context.data(), nodeToPrint), 21);        
       }
     }
   } 
@@ -174,7 +174,7 @@ public class CAT {
    * @throws IOException in case of problems with the PrintOutput
    */
   private void printHelp() throws IOException {
-    out.print("cat [-bn] ...");
+    out.print("cat [-bhn] ...");
 
   }
 }
