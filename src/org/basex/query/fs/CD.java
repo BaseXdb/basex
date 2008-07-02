@@ -3,7 +3,6 @@ package org.basex.query.fs;
 import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.io.PrintOutput;
-import org.basex.query.fs.Exception.PathNotFoundException;
 import org.basex.util.GetOpts;
 /**
  * Performs a cd command.
@@ -75,9 +74,8 @@ public final class CD {
     if(g.getPath() != null) {    
       curDirPre = FSUtils.goToDir(context.data(), curDirPre, g.getPath());
       if(curDirPre == -1) {
-        throw new PathNotFoundException("cd", g.getPath());
+        out.print("cd " + g.getPath() + ": No such file or directory. ");
       } else {
-
         context.current().pre[0] = curDirPre;
       }
     } else {

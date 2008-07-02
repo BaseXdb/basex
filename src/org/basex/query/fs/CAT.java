@@ -78,11 +78,11 @@ public class CAT {
           break;          
         case ':':         
           fError = true;
-          out.print("cd: missing argument");
+          out.print("cat: missing argument");
           break;  
         case '?':         
           fError = true;
-          out.print("cd: illegal option");
+          out.print("cat: illegal option");
           break;
       }      
       if(fError) {
@@ -91,15 +91,16 @@ public class CAT {
       }
       ch = g.getopt();
     }
-    int nodeToPrint = 0;
+    int[] nodeToPrint;
     // if there is path expression go to work
     if(g.getPath() != null) {    
-      nodeToPrint = FSUtils.getSpecificFile(context.data(), 
-          curDirPre, g.getPath().getBytes()); 
-      if(nodeToPrint == -1) {
+      nodeToPrint = FSUtils.getSpecificFilesOrDirs(context.data(), 
+          curDirPre, g.getPath()); 
+      if(nodeToPrint.length < 1) {
         out.print("cat:" + g.getPath() + ": No such file or directory");
       } else {
-        if(FSUtils.isDir(context.data(), nodeToPrint)) {
+        if(nodeToPrint.length == 1 && 
+            FSUtils.isDir(context.data(), nodeToPrint[0])) {
           out.print("cat:" + g.getPath() + ": Is a directory");
         } else {
           cat(nodeToPrint);
@@ -110,54 +111,60 @@ public class CAT {
   /**
    * Performs a cat command.
    *  
-   *  @param nodeToPrint The pre value of the file
+   *  @param print The pre value of the file
    *  @throws IOException in case of problems with the PrintOutput 
    */
-  private void cat(final int nodeToPrint) throws IOException {    
-    IO io = new IO(Token.string(FSUtils.getPath(context.data(), nodeToPrint)));
-    int numberLines = 1;
-    if(io.exists()) {
-      byte[] content = io.content();
-      byte lastChar = 0;
-      for(int i = 0; i < content.length; ++i) {
-        byte c = content[i];
-        if(fnumberLines || fnumberNonBlankLines) {          
-          // Firstline
-          if(fnumberNonBlankLines && lastChar == 0 && c != cr && c != lf) { 
-            out.print(numberLines++ + " ");
-            out.print((char) c);
-            lastChar = c;
-          } else if(fnumberLines && numberLines == 1) {
-            if(c == lf) {
+  private void cat(final int[] print) throws IOException {    
+    for(int j = 0; j < print.length; j++) {
+      int nodeToPrint = print[j];
+      if(FSUtils.isDir(context.data(), nodeToPrint)) { 
+        continue;
+      }
+      IO io = new IO(Token.string(
+          FSUtils.getPath(context.data(), nodeToPrint)));
+      int numberLines = 1;
+      if(io.exists()) {
+        byte[] content = io.content();
+        byte lastChar = 0;
+        for(int i = 0; i < content.length; ++i) {
+          byte c = content[i];
+          if(fnumberLines || fnumberNonBlankLines) {          
+            // Firstline
+            if(fnumberNonBlankLines && lastChar == 0 && c != cr && c != lf) { 
               out.print(numberLines++ + " ");
               out.print((char) c);
+              lastChar = c;
+            } else if(fnumberLines && numberLines == 1) {
+              if(c == lf) {
+                out.print(numberLines++ + " ");
+                out.print((char) c);
+                out.print(numberLines++ + " ");
+              } else {
+                out.print(numberLines++ + " ");
+                out.print((char) c);
+              }
+              //  after line 1
+            } else if (fnumberNonBlankLines && lastChar == lf &&
+                c != cr && c != lf) {
               out.print(numberLines++ + " ");
+              out.print((char) c);
+              lastChar = c;
+            } else if (fnumberLines && c == lf && i < content.length - 1) {
+              out.print((char) c);
+              out.print(numberLines++ + " ");            
             } else {
-              out.print(numberLines++ + " ");
               out.print((char) c);
-            }
-            //  after line 1
-          } else if (fnumberNonBlankLines && lastChar == lf &&
-              c != cr && c != lf) {
-            out.print(numberLines++ + " ");
-            out.print((char) c);
-            lastChar = c;
-          } else if (fnumberLines && c == lf && i < content.length - 1) {
-            out.print((char) c);
-            out.print(numberLines++ + " ");            
+              lastChar = c;
+            }  
           } else {
             out.print((char) c);
-            lastChar = c;
-          }  
-        } else {
-          out.print((char) c);
+          }
         }
-
+        out.print(NL);
+      } else {
+        out.print("cat:" + FSUtils.getFileName(context.data(), nodeToPrint) +
+        ": Is a directory");
       }
-      out.print(NL);
-    } else {
-      out.print("cat:" + FSUtils.getFileName(context.data(), nodeToPrint) +
-      ": Is a directory");
     }
   } 
 

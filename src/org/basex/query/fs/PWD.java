@@ -4,7 +4,6 @@ import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.io.PrintOutput;
-import org.basex.query.fs.Exception.PathNotFoundException;
 import org.basex.util.GetOpts;
 
 /**
@@ -80,7 +79,7 @@ public final class PWD {
     if(g.getPath() != null) {      
       curDirPre = FSUtils.goToDir(data, curDirPre, g.getPath());      
       if(curDirPre == -1) {
-        throw new PathNotFoundException("pwd", g.getPath());
+        out.print("pwd " + g.getPath() + "No such file or directory. ");
       }
     }
     out.print(FSUtils.getPath(data, curDirPre));

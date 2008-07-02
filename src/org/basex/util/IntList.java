@@ -72,6 +72,21 @@ public final class IntList {
     for(int i = 0; i < size; i++) if(list[i] == v) return true;
     return false;
   }
+  
+  /**
+   * Removes the element at the specified position in this list. 
+   * Shifts any subsequent elements to the left (subtracts one 
+   * from their indices). 
+   * @param index - the index of the element to removed.
+   * @return the element that was removed from the list.
+   */
+  public int remove(final int index) {
+    if(size == 0 || size < index) throw new IndexOutOfBoundsException();
+    int elem = list[index];
+    System.arraycopy(list, index + 1, list, index, list.length - index);
+    --size;
+    return elem;
+  }
 
   /**
    * Finishes the int array.

@@ -6,8 +6,9 @@ import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.io.PrintOutput;
 import org.basex.util.GetOpts;
+import org.basex.util.IntList;
 import org.basex.util.Token;
-import org.basex.query.fs.Exception.PathNotFoundException;
+
 
 /**
  * Performs a ls command.
@@ -92,7 +93,7 @@ public final class LS {
     if(g.getPath() != null) {
       curDirPre = FSUtils.goToDir(data, curDirPre, g.getPath());
       if(curDirPre == -1)
-        throw new PathNotFoundException("ls", g.getPath());
+        out.print("ls " + g.getPath() + "No such file or directory. ");
     }
 
     // go to work
@@ -112,11 +113,9 @@ public final class LS {
   private void lsRecursive(final int pre) throws IOException {         
 
     int[] contentDir = FSUtils.getAllOfDir(data, pre);  
-    int[] allDir = FSUtils.getAllDir(data, pre);
+    int[] allDir = print(contentDir);   
 
-    print(contentDir);   
-
-    for(int i = 0; i < allDir.length; i++) {
+    for(int i = 0; i < allDir.length; i++) { 
       if(!fListDot) {    
         // don´t crawl dirs starting with ´.´
         byte[] name = FSUtils.getName(data, allDir[i]);
@@ -124,18 +123,22 @@ public final class LS {
           continue;
       }
       out.print(NL);
-      out.print(FSUtils.getPath(data, allDir[i]));
+      out.print(FSUtils.getPath(data, allDir[i]));      
       out.print(NL);
-      lsRecursive(allDir[i]);
+      out.flush();
+      lsRecursive(allDir[i]); 
     }
   }
 
   /**
    * Print the result.
    * @param result - array to print
+   * @return list of directories found 
    */
-  private void printLong(final int[] result) {
+  private int[] printLong(final int[] result) {
+    IntList allDir = new IntList();
     for(int j : result) {
+      if(FSUtils.isDir(data, j)) allDir.add(j);      
       byte[] name = FSUtils.getName(data, j);
       long size = FSUtils.getSize(data, j);
       byte[] time = FSUtils.getMtime(data, j);
@@ -149,7 +152,8 @@ public final class LS {
       }      
       System.out.printf("%-3s %-30s %10s %20s\n", file, 
           Token.string(name), size, Token.string(time));
-    }   
+    }
+    return allDir.finish();
   }
 
 
@@ -157,12 +161,16 @@ public final class LS {
    * Print the result.
    * @param result - array to print
    * @throws IOException in case of problems with the PrintOutput
+   * @return list of directories found
    */
-  private void print(final int[] result) throws IOException {
+  private int[] print(final int[] result) throws IOException {
+        
     if(fPrintLong) {
-      printLong(result);
+      return printLong(result);
     } else {
+      IntList allDir = new IntList();      
       for(int j : result) {
+        if(FSUtils.isDir(data, j)) allDir.add(j);
         byte[] name = FSUtils.getName(data, j);
         if(!fListDot) {
           // do not print files starting with .
@@ -171,8 +179,9 @@ public final class LS {
         }
         out.print(name);
         out.print("\t");        
-      }
+      }      
       out.print(NL);
+      return allDir.finish();
     }
   }
   /**

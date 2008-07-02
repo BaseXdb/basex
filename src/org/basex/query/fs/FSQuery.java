@@ -23,7 +23,19 @@ public final class FSQuery {
     context = ctx;
   }
 
-
+  /**
+   * Perform cat.
+   * 
+   * @param cmd options
+   * @param out output stream
+   * @throws IOException in case of problems with the PrintOutput
+   */
+  public void cat(final String cmd, final PrintOutput out) 
+  throws IOException {
+    CAT cat = new CAT(context, out);
+    cat.catMain(cmd);    
+  }
+  
   /**
    * Perform cd.
    * 
@@ -90,7 +102,6 @@ public final class FSQuery {
   throws IOException {
     LOCATE locate = new LOCATE(context, out);
     locate.locateMain(cmd);    
-    out.print(NL);
   }
 
   /**
@@ -159,17 +170,5 @@ public final class FSQuery {
   }
 
 
-  /**
-   * Perform cat.
-   * 
-   * @param cmd options
-   * @param out output stream
-   * @throws IOException in case of problems with the PrintOutput
-   */
-  public void cat(final String cmd, final PrintOutput out) 
-  throws IOException {
-    CAT cat = new CAT(context, out);
-    cat.catMain(cmd);    
-    out.print(NL);
-  }
+
 }

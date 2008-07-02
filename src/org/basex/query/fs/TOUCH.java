@@ -89,8 +89,15 @@ public final class TOUCH {
         file = path.substring(beginIndex + 1);
       }
     }
-    int filePre =  FSUtils.getSpecificFile(context.data(), 
+
+//  int[] preFound =  FSUtils.getSpecificFilesOrDirs(context.data(), 
+//  curDirPre, path);
+
+    int filePre = FSUtils.getSpecificFile(context.data(), 
         curDirPre, file.getBytes());
+    // if directory - go to next pre value
+    //   if(!FSUtils.isFile(context.data(), filePre)) continue;       
+
     if(filePre > 0) {
       // file found - update timestamp  
       context.data().update(filePre + 4, "mtime".getBytes(), 
@@ -120,6 +127,7 @@ public final class TOUCH {
         e.printStackTrace();
       }
     }
+
   }
 
   /**

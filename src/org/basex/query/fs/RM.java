@@ -94,28 +94,13 @@ public final class RM {
    */
   private void remove(final String path) throws IOException {
     Data data = context.data();
-    String file = "";
-    int beginIndex = path.lastIndexOf('/');
-    if(beginIndex == -1) {
-      file = path;
-    } else {
-      // go to Path
-      curDirPre = FSUtils.goToDir(data, curDirPre, 
-          path.substring(0, beginIndex));   
-      if(curDirPre == -1) {
-        out.print("rm: '" + path + "' No such file or directory");
-      } else {
-        // file to delete
-        file = path.substring(beginIndex + 1);
-      }
-    }
 
     int[] del = FSUtils.getSpecificFilesOrDirs(data, curDirPre, 
-        file.getBytes());
+        path);
     long sizeOfNode = 0;
     for(int toDel : del) {
       if(toDel == -1) {
-        out.print("rm: '" + file + "' No such file or directory");
+        out.print("rm: '" + path + "' No such file or directory");
         return;
       } else {
         /* 

@@ -166,7 +166,6 @@ public final class LOCATE {
         if(FSUtils.isDir(data, i)) {
           byte[] name = FSUtils.getName(data, i);
           FSUtils.transformToRegex(fileToFind);
-          //if(Token.eq(name, fileToFindByte)) {
           if(Pattern.matches(fileToFind, Token.string(name))) {          
             if(!cFlag) {
               out.print(FSUtils.getPath(data, i));
@@ -254,17 +253,20 @@ public final class LOCATE {
   private void printDir(final int i) throws IOException {
     int toScan = i;
     int[] subContentDir = FSUtils.getAllOfDir(data, toScan);  
-    int[] allDir = FSUtils.getAllDir(data, toScan);
+    IntList allDir = new IntList(); 
 
     for(int j : subContentDir) {   
       if(!cFlag) {
         out.print(FSUtils.getPath(data, j));
         out.print(NL);
       }
+      if(FSUtils.isDir(data, j)) {
+        allDir.add(j);
+      }        
       ++filesfound;
     }
-    for(int x = 0; x < allDir.length; x++) {
-      printDir(allDir[x]);
+    while(allDir.size > 0) {
+      printDir(allDir.remove(0));
     }
   }
 
