@@ -603,7 +603,6 @@ h_catinput=Hier kann die Anfrage durch weitere Teileingaben zusätzlich beschrä
 h_mover=Die Position einer Ansicht kann durch ziehen am oberen Balken des Fensters auf jegliche Position im Hauptfenster verändert werden.\n Wenn eine Ansicht nach außerhalb des Hauptfensters bewegt wird, wird sie geschlossen.
 h_tablehead=Die Tabelle kann durch Anklicken der jeweiligen Spalte im Tabellenkopf sortiert werden. Weiterhin kann durch Eingabe von Text in die Textfelder direkt in der Tabelle Anfragen gestellt werden.
 h_mem=Diese Box stellt den reservierten Speicher von BaseX dar. Durch Anklicken der Box kann eine Garbage-Sammlung erzwungen werden.\n\n Die Anzeige wird rot wenn der freie Speicher niedrig ist. Wenn dies oft der Fall ist, starte BaseX mit der Java Option -Xmx<size> ('java -X' stellt dazu mehr Informationen bereit).
-h_xpathv=Eingabe von '/' startet die Intelli-Liste 
 
 # Filesystem Error Messages
 fs_error0=Undefined error: 0.

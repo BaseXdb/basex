@@ -1,6 +1,8 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQText.*;
+import org.basex.query.QueryTokens;
+import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Dbl;
@@ -10,6 +12,7 @@ import org.basex.query.xquery.util.Err;
 import org.basex.util.Array;
 import org.basex.util.FTTokenizer;
 import org.basex.util.IntList;
+import org.basex.util.Token;
 import org.basex.util.TokenList;
 
 /**
@@ -260,6 +263,15 @@ public final class FTSelect extends Single implements Cloneable {
     } catch(final CloneNotSupportedException e) {
       return null;
     }
+  }
+
+  @Override
+  public void plan(final Serializer ser) throws Exception {
+    ser.startElement(this);
+    if(ordered) ser.attribute(Token.token(QueryTokens.ORDERED), Token.TRUE);
+    ser.finishElement();
+    expr.plan(ser);
+    ser.closeElement(this);
   }
 
   @Override

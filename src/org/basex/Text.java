@@ -1332,8 +1332,6 @@ public interface Text {
   byte[] HELPTABLEHEAD = token(lang("h_tablehead"));
   /** Help String. */
   byte[] HELPMEM = token(lang("h_mem"));
-  /** Help String. */
-  String HELPXPATHV = lang("h_xpathv");
 
   //FILESYSTEM ERROR MESSAGES===================================================
   

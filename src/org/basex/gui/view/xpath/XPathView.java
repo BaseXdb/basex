@@ -1,6 +1,5 @@
 package org.basex.gui.view.xpath;
 
-import static org.basex.Text.*;
 import static org.basex.gui.GUIConstants.*;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -71,7 +70,6 @@ public final class XPathView extends View {
     pop = new ComboPopup(box);
 
     input = new BaseXTextField(null);
-    input.setToolTipText(HELPXPATHV);
     input.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {

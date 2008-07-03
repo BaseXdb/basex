@@ -99,7 +99,6 @@ public final class Array {
    * @param <T> array type
    * @return array
    */
-  @SuppressWarnings("unchecked")
   public static <T> T[] extend(final T[] ar) {
     final int s = ar.length;
     return resize(ar, s, s << 1);
@@ -125,7 +124,6 @@ public final class Array {
    * @param <T> array type
    * @return array
    */
-  @SuppressWarnings("unchecked")
   public static <T> T[] add(final T[] ar, final T e) {
     final int s = ar.length;
     final T[] t = resize(ar, s, s + 1);
@@ -195,7 +193,6 @@ public final class Array {
    * @param size final size
    * @return array
    */
-  @SuppressWarnings("unchecked")
   public static <T> T[] finish(final T[] ar, final int size) {
     final int s = ar.length;
     return resize(ar, s > size ? size : s, size);

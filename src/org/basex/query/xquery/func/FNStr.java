@@ -207,14 +207,20 @@ final class FNStr extends Fun {
 
   /***/
   enum NORM {
-    /** C Normalization. */ C("NFC"),
-    /** D Normalization. */ D("NFD"),
-    /** KC Normalization. */ KC("NFKC"),
-    /** KD Normalization. */ KD("NFKD"),
+    /** C Normalization.      */ C("NFC"),
+    /** D Normalization.      */ D("NFD"),
+    /** KC Normalization.     */ KC("NFKC"),
+    /** KD Normalization.     */ KD("NFKD"),
     /** Simple Normalization. */ S("");
     /** Name of Normalization.*/ byte[] name;
-    /** Constructor. @param n name */
-    NORM(final String n) { name = token(n); }
+
+    /**
+     * Constructor.
+     * @param n name
+     */
+    NORM(final String n) {
+      name = token(n);
+    }
   }
 
   /**
