@@ -278,7 +278,20 @@ public interface Text {
   String FSCD = lang("ch_fscd");
   /** Command Help. */
   String FSCP = lang("ch_fscp");
-
+  /** Command Help. */
+  String FSDU = lang("ch_fsdu");
+  /** Command Help. */
+  String FSLOCATE = lang("ch_fslocate");
+  /** Command Help. */
+  String FSLS = lang("ch_fsls");
+  /** Command Help. */
+  String FSMKDIR = lang("ch_fsmkdir");
+  /** Command Help. */
+  String FSPWD = lang("ch_fspwd");
+  /** Command Help. */
+  String FSRM = lang("ch_fsrm");
+  /** Command Help. */
+  String FSTOUCH = lang("ch_fstouch");
   /** Command Help. */
   String DUMMYUPDATE0 = lang("ch_dummyupdate0");
 

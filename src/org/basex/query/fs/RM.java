@@ -1,5 +1,6 @@
 package org.basex.query.fs;
 
+import static org.basex.Text.FSRM;
 import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.data.Data;
@@ -133,7 +134,7 @@ public final class RM {
    * @throws IOException in case of problems with the PrintOutput
    */
   private void printHelp() throws IOException {
-    out.print("rm [-Rh] file ...");
+    out.print(FSRM);
 
   }
 

@@ -1,5 +1,6 @@
 package org.basex.query.fs;
 
+import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.data.Data;
@@ -24,12 +25,6 @@ public final class DU {
 
   /** PrintOutPutStream. */
   private PrintOutput out;
-
-  /** Shows if an error occurs. */
-  private boolean fError;
-
-  /** Shows if job is done. */
-  private boolean fAccomplished;
 
   /** Display an entry for each file in the file hierarchy. */
   private boolean fPrintAll;
@@ -65,22 +60,15 @@ public final class DU {
           break;
         case 'h':
           printHelp();
-          fAccomplished = true;
-          break;
+          return;
         case ':':         
-          fError = true;
           out.print("ls: missing argument");
-          break;  
+          return;
         case '?':         
-          fError = true;
           out.print("ls: illegal option");
-          break;
+          return;
       }      
-      if(fError || fAccomplished) {
-        // more options ?
-        return;
-      }
-      ch = g.getopt();
+       ch = g.getopt();
     }
     // if there is path expression go to dir
     if(g.getPath() != null) {
@@ -136,7 +124,7 @@ public final class DU {
    * @throws IOException in case of problems with the PrintOutput
    */
   private void printHelp() throws IOException {
-    out.print("du -ah ...");
+    out.print(FSDU);
 
   }
 

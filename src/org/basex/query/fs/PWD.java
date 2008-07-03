@@ -1,5 +1,6 @@
 package org.basex.query.fs;
 
+import static org.basex.Text.FSPWD;
 import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.data.Data;
@@ -92,7 +93,7 @@ public final class PWD {
    * @throws IOException in case of problems with the PrintOutput
    */
   private void printHelp() throws IOException {
-    out.print("pwd");
+    out.print(FSPWD);
    
   }
 

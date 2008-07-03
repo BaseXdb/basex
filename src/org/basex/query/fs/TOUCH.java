@@ -1,5 +1,6 @@
 package org.basex.query.fs;
 
+import static org.basex.Text.FSTOUCH;
 import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.data.Data;
@@ -138,7 +139,7 @@ public final class TOUCH {
    * @throws IOException in case of problems with the PrintOutput
    */
   private void printHelp() throws IOException {
-    out.print("touch  ...");
+    out.print(FSTOUCH);
 
   }
 

@@ -76,20 +76,6 @@ public final class FSQuery {
   }
 
   /**
-   * Perform grep.
-   * 
-   * @param cmd options
-   * @param out output stream
-   * @throws IOException in case of problems with the PrintOutput
-   */
-  public void grep(final String cmd, final PrintOutput out) 
-  throws IOException {
-    GREP grep = new GREP(context, out);
-    grep.grepMain(cmd);    
-    out.print(NL);
-  }
-  
-  /**
    * Perform locate.
    * 
    * @param cmd options

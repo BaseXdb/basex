@@ -1,5 +1,6 @@
 package org.basex.query.fs;
 
+import static org.basex.Text.FSLS;
 import static org.basex.Text.NL;
 import java.io.IOException;
 import org.basex.core.Context;
@@ -36,9 +37,6 @@ public final class LS {
   /** print long version. */
   private boolean fPrintLong;
 
-  /** Shows if an error occurs. */
-  private boolean fError;
-
   /**
    * Simplified Constructor.
    * @param ctx data context
@@ -64,9 +62,6 @@ public final class LS {
     int ch = g.getopt();
     while (ch != -1) {
       switch (ch) {
-        case 'R':
-          fRecursive = true;
-          break;
         case 'a':
           fListDot = true;
           break;
@@ -76,18 +71,17 @@ public final class LS {
         case 'l':
           fPrintLong = true; 
           break;
+        case 'R':
+          fRecursive = true;
+          break;
         case ':':         
-          fError = true;
           out.print("ls: missing argument");
           return;  
         case '?':         
-          fError = true;
           out.print("ls: illegal option");
           return;
       }
-      if(!fError) {
         ch = g.getopt();
-      }
     }
     // if there is path expression set new pre value
     if(g.getPath() != null) {
@@ -190,7 +184,7 @@ public final class LS {
    * @throws IOException in case of problems with the PrintOutput
    */
   private void printHelp() throws IOException {
-    out.print("ls -ahR ...");
+    out.print(FSLS);
 
   }
 }

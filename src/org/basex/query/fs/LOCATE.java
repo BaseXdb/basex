@@ -32,12 +32,6 @@ public final class LOCATE {
   /** PrintOutPutStream. */
   private PrintOutput out;
 
-  /** Shows if an error occurs. */
-  private boolean fError;
-
-  /** Shows if job is done. */
-  private boolean fAccomplished;
-
   /** limit output. */
   private boolean lFlag = false;
 
@@ -62,8 +56,6 @@ public final class LOCATE {
     this.input = ctx.current();
     this.data = ctx.data();
     this.out = output;
-    this.fError = false;
-    this.fAccomplished = false;
     this.fileToFind = null;
     this.filesfound = 0;
   }
@@ -91,8 +83,7 @@ public final class LOCATE {
           break;
         case 'h':
           printHelp();
-          fAccomplished = true;
-          break;
+          return;
         case 'l':
           // Limit output to number of file names and exit.
           limit = Integer.parseInt(g.getOptarg());
@@ -102,18 +93,12 @@ public final class LOCATE {
           version = g.getOptarg().charAt(0);
           break;          
         case ':':         
-          fError = true;
           out.print("ls: missing argument");
-          break;  
+          return;
         case '?':         
-          fError = true;
           out.print("ls: illegal option");
-          break;
+          return;
       }      
-      if(fError || fAccomplished) {
-        // more options ?
-        return;
-      }
       ch = g.getopt();
     }
     fileToFind = g.getPath();
@@ -286,7 +271,7 @@ public final class LOCATE {
    * @throws IOException in case of problems with the PrintOutput
    */
   private void printHelp() throws IOException {
-    out.print("locate -ch -l arg1 -V [1|2]");
+    out.print(FSLOCATE);
 
   }
 
