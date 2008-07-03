@@ -47,7 +47,6 @@ public final class FSQuery {
   throws IOException {
     CD cd = new CD(context, out);
     cd.cdMain(cmd);    
-    out.print(NL);
   }
 
   /**
@@ -61,7 +60,6 @@ public final class FSQuery {
   throws IOException {
     CP cp = new CP(context, out);
     cp.cpMain(cmd);    
-    out.print(NL);
   }
   
   /**
@@ -126,8 +124,7 @@ public final class FSQuery {
   public void mkdir(final String cmd, final PrintOutput out) 
   throws IOException {
     MKDIR mkdir = new MKDIR(context, out);
-    mkdir.mkdirMain(cmd);    
-    out.print(NL);
+    mkdir.mkdirMain(cmd);        
   }
 
   /**

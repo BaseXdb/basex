@@ -79,81 +79,112 @@ public final class CP {
    */
   private void cp(final ArrayList<String> args) throws IOException {
 
+    Data data = context.data();
+
     if(args.size() != 2) {
       printHelp();
       return;
     }
+
     String sourcefile = args.remove(0);
     String targetfile = args.remove(0);
+    int preOfNewFile = 4;
 
-    String file = "";   
-    int beginIndex = sourcefile.lastIndexOf('/');
-    if(beginIndex == -1) {
-      file = sourcefile;
-    } else {
-      curDirPre = FSUtils.goToDir(context.data(), curDirPre, 
-          sourcefile.substring(0, beginIndex));   
-      if(curDirPre == -1) {
-        out.print("cp: " + sourcefile + " No such file or directory");
-      } else {
-        file = sourcefile.substring(beginIndex + 1);
-      }
-    }
-    int sourceFilePre =  FSUtils.getSpecificFile(context.data(), 
-        curDirPre, file.getBytes());
-    
-    if(sourceFilePre > 0) {
-      // source_file found       
-      
-      Data data = context.data();
-      
-      beginIndex = targetfile.lastIndexOf('/');
-      if(beginIndex == -1) {
-        file = targetfile;
-      } else {
-        curDirPre = FSUtils.goToDir(context.data(), curDirPre, 
-            targetfile.substring(0, beginIndex));   
-        if(curDirPre == -1) {
-          out.print("cp: " + targetfile + " No such file or directory");
+    int[] sources = FSUtils.getSpecificFilesOrDirs(data, 
+        curDirPre, sourcefile);
+    sourcefile = sourcefile.substring(sourcefile.lastIndexOf('/') + 1);
+
+    int[] target = FSUtils.getSpecificFilesOrDirs(data, 
+        curDirPre, targetfile);
+    targetfile = targetfile.substring(targetfile.lastIndexOf('/') + 1);
+
+    switch(sources.length) {
+      case 0:
+        FSUtils.printError(out, "cat", sourcefile, 2);
+        break;
+      case 1:        
+
+        byte[] size = ("" + FSUtils.getSize(data, sources[0])).getBytes();
+        byte[] mtime = ("" + System.currentTimeMillis()).getBytes();
+
+        if(target.length == 1) {
+          if(FSUtils.isDir(data, target[0])) {
+            // copy file to dir
+            byte[] name = FSUtils.getName(data, sources[0]);
+            byte[] suffix = FSUtils.getSuffix(data, sources[0]);
+
+            if(!(target[0] == FSUtils.getROOTDIR())) {
+              preOfNewFile = target[0] + 5;
+            }                    
+            insert(data, name, suffix, size, mtime, target[0], preOfNewFile);
+          } else {
+            // file exists - override
+            data.update(target[0] + 3, "size".getBytes(), 
+                ("" + size).getBytes());
+            data.update(target[0] + 4, "mtime".getBytes(), 
+                ("" + System.currentTimeMillis()).getBytes());
+            data.flush();
+          }
         } else {
-          file = targetfile.substring(beginIndex + 1);
+          // create new file and insert into current dir
+          byte[] name = targetfile.getBytes();
+          byte[] suffix = getSuffix(targetfile);
+
+          if(!(curDirPre == FSUtils.getROOTDIR())) {
+            preOfNewFile = curDirPre + 5;
+          }        
+          insert(data, name, suffix, size, mtime, curDirPre, preOfNewFile);
+        }      
+        break;
+      default:
+        if(target.length != 1) { 
+          out.print("cp: missing args");
+          break;
         }
+      if(FSUtils.isFile(data, target[0])) {
+        out.print("cp: is not dir");
+        break;
       }
-      int targetfilePre =  FSUtils.getSpecificFile(context.data(), 
-          curDirPre, file.getBytes());
-      
-      long size = FSUtils.getSize(data, sourceFilePre);      
-      
-      if(targetfilePre > 0) {
-        // update
-        data.update(targetfilePre + 3, "size".getBytes(), 
-            ("" + size).getBytes());
-        context.data().update(targetfilePre + 4, "mtime".getBytes(), 
-            ("" + System.currentTimeMillis()).getBytes()); 
-      } else {
-        // insert
-        int preNewFile = 4;
-        if(!(curDirPre == FSUtils.getROOTDIR())) {
-          preNewFile = curDirPre + 5;
-        }        
-        data.insert(preNewFile, 
-            curDirPre, "file".getBytes(), Data.ELEM);
-        data.insert(preNewFile + 1, preNewFile, 
-            "name".getBytes(), file.getBytes());
-        data.insert(preNewFile + 2, 
-            preNewFile, "suffix".getBytes(), 
-            getSuffix(file));
-        data.insert(preNewFile + 3, 
-            preNewFile, "size".getBytes(), 
-            ("" + size).getBytes());
-        data.insert(preNewFile + 4, 
-            preNewFile, "mtime".getBytes(), 
-            ("" + System.currentTimeMillis()).getBytes());   
-      }      
-    } else {   
-      //cp: XXX: No such file or directory
-      out.print("cp: " + targetfile + " No such file or directory");
-    }
+      if(!(target[0] == FSUtils.getROOTDIR())) {
+        preOfNewFile = target[0] + 5;
+      }  
+      ArrayList<byte[]>  toInsert = new ArrayList<byte[]>();
+      for(int i : sources) {
+        toInsert.add(FSUtils.getName(data, i));
+        toInsert.add(FSUtils.getSuffix(data, i));
+        toInsert.add(("" + FSUtils.getSize(data, i)).getBytes());
+      }
+      for(int i = 0; i < sources.length; ++i) {
+        mtime = ("" + System.currentTimeMillis()).getBytes();
+        insert(data, toInsert.remove(0), toInsert.remove(0), toInsert.remove(0),
+            mtime, target[0], preOfNewFile);
+      }       
+      break;
+    }      
+  }
+
+
+  /**
+   * Inserts a new entry into the table.
+   * 
+   * @param data - the data table
+   * @param name - filename
+   * @param suffix - suffix of the file
+   * @param size - size of the file
+   * @param mtime - make time
+   * @param parrent - pre value of the parrent
+   * @param pre - position to insert
+   * 
+   */
+  private void insert(final Data data, final byte[] name, final byte[] suffix, 
+      final byte[] size, final byte[] mtime, final int parrent, final int pre) {
+
+    data.insert(pre, parrent, "file".getBytes(), Data.ELEM);
+    data.insert(pre + 1, pre, "name".getBytes(), name);
+    data.insert(pre + 2, pre, "suffix".getBytes(), suffix);
+    data.insert(pre + 3, pre, "size".getBytes(), size);
+    data.insert(pre + 4, pre, "mtime".getBytes(), mtime);  
+    data.flush();
   }
 
   /**
