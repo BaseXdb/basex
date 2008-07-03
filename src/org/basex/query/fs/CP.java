@@ -193,6 +193,7 @@ public final class CP {
    * @param file the filename
    * @return the suffix of the file
    */
+  
   private byte[] getSuffix(final String file) {
     int point = file.lastIndexOf('.');
     if(point > 0)

@@ -147,7 +147,7 @@ public final class FSUtils {
    */
   public static int[] getSpecificFilesOrDirs(final Data data, final int pre,
       final String path) {   
-    
+
     String file = path;  
     int curDirPre = pre;
     int lastSlash = path.lastIndexOf('/');
@@ -311,6 +311,31 @@ public final class FSUtils {
     }
     return result;
   }
+
+  /**
+   * Inserts a new entry into the table.
+   * 
+   * @param data - the data table
+   * @param name - filename
+   * @param suffix - suffix of the file
+   * @param size - size of the file
+   * @param mtime - make time
+   * @param parrent - pre value of the parrent
+   * @param pre - position to insert
+   * 
+   */
+  public static void insert(final Data data, final byte[] name, 
+      final byte[] suffix, final byte[] size, final byte[] mtime, 
+      final int parrent, final int pre) {
+
+    data.insert(pre, parrent, "file".getBytes(), Data.ELEM);
+    data.insert(pre + 1, pre, "name".getBytes(), name);
+    data.insert(pre + 2, pre, "suffix".getBytes(), suffix);
+    data.insert(pre + 3, pre, "size".getBytes(), size);
+    data.insert(pre + 4, pre, "mtime".getBytes(), mtime);  
+    data.flush();
+  }
+
   /**
    * Returns int value of the root dir.
    * 
@@ -320,43 +345,7 @@ public final class FSUtils {
     return ROOTDIR;
   }
 
-  /**
-   * Returns the pre value of a file.
-   *  
-   * @param data - the data table
-   * @param pre - pre value of the "parent" directory
-   * @param file - directory name
-   * @return -  all pre values of all files
-   */
-  public static int getSpecificFile(final Data data, final int pre,
-      final byte[] file) {
-
-    final DirIterator it = new DirIterator(data, pre);
-    while(it.more()) {
-      final int n = it.next();
-      if(isFile(data, n) && Token.eq(getName(data, n), file)) return n;
-    }
-    return -1;
-  }
-
-  /**
-   * Returns the pre value of a dir.
-   *  
-   * @param data - the data table
-   * @param pre - pre value of the "parent" directory
-   * @param dir - directory name
-   * @return -  all pre values of all files
-   */
-  public static int getSpecificDir(final Data data, final int pre,
-      final byte[] dir) {
-
-    final DirIterator it = new DirIterator(data, pre);
-    while(it.more()) {
-      final int n = it.next();
-      if(isDir(data, n) && Token.eq(getName(data, n), dir)) return n;
-    }
-    return -1;
-  }
+  
   /**
    * Returns the pre value of a dir.
    *  
@@ -413,8 +402,27 @@ public final class FSUtils {
         break;
       default:
         out.print(programm + ": " + arg + ": " + EUND);
-        break;
+      break;
     }
     out.print(NL);
+  }
+ 
+  /**
+   * Returns the pre value of a dir.
+   *  
+   * @param data - the data table
+   * @param pre - pre value of the "parent" directory
+   * @param dir - directory name
+   * @return -  all pre values of all files
+   */
+  public static int getSpecificDir(final Data data, final int pre,
+      final byte[] dir) {
+
+    final DirIterator it = new DirIterator(data, pre);
+    while(it.more()) {
+      final int n = it.next();
+      if(isDir(data, n) && Token.eq(getName(data, n), dir)) return n;
+    }
+    return -1;
   }
 }
