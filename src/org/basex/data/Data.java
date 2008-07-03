@@ -1,9 +1,9 @@
 package org.basex.data;
 
 import java.io.IOException;
+
 import org.basex.index.Index;
 import org.basex.index.Names;
-import org.basex.index.Namespaces;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -41,8 +41,10 @@ public abstract class Data  {
   public Names tags;
   /** Attribute name index. */
   public Names atts;
-  /** Attribute name index. */
+  /** Namespace index. */
   public Namespaces ns;
+  /** Tree structure. */
+  public Skeleton skel;
 
   /** Text index. */
   protected Index txtindex;
@@ -392,24 +394,6 @@ public abstract class Data  {
   }
 
   /**
-   * Returns if the specified tag is no leaf element.
-   * @param id id of the tag name
-   * @return result of check
-   */
-  public final boolean noLeaf(final int id) {
-    return tags.noLeaf(id);
-  }
-
-  /**
-   * Returns the number of occurrences of the specified tag. 
-   * @param id id of the tag name
-   * @return number of occurrences
-   */
-  public final int nrTags(final int id) {
-    return tags.counter(id);
-  }
-
-  /**
    * Returns an atomized content for any node kind.
    * The atomized value can be an attribute value or XML content.
    * @param pre pre value
@@ -506,5 +490,6 @@ public abstract class Data  {
     meta.noIndex();
     tags.noStats();
     atts.noStats();
+    skel.noStats();
   }
 }

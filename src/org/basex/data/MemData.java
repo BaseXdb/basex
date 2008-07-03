@@ -4,7 +4,6 @@ import org.basex.BaseX;
 import org.basex.index.Index;
 import org.basex.index.MemValues;
 import org.basex.index.Names;
-import org.basex.index.Namespaces;
 import org.basex.util.Array;
 import org.basex.util.Token;
 

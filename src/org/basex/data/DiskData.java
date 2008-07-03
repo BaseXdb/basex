@@ -7,7 +7,6 @@ import org.basex.core.Prop;
 import org.basex.index.Fuzzy;
 import org.basex.index.Index;
 import org.basex.index.Names;
-import org.basex.index.Namespaces;
 import org.basex.index.Values;
 import org.basex.index.WordsCTANew;
 import org.basex.io.DataAccess;
@@ -83,6 +82,7 @@ public final class DiskData extends Data {
     tags = new Names(db, true);
     atts = new Names(db, false);
     ns = new Namespaces(db);
+    skel = new Skeleton(db);
 
     // main memory mode.. keep table in memory
     table = Prop.mainmem ? new TableMemAccess(db, DATATBL, size) :

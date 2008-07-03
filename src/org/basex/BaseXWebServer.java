@@ -445,7 +445,7 @@ public final class BaseXWebServer {
         try {
           // send the stop command
           final Socket s = new Socket("localhost", Prop.webport);
-          s.getOutputStream().write("STOP\n\n".getBytes());
+          s.getOutputStream().write(Token.token("STOP\n\n"));
           s.close();
         } catch(final Exception ex) {
           if(ex instanceof IOException) BaseX.errln(SERVERERR);

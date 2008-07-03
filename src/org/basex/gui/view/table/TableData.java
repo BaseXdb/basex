@@ -143,9 +143,9 @@ public final class TableData {
 
       final int tag = data.tagID(p);
       // get number of tag occurrences
-      final int occ = data.nrTags(rootTag);
+      final int occ = data.tags.counter(rootTag);
       // select tag as root node if it occurs often, but not too often..
-      if(occ > data.nrTags(tag) / 2 && occ > data.size / 100) {
+      if(occ > data.tags.counter(tag) / 2 && occ > data.size / 100) {
         createCols(pre);
         return;
       }

@@ -1,4 +1,4 @@
-package org.basex.index;
+package org.basex.data;
 
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
@@ -131,7 +131,7 @@ public final class Namespaces extends Set {
   }
 
   /**
-   * Finishes the index structure and optimizes its memory usage.
+   * Finishes the structure.
    * @param db name of the database
    * @throws IOException I/O exception
    */

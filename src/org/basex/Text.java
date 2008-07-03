@@ -41,7 +41,7 @@ public interface Text {
   /** URL. */
   String URL = "http://www.basex.org";
   /** Code version. */
-  String VERSION = "4.07";
+  String VERSION = "4.10";
   /** Company Info. */
   String COMPANY = "DBIS, University of Konstanz";
 
@@ -1289,9 +1289,7 @@ public interface Text {
   /** Help String. */
   byte[] HELPINFO = token(lang("h_info"));
   /** Help String. */
-  byte[][] HELPSEARCH = { token(lang("h_search1")),
-      token(lang("h_search2"))
-  };
+  byte[][] HELPSEARCH = { token(lang("h_search1")), token(lang("h_search2")) };
   /** Help String. */
   byte[] HELPQUERYMODE = token(lang("h_querymode"));
   /** Help String. */

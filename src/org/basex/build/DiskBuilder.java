@@ -69,7 +69,7 @@ public final class DiskBuilder extends Builder {
   }
 
   @Override
-  protected Data finish() throws IOException {
+  protected synchronized DiskData finish() throws IOException {
     // check if data ranges exceed database limits
     if(tags.size() > 0xFFFF) throw new IOException(LIMITTAGS);
     if(atts.size() > 0xFFFF) throw new IOException(LIMITATTS);
@@ -79,6 +79,7 @@ public final class DiskBuilder extends Builder {
     tags.finish(db);
     atts.finish(db);
     ns.finish(db);
+    skel.finish(db);
     meta.finish(size);
     close();
     

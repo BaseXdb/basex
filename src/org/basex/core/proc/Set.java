@@ -90,10 +90,10 @@ public final class Set extends Proc {
         if(o instanceof Boolean) {
           f.setBoolean(null, toggle(((Boolean) o).booleanValue(), option, ext));
         } else if(o instanceof String) {
-          f.set(null, ((String) o).toString());
+          f.set(null, ext);
           info(option + ": " + ext);
         } else if(o instanceof Integer) {
-          f.setInt(null, ((Integer) o).intValue());
+          f.setInt(null, Integer.parseInt(ext));
           info(option + ": " + ext);
         } else {
           throw new Exception();

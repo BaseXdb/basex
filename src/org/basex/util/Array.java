@@ -304,7 +304,7 @@ public final class Array {
   }
 
   /**
-   * Doubles the array size.
+   * Convenience method for resizing a generic array.
    * @param ar array to be resized
    * @param os old size
    * @param ns new size

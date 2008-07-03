@@ -6,8 +6,9 @@ import java.io.IOException;
 import org.basex.core.Progress;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
+import org.basex.data.Namespaces;
+import org.basex.data.Skeleton;
 import org.basex.index.Names;
-import org.basex.index.Namespaces;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -29,6 +30,8 @@ public abstract class Builder extends Progress {
   protected Names atts;
   /** Namespace index. */
   protected Namespaces ns = new Namespaces();
+  /** Tree structure. */
+  protected Skeleton skel = new Skeleton();
 
   /** Parser instance. */
   protected Parser parser;
@@ -198,22 +201,24 @@ public abstract class Builder extends Progress {
       tags.noleaf(tagStack[level - 1], true);
     }
 
+    // get tag and namespaces references
+    final int tid = tags.index(tag, null);
+    final int tns = ns.get(tag);
+    skel.add(tid, level, Data.ELEM);
+
     // create numeric attribute references and check if they appear only once
     final int al = att != null ? att.length : 0;
     final int[] at = al != 0 ? new int[al] : null;
     for(int a = 0; a < al; a += 2) {
       at[a] = atts.index(att[a], att[a + 1]);
       at[a + 1] = ns.get(att[a]);
+      skel.add(at[a], level + 1, Data.ATTR);
     }
     for(int a = 0; a < al - 1; a += 2) {
       for(int b = a + 2; b < al; b += 2) {
         if(at[a] == at[b]) error(DUPLATT, parser.det(), att[a]);
       }
     }
-
-    // get tag and namespaces references
-    final int tid = tags.index(tag, null);
-    final int tns = ns.get(tag);
 
     // remember tag id and parent reference
     tagStack[level] = tid;
@@ -286,12 +291,12 @@ public abstract class Builder extends Progress {
   private void addText(final TokenBuilder txt, final byte type)
       throws IOException {
 
-    //parStack[level] = size; // ...necessary?
     final byte[] t = utf8(txt.finish(), meta.encoding);
     
     // text node processing for statistics 
     if(type == Data.TEXT) tags.index(tagStack[level - 1], t);
-    
+
+    skel.add(0, level, type);
     addText(t, level == 0 ? 1 : size - parStack[level - 1], type);
   }
 

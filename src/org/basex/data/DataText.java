@@ -170,6 +170,8 @@ public interface DataText {
   String DATASTAT = "sta";
   /** Database - Namespaces. */
   String DATANS = "nsp";
+  /** Database - Structure. */
+  String DATASTR = "str";
 
   // Document Statistics ======================================================
 

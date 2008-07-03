@@ -278,7 +278,7 @@ help_long=Detaillierte Infos: 'help [command]'.
 # Create Command
 pc_create=Datenbank wird erzeugt
 pc_index=Indizes werden erzeugt
-pc_update=Das Datenbankformat has sich geändert; bitte erstellen Sie eine neue Datenbank.
+pc_update=Das Datenbankformat hat sich geändert; bitte erstellen Sie eine neue Datenbank.
 pc_indupdate=Das Indexformat hat sich geändert; bitte erstellen Sie neue Indizes.
 pc_cancel=Der Prozess wurde abgebrochen.
 pc_range=Das Dokument/Fragment ist zu groß, um verarbeitet zu werden.
@@ -461,7 +461,7 @@ ch_export1=Exportieren der Datenbank als XML.
 ch_export2=Exportiert die aktuelle Kontext-Knoten als XML [Datei].
 ch_dummyquery0=Query-Befehle:
 ch_xpath0= [Anfrage]
-ch_xpath1= Ausführung einer XPath Anfrage.
+ch_xpath1=Ausführung einer XPath Anfrage.
 ch_xpath2= Führt die angegebene XPath-[Anfrage] aus und zeigt das Ergebnis an.
 ch_xpathmv0= [hits] [subhits] ["query"]
 ch_xpathmv1= Ausführung einer MedioVis-Anfrage.

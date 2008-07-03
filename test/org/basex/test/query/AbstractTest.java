@@ -2,9 +2,9 @@ package org.basex.test.query;
 
 import org.basex.data.Data;
 import org.basex.data.MemData;
+import org.basex.data.Namespaces;
 import org.basex.data.Nodes;
 import org.basex.index.Names;
-import org.basex.index.Namespaces;
 import org.basex.query.xpath.values.Bool;
 import org.basex.query.xpath.values.Literal;
 import org.basex.query.xpath.values.Num;
