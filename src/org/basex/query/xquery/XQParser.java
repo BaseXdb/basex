@@ -1948,8 +1948,8 @@ public final class XQParser extends QueryParser {
         if(!same && !diff) break;
         sel.same = same;
         sel.different = diff;
-        if(consumeWS(SENTENCE)) sel.sdunit = FTSelect.Unit.SENTENCES;
-        else if(consumeWS(PARAGRAPH)) sel.sdunit = FTSelect.Unit.PARAGRAPHS;
+        if(consumeWS(SENTENCE)) sel.sdunit = FTSelect.Unit.SNT;
+        else if(consumeWS(PARAGRAPH)) sel.sdunit = FTSelect.Unit.PAR;
         else Err.or(INCOMPLETE);
       }
     }
@@ -2102,9 +2102,9 @@ public final class XQParser extends QueryParser {
    * @throws XQException xquery exception
    */
   private FTSelect.Unit ftUnit() throws XQException {
-    if(consumeWS(WORDS)) return FTSelect.Unit.WORDS;
-    if(consumeWS(SENTENCES)) return FTSelect.Unit.SENTENCES;
-    if(consumeWS(PARAGRAPHS)) return FTSelect.Unit.PARAGRAPHS;
+    if(consumeWS(WORDS)) return FTSelect.Unit.WRD;
+    if(consumeWS(SENTENCES)) return FTSelect.Unit.SNT;
+    if(consumeWS(PARAGRAPHS)) return FTSelect.Unit.PAR;
     Err.or(INCOMPLETE);
     return null;
   }

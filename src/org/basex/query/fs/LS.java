@@ -1,6 +1,6 @@
 package org.basex.query.fs;
 
-import static org.basex.Text.FSLS;
+import static org.basex.query.fs.FSText.*;
 import static org.basex.Text.NL;
 import java.io.IOException;
 import org.basex.core.Context;
@@ -13,7 +13,7 @@ import org.basex.util.Token;
 
 /**
  * Performs a ls command.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Hannes Schwarz - Hannes.Schwarz@gmail.com
  */
@@ -50,12 +50,12 @@ public final class LS {
 
   /**
    * Performs an ls command.
-   * 
+   *
    * @param cmd - command line
-   * @throws IOException - in case of problems with the PrintOutput 
+   * @throws IOException - in case of problems with the PrintOutput
    */
-  public void lsMain(final String cmd) 
-  throws IOException {    
+  public void lsMain(final String cmd)
+  throws IOException {
     GetOpts g = new GetOpts(cmd, "ahlR", 1);
 
     // get all Options
@@ -69,15 +69,15 @@ public final class LS {
           printHelp();
           return;
         case 'l':
-          fPrintLong = true; 
+          fPrintLong = true;
           break;
         case 'R':
           fRecursive = true;
           break;
-        case ':':         
+        case ':':
           out.print("ls: missing argument");
-          return;  
-        case '?':         
+          return;
+        case '?':
           out.print("ls: illegal option");
           return;
       }
@@ -95,44 +95,44 @@ public final class LS {
       lsRecursive(curDirPre);
     } else {
       print(FSUtils.getAllOfDir(data, curDirPre));
-    }    
+    }
   }
 
   /**
    * Recursively list subdirectories encountered.
-   *  
-   * @param pre Value of dir 
-   * @throws IOException in case of problems with the PrintOutput 
+   *
+   * @param pre Value of dir
+   * @throws IOException in case of problems with the PrintOutput
    */
-  private void lsRecursive(final int pre) throws IOException {         
+  private void lsRecursive(final int pre) throws IOException {
 
-    int[] contentDir = FSUtils.getAllOfDir(data, pre);  
-    int[] allDir = print(contentDir);   
+    int[] contentDir = FSUtils.getAllOfDir(data, pre);
+    int[] allDir = print(contentDir);
 
-    for(int i = 0; i < allDir.length; i++) { 
-      if(!fListDot) {    
+    for(int i = 0; i < allDir.length; i++) {
+      if(!fListDot) {
         // don´t crawl dirs starting with ´.´
         byte[] name = FSUtils.getName(data, allDir[i]);
         if(Token.startsWith(name, '.'))
           continue;
       }
       out.print(NL);
-      out.print(FSUtils.getPath(data, allDir[i]));      
+      out.print(FSUtils.getPath(data, allDir[i]));
       out.print(NL);
       out.flush();
-      lsRecursive(allDir[i]); 
+      lsRecursive(allDir[i]);
     }
   }
 
   /**
    * Print the result.
    * @param result - array to print
-   * @return list of directories found 
+   * @return list of directories found
    */
   private int[] printLong(final int[] result) {
     IntList allDir = new IntList();
     for(int j : result) {
-      if(FSUtils.isDir(data, j)) allDir.add(j);      
+      if(FSUtils.isDir(data, j)) allDir.add(j);
       byte[] name = FSUtils.getName(data, j);
       long size = FSUtils.getSize(data, j);
       byte[] time = FSUtils.getMtime(data, j);
@@ -143,8 +143,8 @@ public final class LS {
         // do not print files starting with .
         if(Token.startsWith(name, '.'))
           continue;
-      }      
-      System.out.printf("%-3s %-30s %10s %20s\n", file, 
+      }
+      System.out.printf("%-3s %-30s %10s %20s\n", file,
           Token.string(name), size, Token.string(time));
     }
     return allDir.finish();
@@ -158,11 +158,11 @@ public final class LS {
    * @return list of directories found
    */
   private int[] print(final int[] result) throws IOException {
-        
+
     if(fPrintLong) {
       return printLong(result);
     } else {
-      IntList allDir = new IntList();      
+      IntList allDir = new IntList();
       for(int j : result) {
         if(FSUtils.isDir(data, j)) allDir.add(j);
         byte[] name = FSUtils.getName(data, j);
@@ -172,15 +172,16 @@ public final class LS {
             continue;
         }
         out.print(name);
-        out.print("\t");        
-      }      
+        out.print("\t");
+      }
       out.print(NL);
       return allDir.finish();
     }
   }
+  
   /**
    * Print the help.
-   * 
+   *
    * @throws IOException in case of problems with the PrintOutput
    */
   private void printHelp() throws IOException {

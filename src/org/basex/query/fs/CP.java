@@ -1,9 +1,8 @@
 package org.basex.query.fs;
 
-import static org.basex.Text.*;
+import static org.basex.query.fs.FSText.*;
 import java.io.IOException;
 import java.util.ArrayList;
-
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.io.PrintOutput;

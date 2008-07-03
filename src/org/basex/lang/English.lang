@@ -489,16 +489,6 @@ ch_fs27=: [-h] : make directories
 ch_fs28=: [-Rh] file : remove directory entries
 ch_fs29=: [-h] : change file access and modification times
 ch_fs30=: [-h] source_file target_file : copy files
-ch_fscat=CAT(1)      deepFS General Commands Manual      CAT(1) \n\n  NAME\n     cat -- concatenate and print files  \n\n  SYNOPSIS\n     cat [-bhn] [file ...]  \n\n  DESCRIPTION\n     The cat utility reads files, writing them to the standard output.    \n\n     The options are as follows:\n     -b    Number the non-blank output lines, starting at 1.\n     -h    Print this page.\n     -n    Number the output lines, starting at 1.\n\n\n
-ch_fscd=CD(1)      deepFS General Commands Manual      CD(1) \n\n  NAME\n     cd -- changes the working directory\n\n  SYNOPSIS\n     cd [-h] dir  \n\n  DESCRIPTION\n     Changes the working directory.    \n\n     The options are as follows:\n     -h    Print this page.\n\n\n
-ch_fscp=CP(1)      deepFS General Commands Manual      CP(1)\n\n  NAME\n     cp -- copy files\n\n  SYNOPSIS\n     cp source_file target_file\n     cp  source_file ... target_directory\n\nDESCRIPTION\n     In the first synopsis form, the cp utility copies the contents of the\n     source_file to the target_file.  In the second synopsis form, the con-\n     tents of each named source_file is copied to the destination\n     target_directory. The names of the files themselves are not changed. If \n cp detects an attempt to copy a file to itself, the copy will fail.\n\n\n
-ch_fsdu=DU(1)      deepFS General Commands Manual      DU(1)\n\n  NAME\n     du -- display disk usage statistics\n\n  SYNOPSIS\n     du [-a] [dir]\n\n  DESCRIPTION\n     The du utility displays the file system block usage for each file argu-\n     ment and for each directory in the file hierarchy rooted in each direc-\n     tory argument.  If no file is specified, the block usage of the hierarchy\n     rooted in the current directory is displayed.\n\n     The options are as follows:\n\n     -a    Display an entry for each file in a file hierarchy.\n     -h    Print this page.\n\n\n
-ch_fslocate=LOCATE(1)      deepFS General Commands Manual      LOCATE(1)\n\n  NAME\n     locate -- find filenames quickly\n\n  SYNOPSIS\n     locate[-l limit] [-c] -V [1|2] pattern ...\n\n  DESCRIPTION (Not Yet Tested !!!)\n     The locate program searches a database for all pathnames which match the\n     specified pattern.  The database is recomputed periodically (usually\n     weekly or daily), and contains the pathnames of all files which are pub-\n     licly accessible.\n\n     Shell globbing and quoting characters (``*'', ``?'', ``\'', ``['' and\n     ``]'') may be used in pattern, although they will have to be escaped from\n     the shell.  Preceding any character with a backslash (``\'') eliminates\n     any special meaning which it may have.  The matching differs in that no\n     characters must be matched explicitly, including slashes (``/'').\n\n     As a special case, a pattern containing no globbing characters (``foo'')\n     is matched as though it were ``*foo*''.\n\n     The following options are available:\n\n     -c         Suppress normal output; instead print a count of matching file names.\n     -h         Print this page.\n     -l number  Limit output to number of file names and exit.\n     -V number  1 = use locate with direct access to the data table\n                2 = use XPath (no wildcards atm)\n\n\n
-ch_fsls=LS(1)      deepFS General Commands Manual       LS(1)\n\n  NAME\n     ls -- list directory contents\n\n  SYNOPSIS\n     ls [-ahlR] [file ...]\n\n  DESCRIPTION\n     For each operand ls displays its name as well as any requested,\n     associated information.\n\n     The following options are available:\n     -a     Include directory entries whose names begin with a dot (`.').\n     -h     Print this page\n     -l     List files in the long format.\n     -R     Recursively list subdirectories encountered.\n\n\n
-ch_fsmkdir=MKDIR(1)      deepFS General Commands Manual      MKDIR(1))\n\n    NAME\n      mkdir -- make directories)\n\n    SYNOPSIS\n      mkdir directory_name)\n\n    DESCRIPTION\n      The mkdir utility creates the directories.\n\n\n
-ch_fspwd=PWD(1)      deepFS General Commands Manual      PWD(1)\n\n  NAME\n     pwd -- return working directory name\n\n  SYNOPSIS\n     pwd\n\n  DESCRIPTION\n     The pwd utility writes the absolute pathname of the current working\n     directory to the standard output.\n\n     The options are as follows:\n\n     -h    Print this page.\n\n\n
-ch_fsrm=RM(1)      deepFS General Commands Manual      RM(1)\n\n  NAME\n     rm, unlink -- remove directory entries\n\n  SYNOPSIS\n     rm [-R] file ...\n\n  DESCRIPTION\n     The rm utility attempts to remove the non-directory type files specified\n     on the command line.  If the permissions of the file do not permit writ-\n     ing, and the standard input device is a terminal, the user is prompted\n     (on the standard error output) for confirmation.\n\n     The options are as follows:\n\n     -h    Print this page.\n     -R     Attempt to remove the file hierarchy rooted in each file argument.\n\n\n
-ch_fstouch=TOUCH(1)      deepFS General Commands Manual      TOUCH(1)\n\n  NAME\n     touch -- change file access and modification times\n\n  SYNOPSIS\n     touch file ...\n\n  DESCRIPTION\n     The touch utility sets the modification and access times of files.  If\n     any file does not exist, it is created with default permissions.\n\n     The options are as follows:\n\n     -h    Print this page.\n\n\n
 ch_dummyupdate0=Update Commands:
 ch_copy0=[pos] ["source"] ["target"]
 ch_copy1=Copy XML nodes.
@@ -603,20 +593,3 @@ h_catinput=Here you can further limit your query by entering substrings. To find
 h_mover=You can change the position of a view by dragging the bar on top of all view panels to any other place inside the main window.\n If you move a view outside the main window, it will be closed.
 h_tablehead=You can sort the table by clicking on the corresponding column in the table header. Moreover, you can directly query inside the table by entering something into the text fields.
 h_mem=This box displays the reserved memory of BaseX. By clicking on the box, you can enforce garbage collection.\n\n The display turns red if free memory is low. If this happens regularly, just launch BaseX with the Java flag -Xmx<size> ('java -X' gives you more information).
-
-# Filesystem Error Messages
-fs_error0=Undefined error: 0.
-fs_error1=Operation not permitted.
-fs_error2=No such file or directory.
-fs_error5=Input/output error.
-fs_error13=Permission denied.
-fs_error17=File exists.
-fs_error20=Not a directory.
-fs_error21=Is a directory.
-fs_error22=Invalid argument.
-fs_error30=Read-only file system.
-fs_error34=Result too large.
-fs_error63=File name too long.
-fs_error66=Directory not empty.
-fs_error79=Inappropriate file type or format.
-fs_error99=Missing argument.

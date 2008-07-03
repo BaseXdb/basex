@@ -7,7 +7,7 @@ import org.basex.io.PrintOutput;
 import org.basex.query.fs.FSQuery;
 /**
  * Filesystem commands.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
@@ -25,53 +25,52 @@ public final class Fs extends Proc {
   /** Create option. */
   public static final String LS = "ls";
   /** Create option. */
-  public static final String MKDIR = "mkdir";  
+  public static final String MKDIR = "mkdir";
   /** Create option. */
   public static final String PWD = "pwd";
   /** Create option. */
   public static final String RM = "rm";
   /** Create option. */
   public static final String TOUCH = "touch";
-  
 
-  /** Filesystem query reference. */
-  FSQuery query;
   /** Filesystem command. */
   String comm;
 
   @Override
   protected boolean exec() {
-    query = new FSQuery(context);
     comm = cmd.arg(0).toLowerCase();
-    return comm.equals(CAT) || comm.equals(CD) || comm.equals(CP) 
-    || comm.equals(DU) || comm.equals(LOCATE) 
-    || comm.equals(LS) || comm.equals(MKDIR) || comm.equals(PWD) 
+    return comm.equals(CAT) || comm.equals(CD) || comm.equals(CP)
+    || comm.equals(DU) || comm.equals(LOCATE)
+    || comm.equals(LS) || comm.equals(MKDIR) || comm.equals(PWD)
     || comm.equals(RM) || comm.equals(TOUCH);
   }
 
 
   @Override
   protected void out(final PrintOutput out) throws IOException {
+    final FSQuery query = new FSQuery(context);
+    final String args = cmd.args();
+
     if(comm.equals(CAT)) {
-      query.cat(cmd.args(), out);
-    } else if(comm.equals(CD)) {      
-      query.cd(cmd.args(), out);  
-    } else if(comm.equals(CP)) {      
-      query.cp(cmd.args(), out);     
-    } else if(comm.equals(DU)) {      
-      query.du(cmd.args(), out);     
-    } else if(comm.equals(LOCATE)) {      
-      query.locate(cmd.args(), out);
+      query.cat(args, out);
+    } else if(comm.equals(CD)) {
+      query.cd(args, out);
+    } else if(comm.equals(CP)) {
+      query.cp(args, out);
+    } else if(comm.equals(DU)) {
+      query.du(args, out);
+    } else if(comm.equals(LOCATE)) {
+      query.locate(args, out);
     } else if(comm.equals(LS)) {
-      query.ls(cmd.args(), out);
+      query.ls(args, out);
     } else if(comm.equals(MKDIR)) {
-      query.mkdir(cmd.args(), out);
+      query.mkdir(args, out);
     } else if(comm.equals(PWD)) {
-      query.pwd(cmd.args(), out); 
-    } else if(comm.equals(RM)) { 
-      query.rm(cmd.args(), out); 
-    }  else if(comm.equals(TOUCH)) { 
-      query.touch(cmd.args(), out); 
+      query.pwd(args, out);
+    } else if(comm.equals(RM)) {
+      query.rm(args, out);
+    } else if(comm.equals(TOUCH)) {
+      query.touch(args, out);
     }
     if(Prop.info) timer(PROCTIME);
   }

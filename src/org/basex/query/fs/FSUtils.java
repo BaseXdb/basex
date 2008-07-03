@@ -1,9 +1,10 @@
 package org.basex.query.fs;
 
+import static org.basex.query.fs.FSText.*;
+import static org.basex.Text.NL;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.regex.Pattern;
-
 import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.Data;
@@ -11,7 +12,6 @@ import org.basex.util.IntList;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.io.PrintOutput;
-import static org.basex.Text.*;
 
 /**
  * Preliminary collection of file system methods.

@@ -262,36 +262,16 @@ public interface Text {
   String FS1 = lang("ch_fs1");
   /** Command Help. */
   String FS2 = lang("ch_fs2") + NL +
-  "- " + Fs.CAT      + lang("ch_fs25") + NL +
-  "- " + Fs.CD       + lang("ch_fs23") + NL +  
-  "- " + Fs.CP       + lang("ch_fs30") + NL +    
-  "- " + Fs.DU       + lang("ch_fs21") + NL +
-  "- " + Fs.LOCATE   + lang("ch_fs26") + NL +
-  "- " + Fs.LS       + lang("ch_fs22") + NL +
-  "- " + Fs.MKDIR    + lang("ch_fs27") + NL +
-  "- " + Fs.PWD      + lang("ch_fs24") + NL +
-  "- " + Fs.RM       + lang("ch_fs28") + NL +  
-  "- " + Fs.TOUCH    + lang("ch_fs29");
-  /** Command Help. */
-  String FSCAT = lang("ch_fscat");
-  /** Command Help. */
-  String FSCD = lang("ch_fscd");
-  /** Command Help. */
-  String FSCP = lang("ch_fscp");
-  /** Command Help. */
-  String FSDU = lang("ch_fsdu");
-  /** Command Help. */
-  String FSLOCATE = lang("ch_fslocate");
-  /** Command Help. */
-  String FSLS = lang("ch_fsls");
-  /** Command Help. */
-  String FSMKDIR = lang("ch_fsmkdir");
-  /** Command Help. */
-  String FSPWD = lang("ch_fspwd");
-  /** Command Help. */
-  String FSRM = lang("ch_fsrm");
-  /** Command Help. */
-  String FSTOUCH = lang("ch_fstouch");
+    "- " + Fs.CAT      + lang("ch_fs25") + NL +
+    "- " + Fs.CD       + lang("ch_fs23") + NL +  
+    "- " + Fs.CP       + lang("ch_fs30") + NL +    
+    "- " + Fs.DU       + lang("ch_fs21") + NL +
+    "- " + Fs.LOCATE   + lang("ch_fs26") + NL +
+    "- " + Fs.LS       + lang("ch_fs22") + NL +
+    "- " + Fs.MKDIR    + lang("ch_fs27") + NL +
+    "- " + Fs.PWD      + lang("ch_fs24") + NL +
+    "- " + Fs.RM       + lang("ch_fs28") + NL +  
+    "- " + Fs.TOUCH    + lang("ch_fs29");
   /** Command Help. */
   String DUMMYUPDATE0 = lang("ch_dummyupdate0");
 
@@ -489,10 +469,6 @@ public interface Text {
   String GUIINFO = lang("c_info");
   /** Command Info. */
   String GUIINFOTT = lang("c_infott");
-  /** Command Info. */
-  //String GUIINPUTMODE = lang("c_inputmode");
-  /** Command Info. */
-  //String GUIINPUTMODETT = lang("c_inputmodett");
   /** Command Info. */
   String GUIINSERT = lang("c_insert") + DOTS;
   /** Command Info. */
@@ -1335,37 +1311,6 @@ public interface Text {
 
   //FILESYSTEM ERROR MESSAGES===================================================
   
-  /** FS Error Message. */
-  String EUND = lang("fs_error0"); 
-  /** FS Error Message. */
-  String EPERM = lang("fs_error1");
-  /** FS Error Message. */
-  String ENOENT = lang("fs_error2");
-  /** FS Error Message. */
-  String EIO = lang("fs_error5");
-  /** FS Error Message. */
-  String EACCES = lang("fs_error13");
-  /** FS Error Message. */
-  String EEXIST = lang("fs_error17");
-  /** FS Error Message. */
-  String ENOTDIR = lang("fs_error20");
-  /** FS Error Message. */
-  String EISDIR = lang("fs_error21");
-  /** FS Error Message. */
-  String EINVAL = lang("fs_error22");
-  /** FS Error Message. */
-  String EROFS = lang("fs_error30");
-  /** FS Error Message. */
-  String ERANGE = lang("fs_error34");
-  /** FS Error Message. */
-  String ENAMETOOLONG = lang("fs_error63");
-  /** FS Error Message. */
-  String ENOTEMPTY = lang("fs_error66");
-  /** FS Error Message. */
-  String EFTYPE = lang("fs_error79");
-  /** FS Error Message. */
-  String EMISSARG = lang("fs_error99");
-
   /** Dummy string to check if all language strings have been assigned. */
   String CHECK = lang(null);
 }

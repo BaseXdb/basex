@@ -1,7 +1,7 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQText.*;
-import org.basex.query.QueryTokens;
+import static org.basex.query.QueryTokens.*;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
@@ -24,9 +24,9 @@ import org.basex.util.TokenList;
 public final class FTSelect extends Single implements Cloneable {
   /** Units. */
   public enum Unit {
-    /** Word unit. */      WORDS,
-    /** Sentence unit. */  SENTENCES,
-    /** Paragraph unit. */ PARAGRAPHS
+    /** Word unit. */      WRD,
+    /** Sentence unit. */  SNT,
+    /** Paragraph unit. */ PAR
   };
 
   /** Ordered flag. */
@@ -237,12 +237,12 @@ public final class FTSelect extends Single implements Cloneable {
    * @return new position
    */
   private int calc(final XQContext ctx, final int p, final Unit u) {
-    if(u == Unit.WORDS) return p;
+    if(u == Unit.WRD) return p;
 
     final FTTokenizer iter = ctx.ftitem;
     iter.init();
     while(iter.more() && iter.pos != p);
-    return u == Unit.SENTENCES ? iter.sent : iter.para;
+    return u == Unit.SNT ? iter.sent : iter.para;
   }
 
   /**
@@ -268,7 +268,10 @@ public final class FTSelect extends Single implements Cloneable {
   @Override
   public void plan(final Serializer ser) throws Exception {
     ser.startElement(this);
-    if(ordered) ser.attribute(Token.token(QueryTokens.ORDERED), Token.TRUE);
+    if(ordered) ser.attribute(Token.token(ORDERED), Token.TRUE);
+    if(start) ser.attribute(Token.token(START), Token.TRUE);
+    if(end) ser.attribute(Token.token(END), Token.TRUE);
+    if(content) ser.attribute(Token.token(CONTENT), Token.TRUE);
     ser.finishElement();
     expr.plan(ser);
     ser.closeElement(this);
@@ -278,10 +281,10 @@ public final class FTSelect extends Single implements Cloneable {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append(expr);
-    if(ordered) sb.append(" ordered");
-    if(start) sb.append(" at start");
-    if(end) sb.append(" at end");
-    if(content) sb.append(" entire content");
+    if(ordered) sb.append(" " + ORDERED);
+    if(start) sb.append(" " + AT + " " + START);
+    if(end) sb.append(" " + AT + " " + END);
+    if(content) sb.append(" " + ENTIRE + " " + CONTENT);
     if(dunit != null) {
       sb.append(" distance(");
       sb.append(dist[0]);

@@ -33,12 +33,19 @@ public final class Lang {
   private Lang() { }
 
   /** Reads the language file. */
-  static {
+  static { read(Prop.language, CHECK); }
+
+  /**
+   * Reads the specified language file.
+   * @param lang language
+   * @param chk check flag
+   */
+  public static void read(final String lang, final boolean chk) {
     try {
       if(DISALLOW) throw new Error("Language file was accessed.");
-      if(CHECK) check = new HashMap<String, Boolean>();
+      if(chk) check = new HashMap<String, Boolean>();
       
-      final String path = "lang/" + Prop.language + ".lang";
+      final String path = "lang/" + lang + ".lang";
       final URL url = BaseX.class.getResource(path);
       if(url != null) {
         final InputStream is = (InputStream) url.getContent();
@@ -51,15 +58,16 @@ public final class Lang {
           final String key = line.substring(0, i);
           String val = line.substring(i + 1);
           if(val.contains("\\n")) val = val.replaceAll("\\\\n", "\n");
-          if(CHECK && texts.get(key) != null) {
-            BaseX.errln(Prop.language + ".lang: '%' assigned twice.", key);
+          if(texts.get(key) != null) {
+            if(chk) BaseX.errln("%.lang: '%' assigned twice", lang, key);
+          } else {
+            texts.put(key, val);
           }
-          texts.put(key, val);
-          if(CHECK) check.put(key, true);
+          if(chk) check.put(key, true);
         }
         br.close();
       } else {
-        BaseX.errln("%.lang not found.", Prop.language);
+        BaseX.errln("%.lang not found.", lang);
       }
     } catch(final IOException ex) {
       BaseX.errln(ex.toString());
@@ -74,17 +82,22 @@ public final class Lang {
   public static String lang(final String key) {
     if(key == null) {
       if(CHECK && check.size() != 0) {
-        BaseX.errln("%.lang: not assigned:", Prop.language);
         final Iterator<String> it = check.keySet().iterator();
-        while(it.hasNext()) BaseX.errln("- %", it.next());
+        while(it.hasNext()) {
+          BaseX.errln("%.lang: '%' not used", Prop.language, it.next());
+        }
       }
       return null;
     }
 
-    final String val = texts.get(key);
+    String val = texts.get(key);
     if(val == null) {
-      if(texts.size() != 0)
-        BaseX.errln(Prop.language + ".lang: '%' is missing", key);
+      if(texts.size() != 0) {
+        BaseX.errln("%.lang: '%' missing", Prop.language, key);
+        //if(Prop.language.equals("English")) return "?????";
+        //read("English", false);
+        //val = texts.get(key);
+      }
       return "?????";
     }
     if(CHECK) check.remove(key);

@@ -1,6 +1,6 @@
 package org.basex.query.fs;
 
-import static org.basex.Text.FSPWD;
+import static org.basex.query.fs.FSText.*;
 import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.data.Data;
@@ -86,7 +86,6 @@ public final class PWD {
     out.print(FSUtils.getPath(data, curDirPre));
   }
   
-  
   /**
    * Print the help.
    * 
@@ -94,8 +93,5 @@ public final class PWD {
    */
   private void printHelp() throws IOException {
     out.print(FSPWD);
-   
   }
-
 }
-

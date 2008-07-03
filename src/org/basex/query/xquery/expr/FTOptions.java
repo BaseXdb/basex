@@ -48,7 +48,7 @@ public final class FTOptions extends Single implements Cloneable {
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
     final FTOptions tmp = ctx.ftopt;
-    
+
     final boolean emp = tmp == null;
     if(cs == null) cs = emp ? Bln.FALSE : tmp.cs;
     if(lc == null) lc = emp ? Bln.FALSE : tmp.lc;
@@ -60,7 +60,7 @@ public final class FTOptions extends Single implements Cloneable {
     if(fz == null) fz = emp ? Bln.FALSE : tmp.fz;
     if(sw == null) sw = emp ? null : tmp.sw;
     if(ln == null) ln = emp ? null : tmp.ln;
-    
+
     if(expr != null) {
       ctx.ftopt = this;
       expr = expr.comp(ctx);
@@ -94,6 +94,8 @@ public final class FTOptions extends Single implements Cloneable {
     if(wc.bool()) ser.attribute(Token.token(WILDCARDS), Token.TRUE);
     if(fz.bool()) ser.attribute(Token.token(FUZZY), Token.TRUE);
     if(dc.bool()) ser.attribute(Token.token(DIACRITICS), Token.TRUE);
+    if(uc.bool()) ser.attribute(Token.token(UPPERCASE), Token.TRUE);
+    if(lc.bool()) ser.attribute(Token.token(LOWERCASE), Token.TRUE);
     ser.finishElement();
     expr.plan(ser);
     ser.closeElement(this);

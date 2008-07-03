@@ -1,9 +1,9 @@
 package org.basex.query.fs;
 
-import static org.basex.Text.*;
+import static org.basex.query.fs.FSText.*;
+import static org.basex.Text.NL;
 import java.io.IOException;
 import java.util.regex.Pattern;
-
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.io.PrintOutput;
