@@ -34,6 +34,8 @@ public final class XPContext extends QueryContext {
   private int cc;
   /** Current evaluation time. */
   private long evalTime;
+  /** Fulltext index counter (temporary!). */
+  public int ftcount;
 
   /**
    * Constructor.

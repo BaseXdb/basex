@@ -93,13 +93,12 @@ public final class FZBuilder extends Progress implements IndexBuilder {
    */
   private void index() {
     final byte[] tok = wp.next();
-    final int pos = wp.s;
+    final int pos = wp.pos;
     final int tl = tok.length;
     if(tree[tl] == null) {
       isize++;
       tree[tl] = new FZHash();
     }
-    //System.out.println(new String(tok) + "," + id + "," + pos);
     tree[tl].index(tok, id, pos);
   }
 

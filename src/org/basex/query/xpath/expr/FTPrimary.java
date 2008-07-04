@@ -28,15 +28,6 @@ public final class FTPrimary extends FTArrayExpr {
     ftpos = ftps;
   }
 
-  /**
-   * Constructor.
-   * @param e expressions
-   */
-  public FTPrimary(final Expr[] e) {
-    exprs = e;
-  }
-
-
   @Override
   public NodeSet eval(final XPContext context) {
     // not used
@@ -46,20 +37,15 @@ public final class FTPrimary extends FTArrayExpr {
   @Override
   public Expr compile(final XPContext context) {
     ctx = context;
-    final byte[] lit = ((Literal)  exprs[0]).str();
-    ctx.compInfo(OPTFTINDEX);
+    final byte[] lit = ((Literal) exprs[0]).str();
     
-    if (fto != null) {
-      if (Token.indexOf(lit, ' ') > 0) {
-        return  new FTIndex(lit, fto, false, false); 
-      } else {
-        return  new FTIndex(lit, fto, false, true);
-      }
+    if(fto != null && context.ftcount++ == 0) {
+      ctx.compInfo(OPTFTINDEX);
+      return new FTIndex(lit, fto, false, Token.indexOf(lit, ' ') < 0);
     }
-    return null;
-    
+    return exprs[0];
   }
-
+  
   @Override
   public Expr indexEquivalent(final XPContext context, final Step curr) {
     return this;

@@ -48,7 +48,7 @@ public final class QueryTest {
     Prop.textindex = true;
     Prop.attrindex = true;
     Prop.ftindex = true;
-    Prop.ftfuzzy = false;
+    Prop.ftfuzzy = true;
     Prop.chop = true;
 
     test(Commands.XPATH);

@@ -69,17 +69,16 @@ public final class FTContains extends Comparison {
   
   @Override
   public Expr compile(final XPContext ctx) throws QueryException {
-    if (!ctx.local.data.meta.ftxindex) 
-      throw new QueryException("Please create full-text index first.");
+    if(!ctx.local.data.meta.ftxindex) throw new QueryException(NOFT);
 
     if (expr2 instanceof Literal && expr1 instanceof Literal) {
       final byte[] lit = ((Literal)  expr2).str();
       
-      
       ctx.compInfo(OPTFTINDEX);
       
-//    <SG> to be change if ftnot is combined with further options like order...
-      if (Token.indexOf(lit, ' ') > 0) {
+      // <SG> to be change if ftnot is combined with further options
+      // like order...
+      if(Token.indexOf(lit, ' ') > 0) {
         return new FTIndex(lit, option, false, false);
       }
         
@@ -92,7 +91,7 @@ public final class FTContains extends Comparison {
     XPOptimizer.addText(expr1, ctx);
     XPOptimizer.addText(expr2, ctx);
 
-   return this;
+    return this;
   }
 
   @Override
@@ -124,7 +123,6 @@ public final class FTContains extends Comparison {
     }
    
     // use conventional check for other cases..
-    
     return super.eval(ctx);
   }
 
@@ -132,9 +130,7 @@ public final class FTContains extends Comparison {
   public Expr indexEquivalent(final XPContext ctx, final Step curr)
     throws QueryException {
     
-    LocPath path = (LocPath) expr1;;
-    
-    
+    LocPath path = (LocPath) expr1;
     return new Path(expr2.indexEquivalent(ctx, curr), path.invertPath(curr));
     
     /*

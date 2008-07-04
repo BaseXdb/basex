@@ -860,11 +860,7 @@ public final class XPParser extends QueryParser {
       // optional
       // parseFTAnyallOptions();
       // optional 
-      FTPositionFilter ftps = parseFTTimes();
-      if (ftps != null)
-        return new FTPrimary(new Expr[]{e}, ftps);
-      return new FTPrimary(new Expr[]{e});
-      
+      return new FTPrimary(new Expr[] { e }, parseFTTimes());
     } else if (consume('(')) {
       consumeWS();
       e = parseFTSelection();

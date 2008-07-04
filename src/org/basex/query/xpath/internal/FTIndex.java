@@ -1,5 +1,6 @@
 package org.basex.query.xpath.internal;
 
+import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.query.xpath.XPContext;
@@ -14,7 +15,7 @@ import org.basex.util.Token;
 
 /**
  * This expression retrieves the ids of indexed fulltext terms.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Sebastian Gath
  * @author Christian Gruen
@@ -26,12 +27,12 @@ public final class FTIndex extends InternalExpr {
   private FTOption option;
   /** FullText options. */
   FTPositionFilter ftpos;
-  
+
   /** Ids as result of index request with tok. */
   private int[][] ids;
   /** Flag for simple ftcontains queries. **/
   private boolean simple = true;
-  /** Flag for tokens containing only one single word, 
+  /** Flag for tokens containing only one single word,
    * like 'usability' (not 'usability testing'). **/
   private boolean single = false;
   /** Number of errors allowed - used for fuzzy search. **/
@@ -44,7 +45,7 @@ public final class FTIndex extends InternalExpr {
    * @param sim flag for simple ftcontains queries
    * @param sing flag for single word queries
    */
-  public FTIndex(final byte[] tok, final FTOption opt, 
+  public FTIndex(final byte[] tok, final FTOption opt,
       final boolean sim, final boolean sing) {
     token = tok;
     option = opt;
@@ -60,7 +61,7 @@ public final class FTIndex extends InternalExpr {
    * @param sim flag for simple ftcontains queries
    * @param sing flag for single word queries
    */
-  public FTIndex(final byte[] tok, final FTOption opt, 
+  public FTIndex(final byte[] tok, final FTOption opt,
       final FTPositionFilter ftp, final boolean sim, final boolean sing) {
     token = tok;
     option = opt;
@@ -79,7 +80,7 @@ public final class FTIndex extends InternalExpr {
     ne = numErrors;
   }
 
-  
+
   /**
    * Setter for FTPostion Filter - used for fTContent.
    * @param ftp FTPostionFilter
@@ -87,7 +88,7 @@ public final class FTIndex extends InternalExpr {
   public void setFTPosFilter(final FTPositionFilter ftp) {
     ftpos = ftp;
   }
-  
+
   /**
    * Setter for single - used for fTContent.
    * @param sing boolean flag for single word queries
@@ -95,7 +96,7 @@ public final class FTIndex extends InternalExpr {
   public void setSingle(final boolean sing) {
     single = sing;
   }
-  
+
   /**
    * Get token for index access.
    * @return token
@@ -117,140 +118,71 @@ public final class FTIndex extends InternalExpr {
     return option;
   }
 
-  
-  
+
+
   @Override
   public NodeSet eval(final XPContext ctx) {
     final Data data = ctx.local.data;
-    
+
     if (ne > 0) {
       ids = data.fuzzyIDs(token, ne);
       if (ids == null) return new NodeSet(ctx);
       return new NodeSet(Array.extractIDsFromData(ids), ctx, ids);
     }
-    
-    FTTokenizer ftt = new FTTokenizer();
+
+    final FTTokenizer ftt = new FTTokenizer();
     ftt.init(token);
     ftt.sens = option.ftCasesen;
     ftt.wc = option.ftWild;
     ftt.lc = option.ftlc | !ftt.sens;
     ftt.uc = option.ftuc;
-    
-    int c = 0;
-    int pos;
+
     int[][] d = null;
-    byte[] b;
-    while (ftt.more()) {
-      b = ftt.next();
-      c++;
-      if (ftt.wc) {
-        pos = Token.indexOf(b, '.');
-        if (pos > -1) {
-          d = data.wildcardIDs(b, pos);
-        } else {
-          d = data.ftIDs(b, ftt.sens);
-        }
+    while(ftt.more()) {
+      final byte[] b = ftt.next();
+      int[][] dd = null;
+      final int pos = Token.indexOf(b, '.');
+      if(ftt.wc && pos > -1) {
+        dd = data.wildcardIDs(b, pos);
       } else {
-        d = data.ftIDs(b, ftt.sens);
+        dd = data.ftIDs(b, ftt.sens);
       }
-      break; // <SG> remove me
+      d = d == null ? dd : phrase(d, dd);
+      if(d == null || d.length == 0) break;
     }
-    
-    if (d != null) 
-      return new NodeSet(Array.extractIDsFromData(d), ctx, d);
-    else 
-      return new NodeSet(ctx);
+    return new NodeSet(Array.extractIDsFromData(d), ctx);
   }
 
-  @Override
-  public String toString() {
-    return Token.string(name()) + "(" + Token.string(token) + ")";
-  }
+  /**
+   * Joins the specified arrays, returning only phrase hits.
+   * @param a first array
+   * @param b second array
+   * @return resulting array
+   */
+  private int[][] phrase(final int[][] a, final int[][] b) {
+    if(b == null) return null;
 
-/*  
-  private void evalNonSingle(final Data data) {
-    byte[] tok;
-    int i = Token.indexOf(token, ' ');
-    if (i == -1) i = token.length; 
-    tok = new byte[i];
-    System.arraycopy(token, 0, tok, 0, i);
-    int[][] tmp = data.ftIDs(tok, option);
-
-    if(tmp == null) return;
-
-    int lastpre = -1;
-    byte[] db = null;
-    int count = 0;
-    int[][] res = new int[2][tmp[0].length];
-    int j; // runvariable for token
-    int k; // runvaribale for db
-
-    tok = token;
-
-    if(option.ftCase == FTOption.CASE.UPPERCASE) {
-      tok = Token.uc(tok);
-    } else if(option.ftCase == FTOption.CASE.INSENSITIVE ||
-        option.ftCase == FTOption.CASE.LOWERCASE) {
-      tok = Token.lc(tok);
-      
-    }
-    
-    for(i = 0; i < tmp[0].length; i++) {
-      j = 0;
-      k = 0;
-      if(lastpre != tmp[0][i]) {
-        lastpre = tmp[0][i];
-        db = data.text(lastpre);
-      }
-      
-          // "usability" not in "usability testing"
-      // "mexico" not in "new mexico"
-      // "mexico" not in "new mexico city"
-      if(db.length >= tmp[1][i] + tok.length) {
-        //if(option.ftCase == FTOption.CASE.INSENSITIVE) {
-        if(option.ftCase == FTOption.CASE.INSENSITIVE) db = Token.lc(db);
-        while(j < tok.length && tmp[1][i] + k < db.length) { 
-            if(db[tmp[1][i] + k] == tok[j]) {
-              j++;
-              k++;
-            } else if(!Token.ftChar(db[tmp[1][i] + k])) {
-              while(db.length > tmp[1][i] + k 
-                  && !Token.ftChar(db[tmp[1][i] + k])) k++;
-            } else {
-              break;
-            }
-          //}       
+    final int[][] il = new int[2][0];
+    for(int ai = 0, bi = 0; ai < a[0].length && bi < b[0].length;) {
+      int d = a[0][ai] - b[0][bi];
+      if(d == 0) {
+        d = a[1][ai] - b[1][bi] + 1;
+        if(d == 0) {
+          final int i = il[0].length;
+          final int[] t0 = new int[i + 1], t1 = new int[i + 1];
+          System.arraycopy(il[0], 0, t0, 0, i);
+          System.arraycopy(il[1], 0, t1, 0, i);
+          t0[i] = b[0][bi];
+          t1[i] = b[1][bi];
+          il[0] = t0;
+          il[1] = t1;
         }
-
-        if (j == tok.length) {
-          if (ftpos != null && ftpos.ftContent != null) {
-            if ((ftpos.ftContent == FTPositionFilter.CONTENT.ATSTART 
-                && tmp[1][i] == 0) 
-                || (ftpos.ftContent == FTPositionFilter.CONTENT.ATEND 
-                    && tmp[1][i] + k == db.length)
-                || (ftpos.ftContent ==  FTPositionFilter.CONTENT.ENTIRECONTENT
-                    && tmp[1][i] == 0 && db.length == k)) {              
-              res[0][count] = tmp[0][i];
-              res[1][count++] = tmp[1][i];
-
-            }
-          } else {
-            res[0][count] = tmp[0][i];
-            res[1][count++] = tmp[1][i];
-          }
-        } 
       }
+      if(d <= 0) ai++;
+      if(d >= 0) bi++;
     }
-    
-    if (count == 0) {
-      ids = null;
-      return;
-    }
-    ids = new int[2][];
-    ids[0] = Array.finish(res[0], count);
-    ids[1] = Array.finish(res[1], count);
+    return il;
   }
-  */
 
   @Override
   public void plan(final Serializer ser) throws Exception {
@@ -261,8 +193,12 @@ public final class FTIndex extends InternalExpr {
   }
 
   @Override
-  public int indexSizes(final XPContext ctx, final Step curr,
-      final int min) {
+  public int indexSizes(final XPContext ctx, final Step curr, final int min) {
     return 1;
+  }
+
+  @Override
+  public String toString() {
+    return BaseX.info("%(\"%\")", name(), token);
   }
 }
