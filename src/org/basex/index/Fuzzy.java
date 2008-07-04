@@ -56,8 +56,8 @@ public final class Fuzzy extends Index {
   private final DataAccessPerf ti;
   /** Storing pre and pos values for each token. */ 
   private DataAccessPerf dat;  
-  /** Flag for case sensitve index. FUZZYINDEX is always insensitive!.*/
-  protected boolean cs = false;
+  /** Flag for case sensitive index. FUZZYINDEX is always insensitive!.*/
+  boolean cs = false;
 
   /**
    * Constructor, initializing the index structure.
@@ -108,6 +108,7 @@ public final class Fuzzy extends Index {
     if (i == is || ts > tok.length) return -1;
     int l = li.readInt(1L + i * 5L + 1L);
     int r = li.readInt(1L + (i + 1) * 5L + 1L);
+    // <SG> m is overwritten without having being touched
     int m = (int) (l + ((int) ((r - l) 
         /// (tok.length * 1L + 8L) / 2)) * (tok.length * 1L + 8L));
         / (tok.length * 1L + 9L) / 2)) * (tok.length * 1L + 9L));

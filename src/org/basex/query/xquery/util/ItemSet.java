@@ -14,7 +14,7 @@ import org.basex.util.Array;
  */
 public final class ItemSet {
   /** Initial hash capacity. */
-  protected static final int CAP = 1 << 3;
+  private static final int CAP = 1 << 3;
   /** Hash keys. */
   private int[] keys = new int[CAP];
   /** Pointers to the next token. */

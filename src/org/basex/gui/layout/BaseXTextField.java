@@ -14,7 +14,7 @@ import org.basex.gui.dialog.Dialog;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class BaseXTextField extends JTextField {
+public class BaseXTextField extends JTextField {
   /** Last Input. */
   String last = "";
   /** Button help. */

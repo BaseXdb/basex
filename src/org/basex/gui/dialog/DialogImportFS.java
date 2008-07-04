@@ -28,7 +28,7 @@ import org.basex.gui.layout.TableLayout;
  */
 public final class DialogImportFS  extends Dialog {
   /** Directory path. */
-  protected BaseXTextField path;
+  BaseXTextField path;
   /** Parsing complete filesystem. */
   private BaseXCheckBox all;
   /** Browse button. */
@@ -158,11 +158,6 @@ public final class DialogImportFS  extends Dialog {
       (all.isSelected() || path.getText().length() > 0);
     BaseXLayout.enableOK(buttons, valid);
     return valid;
-  }
-
-  @Override
-  public void cancel() {
-    super.cancel();
   }
 
   @Override

@@ -97,8 +97,8 @@ public final class Info extends XPath {
     tb.add(NL + INFOINDEX + NL);
     format(tb, INFOTXTINDEX, BaseX.flag(Prop.textindex), true, 0);
     format(tb, INFOATVINDEX, BaseX.flag(Prop.attrindex), true, 0);
-    format(tb, INFOFTINDEX, BaseX.flag(Prop.ftindex) +
-        (Prop.ftfuzzy ? " (" + INFOFZINDEX + ")" : ""), true, 0);
+    format(tb, INFOFTINDEX, BaseX.flag(Prop.ftindex) + (Prop.ftindex &&
+        Prop.ftfuzzy ? " (" + INFOFZINDEX + ")" : ""), true, 0);
     out.print(tb.finish());
   }
 
@@ -157,8 +157,8 @@ public final class Info extends XPath {
       } else {
         format(tb, INFOTXTINDEX, BaseX.flag(meta.txtindex), true, 0);
         format(tb, INFOATVINDEX, BaseX.flag(meta.atvindex), true, 0);
-        format(tb, INFOFTINDEX, BaseX.flag(meta.ftxindex) +
-            (meta.ftfuzzy ? " (" + INFOFZINDEX + ")" : ""), true, 0);
+        format(tb, INFOFTINDEX, BaseX.flag(meta.ftxindex) + (meta.ftxindex &&
+            meta.ftfuzzy ? " (" + INFOFZINDEX + ")" : ""), true, 0);
       }
     }
     return tb.finish();

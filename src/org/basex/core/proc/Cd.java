@@ -14,7 +14,10 @@ public final class Cd extends Proc {
     final Nodes nodes = query(cmd.args(), null);
     if(nodes == null) return false;
 
-    if(nodes.size() != 0) context.current(nodes);
+    if(nodes.size() != 0) {
+      context.current(nodes);
+      result = nodes;
+    }
     return true;
   }
 }

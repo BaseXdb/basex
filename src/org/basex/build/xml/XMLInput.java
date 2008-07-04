@@ -105,7 +105,7 @@ final class XMLInput {
    * Finishes file input.
    * @throws IOException I/O Exception
    */
-  public void finish() throws IOException {
+  void finish() throws IOException {
     in[0].close();
   }
 

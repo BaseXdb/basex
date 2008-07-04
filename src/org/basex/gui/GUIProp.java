@@ -129,8 +129,6 @@ public final class GUIProp {
   public static boolean showmenu = true;
   /** Flag for activated real tree view. */
   public static boolean showreal = false;
-  /** Flag for activated xpath view. */
-  public static boolean showxpath = true;
 
   /** Flag for activated result view after starting. */
   public static boolean showstarttext = false;

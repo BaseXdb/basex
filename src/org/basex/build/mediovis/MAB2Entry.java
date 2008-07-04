@@ -9,9 +9,9 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class MAB2Entry {
+final class MAB2Entry {
   /** Top ID. */
-  final byte[] id;
+  private final byte[] id;
   /** Children offsets. */
   long[] children;
   /** File offset. */
@@ -23,7 +23,7 @@ public final class MAB2Entry {
    * Constructor.
    * @param i id value
    */
-  public MAB2Entry(final byte[] i) {
+  MAB2Entry(final byte[] i) {
     id = i;
   }
 
@@ -31,7 +31,7 @@ public final class MAB2Entry {
    * Adds a child.
    * @param c child to be added
    */
-  public void add(final long c) {
+  void add(final long c) {
     if(children == null) children = new long[1];
     else if(children.length == size) children = Array.extend(children);
     children[size++] = c;
@@ -41,7 +41,7 @@ public final class MAB2Entry {
    * Sets the file offset.
    * @param p file offset
    */
-  public void pos(final long p) {
+  void pos(final long p) {
     pos = p;
   }
 

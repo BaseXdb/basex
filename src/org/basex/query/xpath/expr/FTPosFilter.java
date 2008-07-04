@@ -229,6 +229,7 @@ public final class FTPosFilter extends FTArrayExpr {
         if (lpo != p[j + 1] && lpo != p[0]) {
           s = e;
           e = j;
+          // <SG> pold is not used... 
           pold = p[s + 1];
           lpo = p[e + 1];
           lid = res[0][s];

@@ -42,20 +42,21 @@ public final class XMLScanner {
     /** Quoted state.    */ QUOTE,
   }
 
-  /** Document encoding. */
-  String encoding = UTF8;
   /** Character buffer for the current token. */
   TokenBuilder token = new TokenBuilder();
   /** Current token type. */
   Type type;
-  /** Index for all entity names. */
-  TokenMap ents;
-  /** Index for all PEReferences. */
-  TokenMap pents;
   /** Whitespace flag. */
   boolean ws;
+
+  /** Document encoding (currently not used). */
+  String encoding = UTF8;
+  /** Index for all entity names. */
+  private TokenMap ents;
+  /** Index for all PEReferences. */
+  private TokenMap pents;
   /** Parameter entity parsing. */
-  boolean pe;
+  private boolean pe;
 
   /** Current scanner state. */
   private State state = State.CONTENT;

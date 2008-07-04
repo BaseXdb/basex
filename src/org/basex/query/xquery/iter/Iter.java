@@ -1,6 +1,7 @@
 package org.basex.query.xquery.iter;
 
 import static org.basex.query.xquery.XQText.*;
+
 import org.basex.BaseX;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQParser;
@@ -98,8 +99,7 @@ public abstract class Iter {
         if(!empty) Err.empty(expr);
         return null;
       }
-      Err.or(XPSEQ, "(" + next() + "," + next() +
-          (next() != null ? ",...)" : ")"), expr.info());
+      seqErr(next(), next(), next(), expr);
     }
 
     final Item it = next();
@@ -109,10 +109,21 @@ public abstract class Iter {
     }
 
     final Item n = next();
-    if(n != null) {
-      final boolean m = next() != null;
-      Err.or(XPSEQ, "(" + it + "," + n + (m ? ",...)" : ")"), expr.info());
-    }
+    if(n != null) seqErr(it, n, next(), expr);
     return it;
+  }
+  
+  /**
+   * Throws a sequence error.
+   * @param i1 first item
+   * @param i2 first item
+   * @param i3 first item
+   * @param expr expression
+   * @throws XQException evaluation exception
+   */
+  public static void seqErr(final Item i1, final Item i2, final Item i3,
+      final Expr expr) throws XQException {
+    Err.or(XPSEQ, "(" + i1 + "," + i2 + (i3 != null ? ",..." : "") + ")",
+        expr.info());
   }
 }

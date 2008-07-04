@@ -48,9 +48,9 @@ public final class EMLExtractor extends AbstractExtractor {
   private boolean quotePrint;
 
   /** Email body character encoding. */
-  String mBodyCharset;
+  private String mBodyCharset;
   /** Email body content type. */
-  String mBodyType;
+  private String mBodyType;
 
   @Override
   public void extract(final Builder listener, final File f) throws IOException {

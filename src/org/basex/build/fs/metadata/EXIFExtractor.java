@@ -34,7 +34,7 @@ abstract class EXIFExtractor extends AbstractExtractor {
    * @return false if TIFF endian is invalid.
    * @throws IOException I/O exception
    */
-  boolean checkEndian(final InputStream in) throws IOException {
+  protected boolean checkEndian(final InputStream in) throws IOException {
     final int b1 = in.read();
     final int b2 = in.read();
     return checkEndian(b1, b2);
@@ -60,7 +60,7 @@ abstract class EXIFExtractor extends AbstractExtractor {
    * @return number of skipped bytes
    * @throws IOException I/O exception
    */
-  int scanEXIF(final InputStream in, final int skip, final String f)
+  protected int scanEXIF(final InputStream in, final int skip, final String f)
       throws IOException {
 
     file = f;
@@ -189,7 +189,7 @@ abstract class EXIFExtractor extends AbstractExtractor {
    * @return number
    * @throws IOException I/O exception
    */
-  int getShort(final InputStream in) throws IOException {
+  protected int getShort(final InputStream in) throws IOException {
     final int b1 = in.read();
     final int b2 = in.read();
     return littleEndian ? b1 + (b2 << 8) : (b1 << 8) + b1;
@@ -201,7 +201,7 @@ abstract class EXIFExtractor extends AbstractExtractor {
    * @return number
    * @throws IOException I/O exception
    */
-  int getInt(final InputStream in) throws IOException {
+  protected int getInt(final InputStream in) throws IOException {
     final int b1 = getShort(in);
     final int b2 = getShort(in);
     return littleEndian ? b1 + (b2 << 16) : (b1 << 16) + b1;

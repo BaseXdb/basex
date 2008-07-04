@@ -83,7 +83,9 @@ public final class DNode extends Node {
       case ELM:
         return type + "(" + string(data.tag(pre)) + "/" + pre + ")";
       default:
-        return type + "(" + string(str()) + ")";
+        String str = string(str());
+        if(str.length() > 20) str = str.substring(0, 20) + "...";
+        return type + "(" + str + ")";
     }
   }
 

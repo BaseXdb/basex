@@ -25,6 +25,13 @@ public final class BaseXCombo extends JComboBox {
   public byte[] help;
 
   /**
+   * Default Constructor.
+   */
+  public BaseXCombo() {
+    this(new String[] {}, null, false, null);
+  }
+
+  /**
    * Constructor.
    * @param choice combobox choice.
    * @param e editable combobox
@@ -45,7 +52,7 @@ public final class BaseXCombo extends JComboBox {
       final Dialog list) {
     
     super(choice);
-    setMaximumRowCount(edit ? 5 : 12);
+    setMaximumRowCount(edit ? 5 : 10);
     BaseXLayout.addDefaultKeys(this, list);
     help = hlp;
 

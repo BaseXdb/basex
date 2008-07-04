@@ -31,9 +31,9 @@ import org.basex.gui.view.View;
  */
 public final class DialogPrefs extends Dialog {
   /** Language label. */
-  protected BaseXLabel creds;
+  BaseXLabel creds;
   /** Language Combo Box. */
-  protected BaseXCombo lang;
+  BaseXCombo lang;
   /** Browse button. */
   private BaseXButton button;
   /** Directory path. */

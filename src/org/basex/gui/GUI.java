@@ -47,7 +47,6 @@ import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewContainer;
@@ -59,10 +58,8 @@ import org.basex.gui.view.real.RealView;
 import org.basex.gui.view.table.TableView;
 import org.basex.gui.view.text.TextView;
 import org.basex.gui.view.tree.TreeView;
-import org.basex.gui.view.xpath.XPathView;
 import org.basex.io.CachedOutput;
 import org.basex.util.Performance;
-import org.basex.util.StringList;
 import org.basex.util.Token;
 
 /**
@@ -82,8 +79,8 @@ public final class GUI extends JFrame {
   public final GUIStatus status;
   /** Content panel, containing all views. */
   public final ViewContainer views;
-  /** Query field. */
-  public final BaseXTextField input;
+  /** Input field. */
+  public final GUIInput input;
   /** Filter button. */
   public final BaseXButton filter;
   /** History button. */
@@ -122,8 +119,6 @@ public final class GUI extends JFrame {
   private final GUIToolBar toolbar;
   /** Menu panel height. */
   private int menuHeight;
-  /** JPopupMenu. */
-  public JPopupMenu pop = new JPopupMenu();
 
   /**
    * Singleton Constructor.
@@ -216,48 +211,8 @@ public final class GUI extends JFrame {
     });
     nav.add(mode, BorderLayout.WEST);
 
-    input = new BaseXTextField(null);
-
-    final Font f = input.getFont();
-    input.setFont(f.deriveFont((float) f.getSize() + 2));
-
-    input.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyPressed(final KeyEvent e) {
-        checkKeys(e);
-        if(e.getKeyCode() != KeyEvent.VK_ENTER) return;
-
-        // store current input in history
-        final String txt = input.getText();
-        final StringList sl = new StringList();
-        sl.add(txt);
-
-        final int i = !context.db() ? 2 : GUIProp.searchmode;
-        final String[] hs = i == 0 ? GUIProp.search : i == 1 ? GUIProp.xpath :
-          GUIProp.commands;
-        for(int p = 0; p < hs.length && sl.size < 10; p++) {
-          if(!hs[p].equals(txt)) sl.add(hs[p]);
-        }
-        if(i == 0) GUIProp.search = sl.finish();
-        else if(i == 1) GUIProp.xpath = sl.finish();
-        else GUIProp.commands = sl.finish();
-
-        // evaluate the input
-        execute();
-      }
-
-      @Override
-      public void keyReleased(final KeyEvent e) {
-        if(e.getKeyChar() == 0xFFFF || e.isControlDown()) return;
-
-        if(GUIProp.searchmode == 2 || !context.db()) refreshPop(e.getKeyCode());
-
-        // skip commands
-        if(GUIProp.execrt && GUIProp.searchmode != 2 && context.db() &&
-            !input.getText().startsWith("!")) execute();
-      }
-    });
-
+    input = new GUIInput(this);
+    
     hist = new BaseXButton(icon("hist"), HELPHIST);
     hist.trim();
     hist.addActionListener(new ActionListener() {
@@ -333,7 +288,6 @@ public final class GUI extends JFrame {
       textpanel, helppanel }, {
         new ViewPanel(new TreeView(HELPTREE), TREEVIEW),
         new ViewPanel(new RealView(), REALVIEW),
-        new ViewPanel(new XPathView(), XPATHVIEW),
         new ViewPanel(new TableView(HELPTABLE), TABLEVIEW),
         new ViewPanel(new MapView(HELPMAP), MAPVIEW),
         new ViewPanel(query, QUERYVIEW),
@@ -378,37 +332,6 @@ public final class GUI extends JFrame {
         views.run();
       }
     }.start();
-  }
-
-  /**
-   * Creates the JPopupMenu.
-   * @param c current key
-   */
-  public void refreshPop(final int c) {
-    if(pop.isVisible()) pop.setVisible(false);
-    if(c == KeyEvent.VK_ESCAPE || c == KeyEvent.VK_ENTER) return;
-    final String in = input.getText().toLowerCase();
-    if(in.length() == 0) return;
-
-    pop.removeAll();
-    final String[] all = Commands.list();
-    for(final String element : all) {
-      if(element.startsWith(in)) {
-        final JMenuItem jmi = new JMenuItem(element);
-        jmi.addActionListener(new ActionListener() {
-          public void actionPerformed(final ActionEvent ac) {
-            input.setText(ac.getActionCommand());
-            pop.setVisible(false);
-          }
-        });
-        pop.add(jmi);
-      }
-    }
-    if(pop.getComponentCount() != 0) {
-      input.add(pop);
-      pop.show(input, 0, input.getHeight());
-      input.requestFocusInWindow();
-    }
   }
 
   /**
@@ -580,13 +503,13 @@ public final class GUI extends JFrame {
             // cached resulting text output
             final CachedOutput out = new CachedOutput(TextView.MAX);
 
-            if(cc.printing() && ok) {
+            if(cc.printing() || !ok) {
               if(!GUIProp.showstarttext && data == null ||
                  !GUIProp.showtext && data != null && nodes == null) {
                 GUICommands.SHOWTEXT.execute();
               }
               // retrieve text result
-              if(text.isValid()) {
+              if(text.isValid() && nodes == null) {
                 p.output(out);
                 out.addInfo();
               }
@@ -752,7 +675,6 @@ public final class GUI extends JFrame {
     refreshMode();
     toolbar.refresh();
     menu.refresh();
-    pop.setVisible(false);
     
     final int i = !context.db() ? 2 : GUIProp.searchmode;
     final String[] hs = i == 0 ? GUIProp.search : i == 1 ? GUIProp.xpath :
