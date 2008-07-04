@@ -12,7 +12,7 @@ import javax.xml.xquery.XQItem;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQResultSequence;
 
-import org.basex.data.PrintSerializer;
+import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
@@ -143,7 +143,7 @@ public class BXQResultSequence implements XQResultSequence {
     checkIfClosed();
     try {
       final CachedOutput co = new CachedOutput();
-      final PrintSerializer ps = new PrintSerializer(co);
+      final XMLSerializer ps = new XMLSerializer(co);
       item.serialize(ps, context, 0);
       return co.toString();
     } catch(final Exception ex) {
