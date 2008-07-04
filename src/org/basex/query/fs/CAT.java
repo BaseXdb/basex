@@ -38,8 +38,6 @@ public class CAT {
   /** Number the output lines, starting at 1. */
   private boolean fnumberLines;
 
-  /** Shows if an error occurs. */
-  private boolean fError;
 
 
   /**
@@ -72,23 +70,18 @@ public class CAT {
           break;        
         case 'h':
           printHelp();
-          break;
+          return;
         case 'n':
           fnumberLines = true;
           break;          
         case ':':         
-          fError = true;
           FSUtils.printError(out, "cat", g.getPath(), 99);
-          break;  
+          return;  
         case '?':         
-          fError = true;
           FSUtils.printError(out, "cat", g.getPath(), 22);
-          break;
+          return;
       }      
-      if(fError) {
-        // more options ?
-        return;
-      }
+
       ch = g.getopt();
     }
     int[] nodeToPrint;
@@ -96,7 +89,7 @@ public class CAT {
     if(g.getPath() != null) {    
       nodeToPrint = FSUtils.getSpecificFilesOrDirs(context.data(), 
           curDirPre, g.getPath()); 
-      if(nodeToPrint.length < 1) {
+      if(nodeToPrint.length == 1 && nodeToPrint[0] == -1) {
         FSUtils.printError(out, "cat", g.getPath(), 2);
       } else {
         if(nodeToPrint.length == 1 && 
@@ -115,7 +108,7 @@ public class CAT {
    *  @throws IOException in case of problems with the PrintOutput 
    */
   private void cat(final int[] print) throws IOException {    
-    for(int j = 0; j < print.length; j++) {
+    for(int j : print) {
       int nodeToPrint = print[j];
       if(FSUtils.isDir(context.data(), nodeToPrint)) { 
         continue;

@@ -35,12 +35,12 @@ public interface FSText {
     " In the second synopsis form, the con-\n" +
     "     tents of each named source_file is copied to the destination\n" +
     "     target_directory. The names of the files themselves are not " +
-    "changed. If \n cp detects an attempt to copy a file to itself," + 
+    "changed. If \n     cp detects an attempt to copy a file to itself," + 
     " the copy will fail.\n\n\n";
   /** Help text. */
   String FSDU = "DU(1)" + FSMAN + "DU(1)\n\n  NAME\n" +
     "     du -- display disk usage statistics\n\n  SYNOPSIS\n" +
-    "     du [-a] [dir]\n\n  DESCRIPTION\n" +
+    "     du [-ah] [dir]\n\n  DESCRIPTION\n" +
     "     The du utility displays the file system block usage for each" +
     " file argu-\n     ment and for each directory in the file hierarchy" +
     " rooted in each direc-\n     tory argument.  If no file is specified," +
@@ -145,4 +145,6 @@ public interface FSText {
   String EFTYPE = "Inappropriate file type or format.";
   /** FS Error Message. */
   String EMISSARG = "Missing argument.";
+  /** FS Error Message. */
+  String EOMDIR = "omitting directory";
 }

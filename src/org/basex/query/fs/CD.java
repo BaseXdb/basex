@@ -23,10 +23,6 @@ public final class CD {
   /** PrintOutPutStream. */
   private PrintOutput out;
 
-  /** Shows if an error occurs. */
-  private boolean fError;
-
-
   /**
    * Simplified Constructor.
    * @param ctx data context
@@ -54,20 +50,14 @@ public final class CD {
       switch (ch) {
         case 'h':
           printHelp();
-          break;
+          return;
         case ':':         
-          fError = true;
-          out.print("cd: missing argument");
-          break;  
+          FSUtils.printError(out, "cd", g.getPath(), 99);
+          return;
         case '?':         
-          fError = true;
-          out.print("cd: illegal option");
-          break;
-      }      
-      if(fError) {
-        // more options ?
-        return;
-      }
+          FSUtils.printError(out, "cat", g.getPath(), 22);
+          return;
+      }     
       ch = g.getopt();
     }
 
@@ -75,7 +65,7 @@ public final class CD {
     if(g.getPath() != null) {    
       curDirPre = FSUtils.goToDir(context.data(), curDirPre, g.getPath());
       if(curDirPre == -1) {
-        out.print("cd " + g.getPath() + ": No such file or directory. ");
+        FSUtils.printError(out, "cd", g.getPath(), 2);
       } else {
         context.current().pre[0] = curDirPre;
       }
@@ -84,7 +74,7 @@ public final class CD {
     } 
   }
 
-  
+
   /**
    * Print the help.
    * 
@@ -92,7 +82,7 @@ public final class CD {
    */
   private void printHelp() throws IOException {
     out.print(FSCD);
-   
+
   }
 
 }

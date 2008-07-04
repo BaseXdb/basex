@@ -7,6 +7,7 @@ import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.io.PrintOutput;
 import org.basex.util.GetOpts;
+import org.basex.util.Token;
 
 /**
  * Performs a cp command.
@@ -56,10 +57,10 @@ public final class CP {
           printHelp();
           return;
         case ':':         
-          out.print("cp: missing argument");
+          FSUtils.printError(out, "cp", g.getPath(), 99);
           return;  
         case '?':         
-          out.print("cp: illegal option");
+          FSUtils.printError(out, "cp", g.getPath(), 22);
           return;
       }      
       ch = g.getopt();
@@ -99,12 +100,19 @@ public final class CP {
 
     switch(sources.length) {
       case 0:
-        FSUtils.printError(out, "cat", sourcefile, 2);
+        FSUtils.printError(out, "cp", sourcefile, 2);
         break;
       case 1:        
 
-        byte[] size = ("" + FSUtils.getSize(data, sources[0])).getBytes();
-        byte[] mtime = ("" + System.currentTimeMillis()).getBytes();
+        if(FSUtils.isDir(data, sources[0])) {
+          FSUtils.printError(out, "cp", 
+              Token.string(FSUtils.getName(data, sources[0])), 100);
+          break;
+        }
+        //test ob source ein verzeichnis ist und dann nicht kopieren ? 
+        
+        byte[] size = Token.token(FSUtils.getSize(data, sources[0]));
+        byte[] mtime = Token.token(System.currentTimeMillis());
 
         if(target.length == 1) {
           if(FSUtils.isDir(data, target[0])) {
@@ -114,25 +122,25 @@ public final class CP {
 
             if(!(target[0] == FSUtils.getROOTDIR())) {
               preOfNewFile = target[0] + 5;
-            }                    
-            insert(data, name, suffix, size, mtime, target[0], preOfNewFile);
+            }                             
+            FSUtils.insert(data, name, suffix, size, mtime,
+                target[0], preOfNewFile);
           } else {
             // file exists - override
-            data.update(target[0] + 3, "size".getBytes(), 
-                ("" + size).getBytes());
-            data.update(target[0] + 4, "mtime".getBytes(), 
-                ("" + System.currentTimeMillis()).getBytes());
-            data.flush();
+            FSUtils.update(data, FSUtils.getName(data, target[0]),
+                FSUtils.getSuffix(data, target[0]),
+                size, mtime, target[0]);
           }
         } else {
           // create new file and insert into current dir
-          byte[] name = targetfile.getBytes();
+          byte[] name = Token.token(targetfile);
           byte[] suffix = getSuffix(targetfile);
 
           if(!(curDirPre == FSUtils.getROOTDIR())) {
             preOfNewFile = curDirPre + 5;
           }        
-          insert(data, name, suffix, size, mtime, curDirPre, preOfNewFile);
+          FSUtils.insert(data, name, suffix, size, mtime,
+              curDirPre, preOfNewFile);
         }      
         break;
       default:
@@ -148,42 +156,25 @@ public final class CP {
         preOfNewFile = target[0] + 5;
       }  
       ArrayList<byte[]>  toInsert = new ArrayList<byte[]>();
-      for(int i : sources) {
+
+      for(int i : sources) {  
+        // prüfen ob dir und wenn ja überspringen... ?
+        if(FSUtils.isDir(data, i)) {
+          FSUtils.printError(out, "cp", 
+              Token.string(FSUtils.getName(data, i)), 100);
+          continue;
+        }      
         toInsert.add(FSUtils.getName(data, i));
         toInsert.add(FSUtils.getSuffix(data, i));
-        toInsert.add(("" + FSUtils.getSize(data, i)).getBytes());
+        toInsert.add(Token.token(FSUtils.getSize(data, i)));
       }
-      for(int i = 0; i < sources.length; ++i) {
+      for(int j = 0; j < toInsert.size(); ++j) {
         mtime = ("" + System.currentTimeMillis()).getBytes();
-        insert(data, toInsert.remove(0), toInsert.remove(0), toInsert.remove(0),
-            mtime, target[0], preOfNewFile);
+        FSUtils.insert(data, toInsert.remove(0), toInsert.remove(0),
+            toInsert.remove(0), mtime, target[0], preOfNewFile);
       }       
       break;
     }      
-  }
-
-
-  /**
-   * Inserts a new entry into the table.
-   * 
-   * @param data - the data table
-   * @param name - filename
-   * @param suffix - suffix of the file
-   * @param size - size of the file
-   * @param mtime - make time
-   * @param parrent - pre value of the parrent
-   * @param pre - position to insert
-   * 
-   */
-  private void insert(final Data data, final byte[] name, final byte[] suffix, 
-      final byte[] size, final byte[] mtime, final int parrent, final int pre) {
-
-    data.insert(pre, parrent, "file".getBytes(), Data.ELEM);
-    data.insert(pre + 1, pre, "name".getBytes(), name);
-    data.insert(pre + 2, pre, "suffix".getBytes(), suffix);
-    data.insert(pre + 3, pre, "size".getBytes(), size);
-    data.insert(pre + 4, pre, "mtime".getBytes(), mtime);  
-    data.flush();
   }
 
   /**
@@ -196,8 +187,8 @@ public final class CP {
   private byte[] getSuffix(final String file) {
     int point = file.lastIndexOf('.');
     if(point > 0)
-      return file.substring(point + 1).getBytes();
-    return "".getBytes();
+      return Token.token(file.substring(point + 1));
+    return Token.token("");
   }
   /**
    * Print the help.

@@ -62,22 +62,38 @@ public final class DU {
           printHelp();
           return;
         case ':':         
-          out.print("ls: missing argument");
+          FSUtils.printError(out, "du", g.getPath(), 99);
           return;
         case '?':         
-          out.print("ls: illegal option");
+          FSUtils.printError(out, "du", g.getPath(), 22);
           return;
       }      
-       ch = g.getopt();
+      ch = g.getopt();
     }
     // if there is path expression go to dir
     if(g.getPath() != null) {
-      curDirPre = FSUtils.goToDir(context.data(), curDirPre, g.getPath());
-      if(curDirPre == -1) {
-        out.print("du " + g.getPath() + "No such file or directory. ");
+      int[] sources = FSUtils.getSpecificFilesOrDirs(context.data(),
+          curDirPre, g.getPath());
+      // curDirPre = FSUtils.goToDir(context.data(), curDirPre, g.getPath());
+      if(sources.length == 1 && sources[0] == -1) {
+        FSUtils.printError(out, "du", g.getPath(), 2);
       }
+      du(sources);
     }
-    du(".", curDirPre);
+  }
+  
+  /**
+   * The du utility displays the file system block usage for each file argu-
+   * ment and for each directory in the file hierarchy rooted in each direc-
+   * tory argument.  If no file is specified, the block usage of the hierarchy
+   * rooted in the current directory is displayed.
+   * 
+   * @param sources pfad
+   * @throws IOException in case of problems with the PrintOutput
+   */
+  private void du(final int[] sources) throws IOException {
+    for(int i : sources)
+      du(".", i);
   }
 
   /**
@@ -92,30 +108,35 @@ public final class DU {
    * @return die speicher
    */
   private long du(final String path, final int pre) throws IOException {    
-
     final Data data = context.data();
-    int n = pre;    
-    long diskusage = FSUtils.getSize(data, n);
-    int size = data.size(n, data.kind(n)) + n;               
-    n += data.attSize(n, data.kind(n));
+    if(FSUtils.isFile(data, pre)) {
+      out.print(FSUtils.getSize(data, pre) + "\t" + path + "/" + 
+          Token.string(FSUtils.getName(data, pre)) + "\r");
+      return 0;
+    } else {
+      int n = pre;    
+      long diskusage = FSUtils.getSize(data, n);
+      int size = data.size(n, data.kind(n)) + n;               
+      n += data.attSize(n, data.kind(n));
 
-    while(n < size) {      
-      if(FSUtils.isDir(data, n)) {  
-        diskusage += du(path + "/" + 
-            Token.string(FSUtils.getName(data, n)), n);      
-        n += data.size(n, data.kind(n));
-      } else {      
-        long diskuse = FSUtils.getSize(data, n);
-        if(fPrintAll) {
-          out.print(diskuse + "\t" + path + "/" + 
-              Token.string(FSUtils.getName(data, n)) + "\r");        
+      while(n < size) {      
+        if(FSUtils.isDir(data, n)) {  
+          diskusage += du(path + "/" + 
+              Token.string(FSUtils.getName(data, n)), n);      
+          n += data.size(n, data.kind(n));
+        } else {      
+          long diskuse = FSUtils.getSize(data, n);
+          if(fPrintAll) {
+            out.print(diskuse + "\t" + path + "/" + 
+                Token.string(FSUtils.getName(data, n)) + "\r");        
+          }
+          diskusage += diskuse;
+          n += data.attSize(n, data.kind(n));
         }
-        diskusage += diskuse;
-        n += data.attSize(n, data.kind(n));
       }
+      out.println(diskusage + "\t" + path);
+      return diskusage;
     }
-    out.println(diskusage + "\t" + path);
-    return diskusage;
   }
 
   /**
