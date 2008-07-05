@@ -376,16 +376,19 @@ public final class Token {
 
   /**
    * Converts the specified token into a double value.
-   * {@link Double#NaN} is returned when the input is invalid.
+   * {@link Double#NaN} is returned if the input is invalid.
    * @param to character array to be converted
    * @return converted double value
    */
   public static double toDouble(final byte[] to) {
     final int tl = to.length;
-    if(tl > 9) return toDouble(string(to));
-    for(int i = 0; i < tl; i++) {
-      if(!digit(to[i]) && to[i] > ' ') return toDouble(string(to));
+    boolean f = false;
+    for(int t : to) {
+      if(t > 0 && t < ' ' || digit(t)) continue;
+      f = t == 'e' || t == 'E' || t == '.';
+      if(!f) return Double.NaN;
     }
+    if(f || tl > 9) return dbl(to);
     final int d = toInt(to);
     return d == Integer.MIN_VALUE ? Double.NaN : d;
   }
@@ -396,9 +399,9 @@ public final class Token {
    * @param to character array to be converted
    * @return converted double value
    */
-  public static double toDouble(final String to) {
+  private static double dbl(final byte[] to) {
     try {
-      return Double.parseDouble(to);
+      return Double.parseDouble(string(to));
     } catch(final Exception e) {
       return Double.NaN;
     }

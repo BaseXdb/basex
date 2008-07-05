@@ -11,9 +11,9 @@ import org.basex.core.Prop;
 public interface XPText {
   /** Position info. */
   String POSINFO = "Stopped at line %, column %:" + Prop.NL;
-  
+
   // XPath Parser =============================================================
-  
+
   /** Parsing exception. */
   String QUERYDATA = "Please create database first.";
   /** Parsing exception. */
@@ -65,15 +65,33 @@ public interface XPText {
   /** Parsing Exception. */
   String NONODESET = "NodeSet expected; found: %";
   /** Parsing exception. */
-  String NOFT =
-    "Please create a fulltext index or use XQuery for using 'ftcontains'.";
-  /** Parsing exception. */
   String FTINCOMP =
     "Unfinished predicate, or 'ftcontains' option not supported yet.";
-
+  /** Parsing Exception. */
+  String FTNOTEXC = "\"ftnot\" may only appear as right operand of \"ftand\".";
+  /** Parsing Exception. */
+  String FTCASE = "Case sensitivity flag expected (sensitive/insensitive).";
+  /** Parsing Exception. */
+  String FTDIA = "Diacritics flag expected (sensitive/insensitive).";
+  /** Parsing Exception. */
+  String FTRANGE = "Incomplete range option.";
+  /** Parsing Exception. */
+  String FTSCOPE = "Incomplete scope option.";
+  /** Parsing Exception. */
+  String FTSTOP = "Incomplete stop words option.";
+  /** Parsing Exception. */
+  String FTTHES = "Incomplete thesaurus option.";
+  /** Parsing Exception. */
+  String FTSWFILE = "Stop word file not found: \"%\".";
+  /** Parsing Exception. */
+  String FTLANG = "Language '%' not supported.";
+  
   /** Evaluation exception. */
   String NODATA = "No data available.";
 
+  /** Parsing exception. */
+  String NOFT =
+    "Please create a fulltext index or use XQuery for using 'ftcontains'.";
   /** Evaluation Exception. */
   String NSSUPPORT = "Namespaces not supported yet.";
   /** Evaluation Exception. */
@@ -89,15 +107,7 @@ public interface XPText {
   String LASTEXC = "Invalid use of last().";
   /** Evaluation Exception. */
   String INVALIDPRE = "'%' is no valid pre value.";
-  /** Evaluation Exception. */
-  String FTNOTEXC = "\"ftnot\" may only appear as right operand of \"ftand\"."; 
-  /** Evaluation Exception. */
-  String FTCASE = "Case sensitivity flag expected (sensitive/insensitive)."; 
-  /** Evaluation Exception. */
-  String FTRANGE = "Incomplete range expression."; 
-  /** Evaluation Exception. */
-  String FTSCOPE = "Incomplete scope expression."; 
-
+  
   /** Attribute name. */
   String TYPE = "type";
   /** Minimum . */
@@ -108,66 +118,64 @@ public interface XPText {
   // XPath Optimizer ==========================================================
 
   /** Optimization info. */
-  String OPTCALC = "pre-evaluating expression";
+  String OPTCALC = "Pre-evaluating expression";
   /** Optimization info. */
-  String OPTFUNC = "pre-evaluating %";
+  String OPTFUNC = "Pre-evaluating %";
   /** Optimization info. */
-  String OPTRELATIONAL = "pre-evaluating relational expression";
+  String OPTRELATIONAL = "Pre-evaluating relational expression";
   /** Optimization info. */
-  String OPTLOC = "removing location path with no index results";
+  String OPTLOC = "Removing location path with no index results";
   /** Optimization info. */
-  String OPTNAME = "removing unknown tag/attribute \"%\"";
+  String OPTNAME = "Removing unknown tag/attribute \"%\"";
   /** Optimization info. */
-  String OPTAND1 = "removing always false AND expression";
+  String OPTAND1 = "Removing always false AND expression";
   /** Optimization info. */
-  String OPTAND2 = "removing always true operand in AND expression";
+  String OPTAND2 = "Removing always true operand in AND expression";
   /** Optimization info. */
-  String OPTAND4 = "replacing AND expression by index access";
+  String OPTAND4 = "Replacing AND expression by index access";
   /** Optimization info. */
-  String OPTAND5 = "replacing AND by ALLOF expression";
+  String OPTAND5 = "Replacing AND by ALLOF expression";
   /** Optimization info. */
-  String OPTALLOF = "replacing ALLOF expression by index access";
+  String OPTALLOF = "Replacing ALLOF expression by index access";
   /** Optimization info. */
-  String OPTONEOF = "replacing ONEOF expression by index access";
+  String OPTONEOF = "Replacing ONEOF expression by index access";
   /** Optimization info. */
-  String OPTRANGE = "replacing AND by RANGE expression";
+  String OPTRANGE = "Replacing AND by RANGE expression";
   /** Optimization info. */
-  String OPTOR1 = "removing always true OR expression";
+  String OPTOR1 = "Removing always true OR expression";
   /** Optimization info. */
-  String OPTOR2 = "removing always false operand in OR expression";
+  String OPTOR2 = "Removing always false operand in OR expression";
   /** Optimization info. */
-  String OPTOR4 = "replacing OR expression by index access";
+  String OPTOR4 = "Replacing OR expression by index access";
   /** Optimization info. */
-  String OPTOR5 = "replacing OR by ONEOF expression";
+  String OPTOR5 = "Replacing OR by ONEOF expression";
   /** Optimization info. */
-  String OPTEQ1 = "removing EQUALITY expression for empty nodeset";
+  String OPTEQ1 = "Removing EQUALITY expression for empty nodeset";
   /** Optimization info. */
-  String OPTEQ2 = "removing EQUALITY expression for constant comparison";
+  String OPTEQ2 = "Removing EQUALITY expression for constant comparison";
   /** Optimization info. */
-  String OPTSELF = "removing superfluous self axes";
+  String OPTSELF = "Removing superfluous self axes";
   /** Optimization info. */
-  String OPTPRED = "removing always true predicate";
+  String OPTPRED = "Removing always true predicate";
   /** Optimization info. */
-  String OPTPOSPRED1 = "adding position predicate to evaluate only first node";
+  String OPTPOSPRED1 = "Adding position predicate to evaluate only first node";
   /** Optimization info. */
-  String OPTPOSPRED2 = "removing path with impossible position predicate";
+  String OPTPOSPRED2 = "Removing path with impossible position predicate";
   /** Optimization info. */
-  String OPTEMPTY = "removing empty location path";
+  String OPTEMPTY = "Removing empty location path";
   /** Optimization info. */
-  String OPTMERGE = "merging descendant-or-self and child steps";
+  String OPTMERGE = "Merging descendant-or-self and child steps";
   /** Optimization info. */
-  String OPTINDEX = "choosing TEXTINDEX for textual match";
+  String OPTINDEX = "Choosing TEXTINDEX for textual match";
   /** Optimization info. */
-  String OPTATTINDEX = "choosing ATTINDEX for attribute match";
+  String OPTATTINDEX = "Choosing ATTINDEX for attribute match";
   /** Optimization info. */
-  String OPTFTINDEX = "choosing FTINDEX for fulltext search";
+  String OPTFTINDEX = "Choosing FTINDEX for fulltext search";
   /** Optimization info. */
-  String OPTWORDINDEX = "choosing WORDINDEX for word-based search";
+  String OPTTEXT = "Adding text() step";
   /** Optimization info. */
-  String OPTTEXT = "adding text() step";
-  /** Optimization info. */
-  String OPTPOS = "rewriting position predicate";
-  
+  String OPTPOS = "Rewriting position predicate";
+
   /** Evaluation info. */
   String EVALSKIP = "rest of output skipped...";
 }

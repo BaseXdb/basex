@@ -36,22 +36,6 @@ public final class Path extends DualExpr {
     ns.ftpointer = ftpoin;
     ctx.local = local;
     return ns;
-
-    /* <SG> hm, yes, seems it causes errors ;)
-    final Item val = ctx.eval(expr1);
-    int[][] ftprepos = null;
-    int[] ftpoin = null;
-    if(val instanceof NodeSet) {
-      NodeSet ns = (NodeSet) val;
-      ctx.local = ns;
-      ftprepos =  ns.ftidpos;
-      ftpoin = ns.ftpointer;
-    }
-    ctx.local = (NodeSet) ctx.eval(expr2);
-    ctx.local.ftidpos = ftprepos;
-    ctx.local.ftpointer = ftpoin;
-    return ctx.local;
-    */
   }
 
   @Override

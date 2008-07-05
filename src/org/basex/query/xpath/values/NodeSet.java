@@ -208,35 +208,13 @@ public final class NodeSet extends Item {
   }
 
   /**
-   * inverse ftcontains (this NodeSet is the argument to val.apprContains).
+   * inverse contains (this NodeSet is the argument to val.apprContains).
    * @param val value to contain one of these nodes
-   * @return whether val ftcontains one of the node-values in this set
+   * @return whether val contains one of the node-values in this set
    */
   public boolean apprContainedIn(final Item val) {
     for(int i = 0; i < size; i++) {
       if(val.apprContains(new Literal(data.atom(nodes[i])))) return true;
-    }
-    return false;
-  }
-
-  @Override
-  public boolean contains(final Item val) {
-    final byte[] qu = val.str();
-    
-    for(int i = 0; i < size; i++) {
-      if(Token.ftcontains(data.atom(nodes[i]), qu)) return true;
-    }
-    return false;
-  }
-
-  /**
-   * inverse ftcontains (this NodeSet is the argument to val.ftcontains).
-   * @param val value to contain one of these nodes
-   * @return whether val ftcontains one of the node-values in this set
-   */
-  public boolean ftcontainedin(final Item val) {
-    for(int i = 0; i < size; i++) {
-      if(val.contains(new Literal(data.atom(nodes[i])))) return true;
     }
     return false;
   }

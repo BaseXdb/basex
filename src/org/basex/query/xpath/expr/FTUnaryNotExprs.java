@@ -20,7 +20,7 @@ public final class FTUnaryNotExprs extends FTArrayExpr {
    * Constructor.
    * @param e operands joined with the mild not operator
    */
-  public FTUnaryNotExprs(final Expr[] e) {
+  public FTUnaryNotExprs(final FTArrayExpr[] e) {
     exprs = e;
   }
 
@@ -48,16 +48,6 @@ public final class FTUnaryNotExprs extends FTArrayExpr {
     return null;  
   }
 
-  @Override
-  public Expr compile(final XPContext ctx) throws QueryException {
-    final int el = exprs.length;
-    for(int e = 0; e != el; e++) exprs[e] = exprs[e].compile(ctx);
-    return this;
-  }
-  
-  
-  
-  
   /**
    * Each result wordA, is not allowed to be contained in result wordB.
    *

@@ -56,9 +56,7 @@ public class Set {
   public final int delete(final byte[] key) {
     final int p = Token.hash(key) & bucket.length - 1;
     for(int id = bucket[p]; id != 0; id = next[id]) {
-      System.out.println("ID: " + id);
       if(Token.eq(key, keys[id])) {
-        System.out.println("DELETE");
         if(bucket[p] == id) bucket[p] = next[id];
         else next[id] = next[next[id]];
         keys[id] = null;

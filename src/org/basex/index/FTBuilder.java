@@ -28,9 +28,8 @@ public final class FTBuilder extends Progress implements IndexBuilder {
   private int id;
   /** Current parsing value. */
   private int total;
-  /** Hash structure for saving the tonkes temporary. */
+  /** Hash structure for temporarily saving the tokens. */
   private FZHash hash;
-  
   
   /**
    * Builds the index structure and returns an index instance.
@@ -40,12 +39,12 @@ public final class FTBuilder extends Progress implements IndexBuilder {
    */
   public WordsCTANew build(final Data data) throws IOException {
     data.meta.fcompress = Prop.fcompress;
-    wp.sens = data.meta.ftcs;
+    wp.cs = data.meta.ftcs;
     int s = 0;
     index = new CTArrayNew(128, data.meta.ftcs);
     index.bl |= data.meta.filesize > 1073741824;
     if(index.bl) {
-      if (wp.sens) {
+      if (wp.cs) {
         // bulk loader doesn't support case sensitivity
         index.bl = false; 
       } else hash = new FZHash();

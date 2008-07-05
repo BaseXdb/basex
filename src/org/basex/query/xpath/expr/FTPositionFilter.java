@@ -1,5 +1,6 @@
 package org.basex.query.xpath.expr;
 
+import org.basex.query.FTPos;
 import org.basex.query.xpath.values.Num;
 
 /**
@@ -9,81 +10,27 @@ import org.basex.query.xpath.values.Num;
  * @author Christian Gruen
  */
 public final class FTPositionFilter {
-  /** Cardinality Selection. */
-  public enum CARDSEL {
-    /** count occurence */ FTTIMES
-  };
-  
-  /** Position filter enumeration. */
-  public enum POSFILTER {
-    /** Ordered selection. */ ORDERED,
-    /** Windows selection.   */ WINDOW,
-    /** Distance selection.   */ DISTANCE,
-    /** Scope selection.   */ SCOPE,
-    /** Content selection. */ CONTENT;
-  };
-  
-  /** Scope enumeration. */
-  public enum SCOPE {
-    /** same */ SAME,
-    /** different */ DIFFERENT;
-  }
-  
-  /** Range enumeration */
-  public enum RANGE {
-    /** exactly */ EXACTLY,
-    /** at least */ ATLEAST,
-    /** at most */ ATMOST,
-    /** from to */ FROMTO;
-  }
+  /** Position filter. */
+  public FTPos pos;
+  /** Window occurrences. */
+  public Num window;
+  /** Distances. */
+  public long[] dist;
 
-  /** Unit enumeration for PosFilter Expressions. */ 
-  public enum UNIT {
-    /** words */ WORDS,
-    /** sentences */ SENTENCES,
-    /** paragraphs */ PARAGRAPHS;
-  }
-
-  /** Unit enumeration for PosFilter Expressions. */ 
-  public enum BIGUNIT {
-    /** sentences */ SENTENCE,
-    /** paragraphs */ PARAGRAPH;
-  }
-
-  
-  /** Content enumeration for PosFilter Expressions. */
-  public enum CONTENT {
-    /** at start */ ATSTART,
-    /** at end */ ATEND,
-    /** entire content */ ENTIRECONTENT;
+  /**
+   * Constructor.
+   * @param p position filter
+   */
+  public FTPositionFilter(final FTPos p) {
+    pos = p;
   }
   
-  
-  /** Case sensitivity enumeration. */
-  public enum WILD {
-    /** Using wildcards. */ WITH,
-    /** No wildcards.    */ WITHOUT;
-  };
-  
-  /** Wildcard search (default: without wildcards). */ 
-  public WILD ftWild = WILD.WITHOUT;
-  /** Position Filter (default: without filters). */
-  public POSFILTER ftPosFilt; 
-  /** Use for lowerbound in posfilter expression. */
-  public Num from;
-  /** use for upperbound in posfilter expression. */
-  public Num to;
-  /** Unit for Position Filter with distance. */
-  public UNIT ftUnit;
-  /** BigUnit for Position Filter with distance. */
-  public BIGUNIT ftBigUnit;
-    /** Range for Position Filter with range. */
-  public RANGE ftRange;
-  /** Scope for Position Filter. */
-  public SCOPE ftScope;
-  /** Content for Position Filter. */
-  public CONTENT ftContent;
-  /** Cardinality Selection in ftcontains expression. */
-  public CARDSEL ftTimes;
+  @Override
+  protected FTPositionFilter clone() {
+    try {
+      return (FTPositionFilter) super.clone();
+    } catch(final CloneNotSupportedException e) {
+      return null;
+    }
+  }
 }
-

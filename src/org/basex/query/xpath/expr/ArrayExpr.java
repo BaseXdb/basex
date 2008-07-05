@@ -11,7 +11,7 @@ import org.basex.util.TokenBuilder;
  */
 public abstract class ArrayExpr extends Expr {
   /** Array with arguments. */
-  public Expr[] exprs;
+  protected Expr[] exprs;
 
   @Override
   public final boolean usesPos() {

@@ -42,19 +42,19 @@ public final class Equality extends Comparison {
     expr1 = expr1.compile(ctx);
     expr2 = expr2.compile(ctx);
 
-    if(expr1 instanceof Item && ((Item) expr1).size() == 0 ||
-       expr2 instanceof Item && ((Item) expr2).size() == 0) {
-
+    final Item i1 = expr1 instanceof Item ? (Item) expr1 : null;
+    final Item i2 = expr2 instanceof Item ? (Item) expr2 : null;
+    if(i1 != null && i1.size() == 0 || i2 != null && i2.size() == 0) {
       ctx.compInfo(OPTEQ1);
       return Bool.FALSE;
     }
 
-    XPOptimizer.addText(expr1, ctx);
-    XPOptimizer.addText(expr2, ctx);
-
-    if(expr1 instanceof Item && expr2 instanceof Item) {
+    if(i1 != null && i2 != null) {
       ctx.compInfo(OPTEQ2);
-      return Bool.get(type.eval((Item) expr1, (Item) expr2));
+      return Bool.get(type.eval(i1, i2));
+    } else {
+      XPOptimizer.addText(expr1, ctx);
+      XPOptimizer.addText(expr2, ctx);
     }
     return this;
   }
@@ -65,8 +65,7 @@ public final class Equality extends Comparison {
     final byte[] lit = ((Literal) expr2).str();
     final LocPath inv = path.invertPath(curr);
 
-    ctx.compInfo(indexType == Index.TYPE.TXT ? OPTINDEX :
-      indexType == Index.TYPE.ATV ? OPTATTINDEX : OPTWORDINDEX);
+    ctx.compInfo(indexType == Index.TYPE.TXT ? OPTINDEX : OPTATTINDEX);
     if(indexType == Index.TYPE.ATV) {
       inv.steps.add(0, Axis.create(Axis.SELF, path.steps.last().test));
     }
@@ -78,17 +77,14 @@ public final class Equality extends Comparison {
 
   @Override
   public int indexSizes(final XPContext ctx, final Step curr, final int min) {
-    // check which expression is a location path
+    // check if first expression is a location path
     if(!(expr1 instanceof LocPath)) return Integer.MAX_VALUE;
 
     // check which index can be applied
     indexType = ((LocPath) expr1).indexable(ctx, expr2, type);
     if(indexType == null) return Integer.MAX_VALUE;
 
-    // skip too long tokens
-    final byte[] token = ((Literal) expr2).str();
-
-    final int nrIDs = ctx.local.data.nrIDs(indexType, token);
-    return nrIDs < min ? nrIDs : Integer.MAX_VALUE;
+    // return number of expected index results
+    return ctx.local.data.nrIDs(indexType, ((Literal) expr2).str());
   }
 }

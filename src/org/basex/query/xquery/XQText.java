@@ -502,11 +502,11 @@ public interface XQText {
   // OPTIMIZATIONS
 
   /** Compiler info. */
-  String OPTPREEVAL = "pre-evaluating %";
+  String OPTPREEVAL = "Pre-evaluating %";
   /** Compiler info. */
-  String OPTCAST = "casting %";
+  String OPTCAST = "Casting %";
   /** Compiler info. */
-  String OPTDESC = "merging descendant-or-self step(s)";
+  String OPTDESC = "Merging descendant-or-self step(s)";
 
   /** Evaluation info. */
   String EVALSKIP = "rest of output skipped...";

@@ -20,7 +20,7 @@ public final class FTUnaryNot extends FTArrayExpr {
    * Constructor.
    * @param e expressions
    */
-  public FTUnaryNot(final Expr[] e) {
+  public FTUnaryNot(final FTArrayExpr[] e) {
     exprs = e;
   }
 
@@ -39,21 +39,21 @@ public final class FTUnaryNot extends FTArrayExpr {
   }
 
   @Override
-  public Expr compile(final XPContext ctx) throws QueryException {
+  public FTArrayExpr compile(final XPContext ctx) throws QueryException {
     for(int i = 0; i != exprs.length; i++) {
-      if (fto != null && exprs[i] instanceof FTArrayExpr) {
-        FTArrayExpr ftae = (FTArrayExpr) exprs[i];
-        if (ftae.fto == null) ftae.fto = fto;
+      if (fto != null) {
+        if (exprs[i].fto == null) exprs[i].fto = fto;
       }
       exprs[i] = exprs[i].compile(ctx);
-    }    return this;
-   }
+    }
+    return this;
+  }
   
   @Override
-  public Expr indexEquivalent(final XPContext ctx, final Step curr)
+  public FTArrayExpr indexEquivalent(final XPContext ctx, final Step curr)
       throws QueryException {
    
-    final Expr[] indexExprs = new Expr[exprs.length];
+    final FTArrayExpr[] indexExprs = new FTArrayExpr[exprs.length];
     
     // find index equivalents
     for(int i = 0; i != exprs.length; i++) {
@@ -67,7 +67,6 @@ public final class FTUnaryNot extends FTArrayExpr {
         ((Path) indexExprs[0]).path);*/
     // <SG> add compiler infos??
     return new FTUnaryNotExprs(indexExprs);
-    
   }
   
   @Override

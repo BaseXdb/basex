@@ -22,8 +22,6 @@ public final class Nodes implements Result {
   public int[][] ftpos;
   /** Fulltext pointer values, linking pre values and query strings. */
   public int[] ftpoin;
-  /** Fulltext search string from query. **/
-  public byte[][] ftss;
   
   /**
    * Node Set constructor.

@@ -13,6 +13,8 @@ import org.basex.util.Token;
  */
 public final class Num extends Item {
   /** Static number. */
+  public static final Num ZERO = new Num(0);
+  /** Static number. */
   public static final Num ONE = new Num(1);
   /** Precedence. */
   private static final int PREC = 3;

@@ -20,7 +20,7 @@ public final class FTTokenizer {
   /** Diacritics flag. */
   public boolean dc = Prop.ftdc;
   /** Sensitivity flag. */
-  public boolean sens = Prop.ftcs;
+  public boolean cs = Prop.ftcs;
   /** Uppercase flag. */
   public boolean uc;
   /** Lowercase flag. */
@@ -120,9 +120,19 @@ public final class FTTokenizer {
     byte[] n = substring(text, s, p);
     if(!dc) n = dc(n);
     if(uc) n = uc(n);
-    if(lc || !sens) n = lc(n);
+    if(lc || !cs) n = lc(n);
     if(stem) n = STEM.word(n);
     return n;
+  }
+  
+  /**
+   * Counts the number of tokens.
+   * @return number of tokens
+   */
+  public int count() {
+    init();
+    while(more());
+    return pos;
   }
   
   /**

@@ -8,10 +8,10 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.QueryContext;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.expr.FTOption;
 import org.basex.query.xpath.expr.FTPositionFilter;
 import org.basex.query.xpath.values.NodeSet;
 import org.basex.query.xpath.values.Item;
+import org.basex.util.FTTokenizer;
 
 /**
  * Query context.
@@ -24,10 +24,16 @@ public final class XPContext extends QueryContext {
   public NodeSet local;
   /** Leaf flag. */
   public boolean leaf;
-  /** Fulltext options. */
-  public FTOption fto;
-  /** Fulltext position filters. */
+  
+  // TODO... use fulltext flags
+  
+  /** Current fulltext item. */
+  public FTTokenizer ftitem;
+  /** Current fulltext position filter. */
   public FTPositionFilter ftpos;
+  /** Current fulltext options. */
+  //public FTOpt ftopt;
+  
   /** Reference to the root expression. */
   private Expr root;
   /** Query info counter. */

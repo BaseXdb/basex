@@ -6,7 +6,11 @@ import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.io.IO;
+import org.basex.query.FTOpt;
+import org.basex.query.FTPos;
 import org.basex.query.QueryParser;
+import org.basex.query.FTOpt.FTMode;
+import org.basex.query.FTPos.FTUnit;
 import org.basex.query.xquery.expr.And;
 import org.basex.query.xquery.expr.CAttr;
 import org.basex.query.xquery.expr.CComm;
@@ -28,7 +32,7 @@ import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.expr.FLWOR;
 import org.basex.query.xquery.expr.FLWR;
 import org.basex.query.xquery.expr.FTAnd;
-import org.basex.query.xquery.expr.FTCont;
+import org.basex.query.xquery.expr.FTContains;
 import org.basex.query.xquery.expr.FTMildNot;
 import org.basex.query.xquery.expr.FTNot;
 import org.basex.query.xquery.expr.FTOptions;
@@ -548,7 +552,7 @@ public final class XQParser extends QueryParser {
     } else {
       if(ctx.vars.get(var) != null) Err.or(VARDEFINE, var);
       check(ASSIGN);
-      ctx.vars.addGlobal(var.expr(check(exprSingle(), VARMISSING)));
+      ctx.vars.addGlobal(var.expr(check(single(), VARMISSING)));
     }
   }
 
@@ -598,7 +602,7 @@ public final class XQParser extends QueryParser {
     final Func func = new Func(new Var(name, type), args, true);
 
     ctx.fun.add(ctx, func);
-    if(!consumeWS(EXTERNAL)) func.expr = enclosedExpr(NOFUNBODY);
+    if(!consumeWS(EXTERNAL)) func.expr = enclosed(NOFUNBODY);
     ctx.vars.reset(s);
   }
 
@@ -608,11 +612,11 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr enclosedExpr(final Object[] err) throws XQException {
+  private Expr enclosed(final Object[] err) throws XQException {
     check(BRACE1);
-    final Expr expr = check(expr(), err);
+    final Expr e = check(expr(), err);
     check(BRACE2);
-    return expr;
+    return e;
   }
 
   /**
@@ -621,15 +625,15 @@ public final class XQParser extends QueryParser {
    * @throws XQException xquery exception
    */
   private Expr expr() throws XQException {
-    final Expr expr = exprSingle();
-    if(expr == null) {
+    final Expr e = single();
+    if(e == null) {
       if(qp != ql) return null;
       if(alter != null) error(); else Err.or(NOEXPR);
     }
 
-    if(!consumeWS2(COMMA)) return expr;
-    Expr[] list = { expr };
-    do list = add(list, exprSingle()); while(consumeWS2(COMMA));
+    if(!consumeWS2(COMMA)) return e;
+    Expr[] list = { e };
+    do list = add(list, single()); while(consumeWS2(COMMA));
     return new List(list);
   }
 
@@ -638,10 +642,10 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr exprSingle() throws XQException {
-    if(!consumeWS2(TRY)) return exprSingle2();
+  private Expr single() throws XQException {
+    if(!consumeWS2(TRY)) return single2();
 
-    final Expr tr = enclosedExpr(NOENCLEXPR);
+    final Expr tr = enclosed(NOENCLEXPR);
     check(CATCH);
     check(PAR1);
     final int s = ctx.vars.size();
@@ -657,7 +661,7 @@ public final class XQParser extends QueryParser {
       }
     }
     check(PAR2);
-    final Expr ct = enclosedExpr(NOENCLEXPR);
+    final Expr ct = enclosed(NOENCLEXPR);
     ctx.vars.reset(s);
     return new Try(tr, ct, var1, var2);
   }
@@ -667,14 +671,14 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr exprSingle2() throws XQException {
+  private Expr single2() throws XQException {
     alter = null;
-    Expr expr = flworExpr();
-    if(expr == null) expr = quantifiedExpr();
-    if(expr == null) expr = typeswitchExpr();
-    if(expr == null) expr = ifExpr();
-    if(expr == null) expr = orExpr();
-    return expr;
+    Expr e = flwor();
+    if(e == null) e = quantified();
+    if(e == null) e = typeswitch();
+    if(e == null) e = iff();
+    if(e == null) e = or();
+    return e;
   }
 
   /**
@@ -685,16 +689,16 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr flworExpr() throws XQException {
+  private Expr flwor() throws XQException {
     final int s = ctx.vars.size();
 
-    final ForLet[] fl = forLetClause();
+    final ForLet[] fl = forLet();
     if(fl == null) return null;
 
     Expr where = null;
     if(consumeWS(WHERE)) {
       ap = qp;
-      where = check(exprSingle(), NOWHERE);
+      where = check(single(), NOWHERE);
       alter = NOWHERE;
     }
 
@@ -714,7 +718,7 @@ public final class XQParser extends QueryParser {
       if(alter != null) error();
       Err.or(where == null ? FLWORWHERE : order == null ? FLWORORD : FLWORRET);
     }
-    final Expr ret = check(exprSingle(), NORETURN);
+    final Expr ret = check(single(), NORETURN);
     ctx.vars.reset(s);
 
     return order == null ? new FLWR(fl, where, ret) :
@@ -729,7 +733,7 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private ForLet[] forLetClause() throws XQException {
+  private ForLet[] forLet() throws XQException {
     ForLet[] fl = null;
     boolean comma = false;
 
@@ -750,7 +754,7 @@ public final class XQParser extends QueryParser {
         final Var sc = fr && consumeWS(SCORE) ? new Var(varName()) : null;
 
         check(fr ? IN : ASSIGN);
-        final Expr e = check(exprSingle(), VARMISSING);
+        final Expr e = check(single(), VARMISSING);
         ctx.vars.add(var);
 
         if(fl == null) fl = new ForLet[1];
@@ -781,7 +785,7 @@ public final class XQParser extends QueryParser {
    * @throws XQException xquery exception
    */
   private Ord[] orderSpec(final Ord[] order) throws XQException {
-    final Expr expr = exprSingle();
+    final Expr e = single();
     boolean desc = false;
     if(!consumeWS(ASCENDING)) desc = consumeWS(DESCENDING);
     boolean least = !ctx.orderGreatest.bool();
@@ -793,8 +797,8 @@ public final class XQParser extends QueryParser {
       final byte[] coll = stringLiteral();
       if(!Token.eq(URLCOLL, coll)) Err.or(INVCOLL, coll);
     }
-    if(expr.e()) return order;
-    final Ord ord = new Ord(expr, desc, least);
+    if(e.e()) return order;
+    final Ord ord = new Ord(e, desc, least);
     return order == null ? new Ord[] { ord } : Array.add(order, ord);
   }
 
@@ -803,7 +807,7 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr quantifiedExpr() throws XQException {
+  private Expr quantified() throws XQException {
     final boolean some = consumeWS(SOME, DOLLAR, NOSOME);
     if(!some && !consumeWS(EVERY, DOLLAR, NOSOME)) return null;
 
@@ -812,15 +816,15 @@ public final class XQParser extends QueryParser {
     do {
       final Var var = new Var(varName(), consumeWS(AS) ? sequenceType() : null);
       check(IN);
-      final Expr expr = check(exprSingle(), NOSOME);
+      final Expr e = check(single(), NOSOME);
       ctx.vars.add(var);
-      fl = Array.add(fl, new For(expr, var, null, null));
+      fl = Array.add(fl, new For(e, var, null, null));
     } while(consumeWS2(COMMA));
 
     check(SATISFIES);
-    final Expr expr = check(exprSingle(), NOSOME);
+    final Expr e = check(single(), NOSOME);
     ctx.vars.reset(s);
-    return new Satisfy(fl, expr, !some);
+    return new Satisfy(fl, e, !some);
   }
 
   /**
@@ -828,11 +832,11 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr typeswitchExpr() throws XQException {
+  private Expr typeswitch() throws XQException {
     if(!consumeWS(TYPESWITCH, PAR1, TYPEPAR)) return null;
 
     check(PAR1);
-    final Expr expr = check(expr(), NOTYPESWITCH);
+    final Expr e = check(expr(), NOTYPESWITCH);
     check(PAR2);
 
     Case[] list = new Case[0];
@@ -847,7 +851,7 @@ public final class XQParser extends QueryParser {
       final Var var = new Var(name, sequenceType());
       if(name != null) ctx.vars.add(var);
       check(RETURN);
-      final Expr ret = check(exprSingle(), NOTYPESWITCH);
+      final Expr ret = check(single(), NOTYPESWITCH);
       list = Array.add(list, new Case(var, ret));
       ctx.vars.reset(s);
     }
@@ -861,9 +865,9 @@ public final class XQParser extends QueryParser {
     if(name != null) ctx.vars.add(var);
     check(RETURN);
 
-    final Expr ret = check(exprSingle(), NOTYPESWITCH);
+    final Expr ret = check(single(), NOTYPESWITCH);
     ctx.vars.reset(s);
-    return new TypeSwitch(expr, list, var, ret);
+    return new TypeSwitch(e, list, var, ret);
   }
 
   /**
@@ -871,16 +875,16 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr ifExpr() throws XQException {
+  private Expr iff() throws XQException {
     if(!consumeWS(IF, PAR1, IFPAR)) return null;
     check(PAR1);
-    final Expr expr = check(expr(), NOIF);
+    final Expr e = check(expr(), NOIF);
     check(PAR2);
     if(!consumeWS(THEN)) Err.or(NOIF);
-    final Expr thn = check(exprSingle(), NOIF);
+    final Expr thn = check(single(), NOIF);
     if(!consumeWS(ELSE)) Err.or(NOIF);
-    final Expr els = check(exprSingle(), NOIF);
-    return new If(expr, thn, els);
+    final Expr els = check(single(), NOIF);
+    return new If(e, thn, els);
   }
 
   /**
@@ -888,12 +892,12 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr orExpr() throws XQException {
-    final Expr expr = andExpr();
-    if(!consumeWS(OR)) return expr;
+  private Expr or() throws XQException {
+    final Expr e = and();
+    if(!consumeWS(OR)) return e;
 
-    Expr[] list = { expr };
-    do list = add(list, andExpr()); while(consumeWS(OR));
+    Expr[] list = { e };
+    do list = add(list, and()); while(consumeWS(OR));
     return new Or(list);
   }
 
@@ -902,12 +906,12 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr andExpr() throws XQException {
-    final Expr expr = comparisonExpr();
-    if(!consumeWS(AND)) return expr;
+  private Expr and() throws XQException {
+    final Expr e = comparison();
+    if(!consumeWS(AND)) return e;
 
-    Expr[] list = { expr };
-    do list = add(list, comparisonExpr()); while(consumeWS(AND));
+    Expr[] list = { e };
+    do list = add(list, comparison()); while(consumeWS(AND));
     return new And(list);
   }
 
@@ -916,18 +920,18 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr comparisonExpr() throws XQException {
-    final Expr expr = ftContainsExpr();
-    if(expr == null) return null;
+  private Expr comparison() throws XQException {
+    final Expr e = ftContains();
+    if(e == null) return null;
 
     for(final CmpV.COMP c : CmpV.COMP.values()) if(consumeWS(c.name))
-        return new CmpV(expr, check(ftContainsExpr(), CMPEXPR), c);
+        return new CmpV(e, check(ftContains(), CMPEXPR), c);
     for(final CmpN.COMP c : CmpN.COMP.values()) if(consumeWS(c.name))
-        return new CmpN(expr, check(ftContainsExpr(), CMPEXPR), c);
+        return new CmpN(e, check(ftContains(), CMPEXPR), c);
     for(final CmpG.COMP c : CmpG.COMP.values()) if(consumeWS2(c.name))
-        return new CmpG(expr, check(ftContainsExpr(), CMPEXPR), c);
+        return new CmpG(e, check(ftContains(), CMPEXPR), c);
 
-    return expr;
+    return e;
   }
 
   /**
@@ -935,19 +939,19 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr ftContainsExpr() throws XQException {
-    final Expr expr = rangeExpr();
-    if(!consumeWS(FTCONTAINS)) return expr;
+  private Expr ftContains() throws XQException {
+    final Expr e = range();
+    if(!consumeWS(FTCONTAINS)) return e;
 
     // [CG] XQuery/FTIgnoreOption
     final Expr select = ftSelection();
     //Expr ignore = null;
     if(consumeWS2(WITHOUT) && consumeWS2(CONTENT)) {
       //ignore = unionExpr();
-      unionExpr();
+      union();
       Err.or(FTIGNORE);
     }
-    return new FTCont(expr, select);
+    return new FTContains(e, select);
   }
 
   /**
@@ -955,10 +959,10 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr rangeExpr() throws XQException {
-    final Expr expr = additiveExpr();
-    if(!consumeWS(TO)) return expr;
-    return new Range(expr, check(additiveExpr(), INCOMPLETE));
+  private Expr range() throws XQException {
+    final Expr e = additive();
+    if(!consumeWS(TO)) return e;
+    return new Range(e, check(additive(), INCOMPLETE));
   }
 
   /**
@@ -966,16 +970,16 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr additiveExpr() throws XQException {
-    Expr expr = multiplicativeExpr();
+  private Expr additive() throws XQException {
+    Expr e = multiplicative();
 
     while(true) {
       final Calc c = consume('+') ? Calc.PLUS : consume('-') ? Calc.MINUS :
         null;
       if(c == null) break;
-      expr = new Clc(expr, check(multiplicativeExpr(), CALCEXPR), c);
+      e = new Clc(e, check(multiplicative(), CALCEXPR), c);
     }
-    return expr;
+    return e;
   }
 
   /**
@@ -983,18 +987,18 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr multiplicativeExpr() throws XQException {
-    Expr expr = unionExpr();
-    if(expr == null) return null;
+  private Expr multiplicative() throws XQException {
+    Expr e = union();
+    if(e == null) return null;
 
     while(true) {
       final Calc c = consume('*') ? Calc.MULT : consumeWS(DIV) ?
         Calc.DIV : consumeWS(IDIV) ? Calc.IDIV : consumeWS(MOD) ?
         Calc.MOD : null;
       if(c == null) break;
-      expr = new Clc(expr, check(unionExpr(), CALCEXPR), c);
+      e = new Clc(e, check(union(), CALCEXPR), c);
     }
-    return expr;
+    return e;
   }
 
   /**
@@ -1002,12 +1006,12 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr unionExpr() throws XQException {
-    final Expr expr = intersectExpr();
-    if(!consumeWS(UNION) && !consumeWS2(PIPE)) return expr;
+  private Expr union() throws XQException {
+    final Expr e = intersect();
+    if(!consumeWS(UNION) && !consumeWS2(PIPE)) return e;
 
-    Expr[] list = { expr };
-    do list = add(list, intersectExpr());
+    Expr[] list = { e };
+    do list = add(list, intersect());
     while(consumeWS(UNION) || consumeWS2(PIPE));
     return new Union(list);
   }
@@ -1017,19 +1021,19 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr intersectExpr() throws XQException {
-    final Expr expr = instanceofExpr();
+  private Expr intersect() throws XQException {
+    final Expr e = instanceoff();
 
     if(consumeWS(INTERSECT)) {
-      Expr[] list = { expr };
-      do list = add(list, instanceofExpr()); while(consumeWS(INTERSECT));
+      Expr[] list = { e };
+      do list = add(list, instanceoff()); while(consumeWS(INTERSECT));
       return new InterSect(list);
     } else if(consumeWS(EXCEPT)) {
-      Expr[] list = { expr };
-      do list = add(list, instanceofExpr()); while(consumeWS(EXCEPT));
+      Expr[] list = { e };
+      do list = add(list, instanceoff()); while(consumeWS(EXCEPT));
       return new Except(list);
     } else {
-      return expr;
+      return e;
     }
   }
 
@@ -1038,11 +1042,11 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr instanceofExpr() throws XQException {
-    final Expr expr = treatExpr();
-    if(!consumeWS(INSTANCE)) return expr;
+  private Expr instanceoff() throws XQException {
+    final Expr e = treat();
+    if(!consumeWS(INSTANCE)) return e;
     check(OF);
-    return new Instance(expr, sequenceType());
+    return new Instance(e, sequenceType());
   }
 
   /**
@@ -1050,11 +1054,11 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr treatExpr() throws XQException {
-    final Expr expr = castableExpr();
-    if(!consumeWS(TREAT)) return expr;
+  private Expr treat() throws XQException {
+    final Expr e = castable();
+    if(!consumeWS(TREAT)) return e;
     check(AS);
-    return new Treat(expr, sequenceType());
+    return new Treat(e, sequenceType());
   }
 
   /**
@@ -1062,11 +1066,11 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr castableExpr() throws XQException {
-    final Expr expr = castExpr();
-    if(!consumeWS(CASTABLE)) return expr;
+  private Expr castable() throws XQException {
+    final Expr e = cast();
+    if(!consumeWS(CASTABLE)) return e;
     check(AS);
-    return new Castable(expr, simpleType());
+    return new Castable(e, simpleType());
   }
 
   /**
@@ -1074,11 +1078,11 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr castExpr() throws XQException {
-    final Expr expr = unaryExpr();
-    if(!consumeWS(CAST)) return expr;
+  private Expr cast() throws XQException {
+    final Expr e = unary();
+    if(!consumeWS(CAST)) return e;
     check(AS);
-    return new Cast(expr, simpleType());
+    return new Cast(e, simpleType());
   }
 
   /**
@@ -1086,7 +1090,7 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr unaryExpr() throws XQException {
+  private Expr unary() throws XQException {
     boolean minus = false;
     boolean found = false;
     do {
@@ -1097,7 +1101,7 @@ public final class XQParser extends QueryParser {
       } else if(consume('+')) {
         found = true;
       } else {
-        final Expr e = valueExpr();
+        final Expr e = value();
         return found ? new Unary(check(e, EVALUNARY), minus) : e;
       }
     } while(true);
@@ -1108,22 +1112,22 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr valueExpr() throws XQException {
+  private Expr value() throws XQException {
     final boolean lax = consumeWS(VALIDATE, LAX, NOVALIDATE);
-    if(lax || consumeWS(VALIDATE, STRICT, NOVALIDATE)) validateExpr();
+    if(lax || consumeWS(VALIDATE, STRICT, NOVALIDATE)) validate();
 
-    final Expr expr = pathExpr();
-    return expr != null ? expr : extensionExpr();
+    final Expr e = path();
+    return e != null ? e : extension();
   }
 
   /**
    * [ 63] Parses a ValidateExpr.
    * @throws XQException xquery exception
    */
-  private void validateExpr() throws XQException {
+  private void validate() throws XQException {
     if(!consumeWS2(LAX)) consumeWS2(STRICT);
     check(BRACE1);
-    check(exprSingle(), NOVALIDATE);
+    check(single(), NOVALIDATE);
     check(BRACE2);
     Err.or(IMPLVAL);
   }
@@ -1133,7 +1137,7 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr extensionExpr() throws XQException {
+  private Expr extension() throws XQException {
     if(!consumeWS2(PRAGMA)) return null;
 
     do {
@@ -1154,7 +1158,7 @@ public final class XQParser extends QueryParser {
       qp += 2;
     } while(consumeWS(PRAGMA));
 
-    return enclosedExpr(NOPRAGMA);
+    return enclosed(NOPRAGMA);
   }
 
   /**
@@ -1163,10 +1167,10 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr pathExpr() throws XQException {
+  private Expr path() throws XQException {
     final int s = consume('/') ? consume('/') ? 2 : 1 : 0;
 
-    final Expr ex = stepExpr();
+    final Expr ex = step();
     if(ex == null) {
       if(s > 1) Err.or(PATHMISS);
       return s == 0 ? null : new Root();
@@ -1184,7 +1188,7 @@ public final class XQParser extends QueryParser {
       do {
         if(consume('/')) list = add(list, new Step(Axis.DESCORSELF,
             Test.NODE, new Expr[0]));
-        list = add(list, check(stepExpr(), PATHMISS));
+        list = add(list, check(step(), PATHMISS));
       } while(consume('/'));
     }
     return new Path(s > 0 ? new Root() : ex, list);
@@ -1195,9 +1199,9 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr stepExpr() throws XQException {
-    final Expr expr = filterExpr();
-    return expr != null ? expr : axisStep();
+  private Expr step() throws XQException {
+    final Expr e = filter();
+    return e != null ? e : axis();
   }
 
   /**
@@ -1205,7 +1209,7 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Step axisStep() throws XQException {
+  private Step axis() throws XQException {
     Axis ax = null;
     Test test = null;
 
@@ -1214,7 +1218,7 @@ public final class XQParser extends QueryParser {
       test = Test.NODE;
     } else if(consume('@')) {
       ax = Axis.ATTR;
-      test = nodeTest();
+      test = test();
     } else {
       for(final Axis a : Axis.values()) {
         if(consumeWS(a.name, COL2, NOLOCSTEP)) {
@@ -1222,14 +1226,14 @@ public final class XQParser extends QueryParser {
           alter = NOLOCSTEP;
           ap = qp;
           ax = a;
-          test = nodeTest();
+          test = test();
           break;
         }
       }
     }
     if(ax == null) {
       ax = Axis.CHILD;
-      test = nodeTest();
+      test = test();
       if(test != null && test.type == Type.ATT) ax = Axis.ATTR;
     }
     if(test == null) return null;
@@ -1249,7 +1253,7 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Test nodeTest() throws XQException {
+  private Test test() throws XQException {
     final int p = qp;
     final char ch = curr();
     if(XMLToken.isXMLLetter(ch)) {
@@ -1297,14 +1301,14 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr filterExpr() throws XQException {
-    final Expr expr = primary();
-    if(!consumeWS2(BR1)) return expr;
+  private Expr filter() throws XQException {
+    final Expr e = primary();
+    if(!consumeWS2(BR1)) return e;
 
-    if(expr == null) Err.or(PREDMISSING);
+    if(e == null) Err.or(PREDMISSING);
     Expr[] pred = {};
     do { pred = add(pred, expr()); check(BR2); } while(consumeWS2(BR1));
-    return new Pred(expr, pred);
+    return new Pred(e, pred);
   }
 
   /**
@@ -1341,13 +1345,13 @@ public final class XQParser extends QueryParser {
     if(c == '<') return constructor();
     // function calls and computed constructors
     if(letter(c)) {
-      Expr expr = functionCall();
-      if(expr != null) return expr;
-      expr = computedConstructor();
-      if(expr != null) return expr;
+      Expr e = functionCall();
+      if(e != null) return e;
+      e = computedConstructor();
+      if(e != null) return e;
       // ordered expression
       if(consumeWS(ORDERED) || consumeWS(UNORDERED))
-        return enclosedExpr(NOENCLEXPR);
+        return enclosed(NOENCLEXPR);
     }
     return null;
   }
@@ -1402,9 +1406,9 @@ public final class XQParser extends QueryParser {
    */
   private Expr parenthesized() throws XQException {
     check(PAR1);
-    final Expr expr = expr();
+    final Expr e = expr();
     check(PAR2);
-    return expr == null ? Seq.EMPTY : expr;
+    return e == null ? Seq.EMPTY : e;
   }
 
   /**
@@ -1438,7 +1442,7 @@ public final class XQParser extends QueryParser {
         return null;
       }
       if(exprs.length != 0) check(COMMA);
-      exprs = add(exprs, exprSingle());
+      exprs = add(exprs, single());
     }
     Err.or(FUNCMISS, name.str());
     return null;
@@ -1496,7 +1500,7 @@ public final class XQParser extends QueryParser {
               if(text.length != 0) {
                 attv = add(attv, Str.get(text));
               } else {
-                attv = add(attv, enclosedExpr(NOENCLEXPR));
+                attv = add(attv, enclosed(NOENCLEXPR));
                 simple = false;
               }
               tb.reset();
@@ -1547,9 +1551,9 @@ public final class XQParser extends QueryParser {
     } else {
       check('>');
       while(curr() != '<' || next() != '/') {
-        final Expr expr = dirElemContent(open);
-        if(expr == null) continue;
-        cont = add(cont, expr);
+        final Expr e = dirElemContent(open);
+        if(e == null) continue;
+        cont = add(cont, e);
       }
       qp += 2;
 
@@ -1602,7 +1606,7 @@ public final class XQParser extends QueryParser {
           consume();
         } else {
           final byte[] txt = text(tb);
-          return txt != null ? Str.get(txt) : enclosedExpr(NOENCLEXPR);
+          return txt != null ? Str.get(txt) : enclosed(NOENCLEXPR);
         }
       } else if(c == '}') {
         consume();
@@ -1712,9 +1716,9 @@ public final class XQParser extends QueryParser {
    */
   private Expr compDocConstructor() throws XQException {
     if(!consumeWS2(BRACE1)) return null;
-    final Expr expr = check(expr(), NODOCCONS);
+    final Expr e = check(expr(), NODOCCONS);
     consumeWS2(BRACE2);
-    return new CDoc(expr);
+    return new CDoc(e);
   }
 
   /**
@@ -1736,9 +1740,9 @@ public final class XQParser extends QueryParser {
     }
 
     check(BRACE1);
-    final Expr expr = expr();
+    final Expr e = expr();
     check(BRACE2);
-    return new CElem(name, expr == null ? new Expr[0] : new Expr[] { expr },
+    return new CElem(name, e == null ? new Expr[0] : new Expr[] { e },
         new FAttr[] {});
   }
 
@@ -1760,9 +1764,9 @@ public final class XQParser extends QueryParser {
     }
 
     check(BRACE1);
-    final Expr expr = expr();
+    final Expr e = expr();
     check(BRACE2);
-    return new CAttr(nm, new Expr[] { expr == null ? Seq.EMPTY : expr }, true);
+    return new CAttr(nm, new Expr[] { e == null ? Seq.EMPTY : e }, true);
   }
 
   /**
@@ -1772,9 +1776,9 @@ public final class XQParser extends QueryParser {
    */
   private Expr compTextConstructor() throws XQException {
     if(!consumeWS2(BRACE1)) return null;
-    final Expr expr = check(expr(), NOTXTCONS);
+    final Expr e = check(expr(), NOTXTCONS);
     check(BRACE2);
-    return new CText(expr);
+    return new CText(e);
   }
 
   /**
@@ -1784,9 +1788,9 @@ public final class XQParser extends QueryParser {
    */
   private Expr compCommentConstructor() throws XQException {
     if(!consumeWS2(BRACE1)) return null;
-    final Expr expr = check(expr(), NOCOMCONS);
+    final Expr e = check(expr(), NOCOMCONS);
     consumeWS2(BRACE2);
-    return new CComm(expr);
+    return new CComm(e);
   }
 
   /**
@@ -1806,10 +1810,10 @@ public final class XQParser extends QueryParser {
     }
 
     check(BRACE1);
-    Expr expr = expr();
-    if(expr == null) expr = Seq.EMPTY;
+    Expr e = expr();
+    if(e == null) e = Seq.EMPTY;
     check(BRACE2);
-    return new CPI(name, expr);
+    return new CPI(name, e);
   }
 
   /**
@@ -1922,39 +1926,40 @@ public final class XQParser extends QueryParser {
    * @throws XQException xquery exception
    */
   private Expr ftSelection() throws XQException {
-    final Expr expr = ftOr();
-    final FTSelect sel = new FTSelect(expr);
+    final Expr e = ftOr();
+    final FTPos pos = new FTPos();
+    final FTSelect sel = new FTSelect(e, pos);
 
     while(true) {
       if(consumeWS(ORDERED)) {
-        sel.ordered = true;
+        pos.ordered = true;
       } else if(consumeWS(WINDOW)) {
-        sel.window = additiveExpr();
-        sel.wunit = ftUnit();
+        sel.window = additive();
+        pos.wunit = ftUnit();
       } else if(consumeWS(DISTANCE)) {
         sel.dist = ftRange();
         if(sel.dist == null) Err.or(FTRANGE);
-        sel.dunit = ftUnit();
+        pos.dunit = ftUnit();
       } else if(consumeWS(AT)) {
-        sel.start = consumeWS(START);
-        if(!sel.start) sel.end = consumeWS(END);
-        if(!sel.start && !sel.end) Err.or(INCOMPLETE);
+        pos.start = consumeWS(START);
+        if(!pos.start) pos.end = consumeWS(END);
+        if(!pos.start && !pos.end) Err.or(INCOMPLETE);
       } else if(consumeWS(ENTIRE)) {
         check(CONTENT);
-        sel.content = true;
+        pos.content = true;
       } else {
         final boolean same = consumeWS(SAME);
         final boolean diff = !same && consumeWS(DIFFERENT);
         if(!same && !diff) break;
-        sel.same = same;
-        sel.different = diff;
-        if(consumeWS(SENTENCE)) sel.sdunit = FTSelect.Unit.SNT;
-        else if(consumeWS(PARAGRAPH)) sel.sdunit = FTSelect.Unit.PAR;
+        pos.same = same;
+        pos.different = diff;
+        if(consumeWS(SENTENCE)) pos.sdunit = FTUnit.SENTENCES;
+        else if(consumeWS(PARAGRAPH)) pos.sdunit = FTUnit.PARAGRAPHS;
         else Err.or(INCOMPLETE);
       }
     }
 
-    sel.weight = consumeWS(WEIGHT) ? rangeExpr() : Dbl.ONE;
+    sel.weight = consumeWS(WEIGHT) ? range() : Dbl.ONE;
     return sel;
   }
 
@@ -1964,10 +1969,10 @@ public final class XQParser extends QueryParser {
    * @throws XQException xquery exception
    */
   private Expr ftOr() throws XQException {
-    final Expr expr = ftAnd();
-    if(!consumeWS(FTOR)) return expr;
+    final Expr e = ftAnd();
+    if(!consumeWS(FTOR)) return e;
 
-    Expr[] list = { expr };
+    Expr[] list = { e };
     do list = add(list, ftAnd()); while(consumeWS(FTOR));
     return new FTOr(list);
   }
@@ -1978,10 +1983,10 @@ public final class XQParser extends QueryParser {
    * @throws XQException xquery exception
    */
   private Expr ftAnd() throws XQException {
-    final Expr expr = ftMildNot();
-    if(!consumeWS(FTAND)) return expr;
+    final Expr e = ftMildNot();
+    if(!consumeWS(FTAND)) return e;
 
-    Expr[] list = { expr };
+    Expr[] list = { e };
     do list = add(list, ftMildNot()); while(consumeWS(FTAND));
     return new FTAnd(list);
   }
@@ -1992,10 +1997,10 @@ public final class XQParser extends QueryParser {
    * @throws XQException xquery exception
    */
   private Expr ftMildNot() throws XQException {
-    final Expr expr = ftUnaryNot();
-    if(!consumeWS(NOT)) return expr;
+    final Expr e = ftUnaryNot();
+    if(!consumeWS(NOT)) return e;
 
-    Expr[] list = { expr };
+    Expr[] list = { e };
     do { check(IN); list = add(list, ftUnaryNot()); } while(consumeWS(NOT));
     Err.or(FTMILD);
     return new FTMildNot(list);
@@ -2008,8 +2013,8 @@ public final class XQParser extends QueryParser {
    */
   private Expr ftUnaryNot() throws XQException {
     final boolean not = consumeWS(FTNOT);
-    final Expr expr = ftPrimaryWithOptions();
-    return not ? new FTNot(expr) : expr;
+    final FTOptions e = ftPrimaryWithOptions();
+    return not ? new FTNot(e) : e;
   }
 
   /**
@@ -2017,44 +2022,41 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr ftPrimaryWithOptions() throws XQException {
-    final FTOptions opt = new FTOptions(ftPrimary());
+  private FTOptions ftPrimaryWithOptions() throws XQException {
+    final FTOpt opt = new FTOpt();
+    final FTOptions ftopt = new FTOptions(ftPrimary(), opt);
     while(ftMatchOption(opt));
-    return opt;
+    return ftopt;
   }
 
   /**
    * [FT150] Parses an FTWordsSelection.
-   * @return query expression
-   * @throws XQException xquery exception
-   */
-  private Expr ftPrimary() throws XQException {
-    if(consumeWS(PAR1)) {
-      final Expr expr = ftSelection();
-      check(PAR2);
-      return expr;
-    }
-    return ftWords();
-  }
-
-  /**
    * [FT151] Parses FTWords.
+   * [FT152] Parses an FTWordsValue.
    * [FT154] Parses FTAnyallOption.
    * [FT155] Parses FTTimes.
    * @return query expression
    * @throws XQException xquery exception
    */
-  private FTWords ftWords() throws XQException {
-    final Expr expr = ftWordsValue();
+  private Expr ftPrimary() throws XQException {
+    if(consumeWS(PAR1)) {
+      final Expr e = ftSelection();
+      check(PAR2);
+      return e;
+    }
+
+    skipWS();
+    final Expr e = quote(curr()) ? Str.get(stringLiteral()) :
+      enclosed(NOENCLEXPR);
 
     // FTAnyAllOption
-    FTWords.Mode mode = FTWords.Mode.ANY;
+    FTMode mode = FTMode.ANY;
     if(consumeWS(ALL)) {
-      mode = consumeWS(WORDS) ? FTWords.Mode.ALLWORDS : FTWords.Mode.ALL;
+      mode = consumeWS(WORDS) ? FTMode.ALLWORDS : FTMode.ALL;
     } else if(consumeWS(ANY)) {
-      mode = consumeWS(WORD) ? FTWords.Mode.ANYWORD : FTWords.Mode.ANY;
+      mode = consumeWS(WORD) ? FTMode.ANYWORD : FTMode.ANY;
     } else if(consumeWS(PHRASE)) {
-      mode = FTWords.Mode.PHRASE;
+      mode = FTMode.PHRASE;
     }
 
     // FTTimes
@@ -2064,7 +2066,7 @@ public final class XQParser extends QueryParser {
       if(occ == null) Err.or(FTRANGE);
       consumeWS(TIMES);
     }
-    return new FTWords(expr, mode, occ);
+    return new FTWords(e, mode, occ);
   }
 
   /**
@@ -2075,21 +2077,20 @@ public final class XQParser extends QueryParser {
   private Expr[] ftRange() throws XQException {
     final Expr[] occ = { Itr.get(1), Itr.get(Long.MAX_VALUE) };
     if(consumeWS(EXACTLY)) {
-      occ[0] = unionExpr();
+      occ[0] = union();
       occ[1] = occ[0];
     } else if(consumeWS(AT)) {
       if(consumeWS(LEAST)) {
-        occ[0] = unionExpr();
-        occ[1] = Itr.get(Long.MAX_VALUE);
+        occ[0] = union();
       } else {
         check(MOST);
         occ[0] = Itr.get(0);
-        occ[1] = unionExpr();
+        occ[1] = union();
       }
     } else if(consumeWS(FROM)) {
-      occ[0] = unionExpr();
+      occ[0] = union();
       check(TO);
-      occ[1] = unionExpr();
+      occ[1] = union();
     } else {
       return null;
     }
@@ -2101,22 +2102,12 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private FTSelect.Unit ftUnit() throws XQException {
-    if(consumeWS(WORDS)) return FTSelect.Unit.WRD;
-    if(consumeWS(SENTENCES)) return FTSelect.Unit.SNT;
-    if(consumeWS(PARAGRAPHS)) return FTSelect.Unit.PAR;
+  private FTUnit ftUnit() throws XQException {
+    if(consumeWS(WORDS)) return FTUnit.WORDS;
+    if(consumeWS(SENTENCES)) return FTUnit.SENTENCES;
+    if(consumeWS(PARAGRAPHS)) return FTUnit.PARAGRAPHS;
     Err.or(INCOMPLETE);
     return null;
-  }
-
-  /**
-   * [FT152] Parses an FTWordsValue.
-   * @return query expression
-   * @throws XQException xquery exception
-   */
-  private Expr ftWordsValue() throws XQException {
-    skipWS();
-    return quote(curr()) ? Str.get(stringLiteral()) : enclosedExpr(NOENCLEXPR);
   }
 
   /**
@@ -2125,25 +2116,25 @@ public final class XQParser extends QueryParser {
    * @return false if no options were found
    * @throws XQException xquery exception
    */
-  private boolean ftMatchOption(final FTOptions opt) throws XQException {
-    // [CG] XQuery/FTMatchOptions: language, thesaurus
+  private boolean ftMatchOption(final FTOpt opt) throws XQException {
+    // [CG] XQuery/FTMatchOptions: thesaurus
 
     if(consumeWS(LOWERCASE)) {
-      if(opt.lc != null || opt.uc != null || opt.cs != null) Err.or(FTCASE);
-      opt.lc = Bln.TRUE;
-      opt.cs = Bln.TRUE;
+      if(opt.lc || opt.uc || opt.cs) Err.or(FTCASE);
+      opt.lc = true;
+      opt.cs = true;
     } else if(consumeWS(UPPERCASE)) {
-      if(opt.lc != null || opt.uc != null || opt.cs != null) Err.or(FTCASE);
-      opt.uc = Bln.TRUE;
-      opt.cs = Bln.TRUE;
+      if(opt.lc || opt.uc || opt.cs) Err.or(FTCASE);
+      opt.uc = true;
+      opt.cs = true;
     } else if(consumeWS(CASE)) {
-      if(opt.lc != null || opt.uc != null || opt.cs != null) Err.or(FTCASE);
-      opt.cs = Bln.get(consumeWS(SENSITIVE));
-      if(!opt.cs.bool()) check(INSENSITIVE);
+      if(opt.lc || opt.uc || opt.cs) Err.or(FTCASE);
+      opt.cs = consumeWS(SENSITIVE);
+      if(!opt.cs) check(INSENSITIVE);
     } else if(consumeWS(DIACRITICS)) {
-      if(opt.dc != null) Err.or(FTDIA);
-      opt.dc = Bln.get(consumeWS(SENSITIVE));
-      if(!opt.dc.bool()) check(INSENSITIVE);
+      if(opt.dc) Err.or(FTDIA);
+      opt.dc = consumeWS(SENSITIVE);
+      if(!opt.dc) check(INSENSITIVE);
     } else if(consumeWS(LANGUAGE)) {
       opt.ln = lc(stringLiteral());
       if(!eq(opt.ln, EN)) Err.or(FTLAN, opt.ln);
@@ -2153,9 +2144,9 @@ public final class XQParser extends QueryParser {
       if(!with && !consumeWS(WITHOUT)) return false;
 
       if(consumeWS2(STEMMING)) {
-        opt.st = Bln.get(with);
+        opt.st = with;
       } else if(consumeWS2(THESAURUS)) {
-        opt.ts = Bln.get(with);
+        opt.ts = with;
         if(with) {
           final boolean par = consumeWS2(PAR1);
           if(consumeWS2(AT)) {
@@ -2206,11 +2197,11 @@ public final class XQParser extends QueryParser {
         check(STOP);
         check(WORDS);
       } else if(consumeWS2(WILDCARDS)) {
-        if(opt.fz != null) Err.or(FTFZWC);
-        opt.wc = Bln.get(with);
+        if(opt.fz) Err.or(FTFZWC);
+        opt.wc = with;
       } else if(consumeWS2(FUZZY)) {
-        if(opt.wc != null) Err.or(FTFZWC);
-        opt.fz = Bln.get(with);
+        if(opt.wc) Err.or(FTFZWC);
+        opt.fz = with;
       } else {
         qp = p;
         return false;

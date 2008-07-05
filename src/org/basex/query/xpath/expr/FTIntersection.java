@@ -1,6 +1,7 @@
 package org.basex.query.xpath.expr;
 
 import org.basex.core.Prop;
+import org.basex.query.FTOpt;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.values.Item;
@@ -17,50 +18,42 @@ import org.basex.util.Array;
 public final class FTIntersection extends FTArrayExpr {
   /** Flag for order preserving at intersection determination. */
   boolean pres;
-  /** Query context. */
-  public XPContext ctx;
   
   /**
    * Constructor.
    * @param e operands joined with the union operator
    * @param opres used to preserve order of query strings
-   * @param context XPathContext
    * @Deprecated
    */
-  public FTIntersection(final Expr[] e, final boolean opres, 
-      final XPContext context) {
+  public FTIntersection(final FTArrayExpr[] e, final boolean opres) {
     exprs = e;
     pres = opres;
-    ctx = context;
   }
 
   /**
    * Constructor.
    * @param e operands joined with the union operator
    * @param option FTOption with special features for the evaluation
-   * @param context XPathContext
    */
-  public FTIntersection(final Expr[] e, final FTOption option, 
-      final XPContext context) {
+  public FTIntersection(final FTArrayExpr[] e, final FTOpt option) {
     exprs = e;
     fto = option;
-    ctx = context;
   }
   
   @Override
-  public NodeSet eval(final XPContext context) throws QueryException {
+  public NodeSet eval(final XPContext ctx) throws QueryException {
     int[][] res = null;
     int[][] tmp;
     int[] pntr = null;
     Object[] o;
 
-    Item it = exprs[0].eval(context);
+    Item it = exprs[0].eval(ctx);
     if(it instanceof NodeSet) {
       res = ((NodeSet) it).ftidpos;
       pntr = ((NodeSet) it).ftpointer;
       
       for (int i = 1; i < exprs.length; i++) {
-        it = exprs[i].eval(context);
+        it = exprs[i].eval(ctx);
         if (it instanceof NodeSet) {
           tmp = ((NodeSet) it).ftidpos;
           if (pres) {
@@ -85,18 +78,11 @@ public final class FTIntersection extends FTArrayExpr {
         }
       }
       if (pres || Prop.ftdetails) {
-        return new NodeSet(Array.extractIDsFromData(res), context, res, pntr);
+        return new NodeSet(Array.extractIDsFromData(res), ctx, res, pntr);
       }
-      return new NodeSet(Array.extractIDsFromData(res), context, res);
+      return new NodeSet(Array.extractIDsFromData(res), ctx, res);
     }
     return null;
-  }
-
-  @Override
-  public Expr compile(final XPContext context) throws QueryException {
-    final int el = exprs.length;
-    for(int e = 0; e != el; e++) exprs[e] = exprs[e].compile(context);
-    return this;
   }
 
   /**

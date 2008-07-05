@@ -297,7 +297,7 @@ public final class XQFTTS {
   private boolean parse(final Nodes root) throws Exception {
     final String path = text("@FilePath", root);
     final String outname = text("@name", root);
-    String inname = text("query/@name", root);
+    String inname = text("@name", root);
     if(inname == null) inname = outname;
     if(verbose) BaseX.outln(inname);
 

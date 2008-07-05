@@ -39,8 +39,6 @@ public interface XQTokens {
   /** Parser token. */
   String DECLARE = "declare";
   /** Parser token. */
-  String DEFAULT = "default";
-  /** Parser token. */
   String DESCENDING = "descending";
   /** Parser token. */
   String DIV = "div";
@@ -56,8 +54,6 @@ public interface XQTokens {
   String ENCODING = "encoding";
   /** Parser token. */
   String EVERY = "every";
-  /** Parser token. */
-  String EXCEPT = "except";
   /** Parser token. */
   String EXTERNAL = "external";
   /** Parser token. */
@@ -128,8 +124,6 @@ public interface XQTokens {
   String TRY = "try";
   /** Parser token. */
   String TYPESWITCH = "typeswitch";
-  /** Parser token. */
-  String UNION = "union";
   /** Parser token. */
   String UNORDERED = "unordered";
   /** Parser token. */
@@ -228,8 +222,6 @@ public interface XQTokens {
   byte[] LOCAL = token("local");
   /** Language attribute. */
   byte[] LANG = token("xml:lang");
-  /** Default language. */
-  byte[] EN = token("en");
 
   // QUERY PLAN ===============================================================
   

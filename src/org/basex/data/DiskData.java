@@ -13,6 +13,7 @@ import org.basex.io.DataAccess;
 import org.basex.io.TableAccess;
 import org.basex.io.TableDiskAccess;
 import org.basex.io.TableMemAccess;
+import org.basex.util.FTTokenizer;
 import org.basex.util.Token;
 
 /**
@@ -325,19 +326,8 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public int[][] fuzzyIDs(final byte[] words, final int ne) {
-    return ftxindex.fuzzyIDs(words, ne);
-  }
-
-  @Override
-  public int[][] wildcardIDs(final byte[] tok, final int posw) {
-    return ftxindex.wildcardIDs(tok, posw);
-  }
-
-  
-  @Override
-  public int[][] ftIDs(final byte[] word, final boolean cs) {
-    return ftxindex.ftIDs(word, cs);
+  public int[][] ftIDs(final byte[] word, final FTTokenizer ft) {
+    return ftxindex.ftIDs(word, ft);
   }
 
   @Override
@@ -348,10 +338,9 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public int nrFTIDs(final byte[] token) {
-     return ftxindex.nrIDs(token);
+  public int nrFTIDs(final byte[] token, final FTTokenizer ft) {
+     return ftxindex.nrIDs(token, ft);
   }
-
 
   @Override
   public void update(final int pre, final byte[] val) {

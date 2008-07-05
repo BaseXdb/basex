@@ -40,8 +40,7 @@ public final class Range extends InternalExpr {
    * @param mn minimum value
    * @param mx maximum value
    */
-  public Range(final Expr e, final Item mn,
-      final Item mx) {
+  public Range(final Expr e, final Item mn, final Item mx) {
     expr = e;
     min = mn.num();
     max = mx.num();
@@ -77,8 +76,7 @@ public final class Range extends InternalExpr {
     final LocPath path = (LocPath) expr;
     final LocPath inv = path.invertPath(curr);
 
-    ctx.compInfo(indexType == Index.TYPE.TXT ? OPTINDEX :
-      indexType == Index.TYPE.ATV ? OPTATTINDEX : OPTWORDINDEX);
+    ctx.compInfo(indexType == Index.TYPE.TXT ? OPTINDEX : OPTATTINDEX);
     if(indexType == Index.TYPE.ATV) {
       inv.steps.add(0, Axis.create(Axis.SELF, path.steps.last().test));
     }
@@ -104,8 +102,9 @@ public final class Range extends InternalExpr {
     indexType = text ? Index.TYPE.TXT : Index.TYPE.ATV;
     getKey(path, data, text);
     
+    // if index can be applied, assume data size / 10 as costs
     return key == null || key.kind != StatsKey.Kind.DBL && key.kind !=
-      StatsKey.Kind.INT ? Integer.MAX_VALUE : 1;
+      StatsKey.Kind.INT ? Integer.MAX_VALUE : data.size / 10;
   }
   
   /**

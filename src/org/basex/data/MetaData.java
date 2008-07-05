@@ -41,8 +41,6 @@ public final class MetaData {
   /** Flag for creating a fulltext index. */
   public boolean ftxindex = Prop.ftindex;
   /** Flag for creating a fuzzy fulltext index. */
-  public boolean fzindex = Prop.fzindex;
-  /** Flag for creating a fuzzy fulltext index. */
   public boolean fcompress = Prop.fcompress;
   /** Flag for removing the index structures. */
   public boolean ftfuzzy = Prop.ftfuzzy;

@@ -69,22 +69,6 @@ public enum Comp {
     public boolean eval(final Item v1, final Item v2) {
       return v1.apprContains(v2);
     }
-  },
-  
-  /** Expression Type: contains. */
-  WORD("contains") {
-    @Override
-    public boolean eval(final Item v1, final Item v2) {
-      return v1.contains(v2);
-    }
-  },
-
-  /** Expression Type: ftcontains. */
-  FTCONTAINS("ftcontains") {
-    @Override
-    public boolean eval(final Item v1, final Item v2) {
-      return v1.contains(v2);
-    }
   };
   
   /** String representation. */

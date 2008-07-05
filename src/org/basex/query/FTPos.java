@@ -1,0 +1,260 @@
+package org.basex.query;
+
+import org.basex.util.Array;
+import org.basex.util.FTTokenizer;
+import org.basex.util.IntList;
+import org.basex.util.TokenList;
+
+/**
+ * This class contains all ftcontains positions filters. It can be used
+ * by different query implementations. After calling the {@link #valid}
+ * method, {@link #distance} and {@link #window} must be called with
+ * query specific arguments.
+ *
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Christian Gruen
+ */
+public final class FTPos {
+  /** Units. */
+  public enum FTUnit {
+    /** Word unit. */      WORDS,
+    /** Sentence unit. */  SENTENCES,
+    /** Paragraph unit. */ PARAGRAPHS
+  }
+
+  /** Ordered flag. */
+  public boolean ordered;
+  /** Start flag. */
+  public boolean start;
+  /** End flag. */
+  public boolean end;
+  /** Entire content flag. */
+  public boolean content;
+  /** Window unit. */
+  public FTUnit wunit;
+  /** Distance unit. */
+  public FTUnit dunit;
+  /** Same flag. */
+  public boolean same;
+  /** Different flag. */
+  public boolean different;
+  /** Same/different unit. */
+  public FTUnit sdunit;
+
+  /** Term list. */
+  private final TokenList term = new TokenList();
+  /** Input token. */
+  private FTTokenizer ft;
+  /** Position list. */
+  private IntList[] pos = new IntList[0];
+  /** Number of entries. */
+  private int size;
+
+  /**
+   * Initializes the select operator. Has to be called before any FTWords
+   * are performed.
+   * @param tok tokenizer for source term
+   */
+  public void init(final FTTokenizer tok) {
+    size = 0;
+    term.reset();
+    ft = tok;
+  }
+
+  /**
+   * Adds the specified fulltext term and position list. This method is
+   * called every time an FTWords test was successful.
+   * @param t term to be added
+   * @param il positions to be added
+   */
+  public void add(final byte[] t, final IntList il) {
+    if(size == pos.length) pos = Array.resize(pos, size, size + 1);
+    pos[size++] = il;
+    term.add(t);
+  }
+
+  /**
+   * Performs common position tests.
+   * @return result of check
+   */
+  public boolean valid() {
+    return ordered() && content() && same() && different();
+  }
+
+  /**
+   * Checks if the position values are ordered.
+   * @return result of check
+   */
+  private boolean ordered() {
+    if(!ordered) return true;
+
+    int c = -1;
+    int d = -1;
+    for(int i = 0; i < size; i++) {
+      for(int j = 0; j < pos[i].size; j++) {
+        d = pos[i].get(j);
+        if(c <= d) break;
+      }
+      if(c > d) return false;
+      c = d;
+    }
+    return true;
+  }
+
+  /**
+   * Checks if the start and end conditions are fulfilled.
+   * @return result of check
+   */
+  private boolean content() {
+    // ...to be revised...
+    int l = 0;
+    if(start || content) {
+      for(int i = 0; i < size; i++) {
+        boolean o = false;
+        final int ts = pos[i].size;
+        for(int j = 0; j < (ordered ? Math.min(1, ts) : ts); j++) {
+          if(pos[i].get(j) == l) {
+            l += new FTTokenizer(term.list[i]).count();
+            o = true;
+          }
+          if(ordered && !content) break;
+        }
+        if(!o) return false;
+        if(o) break;
+      }
+    }
+    if(content && l != ft.count()) return false;
+
+    if(end) {
+      final int c = ft.count();
+      for(int i = 0; i < size; i++) {
+        l += new FTTokenizer(term.list[i]).count();
+      }
+      for(int i = 0; i < size; i++) {
+        boolean o = false;
+        final int ts = pos[i].size;
+        for(int j = ordered ? Math.max(0, ts - 1) : 0; j < ts; j++) {
+          if(l + pos[i].get(j) == c) {
+            o = true;
+            break;
+          }
+          if(ordered) break;
+        }
+        if(!o) return false;
+        if(o) break;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Checks if the position values are ordered.
+   * @param mn minimum distance
+   * @param mx maximum distance
+   * @return result of check
+   */
+  public boolean distance(final long mn, final long mx) {
+    if(dunit == null) return true;
+
+    // ...to be revised...
+    int l = -1;
+    for(int i = 0; i < size; i++) {
+      boolean o = false;
+      for(int j = 0; j < pos[i].size; j++) {
+        final int p = calcPosition(pos[i].get(j), dunit);
+        final int d = Math.abs(p - l) - 1;
+        if(i == 0 || (d >= mn && d <= mx)) {
+          o = true;
+          l = p;
+          break;
+        }
+      }
+      if(!o) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Checks if the specified window is correct.
+   * @param win window value
+   * @return result of check
+   */
+  public boolean window(final long win) {
+    if(wunit == null) return true;
+
+    // ...to be revised...
+    int l = -1;
+    for(int i = 0; i < size; i++) {
+      boolean o = false;
+      for(int j = 0; j < pos[i].size; j++) {
+        final int p = calcPosition(pos[i].get(j), wunit);
+        if(i == 0 || (Math.abs(p - l) - 1 < win)) {
+          o = true;
+          l = p;
+          break;
+        }
+      }
+      if(!o) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Checks if all words are found in the same unit.
+   * @return result of check
+   */
+  private boolean same() {
+    if(!same) return true;
+
+    final IntList il = pos[0];
+    int p = -1, q = 0;
+    for(int i = 0; i < il.size && p != q; i++) {
+      p = calcPosition(il.get(i), sdunit);
+      q = p;
+      for(int j = 1; j < size && p == q; j++) {
+        for(int k = 0; k < pos[j].size; k++) {
+          q = calcPosition(pos[j].get(k), sdunit);
+          if(p == q) break;
+        }
+      }
+    }
+    return p == q;
+  }
+
+  /**
+   * Checks if all words are found in different units.
+   * @return result of check
+   */
+  private boolean different() {
+    if(!different) return true;
+
+    int l = -1;
+    for(int i = 0; i < size; i++) {
+      boolean o = false;
+      for(int j = 0; j < pos[i].size; j++) {
+        final int p = calcPosition(pos[i].get(j), sdunit);
+        if(i != 0 && p != l) {
+          o = true;
+          break;
+        }
+        l = p;
+      }
+      if(i != 0 && !o) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Calculates a position value, dependent on the specified unit.
+   * @param p word position
+   * @param u unit
+   * @return new position
+   */
+  public int calcPosition(final int p, final FTUnit u) {
+    if(u == FTUnit.WORDS) return p;
+    final FTTokenizer iter = ft;
+    iter.init();
+    while(iter.more() && iter.pos != p);
+    return u == FTUnit.SENTENCES ? iter.sent : iter.para;
+  }
+}

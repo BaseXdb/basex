@@ -381,7 +381,7 @@ public final class MapView extends View implements Runnable {
       int hh =  v ? r.h : (int) ((long) r.h * ln / nn);
 
       // paint both rectangles if enough space is left
-      if(ww > 0 && hh > 0)  calcMap(new MapRect(xx, yy, ww, hh, 0, r.l),
+      if(ww > 0 && hh > 0) calcMap(new MapRect(xx, yy, ww, hh, 0, r.l),
           l, ns, ni, first);
       if(v) {
         xx += ww;

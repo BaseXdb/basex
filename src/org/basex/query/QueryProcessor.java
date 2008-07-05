@@ -1,7 +1,6 @@
 package org.basex.query;
 
 import static org.basex.Text.*;
-import org.basex.BaseX;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.data.Nodes;
@@ -57,6 +56,12 @@ public abstract class QueryProcessor extends Progress {
   public final void compile(final Nodes nodes) throws QueryException {
     if(context == null) parse();
     context.compile(nodes);
+    try {
+      if(Prop.xmlplan) context.planXML(PLANXML);
+      if(Prop.dotplan) context.planDot(PLANDOT);
+    } catch(Exception ex) {
+      ex.printStackTrace();
+    }
     compiled = true;
   }
 
@@ -102,18 +107,8 @@ public abstract class QueryProcessor extends Progress {
   public final String getInfo() {
     final TokenBuilder tb = new TokenBuilder(context.info());
 
-    try {
-      if(Prop.xmlplan) {
-        tb.add(QUERYPLAN + NL, PLANXML);
-        context.planXML(PLANXML);
-      }
-      if(Prop.dotplan) {
-        tb.add(QUERYPLAN + NL, PLANDOT);
-        context.planDot(PLANDOT);
-      }
-    } catch(Exception ex) {
-      BaseX.debug(ex);
-    }
+    if(Prop.xmlplan) tb.add(QUERYPLAN + NL, PLANXML);
+    if(Prop.dotplan) tb.add(QUERYPLAN + NL, PLANDOT);
     
     if(Prop.allInfo) {
       tb.add(NL + QUERYSTRING);

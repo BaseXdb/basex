@@ -49,8 +49,6 @@ public abstract class View extends BaseXPanel {
   public static int[][] ftPos;
   /** Current FTPointer on FTPrePos values. **/
   public static int[] ftPoi; 
-  /** FTSearchStrings out of query. **/
-  public static byte[] ftss; 
   
   /** Popup reference. */
   public BaseXPopup popup;
@@ -87,7 +85,6 @@ public abstract class View extends BaseXPanel {
     focused = -1;
     ftPos = null;
     ftPoi = null;
-    ftss = null;
     hist = 0;
     maxhist = 0;
     for(final View v : view) v.refreshInit();

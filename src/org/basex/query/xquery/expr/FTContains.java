@@ -15,7 +15,7 @@ import org.basex.util.FTTokenizer;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class FTCont extends Arr {
+public final class FTContains extends Arr {
   /** Fulltext parser. */
   private final FTTokenizer ft = new FTTokenizer();
 
@@ -23,7 +23,7 @@ public final class FTCont extends Arr {
    * Constructor.
    * @param ex contains, select and optional ignore expression
    */
-  public FTCont(final Expr... ex) {
+  public FTContains(final Expr... ex) {
     super(ex);
   }
 
@@ -41,7 +41,6 @@ public final class FTCont extends Arr {
       d = Scoring.and(d, it.dbl());
     }
     ctx.ftitem = tmp;
-    //return d == 0 ? Iter.EMPTY : new Bln(true, d).iter();
     return new Bln(d != 0, d).iter();
   }
 

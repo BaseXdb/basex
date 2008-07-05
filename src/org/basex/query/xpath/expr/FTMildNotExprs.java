@@ -19,7 +19,7 @@ public final class FTMildNotExprs extends FTArrayExpr {
    * Constructor.
    * @param e operands joined with the mild not operator
    */
-  public FTMildNotExprs(final Expr[] e) {
+  public FTMildNotExprs(final FTArrayExpr[] e) {
     exprs = e;
   }
 
@@ -53,13 +53,6 @@ public final class FTMildNotExprs extends FTArrayExpr {
     return null;  
   }
 
-  @Override
-  public Expr compile(final XPContext ctx) throws QueryException {
-    final int el = exprs.length;
-    for(int e = 0; e != el; e++) exprs[e] = exprs[e].compile(ctx);
-    return this;
-  }
-  
   /**
    * Each result wordA, is not allowed to be contained in result wordB.
    * each result for wordA, that is not contained in result set wordB,

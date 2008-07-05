@@ -2,11 +2,13 @@ package org.basex.index;
 
 import static org.basex.data.DataText.*;
 import static org.basex.Text.*;
+import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.Arrays;
 import org.basex.data.Data;
 import org.basex.io.DataAccess;
 import org.basex.util.Array;
+import org.basex.util.FTTokenizer;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -75,7 +77,7 @@ public final class Values extends Index {
   }
 
   @Override
-  public int nrIDs(final byte[] tok) {
+  public int nrIDs(final byte[] tok, final FTTokenizer ft) {
     final long pos = get(tok);
     return pos > 0 ? idxl.readNum(pos) : 0;
   }
@@ -83,6 +85,10 @@ public final class Values extends Index {
   @Override
   public int[] idRange(final double min, final boolean ge, 
       final double max, final boolean le) {
+
+    final int mx = (long) max == max ? token(max).length : 0;  
+    final boolean sl = (long) max == max && (long) min == min && 
+      token(min).length == mx;
     
     final IntList ids = new IntList();
     boolean found = false;
@@ -90,20 +96,24 @@ public final class Values extends Index {
       final int ds = idxl.readNum(idxr.read5(l * 5L));
       int pre = idxl.readNum();
       final double v = text ? data.textNum(pre) : data.attNum(pre);
-      
+        
       if(!found) {
         found = v == v;
         if(!found || v < min || v > max) continue;
       } else {
-        found = v == v;
-        if(!found) {
-          found = (text ? data.text(pre) : data.attValue(pre))[0] <= '9';
-          if(!found) break;
-          else continue;
-        } else if(v < min || v > max) {
+        if(v == v) {
+          // skip if if min, max and the current value have the same length
+          // and if current value is larger
+          if(sl && (text ? data.textLen(pre) : data.attLen(pre)) == mx &&
+              v > max) break;
+          if(v < min || v > max) continue;
+        } else {
+          // skip if all numbers have been parsed
+          if((text ? data.text(pre) : data.attValue(pre))[0] > '9') break;
           continue;
         }
       }
+      
       ids.add(pre);
       for(int d = 0; d < ds; d++) {
         pre += idxl.readNum(); 
@@ -114,7 +124,7 @@ public final class Values extends Index {
     Arrays.sort(res);
     return res;
   }
-
+  
   /**
    * Returns the id offset for the specified token or
    * 0 if the token is not found.

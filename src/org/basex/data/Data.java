@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.basex.index.Index;
 import org.basex.index.Names;
+import org.basex.util.FTTokenizer;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -318,51 +319,27 @@ public abstract class Data  {
   public final int nrIDs(final Index.TYPE type, final byte[] token) {
     if(token.length > Token.MAXLEN) return Integer.MAX_VALUE;
     switch(type) {
-      case TXT: return txtindex.nrIDs(token);
-      case ATV: return atvindex.nrIDs(token);
+      case TXT: return txtindex.nrIDs(token, null);
+      case ATV: return atvindex.nrIDs(token, null);
       default:  return Integer.MAX_VALUE;
     }
   }
-
-  /**
-   * FUZZY SEARCH
-   * Returns the indexed id references for the specified fulltext token,
-   * with respect to number of errors (ne) that are allowed to occure.
-   * 
-   * @param fulltext token to be looked up
-   * @param ne int number of errors allowed
-   * @return id array
-   */
-  public abstract int[][] fuzzyIDs(byte[] fulltext, final int ne);
   
   /**
    * Returns the indexed id references for the specified fulltext token.
    * @param fulltext token to be looked up
-   * @param cs boolean flag for case sensitive search
+   * @param ft fulltext tokenizer
    * @return id array
    */
-  public abstract int[][] ftIDs(byte[] fulltext, final boolean cs);
+  public abstract int[][] ftIDs(byte[] fulltext, final FTTokenizer ft);
 
-  /**
-   * WILDCARD SEARCH
-   * Returns the indexed id references for the specified fulltext token,
-   * with respect to the wildcard contained in the token.
-   * 
-   * @param tok token to look up
-   * @param posw int position of the wildcard in tok
-   * @return id array
-   */
- 
-  public abstract int[][] wildcardIDs(final byte[] tok, final int posw);
-  
-  
-  
   /**
    * Returns the number of indexed id references for the specified token.
    * @param token token to be looked up
+   * @param ft fulltext tokenizer
    * @return id array
    */
-  public abstract int nrFTIDs(byte[] token);
+  public abstract int nrFTIDs(byte[] token, final FTTokenizer ft);
 
   /**
    * Returns the ids for the specified range expression.

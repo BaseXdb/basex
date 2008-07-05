@@ -3,8 +3,14 @@ package org.basex.query.xpath;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.xpath.XPText.*;
 import static org.basex.util.Token.*;
+import java.io.IOException;
+import org.basex.io.IO;
+import org.basex.query.FTOpt;
+import org.basex.query.FTPos;
 import org.basex.query.QueryException;
 import org.basex.query.QueryParser;
+import org.basex.query.FTOpt.FTMode;
+import org.basex.query.FTPos.FTUnit;
 import org.basex.query.xpath.expr.And;
 import org.basex.query.xpath.expr.Calculation;
 import org.basex.query.xpath.expr.Equality;
@@ -12,13 +18,11 @@ import org.basex.query.xpath.expr.Expr;
 import org.basex.query.xpath.expr.FTAnd;
 import org.basex.query.xpath.expr.FTArrayExpr;
 import org.basex.query.xpath.expr.FTContains;
-import org.basex.query.xpath.expr.FTFuzzy;
 import org.basex.query.xpath.expr.FTMildNot;
-import org.basex.query.xpath.expr.FTOption;
 import org.basex.query.xpath.expr.FTOr;
-import org.basex.query.xpath.expr.FTPosFilter;
+import org.basex.query.xpath.expr.FTSelect;
 import org.basex.query.xpath.expr.FTPositionFilter;
-import org.basex.query.xpath.expr.FTPrimary;
+import org.basex.query.xpath.expr.FTWords;
 import org.basex.query.xpath.expr.FTUnaryNot;
 import org.basex.query.xpath.expr.Filter;
 import org.basex.query.xpath.expr.Or;
@@ -44,6 +48,8 @@ import org.basex.query.xpath.values.Item;
 import org.basex.query.xpath.values.Literal;
 import org.basex.query.xpath.values.NodeSet;
 import org.basex.query.xpath.values.Num;
+import org.basex.util.Array;
+import org.basex.util.Set;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -71,9 +77,9 @@ public final class XPParser extends QueryParser {
    */
   public XPContext parse() throws QueryException {
     try {
-      final Expr expr = parseOr();
+      final Expr e = or();
       if(qp != ql) error(QUERYEND, rest());
-      return new XPContext(expr, qu);
+      return new XPContext(e, qu);
     } catch(final QueryException ex) {
       ex.pos(this);
       throw ex;
@@ -85,20 +91,14 @@ public final class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  private Expr parseOr() throws QueryException {
-    final Expr e = parseAnd();
+  private Expr or() throws QueryException {
+    final Expr e = and();
     consumeWS();
     if(!consume(OR)) return e;
 
-    // initialize list for all or'd expressions
-    final ExprList exprs = new ExprList();
-    // add initial two operands
-    exprs.add(e);
-    exprs.add(parseAnd());
-    // search for further operands
-    while(consume(OR)) exprs.add(parseAnd());
-    // return OrExpr
-    return new Or(exprs.get());
+    Expr[] list = { e };
+    do list = add(list, and()); while(consume(OR));
+    return new Or(list);
   }
 
   /**
@@ -106,20 +106,14 @@ public final class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  private Expr parseAnd() throws QueryException {
-    final Expr e = parseEquality();
+  private Expr and() throws QueryException {
+    final Expr e = equality();
     consumeWS();
     if(!consume(AND)) return e;
 
-    // initialize list for all and'd expressions
-    final ExprList exprs = new ExprList();
-    // add initial two operands
-    exprs.add(e);
-    exprs.add(parseEquality());
-    // search for further operands
-    while(consume(AND)) exprs.add(parseEquality());
-    // return ANDExpr
-    return new And(exprs.get());
+    Expr[] list = { e };
+    do list = add(list, equality()); while(consume(AND));
+    return new And(list);
   }
 
   /**
@@ -127,15 +121,15 @@ public final class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  private Expr parseEquality() throws QueryException {
-    Expr e = parseRelational();
+  private Expr equality() throws QueryException {
+    Expr e = relational();
     consumeWS();
 
     while(true) {
-      final Comp expr = cmp(new Comp[] {
-          Comp.WORD, Comp.EQ, Comp.NE, Comp.APPRWORD, Comp.APPR });
-      if(expr == null) return e;
-      e = new Equality(e, parseRelational(), expr);
+      final Comp c = cmp(new Comp[] {
+          Comp.EQ, Comp.NE, Comp.APPRWORD, Comp.APPR });
+      if(c == null) return e;
+      e = new Equality(e, relational(), c);
     }
   }
 
@@ -144,14 +138,14 @@ public final class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  private Expr parseRelational() throws QueryException {
-    Expr e = parseFTContains();
+  private Expr relational() throws QueryException {
+    Expr e = ftContains();
     consumeWS();
 
     while(true) {
-      final Comp expr = cmp(new Comp[] { Comp.LE, Comp.LT, Comp.GE, Comp.GT });
-      if(expr == null) return e;
-      e = new Relational(e, parseFTContains(), expr);
+      final Comp c = cmp(new Comp[] { Comp.LE, Comp.LT, Comp.GE, Comp.GT });
+      if(c == null) return e;
+      e = new Relational(e, ftContains(), c);
     }
   }
 
@@ -166,35 +160,32 @@ public final class XPParser extends QueryParser {
   }
 
   /**
-   * Parses an FTWords.
+   * Parses an FTContainsExpr.
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  private Expr parseFTWords() throws QueryException {
-    if(curr('"') || curr('\'')) return parseLiteral();
-    
+  private Expr ftContains() throws QueryException {
+    final Expr e = additive();
     consumeWS();
-    /*
-    if (curr('f')) return  parseFTOr();
-    else if (curr('o')) return parseFTTimes();
-      return error(WRONGTEXT, "quote", (char) curr());
-    */
-    return curr('f') ? parseFTOr() : error(WRONGTEXT, QUOTE, curr());
+    if(!consume(FTCONTAINS)) return e;
+
+    consumeWS();
+    return new FTContains(e, ftSelection());
   }
- 
+
   /**
    * Parses an AdditiveExpr.
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  private Expr parseAdditive() throws QueryException {
-    Expr e = parseMultiplicative();
+  private Expr additive() throws QueryException {
+    Expr e = multiplicative();
     consumeWS();
 
     while(true) {
-      final Calc expr = calc(new Calc[] { Calc.PLUS, Calc.MINUS });
-      if(expr == null) return e;
-      e = new Calculation(e, parseMultiplicative(), expr);
+      final Calc c = calc(new Calc[] { Calc.PLUS, Calc.MINUS });
+      if(c == null) return e;
+      e = new Calculation(e, multiplicative(), c);
     }
   }
 
@@ -203,14 +194,14 @@ public final class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  private Expr parseMultiplicative() throws QueryException {
-    Expr e = parseUnary();
+  private Expr multiplicative() throws QueryException {
+    Expr e = unary();
     consumeWS();
 
     while(true) {
-      final Calc expr = calc(new Calc[] { Calc.MULT, Calc.DIV, Calc.MOD });
-      if(expr == null) return e;
-      e = new Calculation(e, parseUnary(), expr);
+      final Calc c = calc(new Calc[] { Calc.MULT, Calc.DIV, Calc.MOD });
+      if(c == null) return e;
+      e = new Calculation(e, unary(), c);
     }
   }
 
@@ -229,12 +220,12 @@ public final class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  private Expr parseUnary() throws QueryException {
+  private Expr unary() throws QueryException {
     Expr e = null;
     consumeWS();
 
-    while(consume('-')) e = new Unary(parseUnary());
-    return e != null ? e : parseUnion();
+    while(consume('-')) e = new Unary(unary());
+    return e != null ? e : union();
   }
 
   /**
@@ -242,26 +233,14 @@ public final class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  private Expr parseUnion() throws QueryException {
-    final Expr e = parsePath();
+  private Expr union() throws QueryException {
+    final Expr e = path();
     consumeWS();
     if(!consume('|')) return e;
-    
-    // initialize list for all and'd expressions
-    final ExprList exprs = new ExprList();
-    // add initial two operands
-    checkNodesReturned(e);
-    exprs.add(e);
-    Expr tmp = parsePath();
-    checkNodesReturned(tmp);
-    exprs.add(tmp);
-    // search for further operands
-    while(consume('|')) {
-      tmp = parsePath();
-      checkNodesReturned(tmp);
-      exprs.add(tmp);
-    }
-    return new Union(exprs.get());
+
+    Expr[] list = { nodeCheck(e) };
+    do list = add(list, nodeCheck(path())); while(consume('|'));
+    return new Union(list);
   }
 
   /**
@@ -269,12 +248,12 @@ public final class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  private Expr parsePath() throws QueryException {
+  private Expr path() throws QueryException {
     consumeWS();
 
     // simple LocationPath cases
     final char c = curr();
-    if(c == '@' || c == '*' || c == '.' || c == '/') return parseLocPath();
+    if(c == '@' || c == '*' || c == '.' || c == '/') return locPath();
 
     // other possible LocationPath cases
     final int p = qp;
@@ -285,21 +264,21 @@ public final class XPParser extends QueryParser {
     if(name.length() != 0 && (curr() != '(' || name.equals(NODE) ||
         name.equals(TEXT) || name.equals(COMMENT) || name.equals(PI))) {
       qp = p;
-      return parseLocPath();
+      return locPath();
     }
-    
+
     qp = p;
 
-    final Expr e = parseFilter();
+    final Expr e = filter();
     consumeWS();
     if(!consume('/')) return e;
-    
-    checkNodesReturned(e);
+
+    nodeCheck(e);
     final LocPath path = new LocPathRel();
     if(consume('/')) {
       path.steps.add(Axis.create(Axis.DESCORSELF, TestNode.NODE));
     }
-    return new Path(e, parseRelLocPath(path));
+    return new Path(e, relLocPath(path));
   }
 
   /**
@@ -307,9 +286,9 @@ public final class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  private LocPath parseLocPath() throws QueryException {
-    return curr('/') ? parseAbsLocPath(new LocPathAbs()) :
-      parseRelLocPath(new LocPathRel());
+  private LocPath locPath() throws QueryException {
+    return curr('/') ? absLocPath(new LocPathAbs()) :
+      relLocPath(new LocPathRel());
   }
 
   /**
@@ -318,12 +297,12 @@ public final class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  private LocPath parseAbsLocPath(final LocPath path) throws QueryException {
+  private LocPath absLocPath(final LocPath path) throws QueryException {
     boolean more = false;
     while(consume('/')) {
       final char c = curr();
       if(c != 0 && c != ' ' && c != ']' && c != ')' && c != '|' && c != ',') {
-        path.steps.add(parseStep());
+        path.steps.add(step());
         more = true;
       } else if(more) {
         error(NOLOCSTEP);
@@ -338,9 +317,9 @@ public final class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  private LocPath parseRelLocPath(final LocPath path) throws QueryException {
-    path.steps.add(parseStep());
-    while(consume('/')) path.steps.add(parseStep());
+  private LocPath relLocPath(final LocPath path) throws QueryException {
+    path.steps.add(step());
+    while(consume('/')) path.steps.add(step());
     return path;
   }
 
@@ -349,7 +328,7 @@ public final class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  private Step parseStep() throws QueryException {
+  private Step step() throws QueryException {
     if(curr('/')) {
       final char c = next();
       if(letter(c) || c == '@' || c == '*' || c == '.') {
@@ -386,8 +365,8 @@ public final class XPParser extends QueryParser {
       axis = Axis.CHILD;
       nodetest = new TestName(true);
     } else if(letter(curr())) {
-      axis = parseAxis();
-      nodetest = parseNodeTest(axis);
+      axis = axis();
+      nodetest = test(axis);
     } else {
       error(NOLOCSTEP);
     }
@@ -395,7 +374,7 @@ public final class XPParser extends QueryParser {
     final Preds preds = new Preds();
     consumeWS();
     while(curr('[')) {
-      preds.add(parsePred());
+      preds.add(pred());
       consumeWS();
     }
 
@@ -408,7 +387,7 @@ public final class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  private Test parseNodeTest(final Axis axis) throws QueryException {
+  private Test test(final Axis axis) throws QueryException {
     final String test = name();
 
     // all elements/attributes
@@ -457,7 +436,7 @@ public final class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  private Axis parseAxis() throws QueryException {
+  private Axis axis() throws QueryException {
     // AxisName '::' or default axis (child)
     final String name = name();
 
@@ -478,11 +457,11 @@ public final class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  private Expr parsePred() throws QueryException {
+  private Expr pred() throws QueryException {
     consume('[');
-    final Expr p = parseOr();
-    return consume(']') ? p : p instanceof FTContains ? error(FTINCOMP)
-        : error(UNFINISHEDPRED);
+    final Expr p = or();
+    return consume(']') ? p : p instanceof FTContains ? error(FTINCOMP) :
+      error(UNFINISHEDPRED);
   }
 
   /**
@@ -490,13 +469,13 @@ public final class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  private Expr parseFilter() throws QueryException {
-    Expr e = parsePrimary();
+  private Expr filter() throws QueryException {
+    Expr e = primary();
     consumeWS();
     while(curr('[')) {
-      checkNodesReturned(e);
+      nodeCheck(e);
       final Preds preds = new Preds();
-      preds.add(parsePred());
+      preds.add(pred());
       e = new Filter(e, preds);
     }
     return e;
@@ -507,16 +486,16 @@ public final class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  private Expr parsePrimary() throws QueryException {
+  private Expr primary() throws QueryException {
     consumeWS();
-    if(consume('$')) return parseVarReference();
+    if(consume('$')) return varReference();
     if(consume('(')) {
-      final Expr e = parseOr();
+      final Expr e = or();
       return consume(')') ? e : error(NOPARENTHESIS);
     }
-    if(curr('"') || curr('\'')) return parseLiteral();
-    if(digit(curr())) return parseNumber();
-    return parseFunction();
+    if(curr('"') || curr('\'')) return literal();
+    if(digit(curr())) return number();
+    return function();
   }
 
   /**
@@ -524,7 +503,7 @@ public final class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException query exception
    */
-  private Item parseVarReference() throws QueryException {
+  private Item varReference() throws QueryException {
     final String var = name();
     if(var.length() == 0) error(NOVARNAME);
     return XPathContext.get().evalVariable(token(var));
@@ -535,7 +514,7 @@ public final class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException query exception
    */
-  private Literal parseLiteral() throws QueryException {
+  private Literal literal() throws QueryException {
     final char delim = consume();
     if(!quote(delim)) error(WRONGTEXT, QUOTE, delim);
     tok.reset();
@@ -550,7 +529,15 @@ public final class XPParser extends QueryParser {
    * Parses a Number.
    * @return resulting expression
    */
-  private Item parseNumber() {
+  private Num number() {
+    return new Num(num());
+  }
+
+  /**
+   * Parses a Number.
+   * @return resulting expression
+   */
+  private double num() {
     tok.reset();
     boolean dot = true;
     boolean exp = true;
@@ -565,7 +552,7 @@ public final class XPParser extends QueryParser {
       tok.add(consume());
       curr = curr();
     }
-    return new Num(toDouble(tok.finish()));
+    return toDouble(tok.finish());
   }
 
   /**
@@ -573,22 +560,20 @@ public final class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException query exception
    */
-  private Func parseFunction() throws QueryException {
+  private Func function() throws QueryException {
     final String func = name();
     consumeWS();
     if(!consume('(')) error(UNEXPECTEDEND);
 
     // name and opening bracket found
-    final ExprList exprs = new ExprList();
-    boolean more = false;
+    Expr[] list = {};
     while(!curr(0)) {
       consumeWS();
       if(consume(')')) {
-        return XPathContext.get().getFunction(token(func), exprs.get());
+        return XPathContext.get().getFunction(token(func), list);
       }
-      if(more && !consume(',')) error(UNFINISHEDFUNC);
-      exprs.add(parseOr());
-      more = true;
+      if(list.length != 0 && !consume(',')) error(UNFINISHEDFUNC);
+      list = add(list, or());
     }
     error(UNFINISHEDFUNC);
     return null;
@@ -615,10 +600,12 @@ public final class XPParser extends QueryParser {
   /**
    * Check if the given expression evaluates to a NodeSet.
    * @param e Expression to check
+   * @return argument
    * @throws QueryException in case no NodeSet is returned
    */
-  private void checkNodesReturned(final Expr e) throws QueryException {
+  private Expr nodeCheck(final Expr e) throws QueryException {
     if(e.returnedValue() != NodeSet.class) error(NONODESET, e.toString());
+    return e;
   }
 
   /**
@@ -652,377 +639,396 @@ public final class XPParser extends QueryParser {
   }
 
   /**
-   * Parses an FTContainsExpr.
-   * @return resulting expression
-   * @throws QueryException parsing exception
-   */
-  private Expr parseFTContains() throws QueryException {
-    final Expr e = parseAdditive();
-    consumeWS();
-    if(consume("ftfuzzy")) {
-      consumeWS();
-      Literal lit = parseLiteral();
-      consumeWS();
-      //boolean fi = consume("fi".getBytes());
-      //consume("fti".getBytes());
-      //consumeWS();
-      Num error = (Num) parseNumber();
-      int ne = (int) error.num();
-      if (ne == 0) ne = 3;
-      return new FTFuzzy(e, lit, ne);
-      
-    }
-    if(!consume(FTCONTAINS)) return e;
-    //if(!context.data().meta.ftxindex) error(NOFT);
-    consumeWS();
-
-    Expr second = parseFTSelection();
-    FTContains ftc = new FTContains(e, second);
-    return ftc;
-    /*final FTOption option = new FTOption();
-
-    boolean fto = false;
-    if (second instanceof Literal) {
-      // parse optional FTTimes
-      if (curr('o')) {
-        parseFTTimes(option);
-        fto = true;
-      }
-    }*/
-  }
-    
-  /**
    * Parses a FTSelection expression.
-   * @return FTArrayExpr  
+   * @return FTArrayExpr
    * @throws QueryException parsing exception
    */
-  private Expr parseFTSelection() throws QueryException {
-    Expr e = parseFTOr();
-    // optional
-    FTPositionFilter ftps = parseFTPosFilter();
-    if (ftps != null) {
-      return new FTPosFilter(new Expr[]{e}, ftps);
-    }
-    return e;
+  private FTArrayExpr ftSelection() throws QueryException {
+    final FTArrayExpr e = ftOr();
+    return new FTSelect(e, ftPosFilter());
   }
-  
+
   /**
    * Parses an FTOr expression.
-   * @return FTArrayExpr  
+   * @return FTArrayExpr
    * @throws QueryException parsing exception
    */
-  private Expr parseFTOr() throws QueryException {
-    Expr e = parseFTAnd();
-    consumeWS();
-    
-    if (!consume(FTOR)) return e;
-    ExprList el = new ExprList();
-    el.add(e);
+  private FTArrayExpr ftOr() throws QueryException {
+    final FTArrayExpr e = ftAnd();
+    if(!consume(FTOR)) return e;
+
     consumeWS();
     if(consume(FTNOT)) error(FTNOTEXC);
-    el.add(parseFTAnd());
-    consumeWS();
-    
-    while (consume(FTOR)) {
-      consumeWS();
-      el.add(parseFTAnd());
-    }
-    
-    return new FTOr(el.get());
+
+    FTArrayExpr[] list = { e };
+    do list = add(list, ftAnd()); while(consume(FTOR));
+    return new FTOr(list);
   }
 
   /**
    * Parses an FTAnd expression.
-   * @return FTArrayExpr  
+   * @return FTArrayExpr
    * @throws QueryException parsing exception
    */
-  private Expr parseFTAnd() throws QueryException {
-    Expr e = parseFTMildNot();
-    consumeWS();
-    
-    if (!consume(FTAND)) return e;
-    consumeWS();
- 
-    ExprList el = new ExprList();
-    el.add(e);
-    el.add(parseFTMildNot());
-    consumeWS();
-    
-    while (consume(FTAND)) {
-      consumeWS();
-      el.add(parseFTMildNot());
-    }
-    
-    return new FTAnd(el.get(), false);
+  private FTArrayExpr ftAnd() throws QueryException {
+    final FTArrayExpr e = ftMildNot();
+    if(!consume(FTAND)) return e;
+
+    FTArrayExpr[] list = { e };
+    do list = add(list, ftMildNot()); while(consume(FTAND));
+    return new FTAnd(list);
   }
-  
+
   /**
    * Parses an FTMildNot expression.
-   * @return FTArrayExpr  
+   * @return FTArrayExpr
    * @throws QueryException parsing exception
    */
-  private Expr parseFTMildNot() throws QueryException {
-    Expr e = parseFTUnaryNot();
-    consumeWS();
-    
+  private FTArrayExpr ftMildNot() throws QueryException {
+    final FTArrayExpr e = ftUnaryNot();
     if(!consume(NOT)) return e;
-    consumeWS();
-    if(!consume(IN)) error(WRONGTEXT, IN, curr());
-    ExprList el = new ExprList();
-    el.add(e);
-    consumeWS();
-    if(consume(FTNOT)) error(FTNOTEXC);
-    el.add(parseFTUnaryNot());
-    consumeWS();
-    
-    while(consume(NOT)) {
+
+    FTArrayExpr[] list = { e };
+    do {
       consumeWS();
       if(!consume(IN)) error(WRONGTEXT, IN, curr());
-      consumeWS();
-      el.add(parseFTUnaryNot());
-    }
-    
-    return new FTMildNot(el.get());
+      if(consume(FTNOT)) error(FTNOTEXC);
+      list = add(list, ftUnaryNot());
+    } while(consume(NOT));
+    return new FTMildNot(list);
   }
-  
+
   /**
    * Parses an FTUnaryNot expression.
-   * @return FTArrayExpr  
+   * @return FTArrayExpr
    * @throws QueryException parsing exception
    */
-  private Expr parseFTUnaryNot() throws QueryException {
-    Expr e;
-    // optional
-    if (consume(FTNOT)) {
-      consumeWS();
-      
-      e = new FTUnaryNot(new Expr[]{parseFTPrimaryWithOptions()}); 
-      return e;
-    }
-    
-    return parseFTPrimaryWithOptions();
+  private FTArrayExpr ftUnaryNot() throws QueryException {
+    consumeWS();
+    final boolean not = consume(FTNOT);
+    consumeWS();
+    final FTArrayExpr e = ftPrimaryWithOptions();
+    return not ? new FTUnaryNot(new FTArrayExpr[] { e }) : e;
   }
-  
+
   /**
    * Parses an FTPrimaryWithOptions expression.
-   * @return FTArrayExpr  
+   * @return FTArrayExpr
    * @throws QueryException parsing exception
    */
-  private Expr parseFTPrimaryWithOptions() throws QueryException {
-    Expr e = parseFTPrimary();
-    FTOption fto = new FTOption();
-    parseFTMatchOption(fto);
-    if (e instanceof FTArrayExpr)
-      ((FTArrayExpr) e).fto = fto;
+  private FTArrayExpr ftPrimaryWithOptions() throws QueryException {
+    final FTArrayExpr e = ftPrimary();
+    e.fto = new FTOpt();
+    ftMatchOption(e.fto);
     return e;
-    
   }
-  
+
+  /**
+   * Parses an FTPrimary expression.
+   * @return FTPrimary expression
+   * @throws QueryException parsing exception
+   */
+  private FTArrayExpr ftPrimary() throws QueryException {
+    if(consume('(')) {
+      final FTArrayExpr e = ftSelection();
+      consumeWS();
+      if(!consume(')')) error(") expected");
+      return e;
+    }
+
+    if(curr('"') || curr('\'')) {
+      final byte[] word = literal().str();
+      consumeWS();
+
+      // FTAnyAllOption
+      FTMode mode = FTMode.ANY;
+      if(consume(ALL)) {
+        consumeWS();
+        mode = consume(WORDS) ? FTMode.ALLWORDS : FTMode.ALL;
+      } else if(consume(ANY)) {
+        consumeWS();
+        mode = consume(WORD) ? FTMode.ANYWORD : FTMode.ANY;
+      } else if(consume(PHRASE)) {
+        consumeWS();
+        mode = FTMode.PHRASE;
+      }
+      consumeWS();
+      return new FTWords(word, mode, ftTimes());
+    }
+    error("\', \" or ( expected");
+    return null;
+  }
+
   /**
    * Parses an FTMatchOption.
    * @param opt container for fulltext options
    * @throws QueryException parsing exception
    */
-  private void parseFTMatchOption(final FTOption opt) throws QueryException {
+  private void ftMatchOption(final FTOpt opt) throws QueryException {
+    // [CG] XPath/FTMatchOptions: language, thesaurus, stemming, stop words
+
     while(true) {
       consumeWS();
-      if(consume(CASE)) {
-        consumeWS();
-        if(consume(SENSITIVE))        opt.ftCasesen = true;
-        else if(consume(INSENSITIVE)) opt.ftCasesen = false;
-        else error(FTCASE);
-      } else if(consume(LOWERCASE)) {
-        opt.ftlc = true;
+      if(consume(LOWERCASE)) {
+        opt.lc = true;
+        opt.cs = true;
       } else if(consume(UPPERCASE)) {
-        opt.ftuc = true;
-      } else if(consume(WITH)) {
+        opt.uc = true;
+        opt.cs = true;
+      } else if(consume(CASE)) {
         consumeWS();
-        if(consume(WILDCARDS)) opt.ftWild = true;
+        if(consume(SENSITIVE))        opt.cs = true;
+        else if(consume(INSENSITIVE)) opt.cs = false;
+        else error(FTCASE);
+      } else if(consume(DIACRITICS)) {
+        consumeWS();
+        if(consume(SENSITIVE))        opt.dc = true;
+        else if(consume(INSENSITIVE)) opt.dc = false;
+        else error(FTDIA);
       } else if(consume(WITHOUT)) {
         consumeWS();
-        if(consume(WILDCARDS)) opt.ftWild = false;
+        if(consume(WILDCARDS)) opt.wc = false;
+        else if(consume(FUZZY)) opt.fz = false;
+        else if(consume(STEMMING)) opt.st = false;
+        else if(consume(THESAURUS)) opt.ts = false;
+        else if(consume(STOP)) {
+          if(!consume(WORDS)) error(FTSTOP);
+          opt.sw = null;
+        }
+      } else if(consume(WITH)) {
+        consumeWS();
+        if(consume(WILDCARDS)) opt.wc = true;
+        else if(consume(FUZZY)) opt.fz = true;
+        else if(consume(STEMMING)) opt.st = true;
+        else if(consume(STOP)) {
+          consumeWS();
+          if(!consume(WORDS)) error(FTSTOP);
+          opt.sw = new Set();
+          boolean union = false;
+          boolean except = false;
+          while(true) {
+            consumeWS();
+            if(consume('(')) {
+              do {
+                consumeWS();
+                final byte[] sl = literal().str();
+                if(except) opt.sw.delete(sl);
+                else if(!union || opt.sw.id(sl) == 0) opt.sw.add(sl);
+                consumeWS();
+              } while(consume(','));
+              if(!consume(')')) error(FTSTOP);
+            } else if(consume(AT)) {
+              IO fl = new IO(string(literal().str()));
+              if(!fl.exists()) error(FTSWFILE, fl);
+              try {
+                for(final byte[] sl : split(norm(fl.content()), ' ')) {
+                  if(except) opt.sw.delete(sl);
+                  else if(!union || opt.sw.id(sl) == 0) opt.sw.add(sl);
+                }
+              } catch(final IOException ex) {
+                error(FTSWFILE, fl);
+              }
+            } else if(!union && !except) {
+              error(FTSTOP);
+            }
+            consumeWS();
+            union = consume(UNION);
+            except = !union && consume(EXCEPT);
+            if(!union && !except) break;
+          }
+        } else if(consume(THESAURUS)) {
+          consumeWS();
+          opt.ts = true;
+          final boolean par = consume('(');
+          consumeWS();
+          if(consume(AT)) {
+            consumeWS();
+            ftThesaurusID();
+          } else {
+            if(!consume(DEFAULT)) error(FTTHES);
+          }
+          while(par && consume(',')) {
+            consumeWS();
+            ftThesaurusID();
+          }
+          if(par && !consume(')')) error(FTTHES);
+          error(FTTHES);
+        }
+      } else if(consume(LANGUAGE)) {
+        consumeWS();
+        opt.ln = lc(literal().str());
+        if(!eq(opt.ln, EN)) error(FTLANG, opt.ln);
+      } else if(consume(DEFAULT)) {
+        consumeWS();
+        if(!consume(STOP)) error(FTSTOP);
+        consumeWS();
+        if(!consume(WORDS)) error(FTSTOP);
       } else {
         break;
       }
     }
   }
-  
+
   /**
-   * Parses an FTPrimary expression.
-   * @return Expr  FTPrimary expression
-   * @throws QueryException parsing exception
+   * Parses an FTThesaurusID.
+   * @throws QueryException xquery exception
    */
-  private Expr parseFTPrimary() throws QueryException {
-    Expr e = null;
-    if(curr('"') || curr('\'')) {
-      e = parseFTWords();
-      consumeWS();
-      // optional
-      // parseFTAnyallOptions();
-      // optional 
-      return new FTPrimary(new Expr[] { e }, parseFTTimes());
-    } else if (consume('(')) {
-      consumeWS();
-      e = parseFTSelection();
-      consumeWS();
-      if (!consume(')')) {
-        error(") expected");
-      }
-    } else {
-        error("\', \" or ( expected");
-    }
-    return e;
+  private void ftThesaurusID() throws QueryException {
+    literal();
+    consumeWS();
+    if(consume(RELATIONSHIP)) literal();
+    consumeWS();
+    if(ftRange() != null && !consume(LEVELS)) error(FTTHES);
   }
-  
+
   /**
    * Parses an FTTimes expression.
    * @return FTPositionFilter
    * @throws QueryException parsing exception
    */
-  private FTPositionFilter parseFTTimes() throws QueryException {
-    if (consume(OCCURS)) {
+  private long[] ftTimes() throws QueryException {
+    if(consume(OCCURS)) {
       consumeWS();
-      FTPositionFilter ftps = new FTPositionFilter();
-      parseFTRange(ftps);
-      if(!consume(TIMES)) 
-        error("times expected");
-      ftps.ftTimes = FTPositionFilter.CARDSEL.FTTIMES;
+      final long[] occ = ftRange();
+      if(!consume(TIMES)) error("times expected");
       consumeWS();
-      return ftps;
+      return occ;
     }
-    return null;
+    return new long[] { 1, Long.MAX_VALUE };
   }
-  
+
   /**
    * Parses an FTRange expression.
-   * @param ftpf FTPositionFilter saves unit information
+   * @return numeric range
    * @throws QueryException parsing exception
    */
-  private void parseFTRange(final FTPositionFilter ftpf) throws QueryException {
-    if (consume(EXACTLY)) {
+  private long[] ftRange() throws QueryException {
+    final long[] occ = { 1, Long.MAX_VALUE };
+    if(consume(EXACTLY)) {
       consumeWS();
-      ftpf.to = (Num) parseNumber();
-      ftpf.from = ftpf.to;
-      ftpf.ftRange = FTPositionFilter.RANGE.EXACTLY;
+      occ[0] = (long) num();
+      occ[1] = occ[0];
       consumeWS();
     } else if(consume(AT)) {
       consumeWS();
-      if(consume(MOST)) {
+      if(consume(LEAST)) {
         consumeWS();
-        ftpf.from = new Num(0);
-        ftpf.to = (Num) parseNumber();
-        ftpf.ftRange = FTPositionFilter.RANGE.ATMOST;
+        occ[0] = (long) num();
         consumeWS();
-      } else if(consume(LEAST)) {
+      } else if(consume(MOST)) {
         consumeWS();
-        ftpf.from = (Num) parseNumber();
-        ftpf.ftRange = FTPositionFilter.RANGE.ATLEAST;
+        occ[0] = 0;
+        occ[1] = (long) num();
         consumeWS();
       } else {
         error(FTRANGE);
       }
     } else if(consume(FROM)) {
       consumeWS();
-      ftpf.from = (Num) parseNumber();
+      occ[0] = (long) num();
       consumeWS();
       if(consume(TO))  {
         consumeWS();
-        ftpf.to = (Num) parseNumber();
+        occ[1] = (long) num();
       } else {
         error(FTRANGE);
       }
-      ftpf.ftRange = FTPositionFilter.RANGE.FROMTO;
       consumeWS();
     } else {
       error(FTRANGE);
     }
+    return occ;
   }
-  
+
   /**
    * Parses an FTPositionFilter expression.
    * @return FTPositionFilter ft position filter information
    * @throws QueryException parsing exception
    */
-  private FTPositionFilter parseFTPosFilter() throws QueryException {
-    FTPositionFilter ftpf = new FTPositionFilter();
-    if (consume(ORDERED)) {
-      consumeWS();
-      // FTOrdered
-      ftpf.ftPosFilt = FTPositionFilter.POSFILTER.ORDERED;
-    } else if (consume(WINDOW)) {
-      consumeWS();
-      // FTWindow
-      ftpf.ftPosFilt = FTPositionFilter.POSFILTER.WINDOW;
-      ftpf.from = (Num) parseNumber();
-      parseFTUnit(ftpf);
-    } else if (consume(DISTANCE)) {
-      consumeWS();
-      ftpf.ftPosFilt = FTPositionFilter.POSFILTER.DISTANCE;
-      parseFTRange(ftpf);
-      parseFTUnit(ftpf);
-    } else if (consume(SAME)) {
-      consumeWS();
-      //FTScope
-      ftpf.ftPosFilt = FTPositionFilter.POSFILTER.SCOPE;
-      ftpf.ftScope = FTPositionFilter.SCOPE.SAME;
-      parseFTBigUnit(ftpf);        
-    } else if (consume(DIFFERENT)) {
-      consumeWS();
-      //FTScope
-      ftpf.ftPosFilt = FTPositionFilter.POSFILTER.SCOPE;
-      ftpf.ftScope = FTPositionFilter.SCOPE.DIFFERENT;
-      parseFTBigUnit(ftpf);
-    } else if (consume(AT) || consume(ENTIRE)) {
-      ftpf.ftPosFilt = FTPositionFilter.POSFILTER.CONTENT;
-      consumeWS();
-      if (consume(START)) {
-        ftpf.ftContent = FTPositionFilter.CONTENT.ATSTART;  
-      } else if (consume(END)) {
-        ftpf.ftContent = FTPositionFilter.CONTENT.ATEND;  
-      } else if (consume(CONTENT)) {
-        ftpf.ftContent = FTPositionFilter.CONTENT.ENTIRECONTENT;
+  private FTPositionFilter ftPosFilter() throws QueryException {
+    final FTPos pos = new FTPos();
+    final FTPositionFilter ftpos = new FTPositionFilter(pos);
+
+    while(true) {
+      if(consume(ORDERED)) { // FTOrdered
+        consumeWS();
+        pos.ordered = true;
+      } else if(consume(WINDOW)) { // FTWindow
+        consumeWS();
+        ftpos.window = number();
+        pos.wunit = ftUnit();
+      } else if(consume(DISTANCE)) { // FTDistance
+        consumeWS();
+        ftpos.dist = ftRange();
+        pos.dunit = ftUnit();
+      } else if(consume(AT)) { // FTContent
+        consumeWS();
+        if(consume(START)) pos.start = true;
+        else if(consume(END)) pos.end = true;
+        else error(FTSCOPE);
+      } else if(consume(ENTIRE)) { // FTContent
+        consumeWS();
+        if(consume(CONTENT)) pos.content = true;
+        else error(FTSCOPE);
+      } else if(consume(SAME)) { // FTScope
+        consumeWS();
+        pos.same = true;
+        pos.sdunit = ftBigUnit();
+      } else if (consume(DIFFERENT)) { // FTScope
+        consumeWS();
+        pos.different = true;
+        pos.sdunit = ftBigUnit();
       } else {
-        error(FTSCOPE);
+        break;
       }
-    } else {
-      return null;
     }
-    return ftpf;
+    return ftpos;
   }
 
   /**
    * Parses a Unit.
-   * @param ftpf FTPositionFilter saves unit information
    * @throws QueryException parsing exception
+   * @return fulltext unit
    */
-  private void parseFTUnit(final FTPositionFilter ftpf) throws QueryException {
+  private FTUnit ftUnit() throws QueryException {
     consumeWS();
-    if (consume(WORDS)) {
-      ftpf.ftUnit = FTPositionFilter.UNIT.WORDS;
-    } else if (consume(SENTENCES)) {
-      ftpf.ftUnit = FTPositionFilter.UNIT.SENTENCES;
-    } else if (consume(PARAGRAPHS)) {
-      ftpf.ftUnit = FTPositionFilter.UNIT.PARAGRAPHS;
-    } else {
-      error("words, sentences or paragraphs expected.");
-    }
+    if(consume(WORDS)) return FTUnit.WORDS;
+    if(consume(SENTENCES)) return FTUnit.SENTENCES;
+    if(consume(PARAGRAPHS)) return FTUnit.PARAGRAPHS;
+    error("words, sentences or paragraphs expected.");
+    return null;
   }
-  
-  
+
   /**
    * Parses a BigUnit.
-   * @param ftpf FTPositionFilter saves big unit information
+   * @return fulltext unit
    * @throws QueryException parsing exception
    */
-  private void parseFTBigUnit(final FTPositionFilter ftpf) 
-      throws QueryException {
+  private FTUnit ftBigUnit() throws QueryException {
     consumeWS();
-    if (consume(SENTENCE)) {
-      ftpf.ftBigUnit = FTPositionFilter.BIGUNIT.SENTENCE;
-    } else if (consume(PARAGRAPH)) {
-      ftpf.ftBigUnit = FTPositionFilter.BIGUNIT.PARAGRAPH;
-    } else {
-      error("sentece or paragraph expected.");
-    }
+    if(consume(SENTENCE)) return FTUnit.SENTENCES;
+    if(consume(PARAGRAPH)) return FTUnit.PARAGRAPHS;
+    error("sentece or paragraph expected.");
+    return null;
+  }
+
+  /**
+   * Adds an expression to the specified array.
+   * @param a input array
+   * @param e new expression
+   * @return new array
+   */
+  private static Expr[] add(final Expr[] a, final Expr e) {
+    return Array.add(a, e);
+  }
+
+  /**
+   * Adds a fulltext expression to the specified array.
+   * @param a input array
+   * @param e new expression
+   * @return new array
+   */
+  private static FTArrayExpr[] add(final FTArrayExpr[] a, final FTArrayExpr e) {
+    return Array.add(a, e);
   }
 }

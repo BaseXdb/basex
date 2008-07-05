@@ -2,7 +2,6 @@ package org.basex.query.xpath.expr;
 
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
-import org.basex.query.xpath.XPOptimizer;
 import org.basex.query.xpath.locpath.Step;
 import org.basex.query.xpath.values.Bool;
 
@@ -17,7 +16,7 @@ public final class FTMildNot extends FTArrayExpr {
    * Constructor.
    * @param e expressions
    */
-  public FTMildNot(final Expr[] e) {
+  public FTMildNot(final FTArrayExpr[] e) {
     exprs = e;
   }
 
@@ -34,22 +33,21 @@ public final class FTMildNot extends FTArrayExpr {
   }
 
   @Override
-  public Expr compile(final XPContext ctx) throws QueryException {
+  public FTArrayExpr compile(final XPContext ctx) throws QueryException {
     for(int i = 0; i != exprs.length; i++) {
-      if (fto != null && exprs[i] instanceof FTArrayExpr) {
-        FTArrayExpr ftae = (FTArrayExpr) exprs[i];
-        if (ftae.fto == null) ftae.fto = fto;
+      if (fto != null) {
+        if (exprs[i].fto == null) exprs[i].fto = fto;
       }
       exprs[i] = exprs[i].compile(ctx);
     }
     return this;
-   }
+  }
   
   @Override
-  public Expr indexEquivalent(final XPContext ctx, final Step curr)
+  public FTArrayExpr indexEquivalent(final XPContext ctx, final Step curr)
       throws QueryException {
     
-    final Expr[] indexExprs = new Expr[exprs.length];
+    final FTArrayExpr[] indexExprs = new FTArrayExpr[exprs.length];
     
     // find index equivalents
     for(int i = 0; i != exprs.length; i++) {
@@ -57,10 +55,12 @@ public final class FTMildNot extends FTArrayExpr {
       if(indexExprs[i] == null) indexExprs[i] = exprs[i];
     }
 
-    // perform path step only once if all path expressions are the same
+    /* perform path step only once if all path expressions are the same
     final Expr[] ex = XPOptimizer.getIndexExpr(indexExprs);
     if(ex != null) return new Path(new FTMildNotExprs(ex),
         ((Path) indexExprs[0]).expr2);
+    */
+    
     // <SG> add compiler infos??
     return new FTMildNotExprs(indexExprs);
   }

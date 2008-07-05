@@ -2,11 +2,11 @@ package org.basex.query.xpath.expr;
 
 import static org.basex.query.xpath.XPText.OPTOR4;
 import org.basex.query.QueryException;
-import org.basex.query.xpath.ExprList;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.locpath.PredSimple;
 import org.basex.query.xpath.locpath.Step;
 import org.basex.query.xpath.values.Bool;
+import org.basex.util.Array;
 
 /**
  * Logical FTOr expression.
@@ -19,7 +19,7 @@ public final class FTOr extends FTArrayExpr {
    * Constructor.
    * @param e expressions
    */
-  public FTOr(final Expr[] e) {
+  public FTOr(final FTArrayExpr[] e) {
     exprs = e;
   }
 
@@ -30,11 +30,10 @@ public final class FTOr extends FTArrayExpr {
   }
 
   @Override
-  public Expr compile(final XPContext ctx) throws QueryException {
+  public FTArrayExpr compile(final XPContext ctx) throws QueryException {
     for(int i = 0; i != exprs.length; i++) {
-      if (fto != null && exprs[i] instanceof FTArrayExpr) {
-        FTArrayExpr ftae = (FTArrayExpr) exprs[i];
-        if (ftae.fto == null) ftae.fto = fto;
+      if (fto != null) {
+        if (exprs[i].fto == null) exprs[i].fto = fto;
       }
       exprs[i] = exprs[i].compile(ctx);
     }
@@ -42,21 +41,21 @@ public final class FTOr extends FTArrayExpr {
    }
   
   @Override
-  public Expr indexEquivalent(final XPContext ctx, final Step curr)
+  public FTArrayExpr indexEquivalent(final XPContext ctx, final Step curr)
       throws QueryException {
    
-    Expr tmp;
-    ExprList ftun = new ExprList();
-    ExprList other = new ExprList();
+    FTArrayExpr tmp;
+    FTArrayExpr[] ftun = {};
+    FTArrayExpr[] other = {};
 
     // find index equivalents
     for(int i = 0; i != exprs.length; i++) {
       if (exprs[i] instanceof FTUnaryNot) { 
-        ftun.add(exprs[i]);
+        ftun = Array.add(ftun, exprs[i]);
       } else {
         tmp = exprs[i].indexEquivalent(ctx, curr);
         if(tmp == null) return null;
-        other.add(tmp);
+        other = Array.add(other, tmp);
       }
       /*
       tmp = exprs[i].indexEquivalent(ctx, curr);
@@ -78,19 +77,17 @@ public final class FTOr extends FTArrayExpr {
 
     
        
-    if (ftun.get().length > 0 && other.get().length > 0) {
+    if (ftun.length > 0 && other.length > 0) {
       for (int i = 0; i < curr.preds.size(); i++) {
         if (curr.preds.get(i) instanceof PredSimple) {
           PredSimple ps = (PredSimple) curr.preds.get(i);
           
           if (ps.getExpr() instanceof FTContains) {
-            Expr[] e = new Expr[ftun.get().length + 1];
-            e[0] = new FTUnion(other.get());
+            FTArrayExpr[] e = new FTArrayExpr[ftun.length + 1];
+            e[0] = new FTUnion(other);
             
-            System.arraycopy(ftun.get(), 0, e, 1, ftun.get().length);
-            Or o = new Or(e);
-            
-            System.out.println(o);
+            System.arraycopy(ftun, 0, e, 1, ftun.length);
+            //Or o = new Or(e);
           }
           
         }
@@ -98,13 +95,12 @@ public final class FTOr extends FTArrayExpr {
 
       
       
-      Expr[] e = new Expr[ftun.get().length + 1];
-      e[0] = new FTUnion(other.get());
-      
-      System.arraycopy(ftun.get(), 0, e, 1, ftun.get().length);
-      
-      return new Or(e);
+      FTArrayExpr[] e = new FTArrayExpr[ftun.length + 1];
+      e[0] = new FTUnion(other);
+      System.arraycopy(ftun, 0, e, 1, ftun.length);
+      return new FTOr(e);
     }
+    
     /*
     // perform path step only once if all path expressions are the same
     final Expr[] ex = XPOptimizer.getIndexExpr(indexExprs);
@@ -114,7 +110,7 @@ public final class FTOr extends FTArrayExpr {
      */
     // <SG> add compiler infos??
     ctx.compInfo(OPTOR4);
-    return new FTUnion(other.get());
+    return new FTUnion(other);
   }
   
   @Override

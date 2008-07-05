@@ -2,11 +2,10 @@ package org.basex.query.xquery.expr;
 
 import static org.basex.query.QueryTokens.*;
 import org.basex.data.Serializer;
+import org.basex.query.FTOpt;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
-import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.iter.Iter;
-import org.basex.util.Set;
 import org.basex.util.Token;
 
 /**
@@ -16,63 +15,32 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class FTOptions extends Single implements Cloneable {
-  /** Sensitive flag. */
-  public Bln cs;
-  /** Lowercase flag. */
-  public Bln lc;
-  /** Uppercase flag. */
-  public Bln uc;
-  /** Diacritics flag. */
-  public Bln dc;
-  /** Stemming flag (currently ignored). */
-  public Bln st;
-  /** Thesaurus flag (currently ignored). */
-  public Bln ts;
-  /** Wildcards flag. */
-  public Bln wc;
-  /** Fuzzy flag. */
-  public Bln fz;
-  /** Stopwords. */
-  public Set sw;
-  /** Language (currently ignored). */
-  public byte[] ln;
+  /** FTOptions. */
+  public FTOpt opt;
 
   /**
    * Constructor.
    * @param e expression
+   * @param o ft options
    */
-  public FTOptions(final Expr e) {
+  public FTOptions(final Expr e, final FTOpt o) {
     super(e);
+    opt = o;
   }
 
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
-    final FTOptions tmp = ctx.ftopt;
-
-    final boolean emp = tmp == null;
-    if(cs == null) cs = emp ? Bln.FALSE : tmp.cs;
-    if(lc == null) lc = emp ? Bln.FALSE : tmp.lc;
-    if(uc == null) uc = emp ? Bln.FALSE : tmp.uc;
-    if(dc == null) dc = emp ? Bln.FALSE : tmp.dc;
-    if(st == null) st = emp ? Bln.FALSE : tmp.st;
-    if(ts == null) ts = emp ? Bln.FALSE : tmp.ts;
-    if(wc == null) wc = emp ? Bln.FALSE : tmp.wc;
-    if(fz == null) fz = emp ? Bln.FALSE : tmp.fz;
-    if(sw == null) sw = emp ? null : tmp.sw;
-    if(ln == null) ln = emp ? null : tmp.ln;
-
-    if(expr != null) {
-      ctx.ftopt = this;
-      expr = expr.comp(ctx);
-      ctx.ftopt = tmp;
-    }
+    final FTOpt tmp = ctx.ftopt;
+    ctx.ftopt = opt;
+    expr = expr.comp(ctx);
+    ctx.ftopt = tmp;
     return this;
   }
 
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
-    final FTOptions tmp = ctx.ftopt;
-    ctx.ftopt = this;
+    final FTOpt tmp = ctx.ftopt;
+    ctx.ftopt = opt;
     final Iter it = ctx.iter(expr);
     ctx.ftopt = tmp;
     return it;
@@ -90,12 +58,12 @@ public final class FTOptions extends Single implements Cloneable {
   @Override
   public void plan(final Serializer ser) throws Exception {
     ser.startElement(this);
-    if(st.bool()) ser.attribute(Token.token(STEMMING), Token.TRUE);
-    if(wc.bool()) ser.attribute(Token.token(WILDCARDS), Token.TRUE);
-    if(fz.bool()) ser.attribute(Token.token(FUZZY), Token.TRUE);
-    if(dc.bool()) ser.attribute(Token.token(DIACRITICS), Token.TRUE);
-    if(uc.bool()) ser.attribute(Token.token(UPPERCASE), Token.TRUE);
-    if(lc.bool()) ser.attribute(Token.token(LOWERCASE), Token.TRUE);
+    if(opt.st) ser.attribute(Token.token(STEMMING), Token.TRUE);
+    if(opt.wc) ser.attribute(Token.token(WILDCARDS), Token.TRUE);
+    if(opt.fz) ser.attribute(Token.token(FUZZY), Token.TRUE);
+    if(opt.dc) ser.attribute(Token.token(DIACRITICS), Token.TRUE);
+    if(opt.uc) ser.attribute(Token.token(UPPERCASE), Token.TRUE);
+    if(opt.lc) ser.attribute(Token.token(LOWERCASE), Token.TRUE);
     ser.finishElement();
     expr.plan(ser);
     ser.closeElement(this);
@@ -105,12 +73,12 @@ public final class FTOptions extends Single implements Cloneable {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append(expr != null ? expr.toString() : "FTOptions");
-    if(st.bool()) sb.append(" " + WITH + " " + STEMMING);
-    if(wc.bool()) sb.append(" " + WITH + " " + WILDCARDS);
-    if(fz.bool()) sb.append(" " + WITH + " " + FUZZY);
-    if(dc.bool()) sb.append(" " + DIACRITICS + " " + SENSITIVE);
-    if(uc.bool()) sb.append(" " + UPPERCASE);
-    if(lc.bool()) sb.append(" " + LOWERCASE);
+    if(opt.st) sb.append(" " + WITH + " " + STEMMING);
+    if(opt.wc) sb.append(" " + WITH + " " + WILDCARDS);
+    if(opt.fz) sb.append(" " + WITH + " " + FUZZY);
+    if(opt.dc) sb.append(" " + DIACRITICS + " " + SENSITIVE);
+    if(opt.uc) sb.append(" " + UPPERCASE);
+    if(opt.lc) sb.append(" " + LOWERCASE);
     return sb.toString();
   }
 }

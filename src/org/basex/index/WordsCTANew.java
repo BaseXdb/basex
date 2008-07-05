@@ -5,9 +5,11 @@ import static org.basex.Text.*;
 
 import java.io.IOException;
 import org.basex.BaseX;
+import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataAccessPerf;
 import org.basex.util.Array;
+import org.basex.util.FTTokenizer;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.basex.query.xpath.expr.FTUnion;
@@ -72,70 +74,72 @@ public final class WordsCTANew extends Index {
   }
 
   @Override
-  public int[][] wildcardIDs(final byte[] tok, final int posw) {
-    if (cs) return null;
-    return getNodeFromTrieWithWildCard(tok, posw);
-  }
-  
-  @Override
-  public int[][] ftIDs(final byte[] tok, final boolean casesen) {
-    if (!cs && casesen) {
-        // case insensitive index create - check real case with dbdata
-        int[][] ids = getNodeFromTrieRecursive(0, Token.lc(tok), false);
-        if (ids == null) {
-          return null;
-        }
-        
-        byte[] tokenFromDB;
-        byte[] textFromDB;
-        int[][] rIds = new int[2][ids[0].length];
-        int count = 0;
-        int readId;
+  public int[][] ftIDs(final byte[] tok, final FTTokenizer ft) {
+    if(ft.fz) {
+      int k = Prop.lserr;
+      if(k == 0) k = Math.max(1, tok.length >> 2);
+      return getNodeFuzzy(0, null, -1, tok, 0, 0, 0, k);
+    }
 
-        int i = 0;
-        // check real case of each result node
-        while(i < ids[0].length) {
-          // get date from disk
-          readId = ids[0][i];
-          textFromDB = data.text(ids[0][i]);
-          tokenFromDB = new byte[tok.length];
-
-          System.arraycopy(textFromDB, ids[1][i], tokenFromDB, 0, tok.length);
-
-          // check unique node ones
-          while (i < ids[0].length && readId == ids[0][i]) {
-            System.arraycopy(textFromDB, ids[1][i], tokenFromDB, 0, tok.length);
-
-            readId = ids[0][i];
-
-            // check unique node ones
-            // compare token from db with token from query
-            if (Token.eq(tokenFromDB, tok)) {
-              rIds[0][count] = ids[0][i];
-              rIds[1][count++] = ids[1][i];
-
-              // jump over same ids
-              while (i < ids[0].length && readId == ids[0][i]) i++;
-              break;
-            }
-            i++;
-          }
-        }
-
-        if (count == 0) return null;
-        
-        int[][] tmp = new int[2][count];
-        System.arraycopy(rIds[0], 0, tmp[0], 0, count);
-        System.arraycopy(rIds[1], 0, tmp[1], 0, count);
-
-        return tmp;
-        
-    } else {
-        return getNodeFromTrieRecursive(0, tok, casesen);         
+    if(ft.wc) {
+      final int pw = Token.indexOf(tok, '.');
+      if(pw != -1) return getNodeFromTrieWithWildCard(tok, pw);
     }
     
-    
-    
+    if(!cs && ft.cs) {
+      // case insensitive index create - check real case with dbdata
+      int[][] ids = getNodeFromTrieRecursive(0, Token.lc(tok), false);
+      if(ids == null) {
+        return null;
+      }
+
+      byte[] tokenFromDB;
+      byte[] textFromDB;
+      int[][] rIds = new int[2][ids[0].length];
+      int count = 0;
+      int readId;
+
+      int i = 0;
+      // check real case of each result node
+      while(i < ids[0].length) {
+        // get date from disk
+        readId = ids[0][i];
+        textFromDB = data.text(ids[0][i]);
+        tokenFromDB = new byte[tok.length];
+
+        System.arraycopy(textFromDB, ids[1][i], tokenFromDB, 0, tok.length);
+
+        // check unique node ones
+        while(i < ids[0].length && readId == ids[0][i]) {
+          System.arraycopy(textFromDB, ids[1][i], tokenFromDB, 0, tok.length);
+
+          readId = ids[0][i];
+
+          // check unique node ones
+          // compare token from db with token from query
+          if(Token.eq(tokenFromDB, tok)) {
+            rIds[0][count] = ids[0][i];
+            rIds[1][count++] = ids[1][i];
+
+            // jump over same ids
+            while(i < ids[0].length && readId == ids[0][i])
+              i++;
+            break;
+          }
+          i++;
+        }
+      }
+
+      if(count == 0) return null;
+
+      final int[][] tmp = new int[2][count];
+      System.arraycopy(rIds[0], 0, tmp[0], 0, count);
+      System.arraycopy(rIds[1], 0, tmp[1], 0, count);
+      return tmp;
+    } else {
+      return getNodeFromTrieRecursive(0, tok, ft.cs);
+    }
+
     /*// init no wildcard included in token
     int posW = -1;
     // backup original token
@@ -361,16 +365,9 @@ public final class WordsCTANew extends Index {
               getAllNodes(ne[k], b, dt));
        } 
     }
-      
     return dt;
   }
   
-  @Override
-  public int[][] fuzzyIDs(final byte[] tok, final int ne) {
-    return getNodeFuzzy(0, null, -1, tok, 0, 0, 0, ne);
-    //return getNodesFuzzyWLev(0, new StringBuilder(), tok, 3, null);
-  }
-
   @Override
   public int[] ids(final byte[] tok) {
     int[] ne = getNodeIdFromTrieRecursive(0, tok);
@@ -382,7 +379,7 @@ public final class WordsCTANew extends Index {
   }
 
   @Override
-  public int nrIDs(final byte[] tok) {
+  public int nrIDs(final byte[] tok, final FTTokenizer ft) {
     return ids(tok).length;
   }
 

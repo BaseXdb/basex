@@ -4,8 +4,10 @@ import static org.basex.data.DataText.*;
 import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.BaseX;
+import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataAccessPerf;
+import org.basex.util.FTTokenizer;
 import org.basex.util.Levenshtein;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -56,8 +58,6 @@ public final class Fuzzy extends Index {
   private final DataAccessPerf ti;
   /** Storing pre and pos values for each token. */ 
   private DataAccessPerf dat;  
-  /** Flag for case sensitive index. FUZZYINDEX is always insensitive!.*/
-  boolean cs = false;
 
   /**
    * Constructor, initializing the index structure.
@@ -138,10 +138,10 @@ public final class Fuzzy extends Index {
     }
     return -1;
   }
-
   
   /** Saves the last pointer on the index. Used for wildcardsearch. */
   private int lastIndex = -1;
+  
   /**
    * Returns the pointer on the first token with minimum length 
    * tokl and the first pointer on the token with minimum length
@@ -286,7 +286,7 @@ public final class Fuzzy extends Index {
   }
 
   /**
-   * Get pre- and posvalues, stored for token out of index.
+   * Get pre- and pos values, stored for token out of index.
    * @param tok token looking for
    * @return int[][] ftdata
    */
@@ -295,23 +295,22 @@ public final class Fuzzy extends Index {
 
     if (p == -1) return null;
     return getData(getPointerOnData(p, tok.length), getDataSize(p, tok.length));
-    
   } 
  
   @Override
-  public int[][] fuzzyIDs(final byte[] tok, final int ne) {
-    return getFuzzy(tok, ne);
-  }
-
-  @Override
-  public int[][] wildcardIDs(final byte[] tok, final int pw) {
-    byte[] btok = Token.lc(tok);
-    return getTokenWildCard(btok, pw);
-  }
-  
-  @Override
-  public int[][] ftIDs(final byte[] tok, final boolean casesen) {
-    if (!casesen) {
+  public int[][] ftIDs(final byte[] tok, final FTTokenizer ft) {
+    if(ft.fz) {
+      int k = Prop.lserr;
+      if(k == 0) k = Math.max(1, tok.length >> 2);
+      return getFuzzy(tok, k);
+    }
+    
+    if(ft.wc) {
+      final int pw = Token.indexOf(tok, '.');
+      if(pw != -1) return getTokenWildCard(Token.lc(tok), pw);
+    }
+    
+    if(!ft.cs) {
       // index request with pre-values as result
       return get(Token.lc(tok));
     }
@@ -369,8 +368,10 @@ public final class Fuzzy extends Index {
   }
   
   @Override
-  public int nrIDs(final byte[] tok) {
-    return -1;
+  public int nrIDs(final byte[] tok, final FTTokenizer ft) {
+    // specified ft options are not checked yet...
+    final int p = getPointerOnToken(Token.lc(tok));
+    return p == -1 ? 0 : getDataSize(p, tok.length);
   }
 
   @Override

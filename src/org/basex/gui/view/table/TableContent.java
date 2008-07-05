@@ -84,8 +84,8 @@ public final class TableContent extends BaseXBack {
     int posY = -scroll.pos() + l * rowH;
 
     while(++l < nRows) {
-      // skip when all visible rows have been painted
-      if(posY > h) break;
+      // skip when all visible rows have been painted or if data has changed
+      if(posY > h || l >= tdata.rows.size) break;
       posY += rowH;
 
       final int pre = tdata.rows.get(l);

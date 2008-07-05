@@ -2,6 +2,7 @@ package org.basex.index;
 
 import java.io.IOException;
 import org.basex.BaseX;
+import org.basex.util.FTTokenizer;
 
 /**
  * This interface defines the methods which have to be implemented
@@ -35,19 +36,20 @@ public abstract class Index {
 
   /**
    * Returns the (approximate/estimated) number of ids for the specified token.
+   * @param ft fulltext tokenizer
    * @param tok token to be found
    * @return number of ids
    */
-  public abstract int nrIDs(final byte[] tok);
+  public abstract int nrIDs(final byte[] tok, final FTTokenizer ft);
 
   /**
    * Returns the decompressed ids for the specified token.
    * @param tok token to be found
-   * @param cs case sensitive search
+   * @param ft fulltext tokenizer
    * @return ids
    */
   @SuppressWarnings("unused")
-  public int[][] ftIDs(final byte[] tok, final boolean cs) {
+  public int[][] ftIDs(final byte[] tok, final FTTokenizer ft) {
     BaseX.notimplemented();
     return null;
   }
@@ -67,37 +69,6 @@ public abstract class Index {
     BaseX.notimplemented();
     return null;
   }
-
-  /**
-   * FUZZY SEARCH
-   * Returns the indexed id references for the specified fulltext token,
-   * with respect to number of errors (ne) that are allowed to occur.
-   * 
-   * @param tok token to look up
-   * @param ne int number of errors allowed
-   * @return id array
-   */
-  @SuppressWarnings("unused")
-  public int[][] fuzzyIDs(final byte[] tok, final int ne) {
-    BaseX.notimplemented();
-    return null;
-  }
-  
-  /**
-   * WILDCARD SEARCH
-   * Returns the indexed id references for the specified fulltext token,
-   * with respect to the wildcard contained in the token.
-   * 
-   * @param tok token to look up
-   * @param posw int position of the wildcard in tok
-   * @return id array
-   */
-  @SuppressWarnings("unused")
-  public int[][] wildcardIDs(final byte[] tok, final int posw) {
-    BaseX.notimplemented();
-    return null;
-  }
-  
 
   /**
    * Close the index.

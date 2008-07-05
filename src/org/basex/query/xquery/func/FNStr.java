@@ -205,8 +205,8 @@ final class FNStr extends Fun {
     return Str.iter(c == 0 ? v : substring(v, 0, v.length - sep.length));
   }
 
-  /***/
-  enum NORM {
+  /** Normalization types. */
+  private enum NORM {
     /** C Normalization.      */ C("NFC"),
     /** D Normalization.      */ D("NFD"),
     /** KC Normalization.     */ KC("NFKC"),

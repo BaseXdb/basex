@@ -28,7 +28,6 @@ import org.basex.gui.GUIConstants.FILL;
 import org.basex.gui.dialog.Dialog;
 import org.basex.gui.view.View;
 import org.basex.gui.view.map.MapRect;
-import org.basex.util.Array;
 import org.basex.util.Token;
 
 /**
@@ -458,7 +457,8 @@ public final class BaseXLayout {
 
     // get index on first pre value
     final int[][] ft = View.ftPos;
-    int k = ft != null && ft.length != 0 ? Array.firstIndexOf(r.p, ft[0]) : -1;
+    //int k = ft != null && ft.length != 0 ? Array.firstIndexOf(r.p, ft[0]) :-1;
+    int k = -1; // ft highlighting currently disabled...
     
     do {
       int sw = 0;
@@ -536,7 +536,8 @@ public final class BaseXLayout {
 
     // get index on first pre value
     final int[][] ft = View.ftPos;
-    int k = ft != null && ft.length != 0 ? Array.firstIndexOf(r.p, ft[0]) : -1;
+    //int k = ft != null && ft.length != 0 ? Array.firstIndexOf(r.p, ft[0]) :-1;
+    int k = -1; // ft highlighting currently disabled...
 
     final Color textc = g.getColor();
     boolean c = false;

@@ -22,7 +22,7 @@ public final class FTUnion extends FTArrayExpr {
    * Constructor.
    * @param e operands joined with the union operator
    */
-  public FTUnion(final Expr[] e) {
+  public FTUnion(final FTArrayExpr[] e) {
     exprs = e;
   }
 
@@ -31,7 +31,7 @@ public final class FTUnion extends FTArrayExpr {
    * @param e operands joined with the union operator
    * @param pointerNeeded to be set if pointer are needed
    */
-  public FTUnion(final Expr[] e, final boolean pointerNeeded) {
+  public FTUnion(final FTArrayExpr[] e, final boolean pointerNeeded) {
     exprs = e;
     po = pointerNeeded;
   }
@@ -75,15 +75,6 @@ public final class FTUnion extends FTArrayExpr {
     return null;
   }
 
-  @Override
-  public Expr compile(final XPContext ctx) throws QueryException {
-    final int el = exprs.length;
-    for(int e = 0; e != el; e++) {
-        exprs[e] = exprs[e].compile(ctx);
-    }
-    return this;
-  }
-  
   /**
    * Builds an or-conjunction of values1 and values2.
    * @param values1 input set

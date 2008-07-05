@@ -3,15 +3,14 @@ package org.basex.query.xpath.internal;
 import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
+import org.basex.query.FTOpt;
 import org.basex.query.xpath.XPContext;
-import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.expr.FTOption;
+import org.basex.query.xpath.expr.FTArrayExpr;
 import org.basex.query.xpath.expr.FTPositionFilter;
 import org.basex.query.xpath.locpath.Step;
 import org.basex.query.xpath.values.NodeSet;
 import org.basex.util.Array;
 import org.basex.util.FTTokenizer;
-import org.basex.util.Token;
 
 /**
  * This expression retrieves the ids of indexed fulltext terms.
@@ -20,66 +19,22 @@ import org.basex.util.Token;
  * @author Sebastian Gath
  * @author Christian Gruen
  */
-public final class FTIndex extends InternalExpr {
-  /** Token to be found in the index. */
-  private final byte[] token;
+public final class FTIndex extends FTArrayExpr {
+  /** Token. */
+  final byte[] token;
   /** FullText options. */
-  private FTOption option;
-  /** FullText options. */
-  FTPositionFilter ftpos;
-
-  /** Ids as result of index request with tok. */
-  private int[][] ids;
-  /** Flag for simple ftcontains queries. **/
-  private boolean simple = true;
-  /** Flag for tokens containing only one single word,
-   * like 'usability' (not 'usability testing'). **/
-  private boolean single = false;
-  /** Number of errors allowed - used for fuzzy search. **/
-  private int ne = -1;
+  private FTOpt option;
 
   /**
    * Constructor.
    * @param tok index token
    * @param opt FTOption for index token
-   * @param sim flag for simple ftcontains queries
-   * @param sing flag for single word queries
    */
-  public FTIndex(final byte[] tok, final FTOption opt,
-      final boolean sim, final boolean sing) {
+  public FTIndex(final byte[] tok, final FTOpt opt) {
+    exprs = new FTArrayExpr[] {};
     token = tok;
     option = opt;
-    simple = sim;
-    single = sing;
   }
-
-  /**
-   * Constructor.
-   * @param tok index token
-   * @param opt FTOption for index token
-   * @param ftp FTPositionFilter postion filter used for FTContent
-   * @param sim flag for simple ftcontains queries
-   * @param sing flag for single word queries
-   */
-  public FTIndex(final byte[] tok, final FTOption opt,
-      final FTPositionFilter ftp, final boolean sim, final boolean sing) {
-    token = tok;
-    option = opt;
-    ftpos = ftp;
-    simple = sim;
-    single = sing;
-  }
-
-  /**
-   * Constructor used for fuzzy search.
-   * @param tok index token
-   * @param numErrors int number of errors allowed
-   */
-  public FTIndex(final byte[] tok, final int numErrors) {
-    token = tok;
-    ne = numErrors;
-  }
-
 
   /**
    * Setter for FTPostion Filter - used for fTContent.
@@ -89,68 +44,52 @@ public final class FTIndex extends InternalExpr {
     ftpos = ftp;
   }
 
-  /**
-   * Setter for single - used for fTContent.
-   * @param sing boolean flag for single word queries
-   */
-  public void setSingle(final boolean sing) {
-    single = sing;
-  }
-
-  /**
-   * Get token for index access.
-   * @return token
-   */
-  public byte[] getToken() {
-    return token;
-  }
-
   @Override
-  public Expr indexEquivalent(final XPContext ctx, final Step curr) {
+  public FTArrayExpr indexEquivalent(final XPContext ctx, final Step curr) {
     return this;
   }
 
   /**
    * Get FTOptions for index access.
-   * @return ftoptions
+   * @return ft options
    */
-  public FTOption getFTOption() {
+  public FTOpt getFTOption() {
     return option;
   }
-
-
 
   @Override
   public NodeSet eval(final XPContext ctx) {
     final Data data = ctx.local.data;
 
-    if (ne > 0) {
-      ids = data.fuzzyIDs(token, ne);
-      if (ids == null) return new NodeSet(ctx);
-      return new NodeSet(Array.extractIDsFromData(ids), ctx, ids);
+    final FTTokenizer ft = new FTTokenizer();
+    ft.init(token);
+    ft.stem = option.st;
+    ft.dc = option.dc;
+    ft.lc = option.lc;
+    ft.uc = option.uc;
+    ft.cs = option.cs;
+    ft.wc = option.wc;
+    ft.fz = option.fz;
+    
+    // check if all terms return a result at all... if not, skip node retrieval
+    // (has still to be checked, maybe ft options cause troubles here)
+    // ideal solution for phrases would be to process small results first
+    // and end up with the largest ones.. but this seems tiresome
+    while(ft.more()) {
+      if(data.nrFTIDs(ft.next(), ft) == 0) return new NodeSet(ctx);
     }
-
-    final FTTokenizer ftt = new FTTokenizer();
-    ftt.init(token);
-    ftt.sens = option.ftCasesen;
-    ftt.wc = option.ftWild;
-    ftt.lc = option.ftlc | !ftt.sens;
-    ftt.uc = option.ftuc;
-
+    
     int[][] d = null;
-    while(ftt.more()) {
-      final byte[] b = ftt.next();
-      int[][] dd = null;
-      final int pos = Token.indexOf(b, '.');
-      if(ftt.wc && pos > -1) {
-        dd = data.wildcardIDs(b, pos);
-      } else {
-        dd = data.ftIDs(b, ftt.sens);
-      }
+    ft.init();
+    while(ft.more()) {
+      final byte[] b = ft.next();
+      int[][] dd = data.ftIDs(b, ft);
+      ctx.checkStop();
+      
       d = d == null ? dd : phrase(d, dd);
       if(d == null || d.length == 0) break;
     }
-    return new NodeSet(Array.extractIDsFromData(d), ctx);
+    return new NodeSet(Array.extractIDsFromData(d), ctx, d);
   }
 
   /**
@@ -185,16 +124,15 @@ public final class FTIndex extends InternalExpr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
-    ser.openElement(this, Token.token("simple"), Token.token(simple),
-        Token.token("single"), Token.token(single));
-    ser.item(token);
-    ser.closeElement(this);
+  public int indexSizes(final XPContext ctx, final Step curr, final int min) {
+    return 1;
   }
 
   @Override
-  public int indexSizes(final XPContext ctx, final Step curr, final int min) {
-    return 1;
+  public void plan(final Serializer ser) throws Exception {
+    ser.openElement(this);
+    ser.text(token);
+    ser.closeElement(this);
   }
 
   @Override

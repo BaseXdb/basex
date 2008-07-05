@@ -10,10 +10,10 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.Serializer;
 import org.basex.io.IO;
+import org.basex.query.FTOpt;
+import org.basex.query.FTPos;
 import org.basex.query.QueryContext;
 import org.basex.query.xquery.expr.Expr;
-import org.basex.query.xquery.expr.FTOptions;
-import org.basex.query.xquery.expr.FTSelect;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.DNode;
 import org.basex.query.xquery.item.Dat;
@@ -60,9 +60,9 @@ public final class XQContext extends QueryContext {
   /** Current fulltext item. */
   public FTTokenizer ftitem;
   /** Current fulltext options. */
-  public FTOptions ftopt;
-  /** Current fulltext selections. */
-  public FTSelect ftselect;
+  public FTOpt ftopt;
+  /** Current fulltext position filter. */
+  public FTPos ftpos;
 
   /** Current Date. */
   public Dat date;
@@ -92,7 +92,7 @@ public final class XQContext extends QueryContext {
   byte[][] collName = new byte[0][];
 
   /** Default fulltext options. */
-  private final FTOptions ftoptions = new FTOptions(null);
+  private final FTOpt ftoptions = new FTOpt();
   /** Default boundary-space. */
   public Bln spaces = Bln.FALSE;
   /** Empty Order mode. */
@@ -129,7 +129,6 @@ public final class XQContext extends QueryContext {
     if(inf) compInfo(QUERYCOMP);
     fun.comp(this);
     vars.comp(this);
-    ftoptions.comp(this);
     ftopt = ftoptions;
     root = root.comp(this);
     if(inf) compInfo(QUERYRESULT + "%", root);

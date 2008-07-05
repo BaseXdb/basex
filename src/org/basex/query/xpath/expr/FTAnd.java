@@ -1,6 +1,8 @@
 package org.basex.query.xpath.expr;
 
 import static org.basex.query.xpath.XPText.OPTAND4;
+
+import org.basex.query.FTOpt;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.internal.FTIndex;
@@ -14,15 +16,12 @@ import org.basex.query.xpath.values.Bool;
  * @author Sebastian Gath
  */
 public final class FTAnd extends FTArrayExpr {
-  /** Flag for order preserving. */
-  boolean pres = false;
-  
   /**
    * Constructor.
    * @param e expressions
    * @param options FTOptions
    */
-  public FTAnd(final Expr[] e, final FTOption options) {
+  public FTAnd(final FTArrayExpr[] e, final FTOpt options) {
     exprs = e;
     super.fto = options;
   }
@@ -30,14 +29,10 @@ public final class FTAnd extends FTArrayExpr {
   /**
    * Constructor.
    * @param e expressions
-   * @param preserving flag for order preserving
    */
-  public FTAnd(final Expr[] e, final boolean preserving) {
+  public FTAnd(final FTArrayExpr[] e) {
     exprs = e;
-    pres = preserving;
   }
-  
-  
 
   @Override
   public Bool eval(final XPContext ctx) throws QueryException {
@@ -46,11 +41,10 @@ public final class FTAnd extends FTArrayExpr {
   }
 
   @Override
-  public Expr compile(final XPContext ctx) throws QueryException {
+  public FTArrayExpr compile(final XPContext ctx) throws QueryException {
     for(int i = 0; i != exprs.length; i++) {
-      if (fto != null && exprs[i] instanceof FTArrayExpr) {
-        FTArrayExpr ftae = (FTArrayExpr) exprs[i];
-        if (ftae.fto == null) ftae.fto = fto;
+      if (fto != null) {
+        if (exprs[i].fto == null) exprs[i].fto = fto;
       }
       exprs[i] = exprs[i].compile(ctx);
     }
@@ -58,10 +52,10 @@ public final class FTAnd extends FTArrayExpr {
   }
   
   @Override
-  public Expr indexEquivalent(final XPContext ctx, final Step curr)
+  public FTArrayExpr indexEquivalent(final XPContext ctx, final Step curr)
       throws QueryException {
 
-    Expr[] indexExprs = new Expr[exprs.length];
+    FTArrayExpr[] indexExprs = new FTArrayExpr[exprs.length];
     int j = 0;
     int i = 0;
     
@@ -72,7 +66,7 @@ public final class FTAnd extends FTArrayExpr {
       if (i > 0 && indexExprs[j - 1] instanceof FTIndex 
           && indexExprs[j] instanceof FTUnaryNotExprs) {
         FTUnaryNotExprs e = (FTUnaryNotExprs) indexExprs[j];
-        Expr[] ex = new Expr[e.exprs.length + 1];
+        FTArrayExpr[] ex = new FTArrayExpr[e.exprs.length + 1];
         ex[0] = indexExprs[j - 1];
         System.arraycopy(e.exprs, 0, ex, 1, e.exprs.length);
         e.exprs = ex;
@@ -84,13 +78,12 @@ public final class FTAnd extends FTArrayExpr {
           indexExprs[j - 1] = e;
           j--;
         }
-       
       }
       j++;
     }
    
     if (j != i) { 
-      Expr[] ie = new Expr[j];
+      FTArrayExpr[] ie = new FTArrayExpr[j];
       System.arraycopy(indexExprs, 0, ie, 0, j);
       indexExprs = ie; 
     }
@@ -106,7 +99,7 @@ public final class FTAnd extends FTArrayExpr {
       }
     }
 */
-    return new FTIntersection(indexExprs, pres, ctx);
+    return new FTIntersection(indexExprs, false);
     
     //return new FTIntersection(indexExprs, option, ctx);
   }

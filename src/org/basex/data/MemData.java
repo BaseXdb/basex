@@ -5,6 +5,7 @@ import org.basex.index.Index;
 import org.basex.index.MemValues;
 import org.basex.index.Names;
 import org.basex.util.Array;
+import org.basex.util.FTTokenizer;
 import org.basex.util.Token;
 
 /**
@@ -308,24 +309,11 @@ public final class MemData extends Data {
   }
 
   @Override
-  public int[][] ftIDs(final byte[] word, final boolean cs) {
+  public int[][] ftIDs(final byte[] word, final FTTokenizer ft) {
     BaseX.notimplemented();
     return null;
   }
 
-  @Override
-  public int[][] fuzzyIDs(final byte[] word, final int ne) {
-    BaseX.notimplemented();
-    return null;
-  }
-
-  @Override
-  public int[][] wildcardIDs(final byte[] word, final int posw) {
-    BaseX.notimplemented();
-    return null;
-  }
-
-  
   @Override
   public int[] idRange(final Index.TYPE type, final double word0,
       final boolean iword0, final double word1, final boolean iword1) {
@@ -334,7 +322,7 @@ public final class MemData extends Data {
   }
 
   @Override
-  public int nrFTIDs(final byte[] token) {
+  public int nrFTIDs(final byte[] token, final FTTokenizer ft) {
     BaseX.notimplemented();
     return 0;
   }

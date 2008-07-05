@@ -334,8 +334,8 @@ final class QuerySimple extends QueryPanel implements ActionListener {
       } else if(comp instanceof BaseXDSlider) {
         final BaseXDSlider slider = (BaseXDSlider) comp;
         if(slider.min != slider.totMin || slider.max != slider.totMax) {
-          final double m = (long) (slider.min * 100) / 100.0;
-          final double n = (long) (slider.max * 100 + 99) / 100.0;
+          final double m = slider.min;
+          final double n = slider.max;
           val1 = (long) m == m ? Long.toString((long) m) : Double.toString(m);
           val2 = (long) n == n ? Long.toString((long) n) : Double.toString(n);
           pattern = PATNUM;

@@ -89,8 +89,6 @@ public final class Prop {
   public static boolean entity = true;
   /** Flag for creating a fulltext index. */
   public static boolean ftindex = false;
-  /** Flag for creating a fuzzy index. */
-  public static boolean fzindex = true;
   /** Flag for compressing ft-values on disk. */
   public static boolean fcompress = false;
   /** Flag for creating a text index. */

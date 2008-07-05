@@ -5,7 +5,6 @@ import org.basex.data.Serializer;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
 import org.basex.util.Levenshtein;
-import org.basex.util.Token;
 
 /**
  * Interface for all XPath items (results of expressions).
@@ -97,16 +96,6 @@ public abstract class Item extends Expr implements Result {
   protected boolean apprContains(final Item v) {
     return v instanceof NodeSet ? ((NodeSet) v).apprContainedIn(this) :
       Levenshtein.contains(str(), v.str());
-  }
-
-  /**
-   * Checks whether this value contains the word(s) in val.
-   * @param val word(s) to be contained
-   * @return whether val is contained
-   */
-  protected boolean contains(final Item val) {
-    return val instanceof NodeSet ? ((NodeSet) val).ftcontainedin(this) :
-      Token.ftcontains(str(), val.str());
   }
 
   @Override
