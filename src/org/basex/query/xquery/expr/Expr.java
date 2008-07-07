@@ -122,7 +122,7 @@ public abstract class Expr extends ExprInfo {
   /**
    * Indicates if an expression returns the specified type.
    * Called by the compiler to check if expressions can be reformulated.
-   * true is returned by default.
+   * null is returned by default.
    * @return result of check
    */
   public Type returned() {

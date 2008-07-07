@@ -2,6 +2,8 @@ package org.basex.query.xquery.expr;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
+import org.basex.query.xquery.func.Fun;
+import org.basex.query.xquery.func.FunDef;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
@@ -32,57 +34,25 @@ public class Pred extends Arr {
   public Expr comp(final XQContext ctx) throws XQException {
     root = root.comp(ctx);
     super.comp(ctx);
-    // if in Using.POS is a predicate that has the last() or
-    // position() function, it will be processed in PredIter
-    return uses(Using.POS) ? new PredIter(root, expr) : this; 
+
+    // Multiple Predicates
+    if(expr.length > 1) return this;
+    
+    else {      
+      // LAST
+      if(expr[0] instanceof Fun) {
+        Fun f = (Fun) expr[0];
+        if(f.func == FunDef.LAST) return new PredIter(root, expr, true, false);
+      }
+      
+      // numeric value
+      if(expr[0].n()) return new PredIter(root, expr, false, true);
+      
+      // POS
+      return uses(Using.POS) ? this : new PredIter(root, expr);
+    } 
   }  
 
-  /*
-  @Override
-  public Iter iter(final XQContext ctx) throws XQException {
-    return new Iter() {
-
-      Iter iter = ctx.iter(root);
-
-      final Item ci = ctx.item;
-      final int cp = ctx.pos;
-      
-      int predCount = 0;
-      int predCountTemp = predCount - 1;
-      
-      Item i;
-      
-      @Override
-      public Item next() throws XQException {
-
-        // evaluates predicates
-        while (predCount < expr.length) {
-          
-          // looks if it's a new predicate
-          if ((predCount - 1) == predCountTemp) {
-            predCountTemp++;
-            ctx.pos = 1;
-          }
-
-          while ((i = iter.next()) != null) {
-            ctx.item = i;
-            i = ctx.iter(expr[predCount]).ebv();
-            if(i.n() ? i.dbl() == ctx.pos : i.bool()) {
-              ctx.pos++;
-              return i;
-            }
-            ctx.pos++;
-          }
-          predCount++;
-        }
-
-        ctx.item = ci;
-        ctx.pos = cp;
-        return null;
-      }
-    };
-  } */
-  
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
     Iter iter = ctx.iter(root);
@@ -114,7 +84,7 @@ public class Pred extends Arr {
     ctx.size = cs;
     ctx.pos = cp;
     return sb;
-  } 
+  }
   
   @Override
   public boolean uses(final Using u) {
@@ -122,12 +92,7 @@ public class Pred extends Arr {
       case POS:
         for(final Expr e : expr) {
           final Type t = e.returned();
-          
-          // I need to find a way to get access to e.func.desc or 
-          // e.func.name because there is the last() or position() 
-          // function described and I didn't find it anywhere else.
-
-          if(t == null || t.num || e.uses(u)) return false;
+          if(t == null || t.num || e.uses(u)) return true;
         }
         return super.uses(u);
       default:
