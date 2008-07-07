@@ -77,7 +77,6 @@ public final class PredIter extends Pred {
             // returns only one numeric value.
             // next call of next() will return null.
             if (numFlag) {
-              numFlag = false;
               returnNull = true;
               return ctx.item;
             }
