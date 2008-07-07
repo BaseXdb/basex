@@ -3,9 +3,9 @@ package org.basex.query.fs;
 import static org.basex.query.fs.FSText.*;
 import java.io.IOException;
 import org.basex.core.Context;
-import org.basex.data.Data;
 import org.basex.io.PrintOutput;
 import org.basex.util.GetOpts;
+import org.basex.util.Token;
 
 /**
  * Performs a touch command.
@@ -55,10 +55,10 @@ public class MKDIR {
           printHelp();
           return;
         case ':':         
-          out.print("mkdir: missing argument");
+          FSUtils.printError(out, "mkdir", g.getPath(), 99);
           return;  
         case '?':         
-          out.print("mkdir: illegal option");
+          FSUtils.printError(out, "mkdir", g.getPath(), 22);
           return;
       }      
       ch = g.getopt();
@@ -85,15 +85,15 @@ public class MKDIR {
       curDirPre = FSUtils.goToDir(context.data(), curDirPre, 
           path.substring(0, beginIndex));   
       if(curDirPre == -1) {
-        out.print("mkdir: " + path + " No such file or directory");
+        FSUtils.printError(out, "mkdir", path, 2);        
       } else {
         dir = path.substring(beginIndex + 1);
       }
     }
     int dirPre =  FSUtils.getSpecificDir(context.data(), 
-        curDirPre, dir.getBytes());
+        curDirPre, Token.token(dir));
     if(dirPre > 0) {
-      out.print("mkdir: '" + dir + "': Directory exists");
+      FSUtils.printError(out, "mkdir", path, 17);         
     } else {   
       // add new dir  
       try {
@@ -101,20 +101,23 @@ public class MKDIR {
         if(!(curDirPre == FSUtils.getROOTDIR())) {
           preNewFile = curDirPre + 5;
         }
-        context.data().insert(preNewFile, 
-            curDirPre, "dir".getBytes(), Data.ELEM);
-        context.data().insert(preNewFile + 1, preNewFile, 
-            "name".getBytes(), dir.getBytes());
-        context.data().insert(preNewFile + 2, 
-            preNewFile, "suffix".getBytes(), 
-            "".getBytes());
-        context.data().insert(preNewFile + 3, 
-            preNewFile, "size".getBytes(), 
-            "0".getBytes());
-        context.data().insert(preNewFile + 4, 
-            preNewFile, "mtime".getBytes(), 
-            ("" + System.currentTimeMillis()).getBytes());   
-        context.data().flush();
+        FSUtils.insert(context.data(), true, Token.token(dir), 
+            Token.token(""), Token.token(0), 
+            Token.token(System.currentTimeMillis()), curDirPre, preNewFile);
+//        context.data().insert(preNewFile, 
+//            curDirPre, "dir".getBytes(), Data.ELEM);
+//        context.data().insert(preNewFile + 1, preNewFile, 
+//            "name".getBytes(), dir.getBytes());
+//        context.data().insert(preNewFile + 2, 
+//            preNewFile, "suffix".getBytes(), 
+//            "".getBytes());
+//        context.data().insert(preNewFile + 3, 
+//            preNewFile, "size".getBytes(), 
+//            "0".getBytes());
+//        context.data().insert(preNewFile + 4, 
+//            preNewFile, "mtime".getBytes(), 
+//            ("" + System.currentTimeMillis()).getBytes());   
+//        context.data().flush();
       } catch(Exception e) {
         e.printStackTrace();
       }

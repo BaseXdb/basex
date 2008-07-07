@@ -75,10 +75,10 @@ public final class LS {
           fRecursive = true;
           break;
         case ':':
-          out.print("ls: missing argument");
+          FSUtils.printError(out, "ls", g.getPath(), 99);
           return;
         case '?':
-          out.print("ls: illegal option");
+          FSUtils.printError(out, "ls", g.getPath(), 22);
           return;
       }
         ch = g.getopt();
@@ -87,7 +87,7 @@ public final class LS {
     if(g.getPath() != null) {
       curDirPre = FSUtils.goToDir(data, curDirPre, g.getPath());
       if(curDirPre == -1)
-        out.print("ls " + g.getPath() + "No such file or directory. ");
+        FSUtils.printError(out, "ls", g.getPath(), 2);
     }
 
     // go to work

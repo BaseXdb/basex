@@ -25,12 +25,6 @@ public final class PWD {
   /** PrintOutPutStream. */
   private PrintOutput out;
 
-  /** Shows if an error occurs. */
-  private boolean fError;
-
-  /** Shows if job is done. */
-  private boolean fAccomplished;
-
   /**
    * Simplified Constructor.
    * @param ctx data context
@@ -58,20 +52,14 @@ public final class PWD {
       switch (ch) {
         case 'h':
           printHelp();
-          fAccomplished = true;
-          break;
+          return;
         case ':':         
-          fError = true;
-          out.print("ls: missing argument");
-          break;  
-        case '?':         
-          fError = true;
-          out.print("ls: illegal option");
-          break;
+          FSUtils.printError(out, "pwd", g.getPath(), 99);  
+          return;  
+        case '?':                   
+          FSUtils.printError(out, "pwd", g.getPath(), 22);
+          return;
       }      
-      if(fError || fAccomplished) {
-        return;
-      }
       ch = g.getopt();
     }
 
@@ -80,7 +68,7 @@ public final class PWD {
     if(g.getPath() != null) {      
       curDirPre = FSUtils.goToDir(data, curDirPre, g.getPath());      
       if(curDirPre == -1) {
-        out.print("pwd " + g.getPath() + "No such file or directory. ");
+        FSUtils.printError(out, "pwd", g.getPath(), 2);        
       }
     }
     out.print(FSUtils.getPath(data, curDirPre));

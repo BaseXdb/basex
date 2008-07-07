@@ -3,9 +3,9 @@ package org.basex.query.fs;
 import static org.basex.query.fs.FSText.*;
 import java.io.IOException;
 import org.basex.core.Context;
-import org.basex.data.Data;
 import org.basex.io.PrintOutput;
 import org.basex.util.GetOpts;
+import org.basex.util.Token;
 
 /**
  * Performs a touch command.
@@ -55,10 +55,10 @@ public final class TOUCH {
           printHelp();
           return;
         case ':':         
-          out.print("touch: missing argument");
+          FSUtils.printError(out, "touch", g.getPath(), 99);      
           return;  
         case '?':         
-          out.print("touch: illegal option");
+          FSUtils.printError(out, "touch", g.getPath(), 22);      
           return;
       }      
       ch = g.getopt();
@@ -85,14 +85,14 @@ public final class TOUCH {
       for(int i : preFound) {
         if(FSUtils.isFile(context.data(), i)) {
           context.data().update(i + 4, "mtime".getBytes(), 
-              ("" + System.currentTimeMillis()).getBytes());
+              Token.token(System.currentTimeMillis()));
         }
       }
     } else {   
       // add new file 
       if(file.indexOf('?') > 0 || file.indexOf('*') > 0 
           || file.indexOf('[') > 0) {
-        out.print("touch: " + file + ": filename not allowed.\n");
+        FSUtils.printError(out, "touch", file, 101);              
         return;
       } 
       try {
@@ -100,20 +100,10 @@ public final class TOUCH {
         if(!(curDirPre == FSUtils.getROOTDIR())) {
           preNewFile = curDirPre + 5;
         }
-        context.data().insert(preNewFile, 
-            curDirPre, "file".getBytes(), Data.ELEM);
-        context.data().insert(preNewFile + 1, preNewFile, 
-            "name".getBytes(), file.getBytes());
-        context.data().insert(preNewFile + 2, 
-            preNewFile, "suffix".getBytes(), 
-            getSuffix(file));
-        context.data().insert(preNewFile + 3, 
-            preNewFile, "size".getBytes(), 
-            "0".getBytes());
-        context.data().insert(preNewFile + 4, 
-            preNewFile, "mtime".getBytes(), 
-            ("" + System.currentTimeMillis()).getBytes());   
-        context.data().flush();
+        FSUtils.insert(context.data(), false, Token.token(file), 
+            getSuffix(file), Token.token(0), 
+            Token.token(System.currentTimeMillis()),
+            curDirPre, preNewFile);        
       } catch(Exception e) {
         e.printStackTrace();
       }

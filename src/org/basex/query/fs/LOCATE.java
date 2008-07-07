@@ -93,10 +93,10 @@ public final class LOCATE {
           version = g.getOptarg().charAt(0);
           break;          
         case ':':         
-          out.print("ls: missing argument");
+          FSUtils.printError(out, "locate", g.getPath(), 99);
           return;
         case '?':         
-          out.print("ls: illegal option");
+          FSUtils.printError(out, "locate", g.getPath(), 22);
           return;
       }      
       ch = g.getopt();
@@ -121,11 +121,9 @@ public final class LOCATE {
       case '2':
         locateXQuery(limit);
         break;
-      case '3':
-        out.print("Not yet implemented");
-        break;
       default:
-        locateXQuery(limit);
+        fileToFind = FSUtils.transformToRegex(fileToFind);
+        locateTable(FSUtils.getROOTDIR(), limit);
       break;        
     }
 

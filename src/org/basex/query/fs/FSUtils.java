@@ -87,6 +87,44 @@ public final class FSUtils {
   }
 
   /**
+   * Returns the path of a file.
+   * @param data data reference
+   * @param pre pre value of current node
+   * @param parrent pre value of last dir to print 
+   * @return file path.
+   */
+  public static byte[] getRelativePath(final Data data, 
+      final int pre, final int parrent) {
+    int p = pre;
+    final int kind = data.kind(p);
+    if(isFile(data, p))      
+      p = data.parent(p, kind);
+    final IntList il = new IntList();
+    while(p >= parrent && p != 0) {
+      il.add(p);      
+      p = data.parent(p, kind);
+    }
+
+    final TokenBuilder tb = new TokenBuilder();
+    tb.add('.');
+    final int s = il.size;
+    boolean keepSlash = false;
+    if(pre > parrent) {
+      tb.add('/');
+      keepSlash = true;
+    }
+    for(int i = s - 2; i >= 0; i--) {      
+      final byte[] node = replace(getName(data, il.get(i)), '\\', '/');
+      tb.add(node);
+      if(!endsWith(node, '/')) tb.add('/');
+    }
+    byte[] node = tb.finish();
+    while(endsWith(node, '/') && !keepSlash) 
+      node = substring(node, 0, node.length - 1);
+    return node;
+  }
+
+  /**
    * Returns the name of a file.
    * @param data data reference
    * @param pre pre value
@@ -331,7 +369,7 @@ public final class FSUtils {
     return result;
   }
 
-  
+
 
   /**
    * Returns int value of the root dir.
@@ -342,7 +380,7 @@ public final class FSUtils {
     return ROOTDIR;
   }
 
-  
+
   /**
    * Returns the pre value of a dir.
    *  
@@ -400,17 +438,21 @@ public final class FSUtils {
       case 100:
         out.print(programm + ": " + arg + ": " + EOMDIR);
         break;        
+      case 101:
+        out.print(programm + ": " + arg + ": " + ENAMENOALLOW);
+        break;        
       default:
         out.print(programm + ": " + arg + ": " + EUND);
       break;
     }
     out.print(NL);
   }
- 
+
   /**
    * Inserts a new entry into the table.
    * 
    * @param data - the data table
+   * @param isDir - insert dir or file 
    * @param name - filename
    * @param suffix - suffix of the file
    * @param size - size of the file
@@ -419,11 +461,15 @@ public final class FSUtils {
    * @param pre - position to insert
    * 
    */
-  public static void insert(final Data data, final byte[] name, 
-      final byte[] suffix, final byte[] size, final byte[] mtime, 
-      final int parrent, final int pre) {
+  public static void insert(final Data data, final boolean isDir,
+      final byte[] name, final byte[] suffix, final byte[] size,
+      final byte[] mtime, final int parrent, final int pre) {
 
-    data.insert(pre, parrent, FILE, Data.ELEM);
+    if(isDir)
+      data.insert(pre, parrent, DIR, Data.ELEM);
+    else
+      data.insert(pre, parrent, FILE, Data.ELEM);
+    
     data.insert(pre + 1, pre, NAME, name);
     data.insert(pre + 2, pre, SUFFIX, suffix);
     data.insert(pre + 3, pre, SIZE, size);

@@ -25,12 +25,6 @@ public final class RM {
   /** PrintOutPutStream. */
   private PrintOutput out;
 
-  /** Shows if an error occurs. */
-  private boolean fError;
-
-  /** Shows if job is done. */
-  private boolean fAccomplished;
-
   /** Remove the all. */
   private boolean fRecursive;
 
@@ -61,23 +55,17 @@ public final class RM {
       switch (ch) {
         case 'h':
           printHelp();
-          fAccomplished = true;
-          break;
+          return;
         case 'R':
           fRecursive = true;
           break;          
         case ':':         
-          fError = true;
-          out.print("rm: missing argument");
-          break;  
+          FSUtils.printError(out, "rm", g.getPath(), 99);                    
+          return;  
         case '?':         
-          fError = true;
-          out.print("rm: illegal option");
-          break;
+          FSUtils.printError(out, "rm", g.getPath(), 22);
+          return;
       }      
-      if(fError || fAccomplished) {
-        return;
-      }
       ch = g.getopt();
     }
 
@@ -101,7 +89,7 @@ public final class RM {
     long sizeOfNode = 0;
     for(int toDel : del) {
       if(toDel == -1) {
-        out.print("rm: '" + path + "' No such file or directory");
+        FSUtils.printError(out, "rm", path, 2);
         return;
       } else {
         /* 
@@ -119,8 +107,7 @@ public final class RM {
             e.printStackTrace();
           }     
         } else {
-          out.print("rm: cannot remove '" + 
-              FSUtils.getFileName(data, toDel) + "': Is a directory");
+          FSUtils.printError(out, "rm", path, 21);
         }
       }
     }

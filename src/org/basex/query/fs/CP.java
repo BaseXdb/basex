@@ -123,7 +123,7 @@ public final class CP {
             if(!(target[0] == FSUtils.getROOTDIR())) {
               preOfNewFile = target[0] + 5;
             }                             
-            FSUtils.insert(data, name, suffix, size, mtime,
+            FSUtils.insert(data, false, name, suffix, size, mtime,
                 target[0], preOfNewFile);
           } else {
             // file exists - override
@@ -139,7 +139,7 @@ public final class CP {
           if(!(curDirPre == FSUtils.getROOTDIR())) {
             preOfNewFile = curDirPre + 5;
           }        
-          FSUtils.insert(data, name, suffix, size, mtime,
+          FSUtils.insert(data, false, name, suffix, size, mtime,
               curDirPre, preOfNewFile);
         }      
         break;
@@ -170,7 +170,7 @@ public final class CP {
       }
       for(int j = 0; j < toInsert.size(); ++j) {
         mtime = ("" + System.currentTimeMillis()).getBytes();
-        FSUtils.insert(data, toInsert.remove(0), toInsert.remove(0),
+        FSUtils.insert(data, false, toInsert.remove(0), toInsert.remove(0),
             toInsert.remove(0), mtime, target[0], preOfNewFile);
       }       
       break;

@@ -126,7 +126,7 @@ public interface FSText {
   /** FS Error Message. */
   String EACCES = "Permission denied.";
   /** FS Error Message. */
-  String EEXIST = "File exists.";
+  String EEXIST = "File / Directory exists.";
   /** FS Error Message. */
   String ENOTDIR = "Not a directory.";
   /** FS Error Message. */
@@ -139,6 +139,8 @@ public interface FSText {
   String ERANGE = "Result too large.";
   /** FS Error Message. */
   String ENAMETOOLONG = "File name too long.";
+  /** FS Error Message. */
+  String ENAMENOALLOW = "File name not allowed.";
   /** FS Error Message. */
   String ENOTEMPTY = "Directory not empty.";
   /** FS Error Message. */
