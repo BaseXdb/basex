@@ -72,15 +72,15 @@ public final class PredIter extends Pred {
           ctx.item = i;
           i = ctx.iter(expr[0]).ebv();
           if(i.n() ? i.dbl() == ctx.pos : i.bool()) {
-            ctx.pos++;
             
-            // returns only one numeric value.
-            // next call of next() will return null.
+            // if item is numeric it will be returned and the rest of expr 
+            // will be skipped. next call of next() will return null.
             if (numFlag) {
               returnNull = true;
               return ctx.item;
             }
             
+            ctx.pos++;
             return ctx.item;
           }
           ctx.pos++;
