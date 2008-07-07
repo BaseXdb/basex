@@ -100,7 +100,7 @@ public final class Insert extends Proc {
       }
       data.flush();
 
-      return Prop.info ? timer(BaseX.info(INSERTINFO, nodes.size)) : true;
+      return Prop.info ? timer(INSERTINFO, nodes.size) : true;
     } catch(final IOException ex) {
       BaseX.debug(ex);
       return error(ex.getMessage());
@@ -143,7 +143,7 @@ public final class Insert extends Proc {
       data.insert(par + data.attSize(par, data.kind(par)), par, n, v);
     }
     data.flush();
-    return Prop.info ? timer(BaseX.info(INSERTINFO, nodes.size)) : true;
+    return Prop.info ? timer(INSERTINFO, nodes.size) : true;
   }
 
   /**
@@ -199,7 +199,7 @@ public final class Insert extends Proc {
       }
     }
     data.flush();
-    return Prop.info ? timer(BaseX.info(INSERTINFO, nodes.size)) : true;
+    return Prop.info ? timer(INSERTINFO, nodes.size) : true;
   }
   
   /**

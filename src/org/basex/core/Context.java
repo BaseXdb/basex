@@ -33,6 +33,14 @@ public final class Context {
   }
   
   /**
+   * Returns true if the current node set refers to the root node.
+   * @return result of check
+  */
+  public boolean root() {
+    return current.size == 1 && data.kind(current.pre[0]) == Data.DOC;
+  }
+  
+  /**
    * Returns data reference.
    * @return data reference
    */

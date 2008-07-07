@@ -1,7 +1,6 @@
 package org.basex.query.xpath.expr;
 
 import java.util.Arrays;
-
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.query.QueryException;

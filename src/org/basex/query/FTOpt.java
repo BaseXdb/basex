@@ -74,16 +74,16 @@ public final class FTOpt {
     IntList il = null;
     while(tk.more()) {
       final int tp = tk.p;
-      byte[] t = tk.next();
+      byte[] t = tk.get();
       boolean f = true;
       boolean c = false;
       sb.init();
       final int tpos = tk.pos;
       while(f && sb.more()) {
-        final byte[] s = sb.next();
+        final byte[] s = sb.get();
         if(c) {
           tk.more();
-          t = tk.next();
+          t = tk.get();
         } else {
           c = true;
         }

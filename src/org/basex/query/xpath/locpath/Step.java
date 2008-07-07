@@ -107,7 +107,8 @@ public abstract class Step extends ExprInfo {
     test.compile(data);
     if(test instanceof TestName) {
       final TestName t = (TestName) test;
-      ctx.leaf = axis != Axis.ATTR && t.id >= 0 && !data.tags.noLeaf(t.id);
+      ctx.leaf = axis != Axis.ATTR && axis != Axis.SELF && t.id >= 0 &&
+        !data.tags.noLeaf(t.id);
     }
     if(!preds.compile(ctx)) return false;
     ctx.leaf = false;
@@ -132,8 +133,8 @@ public abstract class Step extends ExprInfo {
    */
   final boolean addPosPred() {
     // skip optimization if position predicate does already exist
-    if(preds.size() != 0 && preds.get(0) instanceof PredPos
-        || axis == Axis.PARENT) return false;
+    if(preds.size() != 0 && preds.get(0) instanceof PredPos ||
+        axis == Axis.PARENT || axis == Axis.SELF) return false;
     preds.add(1, 1);
     return true;
   }
@@ -215,6 +216,9 @@ public abstract class Step extends ExprInfo {
   public final void plan(final Serializer ser) throws Exception {
     ser.startElement(this);
     ser.attribute(Token.token("test"), Token.token(test.toString()));
+    if(simple) ser.attribute(Token.token("simple"), Token.TRUE);
+    else if(early) ser.attribute(Token.token("early"), Token.TRUE);
+    else if(posPred != 0) ser.attribute(Token.token("pos"), Token.TRUE);
     if(preds.size() != 0) {
       ser.finishElement();
       preds.plan(ser);

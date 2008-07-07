@@ -89,7 +89,7 @@ public class BaseXClient {
       if(query != null) {
         execute(xpath ? Commands.XPATH : Commands.XQUERY, query, info);
       } else if(commands != null) {
-        parse(commands);
+        process(commands);
         quit(true);
       } else {
         console();
@@ -114,7 +114,7 @@ public class BaseXClient {
         String in = "";
         while((in = input(INPUTCONT)).length() != 0) input += " " + in;
       }
-    } while(input != null && parse(input));
+    } while(input != null && process(input));
     
     quit(input == null);
   }
@@ -152,7 +152,7 @@ public class BaseXClient {
    * @param input input commands
    * @return false if exit command was sent
    */
-  private boolean parse(final String input) {
+  private boolean process(final String input) {
     try {
       final CommandParser cp = new CommandParser(input);
       while(cp.more()) {
@@ -220,7 +220,7 @@ public class BaseXClient {
         final CachedOutput out = new CachedOutput();
         proc.info(out);
         final String inf = out.toString();
-        if(inf.length() != 0) {
+        if(!ok || inf.length() != 0) {
           if(!ok) {
             error(null, inf);
           } else {

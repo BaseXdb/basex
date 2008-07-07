@@ -1,6 +1,7 @@
 package org.basex.gui.view.query;
 
 import static org.basex.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Insets;
@@ -9,12 +10,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
+
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import org.basex.BaseX;
+
 import org.basex.core.Commands;
 import org.basex.core.proc.Find;
-import org.basex.core.proc.Optimize;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.StatsKey;
@@ -34,8 +35,8 @@ import org.basex.gui.layout.TableLayout;
 import org.basex.index.Names;
 import org.basex.query.xpath.func.ContainsLC;
 import org.basex.util.Set;
-import org.basex.util.StringList;
 import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 
 /**
  * This is a simple user search panel.
@@ -69,8 +70,6 @@ final class QuerySimple extends QueryPanel implements ActionListener {
   BaseXButton exec;
   /** Copy to XQuery button. */
   BaseXButton copy;
-  /** Query keys. */
-  String[] keys;
 
   /**
    * Default constructor.
@@ -121,7 +120,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
       }
     });
     BaseXLayout.enable(copy, false);
-    
+
     final Box box = new Box(BoxLayout.X_AXIS);
     box.add(exec);
     box.add(Box.createHorizontalStrut(4));
@@ -144,9 +143,8 @@ final class QuerySimple extends QueryPanel implements ActionListener {
    * Create search categories.
    */
   private void create() {
-    keys = keys(GUI.context.data());
     panel.removeAll();
-    addKeys(0);
+    addKeys(GUI.context.data());
   }
 
   @Override
@@ -190,14 +188,32 @@ final class QuerySimple extends QueryPanel implements ActionListener {
 
   /**
    * Adds a category combobox.
-   * @param pos position
+   * @param data data reference
    */
-  void addKeys(final int pos) {
+  void addKeys(final Data data) {
+    final int cs = panel.getComponentCount();
+    final StringBuilder sb = new StringBuilder("//");
+    for(int c = 0; c < cs; c += 2) {
+      final BaseXCombo combo = (BaseXCombo) panel.getComponent(c);
+      if(combo.getSelectedIndex() == 0) continue;
+      final String elem = combo.getSelectedItem().toString();
+      if(elem.startsWith("@")) continue;
+      sb.append(elem + "//");
+    }
+
+    final String[] tmp = data.skel.suggest(data, sb.toString()).finish();
+    if(tmp.length == 0) return;
+
+    final String[] keys = new String[tmp.length + 1];
+    System.arraycopy(tmp, 0, keys, 1, tmp.length);
+    keys[0] = "(" + (tmp.length) + " entries)";
+
+
     final BaseXCombo combo = new BaseXCombo(keys, HELPSEARCHCAT, false);
     combo.addActionListener(this);
     combo.addKeyListener(main);
-    panel.add(combo, pos);
-    panel.add(new BaseXLabel(""), pos + 1);
+    panel.add(combo);
+    panel.add(new BaseXLabel(""));
   }
 
   /**
@@ -252,9 +268,9 @@ final class QuerySimple extends QueryPanel implements ActionListener {
 
       panel.remove(cp + 1);
 
+      final Data data = GUI.context.data();
       if(combo.getSelectedIndex() != 0) {
         final String item = combo.getSelectedItem().toString();
-        final Data data = GUI.context.data();
         final boolean att = item.startsWith("@");
         final Names names = att ? data.atts : data.tags;
         final byte[] key = Token.token(att ? item.substring(1) : item);
@@ -274,44 +290,38 @@ final class QuerySimple extends QueryPanel implements ActionListener {
             addInput(cp + 1);
             break;
           case NONE:
-            final BaseXLabel label = new BaseXLabel("");
-            label.setBorder(3, 0, 0, 0);
-            panel.add(label, cp + 1);
+            panel.add(new BaseXLabel(""), cp + 1);
             break;
         }
-        if(cp + 2 == cs) addKeys(cp + 2);
-        panel.validate();
-        panel.repaint();
       } else {
         panel.add(new BaseXLabel(""), cp + 1);
-        if(cp + 4 == cs && ((BaseXCombo) panel.getComponent(cp + 2)).
-            getSelectedIndex() == 0) {
-          panel.remove(cp + 2);
-          panel.remove(cp + 2);
-          panel.validate();
-          panel.repaint();
-        }
       }
+      while(cp + 2 < panel.getComponentCount()) {
+        panel.remove(cp + 2);
+        panel.remove(cp + 2);
+      }
+      addKeys(data);
+
+      panel.validate();
+      panel.repaint();
     }
     if(GUIProp.execrt) query(false);
   }
 
   @Override
   void query(final boolean force) {
-    final StringBuilder sb = new StringBuilder();
-    final int cs = panel.getComponentCount();
+    final TokenBuilder tb = new TokenBuilder();
     final Data data = GUI.context.data();
-    final boolean fsxml = data.deepfs;
 
-    boolean first = true;
-    for(int c = 0; c < cs; c += 2) {
-      final int k = ((BaseXCombo) panel.getComponent(c)).getSelectedIndex();
+    for(int c = 0, cs = panel.getComponentCount(); c < cs; c += 2) {
+      final BaseXCombo com = (BaseXCombo) panel.getComponent(c);
+      final int k = com.getSelectedIndex();
       if(k <= 0) continue;
-      String key = keys[k];
-      final boolean attr = keys[k].startsWith("@");
+      String key = com.getSelectedItem().toString();
+      final boolean attr = key.startsWith("@");
 
       final Component comp = panel.getComponent(c + 1);
-      String pattern = null;
+      String pattern = "";
       String val1 = null;
       String val2 = null;
       if(comp instanceof BaseXTextField) {
@@ -341,23 +351,20 @@ final class QuerySimple extends QueryPanel implements ActionListener {
           pattern = PATNUM;
         }
       }
-      if(pattern == null) pattern = PATSIMPLE;
 
-      if(fsxml) key = "descendant-or-self::" + (attr ? "*/" : "") + key;
-      else {
-        if(!attr) key = "self::" + key;
-        if(!first) sb.append("/descendant-or-self::node()");
+      if(attr) {
+        tb.add("//.");
+        if(pattern.length() == 0) pattern = PATSIMPLE;
+      } else {
+        tb.add("//" + key);
+        key = "text()";
       }
-      sb.append(BaseX.info(pattern, key, val1, key, val2));
-      first = false;
+      tb.add(pattern, key, val1, key, val2);
     }
 
-    String qu = sb.toString();
+    String qu = tb.toString();
     if(qu.length() != 0) {
-      final Nodes curr = GUI.context.current();
-      final boolean r = GUIProp.filterrt || curr.size == 1 && curr.pre[0] == 0;
-      qu = (r ? "/" : "") + "descendant-or-self::" +
-        (fsxml ? "file" : "*") + qu;
+      if(!GUIProp.filterrt && !GUI.context.root()) qu = "." + qu;
     }
 
     String simple = all.getText().trim();
@@ -367,9 +374,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     }
 
     if(qu.length() == 0) {
-      final boolean root = GUIProp.filterrt;
-      final Nodes current = GUI.context.current();
-      qu = root || current.size == 1 && current.pre[0] < 1 ? "/" : ".";
+      qu = GUIProp.filterrt || GUI.context.root() ? "/" : ".";
     }
 
     if(!force && last.equals(qu)) return;
@@ -383,31 +388,6 @@ final class QuerySimple extends QueryPanel implements ActionListener {
 
   @Override
   void info(final String info, final boolean ok) { }
-
-  /**
-   * Returns a string array with all distinct keys
-   * and the keys of the specified set.
-   * @param data data reference
-   * @return key array
-   */
-  String[] keys(final Data data) {
-    if(!data.tags.stats()) new Optimize().stats(data);
-    
-    final StringList sl = new StringList();
-    sl.add("");
-    for(int i = 1; i <= data.tags.size(); i++) {
-      if(data.tags.counter(i) == 0) continue;
-      sl.add(Token.string(data.tags.key(i)));
-    }
-    for(int i = 1; i <= data.atts.size(); i++) {
-      if(data.atts.counter(i) == 0) continue;
-      sl.add("@" + Token.string(data.atts.key(i)));
-    }
-    final String[] vals = sl.finish();
-    Arrays.sort(vals);
-    vals[0] = "(" + (vals.length - 1) + " entries)";
-    return vals;
-  }
 
   /**
    * Returns a string array with all distinct keys

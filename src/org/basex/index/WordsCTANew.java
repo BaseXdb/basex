@@ -2,7 +2,6 @@ package org.basex.index;
 
 import static org.basex.data.DataText.*;
 import static org.basex.Text.*;
-
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.Prop;
@@ -72,9 +71,18 @@ public final class WordsCTANew extends Index {
     tb.add(SIZEDISK + Performance.formatSize(l, true) + NL);
     return tb.finish();
   }
+  
+  @Override
+  public int nrIDs(final IndexToken ind) {
+    return ids(ind).length;
+  }
 
   @Override
-  public int[][] ftIDs(final byte[] tok, final FTTokenizer ft) {
+  public int[][] ids(final IndexToken ind) {
+    if(ind.range()) return idRange((RangeToken) ind);
+    
+    final FTTokenizer ft = (FTTokenizer) ind;
+    final byte[] tok = ft.get();
     if(ft.fz) {
       int k = Prop.lserr;
       if(k == 0) k = Math.max(1, tok.length >> 2);
@@ -226,9 +234,14 @@ public final class WordsCTANew extends Index {
     return tmp;*/
   }
   
-  @Override
-  public int[] idRange(final double from, final boolean itok0,
-      final double to, final boolean itok1) {
+  /**
+   * Performs a range query.
+   * @param tok index term
+   * @return results
+   */
+  private int[][] idRange(final RangeToken tok) {
+    final double from = tok.min;
+    final double to = tok.min;
     
     final byte[] tokFrom = Token.token(from);
     final byte[] tokTo = Token.token(to);
@@ -247,8 +260,6 @@ public final class WordsCTANew extends Index {
     }
     
     int[][] dt = null;
-    fromi = itok0;
-    toi = itok1;
     
     if (Token.ftdigit(tokFrom) && Token.ftdigit(tokTo)) {
       int td = tokTo.length - tokFrom.length;
@@ -256,7 +267,9 @@ public final class WordsCTANew extends Index {
       if (hasNextNodes(ne)) {
         //for (int i = ne[0] + 1; i < ne.length - 2; i += 2) {
         for (int i = ne[0] + 1; i < ne.length - 1; i += 2) {
-          if (Token.letter(ne[i + 1])) return Array.extractIDsFromData(dt);
+          if (Token.letter(ne[i + 1]))
+            return new int[][] { Array.extractIDsFromData(dt) };
+          
           if (ne[i + 1] != tokFrom[0] && ne[i + 1] != tokTo[0]) {
             if (tokTID == tokFID) {
             //if (tokTo.length == tokFrom.length) {
@@ -289,15 +302,11 @@ public final class WordsCTANew extends Index {
     } else if (Token.letterOrDigit(tokFrom) && Token.letterOrDigit(tokTo)) {
       dt = idPosRangeText(tokF, tokT);
     }
-    return Array.extractIDsFromData(dt);
+    return new int[][] { Array.extractIDsFromData(dt) };
   }
   
   /** Count current level. */
   private int cl = 0;
-  /** Maximum level, equals the length of the upper bound of a range. */
-  //private int mxl = 0;
-  /** Minimum level, equals the length of the lowerbound of a range. */
-  //private int mnl = 0;
 
   /**
    * Returns all ids that are in the range of tok0 and tok1.
@@ -327,7 +336,7 @@ public final class WordsCTANew extends Index {
       while (k > -1 && idNNT[0][k] == 0) k--;
       if (k > -1) b = idNNT[0][k];
       else b = -1;
-    } else if (toi) {
+    } else {
       ne = getNodeEntry(b);
       //data = getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]);
       ldid = did;
@@ -343,7 +352,7 @@ public final class WordsCTANew extends Index {
     // start travesing with id of tokFrom
     // reduce minimul level, every following node has to be chacked 
     // with same or bigger length than tokFrom
-    if (id > -1 && fromi) {
+    if (id > -1) {
       ne = getNodeEntry(id);
       ldid = did;
       //int[][] tmp 
@@ -366,21 +375,6 @@ public final class WordsCTANew extends Index {
        } 
     }
     return dt;
-  }
-  
-  @Override
-  public int[] ids(final byte[] tok) {
-    int[] ne = getNodeIdFromTrieRecursive(0, tok);
-    long ldid = did;
-    if (ne == null) return null;
-    return Array.extractIDsFromData(
-        //getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]));
-        getDataFromDataArray(ne[ne.length - 1], ldid));
-  }
-
-  @Override
-  public int nrIDs(final byte[] tok, final FTTokenizer ft) {
-    return ids(tok).length;
   }
 
   @Override
@@ -681,13 +675,6 @@ public final class WordsCTANew extends Index {
     }
   }
   
- 
-  /** Lower bound included in bound range. */
-  boolean fromi = false;
-  /** Upper bound included in bound range. */
-  boolean toi = false;
-    
-  
   /**
    * Parses the trie and backups each passed node that has a value
    * wihtin the range of lb and ub.
@@ -864,8 +851,7 @@ public final class WordsCTANew extends Index {
       else if (v[i] < lb[i]) return false;
       i++;
     }
-        
-    return fromi;
+    return true;
   }
  
   /**
@@ -890,10 +876,7 @@ public final class WordsCTANew extends Index {
       else if (v[i] < lb[i]) return false;
       i++;
     }
-    
-    if (v.length == lb.length) 
-      return fromi;
-    return lb.length < v.length;
+    return lb.length <= v.length;
   }
  
   
@@ -918,8 +901,7 @@ public final class WordsCTANew extends Index {
       else if (v[i] > ub[i]) return false;
       i++;
     }
-        
-    return toi;
+    return true;
   }
 
 
@@ -945,10 +927,7 @@ public final class WordsCTANew extends Index {
       else if (v[i] > ub[i]) return false;
       i++;
     }
-        
-    if (v.length == ub.length) 
-      return toi;
-    return ub.length > v.length;
+    return ub.length >= v.length;
   }
 
   

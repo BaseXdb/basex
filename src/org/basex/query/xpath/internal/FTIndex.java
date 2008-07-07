@@ -76,14 +76,13 @@ public final class FTIndex extends FTArrayExpr {
     // ideal solution for phrases would be to process small results first
     // and end up with the largest ones.. but this seems tiresome
     while(ft.more()) {
-      if(data.nrFTIDs(ft.next(), ft) == 0) return new NodeSet(ctx);
+      if(data.nrIDs(ft) == 0) return new NodeSet(ctx);
     }
     
     int[][] d = null;
     ft.init();
     while(ft.more()) {
-      final byte[] b = ft.next();
-      int[][] dd = data.ftIDs(b, ft);
+      int[][] dd = data.ids(ft);
       ctx.checkStop();
       
       d = d == null ? dd : phrase(d, dd);

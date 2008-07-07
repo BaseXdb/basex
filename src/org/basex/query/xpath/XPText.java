@@ -124,7 +124,7 @@ public interface XPText {
   /** Optimization info. */
   String OPTRELATIONAL = "Pre-evaluating relational expression";
   /** Optimization info. */
-  String OPTLOC = "Removing location path with no index results";
+  String OPTLOC = "Removing location path with no results";
   /** Optimization info. */
   String OPTNAME = "Removing unknown tag/attribute \"%\"";
   /** Optimization info. */
@@ -156,7 +156,7 @@ public interface XPText {
   /** Optimization info. */
   String OPTSELF = "Removing superfluous self axes";
   /** Optimization info. */
-  String OPTPRED = "Removing always true predicate";
+  String OPTTRUE = "Removing always true predicate";
   /** Optimization info. */
   String OPTPOSPRED1 = "Adding position predicate to evaluate only first node";
   /** Optimization info. */

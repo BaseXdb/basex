@@ -86,11 +86,6 @@ public final class Fuzzy extends Index {
     return tb.finish();
   }
 
-  @Override
-  public int[] ids(final byte[] tok) {
-    return CTArrayX.getIDsFromData(get(tok));
-  }
-
   /**
    * Determines the pointer on a token.
    * @param tok token looking for.
@@ -298,7 +293,9 @@ public final class Fuzzy extends Index {
   } 
  
   @Override
-  public int[][] ftIDs(final byte[] tok, final FTTokenizer ft) {
+  public int[][] ids(final IndexToken ind) {
+    final FTTokenizer ft = (FTTokenizer) ind;
+    final byte[] tok = ft.get();
     if(ft.fz) {
       int k = Prop.lserr;
       if(k == 0) k = Math.max(1, tok.length >> 2);
@@ -368,8 +365,9 @@ public final class Fuzzy extends Index {
   }
   
   @Override
-  public int nrIDs(final byte[] tok, final FTTokenizer ft) {
+  public int nrIDs(final IndexToken index) {
     // specified ft options are not checked yet...
+    final byte[] tok = index.text;
     final int p = getPointerOnToken(Token.lc(tok));
     return p == -1 ? 0 : getDataSize(p, tok.length);
   }

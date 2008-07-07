@@ -1,10 +1,9 @@
 package org.basex.data;
 
 import java.io.IOException;
-
 import org.basex.index.Index;
+import org.basex.index.IndexToken;
 import org.basex.index.Names;
-import org.basex.util.FTTokenizer;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -110,7 +109,7 @@ public abstract class Data  {
    * @param index index to be closed
    * @throws IOException in case the index could not be closed
    */
-  public abstract void closeIndex(Index.TYPE index) throws IOException;
+  public abstract void closeIndex(IndexToken.TYPE index) throws IOException;
 
   /**
    * Opens the specified index.
@@ -118,7 +117,7 @@ public abstract class Data  {
    * @param ind index instance
    * @throws IOException in case the index could not be opened
    */
-  public abstract void openIndex(Index.TYPE type, Index ind)
+  public abstract void openIndex(IndexToken.TYPE type, Index ind)
     throws IOException;
 
   /**
@@ -296,13 +295,12 @@ public abstract class Data  {
 
   /**
    * Returns the indexed id references for the specified token.
-   * @param type index to be looked up
-   * @param token token to be found
+   * @param token index token reference
    * @return id array
    */
-  public final int[] ids(final Index.TYPE type, final byte[] token) {
-    if(token.length > Token.MAXLEN) return null;
-    switch(type) {
+  public final int[][] ids(final IndexToken token) {
+    if(token.get().length > Token.MAXLEN) return null;
+    switch(token.type) {
       case TXT: return txtindex.ids(token);
       case ATV: return atvindex.ids(token);
       case FTX: return ftxindex.ids(token);
@@ -312,54 +310,26 @@ public abstract class Data  {
   
   /**
    * Returns the number of indexed id references for the specified token.
-   * @param type index type.
    * @param token text to be found
    * @return id array
    */
-  public final int nrIDs(final Index.TYPE type, final byte[] token) {
-    if(token.length > Token.MAXLEN) return Integer.MAX_VALUE;
-    switch(type) {
-      case TXT: return txtindex.nrIDs(token, null);
-      case ATV: return atvindex.nrIDs(token, null);
+  public final int nrIDs(final IndexToken token) {
+    // token to long.. no results can be expected
+    if(token.get().length > Token.MAXLEN) return Integer.MAX_VALUE;
+    switch(token.type) {
+      case TXT: return txtindex.nrIDs(token);
+      case ATV: return atvindex.nrIDs(token);
+      case FTX: return ftxindex.nrIDs(token);
       default:  return Integer.MAX_VALUE;
     }
   }
-  
-  /**
-   * Returns the indexed id references for the specified fulltext token.
-   * @param fulltext token to be looked up
-   * @param ft fulltext tokenizer
-   * @return id array
-   */
-  public abstract int[][] ftIDs(byte[] fulltext, final FTTokenizer ft);
-
-  /**
-   * Returns the number of indexed id references for the specified token.
-   * @param token token to be looked up
-   * @param ft fulltext tokenizer
-   * @return id array
-   */
-  public abstract int nrFTIDs(byte[] token, final FTTokenizer ft);
-
-  /**
-   * Returns the ids for the specified range expression.
-   * Each token between tok0 and tok1 is returned as result.
-   * @param type index type
-   * @param tok0 start token defining the range
-   * @param itok0 token included in range boundaries
-   * @param tok1 end token defining the range
-   * @param itok1 token included in range boundaries
-   * @return ids
-   */
-  public abstract int[] idRange(final Index.TYPE type, final double tok0,
-      final boolean itok0, final double tok1, final boolean itok1);
   
   /**
    * Returns info on the specified index structure.
    * @param type index type
    * @return info
    */
-  public final byte[] info(final Index.TYPE type) {
+  public final byte[] info(final IndexToken.TYPE type) {
     switch(type) {
       case TAG: return tags.info();
       case ATN: return atts.info();

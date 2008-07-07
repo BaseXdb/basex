@@ -3,11 +3,13 @@ package org.basex.data;
 import static org.basex.data.DataText.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
 import org.basex.util.Array;
+import org.basex.util.StringList;
 import org.basex.util.Token;
 
 /**
@@ -77,13 +79,78 @@ public final class Skeleton {
   }
 
   /**
-   * Dumps the tree structure.
-   * @param d data reference
+   * Suggest completions for the specified xpath in a string list,
+   * based on the document tree structure.
+   * Note that only basic completions will be recognized.
+   * @param data data reference
+   * @param xpath input xpath
+   * @return children
    */
-  public void dump(final Data d) {
-    final StringBuilder sb = new StringBuilder();
-    root.dump(sb, 0, d);
-    System.out.println(sb.toString());
+  public StringList suggest(final Data data, final String xpath) {
+    final StringList sl = new StringList();
+    
+    ArrayList<Node> n = new ArrayList<Node>();
+    n.add(root);
+
+    final String input = xpath.startsWith("/") ? xpath : "/" + xpath;
+    final int il = input.length();
+    int s = 0;
+    for(int i = 0; i < il; i++) {
+      final char c = input.charAt(i);
+      if(c == '/' || c == '[') {
+        final boolean desc = i + 1 < il && input.charAt(i + 1) == '/';
+        if(desc && i + 2 < il && input.charAt(i + 2) == '/') return sl;
+        n = child(n, data, input.substring(s, i), desc);
+        if(n.size() == 0) return sl;
+        if(desc) i++;
+        s = i + 1;
+      }
+    }
+
+    for(final Node r : n) {
+      String name = null;
+      if(r.kind == Data.ATTR) {
+        name = "@" + Token.string(data.atts.key(r.name));
+      } else if(r.kind == Data.ELEM) {
+        name = Token.string(data.tags.key(r.name));
+        /*
+      } else if(r.kind == Data.TEXT) {
+        name = "text()";
+      } else if(r.kind == Data.COMM) {
+        name = "comment()";
+      } else if(r.kind == Data.PI) {
+        name = "processing-instruction()";
+        */
+      }
+      if(name != null && !sl.contains(name)) sl.add(name);
+    }
+    sl.sort();
+    return sl;
+  }
+
+  /**
+   * Returns the child node for the specified name.
+   * @param n node
+   * @param data data reference
+   * @param name name
+   * @param desc descendant flag
+   * @return child node
+   */
+  private ArrayList<Node> child(final ArrayList<Node> n, final Data data,
+      final String name, final boolean desc) {
+
+    final ArrayList<Node> ch = new ArrayList<Node>();
+    if(name.startsWith("@")) return ch;
+    final int t = data.tagID(Token.token(name));
+    
+    for(final Node r : n) {
+      if(name.length() != 0 && r.name != t) continue;
+      for(final Node c : r.ch) {
+        if(desc) c.child(ch);
+        else ch.add(c);
+      }
+    }
+    return ch;
   }
 
   /** Document node. */
@@ -117,7 +184,7 @@ public final class Skeleton {
       name = in.readNum();
       kind = in.readByte();
       count = in.readNum();
-      int cl = in.readNum();
+      final int cl = in.readNum();
       ch = new Node[cl];
       for(int i = 0; i < ch.length; i++) ch[i] = new Node(in);
     }
@@ -154,23 +221,17 @@ public final class Skeleton {
     }
 
     /**
-     * Dumps the tree structure.
-     * @param sb string builder
-     * @param l level
-     * @param d data reference
+     * Recursively adds the children to this node.
+     * @param nodes node array
      */
-    void dump(final StringBuilder sb, final int l, final Data d) {
-      for(int i = 0; i < l; i++) sb.append("  ");
-      String nm = "";
-      switch(kind) {
-        case Data.ELEM: nm = Token.string(d.tags.key(name)); break;
-        case Data.ATTR: nm = "@" + Token.string(d.atts.key(name)); break;
-        case Data.TEXT: nm = "TEXT"; break;
-        case Data.COMM: nm = "COMM"; break;
-        case Data.PI  : nm = "PI"; break;
-      }
-      sb.append(nm + ": " + count + "x\n");
-      for(final Node c : ch) c.dump(sb, l + 1, d);
+    public void child(final ArrayList<Node> nodes) {
+      nodes.add(this);
+      for(final Node n : ch) n.child(nodes);
+    }
+
+    @Override
+    public String toString() {
+      return "Node[" + kind + ", " + name + ", " + ch.length + " Children]";
     }
   }
 }

@@ -42,6 +42,14 @@ final class XMLInput {
     in[0].encoding();
     file = f;
   }
+  /**
+   * Sets a new encoding.
+   * @param e encoding
+   * @throws IOException IO Exception
+   */
+  public void encoding(final String e) throws IOException {
+    in[0].encoding(e);
+  }
 
   /**
    * Jumps the specified number of characters back.

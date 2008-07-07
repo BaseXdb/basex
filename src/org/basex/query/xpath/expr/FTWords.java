@@ -107,8 +107,9 @@ public final class FTWords extends FTArrayExpr {
 
   @Override
   public int indexSizes(final XPContext ctx, final Step curr, final int min) {
-    // not quite correct; second argument should contain the correct ft options 
-    return ctx.local.data.nrFTIDs(token, fto.sb);
+    // not quite correct; second argument should contain the correct ft options
+    fto.sb.init(token);
+    return ctx.local.data.nrIDs(fto.sb);
   }
 
   @Override

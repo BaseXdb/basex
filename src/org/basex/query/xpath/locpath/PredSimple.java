@@ -54,7 +54,6 @@ public final class PredSimple extends Pred {
       if(v instanceof Num) {
         if(v.num() == n + 1) tmp.add(pre);
       } else if(v.bool()) {
-        // <cg> find general solution for ftdata
         tmp.add(pre);
       }
     }

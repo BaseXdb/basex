@@ -66,7 +66,7 @@ public final class Update extends Proc {
     for(int i = nodes.size - 1; i >= 0; i--) data.update(nodes.pre[i], t);
     data.flush();
 
-    return Prop.info ? timer(BaseX.info(UPDATEINFO, nodes.size)) : true;
+    return Prop.info ? timer(UPDATEINFO, nodes.size) : true;
   }
 
   /**

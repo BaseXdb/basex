@@ -31,7 +31,7 @@ public interface BuildText {
   /** Scanner Error. */
   String CDATASEC = "Invalid CDATA section.";
   /** Scanner Error. */
-  String XMLCHAR = "Invalid XML character found: '%' (#%)";
+  String XMLCHAR = "Invalid XML character found: #%";
   /** Scanner Error. */
   String CHARACTER = "Invalid character found: '%'";
   /** Scanner Error. */

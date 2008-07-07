@@ -2,7 +2,7 @@ package org.basex.query.xpath.internal;
 
 import static org.basex.query.xpath.XPText.*;
 import org.basex.data.Serializer;
-import org.basex.index.Index;
+import org.basex.index.IndexToken;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
@@ -12,7 +12,6 @@ import org.basex.query.xpath.locpath.LocPath;
 import org.basex.query.xpath.locpath.Step;
 import org.basex.query.xpath.values.Bool;
 import org.basex.query.xpath.values.Comp;
-import org.basex.query.xpath.values.Literal;
 import org.basex.query.xpath.values.Item;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -45,15 +44,11 @@ public final class AllOf extends InternalExpr {
   }
 
   @Override
-  public Bool eval(final XPContext ctx)
-      throws QueryException {
-
+  public Bool eval(final XPContext ctx) throws QueryException {
     final Item v = ctx.eval(path);
     if(v.size() == 0) return Bool.FALSE;
 
-    for(final Item val : vals) {
-      if(!Comp.EQ.eval(v, val)) return Bool.FALSE;
-    }
+    for(final Item val : vals) if(!Comp.EQ.eval(v, val)) return Bool.FALSE;
     return Bool.TRUE;
   }
 
@@ -64,7 +59,7 @@ public final class AllOf extends InternalExpr {
 
     // find index equivalents
     for(int v = 0; v != vl; v++) {
-      indexExprs[v] = new IndexAccess(indexType, ((Literal) vals[v]).str());
+      indexExprs[v] = new IndexAccess(path.indexable(ctx, vals[v], cmp));
     }
 
     ctx.compInfo(OPTALLOF);
@@ -75,20 +70,17 @@ public final class AllOf extends InternalExpr {
   public int indexSizes(final XPContext ctx, final Step curr,
       final int min) {
 
-    indexType = path.indexable(ctx, vals[0], cmp);
-    if(indexType == null) return Integer.MAX_VALUE;
-
     int max = Integer.MIN_VALUE;
     for(final Item val : vals) {
-      final int nrIDs = ctx.local.data.nrIDs(indexType, val.str());
+      final IndexToken index = path.indexable(ctx, val, cmp);
+      if(index == null) return Integer.MAX_VALUE;
+      
+      final int nrIDs = ctx.local.data.nrIDs(index);
       if(nrIDs == 0 || nrIDs > min) return nrIDs;
       if(max < nrIDs) max = nrIDs;
     }
     return max;
   }
-
-  /** Index type (0 = none, 1 = text, 2 = word, 3 = attr). */
-  private Index.TYPE indexType;
 
   @Override
   public String toString() {

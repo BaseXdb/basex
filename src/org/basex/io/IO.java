@@ -76,12 +76,13 @@ public final class IO {
   
   /**
    * Constructor.
-   * @param f file contents
+   * @param f buffer contents
+   * @param fn file name
    */
-  public IO(final byte[] f) {
+  public IO(final byte[] f, final String fn) {
     content = true;
     cont = f;
-    path = "tmp";
+    path = fn;
   }
   
   /**

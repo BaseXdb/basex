@@ -53,7 +53,9 @@ public final class ValueBuilder extends Progress implements IndexBuilder {
     for(id = 0; id < total; id++) {
       checkStop();
       if(data.kind(id) != type) continue;
-      index(text ? data.text(id) : data.attValue(id), id);
+      final byte[] tok = text ? data.text(id) : data.attValue(id);
+      // skip too long and pure whitespace tokens
+      if(tok.length <= Token.MAXLEN && !Token.ws(tok)) index.index(tok, id);
     }
     index.init();
 
@@ -83,19 +85,6 @@ public final class ValueBuilder extends Progress implements IndexBuilder {
     outr.close();
     
     return new Values(data, db, text);
-  }
-
-  /**
-   * Indexes a single token and returns its unique id.
-   * @param tok token to be indexed
-   * @param pre pre value
-   */
-  private void index(final byte[] tok, final int pre) {
-    // check if token exists
-    if(tok.length > Token.MAXLEN || Token.ws(tok)) return;
-
-    // resize tables if necessary
-    index.index(tok, pre);
   }
   
   @Override

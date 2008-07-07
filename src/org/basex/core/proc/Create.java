@@ -18,8 +18,8 @@ import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.index.FTBuilder;
 import org.basex.index.FZBuilder;
-import org.basex.index.Index;
 import org.basex.index.IndexBuilder;
+import org.basex.index.IndexToken;
 import org.basex.index.ValueBuilder;
 import org.basex.io.IO;
 import org.basex.util.Performance;
@@ -170,12 +170,12 @@ public final class Create extends Proc {
       if(Prop.allInfo) info(CREATETABLE + NL, pp.getTimer());
       builder = null;
 
-      if(data.meta.txtindex) buildIndex(Index.TYPE.TXT, data);
-      if(data.meta.atvindex) buildIndex(Index.TYPE.ATV, data);
-      if(data.meta.ftxindex) buildIndex(Index.TYPE.FTX, data);
+      if(data.meta.txtindex) buildIndex(IndexToken.TYPE.TXT, data);
+      if(data.meta.atvindex) buildIndex(IndexToken.TYPE.ATV, data);
+      if(data.meta.ftxindex) buildIndex(IndexToken.TYPE.FTX, data);
       context.data(data);
       
-      return Prop.info ? timer(DBCREATED) : true;
+      return Prop.info ? timer(DBCREATED, db) : true;
     } catch(final FileNotFoundException ex) {
       BaseX.debug(ex);
       err = BaseX.info(FILEWHICH, p.file);
@@ -215,14 +215,13 @@ public final class Create extends Proc {
       if(Prop.onthefly) return new MemBuilder().build(p, db);
 
       final Data data = new DiskBuilder().build(p, db);
-      if(data.meta.txtindex)
-        data.openIndex(Index.TYPE.TXT, new ValueBuilder(true).build(data));
-      if(data.meta.atvindex)
-        data.openIndex(Index.TYPE.ATV, new ValueBuilder(false).build(data));
-      if(data.meta.ftxindex) {
-        data.openIndex(Index.TYPE.FTX, data.meta.ftfuzzy ?
-            new FZBuilder().build(data) : new FTBuilder().build(data));
-      }
+      if(data.meta.txtindex) data.openIndex(
+          IndexToken.TYPE.TXT, new ValueBuilder(true).build(data));
+      if(data.meta.atvindex) data.openIndex(
+          IndexToken.TYPE.ATV, new ValueBuilder(false).build(data));
+      if(data.meta.ftxindex) data.openIndex(
+          IndexToken.TYPE.FTX, data.meta.ftfuzzy ?
+              new FZBuilder().build(data) : new FTBuilder().build(data));
       return data;
     } catch(final IOException ex) {
       BaseX.debug(ex);
@@ -241,16 +240,16 @@ public final class Create extends Proc {
 
     try {
       final Data data = context.data();
-      Index.TYPE index = null;
+      IndexToken.TYPE index = null;
       if(type.equals(TXT)) {
         data.meta.txtindex = true;
-        index = Index.TYPE.TXT;
+        index = IndexToken.TYPE.TXT;
       } else if(type.equals(ATV)) {
         data.meta.atvindex = true;
-        index = Index.TYPE.ATV;
+        index = IndexToken.TYPE.ATV;
       } else if(type.equals(FTX)) {
         data.meta.ftxindex = true;
-        index = Index.TYPE.FTX;
+        index = IndexToken.TYPE.FTX;
       } else {
         throw new IllegalArgumentException();
       }
@@ -270,7 +269,8 @@ public final class Create extends Proc {
    * @param d data reference
    * @throws IOException I/O exception
    */
-  private void buildIndex(final Index.TYPE i, final Data d) throws IOException {
+  private void buildIndex(final IndexToken.TYPE i, final Data d)
+      throws IOException {
     switch(i) {
       case TXT: buildIndex(i,
           new ValueBuilder(true), d, Prop.allInfo ? CREATETEXT : null);  break;
@@ -291,8 +291,8 @@ public final class Create extends Proc {
    * @param inf info string
    * @throws IOException I/O exception
    */
-  private void buildIndex(final Index.TYPE index, final IndexBuilder builder,
-      final Data data, final String inf) throws IOException {
+  private void buildIndex(final IndexToken.TYPE index, final IndexBuilder
+      builder, final Data data, final String inf) throws IOException {
 
     final Performance pp = new Performance();
     progress((Progress) builder);

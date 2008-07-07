@@ -1,7 +1,6 @@
 package org.basex.query.xpath.expr;
 
 import static org.basex.query.xpath.XPText.OPTAND4;
-
 import org.basex.query.FTOpt;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;

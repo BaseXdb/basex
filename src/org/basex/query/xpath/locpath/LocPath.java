@@ -2,7 +2,8 @@ package org.basex.query.xpath.locpath;
 
 import org.basex.data.Data;
 import org.basex.data.Serializer;
-import org.basex.index.Index;
+import org.basex.index.IndexToken;
+import org.basex.index.ValuesToken;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
@@ -80,8 +81,9 @@ public abstract class LocPath extends Expr {
         }
       }
       if(min == Integer.MAX_VALUE) continue;
+      
       // ..what is the optimal maximum for index access?
-      if(this instanceof LocPathRel && min > 100) continue;
+      if(this instanceof LocPathRel && min > ctx.local.data.size / 10) continue;
       
       // predicates that are optimized to use index and results of index queries
       final IntList oldPreds = new IntList();
@@ -182,8 +184,8 @@ public abstract class LocPath extends Expr {
   }
 
   /**
-   * Limit evaluation of predicates to first hit when only existence of path has
-   * to be checked...
+   * Limit evaluation of predicates to first hit
+   * if only existence of path has to be checked.
    * @param ctx query context
    */
   public final void addPosPred(final XPContext ctx) {
@@ -199,7 +201,7 @@ public abstract class LocPath extends Expr {
    * @param cmp comparator
    * @return result of check
    */
-  public final Index.TYPE indexable(final XPContext ctx, final Expr exp,
+  public final IndexToken indexable(final XPContext ctx, final Expr exp,
       final Comp cmp) {
 
     if(!(this instanceof LocPathRel && exp instanceof Literal)) return null;
@@ -211,11 +213,11 @@ public abstract class LocPath extends Expr {
     final Step step = steps.last();
     final boolean text = txt && step.test == TestNode.TEXT &&
       step.preds.size() == 0;
-    final boolean attr = atv && step.simpleName(Axis.ATTR, false) !=
+    final boolean attr = !text && atv && step.simpleName(Axis.ATTR, false) !=
       Integer.MIN_VALUE;
-    if(!text && !attr || !checkAxes()) return null;
 
-    return attr ? Index.TYPE.ATV : Index.TYPE.TXT;
+    return text || attr && checkAxes() ?
+        new ValuesToken(text, ((Literal) exp).str()) : null;
   }
 
   /**

@@ -178,7 +178,7 @@ public final class BaseXTextRenderer extends BaseXBack {
    */
   private void next() {
     x += wordW;
-    final int ch = word.charAt(0);
+    final int ch = word.length() > 0 ? word.charAt(0) : 0;
     if(ch == 0x0A || ch == 0x0B) {
       x = off;
       y += fontH >> (ch == 0x0A ? 0 : 1);
@@ -190,8 +190,6 @@ public final class BaseXTextRenderer extends BaseXBack {
    * @param g graphics reference
    */
   private void write(final Graphics g) {
-    // choose color (later: use variable syntax highlighter)
-    final char ch = word.charAt(0);
     final Color color = isEnabled() ? syntax.getColor(word) : Color.gray;
 
     // return if current text is not visible.
@@ -219,11 +217,10 @@ public final class BaseXTextRenderer extends BaseXBack {
       }
 
       // don't write whitespaces
+      final int ch = word.length() > 0 ? word.charAt(0) : 0;
       if(ch > ' ') {
         g.setColor(color);
         g.drawString(word, x, y);
-      } else if(ch < ' ') {
-        g.setFont(font);
       }
   
       // show cursor

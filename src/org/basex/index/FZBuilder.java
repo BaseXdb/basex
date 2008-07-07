@@ -92,9 +92,10 @@ public final class FZBuilder extends Progress implements IndexBuilder {
    * Indexes a single token.
    */
   private void index() {
-    final byte[] tok = wp.next();
+    final byte[] tok = wp.get();
     final int pos = wp.pos;
     final int tl = tok.length;
+    if(tl > Token.MAXLEN) return;
     if(tree[tl] == null) {
       isize++;
       tree[tl] = new FZHash();

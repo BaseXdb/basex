@@ -4,6 +4,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import org.basex.util.Array;
 import org.basex.util.Token;
 
 /**
@@ -27,6 +33,8 @@ public class BufferInput {
   private InputStream in;
   /** Default encoding for text files. */
   private String enc = Token.UTF8;
+  /** Charset decoder. */
+  private CharsetDecoder csd;
 
   /**
    * Empty constructor.
@@ -80,7 +88,16 @@ public class BufferInput {
     in = is;
     next();
   }
-  
+
+  /**
+   * Empty constructor.
+   * @param buf buffer
+   */
+  public BufferInput(final byte[] buf) {
+    buffer = buf;
+    length = buf.length;
+  }
+
   /**
    * Determines the file encoding.
    */
@@ -101,14 +118,19 @@ public class BufferInput {
   }
 
   /**
-   * Empty constructor.
-   * @param buf buffer
+   * Sets a new encoding.
+   * @param e encoding
+   * @throws IOException IO Exception
    */
-  public BufferInput(final byte[] buf) {
-    buffer = buf;
-    length = buf.length;
+  public final void encoding(final String e) throws IOException {
+    try {
+      enc = e.equals(Token.UTF8) || e.equals(Token.UTF82) ? Token.UTF8 : e;
+      csd = Charset.forName(e).newDecoder();
+    } catch(final Exception ex) {
+      throw new IOException(ex.toString());
+    }
   }
-  
+
   /**
    * Reads a single byte and returns it as integer.
    * @return read byte
@@ -116,9 +138,9 @@ public class BufferInput {
   public final int read() {
     return readByte() & 0xFF;
   }
-  
+
   /**
-   * Returns the next byte.
+   * Returns the next byte or 0 if all bytes have been read.
    * @return next byte
    */
   public byte readByte() {
@@ -128,7 +150,7 @@ public class BufferInput {
     }
     return buffer[pos++];
   }
-  
+
   /**
    * Reads the next buffer entry.
    */
@@ -143,13 +165,14 @@ public class BufferInput {
   }
 
   /**
-   * Returns the next character.
+   * Returns the next character, 0 if all bytes have been read or 
+   * a negative character value -1 if the read byte is invalid.
    * @return next character
    */
   public final int readChar() {
     // support encodings..
     byte ch = readByte();
-    if(enc == Token.UTF16LE) return (ch & 0xFF) | (readByte() << 8) & 0xFF;
+    if(enc == Token.UTF16LE) return (ch & 0xFF) | ((readByte() & 0xFF) << 8);
     if(enc == Token.UTF16BE) return ((ch & 0xFF) << 8) | readByte() & 0xFF;
     if(enc == Token.UTF8) {
       final int cl = Token.cl(ch);
@@ -158,9 +181,24 @@ public class BufferInput {
       for(int c = 1; c < cl; c++) CACHE[c] = readByte();
       return Token.cp(CACHE, 0);
     }
-    return ch & 0xFF;
+    if(ch >= 0) return ch;
+
+    // convert other encodings.. loop until all needed bytes have been read
+    int p = 0;
+    while(true) {
+      if(p == 4) return -CACHE[0];
+      CACHE[p++] = ch;
+      try {
+        CharBuffer cb = csd.decode(ByteBuffer.wrap(Array.finish(CACHE, p)));
+        int i = 0;
+        for(int c = 0; c < cb.limit(); c++) i |= cb.get(c) << (c << 3);
+        return i;
+      } catch(final CharacterCodingException ex) {
+        ch = readByte();
+      }
+    }
   }
-  
+
   /** UTF8 cache. */
   private static final byte[] CACHE = new byte[4];
 

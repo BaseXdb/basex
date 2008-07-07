@@ -2,10 +2,10 @@ package org.basex.data;
 
 import org.basex.BaseX;
 import org.basex.index.Index;
+import org.basex.index.IndexToken;
 import org.basex.index.MemValues;
 import org.basex.index.Names;
 import org.basex.util.Array;
-import org.basex.util.FTTokenizer;
 import org.basex.util.Token;
 
 /**
@@ -62,10 +62,10 @@ public final class MemData extends Data {
   public void close() { }
 
   @Override
-  public void closeIndex(final Index.TYPE index) { }
+  public void closeIndex(final IndexToken.TYPE index) { }
 
   @Override
-  public void openIndex(final Index.TYPE type, final Index ind) { }
+  public void openIndex(final IndexToken.TYPE type, final Index ind) { }
 
   @Override
   public int kind(final int pre) {
@@ -84,12 +84,12 @@ public final class MemData extends Data {
 
   @Override
   public int tagID(final int pre) {
-    return (int) (val[pre] >>> 24) & 0x3F;
+    return (int) (val[pre] >>> 24) & 0x7F;
   }
 
   @Override
   public int tagNS(final int pre) {
-    return (int) (val[pre] >>> 30) & 0x3;
+    return (int) (val[pre] >>> 30) & 0x1;
   }
 
   @Override
@@ -99,12 +99,12 @@ public final class MemData extends Data {
 
   @Override
   public int attNameID(final int pre) {
-    return (int) (val[pre] >>> 24) & 0x3F;
+    return (int) (val[pre] >>> 24) & 0x7F;
   }
 
   @Override
   public int attNS(final int pre) {
-    return (int) (val[pre] >>> 30) & 0x3;
+    return (int) (val[pre] >>> 30) & 0x1;
   }
 
   @Override
@@ -224,7 +224,7 @@ public final class MemData extends Data {
       final int s, final int k) {
 
     check();
-    val[size++] = ((long) k << 61) + ((long) a << 56) + ((long) n << 38) +
+    val[size++] = ((long) k << 61) + ((long) a << 56) + ((long) n << 39) +
       ((long) s << 32) + ((long) t << 24) + d;
   }
 
@@ -240,7 +240,7 @@ public final class MemData extends Data {
 
     check();
     final long ai = attIndex(v);
-    val[size++] = ((long) Data.ATTR << 61) + ((long) n << 38) + (ai << 32) +
+    val[size++] = ((long) Data.ATTR << 61) + ((long) n << 39) + (ai << 32) +
       ((long) a << 24) + d;
   }
 
@@ -306,25 +306,6 @@ public final class MemData extends Data {
    */
   private void check() {
     if(size == val.length) val = Array.extend(val);
-  }
-
-  @Override
-  public int[][] ftIDs(final byte[] word, final FTTokenizer ft) {
-    BaseX.notimplemented();
-    return null;
-  }
-
-  @Override
-  public int[] idRange(final Index.TYPE type, final double word0,
-      final boolean iword0, final double word1, final boolean iword1) {
-    BaseX.notimplemented();
-    return null;
-  }
-
-  @Override
-  public int nrFTIDs(final byte[] token, final FTTokenizer ft) {
-    BaseX.notimplemented();
-    return 0;
   }
 
   @Override

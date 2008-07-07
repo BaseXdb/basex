@@ -384,7 +384,7 @@ public final class Token {
     final int tl = to.length;
     boolean f = false;
     for(int t : to) {
-      if(t > 0 && t < ' ' || digit(t)) continue;
+      if(t >= 0 && t <= ' ' || digit(t)) continue;
       f = t == 'e' || t == 'E' || t == '.';
       if(!f) return Double.NaN;
     }

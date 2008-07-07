@@ -204,7 +204,7 @@ public abstract class Builder extends Progress {
     // get tag and namespaces references
     final int tid = tags.index(tag, null);
     final int tns = ns.get(tag);
-    skel.add(tid, level, Data.ELEM);
+    skel.add(tid, level, kind);
 
     // create numeric attribute references and check if they appear only once
     final int al = att != null ? att.length : 0;

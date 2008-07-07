@@ -2,7 +2,7 @@ package org.basex.query.xpath.internal;
 
 import static org.basex.query.xpath.XPText.*;
 import org.basex.data.Serializer;
-import org.basex.index.Index;
+import org.basex.index.IndexToken;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.values.NodeSet;
 import org.basex.util.Token;
@@ -16,30 +16,27 @@ import org.basex.util.Token;
  */
 public final class IndexAccess extends InternalExpr {
   /** Index type. */
-  private final Index.TYPE type;
-  /** Token to be found in the index. */
-  private final byte[] token;
+  private final IndexToken index;
 
   /**
    * Constructor.
-   * @param typ index type
-   * @param tok index token
+   * @param ind index reference
    */
-  public IndexAccess(final Index.TYPE typ, final byte[] tok) {
-    token = tok;
-    type = typ;
+  public IndexAccess(final IndexToken ind) {
+    index = ind;
   }
 
   @Override
   public NodeSet eval(final XPContext ctx) {
-    ctx.local = new NodeSet(ctx.local.data.ids(type, token), ctx);
+    ctx.local = new NodeSet(ctx.local.data.ids(index)[0], ctx);
     return ctx.local;
   }
 
   @Override
   public void plan(final Serializer ser) throws Exception {
-    ser.openElement(this, Token.token(TYPE), Token.token(type.toString()));
-    ser.item(token);
+    ser.openElement(this, Token.token(TYPE),
+        Token.token(index.type.toString()));
+    ser.item(index.get());
     ser.closeElement(this);
   }
 
@@ -50,7 +47,7 @@ public final class IndexAccess extends InternalExpr {
 
   @Override
   public String toString() {
-    return Token.string(name()) + "(" + type + ", \"" +
-      Token.string(token) + "\")";
+    return Token.string(name()) + "(" + index.type + ", \"" +
+      Token.string(index.get()) + "\")";
   }
 }

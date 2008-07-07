@@ -2,6 +2,7 @@ package org.basex.util;
 
 import static org.basex.util.Token.*;
 import org.basex.core.Prop;
+import org.basex.index.IndexToken;
 
 /**
  * Full-text tokenizer.
@@ -9,11 +10,9 @@ import org.basex.core.Prop;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class FTTokenizer {
+public final class FTTokenizer extends IndexToken {
   /** Stemming instance. */
   private static final Stemming STEM = new Stemming();
-  /** Textual contents. */
-  private byte[] text;
   
   /** Stemming flag. */
   public boolean stem = Prop.ftstem;
@@ -44,14 +43,17 @@ public final class FTTokenizer {
   /**
    * Empty constructor.
    */
-  public FTTokenizer() { }
+  public FTTokenizer() {
+    super(TYPE.FTX);
+  }
   
   /**
    * Constructor.
    * @param txt text
    */
   public FTTokenizer(final byte[] txt) {
-    init(txt);
+    this();
+    text = txt;
   }
   
   /**
@@ -112,11 +114,8 @@ public final class FTTokenizer {
     return true;
   }
   
-  /**
-   * Returns the next token.
-   * @return size
-   */
-  public byte[] next() {
+  @Override
+  public byte[] get() {
     byte[] n = substring(text, s, p);
     if(!dc) n = dc(n);
     if(uc) n = uc(n);

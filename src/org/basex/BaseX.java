@@ -1,7 +1,6 @@
 package org.basex;
 
 import static org.basex.Text.*;
-
 import org.basex.core.AbstractProcess;
 import org.basex.core.Command;
 import org.basex.core.Context;

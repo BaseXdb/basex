@@ -1,7 +1,6 @@
 package org.basex.index;
 
 import org.basex.util.Array;
-import org.basex.util.FTTokenizer;
 import org.basex.util.Set;
 import org.basex.util.Token;
 
@@ -45,13 +44,13 @@ public final class MemValues extends Index {
   }
   
   @Override
-  public int[] ids(final byte[] key) {
-    return index.ids(key);
+  public int[][] ids(final IndexToken ind) {
+    return new int[][] { index.ids(ind.text) };
   }
   
   @Override
-  public int nrIDs(final byte[] key, final FTTokenizer ft) {
-    return index.len(key);
+  public int nrIDs(final IndexToken ind) {
+    return index.len(ind.text);
   }
 
   @Override

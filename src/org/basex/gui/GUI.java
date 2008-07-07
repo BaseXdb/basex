@@ -427,10 +427,11 @@ public final class GUI extends JFrame {
   /**
    * Checks if the specified thread is obsolete.
    * @param thread thread to be checked
+   * @param cmd executed command
    * @return result of check
    */
-  protected boolean obsolete(final int thread) {
-    final boolean obs = thread != threadID;
+  protected boolean obsolete(final int thread, final Commands cmd) {
+    final boolean obs = thread != threadID  && !cmd.data() && !cmd.updating();
     if(obs) proc = null;
     return obs;
   }
@@ -455,16 +456,16 @@ public final class GUI extends JFrame {
           if(threadID != thread) return;
         }
 
+
         cursor(CURSORWAIT);
 
         try {
           // parse command string
           final CommandParser cp = new CommandParser(command);
           while(cp.more()) {
-            if(obsolete(thread)) return;
-
             final Command cmd = cp.next();
             final Commands cc = cmd.name;
+            if(obsolete(thread, cc)) return;
 
             // exit command
             if(cc == Commands.EXIT || cc == Commands.QUIT) {
@@ -488,7 +489,7 @@ public final class GUI extends JFrame {
             }
 
             if(cc.updating()) View.working = false;
-            if(obsolete(thread)) return;
+            if(obsolete(thread, cc)) return;
 
             final Result result = p.result();
             final Nodes nodes = result instanceof Nodes ? (Nodes) result : null;
@@ -515,13 +516,20 @@ public final class GUI extends JFrame {
               }
             }
 
-            final String time = perf.getTimer();
-            final String inf = p.info();
-            if(obsolete(thread)) return;
-
             // check if query feedback was evaluated in the query view
+            final String inf = p.info();
             final boolean feedback = cc.printing() && data != null &&
               GUIProp.showquery && cc == Commands.XQUERY && query.info(inf, ok);
+            
+            if(!ok) {
+              // show error info
+              if(feedback) status.setText(STATUSOK);
+              else status.setError(inf);
+              break;
+            }
+            
+            final String time = perf.getTimer();
+            if(obsolete(thread, cc)) return;
 
             final Data ndata = context.data();
             if(ndata != data) {
@@ -558,10 +566,10 @@ public final class GUI extends JFrame {
                 }
               }
             }
-            if(obsolete(thread)) return;
+            if(obsolete(thread, cc)) return;
 
             // print result
-            if(ok && cc.printing() && nodes == null) {
+            if(cc.printing() && nodes == null) {
               text.setText(out.buffer(), out.size(), false);
               //text.updateHeader(null);
             }
@@ -573,15 +581,8 @@ public final class GUI extends JFrame {
             if(GUIProp.showinfo) info.setInfo(result != null ?
                 Token.token(inf) : Token.EMPTY);
 
-            if(ok) {
-              // show status info
-              status.setText(BaseX.info(PROCTIME, time));
-            } else {
-              // show error info
-              if(feedback) status.setText(STATUSOK);
-              else status.setError(inf);
-              break;
-            }
+            // show status info
+            status.setText(BaseX.info(PROCTIME, time));
           }
         } catch(final IllegalArgumentException ex) {
           // unknown command or wrong argument

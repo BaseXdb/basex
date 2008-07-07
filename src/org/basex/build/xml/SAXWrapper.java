@@ -29,6 +29,8 @@ import org.xml.sax.helpers.DefaultHandler;
 public final class SAXWrapper extends Parser {
   /** Element counter. */
   int nodes;
+  /** DTD flag. */
+  boolean dtd;
   /** Builder reference. */
   Builder builder;
 
@@ -135,6 +137,7 @@ public final class SAXWrapper extends Parser {
     public void processingInstruction(final String name, final String cont)
         throws SAXException {
       
+      if(dtd) return;
       try {
         finishText();
         builder.pi(new TokenBuilder(name + ' ' + cont));
@@ -148,6 +151,7 @@ public final class SAXWrapper extends Parser {
     public void comment(final char[] ch, final int s, final int l)
         throws SAXException {
       
+      if(dtd) return;
       try {
         finishText();
         builder.comment(new TokenBuilder(new String(ch, s, l)));
@@ -218,11 +222,17 @@ public final class SAXWrapper extends Parser {
     /* public void fatalError(final SAXParseException e) { } */
 
     // LexicalHandler
+    public void startDTD(final String n, final String pid, final String sid) {
+      dtd = true;
+    }
+
+    public void endDTD() {
+      dtd = false;
+    }
+
     public void endCDATA() { }
-    public void endDTD() { }
     public void endEntity(final String name) { }
     public void startCDATA() { }
-    public void startDTD(final String n, final String pid, final String sid) { }
     public void startEntity(final String name) { }
   }
 }

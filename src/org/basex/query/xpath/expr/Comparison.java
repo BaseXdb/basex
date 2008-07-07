@@ -33,6 +33,7 @@ public abstract class Comparison extends DualExpr {
   public Bool eval(final XPContext ctx) throws QueryException {
     final Item v1 = ctx.eval(expr1);
     final Item v2 = ctx.eval(expr2);
+   
     // don't evaluate empty node sets
     return Bool.get(v1.size() != 0 && v2.size() != 0 && type.eval(v1, v2));
   }

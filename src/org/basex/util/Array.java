@@ -9,6 +9,8 @@ package org.basex.util;
 public final class Array {
   /** Empty integer array. */
   public static final int[] NOINTS = {};
+  /** Empty integer array. */
+  public static final int[][] NOINTS2 = {};
 
   /** Private constructor. */
   private Array() { }
@@ -171,6 +173,17 @@ public final class Array {
    * @return finished array
    */
   public static byte[] finish(final byte[] ar, final int size) {
+    final int s = ar.length;
+    return resize(ar, s > size ? size : s, size);
+  }
+
+  /**
+   * Optimizes the array size.
+   * @param ar array to be resized
+   * @param size final size
+   * @return finished array
+   */
+  public static char[] finish(final char[] ar, final int size) {
     final int s = ar.length;
     return resize(ar, s > size ? size : s, size);
   }

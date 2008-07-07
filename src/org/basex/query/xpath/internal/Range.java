@@ -4,7 +4,8 @@ import static org.basex.query.xpath.XPText.*;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.data.StatsKey;
-import org.basex.index.Index;
+import org.basex.index.IndexToken;
+import org.basex.index.RangeToken;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
@@ -67,20 +68,17 @@ public final class Range extends InternalExpr {
   }
   
   /** Index type. */
-  private Index.TYPE indexType;
-  /** Range Key. */
-  private StatsKey key;
+  private RangeToken ind;
   
   @Override
-  public Path indexEquivalent(final XPContext ctx, final Step curr) {
+  public Expr indexEquivalent(final XPContext ctx, final Step curr) {
     final LocPath path = (LocPath) expr;
     final LocPath inv = path.invertPath(curr);
 
-    ctx.compInfo(indexType == Index.TYPE.TXT ? OPTINDEX : OPTATTINDEX);
-    if(indexType == Index.TYPE.ATV) {
-      inv.steps.add(0, Axis.create(Axis.SELF, path.steps.last().test));
-    }
-    return new Path(new RangeAccess(indexType, key, min, max), inv);
+    final boolean txt = ind.type == IndexToken.TYPE.TXT;
+    ctx.compInfo(txt ? OPTINDEX : OPTATTINDEX);
+    if(!txt) inv.steps.add(0, Axis.create(Axis.SELF, path.steps.last().test));
+    return new Path(new RangeAccess(ind), inv);
   }
   
   @Override
@@ -95,15 +93,19 @@ public final class Range extends InternalExpr {
     
     final Step step = path.steps.last();
     final boolean text = txt && step.test == TestNode.TEXT &&
-      step.preds.size() == 0;
-    if(!text && !atv || !path.checkAxes() || !data.meta.chop)
+      step.preds.size() == 0 && data.meta.chop;
+    if(!text && !atv || !path.checkAxes())
       return Integer.MAX_VALUE;
 
-    indexType = text ? Index.TYPE.TXT : Index.TYPE.ATV;
-    getKey(path, data, text);
-    
+    ind = new RangeToken(text, min, max);
+    final StatsKey key = getKey(path, data, text);
+    if(key == null) return Integer.MAX_VALUE;
+
+    // all values out of range - no results
+    if(ind.min > ind.max || ind.max < key.min || ind.min > key.max) return 0;
+
     // if index can be applied, assume data size / 10 as costs
-    return key == null || key.kind != StatsKey.Kind.DBL && key.kind !=
+    return key.kind != StatsKey.Kind.DBL && key.kind !=
       StatsKey.Kind.INT ? Integer.MAX_VALUE : data.size / 10;
   }
   
@@ -112,20 +114,21 @@ public final class Range extends InternalExpr {
    * @param path location path
    * @param data data reference
    * @param text text flag
+   * @return key
    */
-  private void getKey(final LocPathRel path, final Data data,
+  private StatsKey getKey(final LocPathRel path, final Data data,
       final boolean text) {
     
     final int st = path.steps.size();
     if(text) {
-      if(st == 1) return;
+      if(st == 1) return null;
       final Step step = path.steps.get(st - 2);
-      if(!(step.test instanceof TestName)) return;
-      key = data.tags.stat(((TestName) step.test).id);
+      if(!(step.test instanceof TestName)) return null;
+      return data.tags.stat(((TestName) step.test).id);
     } else {
       final int id = path.steps.last().simpleName(Axis.ATTR, true);
-      if(id == Integer.MIN_VALUE) return;
-      key = data.atts.stat(id);
+      if(id == Integer.MIN_VALUE) return null;
+      return data.atts.stat(id);
     }
   }
 

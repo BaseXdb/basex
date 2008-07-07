@@ -331,8 +331,9 @@ public final class TableData {
    */
   void find() {
     final Data data = GUI.context.data();
+    final boolean root = rows == rootRows;
     final String xpath = Find.findTable(filter, colNames,
-        data.tags.key(rootTag), data, GUIProp.filterrt);
+        data.tags.key(rootTag), data, GUIProp.filterrt || root);
     GUI.get().execute(Commands.XPATH, xpath.length() != 0 ? xpath : "/");
   }
 

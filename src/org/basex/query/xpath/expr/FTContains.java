@@ -128,7 +128,7 @@ public final class FTContains extends DualExpr {
     // check all ftcontains options recursively if they comply
     // to the index options..
     if(!((FTArrayExpr) expr2).indexOptions(meta)) return Integer.MAX_VALUE;
-    
+ 
     // TODO... check number of index results
     //final byte[] token = expr2.str();
     //final int nrIDs = ctx.local.data.nrFTIDs(token);

@@ -2,12 +2,9 @@ package org.basex.test;
 
 import java.io.IOException;
 import java.util.ArrayList;
-
 import org.basex.util.GetOpts;
 import org.junit.Test;
 import static org.junit.Assert.*;
-
-
 
 /**
  * GetOpt Test class.
@@ -16,18 +13,15 @@ import static org.junit.Assert.*;
  * @author Hannes Schwarz
  */
 public final class GetOptTest {
-
   /** OutputStream.*/
   private String returnedPath;
   /** OutputStream.*/
   private String returnedArgument;
 
-
   /**
    * Constructor.
    */
   public GetOptTest() { }
-
 
   /**
    * Test of GetOpt.
@@ -41,7 +35,6 @@ public final class GetOptTest {
    */
   @Test
   public void testWithoutOption() throws IOException {
-
     /*
      *   % testopt
      *   aflag = 0, bflag = 0, cvalue = (null)
@@ -60,6 +53,7 @@ public final class GetOptTest {
     assertEquals("Path of fs testopt /music/IckeUndEr", 
         "/music/IckeUndEr", g.getPath());
   }
+
   /**
    * Test of GetOpt.
    * 

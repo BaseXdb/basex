@@ -6,16 +6,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-
 import javax.swing.JComboBox;
 import javax.swing.plaf.basic.BasicComboPopup;
-
 import org.basex.core.Commands;
+import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.util.StringList;
-import org.basex.util.Token;
 
 /**
  * This class offers a text field for XPath input.
@@ -25,13 +23,6 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class GUIInput extends BaseXTextField {
-  /** XPath input completions. */
-  private static final String[] XPATH = { "*", "comment()", "node()",
-    "processing-instruction()", "text()", "ancestor-or-self::", "ancestor::",
-      "attribute::", "child::", "descendant-or-self::", "descendant::",
-      "following-sibling::", "following::", "parent::", "preceding-sibling::",
-      "preceding::", "self::" };
-
   /** BasicComboPopup Menu. */
   ComboPopup pop;
   /** JComboBox. */
@@ -163,7 +154,8 @@ public final class GUIInput extends BaseXTextField {
     final String query = getText();
     if(cmdMode()) {
       cmdPopup(query);
-    } else if(GUIProp.searchmode == 1) {
+    } else if(GUIProp.searchmode == 1 ||
+        GUIProp.searchmode == 0 && query.startsWith("/")) {
       xpathPopup(query);
     }
   }
@@ -192,57 +184,24 @@ public final class GUIInput extends BaseXTextField {
    * @param query query input
    */
   private void xpathPopup(final String query) {
+    final int last = Math.max(query.lastIndexOf('|'), query.lastIndexOf('('));
+    final int slash = Math.max(Math.max(last, query.lastIndexOf('/')),
+        query.lastIndexOf('['));
+
+    pre = slash != -1 ? query.substring(0, slash + 1) : "";
+    final String pref = query.substring(last + 1, slash != -1 ? slash + 1 :
+      query.length()).trim();
+ 
     final StringList sl = new StringList();
-
-    final int slash = Math.max(query.lastIndexOf('/'),
-        Math.max(query.lastIndexOf('['), query.lastIndexOf('(')));
-    final int axis = query.lastIndexOf("::");
-    final boolean test = axis > slash;
-
-    pre = "";
-    if(test) pre = query.substring(0, axis + 2);
-    else if(slash != -1) pre = query.substring(0, slash + 1);
-
-    if(query.length() != 0) {
-      final String suf = getText().substring(pre.length());
-      final String[] all = xpathList();
-      if(test) {
-        final boolean attest = pre.endsWith("attribute::");
-        for(final String a : all) {
-          if(a.endsWith("::")) continue;
-          if(attest ^ a.startsWith("@")) continue;
-          final String at = a.substring(attest ? 1 : 0);
-          if(at.startsWith(suf) && !at.equals(suf)) sl.add(at);
-        }
-      } else {
-        for(final String a : all) {
-          if(a.startsWith(suf) && !a.equals(suf)) sl.add(a);
-        }
+    final Context ctx = GUI.context;
+    if(query.length() != 0 && (pref.startsWith("/") || ctx.root())) {
+      final String suf = getText().substring(pre.length()).trim();
+      final Data data = ctx.data();
+      for(final String a : data.skel.suggest(data, pref).finish()) {
+        if(a.startsWith(suf) && !a.equals(suf)) sl.add(a);
       }
     }
     createCombo(sl);
-  }
-
-  /**
-   * Creates a combo box list.
-   * @return list
-   */
-  private String[] xpathList() {
-    final StringList sl = new StringList();
-    final Data data = GUI.context.data();
-
-    for(int i = 1; i <= data.tags.size(); i++) {
-      if(data.tags.counter(i) == 0) continue;
-      sl.add(Token.string(data.tags.key(i)));
-    }
-    for(int i = 1; i <= data.atts.size(); i++) {
-      if(data.atts.counter(i) == 0) continue;
-      sl.add("@" + Token.string(data.atts.key(i)));
-    }
-    sl.sort();
-
-    for(final String c : XPATH) sl.add(c);
-    return sl.finish();
   }
 
   /**

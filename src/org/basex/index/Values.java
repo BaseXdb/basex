@@ -8,7 +8,6 @@ import java.util.Arrays;
 import org.basex.data.Data;
 import org.basex.io.DataAccess;
 import org.basex.util.Array;
-import org.basex.util.FTTokenizer;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -53,7 +52,6 @@ public final class Values extends Index {
   @Override
   public byte[] info() {
     final TokenBuilder tb = new TokenBuilder();
-    //tb.add(text ? TEXTINDEX : VALUEINDEX);
     tb.add(TXTINDEX + NL);
     tb.add(IDXENTRIES + size + NL);
     final long l = idxl.length() + idxr.length();
@@ -62,9 +60,11 @@ public final class Values extends Index {
   }
 
   @Override
-  public int[] ids(final byte[] tok) {
-    final long pos = get(tok);
-    if(pos == 0) return Array.NOINTS;
+  public int[][] ids(final IndexToken tok) {
+    if(tok.range()) return idRange((RangeToken) tok);
+    
+    final long pos = get(tok.text);
+    if(pos == 0) return Array.NOINTS2;
     
     final int ds = idxl.readNum(pos);
     final int[] ids = new int[ds];
@@ -73,18 +73,23 @@ public final class Values extends Index {
       ids[d] = p + idxl.readNum();
       p = ids[d];
     }
-    return ids;
+    return new int[][] { ids };
   }
 
   @Override
-  public int nrIDs(final byte[] tok, final FTTokenizer ft) {
-    final long pos = get(tok);
+  public int nrIDs(final IndexToken tok) {
+    final long pos = get(tok.text);
     return pos > 0 ? idxl.readNum(pos) : 0;
   }
 
-  @Override
-  public int[] idRange(final double min, final boolean ge, 
-      final double max, final boolean le) {
+  /**
+   * Performs a range query.
+   * @param tok index term
+   * @return results
+   */
+  private int[][] idRange(final RangeToken tok) {
+    final double min = tok.min;
+    final double max = tok.max;
 
     final int mx = (long) max == max ? token(max).length : 0;  
     final boolean sl = (long) max == max && (long) min == min && 
@@ -113,16 +118,13 @@ public final class Values extends Index {
           continue;
         }
       }
-      
+
       ids.add(pre);
-      for(int d = 0; d < ds; d++) {
-        pre += idxl.readNum(); 
-        ids.add(pre);
-      }
+      for(int d = 0; d < ds - 1; d++) ids.add(pre += idxl.readNum());
     }
     final int[] res = ids.finish();
     Arrays.sort(res);
-    return res;
+    return new int[][] { res };
   }
   
   /**

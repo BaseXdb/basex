@@ -2,10 +2,10 @@ package org.basex.data;
 
 import static org.basex.data.DataText.*;
 import java.io.IOException;
-
 import org.basex.core.Prop;
 import org.basex.index.Fuzzy;
 import org.basex.index.Index;
+import org.basex.index.IndexToken;
 import org.basex.index.Names;
 import org.basex.index.Values;
 import org.basex.index.WordsCTANew;
@@ -13,7 +13,6 @@ import org.basex.io.DataAccess;
 import org.basex.io.TableAccess;
 import org.basex.io.TableDiskAccess;
 import org.basex.io.TableMemAccess;
-import org.basex.util.FTTokenizer;
 import org.basex.util.Token;
 
 /**
@@ -92,9 +91,11 @@ public final class DiskData extends Data {
     values = new DataAccess(db, DATAATV);
 
     if(index) {
-      if(meta.txtindex) openIndex(Index.TYPE.TXT, new Values(this, db, true));
-      if(meta.atvindex) openIndex(Index.TYPE.ATV, new Values(this, db, false));
-      if(meta.ftxindex) openIndex(Index.TYPE.FTX, meta.ftfuzzy ?
+      if(meta.txtindex) openIndex(
+          IndexToken.TYPE.TXT, new Values(this, db, true));
+      if(meta.atvindex) openIndex(
+          IndexToken.TYPE.ATV, new Values(this, db, false));
+      if(meta.ftxindex) openIndex(IndexToken.TYPE.FTX, meta.ftfuzzy ?
           new Fuzzy(this, db) : new WordsCTANew(this, db));
     }
     initNames();
@@ -139,13 +140,13 @@ public final class DiskData extends Data {
     table.close();
     texts.close();
     values.close();
-    closeIndex(Index.TYPE.TXT);
-    closeIndex(Index.TYPE.ATV);
-    closeIndex(Index.TYPE.FTX);
+    closeIndex(IndexToken.TYPE.TXT);
+    closeIndex(IndexToken.TYPE.ATV);
+    closeIndex(IndexToken.TYPE.FTX);
   }
 
   @Override
-  public void closeIndex(final Index.TYPE index) throws IOException {
+  public void closeIndex(final IndexToken.TYPE index) throws IOException {
     switch(index) {
       case TXT: if(txtindex != null) txtindex.close(); break;
       case ATV: if(atvindex != null) atvindex.close(); break;
@@ -155,7 +156,7 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public void openIndex(final Index.TYPE type, final Index index) {
+  public void openIndex(final IndexToken.TYPE type, final Index index) {
     switch(type) {
       case TXT: if(meta.txtindex) txtindex = index; break;
       case ATV: if(meta.atvindex) atvindex = index; break;
@@ -323,23 +324,6 @@ public final class DiskData extends Data {
       n = q;
     }
     return num;
-  }
-
-  @Override
-  public int[][] ftIDs(final byte[] word, final FTTokenizer ft) {
-    return ftxindex.ftIDs(word, ft);
-  }
-
-  @Override
-  public int[] idRange(final Index.TYPE type, final double word1,
-      final boolean itok0, final double word2, final boolean itok1) {
-    final Index index = type == Index.TYPE.TXT ? txtindex : atvindex;
-    return index.idRange(word1, itok0, word2, itok1);
-  }
-
-  @Override
-  public int nrFTIDs(final byte[] token, final FTTokenizer ft) {
-     return ftxindex.nrIDs(token, ft);
   }
 
   @Override

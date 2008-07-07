@@ -27,22 +27,21 @@ public final class Find extends XPath {
   /**
    * Creates an XPath representation for the specified query.
    * @param query query
-   * @param context context reference
+   * @param ctx context reference
    * @param root root flag
    * @return XPath query
    */
-  public static String find(final String query, final Context context,
+  public static String find(final String query, final Context ctx,
       final boolean root) {
     
     if(query.startsWith("/")) return query;
 
-    final Nodes current = context.current();
-    final boolean r = root || current.size == 1 && current.pre[0] < 1;
+    final boolean r = root || ctx.root();
     if(query.length() == 0) return r ? "/" : ".";
 
     // deepfs instance
-    final Data data = context.data();
-    if(data.deepfs) return findFS(query, context, root);
+    final Data data = ctx.data();
+    if(data.deepfs) return findFS(query, ctx, root);
 
     // parse user input
     final String qu = query.replaceAll(" \\+", " ");

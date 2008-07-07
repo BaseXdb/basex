@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.Commands;
 import org.basex.data.Data;
-import org.basex.index.Index;
+import org.basex.index.IndexToken;
 import org.basex.io.IO;
 
 /**
@@ -64,15 +64,15 @@ public final class Drop extends Proc {
 
     if(type.equals(Create.TXT)) {
       data.meta.txtindex = false;
-      return dropIndex(Index.TYPE.TXT, DATATXT);
+      return dropIndex(IndexToken.TYPE.TXT, DATATXT);
     }
     if(type.equals(Create.ATV)) {
       data.meta.atvindex = false;
-      return dropIndex(Index.TYPE.ATV, DATAATV);
+      return dropIndex(IndexToken.TYPE.ATV, DATAATV);
     }
     if(type.equals(Create.FTX)) {
       data.meta.ftxindex = false;
-      return dropIndex(Index.TYPE.FTX, DATAFTX);
+      return dropIndex(IndexToken.TYPE.FTX, DATAFTX);
     }
     throw new IllegalArgumentException();
   }
@@ -83,7 +83,7 @@ public final class Drop extends Proc {
    * @param pat pattern
    * @return success of operation
    */
-  private boolean dropIndex(final Index.TYPE index, final String pat) {
+  private boolean dropIndex(final IndexToken.TYPE index, final String pat) {
     try {
       final Data data = context.data();
       data.meta.finish(data.size);

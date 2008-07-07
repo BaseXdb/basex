@@ -1,7 +1,7 @@
 package org.basex.query.xpath.func;
 
 import org.basex.data.Data;
-import org.basex.index.Index;
+import org.basex.index.ValuesToken;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
@@ -57,7 +57,8 @@ public final class Id extends Func {
     final NodeBuilder tmp = new NodeBuilder();
     for(final byte[] v : values) {
       if(data.meta.atvindex) {
-        for(final int i : data.ids(Index.TYPE.ATV, v)) {
+        final ValuesToken tok = new ValuesToken(false, v);
+        for(final int i : data.ids(tok)[0]) {
           if(data.attNameID(i) == id) 
             tmp.add(data.parent(i, data.kind(i)));
         }

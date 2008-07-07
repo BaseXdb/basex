@@ -260,7 +260,8 @@ public final class FTBuilder extends Progress implements IndexBuilder {
    * Indexes a single token and returns its unique id.
    */
   private void index() {
-    final byte[] tok = wp.next();
+    final byte[] tok = wp.get();
+    if(tok.length > Token.MAXLEN) return;
     
     final int pos = wp.pos;
     if(index.bl) index(tok, id, pos);

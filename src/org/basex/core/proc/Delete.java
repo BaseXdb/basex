@@ -1,7 +1,6 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
-import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
@@ -48,6 +47,6 @@ public final class Delete extends Proc {
     }
     data.flush();
 
-    return Prop.info ? timer(BaseX.info(DELETEINFO, nodes.size)) : true;
+    return Prop.info ? timer(DELETEINFO, nodes.size) : true;
   }
 }

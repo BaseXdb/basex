@@ -19,7 +19,7 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.TableLayout;
-import org.basex.index.Index;
+import org.basex.index.IndexToken;
 import org.basex.io.IO;
 import org.basex.util.Token;
 
@@ -79,7 +79,7 @@ public final class DialogInfo extends Dialog {
 
     p2.add(new BaseXLabel(INFOTAGINDEX));
     text = text();
-    text.setText(data.info(Index.TYPE.TAG));
+    text.setText(data.info(IndexToken.TYPE.TAG));
     BaseXLayout.setHeight(text, 110);
     p2.add(text);
     
@@ -87,7 +87,7 @@ public final class DialogInfo extends Dialog {
     label.setBorder(8, 0, 0, 0);
     p2.add(label);
     text = text();
-    text.setText(data.info(Index.TYPE.ATN));
+    text.setText(data.info(IndexToken.TYPE.ATN));
     BaseXLayout.setHeight(text, 110);
     p2.add(text);
 
@@ -101,7 +101,7 @@ public final class DialogInfo extends Dialog {
 
     if(meta.txtindex) {
       text = text();
-      text.setText(data.info(Index.TYPE.TXT));
+      text.setText(data.info(IndexToken.TYPE.TXT));
       BaseXLayout.setHeight(text, 75);
       p3.add(text);
     } else {
@@ -114,7 +114,7 @@ public final class DialogInfo extends Dialog {
     
     if(meta.atvindex) {
       text = text();
-      text.setText(data.info(Index.TYPE.ATV));
+      text.setText(data.info(IndexToken.TYPE.ATV));
       BaseXLayout.setHeight(text, 75);
       p3.add(text);
     } else {
@@ -143,7 +143,7 @@ public final class DialogInfo extends Dialog {
       }
     } else {
       text = text();
-      text.setText(data.info(Index.TYPE.FTX));
+      text.setText(data.info(IndexToken.TYPE.FTX));
       BaseXLayout.setHeight(text, 150);
       p4.add(text);
     }

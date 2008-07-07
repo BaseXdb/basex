@@ -1,6 +1,6 @@
 package org.basex.query.xpath.expr;
 
-import org.basex.index.Index;
+import org.basex.index.IndexToken;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.XPOptimizer;
@@ -11,7 +11,6 @@ import org.basex.query.xpath.locpath.LocPathRel;
 import org.basex.query.xpath.locpath.Step;
 import org.basex.query.xpath.values.Bool;
 import org.basex.query.xpath.values.Comp;
-import org.basex.query.xpath.values.Literal;
 import org.basex.query.xpath.values.Item;
 import static org.basex.query.xpath.XPText.*;
 
@@ -62,29 +61,27 @@ public final class Equality extends Comparison {
   @Override
   public Path indexEquivalent(final XPContext ctx, final Step curr) {
     final LocPath path = (LocPath) expr1;
-    final byte[] lit = ((Literal) expr2).str();
     final LocPath inv = path.invertPath(curr);
 
-    ctx.compInfo(indexType == Index.TYPE.TXT ? OPTINDEX : OPTATTINDEX);
-    if(indexType == Index.TYPE.ATV) {
-      inv.steps.add(0, Axis.create(Axis.SELF, path.steps.last().test));
-    }
-    return new Path(new IndexAccess(indexType, lit), inv);
+    final boolean txt = index.type == IndexToken.TYPE.TXT;
+    ctx.compInfo(txt ? OPTINDEX : OPTATTINDEX);
+    if(!txt) inv.steps.add(0, Axis.create(Axis.SELF, path.steps.last().test));
+    return new Path(new IndexAccess(index), inv);
   }
 
   /** Index type. */
-  private Index.TYPE indexType;
+  private IndexToken index;
 
   @Override
   public int indexSizes(final XPContext ctx, final Step curr, final int min) {
-    // check if first expression is a location path
+    // check if first expression is no location path
     if(!(expr1 instanceof LocPath)) return Integer.MAX_VALUE;
 
     // check which index can be applied
-    indexType = ((LocPath) expr1).indexable(ctx, expr2, type);
-    if(indexType == null) return Integer.MAX_VALUE;
+    index = ((LocPath) expr1).indexable(ctx, expr2, type);
+    if(index == null) return Integer.MAX_VALUE;
 
     // return number of expected index results
-    return ctx.local.data.nrIDs(indexType, ((Literal) expr2).str());
+    return ctx.local.data.nrIDs(index);
   }
 }

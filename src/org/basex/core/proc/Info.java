@@ -11,7 +11,7 @@ import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.data.Nodes;
-import org.basex.index.Index;
+import org.basex.index.IndexToken;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.util.Performance;
@@ -188,20 +188,20 @@ public final class Info extends XPath {
     final Data data = context.data();
     
     out.println(INFOTAGINDEX);
-    out.println(data.info(Index.TYPE.TAG));
+    out.println(data.info(IndexToken.TYPE.TAG));
     out.println(INFOATNINDEX);
-    out.println(data.info(Index.TYPE.ATN));
+    out.println(data.info(IndexToken.TYPE.ATN));
     if(data.meta.txtindex) {
       out.println(INFOTXTINDEX);
-      out.println(data.info(Index.TYPE.TXT));
+      out.println(data.info(IndexToken.TYPE.TXT));
     }
     if(data.meta.atvindex) {
       out.println(INFOATVINDEX);
-      out.println(data.info(Index.TYPE.ATV));
+      out.println(data.info(IndexToken.TYPE.ATV));
     }
     if(data.meta.ftxindex) {
       out.println(INFOFTINDEX);
-      out.println(data.info(Index.TYPE.FTX));
+      out.println(data.info(IndexToken.TYPE.FTX));
     }
   }
 

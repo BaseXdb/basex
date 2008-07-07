@@ -86,6 +86,7 @@ public abstract class Proc extends AbstractProcess {
       if(comm.args(cmd.nrArgs())) return exec();
       throw new IllegalArgumentException();
     } catch(final IllegalArgumentException ex) {
+      BaseX.debug(ex);
       return error(PROCSYNTAX, comm.help(true, true));
     } catch(final Exception ex) {
       // should not happen...
@@ -221,10 +222,11 @@ public abstract class Proc extends AbstractProcess {
   /**
    * Adds some timing information to the information string.
    * @param inf info to be added
+   * @param ext extended timer information
    * @return true
    */
-  protected final boolean timer(final String inf) {
-    return info(inf, perf.getTimer());
+  protected final boolean timer(final String inf, final Object... ext) {
+    return info(BaseX.info(inf, ext), perf.getTimer());
   }
 
   /**

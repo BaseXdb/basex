@@ -168,7 +168,7 @@ public final class Preds extends ExprInfo {
       }
 
       if(pred.alwaysTrue()) {
-        ctx.compInfo(OPTPRED);
+        ctx.compInfo(OPTTRUE);
         remove(j);
       } else {
         preds[j] = pred;
