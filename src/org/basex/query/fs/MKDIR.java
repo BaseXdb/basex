@@ -104,20 +104,6 @@ public class MKDIR {
         FSUtils.insert(context.data(), true, Token.token(dir), 
             Token.token(""), Token.token(0), 
             Token.token(System.currentTimeMillis()), curDirPre, preNewFile);
-//        context.data().insert(preNewFile, 
-//            curDirPre, "dir".getBytes(), Data.ELEM);
-//        context.data().insert(preNewFile + 1, preNewFile, 
-//            "name".getBytes(), dir.getBytes());
-//        context.data().insert(preNewFile + 2, 
-//            preNewFile, "suffix".getBytes(), 
-//            "".getBytes());
-//        context.data().insert(preNewFile + 3, 
-//            preNewFile, "size".getBytes(), 
-//            "0".getBytes());
-//        context.data().insert(preNewFile + 4, 
-//            preNewFile, "mtime".getBytes(), 
-//            ("" + System.currentTimeMillis()).getBytes());   
-//        context.data().flush();
       } catch(Exception e) {
         e.printStackTrace();
       }

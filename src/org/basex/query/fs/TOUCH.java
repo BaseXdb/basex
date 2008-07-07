@@ -120,8 +120,8 @@ public final class TOUCH {
   private byte[] getSuffix(final String file) {
     int point = file.lastIndexOf('.');
     if(point > 0)
-      return file.substring(point + 1).getBytes();
-    return "".getBytes();
+      return Token.token(file.substring(point + 1));
+    return Token.token("");
   }
   /**
    * Print the help.

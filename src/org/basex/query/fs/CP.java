@@ -169,9 +169,10 @@ public final class CP {
         toInsert.add(Token.token(FSUtils.getSize(data, i)));
       }
       for(int j = 0; j < toInsert.size(); ++j) {
-        mtime = ("" + System.currentTimeMillis()).getBytes();
+        
         FSUtils.insert(data, false, toInsert.remove(0), toInsert.remove(0),
-            toInsert.remove(0), mtime, target[0], preOfNewFile);
+            toInsert.remove(0), Token.token(System.currentTimeMillis()),
+            target[0], preOfNewFile);
       }       
       break;
     }      
