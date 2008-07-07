@@ -107,9 +107,9 @@ public class Step extends Arr {
   public boolean uses(final Using u) {
     switch(u) {
       case POS:
-        for(int e = 0; e != expr.length; e++) {
-          final Type t = expr[e].returned();
-          if(t == null || t.num || expr[e].uses(u)) return true;
+        for(final Expr e : expr) {
+          final Type t = e.returned();
+          if(t == null || t.num || e.uses(u)) return true;
         }
         return super.uses(u);
       default:
