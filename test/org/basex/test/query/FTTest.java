@@ -34,6 +34,13 @@ public class FTTest extends AbstractTest {
       "</fttest>";
 
     queries = new Object[][] {
+        { "Simple 1", bool(true),
+          "'abc' ftcontains 'abc'" },
+        { "Simple 2", bool(true),
+          "'a b c' ftcontains 'b'" },
+        { "Simple 3", bool(false),
+          "'abc' ftcontains 'b'" },
+
         { "FT 1", nodes(14),
           "//w [text() ftcontains 'HELLO']" },
         { "FT 2", nodes(14),

@@ -125,6 +125,7 @@ public abstract class QueryContext extends Progress {
     ser.openElement(PLAN);
     plan(ser);
     ser.closeElement(PLAN);
+    out.print(NL);
     new IO(fn).write(out.finish());
   }
   

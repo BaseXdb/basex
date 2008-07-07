@@ -1,7 +1,6 @@
 package org.basex.query.xpath.expr;
 
 import static org.basex.query.xpath.XPText.*;
-
 import org.basex.data.MetaData;
 import org.basex.data.Serializer;
 import org.basex.query.FTOpt;
@@ -109,9 +108,8 @@ public final class FTContains extends DualExpr {
   } 
 
   @Override
-  public int indexSizes(final XPContext ctx, final Step curr,
-      final int min) {
-    
+  public int indexSizes(final XPContext ctx, final Step curr, final int min) {
+
     // check if first expression is a location path and if fulltext index exists
     final MetaData meta = ctx.local.data.meta;
     if(!(expr1 instanceof LocPathRel && meta.ftxindex))
@@ -134,7 +132,7 @@ public final class FTContains extends DualExpr {
     //final int nrIDs = ctx.local.data.nrFTIDs(token);
     
     final int nrIDs = expr2.indexSizes(ctx, curr, min);
-    return Math.max(nrIDs, 1);
+    return nrIDs == -1 ? Integer.MAX_VALUE : nrIDs;
   }
   
   @Override

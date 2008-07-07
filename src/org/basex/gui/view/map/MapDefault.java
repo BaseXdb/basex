@@ -105,7 +105,7 @@ public final class MapDefault extends MapPainter {
       g.setFont(GUIConstants.font);
       BaseXLayout.chopString(g, name, rect.x, rect.y, rect.w);
     } else {
-      g.setColor(GUIConstants.COLORS[rect.l * 2 + 8]);
+      g.setColor(GUIConstants.COLORS[Math.min(255, rect.l * 2 + 8)]);
       g.setFont(GUIConstants.mfont);
       final byte[] text = ViewData.content(data, pre, false);
       

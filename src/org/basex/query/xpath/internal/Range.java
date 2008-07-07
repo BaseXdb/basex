@@ -103,6 +103,8 @@ public final class Range extends InternalExpr {
 
     // all values out of range - no results
     if(ind.min > ind.max || ind.max < key.min || ind.min > key.max) return 0;
+    ind.min = Math.max(ind.min, key.min);
+    ind.max = Math.min(ind.max, key.max);
 
     // if index can be applied, assume data size / 10 as costs
     return key.kind != StatsKey.Kind.DBL && key.kind !=

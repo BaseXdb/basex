@@ -91,7 +91,7 @@ public final class Num extends Item {
   @Override
   public void plan(final Serializer ser) throws Exception {
     ser.openElement(this);
-    ser.item(Token.token(num));
+    ser.text(Token.token(num));
     ser.closeElement(this);
   }
 }

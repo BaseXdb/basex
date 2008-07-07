@@ -221,6 +221,8 @@ public final class BaseXTextRenderer extends BaseXBack {
       if(ch > ' ') {
         g.setColor(color);
         g.drawString(word, x, y);
+      } else if(ch < 0x04) {
+        g.setFont(font);
       }
   
       // show cursor

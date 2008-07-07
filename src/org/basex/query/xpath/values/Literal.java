@@ -73,7 +73,7 @@ public final class Literal extends Item {
   @Override
   public void plan(final Serializer ser) throws Exception {
     ser.openElement(this);
-    ser.item(bytes);
+    ser.text(bytes);
     ser.closeElement(this);
   }
 }

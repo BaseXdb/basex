@@ -84,8 +84,8 @@ public final class Bool extends Item {
 
   @Override
   public void plan(final Serializer ser) throws Exception {
-    ser.startElement(this);
-    ser.item(Token.token(value));
+    ser.openElement(this);
+    ser.text(Token.token(value));
     ser.closeElement(this);
   }
 }

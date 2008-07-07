@@ -367,7 +367,8 @@ public final class Fuzzy extends Index {
   @Override
   public int nrIDs(final IndexToken index) {
     // specified ft options are not checked yet...
-    final byte[] tok = index.text;
+    
+    final byte[] tok = index.get();
     final int p = getPointerOnToken(Token.lc(tok));
     return p == -1 ? 0 : getDataSize(p, tok.length);
   }

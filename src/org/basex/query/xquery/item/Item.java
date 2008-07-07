@@ -236,7 +236,7 @@ public abstract class Item extends Expr {
   @Override
   public void plan(final Serializer ser) throws Exception {
     ser.openElement(this);
-    ser.item(str());
+    ser.text(str());
     ser.closeElement(this);
   }
 
