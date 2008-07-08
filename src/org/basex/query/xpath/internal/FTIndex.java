@@ -64,7 +64,7 @@ public final class FTIndex extends FTArrayExpr {
 
     final FTTokenizer ft = new FTTokenizer();
     ft.init(token);
-    ft.stem = option.st;
+    ft.st = option.st;
     ft.dc = option.dc;
     ft.lc = option.lc;
     ft.uc = option.uc;

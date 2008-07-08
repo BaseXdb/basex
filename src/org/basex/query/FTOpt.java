@@ -57,13 +57,13 @@ public final class FTOpt {
   public int contains(final FTTokenizer tk, final FTPos pos, final byte[] sub) {
     if(sub.length == 0) return 0;
 
-    tk.stem = st;
+    tk.st = st;
     tk.dc = dc;
     tk.cs = cs;
     tk.init();
 
     sb.init(sub);
-    sb.stem = tk.stem;
+    sb.st = tk.st;
     sb.dc = tk.dc;
     sb.cs = tk.cs;
     sb.uc = uc;

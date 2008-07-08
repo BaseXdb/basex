@@ -39,26 +39,20 @@ public final class FTUnion extends FTArrayExpr {
   
   @Override
   public NodeSet eval(final XPContext ctx) throws QueryException {
-    int[][] res = null;
-    int[][] tmp;
-    int[] pntr;
-    Object[] o;
-      
     Item it = exprs[0].eval(ctx);
     if (it instanceof NodeSet) {
-      res = ((NodeSet) it).ftidpos;
-      pntr = ((NodeSet) it).ftpointer;
+      int[][] res = ((NodeSet) it).ftidpos;
+      int[] pntr = ((NodeSet) it).ftpointer;
 
       for (int i = 1; i < exprs.length; i++) {
         it = exprs[i].eval(ctx);
         if (it instanceof NodeSet) {
-          tmp = ((NodeSet) it).ftidpos;
+          int[][] tmp = ((NodeSet) it).ftidpos;
 
           if (po) {
-            o = calculateFTOr(res, tmp, pntr); 
-            if (o.length == 0) {
-              return null;
-            }
+            Object[] o = calculateFTOr(res, tmp, pntr);
+            if(o.length == 0) return null;
+
             res = (int[][]) o[0];
             pntr = (int[]) o[1];
           } else {
@@ -66,11 +60,8 @@ public final class FTUnion extends FTArrayExpr {
           }
         }
       }
-      
-      if (po)
-        return new NodeSet(Array.extractIDsFromData(res), ctx, res, pntr);
-      
-      return new NodeSet(Array.extractIDsFromData(res), ctx, res);
+      return new NodeSet(Array.extractIDsFromData(res), ctx, res,
+          po ? pntr : null);
     }
     return null;
   }
@@ -87,11 +78,8 @@ public final class FTUnion extends FTArrayExpr {
     int[][] val1 = values1;
     int[][] val2 = values2;
     
-    if(val1 == null || val1[0].length == 0) {
-      return val2;
-    } else if(val2 == null || val2[0].length == 0) {
-      return val1;
-    }
+    if(val1 == null || val1[0].length == 0) return val2;
+    if(val2 == null || val2[0].length == 0) return val1;
 
     int[][] maxResult = new int[2][val1[0].length + val2[0].length];
 
@@ -103,70 +91,39 @@ public final class FTUnion extends FTArrayExpr {
       val2 = tmp;
     }
 
-    // run variable for values1
-    int i = 0;
-    // run variable for values2
-    int k = 0;
-    // count inserted elements
-    int counter = 0;
-
-    int cmpResult;
     // process smaller set
+    int i = 0;
+    int k = 0;
+    int c = 0;
     while(val1[0].length > i) {
-      if(k >= val2[0].length) {
-        break;
-      }
-      cmpResult = Array.compareIntArrayEntry(val1[0][i], 
-          val1[1][i], val2[0][k], val2[1][k]);
-      if(cmpResult == 1 || cmpResult == 2) {
-        // same Id, pos0 < pos1 oder id0 < id1
-        maxResult[0][counter] = val2[0][k];
-        maxResult[1][counter] = val2[1][k];
-        counter++;
-        k++;
-      } else if(cmpResult == -1 || cmpResult == -2) {
-        // same Id, pos0 > pos1 oder id0 > id1
-        maxResult[0][counter] = val1[0][i];
-        maxResult[1][counter] = val1[1][i];
-        counter++;
-        i++;
-        //k++;
-      } else {
-        // ids and pos identical
-        maxResult[0][counter] = val1[0][i];
-        maxResult[1][counter] = val1[1][i];
-        counter++;
-        i++;
-        k++;
-      }
+      if(k >= val2[0].length) break;
+
+      final int cmp = Array.compareIntArrayEntry(val1[0][i], val1[1][i],
+          val2[0][k], val2[1][k]);
+      final boolean l = cmp > 0;
+      maxResult[0][c] = l ? val2[0][k] : val1[0][i];
+      maxResult[1][c] = l ? val2[1][k] : val1[1][i];
+
+      if(cmp >= 0) k++;
+      if(cmp <= 0) i++;
+      c++;
     }
+    if(c == 0) return null;
 
-    if(counter == 0) return null;
+    final boolean l = k == val2[0].length && i < val1[0].length;
+    final int[] left = l ? val1[0] : val2[0];
+    final int v = left.length - (l ? i : k);
 
-    int[][] returnArray;
+    final int[][] result = new int[2][c + v];
+    // copy first values
+    System.arraycopy(maxResult[0], 0, result[0], 0, c);
+    System.arraycopy(maxResult[1], 0, result[1], 0, c);
 
-    // all elements form values2 are processed
-    if(k == val2[0].length && i < val1[0].length) {
-      //returnArray = new int[counter+values1.length-i][2];
-      returnArray = new int[2][counter + val1[0].length - i];
-      // copy left values (bigger than last element values2) from values1
-      System.arraycopy(val1[0], i, returnArray[0], counter, 
-          val1[0].length - i);
-      System.arraycopy(val1[1], i, returnArray[1], counter, 
-          val1[0].length - i);
-    } else {
-      // all elements form values1 are processed
-      returnArray = new int[2][counter + val2[0].length - k];
-      // copy left values (bigger than last element values1) from values2
-      System.arraycopy(val2[0], k, returnArray[0], counter, 
-          val2[0].length - k);
-      System.arraycopy(val2[1], k, returnArray[1], counter, 
-          val2[0].length - k);
-    }
+    // copy left values
+    System.arraycopy(left, i, result[0], c, v);
+    System.arraycopy(left, i, result[1], c, v);
 
-    System.arraycopy(maxResult[0], 0, returnArray[0], 0, counter);
-    System.arraycopy(maxResult[1], 0, returnArray[1], 0, counter);
-    return returnArray;
+    return result;
   }
 
   /**
@@ -199,20 +156,15 @@ public final class FTUnion extends FTArrayExpr {
       val2 = tmp;
     }
 
-    // run variable for values1
     int i = 0;
-    // run variable for values2
     int k = 0;
-    // count inserted elements
     int c = 0;
 
     // space for new pointer
     int[] pn = new int[mr[0].length + 1];
 
     // first call FTUnion
-    if (p == null) {
-      p = new int[pn.length];
-    }
+    if (p == null) p = new int[pn.length];
 
     // first element in pointers shows the maximum level
     pn[0] = p[0] + 1;

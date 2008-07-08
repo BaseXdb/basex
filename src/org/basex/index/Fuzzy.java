@@ -7,6 +7,7 @@ import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataAccessPerf;
+import org.basex.util.Array;
 import org.basex.util.FTTokenizer;
 import org.basex.util.IntList;
 import org.basex.util.Levenshtein;
@@ -206,16 +207,43 @@ public final class Fuzzy extends Index {
    * @param s size of pre values
    * @return iterator
    */
-  private int[][] getData(final long p, final int s) {
-    int[][] d = new int[2][s];
-    if(data.meta.fcompress) {
-      d[0] = dat.readNums(p, s);
-      d[1] = dat.readNums(s);
-    } else {
-      d[0] = dat.readInts(p, p + s * 4L);
-      d[1] = dat.readInts(p + s * 4L, p + 2 * s * 4L);
+  private IndexIterator getData(final long p, final int s) {
+    final boolean cmp = data.meta.fcompress;
+    final int[][] d = {
+        cmp ? dat.readNums(p, s) : dat.readInts(p, p + s * 4L),
+        cmp ? dat.readNums(s) : dat.readInts(p + s * 4L, p + 2 * s * 4L)
+    };
+    
+    return new IndexIterator() {
+      /** Counter. */
+      private int c = -1;
+      /** Pre value flag. */
+      private boolean pre;
+
+      @Override
+      public boolean more() {
+        return ++c < s;
+      }
+      @Override
+      public int next() {
+        return d[(pre ^= true) ? 0 : 1][c];
+      }
+    };
+  }
+  
+  /**
+   * Caches the iterator values and returns an int array (temporary).
+   * @param it iterator
+   * @return array
+   */
+  private int[][] finish(final IndexIterator it) {
+    final IntList pre = new IntList();
+    final IntList pos = new IntList();
+    while(it.more()) {
+      pre.add(it.next());
+      pos.add(it.next());
     }
-    return d;
+    return new int[][] { pre.finish(), pos.finish() };
   }
  
   /**
@@ -259,7 +287,7 @@ public final class Fuzzy extends Index {
           //System.out.println(new String(to));
           // read data
           ft = FTUnion.calculateFTOr(ft, 
-              getData(getPointerOnData(p, ts), getDataSize(p, ts)));
+              finish(getData(getPointerOnData(p, ts), getDataSize(p, ts))));
         } 
         p += ts + 4L  + 5L;
      }
@@ -278,18 +306,15 @@ public final class Fuzzy extends Index {
    */
   private IndexIterator get(final byte[] tok) {
     final int p = getPointerOnToken(tok);
-
     if (p == -1) return IndexIterator.EMPTY;
-    int[][] res = getData(getPointerOnData(p, tok.length),
-        getDataSize(p, tok.length));
-
-    return new IndexArrayIterator(res[0], res[1]);
+    return getData(getPointerOnData(p, tok.length), getDataSize(p, tok.length));
   } 
  
   @Override
   public IndexIterator ids(final IndexToken ind) {
     final FTTokenizer ft = (FTTokenizer) ind;
     final byte[] tok = ft.get();
+
     if(ft.fz) {
       int k = Prop.lserr;
       if(k == 0) k = Math.max(1, tok.length >> 2);
@@ -301,75 +326,50 @@ public final class Fuzzy extends Index {
       if(pw != -1) return getTokenWildCard(Token.lc(tok), pw);
     }
     
-    if(!ft.cs) {
-      // index request with pre-values as result
-      return get(Token.lc(tok));
-    }
+    // get result iterator
+    final IndexIterator ii = get(Token.lc(tok));
 
-    // index request with pre-values and positions as result
-    IndexIterator ii = get(Token.lc(tok));
-    if(!ii.more()) return null;
+    // case insensitive search..
+    if(!ft.cs) return ii;
 
-    final IntList pre = new IntList();
-    final IntList pos = new IntList();
-    do {
-      pre.add(ii.next());
-      ii.more();
-      pos.add(ii.next());
-    } while(ii.more());
-    final int[][] ids = { pre.finish(), pos.finish() };
+    // case sensitive search
+    if(!ii.more()) return ii;
 
-    byte[] tokenFromDB;
-    byte[] textFromDB;
-    int[][] rIds = new int[2][ids[0].length];
-    int count = 0;
-    int readId;
+    // cache iterator results (temporary...)
+    final int[][] ids = finish(ii);
+    int c = 0;
 
-    int i = 0;
     // check real case of each result node
-    while(i < ids[0].length) {
-      // get date from disk
-      // <SG> readId is overwritten again some lines later... 
-      readId = ids[0][i];
-      textFromDB = data.text(ids[0][i]);
-      tokenFromDB = new byte[tok.length];
+    final FTTokenizer ftdb = new FTTokenizer();
+    ftdb.st = ft.st;
 
-      System.arraycopy(textFromDB, ids[1][i], tokenFromDB, 0, tok.length);
+    for(int i = 0; i < ids[0].length;) {
+      final int id = ids[0][i];
+      ftdb.init(data.text(id));
 
-      readId = ids[0][i];
+      // iterator text values
+      while(id == ids[0][i] && ftdb.more()) {
+        // first match case insensitive value
+        ftdb.cs = false;
+        if(!Token.eq(tok, ftdb.get())) continue;
 
-      // check unique node ones
-      while (i < ids[0].length && readId == ids[0][i]) {
-        System.arraycopy(textFromDB, ids[1][i], tokenFromDB, 0, tok.length);
-
-        readId = ids[0][i];
-
-        // check unique node ones
-        // compare token from db with token from query
-        if (Token.eq(tokenFromDB, tok)) {
-          rIds[0][count] = ids[0][i];
-          rIds[1][count++] = ids[1][i];
-
-          // jump over same ids
-          while (i < ids[0].length && readId == ids[0][i]) i++;
-          break;
+        // token found - match case sensitivity
+        ftdb.cs = true;
+        if(Token.eq(tok, ftdb.get())) {
+          // overwrite original values
+          ids[0][c] = id;
+          ids[1][c++] = ids[1][i];
         }
         i++;
       }
     }
-
-    if (count == 0) return null;
-    
-    int[][] tmp = new int[2][count];
-    System.arraycopy(rIds[0], 0, tmp[0], 0, count);
-    System.arraycopy(rIds[1], 0, tmp[1], 0, count);
-    return new IndexArrayIterator(tmp[0], tmp[1]);
+    return new IndexArrayIterator(
+        Array.finish(ids[0], c), Array.finish(ids[1], c));
   }
   
   @Override
   public int nrIDs(final IndexToken index) {
     // specified ft options are not checked yet...
-    
     final byte[] tok = index.get();
     final int p = getPointerOnToken(Token.lc(tok));
     return p == -1 ? 0 : getDataSize(p, tok.length);
@@ -426,16 +426,16 @@ public final class Fuzzy extends Index {
         dtok = ti.readBytes(b[0][1], b[0][0] + b[0][1]);
         //System.out.println(new String(dtok));
         if (contains(tok, posw, dtok)) dt = FTUnion.calculateFTOr(dt,
-            getData(getPointerOnData(b[0][1], b[0][0]),
-                getDataSize(b[0][1], b[0][0])));
+            finish(getData(getPointerOnData(b[0][1], b[0][0]),
+                getDataSize(b[0][1], b[0][0]))));
         // b[0][1] += b[0][0] * 1L + 8L;
         b[0][1] += b[0][0] * 1L + 9L;
         //}
       }
       dtok = ti.readBytes(b[0][1], b[0][0] + b[0][1]);
       if (contains(tok, posw, dtok)) dt = FTUnion.calculateFTOr(dt,
-          getData(getPointerOnData(b[0][1], b[0][0]),
-              getDataSize(b[0][1], b[0][0])));
+          finish(getData(getPointerOnData(b[0][1], b[0][0]),
+              getDataSize(b[0][1], b[0][0]))));
       return new IndexArrayIterator(dt[0], dt[1]);
     }
     

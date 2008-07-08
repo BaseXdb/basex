@@ -15,7 +15,7 @@ public final class FTTokenizer extends IndexToken {
   private static final Stemming STEM = new Stemming();
   
   /** Stemming flag. */
-  public boolean stem = Prop.ftstem;
+  public boolean st = Prop.ftstem;
   /** Diacritics flag. */
   public boolean dc = Prop.ftdc;
   /** Sensitivity flag. */
@@ -120,7 +120,7 @@ public final class FTTokenizer extends IndexToken {
     if(!dc) n = dc(n);
     if(uc) n = uc(n);
     if(lc || !cs) n = lc(n);
-    if(stem) n = STEM.word(n);
+    if(st) n = STEM.word(n);
     return n;
   }
   
