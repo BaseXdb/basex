@@ -55,7 +55,7 @@ public final class CD {
           FSUtils.printError(out, "cd", g.getPath(), 99);
           return;
         case '?':         
-          FSUtils.printError(out, "cat", g.getPath(), 22);
+          FSUtils.printError(out, "cat", g.getPath(), 102);
           return;
       }     
       ch = g.getopt();

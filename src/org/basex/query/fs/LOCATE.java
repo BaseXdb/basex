@@ -96,7 +96,7 @@ public final class LOCATE {
           FSUtils.printError(out, "locate", g.getPath(), 99);
           return;
         case '?':         
-          FSUtils.printError(out, "locate", g.getPath(), 22);
+          FSUtils.printError(out, "locate", g.getPath(), 102);
           return;
       }      
       ch = g.getopt();

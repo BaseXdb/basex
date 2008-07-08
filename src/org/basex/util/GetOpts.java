@@ -1,7 +1,7 @@
 package org.basex.util;
 
 import java.io.IOException;
-import java.util.ArrayList;
+
 
 /**
  * This class splits the input String into its arguments and checks if 
@@ -29,7 +29,7 @@ public final class GetOpts {
   private String optString;
   
   /** Arguments found. */ 
-  private ArrayList<String> foundArgs;  
+  private StringList foundArgs;  
 
   /** Arguments passed to the program. */ 
   private String[] args;
@@ -58,7 +58,7 @@ public final class GetOpts {
     this.optarg = null;
     this.path = null;
     this.multipleOptIndex = 1;
-    this.foundArgs = new ArrayList<String>();
+    this.foundArgs = new StringList();
   }
   /**
    * Construct a basic Getopt instance with the given input data.
@@ -76,7 +76,7 @@ public final class GetOpts {
     this.optarg = null;
     this.path = null;
     this.multipleOptIndex = 1;
-    this.foundArgs = new ArrayList<String>();
+    this.foundArgs = new StringList();
   }
   /**
    * Getter of the index.
@@ -105,7 +105,7 @@ public final class GetOpts {
    * 
    * @return all parsed arguments
    */
-  public ArrayList<String> getFoundArgs() {
+  public StringList getFoundArgs() {
     return foundArgs;
   }
   

@@ -58,7 +58,7 @@ public class MKDIR {
           FSUtils.printError(out, "mkdir", g.getPath(), 99);
           return;  
         case '?':         
-          FSUtils.printError(out, "mkdir", g.getPath(), 22);
+          FSUtils.printError(out, "mkdir", g.getPath(), 102);
           return;
       }      
       ch = g.getopt();
@@ -90,10 +90,18 @@ public class MKDIR {
         dir = path.substring(beginIndex + 1);
       }
     }
-    int dirPre =  FSUtils.getSpecificDir(context.data(), 
-        curDirPre, Token.token(dir));
-    if(dirPre > 0) {
-      FSUtils.printError(out, "mkdir", path, 17);         
+    int[] sources =  FSUtils.getOneSpecificFileOrDir(context.data(), 
+        curDirPre, dir);
+    
+   
+    
+    if(sources.length > 0) {
+      for(int dirPre : sources) {
+        if(FSUtils.isDir(context.data(), dirPre)) {
+          FSUtils.printError(out, "mkdir", path, 17);
+          return;
+        }
+      }
     } else {   
       // add new dir  
       try {

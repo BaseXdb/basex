@@ -58,7 +58,18 @@ public final class FSUtils {
     final byte[] att = data.attValue(data.sizeID, pre);
     return att != null ? toLong(att) : 0;
   }
-
+  
+  /**
+   * Returns the pre value of the parrent.
+   * @param data data reference
+   * @param pre pre value of child
+   * @return pre value of the parrent.
+   */
+  public static int getParrent(final Data data, final int pre) {
+    return data.parent(pre, data.kind(pre));
+  }
+  
+  
   /**
    * Returns the path of a file.
    * @param data data reference
@@ -218,18 +229,22 @@ public final class FSUtils {
    *  
    * @param data - the data table
    * @param pre - pre value of the "parent" directory
-   * @param dir - directory name
+   * @param path - path name
    * @return -  all pre values of all files
    */
-  public static int getSpecificDir(final Data data, final int pre,
-      final byte[] dir) {
+  public static int[] getOneSpecificFileOrDir(final Data data, final int pre,
+      final String path) {
 
+    final IntList res = new IntList();
     final DirIterator it = new DirIterator(data, pre);
+
+    String fileToFind = FSUtils.transformToRegex(path);
     while(it.more()) {
       final int n = it.next();
-      if(isDir(data, n) && Token.eq(getName(data, n), dir)) return n;
+      if(Pattern.matches(fileToFind, Token.string(getName(data, n)))) 
+        res.add(n);
     }
-    return -1;
+    return res.finish();
   }
 
   /**
@@ -440,7 +455,10 @@ public final class FSUtils {
         break;        
       case 101:
         out.print(programm + ": " + arg + ": " + ENAMENOALLOW);
-        break;        
+        break;     
+      case 102:
+        out.print(programm + ": " + arg + ": " + EINVOPT);
+        break;  
       default:
         out.print(programm + ": " + arg + ": " + EUND);
       break;
@@ -490,10 +508,14 @@ public final class FSUtils {
   public static void update(final Data data, final byte[] name, 
       final byte[] suffix, final byte[] size, final byte[] mtime, 
       final int pre) {
-    data.update(pre + 1, NAME, name);
-    data.update(pre + 2, SUFFIX, suffix);
-    data.update(pre + 3, SIZE, size);
-    data.update(pre + 4, MTIME, mtime);  
+    if(name != null)
+      data.update(pre + 1, NAME, name);
+    if(suffix != null)
+      data.update(pre + 2, SUFFIX, suffix);
+    if(size != null)
+      data.update(pre + 3, SIZE, size);
+    if(mtime != null)
+      data.update(pre + 4, MTIME, mtime);  
     data.flush();
   }
 }

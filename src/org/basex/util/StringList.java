@@ -26,6 +26,19 @@ public final class StringList {
   }
 
   /**
+   * Removes an element of the array and returns it.
+   * @param index of element to remove
+   * @return the element that has been removed
+   */
+  public String remove(final int index) {
+    if(size == 0 || size < index) throw new IndexOutOfBoundsException();
+    String elem = list[index];
+    System.arraycopy(list, index + 1, list, index, size - index);
+    --size;
+    return elem;
+  }
+  
+  /**
    * Returns the string array.
    * @return array
    */

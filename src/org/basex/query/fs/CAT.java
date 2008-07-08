@@ -78,7 +78,7 @@ public class CAT {
           FSUtils.printError(out, "cat", g.getPath(), 99);
           return;  
         case '?':         
-          FSUtils.printError(out, "cat", g.getPath(), 22);
+          FSUtils.printError(out, "cat", g.getPath(), 102);
           return;
       }      
 

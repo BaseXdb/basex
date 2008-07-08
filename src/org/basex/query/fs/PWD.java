@@ -57,7 +57,7 @@ public final class PWD {
           FSUtils.printError(out, "pwd", g.getPath(), 99);  
           return;  
         case '?':                   
-          FSUtils.printError(out, "pwd", g.getPath(), 22);
+          FSUtils.printError(out, "pwd", g.getPath(), 102);
           return;
       }      
       ch = g.getopt();

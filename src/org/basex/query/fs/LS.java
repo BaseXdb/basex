@@ -78,7 +78,7 @@ public final class LS {
           FSUtils.printError(out, "ls", g.getPath(), 99);
           return;
         case '?':
-          FSUtils.printError(out, "ls", g.getPath(), 22);
+          FSUtils.printError(out, "ls", g.getPath(), 102);
           return;
       }
         ch = g.getopt();
@@ -86,8 +86,10 @@ public final class LS {
     // if there is path expression set new pre value
     if(g.getPath() != null) {
       curDirPre = FSUtils.goToDir(data, curDirPre, g.getPath());
-      if(curDirPre == -1)
+      if(curDirPre == -1) {
         FSUtils.printError(out, "ls", g.getPath(), 2);
+        return;
+      }
     }
 
     // go to work

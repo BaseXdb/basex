@@ -149,4 +149,6 @@ public interface FSText {
   String EMISSARG = "Missing argument.";
   /** FS Error Message. */
   String EOMDIR = "omitting directory";
+  /** FS Error Message. */
+  String EINVOPT = "Invalid option";
 }

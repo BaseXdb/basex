@@ -58,7 +58,7 @@ public final class TOUCH {
           FSUtils.printError(out, "touch", g.getPath(), 99);      
           return;  
         case '?':         
-          FSUtils.printError(out, "touch", g.getPath(), 22);      
+          FSUtils.printError(out, "touch", g.getPath(), 102);      
           return;
       }      
       ch = g.getopt();
@@ -84,14 +84,14 @@ public final class TOUCH {
     if(preFound.length  > 0) {
       for(int i : preFound) {
         if(FSUtils.isFile(context.data(), i)) {
-          context.data().update(i + 4, "mtime".getBytes(), 
-              Token.token(System.currentTimeMillis()));
+          FSUtils.update(context.data(), null, null, null,
+             Token.token(System.currentTimeMillis()), i);
         }
       }
     } else {   
       // add new file 
       if(file.indexOf('?') > 0 || file.indexOf('*') > 0 
-          || file.indexOf('[') > 0) {
+          || file.indexOf('[') > 0 || file.indexOf(']') > 0) {
         FSUtils.printError(out, "touch", file, 101);              
         return;
       } 
@@ -100,6 +100,7 @@ public final class TOUCH {
         if(!(curDirPre == FSUtils.getROOTDIR())) {
           preNewFile = curDirPre + 5;
         }
+        // TODO<HS> Go to dir... 
         FSUtils.insert(context.data(), false, Token.token(file), 
             getSuffix(file), Token.token(0), 
             Token.token(System.currentTimeMillis()),
@@ -108,7 +109,6 @@ public final class TOUCH {
         e.printStackTrace();
       }
     }
-
   }
 
   /**
@@ -132,6 +132,4 @@ public final class TOUCH {
     out.print(FSTOUCH);
 
   }
-
 }
-

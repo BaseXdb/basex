@@ -65,7 +65,7 @@ public final class DU {
           FSUtils.printError(out, "du", g.getPath(), 99);
           return;
         case '?':         
-          FSUtils.printError(out, "du", g.getPath(), 22);
+          FSUtils.printError(out, "du", g.getPath(), 102);
           return;
       }      
       ch = g.getopt();

@@ -63,7 +63,7 @@ public final class RM {
           FSUtils.printError(out, "rm", g.getPath(), 99);                    
           return;  
         case '?':         
-          FSUtils.printError(out, "rm", g.getPath(), 22);
+          FSUtils.printError(out, "rm", g.getPath(), 102);
           return;
       }      
       ch = g.getopt();

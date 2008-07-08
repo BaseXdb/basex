@@ -83,7 +83,7 @@ public final class IntList {
   public int remove(final int index) {
     if(size == 0 || size < index) throw new IndexOutOfBoundsException();
     int elem = list[index];
-    System.arraycopy(list, index + 1, list, index, list.length - index);
+    System.arraycopy(list, index + 1, list, index, size - index);
     --size;
     return elem;
   }

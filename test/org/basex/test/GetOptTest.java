@@ -1,8 +1,8 @@
 package org.basex.test;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import org.basex.util.GetOpts;
+import org.basex.util.StringList;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -585,8 +585,8 @@ public final class GetOptTest {
     String args = "ahRbd:li:";
     GetOpts g = new GetOpts(command, args);
     g.getopt();   
-    ArrayList<String> argsOfGetopt = g.getFoundArgs();    
-    if(argsOfGetopt.size() == 2) {
+    StringList argsOfGetopt = g.getFoundArgs();    
+    if(argsOfGetopt.size == 2) {
       assertEquals("Path of " + command,
           "ickeUndEr.txt", argsOfGetopt.remove(0));
       assertEquals("Path of " + command, 
