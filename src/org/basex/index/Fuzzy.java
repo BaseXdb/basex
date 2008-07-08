@@ -8,6 +8,7 @@ import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataAccessPerf;
 import org.basex.util.FTTokenizer;
+import org.basex.util.IntList;
 import org.basex.util.Levenshtein;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -203,28 +204,18 @@ public final class Fuzzy extends Index {
    * Reads the ftdata from disk.
    * @param p pointer of ftdata
    * @param s size of pre values
-   * @return int[][] with ftdata
+   * @return iterator
    */
   private int[][] getData(final long p, final int s) {
     int[][] d = new int[2][s];
-    if (data.meta.fcompress) {
+    if(data.meta.fcompress) {
       d[0] = dat.readNums(p, s);
       d[1] = dat.readNums(s);
-      /*d[0][0] = dat.readNum(p);
-      for (int i = 1; i < s; i++) {
-        d[0][i] = dat.readNum();
-      }
-      
-      for (int i = 0; i < s; i++) {
-        d[1][i] = dat.readNum();
-      }*/
     } else {
       d[0] = dat.readInts(p, p + s * 4L);
       d[1] = dat.readInts(p + s * 4L, p + 2 * s * 4L);
     }
-    
     return d;
-    
   }
  
   /**
@@ -235,7 +226,7 @@ public final class Fuzzy extends Index {
    * @param e number of errors allowed
    * @return int[][] data
    */
-  private int[][] getFuzzy(final byte[] tok, final int e) {
+  private IndexIterator getFuzzy(final byte[] tok, final int e) {
     int[][] ft = null;
     byte[] to;
     
@@ -277,23 +268,26 @@ public final class Fuzzy extends Index {
       dif = (tok.length - ts < 0) ? 
           ts - tok.length : tok.length - ts;       
     }
-    return ft;
+    return new IndexArrayIterator(ft[0], ft[1]);
   }
 
   /**
    * Get pre- and pos values, stored for token out of index.
    * @param tok token looking for
-   * @return int[][] ftdata
+   * @return iterator
    */
-  private int[][] get(final byte[] tok) {
+  private IndexIterator get(final byte[] tok) {
     final int p = getPointerOnToken(tok);
 
-    if (p == -1) return null;
-    return getData(getPointerOnData(p, tok.length), getDataSize(p, tok.length));
+    if (p == -1) return IndexIterator.EMPTY;
+    int[][] res = getData(getPointerOnData(p, tok.length),
+        getDataSize(p, tok.length));
+
+    return new IndexArrayIterator(res[0], res[1]);
   } 
  
   @Override
-  public int[][] ids(final IndexToken ind) {
+  public IndexIterator ids(final IndexToken ind) {
     final FTTokenizer ft = (FTTokenizer) ind;
     final byte[] tok = ft.get();
     if(ft.fz) {
@@ -313,8 +307,17 @@ public final class Fuzzy extends Index {
     }
 
     // index request with pre-values and positions as result
-    int[][] ids = get(Token.lc(tok));
-    if (ids == null) return null;
+    IndexIterator ii = get(Token.lc(tok));
+    if(!ii.more()) return null;
+
+    final IntList pre = new IntList();
+    final IntList pos = new IntList();
+    do {
+      pre.add(ii.next());
+      ii.more();
+      pos.add(ii.next());
+    } while(ii.more());
+    final int[][] ids = { pre.finish(), pos.finish() };
 
     byte[] tokenFromDB;
     byte[] textFromDB;
@@ -360,8 +363,7 @@ public final class Fuzzy extends Index {
     int[][] tmp = new int[2][count];
     System.arraycopy(rIds[0], 0, tmp[0], 0, count);
     System.arraycopy(rIds[1], 0, tmp[1], 0, count);
-
-    return tmp;
+    return new IndexArrayIterator(tmp[0], tmp[1]);
   }
   
   @Override
@@ -408,39 +410,39 @@ public final class Fuzzy extends Index {
    * @param posw position of the wildcard in tok
    * @return data found
    */
-  private int[][] getTokenWildCard(final byte[] tok, final int posw) {
+  private IndexIterator getTokenWildCard(final byte[] tok, final int posw) {
     if (tok[posw] == '.' && tok.length > posw + 1 && tok[posw + 1] == '*') {
       int[][] b;
       int[][] dt = null;
       byte[] dtok;
       b = getBoundPointer(tok.length - 2);
-        while (true) {
-          if (b[0][1] >= b[1][1]) {
-            // set new bounds
-            b[0] = b[1];
-            b[1] = getNextBoundPointer();
-            if (b[1] == null) break; //return data;
-          }
-          dtok = ti.readBytes(b[0][1], b[0][0] + b[0][1]);
-          //System.out.println(new String(dtok));
-          if (contains(tok, posw, dtok)) dt = FTUnion.calculateFTOr(dt, 
-                  getData(getPointerOnData(b[0][1], b[0][0]), 
-                  getDataSize(b[0][1], b[0][0])));
-          // b[0][1] += b[0][0] * 1L + 8L;
-          b[0][1] += b[0][0] * 1L + 9L;
+      while (true) {
+        if (b[0][1] >= b[1][1]) {
+          // set new bounds
+          b[0] = b[1];
+          b[1] = getNextBoundPointer();
+          if (b[1] == null) break; //return data;
+        }
+        dtok = ti.readBytes(b[0][1], b[0][0] + b[0][1]);
+        //System.out.println(new String(dtok));
+        if (contains(tok, posw, dtok)) dt = FTUnion.calculateFTOr(dt,
+            getData(getPointerOnData(b[0][1], b[0][0]),
+                getDataSize(b[0][1], b[0][0])));
+        // b[0][1] += b[0][0] * 1L + 8L;
+        b[0][1] += b[0][0] * 1L + 9L;
         //}
       }
-        dtok = ti.readBytes(b[0][1], b[0][0] + b[0][1]);
-        if (contains(tok, posw, dtok)) dt = FTUnion.calculateFTOr(dt, 
-            getData(getPointerOnData(b[0][1], b[0][0]), 
-            getDataSize(b[0][1], b[0][0])));
-        return dt;
-        
-    } else {
-      BaseX.debug("Sorry, FuzzyIndex supports only \'.*\' as wildcard.");
-      return null;
+      dtok = ti.readBytes(b[0][1], b[0][0] + b[0][1]);
+      if (contains(tok, posw, dtok)) dt = FTUnion.calculateFTOr(dt,
+          getData(getPointerOnData(b[0][1], b[0][0]),
+              getDataSize(b[0][1], b[0][0])));
+      return new IndexArrayIterator(dt[0], dt[1]);
     }
+    
+    BaseX.debug("Sorry, FuzzyIndex supports only \'.*\' as wildcard.");
+    return null;
   }
+  
   /**
    * Compares two character arrays for equality and 
    * checks if a is contained in b.

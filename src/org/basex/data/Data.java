@@ -2,6 +2,7 @@ package org.basex.data;
 
 import java.io.IOException;
 import org.basex.index.Index;
+import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
 import org.basex.index.Names;
 import org.basex.util.Token;
@@ -298,7 +299,7 @@ public abstract class Data  {
    * @param token index token reference
    * @return id array
    */
-  public final int[][] ids(final IndexToken token) {
+  public final IndexIterator ids(final IndexToken token) {
     if(token.get().length > Token.MAXLEN) return null;
     switch(token.type) {
       case TXT: return txtindex.ids(token);

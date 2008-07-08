@@ -3,14 +3,15 @@ package org.basex.query.xpath.internal;
 import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
+import org.basex.index.IndexIterator;
 import org.basex.query.FTOpt;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.FTArrayExpr;
 import org.basex.query.xpath.expr.FTPositionFilter;
 import org.basex.query.xpath.locpath.Step;
 import org.basex.query.xpath.values.NodeSet;
-import org.basex.util.Array;
 import org.basex.util.FTTokenizer;
+import org.basex.util.IntList;
 
 /**
  * This expression retrieves the ids of indexed fulltext terms.
@@ -75,51 +76,60 @@ public final class FTIndex extends FTArrayExpr {
     // (has still to be checked, maybe ft options cause troubles here)
     // ideal solution for phrases would be to process small results first
     // and end up with the largest ones.. but this seems tiresome
-    while(ft.more()) {
-      if(data.nrIDs(ft) == 0) return new NodeSet(ctx);
-    }
+    while(ft.more()) if(data.nrIDs(ft) == 0) return new NodeSet(ctx);
     
-    int[][] d = null;
+    IntList pre = null, pos = null;
     ft.init();
+    int w = 0;
     while(ft.more()) {
-      int[][] dd = data.ids(ft);
-      ctx.checkStop();
-      
-      d = d == null ? dd : phrase(d, dd);
-      if(d == null || d.length == 0) break;
+      final IndexIterator it = data.ids(ft);
+      final IntList pre2 = new IntList();
+      final IntList pos2 = new IntList();
+      while(it.more()) {
+        ctx.checkStop();
+        pre2.add(it.next());
+        pos2.add(it.next());
+      }
+      if(pre == null) {
+        pre = pre2;
+        pos = pos2;
+      } else {
+        phrase(pre, pos, pre2, pos2, ++w);
+      }
+      if(pre.size == 0) break;
     }
-    return new NodeSet(Array.extractIDsFromData(d), ctx, d);
+
+    final int[][] d = { pre.finish(), pos.finish() };
+    pre.distinct();
+    return new NodeSet(pre.finish(), ctx, d);
   }
 
   /**
-   * Joins the specified arrays, returning only phrase hits.
-   * @param a first array
-   * @param b second array
-   * @return resulting array
+   * Joins the specified integer lists, reducing the entries in the first list.
+   * @param pre first pre values
+   * @param pos first pre values
+   * @param pre2 first pre values
+   * @param pos2 second pos values
+   * @param w distance to first word
    */
-  private int[][] phrase(final int[][] a, final int[][] b) {
-    if(b == null) return null;
+  private void phrase(final IntList pre, final IntList pos,
+      final IntList pre2, final IntList pos2, final int w) {
 
-    final int[][] il = new int[2][0];
-    for(int ai = 0, bi = 0; ai < a[0].length && bi < b[0].length;) {
-      int d = a[0][ai] - b[0][bi];
+    int s = 0;
+    for(int ai = 0, bi = 0; ai < pre.size && bi < pre2.size;) {
+      int d = pre.get(ai) - pre2.get(bi);
       if(d == 0) {
-        d = a[1][ai] - b[1][bi] + 1;
+        d = pos.get(ai) - pos2.get(bi) + w;
         if(d == 0) {
-          final int i = il[0].length;
-          final int[] t0 = new int[i + 1], t1 = new int[i + 1];
-          System.arraycopy(il[0], 0, t0, 0, i);
-          System.arraycopy(il[1], 0, t1, 0, i);
-          t0[i] = b[0][bi];
-          t1[i] = b[1][bi];
-          il[0] = t0;
-          il[1] = t1;
+          pre.set(pre.get(ai), s);
+          pos.set(pos.get(ai), s++);
         }
       }
       if(d <= 0) ai++;
       if(d >= 0) bi++;
     }
-    return il;
+    pre.size = s;
+    pos.size = s;
   }
 
   @Override

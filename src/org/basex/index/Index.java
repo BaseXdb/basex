@@ -17,11 +17,11 @@ public abstract class Index {
   public abstract byte[] info();
 
   /**
-   * Returns the node ids for the specified token.
+   * Returns an iterator for the index results.
    * @param tok token to be found
    * @return ids
    */
-  public abstract int[][] ids(final IndexToken tok);
+  public abstract IndexIterator ids(final IndexToken tok);
 
   /**
    * Returns the (approximate/estimated) number of ids for the specified token.

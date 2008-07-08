@@ -2,9 +2,11 @@ package org.basex.query.xpath.internal;
 
 import static org.basex.query.xpath.XPText.*;
 import org.basex.data.Serializer;
+import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.values.NodeSet;
+import org.basex.util.IntList;
 import org.basex.util.Token;
 
 /**
@@ -28,7 +30,13 @@ public final class IndexAccess extends InternalExpr {
 
   @Override
   public NodeSet eval(final XPContext ctx) {
-    ctx.local = new NodeSet(ctx.local.data.ids(index)[0], ctx);
+    final IndexIterator it = ctx.local.data.ids(index);
+    final IntList il = new IntList();
+    while(it.more()) {
+      ctx.checkStop();
+      il.add(it.next());
+    }
+    ctx.local = new NodeSet(il.finish(), ctx);
     return ctx.local;
   }
 

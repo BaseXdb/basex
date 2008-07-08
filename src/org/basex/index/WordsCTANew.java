@@ -74,11 +74,14 @@ public final class WordsCTANew extends Index {
   
   @Override
   public int nrIDs(final IndexToken ind) {
-    return ids(ind).length;
+    final IndexIterator ii  = ids(ind);
+    int c = 0;
+    while(ii.more()) c++;
+    return c;
   }
 
   @Override
-  public int[][] ids(final IndexToken ind) {
+  public IndexIterator ids(final IndexToken ind) {
     if(ind.range()) return idRange((RangeToken) ind);
     
     final FTTokenizer ft = (FTTokenizer) ind;
@@ -86,12 +89,16 @@ public final class WordsCTANew extends Index {
     if(ft.fz) {
       int k = Prop.lserr;
       if(k == 0) k = Math.max(1, tok.length >> 2);
-      return getNodeFuzzy(0, null, -1, tok, 0, 0, 0, k);
+      final int[][] ids = getNodeFuzzy(0, null, -1, tok, 0, 0, 0, k);
+      return new IndexArrayIterator(ids[0], ids[1]);
     }
 
     if(ft.wc) {
       final int pw = Token.indexOf(tok, '.');
-      if(pw != -1) return getNodeFromTrieWithWildCard(tok, pw);
+      if(pw != -1) {
+        final int[][] ids = getNodeFromTrieWithWildCard(tok, pw);
+        return new IndexArrayIterator(ids[0], ids[1]);
+      }
     }
     
     if(!cs && ft.cs) {
@@ -143,95 +150,11 @@ public final class WordsCTANew extends Index {
       final int[][] tmp = new int[2][count];
       System.arraycopy(rIds[0], 0, tmp[0], 0, count);
       System.arraycopy(rIds[1], 0, tmp[1], 0, count);
-      return tmp;
-    } else {
-      return getNodeFromTrieRecursive(0, tok, ft.cs);
+      return new IndexArrayIterator(tmp[0], tmp[1]);
     }
-
-    /*// init no wildcard included in token
-    int posW = -1;
-    // backup original token
-    byte[] bTok = new byte[tok.length];
-    System.arraycopy(tok, 0, bTok, 0, tok.length);
-
-    // token to lower case
-    for (int i = 0; i < tok.length; i++) {
-      tok[i] = (byte) Token.lc(tok[i]);
-      // check for wildcards
-      if (tok[i] == '.') {
-        posW = i;
-      }
-    }
-
-    // check wildcards
-    if (ftO.ftWild == FTOption.WILD.WITH && posW > -1)  {
-      return getNodeFromTrieWithWildCard(tok, posW);
-    }
-
-
-    if (ftO.ftCase == FTOption.CASE.INSENSITIVE) {
-      // index request with pre-values as result
-      return getNodeFromTrieRecursive(0, tok);
-    }
-
-    // index request with pre-values and positions as result
-    int[][] ids = getNodeFromTrieRecursive(0, tok);
-    if (ids == null) {
-      return null;
-    }
-
-    if (ftO.ftCase == FTOption.CASE.UPPERCASE) {
-      // convert search string to upper case and use case sensitive search
-      bTok = Token.uc(bTok);
-    } else if (ftO.ftCase == FTOption.CASE.LOWERCASE) {
-      // carry search string to upper case and use case sensitive search
-      bTok = Token.lc(bTok);
-    }
-
-
-    byte[] tokenFromDB;
-    byte[] textFromDB;
-    int[][] rIds = new int[2][ids[0].length];
-    int count = 0;
-    int readId;
-
-    int i = 0;
-    // check real case of each result node
-    while(i < ids[0].length) {
-      // get date from disk
-      readId = ids[0][i];
-      textFromDB = data.text(ids[0][i]);
-      tokenFromDB = new byte[tok.length];
-
-      System.arraycopy(textFromDB, ids[1][i], tokenFromDB, 0, tok.length);
-
-      // check unique node ones
-      while (i < ids[0].length && readId == ids[0][i]) {
-        System.arraycopy(textFromDB, ids[1][i], tokenFromDB, 0, tok.length);
-
-        readId = ids[0][i];
-
-        // check unique node ones
-        // compare token from db with token from query
-        if (Token.eq(tokenFromDB, bTok)) {
-          rIds[0][count] = ids[0][i];
-          rIds[1][count++] = ids[1][i];
-
-          // jump over same ids
-          while (i < ids[0].length && readId == ids[0][i]) i++;
-          break;
-        }
-        i++;
-      }
-    }
-
-    if (count == 0) return null;
     
-    int[][] tmp = new int[2][count];
-    System.arraycopy(rIds[0], 0, tmp[0], 0, count);
-    System.arraycopy(rIds[1], 0, tmp[1], 0, count);
-
-    return tmp;*/
+    final int[][] tmp = getNodeFromTrieRecursive(0, tok, ft.cs);
+    return new IndexArrayIterator(tmp[0], tmp[1]);
   }
   
   /**
@@ -239,7 +162,7 @@ public final class WordsCTANew extends Index {
    * @param tok index term
    * @return results
    */
-  private int[][] idRange(final RangeToken tok) {
+  private IndexIterator idRange(final RangeToken tok) {
     final double from = tok.min;
     final double to = tok.min;
     
@@ -268,7 +191,7 @@ public final class WordsCTANew extends Index {
         //for (int i = ne[0] + 1; i < ne.length - 2; i += 2) {
         for (int i = ne[0] + 1; i < ne.length - 1; i += 2) {
           if (Token.letter(ne[i + 1]))
-            return new int[][] { Array.extractIDsFromData(dt) };
+            return new IndexArrayIterator(Array.extractIDsFromData(dt));
           
           if (ne[i + 1] != tokFrom[0] && ne[i + 1] != tokTo[0]) {
             if (tokTID == tokFID) {
@@ -302,7 +225,7 @@ public final class WordsCTANew extends Index {
     } else if (Token.letterOrDigit(tokFrom) && Token.letterOrDigit(tokTo)) {
       dt = idPosRangeText(tokF, tokT);
     }
-    return new int[][] { Array.extractIDsFromData(dt) };
+    return new IndexArrayIterator(Array.extractIDsFromData(dt));
   }
   
   /** Count current level. */

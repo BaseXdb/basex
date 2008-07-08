@@ -285,7 +285,7 @@ public final class TableHeader extends BaseXPanel {
     shift = e.isShiftDown();
     ctrl = e.isControlDown();
     alt = e.isAltDown();
-    if(box == null && alt) return;
+    if(box == null && alt || inputCol == -1) return;
     
     final int c = e.getKeyCode();
     if(c == KeyEvent.VK_ENTER) {

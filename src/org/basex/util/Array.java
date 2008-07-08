@@ -418,14 +418,14 @@ public final class Array {
         || data[0].length == 0) return NOINTS;
 
     final int l = data[0].length;
-    final int[] max = new int[l];
-    max[0] = data[0][0];
+    final int[] ids = new int[l];
+    ids[0] = data[0][0];
     int c = 1;
     for(int i = 1; i < l; i++) {
       final int j = data[0][i];
-      if(max[c - 1] != j) max[c++] = j;
+      if(ids[c - 1] != j) ids[c++] = j;
     }
-    return finish(max, c);
+    return finish(ids, c);
   }
 
   /**

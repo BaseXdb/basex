@@ -44,8 +44,8 @@ public final class MemValues extends Index {
   }
   
   @Override
-  public int[][] ids(final IndexToken ind) {
-    return new int[][] { index.ids(ind.text) };
+  public IndexIterator ids(final IndexToken ind) {
+    return index.ids(ind.text);
   }
   
   @Override
@@ -61,9 +61,9 @@ public final class MemValues extends Index {
   /** MemValue Index. */
   static class MemValueIndex extends Set {
     /** IDs. */
-    private int[][] ids = new int[CAP][];
+    int[][] ids = new int[CAP][];
     /** ID array lengths. */
-    private int[] len = new int[CAP];
+    int[] len = new int[CAP];
 
     /**
      * Indexes the specified keys and values.
@@ -90,9 +90,18 @@ public final class MemValues extends Index {
      * @param key index key
      * @return ids
      */
-    public int[] ids(final byte[] key) {
+    public IndexIterator ids(final byte[] key) {
       final int i = id(key);
-      return i == 0 ? Array.NOINTS : Array.finish(ids[i], len[i]);
+      if(i == 0) return IndexIterator.EMPTY;
+      
+      final int l = len[i];
+      return new IndexIterator() {
+        int d = -1;
+        @Override
+        public boolean more() { return ++d < l; }
+        @Override
+        public int next() { return ids[i][d]; }
+      };
     }
     
     /**

@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import org.basex.data.Data;
 import org.basex.io.DataAccess;
-import org.basex.util.Array;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -22,15 +21,15 @@ import org.basex.util.TokenBuilder;
  */
 public final class Values extends Index {
   /** Number of hash entries. */
-  private int size;
+  int size;
   /** Values file. */
-  private final Data data;
+  final Data data;
   /** ID references. */
-  private final DataAccess idxr;
+  final DataAccess idxr;
   /** ID lists. */
-  private final DataAccess idxl;
+  final DataAccess idxl;
   /** Value type (texts/attributes). */
-  private final boolean text;
+  final boolean text;
 
   /**
    * Constructor, initializing the index structure.
@@ -60,20 +59,30 @@ public final class Values extends Index {
   }
 
   @Override
-  public int[][] ids(final IndexToken tok) {
+  public IndexIterator ids(final IndexToken tok) {
     if(tok.range()) return idRange((RangeToken) tok);
     
     final long pos = get(tok.text);
-    if(pos == 0) return Array.NOINTS2;
+    if(pos == 0) return IndexIterator.EMPTY;
     
     final int ds = idxl.readNum(pos);
-    final int[] ids = new int[ds];
-    int p = 0;
-    for(int d = 0; d < ds; d++) {
-      ids[d] = p + idxl.readNum();
-      p = ids[d];
-    }
-    return new int[][] { ids };
+
+    return new IndexIterator() {
+      /** Counter. */
+      int d = -1;
+      /** Last pre value. */
+      int p = 0;
+
+      @Override
+      public boolean more() {
+        return ++d < ds;
+      }
+      @Override
+      public int next() {
+        p += idxl.readNum();
+        return p;
+      }
+    };
   }
 
   @Override
@@ -87,7 +96,7 @@ public final class Values extends Index {
    * @param tok index term
    * @return results
    */
-  private int[][] idRange(final RangeToken tok) {
+  private IndexIterator idRange(final RangeToken tok) {
     final double min = tok.min;
     final double max = tok.max;
 
@@ -124,7 +133,8 @@ public final class Values extends Index {
     }
     final int[] res = ids.finish();
     Arrays.sort(res);
-    return new int[][] { res };
+    
+    return new IndexArrayIterator(res);
   }
   
   /**

@@ -128,9 +128,7 @@ public class DataAccess {
   public synchronized int[] readNums(final long p, final int s) {
     int[] r = new int[s];
     cursor(p);
-    for (int i = 0; i < s; i++) {
-      r[i] = readNum();
-    }
+    for (int i = 0; i < s; i++) r[i] = readNum();
     return r;
   }
 
@@ -141,9 +139,7 @@ public class DataAccess {
    */
   public synchronized int[] readNums(final int s) {
     int[] r = new int[s];
-    for (int i = 0; i < s; i++) {
-      r[i] = readNum();
-    }
+    for (int i = 0; i < s; i++) r[i] = readNum();
     return r;
   }
 
