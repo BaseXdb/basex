@@ -23,6 +23,7 @@ public final class Union extends Arr {
     super(e);
   }
 
+  /*
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
     final NodeBuilder nb = new NodeBuilder(false);
@@ -39,6 +40,44 @@ public final class Union extends Arr {
       }
     }
     return nb.iter();
+  } */
+  
+  @Override
+  public Iter iter(final XQContext ctx) throws XQException {
+    return new Iter() {
+
+      final NodeBuilder nb = new NodeBuilder(false);
+      Iter iter;
+      int exprCount = 0;
+      int exprCountTemp = exprCount - 1;
+      Item item;
+      
+      @Override
+      public Item next() throws XQException {
+        
+        while(exprCount < expr.length) {
+          
+          // new expression ?
+          if (exprCount - 1 == exprCountTemp) {
+            iter = ctx.iter(expr[exprCount]);
+            exprCountTemp++;
+          }
+          
+          while((item = iter.next()) != null) {
+            if(!(item.node())) Err.nodes(Union.this);
+            final Node node = (Node) item;
+            int j = -1;
+            while(++j < nb.size) if(CmpN.COMP.EQ.e(nb.list[j], node)) break;
+            if(j == nb.size) {
+              nb.add(node);
+              return node;
+            }
+          }
+          exprCount++;
+        }
+        return null;
+      }
+    };
   }
   
   @Override
