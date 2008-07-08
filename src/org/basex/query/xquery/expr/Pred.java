@@ -38,19 +38,14 @@ public class Pred extends Arr {
     // Multiple Predicates
     if(expr.length > 1) return this;
     
-    else {      
-      // LAST
-      if(expr[0] instanceof Fun) {
-        Fun f = (Fun) expr[0];
-        if(f.func == FunDef.LAST) return new PredIter(root, expr, true, false);
-      }
-      
-      // numeric value
-      if(expr[0].n()) return new PredIter(root, expr, false, true);
-      
-      // POS
-      return uses(Using.POS) ? this : new PredIter(root, expr);
-    } 
+    // LAST
+    final boolean last = expr[0] instanceof Fun &&
+      ((Fun) expr[0]).func == FunDef.LAST;
+    // Numeric value
+    final boolean num = expr[0].n();
+    // POS
+    return !last && !num && uses(Using.POS) ? this :
+      new PredIter(root, expr, last, num);
   }  
 
   @Override

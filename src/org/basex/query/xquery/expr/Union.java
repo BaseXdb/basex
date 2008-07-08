@@ -23,7 +23,6 @@ public final class Union extends Arr {
     super(e);
   }
 
-  /*
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
     final NodeBuilder nb = new NodeBuilder(false);
@@ -40,10 +39,11 @@ public final class Union extends Arr {
       }
     }
     return nb.iter();
-  } */
+  }
   
+  /*
   @Override
-  public Iter iter(final XQContext ctx) throws XQException {
+  public Iter iter(final XQContext ctx) {
     return new Iter() {
 
       final NodeBuilder nb = new NodeBuilder(false);
@@ -78,7 +78,7 @@ public final class Union extends Arr {
         return null;
       }
     };
-  }
+  } */
   
   @Override
   public String toString() {
