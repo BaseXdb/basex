@@ -46,6 +46,9 @@ public class Step extends Arr {
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
     super.comp(ctx);
+
+    // No predicates.. use simple evaluation
+    if(expr.length == 0) return new SimpleIterStep(axis, test, expr);
     // LAST
     final boolean last = expr[0] instanceof Fun &&
       ((Fun) expr[0]).func == FunDef.LAST;
@@ -53,8 +56,7 @@ public class Step extends Arr {
     final boolean num = expr[0].n();
     // Multiple Predicates or POS
     return expr.length > 1 || (!last && !num && uses(Using.POS)) ? this : 
-      expr.length == 0 ? new SimpleIterStep(axis, test, expr) : 
-        new IterStep(axis, test, expr, last, num);
+      new IterStep(axis, test, expr, last, num);
   }
 
   @Override
