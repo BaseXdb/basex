@@ -11,20 +11,29 @@ import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.util.Err;
 
 /**
- * Path expression.
+ * Path expression. Mustn't be called with more than one predicate.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public final class IterStep extends Step {
+  /** Flag is set to true if predicate has last function. */
+  boolean lastFlag;
+  /** Flag is set to true if predicate has a numeric value. */
+  boolean numFlag;
   /**
    * Constructor.
    * @param a axis
    * @param t node test
    * @param p predicates
+   * @param last lastFlag is true if predicate has a last function
+   * @param num numberFlag is true if predicate has a numeric value
    */
-  public IterStep(final Axis a, final Test t, final Expr[] p) {
+  public IterStep(final Axis a, final Test t, final Expr[] p, 
+      final boolean last, final boolean num) {
     super(a, t, p);
+    lastFlag = last;
+    numFlag = num;
   }
   
   @Override
@@ -38,37 +47,47 @@ public final class IterStep extends Step {
     return new NodeIter() {
       /** Temporary iterator. */
       NodeIter ir;
+      boolean finished = false;
+      Node nod;
       
       @Override
       public Node next() throws XQException {
+        if(finished) return null;
         while(true) {
           if(ir == null) {
             final Item it = iter.next();
             if(it == null) {
               ctx.item = item;
+              if(lastFlag) {
+                finished = true;
+                return nod.finish();
+              }
               return null;
             }
             if(!it.node()) Err.or(NODESPATH, this, it);
             ir = axis.init((Node) it);
           }
-          final Node nod = ir.next();
+          nod = ir.next();
           if(nod != null) {
             if(test.e(nod, ctx)) {
               // evaluates predicates
               boolean add = true;
-              for(final Expr e : expr) {
-                ctx.item = nod;
-                final Item i = ctx.iter(e).ebv();
-                if(i.bool()) {
-                  // assign score value
-                  nod.score(i.score());
-                } else {
-                  add = false;
-                  break;
-                }
+
+              ctx.item = nod;
+              final Item i = ctx.iter(expr[0]).ebv();
+              if(i.bool()) {
+                // assign score value
+                nod.score(i.score());
+              } else {
+                add = false;
               }
+
               if(add) {
                 ctx.item = item;
+                if(numFlag) {
+                  finished = true;
+                  return nod.finish();
+                }
                 return nod.finish();
               }
             }

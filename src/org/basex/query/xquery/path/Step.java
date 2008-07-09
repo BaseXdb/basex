@@ -7,6 +7,8 @@ import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Arr;
 import org.basex.query.xquery.expr.Expr;
+import org.basex.query.xquery.func.Fun;
+import org.basex.query.xquery.func.FunDef;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Node;
 import org.basex.query.xquery.item.Type;
@@ -44,8 +46,15 @@ public class Step extends Arr {
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
     super.comp(ctx);
-    return uses(Using.POS) ? this : expr.length == 0 ?
-        new SimpleIterStep(axis, test, expr) : new IterStep(axis, test, expr);
+    // LAST
+    final boolean last = expr[0] instanceof Fun &&
+      ((Fun) expr[0]).func == FunDef.LAST;
+    // Numeric value
+    final boolean num = expr[0].n();
+    // Multiple Predicates or POS
+    return expr.length > 1 || (!last && !num && uses(Using.POS)) ? this : 
+      expr.length == 0 ? new SimpleIterStep(axis, test, expr) : 
+        new IterStep(axis, test, expr, last, num);
   }
 
   @Override
