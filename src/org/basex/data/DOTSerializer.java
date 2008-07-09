@@ -79,6 +79,14 @@ public final class DOTSerializer extends Serializer {
     openElement(RESULT);
   }
 
+  /*@Override
+  public void openElement(final byte[] t, final byte[]... a) throws Exception {
+    if(Token.eq(t, PLAN)) {
+      
+    }
+    openElement(RESULT);
+  }*/
+
   @Override
   public void closeResult() throws IOException {
     closeElement(RESULT);

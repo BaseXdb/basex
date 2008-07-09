@@ -116,55 +116,35 @@ public abstract class QueryContext extends Progress {
   
   /**
    * Prints the plan to the specified file.
-   * @param fn name of xml file
    * @throws Exception exception
    */
-  public final void planXML(final String fn) throws Exception {
+  public final void planXML() throws Exception {
     final CachedOutput out = new CachedOutput();
     final XMLSerializer ser = new XMLSerializer(out, true, true);
     ser.openElement(PLAN);
     plan(ser);
     ser.closeElement(PLAN);
     out.print(NL);
-    new IO(fn).write(out.finish());
+    info.add(out.finish());
+    //new IO(fn).write(out.finish());
   }
   
   /**
    * Shows the dot output via dotty.
-   * @param fn name of dot file
    * @throws Exception exception
    */
-  public final void planDot(final String fn) throws Exception {
+  public final void planDot() throws Exception {
     final CachedOutput out = new CachedOutput();
-    planDot(fn, out, new DOTSerializer(out));
-  }
-  
-  /**
-   * Shows the dot output via dotty.
-   * @param fn name of dot file
-   * @param out output stream
-   * @param ser serializer
-   * @throws Exception exception
-   */
-  protected final void planDot(final String fn, final CachedOutput out,
-      final DOTSerializer ser) throws Exception {
-    ser.open(1);
+    final DOTSerializer ser = new DOTSerializer(out);
+    //ser.open(1);
     ser.openElement(PLAN);
     plan(ser);
     ser.closeElement(PLAN);
-    ser.close(1);
-    dot(fn, out.finish());
-  }
-  
-  /**
-   * Shows the dot output via dotty.
-   * @param f name of temporary dot file
-   * @param cont content
-   * @throws Exception exception
-   */
-  protected final void dot(final String f, final byte[] cont)
-      throws Exception {
-    new IO(f).write(cont);
-    new ProcessBuilder(Prop.dotty, f).start().waitFor();
+    //ser.close(1);
+    
+    final IO f = new IO(PLANDOT);
+    f.write(out.finish());
+    new ProcessBuilder(Prop.dotty, PLANDOT).start().waitFor();
+    //f.delete();
   }
 }

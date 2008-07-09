@@ -57,8 +57,8 @@ public abstract class QueryProcessor extends Progress {
     if(context == null) parse();
     context.compile(nodes);
     try {
-      if(Prop.xmlplan) context.planXML(PLANXML);
-      if(Prop.dotplan) context.planDot(PLANDOT);
+      if(Prop.xmlplan) context.planXML();
+      if(Prop.dotplan) context.planDot();
     } catch(Exception ex) {
       ex.printStackTrace();
     }
@@ -107,8 +107,8 @@ public abstract class QueryProcessor extends Progress {
   public final String getInfo() {
     final TokenBuilder tb = new TokenBuilder(context.info());
 
-    if(Prop.xmlplan) tb.add(QUERYPLAN + NL, PLANXML);
-    if(Prop.dotplan) tb.add(QUERYPLAN + NL, PLANDOT);
+    //if(Prop.xmlplan) tb.add(QUERYPLAN + NL, PLANXML);
+    //if(Prop.dotplan) tb.add(QUERYPLAN + NL, PLANDOT);
     
     if(Prop.allInfo) {
       tb.add(NL + QUERYSTRING);
