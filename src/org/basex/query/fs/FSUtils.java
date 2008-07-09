@@ -25,6 +25,9 @@ public final class FSUtils {
   /** Root dir. */
   private static final int ROOTDIR = 2;
 
+  /** # of attributes. */
+  public static final int NUMATT = 5;
+
   /** Private constructor, preventing class instances. */
   private FSUtils() { }
 
@@ -58,7 +61,7 @@ public final class FSUtils {
     final byte[] att = data.attValue(data.sizeID, pre);
     return att != null ? toLong(att) : 0;
   }
-  
+
   /**
    * Returns the pre value of the parrent.
    * @param data data reference
@@ -68,8 +71,8 @@ public final class FSUtils {
   public static int getParrent(final Data data, final int pre) {
     return data.parent(pre, data.kind(pre));
   }
-  
-  
+
+
   /**
    * Returns the path of a file.
    * @param data data reference
@@ -232,19 +235,19 @@ public final class FSUtils {
    * @param path - path name
    * @return -  all pre values of all files
    */
-  public static int[] getOneSpecificFileOrDir(final Data data, final int pre,
+  public static int getOneSpecificDir(final Data data, final int pre,
       final String path) {
 
-    final IntList res = new IntList();
     final DirIterator it = new DirIterator(data, pre);
 
     String fileToFind = FSUtils.transformToRegex(path);
     while(it.more()) {
       final int n = it.next();
-      if(Pattern.matches(fileToFind, Token.string(getName(data, n)))) 
-        res.add(n);
+      if(Pattern.matches(fileToFind, Token.string(getName(data, n))) 
+          && isDir(data, n)) 
+        return n;
     }
-    return res.finish();
+    return -1;
   }
 
   /**
@@ -384,7 +387,21 @@ public final class FSUtils {
     return result;
   }
 
-
+  /**
+   * Returns if the file / dir expression is valid.
+   * 
+   * @param file file / dir expression
+   * @return if the file / dir expression is valid
+   */
+  public static boolean validFileName(final String file) {
+    if(file.indexOf('?') > 0 || 
+       file.indexOf('*') > 0 ||       
+       file.indexOf('[') > 0 || 
+       file.indexOf(']') > 0) {
+      return false;     
+    }
+    return true;
+  }
 
   /**
    * Returns int value of the root dir.
@@ -448,7 +465,7 @@ public final class FSUtils {
         out.print(programm + ": " + arg + ": " + EFTYPE);
         break;
       case 99:
-        out.print(programm + ": " + arg + ": " + EMISSARG);
+        out.print(programm + ": " + EMISSARG);
         break;
       case 100:
         out.print(programm + ": " + arg + ": " + EOMDIR);
@@ -487,7 +504,7 @@ public final class FSUtils {
       data.insert(pre, parrent, DIR, Data.ELEM);
     else
       data.insert(pre, parrent, FILE, Data.ELEM);
-    
+
     data.insert(pre + 1, pre, NAME, name);
     data.insert(pre + 2, pre, SUFFIX, suffix);
     data.insert(pre + 3, pre, SIZE, size);
@@ -517,5 +534,20 @@ public final class FSUtils {
     if(mtime != null)
       data.update(pre + 4, MTIME, mtime);  
     data.flush();
+  }
+  /**
+   * Updates a entry of the table.
+   * 
+   * @param data - the data table
+   * @param del - pre value of file to delete
+   * 
+   */
+  public static void delete(final Data data, final int del) {
+    try {
+      data.delete(del);
+      data.flush();  
+    } catch(Exception e) {
+      e.printStackTrace();
+    }     
   }
 }

@@ -46,7 +46,7 @@ public class MKDIR {
   public void mkdirMain(final String cmd) 
   throws IOException {
 
-    GetOpts g = new GetOpts(cmd, "h");
+    GetOpts g = new GetOpts(cmd, "h", 1);
     // get all Options
     int ch = g.getopt();
     while (ch != -1) {
@@ -66,7 +66,9 @@ public class MKDIR {
     // if there is path expression remove it     
     if(g.getPath() != null) {      
       mkdir(g.getPath());
-    } 
+    } else {
+      FSUtils.printError(out, "mkdir", "", 99);
+    }
   }
 
   /**
@@ -85,29 +87,31 @@ public class MKDIR {
       curDirPre = FSUtils.goToDir(context.data(), curDirPre, 
           path.substring(0, beginIndex));   
       if(curDirPre == -1) {
-        FSUtils.printError(out, "mkdir", path, 2);        
+        FSUtils.printError(out, "mkdir", path, 2);     
+        return;
       } else {
         dir = path.substring(beginIndex + 1);
       }
     }
-    int[] sources =  FSUtils.getOneSpecificFileOrDir(context.data(), 
+
+    if(!FSUtils.validFileName(dir)) {
+      FSUtils.printError(out, "mkdir", dir, 101);              
+      return;
+    }
+
+    int source =  FSUtils.getOneSpecificDir(context.data(), 
         curDirPre, dir);
-    
-   
-    
-    if(sources.length > 0) {
-      for(int dirPre : sources) {
-        if(FSUtils.isDir(context.data(), dirPre)) {
-          FSUtils.printError(out, "mkdir", path, 17);
-          return;
-        }
-      }
+    if(source > -1) {
+      FSUtils.printError(out, "mkdir", path, 17);
+      return;
+
+
     } else {   
       // add new dir  
       try {
         int preNewFile = 4;
         if(!(curDirPre == FSUtils.getROOTDIR())) {
-          preNewFile = curDirPre + 5;
+          preNewFile = curDirPre + FSUtils.NUMATT;
         }
         FSUtils.insert(context.data(), true, Token.token(dir), 
             Token.token(""), Token.token(0), 

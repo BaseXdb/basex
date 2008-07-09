@@ -76,12 +76,22 @@ public final class TOUCH {
    * @throws IOException - in case of problems with the PrintOutput 
    */
   private void touch(final String path) throws IOException {
-
+    
+    int beginIndex = path.lastIndexOf('/');
+    if(beginIndex > -1) {
+      curDirPre = FSUtils.goToDir(context.data(), curDirPre, 
+          path.substring(0, beginIndex));   
+      if(curDirPre == -1) {
+        FSUtils.printError(out, "touch", path, 2);
+        return;
+      } 
+    }
+    
     String file = path.substring(path.lastIndexOf('/') + 1);
 
     int[] preFound =  FSUtils.getSpecificFilesOrDirs(context.data(), 
-        curDirPre, path);
-    if(preFound.length  > 0) {
+        curDirPre, file);
+    if(preFound.length  > 0 && preFound[0] != -1) {
       for(int i : preFound) {
         if(FSUtils.isFile(context.data(), i)) {
           FSUtils.update(context.data(), null, null, null,
@@ -90,17 +100,15 @@ public final class TOUCH {
       }
     } else {   
       // add new file 
-      if(file.indexOf('?') > 0 || file.indexOf('*') > 0 
-          || file.indexOf('[') > 0 || file.indexOf(']') > 0) {
+      if(!FSUtils.validFileName(file)) {
         FSUtils.printError(out, "touch", file, 101);              
         return;
       } 
       try {
         int preNewFile = 4;
         if(!(curDirPre == FSUtils.getROOTDIR())) {
-          preNewFile = curDirPre + 5;
+          preNewFile = curDirPre + FSUtils.NUMATT;
         }
-        // TODO<HS> Go to dir... 
         FSUtils.insert(context.data(), false, Token.token(file), 
             getSuffix(file), Token.token(0), 
             Token.token(System.currentTimeMillis()),

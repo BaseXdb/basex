@@ -145,7 +145,7 @@ public final class CP {
               byte[] suffix = FSUtils.getSuffix(data, sources[0]);
 
               if(!(target[0] == FSUtils.getROOTDIR())) {
-                preOfNewFile = target[0] + 5;
+                preOfNewFile = target[0] + FSUtils.NUMATT;
               }                             
               FSUtils.insert(data, false, name, suffix, size, mtime,
                   target[0], preOfNewFile);
@@ -161,12 +161,14 @@ public final class CP {
             byte[] suffix = getSuffix(targetfile);
 
             if(!(curDirPre == FSUtils.getROOTDIR())) {
-              preOfNewFile = curDirPre + 5;
+              preOfNewFile = curDirPre + FSUtils.NUMATT;
             }        
             FSUtils.insert(data, false, name, suffix, size, mtime,
                 curDirPre, preOfNewFile);
           }      
           break;
+
+
         default:
           if(target.length != 1) { 
             FSUtils.printError(out, "cp", "", 99);
@@ -178,16 +180,23 @@ public final class CP {
           break;
         }
         if(!(target[0] == FSUtils.getROOTDIR())) {
-          preOfNewFile = target[0] + 5;
+          preOfNewFile = target[0] + FSUtils.NUMATT;
         }  
         ArrayList<byte[]>  toInsert = new ArrayList<byte[]>();
-
+        int sizeToAdd = 0;
         for(int i : sources) {  
-          // if i is dir go to next value
+          i += sizeToAdd; 
+          // if i is dir and frecursive is false go to next value
           if(FSUtils.isDir(data, i)) {
-            FSUtils.printError(out, "cp", 
-                Token.string(FSUtils.getName(data, i)), 100);
-            continue;
+            if(fRecursive) {
+              sizeToAdd += data.size(i, Data.ELEM);    
+              cpRecursive(i, target, "");              
+              continue;
+            } else {
+              FSUtils.printError(out, "cp", 
+                  Token.string(FSUtils.getName(data, i)), 100);
+              continue;
+            }
           }      
           toInsert.add(FSUtils.getName(data, i));
           toInsert.add(FSUtils.getSuffix(data, i));
@@ -260,7 +269,7 @@ public final class CP {
     // if target exists - insert into the target the directory to copy
     if(target.length == 1) {
       if(!(target[0] == FSUtils.getROOTDIR())) {
-        preOfNewFile = target[0] + 5;
+        preOfNewFile = target[0] + FSUtils.NUMATT;
       }  
       parPre = target[0];
       // insert a copy of the source dir into the target dir
@@ -272,29 +281,29 @@ public final class CP {
       // target does not extist - create a new directory and copy all contents
       // of the source directory to it
       if(!(curDirPre == FSUtils.getROOTDIR())) {
-        preOfNewFile = curDirPre + 5;
+        preOfNewFile = curDirPre + FSUtils.NUMATT;
       }      
       parPre = preOfNewFile; 
       FSUtils.insert(data, true, Token.token(targetFile), Token.token(""),
           Token.token(0), Token.token(System.currentTimeMillis()),
           curDirPre, preOfNewFile);
-    }
-    out.print("Par: " + parPre + "\n");
+    }    
     // insert fs hierarchy
     copyRoot = parPre;
+    byte[] f = Token.token("f");
     while(!toInsert.isEmpty()) {      
       if(toInsert.get(0) == null) {
         toInsert.remove(0);
         parPre = FSUtils.goToDir(data, copyRoot, 
             Token.string(toInsert.remove(0)));
         continue;
-      }
+      }      
       boolean isDir = true;
-      if(Token.string(toInsert.remove(0)).equals("f"))
+      if(Token.eq(toInsert.remove(0), f))
         isDir = false;      
       FSUtils.insert(data, isDir, toInsert.remove(0), toInsert.remove(0),
           toInsert.remove(0), Token.token(System.currentTimeMillis()),
-          parPre, parPre + 5);
+          parPre, parPre + FSUtils.NUMATT);
     }
   }
 

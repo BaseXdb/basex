@@ -88,6 +88,9 @@ public interface FSText {
     "      mkdir directory_name)\n\n    DESCRIPTION\n      The mkdir utility " +
     "creates the directories.\n\n\n";
   /** Help text. */
+  String FSMV = "MV(1)" + FSMAN + "MV(1))\n\n" +
+    "    NAME\n      mv -- move files\n\n\n";  
+  /** Help text. */
   String FSPWD = "PWD(1)" + FSMAN + "PWD(1)\n\n  NAME\n" +
     "     pwd -- return working directory name\n\n  SYNOPSIS\n" +
     "     pwd\n\n  DESCRIPTION\n     The pwd utility writes the absolute " +
