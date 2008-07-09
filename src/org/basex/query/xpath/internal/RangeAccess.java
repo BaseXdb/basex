@@ -7,7 +7,6 @@ import org.basex.index.IndexIterator;
 import org.basex.index.RangeToken;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.values.NodeSet;
-import org.basex.util.IntList;
 import org.basex.util.Token;
 
 /**
@@ -18,32 +17,30 @@ import org.basex.util.Token;
  */
 public final class RangeAccess extends InternalExpr {
   /** Index type. */
-  private final RangeToken index;
+  private final RangeToken ind;
 
   /**
    * Constructor.
-   * @param ind index terms
+   * @param i index terms
    */
-  public RangeAccess(final RangeToken ind) {
-    index = ind;
+  public RangeAccess(final RangeToken i) {
+    ind = i;
   }
 
   @Override
   public NodeSet eval(final XPContext ctx) {
-    final IndexIterator it = ctx.local.data.ids(index);
-    final IntList il = new IntList();
-    while(it.more()) {
-      ctx.checkStop();
-      il.add(it.next());
-    }
+    final IndexIterator it = ctx.local.data.ids(ind);
+    final int[] ids = new int[it.size()];
+    for(int i = 0; it.more(); i++) ids[i] = it.next();
+    ctx.local = new NodeSet(ids, ctx);
     return ctx.local;
   }
 
   @Override
   public void plan(final Serializer ser) throws Exception {
-    ser.emptyElement(this, Token.token(TYPE), Token.token(
-        index.type.toString()), Token.token(MIN), Token.token(index.min),
-        Token.token(MAX), Token.token(index.max));
+    ser.emptyElement(this, Token.token(TYPE), Token.token(ind.type.toString()),
+        Token.token(MIN), Token.token(ind.min),
+        Token.token(MAX), Token.token(ind.max));
   }
 
   @Override
@@ -53,6 +50,6 @@ public final class RangeAccess extends InternalExpr {
 
   @Override
   public String toString() {
-    return BaseX.info("%(%, %-%)", name(), index.type, index.min, index.max);
+    return BaseX.info("%(%, %-%)", name(), ind.type, ind.min, ind.max);
   }
 }

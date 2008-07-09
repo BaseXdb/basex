@@ -113,14 +113,12 @@ public final class Skeleton {
         name = "@" + Token.string(data.atts.key(r.name));
       } else if(r.kind == Data.ELEM) {
         name = Token.string(data.tags.key(r.name));
-        /*
       } else if(r.kind == Data.TEXT) {
         name = "text()";
       } else if(r.kind == Data.COMM) {
         name = "comment()";
       } else if(r.kind == Data.PI) {
         name = "processing-instruction()";
-        */
       }
       if(name != null && !sl.contains(name)) sl.add(name);
     }
@@ -156,7 +154,7 @@ public final class Skeleton {
   /** Document node. */
   private static final class Node {
     /** Tag reference. */
-    final int name;
+    final short name;
     /** Node kind. */
     final byte kind;
     /** Tag counter. */
@@ -172,7 +170,7 @@ public final class Skeleton {
     Node(final int t, final byte k) {
       ch = new Node[0];
       count = 1;
-      name = t;
+      name = (short) t;
       kind = k;
     }
 
@@ -181,7 +179,7 @@ public final class Skeleton {
      * @param in input stream
      */
     Node(final DataInput in) {
-      name = in.readNum();
+      name = (short) in.readNum();
       kind = in.readByte();
       count = in.readNum();
       final int cl = in.readNum();
@@ -197,7 +195,7 @@ public final class Skeleton {
      */
     Node get(final int t, final byte k) {
       for(final Node c : ch) {
-        if(c.name == t && c.kind == k) {
+        if(c.kind == k && c.name == t) {
           c.count++;
           return c;
         }

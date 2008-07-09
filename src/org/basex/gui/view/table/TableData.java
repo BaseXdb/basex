@@ -53,7 +53,8 @@ public final class TableData {
   private IntList rootRows;
   /** ID of the table root tag. */
   private int rootTag;
-
+  /** Last query. */
+  private String last = "";
 
   /**
    * Initializes the table data.
@@ -69,6 +70,7 @@ public final class TableData {
     rootTag = 0;
     sortCol = -1;
     colW = null;
+    last = "";
     rowH = 1;
 
     if(data.deepfs) {
@@ -199,14 +201,14 @@ public final class TableData {
     for(int c = 0; c < n.size; c++) {
       int p = n.pre[c];
 
-      final int last = p + data.size(p, data.kind(p));
+      final int s = p + data.size(p, data.kind(p));
       // find first root tag
       do {
         if(data.kind(p) == Data.ELEM && data.tagID(p) == rootTag) break;
-      } while(++p < last);
+      } while(++p < s);
 
       // parse whole document and collect root tags
-      while(p < last) {
+      while(p < s) {
         final int k = data.kind(p);
         if(k == Data.ELEM && data.tagID(p) == rootTag) rows.add(p);
         //p += fs ? data.attSize(p, k) : data.size(p, k);
@@ -334,6 +336,8 @@ public final class TableData {
     final boolean root = rows == rootRows;
     final String xpath = Find.findTable(filter, colNames,
         data.tags.key(rootTag), data, GUIProp.filterrt || root);
+    if(xpath.equals(last)) return;
+    last = xpath;
     GUI.get().execute(Commands.XPATH, xpath.length() != 0 ? xpath : "/");
   }
 

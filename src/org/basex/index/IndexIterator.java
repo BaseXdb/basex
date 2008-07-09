@@ -13,6 +13,8 @@ public abstract class IndexIterator {
     public boolean more() { return false; }
     @Override
     public int next() { return 0; };
+    @Override
+    public int size() { return 0; };
   };
   
   /**
@@ -26,4 +28,10 @@ public abstract class IndexIterator {
    * @return result
    */
   public abstract int next();
+  
+  /**
+   * Returns the number of index results.
+   * @return size
+   */
+  public abstract int size();
 }

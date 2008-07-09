@@ -90,7 +90,7 @@ public final class Prop {
   /** Flag for creating a fulltext index. */
   public static boolean ftindex = false;
   /** Flag for compressing ft-values on disk. */
-  public static boolean fcompress = false;
+  public static boolean fcompress = true;
   /** Flag for creating a text index. */
   public static boolean textindex = true;
   /** Flag for creating an attribute value index. */

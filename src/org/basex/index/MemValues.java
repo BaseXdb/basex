@@ -92,16 +92,8 @@ public final class MemValues extends Index {
      */
     public IndexIterator ids(final byte[] key) {
       final int i = id(key);
-      if(i == 0) return IndexIterator.EMPTY;
-      
-      final int l = len[i];
-      return new IndexIterator() {
-        int d = -1;
-        @Override
-        public boolean more() { return ++d < l; }
-        @Override
-        public int next() { return ids[i][d]; }
-      };
+      return i == 0 ? IndexIterator.EMPTY :
+        new IndexArrayIterator(ids[i], len[i]);
     }
     
     /**

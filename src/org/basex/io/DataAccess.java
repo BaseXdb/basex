@@ -327,7 +327,7 @@ public class DataAccess {
    * (without cursor correction).
    * @return integer value
    */
-  private synchronized int readInt() {
+  public synchronized int readInt() {
     return (read() << 24) + (read() << 16) + (read() << 8) + read();
   }
   

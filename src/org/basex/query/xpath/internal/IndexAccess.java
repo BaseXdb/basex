@@ -1,12 +1,13 @@
 package org.basex.query.xpath.internal;
 
 import static org.basex.query.xpath.XPText.*;
+
+import org.basex.BaseX;
 import org.basex.data.Serializer;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.values.NodeSet;
-import org.basex.util.IntList;
 import org.basex.util.Token;
 
 /**
@@ -18,33 +19,29 @@ import org.basex.util.Token;
  */
 public final class IndexAccess extends InternalExpr {
   /** Index type. */
-  private final IndexToken index;
+  private final IndexToken ind;
 
   /**
    * Constructor.
-   * @param ind index reference
+   * @param i index reference
    */
-  public IndexAccess(final IndexToken ind) {
-    index = ind;
+  public IndexAccess(final IndexToken i) {
+    ind = i;
   }
 
   @Override
   public NodeSet eval(final XPContext ctx) {
-    final IndexIterator it = ctx.local.data.ids(index);
-    final IntList il = new IntList();
-    while(it.more()) {
-      ctx.checkStop();
-      il.add(it.next());
-    }
-    ctx.local = new NodeSet(il.finish(), ctx);
+    final IndexIterator it = ctx.local.data.ids(ind);
+    final int[] ids = new int[it.size()];
+    for(int i = 0; it.more(); i++) ids[i] = it.next();
+    ctx.local = new NodeSet(ids, ctx);
     return ctx.local;
   }
 
   @Override
   public void plan(final Serializer ser) throws Exception {
-    ser.openElement(this, Token.token(TYPE),
-        Token.token(index.type.toString()));
-    ser.item(index.get());
+    ser.openElement(this, Token.token(TYPE), Token.token(ind.type.toString()));
+    ser.item(ind.get());
     ser.closeElement(this);
   }
 
@@ -55,7 +52,6 @@ public final class IndexAccess extends InternalExpr {
 
   @Override
   public String toString() {
-    return Token.string(name()) + "(" + index.type + ", \"" +
-      Token.string(index.get()) + "\")";
+    return BaseX.info("%(%, \"%\")", name(), ind.type, ind.get());
   }
 }

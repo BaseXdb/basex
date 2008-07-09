@@ -82,6 +82,10 @@ public final class Values extends Index {
         p += idxl.readNum();
         return p;
       }
+      @Override
+      public int size() {
+        return ds;
+      }
     };
   }
 

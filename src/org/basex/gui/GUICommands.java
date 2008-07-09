@@ -590,13 +590,12 @@ public enum GUICommands implements GUICommand {
       View.notifyLayout();
 
       final Context context = GUI.context;
-      final Nodes curr = context.current();
-      final boolean root = curr.size == 1 && curr.pre[0] == 0;
+      final boolean root = context.root();
 
       if(!GUIProp.filterrt) {
         if(!root) {
           View.notifyContext(new Nodes(0, context.data()), true);
-          View.notifyMark(curr);
+          View.notifyMark(context.current());
         }
       } else {
         if(root) {

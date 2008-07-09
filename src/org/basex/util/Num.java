@@ -10,8 +10,6 @@ package org.basex.util;
  * @author Christian Gruen
  */
 public final class Num {
-  /** Flag for storing word position. */
-  private final boolean word;
   /** Num array. */
   private final byte[] iter;
   /** Iterator position. */
@@ -20,12 +18,10 @@ public final class Num {
   /**
    * Constructor for iterating a {@link Num} instance.
    * @param array array to be iterated
-   * @param w flag stating if word positions are stored in the array
    */
-  public Num(final byte[] array, final boolean w) {
+  public Num(final byte[] array) {
     iter = array;
     itpos = 4;
-    word = w;
   }
 
   /**
@@ -40,25 +36,10 @@ public final class Num {
    * Decompresses and returns the current number.
    * @return id
    */
-  public int num() {
-    return Num.read(iter, itpos);
-  }
-  
-  /**
-   * Returns the current word position.
-   * @return word position
-   */
-  public int pos() {
-    return Num.read(iter, itpos + Num.len(iter, itpos));
-  }
-  
-  /**
-   * Jumps to next the next number; to be called after {@link #num()} (and
-   *  {@link #pos()})..
-   */
-  public void next() {
+  public int next() {
+    final int n = Num.read(iter, itpos);
     itpos += Num.len(iter, itpos);
-    if(word) itpos += Num.len(iter, itpos);
+    return n;
   }
   
   // STATIC METHODS ===========================================================
@@ -170,12 +151,12 @@ public final class Num {
     int p = pos;
     final int v = array[p++] & 0xFF;
     switch((v & 0xC0) >>> 6) {
-    case 0: return v;
-    case 1: return (v & 0x3F) << 8 | (array[p++] & 0xFF);
-    case 2: return (v & 0x3F) << 24 | (array[p++] & 0xFF) << 16 |
-      (array[p++] & 0xFF) << 8 | (array[p++] & 0xFF);
-    default: return (array[p++] & 0xFF) << 24 | (array[p++] & 0xFF) << 16 |
-      (array[p++] & 0xFF) << 8 | (array[p++] & 0xFF);
+      case 0: return v;
+      case 1: return (v & 0x3F) << 8 | (array[p++] & 0xFF);
+      case 2: return (v & 0x3F) << 24 | (array[p++] & 0xFF) << 16 |
+        (array[p++] & 0xFF) << 8 | (array[p++] & 0xFF);
+      default: return (array[p++] & 0xFF) << 24 | (array[p++] & 0xFF) << 16 |
+        (array[p++] & 0xFF) << 8 | (array[p++] & 0xFF);
     }
   }
 

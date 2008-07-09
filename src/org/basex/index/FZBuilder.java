@@ -138,18 +138,14 @@ public final class FZBuilder extends Progress implements IndexBuilder {
         for(int x = 0; x != j; x++) outy.write(key[x]);
 
         // write pointer on data
-        //outy.writeInt(dr);
         outy.write5(dr);
         // write data size
         final int ds = tre.ns[p];
         outy.writeInt(ds);
 
-        //System.out.println(new String(key) + "," + ds);
-        
         byte[] val = tre.pre[p];
         if (Prop.fcompress) {
-          for (int z = 4; z < val.length; z++) 
-            outz.write(val[z]);
+          for (int z = 4; z < val.length; z++) outz.write(val[z]);
         } else {
           for(int v = 0, ip = 4; v < ds; ip += Num.len(val, ip), v++)
             outz.writeInt(Num.read(val, ip));  
