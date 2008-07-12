@@ -100,7 +100,7 @@ public final class Insert extends Proc {
       }
       data.flush();
 
-      return Prop.info ? timer(INSERTINFO, nodes.size) : true;
+      return Prop.info ? info(INSERTINFO, nodes.size, perf.getTimer()) : true;
     } catch(final IOException ex) {
       BaseX.debug(ex);
       return error(ex.getMessage());
@@ -143,7 +143,7 @@ public final class Insert extends Proc {
       data.insert(par + data.attSize(par, data.kind(par)), par, n, v);
     }
     data.flush();
-    return Prop.info ? timer(INSERTINFO, nodes.size) : true;
+    return Prop.info ? info(INSERTINFO, nodes.size, perf.getTimer()) : true;
   }
 
   /**
@@ -199,7 +199,7 @@ public final class Insert extends Proc {
       }
     }
     data.flush();
-    return Prop.info ? timer(INSERTINFO, nodes.size) : true;
+    return Prop.info ? info(INSERTINFO, nodes.size, perf.getTimer()) : true;
   }
   
   /**
@@ -254,20 +254,22 @@ public final class Insert extends Proc {
     // copy all nodes
     for(int p = pre; p < pre + size; p++) {
       final int k = data.kind(p);
-      final int par = p - data.parent(p, k);
+      final int d = p - data.parent(p, k);
       switch(k) {
         case Data.DOC:
+          tmp.addDoc(data.text(p), data.size(p, k), k);
+          break;
         case Data.ELEM:
-          tmp.addElem(data.tagID(p), data.tagNS(p), par, data.attSize(p, k),
+          tmp.addElem(data.tagID(p), data.tagNS(p), d, data.attSize(p, k),
               data.size(p, k), k);
           break;
         case Data.ATTR:
-          tmp.addAtt(data.attNameID(p), data.attNS(p), data.attValue(p), par);
+          tmp.addAtt(data.attNameID(p), data.attNS(p), data.attValue(p), d, k);
           break;
         case Data.TEXT:
         case Data.COMM:
         case Data.PI:
-          tmp.addText(data.text(p), par, k);
+          tmp.addText(data.text(p), d, k);
           break;
       }
     }

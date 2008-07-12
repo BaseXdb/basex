@@ -1,6 +1,7 @@
 package org.basex.query.fs;
 
 import org.basex.data.Data;
+import org.basex.util.IntList;
 
 /**
  * Offers an iterator for the children of a node. Could be as well be
@@ -14,7 +15,7 @@ public final class DirIterator {
   /** Data reference. */
   final Data data;
   /** Maximum size. */
-  final int size;
+  int size;
   /** Current pre value. */
   int pre;
   
@@ -25,7 +26,15 @@ public final class DirIterator {
    */
   public DirIterator(final Data d, final int p) {
     data = d;
-    final int k = d.kind(p);
+    init(p);
+  }
+  
+  /**
+   * Initializes the iterator.
+   * @param p root pre value
+   */
+  public void init(final int p) {
+    final int k = data.kind(p);
     size = p + data.size(p, k);
     pre = p + data.attSize(p, k);
   }
@@ -48,4 +57,14 @@ public final class DirIterator {
     return p;
   }
   
+  
+  /**
+   * Returns an array with all pre values..
+   * @return children array
+   */
+  public int[] all() {
+    final IntList il = new IntList();
+    while(more()) il.add(next());
+    return il.finish();
+  }
 }

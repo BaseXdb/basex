@@ -300,7 +300,6 @@ public final class MapView extends View implements Runnable {
     // call recursive TreeMap algorithm
     final Performance perf = new Performance();
     final Nodes nodes = GUI.context.current();
-     
     calcMap(rect, new IntList(nodes.pre), 0, nodes.size, true);
 
     // output timing information

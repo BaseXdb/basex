@@ -36,7 +36,7 @@ public final class Export extends Proc {
       }
       out.close();
 
-      return Prop.info ? timer(DBEXPORTED) : true;
+      return Prop.info ? info(DBEXPORTED, perf.getTimer()) : true;
     } catch(final Exception ex) {
       BaseX.debug(ex);
       return error(ex.getMessage());

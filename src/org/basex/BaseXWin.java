@@ -93,7 +93,7 @@ public final class BaseXWin {
     Enumeration<?> en = def.keys();
     while(en.hasMoreElements()) {
       Object o = en.nextElement();
-      System.out.println(o + ": " + def.get(o));
+      BaseX.outln(o + ": " + def.get(o));
     }
      */
   }

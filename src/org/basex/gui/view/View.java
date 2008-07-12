@@ -76,10 +76,11 @@ public abstract class View extends BaseXPanel {
    * Notifies all views of a data reference change.
    */
   public static void notifyInit() {
-    final Data data = GUI.context.data();
-    if(data != null) {
-      NODEHIST[0] = new Nodes(0, data);
-      MARKHIST[0] = new Nodes(0, data);
+    final Context ctx = GUI.context;
+    final boolean db = ctx.db();
+    if(db) {
+      NODEHIST[0] = ctx.current();
+      MARKHIST[0] = new Nodes(ctx.data());
     }
     
     focused = -1;
@@ -90,13 +91,12 @@ public abstract class View extends BaseXPanel {
     for(final View v : view) v.refreshInit();
 
     final GUI gui = GUI.get();
-    gui.views.setViews(data != null);
+    gui.views.setViews(db);
     gui.layoutViews();
 
     // set new windows title
     gui.status.setPerformance("");
-    gui.setTitle(Text.TITLE + (data == null ? "" : " - " +
-        data.meta.dbname));
+    gui.setTitle(Text.TITLE + (db ? " - " + ctx.data().meta.dbname : ""));
   }
 
   /**
@@ -140,10 +140,6 @@ public abstract class View extends BaseXPanel {
     Nodes nodes = context.marked();
     if(mode == 0) {
       nodes = new Nodes(focused, context.data());
-      /* TEMP
-      // remove ftdata
-      context.ftData(null, null);
-      */
     } else if(mode == 1) {
       nodes.add(focused);
     } else {

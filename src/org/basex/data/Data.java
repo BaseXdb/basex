@@ -5,6 +5,7 @@ import org.basex.index.Index;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
 import org.basex.index.Names;
+import org.basex.util.IntList;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -198,15 +199,6 @@ public abstract class Data  {
   public abstract byte[] text(int pre);
 
   /**
-   * Returns the specified text snippet.
-   * @param pre pre value
-   * @param off offset
-   * @param len length
-   * @return atomized value
-   */
-  public abstract byte[] text(int pre, int off, int len);
-  
-  /**
    * Returns a text as double value.
    * @param pre pre value
    * @return numeric value
@@ -339,6 +331,16 @@ public abstract class Data  {
       case FTX: return ftxindex.info();
       default: return Token.EMPTY;
     }
+  }
+  
+  /**
+   * Returns the document nodes.
+   * @return root nodes
+   */
+  public int[] doc() {
+    final IntList il = new IntList();
+    for(int i = 0; i < size; i += size(i, Data.DOC)) il.add(i);
+    return il.finish();
   }
 
   /**

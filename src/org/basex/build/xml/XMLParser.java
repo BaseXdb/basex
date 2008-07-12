@@ -3,6 +3,7 @@ package org.basex.build.xml;
 import static org.basex.build.BuildText.*;
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import org.basex.build.BuildException;
 import org.basex.build.Builder;
@@ -36,6 +37,7 @@ public final class XMLParser extends Parser {
   @Override
   public void parse(final Builder build) throws IOException {
     builder = build;
+    builder.startDoc(token(file.name()));
 
     // loop until all tokens have been processed
     scanner.more();
@@ -54,7 +56,9 @@ public final class XMLParser extends Parser {
       if(!scanner.more()) break;
     }
     scanner.finish();
+    
     builder.encoding(scanner.encoding);
+    builder.endDoc();
   }
 
   /**
@@ -71,7 +75,7 @@ public final class XMLParser extends Parser {
       final byte[] tag = consumeToken(Type.TAGNAME);
       skipSpace();
 
-      builder.endNode(tag);
+      builder.endElem(tag);
       return consume(Type.R_BR);
     } else {
       consume(Type.L_BR);
@@ -121,10 +125,10 @@ public final class XMLParser extends Parser {
 
       // send start tag to the xml builder
       if(scanner.type == Type.CLOSE_R_BR) {
-        builder.emptyNode(tag, atts);
+        builder.emptyElem(tag, atts);
         return scanner.more();
       } else {
-        builder.startNode(tag, atts);
+        builder.startElem(tag, atts);
         return consume(Type.R_BR);
       }
     }

@@ -27,24 +27,29 @@ import org.basex.util.Token;
  * Each node occupies 128 bits. The current storage layout looks like follows:
  *
  * <pre>
- *  ELEMENTS:
- * - Byte     0: Node kind ({@link Data#ELEM}/{@link Data#DOC})
- * - Byte   1-2: Namespace and Tag Reference
- * - Byte     3: Number of attributes
- * - Byte  4- 7: Number of descendants (size)
- * - Byte  8-11: Relative parent reference
- * - Byte 12-15: Unique Node ID
+ * ELEMENT NODES:
+ * - Byte     0:  KIND: Node kind (ELEM)
+ * - Byte   1-2:  NSPC: Namespace and Tag Reference
+ * - Byte     3:  ATTS: Number of attributes
+ * - Byte  4- 7:  DIST: Relative parent reference
+ * - Byte  8-11:  SIZE: Number of descendants
+ * - Byte 12-15:  UNID: Unique Node ID
+ * DOCUMENT NODES:
+ * - Byte     0:  KIND: Node kind (DOC)
+ * - Byte  3- 7:  TEXT: Text reference
+ * - Byte  8-11:  SIZE: Number of descendants
+ * - Byte 12-15:  UNID: Unique Node ID
  * TEXT NODES:
- * - Byte     0: Node kind ({@link Data#TEXT}/{@link Data#PI}/{@link Data#COMM})
- * - Byte  3- 7: Text reference
- * - Byte  8-11: Relative parent reference
- * - Byte 12-15: Unique Node ID
+ * - Byte     0:  KIND: Node kind (TEXT/COMM/PI)
+ * - Byte  3- 7:  TEXT: Text reference
+ * - Byte  8-11:  DIST: Relative parent reference
+ * - Byte 12-15:  UNID: Unique Node ID
  * ATTRIBUTE NODES:
- * - Byte     0: Node kind ({@link Data#ATTR})
- * - Byte   1-2: Namespace and Attribute name reference
- * - Byte  3- 7: Attribute value reference
- * - Byte    11: Relative parent reference
- * - Byte 12-15: Unique Node ID
+ * - Byte     0:  KIND: Node kind (ATTR)
+ * - Byte   1-2:  NSPC: Namespace and Attribute name reference
+ * - Byte  3- 7:  TEXT: Attribute value reference
+ * - Byte    11:  DIST: Relative parent reference
+ * - Byte 12-15:  UNID: Unique Node ID
  * </pre>
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
@@ -186,7 +191,23 @@ public final class DiskData extends Data {
 
   @Override
   public int parent(final int pre, final int kind) {
-    return pre - (kind == ATTR ? table.read1(pre, 11) : table.read4(pre, 8));
+    return pre - dist(pre, kind);
+  }
+
+  /**
+   * Returns the distance of the specified node.
+   * @param pre pre value
+   * @param kind node kind
+   * @return distance
+   */
+  private int dist(final int pre, final int kind) {
+   switch(kind) {
+      case ELEM: return table.read4(pre, 4);
+      case TEXT: case COMM:
+      case PI:   return table.read4(pre, 8);
+      case ATTR: return table.read1(pre, 11);
+      default:   return pre + 1;
+    }
   }
 
   @Override
@@ -195,8 +216,8 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public int size(final int pre, final int kind) {
-    return kind == ELEM || kind == DOC ? table.read4(pre, 4) : 1;
+  public int size(final int pre, final int k) {
+    return k == ELEM || k == DOC ? table.read4(pre, 8) : 1;
   }
 
   @Override
@@ -223,14 +244,6 @@ public final class DiskData extends Data {
   public byte[] text(final int pre) {
     return txt(pre, texts);
   }
-
-  @Override
-  public byte[] text(final int pre, final int off, final int len) {
-    final byte[] t = text(pre);
-    return Token.substring(t, Math.min(t.length, off),
-        Math.min(t.length, off + len));
-  }
-
 
   @Override
   public byte[] attValue(final int pre) {
@@ -389,8 +402,9 @@ public final class DiskData extends Data {
 
     // reduce size of remaining ancestors
     while(par > 0) {
-      par = parent(par, ELEM);
-      size(par, ELEM, size(par, ELEM) - siz);
+      kind = kind(par);
+      par = parent(par, kind);
+      size(par, kind, size(par, kind) - siz);
     }
 
     // delete node from table structure and reduce document size
@@ -471,14 +485,17 @@ public final class DiskData extends Data {
     // increase sizes
     int p = par;
     while(p >= 0) {
-      size(p, ELEM, size(p, ELEM) + s);
-      p = parent(p, ELEM);
+      int k = kind(p);
+      size(p, k, size(p, k) + s);
+      p = parent(p, k);
     }
 
     // increase parent references
     p = pre + s;
     while(p < size) {
-      dist(p, ELEM, dist(p, ELEM) + s);
+      int k = kind(p);
+      if(k == DOC) break;
+      dist(p, k, dist(p, k) + s);
       p += size(p, kind(p));
     }
   }
@@ -496,11 +513,10 @@ public final class DiskData extends Data {
 
     final long id = ++meta.lastid;
     final int t = tags.index(tag, null);
-    table.insert(pre, new byte[] { ELEM, (byte) (t >> 8),
-        (byte) t, (byte) as, (byte) (s >> 24), (byte) (s >> 16),
-        (byte) (s >> 8), (byte) s, (byte) (dis >> 24),
-        (byte) (dis >> 16), (byte) (dis >> 8), (byte) dis, (byte) (id >> 24),
-        (byte) (id >> 16), (byte) (id >> 8), (byte) id });
+    table.insert(pre, new byte[] { ELEM, (byte) (t >> 8), (byte) t, (byte) as,
+        (byte) (dis >> 24), (byte) (dis >> 16), (byte) (dis >> 8), (byte) dis, 
+        (byte) (s >> 24), (byte) (s >> 16), (byte) (s >> 8), (byte) s,
+        (byte) (id >> 24), (byte) (id >> 16), (byte) (id >> 8), (byte) id });
     size++;
   }
 
@@ -546,30 +562,19 @@ public final class DiskData extends Data {
     table.insert(pre, new byte[] { ATTR, (byte) (att >> 8), (byte) att,
         (byte) (len >> 32), (byte) (len >> 24), (byte) (len >> 16),
         (byte) (len >> 8), (byte) len, 0, 0, 0, (byte) dis,
-        (byte) (id >> 24), (byte) (id >> 16), (byte) (id >> 8),
-        (byte) id });
+        (byte) (id >> 24), (byte) (id >> 16), (byte) (id >> 8), (byte) id });
     size++;
   }
 
   /**
-   * Returns the distance of the specified node.
-   * @param pre pre value
-   * @param kind node kind
-   * @return distance
-   */
-  private int dist(final int pre, final int kind) {
-    return kind == ATTR ? table.read1(pre, 11) : table.read4(pre, 8);
-  }
-
-  /**
-   * Returns the distance of the specified node.
+   * Writes the distance for the specified node.
    * @param pre pre value
    * @param kind node kind
    * @param v value
    */
   private void dist(final int pre, final int kind, final int v) {
     if(kind == ATTR) table.write1(pre, 11, v);
-    else table.write4(pre, 8, v);
+    else table.write4(pre, kind == ELEM ? 4 : 8, v);
   }
 
   /**
@@ -616,6 +621,6 @@ public final class DiskData extends Data {
    * @param v value
    */
   public void size(final int pre, final int kind, final int v) {
-    if(kind == ELEM || kind == DOC) table.write4(pre, 4, v);
+    if(kind == ELEM || kind == DOC) table.write4(pre, 8, v);
   }
 }

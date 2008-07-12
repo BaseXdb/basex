@@ -97,7 +97,8 @@ public final class BaseXLayout {
       } else {
         final BaseXButton b = (BaseXButton) c;
         final String text = b.getText();
-        if(!text.equals(BUTTONCANCEL)) enable(b, enabled);
+        if(!text.equals(BUTTONCANCEL) && !text.equals(BUTTONDROP))
+          enable(b, enabled);
       }
     }
   }

@@ -3,6 +3,7 @@ package org.basex.build.fs;
 import static org.basex.build.fs.FSText.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -95,8 +96,8 @@ public final class FSParser extends Parser implements FSVisitor {
    */
   public void preTraversal(final String path, final boolean docOpen)
       throws IOException {
-    if(docOpen) builder.startNode(DEEPFS, new byte[][] { });
-    builder.startNode(DIR, new byte[][] { NAME, token(path) });
+    if(docOpen) builder.startElem(DEEPFS, new byte[][] { });
+    builder.startElem(DIR, new byte[][] { NAME, token(path) });
   }
 
   /**
@@ -104,14 +105,14 @@ public final class FSParser extends Parser implements FSVisitor {
    */
   public void preEvent(final File dir) throws IOException {
     guimsg = dir.toString();
-    builder.startNode(DIR, atts(dir));
+    builder.startElem(DIR, atts(dir));
   }
 
   /**
    * {@inheritDoc}
    */
   public void postEvent() throws IOException {
-    builder.endNode(DIR);
+    builder.endElem(DIR);
   }
 
   /**
@@ -119,7 +120,7 @@ public final class FSParser extends Parser implements FSVisitor {
    */
   public void regfileEvent(final File f) throws IOException {
     guimsg = f.toString();
-    builder.startNode(FILE, atts(f));
+    builder.startElem(FILE, atts(f));
     if (f.canRead()) {
       if(Prop.fsmeta && f.getName().indexOf('.') != -1) {
         final String name = f.getName();
@@ -153,7 +154,7 @@ public final class FSParser extends Parser implements FSVisitor {
         }
       }
     }
-    builder.endNode(FILE);
+    builder.endElem(FILE);
   }
 
   /**
@@ -165,8 +166,8 @@ public final class FSParser extends Parser implements FSVisitor {
    * {@inheritDoc}
    */
   public void postTraversal(final boolean docClose) throws IOException {
-    builder.endNode(DIR);
-    if(docClose) builder.endNode(DEEPFS);
+    builder.endElem(DIR);
+    if(docClose) builder.endElem(DEEPFS);
   }
 
   @Override
@@ -197,7 +198,10 @@ public final class FSParser extends Parser implements FSVisitor {
     
     final FSWalker f = new FSWalker();
     f.register(this);
+    
+    builder.startDoc(token(file.name()));
     f.fileHierarchyTraversal(file);
+    builder.endDoc();
   }
 
   /** Construct attributes for file and directory tags.

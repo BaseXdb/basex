@@ -21,6 +21,7 @@ import org.basex.query.xquery.item.Dtm;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Node;
 import org.basex.query.xquery.item.QNm;
+import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.item.Tim;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.item.Uri;
@@ -121,8 +122,15 @@ public final class XQContext extends QueryContext {
 
     // adds an existing document to the database array
     if(nodes != null) {
-      docs = new DNode[] { addNS(new DNode(nodes.data, 0, null, Type.DOC)) };
-      item = docs[0];
+      docs = new DNode[nodes.size];
+      for(int d = 0; d < docs.length; d++) {
+        docs[d] = addNS(new DNode(nodes.data, nodes.pre[d], null, Type.DOC));
+      }
+      item = Seq.get(docs, docs.length);
+      final NodIter col = new NodIter();
+      for(int d = 0; d < docs.length; d++) col.add(docs[d]);
+      collect = Array.add(collect, col);
+      collName = Array.add(collName, docs[0].base());
     }
 
     // evaluates the query and returns the result
@@ -305,7 +313,7 @@ public final class XQContext extends QueryContext {
       Err.or(COLLDEF);
     } else {
       if(contains(coll, '<') || contains(coll, '\\'))
-        Err.or(COLLINV, coll);
+        Err.or(COLLINV, cut(coll, 20));
 
       for(int c = 0; c < collName.length; c++) {
         if(eq(collName[c], coll))

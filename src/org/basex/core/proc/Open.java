@@ -29,7 +29,7 @@ public final class Open extends Proc {
       context.data(data);
       if(Prop.info) {
         if(data.meta.newindex) info(INDUPDATE + NL);
-        timer(DBOPENED);
+        info(DBOPENED, perf.getTimer());
       }
       return true;
     } catch(final IOException ex) {

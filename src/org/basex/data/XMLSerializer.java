@@ -216,8 +216,10 @@ public final class XMLSerializer extends Serializer {
    */
   public static byte[] content(final Data data, final int p, final boolean s) {
     final int kind = data.kind(p);
-    if(kind == Data.ELEM || kind == Data.DOC) {
+    if(kind == Data.ELEM) {
       return data.tag(p);
+    } else if(kind == Data.DOC) {
+      return data.text(p);
     } else if(kind == Data.TEXT) {
       return s ? TEXT : data.text(p);
     } else if(kind == Data.COMM) {

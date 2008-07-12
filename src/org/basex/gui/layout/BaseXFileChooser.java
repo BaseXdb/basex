@@ -25,16 +25,10 @@ public final class BaseXFileChooser {
   /** File Dialog Mode. */
   public enum MODE {
     /** Open. */ OPEN,
+    /** OpenDir.  */ OPENDIR,
     /** Save. */ SAVE,
     /** Dir.  */ DIR
   }
-  
-  /** Open dialog. */
-  //public static final int OPEN = JFileChooser.OPEN_DIALOG;
-  /** Save dialog. */
-  //public static final int SAVE = JFileChooser.SAVE_DIALOG;
-  /** Directory chooser. */
-  //public static final int DIR = JFileChooser.CUSTOM_DIALOG;
   
   /** Parent component. */
   private Component parent;
@@ -83,6 +77,8 @@ public final class BaseXFileChooser {
     mode = type;
     
     if(fd != null) {
+      if(type == MODE.OPENDIR) fd.setFile(" ");
+      fd.setMode(type == MODE.SAVE ? FileDialog.SAVE : FileDialog.LOAD);
       fd.setVisible(true);
       return fd.getFile() != null;
     }
@@ -90,6 +86,10 @@ public final class BaseXFileChooser {
     int state = 0;
     switch(type) {
       case OPEN:
+        state = fc.showOpenDialog(parent);
+        break;
+      case OPENDIR:
+        fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         state = fc.showOpenDialog(parent);
         break;
       case SAVE:
@@ -100,7 +100,6 @@ public final class BaseXFileChooser {
         state = fc.showDialog(parent, null);
         break;
     }
-    
     if(state != JFileChooser.APPROVE_OPTION) return false;
 
     if(mode == MODE.SAVE) {

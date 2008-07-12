@@ -1,6 +1,8 @@
 package org.basex.build.xml;
 
 import static org.basex.Text.*;
+import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import javax.xml.parsers.SAXParserFactory;
 import org.basex.BaseX;
@@ -61,10 +63,12 @@ public final class SAXWrapper extends Parser {
       r.setContentHandler(p);
       r.setProperty("http://xml.org/sax/properties/lexical-handler", p);
       r.setErrorHandler(p);
+      builder.startDoc(token(file.name()));
       r.parse(file.source());
+      builder.endDoc();
     } catch(final SAXParseException ex) {
-      final String msg = "Line " + ex.getLineNumber() + ", Col " +
-          ex.getColumnNumber() + ": " + ex.getMessage();
+      final String msg = BaseX.info(SCANPOS, ex.getSystemId(),
+          ex.getLineNumber(), ex.getColumnNumber()) + ": " + ex.getMessage();
       final IOException ioe = new IOException(msg);
       ioe.setStackTrace(ex.getStackTrace());
       throw ioe;
@@ -109,7 +113,7 @@ public final class SAXWrapper extends Parser {
             atts[(a << 1) + 1] = Token.token(at.getValue(a));
           }
         }
-        builder.startNode(Token.token(qn), atts);
+        builder.startElem(Token.token(qn), atts);
         nodes++;
       } catch(final IOException ex) {
         error(ex);
@@ -122,7 +126,7 @@ public final class SAXWrapper extends Parser {
 
       try {
         finishText();
-        builder.endNode(Token.token(qn));
+        builder.endElem(Token.token(qn));
       } catch(final IOException ex) {
         error(ex);
       }

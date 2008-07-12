@@ -20,7 +20,7 @@ public final class LocPathAbs extends LocPath {
     // only evaluated once as result for absolute traversals is always the same
     if(nodeset == null) {
       final NodeSet ns = ctx.local;
-      ctx.local = new NodeSet(new int[] { 0 }, ctx);
+      ctx.local = new NodeSet(ns.data.doc(), ctx);
       nodeset = steps.eval(ctx);
       ctx.local = ns;
     }

@@ -50,9 +50,8 @@ public final class BaseX extends BaseXClient {
   }
 
   /**
-   * Global method, replacing all % characters in the input string by the
-   * specified extension objects, which can be byte arrays or any other
-   * object that can be cast to string.
+   * Global method, replacing all % characters
+   * (see {@link TokenBuilder#add(String, Object...)} for details.
    * @param str string to be extended
    * @param ext text text extensions
    * @return token
@@ -65,7 +64,7 @@ public final class BaseX extends BaseXClient {
 
   /**
    * Global method, replacing all % characters
-   * (see {@link #inf(String, Object...)}.
+   * (see {@link TokenBuilder#add(String, Object...)} for details.
    * @param str string to be extended
    * @param ext text text extensions
    * @return extended string
@@ -76,7 +75,7 @@ public final class BaseX extends BaseXClient {
 
   /**
    * Global method for printing debug information if the
-   * {@link org.basex.core.Prop#debug} flag is set.
+   * {@link Prop#debug} flag is set.
    * @param str debug string
    * @param ext text optional extensions
    */
@@ -86,7 +85,7 @@ public final class BaseX extends BaseXClient {
 
   /**
    * Global method for printing the exception stack trace if the
-   * {@link org.basex.core.Prop#debug} flag is set.
+   * {@link Prop#debug} flag is set.
    * @param ex exception
    * @return always false
    */
@@ -110,16 +109,7 @@ public final class BaseX extends BaseXClient {
    * @param ext text optional extensions
    */
   public static void errln(final Object obj, final Object... ext) {
-    System.err.println(info(obj, ext));
-  }
-
-  /**
-   * Global method for printing information to the standard output.
-   * @param str output string
-   * @param ext text optional extensions
-   */
-  public static void outln(final Object str, final Object... ext) {
-    System.out.println(info(str, ext));
+    err(obj + NL, ext);
   }
 
   /**
@@ -129,6 +119,15 @@ public final class BaseX extends BaseXClient {
    */
   public static void out(final Object str, final Object... ext) {
     System.out.print(info(str, ext));
+  }
+
+  /**
+   * Global method for printing information to the standard output.
+   * @param str output string
+   * @param ext text optional extensions
+   */
+  public static void outln(final Object str, final Object... ext) {
+    out(str + NL, ext);
   }
   
   /**
@@ -152,15 +151,7 @@ public final class BaseX extends BaseXClient {
   }
 
   /**
-   * Throws a runtime exception for methods which don't support updates.
-   * @return dummy object
-   */
-  public static Object noupdates() {
-    throw new RuntimeException("Updates not supported.");
-  }
-
-  /**
-   * Throws a runtime exception for methods unimplemented methods.
+   * Throws a runtime exception for unimplemented methods.
    * @return dummy object
    */
   public static Object notimplemented() {
@@ -168,7 +159,7 @@ public final class BaseX extends BaseXClient {
   }
 
   /**
-   * Throws a runtime exception for methods unimplemented methods.
+   * Throws a runtime exception for unexpected exceptions.
    * @return dummy object
    */
   public static Object notexpected() {

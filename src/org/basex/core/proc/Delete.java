@@ -47,6 +47,6 @@ public final class Delete extends Proc {
     }
     data.flush();
 
-    return Prop.info ? timer(DELETEINFO, nodes.size) : true;
+    return Prop.info ? info(DELETEINFO, nodes.size, perf.getTimer()) : true;
   }
 }

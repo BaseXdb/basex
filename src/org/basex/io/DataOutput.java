@@ -1,6 +1,5 @@
 package org.basex.io;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -32,8 +31,7 @@ public final class DataOutput extends OutputStream {
   
   /**
    * Convenience constructor.
-   * A default buffersize will be used.
-   * DBSUFFIX will be added to the filename.
+   * A default buffer size will be used.
    * @param db name of the database
    * @param fn File to write to
    * @throws IOException in case of write errors
@@ -43,9 +41,8 @@ public final class DataOutput extends OutputStream {
   }
   
   /**
-   * Convenience constructor with underlying.
+   * Convenience constructor with a specified buffer size.
    * The specified buffer size is used.
-   * DBSUFFIX will be added to the filename.
    * @param db name of the database
    * @param fn name of the file to write to
    * @param bufs size of the buffer to use
@@ -53,8 +50,7 @@ public final class DataOutput extends OutputStream {
    */
   public DataOutput(final String db, final String fn, final int bufs)
       throws IOException {
-    final File path = IO.dbfile(db, fn);
-    os = new BufferedOutput(new FileOutputStream(path), bufs);
+    os = new BufferedOutput(new FileOutputStream(IO.dbfile(db, fn)), bufs);
   }
   
   @Override
@@ -96,50 +92,15 @@ public final class DataOutput extends OutputStream {
   /**
    * Writes the specified token to the output stream.
    * @param text text to be written
-   * @return length of written bytes
+   * @return number of written bytes
    * @throws IOException in case of write errors
    */
   public int writeToken(final byte[] text) throws IOException {
     final int s = writeNum(text.length);
-    for(final byte t : text) {
-      write(t);
-    }
-
+    for(final byte t : text) write(t);
     return s + text.length;
   }
 
-  /**
-   * Writes the specified token to the output stream.
-   * @param text text to be written
-   * @param numWords number of words written
-   * @return int[] {length of written bytes, number of words written}
-   * @throws IOException in case of write errors
-   */
-  public int[] writeToken(final byte[] text, final int[] numWords)
-  throws IOException {
-    int[] nw = numWords;
-    int l = 0;
-    final int s = writeNum(text.length);
-    for(final byte t : text) {
-      write(t);
-      
-     if (!Token.ftChar(t)) {
-       if (l > 0) {
-         nw[l]++;
-         l = 0;
-        }
-     } else {
-       l++;
-     }
-    }
-
-    nw[0] = s + text.length;
-    if (l > 0)
-      nw[l]++;
-    return nw;
-  }
-
-  
   /**
    * Writes the specified array to the output stream.
    * @param array array to be written
@@ -267,50 +228,6 @@ public final class DataOutput extends OutputStream {
     write((byte) (v >>> 16));
     write((byte) (v >>>  8));
     write((byte) v);
-  }
-  
-  /**
-   * Writes the specified array to the output stream; null references
-   * are replaced with an empty array. No size info is written!!
-   * @param array array to be written
-   * @throws IOException in case of write errors
-   */
-  public void writeBytesArrayFlat(final byte[][] array) throws IOException {
-    for(final byte[] a : array) writeBytesFlat(a != null ? a : Token.EMPTY);  
-  }
-  
-  /**
-   * Writes the specifies array to output stream as follows.
-   * Input: {a, b, c, d, e, ...}
-   * Written: {a, a+b, a+b+c, a+b+c+d, a+b+c+d+e, ...}
-   * @param array inputarray
-   * @throws IOException in case of wrtie errors
-   */
-  public void writeStructureWithOffsets(final int[] array) throws IOException {
-    int b = 0;
-    for(final int a : array) {
-      b += a;
-      writeInt(b);  
-    }
-  }
-
-  /**
-   * Writes the specified array to the output stream; null references
-   * are replaced with an empty array.
-   * @param array array to be written
-   * @throws IOException in case of write errors
-   */
-  public void writeIntArray(final int[][] array) throws IOException {
-    for(final int[] a : array) writeInts(a != null ? a : Array.NOINTS);
-  }
-  
-  /**
-   * Writes the specified array to the output stream. No size info is written!!
-   * @param array array to be written
-   * @throws IOException in case of write errors
-   */
-  public void writeBytesFlat(final byte[] array) throws IOException {
-    for(final byte a : array) write(a);
   }
  
   /**

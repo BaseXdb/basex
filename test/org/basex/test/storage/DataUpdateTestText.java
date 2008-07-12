@@ -42,7 +42,7 @@ public final class DataUpdateTestText {
 
   /**
    * Create the database.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Before
   public void setUp() throws Exception {
@@ -52,7 +52,7 @@ public final class DataUpdateTestText {
 
   /**
    * Delete the test-database.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @After
   public void tearDown() throws Exception {
@@ -62,7 +62,7 @@ public final class DataUpdateTestText {
 
   /**
    * Reload Data class.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   private void reload() throws Exception {
     data.close();
@@ -71,21 +71,19 @@ public final class DataUpdateTestText {
 
   /**
    * Test byte-arrays for equality.
-   * @param expected expected value
+   * @param exp expected value
    * @param actual actual value
    */
-  private void assertByteArraysEqual(
-      final byte[] expected,
-      final byte[] actual) {
-    assertEquals("array lengths don't equal", expected.length, actual.length);
-    for(int i = 0; i < expected.length; i++) {
-      assertEquals(expected[i], actual[i]);
+  private void assertByteArraysEqual(final byte[] exp, final byte[] actual) {
+    assertEquals("array lengths don't equal", exp.length, actual.length);
+    for(int i = 0; i < exp.length; i++) {
+      assertEquals(exp[i], actual[i]);
     }
   }
 
   /**
    * Test for correct data size.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Test
   public void testSize() throws Exception {
@@ -96,11 +94,11 @@ public final class DataUpdateTestText {
 
   /**
    * Test insert as last child.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Test
   public void testInsertTextAsOnly1() throws Exception {
-    final long nextid = data.meta.lastid;
+    final int nextid = data.meta.lastid;
     insertText(3, 0, token("junit"), Data.TEXT);
     assertEquals(size + 1, data.size);
     assertEquals(3, data.parent(4, Data.TEXT));
@@ -123,11 +121,11 @@ public final class DataUpdateTestText {
 
   /**
    * Test insert as last child.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Test
   public void testInsertTextAsOnly2() throws Exception {
-    final long nextid = data.meta.lastid;
+    final int nextid = data.meta.lastid;
     insertText(3, 1, token("junit"), Data.TEXT);
     assertEquals(size + 1, data.size);
     assertEquals(3, data.parent(4, Data.TEXT));
@@ -150,11 +148,11 @@ public final class DataUpdateTestText {
 
   /**
    * Test insert as last child.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Test
   public void testInsertTextAsOnly3() throws Exception {
-    final long nextid = data.meta.lastid;
+    final int nextid = data.meta.lastid;
     insertText(3, 2, token("junit"), Data.TEXT);
     assertEquals(size + 1, data.size);
     assertEquals(3, data.parent(4, Data.TEXT));
@@ -177,11 +175,11 @@ public final class DataUpdateTestText {
 
   /**
    * Test insert as last child.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Test
   public void testInsertTextAfterAttsAsFirst() throws Exception {
-    final long nextid = data.meta.lastid;
+    final int nextid = data.meta.lastid;
     insertText(6, 1, token("junit"), Data.TEXT);
     assertEquals(size + 1, data.size);
     assertEquals((int) Data.TEXT, data.kind(9));
@@ -202,11 +200,11 @@ public final class DataUpdateTestText {
 
   /**
    * Test insert as last child.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Test
   public void testInsertTextAfterAttsAsSecond() throws Exception {
-    final long nextid = data.meta.lastid;
+    final int nextid = data.meta.lastid;
     insertText(6, 2, token("junit"), Data.TEXT);
     assertEquals(size + 1, data.size);
     assertEquals((int) Data.ELEM, data.kind(9));
@@ -228,11 +226,11 @@ public final class DataUpdateTestText {
 
   /**
    * Test insert as last child.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Test
   public void testInsertTextAfterAttsAsLast() throws Exception {
-    final long nextid = data.meta.lastid;
+    final int nextid = data.meta.lastid;
     insertText(6, 0, token("junit"), Data.TEXT);
     assertEquals(size + 1, data.size);
     assertEquals((int) Data.ELEM, data.kind(9));
@@ -253,7 +251,7 @@ public final class DataUpdateTestText {
 
   /**
    * Test insert text before text.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Test(expected = IOException.class)
   public void testInsertTextBeforeText() throws Exception {
@@ -262,7 +260,7 @@ public final class DataUpdateTestText {
 
   /**
    * Test insert text before text.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Test(expected = IOException.class)
   public void testInsertTextAfterTextAsSecond() throws Exception {
@@ -271,7 +269,7 @@ public final class DataUpdateTestText {
 
   /**
    * Test insert text before text.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Test(expected = IOException.class)
   public void testInsertTextAfterTextAsLast() throws Exception {
@@ -300,8 +298,8 @@ public final class DataUpdateTestText {
    * @param kind node kind
    * @throws IOException I/O exception
    */
-  private void insertText(final int par, final int pos,
-      final byte[] name, final byte kind) throws IOException {
+  private void insertText(final int par, final int pos, final byte[] name,
+      final byte kind) throws IOException {
 
     int pre = par;
     int k = data.kind(pre);
@@ -309,15 +307,14 @@ public final class DataUpdateTestText {
       pre += data.size(pre, k);
     } else {
       pre += data.attSize(pre, k);
-      for(int p = 1; p < pos && data.parent(pre, k) == par;
-        pre += data.size(pre, k), p++) {
+      for(int p = 1; p < pos && data.parent(pre, k) == par; pre += data.size(
+          pre, k), p++) {
         k = data.kind(pre);
       }
     }
 
-    if(kind == Data.TEXT && (data.kind(pre) == Data.TEXT ||
-        data.parent(pre - 1, data.kind(pre - 1)) == par &&
-        data.kind(pre - 1) == Data.TEXT))
+    if(kind == Data.TEXT && (data.kind(pre) == Data.TEXT || data.parent(pre - 1,
+        data.kind(pre - 1)) == par && data.kind(pre - 1) == Data.TEXT))
       throw new IOException("May not insert TEXT before/after TEXT!");
 
     data.insert(pre, par, name, kind);

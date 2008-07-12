@@ -1,5 +1,7 @@
 package org.basex.util;
 
+import static org.basex.util.Token.*;
+
 /**
  * This class serves as an efficient constructor for byte arrays.
  * It bears some resemblance to Java's {@link java.lang.StringBuilder}.
@@ -107,7 +109,7 @@ public final class TokenBuilder {
    * @param i the integer to be added
    */
   public void add(final int i) {
-    add(Token.token(i));
+    add(token(i));
   }
 
   /**
@@ -140,7 +142,7 @@ public final class TokenBuilder {
    * @param s the string to be added
    */
   public void add(final String s) {
-    add(Token.token(s));
+    add(token(s));
   }
 
   /**
@@ -154,21 +156,26 @@ public final class TokenBuilder {
   }
 
   /**
-   * Adds some query information.
+   * Replaces all % characters in the input string by the specified extension
+   * objects, which can be byte arrays or any other object.
+   * If a digit is found after %, it is interpreted as insertion position.
    * @param str query information
    * @param ext text text extensions
    */
   public void add(final Object str, final Object... ext) {
-    final byte[] t = str == null ? Token.NULL : str instanceof byte[] ?
-        (byte[]) str : Token.token(str.toString());
-    int e = 0;
-    for(final byte c : t) {
-      if(e < ext.length && c == '%') {
-        if(ext[e] instanceof byte[]) add((byte[]) ext[e++]);
-        else if(ext[e] == null) add("null");
-        else add(ext[e++].toString());
+    final byte[] t = str == null ? NULL : str instanceof byte[] ?
+        (byte[]) str : token(str.toString());
+
+    for(int i = 0, e = 0; i < t.length; i++) {
+      if(t[i] != '%' || e == ext.length) {
+        add(t[i]);
       } else {
-        add(c);
+        final byte c = i + 1 < t.length ? t[i + 1] : 0;
+        final boolean d = c >= '1' && c <= '9';
+        if(d) i++;
+        final int n = d ? c - '1' : e++;
+        final Object o = n < ext.length ? ext[n] : null;
+        add(o instanceof byte[] ? (byte[]) o : o == null ? NULL : o.toString());
       }
     }
   }
@@ -177,7 +184,7 @@ public final class TokenBuilder {
    * Chops trailing whitespaces.
    */
   public void trim() {
-    while(size > 0 && Token.ws(chars[size - 1])) size--;
+    while(size > 0 && ws(chars[size - 1])) size--;
   }
   
   /**
@@ -186,7 +193,7 @@ public final class TokenBuilder {
   public void chop() {
     trim();
     int s = -1;
-    while(++s < size && Token.ws(chars[s]));
+    while(++s < size && ws(chars[s]));
     if(s != 0 && s != size) Array.move(chars, s, -s, size - s);
     size -= s;
   }
@@ -211,6 +218,6 @@ public final class TokenBuilder {
 
   @Override
   public String toString() {
-    return Token.string(chars, 0, size);
+    return string(chars, 0, size);
   }
 }

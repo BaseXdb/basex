@@ -1,6 +1,8 @@
 package org.basex.build.mediovis;
 
 import static org.basex.build.mediovis.MAB2.*;
+import static org.basex.util.Token.*;
+
 import java.io.File;
 import java.io.IOException;
 import org.basex.BaseX;
@@ -132,7 +134,9 @@ public final class MAB2Parser extends Parser {
     //b.encoding(Prop.ENCODING);
 
     builder = b;
-    builder.startNode(LIBRARY, null);
+    builder.startDoc(token(file.name()));
+    builder.startElem(LIBRARY, null);
+    builder.endDoc();
 
     // find file offsets of all titles
     final Performance p = new Performance();
@@ -168,7 +172,7 @@ public final class MAB2Parser extends Parser {
       if(pos != 0) {
         addEntry(input, pos, entry.size);
         addChildren(input, entry);
-        builder.endNode(MEDIUM);
+        builder.endElem(MEDIUM);
       } else {
         // no top entry exists... treat children as top entries
         addChildren(input, entry);
@@ -185,7 +189,7 @@ public final class MAB2Parser extends Parser {
       BaseX.err(p.getTimer() + "/" + Performance.getMem() + "\n");
     }
 
-    builder.endNode(LIBRARY);
+    builder.endElem(LIBRARY);
     input.close();
 
     // write the mediovis ids back to disk
@@ -282,7 +286,7 @@ public final class MAB2Parser extends Parser {
     final int es = entry.size;
     for(int j = 0; j < es; j++) {
       addEntry(in, entry.children[j], 0);
-      builder.endNode(MEDIUM);
+      builder.endElem(MEDIUM);
     }
   }
 
@@ -393,7 +397,7 @@ public final class MAB2Parser extends Parser {
               Token.token(sub) };
         }
 
-        builder.startNode(MEDIUM, atts);
+        builder.startElem(MEDIUM, atts);
         addTag(TYPE, type);
         addTag(LANGUAGE, language);
         for(int s = 0; s < nrPers; s++) addTag(PERSON, pers[s]);

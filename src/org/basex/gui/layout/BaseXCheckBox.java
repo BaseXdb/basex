@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JCheckBox;
 import org.basex.gui.dialog.Dialog;
+import org.basex.util.Token;
 
 /**
  * Project specific CheckBox implementation.
@@ -49,6 +50,7 @@ public final class BaseXCheckBox extends JCheckBox {
     super(label, sel);
     setMargin(new Insets(0, 0, dist, 0));
     BaseXLayout.addHelp(this, hlp);
+    if(hlp != null) setToolTipText(Token.string(hlp));
     if(list == null) return;
 
     BaseXLayout.addDefaultKeys(this, list);

@@ -77,6 +77,6 @@ public final class Copy extends Proc {
     }
 
     data.flush();
-    return Prop.info ? timer(INSERTINFO, copied) : true;
+    return Prop.info ? info(INSERTINFO, copied, perf.getTimer()) : true;
   }
 }

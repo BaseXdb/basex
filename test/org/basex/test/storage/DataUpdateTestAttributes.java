@@ -140,9 +140,7 @@ public final class DataUpdateTestAttributes {
     assertEquals(nextid + 1, data.meta.lastid);
     assertByteArraysEqual(token("foo"), data.attName(9));
     assertByteArraysEqual(token("junit"), data.attValue(9));
-    System.out.println(size + "/" + data.size);
     reload();
-    System.out.println(size + "/" + data.size);
     assertEquals(size + 1, data.size);
     assertEquals(size + 1, data.size(0, Data.DOC));
     assertEquals((int) Data.ATTR, data.kind(9));

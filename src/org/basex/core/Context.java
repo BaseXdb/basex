@@ -37,7 +37,11 @@ public final class Context {
    * @return result of check
   */
   public boolean root() {
-    return current.size == 1 && data.kind(current.pre[0]) == Data.DOC;
+    if(current == null) return true;
+    for(int c = 0; c < current.size; c++) {
+      if(data.kind(current.pre[c]) != Data.DOC) return false;
+    }
+    return true;
   }
   
   /**
@@ -58,11 +62,11 @@ public final class Context {
       close();
     }
     data = d;
-    current = new Nodes(0, d);
-    marked = new Nodes(d);
     copied = null;
+    marked = new Nodes(d);
+    current = new Nodes(d.doc(), d);
   }
-  
+    
   /**
    * Closes the database instance.
    * @return true if operation was successful

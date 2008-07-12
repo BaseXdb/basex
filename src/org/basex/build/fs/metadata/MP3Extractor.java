@@ -242,7 +242,7 @@ public final class MP3Extractor extends AbstractExtractor {
   
         // ID3 frames
         found = true;
-        builder.startNode(AUDIO, new byte[][] { TYPE, TYPEMP3 });
+        builder.startElem(AUDIO, new byte[][] { TYPE, TYPEMP3 });
 
         exthea = (hflag & 0x40) != 0;
         experi = (hflag & 0x20) != 0;
@@ -256,7 +256,7 @@ public final class MP3Extractor extends AbstractExtractor {
         getTechInfo(builder, size);
   
         // insert ID3 info
-        builder.startNode(ID3, new byte[][] {
+        builder.startElem(ID3, new byte[][] {
             ID3VERS, token("2." + major + '.' + minor),
             ID3FLAG_EXTHEA, token(exthea),
             ID3FLAG_EXPERI, token(experi),
@@ -265,11 +265,11 @@ public final class MP3Extractor extends AbstractExtractor {
         for(int i = 0; i < frames.size() - 1; i += 2) {
           builder.nodeAndText(frames.get(i), frames.get(i + 1));
         }
-        builder.endNode(ID3);
+        builder.endElem(ID3);
   
       } else if(fileLen > 0x80) { // ID3V1...
         found = true;
-        builder.startNode(AUDIO, new byte[][] { TYPE, TYPEMP3 });
+        builder.startElem(AUDIO, new byte[][] { TYPE, TYPEMP3 });
 
         if(first != 0xFF) while(read() != 0xFF);
 
@@ -291,13 +291,13 @@ public final class MP3Extractor extends AbstractExtractor {
           final byte[] year = getTag(id3v1, 93, 4);
           final byte[] comment = getTag(id3v1, 97, 30);
   
-          builder.startNode(ID3, new byte[][] { ID3VERS, new byte[] { '1' } });
+          builder.startElem(ID3, new byte[][] { ID3VERS, new byte[] { '1' } });
           add(builder, ID3TITLE, title);
           add(builder, ID3ARTIST, artist);
           add(builder, ID3ALBUM, album);
           add(builder, ID3YEAR, year);
           add(builder, ID3COMMENT, comment);
-          builder.endNode(ID3);
+          builder.endElem(ID3);
         }
       } else {
         BaseX.debug(ID3INVALID, file.getName());
@@ -306,7 +306,7 @@ public final class MP3Extractor extends AbstractExtractor {
       BaseX.debug(ex);
     }
 
-    if(found) builder.endNode(AUDIO);
+    if(found) builder.endElem(AUDIO);
   }
 
   /**

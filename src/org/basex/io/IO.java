@@ -258,6 +258,17 @@ public final class IO {
   }
 
   /**
+   * Returns the children of a document.
+   * @return chopped filename
+   */
+  public IO[] children() {
+    final File[] ch = file().listFiles();
+    final IO[] io = new IO[ch.length];
+    for(int i = 0; i < io.length; i++) io[i] = new IO(ch[i]);
+    return io;
+  }
+
+  /**
    * Writes the specified file contents.
    * @param c contents
    * @throws IOException I/O exception

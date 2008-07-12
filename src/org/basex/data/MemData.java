@@ -15,16 +15,20 @@ import org.basex.util.Token;
  * 
  * <pre>
  * ELEMENTS:
- * - Bit 0-2   : Node kind (ELEM/DOC)
+ * - Bit 0-2   : Node kind (ELEM)
  * - Bit 3-7   : Number of attributes
  * - Byte  1- 3: Number of descendants (size)
  * - Byte  4   : Namespace and tag name
  * - Byte  5- 7: Relative parent reference
- * TEXT NODES:
+ * DOCUMENTS:
+ * - Bit 0-2   : Node kind (DOC)
+ * - Byte  0- 3: Text reference
+ * - Byte  5- 7: Number of descendants (size)
+ * TEXTS:
  * - Bit 0-2   : Node kind (TEXT/PI/COMM)
  * - Byte  0- 3: Text reference
  * - Byte  5- 7: Relative parent reference
- * ATTRIBUTE NODES:
+ * ATTRIBUTES:
  * - Bit 0-2   : Node kind (ATTR)
  * - Byte  0- 3: Attribute value
  * - Byte     4: Namespace and attribute name
@@ -79,7 +83,8 @@ public final class MemData extends Data {
 
   @Override
   public int size(final int pre, final int kind) {
-    return kind == ELEM || kind == DOC ? (int) (val[pre] >> 32 & 0xFFFFFF) : 1;
+    return kind == ELEM ? (int) (val[pre] >> 32 & 0xFFFFFF) :
+      kind == DOC ? (int) (val[pre] & 0xFFFFFF) : 1;
   }
 
   @Override
@@ -110,12 +115,6 @@ public final class MemData extends Data {
   @Override
   public byte[] text(final int pre) {
     return textToken((int) (val[pre] >> 32) & 0x1FFFFFFF);
-  }
-
-  @Override
-  public byte[] text(final int pre, final int off, final int len) {
-    BaseX.notimplemented();
-    return null;
   }
 
   @Override
@@ -199,16 +198,14 @@ public final class MemData extends Data {
   }
 
   /**
-   * Convenience method for adding an element.
-   * @param t tag
-   * @param d distance
-   * @param a number of attributes
+   * Adds an element.
+   * @param t document name
    * @param s node size
    * @param k node kind
    */
-  public void addElem(final byte[] t, final int d, final int a,
-      final int s, final int k) {
-    addElem(tags.index(t, null), ns.get(t), d, a, s, k);
+  public void addDoc(final byte[] t, final int s, final int k) {
+    check();
+    val[size++] = ((long) k << 61) + (textIndex(t) << 32) + s;
   }
 
   /**
@@ -234,13 +231,13 @@ public final class MemData extends Data {
    * @param n namespace
    * @param v attribute value
    * @param d distance
+   * @param k node kind
    */
-  public void addAtt(final int a, final int n, final byte[] v,
-      final int d) {
-
+  public void addAtt(final int a, final int n, final byte[] v, final int d,
+      final int k) {
     check();
     final long ai = attIndex(v);
-    val[size++] = ((long) Data.ATTR << 61) + ((long) n << 39) + (ai << 32) +
+    val[size++] = ((long) k << 61) + ((long) n << 39) + (ai << 32) +
       ((long) a << 24) + d;
   }
 
@@ -261,44 +258,10 @@ public final class MemData extends Data {
    * @param pre closing pre tag
    */
   public void finishElem(final int pre) {
-    val[pre] = (val[pre] & 0xFF000000FFFFFFFFL) + ((long) (size - pre) << 32);
-  }
-
-  /**
-   * Copies some data.
-   * @param d data reference
-   * @param p position
-   */
-  public void append(final MemData d, final int p) {
-    check();
-    val[size++] = d.val[p];
-  }
-
-  /**
-   * Convenience method for adding an attribute.
-   * @param a attribute name
-   * @param v attribute value
-   * @param p parent
-   */
-  public void addAtt(final byte[] a, final byte[] v, final int p) {
-    addAtt(atts.index(a, v), ns.get(a), v, p);
-  }
-
-  /**
-   * Inserts a data instance at the specified position.
-   * Attention: get sure that both data instances are based on the same
-   * indexes as the references are simply copied and not checked at all...
-   * @param d data instance
-   * @param pos insertion position
-   */
-  public void insert(final MemData d, final int pos) {
-    final int s = d.size;
-    while(size + s >= val.length) val = Array.extend(val);
-
-    check();
-    System.arraycopy(val, pos, val, pos + s, size - pos);
-    System.arraycopy(d.val, 0, val, pos, s);
-    size += s;
+    long s = size - pre;  
+    final boolean e = kind(pre) == ELEM;
+    final long o = e ? 0xFF000000FFFFFFFFL : 0xFFFFFFFFFF000000L;
+    val[pre] = (val[pre] & o) + (e ? (s << 32) : s);
   }
 
   /**
@@ -310,35 +273,35 @@ public final class MemData extends Data {
 
   @Override
   public void delete(final int pre) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 
   @Override
   public void update(final int pre, final byte[] attName,
       final byte[] attValue) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 
   @Override
   public void insert(final int pre, final int par, final byte[] tag,
       final byte kind) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 
   @Override
   public void insert(final int pre, final int par, final byte[] name,
       final byte[] v) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 
   @Override
   public void insert(final int pre, final int par, final Data d) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 
   @Override
   public void update(final int pre, final byte[] text) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 }
 

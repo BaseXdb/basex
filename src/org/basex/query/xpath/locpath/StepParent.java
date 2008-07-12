@@ -14,8 +14,9 @@ import org.basex.query.xpath.values.NodeBuilder;
 public final class StepParent extends Step {
   @Override
   protected void eval(final Data data, final int p, final NodeBuilder t) {
-    if(p == 0) return;
-    final int pre = data.parent(p, data.kind(p));
+    final int k = data.kind(p);
+    if(k == Data.DOC) return;
+    final int pre = data.parent(p, k);
     test.eval(data, pre, data.kind(pre), t);
   }
 

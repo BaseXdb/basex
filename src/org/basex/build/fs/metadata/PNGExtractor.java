@@ -28,7 +28,7 @@ public final class PNGExtractor extends AbstractExtractor {
     if(!Token.startsWith(data, HEADERPNG)) return;
 
     // open image tag
-    listener.startNode(IMAGE, new byte[][] { TYPE, TYPEPNG });
+    listener.startElem(IMAGE, new byte[][] { TYPE, TYPEPNG });
 
     // extract image dimensions
     final int w = ((data[16] & 0xFF) << 24) + ((data[17] & 0xFF) << 16) +
@@ -39,6 +39,6 @@ public final class PNGExtractor extends AbstractExtractor {
     listener.nodeAndText(WIDTH, Token.token(w));
     listener.nodeAndText(HEIGHT, Token.token(h));
     
-    listener.endNode(IMAGE);
+    listener.endElem(IMAGE);
   }
 }

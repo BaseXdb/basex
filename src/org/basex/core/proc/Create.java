@@ -10,6 +10,7 @@ import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.build.fs.FSParser;
 import org.basex.build.mediovis.MAB2Parser;
+import org.basex.build.xml.DirParser;
 import org.basex.build.xml.SAXWrapper;
 import org.basex.build.xml.XMLParser;
 import org.basex.core.Progress;
@@ -33,6 +34,10 @@ import org.basex.util.Performance;
  */
 public final class Create extends Proc {
   /** Create option. */
+  public static final String DB = "database";
+  /** Create option. */
+  public static final String DBS = "db";
+  /** Create option. */
   public static final String XML = "xml";
   /** Create option. */
   public static final String MAB2 = "mab2";
@@ -53,7 +58,7 @@ public final class Create extends Proc {
     final String type = cmd.arg(0).toLowerCase();
 
     try {
-      if(type.equals(XML)) return Prop.intparse ? xml() : sax();
+      if(type.equals(DB) || type.equals(DBS) || type.equals(XML)) return xml();
       if(type.equals(MAB2)) return mab2();
       if(type.equals(FS)) return fs();
       if(type.equals(INDEX)) return index();
@@ -70,34 +75,13 @@ public final class Create extends Proc {
    * @return success of operation
    */
   private boolean xml() {
-    if(cmd.nrArgs() != 2) throw new IllegalArgumentException();
+    int n = cmd.nrArgs();
+    if(n < 2 || n > 3) throw new IllegalArgumentException();
 
-    final IO file = new IO(cmd.arg(1));
-    if(!file.exists()) return error(FILEWHICH, file);
-    final String db = file.dbname();
-    
-    try {
-      return build(new XMLParser(file), db);
-    } catch(final IOException ex) {
-      BaseX.debug(ex);
-      return error(ex.getMessage(), db);
-    }
-  }
-
-  /**
-   * Create a database for the specified XML file
-   * with a conventional SAX parser.
-   * @return success of operation
-   */
-  private boolean sax() {
-    if(cmd.nrArgs() != 2) throw new IllegalArgumentException();
-
-    // determine file path and create database
-    final IO file = new IO(cmd.arg(1));
-    if(!file.exists()) return error(FILEWHICH, file);
-    final String db = file.dbname();
-
-    return build(new SAXWrapper(file), db);
+    final IO f = new IO(cmd.arg(1));
+    if(!f.exists()) return error(FILEWHICH, f);
+    final String db = n != 3 ? f.dbname() : cmd.arg(2);
+    return build(new DirParser(f), db);
   }
 
   /**
@@ -126,15 +110,17 @@ public final class Create extends Proc {
    * @return success of operation
    */
   private boolean fs() {
-    if(cmd.nrArgs() != 3) throw new IllegalArgumentException();
-    final String db = cmd.arg(1);
-    final IO path = new IO(cmd.arg(2));
+    int n = cmd.nrArgs();
+    if(n < 2 || n > 3) throw new IllegalArgumentException();
+
+    final IO f = new IO(cmd.arg(1));
+    final String db = n != 3 ? f.dbname() : cmd.arg(2);
 
     Prop.chop = true;
     Prop.entity = true;
     Prop.mainmem = false;
 
-    return build(new FSParser(path), db);
+    return build(new FSParser(f), db);
   }
 
   /**
@@ -175,7 +161,7 @@ public final class Create extends Proc {
       if(data.meta.ftxindex) buildIndex(IndexToken.TYPE.FTX, data);
       context.data(data);
       
-      return Prop.info ? timer(DBCREATED, db) : true;
+      return Prop.info ? info(DBCREATED, db, perf.getTimer()) : true;
     } catch(final FileNotFoundException ex) {
       BaseX.debug(ex);
       err = BaseX.info(FILEWHICH, p.file);
@@ -256,7 +242,7 @@ public final class Create extends Proc {
 
       data.meta.finish(data.size);
       buildIndex(index, data);
-      return inf ? timer(DBINDEXED) : true;
+      return inf ? info(DBINDEXED, perf.getTimer()) : true;
     } catch(final IOException ex) {
       BaseX.debug(ex);
       return error(ex.getMessage());

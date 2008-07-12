@@ -6,7 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-
 import javax.swing.JFrame;
 import org.basex.core.Prop;
 import org.basex.data.Data;
@@ -34,12 +33,8 @@ public final class DialogPrefs extends Dialog {
   BaseXLabel creds;
   /** Language Combo Box. */
   BaseXCombo lang;
-  /** Browse button. */
-  private BaseXButton button;
   /** Directory path. */
   private BaseXTextField path;
-  /** Button panel. */
-  private BaseXBack buttons;
   /** Focus checkbox. */
   private BaseXCheckBox focus;
   /** Show names checkbox. */
@@ -77,15 +72,17 @@ public final class DialogPrefs extends Dialog {
     p.setLayout(new TableLayout(1, 2, 6, 0));
     
     path = new BaseXTextField(Prop.dbpath, HELPDBPATH, this);
-    BaseXLayout.setWidth(path, 300);
-    p.add(path);
     
-    button = new BaseXButton(BUTTONBROWSE, HELPBROWSE, this);
+    final BaseXButton button = new BaseXButton(BUTTONBROWSE, HELPBROWSE, this);
     button.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         chooseDir(gui);
       }
     });
+    
+    BaseXLayout.setWidth(path, 300);
+    BaseXLayout.setHeight(path, button.getPreferredSize().height);
+    p.add(path);
     p.add(button);
     pp.add(p);
 
@@ -134,8 +131,7 @@ public final class DialogPrefs extends Dialog {
     set(pp, BorderLayout.CENTER);
 
     // create buttons
-    buttons = BaseXLayout.okCancel(this);
-    set(buttons, BorderLayout.SOUTH);
+    set(BaseXLayout.okCancel(this), BorderLayout.SOUTH);
     
     finish(gui);
   }

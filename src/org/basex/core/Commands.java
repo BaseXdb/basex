@@ -100,7 +100,7 @@ public enum Commands {
   /** Convenience alias for creating an index. */
   CREATEINDEX(CreateIndex.class, STANDARD, 1, 1, true),
   /** Convenience alias for creating an xml database. */
-  CREATEXML(CreateXML.class, STANDARD, 1, 1, true),
+  CREATEXML(CreateXML.class, STANDARD, 1, 2, true),
   /** Open a database. */
   OPEN(Open.class, STANDARD, 1, 1, false),
   /** Show some information on the XML and memory structure. */

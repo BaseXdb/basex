@@ -19,6 +19,7 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
+import org.basex.io.IO;
 
 /**
  * Dialog window for specifying the options for importing a file system.
@@ -29,12 +30,12 @@ import org.basex.gui.layout.TableLayout;
 public final class DialogImportFS  extends Dialog {
   /** Directory path. */
   BaseXTextField path;
+  /** Database name. */
+  BaseXTextField dbname;
   /** Parsing complete filesystem. */
   private BaseXCheckBox all;
   /** Browse button. */
   private BaseXButton button;
-  /** Database name. */
-  private BaseXTextField database;
   /** ID3 parsing. */
   private BaseXCheckBox meta;
   /** Context inclusion. */
@@ -74,20 +75,24 @@ public final class DialogImportFS  extends Dialog {
       public void actionPerformed(final ActionEvent e) {
         final BaseXFileChooser fc = new BaseXFileChooser(
             DIALOGFC, path.getText(), parent);
-        if(fc.select(BaseXFileChooser.MODE.DIR)) path.setText(fc.getDir());
+        if(fc.select(BaseXFileChooser.MODE.DIR)) {
+          IO file = fc.getFile();
+          path.setText(file.path());
+          dbname.setText(file.dbname());
+        }
       }
     });
     p.add(button);
     
     p.add(new BaseXLabel(IMPORTSAVE + "   "));
-    database = new BaseXTextField(GUIProp.importfsname, HELPFSNAME, this);
-    database.addKeyListener(new KeyAdapter() {
+    dbname = new BaseXTextField(GUIProp.importfsname, HELPFSNAME, this);
+    dbname.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {
         check();
       }
     });
-    p.add(database);
+    p.add(dbname);
 
     all = new BaseXCheckBox(IMPORTALL, HELPFSALL, GUIProp.fsall, this);
     all.setToolTipText(IMPORTALLINFO);
@@ -154,7 +159,7 @@ public final class DialogImportFS  extends Dialog {
     BaseXLayout.enable(button, sel);
     BaseXLayout.enable(maxsize, cont.isSelected());
 
-    final boolean valid = database.getText().length() != 0 &&
+    final boolean valid = dbname.getText().length() != 0 &&
       (all.isSelected() || path.getText().length() > 0);
     BaseXLayout.enableOK(buttons, valid);
     return valid;
@@ -169,7 +174,7 @@ public final class DialogImportFS  extends Dialog {
     Prop.fsmeta = meta.isSelected();
     Prop.fstextmax = IMPORTFSMAXSIZE[maxsize.getSelectedIndex()];
     GUIProp.fsall = all.isSelected();
-    GUIProp.importfsname = database.getText();
+    GUIProp.importfsname = dbname.getText();
     GUIProp.fspath = path.getText();
   }
 }

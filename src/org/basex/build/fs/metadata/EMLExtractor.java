@@ -73,7 +73,7 @@ public final class EMLExtractor extends AbstractExtractor {
    * @throws IOException I/O exception
    */
   private boolean getSingleMailData(final Builder listener) throws IOException {
-    listener.startNode(EMAIL, null);
+    listener.startElem(EMAIL, null);
 
     // catch exceptions and insert them into tree to find the part of
     // the mail which caused problem
@@ -95,7 +95,7 @@ public final class EMLExtractor extends AbstractExtractor {
     // need to reset if email is mbox format
     mMultiPart = false;
 
-    listener.endNode(EMAIL);
+    listener.endElem(EMAIL);
 
     while(readLine() && mCurrLine.length() == 0);
     return mCurrLine != null;
@@ -124,11 +124,11 @@ public final class EMLExtractor extends AbstractExtractor {
     }
 
     // write body tag & content
-    listener.startNode(EMLBODY, mBodyType == null ? null : new byte[][] { TYPE,
+    listener.startElem(EMLBODY, mBodyType == null ? null : new byte[][] { TYPE,
         token(mBodyType) });
     listener.text(quotePrint ?
         new TokenBuilder(decodeQP(tb.finish())) : tb, false);
-    listener.endNode(EMLBODY);
+    listener.endElem(EMLBODY);
 
     // reset encoding flag
     quotePrint = false;
@@ -392,9 +392,9 @@ public final class EMLExtractor extends AbstractExtractor {
       final GregorianCalendar cal = new GregorianCalendar(toInt(yea),
           toInt(mon), toInt(day), toInt(tim[0]), toInt(tim[1]), toInt(tim[2]));
       final long min = cal.getTimeInMillis() / 60000;
-      listener.startNode(EMLDATE, new byte[][] { EMLTIME, token(min) });
+      listener.startElem(EMLDATE, new byte[][] { EMLTIME, token(min) });
 
-      listener.endNode(EMLDATE);
+      listener.endElem(EMLDATE);
     } catch(final Exception e) {
       BaseX.debug("EMLExtractor.getDate: " + mCurrLine);
     }

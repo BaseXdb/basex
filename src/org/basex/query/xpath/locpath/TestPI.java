@@ -24,9 +24,7 @@ public final class TestPI extends Test {
 
   @Override
   public boolean eval(final Data data, final int pre, final int kind) {
-    if(kind != Data.PI) return false;
-    final byte[] pi = data.text(pre);
-    return startsWith(pi, name);
+    return kind == Data.PI && startsWith(data.text(pre), name);
   }
 
   @Override

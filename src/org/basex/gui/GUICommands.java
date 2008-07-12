@@ -50,20 +50,11 @@ public enum GUICommands implements GUICommand {
     @Override
     public void execute() {
       // open file chooser for XML creation
-      final GUI main = GUI.get();
-
-      final BaseXFileChooser fc = new BaseXFileChooser(CREATETITLE,
-          GUIProp.createpath, main);
-      fc.addFilter(IO.GZSUFFIX, CREATEGZDESC);
-      fc.addFilter(IO.ZIPSUFFIX, CREATEZIPDESC);
-      fc.addFilter(IO.XMLSUFFIX, CREATEXMLDESC);
-
-      if(fc.select(BaseXFileChooser.MODE.OPEN)) {
-        if(!new DialogCreate(main).ok()) return;
-        final IO file = fc.getFile();
-        build(CREATETITLE, Commands.CREATEXML + " \"" + file.path() + "\"");
-      }
-      GUIProp.createpath = fc.getDir();
+      final DialogCreate dialog = new DialogCreate(GUI.get());
+      if(!dialog.ok()) return;
+      final String in = dialog.input();
+      final String db = dialog.db();
+      build(PROGCREATE, Commands.CREATEXML + " \"" + in + "\" " + db);
     }
   },
 
@@ -265,10 +256,8 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final AbstractButton button) {
       // disallow deletion of empty node set or root node
-      final Context context = GUI.context;
-      final Nodes nodes = context.marked();
-      BaseXLayout.enable(button, !Prop.mainmem && nodes != null &&
-          nodes.size != 0 && (nodes.size != 1 || nodes.pre[0] != 0));
+      final Nodes n = GUI.context.marked();
+      BaseXLayout.enable(button, !Prop.mainmem && n != null && n.size != 0);
     }
   },
 
@@ -728,8 +717,8 @@ public enum GUICommands implements GUICommand {
       final int h = View.hist;
       final boolean enabled = h > 0;
       BaseXLayout.enable(button, enabled);
-      final String tt = enabled ? View.QUERYHIST[h - 1] : null;
-      button.setToolTipText(enabled && tt.equals("") ? GUIGOBACKTT : tt);
+      final String tt = enabled ? View.QUERYHIST[h - 1] : "";
+      button.setToolTipText(enabled && tt.length() == 0 ? GUIGOBACKTT : tt);
     }
   },
 
@@ -745,8 +734,8 @@ public enum GUICommands implements GUICommand {
       final int h = View.hist;
       final boolean enabled = h < View.maxhist;
       BaseXLayout.enable(button, enabled);
-      final String tt = enabled ? View.QUERYHIST[h + 1] : null;
-      button.setToolTipText(enabled && tt.equals("") ? GUIGOFORWARDTT : tt);
+      final String tt = enabled ? View.QUERYHIST[h + 1] : "";
+      button.setToolTipText(enabled && tt.length() == 0 ? GUIGOFORWARDTT : tt);
     }
   },
 
@@ -760,8 +749,8 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final AbstractButton button) {
       final Nodes current = GUI.context.current();
-      final boolean enabled = current != null && (current.size != 1 ||
-          current.pre[0] != 0);
+      final boolean enabled = !GUI.context.root() ||
+        current != null && (current.size == 1 || current.pre[0] != 0);
       BaseXLayout.enable(button, enabled);
     }
   },
@@ -776,8 +765,8 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final AbstractButton button) {
       final Nodes current = GUI.context.current();
-      final boolean enabled = current != null && (current.size != 1 ||
-          current.pre[0] != 0);
+      final boolean enabled = !GUI.context.root() ||
+        current != null && (current.size == 1 || current.pre[0] != 0);
       BaseXLayout.enable(button, enabled);
     }
   };

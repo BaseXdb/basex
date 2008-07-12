@@ -220,16 +220,6 @@ public abstract class Proc extends AbstractProcess {
   }
 
   /**
-   * Adds some timing information to the information string.
-   * @param inf info to be added
-   * @param ext extended timer information
-   * @return true
-   */
-  protected final boolean timer(final String inf, final Object... ext) {
-    return info(BaseX.info(inf, ext), perf.getTimer());
-  }
-
-  /**
    * Performs a query for update operations.
    * @param query query to be performed
    * @param err if this string is specified, it is thrown if the results

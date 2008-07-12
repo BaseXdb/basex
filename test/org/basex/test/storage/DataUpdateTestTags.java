@@ -41,7 +41,7 @@ public final class DataUpdateTestTags {
 
   /**
    * Create the database.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Before
   public void setUp() throws Exception {
@@ -51,7 +51,7 @@ public final class DataUpdateTestTags {
 
   /**
    * Delete the test-database.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @After
   public void tearDown() throws Exception {
@@ -61,7 +61,7 @@ public final class DataUpdateTestTags {
 
   /**
    * Reload Data class.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   private void reload() throws Exception {
     data.close();
@@ -84,7 +84,7 @@ public final class DataUpdateTestTags {
 
   /**
    * Test for correct data size.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Test
   public void testSize() throws Exception {
@@ -95,7 +95,7 @@ public final class DataUpdateTestTags {
 
   /**
    * Test insert as last child.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Test
   public void testInsertTagAsOnly1() throws Exception {
@@ -121,7 +121,7 @@ public final class DataUpdateTestTags {
 
   /**
    * Test insert as last child.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Test
   public void testInsertTagAsOnly2() throws Exception {
@@ -147,7 +147,7 @@ public final class DataUpdateTestTags {
 
   /**
    * Test insert as last child.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Test
   public void testInsertTagAsOnly3() throws Exception {
@@ -173,7 +173,7 @@ public final class DataUpdateTestTags {
 
   /**
    * Test insert as last child.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Test
   public void testInsertTagAfterAttsAsFirst() throws Exception {
@@ -198,7 +198,7 @@ public final class DataUpdateTestTags {
 
   /**
    * Test insert as last child.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Test
   public void testInsertTagAfterAttsAsSecond() throws Exception {
@@ -224,7 +224,7 @@ public final class DataUpdateTestTags {
 
   /**
    * Test insert as last child.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Test
   public void testInsertTagAfterAttsAsLast() throws Exception {

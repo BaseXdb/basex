@@ -95,32 +95,32 @@ public final class TableMemAccess extends TableAccess {
 
   @Override
   public void write1(final int p, final int o, final int v) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 
   @Override
   public void write2(final int p, final int o, final int v) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
   
   @Override
   public void write4(final int p, final int o, final int v) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
   
   @Override
   public void write5(final int p, final int o, final long v) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 
   @Override
   public void delete(final int pre, final int size) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
   
   @Override
   public void insert(final int pre, final byte[] entries) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
   
   @Override

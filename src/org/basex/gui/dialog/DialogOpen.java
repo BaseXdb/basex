@@ -11,7 +11,6 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import org.basex.BaseX;
-import org.basex.core.Prop;
 import org.basex.core.proc.Drop;
 import org.basex.core.proc.Info;
 import org.basex.core.proc.List;
@@ -19,7 +18,6 @@ import org.basex.data.MetaData;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXCheckBox;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXListChooser;
@@ -42,8 +40,6 @@ public final class DialogOpen extends Dialog {
   private BaseXText detail;
   /** Buttons. */
   private BaseXBack buttons;
-  /** Main Memory flag. */
-  private BaseXCheckBox mm;
 
   /**
    * Default Constructor.
@@ -86,10 +82,6 @@ public final class DialogOpen extends Dialog {
     // create buttons
     final BaseXBack p = new BaseXBack();
     p.setLayout(new BorderLayout());
-    if(!drop) {
-      mm = new BaseXCheckBox(CREATEMAINMEM, HELPMMEM, Prop.mainmem, this);
-      p.add(mm, BorderLayout.WEST);
-    }
 
     if(drop) {
       buttons = BaseXLayout.newButtons(this, true,
@@ -113,7 +105,6 @@ public final class DialogOpen extends Dialog {
    * @return database name
    */
   public String db() {
-    Prop.mainmem = mm.isEnabled() && mm.isSelected();
     final String db = choice.getValue();
     return ok && db.length() > 0 ? db : null;
   }
@@ -150,9 +141,7 @@ public final class DialogOpen extends Dialog {
 
   @Override
   public void close() {
-    if(!ok) return;
-    if(mm == null) action(BUTTONDROP);
-    else dispose();
+    if(ok) dispose();
   }
 
   /**
@@ -173,12 +162,11 @@ public final class DialogOpen extends Dialog {
       final MetaData meta = new MetaData(db);
       final int size = meta.read();
       detail.setText(Info.db(meta, size, false, true));
-      if(mm != null) BaseXLayout.enable(mm, meta.filesize < (1 << 30));
     } catch(final IOException ex) {
       detail.setText(Token.token(ex.getMessage()));
       ok = false;
     }
     BaseXLayout.enableOK(buttons, ok);
-    return true;
+    return ok;
   }
 }

@@ -334,7 +334,7 @@ public final class TableBlockAccessTest {
 
   /**
    * Drop the JUnitTest database.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @After
   public void tearDown() throws Exception {

@@ -62,7 +62,8 @@ public final class DialogEdit extends Dialog {
     pp.add(label, BorderLayout.NORTH);
 
     if(kind == Data.ELEM || kind == Data.DOC) {
-      input = new BaseXTextField(Token.string(data.tag(pre)), null, this);
+      final byte[] txt = kind == Data.ELEM ? data.tag(pre) : data.text(pre);
+      input = new BaseXTextField(Token.string(txt), null, this);
       old1 = input.getText();
       pp.add(input, BorderLayout.CENTER);
     } else if(kind == Data.TEXT || kind == Data.COMM) {

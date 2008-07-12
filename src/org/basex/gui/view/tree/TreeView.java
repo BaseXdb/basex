@@ -314,7 +314,7 @@ public final class TreeView extends View {
 
     if(open) {
       int p = pre;
-      while(p != 0) {
+      while(p > 0) {
         opened[p] = true;
         p = ViewData.parent(GUI.context.data(), p);
       }

@@ -234,9 +234,22 @@ public final class Info extends XPath {
           pe = ps + 1;
         }
       }
-      tableHeader(out, data);
-      for(int p = ps; p < pe; p++) table(out, data, p);
+      table(out, data, ps, pe);
     }
+  }
+
+  /**
+   * Prints the specified range of the table.
+   * @param out output stream
+   * @param data data reference
+   * @param ps first node to be printed
+   * @param pe last node to be printed
+   * @throws IOException build or write error
+   */
+  public static void table(final PrintOutput out, final Data data,
+      final int ps, final int pe) throws IOException {
+    tableHeader(out, data);
+    for(int p = ps; p < pe; p++) table(out, data, p);
   }
 
   /**
@@ -266,6 +279,7 @@ public final class Info extends XPath {
    */
   private static void table(final PrintOutput out, final Data data,
       final int p) throws IOException {
+    
     final int len = Token.numDigits(data.size);
     format(out, p, len + 1);
     final int k = data.kind(p);
@@ -281,8 +295,8 @@ public final class Info extends XPath {
     else if(k == Data.PI) out.print(TABLEPI);
 
     out.print("  ");
-    out.print(k == Data.TEXT || k == Data.COMM || k == Data.PI ? data.text(p) :
-      k == Data.ATTR ? data.attName(p) : data.tag(p));
+    out.print(k == Data.ELEM ? data.tag(p) : k == Data.ATTR ?
+      data.attName(p) : data.text(p));
 
     if(k == Data.ATTR) {
       out.print(ATT1);

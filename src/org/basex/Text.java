@@ -23,11 +23,11 @@ public interface Text {
 
   /** New Line. */
   String NL = org.basex.core.Prop.NL;
-  /** New Line. */
+  /** Colon. */
   String COL = ":";
-  /** New Line. */
+  /** Colon/space. */
   String COLS = ": ";
-  /** Dots. */
+  /** Dot. */
   String DOT = ".";
   /** Dots. */
   String DOTS = "...";
@@ -41,7 +41,7 @@ public interface Text {
   /** URL. */
   String URL = "http://www.basex.org";
   /** Code version. */
-  String VERSION = "4.10";
+  String VERSION = "4.11";
   /** Company Info. */
   String COMPANY = "DBIS, University of Konstanz";
 
@@ -149,13 +149,13 @@ public interface Text {
   String DUMMYDATABASE0 = lang("ch_dummydatabase0");
 
   /** Command help. */
-  String CREATE0 = "[" + Create.XML + "|" + Create.FS + "|" + Create.INDEX +
+  String CREATE0 = "[" + Create.DB + "|" + Create.FS + "|" + Create.INDEX +
   "] [...]";
   /** Command help. */
   String CREATE1 = lang("ch_create1");
   /** Command help. */
   String CREATE2 = lang("ch_create2") + NL + NL +
-  "- " + Create.XML + lang("ch_file") + NL + lang("ch_create3") + NL +
+  "- " + Create.DB + lang("ch_file") + NL + lang("ch_create3") + NL +
   "- " + Create.FS + lang("ch_create4") + NL + lang("ch_create5") + NL +
   "- " + Create.INDEX + " [" + Create.TXT + "|" + Create.ATV +
   "|" + Create.FTX + "]: " + NL + lang("ch_create6");
@@ -632,6 +632,8 @@ public interface Text {
 
   /** Dialog title for creating a database. */
   String CREATETITLE = lang("dc_title");
+  /** Dialog title for creating a database. */
+  String CREATENAME = lang("dc_name") + COLS;
   /** XML File Description. */
   String CREATEXMLDESC = lang("dc_xmldesc") + " (*.xml)";
   /** ZIP File Description. */
@@ -640,6 +642,10 @@ public interface Text {
   String CREATEGZDESC = lang("dc_gzdesc") + " (*.gz)";
   /** XQ File Description. */
   String CREATEXQDESC = lang("dc_xqdesc") + " (*.xq)";
+  /** Dialog title for creating a database. */
+  String CREATEDOC = lang("dc_doc") + COL;
+  /** Dialog title for creating a database. */
+  String CREATECOLL = lang("dc_coll") + COL;
   /** Dialog Title for Database Options. */
   String CREATEADVTITLE = lang("dc_advtitle");
   /** Whitespaces information. */
@@ -686,6 +692,8 @@ public interface Text {
 
   /** General info. */
   String GENERALINFO =  lang("dc_general");
+  /** General info. */
+  String PARSEINFO =  lang("dc_parse");
   /** Indexing info. */
   String NAMESINFO =  lang("dc_names");
   /** Indexing info. */
@@ -961,7 +969,7 @@ public interface Text {
   /** Database Optimized. */
   String DBOPTIMIZED = lang("db_optimized");
   /** Database Optimization. */
-  String DBOPT1 = "Statistics rebuilt in %.";
+  String DBOPT1 = "Statistics rebuilt in %." + NL;
   /** Database Optimization. */
   String DBOPTERR1 = "Could not write statistics...";
 

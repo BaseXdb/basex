@@ -41,7 +41,7 @@ public final class DataUpdateTestDeletes {
 
   /**
    * Create the database.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Before
   public void setUp() throws Exception {
@@ -51,7 +51,7 @@ public final class DataUpdateTestDeletes {
 
   /**
    * Delete the test-database.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @After
   public void tearDown() throws Exception {
@@ -61,7 +61,7 @@ public final class DataUpdateTestDeletes {
 
   /**
    * Reload Data class.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   private void reload() throws Exception {
     data.close();
@@ -84,7 +84,7 @@ public final class DataUpdateTestDeletes {
 
   /**
    * Test for correct data size.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Test
   public void testSize() throws Exception {
@@ -95,7 +95,7 @@ public final class DataUpdateTestDeletes {
 
   /**
    * Test deletion of a simple node.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Test
   public void testSimpleNodeDelete() throws Exception {
@@ -120,7 +120,7 @@ public final class DataUpdateTestDeletes {
 
   /**
    * Test deletion of a node with a child.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Test
   public void testCascadingDelete() throws Exception {
@@ -142,7 +142,7 @@ public final class DataUpdateTestDeletes {
 
   /**
    * Test deletion of a node with a child (with text) and attribute.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Test
   public void testCascadingDelete2() throws Exception {
@@ -167,7 +167,7 @@ public final class DataUpdateTestDeletes {
 
   /**
    * Test deletion of an attribute.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Test
   public void testDeleteAttribute() throws Exception {
@@ -194,7 +194,7 @@ public final class DataUpdateTestDeletes {
   /**
    * For the sake of completeness.
    * Test deletion of a text-node.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Test
   public void testDeleteText() throws Exception {

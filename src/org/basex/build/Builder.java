@@ -4,6 +4,7 @@ import static org.basex.build.BuildText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.core.Progress;
+import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.data.Namespaces;
@@ -81,17 +82,22 @@ public abstract class Builder extends Progress {
   public abstract void close() throws IOException;
   
   /**
-   * Adds a complex node to the database.
-   * @param tok the tag name reference
-   * @param tns the tag namespace
-   * @param par relative parent value (distance)
-   * @param at optional attribute tokens
-   * @param atr numeric attribute references
-   * @param kind node type
+   * Adds a document node to the database.
+   * @param tok the token to be added (tag name or content)
    * @throws IOException in case of parsing or writing problems 
    */
-  protected abstract void addNode(int tok, int tns, int par, byte[][] at,
-      int[] atr, byte kind) throws IOException;
+  protected abstract void addDoc(byte[] tok) throws IOException;
+  
+  /**
+   * Adds an element node to the database.
+   * @param tok the tag name reference
+   * @param tns the tag namespace
+   * @param dis distance (relative parent reference)
+   * @param as number of attributes
+   * @throws IOException in case of parsing or writing problems 
+   */
+  protected abstract void addElem(int tok, int tns, int dis, int as)
+    throws IOException;
   
   /**
    * Adds the size value to the table.
@@ -101,13 +107,24 @@ public abstract class Builder extends Progress {
   protected abstract void addSize(int pre) throws IOException;
 
   /**
+   * Adds an attribute to the database.
+   * @param n attribute name
+   * @param s namespace
+   * @param v attribute value
+   * @param d distance (relative parent reference)
+   * @throws IOException in case of parsing or writing problems 
+   */
+  protected abstract void addAttr(int n, int s, byte[] v, int d)
+    throws IOException;
+
+  /**
    * Adds a simple node to the database.
    * @param tok the token to be added (tag name or content)
-   * @param par relative parent value (distance)
+   * @param dis distance (relative parent reference)
    * @param kind the node kind
    * @throws IOException in case of parsing or writing problems 
    */
-  protected abstract void addText(byte[] tok, int par, byte kind)
+  protected abstract void addText(byte[] tok, int dis, byte kind)
     throws IOException;
 
 
@@ -125,13 +142,30 @@ public abstract class Builder extends Progress {
     init(db);
 
     // add document node and parse document
-    final byte[] name = token(db);
-    addNode(Data.DOC, name, null, true);
     parser.parse(this);
-    endNode(name);
     
     meta.lastid = size;
     return finish();
+  }
+
+  /**
+   * Opens a document node.
+   * @param doc document name
+   * @throws IOException in case of parsing or writing problems 
+   */
+  public final void startDoc(final byte[] doc) throws IOException {
+    parStack[level++] = size;
+    skel.add(0, level, Data.DOC);
+    addDoc(utf8(doc, Prop.ENCODING));
+  }
+
+  /**
+   * Closes a document node.
+   * @throws IOException in case of parsing or writing problems 
+   */
+  public final void endDoc() throws IOException {
+    addSize(parStack[--level]);
+    inDoc = false;
   }
 
   /**
@@ -149,10 +183,10 @@ public abstract class Builder extends Progress {
    * @param att the tag attributes
    * @throws IOException in case of parsing or writing problems 
    */
-  public final void startNode(final byte[] tag, final byte[][] att)
+  public final void startElem(final byte[] tag, final byte[][] att)
       throws IOException {
 
-    addNode(Data.ELEM, tag, att, true);
+    addElem(tag, att, true);
   }
 
   /**
@@ -161,10 +195,10 @@ public abstract class Builder extends Progress {
    * @param att the tag attributes
    * @throws IOException in case of parsing or writing problems 
    */
-  public final void emptyNode(final byte[] tag, final byte[][] att)
+  public final void emptyElem(final byte[] tag, final byte[][] att)
       throws IOException {
 
-    addNode(Data.ELEM, tag, att, false);
+    addElem(tag, att, false);
   }
   
   /**
@@ -172,7 +206,7 @@ public abstract class Builder extends Progress {
    * @param tag the tag to be processed
    * @throws IOException in case of parsing or writing problems 
    */
-  public final void endNode(final byte[] tag) throws IOException {
+  public final void endElem(final byte[] tag) throws IOException {
     checkStop();
     final byte[] t = utf8(tag, meta.encoding);
     if(level-- == 0 || tags.id(t) != tagStack[level])
@@ -182,15 +216,14 @@ public abstract class Builder extends Progress {
   }
 
   /**
-   * Stores an node.
-   * @param kind node type
+   * Stores a node.
    * @param name tag to be processed
    * @param att attribute names and values
    * @param open opening tag
    * @throws IOException in case of parsing or writing problems 
    */
-  protected final void addNode(final byte kind, final byte[] name,
-      final byte[][] att, final boolean open) throws IOException {
+  protected final void addElem(final byte[] name, final byte[][] att,
+      final boolean open) throws IOException {
     
     // convert tag to utf8
     final byte[] tag = utf8(name, meta.encoding);
@@ -204,29 +237,25 @@ public abstract class Builder extends Progress {
     // get tag and namespaces references
     final int tid = tags.index(tag, null);
     final int tns = ns.get(tag);
-    skel.add(tid, level, kind);
-
-    // create numeric attribute references and check if they appear only once
-    final int al = att != null ? att.length : 0;
-    final int[] at = al != 0 ? new int[al] : null;
-    for(int a = 0; a < al; a += 2) {
-      at[a] = atts.index(att[a], att[a + 1]);
-      at[a + 1] = ns.get(att[a]);
-      skel.add(at[a], level + 1, Data.ATTR);
-    }
-    for(int a = 0; a < al - 1; a += 2) {
-      for(int b = a + 2; b < al; b += 2) {
-        if(at[a] == at[b]) error(DUPLATT, parser.det(), att[a]);
-      }
-    }
+    skel.add(tid, level, Data.ELEM);
 
     // remember tag id and parent reference
     tagStack[level] = tid;
     parStack[level] = size;
 
     // add node
-    final int par = level != 0 ? size - parStack[level - 1] : 1;
-    addNode(tid, tns, par, att, at, kind);
+    final int dis = level != 0 ? size - parStack[level - 1] : 1;
+    final int al = att != null ? att.length : 0;
+    addElem(tid, tns, dis, (al >> 1) + 1);
+
+    // create numeric attribute references
+    for(int a = 0; a < al; a += 2) {
+      final byte[] av = att[a + 1];
+      final int an = atts.index(att[a], av);
+      final int ans = ns.get(att[a]);
+      skel.add(an, level + 1, Data.ATTR);
+      addAttr(an, ans, av, (a >> 1) + 1);
+    }
 
     if(open && meta.height < ++level) meta.height = level;
     if(size != 1) inDoc = true;
@@ -317,9 +346,9 @@ public abstract class Builder extends Progress {
    */
   public final void nodeAndText(final byte[] tag, final byte[] txt)
       throws IOException {
-    startNode(tag, null);
+    startElem(tag, null);
     text(new TokenBuilder(txt), false);
-    endNode(tag);
+    endElem(tag);
   }
 
   /**

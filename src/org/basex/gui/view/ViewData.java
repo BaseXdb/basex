@@ -47,11 +47,12 @@ public final class ViewData {
     if(data.deepfs) return FSUtils.getPath(data, pre);
 
     int p = pre;
+    int k = data.kind(p);
     final IntList il = new IntList();
-    while(p != 0) {
+    while(k != Data.DOC) {
       il.add(p);
-      final int kind = data.kind(p);
-      p = data.parent(p, kind);
+      p = data.parent(p, k);
+      k = data.kind(p);
     }
 
     final TokenBuilder sb = new TokenBuilder();
@@ -64,17 +65,14 @@ public final class ViewData {
 
   /**
    * Returns the contents of the specified node.
+   * @param data data reference
    * @param p pre value
    * @param s if specified, a short representation is returned
-   * @param data data reference
    * (no full text nodes, only attribute names)
    * @return name
    */
   public static byte[] content(final Data data, final int p, final boolean s) {
-    final int kind = data.kind(p);
-
-    return kind == Data.ELEM || kind == Data.DOC ? tag(data, p) :
-      XMLSerializer.content(data, p, s);
+    return XMLSerializer.content(data, p, s);
   }
 
   /**
@@ -94,7 +92,7 @@ public final class ViewData {
       final byte[] att = data.attValue(data.nameID, pre);
       if(att != null) return att;
     }
-    return data.tag(pre);
+    return content(data, pre, true);
   }
 
   /**

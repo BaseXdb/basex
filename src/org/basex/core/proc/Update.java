@@ -1,7 +1,6 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
-import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
@@ -66,7 +65,7 @@ public final class Update extends Proc {
     for(int i = nodes.size - 1; i >= 0; i--) data.update(nodes.pre[i], t);
     data.flush();
 
-    return Prop.info ? timer(UPDATEINFO, nodes.size) : true;
+    return Prop.info ? info(UPDATEINFO, nodes.size, perf.getTimer()) : true;
   }
 
   /**
@@ -100,7 +99,7 @@ public final class Update extends Proc {
     for(int i = nodes.size - 1; i >= 0; i--) data.update(nodes.pre[i], n, v);
     data.flush();
     
-    return Prop.info ? timer(BaseX.info(UPDATEINFO, nodes.size)) : true;
+    return Prop.info ? info(UPDATEINFO, nodes.size, perf.getTimer()) : true;
   }
 
   /**
@@ -138,6 +137,6 @@ public final class Update extends Proc {
     for(int i = nodes.size - 1; i >= 0; i--) data.update(nodes.pre[i], t);
     data.flush();
 
-    return Prop.info ? timer(BaseX.info(UPDATEINFO, nodes.size)) : true;
+    return Prop.info ? info(UPDATEINFO, nodes.size, perf.getTimer()) : true;
   }
 }

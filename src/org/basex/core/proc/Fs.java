@@ -72,6 +72,6 @@ public final class Fs extends Proc {
     } else if(comm.equals(TOUCH)) {
       query.touch(args, out);
     }
-    if(Prop.info) timer(PROCTIME);
+    if(Prop.info) info(PROCTIME, perf.getTimer());
   }
 }

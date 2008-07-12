@@ -35,8 +35,8 @@ public final class DNode extends Node {
   public DNode(final Data d, final int p, final Node r, final Type t) {
     super(t);
     data = d;
-    par = r;
     pre = p;
+    par = r;
   }
 
   @Override
@@ -56,7 +56,7 @@ public final class DNode extends Node {
         ser.comment(str());
         break;
       case DOC:
-        serElem(ser, 1, level);
+        serElem(ser, pre + 1, level);
         break;
       case ELM:
         serElem(ser, pre, level);
@@ -195,12 +195,12 @@ public final class DNode extends Node {
   /**
    * Serializes the specified node, starting from the specified pre value.
    * @param ser result reader
-   * @param pos pre value
+   * @param pr pre value
    * @param level current level
    * @throws Exception exception
    */
-  public void serElem(final Serializer ser, final int pos,
-      final int level) throws Exception {
+  public void serElem(final Serializer ser, final int pr, final int level)
+      throws Exception {
 
     // attribute lists
     final TokenList names = new TokenList();
@@ -210,22 +210,22 @@ public final class DNode extends Node {
     final byte[][] token = new byte[256][];
     // current output level
     int l = 0;
-    int p = pos;
 
     // start with the root node
-    final int r = p;
+    final int r = pr;
+    final int s = pr + data.size(pr, data.kind(pr));
 
     // loop through all table entries
-    final int s = data.size;
+    int p = pr;
     while(p < s) {
       final int kind = data.kind(p);
-      final int pr = data.parent(p, kind);
+      final int pa = data.parent(p, kind);
       // skip writing if all sub nodes were processed
-      if(r != 1 && p > r && pr < r) break;
+      if(p > r && pa < r) break;
 
       // close opened tags...
       while(l > 0) {
-        if(parent[l - 1] < pr) break;
+        if(parent[l - 1] < pa) break;
         ser.closeElement(token[--l]);
       }
 
@@ -293,7 +293,7 @@ public final class DNode extends Node {
         } else {
           ser.finishElement();
           token[l] = name;
-          parent[l++] = pr;
+          parent[l++] = pa;
         }
       }
     }

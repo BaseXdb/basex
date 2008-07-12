@@ -22,7 +22,7 @@ public final class Optimize extends Proc {
     // rebuild statistics
     final Data data = context.data();
     if(!stats(data)) return error(DBOPTERR1);
-    timer(DBOPT1 + NL);
+    info(DBOPT1, perf.getTimer());
 
     // minimize and rewrite textual database contents... not quite finished
     return true;
@@ -47,7 +47,7 @@ public final class Optimize extends Proc {
       final int par = data.parent(pre, kind);
       while(l > 0 && parStack[l - 1] > par) --l;
 
-      if(kind == Data.ELEM || kind == Data.DOC) {
+      if(kind == Data.ELEM) {
         final int id = data.tagID(pre);
         final byte[] tag = data.tags.key(id);
         data.tags.index(tag, null);
@@ -56,7 +56,7 @@ public final class Optimize extends Proc {
         if(h < ++l) h = l;
       } else if(kind == Data.ATTR) {
         data.atts.index(data.attName(pre), data.attValue(pre));
-      } else if(kind == Data.TEXT) {
+      } else if(kind == Data.TEXT || kind == Data.DOC) {
         if(l > 0) data.tags.index(tagStack[l - 1], data.text(pre));
       }
     }

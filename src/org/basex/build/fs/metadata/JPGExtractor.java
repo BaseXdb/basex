@@ -52,19 +52,19 @@ public final class JPGExtractor extends EXIFExtractor {
     in.close();
 
     // open image tag
-    listener.startNode(IMAGE, new byte[][] { TYPE, TYPEJPG });
+    listener.startElem(IMAGE, new byte[][] { TYPE, TYPEJPG });
 
     listener.nodeAndText(WIDTH, Token.token(w));
     listener.nodeAndText(HEIGHT, Token.token(h));
 
     if(!exif.isEmpty()) {
-      listener.startNode(EXIF, null);
+      listener.startElem(EXIF, null);
       final Iterator<byte[]> it = exif.iterator();
       while(it.hasNext()) listener.nodeAndText(it.next(), it.next());
-      listener.endNode(EXIF);
+      listener.endElem(EXIF);
       exif.clear();
     }
     
-    listener.endNode(IMAGE);
+    listener.endElem(IMAGE);
   }
 }

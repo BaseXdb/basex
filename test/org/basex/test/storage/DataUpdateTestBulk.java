@@ -47,7 +47,7 @@ public final class DataUpdateTestBulk {
 
   /**
    * Create the database.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Before
   public void setUp() throws Exception {
@@ -59,7 +59,7 @@ public final class DataUpdateTestBulk {
 
   /**
    * Delete the test-database.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @After
   public void tearDown() throws Exception {
@@ -69,7 +69,7 @@ public final class DataUpdateTestBulk {
 
   /**
    * Reload Data class.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   private void reload() throws Exception {
     data.close();
@@ -78,16 +78,12 @@ public final class DataUpdateTestBulk {
 
   /**
    * Test byte-arrays for equality.
-   * @param expected expected value
+   * @param exp expected value
    * @param actual actual value
    */
-  private void assertByteArraysEqual(
-      final byte[] expected,
-      final byte[] actual) {
-    assertEquals("array lengths don't equal", expected.length, actual.length);
-    for(int i = 0; i < expected.length; i++) {
-      assertEquals(expected[i], actual[i]);
-    }
+  private void assertByteArraysEqual(final byte[] exp, final byte[] actual) {
+    assertEquals("array lengths don't equal", exp.length, actual.length);
+    for(int i = 0; i < exp.length; i++) assertEquals(exp[i], actual[i]);
   }
 
   /**
@@ -99,8 +95,10 @@ public final class DataUpdateTestBulk {
    */
   private void assertNodesDeepEqual(final Data data1, final int pre1,
       final Data data2, final int pre2) {
-    assertEquals(data1.kind(pre1), data2.kind(pre2));
-    switch(data1.kind(pre1)) {
+    
+    final int kind = data1.kind(pre1);
+    assertEquals(kind, data2.kind(pre2));
+    switch(kind) {
       case Data.TEXT:
         assertByteArraysEqual(data1.text(pre1), data2.text(pre2));
         break;
@@ -110,8 +108,8 @@ public final class DataUpdateTestBulk {
         break;
       case Data.ELEM:
         assertByteArraysEqual(data1.tag(pre1), data2.tag(pre2));
-        assertEquals(data1.size(pre1, Data.ELEM), data2.size(pre2, Data.ELEM));
-        final int siz = data1.size(pre1, Data.ELEM);
+        assertEquals(data1.size(pre1, kind), data2.size(pre2, kind));
+        final int siz = data1.size(pre1, kind);
         int pos = 1;
         while(pos < siz) {
           assertNodesDeepEqual(data1, pre1 + pos, data2, pre2 + pos);
@@ -124,8 +122,18 @@ public final class DataUpdateTestBulk {
   }
 
   /**
+   * Test nodes for correct parent reference.
+   * @param par parent value
+   * @param pre pre value
+   * @param d node data
+   */
+  private void assertParentEqual(final int par, final int pre, final Data d) {
+    assertEquals(par, d.parent(pre, d.kind(pre)));
+  }
+
+  /**
    * Test for correct data size.
-   * @throws java.lang.Exception in case of problems.
+   * @throws Exception in case of problems.
    */
   @Test
   public void testSize() throws Exception {
@@ -136,24 +144,26 @@ public final class DataUpdateTestBulk {
 
   /**
    * Test bulk insertion.
+   * @throws Exception in case of problems.
    */
   @Test
-  public void testBulkInsertSmall() {
+  public void testBulkInsertSmall() throws Exception {
     insert(6, 2, Insert.copy(insertData, 3));
     assertEquals(size + 4, data.size);
     assertNodesDeepEqual(insertData, 3, data, 11);
-    assertEquals(11, data.parent(13, Data.ELEM));
+    assertParentEqual(11, 13, data);
   }
 
   /**
    * Test bulk insertion.
+   * @throws Exception in case of problems.
    */
   @Test
-  public void testBulkInsertLarge() {
+  public void testBulkInsertLarge() throws Exception {
     insert(6, 2, Insert.copy(insertData, 5));
     assertEquals(size + 2, data.size);
     assertNodesDeepEqual(insertData, 5, data, 11);
-    assertEquals(21, data.parent(22, Data.ELEM));
+    assertParentEqual(21, 22, data);
   }
 
   /**
@@ -161,8 +171,11 @@ public final class DataUpdateTestBulk {
    * @param par parent value
    * @param pos inserting position
    * @param tmp temporary data instance
+   * @throws Exception in case of problems.
    */
-  private void insert(final int par, final int pos, final Data tmp) {
+  private void insert(final int par, final int pos, final Data tmp)
+      throws Exception {
+
     // find inserting position
     int pre = par;
     int k = data.kind(pre);

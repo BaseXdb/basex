@@ -3,7 +3,6 @@ package org.basex.query.xpath.values;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.query.xpath.XPContext;
-import org.basex.util.Array;
 import org.basex.util.Levenshtein;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -227,18 +226,5 @@ public final class NodeSet extends Item {
   @Override
   public void plan(final Serializer ser) throws Exception {
     ser.emptyElement(this, Token.token("size"), Token.token(size));
-  }
-  
-  /**
-   * Extracts ids from ftidpos and safes them in array nodes.
-   * @return boolean anything to copy
-   */
-  public boolean setNodesFromFTIdPos() {
-    if (ftidpos != null && ftidpos.length > 0) {
-      nodes = Array.extractIDsFromData(ftidpos);
-      size = nodes.length;
-      return true;
-    }
-    return false;
   }
 }

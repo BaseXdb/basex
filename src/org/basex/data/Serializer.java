@@ -231,33 +231,31 @@ public abstract class Serializer {
   }
   
   /**
-   * Writes the specified XML node and all its sub nodes to the specified
-   * output stream.
+   * Writes the specified node and all its sub nodes.
    * @param data data reference
-   * @param pos XML node to be written
-   * @return last p value
+   * @param pre pre value to be written
+   * @return last pre value
    * @throws Exception exception
    */
-  public final int elem(final Data data, final int pos) throws Exception {
+  public final int elem(final Data data, final int pre) throws Exception {
     // stacks
     final int[] parent = new int[256];
     final byte[][] token = new byte[256][];
     // current output level
     int l = 0;
-    int p = pos;
 
-    // start with the root node
-    final int root = p;
+    // get root node and size value
+    final int root = pre;
+    final int s = pre + data.size(pre, data.kind(pre));
 
-    // loop through all table entries
-    final int s = data.size;
+    int p = pre;
     while(p < s) {
       if(finished()) return p;
 
       final int kind = data.kind(p);
       final int par = data.parent(p, kind);
       // skip writing if all sub nodes were processed
-      if(root != 1 && p > root && par < root) break;
+      if(p > root && par < root) break;
       
       // close opened tags...
       while(l > 0) {

@@ -85,9 +85,7 @@ public final class DiskBuilder extends Builder {
     final TableAccess ta = new TableDiskAccess(db, DATATBL);
     final DataInput in = new DataInput(db, DATATMP);
     for(int pre = 0; pre < ssize; pre++) {
-      final int pp = in.readNum();
-      final int sz = in.readNum();
-      ta.write4(pp, 4, sz);
+      ta.write4(in.readNum(), 8, in.readNum());
     }
     ta.close();
     in.close();
@@ -109,67 +107,73 @@ public final class DiskBuilder extends Builder {
     sout.close();
     sout = null;
   }
+
+  @Override
+  public void addDoc(final byte[] txt) throws IOException {
+    tout.write(Data.DOC);
+    tout.write(0);
+    tout.write(0);
+    tout.write5(inline(txt, true));
+    tout.writeInt(0);
+    tout.writeInt(size++);
+  }
   
   @Override
-  protected void addNode(final int tag, final int tns, final int par,
-      final byte[][] atr, final int[] attRef, final byte kind)
-        throws IOException {
+  protected void addElem(final int n, final int s, final int dis,
+      final int as) throws IOException {
 
-    // element node
-    final int attl = attRef != null ? attRef.length >> 1 : 0;
-    final int t = tag + (tns << 12);
-    tout.write(kind);
-    tout.write2(t);
-    tout.write(attl + 1);
-    tout.writeInt(attl + 1);
-    tout.writeInt(par);
+    tout.write(Data.ELEM);
+    tout.write2(n + (s << 12));
+    tout.write(as);
+    tout.writeInt(dis);
+    tout.writeInt(as);
     tout.writeInt(size++);
-
-    // attributes
-    for(int a = 0; a < attl; a++) {
-      final int n = attRef[a << 1] + (attRef[(a << 1) + 1] << 12);
-      final byte[] val = atr[(a << 1) + 1];
-      
-      // inline integer value?
-      long v = Token.toSimpleInt(val);
-      if(v != Integer.MIN_VALUE) {
-        v |= 0x8000000000L;
-      } else {
-        v = vallen;
-        vallen += vout.writeToken(val);
-      }
-      
-      tout.write(Data.ATTR);
-      tout.write2(n);
-      tout.write5(v);
-      tout.write(0);
-      tout.write(0);
-      tout.write(0);
-      tout.write(a + 1);
-      tout.writeInt(size++);
-    }
     if(size < 0) throw new IOException(LIMITRANGE);
   }
 
   @Override
-  public void addText(final byte[] txt, final int par, final byte kind)
+  public void addAttr(final int n, final int s, final byte[] txt,
+      final int dis) throws IOException {
+
+    tout.write(Data.ATTR);
+    tout.write2(n + (s << 12));
+    tout.write5(inline(txt, false));
+    tout.writeInt(dis);
+    tout.writeInt(size++);
+  }
+
+  @Override
+  public void addText(final byte[] txt, final int dis, final byte kind)
       throws IOException {
-    
-    // inline integer values...
-    long v = Token.toSimpleInt(txt);
-    if(v != Integer.MIN_VALUE) {
-      v |= 0x8000000000L;
-    } else {
-      v = txtlen;
-      txtlen += xout.writeToken(txt);
-    }
     
     tout.write(kind);
     tout.write(0);
     tout.write(0);
-    tout.write5(v);
-    tout.writeInt(par);
+    tout.write5(inline(txt, true));
+    tout.writeInt(dis);
     tout.writeInt(size++);
+  }
+
+  /**
+   * Calculates the value to be inlined or returns a text position.
+   * @param val value to be inlined
+   * @param txt text/attribute flag
+   * @return inline value or text position
+   * @throws IOException I/O exception
+   */
+  private long inline(final byte[] val, final boolean txt) throws IOException {
+    // inline integer values...
+    long v = Token.toSimpleInt(val);
+    if(v != Integer.MIN_VALUE) {
+      v |= 0x8000000000L;
+    } else if(txt) {
+      v = txtlen;
+      txtlen += xout.writeToken(val);
+    } else {
+      v = vallen;
+      vallen += vout.writeToken(val);
+    }
+    return v;
   }
 
   @Override
