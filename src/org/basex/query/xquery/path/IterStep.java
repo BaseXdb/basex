@@ -1,6 +1,7 @@
 package org.basex.query.xquery.path;
 
 import static org.basex.query.xquery.XQText.*;
+
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Expr;
@@ -38,29 +39,39 @@ public final class IterStep extends Step {
   
   @Override
   public NodeIter iter(final XQContext ctx) throws XQException {
-    final Item item = ctx.item;
+    final Item ci = ctx.item;
+    final int cp = ctx.pos;
 
-    if(item == null) Err.or(XPNOCTX, this);
-    final Iter iter = item.iter();
+    if(ci == null) Err.or(XPNOCTX, this);
+    final Iter iter = ci.iter();
 
     // no special predicate treatment?
     return new NodeIter() {
       /** Temporary iterator. */
       NodeIter ir;
+      boolean first = true;
       boolean finished = false;
       Node nod;
+      Node temp;
       
       @Override
       public Node next() throws XQException {
         if(finished) return null;
+        
+        if(first) {
+          first = false;
+          ctx.pos = 1;
+        }
+        
         while(true) {
           if(ir == null) {
             final Item it = iter.next();
             if(it == null) {
-              ctx.item = item;
-              if(lastFlag) {
+              ctx.item = ci;
+              ctx.pos = cp;
+              if(lastFlag && temp != null) {
                 finished = true;
-                return nod.finish();
+                return temp;
               }
               return null;
             }
@@ -75,15 +86,18 @@ public final class IterStep extends Step {
 
               ctx.item = nod;
               final Item i = ctx.iter(expr[0]).ebv();
-              if(i.bool()) {
+              
+              if(i.n() ? i.dbl() == ctx.pos : i.bool()) {
                 // assign score value
                 nod.score(i.score());
               } else {
                 add = false;
               }
+              temp = lastFlag ? nod.finish() : null;
+              ctx.pos++;
 
               if(add) {
-                ctx.item = item;
+                ctx.item = ci;
                 if(numFlag) {
                   finished = true;
                   return nod.finish();
@@ -95,7 +109,7 @@ public final class IterStep extends Step {
             ir = null;
           }
         }
-      }
+      } 
 
       @Override
       public String toString() {
