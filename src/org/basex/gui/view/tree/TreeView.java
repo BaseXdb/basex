@@ -224,9 +224,10 @@ public final class TreeView extends View {
     g.setColor(GUIConstants.color2);
     g.drawLine(2, y + boxMargin - 1, totalW - 5, y + boxMargin - 1);
 
-    final byte[] name = ViewData.content(data, pre, false);
     final boolean file = data.deepfs && FSUtils.isFile(data, pre);
     final boolean dir = data.deepfs && FSUtils.isDir(data, pre);
+    final byte[] name = file || dir ? ViewData.tag(data, pre) :
+      ViewData.content(data, pre, false);
 
     int p = focused;
     while(p > pre) p = ViewData.parent(data, p);

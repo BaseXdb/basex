@@ -66,7 +66,7 @@ public abstract class Builder extends Progress {
    * @return builder instance
    * @throws IOException in case of parsing or writing problems
    */
-  public abstract Builder init(String db) throws IOException;
+  protected abstract Builder init(String db) throws IOException;
 
   /**
    * Finishes the build process and returns a database instance.
@@ -145,6 +145,10 @@ public abstract class Builder extends Progress {
     parser.parse(this);
     
     meta.lastid = size;
+    if(size == 0) {
+      startDoc(token("root"));
+      endDoc();
+    }
     return finish();
   }
 
@@ -165,6 +169,7 @@ public abstract class Builder extends Progress {
    */
   public final void endDoc() throws IOException {
     addSize(parStack[--level]);
+    meta.ndocs++;
     inDoc = false;
   }
 
@@ -352,11 +357,11 @@ public abstract class Builder extends Progress {
   }
 
   /**
-   * Returns current progress header.
-   * @return progress information
+   * Returns the meta data reference.
+   * @return meta data
    */
-  public final Object[] state() {
-    return new Object[] { parser.head(), parser.toString() };
+  public final MetaData meta() {
+    return meta;
   }
 
   @Override

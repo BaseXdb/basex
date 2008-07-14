@@ -3,6 +3,7 @@ package org.basex.gui.dialog;
 import static org.basex.Text.*;
 import java.awt.BorderLayout;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.io.File;
 import javax.swing.JTabbedPane;
 import javax.swing.border.CompoundBorder;
@@ -74,22 +75,27 @@ public final class DialogInfo extends Dialog {
     p1.add(text, BorderLayout.CENTER);
 
     final BaseXBack p2 = new BaseXBack();
-    p2.setLayout(new TableLayout(4, 1, 0, 0));
+    p2.setLayout(new GridLayout(2, 1));
     p2.setBorder(8, 8, 0, 8);
 
-    p2.add(new BaseXLabel(INFOTAGINDEX));
+    BaseXBack p = new BaseXBack();
+    p.setLayout(new BorderLayout());
+    p.add(new BaseXLabel(INFOTAGINDEX), BorderLayout.NORTH);
     text = text();
     text.setText(data.info(IndexToken.TYPE.TAG));
-    BaseXLayout.setHeight(text, 110);
-    p2.add(text);
-    
+    p.add(text, BorderLayout.CENTER);
+    p2.add(p);
+
+    p = new BaseXBack();
+    p.setLayout(new BorderLayout());
+
     final BaseXLabel label = new BaseXLabel(INFOATNINDEX); 
     label.setBorder(8, 0, 0, 0);
-    p2.add(label);
+    p.add(label, BorderLayout.NORTH);
     text = text();
     text.setText(data.info(IndexToken.TYPE.ATN));
-    BaseXLayout.setHeight(text, 110);
-    p2.add(text);
+    p.add(text, BorderLayout.CENTER);
+    p2.add(p);
 
     final BaseXBack p3 = new BaseXBack();
     p3.setLayout(new TableLayout(6, 1, 0, 0));
@@ -162,6 +168,8 @@ public final class DialogInfo extends Dialog {
         new byte[][] { HELPOPT, HELPOK, HELPCANCEL }), BorderLayout.SOUTH);
 
     action(null);
+    setResizable(true);
+    setMinimumSize(getPreferredSize());
     finish(gui);
   }
   

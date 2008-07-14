@@ -1,119 +1,60 @@
 package org.basex.query.fs;
 
-import static org.basex.query.fs.FSText.*;
 import java.io.IOException;
-import org.basex.core.Context;
 import org.basex.io.PrintOutput;
-import org.basex.util.GetOpts;
 import org.basex.util.Token;
 
 /**
  * Performs a touch command.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Hannes Schwarz - Hannes.Schwarz@gmail.com
- *
  */
-public final class TOUCH {
+public final class TOUCH extends FSCmd {
+  /** Specified path. */
+  private String path;
 
-  /** Data reference. */
-  private final Context context;
-
-  /** current dir. */
-  private int curDirPre;
-
-  /** PrintOutPutStream. */
-  private PrintOutput out;
-
-
-  /**
-   * Simplified Constructor.
-   * @param ctx data context
-   * @param output output stream
-   */
-  public TOUCH(final Context ctx, final PrintOutput output) {
-    this.context = ctx;
-    curDirPre = ctx.current().pre[0];
-    this.out = output;
+  @Override
+  public void args(final String args) throws FSException {
+    // check default options and get path
+    path = defaultOpts(args).getPath();
+    // no file/path was specified...
+    if(path == null) error("", 100);
   }
 
-  /**
-   * Performs a touch command.
-   * 
-   * @param cmd - command line
-   * @throws IOException - in case of problems with the PrintOutput 
-   */
-  public void touchMain(final String cmd) 
-  throws IOException {
-
-    GetOpts g = new GetOpts(cmd, "h", 1);
-    // get all Options
-    int ch = g.getopt();
-    while (ch != -1) {
-      switch (ch) {
-        case 'h':
-          printHelp();
-          return;
-        case ':':         
-          FSUtils.printError(out, "touch", g.getPath(), 99);      
-          return;  
-        case '?':         
-          FSUtils.printError(out, "touch", g.getPath(), 102);      
-          return;
-      }      
-      ch = g.getopt();
-    }
-    // if there is path expression remove it     
-    if(g.getPath() != null) {      
-      touch(g.getPath());
-    } 
-  }
-
-  /**
-   * Performs a touch command.
-   *  
-   *  @param path The name of the file 
-   * @throws IOException - in case of problems with the PrintOutput 
-   */
-  private void touch(final String path) throws IOException {
-    
-    int beginIndex = path.lastIndexOf('/');
+  @Override
+  public void exec(final String cmd, final PrintOutput out) throws IOException {
+    final int beginIndex = path.lastIndexOf('/');
     if(beginIndex > -1) {
-      curDirPre = FSUtils.goToDir(context.data(), curDirPre, 
-          path.substring(0, beginIndex));   
-      if(curDirPre == -1) {
-        FSUtils.printError(out, "touch", path, 2);
-        return;
-      } 
+      curPre = checkPre(path, FSUtils.goToDir(context.data(), curPre,
+          path.substring(0, beginIndex)));
     }
-    
-    String file = path.substring(path.lastIndexOf('/') + 1);
 
-    int[] preFound =  FSUtils.getSpecificFilesOrDirs(context.data(), 
-        curDirPre, file);
-    if(preFound.length  > 0 && preFound[0] != -1) {
-      for(int i : preFound) {
+    final String file = path.substring(path.lastIndexOf('/') + 1);
+
+    final int[] preFound =  FSUtils.getChildren(context.data(),
+        curPre, file);
+
+    if(preFound.length > 0) {
+      for(final int i : preFound) {
         if(FSUtils.isFile(context.data(), i)) {
           FSUtils.update(context.data(), null, null, null,
-             Token.token(System.currentTimeMillis()), i);
+              FSUtils.currTime(), i);
         }
       }
-    } else {   
-      // add new file 
-      if(!FSUtils.validFileName(file)) {
-        FSUtils.printError(out, "touch", file, 101);              
-        return;
-      } 
+    } else {
+      // add new file
+      if(!FSUtils.validFileName(file)) error(file, 101);
+
       try {
         int preNewFile = 4;
-        if(!(curDirPre == FSUtils.getROOTDIR())) {
-          preNewFile = curDirPre + FSUtils.NUMATT;
+        if(!(curPre == FSUtils.getROOTDIR())) {
+          preNewFile = curPre + FSUtils.NUMATT;
         }
-        FSUtils.insert(context.data(), false, Token.token(file), 
-            getSuffix(file), Token.token(0), 
-            Token.token(System.currentTimeMillis()),
-            curDirPre, preNewFile);        
-      } catch(Exception e) {
+        FSUtils.insert(context.data(), false, Token.token(file),
+            getSuffix(file), Token.ZERO, FSUtils.currTime(),
+            curPre, preNewFile);
+      } catch(final Exception e) {
         e.printStackTrace();
       }
     }
@@ -121,23 +62,11 @@ public final class TOUCH {
 
   /**
    * Extracts the suffix of a file.
-   * 
    * @param file the filename
    * @return the suffix of the file
    */
   private byte[] getSuffix(final String file) {
-    int point = file.lastIndexOf('.');
-    if(point > 0)
-      return Token.token(file.substring(point + 1));
-    return Token.token("");
-  }
-  /**
-   * Print the help.
-   * 
-   * @throws IOException in case of problems with the PrintOutput
-   */
-  private void printHelp() throws IOException {
-    out.print(FSTOUCH);
-
+    final int i = file.lastIndexOf('.');
+    return i > 0 ? Token.token(file.substring(i + 1)) : Token.EMPTY;
   }
 }

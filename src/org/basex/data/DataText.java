@@ -34,6 +34,8 @@ public interface DataText {
   String DBFNAME = "FNAME";
   /** File size. */
   String DBFSIZE = "FSIZE";
+  /** Number of XML documents. */
+  String DBNDOCS = "NDOCS";
   /** Encoding. */
   String DBENCODING = "ENCODING";
   /** Whitespace chopping. */

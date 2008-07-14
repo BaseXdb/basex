@@ -133,7 +133,7 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
    * @param path the path to be set
    */
   public void setPath(final byte[] path) {
-    status = path.length == 0 ? oldStatus : STATUSPATH + Token.string(path);
+    status = path.length == 0 ? oldStatus : Token.string(path);
     error = false;
     perf = "";
     repaint();

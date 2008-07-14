@@ -32,7 +32,7 @@ b_simple=簡易
 b_search=検索
 
 # Status messages
-s_path=パス
+#s_path=パス
 s_calcmap=Mapを計算中
 s_paintmap=描画中
 s_ok=OK
@@ -54,6 +54,7 @@ d_fctitle=ディレクトリの選択
 d_export=Save XML Document
 
 dc_title=XML文書の保存
+dc_name=Name of Database
 dc_xmldesc=XML文書
 dc_zipdesc=Zip圧縮されたXML文書
 dc_gzdesc=GZip圧縮されたXML文書
@@ -112,6 +113,7 @@ dfs_ftindex=ファイルの内容にインデックスを作成する
 
 dr_title=データベースの名前を変更
 dr_exists=同じ名前のデータベースが存在します。
+dr_over=Old database will be overwritten.
 dr_invalid=不正な名前です。
 
 dd_title=データベースの削除
@@ -184,6 +186,8 @@ c_color=色
 c_colortt=アプリケーションの配色を変更します。
 c_copy=コピー
 c_copytt=現在選択中のXMLノードをコピーします。
+c_cppath=Copy Path
+c_cppathtt=Copies the path to the selected XML nodes.
 c_create=新規
 c_creatett=選択されたXML文書からデータベースを作成します。
 c_cut=カット
@@ -296,7 +300,8 @@ pc_tbl=% にテーブルが作成されました。
 pc_att=% に属性インデックスが作成されました。
 pc_txt=% にテキストインデックスが作成されました。
 pc_ftx=% に全文インデックスが作成されました。
-pc_notfound=ファイル "%" が見付かりませんでした。
+pc_filenf=ファイル "%" が見付かりませんでした。
+pc_pathnf=File or directory not found.
 pc_err="%" をパースできませんでした。
 pc_pos=% (%行、%列)
 
@@ -389,10 +394,11 @@ info_opt=データベースを最適化中
 info_optim=最適化を完了しました。
 info_stats=統計の作成
 info_dbname=データベース名
-info_docsize=XML文書のサイズ
+info_ndocs=No/Documents
+info_docsize=文書のサイズ
 info_dbsize=データベースサイズ
 info_doc=ソースのパス
-info_path=パス
+#info_path=パス
 info_time=タイムスタンプ
 info_mem=メインメモリの使用量
 info_nodes=Table Nodes
@@ -421,7 +427,8 @@ info_ftindex=全文インデックス
 info_fzindex=曖昧
 info_fcompress=全文データの圧縮（？）
 info_db=データベース情報
-info_create=文書作成
+info_create=Database Creation
+#info_create=文書作成
 info_general=一般事項
 info_resultchop=\n...output was chopped.
 info_on=ON

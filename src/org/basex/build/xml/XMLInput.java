@@ -42,6 +42,7 @@ final class XMLInput {
     in[0].encoding();
     file = f;
   }
+  
   /**
    * Sets a new encoding.
    * @param e encoding

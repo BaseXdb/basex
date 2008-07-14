@@ -78,7 +78,7 @@ public final class Info extends XPath {
    */
   private void general(final PrintOutput out) throws IOException {
     Performance.gc(4);
-    final int l = BaseX.max(new String[] {
+    final int l = maxLength(new String[] {
         INFODBPATH, INFOMEM, INFOMM, INFOINFO
     });
 
@@ -86,7 +86,7 @@ public final class Info extends XPath {
     tb.add(INFOGENERAL + NL);
     format(tb, INFODBPATH, Prop.dbpath, true, l);
     format(tb, INFOMEM, Performance.getMem(), true, l);
-    format(tb, INFOMM, BaseX.flag(Prop.mainmem), true, l);
+    //format(tb, INFOMM, BaseX.flag(Prop.mainmem), true, l);
     format(tb, INFOINFO, BaseX.flag(Prop.info) +
         (Prop.allInfo ? " (" + INFOALL + ")" : ""), true, l);
     
@@ -128,27 +128,28 @@ public final class Info extends XPath {
     for(final File f : dir.listFiles()) len += f.length();
 
     final TokenBuilder tb = new TokenBuilder();
-    final int l = BaseX.max(new String[] {
-        INFODBNAME, INFODOC, INFOTIME, INFODOCSIZE, INFODBSIZE,
+    final int l = maxLength(new String[] {
+        INFODBNAME, INFODBSIZE, INFODOC, INFOTIME, INFONDOCS, INFODOCSIZE, 
         INFOENCODING, INFONODES, INFOHEIGHT
-    });
+    }) + 1;
 
     if(header) {
       tb.add(INFODB + NL);
       format(tb, INFODBNAME, meta.dbname, header, l);
     }
-    format(tb, INFODOC, meta.file.path(), header, l);
-    format(tb, INFOTIME, DATE.format(new Date(meta.time)), header, l);
-    format(tb, INFODOCSIZE, meta.filesize != 0 ?
-        Performance.formatSize(meta.filesize) : "-", header, l);
     format(tb, INFODBSIZE, Performance.formatSize(len), header, l);
     format(tb, INFOENCODING, meta.encoding, header, l);
     format(tb, INFONODES, Integer.toString(size), header, l);
     format(tb, INFOHEIGHT, Integer.toString(meta.height), header, l);
-
+    
     tb.add(NL + INFOCREATE + NL);
-    format(tb, INFOCHOP, BaseX.flag(meta.chop), true, 0);
-    format(tb, INFOENTITIES, BaseX.flag(meta.chop), true, 0);
+    format(tb, INFODOC, meta.file.path(), header, l);
+    format(tb, INFOTIME, DATE.format(new Date(meta.time)), header, l);
+    format(tb, INFODOCSIZE, meta.filesize != 0 ?
+        Performance.formatSize(meta.filesize) : "-", header, l);
+    format(tb, INFONDOCS, Integer.toString(meta.ndocs), header, l);
+    //format(tb, INFOCHOP, BaseX.flag(meta.chop), true, 0);
+    //format(tb, INFOENTITIES, BaseX.flag(meta.entity), true, 0);
     
     if(index) {
       tb.add(NL + INFOINDEX + NL);
@@ -162,6 +163,17 @@ public final class Info extends XPath {
       }
     }
     return tb.finish();
+  }
+  
+  /**
+   * Returns the length of the longest string.
+   * @param str strings
+   * @return maximum length
+   */
+  private static int maxLength(final String[] str) {
+    int max = 0;
+    for(final String s : str) if(max < s.length()) max = s.length();
+    return max;
   }
 
   /**

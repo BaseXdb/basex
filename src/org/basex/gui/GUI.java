@@ -456,9 +456,7 @@ public final class GUI extends JFrame {
           if(threadID != thread) return;
         }
 
-
         cursor(CURSORWAIT);
-
         try {
           // parse command string
           final CommandParser cp = new CommandParser(command);

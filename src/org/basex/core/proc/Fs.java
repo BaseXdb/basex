@@ -4,7 +4,8 @@ import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.io.PrintOutput;
-import org.basex.query.fs.FSQuery;
+import org.basex.query.fs.*;
+
 /**
  * Filesystem commands.
  *
@@ -35,43 +36,56 @@ public final class Fs extends Proc {
 
   /** Filesystem command. */
   String comm;
+  /** Filesystem command. */
+  FSCmd fs;
 
   @Override
   protected boolean exec() {
     comm = cmd.arg(0).toLowerCase();
-    return comm.equals(CAT) || comm.equals(CD) || comm.equals(CP)
-    || comm.equals(DU) || comm.equals(LOCATE)
-    || comm.equals(LS) || comm.equals(MKDIR) || comm.equals(PWD)
-    || comm.equals(RM) || comm.equals(TOUCH);
-  }
 
+    if(comm.equals(CAT)) {
+      fs = new CAT();
+    } else if(comm.equals(CD)) {
+      fs = new CD();
+    } else if(comm.equals(CP)) {
+      fs = new CP();
+    } else if(comm.equals(DU)) {
+      fs = new DU();
+    } else if(comm.equals(LOCATE)) {
+      fs = new LOCATE();
+    } else if(comm.equals(LS)) {
+      fs = new LS();
+    } else if(comm.equals(MKDIR)) {
+      fs = new MKDIR();
+    } else if(comm.equals(PWD)) {
+      fs = new PWD();
+    } else if(comm.equals(RM)) {
+      fs = new RM();
+    } else if(comm.equals(TOUCH)) {
+      fs = new TOUCH();
+    }
+    // unknown command...
+    if(fs == null) throw new IllegalArgumentException();
+
+    try {
+      // evaluate arguments...
+      fs.context(context);
+      fs.args(cmd.args());
+      return true;
+    } catch(final FSException ex) {
+      // internal command info..
+      return error(ex.getMessage());
+    }
+  }
 
   @Override
   protected void out(final PrintOutput out) throws IOException {
-    final FSQuery query = new FSQuery(context);
-    final String args = cmd.args();
-
-    if(comm.equals(CAT)) {
-      query.cat(args, out);
-    } else if(comm.equals(CD)) {
-      query.cd(args, out);
-    } else if(comm.equals(CP)) {
-      query.cp(args, out);
-    } else if(comm.equals(DU)) {
-      query.du(args, out);
-    } else if(comm.equals(LOCATE)) {
-      query.locate(args, out);
-    } else if(comm.equals(LS)) {
-      query.ls(args, out);
-    } else if(comm.equals(MKDIR)) {
-      query.mkdir(args, out);
-    } else if(comm.equals(PWD)) {
-      query.pwd(args, out);
-    } else if(comm.equals(RM)) {
-      query.rm(args, out);
-    } else if(comm.equals(TOUCH)) {
-      query.touch(args, out);
+    try {
+      fs.exec(cmd.args(), out);
+      if(Prop.info) info(PROCTIME, perf.getTimer());
+    } catch(final FSException ex) {
+      // exception.. print as normal text
+      out.println(ex.getMessage());
     }
-    if(Prop.info) info(PROCTIME, perf.getTimer());
   }
 }

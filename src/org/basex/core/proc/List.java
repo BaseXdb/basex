@@ -1,14 +1,13 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
-import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Comparator;
 import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.MetaData;
+import org.basex.io.IO;
 import org.basex.io.PrintOutput;
+import org.basex.util.StringList;
 
 /**
  * Evaluates the 'list' command. Shows all available databases.
@@ -25,11 +24,11 @@ public final class List extends Proc {
 
   @Override
   protected void out(final PrintOutput o) throws IOException {
-    final String[] list = list();
+    final StringList list = list();
 
     final StringBuilder sb = new StringBuilder();
     int c = 0;
-    for(final String name : list) {
+    for(final String name : list.finish()) {
       sb.append(name);
       int l = name.length();
       while(l++ < 14) sb.append(" ");
@@ -57,24 +56,16 @@ public final class List extends Proc {
    * Returns the list of available databases.
    * @return available databases.
    */
-  public static String[] list() {
+  public static StringList list() {
     // create database list
-    int n = 0;
-    final File file = new File(Prop.dbpath);
-    // no database directory found...
-    if(!file.exists()) return new String[] {};
+    final StringList db = new StringList();
 
-    for(final File f : file.listFiles()) if(f.isDirectory()) n++;
-    final String[] db = new String[n];
-    n = 0;
-    for(final File f : file.listFiles()) {
-      if(f.isDirectory()) db[n++] = f.getName();
-    }
-    Arrays.sort(db, new Comparator<String>() {
-      public int compare(final String s1, final String s2) {
-        return s1.compareToIgnoreCase(s2);
-      }
-    });
+    final IO dir = new IO(Prop.dbpath);
+    // no database directory found...
+    if(!dir.exists()) return db;
+
+    for(final IO f : dir.children()) if(f.isDir()) db.add(f.name());
+    db.sort();
     return db;
   }
 }

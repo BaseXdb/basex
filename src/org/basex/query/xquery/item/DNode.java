@@ -143,7 +143,8 @@ public final class DNode extends Node {
 
   @Override
   public byte[] base() {
-    return type != Type.DOC ? EMPTY : token(data.meta.file.path());
+    //return type != Type.DOC ? EMPTY : token(data.meta.file.path());
+    return type != Type.DOC ? EMPTY : data.text(pre);
   }
 
   @Override

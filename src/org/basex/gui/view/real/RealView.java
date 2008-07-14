@@ -106,13 +106,13 @@ public final class RealView extends View {
     fontHeight = g.getFontMetrics().getHeight();
     
     /** Initialize the pointer */
-    pointerx = this.getWidth() / 2;
+    pointerx = getWidth() / 2;
     pointery = topdistance;
     
 //  TODO: choose visualization here
     /** Paint the root */
 //    drawNode(g, 0, pointerx, pointery, elementColor);
-//    drawTree(g, 0, 0, 0, this.getWidth());
+//    drawTree(g, 0, 0, 0, getWidth());
     
     drawPrePost(g, 1, 1);
 
@@ -180,7 +180,7 @@ public final class RealView extends View {
         drawNode(g, pre, pointerx, pointery, elementColor);
         /** System.out.println(Token.string(data.tag(pre))
          *  + "; Percent: " + percent + "; Framewidth: "
-         *  + this.getWidth() + "; framex1: " + (space - childframewidth)
+         *  + getWidth() + "; framex1: " + (space - childframewidth)
          *  + "; space: " + space); */
         drawTree(g, pre, level, border, childframewidth);
         
@@ -215,7 +215,7 @@ public final class RealView extends View {
     int y = post * prePostMulti;
     int preStrLen = BaseXLayout.width(g, Integer.toString(pre) + " ");
     int postStrLen = BaseXLayout.width(g, " ") + textWidth;
-    Font temp = this.getFont();
+    Font temp = getFont();
     Font little = new Font(temp.getFontName(), Font.TRUETYPE_FONT,
         (int) (fontHeight / 1.5f));
     g.setFont(little);

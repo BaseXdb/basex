@@ -129,17 +129,6 @@ public final class BaseX extends BaseXClient {
   public static void outln(final Object str, final Object... ext) {
     out(str + NL, ext);
   }
-  
-  /**
-   * Returns the length of the longest string.
-   * @param str strings
-   * @return maximum length
-   */
-  public static int max(final String[] str) {
-    int max = 0;
-    for(final String s : str) if(max < s.length()) max = s.length();
-    return max;
-  }
 
   /**
    * Returns an info message for the specified flag.

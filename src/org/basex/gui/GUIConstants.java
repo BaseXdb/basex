@@ -95,7 +95,7 @@ public final class GUIConstants {
     IMPORTFS, EXPORT, null, EXIT
   }, {
     COPY, PASTE, DELETE, INSERT, EDIT, null,
-    SHOWSEARCH, SHOWINFO, null, SELECT, FILTER
+    SHOWSEARCH, SHOWINFO, null, COPYPATH, SELECT, FILTER
   }, {
     MENUMAIN, SHOWMENU, SHOWBUTTONS, SHOWINPUT, SHOWSTATUS, null,
     MENUVIEWS, SHOWTEXT, SHOWMAP, SHOWTREE, SHOWTABLE, null, FULL
@@ -108,7 +108,8 @@ public final class GUIConstants {
 
   /** Context menu entries. */
   public static final GUICommand[] POPUP = {
-      GOBACK, null, COPY, PASTE, DELETE, INSERT, EDIT, null, SELECT, FILTER
+      GOBACK, null, COPY, PASTE, DELETE, INSERT, EDIT, null, COPYPATH,
+      SELECT, FILTER
   };
 
   // IMAGES ===================================================================

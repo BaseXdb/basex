@@ -124,7 +124,10 @@ public class BufferInput {
    */
   public final void encoding(final String e) throws IOException {
     try {
-      enc = e.equals(Token.UTF8) || e.equals(Token.UTF82) ? Token.UTF8 : e;
+      if(e.equals(Token.UTF8) || e.equals(Token.UTF82)) enc = Token.UTF8;
+      else if(e.equals(Token.UTF16BE)) enc = Token.UTF16BE;
+      else if(e.equals(Token.UTF16LE)) enc = Token.UTF16LE;
+      else enc = e;
       csd = Charset.forName(e).newDecoder();
     } catch(final Exception ex) {
       throw new IOException(ex.toString());

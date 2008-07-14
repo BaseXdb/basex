@@ -385,16 +385,16 @@ public final class DiskData extends Data {
 
   @Override
   public void delete(final int pre) {
-    int kind = kind(pre);
+    int k = kind(pre);
 
     // size of the subtree to delete
-    final int siz = size(pre, kind);
+    final int s = size(pre, k);
 
     // reduce size of ancestors
     int par = pre;
 
     // check if we are an attribute (different size counters)
-    if(kind == ATTR) {
+    if(k == ATTR) {
       par = parent(par, ATTR);
       attSize(par, ELEM, attSize(par, ELEM) - 1);
       size(par, ELEM, size(par, ELEM) - 1);
@@ -402,21 +402,48 @@ public final class DiskData extends Data {
 
     // reduce size of remaining ancestors
     while(par > 0) {
-      kind = kind(par);
-      par = parent(par, kind);
-      size(par, kind, size(par, kind) - siz);
+      k = kind(par);
+      if(k == DOC) break;
+      par = parent(par, k);
+      size(par, k, size(par, k) - s);
     }
 
     // delete node from table structure and reduce document size
-    table.delete(pre, siz);
-    size -= siz;
+    table.delete(pre, s);
+    size -= s;
 
-    // correct parent values of following nodes
+    updateDist(pre, -s);
+  }
+
+  /**
+   * Updates the ancestor sizes and parent references of the following nodes.
+   * @param pre root node
+   * @param par parent node
+   * @param s size to be added
+   */
+  private void updateTable(final int pre, final int par, final int s) {
+    // increase sizes
+    int p = par;
+    while(p >= 0) {
+      int k = kind(p);
+      size(p, k, size(p, k) + s);
+      p = parent(p, k);
+    }
+    updateDist(pre + s, s);
+  }
+
+  /**
+   * Updates the distance values.
+   * @param pre root node
+   * @param s size to be added/removed
+   */
+  private void updateDist(final int pre, final int s) {
     int p = pre;
     while(p < size) {
-      kind = kind(p);
-      dist(p, kind, dist(p, kind) - siz);
-      p += size(p, kind);
+      int k = kind(p);
+      if(k == DOC) break;
+      dist(p, k, dist(p, k) + s);
+      p += size(p, kind(p));
     }
   }
 
@@ -426,6 +453,8 @@ public final class DiskData extends Data {
 
     if(kind == ELEM) {
       insertElem(pre - 1, pre - par, val, 1, 1);
+    } else if(kind == DOC) {
+      insertDoc(pre - 1, 1, val);
     } else {
       insertText(pre - 1, pre - par, val, kind);
     }
@@ -476,31 +505,6 @@ public final class DiskData extends Data {
   }
 
   /**
-   * Updates the ancestor sizes and parent references of the following nodes.
-   * @param pre root node
-   * @param par parent node
-   * @param s size to be added
-   */
-  private void updateTable(final int pre, final int par, final int s) {
-    // increase sizes
-    int p = par;
-    while(p >= 0) {
-      int k = kind(p);
-      size(p, k, size(p, k) + s);
-      p = parent(p, k);
-    }
-
-    // increase parent references
-    p = pre + s;
-    while(p < size) {
-      int k = kind(p);
-      if(k == DOC) break;
-      dist(p, k, dist(p, k) + s);
-      p += size(p, kind(p));
-    }
-  }
-
-  /**
    * Inserts a tag name without updating the table.
    * @param pre insert position
    * @param dis parent distance
@@ -515,6 +519,25 @@ public final class DiskData extends Data {
     final int t = tags.index(tag, null);
     table.insert(pre, new byte[] { ELEM, (byte) (t >> 8), (byte) t, (byte) as,
         (byte) (dis >> 24), (byte) (dis >> 16), (byte) (dis >> 8), (byte) dis, 
+        (byte) (s >> 24), (byte) (s >> 16), (byte) (s >> 8), (byte) s,
+        (byte) (id >> 24), (byte) (id >> 16), (byte) (id >> 8), (byte) id });
+    size++;
+  }
+
+  /**
+   * Insert text node without updating the table.
+   * @param pre insert position
+   * @param s node size
+   * @param val tag name or text node
+   */
+  private void insertDoc(final int pre, final int s, final byte[] val) {
+    // build and insert new entry
+    final long id = ++meta.lastid;
+    final long txt = texts.length();
+    texts.writeBytes(txt, val);
+
+    table.insert(pre, new byte[] { DOC, 0, 0, (byte) (txt >> 32),
+        (byte) (txt >> 24), (byte) (txt >> 16), (byte) (txt >> 8), (byte) txt,
         (byte) (s >> 24), (byte) (s >> 16), (byte) (s >> 8), (byte) s,
         (byte) (id >> 24), (byte) (id >> 16), (byte) (id >> 8), (byte) id });
     size++;

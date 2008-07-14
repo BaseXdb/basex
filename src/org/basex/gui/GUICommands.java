@@ -2,6 +2,9 @@ package org.basex.gui;
 
 import static org.basex.Text.*;
 import java.awt.BorderLayout;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import javax.swing.AbstractButton;
 import javax.swing.JOptionPane;
@@ -31,8 +34,10 @@ import org.basex.gui.dialog.DialogProgress;
 import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.View;
+import org.basex.gui.view.ViewData;
 import org.basex.io.IO;
 import org.basex.util.Performance;
+import org.basex.util.Token;
 
 /**
  * This enumeration encapsulates all commands that are triggered by
@@ -53,7 +58,7 @@ public enum GUICommands implements GUICommand {
       final DialogCreate dialog = new DialogCreate(GUI.get());
       if(!dialog.ok()) return;
       final String in = dialog.input();
-      final String db = dialog.db();
+      final String db = dialog.dbname();
       build(PROGCREATE, Commands.CREATEXML + " \"" + in + "\" " + db);
     }
   },
@@ -159,7 +164,7 @@ public enum GUICommands implements GUICommand {
       if(!new DialogImportFS(main).ok()) return;
       final String p = GUIProp.fsall ? "/" : GUIProp.fspath.replace('\\', '/');
       final String name = GUIProp.importfsname;
-      build(IMPORTFSTITLE, Commands.CREATEFS + " " + name + " \"" + p + "\"");
+      build(IMPORTFSTITLE, Commands.CREATEFS + " \"" + p + "\"" + " " + name);
     }
   },
 
@@ -214,6 +219,25 @@ public enum GUICommands implements GUICommand {
       final Nodes nodes = GUI.context.marked();
       BaseXLayout.enable(button, !Prop.mainmem && nodes != null &&
           nodes.size != 0 && (nodes.size != 1 || nodes.pre[0] != 0));
+    }
+  },
+
+  /** Copy the current path. */
+  COPYPATH(true, GUICPPATH, "ctrl shift C", GUICPPATHTT) {
+    @Override
+    public void execute() {
+      final int pre = GUI.context.marked().pre[0];
+      final byte[] txt = ViewData.path(GUI.context.data(), pre);
+      // copy path to clipboard
+      final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
+      clip.setContents(new StringSelection(Token.string(txt)), null);
+    }
+
+    @Override
+    public void refresh(final AbstractButton button) {
+      // disallow copy of empty node set or root node
+      final Nodes marked = GUI.context.marked();
+      BaseXLayout.enable(button, marked != null && marked.size != 0);
     }
   },
 
@@ -301,7 +325,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Select current nodes. */
-  SELECT(true, GUISELECT, "ctrl A", GUISELECTTT) {
+  SELECT(true, GUISELECT, null, GUISELECTTT) {
     @Override
     public void execute() {
       View.notifyMark(GUI.context.current().copy());

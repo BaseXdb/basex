@@ -1,111 +1,60 @@
 package org.basex.query.fs;
 
-import static org.basex.Text.NL;
-import static org.basex.query.fs.FSText.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import org.basex.core.Context;
+
 import org.basex.data.Data;
 import org.basex.io.PrintOutput;
 import org.basex.util.GetOpts;
 import org.basex.util.IntList;
 import org.basex.util.StringList;
 import org.basex.util.Token;
+import org.basex.util.TokenList;
 
 /**
  * Performs a cp command.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Hannes Schwarz - Hannes.Schwarz@gmail.com
- *
  */
-public final class CP {
-
-  /** Data reference. */
-  private final Context context;
-
-  /** current dir. */
-  private int curDirPre;
-
-  /** PrintOutPutStream. */
-  private PrintOutput out;
-
+public final class CP extends FSCmd {
   /** Remove the all. */
   private boolean fRecursive;
+  /** Specified paths. */
+  private StringList paths;
 
-  /**
-   * Simplified Constructor.
-   * @param ctx data context
-   * @param output output stream
-   */
-  public CP(final Context ctx, final PrintOutput output) {
-    this.context = ctx;
-    curDirPre = ctx.current().pre[0];
-    this.out = output;
-  }
-
-  /**
-   * Performs a cp command.
-   * 
-   * @param cmd - command line
-   * @throws IOException - in case of problems with the PrintOutput 
-   */
-  public void cpMain(final String cmd) 
-  throws IOException {
-
-    GetOpts g = new GetOpts(cmd, "hR", 1);
+  @Override
+  public void args(final String args) throws FSException {
     // get all Options
-    int ch = g.getopt();
-    while (ch != -1) {
+    final GetOpts g = new GetOpts(args, "hR", 1);
+    while(g.more()) {
+      final int ch = checkOpt(g);
       switch (ch) {
-        case 'h':
-          printHelp();
-          return;
         case 'R':
           fRecursive = true;
-          break;                
-        case ':':         
-          FSUtils.printError(out, "cp", g.getPath(), 99);
-          return;  
-        case '?':         
-          FSUtils.printError(out, "cp", g.getPath(), 102);
-          return;
-      }      
-      ch = g.getopt();
+          break;
+      }
     }
-    // if there is path expression remove it     
-    if(g.getPath() != null) {      
-      cp(g.getFoundArgs());
-    } 
-    out.print(NL);
+    paths = g.getFoundArgs();
+
+    // less than two files/paths were specified...
+    if(paths.size < 2) error("", 100);
   }
 
-  /**
-   * Performs a cp command.
-   *  
-   *  @param args The name of the file
-   *  @throws IOException in case of problems with the PrintOutput 
-   */
-  private void cp(final StringList args) throws IOException {
-
-    if(args.size < 2) {
-      printHelp();
-      return;
-    }    
-    Data data = context.data();
+  @Override
+  public void exec(final String cmd, final PrintOutput out) throws IOException {
     // Last element of arguments is the target
-    String targetfile = args.remove(args.size - 1);
+    String targetfile = paths.remove(paths.size - 1);
 
     // All other argument should be copied
-    while(args.size > 0) {
-      String sourcefile = args.remove(0);
+    while(paths.size > 0) {
+      String sourcefile = paths.remove(0);
       // Get all pre values of the source files
-      int[] sources = FSUtils.getSpecificFilesOrDirs(data, 
-          curDirPre, sourcefile);
+      final int[] sources = FSUtils.getChildren(data,
+          curPre, sourcefile);
       sourcefile = sourcefile.substring(sourcefile.lastIndexOf('/') + 1);
-      // check if there is an existing target dir or file 
-      int[] target = FSUtils.getSpecificFilesOrDirs(data, 
-          curDirPre, targetfile);
+      // check if there is an existing target dir or file
+      final int[] target = FSUtils.getChildren(data,
+          curPre, targetfile);
       targetfile = targetfile.substring(targetfile.lastIndexOf('/') + 1);
       // The pre value of the new file
       int preOfNewFile = 4;
@@ -113,9 +62,9 @@ public final class CP {
       switch(sources.length) {
         case 0:
           // There is no source file
-          FSUtils.printError(out, "cp", sourcefile, 2);
+          error(sourcefile, 2);
           break;
-        case 1: 
+        case 1:
           /* Just one file or dir to copy
            * Possibilities:
            *  1. Source = dir -> copy recursive if option -R is set
@@ -126,27 +75,26 @@ public final class CP {
           if(FSUtils.isDir(data, sources[0])) {
             //Test if it is a dir. Just copy if frecursive is set.
             if(fRecursive) {
-              cpRecursive(sources[0], target, targetfile); 
+              cpRecursive(sources[0], target, targetfile);
               break;
             } else {
-              FSUtils.printError(out, "cp", 
-                  Token.string(FSUtils.getName(data, sources[0])), 100);
+              error(FSUtils.getName(data, sources[0]), 100);
               break;
             }
           }
 
-          byte[] size = Token.token(FSUtils.getSize(data, sources[0]));
-          byte[] mtime = Token.token(System.currentTimeMillis());
+          final byte[] size = Token.token(FSUtils.getSize(data, sources[0]));
+          final byte[] mtime = FSUtils.currTime();
 
           if(target.length == 1) {
             if(FSUtils.isDir(data, target[0])) {
               // copy file to dir
-              byte[] name = FSUtils.getName(data, sources[0]);
-              byte[] suffix = FSUtils.getSuffix(data, sources[0]);
+              final byte[] name = FSUtils.getName(data, sources[0]);
+              final byte[] suffix = FSUtils.getSuffix(data, sources[0]);
 
               if(!(target[0] == FSUtils.getROOTDIR())) {
                 preOfNewFile = target[0] + FSUtils.NUMATT;
-              }                             
+              }
               FSUtils.insert(data, false, name, suffix, size, mtime,
                   target[0], preOfNewFile);
             } else {
@@ -157,100 +105,94 @@ public final class CP {
             }
           } else {
             // create new file and insert into current dir
-            byte[] name = Token.token(targetfile);
-            byte[] suffix = getSuffix(targetfile);
+            final byte[] name = Token.token(targetfile);
+            final byte[] suffix = getSuffix(targetfile);
 
-            if(!(curDirPre == FSUtils.getROOTDIR())) {
-              preOfNewFile = curDirPre + FSUtils.NUMATT;
-            }        
+            if(!(curPre == FSUtils.getROOTDIR())) {
+              preOfNewFile = curPre + FSUtils.NUMATT;
+            }
             FSUtils.insert(data, false, name, suffix, size, mtime,
-                curDirPre, preOfNewFile);
-          }      
+                curPre, preOfNewFile);
+          }
           break;
 
 
         default:
-          if(target.length != 1) { 
-            FSUtils.printError(out, "cp", "", 99);
+          if(target.length != 1) {
+            error("", 99);
             break;
           }
         if(FSUtils.isFile(data, target[0])) {
-          FSUtils.printError(out, "cp", 
-              Token.string(FSUtils.getName(data, target[0])), 20);
+          error(FSUtils.getName(data, target[0]), 20);
           break;
         }
         if(!(target[0] == FSUtils.getROOTDIR())) {
           preOfNewFile = target[0] + FSUtils.NUMATT;
-        }  
-        ArrayList<byte[]>  toInsert = new ArrayList<byte[]>();
+        }
+        final TokenList toInsert = new TokenList();
         int sizeToAdd = 0;
-        for(int i : sources) {  
-          i += sizeToAdd; 
+        for(int i : sources) {
+          i += sizeToAdd;
           // if i is dir and frecursive is false go to next value
           if(FSUtils.isDir(data, i)) {
             if(fRecursive) {
-              sizeToAdd += data.size(i, Data.ELEM);    
-              cpRecursive(i, target, "");              
+              sizeToAdd += data.size(i, Data.ELEM);
+              cpRecursive(i, target, "");
               continue;
             } else {
-              FSUtils.printError(out, "cp", 
-                  Token.string(FSUtils.getName(data, i)), 100);
+              error(FSUtils.getName(data, i), 100);
               continue;
             }
-          }      
+          }
           toInsert.add(FSUtils.getName(data, i));
           toInsert.add(FSUtils.getSuffix(data, i));
           toInsert.add(Token.token(FSUtils.getSize(data, i)));
         }
-        for(int j = 0; j < toInsert.size(); ++j) {
-
-          FSUtils.insert(data, false, toInsert.remove(0), toInsert.remove(0),
-              toInsert.remove(0), Token.token(System.currentTimeMillis()),
-              target[0], preOfNewFile);
-        }       
+        for(int j = 0; j < toInsert.size; ++j) {
+          FSUtils.insert(data, false, toInsert.delete(0), toInsert.delete(0),
+              toInsert.delete(0), FSUtils.currTime(), target[0], preOfNewFile);
+        }
         break;
-      }      
+      }
     }
   }
 
   /**
    * Copies all contents of a dir.
-   * 
+   *
    * @param pre value of the source
    * @param target the list if there is a target
    * @param targetFile the name of the target
-   * @throws IOException in case of problems with the PrintOutput 
+   * @throws IOException in case of problems with the PrintOutput
    */
   private void cpRecursive(final int pre,
       final int[] target, final String targetFile) throws IOException {
 
     int[] dirs = new int[]{pre};
-    Data data = context.data();
-    ArrayList<byte[]>  toInsert = new ArrayList<byte[]>();
+    final TokenList toInsert = new TokenList();
 
     if(target.length == 1) {
       if(FSUtils.isFile(data, target[0])) {
-        FSUtils.printError(out, "cp", 
-            Token.string(FSUtils.getName(data, target[0])), 20);
+        error(FSUtils.getName(data, target[0]), 20);
         return;
       }
     }
-    int d = 0;  
+    int d = 0;
     // remember fs hierarchy
     while(0 < dirs.length) {
-      IntList allDir = new IntList();
+      final IntList allDir = new IntList();
       while(d < dirs.length) {
-        int[] toCopy = FSUtils.getAllOfDir(data, dirs[d]);
+        final int[] toCopy = FSUtils.getChildren(data, dirs[d]);
         toInsert.add(null);
         // remember relative path for insertion
         toInsert.add(FSUtils.getRelativePath(data, dirs[d], pre));
-        for(int p : toCopy) {
-          if(FSUtils.isDir(data, p)) {          
+        for(final int p : toCopy) {
+          if(FSUtils.isDir(data, p)) {
             allDir.add(p);
             toInsert.add(Token.token("d"));
           } else {
             toInsert.add(Token.token("f"));
-          }          
+          }
           toInsert.add(FSUtils.getName(data, p));
           toInsert.add(FSUtils.getSuffix(data, p));
           toInsert.add(Token.token(FSUtils.getSize(data, p)));
@@ -270,62 +212,47 @@ public final class CP {
     if(target.length == 1) {
       if(!(target[0] == FSUtils.getROOTDIR())) {
         preOfNewFile = target[0] + FSUtils.NUMATT;
-      }  
+      }
       parPre = target[0];
       // insert a copy of the source dir into the target dir
-      FSUtils.insert(data, true, FSUtils.getName(data, pre), Token.token(""),
-          Token.token(0), Token.token(System.currentTimeMillis()),
-          parPre, preOfNewFile);
+      FSUtils.insert(data, true, FSUtils.getName(data, pre), Token.EMPTY,
+          Token.ZERO, FSUtils.currTime(), parPre, preOfNewFile);
       parPre = preOfNewFile;
-    } else {     
-      // target does not extist - create a new directory and copy all contents
+    } else {
+      // target does not exist - create a new directory and copy all contents
       // of the source directory to it
-      if(!(curDirPre == FSUtils.getROOTDIR())) {
-        preOfNewFile = curDirPre + FSUtils.NUMATT;
-      }      
-      parPre = preOfNewFile; 
-      FSUtils.insert(data, true, Token.token(targetFile), Token.token(""),
-          Token.token(0), Token.token(System.currentTimeMillis()),
-          curDirPre, preOfNewFile);
-    }    
+      if(!(curPre == FSUtils.getROOTDIR())) {
+        preOfNewFile = curPre + FSUtils.NUMATT;
+      }
+      parPre = preOfNewFile;
+      FSUtils.insert(data, true, Token.token(targetFile), Token.EMPTY,
+          Token.ZERO, FSUtils.currTime(), curPre, preOfNewFile);
+    }
     // insert fs hierarchy
     copyRoot = parPre;
-    byte[] f = Token.token("f");
-    while(!toInsert.isEmpty()) {      
-      if(toInsert.get(0) == null) {
-        toInsert.remove(0);
-        parPre = FSUtils.goToDir(data, copyRoot, 
-            Token.string(toInsert.remove(0)));
+    final byte[] f = Token.token("f");
+    while(toInsert.size != 0) {
+      if(toInsert.list[0] == null) {
+        toInsert.delete(0);
+        parPre = FSUtils.goToDir(data, copyRoot,
+            Token.string(toInsert.delete(0)));
         continue;
-      }      
-      boolean isDir = true;
-      if(Token.eq(toInsert.remove(0), f))
-        isDir = false;      
-      FSUtils.insert(data, isDir, toInsert.remove(0), toInsert.remove(0),
-          toInsert.remove(0), Token.token(System.currentTimeMillis()),
-          parPre, parPre + FSUtils.NUMATT);
+      }
+      final boolean isDir = !Token.eq(toInsert.delete(0), f);
+      FSUtils.insert(data, isDir, toInsert.delete(0), toInsert.delete(0),
+          toInsert.delete(0), FSUtils.currTime(), parPre,
+          parPre + FSUtils.NUMATT);
     }
   }
 
   /**
    * Extracts the suffix of a file.
-   * 
    * @param file the filename
    * @return the suffix of the file
    */
   private byte[] getSuffix(final String file) {
-    int point = file.lastIndexOf('.');
-    if(point > 0)
-      return Token.token(file.substring(point + 1));
-    return Token.token("");
-  }
-  /**
-   * Print the help.
-   * 
-   * @throws IOException in case of problems with the PrintOutput
-   */
-  private void printHelp() throws IOException {
-    out.print(FSCP);
+    final int i = file.lastIndexOf('.');
+    return i > 0 ? Token.token(file.substring(i + 1)) : Token.EMPTY;
   }
 }
 

@@ -39,6 +39,9 @@ public final class Delete extends Proc {
       if(nodes.pre[i] == 0) return error(DELETEROOT);
       data.delete(nodes.pre[i]);
     }
+    
+    // recreate root node
+    //if(data.size == 0) data.insert(0, 1, Token.EMPTY, Data.DOC);
 
     // refresh current context
     final Nodes curr = context.current();

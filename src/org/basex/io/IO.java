@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
@@ -52,6 +53,8 @@ public final class IO {
   private boolean content;
   /** File contents. */
   private byte[] cont;
+  /** File length. */
+  private long len;
   
   /**
    * Constructor.
@@ -111,33 +114,6 @@ public final class IO {
   }
   
   /**
-   * Returns a buffered reader for the file.
-   * @return buffered reader
-   * @throws IOException I/O exception
-   */
-  public BufferInput buffer() throws IOException {
-    // return cached content
-    if(content || url) return new CachedInput(content());
-
-    // support for zipped files; the first file will be chosen
-    if(path.endsWith(ZIPSUFFIX)) {
-      ZipInputStream zip = new ZipInputStream(new FileInputStream(file));
-      ZipEntry entry = zip.getNextEntry();
-      final BufferInput in = new BufferInput(zip);
-      in.length(entry.getSize());
-      return in;
-    }
-    // support for gzipped files
-    if(path.endsWith(GZSUFFIX)) {
-      GZIPInputStream zip = new GZIPInputStream(new FileInputStream(file));
-      return new BufferInput(zip);
-    }
-    
-    // return file content
-    return new BufferInput(path);
-  }
-  
-  /**
    * Verifies if the file exists.
    * @return result of check
    */
@@ -165,6 +141,20 @@ public final class IO {
   }
   
   /**
+   * Returns if this is a symbolic link.
+   * @return result of check
+   */
+  public boolean isLink() {
+    try {
+      return !path().equals(file().getCanonicalPath());
+    } catch(IOException ex) {
+      BaseX.debug(ex);
+      return false;
+    }
+  }
+
+
+  /**
    * Returns the modification date of this file.
    * @return modification date
    */
@@ -178,8 +168,54 @@ public final class IO {
    * @return file length
    */
   public long length() {
+    if(len != 0) return len;
     if(cont != null) return cont.length;
     return url ? 0 : file().length();
+  }
+
+  /**
+   * Checks if more input streams are found.
+   * @return result of check
+   * @throws IOException I/O exception
+   */
+  public boolean more() throws IOException {
+    // return cached content
+    if(content) {
+      is = is == null ? new ByteArrayInputStream(cont) : null;
+    } else if(is instanceof ZipInputStream || path.endsWith(ZIPSUFFIX)) {
+      if(is == null) is = new ZipInputStream(new FileInputStream(file));
+      // doesn't work yet with several zip entries
+      else return false;
+      while(is != null) {
+        ZipEntry e = ((ZipInputStream) is).getNextEntry();
+        if(e == null) {
+          is = null;
+        } else {
+          len = e.getSize();
+          path = e.getName();
+          if(!e.isDirectory()) break;
+        }
+      }
+    } else if(path.endsWith(GZSUFFIX)) {
+      is = is == null ? new GZIPInputStream(new FileInputStream(file)) : null;
+    } else {
+      simple ^= true;
+    }
+    return is != null || simple;
+  }
+
+  /** Input stream reference. */
+  InputStream is;
+  /** Simple stream reference. */
+  boolean simple;
+  
+  /**
+   * Returns the next input source.
+   * @return input source
+   */
+  public InputSource next() {
+    if(is != null) return new InputSource(is);
+    return new InputSource(url ? path : "file:///" + path);
   }
   
   /**
@@ -187,24 +223,28 @@ public final class IO {
    * @return buffered reader
    * @throws IOException I/O exception
    */
-  public InputSource source() throws IOException {
+  public BufferInput buffer() throws IOException {
     // return cached content
-    if(content) return new InputSource(new ByteArrayInputStream(cont));
-    
+    if(content || url) return new CachedInput(content());
+
     // support for zipped files; the first file will be chosen
     if(path.endsWith(ZIPSUFFIX)) {
       ZipInputStream zip = new ZipInputStream(new FileInputStream(file));
-      zip.getNextEntry();
-      return new InputSource(zip);
+      ZipEntry entry = zip.getNextEntry();
+      final BufferInput in = new BufferInput(zip);
+      in.length(entry.getSize());
+      return in;
     }
     // support for gzipped files
     if(path.endsWith(GZSUFFIX)) {
       GZIPInputStream zip = new GZIPInputStream(new FileInputStream(file));
-      return new InputSource(zip);
+      return new BufferInput(zip);
     }
-    // return file content...
-    return new InputSource(url ? path : "file:///" + path);
+    
+    // return file content
+    return new BufferInput(path);
   }
+  
   
   /**
    * Merges two filenames.
@@ -221,6 +261,15 @@ public final class IO {
    */
   public void suffix(final String suf) {
     if(path.indexOf(".") == -1) path += suf;
+  }
+
+  /**
+   * Returns the file suffix in lower case.
+   * @return suffix
+   */
+  public String suffix() {
+    int i = path.lastIndexOf(".");
+    return i == -1 ? "" : path.substring(i + 1).toLowerCase();
   }
 
   /**

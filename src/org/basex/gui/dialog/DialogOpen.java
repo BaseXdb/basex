@@ -23,6 +23,7 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXListChooser;
 import org.basex.gui.layout.BaseXText;
 import org.basex.io.IO;
+import org.basex.util.StringList;
 import org.basex.util.Token;
 
 /**
@@ -50,10 +51,10 @@ public final class DialogOpen extends Dialog {
     super(parent, drop ? DROPTITLE : OPENTITLE);
 
     // create database chooser
-    final String[] db = List.list();
-    if(db.length == 0) return;
+    final StringList db = List.list();
+    if(db.size == 0) return;
     
-    choice = new BaseXListChooser(this, db, HELPOPEN);
+    choice = new BaseXListChooser(this, db.finish(), HELPOPEN);
     set(choice, BorderLayout.CENTER);
     choice.setSize(130, 356);
 
@@ -121,7 +122,7 @@ public final class DialogOpen extends Dialog {
   public void action(final String cmd) {
     if(BUTTONRENAME.equals(cmd)) {
       new DialogRename(GUI.get(), choice.getValue());
-      choice.setData(List.list());
+      choice.setData(List.list().finish());
     } else if(BUTTONOPEN.equals(cmd)) {
       close();
     } else if(BUTTONDROP.equals(cmd)) {
@@ -130,7 +131,7 @@ public final class DialogOpen extends Dialog {
       if(JOptionPane.showConfirmDialog(this, BaseX.info(DROPCONF, db),
           DIALOGINFO, JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
         Drop.drop(db);
-        choice.setData(List.list());
+        choice.setData(List.list().finish());
         choice.requestFocusInWindow();
       }
     } else {

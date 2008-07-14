@@ -26,6 +26,8 @@ public final class MetaData {
   public IO file;
   /** Original file size of XML document. */
   public long filesize;
+  /** Number of XML documents. */
+  public int ndocs;
   /** Maximum document height. */
   public int height;
   /** Modification time. */
@@ -123,6 +125,8 @@ public final class MetaData {
       else if(k.equals(IDBSTORAGE)) istorage = v;
       else if(k.equals(DBFNAME)) file = new IO(v);
       else if(k.equals(DBFSIZE)) filesize = Token.toLong(v);
+      else if(k.equals(DBNDOCS)) ndocs = Token.toInt(v);
+      else if(k.equals(DBFTDC)) ftdc = toBool(v);
       else if(k.equals(DBENCODING)) encoding = v;
       else if(k.equals(DBHEIGHT)) height = Token.toInt(v);
       else if(k.equals(DBSIZE)) size = Token.toInt(v);
@@ -166,6 +170,7 @@ public final class MetaData {
     writeInfo(inf, IDBSTORAGE, ISTORAGE);
     writeInfo(inf, DBFNAME, file.path());
     writeInfo(inf, DBFSIZE, Long.toString(filesize));
+    writeInfo(inf, DBNDOCS, Integer.toString(ndocs));
     writeInfo(inf, DBENCODING, encoding);
     writeInfo(inf, DBHEIGHT, Integer.toString(height));
     writeInfo(inf, DBSIZE, Integer.toString(siz));

@@ -35,6 +35,18 @@ public final class TokenList {
   }
   
   /**
+   * Removes the specified value.
+   * @param i value index
+   * @return removed value
+   */
+  public byte[] delete(final int i) {
+    if(size == 0 || size < i) throw new IndexOutOfBoundsException();
+    final byte[] l = list[i];
+    System.arraycopy(list, i + 1, list, i, size-- - i);
+    return l;
+  }
+  
+  /**
    * Checks if the specified token is found in the list.
    * @param v token to be checked
    * @return true if value is found

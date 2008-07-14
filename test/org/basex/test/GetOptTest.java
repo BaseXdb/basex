@@ -1,6 +1,5 @@
 package org.basex.test;
 
-import java.io.IOException;
 import org.basex.util.GetOpts;
 import org.basex.util.StringList;
 import org.junit.Test;
@@ -30,11 +29,9 @@ public final class GetOptTest {
    *    "fs ls"
    *    "fs ls /music/IckeUndEr"
    *    "fs ls media/../media"
-   * 
-   * @throws IOException - If Input fails.
    */
   @Test
-  public void testWithoutOption() throws IOException {
+  public void testWithoutOption() {
     /*
      *   % testopt
      *   aflag = 0, bflag = 0, cvalue = (null)
@@ -59,11 +56,9 @@ public final class GetOptTest {
    * 
    * Testcase:
    *  "fs ls -a";
-   * 
-   * @throws IOException - Input/Output failure.
    */
   @Test
-  public void testOption1() throws IOException {
+  public void testOption1() {
     String command = "-a";
     int[] enteredOptions =  {'a'};    
     int[] getOptResult = optionHelp(command, enteredOptions.length, "ahRli");
@@ -80,11 +75,9 @@ public final class GetOptTest {
    * Testcase:
    *  % fs testopt -a -b
    *  aflag = 1, bflag = 1, cvalue = (null)
-   * 
-   * @throws IOException - Input/Output failure.
    */
   @Test
-  public void testOption2() throws IOException {
+  public void testOption2() {
     String command = "-a -b";
     int[] enteredOptions =  {'a', 'b'};    
     int[] getOptResult = optionHelp(command, enteredOptions.length, "ahRbli");
@@ -101,11 +94,9 @@ public final class GetOptTest {
    * Testcase:
    *  % fs testopt -ab
    *  aflag = 1, bflag = 1, cvalue = (null)
-   * 
-   * @throws IOException - Input/Output failure.
    */
   @Test
-  public void testOption3() throws IOException {
+  public void testOption3() {
     String command = "-ab";
     int[] enteredOptions =  {'a', 'b'};    
     int[] getOptResult = optionHelp(command, enteredOptions.length, "ahRbli");
@@ -122,13 +113,11 @@ public final class GetOptTest {
    * 
    * Testcase:
    *  % fs testopt -a -X
-   * 
-   * @throws IOException - Input/Output failure.
    */
   @Test
-  public void testOption4() throws IOException {
+  public void testOption4() {
     String command = "-a -X";
-    int[] enteredOptions =  {'a', '?'};    
+    int[] enteredOptions =  {'a', 0 };    
     int[] getOptResult = optionHelp(command, enteredOptions.length, "ahRbli");
 
     for(int i = 0; i < enteredOptions.length; i++) {          
@@ -145,11 +134,9 @@ public final class GetOptTest {
    * Testcase:
    *  % fs testopt -ab
    *  aflag = 1, bflag = 1, cvalue = (null)
-   * 
-   * @throws IOException - Input/Output failure.
    */
   @Test
-  public void testOption5() throws IOException {
+  public void testOption5() {
     String command = "-ab -c";
     int[] enteredOptions =  {'a', 'b' , 'c'};    
     int[] getOptResult = optionHelp(command, enteredOptions.length, "ahRblci");
@@ -167,13 +154,11 @@ public final class GetOptTest {
    * Testcase:
    *  % fs testopt -ab
    *  aflag = 1, bflag = 1, cvalue = (null)
-   * 
-   * @throws IOException - Input/Output failure.
    */
   @Test
-  public void testOption6() throws IOException {
+  public void testOption6() {
     String command = "-YXb";
-    int[] enteredOptions =  {'Y', '?', 'b'};    
+    int[] enteredOptions =  {'Y', 0, 'b'};    
     int[] getOptResult = optionHelp(command, enteredOptions.length, "YahRbli");
 
     for(int i = 0; i < enteredOptions.length; i++) {          
@@ -188,11 +173,9 @@ public final class GetOptTest {
    * 
    * Testcase:
    *  % fs testopt -d ickeUndEr
-   * 
-   * @throws IOException - Input/Output failure.
    */
   @Test
-  public void testOptionArgument1() throws IOException {
+  public void testOptionArgument1() {
     String command = "-d ickeUndEr -a";
     int[] enteredOptions =  {'d' , 'a'};    
     String args = "ahRbd:li";
@@ -219,11 +202,9 @@ public final class GetOptTest {
    * 
    * Testcase:
    *  % fs testopt -dickeUndEr -R
-   * 
-   * @throws IOException - Input/Output failure.
    */
   @Test
-  public void testOptionArgument2() throws IOException {
+  public void testOptionArgument2() {
     String command = "-dickeUndEr -R";
     int[] enteredOptions =  {'d', 'R'};    
     String args = "ahRbd:li";
@@ -252,13 +233,11 @@ public final class GetOptTest {
    * 
    * Testcase:
    *  % fs testopt -d ickeUndEr
-   * 
-   * @throws IOException - Input/Output failure.
    */
   @Test
-  public void testOptionArgument3() throws IOException {
+  public void testOptionArgument3() {
     String command = "-d ickeUndEr -X";
-    int[] enteredOptions =  {'d', '?'};    
+    int[] enteredOptions =  {'d', 0};    
     String args = "ahRbd:li";
     GetOpts g = new GetOpts(command, args);
 
@@ -284,11 +263,9 @@ public final class GetOptTest {
    * 
    * Testcase:
    *  % fs testopt -d ickeUndEr
-   * 
-   * @throws IOException - Input/Output failure.
    */
   @Test
-  public void testOptionArgument4() throws IOException {
+  public void testOptionArgument4() {
     String command = "-d icke -u";
     int[] enteredOptions =  {'d', 'u'};   
     String args = "ahRbd:lu";
@@ -318,11 +295,9 @@ public final class GetOptTest {
    * 
    * Testcase:
    *  % fs testopt -d ickeUndEr -iTest
-   * 
-   * @throws IOException - Input/Output failure.
    */
   @Test
-  public void testOptionArgument5() throws IOException {
+  public void testOptionArgument5() {
     String command = "-d ickeUndEr -iTest";
     int[] enteredOptions =  {'d', 'i'}; 
     String args = "ahRbd:li:";
@@ -354,11 +329,9 @@ public final class GetOptTest {
    * 
    * Testcase:
    *  % fs testopt -d ickeUndEr -R -iTest
-   * 
-   * @throws IOException - Input/Output failure.
    */
   @Test
-  public void testOptionArgument6() throws IOException {
+  public void testOptionArgument6() {
     String command = "-d ickeUndEr -R -iTest -h";
     int[] enteredOptions =  {'d', 'R', 'i', 'h'}; 
     String args = "ahRbd:li:";
@@ -389,11 +362,9 @@ public final class GetOptTest {
    * 
    * Testcase:
    *  % fs testopt -d ickeUndEr -R -iTest
-   * 
-   * @throws IOException - Input/Output failure.
    */
   @Test
-  public void testOptionArgument7() throws IOException {
+  public void testOptionArgument7() {
     String command = "-d ickeUndEr -R -iTest -h";
     int[] enteredOptions =  {'d', 'R', 'i', 'h'}; 
     String args = "ah:Rbd:li:";
@@ -428,11 +399,9 @@ public final class GetOptTest {
    * 
    * Testcase:
    *  % testopt -d ickeUndEr -R -iTest -h
-   * 
-   * @throws IOException - Input/Output failure.
    */
   @Test
-  public void testOptionArgument8() throws IOException {
+  public void testOptionArgument8() {
     String command = "-d ickeUndEr -R -iTest -h";
     int[] enteredOptions =  {'d', 'R', 'h'}; 
     String args = "ahR:bd:li:";
@@ -467,11 +436,9 @@ public final class GetOptTest {
    * 
    * Testcase:
    *  % fs testopt -d ickeUndEr -R -iTest /Itunes/music/
-   * 
-   * @throws IOException - Input/Output failure.
    */
   @Test
-  public void testAll1() throws IOException {
+  public void testAll1() {
     String command = "-d ickeUndEr -R -iTest /Itunes/music/";
     int[] enteredOptions =  {'d', 'R', 'i'};    
     String args = "ahRbd:li:";
@@ -503,11 +470,9 @@ public final class GetOptTest {
    * Testcase:
    *  % fs testopt /Itunes/music/ -d ickeUndEr -R -iTest
    *  X is a nonvalid option
-   * 
-   * @throws IOException - Input/Output failure.
    */
   @Test
-  public void testAll2() throws IOException {
+  public void testAll2() {
     String command = "/Itunes/music/ -d ickeUndEr -R -iTest ";
     int[] enteredOptions =  {'d', 'R', 'i'};    
     String args = "ahRbd:li:";
@@ -540,13 +505,11 @@ public final class GetOptTest {
    * Testcase:
    *  % fs testopt /Itunes/music/ -d ickeUndEr -R -iTest
    *  X is a nonvalid option
-   * 
-   * @throws IOException - Input/Output failure.
    */
   @Test
-  public void testAll3() throws IOException {
+  public void testAll3() {
     String command = "-d ickeUndEr /Itunes/music/ -R -iTest -X";
-    int[] enteredOptions =  {'d', 'R', 'i', '?'}; 
+    int[] enteredOptions =  {'d', 'R', 'i', 0}; 
     String args = "ahRbd:li:";
     GetOpts g = new GetOpts(command, args);
 
@@ -576,11 +539,9 @@ public final class GetOptTest {
    * Testcase:
    *  % fs testopt /Itunes/music/ -d ickeUndEr -R -iTest
    *  X is a nonvalid option
-   * 
-   * @throws IOException - Input/Output failure.
    */
   @Test
-  public void testSourceAndTarget() throws IOException {
+  public void testSourceAndTarget() {
     String command = "ickeUndEr.txt icke.txt";    
     String args = "ahRbd:li:";
     GetOpts g = new GetOpts(command, args);
@@ -601,10 +562,9 @@ public final class GetOptTest {
    * @param args  arguments.
    * @param command  passed by the "command line".
    * @return getopt result array.
-   * @throws IOException  - Input/Output failure.
    */
   public int[] optionHelp(final String command, final int length,
-      final String args) throws IOException {
+      final String args) {
 
     int[] getOptResult = new int[length]; 
     int index;

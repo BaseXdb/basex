@@ -64,7 +64,7 @@ public final class SAXWrapper extends Parser {
       r.setProperty("http://xml.org/sax/properties/lexical-handler", p);
       r.setErrorHandler(p);
       builder.startDoc(token(file.name()));
-      r.parse(file.source());
+      r.parse(file.next());
       builder.endDoc();
     } catch(final SAXParseException ex) {
       final String msg = BaseX.info(SCANPOS, ex.getSystemId(),

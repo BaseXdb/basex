@@ -1,12 +1,17 @@
 package org.basex.gui.dialog;
 
 import static org.basex.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import org.basex.core.Prop;
+import org.basex.core.proc.List;
+import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
@@ -17,7 +22,9 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.io.IO;
+import org.basex.util.StringList;
 import org.basex.util.Token;
+import org.basex.util.XMLToken;
 
 /**
  * Dialog window for specifying options for creating a new database.
@@ -26,10 +33,19 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class DialogCreate extends Dialog {
+  /** Maximum file counter. */
+  //private static final int MAX = 10000;
   /** Database Input. */
-  private BaseXTextField input;
+  BaseXTextField input;
+  /** Input info. */
+  final BaseXLabel info1;
   /** Database name. */
-  private BaseXTextField dbname;
+  BaseXTextField dbname;
+  /** Database info. */
+  final BaseXLabel info2;
+  
+  /** File counter. */
+  private BaseXLabel count;
   /** Internal XML parsing. */
   private BaseXCheckBox intparse;
   /** Whitespace chopping. */
@@ -48,6 +64,8 @@ public final class DialogCreate extends Dialog {
   private BaseXLabel[] fl = new BaseXLabel[4];
   /** Buttons. */
   private BaseXBack buttons;
+  /** Available databases. */
+  final StringList db = List.list();
 
   /**
    * Default Constructor.
@@ -58,16 +76,20 @@ public final class DialogCreate extends Dialog {
 
     // create checkboxes
     final BaseXBack p1 = new BaseXBack();
-    p1.setLayout(new TableLayout(5, 1));
+    p1.setLayout(new TableLayout(7, 1));
     p1.setBorder(8, 8, 8, 8);
  
-    BaseXLabel l = new BaseXLabel(CREATETITLE);
-    p1.add(l);
+    count = new BaseXLabel(CREATETITLE + " (*.xml):");
+    p1.add(count);
 
     final BaseXBack p = new BaseXBack();
     p.setLayout(new TableLayout(1, 3, 6, 0));
 
-    input = new BaseXTextField(null, this);
+    input = new BaseXTextField(GUIProp.createpath, null, this);
+    input.addKeyListener(new KeyAdapter() {
+      @Override
+      public void keyReleased(final KeyEvent e) { action(null); }
+    });
     BaseXLayout.setWidth(input, 300);
 
     final BaseXButton button = new BaseXButton(BUTTONBROWSE, HELPBROWSE, this);
@@ -80,13 +102,27 @@ public final class DialogCreate extends Dialog {
     p.add(input);
     p.add(button);
     p1.add(p);
+    
+    info1 = new BaseXLabel(" ", true);
+    info1.setForeground(GUIConstants.COLORERROR);
+    p1.add(info1);
 
-    l = new BaseXLabel(CREATENAME);
+    final BaseXLabel l = new BaseXLabel(CREATENAME);
     l.setBorder(0, 0, 0, 0);
     p1.add(l);
     dbname = new BaseXTextField(null, this);
+    dbname.addKeyListener(new KeyAdapter() {
+      @Override
+      public void keyReleased(final KeyEvent e) {
+        action(null);
+      }
+    });
     BaseXLayout.setWidth(dbname, 300);
     p1.add(dbname);
+
+    info2 = new BaseXLabel(" ", true);
+    info2.setForeground(GUIConstants.COLORERROR);
+    p1.add(info2);
 
     // create checkboxes
     final BaseXBack p2 = new BaseXBack();
@@ -140,7 +176,6 @@ public final class DialogCreate extends Dialog {
       ft[f] = new BaseXCheckBox(cb[f], Token.token(desc[f]), val[f], 0, this);
       fl[f] = new BaseXLabel(desc[f], 8);
       p4.add(ft[f]);
-      //p4.add(fl[f]);
     }
 
     final JTabbedPane tabs = new JTabbedPane();
@@ -172,28 +207,48 @@ public final class DialogCreate extends Dialog {
     fc.addFilter(IO.ZIPSUFFIX, CREATEZIPDESC);
     fc.addFilter(IO.XMLSUFFIX, CREATEXMLDESC);
 
-    GUIProp.createpath = fc.getDir();
     if(fc.select(BaseXFileChooser.MODE.OPENDIR)) {
       IO file = fc.getFile();
       input.setText(file.path());
       dbname.setText(file.dbname());
+      //final int c = count(file);
+      //count.setText(CREATETITLE +
+      //    " (" + (c >= MAX ? "> " + MAX : c) + " files):");
     }
+    GUIProp.createpath = fc.getDir();
   }
+
+  /**
+   * Counts the number of XML documents.
+   * @param f file reference
+   * @return number of files
+  int count(final IO f) {
+    if(f.isDir() && !f.isLink()) {
+      int c = 0;
+      for(final IO ch : f.children()) {
+        c += count(ch);
+        if(c > MAX) break;
+      }
+      return c;
+    }
+    return f.name().endsWith(IO.XMLSUFFIX) ? 1 : 0;
+  }
+   */
 
   /**
    * Returns the chosen XML file or directory.
    * @return file or directory
    */
   public String input() {
-    return input.getText();
+    return input.getText().trim();
   }
 
   /**
    * Returns the database name.
    * @return file or directory
    */
-  public String db() {
-    return dbname.getText();
+  public String dbname() {
+    return dbname.getText().trim();
   }
 
   @Override
@@ -203,12 +258,26 @@ public final class DialogCreate extends Dialog {
       ft[f].setEnabled(ftx);
       fl[f].setEnabled(ftx);
     }
-    ok = dbname.getText().length() != 0;
+    
+    final String nm = dbname();
+    final String path = input();
+    final boolean exists = new IO(path).exists();
+    
+    ok = nm.length() != 0 && path.length() != 0 && exists;
+    String inf1 = !exists ? PATHWHICH : " ";
+    String inf2 = db.contains(nm) ? RENAMEOVER : " ";
+    if(nm.length() != 0 && !XMLToken.isName(Token.token(nm))) {
+      inf2 = RENAMEINVALID;
+      ok = false;
+    }
+    info1.setText(inf1);
+    info2.setText(inf2);
     BaseXLayout.enableOK(buttons, ok);
   }
 
   @Override
   public void close() {
+    if(!ok) return;
     super.close();
     Prop.chop  = chop.isSelected();
     Prop.entity   = entities.isSelected();

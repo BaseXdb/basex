@@ -410,7 +410,11 @@ public interface Text {
   /** Command Info. */
   String GUICOPY = lang("c_copy");
   /** Command Info. */
+  String GUICPPATH = lang("c_cppath");
+  /** Command Info. */
   String GUICOPYTT = lang("c_copytt");
+  /** Command Info. */
+  String GUICPPATHTT = lang("c_cppathtt");
   /** Command Info. */
   String GUICREATE = lang("c_create") + DOTS;
   /** Command Info. */
@@ -591,8 +595,6 @@ public interface Text {
 
   // STATUS BAR ===============================================================
 
-  /** Path information. */
-  String STATUSPATH = lang("s_path") + COLS;
   /** Info text for calculating map. */
   String STATUSMAP1 = lang("s_calcmap") + COLS;
   /** Info text for painting map. */
@@ -764,6 +766,8 @@ public interface Text {
   String RENAMEINVALID = lang("dr_invalid");
   /** Info for renaming a database. */
   String RENAMEEXISTS = lang("dr_exists");
+  /** Info for overwrite a database. */
+  String RENAMEOVER = lang("dr_over");
 
   /** Dialog title for dropping a database. */
   String DROPTITLE = lang("dd_title");
@@ -941,7 +945,9 @@ public interface Text {
   String CREATEERR = lang("pc_err");
 
   /** File not found. */
-  String FILEWHICH = lang("pc_notfound");
+  String FILEWHICH = lang("pc_filenf");
+  /** Path not found. */
+  String PATHWHICH = lang("pc_pathnf");
 
   // DATABASE COMMANDS ========================================================
 
@@ -1113,26 +1119,30 @@ public interface Text {
   String INFOOPTIM = lang("info_optim");
   /** Statistics information. */
   String INFOSTATS = lang("info_stats") + DOTS;
+
   /** Info on source document. */
   String INFODBNAME = lang("info_dbname");
-  /** Info on document size. */
-  String INFODOCSIZE = lang("info_docsize");
   /** Info on database size. */
   String INFODBSIZE = lang("info_dbsize");
   /** Info on source document. */
   String INFODOC = lang("info_doc");
-  /** Info on document path. */
-  String INFOPATH = lang("info_path");
   /** Info on database time stamp. */
   String INFOTIME = lang("info_time");
-  /** Info on used main memory. */
-  String INFOMEM = lang("info_mem");
+  /** Info on number of documents. */
+  String INFONDOCS = lang("info_ndocs");
+  /** Info on document size. */
+  String INFODOCSIZE = lang("info_docsize");
+  /** Document encoding. */
+  String INFOENCODING = lang("info_encoding");
   /** Info on database table size. */
   String INFONODES = lang("info_nodes");
   /** Maximum tree height. */
   String INFOHEIGHT = lang("info_height");
-  /** Document encoding. */
-  String INFOENCODING = lang("info_encoding");
+
+  /** Info on document path. */
+  //String INFOPATH = lang("info_path");
+  /** Info on used main memory. */
+  String INFOMEM = lang("info_mem");
   /** Info on execution times. */
   String INFORUNS = lang("info_runs");
 

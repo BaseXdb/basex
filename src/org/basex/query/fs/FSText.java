@@ -118,40 +118,25 @@ public interface FSText {
     "permissions.\n\n     The options are as follows:\n\n" +
     "     -h    Print this page.\n\n\n";
 
-  /** FS Error Message. */
-  String EUND = "Undefined error: 0.";
-  /** FS Error Message. */
-  String EPERM = "Operation not permitted.";
-  /** FS Error Message. */
-  String ENOENT = "No such file or directory.";
-  /** FS Error Message. */
-  String EIO = "Input/output error.";
-  /** FS Error Message. */
-  String EACCES = "Permission denied.";
-  /** FS Error Message. */
-  String EEXIST = "File / Directory exists.";
-  /** FS Error Message. */
-  String ENOTDIR = "Not a directory.";
-  /** FS Error Message. */
-  String EISDIR = "Is a directory.";
-  /** FS Error Message. */
-  String EINVAL = "Invalid argument.";
-  /** FS Error Message. */
-  String EROFS = "Read-only file system.";
-  /** FS Error Message. */
-  String ERANGE = "Result too large.";
-  /** FS Error Message. */
-  String ENAMETOOLONG = "File name too long.";
-  /** FS Error Message. */
-  String ENAMENOALLOW = "File name not allowed.";
-  /** FS Error Message. */
-  String ENOTEMPTY = "Directory not empty.";
-  /** FS Error Message. */
-  String EFTYPE = "Inappropriate file type or format.";
-  /** FS Error Message. */
-  String EMISSARG = "Missing argument.";
-  /** FS Error Message. */
-  String EOMDIR = "omitting directory";
-  /** FS Error Message. */
-  String EINVOPT = "Invalid option";
+  /** File System errors. */
+  String[][] CODES = {
+      {   "0", "Undefined error: 0." },
+      {   "1", "Operation not permitted." },
+      {   "2", "No such file or directory." },
+      {   "5", "Input/output error." },
+      {  "13", "Permission denied." },
+      {  "17", "File / Directory exists." },
+      {  "20", "Not a directory." },
+      {  "21", "Is a directory." },
+      {  "22", "Invalid argument." },
+      {  "30", "Read-only file system." },
+      {  "34", "Result too large." },
+      {  "63", "File name too long." },
+      {  "66", "File name not allowed." },
+      {  "79", "Directory not empty." },
+      {  "99", "Inappropriate file type or format." },
+      { "100", "Missing argument." },
+      { "101", "Omitting directory" },
+      { "102", "Invalid option" }
+  };
 }

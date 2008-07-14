@@ -1,10 +1,8 @@
 package org.basex.data;
 
 import static org.basex.data.DataText.*;
-
 import java.io.IOException;
 import java.util.ArrayList;
-
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
@@ -41,7 +39,7 @@ public final class Skeleton {
     if(!IO.dbfile(db, DATASTR).exists()) return;
 
     final DataInput in = new DataInput(db, DATASTR);
-    root = new Node(in);
+    if(in.length() != 0) root = new Node(in);
     in.close();
   }
 
@@ -67,7 +65,7 @@ public final class Skeleton {
    */
   public synchronized void finish(final String db) throws IOException {
     final DataOutput out = new DataOutput(db, DATASTR);
-    root.finish(out);
+    if(root != null) root.finish(out);
     out.close();
   }
 
@@ -88,6 +86,7 @@ public final class Skeleton {
    */
   public StringList suggest(final Data data, final String xpath) {
     final StringList sl = new StringList();
+    if(root == null) return sl;
     
     ArrayList<Node> n = new ArrayList<Node>();
     n.add(root);

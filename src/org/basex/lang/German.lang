@@ -32,7 +32,7 @@ b_simple=Einfach
 b_search=Suche
 
 # Status messages
-s_path=Pfad
+#s_path=Pfad
 s_calcmap=Berechnung
 s_paintmap=Zeichnen
 s_ok=OK
@@ -54,6 +54,7 @@ d_fctitle=Verzeichnis
 d_export=XML-Dokument speichern
 
 dc_title=XML-Dokument or -Verzeichnis auswählen 
+dc_name=Name der Datenbank
 dc_xmldesc=XML-Dokumente
 dc_zipdesc=Gezippte XML-Dokumente
 dc_gzdesc=Gezippte XML-Dokumente
@@ -112,6 +113,7 @@ dfs_ftindex=Indexiere Dateiinhalte
 
 dr_title=Datenbank umbenennen
 dr_exists=Databank existiert schon
+dr_over=Alte Databank wird überschrieben.
 dr_invalid=Ungültiger Name
 
 dd_title=Datenbank löschen
@@ -185,6 +187,8 @@ c_colortt=Stellt eine Farbpalette zur Auswahl.
 c_cut=Ausschneiden
 c_copy=Kopieren
 c_copytt=Kopiert die derzeit ausgewählten XML-Knoten.
+c_cppath=Pfad kopieren
+c_cppathtt=Kopiert den Pfad zu den ausgewählten XML-Knoten.
 c_create=Neu
 c_creatett=Erzeugt eine Datenbank aus dem ausgewählten XML-Dokument.
 c_delete=Löschen
@@ -296,7 +300,8 @@ pc_tbl=Tabelle erzeugt in %.
 pc_att=Attribute indiziert in %.
 pc_txt=Texte indiziert in %.
 pc_ftx=Volltext indiziert in %.
-pc_notfound=Die Datei "%" wurde nicht gefunden.
+pc_filenf="%" wurde nicht gefunden.
+pc_pathnf=Datei oder Verzeichnis nicht gefunden.
 pc_err="%" konnte nicht eingelesen werden.
 pc_pos="%" (Zeile %, Spalte %)
 
@@ -387,10 +392,11 @@ info_opt=Optimiere Datenbank
 info_optim=Optimierung beendet.
 info_stats=Erstelle Statistiken
 info_dbname=Datenbank-Name
-info_docsize=XML Dok. Größe
+info_ndocs=Anz./Dokumente
+info_docsize=Dokument-Größe
 info_dbsize=Datenbank-Größe
 info_doc=Quellenpfad
-info_path=Pfad
+#info_path=Pfad
 info_time=Zeitstempel
 info_mem=Hauptspeicher
 info_nodes=Tabellenknoten
@@ -419,7 +425,7 @@ info_ftindex=Volltext-Index
 info_fzindex=unscharf
 info_fcompress=Fulltext Daten Kompression
 info_db=Datenbank-Information
-info_create=Dokumenterstellung
+info_create=Datenbankerstellung
 info_general=Allgemeines
 info_resultchop=\n...Ausgabe gekürzt.
 info_on=AN

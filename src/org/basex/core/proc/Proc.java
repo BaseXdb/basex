@@ -27,10 +27,10 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public abstract class Proc extends AbstractProcess {
+  /** Container for query information. */
+  private TokenBuilder info = new TokenBuilder();
   /** Performance measurements. */
   protected Performance perf = new Performance();
-  /** Container for query information. */
-  protected TokenBuilder info = new TokenBuilder();
   /** Current context. */
   protected Context context;
   /** Temporary query result. */
@@ -60,7 +60,6 @@ public abstract class Proc extends AbstractProcess {
    */
   public static boolean execute(final Context context, final Commands comm,
       final String... arg) {
-    
     return get(context, comm, arg).execute();
   }
 
@@ -104,7 +103,8 @@ public abstract class Proc extends AbstractProcess {
   }
 
   /**
-   * Executes a process.
+   * Executes a process. Returns an {@link IllegalArgumentException} if
+   * the number of arguments is wrong.
    * @return success of operation
    */
   protected abstract boolean exec();

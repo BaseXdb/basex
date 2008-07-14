@@ -56,6 +56,9 @@ public final class ViewData {
     }
 
     final TokenBuilder sb = new TokenBuilder();
+    sb.add("doc(\"");
+    sb.add(content(data, p, true));
+    sb.add("\")");
     for(int i = il.size - 1; i >= 0; i--) {
       sb.add('/');
       sb.add(content(data, il.get(i), true));

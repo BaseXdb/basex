@@ -4,7 +4,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import org.basex.Text;
 import org.basex.core.Context;
-import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
 import org.basex.gui.GUICommands;
@@ -14,7 +13,6 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPanel;
 import org.basex.gui.layout.BaseXPopup;
 import org.basex.util.Array;
-import org.basex.util.Token;
 
 /**
  * View observer pattern. All inheriting classes are attached to the
@@ -101,15 +99,14 @@ public abstract class View extends BaseXPanel {
 
   /**
    * Notifies all views of a focus change.
-   * @param id focused id
+   * @param pre focused pre value
    * @param vw the calling view
    */
-  public static void notifyFocus(final int id, final View vw) {
-    if(focused == id) return;
-    focused = id;
+  public static void notifyFocus(final int pre, final View vw) {
+    if(focused == pre) return;
+    focused = pre;
     for(final View v : view) if(v != vw && v.isValid()) v.refreshFocus();
-    final Data data = GUI.context.data();
-    GUI.get().status.setPath(id > 0 ? ViewData.path(data, id) : Token.EMPTY);
+    GUI.get().status.setPath(ViewData.path(GUI.context.data(), pre));
   }
 
   /**

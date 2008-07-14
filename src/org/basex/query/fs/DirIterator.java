@@ -4,12 +4,11 @@ import org.basex.data.Data;
 import org.basex.util.IntList;
 
 /**
- * Offers an iterator for the children of a node. Could be as well be
+ * Offers an iterator for the children of a node. Could as well be
  * defined as generic child iterator.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
- *
  */
 public final class DirIterator {
   /** Data reference. */
@@ -57,9 +56,9 @@ public final class DirIterator {
     return p;
   }
   
-  
   /**
-   * Returns an array with all pre values..
+   * Returns an array with all pre values. Must be directly called after
+   * creating the class instance.
    * @return children array
    */
   public int[] all() {

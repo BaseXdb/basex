@@ -142,7 +142,7 @@ public enum Commands {
   /** Evaluate XPath query, show result and create links. */
   LINK(Link.class, PRINTING, 0, -1, true),
   /** Filesystem command. */
-  FS(Fs.class, DATAREF | PRINTING, 1, 30, true),
+  FS(Fs.class, DATAREF | UPDATING | PRINTING, 1, 30, true),
 
   // UPDATE COMMANDS ==========================================================
           

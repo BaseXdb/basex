@@ -1,10 +1,13 @@
 package org.basex.gui.dialog;
 
 import static org.basex.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+
 import javax.swing.JFrame;
+
 import org.basex.core.proc.List;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXBack;
@@ -12,6 +15,7 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.io.IO;
+import org.basex.util.StringList;
 import org.basex.util.Token;
 
 /**
@@ -25,6 +29,12 @@ public final class DialogRename extends Dialog {
   final String old;
   /** New name. */
   final BaseXTextField name;
+  /** Buttons. */
+  final BaseXBack buttons;
+  /** Info label. */
+  final BaseXLabel info;
+  /** Available databases. */
+  final StringList db = List.list();
 
   /**
    * Default Constructor.
@@ -35,29 +45,15 @@ public final class DialogRename extends Dialog {
     super(parent, RENAMETITLE);
     old = dbname;
 
-    final BaseXBack buttons = BaseXLayout.okCancel(this);
-    final BaseXLabel info = new BaseXLabel(" ");
+    buttons = BaseXLayout.okCancel(this);
+    info = new BaseXLabel(" ");
     info.setForeground(GUIConstants.COLORERROR);
 
-    // create database chooser
-    final String[] db = List.list();
-    
     name = new BaseXTextField(dbname, null, this);
     name.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {
-        final String nm = name.getText();
-        ok = true;
-        for(final String d : db) ok &= !d.equals(nm);
-        ok |= nm.equals(dbname);
-        String inf = ok ? "" : RENAMEEXISTS;
-        if(ok) {
-          ok = nm.length() != 0 &&
-            Token.letterOrDigit(Token.token(nm));
-          if(!ok) inf = RENAMEINVALID;
-        }
-        info.setText(inf);
-        BaseXLayout.enableOK(buttons, ok);
+        action(null);
       }
     });
 
@@ -74,11 +70,24 @@ public final class DialogRename extends Dialog {
   }
 
   @Override
+  public void action(final String cmd) {
+    final String nm = name.getText().trim();
+    ok = !db.contains(nm) | nm.equals(old);
+    String inf = ok ? "" : RENAMEEXISTS;
+    if(ok) {
+      ok = nm.length() != 0 &&
+        Token.letterOrDigit(Token.token(nm));
+      if(!ok && nm.length() != 0) inf = RENAMEINVALID;
+    }
+    info.setText(inf);
+    BaseXLayout.enableOK(buttons, ok);
+  }
+
+
+  @Override
   public void close() {
     if(!ok) return;
     super.close();
-    
-    final String nm = name.getText();
-    IO.dbpath(old).renameTo(IO.dbpath(nm));
+    IO.dbpath(old).renameTo(IO.dbpath(name.getText().trim()));
   }
 }

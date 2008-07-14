@@ -233,6 +233,15 @@ public final class XQContext extends QueryContext {
   public DNode doc(final byte[] db) throws XQException {
     if(contains(db, '<') || contains(db, '>')) Err.or(INVDOC, db);
 
+    // check if the collections contain the document
+    if(collect.length > 0) {
+      for(final NodIter ni : collect) {
+        for(int n = 0; n < ni.size; n++) {
+          if(eq(db, ni.list[n].base())) return (DNode) ni.list[n];
+        }
+      }
+    }
+    
     // check if the database has already been read
     final String dbname = string(db);
     for(final DNode d : docs) if(d.data.meta.dbname.equals(dbname)) return d;
