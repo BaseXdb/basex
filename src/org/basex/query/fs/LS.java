@@ -3,10 +3,10 @@ package org.basex.query.fs;
 import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.io.PrintOutput;
-import org.basex.util.ByteArrayList;
 import org.basex.util.GetOpts;
 import org.basex.util.IntList;
 import org.basex.util.Token;
+import org.basex.util.TokenList;
 
 /**
  * Performs a ls command.
@@ -101,7 +101,7 @@ public final class LS extends FSCmd {
   private int[] print(final int[] result, final PrintOutput out)
   throws IOException {
 
-    ByteArrayList b = new ByteArrayList();
+    TokenList b = new TokenList();
 
 
     final IntList allDir = new IntList();
@@ -130,7 +130,7 @@ public final class LS extends FSCmd {
       }
     }
     if(fSorted) {
-      b.sort(false, false);
+      b.sort();
       byte[][] content = b.finish();
       for(byte[] el : content) {
         out.print(el);

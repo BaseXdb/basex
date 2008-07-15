@@ -65,21 +65,21 @@ public final class Values extends Index {
     final long pos = get(tok.text);
     if(pos == 0) return IndexIterator.EMPTY;
     
-    final int ds = idxl.readNum(pos);
     return new IndexIterator() {
+      /** Number of results. */
+      int s = idxl.readNum(pos);
       /** Last pre value. */
       int p = 0;
       @Override
       public int next() { return p += idxl.readNum(); }
       @Override
-      public int size() { return ds; }
+      public int size() { return s; }
     };
   }
 
   @Override
   public int nrIDs(final IndexToken tok) {
-    final long pos = get(tok.text);
-    return pos > 0 ? idxl.readNum(pos) : 0;
+    return ids(tok).size();
   }
 
   /**

@@ -324,7 +324,7 @@ public final class XQTS {
           nodes("input-file/@variable", root), ctx));
       files.add(file(nodes("input-URI", root),
           nodes("input-URI/@variable", root), ctx));
-      file(nodes("defaultCollection", root), null, ctx);
+      files.add(file(nodes("defaultCollection", root), null, ctx));
 
       var(nodes("input-query/@name", root),
           nodes("input-query/@variable", root), path, ctx);
@@ -542,6 +542,8 @@ public final class XQTS {
     for(int c = 0; c < nod.size; c++) {
       final byte[] name = data.atom(nod.pre[c]);
       final String src = srcFiles.get(string(name));
+      if(tb.size != 0) tb.add(", ");
+      tb.add(name);
 
       if(src == null) {
         // assign collection
@@ -557,9 +559,6 @@ public final class XQTS {
             new Expr[] { Str.get(token(src)) });
         final Var v = new Var(new QNm(data.atom(var.pre[c])));
         ctx.vars.addGlobal(v.expr(fun));
-
-        if(tb.size != 0) tb.add(", ");
-        tb.add(name);
       }
     }
     return tb.finish();

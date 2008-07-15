@@ -940,7 +940,7 @@ public interface Text {
   /** Create information. */
   String CREATETEXT = lang("pc_txt");
   /** Create information. */
-  String CREATEFT = lang("pc_ftx");
+  //String CREATEFT = lang("pc_ftx");
   /** Parse error. */
   String CREATEERR = lang("pc_err");
 

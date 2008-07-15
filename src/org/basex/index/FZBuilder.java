@@ -144,6 +144,17 @@ public final class FZBuilder extends Progress implements IndexBuilder {
         outy.writeInt(ds);
 
         byte[] val = tre.pre[p];
+        
+        /* Store relative pre list..
+        int po = 0;
+        for(int v = 0, ip = 4; v < ds; ip += Num.len(val, ip), v++) {
+          final int pn = Num.read(val, ip);
+          outz.writeNum(pn - po);
+          po = pn;
+        }
+        for (int z = 4; z < val.length; z++) outz.write(val[z]);
+        */
+        
         if (Prop.fcompress) {
           for (int z = 4; z < val.length; z++) outz.write(val[z]);
         } else {

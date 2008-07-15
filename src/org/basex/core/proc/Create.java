@@ -195,8 +195,6 @@ public final class Create extends Proc {
    */
   public static Data xml(final IO fn, final String db) {
     try {
-      //if(!fn.exists()) return null;
-
       final Parser p = Prop.intparse ? new XMLParser(fn) : new SAXWrapper(fn);
       if(Prop.onthefly) return new MemBuilder().build(p, db);
 
@@ -257,14 +255,12 @@ public final class Create extends Proc {
    */
   private void buildIndex(final IndexToken.TYPE i, final Data d)
       throws IOException {
+
     switch(i) {
-      case TXT: buildIndex(i,
-          new ValueBuilder(true), d, Prop.allInfo ? CREATETEXT : null);  break;
-      case ATV: buildIndex(i,
-          new ValueBuilder(false), d, Prop.allInfo ? CREATEATTR : null); break;
-      case FTX: buildIndex(i,
-          d.meta.ftfuzzy ? new FZBuilder() : new FTBuilder(), d,
-              Prop.allInfo ? CREATEFT : null); break;
+      case TXT: buildIndex(i, new ValueBuilder(true), d);  break;
+      case ATV: buildIndex(i, new ValueBuilder(false), d); break;
+      case FTX: buildIndex(i, d.meta.ftfuzzy ?
+          new FZBuilder() : new FTBuilder(), d); break;
       default: break;
     }
   }
@@ -274,16 +270,18 @@ public final class Create extends Proc {
    * @param index index to be built.
    * @param builder builder instance
    * @param data data reference
-   * @param inf info string
    * @throws IOException I/O exception
    */
   private void buildIndex(final IndexToken.TYPE index, final IndexBuilder
-      builder, final Data data, final String inf) throws IOException {
+      builder, final Data data) throws IOException {
 
     final Performance pp = new Performance();
     progress((Progress) builder);
     data.closeIndex(index);
     data.openIndex(index, builder.build(data));
-    if(inf != null) info(inf + NL, pp.getTimer());
+
+    if(Prop.debug) {
+      BaseX.err("% Index: % (%)\n", index, pp.getTimer(), Performance.getMem());
+    }
   }
 }

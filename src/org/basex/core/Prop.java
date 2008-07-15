@@ -91,6 +91,8 @@ public final class Prop {
   public static boolean ftindex = false;
   /** Flag for compressing ft-values on disk. */
   public static boolean fcompress = true;
+  /** Flag for compressing ft-values on disk. */
+  public static boolean ftest = false;
   /** Flag for creating a text index. */
   public static boolean textindex = true;
   /** Flag for creating an attribute value index. */

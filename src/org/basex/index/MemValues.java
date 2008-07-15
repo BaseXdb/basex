@@ -13,8 +13,8 @@ import org.basex.util.Token;
  */
 public final class MemValues extends Index {
   /** Initial hash capacity. */
-  private MemValueIndex index = new MemValueIndex();
-  
+  private final MemValueIndex index = new MemValueIndex();
+
   /**
    * Indexes the specified keys and values.
    * @param key key
@@ -42,24 +42,24 @@ public final class MemValues extends Index {
   public byte[] token(final int id) {
     return index.key(id);
   }
-  
+
   @Override
   public IndexIterator ids(final IndexToken ind) {
     return index.ids(ind.text);
   }
-  
+
   @Override
   public int nrIDs(final IndexToken ind) {
-    return index.len(ind.text);
+    return ids(ind).size();
   }
 
   @Override
   public byte[] info() {
     return Token.token("MemValues");
   }
-  
+
   /** MemValue Index. */
-  static class MemValueIndex extends Set {
+  static final class MemValueIndex extends Set {
     /** IDs. */
     int[][] ids = new int[CAP][];
     /** ID array lengths. */
@@ -71,7 +71,7 @@ public final class MemValues extends Index {
      * @param id id value
      * @return index position
      */
-    public int index(final byte[] key, final int id) {
+    int index(final byte[] key, final int id) {
       int i = add(key);
       if(i > 0) {
         ids[i] = new int[] { id };
@@ -84,27 +84,18 @@ public final class MemValues extends Index {
       len[i]++;
       return i;
     }
-    
+
     /**
      * Returns the ids for the specified key.
      * @param key index key
      * @return ids
      */
-    public IndexIterator ids(final byte[] key) {
+    IndexIterator ids(final byte[] key) {
       final int i = id(key);
       return i == 0 ? IndexIterator.EMPTY :
         new IndexArrayIterator(ids[i], len[i]);
     }
-    
-    /**
-     * Returns the ids for the specified key.
-     * @param key index key
-     * @return ids
-     */
-    public int len(final byte[] key) {
-      return len[id(key)];
-    }
-    
+
     @Override
     public void rehash() {
       super.rehash();

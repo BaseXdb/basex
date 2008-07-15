@@ -317,22 +317,19 @@ public final class XQContext extends QueryContext {
    */
   public NodIter coll(final byte[] coll) throws XQException {
     if(coll == null) {
-      if(collName.length != 0)
-        return new NodIter(collect[0].list, collect[0].size);
-      Err.or(COLLDEF);
-    } else {
-      if(contains(coll, '<') || contains(coll, '\\'))
-        Err.or(COLLINV, cut(coll, 20));
-
-      for(int c = 0; c < collName.length; c++) {
-        if(eq(collName[c], coll))
-          return new NodIter(collect[c].list, collect[c].size);
-      }
-      addColl(doc(coll));
-      final int c = collect.length - 1;
-      return new NodIter(collect[c].list, collect[c].size);
+      if(collName.length == 0) Err.or(COLLDEF);
+      return new NodIter(collect[0].list, collect[0].size);
     }
-    return null;
+    
+    if(contains(coll, '<') || contains(coll, '\\'))
+      Err.or(COLLINV, cut(coll, 20));
+
+    int c = -1, cl = collName.length;
+    while(c < cl) {
+      if(++c == cl) addColl(doc(coll));
+      else if(!eq(collName[c], coll)) continue;
+    }
+    return new NodIter(collect[c].list, collect[c].size);
   }
   
   @Override

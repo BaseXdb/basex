@@ -61,10 +61,5 @@ public final class StringList {
    */
   public void sort() {
     Arrays.sort(list, 0, size);
-    /*Arrays.sort(db, new Comparator<String>() {
-      public int compare(final String s1, final String s2) {
-        return s1.compareToIgnoreCase(s2);
-      }
-    });*/
   }
 }

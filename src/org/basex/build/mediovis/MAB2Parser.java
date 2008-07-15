@@ -136,7 +136,6 @@ public final class MAB2Parser extends Parser {
     builder = b;
     builder.startDoc(token(file.name()));
     builder.startElem(LIBRARY, null);
-    builder.endDoc();
 
     // find file offsets of all titles
     final Performance p = new Performance();
@@ -148,7 +147,12 @@ public final class MAB2Parser extends Parser {
       final byte[] par = par(input);
 
       final boolean child = par != null;
-      final MAB2Entry entry = ids.value(ids.add(child ? par : id));
+      final byte[] key = child ? par : id;
+      MAB2Entry entry = ids.get(key);
+      if(entry == null) {
+        entry = new MAB2Entry(key);
+        ids.add(key, entry);
+      }
       if(child) entry.add(pos);
       else entry.pos(pos);
 
@@ -160,8 +164,8 @@ public final class MAB2Parser extends Parser {
     }
 
     if(Prop.debug) {
-      BaseX.err("\nParse Offsets (" + ids.size + "): ");
-      BaseX.err(p.getTimer() + "/" + Performance.getMem());
+      BaseX.err("\nParse Offsets (%): %/%\n", ids.size, p.getTimer(),
+          Performance.getMem());
     }
 
     // create all titles
@@ -185,11 +189,11 @@ public final class MAB2Parser extends Parser {
     }
 
     if(Prop.debug) {
-      BaseX.err("\nCreate Titles: ");
-      BaseX.err(p.getTimer() + "/" + Performance.getMem() + "\n");
+      BaseX.err("\nCreate Titles: %/%\n", p.getTimer(), Performance.getMem());
     }
 
     builder.endElem(LIBRARY);
+    builder.endDoc();
     input.close();
 
     // write the mediovis ids back to disk

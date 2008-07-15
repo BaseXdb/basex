@@ -1,5 +1,8 @@
 package org.basex.util;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 /**
  * This is a simple container for native byte[] values (tokens).
  *
@@ -79,5 +82,16 @@ public final class TokenList {
     }
     sb.append("]");
     return sb.toString();
+  }
+
+  /**
+   * Sorts the strings.
+   */
+  public void sort() {
+    Arrays.sort(list, 0, size, new Comparator<byte[]>() {
+      public int compare(final byte[] s1, final byte[] s2) {
+        return Token.cmp(s1, s2);
+      }
+    });
   }
 }
