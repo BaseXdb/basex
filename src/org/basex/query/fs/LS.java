@@ -3,6 +3,7 @@ package org.basex.query.fs;
 import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.io.PrintOutput;
+import org.basex.util.ByteArrayList;
 import org.basex.util.GetOpts;
 import org.basex.util.IntList;
 import org.basex.util.Token;
@@ -20,13 +21,15 @@ public final class LS extends FSCmd {
   private boolean fListDot;
   /** Prints long version. */
   private boolean fPrintLong;
+  /** Prints long version. */
+  private boolean fSorted;
   /** Specified path. */
   private String path;
 
   @Override
   public void args(final String args) throws FSException {
     // get all Options
-    final GetOpts g = new GetOpts(args, "ahlR", 1);
+    final GetOpts g = new GetOpts(args, "ahlRs", 1);
     while(g.more()) {
       final int ch = checkOpt(g);
       switch (ch) {
@@ -39,6 +42,10 @@ public final class LS extends FSCmd {
         case 'R':
           fRecursive = true;
           break;
+        case 's':
+          fSorted = true;
+          break;  
+
       }
     }
     path = g.getPath();
@@ -67,7 +74,7 @@ public final class LS extends FSCmd {
    * @throws IOException in case of problems with the PrintOutput
    */
   private void lsRecursive(final int pre, final PrintOutput out)
-      throws IOException {
+  throws IOException {
 
     final int[] contentDir = FSUtils.getChildren(data, pre);
     final int[] allDir = print(contentDir, out);
@@ -92,23 +99,41 @@ public final class LS extends FSCmd {
    * @return list of directories found
    */
   private int[] print(final int[] result, final PrintOutput out)
-      throws IOException {
-    
+  throws IOException {
+
+    ByteArrayList b = new ByteArrayList();
+
+
     final IntList allDir = new IntList();
     for(final int j : result) {
       if(FSUtils.isDir(data, j)) allDir.add(j);
       final byte[] name = FSUtils.getName(data, j);
       // do not print files starting with .
       if(!fListDot && Token.startsWith(name, '.')) continue;
-      
+
+      if(fSorted)
+        b.add(name);
+
       if(fPrintLong) {
+        if(fSorted) error("", 102);
+        
         final long size = FSUtils.getSize(data, j);
         final byte[] time = FSUtils.getMtime(data, j);
         final char file = FSUtils.isFile(data, j) ? 'f' : 'd';
         out.println(String.format("%-3s %-30s %10s %20s", file,
             Token.string(name), size, Token.string(time)));
       } else {
-        out.print(name);
+        if(!fSorted) {
+          out.print(name);
+          out.print("\t");
+        }
+      }
+    }
+    if(fSorted) {
+      b.sort(false, false);
+      byte[][] content = b.finish();
+      for(byte[] el : content) {
+        out.print(el);
         out.print("\t");
       }
     }

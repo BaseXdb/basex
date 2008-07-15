@@ -38,8 +38,7 @@ public final class TOUCH extends FSCmd {
     if(preFound.length > 0) {
       for(final int i : preFound) {
         if(FSUtils.isFile(context.data(), i)) {
-          FSUtils.update(context.data(), null, null, null,
-              FSUtils.currTime(), i);
+          FSUtils.setMtime(data, i, FSUtils.currTime());
         }
       }
     } else {

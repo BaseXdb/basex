@@ -99,9 +99,12 @@ public final class CP extends FSCmd {
                   target[0], preOfNewFile);
             } else {
               // file exists - override
-              FSUtils.update(data, FSUtils.getName(data, target[0]),
-                  FSUtils.getSuffix(data, target[0]),
-                  size, mtime, target[0]);
+              //FSUtils.setName(data, target[0], 
+              //  FSUtils.getName(data, target[0]));
+              //FSUtils.setSuffix(data, target[0],  
+              //  FSUtils.getSuffix(data, target[0]));
+              FSUtils.setSize(data, target[0], size);
+              FSUtils.setMtime(data, target[0], mtime);              
             }
           } else {
             // create new file and insert into current dir

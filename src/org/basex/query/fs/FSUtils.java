@@ -125,6 +125,20 @@ public final class FSUtils {
   public static byte[] getName(final Data data, final int pre) {
     return getAttr(data, pre, data.nameID);
   }
+  
+  /**
+   * Sets the name of a file.
+   * @param data data reference
+   * @param pre pre value
+   * @param name to set
+   */
+  public static void setName(final Data data, final int pre,
+      final byte[] name) {
+    data.update(pre + 1, NAME, name);
+    data.flush();
+  }
+  
+  
   /**
    * Returns the size of a file.
    * @param data data reference
@@ -135,9 +149,21 @@ public final class FSUtils {
     return toLong(getAttr(data, pre, data.sizeID));
   }
 
+  /**
+   * Sets the size of a file.
+   * @param data data reference
+   * @param pre pre value
+   * @param size to set
+   */
+  public static void setSize(final Data data, final int pre,
+      final byte[] size) {
+    data.update(pre + 3, SIZE, size);
+    data.flush();
+  }
+  
 
   /**
-   * Returns the name of a file.
+   * Returns the Mtime of a file.
    * @param data data reference
    * @param pre pre value
    * @return file name.
@@ -147,6 +173,18 @@ public final class FSUtils {
   }
 
   /**
+   * Sets the Mtime of a file.
+   * @param data data reference
+   * @param pre pre value
+   * @param mtime to set
+   */
+  public static void setMtime(final Data data, final int pre,
+      final byte[] mtime) {
+    data.update(pre + 4, MTIME, mtime);
+    data.flush();
+  }
+  
+  /**
    * Returns the suffix of a file.
    * @param data data reference
    * @param pre pre value
@@ -154,6 +192,18 @@ public final class FSUtils {
    */
   public static byte[] getSuffix(final Data data, final int pre) {
     return getAttr(data, pre, data.suffixID);
+  }
+  
+  /**
+   * Sets the suffix of a file.
+   * @param data data reference
+   * @param pre pre value
+   * @param suffix to set
+   */
+  public static void setSuffix(final Data data, final int pre,
+      final byte[] suffix) {
+    data.update(pre + 2, SUFFIX, suffix);
+    data.flush();
   }
 
   /**
@@ -359,28 +409,7 @@ public final class FSUtils {
     data.insert(pre + 4, pre, MTIME, mtime);
     data.flush();
   }
-
-  /**
-   * Updates an entry of the table.
-   *
-   * @param data - the data table
-   * @param name - filename
-   * @param suffix - suffix of the file
-   * @param size - size of the file
-   * @param mtime - make time
-   * @param pre - position to insert
-   */
-  public static void update(final Data data, final byte[] name,
-      final byte[] suffix, final byte[] size, final byte[] mtime,
-      final int pre) {
-
-    if(name != null)   data.update(pre + 1, NAME, name);
-    if(suffix != null) data.update(pre + 2, SUFFIX, suffix);
-    if(size != null)   data.update(pre + 3, SIZE, size);
-    if(mtime != null)  data.update(pre + 4, MTIME, mtime);
-    data.flush();
-  }
-
+  
   /**
    * Deletes an entry of the table.
    *

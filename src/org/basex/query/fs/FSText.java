@@ -81,7 +81,8 @@ public interface FSText {
     "-a     Include directory entries whose names begin with a dot (`.').\n" +
     "     -h     Print this page\n" +
     "     -l     List files in the long format.\n" +
-    "     -R     Recursively list subdirectories encountered.\n\n\n";
+    "     -R     Recursively list subdirectories encountered.\n" +
+    "     -s     Sort the Output (Long format is not working yet).\n\n\n";
   /** Help text. */
   String FSMKDIR = "MKDIR(1)" + FSMAN + "MKDIR(1))\n\n" +
     "    NAME\n      mkdir -- make directories)\n\n    SYNOPSIS\n" +
@@ -137,6 +138,6 @@ public interface FSText {
       {  "99", "Inappropriate file type or format." },
       { "100", "Missing argument." },
       { "101", "Omitting directory" },
-      { "102", "Invalid option" }
+      { "102", "Invalid option" }      
   };
 }
