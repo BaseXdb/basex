@@ -31,7 +31,7 @@ public final class RangeAccess extends InternalExpr {
   public NodeSet eval(final XPContext ctx) {
     final IndexIterator it = ctx.local.data.ids(ind);
     final int[] ids = new int[it.size()];
-    for(int i = 0; it.more(); i++) ids[i] = it.next();
+    for(int i = 0; i < ids.length; i++) ids[i] = it.next();
     ctx.local = new NodeSet(ids, ctx);
     return ctx.local;
   }

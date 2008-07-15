@@ -8,9 +8,7 @@ import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataAccessPerf;
 import org.basex.query.xpath.expr.FTUnion;
-import org.basex.util.Array;
 import org.basex.util.FTTokenizer;
-import org.basex.util.IntList;
 import org.basex.util.Levenshtein;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -190,54 +188,20 @@ public final class Fuzzy extends Index {
   }
 
   /**
-   * Reads the ftdata from disk.
-   * @param p pointer of ftdata
-   * @param s size of pre values
+   * Creates an index iterator for all pre/pos values.
+   * @param p pointer of pre/pos data
+   * @param s number of pre values
    * @return iterator
    */
   private IndexIterator getData(final long p, final int s) {
-    final boolean cmp = data.meta.fcompress;
-    final int[][] d = {
-        cmp ? dat.readNums(p, s) : dat.readInts(p, p + s * 4L),
-        cmp ? dat.readNums(s) : dat.readInts(p + s * 4L, p + 2 * s * 4L)
-    };
-
-    return new IndexIterator() {
-      /** Counter. */
-      private int c = -1;
-      /** Pre value flag. */
-      private boolean pre;
-
-      @Override
-      public boolean more() {
-        return ++c < s;
-      }
-      @Override
-      public int next() {
-        return d[(pre ^= true) ? 0 : 1][c];
-      }
-      @Override
-      public int size() {
-        return s;
-      }
-    };
-  }
-
-  /*
-  private IndexIterator getData(final long p, final int s) {
     dat.cursor(p);
     return new IndexIterator() {
-      /* Counter.
-      private int c = -1;
-      @Override
-      public boolean more() { return ++c < s; }
       @Override
       public int next() { return dat.readNum(); }
       @Override
       public int size() { return s; }
     };
   }
-  */
 
   /**
    * Caches the iterator values and returns an int array (temporary).
@@ -245,13 +209,12 @@ public final class Fuzzy extends Index {
    * @return array
    */
   private int[][] finish(final IndexIterator it) {
-    final IntList pre = new IntList();
-    final IntList pos = new IntList();
-    while(it.more()) {
-      pre.add(it.next());
-      pos.add(it.next());
-    }
-    return new int[][] { pre.finish(), pos.finish() };
+    final int s = it.size();
+    final int[] pre = new int[s];
+    final int[] pos = new int[s];
+    for(int i = 0; i < s; i++) pre[i] = it.next();
+    for(int i = 0; i < s; i++) pos[i] = it.next();
+    return new int[][] { pre, pos };
   }
 
   /**
@@ -266,21 +229,16 @@ public final class Fuzzy extends Index {
     int[][] ft = null;
     byte[] to;
 
-    int dif;
-
     int i = 0;
     final int is = li.readBytes(0, 1L)[0];
     int ts = li.readBytes(1L, 2L)[0];
 
-    dif = (tok.length - ts < 0) ?
-        ts - tok.length : tok.length - ts;
+    int dif = Math.abs(tok.length - ts);
     while (i < is && dif > e) {
       i++;
       ts = li.readBytes(1L + i * 5L, 1L + i * 5L + 1L)[0];
-      dif = (tok.length - ts < 0) ?
-          ts - tok.length : tok.length - ts;
+      dif = Math.abs(tok.length - ts);
     }
-
     if (i == is) return null;
 
     int p;
@@ -301,10 +259,9 @@ public final class Fuzzy extends Index {
      }
       i++;
       ts = li.readBytes(1L + i * 5L, 1L + i * 5L + 1L)[0];
-      dif = (tok.length - ts < 0) ?
-          ts - tok.length : tok.length - ts;
+      dif = Math.abs(tok.length - ts);
     }
-    return new IndexArrayIterator(ft[0], ft[1]);
+    return new IndexArrayIterator(ft);
   }
 
   /**
@@ -314,7 +271,7 @@ public final class Fuzzy extends Index {
    */
   private IndexIterator get(final byte[] tok) {
     final long p = getPointerOnToken(tok);
-    if (p == -1) return IndexIterator.EMPTY;
+    if(p == -1) return IndexIterator.EMPTY;
     return getData(getPointerOnData(p, tok.length), getDataSize(p, tok.length));
   }
 
@@ -341,9 +298,6 @@ public final class Fuzzy extends Index {
     if(!ft.cs) return ii;
 
     // case sensitive search
-    if(!ii.more()) return ii;
-
-    // cache iterator results (temporary...)
     final int[][] ids = finish(ii);
     int c = 0;
 
@@ -371,8 +325,7 @@ public final class Fuzzy extends Index {
         i++;
       }
     }
-    return new IndexArrayIterator(
-        Array.finish(ids[0], c), Array.finish(ids[1], c));
+    return new IndexArrayIterator(ids, c);
   }
 
   @Override
@@ -432,19 +385,17 @@ public final class Fuzzy extends Index {
           if (b[1] == null) break; //return data;
         }
         dtok = ti.readBytes(b[0][1], b[0][0] + b[0][1]);
-        //System.out.println(new String(dtok));
         if (contains(tok, posw, dtok)) dt = FTUnion.calculateFTOr(dt,
             finish(getData(getPointerOnData(b[0][1], b[0][0]),
                 getDataSize(b[0][1], b[0][0]))));
-        // b[0][1] += b[0][0] * 1L + 8L;
         b[0][1] += b[0][0] * 1L + 9L;
-        //}
       }
       dtok = ti.readBytes(b[0][1], b[0][0] + b[0][1]);
       if (contains(tok, posw, dtok)) dt = FTUnion.calculateFTOr(dt,
           finish(getData(getPointerOnData(b[0][1], b[0][0]),
               getDataSize(b[0][1], b[0][0]))));
-      return new IndexArrayIterator(dt[0], dt[1]);
+
+      return new IndexArrayIterator(dt);
     }
 
     BaseX.debug("Sorry, FuzzyIndex supports only \'.*\' as wildcard.");

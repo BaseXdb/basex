@@ -66,26 +66,13 @@ public final class Values extends Index {
     if(pos == 0) return IndexIterator.EMPTY;
     
     final int ds = idxl.readNum(pos);
-
     return new IndexIterator() {
-      /** Counter. */
-      int d = -1;
       /** Last pre value. */
       int p = 0;
-
       @Override
-      public boolean more() {
-        return ++d < ds;
-      }
+      public int next() { return p += idxl.readNum(); }
       @Override
-      public int next() {
-        p += idxl.readNum();
-        return p;
-      }
-      @Override
-      public int size() {
-        return ds;
-      }
+      public int size() { return ds; }
     };
   }
 

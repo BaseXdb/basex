@@ -106,7 +106,8 @@ public abstract class View extends BaseXPanel {
     if(focused == pre) return;
     focused = pre;
     for(final View v : view) if(v != vw && v.isValid()) v.refreshFocus();
-    GUI.get().status.setPath(ViewData.path(GUI.context.data(), pre));
+    if(pre != -1) GUI.get().status.setPath(
+        ViewData.path(GUI.context.data(), pre));
   }
 
   /**

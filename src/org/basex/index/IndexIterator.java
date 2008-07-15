@@ -10,18 +10,10 @@ public abstract class IndexIterator {
   /** Empty iterator. */
   public static final IndexIterator EMPTY = new IndexIterator() {
     @Override
-    public boolean more() { return false; }
-    @Override
     public int next() { return 0; };
     @Override
     public int size() { return 0; };
   };
-  
-  /**
-   * Checks if more results can be expected.
-   * @return result of check
-   */
-  public abstract boolean more();
 
   /**
    * Returns the next result.

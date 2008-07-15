@@ -87,10 +87,14 @@ public final class FTIndex extends FTArrayExpr {
     while(ft.more()) {
       final IndexIterator it = data.ids(ft);
       final IntList pre2 = new IntList();
-      final IntList pos2 = new IntList();
-      while(it.more()) {
+      int s = it.size();
+      for(int i = 0; i < s; i++) {
         ctx.checkStop();
         pre2.add(it.next());
+      }
+      final IntList pos2 = new IntList();
+      for(int i = 0; i < s; i++) {
+        ctx.checkStop();
         pos2.add(it.next());
       }
       if(pre == null) {

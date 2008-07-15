@@ -74,10 +74,7 @@ public final class WordsCTANew extends Index {
   
   @Override
   public int nrIDs(final IndexToken ind) {
-    final IndexIterator ii  = ids(ind);
-    int c = 0;
-    while(ii.more()) c++;
-    return c;
+    return ids(ind).size();
   }
 
   @Override
@@ -90,14 +87,14 @@ public final class WordsCTANew extends Index {
       int k = Prop.lserr;
       if(k == 0) k = Math.max(1, tok.length >> 2);
       final int[][] ids = getNodeFuzzy(0, null, -1, tok, 0, 0, 0, k);
-      return new IndexArrayIterator(ids[0], ids[1]);
+      return new IndexArrayIterator(ids);
     }
 
     if(ft.wc) {
       final int pw = Token.indexOf(tok, '.');
       if(pw != -1) {
         final int[][] ids = getNodeFromTrieWithWildCard(tok, pw);
-        return new IndexArrayIterator(ids[0], ids[1]);
+        return new IndexArrayIterator(ids);
       }
     }
     
@@ -144,17 +141,11 @@ public final class WordsCTANew extends Index {
           i++;
         }
       }
-
-      if(count == 0) return null;
-
-      final int[][] tmp = new int[2][count];
-      System.arraycopy(rIds[0], 0, tmp[0], 0, count);
-      System.arraycopy(rIds[1], 0, tmp[1], 0, count);
-      return new IndexArrayIterator(tmp[0], tmp[1]);
+      return new IndexArrayIterator(rIds, count);
     }
     
     final int[][] tmp = getNodeFromTrieRecursive(0, tok, ft.cs);
-    return new IndexArrayIterator(tmp[0], tmp[1]);
+    return new IndexArrayIterator(tmp);
   }
   
   /**
@@ -272,8 +263,8 @@ public final class WordsCTANew extends Index {
     int id;
     id = getNodeIdsForRQ(0, tokFrom, c, idNNF);
     c = 0;
-    // start travesing with id of tokFrom
-    // reduce minimul level, every following node has to be chacked 
+    // start traversing with id of tokFrom
+    // reduce minimal level, every following node has to be checked 
     // with same or bigger length than tokFrom
     if (id > -1) {
       ne = getNodeEntry(id);
@@ -463,7 +454,7 @@ public final class WordsCTANew extends Index {
     }
   }
   /**
-   * Traverse case sentsitive trie and search case sensitive.
+   * Traverse case sensitive trie and search case sensitive.
    * Returns data from node or null.
    *
    * @param cn int
@@ -522,8 +513,8 @@ public final class WordsCTANew extends Index {
 
   /**
    * Parses the trie and backups each passed node its first/next child node 
-   * in idNN. If searchNode is contained, the corresponding nodeid is 
-   * retruned, else - 1.
+   * in idNN. If searchNode is contained, the corresponding node id is 
+   * returned, else - 1.
    *
    * @param cn int current node
    * @param searchNode search nodes value
@@ -600,10 +591,10 @@ public final class WordsCTANew extends Index {
   
   /**
    * Parses the trie and backups each passed node that has a value
-   * wihtin the range of lb and ub.
+   * within the range of lb and ub.
    *
    * @param id int current node
-   * @param v appened value for the current node, starting from root
+   * @param v appended value for the current node, starting from root
    * @param ub upper bound of the range
    * @param ubid index of dot in ub
    * @param lb lower bound of the range
@@ -761,7 +752,7 @@ public final class WordsCTANew extends Index {
    * @param vid index of dot in v 
    * @param lb lower bound of a range
    * @param lbid of dot in lb
-   * @return boolean result of constraintcheck
+   * @return boolean result of constraint check
    */
   private boolean checkLBConstrain(final int[] v, final int vid,
       final int[] lb, final int lbid) {
@@ -836,7 +827,7 @@ public final class WordsCTANew extends Index {
    * @param vid index of dot in v
    * @param ub upper bound of a range
    * @param ubid index of dot in ub
-   * @return boolean result of constraintcheck
+   * @return boolean result of constraint check
    */
   private boolean checkUBConstrainDbl(final int[] v, final int vid, 
       final  int[] ub, final int ubid) {
@@ -853,13 +844,12 @@ public final class WordsCTANew extends Index {
     return ub.length >= v.length;
   }
 
-  
   /**
    * Collects and returns all data found at nodes in the range of cn and b.
    * 
    * @param cn id on nodeArray, current node
    * @param b id on nodeArray, lastNode to check (upper bound of range)
-   * @param dt data found in trie in earlier recursionsteps
+   * @param dt data found in trie in earlier recursion steps
    * @return int[][] idpos
    */
   private int [][] getAllNodes(final int cn, final int b, final int[][] dt) {
@@ -1022,7 +1012,6 @@ public final class WordsCTANew extends Index {
    * @param toInsert value to be inserted
    * @return inserting position
    */
-
   private int getInsPosLinCSF(final int[] cne,
       final int toInsert) {
     found = false;
@@ -1051,15 +1040,12 @@ public final class WordsCTANew extends Index {
     return i;
   }
 
-  
-  
-  
-  /**
+  /*
    * Uses linear search for finding inserting positions in a 
-   * casesensitive trie.
+   * case sensitive trie.
    * returns:
    * null if any successor exists, 
-   * an int[1] if one successor exists and an int[2] if 2 succsessors exists
+   * an int[1] if one successor exists and an int[2] if 2 successors exists
    * n if nth item is occupied
    *
    * @param cne current node entry
@@ -1082,11 +1068,10 @@ public final class WordsCTANew extends Index {
     if (r > -1) return new int[]{r};
     
     return null;
-
   }
    */
   
-  /**
+  /*
    * Uses linear search for finding inserting position.
    * returns:
    * 0 if any successor exists, or 0 is inserting position
@@ -1096,8 +1081,6 @@ public final class WordsCTANew extends Index {
    * @param cne current node entry
    * @param toin value to be inserted
    * @return inserting position
-   */
-/*
   private int getInsertingPositionBinary(final int[] cne, final int toin) {
     found = false;
     int l = cne[0] + 1;
@@ -1120,9 +1103,7 @@ public final class WordsCTANew extends Index {
     }
     return l;
   }
-*/
-  
-  
+   */
   
   /** saves astericsWildCardTraversing result
   has to be re-init each time (before calling method). */
@@ -1132,21 +1113,21 @@ public final class WordsCTANew extends Index {
   private int countSkippedChars;
 
   /**
-  * Looking up node with value, which match ending.
-  * The parameter lastFound shows, whether chars were found in last recursive
-  * call, which correspond to the ending, consequently those chars are
-  * considered, which occur successive in ending.
-  * pointerNode shows the position comparison between value[nodeId] and
-  * ending starts
-  * pointerEnding shows the position comparison between ending and
-  * value[nodeId] starts
-  *
-  * @param node id on node
-  * @param ending ending of value
-  * @param lastFound boolean if value was found in last run
-  * @param pointerNode pointer on current node
-  * @param pointerEnding pointer on value ending
-  */
+   * Looking up node with value, which match ending.
+   * The parameter lastFound shows, whether chars were found in last recursive
+   * call, which correspond to the ending, consequently those chars are
+   * considered, which occur successive in ending.
+   * pointerNode shows the position comparison between value[nodeId] and
+   * ending starts
+   * pointerEnding shows the position comparison between ending and
+   * value[nodeId] starts
+   *
+   * @param node id on node
+   * @param ending ending of value
+   * @param lastFound boolean if value was found in last run
+   * @param pointerNode pointer on current node
+   * @param pointerEnding pointer on value ending
+   */
   private void astericsWildCardTraversing(final int node, final byte[] ending,
     final boolean lastFound, final int pointerNode, final int pointerEnding) {
 
@@ -1283,12 +1264,12 @@ public final class WordsCTANew extends Index {
   private int[] counter;
 
   /**
-   * Method for wildcars search in trie.
+   * Method for wildcards search in trie.
    *
    * getNodeFromTrieWithWildCard(char[] valueSearchNode, int pos) is called
    * getNodeFromTrieWithWildCard(FTIndexCTNode currentCompressedTrieNode,
    *    char[] valueSearchNode, int posWildcard)
-   * executes the wildcardsearch and works on trie via
+   * executes the wildcard search and works on trie via
    * getNodeFromTrieRecursiveWildcard(FTIndexCTNode currentCompressedTrieNode,
    *    byte[] valueSearchNode)
    * calls
