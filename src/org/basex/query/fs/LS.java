@@ -45,7 +45,6 @@ public final class LS extends FSCmd {
         case 's':
           fSorted = true;
           break;  
-
       }
     }
     path = g.getPath();
@@ -99,10 +98,9 @@ public final class LS extends FSCmd {
    * @return list of directories found
    */
   private int[] print(final int[] result, final PrintOutput out)
-  throws IOException {
+    throws IOException {
 
     TokenList b = new TokenList();
-
 
     final IntList allDir = new IntList();
     for(final int j : result) {
@@ -130,9 +128,8 @@ public final class LS extends FSCmd {
       }
     }
     if(fSorted) {
-      b.sort();
-      byte[][] content = b.finish();
-      for(byte[] el : content) {
+      b.sort(true);
+      for(final byte[] el : b.finish()) {
         out.print(el);
         out.print("\t");
       }

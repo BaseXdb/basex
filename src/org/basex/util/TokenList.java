@@ -2,6 +2,7 @@ package org.basex.util;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import static org.basex.util.Token.*;
 
 /**
  * This is a simple container for native byte[] values (tokens).
@@ -55,7 +56,7 @@ public final class TokenList {
    * @return true if value is found
    */
   public boolean contains(final byte[] v) {
-    for(int i = 0; i < size; i++) if(Token.eq(list[i], v)) return true;
+    for(int i = 0; i < size; i++) if(eq(list[i], v)) return true;
     return false;
   }
 
@@ -78,7 +79,7 @@ public final class TokenList {
   public String toString() {
     final StringBuilder sb = new StringBuilder("TokenList[");
     for(int i = 0; i < size; i++) {
-      sb.append((i == 0 ? "" : ", ") + Token.string(list[i]));
+      sb.append((i == 0 ? "" : ", ") + string(list[i]));
     }
     sb.append("]");
     return sb.toString();
@@ -86,11 +87,12 @@ public final class TokenList {
 
   /**
    * Sorts the strings.
+   * @param cs respect case sensitivity
    */
-  public void sort() {
+  public void sort(final boolean cs) {
     Arrays.sort(list, 0, size, new Comparator<byte[]>() {
       public int compare(final byte[] s1, final byte[] s2) {
-        return Token.cmp(s1, s2);
+        return cs ? diff(s1, s2) : diff(lc(s1), lc(s2));
       }
     });
   }
