@@ -27,9 +27,12 @@ public final class Prop {
   public static final String WORK = System.getProperty("user.dir") + "/";
   /** User's home directory. */
   public static final String HOME = System.getProperty("user.home");
+  /** OS Flag (should be ignored whenever possible). */
+  public static final String OS = System.getProperty("os.name");
   /** Flag denoting if OS belongs to UNIX or Windows family. */
-  public static final boolean UNIX =
-    System.getProperty("os.name").charAt(0) != 'W';
+  public static final boolean UNIX = OS.charAt(0) != 'W';
+  /** Flag denoting if OS belongs to UNIX or Windows family. */
+  public static final boolean MAC = OS.charAt(0) == 'M';
   /** New line string. */
   public static final String NL = System.getProperty("line.separator");
 

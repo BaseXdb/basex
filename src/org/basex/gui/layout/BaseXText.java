@@ -19,6 +19,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 import org.basex.BaseX;
+import org.basex.core.Prop;
 import org.basex.gui.GUI;
 import org.basex.gui.GUICommand;
 import org.basex.gui.GUIConstants;
@@ -319,6 +320,7 @@ public final class BaseXText extends BaseXPanel {
   @Override
   public void keyPressed(final KeyEvent e) {
     final int c = e.getKeyCode();
+    
     if(e.isAltDown() || e.isMetaDown() || c == KeyEvent.VK_SHIFT ||
         c == KeyEvent.VK_CONTROL || c == KeyEvent.VK_ESCAPE) return;
 
@@ -479,11 +481,12 @@ public final class BaseXText extends BaseXPanel {
     final byte[] txt = text.text;
     boolean down = true;
 
-    final boolean ctrl = e.isControlDown();
-    //if(e.isAltDown() || e.isMetaDown() || e.isActionKey() ||
-    if(e.isMetaDown() || e.isActionKey() || ch == KeyEvent.VK_ESCAPE) return;
+    // not nice here.. no alternative, though
+    if(!Prop.MAC && e.isAltDown() || e.isMetaDown() || e.isActionKey() ||
+      ch == KeyEvent.VK_ESCAPE) return;
 
     text.pos(text.cursor());
+    final boolean ctrl = e.isControlDown();
     if(ch == KeyEvent.VK_BACK_SPACE) {
       if(text.start() == -1) {
         if(text.pos() == 0) return;
