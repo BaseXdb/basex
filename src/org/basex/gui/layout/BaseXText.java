@@ -480,8 +480,8 @@ public final class BaseXText extends BaseXPanel {
     boolean down = true;
 
     final boolean ctrl = e.isControlDown();
-    if(e.isAltDown() || e.isMetaDown() || e.isActionKey() ||
-        ch == KeyEvent.VK_ESCAPE) return;
+    //if(e.isAltDown() || e.isMetaDown() || e.isActionKey() ||
+    if(e.isMetaDown() || e.isActionKey() || ch == KeyEvent.VK_ESCAPE) return;
 
     text.pos(text.cursor());
     if(ch == KeyEvent.VK_BACK_SPACE) {
