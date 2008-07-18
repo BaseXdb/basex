@@ -32,6 +32,8 @@ public final class MAB2Parser extends Parser {
   private final TokenMap subjects = new TokenMap();
   /** Media type assignments. */
   private final TokenMap mediatypes = new TokenMap();
+  /** Language assignments. */
+  private final TokenMap languages = new TokenMap();
   /** MedioVis ID assignments. */
   private final TokenMap mvids = new TokenMap();
   /** Image assignments. */
@@ -111,6 +113,7 @@ public final class MAB2Parser extends Parser {
     final String dir = f.getAbsoluteFile().getParent();
     index(mediatypes, dir + "/mediatypes.dat");
     index(subjects, dir + "/subjects.dat");
+    index(languages, dir + "/lang.dat");
     index(mvids, dir + "/mvids.dat");
     index(posters, dir + "/posters.dat");
     index(genres, dir + "/genres.dat");
@@ -346,7 +349,7 @@ public final class MAB2Parser extends Parser {
           }
         } else if(n == 29) {
           type = mediatypes.get(num(line));
-        } else if(n == 37) {
+        } else if(n == 37 && language == null) {
           language = language(line);
         } else if(n == 81) {
           title = string(line);
@@ -509,10 +512,16 @@ public final class MAB2Parser extends Parser {
    * @param token token to be corrected
    * @return corrected characters
    */
-  private static byte[] language(final byte[] token) {
+  private byte[] language(final byte[] token) {
     final byte[] t = string(token);
-    for(int i = 0; i < t.length; i++) if(t[i] == '?') t[i] = '+';
-    return t;
+    for(int i = 0; i < t.length; i++) if(t[i] == '?' || t[i] == '$') t[i] = '+';
+    TokenBuilder tb = new TokenBuilder();
+    for(byte[] lang : split(t, '+')) {
+      final byte[] l = languages.get(lang);
+      if(tb.size != 0) tb.add('+');
+      tb.add(l != null ? l : t);
+    }
+    return tb.finish();
   }
 
   /**
@@ -562,15 +571,7 @@ public final class MAB2Parser extends Parser {
    * @return byte array
    */
   private static byte[] merge(final byte[] text1, final byte[] text2) {
-    if(text1 == null) return text2;
-    final int t1 = text1.length;
-    final int t2 = text2.length;
-    final byte[] n = new byte[t1 + t2 + 2];
-    Array.copy(text1, n, 0);
-    n[t1] = '.';
-    n[t1 + 1] = ' ';
-    Array.copy(text2, n, t1 + 2);
-    return n;
+    return text1 == null ? text2 : concat(text1, token(". "), text2);
   }
 
   @Override
