@@ -37,8 +37,9 @@ public final class Drop extends Proc {
     // close database if it's open
     final String db = cmd.arg(1);
     final Data data = context.data();
-    if(data != null && data.meta.dbname.equals(db))
+    if(data != null && data.meta.dbname.equals(db)) {
       execute(context, Commands.CLOSE);
+    }
 
     if(!IO.dbpath(db).exists()) return error(DBNOTFOUND, db);
     return drop(db) ? info(DBDROPPED) : error(DBNOTDROPPED);

@@ -495,7 +495,7 @@ public final class TreeView extends View {
     }
     
     if(key == KeyEvent.VK_DOWN) {
-      focus = Math.min(data.size, focus + 1);
+      focus = Math.min(data.size - 1, focus + 1);
     } else if(key == KeyEvent.VK_UP) {
       focus = Math.max(0, focus - 1);
     } else if(key == KeyEvent.VK_PAGE_DOWN) {

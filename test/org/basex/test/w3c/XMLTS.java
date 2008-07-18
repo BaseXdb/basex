@@ -86,7 +86,7 @@ public final class XMLTS {
       final boolean valid = text("@TYPE", srcRoot).equals("valid");
 
       Prop.intparse = true;
-      Proc proc = Proc.get(ctx, Commands.CREATEXML, PATH + uri);
+      Proc proc = Proc.get(ctx, Commands.CREATEDB, PATH + uri);
       final boolean success = proc.execute();
       final boolean correct = valid == success;
 
@@ -98,7 +98,7 @@ public final class XMLTS {
           if(inf.length() != 0) BaseX.outln("[BASEX ] " + inf);
           Prop.intparse = false;
           Proc.execute(ctx, Commands.CLOSE);
-          proc = Proc.get(ctx, Commands.CREATEXML, PATH + uri);
+          proc = Proc.get(ctx, Commands.CREATEDB, PATH + uri);
           proc.execute();
           inf = proc.info();
           if(inf.length() != 0) BaseX.outln("[XERCES] " + inf);

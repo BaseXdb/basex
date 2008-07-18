@@ -35,7 +35,7 @@ public final class ASTTest {
     Prop.read();
     Prop.chop = true;
 
-    final Proc proc = Proc.get(CONTEXT, Commands.CREATEXML, TEST_FILE);
+    final Proc proc = Proc.get(CONTEXT, Commands.CREATEDB, TEST_FILE);
     if(!proc.execute()) throw new Exception(proc.info());
   }
 

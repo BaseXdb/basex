@@ -219,7 +219,7 @@ public abstract class Serializer {
     } else if(kind == Data.ATTR) {
       attribute(data.attName(p), data.attValue(p++));
     } else if(kind == Data.DOC) {
-      p = elem(data, p + 1);
+      p = elem(data, p);
     } else if(kind == Data.COMM) {
       comment(data.text(p++));
     } else if(kind == Data.PI) {
@@ -233,50 +233,44 @@ public abstract class Serializer {
   /**
    * Writes the specified node and all its sub nodes.
    * @param data data reference
-   * @param pre pre value to be written
+   * @param pr pre value to be written
    * @return last pre value
    * @throws Exception exception
    */
-  public final int elem(final Data data, final int pre) throws Exception {
+  public final int elem(final Data data, final int pr) throws Exception {
     // stacks
     final int[] parent = new int[256];
     final byte[][] token = new byte[256][];
     // current output level
     int l = 0;
 
-    // get root node and size value
-    final int root = pre;
-    final int s = pre + data.size(pre, data.kind(pre));
-
-    int p = pre;
+    // loop through all table entries
+    int p = pr;
+    final int s = pr + data.size(pr, data.kind(pr));
     while(p < s) {
-      if(finished()) return p;
+      if(finished()) return s;
 
-      final int kind = data.kind(p);
-      final int par = data.parent(p, kind);
-      // skip writing if all sub nodes were processed
-      if(p > root && par < root) break;
-      
+      final int k = data.kind(p);
+      final int pa = data.parent(p, k);
       // close opened tags...
-      while(l > 0) {
-        if(parent[l - 1] < par) break;
-        closeElement(token[--l]);
-      }
+      while(l > 0 && parent[l - 1] >= pa) closeElement(token[--l]);
 
-      if(kind == Data.TEXT) {
+      if(k == Data.DOC) {
+        p++;
+      } else if(k == Data.TEXT) {
         text(data.text(p++));
-      } else if(kind == Data.COMM) {
+      } else if(k == Data.COMM) {
         comment(data.text(p++));
-      } else if(kind == Data.PI) {
+      } else if(k == Data.PI) {
         pi(data.text(p++));
       } else {
         // add element node
-        final byte[] tok = data.tag(p);
+        final byte[] name = data.tag(p);
+        startElement(name);
 
         // add element attributes
-        final int ps = p + data.size(p, kind);
-        final int as = p + data.attSize(p, kind);
-        startElement(tok);
+        final int ps = p + data.size(p, k);
+        final int as = p + data.attSize(p, k);
         while(++p != as) attribute(data.attName(p), data.attValue(p));
 
         // check if this is an empty tag
@@ -284,8 +278,8 @@ public abstract class Serializer {
           emptyElement();
         } else {
           finishElement();
-          token[l] = tok;
-          parent[l++] = par;
+          token[l] = name;
+          parent[l++] = pa;
         }
       }
     }

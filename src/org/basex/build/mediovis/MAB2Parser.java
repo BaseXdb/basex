@@ -2,7 +2,6 @@ package org.basex.build.mediovis;
 
 import static org.basex.build.mediovis.MAB2.*;
 import static org.basex.util.Token.*;
-
 import java.io.File;
 import java.io.IOException;
 import org.basex.BaseX;
@@ -95,7 +94,7 @@ public final class MAB2Parser extends Parser {
   /** Temporary read position. */
   private long off;
   /** Maximum mediovis id. */
-  private int maxid = Integer.MIN_VALUE;
+  private int maxid = 0;
 
   /**
    * Constructor.

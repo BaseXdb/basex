@@ -114,8 +114,8 @@ public final class TableDiskAccess extends TableAccess {
       np = mid == last ? fp + ENTRIES : firstPres[mid + 1];
     }
     if(low > high) {
-      throw new RuntimeException("Possible Bug in Table DiskAccess:\n" +
-          "IndexSize: " + indexSize + ", Access: " + mid + " (" + low + ")");
+      throw new RuntimeException("Invalid Data Access:\nPre: " + pre +
+          ", IndexSize: " + indexSize + ", Access: " + mid + " (" + low + ")");
       //BaseX.notexpected();
     }
     

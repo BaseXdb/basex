@@ -48,7 +48,7 @@ public final class Prop {
   /** Database path. */
   public static String dbpath = HOME + "/BaseXData";
   /** Web Server path. */
-  public static String webpath = WORK + "/web";
+  public static String webpath = WORK + "web";
   /** Path to dotty. */
   public static String dotty = "dotty";  
   /** Language Name (currently: English or German). */

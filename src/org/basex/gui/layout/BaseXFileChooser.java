@@ -47,12 +47,14 @@ public final class BaseXFileChooser {
    */
   public BaseXFileChooser(final String title, final String path,
       final JFrame par) {
+    
     if(GUIProp.simplefd) {
       fd = new FileDialog(par, title);
       fd.setDirectory(path);
     } else {
       fc = new JFileChooser(path);
-      if(path.contains(".")) fc.setSelectedFile(new File(path));
+      final File file = new File(path);
+      if(!file.isDirectory()) fc.setSelectedFile(file);
       fc.setDialogTitle(title);
       parent = par;
     }
@@ -119,8 +121,8 @@ public final class BaseXFileChooser {
    * @return file
    */
   public IO getFile() {
-    return new IO(fc != null ? fc.getSelectedFile().getPath() :
-      fd.getDirectory() + "/" + fd.getFile());
+    return new IO(fd != null ? fd.getDirectory() + "/" + fd.getFile() :
+      fc.getSelectedFile().getPath());
   }
   
   /**
@@ -132,7 +134,6 @@ public final class BaseXFileChooser {
     return mode == MODE.DIR ? getFile().path() :
       fc.getCurrentDirectory().getPath();
   }
-
 
   /**
    * Defines a file filter for XML documents.

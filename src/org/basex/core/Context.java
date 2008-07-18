@@ -25,6 +25,13 @@ public final class Context {
   private Nodes copied;
   
   /**
+   * Constructor.
+  */
+  public Context() {
+    Prop.read();
+  }
+  
+  /**
    * Returns true if a data reference has been set.
    * @return result of check
   */

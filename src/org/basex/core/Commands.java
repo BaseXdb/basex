@@ -12,7 +12,7 @@ import org.basex.core.proc.Copy;
 import org.basex.core.proc.Create;
 import org.basex.core.proc.CreateFS;
 import org.basex.core.proc.CreateIndex;
-import org.basex.core.proc.CreateXML;
+import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.Delete;
 import org.basex.core.proc.Drop;
 import org.basex.core.proc.DropIndex;
@@ -99,8 +99,8 @@ public enum Commands {
   CREATEFS(CreateFS.class, STANDARD, 2, 2, true),
   /** Convenience alias for creating an index. */
   CREATEINDEX(CreateIndex.class, STANDARD, 1, 1, true),
-  /** Convenience alias for creating an xml database. */
-  CREATEXML(CreateXML.class, STANDARD, 1, 2, true),
+  /** Convenience alias for creating a database. */
+  CREATEDB(CreateDB.class, STANDARD, 1, 2, true),
   /** Open a database. */
   OPEN(Open.class, STANDARD, 1, 1, false),
   /** Show some information on the XML and memory structure. */

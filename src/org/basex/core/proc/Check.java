@@ -25,9 +25,9 @@ public final class Check extends Proc {
       return Prop.info ? info(DBINMEM) : true;
 
     // streaming mode - create new database instance in main memory
-    if(Prop.onthefly) return exec(Commands.CREATEXML);
+    if(Prop.onthefly) return exec(Commands.CREATEDB);
     // open or create new database
-    return exec(Commands.OPEN) || exec(Commands.CREATEXML);
+    return exec(Commands.OPEN) || exec(Commands.CREATEDB);
   }
   
   /**

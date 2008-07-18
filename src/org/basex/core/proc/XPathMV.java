@@ -1,7 +1,6 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
-
 import org.basex.BaseX;
 import org.basex.build.mediovis.MAB2;
 import org.basex.core.Prop;
@@ -28,13 +27,13 @@ import org.basex.util.Token;
  */
 public final class XPathMV extends XPath {
   /** Index reference. */
-  private final IDSet ids = new IDSet();
+  private IDSet ids;
   /** Maximum hits. */
   private int hits;
   /** Maximum subhits. */
   private int sub;
   /** Approximate hits. */
-  private boolean approx;
+  //private boolean approx;
   /** Maximum hits. */
   private int maxhits;
 
@@ -86,6 +85,8 @@ public final class XPathMV extends XPath {
         final Nodes res = (Nodes) result;
         final int[] pres = res.pre;
         final int size = res.size;
+        ids = new IDSet();
+        
         for(int n = 0; n < size; n++) {
           // superordinate title found?
           int pre = data.parent(pres[n], data.kind(pres[n]));
@@ -124,7 +125,7 @@ public final class XPathMV extends XPath {
 
     for(int i = 0; i < Prop.runs; i++) {
       if(i != 0) out = new NullOutput();
-      show(new XMLSerializer(out, false, false));
+      show(new XMLSerializer(out, false, true));
     }
     if(Prop.info) outInfo(o, maxhits);
   }
@@ -149,7 +150,7 @@ public final class XPathMV extends XPath {
     ser.startElement(MAB2.ROOT);
     ser.attribute(MAB2.HITS, Token.token(maxhits));
     ser.attribute(MAB2.MAX, Token.token(size));
-    ser.attribute(MAB2.APPROX, Token.token(approx));
+    //ser.attribute(MAB2.APPROX, Token.token(approx));
     if(maxhits == 0) ser.emptyElement();
     else ser.finishElement();
 
@@ -169,7 +170,6 @@ public final class XPathMV extends XPath {
       int pp = par + data.attSize(par, data.kind(par));
       while(pp != data.size) {
         if(data.tagID(pp) == medid) break;
-        ser.xml(data, pp);
         pp = ser.xml(data, pp);
       }
 
@@ -207,7 +207,7 @@ public final class XPathMV extends XPath {
    * @param pre pre value
    * @return attribute value
    */
-  public double attNum(final Data data, final int att, final int pre) {
+  private double attNum(final Data data, final int att, final int pre) {
     final int atts = pre + data.attSize(pre, data.kind(pre));
     int p = pre;
     while(++p != atts) if(data.attNameID(p) == att) return data.attNum(p);
@@ -227,7 +227,7 @@ public final class XPathMV extends XPath {
      * @param pre pre value
      * @return index offset
      */
-    public int index(final byte[] par, final int pre) {
+    int index(final byte[] par, final int pre) {
       int i = add(par);
       if(i < 0) {
         i = -i;
@@ -244,7 +244,7 @@ public final class XPathMV extends XPath {
      * @param pre pre value
      * @param sub sub id
      */
-    public void index(final byte[] par, final int pre, final int sub) {
+    void index(final byte[] par, final int pre, final int sub) {
       final int i = index(par, pre);
       values[i].add(sub);
     }
@@ -254,7 +254,7 @@ public final class XPathMV extends XPath {
      * @param tok key to be found
      * @return value or null if nothing was found
      */
-    public IntList get(final byte[] tok) {
+    IntList get(final byte[] tok) {
       return tok != null ? values[id(tok)] : null;
     }
 

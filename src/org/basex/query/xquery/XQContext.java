@@ -4,6 +4,8 @@ import static org.basex.Text.*;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
+
+import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.core.proc.Check;
 import org.basex.data.Data;
@@ -296,6 +298,7 @@ public final class XQContext extends QueryContext {
    */
   public void addColl(final Node coll) throws XQException {
     // [CG] XQuery/add collection; check validity of specified collection
+
     final NodIter col = new NodIter();
     NodeIter ni = coll.child();
     ni = ni.next().child();
@@ -303,7 +306,9 @@ public final class XQContext extends QueryContext {
     while((nod = ni.next()) != null) {
       if(nod.type != Type.ELM) continue;
       final NodeIter n = nod.attr();
-      col.add(doc(n.next().str()));
+      final Node nd = n.next();
+      col.add(doc(nd.str()));
+      BaseX.outln("+ %: %", coll, nd.str());
     }
     collect = Array.add(collect, col);
     collName = Array.add(collName, coll.base());
@@ -316,20 +321,22 @@ public final class XQContext extends QueryContext {
    * @throws XQException evaluation exception
    */
   public NodIter coll(final byte[] coll) throws XQException {
+    // no collection specified.. return default collection/current context set
     if(coll == null) {
       if(collName.length == 0) Err.or(COLLDEF);
       return new NodIter(collect[0].list, collect[0].size);
     }
     
+    // invalid collection reference
     if(contains(coll, '<') || contains(coll, '\\'))
       Err.or(COLLINV, cut(coll, 20));
 
     int c = -1, cl = collName.length;
-    while(c < cl) {
+    while(true) {
       if(++c == cl) addColl(doc(coll));
       else if(!eq(collName[c], coll)) continue;
+      return new NodIter(collect[c].list, collect[c].size);
     }
-    return new NodIter(collect[c].list, collect[c].size);
   }
   
   @Override

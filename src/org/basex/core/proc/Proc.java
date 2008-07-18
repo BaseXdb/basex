@@ -11,7 +11,6 @@ import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
-import org.basex.io.CachedOutput;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPathProcessor;
@@ -56,11 +55,12 @@ public abstract class Proc extends AbstractProcess {
    * @param context context
    * @param comm command to be executed
    * @param arg arguments
-   * @return success of operation
    */
-  public static boolean execute(final Context context, final Commands comm,
+  public static void execute(final Context context, final Commands comm,
       final String... arg) {
-    return get(context, comm, arg).execute();
+
+    final Proc proc = get(context, comm, arg);
+    if(!proc.execute()) throw new RuntimeException(proc.info());
   }
 
   /**
@@ -129,23 +129,6 @@ public abstract class Proc extends AbstractProcess {
    */
   @SuppressWarnings("unused")
   protected void out(final PrintOutput out) throws Exception { }
-
-  /**
-   * Returns all data generated during the last call of
-   * {@link #exec(Commands,String) process} in a single string.
-   * Only recommended for short results.
-   * @return result string
-   */
-  public final String output() {
-    try {
-      final CachedOutput cache = new CachedOutput();
-      out(cache);
-      return cache.toString();
-    } catch(final Exception ex) {
-      ex.printStackTrace();
-      return null;
-    }
-  }
 
   @Override
   public final void info(final PrintOutput out) throws IOException {

@@ -936,9 +936,9 @@ public interface Text {
   /** Create information. */
   String CREATETABLE = lang("pc_tbl");
   /** Create information. */
-  String CREATEATTR = lang("pc_att");
+  //String CREATEATTR = lang("pc_att");
   /** Create information. */
-  String CREATETEXT = lang("pc_txt");
+  //String CREATETEXT = lang("pc_txt");
   /** Create information. */
   //String CREATEFT = lang("pc_ftx");
   /** Parse error. */

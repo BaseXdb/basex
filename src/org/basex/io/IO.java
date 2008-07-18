@@ -73,7 +73,7 @@ public final class IO {
     content = f.startsWith("<");
     if(content) cont = Token.token(f);
     url = !content && f.startsWith("http://");
-    path = content ? "tmp" : url ? f :
+    path = content ? "tmp.xml" : url ? f :
       new File(f).getAbsolutePath().replace('\\', '/');
   }
   
@@ -136,8 +136,16 @@ public final class IO {
    * @return result of check
    */
   public boolean isDir() {
-    if(content || url) BaseX.notexpected();
-    return file().isDirectory();
+    if(url) BaseX.notexpected();
+    return !content && file().isDirectory();
+  }
+  
+  /**
+   * Returns the directory of this path.
+   * @return result of check
+   */
+  public String getDir() {
+    return isDir() ? path() : file().getParent();
   }
   
   /**
@@ -312,8 +320,9 @@ public final class IO {
    */
   public IO[] children() {
     final File[] ch = file().listFiles();
-    final IO[] io = new IO[ch.length];
-    for(int i = 0; i < io.length; i++) io[i] = new IO(ch[i]);
+    final int l = ch != null ? ch.length : 0;
+    final IO[] io = new IO[l];
+    for(int i = 0; i < l; i++) io[i] = new IO(ch[i]);
     return io;
   }
 

@@ -99,7 +99,7 @@ public final class Create extends Proc {
     Prop.entity   = true;
     Prop.textindex = true;
     Prop.attrindex = true;
-    Prop.ftindex = false;
+    Prop.ftindex = true;
     
     return build(new MAB2Parser(file), file.dbname().replaceAll("\\..*", ""));
   }

@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.Data;
-import org.basex.io.DataAccessPerf;
+import org.basex.io.DataAccess;
 import org.basex.util.Array;
 import org.basex.util.FTTokenizer;
 import org.basex.util.Performance;
@@ -32,13 +32,13 @@ public final class WordsCTANew extends Index {
   /** Values file. */
   private final Data data;
   /** Trie structure on disk. */
-  private final DataAccessPerf inN;
+  private final DataAccess inN;
   // ftdata is stored here, with pre1, ..., preu, pos1, ..., posu
   /** FTData on disk. */
-  private final DataAccessPerf inD;
+  private final DataAccess inD;
   // each node entries size is stored here
   /** FTData sizes on disk. */
-  private final DataAccessPerf inS;
+  private final DataAccess inS;
   /** Id on data, corresponding to the current node entry. */
   private long did;
   /** Flag for case sensitive index. */
@@ -52,9 +52,9 @@ public final class WordsCTANew extends Index {
    */
   public WordsCTANew(final Data d, final String db) throws IOException {
     final String file = DATAFTX;
-    inN = new DataAccessPerf(db, file + 'a', "NodeData");
-    inD = new DataAccessPerf(db, file + 'b', "FT-Data");
-    inS = new DataAccessPerf(db, file + 'c', "Size");
+    inN = new DataAccess(db, file + 'a');
+    inD = new DataAccess(db, file + 'b');
+    inS = new DataAccess(db, file + 'c');
     data = d;
     did = -1;
     cs = data.meta.ftcs;

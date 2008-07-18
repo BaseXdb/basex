@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.Data;
-import org.basex.io.DataAccessPerf;
+import org.basex.io.DataAccess;
 import org.basex.query.xpath.expr.FTUnion;
 import org.basex.util.FTTokenizer;
 import org.basex.util.Levenshtein;
@@ -52,12 +52,12 @@ public final class Fuzzy extends Index {
   final Data data;
   /** Index storing each unique token length and pointer
    * on the first token with this length. */
-  final DataAccessPerf li;
+  final DataAccess li;
   /** Index storing each token, its data size and pointer
    * on then data. */
-  final DataAccessPerf ti;
+  final DataAccess ti;
   /** Storing pre and pos values for each token. */
-  final DataAccessPerf dat;
+  final DataAccess dat;
   /** Token positions. */
   final int[] tp = new int[Token.MAXLEN + 1];
 
@@ -70,12 +70,12 @@ public final class Fuzzy extends Index {
    */
   public Fuzzy(final Data d, final String db) throws IOException {
     final String file = DATAFTX;
-    ti = new DataAccessPerf(db, file + "y" , "Token");
-    dat = new DataAccessPerf(db, file + "z", "FTData");
+    ti = new DataAccess(db, file + "y");
+    dat = new DataAccess(db, file + "z");
     data = d;
 
     // cache token length index
-    li = new DataAccessPerf(db, file + "x", "TokenLengthIndex");
+    li = new DataAccess(db, file + "x");
     for(int i = 0; i < tp.length; i++) tp[i] = -1;
     int is = li.read();
     while(--is >= 0) {
@@ -331,6 +331,9 @@ public final class Fuzzy extends Index {
   @Override
   public int nrIDs(final IndexToken index) {
     // specified ft options are not checked yet...
+    final FTTokenizer ft = (FTTokenizer) index;
+    if(ft.fz) return 1;
+    
     final byte[] tok = index.get();
     final long p = getPointerOnToken(Token.lc(tok));
     return p == -1 ? 0 : getDataSize(p, tok.length);

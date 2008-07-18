@@ -38,7 +38,7 @@ public final class DirParser extends Parser {
    * @throws IOException I/O exception
    */
   private void parse(final Builder b, final IO f) throws IOException {
-    if(f.isDir() && !f.isLink()) {
+    if(f.isDir()) {
       for(final IO ch : f.children()) parse(b, ch);
     } else {
       file = f;

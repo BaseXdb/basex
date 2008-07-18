@@ -122,9 +122,9 @@ public enum FunDef {
   /** XQuery function. */
   COLLECT(Uri.FN, FNGen.class, 0, 1, "collection(item)", Type.NOD),
   /** XQuery function. */
-  DOCAVAIL(Uri.FN, FNGen.class, 1, 1, "doc-available(string?)", Type.BLN),
+  DOCAVAIL(Uri.FN, FNGen.class, 1, 1, "doc-available(item)", Type.BLN),
   /** XQuery function. */
-  DOC(Uri.FN, FNGen.class, 1, 1, "doc(string?)", Type.DOC),
+  DOC(Uri.FN, FNGen.class, 1, 1, "doc(item)", Type.DOC),
 
   /* FNId functions. */
   

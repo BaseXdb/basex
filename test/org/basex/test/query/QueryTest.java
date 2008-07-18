@@ -86,7 +86,7 @@ public final class QueryTest {
     out("\nBuilding database...\n");
 
     final String file = test.doc.replaceAll("\\\"", "\\\\\"");
-    Proc proc = Proc.get(context, Commands.CREATEXML, "\"" + file + "\"");
+    Proc proc = Proc.get(context, Commands.CREATE, "db \"" + file + "\"");
     if(!proc.execute()) {
       err("\n", proc.info());
       return false;

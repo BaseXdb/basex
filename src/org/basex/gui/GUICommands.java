@@ -59,7 +59,7 @@ public enum GUICommands implements GUICommand {
       if(!dialog.ok()) return;
       final String in = dialog.input();
       final String db = dialog.dbname();
-      build(PROGCREATE, Commands.CREATEXML + " \"" + in + "\" " + db);
+      build(PROGCREATE, Commands.CREATEDB + " \"" + in + "\" " + db);
     }
   },
 
@@ -73,7 +73,7 @@ public enum GUICommands implements GUICommand {
         final String db = dialog.db();
         if(db == null) return;
         if(IO.dbpath(db).exists()) {
-          Proc.execute(GUI.context, Commands.CLOSE);
+          Proc.get(GUI.context, Commands.CLOSE).execute();
           View.notifyInit();
         }
         main.execute(Commands.OPEN, db);

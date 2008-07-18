@@ -56,7 +56,7 @@ public final class DNode extends Node {
         ser.comment(str());
         break;
       case DOC:
-        serElem(ser, pre + 1, level);
+        serElem(ser, pre, level);
         break;
       case ELM:
         serElem(ser, pre, level);
@@ -212,29 +212,22 @@ public final class DNode extends Node {
     // current output level
     int l = 0;
 
-    // start with the root node
-    final int r = pr;
-    final int s = pr + data.size(pr, data.kind(pr));
-
     // loop through all table entries
     int p = pr;
+    final int s = pr + data.size(pr, data.kind(pr));
     while(p < s) {
-      final int kind = data.kind(p);
-      final int pa = data.parent(p, kind);
-      // skip writing if all sub nodes were processed
-      if(p > r && pa < r) break;
-
+      final int k = data.kind(p);
+      final int pa = data.parent(p, k);
       // close opened tags...
-      while(l > 0) {
-        if(parent[l - 1] < pa) break;
-        ser.closeElement(token[--l]);
-      }
+      while(l > 0 && parent[l - 1] >= pa) ser.closeElement(token[--l]);
 
-      if(kind == Data.TEXT) {
+      if(k == Data.DOC) {
+        p++;
+      } else if(k == Data.TEXT) {
         ser.text(data.text(p++));
-      } else if(kind == Data.COMM) {
+      } else if(k == Data.COMM) {
         ser.comment(data.text(p++));
-      } else if(kind == Data.PI) {
+      } else if(k == Data.PI) {
         ser.pi(data.text(p++));
       } else {
         // add element node
@@ -242,8 +235,8 @@ public final class DNode extends Node {
         ser.startElement(name);
 
         // find attributes
-        final int ps = p + data.size(p, kind);
-        final int as = p + data.attSize(p, kind);
+        final int ps = p + data.size(p, k);
+        final int as = p + data.attSize(p, k);
 
         if(level != 0 || l != 0) {
           while(++p != as) ser.attribute(data.attName(p), data.attValue(p));

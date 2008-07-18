@@ -12,7 +12,7 @@ import org.basex.util.Performance;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class DataAccessPerf extends DataAccess{
+public final class DataAccessPerf extends DataAccess {
   /** Performance Container. */
   private Performance rp;
   /** Runtime. */

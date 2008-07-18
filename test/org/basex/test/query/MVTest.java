@@ -34,10 +34,7 @@ public final class MVTest {
     // toggle main memory mode
     Prop.mainmem = mm; // false
     
-    if(!Proc.execute(context, Commands.OPEN, db)) {
-      System.out.println("Could not open database.");
-      return;
-    }
+    Proc.execute(context, Commands.OPEN, db);
 
     // open query file
     final File file = new File("tests/queries.mv");
@@ -45,8 +42,6 @@ public final class MVTest {
       System.out.println("Could not read \"" + file.getAbsolutePath() + "\"");
       return;
     }
-    Prop.serialize = false;
-    Proc.execute(context, Commands.XPATH, "descendant::MEDIUM");
     Prop.serialize = true;
     
     // scan all queries

@@ -107,8 +107,14 @@ public final class FTWords extends FTArrayExpr {
 
   @Override
   public int indexSizes(final XPContext ctx, final Step curr, final int min) {
-    // not quite correct; second argument should contain the correct ft options
+    // not correct; all ft options should be checked
     fto.sb.init(token);
+    fto.sb.fz = fto.fz;
+    fto.sb.wc = fto.wc;
+    fto.sb.st = fto.st;
+    fto.sb.cs = fto.cs;
+    fto.sb.dc = fto.dc;
+    
     int i = 0;
     while(fto.sb.more()) {
       int n = ctx.local.data.nrIDs(fto.sb);

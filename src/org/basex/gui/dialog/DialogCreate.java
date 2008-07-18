@@ -1,7 +1,6 @@
 package org.basex.gui.dialog;
 
 import static org.basex.Text.*;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,8 +32,6 @@ import org.basex.util.XMLToken;
  * @author Christian Gruen
  */
 public final class DialogCreate extends Dialog {
-  /** Maximum file counter. */
-  //private static final int MAX = 10000;
   /** Database Input. */
   BaseXTextField input;
   /** Input info. */
@@ -194,7 +191,6 @@ public final class DialogCreate extends Dialog {
 
     finish(parent);
   }
-  
 
   /**
    * Choose an XML document or directory.
@@ -217,23 +213,6 @@ public final class DialogCreate extends Dialog {
     }
     GUIProp.createpath = fc.getDir();
   }
-
-  /**
-   * Counts the number of XML documents.
-   * @param f file reference
-   * @return number of files
-  int count(final IO f) {
-    if(f.isDir() && !f.isLink()) {
-      int c = 0;
-      for(final IO ch : f.children()) {
-        c += count(ch);
-        if(c > MAX) break;
-      }
-      return c;
-    }
-    return f.name().endsWith(IO.XMLSUFFIX) ? 1 : 0;
-  }
-   */
 
   /**
    * Returns the chosen XML file or directory.
@@ -259,16 +238,21 @@ public final class DialogCreate extends Dialog {
       fl[f].setEnabled(ftx);
     }
     
-    final String nm = dbname();
     final String path = input();
-    final boolean exists = new IO(path).exists();
+    final IO file = new IO(path);
+    final boolean exists = path.length() != 0 && file.exists();
+    if(exists) GUIProp.createpath = file.getDir();
     
-    ok = nm.length() != 0 && path.length() != 0 && exists;
+    final String nm = dbname();
+    dbname.setEnabled(exists);
+    ok = exists && nm.length() != 0;
+    
     String inf1 = !exists ? PATHWHICH : " ";
-    String inf2 = db.contains(nm) ? RENAMEOVER : " ";
-    if(nm.length() != 0 && !XMLToken.isName(Token.token(nm))) {
-      inf2 = RENAMEINVALID;
-      ok = false;
+    String inf2 = "";
+    if(ok) {
+      ok = XMLToken.isName(Token.token(nm));
+      if(!ok) inf2 = RENAMEINVALID;
+      else if(db.contains(nm)) inf2 = RENAMEOVER;
     }
     info1.setText(inf1);
     info2.setText(inf2);

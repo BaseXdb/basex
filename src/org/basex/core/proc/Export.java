@@ -30,7 +30,8 @@ public final class Export extends Proc {
       
       if(current.size == 1 && current.pre[0] == 0) {
         out.println(BaseX.info(DOCDECL, Token.UTF8));
-        new Nodes(0, data).serialize(new XMLSerializer(out));
+        new Nodes(0, data).serialize(
+            new XMLSerializer(out, false, data.meta.chop));
       } else {
         current.serialize(new XMLSerializer(out, true, false));
       }

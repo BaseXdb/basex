@@ -145,8 +145,7 @@ public final class Info extends XPath {
     tb.add(NL + INFOCREATE + NL);
     format(tb, INFODOC, meta.file.path(), header, l);
     format(tb, INFOTIME, DATE.format(new Date(meta.time)), header, l);
-    format(tb, INFODOCSIZE, meta.filesize != 0 ?
-        Performance.formatSize(meta.filesize) : "-", header, l);
+    format(tb, INFODOCSIZE, Performance.formatSize(meta.filesize), header, l);
     format(tb, INFONDOCS, Integer.toString(meta.ndocs), header, l);
     //format(tb, INFOCHOP, BaseX.flag(meta.chop), true, 0);
     //format(tb, INFOENTITIES, BaseX.flag(meta.entity), true, 0);

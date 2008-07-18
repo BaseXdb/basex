@@ -1,15 +1,11 @@
 package org.basex.test.examples;
 
-import org.basex.core.Commands;
-import org.basex.core.Context;
-import org.basex.core.Prop;
-import org.basex.core.proc.Proc;
-import org.basex.data.XMLSerializer;
-import org.basex.data.Result;
-import org.basex.io.ConsoleOutput;
-import org.basex.query.QueryException;
-import org.basex.query.QueryProcessor;
-import org.basex.query.xquery.XQueryProcessor;
+import org.basex.core.*;
+import org.basex.core.proc.*;
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.query.*;
+import org.basex.query.xquery.*;
 
 /**
  * This class serves as an example for executing XQuery requests.
@@ -38,8 +34,6 @@ public final class XQueryExample {
     // create standard output stream
     ConsoleOutput out = new ConsoleOutput(System.out);
 
-    // read properties (database path, language, ...)
-    Prop.read();
     // create a new database context
     Context context = new Context();
     // Create a BaseX process
@@ -59,21 +53,15 @@ public final class XQueryExample {
     // SECOND EXAMPLE:
     System.out.println("Second example:");
 
-    // Execute XQuery request
-    try {
-      // create query instance
-      QueryProcessor xquery = new XQueryProcessor(QUERY);
-      // execute query; no initial context set is specified (null)
-      Result result = xquery.query(null);
-      // print output
-      result.serialize(new XMLSerializer(out));
-      out.println();
-    } catch(QueryException e) {
-      // dump stack trace
-      e.printStackTrace();
-    }
+    // create query instance
+    QueryProcessor xquery = new XQueryProcessor(QUERY);
+    // execute query; no initial context set is specified (null)
+    Result result = xquery.query(null);
+    // print output
+    result.serialize(new XMLSerializer(out));
 
     // close output stream
+    out.println();
     out.close();
   }
 }
