@@ -4,8 +4,6 @@ import static org.basex.Text.*;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
-
-import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.core.proc.Check;
 import org.basex.data.Data;
@@ -132,7 +130,7 @@ public final class XQContext extends QueryContext {
       final NodIter col = new NodIter();
       for(int d = 0; d < docs.length; d++) col.add(docs[d]);
       collect = Array.add(collect, col);
-      collName = Array.add(collName, docs[0].base());
+      collName = Array.add(collName, token(nodes.data.meta.dbname));
     }
 
     // evaluates the query and returns the result
@@ -236,11 +234,9 @@ public final class XQContext extends QueryContext {
     if(contains(db, '<') || contains(db, '>')) Err.or(INVDOC, db);
 
     // check if the collections contain the document
-    if(collect.length > 0) {
-      for(final NodIter ni : collect) {
-        for(int n = 0; n < ni.size; n++) {
-          if(eq(db, ni.list[n].base())) return (DNode) ni.list[n];
-        }
+    for(final NodIter ni : collect) {
+      for(int n = 0; n < ni.size; n++) {
+        if(eq(db, ni.list[n].base())) return (DNode) ni.list[n];
       }
     }
     
@@ -261,6 +257,55 @@ public final class XQContext extends QueryContext {
     final int dl = docs.length;
     docs = Array.add(docs, new DNode(data, 0, null, Type.DOC));
     return addNS(docs[dl]);
+  }
+
+  /**
+   * Adds a collection instance or returns an existing one.
+   * @param coll name of the collection to be returned.
+   * @return collection
+   * @throws XQException evaluation exception
+   */
+  public NodIter coll(final byte[] coll) throws XQException {
+    // no collection specified.. return default collection/current context set
+    if(coll == null) {
+      if(collName.length == 0) Err.or(COLLDEF);
+      return new NodIter(collect[0].list, collect[0].size);
+    }
+    
+    // invalid collection reference
+    if(contains(coll, '<') || contains(coll, '\\'))
+      Err.or(COLLINV, cut(coll, 20));
+
+    int c = -1, cl = collName.length;
+    while(true) {
+      if(++c == cl) addDocs(doc(coll));
+      else if(!eq(collName[c], coll)) continue;
+      return new NodIter(collect[c].list, collect[c].size);
+    }
+  }
+
+  /**
+   * Adds database documents as a collection.
+   * @param db database reference
+   */
+  private void addDocs(final DNode db) {
+    final NodIter col = new NodIter();
+    final Data data = db.data;
+    for(int p = 0; p < data.size;) {
+      col.add(new DNode(data, p, null, Type.DOC));
+      p += data.size(p, data.kind(p));
+    }
+    addColl(col, token(data.meta.dbname));
+  }
+
+  /**
+   * Adds a collection.
+   * @param nod collection nodes
+   * @param name name
+   */
+  public void addColl(final NodIter nod, final byte[] name) {
+    collect = Array.add(collect, nod);
+    collName = Array.add(collName, name);
   }
 
   /** Finishes the query execution.
@@ -289,54 +334,6 @@ public final class XQContext extends QueryContext {
       break;
     }
     return doc;
-  }
-
-  /**
-   * Adds a collection.
-   * @param coll collection to be added
-   * @throws XQException evaluation exception
-   */
-  public void addColl(final Node coll) throws XQException {
-    // [CG] XQuery/add collection; check validity of specified collection
-
-    final NodIter col = new NodIter();
-    NodeIter ni = coll.child();
-    ni = ni.next().child();
-    Node nod;
-    while((nod = ni.next()) != null) {
-      if(nod.type != Type.ELM) continue;
-      final NodeIter n = nod.attr();
-      final Node nd = n.next();
-      col.add(doc(nd.str()));
-      BaseX.outln("+ %: %", coll, nd.str());
-    }
-    collect = Array.add(collect, col);
-    collName = Array.add(collName, coll.base());
-  }
-
-  /**
-   * Returns the specified collection.
-   * @param coll name of the collection to be returned.
-   * @return collection
-   * @throws XQException evaluation exception
-   */
-  public NodIter coll(final byte[] coll) throws XQException {
-    // no collection specified.. return default collection/current context set
-    if(coll == null) {
-      if(collName.length == 0) Err.or(COLLDEF);
-      return new NodIter(collect[0].list, collect[0].size);
-    }
-    
-    // invalid collection reference
-    if(contains(coll, '<') || contains(coll, '\\'))
-      Err.or(COLLINV, cut(coll, 20));
-
-    int c = -1, cl = collName.length;
-    while(true) {
-      if(++c == cl) addColl(doc(coll));
-      else if(!eq(collName[c], coll)) continue;
-      return new NodIter(collect[c].list, collect[c].size);
-    }
   }
   
   @Override

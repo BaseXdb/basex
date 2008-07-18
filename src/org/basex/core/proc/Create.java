@@ -11,8 +11,6 @@ import org.basex.build.Parser;
 import org.basex.build.fs.FSParser;
 import org.basex.build.mediovis.MAB2Parser;
 import org.basex.build.xml.DirParser;
-import org.basex.build.xml.SAXWrapper;
-import org.basex.build.xml.XMLParser;
 import org.basex.core.Progress;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
@@ -195,7 +193,8 @@ public final class Create extends Proc {
    */
   public static Data xml(final IO fn, final String db) {
     try {
-      final Parser p = Prop.intparse ? new XMLParser(fn) : new SAXWrapper(fn);
+      if(!fn.exists()) return null;
+      final Parser p = new DirParser(fn);
       if(Prop.onthefly) return new MemBuilder().build(p, db);
 
       final Data data = new DiskBuilder().build(p, db);

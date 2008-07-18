@@ -16,8 +16,6 @@ public final class DBExample {
   static final String INPUT = "input.xml";
   /** Name of the resulting database. */
   static final String DBNAME = "input";
-  /** Optional database path. */
-  static final String DBPATH = "/.....";
   /** Sample query. */
   static final String QUERY = "//li";
   /** Result file. */
@@ -35,26 +33,26 @@ public final class DBExample {
     // Creates a new database context
     Context context = new Context();
 
-    // sets a new database path
-    //Proc.execute(context, Commands.SET, Set.DBPATH + " " + DBPATH);
+    // Optionally sets a new database path
+    //Proc.execute(context, Commands.SET, Set.DBPATH + " ...............");
 
     // Creates a database for the specified path/file.
     Proc.execute(context, Commands.CREATEDB, INPUT);
 
-    // create a process for the XQuery command 
+    // Creates a process for the XQuery command 
     Proc proc = Proc.get(context, Commands.XQUERY, QUERY);
 
-    // Creates a console output
+    // Uses console output
     ConsoleOutput out = new ConsoleOutput(System.out);
-    // Creates an file output
+    // Uses file output
     //PrintOutput out = new PrintOutput(RESULT);
 
-    // launch process
+    // Launches the process
     if(proc.execute()) {
-      // successful execution: print result
+      // Successful execution: print result
       proc.output(out);
     } else {
-      // execution failed: print result
+      // Execution failed: print information
       proc.info(out);
     }
 

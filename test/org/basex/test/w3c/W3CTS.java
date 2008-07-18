@@ -35,9 +35,6 @@ import org.basex.query.xquery.XQueryProcessor;
 import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.func.FNIndex;
 import org.basex.query.xquery.func.Fun;
-import org.basex.query.xquery.item.FAttr;
-import org.basex.query.xquery.item.FDoc;
-import org.basex.query.xquery.item.FElem;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Node;
 import org.basex.query.xquery.item.QNm;
@@ -48,6 +45,7 @@ import org.basex.query.xquery.iter.NodIter;
 import org.basex.query.xquery.util.Var;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
+import org.basex.util.TokenList;
 
 /**
  * XQuery Test Suite Wrapper.
@@ -83,7 +81,7 @@ public abstract class W3CTS {
   private static final byte[] INSPECT = token("Inspect");
 
   /** Maximum length of result output. */
-  private static int maxout = 50000;
+  private static int maxout = 500;
 
   /** Delimiter. */
   private static final String DELIM = "#~%~#";
@@ -107,7 +105,8 @@ public abstract class W3CTS {
   /** Cached module files. */
   private final HashMap<String, String> modules = new HashMap<String, String>();
   /** Cached collections. */
-  private final HashMap<String, FDoc> colls = new HashMap<String, FDoc>();
+  private final HashMap<String, byte[][]> colls =
+    new HashMap<String, byte[][]>();
 
   /** OK log. */
   private final StringBuilder logOK = new StringBuilder();
@@ -214,8 +213,13 @@ public abstract class W3CTS {
     for(final int c : nodes("//collection", root).pre) {
       final Nodes nodes = new Nodes(c, data);
       final String cname = text("@ID", nodes);
-      final FDoc doc = coll(nodes("input-document", nodes), cname);
-      colls.put(cname, doc);
+
+      final TokenList dl = new TokenList();
+      final Nodes doc = nodes("input-document", nodes);
+      for(int d = 0; d < doc.size; d++) {
+        dl.add(token(sources + string(data.atom(doc.pre[d])) + ".xml"));
+      }
+      colls.put(cname, dl.finish());
     }
 
     if(reporting) {
@@ -545,7 +549,9 @@ public abstract class W3CTS {
 
       if(src == null) {
         // assign collection
-        ctx.addColl(colls.get(string(nm)));
+        final NodIter col = new NodIter();
+        for(byte[] cl : colls.get(string(nm))) col.add(ctx.doc(cl));
+        ctx.addColl(col, nm);
 
         BaseX.outln("%: %", nm, var);
         if(var != null) {
@@ -583,30 +589,6 @@ public abstract class W3CTS {
       final Var v = new Var(new QNm(data.atom(var.pre[c])));
       ctx.vars.addGlobal(v.item(result.item()));
     }
-  }
-
-  /**
-   * Creates a collection.
-   * @param doc collection documents
-   * @param cname name of collection
-   * @return collection
-   * @throws Exception exception
-   */
-  private FDoc coll(final Nodes doc, final String cname)
-      throws Exception {
-    final NodIter docs = new NodIter();
-    for(int c = 0; c < doc.size; c++) {
-      final NodIter atts = new NodIter();
-      final String file = sources + string(data.atom(doc.pre[c])) + ".xml";
-      atts.add(new FAttr(new QNm(token("href")), token(file), null));
-      docs.add(new FElem(new QNm(token("doc")),
-          new NodIter(), atts, EMPTY, new FAttr[] {}, null));
-    }
-
-    final NodIter coll = new NodIter();
-    coll.add(new FElem(new QNm(token("collection")),
-        docs, new NodIter(), EMPTY, new FAttr[] {}, null));
-    return new FDoc(coll, token(cname));
   }
 
   /**
