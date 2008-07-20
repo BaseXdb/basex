@@ -13,7 +13,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import org.basex.core.Commands;
+
+import org.basex.core.proc.XQuery;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
@@ -66,7 +67,7 @@ public final class QueryArea extends QueryPanel {
           boolean module = xq.trim().startsWith("module namespace ");
           if(xq.trim().length() == 0) xq = ".";
           if(GUIProp.execrt && !module) {
-            GUI.get().execute(Commands.XQUERY, xq);
+            GUI.get().execute(new XQuery(xq));
           } else {
             final XQParser parser = new XQParser(new XQContext());
             try {
@@ -144,7 +145,7 @@ public final class QueryArea extends QueryPanel {
       last = xq;
       final String xqt = xq.trim();
       if(xqt.length() == 0 || xqt.startsWith("module namespace ")) return;
-      GUI.get().execute(Commands.XQUERY, xq);
+      GUI.get().execute(new XQuery(xq));
     }
   }
 

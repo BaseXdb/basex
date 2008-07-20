@@ -9,7 +9,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
-import org.basex.core.proc.Info;
+
+import org.basex.core.proc.InfoDB;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.gui.GUI;
@@ -71,7 +72,7 @@ public final class DialogInfo extends Dialog {
     long len = 0;
     for(final File f : dir.listFiles()) len += f.length();
 
-    text.setText(Info.db(meta, data.size, false, false));
+    text.setText(InfoDB.db(meta, data.size, false, false));
     p1.add(text, BorderLayout.CENTER);
 
     final BaseXBack p2 = new BaseXBack();

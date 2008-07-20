@@ -4,10 +4,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import org.basex.core.Commands;
 import org.basex.core.Context;
+import org.basex.core.Process;
 import org.basex.core.Prop;
-import org.basex.core.proc.Proc;
+import org.basex.core.proc.Open;
+import org.basex.core.proc.XPathMV;
 import org.basex.io.NullOutput;
 
 /**
@@ -34,7 +35,7 @@ public final class MVTest {
     // toggle main memory mode
     Prop.mainmem = mm; // false
     
-    Proc.execute(context, Commands.OPEN, db);
+    new Open(db).execute(context, null);
 
     // open query file
     final File file = new File("tests/queries.mv");
@@ -92,10 +93,10 @@ public final class MVTest {
       query.append("[position() <= " + MAX + "]\"");
 
       // process query
-      final Proc proc = Proc.get(context, Commands.XPATHMV,
-          Integer.toString(MAX), Integer.toString(SUB), query.toString());
+      final Process proc = new XPathMV(Integer.toString(MAX),
+          Integer.toString(SUB), query.toString());
 
-      if(!proc.execute()) {
+      if(!proc.execute(context)) {
         System.out.println("ERR\t" + query);
       } else {
         // run serialization

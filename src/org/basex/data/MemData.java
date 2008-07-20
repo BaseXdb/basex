@@ -284,7 +284,7 @@ public final class MemData extends Data {
 
   @Override
   public void insert(final int pre, final int par, final byte[] tag,
-      final byte kind) {
+      final int kind) {
     BaseX.notimplemented();
   }
 

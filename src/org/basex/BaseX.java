@@ -2,8 +2,7 @@ package org.basex;
 
 import static org.basex.Text.*;
 import org.basex.core.AbstractProcess;
-import org.basex.core.Command;
-import org.basex.core.Context;
+import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -18,9 +17,6 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class BaseX extends BaseXClient {
-  /** Database Context. */
-  private final Context context = new Context();
-
   /**
    * Main method, launching the stand-alone console mode.
    * Use <code>-h</code> to get a list of all available command-line
@@ -45,8 +41,8 @@ public final class BaseX extends BaseXClient {
   }
 
   @Override
-  protected AbstractProcess getProcess(final Command cmd) {
-    return cmd.proc(context);
+  protected AbstractProcess getProcess(final Process p) {
+    return p;
   }
 
   /**

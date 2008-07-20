@@ -25,7 +25,10 @@ import org.basex.util.Token;
  */
 public final class DialogInsert extends Dialog {
   /** Resulting query. */
-  public String query;
+  public String[] result;
+  /** Node kind. */
+  public int kind;
+  
   /** Text area. */
   BaseXTextField input;
   /** Text area. */
@@ -63,8 +66,8 @@ public final class DialogInsert extends Dialog {
     input2.setEnabled(false);
     setResizable(true);
 
-    final BaseXBack kind = new BaseXBack();
-    kind.setLayout(new TableLayout(1, 5));
+    final BaseXBack knd = new BaseXBack();
+    knd.setLayout(new TableLayout(1, 5));
     final ButtonGroup group = new ButtonGroup();
     
     final ActionListener al = new ActionListener() {
@@ -84,11 +87,11 @@ public final class DialogInsert extends Dialog {
       radio[i] = new BaseXRadio(EDITKIND[i], null, false, this);
       radio[i].addActionListener(al);
       group.add(radio[i]);
-      kind.add(radio[i]);
+      knd.add(radio[i]);
     }
     radio[1].setSelected(true);
 
-    b.add(kind);
+    b.add(knd);
     b.add(label);
     b.add(input);
     b.add(label2);
@@ -106,16 +109,19 @@ public final class DialogInsert extends Dialog {
   public void close() {
     super.close();
 
-    final String in1 = input.getText().replaceAll("\"", "\\\"");
-    final String in2 = Token.string(input2.getText()).replaceAll("\"", "\\\"");
-    query = null;
+    final String in1 = input.getText();
+    final String in2 = Token.string(input2.getText());
 
     for(int i = 1; i < KINDS.length; i++) {
-      if(radio[i].isSelected()) {
-        query = KINDS[i];
-        if(i != 2 && i != 4) query += " \"" + in1 + "\"";
-        if(i != 1) query += " \"" + in2 + "\"";
-      }
+      if(radio[i].isSelected()) kind = i;
+    }
+    switch(kind) {
+      case 0: case 3: case 5:
+        result = new String[] { in1, in2 }; break;
+      case 1:
+        result = new String[] { in1 }; break;
+      case 2: case 4:
+        result = new String[] { in2 }; break;
     }
   }
 }

@@ -78,7 +78,7 @@ public final class XMLSerializer extends Serializer {
   }
 
   @Override
-  public void openResult() throws Exception {
+  public void openResult() throws IOException {
     if(xml) openElement(RESULT);
   }
 

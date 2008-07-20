@@ -2,10 +2,12 @@ package org.basex.test.w3c;
 
 import java.io.File;
 import org.basex.BaseX;
-import org.basex.core.Commands;
 import org.basex.core.Context;
+import org.basex.core.Process;
 import org.basex.core.Prop;
-import org.basex.core.proc.Proc;
+import org.basex.core.proc.Check;
+import org.basex.core.proc.Close;
+import org.basex.core.proc.CreateDB;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.query.xpath.XPathProcessor;
@@ -66,11 +68,7 @@ public final class XMLTS {
     Prop.mainmem = true;
 
     final Context ctx = new Context();
-    final Proc pr = Proc.get(ctx, Commands.CHECK, FILE);
-    if(!pr.execute()) {
-      BaseX.outln(pr.info());
-      return;
-    }
+    new Check(FILE).execute(ctx, null);
     data = ctx.data();
     
     int ok = 0;
@@ -86,8 +84,8 @@ public final class XMLTS {
       final boolean valid = text("@TYPE", srcRoot).equals("valid");
 
       Prop.intparse = true;
-      Proc proc = Proc.get(ctx, Commands.CREATEDB, PATH + uri);
-      final boolean success = proc.execute();
+      Process proc = new CreateDB(PATH + uri);
+      final boolean success = proc.execute(ctx);
       final boolean correct = valid == success;
 
       if(verbose || !correct) {
@@ -97,9 +95,9 @@ public final class XMLTS {
           String inf = proc.info();
           if(inf.length() != 0) BaseX.outln("[BASEX ] " + inf);
           Prop.intparse = false;
-          Proc.execute(ctx, Commands.CLOSE);
-          proc = Proc.get(ctx, Commands.CREATEDB, PATH + uri);
-          proc.execute();
+          new Close().execute(ctx);
+          proc = new CreateDB(PATH + uri);
+          proc.execute(ctx);
           inf = proc.info();
           if(inf.length() != 0) BaseX.outln("[XERCES] " + inf);
         }
@@ -107,7 +105,7 @@ public final class XMLTS {
       if(correct) ok++;
       else wrong++;
 
-      Proc.execute(ctx, Commands.CLOSE);
+      new Close().execute(ctx);
     }
 
     BaseX.outln("\nResult of Test \"" + new File(FILE).getName() + "\":");

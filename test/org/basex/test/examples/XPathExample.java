@@ -1,7 +1,9 @@
 package org.basex.test.examples;
 
 import org.basex.core.*;
-import org.basex.core.proc.*;
+import org.basex.core.proc.CreateDB;
+import org.basex.core.proc.Set;
+import org.basex.core.proc.XPath;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.query.*;
@@ -37,28 +39,20 @@ public final class XPathExample {
     // writing the query result to RESULT:
     System.out.println("First example, writing result to " + RESULT + ":");
 
-    // create a new database context
+    // Creates a new database context
     Context context = new Context();
-    // execute the specified command
-    Proc.execute(context, Commands.CREATEDB, XMLFILE);
-    // writing result as well-formed XML
-    Proc.execute(context, Commands.SET, "xmloutput on");
+    // Creates a database
+    new CreateDB(XMLFILE, DBNAME).execute(context, null);
+    // Serializes query results as well-formed XML
+    new Set("xmloutput", "on").execute(context, null);
 
-    // create standard output stream
+    // Creates a standard output stream
     PrintOutput file = new PrintOutput(RESULT);
 
-    // create a process for the XPath command 
-    Proc proc = Proc.get(context, Commands.XPATH, QUERY);
+    // Executes the XPath query and writes the result to the output stream 
+    new XPath(QUERY).execute(context, file);
 
-    // launch process
-    if(proc.execute()) {
-      // successful execution: print result
-      proc.output(file);
-    } else {
-      // execution failed: print result
-      proc.info(file);
-    }
-    // close output stream
+    // Closes the output stream
     file.close();
     System.out.println();
     
@@ -66,18 +60,14 @@ public final class XPathExample {
     // writing the query result to the the standard output:
     System.out.println("Second example, writing result to standard output:");
 
-    // Execute XPath request
-    // create new database; "input" = database name, "input.xml" = source doc.
-    Data data = Create.xml(new IO(XMLFILE), DBNAME);
-
-    // create query instance
+    // Creates a query instance
     QueryProcessor xpath = new XPathProcessor(QUERY);
-    // create context set, referring to the root node (0)
-    Nodes nodes = new Nodes(0, data);
-    // execute query
+    // Start a query with the default context set (root node).
+    Nodes nodes = context.current();
+    // Executes the query
     Result result = xpath.query(nodes);
 
-    // print output to file
+    // Prints the output to an output stream
     ConsoleOutput console = new ConsoleOutput(System.out);
     result.serialize(new XMLSerializer(console));
     console.flush();

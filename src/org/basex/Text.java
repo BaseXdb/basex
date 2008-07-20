@@ -1,13 +1,8 @@
 package org.basex;
 
+import static org.basex.core.Commands.*;
 import static org.basex.core.Lang.*;
 import static org.basex.util.Token.*;
-import org.basex.core.proc.Create;
-import org.basex.core.proc.Drop;
-import org.basex.core.proc.Fs;
-import org.basex.core.proc.Info;
-import org.basex.core.proc.Insert;
-import org.basex.core.proc.Set;
 
 /**
  * This class organizes textual information for the project classes.
@@ -149,16 +144,16 @@ public interface Text {
   String DUMMYDATABASE0 = lang("ch_dummydatabase0");
 
   /** Command help. */
-  String CREATE0 = "[" + Create.DB + "|" + Create.FS + "|" + Create.INDEX +
+  String CREATE0 = "[" + CREATE.DB + "|" + CREATE.FS + "|" + CREATE.INDEX +
   "] [...]";
   /** Command help. */
   String CREATE1 = lang("ch_create1");
   /** Command help. */
   String CREATE2 = lang("ch_create2") + NL + NL +
-  "- " + Create.DB + lang("ch_file") + NL + lang("ch_create3") + NL +
-  "- " + Create.FS + lang("ch_create4") + NL + lang("ch_create5") + NL +
-  "- " + Create.INDEX + " [" + Create.TXT + "|" + Create.ATV +
-  "|" + Create.FTX + "]: " + NL + lang("ch_create6");
+  "- " + CREATE.DB + lang("ch_file") + NL + lang("ch_create3") + NL +
+  "- " + CREATE.FS + lang("ch_create4") + NL + lang("ch_create5") + NL +
+  "- " + CREATE.INDEX + " [" + INDEX.TEXT + "|" + INDEX.ATTRIBUTE +
+  "|" + INDEX.FULLTEXT + "]: " + NL + lang("ch_create6");
   /** Command help. */
   String OPEN0 = lang("ch_open0");
   /** Command help. */
@@ -166,14 +161,14 @@ public interface Text {
   /** Command help. */
   String OPEN2 = lang("ch_open2");
   /** Command help. */
-  String INFO0 = "[" + Info.DB + "|" + Info.IDX + "|" + Info.TBL + "]?";
+  String INFO0 = "[" + INFO.DB + "|" + INFO.INDEX + "|" + INFO.TABLE + "]?";
   /** Command help. */
   String INFO1 = lang("ch_info1");
   /** Command help. */
   String INFO2 = lang("ch_info21") + NL + lang("ch_info22") + NL +
-  "- " + Info.DB + lang("ch_info23") + NL +
-  "- " + Info.IDX + lang("ch_info24") + NL +
-  "- " + Info.TBL + lang("ch_info25");
+  "- " + INFO.DB + lang("ch_info23") + NL +
+  "- " + INFO.INDEX + lang("ch_info24") + NL +
+  "- " + INFO.TABLE + lang("ch_info25");
   /** Command help. */
   String CHECK0 = lang("ch_check0");
   /** Command help. */
@@ -193,15 +188,14 @@ public interface Text {
   /** Command help. */
   String LIST2 = lang("ch_list2");
   /** Command help. */
-  String DROP0 = "[" + Drop.DB + "|" + Drop.INDEX + "] [...]";
+  String DROP0 = "[" + DROP.DB + "|" + DROP.INDEX + "] [...]";
   /** Command help. */
   String DROP1 = lang("ch_drop1");
   /** Command help. */
   String DROP2 = lang("ch_drop2") + NL +
-  "- " + Drop.DB + lang("ch_drop21") + NL +
-  lang("ch_drop22") + NL +
-  "- " + Create.INDEX + " [" + Create.TXT + "|" + Create.ATV + "|" +
-  Create.FTX + "]:" + NL + lang("ch_drop23");
+  "- " + DROP.DB + lang("ch_drop21") + NL + lang("ch_drop22") + NL +
+  "- " + DROP.INDEX + " [" + INDEX.TEXT + "|" + INDEX.ATTRIBUTE + "|" +
+  INDEX.FULLTEXT + "]:" + NL + lang("ch_drop23");
   /** Command help. */
   String OPTIMIZE0 = "";
   /** Command help. */
@@ -255,23 +249,23 @@ public interface Text {
   /** Command Help. */
   String CD2 = lang("ch_cd2");
   /** Command Help. */
-  String FS0 = "[" + Fs.CAT + "|" + Fs.CP + "|" + Fs.CD + "|" + Fs.DU +
-  "|" + Fs.LOCATE + "|" + Fs.LS + "|" + Fs.MKDIR + "|" +
-  Fs.PWD + "|" + Fs.RM + "|" + Fs.TOUCH + "]";
+  String FS0 = "[" + FS.CAT + "|" + FS.CP + "|" + FS.CD + "|" + FS.DU +
+  "|" + FS.LOCATE + "|" + FS.LS + "|" + FS.MKDIR + "|" +
+  FS.PWD + "|" + FS.RM + "|" + FS.TOUCH + "]";
   /** Command Help. */
   String FS1 = lang("ch_fs1");
   /** Command Help. */
   String FS2 = lang("ch_fs2") + NL +
-    "- " + Fs.CAT      + lang("ch_fs25") + NL +
-    "- " + Fs.CD       + lang("ch_fs23") + NL +  
-    "- " + Fs.CP       + lang("ch_fs30") + NL +    
-    "- " + Fs.DU       + lang("ch_fs21") + NL +
-    "- " + Fs.LOCATE   + lang("ch_fs26") + NL +
-    "- " + Fs.LS       + lang("ch_fs22") + NL +
-    "- " + Fs.MKDIR    + lang("ch_fs27") + NL +
-    "- " + Fs.PWD      + lang("ch_fs24") + NL +
-    "- " + Fs.RM       + lang("ch_fs28") + NL +  
-    "- " + Fs.TOUCH    + lang("ch_fs29");
+    "- " + FS.CAT      + lang("ch_fs25") + NL +
+    "- " + FS.CD       + lang("ch_fs23") + NL +  
+    "- " + FS.CP       + lang("ch_fs30") + NL +    
+    "- " + FS.DU       + lang("ch_fs21") + NL +
+    "- " + FS.LOCATE   + lang("ch_fs26") + NL +
+    "- " + FS.LS       + lang("ch_fs22") + NL +
+    "- " + FS.MKDIR    + lang("ch_fs27") + NL +
+    "- " + FS.PWD      + lang("ch_fs24") + NL +
+    "- " + FS.RM       + lang("ch_fs28") + NL +  
+    "- " + FS.TOUCH    + lang("ch_fs29");
   /** Command Help. */
   String DUMMYUPDATE0 = lang("ch_dummyupdate0");
 
@@ -289,30 +283,31 @@ public interface Text {
   String DELETE2 = lang("ch_delete2");
 
   /** Command Help. */
-  String INSERT0 = "[" + Insert.FRG + "|" + Insert.ELEM + "|" + Insert.ATT +
-  "|" + Insert.TXT + "|" + Insert.COM + "|" + Insert.PI + "] [...]";
+  String INSERT0 = "[" + UPDATE.FRAGMENT + "|" + UPDATE.ELEMENT + "|" +
+  UPDATE.ATTRIBUTE + "|" + UPDATE.TEXT + "|" + UPDATE.COMMENT + "|" +
+  UPDATE.PI + "] [...]";
   /** Command Help. */
   String INSERT1 = lang("ch_insert1");
   /** Command Help. */
   String INSERT2 = lang("ch_insert2") + NL + NL +
-  "- " + Insert.ELEM + " " + lang("ch_insert21") + NL +
-  "- " + Insert.TXT + " " + lang("ch_insert22") + NL +
-  "- " + Insert.ATT + " " + lang("ch_insert23") + NL +
-  "- " + Insert.COM + " " + lang("ch_insert24") + NL +
-  "- " + Insert.PI + " " + lang("ch_insert25") + NL +
-  "- " + Insert.FRG + " " + lang("ch_insert26");
+  "- " + UPDATE.ELEMENT + " " + lang("ch_insert21") + NL +
+  "- " + UPDATE.TEXT + " " + lang("ch_insert22") + NL +
+  "- " + UPDATE.ATTRIBUTE + " " + lang("ch_insert23") + NL +
+  "- " + UPDATE.COMMENT + " " + lang("ch_insert24") + NL +
+  "- " + UPDATE.PI + " " + lang("ch_insert25") + NL +
+  "- " + UPDATE.FRAGMENT + " " + lang("ch_insert26");
   /** Command Help. */
-  String UPDATE0 = "[" + Insert.ELEM + "|" + Insert.ATT + "|" + Insert.TXT +
-  "|" + Insert.COM + "|" + Insert.PI + "] [...]";
+  String UPDATE0 = "[" + UPDATE.ELEMENT + "|" + UPDATE.ATTRIBUTE + "|" +
+  UPDATE.TEXT + "|" + UPDATE.COMMENT + "|" + UPDATE.PI + "] [...]";
   /** Command Help. */
   String UPDATE1 = lang("ch_update1");
   /** Command Help. */
   String UPDATE2 = lang("ch_update2") + NL + NL +
-  "- " + Insert.ELEM + " " + lang("ch_update21") + NL +
-  "- " + Insert.TXT + " " + lang("ch_update22") + NL +
-  "- " + Insert.ATT + " " + lang("ch_update23") + NL +
-  "- " + Insert.COM + " " + lang("ch_update24") + NL +
-  "- " + Insert.PI + " " + lang("ch_update25");
+  "- " + UPDATE.ELEMENT + " " + lang("ch_update21") + NL +
+  "- " + UPDATE.TEXT + " " + lang("ch_update22") + NL +
+  "- " + UPDATE.ATTRIBUTE + " " + lang("ch_update23") + NL +
+  "- " + UPDATE.COMMENT + " " + lang("ch_update24") + NL +
+  "- " + UPDATE.PI + " " + lang("ch_update25");
 
   /** Command Help. */
   String DUMMYGENERAL0 = lang("ch_dummygeneral0");
@@ -323,21 +318,16 @@ public interface Text {
   String SET1 = lang("ch_set1");
   /** Command Help. */
   String SET2 = lang("ch_set2") + NL +
-  "- " + Set.INFO + lang("ch_set21") + NL +
-  "- " + Set.DEBUG + lang("ch_set22") + NL +
-  "- " + Set.SERIALIZE + lang("ch_set23") + NL +
-  "- " + Set.XMLOUTPUT + lang("ch_set24") + NL +
-  "- " + Set.MAINMEM + lang("ch_set25") + NL +
-  "- " + Set.CHOP + lang("ch_set26") + NL +
-  "- " + Set.ENTITY + lang("ch_set27") + NL +
-  "- " + Set.TXTINDEX + lang("ch_set28") + NL +
-  "- " + Set.ATTRINDEX + lang("ch_set29") + NL +
-  "- " + Set.FTINDEX + lang("ch_set31") + NL + NL +
-  lang("ch_set32") + NL +
-  "- " + Set.DBPATH + lang("ch_set33") + NL +
-  "- " + Set.RUNS + lang("ch_set34") + NL +
-  "- " + Set.FCOMPRESS + lang("ch_set35") + NL + NL +
-  lang("ch_set32");
+  "- " + SET.INFO + lang("ch_set21") + NL +
+  "- " + SET.DEBUG + lang("ch_set22") + NL +
+  "- " + SET.SERIALIZE + lang("ch_set23") + NL +
+  "- " + SET.XMLOUTPUT + lang("ch_set24") + NL +
+  "- " + SET.MAINMEM + lang("ch_set25") + NL +
+  "- " + SET.CHOP + lang("ch_set26") + NL +
+  "- " + SET.ENTITY + lang("ch_set27") + NL +
+  "- " + SET.TEXTINDEX + lang("ch_set28") + NL +
+  "- " + SET.ATTRINDEX + lang("ch_set29") + NL +
+  "- " + SET.FTINDEX + lang("ch_set31");
 
   /** Command Help. */
   String HELP0 = "[command]?";
@@ -811,9 +801,10 @@ public interface Text {
   String[] EDITKIND = { lang("de_kind1"), lang("de_kind2"), lang("de_kind3"),
       lang("de_kind4"), lang("de_kind5"), lang("de_kind6")
   };
-  /** Dialog Title for updating text. */
-  String[] KINDS = { "root", "element", "text", "attribute", "comment", "pi" };
 
+  /** Update texts. */
+  String[] KINDS = { "root", "element", "text", "attribute", "comment", "pi" };
+  
   /** Dialog title for choosing a font. */
   String FONTTITLE = lang("df_title");
   /** Anti-Aliasing information. */
@@ -991,13 +982,13 @@ public interface Text {
   // DATABASE/INDEX INFORMATION ===============================================
 
   /** Data info. */
-  String TAGINDEX = "Tag Names";
+  //String TAGINDEX = "Tag Names";
   /** Data info. */
-  String ATTINDEX = "Attribute Names";
+  //String ATTINDEX = "Attribute Names";
   /** Data info. */
-  String TEXTINDEX = "Texts";
+  //String TEXTINDEX = "Texts";
   /** Data info. */
-  String VALUEINDEX = "Attribute Values";
+  //String VALUEINDEX = "Attribute Values";
   /** Index info. */
   String TRIE = "- Compressed Trie";
   /** Index info. */
@@ -1083,15 +1074,15 @@ public interface Text {
   /** Update node info. */
   String UPDATENODE = lang("uc_updatenode");
   /** Update element info. */
-  String UPDATEELEM = lang("uc_updateelem");
+  //String UPDATEELEM = lang("uc_updateelem");
   /** Update attribute info. */
-  String UPDATEATTR = lang("uc_updateattr");
+  //String UPDATEATTR = lang("uc_updateattr");
   /** Insert query info. */
   String COPYTAGS = lang("uc_copytags");
   /** Insert query info. */
   String INSERTTEXT = lang("uc_inserttext");
   /** Update element info. */
-  String TAGINVALID = lang("uc_taginvalid");
+  //String TAGINVALID = lang("uc_taginvalid");
   /** Update element info. */
   String ATTINVALID = lang("uc_attinvalid");
   /** Duplicate attribute info. */
@@ -1099,7 +1090,7 @@ public interface Text {
   /** Invalid position. */
   String POSINVALID = lang("uc_posinvalid");
   /** Update PI info. */
-  String PIINVALID = lang("uc_piinvalid");
+  String NAMEINVALID = lang("uc_invalid");
   /** Update text info. */
   String TXTINVALID = lang("uc_txtinvalid");
 
@@ -1144,7 +1135,7 @@ public interface Text {
   /** Info on used main memory. */
   String INFOMEM = lang("info_mem");
   /** Info on execution times. */
-  String INFORUNS = lang("info_runs");
+  //String INFORUNS = lang("info_runs");
 
   /** Info on database path. */
   String INFODBPATH = lang("info_dbpath");
@@ -1156,9 +1147,9 @@ public interface Text {
   String INFODBERR = lang("info_dberror");
 
   /** Info on database path. */
-  String INFONEWPATH = lang("info_newpath") + COLS;
+  //String INFONEWPATH = lang("info_newpath") + COLS;
   /** Info on database path. */
-  String INFOPATHERR = lang("info_patherr") + COLS;
+  //String INFOPATHERR = lang("info_patherr") + COLS;
   /** Info on Query Verbosity. */
   String INFOINFO = lang("info_info");
   /** Info on Query Verbosity. */
@@ -1187,9 +1178,8 @@ public interface Text {
   String INFOFTINDEX = lang("info_ftindex");
   /** Info on Fuzzy Indexing. */
   String INFOFZINDEX = lang("info_fzindex");
-  /** Info on Fulltext Fuzzyindexing. */
-  String INFOFTCOMPRESS = lang("info_fcompress");
-
+  /** Info on Fulltext Fuzzy indexing. */
+  //String INFOFTCOMPRESS = lang("info_fcompress");
 
   /** Info on Document Creation. */
   String INFODB = lang("info_db");
@@ -1328,5 +1318,5 @@ public interface Text {
   //FILESYSTEM ERROR MESSAGES===================================================
   
   /** Dummy string to check if all language strings have been assigned. */
-  String CHECK = lang(null);
+  String DUMMY = lang(null);
 }

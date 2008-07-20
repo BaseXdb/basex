@@ -49,7 +49,7 @@ public final class FPI extends FNode {
   
   @Override
   public void serialize(final Serializer ser,  final XQContext ctx,
-      final int level) throws Exception  {
+      final int level) throws IOException {
     ser.pi(name.str(), val);
   }
 

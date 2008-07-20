@@ -3,6 +3,7 @@ package org.basex.query;
 import static org.basex.query.QueryTokens.*;
 import org.basex.BaseX;
 import org.basex.io.IO;
+import org.basex.util.StringList;
 
 /**
  * This class indicates exceptions during query parsing or evaluation.
@@ -13,6 +14,8 @@ import org.basex.io.IO;
 public class QueryException extends Exception {
   /** File reference. */
   protected IO file;
+  /** Possible completions. */
+  protected StringList complete;
   /** Error code. */
   protected String code;
   /** Error line. */
@@ -46,6 +49,14 @@ public class QueryException extends Exception {
   }
 
   /**
+   * Possible completions.
+   * @return error line
+   */
+  public final StringList complete() {
+    return complete;
+  }
+
+  /**
    * Returns the error column.
    * @return error column
    */
@@ -62,10 +73,21 @@ public class QueryException extends Exception {
     file = parser.file;
     line = 1;
     col = 1;
-    for(int i = 0; i + 1 < parser.qp && i < parser.ql; i++) {
+    for(int i = 0; i + 1 < parser.qm && i < parser.ql; i++) {
       final char ch = parser.qu.charAt(i);
       if(ch == 0x0A) { line++; col = 1; } else if(ch != 0x0D) { col++; }
     }
+  }
+
+  /**
+   * Sets code completions.
+   * @param qp query parser
+   * @param comp completions
+   */
+  public final void complete(final QueryParser qp, final StringList comp) {
+    complete = comp == null ? new StringList() : comp;
+    qp.qm++;
+    pos(qp);
   }
 
   /**

@@ -18,9 +18,9 @@ public final class DU extends FSCmd {
   private String path;
 
   @Override
-  public void args(final String args) throws FSException {
+  public void args(final String args, final int pos) throws FSException {
     // get all Options
-    final GetOpts g = new GetOpts(args, "ah", 1);
+    final GetOpts g = new GetOpts(args, "ah", pos);
     while(g.more()) {
       final int ch = checkOpt(g);
       switch (ch) {
@@ -33,7 +33,7 @@ public final class DU extends FSCmd {
   }
 
   @Override
-  public void exec(final String cmd, final PrintOutput out) throws IOException {
+  public void exec(final PrintOutput out) throws IOException {
     // if there is path expression go to dir
     if(path != null) {
       final int[] sources = checkPre(path,

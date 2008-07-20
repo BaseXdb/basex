@@ -449,7 +449,7 @@ public final class DiskData extends Data {
 
   @Override
   public void insert(final int pre, final int par, final byte[] val,
-      final byte kind) {
+      final int kind) {
 
     if(kind == ELEM) {
       insertElem(pre - 1, pre - par, val, 1, 1);

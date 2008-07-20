@@ -385,8 +385,8 @@ public final class IO {
   }
   
   /**
-   * Delete a directory recursively.
-   * @param db database to delete recursively
+   * Recursively deletes a directory.
+   * @param db database to delete
    * @param pat file pattern
    * @return success of operation
    */

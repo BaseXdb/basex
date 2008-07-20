@@ -6,17 +6,23 @@ import java.io.InputStreamReader;
 import java.util.Random;
 import org.basex.core.AbstractProcess;
 import org.basex.core.ClientProcess;
-import org.basex.core.Command;
 import org.basex.core.CommandParser;
-import org.basex.core.Commands;
+import org.basex.core.Context;
+import org.basex.core.Process;
 import org.basex.core.Prop;
+import org.basex.core.proc.Exit;
+import org.basex.core.proc.Prompt;
 import org.basex.core.proc.Set;
+import org.basex.core.proc.XPath;
+import org.basex.core.proc.XQuery;
 import org.basex.io.IO;
 import org.basex.io.CachedOutput;
 import org.basex.io.ConsoleOutput;
 import org.basex.io.PrintOutput;
+import org.basex.query.QueryException;
 import org.basex.util.Token;
 import static org.basex.Text.*;
+import static org.basex.core.Commands.*;
 
 /**
  * This is the starter class for the client console mode.
@@ -27,6 +33,8 @@ import static org.basex.Text.*;
  * @author Christian Gruen
  */
 public class BaseXClient {
+  /** Database Context. */
+  protected final Context context = new Context();
   /** Stand-alone or Client/Server mode. */
   protected boolean standalone;
 
@@ -75,9 +83,7 @@ public class BaseXClient {
    * Runs the application, dependent on the command-line arguments.
    */
   final void run() {
-    if(allInfo || info) {
-      execute(Commands.SET, Set.INFO + " " + (allInfo ? Set.ALL : ON), false);
-    }
+    if(allInfo || info) process(new Set(SET.INFO, allInfo ? ALL : ON), false);
 
     try {
       // replace input file with content
@@ -87,7 +93,8 @@ public class BaseXClient {
       }
 
       if(query != null) {
-        execute(xpath ? Commands.XPATH : Commands.XQUERY, query, info);
+        if(xpath) process(new XPath(query), info);
+        else process(new XQuery(query), info);
       } else if(commands != null) {
         process(commands);
         quit(true);
@@ -108,7 +115,7 @@ public class BaseXClient {
     // wait for user input
     String input = null;
     do {
-      execute(Commands.PROMPT, null, false);
+      process(new Prompt(), false);
       input = input(INPUT);
       if("xquery".equals(input)) {
         String in = "";
@@ -154,18 +161,11 @@ public class BaseXClient {
    */
   private boolean process(final String input) {
     try {
-      final CommandParser cp = new CommandParser(input);
-      while(cp.more()) {
-        final Command cmd = cp.next();
-        if(cmd.name.local()) {
-          if(cmd.name == Commands.EXIT || cmd.name == Commands.QUIT)
-            return false;
-          throw new IllegalArgumentException(
-              BaseX.info("Unknown local command '%'.", input));
-        }
-        if(!process(cmd, info)) break;
+      for(final Process p : new CommandParser(input).parse()) {
+        if(p instanceof Exit) return false;
+        if(!process(p, info)) break;
       }
-    } catch(final IllegalArgumentException ex) {
+    } catch(final QueryException ex) {
       error(ex, ex.getMessage());
     }
     return true;
@@ -192,31 +192,43 @@ public class BaseXClient {
    * @param arg argument
    * @param v verbose flag
    * @return true if operation was successful
-   */
-  protected final boolean execute(final Commands comm, final String arg,
+  protected final boolean execute(final Process p, final String arg,
       final boolean v) {
     return process(new Command(comm, arg), v);
   }
+   */
 
   /**
    * Processes the specified command, specifying verbose output.
-   * @param cmd command
+   * @param comm command
+   * @param arg argument
+   * @param v verbose flag
+   * @return true if operation was successful
+  protected final boolean executee(final Commands comm, final String arg,
+      final boolean v) {
+    return process(new Command(comm, arg), v);
+  }
+   */
+
+  /**
+   * Processes the specified command, specifying verbose output.
+   * @param p process
    * @param v verbose flag
    * @return true if operation was successful
    */
-  protected final boolean process(final Command cmd, final boolean v) {
-    final AbstractProcess proc = getProcess(cmd);
+  protected final boolean process(final Process p, final boolean v) {
+    final AbstractProcess proc = getProcess(p);
     try {
-      final boolean ok = proc.execute();
-      final Commands name = cmd.name;
-      if(ok && name.printing()) {
+      final boolean ok = proc.execute(context);
+      if(ok && p.printing()) {
         final PrintOutput out = output != null ? new PrintOutput(output) :
             new ConsoleOutput(System.out);
         proc.output(out);
         out.close();
       }
 
-      if(!ok || v || !name.printing() || name == Commands.SET) {
+      final boolean set = p instanceof Set;
+      if(!ok || v || !p.printing() || set) {
         final CachedOutput out = new CachedOutput();
         proc.info(out);
         final String inf = out.toString();
@@ -231,7 +243,7 @@ public class BaseXClient {
           }
         }
 
-        if(name == Commands.SET && cmd.args().startsWith(Set.INFO)) {
+        if(set && p.args[0].equals(SET.INFO)) {
           info = inf.contains(INFOON);
         }
       }
@@ -244,11 +256,11 @@ public class BaseXClient {
 
   /**
    * Return command process.
-   * @param cmd command
+   * @param p process
    * @return process
    */
-  protected AbstractProcess getProcess(final Command cmd) {
-    return new ClientProcess(host, port, cmd);
+  protected AbstractProcess getProcess(final Process p) {
+    return new ClientProcess(host, port, p);
   }
 
   /**
@@ -275,7 +287,7 @@ public class BaseXClient {
           final char c = args[a].charAt(i);
           if(c == 'c' && standalone) {
             // chop XML whitespaces while creating new database instances
-            execute(Commands.SET, Set.CHOP + " on", false);
+            process(new Set(SET.CHOP, ON), false);
             ok = true;
           } else if(c == 'd') {
             // activate debug mode
@@ -283,7 +295,7 @@ public class BaseXClient {
             ok = true;
           } else if(c == 'e' && standalone) {
             // skip parsing of XML entities
-            execute(Commands.SET, Set.ENTITY  + OFF, false);
+            process(new Set(SET.ENTITY, OFF), false);
             ok = true;
           } else if(c == 'o') {
             // specify file for result output
@@ -332,7 +344,7 @@ public class BaseXClient {
             if(a == args.length) break;
             // turn off result serialization
             int runs = Math.max(1, Token.toInt(args[a].substring(i)));
-            execute(Commands.SET, Set.RUNS + " " + runs, false);
+            process(new Set("RUNS", Integer.toString(runs)), false);
             i = args[a].length();
             ok = true;
           } else if(c == 's' && !standalone) {
@@ -356,7 +368,7 @@ public class BaseXClient {
             ok = true;
           } else if(c == 'x') {
             // activate well-formed XML output
-            execute(Commands.SET, Set.XMLOUTPUT + " " + ON, false);
+            process(new Set(SET.XMLOUTPUT, ON), false);
             ok = true;
           } else if(c == 'y' && standalone) {
             // hidden option: activate main memory mode
@@ -368,7 +380,7 @@ public class BaseXClient {
             ok = true;
           } else if(c == 'z') {
             // turn off result serialization
-            execute(Commands.SET, Set.SERIALIZE + " " + OFF, false);
+            process(new Set(SET.SERIALIZE, OFF), false);
             ok = true;
           } else {
             break;

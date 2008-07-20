@@ -61,7 +61,7 @@ public final class DOTSerializer extends Serializer {
   TokenBuilder tb = new TokenBuilder();
 
   @Override
-  public void open(final int s) throws Exception {
+  public void open(final int s) throws IOException {
     out.println("digraph BaseXAlgebra {");
     out.println("node[shape=box,style=filled,width=0.1,height=0.3];");
     out.println("node[fontsize=12,fontname=SansSerif];");
@@ -75,7 +75,7 @@ public final class DOTSerializer extends Serializer {
   }
 
   @Override
-  public void openResult() throws Exception {
+  public void openResult() throws IOException {
     openElement(RESULT);
   }
 

@@ -1,6 +1,8 @@
 package org.basex.gui;
 
 import static org.basex.Text.*;
+import static org.basex.core.Commands.*;
+
 import java.awt.BorderLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -9,13 +11,21 @@ import java.io.IOException;
 import javax.swing.AbstractButton;
 import javax.swing.JOptionPane;
 import org.basex.BaseX;
-import org.basex.core.Command;
-import org.basex.core.CommandParser;
-import org.basex.core.Commands;
 import org.basex.core.Context;
+import org.basex.core.Process;
 import org.basex.core.Prop;
-import org.basex.core.proc.Create;
-import org.basex.core.proc.Proc;
+import org.basex.core.proc.Cd;
+import org.basex.core.proc.Close;
+import org.basex.core.proc.Copy;
+import org.basex.core.proc.CreateDB;
+import org.basex.core.proc.CreateFS;
+import org.basex.core.proc.CreateIndex;
+import org.basex.core.proc.Delete;
+import org.basex.core.proc.DropIndex;
+import org.basex.core.proc.Insert;
+import org.basex.core.proc.Open;
+import org.basex.core.proc.Optimize;
+import org.basex.core.proc.Update;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.data.Nodes;
@@ -59,7 +69,7 @@ public enum GUICommands implements GUICommand {
       if(!dialog.ok()) return;
       final String in = dialog.input();
       final String db = dialog.dbname();
-      build(PROGCREATE, Commands.CREATEDB + " \"" + in + "\" " + db);
+      build(PROGCREATE, new CreateDB(in, db));
     }
   },
 
@@ -73,10 +83,10 @@ public enum GUICommands implements GUICommand {
         final String db = dialog.db();
         if(db == null) return;
         if(IO.dbpath(db).exists()) {
-          Proc.get(GUI.context, Commands.CLOSE).execute();
+          new Close().execute(GUI.context);
           View.notifyInit();
         }
-        main.execute(Commands.OPEN, db);
+        main.execute(new Open(db));
       } else if(dialog.nodb()) {
         if(JOptionPane.showConfirmDialog(GUI.get(), NODBQUESTION, DIALOGINFO,
             JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
@@ -100,7 +110,7 @@ public enum GUICommands implements GUICommand {
   CLOSE(true, GUICLOSE, "ctrl F4", GUICLOSETT) {
     @Override
     public void execute() {
-      GUI.get().execute(Commands.CLOSE);
+      GUI.get().execute(new Close());
     }
   },
 
@@ -164,7 +174,7 @@ public enum GUICommands implements GUICommand {
       if(!new DialogImportFS(main).ok()) return;
       final String p = GUIProp.fsall ? "/" : GUIProp.fspath.replace('\\', '/');
       final String name = GUIProp.importfsname;
-      build(IMPORTFSTITLE, Commands.CREATEFS + " \"" + p + "\"" + " " + name);
+      build(IMPORTFSTITLE, new CreateFS(p, name));
     }
   },
 
@@ -245,7 +255,7 @@ public enum GUICommands implements GUICommand {
   PASTE(true, GUIPASTE, "ctrl V", GUIPASTETT) {
     @Override
     public void execute() {
-      GUI.get().execute(Commands.COPY, "0");
+      GUI.get().execute(new Copy(true, "0"));
     }
 
     @Override
@@ -274,7 +284,7 @@ public enum GUICommands implements GUICommand {
     public void execute() {
       if(JOptionPane.showConfirmDialog(GUI.get(), DELETECONF, DELETETITLE,
           JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
-        GUI.get().execute(Commands.DELETE);
+        GUI.get().execute(new Delete());
     }
 
     @Override
@@ -290,8 +300,9 @@ public enum GUICommands implements GUICommand {
     @Override
     public void execute() {
       final DialogInsert insert = new DialogInsert(GUI.get());
-      if(insert.query == null) return;
-      GUI.get().execute(Commands.INSERT, insert.query);
+      if(insert.result == null) return;
+      final UPDATE type = UPDATE.values()[insert.kind];
+      GUI.get().execute(new Insert(true, type, insert.result));
     }
 
     @Override
@@ -311,8 +322,9 @@ public enum GUICommands implements GUICommand {
     public void execute() {
       final Nodes nodes = GUI.context.marked();
       final DialogEdit edit = new DialogEdit(GUI.get(), nodes.pre[0]);
-      if(edit.query == null) return;
-      GUI.get().execute(Commands.UPDATE, edit.query);
+      if(edit.result == null) return;
+      final UPDATE type = UPDATE.values()[edit.kind];
+      GUI.get().execute(new Update(true, type, edit.result));
     }
 
     @Override
@@ -692,15 +704,18 @@ public enum GUICommands implements GUICommand {
       final DialogInfo info = new DialogInfo(GUI.get());
       if(info.ok()) {
         if(info.opt) {
-          build(INFOOPT, Commands.OPTIMIZE.toString());
+          build(INFOOPT, new Optimize());
         } else {
           final MetaData meta = GUI.context.data().meta;
           final boolean[] indexes = info.indexes();
-          final StringBuilder sb = new StringBuilder();
-          if(indexes[0] != meta.txtindex) cmd(indexes[0], Create.TXT, sb);
-          if(indexes[1] != meta.atvindex) cmd(indexes[1], Create.ATV, sb);
-          if(indexes[2] != meta.ftxindex) cmd(indexes[2], Create.FTX, sb);
-          build(INFOBUILD, sb.toString());
+
+          // <CG> no parallel execution...
+          if(indexes[0] != meta.txtindex)
+            build(INFOBUILD, cmd(indexes[0], INDEX.TEXT));
+          if(indexes[1] != meta.atvindex)
+            build(INFOBUILD, cmd(indexes[1], INDEX.ATTRIBUTE));
+          if(indexes[2] != meta.ftxindex)
+            build(INFOBUILD, cmd(indexes[2], INDEX.FULLTEXT));
         }
       }
     }
@@ -709,13 +724,10 @@ public enum GUICommands implements GUICommand {
      * Builds the create command.
      * @param create create flag
      * @param index name of index
-     * @param sb string builder
+     * @return process
      */
-    private void cmd(final boolean create, final String index,
-        final StringBuilder sb) {
-      final Commands cmd = create ? Commands.CREATEINDEX : Commands.DROPINDEX;
-      if(sb.length() != 0) sb.append(';');
-      sb.append(cmd + " " + index);
+    private Process cmd(final boolean create, final INDEX index) {
+      return create ? new CreateIndex(index) : new DropIndex(index);
     }
   },
 
@@ -767,7 +779,7 @@ public enum GUICommands implements GUICommand {
   GOUP(true, GUIGOUP, "alt UP", GUIGOUPTT) {
     @Override
     public void execute() {
-      GUI.get().execute(Commands.CD, "..");
+      GUI.get().execute(new Cd(".."));
     }
 
     @Override
@@ -783,7 +795,7 @@ public enum GUICommands implements GUICommand {
   ROOT(true, GUIROOT, "alt HOME", GUIROOTTT) {
     @Override
     public void execute() {
-      GUI.get().execute(Commands.CD, "/");
+      GUI.get().execute(new Cd("/"));
     }
 
     @Override
@@ -843,67 +855,64 @@ public enum GUICommands implements GUICommand {
   /**
    * Runs a building progress.
    * @param title dialog title
-   * @param command command string
+   * @param proc process
    */
-  static void build(final String title, final String command) {
+  static void build(final String title, final Process proc) {
     // start database creation thread
     new Thread() {
       @Override
       public void run() {
         final GUI main = GUI.get();
 
-        final CommandParser cp = new CommandParser(command);
-        while(cp.more()) {
-          final Command cmd = cp.next();
-          final Commands cc = cmd.name;
-          final Proc proc = cmd.proc(GUI.context);
-
-          if(cc != Commands.CREATEINDEX && cc != Commands.DROPINDEX  &&
-              cc != Commands.OPTIMIZE) main.execute(Commands.CLOSE);
-
-          Performance.sleep(100);
-          final DialogProgress wait = cc == Commands.DROPINDEX ? null :
-              new DialogProgress(main, title, cc != Commands.CREATEFS,
-                  cc != Commands.OPTIMIZE);
-
-          // start dialog window thread
-          if(wait != null) {
-            new Thread() {
-              @Override
-              public void run() {
-                while(true) {
-                  Performance.sleep(100);
-                  if(wait.stopped()) proc.stop();
-                  if(!wait.isVisible()) return;
-                  wait.setProgress(proc);
-                }
-              }
-            }.start();
-          }
-
-          // create database
-          final Performance perf = new Performance();
-          final boolean ok = proc.execute();
-          // get server info
-          final String inf = proc.info();
-
-          // close status dialog
-          if(wait != null) wait.dispose();
-
-          // return user information
-          if(ok) {
-            main.status.setText(BaseX.info(PROCTIME, perf.getTimer()));
-            if(cc == Commands.OPTIMIZE)
-              JOptionPane.showMessageDialog(GUI.get(), INFOOPTIM, DIALOGINFO,
-                  JOptionPane.INFORMATION_MESSAGE);
-          } else {
-            JOptionPane.showMessageDialog(main, inf,
-                DIALOGINFO, JOptionPane.WARNING_MESSAGE);
-          }
-          // initialize views
-          if(cc != Commands.DROPINDEX && cc != Commands.CREATEINDEX)
-            View.notifyInit();
+        final boolean ci = proc instanceof CreateIndex;
+        final boolean fs = proc instanceof CreateFS;
+        final boolean di = proc instanceof DropIndex;
+        final boolean op = proc instanceof Optimize;
+        
+        if(!ci && !di && !op) {
+          new Close().execute(GUI.context);
+          View.notifyInit();
         }
+
+        Performance.sleep(100);
+        final DialogProgress wait = di ? null :
+            new DialogProgress(main, title, !fs, !op);
+
+        // start dialog window thread
+        if(wait != null) {
+          new Thread() {
+            @Override
+            public void run() {
+              while(true) {
+                Performance.sleep(100);
+                if(wait.stopped()) proc.stop();
+                if(!wait.isVisible()) return;
+                wait.setProgress(proc);
+              }
+            }
+          }.start();
+        }
+
+        // create database
+        final Performance perf = new Performance();
+        final boolean ok = proc.execute(GUI.context);
+        // get server info
+        final String inf = proc.info();
+
+        // close status dialog
+        if(wait != null) wait.dispose();
+
+        // return user information
+        if(ok) {
+          main.status.setText(BaseX.info(PROCTIME, perf.getTimer()));
+          if(op) JOptionPane.showMessageDialog(main, INFOOPTIM,
+              DIALOGINFO, JOptionPane.INFORMATION_MESSAGE);
+        } else {
+          JOptionPane.showMessageDialog(main, inf,
+              DIALOGINFO, JOptionPane.WARNING_MESSAGE);
+        }
+        // initialize views
+        if(!ci && !di) View.notifyInit();
       }
     }.start();
   }

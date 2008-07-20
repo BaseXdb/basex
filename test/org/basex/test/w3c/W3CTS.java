@@ -17,10 +17,9 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 import org.basex.BaseX;
-import org.basex.core.Commands;
 import org.basex.core.Context;
 import org.basex.core.Prop;
-import org.basex.core.proc.Proc;
+import org.basex.core.proc.Check;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
@@ -186,7 +185,7 @@ public abstract class W3CTS {
     final Performance perf = new Performance();
 
     final Context context = new Context();
-    Proc.execute(context, Commands.CHECK, path + input);
+    new Check(path + input).execute(context, null);
     data = context.data();
 
     final Nodes root = new Nodes(0, data);
@@ -318,8 +317,8 @@ public abstract class W3CTS {
       
       final XQueryProcessor xq = new XQueryProcessor(in, file);
       final Nodes cont = nodes("contextItem", root);
-      if(cont.size != 0) Proc.execute(context, Commands.CHECK,
-          sources + string(data.atom(cont.pre[0])) + IO.XMLSUFFIX);
+      if(cont.size != 0) new Check(sources + string(data.atom(cont.pre[0])) +
+          IO.XMLSUFFIX).execute(context, null);
 
       final XQContext ctx = xq.ctx;
       files.add(file(nodes("input-file", root),

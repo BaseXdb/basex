@@ -2,6 +2,7 @@ package org.basex.gui;
 
 import static org.basex.Text.*;
 import static org.basex.gui.GUIConstants.*;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -16,7 +17,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.net.URL;
+
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -29,15 +32,16 @@ import javax.swing.WindowConstants;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
+
 import org.basex.BaseX;
 import org.basex.Text;
-import org.basex.core.Command;
 import org.basex.core.CommandParser;
-import org.basex.core.Commands;
 import org.basex.core.Context;
+import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.core.proc.Find;
-import org.basex.core.proc.Proc;
+import org.basex.core.proc.XPath;
+import org.basex.core.proc.XQuery;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
@@ -59,6 +63,7 @@ import org.basex.gui.view.table.TableView;
 import org.basex.gui.view.text.TextView;
 import org.basex.gui.view.tree.TreeView;
 import org.basex.io.CachedOutput;
+import org.basex.query.QueryException;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 
@@ -173,7 +178,7 @@ public final class GUI extends JFrame {
     hits.setFont(fnt);
     BaseXLayout.setWidth(hits, 150);
     hits.setHorizontalAlignment(SwingConstants.RIGHT);
-    
+
     BaseXBack b = new BaseXBack();
     b.add(hits);
     b.add(Box.createHorizontalStrut(4));
@@ -212,7 +217,7 @@ public final class GUI extends JFrame {
     nav.add(mode, BorderLayout.WEST);
 
     input = new GUIInput(this);
-    
+
     hist = new BaseXButton(icon("hist"), HELPHIST);
     hist.trim();
     hist.addActionListener(new ActionListener() {
@@ -401,207 +406,211 @@ public final class GUI extends JFrame {
     if(cmd || in.startsWith("!")) {
       // run as command: command mode or exclamation mark as first character
       final int i = cmd ? 0 : 1;
-      if(in.length() > i) execute(in.substring(i));
+      if(in.length() > i) {
+        // <CG> parse multiple commands..
+        try {
+          for(final Process p : new CommandParser(in.substring(i)).parse()) {
+            if(!exec(p)) break;
+          }
+        } catch(final QueryException ex) {
+          final boolean db = context.db();
+          if(!GUIProp.showstarttext && !db || !GUIProp.showtext && db) {
+            GUICommands.SHOWTEXT.execute();
+          }
+          // retrieve text result
+          if(text.isValid()) {
+            try {
+              final CachedOutput out = new CachedOutput();
+              out.println(ex.getMessage());
+              text.setText(out.buffer(), out.size(), false);
+            } catch(final IOException e) {
+              e.printStackTrace();
+            }
+          }
+        }
+      }
     } else {
-      execute(Commands.XPATH, GUIProp.searchmode == 1 ? in :
-        Find.find(in, context, GUIProp.filterrt));
+      execute(new XPath(GUIProp.searchmode == 1 ? in :
+        Find.find(in, context, GUIProp.filterrt)));
     }
-  }
-
-  /**
-   * Launches the specified command.
-   * @param cmd command to be launched
-   * @param arg arguments
-   */
-  public void execute(final Commands cmd, final String... arg) {
-    final StringBuilder sb = new StringBuilder(cmd.toString());
-    for(final String a : arg) sb.append(" " + a);
-    execute(sb.toString());
   }
 
   /** Thread counter. */
   int threadID;
   /** Current process. */
-  Proc proc;
+  Process proc;
 
   /**
    * Checks if the specified thread is obsolete.
    * @param thread thread to be checked
-   * @param cmd executed command
+   * @param p executed process
    * @return result of check
    */
-  protected boolean obsolete(final int thread, final Commands cmd) {
-    final boolean obs = thread != threadID  && !cmd.data() && !cmd.updating();
+  protected boolean obsolete(final int thread, final Process p) {
+    final boolean obs = thread != threadID  && !p.data() && !p.updating();
     if(obs) proc = null;
     return obs;
   }
 
   /**
-   * Launches the specified command string.
-   * @param command commands to be launched
+   * Launches the specified process in a thread.
+   * @param pr process to be launched
    */
-  public void execute(final String command) {
+  public void execute(final Process pr) {
     if(View.working) return;
-    final int thread = ++threadID;
-
     new Thread() {
       @Override
-      public void run() {
-        if(threadID != thread) return;
+      public void run() { exec(pr); }
+    }.start();
+  }
 
-        // wait when command is still running
-        while(proc != null) {
-          proc.stop();
-          Performance.sleep(50);
-          if(threadID != thread) return;
+  /**
+   * Launches the specified process.
+   * @param pr process to be launched
+   * @return success flag
+   */
+  public boolean exec(final Process pr) {
+    final int thread = ++threadID;
+
+    // wait when command is still running
+    while(proc != null) {
+      proc.stop();
+      Performance.sleep(50);
+      if(threadID != thread) return true;
+    }
+
+    cursor(CURSORWAIT);
+    try {
+      // parse command string
+      if(obsolete(thread, pr)) return true;
+
+      if(pr.updating()) View.working = true;
+
+      // cache some variables before executing the command
+      final Performance perf = new Performance();
+      final Nodes current = context.current();
+      final Data data = context.data();
+      proc = pr;
+
+      // execute command
+      final boolean ok = pr.execute(context);
+      if(!ok && pr.info().length() == 0) {
+        proc = null;
+        return false;
+      }
+
+      if(pr.updating()) View.working = false;
+      if(obsolete(thread, pr)) return true;
+
+      final Result result = pr.result();
+      final Nodes nodes = result instanceof Nodes ? (Nodes) result : null;
+
+      /* convert xquery result to a flat nodeset
+       * solve problems with TextView first
+      if(result instanceof XQResult) {
+        final Nodes nod = ((XQResult) result).nodes(data);
+        if(nod != null) result = nod;
+      }*/
+
+      // cached resulting text output
+      final String inf = pr.info();
+
+      if(pr.printing() || (!ok && inf.length() != 0)) {
+        if(!GUIProp.showstarttext && data == null ||
+           !GUIProp.showtext && data != null && nodes == null) {
+          GUICommands.SHOWTEXT.execute();
         }
-
-        cursor(CURSORWAIT);
-        try {
-          // parse command string
-          final CommandParser cp = new CommandParser(command);
-          while(cp.more()) {
-            final Command cmd = cp.next();
-            final Commands cc = cmd.name;
-            if(obsolete(thread, cc)) return;
-
-            // exit command
-            if(cc == Commands.EXIT || cc == Commands.QUIT) {
-              quit();
-              return;
-            }
-            proc = cmd.proc(context);
-            if(cc.updating()) View.working = true;
-
-            // cache some variables before executing the command
-            final Performance perf = new Performance();
-            final Nodes current = context.current();
-            final Data data = context.data();
-            final Proc p = proc;
-
-            // execute command
-            final boolean ok = p.execute();
-            if(!ok && p.info().length() == 0) {
-              proc = null;
-              return;
-            }
-
-            if(cc.updating()) View.working = false;
-            if(obsolete(thread, cc)) return;
-
-            final Result result = p.result();
-            final Nodes nodes = result instanceof Nodes ? (Nodes) result : null;
-
-            /* convert xquery result to a flat nodeset
-             * solve problems with TextView first
-            if(result instanceof XQResult) {
-              final Nodes nod = ((XQResult) result).nodes(data);
-              if(nod != null) result = nod;
-            }*/
-
-            // cached resulting text output
-            final CachedOutput out = new CachedOutput(TextView.MAX);
-
-            if(cc.printing() || !ok) {
-              if(!GUIProp.showstarttext && data == null ||
-                 !GUIProp.showtext && data != null && nodes == null) {
-                GUICommands.SHOWTEXT.execute();
-              }
-              // retrieve text result
-              if(text.isValid() && nodes == null) {
-                p.output(out);
-                out.addInfo();
-              }
-            }
-
-            // check if query feedback was evaluated in the query view
-            final String inf = p.info();
-            final boolean feedback = cc.printing() && data != null &&
-              GUIProp.showquery && cc == Commands.XQUERY && query.info(inf, ok);
-            
-            if(!ok) {
-              // show error info
-              if(feedback) status.setText(STATUSOK);
-              else status.setError(inf);
-              break;
-            }
-            
-            final String time = perf.getTimer();
-            if(obsolete(thread, cc)) return;
-
-            final Data ndata = context.data();
-            if(ndata != data) {
-              // database reference has changed - notify views
-              View.notifyInit();
-            } else if(cc.updating()) {
-              // update command
-              View.notifyUpdate();
-            } else if(result != null) {
-              if(context.current() != current || GUIProp.filterrt) {
-                // refresh context
-                if(nodes != null) {
-                  if(GUIProp.filterrt) {
-                    View.ftPos = nodes.ftpos;
-                    View.ftPoi = nodes.ftpoin;
-                  }
-                  View.notifyContext((Nodes) result, GUIProp.filterrt);
-                }
-              } else if(context.marked() != null) {
-                // refresh highlight
-                Nodes marked = context.marked();
-                // nodes as result?
-                if(nodes != null) {
-                  marked = nodes;
-                } else if(marked.size != 0) {
-                  // any other result - remove old marks
-                  marked = new Nodes(data);
-                }
-                // highlights have changed.. refresh views
-                if(marked != context.marked()) {
-                  View.ftPos = marked.ftpos;
-                  View.ftPoi = marked.ftpoin;
-                  View.notifyMark(marked);
-                }
-              }
-            }
-            if(obsolete(thread, cc)) return;
-
-            // print result
-            if(cc.printing() && nodes == null) {
-              text.setText(out.buffer(), out.size(), false);
-              //text.updateHeader(null);
-            }
-
-            // show number of hits
-            setHits(result == null ? 0 : result.size());
-
-            // show query info
-            if(GUIProp.showinfo) info.setInfo(result != null ?
-                Token.token(inf) : Token.EMPTY);
-
-            // show status info
-            status.setText(BaseX.info(PROCTIME, time));
-          }
-        } catch(final IllegalArgumentException ex) {
-          // unknown command or wrong argument
-          JOptionPane.showMessageDialog(GUI.this, ex.getMessage(),
-              DIALOGINFO, JOptionPane.INFORMATION_MESSAGE);
-          status.setText(STATUSOK);
-        } catch(final Exception ex) {
-          // unexpected error
-          //BaseX.debug(ex);
-          ex.printStackTrace();
-          String msg = ex.toString();
-          if(msg.length() == 0) msg = ex.getMessage();
-
-          JOptionPane.showMessageDialog(GUI.this, BaseX.info(PROCERR,
-              command, msg), DIALOGINFO, JOptionPane.ERROR_MESSAGE);
+        // retrieve text result
+        if(text.isValid() && nodes == null) {
+          final CachedOutput out = new CachedOutput(TextView.MAX);
+          if(ok) pr.output(out);
+          else out.println(inf);
+          out.addInfo();
+          text.setText(out.buffer(), out.size(), false);
         }
+      }
 
+      // check if query feedback was evaluated in the query view
+      final boolean feedback = pr.printing() && data != null &&
+        GUIProp.showquery && pr instanceof XQuery && query.info(inf, ok);
+
+      if(!ok) {
+        // show error info
+        if(feedback) status.setText(STATUSOK);
+        else status.setError(inf);
         cursor(CURSORARROW, true);
         proc = null;
+        return false;
       }
-    }.start();
+      if(obsolete(thread, pr)) return true;
+
+      final String time = perf.getTimer();
+
+      final Data ndata = context.data();
+      if(ndata != data) {
+        // database reference has changed - notify views
+        View.notifyInit();
+      } else if(pr.updating()) {
+        // update command
+        View.notifyUpdate();
+      } else if(result != null) {
+        if(context.current() != current || GUIProp.filterrt) {
+          // refresh context
+          if(nodes != null) {
+            if(GUIProp.filterrt) {
+              View.ftPos = nodes.ftpos;
+              View.ftPoi = nodes.ftpoin;
+            }
+            View.notifyContext((Nodes) result, GUIProp.filterrt);
+          }
+        } else if(context.marked() != null) {
+          // refresh highlight
+          Nodes marked = context.marked();
+          // nodes as result?
+          if(nodes != null) {
+            marked = nodes;
+          } else if(marked.size != 0) {
+            // any other result - remove old marks
+            marked = new Nodes(data);
+          }
+          // highlights have changed.. refresh views
+          if(marked != context.marked()) {
+            View.ftPos = marked.ftpos;
+            View.ftPoi = marked.ftpoin;
+            View.notifyMark(marked);
+          }
+        }
+      }
+      if(obsolete(thread, pr)) return true;
+
+      // show number of hits
+      setHits(result == null ? 0 : result.size());
+
+      // show query info
+      if(GUIProp.showinfo) info.setInfo(result != null ?
+          Token.token(inf) : Token.EMPTY);
+
+      // show status info
+      status.setText(BaseX.info(PROCTIME, time));
+    } catch(final IllegalArgumentException ex) {
+      // unknown command or wrong argument
+      JOptionPane.showMessageDialog(GUI.this, ex.getMessage(),
+          DIALOGINFO, JOptionPane.INFORMATION_MESSAGE);
+      status.setText(STATUSOK);
+    } catch(final Exception ex) {
+      // unexpected error
+      //BaseX.debug(ex);
+      ex.printStackTrace();
+      String msg = ex.toString();
+      if(msg.length() == 0) msg = ex.getMessage();
+
+      JOptionPane.showMessageDialog(GUI.this, BaseX.info(PROCERR,
+          pr, msg), DIALOGINFO, JOptionPane.ERROR_MESSAGE);
+    }
+
+    cursor(CURSORARROW, true);
+    proc = null;
+    return true;
   }
 
   /**
@@ -674,7 +683,7 @@ public final class GUI extends JFrame {
     refreshMode();
     toolbar.refresh();
     menu.refresh();
-    
+
     final int i = !context.db() ? 2 : GUIProp.searchmode;
     final String[] hs = i == 0 ? GUIProp.search : i == 1 ? GUIProp.xpath :
       GUIProp.commands;

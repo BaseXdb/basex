@@ -7,8 +7,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.basex.build.DiskBuilder;
 import org.basex.build.xml.XMLParser;
-import org.basex.core.proc.Drop;
-import org.basex.core.proc.Open;
+import org.basex.core.proc.DropDB;
 import org.basex.io.IO;
 import org.basex.io.TableDiskAccess;
 import static org.junit.Assert.*;
@@ -43,18 +42,17 @@ public final class TableBlockAccessTest {
    */
   @BeforeClass
   public static void setUpBeforeClass() {
-    Drop.drop(DBNAME);
+    DropDB.drop(DBNAME);
   }
 
   /**
    * Load the JUnitTest database.
-   * @throws IOException in case of probs
+   * @throws Exception in case of probs
    */
   @Before
-  public void setUp() throws IOException {
-    final IO file = new IO(TESTFILE);
-    new DiskBuilder().build(new XMLParser(file), DBNAME);
-    size = Open.open(DBNAME).size;
+  public void setUp() throws Exception {
+    final XMLParser parser = new XMLParser(new IO(TESTFILE));
+    size = new DiskBuilder().build(parser, DBNAME).size;
     tba = new TableDiskAccess(DBNAME, DATATBL);
     final int bytecount = size * (1 << IO.NODEPOWER);
     storage = new byte[bytecount];
@@ -339,7 +337,7 @@ public final class TableBlockAccessTest {
   @After
   public void tearDown() throws Exception {
     tba.close();
-    Drop.drop(DBNAME);
+    DropDB.drop(DBNAME);
   }
 }
 

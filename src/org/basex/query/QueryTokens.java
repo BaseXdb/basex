@@ -149,6 +149,7 @@ public interface QueryTokens {
   String FILEINFO = " in %";
   /** Parsing exception. */
   String FOUND = ", found \"%\"";
+  
   /** Parsing exception. */
   String UNENTITY = "Unknown entity \"%\".";
   /** Parsing exception. */

@@ -1,7 +1,6 @@
 package org.basex.gui.view.query;
 
 import static org.basex.Text.*;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Insets;
@@ -10,12 +9,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
-
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 
-import org.basex.core.Commands;
 import org.basex.core.proc.Find;
+import org.basex.core.proc.XPath;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.StatsKey;
@@ -380,7 +378,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     if(!force && last.equals(qu)) return;
     last = qu;
     BaseXLayout.enable(copy, last.length() != 0);
-    GUI.get().execute(Commands.XPATH, qu);
+    GUI.get().execute(new XPath(qu));
   }
 
   @Override

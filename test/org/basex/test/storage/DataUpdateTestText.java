@@ -3,12 +3,12 @@ package org.basex.test.storage;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 import java.io.IOException;
+import org.basex.core.Context;
 import org.basex.core.Prop;
-import org.basex.core.proc.Create;
-import org.basex.core.proc.Drop;
+import org.basex.core.proc.CreateDB;
+import org.basex.core.proc.DropDB;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
-import org.basex.io.IO;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -21,6 +21,8 @@ import org.junit.Test;
  * @author Tim Petrowsky
  */
 public final class DataUpdateTestText {
+  /** Context. */
+  private static final Context CONTEXT = new Context();
   /** Test file size in nodes. */
   private int size;
   /** Data. */
@@ -46,7 +48,8 @@ public final class DataUpdateTestText {
    */
   @Before
   public void setUp() throws Exception {
-    data = Create.xml(new IO(TESTFILE), DBNAME);
+    new CreateDB(TESTFILE, DBNAME).execute(CONTEXT);
+    data = CONTEXT.data();
     size = data.size;
   }
 
@@ -57,7 +60,7 @@ public final class DataUpdateTestText {
   @After
   public void tearDown() throws Exception {
     data.close();
-    Drop.drop(DBNAME);
+    DropDB.drop(DBNAME);
   }
 
   /**

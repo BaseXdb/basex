@@ -1,11 +1,9 @@
 package org.basex.gui.dialog;
 
 import static org.basex.Text.*;
-
 import java.awt.BorderLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-
 import javax.swing.JFrame;
 
 import org.basex.core.proc.List;

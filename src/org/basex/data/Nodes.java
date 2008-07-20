@@ -1,5 +1,7 @@
 package org.basex.data;
 
+import java.io.IOException;
+
 import org.basex.core.Context;
 import org.basex.util.Array;
 import org.basex.util.TokenBuilder;
@@ -154,7 +156,7 @@ public final class Nodes implements Result {
   }
 
   /** {@inheritDoc} */
-  public void serialize(final Serializer ser) throws Exception {
+  public void serialize(final Serializer ser) throws IOException {
     ser.open(size);
     for(int c = 0; c < size; c++) {
       if(ser.finished()) break;

@@ -2,6 +2,9 @@ package org.basex.query.xquery.item;
 
 import static org.basex.util.Token.*;
 import static org.basex.query.xquery.XQTokens.*;
+
+import java.io.IOException;
+
 import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
@@ -46,7 +49,7 @@ public final class DNode extends Node {
 
   @Override
   public void serialize(final Serializer ser, final XQContext ctx,
-      final int level) throws Exception {
+      final int level) throws IOException {
 
     switch(type) {
       case ATT:
@@ -198,10 +201,10 @@ public final class DNode extends Node {
    * @param ser result reader
    * @param pr pre value
    * @param level current level
-   * @throws Exception exception
+   * @throws IOException exception
    */
   public void serElem(final Serializer ser, final int pr, final int level)
-      throws Exception {
+      throws IOException {
 
     // attribute lists
     final TokenList names = new TokenList();

@@ -8,37 +8,58 @@ import org.basex.util.TokenBuilder;
 import org.basex.util.XMLToken;
 
 /**
- * Abstract parser definition.
+ * Simple query parser; can be overwritten to support more complex parsings.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public abstract class QueryParser {
+public class QueryParser {
   /** Temporary token constructions. */
-  protected final TokenBuilder tok = new TokenBuilder();
-  /** Optional name of input file. */
-  public IO file;
+  protected TokenBuilder tk = new TokenBuilder();
+  /** Optional reference to query input. */
+  protected IO file;
   /** Input query. */
-  public String qu;
+  protected String qu;
   /** Current query position. */
-  public int qp;
+  protected int qp;
+  /** Marked query position. */
+  protected int qm;
   /** Query length. */
-  public int ql;
+  protected int ql;
 
   /**
-   * Initializes the query.
+   * Constructor.
    * @param q input query
    */
-  protected void init(final String q) {
+  public void init(final String q) {
     qu = q;
     ql = qu.length();
+  }
+
+  /**
+   * Checks if the input is valid.
+   * @return 0 if everything is valid
+   */
+  public int valid() {
+    for(qp = ql; qp > 0; qp--) {
+      if(!XMLToken.valid(qu.charAt(qp - 1))) return qu.charAt(qp - 1);
+    }
+    return -1;
+  }
+
+  /**
+   * Checks if more characters are found.
+   * @return current character
+   */
+  public boolean more() {
+    return qp < ql;
   }
 
   /**
    * Returns the current character.
    * @return current character
    */
-  protected final char curr() {
+  public char curr() {
     return qp >= ql ? 0 : qu.charAt(qp);
   }
 
@@ -47,15 +68,22 @@ public abstract class QueryParser {
    * @param ch character to be checked
    * @return result of check
    */
-  protected final boolean curr(final int ch) {
+  public boolean curr(final int ch) {
     return curr() == ch;
+  }
+
+  /**
+   * Remember the current position.
+   */
+  public void mark() {
+    qm = qp;
   }
 
   /**
    * Returns the next character.
    * @return result of check
    */
-  protected final char next() {
+  public char next() {
     return qp + 1 >= ql ? 0 : qu.charAt(qp + 1);
   }
 
@@ -63,7 +91,7 @@ public abstract class QueryParser {
    * Returns next character.
    * @return next character
    */
-  protected final char consume() {
+  public char consume() {
     return qp >= ql ? 0 : qu.charAt(qp++);
   }
 
@@ -72,7 +100,7 @@ public abstract class QueryParser {
    * @param ch character to consume
    * @return true if character was found
    */
-  protected final boolean consume(final int ch) {
+  public boolean consume(final int ch) {
     final boolean found = curr() == ch;
     if(found) qp++;
     return found;
@@ -83,23 +111,22 @@ public abstract class QueryParser {
    * @param ch character to be checked
    * @return result
    */
-  protected final boolean quote(final char ch) {
+  public boolean quote(final char ch) {
     return ch == '"' || ch == '\'';
   }
 
   /**
    * Consumes all whitespace characters from the beginning of the remaining
    * query.
-   * @return true if whitespaces were found
    */
-  protected final boolean consumeWS() {
-    final int p = qp;
+  public void consumeWS() {
     while(qp < ql) {
       final char ch = qu.charAt(qp);
-      if(ch <= 0 || ch > ' ') return p != qp;
+      if(ch <= 0 || ch > ' ') break;
       qp++;
     }
-    return true;
+    qm = qp;
+    return;
   }
 
   /**
@@ -107,7 +134,7 @@ public abstract class QueryParser {
    * @param str string to consume
    * @return true if string was found
    */
-  protected final boolean consume(final String str) {
+  public boolean consume(final String str) {
     int p = qp;
     final int l = str.length();
     if(p + l > ql) return false;
@@ -120,7 +147,7 @@ public abstract class QueryParser {
    * Returns a "found" string, containing the current character.
    * @return completion
    */
-  protected final byte[] found() {
+  public byte[] found() {
     return curr() == 0 ? EMPTY : BaseX.inf(FOUND, curr());
   }
 
@@ -129,7 +156,7 @@ public abstract class QueryParser {
    * @param tb token builder
    * @return error string or null
    */
-  protected final String ent(final TokenBuilder tb) {
+  public String ent(final TokenBuilder tb) {
     final int p = qp;
     if(consume('&')) {
       if(consume('#')) {
@@ -176,7 +203,7 @@ public abstract class QueryParser {
    * @param p start position
    * @return entity
    */
-  protected final String invalidEnt(final int p) {
+  public String invalidEnt(final int p) {
     final String sub = qu.substring(p, Math.min(p + 20, ql));
     final int sc = sub.indexOf(';');
     final String ent = sc != -1 ? sub.substring(0, sc + 1) : sub;
@@ -187,7 +214,7 @@ public abstract class QueryParser {
    * Returns the remaining, unscanned query substring.
    * @return query substring
    */
-  protected final String rest() {
+  public String rest() {
     final int e = Math.min(ql, qp + 15);
     return qu.substring(qp, e) + (e == ql ? "" : "...");
   }

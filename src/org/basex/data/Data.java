@@ -413,7 +413,7 @@ public abstract class Data  {
    * @param val value to be inserted
    * @param kind node kind
    */
-  public abstract void insert(int pre, int par, byte[] val, byte kind);
+  public abstract void insert(int pre, int par, byte[] val, int kind);
   
   /**
    * Inserts an attribute.

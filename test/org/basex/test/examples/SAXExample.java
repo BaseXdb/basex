@@ -1,9 +1,8 @@
 package org.basex.test.examples;
 
-import org.basex.core.Commands;
 import org.basex.core.Context;
 import org.basex.core.Prop;
-import org.basex.core.proc.Proc;
+import org.basex.core.proc.Check;
 import org.basex.data.Result;
 import org.basex.data.SAXSerializer;
 import org.basex.query.QueryProcessor;
@@ -47,10 +46,8 @@ public final class SAXExample extends DefaultHandler {
     // create database context
     final Context ctx = new Context();
 
-    // create a database or open an existing one
-    final Proc proc = Proc.get(ctx, Commands.CHECK, XMLFILE);
-    // stop if database could not be opened
-    if(!proc.execute()) throw new Exception(proc.info());
+    // create a database, open an existing one or throw an exception
+    new Check(XMLFILE).execute(ctx, null);
     
     // create query instance
     final QueryProcessor xpath = new XQueryProcessor(QUERY);

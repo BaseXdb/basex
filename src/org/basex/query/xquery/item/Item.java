@@ -1,6 +1,8 @@
 package org.basex.query.xquery.item;
 
 import static org.basex.query.xquery.XQText.*;
+
+import java.io.IOException;
 import java.math.BigDecimal;
 import org.basex.BaseX;
 import org.basex.data.Serializer;
@@ -210,11 +212,11 @@ public abstract class Item extends Expr {
    * @param ser serializer
    * @param ctx query context
    * @param level current level
-   * @throws Exception exception
+   * @throws IOException exception
    */
   @SuppressWarnings("unused")
   public void serialize(final Serializer ser, final XQContext ctx,
-      final int level) throws Exception {
+      final int level) throws IOException {
     ser.item(str());
   }
 

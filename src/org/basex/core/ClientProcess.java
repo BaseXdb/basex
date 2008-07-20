@@ -14,6 +14,8 @@ import org.basex.io.PrintOutput;
  * @author Christian Gruen
  */
 public final class ClientProcess extends AbstractProcess {
+  /** Process reference. */
+  private Process proc;
   /** Host name. */
   private final String host;
   /** Port number. */
@@ -25,29 +27,29 @@ public final class ClientProcess extends AbstractProcess {
    * Constructor, specifying the server host:port and the command to be sent.
    * @param h name of the host
    * @param p port
-   * @param c command
+   * @param pr process
    */
-  public ClientProcess(final String h, final int p, final Command c) {
+  public ClientProcess(final String h, final int p, final Process pr) {
     host = h;
     port = p;
-    cmd = c;
+    proc = pr;
   }
   
   @Override
-  public boolean execute() throws IOException {
-    send(cmd.name + " " + cmd.args());
+  public boolean execute(final Context ctx) throws IOException {
+    send(proc.toString());
     return socket.getInputStream().read() != 0;
   }
 
   @Override
   public void output(final PrintOutput o) throws IOException {
-    send(Commands.GETRESULT.name());
+    send(Commands.COMMANDS.GETRESULT.name());
     receive(o);
   }
 
   @Override
   public void info(final PrintOutput o) throws IOException {
-    send(Commands.GETINFO.name());
+    send(Commands.COMMANDS.GETINFO.name());
     receive(o);
   }
 

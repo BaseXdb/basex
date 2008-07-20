@@ -1,5 +1,7 @@
 package org.basex.core;
 
+import static org.basex.Text.*;
+
 /**
  * This class is implemented by all kinds of processes.
  * It gives feedback on the current process. Moreover, it allows to
@@ -24,24 +26,30 @@ public abstract class Progress {
   
   /**
    * Returns short information on this process.
+   * Can be overwritten to give more detailed information.
    * @return header information
    */
-  protected abstract String tit();
+  protected String tit() {
+    return INFOWAIT;
+  }
   
   /**
    * Returns detailed information on the current process or sub process.
+   * Can be overwritten to give more detailed information.
    * @return information in detail
    */
   public final String detail() {
     return sub != null ? sub.detail() : det();
   }
-
-  /**
-   * Returns detailed information on this progress.
-   * @return information in detail
-   */
-  protected abstract String det();
   
+  /**
+   * Returns short information on this process.
+   * @return header information
+   */
+  public String det() {
+    return INFOWAIT;
+  }
+
   /**
    * Returns a progress value (0 - 1).
    * @return header information
@@ -52,9 +60,12 @@ public abstract class Progress {
 
   /**
    * Returns progress information.
+   * Can be overwritten to give more detailed information.
    * @return header information
    */
-  protected abstract double prog();
+  public double prog() {
+    return 0;
+  }
 
   /**
    * Sets a new sub progress.

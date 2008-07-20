@@ -32,9 +32,9 @@ public final class LOCATE extends FSCmd {
   int limit = -1;
 
   @Override
-  public void args(final String args) throws FSException {
+  public void args(final String args, final int pos) throws FSException {
     // get all Options
-    final GetOpts g = new GetOpts(args, "chl:V:", 1);
+    final GetOpts g = new GetOpts(args, "chl:V:", pos);
     while(g.more()) {
       final int ch = checkOpt(g);
       switch (ch) {
@@ -62,7 +62,7 @@ public final class LOCATE extends FSCmd {
   }
 
   @Override
-  public void exec(final String cmd, final PrintOutput out) throws IOException {
+  public void exec(final PrintOutput out) throws IOException {
     //fileToFindByte = Token.token(fileToFind);
     // Version -  1 = use table
     //            2 = use xquery

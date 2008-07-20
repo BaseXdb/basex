@@ -15,13 +15,13 @@ public final class CD extends FSCmd {
   private String path;
 
   @Override
-  public void args(final String args) throws FSException {
+  public void args(final String args, final int pos) throws FSException {
     // check default options and get path
-    path = defaultOpts(args).getPath();
+    path = defaultOpts(args, pos).getPath();
   }
 
   @Override
-  public void exec(final String cmd, final PrintOutput out) throws IOException {
+  public void exec(final PrintOutput out) throws IOException {
     // if there is path expression go to work
     if(path != null) {
       curPre = checkPre(path, FSUtils.goToDir(context.data(), curPre, path));

@@ -7,8 +7,8 @@ import java.io.IOException;
 import org.basex.io.IO;
 import org.basex.query.FTOpt;
 import org.basex.query.FTPos;
-import org.basex.query.QueryException;
 import org.basex.query.QueryParser;
+import org.basex.query.QueryException;
 import org.basex.query.FTOpt.FTMode;
 import org.basex.query.FTPos.FTUnit;
 import org.basex.query.xpath.expr.And;
@@ -76,11 +76,22 @@ public final class XPParser extends QueryParser {
    * @throws QueryException parsing exception
    */
   public XPContext parse() throws QueryException {
+    return parse(true);
+  }
+
+  /**
+   * Parses the query and returns a query context.
+   * @param end input must have been completely evaluated
+   * @return query context
+   * @throws QueryException parsing exception
+   */
+  public XPContext parse(final boolean end) throws QueryException {
     try {
       final Expr e = or();
-      if(qp != ql) error(QUERYEND, rest());
+      if(end && qp != ql) error(QUERYEND, rest());
       return new XPContext(e, qu);
     } catch(final QueryException ex) {
+      mark();
       ex.pos(this);
       throw ex;
     }
@@ -517,12 +528,12 @@ public final class XPParser extends QueryParser {
   private Literal literal() throws QueryException {
     final char delim = consume();
     if(!quote(delim)) error(WRONGTEXT, QUOTE, delim);
-    tok.reset();
+    tk.reset();
     while(!curr(0) && !curr(delim)) {
-      entity(tok);
+      entity(tk);
     }
     if(!consume(delim)) error(QUOTECLOSE);
-    return new Literal(tok.finish());
+    return new Literal(tk.finish());
   }
 
   /**
@@ -538,7 +549,7 @@ public final class XPParser extends QueryParser {
    * @return resulting expression
    */
   private double num() {
-    tok.reset();
+    tk.reset();
     boolean dot = true;
     boolean exp = true;
     char curr = curr();
@@ -549,10 +560,10 @@ public final class XPParser extends QueryParser {
       } else if(curr == 'e' || curr == 'E') {
         exp = false;
       }
-      tok.add(consume());
+      tk.add(consume());
       curr = curr();
     }
-    return toDouble(tok.finish());
+    return toDouble(tk.finish());
   }
 
   /**
@@ -584,17 +595,17 @@ public final class XPParser extends QueryParser {
    * @return string
    */
   private String name() {
-    tok.reset();
+    tk.reset();
     // '-' not allowed as first char in name
     if(letter(curr())) {
       while(!curr(0)) {
-        tok.add(consume());
+        tk.add(consume());
         final char c = curr();
         if(c == ':' && next() != ':') continue;
         if(!letterOrDigit(c) && c != '-') break;
       }
     }
-    return tok.toString();
+    return tk.toString();
   }
 
   /**

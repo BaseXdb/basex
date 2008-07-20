@@ -7,7 +7,7 @@ import org.basex.BaseX;
 import org.basex.build.xml.SAXWrapper;
 import org.basex.build.xml.XMLParser;
 import org.basex.core.Prop;
-import org.basex.core.proc.Drop;
+import org.basex.core.proc.DropDB;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
 import org.basex.data.MetaData;
@@ -52,7 +52,7 @@ public final class DiskBuilder extends Builder {
     meta.filesize = meta.file.length();
     meta.time = meta.file.date();
     
-    Drop.drop(db);
+    DropDB.drop(db);
     IO.dbpath(db).mkdirs();
 
     // calculate output buffer sizes: (1 << BLOCKPOWER) < bs < (1 << 22)

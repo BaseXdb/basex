@@ -64,7 +64,7 @@ public final class XQResult implements Result {
   }
 
   /** {@inheritDoc} */
-  public void serialize(final Serializer ser) throws Exception {
+  public void serialize(final Serializer ser) throws IOException {
     try {
       ser.open(seq.size);
       for(int i = 0; i < seq.size; i++) {
@@ -74,7 +74,7 @@ public final class XQResult implements Result {
         ser.closeResult();
       }
       ser.close(seq.size);
-    } catch(final XQException ex) {
+    } catch(final IOException ex) {
       BaseX.debug(ex);
       try {
         ser.item(Token.token(" " + ex.getMessage() + "..."));

@@ -1,5 +1,7 @@
 package org.basex.data;
 
+import java.io.IOException;
+
 import org.basex.query.ExprInfo;
 import org.basex.util.Token;
 
@@ -16,28 +18,28 @@ public abstract class Serializer {
   /**
    * Initializes the serializer.
    * @param s number of results
-   * @throws Exception exception
+   * @throws IOException exception
    */
-  public abstract void open(final int s) throws Exception;
+  public abstract void open(final int s) throws IOException;
 
   /**
    * Initializes the serializer.
    * @param s number of results
-   * @throws Exception exception
+   * @throws IOException exception
    */
-  public abstract void close(final int s) throws Exception;
+  public abstract void close(final int s) throws IOException;
 
   /**
    * Starts a result.
-   * @throws Exception exception
+   * @throws IOException exception
    */
-  public abstract void openResult() throws Exception;
+  public abstract void openResult() throws IOException;
 
   /**
    * Ends a result.
-   * @throws Exception exception
+   * @throws IOException exception
    */
-  public abstract void closeResult() throws Exception;
+  public abstract void closeResult() throws IOException;
 
   /**
    * Starts an element.
@@ -51,9 +53,9 @@ public abstract class Serializer {
   /**
    * Starts an element.
    * @param t tag
-   * @throws Exception exception
+   * @throws IOException exception
    */
-  public abstract void startElement(final byte[] t) throws Exception;
+  public abstract void startElement(final byte[] t) throws IOException;
 
   /**
    * Opens an element.
@@ -72,10 +74,10 @@ public abstract class Serializer {
    * Opens an element.
    * @param t tag
    * @param a attributes
-   * @throws Exception exception
+   * @throws IOException exception
    */
   public final void openElement(final byte[] t, final byte[]... a)
-      throws Exception {
+      throws IOException {
     startElement(t);
     for(int i = 0; i < a.length; i += 2) attribute(a[i], a[i + 1]);
     finishElement();
@@ -85,10 +87,10 @@ public abstract class Serializer {
    * Serializes an attribute.
    * @param n name
    * @param v value
-   * @throws Exception exception
+   * @throws IOException exception
    */
   public abstract void attribute(final byte[] n, final byte[] v)
-    throws Exception;
+    throws IOException;
 
   /**
    * Finishes an empty element.
@@ -116,15 +118,15 @@ public abstract class Serializer {
 
   /**
    * Finishes an empty element.
-   * @throws Exception exception
+   * @throws IOException exception
    */
-  public abstract void emptyElement() throws Exception;
+  public abstract void emptyElement() throws IOException;
 
   /**
    * Finishes an element.
-   * @throws Exception exception
+   * @throws IOException exception
    */
-  public abstract void finishElement() throws Exception;
+  public abstract void finishElement() throws IOException;
 
   /**
    * Closes an element.
@@ -138,38 +140,38 @@ public abstract class Serializer {
   /**
    * Closes an element.
    * @param t tag
-   * @throws Exception exception
+   * @throws IOException exception
    */
-  public abstract void closeElement(final byte[] t) throws Exception;
+  public abstract void closeElement(final byte[] t) throws IOException;
 
   /**
    * Serializes a text.
    * @param b text bytes
-   * @throws Exception exception
+   * @throws IOException exception
    */
-  public abstract void text(final byte[] b) throws Exception;
+  public abstract void text(final byte[] b) throws IOException;
 
   /**
    * Serializes a comment.
    * @param b comment
-   * @throws Exception exception
+   * @throws IOException exception
    */
-  public abstract void comment(final byte[] b) throws Exception;
+  public abstract void comment(final byte[] b) throws IOException;
 
   /**
    * Serializes a processing instruction.
    * @param n name
    * @param v value
-   * @throws Exception exception
+   * @throws IOException exception
    */
-  public abstract void pi(final byte[] n, final byte[] v) throws Exception;
+  public abstract void pi(final byte[] n, final byte[] v) throws IOException;
 
   /**
    * Serializes a processing instruction.
    * @param c content
-   * @throws Exception exception
+   * @throws IOException exception
    */
-  public final void pi(final byte[] c) throws Exception {
+  public final void pi(final byte[] c) throws IOException {
     byte[] n = c;
     byte[] v = Token.EMPTY;
     final int i = Token.indexOf(n, ' ');
@@ -183,9 +185,9 @@ public abstract class Serializer {
   /**
    * Serializes an item.
    * @param b text bytes
-   * @throws Exception exception
+   * @throws IOException exception
    */
-  public abstract void item(final byte[] b) throws Exception;
+  public abstract void item(final byte[] b) throws IOException;
 
   /**
    * Tests if the serialization was interrupted.
@@ -209,9 +211,9 @@ public abstract class Serializer {
    * @param data data reference
    * @param pre table position
    * @return last p value
-   * @throws Exception exception
+   * @throws IOException exception
    */
-  public final int xml(final Data data, final int pre) throws Exception {
+  public final int xml(final Data data, final int pre) throws IOException {
     int p = pre;
     final int kind = data.kind(p);
     if(kind == Data.TEXT) {
@@ -235,9 +237,9 @@ public abstract class Serializer {
    * @param data data reference
    * @param pr pre value to be written
    * @return last pre value
-   * @throws Exception exception
+   * @throws IOException exception
    */
-  public final int elem(final Data data, final int pr) throws Exception {
+  public final int elem(final Data data, final int pr) throws IOException {
     // stacks
     final int[] parent = new int[256];
     final byte[][] token = new byte[256][];

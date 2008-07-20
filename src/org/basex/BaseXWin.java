@@ -15,8 +15,8 @@ import javax.swing.UIManager;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
-import org.basex.core.Commands;
 import org.basex.core.Prop;
+import org.basex.core.proc.Check;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
@@ -59,7 +59,7 @@ public final class BaseXWin {
           if(db.endsWith(IO.BASEXSUFFIX)) {
             db = db.replaceAll("^.*/(.*)/.*", "$1");
           }
-          GUI.get().execute(Commands.CHECK, db);
+          GUI.get().execute(new Check(db));
         }
         // close wait panel
         wait.dispose();

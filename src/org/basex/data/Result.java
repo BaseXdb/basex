@@ -1,5 +1,7 @@
 package org.basex.data;
 
+import java.io.IOException;
+
 /**
  * This is an interface for query results.
  *
@@ -23,7 +25,7 @@ public interface Result {
   /**
    * Serializes the result.
    * @param ser serializer
-   * @throws Exception exception
+   * @throws IOException exception
    */
-  void serialize(Serializer ser) throws Exception;
+  void serialize(Serializer ser) throws IOException;
 }

@@ -27,9 +27,9 @@ public class CAT extends FSCmd {
   private String path;
 
   @Override
-  public void args(final String args) throws FSException {
+  public void args(final String args, final int pos) throws FSException {
     // get all Options
-    final GetOpts g = new GetOpts(args, "bhn", 1);
+    final GetOpts g = new GetOpts(args, "bhn", pos);
     while(g.more()) {
       final int ch = checkOpt(g);
       switch (ch) {
@@ -48,7 +48,7 @@ public class CAT extends FSCmd {
   }
 
   @Override
-  public void exec(final String cmd, final PrintOutput out) throws IOException {
+  public void exec(final PrintOutput out) throws IOException {
     final int[] nodes = checkPre(path,
         FSUtils.getChildren(context.data(), curPre, path));
 

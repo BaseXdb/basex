@@ -1,7 +1,7 @@
 package org.basex.test.examples;
 
-import org.basex.core.*;
-import org.basex.core.proc.*;
+import org.basex.core.Context;
+import org.basex.core.proc.XQuery;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.query.*;
@@ -27,40 +27,36 @@ public final class XQueryExample {
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
-
     // FIRST EXAMPLE:
     System.out.println("First example:");
 
     // create standard output stream
     ConsoleOutput out = new ConsoleOutput(System.out);
 
-    // create a new database context
+    // Creates a new database context
     Context context = new Context();
-    // Create a BaseX process
-    Proc proc = Proc.get(context, Commands.XQUERY, QUERY);
+
+    // Creates and executes a query
+    new XQuery(QUERY).execute(context, out);
     
-    // launch process
-    if(proc.execute()) {
-      // successful execution: print result
-      proc.output(out);
-    } else {
-      // execution failed: print result
-      proc.info(out);
-    }
-    out.flush();
-    System.out.println();
+    // Closes the output stream
+    out.println();
+    out.close();
+
     
-    // SECOND EXAMPLE:
+    // SECOND EXAMPLE, directly accessing the query processor:
     System.out.println("Second example:");
 
-    // create query instance
+    // Creates a query instance
     QueryProcessor xquery = new XQueryProcessor(QUERY);
-    // execute query; no initial context set is specified (null)
+
+    // Executes the query; no initial context set is specified (null)
     Result result = xquery.query(null);
-    // print output
+
+    // Serializes the result
     result.serialize(new XMLSerializer(out));
 
-    // close output stream
+    // Closes the output stream
     out.println();
     out.close();
   }

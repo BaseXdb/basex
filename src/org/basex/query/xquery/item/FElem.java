@@ -2,6 +2,9 @@ package org.basex.query.xquery.item;
 
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
+
+import java.io.IOException;
+
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
@@ -76,7 +79,7 @@ public final class FElem extends FNode {
 
   @Override
   public void serialize(final Serializer ser,  final XQContext ctx,
-      final int level) throws Exception {
+      final int level) throws IOException {
 
     final byte[] nm = name.str();
     ser.startElement(nm);

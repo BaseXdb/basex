@@ -166,13 +166,11 @@ public final class XQParser extends QueryParser {
       throws XQException {
 
     try {
-      file = f;
       init(q);
-      if(ql == 0) Err.or(QUERYEMPTY);
-      for(qp = ql; qp > 0; qp--) {
-        if(!XMLToken.valid(qu.charAt(qp - 1)))
-          Err.or(QUERYINV, (int) qu.charAt(qp - 1));
-      }
+      file = f;
+      if(!more()) Err.or(QUERYEMPTY);
+      final int v = valid();
+      if(v != -1) Err.or(QUERYINV, v);
 
       versionDecl();
       if(u == null) {
@@ -182,18 +180,18 @@ public final class XQParser extends QueryParser {
         moduleDecl(u);
       }
 
-      if(qp != ql) {
+      if(more()) {
         if(alter != null) error();
         if(ctx.root instanceof Step) {
           final Step step = (Step) ctx.root;
           if(step.axis == Axis.CHILD && step.test.type == null &&
               step.test.name != null) Err.or(QUERYSTEP, step);
         }
-        final int e = Math.min(ql, qp + 15);
-        Err.or(QUERYEND, qu.substring(qp, e) + (e == ql ? "" : "..."));
+        Err.or(QUERYEND, rest());
       }
       ctx.fun.check();
     } catch(final XQException ex) {
+      mark();
       ex.pos(this);
       throw ex;
     }
@@ -627,7 +625,7 @@ public final class XQParser extends QueryParser {
   private Expr expr() throws XQException {
     final Expr e = single();
     if(e == null) {
-      if(qp != ql) return null;
+      if(more()) return null;
       if(alter != null) error(); else Err.or(NOEXPR);
     }
 
@@ -974,8 +972,8 @@ public final class XQParser extends QueryParser {
     Expr e = multiplicative();
 
     while(true) {
-      final Calc c = consume('+') ? Calc.PLUS : consume('-') ? Calc.MINUS :
-        null;
+      final Calc c = consume('+') ? Calc.PLUS : consume('-') ?
+          Calc.MINUS : null;
       if(c == null) break;
       e = new Clc(e, check(multiplicative(), CALCEXPR), c);
     }
@@ -1460,7 +1458,7 @@ public final class XQParser extends QueryParser {
       consume('?') ? dirPIConstructor() : dirElemConstructor();
   }
 
-  /**
+/**
    * [ 96] Parses a DirElemConstructor.
    * [ 97-100] Parses attributes.
    * @return query expression
@@ -2392,8 +2390,8 @@ public final class XQParser extends QueryParser {
    */
   private boolean skipWS() throws XQException {
     final int p = qp;
-    while(qp < ql) {
-      final int c = qu.charAt(qp);
+    while(more()) {
+      final int c = curr();
       if(c == '(' && next() == ':') {
         comment();
       } else {
@@ -2411,8 +2409,8 @@ public final class XQParser extends QueryParser {
   private void comment() throws XQException {
     qp++;
     while(++qp < ql) {
-      if(qu.charAt(qp) == '(' && next() == ':') comment();
-      if(curr() == ':' && next() == ')') {
+      if(curr('(') && next() == ':') comment();
+      if(curr(':') && next() == ')') {
         qp += 2;
         return;
       }
@@ -2426,8 +2424,8 @@ public final class XQParser extends QueryParser {
    */
   private boolean consumeWSS() {
     final int p = qp;
-    while(qp < ql) {
-      final int c = qu.charAt(qp);
+    while(more()) {
+      final int c = curr();
       if(c <= 0 || c > ' ') return p != qp;
       qp++;
     }

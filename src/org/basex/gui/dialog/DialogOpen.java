@@ -11,8 +11,8 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import org.basex.BaseX;
-import org.basex.core.proc.Drop;
-import org.basex.core.proc.Info;
+import org.basex.core.proc.DropDB;
+import org.basex.core.proc.InfoDB;
 import org.basex.core.proc.List;
 import org.basex.data.MetaData;
 import org.basex.gui.GUI;
@@ -130,7 +130,7 @@ public final class DialogOpen extends Dialog {
       if(db.length() == 0) return;
       if(JOptionPane.showConfirmDialog(this, BaseX.info(DROPCONF, db),
           DIALOGINFO, JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-        Drop.drop(db);
+        DropDB.drop(db);
         choice.setData(List.list().finish());
         choice.requestFocusInWindow();
       }
@@ -162,7 +162,7 @@ public final class DialogOpen extends Dialog {
       ok = true;
       final MetaData meta = new MetaData(db);
       final int size = meta.read();
-      detail.setText(Info.db(meta, size, false, true));
+      detail.setText(InfoDB.db(meta, size, false, true));
     } catch(final IOException ex) {
       detail.setText(Token.token(ex.getMessage()));
       ok = false;

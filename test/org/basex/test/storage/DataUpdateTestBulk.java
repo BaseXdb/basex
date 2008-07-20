@@ -2,10 +2,11 @@ package org.basex.test.storage;
 
 import org.basex.build.MemBuilder;
 import org.basex.build.xml.XMLParser;
+import org.basex.core.Context;
 import org.basex.core.Prop;
-import org.basex.core.proc.Create;
-import org.basex.core.proc.Drop;
-import org.basex.core.proc.Insert;
+import org.basex.core.proc.Copy;
+import org.basex.core.proc.CreateDB;
+import org.basex.core.proc.DropDB;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
 import org.basex.io.IO;
@@ -22,6 +23,8 @@ import static org.junit.Assert.*;
  * @author Tim Petrowsky
  */
 public final class DataUpdateTestBulk {
+  /** Context. */
+  private static final Context CONTEXT = new Context();
   /** Test file size in nodes. */
   private int size;
   /** Data. */
@@ -51,7 +54,8 @@ public final class DataUpdateTestBulk {
    */
   @Before
   public void setUp() throws Exception {
-    data = Create.xml(new IO(TESTFILE), DBNAME);
+    new CreateDB(TESTFILE, DBNAME).execute(CONTEXT);
+    data = CONTEXT.data();
     size = data.size;
     final IO file = new IO(INSERTFILE);
     insertData = new MemBuilder().build(new XMLParser(file), INSERTFILE);
@@ -64,7 +68,7 @@ public final class DataUpdateTestBulk {
   @After
   public void tearDown() throws Exception {
     data.close();
-    Drop.drop(DBNAME);
+    DropDB.drop(DBNAME);
   }
 
   /**
@@ -148,7 +152,7 @@ public final class DataUpdateTestBulk {
    */
   @Test
   public void testBulkInsertSmall() throws Exception {
-    insert(6, 2, Insert.copy(insertData, 3));
+    insert(6, 2, Copy.copy(insertData, 3));
     assertEquals(size + 4, data.size);
     assertNodesDeepEqual(insertData, 3, data, 11);
     assertParentEqual(11, 13, data);
@@ -160,7 +164,7 @@ public final class DataUpdateTestBulk {
    */
   @Test
   public void testBulkInsertLarge() throws Exception {
-    insert(6, 2, Insert.copy(insertData, 5));
+    insert(6, 2, Copy.copy(insertData, 5));
     assertEquals(size + 2, data.size);
     assertNodesDeepEqual(insertData, 5, data, 11);
     assertParentEqual(21, 22, data);

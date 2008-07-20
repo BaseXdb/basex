@@ -8,11 +8,13 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.JComboBox;
 import javax.swing.plaf.basic.BasicComboPopup;
-import org.basex.core.Commands;
+
+import org.basex.core.CommandParser;
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXTextField;
+import org.basex.query.QueryException;
 import org.basex.util.StringList;
 
 /**
@@ -143,6 +145,9 @@ public final class GUIInput extends BaseXTextField {
   protected void completeInput() {
     Object sel = box.getSelectedItem();
     if(sel == null) sel = box.getItemAt(0);
+    final int pl = pre.length();
+    final int ll = cmdMode() && pl > 0 ? pre.charAt(pl - 1) : ' ';
+    if(ll != ';' && ll != ' ') pre += ' ';
     setText(pre + sel);
     showPopup();
   }
@@ -165,17 +170,15 @@ public final class GUIInput extends BaseXTextField {
    * @param query query input
    */
   private void cmdPopup(final String query) {
-    final StringList sl = new StringList();
-    pre = query.startsWith("!") ? "!" : "";
-    final String suf = getText().substring(pre.length());
-
-    if(suf.length() != 0) {
-      for(final String cmd : Commands.list()) {
-        if(cmd.startsWith(suf) && !cmd.equals(suf)) sl.add(cmd);
-      }
+    StringList sl = new StringList();
+    try {
+      pre = query.startsWith("!") ? "!" : "";
+      final String suf = getText().substring(pre.length());
+      new CommandParser(suf).parse();
+    } catch(final QueryException ex) {
+      sl = ex.complete();
+      pre = query.substring(0, ex.col() - 1);
     }
-    sl.sort();
-
     createCombo(sl);
   }
 
@@ -222,6 +225,7 @@ public final class GUIInput extends BaseXTextField {
       pop = new ComboPopup(box);
       box.setSelectedIndex(0);
     }
+    
     final int w = getFontMetrics(getFont()).stringWidth(pre);
     pop.show(this, Math.min(getWidth(), w), getHeight());
   }

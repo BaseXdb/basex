@@ -5,7 +5,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import org.basex.BaseX;
 import org.basex.core.Context;
-import org.basex.core.proc.Insert;
 import org.basex.data.Data;
 import org.basex.gui.GUI;
 import org.basex.gui.layout.BaseXBack;
@@ -23,8 +22,11 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class DialogEdit extends Dialog {
-  /** Resulting query. */
-  public String query;
+  /** Resulting update arguments. */
+  public String[] result;
+  /** Node kind. */
+  public final int kind;
+  
   /** Text area. */
   private BaseXTextField input;
   /** Text area. */
@@ -55,7 +57,7 @@ public final class DialogEdit extends Dialog {
 
     final Context context = GUI.context;
     final Data data = context.data();
-    final int kind = data.kind(pre);
+    kind = data.kind(pre);
 
     final String title = BaseX.info(EDITTEXT, EDITKIND[kind]);
     final BaseXLabel label = new BaseXLabel(title, true);
@@ -107,25 +109,20 @@ public final class DialogEdit extends Dialog {
   @Override
   public void close() {
     super.close();
-    query = null;
 
-    final Context context = GUI.context;
-    final Data data = context.data();
-    final int kind = data.kind(pre);
-    final String in = (input != null ? input.getText() :
-      Token.string(input3.getText())).replaceAll("\"", "\\\"");
+    final String in = input != null ? input.getText() :
+      Token.string(input3.getText());
 
     if(kind == Data.ELEM || kind == Data.DOC) {
       if(in.length() == 0 || in.equals(old1)) return;
-      query = Insert.ELEM + " \"" + in + "\"";
+      result = new String[] { in };
     } else if(kind == Data.TEXT || kind == Data.COMM) {
       if(in.equals(old2)) return;
-      query = Insert.KINDS[kind] + " \"" + in + "\"";
+      result = new String[] { in };
     } else {
       final String in2 = Token.string(input2.getText());
       if(in.length() == 0 || in.equals(old1) && in2.equals(old2)) return;
-      query = Insert.KINDS[kind] + " \"" + in + "\" \"" +
-        in2.replaceAll("\"", "\\\"") + "\"";
+      result = new String[] { in, in2 };
     }
   }
 }

@@ -183,8 +183,6 @@ public interface XQText {
   Object[] NOEXPR = { XPST, 3, "Expecting expression." };
   /** XPST0003: Parsing exception. */
   Object[] WRONGCHAR = { XPST, 3, "Expecting \"%\"%." };
-  /** XPST0003: Parsing exception. */
-  String FOUND = ", found \"%\".";
   /** FTST0000: Parsing exception. */
   Object[] FTMATCH = { XPST, 3, "Missing ftcontains option after '%'." };
   

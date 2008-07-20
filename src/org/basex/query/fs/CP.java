@@ -23,9 +23,9 @@ public final class CP extends FSCmd {
   private StringList paths;
 
   @Override
-  public void args(final String args) throws FSException {
+  public void args(final String args, final int pos) throws FSException {
     // get all Options
-    final GetOpts g = new GetOpts(args, "hR", 1);
+    final GetOpts g = new GetOpts(args, "hR", pos);
     while(g.more()) {
       final int ch = checkOpt(g);
       switch (ch) {
@@ -41,7 +41,7 @@ public final class CP extends FSCmd {
   }
 
   @Override
-  public void exec(final String cmd, final PrintOutput out) throws IOException {
+  public void exec(final PrintOutput out) throws IOException {
     // Last element of arguments is the target
     String targetfile = paths.remove(paths.size - 1);
 

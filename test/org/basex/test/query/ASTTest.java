@@ -1,9 +1,9 @@
 package org.basex.test.query;
 
-import org.basex.core.Commands;
 import org.basex.core.Context;
 import org.basex.core.Prop;
-import org.basex.core.proc.Proc;
+import org.basex.core.proc.CreateDB;
+import org.basex.core.proc.DropDB;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.query.QueryException;
@@ -32,11 +32,8 @@ public final class ASTTest {
    */
   @BeforeClass
   public static void initData() throws Exception {
-    Prop.read();
     Prop.chop = true;
-
-    final Proc proc = Proc.get(CONTEXT, Commands.CREATEDB, TEST_FILE);
-    if(!proc.execute()) throw new Exception(proc.info());
+    new CreateDB(TEST_FILE).execute(CONTEXT, null);
   }
 
   /**
@@ -71,14 +68,12 @@ public final class ASTTest {
   /**
    * Evaluates an expression.
    * @param str expression string
-   * @param cont initial context set
+   * @param n initial context set
    * @return context set
    * @throws QueryException query exception
    */
-  private Result eval(final String str, final Nodes cont)
-      throws QueryException {
-
-    return build(str).eval(cont);
+  private Result eval(final String str, final Nodes n) throws QueryException {
+    return build(str).query(n);
   }
 
   /**
@@ -359,6 +354,6 @@ public final class ASTTest {
    */
   @AfterClass
   public static void tearDown() {
-    Proc.execute(CONTEXT, Commands.DROP, "database test");
+    new DropDB("test").execute(CONTEXT);
   }
 }

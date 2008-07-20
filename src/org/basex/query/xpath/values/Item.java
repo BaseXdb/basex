@@ -1,5 +1,7 @@
 package org.basex.query.xpath.values;
 
+import java.io.IOException;
+
 import org.basex.data.Result;
 import org.basex.data.Serializer;
 import org.basex.query.xpath.XPContext;
@@ -127,7 +129,7 @@ public abstract class Item extends Expr implements Result {
   }
   
   /** {@inheritDoc} */
-  public final void serialize(final Serializer ser) throws Exception {
+  public final void serialize(final Serializer ser) throws IOException {
     ser.open(1);
     ser.openResult();
     ser.item(str());

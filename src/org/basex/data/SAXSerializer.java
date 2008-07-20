@@ -1,6 +1,9 @@
 package org.basex.data;
 
 import static org.basex.data.DataText.*;
+
+import java.io.IOException;
+
 import org.basex.BaseX;
 import org.basex.util.Token;
 import org.xml.sax.ContentHandler;
@@ -116,24 +119,24 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   private AttributesImpl atts;
 
   @Override
-  public void open(final int s) throws Exception {
+  public void open(final int s) throws IOException {
     startElement(RESULTS);
     if(s == 0) emptyElement();
     else finishElement();
   }
 
   @Override
-  public void close(final int s) throws Exception {
+  public void close(final int s) throws IOException {
     if(s != 0) closeElement(RESULTS);
   }
 
   @Override
-  public void openResult() throws Exception {
+  public void openResult() throws IOException {
     openElement(RESULT);
   }
 
   @Override
-  public void closeResult() throws Exception {
+  public void closeResult() throws IOException {
     closeElement(RESULT);
   }
   
@@ -149,39 +152,59 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  public void emptyElement() throws Exception {
+  public void emptyElement() throws IOException {
     finishElement();
-    handler.endElement("", "", tag);
+    try {
+      handler.endElement("", "", tag);
+    } catch(final SAXException ex) {
+      throw new IOException(ex.getMessage());
+    }
   }
 
   @Override
-  public void finishElement() throws SAXException {
-    handler.startElement("", "", tag, atts);
+  public void finishElement() throws IOException {
+    try {
+      handler.startElement("", "", tag, atts);
+    } catch(final SAXException ex) {
+      throw new IOException(ex.getMessage());
+    }
   }
 
   @Override
-  public void closeElement(final byte[] t) throws SAXException {
-    handler.endElement("", "", Token.string(t));
+  public void closeElement(final byte[] t) throws IOException {
+    try {
+      handler.endElement("", "", Token.string(t));
+    } catch(final SAXException ex) {
+      throw new IOException(ex.getMessage());
+    }
   }
 
   @Override
-  public void text(final byte[] b) throws SAXException {
+  public void text(final byte[] b) throws IOException {
     final char[] c = Token.string(b).toCharArray();
-    handler.characters(c, 0, c.length);
+    try {
+      handler.characters(c, 0, c.length);
+    } catch(final SAXException ex) {
+      throw new IOException(ex.getMessage());
+    }
   }
 
   @Override
-  public void comment(final byte[] t) throws SAXException {
-    throw new SAXException("Can't serialize comments.");
+  public void comment(final byte[] t) throws IOException {
+    throw new IOException("Can't serialize comments.");
   }
 
   @Override
-  public void pi(final byte[] n, final byte[] v) throws SAXException {
-    handler.processingInstruction(Token.string(n), Token.string(v));
+  public void pi(final byte[] n, final byte[] v) throws IOException {
+    try {
+      handler.processingInstruction(Token.string(n), Token.string(v));
+    } catch(final SAXException ex) {
+      throw new IOException(ex.getMessage());
+    }
   }
 
   @Override
-  public void item(final byte[] b) throws SAXException {
-    throw new SAXException("Can't serialize atomic items.");
+  public void item(final byte[] b) throws IOException {
+    throw new IOException("Can't serialize atomic items.");
   }
 }

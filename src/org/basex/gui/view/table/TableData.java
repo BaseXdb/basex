@@ -1,8 +1,8 @@
 package org.basex.gui.view.table;
 
-import org.basex.core.Commands;
 import org.basex.core.Context;
 import org.basex.core.proc.Find;
+import org.basex.core.proc.XPath;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
@@ -338,7 +338,7 @@ public final class TableData {
         data.tags.key(rootTag), data, GUIProp.filterrt || root);
     if(xpath.equals(last)) return;
     last = xpath;
-    GUI.get().execute(Commands.XPATH, xpath.length() != 0 ? xpath : "/");
+    GUI.get().execute(new XPath(xpath.length() != 0 ? xpath : "/"));
   }
 
   /**

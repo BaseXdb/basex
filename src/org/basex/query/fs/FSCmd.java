@@ -33,28 +33,27 @@ public abstract class FSCmd {
   /**
    * Checks the command line arguments.
    * @param args command line arguments
+   * @param p argument position
    * @throws FSException file system exception
    */
-  public abstract void args(final String args) throws FSException;
+  public abstract void args(final String args, final int p) throws FSException;
   
   /**
    * Executes the command..
-   * 
-   * @param cmd - command line
    * @param out output stream
    * @throws IOException - in case of problems with the PrintOutput 
    */
-  public abstract void exec(final String cmd, final PrintOutput out)
-    throws IOException;
+  public abstract void exec(final PrintOutput out) throws IOException;
 
   /**
    * Checks the default options and returns the option parser.
    * @param args command arguments
+   * @param p start position
    * @return option parser
    * @throws FSException file system exception
    */
-  final GetOpts defaultOpts(final String args) throws FSException {
-    final GetOpts g = new GetOpts(args, "h", 1);
+  final GetOpts defaultOpts(final String args, final int p) throws FSException {
+    final GetOpts g = new GetOpts(args, "h", p);
     while(g.more()) checkOpt(g);
     return g;
   }

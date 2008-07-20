@@ -2,7 +2,6 @@ package org.basex.query.fs;
 
 import static org.basex.query.fs.FSText.*;
 import java.io.IOException;
-
 import org.basex.BaseX;
 
 /**

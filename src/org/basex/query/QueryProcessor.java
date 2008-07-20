@@ -66,17 +66,6 @@ public abstract class QueryProcessor extends Progress {
   }
 
   /**
-   * Evaluates the query and returns the result.
-   * @param n node context
-   * @return result of query
-   * @throws QueryException query exception
-   */
-  public final Result eval(final Nodes n) throws QueryException {
-    if(!compiled) compile(n);
-    return context.eval(n);
-  }
-
-  /**
    * Parses the specified query and returns the result nodes.
    * @param nodes node context
    * @return result of query
@@ -97,7 +86,8 @@ public abstract class QueryProcessor extends Progress {
    * @throws QueryException query exception
    */
   public final Result query(final Nodes n) throws QueryException {
-    return eval(n);
+    if(!compiled) compile(n);
+    return context.eval(n);
   }
   
   /**

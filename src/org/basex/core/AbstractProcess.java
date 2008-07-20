@@ -1,6 +1,5 @@
 package org.basex.core;
 
-import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.io.PrintOutput;
 
@@ -13,18 +12,16 @@ import org.basex.io.PrintOutput;
  * @author Christian Gruen
  */
 public abstract class AbstractProcess extends Progress {
-  /** Command reference. */
-  protected Command cmd;
-  
   /**
-   * Processes a command.
+   * Executes a command.
+   * @param ctx context reference
    * @return success of operation
    * @throws IOException I/O exception
    */
-  public abstract boolean execute() throws IOException;
+  public abstract boolean execute(final Context ctx) throws IOException;
 
   /**
-   * Processes a command.
+   * Serializes the textual results of a command.
    * @param out output stream
    * @throws IOException I/O exception
    */
@@ -36,19 +33,4 @@ public abstract class AbstractProcess extends Progress {
    * @throws IOException I/O exception
    */
   public abstract void info(final PrintOutput out) throws IOException;
-
-  @Override
-  public String tit() {
-    return INFOWAIT;
-  }
-
-  @Override
-  public String det() {
-    return INFOWAIT;
-  }
-
-  @Override
-  public double prog() {
-    return 0;
-  }
 }

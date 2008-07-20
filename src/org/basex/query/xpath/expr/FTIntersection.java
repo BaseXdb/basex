@@ -230,7 +230,7 @@ public final class FTIntersection extends FTArrayExpr {
   public Object[] calculateFTAndOrderPreserving(final int[][] val2, 
       final int[][]val1, final int[] po) {
     
-    if (val1 == null || val1[0].length == 0 || val2 == null  
+    if (val1 == null || val1[0].length == 0 || val2 == null
         || val2[0].length == 0) {
       return new Object[]{null, null};
     } 

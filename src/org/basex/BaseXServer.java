@@ -8,14 +8,17 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import org.basex.core.ClientProcess;
-import org.basex.core.Command;
-import org.basex.core.Commands;
+import org.basex.core.CommandParser;
 import org.basex.core.Context;
+import org.basex.core.Process;
 import org.basex.core.Prop;
-import org.basex.core.proc.Proc;
+import org.basex.core.proc.GetInfo;
+import org.basex.core.proc.GetResult;
+import org.basex.core.proc.Stop;
 import org.basex.io.BufferedOutput;
 import org.basex.io.ConsoleOutput;
 import org.basex.io.PrintOutput;
+import org.basex.query.QueryException;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 import static org.basex.Text.*;
@@ -23,7 +26,7 @@ import static org.basex.Text.*;
 /**
  * This is the starter class for the database server.
  * It handles incoming requests and offers some simple threading to
- * allow simultaneous database requests. 
+ * allow simultaneous database requests.
  * Add the '-h' option to get a list on all available command-line arguments.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
@@ -46,9 +49,11 @@ public final class BaseXServer {
   /** Client ip addresses. */
   private final String[] client = new String[MAX];
   /** Core reference. */
-  private final Proc[] core = new Proc[MAX];
-  /** Core reference. */
   private final long[] time = new long[MAX];
+  /** Core reference. */
+  private final Process[] corc = new Process[MAX];
+  /* Core reference.
+  private final Proc[] core = new Proc[MAX]; */
   
   /**
    * Main method, launching the server process.
@@ -100,13 +105,29 @@ public final class BaseXServer {
       final Performance perf = new Performance();
       // get command and arguments
       final DataInputStream dis = new DataInputStream(s.getInputStream());
-      final Command cmd = new Command(dis.readUTF().trim());
+      final String in = dis.readUTF().trim();
       
-      // quit server
-      if(cmd.name == Commands.STOP) {
+      final InetAddress addr = s.getInetAddress();
+      final String ip = addr.toString();
+      if(verbose) BaseX.outln("[%:%] %", addr.getHostAddress(),
+          s.getPort(), in);
+
+      Process pr = null;
+      try {
+        pr = new CommandParser(in).parse()[0];
+      } catch(final QueryException ex) {
+        BaseX.errln(ex.getMessage());
+        final OutputStream out = s.getOutputStream();
+        out.write(0);
+        out.close();
+        return;
+      }
+      final Process proc = pr;
+      
+      if(proc instanceof Stop) {
         s.getOutputStream().write(1);
         // interrupt running processes
-        for(int p = 0; p < MAX; p++) if(core[p] != null) core[p].stop();
+        for(int p = 0; p < MAX; p++) if(corc[p] != null) corc[p].stop();
         running = false;
         return;
       }
@@ -116,55 +137,43 @@ public final class BaseXServer {
         @Override
         public void run() {
           try {
-            final InetAddress addr = s.getInetAddress();
-            final String ip = addr.toString();
-
-            if(!cmd.name.server()) {
+            if(proc instanceof GetResult || proc instanceof GetInfo) {
+              final OutputStream os = s.getOutputStream();
+              final PrintOutput out = new PrintOutput(new BufferedOutput(os));
+              final Process c = session(ip);
+              if(c == null) {
+                out.print(SERVERFULL);
+              } else if(proc instanceof GetResult) {
+                // the client requests result of the last process
+                c.output(out);
+              } else if(proc instanceof GetInfo) {
+                // the client requests information about the last process
+                c.info(out);
+              }
+              out.close();
+            } else {
               // process a normal request
-              final Proc proc = cmd.proc(context);
-              final Proc p = newCore(proc, ip);
-              boolean ok = p != null;
-
+              boolean ok = save(proc, ip);
               if(ok) {
-                ok = p.execute();
+                ok = proc.execute(context);
                 if(!ok && verbose) {
                   final PrintOutput o = new ConsoleOutput(System.err);
-                  p.info(o);
+                  proc.info(o);
                   o.close();
                 }
               }
-
               // answer with ok flag (1: everything alright, 0: error)
               final OutputStream out = s.getOutputStream();
               out.write(ok ? 1 : 0);
               out.close();
-            } else {
-              final OutputStream os = s.getOutputStream();
-              final PrintOutput out = new PrintOutput(new BufferedOutput(os));
-
-              final Proc c = getSession(ip);
-              if(c == null) {
-                out.print(SERVERFULL);
-              } else if(cmd.name == Commands.GETRESULT) {
-                // the client requests result of the last computation
-                c.output(out);
-                out.close();
-              } else if(cmd.name == Commands.GETINFO) {
-                // the client requests information about the last computation
-                c.info(out);
-              }
-              out.close();
             }
             dis.close();
-            
-            if(verbose) {
-              BaseX.outln("%:% => % [%]", addr.getHostAddress(),
-                  s.getPort(), cmd, perf.getTimer());
-            }
           } catch(final Exception ex) {
             if(ex instanceof IOException) BaseX.errln(SERVERERR);
             else ex.printStackTrace();
           }
+          if(verbose) BaseX.outln("[%:%] %", addr.getHostAddress(),
+              s.getPort(), perf.getTimer());
         }
       }.start();
     } catch(final Exception ex) {
@@ -174,11 +183,31 @@ public final class BaseXServer {
   }
 
   /**
+   * Saves a user process.
+   * @param cmd command
+   * @param ip client ip address
+   * @return result of check
+   */
+  synchronized boolean save(final Process cmd, final String ip) {
+    final long t = System.nanoTime();
+    
+    for(int i = 0; i < MAX; i++) {
+      if(client[i] == null || client[i].equals(ip) || t - time[i] > TIMEOUT) {
+        client[i] = ip;
+        time[i] = System.nanoTime();
+        corc[i] = cmd;
+        return true;
+      }
+    }
+    BaseX.errln(SERVERFULL);
+    return false;
+  }
+
+  /**
    * Returns a new client session.
    * @param cmd command
    * @param ip client ip address
    * @return core reference
-   */
   synchronized Proc newCore(final Proc cmd, final String ip) {
     final long t = System.nanoTime();
     
@@ -193,15 +222,28 @@ public final class BaseXServer {
     BaseX.errln(SERVERFULL);
     return null;
   }
+   */
 
   /**
    * Returns the correct client session.
    * @param ip client ip address
    * @return core reference
-   */
   synchronized Proc getSession(final String ip) {
     for(int i = 0; i < MAX; i++) {
       if(ip.equals(client[i])) return core[i];
+    }
+    return null;
+  }
+   */
+  
+  /**
+   * Returns the correct client session.
+   * @param ip client ip address
+   * @return core reference
+   */
+  synchronized Process session(final String ip) {
+    for(int i = 0; i < MAX; i++) {
+      if(ip.equals(client[i])) return corc[i];
     }
     return null;
   }
@@ -248,8 +290,7 @@ public final class BaseXServer {
       } else if(args[a].equals("stop")) {
         try {
           // run new process, sending the stop command
-          new ClientProcess("localhost", Prop.port,
-              new Command(Commands.STOP, "")).execute();
+          new ClientProcess("localhost", Prop.port, new Stop()).execute(null);
           BaseX.outln(SERVERSTOPPED);
         } catch(final Exception ex) {
           if(ex instanceof IOException) BaseX.errln(SERVERERR);

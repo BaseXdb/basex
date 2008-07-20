@@ -15,15 +15,15 @@ public final class TOUCH extends FSCmd {
   private String path;
 
   @Override
-  public void args(final String args) throws FSException {
+  public void args(final String args, final int pos) throws FSException {
     // check default options and get path
-    path = defaultOpts(args).getPath();
+    path = defaultOpts(args, pos).getPath();
     // no file/path was specified...
     if(path == null) error("", 100);
   }
 
   @Override
-  public void exec(final String cmd, final PrintOutput out) throws IOException {
+  public void exec(final PrintOutput out) throws IOException {
     final int beginIndex = path.lastIndexOf('/');
     if(beginIndex > -1) {
       curPre = checkPre(path, FSUtils.goToDir(context.data(), curPre,

@@ -1,9 +1,11 @@
 package org.basex.test.query;
 
-import org.basex.core.Commands;
 import org.basex.core.Context;
+import org.basex.core.Process;
 import org.basex.core.Prop;
-import org.basex.core.proc.Proc;
+import org.basex.core.proc.CreateDB;
+import org.basex.core.proc.XPath;
+import org.basex.core.proc.XQuery;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.query.xquery.XQResult;
@@ -52,33 +54,33 @@ public final class QueryTest {
     Prop.ftfuzzy = true;
     Prop.chop = true;
 
-    test(Commands.XPATH);
-    test(Commands.XQUERY);
+    test(false);
+    test(true);
   }
   
 
   /**
    * Tests the specified query implementation.
-   * @param cmd query command
+   * @param xquery use xpath/xquery
    * @return true if everything went alright
    */
-  private boolean test(final Commands cmd) {
-    System.out.println("Testing " + cmd);
+  private boolean test(final boolean xquery) {
+    System.out.println("Testing " + (xquery ? "XQuery" : "XPath"));
     boolean ok = true;
-    ok &= test(cmd, new SimpleTest());
-    ok &= test(cmd, new XPathMarkFTTest());
-    ok &= test(cmd, new FTTest());
+    ok &= test(xquery, new SimpleTest());
+    ok &= test(xquery, new XPathMarkFTTest());
+    ok &= test(xquery, new FTTest());
     System.out.println(ok ? "All tests correct.\n" : "Wrong results...\n");
     return ok;
   }
 
   /**
    * Tests the specified instance.
-   * @param cmd query command
+   * @param xquery use xpath/xquery
    * @param test instance
    * @return true if everything went alright
    */
-  private boolean test(final Commands cmd, final AbstractTest test) {
+  private boolean test(final boolean xquery, final AbstractTest test) {
     boolean ok = true;
 
     String name = test.getClass().getSimpleName();
@@ -86,8 +88,8 @@ public final class QueryTest {
     out("\nBuilding database...\n");
 
     final String file = test.doc.replaceAll("\\\"", "\\\\\"");
-    Proc proc = Proc.get(context, Commands.CREATE, "db \"" + file + "\"");
-    if(!proc.execute()) {
+    Process proc = new CreateDB(file);
+    if(!proc.execute(context)) {
       err("\n", proc.info());
       return false;
     }
@@ -99,11 +101,10 @@ public final class QueryTest {
       boolean correct = qu.length == 3;
       String query = qu[correct ? 2 : 1].toString();
 
-      proc = Proc.get(context, cmd, query);
-      if(proc.execute()) {
+      proc = xquery ? new XQuery(query) : new XPath(query);
+      if(proc.execute(context)) {
         Result value = proc.result();
-        if(cmd == Commands.XQUERY) 
-          value = ((XQResult) value).xpResult(context.data());
+        if(xquery) value = ((XQResult) value).xpResult(context.data());
         
         final Result cmp = correct ? (Result) qu[1] : null;
         if(value instanceof Nodes && cmp instanceof Nodes) {
