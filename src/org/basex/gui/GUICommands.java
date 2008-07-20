@@ -779,7 +779,7 @@ public enum GUICommands implements GUICommand {
   GOUP(true, GUIGOUP, "alt UP", GUIGOUPTT) {
     @Override
     public void execute() {
-      GUI.get().execute(new Cd(".."));
+      GUI.get().exec(new Cd(".."));
     }
 
     @Override
@@ -795,7 +795,7 @@ public enum GUICommands implements GUICommand {
   ROOT(true, GUIROOT, "alt HOME", GUIROOTTT) {
     @Override
     public void execute() {
-      GUI.get().execute(new Cd("/"));
+      GUI.get().exec(new Cd("/"));
     }
 
     @Override

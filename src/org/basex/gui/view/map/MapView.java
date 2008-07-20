@@ -663,8 +663,8 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public void keyPressed(final KeyEvent e) {
-    if(working) return;
     super.keyPressed(e);
+    if(working) return;
     if(mainRects == null || e.isControlDown() || e.isAltDown()) return;
 
     final int key = e.getKeyCode();

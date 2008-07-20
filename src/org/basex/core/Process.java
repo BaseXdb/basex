@@ -55,23 +55,6 @@ public abstract class Process extends AbstractProcess {
   }
 
   /**
-   * Returns a single process for the string input.
-   * @param in input
-   * @return process
-  public static Procc get(final String in) {
-    try {
-      final CmdParser parser = new CmdParser(in); 
-      final Procc[] p = parser.parse();
-      if(p.length == 1) return p[0];
-      parser.error(null, "One single command expected.");
-    } catch(final QueryException ex) {
-      ex.printStackTrace();
-    }
-    return null;
-  }
-   */
-
-  /**
    * Executes the process and serializes the results.
    * If an error happens, an exception is thrown.
    * @param ctx query context
@@ -81,18 +64,8 @@ public abstract class Process extends AbstractProcess {
   public void execute(final Context ctx, final PrintOutput out)
       throws Exception {
     
-    // Launches the process
     if(!execute(ctx)) throw new RuntimeException(info());
-    if(printing()) output(out);
-  }
-
-  /**
-   * Executes a process. Returns an {@link IllegalArgumentException} if
-   * the number of arguments is wrong.
-   * @return success of operation
-   */
-  protected boolean exec() {
-    return true;
+    output(out);
   }
 
   @Override
@@ -116,11 +89,18 @@ public abstract class Process extends AbstractProcess {
     }
   }
 
+  /**
+   * Executes a process.
+   * @return success of operation
+   */
+  protected boolean exec() {
+    return true;
+  }
+
   @Override
   public final void output(final PrintOutput out) throws IOException {
     try {
-      if(!printing()) BaseX.err("No result available for \"%\"", this);
-      out(out);
+      if(printing()) out(out);
     } catch(final IOException ex) {
       throw ex;
     } catch(final Exception ex) {
@@ -271,11 +251,6 @@ public abstract class Process extends AbstractProcess {
     return max;
   }
 
-  @Override
-  public String toString() {
-    return name() + args();
-  }
-
   /**
    * Returns the list of arguments.
    * @return arguments
@@ -292,5 +267,10 @@ public abstract class Process extends AbstractProcess {
    */
   public String name() {
     return getClass().getSimpleName();
+  }
+
+  @Override
+  public String toString() {
+    return name() + args();
   }
 }

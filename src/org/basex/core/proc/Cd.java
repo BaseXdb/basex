@@ -20,7 +20,10 @@ public final class Cd extends AQuery {
   @Override
   protected boolean exec() {
     final Nodes nodes = query(args[0], null);
-    if(nodes != null && nodes.size() != 0) context.current(nodes);
+    if(nodes != null && nodes.size() != 0) {
+      context.current(nodes);
+      result = nodes;
+    }
     return nodes != null;
   }
 }

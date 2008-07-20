@@ -17,9 +17,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
 import java.net.URL;
-
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -32,7 +30,6 @@ import javax.swing.WindowConstants;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
-
 import org.basex.BaseX;
 import org.basex.Text;
 import org.basex.core.CommandParser;
@@ -66,6 +63,7 @@ import org.basex.io.CachedOutput;
 import org.basex.query.QueryException;
 import org.basex.util.Performance;
 import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 
 /**
  * This class is the main window of the GUI. It is the central instance
@@ -417,16 +415,8 @@ public final class GUI extends JFrame {
           if(!GUIProp.showstarttext && !db || !GUIProp.showtext && db) {
             GUICommands.SHOWTEXT.execute();
           }
-          // retrieve text result
-          if(text.isValid()) {
-            try {
-              final CachedOutput out = new CachedOutput();
-              out.println(ex.getMessage());
-              text.setText(out.buffer(), out.size(), false);
-            } catch(final IOException e) {
-              e.printStackTrace();
-            }
-          }
+          final byte[] inf = new TokenBuilder(ex.getMessage()).finish();
+          text.setText(inf, inf.length, false);
         }
       }
     } else {
@@ -434,7 +424,7 @@ public final class GUI extends JFrame {
         Find.find(in, context, GUIProp.filterrt)));
     }
   }
-
+  
   /** Thread counter. */
   int threadID;
   /** Current process. */
@@ -592,20 +582,14 @@ public final class GUI extends JFrame {
 
       // show status info
       status.setText(BaseX.info(PROCTIME, time));
-    } catch(final IllegalArgumentException ex) {
-      // unknown command or wrong argument
-      JOptionPane.showMessageDialog(GUI.this, ex.getMessage(),
-          DIALOGINFO, JOptionPane.INFORMATION_MESSAGE);
-      status.setText(STATUSOK);
     } catch(final Exception ex) {
       // unexpected error
-      //BaseX.debug(ex);
       ex.printStackTrace();
       String msg = ex.toString();
       if(msg.length() == 0) msg = ex.getMessage();
 
-      JOptionPane.showMessageDialog(GUI.this, BaseX.info(PROCERR,
-          pr, msg), DIALOGINFO, JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(GUI.this, BaseX.info(PROCERR, pr, msg),
+          DIALOGINFO, JOptionPane.ERROR_MESSAGE);
     }
 
     cursor(CURSORARROW, true);

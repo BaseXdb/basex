@@ -3,7 +3,6 @@ package org.basex.core;
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
 import static org.basex.core.Commands.*;
-
 import org.basex.core.proc.Cd;
 import org.basex.core.proc.Check;
 import org.basex.core.proc.Close;
@@ -114,7 +113,7 @@ public final class CommandParser extends QueryParser {
           case TABLE:
             String arg1 = number(null);
             String arg2 = arg1 != null ? number(null) : null;
-            if(arg1 == null) arg1 = xpath(null);
+            if(arg1 == null) arg1 = xquery(null);
             return new InfoTable(arg1, arg2);
         }
         break;
@@ -137,21 +136,21 @@ public final class CommandParser extends QueryParser {
       case EXPORT:
         return new Export(path(cmd));
       case XPATH:
-        return new XPath(xpath(null));
+        return new XPath(xquery(null));
       case XPATHMV:
-        return new XPathMV(number(cmd), number(cmd), xpath(cmd));
+        return new XPathMV(number(cmd), number(cmd), xquery(cmd));
       case XQUERY:
         return new XQuery(xquery(cmd));
       case XQUENV:
-        return new XQEnv(xpath(null));
+        return new XQEnv(xquery(null));
       case FIND:
-        return new Find(xpath(cmd));
+        return new Find(xquery(cmd));
       case XMARK:
         return new XMark(number(cmd));
       case CD:
-        return new Cd(xpath(null));
+        return new Cd(xquery(null));
       case FS:
-        return new Fs(consume(FS.class, cmd).name(), xpath(null));
+        return new Fs(consume(FS.class, cmd).name(), xquery(null));
       case COPY:
         return new Copy(number(cmd), xpath(cmd), xpath(cmd));
       case DELETE:

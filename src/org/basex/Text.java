@@ -30,6 +30,8 @@ public interface Text {
   String ON = "ON";
   /** Off flag. */
   String OFF = "OFF";
+  /** All flag. */
+  String ALL = "ALL";
 
   /** Project name. */
   String NAME = "BaseX";

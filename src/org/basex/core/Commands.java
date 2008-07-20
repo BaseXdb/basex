@@ -10,38 +10,6 @@ import static org.basex.Text.*;
  */
 @SuppressWarnings("all")
 public interface Commands {
-  /** Create Commands. */
-  enum CREATE { DATABASE, DB, MAB2, MAB, FS, XML, INDEX }
-  /** Index Types. */
-  enum INDEX { TEXT, ATTRIBUTE, FULLTEXT }
-  /** Info commands. */
-  enum INFO { NULL, DATABASE, DB, INDEX, TABLE }
-  /** Drop commands. */
-  enum DROP { DATABASE, DB, INDEX }
-  /** Filesystem commands. */
-  enum FS { CAT, CD, CP, DU, LOCATE, LS, MKDIR, PWD, RM, TOUCH }
-  /** Insert commands. */
-  enum UPDATE { FRAGMENT, ELEMENT, TEXT, ATTRIBUTE, COMMENT, PI }
-
-  /** Set commands. */
-  enum SET {
-    INFO(INFOINFO), DEBUG(INFODEBUG), SERIALIZE(INFOSERIALIZE), 
-    XMLOUTPUT(INFOXMLOUTPUT), MAINMEM(INFOMM), CHOP(INFOCHOP),
-    ENTITY(INFOENTITIES), TEXTINDEX(INFOTXTINDEX), ATTRINDEX(INFOATVINDEX),
-    FTINDEX(INFOFTINDEX);
-
-    /** Description. */
-    public final String desc;
-    /**
-     * Constructor.
-     * @param d descriptions
-     */
-    SET(final String d) { desc = d; }
-  }
-
-  /** All flag. */
-  String ALL = "ALL";
-
   /** Commands. */
   enum COMMANDS {
     // DATABASE COMMANDS
@@ -57,11 +25,13 @@ public interface Commands {
     // SERVER COMMANDS
     GETRESULT(), GETINFO(), STOP();
     
-    /** Official flag. */
+    /** Flag for official (public) commands. */
     boolean official;
 
     /** Default Constructor. */
-    private COMMANDS() { this(false); }
+    private COMMANDS() {
+      this(false);
+    }
 
     /**
      * Constructor, initializing the constants.
@@ -103,6 +73,43 @@ public interface Commands {
       } catch(final Exception ex) {
         return null;
       }
+    }
+  }
+  
+  /** Create Commands. */
+  enum CREATE { DATABASE, DB, MAB2, MAB, FS, XML, INDEX }
+  
+  /** Index Types. */
+  enum INDEX { TEXT, ATTRIBUTE, FULLTEXT }
+  
+  /** Info commands. */
+  enum INFO { NULL, DATABASE, DB, INDEX, TABLE }
+  
+  /** Drop commands. */
+  enum DROP { DATABASE, DB, INDEX }
+  
+  /** Filesystem commands. */
+  enum FS { CAT, CD, CP, DU, LOCATE, LS, MKDIR, PWD, RM, TOUCH }
+  
+  /** Insert commands. */
+  enum UPDATE { FRAGMENT, ELEMENT, TEXT, ATTRIBUTE, COMMENT, PI }
+  
+  /** Set commands. */
+  enum SET {
+    INFO(INFOINFO), DEBUG(INFODEBUG), SERIALIZE(INFOSERIALIZE), 
+    XMLOUTPUT(INFOXMLOUTPUT), MAINMEM(INFOMM), CHOP(INFOCHOP),
+    ENTITY(INFOENTITIES), TEXTINDEX(INFOTXTINDEX), ATTRINDEX(INFOATVINDEX),
+    FTINDEX(INFOFTINDEX);
+    
+    /** Description. */
+    public final String desc;
+    
+    /**
+     * Constructor.
+     * @param d descriptions
+     */
+    SET(final String d) {
+      desc = d;
     }
   }
 }

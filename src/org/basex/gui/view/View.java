@@ -323,7 +323,6 @@ public abstract class View extends BaseXPanel {
   @Override
   public void keyPressed(final KeyEvent e) {
     if(working) return;
-
     final int key = e.getKeyCode();
     final boolean alt = e.isAltDown();
     final boolean ctrl = e.isControlDown();

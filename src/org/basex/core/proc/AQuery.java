@@ -93,8 +93,6 @@ abstract class AQuery extends Process {
         info(QUERYEVALUATE + Performance.getTimer(eval, Prop.runs) + NL);
       }
       return true;
-    } catch(final IllegalArgumentException ex) {
-      throw ex;
     } catch(final QueryException ex) {
       BaseX.debug(ex);
       return error(ex.getMessage());
