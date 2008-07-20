@@ -1,0 +1,137 @@
+package org.basex.core.proc;
+
+import static org.basex.Text.*;
+import org.basex.core.Prop;
+import org.basex.data.Data;
+import org.basex.data.MemData;
+import org.basex.data.Nodes;
+import org.basex.util.IntList;
+import org.basex.util.Token;
+
+/**
+ * Evaluates the 'copy' command.
+ *
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Christian Gruen
+ */
+public final class Copy extends AUpdate {
+  /**
+   * Constructor.
+   * @param a arguments
+   */
+  public Copy(final String... a) {
+    this(false, a);
+  }
+
+  /**
+   * Constructor for GUI updates.
+   * @param g gui flag
+   * @param a arguments
+   */
+  public Copy(final boolean g, final String... a) {
+    super(g, null, a);
+  }
+  
+  @Override
+  protected boolean exec() {
+    final Data data = context.data();
+    final int pos = Token.toInt(args[0]);
+    if(pos < 0) return error(POSINVALID, args[0]);
+
+    Nodes source;
+    Nodes target;
+    if(gui) {
+      source = context.copied();
+      target = context.marked();
+      context.copy(null);
+    } else {
+      // perform query and check if all result nodes reference tags
+      query(args[1], null);
+      source = (Nodes) result;
+      query(args[2], COPYTAGS);
+      target = (Nodes) result;
+    }
+    if(source == null || target == null) return false;
+
+    data.noIndex();
+
+    final int size = source.size;
+    final Data[] srcDocs = new Data[source.size];
+    for(int c = 0; c < size; c++) srcDocs[c] = copy(source.data, source.pre[c]);
+
+    final IntList marked = gui ? new IntList() : null;
+    int copied = 0;
+
+    for(int n = target.size - 1; n >= 0; n--) {
+      final int par = target.pre[n];
+      if(data.kind(par) != Data.ELEM) return error(COPYTAGS);
+
+      for(int c = 0; c < size; c++) {
+        final int pre = pre(par, pos, data);
+        
+        // merge text nodes if necessary
+        // [CG] MergeText: might not cover all cases yet
+        
+        final int s = srcDocs[c].size - 1;
+        final int up = s != 0 ? -1 :
+          Insert.checkText(data, pre, par, srcDocs[c].kind(s));
+        if(up != -1) {
+          data.update(up, Token.concat(data.text(up), srcDocs[c].text(s)));
+          if(gui && !marked.contains(up)) marked.add(up);
+        } else {
+          data.insert(pre, par, srcDocs[c]);
+          if(gui) marked.add(pre);
+        }
+      }
+      copied += size;
+    }
+    
+    if(gui) {
+      if(context.current().size > 1 || 
+          context.current().pre[0] == source.pre[0]) {
+        context.current(new Nodes(0, data));
+      }
+      context.marked(new Nodes(marked.finish(), data));
+    }
+
+    data.flush();
+    return Prop.info ? info(INSERTINFO, copied, perf.getTimer()) : true;
+  }
+
+  /**
+   * Creates a memory data instance from the specified database and pre value.
+   * @param data data reference
+   * @param pre pre value
+   * @return database instance
+   */
+  public static Data copy(final Data data, final int pre) {
+    // size of the data instance
+    final int size = data.size(pre, data.kind(pre));
+    // create temporary data instance, adopting the indexes of the source data
+    final MemData tmp = new MemData(size, data.tags, data.atts, data.ns);
+
+    // copy all nodes
+    for(int p = pre; p < pre + size; p++) {
+      final int k = data.kind(p);
+      final int d = p - data.parent(p, k);
+      switch(k) {
+        case Data.DOC:
+          tmp.addDoc(data.text(p), data.size(p, k), k);
+          break;
+        case Data.ELEM:
+          tmp.addElem(data.tagID(p), data.tagNS(p), d, data.attSize(p, k),
+              data.size(p, k), k);
+          break;
+        case Data.ATTR:
+          tmp.addAtt(data.attNameID(p), data.attNS(p), data.attValue(p), d, k);
+          break;
+        case Data.TEXT:
+        case Data.COMM:
+        case Data.PI:
+          tmp.addText(data.text(p), d, k);
+          break;
+      }
+    }
+    return tmp;
+  }
+}
