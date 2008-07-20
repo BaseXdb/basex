@@ -53,13 +53,6 @@ public final class XPContext extends QueryContext {
     query = qu;
   }
 
-  // below, the current node set is passed on as argument; if the doc(...)
-  // function is rewritten to generate the input document while compilation
-  // time, the query could be optimized for different documents, and
-  // instead of the data reference, the current nodeset would be passed
-  // on as parameter. this might simplify other optimizations such as
-  // checking if the current context is a root context, etc.
-
   @Override
   public XPContext compile(final Nodes n) throws QueryException {
     if(Prop.allInfo) compInfo(QUERYCOMP);

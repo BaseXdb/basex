@@ -505,19 +505,17 @@ public final class GUI extends JFrame {
       // cached resulting text output
       final String inf = pr.info();
 
-      if(pr.printing() || (!ok && inf.length() != 0)) {
+      if(ok && pr.printing() && nodes == null) {
         if(!GUIProp.showstarttext && data == null ||
-           !GUIProp.showtext && data != null && nodes == null) {
+           !GUIProp.showtext && data != null) {
           GUICommands.SHOWTEXT.execute();
         }
         // retrieve text result
-        if(text.isValid() && nodes == null) {
-          final CachedOutput out = new CachedOutput(TextView.MAX);
-          if(ok) pr.output(out);
-          else out.println(inf);
-          out.addInfo();
-          text.setText(out.buffer(), out.size(), false);
-        }
+        final CachedOutput out = new CachedOutput(TextView.MAX);
+        if(ok) pr.output(out);
+        else out.println(inf);
+        out.addInfo();
+        text.setText(out.buffer(), out.size(), false);
       }
 
       // check if query feedback was evaluated in the query view

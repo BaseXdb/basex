@@ -2,7 +2,14 @@ package org.basex.core;
 
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
-import static org.basex.core.Commands.*;
+import org.basex.core.Commands.COMMANDS;
+import org.basex.core.Commands.CREATE;
+import org.basex.core.Commands.DROP;
+import org.basex.core.Commands.FS;
+import org.basex.core.Commands.INDEX;
+import org.basex.core.Commands.INFO;
+import org.basex.core.Commands.SET;
+import org.basex.core.Commands.UPDATE;
 import org.basex.core.proc.Cd;
 import org.basex.core.proc.Check;
 import org.basex.core.proc.Close;
@@ -39,8 +46,11 @@ import org.basex.core.proc.XPath;
 import org.basex.core.proc.XPathMV;
 import org.basex.core.proc.XQEnv;
 import org.basex.core.proc.XQuery;
-import org.basex.query.QueryParser;
 import org.basex.query.QueryException;
+import org.basex.query.QueryParser;
+import org.basex.query.xpath.XPParser;
+import org.basex.query.xquery.XQContext;
+import org.basex.query.xquery.XQParser;
 import org.basex.util.Array;
 import org.basex.util.Levenshtein;
 import org.basex.util.StringList;
@@ -61,7 +71,7 @@ public final class CommandParser extends QueryParser {
   public CommandParser(final String in) {
     init(in);
   }
-  
+
   /**
    * Parses the input and returns a command list.
    * @return commands
@@ -91,11 +101,11 @@ public final class CommandParser extends QueryParser {
       case CREATE:
         switch(consume(CREATE.class, cmd)) {
           case DATABASE: case DB: case XML:
-            return new CreateDB(path(cmd), name(null));
+            return new CreateDB(path(cmd, true), name(null));
           case MAB: case MAB2:
-            return new CreateMAB(path(cmd), name(null));
+            return new CreateMAB(path(cmd, true), name(null));
           case FS:
-            return new CreateFS(path(cmd), name(null));
+            return new CreateFS(path(cmd, true), name(null));
           case INDEX:
             return new CreateIndex(consume(INDEX.class, cmd));
         }
@@ -112,8 +122,8 @@ public final class CommandParser extends QueryParser {
             return new InfoIndex();
           case TABLE:
             String arg1 = number(null);
-            String arg2 = arg1 != null ? number(null) : null;
-            if(arg1 == null) arg1 = xquery(null);
+            final String arg2 = arg1 != null ? number(null) : null;
+            if(arg1 == null) arg1 = xpath(null);
             return new InfoTable(arg1, arg2);
         }
         break;
@@ -134,23 +144,23 @@ public final class CommandParser extends QueryParser {
       case OPTIMIZE:
         return new Optimize();
       case EXPORT:
-        return new Export(path(cmd));
+        return new Export(path(cmd, true));
       case XPATH:
-        return new XPath(xquery(null));
+        return new XPath(xpath(null));
       case XPATHMV:
-        return new XPathMV(number(cmd), number(cmd), xquery(cmd));
+        return new XPathMV(number(cmd), number(cmd), xpath(cmd));
       case XQUERY:
         return new XQuery(xquery(cmd));
       case XQUENV:
         return new XQEnv(xquery(null));
       case FIND:
-        return new Find(xquery(cmd));
+        return new Find(path(cmd, false));
       case XMARK:
         return new XMark(number(cmd));
       case CD:
-        return new Cd(xquery(null));
+        return new Cd(xpath(null));
       case FS:
-        return new Fs(consume(FS.class, cmd).name(), xquery(null));
+        return new Fs(consume(FS.class, cmd).name(), xpath(null));
       case COPY:
         return new Copy(number(cmd), xpath(cmd), xpath(cmd));
       case DELETE:
@@ -186,11 +196,11 @@ public final class CommandParser extends QueryParser {
           final Object o = Prop.class.getField(opt.toLowerCase()).get(null);
           if(val != null) {
             if(o instanceof Boolean) {
-              val = val.toUpperCase(); 
+              val = val.toUpperCase();
               final boolean info = opt.equals(SET.INFO.name());
               if(!val.equals(ON) && !val.equals(OFF) &&
                   !(info && val.equals(ALL))) {
-                StringList sl = new StringList();
+                final StringList sl = new StringList();
                 sl.add(OFF);
                 sl.add(ON);
                 if(info) sl.add(ALL);
@@ -233,12 +243,14 @@ public final class CommandParser extends QueryParser {
   }
 
   /**
-   * Parses and returns a file or directory path.
+   * Parses and returns a string delimited by a space.
    * @param cmd referring command; if specified, the result mustn't be empty
+   * @param spc accept spaces as delimiters
    * @return path
    * @throws QueryException query exception
    */
-  private String path(final COMMANDS cmd) throws QueryException {
+  private String path(final COMMANDS cmd, final boolean spc)
+      throws QueryException {
     final StringBuilder tb = new StringBuilder();
     consumeWS();
     char q = 0;
@@ -248,7 +260,7 @@ public final class CommandParser extends QueryParser {
         consume();
         if(more()) ch = curr();
       } else {
-        if((ch == ' ' || ch == ';') && q == 0) break;
+        if((spc && ch <= ' ' || ch == ';') && q == 0) break;
         if(quote(ch)) q = q == 0 ? ch : q == ch ? 0 : q;
       }
       tb.append(ch);
@@ -264,7 +276,14 @@ public final class CommandParser extends QueryParser {
    * @throws QueryException query exception
    */
   private String xpath(final COMMANDS cmd) throws QueryException {
-    return path(cmd);
+    consumeWS();
+    if(!more()) return finish(cmd, "");
+    final XPParser p = new XPParser(qu);
+    p.qp = qp;
+    p.parse(false);
+    final String xp = qu.substring(qp, p.qp);
+    qp = p.qp;
+    return finish(cmd, xp);
   }
 
   /**
@@ -275,9 +294,13 @@ public final class CommandParser extends QueryParser {
    */
   private String xquery(final COMMANDS cmd) throws QueryException {
     consumeWS();
-    int p = qp;
-    qp = ql;
-    return finish(cmd, qu.substring(p));
+    final XQParser p = new XQParser(new XQContext());
+    p.init(qu);
+    p.qp = qp;
+    p.parse(null, false);
+    final String xp = qu.substring(qp, p.qp);
+    qp = p.qp;
+    return finish(cmd, xp);
   }
 
   /**
@@ -341,7 +364,7 @@ public final class CommandParser extends QueryParser {
 
     final StringList alt = list(cmp, token);
     if(token == null) {
-      error(alt, "Expecting command.");
+      if(par == null) error(alt, "Expecting command.");
       help(alt, par);
     }
 

@@ -5,6 +5,7 @@ import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Type;
+import org.basex.util.StringList;
 
 /**
  * This class is supposed to support a consistent error output.
@@ -24,7 +25,19 @@ public final class Err {
    */
   public static void or(final Object[] err, final Object... x)
       throws XQException {
-    throw new XQException(err, x);
+    or(null, err, x);
+  }
+
+  /**
+   * Throws an exception.
+   * @param list code completion list
+   * @param err error message
+   * @param x extended info
+   * @throws XQException evaluation exception
+   */
+  public static void or(final StringList list, final Object[] err,
+      final Object... x) throws XQException {
+    throw new XQException(list, err, x);
   }
 
   /**

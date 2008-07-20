@@ -4,6 +4,7 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 import org.basex.BaseX;
 import org.basex.io.IO;
+import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
 import org.basex.util.XMLToken;
 
@@ -17,15 +18,15 @@ public class QueryParser {
   /** Temporary token constructions. */
   protected TokenBuilder tk = new TokenBuilder();
   /** Optional reference to query input. */
-  protected IO file;
+  public IO file;
   /** Input query. */
-  protected String qu;
+  public String qu;
   /** Current query position. */
-  protected int qp;
+  public int qp;
   /** Marked query position. */
-  protected int qm;
+  public int qm;
   /** Query length. */
-  protected int ql;
+  public int ql;
 
   /**
    * Constructor.
@@ -125,7 +126,7 @@ public class QueryParser {
       if(ch <= 0 || ch > ' ') break;
       qp++;
     }
-    qm = qp;
+    qm = qp - 1;
     return;
   }
 
@@ -217,5 +218,16 @@ public class QueryParser {
   public String rest() {
     final int e = Math.min(ql, qp + 15);
     return qu.substring(qp, e) + (e == ql ? "" : "...");
+  }
+  
+  /**
+   * Creates a string list.
+   * @param str input
+   * @return output
+   */
+  protected StringList list(final String... str) {
+    final StringList sl = new StringList();
+    for(final String s : str) sl.add(s);
+    return sl;
   }
 }

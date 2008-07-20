@@ -65,8 +65,7 @@ public interface XPText {
   /** Parsing Exception. */
   String NONODESET = "NodeSet expected; found: %";
   /** Parsing exception. */
-  String FTINCOMP =
-    "Unfinished predicate, or 'ftcontains' option not supported yet.";
+  String FTINCOMP = "Unfinished predicate.";
   /** Parsing Exception. */
   String FTNOTEXC = "\"ftnot\" may only appear as right operand of \"ftand\".";
   /** Parsing Exception. */

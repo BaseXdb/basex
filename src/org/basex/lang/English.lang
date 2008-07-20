@@ -477,7 +477,7 @@ ch_xpathmv1= Evaluate MedioVis query.
 ch_xpathmv2=Evaluates the specified XPath [query] and limits the\n number of results to [hits] and the number of\n subordinate elements to [subhits].
 ch_xquery0=[query]
 ch_xquery1=Evaluate XQuery [query].
-ch_xquery2=Evaluates an XQuery and prints the result. No other commands\n are allowed in the same line.
+ch_xquery2=Evaluates an XQuery and prints the result.
 ch_find0=[query]
 ch_find1=Evaluate a keyword query.
 ch_find2=The following modifiers can be used:\n =  : looks for exact text nodes"\n @= : looks for exact attributes\n @  : looks for attributes

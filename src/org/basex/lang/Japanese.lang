@@ -480,7 +480,8 @@ ch_xpathmv1= MedioVisクエリーの評価
 ch_xpathmv2= 指定されたXPath [query] を評価し、結果を [hits] 件まで、\n 下位の要素を [subhits] 件までに制限して表示します。
 ch_xquery0=[query]
 ch_xquery1=XQuery [query] の評価
-ch_xquery2=XQueryを評価し、結果を表示します。\nそれ以外のコマンドを同じ行に入力する事は出来ません。
+ch_xquery2=XQueryを評価し、結果を表示します
+#\nそれ以外のコマンドを同じ行に入力する事は出来ません。
 ch_find0=[query]
 ch_find1=キーワードクエリーの評価
 ch_find2=以下の修飾子が使えます。:\n =  : 完全に一致するテキストノードを検索します\n @= : 完全に一致する属性を検索します。\n @  : 属性を検索します。

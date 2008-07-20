@@ -53,7 +53,7 @@ public class QueryException extends Exception {
    * @return error line
    */
   public final StringList complete() {
-    return complete;
+    return complete == null ? new StringList() : complete;
   }
 
   /**
@@ -73,7 +73,7 @@ public class QueryException extends Exception {
     file = parser.file;
     line = 1;
     col = 1;
-    for(int i = 0; i + 1 < parser.qm && i < parser.ql; i++) {
+    for(int i = 0; i < parser.qm && i < parser.ql; i++) {
       final char ch = parser.qu.charAt(i);
       if(ch == 0x0A) { line++; col = 1; } else if(ch != 0x0D) { col++; }
     }
@@ -85,7 +85,7 @@ public class QueryException extends Exception {
    * @param comp completions
    */
   public final void complete(final QueryParser qp, final StringList comp) {
-    complete = comp == null ? new StringList() : comp;
+    complete = comp;
     qp.qm++;
     pos(qp);
   }

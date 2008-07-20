@@ -552,7 +552,6 @@ public abstract class W3CTS {
         for(byte[] cl : colls.get(string(nm))) col.add(ctx.doc(cl));
         ctx.addColl(col, nm);
 
-        BaseX.outln("%: %", nm, var);
         if(var != null) {
           final Var v = new Var(new QNm(data.atom(var.pre[c])));
           ctx.vars.addGlobal(v.item(Uri.uri(nm)));

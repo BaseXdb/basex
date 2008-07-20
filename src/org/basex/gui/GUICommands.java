@@ -2,7 +2,6 @@ package org.basex.gui;
 
 import static org.basex.Text.*;
 import static org.basex.core.Commands.*;
-
 import java.awt.BorderLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -779,7 +778,7 @@ public enum GUICommands implements GUICommand {
   GOUP(true, GUIGOUP, "alt UP", GUIGOUPTT) {
     @Override
     public void execute() {
-      GUI.get().exec(new Cd(".."));
+      GUI.get().execute(new Cd(".."));
     }
 
     @Override
@@ -795,7 +794,7 @@ public enum GUICommands implements GUICommand {
   ROOT(true, GUIROOT, "alt HOME", GUIROOTTT) {
     @Override
     public void execute() {
-      GUI.get().exec(new Cd("/"));
+      GUI.get().execute(new Cd("/"));
     }
 
     @Override

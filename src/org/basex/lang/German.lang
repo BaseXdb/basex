@@ -477,7 +477,7 @@ ch_xpathmv1= Ausführung einer MedioVis-Anfrage.
 ch_xpathmv2=Führt die angegebene XPath-[Anfrage] aus und begrenzt\ndie Anzahl Treffer auf [hits] und die Anzahl\nuntergeordneter Elementen auf [subhits].
 ch_xquery0=[Anfrage]
 ch_xquery1=Ausführung einer XQuery-Anfrage.
-ch_xquery2=Führt eine XQuery-[Anfrage] aus und zeigt das\nErgebnis an. Keine anderen Befehle sind in der\ngleichen Zeile erlaubt.
+ch_xquery2=Führt eine XQuery-[Anfrage] aus und zeigt das Ergebnis an.
 ch_find0=[Anfrage]
 ch_find1=Ausführung einer Schlüsselwort-Anfrage.
 ch_find2=Die folgenden Modifikatoren sind erlaubt:\n =  : sucht nach exakten Textknoten\n @= : sucht nach exakten Attributen\n @  : sucht nach Attributen

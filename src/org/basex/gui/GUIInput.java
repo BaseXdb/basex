@@ -8,13 +8,13 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.JComboBox;
 import javax.swing.plaf.basic.BasicComboPopup;
-
 import org.basex.core.CommandParser;
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.query.QueryException;
+import org.basex.query.xpath.XPParser;
 import org.basex.util.StringList;
 
 /**
@@ -145,9 +145,10 @@ public final class GUIInput extends BaseXTextField {
   protected void completeInput() {
     Object sel = box.getSelectedItem();
     if(sel == null) sel = box.getItemAt(0);
+    final String suf = sel.toString();
     final int pl = pre.length();
-    final int ll = cmdMode() && pl > 0 ? pre.charAt(pl - 1) : ' ';
-    if(ll != ';' && ll != ' ') pre += ' ';
+    final int ll = pl > 0 ? pre.charAt(pl - 1) : ' ';
+    if(Character.isLetter(ll) && Character.isLetter(suf.charAt(0))) pre += " ";
     setText(pre + sel);
     showPopup();
   }
@@ -171,13 +172,14 @@ public final class GUIInput extends BaseXTextField {
    */
   private void cmdPopup(final String query) {
     StringList sl = new StringList();
+    final boolean excl = query.startsWith("!");
     try {
-      pre = query.startsWith("!") ? "!" : "";
+      pre = excl ? "!" : "";
       final String suf = getText().substring(pre.length());
       new CommandParser(suf).parse();
     } catch(final QueryException ex) {
       sl = ex.complete();
-      pre = query.substring(0, ex.col() - 1);
+      pre = query.substring(0, ex.col() - (excl ? 0 : 1));
     }
     createCombo(sl);
   }
@@ -195,13 +197,22 @@ public final class GUIInput extends BaseXTextField {
     final String pref = query.substring(last + 1, slash != -1 ? slash + 1 :
       query.length()).trim();
  
-    final StringList sl = new StringList();
+    StringList sl = new StringList();
     final Context ctx = GUI.context;
     if(query.length() != 0 && (pref.startsWith("/") || ctx.root())) {
       final String suf = getText().substring(pre.length()).trim();
       final Data data = ctx.data();
       for(final String a : data.skel.suggest(data, pref).finish()) {
         if(a.startsWith(suf) && !a.equals(suf)) sl.add(a);
+      }
+    }
+    
+    if(sl.size == 0) {
+      try {
+        new XPParser(query).parse();
+      } catch(final QueryException ex) {
+        pre = query;
+        sl = ex.complete();
       }
     }
     createCombo(sl);

@@ -141,7 +141,7 @@ public final class XQParser extends QueryParser {
    */
   public void parse(final String q) throws XQException {
     ctx.query = q;
-    parse(q, ctx.file, null);
+    parse(q, ctx.file, null, true);
   }
 
   /**
@@ -151,27 +151,37 @@ public final class XQParser extends QueryParser {
    */
   public void module(final String q) throws XQException {
     ctx.query = q;
-    parse(q, ctx.file, Uri.EMPTY);
+    parse(q, ctx.file, Uri.EMPTY, true);
   }
 
   /**
    * Parses the specified query.
-   * [  1] Parses a Module.
    * @param q input query
    * @param f optional input file
    * @param u module uri
+   * @param end input must have been completely evaluated
    * @throws XQException xquery exception
    */
-  public void parse(final String q, final IO f, final Uri u)
+  public void parse(final String q, final IO f, final Uri u, final boolean end)
       throws XQException {
+    init(q);
+    file = f;
+    if(!more()) Err.or(QUERYEMPTY);
+    final int v = valid();
+    if(v != -1) Err.or(QUERYINV, v);
+    parse(u, end);
+  }
 
+
+  /**
+   * Parses the specified query.
+   * [  1] Parses a Module.
+   * @param u module uri
+   * @param end input must have been completely evaluated
+   * @throws XQException xquery exception
+   */
+  public void parse(final Uri u, final boolean end) throws XQException {
     try {
-      init(q);
-      file = f;
-      if(!more()) Err.or(QUERYEMPTY);
-      final int v = valid();
-      if(v != -1) Err.or(QUERYINV, v);
-
       versionDecl();
       if(u == null) {
         ctx.root = mainModule();
@@ -180,7 +190,7 @@ public final class XQParser extends QueryParser {
         moduleDecl(u);
       }
 
-      if(more()) {
+      if(end && more()) {
         if(alter != null) error();
         if(ctx.root instanceof Step) {
           final Step step = (Step) ctx.root;
@@ -289,7 +299,8 @@ public final class XQParser extends QueryParser {
           baseURIDecl();
         } else if(consumeWS(DEFAULT)) {
           if(!defaultNamespaceDecl() && !defaultCollationDecl() &&
-              !emptyOrderDecl()) Err.or(DECLINCOMPLETE);
+              !emptyOrderDecl()) Err.or(list(ELEMENT, COLLATION, EMPTYORDER),
+                  DECLINCOMPLETE);
         } else if(consumeWS(FTOPTION)) {
           ftMatchOption(ctx.ftopt);
         } else {
@@ -525,7 +536,7 @@ public final class XQParser extends QueryParser {
 
     final Namespaces ns = ctx.ns;
     ctx.ns = new Namespaces();
-    new XQParser(ctx).parse(query, fl, u);
+    new XQParser(ctx).parse(query, fl, u, true);
     ctx.ns = ns;
     ctx.modLoaded.add(f);
   }
@@ -783,7 +794,7 @@ public final class XQParser extends QueryParser {
    * @throws XQException xquery exception
    */
   private Ord[] orderSpec(final Ord[] order) throws XQException {
-    final Expr e = single();
+    final Expr e = check(single(), ORDERBY);
     boolean desc = false;
     if(!consumeWS(ASCENDING)) desc = consumeWS(DESCENDING);
     boolean least = !ctx.orderGreatest.bool();
@@ -2297,7 +2308,8 @@ public final class XQParser extends QueryParser {
    * @throws XQException xquery exception
    */
   private void check(final int ch) throws XQException {
-    if(!consume(ch)) Err.or(WRONGCHAR, (char) ch, found());
+    if(!consume(ch)) Err.or(list(Character.toString((char) ch)),
+        WRONGCHAR, (char) ch, found());
   }
 
   /**
@@ -2307,7 +2319,7 @@ public final class XQParser extends QueryParser {
    * @throws XQException xquery exception
    */
   private void check(final String s) throws XQException {
-    if(!consumeWS2(s)) Err.or(WRONGCHAR, s, found());
+    if(!consumeWS2(s)) Err.or(list(s), WRONGCHAR, s, found());
   }
 
   /**

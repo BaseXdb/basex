@@ -50,6 +50,7 @@ import org.basex.query.xpath.values.NodeSet;
 import org.basex.query.xpath.values.Num;
 import org.basex.util.Array;
 import org.basex.util.Set;
+import org.basex.util.StringList;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -529,9 +530,7 @@ public final class XPParser extends QueryParser {
     final char delim = consume();
     if(!quote(delim)) error(WRONGTEXT, QUOTE, delim);
     tk.reset();
-    while(!curr(0) && !curr(delim)) {
-      entity(tk);
-    }
+    while(!curr(0) && !curr(delim)) entity(tk);
     if(!consume(delim)) error(QUOTECLOSE);
     return new Literal(tk.finish());
   }
@@ -638,7 +637,23 @@ public final class XPParser extends QueryParser {
    */
   private Expr error(final String err, final Object... arg)
       throws QueryException {
-    throw new QueryException(err, arg);
+    return error(null, err, arg);
+  }
+
+  /**
+   * Throws the specified error.
+   * @param comp code completion
+   * @param err error to be thrown
+   * @param arg error arguments
+   * @return expression
+   * @throws QueryException parse exception
+   */
+  private Expr error(final StringList comp, final String err,
+      final Object... arg) throws QueryException {
+    
+    final QueryException qe = new QueryException(err, arg);
+    qe.complete(this, comp);
+    throw qe;
   }
 
   /**

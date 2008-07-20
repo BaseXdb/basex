@@ -23,7 +23,7 @@ public final class Info extends AInfo {
 
   @Override
   protected void out(final PrintOutput out) throws IOException {
-    Performance.gc(4);
+    Performance.gc(1);
     
     final int l = maxLength(new String[] {
         INFODBPATH, INFOMEM, INFOMM, INFOINFO
