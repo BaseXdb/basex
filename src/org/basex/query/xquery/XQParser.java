@@ -141,7 +141,7 @@ public final class XQParser extends QueryParser {
    */
   public void parse(final String q) throws XQException {
     ctx.query = q;
-    parse(q, ctx.file, null, true);
+    parse(q, ctx.file, null);
   }
 
   /**
@@ -151,7 +151,7 @@ public final class XQParser extends QueryParser {
    */
   public void module(final String q) throws XQException {
     ctx.query = q;
-    parse(q, ctx.file, Uri.EMPTY, true);
+    parse(q, ctx.file, Uri.EMPTY);
   }
 
   /**
@@ -159,25 +159,23 @@ public final class XQParser extends QueryParser {
    * @param q input query
    * @param f optional input file
    * @param u module uri
-   * @param end input must have been completely evaluated
    * @throws XQException xquery exception
    */
-  public void parse(final String q, final IO f, final Uri u, final boolean end)
+  public void parse(final String q, final IO f, final Uri u)
       throws XQException {
     init(q);
     file = f;
     if(!more()) Err.or(QUERYEMPTY);
     final int v = valid();
     if(v != -1) Err.or(QUERYINV, v);
-    parse(u, end);
+    parse(u, true);
   }
-
 
   /**
    * Parses the specified query.
    * [  1] Parses a Module.
    * @param u module uri
-   * @param end input must have been completely evaluated
+   * @param end if true, input must be completely evaluated
    * @throws XQException xquery exception
    */
   public void parse(final Uri u, final boolean end) throws XQException {
@@ -536,7 +534,7 @@ public final class XQParser extends QueryParser {
 
     final Namespaces ns = ctx.ns;
     ctx.ns = new Namespaces();
-    new XQParser(ctx).parse(query, fl, u, true);
+    new XQParser(ctx).parse(query, fl, u);
     ctx.ns = ns;
     ctx.modLoaded.add(f);
   }

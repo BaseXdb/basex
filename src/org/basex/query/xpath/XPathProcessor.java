@@ -4,8 +4,9 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 
 /**
- * XPath Processor, containing the XPath parser. The {@link #parse()} method
- * evaluates the query and returns the parsed expression.
+ * XPath Processor, containing the XPath parser.
+ * The {@link #create()} method evaluates the query and returns
+ * a query context.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Tim Petrowsky

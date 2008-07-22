@@ -28,6 +28,15 @@ public abstract class QueryContext extends Progress {
   /** Query string. */
   public String query;
   
+  /** Maximum number of evaluation dumps. */
+  protected static final int MAXDUMP = 16;
+  /** Query info counter. */
+  protected int cc;
+  /** Current evaluation time. */
+  protected long evalTime;
+  /** Info flag. */
+  protected boolean inf;
+
   /** String container for query background information. */
   protected final TokenBuilder info = new TokenBuilder();
   /** Optimization flag. */
@@ -64,12 +73,11 @@ public abstract class QueryContext extends Progress {
    * @param ext text text extensions
    */
   public final void compInfo(final String string, final Object... ext) {
-    if(Prop.allInfo) {
-      if(!firstOpt) info.add(QUERYSEP);
-      firstOpt = false;
-      info.add(string, ext);
-      info.add(NL);
-    }
+    if(!inf) return;
+    if(!firstOpt) info.add(QUERYSEP);
+    firstOpt = false;
+    info.add(string, ext);
+    info.add(NL);
   }
 
   /**
@@ -78,17 +86,16 @@ public abstract class QueryContext extends Progress {
    * @param ext text text extensions
    */
   public final void evalInfo(final String string, final Object... ext) {
-    if(Prop.allInfo) {
-      if(firstEval) {
-        info.add(NL);
-        info.add(QUERYEVAL);
-        info.add(NL);
-      }
-      info.add(QUERYSEP);
-      info.add(string, ext);
+    if(!inf) return;
+    if(firstEval) {
       info.add(NL);
-      firstEval = false;
+      info.add(QUERYEVAL);
+      info.add(NL);
     }
+    info.add(QUERYSEP);
+    info.add(string, ext);
+    info.add(NL);
+    firstEval = false;
   }
 
   /**

@@ -18,10 +18,10 @@ import org.basex.io.IO;
 public final class Open extends Process {
   /**
    * Constructor.
-   * @param n database name
+   * @param name name of database
    */
-  public Open(final String n) {
-    super(STANDARD, n);
+  public Open(final String name) {
+    super(STANDARD, name);
   }
   
   @Override

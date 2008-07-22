@@ -203,7 +203,8 @@ public final class DiskData extends Data {
   private int dist(final int pre, final int kind) {
    switch(kind) {
       case ELEM: return table.read4(pre, 4);
-      case TEXT: case COMM:
+      case TEXT:
+      case COMM:
       case PI:   return table.read4(pre, 8);
       case ATTR: return table.read1(pre, 11);
       default:   return pre + 1;
@@ -441,7 +442,7 @@ public final class DiskData extends Data {
     int p = pre;
     while(p < size) {
       int k = kind(p);
-      if(k == DOC) break;
+      //if(k == DOC) break;
       dist(p, k, dist(p, k) + s);
       p += size(p, kind(p));
     }

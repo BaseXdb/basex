@@ -46,7 +46,8 @@ public abstract class QueryProcessor extends Progress {
    * @return query expression
    * @throws QueryException query exception
    */
-  protected abstract QueryContext create() throws QueryException;
+  protected abstract QueryContext create()
+    throws QueryException;
   
   /**
    * Compiles the query.

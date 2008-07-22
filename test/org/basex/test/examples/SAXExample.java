@@ -65,20 +65,16 @@ public final class SAXExample extends DefaultHandler {
   @Override
   public void startElement(final String uri, final String ln, final String qn,
       final Attributes at) {
-    System.out.print("<" + qn);
-    for(int a = 0; a < at.getLength(); a++) {
-      System.out.print(" " + at.getQName(a) + "=\"" + at.getValue(a) + "\"");
-    }
-    System.out.print(">");
+    System.out.print("Start Element: " + qn);
   }
 
   @Override
   public void endElement(final String uri, final String ln, final String qn) {
-    System.out.print("</" + qn + ">");
+    System.out.print("End Element: " + qn);
   }
 
   @Override
   public void characters(final char[] ch, final int s, final int l) {
-    System.out.print(new String(ch, s, l));
+    System.out.print("Characters: " + new String(ch, s, l));
   }
 }

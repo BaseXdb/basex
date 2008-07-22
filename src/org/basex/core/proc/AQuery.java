@@ -38,19 +38,6 @@ abstract class AQuery extends Process {
   }
 
   /**
-   * Adds query information to the information string.
-   * @param out output stream
-   * @param hits information
-   */
-  protected final void outInfo(final PrintOutput out, final int hits) {
-    info(QUERYPRINT + per.getTimer(Prop.runs) + NL);
-    info(QUERYTOTAL + perf.getTimer(Prop.runs) + NL);
-    info(QUERYHITS + hits + " " + (hits == 1 ? VALHIT : VALHITS) + NL);
-    info(QUERYPRINTED + Performance.formatSize(out.size()));
-    //info(QUERYMEM, Performance.getMem() + NL);
-  }
-
-  /**
    * Returns a new query instance.
    * @param cls query class
    * @param query query
@@ -131,5 +118,18 @@ abstract class AQuery extends Process {
         throw new IOException(ex);
       }
     }
+  }
+
+  /**
+   * Adds query information to the information string.
+   * @param out output stream
+   * @param hits information
+   */
+  protected final void outInfo(final PrintOutput out, final int hits) {
+    info(QUERYPRINT + per.getTimer(Prop.runs) + NL);
+    info(QUERYTOTAL + perf.getTimer(Prop.runs) + NL);
+    info(QUERYHITS + hits + " " + (hits == 1 ? VALHIT : VALHITS) + NL);
+    info(QUERYPRINTED + Performance.formatSize(out.size()));
+    //info(QUERYMEM, Performance.getMem() + NL);
   }
 }

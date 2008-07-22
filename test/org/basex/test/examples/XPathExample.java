@@ -1,9 +1,7 @@
 package org.basex.test.examples;
 
 import org.basex.core.*;
-import org.basex.core.proc.CreateDB;
-import org.basex.core.proc.Set;
-import org.basex.core.proc.XPath;
+import org.basex.core.proc.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.query.*;

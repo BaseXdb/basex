@@ -1,8 +1,7 @@
 package org.basex.test.examples;
 
 import org.basex.core.*;
-import org.basex.core.proc.CreateDB;
-import org.basex.core.proc.XQuery;
+import org.basex.core.proc.*;
 import org.basex.io.*;
 
 /**
@@ -34,16 +33,18 @@ public final class DBExample {
     // Creates a new database context
     Context context = new Context();
 
-    // Optionally sets a new database path
-    //new Set("dbpath", "...............").execute(context);
-
-    // Creates a database for the specified path/file.
-    new CreateDB(INPUT).execute(context, null);
-
     // Uses console output
     ConsoleOutput out = new ConsoleOutput(System.out);
     // Uses file output
     //PrintOutput out = new PrintOutput(RESULT);
+
+    // Optionally sets a new database path
+    //new Set("dbpath", "/path/to/database").execute(context, out);
+
+    // Creates a database for the specified path/file.
+    new CreateDB(INPUT).execute(context, out);
+    // Optionally opens an existing database
+    //new Open(DBNAME).execute(context, out);
 
     new XQuery(QUERY).execute(context, out);
 

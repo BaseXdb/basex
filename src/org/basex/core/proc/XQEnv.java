@@ -42,9 +42,9 @@ public final class XQEnv extends AQuery {
         }
   
         qu.query = query;
+        final Nodes nodes = context.current();
         progress(qu);
   
-        final Nodes nodes = context.current();
         qu.parse();
         pars += per.getTime();
         qu.compile(nodes);

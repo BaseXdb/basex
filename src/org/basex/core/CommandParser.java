@@ -266,7 +266,7 @@ public final class CommandParser extends QueryParser {
       tb.append(ch);
       consume();
     }
-    return finish(cmd, tb.toString());
+    return finish(cmd, tb);
   }
 
   /**
@@ -277,13 +277,16 @@ public final class CommandParser extends QueryParser {
    */
   private String xpath(final COMMANDS cmd) throws QueryException {
     consumeWS();
-    if(!more()) return finish(cmd, "");
-    final XPParser p = new XPParser(qu);
-    p.qp = qp;
-    p.parse(false);
-    final String xp = qu.substring(qp, p.qp);
-    qp = p.qp;
-    return finish(cmd, xp);
+    final StringBuilder sb = new StringBuilder();
+    if(more() && !curr(';')) {
+      // <CG> add context nodes to parsing...
+      final XPParser p = new XPParser(qu, null);
+      p.qp = qp;
+      p.parse(false);
+      sb.append(qu.substring(qp, p.qp));
+      qp = p.qp;
+    }
+    return finish(cmd, sb);
   }
 
   /**
@@ -294,13 +297,16 @@ public final class CommandParser extends QueryParser {
    */
   private String xquery(final COMMANDS cmd) throws QueryException {
     consumeWS();
-    final XQParser p = new XQParser(new XQContext());
-    p.init(qu);
-    p.qp = qp;
-    p.parse(null, false);
-    final String xp = qu.substring(qp, p.qp);
-    qp = p.qp;
-    return finish(cmd, xp);
+    final StringBuilder sb = new StringBuilder();
+    if(more() && !curr(';')) {
+      final XQParser p = new XQParser(new XQContext());
+      p.init(qu);
+      p.qp = qp;
+      p.parse(null, false);
+      sb.append(qu.substring(qp, p.qp));
+      qp = p.qp;
+    }
+    return finish(cmd, sb);
   }
 
   /**
@@ -313,7 +319,7 @@ public final class CommandParser extends QueryParser {
     consumeWS();
     final StringBuilder sb = new StringBuilder();
     while(letterOrDigit(curr())) sb.append(consume());
-    return finish(cmd, sb.toString());
+    return finish(cmd, sb);
   }
 
   /**
@@ -323,7 +329,7 @@ public final class CommandParser extends QueryParser {
    * @return name
    * @throws QueryException query exception
    */
-  private String finish(final COMMANDS cmd, final String s)
+  private String finish(final COMMANDS cmd, final StringBuilder s)
       throws QueryException {
     if(s.length() != 0) return s.toString();
     if(cmd != null) help(null, cmd);

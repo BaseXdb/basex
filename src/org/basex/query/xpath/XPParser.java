@@ -4,6 +4,8 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.query.xpath.XPText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
+
+import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.query.FTOpt;
 import org.basex.query.FTPos;
@@ -63,11 +65,24 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class XPParser extends QueryParser {
+  /** Node reference. */
+  Nodes nodes;
+  
   /**
-   * XPath Query Constructor.
+   * Constructor.
    * @param q query
    */
   public XPParser(final String q) {
+    this(q, null);
+  }
+  
+  /**
+   * Constructor, specifying a node set.
+   * @param q query
+   * @param n context nodes
+   */
+  public XPParser(final String q, final Nodes n) {
+    nodes = n;
     init(q);
   }
 
@@ -82,7 +97,7 @@ public final class XPParser extends QueryParser {
 
   /**
    * Parses the query and returns a query context.
-   * @param end input must have been completely evaluated
+   * @param end if true, input must be completely evaluated
    * @return query context
    * @throws QueryException parsing exception
    */
@@ -278,7 +293,6 @@ public final class XPParser extends QueryParser {
       qp = p;
       return locPath();
     }
-
     qp = p;
 
     final Expr e = filter();
@@ -572,6 +586,8 @@ public final class XPParser extends QueryParser {
    */
   private Func function() throws QueryException {
     final String func = name();
+    if(func.length() == 0) return null;
+    
     consumeWS();
     if(!consume('(')) error(UNEXPECTEDEND);
 

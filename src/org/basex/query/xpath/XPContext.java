@@ -36,12 +36,6 @@ public final class XPContext extends QueryContext {
   
   /** Reference to the root expression. */
   private Expr root;
-  /** Query info counter. */
-  private int cc;
-  /** Current evaluation time. */
-  private long evalTime;
-  /** Fulltext index counter (temporary!). */
-  public int ftcount;
 
   /**
    * Constructor.
@@ -55,10 +49,11 @@ public final class XPContext extends QueryContext {
 
   @Override
   public XPContext compile(final Nodes n) throws QueryException {
-    if(Prop.allInfo) compInfo(QUERYCOMP);
+    inf = Prop.allInfo;
+    if(inf) compInfo(QUERYCOMP);
     local = n != null ? new NodeSet(n.pre, n.data) : null;
     root = root.compile(this);
-    if(Prop.allInfo) compInfo(QUERYRESULT + "%", root);
+    if(inf) compInfo(QUERYRESULT + "%", root);
     return this;
   }
 
@@ -74,9 +69,6 @@ public final class XPContext extends QueryContext {
     root.plan(ser);
   }
 
-  /** Maximum number of evaluation dumps. */
-  private static final int MAXDUMP = 12;
-  
   /**
    * Evaluates the expression with the specified context set.
    * Additionally provides a context.
@@ -88,7 +80,7 @@ public final class XPContext extends QueryContext {
     checkStop();
 
     final Item v = e.eval(this);
-    if(!Prop.allInfo || cc >= MAXDUMP) return v;
+    if(!inf || cc >= MAXDUMP) return v;
 
     final double time = ((System.nanoTime() - evalTime) / 10000) / 100.0;
     evalInfo(time + MS + ": " + e + " -> " + v);

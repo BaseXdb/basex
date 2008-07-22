@@ -13,10 +13,10 @@ import org.basex.query.xpath.XPathProcessor;
 public final class XPath extends AQuery {
   /**
    * Constructor.
-   * @param q query
+   * @param query query
    */
-  public XPath(final String q) {
-    super(DATAREF | PRINTING, q);
+  public XPath(final String query) {
+    super(DATAREF | PRINTING, query);
   }
   
   @Override

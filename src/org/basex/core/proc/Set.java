@@ -17,11 +17,11 @@ import org.basex.core.Prop;
 public final class Set extends Process {
   /**
    * Constructor.
-   * @param o option
-   * @param v optional value
+   * @param option option
+   * @param val optional value
    */
-  public Set(final Object o, final String v) {
-    super(STANDARD, o.toString(), v);
+  public Set(final Object option, final String val) {
+    super(STANDARD, option.toString(), val);
   }
   
   @Override

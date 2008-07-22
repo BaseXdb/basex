@@ -209,7 +209,7 @@ public final class GUIInput extends BaseXTextField {
     
     if(sl.size == 0) {
       try {
-        new XPParser(query).parse();
+        new XPParser(query, ctx.current()).parse();
       } catch(final QueryException ex) {
         pre = query;
         sl = ex.complete();

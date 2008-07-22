@@ -405,7 +405,6 @@ public final class GUI extends JFrame {
       // run as command: command mode or exclamation mark as first character
       final int i = cmd ? 0 : 1;
       if(in.length() > i) {
-        // <CG> parse multiple commands..
         try {
           for(final Process p : new CommandParser(in.substring(i)).parse()) {
             if(!exec(p)) break;

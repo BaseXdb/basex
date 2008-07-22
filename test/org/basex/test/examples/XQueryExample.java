@@ -1,7 +1,7 @@
 package org.basex.test.examples;
 
 import org.basex.core.Context;
-import org.basex.core.proc.XQuery;
+import org.basex.core.proc.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.query.*;

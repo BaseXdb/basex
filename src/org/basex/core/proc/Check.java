@@ -19,10 +19,10 @@ import org.basex.io.IO;
 public final class Check extends Process {
   /**
    * Constructor.
-   * @param n database name
+   * @param name name of database
    */
-  public Check(final String n) {
-    super(STANDARD, n);
+  public Check(final String name) {
+    super(STANDARD, name);
   }
   
   @Override

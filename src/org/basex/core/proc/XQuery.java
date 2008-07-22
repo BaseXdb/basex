@@ -14,10 +14,10 @@ import org.basex.query.xquery.XQueryProcessor;
 public final class XQuery extends AQuery {
   /**
    * Constructor.
-   * @param q query
+   * @param query query
    */
-  public XQuery(final String q) {
-    super(PRINTING, q);
+  public XQuery(final String query) {
+    super(PRINTING, query);
   }
 
   @Override

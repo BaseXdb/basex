@@ -110,16 +110,11 @@ public final class XQContext extends QueryContext {
   /** Construction mode (currently ignored). */
   Bln construct = Bln.FALSE;
 
-  /** Reference to the expression root. */
+  /** Reference to the root expression. */
   Expr root;
 
   @Override
   public XQContext compile(final Nodes nodes) throws XQException {
-    inf = Prop.allInfo;
-    info.reset();
-    firstOpt = true;
-    firstEval = true;
-
     // adds an existing document to the database array
     if(nodes != null) {
       docs = new DNode[nodes.size];
@@ -134,6 +129,7 @@ public final class XQContext extends QueryContext {
     }
 
     // evaluates the query and returns the result
+    inf = Prop.allInfo;
     if(inf) compInfo(QUERYCOMP);
     fun.comp(this);
     vars.comp(this);
@@ -173,15 +169,6 @@ public final class XQContext extends QueryContext {
     fun.plan(ser);
     root.plan(ser);
   }
-
-  /** Maximum number of evaluation dumps. */
-  private static final int MAXDUMP = 16;
-  /** Query info counter. */
-  private int cc;
-  /** Current evaluation time. */
-  private long evalTime;
-  /** Info flag. */
-  private boolean inf;
 
   /**
    * Evaluates the specified expression and returns an iterator.

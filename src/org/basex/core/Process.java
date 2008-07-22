@@ -66,6 +66,7 @@ public abstract class Process extends AbstractProcess {
     
     if(!execute(ctx)) throw new RuntimeException(info());
     output(out);
+    if(Prop.info) out.println(info());
   }
 
   @Override

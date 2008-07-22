@@ -27,10 +27,19 @@ import org.basex.io.IO;
 public final class CreateDB extends ACreate {
   /**
    * Constructor.
-   * @param a database path and optional name
+   * @param input input path
    */
-  public CreateDB(final String... a) {
-    super(STANDARD, a);
+  public CreateDB(final String input) {
+    this(input, null);
+  }
+
+  /**
+   * Constructor.
+   * @param input input path
+   * @param name name of database
+   */
+  public CreateDB(final String input, final String name) {
+    super(STANDARD, input, name);
   }
   
   @Override
