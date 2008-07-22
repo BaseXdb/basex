@@ -11,6 +11,20 @@ import org.xmldb.api.base.XMLDBException;
  * @author Andreas Weiler
  */
 public class BXDatabaseImpl implements Database {
+  
+  /** DB URI. */
+  public static final String BASEXDB_URI = "basexdb://";
+  /** Instance Name. */
+  public static final String INSTANCE_NAME = "basexdb";
+  /** Conformance Level of the implementation. */
+  public static final String CONFORMANCE_LEVEL = "0";
+
+  /**
+   * Constructor.
+   */
+  public BXDatabaseImpl() {
+      super();
+  }
 
   /**
    * @see org.xmldb.api.base.Database#acceptsURI(java.lang.String)
@@ -33,19 +47,15 @@ public class BXDatabaseImpl implements Database {
   /**
    * @see org.xmldb.api.base.Database#getConformanceLevel()
    */
-  public String getConformanceLevel() throws XMLDBException {
-    // TODO Auto-generated method stub
-    throw new XMLDBException();
-    //return null;
+  public String getConformanceLevel() {
+    return CONFORMANCE_LEVEL;
   }
 
   /**
    * @see org.xmldb.api.base.Database#getName()
    */
-  public String getName() throws XMLDBException {
-    // TODO Auto-generated method stub
-    throw new XMLDBException();
-    //return null;
+  public String getName() {
+    return INSTANCE_NAME;
   }
 
   /**
