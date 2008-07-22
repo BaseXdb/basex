@@ -83,47 +83,47 @@ public final class ElementImpl extends NodeImpl implements Element {
   }
 
   public void removeAttribute(final String name) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 
   public void removeAttributeNS(final String uri, final String ln) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 
   public Attr removeAttributeNode(final Attr oldAttr) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
     return null;
   }
 
   public void setAttribute(final String name, final String value) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 
   public void setAttributeNS(final String uri, final String qn,
       final String value) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 
   public Attr setAttributeNode(final Attr newAttr) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
     return null;
   }
 
   public Attr setAttributeNodeNS(final Attr newAttr) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
     return null;
   }
 
   public void setIdAttribute(final String name, final boolean isId) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 
   public void setIdAttributeNS(final String uri, final String ln,
       final boolean isId) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 
   public void setIdAttributeNode(final Attr idAttr, final boolean isId) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 }

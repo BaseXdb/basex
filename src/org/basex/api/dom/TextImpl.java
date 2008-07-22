@@ -30,12 +30,12 @@ public final class TextImpl extends CharImpl implements Text {
   }
 
   public Text replaceWholeText(final String content) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
     return null;
   }
 
   public Text splitText(final int off) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
     return null;
   }
 }

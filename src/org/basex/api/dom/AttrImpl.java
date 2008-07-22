@@ -75,6 +75,6 @@ public final class AttrImpl extends NodeImpl implements Attr {
   }
 
   public void setValue(final String value) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 }

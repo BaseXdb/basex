@@ -41,22 +41,22 @@ public abstract class CharImpl extends NodeImpl implements CharacterData {
   }
 
   public final void appendData(final String arg) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 
   public final void deleteData(final int off, final int count) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 
   public final void insertData(final int off, final String arg) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 
   public final void replaceData(final int off, final int c, final String arg) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 
   public final void setData(final String dat) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 }

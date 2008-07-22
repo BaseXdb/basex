@@ -32,57 +32,57 @@ public final class DocImpl extends NodeImpl implements Document {
   }
   
   public Node adoptNode(final Node source) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
     return null;
   }
 
   public Attr createAttribute(final String name) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
     return null;
   }
 
   public Attr createAttributeNS(final String uri, final String qn) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
     return null;
   }
 
   public CDATASection createCDATASection(final String dat) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
     return null;
   }
 
   public Comment createComment(final String dat) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
     return null;
   }
 
   public DocumentFragment createDocumentFragment() {
-    BaseX.noupdates();
+    BaseX.notimplemented();
     return null;
   }
 
   public Element createElement(final String tagName) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
     return null;
   }
 
   public Element createElementNS(final String uri, final String qn) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
     return null;
   }
 
   public EntityReference createEntityReference(final String name) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
     return null;
   }
 
   public PIImpl createProcessingInstruction(final String t, final String dat) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
     return null;
   }
 
   public Text createTextNode(final String dat) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
     return null;
   }
 
@@ -147,33 +147,33 @@ public final class DocImpl extends NodeImpl implements Document {
   }
 
   public Node importNode(final Node importedNode, final boolean deep) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
     return null;
   }
 
   public void normalizeDocument() {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 
   public Node renameNode(final Node n, final String namespaceURI,
       final String qualifiedName) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
     return null;
   }
 
   public void setDocumentURI(final String documentURI) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 
   public void setStrictErrorChecking(final boolean strictErrorChecking) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 
   public void setXmlStandalone(final boolean xmlStandalone) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 
   public void setXmlVersion(final String xmlVersion) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 }

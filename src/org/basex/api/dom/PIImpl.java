@@ -40,6 +40,6 @@ public final class PIImpl extends NodeImpl implements ProcessingInstruction {
   }
 
   public void setData(final String dat) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 }

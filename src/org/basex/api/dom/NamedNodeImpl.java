@@ -39,22 +39,22 @@ public class NamedNodeImpl extends NodeListImpl implements NamedNodeMap {
   }
 
   public Node setNamedItem(final Node arg) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
     return null;
   }
 
   public Node removeNamedItem(final String name) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
     return null;
   }
 
   public Node setNamedItemNS(final Node arg) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
     return null;
   }
 
   public Node removeNamedItemNS(final String uri, final String ln) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
     return null;
   }
 }

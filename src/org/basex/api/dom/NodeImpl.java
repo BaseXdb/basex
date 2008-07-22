@@ -176,7 +176,7 @@ public abstract class NodeImpl implements Node {
   }
 
   public Node appendChild(final Node newChild) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
     return null;
   }
 
@@ -189,7 +189,7 @@ public abstract class NodeImpl implements Node {
   }
 
   public Node insertBefore(final Node newChild, final Node refChild) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
     return null;
   }
 
@@ -214,34 +214,34 @@ public abstract class NodeImpl implements Node {
   }
 
   public void normalize() {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 
   public Node removeChild(final Node oldChild) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
     return null;
   }
 
   public Node replaceChild(final Node newChild, final Node oldChild) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
     return null;
   }
 
   public void setNodeValue(final String nodeValue) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 
   public void setPrefix(final String prefix) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 
   public void setTextContent(final String textContent) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
   }
 
   public Object setUserData(final String key, final Object dat,
       final UserDataHandler handler) {
-    BaseX.noupdates();
+    BaseX.notimplemented();
     return null;
   }
   
