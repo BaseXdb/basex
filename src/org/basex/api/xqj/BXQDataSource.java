@@ -7,7 +7,6 @@ import javax.xml.xquery.XQConnection;
 import javax.xml.xquery.XQDataSource;
 import javax.xml.xquery.XQException;
 import org.basex.core.Context;
-import org.basex.core.Prop;
 
 /**
  * BaseX  XQuery data source.
@@ -25,8 +24,6 @@ public class BXQDataSource implements XQDataSource {
    * Constructor.
    */
   public BXQDataSource() {
-    // read properties (database path, language, ...)
-    Prop.read();
     // create new context instance, containing the data reference
     // and initial node set
     ctx = new Context();

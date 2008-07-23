@@ -6,7 +6,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 import org.basex.api.dom.NodeImpl;
 import org.basex.api.jaxp.XPathImpl;
-import org.basex.core.Prop;
 import org.basex.core.proc.Check;
 import org.basex.data.Data;
 import org.basex.util.Performance;
@@ -33,7 +32,6 @@ public final class JAXPExample {
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
-    Prop.read();
     eval(new XPathImpl());
     eval(XPathFactory.newInstance().newXPath());
   }

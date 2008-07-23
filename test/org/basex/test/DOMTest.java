@@ -4,7 +4,6 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 import org.basex.api.jaxp.XPathImpl;
-import org.basex.core.Prop;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 import org.xml.sax.InputSource;
@@ -30,7 +29,6 @@ public final class DOMTest {
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
-    Prop.read();
     System.out.println("=== BaseX DOM ===========================");
     test(eval(new XPathImpl()));
     System.out.println("\n=== Java DOM ============================");
