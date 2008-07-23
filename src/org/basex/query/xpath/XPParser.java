@@ -4,7 +4,6 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.query.xpath.XPText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-
 import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.query.FTOpt;
@@ -65,15 +64,15 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class XPParser extends QueryParser {
-  /** Node reference. */
-  Nodes nodes;
+  /** XPath complete suggestions. */
+  XPSuggest suggest;
   
   /**
    * Constructor.
    * @param q query
    */
   public XPParser(final String q) {
-    this(q, null);
+    init(q);
   }
   
   /**
@@ -82,8 +81,8 @@ public final class XPParser extends QueryParser {
    * @param n context nodes
    */
   public XPParser(final String q, final Nodes n) {
-    nodes = n;
-    init(q);
+    this(q);
+    if(n != null) suggest = new XPSuggest(n);
   }
 
   /**
@@ -325,9 +324,11 @@ public final class XPParser extends QueryParser {
    */
   private LocPath absLocPath(final LocPath path) throws QueryException {
     boolean more = false;
+    if(suggest != null) suggest.absLocPath();
+    
     while(consume('/')) {
       final char c = curr();
-      if(c != 0 && c != ' ' && c != ']' && c != ')' && c != '|' && c != ',') {
+      if(c != 0 && c != ']' && c != ')' && c != '|' && c != ',') {
         path.steps.add(step());
         more = true;
       } else if(more) {
@@ -344,8 +345,9 @@ public final class XPParser extends QueryParser {
    * @throws QueryException parsing exception
    */
   private LocPath relLocPath(final LocPath path) throws QueryException {
-    path.steps.add(step());
-    while(consume('/')) path.steps.add(step());
+    if(suggest != null) suggest.absLocPath();
+    
+    do path.steps.add(step()); while(consume('/'));
     return path;
   }
 
@@ -355,44 +357,29 @@ public final class XPParser extends QueryParser {
    * @throws QueryException parsing exception
    */
   private Step step() throws QueryException {
-    if(curr('/')) {
-      final char c = next();
-      if(letter(c) || c == '@' || c == '*' || c == '.') {
-        return Axis.create(Axis.DESCORSELF, TestNode.NODE);
-      }
-      error(NOLOCSTEP);
-    }
-
     Axis axis = null;
-    Test nodetest = null;
+    Test test = null;
 
-    if(consume('.')) {
-      // AbbreviatedStep
-      if(consume('.')) {
-        // parent axis
-        axis = Axis.PARENT;
-      } else {
-        // self axis
-        axis = Axis.SELF;
-      }
-      nodetest = TestNode.NODE;
-    } else if(curr('@')) {
-      consume('@');
+    if(curr('/')) {
+      if(next() == '/') error(NOLOCSTEP);
+      axis = Axis.DESCORSELF;
+      test = TestNode.NODE;
+    } else if(consume('.')) {
+      // Abbreviated Step (self or parent)
+      axis = consume('.') ? Axis.PARENT : Axis.SELF;
+      test = TestNode.NODE;
+    } else if(consume('@')) {
       axis = Axis.ATTR;
-      final String test = name();
-      if(test.length() != 0) {
-        nodetest = new TestName(Token.token(test), false);
-      } else if(consume('*')) {
-        nodetest = new TestName(false);
-      } else {
-        error(NOATTNAME);
-      }
+      final String t = name();
+      test = t.length() != 0 ? new TestName(Token.token(t), false) :
+        consume('*') ? new TestName(false) : null;
+      if(test == null) error(NOATTNAME);
     } else if(consume('*')) {
       axis = Axis.CHILD;
-      nodetest = new TestName(true);
+      test = new TestName(true);
     } else if(letter(curr())) {
       axis = axis();
-      nodetest = test(axis);
+      test = test(axis);
     } else {
       error(NOLOCSTEP);
     }
@@ -404,7 +391,8 @@ public final class XPParser extends QueryParser {
       consumeWS();
     }
 
-    return Axis.create(axis, nodetest, preds);
+    if(suggest != null) suggest.step(axis, test, preds);
+    return Axis.create(axis, test, preds);
   }
 
   /**
@@ -486,8 +474,7 @@ public final class XPParser extends QueryParser {
   private Expr pred() throws QueryException {
     consume('[');
     final Expr p = or();
-    return consume(']') ? p : p instanceof FTContains ? error(FTINCOMP) :
-      error(UNFINISHEDPRED);
+    return p != null && consume(']') ? p : error(UNFINISHEDPRED);
   }
 
   /**
@@ -565,16 +552,16 @@ public final class XPParser extends QueryParser {
     tk.reset();
     boolean dot = true;
     boolean exp = true;
-    char curr = curr();
-    while(curr != 0 && (digit(curr) || dot && exp && curr == '.' ||
-        exp && (curr == 'E' || curr == 'e'))) {
-      if(curr == '.') {
+    char c = curr();
+    while(c != 0 && (digit(c) || dot && exp && c == '.' ||
+        exp && (c == 'E' || c == 'e'))) {
+      if(c == '.') {
         dot = false;
-      } else if(curr == 'e' || curr == 'E') {
+      } else if(c == 'e' || c == 'E') {
         exp = false;
       }
       tk.add(consume());
-      curr = curr();
+      c = curr();
     }
     return toDouble(tk.finish());
   }
@@ -653,7 +640,16 @@ public final class XPParser extends QueryParser {
    */
   private Expr error(final String err, final Object... arg)
       throws QueryException {
-    return error(null, err, arg);
+
+    return error(complete(), err, arg);
+  }
+  
+  /**
+   * Returns the code completions.
+   * @return completions
+   */
+  public StringList complete() {
+    return suggest != null ? suggest.complete() : null;
   }
 
   /**

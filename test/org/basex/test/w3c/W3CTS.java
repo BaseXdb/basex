@@ -179,12 +179,11 @@ public abstract class W3CTS {
 
     final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     final String dat = sdf.format(Calendar.getInstance().getTime());
-    Prop.read();
-    Prop.xqformat = false;
 
     final Performance perf = new Performance();
-
     final Context context = new Context();
+    Prop.xqformat = false;
+
     new Check(path + input).execute(context, null);
     data = context.data();
 

@@ -19,7 +19,7 @@ public final class TestName extends Test {
   /** Index reference to the Tag/Attribute. */
   public int id;
   /** Tag/Attribute name. */
-  final byte[] name;
+  public final byte[] name;
   /** Tag reference. */
   private final boolean tag;
 

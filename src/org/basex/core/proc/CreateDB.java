@@ -2,9 +2,7 @@ package org.basex.core.proc;
 
 import static org.basex.Text.*;
 import static org.basex.core.Commands.*;
-
 import java.io.IOException;
-
 import org.basex.BaseX;
 import org.basex.build.DiskBuilder;
 import org.basex.build.MemBuilder;
@@ -50,11 +48,6 @@ public final class CreateDB extends ACreate {
         f.dbname() : args[1];
     return build(new DirParser(f), db);
   }
-  
-  @Override
-  public String toString() {
-    return COMMANDS.CREATE.name() + " " + CREATE.DB + args();
-  }
 
   /**
    * Creates and returns a database for the specified XML document.
@@ -82,5 +75,10 @@ public final class CreateDB extends ACreate {
       BaseX.debug(ex);
       return null;
     }
+  }
+  
+  @Override
+  public String toString() {
+    return COMMANDS.CREATE.name() + " " + CREATE.DB + args();
   }
 }

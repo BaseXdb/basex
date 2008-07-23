@@ -74,7 +74,6 @@ public class BaseXClient {
    * @param args command line arguments
    */
   void init(final String[] args) {
-    Prop.read();
     if(!parseArguments(args)) return;
     run();
   }
@@ -154,14 +153,14 @@ public class BaseXClient {
   }
 
   /**
-   * Evaluates the user input, which can be any user input or the commands
+   * Evaluates the input, which can be interactive input or the commands
    * specified after the <code>-q</code> command-line argument.
-   * @param input input commands
+   * @param in input commands
    * @return false if exit command was sent
    */
-  private boolean process(final String input) {
+  private boolean process(final String in) {
     try {
-      for(final Process p : new CommandParser(input).parse()) {
+      for(final Process p : new CommandParser(in).parse()) {
         if(p instanceof Exit) return false;
         if(!process(p, info)) break;
       }

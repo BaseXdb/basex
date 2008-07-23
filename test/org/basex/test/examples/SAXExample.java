@@ -1,7 +1,6 @@
 package org.basex.test.examples;
 
 import org.basex.core.Context;
-import org.basex.core.Prop;
 import org.basex.core.proc.Check;
 import org.basex.data.Result;
 import org.basex.data.SAXSerializer;
@@ -40,9 +39,6 @@ public final class SAXExample extends DefaultHandler {
    * @throws Exception exception
    */
   public SAXExample() throws Exception {
-    // read properties (database path, language, ...)
-    Prop.read();
-
     // create database context
     final Context ctx = new Context();
 

@@ -12,9 +12,9 @@ import org.basex.core.CommandParser;
 import org.basex.core.Context;
 import org.basex.core.Process;
 import org.basex.core.Prop;
+import org.basex.core.proc.Exit;
 import org.basex.core.proc.GetInfo;
 import org.basex.core.proc.GetResult;
-import org.basex.core.proc.Stop;
 import org.basex.io.BufferedOutput;
 import org.basex.io.ConsoleOutput;
 import org.basex.io.PrintOutput;
@@ -72,7 +72,6 @@ public final class BaseXServer {
    */
   private BaseXServer(final String[] args) {
     try {
-      Prop.read();
       if(!parseArguments(args)) return;
 
       final ServerSocket server = new ServerSocket(Prop.port);
@@ -80,7 +79,6 @@ public final class BaseXServer {
       while(running) serve(server);
       BaseX.outln(SERVERSTOPPED);
 
-      Prop.write();
       context.close();
     } catch(final Exception ex) {
       BaseX.debug(ex);
@@ -124,7 +122,7 @@ public final class BaseXServer {
       }
       final Process proc = pr;
       
-      if(proc instanceof Stop) {
+      if(proc instanceof Exit) {
         s.getOutputStream().write(1);
         // interrupt running processes
         for(int p = 0; p < MAX; p++) if(corc[p] != null) corc[p].stop();
@@ -202,39 +200,6 @@ public final class BaseXServer {
     BaseX.errln(SERVERFULL);
     return false;
   }
-
-  /**
-   * Returns a new client session.
-   * @param cmd command
-   * @param ip client ip address
-   * @return core reference
-  synchronized Proc newCore(final Proc cmd, final String ip) {
-    final long t = System.nanoTime();
-    
-    for(int i = 0; i < MAX; i++) {
-      if(client[i] == null || client[i].equals(ip) || t - time[i] > TIMEOUT) {
-        client[i] = ip;
-        time[i] = System.nanoTime();
-        core[i] = cmd;
-        return cmd;
-      }
-    }
-    BaseX.errln(SERVERFULL);
-    return null;
-  }
-   */
-
-  /**
-   * Returns the correct client session.
-   * @param ip client ip address
-   * @return core reference
-  synchronized Proc getSession(final String ip) {
-    for(int i = 0; i < MAX; i++) {
-      if(ip.equals(client[i])) return core[i];
-    }
-    return null;
-  }
-   */
   
   /**
    * Returns the correct client session.
@@ -290,7 +255,7 @@ public final class BaseXServer {
       } else if(args[a].equals("stop")) {
         try {
           // run new process, sending the stop command
-          new ClientProcess("localhost", Prop.port, new Stop()).execute(null);
+          new ClientProcess("localhost", Prop.port, new Exit()).execute(null);
           BaseX.outln(SERVERSTOPPED);
         } catch(final Exception ex) {
           if(ex instanceof IOException) BaseX.errln(SERVERERR);

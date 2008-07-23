@@ -15,11 +15,11 @@ import org.basex.io.IO;
 public final class CreateFS extends ACreate {
   /**
    * Constructor.
-   * @param p database path
-   * @param n database name
+   * @param path filesystem path
+   * @param name name of database 
    */
-  public CreateFS(final String p, final String n) {
-    super(STANDARD, p, n);
+  public CreateFS(final String path, final String name) {
+    super(STANDARD, path, name);
   }
   
   @Override

@@ -10,7 +10,6 @@ import javax.swing.JComboBox;
 import javax.swing.plaf.basic.BasicComboPopup;
 import org.basex.core.CommandParser;
 import org.basex.core.Context;
-import org.basex.data.Data;
 import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.query.QueryException;
@@ -171,12 +170,12 @@ public final class GUIInput extends BaseXTextField {
    * @param query query input
    */
   private void cmdPopup(final String query) {
-    StringList sl = new StringList();
+    StringList sl = null;
     final boolean excl = query.startsWith("!");
     try {
       pre = excl ? "!" : "";
       final String suf = getText().substring(pre.length());
-      new CommandParser(suf).parse();
+      new CommandParser(suf, GUI.context.current()).parse();
     } catch(final QueryException ex) {
       sl = ex.complete();
       pre = query.substring(0, ex.col() - (excl ? 0 : 1));
@@ -189,33 +188,42 @@ public final class GUIInput extends BaseXTextField {
    * @param query query input
    */
   private void xpathPopup(final String query) {
-    final int last = Math.max(query.lastIndexOf('|'), query.lastIndexOf('('));
-    final int slash = Math.max(Math.max(last, query.lastIndexOf('/')),
-        query.lastIndexOf('['));
-
-    pre = slash != -1 ? query.substring(0, slash + 1) : "";
-    final String pref = query.substring(last + 1, slash != -1 ? slash + 1 :
-      query.length()).trim();
- 
-    StringList sl = new StringList();
     final Context ctx = GUI.context;
-    if(query.length() != 0 && (pref.startsWith("/") || ctx.root())) {
+    StringList sl = null;
+    try {
+      final XPParser parser = new XPParser(query, ctx.current());
+      parser.parse();
+      sl = parser.complete();
+      pre = query.substring(0, xPos(query) + 1);
+    } catch(final QueryException ex) {
+      sl = ex.complete();
+      pre = query.substring(0, ex.col() - 1);
+    }
+
+    /*if(sl != null) {
+      final String pref = query.substring(last + 1, slash != -1 ? slash + 1 :
+        query.length()).trim();
       final String suf = getText().substring(pre.length()).trim();
       final Data data = ctx.data();
       for(final String a : data.skel.suggest(data, pref).finish()) {
         if(a.startsWith(suf) && !a.equals(suf)) sl.add(a);
       }
-    }
+    }*/
     
-    if(sl.size == 0) {
-      try {
-        new XPParser(query, ctx.current()).parse();
-      } catch(final QueryException ex) {
-        pre = query;
-        sl = ex.complete();
-      }
-    }
     createCombo(sl);
+  }
+  
+  /**
+   * Returns an xpath completion position (temporary).
+   * @param query input query
+   * @return position
+   */
+  private int xPos(final String query) {
+    for(int q = query.length() - 1; q >= 0; q--) {
+      int c = query.charAt(q);
+      if(c == '|' || c == '(' || c == '/' || c == '[') return q;
+    }
+    return -1;
   }
 
   /**
@@ -223,7 +231,7 @@ public final class GUIInput extends BaseXTextField {
    * @param sl strings to be added
    */
   private void createCombo(final StringList sl) {
-    if(sl.size == 0) {
+    if(sl == null || sl.size == 0) {
       box.setSelectedItem(null);
       pop.setVisible(false);
       return;

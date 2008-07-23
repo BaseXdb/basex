@@ -1,10 +1,10 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
+import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.Process;
 import org.basex.core.Prop;
-import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
 import org.basex.io.PrintOutput;
@@ -31,22 +31,15 @@ public final class Export extends Process {
   @Override
   protected boolean exec() {
     try {
-      final String name = args[0];
-      final PrintOutput out = new PrintOutput(name);
-      final Data data = context.data();
+      final PrintOutput out = new PrintOutput(args[0]);
       final Nodes current = context.current();
-      
-      if(current.size == 1 && current.pre[0] == 0) {
-        out.println(BaseX.info(DOCDECL, Token.UTF8));
-        new Nodes(0, data).serialize(
-            new XMLSerializer(out, false, data.meta.chop));
-      } else {
-        current.serialize(new XMLSerializer(out, true, false));
-      }
+      final boolean root = context.root();
+      if(root) out.println(BaseX.info(DOCDECL, Token.UTF8));
+      current.serialize(new XMLSerializer(out, !root, current.data.meta.chop));
       out.close();
 
       return Prop.info ? info(DBEXPORTED, perf.getTimer()) : true;
-    } catch(final Exception ex) {
+    } catch(final IOException ex) {
       BaseX.debug(ex);
       return error(ex.getMessage());
     }

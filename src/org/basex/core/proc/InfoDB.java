@@ -92,6 +92,6 @@ public class InfoDB extends AInfo {
   
   @Override
   public String toString() {
-    return COMMANDS.INFO.name() + " " + INFO.DB + args();
+    return COMMANDS.INFO.name() + " " + INFO.DB;
   }
 }

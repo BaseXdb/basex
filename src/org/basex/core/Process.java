@@ -258,7 +258,7 @@ public abstract class Process extends AbstractProcess {
    */
   public String args() {
     final StringBuilder sb = new StringBuilder();
-    for(final String a : args) sb.append(" " + a);
+    for(final String a : args) if(a != null) sb.append(" " + a);
     return sb.toString();
   }
 
@@ -267,7 +267,7 @@ public abstract class Process extends AbstractProcess {
    * @return class name
    */
   public String name() {
-    return getClass().getSimpleName();
+    return getClass().getSimpleName().toUpperCase();
   }
 
   @Override

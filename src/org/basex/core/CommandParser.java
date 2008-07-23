@@ -39,13 +39,13 @@ import org.basex.core.proc.Optimize;
 import org.basex.core.proc.Ping;
 import org.basex.core.proc.Prompt;
 import org.basex.core.proc.Set;
-import org.basex.core.proc.Stop;
 import org.basex.core.proc.Update;
 import org.basex.core.proc.XMark;
 import org.basex.core.proc.XPath;
 import org.basex.core.proc.XPathMV;
 import org.basex.core.proc.XQEnv;
 import org.basex.core.proc.XQuery;
+import org.basex.data.Nodes;
 import org.basex.query.QueryException;
 import org.basex.query.QueryParser;
 import org.basex.query.xpath.XPParser;
@@ -64,12 +64,25 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class CommandParser extends QueryParser {
+  /** Current node set. */
+  public Nodes curr;
+  
   /**
    * Constructor, parsing the input queries.
    * @param in query input
    */
   public CommandParser(final String in) {
     init(in);
+  }
+
+  /**
+   * Constructor, parsing the input queries.
+   * @param in query input
+   * @param c current nodeset
+   */
+  public CommandParser(final String in, final Nodes c) {
+    this(in);
+    curr = c;
   }
 
   /**
@@ -219,8 +232,8 @@ public final class CommandParser extends QueryParser {
         break;
       case HELP:
         String hc = name(null);
-        qp = qm;
         if(hc != null && !hc.toUpperCase().equals(ALL)) {
+          qp = qm;
           hc = consume(COMMANDS.class, cmd).toString();
         }
         return new Help(hc);
@@ -232,8 +245,6 @@ public final class CommandParser extends QueryParser {
         return new GetResult();
       case GETINFO:
         return new GetInfo();
-      case STOP:
-        return new Stop();
       case EXIT:
       case QUIT:
         return new Exit();
@@ -280,7 +291,7 @@ public final class CommandParser extends QueryParser {
     final StringBuilder sb = new StringBuilder();
     if(more() && !curr(';')) {
       // <CG> add context nodes to parsing...
-      final XPParser p = new XPParser(qu, null);
+      final XPParser p = new XPParser(qu, curr);
       p.qp = qp;
       p.parse(false);
       sb.append(qu.substring(qp, p.qp));

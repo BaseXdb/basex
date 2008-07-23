@@ -45,6 +45,6 @@ public class InfoIndex extends AInfo {
   
   @Override
   public String toString() {
-    return COMMANDS.INFO.name() + " " + INFO.INDEX + args();
+    return COMMANDS.INFO.name() + " " + INFO.INDEX;
   }
 }

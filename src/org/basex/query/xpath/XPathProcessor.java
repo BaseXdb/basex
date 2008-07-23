@@ -18,7 +18,7 @@ public final class XPathProcessor extends QueryProcessor {
    * @param q query
    */
   public XPathProcessor(final String q) {
-    super(q.length() == 0 ? "." : q);
+    super(q.trim().length() == 0 ? "." : q);
   }
 
   @Override

@@ -90,7 +90,6 @@ public final class BaseXWebServer {
    */
   private BaseXWebServer(final String[] args) {
     try {
-      Prop.read();
       if(!parseArguments(args)) return;
 
       final ServerSocket server = new ServerSocket(Prop.webport);

@@ -46,7 +46,6 @@ public final class QueryTest {
    * Constructor.
    */
   private QueryTest() {
-    Prop.read();
     Prop.textindex = true;
     Prop.attrindex = true;
     Prop.ftindex = true;

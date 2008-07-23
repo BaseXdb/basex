@@ -44,6 +44,14 @@ public final class Skeleton {
   }
 
   /**
+   * Returns the skeleton root.
+   * @return root
+   */
+  public Node root() {
+    return root;
+  }
+
+  /**
    * Opens an element.
    * @param n name reference
    * @param l current level
@@ -133,17 +141,28 @@ public final class Skeleton {
    * @param desc descendant flag
    * @return child node
    */
-  private ArrayList<Node> child(final ArrayList<Node> n, final Data data,
+  public ArrayList<Node> child(final ArrayList<Node> n, final Data data,
       final String name, final boolean desc) {
 
+    if(name.startsWith("@")) return new ArrayList<Node>();
+    return child(n, data.tagID(Token.token(name)), desc);
+  }
+
+  /**
+   * Returns the child node for the specified name.
+   * @param n node
+   * @param t name reference
+   * @param desc descendant flag
+   * @return child node
+   */
+  public ArrayList<Node> child(final ArrayList<Node> n, final int t,
+      final boolean desc) {
+
     final ArrayList<Node> ch = new ArrayList<Node>();
-    if(name.startsWith("@")) return ch;
-    final int t = data.tagID(Token.token(name));
-    
     for(final Node r : n) {
-      if(name.length() != 0 && r.name != t) continue;
+      if(t != 0 && r.name != t) continue;
       for(final Node c : r.ch) {
-        if(desc) c.child(ch);
+        if(desc) c.desc(ch);
         else ch.add(c);
       }
     }
@@ -151,15 +170,15 @@ public final class Skeleton {
   }
 
   /** Document node. */
-  private static final class Node {
+  public static final class Node {
     /** Tag reference. */
-    final short name;
+    public final short name;
     /** Node kind. */
-    final byte kind;
+    public final byte kind;
     /** Tag counter. */
-    int count;
+    public int count;
     /** Children. */
-    Node[] ch;
+    public Node[] ch;
 
     /**
      * Default Constructor.
@@ -218,12 +237,12 @@ public final class Skeleton {
     }
 
     /**
-     * Recursively adds the children to this node.
-     * @param nodes node array
+     * Recursively adds the descendants to the specified node list.
+     * @param nodes node list
      */
-    public void child(final ArrayList<Node> nodes) {
+    public void desc(final ArrayList<Node> nodes) {
       nodes.add(this);
-      for(final Node n : ch) n.child(nodes);
+      for(final Node n : ch) n.desc(nodes);
     }
 
     @Override

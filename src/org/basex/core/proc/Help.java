@@ -2,9 +2,7 @@ package org.basex.core.proc;
 
 import static org.basex.Text.*;
 import static org.basex.core.Commands.*;
-
 import java.io.IOException;
-
 import org.basex.core.Process;
 import org.basex.io.PrintOutput;
 
@@ -27,9 +25,10 @@ public final class Help extends Process {
   protected void out(final PrintOutput out) throws IOException {
     try {
       out.print(COMMANDS.valueOf(args[0]).help(true, true));
+      return;
     } catch(Exception ex) {
       out.println(CMDHELP);
-      final boolean all = ALL.equals(args[0]);
+      final boolean all = ALL.equalsIgnoreCase(args[0]);
       for(final COMMANDS c : COMMANDS.values()) out.print(c.help(false, all));
     }
   }
