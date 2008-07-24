@@ -115,7 +115,7 @@ abstract class AQuery extends Process {
       try {
         new ProcessBuilder(Prop.dotty, RESULTDOT).start().waitFor();
       } catch(final InterruptedException ex) {
-        throw new IOException(ex);
+        throw new IOException(ex.toString());
       }
     }
   }
