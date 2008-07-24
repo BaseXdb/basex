@@ -1,6 +1,7 @@
 package org.basex.data;
 
 import static org.basex.data.DataText.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import org.basex.io.DataInput;
@@ -115,19 +116,8 @@ public final class Skeleton {
     }
 
     for(final Node r : n) {
-      String name = null;
-      if(r.kind == Data.ATTR) {
-        name = "@" + Token.string(data.atts.key(r.name));
-      } else if(r.kind == Data.ELEM) {
-        name = Token.string(data.tags.key(r.name));
-      } else if(r.kind == Data.TEXT) {
-        name = "text()";
-      } else if(r.kind == Data.COMM) {
-        name = "comment()";
-      } else if(r.kind == Data.PI) {
-        name = "processing-instruction()";
-      }
-      if(name != null && !sl.contains(name)) sl.add(name);
+      final String name = Token.string(r.token(data));
+      if(name.length() != 0 && !sl.contains(name)) sl.add(name);
     }
     sl.sort();
     return sl;
@@ -243,6 +233,22 @@ public final class Skeleton {
     public void desc(final ArrayList<Node> nodes) {
       nodes.add(this);
       for(final Node n : ch) n.desc(nodes);
+    }
+
+    /**
+     * Returns a readable representation of this node.
+     * @param data data reference
+     * @return completions
+     */
+    public byte[] token(final Data data) {
+      switch(kind) {
+        case Data.ELEM: return data.tags.key(name);
+        case Data.ATTR: return Token.concat(ATT, data.atts.key(name));
+        case Data.TEXT: return TEXT;
+        case Data.COMM: return COMM;
+        case Data.PI:   return PI;
+        default:        return Token.EMPTY;
+      }
     }
 
     @Override

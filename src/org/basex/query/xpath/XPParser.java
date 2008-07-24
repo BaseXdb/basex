@@ -4,7 +4,6 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.query.xpath.XPText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.query.FTOpt;
 import org.basex.query.FTPos;
@@ -51,7 +50,6 @@ import org.basex.query.xpath.values.NodeSet;
 import org.basex.query.xpath.values.Num;
 import org.basex.util.Array;
 import org.basex.util.Set;
-import org.basex.util.StringList;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -63,26 +61,13 @@ import org.basex.util.TokenBuilder;
  * @author Tim Petrowsky
  * @author Christian Gruen
  */
-public final class XPParser extends QueryParser {
-  /** XPath complete suggestions. */
-  XPSuggest suggest;
-  
+public class XPParser extends QueryParser {
   /**
    * Constructor.
    * @param q query
    */
   public XPParser(final String q) {
     init(q);
-  }
-  
-  /**
-   * Constructor, specifying a node set.
-   * @param q query
-   * @param n context nodes
-   */
-  public XPParser(final String q, final Nodes n) {
-    this(q);
-    if(n != null) suggest = new XPSuggest(n);
   }
 
   /**
@@ -322,18 +307,16 @@ public final class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  private LocPath absLocPath(final LocPath path) throws QueryException {
+  LocPath absLocPath(final LocPath path) throws QueryException {
     boolean more = false;
-    if(suggest != null) suggest.absLocPath();
-    
     while(consume('/')) {
-      final char c = curr();
-      if(c != 0 && c != ']' && c != ')' && c != '|' && c != ',') {
-        path.steps.add(step());
-        more = true;
-      } else if(more) {
-        error(NOLOCSTEP);
+      final Step step = step();
+      if(step == null) {
+        if(more) error(NOLOCSTEP);
+        break;
       }
+      path.steps.add(step);
+      more = true;
     }
     return path;
   }
@@ -344,10 +327,12 @@ public final class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  private LocPath relLocPath(final LocPath path) throws QueryException {
-    if(suggest != null) suggest.absLocPath();
-    
-    do path.steps.add(step()); while(consume('/'));
+  LocPath relLocPath(final LocPath path) throws QueryException {
+    do {
+      final Step step = step();
+      if(step == null) error(NOLOCSTEP);
+      path.steps.add(step);
+    } while(consume('/'));
     return path;
   }
 
@@ -356,7 +341,7 @@ public final class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  private Step step() throws QueryException {
+  Step step() throws QueryException {
     Axis axis = null;
     Test test = null;
 
@@ -381,7 +366,7 @@ public final class XPParser extends QueryParser {
       axis = axis();
       test = test(axis);
     } else {
-      error(NOLOCSTEP);
+      return null;
     }
 
     final Preds preds = new Preds();
@@ -390,8 +375,6 @@ public final class XPParser extends QueryParser {
       preds.add(pred());
       consumeWS();
     }
-
-    if(suggest != null) suggest.step(axis, test, preds);
     return Axis.create(axis, test, preds);
   }
 
@@ -573,7 +556,7 @@ public final class XPParser extends QueryParser {
    */
   private Func function() throws QueryException {
     final String func = name();
-    if(func.length() == 0) return null;
+    //if(!end && func.length() == 0) return null;
     
     consumeWS();
     if(!consume('(')) error(UNEXPECTEDEND);
@@ -638,34 +621,8 @@ public final class XPParser extends QueryParser {
    * @return expression
    * @throws QueryException parse exception
    */
-  private Expr error(final String err, final Object... arg)
-      throws QueryException {
-
-    return error(complete(), err, arg);
-  }
-  
-  /**
-   * Returns the code completions.
-   * @return completions
-   */
-  public StringList complete() {
-    return suggest != null ? suggest.complete() : null;
-  }
-
-  /**
-   * Throws the specified error.
-   * @param comp code completion
-   * @param err error to be thrown
-   * @param arg error arguments
-   * @return expression
-   * @throws QueryException parse exception
-   */
-  private Expr error(final StringList comp, final String err,
-      final Object... arg) throws QueryException {
-    
-    final QueryException qe = new QueryException(err, arg);
-    qe.complete(this, comp);
-    throw qe;
+  Expr error(final String err, final Object... arg) throws QueryException {
+    throw new QueryException(err, arg);
   }
 
   /**

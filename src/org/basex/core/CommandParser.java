@@ -49,6 +49,7 @@ import org.basex.data.Nodes;
 import org.basex.query.QueryException;
 import org.basex.query.QueryParser;
 import org.basex.query.xpath.XPParser;
+import org.basex.query.xpath.XPSuggest;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQParser;
 import org.basex.util.Array;
@@ -290,8 +291,8 @@ public final class CommandParser extends QueryParser {
     consumeWS();
     final StringBuilder sb = new StringBuilder();
     if(more() && !curr(';')) {
-      // <CG> add context nodes to parsing...
-      final XPParser p = new XPParser(qu, curr);
+      final XPParser p = curr != null ? new XPSuggest(qu, curr) :
+        new XPParser(qu);
       p.qp = qp;
       p.parse(false);
       sb.append(qu.substring(qp, p.qp));

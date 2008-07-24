@@ -28,7 +28,7 @@ public final class TestName extends Test {
    * @param t tag reference
    */
   public TestName(final boolean t) {
-    this(new byte[] { '*' }, t);
+    this(ALLNODES, t);
     id = ALL;
   }
 

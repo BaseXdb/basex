@@ -20,7 +20,7 @@ public final class QueryTest {
   /** Database Context. */
   private final Context context = new Context();
 
-  /** Test Information. */
+  /** Test Information. */  
   static final String TESTINFO =
     "\nUsage: Test [options]" +
     "\n -h  show this help" +

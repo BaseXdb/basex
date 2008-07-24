@@ -37,7 +37,7 @@ public interface XPText {
   /** Evaluation Exception. */
   String NOTEST = "NodeTest missing.";
   /** Parsing exception. */
-  String KINDCLOSE = "Unclosed node kind.";
+  String KINDCLOSE = "Invalid kind test.";
   /** Parsing exception. */
   String QUOTECLOSE = "Unclosed quote.";
   /** Parsing exception. */

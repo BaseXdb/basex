@@ -13,7 +13,7 @@ import org.basex.core.Context;
 import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.query.QueryException;
-import org.basex.query.xpath.XPParser;
+import org.basex.query.xpath.XPSuggest;
 import org.basex.util.StringList;
 
 /**
@@ -191,13 +191,13 @@ public final class GUIInput extends BaseXTextField {
     final Context ctx = GUI.context;
     StringList sl = null;
     try {
-      final XPParser parser = new XPParser(query, ctx.current());
+      final XPSuggest parser = new XPSuggest(query, ctx.current());
       parser.parse();
       sl = parser.complete();
       pre = query.substring(0, xPos(query) + 1);
     } catch(final QueryException ex) {
       sl = ex.complete();
-      pre = query.substring(0, ex.col() - 1);
+      pre = query.substring(0, Math.min(query.length(), ex.col()));
     }
 
     /*if(sl != null) {
