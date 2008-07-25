@@ -128,7 +128,7 @@ public final class LS extends FSCmd {
       }
     }
     if(fSorted) {
-      b.sort(true);
+      b.sort(false);
       for(final byte[] el : b.finish()) {
         out.print(el);
         out.print("\t");
