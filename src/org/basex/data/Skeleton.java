@@ -1,7 +1,6 @@
 package org.basex.data;
 
 import static org.basex.data.DataText.*;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import org.basex.io.DataInput;

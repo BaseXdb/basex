@@ -26,7 +26,7 @@ public final class Open extends Process {
   
   @Override
   protected boolean exec() {
-    final String db = args[0];
+    final String db = args[0].replaceAll("(.*)\\..*", "$1");
     if(!IO.dbpath(db).exists()) return error(DBNOTFOUND, db);
 
     // close old database

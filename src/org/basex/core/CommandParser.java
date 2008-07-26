@@ -45,7 +45,6 @@ import org.basex.core.proc.XPath;
 import org.basex.core.proc.XPathMV;
 import org.basex.core.proc.XQEnv;
 import org.basex.core.proc.XQuery;
-import org.basex.data.Nodes;
 import org.basex.query.QueryException;
 import org.basex.query.QueryParser;
 import org.basex.query.xpath.XPParser;
@@ -65,8 +64,8 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class CommandParser extends QueryParser {
-  /** Current node set. */
-  public Nodes curr;
+  /** Context. */
+  public Context ctx;
   
   /**
    * Constructor, parsing the input queries.
@@ -79,11 +78,11 @@ public final class CommandParser extends QueryParser {
   /**
    * Constructor, parsing the input queries.
    * @param in query input
-   * @param c current nodeset
+   * @param c context
    */
-  public CommandParser(final String in, final Nodes c) {
+  public CommandParser(final String in, final Context c) {
     this(in);
-    curr = c;
+    ctx = c;
   }
 
   /**
@@ -291,7 +290,7 @@ public final class CommandParser extends QueryParser {
     consumeWS();
     final StringBuilder sb = new StringBuilder();
     if(more() && !curr(';')) {
-      final XPParser p = curr != null ? new XPSuggest(qu, curr) :
+      final XPParser p = ctx != null ? new XPSuggest(qu, ctx) :
         new XPParser(qu);
       p.qp = qp;
       p.parse(false);
@@ -330,7 +329,7 @@ public final class CommandParser extends QueryParser {
   private String name(final COMMANDS cmd) throws QueryException {
     consumeWS();
     final StringBuilder sb = new StringBuilder();
-    while(letterOrDigit(curr())) sb.append(consume());
+    while(curr('.') || letterOrDigit(curr())) sb.append(consume());
     return finish(cmd, sb);
   }
 

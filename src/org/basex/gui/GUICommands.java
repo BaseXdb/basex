@@ -45,6 +45,7 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewData;
 import org.basex.io.IO;
+import org.basex.util.Array;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 
@@ -68,7 +69,7 @@ public enum GUICommands implements GUICommand {
       if(!dialog.ok()) return;
       final String in = dialog.input();
       final String db = dialog.dbname();
-      build(PROGCREATE, new CreateDB(in, db));
+      build(PROGCREATE, new Process[] { new CreateDB(in, db) });
     }
   },
 
@@ -173,7 +174,7 @@ public enum GUICommands implements GUICommand {
       if(!new DialogImportFS(main).ok()) return;
       final String p = GUIProp.fsall ? "/" : GUIProp.fspath.replace('\\', '/');
       final String name = GUIProp.importfsname;
-      build(IMPORTFSTITLE, new CreateFS(p, name));
+      build(IMPORTFSTITLE, new Process[] { new CreateFS(p, name) });
     }
   },
 
@@ -703,18 +704,21 @@ public enum GUICommands implements GUICommand {
       final DialogInfo info = new DialogInfo(GUI.get());
       if(info.ok()) {
         if(info.opt) {
-          build(INFOOPT, new Optimize());
+          build(INFOOPT, new Process[] { new Optimize() });
         } else {
           final MetaData meta = GUI.context.data().meta;
           final boolean[] indexes = info.indexes();
 
           // <CG> no parallel execution...
+          Process[] proc = new Process[0];
           if(indexes[0] != meta.txtindex)
-            build(INFOBUILD, cmd(indexes[0], INDEX.TEXT));
+            proc = Array.add(proc, cmd(indexes[0], INDEX.TEXT));
           if(indexes[1] != meta.atvindex)
-            build(INFOBUILD, cmd(indexes[1], INDEX.ATTRIBUTE));
+            proc = Array.add(proc, cmd(indexes[1], INDEX.ATTRIBUTE));
           if(indexes[2] != meta.ftxindex)
-            build(INFOBUILD, cmd(indexes[2], INDEX.FULLTEXT));
+            proc = Array.add(proc, cmd(indexes[2], INDEX.FULLTEXT));
+          
+          if(proc.length != 0) build(INFOBUILD, proc);
         }
       }
     }
@@ -854,31 +858,30 @@ public enum GUICommands implements GUICommand {
   /**
    * Runs a building progress.
    * @param title dialog title
-   * @param proc process
+   * @param procs processes
    */
-  static void build(final String title, final Process proc) {
+  static void build(final String title, final Process[] procs) {
     // start database creation thread
     new Thread() {
       @Override
       public void run() {
         final GUI main = GUI.get();
 
-        final boolean ci = proc instanceof CreateIndex;
-        final boolean fs = proc instanceof CreateFS;
-        final boolean di = proc instanceof DropIndex;
-        final boolean op = proc instanceof Optimize;
-        
-        if(!ci && !di && !op) {
-          new Close().execute(GUI.context);
-          View.notifyInit();
-        }
+        for(int p = 0; p < procs.length; p++) {
+          final Process proc = procs[p];
+          final boolean ci = proc instanceof CreateIndex;
+          final boolean fs = proc instanceof CreateFS;
+          final boolean di = proc instanceof DropIndex;
+          final boolean op = proc instanceof Optimize;
+          
+          if(!ci && !di && !op) {
+            new Close().execute(GUI.context);
+            View.notifyInit();
+          }
+          Performance.sleep(100);
+          final DialogProgress wait = new DialogProgress(main, title, !fs, !op);
 
-        Performance.sleep(100);
-        final DialogProgress wait = di ? null :
-            new DialogProgress(main, title, !fs, !op);
-
-        // start dialog window thread
-        if(wait != null) {
+          // start dialog window thread
           new Thread() {
             @Override
             public void run() {
@@ -890,28 +893,28 @@ public enum GUICommands implements GUICommand {
               }
             }
           }.start();
+
+          // create database
+          final Performance perf = new Performance();
+          final boolean ok = proc.execute(GUI.context);
+          // get server info
+          final String inf = proc.info();
+
+          // close status dialog
+          wait.dispose();
+
+          // return user information
+          if(ok) {
+            main.status.setText(BaseX.info(PROCTIME, perf.getTimer()));
+            if(op) JOptionPane.showMessageDialog(main, INFOOPTIM,
+                DIALOGINFO, JOptionPane.INFORMATION_MESSAGE);
+          } else {
+            JOptionPane.showMessageDialog(main, inf,
+                DIALOGINFO, JOptionPane.WARNING_MESSAGE);
+          }
+          // initialize views
+          if(!ci && !di) View.notifyInit();
         }
-
-        // create database
-        final Performance perf = new Performance();
-        final boolean ok = proc.execute(GUI.context);
-        // get server info
-        final String inf = proc.info();
-
-        // close status dialog
-        if(wait != null) wait.dispose();
-
-        // return user information
-        if(ok) {
-          main.status.setText(BaseX.info(PROCTIME, perf.getTimer()));
-          if(op) JOptionPane.showMessageDialog(main, INFOOPTIM,
-              DIALOGINFO, JOptionPane.INFORMATION_MESSAGE);
-        } else {
-          JOptionPane.showMessageDialog(main, inf,
-              DIALOGINFO, JOptionPane.WARNING_MESSAGE);
-        }
-        // initialize views
-        if(!ci && !di) View.notifyInit();
       }
     }.start();
   }

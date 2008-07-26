@@ -62,18 +62,18 @@ final class FNStr extends Fun {
         return Str.iter(uri(checkStr(iter), true));
       case ESCURI:
         return Str.iter(esc(checkStr(iter)));
-      case CONTAINS:
-        if(arg.length == 3) checkColl(arg[2]);
-        Item it = arg[1].atomic(this, true);
-        return it == null ? Bln.TRUE.iter() :
-          Bln.get(contains(checkStr(iter), checkStr(it))).iter();
       case CONCAT:
         final TokenBuilder tb = new TokenBuilder();
         for(final Iter a : arg) {
-          it = a.atomic(this, true);
+          final Item it = a.atomic(this, true);
           if(it != null) tb.add(it.str());
         }
         return Str.iter(tb.finish());
+      case CONTAINS:
+        if(arg.length == 3) checkColl(arg[2]);
+        Item it = arg[1].atomic(this, true);
+        if(it == null) return Bln.TRUE.iter();
+        return Bln.get(contains(checkStr(iter), checkStr(it))).iter();
       case STARTS:
         if(arg.length == 3) checkColl(arg[2]);
         it = arg[1].atomic(this, true);

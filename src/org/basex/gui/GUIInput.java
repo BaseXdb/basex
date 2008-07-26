@@ -9,7 +9,6 @@ import java.awt.event.KeyEvent;
 import javax.swing.JComboBox;
 import javax.swing.plaf.basic.BasicComboPopup;
 import org.basex.core.CommandParser;
-import org.basex.core.Context;
 import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.query.QueryException;
@@ -175,7 +174,7 @@ public final class GUIInput extends BaseXTextField {
     try {
       pre = excl ? "!" : "";
       final String suf = getText().substring(pre.length());
-      new CommandParser(suf, GUI.context.current()).parse();
+      new CommandParser(suf, GUI.context).parse();
     } catch(final QueryException ex) {
       sl = ex.complete();
       pre = query.substring(0, ex.col() - (excl ? 0 : 1));
@@ -188,10 +187,9 @@ public final class GUIInput extends BaseXTextField {
    * @param query query input
    */
   private void xpathPopup(final String query) {
-    final Context ctx = GUI.context;
     StringList sl = null;
     try {
-      final XPSuggest parser = new XPSuggest(query, ctx.current());
+      final XPSuggest parser = new XPSuggest(query, GUI.context);
       parser.parse();
       sl = parser.complete();
       pre = query.substring(0, xPos(query) + 1);
@@ -199,17 +197,6 @@ public final class GUIInput extends BaseXTextField {
       sl = ex.complete();
       pre = query.substring(0, Math.min(query.length(), ex.col()));
     }
-
-    /*if(sl != null) {
-      final String pref = query.substring(last + 1, slash != -1 ? slash + 1 :
-        query.length()).trim();
-      final String suf = getText().substring(pre.length()).trim();
-      final Data data = ctx.data();
-      for(final String a : data.skel.suggest(data, pref).finish()) {
-        if(a.startsWith(suf) && !a.equals(suf)) sl.add(a);
-      }
-    }*/
-    
     createCombo(sl);
   }
   
@@ -220,7 +207,7 @@ public final class GUIInput extends BaseXTextField {
    */
   private int xPos(final String query) {
     for(int q = query.length() - 1; q >= 0; q--) {
-      int c = query.charAt(q);
+      final int c = query.charAt(q);
       if(c == '|' || c == '(' || c == '/' || c == '[') return q;
     }
     return -1;

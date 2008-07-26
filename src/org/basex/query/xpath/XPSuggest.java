@@ -2,8 +2,9 @@ package org.basex.query.xpath;
 
 import static org.basex.data.DataText.*;
 import java.util.ArrayList;
+import java.util.Stack;
+import org.basex.core.Context;
 import org.basex.data.Data;
-import org.basex.data.Nodes;
 import org.basex.data.Skeleton;
 import org.basex.data.Skeleton.Node;
 import org.basex.query.QueryException;
@@ -24,10 +25,10 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class XPSuggest extends XPParser {
-  /** Node reference. */
-  Nodes curr;
+  /** Context. */
+  Context ctx;
   /** Current skeleton nodes. */
-  ArrayList<Node> ctx = new ArrayList<Node>();
+  Stack<ArrayList<Node>> stack = new Stack<ArrayList<Node>>();
   /** Skeleton reference. */
   Skeleton skel;
   /** Last step. */
@@ -36,27 +37,46 @@ public final class XPSuggest extends XPParser {
   /**
    * Constructor, specifying a node set.
    * @param q query
-   * @param n context nodes
+   * @param c context
    */
-  public XPSuggest(final String q, final Nodes n) {
+  public XPSuggest(final String q, final Context c) {
     super(q);
-    curr = n;
-    skel = curr.data.skel;
+    ctx = c;
+    skel = ctx.data().skel;
   }
 
   @Override
   LocPath absLocPath(final LocPath path) throws QueryException {
-    // <CG> move current context to stack..
-    ctx = new ArrayList<Node>();
-    ctx.add(skel.root());
+    final ArrayList<Node> list = new ArrayList<Node>();
+    list.add(skel.root());
+    stack.push(list);
     final LocPath lp = super.absLocPath(path);
     filter(false);
+    if(stack.size() > 1) {
+      stack.pop();
+    }
     return lp;
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   LocPath relLocPath(final LocPath path) throws QueryException {
-    return super.relLocPath(path);
+    ArrayList<Node> list = null;
+    if(stack.size() == 0) {
+      if(!ctx.root()) return super.relLocPath(path);
+      list = new ArrayList<Node>();
+      list.add(skel.root());
+    } else {
+      list = skel.child(stack.peek(), 0, false);
+    }
+    
+    stack.push(list);
+    final LocPath lp = super.relLocPath(path);
+    filter(false);
+    /*if(stack.size() > 1) {
+      stack.pop();
+    }*/
+    return lp;
   }
 
   /**
@@ -68,35 +88,38 @@ public final class XPSuggest extends XPParser {
     if(finish && last.test == TestNode.NODE) return;
     final byte[] tn = entry(last);
     if(tn == null) return;
-    for(int c = ctx.size() - 1; c >= 0; c--) {
-      final Node n = ctx.get(c);
-      final byte[] t = n.token(curr.data);
+    final ArrayList<Node> list = stack.peek();
+    for(int c = list.size() - 1; c >= 0; c--) {
+      final Node n = list.get(c);
+      final byte[] t = n.token(ctx.data());
       if(n.kind == Data.ELEM && tn == TestName.ALLNODES) continue;
-      
+
       final boolean eq = Token.eq(t, tn);
       if(finish) {
-        if(!eq) ctx.remove(c);
+        if(!eq) list.remove(c);
       } else {
-        if(eq || !Token.startsWith(t, tn)) ctx.remove(c);
+        if(eq || !Token.startsWith(t, tn)) list.remove(c);
       }
     }
   }
-  
+
   @Override
   Step step() throws QueryException {
     final Step step = super.step();
+    if(stack.empty()) return step;
+
     filter(true);
     if(step == null) {
-      ctx = skel.child(ctx, 0, false);
+      stack.push(skel.child(stack.pop(), 0, false));
       return null;
     }
 
-    if(step.axis == Axis.CHILD) {
-      ctx = skel.child(ctx, 0, false);
+    if(step.axis == Axis.CHILD || step.axis == Axis.ATTR) {
+      stack.push(skel.child(stack.pop(), 0, false));
     } else if(step.axis == Axis.DESC || step.axis == Axis.DESCORSELF) {
-      ctx = skel.child(ctx, 0, true);
+      stack.push(skel.child(stack.pop(), 0, true));
     } else {
-      ctx = new ArrayList<Node>();
+      stack.peek().clear();
     }
     last = step;
     return step;
@@ -108,9 +131,11 @@ public final class XPSuggest extends XPParser {
    */
   public StringList complete() {
     final StringList sl = new StringList();
+    if(stack.empty()) return sl;
 
-    for(final Node r : ctx) {
-      final String name = Token.string(r.token(curr.data));
+    final ArrayList<Node> list = stack.peek();
+    for(final Node r : list) {
+      final String name = Token.string(r.token(ctx.data()));
       if(name.length() != 0 && !sl.contains(name)) sl.add(name);
     }
     sl.sort();
@@ -126,10 +151,13 @@ public final class XPSuggest extends XPParser {
     if(s.test == TestNode.TEXT) return TEXT;
     if(s.test == TestNode.COMM) return COMM;
     if(s.test == TestNode.PI) return PI;
-    if(s.test instanceof TestName) return ((TestName) s.test).name;
+    if(s.test instanceof TestName) {
+      final byte[] name = ((TestName) s.test).name;
+      return s.axis == Axis.ATTR ? Token.concat(ATT, name) : name;
+    }
     return Token.EMPTY;
   }
-  
+
   @Override
   Expr error(final String err, final Object... arg) throws QueryException {
 

@@ -34,8 +34,7 @@ public final class MapDefault extends MapPainter {
     final Data data = GUI.context.data();
 
     mpos = 0;
-    final int rs = rects.size;
-    for(int ri = 0; ri < rs; ri++) {
+    for(int ri = 0; ri < rects.size; ri++) {
       // get rectangle information
       final MapRect r = rects.get(ri);
       final int pre = r.p;
@@ -47,7 +46,7 @@ public final class MapDefault extends MapPainter {
       final boolean full = r.w == ww && r.h == hh;
 
       // draw rectangle
-      Color color = nextMark(rects, pre, ri, rs);
+      Color color = nextMark(rects, pre, ri, rects.size);
       final boolean mark = color != null;
 
       g.setColor(mark ? color : GUIConstants.COLORS[lvl]);

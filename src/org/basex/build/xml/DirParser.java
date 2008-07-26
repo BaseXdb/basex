@@ -26,9 +26,9 @@ public final class DirParser extends Parser {
   }
 
   @Override
-  public void parse(final Builder build) throws IOException {
-    build.meta().filesize = 0;
-    parse(build, file);
+  public void parse(final Builder b) throws IOException {
+    b.meta.filesize = 0;
+    parse(b, file);
   }
   
   /**
@@ -43,8 +43,9 @@ public final class DirParser extends Parser {
     } else {
       file = f;
       while(f.more()) {
-        if(!f.name().endsWith(IO.XMLSUFFIX)) continue;
-        b.meta().filesize += file.length();
+        // [CG] Create Collection: how to deal with non-XML documents?
+        //if(!f.name().endsWith(IO.XMLSUFFIX)) continue;
+        b.meta.filesize += file.length();
         parser = Prop.intparse ? new XMLParser(file) : new SAXWrapper(file);
         parser.parse(b);
       }

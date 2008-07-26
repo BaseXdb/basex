@@ -44,9 +44,7 @@ public final class CreateDB extends ACreate {
   protected boolean exec() {
     final IO f = new IO(args[0]);
     if(!f.exists()) return error(FILEWHICH, f);
-    final String db = args.length == 1 || args[1] == null ?
-        f.dbname() : args[1];
-    return build(new DirParser(f), db);
+    return build(new DirParser(f), args[1] == null ? f.dbname() : args[1]);
   }
 
   /**

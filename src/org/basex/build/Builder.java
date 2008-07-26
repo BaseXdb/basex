@@ -25,6 +25,9 @@ public abstract class Builder extends Progress {
   /** Maximum level depth. */
   private static final int CAP = 1 << 8;
 
+  /** Meta data on built database. */
+  public MetaData meta;
+
   /** Tag name index. */
   protected Names tags;
   /** Attribute name index. */
@@ -36,8 +39,6 @@ public abstract class Builder extends Progress {
 
   /** Parser instance. */
   protected Parser parser;
-  /** Meta data on built database. */
-  protected MetaData meta;
   /** Table size. */
   protected int size;
 
@@ -354,14 +355,6 @@ public abstract class Builder extends Progress {
     startElem(tag, null);
     text(new TokenBuilder(txt), false);
     endElem(tag);
-  }
-
-  /**
-   * Returns the meta data reference.
-   * @return meta data
-   */
-  public final MetaData meta() {
-    return meta;
   }
 
   @Override

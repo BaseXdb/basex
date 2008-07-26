@@ -2,7 +2,6 @@ package org.basex.gui;
 
 import static org.basex.Text.*;
 import static org.basex.gui.GUIConstants.*;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;
