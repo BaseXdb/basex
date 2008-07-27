@@ -3,6 +3,8 @@ package org.basex.api.xmldb;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.Database;
 import org.xmldb.api.base.XMLDBException;
+import org.basex.core.Context;
+import org.basex.core.proc.*;
 
 /**
  * Implementation of the Database Interface for the XMLDB:API
@@ -13,9 +15,9 @@ import org.xmldb.api.base.XMLDBException;
 public class BXDatabaseImpl implements Database {
   
   /** DB URI. */
-  public static final String BASEXDB_URI = "basexdb://";
+  public static final String BASEXDB_URI = "basex://";
   /** Instance Name. */
-  public static final String INSTANCE_NAME = "basexdb";
+  public static final String INSTANCE_NAME = "basex";
   /** Conformance Level of the implementation. */
   public static final String CONFORMANCE_LEVEL = "0";
 
@@ -37,11 +39,20 @@ public class BXDatabaseImpl implements Database {
   /**
    * @see org.xmldb.api.base.Database#getCollection(java.lang.String, java.lang.String, java.lang.String)
    */
-  public Collection getCollection(String uri, String username, String password)
-      throws XMLDBException {
-    // TODO Auto-generated method stub
-    throw new XMLDBException();
-    //return null;
+  public Collection getCollection(String uri, String username, String password) {
+    // create database context
+    final Context ctx = new Context();
+    if (uri.startsWith(BASEXDB_URI)) {
+      String tmp = uri.substring(BASEXDB_URI.length());
+      if(new Check(tmp).execute(ctx)) {
+      new Open(tmp).execute(ctx);
+      } else {
+        new CreateDB(tmp).execute(ctx);
+      }
+      BXCollection col = new BXCollection(ctx);
+      return col;
+    }
+    return null;
   }
 
   /**
