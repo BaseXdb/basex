@@ -22,7 +22,7 @@ public class BXCollection implements Collection {
     this.ctx = ctx;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.Collection#close()
    */
   public void close() {
@@ -30,7 +30,7 @@ public class BXCollection implements Collection {
     
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.Collection#createId()
    */
   public String createId() {
@@ -38,7 +38,7 @@ public class BXCollection implements Collection {
     return null;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.Collection#createResource(java.lang.String, java.lang.String)
    */
   public Resource createResource(String id, String type) {
@@ -46,7 +46,7 @@ public class BXCollection implements Collection {
     return null;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.Collection#getChildCollection(java.lang.String)
    */
   public Collection getChildCollection(String name) {
@@ -54,7 +54,7 @@ public class BXCollection implements Collection {
     return null;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.Collection#getChildCollectionCount()
    */
   public int getChildCollectionCount() {
@@ -62,7 +62,7 @@ public class BXCollection implements Collection {
     return 0;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.Collection#getName()
    */
   public String getName() {
@@ -70,7 +70,7 @@ public class BXCollection implements Collection {
     return null;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.Collection#getParentCollection()
    */
   public Collection getParentCollection() {
@@ -78,7 +78,7 @@ public class BXCollection implements Collection {
     return null;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.Configurable#getProperty(java.lang.String)
    */
   public String getProperty(String name) {
@@ -86,7 +86,7 @@ public class BXCollection implements Collection {
     return null;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.Collection#getResource(java.lang.String)
    */
   public Resource getResource(String id) {
@@ -94,7 +94,7 @@ public class BXCollection implements Collection {
     return null;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.Collection#getResourceCount()
    */
   public int getResourceCount() {
@@ -102,7 +102,7 @@ public class BXCollection implements Collection {
     return 0;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.Collection#getService(java.lang.String, java.lang.String)
    */
   public Service getService(String name, String version) {
@@ -112,7 +112,7 @@ public class BXCollection implements Collection {
     return null;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.Collection#getServices()
    */
   public Service[] getServices() {
@@ -120,7 +120,7 @@ public class BXCollection implements Collection {
     return null;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.Collection#isOpen()
    */
   public boolean isOpen() {
@@ -128,7 +128,7 @@ public class BXCollection implements Collection {
     return false;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.Collection#listChildCollections()
    */
   public String[] listChildCollections() {
@@ -136,7 +136,7 @@ public class BXCollection implements Collection {
     return null;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.Collection#listResources()
    */
   public String[] listResources() {
@@ -144,7 +144,7 @@ public class BXCollection implements Collection {
     return null;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.Collection#removeResource(org.xmldb.api.base.Resource)
    */
   public void removeResource(Resource res) {
@@ -152,7 +152,7 @@ public class BXCollection implements Collection {
     
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.Configurable#setProperty(java.lang.String, java.lang.String)
    */
   public void setProperty(String name, String value) {
@@ -160,7 +160,7 @@ public class BXCollection implements Collection {
     
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.Collection#storeResource(org.xmldb.api.base.Resource)
    */
   public void storeResource(Resource res) {

@@ -11,7 +11,7 @@ import org.xmldb.api.base.Service;
  */
 public class BXService implements Service {
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.Service#getName()
    */
   public String getName() {
@@ -19,7 +19,7 @@ public class BXService implements Service {
     return null;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.Configurable#getProperty(java.lang.String)
    */
   public String getProperty(String name) {
@@ -27,7 +27,7 @@ public class BXService implements Service {
     return null;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.Service#getVersion()
    */
   public String getVersion() {
@@ -35,7 +35,7 @@ public class BXService implements Service {
     return null;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.Service#setCollection(org.xmldb.api.base.Collection)
    */
   public void setCollection(Collection col) {
@@ -43,7 +43,7 @@ public class BXService implements Service {
     
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.Configurable#setProperty(java.lang.String, java.lang.String)
    */
   public void setProperty(String name, String value) {

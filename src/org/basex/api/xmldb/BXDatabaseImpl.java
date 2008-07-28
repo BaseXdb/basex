@@ -13,7 +13,7 @@ import org.basex.core.proc.*;
  * @author Andreas Weiler
  */
 public class BXDatabaseImpl implements Database {
-  
+
   /** DB URI. */
   public static final String BASEXDB_URI = "basex://";
   /** Instance Name. */
@@ -25,7 +25,7 @@ public class BXDatabaseImpl implements Database {
    * Constructor.
    */
   public BXDatabaseImpl() {
-      super();
+    super();
   }
 
   /**
@@ -42,10 +42,10 @@ public class BXDatabaseImpl implements Database {
   public Collection getCollection(String uri, String username, String password) {
     // create database context
     final Context ctx = new Context();
-    if (uri.startsWith(BASEXDB_URI)) {
+    if(uri.startsWith(BASEXDB_URI)) {
       String tmp = uri.substring(BASEXDB_URI.length());
       if(new Check(tmp).execute(ctx)) {
-      new Open(tmp).execute(ctx);
+        new Open(tmp).execute(ctx);
       } else {
         new CreateDB(tmp).execute(ctx);
       }
@@ -77,7 +77,7 @@ public class BXDatabaseImpl implements Database {
     throw new XMLDBException();
     //return null;
   }
-  
+
   /**
    * @see org.xmldb.api.base.Configurable#setProperty(java.lang.String, java.lang.String)
    */
@@ -85,7 +85,4 @@ public class BXDatabaseImpl implements Database {
     // TODO Auto-generated method stub
     throw new XMLDBException();
   }
-  
-  
-
 }

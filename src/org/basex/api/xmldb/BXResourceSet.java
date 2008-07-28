@@ -24,7 +24,7 @@ public class BXResourceSet implements ResourceSet {
     this.result = result;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.ResourceSet#addResource(org.xmldb.api.base.Resource)
    */
   public void addResource(Resource res) {
@@ -32,7 +32,7 @@ public class BXResourceSet implements ResourceSet {
     
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.ResourceSet#clear()
    */
   public void clear() {
@@ -40,7 +40,7 @@ public class BXResourceSet implements ResourceSet {
     
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.ResourceSet#getIterator()
    */
   public ResourceIterator getIterator() {
@@ -48,7 +48,7 @@ public class BXResourceSet implements ResourceSet {
     return new BXResourceIterator(result);
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.ResourceSet#getMembersAsResource()
    */
   public Resource getMembersAsResource() {
@@ -56,7 +56,7 @@ public class BXResourceSet implements ResourceSet {
     return null;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.ResourceSet#getResource(long)
    */
   public Resource getResource(long index) {
@@ -64,7 +64,7 @@ public class BXResourceSet implements ResourceSet {
     return null;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.ResourceSet#getSize()
    */
   public long getSize() {
@@ -72,7 +72,7 @@ public class BXResourceSet implements ResourceSet {
     return 0;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.ResourceSet#removeResource(long)
    */
   public void removeResource(long index) {

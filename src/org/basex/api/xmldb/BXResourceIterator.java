@@ -28,7 +28,7 @@ public class BXResourceIterator implements ResourceIterator {
     this.result = result;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.ResourceIterator#hasMoreResources()
    */
   public boolean hasMoreResources() {
@@ -36,7 +36,7 @@ public class BXResourceIterator implements ResourceIterator {
     return false;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.ResourceIterator#nextResource()
    */
   public Resource nextResource() {

@@ -29,7 +29,7 @@ public class BXXPathQueryService implements XPathQueryService {
     this.ctx = ctx;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.modules.XPathQueryService#clearNamespaces()
    */
   public void clearNamespaces() {
@@ -37,7 +37,7 @@ public class BXXPathQueryService implements XPathQueryService {
     
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.Service#getName()
    */
   public String getName() {
@@ -45,7 +45,7 @@ public class BXXPathQueryService implements XPathQueryService {
     return null;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.modules.XPathQueryService#getNamespace(java.lang.String)
    */
   public String getNamespace(String prefix) {
@@ -53,7 +53,7 @@ public class BXXPathQueryService implements XPathQueryService {
     return null;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.Configurable#getProperty(java.lang.String)
    */
   public String getProperty(String name) {
@@ -61,7 +61,7 @@ public class BXXPathQueryService implements XPathQueryService {
     return null;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.Service#getVersion()
    */
   public String getVersion() {
@@ -69,7 +69,7 @@ public class BXXPathQueryService implements XPathQueryService {
     return null;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.modules.XPathQueryService#query(java.lang.String)
    */
   public ResourceSet query(String query) {
@@ -87,7 +87,7 @@ public class BXXPathQueryService implements XPathQueryService {
     return null;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.modules.XPathQueryService#queryResource(java.lang.String, java.lang.String)
    */
   public ResourceSet queryResource(String id, String query) {
@@ -95,7 +95,7 @@ public class BXXPathQueryService implements XPathQueryService {
     return null;
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.modules.XPathQueryService#removeNamespace(java.lang.String)
    */
   public void removeNamespace(String prefix) {
@@ -103,7 +103,7 @@ public class BXXPathQueryService implements XPathQueryService {
     
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.Service#setCollection(org.xmldb.api.base.Collection)
    */
   public void setCollection(Collection col) {
@@ -111,7 +111,7 @@ public class BXXPathQueryService implements XPathQueryService {
     
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.modules.XPathQueryService#setNamespace(java.lang.String, java.lang.String)
    */
   public void setNamespace(String prefix, String uri) {
@@ -119,7 +119,7 @@ public class BXXPathQueryService implements XPathQueryService {
     
   }
 
-  /* (non-Javadoc)
+  /**
    * @see org.xmldb.api.base.Configurable#setProperty(java.lang.String, java.lang.String)
    */
   public void setProperty(String name, String value) {
