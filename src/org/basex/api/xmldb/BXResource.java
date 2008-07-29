@@ -10,13 +10,23 @@ import org.xmldb.api.base.Resource;
  * @author Andreas Weiler
  */
 public class BXResource implements Resource {
+  
+  /** Byte[] */
+  byte[] resource;
+  
+  /**
+   * Standard Constructor.
+   * @param resource
+   */
+  public BXResource(byte[] resource) {
+    this.resource = resource;
+  }
 
   /**
    * @see org.xmldb.api.base.Resource#getContent()
    */
   public Object getContent() {
-    // TODO Auto-generated method stub
-    return null;
+    return new String(resource);
   }
 
   /**

@@ -3,9 +3,7 @@ package org.basex.api.xmldb;
 import org.xmldb.api.base.Resource;
 import org.xmldb.api.base.ResourceIterator;
 import org.basex.data.Result;
-import org.basex.data.XMLSerializer;
-import org.basex.io.ConsoleOutput;
-import java.io.IOException;
+import org.basex.query.xpath.values.NodeSet;
 
 /**
  * Implementation of the ResourceIterator Interface for the XMLDB:API
@@ -18,7 +16,7 @@ public class BXResourceIterator implements ResourceIterator {
   /** Result */
   Result result;
   /** Start value for iterator */
-  int start = 0;
+  int start = -1;
   
   /**
    * Standard constructor with result.
@@ -32,7 +30,9 @@ public class BXResourceIterator implements ResourceIterator {
    * @see org.xmldb.api.base.ResourceIterator#hasMoreResources()
    */
   public boolean hasMoreResources() {
-    // TODO Auto-generated method stub
+    if(start < result.size() - 1) {
+      return true;
+    }
     return false;
   }
 
@@ -40,16 +40,8 @@ public class BXResourceIterator implements ResourceIterator {
    * @see org.xmldb.api.base.ResourceIterator#nextResource()
    */
   public Resource nextResource() {
- // Prints the output to an output stream
-    ConsoleOutput console = new ConsoleOutput(System.out);
-    try{
-      result.serialize(new XMLSerializer(console));
-      console.flush();
-      return null;
-    } catch (IOException io) {
-      System.out.println(io);
-    }
-    return null;
+    start++;
+    NodeSet nodes = (NodeSet) result;
+    return new BXResource(nodes.data.atom(nodes.nodes[start]));
   }
-
 }

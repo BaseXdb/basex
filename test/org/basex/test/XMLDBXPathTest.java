@@ -19,7 +19,7 @@ public class XMLDBXPathTest {
    */
   public static void main(String[] args) throws Exception {
     Collection col = null;
-    //try {
+    try {
       String driver = "org.basex.api.xmldb.BXDatabaseImpl";
       Class c = Class.forName(driver);
 
@@ -34,8 +34,8 @@ public class XMLDBXPathTest {
       ResourceSet resultSet = service.query(xpath);
       
       ResourceIterator results = resultSet.getIterator();
-      results.nextResource();
-      /*while(results.hasMoreResources()) {
+      
+      while(results.hasMoreResources()) {
         Resource res = results.nextResource();
         System.out.println((String) res.getContent());
       }
@@ -45,6 +45,6 @@ public class XMLDBXPathTest {
       if(col != null) {
         col.close();
       }
-    }*/
+    }
   }
 }
