@@ -26,13 +26,13 @@ import org.basex.util.Token;
  */
 public final class XPSuggest extends XPParser {
   /** Context. */
-  Context ctx;
+  private Context ctx;
   /** Current skeleton nodes. */
-  Stack<ArrayList<Node>> stack = new Stack<ArrayList<Node>>();
+  private Stack<ArrayList<Node>> stack = new Stack<ArrayList<Node>>();
   /** Skeleton reference. */
-  Skeleton skel;
+  private Skeleton skel;
   /** Last step. */
-  Step last;
+  private Step last;
 
   /**
    * Constructor, specifying a node set.
@@ -52,14 +52,10 @@ public final class XPSuggest extends XPParser {
     stack.push(list);
     final LocPath lp = super.absLocPath(path);
     filter(false);
-    if(stack.size() > 1) {
-      stack.pop();
-    }
     return lp;
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   LocPath relLocPath(final LocPath path) throws QueryException {
     ArrayList<Node> list = null;
     if(stack.size() == 0) {
@@ -69,14 +65,18 @@ public final class XPSuggest extends XPParser {
     } else {
       list = skel.child(stack.peek(), 0, false);
     }
-    
+
     stack.push(list);
     final LocPath lp = super.relLocPath(path);
     filter(false);
-    /*if(stack.size() > 1) {
-      stack.pop();
-    }*/
     return lp;
+  }
+
+  @Override
+  Expr pred() throws QueryException {
+    final Expr expr = super.pred();
+    if(stack.size() > 1) stack.pop();
+    return expr;
   }
 
   /**
@@ -147,7 +147,7 @@ public final class XPSuggest extends XPParser {
    * @param s step
    * @return completions
    */
-  public byte[] entry(final Step s) {
+  private byte[] entry(final Step s) {
     if(s.test == TestNode.TEXT) return TEXT;
     if(s.test == TestNode.COMM) return COMM;
     if(s.test == TestNode.PI) return PI;
@@ -160,7 +160,6 @@ public final class XPSuggest extends XPParser {
 
   @Override
   Expr error(final String err, final Object... arg) throws QueryException {
-
     final QueryException qe = new QueryException(err, arg);
     qe.complete(this, complete());
     throw qe;
