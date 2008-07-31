@@ -54,7 +54,7 @@ public final class XPSuggest extends XPParser {
     filter(false);
     if(stack.size() > 1) {
       stack.pop();
-    } 
+    }
     return lp;
   }
 
