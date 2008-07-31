@@ -123,16 +123,17 @@ public final class Prop {
   /** Last XQuery file. */
   public static IO xquery;
 
-  // FILE SYSTEM OPTIONS ======================================================
-  
   /** Flag for importing file contents. */
   public static boolean fscont = false;
   /** Flag for importing file metadata. */
   public static boolean fsmeta = false;
   /** Maximum size for textual imports. */
   public static int fstextmax = 10240;
+
   /** Levenshtein default error. */
   public static int lserr = 0;
+  /** Flag for creating flat MAB2 data. */
+  public static boolean mab2flat = false;
 
   // WEBSERVER OPTIONS ========================================================
 

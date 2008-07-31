@@ -175,13 +175,18 @@ public final class MAB2Parser extends Parser {
     for(i = 1; i < is; i++) {
       final MAB2Entry entry = ids.value(i);
       final long pos = entry.pos;
+      final int es = entry.size;
       if(pos != 0) {
-        addEntry(input, pos, entry.size);
-        addChildren(input, entry);
+        final byte[] last = addEntry(input, pos, es, null);
+        addChildren(input, entry, last);
         builder.endElem(MEDIUM);
       } else {
         // no top entry exists... treat children as top entries
-        addChildren(input, entry);
+        for(int j = 0; j < es; j++) {
+          addEntry(input, entry.children[j], 0, null);
+          builder.endElem(MEDIUM);
+        }
+        //addChildren(input, entry);
       }
       if(Prop.debug) {
         if(i % 50000 == 0) BaseX.err(" " + i + "\n");
@@ -286,13 +291,18 @@ public final class MAB2Parser extends Parser {
    * @param entry mab2 entry
    * @throws IOException I/O exception
    */
-  private void addChildren(final RandomAccess in, final MAB2Entry entry)
-      throws IOException {
+  private void addChildren(final RandomAccess in, final MAB2Entry entry,
+      final byte[] last) throws IOException {
     // no top entry exists... treat children as top entries
     final int es = entry.size;
     for(int j = 0; j < es; j++) {
-      addEntry(in, entry.children[j], 0);
-      builder.endElem(MEDIUM);
+      if(Prop.mab2flat) {
+        builder.endElem(MEDIUM);
+        addEntry(in, entry.children[j], 0, last);
+      } else {
+        addEntry(in, entry.children[j], 0, null);
+        builder.endElem(MEDIUM);
+      }
     }
   }
 
@@ -301,10 +311,12 @@ public final class MAB2Parser extends Parser {
    * @param in input stream
    * @param pos file offset to start from
    * @param sub number of subordinate titles
+   * @param last last title
+   * @return last title
    * @throws IOException I/O exception
    */
-  private void addEntry(final RandomAccess in, final long pos, final int sub)
-      throws IOException {
+  private byte[] addEntry(final RandomAccess in, final long pos, final int sub,
+      final byte[] last) throws IOException {
 
     mvID = null;
     bibID = null;
@@ -403,6 +415,8 @@ public final class MAB2Parser extends Parser {
               Token.token(sub) };
         }
 
+        if(last != null && !eq(last, title)) title = concat(last, SEMI, title);
+
         builder.startElem(MEDIUM, atts);
         addTag(TYPE, type);
         addTag(LANGUAGE, language);
@@ -427,7 +441,7 @@ public final class MAB2Parser extends Parser {
         addTag(ISBN, isbn);
         addTag(POSTER, posters.get(bibID));
         addTag(GENRE, genres.get(mvID));
-        return;
+        return title;
       }
     }
   }

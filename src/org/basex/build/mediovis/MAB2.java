@@ -71,4 +71,6 @@ public interface MAB2 {
   byte[] YEAR = token("YEA");
   /** Missing MV ID. */
   byte[] MISSING = token("#");
+  /** Semicolon. */
+  byte[] SEMI = token("; ");
 }
