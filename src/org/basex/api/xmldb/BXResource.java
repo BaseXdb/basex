@@ -1,7 +1,9 @@
 package org.basex.api.xmldb;
 
+import org.basex.data.Result;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.Resource;
+import org.basex.query.xpath.values.NodeSet;
 
 /**
  * Implementation of the Resource Interface for the XMLDB:API
@@ -11,22 +13,32 @@ import org.xmldb.api.base.Resource;
  */
 public class BXResource implements Resource {
   
-  /** Byte[] */
-  byte[] resource;
+  /** Result */
+  Result result;
+  /** Position for value */
+  int pos;
   
   /**
    * Standard Constructor.
-   * @param resource
+   * @param result
+   * @param pos
    */
-  public BXResource(byte[] resource) {
-    this.resource = resource;
+  public BXResource(Result result, int pos) {
+    this.result = result;
+    this.pos = pos;
   }
 
   /**
    * @see org.xmldb.api.base.Resource#getContent()
    */
   public Object getContent() {
-    return new String(resource);
+    if(result instanceof NodeSet) {
+      NodeSet nodes = (NodeSet) result;
+      System.out.println(result.toString());
+      return new String(nodes.data.atom(nodes.nodes[pos]));
+    } else {
+      return result.toString();
+    }
   }
 
   /**
@@ -49,8 +61,7 @@ public class BXResource implements Resource {
    * @see org.xmldb.api.base.Resource#getResourceType()
    */
   public String getResourceType() {
-    // TODO Auto-generated method stub
-    return null;
+    return result.toString();
   }
 
   /**

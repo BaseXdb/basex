@@ -39,7 +39,7 @@ public class BXDatabaseImpl implements Database {
   /**
    * @see org.xmldb.api.base.Database#getCollection(java.lang.String, java.lang.String, java.lang.String)
    */
-  public Collection getCollection(String uri, String username, String password) {
+  public Collection getCollection(String uri, String username, String password) throws XMLDBException {
     // create database context
     final Context ctx = new Context();
     if(uri.startsWith(BASEXDB_URI)) {
@@ -47,7 +47,7 @@ public class BXDatabaseImpl implements Database {
       if(new Check(tmp).execute(ctx)) {
         new Open(tmp).execute(ctx);
       } else {
-        new CreateDB(tmp).execute(ctx);
+        throw new XMLDBException();
       }
       BXCollection col = new BXCollection(ctx);
       return col;

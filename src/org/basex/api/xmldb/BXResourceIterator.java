@@ -3,7 +3,6 @@ package org.basex.api.xmldb;
 import org.xmldb.api.base.Resource;
 import org.xmldb.api.base.ResourceIterator;
 import org.basex.data.Result;
-import org.basex.query.xpath.values.NodeSet;
 
 /**
  * Implementation of the ResourceIterator Interface for the XMLDB:API
@@ -41,7 +40,6 @@ public class BXResourceIterator implements ResourceIterator {
    */
   public Resource nextResource() {
     start++;
-    NodeSet nodes = (NodeSet) result;
-    return new BXResource(nodes.data.atom(nodes.nodes[start]));
+    return new BXResource(result, start);
   }
 }
