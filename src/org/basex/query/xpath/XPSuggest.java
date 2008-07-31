@@ -53,7 +53,7 @@ public final class XPSuggest extends XPParser {
     final LocPath lp = super.absLocPath(path);
     filter(false);
     if(stack.size() > 1) {
-      stack.pop();
+      stack.pop(); 
     }
     return lp;
   }
