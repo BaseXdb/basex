@@ -60,7 +60,7 @@ public class BXResource implements Resource {
    * @see org.xmldb.api.base.Resource#getResourceType()
    */
   public String getResourceType() {
-    return result.toString();
+    return result.getClass().getSimpleName();
   }
 
   /**
