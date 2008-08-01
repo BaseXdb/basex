@@ -34,7 +34,6 @@ public class BXResource implements Resource {
   public Object getContent() {
     if(result instanceof NodeSet) {
       NodeSet nodes = (NodeSet) result;
-      System.out.println(result.toString());
       return new String(nodes.data.atom(nodes.nodes[pos]));
     } else {
       return result.toString();

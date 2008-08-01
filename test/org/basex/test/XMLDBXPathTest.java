@@ -28,7 +28,7 @@ public class XMLDBXPathTest {
       col = DatabaseManager
           .getCollection("xmldb:basex://input");
 
-      String xpath = "//body/attribute::*";
+      String xpath = "1+2";
       XPathQueryService service = (XPathQueryService) col.getService(
           "XPathQueryService", "1.0");
       ResourceSet resultSet = service.query(xpath);
