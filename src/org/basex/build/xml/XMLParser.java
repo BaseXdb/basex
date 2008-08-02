@@ -76,61 +76,60 @@ public final class XMLParser extends Parser {
 
       builder.endElem(tag);
       return consume(Type.R_BR);
-    } else {
-      consume(Type.L_BR);
+    }
 
-      // start parsing for opening tag
-      byte[][] atts = null;
+    consume(Type.L_BR);
 
-      // get tag name
-      final byte[] tag = consumeToken(Type.TAGNAME);
+    // start parsing for opening tag
+    byte[][] atts = null;
+
+    // get tag name
+    final byte[] tag = consumeToken(Type.TAGNAME);
+    skipSpace();
+
+    // parse optional attributes
+    int as = 0;
+    while(scanner.type != Type.R_BR && scanner.type != Type.CLOSE_R_BR) {
+      final byte[] attName = consumeToken(Type.ATTNAME);
       skipSpace();
+      consume(Type.EQ);
+      skipSpace();
+      consume(Type.QUOTE);
+      byte[] attValue = EMPTY;
+      if(scanner.type == Type.ATTVALUE) {
+        attValue = scanner.token.finish();
+        scanner.more();
+      }
+      consume(Type.QUOTE);
 
-      // parse optional attributes
-      int as = 0;
-      while(scanner.type != Type.R_BR && scanner.type != Type.CLOSE_R_BR) {
-        final byte[] attName = consumeToken(Type.ATTNAME);
-        skipSpace();
-        consume(Type.EQ);
-        skipSpace();
-        consume(Type.QUOTE);
-        byte[] attValue = EMPTY;
-        if(scanner.type == Type.ATTVALUE) {
-          attValue = scanner.token.finish();
-          scanner.more();
-        }
-        consume(Type.QUOTE);
-
-        final int s = indexOf(attName, ':');
-        if(s != -1 && startsWith(attName, DataText.XMLNSC)) {
-          // open namespace...
-          builder.startNS(substring(attName, s + 1), attValue);
-        } else if(eq(attName, DataText.XMLNS)) {
-          // open namespace...
-          builder.startNS(EMPTY, attValue);
-        } else {
-          // add attribute
-          final byte[][] tmp = new byte[as + 2][];
-          if(as > 0) System.arraycopy(atts, 0, tmp, 0, as);
-          atts = tmp;
-          atts[as++] = attName;
-          atts[as++] = attValue;
-        }
-
-        if(scanner.type != Type.R_BR && scanner.type != Type.CLOSE_R_BR) {
-          consume(Type.WS);
-        }
+      final int s = indexOf(attName, ':');
+      if(s != -1 && startsWith(attName, DataText.XMLNSC)) {
+        // open namespace...
+        builder.startNS(substring(attName, s + 1), attValue);
+      } else if(eq(attName, DataText.XMLNS)) {
+        // open namespace...
+        builder.startNS(EMPTY, attValue);
+      } else {
+        // add attribute
+        final byte[][] tmp = new byte[as + 2][];
+        if(as > 0) System.arraycopy(atts, 0, tmp, 0, as);
+        atts = tmp;
+        atts[as++] = attName;
+        atts[as++] = attValue;
       }
 
-      // send start tag to the xml builder
-      if(scanner.type == Type.CLOSE_R_BR) {
-        builder.emptyElem(tag, atts);
-        return scanner.more();
-      } else {
-        builder.startElem(tag, atts);
-        return consume(Type.R_BR);
+      if(scanner.type != Type.R_BR && scanner.type != Type.CLOSE_R_BR) {
+        consume(Type.WS);
       }
     }
+
+    // send start tag to the xml builder
+    if(scanner.type == Type.CLOSE_R_BR) {
+      builder.emptyElem(tag, atts);
+      return scanner.more();
+    }
+    builder.startElem(tag, atts);
+    return consume(Type.R_BR);
   }
 
   /**

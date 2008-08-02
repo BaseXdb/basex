@@ -252,10 +252,9 @@ public final class GUIFS {
    * @param tk toolkit
    * @param n tracker id
    * @return image
-   * @throws Exception exception
    */
   private static Image add(final String name, final MediaTracker tracker,
-      final Toolkit tk, final int n) throws Exception {
+      final Toolkit tk, final int n) {
     final Image img = tk.getImage(GUI.imageURL("file-" + name));
     tracker.addImage(img, n);
     return img;

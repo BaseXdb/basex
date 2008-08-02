@@ -127,11 +127,11 @@ public final class Range extends InternalExpr {
       final Step step = path.steps.get(st - 2);
       if(!(step.test instanceof TestName)) return null;
       return data.tags.stat(((TestName) step.test).id);
-    } else {
-      final int id = path.steps.last().simpleName(Axis.ATTR, true);
-      if(id == Integer.MIN_VALUE) return null;
-      return data.atts.stat(id);
     }
+    
+    final int id = path.steps.last().simpleName(Axis.ATTR, true);
+    if(id == Integer.MIN_VALUE) return null;
+    return data.atts.stat(id);
   }
 
   @Override

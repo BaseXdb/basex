@@ -148,10 +148,9 @@ public final class DataUpdateTestBulk {
 
   /**
    * Test bulk insertion.
-   * @throws Exception in case of problems.
    */
   @Test
-  public void testBulkInsertSmall() throws Exception {
+  public void testBulkInsertSmall() {
     insert(6, 2, Copy.copy(insertData, 3));
     assertEquals(size + 4, data.size);
     assertNodesDeepEqual(insertData, 3, data, 11);
@@ -160,10 +159,9 @@ public final class DataUpdateTestBulk {
 
   /**
    * Test bulk insertion.
-   * @throws Exception in case of problems.
    */
   @Test
-  public void testBulkInsertLarge() throws Exception {
+  public void testBulkInsertLarge() {
     insert(6, 2, Copy.copy(insertData, 5));
     assertEquals(size + 2, data.size);
     assertNodesDeepEqual(insertData, 5, data, 11);
@@ -175,11 +173,8 @@ public final class DataUpdateTestBulk {
    * @param par parent value
    * @param pos inserting position
    * @param tmp temporary data instance
-   * @throws Exception in case of problems.
    */
-  private void insert(final int par, final int pos, final Data tmp)
-      throws Exception {
-
+  private void insert(final int par, final int pos, final Data tmp) {
     // find inserting position
     int pre = par;
     int k = data.kind(pre);

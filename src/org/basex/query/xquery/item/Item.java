@@ -200,7 +200,7 @@ public abstract class Item extends Expr {
    * @param val cast value
    * @throws XQException evaluation exception
    */
-  protected final void castErr(final Object val) throws XQException {
+  public final void castErr(final Object val) throws XQException {
     String str = val instanceof byte[] ? Token.string((byte[]) val) :
       val.toString();
     if(str.length() > 30) str = str.substring(0, 30) + "...";

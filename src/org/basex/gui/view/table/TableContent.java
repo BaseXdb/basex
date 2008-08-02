@@ -125,15 +125,15 @@ public final class TableContent extends BaseXBack {
           // don't add content if string is already too long
           tb[c].add("...");
           break;
-        } else {
-          if(tb[c].size != 0) tb[c].add("; ");
-          byte[] txt = ti.elem ? data.text(ti.pre) : data.attValue(ti.pre);
-          if(tdata.cols.get(c) == data.timeID) {
-            txt = Token.token(new SimpleDateFormat("dd.MM.yyyy").
-                format(new Date(Token.toLong(txt) * 60000)));
-          }
-          tb[c].add(txt);
         }
+        
+        if(tb[c].size != 0) tb[c].add("; ");
+        byte[] txt = ti.elem ? data.text(ti.pre) : data.attValue(ti.pre);
+        if(tdata.cols.get(c) == data.timeID) {
+          txt = Token.token(new SimpleDateFormat("dd.MM.yyyy").
+              format(new Date(Token.toLong(txt) * 60000)));
+        }
+        tb[c].add(txt);
       }
 
       // draw row contents

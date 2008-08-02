@@ -43,10 +43,9 @@ public final class DataUpdateTestDeletes {
 
   /**
    * Create the database.
-   * @throws Exception in case of problems.
    */
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     new CreateDB(TESTFILE, DBNAME).execute(CONTEXT);
     data = CONTEXT.data();
     size = data.size;

@@ -44,7 +44,7 @@ public enum Type {
     }
   },
   
-  /** Untyped type. */
+  /** Untyped Atomic type. */
   ATM("untypedAtomic", AAT, XSURI, false, true, true, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) {
