@@ -289,6 +289,7 @@ public final class MAB2Parser extends Parser {
    * Adds children of a title.
    * @param in input stream
    * @param entry mab2 entry
+   * @param last last top title
    * @throws IOException I/O exception
    */
   private void addChildren(final RandomAccess in, final MAB2Entry entry,

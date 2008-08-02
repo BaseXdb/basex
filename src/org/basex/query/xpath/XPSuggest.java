@@ -11,7 +11,7 @@ import org.basex.query.QueryException;
 import org.basex.query.xpath.expr.Expr;
 import org.basex.query.xpath.locpath.Axis;
 import org.basex.query.xpath.locpath.LocPath;
-import org.basex.query.xpath.locpath.Step;
+import org.basex.query.xpath.locpath.Test;
 import org.basex.query.xpath.locpath.TestName;
 import org.basex.query.xpath.locpath.TestNode;
 import org.basex.util.StringList;
@@ -31,8 +31,10 @@ public final class XPSuggest extends XPParser {
   private Stack<ArrayList<Node>> stack = new Stack<ArrayList<Node>>();
   /** Skeleton reference. */
   private Skeleton skel;
-  /** Last step. */
-  private Step last;
+  /** Last axis. */
+  private Axis laxis;
+  /** Last test. */
+  private Test ltest;
 
   /**
    * Constructor, specifying a node set.
@@ -74,19 +76,39 @@ public final class XPSuggest extends XPParser {
 
   @Override
   Expr pred() throws QueryException {
+    final int s = stack.size();
     final Expr expr = super.pred();
-    if(stack.size() > 1) stack.pop();
+    while(stack.size() != s) stack.pop();
     return expr;
+  }
+
+  @Override
+  void checkStep(final Axis axis, final Test test) {
+    filter(true);
+    if(axis == null) {
+      stack.push(skel.child(stack.pop(), 0, false));
+      return;
+    }
+
+    if(axis == Axis.CHILD || axis == Axis.ATTR) {
+      stack.push(skel.child(stack.pop(), 0, false));
+    } else if(axis == Axis.DESC || axis == Axis.DESCORSELF) {
+      stack.push(skel.child(stack.pop(), 0, true));
+    } else {
+      stack.peek().clear();
+    }
+    laxis = axis;
+    ltest = test;
   }
 
   /**
    * Filters the current steps.
    * @param finish finish flag
    */
-  void filter(final boolean finish) {
-    if(last == null) return;
-    if(finish && last.test == TestNode.NODE) return;
-    final byte[] tn = entry(last);
+  private void filter(final boolean finish) {
+    if(laxis == null) return;
+    if(finish && ltest == TestNode.NODE) return;
+    final byte[] tn = entry(laxis, ltest);
     if(tn == null) return;
     final ArrayList<Node> list = stack.peek();
     for(int c = list.size() - 1; c >= 0; c--) {
@@ -101,28 +123,6 @@ public final class XPSuggest extends XPParser {
         if(eq || !Token.startsWith(t, tn)) list.remove(c);
       }
     }
-  }
-
-  @Override
-  Step step() throws QueryException {
-    final Step step = super.step();
-    if(stack.empty()) return step;
-
-    filter(true);
-    if(step == null) {
-      stack.push(skel.child(stack.pop(), 0, false));
-      return null;
-    }
-
-    if(step.axis == Axis.CHILD || step.axis == Axis.ATTR) {
-      stack.push(skel.child(stack.pop(), 0, false));
-    } else if(step.axis == Axis.DESC || step.axis == Axis.DESCORSELF) {
-      stack.push(skel.child(stack.pop(), 0, true));
-    } else {
-      stack.peek().clear();
-    }
-    last = step;
-    return step;
   }
 
   /**
@@ -144,16 +144,17 @@ public final class XPSuggest extends XPParser {
 
   /**
    * Returns a node entry.
-   * @param s step
+   * @param a axis
+   * @param t text
    * @return completions
    */
-  private byte[] entry(final Step s) {
-    if(s.test == TestNode.TEXT) return TEXT;
-    if(s.test == TestNode.COMM) return COMM;
-    if(s.test == TestNode.PI) return PI;
-    if(s.test instanceof TestName) {
-      final byte[] name = ((TestName) s.test).name;
-      return s.axis == Axis.ATTR ? Token.concat(ATT, name) : name;
+  private byte[] entry(final Axis a, final Test t) {
+    if(t == TestNode.TEXT) return TEXT;
+    if(t == TestNode.COMM) return COMM;
+    if(t == TestNode.PI) return PI;
+    if(t instanceof TestName) {
+      final byte[] name = ((TestName) t).name;
+      return a == Axis.ATTR ? Token.concat(ATT, name) : name;
     }
     return Token.EMPTY;
   }
