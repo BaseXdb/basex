@@ -24,126 +24,98 @@ import org.xml.sax.XMLReader;
 
 /**
  * BaseX XQuery prepared expression.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler
  */
-public class BXQPreparedExpression implements XQPreparedExpression  {
-  private XQueryProcessor query;
-  private Nodes nodes;
+public final class BXQPreparedExpression implements XQPreparedExpression  {
+  private final XQueryProcessor query;
+  private final Nodes nodes;
   private boolean closed;
-  
+
   /**
    * Constructor.
    * @param xquery query instance
    * @param xnodes node reference
    */
-  public BXQPreparedExpression(XQueryProcessor xquery, Nodes xnodes) {
-    this.query = xquery;
-    this.nodes = xnodes;
-  }
-  
-  public void bindAtomicValue(QName arg0, String arg1, XQItemType arg2) {
-    // TODO Auto-generated method stub
-    
+  public BXQPreparedExpression(final XQueryProcessor xquery,
+      final Nodes xnodes) {
+    query = xquery;
+    nodes = xnodes;
   }
 
-  public void bindBoolean(QName arg0, boolean arg1, XQItemType arg2) {
-    // TODO Auto-generated method stub
-    
+  public void bindAtomicValue(final QName qn, final String arg1,
+      final XQItemType arg2) {
   }
 
-  public void bindByte(QName arg0, byte arg1, XQItemType arg2) {
-    // TODO Auto-generated method stub
-    
+  public void bindBoolean(final QName qn, final boolean arg1,
+      final XQItemType arg2) {
   }
 
-  public void bindDocument(QName arg0, InputStream arg1, String arg2,
-      XQItemType arg3) {
-    // TODO Auto-generated method stub
-    
+  public void bindByte(final QName qn, final byte arg1, final XQItemType arg2) {
   }
 
-  public void bindDocument(QName arg0, Reader arg1, String arg2,
-      XQItemType arg3) {
-    // TODO Auto-generated method stub
-    
+  public void bindDocument(final QName qn, final InputStream arg1,
+      final String arg2, final XQItemType arg3) {
   }
 
-  public void bindDocument(QName arg0, Source arg1, XQItemType arg2) {
-    // TODO Auto-generated method stub
-    
+  public void bindDocument(final QName qn, final Reader arg1, final String arg2,
+      final XQItemType arg3) {
   }
 
-  public void bindDocument(QName arg0, String arg1, String arg2,
-      XQItemType arg3) {
-    // TODO Auto-generated method stub
-    
+  public void bindDocument(final QName qn, final Source arg1,
+      final XQItemType arg2) {
   }
 
-  public void bindDocument(QName arg0, XMLReader arg1, XQItemType arg2) {
-    // TODO Auto-generated method stub
-    
+  public void bindDocument(final QName qn, final String arg1, final String arg2,
+      final XQItemType arg3) {
   }
 
-  public void bindDocument(QName arg0, XMLStreamReader arg1, XQItemType arg2) {
-    // TODO Auto-generated method stub
-    
+  public void bindDocument(final QName qn, final XMLReader arg1,
+      final XQItemType arg2) {
   }
 
-  public void bindDouble(QName arg0, double arg1, XQItemType arg2) {
-    // TODO Auto-generated method stub
-    
+  public void bindDocument(final QName qn, final XMLStreamReader arg1,
+      final XQItemType arg2) {
   }
 
-  public void bindFloat(QName arg0, float arg1, XQItemType arg2) {
-    // TODO Auto-generated method stub
-    
+  public void bindDouble(final QName qn, final double arg1, 
+      final XQItemType arg2) {
   }
 
-  public void bindInt(QName arg0, int arg1, XQItemType arg2) {
-    // TODO Auto-generated method stub
-    
+  public void bindFloat(final QName qn, final float arg1, 
+      final XQItemType arg2) {
   }
 
-  public void bindItem(QName arg0, XQItem arg1) {
-    // TODO Auto-generated method stub
-    
+  public void bindInt(final QName qn, final int arg1, 
+      final XQItemType arg2) {
   }
 
-  public void bindLong(QName arg0, long arg1, XQItemType arg2) {
-    // TODO Auto-generated method stub
-    
+  public void bindItem(final QName qn, final XQItem arg1) {
   }
 
-  public void bindNode(QName arg0, Node arg1, XQItemType arg2){
-    // TODO Auto-generated method stub
-    
+  public void bindLong(final QName qn, final long arg1, final XQItemType arg2) {
   }
 
-  public void bindObject(QName arg0, Object arg1, XQItemType arg2) {
-    // TODO Auto-generated method stub
-    
+  public void bindNode(final QName qn, final Node arg1, final XQItemType arg2){
   }
 
-  public void bindSequence(QName arg0, XQSequence arg1) {
-    // TODO Auto-generated method stub
-    
+  public void bindObject(final QName qn, final Object arg1,
+      final XQItemType arg2) {
   }
 
-  public void bindShort(QName arg0, short arg1, XQItemType arg2) {
-    // TODO Auto-generated method stub
-    
+  public void bindSequence(final QName qn, final XQSequence arg1) {
   }
 
-  public void bindString(QName arg0, String arg1, XQItemType arg2) {
-    // TODO Auto-generated method stub
-    
+  public void bindShort(final QName qn, final short arg1,
+      final XQItemType arg2) {
+  }
+
+  public void bindString(final QName qn, final String arg1,
+      final XQItemType arg2) {
   }
 
   public void cancel() {
-    // TODO Auto-generated method stub
-    
   }
 
   public void close() {
@@ -153,41 +125,35 @@ public class BXQPreparedExpression implements XQPreparedExpression  {
   public BXQResultSequence executeQuery() throws XQException {
     try {
       query.create();
-      XQContext ctx = query.ctx;
-      Iter iter = ctx.compile(nodes).iter();
+      final XQContext ctx = query.ctx;
+      final Iter iter = ctx.compile(nodes).iter();
       return new BXQResultSequence(ctx, iter);
-    } catch(QueryException ex) {
+    } catch(final QueryException ex) {
       throw new XQQueryException(ex.getMessage());
     }
-  } 
+  }
 
   public QName[] getAllExternalVariables() {
-    // TODO Auto-generated method stub
     return null;
   }
 
   public QName[] getAllUnboundExternalVariables() {
-    // TODO Auto-generated method stub
     return null;
   }
 
   public TimeZone getImplicitTimeZone() {
-    // TODO Auto-generated method stub
     return null;
   }
 
   public XQStaticContext getStaticContext() {
-    // TODO Auto-generated method stub
     return null;
   }
 
   public XQSequenceType getStaticResultType() {
-    // TODO Auto-generated method stub
     return null;
   }
 
-  public XQSequenceType getStaticVariableType(QName arg0) {
-    // TODO Auto-generated method stub
+  public XQSequenceType getStaticVariableType(final QName qn) {
     return null;
   }
 
@@ -195,8 +161,6 @@ public class BXQPreparedExpression implements XQPreparedExpression  {
     return closed;
   }
 
-  public void setImplicitTimeZone(TimeZone arg0) {
-    // TODO Auto-generated method stub
-    
+  public void setImplicitTimeZone(final TimeZone arg0) {
   }
 }

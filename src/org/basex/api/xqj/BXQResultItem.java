@@ -4,47 +4,43 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URI;
 import java.util.Properties;
-
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Result;
 import javax.xml.xquery.XQConnection;
-import org.basex.query.xquery.XQException;
+import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQResultItem;
-import org.basex.api.xqj.BXQException;
 import org.basex.query.xquery.item.Item;
-//import org.basex.query.xquery.item.Type;
-
+import org.basex.util.Token;
 import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
 
 /**
  * BaseX XQuery result item.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler
  */
-public class BXQResultItem implements XQResultItem {
-  
+public final class BXQResultItem implements XQResultItem {
   /** Item item. */
   Item item;
   /** BXQConnection connection. */
-  BXQConnection connection;
-  
+  BXQConnection conn;
+
   /**
    * Sets the connection.
    * @param connection
    */
-  void setConnection(BXQConnection connection) {
-    this.connection = connection;
+  void setConnection(final BXQConnection connection) {
+    conn = connection;
   }
 
   public XQConnection getConnection() {
-    return connection;
+    return conn;
   }
 
   public void close() {
-   item = null;
+    item = null;
   }
 
   public boolean isClosed() {
@@ -52,113 +48,102 @@ public class BXQResultItem implements XQResultItem {
   }
 
   public String getAtomicValue() {
-      return item.toString();
+    return item.toString();
   }
 
-  public boolean getBoolean() throws BXQException {
+  public boolean getBoolean() throws XQException {
     try {
       return item.bool();
-    } catch(XQException ex) {
+    } catch(final org.basex.query.xquery.XQException ex) {
       throw new BXQException(ex);
     }
   }
 
-  public byte getByte() {
-    return 0;
+  public byte getByte() throws XQException {
+    try {
+      return (byte) item.itr();
+    } catch(final org.basex.query.xquery.XQException ex) {
+      throw new BXQException(ex);
     }
+  }
 
-  public double getDouble() throws BXQException {
+  public double getDouble() throws XQException {
     try {
       return item.dbl();
-    } catch(XQException ex) {
+    } catch(final org.basex.query.xquery.XQException ex) {
       throw new BXQException(ex);
     }
   }
 
-  public float getFloat() throws BXQException {
+  public float getFloat() throws XQException {
     try {
       return item.flt();
-    } catch(XQException ex) {
+    } catch(final org.basex.query.xquery.XQException ex) {
       throw new BXQException(ex);
     }
   }
 
-  public int getInt() throws BXQException {
+  public int getInt() throws XQException {
     try {
       return (int) item.itr();
-    } catch(XQException ex) {
+    } catch(final org.basex.query.xquery.XQException ex) {
       throw new BXQException(ex);
     }
   }
 
   public XMLStreamReader getItemAsStream() {
-    // TODO Auto-generated method stub
     return null;
   }
 
-  public String getItemAsString(Properties props) {
-    // TODO Auto-generated method stub
-    return null;
+  public String getItemAsString(final Properties props) {
+    return Token.string(item.str());
   }
 
   public XQItemType getItemType() {
-    // TODO Auto-generated method stub
     return null;
   }
 
-  public long getLong() throws BXQException {
+  public long getLong() throws XQException {
     try {
       return item.itr();
-    } catch(XQException ex) {
+    } catch(final org.basex.query.xquery.XQException ex) {
       throw new BXQException(ex);
     }
   }
 
   public Node getNode() {
-    if(item.node()) {
-      return (Node) item;
-    }
-    return null;
+    return item.node() ? (Node) item : null;
   }
 
   public URI getNodeUri() {
-    // TODO Auto-generated method stub
     return null;
   }
 
   public Object getObject() {
-    // TODO Auto-generated method stub
     return null;
   }
 
-  public short getShort() {
-    // TODO Auto-generated method stub
-    return 0;
+  public short getShort() throws XQException {
+    try {
+      return (short) item.itr();
+    } catch(final org.basex.query.xquery.XQException ex) {
+      throw new BXQException(ex);
+    }
   }
 
-  public boolean instanceOf(XQItemType type) {
-    // TODO Auto-generated method stub
-    return false;
+  public boolean instanceOf(final XQItemType it) {
+    return item.type.instance(((BXQItemType) it).type);
   }
 
-  public void writeItem(OutputStream os, Properties props) {
-  // TODO Auto-generated method stub
-
+  public void writeItem(final OutputStream os, final Properties props) {
   }
 
-  public void writeItem(Writer ow, Properties props) {
-  // TODO Auto-generated method stub
-
+  public void writeItem(final Writer w, final Properties props) {
   }
 
-  public void writeItemToResult(Result result) {
-  // TODO Auto-generated method stub
-    
+  public void writeItemToResult(final Result result) {
   }
 
-  public void writeItemToSAX(ContentHandler saxhdlr) {
-  // TODO Auto-generated method stub
-
+  public void writeItemToSAX(final ContentHandler saxhdlr) {
   }
-
 }

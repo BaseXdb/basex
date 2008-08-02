@@ -3,19 +3,18 @@ package org.basex.api.xqj;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URI;
-import java.util.Properties;
 import java.net.URISyntaxException;
+import java.util.Properties;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Result;
 import javax.xml.xquery.XQConnection;
+import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItem;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQResultSequence;
-
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
 import org.basex.query.xquery.XQContext;
-import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
@@ -25,11 +24,11 @@ import org.xml.sax.ContentHandler;
 
 /**
  * BaseX XQuery result sequence.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler
  */
-public class BXQResultSequence implements XQResultSequence {
+public final class BXQResultSequence implements XQResultSequence {
   /** Forward-Only error message. */
   private static final String FORWARD = "Sequence is forwards-only";
   /** Query context. */
@@ -44,27 +43,27 @@ public class BXQResultSequence implements XQResultSequence {
   private boolean closed;
   /** BXQConnection. */
   private BXQConnection connection;
-  
+
   /**
    * Constructor.
    * @param item result item
    * @param ctx query context
    */
-  public BXQResultSequence(XQContext ctx, Iter item) {
+  public BXQResultSequence(final XQContext ctx, final Iter item) {
     context = ctx;
     result = item;
   }
 
-  public boolean absolute(int arg0) throws BXQException {
+  public boolean absolute(final int arg0) throws XQException {
     throw new BXQException(FORWARD);
   }
 
-  public void afterLast() throws BXQException {
+  public void afterLast() throws XQException {
     checkIfClosed();
     pos = -1;
   }
 
-  public void beforeFirst() throws BXQException {
+  public void beforeFirst() throws XQException {
     throw new BXQException(FORWARD);
   }
 
@@ -72,31 +71,31 @@ public class BXQResultSequence implements XQResultSequence {
     closed = true;
   }
 
-  public int count() throws BXQException {
+  public int count() throws XQException {
     throw new BXQException(FORWARD);
   }
 
-  public boolean first() throws BXQException {
+  public boolean first() throws XQException {
     throw new BXQException(FORWARD);
   }
 
-  public String getAtomicValue() throws BXQException {
+  public String getAtomicValue() throws XQException {
     if(item.node()) throw new BXQException("Current item is a node.");
     return Token.string(item.str());
   }
 
-  public boolean getBoolean() throws BXQException {
+  public boolean getBoolean() throws XQException {
     try {
       return item.bool();
-    } catch(XQException ex) {
+    } catch(final org.basex.query.xquery.XQException ex) {
       throw new BXQException(ex);
     }
   }
 
-  public byte getByte() throws BXQException {
+  public byte getByte() throws XQException {
     try {
       return (byte) Type.BYT.e(item, context).itr();
-    } catch(XQException ex) {
+    } catch(final org.basex.query.xquery.XQException ex) {
       throw new BXQException(ex);
     }
   }
@@ -105,41 +104,39 @@ public class BXQResultSequence implements XQResultSequence {
     return connection;
   }
 
-  public double getDouble() throws BXQException {
+  public double getDouble() throws XQException {
     try {
       return item.dbl();
-    } catch(XQException ex) {
+    } catch(final org.basex.query.xquery.XQException ex) {
       throw new BXQException(ex);
     }
   }
 
-  public float getFloat() throws BXQException {
+  public float getFloat() throws XQException {
     try {
       return item.flt();
-    } catch(XQException ex) {
+    } catch(final org.basex.query.xquery.XQException ex) {
       throw new BXQException(ex);
     }
   }
 
-  public int getInt() throws BXQException {
+  public int getInt() throws XQException {
     try {
       return (int) item.itr();
-    } catch(XQException ex) {
+    } catch(final org.basex.query.xquery.XQException ex) {
       throw new BXQException(ex);
     }
   }
 
   public XQItem getItem() {
-    // TODO Auto-generated method stub
     return null;
   }
 
   public XMLStreamReader getItemAsStream() {
-    // TODO Auto-generated method stub
     return null;
   }
 
-  public String getItemAsString(Properties arg0) throws BXQException {
+  public String getItemAsString(final Properties arg0) throws XQException {
     checkIfClosed();
     try {
       final CachedOutput co = new CachedOutput();
@@ -152,31 +149,27 @@ public class BXQResultSequence implements XQResultSequence {
   }
 
   public XQItemType getItemType() {
-    // TODO Auto-generated method stub
     return null;
   }
 
-  public long getLong() throws BXQException {
+  public long getLong() throws XQException {
     try {
       return item.itr();
-    } catch(XQException ex) {
+    } catch(final org.basex.query.xquery.XQException ex) {
       throw new BXQException(ex);
     }
   }
 
   public Node getNode() {
-    if(item.node()) {
-      return (Node) item;
-    }
-    return null;
+    return item.node() ? (Node) item : null;
   }
 
-  public URI getNodeUri() throws BXQException {
+  public URI getNodeUri() throws XQException {
     if(item.node()) {
-      Node node = (Node) item;
+      final Node node = (Node) item;
       try {
         return new URI(node.getBaseURI());
-      } catch(URISyntaxException ex) {
+      } catch(final URISyntaxException ex) {
         throw new BXQException(ex.toString());
       }
     }
@@ -184,7 +177,6 @@ public class BXQResultSequence implements XQResultSequence {
   }
 
   public Object getObject() {
-    // TODO Auto-generated method stub
     return null;
   }
 
@@ -193,33 +185,30 @@ public class BXQResultSequence implements XQResultSequence {
   }
 
   public XMLStreamReader getSequenceAsStream() {
-    // TODO Auto-generated method stub
     return null;
   }
 
-  public String getSequenceAsString(Properties arg0) {
-    // TODO Auto-generated method stub
+  public String getSequenceAsString(final Properties arg0) {
     return null;
   }
 
-  public short getShort() throws BXQException {
+  public short getShort() throws XQException {
     try {
       return (short) Type.SHR.e(item, context).itr();
-    } catch(XQException ex) {
+    } catch(final org.basex.query.xquery.XQException ex) {
       throw new BXQException(ex);
     }
   }
 
-  public boolean instanceOf(XQItemType arg0) {
-    // TODO Auto-generated method stub
-    return false;
+  public boolean instanceOf(final XQItemType it) {
+    return item.type.instance(((BXQItemType) it).type);
   }
 
-  public boolean isAfterLast() throws BXQException {
+  public boolean isAfterLast() throws XQException {
     throw new BXQException(FORWARD);
    }
 
-  public boolean isBeforeFirst() throws BXQException {
+  public boolean isBeforeFirst() throws XQException {
     throw new BXQException(FORWARD);
   }
 
@@ -227,87 +216,75 @@ public class BXQResultSequence implements XQResultSequence {
     return closed;
   }
 
-  public boolean isFirst() throws BXQException {
+  public boolean isFirst() throws XQException {
     throw new BXQException(FORWARD);
   }
 
-  public boolean isLast() throws BXQException {
+  public boolean isLast() throws XQException {
     throw new BXQException(FORWARD);
   }
 
-  public boolean isOnItem() throws BXQException {
+  public boolean isOnItem() throws XQException {
     checkIfClosed();
     return pos > 0;
   }
 
   public boolean isScrollable() {
-    // TODO Auto-generated method stub
     return false;
   }
 
-  public boolean last() throws BXQException {
+  public boolean last() throws XQException {
     throw new BXQException(FORWARD);
   }
 
-  public boolean next() throws BXQException {
+  public boolean next() throws XQException {
     checkIfClosed();
     if(pos < 0) return false;
 
     try {
       item = result.next();
-      if(item == null) {
-        pos = -1;
-        return false;
-      } else {
-        pos++;
-        return true;
-      }
-    } catch(XQException ex) {
+      pos++;
+      boolean more = item != null;
+      if(!more) pos = -1;
+      return more;
+    } catch(final org.basex.query.xquery.XQException ex) {
       throw new BXQException(ex);
     }
   }
 
-  public boolean previous() throws BXQException {
+  public boolean previous() throws XQException {
     throw new BXQException(FORWARD);
   }
 
-  public boolean relative(int arg0) throws BXQException {
+  public boolean relative(final int arg0) throws XQException {
     throw new BXQException(FORWARD);
   }
 
-  public void writeItem(OutputStream arg0, Properties arg1) {
-    // TODO Auto-generated method stub
+  public void writeItem(final OutputStream arg0, final Properties arg1) {
   }
 
-  public void writeItem(Writer arg0, Properties arg1) {
-    // TODO Auto-generated method stub
+  public void writeItem(final Writer arg0, final Properties arg1) {
   }
 
-  public void writeItemToResult(Result arg0) {
-    // TODO Auto-generated method stub
+  public void writeItemToResult(final Result arg0) {
   }
 
-  public void writeItemToSAX(ContentHandler arg0) {
-    // TODO Auto-generated method stub
-  }
-  
-  public void writeSequence(OutputStream arg0, Properties arg1) {
-    // TODO Auto-generated method stub    
+  public void writeItemToSAX(final ContentHandler arg0) {
   }
 
-  public void writeSequence(Writer arg0, Properties arg1) {
-    // TODO Auto-generated method stub
+  public void writeSequence(final OutputStream arg0, final Properties arg1) {
   }
 
-  public void writeSequenceToResult(Result arg0) {
-    // TODO Auto-generated method stub
+  public void writeSequence(final Writer arg0, final Properties arg1) {
   }
 
-  public void writeSequenceToSAX(ContentHandler arg0) {
-    // TODO Auto-generated method stub
+  public void writeSequenceToResult(final Result arg0) {
   }
-  
-  private void checkIfClosed() throws BXQException {
+
+  public void writeSequenceToSAX(final ContentHandler arg0) {
+  }
+
+  private void checkIfClosed() throws XQException {
     if(closed) throw new BXQException("The XQSequence has been closed");
   }
 }

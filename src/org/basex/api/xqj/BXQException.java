@@ -8,12 +8,12 @@ import javax.xml.xquery.XQException;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler
  */
-public  class BXQException extends XQException {
+final class BXQException extends XQException {
   /** 
    * Constructor.
    * @param ex query exception
    */
-  public BXQException(org.basex.query.xquery.XQException ex) {
+  BXQException(final Exception ex) {
      this(ex.getMessage());
      setStackTrace(ex.getStackTrace());
   }
@@ -22,7 +22,7 @@ public  class BXQException extends XQException {
    * Constructor.
    * @param msg query message
    */
-  public BXQException(String msg) {
+  BXQException(String msg) {
      super(msg);
   }
 }
