@@ -3,7 +3,7 @@ package org.basex.api.xmldb;
 import org.xmldb.api.base.Resource;
 import org.xmldb.api.base.ResourceIterator;
 import org.xmldb.api.base.ResourceSet;
-import org.basex.data.Result;
+import org.basex.query.xpath.values.Item;
 
 /**
  * Implementation of the ResourceSet Interface for the XMLDB:API
@@ -12,15 +12,14 @@ import org.basex.data.Result;
  * @author Andreas Weiler
  */
 public class BXResourceSet implements ResourceSet {
-  
   /** Result */
-  Result result;
+  Item result;
   
   /**
    * Standard Constructor with result.
    * @param result Result
    */
-  public BXResourceSet(Result result) {
+  public BXResourceSet(Item result) {
     this.result = result;
   }
 

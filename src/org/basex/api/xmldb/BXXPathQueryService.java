@@ -2,9 +2,9 @@ package org.basex.api.xmldb;
 
 import org.basex.core.Context;
 import org.basex.data.Nodes;
-import org.basex.data.Result;
 import org.basex.query.QueryProcessor;
 import org.basex.query.xpath.XPathProcessor;
+import org.basex.query.xpath.values.Item;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.ResourceSet;
 import org.xmldb.api.modules.XPathQueryService;
@@ -79,7 +79,7 @@ public class BXXPathQueryService implements XPathQueryService {
     Nodes nodes = ctx.current();
  // Executes the query
     try{
-      Result result = xpath.query(nodes);
+      Item result = (Item) xpath.query(nodes);
       return new BXResourceSet(result);
     } catch (QueryException qe) {
       System.out.println(qe);

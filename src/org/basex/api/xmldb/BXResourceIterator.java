@@ -2,7 +2,7 @@ package org.basex.api.xmldb;
 
 import org.xmldb.api.base.Resource;
 import org.xmldb.api.base.ResourceIterator;
-import org.basex.data.Result;
+import org.basex.query.xpath.values.Item;
 
 /**
  * Implementation of the ResourceIterator Interface for the XMLDB:API
@@ -11,9 +11,8 @@ import org.basex.data.Result;
  * @author Andreas Weiler
  */
 public class BXResourceIterator implements ResourceIterator {
-  
   /** Result */
-  Result result;
+  Item result;
   /** Start value for iterator */
   int start = -1;
   
@@ -21,7 +20,7 @@ public class BXResourceIterator implements ResourceIterator {
    * Standard constructor with result.
    * @param result Result
    */
-  public BXResourceIterator(Result result) {
+  public BXResourceIterator(Item result) {
     this.result = result;
   }
 
@@ -29,10 +28,7 @@ public class BXResourceIterator implements ResourceIterator {
    * @see org.xmldb.api.base.ResourceIterator#hasMoreResources()
    */
   public boolean hasMoreResources() {
-    if(start < result.size() - 1) {
-      return true;
-    }
-    return false;
+    return start < result.size() - 1;
   }
 
   /**

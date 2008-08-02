@@ -1,8 +1,13 @@
 package org.basex.api.xmldb;
 
-import org.basex.data.Result;
+import java.io.IOException;
+import org.basex.data.XMLSerializer;
+import org.basex.io.CachedOutput;
 import org.xmldb.api.base.Collection;
+import org.xmldb.api.base.ErrorCodes;
 import org.xmldb.api.base.Resource;
+import org.xmldb.api.base.XMLDBException;
+import org.basex.query.xpath.values.Item;
 import org.basex.query.xpath.values.NodeSet;
 
 /**
@@ -12,10 +17,9 @@ import org.basex.query.xpath.values.NodeSet;
  * @author Andreas Weiler
  */
 public class BXResource implements Resource {
-  
-  /** Result */
-  Result result;
-  /** Position for value */
+  /** Result. */
+  Item result;
+  /** Position for value. */
   int pos;
   
   /**
@@ -23,7 +27,7 @@ public class BXResource implements Resource {
    * @param result
    * @param pos
    */
-  public BXResource(Result result, int pos) {
+  public BXResource(Item result, int pos) {
     this.result = result;
     this.pos = pos;
   }
@@ -31,12 +35,19 @@ public class BXResource implements Resource {
   /**
    * @see org.xmldb.api.base.Resource#getContent()
    */
-  public Object getContent() {
-    if(result instanceof NodeSet) {
-      NodeSet nodes = (NodeSet) result;
-      return new String(nodes.data.atom(nodes.nodes[pos]));
-    } else {
-      return result.toString();
+  public Object getContent() throws XMLDBException {
+    try {
+      final CachedOutput out = new CachedOutput();
+      final XMLSerializer ser = new XMLSerializer(out);
+      if(result instanceof NodeSet) {
+        final NodeSet nodes = (NodeSet) result;
+        ser.xml(nodes.data, nodes.nodes[pos]);
+      } else {
+        ser.item(result.str());
+      }
+      return out.toString();
+    } catch(final IOException ex) {
+      throw new XMLDBException(ErrorCodes.UNKNOWN_ERROR, ex.getMessage());
     }
   }
 

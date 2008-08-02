@@ -2,6 +2,7 @@ package org.basex.api.xmldb;
 
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.Database;
+import org.xmldb.api.base.ErrorCodes;
 import org.xmldb.api.base.XMLDBException;
 import org.basex.core.Context;
 import org.basex.core.proc.*;
@@ -43,14 +44,12 @@ public class BXDatabaseImpl implements Database {
     // create database context
     final Context ctx = new Context();
     if(uri.startsWith(BASEXDB_URI)) {
-      String tmp = uri.substring(BASEXDB_URI.length());
-      if(new Check(tmp).execute(ctx)) {
-        new Open(tmp).execute(ctx);
-      } else {
-        throw new XMLDBException();
+      final String tmp = uri.substring(BASEXDB_URI.length());
+      if(new Open(tmp).execute(ctx)) {
+        return new BXCollection(ctx);
       }
-      BXCollection col = new BXCollection(ctx);
-      return col;
+    } else {
+      throw new XMLDBException(ErrorCodes.INVALID_URI);
     }
     return null;
   }

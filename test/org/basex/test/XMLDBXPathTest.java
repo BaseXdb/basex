@@ -11,6 +11,12 @@ import org.xmldb.api.*;
  * @author Andreas Weiler
  */
 public class XMLDBXPathTest {
+  /** XMLDB driver. */
+  static String driver = "org.basex.api.xmldb.BXDatabaseImpl";
+  /** Database/document path. */
+  static String url = "xmldb:basex://localhost:8080/input";
+  /** Query. */
+  static String query = "//li";
 
   /**
    * Main Method.
@@ -20,27 +26,24 @@ public class XMLDBXPathTest {
   public static void main(String[] args) throws Exception {
     Collection col = null;
     try {
-      String driver = "org.basex.api.xmldb.BXDatabaseImpl";
-      Class c = Class.forName(driver);
-
+      Class<?> c = Class.forName(driver);
       Database database = (Database) c.newInstance();
       DatabaseManager.registerDatabase(database);
-      col = DatabaseManager
-          .getCollection("xmldb:basex://input");
+      col = DatabaseManager.getCollection(url);
 
-      String xpath = "//li";
       XPathQueryService service = (XPathQueryService) col.getService(
           "XPathQueryService", "1.0");
-      ResourceSet resultSet = service.query(xpath);
+      ResourceSet resultSet = service.query(query);
       
       ResourceIterator results = resultSet.getIterator();
       
       while(results.hasMoreResources()) {
         Resource res = results.nextResource();
-        System.out.println((String) res.getContent());
+        System.out.println(res.getContent());
       }
     } catch(XMLDBException e) {
       System.err.println("XML:DB Exception occured " + e.errorCode);
+      e.printStackTrace();
     } finally {
       if(col != null) {
         col.close();
