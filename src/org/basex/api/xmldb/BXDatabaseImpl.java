@@ -44,7 +44,7 @@ public class BXDatabaseImpl implements Database {
     // create database context
     final Context ctx = new Context();
     if(uri.startsWith(BASEXDB_URI)) {
-      final String tmp = uri.substring(BASEXDB_URI.length());
+      final String tmp = uri.substring(uri.lastIndexOf('/'));
       if(new Open(tmp).execute(ctx)) {
         return new BXCollection(ctx);
       }
