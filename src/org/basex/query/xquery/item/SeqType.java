@@ -54,11 +54,11 @@ public final class SeqType {
   }
 
   /**
-   * Casts the specified item.
+   * Casts the specified iterator item.
    * @param iter iterator
    * @param expr expression reference
    * @param ctx xquery context
-   * @return result of check
+   * @return resulting item
    * @throws XQException evaluation exception
    */
   public Item cast(final Iter iter, final Expr expr, final XQContext ctx)
@@ -72,7 +72,7 @@ public final class SeqType {
    * Casts the specified item.
    * @param item item to be cast
    * @param ctx xquery context
-   * @return result of check
+   * @return resulting item
    * @throws XQException evaluation exception
    */
   public Item cast(final Item item, final XQContext ctx) throws XQException {

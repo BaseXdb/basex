@@ -57,4 +57,12 @@ public final class XQueryProcessor extends QueryProcessor {
     ctx.modules.add(ns);
     ctx.modules.add(file);
   }
+  
+  /**
+   * Sets a new query. Should be called before parsing the query.
+   * @param qu query
+   */
+  public void setQuery(final String qu) {
+    query = qu;;
+  }
 }

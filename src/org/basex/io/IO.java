@@ -222,8 +222,8 @@ public final class IO {
    * @return input source
    */
   public InputSource next() {
-    if(is != null) return new InputSource(is);
-    return new InputSource(url ? path : "file:///" + path);
+    return is == null ? new InputSource(url ? path : "file:///" + path) :
+      new InputSource(is);
   }
   
   /**

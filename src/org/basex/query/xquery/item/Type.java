@@ -795,13 +795,13 @@ public enum Type {
   /** Parent type. */
   public final Type par;
   /** Untyped flag. */
-  final boolean unt;
+  public final boolean unt;
   /** String flag. */
-  final boolean str;
+  public final boolean str;
   /** Duration flag. */
-  final boolean dur;
+  public final boolean dur;
   /** Node flag. */
-  final boolean node;
+  public final boolean node;
 
   /**
    * Constructs a new item from the specified item.

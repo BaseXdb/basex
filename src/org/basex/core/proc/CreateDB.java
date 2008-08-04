@@ -49,15 +49,25 @@ public final class CreateDB extends ACreate {
 
   /**
    * Creates and returns a database for the specified XML document.
-   * No warnings are thrown; instead, an empty reference is returned.
+   * No warnings are thrown; instead, an null reference is returned if
+   * errors occur.
    * @param db name of the database to be created
-   * @param fn database name
+   * @param fn file name
    * @return database instance
    */
   public static Data xml(final IO fn, final String db) {
+    return fn.exists() ? xml(new DirParser(fn), db) : null;
+  }
+
+  /**
+   * Creates and returns a database for the specified XML document.
+   * No warnings are thrown; instead, an empty reference is returned.
+   * @param p xml parser
+   * @param db name of the database to be created
+   * @return database instance
+   */
+  public static Data xml(final Parser p, final String db) {
     try {
-      if(!fn.exists()) return null;
-      final Parser p = new DirParser(fn);
       if(Prop.onthefly) return new MemBuilder().build(p, db);
 
       final Data data = new DiskBuilder().build(p, db);

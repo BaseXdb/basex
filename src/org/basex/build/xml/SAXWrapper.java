@@ -2,7 +2,6 @@ package org.basex.build.xml;
 
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
 import javax.xml.parsers.SAXParserFactory;
 import org.basex.BaseX;
@@ -35,6 +34,8 @@ public final class SAXWrapper extends Parser {
   boolean dtd;
   /** Builder reference. */
   Builder builder;
+  /** Optional XML reader. */
+  XMLReader reader;
 
   static {
     // needed for XMLEntityManager: increase entity limit
@@ -46,19 +47,31 @@ public final class SAXWrapper extends Parser {
    * @param in input file
    */
   public SAXWrapper(final IO in) {
+    this(in, null);
+  }
+
+  /**
+   * Constructor.
+   * @param in input file
+   * @param read reader reference
+   */
+  public SAXWrapper(final IO in, final XMLReader read) {
     super(in);
+    reader = read;
   }
 
   @Override
   public void parse(final Builder build) throws IOException {
     builder = build;
     try {
-      final SAXParserFactory f = SAXParserFactory.newInstance();
-      f.setNamespaceAware(true);
-      f.setValidating(false);
-
+      XMLReader r = reader;
+      if(r == null) {
+        final SAXParserFactory f = SAXParserFactory.newInstance();
+        f.setNamespaceAware(true);
+        f.setValidating(false);
+        r = f.newSAXParser().getXMLReader();
+      }
       final SAXParser p = new SAXParser();
-      final XMLReader r = f.newSAXParser().getXMLReader();
       r.setDTDHandler(p);
       r.setContentHandler(p);
       r.setProperty("http://xml.org/sax/properties/lexical-handler", p);

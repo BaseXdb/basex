@@ -1,7 +1,6 @@
 package org.basex.query.xquery.iter;
 
 import static org.basex.query.xquery.XQText.*;
-
 import org.basex.BaseX;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQParser;
@@ -20,8 +19,6 @@ import org.basex.query.xquery.util.SeqBuilder;
 public abstract class Iter {
   /** Parser reference (should be stored outside expressions). */
   public XQParser parser;
-  /** Position in original query. */
-  public int qpos;
   
   /** Empty iterator. */
   public static final Iter EMPTY = new Iter() {

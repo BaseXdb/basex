@@ -548,7 +548,7 @@ public abstract class W3CTS {
       if(src == null) {
         // assign collection
         final NodIter col = new NodIter();
-        for(byte[] cl : colls.get(string(nm))) col.add(ctx.doc(cl));
+        for(final byte[] cl : colls.get(string(nm))) col.add(ctx.doc(cl));
         ctx.addColl(col, nm);
 
         if(var != null) {
