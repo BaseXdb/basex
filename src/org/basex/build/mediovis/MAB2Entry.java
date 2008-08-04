@@ -14,7 +14,7 @@ final class MAB2Entry {
   private final byte[] id;
   /** Children offsets. */
   long[] children;
-  /** File offset. */
+  /** File offset; 0 if no parent node exists. */
   long pos;
   /** Number of children. */
   int size;
