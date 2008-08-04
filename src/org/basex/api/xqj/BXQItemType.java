@@ -1,16 +1,14 @@
 package org.basex.api.xqj;
 
 import java.net.URI;
-
 import javax.xml.namespace.QName;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQSequenceType;
-
 import org.basex.query.xquery.item.Type;
 import org.basex.util.Token;
 
 /**
- * BaseX  XQuery item type.
+ * Java XQuery API - Item type.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler
@@ -28,8 +26,12 @@ public final class BXQItemType implements XQItemType {
       Type.IDR, null, Type.NMT
   };
 
-  /** Type itemType. */
-  final Type type;
+  /** Data Type. */
+  Type type;
+  /** Name. */
+  String name;
+  /** Occurrence. */
+  int occ = XQSequenceType.OCC_EXACTLY_ONE;
 
   /**
    * Constructor.
@@ -44,12 +46,36 @@ public final class BXQItemType implements XQItemType {
    * @param t type
    */
   public BXQItemType(final Type t) {
-    type = t;
+    this(t, null);
   }
 
-  public int getBaseType() {
-    for(int b = 0; b < BASE.length; b++) if(BASE[b] == type) return b;
-    return 0;
+  /**
+   * Constructor.
+   * @param t type
+   * @param nm name
+   */
+  public BXQItemType(final Type t, final String nm) {
+    type = t;
+    name = nm;
+  }
+
+  /**
+   * Constructor.
+   * @param t type
+   * @param o numeric value
+   */
+  public BXQItemType(final Type t, final int o) {
+    type = t;
+    occ = o;
+  }
+
+  public int getBaseType() throws BXQException {
+    if(type != Type.ELM && type != Type.ATT && type.unt)
+      throw new BXQException("Node must be element, attribute or atomic.");
+    for(int b = 0; b < BASE.length; b++) {
+      if(BASE[b] == type) return b;
+    }
+    throw new BXQException("Item has no base type.");
   }
 
   public int getItemKind() {
@@ -61,27 +87,34 @@ public final class BXQItemType implements XQItemType {
       case NOD: return XQITEMKIND_NODE;
       case PI : return XQITEMKIND_PI;
       case TXT: return XQITEMKIND_TEXT;
-      default : return XQITEMKIND_ITEM;
+      // [CG] not correct..
+      default : return type.unt ? XQITEMKIND_ITEM : XQITEMKIND_ATOMIC;
     }
   }
 
   public int getItemOccurrence() {
-    return XQSequenceType.OCC_EXACTLY_ONE;
+    return occ;
   }
 
-  public QName getNodeName() {
-    return type.node() ? new QName(type.name()) : null;
+  public QName getNodeName() throws BXQException {
+    if(type != Type.ELM && type != Type.ATT)
+      throw new BXQException("Node must be an element or attribute.");
+    return new QName(name);
   }
 
-  public String getPIName() {
-    return null;
+  public String getPIName() throws BXQException {
+    if(type != Type.PI)
+      throw new BXQException("Node must be a processing instruction.");
+    return name;
   }
 
   public URI getSchemaURI() {
     return null;
   }
 
-  public QName getTypeName() {
+  public QName getTypeName() throws BXQException {
+    if(type != Type.ELM && type != Type.ATT && type.unt)
+      throw new BXQException("Node must be element, attribute or atomic.");
     return new QName(Token.string(type.name));
   }
 

@@ -3,7 +3,7 @@ package org.basex.api.xqj;
 import javax.xml.xquery.XQException;
 
 /**
- * BaseX XQuery exception.
+ * Java XQuery API - Exception.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler

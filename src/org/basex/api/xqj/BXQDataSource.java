@@ -9,7 +9,7 @@ import javax.xml.xquery.XQException;
 import org.basex.core.Context;
 
 /**
- * BaseX  XQuery data source.
+ * Java XQuery API - Data Source.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler
@@ -25,6 +25,7 @@ public final class BXQDataSource implements XQDataSource {
    */
   public BXQDataSource() {
     ctx = new Context();
+    //org.basex.core.Prop.debug = true;
   }
 
   public BXQConnection getConnection() {
