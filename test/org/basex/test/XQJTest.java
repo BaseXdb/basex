@@ -5,6 +5,7 @@ import javax.xml.namespace.QName;
 import javax.xml.xquery.XQConnection;
 import javax.xml.xquery.XQDataSource;
 import javax.xml.xquery.XQExpression;
+import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQPreparedExpression;
 import javax.xml.xquery.XQResultSequence;
 import javax.xml.xquery.XQSequence;
@@ -118,9 +119,39 @@ public class XQJTest extends TestCase {
   public void test5() throws Exception {
     final XQConnection conn = conn(drv);
 
-    final XQExpression expr = conn.createExpression();
-    final XQSequence seq = expr.executeQuery("100.1");
-    seq.next();
-    System.out.println(seq.getByte());
+    conn.createItemFromString("Hello",
+        conn.createAtomicType(XQItemType.XQBASETYPE_NCNAME));
+  }
+
+  /**
+   * Test.
+   * @throws Exception exception
+   */
+  @Test
+  public void test6() throws Exception {
+    final XQConnection conn = conn(drv);
+
+    try {
+      conn.createItemFromInt(1000,
+          conn.createAtomicType(XQItemType.XQBASETYPE_BYTE));
+      fail("1000 cannot be converted to byte.");
+    } catch(final Exception ex) {
+    }
+  }
+
+  /**
+   * Test.
+   * @throws Exception exception
+   */
+  @Test
+  public void test7() throws Exception {
+    final XQConnection conn = conn(drv);
+
+    try {
+      conn.createItemFromByte((byte) 1,
+          conn.createAtomicType(XQItemType.XQBASETYPE_INTEGER));
+    } catch(final Exception ex) {
+      fail(ex.getMessage());
+    }
   }
 }

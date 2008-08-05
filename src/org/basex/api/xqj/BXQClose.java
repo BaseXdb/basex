@@ -1,5 +1,6 @@
 package org.basex.api.xqj;
 
+import static org.basex.api.xqj.BXQText.*;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -8,14 +9,13 @@ import java.io.InputStream;
 import java.io.Reader;
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItemType;
-import org.basex.BaseX;
 import org.basex.query.xquery.item.Type;
 
 /**
  * Java XQuery API - Closable objects.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
- * @author Andreas Weiler
+ * @author Christian Gruen
  */
 abstract class BXQClose {
   /** Closed flag. */
@@ -52,7 +52,7 @@ abstract class BXQClose {
    */
   protected final void check() throws XQException {
     if(isClosed())
-      throw new BXQException(getClass().getSimpleName() + " has been closed.");
+      throw new BXQException(getClass().getSimpleName() + CLOSED);
   }
   
   /**
@@ -61,7 +61,7 @@ abstract class BXQClose {
    * @throws XQException exception
    */
   protected static final void check(final Object obj) throws XQException {
-    if(obj == null) throw new BXQException("Specified object is null.");
+    if(obj == null) throw new BXQException(NULL);
   }
 
   /**
@@ -74,8 +74,9 @@ abstract class BXQClose {
   protected Type check(final XQItemType it, final Type t) throws XQException {
     check();
     final BXQItemType bit = (BXQItemType) it;
-    if(it != null && !t.instance(bit.type)) throw new BXQException(
-        BaseX.info("Wrong data type; % expected, % found", bit.type, t));
+    if(it != null && !bit.type.instance(t))
+    //if(it != null && !t.instance(bit.type))
+      throw new BXQException(WRONG, bit.type, t);
     return it != null ? bit.type : t;
   }
   

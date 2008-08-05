@@ -24,7 +24,7 @@ public final class BXQExpression extends BXQDynamicContext
    * @param c closer
    */
   BXQExpression(final BXQStaticContext sc, final BXQConnection c) {
-    super("", sc, c);
+    super(null, sc, c);
   }
 
   public void cancel() throws XQException {

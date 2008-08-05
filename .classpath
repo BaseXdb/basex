@@ -5,8 +5,5 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/basex"/>
-	<classpathentry kind="lib" path="/home/db/code/saxon/saxon9.jar"/>
-	<classpathentry kind="lib" path="/home/db/code/saxon/saxon9-xqj.jar"/>
-	<classpathentry kind="lib" path="/home/db/code/saxon/saxon9-dom.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

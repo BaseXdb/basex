@@ -1,6 +1,7 @@
 package org.basex.api.xqj;
 
 import javax.xml.xquery.XQException;
+import org.basex.BaseX;
 
 /**
  * Java XQuery API - Exception.
@@ -18,11 +19,12 @@ final class BXQException extends XQException {
      setStackTrace(ex.getStackTrace());
   }
 
-  /** 
-   * Constructor.
-   * @param msg query message
+  /**
+   * Constructs an exception with the specified message and extension.
+   * @param s message
+   * @param e message extension
    */
-  BXQException(String msg) {
-     super(msg);
+  public BXQException(final String s, final Object... e) {
+    super(BaseX.info(s, e));
   }
 }

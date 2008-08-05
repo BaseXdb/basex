@@ -1,5 +1,6 @@
 package org.basex.api.xqj;
 
+import static org.basex.api.xqj.BXQText.*;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.util.Properties;
@@ -19,6 +20,8 @@ public final class BXQDataSource implements XQDataSource {
   private final Context ctx;
   /** Log output (currently ignored). */
   private PrintWriter log;
+  /** Timeout. */
+  private int timeout;
 
   /**
    * Constructor.
@@ -33,7 +36,7 @@ public final class BXQDataSource implements XQDataSource {
   }
 
   public XQConnection getConnection(final Connection c) throws XQException {
-    throw new BXQException("SQL sources not supported.");
+    throw new BXQException(SQL);
   }
 
   public XQConnection getConnection(final String name, final String pw) {
@@ -41,7 +44,7 @@ public final class BXQDataSource implements XQDataSource {
   }
 
   public int getLoginTimeout() {
-    return 0;
+    return timeout;
   }
 
   public PrintWriter getLogWriter() {
@@ -49,7 +52,7 @@ public final class BXQDataSource implements XQDataSource {
   }
 
   public String getProperty(final String key) throws XQException {
-    throw new BXQException("No property support.");
+    throw new BXQException(PROPS);
   }
 
   public String[] getSupportedPropertyNames() {
@@ -57,6 +60,7 @@ public final class BXQDataSource implements XQDataSource {
   }
 
   public void setLoginTimeout(final int to) {
+    timeout = to;
   }
 
   public void setLogWriter(final PrintWriter out) {
@@ -64,10 +68,10 @@ public final class BXQDataSource implements XQDataSource {
   }
 
   public void setProperties(final Properties prop) throws XQException {
-    throw new BXQException("No property support.");
+    throw new BXQException(PROPS);
   }
 
   public void setProperty(final String key, final String val) throws XQException {
-    throw new BXQException("No property support.");
+    throw new BXQException(PROPS);
   }
 }

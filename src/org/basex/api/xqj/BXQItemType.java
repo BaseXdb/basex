@@ -1,5 +1,6 @@
 package org.basex.api.xqj;
 
+import static org.basex.api.xqj.BXQText.*;
 import java.net.URI;
 import javax.xml.namespace.QName;
 import javax.xml.xquery.XQItemType;
@@ -71,11 +72,11 @@ public final class BXQItemType implements XQItemType {
 
   public int getBaseType() throws BXQException {
     if(type != Type.ELM && type != Type.ATT && type.unt)
-      throw new BXQException("Node must be element, attribute or atomic.");
+      throw new BXQException(ELMATT);
     for(int b = 0; b < BASE.length; b++) {
       if(BASE[b] == type) return b;
     }
-    throw new BXQException("Item has no base type.");
+    throw new BXQException(NOBASE);
   }
 
   public int getItemKind() {
@@ -97,14 +98,12 @@ public final class BXQItemType implements XQItemType {
   }
 
   public QName getNodeName() throws BXQException {
-    if(type != Type.ELM && type != Type.ATT)
-      throw new BXQException("Node must be an element or attribute.");
+    if(type != Type.ELM && type != Type.ATT) throw new BXQException(ELMATT1);
     return new QName(name);
   }
 
   public String getPIName() throws BXQException {
-    if(type != Type.PI)
-      throw new BXQException("Node must be a processing instruction.");
+    if(type != Type.PI) throw new BXQException(PI);
     return name;
   }
 
@@ -114,7 +113,7 @@ public final class BXQItemType implements XQItemType {
 
   public QName getTypeName() throws BXQException {
     if(type != Type.ELM && type != Type.ATT && type.unt)
-      throw new BXQException("Node must be element, attribute or atomic.");
+      throw new BXQException(ELMATT);
     return new QName(Token.string(type.name));
   }
 
@@ -128,5 +127,10 @@ public final class BXQItemType implements XQItemType {
 
   public XQItemType getItemType() {
     return this;
+  }
+
+  @Override
+  public String toString() {
+    return "xs:" + Token.string(type.name);
   }
 }

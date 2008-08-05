@@ -46,9 +46,9 @@ abstract class BXQDynamicContext extends BXQClose implements XQDynamicContext {
 
   /**
    * Constructor.
+   * @param in query input
    * @param c closer
    * @param sc static context
-   * @param in query input
    */
   protected BXQDynamicContext(final String in, final BXQStaticContext sc,
       final BXQConnection c) {

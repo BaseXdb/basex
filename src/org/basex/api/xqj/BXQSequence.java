@@ -1,5 +1,6 @@
 package org.basex.api.xqj;
 
+import static org.basex.api.xqj.BXQText.*;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URI;
@@ -26,8 +27,6 @@ import org.xml.sax.ContentHandler;
  * @author Andreas Weiler
  */
 public final class BXQSequence extends BXQClose implements XQResultSequence {
-  /** Forward-Only error message. */
-  private static final String FORWARD = "Sequence is forwards-only";
   /** Result iterator. */
   private final Iter result;
   /** Query context. */
@@ -163,8 +162,7 @@ public final class BXQSequence extends BXQClose implements XQResultSequence {
   
   public String getSequenceAsString(final Properties p) throws XQException {
     check();
-    if(it != null && !next)
-      throw new BXQException("Current item was already requested.");
+    if(it != null && !next) throw new BXQException(TWICE);
     final StringBuilder sb = new StringBuilder();
     while(next()) sb.append(item().getItemAsString(p));
     return sb.toString();
@@ -263,16 +261,14 @@ public final class BXQSequence extends BXQClose implements XQResultSequence {
   public void writeSequence(final OutputStream os, final Properties p)
       throws XQException {
     check();
-    if(it != null && !next)
-      throw new BXQException("Current item was already requested.");
+    if(it != null && !next) throw new BXQException(TWICE);
     while(next()) item().writeItem(os, p);
   }
 
   public void writeSequence(final Writer ow, final Properties p)
       throws XQException {
     check();
-    if(it != null && !next) 
-      throw new BXQException("Current item was already requested.");
+    if(it != null && !next) throw new BXQException(TWICE);
     while(next()) item().writeItem(ow, p);
   }
 
@@ -295,7 +291,7 @@ public final class BXQSequence extends BXQClose implements XQResultSequence {
    */
   private BXQItem item() throws XQException {
     pos();
-    if(!next) throw new BXQException("Current item was already requested.");
+    if(!next) throw new BXQException(TWICE);
     next = sc.scrollable;
     return it;
   }
@@ -305,7 +301,7 @@ public final class BXQSequence extends BXQClose implements XQResultSequence {
    * @throws XQException xquery exception
    */
   private void pos() throws XQException {
-    if(!isOnItem()) throw new BXQException("Cursor does not point to an item.");
+    if(!isOnItem()) throw new BXQException(CURSOR);
   }
 
   /**

@@ -106,7 +106,7 @@ public class BXCollection implements Collection {
    * @see org.xmldb.api.base.Collection#getService(java.lang.String, java.lang.String)
    */
   public Service getService(String name, String version) {
-    if(name.startsWith("XPath")) {
+    if(name.startsWith("XPathQueryService")) {
     return new BXXPathQueryService(ctx);
     } 
     return null;

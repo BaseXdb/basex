@@ -1,8 +1,8 @@
 package org.basex.api.xqj;
 
+import static org.basex.api.xqj.BXQText.*;
 import java.nio.charset.Charset;
 import java.util.Set;
-
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQMetaData;
 import org.basex.Text;
@@ -34,12 +34,12 @@ public class BXQMetaData extends BXQClose implements XQMetaData {
 
   public int getProductMajorVersion() throws XQException {
     check();
-    return Integer.parseInt(Text.VERSION.replaceAll("\\..*", ""));
+    return version(Text.VERSION, true);
   }
 
   public int getProductMinorVersion() throws XQException {
     check();
-    return Integer.parseInt(Text.VERSION.replaceAll(".*\\.", ""));
+    return version(Text.VERSION, false);
   }
 
   public String getProductName() throws XQException {
@@ -64,17 +64,17 @@ public class BXQMetaData extends BXQClose implements XQMetaData {
 
   public int getXQJMajorVersion() throws XQException {
     check();
-    return 1;
+    return version(VERSION, true);
   }
 
   public int getXQJMinorVersion() throws XQException {
     check();
-    return 0;
+    return version(VERSION, false);
   }
 
   public String getXQJVersion() throws XQException {
     check();
-    return "1.0";
+    return VERSION;
   }
 
   public boolean isFullAxisFeatureSupported() throws XQException {
@@ -145,5 +145,15 @@ public class BXQMetaData extends BXQClose implements XQMetaData {
   public boolean wasCreatedFromJDBCConnection() throws XQException {
     check();
     return false;
+  }
+
+  /**
+   * Returns the pre- or suffix of the specified version.
+   * @param t input version
+   * @param pre flag
+   * @return pre or suffix
+   */
+  private int version(final String t, final boolean pre) {
+    return Integer.parseInt(t.replaceAll(pre ? ".*\\." : "\\..*", ""));
   }
 }

@@ -1,0 +1,45 @@
+package org.basex.api.xqj;
+
+/**
+ * Java XQuery API - Texts.
+ * 
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Christian Gruen
+ */
+public interface BXQText {
+  /** Java XQuery API version. */
+  String VERSION = "1.0";
+  /** Temporary database instance (skip?). */
+  String TMP = "tmp";
+
+  /** Error Message. */
+  String CLOSED = " has been closed.";
+  /** Error Message. */
+  String NULL = "Specified object is null.";
+  /** Error Message. */
+  String WRONG = "Wrong data type; % expected, % found";
+  /** Error Message. */
+  String SQL = "SQL sources not supported.";
+  /** Error Message. */
+  String PROPS = "No property support.";
+  /** Error Message. */
+  String NODE = "Current item is not a node.";
+  /** Error Message. */
+  String ATTR = "Cannot serialize top-level attributes.";
+  /** Error Message. */
+  String NUM = "Number is no integer.";
+  /** Error Message. */
+  String ELMATT = "Node must be element, attribute or atomic.";
+  /** Error Message. */
+  String ELMATT1 = "Node must be element, attribute or atomic.";
+  /** Error Message. */
+  String PI = "Node must be a processing instruction.";
+  /** Error Message. */
+  String NOBASE = "Item has no base type.";
+  /** Error Message. */
+  String TWICE = "Current item was already requested.";
+  /** Error Message. */
+  String FORWARD = "Sequence is forwards-only";
+  /** Error Message. */
+  String CURSOR = "Cursor does not point to an item.";
+}

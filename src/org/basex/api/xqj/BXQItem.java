@@ -1,5 +1,6 @@
 package org.basex.api.xqj;
 
+import static org.basex.api.xqj.BXQText.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
@@ -85,7 +86,6 @@ public final class BXQItem extends BXQClose implements XQResultItem {
 
   public float getFloat() throws XQException {
     try {
-      //return (float) cast(Type.FLT).dbl();
       return check(Type.FLT).flt();
     } catch(final org.basex.query.xquery.XQException ex) {
       throw new BXQException(ex);
@@ -122,7 +122,7 @@ public final class BXQItem extends BXQClose implements XQResultItem {
 
   public URI getNodeUri() throws XQException {
     check();
-    if(!it.node()) throw new BXQException("Current item is not a node.");
+    if(!it.node()) throw new BXQException(NODE);
     final org.basex.query.xquery.item.Node node =
       (org.basex.query.xquery.item.Node) it;
     try {
@@ -174,8 +174,7 @@ public final class BXQItem extends BXQClose implements XQResultItem {
     try {
       final CachedOutput co = new CachedOutput();
       final XMLSerializer ser = new XMLSerializer(co);
-      if(it.type == Type.ATT) throw new BXQException(
-        "Cannot serialize top-level attributes.");
+      if(it.type == Type.ATT) throw new BXQException(ATTR);
       it.serialize(ser, ctx, 0);
       return co;
     } catch(final IOException ex) {
@@ -206,8 +205,7 @@ public final class BXQItem extends BXQClose implements XQResultItem {
    */
   private Item check(final Type type) throws XQException {
     check();
-    if(!it.type.instance(type)) throw new BXQException(
-        BaseX.info("Wrong data type; % expected, % found", it.type, type));
+    if(!it.type.instance(type)) throw new BXQException(WRONG, it.type, type);
     return it;
   }
 
@@ -235,10 +233,8 @@ public final class BXQItem extends BXQClose implements XQResultItem {
   private long castItr(final Type type) throws XQException {
     check();
     try {
-      double d = it.dbl();
-      if(!it.n() || d != (long) d) {
-        throw new BXQException("Number is not integer.");
-      }
+      final double d = it.dbl();
+      if(!it.n() || d != (long) d) throw new BXQException(NUM);
       return cast(type).itr();
     } catch(org.basex.query.xquery.XQException ex) {
       throw new BXQException(ex);

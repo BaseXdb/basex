@@ -40,7 +40,8 @@ public final class BXQConnection extends BXQDataFactory
     return createExpression(ctx);
   }
 
-  public XQExpression createExpression(final XQStaticContext sc) throws XQException {
+  public XQExpression createExpression(final XQStaticContext sc)
+      throws XQException {
     check();
     check(sc);
     final BXQStaticContext bsc = (BXQStaticContext) sc;
