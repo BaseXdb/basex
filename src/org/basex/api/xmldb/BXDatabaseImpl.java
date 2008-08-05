@@ -19,8 +19,11 @@ public class BXDatabaseImpl implements Database {
   public static final String BASEXDB_URI = "basex://";
   /** Instance Name. */
   public static final String INSTANCE_NAME = "basex";
+  /** Localhost Name. */
+  public static final String LOCALHOST = "localhost:8080/";
   /** Conformance Level of the implementation. */
   public static final String CONFORMANCE_LEVEL = "0";
+  
 
   /**
    * Constructor.
@@ -44,9 +47,14 @@ public class BXDatabaseImpl implements Database {
     // create database context
     final Context ctx = new Context();
     if(uri.startsWith(BASEXDB_URI)) {
-      final String tmp = uri.substring(uri.lastIndexOf('/'));
+      final String host = uri.substring(BASEXDB_URI.length());
+      if(host.startsWith(LOCALHOST)) {
+      final String tmp = host.substring(LOCALHOST.length());
       if(new Open(tmp).execute(ctx)) {
         return new BXCollection(ctx);
+      }
+      } else {
+        throw new XMLDBException(1, "Not implemented yet");
       }
     } else {
       throw new XMLDBException(ErrorCodes.INVALID_URI);
