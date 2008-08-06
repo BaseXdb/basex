@@ -40,8 +40,6 @@ public final class MAB2Parser extends Parser {
   private final TokenMap posters = new TokenMap();
   /** Genre assignments. */
   private final TokenMap genres = new TokenMap();
-  /** MAB2 index. */
-  private final Map<MAB2Entry> ids = new Map<MAB2Entry>();
   /** Builder listener. */
   private Builder builder;
   /** MAB2 input. */
@@ -142,6 +140,9 @@ public final class MAB2Parser extends Parser {
     // find file offsets of all titles
     final Performance p = new Performance();
 
+    /** MAB2 Entries. */
+    final Map<MAB2Entry> ids = new Map<MAB2Entry>();
+
     int i = 0;
     byte[] id;
     while((id = id(input)) != null) {
@@ -175,16 +176,14 @@ public final class MAB2Parser extends Parser {
     for(i = 1; i < is; i++) {
       final MAB2Entry entry = ids.value(i);
       final long pos = entry.pos;
-      final int es = entry.size;
-      // is correct...
-      if(pos != 0) {
-        final byte[] last = addEntry(input, pos, es, null, true);
-        addChildren(input, entry, last);
-        if(!Prop.mab2flat) builder.endElem(MEDIUM);
-      } else {
-        // no top entry exists... treat children as top entries
-        addChildren(input, entry, null);
+      // check if top entry exists...
+      byte[] l = pos != 0 ? addEntry(input, pos, entry.size, null, true) : null;
+      // loop through all children...
+      for(int j = 0; j < entry.size; j++) {
+        addEntry(input, entry.children[j], 0, l, false);
       }
+      if(entry.size != 0 && pos != 0 && !Prop.mab2flat) builder.endElem(MEDIUM);
+      
       if(Prop.debug) {
         if(i % 50000 == 0) BaseX.err(" " + i + "\n");
         else if(i % 5000 == 0) BaseX.err("!");
@@ -209,7 +208,7 @@ public final class MAB2Parser extends Parser {
     }
     out.close();
   }
-
+  
   /**
    * Returns the next id.
    * @param in input stream
@@ -283,29 +282,12 @@ public final class MAB2Parser extends Parser {
   }
 
   /**
-   * Adds children of a title.
-   * @param in input stream
-   * @param entry mab2 entry
-   * @param last last top title
-   * @throws IOException I/O exception
-   */
-  private void addChildren(final RandomAccess in, final MAB2Entry entry,
-      final byte[] last) throws IOException {
-
-    final int es = entry.size;
-    for(int j = 0; j < es; j++) {
-      addEntry(in, entry.children[j], 0, last, false);
-      builder.endElem(MEDIUM);
-    }
-  }
-
-  /**
    * Adds an entry.
    * @param in input stream
    * @param pos file offset to start from
    * @param sub number of subordinate titles
    * @param last last title
-   * "param top top flag
+   * @param top top flag
    * @return last title
    * @throws IOException I/O exception
    */
@@ -333,6 +315,7 @@ public final class MAB2Parser extends Parser {
     nrInst = 0;
     shortTitle = false;
 
+    // position disk cursor
     in.cursor(pos);
 
     // collect meta-data
@@ -346,7 +329,7 @@ public final class MAB2Parser extends Parser {
         final int n = Token.toInt(line, 0, 3);
         if(n == 1) {
           if(bibID == null) {
-            bibID = num(line);
+            bibID = string(line);
             mvID = mvids.get(bibID);
             if(mvID == null) {
               mvID = Token.token(++maxid);
@@ -402,17 +385,21 @@ public final class MAB2Parser extends Parser {
         }
       } else {
         byte[][] atts = null;
-        if(sub == 0) {
+        if(sub == 0 || Prop.mab2flat) {
           atts = new byte[][] { MV_ID, mvID, BIB_ID, bibID };
         } else {
           atts = new byte[][] { MV_ID, mvID, BIB_ID, bibID, MAX,
               Token.token(sub) };
         }
 
-        if(last != null && title != null && !eq(last, title))
-          title = concat(last, SEMI, title);
+        // merge super and sub titles
+        if(last != null) {
+          if(title == null) title = last;
+          else if(!eq(last, title)) title = concat(last, SEMI, title);
+        }
 
-        if(!top || !Prop.mab2flat) {
+        // no flat view - create top title
+        if(!top || !Prop.mab2flat || sub == 0) {
           builder.startElem(MEDIUM, atts);
           addTag(TYPE, type);
           addTag(LANGUAGE, language);
@@ -437,6 +424,7 @@ public final class MAB2Parser extends Parser {
           addTag(ISBN, isbn);
           addTag(POSTER, posters.get(bibID));
           addTag(GENRE, genres.get(mvID));
+          if(sub == 0) builder.endElem(MEDIUM);          
         }
         return title;
       }
