@@ -52,14 +52,10 @@ public class BXDatabaseImpl implements Database {
       final String tmp = host.substring(LOCALHOST.length());
       if(new Open(tmp).execute(ctx)) {
         return new BXCollection(ctx);
+        }
       }
-      } else {
-        throw new XMLDBException(1, "Not implemented yet");
-      }
-    } else {
-      throw new XMLDBException(ErrorCodes.INVALID_URI);
     }
-    return null;
+    throw new XMLDBException(ErrorCodes.INVALID_URI);
   }
 
   /**

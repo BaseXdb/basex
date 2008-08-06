@@ -2,6 +2,7 @@ package org.basex.api.xmldb;
 
 import org.xmldb.api.base.*;
 import org.basex.core.Context;
+import org.basex.core.proc.Open;
 
 /**
  * Implementation of the Collection Interface for the XMLDB:API
@@ -89,10 +90,13 @@ public class BXCollection implements Collection {
   /**
    * @see org.xmldb.api.base.Collection#getResource(java.lang.String)
    */
-  public Resource getResource(String id) {
-    // TODO Auto-generated method stub
-    return null;
+  public Resource getResource(String id) throws XMLDBException {
+    if(new Open(id).execute(ctx)) {
+      return new BXXMLResource(ctx);
+      }
+    throw new XMLDBException(ErrorCodes.NO_SUCH_RESOURCE);
   }
+
 
   /**
    * @see org.xmldb.api.base.Collection#getResourceCount()
@@ -105,11 +109,11 @@ public class BXCollection implements Collection {
   /**
    * @see org.xmldb.api.base.Collection#getService(java.lang.String, java.lang.String)
    */
-  public Service getService(String name, String version) {
+  public Service getService(String name, String version) throws XMLDBException {
     if(name.equals("XPathQueryService")) {
     return new BXXPathQueryService(ctx);
     } 
-    return null;
+    throw new XMLDBException(ErrorCodes.NO_SUCH_SERVICE);
   }
 
   /**

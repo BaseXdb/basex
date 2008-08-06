@@ -1,9 +1,26 @@
 package org.basex.api.xmldb;
 
+import org.basex.BaseX;
+import org.basex.core.Context;
+import org.basex.data.XMLSerializer;
+import org.basex.io.CachedOutput;
 import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.modules.XMLResource;
+import org.basex.data.Nodes;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import org.w3c.dom.Document;
+import java.io.IOException;
+//import java.io.File;
+import org.xmldb.api.base.XMLDBException;
+import org.xml.sax.SAXException;
+import javax.xml.parsers.ParserConfigurationException;
+//import org.xml.sax.InputSource;
+//import java.io.StringReader;
+//import java.io.FileReader;
+//import java.io.FileInputStream;
 
 /**
  * Implementation of the XMLResource Interface for the XMLDB:API
@@ -12,21 +29,58 @@ import org.xmldb.api.modules.XMLResource;
  * @author Andreas Weiler
  */
 public class BXXMLResource implements XMLResource {
+  
+  /** Context ctx */
+  Context ctx;
+  
+  /**
+   * Standard constructor.
+   * @param ctx for Context
+   */
+  public BXXMLResource(Context ctx) {
+    this.ctx = ctx;
+  }
 
   /**
    * @see org.xmldb.api.base.Resource#getContent()
    */
   public Object getContent() {
-    // TODO Auto-generated method stub
+    Nodes nodes = ctx.current();
+    try {
+      final CachedOutput out = new CachedOutput();
+      final boolean chop = ctx.data().meta.chop;
+      nodes.serialize(new XMLSerializer(out, false, chop));
+      return out.toString();
+    } catch(final Exception ex) {
+      BaseX.debug(ex);
+    }
     return null;
   }
 
   /**
    * @see org.xmldb.api.modules.XMLResource#getContentAsDOM()
    */
-  public Node getContentAsDOM() {
-    // TODO Auto-generated method stub
-    return null;
+  public Node getContentAsDOM() throws XMLDBException {
+    try
+    {
+    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    //factory.setNamespaceAware(true);
+    //factory.setValidating(false);
+    DocumentBuilder builder = factory.newDocumentBuilder();
+    Document doc = builder.parse("");
+    return doc;
+    } catch(SAXException saxe)
+    {
+        throw new XMLDBException(1, saxe.getMessage());
+    }
+    catch(ParserConfigurationException pce)
+    {
+        throw new XMLDBException(1, pce.getMessage());
+    }
+    catch(IOException ioe)
+    {
+        throw new XMLDBException(1, ioe.getMessage());
+    }
   }
 
   /**

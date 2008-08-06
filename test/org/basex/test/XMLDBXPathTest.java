@@ -3,6 +3,7 @@ package org.basex.test;
 import org.xmldb.api.base.*;
 import org.xmldb.api.modules.*;
 import org.xmldb.api.*;
+import org.w3c.dom.Document;
 
 /**
  * Test for the XMLDB:API
@@ -36,11 +37,26 @@ public class XMLDBXPathTest {
       ResourceSet resultSet = service.query(query);
       
       ResourceIterator results = resultSet.getIterator();
-      
+                     
       while(results.hasMoreResources()) {
         Resource res = results.nextResource();
         System.out.println(res.getContent());
       }
+      
+      String id = "input";
+      
+      /* Test XML Document Retrieval */
+      XMLResource resource = 
+         (XMLResource) col.getResource(id);
+      String doc = (String) resource.getContent();
+      System.out.println(doc);
+      
+      /* DOM Document Retrieval*/
+      XMLResource resource2 = 
+         (XMLResource) col.getResource(id);
+      Document doc2 = (Document) resource2.getContentAsDOM();
+      System.out.println(doc2);
+
     } catch(XMLDBException e) {
       System.err.println("XML:DB Exception occured " + e.errorCode);
       e.printStackTrace();
