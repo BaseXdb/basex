@@ -177,10 +177,10 @@ public final class MAB2Parser extends Parser {
       final MAB2Entry entry = ids.value(i);
       final long pos = entry.pos;
       // check if top entry exists...
-      byte[] l = pos != 0 ? addEntry(input, pos, entry.size, null, true) : null;
+      byte[] l = pos != 0 ? addEntry(input, pos, entry.size, null) : null;
       // loop through all children...
       for(int j = 0; j < entry.size; j++) {
-        addEntry(input, entry.children[j], 0, l, false);
+        addEntry(input, entry.children[j], 0, l);
       }
       if(entry.size != 0 && pos != 0 && !Prop.mab2flat) builder.endElem(MEDIUM);
       
@@ -287,12 +287,11 @@ public final class MAB2Parser extends Parser {
    * @param pos file offset to start from
    * @param sub number of subordinate titles
    * @param last last title
-   * @param top top flag
    * @return last title
    * @throws IOException I/O exception
    */
   private byte[] addEntry(final RandomAccess in, final long pos, final int sub,
-      final byte[] last, final boolean top) throws IOException {
+      final byte[] last) throws IOException {
 
     mvID = null;
     bibID = null;
@@ -398,34 +397,35 @@ public final class MAB2Parser extends Parser {
           else if(!eq(last, title)) title = concat(last, SEMI, title);
         }
 
-        // no flat view - create top title
-        if(!top || !Prop.mab2flat || sub == 0) {
-          builder.startElem(MEDIUM, atts);
-          addTag(TYPE, type);
-          addTag(LANGUAGE, language);
-          for(int s = 0; s < nrPers; s++) addTag(PERSON, pers[s]);
-          for(int s = 0; s < nrInst; s++) addTag(INSTITUTE, inst[s]);
-          addTag(ORIGINAL, original);
-          addTag(TITLE, title);
-          addTag(SUBTITLE, subtitle);
-          addTag(DESCRIPTION, description);
-          addTag(TOWN, town);
-          addTag(PUBLISHER, publisher);
-          addTag(YEAR, year);
-          addTag(FORMAT, format);
-          addTag(DETAILS, details);
-          addTag(NOTE, note);
-          for(int s = 0; s < nrSigs; s++) addTag(SIGNATURE, sig[s]);
-          // actually: several subjects/lending numbers per medium..
-          for(int s = 0; s < nrSigs; s++) {
-            if(subject == null) subject = subjects.get(subject(sig[s]));
-          }
-          addTag(SUBJECT, subject);
-          addTag(ISBN, isbn);
-          addTag(POSTER, posters.get(bibID));
-          addTag(GENRE, genres.get(mvID));
-          if(sub == 0) builder.endElem(MEDIUM);          
+        // add line below to omit root nodes
+        //if(!top || !Prop.mab2flat || sub == 0) {
+        builder.startElem(MEDIUM, atts);
+        addTag(TYPE, type);
+        addTag(LANGUAGE, language);
+        for(int s = 0; s < nrPers; s++) addTag(PERSON, pers[s]);
+        for(int s = 0; s < nrInst; s++) addTag(INSTITUTE, inst[s]);
+        addTag(ORIGINAL, original);
+        addTag(TITLE, title);
+        addTag(SUBTITLE, subtitle);
+        addTag(DESCRIPTION, description);
+        addTag(TOWN, town);
+        addTag(PUBLISHER, publisher);
+        addTag(YEAR, year);
+        addTag(FORMAT, format);
+        addTag(DETAILS, details);
+        addTag(NOTE, note);
+        for(int s = 0; s < nrSigs; s++) addTag(SIGNATURE, sig[s]);
+        // actually: several subjects/lending numbers per medium..
+        for(int s = 0; s < nrSigs; s++) {
+          if(subject == null) subject = subjects.get(subject(sig[s]));
         }
+        addTag(SUBJECT, subject);
+        addTag(ISBN, isbn);
+        addTag(POSTER, posters.get(bibID));
+        addTag(GENRE, genres.get(mvID));
+        if(sub == 0 || Prop.mab2flat) builder.endElem(MEDIUM);
+        //if(sub == 0) builder.endElem(MEDIUM);          
+
         return title;
       }
     }
