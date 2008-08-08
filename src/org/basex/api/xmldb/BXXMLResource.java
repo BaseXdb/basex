@@ -127,8 +127,7 @@ public class BXXMLResource implements XMLResource {
    * @see org.xmldb.api.base.Resource#getId()
    */
   public String getId() {
-    // TODO Auto-generated method stub
-    return null;
+    return ctx.data().meta.dbname;
   }
 
   /**

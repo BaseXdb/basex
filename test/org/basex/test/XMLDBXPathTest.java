@@ -4,6 +4,7 @@ import org.xmldb.api.base.*;
 import org.xmldb.api.modules.*;
 import org.xmldb.api.*;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -30,14 +31,14 @@ public class XMLDBXPathTest {
    * @exception Exception Exception.
    */
   public static void main(String[] args) throws Exception {
-    Collection col = null;
+    Collection collection = null;
     try {
       Class<?> c = Class.forName(driver);
       Database database = (Database) c.newInstance();
       DatabaseManager.registerDatabase(database);
-      col = DatabaseManager.getCollection(url);
+      collection = DatabaseManager.getCollection(url);
 
-      XPathQueryService service = (XPathQueryService) col.getService(
+      XPathQueryService service = (XPathQueryService) collection.getService(
           "XPathQueryService", "1.0");
       ResourceSet resultSet = service.query(query);
       
@@ -50,7 +51,7 @@ public class XMLDBXPathTest {
       
       String id = "input";
       XMLResource resource = 
-        (XMLResource) col.getResource(id);
+        (XMLResource) collection.getResource(id);
       
       /* Test XML Document Retrieval */
       String cont = (String) resource.getContent();
@@ -71,6 +72,16 @@ public class XMLDBXPathTest {
       ContentHandler handler = sax.getContentHandler();
       resource.getContentAsSAX(handler);
       
+      /* DOM Node Retrieval*/
+      Node node = resource.getContentAsDOM();
+      System.out.println("------DOM Node Retrieval------");
+      TransformerFactory.newInstance().newTransformer().transform(
+                      new DOMSource(node), new StreamResult(System.out));
+      System.out.println("------DOM Node Retrieval END------");
+
+      /* Deleting a Resource*/
+      collection.removeResource(collection.getResource(id));
+      
       /* Binary Content Retrieval*/
       /*BinaryResource resource2 = 
          (BinaryResource) col.getResource(id);
@@ -86,8 +97,8 @@ public class XMLDBXPathTest {
       System.err.println("XML:DB Exception occured " + e.errorCode);
       e.printStackTrace();
     } finally {
-      if(col != null) {
-        col.close();
+      if(collection != null) {
+        collection.close();
       }
     }
   }

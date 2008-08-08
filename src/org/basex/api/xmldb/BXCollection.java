@@ -3,6 +3,8 @@ package org.basex.api.xmldb;
 import org.xmldb.api.base.*;
 import org.basex.core.Context;
 import org.basex.core.proc.Open;
+import org.basex.core.proc.Check;
+import org.basex.core.proc.DropDB;
 
 /**
  * Implementation of the Collection Interface for the XMLDB:API
@@ -151,9 +153,12 @@ public class BXCollection implements Collection {
   /**
    * @see org.xmldb.api.base.Collection#removeResource(org.xmldb.api.base.Resource)
    */
-  public void removeResource(Resource res) {
-    // TODO Auto-generated method stub
-    
+  public void removeResource(Resource res) throws XMLDBException {
+    if(new Check(res.getId()).execute(ctx)) {
+      new DropDB(res.getId()).execute(ctx);
+      }
+    else { throw new XMLDBException(ErrorCodes.NO_SUCH_RESOURCE); 
+    }
   }
 
   /**
