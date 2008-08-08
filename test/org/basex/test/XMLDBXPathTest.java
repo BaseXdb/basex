@@ -4,6 +4,11 @@ import org.xmldb.api.base.*;
 import org.xmldb.api.modules.*;
 import org.xmldb.api.*;
 import org.w3c.dom.Document;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.xml.sax.ContentHandler;
+import org.basex.data.SAXSerializer;
 
 /**
  * Test for the XMLDB:API
@@ -44,18 +49,38 @@ public class XMLDBXPathTest {
       }
       
       String id = "input";
+      XMLResource resource = 
+        (XMLResource) col.getResource(id);
       
       /* Test XML Document Retrieval */
-      XMLResource resource = 
-         (XMLResource) col.getResource(id);
-      String doc = (String) resource.getContent();
-      System.out.println(doc);
+      String cont = (String) resource.getContent();
+      System.out.println("------XML Document Retrieval------");
+      System.out.println(cont);
+      System.out.println("------XML Document Retrieval END------");
       
       /* DOM Document Retrieval*/
-      XMLResource resource2 = 
-         (XMLResource) col.getResource(id);
-      Document doc2 = (Document) resource2.getContentAsDOM();
-      System.out.println(doc2);
+      Document doc = (Document) resource.getContentAsDOM();
+      System.out.println("------DOC Document Retrieval------");
+      TransformerFactory.newInstance().newTransformer().transform(
+                      new DOMSource(doc), new StreamResult(System.out));
+      System.out.println("------DOC Document Retrieval END------");
+      
+      /* SAX Document Retrieval*/
+      SAXSerializer sax = new SAXSerializer(null);
+      // A custom SAX Content Handler is required to handle the SAX events
+      ContentHandler handler = sax.getContentHandler();
+      resource.getContentAsSAX(handler);
+      
+      /* Binary Content Retrieval*/
+      /*BinaryResource resource2 = 
+         (BinaryResource) col.getResource(id);
+      // Return value of getContent must be defined in the specific language mapping
+      // for the language used. For Java this is a byte array.
+      byte[] img = (byte[]) resource2.getContent();
+      System.out.println("------Binary Content Retrieval------");
+      System.out.println(new String(img));
+      System.out.println("------Binary Content Retrieval END------");*/
+                     
 
     } catch(XMLDBException e) {
       System.err.println("XML:DB Exception occured " + e.errorCode);
