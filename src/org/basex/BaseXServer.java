@@ -1,12 +1,15 @@
 package org.basex;
 
+import static org.basex.Text.*;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.BindException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import org.basex.core.ClientProcess;
 import org.basex.core.CommandParser;
 import org.basex.core.Context;
@@ -16,28 +19,25 @@ import org.basex.core.proc.Exit;
 import org.basex.core.proc.GetInfo;
 import org.basex.core.proc.GetResult;
 import org.basex.io.BufferedOutput;
-import org.basex.io.ConsoleOutput;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
+import org.basex.util.Action;
 import org.basex.util.Performance;
 import org.basex.util.Token;
-import static org.basex.Text.*;
 
 /**
  * This is the starter class for the database server.
  * It handles incoming requests and offers some simple threading to
  * allow simultaneous database requests.
  * Add the '-h' option to get a list on all available command-line arguments.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  * @author Stefan Klinger
  */
 public final class BaseXServer {
-  /** Maximum number of simultaneous connections. */
-  private static final int MAX = 10;
-  /** Time out in nanoseconds. */
-  private static final long TIMEOUT = 180 * 1000000000;
+  /** Session time out in seconds. */
+  private static final long TIMEOUT = 5;
 
   /** Database Context. */
   final Context context = new Context();
@@ -45,16 +45,10 @@ public final class BaseXServer {
   boolean running = true;
   /** Verbose mode. */
   boolean verbose;
-  
-  /** Client ip addresses. */
-  private final String[] client = new String[MAX];
-  /** Core reference. */
-  private final long[] time = new long[MAX];
-  /** Core reference. */
-  private final Process[] corc = new Process[MAX];
-  /* Core reference.
-  private final Proc[] core = new Proc[MAX]; */
-  
+
+  /** Current client connections. */
+  private final ArrayList<BaseXSession> sess = new ArrayList<BaseXSession>();
+
   /**
    * Main method, launching the server process.
    * Command-line arguments can be listed with the <code>-h</code> argument.
@@ -63,9 +57,9 @@ public final class BaseXServer {
   public static void main(final String[] args) {
     new BaseXServer(args);
   }
-  
+
   /**
-   * The server calls this constructor to listen on the given port for incoming 
+   * The server calls this constructor to listen on the given port for incoming
    * connections. Protocol version handshake is performed when the connection
    * is established. This constructor blocks until a client connects.
    * @param args arguments
@@ -91,7 +85,7 @@ public final class BaseXServer {
       }
     }
   }
-  
+
   /**
    * Waits for a network request and evaluates the input.
    * @param server server reference
@@ -104,11 +98,11 @@ public final class BaseXServer {
       // get command and arguments
       final DataInputStream dis = new DataInputStream(s.getInputStream());
       final String in = dis.readUTF().trim();
-      
+
       final InetAddress addr = s.getInetAddress();
-      final String ip = addr.toString();
-      if(verbose) BaseX.outln("[%:%] %", addr.getHostAddress(),
-          s.getPort(), in);
+      final String ha = addr.getHostAddress();
+      final int sp = s.getPort();
+      if(verbose) BaseX.outln("[%:%] %", ha, sp, in);
 
       Process pr = null;
       try {
@@ -121,24 +115,24 @@ public final class BaseXServer {
         return;
       }
       final Process proc = pr;
-      
+
       if(proc instanceof Exit) {
         s.getOutputStream().write(1);
         // interrupt running processes
-        for(int p = 0; p < MAX; p++) if(corc[p] != null) corc[p].stop();
+        for(final BaseXSession ss : sess) ss.core.stop();
         running = false;
         return;
       }
 
       // start session thread
-      new Thread() {
-        @Override
+      new Action() {
         public void run() {
           try {
             if(proc instanceof GetResult || proc instanceof GetInfo) {
               final OutputStream os = s.getOutputStream();
               final PrintOutput out = new PrintOutput(new BufferedOutput(os));
-              final Process c = session(ip);
+              final int id = Math.abs(Integer.parseInt(proc.args().trim()));
+              final Process c = get(id);
               if(c == null) {
                 out.print(SERVERFULL);
               } else if(proc instanceof GetResult) {
@@ -151,29 +145,19 @@ public final class BaseXServer {
               out.close();
             } else {
               // process a normal request
-              boolean ok = save(proc, ip);
-              if(ok) {
-                ok = proc.execute(context);
-                if(!ok && verbose) {
-                  final PrintOutput o = new ConsoleOutput(System.err);
-                  proc.info(o);
-                  o.close();
-                }
-              }
-              // answer with ok flag (1: everything alright, 0: error)
-              final OutputStream out = s.getOutputStream();
-              out.write(ok ? 1 : 0);
-              out.close();
+              add(new BaseXSession(sp, System.nanoTime(), proc));
+              final boolean ok = proc.execute(context);
+              // return process id (negative: error)
+              new DataOutputStream(s.getOutputStream()).writeInt(ok ? sp : -sp);
             }
             dis.close();
           } catch(final Exception ex) {
             if(ex instanceof IOException) BaseX.errln(SERVERERR);
             else ex.printStackTrace();
           }
-          if(verbose) BaseX.outln("[%:%] %", addr.getHostAddress(),
-              s.getPort(), perf.getTimer());
+          if(verbose) BaseX.outln("[%:%] %", ha, sp, perf.getTimer());
         }
-      }.start();
+      }.execute();
     } catch(final Exception ex) {
       if(ex instanceof IOException) BaseX.errln(SERVERERR);
       else ex.printStackTrace();
@@ -181,38 +165,30 @@ public final class BaseXServer {
   }
 
   /**
-   * Saves a user process.
-   * @param cmd command
-   * @param ip client ip address
-   * @return result of check
+   * Caches a user connection and removes out-of-dated entries.
+   * @param bs session to be added
    */
-  synchronized boolean save(final Process cmd, final String ip) {
+  synchronized void add(final BaseXSession bs) {
     final long t = System.nanoTime();
-    
-    for(int i = 0; i < MAX; i++) {
-      if(client[i] == null || client[i].equals(ip) || t - time[i] > TIMEOUT) {
-        client[i] = ip;
-        time[i] = System.nanoTime();
-        corc[i] = cmd;
-        return true;
+    for(int i = 0; i < sess.size(); i++) {
+      if(t - sess.get(i).time > TIMEOUT * 1000000000L) {
+        final BaseXSession s = sess.remove(sess.size() - 1);
+        if(i != sess.size()) sess.set(i--, s);
       }
     }
-    BaseX.errln(SERVERFULL);
-    return false;
+    sess.add(bs);
   }
-  
+
   /**
    * Returns the correct client session.
-   * @param ip client ip address
+   * @param id process id
    * @return core reference
    */
-  synchronized Process session(final String ip) {
-    for(int i = 0; i < MAX; i++) {
-      if(ip.equals(client[i])) return corc[i];
-    }
+  synchronized Process get(final int id) {
+    for(final BaseXSession s : sess) if(s != null && s.pid == id) return s.core;
     return null;
   }
-  
+
   /**
    * Parses the command line arguments.
    * @param args the command line arguments
@@ -268,5 +244,27 @@ public final class BaseXServer {
     }
     if(!ok) BaseX.errln(SERVERINFO);
     return ok;
+  }
+  
+  /** Simple session class. */
+  class BaseXSession {
+    /** Process id. */
+    int pid;
+    /** Timer. */
+    long time;
+    /** Process. */
+    Process core;
+    
+    /**
+     * Constructor.
+     * @param i process id
+     * @param t timer
+     * @param c process
+     */
+    BaseXSession(final int i, final long t, final Process c) {
+      pid = i;
+      time = t;
+      core = c;
+    }
   }
 }

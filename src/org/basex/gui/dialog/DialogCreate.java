@@ -23,7 +23,6 @@ import org.basex.gui.layout.TableLayout;
 import org.basex.io.IO;
 import org.basex.util.StringList;
 import org.basex.util.Token;
-import org.basex.util.XMLToken;
 
 /**
  * Dialog window for specifying options for creating a new database.
@@ -250,7 +249,7 @@ public final class DialogCreate extends Dialog {
     String inf1 = !exists ? PATHWHICH : " ";
     String inf2 = "";
     if(ok) {
-      ok = XMLToken.isName(Token.token(nm));
+      ok = Token.letterOrDigit(Token.token(nm));
       if(!ok) inf2 = RENAMEINVALID;
       else if(db.contains(nm)) inf2 = RENAMEOVER;
     }

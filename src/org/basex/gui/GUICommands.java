@@ -1,7 +1,6 @@
 package org.basex.gui;
 
 import static org.basex.Text.*;
-import static org.basex.core.Commands.*;
 import java.awt.BorderLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -13,6 +12,8 @@ import org.basex.BaseX;
 import org.basex.core.Context;
 import org.basex.core.Process;
 import org.basex.core.Prop;
+import org.basex.core.Commands.INDEX;
+import org.basex.core.Commands.UPDATE;
 import org.basex.core.proc.Cd;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.Copy;
@@ -45,6 +46,7 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewData;
 import org.basex.io.IO;
+import org.basex.util.Action;
 import org.basex.util.Array;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -717,7 +719,7 @@ public enum GUICommands implements GUICommand {
             proc = Array.add(proc, cmd(indexes[1], INDEX.ATTRIBUTE));
           if(indexes[2] != meta.ftxindex)
             proc = Array.add(proc, cmd(indexes[2], INDEX.FULLTEXT));
-          
+
           if(proc.length != 0) build(INFOBUILD, proc);
         }
       }
@@ -861,46 +863,28 @@ public enum GUICommands implements GUICommand {
    * @param procs processes
    */
   static void build(final String title, final Process[] procs) {
-    // start database creation thread
-    new Thread() {
-      @Override
-      public void run() {
-        final GUI main = GUI.get();
+    final GUI main = GUI.get();
 
-        for(int p = 0; p < procs.length; p++) {
-          final Process proc = procs[p];
+    // start database creation thread
+    new Action() {
+      public void run() {
+        for(final Process proc : procs) {
           final boolean ci = proc instanceof CreateIndex;
           final boolean fs = proc instanceof CreateFS;
           final boolean di = proc instanceof DropIndex;
           final boolean op = proc instanceof Optimize;
-          
+
           if(!ci && !di && !op) {
             new Close().execute(GUI.context);
             View.notifyInit();
           }
           Performance.sleep(100);
-          final DialogProgress wait = new DialogProgress(main, title, !fs, !op);
-
-          // start dialog window thread
-          new Thread() {
-            @Override
-            public void run() {
-              while(true) {
-                Performance.sleep(100);
-                if(wait.stopped()) proc.stop();
-                if(!wait.isVisible()) return;
-                wait.setProgress(proc);
-              }
-            }
-          }.start();
+          final DialogProgress wait = new DialogProgress(
+              main, title, !fs, !op, proc);
 
           // create database
           final Performance perf = new Performance();
           final boolean ok = proc.execute(GUI.context);
-          // get server info
-          final String inf = proc.info();
-
-          // close status dialog
           wait.dispose();
 
           // return user information
@@ -909,13 +893,13 @@ public enum GUICommands implements GUICommand {
             if(op) JOptionPane.showMessageDialog(main, INFOOPTIM,
                 DIALOGINFO, JOptionPane.INFORMATION_MESSAGE);
           } else {
-            JOptionPane.showMessageDialog(main, inf,
+            JOptionPane.showMessageDialog(main, proc.info(),
                 DIALOGINFO, JOptionPane.WARNING_MESSAGE);
           }
           // initialize views
           if(!ci && !di) View.notifyInit();
         }
       }
-    }.start();
+    }.execute();
   }
 }

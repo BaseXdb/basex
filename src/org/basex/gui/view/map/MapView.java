@@ -21,6 +21,7 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewData;
+import org.basex.util.Action;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -698,8 +699,7 @@ public final class MapView extends View implements Runnable {
     } else if(key == KeyEvent.VK_S && !slide) {
       // slide show
       slide = true;
-      new Thread() {
-        @Override
+      new Action() {
         public void run() {
           while(slide) {
             int pre = context.current().pre[0];
@@ -715,7 +715,7 @@ public final class MapView extends View implements Runnable {
             Performance.sleep(slideSpeed);
           }
         }
-      }.start();
+      }.execute();
     }
 
     final boolean cursor = key == KeyEvent.VK_UP || key == KeyEvent.VK_DOWN ||

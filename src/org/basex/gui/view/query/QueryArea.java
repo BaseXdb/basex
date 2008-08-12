@@ -13,7 +13,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-
 import org.basex.core.proc.XQuery;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
@@ -186,7 +185,7 @@ public final class QueryArea extends QueryPanel {
 
     area.error(-1);
     info.setName(Integer.toString(err));
-    error.sleep(500);
+    error.delay(500);
   }
 
   /** Last error position. */
@@ -194,8 +193,7 @@ public final class QueryArea extends QueryPanel {
 
   /** Delays the display of error information. */
   Action error = new Action() {
-    @Override
-    public void action() {
+    public void run() {
       area.error(err);
     }
   };

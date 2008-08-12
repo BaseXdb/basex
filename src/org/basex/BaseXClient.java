@@ -187,30 +187,6 @@ public class BaseXClient {
 
   /**
    * Processes the specified command, specifying verbose output.
-   * @param comm command
-   * @param arg argument
-   * @param v verbose flag
-   * @return true if operation was successful
-  protected final boolean execute(final Process p, final String arg,
-      final boolean v) {
-    return process(new Command(comm, arg), v);
-  }
-   */
-
-  /**
-   * Processes the specified command, specifying verbose output.
-   * @param comm command
-   * @param arg argument
-   * @param v verbose flag
-   * @return true if operation was successful
-  protected final boolean executee(final Commands comm, final String arg,
-      final boolean v) {
-    return process(new Command(comm, arg), v);
-  }
-   */
-
-  /**
-   * Processes the specified command, specifying verbose output.
    * @param p process
    * @param v verbose flag
    * @return true if operation was successful

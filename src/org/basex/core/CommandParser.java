@@ -242,9 +242,9 @@ public final class CommandParser extends QueryParser {
       case PROMPT:
         return new Prompt();
       case GETRESULT:
-        return new GetResult();
+        return new GetResult(number(null));
       case GETINFO:
-        return new GetInfo();
+        return new GetInfo(number(null));
       case EXIT:
       case QUIT:
         return new Exit();
@@ -356,6 +356,7 @@ public final class CommandParser extends QueryParser {
   private String number(final COMMANDS cmd) throws QueryException {
     consumeWS();
     final StringBuilder tb = new StringBuilder();
+    if(curr() == '-') tb.append(consume());
     while(digit(curr())) tb.append(consume());
     if(tb.length() != 0) return tb.toString();
     if(cmd != null) help(null, cmd);

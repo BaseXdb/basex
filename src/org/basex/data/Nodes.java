@@ -74,11 +74,9 @@ public final class Nodes implements Result {
    * @return result of check
    */
   public boolean sameAs(final Nodes n) {
-    if(data != n.data) return false;
-    if(size != n.size) return false;
-    for(int s = 0; s < size; s++) {
-      if(pre[s] != n.pre[s]) return false;
-    }
+    if(this == n) return true;
+    if(data != n.data || size != n.size) return false;
+    for(int s = 0; s != size; s++) if(pre[s] != n.pre[s]) return false;
     return true;
   }
 

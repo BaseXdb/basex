@@ -9,8 +9,11 @@ import org.basex.core.Process;
  * @author Christian Gruen
  */
 public final class GetResult extends Process {
-  /** Constructor. */
-  public GetResult() {
-    super(STANDARD);
+  /**
+   * Constructor.
+   * @param n optional process number
+   */
+  public GetResult(final String n) {
+    super(STANDARD, n);
   }
 }

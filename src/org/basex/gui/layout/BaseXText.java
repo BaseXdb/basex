@@ -8,6 +8,8 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -16,6 +18,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import javax.swing.AbstractButton;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 import org.basex.BaseX;
@@ -51,7 +54,7 @@ public final class BaseXText extends BaseXPanel {
   final boolean editable;
   /** Popup Menu. */
   final BaseXPopup popup;
-  
+
   /**
    * Default constructor.
    * @param help help text
@@ -68,7 +71,7 @@ public final class BaseXText extends BaseXPanel {
   public BaseXText(final byte[] help, final boolean edit) {
     this(help, edit, null);
   }
-  
+
   /**
    * Default constructor.
    * @param help help text
@@ -90,11 +93,11 @@ public final class BaseXText extends BaseXPanel {
     addFocusListener(new FocusAdapter() {
       @Override
       public void focusGained(final FocusEvent e) {
-        cursor();
+        cursor(true);
       }
       @Override
       public void focusLost(final FocusEvent e) {
-        cursor.stop();
+        cursor(false);
         rend.cursor(false);
         rend.repaint();
       }
@@ -117,7 +120,7 @@ public final class BaseXText extends BaseXPanel {
     } else {
       setMode(FILL.NONE);
     }
-    
+
     final GUICommand[] pop = edit ?
         new GUICommand[] { new UndoCmd(), new RedoCmd(), null, new CutCmd(),
         new CopyCmd(), new PasteCmd(), new DelCmd(), null, new AllCmd() } :
@@ -132,7 +135,7 @@ public final class BaseXText extends BaseXPanel {
   public void setText(final byte[] t) {
     setText(t, t.length);
   }
-    
+
   /**
    * Sets the output text.
    * @param t output text
@@ -158,7 +161,7 @@ public final class BaseXText extends BaseXPanel {
     }
 
     if(undo != null) undo.store(t.length != ns ? Array.finish(t, ns) : t, 0);
-    SwingUtilities.invokeLater(calc.single());
+    SwingUtilities.invokeLater(calc);
   }
 
   /**
@@ -214,11 +217,11 @@ public final class BaseXText extends BaseXPanel {
   }
 
   @Override
-  public void setEnabled(final boolean enabled) {
-    super.setEnabled(enabled);
-    rend.setEnabled(enabled);
-    scroll.setEnabled(enabled);
-    cursor();
+  public void setEnabled(final boolean e) {
+    super.setEnabled(e);
+    rend.setEnabled(e);
+    scroll.setEnabled(e);
+    cursor(true);
   }
 
   /**
@@ -231,7 +234,7 @@ public final class BaseXText extends BaseXPanel {
     text.endMark();
     rend.repaint();
   }
-    
+
   // OVERRIDDEN METHODS =======================================================
 
   @Override
@@ -248,7 +251,7 @@ public final class BaseXText extends BaseXPanel {
   public void mousePressed(final MouseEvent e) {
     super.mousePressed(e);
     requestFocusInWindow();
-    cursor();
+    cursor(true);
 
     if(!SwingUtilities.isLeftMouseButton(e)) return;
 
@@ -313,24 +316,24 @@ public final class BaseXText extends BaseXPanel {
       scroll.pos(scroll.pos() + e.getY() - 20);
     }
   }
-  
+
   /** Last horizontal position. */
   private int col = -1;
 
   @Override
   public void keyPressed(final KeyEvent e) {
     final int c = e.getKeyCode();
-    
+
     if(e.isAltDown() || e.isMetaDown() || c == KeyEvent.VK_SHIFT ||
         c == KeyEvent.VK_CONTROL || c == KeyEvent.VK_ESCAPE) return;
 
     text.pos(text.cursor());
-    cursor();
+    cursor(true);
 
     final byte[] txt = text.text;
     final boolean ctrl = e.isControlDown();
     final boolean shf = e.isShiftDown();
-    
+
     boolean down = true;
     if(!ctrl && !e.isActionKey()) return;
 
@@ -345,7 +348,7 @@ public final class BaseXText extends BaseXPanel {
         copy();
         return;
       }
-    
+
       if(editable) {
         if(c == 'X') {
           cut();
@@ -358,7 +361,7 @@ public final class BaseXText extends BaseXPanel {
         }
       }
     }
-    
+
     if(shf && text.start() == -1) text.startMark();
 
     final int fh = rend.fontH();
@@ -420,7 +423,7 @@ public final class BaseXText extends BaseXPanel {
     if(txt != text.text) rend.calc();
     showCursor(down ? 2 : 0);
   }
-  
+
   /**
    * Displays the currently edited text area.
    * @param align vertical alignment
@@ -435,7 +438,7 @@ public final class BaseXText extends BaseXPanel {
       rend.repaint();
     }
   }
-  
+
   /**
    * Moves the cursor down.
    * @param l number of lines to move cursor
@@ -452,7 +455,7 @@ public final class BaseXText extends BaseXPanel {
     text.end(col, shf);
     if(text.pos() == text.size) col = -1;
   }
-  
+
   /**
    * Moves the cursor up.
    * @param l number of lines to move cursor
@@ -605,26 +608,24 @@ public final class BaseXText extends BaseXPanel {
     return null;
   }
 
-  /** Cursor action. */
-  Action cursor = new Action() {
-    @Override
-    public void action() {
+  /** Cursor. */
+  final Timer cursor = new Timer(500, new ActionListener() {
+    public void actionPerformed(final ActionEvent e) {
       rend.cursor(!rend.cursor());
       rend.repaint();
     }
-  };
+  });
 
   /**
    * Handles the cursor thread; interrupts the old thread as soon as
    * new one has been started.
+   * @param start start/stop flag
    */
-  protected void cursor() {
-    if(!isFocusable() || !isEnabled()) {
-      cursor.stop();
-    } else {
-      rend.cursor(false);
-      cursor.repeat(500);
-    }
+  protected void cursor(final boolean start) {
+    cursor.stop();
+    if(start) cursor.start();
+    rend.cursor(true);
+    rend.repaint();
   }
 
   @Override
@@ -636,18 +637,17 @@ public final class BaseXText extends BaseXPanel {
   @Override
   public void componentResized(final ComponentEvent e) {
     scroll.pos(0);
-    SwingUtilities.invokeLater(calc.single());
+    SwingUtilities.invokeLater(calc);
   }
 
   /** Calculation counter. */
   final Action calc = new Action() {
-    @Override
-    public void action() {
+    public void run() {
       rend.calc();
       rend.repaint();
     }
   };
-  
+
   /** Text Command. */
   class TextCmd implements GUICommand {
     public void execute() { cut(); }
@@ -657,7 +657,7 @@ public final class BaseXText extends BaseXPanel {
     public String help() { return null; }
     public String key() { return null; }
   }
-  
+
   /** Undo Command. */
   class UndoCmd extends TextCmd {
     @Override
@@ -673,7 +673,7 @@ public final class BaseXText extends BaseXPanel {
       return GUIUNDO;
     }
   }
-  
+
   /** Redo Command. */
   class RedoCmd extends TextCmd {
     @Override
@@ -689,7 +689,7 @@ public final class BaseXText extends BaseXPanel {
       return GUIREDO;
     }
   }
-  
+
   /** Cut Command. */
   class CutCmd extends TextCmd {
     @Override
@@ -705,7 +705,7 @@ public final class BaseXText extends BaseXPanel {
       return GUICUT;
     }
   }
-  
+
   /** Cut Command. */
   class CopyCmd extends TextCmd {
     @Override
@@ -721,7 +721,7 @@ public final class BaseXText extends BaseXPanel {
       return GUICOPY;
     }
   }
-  
+
   /** Paste Command. */
   class PasteCmd extends TextCmd {
     @Override
@@ -737,7 +737,7 @@ public final class BaseXText extends BaseXPanel {
       return GUIPASTE;
     }
   }
-  
+
   /** Delete Command. */
   class DelCmd extends TextCmd {
     @Override
@@ -753,7 +753,7 @@ public final class BaseXText extends BaseXPanel {
       return GUIDEL;
     }
   }
-  
+
   /** Select all Command. */
   class AllCmd extends TextCmd {
     @Override

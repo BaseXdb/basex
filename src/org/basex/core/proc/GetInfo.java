@@ -9,8 +9,11 @@ import org.basex.core.Process;
  * @author Christian Gruen
  */
 public final class GetInfo extends Process {
-  /** Constructor. */
-  public GetInfo() {
-    super(STANDARD);
+  /**
+   * Constructor.
+   * @param n optional process number
+   */
+  public GetInfo(final String n) {
+    super(STANDARD, n);
   }
 }

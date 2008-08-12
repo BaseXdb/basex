@@ -1,5 +1,10 @@
 package org.basex.util;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
 /**
  * This class defines an action which is executed as a thread.
  * If it is called another time, the current thread is skipped.
@@ -7,68 +12,50 @@ package org.basex.util;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public abstract class Action {
-  /** Counter. */
-  protected int counter;
-  
-  /**
-   * Creates a new action thread.
-   * @return thread
-   */
-  public final Thread single() {
-    final int c = ++counter;
-    
-    return new Thread() {
-      @Override
-      public void run() {
-        if(c != counter) return;
-        action();
-      }
-    };
-  }
+public abstract class Action implements Runnable {
+  /** Executor service. */
+  private final ScheduledExecutorService sch =
+    Executors.newSingleThreadScheduledExecutor();
+  /** Running thread reference. */
+  private ScheduledFuture<?> sf;
 
   /**
    * Creates a new repeated action thread.
    * @param ms number of milliseconds to wait before executions
    */
   public final void repeat(final int ms) {
-    final int c = ++counter;
-    
-    new Thread() {
-      @Override
-      public void run() {
-        while(c == counter) {
-          action();
-          Performance.sleep(ms);
-        }
-      }
-    }.start();
+    sf = sch.scheduleAtFixedRate(this, 0, ms, TimeUnit.MILLISECONDS);
+  }
+  
+  /**
+   * Creates a new action thread.
+   */
+  public final void execute() {
+    delay(0);
   }
 
   /**
    * Sleeps for a while and executes the action afterwards.
    * @param ms number of milliseconds to wait before executions
    */
-  public final void sleep(final int ms) {
-    final int c = ++counter;
-    
-    new Thread() {
-      @Override
-      public void run() {
-        Performance.sleep(ms);
-        if(c == counter) action();
-      }
-    }.start();
+  public final void delay(final int ms) {
+    cancel();
+    sf = sch.schedule(this, ms, TimeUnit.MILLISECONDS);
   }
 
   /**
-   * Increases the action counter. If a repeated process is running,
-   * it is stopped.
+   * Stops the current process.
+   * @return true if process was stopped.
    */
-  public final void stop() {
-    ++counter;
+  public final boolean cancel() {
+    return sf != null && sf.cancel(true);
   }
 
-  /** Action to be executed. */
-  public abstract void action();
+  /**
+   * Checks if the process is running.
+   * @return result of check
+   */
+  public final boolean running() {
+    return sf != null && !sf.isDone();
+  }
 }

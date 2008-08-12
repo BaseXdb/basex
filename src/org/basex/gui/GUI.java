@@ -60,6 +60,7 @@ import org.basex.gui.view.text.TextView;
 import org.basex.gui.view.tree.TreeView;
 import org.basex.io.CachedOutput;
 import org.basex.query.QueryException;
+import org.basex.util.Action;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -328,12 +329,11 @@ public final class GUI extends JFrame {
     input.requestFocusInWindow();
 
     // start logo animation as thread
-    new Thread() {
-      @Override
+    new Action() {
       public void run() {
         views.run();
       }
-    }.start();
+    }.execute();
   }
 
   /**
@@ -423,34 +423,21 @@ public final class GUI extends JFrame {
     }
   }
   
-  /** Thread counter. */
-  int threadID;
-  /** Current process. */
-  Process proc;
-
-  /**
-   * Checks if the specified thread is obsolete.
-   * @param thread thread to be checked
-   * @param p executed process
-   * @return result of check
-   */
-  protected boolean obsolete(final int thread, final Process p) {
-    final boolean obs = thread != threadID  && !p.data() && !p.updating();
-    if(obs) proc = null;
-    return obs;
-  }
-
   /**
    * Launches the specified process in a thread.
    * @param pr process to be launched
    */
   public void execute(final Process pr) {
     if(View.working) return;
-    new Thread() {
-      @Override
+    new Action() {
       public void run() { exec(pr); }
-    }.start();
+    }.execute();
   }
+  
+  /** Thread counter. */
+  private int threadID;
+  /** Current process. */
+  private Process proc;
 
   /**
    * Launches the specified process.
@@ -469,9 +456,6 @@ public final class GUI extends JFrame {
 
     cursor(CURSORWAIT);
     try {
-      // parse command string
-      if(obsolete(thread, pr)) return true;
-
       if(pr.updating()) View.working = true;
 
       // cache some variables before executing the command
@@ -488,8 +472,6 @@ public final class GUI extends JFrame {
       }
 
       if(pr.updating()) View.working = false;
-      if(obsolete(thread, pr)) return true;
-
       final Result result = pr.result();
       final Nodes nodes = result instanceof Nodes ? (Nodes) result : null;
 
@@ -528,11 +510,10 @@ public final class GUI extends JFrame {
         proc = null;
         return false;
       }
-      if(obsolete(thread, pr)) return true;
-
-      final String time = perf.getTimer();
 
       final Data ndata = context.data();
+      final String time = perf.getTimer();
+      Nodes marked = context.marked();
       if(ndata != data) {
         // database reference has changed - notify views
         View.notifyInit();
@@ -549,26 +530,28 @@ public final class GUI extends JFrame {
             }
             View.notifyContext((Nodes) result, GUIProp.filterrt);
           }
-        } else if(context.marked() != null) {
+        } else if(marked != null) {
           // refresh highlight
-          Nodes marked = context.marked();
-          // nodes as result?
           if(nodes != null) {
+            // use query result 
             marked = nodes;
           } else if(marked.size != 0) {
-            // any other result - remove old marks
+            // remove old highlight
             marked = new Nodes(data);
           }
           // highlights have changed.. refresh views
-          if(marked != context.marked()) {
+          if(!marked.sameAs(context.marked())) {
             View.ftPos = marked.ftpos;
             View.ftPoi = marked.ftpoin;
             View.notifyMark(marked);
           }
+          if(thread != threadID) {
+            proc = null;
+            return true;
+          }
         }
       }
-      if(obsolete(thread, pr)) return true;
-
+      
       // show number of hits
       setHits(result == null ? 0 : result.size());
 

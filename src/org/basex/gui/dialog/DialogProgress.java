@@ -3,8 +3,11 @@ package org.basex.gui.dialog;
 import static org.basex.Text.*;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.JFrame;
 import javax.swing.JProgressBar;
+import javax.swing.Timer;
 import org.basex.core.Progress;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
@@ -17,39 +20,40 @@ import org.basex.gui.layout.BaseXLayout;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class DialogProgress extends Dialog {
+public final class DialogProgress extends Dialog implements ActionListener {
+  /** Refresh action. */
+  private final Timer timer = new Timer(100, this);
   /** Information label. */
-  private BaseXLabel info;
+  private final BaseXLabel info;
+  /** Progress reference. */
+  private final Progress prog;
   /** Progress bar. */
-  private JProgressBar progress;
-  /** Dialog title. */
-  private String title;
+  private JProgressBar bar;
   /** Current progress length. */
   private int ww;
-  /** stopped flag. */
-  private boolean stopped;
 
   /**
    * Default Constructor.
    * @param par parent frame
    * @param msg waiting message.
-   * @param prg showing a progress bar
+   * @param pb showing a progress bar
    * @param cnc cancel flag
+   * @param prg progress reference
    */
   public DialogProgress(final JFrame par, final String msg,
-      final boolean prg, final boolean cnc) {
+      final boolean pb, final boolean cnc, final Progress prg) {
     super(par, msg, false);
 
     info = new BaseXLabel(" ", true);
     set(info, BorderLayout.NORTH);
     
-    if(!prg) {
+    if(!pb) {
       BaseXLayout.setWidth(info, 600);
     } else {
       ww = 320;
-      progress = new JProgressBar(0, ww);
-      progress.setPreferredSize(new Dimension(ww, 16));
-      set(progress, BorderLayout.CENTER);
+      bar = new JProgressBar(0, ww);
+      bar.setPreferredSize(new Dimension(ww, 16));
+      set(bar, BorderLayout.CENTER);
     }
     
     final BaseXBack p = new BaseXBack();
@@ -60,39 +64,26 @@ public final class DialogProgress extends Dialog {
     }
     set(p, BorderLayout.SOUTH);
     finish(par);
-  }
-  
-  /**
-   * Sets progress information and value.
-   * @param proc current process
-   */
-  public void setProgress(final Progress proc) {
-    if(proc == null) return;
-    info.setText(proc.detail());
-
-    final String header = proc.title(); 
-    if(!header.equals(title)) {
-      title = header;
-      setTitle(header);
-    }
-    if(progress != null) {
-      final int v = progress.getValue();
-      final int nv = (int) (proc.progress() * ww);
-      if(v != nv) progress.setValue(nv);
-    }
+    
+    prog = prg;
+    timer.start();
   }
 
   @Override
   public void cancel() {
-    stopped = true;
+    prog.stop();
+    close();
+  }
+
+  @Override
+  public void close() {
+    timer.stop();
     dispose();
   }
 
-  /**
-   * States if progress has been stopped.
-   * @return true if progress has been stopped.
-   */
-  public boolean stopped() {
-    return stopped;
+  public void actionPerformed(final ActionEvent e) {
+    setTitle(prog.title());
+    info.setText(prog.detail());
+    if(bar != null) bar.setValue((int) (prog.progress() * ww));
   }
 }

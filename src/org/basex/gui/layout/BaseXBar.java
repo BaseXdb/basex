@@ -5,6 +5,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.JComponent;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIConstants.FILL;
+import org.basex.util.Action;
 import org.basex.util.Performance;
 
 /**
@@ -193,22 +194,17 @@ public final class BaseXBar extends BaseXPanel {
     // start dragging
     if(sliding || animated) return;
 
-    new Thread() {
-      @Override
+    new Action() {
       public void run() {
         // scroll up/down/move slider
         animated = moving;
         while(animated) {
-          if(moving)
-            step = Math.max(0, Math.min(STEPS.length - 1,
-                step + (down ? 1 : -1)));
-          else
-            step += step < STEPS.length / 2 ? 1 : -1;
+          if(moving) step = Math.max(0, Math.min(STEPS.length - 1,
+              step + (down ? 1 : -1)));
+          else step += step < STEPS.length / 2 ? 1 : -1;
           int offset = STEPS[step];
 
-          if(!button) {
-            offset = offset * hh / MAXSTEP / 4;
-          }
+          if(!button) offset = offset * hh / MAXSTEP / 4;
           pos = Math.max(0, Math.min(height - hh, pos + offset));
           comp.repaint();
           Performance.sleep(25);
@@ -222,7 +218,7 @@ public final class BaseXBar extends BaseXPanel {
           }
         }
       }
-    }.start();
+    }.execute();
   }
 
   @Override

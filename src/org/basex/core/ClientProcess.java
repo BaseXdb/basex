@@ -1,5 +1,6 @@
 package org.basex.core;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,6 +23,8 @@ public final class ClientProcess extends AbstractProcess {
   private final int port;
   /** Temporary socket instance. */
   private Socket socket;
+  /** Last socket reference. */
+  private int last;
 
   /**
    * Constructor, specifying the server host:port and the command to be sent.
@@ -38,18 +41,19 @@ public final class ClientProcess extends AbstractProcess {
   @Override
   public boolean execute(final Context ctx) throws IOException {
     send(proc.toString());
-    return socket.getInputStream().read() != 0;
+    last = new DataInputStream(socket.getInputStream()).readInt();
+    return last > 0;
   }
 
   @Override
   public void output(final PrintOutput o) throws IOException {
-    send(Commands.COMMANDS.GETRESULT.name());
+    send(Commands.COMMANDS.GETRESULT.name() + " " + last);
     receive(o);
   }
 
   @Override
   public void info(final PrintOutput o) throws IOException {
-    send(Commands.COMMANDS.GETINFO.name());
+    send(Commands.COMMANDS.GETINFO.name() + " " + last);
     receive(o);
   }
 
