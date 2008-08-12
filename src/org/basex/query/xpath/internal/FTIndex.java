@@ -97,6 +97,7 @@ public final class FTIndex extends FTArrayExpr {
         ctx.checkStop();
         pos2.add(it.next());
       }
+      
       if(pre == null) {
         pre = pre2;
         pos = pos2;
@@ -214,4 +215,16 @@ public final class FTIndex extends FTArrayExpr {
   public String toString() {
     return BaseX.info("%(\"%\")", name(), token);
   }
+  
+  /**
+   * Dumps the specified integer list.
+   * @param il list to dump
+  private void dump(final IntList il) {
+    for(int i = 0; i < il.size; i++) {
+      if(i != 0) System.out.print(" ");
+      System.out.print("[" + i + "]" + il.get(i));
+    }
+    System.out.println();
+  }
+   */
 }

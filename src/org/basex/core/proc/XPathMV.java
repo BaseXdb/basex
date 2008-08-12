@@ -198,7 +198,7 @@ public final class XPathMV extends AQuery {
           m++;
           pp += data.size(pp, data.kind(pp));
         } else {
-          ser.xml(data, pp);
+          pp = ser.xml(data, pp);
           s++;
         }
       }

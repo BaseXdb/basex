@@ -156,7 +156,9 @@ public final class FZBuilder extends Progress implements IndexBuilder {
         */
         
         if (Prop.fcompress) {
-          for (int z = 4; z < val.length; z++) outz.write(val[z]);
+          for(int v = 0, ip = 4; v < ds; ip += Num.len(val, ip), v++)
+            outz.writeNum(Num.read(val, ip));
+          //for (int z = 4; z < val.length; z++) outz.write(val[z]);
         } else {
           for(int v = 0, ip = 4; v < ds; ip += Num.len(val, ip), v++)
             outz.writeInt(Num.read(val, ip));  
@@ -164,7 +166,9 @@ public final class FZBuilder extends Progress implements IndexBuilder {
         
         val = tre.pos[p];
         if (Prop.fcompress) {
-          for (int z = 4; z < val.length; z++) outz.write(val[z]);
+          for(int v = 0, ip = 4; v < ds; ip += Num.len(val, ip), v++)
+            outz.writeNum(Num.read(val, ip));
+          //for (int z = 4; z < val.length; z++) outz.write(val[z]);
         } else {
           for(int v = 0, ip = 4; v < ds; ip += Num.len(val, ip), v++) 
           outz.writeInt(Num.read(val, ip));

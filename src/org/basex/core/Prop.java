@@ -107,8 +107,6 @@ public final class Prop {
 
   /** Flag for creating a fuzzy index. */
   public static boolean ftfuzzy = true;
-  /** Flag for compressing ft-values on disk. */
-  public static boolean ftcompress = true;
   /** Flag for fulltext stemming. */
   public static boolean ftstem = false;
   /** Flag for fulltext case sensitivity. */
