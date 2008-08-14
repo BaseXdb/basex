@@ -44,36 +44,35 @@ public final class FTMildNot extends FTArrayExpr {
   }
   
   @Override
-  public FTArrayExpr indexEquivalent(final XPContext ctx, final Step curr)
+  public FTArrayExpr indexEquivalent(final XPContext ctx, final Step curr, 
+      final boolean seq)
       throws QueryException {
     
-    final FTArrayExpr[] indexExprs = new FTArrayExpr[exprs.length];
-    
-    // find index equivalents
-    for(int i = 0; i != exprs.length; i++) {
-      indexExprs[i] = exprs[i].indexEquivalent(ctx, curr);
-      if(indexExprs[i] == null) indexExprs[i] = exprs[i];
-    }
 
-    /* perform path step only once if all path expressions are the same
-    final Expr[] ex = XPOptimizer.getIndexExpr(indexExprs);
-    if(ex != null) return new Path(new FTMildNotExprs(ex),
-        ((Path) indexExprs[0]).expr2);
-    */
+    // assumption 1: ftcontains "a" not in "a b" not in "a c"
+    // and ftcontains "a" not in "a b" ftand "a" not in "a c" are equivalent
+    // assumption 2: ftcontains "a" not in ftnot ***
+    // and ftcontains "a" are equivalent
+
+    FTArrayExpr[] indexExprs = new FTArrayExpr[2];
+    FTMildNotExprs[] mne = new FTMildNotExprs[exprs.length - 1];
+    int[] pex = new int[exprs.length - 1];
+    indexExprs[0] = exprs[0].indexEquivalent(ctx, curr, seq);
+    for (int i = 1; i < exprs.length; i++) {
+      indexExprs[1] = exprs[i].indexEquivalent(ctx, curr, seq);
+      mne[i - 1] = new FTMildNotExprs(indexExprs);
+      pex[i - 1] = i - 1;
+    }
+    if (mne.length == 1) {
+      return mne[0];
+    }
     
-    // <SG> add compiler infos??
-    return new FTMildNotExprs(indexExprs);
+    return new FTIntersection(mne, pex, new int[]{});
   }
   
   @Override
   public int indexSizes(final XPContext ctx, final Step curr, final int min) {
-    int sum = 0;
-    for(final Expr expr : exprs) {
-      final int nrIDs = expr.indexSizes(ctx, curr, min);
-      if(nrIDs == Integer.MAX_VALUE) return nrIDs;
-      sum += nrIDs;
-      if(sum > min) return min;
-    }
-    return sum > min ? min : sum;
+    int mmin = exprs[0].indexSizes(ctx, curr, min);
+    return mmin > min ? min : mmin;
   }
 }

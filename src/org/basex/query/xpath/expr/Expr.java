@@ -78,11 +78,13 @@ public abstract class Expr extends ExprInfo {
    * This may not do any changes to the current expression.
    * @param ctx root
    * @param step the LocationStep this Expression is a predicate of
+   * @param seq flag for sequential evaluation
    * @return Equivalent index-expression or null
    * @throws QueryException evaluation exception
    */
   @SuppressWarnings("unused")
-  public Expr indexEquivalent(final XPContext ctx, final Step step)
+  public Expr indexEquivalent(final XPContext ctx, final Step step, 
+      final boolean seq)
       throws QueryException {
     return null;
   }

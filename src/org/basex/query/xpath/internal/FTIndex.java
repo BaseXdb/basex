@@ -3,15 +3,17 @@ package org.basex.query.xpath.internal;
 import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
+import org.basex.index.IndexArrayIterator;
 import org.basex.index.IndexIterator;
 import org.basex.query.FTOpt;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.FTArrayExpr;
 import org.basex.query.xpath.expr.FTPositionFilter;
 import org.basex.query.xpath.locpath.Step;
-import org.basex.query.xpath.values.NodeSet;
+import org.basex.query.xpath.values.Bool;
+import org.basex.query.xpath.values.FTNode;
 import org.basex.util.FTTokenizer;
-import org.basex.util.IntList;
+import org.basex.util.IntArrayList;
 
 /**
  * This expression retrieves the ids of indexed fulltext terms.
@@ -25,7 +27,9 @@ public final class FTIndex extends FTArrayExpr {
   final byte[] token;
   /** FullText options. */
   private FTOpt option;
-
+  /** Collection for the index results. */
+  private IndexArrayIterator iat = null;
+  
   /**
    * Constructor.
    * @param tok index token
@@ -46,7 +50,8 @@ public final class FTIndex extends FTArrayExpr {
   }
 
   @Override
-  public FTArrayExpr indexEquivalent(final XPContext ctx, final Step curr) {
+  public FTArrayExpr indexEquivalent(final XPContext ctx, final Step curr, 
+      final boolean seq) {
     return this;
   }
 
@@ -59,7 +64,7 @@ public final class FTIndex extends FTArrayExpr {
   }
 
   @Override
-  public NodeSet eval(final XPContext ctx) {
+  public Bool eval(final XPContext ctx) {
     final Data data = ctx.local.data;
 
     final FTTokenizer ft = new FTTokenizer();
@@ -71,19 +76,49 @@ public final class FTIndex extends FTArrayExpr {
     ft.cs = option.cs;
     ft.wc = option.wc;
     ft.fz = option.fz;
+   
+    ft.lp = ctx.ftpos.lp;
     
     // check if all terms return a result at all... if not, skip node retrieval
     // (has still to be checked, maybe ft options cause troubles here)
     // ideal solution for phrases would be to process small results first
     // and end up with the largest ones.. but this seems tiresome
+    int sum = 0;
+    int n = 0;
+    iat = new IndexArrayIterator();
+    
     while(ft.more()) {
-      if(data.nrIDs(ft) == 0) return new NodeSet(ctx);
+      n = data.nrIDs(ft);
+      if(n == 0) return Bool.FALSE;
       ctx.checkStop();
+      sum += n;
     }
     
-    IntList pre = null, pos = null;
     ft.init();
     int w = 0;
+    IndexIterator it;
+    while(ft.more()) {
+      it = data.ids(ft);
+      if (it == IndexIterator.EMPTY) return Bool.FALSE;
+      if (w == 0) {
+        iat = (IndexArrayIterator) it;  
+      } else {
+        iat = phrase(iat, (IndexArrayIterator) it, w);
+      }
+      w++;
+    }
+    
+    if (iat.size() > 0) {
+      if (ctx.ftpos.st) iat.setToken(new FTTokenizer[]{ft});
+      iat.setTokenNum(++ctx.ftcount);
+      return Bool.TRUE;
+    }
+    
+    return Bool.FALSE;
+/*    
+    IntList d1 = null, pos = null;
+    ft.init();
+    w = 0;
     while(ft.more()) {
       final IndexIterator it = data.ids(ft);
       final IntList pre2 = new IntList();
@@ -141,6 +176,51 @@ public final class FTIndex extends FTArrayExpr {
     */
   }
 
+  @Override
+  public boolean more() {
+    return iat.more();
+  }
+  
+  @Override
+  public FTNode next(final XPContext ctx) {
+    return iat.nextFTNode();
+    //if (it.more()) return it.nextFTNode();
+    //else return new FTNode();
+  }
+
+  /**
+   * Joins the specified iterators and returns its result.
+   * @param i1 IndexArrayIterator1
+   * @param i2 IndexArrayIterator2
+   * @param w distance between the phrases
+   * @return IndexArrayIterator as result
+   */
+  private IndexArrayIterator phrase(final IndexArrayIterator i1, 
+      final IndexArrayIterator i2, final int w) {
+    IntArrayList ial = new IntArrayList();
+    i1.more();
+    i2.more();
+    while(true) {
+      int d = i1.next() - i2.next();
+      if(d == 0) {
+        FTNode n1 = i1.nextFTNode();
+        FTNode n2 = i2.nextFTNode();
+        if (n1.merge(n2, w)) {
+        //if (n1.phrase(n2, w)) {
+          ial.add(n1.getFTNode());
+        }
+      }
+      if (d <= 0 && !i1.more()) break;
+       
+      if (d >= 0 && !i2.more()) break;
+      
+
+  //    if((d <= 0 && !i1.more()) | (d >= 0 && !i1.more())) break;
+    }
+    return new IndexArrayIterator(ial.list, ial.size, false);
+  }
+  
+  /*
   /**
    * Joins the specified integer lists, reducing the entries in the first list.
    * @param pre first pre values
@@ -149,7 +229,7 @@ public final class FTIndex extends FTArrayExpr {
    * @param pos2 second pos values
    * @param w distance to first word
    */
-  private void phrase(final IntList pre, final IntList pos,
+/*  private void phrase(final IntList pre, final IntList pos,
       final IntList pre2, final IntList pos2, final int w) {
 
     int s = 0;
@@ -168,7 +248,8 @@ public final class FTIndex extends FTArrayExpr {
     pre.size = s;
     pos.size = s;
   }
-
+  */
+ 
   /*
   private void phrase(final IntList pre, final IntArrayList pos,
       final IntList pre2, final IntArrayList pos2, final int w) {

@@ -3,9 +3,8 @@ package org.basex.query.xpath.expr;
 import org.basex.data.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
-import org.basex.query.xpath.values.NodeSet;
-import org.basex.query.xpath.values.Item;
-import org.basex.util.Array;
+import org.basex.query.xpath.values.Bool;
+import org.basex.query.xpath.values.FTNode;
 
 /**
  * FTUnaryNotExprs. This expresses the mild combination of ftand and ftnot.
@@ -24,6 +23,32 @@ public final class FTUnaryNotExprs extends FTArrayExpr {
     exprs = e;
   }
 
+  @Override
+  public boolean pos() {
+    return false;
+  }
+  
+  @Override
+  public Bool eval(final XPContext ctx) throws QueryException {
+    final Bool b = (Bool) exprs[0].eval(ctx);
+    return b;
+    
+  }
+  
+  @Override
+  public FTNode next(final XPContext ctx) {
+    final FTNode n = exprs[0].next(ctx); 
+    n.not = true;
+    return n; 
+  }
+  
+  @Override 
+  public boolean more() {
+    return exprs[0].more();
+  }
+  
+  
+  /*
   @Override
   public NodeSet eval(final XPContext ctx) throws QueryException {
     //int[] nodes = ctx.local.nodes;
@@ -47,7 +72,7 @@ public final class FTUnaryNotExprs extends FTArrayExpr {
     // should not happen
     return null;  
   }
-
+*/
   /**
    * Each result wordA, is not allowed to be contained in result wordB.
    *

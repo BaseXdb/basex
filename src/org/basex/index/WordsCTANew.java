@@ -8,6 +8,7 @@ import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataAccess;
 import org.basex.util.Array;
+import org.basex.util.FTTokenMap;
 import org.basex.util.FTTokenizer;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
@@ -43,6 +44,8 @@ public final class WordsCTANew extends Index {
   private long did;
   /** Flag for case sensitive index. */
   private boolean cs = false;
+  /** Cache for number of hits and data reference per token. **/
+  private FTTokenMap cache;
   
   /**
    * Constructor, initializing the index structure.
@@ -58,6 +61,7 @@ public final class WordsCTANew extends Index {
     data = d;
     did = -1;
     cs = data.meta.ftcs;
+    cache = new FTTokenMap();
   }
 
   @Override
@@ -74,7 +78,31 @@ public final class WordsCTANew extends Index {
   
   @Override
   public int nrIDs(final IndexToken ind) {
-    return ids(ind).size();
+    // hack, should find general solution
+    FTTokenizer fto = (FTTokenizer) ind;
+    if (fto.fz || fto.wc ||  fto.st || fto.cs || fto.dc) return 1;
+
+    byte[] tok = Token.lc(ind.get());
+    final int id = cache.id(tok);
+    if (id > 0) {
+      return cache.getSize(id);
+    } else {
+      
+      final int[] ne = getNodeIdFromTrieRecursive(0, Token.lc(ind.get()));
+      
+      if (ne != null && ne[ne.length - 1] > 0) {
+        cache.add(Token.lc(ind.get()), ne[ne.length - 1], did);
+        return ne[ne.length - 1];
+      } else {
+        cache.add(Token.lc(ind.get()), 0, 0);
+        return 0;
+      }        
+    }
+    /*
+    final IndexIterator ii  = ids(ind);
+    int c = 0;
+    while(ii.more()) c++;
+    return c;*/
   }
 
   @Override
@@ -87,14 +115,16 @@ public final class WordsCTANew extends Index {
       int k = Prop.lserr;
       if(k == 0) k = Math.max(1, tok.length >> 2);
       final int[][] ids = getNodeFuzzy(0, null, -1, tok, 0, 0, 0, k);
-      return new IndexArrayIterator(ids);
+      return (ids == null) ? IndexIterator.EMPTY 
+          : new IndexArrayIterator(ids, true);
     }
 
     if(ft.wc) {
       final int pw = Token.indexOf(tok, '.');
       if(pw != -1) {
         final int[][] ids = getNodeFromTrieWithWildCard(tok, pw);
-        return new IndexArrayIterator(ids);
+        return (ids == null) ? IndexIterator.EMPTY : 
+          new IndexArrayIterator(ids, true);
       }
     }
     
@@ -102,50 +132,20 @@ public final class WordsCTANew extends Index {
       // case insensitive index create - check real case with dbdata
       int[][] ids = getNodeFromTrieRecursive(0, Token.lc(tok), false);
       if(ids == null) {
-        return null;
+        return IndexIterator.EMPTY;
       }
 
-      byte[] tokenFromDB;
-      byte[] textFromDB;
-      int[][] rIds = new int[2][ids[0].length];
-      int count = 0;
-      int readId;
-
-      int i = 0;
       // check real case of each result node
-      while(i < ids[0].length) {
-        // get date from disk
-        readId = ids[0][i];
-        textFromDB = data.text(ids[0][i]);
-        tokenFromDB = new byte[tok.length];
-
-        System.arraycopy(textFromDB, ids[1][i], tokenFromDB, 0, tok.length);
-
-        // check unique node ones
-        while(i < ids[0].length && readId == ids[0][i]) {
-          System.arraycopy(textFromDB, ids[1][i], tokenFromDB, 0, tok.length);
-
-          readId = ids[0][i];
-
-          // check unique node ones
-          // compare token from db with token from query
-          if(Token.eq(tokenFromDB, tok)) {
-            rIds[0][count] = ids[0][i];
-            rIds[1][count++] = ids[1][i];
-
-            // jump over same ids
-            while(i < ids[0].length && readId == ids[0][i])
-              i++;
-            break;
-          }
-          i++;
-        }
-      }
-      return new IndexArrayIterator(rIds, count);
+      final FTTokenizer ftdb = new FTTokenizer();
+      ftdb.st = ft.st;
+      int count = Fuzzy.csDBCheck(ids, data, ftdb, tok);
+      return (count == 0) ? IndexIterator.EMPTY : 
+        new IndexArrayIterator(ids, count, true);
     }
     
     final int[][] tmp = getNodeFromTrieRecursive(0, tok, ft.cs);
-    return new IndexArrayIterator(tmp);
+    return (tmp == null) ? IndexIterator.EMPTY 
+        : new IndexArrayIterator(tmp, true);
   }
   
   /**
@@ -923,7 +923,7 @@ public final class WordsCTANew extends Index {
    * @return  int[][] data
    */
   private int[][] getDataFromDataArray(final int s, final long ldid) {
-    if(s == 0 && ldid <= 0) return null;
+    if(s == 0 || ldid < 0) return null;
     int[][] dt = new int[2][s];
    
     if (data.meta.fcompress) {
@@ -1140,10 +1140,11 @@ public final class WordsCTANew extends Index {
     // wildcard at the end
     if(ending == null || ending.length == 0) {
       // save data current node
-      adata = FTUnion.calculateFTOr(adata, 
+      if (ne[ne.length - 1] > 0) {
+        adata = FTUnion.calculateFTOr(adata, 
           //getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]));
           getDataFromDataArray(ne[ne.length - 1], tdid));
-      
+      }
       if (hasNextNodes(ne)) {
         // preorder traversal through trie
         //for (int t = ne[0] + 1; t < ne.length - 2; t += 2) {

@@ -90,14 +90,15 @@ public final class Or extends ArrayExpr {
   }
   
   @Override
-  public Expr indexEquivalent(final XPContext ctx, final Step curr)
+  public Expr indexEquivalent(final XPContext ctx, final Step curr, 
+      final boolean seq)
       throws QueryException {
 
     final Expr[] indexExprs = new Expr[exprs.length];
     
     // find index equivalents
     for(int i = 0; i != exprs.length; i++) {
-      indexExprs[i] = exprs[i].indexEquivalent(ctx, curr);
+      indexExprs[i] = exprs[i].indexEquivalent(ctx, curr, seq);
       if(indexExprs[i] == null) return null;
     }
 

@@ -41,7 +41,7 @@ public final class CTArrayNew {
   /** FTData: Position values. */
   int[][] pos;
   /** Flag for bulkload option. */
-  boolean bl = false;
+  boolean bl = true;
   /** Flag for creating a case sensitive index. */
   boolean cs = false;
 

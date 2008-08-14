@@ -84,11 +84,12 @@ public abstract class Pred extends ExprInfo {
    * For predicate optimization.
    * @param ctx root
    * @param step location step
+   * @param seq flag for sequential evaluation
    * @return Equivalent index-expression or null
    * @throws QueryException evaluation exception
    */
-  abstract Expr indexEquivalent(final XPContext ctx, final Step step)
-    throws QueryException;
+  abstract Expr indexEquivalent(final XPContext ctx, final Step step, 
+      final boolean seq) throws QueryException;
 
   /**
    * For predicate optimization.

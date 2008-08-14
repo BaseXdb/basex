@@ -10,6 +10,7 @@ import org.basex.query.xpath.internal.FTIndex;
 import org.basex.query.xpath.locpath.Step;
 import org.basex.query.xpath.values.Bool;
 import org.basex.query.xpath.values.Item;
+import org.basex.util.FTTokenizer;
 
 /**
  * Fulltext primary expression and FTTimes.
@@ -40,8 +41,22 @@ public final class FTWords extends FTArrayExpr {
 
   @Override
   public Item eval(final XPContext ctx) {
+    if (ctx.local.nodes[0] != 0) {
+      final FTTokenizer tmp = ctx.ftitem;
+      ctx.ftitem = new FTTokenizer();
+      ctx.ftitem.init(ctx.local.data.text(ctx.local.nodes[0] + 1));
+      final boolean r = contains(ctx);
+      ctx.ftitem = tmp;
+      return Bool.get(r);
+    }
     return Bool.get(contains(ctx));
   }
+  
+  @Override
+  public FTArrayExpr compile(final XPContext ctx) {
+    return this;
+  }
+ 
   
   /**
    * Evaluates the fulltext match.
@@ -95,13 +110,15 @@ public final class FTWords extends FTArrayExpr {
     // - no stop words are specified
     // - if wildcards are specified, the fulltext index is a trie
     // - no FTTimes option is specified
-    return meta.ftcs == fto.cs & meta.ftdc == fto.dc && meta.ftstem == fto.st &&
+    return //meta.ftcs == fto.cs & 
+      meta.ftdc == fto.dc && meta.ftstem == fto.st &&
       fto.sw == null && (!fto.wc || !meta.ftfuzzy) &&
       occ[0] == 1  && occ[1] == Long.MAX_VALUE;
   }
   
   @Override
-  public FTArrayExpr indexEquivalent(final XPContext ctx, final Step curr) {
+  public FTArrayExpr indexEquivalent(final XPContext ctx, final Step curr, 
+      final boolean seq) {
     return new FTIndex(token, fto);
   }
 

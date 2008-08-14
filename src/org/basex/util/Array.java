@@ -490,5 +490,27 @@ public final class Array {
     }
     return -1;
   }
+  
+  /**
+   * Converts an int-array to string.
+   * 
+   * @param sp index of first int value
+   * @param a array with values
+   * @param ep index of last int value
+   * @return a as string
+   */
+  public static String intArrayToString(final int sp, final int[] a, 
+      final int ep) {
+    StringBuffer sb = new StringBuffer();
+    sb.append('[');
+    int i = sp;
+    while (i < ep - 1) {
+      sb.append(a[i++]);
+      sb.append(',');
+    }
+    sb.append(a[ep - 1]);
+    sb.append(']');
+    return sb.toString();
+  }
 }
 

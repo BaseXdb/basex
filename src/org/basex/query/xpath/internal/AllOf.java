@@ -53,7 +53,8 @@ public final class AllOf extends InternalExpr {
   }
 
   @Override
-  public Expr indexEquivalent(final XPContext ctx, final Step curr) {
+  public Expr indexEquivalent(final XPContext ctx, final Step curr, 
+      final boolean seq) {
     final int vl = vals.length;
     final Expr[] indexExprs = new Expr[vl];
 

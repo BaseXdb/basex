@@ -12,9 +12,12 @@ import org.basex.query.xpath.locpath.LocPathRel;
 import org.basex.query.xpath.locpath.Step;
 import org.basex.query.xpath.locpath.TestNode;
 import org.basex.query.xpath.values.Bool;
+import org.basex.query.xpath.values.FTNode;
 import org.basex.query.xpath.values.Item;
+import org.basex.query.xpath.values.Literal;
 import org.basex.query.xpath.values.NodeSet;
 import org.basex.util.FTTokenizer;
+import org.basex.util.IntList;
 
 /**
  * FTContains Expression; used for fulltext operations.
@@ -26,8 +29,18 @@ public final class FTContains extends DualExpr {
   /** Fulltext parser. */
   private final FTTokenizer ft = new FTTokenizer();
   /** FullText options (currently not used). */
-  FTOpt option;
- 
+  private FTOpt option;
+  /** Result item. */
+  private Item v1 = null;
+  /** Flag for intial run.  */
+  private boolean f = false;
+  /** Temporeral result node.*/
+  private FTNode ftn = null;
+  /** Flag for sequential evaluation. */
+  boolean s;
+  /** Flag for index use. */
+  private boolean iu; 
+
   /**
    * Constructor.
    * @param e1 first expression
@@ -52,16 +65,40 @@ public final class FTContains extends DualExpr {
   public Expr compile(final XPContext ctx) throws QueryException {
     expr1 = expr1.compile(ctx);
     expr2 = expr2.compile(ctx);
+    
     XPOptimizer.addText(expr1, ctx);
     return this;
   }
 
   @Override
-  public Bool eval(final XPContext ctx) throws QueryException {
+  public Item eval(final XPContext ctx) throws QueryException {
+    if (expr1 instanceof Literal) {
+      Literal lit = (Literal) expr1;
+      ctx.ftitem = new FTTokenizer();
+      ctx.ftitem.init(lit.str());
+      return expr2.eval(ctx);
+    }
+    
+    if (s) return evalSeq(ctx);
     final FTTokenizer tmp = ctx.ftitem;
     ctx.ftitem = ft;
     
-    final Item v1 = ctx.eval(expr1);
+    v1 = ctx.eval(expr2);
+    if (v1.bool()) {
+      FTArrayExpr ftae = (FTArrayExpr) expr2;
+      IntList il = new IntList();
+      while (ftae.more()) {
+        ftn = ftae.next(ctx);
+        if (ftn.size() > 0)
+          il.add(ftn.getPre());
+        else break;
+      }
+      if (il.size > 0) {
+        return new NodeSet(il.finish(), ctx);
+      } 
+      return new NodeSet(ctx);
+    }
+    /*
     if(v1.size() == 0) return Bool.FALSE;
 
     boolean res = false;
@@ -76,11 +113,10 @@ public final class FTContains extends DualExpr {
       ft.init(v1.str());
       res = ctx.eval(expr2).bool();
     }
-    
+    */
     ctx.ftitem = tmp;
-    return Bool.get(res);
-
-    /*
+    /*return Bool.get(res);
+    
     for(int i = 0; i < size; i++) {
       if(Token.ftcontains(data.atom(nodes[i]), qu)) return true;
     }
@@ -88,26 +124,99 @@ public final class FTContains extends DualExpr {
     // don't evaluate empty node sets
     return Bool.get(v1.size() != 0 && v2.size() != 0 && type.eval(v1, v2));
     */
+    return new NodeSet(ctx);
   }
 
-  @Override
-  public Expr indexEquivalent(final XPContext ctx, final Step curr)
-      throws QueryException {
+  /**
+   * Sequential evaluation - used for not expression. 
+   * @param ctx XPContext
+   * @return Bool result
+   * @throws QueryException Exception
+   */
+  public Bool evalSeq(final XPContext ctx) throws QueryException {
+    if (!iu) return evalWithoutIndex(ctx);
+    final FTTokenizer tmp = ctx.ftitem;
+    ctx.ftitem = ft;
 
+   if (!f) {
+      v1 = ctx.eval(expr2);
+      f = true;
+    }
+    
+   if (v1.bool()) {
+     FTArrayExpr ftae = (FTArrayExpr) expr2;
+     ftn = (ftn == null && ftae.more()) ? ftae.next(ctx) : ftn;
+     
+     if (ftn != null) {
+        while (ftn.getPre() < ctx.local.nodes[0] + 1) {
+          if (ftae.more()) ftn = ftae.next(ctx);
+          else break;
+        }
+        if (ftn.size() > 0) {
+          final boolean not = ftn.not;
+          if (ftn.getPre() == ctx.local.nodes[0] + 1) {
+            ftn = null;
+            return Bool.get(!not); // false
+          } else {
+            return Bool.get(not); //Bool.TRUE;
+          }
+        }
+     }
+     return Bool.TRUE;
+   }
+   
+   ctx.ftitem = tmp;
+   return Bool.FALSE;
+  }
+
+  /**
+   * Performs evaluation without index access.
+   * @param ctx XPContext
+   * @return Bool
+   * @throws QueryException Exception
+   */
+  public Bool evalWithoutIndex(final XPContext ctx) throws QueryException {
+    final FTTokenizer tmp = ctx.ftitem;
+    ctx.ftitem = ft;
+    Bool v2;
+    if (expr1 instanceof Literal) {
+      Literal lit = (Literal) expr1;
+      ctx.ftitem = new FTTokenizer();
+      ctx.ftitem.init(lit.str());
+    } 
+    
+    v2 = (Bool) expr2.eval(ctx);
+    
+    ctx.ftitem = tmp;
+    return v2;
+  }
+
+  
+  
+  @Override
+  public Expr indexEquivalent(final XPContext ctx, final Step curr, 
+      final boolean seq)
+      throws QueryException {
+    s = seq;
     final LocPath path = (LocPath) expr1;
     ctx.compInfo(OPTFTINDEX);
     
     // all FTWords are recursively converted to FTIndex requests
-    final Expr expr = expr2.indexEquivalent(ctx, curr);
-    
-    // <SG> ideally, this method should never return null
-    // and only be called if an index exists...
-    if(expr == null) return this;
-    
-    return new Path(expr, path.invertPath(curr));
+    //final Expr expr = expr2.indexEquivalent(ctx, curr);
+    final FTArrayExpr ae = (FTArrayExpr) 
+      (iu ?  expr2.indexEquivalent(ctx, curr, seq) : expr2);
+    Expr expr;
+    if (!seq) {
+      expr = new FTContains(expr1, ae, option);
+      return new Path(expr, path.invertPath(curr));
+    } else {
+      if (!iu) expr = new FTContains(expr1, expr2, option);
+      else expr = new FTContains(expr1, ae, option);
+      return new Path(expr, path);
+    }
   } 
-
-  @Override
+  
+   @Override
   public int indexSizes(final XPContext ctx, final Step curr, final int min) {
 
     // check if first expression is a location path and if fulltext index exists
@@ -121,23 +230,29 @@ public final class FTContains extends DualExpr {
     final boolean text = step.test == TestNode.TEXT && step.preds.size() == 0;
     if(!text || !path.checkAxes()) return Integer.MAX_VALUE;
 
-    if(expr2 instanceof FTUnaryNot) return Integer.MAX_VALUE;
+    //if(expr2 instanceof FTUnaryNot) return Integer.MAX_VALUE;
 
     // check all ftcontains options recursively if they comply
     // to the index options..
-    if(!((FTArrayExpr) expr2).indexOptions(meta)) return Integer.MAX_VALUE;
+    iu = ((FTArrayExpr) expr2).indexOptions(meta);
+    if(!iu) return Integer.MAX_VALUE;
  
     // TODO... check number of index results
     //final byte[] token = expr2.str();
     //final int nrIDs = ctx.local.data.nrFTIDs(token);
     
+    // Integer.MAX_VALUE is returned if every textnode is a result
     final int nrIDs = expr2.indexSizes(ctx, curr, min);
+    if (nrIDs == Integer.MAX_VALUE) {
+      // <SG> every text node is a hit
+      
+    }
     return nrIDs == -1 ? Integer.MAX_VALUE : nrIDs;
   }
   
   @Override
   public String toString() {
-    return expr1 + " ftcontains " + expr2;
+    return expr1 + " ftcontainsIndex " + expr2;
   }
 
   @Override

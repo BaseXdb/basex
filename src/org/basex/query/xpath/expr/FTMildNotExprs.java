@@ -2,9 +2,9 @@ package org.basex.query.xpath.expr;
 
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
-import org.basex.query.xpath.values.NodeSet;
-import org.basex.query.xpath.values.Item;
-import org.basex.util.Array;
+import org.basex.query.xpath.values.Bool;
+import org.basex.query.xpath.values.FTNode;
+import org.basex.util.IntList;
 
 /**
  * FTMildNotExprs. This expresses the mild combination of ftand and ftnot.
@@ -15,6 +15,7 @@ import org.basex.util.Array;
  * @author Sebastian Gath
  */
 public final class FTMildNotExprs extends FTArrayExpr {
+
   /**
    * Constructor.
    * @param e operands joined with the mild not operator
@@ -24,33 +25,65 @@ public final class FTMildNotExprs extends FTArrayExpr {
   }
 
   @Override
-  public NodeSet eval(final XPContext ctx) throws QueryException {
-    //int[] nodes = ctx.local.nodes;
-    
-    Item it = exprs[0].eval(ctx);
-    if (it instanceof NodeSet) {
-      int[][] tmp = ((NodeSet) it).ftidpos;
-    
-      if (tmp == null || tmp.length == 0 || exprs.length == 1) 
-        return new NodeSet(new int[0], ctx);
-      it = exprs[1].eval(ctx);
-      if (it instanceof NodeSet) {
-        tmp = determineNot(tmp, ((NodeSet) it).ftidpos);
-        if (tmp == null) return new NodeSet(ctx);
-        return new NodeSet(Array.extractIDsFromData(tmp), ctx, tmp);
-      }
-      
-      /*for (int i = 1; i < exprs.length; i++) {
-        it = exprs[i].eval(ctx);
-        if (it instanceof NodeSet) {
-            tmp = determineNot(tmp, ((NodeSet) it).ftidpos);
-        }
-      }*/
-      
-      
-      //return new NodeSet(Array.extractIDsFromData(tmp), ctx, tmp);
+  public boolean more() {
+    return exprs[0].more();
+  }
+
+  /** Result node from expression 1. */
+  FTNode n1 = null;
+  
+  @Override
+  public FTNode next(final XPContext ctx) {
+    FTNode n0 = exprs[0].next(ctx);
+    if (n1 == null) {
+      if (exprs[1].more()) n1 = exprs[1].next(ctx);
+      else return n0;
     } 
-    return null;  
+    
+    IntList pos = new IntList(n0.size());
+    IntList poi = new IntList(n0.size() + 1);
+    pos.add(n0.getPre());
+    poi.add(n0.getNumTokens());
+    
+    if (n0.getPre() < n1.getPre()) {
+      return n0;
+    } else if (n0.getPre() > n1.getPre()) {
+      n1 = null;
+      if (more()) return next(ctx);
+      else return new FTNode();
+    } else {
+      boolean mp0 = n0.morePos();
+      boolean mp1 = n1.morePos();
+      while(mp0 && mp1) {
+        if (n0.nextPos() < n1.nextPos()) {
+          pos.add(n0.nextPos());
+          poi.add(n0.nextPoi());
+          mp0 = n0.morePos();
+        } else if (n0.nextPos() > n1.nextPos()) {
+          mp1 = n1.morePos();
+        } else {
+          mp0 = n0.morePos();
+          mp1 = n1.morePos();
+        }
+      }
+    }
+    if (pos.size > 1) {
+      return new FTNode(pos.finish(), poi.finish());
+    } else {
+      n1 = null;
+      if (more()) return next(ctx);
+      else return new FTNode();
+    }
+  }
+  
+  @Override
+  public Bool eval(final XPContext ctx) throws QueryException {
+    //int[] nodes = ctx.local.nodes;
+    ctx.ftpos.st = true;
+    final Bool b0 = (Bool) exprs[0].eval(ctx);
+    exprs[1].eval(ctx);
+    
+    return   b0;
   }
 
   /**

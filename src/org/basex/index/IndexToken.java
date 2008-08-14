@@ -22,7 +22,7 @@ public abstract class IndexToken {
   protected byte[] text = Token.EMPTY;
   /** Index type. */
   public TYPE type;
-  
+
   /**
    * Constructor.
    * @param t index type

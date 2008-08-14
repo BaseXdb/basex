@@ -78,7 +78,8 @@ public final class PredPos extends Pred {
   }
 
   @Override
-  public Expr indexEquivalent(final XPContext ctx, final Step step) {
+  public Expr indexEquivalent(final XPContext ctx, final Step step, 
+      final boolean seq) {
     return null;
   }
 

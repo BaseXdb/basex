@@ -6,6 +6,7 @@ import org.basex.query.FTOpt;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.locpath.Step;
+import org.basex.query.xpath.values.FTNode;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -21,7 +22,7 @@ public abstract class FTArrayExpr extends Expr {
   public FTOpt fto;
   /** Fulltext position filter. */
   public FTPositionFilter ftpos;
-
+  
   @Override
   public FTArrayExpr compile(final XPContext ctx) throws QueryException {
     for(int i = 0; i < exprs.length; i++) exprs[i] = exprs[i].compile(ctx);
@@ -39,7 +40,33 @@ public abstract class FTArrayExpr extends Expr {
       if(!exprs[i].indexOptions(meta)) return false;
     return true;
   }
+  
+  /**
+   * Checks for more results.
+   * @return boolean 
+   */
+  public boolean more() {
+    return false;
+  }
+  
+  /**
+   * Checks whether the result of the expression is negative.
+   * @return boolean
+   */
+  public boolean pos() {
+    return true;
+  }
+  
+  /**
+   * Returns the next ftquery result.
+   * @param ctx current context
+   * @return FTNode conainter for the next result
+   */
+  public FTNode next(final XPContext ctx) {
+    return new FTNode();
+  }
 
+  
   @Override
   public final boolean usesPos() {
     return false;
@@ -52,7 +79,8 @@ public abstract class FTArrayExpr extends Expr {
 
   @Override
   @SuppressWarnings("unused")
-  public FTArrayExpr indexEquivalent(final XPContext ctx, final Step step)
+  public FTArrayExpr indexEquivalent(final XPContext ctx, final Step step, 
+      final boolean seq)
       throws QueryException {
     return null;
   }

@@ -1,12 +1,12 @@
 package org.basex.query.xpath.expr;
 
-import static org.basex.query.xpath.XPText.OPTAND4;
+
 import org.basex.query.FTOpt;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
-import org.basex.query.xpath.internal.FTIndex;
 import org.basex.query.xpath.locpath.Step;
 import org.basex.query.xpath.values.Bool;
+import org.basex.util.IntList;
 
 /**
  * Logical FTAnd expression.
@@ -15,6 +15,11 @@ import org.basex.query.xpath.values.Bool;
  * @author Sebastian Gath
  */
 public final class FTAnd extends FTArrayExpr {
+  /** Saving index of positive expressions. */
+  private int[] pex;
+  /** Saving index of negative expressions (FTNot). */
+  private int[] nex;
+  
   /**
    * Constructor.
    * @param e expressions
@@ -51,13 +56,19 @@ public final class FTAnd extends FTArrayExpr {
   }
   
   @Override
-  public FTArrayExpr indexEquivalent(final XPContext ctx, final Step curr)
+  public FTArrayExpr indexEquivalent(final XPContext ctx, final Step curr, 
+      final boolean seq)
       throws QueryException {
-
-    FTArrayExpr[] indexExprs = new FTArrayExpr[exprs.length];
-    int j = 0;
-    int i = 0;
+    if (pex.length == 1 && nex.length == 0) 
+      exprs[pex[0]].indexEquivalent(ctx, curr, seq);
     
+    FTArrayExpr[] indexExprs = new FTArrayExpr[exprs.length];
+    for (int i = 0; i < exprs.length; i++) {
+      indexExprs[i] = exprs[i].indexEquivalent(ctx, curr, seq); 
+    }
+    
+    return new FTIntersection(indexExprs, pex, nex);
+/*    
     // find index equivalents
     for(; i != exprs.length && j < exprs.length; i++) {
       indexExprs[j] = exprs[i].indexEquivalent(ctx, curr);
@@ -98,20 +109,30 @@ public final class FTAnd extends FTArrayExpr {
       }
     }
 */
-    return new FTIntersection(indexExprs, false);
+   // return new FTIntersection(indexExprs, false);
     
     //return new FTIntersection(indexExprs, option, ctx);
   }
   
   @Override
   public int indexSizes(final XPContext ctx, final Step curr, final int min) {
-    int sum = 0;
-    for(final Expr expr : exprs) {
-      final int nrIDs = expr.indexSizes(ctx, curr, min);
-      if(nrIDs == Integer.MAX_VALUE) return nrIDs;
-      sum += nrIDs;
-      if(sum > min) return min;
+    IntList i1 = new IntList(exprs.length);
+    IntList i2 = new IntList(exprs.length);
+    int nmin = min;
+    int nrIDs;
+    for (int i = 0; i < exprs.length; i++) {
+      nrIDs = exprs[i].indexSizes(ctx, curr, min);
+      if (!(exprs[i] instanceof FTUnaryNot)) {
+        i1.add(i);
+        nmin = (nrIDs < nmin) ? nrIDs : nmin;
+      } else if (nrIDs > 0) {
+        i2.add(i);
+      }
     }
-    return sum > min ? min : sum;
-  }
+    pex = i1.finish();
+    nex = i2.finish();
+    
+    if (i1.size == 0) return Integer.MAX_VALUE;
+    return nmin;
+  }  
 }

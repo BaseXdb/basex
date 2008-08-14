@@ -138,9 +138,10 @@ public final class PredSimple extends Pred {
   }
 
   @Override
-  public Expr indexEquivalent(final XPContext ctx, final Step step)
+  public Expr indexEquivalent(final XPContext ctx, final Step step, 
+      final boolean seq)
       throws QueryException {
-    return expr.indexEquivalent(ctx, step);
+    return expr.indexEquivalent(ctx, step, seq);
   }
 
   @Override

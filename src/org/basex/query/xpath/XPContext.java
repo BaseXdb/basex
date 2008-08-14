@@ -24,7 +24,8 @@ public final class XPContext extends QueryContext {
   public NodeSet local;
   /** Leaf flag. */
   public boolean leaf;
-  
+  /** Count number of xpath fulltext query tokens. **/
+  public int ftcount = 0;
   // TODO... use fulltext flags
   
   /** Current fulltext item. */

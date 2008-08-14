@@ -106,7 +106,8 @@ public final class And extends ArrayExpr {
   }
   
   @Override
-  public Expr indexEquivalent(final XPContext ctx, final Step curr)
+  public Expr indexEquivalent(final XPContext ctx, final Step curr, 
+      final boolean seq)
       throws QueryException {
     
     final int el = exprs.length;
@@ -115,7 +116,7 @@ public final class And extends ArrayExpr {
     
     // find index equivalents
     for(int i = 0; i != el; i++) {
-      indexExprs[i] = exprs[i].indexEquivalent(ctx, curr);
+      indexExprs[i] = exprs[i].indexEquivalent(ctx, curr, seq);
       if(indexExprs[i] == null) return null;
     }
 

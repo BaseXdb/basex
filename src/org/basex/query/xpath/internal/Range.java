@@ -71,7 +71,8 @@ public final class Range extends InternalExpr {
   private RangeToken ind;
   
   @Override
-  public Expr indexEquivalent(final XPContext ctx, final Step curr) {
+  public Expr indexEquivalent(final XPContext ctx, final Step curr, 
+      final boolean seq) {
     final LocPath path = (LocPath) expr;
     final LocPath inv = path.invertPath(curr);
 

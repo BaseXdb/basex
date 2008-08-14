@@ -77,7 +77,7 @@ public final class FTSelect extends Single implements Cloneable {
     }
     return true;
   }
-
+  
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
     weight = weight.comp(ctx);

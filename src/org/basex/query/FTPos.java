@@ -40,11 +40,11 @@ public final class FTPos {
   public boolean different;
   /** Same/different unit. */
   public FTUnit sdunit;
-
   /** Term list. */
-  private final TokenList term = new TokenList();
+  public TokenList term = new TokenList();
   /** Input token. */
-  private FTTokenizer ft;
+  public FTTokenizer ft;
+
   /** Position list. */
   private IntList[] pos = new IntList[0];
   /** Number of entries. */
@@ -73,6 +73,16 @@ public final class FTPos {
     term.add(t);
   }
 
+  /**
+   * Sets the position values and the number of tokens.
+   * @param il IntList[] with position values
+   * @param ilsize int number of tokens in query
+   */
+  public void setPos(final IntList[] il, final int ilsize) {
+    pos = il;
+    size = ilsize;
+  }
+  
   /**
    * Performs common position tests.
    * @return result of check

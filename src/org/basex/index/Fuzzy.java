@@ -8,6 +8,7 @@ import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataAccess;
 import org.basex.query.xpath.expr.FTUnion;
+import org.basex.util.FTTokenMap;
 import org.basex.util.FTTokenizer;
 import org.basex.util.Levenshtein;
 import org.basex.util.Performance;
@@ -60,6 +61,9 @@ public final class Fuzzy extends Index {
   final DataAccess dat;
   /** Token positions. */
   final int[] tp = new int[Token.MAXLEN + 1];
+  /** Cache for number of hits and data reference per token. **/
+  private FTTokenMap cache;
+
 
   /**
    * Constructor, initializing the index structure.
@@ -83,6 +87,7 @@ public final class Fuzzy extends Index {
       tp[p] = li.readInt();
     }
     tp[tp.length - 1] = (int) ti.length();
+    cache = new FTTokenMap();
   }
 
   @Override
@@ -195,12 +200,28 @@ public final class Fuzzy extends Index {
    */
   private IndexIterator getData(final long p, final int s) {
     dat.cursor(p);
-    return new IndexIterator() {
+    int[][] d = new int[2][s];
+    
+    if (data.meta.fcompress) {
+      d[0][0] = dat.readNum();
+      for(int i = 1; i < s; i++) d[0][i] = dat.readNum();
+      for(int i = 0; i < s; i++) d[1][i] = dat.readNum();
+    } else {
+      d[0] = dat.readInts(p, s * 4L + p);
+      d[1] = dat.readInts(s * 4L + p, s * 8L + p);
+    }
+
+    return new IndexArrayIterator(d, true);
+    
+    /*
+    //Iterator has to be implemented for hard disk access
+    return new IndexArrayIterator() {
       @Override
       public int next() { return dat.readNum(); }
       @Override
       public int size() { return s; }
     };
+    */
   }
 
   /**
@@ -261,7 +282,7 @@ public final class Fuzzy extends Index {
       ts = li.readBytes(1L + i * 5L, 1L + i * 5L + 1L)[0];
       dif = Math.abs(tok.length - ts);
     }
-    return new IndexArrayIterator(ft);
+    return new IndexArrayIterator(ft, true);
   }
 
   /**
@@ -298,14 +319,14 @@ public final class Fuzzy extends Index {
     if(!ft.cs) return ii;
 
     // case sensitive search
-    final int[][] ids = finish(ii);
-    int c = 0;
+    int[][] ids = finish(ii);
+    //int c = 0;
 
     // check real case of each result node
     final FTTokenizer ftdb = new FTTokenizer();
     ftdb.st = ft.st;
-
-    for(int i = 0; i < ids[0].length;) {
+    int c = csDBCheck(ids, data, ftdb, tok);
+ /*   for(int i = 0; i < ids[0].length;) {
       final int id = ids[0][i];
       ftdb.init(data.text(id));
 
@@ -325,18 +346,70 @@ public final class Fuzzy extends Index {
         i++;
       }
     }
-    return new IndexArrayIterator(ids, c);
+*/
+    return new IndexArrayIterator(ids, c, true);
   }
 
+  /**
+   * Performs db-access and checks real case of a token. 
+   * @param ids full-text ids
+   * @param d Data-reference
+   * @param ftdb Fulltext Tokenizer
+   * @param tok token
+   * @return counter 
+   */
+  public static int csDBCheck(final int[][] ids, final Data d, 
+      final FTTokenizer ftdb, final byte[] tok) {
+    int c = 0;
+    for(int i = 0; i < ids[0].length;) {
+      final int id = ids[0][i];
+      ftdb.init(d.text(id));
+
+      // iterator text values
+      while(i < ids[0].length && id == ids[0][i] && ftdb.more()) {
+        // first match case insensitive value
+        ftdb.cs = false;
+        if(!Token.eq(Token.lc(tok), ftdb.get())) {
+          //i++;
+          continue;
+        }
+
+        // token found - match case sensitivity
+        ftdb.cs = true;
+        if(Token.eq(tok, ftdb.get())) {
+          // overwrite original values
+          ids[0][c] = id;
+          ids[1][c++] = ids[1][i];
+        }
+        i++;
+      }
+    }
+    return c;
+  }
+  
   @Override
   public int nrIDs(final IndexToken index) {
+    // hack, should find general solution
+    FTTokenizer fto = (FTTokenizer) index;
+    if(fto.fz) return 1;
+
     // specified ft options are not checked yet...
-    final FTTokenizer ft = (FTTokenizer) index;
-    if(ft.fz) return 1;
-    
     final byte[] tok = index.get();
-    final long p = getPointerOnToken(Token.lc(tok));
-    return p == -1 ? 0 : getDataSize(p, tok.length);
+    final int id = cache.id(Token.lc(tok));
+    if (id > 0) {
+      return cache.getSize(id);
+    } else {
+      final long p = getPointerOnToken(Token.lc(tok));
+      if (p > -1) {
+        final int size = getDataSize(p, tok.length);
+        cache.add(tok, size, p);
+        return size;
+      } else {
+        cache.add(tok, 0, 0);
+        return 0;        
+      }        
+    }
+    //return p == -1 ? 0 : getDataSize(p, tok.length);
   }
 
   @Override
@@ -398,11 +471,11 @@ public final class Fuzzy extends Index {
           finish(getData(getPointerOnData(b[0][1], b[0][0]),
               getDataSize(b[0][1], b[0][0]))));
 
-      return new IndexArrayIterator(dt);
+      return new IndexArrayIterator(dt, true);
     }
 
     BaseX.debug("Sorry, FuzzyIndex supports only \'.*\' as wildcard.");
-    return null;
+    return IndexIterator.EMPTY;
   }
 
   /**

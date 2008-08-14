@@ -80,10 +80,16 @@ public abstract class LocPath extends Expr {
           minP = p;
         }
       }
-      if(min == Integer.MAX_VALUE) continue;
+      
+      final boolean seq = min == Integer.MAX_VALUE;
+      //if(min == Integer.MAX_VALUE) continue;
       
       // ..what is the optimal maximum for index access?
-      if(this instanceof LocPathRel && min > ctx.local.data.size / 10) continue;
+      //if(this instanceof LocPathRel && min > ctx.local.data.size / 10) 
+      //continue;
+      if(!seq && 
+          this instanceof LocPathRel && min > ctx.local.data.size / 10) 
+        continue;
       
       // predicates that are optimized to use index and results of index queries
       final IntList oldPreds = new IntList();
@@ -92,12 +98,18 @@ public abstract class LocPath extends Expr {
       for(int p = 0; p < preds.size(); p++) {
         final Pred pred = preds.get(p);
 
-        if(p == minP && indexArg == null) {
+        //if(p == minP && indexArg == null) {
+        if(seq || p == minP && indexArg == null) {
           oldPreds.add(p);
-          indexArg = pred.indexEquivalent(ctx, step);
+          //indexArg = pred.indexEquivalent(ctx, step);
+          indexArg = pred.indexEquivalent(ctx, step, seq);
         }
       }
 
+      if (seq) {
+        continue;
+      }
+      
       // hold all steps following this step
       final LocPath oldPath = new LocPathRel();
       for(final int j = i + 1; j < steps.size();) {

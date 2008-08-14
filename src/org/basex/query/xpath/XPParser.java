@@ -20,7 +20,7 @@ import org.basex.query.xpath.expr.FTArrayExpr;
 import org.basex.query.xpath.expr.FTContains;
 import org.basex.query.xpath.expr.FTMildNot;
 import org.basex.query.xpath.expr.FTOr;
-import org.basex.query.xpath.expr.FTSelect;
+import org.basex.query.xpath.expr.FTSelectXP;
 import org.basex.query.xpath.expr.FTPositionFilter;
 import org.basex.query.xpath.expr.FTWords;
 import org.basex.query.xpath.expr.FTUnaryNot;
@@ -648,7 +648,7 @@ public class XPParser extends QueryParser {
    */
   FTArrayExpr ftSelection() throws QueryException {
     final FTArrayExpr e = ftOr();
-    return new FTSelect(e, ftPosFilter());
+    return new FTSelectXP(e, ftPosFilter());
   }
 
   /**
@@ -661,7 +661,7 @@ public class XPParser extends QueryParser {
     if(!consume(FTOR)) return e;
 
     consumeWS();
-    if(consume(FTNOT)) error(FTNOTEXC);
+    //if(consume(FTNOT)) error(FTNOTEXC);
 
     FTArrayExpr[] list = { e };
     do list = add(list, ftAnd()); while(consume(FTOR));
@@ -956,31 +956,38 @@ public class XPParser extends QueryParser {
       if(consume(ORDERED)) { // FTOrdered
         consumeWS();
         pos.ordered = true;
+        ftpos.lp = true;
       } else if(consume(WINDOW)) { // FTWindow
         consumeWS();
         ftpos.window = number();
         pos.wunit = ftUnit();
+        ftpos.lp = true;
       } else if(consume(DISTANCE)) { // FTDistance
         consumeWS();
         ftpos.dist = ftRange();
         pos.dunit = ftUnit();
+        ftpos.lp = true;
       } else if(consume(AT)) { // FTContent
         consumeWS();
         if(consume(START)) pos.start = true;
         else if(consume(END)) pos.end = true;
         else error(FTSCOPE);
+        ftpos.lp = true;
       } else if(consume(ENTIRE)) { // FTContent
         consumeWS();
         if(consume(CONTENT)) pos.content = true;
         else error(FTSCOPE);
+        ftpos.lp = true;
       } else if(consume(SAME)) { // FTScope
         consumeWS();
         pos.same = true;
         pos.sdunit = ftBigUnit();
+        ftpos.lp = true;
       } else if (consume(DIFFERENT)) { // FTScope
         consumeWS();
         pos.different = true;
         pos.sdunit = ftBigUnit();
+        ftpos.lp = true;
       } else {
         break;
       }

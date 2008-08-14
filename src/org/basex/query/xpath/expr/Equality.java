@@ -59,7 +59,8 @@ public final class Equality extends Comparison {
   }
 
   @Override
-  public Path indexEquivalent(final XPContext ctx, final Step curr) {
+  public Path indexEquivalent(final XPContext ctx, final Step curr, 
+      final boolean seq) {
     final LocPath path = (LocPath) expr1;
     final LocPath inv = path.invertPath(curr);
 

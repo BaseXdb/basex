@@ -19,6 +19,15 @@ public final class IntList {
 
   /**
    * Default constructor.
+   * @param s initial list size
+   */
+  public IntList(final int s) {
+    list = new int[s];
+  }
+
+  
+  /**
+   * Default constructor.
    * @param v initial list values
    */
   public IntList(final int[] v) {
@@ -103,6 +112,16 @@ public final class IntList {
     size = 0;
   }
 
+  /**
+   * Resets the integer list.
+   * @param is initial size
+   */
+  public void reset(final int is) {
+    size = 0;
+    list = new int[is];
+  }
+
+  
   /**
    * Removes all duplicates. Note that the integers must be sorted.
    */

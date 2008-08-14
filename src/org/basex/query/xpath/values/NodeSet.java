@@ -13,7 +13,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Tim Petrowsky
  */
-public final class NodeSet extends Item {
+public class NodeSet extends Item {
   /** Precedence. */
   static final int PREC = Integer.MAX_VALUE;
   /** Current node set position. */
@@ -32,6 +32,12 @@ public final class NodeSet extends Item {
   /** Number of stored values.. */
   public int size;
 
+  /**
+   * Standard constuctor.
+   *
+   */
+  public NodeSet() { };
+  
   /**
    * Constructor, creating a new node set from the specified node ids.
    * @param ids node ids

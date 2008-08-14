@@ -1,12 +1,11 @@
 package org.basex.query.xpath.expr;
 
-import static org.basex.query.xpath.XPText.OPTOR4;
+
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
-import org.basex.query.xpath.locpath.PredSimple;
 import org.basex.query.xpath.locpath.Step;
 import org.basex.query.xpath.values.Bool;
-import org.basex.util.Array;
+import org.basex.util.IntList;
 
 /**
  * Logical FTOr expression.
@@ -15,6 +14,10 @@ import org.basex.util.Array;
  * @author Sebastian Gath
  */
 public final class FTOr extends FTArrayExpr {
+  /** Saving index of expressions. */
+  private int[] pex;
+  
+
   /**
    * Constructor.
    * @param e expressions
@@ -41,22 +44,36 @@ public final class FTOr extends FTArrayExpr {
    }
   
   @Override
-  public FTArrayExpr indexEquivalent(final XPContext ctx, final Step curr)
+  public FTArrayExpr indexEquivalent(final XPContext ctx, final Step curr, 
+      final boolean seq)
       throws QueryException {
-   
-    FTArrayExpr tmp;
+    
+    if (pex.length == 1 && seq) 
+      exprs[pex[0]].indexEquivalent(ctx, curr, seq);
+    
+    FTArrayExpr[] indexExprs = new FTArrayExpr[exprs.length];
+    for (int i = 0; i < exprs.length; i++) {
+      indexExprs[i] = exprs[i].indexEquivalent(ctx, curr, seq); 
+    }
+    
+    return new FTUnion(indexExprs, pex);
+
+    
+   /* FTArrayExpr tmp;
     FTArrayExpr[] ftun = {};
     FTArrayExpr[] other = {};
-
+*/
     // find index equivalents
-    for(int i = 0; i != exprs.length; i++) {
+    /*for(int i = 0; i != exprs.length; i++) {
+      
+      /*
       if (exprs[i] instanceof FTUnaryNot) { 
         ftun = Array.add(ftun, exprs[i]);
       } else {
         tmp = exprs[i].indexEquivalent(ctx, curr);
         if(tmp == null) return null;
         other = Array.add(other, tmp);
-      }
+      }*/
       /*
       tmp = exprs[i].indexEquivalent(ctx, curr);
       if(tmp == null) return null;
@@ -72,11 +89,11 @@ public final class FTOr extends FTArrayExpr {
         j = i;
       } else {
         other.add(tmp);
-      }*/
-    }
+      }
+    }*/
 
     
-       
+       /*
     if (ftun.length > 0 && other.length > 0) {
       for (int i = 0; i < curr.preds.size(); i++) {
         if (curr.preds.get(i) instanceof PredSimple) {
@@ -98,8 +115,8 @@ public final class FTOr extends FTArrayExpr {
       FTArrayExpr[] e = new FTArrayExpr[ftun.length + 1];
       e[0] = new FTUnion(other);
       System.arraycopy(ftun, 0, e, 1, ftun.length);
-      return new FTOr(e);
-    }
+      return new FTOr(e); */
+    //}
     
     /*
     // perform path step only once if all path expressions are the same
@@ -109,13 +126,33 @@ public final class FTOr extends FTArrayExpr {
      return new FTUnion(indexExprs);
      */
     // <SG> add compiler infos??
-    ctx.compInfo(OPTOR4);
-    return new FTUnion(other);
+    //ctx.compInfo(OPTOR4);
+    //return new FTUnion(other);
   }
   
   @Override
   public int indexSizes(final XPContext ctx, final Step curr, final int min) {
+    IntList i1 = new IntList(exprs.length);
+    boolean seq = false;
     int sum = 0;
+    int nrIDs = 0;
+    
+    for (int i = 0; i < exprs.length; i++) {
+      nrIDs = exprs[i].indexSizes(ctx, curr, min);
+      if (!(exprs[i] instanceof FTUnaryNot)) {
+        i1.add(i);
+        sum += nrIDs;
+        //if(sum > min) return min;
+      } else if (nrIDs > 0) {
+        i1.add(i);
+        seq = true;
+      }
+    }
+    
+    pex = i1.finish();
+    if (seq) return Integer.MAX_VALUE;
+    return sum > min ? min : sum;
+    /*
     for(final Expr expr : exprs) {
       final int nrIDs = expr.indexSizes(ctx, curr, min);
       if(nrIDs == Integer.MAX_VALUE) return nrIDs;
@@ -123,5 +160,6 @@ public final class FTOr extends FTArrayExpr {
       if(sum > min) return min;
     }
     return sum > min ? min : sum;
+    */
   }
 }
