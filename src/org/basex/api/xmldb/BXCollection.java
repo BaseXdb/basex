@@ -1,6 +1,7 @@
 package org.basex.api.xmldb;
 
 import org.xmldb.api.base.*;
+import org.xmldb.api.modules.XMLResource;
 import org.basex.core.Context;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.Check;
@@ -44,9 +45,13 @@ public class BXCollection implements Collection {
   /**
    * @see org.xmldb.api.base.Collection#createResource(java.lang.String, java.lang.String)
    */
-  public Resource createResource(String id, String type) {
-    // TODO Auto-generated method stub
-    return null;
+  public Resource createResource(String id, String type) throws XMLDBException {
+      if(type.equals(XMLResource.RESOURCE_TYPE.toString())) {
+        if(new Check(id).execute(ctx)) {
+        return new BXXMLResource(ctx); 
+        }
+      }
+    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED);
   }
 
   /**
@@ -173,7 +178,7 @@ public class BXCollection implements Collection {
    * @see org.xmldb.api.base.Collection#storeResource(org.xmldb.api.base.Resource)
    */
   public void storeResource(Resource res) {
-    // TODO Auto-generated method stub
-    
+    BXXMLResource tmpRes = (BXXMLResource) res;
+    ctx.data().insert(ctx.data().meta.lastid, 0, tmpRes.getTmpCtx().data());
   }
 }

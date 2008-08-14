@@ -80,18 +80,19 @@ public class XMLDBXPathTest {
       System.out.println("------DOM Node Retrieval END------");
 
       /* Deleting a Resource*/
-      collection.removeResource(collection.getResource(id));
+      //collection.removeResource(collection.getResource(id));
       
-      /* Binary Content Retrieval*/
-      /*BinaryResource resource2 = 
-         (BinaryResource) col.getResource(id);
-      // Return value of getContent must be defined in the specific language mapping
-      // for the language used. For Java this is a byte array.
-      byte[] img = (byte[]) resource2.getContent();
-      System.out.println("------Binary Content Retrieval------");
-      System.out.println(new String(img));
-      System.out.println("------Binary Content Retrieval END------");*/
-                     
+      
+
+   // document is assumed to be a valid XML document. Where this comes from is
+   // outside the scope of the API
+   String document = "C:/Andy/Test/1.xml";
+   
+   XMLResource resource2 = 
+      (XMLResource) collection.createResource(id, XMLResource.RESOURCE_TYPE);
+
+   resource2.setContent(document);
+   collection.storeResource(resource2);                   
 
     } catch(XMLDBException e) {
       System.err.println("XML:DB Exception occured " + e.errorCode);

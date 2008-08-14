@@ -21,18 +21,20 @@ import java.io.File;
 import java.io.FileInputStream;
 import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
+import org.basex.core.proc.CreateDB;
 
 /**
  * Implementation of the XMLResource Interface for the XMLDB:API
- *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler
  */
 public class BXXMLResource implements XMLResource {
-  
+
   /** Context ctx */
   Context ctx;
-  
+  /** Context2 tmpCtx */
+  Context tmpCtx = new Context();
+
   /**
    * Standard constructor.
    * @param ctx for Context
@@ -67,14 +69,13 @@ public class BXXMLResource implements XMLResource {
       factory.setValidating(false);
 
       // Create the builder and parse the file
-      Document doc = factory.newDocumentBuilder().parse(new File(ctx.data().meta.file.toString()));
+      Document doc = factory.newDocumentBuilder().parse(
+          new File(ctx.data().meta.file.toString()));
       return doc;
-  } catch (SAXException e) {
+    } catch(SAXException e) {
       // A parsing error occurred; the xml input is not valid
-  } catch (ParserConfigurationException e) {
-  } catch (IOException e) {
-  }
-  return null;
+    } catch(ParserConfigurationException e) {} catch(IOException e) {}
+    return null;
   }
 
   /**
@@ -82,38 +83,29 @@ public class BXXMLResource implements XMLResource {
    */
   public void getContentAsSAX(ContentHandler handler) throws XMLDBException {
     XMLReader reader = null;
-        SAXParserFactory saxFactory = SAXParserFactory.newInstance();
-        saxFactory.setNamespaceAware(true);
-        saxFactory.setValidating(false);
-        try
-        {
-            SAXParser sax = saxFactory.newSAXParser();
-            reader = sax.getXMLReader();
-        }
-        catch(ParserConfigurationException pce)
-        {
-            throw new XMLDBException(1, pce.getMessage());
-        }
-        catch(SAXException saxe)
-        {
-            saxe.printStackTrace();
-            throw new XMLDBException(1, saxe.getMessage());
-        }
-    try
-    {
-        reader.setContentHandler(handler);
-        reader.parse(new InputSource(new FileInputStream(new File(ctx.data().meta.file.toString()))));
+    SAXParserFactory saxFactory = SAXParserFactory.newInstance();
+    saxFactory.setNamespaceAware(true);
+    saxFactory.setValidating(false);
+    try {
+      SAXParser sax = saxFactory.newSAXParser();
+      reader = sax.getXMLReader();
+    } catch(ParserConfigurationException pce) {
+      throw new XMLDBException(1, pce.getMessage());
+    } catch(SAXException saxe) {
+      saxe.printStackTrace();
+      throw new XMLDBException(1, saxe.getMessage());
     }
-    catch(SAXException saxe)
-    {
-        saxe.printStackTrace();
-        throw new XMLDBException(1, saxe.getMessage());
+    try {
+      reader.setContentHandler(handler);
+      reader.parse(new InputSource(new FileInputStream(new File(
+          ctx.data().meta.file.toString()))));
+    } catch(SAXException saxe) {
+      saxe.printStackTrace();
+      throw new XMLDBException(1, saxe.getMessage());
+    } catch(IOException ioe) {
+      throw new XMLDBException(1, ioe.getMessage());
     }
-    catch(IOException ioe)
-    {
-        throw new XMLDBException(1, ioe.getMessage());
-    }
-}
+  }
 
   /**
    * @see org.xmldb.api.modules.XMLResource#getDocumentId()
@@ -150,16 +142,22 @@ public class BXXMLResource implements XMLResource {
    * @see org.xmldb.api.base.Resource#setContent(java.lang.Object)
    */
   public void setContent(Object value) {
-    // TODO Auto-generated method stub
-    
-  }
+    new CreateDB(value.toString()).execute(tmpCtx);
+  } 
 
+  /**
+   * @return the tmpCtx
+   */
+  public Context getTmpCtx() {
+    return tmpCtx;
+  }
+  
   /**
    * @see org.xmldb.api.modules.XMLResource#setContentAsDOM(org.w3c.dom.Node)
    */
   public void setContentAsDOM(Node content) {
-    // TODO Auto-generated method stub
-    
+  // TODO Auto-generated method stub
+
   }
 
   /**
