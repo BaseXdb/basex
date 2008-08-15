@@ -81,6 +81,9 @@ public abstract class LocPath extends Expr {
         }
       }
       
+      // [CG] seq flag is used for method call of index equivalant in the case
+      // that the query has to be processed sequential, but index access is 
+      // possible. maybe there will be a more elegant solution. SG
       final boolean seq = min == Integer.MAX_VALUE;
       //if(min == Integer.MAX_VALUE) continue;
       

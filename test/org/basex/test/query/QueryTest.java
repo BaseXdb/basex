@@ -50,7 +50,7 @@ public final class QueryTest {
     Prop.attrindex = true;
     Prop.ftindex = true;
     //Prop.ftcompress = true;
-    Prop.ftfuzzy = true;
+    Prop.ftfuzzy = false; //true;
     Prop.chop = true;
 
     test(false);
