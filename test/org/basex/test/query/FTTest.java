@@ -34,7 +34,6 @@ public class FTTest extends AbstractTest {
       "</fttest>";
 
     queries = new Object[][] {
-        
         { "Simple 1", bool(true),
           "'abc' ftcontains 'abc'" },
         { "Simple 2", bool(true),
@@ -176,6 +175,8 @@ public class FTTest extends AbstractTest {
         
         { "FTMildNot1", nodes(3, 5),
         "//w [text() ftcontains 'xml' not in 'xml databases']" },
+        { "FTMildNot2", nodes(14),
+        "//w [text() ftcontains 'hello' not in 'xml']" },
         
         { "FTUnaryNot1", nodes(14),
         "//w [text() ftcontains ftnot 'xml']" },
@@ -186,7 +187,8 @@ public class FTTest extends AbstractTest {
           "case sensitive]" },
         { "FTUnaryNot4", nodes(7, 9, 11, 14),
         "//w [text() ftcontains 'databases' ftor ftnot 'xml']" },
-        
+        { "FTUnaryNot5", nodes(3, 5, 14),
+        "//w [text() ftcontains 'hello' ftor ftnot 'databases']" },
 
     };
 

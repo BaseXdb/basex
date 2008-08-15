@@ -50,7 +50,7 @@ public final class FTMildNotExprs extends FTArrayExpr {
     } else if (n0.getPre() > n1.getPre()) {
       n1 = null;
       if (more()) return next(ctx);
-      else return new FTNode();
+      else return n0;
     } else {
       boolean mp0 = n0.morePos();
       boolean mp1 = n1.morePos();
