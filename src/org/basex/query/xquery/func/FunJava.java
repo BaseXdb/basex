@@ -151,7 +151,7 @@ public final class FunJava extends Arr {
    * @param par Java type
    * @return xquery type
    */
-  private Type jType(final Class<?> par) {
+  public static Type jType(final Class<?> par) {
     if(par == String.class) return Type.STR;
     if(par == boolean.class || par == Boolean.class) return Type.BLN;
     if(par == char.class || par == Character.class) return Type.USH;

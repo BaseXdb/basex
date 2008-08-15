@@ -150,11 +150,7 @@ public final class FTNode extends NodeSet {
    * @return boolean 
    */
   public boolean merge(final FTNode n, final int w) {
-    // merge only equal ftnodes
-    if (not != n.not) return false;
-    
-    //not = not || n.not;
-    
+    not = not || n.not;
     boolean mp = morePos();
     boolean nmp = n.morePos();
     if (getPre() != n.getPre() || 

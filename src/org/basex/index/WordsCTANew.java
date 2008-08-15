@@ -87,22 +87,15 @@ public final class WordsCTANew extends Index {
     if (id > 0) {
       return cache.getSize(id);
     } else {
-      
-      final int[] ne = getNodeIdFromTrieRecursive(0, Token.lc(ind.get()));
-      
+      final int[] ne = getNodeIdFromTrieRecursive(0, tok);
       if (ne != null && ne[ne.length - 1] > 0) {
-        cache.add(Token.lc(ind.get()), ne[ne.length - 1], did);
+        cache.add(tok, ne[ne.length - 1], did);
         return ne[ne.length - 1];
       } else {
-        cache.add(Token.lc(ind.get()), 0, 0);
+        cache.add(tok, 0, 0);
         return 0;
       }        
     }
-    /*
-    final IndexIterator ii  = ids(ind);
-    int c = 0;
-    while(ii.more()) c++;
-    return c;*/
   }
 
   @Override
@@ -926,14 +919,9 @@ public final class WordsCTANew extends Index {
     if(s == 0 || ldid < 0) return null;
     int[][] dt = new int[2][s];
    
-    if (data.meta.fcompress) {
-      dt[0][0] = inD.readNum(ldid);
-      for(int i = 1; i < s; i++) dt[0][i] = inD.readNum();
-      for(int i = 0; i < s; i++) dt[1][i] = inD.readNum();
-    } else {
-      dt[0] = inD.readInts(ldid, s * 4L + ldid);
-      dt[1] = inD.readInts(s * 4L + ldid, s * 8L + ldid);
-    }
+    dt[0][0] = inD.readNum(ldid);
+    for(int i = 1; i < s; i++) dt[0][i] = inD.readNum();
+    for(int i = 0; i < s; i++) dt[1][i] = inD.readNum();
     return dt;
   }
  

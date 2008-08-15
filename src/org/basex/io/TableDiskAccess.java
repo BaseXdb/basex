@@ -96,7 +96,7 @@ public final class TableDiskAccess extends TableAccess {
    * @param pre pre of the entry to search for
    * @return offset of the entry in currentBlock
    */
-  public synchronized int cursor(final int pre) {
+  private synchronized int cursor(final int pre) {
     int fp = firstPre;
     int np = nextPre;
     if(pre >= fp && pre < np) return (pre - fp) << IO.NODEPOWER;
@@ -116,7 +116,6 @@ public final class TableDiskAccess extends TableAccess {
     if(low > high) {
       throw new RuntimeException("Invalid Data Access:\nPre: " + pre +
           ", IndexSize: " + indexSize + ", Access: " + mid + " (" + low + ")");
-      //BaseX.notexpected();
     }
     
     readBlock(mid, fp, np);

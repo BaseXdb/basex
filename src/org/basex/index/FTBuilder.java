@@ -38,7 +38,6 @@ public final class FTBuilder extends Progress implements IndexBuilder {
    * @throws IOException IO Exception
    */
   public WordsCTANew build(final Data data) throws IOException {
-    data.meta.fcompress = Prop.fcompress;
     wp.cs = data.meta.ftcs;
     int s = 0;
     index = new CTArrayNew(128, data.meta.ftcs);
@@ -207,27 +206,17 @@ public final class FTBuilder extends Progress implements IndexBuilder {
     while(hash.more()) {
       p = hash.next();
       tok = hash.key();
-      //System.out.println("<w>" + new String(tok) + "</w>");
       ds = hash.ns[p];
       c = outD.size();
-      if (Prop.fcompress) {
-        val = Num.finish(hash.pre[p]);
-        for (int z = 4; z < val.length; z++) outD.write(val[z]); 
-        val = Num.finish(hash.pos[p]);
-        for (int z = 4; z < val.length; z++) outD.write(val[z]);
-      } else {
-        val = hash.pre[p];
-        for(int v = 0, ip = 4; v < ds; ip += Num.len(val, ip), v++) {
-          outD.writeInt(Num.read(val, ip));
-        }
-        val = hash.pos[p];
-        for(int v = 0, ip = 4; v < ds; ip += Num.len(val, ip), v++) {
-          outD.writeInt(Num.read(val, ip));
-        }
-      }
+      
+      val = hash.pre[p];
+      int is = Num.size(val);
+      for (int z = 4; z < is; z++) outD.write(val[z]);
+      val = hash.pos[p];
+      is = Num.size(val);
+      for (int z = 4; z < is; z++) outD.write(val[z]);
       index.insertSorted(tok, ds, c);
     }
-    //System.out.println("</words>");
    }
   
   /**
@@ -239,12 +228,8 @@ public final class FTBuilder extends Progress implements IndexBuilder {
    */
   private void writeData(final DataOutput out, final int[] d) 
     throws IOException {
-    if (Prop.fcompress) {
-      byte[] val = Num.create(d);
-      for (int z = 4; z < val.length; z++) out.write(val[z]); 
-    } else {
-      out.writeInts(d);
-    }
+    byte[] val = Num.create(d);
+    for (int z = 4; z < val.length; z++) out.write(val[z]); 
   }
 
   /**

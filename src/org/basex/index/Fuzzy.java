@@ -119,7 +119,7 @@ public final class Fuzzy extends Index {
 
     // binary search
     while(l < r) {
-      final int m = l + (r - l) / 2 / o * o; // (r - l) / 2 - (r - l) / 2 % o
+      final int m = l + (r - l) / 2 / o * o;
       final int c = Token.cmp(ti.readBytes(m, m + tl), tok);
       if(c == 0) return m;
       else if(c > 0) l = m + o;
@@ -201,27 +201,9 @@ public final class Fuzzy extends Index {
   private IndexIterator getData(final long p, final int s) {
     dat.cursor(p);
     int[][] d = new int[2][s];
-    
-    if (data.meta.fcompress) {
-      d[0][0] = dat.readNum();
-      for(int i = 1; i < s; i++) d[0][i] = dat.readNum();
-      for(int i = 0; i < s; i++) d[1][i] = dat.readNum();
-    } else {
-      d[0] = dat.readInts(p, s * 4L + p);
-      d[1] = dat.readInts(s * 4L + p, s * 8L + p);
-    }
-
+    for(int i = 0; i < s; i++) d[0][i] = dat.readNum();
+    for(int i = 0; i < s; i++) d[1][i] = dat.readNum();
     return new IndexArrayIterator(d, true);
-    
-    /*
-    //Iterator has to be implemented for hard disk access
-    return new IndexArrayIterator() {
-      @Override
-      public int next() { return dat.readNum(); }
-      @Override
-      public int size() { return s; }
-    };
-    */
   }
 
   /**
@@ -229,6 +211,7 @@ public final class Fuzzy extends Index {
    * @param it iterator
    * @return array
    */
+  // <SG> must be rewritten...
   private int[][] finish(final IndexIterator it) {
     final int s = it.size();
     final int[] pre = new int[s];
@@ -271,7 +254,6 @@ public final class Fuzzy extends Index {
       while(p < pe) {
         to = ti.readBytes(p, p + ts);
         if (calcEQ(to, 0, tok, e)) {
-          //System.out.println(new String(to));
           // read data
           ft = FTUnion.calculateFTOr(ft,
               finish(getData(getPointerOnData(p, ts), getDataSize(p, ts))));
@@ -326,27 +308,7 @@ public final class Fuzzy extends Index {
     final FTTokenizer ftdb = new FTTokenizer();
     ftdb.st = ft.st;
     int c = csDBCheck(ids, data, ftdb, tok);
- /*   for(int i = 0; i < ids[0].length;) {
-      final int id = ids[0][i];
-      ftdb.init(data.text(id));
 
-      // iterator text values
-      while(id == ids[0][i] && ftdb.more()) {
-        // first match case insensitive value
-        ftdb.cs = false;
-        if(!Token.eq(tok, ftdb.get())) continue;
-
-        // token found - match case sensitivity
-        ftdb.cs = true;
-        if(Token.eq(tok, ftdb.get())) {
-          // overwrite original values
-          ids[0][c] = id;
-          ids[1][c++] = ids[1][i];
-        }
-        i++;
-      }
-    }
-*/
     return new IndexArrayIterator(ids, c, true);
   }
 
@@ -394,22 +356,19 @@ public final class Fuzzy extends Index {
     if(fto.fz) return 1;
 
     // specified ft options are not checked yet...
-    final byte[] tok = index.get();
-    final int id = cache.id(Token.lc(tok));
-    if (id > 0) {
-      return cache.getSize(id);
+    final byte[] tok = Token.lc(index.get());
+    final int id = cache.id(tok);
+    if(id > 0) return cache.getSize(id);
+
+    final long p = getPointerOnToken(tok);
+    if (p > -1) {
+      final int size = getDataSize(p, tok.length);
+      cache.add(tok, size, p);
+      return size;
     } else {
-      final long p = getPointerOnToken(Token.lc(tok));
-      if (p > -1) {
-        final int size = getDataSize(p, tok.length);
-        cache.add(tok, size, p);
-        return size;
-      } else {
-        cache.add(tok, 0, 0);
-        return 0;        
-      }        
-    }
-    //return p == -1 ? 0 : getDataSize(p, tok.length);
+      cache.add(tok, 0, 0);
+      return 0;        
+    }        
   }
 
   @Override

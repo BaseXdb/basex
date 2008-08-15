@@ -56,8 +56,6 @@ public final class FZBuilder extends Progress implements IndexBuilder {
    * @throws IOException IO Exception
    */
   public Fuzzy build(final Data data) throws IOException {
-    data.meta.fcompress = Prop.fcompress;
-    
     final Performance p = new Performance();
 
     total = data.size;
@@ -119,9 +117,7 @@ public final class FZBuilder extends Progress implements IndexBuilder {
     long dr = 0;
     int c = 0, tr = 0;
     byte j = 1;
-    for (; j < tree.length; j++) {
-      if(c == isize - 1) break;
-
+    for (; j < tree.length && c < isize - 1; j++) {
       final FZHash tre = tree[j];
       if(tre == null) continue;
 
@@ -143,46 +139,26 @@ public final class FZBuilder extends Progress implements IndexBuilder {
         final int ds = tre.ns[p];
         outy.writeInt(ds);
 
+        // write compressed pre and pos arrays
         byte[] val = tre.pre[p];
-        
-        /* Store relative pre list..
-        int po = 0;
-        for(int v = 0, ip = 4; v < ds; ip += Num.len(val, ip), v++) {
-          final int pn = Num.read(val, ip);
-          outz.writeNum(pn - po);
-          po = pn;
-        }
-        for (int z = 4; z < val.length; z++) outz.write(val[z]);
-        */
-        
-        if (Prop.fcompress) {
-          for(int v = 0, ip = 4; v < ds; ip += Num.len(val, ip), v++)
-            outz.writeNum(Num.read(val, ip));
-          //for (int z = 4; z < val.length; z++) outz.write(val[z]);
-        } else {
-          for(int v = 0, ip = 4; v < ds; ip += Num.len(val, ip), v++)
-            outz.writeInt(Num.read(val, ip));  
-        }
+        int is = Num.size(val);
+        for (int z = 4; z < is; z++) outz.write(val[z]);
         
         val = tre.pos[p];
-        if (Prop.fcompress) {
-          for(int v = 0, ip = 4; v < ds; ip += Num.len(val, ip), v++)
-            outz.writeNum(Num.read(val, ip));
-          //for (int z = 4; z < val.length; z++) outz.write(val[z]);
-        } else {
-          for(int v = 0, ip = 4; v < ds; ip += Num.len(val, ip), v++) 
-          outz.writeInt(Num.read(val, ip));
-        }
+        is = Num.size(val);
+        for (int z = 4; z < is; z++) outz.write(val[z]);
         
-        dr = outz.size(); //+= ds << 3; // compression
-        tr = (int) outy.size(); //+= j + 8L;
+        dr = outz.size();
+        tr = (int) outy.size();
       }
       c++;
     }
     tree = null;
 
-    outx.write((byte) (j - 1));
-    outx.writeInt((int) (tr - j - 7L));
+    // <SG> pointer on last word list was too big,
+    //   so 'databases' wasn't found in the FTTest cases
+    outx.write(--j);
+    outx.writeInt(tr - j - 9);
 
     outx.close();
     outy.close();

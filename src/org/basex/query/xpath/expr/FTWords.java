@@ -110,7 +110,8 @@ public final class FTWords extends FTArrayExpr {
     // - no stop words are specified
     // - if wildcards are specified, the fulltext index is a trie
     // - no FTTimes option is specified
-    return //meta.ftcs == fto.cs & 
+    // <SG> I (temporarily) readded case sensitivity check for fuzzy index 
+    return meta.ftcs == fto.cs && 
       meta.ftdc == fto.dc && meta.ftstem == fto.st &&
       fto.sw == null && (!fto.wc || !meta.ftfuzzy) &&
       occ[0] == 1  && occ[1] == Long.MAX_VALUE;

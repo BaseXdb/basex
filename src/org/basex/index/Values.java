@@ -70,6 +70,10 @@ public final class Values extends Index {
       int s = idxl.readNum(pos);
       /** Last pre value. */
       int p = 0;
+      /** Number of values. */
+      int d = -1;
+      @Override
+      public boolean more() { return ++d < s; }
       @Override
       public int next() { return p += idxl.readNum(); }
       @Override

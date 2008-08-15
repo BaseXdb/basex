@@ -60,7 +60,7 @@ public final class Id extends Func {
       if(data.meta.atvindex) {
         final ValuesToken tok = new ValuesToken(false, v);
         IndexIterator it = data.ids(tok);
-        for(int c = 0; c < it.size(); c++) {
+        while(it.more()) {
           int i = it.next();
           if(data.attNameID(i) == id) tmp.add(data.parent(i, data.kind(i)));
         }

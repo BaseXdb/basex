@@ -710,8 +710,6 @@ public enum GUICommands implements GUICommand {
         } else {
           final MetaData meta = GUI.context.data().meta;
           final boolean[] indexes = info.indexes();
-
-          // <CG> no parallel execution...
           Process[] proc = new Process[0];
           if(indexes[0] != meta.txtindex)
             proc = Array.add(proc, cmd(indexes[0], INDEX.TEXT));

@@ -3,7 +3,9 @@ package org.basex.test.query;
 import org.basex.core.Context;
 import org.basex.core.Process;
 import org.basex.core.Prop;
+import org.basex.core.proc.Close;
 import org.basex.core.proc.CreateDB;
+import org.basex.core.proc.DropDB;
 import org.basex.core.proc.XPath;
 import org.basex.core.proc.XQuery;
 import org.basex.data.Nodes;
@@ -49,8 +51,7 @@ public final class QueryTest {
     Prop.textindex = true;
     Prop.attrindex = true;
     Prop.ftindex = true;
-    //Prop.ftcompress = true;
-    Prop.ftfuzzy = false; //true;
+    Prop.ftfuzzy = true;
     Prop.chop = true;
 
     test(false);
@@ -129,6 +130,9 @@ public final class QueryTest {
     }
     out("\n");
 
+    String db = context.data().meta.dbname;
+    new Close().execute(context);
+    DropDB.drop(db);
     return ok;
   }
 

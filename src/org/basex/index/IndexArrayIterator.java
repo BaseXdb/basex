@@ -1,9 +1,9 @@
 package org.basex.index;
 
 import org.basex.query.xpath.values.FTNode;
+import org.basex.util.Array;
 import org.basex.util.FTTokenizer;
 import org.basex.util.IntArrayList;
-import org.basex.util.Array;
 
 /**
  * This interface provides methods for returning index results.
@@ -31,7 +31,7 @@ public class IndexArrayIterator extends IndexIterator {
   public IndexArrayIterator() {
     size = 0;
   }
-  
+
   /**
    * Constructor.
    * @param res pres array
@@ -39,27 +39,7 @@ public class IndexArrayIterator extends IndexIterator {
   public IndexArrayIterator(final int[] res) {
     this(res, res.length);
   }
-  
-  /**
-   * Constructor.
-   * @param ftd ftdata array
-   */
-/*  public IndexArrayIterator(final int[][] ftd) {
-    ftdata = ftd;
-    size = ftd[0].length;
-  }
-*/
-  /**
-   * Constructor.
-   * @param ftd ftdata array
-   * @param s size
-   */
-/*  public IndexArrayIterator(final int[][] ftd, final int s) {
-    ftdata = ftd;
-    size = s;
-  }
-*/
-  
+
   /**
    * Constructor.
    * @param res pres array
@@ -69,8 +49,7 @@ public class IndexArrayIterator extends IndexIterator {
     pres = res;
     size = s;
   }
-  
-  
+
   /**
    * Constructor.
    * @param res pres array
@@ -79,7 +58,7 @@ public class IndexArrayIterator extends IndexIterator {
   public IndexArrayIterator(final int[][] res, final boolean c) {
     this (res, res[0].length, c);
   }
-  
+
   /**
    * Constructor.
    * @param res pres array
@@ -94,18 +73,14 @@ public class IndexArrayIterator extends IndexIterator {
     }
   }
 
-  
-  /**
-   * Checks if more results are available.
-   * @return boolean
-   */
+  @Override
   public boolean more() {
     return ++d < size;
   }
-  
+
   @Override
   public int next() {
-    return (pres != null) ? pres[d] : ftdata[d][0];
+    return pres != null ? pres[d] : ftdata[d][0];
   }
 
   /**
@@ -113,27 +88,27 @@ public class IndexArrayIterator extends IndexIterator {
    * @return ftnode next ftnode
    */
   public FTNode nextFTNode() {
-    FTNode n = (pres != null) ? new FTNode(pres[d]) 
+    final FTNode n = pres != null ? new FTNode(pres[d])
       : new FTNode(ftdata[d], toknum);
     if (tok != null) n.setToken(tok);
-    return n;  
+    return n;
   }
 
   @Override
   public int size() {
     return size;
   }
-  
+
   /**
    * Each token in the query has a number.
    * Used for visualization.
-   * 
+   *
    * @param tn number of tokens
    */
   public void setTokenNum(final int tn) {
     toknum = tn;
   }
-  
+
   /**
    * Set FTTokinzer.
    * @param token FTTokenizer
@@ -141,7 +116,7 @@ public class IndexArrayIterator extends IndexIterator {
   public void setToken(final FTTokenizer[] token) {
     tok = token;
   }
-  
+
   /**
    * Getter FTTokenizer.
    * @return FTTokenizer
@@ -149,7 +124,7 @@ public class IndexArrayIterator extends IndexIterator {
   public FTTokenizer[] getToken() {
     return tok;
   }
-  
+
   /**
    * Get number of tokens.
    * @return number of tokens
@@ -157,7 +132,7 @@ public class IndexArrayIterator extends IndexIterator {
   public int getTokenNum() {
     return toknum;
   }
-  
+
   /**
    * Get fulltext data.
    * @return int [][] fulltext data
@@ -165,26 +140,26 @@ public class IndexArrayIterator extends IndexIterator {
   public int[][] getFTData() {
     return ftdata;
   }
-  
+
   /**
-   * Get current pre-value.
+   * Get specified pre value.
    * @param p int pointer
-   * @return pre-value
+   * @return pre value
    */
   public int getPre(final int p) {
-    return (pres != null) ? pres[p] : ftdata[p][0];
+    return pres != null ? pres[p] : ftdata[p][0];
   }
-  
+
   /**
    * Converts the ftdata in the style:.
    * pre1, pos0, ..., posn, pre2, ....
-   * 
+   *
    * @param r1 pre-values
    * @param r2 pos-values
    * @param siz number of pre/pos values
    */
   private void convertData(final int[] r1, final int[] r2, final int siz) {
-    IntArrayList ia = new IntArrayList(siz);
+    final IntArrayList ia = new IntArrayList(siz);
     int i = 0, s;
     int[] t;
     while (i < siz) {

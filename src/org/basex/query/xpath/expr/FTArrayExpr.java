@@ -60,8 +60,9 @@ public abstract class FTArrayExpr extends Expr {
   /**
    * Returns the next ftquery result.
    * @param ctx current context
-   * @return FTNode conainter for the next result
+   * @return FTNode container for the next result
    */
+  @SuppressWarnings("unused")
   public FTNode next(final XPContext ctx) {
     return new FTNode();
   }

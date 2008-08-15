@@ -115,65 +115,6 @@ public final class FTIndex extends FTArrayExpr {
     }
     
     return Bool.FALSE;
-/*    
-    IntList d1 = null, pos = null;
-    ft.init();
-    w = 0;
-    while(ft.more()) {
-      final IndexIterator it = data.ids(ft);
-      final IntList pre2 = new IntList();
-      int s = it.size();
-      for(int i = 0; i < s; i++) {
-        ctx.checkStop();
-        pre2.add(it.next());
-      }
-      final IntList pos2 = new IntList();
-      for(int i = 0; i < s; i++) {
-        ctx.checkStop();
-        pos2.add(it.next());
-      }
-      
-      if(pre == null) {
-        pre = pre2;
-        pos = pos2;
-      } else {
-        phrase(pre, pos, pre2, pos2, ++w);
-      }
-      if(pre.size == 0) break;
-    }
-
-    final int[][] d = { pre.finish(), pos.finish() };
-    pre.distinct();
-    return new NodeSet(pre.finish(), ctx, d);
-
-    /*
-    IntList pre = null;
-    IntArrayList pos = null;
-    ft.init();
-    int w = 0;
-    while(ft.more()) {
-      final IndexIterator it = data.ids(ft);
-      final IntList pre2 = new IntList();
-      final IntArrayList pos2 = new IntArrayList();
-      while(it.more()) {
-        ctx.checkStop();
-        int p = it.next();
-        pre2.add(p);
-        int s = it.next();
-        final int[] tmp = new int[s];
-        for(int i = 0; i < s; i++) tmp[i] = it.next();
-        pos2.add(tmp);
-      }
-      if(pre == null) {
-        pre = pre2;
-        pos = pos2;
-      } else {
-        phrase(pre, pos, pre2, pos2, ++w);
-      }
-      if(pre.size == 0) break;
-    }
-    return new NodeSet(pre.finish(), ctx);
-    */
   }
 
   @Override
@@ -184,8 +125,6 @@ public final class FTIndex extends FTArrayExpr {
   @Override
   public FTNode next(final XPContext ctx) {
     return iat.nextFTNode();
-    //if (it.more()) return it.nextFTNode();
-    //else return new FTNode();
   }
 
   /**
@@ -219,66 +158,6 @@ public final class FTIndex extends FTArrayExpr {
     }
     return new IndexArrayIterator(ial.list, ial.size, false);
   }
-  
-  /*
-  /**
-   * Joins the specified integer lists, reducing the entries in the first list.
-   * @param pre first pre values
-   * @param pos first pre values
-   * @param pre2 first pre values
-   * @param pos2 second pos values
-   * @param w distance to first word
-   */
-/*  private void phrase(final IntList pre, final IntList pos,
-      final IntList pre2, final IntList pos2, final int w) {
-
-    int s = 0;
-    for(int ai = 0, bi = 0; ai < pre.size && bi < pre2.size;) {
-      int d = pre.get(ai) - pre2.get(bi);
-      if(d == 0) {
-        d = pos.get(ai) - pos2.get(bi) + w;
-        if(d == 0) {
-          pre.set(pre.get(ai), s);
-          pos.set(pos.get(ai), s++);
-        }
-      }
-      if(d <= 0) ai++;
-      if(d >= 0) bi++;
-    }
-    pre.size = s;
-    pos.size = s;
-  }
-  */
- 
-  /*
-  private void phrase(final IntList pre, final IntArrayList pos,
-      final IntList pre2, final IntArrayList pos2, final int w) {
-
-    int c = 0;
-    for(int ai = 0, bi = 0; ai < pre.size && bi < pre2.size;) {
-      int d = pre.get(ai) - pre2.get(bi);
-      if(d == 0) {
-        final int[] ps1 = pos.list[ai];
-        final int[] ps2 = pos2.list[bi];
-        int cc = 0;
-        for(int aj = 0, bj = 0; aj < ps1.length && bj < ps2.length;) {
-          int dd = ps1[aj] - ps2[bj] + w;
-          if(dd == 0) ps1[cc++] = ps1[aj];
-          if(dd <= 0) aj++;
-          if(dd >= 0) bj++;
-        }
-        if(cc != 0) {
-          pre.set(pre.get(ai), c);
-          pos.list[c++] = ps1;
-        }
-      }
-      if(d <= 0) ai++;
-      if(d >= 0) bi++;
-    }
-    pre.size = c;
-    pos.size = c;
-  }
-  */
 
   @Override
   public int indexSizes(final XPContext ctx, final Step curr, final int min) {
@@ -296,16 +175,4 @@ public final class FTIndex extends FTArrayExpr {
   public String toString() {
     return BaseX.info("%(\"%\")", name(), token);
   }
-  
-  /**
-   * Dumps the specified integer list.
-   * @param il list to dump
-  private void dump(final IntList il) {
-    for(int i = 0; i < il.size; i++) {
-      if(i != 0) System.out.print(" ");
-      System.out.print("[" + i + "]" + il.get(i));
-    }
-    System.out.println();
-  }
-   */
 }
