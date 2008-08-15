@@ -3,6 +3,8 @@ package org.basex.query.xpath.internal;
 import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
+import org.basex.index.FTNode;
+import org.basex.index.FTTokenizer;
 import org.basex.index.IndexArrayIterator;
 import org.basex.index.IndexIterator;
 import org.basex.query.FTOpt;
@@ -11,8 +13,6 @@ import org.basex.query.xpath.expr.FTArrayExpr;
 import org.basex.query.xpath.expr.FTPositionFilter;
 import org.basex.query.xpath.locpath.Step;
 import org.basex.query.xpath.values.Bool;
-import org.basex.query.xpath.values.FTNode;
-import org.basex.util.FTTokenizer;
 import org.basex.util.IntArrayList;
 
 /**

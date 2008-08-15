@@ -33,7 +33,7 @@ public class NodeSet extends Item {
   public int size;
 
   /**
-   * Standard constuctor.
+   * Standard constructor.
    *
    */
   public NodeSet() { };

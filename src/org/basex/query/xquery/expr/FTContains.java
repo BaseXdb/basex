@@ -1,5 +1,6 @@
 package org.basex.query.xquery.expr;
 
+import org.basex.index.FTTokenizer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Bln;
@@ -7,7 +8,6 @@ import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Scoring;
-import org.basex.util.FTTokenizer;
 
 /**
  * FTContains expression.

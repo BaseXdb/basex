@@ -1,9 +1,9 @@
 package org.basex.query.xpath.expr;
 
+import org.basex.index.FTNode;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.values.Bool;
-import org.basex.query.xpath.values.FTNode;
 import org.basex.util.IntList;
 
 /**
@@ -15,7 +15,6 @@ import org.basex.util.IntList;
  * @author Sebastian Gath
  */
 public final class FTMildNotExprs extends FTArrayExpr {
-
   /**
    * Constructor.
    * @param e operands joined with the mild not operator
@@ -40,8 +39,8 @@ public final class FTMildNotExprs extends FTArrayExpr {
       else return n0;
     } 
     
-    IntList pos = new IntList(n0.size());
-    IntList poi = new IntList(n0.size() + 1);
+    IntList pos = new IntList();
+    IntList poi = new IntList();
     pos.add(n0.getPre());
     poi.add(n0.getNumTokens());
     
@@ -78,12 +77,10 @@ public final class FTMildNotExprs extends FTArrayExpr {
   
   @Override
   public Bool eval(final XPContext ctx) throws QueryException {
-    //int[] nodes = ctx.local.nodes;
     ctx.ftpos.st = true;
     final Bool b0 = (Bool) exprs[0].eval(ctx);
     exprs[1].eval(ctx);
-    
-    return   b0;
+    return b0;
   }
 
   /**

@@ -1,8 +1,6 @@
 package org.basex.index;
 
-import org.basex.query.xpath.values.FTNode;
 import org.basex.util.Array;
-import org.basex.util.FTTokenizer;
 import org.basex.util.IntArrayList;
 
 /**

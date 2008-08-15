@@ -2,11 +2,11 @@ package org.basex.query.xpath.expr;
 
 import org.basex.data.MetaData;
 import org.basex.data.Serializer;
+import org.basex.index.FTNode;
 import org.basex.query.FTOpt;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.locpath.Step;
-import org.basex.query.xpath.values.FTNode;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -36,8 +36,7 @@ public abstract class FTArrayExpr extends Expr {
    * @return result of check
    */
   public boolean indexOptions(final MetaData meta) {
-    for(int i = 0; i < exprs.length; i++) 
-      if(!exprs[i].indexOptions(meta)) return false;
+    for(final FTArrayExpr e : exprs) if(!e.indexOptions(meta)) return false;
     return true;
   }
   

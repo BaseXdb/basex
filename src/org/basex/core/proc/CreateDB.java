@@ -11,7 +11,7 @@ import org.basex.build.xml.DirParser;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.index.FTBuilder;
-import org.basex.index.FZBuilder;
+import org.basex.index.FTFuzzyBuilder;
 import org.basex.index.IndexToken;
 import org.basex.index.ValueBuilder;
 import org.basex.io.IO;
@@ -77,7 +77,7 @@ public final class CreateDB extends ACreate {
           IndexToken.TYPE.ATV, new ValueBuilder(false).build(data));
       if(data.meta.ftxindex) data.openIndex(
           IndexToken.TYPE.FTX, data.meta.ftfuzzy ?
-              new FZBuilder().build(data) : new FTBuilder().build(data));
+              new FTFuzzyBuilder().build(data) : new FTBuilder().build(data));
       return data;
     } catch(final IOException ex) {
       BaseX.debug(ex);

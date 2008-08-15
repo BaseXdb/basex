@@ -5,13 +5,13 @@ import org.basex.core.Prop;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.data.Serializer;
+import org.basex.index.FTTokenizer;
 import org.basex.query.QueryException;
 import org.basex.query.QueryContext;
 import org.basex.query.xpath.expr.Expr;
 import org.basex.query.xpath.expr.FTPositionFilter;
 import org.basex.query.xpath.values.NodeSet;
 import org.basex.query.xpath.values.Item;
-import org.basex.util.FTTokenizer;
 
 /**
  * Query context.

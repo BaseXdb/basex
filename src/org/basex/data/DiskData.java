@@ -3,12 +3,12 @@ package org.basex.data;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
 import org.basex.core.Prop;
-import org.basex.index.Fuzzy;
+import org.basex.index.FTFuzzy;
 import org.basex.index.Index;
 import org.basex.index.IndexToken;
 import org.basex.index.Names;
 import org.basex.index.Values;
-import org.basex.index.WordsCTANew;
+import org.basex.index.FTTrie;
 import org.basex.io.DataAccess;
 import org.basex.io.TableAccess;
 import org.basex.io.TableDiskAccess;
@@ -101,7 +101,7 @@ public final class DiskData extends Data {
       if(meta.atvindex) openIndex(
           IndexToken.TYPE.ATV, new Values(this, db, false));
       if(meta.ftxindex) openIndex(IndexToken.TYPE.FTX, meta.ftfuzzy ?
-          new Fuzzy(this, db) : new WordsCTANew(this, db));
+          new FTFuzzy(this, db) : new FTTrie(this, db));
     }
     initNames();
   }

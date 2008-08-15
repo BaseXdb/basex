@@ -16,15 +16,6 @@ public final class IntList {
    * Default constructor.
    */
   public IntList() { }
-
-  /**
-   * Default constructor.
-   * @param s initial list size
-   */
-  public IntList(final int s) {
-    list = new int[s];
-  }
-
   
   /**
    * Default constructor.

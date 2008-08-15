@@ -1,6 +1,5 @@
 package org.basex.index;
 
-import org.basex.util.FTTokenizer;
 import org.basex.util.Token;
 
 /**
@@ -19,7 +18,7 @@ public abstract class IndexToken {
     /** Fulltext index.  */ FTX,
   };
   /** Text. */
-  protected byte[] text = Token.EMPTY;
+  public byte[] text = Token.EMPTY;
   /** Index type. */
   public TYPE type;
 

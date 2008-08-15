@@ -1,8 +1,11 @@
 package org.basex.query.xpath.expr;
 
 import static org.basex.query.xpath.XPText.*;
+
 import org.basex.data.MetaData;
 import org.basex.data.Serializer;
+import org.basex.index.FTNode;
+import org.basex.index.FTTokenizer;
 import org.basex.query.FTOpt;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
@@ -12,11 +15,9 @@ import org.basex.query.xpath.locpath.LocPathRel;
 import org.basex.query.xpath.locpath.Step;
 import org.basex.query.xpath.locpath.TestNode;
 import org.basex.query.xpath.values.Bool;
-import org.basex.query.xpath.values.FTNode;
 import org.basex.query.xpath.values.Item;
 import org.basex.query.xpath.values.Literal;
 import org.basex.query.xpath.values.NodeSet;
-import org.basex.util.FTTokenizer;
 import org.basex.util.IntList;
 
 /**
@@ -32,9 +33,9 @@ public final class FTContains extends DualExpr {
   private FTOpt option;
   /** Result item. */
   private Item v1 = null;
-  /** Flag for intial run.  */
+  /** Flag for initial run. */
   private boolean f = false;
-  /** Temporeral result node.*/
+  /** Temporary result node.*/
   private FTNode ftn = null;
   /** Flag for sequential evaluation. */
   boolean s;
@@ -65,13 +66,21 @@ public final class FTContains extends DualExpr {
   public Expr compile(final XPContext ctx) throws QueryException {
     expr1 = expr1.compile(ctx);
     expr2 = expr2.compile(ctx);
-    
+
+    final Item i1 = expr1 instanceof Item ? (Item) expr1 : null;
+    final Item i2 = expr2 instanceof Item ? (Item) expr2 : null;
+    if(i1 != null && i1.size() == 0 || i2 != null && i2.size() == 0) {
+      ctx.compInfo(OPTEQ1);
+      return Bool.FALSE;
+    }
+
     XPOptimizer.addText(expr1, ctx);
     return this;
   }
 
   @Override
   public Item eval(final XPContext ctx) throws QueryException {
+    
     if (expr1 instanceof Literal) {
       Literal lit = (Literal) expr1;
       ctx.ftitem = new FTTokenizer();
@@ -89,7 +98,7 @@ public final class FTContains extends DualExpr {
       IntList il = new IntList();
       while (ftae.more()) {
         ftn = ftae.next(ctx);
-        if (ftn.size() > 0)
+        if (ftn.size > 0)
           il.add(ftn.getPre());
         else break;
       }
@@ -152,7 +161,7 @@ public final class FTContains extends DualExpr {
           if (ftae.more()) ftn = ftae.next(ctx);
           else break;
         }
-        if (ftn.size() > 0) {
+        if (ftn.size > 0) {
           final boolean not = ftn.not;
           if (ftn.getPre() == ctx.local.nodes[0] + 1) {
             ftn = null;
@@ -195,8 +204,10 @@ public final class FTContains extends DualExpr {
   
   @Override
   public Expr indexEquivalent(final XPContext ctx, final Step curr, 
-      final boolean seq)
-      throws QueryException {
+      final boolean seq) throws QueryException {
+
+    if(!(expr1 instanceof LocPathRel)) return this;
+
     s = seq;
     final LocPath path = (LocPath) expr1;
     ctx.compInfo(OPTFTINDEX);
@@ -204,7 +215,7 @@ public final class FTContains extends DualExpr {
     // all FTWords are recursively converted to FTIndex requests
     //final Expr expr = expr2.indexEquivalent(ctx, curr);
     final FTArrayExpr ae = (FTArrayExpr) 
-      (iu ?  expr2.indexEquivalent(ctx, curr, seq) : expr2);
+      (iu ? expr2.indexEquivalent(ctx, curr, seq) : expr2);
     Expr expr;
     if (!seq) {
       expr = new FTContains(expr1, ae, option);

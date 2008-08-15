@@ -1,10 +1,10 @@
 package org.basex.query.xpath.expr;
 
 import org.basex.data.Serializer;
+import org.basex.index.FTNode;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.values.Bool;
-import org.basex.query.xpath.values.FTNode;
 
 /**
  * FTUnaryNotExprs. This expresses the mild combination of ftand and ftnot.

@@ -132,7 +132,7 @@ public final class FTOr extends FTArrayExpr {
   
   @Override
   public int indexSizes(final XPContext ctx, final Step curr, final int min) {
-    IntList i1 = new IntList(exprs.length);
+    IntList i1 = new IntList();
     boolean seq = false;
     int sum = 0;
     int nrIDs = 0;

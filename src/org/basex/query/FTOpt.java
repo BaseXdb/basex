@@ -1,7 +1,8 @@
 package org.basex.query;
 
 import static org.basex.util.Token.*;
-import org.basex.util.FTTokenizer;
+
+import org.basex.index.FTTokenizer;
 import org.basex.util.IntList;
 import org.basex.util.Levenshtein;
 import org.basex.util.Set;

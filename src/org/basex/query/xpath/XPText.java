@@ -147,9 +147,9 @@ public interface XPText {
   /** Optimization info. */
   String OPTOR5 = "Replacing OR by ONEOF expression";
   /** Optimization info. */
-  String OPTEQ1 = "Removing EQUALITY expression for empty nodeset";
+  String OPTEQ1 = "Removing comparison for empty nodeset";
   /** Optimization info. */
-  String OPTEQ2 = "Removing EQUALITY expression for constant comparison";
+  String OPTEQ2 = "Removing constant comparison";
   /** Optimization info. */
   String OPTSELF = "Removing superfluous self axes";
   /** Optimization info. */

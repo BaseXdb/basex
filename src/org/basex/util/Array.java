@@ -377,140 +377,17 @@ public final class Array {
       final int l) {
     System.arraycopy(ar, pos, ar, pos + off, l);
   }
-
-  /**
-   * Convert a byte array to a positive integer value.
-   * @param b byte array
-   * @return result
-   */
-  public static int byteToInt(final byte[] b) {
-    int i = 0;
-    for(int j = 0, p = 0; j < b.length; j++, p += 8) i += (b[j] & 0xff) << p;
-    return i;
-  }
-  
-  /**
-   * Convert integer to byte array, does only work for values > 0.
-   * @param i integer
-   * @return result
-   */
-  public static byte[] intToByteNN(final int i) {
-    if(i == 0) return new byte[] { 0 };
-
-    final int l = i < 0x100 ? 1 : i < 0x10000 ? 2 : i < 0x1000000 ? 3 : 4;
-    final byte[] b = new byte[l];
-    for(int c = 0, j = i; c < l; c++) {
-      b[c] = (byte) j;
-      j >>>= 8;
-    }
-    return b;
-  }
- 
-  /**
-   * Extracts ids out of an int[2][]-array.
-   * int[0] = ids
-   * int[1] = position values
-   * @param data data
-   * @return ids int[]
-   */
-  public static int[] extractIDsFromData(final int[][] data) {
-    if(data == null || data.length == 0 || data[0] == null 
-        || data[0].length == 0) return NOINTS;
-
-    final int l = data[0].length;
-    final int[] ids = new int[l];
-    ids[0] = data[0][0];
-    int c = 1;
-    for(int i = 1; i < l; i++) {
-      final int j = data[0][i];
-      if(ids[c - 1] != j) ids[c++] = j;
-    }
-    return finish(ids, c);
-  }
-
-  /**
-   * Compares 2 int[1][2] array entries and returns.
-   *  0 for equality
-   * -1 if intArrayEntry1 < intArrayEntry2 (same id) or
-   *  1  if intArrayEntry1 > intArrayEntry2 (same id)
-   *  2  real bigger (different id)
-   * -2 real smaller (different id)
-   *
-   * @param id1 first id
-   * @param p1 first position
-   * @param id2 second id
-   * @param p2 second position
-   * @return result [0|-1|1|2|-2]
-   */
-  public static int compareIntArrayEntry(final int id1, final int p1,
-      final int id2, final int p2) {
-
-    // equal ID, equal pos or data1 behind/before data2
-    if(id1 == id2) return p1 == p2 ? 0 : p1 > p2 ? 1 : -1;
-    // real bigger/smaller
-    return id1 > id2 ? 2 : -2;
-  }
-
-  /**
-   * Checks whether i is contained in a. 
-   * @param i value to be found
-   * @param a array to be checked
-   * @return boolean contained
-   */
-  public static boolean contains(final int i, final int[] a) {
-    return firstIndexOf(i, a) != -1;
-  }
-
-  /**
-   * Checks whether p is contained in a. 
-   * returns 
-   *    -1 if i is not contained in a.
-   *    first index of p if it is contained.
-   *    
-   * @param p value to be found
-   * @param a array to be checked
-   * @return int index of p in a contained
-   */
-  public static int firstIndexOf(final int p, final int[] a) {
-    if(a == null || a.length == 0) return -1;
-    int f = 0;
-    int l = a.length - 1;
-
-    while(f <= l) {
-      int m = f + ((l - f) >> 1);
-      if(a[m] < p) {
-        f = m + 1; // continue right
-      } else if(a[m] > p) {
-        l = m - 1; // continue left
-      } else {
-        // find first index
-        while(m > -1 && a[m] == p) m--;
-        return m + 1;
-      }
-    }
-    return -1;
-  }
   
   /**
    * Converts an int-array to string.
-   * 
    * @param sp index of first int value
    * @param a array with values
    * @param ep index of last int value
    * @return a as string
    */
-  public static String intArrayToString(final int sp, final int[] a, 
-      final int ep) {
-    StringBuffer sb = new StringBuffer();
-    sb.append('[');
-    int i = sp;
-    while (i < ep - 1) {
-      sb.append(a[i++]);
-      sb.append(',');
-    }
-    sb.append(a[ep - 1]);
-    sb.append(']');
+  public static String toString(final int[] a, final int sp, final int ep) {
+    final StringBuilder sb = new StringBuilder('[');
+    for(int s = sp; s < ep; s++) sb.append((s != sp ? "," : "") + a[s]);
     return sb.toString();
   }
 }
-

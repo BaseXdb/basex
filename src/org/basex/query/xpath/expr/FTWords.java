@@ -10,7 +10,7 @@ import org.basex.query.xpath.internal.FTIndex;
 import org.basex.query.xpath.locpath.Step;
 import org.basex.query.xpath.values.Bool;
 import org.basex.query.xpath.values.Item;
-import org.basex.util.FTTokenizer;
+import org.basex.util.Token;
 
 /**
  * Fulltext primary expression and FTTimes.
@@ -41,12 +41,10 @@ public final class FTWords extends FTArrayExpr {
 
   @Override
   public Item eval(final XPContext ctx) {
-    if (ctx.local.nodes[0] != 0) {
-      final FTTokenizer tmp = ctx.ftitem;
-      ctx.ftitem = new FTTokenizer();
-      ctx.ftitem.init(ctx.local.data.text(ctx.local.nodes[0] + 1));
+    if (ctx.ftitem.text.length == 0) {
+      ctx.ftitem.init(ctx.local.data.atom(ctx.local.nodes[0]));
       final boolean r = contains(ctx);
-      ctx.ftitem = tmp;
+      ctx.ftitem.text = Token.EMPTY;
       return Bool.get(r);
     }
     return Bool.get(contains(ctx));
@@ -56,7 +54,6 @@ public final class FTWords extends FTArrayExpr {
   public FTArrayExpr compile(final XPContext ctx) {
     return this;
   }
- 
   
   /**
    * Evaluates the fulltext match.

@@ -2,55 +2,24 @@ package org.basex.util;
 
 /**
  * This class provides operations to compress and decompress integer values
- * in byte arrays to save memory. The first four bytes of the array contain the 
- * array length. If an instance of this class is created, {@link #more()} and
- * {@link #next()} can be called to iterate through the stored values.
+ * in byte arrays to save memory.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public final class Num {
-  /** Num array. */
-  private final byte[] iter;
-  /** Iterator position. */
-  private int itpos;
-
-  /**
-   * Constructor for iterating a {@link Num} instance.
-   * @param array array to be iterated
-   */
-  public Num(final byte[] array) {
-    iter = array;
-    itpos = 4;
-  }
-
-  /**
-   * Checks if more numbers are to be iterated.
-   * @return true if more numbers are found
-   */
-  public boolean more() {
-    return itpos < iter.length;
-  }
-  
-  /**
-   * Decompresses and returns the current number.
-   * @return id
-   */
-  public int next() {
-    final int n = Num.read(iter, itpos);
-    itpos += Num.len(iter, itpos);
-    return n;
-  }
+  /** Private constructor, preventing instantiation. */
+  private Num() { }
   
   // STATIC METHODS ===========================================================
   
   /**
    * Returns an empty number array.
    * @return new array
-   */
   public static byte[] newNum() {
     return new byte[] { 0, 0, 0, 4 };
   }
+   */
 
   /**
    * Creates a new number array.
@@ -161,16 +130,6 @@ public final class Num {
   }
 
   /**
-   * Finishes compressed id array.
-   * @param array to be finished
-   * @return byte array
-   */
-  public static byte[] finish(final byte[] array) {
-    final int s = size(array);
-    return s == array.length ? array : Array.finish(array, s);
-  }
-
-  /**
    * Returns the length of the specified array, stored in the first four bytes.
    * @param array array to be evaluated
    * @return array length
@@ -211,4 +170,14 @@ public final class Num {
   private static int len(final int v) {
     return v < 0 || v > 0x3FFFFFFF ? 5 : v > 0x3FFF ? 4 : v > 0x3F ? 2 : 1;
   }
+
+  /**
+   * Finishes compressed id array.
+   * @param array to be finished
+   * @return byte array
+  public static byte[] finish(final byte[] array) {
+    final int s = size(array);
+    return s == array.length ? array : Array.finish(array, s);
+  }
+   */
 }

@@ -1,12 +1,10 @@
 package org.basex.query.xpath.expr;
 
-
 import org.basex.data.MetaData;
+import org.basex.index.FTNode;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.locpath.Step;
-import org.basex.query.xpath.values.Bool;
-import org.basex.query.xpath.values.FTNode;
 import org.basex.query.xpath.values.Item;
 
 
@@ -39,7 +37,7 @@ public final class FTSelectXP extends FTArrayExpr {
     ctx.ftpos = ftpos;
     
     ftpos.pos.init(ctx.ftitem);
-    if (ftn.size() > 0) {
+    if (ftn.size > 0) {
       init(ftn, ctx);
       while (!seqEval()) {
         if (more()) {
@@ -71,18 +69,15 @@ public final class FTSelectXP extends FTArrayExpr {
       ftpos.pos.ft.init(ctx.local.data.text(ftn.getPre()));
       ftpos.pos.term = ftpos.pos.ft.getTokenList();
     }
-    
   }
 
-  
   @Override
   public boolean more() {
     return exprs[0].more();
   }
-
   
   @Override
-  public Bool eval(final XPContext ctx) throws QueryException {
+  public Item eval(final XPContext ctx) throws QueryException {
     final FTPositionFilter tmp = ctx.ftpos;
     ctx.ftpos = ftpos;
     ctx.ftpos.st = ctx.ftpos.pos.content || ctx.ftpos.pos.different 
@@ -94,7 +89,7 @@ public final class FTSelectXP extends FTArrayExpr {
 
     // <SG> ..an own FTIndexSelect could be created for the index version...
     //if(i instanceof NodeSet) return indexEval(ctx, (FTNodeSet) i);
-    return (Bool) i;
+    return i;
     
     // sequential traversal..
     //return Bool.get(i.bool() && seqEval());
@@ -125,8 +120,8 @@ public final class FTSelectXP extends FTArrayExpr {
   public boolean indexOptions(final MetaData meta) {
     // if the following conditions yield true, the index is accessed:
     // - no ftcontent option was specified
-   // return !ftpos.pos.start && !ftpos.pos.end && !ftpos.pos.content &&
-   return   super.indexOptions(meta);
+    // return !ftpos.pos.start && !ftpos.pos.end && !ftpos.pos.content &&
+    return super.indexOptions(meta);
   }
 
   @Override

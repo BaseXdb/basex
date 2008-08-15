@@ -9,6 +9,7 @@ import org.basex.core.proc.Check;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.Serializer;
+import org.basex.index.FTTokenizer;
 import org.basex.io.IO;
 import org.basex.query.FTOpt;
 import org.basex.query.FTPos;
@@ -34,7 +35,6 @@ import org.basex.query.xquery.util.Namespaces;
 import org.basex.query.xquery.util.SeqBuilder;
 import org.basex.query.xquery.util.Variables;
 import org.basex.util.Array;
-import org.basex.util.FTTokenizer;
 import org.basex.util.StringList;
 
 /**

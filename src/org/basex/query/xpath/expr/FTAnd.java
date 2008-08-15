@@ -116,8 +116,8 @@ public final class FTAnd extends FTArrayExpr {
   
   @Override
   public int indexSizes(final XPContext ctx, final Step curr, final int min) {
-    IntList i1 = new IntList(exprs.length);
-    IntList i2 = new IntList(exprs.length);
+    IntList i1 = new IntList();
+    IntList i2 = new IntList();
     int nmin = min;
     int nrIDs;
     for (int i = 0; i < exprs.length; i++) {

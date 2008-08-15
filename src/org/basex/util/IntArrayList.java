@@ -8,7 +8,7 @@ package org.basex.util;
  */
 public final class IntArrayList {
   /** Value array. */
-  public int[][] list = new int[8][];
+  public int[][] list;
   /** Current array size. */
   public int size;
   
@@ -16,6 +16,7 @@ public final class IntArrayList {
    * Default constructor.
    */
   public IntArrayList() {
+    this(8);
   }
   
   /**

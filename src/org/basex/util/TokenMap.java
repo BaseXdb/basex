@@ -1,6 +1,5 @@
 package org.basex.util;
 
-
 /**
  * This is a simple hash map, extending the even simpler
  * {@link Set hash set}.
