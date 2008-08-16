@@ -134,7 +134,8 @@ public final class FTNode {
    * @return boolean 
    */
   public boolean merge(final FTNode n, final int w) {
-    not = not || n.not;
+    if (not != n.not) return false;
+    
     boolean mp = morePos();
     boolean nmp = n.morePos();
     if (getPre() != n.getPre() || !(mp && nmp)) return false;

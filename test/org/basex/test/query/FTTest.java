@@ -34,7 +34,6 @@ public class FTTest extends AbstractTest {
       "</fttest>";
 
     queries = new Object[][] {
-        
         { "Simple 1", bool(true),
           "'abc' ftcontains 'abc'" },
         { "Simple 2", bool(true),
@@ -134,7 +133,14 @@ public class FTTest extends AbstractTest {
           "//w [text() ftcontains 'xml database' with stemming]" },
         { "FTStemming 2", nodes(),
           "//w [text() ftcontains 'xml database' without stemming]" },
-
+        { "FTStemming 3", nodes(7, 9, 11),
+          "//w [text() ftcontains 'xml' ftand 'database' with stemming]" },
+        { "FTStemming 4", nodes(7, 9, 11, 14),
+          "//w [text() ftcontains 'hello' ftor 'database' with stemming]" },
+        { "FTStemming 5", nodes(3, 5, 14),
+          "//w [text() ftcontains ftnot 'database' with stemming]" },
+          
+          
         { "FTLanguage 1", nodes(14),
           "//* [text() ftcontains 'hello' language 'en']" },
         { "FTLanguage 2", // error...
