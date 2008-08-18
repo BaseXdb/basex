@@ -35,8 +35,8 @@ public class BXQStaticContext implements XQStaticContext {
   
   public void declareNamespace(String prefix, String uri) throws XQException {
     try {
-      BXQClose.check(prefix);
-      BXQClose.check(uri);
+      BXQClose.check(prefix, String.class);
+      BXQClose.check(uri, String.class);
       ns.index(new QNm(Token.token(prefix), Uri.uri(Token.token(uri))));
     } catch(final org.basex.query.xquery.XQException ex) {
       throw new BXQException(ex);

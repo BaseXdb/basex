@@ -15,7 +15,7 @@ public interface BXQText {
   /** Error Message. */
   String CLOSED = " has been closed.";
   /** Error Message. */
-  String NULL = "Specified object is null.";
+  String NULL = "Specified % is null.";
   /** Error Message. */
   String WRONG = "Wrong data type; % expected, % found";
   /** Error Message. */
@@ -33,6 +33,10 @@ public interface BXQText {
   /** Error Message. */
   String ELMATT1 = "Node must be element, attribute or atomic.";
   /** Error Message. */
+  String ATT = "Node must not be UNTYPED or ANYTYPE.";
+  /** Error Message. */
+  String ELM = "Node must not be ELEMENT.";
+  /** Error Message. */
   String PI = "Node must be a processing instruction.";
   /** Error Message. */
   String NOBASE = "Item has no base type.";
@@ -42,4 +46,8 @@ public interface BXQText {
   String FORWARD = "Sequence is forwards-only";
   /** Error Message. */
   String CURSOR = "Cursor does not point to an item.";
+  /** Error Message. */
+  String OCC = "Occurrence indicator and item type do not match.";
+  /** Error Message. */
+  String OCCINV = "Invalid occurrence indicator.";
 }

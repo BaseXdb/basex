@@ -10,6 +10,7 @@ import java.io.Reader;
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItemType;
 import org.basex.query.xquery.item.Type;
+import org.xml.sax.XMLReader;
 
 /**
  * Java XQuery API - Closable objects.
@@ -58,10 +59,12 @@ abstract class BXQClose {
   /**
    * Checks if the specified object is null.
    * @param obj object to be checked
+   * @param type data type
    * @throws XQException exception
    */
-  protected static final void check(final Object obj) throws XQException {
-    if(obj == null) throw new BXQException(NULL);
+  protected static final void check(final Object obj, final Class type)
+      throws XQException {
+    if(obj == null) throw new BXQException(NULL, type.getSimpleName());
   }
 
   /**
@@ -74,12 +77,13 @@ abstract class BXQClose {
   protected Type check(final XQItemType it, final Type t) throws XQException {
     check();
     final BXQItemType bit = (BXQItemType) it;
-    if(it != null && !bit.type.instance(t))
+    //if(it != null && !bit.type.instance(t))
+    if(it != null && !bit.type.instance(t) && !t.instance(bit.type))
     //if(it != null && !t.instance(bit.type))
-      throw new BXQException(WRONG, bit.type, t);
+      throw new BXQException(WRONG, t, bit.type);
     return it != null ? bit.type : t;
   }
-  
+
   /**
    * Return the contents of the specified reader as a string.
    * @param r reader 
@@ -87,7 +91,7 @@ abstract class BXQClose {
    * @throws XQException exception
    */
   public final String content(final Reader r) throws XQException {
-    check(r);
+    check(r, XMLReader.class);
     try {
       final StringBuilder sb = new StringBuilder();
       final BufferedReader br = new BufferedReader(r);
@@ -107,7 +111,7 @@ abstract class BXQClose {
    * @throws XQException exception
    */
   public final String content(final InputStream is) throws XQException {
-    check(is);
+    check(is, InputStream.class);
     try {
       final ByteArrayOutputStream bos = new ByteArrayOutputStream();
       final BufferedInputStream bis = new BufferedInputStream(is);

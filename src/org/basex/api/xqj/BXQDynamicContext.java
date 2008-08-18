@@ -17,6 +17,7 @@ import org.basex.BaseX;
 import org.basex.query.QueryException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQueryProcessor;
+import org.basex.query.xquery.item.Atm;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Dbl;
 import org.basex.query.xquery.item.Flt;
@@ -57,9 +58,9 @@ abstract class BXQDynamicContext extends BXQClose implements XQDynamicContext {
     ctx = sc;
   }
   
-  public void bindAtomicValue(final QName qn, final String arg1,
-      final XQItemType it) {
-    BaseX.notimplemented();
+  public void bindAtomicValue(final QName qn, final String val,
+      final XQItemType it) throws XQException {
+    bind(qn, new Atm(Token.token(val)), it);
   }
 
   public void bindBoolean(final QName qn, final boolean val,
@@ -135,7 +136,7 @@ abstract class BXQDynamicContext extends BXQClose implements XQDynamicContext {
     BaseX.notimplemented();
   }
 
-  public void bindSequence(final QName qn, final XQSequence arg1) {
+  public void bindSequence(final QName qn, final XQSequence seq) {
     BaseX.notimplemented();
   }
 
@@ -168,13 +169,12 @@ abstract class BXQDynamicContext extends BXQClose implements XQDynamicContext {
   private void bind(final QName var, final Item it, final XQItemType t)
       throws XQException {
     check();
-    check(var);
+    check(var, QName.class);
     try {
       final Var v = new Var(new QNm(Token.token(var.getLocalPart())));
       final BXQItemType bit = (BXQItemType) t;
       final Item i = bit != null && bit.type == it.type ? it :
         check(t, it.type).e(it, null);
-      //final Item i = check(t, it.type).e(it, null);
       query.ctx.vars.addGlobal(v.item(i));
     } catch(final QueryException ex) {
       throw new BXQException(ex);

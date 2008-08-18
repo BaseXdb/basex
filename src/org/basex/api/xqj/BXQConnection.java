@@ -43,7 +43,7 @@ public final class BXQConnection extends BXQDataFactory
   public XQExpression createExpression(final XQStaticContext sc)
       throws XQException {
     check();
-    check(sc);
+    check(sc, XQStaticContext.class);
     final BXQStaticContext bsc = (BXQStaticContext) sc;
     return new BXQExpression(bsc, this);
   }
@@ -85,8 +85,8 @@ public final class BXQConnection extends BXQDataFactory
   public XQPreparedExpression prepareExpression(final String query,
       final XQStaticContext sc) throws XQException {
     check();
-    check(sc);
-    check(query);
+    check(sc, XQStaticContext.class);
+    check(query, String.class);
     final BXQStaticContext bsc = (BXQStaticContext) sc;
     return new BXQPreparedExpression(query, bsc, this);
   }
@@ -107,7 +107,7 @@ public final class BXQConnection extends BXQDataFactory
 
   public void setStaticContext(final XQStaticContext sc) throws XQException {
     check();
-    check(sc);
+    check(sc, XQStaticContext.class);
     ctx = (BXQStaticContext) sc;
   }
 }

@@ -147,7 +147,7 @@ public final class BXQItem extends BXQClose implements XQResultItem {
   }
 
   public void writeItem(OutputStream os, Properties props) throws XQException {
-    check(os);
+    check(os, OutputStream.class);
     try {
       os.write(getItemCache().finish());
     } catch(final IOException ex) {
@@ -156,7 +156,7 @@ public final class BXQItem extends BXQClose implements XQResultItem {
   }
 
   public void writeItem(Writer ow, Properties props) throws XQException {
-    check(ow);
+    check(ow, Writer.class);
     try {
       ow.write(getItemCache().toString());
     } catch(final IOException ex) {

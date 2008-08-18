@@ -1,10 +1,13 @@
 package org.basex.api.xqj;
 
 import static org.basex.api.xqj.BXQText.*;
+
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URI;
 import java.util.Properties;
+
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Result;
 import javax.xml.xquery.XQConnection;
@@ -12,7 +15,10 @@ import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItem;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQResultSequence;
+
 import org.basex.BaseX;
+import org.basex.data.XMLSerializer;
+import org.basex.io.CachedOutput;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.iter.Iter;
@@ -32,13 +38,13 @@ public final class BXQSequence extends BXQClose implements XQResultSequence {
   /** Query context. */
   private final XQContext ctx;
   /** Static context. */
-  private BXQStaticContext sc;
+  private final BXQStaticContext sc;
   /** Current result. */
   private BXQItem it;
   /** Iterator position. */
   private int pos;
   /** BXQConnection. */
-  private BXQConnection conn;
+  private final BXQConnection conn;
   /** Next flag. */
   private boolean next;
 
@@ -67,7 +73,7 @@ public final class BXQSequence extends BXQClose implements XQResultSequence {
 
   public boolean absolute(final int p) throws XQException {
     final SeqIter iter = sequence();
-    int ps = Math.max(0, p >= 0 ? p : iter.size + p);
+    final int ps = Math.max(0, p >= 0 ? p : iter.size + p);
     cursor(iter, ps);
     return ps > 0 && ps <= iter.size;
   }
@@ -126,7 +132,7 @@ public final class BXQSequence extends BXQClose implements XQResultSequence {
   public String getItemAsString(final Properties p) throws XQException {
     return item().getItemAsString(p);
   }
-  
+
   public XQItemType getItemType() throws XQException {
     pos();
     return it.getItemType();
@@ -159,13 +165,18 @@ public final class BXQSequence extends BXQClose implements XQResultSequence {
     BaseX.notimplemented();
     return null;
   }
-  
+
   public String getSequenceAsString(final Properties p) throws XQException {
     check();
     if(it != null && !next) throw new BXQException(TWICE);
-    final StringBuilder sb = new StringBuilder();
-    while(next()) sb.append(item().getItemAsString(p));
-    return sb.toString();
+    final CachedOutput out = new CachedOutput();
+    final XMLSerializer ser = new XMLSerializer(out);
+    try {
+      while(next()) item().it.serialize(ser, ctx, 0);
+    } catch(final IOException ex) {
+      throw new BXQException(ex);
+    }
+    return out.toString();
   }
 
   public short getShort() throws XQException {

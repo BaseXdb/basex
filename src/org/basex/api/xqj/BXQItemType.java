@@ -5,6 +5,7 @@ import java.net.URI;
 import javax.xml.namespace.QName;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQSequenceType;
+import org.basex.query.xquery.XQTokens;
 import org.basex.query.xquery.item.Type;
 import org.basex.util.Token;
 
@@ -28,18 +29,22 @@ public final class BXQItemType implements XQItemType {
   };
 
   /** Data Type. */
-  Type type;
+  final Type type;
   /** Name. */
-  String name;
+  final String name;
+  /** Base Type. */
+  final int base;
   /** Occurrence. */
-  int occ = XQSequenceType.OCC_EXACTLY_ONE;
+  final int occ;
+  /** Nillable flag. */
+  final boolean nill;
 
   /**
    * Constructor.
    * @param b item type
    */
   public BXQItemType(final int b) {
-    this(BASE[b]);
+    this(BASE[b], null, b, true);
   }
 
   /**
@@ -47,17 +52,29 @@ public final class BXQItemType implements XQItemType {
    * @param t type
    */
   public BXQItemType(final Type t) {
-    this(t, null);
+    this(t, null, -1, true);
   }
 
   /**
    * Constructor.
    * @param t type
    * @param nm name
+   * @param b base type
    */
-  public BXQItemType(final Type t, final String nm) {
-    type = t;
-    name = nm;
+  public BXQItemType(final Type t, final String nm, final int b) {
+    this(t, nm, b, true);
+  }
+
+  /**
+   * Constructor.
+   * @param t type
+   * @param nm name
+   * @param b base type
+   * @param n nillable flag
+   */
+  public BXQItemType(final Type t, final String nm, final int b,
+      final boolean n) {
+    this(t, nm, b, n, XQSequenceType.OCC_EXACTLY_ONE);
   }
 
   /**
@@ -66,16 +83,31 @@ public final class BXQItemType implements XQItemType {
    * @param o numeric value
    */
   public BXQItemType(final Type t, final int o) {
+    this(t, null, -1, true, o);
+  }
+
+  /**
+   * Constructor.
+   * @param t type
+   * @param nm name
+   * @param b base type
+   * @param n nillable flag
+   * @param o occurrence
+   */
+  public BXQItemType(final Type t, final String nm, final int b,
+      final boolean n, final int o) {
     type = t;
+    name = nm;
+    base = b;
+    nill = n;
     occ = o;
   }
 
   public int getBaseType() throws BXQException {
-    if(type != Type.ELM && type != Type.ATT && type.unt)
+    if(type != Type.ELM && type != Type.ATT && type != Type.ATM && type.unt)
       throw new BXQException(ELMATT);
-    for(int b = 0; b < BASE.length; b++) {
-      if(BASE[b] == type) return b;
-    }
+    if(base != -1) return base;
+    for(int b = 0; b < BASE.length; b++) if(BASE[b] == type) return b;
     throw new BXQException(NOBASE);
   }
 
@@ -88,6 +120,8 @@ public final class BXQItemType implements XQItemType {
       case NOD: return XQITEMKIND_NODE;
       case PI : return XQITEMKIND_PI;
       case TXT: return XQITEMKIND_TEXT;
+      case ATM: return XQITEMKIND_ATOMIC;
+      case ITEM: return XQITEMKIND_ITEM;
       // [CG] not correct..
       default : return type.unt ? XQITEMKIND_ITEM : XQITEMKIND_ATOMIC;
     }
@@ -112,9 +146,10 @@ public final class BXQItemType implements XQItemType {
   }
 
   public QName getTypeName() throws BXQException {
-    if(type != Type.ELM && type != Type.ATT && type.unt)
+    if(type != Type.ELM && type != Type.ATT && type != Type.ATM && type.unt)
       throw new BXQException(ELMATT);
-    return new QName(Token.string(type.name));
+    final Type t = base != -1 ? BASE[base] : type;
+    return new QName(Token.string(XQTokens.XSURI), Token.string(t.name));
   }
 
   public boolean isAnonymousType() {
@@ -122,7 +157,7 @@ public final class BXQItemType implements XQItemType {
   }
 
   public boolean isElementNillable() {
-    return false;
+    return nill;
   }
 
   public XQItemType getItemType() {
@@ -131,6 +166,7 @@ public final class BXQItemType implements XQItemType {
 
   @Override
   public String toString() {
-    return "xs:" + Token.string(type.name);
+    //"xs:" +
+    return Token.string(type.name);
   }
 }

@@ -1,7 +1,10 @@
 package org.basex.test;
 
+import java.io.StringReader;
 import java.util.Properties;
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xquery.XQConnection;
 import javax.xml.xquery.XQDataSource;
 import javax.xml.xquery.XQExpression;
@@ -11,8 +14,12 @@ import javax.xml.xquery.XQResultSequence;
 import javax.xml.xquery.XQSequence;
 import junit.framework.TestCase;
 import org.basex.io.CachedOutput;
+import org.basex.test.xqj.TestXMLFilter;
 import org.junit.Before;
 import org.junit.Test;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
 
 /**
  * This class tests the XQJ features.
@@ -148,8 +155,62 @@ public class XQJTest extends TestCase {
     final XQConnection conn = conn(drv);
 
     try {
-      conn.createItemFromByte((byte) 1,
+      conn.createItemFromByte((byte) 123,
           conn.createAtomicType(XQItemType.XQBASETYPE_INTEGER));
+    } catch(final Exception ex) {
+      fail(ex.getMessage());
+    }
+  }
+
+  /**
+   * Test.
+   * @throws Exception exception
+   */
+  @Test
+  public void test8() throws Exception {
+    final XQConnection conn = conn(drv);
+    final XMLReader r = new TestXMLFilter("<e>ha</e>");
+
+    try {
+      conn.createItemFromDocument(r, null);
+    } catch(final Exception ex) {
+      fail(ex.getMessage());
+    }
+  }
+
+  /**
+   * Test.
+   * @throws Exception exception
+   */
+  @Test
+  public void test9() throws Exception {
+    final XQConnection conn = conn(drv);
+    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    DocumentBuilder parser = factory.newDocumentBuilder();
+    Document doc = parser.parse(new InputSource(new StringReader("<a>b</a>")));
+    
+    try {
+      conn.createItemFromNode(doc, null);
+    } catch(final Exception ex) {
+      fail(ex.getMessage());
+    }
+  }
+
+  /**
+   * Test.
+   * @throws Exception exception
+   */
+  @Test
+  public void test10() throws Exception {
+    final XQConnection conn = conn(drv);
+    
+    try {
+      XQItemType type = conn.createTextType();
+      System.out.println(type.getBaseType());
+      
+      type = conn.createAttributeType(new QName("a"),
+          XQItemType.XQBASETYPE_INTEGER);
+      System.out.println(type);
     } catch(final Exception ex) {
       fail(ex.getMessage());
     }

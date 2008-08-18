@@ -18,6 +18,10 @@ public class TestXMLFilter extends XMLFilterImpl {
   }
   
   public void parse(String systemId) throws IOException, SAXException {
-     super.parse(inputSource);
-    }       
+    super.parse(inputSource);
+  }
+  
+  public void parse(InputSource is) throws IOException, SAXException {
+    super.parse(inputSource);
+  }
 }
