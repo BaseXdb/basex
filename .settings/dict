@@ -121,3 +121,5 @@ gui
 ip
 dbname
 closable
+download
+nillable

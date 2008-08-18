@@ -31,6 +31,7 @@ public class FTTest extends AbstractTest {
       "  <fti>adfad wordt ook wel eens a</fti>" +
       "  <fti>adfad wordt ook wel een s adf</fti>" +
       "  <fti>adfad wordt ook wel een s</fti>" +
+      "  <atr key='value'/>" +
       "</fttest>";
 
     queries = new Object[][] {
@@ -42,6 +43,8 @@ public class FTTest extends AbstractTest {
           "'abc' ftcontains 'b'" },
         { "Simple 4", nodes(22),
           "//b['true' ftcontains 'true']" },
+        { "Simple 5", bool(true),
+          "//@key ftcontains 'value'" },
 
         { "FT 1", nodes(14),
           "//w [text() ftcontains 'HELLO']" },
@@ -139,8 +142,7 @@ public class FTTest extends AbstractTest {
           "//w [text() ftcontains 'hello' ftor 'database' with stemming]" },
         { "FTStemming 5", nodes(3, 5, 14),
           "//w [text() ftcontains ftnot 'database' with stemming]" },
-          
-          
+                    
         { "FTLanguage 1", nodes(14),
           "//* [text() ftcontains 'hello' language 'en']" },
         { "FTLanguage 2", // error...
@@ -155,6 +157,8 @@ public class FTTest extends AbstractTest {
 
         { "FTAtomization 1", nodes(21),
           "//at [. ftcontains 'bad one']" },
+        { "FTAtomization 2", nodes(35),
+          "//atr [@key ftcontains 'value']" },
 
         { "FTPosFilter 1", nodes(3, 5, 9, 11),
           "//w [. ftcontains 'xml' at start]" },
@@ -237,6 +241,8 @@ public class FTTest extends AbstractTest {
      32   1   1   1  TEXT  adfad wordt ook wel een s adf
      33  32   2   1  ELEM  fti
      34   1   1   1  TEXT  adfad wordt ook wel een s
+     35  34   2   2  ELEM  atr
+     36   1   1   1  ATTR  key="value"
      **/
   }
 }

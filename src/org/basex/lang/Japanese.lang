@@ -366,8 +366,9 @@ qu_tabhits=結果　　　　
 
 # Update Commands
 uc_querynodeserr=Query must yield a nodeset.
-# The word order is different in Japanese.
+# [KK] The word order is different in Japanese.
 # It's necessary to introduce something like %1, %2 etc.
+# [CG] As proposed by you, positions can now be added to the placeholder.
 uc_deleteinfo=%個のノードが削除されました。 in %
 uc_deleteroot=ノードを削除できません。
 uc_copyroot=ルートノードの後には挿入できません。
