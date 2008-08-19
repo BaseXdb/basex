@@ -9,15 +9,13 @@ import org.basex.core.proc.DropDB;
 
 /**
  * Implementation of the Collection Interface for the XMLDB:API
- *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler
  */
 public class BXCollection implements Collection {
-  
-  /** Context ctx */
-  Context ctx;
-  
+  /** Context reference. */
+  private Context ctx;
+
   /**
    * Standard constructor.
    * @param ctx for Context
@@ -30,8 +28,8 @@ public class BXCollection implements Collection {
    * @see org.xmldb.api.base.Collection#close()
    */
   public void close() {
-    // TODO Auto-generated method stub
-    
+  // TODO Auto-generated method stub
+
   }
 
   /**
@@ -46,11 +44,11 @@ public class BXCollection implements Collection {
    * @see org.xmldb.api.base.Collection#createResource(java.lang.String, java.lang.String)
    */
   public Resource createResource(String id, String type) throws XMLDBException {
-      if(type.equals(XMLResource.RESOURCE_TYPE.toString())) {
-        if(new Check(id).execute(ctx)) {
-        return new BXXMLResource(ctx); 
-        }
+    if(type.equals(XMLResource.RESOURCE_TYPE.toString())) {
+      if(new Check(id).execute(ctx)) {
+        return new BXXMLResource(ctx);
       }
+    }
     throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED);
   }
 
@@ -98,12 +96,9 @@ public class BXCollection implements Collection {
    * @see org.xmldb.api.base.Collection#getResource(java.lang.String)
    */
   public Resource getResource(String id) throws XMLDBException {
-    if(new Open(id).execute(ctx)) {
-      return new BXXMLResource(ctx);
-      }
+    if(new Open(id).execute(ctx)) return new BXXMLResource(ctx);
     throw new XMLDBException(ErrorCodes.NO_SUCH_RESOURCE);
   }
-
 
   /**
    * @see org.xmldb.api.base.Collection#getResourceCount()
@@ -117,9 +112,7 @@ public class BXCollection implements Collection {
    * @see org.xmldb.api.base.Collection#getService(java.lang.String, java.lang.String)
    */
   public Service getService(String name, String version) throws XMLDBException {
-    if(name.equals("XPathQueryService")) {
-    return new BXXPathQueryService(ctx);
-    } 
+    if(name.equals("XPathQueryService")) return new BXXPathQueryService(ctx);
     throw new XMLDBException(ErrorCodes.NO_SUCH_SERVICE);
   }
 
@@ -161,8 +154,8 @@ public class BXCollection implements Collection {
   public void removeResource(Resource res) throws XMLDBException {
     if(new Check(res.getId()).execute(ctx)) {
       new DropDB(res.getId()).execute(ctx);
-      }
-    else { throw new XMLDBException(ErrorCodes.NO_SUCH_RESOURCE); 
+    } else {
+      throw new XMLDBException(ErrorCodes.NO_SUCH_RESOURCE);
     }
   }
 
@@ -170,8 +163,8 @@ public class BXCollection implements Collection {
    * @see org.xmldb.api.base.Configurable#setProperty(java.lang.String, java.lang.String)
    */
   public void setProperty(String name, String value) {
-    // TODO Auto-generated method stub
-    
+  // TODO Auto-generated method stub
+
   }
 
   /**
@@ -179,6 +172,7 @@ public class BXCollection implements Collection {
    */
   public void storeResource(Resource res) {
     BXXMLResource tmpRes = (BXXMLResource) res;
-    ctx.data().insert(ctx.data().meta.lastid, 0, tmpRes.getTmpCtx().data());
+    ctx.data().insert(ctx.data().size, -1, tmpRes.getTmpCtx().data());
+    ctx.data().flush();
   }
 }

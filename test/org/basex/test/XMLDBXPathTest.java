@@ -86,7 +86,7 @@ public class XMLDBXPathTest {
 
    // document is assumed to be a valid XML document. Where this comes from is
    // outside the scope of the API
-   String document = "C:/Andy/Test/1.xml";
+   String document = "in.xml";
    
    XMLResource resource2 = 
       (XMLResource) collection.createResource(id, XMLResource.RESOURCE_TYPE);
