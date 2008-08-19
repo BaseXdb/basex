@@ -475,7 +475,7 @@ public final class DiskData extends Data {
   @Override
   public void insert(final int pre, final int par, final Data td) {
     // reference to root tag
-    final int tr = td.kind(0) == DOC ? 1 : 0;
+    final int tr = 0;
     final int ts = td.size(tr, td.kind(tr));
     final int tl = tr + ts;
 
@@ -489,6 +489,10 @@ public final class DiskData extends Data {
         case ELEM:
           // add element
           insertElem(p, dis, td.tag(i), td.attSize(i, tk), td.size(i, tk));
+          break;
+        case DOC:
+          // add document
+          insertDoc(p, td.size(i, tk), td.text(i));
           break;
         case TEXT:
         case COMM:
