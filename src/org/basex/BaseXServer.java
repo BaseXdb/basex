@@ -21,7 +21,6 @@ import org.basex.core.proc.GetResult;
 import org.basex.io.BufferedOutput;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
-import org.basex.util.Action;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 
@@ -109,15 +108,13 @@ public final class BaseXServer {
         pr = new CommandParser(in).parse()[0];
       } catch(final QueryException ex) {
         BaseX.errln(ex.getMessage());
-        final OutputStream out = s.getOutputStream();
-        out.write(0);
-        out.close();
+        send(s, 0);
         return;
       }
       final Process proc = pr;
 
       if(proc instanceof Exit) {
-        s.getOutputStream().write(1);
+        send(s, 1);
         // interrupt running processes
         for(final BaseXSession ss : sess) ss.core.stop();
         running = false;
@@ -125,7 +122,8 @@ public final class BaseXServer {
       }
 
       // start session thread
-      new Action() {
+      new Thread() {
+        @Override
         public void run() {
           try {
             if(proc instanceof GetResult || proc instanceof GetInfo) {
@@ -146,9 +144,8 @@ public final class BaseXServer {
             } else {
               // process a normal request
               add(new BaseXSession(sp, System.nanoTime(), proc));
-              final boolean ok = proc.execute(context);
-              // return process id (negative: error)
-              new DataOutputStream(s.getOutputStream()).writeInt(ok ? sp : -sp);
+              // execute command and return process id (negative: error)
+              send(s, proc.execute(context) ? sp : -sp);
             }
             dis.close();
           } catch(final Exception ex) {
@@ -157,7 +154,7 @@ public final class BaseXServer {
           }
           if(verbose) BaseX.outln("[%:%] %", ha, sp, perf.getTimer());
         }
-      }.execute();
+      }.start();
     } catch(final Exception ex) {
       if(ex instanceof IOException) BaseX.errln(SERVERERR);
       else ex.printStackTrace();
@@ -177,6 +174,18 @@ public final class BaseXServer {
       }
     }
     sess.add(bs);
+  }
+
+  /**
+   * Returns an answer to the client.
+   * @param s socket reference
+   * @param id session id to be returned
+   * @throws IOException I/O exception
+   */
+  synchronized void send(final Socket s, final int id) throws IOException {
+    final DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+    dos.writeInt(id);
+    dos.close();
   }
 
   /**
