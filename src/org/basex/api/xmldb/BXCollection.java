@@ -5,6 +5,7 @@ import org.xmldb.api.modules.XMLResource;
 import org.basex.core.Context;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.Check;
+import org.basex.core.proc.Close;
 import org.basex.core.proc.DropDB;
 
 /**
@@ -28,8 +29,7 @@ public class BXCollection implements Collection {
    * @see org.xmldb.api.base.Collection#close()
    */
   public void close() {
-  // TODO Auto-generated method stub
-
+  new Close().execute(ctx);
   }
 
   /**
@@ -72,8 +72,7 @@ public class BXCollection implements Collection {
    * @see org.xmldb.api.base.Collection#getName()
    */
   public String getName() {
-    // TODO Auto-generated method stub
-    return null;
+    return ctx.data().meta.dbname;
   }
 
   /**
@@ -128,7 +127,9 @@ public class BXCollection implements Collection {
    * @see org.xmldb.api.base.Collection#isOpen()
    */
   public boolean isOpen() {
-    // TODO Auto-generated method stub
+    if (new Check(ctx.data().meta.dbname).execute(ctx)) {
+      return true;
+    }
     return false;
   }
 
