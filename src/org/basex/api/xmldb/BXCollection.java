@@ -173,6 +173,7 @@ public class BXCollection implements Collection {
   public void storeResource(Resource res) {
     BXXMLResource tmpRes = (BXXMLResource) res;
     ctx.data().insert(ctx.data().size, -1, tmpRes.getTmpCtx().data());
+    new DropDB(tmpRes.getTmpCtx().data().meta.dbname).execute(tmpRes.getTmpCtx());
     ctx.data().flush();
   }
 }
