@@ -510,7 +510,8 @@ public final class DiskData extends Data {
   }
 
   /**
-   * Inserts a tag name without updating the table.
+   * Inserts an element node without updating the size and distance values
+   * of the table.
    * @param pre insert position
    * @param dis parent distance
    * @param tag tag name index
@@ -530,7 +531,8 @@ public final class DiskData extends Data {
   }
 
   /**
-   * Insert text node without updating the table.
+   * Insert text node without updating the size and distance values
+   * of the table.
    * @param pre insert position
    * @param s node size
    * @param val tag name or text node
@@ -549,7 +551,8 @@ public final class DiskData extends Data {
   }
 
   /**
-   * Insert text node without updating the table.
+   * Insert text node updating the size and distance values
+   * of the table.
    * @param pre insert position
    * @param dis parent distance
    * @param val tag name or text node
@@ -571,7 +574,8 @@ public final class DiskData extends Data {
   }
 
   /**
-   * Insert attribute without updating the table.
+   * Insert attribute updating the size and distance values
+   * of the table.
    * @param pre pre value
    * @param dis parent distance
    * @param name attribute name

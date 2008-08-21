@@ -23,13 +23,15 @@ public final class LS extends FSCmd {
   private boolean fPrintLong;
   /** Prints long version. */
   private boolean fSorted;
+  /** Human readable format. */
+  private boolean fHuman;
   /** Specified path. */
   private String path;
 
   @Override
   public void args(final String args, final int pos) throws FSException {
     // get all Options
-    final GetOpts g = new GetOpts(args, "ahlRs", pos);
+    final GetOpts g = new GetOpts(args, "ahHlRs", pos);
     while(g.more()) {
       final int ch = checkOpt(g);
       switch (ch) {
@@ -45,6 +47,9 @@ public final class LS extends FSCmd {
         case 's':
           fSorted = true;
           break;  
+        case 'H':
+          fHuman = true;
+          break;
       }
     }
     path = g.getPath();
@@ -115,11 +120,15 @@ public final class LS extends FSCmd {
       if(fPrintLong) {
         if(fSorted) error("", 102);
         
-        final long size = FSUtils.getSize(data, j);
-        final byte[] time = FSUtils.getMtime(data, j);
-        final char file = FSUtils.isFile(data, j) ? 'f' : 'd';
-        out.println(String.format("%-3s %-30s %10s %20s", file,
-            Token.string(name), size, Token.string(time)));
+        final long size = Token.toLong(FSUtils.getSize(data, j));
+        final String time = FSUtils.getMtime(data, j);
+
+        out.print(FSUtils.isFile(data, j) ? 'f' : 'd');
+        out.print(' ');
+        out.print(11, fHuman ? format(size) : Long.toString(size));
+        out.print(11, time);
+        out.print("  ");
+        out.println(name);
       } else {
         if(!fSorted) {
           out.print(name);

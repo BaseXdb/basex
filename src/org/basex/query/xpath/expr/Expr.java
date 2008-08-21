@@ -113,7 +113,8 @@ public abstract class Expr extends ExprInfo {
    */
   protected void openPlan(final PrintOutput out, final String s, final int l)
       throws IOException {
-    out.println("<" + s + ">", l);
+    for(int i = 0; i < l; i++) out.print(' ');
+    out.println("<" + s + ">");
   }
   
   /**
@@ -125,6 +126,7 @@ public abstract class Expr extends ExprInfo {
    */
   protected void closePlan(final PrintOutput out, final String s, final int l)
       throws IOException {
-    out.println("</" + s + ">", l);
+    for(int i = 0; i < l; i++) out.print(' ');
+    out.println("</" + s + ">");
   }
 }

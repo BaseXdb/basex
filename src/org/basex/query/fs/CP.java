@@ -83,7 +83,7 @@ public final class CP extends FSCmd {
             }
           }
 
-          final byte[] size = Token.token(FSUtils.getSize(data, sources[0]));
+          final byte[] size = FSUtils.getSize(data, sources[0]);
           final byte[] mtime = FSUtils.currTime();
 
           if(target.length == 1) {
@@ -149,7 +149,7 @@ public final class CP extends FSCmd {
           }
           toInsert.add(FSUtils.getName(data, i));
           toInsert.add(FSUtils.getSuffix(data, i));
-          toInsert.add(Token.token(FSUtils.getSize(data, i)));
+          toInsert.add(FSUtils.getSize(data, i));
         }
         for(int j = 0; j < toInsert.size; ++j) {
           FSUtils.insert(data, false, toInsert.delete(0), toInsert.delete(0),
@@ -198,7 +198,7 @@ public final class CP extends FSCmd {
           }
           toInsert.add(FSUtils.getName(data, p));
           toInsert.add(FSUtils.getSuffix(data, p));
-          toInsert.add(Token.token(FSUtils.getSize(data, p)));
+          toInsert.add(FSUtils.getSize(data, p));
         }
         ++d;
       }

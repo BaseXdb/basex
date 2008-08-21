@@ -3,6 +3,9 @@ package org.basex.query.fs;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.regex.Pattern;
 import org.basex.BaseX;
 import org.basex.core.Prop;
@@ -19,6 +22,8 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen & Hannes Schwarz
  */
 public final class FSUtils {
+  /** Slider width. */
+  public static final DateFormat DATE = new SimpleDateFormat("dd.MM.yyyy");
   /** Root dir. */
   private static final int ROOTDIR = 2;
   /** # of attributes. */
@@ -145,8 +150,8 @@ public final class FSUtils {
    * @param pre pre value
    * @return file size
    */
-  public static long getSize(final Data data, final int pre) {
-    return toLong(getAttr(data, pre, data.sizeID));
+  public static byte[] getSize(final Data data, final int pre) {
+    return getAttr(data, pre, data.sizeID);
   }
 
   /**
@@ -163,13 +168,14 @@ public final class FSUtils {
   
 
   /**
-   * Returns the Mtime of a file.
+   * Returns the Mtime of a file as string.
    * @param data data reference
    * @param pre pre value
    * @return file name.
    */
-  public static byte[] getMtime(final Data data, final int pre) {
-    return getAttr(data, pre, data.timeID);
+  public static String getMtime(final Data data, final int pre) {
+    final long l = Token.toLong(getAttr(data, pre, data.timeID)) * 60000;
+    return DATE.format(new Date(l));
   }
 
   /**

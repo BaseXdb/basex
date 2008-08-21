@@ -28,6 +28,7 @@ import org.basex.gui.view.ViewData;
 import org.basex.query.fs.FSUtils;
 import org.basex.util.Array;
 import org.basex.util.Performance;
+import org.basex.util.Token;
 
 /**
  * This view offers a tree visualization of the database contents.
@@ -262,7 +263,7 @@ public final class TreeView extends View {
 
     int tw = totalW + 6;
     if(file && tw - xx > 140) {
-      final long size = FSUtils.getSize(data, pre);
+      final long size = Token.toLong(FSUtils.getSize(data, pre));
       final String text = Performance.formatSize(size, false);
       tw -= BaseXLayout.width(g, text) + 10;
       g.drawString(text, tw, yy);

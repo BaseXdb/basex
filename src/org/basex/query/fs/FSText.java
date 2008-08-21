@@ -17,14 +17,14 @@ public interface FSText {
     "     The options are as follows:\n" +
     "     -b    Number the non-blank output lines, starting at 1.\n" +
     "     -h    Print this page.\n" +
-    "     -n    Number the output lines, starting at 1.\n\n\n";
+    "     -n    Number the output lines, starting at 1.\n";
   /** Help text. */
   String FSCD = "CD(1)" + FSMAN + "CD(1) \n\n  NAME\n" +
     "     cd -- changes the working directory\n\n  SYNOPSIS\n" +
     "     cd [-h] dir  \n\n  DESCRIPTION\n" + 
     "     Changes the working directory.    \n\n" + 
     "     The options are as follows:\n" + 
-    "     -h    Print this page.\n\n\n";
+    "     -h    Print this page.\n";
   /** Help text. */
   String FSCP = "CP(1)" + FSMAN + "CP(1)\n\n  NAME\n" +
     "     cp -- copy files\n\n  SYNOPSIS\n" +
@@ -36,7 +36,7 @@ public interface FSText {
     "     tents of each named source_file is copied to the destination\n" +
     "     target_directory. The names of the files themselves are not " +
     "changed. If \n     cp detects an attempt to copy a file to itself," + 
-    " the copy will fail.\n\n\n";
+    " the copy will fail.\n";
   /** Help text. */
   String FSDU = "DU(1)" + FSMAN + "DU(1)\n\n  NAME\n" +
     "     du -- display disk usage statistics\n\n  SYNOPSIS\n" +
@@ -47,7 +47,9 @@ public interface FSText {
     " the block usage of the hierarchy\n     rooted in the current directory" +
     " is displayed.\n\n     The options are as follows:\n\n" +
     "     -a    Display an entry for each file in a file hierarchy.\n" +
-    "     -h    Print this page.\n\n\n";
+    "     -h    Print this page.\n" +
+    "     -H    Print sizes in human readable format.\n" +
+    "     -s    Display only a total for each argument.\n";
   /** Help text. */
   String FSLOCATE = "LOCATE(1)" + FSMAN + "LOCATE(1)\n\n" +
     "  NAME\n     locate -- find filenames quickly\n\n  SYNOPSIS\n" +
@@ -70,7 +72,7 @@ public interface FSText {
     "file names.\n     -h         Print this page.\n     -l number  Limit " +
     "output to number of file names and exit.\n     -V number  1 = use " +
     "locate with direct access to the data table\n" +
-    "                2  = use XPath (no wildcards atm)\n\n\n";
+    "                2  = use XPath (no wildcards atm)\n";
   /** Help text. */
   String FSLS = "LS(1)" + FSMAN + " LS(1)\n\n  NAME\n" +
     "     ls -- list directory contents\n\n  SYNOPSIS\n" +
@@ -80,24 +82,25 @@ public interface FSText {
     "     The following options are available:\n     " +
     "-a     Include directory entries whose names begin with a dot (`.').\n" +
     "     -h     Print this page\n" +
+    "     -H     Print sizes in human readable format.\n" +
     "     -l     List files in the long format.\n" +
     "     -R     Recursively list subdirectories encountered.\n" +
-    "     -s     Sort the Output (Long format is not working yet).\n\n\n";
+    "     -s     Sort the Output (Long format is not working yet).\n";
   /** Help text. */
   String FSMKDIR = "MKDIR(1)" + FSMAN + "MKDIR(1))\n\n" +
     "    NAME\n      mkdir -- make directories)\n\n    SYNOPSIS\n" +
     "      mkdir directory_name)\n\n    DESCRIPTION\n      The mkdir utility " +
-    "creates the directories.\n\n\n";
+    "creates the directories.\n";
   /** Help text. */
   String FSMV = "MV(1)" + FSMAN + "MV(1))\n\n" +
-    "    NAME\n      mv -- move files\n\n\n";  
+    "    NAME\n      mv -- move files\n";  
   /** Help text. */
   String FSPWD = "PWD(1)" + FSMAN + "PWD(1)\n\n  NAME\n" +
     "     pwd -- return working directory name\n\n  SYNOPSIS\n" +
     "     pwd\n\n  DESCRIPTION\n     The pwd utility writes the absolute " +
     "pathname of the current working\n     directory to the standard " +
     "output.\n\n     The options are as follows:\n\n" +
-    "     -h    Print this page.\n\n\n";
+    "     -h    Print this page.\n";
   /** Help text. */
   String FSRM = "RM(1)" + FSMAN + "RM(1)\n\n  NAME\n" +
     "     rm, unlink -- remove directory entries\n\n  SYNOPSIS\n" +
@@ -109,7 +112,7 @@ public interface FSText {
     "for confirmation.\n\n     The options are as follows:\n\n" +
     "     -h    Print this page.\n" +
     "     -R     Attempt to remove the file hierarchy rooted in each " +
-    "file argument.\n\n\n";
+    "file argument.\n";
   /** Help text. */
   String FSTOUCH = "TOUCH(1)" + FSMAN + "TOUCH(1)\n\n" +
     "  NAME\n     touch -- change file access and modification times\n\n" +
@@ -117,7 +120,7 @@ public interface FSText {
     "     The touch utility sets the modification and access times of files." +
     "  If\n     any file does not exist, it is created with default " +
     "permissions.\n\n     The options are as follows:\n\n" +
-    "     -h    Print this page.\n\n\n";
+    "     -h    Print this page.\n";
 
   /** File System errors. */
   String[][] CODES = {
