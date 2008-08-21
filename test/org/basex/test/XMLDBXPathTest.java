@@ -80,13 +80,13 @@ public class XMLDBXPathTest {
       /* Deleting a Resource*/
       //collection.removeResource(collection.getResource(id));
 
-      // document is assumed to be a valid XML document. Where this comes from is
-      // outside the scope of the API
-      String document = "in.xml";
-
-      XMLResource resource2 = (XMLResource) collection.createResource(id,
-          XMLResource.RESOURCE_TYPE);
-
+     // document is assumed to be a valid XML document. Where this comes from is
+     // outside the scope of the API
+     //String document = "in.xml";
+     String document = "<xml>kjhjhjhj</xml>";
+     
+     XMLResource resource2 = 
+      (XMLResource) collection.createResource(id, XMLResource.RESOURCE_TYPE);
       resource2.setContent(document);
       collection.storeResource(resource2);
 

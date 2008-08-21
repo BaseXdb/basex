@@ -1,7 +1,6 @@
 package org.basex.api.xmldb;
 
 import org.basex.BaseX;
-import org.basex.core.Context;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
 import org.w3c.dom.Node;
@@ -21,7 +20,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
-import org.basex.core.proc.CreateDB;
 
 /**
  * Implementation of the XMLResource Interface for the XMLDB:API
@@ -29,40 +27,43 @@ import org.basex.core.proc.CreateDB;
  * @author Andreas Weiler
  */
 public class BXXMLResource implements XMLResource {
-
-  /** Context ctx */
-  Context ctx;
-  /** Context2 tmpCtx */
-  Context tmpCtx = new Context();
+  /** Current node context. */
+  Nodes nodes;
+  /** String content. */
+  Object content;
 
   /**
    * Standard constructor.
-   * @param ctx for Context
+   * @param n nodes
    */
-  public BXXMLResource(Context ctx) {
-    this.ctx = ctx;
+  public BXXMLResource(Nodes n) {
+    nodes = n;
   }
 
   /**
    * @see org.xmldb.api.base.Resource#getContent()
    */
   public Object getContent() {
-    Nodes nodes = ctx.current();
-    try {
-      final CachedOutput out = new CachedOutput();
-      final boolean chop = ctx.data().meta.chop;
-      nodes.serialize(new XMLSerializer(out, false, chop));
-      return out.toString();
-    } catch(final Exception ex) {
-      BaseX.debug(ex);
+    if(content == null) {
+      try {
+        final CachedOutput out = new CachedOutput();
+        final boolean chop = nodes.data.meta.chop;
+        nodes.serialize(new XMLSerializer(out, false, chop));
+        content = out.toString();
+      } catch(final Exception ex) {
+        BaseX.debug(ex);
+      }
     }
-    return null;
+    return content;
   }
 
   /**
    * @see org.xmldb.api.modules.XMLResource#getContentAsDOM()
    */
   public Node getContentAsDOM() {
+    if(content != null) getContent();
+    // <AW> ...process content (see eXist)
+    
     try {
       // Create a builder factory
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -70,7 +71,7 @@ public class BXXMLResource implements XMLResource {
 
       // Create the builder and parse the file
       Document doc = factory.newDocumentBuilder().parse(
-          new File(ctx.data().meta.file.toString()));
+          new File(nodes.data.meta.file.toString()));
       return doc;
     } catch(SAXException e) {
       // A parsing error occurred; the xml input is not valid
@@ -82,6 +83,9 @@ public class BXXMLResource implements XMLResource {
    * @see org.xmldb.api.modules.XMLResource#getContentAsSAX(org.xml.sax.ContentHandler)
    */
   public void getContentAsSAX(ContentHandler handler) throws XMLDBException {
+    if(content != null) getContent();
+    // <AW> ...process content (see eXist)
+
     XMLReader reader = null;
     SAXParserFactory saxFactory = SAXParserFactory.newInstance();
     saxFactory.setNamespaceAware(true);
@@ -98,7 +102,7 @@ public class BXXMLResource implements XMLResource {
     try {
       reader.setContentHandler(handler);
       reader.parse(new InputSource(new FileInputStream(new File(
-          ctx.data().meta.file.toString()))));
+          nodes.data.meta.file.toString()))));
     } catch(SAXException saxe) {
       saxe.printStackTrace();
       throw new XMLDBException(1, saxe.getMessage());
@@ -119,7 +123,7 @@ public class BXXMLResource implements XMLResource {
    * @see org.xmldb.api.base.Resource#getId()
    */
   public String getId() {
-    return ctx.data().meta.dbname;
+    return nodes.data.meta.dbname;
   }
 
   /**
@@ -142,16 +146,9 @@ public class BXXMLResource implements XMLResource {
    * @see org.xmldb.api.base.Resource#setContent(java.lang.Object)
    */
   public void setContent(Object value) {
-    new CreateDB(value.toString()).execute(tmpCtx);
+    content = value;
   } 
 
-  /**
-   * @return the tmpCtx
-   */
-  public Context getTmpCtx() {
-    return tmpCtx;
-  }
-  
   /**
    * @see org.xmldb.api.modules.XMLResource#setContentAsDOM(org.w3c.dom.Node)
    */

@@ -1,12 +1,17 @@
 package org.basex.api.xmldb;
 
+import java.io.IOException;
 import org.xmldb.api.base.*;
 import org.xmldb.api.modules.XMLResource;
+import org.basex.build.DiskBuilder;
+import org.basex.build.xml.XMLParser;
 import org.basex.core.Context;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.Check;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.DropDB;
+import org.basex.data.Data;
+import org.basex.io.IO;
 
 /**
  * Implementation of the Collection Interface for the XMLDB:API
@@ -46,7 +51,7 @@ public class BXCollection implements Collection {
   public Resource createResource(String id, String type) throws XMLDBException {
     if(type.equals(XMLResource.RESOURCE_TYPE.toString())) {
       if(new Check(id).execute(ctx)) {
-        return new BXXMLResource(ctx);
+        return new BXXMLResource(ctx.current());
       }
     }
     throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED);
@@ -95,7 +100,7 @@ public class BXCollection implements Collection {
    * @see org.xmldb.api.base.Collection#getResource(java.lang.String)
    */
   public Resource getResource(String id) throws XMLDBException {
-    if(new Open(id).execute(ctx)) return new BXXMLResource(ctx);
+    if(new Open(id).execute(ctx)) return new BXXMLResource(ctx.current());
     throw new XMLDBException(ErrorCodes.NO_SUCH_RESOURCE);
   }
 
@@ -171,10 +176,24 @@ public class BXCollection implements Collection {
   /**
    * @see org.xmldb.api.base.Collection#storeResource(org.xmldb.api.base.Resource)
    */
-  public void storeResource(Resource res) {
-    BXXMLResource tmpRes = (BXXMLResource) res;
-    ctx.data().insert(ctx.data().size, -1, tmpRes.getTmpCtx().data());
-    new DropDB(tmpRes.getTmpCtx().data().meta.dbname).execute(tmpRes.getTmpCtx());
-    ctx.data().flush();
+  public void storeResource(Resource res) throws XMLDBException {
+    String cont = res.getContent().toString();
+    try {
+      /*
+      Context ctx = new Context();
+      new CreateDB(cont, "tmp").execute(ctx);
+      ctx.data().insert(ctx.data().size, -1, ctx.data());
+      ctx.data().flush();
+      new DropDB("tmp").execute(ctx);
+      */
+      
+      Data tmp = new DiskBuilder().build(new XMLParser(new IO(cont)), "tmp");
+      ctx.data().insert(ctx.data().size, -1, tmp);
+      ctx.data().flush();
+      DropDB.drop("tmp");
+      
+    } catch(final IOException ex) {
+      throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
+    }
   }
 }
