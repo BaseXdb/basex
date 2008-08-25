@@ -1,7 +1,7 @@
 package org.basex.query.xpath.expr;
 
 import static org.basex.query.xpath.XPText.*;
-
+import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.data.Serializer;
 import org.basex.index.FTNode;
@@ -98,15 +98,12 @@ public final class FTContains extends DualExpr {
       IntList il = new IntList();
       while (ftae.more()) {
         ftn = ftae.next(ctx);
-        if (ftn.size > 0)
-          il.add(ftn.getPre());
-        else break;
+        if (ftn.size == 0) break;
+        il.add(ftn.getPre());
       }
-      if (il.size > 0) {
-        return new NodeSet(il.finish(), ctx);
-      } 
-      return new NodeSet(ctx);
+      return new NodeSet(il.finish(), ctx);
     }
+    
     /*
     if(v1.size() == 0) return Bool.FALSE;
 
@@ -133,13 +130,13 @@ public final class FTContains extends DualExpr {
     // don't evaluate empty node sets
     return Bool.get(v1.size() != 0 && v2.size() != 0 && type.eval(v1, v2));
     */
-    return new NodeSet(ctx);
+    return Bool.FALSE;
   }
 
   /**
    * Sequential evaluation - used for not expression. 
    * @param ctx XPContext
-   * @return Bool result
+   * @return resulting result
    * @throws QueryException Exception
    */
   public Bool evalSeq(final XPContext ctx) throws QueryException {
@@ -181,26 +178,38 @@ public final class FTContains extends DualExpr {
   /**
    * Performs evaluation without index access.
    * @param ctx XPContext
-   * @return Bool
+   * @return resulting item
    * @throws QueryException Exception
    */
   public Bool evalWithoutIndex(final XPContext ctx) throws QueryException {
     final FTTokenizer tmp = ctx.ftitem;
     ctx.ftitem = ft;
-    Bool v2;
-    if (expr1 instanceof Literal) {
-      Literal lit = (Literal) expr1;
-      ctx.ftitem = new FTTokenizer();
-      ctx.ftitem.init(lit.str());
-    } 
-    
-    v2 = (Bool) expr2.eval(ctx);
-    
+    Item it = expr1.eval(ctx);
+    if(it instanceof NodeSet) {
+      it = evalNS(ctx, it);
+    } else {
+      it = expr2.eval(ctx);
+    }
     ctx.ftitem = tmp;
-    return v2;
+    return Bool.get(it.bool());
   }
 
-  
+  /**
+   * Performs evaluation without index access for the specified node set.
+   * @param ctx XPContext
+   * @param it item 
+   * @return resulting item
+   * @throws QueryException Exception
+   */
+  public Item evalNS(final XPContext ctx, final Item it) throws QueryException {
+    final NodeSet nodes = (NodeSet) it;
+    final Data data = nodes.data;
+    for(int n = 0; n < nodes.size; n++) {
+      ft.init(data.atom(nodes.nodes[n]));
+      if(expr2.eval(ctx).bool()) return Bool.TRUE;
+    }
+    return Bool.FALSE;
+  }
   
   @Override
   public Expr indexEquivalent(final XPContext ctx, final Step curr, 
