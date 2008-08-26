@@ -45,7 +45,12 @@ public class FTTest extends AbstractTest {
           "//b['true' ftcontains 'true']" },
         { "Simple 5", bool(true),
           "//@key ftcontains 'value'" },
+        { "Simple 6", nodes(36),
+          "//@key[. ftcontains 'value']" },
+        { "Simple 7", bool(false),
+          "//@key ftcontains 'values'" },
 
+          
         { "FT 1", nodes(14),
           "//w [text() ftcontains 'HELLO']" },
         { "FT 2", nodes(14),

@@ -11,6 +11,7 @@ import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.XPOptimizer;
 import org.basex.query.xpath.locpath.LocPath;
+import org.basex.query.xpath.locpath.LocPathAbs;
 import org.basex.query.xpath.locpath.LocPathRel;
 import org.basex.query.xpath.locpath.Step;
 import org.basex.query.xpath.locpath.TestNode;
@@ -67,6 +68,12 @@ public final class FTContains extends DualExpr {
     expr1 = expr1.compile(ctx);
     expr2 = expr2.compile(ctx);
 
+    if (expr1 instanceof LocPathAbs) {
+      s = true;
+      iu = false;
+      return this;
+    }
+    
     final Item i1 = expr1 instanceof Item ? (Item) expr1 : null;
     final Item i2 = expr2 instanceof Item ? (Item) expr2 : null;
     if(i1 != null && i1.size() == 0 || i2 != null && i2.size() == 0) {
