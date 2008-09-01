@@ -186,7 +186,6 @@ public class ScatterData {
     } else {
       xCats = xKey.cats.keys();
       xNrCats = xCats.length;
-      System.out.println(xNrCats);
     }
     final StatsKey yKey = yIsTag ? data.tags.stat(data.tags.id(attrY)) :
       data.atts.stat(data.atts.id(attrY));
@@ -197,7 +196,6 @@ public class ScatterData {
     } else {
       yCats = yKey.cats.keys();
       yNrCats = yCats.length;
-      System.out.println(yNrCats);
     }
     
     tmpPres = new IntList();
@@ -282,11 +280,27 @@ public class ScatterData {
     final double d = Token.toDouble(value);
     double percentage = 0d;
     if(calcX) {
-      final double range = xMax - xMin;
-      percentage = 1 / range * (d - xMin);
+      if(xNumeric) {
+        final double range = xMax - xMin;
+        percentage = 1 / range * (d - xMin);
+      } else {
+        for(int i = 0; i < xNrCats; i++) {
+          if(Token.eq(value, xCats[i])) {
+            percentage = (1.0d / (xNrCats + 1)) * (i + 1);
+          }
+        }
+      }
     } else {
-      final double range = yMax - yMin;
-      percentage = 1 / range * (d - yMin);
+      if(yNumeric) {
+        final double range = yMax - yMin;
+        percentage = 1 / range * (d - yMin);
+      } else {
+        for(int i = 0; i < yNrCats; i++) {
+          if(Token.eq(value, yCats[i])) {
+            percentage = (1.0d / (yNrCats + 1)) * (i + 1);
+          }
+        }
+      }
     }
     return percentage;
   }
