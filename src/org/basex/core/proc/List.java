@@ -45,7 +45,7 @@ public final class List extends Process {
       tb.add(NL);
     }
     if(c == 0) {
-      o.print(INFONODB);
+      o.print(INFONODB + NL);
     } else {
       final TokenBuilder t = new TokenBuilder();
       t.add("Database", ml);
