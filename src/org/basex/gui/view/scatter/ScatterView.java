@@ -19,6 +19,7 @@ import javax.swing.JLabel;
 import org.basex.data.Data;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
+import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.view.View;
 import org.basex.util.Token;
@@ -111,11 +112,9 @@ public class ScatterView extends View implements Runnable {
     box.add(itemCombo);
     box.add(Box.createHorizontalGlue());
     add(box, BorderLayout.NORTH);
-
+    
     itemImg = createItemImage(false);
     itemFocusedImg = createItemImage(true);
-    viewDimension = Integer.MAX_VALUE;
-    scatterData = new ScatterData();
   }
   
   /**
@@ -262,6 +261,10 @@ public class ScatterView extends View implements Runnable {
   protected void refreshInit() {
     final Data data = GUI.context.data();
     if(data != null) {
+      if(!GUIProp.showscatter) return;
+      
+      viewDimension = Integer.MAX_VALUE;
+      scatterData = new ScatterData();
       final String[] keys = scatterData.getStatKeys();
       xCombo.setModel(new DefaultComboBoxModel(keys));
       yCombo.setModel(new DefaultComboBoxModel(keys));
@@ -274,6 +277,8 @@ public class ScatterView extends View implements Runnable {
       }
       itemCombo.setModel(new DefaultComboBoxModel(items));
       itemCombo.setSelectedIndex(-1);
+      plotChanged = true;
+      repaint();
     }
   }
 
