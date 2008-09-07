@@ -127,7 +127,6 @@ public class ScatterData {
     byte[] b = Token.token(xAttribute);
     final boolean tmp = !Token.contains(b, AT);
     b = Token.delete(b, AT);
-//    if(Token.eq(b, attrX)) return false;
     xIsTag = tmp;
     attrX = b;
     refreshCoordinates();
@@ -146,7 +145,6 @@ public class ScatterData {
     byte[] b = Token.token(yAttribute);
     final boolean tmp = !Token.contains(b, AT);
     b = Token.delete(b, AT);
-//    if(Token.eq(b, attrY)) return false;
     yIsTag = tmp;
     attrY = b;
     refreshCoordinates();
@@ -282,7 +280,11 @@ public class ScatterData {
     if(calcX) {
       if(xNumeric) {
         final double range = xMax - xMin;
-        percentage = 1 / range * (d - xMin);
+        if(range == 0) {
+          percentage = 0.5d;
+        } else {
+          percentage = 1 / range * (d - xMin);
+        }
       } else {
         for(int i = 0; i < xNrCats; i++) {
           if(Token.eq(value, xCats[i])) {
@@ -293,7 +295,11 @@ public class ScatterData {
     } else {
       if(yNumeric) {
         final double range = yMax - yMin;
-        percentage = 1 / range * (d - yMin);
+        if(range == 0) {
+          percentage = 0.5d;
+        } else {
+          percentage = 1 / range * (d - yMin);
+        }
       } else {
         for(int i = 0; i < yNrCats; i++) {
           if(Token.eq(value, yCats[i])) {

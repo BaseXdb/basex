@@ -1,6 +1,7 @@
 package org.basex.gui.view.scatter;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -119,13 +120,13 @@ public class ScatterView extends View implements Runnable {
   
   /**
    * Creates a buffered image for items.
-   * @param focusedImage create image of focused item
+   * @param focusedImage create image of focused item if true
    * @return item image
    */
   private BufferedImage createItemImage(final boolean focusedImage) {
     final BufferedImage img = focusedImage ? new BufferedImage(
-        18, 18, Transparency.BITMASK) : new BufferedImage(
-            10, 10, Transparency.BITMASK);
+        18, 18, Transparency.TRANSLUCENT) : new BufferedImage(
+            10, 10, Transparency.TRANSLUCENT);
     final Graphics g = img.getGraphics();
     Graphics2D g2d = (Graphics2D) g;
     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
@@ -136,7 +137,8 @@ public class ScatterView extends View implements Runnable {
       g.setColor(GUIConstants.color6);
       g.fillOval(3, 3, 12, 12);
     } else {
-      g.setColor(GUIConstants.color6);
+//      g.setColor(GUIConstants.color6);
+      g.setColor(new Color(50, 60, 130, 150));
       g.fillOval(0, 0, 10, 10);
     }
     return img;
