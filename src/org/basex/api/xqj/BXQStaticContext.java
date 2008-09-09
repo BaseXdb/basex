@@ -1,14 +1,13 @@
 package org.basex.api.xqj;
 
-import javax.xml.xquery.XQConstants;
+import static org.basex.api.xqj.BXQText.*;
+import static javax.xml.xquery.XQConstants.*;
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQStaticContext;
-import org.basex.BaseX;
-import org.basex.core.Context;
+import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.QNm;
 import org.basex.query.xquery.item.Uri;
-import org.basex.query.xquery.util.Namespaces;
 import org.basex.util.Token;
 
 /**
@@ -19,181 +18,184 @@ import org.basex.util.Token;
  */
 public class BXQStaticContext implements XQStaticContext {
   /** Namespaces. */
-  Namespaces ns = new Namespaces();
-  /** Project context. */
-  final Context ctx;
+  XQContext ctx = new XQContext();
+  /** Context item type. */
+  XQItemType type;
   /** Forward flag. */
   boolean scrollable;
+  /** Binding mode (immediate). */
+  boolean binding = true;
+  /** Holdability. */
+  boolean holdability = true;
+  /** Language mode. */
+  boolean xqueryx = true;
+  /** Timeout. */
+  int timeout = 0;
 
-  /**
-   * Constructor.
-   * @param c context
-   */
-  public BXQStaticContext(final Context c) {
-    ctx = c;
-  }
-  
   public void declareNamespace(String prefix, String uri) throws XQException {
     try {
-      BXQClose.check(prefix, String.class);
-      BXQClose.check(uri, String.class);
-      ns.index(new QNm(Token.token(prefix), Uri.uri(Token.token(uri))));
+      BXQAbstract.check(prefix, String.class);
+      BXQAbstract.check(uri, String.class);
+      ctx.ns.index(new QNm(Token.token(prefix), Uri.uri(Token.token(uri))));
     } catch(final org.basex.query.xquery.XQException ex) {
       throw new BXQException(ex);
     }
   }
 
   public String getBaseURI() {
-    BaseX.notimplemented();
-    return null;
+    return Token.string(ctx.baseURI.str());
   }
 
   public int getBindingMode() {
-    BaseX.notimplemented();
-    return 0;
+    return binding ? BINDING_MODE_IMMEDIATE : BINDING_MODE_DEFERRED;
   }
 
   public int getBoundarySpacePolicy() {
-    BaseX.notimplemented();
-    return 0;
+    return ctx.spaces ? BOUNDARY_SPACE_PRESERVE : BOUNDARY_SPACE_STRIP;
   }
 
   public int getConstructionMode() {
-    BaseX.notimplemented();
-    return 0;
+    return ctx.construct ? CONSTRUCTION_MODE_PRESERVE : CONSTRUCTION_MODE_STRIP; 
   }
 
   public XQItemType getContextItemStaticType() {
-    BaseX.notimplemented();
-    return null;
+    return type;
   }
 
   public int getCopyNamespacesModeInherit() {
-    BaseX.notimplemented();
-    return 0;
+    return ctx.nsInherit ? COPY_NAMESPACES_MODE_INHERIT :
+      COPY_NAMESPACES_MODE_NO_INHERIT;
   }
 
   public int getCopyNamespacesModePreserve() {
-    BaseX.notimplemented();
-    return 0;
+    return ctx.nsPreserve ? COPY_NAMESPACES_MODE_PRESERVE :
+      COPY_NAMESPACES_MODE_NO_PRESERVE;
   }
 
   public String getDefaultCollation() {
-    BaseX.notimplemented();
-    return null;
+    return Token.string(ctx.collation.str());
   }
 
   public String getDefaultElementTypeNamespace() {
-    BaseX.notimplemented();
-    return null;
+    return Token.string(ctx.nsElem.str());
   }
 
   public String getDefaultFunctionNamespace() {
-    BaseX.notimplemented();
-    return null;
+    return Token.string(ctx.nsFunc.str());
   }
 
   public int getDefaultOrderForEmptySequences() {
-    BaseX.notimplemented();
-    return 0;
+    return ctx.orderGreatest ? DEFAULT_ORDER_FOR_EMPTY_SEQUENCES_GREATEST :
+      DEFAULT_ORDER_FOR_EMPTY_SEQUENCES_LEAST;
   }
 
   public int getHoldability() {
-    BaseX.notimplemented();
-    return 0;
+    return holdability ? HOLDTYPE_HOLD_CURSORS_OVER_COMMIT :
+      HOLDTYPE_CLOSE_CURSORS_AT_COMMIT;
   }
 
   public String[] getNamespacePrefixes() {
-    BaseX.notimplemented();
-    return null;
+    final String[] pre = new String[ctx.ns.size];
+    for(int p = 0; p < ctx.ns.size; p++) 
+      pre[p] = Token.string(ctx.ns.names[p].ln());
+    return pre;
   }
 
-  public String getNamespaceURI(String prefix) {
-    BaseX.notimplemented();
-    return null;
-  }
+  public String getNamespaceURI(String prefix) throws XQException {
+    BXQAbstract.check(prefix, String.class);
+    final Uri uri = ctx.ns.find(Token.token(prefix));
+    if(uri != null) return Token.string(uri.str());
+    throw new BXQException(PRE, prefix);  }
 
   public int getOrderingMode() {
-    BaseX.notimplemented();
-    return 0;
+    return ctx.ordered ? ORDERING_MODE_ORDERED : ORDERING_MODE_UNORDERED;
   }
 
   public int getQueryLanguageTypeAndVersion() {
-    BaseX.notimplemented();
-    return 0;
+    return xqueryx ? LANGTYPE_XQUERYX : LANGTYPE_XQUERY;
   }
 
   public int getQueryTimeout() {
-    BaseX.notimplemented();
-    return 0;
+    return timeout;
   }
 
   public int getScrollability() {
-    return scrollable ? XQConstants.SCROLLTYPE_SCROLLABLE :
-      XQConstants.SCROLLTYPE_FORWARD_ONLY;
+    return scrollable ? SCROLLTYPE_SCROLLABLE : SCROLLTYPE_FORWARD_ONLY;
   }
 
-  public void setBaseURI(String baseUri) {
-    BaseX.notimplemented();
+  public void setBaseURI(String baseUri) throws XQException {
+    BXQAbstract.check(baseUri, String.class);
+    ctx.baseURI = Uri.uri(Token.token(baseUri));
   }
 
-  public void setBindingMode(int bindingMode) {
-    BaseX.notimplemented();
+  public void setBindingMode(int mode) throws BXQException {
+    if(mode != 0 && mode != 1) throw new BXQException(ARG, ARGB);
+    binding = mode == BINDING_MODE_IMMEDIATE;
   }
 
-  public void setBoundarySpacePolicy(int policy) {
-    BaseX.notimplemented();
+  public void setBoundarySpacePolicy(int mode) throws BXQException {
+    ctx.spaces = check(mode, ARGS) == BOUNDARY_SPACE_PRESERVE;
   }
 
-  public void setConstructionMode(int mode) {
-    BaseX.notimplemented();
+  public void setConstructionMode(int mode) throws XQException {
+    ctx.construct = check(mode, ARGC) == CONSTRUCTION_MODE_PRESERVE;
   }
 
   public void setContextItemStaticType(XQItemType contextItemType) {
-    BaseX.notimplemented();
+    type = contextItemType;
   }
 
-  public void setCopyNamespacesModeInherit(int mode) {
-    BaseX.notimplemented();
+  public void setCopyNamespacesModeInherit(int mode) throws BXQException {
+    ctx.nsInherit = check(mode, ARGN) == COPY_NAMESPACES_MODE_INHERIT;
   }
 
-  public void setCopyNamespacesModePreserve(int mode) {
-    BaseX.notimplemented();
+  public void setCopyNamespacesModePreserve(int mode) throws BXQException {
+    ctx.nsPreserve = check(mode, ARGN) == COPY_NAMESPACES_MODE_PRESERVE;
   }
 
-  public void setDefaultCollation(String uri) {
-    BaseX.notimplemented();
+  public void setDefaultCollation(String uri) throws XQException {
+    BXQAbstract.check(uri, String.class);
+    ctx.collation = Uri.uri(Token.token(uri));
   }
 
-  public void setDefaultElementTypeNamespace(String uri) {
-    BaseX.notimplemented();
+  public void setDefaultElementTypeNamespace(String uri) throws XQException {
+    BXQAbstract.check(uri, String.class);
+    ctx.nsElem = Uri.uri(Token.token(uri));
   }
 
-  public void setDefaultFunctionNamespace(String uri) {
-    BaseX.notimplemented();
+  public void setDefaultFunctionNamespace(String uri) throws XQException {
+    BXQAbstract.check(uri, String.class);
+    ctx.nsFunc = Uri.uri(Token.token(uri));
   }
 
-  public void setDefaultOrderForEmptySequences(int order) {
-    BaseX.notimplemented();
+  public void setDefaultOrderForEmptySequences(int mode) throws BXQException {
+    ctx.orderGreatest = check(mode, ARGO) ==
+      DEFAULT_ORDER_FOR_EMPTY_SEQUENCES_GREATEST;
   }
 
-  public void setHoldability(int holdability) {
-    BaseX.notimplemented();
+  public void setHoldability(int hold) throws BXQException {
+    holdability = check(hold, ARGH) == HOLDTYPE_HOLD_CURSORS_OVER_COMMIT;
   }
 
-  public void setOrderingMode(int mode) {
-    BaseX.notimplemented();
+  public void setOrderingMode(int mode) throws BXQException {
+    ctx.ordered = check(mode, ARGO) == ORDERING_MODE_ORDERED;
   }
 
-  public void setQueryLanguageTypeAndVersion(int langType) {
-    BaseX.notimplemented();
+  public void setQueryLanguageTypeAndVersion(int mode) throws BXQException {
+    xqueryx = check(mode, ARGL) == LANGTYPE_XQUERYX;
   }
 
-  public void setQueryTimeout(int seconds) {
-    BaseX.notimplemented();
+  public void setQueryTimeout(int seconds) throws BXQException {
+    if(seconds < 0) throw new BXQException(TIME);
+    timeout = seconds;
   }
 
-  public void setScrollability(int scrollability) {
-    scrollable = scrollability == XQConstants.SCROLLTYPE_SCROLLABLE;
+  public void setScrollability(int mode) throws BXQException {
+    scrollable = check(mode, ARGR) == SCROLLTYPE_SCROLLABLE;
+  }
+
+  private int check(final int val, final String msg) throws BXQException {
+    if(val != 1 && val != 2) throw new BXQException(ARG, msg);
+    return val;
   }
 }

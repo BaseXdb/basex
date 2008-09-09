@@ -7,7 +7,7 @@ import java.util.Properties;
 import javax.xml.xquery.XQConnection;
 import javax.xml.xquery.XQDataSource;
 import javax.xml.xquery.XQException;
-import org.basex.core.Context;
+import org.basex.core.Prop;
 
 /**
  * Java XQuery API - Data Source.
@@ -16,8 +16,6 @@ import org.basex.core.Context;
  * @author Andreas Weiler
  */
 public final class BXQDataSource implements XQDataSource {
-  /** BaseX context. */
-  private final Context ctx;
   /** Log output (currently ignored). */
   private PrintWriter log;
   /** Timeout. */
@@ -27,12 +25,12 @@ public final class BXQDataSource implements XQDataSource {
    * Constructor.
    */
   public BXQDataSource() {
-    ctx = new Context();
-    //org.basex.core.Prop.debug = true;
+    Prop.read();
+    //Prop.debug = true;
   }
 
   public BXQConnection getConnection() {
-    return new BXQConnection(ctx);
+    return new BXQConnection();
   }
 
   public XQConnection getConnection(final Connection c) throws XQException {

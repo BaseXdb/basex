@@ -18,17 +18,17 @@ import org.xml.sax.XMLReader;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-abstract class BXQClose {
+abstract class BXQAbstract {
   /** Closed flag. */
   protected boolean closed;
   /** Parent closer. */
-  protected BXQClose par;
+  protected BXQAbstract par;
 
   /**
    * Constructor.
    * @param parent
    */
-  public BXQClose(final BXQClose parent) {
+  public BXQAbstract(final BXQAbstract parent) {
     par = parent;
   }
 

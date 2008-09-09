@@ -1,0 +1,476 @@
+package org.basex.api.jaxp;
+
+import java.util.NoSuchElementException;
+import java.util.Properties;
+import javax.xml.namespace.NamespaceContext;
+import javax.xml.namespace.QName;
+import javax.xml.stream.Location;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import org.basex.data.Data;
+import org.basex.query.xquery.XQException;
+import org.basex.query.xquery.item.DNode;
+import org.basex.query.xquery.item.Item;
+import org.basex.query.xquery.item.Node;
+import org.basex.query.xquery.item.QNm;
+import org.basex.query.xquery.item.Uri;
+import org.basex.query.xquery.iter.Iter;
+import org.basex.query.xquery.iter.NodeIter;
+import org.basex.query.xquery.util.Namespaces;
+import org.basex.query.xquery.util.NodeBuilder;
+import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
+
+/**
+ * XML Stream Reader implementation.
+ *
+ * @author Workgroup DBIS, University of Konstanz 2005-07, ISC License
+ * @author Christian Gruen
+ */
+public final class IterStreamReader implements XMLStreamReader {
+  /** Properties. */
+  private static final Properties PROPS = new Properties();
+  /** Namespaces references. */
+  private final Namespaces ns = new Namespaces();
+  /** Result iterator. */
+  private final Iter result;
+  /** Next flag. */
+  private boolean next;
+  /** Open item. */
+  private DNodeReader read;
+  /** Attributes. */
+  private NodeBuilder atts;
+  /** Current item. */
+  Item item;
+  /** Current state. */
+  int type;
+
+  /**
+   * Constructor.
+   * @param res result iterator
+   */
+  public IterStreamReader(final Iter res) {
+    result = res;
+    
+    PROPS.put(XMLInputFactory.IS_NAMESPACE_AWARE, Boolean.FALSE);
+  }
+
+  public void close() {
+  }
+
+  public int getAttributeCount() {
+    getAttributes();
+    return atts.size;
+  }
+
+  public String getAttributeLocalName(final int i) {
+    getAttributes();
+    return Token.string(atts.list[i].nname());
+  }
+
+  public QName getAttributeName(final int i) {
+    getAttributes();
+    return atts.list[i].qname().toQName();
+  }
+
+  public String getAttributeNamespace(final int i) {
+    getAttributes();
+    return Token.string(atts.list[i].qname().uri.str());
+  }
+
+  public String getAttributePrefix(final int i) {
+    getAttributes();
+    return Token.string(atts.list[i].qname().pre());
+  }
+
+  public String getAttributeType(final int i) {
+    getAttributes();
+    final String name = getAttributeLocalName(i);
+    for(final String a : ATTYPES) if(name.equals(a)) return name;
+    return "CDATA";
+  }
+
+  /** Attribute types. */
+  private static final String[] ATTYPES = {
+    "ID", "IDREF", "IDREFS", "NMTOKEN", "NMTOKENS", "ENTITY", "ENTITIES"
+  };
+
+  public String getAttributeValue(final int i) {
+    getAttributes();
+    return Token.string(atts.list[i].str());
+  }
+
+  /*
+   * @see javax.xml.stream.XMLStreamReader#getAttributeValue(java.lang.String, java.lang.String)
+   */
+  public String getAttributeValue(final String s, final String s1) {
+    getAttributes();
+    for(int a = 0; a < atts.size; a++) {
+      if(!s1.equals(getAttributeLocalName(a))) continue;
+      if(s == null || s.equals(getAttributeNamespace(a)))
+        return getAttributeValue(a);
+    }
+    return null;
+  }
+
+  /** Retrieves the attributes for the current element. */
+  private void getAttributes() {
+    if(atts != null) return;
+    checkType(START_ELEMENT, ATTRIBUTE);
+    atts = new NodeBuilder(true);
+    final NodeIter iter = ((Node) item).attr();
+    try {
+      while(true) {
+        final Node it = iter.next();
+        if(it == null) return;
+        atts.add(it);
+      }
+    } catch(final XQException ex) {
+      ex.printStackTrace();
+    }
+  }
+
+  public String getCharacterEncodingScheme() {
+    return null;
+  }
+
+  public String getElementText() throws XMLStreamException {
+    checkType(START_ELEMENT);
+    next();
+    
+    final TokenBuilder tb = new TokenBuilder();
+    while(type != END_ELEMENT ) {
+      if(isType(CHARACTERS, CDATA, SPACE, ENTITY_REFERENCE)) {
+        tb.add(item.str());
+      } else if(isType(END_DOCUMENT)) {
+        throw new XMLStreamException("Unexpected end of document.");
+      } else if(isType(START_ELEMENT)) {
+        throw new XMLStreamException("START_ELEMENT not expected.");
+      } else {
+        checkType(PROCESSING_INSTRUCTION, COMMENT);
+      }
+      next();
+    }
+    return tb.toString();
+  }
+
+  public String getEncoding() {
+    return null;
+  }
+
+  public int getEventType() {
+    return type;
+  }
+
+  public String getLocalName() {
+    checkType(START_ELEMENT, END_ELEMENT, ENTITY_REFERENCE);
+    return Token.string(((Node) item).nname());
+  }
+
+  public Location getLocation() {
+    return new LocationImpl();
+  }
+
+  public QName getName() {
+    checkType(START_ELEMENT, END_ELEMENT, ENTITY_REFERENCE);
+    return ((Node) item).qname().toQName();
+  }
+
+  public NamespaceContext getNamespaceContext() {
+    return new NSContextImpl(ns);
+  }
+
+  public int getNamespaceCount() {
+    checkType(START_ELEMENT, END_ELEMENT, NAMESPACE);
+    return 0;
+  }
+
+  public String getNamespacePrefix(final int i) {
+    checkType(START_ELEMENT, END_ELEMENT, NAMESPACE);
+    return null;
+  }
+
+  public String getNamespaceURI() {
+    return null;
+  }
+
+  public String getNamespaceURI(final String s) {
+    if(s == null) throw new IllegalArgumentException();
+    checkType(START_ELEMENT, END_ELEMENT, NAMESPACE);
+    final Uri uri = ns.find(Token.token(s));
+    return uri == null ? null : Token.string(uri.str());
+  }
+
+  public String getNamespaceURI(final int i) {
+    checkType(START_ELEMENT, END_ELEMENT, NAMESPACE);
+    return null;
+  }
+
+  public String getPIData() {
+    checkType(PROCESSING_INSTRUCTION);
+    final byte[] val = item.str();
+    final int i = Token.indexOf(val, ' ');
+    return Token.string(i == -1 ? Token.EMPTY : Token.substring(val, i + 1));
+  }
+
+  public String getPITarget() {
+    checkType(PROCESSING_INSTRUCTION);
+    final byte[] val = item.str();
+    final int i = Token.indexOf(val, ' ');
+    return Token.string(i == -1 ? val : Token.substring(val, 0, i));
+  }
+
+  public String getPrefix() {
+    checkType(START_ELEMENT, END_ELEMENT);
+    final QNm qn = ((Node) item).qname();
+    return !qn.ns() ? null : Token.string(qn.pre());
+  }
+
+  public Object getProperty(final String s) {
+    if(s == null) throw new IllegalArgumentException();
+    return PROPS.get(s);
+  }
+
+  public String getText() {
+    checkType(CHARACTERS, COMMENT);
+    return Token.string(item.str());
+  }
+
+  public char[] getTextCharacters() {
+    return getText().toCharArray();
+  }
+
+  public int getTextCharacters(final int ss, final char[] ac, final int ts,
+      final int l) {
+
+    checkType(CHARACTERS, COMMENT);
+    final String value = getText();
+    final int vl = value.length();
+    if(ss >= vl) return 0;
+    int se = ss + l;
+    if(se > vl) se = value.length();
+    value.getChars(ss, se, ac, ts);
+    return se - ss;
+  }
+
+  public int getTextLength() {
+    checkType(CHARACTERS, COMMENT);
+    return item.str().length;
+  }
+
+  public int getTextStart() {
+    checkType(CHARACTERS, COMMENT);
+    return 0;
+  }
+
+  public String getVersion() {
+    return "1.0";
+  }
+
+  public boolean hasName() {
+    return isType(START_ELEMENT, END_ELEMENT);
+  }
+
+  public boolean hasNext() throws XMLStreamException {
+    if(next) return true;
+    next = true;
+    atts = null;
+    try {
+      if(read != null) {
+        if(read.hasNext()) {
+          read.next();
+        } else {
+          read = null;
+          type = END_DOCUMENT;
+          return true;
+        }
+      }
+      if(read == null) {
+        item = result.next();
+        if(item instanceof DNode) {
+          read = new DNodeReader();
+        } else if(item != null) {
+          type();
+        }
+      }
+    } catch(final org.basex.query.xquery.XQException ex) {
+      throw new XMLStreamException(ex);
+    }
+    return item != null;
+  }
+
+  public boolean hasText() {
+    return isType(CHARACTERS, DTD, ENTITY_REFERENCE, COMMENT, SPACE);
+  }
+
+  public boolean isAttributeSpecified(final int i) {
+    checkType(START_ELEMENT, ATTRIBUTE);
+    return true;
+  }
+
+  public boolean isCharacters() {
+    return isType(CHARACTERS);
+  }
+
+  public boolean isEndElement() {
+    return isType(END_ELEMENT);
+  }
+
+  public boolean isStandalone() {
+    return false;
+  }
+
+  public boolean isStartElement() {
+    return isType(START_ELEMENT);
+  }
+
+  public boolean isWhiteSpace() {
+    return isCharacters() && Token.ws(item.str());
+  }
+
+  public int next() throws XMLStreamException {
+    if(next && item == null || !next && !hasNext())
+      throw new NoSuchElementException();
+
+    next = false;
+    return type;
+  }
+
+  public int nextTag() throws XMLStreamException {
+    next();
+    while((type == CHARACTERS && isWhiteSpace()) ||
+        (type == CDATA && isWhiteSpace()) || type == SPACE ||
+        type == PROCESSING_INSTRUCTION || type == COMMENT) {
+      next();
+    }
+    checkType(START_ELEMENT, END_ELEMENT);
+    return type;
+  }
+
+  public void require(final int t, final String uri, final String ln)
+      throws XMLStreamException {
+    checkType(t);
+    if(uri != null && !uri.equals(getNamespaceURI())) {
+      throw new XMLStreamException();
+    }
+    if(ln != null && !ln.equals(getLocalName())) {
+      throw new XMLStreamException();
+    }
+  }
+
+  public boolean standaloneSet() {
+    return false;
+  }
+
+  private void checkType(final int... valid) {
+    if(!isType(valid)) throw new IllegalStateException("Invalid Type: " + type);
+  }
+
+  private boolean isType(final int... valid) {
+    for(final int v : valid) if(type == v) return true;
+    return false;
+  }
+
+  /**
+   * Sets the current event type.
+   */
+  void type() {
+    switch(item.type) {
+      case DOC: type = START_DOCUMENT; return;
+      case ATT: type = ATTRIBUTE; return;
+      case ELM: type = START_ELEMENT; return;
+      case COM: type = COMMENT; return;
+      case PI : type = PROCESSING_INSTRUCTION; return;
+      default:  type = CHARACTERS; return;
+    }
+  }
+
+  /**
+   * Reader for {@link DNode} instances.
+   */
+  private final class DNodeReader {
+    /** Node reference. */
+    private final DNode node;
+    /** Data size. */
+    private final int s;
+    /** Parent stack. */
+    private final int[] parent = new int[256];
+    /** Pre stack. */
+    private final int[] pre = new int[256];
+    /** Current level. */
+    private int l;
+    /** Current pre value. */
+    private int p;
+
+    /**
+     * Constructor.
+     */
+    DNodeReader() {
+      node = ((DNode) item).copy();
+      item = node;
+      p = node.pre;
+      int k = node.data.kind(p);
+      /*if(k == Data.DOC) {
+        p++;
+        k = node.data.kind(p);
+      }*/
+      s = p + node.data.size(p, k);
+      finish(k, 0);
+    }
+
+    /**
+     * Checks if the node reader can return more nodes.
+     * @return result of check
+     */
+    boolean hasNext() {
+      return p < s || l > 0;
+    }
+
+    /**
+     * Checks if the node reader can return more nodes.
+     */
+    void next() {
+      if(p == s) {
+        endElem();
+        return;
+      }
+
+      final Data data = node.data;
+      final int k = data.kind(p);
+      final int pa = data.parent(p, k);
+      if(l > 0 && parent[l - 1] >= pa) {
+        endElem();
+        return;
+      }
+      finish(k, pa);
+    }
+
+    /**
+     * Checks if the node reader can return more nodes.
+     */
+    private void endElem() {
+      node.set(pre[--l], Data.ELEM);
+      type = END_ELEMENT;
+    }
+
+    private void finish(final int k, final int pa) {
+      node.set(p, k);
+      if(k == Data.ELEM) {
+        pre[l] = p;
+        parent[l++] = pa;
+      }
+      p += node.data.attSize(p, k);
+      type();
+    }
+  }
+  
+  /** Dummy Location Implementation. */
+  class LocationImpl implements Location {
+    public int getCharacterOffset() { return -1; }
+    public int getColumnNumber() { return -1; }
+    public int getLineNumber() { return -1; }
+    public String getPublicId() { return null; }
+    public String getSystemId() { return null; }
+  }
+}

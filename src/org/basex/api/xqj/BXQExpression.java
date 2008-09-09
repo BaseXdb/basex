@@ -46,7 +46,7 @@ public final class BXQExpression extends BXQDynamicContext
 
   public XQResultSequence executeQuery(final String input) throws XQException {
     query.setQuery(input);
-    return execute(ctx);
+    return execute();
   }
 
   public XQResultSequence executeQuery(final Reader query) throws XQException {
@@ -60,6 +60,6 @@ public final class BXQExpression extends BXQDynamicContext
 
   public XQStaticContext getStaticContext() throws XQException {
     check();
-    return ctx;
+    return sc;
   }
 }

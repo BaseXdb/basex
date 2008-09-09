@@ -1,5 +1,7 @@
 package org.basex.api.xqj;
 
+import static org.basex.api.xqj.BXQText.*;
+
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.TimeZone;
@@ -14,6 +16,7 @@ import javax.xml.xquery.XQQueryException;
 import javax.xml.xquery.XQResultSequence;
 import javax.xml.xquery.XQSequence;
 import org.basex.BaseX;
+import org.basex.core.ProgressException;
 import org.basex.query.QueryException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQueryProcessor;
@@ -29,6 +32,7 @@ import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
 import org.basex.query.xquery.util.Var;
+import org.basex.util.Action;
 import org.basex.util.Token;
 import org.w3c.dom.Node;
 import org.xml.sax.XMLReader;
@@ -39,23 +43,23 @@ import org.xml.sax.XMLReader;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-abstract class BXQDynamicContext extends BXQClose implements XQDynamicContext {
+abstract class BXQDynamicContext extends BXQAbstract implements XQDynamicContext {
   /** Context. */
-  protected final BXQStaticContext ctx;
+  protected final BXQStaticContext sc;
   /** Query processor. */
   protected final XQueryProcessor query;
 
   /**
    * Constructor.
    * @param in query input
+   * @param s static context
    * @param c closer
-   * @param sc static context
    */
-  protected BXQDynamicContext(final String in, final BXQStaticContext sc,
+  protected BXQDynamicContext(final String in, final BXQStaticContext s,
       final BXQConnection c) {
     super(c);
     query = new XQueryProcessor(in);
-    ctx = sc;
+    sc = s;
   }
   
   public void bindAtomicValue(final QName qn, final String val,
@@ -183,24 +187,30 @@ abstract class BXQDynamicContext extends BXQClose implements XQDynamicContext {
 
   /**
    * Executes the specified query and returns the result iterator.
-   * @param sc static context
    * @return result sequence
    * @throws XQException exception
    */
-  protected XQResultSequence execute(final BXQStaticContext sc)
-      throws XQException {
-
+  protected XQResultSequence execute() throws XQException {
     check();
     final XQContext ctx = query.ctx;
-    ctx.ns = sc.ns;
+    ctx.ns = sc.ctx.ns;
     
     try {
+      if(sc.timeout != 0) {
+        new Action() {
+          public void run() {
+            ctx.stop();
+          }
+        }.delay(sc.timeout * 1000);
+      }
       query.create();
-      Iter iter = ctx.compile(sc.ctx.current()).iter();
+      Iter iter = ctx.compile(null).iter();
       if(sc.scrollable && !(iter instanceof SeqIter)) iter = new SeqIter(iter);
       return new BXQSequence(iter, ctx, this, sc, (BXQConnection) par);
     } catch(final QueryException ex) {
       throw new XQQueryException(ex.getMessage());
+    } catch(final ProgressException ex) {
+      throw new BXQException(TIMEOUT);
     }
   }
 }

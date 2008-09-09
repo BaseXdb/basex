@@ -80,7 +80,7 @@ public final class BXQItemType implements XQItemType {
   /**
    * Constructor.
    * @param t type
-   * @param o numeric value
+   * @param o occurrence
    */
   public BXQItemType(final Type t, final int o) {
     this(t, null, -1, true, o);

@@ -50,4 +50,31 @@ public interface BXQText {
   String OCC = "Occurrence indicator and item type do not match.";
   /** Error Message. */
   String OCCINV = "Invalid occurrence indicator.";
+  /** Error Message. */
+  String PRE = "Unknown namespace prefix '%'.";
+  /** Error Message. */
+  String ARG = "Wrong argument for %.";
+  /** Error Message. */
+  String ARGC = "Construction Mode";
+  /** Error Message. */
+  String ARGO = "Ordering Mode";
+  /** Error Message. */
+  String ARGS = "Boundary Space";
+  /** Error Message. */
+  String ARGN = "Namespace Mode";
+  /** Error Message. */
+  String ARGB = "Binding Mode";
+  /** Error Message. */
+  String ARGH = "Holdability";
+  /** Error Message. */
+  String ARGR = "Scrollability";
+  /** Error Message. */
+  String ARGL = "Language Type";
+  /** Error Message. */
+  String TIME = "Timeout must be positive.";
+  /** Error Message. */
+  String TIMEOUT = "Query exceeded timeout.";
+  /** Error Message. */
+  String VAR = "Unknown variable %.";
+  
 }

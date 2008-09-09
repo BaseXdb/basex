@@ -8,7 +8,6 @@ import javax.xml.xquery.XQExpression;
 import javax.xml.xquery.XQMetaData;
 import javax.xml.xquery.XQPreparedExpression;
 import javax.xml.xquery.XQStaticContext;
-import org.basex.core.Context;
 
 /**
  * Java XQuery API - Connection.
@@ -26,10 +25,9 @@ public final class BXQConnection extends BXQDataFactory
 
   /**
    * Constructor.
-   * @param c project context
    */
-  public BXQConnection(final Context c) {
-    super(c);
+  public BXQConnection() {
+    super();
   }
 
   public void commit() throws XQException {

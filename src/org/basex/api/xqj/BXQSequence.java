@@ -1,13 +1,11 @@
 package org.basex.api.xqj;
 
 import static org.basex.api.xqj.BXQText.*;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URI;
 import java.util.Properties;
-
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Result;
 import javax.xml.xquery.XQConnection;
@@ -15,8 +13,8 @@ import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItem;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQResultSequence;
-
 import org.basex.BaseX;
+import org.basex.api.jaxp.IterStreamReader;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
 import org.basex.query.xquery.XQContext;
@@ -32,7 +30,7 @@ import org.xml.sax.ContentHandler;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler
  */
-public final class BXQSequence extends BXQClose implements XQResultSequence {
+public final class BXQSequence extends BXQAbstract implements XQResultSequence {
   /** Result iterator. */
   private final Iter result;
   /** Query context. */
@@ -57,7 +55,7 @@ public final class BXQSequence extends BXQClose implements XQResultSequence {
    * @param connection connection
    */
   public BXQSequence(final Iter item, final XQContext context,
-      final BXQClose c, final BXQStaticContext scontext,
+      final BXQAbstract c, final BXQStaticContext scontext,
       final BXQConnection connection) {
     super(c);
     result = item;
@@ -73,9 +71,9 @@ public final class BXQSequence extends BXQClose implements XQResultSequence {
 
   public boolean absolute(final int p) throws XQException {
     final SeqIter iter = sequence();
-    final int ps = Math.max(0, p >= 0 ? p : iter.size + p);
+    final int ps = p >= 0 ? p - 1 : iter.size + p;
     cursor(iter, ps);
-    return ps > 0 && ps <= iter.size;
+    return ps >= 0 && ps < iter.size;
   }
 
   public void afterLast() throws XQException {
@@ -84,7 +82,7 @@ public final class BXQSequence extends BXQClose implements XQResultSequence {
   }
 
   public void beforeFirst() throws XQException {
-    cursor(sequence(), 0);
+    cursor(sequence(), -1);
   }
 
   public int count() throws XQException {
@@ -123,10 +121,12 @@ public final class BXQSequence extends BXQClose implements XQResultSequence {
     return item();
   }
 
-  public XMLStreamReader getItemAsStream() throws XQException {
+  public synchronized XMLStreamReader getItemAsStream() throws XQException {
     check();
-    BaseX.notimplemented();
-    return null;
+    final SeqIter seq = new SeqIter();
+    seq.add(it.it);
+    final IterStreamReader xsr = new IterStreamReader(seq);
+    return xsr;
   }
 
   public String getItemAsString(final Properties p) throws XQException {
@@ -160,10 +160,10 @@ public final class BXQSequence extends BXQClose implements XQResultSequence {
     return pos != -1 ? pos : iter.size + 1;
   }
 
-  public XMLStreamReader getSequenceAsStream() throws XQException {
+  public synchronized XMLStreamReader getSequenceAsStream() throws XQException {
     check();
-    BaseX.notimplemented();
-    return null;
+    final IterStreamReader xsr = new IterStreamReader(result);
+    return xsr;
   }
 
   public String getSequenceAsString(final Properties p) throws XQException {
@@ -316,7 +316,7 @@ public final class BXQSequence extends BXQClose implements XQResultSequence {
   }
 
   /**
-   * Checks the forward flag.
+   * Checks the forward flag and returns the result.
    * @return sequence iterator
    * @throws XQException xquery exception
    */
@@ -334,8 +334,8 @@ public final class BXQSequence extends BXQClose implements XQResultSequence {
    * @throws XQException xquery exception
    */
   private boolean cursor(final SeqIter seq, final int p) throws XQException {
-    seq.pos = p - 1;
-    pos = p > seq.size ? -1 : p;
-    return next();
+    pos = p == -1 ? 0 : p > seq.size ? -1 : p;
+    seq.pos = pos - 1;
+    return p == -1 ? true : next();
   }
 }

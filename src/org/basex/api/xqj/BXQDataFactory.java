@@ -19,7 +19,6 @@ import javax.xml.xquery.XQSequence;
 import javax.xml.xquery.XQSequenceType;
 import org.basex.BaseX;
 import org.basex.build.xml.SAXWrapper;
-import org.basex.core.Context;
 import org.basex.core.proc.CreateDB;
 import org.basex.data.Data;
 import org.basex.io.IO;
@@ -45,17 +44,16 @@ import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class BXQDataFactory extends BXQClose implements XQDataFactory {
+public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
   /** Database connection. */
   protected BXQStaticContext ctx;
 
   /**
    * Constructor.
-   * @param c project context
    */
-  public BXQDataFactory(final Context c) {
+  public BXQDataFactory() {
     super(null);
-    ctx = new BXQStaticContext(c);
+    ctx = new BXQStaticContext();
   }
 
   public BXQItemType createAtomicType(final int it, final QName qn,

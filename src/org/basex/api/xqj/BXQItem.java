@@ -14,11 +14,13 @@ import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQResultItem;
 import org.basex.BaseX;
+import org.basex.api.jaxp.IterStreamReader;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Type;
+import org.basex.query.xquery.iter.SeqIter;
 import org.basex.util.Token;
 import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
@@ -29,7 +31,7 @@ import org.xml.sax.ContentHandler;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class BXQItem extends BXQClose implements XQResultItem {
+public final class BXQItem extends BXQAbstract implements XQResultItem {
   /** Connection. */
   private final XQConnection conn;
   /** Query context. */
@@ -52,7 +54,7 @@ public final class BXQItem extends BXQClose implements XQResultItem {
    * @param context query context
    * @param connection connection reference
    */
-  public BXQItem(final Item item, final BXQClose c,
+  public BXQItem(final Item item, final BXQAbstract c,
       final XQContext context, final BXQConnection connection) {
     super(c);
     conn = connection;
@@ -98,7 +100,9 @@ public final class BXQItem extends BXQClose implements XQResultItem {
 
   public XMLStreamReader getItemAsStream() {
     BaseX.notimplemented();
-    return null;
+    final SeqIter seq = new SeqIter();
+    seq.add(it);
+    return new IterStreamReader(seq);
   }
 
   public String getItemAsString(Properties props) throws XQException {

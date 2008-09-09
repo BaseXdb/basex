@@ -1,17 +1,26 @@
 package org.basex.test;
 
+//import static javax.xml.stream.XMLStreamConstants.*;
 import java.io.StringReader;
 import java.util.Properties;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.events.Characters;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 import javax.xml.xquery.XQConnection;
+import javax.xml.xquery.XQConstants;
 import javax.xml.xquery.XQDataSource;
 import javax.xml.xquery.XQExpression;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQPreparedExpression;
 import javax.xml.xquery.XQResultSequence;
 import javax.xml.xquery.XQSequence;
+import javax.xml.xquery.XQStaticContext;
 import junit.framework.TestCase;
 import org.basex.io.CachedOutput;
 import org.basex.test.xqj.TestXMLFilter;
@@ -203,16 +212,67 @@ public class XQJTest extends TestCase {
   @Test
   public void test10() throws Exception {
     final XQConnection conn = conn(drv);
+    XQStaticContext sc = conn.getStaticContext();
+    sc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
     
-    try {
-      XQItemType type = conn.createTextType();
-      System.out.println(type.getBaseType());
-      
-      type = conn.createAttributeType(new QName("a"),
-          XQItemType.XQBASETYPE_INTEGER);
-      System.out.println(type);
-    } catch(final Exception ex) {
-      fail(ex.getMessage());
+    XQExpression ex = conn.createExpression();
+    XQResultSequence seq = ex.executeQuery("1,2,3,4");
+    seq.absolute(2);
+    assertEquals(2, seq.getPosition());
+  }
+
+  /**
+   * Test.
+   * @throws Exception exception
+   */
+  @Test
+  public void test11() throws Exception {
+    final XQConnection conn = conn(drv);
+    XQStaticContext sc = conn.getStaticContext();
+    sc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
+    
+    XQExpression ex = conn.createExpression();
+    String query = "doc('/home/db/projects/basex/input.xml')//title";
+    //String query = "1,2";
+    XQResultSequence seq = ex.executeQuery(query);
+    XMLStreamReader xsr = seq.getSequenceAsStream();
+    while(xsr.hasNext()) {
+      System.out.println(xsr.next());
+    }
+  }
+ 
+  /**
+   * Test.
+   * @throws Exception exception
+   */
+  @Test
+  public void test12() throws Exception {
+    final XQConnection conn = conn(drv);
+    XQStaticContext sc = conn.getStaticContext();
+    sc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
+    
+    XQExpression ex = conn.createExpression();
+    String query = "1,'haha',2.0e3,2";
+    //String query = "1";
+    XQResultSequence seq = ex.executeQuery(query);
+    XMLStreamReader xsr = seq.getSequenceAsStream();
+    
+    XMLInputFactory xif = XMLInputFactory.newInstance();
+    XMLEventReader xer = xif.createXMLEventReader(xsr);
+    
+    while(xer.hasNext()) {
+      XMLEvent ev = xer.nextEvent();
+      if(ev.isStartElement()) {
+        StartElement se = ev.asStartElement();
+        QName qnm = se.getName();
+        System.out.println("TAG: " + qnm);
+      } else if(ev.isCharacters()) {
+        Characters ch = ev.asCharacters();
+        System.out.println("TXT: " + ch.getData());
+      } else {
+        System.out.println("TYP: " + ev.getEventType());
+      }
+      //System.out.println(xer.getElementText());
     }
   }
 }
