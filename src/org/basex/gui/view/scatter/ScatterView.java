@@ -76,7 +76,7 @@ public class ScatterView extends View implements Runnable {
     xCombo = new BaseXCombo();
     xCombo.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        if(scatterData.setXaxis((String) xCombo.getSelectedItem())) {
+        if(scatterData.xAxis.setAxis((String) xCombo.getSelectedItem())) {
           plotChanged = true;
           repaint();
         }
@@ -85,7 +85,7 @@ public class ScatterView extends View implements Runnable {
     yCombo = new BaseXCombo();
     yCombo.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        if(scatterData.setYaxis((String) yCombo.getSelectedItem())) {
+        if(scatterData.yAxis.setAxis((String) yCombo.getSelectedItem())) {
           plotChanged = true;
           repaint();
         }
@@ -131,10 +131,10 @@ public class ScatterView extends View implements Runnable {
     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
         RenderingHints.VALUE_ANTIALIAS_ON);
     if(focusedImage) {
-      g.setColor(GUIConstants.colormark1);
+      g.setColor(Color.black);
+      g.fillOval(4, 4, 10, 10);
+      g.setColor(new Color(180, 80, 80, 200));
       g.fillOval(0, 0, 18, 18);
-      g.setColor(GUIConstants.color6);
-      g.fillOval(3, 3, 12, 12);
     } else {
 //      g.setColor(GUIConstants.color6);
       g.setColor(new Color(50, 60, 130, 150));
@@ -158,7 +158,7 @@ public class ScatterView extends View implements Runnable {
       return img;
     g.setColor(GUIConstants.color6);
     for(int i = 0; i < scatterData.size; i++) {
-      drawItem(g, scatterData.x[i], scatterData.y[i], false);
+      drawItem(g, scatterData.xAxis.co[i], scatterData.yAxis.co[i], false);
     }
     return img;
   }
@@ -179,7 +179,8 @@ public class ScatterView extends View implements Runnable {
     g.drawImage(plotImg, 0, 0, this);
 
     if(focusedItem != -1)
-    drawItem(g, scatterData.x[focusedItem], scatterData.y[focusedItem], true);
+    drawItem(g, scatterData.xAxis.co[focusedItem], 
+        scatterData.yAxis.co[focusedItem], true);
     plotChanged = false;
   }
   
@@ -209,7 +210,7 @@ public class ScatterView extends View implements Runnable {
   private void drawBox(final Graphics g) {
     final int width = getWidth();
     final int height = getHeight();
-    g.setColor(GUIConstants.color1);
+    g.setColor(GUIConstants.color6);
     g.drawLine(XMARGIN, height - YMARGIN, width - XMARGIN, height - YMARGIN);
     g.drawLine(XMARGIN, YMARGIN, XMARGIN, height - YMARGIN);
     g.drawLine(XMARGIN, YMARGIN, width - XMARGIN, YMARGIN);
@@ -268,15 +269,15 @@ public class ScatterView extends View implements Runnable {
       final String[] keys = scatterData.getStatKeys();
       xCombo.setModel(new DefaultComboBoxModel(keys));
       yCombo.setModel(new DefaultComboBoxModel(keys));
-      xCombo.setSelectedIndex(-1);
-      yCombo.setSelectedIndex(-1);
       final byte[][] tmpItems = data.tags.keys();
       final String[] items = new String[tmpItems.length];
       for(int i = 0; i < items.length; i++) {
         items[i] = Token.string(tmpItems[i]);
       }
       itemCombo.setModel(new DefaultComboBoxModel(items));
-      itemCombo.setSelectedIndex(-1);
+      itemCombo.setSelectedIndex(0);
+      xCombo.setSelectedIndex(0);
+      yCombo.setSelectedIndex(0);
       plotChanged = true;
       repaint();
     }
@@ -309,8 +310,8 @@ public class ScatterView extends View implements Runnable {
     int dist = Integer.MAX_VALUE;
     int currFocusedItem = -1;
     for(int i = 0; i < scatterData.size; i++) {
-      final int x = calcCoordinate(true, scatterData.x[i]);
-      final int y = calcCoordinate(false, scatterData.y[i]);
+      final int x = calcCoordinate(true, scatterData.xAxis.co[i]);
+      final int y = calcCoordinate(false, scatterData.yAxis.co[i]);
       // item middle is reference for distance calculation instead of upper
       // left corner -> +5
       final int distX = Math.abs(mouseX - x - 5);

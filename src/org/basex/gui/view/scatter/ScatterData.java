@@ -1,7 +1,6 @@
 package org.basex.gui.view.scatter;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 
 import org.basex.data.Data;
 import org.basex.data.StatsKey;
@@ -23,59 +22,25 @@ import org.basex.util.Token;
 public class ScatterData {
   /** Items pre values. */
   int[] pres;
-  /** Items x coordinates relative. */
-  Double[] x;
-  /** Items y coordinates relative. */
-  Double[] y;
   /** Number of items displayed in plot. */ 
   int size;
+  /** The x axis of the plot. */
+  ScatterAxis xAxis;
+  /** The y axis of the plot. */
+  ScatterAxis yAxis;
   
   /** A temporary list for pre values which match the given item. */
   private IntList tmpPres;
-  /** A temporary list for x coordinates. */
-  private LinkedList<Double> tmpX;
-  /** A temporary list for y coordinates. */
-  private LinkedList<Double> tmpY;
   /** Item token selected by user. */
   private byte[] item;
-  /** X attribute selected by user. */
-  private byte[] attrX;
-  /** Y attribute selected by user. */
-  private byte[] attrY;
-  /** Holds minimum x value in case x attribute is numerical. */
-  private double xMin;
-  /** Holds maximum x value in case x attribute is numerical. */
-  private double xMax;
-  /** Holds maximum y value in case y attribute is numerical. */
-  private double yMax;
-  /** Holds maximum y value in case y attribute is numerical. */
-  private double yMin;
-  /** True if x attribute is a tag, false if attribute. */
-  private boolean xIsTag;
-  /** True if y attribute is a tag, false if attribute. */
-  private boolean yIsTag;
-  /** True if x attribute is numerical. */
-  private boolean xNumeric;
-  /** True if y attribute is numerical. */
-  private boolean yNumeric;
-  /** Number of different categories for x attribute. */
-  private int xNrCats;
-  /** Number of different categories for y attribute. */
-  private int yNrCats;
-  /** The different categories for the x attribute. */
-  private byte[][] xCats;
-  /** The different categories for the y attribute. */
-  private byte[][] yCats;
-  /** Token for String operations. */
-  private static final byte[] AT = Token.token("@");
   
   /**
    * Default Constructor.
    */
   public ScatterData() {
+    xAxis = new ScatterAxis(this);
+    yAxis = new ScatterAxis(this);
     size = 0;
-    attrX = Token.token("");
-    attrY = Token.token("");
     item = Token.token("");
   }
   
@@ -116,42 +81,6 @@ public class ScatterData {
   }
   
   /**
-   * Called if the user has changed the caption of the x axis. If a new 
-   * attribute was selected the positions of the plot items are recalculated.
-   * @param xAttribute x attribute selected by the user
-   * @return true if a new attribute was selected and the plot data has been 
-   * recalculated
-   */
-  boolean setXaxis(final String xAttribute) {
-    if(xAttribute == null) return false;
-    byte[] b = Token.token(xAttribute);
-    final boolean tmp = !Token.contains(b, AT);
-    b = Token.delete(b, AT);
-    xIsTag = tmp;
-    attrX = b;
-    refreshCoordinates();
-    return true;
-  }
-  
-  /**
-   * Called if the user has changed the caption of the y axis. If a new 
-   * attribute was selected the positions of the plot items are recalculated.
-   * @param yAttribute y attribute selected by the user
-   * @return true if a new attribute was selected and the plot data has been 
-   * recalculated
-   */
-  boolean setYaxis(final String yAttribute) {
-    if(yAttribute == null) return false;
-    byte[] b = Token.token(yAttribute);
-    final boolean tmp = !Token.contains(b, AT);
-    b = Token.delete(b, AT);
-    yIsTag = tmp;
-    attrY = b;
-    refreshCoordinates();
-    return true;
-  }
-  
-  /**
    * Called if the user changes the item level displayed in the plot. If a new
    * item was selected the plot data is recalculated.
    * @param newItem item selected by the user
@@ -163,7 +92,9 @@ public class ScatterData {
     final byte[] b = Token.token(newItem);
     if(Token.eq(b, item)) return false;
     item = b;
-    refreshCoordinates();
+    refreshItems();
+    xAxis.refreshAxis();
+    yAxis.refreshAxis();
     return true;
   }
   
@@ -171,143 +102,26 @@ public class ScatterData {
    * Refreshes item list and coordinates if the selection has changed. So far
    * only numerical data is considered for plotting.
    */
-  void refreshCoordinates() {
-    if(Token.eq(attrX, Token.token("")) || Token.eq(attrY, Token.token("")))
-      return;
+  void refreshItems() {
     final Data data = GUI.context.data();
-    final StatsKey xKey = xIsTag ? data.tags.stat(data.tags.id(attrX)) :
-      data.atts.stat(data.atts.id(attrX));
-    xNumeric = xKey.kind == Kind.INT || xKey.kind == Kind.DBL;
-    if(xNumeric) {
-      xMin = xKey.min;
-      xMax = xKey.max;
-    } else {
-      xCats = xKey.cats.keys();
-      xNrCats = xCats.length;
-    }
-    final StatsKey yKey = yIsTag ? data.tags.stat(data.tags.id(attrY)) :
-      data.atts.stat(data.atts.id(attrY));
-    yNumeric = yKey.kind == Kind.INT || yKey.kind == Kind.DBL;
-    if(yNumeric) {
-      yMin = yKey.min;
-      yMax = yKey.max;
-    } else {
-      yCats = yKey.cats.keys();
-      yNrCats = yCats.length;
-    }
-    
     tmpPres = new IntList();
-    tmpX = new LinkedList<Double>();
-    tmpY = new LinkedList<Double>();
     final int s = data.size;
     final int itmID = data.tagID(item);
     int p = 1;
     while(p < s) {
       final int kind = data.kind(p);
-      if(kind == Data.ELEM) {
+      if(kind == Data.ELEM && data.tagID(p) == itmID) {
         if(data.tagID(p) == itmID) {
-          findItemValue(p, data);
+          tmpPres.add(p);
+          p += data.size(p, kind);
+        } else {
+          p += data.attSize(p, kind);
         }
-        p += data.attSize(p, kind);
       } else {
         p++;
       }
     }
     pres = tmpPres.finish();
     size = pres.length;
-    x = new Double[size];
-    y = new Double[size];
-    tmpX.toArray(x);
-    tmpY.toArray(y);
-  }
-  
-  /**
-   * Searches the database for the x and y values of a given item. Starts at 
-   * the given pre value of the item. 
-   * @param pre pre value of the given item
-   * @param data data reference
-   */
-  private void findItemValue(final int pre, final Data data) {
-    final int limit = pre + data.size(pre, Data.ELEM);
-    double currX = -1;
-    double currY = -1;
-    int p = pre;
-    p++;
-    while(p < limit) {
-      final int kind = data.kind(p);
-      if(kind == Data.ELEM) {
-        final byte[] currName = data.tag(p);
-        boolean isXvalue = false;
-        if((isXvalue = Token.eq(attrX, currName)) && xIsTag || 
-            Token.eq(attrY, currName) && yIsTag) {
-          final int attSize = data.attSize(p, kind);
-          final byte[] value = data.text(p + attSize);
-          if(isXvalue) { 
-            currX = calcPosition(true, value);
-          } else {
-            currY = calcPosition(false, value);
-          }
-        }
-      } else if(kind == Data.ATTR) {
-        boolean isXvalue = false;
-        final byte[] currName = data.attName(p);
-        if((isXvalue = Token.eq(attrX, currName)) && !xIsTag || 
-            Token.eq(attrY, currName) && !yIsTag) {
-          final byte[] value = data.attValue(p);
-          if(isXvalue) {
-            currX = calcPosition(true, value);
-          } else {
-            currY = calcPosition(false, value);
-          }
-        }
-      }
-      p++;
-    }
-    tmpPres.add(pre);
-    tmpX.add(currX);
-    tmpY.add(currY);
-  }
-  
-  /**
-   * Calculates the relative position of an item in the plot for a given value.
-   * @param calcX true if x value is calculated
-   * @param value item value
-   * @return relative x or y value of the item
-   */
-  private double calcPosition(final boolean calcX, final byte[] value) {
-    final double d = Token.toDouble(value);
-    double percentage = 0d;
-    if(calcX) {
-      if(xNumeric) {
-        final double range = xMax - xMin;
-        if(range == 0) {
-          percentage = 0.5d;
-        } else {
-          percentage = 1 / range * (d - xMin);
-        }
-      } else {
-        for(int i = 0; i < xNrCats; i++) {
-          if(Token.eq(value, xCats[i])) {
-            percentage = (1.0d / (xNrCats + 1)) * (i + 1);
-          }
-        }
-      }
-    } else {
-      if(yNumeric) {
-        final double range = yMax - yMin;
-        if(range == 0) {
-          percentage = 0.5d;
-        } else {
-          percentage = 1 / range * (d - yMin);
-        }
-      } else {
-        for(int i = 0; i < yNrCats; i++) {
-          if(Token.eq(value, yCats[i])) {
-            percentage = (1.0d / (yNrCats + 1)) * (i + 1);
-          }
-        }
-      }
-    }
-    return percentage;
   }
 }
