@@ -11,11 +11,11 @@ import org.basex.query.xquery.XQContext;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-final class Vars extends ExprInfo {
+public final class Vars extends ExprInfo {
   /** Variable expressions. */
-  private Var[] vars = new Var[2];
+  public Var[] vars = new Var[2];
   /** Number of stored variables. */
-  int size;
+  public int size;
 
   /**
    * Indexes the specified variable name and returns its id.
@@ -36,15 +36,24 @@ final class Vars extends ExprInfo {
   }
 
   /**
-   * Finds the specified variable.
+   * Finds and returns the specified variable.
    * @param v variable
-   * @return variable reference
+   * @return variable
    */
-  Var get(final Var v) {
+  public Var get(final Var v) {
     for(int s = size - 1; s >= 0; s--) {
       if(v == vars[s] || v.name.eq(vars[s].name)) return vars[s];
     }
     return null;
+  }
+
+  /**
+   * Returns the specified variable.
+   * @param o offset
+   * @return variable
+   */
+  public Var get(final int o) {
+    return vars[o];
   }
 
   /**

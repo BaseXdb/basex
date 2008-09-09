@@ -51,6 +51,8 @@ public final class GUIConstants {
   public static final String HELPVIEW = "Help";
   /** Internal name of the Real Tree View. */
   public static final String REALVIEW = "Real";
+  /** Internal name of the Real Tree View. */
+  public static final String SCATTERVIEW = "Scatter";
   
    /**
    * Default GUI Layout. The layout is formatted as follows:
@@ -61,7 +63,7 @@ public final class GUIConstants {
    */
   public static final String LAYOUTOPENED = "H V " + QUERYVIEW + " " + TREEVIEW
       + " " + TEXTVIEW + " " + HELPVIEW + " - V " + MAPVIEW + " " + TABLEVIEW
-      + " " + INFOVIEW + " " + REALVIEW + " - -";
+      + " " + INFOVIEW + " " + REALVIEW + " " + SCATTERVIEW + " - -";
 
   /** This layout is shown when no database is opened. */
   public static final String LAYOUTCLOSED = "V " + TEXTVIEW + " " + HELPVIEW

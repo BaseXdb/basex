@@ -140,7 +140,7 @@ public final class BaseX extends BaseXClient {
    * @return dummy object
    */
   public static Object notimplemented() {
-    throw new RuntimeException("Not implemented.");
+    throw new UnsupportedOperationException();
   }
 
   /**

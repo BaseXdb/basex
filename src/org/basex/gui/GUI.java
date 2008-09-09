@@ -55,6 +55,7 @@ import org.basex.gui.view.info.InfoView;
 import org.basex.gui.view.map.MapView;
 import org.basex.gui.view.query.QueryView;
 import org.basex.gui.view.real.RealView;
+import org.basex.gui.view.scatter.ScatterView;
 import org.basex.gui.view.table.TableView;
 import org.basex.gui.view.text.TextView;
 import org.basex.gui.view.tree.TreeView;
@@ -291,6 +292,7 @@ public final class GUI extends JFrame {
       textpanel, helppanel }, {
         new ViewPanel(new TreeView(HELPTREE), TREEVIEW),
         new ViewPanel(new RealView(), REALVIEW),
+        new ViewPanel(new ScatterView(null), SCATTERVIEW),
         new ViewPanel(new TableView(HELPTABLE), TABLEVIEW),
         new ViewPanel(new MapView(HELPMAP), MAPVIEW),
         new ViewPanel(query, QUERYVIEW),

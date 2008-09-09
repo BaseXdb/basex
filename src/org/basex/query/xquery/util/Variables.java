@@ -23,6 +23,14 @@ public final class Variables {
   public void addGlobal(final Var v) {
     global.add(v);
   }
+  
+  /**
+   * Returns the global variables.
+   * @return global variables
+   */
+  public Vars getGlobal() {
+    return global;
+  }
 
   /**
    * Indexes a local variable.

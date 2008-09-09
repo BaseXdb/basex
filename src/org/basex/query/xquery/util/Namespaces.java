@@ -18,7 +18,7 @@ public final class Namespaces {
   /** Default namespaces. */
   public static final NSIndex DEFAULT = NSIndex.get();
   /** Namespaces. */
-  private QNm[] names = new QNm[1];
+  public QNm[] names = new QNm[1];
   /** Number of stored namespaces. */
   public int size;
 
@@ -30,10 +30,16 @@ public final class Namespaces {
    */
   public boolean index(final QNm name) throws XQException {
     final byte[] ln = name.ln();
+    final boolean del = name.uri.str().length == 0;
     if(eq(ln, XML) || eq(ln, XMLNS)) Err.or(NSDEF, name);
     if(name.uri.eq(Uri.XML)) Err.or(NOXMLNS, name);
 
-    for(int s = 0; s < size; s++) if(eq(ln, names[s].ln())) return false;
+    for(int s = 0; s < size; s++) {
+      if(eq(ln, names[s].ln())) {
+        if(del) Array.move(names, s + 1, -1, --size - s);
+        return del;
+      }
+    }
 
     if(size == names.length) names = Array.extend(names);
     names[size++] = new QNm(ln, name.uri);

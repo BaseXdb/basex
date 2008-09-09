@@ -60,7 +60,6 @@ import org.basex.query.xquery.expr.TypeSwitch;
 import org.basex.query.xquery.expr.Unary;
 import org.basex.query.xquery.expr.Union;
 import org.basex.query.xquery.expr.VarCall;
-import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Dbl;
 import org.basex.query.xquery.item.Dec;
 import org.basex.query.xquery.item.FAttr;
@@ -343,7 +342,7 @@ public final class XQParser extends QueryParser {
     if(declSpaces) Err.or(DUPLBOUND);
     final boolean spaces = consumeWS2(PRESERVE);
     if(!spaces) check(STRIP);
-    ctx.spaces = Bln.get(spaces);
+    ctx.spaces = spaces;
     declSpaces = true;
   }
 
@@ -391,7 +390,7 @@ public final class XQParser extends QueryParser {
     if(declOrder) Err.or(DUPLORD);
     final boolean ordered = consumeWS2(ORDERED);
     if(!ordered) check(UNORDERED);
-    ctx.ordered = Bln.get(ordered);
+    ctx.ordered = ordered;
     declOrder = true;
   }
 
@@ -406,7 +405,7 @@ public final class XQParser extends QueryParser {
     if(declGreat) Err.or(DUPLORDEMP);
     final boolean order = consumeWS2(GREATEST);
     if(!order) check(LEAST);
-    ctx.orderGreatest = Bln.get(order);
+    ctx.orderGreatest = order;
     declGreat = true;
     return true;
   }
@@ -421,12 +420,12 @@ public final class XQParser extends QueryParser {
     if(declPres) Err.or(DUPLCOPYNS);
     boolean nsp = consumeWS(PRESERVE);
     if(!nsp) check(NOPRESERVE);
-    ctx.nsPreserve = Bln.get(nsp);
+    ctx.nsPreserve = nsp;
     declPres = true;
     consume(',');
     nsp = consumeWS(INHERIT);
     if(!nsp) check(NOINHERIT);
-    ctx.nsInherit = Bln.get(nsp);
+    ctx.nsInherit = nsp;
   }
 
   /**
@@ -571,7 +570,7 @@ public final class XQParser extends QueryParser {
     if(declConstr) Err.or(DUPLCONS);
     final boolean cons = consumeWS2(PRESERVE);
     if(!cons) check(STRIP);
-    ctx.construct = Bln.get(cons);
+    ctx.construct = cons;
     declConstr = true;
   }
 
@@ -795,7 +794,7 @@ public final class XQParser extends QueryParser {
     final Expr e = check(single(), ORDERBY);
     boolean desc = false;
     if(!consumeWS(ASCENDING)) desc = consumeWS(DESCENDING);
-    boolean least = !ctx.orderGreatest.bool();
+    boolean least = !ctx.orderGreatest;
     if(consumeWS(EMPTYORD)) {
       least = !consumeWS(GREATEST);
       if(least) check(LEAST);
@@ -1634,8 +1633,7 @@ public final class XQParser extends QueryParser {
    */
   private byte[] text(final TokenBuilder tb) {
     final byte[] t = tb.finish();
-    return t.length == 0 || !tb.ent && !ctx.spaces.bool() &&
-      ws(t) ? null : t;
+    return t.length == 0 || !tb.ent && !ctx.spaces && ws(t) ? null : t;
   }
 
   /**

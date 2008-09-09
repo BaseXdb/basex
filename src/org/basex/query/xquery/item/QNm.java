@@ -1,6 +1,7 @@
 package org.basex.query.xquery.item;
 
 import static org.basex.query.xquery.XQText.*;
+import javax.xml.namespace.QName;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.util.Err;
@@ -129,5 +130,14 @@ public final class QNm extends Item {
   @Override
   public String toString() {
     return "\"" + Token.string(val) + "\"";
+  }
+  
+  /**
+   * Converts this qname to a Java QName.
+   * @return QName
+   */
+  public QName toQName() {
+    return new QName(Token.string(uri.str()),
+        Token.string(ln()), Token.string(pre()));
   }
 }

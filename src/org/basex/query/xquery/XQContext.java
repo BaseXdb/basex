@@ -15,7 +15,6 @@ import org.basex.query.FTOpt;
 import org.basex.query.FTPos;
 import org.basex.query.QueryContext;
 import org.basex.query.xquery.expr.Expr;
-import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.DNode;
 import org.basex.query.xquery.item.Dat;
 import org.basex.query.xquery.item.Dtm;
@@ -95,20 +94,20 @@ public final class XQContext extends QueryContext {
   /** Default fulltext options. */
   private final FTOpt ftoptions = new FTOpt();
   /** Default boundary-space. */
-  public Bln spaces = Bln.FALSE;
+  public boolean spaces = false;
   /** Empty Order mode. */
-  public Bln orderGreatest = Bln.FALSE;
+  public boolean orderGreatest = false;
 
   /** Default encoding (currently ignored). */
-  byte[] encoding = token(Prop.ENCODING);
+  public byte[] encoding = token(Prop.ENCODING);
   /** Preserve Namespaces (currently ignored). */
-  Bln nsPreserve = Bln.FALSE;
+  public boolean nsPreserve = false;
   /** Inherit Namespaces (currently ignored). */
-  Bln nsInherit = Bln.FALSE;
+  public boolean nsInherit = false;
   /** Ordering mode (currently ignored). */
-  Bln ordered = Bln.FALSE;
+  public boolean ordered = false;
   /** Construction mode (currently ignored). */
-  Bln construct = Bln.FALSE;
+  public boolean construct = false;
 
   /** Reference to the root expression. */
   Expr root;

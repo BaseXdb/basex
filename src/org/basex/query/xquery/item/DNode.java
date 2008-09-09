@@ -2,9 +2,7 @@ package org.basex.query.xquery.item;
 
 import static org.basex.util.Token.*;
 import static org.basex.query.xquery.XQTokens.*;
-
 import java.io.IOException;
-
 import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
