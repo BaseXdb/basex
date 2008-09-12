@@ -34,11 +34,15 @@ public class ScatterView extends View implements Runnable {
   /** Data reference. */
   ScatterData scatterData;
   /** X paint margin. */
-  private static final int XMARGIN = 120;
+  private static final int XMARGIN = 100;
   /** Y paint margin. */ 
-  private static final int YMARGIN = 150;
+  private static final int YMARGIN = 130;
   /** Item size. */
   private static final int ITEMSIZE = 10;
+  /** Focused item size. */
+  private static final int ITEMSIZEFOCUSED = 18;
+  /** Place holder for items which lack value. */
+  private static final int NOVALUEBORDER = 60;
   /** Focus offset. */
   private static final int FOCUSOFFSET = 6;
   /** Item image. */
@@ -132,13 +136,14 @@ public class ScatterView extends View implements Runnable {
         RenderingHints.VALUE_ANTIALIAS_ON);
     if(focusedImage) {
       g.setColor(Color.black);
-      g.fillOval(4, 4, 10, 10);
+      final int diff = (ITEMSIZEFOCUSED - ITEMSIZE) / 2;
+      g.fillOval(diff, diff, ITEMSIZE, ITEMSIZE);
       g.setColor(new Color(180, 80, 80, 200));
-      g.fillOval(0, 0, 18, 18);
+      g.fillOval(0, 0, ITEMSIZEFOCUSED, ITEMSIZEFOCUSED);
     } else {
 //      g.setColor(GUIConstants.color6);
       g.setColor(new Color(50, 60, 130, 150));
-      g.fillOval(0, 0, 10, 10);
+      g.fillOval(0, 0, ITEMSIZE, ITEMSIZE);
     }
     return img;
   }
@@ -172,7 +177,13 @@ public class ScatterView extends View implements Runnable {
       viewDimension = w + h;
       plotChanged = true;
     }
-    drawBox(g);
+
+    //draw axis and grid
+    drawXaxis(g);
+    drawYaxis(g);
+    drawGrid(g);
+    
+    // draw items
     if(scatterData.size == 0) return;
     if(plotImg == null || plotChanged)
       plotImg = createPlotImage();
@@ -197,45 +208,75 @@ public class ScatterView extends View implements Runnable {
     final int x1 = calcCoordinate(true, x);
     final int y1 = calcCoordinate(false, y);
     if(drawFocused) {
-      g.drawImage(itemFocusedImg, x1 - 4, y1 - 4, this); 
+      // increased diameter of focused item  --->  -4
+      g.drawImage(itemFocusedImg, x1 - ITEMSIZEFOCUSED / 2, 
+          y1 - ITEMSIZEFOCUSED / 2, this); 
     } else {
-      g.drawImage(itemImg, x1, y1, this);
+      g.drawImage(itemImg, x1 - ITEMSIZE / 2, y1 - ITEMSIZE / 2, this);
     }
   }
   
   /**
-   * Draws a box for the plot. Temporary, will be replaced by a grid.
+   * Draws the x axis of the plot.
    * @param g graphics reference
    */
-  private void drawBox(final Graphics g) {
+  private void drawXaxis(final Graphics g) {
+    final int height = getHeight();
+    g.setColor(Color.black);
+    g.drawLine(XMARGIN, height - YMARGIN, getWidth() - XMARGIN, 
+        height - YMARGIN);
+  }
+  
+  /**
+   * Draws the y axis of the plot.
+   * @param g graphics reference
+   */
+  private void drawYaxis(final Graphics g) {
+    g.setColor(Color.black);
+    g.drawLine(XMARGIN, YMARGIN, XMARGIN, getHeight() - YMARGIN);
+  }
+  
+  /**
+   * Draws the plot grid.
+   * @param g graphics reference
+   */
+  private void drawGrid(final Graphics g) {
     final int width = getWidth();
     final int height = getHeight();
-    g.setColor(GUIConstants.color6);
-    g.drawLine(XMARGIN, height - YMARGIN, width - XMARGIN, height - YMARGIN);
-    g.drawLine(XMARGIN, YMARGIN, XMARGIN, height - YMARGIN);
-    g.drawLine(XMARGIN, YMARGIN, width - XMARGIN, YMARGIN);
-    g.drawLine(width - XMARGIN, YMARGIN, width - XMARGIN, height - YMARGIN);
-    g.drawLine(width / 2, YMARGIN, width / 2, height - YMARGIN);
-    g.drawLine(XMARGIN, height / 2, width - XMARGIN, height / 2);
+    
+    // grid
+    g.setColor(Color.gray);
+    // horizontal
+    g.drawLine(XMARGIN + NOVALUEBORDER, YMARGIN, width - XMARGIN, YMARGIN);
+    g.drawLine(XMARGIN + NOVALUEBORDER, height - YMARGIN - NOVALUEBORDER, 
+        width - XMARGIN, height - YMARGIN - NOVALUEBORDER);
+    // vertical
+    g.drawLine(XMARGIN + NOVALUEBORDER, YMARGIN, XMARGIN + NOVALUEBORDER, 
+        height - YMARGIN - NOVALUEBORDER);
+    g.drawLine(width - XMARGIN, YMARGIN, width - XMARGIN, 
+        height - YMARGIN - NOVALUEBORDER);
   }
   
   /**
    * Returns a coordinate for a specific double value of an item.
-   * @param d relative coordinate
+   * @param d relative coordinate of specific item
    * @param xAxis calculated value is x value
    * @return absolute coordinate
    */
   private int calcCoordinate(final boolean xAxis, final double d) {
     if(xAxis) {
+      if(d == -1)
+        return XMARGIN + NOVALUEBORDER / 2;
       final int width = getWidth();
-      final int xSpace = width - 2 * XMARGIN - ITEMSIZE;
-      final int x = d != -1 ? (int) (d * xSpace) : -30;
-      return x + XMARGIN;
+      final int xSpace = width - 2 * XMARGIN - NOVALUEBORDER;
+      final int x = (int) (d * xSpace);
+      return x + XMARGIN + NOVALUEBORDER;
     } else {
       final int height = getHeight();
-      final int ySpace = height - 2 * YMARGIN - ITEMSIZE;
-      final int y = d != -1 ? ySpace - (int) (d * ySpace) : 
-        ySpace + 30;
+      if(d == -1)
+        return height - YMARGIN - NOVALUEBORDER / 2; 
+      final int ySpace = height - 2 * YMARGIN - ITEMSIZE - NOVALUEBORDER;
+      final int y = ySpace - (int) (d * ySpace);
       return y + YMARGIN;
     }
   }
@@ -278,6 +319,7 @@ public class ScatterView extends View implements Runnable {
       itemCombo.setSelectedIndex(0);
       xCombo.setSelectedIndex(0);
       yCombo.setSelectedIndex(0);
+      focusedItem = -1;
       plotChanged = true;
       repaint();
     }
@@ -309,13 +351,18 @@ public class ScatterView extends View implements Runnable {
   private boolean focus() {
     int dist = Integer.MAX_VALUE;
     int currFocusedItem = -1;
+    if(mouseX < XMARGIN || mouseX > getWidth() - XMARGIN + ITEMSIZE / 2 ||
+        mouseY < YMARGIN - ITEMSIZE / 2 || mouseY > getHeight() - YMARGIN) {
+      return false;
+    }
+    
     for(int i = 0; i < scatterData.size; i++) {
       final int x = calcCoordinate(true, scatterData.xAxis.co[i]);
       final int y = calcCoordinate(false, scatterData.yAxis.co[i]);
       // item middle is reference for distance calculation instead of upper
       // left corner -> +5
-      final int distX = Math.abs(mouseX - x - 5);
-      final int distY = Math.abs(mouseY - y - 5);
+      final int distX = Math.abs(mouseX - x);
+      final int distY = Math.abs(mouseY - y);
       if(distX <= FOCUSOFFSET && distY <= FOCUSOFFSET) {
         final int currDist = distX * distY;
         if(currDist < dist) {
