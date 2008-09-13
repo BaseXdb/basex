@@ -61,6 +61,10 @@ public class ScatterView extends View implements Runnable {
   private int viewDimension;
   /** Keeps track of changes in the plot. */
   boolean plotChanged;
+  /** Current plot height. */
+  private int plotHeight;
+  /** Current plot width. */
+  private int plotWidth;
   /** X axis selector. */
   BaseXCombo xCombo;
   /** Y axis selector. */
@@ -178,10 +182,16 @@ public class ScatterView extends View implements Runnable {
       plotChanged = true;
     }
 
+    plotWidth = w - 2 * XMARGIN;
+    plotHeight = h - 2 * YMARGIN;
+    // draw plot background
+    g.setColor(new Color(90, 90, 150, 50));
+    g.fillRect(XMARGIN, YMARGIN, plotWidth, plotHeight);
+    
     //draw axis and grid
+    drawGrid(g);
     drawXaxis(g);
     drawYaxis(g);
-    drawGrid(g);
     
     // draw items
     if(scatterData.size == 0) return;
@@ -222,9 +232,12 @@ public class ScatterView extends View implements Runnable {
    */
   private void drawXaxis(final Graphics g) {
     final int height = getHeight();
-    g.setColor(GUIConstants.color5);
+    g.setColor(GUIConstants.color1);
     g.drawLine(XMARGIN, height - YMARGIN, getWidth() - XMARGIN, 
         height - YMARGIN);
+    
+    // draw min and max strings
+//    g.setColor(Color.black);
   }
   
   /**
@@ -232,7 +245,7 @@ public class ScatterView extends View implements Runnable {
    * @param g graphics reference
    */
   private void drawYaxis(final Graphics g) {
-    g.setColor(GUIConstants.color5);
+    g.setColor(GUIConstants.color1);
     g.drawLine(XMARGIN, YMARGIN, XMARGIN, getHeight() - YMARGIN);
   }
   
@@ -241,25 +254,25 @@ public class ScatterView extends View implements Runnable {
    * @param g graphics reference
    */
   private void drawGrid(final Graphics g) {
-    final int width = getWidth();
-    final int height = getHeight();
+    final int w = getWidth();
+    final int h = getHeight();
     
     g.setColor(GUIConstants.color1);
     // draw vertical grid lines
     final int x = scatterData.xAxis.nrCaptions;
     final double rangeX = 1.0d / (x - 1);
-    final int plotWidth = width - 2 * XMARGIN - NOVALUEBORDER;
+    final int pWidth = plotWidth - NOVALUEBORDER;
     for(int i = 0; i < x; i++) {
-      final int x1 = XMARGIN + NOVALUEBORDER + ((int)((i * rangeX) * plotWidth));
-      g.drawLine(x1, YMARGIN, x1, height - YMARGIN - NOVALUEBORDER);
+      final int x1 = XMARGIN + NOVALUEBORDER + ((int)((i * rangeX) * pWidth));
+      g.drawLine(x1, YMARGIN, x1, h - YMARGIN);
     }
     // horizontal grid lines
     final int y = scatterData.yAxis.nrCaptions;
     final double rangeY = 1.0d / (y - 1);
-    final int plotHeight = height - 2 * YMARGIN - NOVALUEBORDER;
+    final int pHeight = plotHeight - NOVALUEBORDER;
     for(int i = 0; i < y; i++) {
-      final int y1 = YMARGIN + ((int)((i * rangeY) * plotHeight));
-      g.drawLine(XMARGIN + NOVALUEBORDER, y1, width - XMARGIN, y1);
+      final int y1 = YMARGIN + ((int)((i * rangeY) * pHeight));
+      g.drawLine(XMARGIN, y1, w - XMARGIN, y1);
     }
   }
   
