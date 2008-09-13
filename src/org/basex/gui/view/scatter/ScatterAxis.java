@@ -19,6 +19,10 @@ public final class ScatterAxis {
   ScatterData scatterData;
   /** Coordinates of items. */
   Double[] co;
+  /** Number of captions to display. */
+  int nrCaptions;
+  /** Axis caption. */
+  String[] caption;
   /** Attribute selected by user. */
   private byte[] attr;
   /** Minimum value in case selected attribute is numerical. */
@@ -76,9 +80,11 @@ public final class ScatterAxis {
     if(numeric) {
       min = key.min;
       max = key.max;
+      nrCaptions = 10;
     } else {
       cats = key.cats.keys();
       nrCats = cats.length;
+      nrCaptions = nrCats;
     }
 
     final int[] items = scatterData.pres;
@@ -130,7 +136,7 @@ public final class ScatterAxis {
     } else {
       for(int i = 0; i < nrCats; i++) {
         if(Token.eq(value, cats[i])) {
-          percentage = (1.0d / (nrCats + 1)) * (i + 1);
+          percentage = (1.0d / (nrCats - 1)) * i;
         }
       }
     }
