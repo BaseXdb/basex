@@ -36,7 +36,7 @@ public class ScatterView extends View implements Runnable {
   /** X paint margin. */
   private static final int XMARGIN = 100;
   /** Y paint margin. */ 
-  private static final int YMARGIN = 130;
+  private static final int YMARGIN = 100;
   /** Item size. */
   private static final int ITEMSIZE = 10;
   /** Focused item size. */
@@ -175,6 +175,8 @@ public class ScatterView extends View implements Runnable {
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
+    g.setColor(new Color(90, 90, 150, 90));
+    
     final int w = getWidth();
     final int h = getHeight();
     if(w + h != viewDimension) {
@@ -182,11 +184,12 @@ public class ScatterView extends View implements Runnable {
       plotChanged = true;
     }
 
+    g.fillRect(0, 0, w, h);
     plotWidth = w - 2 * XMARGIN;
     plotHeight = h - 2 * YMARGIN;
     // draw plot background
-    g.setColor(new Color(90, 90, 150, 50));
-    g.fillRect(XMARGIN, YMARGIN, plotWidth, plotHeight);
+//    g.setColor(new Color(90, 90, 150, 50));
+//    g.fillRect(XMARGIN, YMARGIN, plotWidth, plotHeight);
     
     //draw axis and grid
     drawGrid(g);
@@ -231,13 +234,29 @@ public class ScatterView extends View implements Runnable {
    * @param g graphics reference
    */
   private void drawXaxis(final Graphics g) {
-    final int height = getHeight();
+    final int h = getHeight();
+    final int w = getWidth();
     g.setColor(GUIConstants.color1);
-    g.drawLine(XMARGIN, height - YMARGIN, getWidth() - XMARGIN, 
-        height - YMARGIN);
+    g.drawLine(XMARGIN, h - YMARGIN, w - XMARGIN, 
+        h - YMARGIN);
     
-    // draw min and max strings
-//    g.setColor(Color.black);
+    // test axis caption drawing
+//    if(scatterData.xAxis.numeric) {
+//      String min = Double.toString(scatterData.xAxis.min);
+//      String max = Double.toString(scatterData.xAxis.max);
+//      final BufferedImage imgMin = new BufferedImage(10 * min.length(), 10, 
+//          Transparency.BITMASK);
+//      final BufferedImage imgMax = new BufferedImage(10 * max.length(), 10, 
+//          Transparency.TRANSLUCENT);
+//      Graphics2D g2d = (Graphics2D) imgMin.getGraphics();
+////      g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
+////          RenderingHints.VALUE_ANTIALIAS_ON);
+//      g2d.setColor(Color.black);
+////      g2d.rotate(-60);
+//      g2d.setFont(GUIConstants.font);
+//      g2d.drawString(min, 0, 0);
+//      g.drawImage(imgMin, XMARGIN + NOVALUEBORDER, h - YMARGIN + 10, this);
+//    }
   }
   
   /**
@@ -257,6 +276,14 @@ public class ScatterView extends View implements Runnable {
     final int w = getWidth();
     final int h = getHeight();
     
+    // overdraw plot background for non value items
+//    g.setColor(new Color(90, 90, 150, 130));
+    g.setColor(GUIConstants.color2);
+//    g.fillRect(XMARGIN, YMARGIN, NOVALUEBORDER, h - 2 * YMARGIN);
+//    g.fillRect(XMARGIN, h - YMARGIN - NOVALUEBORDER, plotWidth, NOVALUEBORDER);
+    g.fillRect(XMARGIN + NOVALUEBORDER, YMARGIN, plotWidth - NOVALUEBORDER, 
+        plotHeight - NOVALUEBORDER);
+    
     g.setColor(GUIConstants.color1);
     // draw vertical grid lines
     final int x = scatterData.xAxis.nrCaptions;
@@ -264,7 +291,7 @@ public class ScatterView extends View implements Runnable {
     final int pWidth = plotWidth - NOVALUEBORDER;
     for(int i = 0; i < x; i++) {
       final int x1 = XMARGIN + NOVALUEBORDER + ((int)((i * rangeX) * pWidth));
-      g.drawLine(x1, YMARGIN, x1, h - YMARGIN);
+      g.drawLine(x1, YMARGIN, x1, h - YMARGIN + 9);
     }
     // horizontal grid lines
     final int y = scatterData.yAxis.nrCaptions;
@@ -272,7 +299,7 @@ public class ScatterView extends View implements Runnable {
     final int pHeight = plotHeight - NOVALUEBORDER;
     for(int i = 0; i < y; i++) {
       final int y1 = YMARGIN + ((int)((i * rangeY) * pHeight));
-      g.drawLine(XMARGIN, y1, w - XMARGIN, y1);
+      g.drawLine(XMARGIN - 9, y1, w - XMARGIN, y1);
     }
   }
   

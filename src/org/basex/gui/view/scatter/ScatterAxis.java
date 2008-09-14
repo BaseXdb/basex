@@ -24,19 +24,19 @@ public final class ScatterAxis {
   /** Axis caption. */
   String[] caption;
   /** Attribute selected by user. */
-  private byte[] attr;
+  byte[] attr;
   /** Minimum value in case selected attribute is numerical. */
-  private double min;
+  double min;
   /** Maximum  value in case selected attribute is numerical. */
-  private double max;
+  double max;
   /** True if attribute is a tag, false if attribute. */
-  private boolean isTag;
+  boolean isTag;
   /** True if attribute is numerical. */
-  private boolean numeric;
+  boolean numeric;
   /** Number of different categories for x attribute. */
-  private int nrCats;
+  int nrCats;
   /** The different categories for the x attribute. */
-  private byte[][] cats;
+  byte[][] cats;
   /** Token for String operations. */
   private static final byte[] AT = Token.token("@");
   
