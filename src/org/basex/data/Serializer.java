@@ -1,7 +1,6 @@
 package org.basex.data;
 
 import java.io.IOException;
-
 import org.basex.query.ExprInfo;
 import org.basex.util.Token;
 

@@ -33,7 +33,7 @@ public class DataAccess {
   /** Positions. */
   private boolean dirt;
   /** Offset. */
-  private short off;
+  private int off;
   /** Current buffer reference. */
   private int c;
 
@@ -253,7 +253,7 @@ public class DataAccess {
    * @param p read position
    */
   public synchronized void cursor(final long p) {
-    off = (short) (p & BUFLIMIT);
+    off = (int) (p & BUFLIMIT);
     
     final long ps = p - off;
     int o = c;

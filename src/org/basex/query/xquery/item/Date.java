@@ -3,6 +3,8 @@ package org.basex.query.xquery.item;
 import static org.basex.query.xquery.XQText.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.xml.datatype.DatatypeFactory;
+import org.basex.BaseX;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.util.Err;
 import org.basex.util.Token;
@@ -15,6 +17,17 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public abstract class Date extends Item {
+  /** Data factory. */
+  static DatatypeFactory df;
+
+  static {
+    try {
+      df = DatatypeFactory.newInstance();
+    } catch(final Exception e) {
+      BaseX.notexpected();
+    }
+  }
+  
   /** Seconds per day. */
   protected static final int DAYSECONDS = 86400;
   /** Day of months. */
@@ -250,15 +263,16 @@ public abstract class Date extends Item {
   @Override
   @SuppressWarnings("unused")
   public int diff(final Item it) throws XQException {
-    return diff((Date) it);
+    return df(it);
   }
 
   /**
    * Compares two dates.
-   * @param d date to be compared
+   * @param dt date to be compared
    * @return difference
    */
-  public final int diff(final Date d) {
+  protected final int df(final Item dt) {
+    final Date d = (Date) dt;
     final int m1 = minus ? -mon : mon;
     final int m2 = d.minus ? -d.mon : d.mon;
     if(m1 != m2) return m1 < m2 ? -1 : 1;

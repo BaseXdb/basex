@@ -86,6 +86,11 @@ public final class Bln extends Item {
     return score;
   }
 
+  @Override
+  public Object java() {
+    return new Boolean(val);
+  }
+
   /**
    * Checks if the specified value is a correct boolean string.
    * @param str string to be checked

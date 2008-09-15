@@ -1,7 +1,6 @@
 package org.basex.query.xquery.item;
 
 import static org.basex.query.xquery.XQText.*;
-
 import java.io.IOException;
 import java.math.BigDecimal;
 import org.basex.BaseX;
@@ -80,6 +79,14 @@ public abstract class Item extends Expr {
    */
   public int hash() {
     return Token.hash(str());
+  }
+
+  /**
+   * Returns a Java object.
+   * @return string representation
+   */
+  public Object java() {
+    return Token.string(str());
   }
 
   /**

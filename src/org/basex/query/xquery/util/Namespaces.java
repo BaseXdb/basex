@@ -29,15 +29,26 @@ public final class Namespaces {
    * @throws XQException evaluation exception
    */
   public boolean index(final QNm name) throws XQException {
+    return index(name, false);
+  }
+
+  /**
+   * Indexes the specified namespace.
+   * @param name namespace
+   * @param rec flag for recursive definition
+   * @return true if namespaces was added
+   * @throws XQException evaluation exception
+   */
+  public boolean index(final QNm name, final boolean rec) throws XQException {
     final byte[] ln = name.ln();
-    final boolean del = name.uri.str().length == 0;
+    final boolean del = rec && name.uri.str().length == 0;
     if(eq(ln, XML) || eq(ln, XMLNS)) Err.or(NSDEF, name);
     if(name.uri.eq(Uri.XML)) Err.or(NOXMLNS, name);
 
     for(int s = 0; s < size; s++) {
       if(eq(ln, names[s].ln())) {
         if(del) Array.move(names, s + 1, -1, --size - s);
-        return del;
+        return rec;
       }
     }
 

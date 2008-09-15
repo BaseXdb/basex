@@ -3,6 +3,7 @@ package org.basex.query.xquery.item;
 import static org.basex.query.xquery.XQText.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.xml.datatype.XMLGregorianCalendar;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.util.Err;
 import org.basex.util.Token;
@@ -59,5 +60,11 @@ public final class Day extends Date {
   public int diff(final Item it) throws XQException {
     Err.cmp(it, this);
     return 0;
+  }
+
+  @Override
+  public XMLGregorianCalendar java() {
+    return df.newXMLGregorianCalendarDate(1, 1,
+        (int) (sec / DAYSECONDS) + 1, zshift);
   }
 }

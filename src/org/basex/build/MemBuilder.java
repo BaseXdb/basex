@@ -47,14 +47,14 @@ public final class MemBuilder extends Builder {
 
   @Override
   protected void addDoc(final byte[] tok) {
-    data.addDoc(tok, 0, Data.DOC);
+    data.addDoc(tok, 0);
     size = data.size;
   }
 
   @Override
   protected void addElem(final int n, final int s, final int dis,
       final int as) {
-    data.addElem(n, s, dis, as, as, Data.ELEM);
+    data.addElem(n, s, dis, as, as);
     size = data.size;
   }
 

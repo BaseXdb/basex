@@ -2,6 +2,8 @@ package org.basex.query.xquery.item;
 
 import static org.basex.query.xquery.XQText.*;
 import java.math.BigDecimal;
+import java.math.BigInteger;
+
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Err;
@@ -135,6 +137,18 @@ public final class Dec extends Num {
   @Override
   public int hash() {
     return val.intValue();
+  }
+
+  @Override
+  public Object java() {
+    switch(type) {
+      case ULN:
+        return new BigInteger(val.toString());
+      case LNG:
+        return new Long(val.longValue());
+      default:
+        return val;
+    }
   }
   
   /**

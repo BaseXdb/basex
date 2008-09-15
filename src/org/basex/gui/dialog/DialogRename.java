@@ -14,7 +14,6 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.io.IO;
 import org.basex.util.StringList;
-import org.basex.util.Token;
 
 /**
  * Open Database Dialog.
@@ -73,8 +72,7 @@ public final class DialogRename extends Dialog {
     ok = !db.contains(nm) | nm.equals(old);
     String inf = ok ? "" : RENAMEEXISTS;
     if(ok) {
-      ok = nm.length() != 0 &&
-        Token.letterOrDigit(Token.token(nm));
+      ok = nm.length() != 0 && IO.valid(nm);
       if(!ok && nm.length() != 0) inf = RENAMEINVALID;
     }
     info.setText(inf);

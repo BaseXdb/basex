@@ -49,6 +49,11 @@ public final class B64 extends Item {
     return false;
   }
 
+  @Override
+  public Object java() {
+    return val;
+  }
+
   /**
    * Derived from java.util.prefs.Base64.
    * @return base64 array

@@ -2,6 +2,7 @@ package org.basex.query.xquery.item;
 
 import static org.basex.query.xquery.XQText.*;
 import java.text.SimpleDateFormat;
+import javax.xml.datatype.XMLGregorianCalendar;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.util.Err;
 import org.basex.util.Token;
@@ -73,5 +74,13 @@ public final class Dtm extends Date {
     time(tb);
     zone(tb);
     return tb.finish();
+  }
+
+  @Override
+  public XMLGregorianCalendar java() {
+    final int t = (int) (sec % DAYSECONDS);
+    return df.newXMLGregorianCalendar(mon / 12,
+        mon % 12 + 1, (int) (sec / DAYSECONDS) + 1, t / 3600,
+        t % 3600 / 60, t % 60, (int) mil, zshift);
   }
 }

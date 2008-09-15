@@ -1,9 +1,7 @@
 package org.basex.query.xquery.item;
 
 import static org.basex.query.xquery.XQTokens.*;
-
 import java.io.IOException;
-
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.util.Token;
@@ -57,6 +55,11 @@ public final class FAttr extends FNode {
   @Override
   public FAttr copy() {
     return new FAttr(name, val, par);
+  }
+
+  @Override
+  public Object java() {
+    return Token.string(str());
   }
   
   @Override

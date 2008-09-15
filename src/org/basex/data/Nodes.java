@@ -1,7 +1,6 @@
 package org.basex.data;
 
 import java.io.IOException;
-
 import org.basex.core.Context;
 import org.basex.util.Array;
 import org.basex.util.TokenBuilder;

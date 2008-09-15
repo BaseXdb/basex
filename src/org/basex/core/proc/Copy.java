@@ -116,11 +116,11 @@ public final class Copy extends AUpdate {
       final int d = p - data.parent(p, k);
       switch(k) {
         case Data.DOC:
-          tmp.addDoc(data.text(p), data.size(p, k), k);
+          tmp.addDoc(data.text(p), data.size(p, k));
           break;
         case Data.ELEM:
           tmp.addElem(data.tagID(p), data.tagNS(p), d, data.attSize(p, k),
-              data.size(p, k), k);
+              data.size(p, k));
           break;
         case Data.ATTR:
           tmp.addAtt(data.attNameID(p), data.attNS(p), data.attValue(p), d, k);

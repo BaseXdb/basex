@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.plaf.basic.BasicComboPopup;
 import org.basex.core.CommandParser;
@@ -226,10 +227,13 @@ public final class GUIInput extends BaseXTextField {
 
     if(comboChanged(sl)) {
       box.setSelectedItem(null);
+      /*
       box.removeAllItems();
       for(int i = 0; i < sl.size; i++) box.addItem(sl.list[i]);
-      pop = new ComboPopup(box);
       box.setSelectedIndex(0);
+      */
+      box.setModel(new DefaultComboBoxModel(sl.finish()));
+      pop = new ComboPopup(box);
     }
     
     final int w = getFontMetrics(getFont()).stringWidth(pre);

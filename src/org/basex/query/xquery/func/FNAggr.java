@@ -2,6 +2,7 @@ package org.basex.query.xquery.func;
 
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.item.Type.*;
+
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Calc;
@@ -25,7 +26,7 @@ import org.basex.query.xquery.util.Err;
 final class FNAggr extends Fun {
   @Override
   public Iter iter(final XQContext ctx, final Iter[] arg) throws XQException {
-    Iter iter = arg[0];
+    final Iter iter = arg[0];
 
     switch(func) {
       case COUNT:
@@ -98,7 +99,7 @@ final class FNAggr extends Fun {
 
     Item res = iter.next();
     if(res == null) return Iter.EMPTY;
-    
+
     cmp.e(res, res);
     if(!res.u() && res.s() || res instanceof Date)
       return evalStr(iter, res, cmp);
@@ -126,7 +127,7 @@ final class FNAggr extends Fun {
   private Type type(final Item a, final Item b) throws XQException {
     if(b.u()) {
       if(!a.n()) Err.or(FUNCMP, this, a.type, b.type);
-      return DBL; 
+      return DBL;
     }
     if(a.n() && !b.u() && b.s()) Err.or(FUNCMP, this, a.type, b.type);
     if(a.type == b.type) return a.type;

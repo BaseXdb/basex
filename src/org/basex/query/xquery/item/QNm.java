@@ -128,16 +128,13 @@ public final class QNm extends Item {
   }
 
   @Override
-  public String toString() {
-    return "\"" + Token.string(val) + "\"";
-  }
-  
-  /**
-   * Converts this qname to a Java QName.
-   * @return QName
-   */
-  public QName toQName() {
+  public QName java() {
     return new QName(Token.string(uri.str()),
         Token.string(ln()), Token.string(pre()));
+  }
+
+  @Override
+  public String toString() {
+    return "\"" + Token.string(val) + "\"";
   }
 }

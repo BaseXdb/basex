@@ -25,6 +25,8 @@ import org.xml.sax.InputSource;
  * @author Christian Gruen
  */
 public final class IO {
+  /** Invalid file characters. */
+  private static final String INVALID = " \"*./:<>?";
   /** BaseX Suffix. */
   public static final String BASEXSUFFIX = ".basex";
   /** XQuery Suffix. */
@@ -399,5 +401,21 @@ public final class IO {
       }
     }
     return pat == null ? path.delete() : true;
+  }
+
+  /**
+   * Checks if the specified filename is valid; allows only letters,
+   * digits and some special characters.
+   * @param fn filename
+   * @return result of check
+   */
+  public static boolean valid(final String fn) {
+    // . / * "   : < > ?
+    for(int i = 0; i < fn.length(); i++) {
+      final char c = fn.charAt(i);
+      if(!Token.letterOrDigit(c) && (c < ' ' || c > '@' ||
+          INVALID.indexOf(c) != -1)) return false;
+    }
+    return true;
   }
 }

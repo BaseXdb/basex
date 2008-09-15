@@ -11,6 +11,7 @@ import org.basex.util.Array;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Token;
+import org.basex.util.XMLToken;
 
 /**
  * This class indexes text contents in a compressed trie on disk.
@@ -165,7 +166,7 @@ public final class FTTrie extends Index {
     
     int[][] dt = null;
     
-    if (Token.ftdigit(tokFrom) && Token.ftdigit(tokTo)) {
+    if (ftdigit(tokFrom) && ftdigit(tokTo)) {
       int td = tokTo.length - tokFrom.length;
       int[] ne = getNodeEntry(0);
       if (hasNextNodes(ne)) {
@@ -203,10 +204,24 @@ public final class FTTrie extends Index {
           }    
         }
       }
-    } else if (Token.letterOrDigit(tokFrom) && Token.letterOrDigit(tokTo)) {
+    } else if (XMLToken.isNMToken(tokFrom) && XMLToken.isNMToken(tokTo)) {
       dt = idPosRangeText(tokF, tokT);
     }
     return new IndexArrayIterator(extractIDsFromData(dt));
+  }
+
+  /**
+   * Checks if the specified token is a digit.
+   * @param tok the letter to be checked
+   * @return result of comparison
+   */
+  private static boolean ftdigit(final byte[] tok) {
+    boolean d = false;
+    for(final byte t : tok) if(!Token.digit(t)) {
+      if (!d && t == '.') d = true;
+      else return false;
+    }
+    return true;
   }
   
   /** Count current level. */

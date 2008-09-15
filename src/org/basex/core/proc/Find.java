@@ -13,6 +13,7 @@ import org.basex.util.Array;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
+import org.basex.util.XMLToken;
 
 /**
  * Evaluates the 'find' command.
@@ -77,8 +78,7 @@ public final class Find extends AQuery {
         if(term.length() == 1) continue;
         preds += "[" + ContainsLC.NAME + "(@*, \"" + term.substring(1) + "\")]";
         term = term.substring(1);
-        final byte[] t = Token.token(term);
-        if(Token.letter(t[0]) && Token.letterOrDigit(t)) {
+        if(XMLToken.isName(Token.token(term))) {
           // attribute exists.. add location path
           pre += (r ? "" : ".") + "//@" + term + " | ";
         }
@@ -88,8 +88,7 @@ public final class Find extends AQuery {
         } else {
           preds += "[" + ContainsLC.NAME + "(text(), \"" + term + "\")]";
         }
-        final byte[] t = Token.token(term);
-        if(Token.letter(t[0]) && Token.letterOrDigit(t)) {
+        if(XMLToken.isName(Token.token(term))) {
           // tag exists.. add location path
           pre += (r ? "/" : "") + "descendant::" + term + " | ";
         }

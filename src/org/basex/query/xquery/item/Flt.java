@@ -97,6 +97,11 @@ public final class Flt extends Num {
     return (int) val;
   }
 
+  @Override
+  public Object java() {
+    return new Float(val);
+  }
+
   /**
    * Converts the given token into a double value.
    * @param val value to be converted

@@ -249,7 +249,7 @@ public final class DialogCreate extends Dialog {
     String inf1 = !exists ? PATHWHICH : " ";
     String inf2 = "";
     if(ok) {
-      ok = Token.letterOrDigit(Token.token(nm));
+      ok = IO.valid(nm);
       if(!ok) inf2 = RENAMEINVALID;
       else if(db.contains(nm)) inf2 = RENAMEOVER;
     }

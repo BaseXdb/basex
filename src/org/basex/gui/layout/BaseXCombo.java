@@ -18,11 +18,11 @@ import org.basex.gui.dialog.Dialog;
  */
 public final class BaseXCombo extends JComboBox {
   /** Maximum number of strings to be stored. */
-  public static final int MAX = 30;
+  private static final int MAX = 30;
   /** Last Input. */
-  public String last = "";
+  String last = "";
   /** Button help. */
-  public byte[] help;
+  byte[] help;
 
   /**
    * Default Constructor.
@@ -111,24 +111,23 @@ public final class BaseXCombo extends JComboBox {
     getEditor().setItem(txt);
   }
 
-  /**
+  /*
    * Returns all texts.
    * @return text
-   */
   public String[] history() {
     final String[] items = new String[getItemCount()];
     for(int i = 0; i < items.length; i++) items[i] = getItemAt(i).toString();
     return items;
   }
 
-  /**
+  /*
    * Sets texts.
    * @param txt texts to be set
-   */
   public void history(final String[] txt) {
     removeAllItems();
     for(int i = 0; i < txt.length; i++) addItem(txt[i]);
   }
+   */
   
   @Override
   public void addKeyListener(final KeyListener l) {

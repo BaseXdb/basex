@@ -1,9 +1,7 @@
 package org.basex.data;
 
 import static org.basex.data.DataText.*;
-
 import java.io.IOException;
-
 import org.basex.BaseX;
 import org.basex.util.Token;
 import org.xml.sax.ContentHandler;
@@ -148,14 +146,15 @@ public final class SAXSerializer extends Serializer implements XMLReader {
 
   @Override
   public void attribute(final byte[] n, final byte[] v) {
-    atts.addAttribute("", "", Token.string(n), "", Token.string(v));
+    final String an = Token.string(n);
+    atts.addAttribute("", an, an, "", Token.string(v));
   }
 
   @Override
   public void emptyElement() throws IOException {
     finishElement();
     try {
-      handler.endElement("", "", tag);
+      handler.endElement("", tag, tag);
     } catch(final SAXException ex) {
       throw new IOException(ex.getMessage());
     }
@@ -164,7 +163,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   @Override
   public void finishElement() throws IOException {
     try {
-      handler.startElement("", "", tag, atts);
+      handler.startElement("", tag, tag, atts);
     } catch(final SAXException ex) {
       throw new IOException(ex.getMessage());
     }
@@ -173,7 +172,8 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   @Override
   public void closeElement(final byte[] t) throws IOException {
     try {
-      handler.endElement("", "", Token.string(t));
+      tag = Token.string(t);
+      handler.endElement("", tag, tag);
     } catch(final SAXException ex) {
       throw new IOException(ex.getMessage());
     }

@@ -996,28 +996,6 @@ public final class Token {
   }
 
   /**
-   * Checks if the specified token consists only of letters.
-   * Note that this method does not support unicode characters.
-   * @param tok token to be checked
-   * @return result of comparison
-   */
-  public static boolean letter(final byte[] tok) {
-    for(final byte t : tok) if(!letter(t)) return false;
-    return true;
-  }
-
-  /**
-   * Checks if the specified token consists only of letters and digits.
-   * Note that this method does not support unicode characters.
-   * @param tok token to be checked
-   * @return result of comparison
-   */
-  public static boolean letterOrDigit(final byte[] tok) {
-    for(final byte t : tok) if(!letterOrDigit(t)) return false;
-    return true;
-  }
-
-  /**
    * Checks if the specified character is a letter.
    * Note that this method does not support unicode characters.
    * @param c the letter to be checked
@@ -1034,20 +1012,6 @@ public final class Token {
    */
   public static boolean digit(final int c) {
     return c >= '0' && c <= '9';
-  }
-
-  /**
-   * Checks if the specified token is a digit.
-   * @param tok the letter to be checked
-   * @return result of comparison
-   */
-  public static boolean ftdigit(final byte[] tok) {
-    boolean d = false;
-    for(final byte t : tok) if(!digit(t)) {
-      if (!d && (t == '.' || t == ',')) d = true;
-      else return false;
-    }
-    return true;
   }
 
   /**

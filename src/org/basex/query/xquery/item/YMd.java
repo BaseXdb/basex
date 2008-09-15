@@ -3,6 +3,7 @@ package org.basex.query.xquery.item;
 import static org.basex.query.xquery.XQText.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.xml.datatype.Duration;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.util.Err;
 import org.basex.util.Token;
@@ -97,6 +98,11 @@ public final class YMd extends Dur {
   @Override
   public int diff(final Item it) throws XQException {
     if(it.type != type) Err.cmp(it, this);
-    return diff((Date) it);
+    return df(it);
+  }
+
+  @Override
+  public Duration java() {
+    return df.newDurationYearMonth(minus, mon / 12, mon % 12 + 1);
   }
 }

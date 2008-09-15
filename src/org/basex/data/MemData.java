@@ -12,7 +12,7 @@ import org.basex.util.Token;
  * This class stores and organizes the database table and the index structures
  * for textual content in a compressed memory structure.
  * Each node occupies 64 bits. The current storage layout looks like follows:
- * 
+ *
  * <pre>
  * ELEMENTS:
  * - Bit 0-2   : Node kind (ELEM)
@@ -78,7 +78,7 @@ public final class MemData extends Data {
 
   @Override
   public int parent(final int pre, final int kind) {
-    return pre - (int) (val[pre] & 0xFFFFFF);
+    return kind == DOC ? -1 : pre - (int) (val[pre] & 0xFFFFFF);
   }
 
   @Override
@@ -201,11 +201,9 @@ public final class MemData extends Data {
    * Adds an element.
    * @param t document name
    * @param s node size
-   * @param k node kind
    */
-  public void addDoc(final byte[] t, final int s, final int k) {
-    check();
-    val[size++] = ((long) k << 61) + (textIndex(t) << 32) + s;
+  public void addDoc(final byte[] t, final int s) {
+    addText(t, s, DOC);
   }
 
   /**
@@ -215,14 +213,13 @@ public final class MemData extends Data {
    * @param d distance
    * @param a number of attributes
    * @param s node size
-   * @param k node kind
    */
   public void addElem(final int t, final int n, final int d, final int a,
-      final int s, final int k) {
+      final int s) {
 
     check();
-    val[size++] = ((long) k << 61) + ((long) a << 56) + ((long) n << 39) +
-      ((long) s << 32) + ((long) t << 24) + d;
+    val[size++] = ((long) ELEM << 61) + ((long) a << 56) +
+      ((long) n << 39) + ((long) s << 32) + ((long) t << 24) + d;
   }
 
   /**
@@ -249,8 +246,8 @@ public final class MemData extends Data {
    */
   public void addText(final byte[] t, final int d, final int k) {
     check();
-    final long ti = textIndex(t);
-    val[size++] = ((long) k << 61) + (ti << 32) + d;
+    final long l = textIndex(t);
+    val[size++] = ((long) k << 61) + (l << 32) + d;
   }
 
   /**
@@ -258,7 +255,7 @@ public final class MemData extends Data {
    * @param pre closing pre tag
    */
   public void finishElem(final int pre) {
-    long s = size - pre;  
+    final long s = size - pre;
     final boolean e = kind(pre) == ELEM;
     final long o = e ? 0xFF000000FFFFFFFFL : 0xFFFFFFFFFF000000L;
     val[pre] = (val[pre] & o) + (e ? (s << 32) : s);

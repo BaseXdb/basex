@@ -10,12 +10,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
-
 import org.basex.data.Data;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
@@ -248,7 +246,7 @@ public class ScatterView extends View implements Runnable {
     final double rangeX = 1.0d / (x - 1);
     final int pWidth = plotWidth - NOVALUEBORDER;
     for(int i = 0; i < x; i++) {
-      final int x1 = XMARGIN + NOVALUEBORDER + ((int)((i * rangeX) * pWidth));
+      final int x1 = XMARGIN + NOVALUEBORDER + (int) ((i * rangeX) * pWidth);
       g.drawLine(x1, YMARGIN, x1, h - YMARGIN + 9);
     }
     
@@ -283,7 +281,7 @@ public class ScatterView extends View implements Runnable {
     final double rangeY = 1.0d / (y - 1);
     final int pHeight = plotHeight - NOVALUEBORDER;
     for(int i = 0; i < y; i++) {
-      final int y1 = YMARGIN + ((int)((i * rangeY) * pHeight));
+      final int y1 = YMARGIN + (int) ((i * rangeY) * pHeight);
       g.drawLine(XMARGIN - 9, y1, w - XMARGIN, y1);
     }
     

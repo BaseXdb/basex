@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
+import org.basex.io.IO;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.iter.NodeMore;
@@ -144,8 +145,13 @@ public final class DNode extends Node {
 
   @Override
   public byte[] base() {
-    //return type != Type.DOC ? EMPTY : token(data.meta.file.path());
-    return type != Type.DOC ? EMPTY : data.text(pre);
+    if(type != Type.DOC) return EMPTY;
+    final IO dir = new IO(data.meta.file.path());
+    final IO file = new IO(string(data.text(pre)));
+    return token(dir.merge(file).path());
+    
+    //return concat(token(data.meta.file.path()), token('/'), data.text(pre));
+    //return data.text(pre);
   }
 
   @Override

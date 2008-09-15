@@ -45,6 +45,11 @@ public final class Hex extends Item {
     return false;
   }
 
+  @Override
+  public Object java() {
+    return val;
+  }
+
   /**
    * Converts the specified hex array into a byte array.
    * @param h hex input

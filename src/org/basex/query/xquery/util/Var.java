@@ -102,7 +102,8 @@ public final class Var extends ExprInfo implements Cloneable {
    */
   public void check() throws XQException {
     if(type != null) {
-      if(!type.instance(item.iter(), false)) Err.cast(type.type, item);
+      // [CG] check untyped/node types..
+      if(!type.instance(item.iter(), true)) Err.cast(type.type, item);
     }
   }
 

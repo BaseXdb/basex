@@ -1,6 +1,7 @@
 package org.basex.util;
 
 import static org.basex.util.Token.*;
+
 import org.basex.build.xml.XMLScanner;
 
 /**
@@ -51,7 +52,7 @@ public final class XMLToken {
   public static boolean isFirstLetter(final int ch) {
     return isXMLLetter(ch) || ch == ':';
   }
-  
+
   /**
    * Checks if the specified character is an XML letter.
    * @param ch the letter to be checked
@@ -87,7 +88,7 @@ public final class XMLToken {
     }
     return l;
   }
-  
+
   /**
    * Checks if the specified token is a valid Name.
    * @param v value to be checked
@@ -106,7 +107,7 @@ public final class XMLToken {
    */
   public static boolean isNMToken(final byte[] v) {
     if(v.length == 0) return false;
-    for(byte c : v) if(!isLetterOrDigit(c)) return false;
+    for(final byte c : v) if(!isLetterOrDigit(c)) return false;
     return true;
   }
 

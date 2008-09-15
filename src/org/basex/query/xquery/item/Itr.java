@@ -1,6 +1,7 @@
 package org.basex.query.xquery.item;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.util.Token;
@@ -107,6 +108,24 @@ public class Itr extends Num {
   @Override
   public int hash() {
     return (int) val;
+  }
+
+  @Override
+  public Object java() {
+    switch(type) {
+      case BYT:
+        return new Byte((byte) val);
+      case SHR:
+      case UBY:
+        return new Short((short) val);
+      case INT:
+      case USH:
+        return new Integer((int) val);
+      case UIN:
+        return new Long(val);
+      default:
+        return new BigInteger(Token.string(str()));
+    }
   }
 
   /**

@@ -112,6 +112,11 @@ public final class Dbl extends Num {
     return (int) val;
   }
 
+  @Override
+  public Object java() {
+    return new Double(val);
+  }
+
   /**
    * Converts the given token into a double value.
    * @param val value to be converted

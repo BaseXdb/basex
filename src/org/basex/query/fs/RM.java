@@ -1,6 +1,7 @@
 package org.basex.query.fs;
 
 import java.io.IOException;
+
 import org.basex.io.PrintOutput;
 import org.basex.util.GetOpts;
 
@@ -39,7 +40,7 @@ public final class RM extends FSCmd {
 
     // following Pre Values change if nodes are deleted -> delete backwards
     for(int d = del.length - 1; d >= 0; d--) {
-      int toDel = del[d];
+      final int toDel = del[d];
       if((FSUtils.isDir(data, toDel) && fRecursive) ||
           (FSUtils.isFile(data, toDel))) {
         FSUtils.delete(data, toDel);

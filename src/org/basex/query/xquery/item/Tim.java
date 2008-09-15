@@ -1,6 +1,7 @@
 package org.basex.query.xquery.item;
 
 import static org.basex.query.xquery.XQText.*;
+import javax.xml.datatype.XMLGregorianCalendar;
 import org.basex.query.xquery.XQException;
 import org.basex.util.TokenBuilder;
 
@@ -55,5 +56,12 @@ public final class Tim extends Date {
     time(tb);
     zone(tb);
     return tb.finish();
+  }
+
+  @Override
+  public XMLGregorianCalendar java() {
+    final int t = (int) (sec % DAYSECONDS);
+    return df.newXMLGregorianCalendarTime(t / 3600, t % 3600 / 60,
+        t % 60, (int) mil, zshift);
   }
 }
