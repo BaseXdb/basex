@@ -21,6 +21,7 @@ import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXCombo;
+import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.View;
 import org.basex.util.Token;
 
@@ -187,12 +188,13 @@ public class ScatterView extends View implements Runnable {
     g.fillRect(0, 0, w, h);
     plotWidth = w - 2 * XMARGIN;
     plotHeight = h - 2 * YMARGIN;
-    // draw plot background
-//    g.setColor(new Color(90, 90, 150, 50));
-//    g.fillRect(XMARGIN, YMARGIN, plotWidth, plotHeight);
+    
+//    overdraw plot background for non value items
+    g.setColor(GUIConstants.color2);
+    g.fillRect(XMARGIN + NOVALUEBORDER, YMARGIN, plotWidth - NOVALUEBORDER, 
+      plotHeight - NOVALUEBORDER);
     
     //draw axis and grid
-    drawGrid(g);
     drawXaxis(g);
     drawYaxis(g);
     
@@ -239,53 +241,9 @@ public class ScatterView extends View implements Runnable {
     g.setColor(GUIConstants.color1);
     g.drawLine(XMARGIN, h - YMARGIN, w - XMARGIN, 
         h - YMARGIN);
-    
-    // test axis caption drawing
-//    if(scatterData.xAxis.numeric) {
-//      String min = Double.toString(scatterData.xAxis.min);
-//      String max = Double.toString(scatterData.xAxis.max);
-//      final BufferedImage imgMin = new BufferedImage(10 * min.length(), 10, 
-//          Transparency.BITMASK);
-//      final BufferedImage imgMax = new BufferedImage(10 * max.length(), 10, 
-//          Transparency.TRANSLUCENT);
-//      Graphics2D g2d = (Graphics2D) imgMin.getGraphics();
-////      g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
-////          RenderingHints.VALUE_ANTIALIAS_ON);
-//      g2d.setColor(Color.black);
-////      g2d.rotate(-60);
-//      g2d.setFont(GUIConstants.font);
-//      g2d.drawString(min, 0, 0);
-//      g.drawImage(imgMin, XMARGIN + NOVALUEBORDER, h - YMARGIN + 10, this);
-//    }
-  }
-  
-  /**
-   * Draws the y axis of the plot.
-   * @param g graphics reference
-   */
-  private void drawYaxis(final Graphics g) {
+
     g.setColor(GUIConstants.color1);
-    g.drawLine(XMARGIN, YMARGIN, XMARGIN, getHeight() - YMARGIN);
-  }
-  
-  /**
-   * Draws the plot grid.
-   * @param g graphics reference
-   */
-  private void drawGrid(final Graphics g) {
-    final int w = getWidth();
-    final int h = getHeight();
-    
-    // overdraw plot background for non value items
-//    g.setColor(new Color(90, 90, 150, 130));
-    g.setColor(GUIConstants.color2);
-//    g.fillRect(XMARGIN, YMARGIN, NOVALUEBORDER, h - 2 * YMARGIN);
-//    g.fillRect(XMARGIN, h - YMARGIN - NOVALUEBORDER, plotWidth, NOVALUEBORDER);
-    g.fillRect(XMARGIN + NOVALUEBORDER, YMARGIN, plotWidth - NOVALUEBORDER, 
-        plotHeight - NOVALUEBORDER);
-    
-    g.setColor(GUIConstants.color1);
-    // draw vertical grid lines
+    // draw vertical x grid lines
     final int x = scatterData.xAxis.nrCaptions;
     final double rangeX = 1.0d / (x - 1);
     final int pWidth = plotWidth - NOVALUEBORDER;
@@ -293,13 +251,54 @@ public class ScatterView extends View implements Runnable {
       final int x1 = XMARGIN + NOVALUEBORDER + ((int)((i * rangeX) * pWidth));
       g.drawLine(x1, YMARGIN, x1, h - YMARGIN + 9);
     }
-    // horizontal grid lines
+    
+    // test axis caption drawing
+    if(scatterData.xAxis.numeric) {
+      final String min = Double.toString(scatterData.xAxis.min);
+      final String max = Double.toString(scatterData.xAxis.max);
+      g.setColor(Color.black);
+      g.setFont(GUIConstants.font);
+      final int minW = BaseXLayout.width(g, min);
+      final int maxW = BaseXLayout.width(g, max);
+      g.drawString(min, XMARGIN + NOVALUEBORDER - minW / 2, h - YMARGIN + 25);
+      g.drawString(max, w - XMARGIN - maxW / 2, h - YMARGIN + 25);
+    } else {
+      
+    }
+  }
+  
+  /**
+   * Draws the y axis of the plot.
+   * @param g graphics reference
+   */
+  private void drawYaxis(final Graphics g) {
+    final int h = getHeight();
+    final int w = getWidth();
+    g.setColor(GUIConstants.color1);
+    g.drawLine(XMARGIN, YMARGIN, XMARGIN, getHeight() - YMARGIN);
+    
+    g.setColor(GUIConstants.color1);
+    // horizontal y grid lines
     final int y = scatterData.yAxis.nrCaptions;
     final double rangeY = 1.0d / (y - 1);
     final int pHeight = plotHeight - NOVALUEBORDER;
     for(int i = 0; i < y; i++) {
       final int y1 = YMARGIN + ((int)((i * rangeY) * pHeight));
       g.drawLine(XMARGIN - 9, y1, w - XMARGIN, y1);
+    }
+    
+    // test axis caption drawing
+    if(scatterData.yAxis.numeric) {
+      final String min = Double.toString(scatterData.yAxis.min);
+      final String max = Double.toString(scatterData.yAxis.max);
+      g.setColor(Color.black);
+      g.setFont(GUIConstants.font);
+      final int textH = g.getFontMetrics().getHeight();
+      final int minW = BaseXLayout.width(g, min);
+      final int maxW = BaseXLayout.width(g, max);
+      g.drawString(min, XMARGIN - minW - 15, YMARGIN + textH / 2);
+      g.drawString(max, XMARGIN - maxW - 15, 
+          h - YMARGIN - NOVALUEBORDER + textH / 2);
     }
   }
   
