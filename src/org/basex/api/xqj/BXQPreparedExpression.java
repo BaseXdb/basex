@@ -48,7 +48,7 @@ public final class BXQPreparedExpression extends BXQDynamicContext
     check();
     QName[] names = new QName[0];
     for(Var v : getVariables()) {
-      if(v.expr != null) names = Array.add(names, v.name.toQName());
+      if(v.expr != null) names = Array.add(names, v.name.java());
     }
     return names;
   }
@@ -56,7 +56,7 @@ public final class BXQPreparedExpression extends BXQDynamicContext
   public QName[] getAllUnboundExternalVariables() throws XQException {
     check();
     QName[] names = new QName[0];
-    for(Var v : getVariables()) names = Array.add(names, v.name.toQName());
+    for(Var v : getVariables()) names = Array.add(names, v.name.java());
     return names;
   }
 

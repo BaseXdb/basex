@@ -9,14 +9,18 @@ import java.net.URISyntaxException;
 import java.util.Properties;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Result;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.xquery.XQConnection;
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQResultItem;
 import org.basex.BaseX;
 import org.basex.api.jaxp.IterStreamReader;
+import org.basex.data.SAXSerializer;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
+import org.basex.io.PrintOutput;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Type;
@@ -63,7 +67,9 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
   }
   
   public String getAtomicValue() throws XQException {
-    return getItemCache().toString();
+    check();
+    if(it.node()) throw new BXQException(ATOM, it.type);
+    return Token.string(it.str());
   }
 
   public boolean getBoolean() throws XQException {
@@ -99,14 +105,13 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
   }
 
   public XMLStreamReader getItemAsStream() {
-    BaseX.notimplemented();
     final SeqIter seq = new SeqIter();
     seq.add(it);
     return new IterStreamReader(seq);
   }
 
   public String getItemAsString(Properties props) throws XQException {
-    return getItemCache().toString();
+    return serialize();
   }
 
   public XQItemType getItemType() throws XQException {
@@ -138,7 +143,7 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
 
   public Object getObject() throws XQException {
     check();
-    return Token.string(it.str());
+    return it.java();
   }
 
   public short getShort() throws XQException {
@@ -152,17 +157,22 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
 
   public void writeItem(OutputStream os, Properties props) throws XQException {
     check(os, OutputStream.class);
-    try {
-      os.write(getItemCache().finish());
-    } catch(final IOException ex) {
-      throw new BXQException(ex);
-    }
+    serialize(os);
+  }
+
+  /**
+   * Returns the current item in an output cache
+   * @param os output stream
+   * @throws XQException exception
+   */
+  private void serialize(final OutputStream os) throws XQException {
+    serialize(it, ctx, new XMLSerializer(new PrintOutput(os)));
   }
 
   public void writeItem(Writer ow, Properties props) throws XQException {
     check(ow, Writer.class);
     try {
-      ow.write(getItemCache().toString());
+      ow.write(serialize());
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
@@ -173,27 +183,48 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
    * @return cached output
    * @throws XQException exception
    */
-  CachedOutput getItemCache() throws XQException {
+  private String serialize() throws XQException {
     check();
-    try {
-      final CachedOutput co = new CachedOutput();
-      final XMLSerializer ser = new XMLSerializer(co);
-      if(it.type == Type.ATT) throw new BXQException(ATTR);
-      it.serialize(ser, ctx, 0);
-      return co;
-    } catch(final IOException ex) {
-      throw new BXQException(ex);
-    }
+    final CachedOutput co = new CachedOutput();
+    serialize(it, ctx, new XMLSerializer(co));
+    return co.toString();
   }
 
   public void writeItemToResult(Result result) throws XQException {
     check();
-    BaseX.notimplemented();
+    check(result, Result.class);
+    
+    // evaluate different Result types...
+    if(result instanceof StreamResult) {
+      // StreamResult.. directly write result as string
+      writeItem(((StreamResult) result).getWriter(), null);
+    } else if(result instanceof SAXResult) {
+      // SAXResult.. serialize result to underlying parser
+      final SAXSerializer ser = new SAXSerializer(null);
+      ContentHandler h = ((SAXResult) result).getHandler();
+      ser.setContentHandler(h);
+      serialize(it, ctx, ser);
+      
+      /*
+      final ContentHandler handler = ((SAXResult) result).getHandler();
+      try {
+        final SAXParserFactory f = SAXParserFactory.newInstance();
+        f.setNamespaceAware(true);
+        f.setValidating(false);
+        final XMLReader r = f.newSAXParser().getXMLReader();
+        r.setContentHandler(handler);
+        r.parse(new InputSource(new StringReader(serialize())));
+      } catch(final Exception ex) {
+        throw new BXQException(ex);
+      }*/
+    } else {
+      BaseX.notimplemented();
+    }
   }
 
-  public void writeItemToSAX(ContentHandler saxhdlr) throws XQException {
-    check();
-    BaseX.notimplemented();
+  public void writeItemToSAX(ContentHandler sax) throws XQException {
+    check(sax, ContentHandler.class);
+    writeItemToResult(new SAXResult(sax));
   }
 
   public XQConnection getConnection() throws XQException {

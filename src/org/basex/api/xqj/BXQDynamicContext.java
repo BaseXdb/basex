@@ -1,9 +1,9 @@
 package org.basex.api.xqj;
 
 import static org.basex.api.xqj.BXQText.*;
-
 import java.io.InputStream;
 import java.io.Reader;
+import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
@@ -77,34 +77,37 @@ abstract class BXQDynamicContext extends BXQAbstract implements XQDynamicContext
     bind(qn, new Itr(val, Type.BYT), it);
   }
 
-  public void bindDocument(final QName qn, final InputStream arg1,
-      final String arg2, final XQItemType arg3) {
-    BaseX.notimplemented();
+  public void bindDocument(final QName qn, final InputStream is,
+      final String base, final XQItemType it) throws XQException {
+    bind(qn, createDB(content(is)), it);
   }
 
-  public void bindDocument(final QName qn, final Reader arg1, final String arg2,
-      final XQItemType arg3) {
-    BaseX.notimplemented();
+  public void bindDocument(final QName qn, final Reader r, final String base,
+      final XQItemType it) throws XQException {
+    bind(qn, createDB(content(r)), it);
   }
 
-  public void bindDocument(final QName qn, final Source arg1,
+  public void bindDocument(final QName qn, final Source is,
       final XQItemType it) {
     BaseX.notimplemented();
   }
 
-  public void bindDocument(final QName qn, final String arg1, final String arg2,
-      final XQItemType arg3) {
-    BaseX.notimplemented();
+  public void bindDocument(final QName qn, final String val, final String base,
+      final XQItemType it) throws XQException {
+    check(val, String.class);
+    bind(qn, createDB(Token.token(val)), it);
   }
 
-  public void bindDocument(final QName qn, final XMLReader arg1,
-      final XQItemType it) {
-    BaseX.notimplemented();
+  public void bindDocument(final QName qn, final XMLReader r,
+      final XQItemType it) throws XQException {
+    check(r, XMLReader.class);
+    bind(qn, createDB(r), it);
   }
 
-  public void bindDocument(final QName qn, final XMLStreamReader arg1,
-      final XQItemType it) {
-    BaseX.notimplemented();
+  public void bindDocument(final QName qn, final XMLStreamReader sr,
+      final XQItemType it) throws XQException {
+    check(sr, XMLStreamReader.class);
+    bind(qn, createDB(sr), it);
   }
 
   public void bindDouble(final QName qn, final double val, 
@@ -122,8 +125,8 @@ abstract class BXQDynamicContext extends BXQAbstract implements XQDynamicContext
     bind(qn, Itr.get(val), it);
   }
 
-  public void bindItem(final QName qn, final XQItem arg1) {
-    BaseX.notimplemented();
+  public void bindItem(final QName qn, final XQItem it) throws XQException {
+    bind(qn, ((BXQItem) it).it, null);
   }
 
   public void bindLong(final QName qn, final long val, final XQItemType it)
@@ -131,13 +134,14 @@ abstract class BXQDynamicContext extends BXQAbstract implements XQDynamicContext
     bind(qn, new Itr(val, Type.LNG), it);
   }
 
-  public void bindNode(final QName qn, final Node arg1, final XQItemType it){
+  public void bindNode(final QName qn, final Node n, final XQItemType it){
     BaseX.notimplemented();
   }
 
-  public void bindObject(final QName qn, final Object arg1,
-      final XQItemType it) {
-    BaseX.notimplemented();
+  public void bindObject(final QName qn, final Object v,
+      final XQItemType it) throws XQException {
+    check(v, Object.class);
+    bind(qn, v instanceof XQItem ? ((BXQItem) v).it : createItem(v), it);
   }
 
   public void bindSequence(final QName qn, final XQSequence seq) {
@@ -151,16 +155,20 @@ abstract class BXQDynamicContext extends BXQAbstract implements XQDynamicContext
 
   public void bindString(final QName qn, final String val,
       final XQItemType it) throws XQException {
+    check(val, String.class);
     bind(qn, Str.get(Token.token(val)), it);
   }
 
-  public TimeZone getImplicitTimeZone() {
-    BaseX.notimplemented();
-    return null;
+  private TimeZone zone;
+
+  public TimeZone getImplicitTimeZone() throws XQException {
+    check();
+    return zone != null ? zone : new GregorianCalendar().getTimeZone();
   }
 
-  public void setImplicitTimeZone(final TimeZone arg0) {
-    BaseX.notimplemented();
+  public void setImplicitTimeZone(final TimeZone tz) throws XQException {
+    check();
+    zone = tz;
   }
 
   /**
@@ -174,11 +182,12 @@ abstract class BXQDynamicContext extends BXQAbstract implements XQDynamicContext
       throws XQException {
     check();
     check(var, QName.class);
+    
     try {
       final Var v = new Var(new QNm(Token.token(var.getLocalPart())));
       final BXQItemType bit = (BXQItemType) t;
-      final Item i = bit != null && bit.type == it.type ? it :
-        check(t, it.type).e(it, null);
+      final Item i = t == null || bit.type == it.type ? it :
+          check(t, it.type).e(it, null);
       query.ctx.vars.addGlobal(v.item(i));
     } catch(final QueryException ex) {
       throw new BXQException(ex);

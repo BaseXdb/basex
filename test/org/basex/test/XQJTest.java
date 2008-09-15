@@ -2,6 +2,7 @@ package org.basex.test;
 
 //import static javax.xml.stream.XMLStreamConstants.*;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.Properties;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
@@ -9,9 +10,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.events.Characters;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.xquery.XQConnection;
 import javax.xml.xquery.XQConstants;
 import javax.xml.xquery.XQDataSource;
@@ -23,6 +24,7 @@ import javax.xml.xquery.XQSequence;
 import javax.xml.xquery.XQStaticContext;
 import junit.framework.TestCase;
 import org.basex.io.CachedOutput;
+import org.basex.test.xqj.TestContentHandler;
 import org.basex.test.xqj.TestXMLFilter;
 import org.junit.Before;
 import org.junit.Test;
@@ -236,9 +238,7 @@ public class XQJTest extends TestCase {
     //String query = "1,2";
     XQResultSequence seq = ex.executeQuery(query);
     XMLStreamReader xsr = seq.getSequenceAsStream();
-    while(xsr.hasNext()) {
-      System.out.println(xsr.next());
-    }
+    while(xsr.hasNext()) xsr.next();
   }
  
   /**
@@ -267,12 +267,58 @@ public class XQJTest extends TestCase {
         QName qnm = se.getName();
         System.out.println("TAG: " + qnm);
       } else if(ev.isCharacters()) {
-        Characters ch = ev.asCharacters();
-        System.out.println("TXT: " + ch.getData());
+        //Characters ch = ev.asCharacters();
+        //ch.getData());
       } else {
-        System.out.println("TYP: " + ev.getEventType());
+        //ev.getEventType());
       }
       //System.out.println(xer.getElementText());
     }
   }
+
+  /**
+   * Test.
+   * @throws Exception exception
+   */
+  public void test13() throws Exception {
+    final XQConnection conn = conn(drv);
+    final XQExpression expr = conn.createExpression();
+
+    XQResultSequence seq = expr.executeQuery("<H><K/><K/></H>");
+    seq.next();
+    seq.getSequenceAsString(null);
+  }
+
+  /**
+   * Test.
+   * @throws Exception exception
+   */
+  public void test14() throws Exception {
+    final XQConnection conn = conn(drv);
+    final XQExpression expr = conn.createExpression();
+
+    final XQResultSequence seq = expr.executeQuery("1,<H><K/><K/></H>");
+    final StringWriter sw = new StringWriter();
+    seq.next();
+    seq.writeItemToResult(new StreamResult(sw));
+    seq.next();
+    seq.writeItemToResult(new StreamResult(sw));
+    System.out.println(sw.toString());
+  }
+
+  /**
+   * Test.
+   * @throws Exception exception
+   */
+  public void test15() throws Exception {
+    final XQConnection conn = conn(drv);
+    final XQExpression expr = conn.createExpression();
+
+    final XQResultSequence seq = expr.executeQuery("<H><K>B</K></H>");
+    seq.next();
+    TestContentHandler result = new TestContentHandler();
+    seq.writeItemToSAX(result);
+    System.out.println(result.buffer.toString());
+  }
 }
+

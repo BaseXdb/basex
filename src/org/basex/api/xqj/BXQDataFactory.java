@@ -18,18 +18,11 @@ import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQSequence;
 import javax.xml.xquery.XQSequenceType;
 import org.basex.BaseX;
-import org.basex.build.xml.SAXWrapper;
-import org.basex.core.proc.CreateDB;
-import org.basex.data.Data;
-import org.basex.io.IO;
-import org.basex.query.xquery.func.FunJava;
 import org.basex.query.xquery.item.Bln;
-import org.basex.query.xquery.item.DNode;
 import org.basex.query.xquery.item.Dbl;
 import org.basex.query.xquery.item.Flt;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Itr;
-import org.basex.query.xquery.item.Jav;
 import org.basex.query.xquery.item.Str;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.SeqIter;
@@ -161,12 +154,12 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
 
   public XQItem createItemFromDocument(final InputStream is,
       final String base, final XQItemType it) throws XQException {
-    return createItemFromDocument(content(is), base, it);
+    return createItemFromDocument(content(is), it);
   }
 
   public XQItem createItemFromDocument(final Reader r, final String base,
       final XQItemType it) throws XQException {
-    return createItemFromDocument(content(r), base, it);
+    return createItemFromDocument(content(r), it);
   }
 
   public XQItem createItemFromDocument(final Source s, final XQItemType it)
@@ -189,31 +182,30 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
 
   public XQItem createItemFromDocument(final String v, final String base,
       final XQItemType it) throws XQException {
+    check(v, String.class);
+    return createItemFromDocument(Token.token(v), it);
+  }
+
+  private XQItem createItemFromDocument(final byte[] v,
+      final XQItemType it) throws XQException {
     check();
     check(it, Type.DOC);
     check(v, String.class);
-    final IO tmp = new IO(Token.token(v), TMP);
-    final Data data = CreateDB.xml(tmp, TMP);
-    check(data, Data.class);
-    return new BXQItem(new DNode(data, 0, null, Type.DOC));
+    return new BXQItem(createDB(v));
   }
 
   public XQItem createItemFromDocument(final XMLReader r, final XQItemType it)
       throws XQException {
     check();
     check(it, Type.DOC);
-    check(r, XMLReader.class);
-    final IO tmp = new IO(Token.EMPTY, TMP);
-    final Data data = CreateDB.xml(new SAXWrapper(tmp, r), TMP);
-    check(data, Data.class);
-    return new BXQItem(new DNode(data, 0, null, Type.DOC));
+    return new BXQItem(createDB(r));
   }
 
   public XQItem createItemFromDocument(final XMLStreamReader sr,
       final XQItemType it) throws XQException {
     check();
-    BaseX.notimplemented();
-    return null;
+    check(it, Type.DOC);
+    return new BXQItem(createDB(sr));
   }
 
   public XQItem createItemFromDouble(final double v, final XQItemType it)
@@ -250,9 +242,7 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
-    final IO tmp = new IO(ba.toByteArray(), TMP);
-    final Data data = CreateDB.xml(tmp, TMP);
-    return new BXQItem(new DNode(data, 0, null, Type.DOC));
+    return new BXQItem(createDB(ba.toByteArray()));
   }
 
   public XQItem createItemFromObject(final Object v, final XQItemType it)
@@ -268,19 +258,6 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     }
   }
   
-  private Item createItem(Object v) throws XQException {
-    try {
-      final Type t = FunJava.jType(v.getClass());
-      if(t != Type.JAVA) return t.e(new Jav(v), null);
-      
-      final String s = v instanceof BXQItem ?
-          ((BXQItem) v).getAtomicValue() : v.toString();
-      return Str.get(Token.token(s));
-    } catch(org.basex.query.xquery.XQException ex) {
-      throw new BXQException(ex);
-    }
-  }
-
   public XQItem createItemFromShort(final short v, final XQItemType it)
       throws XQException {
     return itr(v, it, Type.SHR);

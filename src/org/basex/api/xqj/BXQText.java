@@ -19,6 +19,8 @@ public interface BXQText {
   /** Error Message. */
   String WRONG = "Wrong data type; % expected, % found";
   /** Error Message. */
+  String ATOM = "Atomic value expected, % found";
+  /** Error Message. */
   String SQL = "SQL sources not supported.";
   /** Error Message. */
   String PROPS = "No property support.";
@@ -41,7 +43,7 @@ public interface BXQText {
   /** Error Message. */
   String NOBASE = "Item has no base type.";
   /** Error Message. */
-  String TWICE = "Current item was already requested.";
+  String TWICE = "Current item has already been requested.";
   /** Error Message. */
   String FORWARD = "Sequence is forwards-only";
   /** Error Message. */

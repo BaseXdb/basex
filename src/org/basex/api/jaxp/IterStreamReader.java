@@ -11,11 +11,14 @@ import javax.xml.stream.XMLStreamReader;
 import org.basex.data.Data;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.DNode;
+import org.basex.query.xquery.item.FNode;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Node;
 import org.basex.query.xquery.item.QNm;
+import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.item.Uri;
 import org.basex.query.xquery.iter.Iter;
+import org.basex.query.xquery.iter.NodIter;
 import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.util.Namespaces;
 import org.basex.query.xquery.util.NodeBuilder;
@@ -37,14 +40,14 @@ public final class IterStreamReader implements XMLStreamReader {
   private final Iter result;
   /** Next flag. */
   private boolean next;
-  /** Open item. */
-  private DNodeReader read;
+  /** Node iterator. */
+  private NodeReader read;
   /** Attributes. */
   private NodeBuilder atts;
   /** Current item. */
-  Item item;
+  protected Item item;
   /** Current state. */
-  int type;
+  protected int kind;
 
   /**
    * Constructor.
@@ -52,7 +55,7 @@ public final class IterStreamReader implements XMLStreamReader {
    */
   public IterStreamReader(final Iter res) {
     result = res;
-    
+    // included for wrapping StreamReader into an XMLEventReader
     PROPS.put(XMLInputFactory.IS_NAMESPACE_AWARE, Boolean.FALSE);
   }
 
@@ -71,7 +74,7 @@ public final class IterStreamReader implements XMLStreamReader {
 
   public QName getAttributeName(final int i) {
     getAttributes();
-    return atts.list[i].qname().toQName();
+    return atts.list[i].qname().java();
   }
 
   public String getAttributeNamespace(final int i) {
@@ -140,7 +143,7 @@ public final class IterStreamReader implements XMLStreamReader {
     next();
     
     final TokenBuilder tb = new TokenBuilder();
-    while(type != END_ELEMENT ) {
+    while(kind != END_ELEMENT ) {
       if(isType(CHARACTERS, CDATA, SPACE, ENTITY_REFERENCE)) {
         tb.add(item.str());
       } else if(isType(END_DOCUMENT)) {
@@ -160,7 +163,7 @@ public final class IterStreamReader implements XMLStreamReader {
   }
 
   public int getEventType() {
-    return type;
+    return kind;
   }
 
   public String getLocalName() {
@@ -174,7 +177,7 @@ public final class IterStreamReader implements XMLStreamReader {
 
   public QName getName() {
     checkType(START_ELEMENT, END_ELEMENT, ENTITY_REFERENCE);
-    return ((Node) item).qname().toQName();
+    return ((Node) item).qname().java();
   }
 
   public NamespaceContext getNamespaceContext() {
@@ -282,7 +285,7 @@ public final class IterStreamReader implements XMLStreamReader {
           read.next();
         } else {
           read = null;
-          type = END_DOCUMENT;
+          kind = END_DOCUMENT;
           return true;
         }
       }
@@ -290,11 +293,13 @@ public final class IterStreamReader implements XMLStreamReader {
         item = result.next();
         if(item instanceof DNode) {
           read = new DNodeReader();
+        } else if(item instanceof FNode) {
+          read = new FNodeReader();
         } else if(item != null) {
           type();
         }
       }
-    } catch(final org.basex.query.xquery.XQException ex) {
+    } catch(final XQException ex) {
       throw new XMLStreamException(ex);
     }
     return item != null;
@@ -334,18 +339,21 @@ public final class IterStreamReader implements XMLStreamReader {
       throw new NoSuchElementException();
 
     next = false;
-    return type;
+    // disallow top level attributes
+    if(item.type == Type.ATT && read == null) throw new XMLStreamException();     
+
+    return kind;
   }
 
   public int nextTag() throws XMLStreamException {
     next();
-    while((type == CHARACTERS && isWhiteSpace()) ||
-        (type == CDATA && isWhiteSpace()) || type == SPACE ||
-        type == PROCESSING_INSTRUCTION || type == COMMENT) {
+    while((kind == CHARACTERS && isWhiteSpace()) ||
+        (kind == CDATA && isWhiteSpace()) || kind == SPACE ||
+        kind == PROCESSING_INSTRUCTION || kind == COMMENT) {
       next();
     }
     checkType(START_ELEMENT, END_ELEMENT);
-    return type;
+    return kind;
   }
 
   public void require(final int t, final String uri, final String ln)
@@ -364,32 +372,47 @@ public final class IterStreamReader implements XMLStreamReader {
   }
 
   private void checkType(final int... valid) {
-    if(!isType(valid)) throw new IllegalStateException("Invalid Type: " + type);
+    if(!isType(valid)) throw new IllegalStateException("Invalid Type: " + kind);
   }
 
   private boolean isType(final int... valid) {
-    for(final int v : valid) if(type == v) return true;
+    for(final int v : valid) if(kind == v) return true;
     return false;
   }
 
   /**
    * Sets the current event type.
    */
-  void type() {
+  protected void type() {
     switch(item.type) {
-      case DOC: type = START_DOCUMENT; return;
-      case ATT: type = ATTRIBUTE; return;
-      case ELM: type = START_ELEMENT; return;
-      case COM: type = COMMENT; return;
-      case PI : type = PROCESSING_INSTRUCTION; return;
-      default:  type = CHARACTERS; return;
+      case DOC: kind = START_DOCUMENT; return;
+      case ATT: kind = ATTRIBUTE; return;
+      case ELM: kind = START_ELEMENT; return;
+      case COM: kind = COMMENT; return;
+      case PI : kind = PROCESSING_INSTRUCTION; return;
+      default:  kind = CHARACTERS; return;
     }
+  }
+  
+  /**
+   * Reader for {@link FNode} instances.
+   */
+  abstract class NodeReader {
+    /**
+     * Checks if the node reader can return more nodes.
+     * @return result of check
+     */
+    abstract boolean hasNext();
+    /**
+     * Checks if the node reader can return more nodes.
+     */
+    abstract void next();
   }
 
   /**
    * Reader for {@link DNode} instances.
    */
-  private final class DNodeReader {
+  final class DNodeReader extends NodeReader {
     /** Node reference. */
     private final DNode node;
     /** Data size. */
@@ -411,25 +434,16 @@ public final class IterStreamReader implements XMLStreamReader {
       item = node;
       p = node.pre;
       int k = node.data.kind(p);
-      /*if(k == Data.DOC) {
-        p++;
-        k = node.data.kind(p);
-      }*/
       s = p + node.data.size(p, k);
       finish(k, 0);
     }
 
-    /**
-     * Checks if the node reader can return more nodes.
-     * @return result of check
-     */
+    @Override
     boolean hasNext() {
       return p < s || l > 0;
     }
 
-    /**
-     * Checks if the node reader can return more nodes.
-     */
+    @Override
     void next() {
       if(p == s) {
         endElem();
@@ -446,12 +460,9 @@ public final class IterStreamReader implements XMLStreamReader {
       finish(k, pa);
     }
 
-    /**
-     * Checks if the node reader can return more nodes.
-     */
     private void endElem() {
       node.set(pre[--l], Data.ELEM);
-      type = END_ELEMENT;
+      kind = END_ELEMENT;
     }
 
     private void finish(final int k, final int pa) {
@@ -465,6 +476,48 @@ public final class IterStreamReader implements XMLStreamReader {
     }
   }
   
+  /**
+   * Reader for {@link FNode} instances.
+   */
+  final class FNodeReader extends NodeReader {
+    /** Iterator. */
+    private NodIter iter;
+    /** Next item. */
+    private Item it;
+    
+    /**
+     * Constructor.
+     * @throws XQException exception
+     */
+    FNodeReader() throws XQException {
+      FNode root = (FNode) item;
+      iter = new NodIter();
+      iter.add(root);
+      addDesc(root.child(), iter);
+      type();
+    }
+    
+    @Override
+    boolean hasNext() {
+      it = iter.next();
+      return it != null;
+    }
+
+    @Override
+    void next() {
+      type();
+    }
+
+    private final void addDesc(final NodeIter children,
+        final NodIter nodes) throws XQException {
+      Node ch;
+      while((ch = children.next()) != null) {
+        nodes.add(ch.finish());
+        addDesc(ch.child(), nodes);
+      }
+    }
+  }
+
   /** Dummy Location Implementation. */
   class LocationImpl implements Location {
     public int getCharacterOffset() { return -1; }

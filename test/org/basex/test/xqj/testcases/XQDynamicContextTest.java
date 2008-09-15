@@ -127,7 +127,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.7: bindAtomicValue() failed with message: "
           + e.getMessage());
     }
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         "Hello world!", xqpe.executeQuery().getSequenceAsString(null));
     xqpe.close();
   }
@@ -201,7 +201,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch(XQException e) {
       fail("A-XQDC-1.7: bindString() failed with message: " + e.getMessage());
     }
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         "Hello world!", xqpe.executeQuery().getSequenceAsString(null));
     xqpe.close();
 
@@ -214,11 +214,11 @@ public class XQDynamicContextTest extends XQJTestCase {
     }
     XQSequence xqs = xqpe.executeQuery();
     xqs.next();
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         XQItemType.XQITEMKIND_ATOMIC, xqs.getItemType().getItemKind());
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         XQItemType.XQBASETYPE_NCNAME, xqs.getItemType().getBaseType());
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         "Hello", xqs.getObject());
     xqpe.close();
   }
@@ -290,7 +290,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch(XQException e) {
       fail("A-XQDC-1.7: bindDocument() failed with message: " + e.getMessage());
     }
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         "<e>Hello world!</e>", xqpe.executeQuery().getSequenceAsString(null));
     xqpe.close();
   }
@@ -368,7 +368,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch(XQException e) {
       fail("A-XQDC-1.7: bindDocument() failed with message: " + e.getMessage());
     }
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         "<e>Hello world!</e>", xqpe.executeQuery().getSequenceAsString(null));
     xqpe.close();
   }
@@ -459,7 +459,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch(XQException e) {
       fail("A-XQDC-1.7: bindDocument() failed with message: " + e.getMessage());
     }
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         "<e>Hello world!</e>", xqpe.executeQuery().getSequenceAsString(null));
     xqpe.close();
   }
@@ -537,7 +537,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.7: bindDocument() failed with message: "
               + e.getMessage());
     }
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         "<e>Hello world!</e>", xqpe.executeQuery().getSequenceAsString(null));
     xqpe.close();
   }*/
@@ -608,7 +608,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch(XQException e) {
       fail("A-XQDC-1.7: bindDocument() failed with message: " + e.getMessage());
     }
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         "<e>Hello world!</e>", xqpe.executeQuery().getSequenceAsString(null));
     xqpe.close();
 
@@ -690,7 +690,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       e.printStackTrace();
       fail("A-XQDC-1.7: bindDocument() failed with message: " + e.getMessage());
     }
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         "<e>Hello world!</e>", xqpe.executeQuery().getSequenceAsString(null));
     xqpe.close();
 
@@ -783,7 +783,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch(XQException e) {
       fail("A-XQDC-1.7: bindItem() failed with message: " + e.getMessage());
     }
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         "Hello world!", xqpe.executeQuery().getSequenceAsString(null));
     xqpe.close();
   }
@@ -845,7 +845,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch(XQException e) {
       fail("A-XQDC-1.7: bindSequence() failed with message: " + e.getMessage());
     }
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         "Hello world!", xqpe.executeQuery().getSequenceAsString(null));
     xqpe.close();
   }
@@ -919,7 +919,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch(XQException e) {
       fail("A-XQDC-1.7: bindObject() failed with message: " + e.getMessage());
     }
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         "Hello world!", xqpe.executeQuery().getSequenceAsString(null));
     xqpe.close();
 
@@ -932,11 +932,11 @@ public class XQDynamicContextTest extends XQJTestCase {
     }
     XQSequence xqs = xqpe.executeQuery();
     xqs.next();
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         XQItemType.XQITEMKIND_ATOMIC, xqs.getItemType().getItemKind());
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         XQItemType.XQBASETYPE_NCNAME, xqs.getItemType().getBaseType());
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         "Hello", xqs.getObject());
     xqpe.close();
   }
@@ -962,61 +962,61 @@ public class XQDynamicContextTest extends XQJTestCase {
     xqs = xqe
         .executeQuery("declare variable $v external; $v instance of xs:boolean");
     xqs.next();
-    junit.framework.Assert.assertTrue(msg, xqs.getBoolean());
+    assertTrue(msg, xqs.getBoolean());
 
     xqe.bindObject(new QName("v"), new Byte((byte) 1), null);
     xqs = xqe
         .executeQuery("declare variable $v external; $v instance of xs:byte");
     xqs.next();
-    junit.framework.Assert.assertTrue(msg, xqs.getBoolean());
+    assertTrue(msg, xqs.getBoolean());
 
     xqe.bindObject(new QName("v"), new Float(1), null);
     xqs = xqe
         .executeQuery("declare variable $v external; $v instance of xs:float");
     xqs.next();
-    junit.framework.Assert.assertTrue(msg, xqs.getBoolean());
+    assertTrue(msg, xqs.getBoolean());
 
     xqe.bindObject(new QName("v"), new Double(1), null);
     xqs = xqe
         .executeQuery("declare variable $v external; $v instance of xs:double");
     xqs.next();
-    junit.framework.Assert.assertTrue(msg, xqs.getBoolean());
+    assertTrue(msg, xqs.getBoolean());
 
     xqe.bindObject(new QName("v"), new Integer(1), null);
     xqs = xqe
         .executeQuery("declare variable $v external; $v instance of xs:int");
     xqs.next();
-    junit.framework.Assert.assertTrue(msg, xqs.getBoolean());
+    assertTrue(msg, xqs.getBoolean());
 
     xqe.bindObject(new QName("v"), new Long(1), null);
     xqs = xqe
         .executeQuery("declare variable $v external; $v instance of xs:long");
     xqs.next();
-    junit.framework.Assert.assertTrue(msg, xqs.getBoolean());
+    assertTrue(msg, xqs.getBoolean());
 
     xqe.bindObject(new QName("v"), new Short((short) 1), null);
     xqs = xqe
         .executeQuery("declare variable $v external; $v instance of xs:short");
     xqs.next();
-    junit.framework.Assert.assertTrue(msg, xqs.getBoolean());
+    assertTrue(msg, xqs.getBoolean());
 
     xqe.bindObject(new QName("v"), "Hello world!", null);
     xqs = xqe
         .executeQuery("declare variable $v external; $v instance of xs:string");
     xqs.next();
-    junit.framework.Assert.assertTrue(msg, xqs.getBoolean());
+    assertTrue(msg, xqs.getBoolean());
 
     xqe.bindObject(new QName("v"), new BigDecimal("1"), null);
     xqs = xqe
         .executeQuery("declare variable $v external; $v instance of xs:decimal");
     xqs.next();
-    junit.framework.Assert.assertTrue(msg, xqs.getBoolean());
+    assertTrue(msg, xqs.getBoolean());
 
     xqe.bindObject(new QName("v"), new BigInteger("1"), null);
     xqs = xqe
         .executeQuery("declare variable $v external; $v instance of xs:integer");
     xqs.next();
-    junit.framework.Assert.assertTrue(msg, xqs.getBoolean());
+    assertTrue(msg, xqs.getBoolean());
 
     if(!jdk14) {
       XQExpression xqe_temp;
@@ -1035,70 +1035,70 @@ public class XQDynamicContextTest extends XQJTestCase {
       xqs = xqe
           .executeQuery("declare variable $v external; $v instance of xs:dayTimeDuration");
       xqs.next();
-      junit.framework.Assert.assertTrue(msg, xqs.getBoolean());
+      assertTrue(msg, xqs.getBoolean());
 
       xqs_temp.next();
       xqe.bindObject(new QName("v"), xqs_temp.getObject(), null);
       xqs = xqe
           .executeQuery("declare variable $v external; $v instance of xs:yearMonthDuration");
       xqs.next();
-      junit.framework.Assert.assertTrue(msg, xqs.getBoolean());
+      assertTrue(msg, xqs.getBoolean());
 
       xqs_temp.next();
       xqe.bindObject(new QName("v"), xqs_temp.getObject(), null);
       xqs = xqe
           .executeQuery("declare variable $v external; $v instance of xs:date");
       xqs.next();
-      junit.framework.Assert.assertTrue(msg, xqs.getBoolean());
+      assertTrue(msg, xqs.getBoolean());
 
       xqs_temp.next();
       xqe.bindObject(new QName("v"), xqs_temp.getObject(), null);
       xqs = xqe
           .executeQuery("declare variable $v external; $v instance of xs:dateTime");
       xqs.next();
-      junit.framework.Assert.assertTrue(msg, xqs.getBoolean());
+      assertTrue(msg, xqs.getBoolean());
 
       xqs_temp.next();
       xqe.bindObject(new QName("v"), xqs_temp.getObject(), null);
       xqs = xqe
           .executeQuery("declare variable $v external; $v instance of xs:gDay");
       xqs.next();
-      junit.framework.Assert.assertTrue(msg, xqs.getBoolean());
+      assertTrue(msg, xqs.getBoolean());
 
       xqs_temp.next();
       xqe.bindObject(new QName("v"), xqs_temp.getObject(), null);
       xqs = xqe
           .executeQuery("declare variable $v external; $v instance of xs:gMonth");
       xqs.next();
-      junit.framework.Assert.assertTrue(msg, xqs.getBoolean());
+      assertTrue(msg, xqs.getBoolean());
 
       xqs_temp.next();
       xqe.bindObject(new QName("v"), xqs_temp.getObject(), null);
       xqs = xqe
           .executeQuery("declare variable $v external; $v instance of xs:gMonthDay");
       xqs.next();
-      junit.framework.Assert.assertTrue(msg, xqs.getBoolean());
+      assertTrue(msg, xqs.getBoolean());
 
       xqs_temp.next();
       xqe.bindObject(new QName("v"), xqs_temp.getObject(), null);
       xqs = xqe
           .executeQuery("declare variable $v external; $v instance of xs:gYear");
       xqs.next();
-      junit.framework.Assert.assertTrue(msg, xqs.getBoolean());
+      assertTrue(msg, xqs.getBoolean());
 
       xqs_temp.next();
       xqe.bindObject(new QName("v"), xqs_temp.getObject(), null);
       xqs = xqe
           .executeQuery("declare variable $v external; $v instance of xs:gYearMonth");
       xqs.next();
-      junit.framework.Assert.assertTrue(msg, xqs.getBoolean());
+      assertTrue(msg, xqs.getBoolean());
 
       xqs_temp.next();
       xqe.bindObject(new QName("v"), xqs_temp.getObject(), null);
       xqs = xqe
           .executeQuery("declare variable $v external; $v instance of xs:time");
       xqs.next();
-      junit.framework.Assert.assertTrue(msg, xqs.getBoolean());
+      assertTrue(msg, xqs.getBoolean());
 
       xqe_temp.close();
     }
@@ -1107,7 +1107,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     xqs = xqe
         .executeQuery("declare variable $v external; $v instance of xs:QName");
     xqs.next();
-    junit.framework.Assert.assertTrue(msg, xqs.getBoolean());
+    assertTrue(msg, xqs.getBoolean());
 
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder builder = factory.newDocumentBuilder();
@@ -1125,43 +1125,43 @@ public class XQDynamicContextTest extends XQJTestCase {
     xqs = xqe
         .executeQuery("declare variable $v external; $v instance of document-node()");
     xqs.next();
-    junit.framework.Assert.assertTrue(msg, xqs.getBoolean());
+    assertTrue(msg, xqs.getBoolean());
 
     xqe.bindObject(new QName("v"), documentFragment, null);
     xqs = xqe
         .executeQuery("declare variable $v external; $v instance of document-node()");
     xqs.next();
-    junit.framework.Assert.assertTrue(msg, xqs.getBoolean());
+    assertTrue(msg, xqs.getBoolean());
 
     xqe.bindObject(new QName("v"), element, null);
     xqs = xqe
         .executeQuery("declare variable $v external; $v instance of element()");
     xqs.next();
-    junit.framework.Assert.assertTrue(msg, xqs.getBoolean());
+    assertTrue(msg, xqs.getBoolean());
 
     xqe.bindObject(new QName("v"), attribute, null);
     xqs = xqe
         .executeQuery("declare variable $v external; $v instance of attribute()");
     xqs.next();
-    junit.framework.Assert.assertTrue(msg, xqs.getBoolean());
+    assertTrue(msg, xqs.getBoolean());
 
     xqe.bindObject(new QName("v"), comment, null);
     xqs = xqe
         .executeQuery("declare variable $v external; $v instance of comment()");
     xqs.next();
-    junit.framework.Assert.assertTrue(msg, xqs.getBoolean());
+    assertTrue(msg, xqs.getBoolean());
 
     xqe.bindObject(new QName("v"), pi, null);
     xqs = xqe
         .executeQuery("declare variable $v external; $v instance of processing-instruction()");
     xqs.next();
-    junit.framework.Assert.assertTrue(msg, xqs.getBoolean());
+    assertTrue(msg, xqs.getBoolean());
 
     xqe.bindObject(new QName("v"), text, null);
     xqs = xqe
         .executeQuery("declare variable $v external; $v instance of text()");
     xqs.next();
-    junit.framework.Assert.assertTrue(msg, xqs.getBoolean());
+    assertTrue(msg, xqs.getBoolean());
 
     xqe.close();
   }
@@ -1223,7 +1223,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch(XQException e) {
       fail("A-XQDC-1.7: bindBoolean() failed with message: " + e.getMessage());
     }
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         "true", xqpe.executeQuery().getSequenceAsString(null));
     xqpe.close();
   }
@@ -1286,7 +1286,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch(XQException e) {
       fail("A-XQDC-1.7: bindByte() failed with message: " + e.getMessage());
     }
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.", "1",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.", "1",
         xqpe.executeQuery().getSequenceAsString(null));
     xqpe.close();
 
@@ -1299,11 +1299,11 @@ public class XQDynamicContextTest extends XQJTestCase {
     }
     XQSequence xqs = xqpe.executeQuery();
     xqs.next();
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         XQItemType.XQITEMKIND_ATOMIC, xqs.getItemType().getItemKind());
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         XQItemType.XQBASETYPE_INTEGER, xqs.getItemType().getBaseType());
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.", "1",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.", "1",
         xqs.getAtomicValue());
     xqpe.close();
   }
@@ -1371,11 +1371,11 @@ public class XQDynamicContextTest extends XQJTestCase {
     }
     XQSequence xqs = xqpe.executeQuery();
     xqs.next();
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         XQItemType.XQITEMKIND_ATOMIC, xqs.getItemType().getItemKind());
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         XQItemType.XQBASETYPE_DOUBLE, xqs.getItemType().getBaseType());
-    junit.framework.Assert.assertTrue("A-XQDC-1.7: Successful bindXXX.",
+    assertTrue("A-XQDC-1.7: Successful bindXXX.",
         1d == xqs.getDouble());
     xqpe.close();
   }
@@ -1441,11 +1441,11 @@ public class XQDynamicContextTest extends XQJTestCase {
     }
     XQSequence xqs = xqpe.executeQuery();
     xqs.next();
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         XQItemType.XQITEMKIND_ATOMIC, xqs.getItemType().getItemKind());
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         XQItemType.XQBASETYPE_FLOAT, xqs.getItemType().getBaseType());
-    junit.framework.Assert.assertTrue("A-XQDC-1.7: Successful bindXXX.",
+    assertTrue("A-XQDC-1.7: Successful bindXXX.",
         1f == xqs.getFloat());
     xqpe.close();
   }
@@ -1515,10 +1515,10 @@ public class XQDynamicContextTest extends XQJTestCase {
     try {
       xqpe.bindInt(new QName("v"), 1, null);
     } catch(XQException e) {
-      junit.framework.Assert.fail("A-XQDC-1.7: bindInt() failed with message: "
+      fail("A-XQDC-1.7: bindInt() failed with message: "
           + e.getMessage());
     }
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.", "1",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.", "1",
         xqpe.executeQuery().getSequenceAsString(null));
     xqpe.close();
 
@@ -1527,16 +1527,16 @@ public class XQDynamicContextTest extends XQJTestCase {
       xqpe.bindInt(new QName("v"), 1, xqc
           .createAtomicType(XQItemType.XQBASETYPE_INTEGER));
     } catch(XQException e) {
-      junit.framework.Assert.fail("A-XQDC-1.7: bindInt() failed with message: "
+      fail("A-XQDC-1.7: bindInt() failed with message: "
           + e.getMessage());
     }
     XQSequence xqs = xqpe.executeQuery();
     xqs.next();
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         XQItemType.XQITEMKIND_ATOMIC, xqs.getItemType().getItemKind());
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         XQItemType.XQBASETYPE_INTEGER, xqs.getItemType().getBaseType());
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.", "1",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.", "1",
         xqs.getAtomicValue());
     xqpe.close();
   }
@@ -1608,7 +1608,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch(XQException e) {
       fail("A-XQDC-1.7: bindLong() failed with message: " + e.getMessage());
     }
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.", "1",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.", "1",
         xqpe.executeQuery().getSequenceAsString(null));
     xqpe.close();
 
@@ -1621,11 +1621,11 @@ public class XQDynamicContextTest extends XQJTestCase {
     }
     XQSequence xqs = xqpe.executeQuery();
     xqs.next();
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         XQItemType.XQITEMKIND_ATOMIC, xqs.getItemType().getItemKind());
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         XQItemType.XQBASETYPE_INTEGER, xqs.getItemType().getBaseType());
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.", "1",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.", "1",
         xqs.getAtomicValue());
     xqpe.close();
   }
@@ -1692,7 +1692,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch(XQException e) {
       fail("A-XQDC-1.7: bindNode() failed with message: " + e.getMessage());
     }
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         "<e>Hello world!</e>", xqpe.executeQuery().getSequenceAsString(null));
     xqpe.close();
   }
@@ -1764,7 +1764,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     } catch(XQException e) {
       fail("A-XQDC-1.7: bindShort() failed with message: " + e.getMessage());
     }
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.", "1",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.", "1",
         xqpe.executeQuery().getSequenceAsString(null));
     xqpe.close();
 
@@ -1777,11 +1777,11 @@ public class XQDynamicContextTest extends XQJTestCase {
     }
     XQSequence xqs = xqpe.executeQuery();
     xqs.next();
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         XQItemType.XQITEMKIND_ATOMIC, xqs.getItemType().getItemKind());
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.",
         XQItemType.XQBASETYPE_INTEGER, xqs.getItemType().getBaseType());
-    junit.framework.Assert.assertEquals("A-XQDC-1.7: Successful bindXXX.", "1",
+    assertEquals("A-XQDC-1.7: Successful bindXXX.", "1",
         xqs.getAtomicValue());
     xqpe.close();
   }

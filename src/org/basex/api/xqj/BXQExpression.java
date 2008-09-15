@@ -8,6 +8,7 @@ import javax.xml.xquery.XQResultSequence;
 import javax.xml.xquery.XQStaticContext;
 import org.basex.core.CommandParser;
 import org.basex.query.QueryException;
+import org.basex.util.Token;
 
 /**
  * Java XQuery API - Expression.
@@ -41,7 +42,7 @@ public final class BXQExpression extends BXQDynamicContext
   }
 
   public void executeCommand(final Reader cmd) throws XQException {
-    executeCommand(content(cmd));
+    executeCommand(Token.string(content(cmd)));
   }
 
   public XQResultSequence executeQuery(final String input) throws XQException {
@@ -50,12 +51,12 @@ public final class BXQExpression extends BXQDynamicContext
   }
 
   public XQResultSequence executeQuery(final Reader query) throws XQException {
-    return executeQuery(content(query));
+    return executeQuery(Token.string(content(query)));
   }
 
   public XQResultSequence executeQuery(final InputStream query)
       throws XQException {
-    return executeQuery(content(query));
+    return executeQuery(Token.string(content(query)));
   }
 
   public XQStaticContext getStaticContext() throws XQException {

@@ -9,6 +9,8 @@ import javax.xml.xquery.XQMetaData;
 import javax.xml.xquery.XQPreparedExpression;
 import javax.xml.xquery.XQStaticContext;
 
+import org.basex.util.Token;
+
 /**
  * Java XQuery API - Connection.
  * 
@@ -62,7 +64,7 @@ public final class BXQConnection extends BXQDataFactory
 
   public XQPreparedExpression prepareExpression(final InputStream is,
       final XQStaticContext sc) throws XQException {
-    return prepareExpression(content(is), sc);
+    return prepareExpression(Token.string(content(is)), sc);
   }
 
   public XQPreparedExpression prepareExpression(final InputStream is)
@@ -72,7 +74,7 @@ public final class BXQConnection extends BXQDataFactory
 
   public XQPreparedExpression prepareExpression(final Reader r,
       final XQStaticContext sc) throws XQException {
-    return prepareExpression(content(r), sc);
+    return prepareExpression(Token.string(content(r)), sc);
   }
 
   public XQPreparedExpression prepareExpression(final Reader r)

@@ -14,6 +14,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.xquery.*;
 
 import org.basex.test.xqj.TestContentHandler;
+import org.basex.util.Performance;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.helpers.DefaultHandler;
 

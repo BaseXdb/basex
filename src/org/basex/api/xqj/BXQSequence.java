@@ -1,6 +1,7 @@
 package org.basex.api.xqj;
 
 import static org.basex.api.xqj.BXQText.*;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
@@ -8,6 +9,8 @@ import java.net.URI;
 import java.util.Properties;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Result;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.xquery.XQConnection;
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItem;
@@ -15,10 +18,12 @@ import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQResultSequence;
 import org.basex.BaseX;
 import org.basex.api.jaxp.IterStreamReader;
+import org.basex.data.SAXSerializer;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Item;
+import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
 import org.w3c.dom.Node;
@@ -123,10 +128,7 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
 
   public synchronized XMLStreamReader getItemAsStream() throws XQException {
     check();
-    final SeqIter seq = new SeqIter();
-    seq.add(it.it);
-    final IterStreamReader xsr = new IterStreamReader(seq);
-    return xsr;
+    return item().getItemAsStream();
   }
 
   public String getItemAsString(final Properties p) throws XQException {
@@ -162,17 +164,23 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
 
   public synchronized XMLStreamReader getSequenceAsStream() throws XQException {
     check();
-    final IterStreamReader xsr = new IterStreamReader(result);
-    return xsr;
+    if(it != null && !next) throw new BXQException(TWICE);
+    return new IterStreamReader(result);
   }
 
   public String getSequenceAsString(final Properties p) throws XQException {
     check();
     if(it != null && !next) throw new BXQException(TWICE);
+    if(!next && !next()) return "";
+    
     final CachedOutput out = new CachedOutput();
     final XMLSerializer ser = new XMLSerializer(out);
     try {
-      while(next()) item().it.serialize(ser, ctx, 0);
+      do {
+        final Item item = item().it;
+        if(item.type == Type.ATT) throw new BXQException(ATTR);
+        item.serialize(ser, ctx, 0);
+      } while(next());
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
@@ -249,50 +257,56 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
 
   public void writeItem(final OutputStream os, final Properties p)
       throws XQException {
-    pos();
     item().writeItem(os, p);
   }
 
   public void writeItem(final Writer ow, final Properties p)
       throws XQException {
-    pos();
     item().writeItem(ow, p);
   }
 
   public void writeItemToResult(final Result r) throws XQException {
-    pos();
     item().writeItemToResult(r);
   }
 
-  public void writeItemToSAX(final ContentHandler ch) throws XQException {
-    pos();
-    item().writeItemToSAX(ch);
+  public void writeItemToSAX(final ContentHandler sax) throws XQException {
+    item().writeItemToSAX(sax);
   }
 
   public void writeSequence(final OutputStream os, final Properties p)
       throws XQException {
-    check();
     if(it != null && !next) throw new BXQException(TWICE);
     while(next()) item().writeItem(os, p);
   }
 
   public void writeSequence(final Writer ow, final Properties p)
       throws XQException {
-    check();
     if(it != null && !next) throw new BXQException(TWICE);
     while(next()) item().writeItem(ow, p);
   }
 
-  public void writeSequenceToResult(final Result r) throws XQException {
-    check();
-    pos();
-    BaseX.notimplemented();
+  public void writeSequenceToResult(final Result result) throws XQException {
+    check(result, Result.class);
+    if(it != null && !next) throw new BXQException(TWICE);
+
+    // evaluate different Result types...
+    if(result instanceof StreamResult) {
+      // StreamResult.. directly write result as string
+      writeSequence(((StreamResult) result).getWriter(), null);
+    } else if(result instanceof SAXResult) {
+      // SAXResult.. serialize result to underlying parser
+      final SAXSerializer ser = new SAXSerializer(null);
+      ContentHandler h = ((SAXResult) result).getHandler();
+      ser.setContentHandler(h);
+      while(next()) serialize(item().it, ctx, ser);
+    } else {
+      BaseX.notimplemented();
+    }
   }
 
-  public void writeSequenceToSAX(final ContentHandler ch) throws XQException {
-    check();
-    pos();
-    BaseX.notimplemented();
+  public void writeSequenceToSAX(final ContentHandler sax) throws XQException {
+    check(sax, ContentHandler.class);
+    writeSequenceToResult(new SAXResult(sax));
   }
 
   /**

@@ -157,7 +157,7 @@ public final class BXQItemType implements XQItemType {
   }
 
   public boolean isElementNillable() {
-    return nill;
+    return type == Type.ELM && nill;
   }
 
   public XQItemType getItemType() {
