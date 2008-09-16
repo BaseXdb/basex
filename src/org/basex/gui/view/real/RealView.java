@@ -9,6 +9,7 @@ import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.View;
 import org.basex.query.fs.DirIterator;
+import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 
@@ -17,7 +18,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Wolfgang Miller, Philipp Ziemer
  */
-public final class RealView extends View { 
+public final class RealView extends View {
   /** Var to show the scrollbar. */
   //private BaseXBar scroll = null;
   /** Horizontal Coords of the pointer. */
@@ -46,12 +47,10 @@ public final class RealView extends View {
   private final Color textColor = Color.CYAN;
   /** multiplier for pre/post values. */
   private final int prePostMulti = 17;
-  
-  //
-  //  /**
-  //   * key par, value all pre values to given par.
-  //   */
-  //  HashMap<Integer, IntList> map = null;
+  /** the sum of all size values of a node line. */
+  private int sumNodeSizeInLine = 0;
+  /** the list of all parent nodes of a node line. */
+  private IntList parentList = null;
 
   /**
    * Default Constructor.
@@ -88,37 +87,121 @@ public final class RealView extends View {
   @Override
   protected void refreshUpdate() {
     repaint();
-  }  
+  }
 
   @Override
-  public void paintComponent(final Graphics g) {  
+  public void paintComponent(final Graphics g) {
     /** Set the paint Component */
-    super.paintComponent(g);    
+    super.paintComponent(g);
     BaseXLayout.antiAlias(g);
     g.setColor(Color.BLACK);
     g.setFont(GUIConstants.font);
 
     /** Timer */
-    Performance perf = new Performance();
+    final Performance perf = new Performance();
     perf.initTimer();
 
-    /** Initialize sizes */    
+    /** Initialize sizes */
     fontHeight = g.getFontMetrics().getHeight();
-    
+
     /** Initialize the pointer */
     pointerx = getWidth() / 2;
     pointery = topdistance;
-    
-//  TODO: choose visualization here
-    /** Paint the root */
-//    drawNode(g, 0, pointerx, pointery, elementColor);
-//    drawTree(g, 0, 0, 0, getWidth());
-    
-    drawPrePost(g, 1, 1);
 
-    System.out.println("Perf: " + perf.getTime());    
+    //TODO: choose visualization here
+
+    switch(3) {
+      case 1:
+        drawTree(g, 0, 0, 0, getWidth());
+        break;
+      case 2:
+        drawPrePost(g, 1, 1);
+        break;
+      case 3:
+        temperature(0, g);
+
+    }
+
+    //  
+    //  // TODO: overlap
+    //  
+
+    //    System.out.println("Perf: " + perf.getTime());
   }
-  
+
+  /**
+   * controls the node temperature drawing.
+   * @param root the root node
+   * @param g the graphics reference
+   */
+  private void temperature(final int root, final Graphics g) {
+    final Data data = GUI.context.data();
+    int level = 0;
+    sumNodeSizeInLine = data.size;
+    parentList = new IntList();
+    parentList.add(root);
+    while(parentList.size > 0) {
+      drawTemperature(g, level);
+      getNextNodeLine();
+      level++;
+    }
+
+  }
+
+  /**
+   * Saves node line in parentList. 
+   */
+  private void getNextNodeLine() {
+    final Data data = GUI.context.data();
+    final int l = parentList.size;
+    final IntList temp = new IntList();
+    int sumNodeSize = 0;
+
+    for(int i = 0; i < l; i++) {
+      final DirIterator iterator = new DirIterator(data, parentList.get(i));
+
+      while(iterator.more()) {
+        final int pre = iterator.next();
+        if(data.kind(pre) == Data.ELEM) temp.add(pre);
+        sumNodeSize += data.size(pre, data.kind(pre));
+        //        System.out.print(Token.string(data.tag(pre)) + " ");
+      }
+      //      System.out.println();
+    }
+    parentList = temp;
+    sumNodeSizeInLine = sumNodeSize;
+  }
+
+  /**
+   * Draws node temperature per line.
+   * @param g graphics reference
+   * @param level the current level
+   */
+  private void drawTemperature(final Graphics g, final int level) {
+    final Data data = GUI.context.data();
+    final int size = parentList.size;
+    int x = 0;
+    final int y = 1 * level * fontHeight * 2;
+    final double width = this.getSize().width - 1;
+    final int ratio = (int) Math.rint((width - 1) / size);
+
+    for(int i = 0; i < size; i++) {
+      final int pre = parentList.get(i);
+      final int nodeSize = data.size(pre, data.kind(pre));
+
+      final double nodePercent = nodeSize / (double) sumNodeSizeInLine;
+      g.setColor(Color.black);
+      g.drawRect(x, y, ratio, fontHeight);
+      int c = (int) Math.rint(255 * nodePercent * 40);
+      c = c > 255 ? 255 : c;
+      g.setColor(new Color(c, 0, 255 - c));
+      g.fillRect(x + 1, y + 1, ratio - 1, fontHeight - 1);
+
+      x += ratio;
+    }
+
+  }
+
   /**
    * Draws the node at the given Coordinates.
    * @param g graphics reference
@@ -127,23 +210,26 @@ public final class RealView extends View {
    * @param y vertical coordinate
    * @param color node-color for different types
    */
-  void drawNode(final Graphics g, final int pre, final int x, final int y, 
-      final Color color) {    
+  private void drawNode(final Graphics g, final int pre, final int x,
+      final int y, final Color color) {
     final Data data = GUI.context.data();
-    String node = Token.string(data.tag(pre));
-    int textWidth = BaseXLayout.width(g, node);
+    final String node = Token.string(data.tag(pre));
+    final int textWidth = BaseXLayout.width(g, node);
+    final int xstart = x - textWidth / 2;
+
     g.setColor(color);
     /** Defines the start of the painting */
-    int xstart = x - textWidth / 2;
-    
+
     /** Draw String and Box */
     g.drawString(node, xstart, y);
-    g.drawRect(xstart - margin, y - fontHeight, textWidth + 2 * margin, 
-      fontHeight + margin);
-//    g.drawRoundRect(xstart - margin, y - fontHeight, textWidth + 2 * margin, 
-//        fontHeight + margin, arcWH, arcWH);
+    g.drawRect(xstart - margin, y - fontHeight, textWidth + 2 * margin,
+        fontHeight + margin);
+
+    //    g.drawRoundRect(xstart - margin, y - fontHeight, textWidth 
+    //    + 2 * margin, 
+    //        fontHeight + margin, arcWH, arcWH);
   }
-  
+
   /**
    * Draws the Tree.
    * @param g graphics reference
@@ -152,29 +238,31 @@ public final class RealView extends View {
    * @param frameleft left border of the parent frame
    * @param space width of the parent frame
    */
-  void drawTree(final Graphics g, final int root, final int lv, 
+  void drawTree(final Graphics g, final int root, final int lv,
       final int frameleft, final int space) {
     final Data data = GUI.context.data();
-    DirIterator iterator = new DirIterator(data, root);
-    
-    int level = lv + 1;
-    int nodetype = Data.ELEM;
+    final DirIterator iterator = new DirIterator(data, root);
+
+    final int level = lv + 1;
+    final int nodetype = Data.ELEM;
     int rootsize = data.size(root, nodetype);
     int pre;
     /** The x-value of the left frame border. */
     int border = frameleft;
     /** To engage inaccuracies during the measure method, this measures 
      * the size that is left after a child got it's space. */
-    int sizeleft = space;    
-    
+    int sizeleft = space;
+    int childframewidth = -1;
+
     while(iterator.more()) {
-      pre = iterator.next();      
+      pre = iterator.next();
+
       if(data.kind(pre) == nodetype) {
         /** Measures the required space by the size value. */
-        double percent = (double) (data.size(pre, nodetype) + 1) /
-          (double) rootsize;
-        int childframewidth = (int) (sizeleft * percent);   
-        
+        final double percent = (double) (data.size(pre, nodetype) + 1)
+            / (double) rootsize;
+        childframewidth = (int) (sizeleft * percent);
+
         pointerx = border + childframewidth / 2;
         pointery = topdistance + level * lvdistance;
         drawNode(g, pre, pointerx, pointery, elementColor);
@@ -182,15 +270,18 @@ public final class RealView extends View {
          *  + "; Percent: " + percent + "; Framewidth: "
          *  + getWidth() + "; framex1: " + (space - childframewidth)
          *  + "; space: " + space); */
+
+        //        checkOverlap(g, pre, pointerx, pointery, elementColor);
         drawTree(g, pre, level, border, childframewidth);
-        
+
         border += childframewidth;
         rootsize = rootsize - data.size(pre, nodetype) + 1;
         sizeleft = sizeleft - childframewidth;
       }
+
     }
   }
-  
+
   /**
    * Calculates the post value of a node.
    * @param pre the pre value of the node
@@ -211,12 +302,12 @@ public final class RealView extends View {
    */
   void drawPreAndPostValues(final Graphics g, final int pre, final int post,
       final int textWidth) {
-    int x = pre * prePostMulti;
-    int y = post * prePostMulti;
-    int preStrLen = BaseXLayout.width(g, Integer.toString(pre) + " ");
-    int postStrLen = BaseXLayout.width(g, " ") + textWidth;
-    Font temp = getFont();
-    Font little = new Font(temp.getFontName(), Font.TRUETYPE_FONT,
+    final int x = pre * prePostMulti;
+    final int y = post * prePostMulti;
+    final int preStrLen = BaseXLayout.width(g, Integer.toString(pre) + " ");
+    final int postStrLen = BaseXLayout.width(g, " ") + textWidth;
+    final Font temp = getFont();
+    final Font little = new Font(temp.getFontName(), Font.TRUETYPE_FONT,
         (int) (fontHeight / 1.5f));
     g.setFont(little);
     g.setColor(Color.BLUE);
@@ -237,14 +328,14 @@ public final class RealView extends View {
   private void drawPrePostNode(final Graphics g, final int pre, final int post,
       final int level) {
     final Data data = GUI.context.data();
-    int x = pre * prePostMulti;
-    int y = post * prePostMulti;
+    final int x = pre * prePostMulti;
+    final int y = post * prePostMulti;
     int preTextWidth = -1;
     //int parTextWidth = -1;
-    
+
     switch(data.kind(pre)) {
       case Data.ELEM:
-        String s = Token.string(data.tag(pre));
+        final String s = Token.string(data.tag(pre));
         g.drawString(s, x, y);
         preTextWidth = BaseXLayout.width(g, s);
         break;
@@ -271,11 +362,11 @@ public final class RealView extends View {
     drawPreAndPostValues(g, pre, post, preTextWidth);
     g.setColor(Color.BLACK);
 
-    int par = data.parent(pre, data.kind(pre));
-    
+    final int par = data.parent(pre, data.kind(pre));
+
     if(par > 0) {
-      int parPost = calcPost(par, level - 1);
-      
+      final int parPost = calcPost(par, level - 1);
+
       switch(data.kind(par)) {
         case Data.ELEM:
           //String s = Token.string(data.tag(pre));
@@ -293,9 +384,9 @@ public final class RealView extends View {
         case Data.TEXT:
           //parTextWidth = BaseXLayout.width(g, "T");
       }
-      
-      int parX = par * prePostMulti;
-      int parY = parPost * prePostMulti;
+
+      final int parX = par * prePostMulti;
+      final int parY = parPost * prePostMulti;
       //TODO: improve line connection between nodes.
       g.drawLine(parX, parY, x, y);
     }
@@ -310,24 +401,20 @@ public final class RealView extends View {
    */
   private void drawPrePost(final Graphics g, final int pre, final int level) {
     final Data data = GUI.context.data();
-    int post = calcPost(pre, level);
-        System.out.println("pre: " + pre + " | post: " + post + " | tag: "
-            + Token.string(data.tag(pre)) + " | level: " + level);
-    int lv = level;
+    final int post = calcPost(pre, level);
+    System.out.println("pre: " + pre + " | post: " + post + " | tag: "
+        + Token.string(data.tag(pre)) + " | level: " + level);
+    final int lv = level;
 
     drawPrePostNode(g, pre, post, lv);
 
-    DirIterator iterator = new DirIterator(data, pre);
+    final DirIterator iterator = new DirIterator(data, pre);
 
     while(iterator.more()) {
-      int newPre = iterator.next();
+      final int newPre = iterator.next();
 
       drawPrePost(g, newPre, lv + 1);
     }
 
   }
- 
 }
-
-
-
