@@ -80,7 +80,7 @@ public final class ScatterAxis {
     if(numeric) {
       min = key.min;
       max = key.max;
-      nrCaptions = 10;
+//      nrCaptions = 10;
     } else {
       cats = key.cats.keys();
       nrCats = cats.length;

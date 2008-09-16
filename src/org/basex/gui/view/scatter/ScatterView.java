@@ -10,10 +10,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
+
 import org.basex.data.Data;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
@@ -33,9 +35,9 @@ public class ScatterView extends View implements Runnable {
   /** Data reference. */
   ScatterData scatterData;
   /** X paint margin. */
-  private static final int XMARGIN = 100;
+  private static final int XMARGIN = 150;
   /** Y paint margin. */ 
-  private static final int YMARGIN = 100;
+  private static final int YMARGIN = 150;
   /** Item size. */
   private static final int ITEMSIZE = 10;
   /** Focused item size. */
@@ -44,6 +46,8 @@ public class ScatterView extends View implements Runnable {
   private static final int NOVALUEBORDER = 60;
   /** Focus offset. */
   private static final int FOCUSOFFSET = 6;
+  /** Whitespace between axis captions. */
+  private static final int CAPTIONWHITESPACE = 40;
   /** Item image. */
   private BufferedImage itemImg;
   /** Focused item image. */
@@ -240,28 +244,30 @@ public class ScatterView extends View implements Runnable {
     g.drawLine(XMARGIN, h - YMARGIN, w - XMARGIN, 
         h - YMARGIN);
 
+    final boolean numeric = scatterData.xAxis.numeric;
+    g.setFont(GUIConstants.font);
     g.setColor(GUIConstants.color1);
-    // draw vertical x grid lines
-    final int x = scatterData.xAxis.nrCaptions;
-    final double rangeX = 1.0d / (x - 1);
+    final int textH = g.getFontMetrics().getHeight();
     final int pWidth = plotWidth - NOVALUEBORDER;
-    for(int i = 0; i < x; i++) {
-      final int x1 = XMARGIN + NOVALUEBORDER + (int) ((i * rangeX) * pWidth);
+    final int nrCaptions = numeric ? 
+        (pWidth / (textH * 2 + CAPTIONWHITESPACE)) :
+      scatterData.xAxis.nrCaptions;
+    final double range = 1.0d / (nrCaptions - 1);
+    for(int i = 0; i < nrCaptions; i++) {
+      g.setColor(GUIConstants.color1);
+      final int x1 = XMARGIN + NOVALUEBORDER + ((int)((i * range) * pWidth));
       g.drawLine(x1, YMARGIN, x1, h - YMARGIN + 9);
-    }
-    
-    // test axis caption drawing
-    if(scatterData.xAxis.numeric) {
-      final String min = Double.toString(scatterData.xAxis.min);
-      final String max = Double.toString(scatterData.xAxis.max);
       g.setColor(Color.black);
-      g.setFont(GUIConstants.font);
-      final int minW = BaseXLayout.width(g, min);
-      final int maxW = BaseXLayout.width(g, max);
-      g.drawString(min, XMARGIN + NOVALUEBORDER - minW / 2, h - YMARGIN + 25);
-      g.drawString(max, w - XMARGIN - maxW / 2, h - YMARGIN + 25);
-    } else {
-      
+      String caption = new String();
+      if(numeric) {
+        final double value = scatterData.xAxis.min +
+          (scatterData.xAxis.max - scatterData.xAxis.min) * range * i;
+        caption = Double.toString(value);
+      } else {
+        caption = Token.string(scatterData.xAxis.cats[i]);
+      }
+      final int capW = BaseXLayout.width(g, caption);
+      g.drawString(caption, x1 - capW / 2, h - YMARGIN + 25);
     }
   }
   
@@ -274,29 +280,32 @@ public class ScatterView extends View implements Runnable {
     final int w = getWidth();
     g.setColor(GUIConstants.color1);
     g.drawLine(XMARGIN, YMARGIN, XMARGIN, getHeight() - YMARGIN);
-    
+
+    final boolean numeric = scatterData.yAxis.numeric;
+    g.setFont(GUIConstants.font);
     g.setColor(GUIConstants.color1);
-    // horizontal y grid lines
-    final int y = scatterData.yAxis.nrCaptions;
-    final double rangeY = 1.0d / (y - 1);
+    final int textH = g.getFontMetrics().getHeight();
     final int pHeight = plotHeight - NOVALUEBORDER;
-    for(int i = 0; i < y; i++) {
-      final int y1 = YMARGIN + (int) ((i * rangeY) * pHeight);
+    final int nrCaptions = numeric ? (pHeight / 
+        (textH * 2 + CAPTIONWHITESPACE)) :
+      scatterData.yAxis.nrCaptions;
+    final double range = 1.0d / (nrCaptions - 1);
+    for(int i = 0; i < nrCaptions; i++) {
+      g.setColor(GUIConstants.color1);
+      final int y1 = h - YMARGIN - NOVALUEBORDER - 
+      ((int)((i * range) * pHeight));
       g.drawLine(XMARGIN - 9, y1, w - XMARGIN, y1);
-    }
-    
-    // test axis caption drawing
-    if(scatterData.yAxis.numeric) {
-      final String min = Double.toString(scatterData.yAxis.min);
-      final String max = Double.toString(scatterData.yAxis.max);
       g.setColor(Color.black);
-      g.setFont(GUIConstants.font);
-      final int textH = g.getFontMetrics().getHeight();
-      final int minW = BaseXLayout.width(g, min);
-      final int maxW = BaseXLayout.width(g, max);
-      g.drawString(min, XMARGIN - minW - 15, YMARGIN + textH / 2);
-      g.drawString(max, XMARGIN - maxW - 15, 
-          h - YMARGIN - NOVALUEBORDER + textH / 2);
+      String caption = new String();
+      if(numeric) {
+        final double value = scatterData.yAxis.min +
+          (scatterData.yAxis.max - scatterData.yAxis.min) * range * i;
+        caption = Double.toString(value);
+      } else {
+        caption = Token.string(scatterData.yAxis.cats[i]);
+      }
+      final int capW = BaseXLayout.width(g, caption);
+      g.drawString(caption, XMARGIN - capW - 15, y1 + textH / 2);
     }
   }
   
@@ -396,7 +405,8 @@ public class ScatterView extends View implements Runnable {
     int currFocusedItem = -1;
     if(mouseX < XMARGIN || mouseX > getWidth() - XMARGIN + ITEMSIZE / 2 ||
         mouseY < YMARGIN - ITEMSIZE / 2 || mouseY > getHeight() - YMARGIN) {
-      return false;
+      focusedItem = -1;
+      return true;
     }
     
     for(int i = 0; i < scatterData.size; i++) {
