@@ -255,7 +255,7 @@ public class ScatterView extends View implements Runnable {
     final double range = 1.0d / (nrCaptions - 1);
     for(int i = 0; i < nrCaptions; i++) {
       g.setColor(GUIConstants.color1);
-      final int x1 = XMARGIN + NOVALUEBORDER + ((int)((i * range) * pWidth));
+      final int x1 = XMARGIN + NOVALUEBORDER + ((int) ((i * range) * pWidth));
       g.drawLine(x1, YMARGIN, x1, h - YMARGIN + 9);
       g.setColor(Color.black);
       String caption = new String();
@@ -268,6 +268,19 @@ public class ScatterView extends View implements Runnable {
       }
       final int capW = BaseXLayout.width(g, caption);
       g.drawString(caption, x1 - capW / 2, h - YMARGIN + 25);
+      
+      // try to draw rotated string
+//      final int imgH = ((int) Math.pow(capW, 2));
+//      final BufferedImage img = new BufferedImage(capW + 50, textH + 50, 
+//          Transparency.TRANSLUCENT);
+//      Graphics2D g2d = (Graphics2D) img.getGraphics();
+//      g2d.setFont(GUIConstants.font);
+//      g2d.setColor(Color.black);
+//      g2d.drawString(caption, 0, 0);
+//      AffineTransform at = new AffineTransform();
+//      at.rotate(Math.PI / -1.41d);
+//      g2d.transform(at);
+//      g.drawImage(img, x1, h - YMARGIN + 25, this);
     }
   }
   
@@ -293,7 +306,7 @@ public class ScatterView extends View implements Runnable {
     for(int i = 0; i < nrCaptions; i++) {
       g.setColor(GUIConstants.color1);
       final int y1 = h - YMARGIN - NOVALUEBORDER - 
-      ((int)((i * range) * pHeight));
+      ((int) ((i * range) * pHeight));
       g.drawLine(XMARGIN - 9, y1, w - XMARGIN, y1);
       g.setColor(Color.black);
       String caption = new String();
@@ -305,7 +318,7 @@ public class ScatterView extends View implements Runnable {
         caption = Token.string(scatterData.yAxis.cats[i]);
       }
       final int capW = BaseXLayout.width(g, caption);
-      g.drawString(caption, XMARGIN - capW - 15, y1 + textH / 2);
+      g.drawString(caption, XMARGIN - capW - 15, y1 + textH / 2 - 1);
     }
   }
   
