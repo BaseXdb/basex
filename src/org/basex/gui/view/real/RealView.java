@@ -3,6 +3,8 @@ package org.basex.gui.view.real;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.util.HashMap;
+
 import org.basex.data.Data;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
@@ -13,7 +15,7 @@ import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 
-/**
+/*
  * This class offers a real tree view.
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Wolfgang Miller, Philipp Ziemer
@@ -52,7 +54,7 @@ public final class RealView extends View {
   /** the list of all parent nodes of a node line. */
   private IntList parentList = null;
   /** array with position of the parent node. */
-  private int [] parentPos = null;
+  private HashMap<Integer, Integer> parentPos = null;
 
   /**
    * Default Constructor.
@@ -162,21 +164,20 @@ public final class RealView extends View {
 
     for(int i = 0; i < l; i++) {
       int p = parentList.get(i);
-      
+
       if(p == -1) {
         continue;
       }
-      
+
       final DirIterator iterator = new DirIterator(data, p);
-      
+
       if(i > 0) {
         temp.add(-1);
       }
-      
+
       while(iterator.more()) {
         final int pre = iterator.next();
-        if(data.kind(pre) == Data.ELEM) 
-        temp.add(pre);
+        if(data.kind(pre) == Data.ELEM) temp.add(pre);
         sumNodeSize += data.size(pre, data.kind(pre));
         //        System.out.print(Token.string(data.tag(pre)) + " ");
       }
@@ -194,23 +195,22 @@ public final class RealView extends View {
   private void drawTemperature(final Graphics g, final int level) {
     final Data data = GUI.context.data();
     final int size = parentList.size;
-    IntList temp = new IntList();
+    HashMap<Integer, Integer> temp = new HashMap<Integer, Integer>();
     int x = 0;
     final int y = 1 * level * fontHeight * 2;
     final double width = this.getSize().width - 1;
     final int ratio = (int) Math.rint(width / size);
-    int lo = 0;
+    final int minSpace = 39; // minimum Space for Tags
+    boolean space = ratio > minSpace ? true : false;
 
     for(int i = 0; i < size; i++) {
       final int pre = parentList.get(i);
-      
+
       if(pre == -1) {
         x += ratio;
-        lo++;
         continue;
       }
-      
-      
+
       final int nodeSize = data.size(pre, Data.ELEM);
 
       final double nodePercent = nodeSize / (double) sumNodeSizeInLine;
@@ -222,31 +222,34 @@ public final class RealView extends View {
       g.fillRect(x + 1, y + 1, ratio - 1, fontHeight - 1);
 
       int boxMiddle = x + Math.round(ratio / 2f);
-      
-//      System.out.println(boxMiddle);
-      
-      if(parentPos != null) {
-        
-        g.setColor(Color.black);
-        int line = Math.round(fontHeight / 4f);
-        int parentMiddle = lo > parentPos.length - 1 ? 0 : parentPos[lo]; 
-        g.drawLine(boxMiddle, y, boxMiddle, y - line);
-        
-        g.drawLine(boxMiddle, y - line, parentMiddle, y - line);
-        g.drawLine(parentMiddle, y - line , parentMiddle , y - fontHeight);
-        
+      g.setColor(Color.black);
+
+      if(space) { 
+        String s = Token.string(data.tag(pre));
+        int textWidth = BaseXLayout.width(g, s);
+        g.drawString(s, boxMiddle - textWidth / 2, y + fontHeight - 2);
       }
-      
-      if(nodeSize > 0)
-      temp.add(boxMiddle);
-      
+        
+      //      System.out.println(boxMiddle);
+
+      if(parentPos != null) {
+
+        int line = Math.round(fontHeight / 4f);
+        int parentMiddle = parentPos.get(data.parent(pre, Data.ELEM));
+        g.drawLine(boxMiddle, y, boxMiddle, y - line);
+
+        g.drawLine(boxMiddle, y - line, parentMiddle, y - line);
+        g.drawLine(parentMiddle, y - line, parentMiddle, y - fontHeight);
+
+      }
+
+      if(nodeSize > 0) temp.put(pre, boxMiddle);
+
       x += ratio;
     }
-    parentPos = temp.finish();
-    
-//    System.out.printf("%s\n", parentPos);
-    
-    temp = new IntList();
+    parentPos = temp;
+
+    //    System.out.printf("%s\n", parentPos);
 
   }
 
