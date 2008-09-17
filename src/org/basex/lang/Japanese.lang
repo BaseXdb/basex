@@ -303,7 +303,7 @@ pc_tbl=% にテーブルが作成されました。
 pc_filenf=ファイル "%" が見付かりませんでした。
 pc_pathnf=File or directory not found.
 pc_err="%" をパースできませんでした。
-pc_err_deepfs=...
+pc_err_deepfs=Special database deepfs is not allowed to be created manually.
 pc_pos=% (%行、%列)
 
 # Database commands

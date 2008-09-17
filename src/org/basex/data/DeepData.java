@@ -2,7 +2,6 @@ package org.basex.data;
 
 import static org.basex.data.DataText.*;
 import java.io.IOException;
-import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.index.FTFuzzy;
 import org.basex.index.Index;
@@ -71,14 +70,13 @@ public final class DeepData extends Data {
   /** Values access file. */
   private final DataAccess values;
 
-  static boolean libLoaded = false;
-  static String libError;
+  /** Flag for loaded DeepFS library. */
+  private static String libError;
 
   /* libdeepfs__Vx.xx.xx.so has to be in -Djava.library.path= */
   static {
     try {
       System.loadLibrary(DEEPLIB);
-      libLoaded = true;
     } catch (UnsatisfiedLinkError e) {
       libError = e.getMessage();
     }
@@ -101,7 +99,8 @@ public final class DeepData extends Data {
    */
   public DeepData(final String db, final boolean index) throws IOException {
     // is caught by proc.Open.java
-    if (!libLoaded) throw new IOException(libError);
+    if(libError != null) throw new IOException(libError);
+    
     meta = new MetaData(db);
     size = meta.read();
 
