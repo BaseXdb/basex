@@ -213,7 +213,7 @@
 
   <target name="clean_build"
           description="Remove generated .class files and the build directory">
-    <delete dir="${build}"/>
+    <delete dir="${build}/*"/>
   </target>
 
   <target name="clean_jars"
