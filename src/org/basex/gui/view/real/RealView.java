@@ -51,6 +51,8 @@ public final class RealView extends View {
   private int sumNodeSizeInLine = 0;
   /** the list of all parent nodes of a node line. */
   private IntList parentList = null;
+  /** array with position of the parent node. */
+  private int [] parentPos = null;
 
   /**
    * Default Constructor.
@@ -140,6 +142,7 @@ public final class RealView extends View {
     sumNodeSizeInLine = data.size;
     parentList = new IntList();
     parentList.add(root);
+    parentPos = null;
     while(parentList.size > 0) {
       drawTemperature(g, level);
       getNextNodeLine();
@@ -158,11 +161,22 @@ public final class RealView extends View {
     int sumNodeSize = 0;
 
     for(int i = 0; i < l; i++) {
-      final DirIterator iterator = new DirIterator(data, parentList.get(i));
-
+      int p = parentList.get(i);
+      
+      if(p == -1) {
+        continue;
+      }
+      
+      final DirIterator iterator = new DirIterator(data, p);
+      
+      if(i > 0) {
+        temp.add(-1);
+      }
+      
       while(iterator.more()) {
         final int pre = iterator.next();
-        if(data.kind(pre) == Data.ELEM) temp.add(pre);
+        if(data.kind(pre) == Data.ELEM) 
+        temp.add(pre);
         sumNodeSize += data.size(pre, data.kind(pre));
         //        System.out.print(Token.string(data.tag(pre)) + " ");
       }
@@ -180,14 +194,24 @@ public final class RealView extends View {
   private void drawTemperature(final Graphics g, final int level) {
     final Data data = GUI.context.data();
     final int size = parentList.size;
+    IntList temp = new IntList();
     int x = 0;
     final int y = 1 * level * fontHeight * 2;
     final double width = this.getSize().width - 1;
-    final int ratio = (int) Math.rint((width - 1) / size);
+    final int ratio = (int) Math.rint(width / size);
+    int lo = 0;
 
     for(int i = 0; i < size; i++) {
       final int pre = parentList.get(i);
-      final int nodeSize = data.size(pre, data.kind(pre));
+      
+      if(pre == -1) {
+        x += ratio;
+        lo++;
+        continue;
+      }
+      
+      
+      final int nodeSize = data.size(pre, Data.ELEM);
 
       final double nodePercent = nodeSize / (double) sumNodeSizeInLine;
       g.setColor(Color.black);
@@ -197,8 +221,32 @@ public final class RealView extends View {
       g.setColor(new Color(c, 0, 255 - c));
       g.fillRect(x + 1, y + 1, ratio - 1, fontHeight - 1);
 
+      int boxMiddle = x + Math.round(ratio / 2f);
+      
+//      System.out.println(boxMiddle);
+      
+      if(parentPos != null) {
+        
+        g.setColor(Color.black);
+        int line = Math.round(fontHeight / 4f);
+        int parentMiddle = lo > parentPos.length - 1 ? 0 : parentPos[lo]; 
+        g.drawLine(boxMiddle, y, boxMiddle, y - line);
+        
+        g.drawLine(boxMiddle, y - line, parentMiddle, y - line);
+        g.drawLine(parentMiddle, y - line , parentMiddle , y - fontHeight);
+        
+      }
+      
+      if(nodeSize > 0)
+      temp.add(boxMiddle);
+      
       x += ratio;
     }
+    parentPos = temp.finish();
+    
+//    System.out.printf("%s\n", parentPos);
+    
+    temp = new IntList();
 
   }
 
