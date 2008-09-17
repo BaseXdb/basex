@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- $Id: build.xml 993 2007-11-21 07:40:12Z gruen $ -->
-
 <project name="basex" default="jars" basedir=".">
 
   <property file="etc/build/build.properties"/>
@@ -160,7 +158,9 @@
   <!-- ===================================================================== -->
   <target name="clean_build"
           description="Remove generated .class files and the build directory">
-    <delete dir="${build}/*"/>
+    <delete includeemptydirs="true">
+      <fileset dir="${build}" includes="**/*"/>
+    </delete>
   </target>
 
   <target name="clean_jars"
