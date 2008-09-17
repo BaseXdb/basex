@@ -150,67 +150,14 @@
           classpath="${build}"
           fork="true"/>
   </target>
-
   <!-- ===================================================================== -->
   <!-- ===== END: Launching BaseX ========================================== -->
   <!-- ===================================================================== -->
-
-  <!-- ===================================================================== -->
-  <!-- ===== BEGIN: Generate JNI header files ============================== -->
-  <!-- ===================================================================== -->
-  
-  <!-- ===================================================================== -->
-  <!-- ===== END: Generate JNI header files ================================ -->
-  <!-- ===================================================================== -->
-  <target name="lstatheader" 
-          depends="build"
-          description="C header file for native stat calls under linux.">
-    <!-- produces weird stuff, maybe jni.h issue
-    <javah classpath="${build}" destdir="lib" verbose="yes" old="yes" force="yes">
-      <class name="org.basex.build.fs.ShredUnixFSVisitor"/>
-    </javah>
-    -->
-    <exec executable="javah" dir="bin" failonerror="true">
-      <arg value="-jni"/>
-      <arg value="-d"/>
-      <arg value="../lib"/>
-      <arg line="org.basex.build.fs.ShredUnixFSVisitor"/>
-    </exec>
-  </target>
-
-  <!-- ===================================================================== -->
-  <!-- ===== BEGIN: Shared objects ========================================= -->
-  <!-- ===================================================================== -->
-
-  <!-- ..... libStat ... -->
-  <target name="lib" 
-          depends="build"
-          description="Shared object for native stat calls under linux.">
-
-     <exec executable="gcc" dir="lib" failonerror="true">
-        <arg value="-fPIC"/>
-        <arg value="-shared"/>
-        <arg value="-o"/>
-        <arg value="libShredUnixFSVisitor.so"/>
-        <arg line="org_basex_build_fs_ShredUnixFSVisitor.c"/>
-     </exec>
-
-  </target>
-
-  <!-- ===================================================================== -->
-  <!-- ===== END: Shared objects =========================================== -->
-  <!-- ===================================================================== -->
-
 
 
   <!-- ===================================================================== -->
   <!-- ===== BEGIN: Cleaning =============================================== -->
   <!-- ===================================================================== -->
-  <target name="clean_lib"
-          description="Remove generated .so files">
-    <delete file="lib/libShredUnixFSVisitor.so"/>
-  </target>
-
   <target name="clean_build"
           description="Remove generated .class files and the build directory">
     <delete dir="${build}/*"/>
