@@ -303,6 +303,7 @@ pc_tbl=Table created in %.
 pc_filenf=Sorry, file "%" was not found.
 pc_pathnf=File or directory not found.
 pc_err="%" could not be parsed.
+pc_err_deepfs=Special database deepfs is not allowed to be created manually.
 pc_pos="%" (Line %, Col %)
 
 # Database commands

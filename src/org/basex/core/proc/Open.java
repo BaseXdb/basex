@@ -6,6 +6,7 @@ import org.basex.BaseX;
 import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.data.Data;
+import org.basex.data.DeepData;
 import org.basex.data.DiskData;
 import org.basex.io.IO;
 
@@ -27,14 +28,15 @@ public final class Open extends Process {
   @Override
   protected boolean exec() {
     final String db = args[0].replaceAll("(.*)\\..*", "$1");
-    if(!IO.dbpath(db).exists()) return error(DBNOTFOUND, db);
+    if(!IO.dbpath(db).exists())
+      if(!db.equals(DEEPDB)) return error(DBNOTFOUND, db);
 
     // close old database
     context.close();
     
     try {
       // open new database instance
-      final Data data = new DiskData(db);
+      final Data data = db.equals(DEEPDB) ? new DeepData(db) : new DiskData(db);
       context.data(data);
       if(Prop.info) {
         if(data.meta.newindex) info(INDUPDATE + NL);
@@ -56,7 +58,7 @@ public final class Open extends Process {
    */
   public static Data open(final String db) {
     try {
-      return new DiskData(db);
+      return db.equals(DEEPDB) ? new DeepData(db) : new DiskData(db);
     } catch(final IOException ex) {
       BaseX.debug(ex);
       return null;

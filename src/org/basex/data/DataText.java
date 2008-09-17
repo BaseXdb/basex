@@ -187,5 +187,9 @@ public interface DataText {
   byte[] STATTEXT = Token.token("TEXT");
   /** Statistics - Categories. */
   byte[] STATCAT = Token.token("CAT");
+
+  // DEEPFS STRINGS ===========================================================
+  /** Name of the current deepfs shared library. */
+  String DEEPLIB = "deepfs__V1.00.0";
 }
 

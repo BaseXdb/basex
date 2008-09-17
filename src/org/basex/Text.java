@@ -937,6 +937,8 @@ public interface Text {
   //String CREATEFT = lang("pc_ftx");
   /** Parse error. */
   String CREATEERR = lang("pc_err");
+  /** Not allowed to create 'deepfs' special database. */
+  String CREATENODEEPDB = lang("pc_err_deepfs");
 
   /** File not found. */
   String FILEWHICH = lang("pc_filenf");
@@ -1318,7 +1320,9 @@ public interface Text {
   /** Help String. */
   byte[] HELPMEM = token(lang("h_mem"));
 
-  //FILESYSTEM ERROR MESSAGES===================================================
+  // DEEPFS STRINGS ===========================================================
+  /** Special db name to indicate a deepfs instance. */
+  String DEEPDB = "deepfs";
   
   /** Dummy string to check if all language strings have been assigned. */
   String DUMMY = lang(null);
