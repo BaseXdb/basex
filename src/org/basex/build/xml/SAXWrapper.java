@@ -53,11 +53,11 @@ public final class SAXWrapper extends Parser {
   /**
    * Constructor.
    * @param in input file
-   * @param read reader reference
+   * @param r reader reference
    */
-  public SAXWrapper(final IO in, final XMLReader read) {
+  public SAXWrapper(final IO in, final XMLReader r) {
     super(in);
-    reader = read;
+    reader = r;
   }
 
   @Override
@@ -76,9 +76,12 @@ public final class SAXWrapper extends Parser {
       r.setContentHandler(p);
       r.setProperty("http://xml.org/sax/properties/lexical-handler", p);
       r.setErrorHandler(p);
+
       builder.startDoc(token(file.name()));
-      r.parse(file.next());
+      if(reader == null) r.parse(file.next());
+      else r.parse(file.path());
       builder.endDoc();
+      
     } catch(final SAXParseException ex) {
       final String msg = BaseX.info(SCANPOS, ex.getSystemId(),
           ex.getLineNumber(), ex.getColumnNumber()) + ": " + ex.getMessage();

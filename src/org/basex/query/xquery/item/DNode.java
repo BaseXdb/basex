@@ -51,17 +51,15 @@ public final class DNode extends Node {
       final int level) throws IOException {
 
     switch(type) {
+      case DOC:
+      case ELM:
+        serElem(ser, pre, level);
+        break;
       case ATT:
         ser.attribute(data.attName(pre), data.attValue(pre));
         break;
       case COM:
         ser.comment(str());
-        break;
-      case DOC:
-        serElem(ser, pre, level);
-        break;
-      case ELM:
-        serElem(ser, pre, level);
         break;
       case PI:
         ser.pi(str());

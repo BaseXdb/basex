@@ -11,6 +11,7 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
+import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
@@ -21,7 +22,9 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public final class SAXSerializer extends Serializer implements XMLReader {
   /** Content handler reference. */
-  private ContentHandler handler;
+  private ContentHandler content;
+  /** Lexical handler reference. */
+  private LexicalHandler lexical;
   /** Content handler reference. */
   private final Result result;
 
@@ -36,7 +39,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
 
   /* Implements XMLReader method. */
   public ContentHandler getContentHandler() {
-    return handler;
+    return content;
   }
 
   /* Implements XMLReader method. */
@@ -73,17 +76,25 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   public void parse(final String id) throws SAXException {
     try {
       // execute query
-      handler.startDocument();
+      content.startDocument();
       result.serialize(this);
-      handler.endDocument();
+      content.endDocument();
     } catch(final Exception ex) {
       throw new SAXException(ex);
     }
   }
 
   /* Implements XMLReader method. */
-  public void setContentHandler(final ContentHandler h) {
-    handler = h;
+  public void setContentHandler(final ContentHandler c) {
+    content = c;
+  }
+
+  /**
+   * Sets the lexical handler for reacting on comments.
+   * @param l handler
+   */
+  public void setLexicalHandler(final LexicalHandler l) {
+    lexical = l;
   }
 
   /* Implements XMLReader method. */
@@ -154,7 +165,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   public void emptyElement() throws IOException {
     finishElement();
     try {
-      handler.endElement("", tag, tag);
+      content.endElement("", tag, tag);
     } catch(final SAXException ex) {
       throw new IOException(ex.getMessage());
     }
@@ -163,7 +174,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   @Override
   public void finishElement() throws IOException {
     try {
-      handler.startElement("", tag, tag, atts);
+      content.startElement("", tag, tag, atts);
     } catch(final SAXException ex) {
       throw new IOException(ex.getMessage());
     }
@@ -173,7 +184,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   public void closeElement(final byte[] t) throws IOException {
     try {
       tag = Token.string(t);
-      handler.endElement("", tag, tag);
+      content.endElement("", tag, tag);
     } catch(final SAXException ex) {
       throw new IOException(ex.getMessage());
     }
@@ -183,7 +194,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   public void text(final byte[] b) throws IOException {
     final char[] c = Token.string(b).toCharArray();
     try {
-      handler.characters(c, 0, c.length);
+      content.characters(c, 0, c.length);
     } catch(final SAXException ex) {
       throw new IOException(ex.getMessage());
     }
@@ -191,13 +202,18 @@ public final class SAXSerializer extends Serializer implements XMLReader {
 
   @Override
   public void comment(final byte[] t) throws IOException {
-    throw new IOException("Can't serialize comments.");
+    try {
+      final char[] c = Token.string(t).toCharArray();
+      if(lexical != null) lexical.comment(c, 0, t.length);
+    } catch(final SAXException ex) {
+      throw new IOException(ex.getMessage());
+    }
   }
 
   @Override
   public void pi(final byte[] n, final byte[] v) throws IOException {
     try {
-      handler.processingInstruction(Token.string(n), Token.string(v));
+      content.processingInstruction(Token.string(n), Token.string(v));
     } catch(final SAXException ex) {
       throw new IOException(ex.getMessage());
     }

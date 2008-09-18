@@ -548,15 +548,17 @@ public final class XQParser extends QueryParser {
 
     final SeqType type = consumeWS(AS) ? sequenceType() : null;
     final Var var = new Var(name, type);
+    final Var ext = ctx.vars.get(var);
 
     if(consumeWS2(EXTERNAL)) {
-      final Var ext = ctx.vars.get(var);
-      if(ext != null && type != null) {
+      if(ext == null) {
+        ctx.vars.addGlobal(var);
+      } else if(type != null) {
         ext.type = type;
         ext.check();
       }
     } else {
-      if(ctx.vars.get(var) != null) Err.or(VARDEFINE, var);
+      if(ext != null) Err.or(VARDEFINE, var);
       check(ASSIGN);
       ctx.vars.addGlobal(var.expr(check(single(), VARMISSING)));
     }
@@ -1341,8 +1343,7 @@ public final class XQParser extends QueryParser {
     // variables
     if(c == '$') {
       final Var var = new Var(varName());
-      final Var v = ctx.vars.get(var);
-      if(v == null) Err.or(VARNOTDEFINED, var);
+      if(ctx.vars.get(var) == null) Err.or(VARNOTDEFINED, var);
       return new VarCall(var);
     }
     // parentheses

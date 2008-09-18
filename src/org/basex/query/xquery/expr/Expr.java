@@ -60,38 +60,6 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Checks if this is an untyped item.
-   * @return result of check
-   */
-  public boolean u() {
-    return false;
-  }
-
-  /**
-   * Checks if this is a string item.
-   * @return result of check
-   */
-  public boolean s() {
-    return false;
-  }
-
-  /**
-   * Checks if this is a duration.
-   * @return result of check
-   */
-  public boolean d() {
-    return false;
-  }
-
-  /**
-   * Checks if this is a node.
-   * @return result of check
-   */
-  public boolean node() {
-    return false;
-  }
-
-  /**
    * Returns if this is an empty sequence.
    * @return result of check
    */

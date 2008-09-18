@@ -394,6 +394,8 @@ public interface XQText {
   Object[] NODESPATH = { XPTY, 19,
     "Context node required for %; '%' found." };
 
+  /** XPDY0002: Parsing exception. */
+  Object[] VAREMPTY = { XQDY, 2, "No value defined for \"%\"." };
   /** XQDY0026: Evaluation exception. */
   Object[] CPICONT = { XQDY, 26, "Invalid PI content: \"%\"" };
   /** XQDY0041: Evaluation exception. */

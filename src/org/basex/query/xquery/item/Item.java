@@ -48,22 +48,34 @@ public abstract class Item extends Expr {
     return type.num;
   }
 
-  @Override
+  /**
+   * Checks if this is an untyped item.
+   * @return result of check
+   */
   public final boolean u() {
     return type.unt;
   }
 
-  @Override
+  /**
+   * Checks if this is a string item.
+   * @return result of check
+   */
   public final boolean s() {
     return type.str;
   }
 
-  @Override
+  /**
+   * Checks if this is a duration.
+   * @return result of check
+   */
   public final boolean d() {
     return type.dur;
   }
 
-  @Override
+  /**
+   * Checks if this is a node.
+   * @return result of check
+   */
   public final boolean node() {
     return type.node;
   }

@@ -58,10 +58,11 @@ final class FNAcc extends Fun {
   @Override
   public Expr comp(final XQContext ctx, final Expr[] arg) {
     if(arg.length == 0) return this;
+    final Item it = arg[0].i() ? (Item) arg[0] : null;
     
     switch(func) {
       case STRING:
-        return arg[0].s() && !arg[0].u() ? arg[0] : this;
+        return it != null && it.s() && !it.u() ? arg[0] : this;
       case NUMBER:
         if(arg[0].e()) return Dbl.NAN;
         return arg[0] instanceof Dbl ? arg[0] : this;

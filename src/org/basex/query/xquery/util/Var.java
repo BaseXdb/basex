@@ -1,5 +1,6 @@
 package org.basex.query.xquery.util;
 
+import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import org.basex.data.Serializer;
 import org.basex.query.ExprInfo;
@@ -87,6 +88,8 @@ public final class Var extends ExprInfo implements Cloneable {
    */
   public Iter iter(final XQContext ctx) throws XQException {
     if(item == null) {
+      if(expr == null) Err.or(VAREMPTY, this);
+      
       final Item it = ctx.item;
       ctx.item = null;
       item = ctx.iter(expr).finish();
