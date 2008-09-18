@@ -3,6 +3,7 @@ package org.basex.test.xqj;
 
 import java.io.IOException;
 import java.io.StringReader;
+
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.XMLFilterImpl;
@@ -18,10 +19,6 @@ public class TestXMLFilter extends XMLFilterImpl {
   }
   
   public void parse(String systemId) throws IOException, SAXException {
-    super.parse(inputSource);
-  }
-  
-  public void parse(InputSource is) throws IOException, SAXException {
     super.parse(inputSource);
   }
 }

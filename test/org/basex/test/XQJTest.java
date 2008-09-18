@@ -16,7 +16,9 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.xquery.XQConnection;
 import javax.xml.xquery.XQConstants;
 import javax.xml.xquery.XQDataSource;
+import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQExpression;
+import javax.xml.xquery.XQItem;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQPreparedExpression;
 import javax.xml.xquery.XQResultSequence;
@@ -101,10 +103,10 @@ public class XQJTest extends TestCase {
   public void test3() throws Exception {
     final XQConnection conn = conn(drv);
     final XQExpression expr = conn.createExpression();
-    expr.bindInt(new QName("x"), 21, null);
+    expr.bindInt(new QName("x3"), 21, null);
 
     final XQSequence result = expr.executeQuery(
-       "declare variable $x as xs:integer external; for $i in $x return $i");
+       "declare variable $x3 as xs:integer external; for $i in $x3 return $i");
 
     final StringBuilder sb = new StringBuilder();
     while(result.next()) sb.append(result.getItemAsString(null));
@@ -196,10 +198,10 @@ public class XQJTest extends TestCase {
   @Test
   public void test9() throws Exception {
     final XQConnection conn = conn(drv);
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    DocumentBuilder parser = factory.newDocumentBuilder();
-    Document doc = parser.parse(new InputSource(new StringReader("<a>b</a>")));
-    
+    final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    final DocumentBuilder parser = factory.newDocumentBuilder();
+    final Document doc = parser.parse(new InputSource(new StringReader("<a>b</a>")));
+
     try {
       conn.createItemFromNode(doc, null);
     } catch(final Exception ex) {
@@ -214,11 +216,11 @@ public class XQJTest extends TestCase {
   @Test
   public void test10() throws Exception {
     final XQConnection conn = conn(drv);
-    XQStaticContext sc = conn.getStaticContext();
+    final XQStaticContext sc = conn.getStaticContext();
     sc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
-    
-    XQExpression ex = conn.createExpression();
-    XQResultSequence seq = ex.executeQuery("1,2,3,4");
+
+    final XQExpression ex = conn.createExpression();
+    final XQResultSequence seq = ex.executeQuery("1,2,3,4");
     seq.absolute(2);
     assertEquals(2, seq.getPosition());
   }
@@ -230,17 +232,17 @@ public class XQJTest extends TestCase {
   @Test
   public void test11() throws Exception {
     final XQConnection conn = conn(drv);
-    XQStaticContext sc = conn.getStaticContext();
+    final XQStaticContext sc = conn.getStaticContext();
     sc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
-    
-    XQExpression ex = conn.createExpression();
-    String query = "doc('/home/db/projects/basex/input.xml')//title";
+
+    final XQExpression ex = conn.createExpression();
+    final String query = "doc('/home/db/projects/basex/input.xml')//title";
     //String query = "1,2";
-    XQResultSequence seq = ex.executeQuery(query);
-    XMLStreamReader xsr = seq.getSequenceAsStream();
+    final XQResultSequence seq = ex.executeQuery(query);
+    final XMLStreamReader xsr = seq.getSequenceAsStream();
     while(xsr.hasNext()) xsr.next();
   }
- 
+
   /**
    * Test.
    * @throws Exception exception
@@ -248,24 +250,23 @@ public class XQJTest extends TestCase {
   @Test
   public void test12() throws Exception {
     final XQConnection conn = conn(drv);
-    XQStaticContext sc = conn.getStaticContext();
+    final XQStaticContext sc = conn.getStaticContext();
     sc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
-    
-    XQExpression ex = conn.createExpression();
-    String query = "1,'haha',2.0e3,2";
+
+    final XQExpression ex = conn.createExpression();
+    final String query = "1,'haha',2.0e3,2";
     //String query = "1";
-    XQResultSequence seq = ex.executeQuery(query);
-    XMLStreamReader xsr = seq.getSequenceAsStream();
-    
-    XMLInputFactory xif = XMLInputFactory.newInstance();
-    XMLEventReader xer = xif.createXMLEventReader(xsr);
-    
+    final XQResultSequence seq = ex.executeQuery(query);
+    final XMLStreamReader xsr = seq.getSequenceAsStream();
+
+    final XMLInputFactory xif = XMLInputFactory.newInstance();
+    final XMLEventReader xer = xif.createXMLEventReader(xsr);
+
     while(xer.hasNext()) {
-      XMLEvent ev = xer.nextEvent();
+      final XMLEvent ev = xer.nextEvent();
       if(ev.isStartElement()) {
-        StartElement se = ev.asStartElement();
-        QName qnm = se.getName();
-        System.out.println("TAG: " + qnm);
+        final StartElement se = ev.asStartElement();
+        se.getName();
       } else if(ev.isCharacters()) {
         //Characters ch = ev.asCharacters();
         //ch.getData());
@@ -284,7 +285,7 @@ public class XQJTest extends TestCase {
     final XQConnection conn = conn(drv);
     final XQExpression expr = conn.createExpression();
 
-    XQResultSequence seq = expr.executeQuery("<H><K/><K/></H>");
+    final XQResultSequence seq = expr.executeQuery("<H><K/><K/></H>");
     seq.next();
     seq.getSequenceAsString(null);
   }
@@ -297,13 +298,14 @@ public class XQJTest extends TestCase {
     final XQConnection conn = conn(drv);
     final XQExpression expr = conn.createExpression();
 
-    final XQResultSequence seq = expr.executeQuery("1,<H><K/><K/></H>");
+    final XQResultSequence seq = expr.executeQuery("1,'test'");
     final StringWriter sw = new StringWriter();
     seq.next();
     seq.writeItemToResult(new StreamResult(sw));
     seq.next();
     seq.writeItemToResult(new StreamResult(sw));
-    System.out.println(sw.toString());
+
+    assertEquals("1test", sw.toString());
   }
 
   /**
@@ -314,11 +316,101 @@ public class XQJTest extends TestCase {
     final XQConnection conn = conn(drv);
     final XQExpression expr = conn.createExpression();
 
-    final XQResultSequence seq = expr.executeQuery("<H><K>B</K></H>");
+    final String query = "<H><K>B</K></H>";
+    final XQResultSequence seq = expr.executeQuery(query);
     seq.next();
-    TestContentHandler result = new TestContentHandler();
+    final TestContentHandler result = new TestContentHandler();
     seq.writeItemToSAX(result);
-    System.out.println(result.buffer.toString());
+
+    assertEquals(query, result.buffer.toString());
+  }
+
+  /**
+   * Test.
+   * @throws Exception exception
+   */
+  public void test16() throws Exception {
+    final XQConnection conn = conn(drv);
+    final XQExpression expr = conn.createExpression();
+
+    final String query = "<ee>Hello world!</ee>";
+    final XQItem item = conn.createItemFromDocument(
+        expr.executeQuery(query).getSequenceAsStream(), null);
+
+    assertEquals(query, item.getItemAsString(null));
+  }
+
+  /**
+   * Test.
+   * @throws Exception exception
+   */
+  public void test17() throws Exception {
+    final XQConnection conn = conn(drv);
+    final String query = "declare variable $x as xs:integer external; $x";
+    final XQPreparedExpression expr = conn.prepareExpression(query);
+
+    int nr = 0;
+    final QName var = new QName("x");
+    expr.bindInt(var, 45, null);
+    XQResultSequence result = expr.executeQuery();
+    while(result.next()) nr += result.getInt();
+    result.close();
+
+    expr.bindInt(var, 54, null);
+    result = expr.executeQuery();
+    while (result.next()) nr += result.getInt();
+    result.close();
+
+    assertEquals(99, nr);
+  }
+
+  /**
+   * Test.
+   * @throws Exception exception
+   */
+  public void test18() throws Exception {
+    final XQConnection conn = conn(drv);
+    
+    try {
+      conn.prepareExpression("declare variable $var1 := $var1; true()");
+      fail("Exception expected for invalid XQuery expression.");
+    } catch (XQException e) {
+    }
+  }
+
+  /**
+   * Test.
+   * @throws Exception exception
+   */
+  public void test19() throws Exception {
+    final XQConnection conn = conn(drv);
+    
+    try {
+      final XQPreparedExpression expr = conn.prepareExpression(
+        "declare variable $v external; $v");
+
+      expr.bindInt(new QName("v"), 123, null);
+      XQResultSequence result = expr.executeQuery();
+      result.next();
+      assertEquals(123, result.getInt());
+    } catch (XQException e) {
+      fail(e.getMessage());
+    }
+  }
+
+  /**
+   * Test.
+   * @throws Exception exception
+   */
+  public void test20() throws Exception {
+    final XQConnection conn = conn(drv);
+    final XQExpression expr = conn.createExpression();
+
+    final XQResultSequence result = expr.executeQuery("'Hello world!'");
+    result.isScrollable();
+    expr.close();
+
+    final XQSequence seq = conn.createSequence(result);
+    seq.beforeFirst();
   }
 }
-

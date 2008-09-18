@@ -16,10 +16,10 @@ public class XQSequenceTypeTest extends XQJTestCase {
     try {
       XQItemType xqit = xqst.getItemType();
       int kind = xqit.getItemKind();
-      junit.framework.Assert.assertTrue("A-XQST-1.1: Successfully call getItemType()", kind == XQItemType.XQITEMKIND_ATOMIC ||
+      assertTrue("A-XQST-1.1: Successfully call getItemType()", kind == XQItemType.XQITEMKIND_ATOMIC ||
                                                                                        kind == XQItemType.XQITEMKIND_ITEM);    
     } catch (Exception e) {
-      junit.framework.Assert.fail("A-XQST-1.1: getItemtype() failed with message: " + e.getMessage());
+      fail("A-XQST-1.1: getItemtype() failed with message: " + e.getMessage());
     }
   }
   
@@ -29,10 +29,10 @@ public class XQSequenceTypeTest extends XQJTestCase {
     
     try { 
       int occurence = xqst.getItemOccurrence();
-      junit.framework.Assert.assertTrue("A-XQST-2.1: Successfully call getItemOccurrence()", occurence == XQSequenceType.OCC_ONE_OR_MORE ||
+      assertTrue("A-XQST-2.1: Successfully call getItemOccurrence()", occurence == XQSequenceType.OCC_ONE_OR_MORE ||
                                                                                        occurence == XQSequenceType.OCC_ZERO_OR_MORE);      
     } catch (Exception e) {
-      junit.framework.Assert.fail("A-XQST-2.1: getItemOccurrence() failed with message: " + e.getMessage());
+      fail("A-XQST-2.1: getItemOccurrence() failed with message: " + e.getMessage());
     }
   }  
   
@@ -43,7 +43,7 @@ public class XQSequenceTypeTest extends XQJTestCase {
     try { 
       xqst.toString();    
     } catch (Exception e) {
-      junit.framework.Assert.fail("A-XQST-3.1: toString() failed with message: " + e.getMessage());
+      fail("A-XQST-3.1: toString() failed with message: " + e.getMessage());
     }
   }  
 }

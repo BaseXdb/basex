@@ -16,7 +16,7 @@ public class XQResultSequenceTest extends XQJTestCase {
     xqs.close();
     try {
       xqs.getConnection();
-      junit.framework.Assert.fail("A-XQRS-1.1: Getting the connection on a closed result sequence fails.");
+      fail("A-XQRS-1.1: Getting the connection on a closed result sequence fails.");
     } catch (XQException e) {
       // Expect an XQException
     }
@@ -27,9 +27,9 @@ public class XQResultSequenceTest extends XQJTestCase {
     try {
       returned_xqc = xqs.getConnection();
     } catch (XQException e) {
-      junit.framework.Assert.fail("A-XQRS-1.2: getConnection() failed with message: " + e.getMessage());
+      fail("A-XQRS-1.2: getConnection() failed with message: " + e.getMessage());
     }
-    junit.framework.Assert.assertSame("A-XQRS-1.2: Successfully get the connection of a result sequence.", xqc, returned_xqc);
+    assertSame("A-XQRS-1.2: Successfully get the connection of a result sequence.", xqc, returned_xqc);
     xqe.close(); 
   }
 }

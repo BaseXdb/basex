@@ -122,7 +122,7 @@ public final class BXQItemType implements XQItemType {
       case TXT: return XQITEMKIND_TEXT;
       case ATM: return XQITEMKIND_ATOMIC;
       case ITEM: return XQITEMKIND_ITEM;
-      // [CG] not correct..
+      // [CG] Check other item kinds
       default : return type.unt ? XQITEMKIND_ITEM : XQITEMKIND_ATOMIC;
     }
   }

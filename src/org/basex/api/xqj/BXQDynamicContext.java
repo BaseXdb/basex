@@ -31,6 +31,7 @@ import org.basex.query.xquery.item.Str;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
+import org.basex.query.xquery.util.SeqBuilder;
 import org.basex.query.xquery.util.Var;
 import org.basex.util.Action;
 import org.basex.util.Token;
@@ -89,6 +90,8 @@ abstract class BXQDynamicContext extends BXQAbstract implements XQDynamicContext
 
   public void bindDocument(final QName qn, final Source is,
       final XQItemType it) {
+    
+    // support all kinds of input sources...
     BaseX.notimplemented();
   }
 
@@ -144,8 +147,13 @@ abstract class BXQDynamicContext extends BXQAbstract implements XQDynamicContext
     bind(qn, v instanceof XQItem ? ((BXQItem) v).it : createItem(v), it);
   }
 
-  public void bindSequence(final QName qn, final XQSequence seq) {
-    BaseX.notimplemented();
+  public void bindSequence(final QName qn, final XQSequence seq)
+      throws XQException {
+    try {
+      bind(qn, new SeqBuilder(((BXQSequence) seq).result).finish(), null);
+    } catch(final QueryException ex) {
+      throw new BXQException(ex);
+    }      
   }
 
   public void bindShort(final QName qn, final short val,
@@ -172,9 +180,9 @@ abstract class BXQDynamicContext extends BXQAbstract implements XQDynamicContext
   }
 
   /**
-   * Binds the specified variable to the specified item. 
-   * @param var variable
-   * @param it item
+   * Binds an item to the specified variable.
+   * @param var variable name
+   * @param it item to be bound
    * @param t target type
    * @throws XQException query exception
    */
@@ -182,13 +190,19 @@ abstract class BXQDynamicContext extends BXQAbstract implements XQDynamicContext
       throws XQException {
     check();
     check(var, QName.class);
+
+    final QNm name = new QNm(Token.token(var.getLocalPart()));
+    Var v = new Var(name);
+    if(this instanceof BXQPreparedExpression) {
+      v = query.ctx.vars.get(v);
+      if(v == null) throw new BXQException(VAR, var);
+    } else {
+      query.ctx.vars.addGlobal(v);
+    }
     
     try {
-      final Var v = new Var(new QNm(Token.token(var.getLocalPart())));
-      final BXQItemType bit = (BXQItemType) t;
-      final Item i = t == null || bit.type == it.type ? it :
-          check(t, it.type).e(it, null);
-      query.ctx.vars.addGlobal(v.item(i));
+      v.item(t == null || ((BXQItemType) t).type == it.type ? it :
+        check(t, it.type).e(it, null));
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }
@@ -215,7 +229,7 @@ abstract class BXQDynamicContext extends BXQAbstract implements XQDynamicContext
       query.create();
       Iter iter = ctx.compile(null).iter();
       if(sc.scrollable && !(iter instanceof SeqIter)) iter = new SeqIter(iter);
-      return new BXQSequence(iter, ctx, this, sc, (BXQConnection) par);
+      return new BXQSequence(iter, ctx, this, (BXQConnection) par);
     } catch(final QueryException ex) {
       throw new XQQueryException(ex.getMessage());
     } catch(final ProgressException ex) {

@@ -8,6 +8,7 @@ import javax.xml.stream.Location;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.DNode;
@@ -18,7 +19,6 @@ import org.basex.query.xquery.item.QNm;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.item.Uri;
 import org.basex.query.xquery.iter.Iter;
-import org.basex.query.xquery.iter.NodIter;
 import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.util.Namespaces;
 import org.basex.query.xquery.util.NodeBuilder;
@@ -409,9 +409,7 @@ public final class IterStreamReader implements XMLStreamReader {
     abstract void next();
   }
 
-  /**
-   * Reader for {@link DNode} instances.
-   */
+  /** Reader for traversing {@link DNode} instances. */
   final class DNodeReader extends NodeReader {
     /** Node reference. */
     private final DNode node;
@@ -426,9 +424,7 @@ public final class IterStreamReader implements XMLStreamReader {
     /** Current pre value. */
     private int p;
 
-    /**
-     * Constructor.
-     */
+    /** Constructor. */
     DNodeReader() {
       node = ((DNode) item).copy();
       item = node;
@@ -476,46 +472,43 @@ public final class IterStreamReader implements XMLStreamReader {
     }
   }
   
-  /**
-   * Reader for {@link FNode} instances.
-   */
+  /** Reader for traversing {@link FNode} instances. */
   final class FNodeReader extends NodeReader {
     /** Iterator. */
-    private NodIter iter;
-    /** Next item. */
-    private Item it;
+    private NodeIter[] iter = new NodeIter[256];
+    /** Iterator. */
+    private Node[] node = new Node[256];
+    /** Iterator Level. */
+    private int l;
     
-    /**
-     * Constructor.
-     * @throws XQException exception
-     */
-    FNodeReader() throws XQException {
-      FNode root = (FNode) item;
-      iter = new NodIter();
-      iter.add(root);
-      addDesc(root.child(), iter);
-      type();
+    /** Constructor. */
+    FNodeReader() {
+      iter[0] = ((FNode) item).self();
+      hasNext();
     }
     
     @Override
     boolean hasNext() {
-      it = iter.next();
-      return it != null;
+      try {
+        final Node n = iter[l].next();
+        if(n != null) {
+          node[l] = n;
+          item = n;
+          type();
+          if(kind == START_ELEMENT) iter[++l] = n.child();
+        } else {
+          if(--l < 0) return false;
+          item = node[l];
+          kind = END_ELEMENT;
+        }
+      } catch(XQException e) {
+        BaseX.notexpected();
+      }
+      return true;
     }
 
     @Override
-    void next() {
-      type();
-    }
-
-    private final void addDesc(final NodeIter children,
-        final NodIter nodes) throws XQException {
-      Node ch;
-      while((ch = children.next()) != null) {
-        nodes.add(ch.finish());
-        addDesc(ch.child(), nodes);
-      }
-    }
+    void next() { }
   }
 
   /** Dummy Location Implementation. */

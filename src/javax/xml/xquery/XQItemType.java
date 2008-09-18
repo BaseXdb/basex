@@ -1,5 +1,8 @@
-package javax.xml.xquery;
+/*
+ * Copyright © 2003, 2004, 2005, 2006, 2007 Oracle.  All rights reserved.
+ */
 
+package javax.xml.xquery;
 import javax.xml.namespace.QName;
 import java.net.URI;
 
@@ -10,7 +13,7 @@ import java.net.URI;
   * <br>
   *
   * The <code>XQItemType</code> extends the <code>XQSequenceType</code> but
-  * restricts the occurrence indicator to be exactly one. This derivation allows passing
+  * restricts the occurrance indicator to be exactly one. This derivation allows passing  
   * an item type wherever a sequence type is expected, but not the other way.
   * 
   * The <code>XQItemType</code> interface contains methods to represent
@@ -25,7 +28,7 @@ import java.net.URI;
   * </ul>
   * 
   * An instance of the <code>XQItemType</code> is a standalone
-  * object that is independent of the <code>XQConnection</code> and
+  * object that is independant of the <code>XQConnection</code> and
   * any XQuery static or dynamic context.
   */
 public interface XQItemType extends XQSequenceType
@@ -251,7 +254,7 @@ public interface XQItemType extends XQSequenceType
     * One of the <code>XQITEMKIND_*</code> constants.
     *
     * @return int      one of the <code>XQITEMKIND_*</code> constants
-    *                  indicating the basic kind of the item
+    *                  indicating the basic kind  of the item
     */
   public int getItemKind();
 
@@ -328,7 +331,7 @@ public interface XQItemType extends XQSequenceType
     * defined.
     *
     * @return                    the <code>QName</code> of the schema type in case of a
-    *                            user defined or anonymous types. For a built-in type,
+    *                            user defined or anonoymous types. For a built-in type,
     *                            returns a predefined type name as QName
     *                            (e.g.<code>xs:anyType</code>, <code>xs:decimal</code>,
     *                            etc). Cannot be <code>null</code>

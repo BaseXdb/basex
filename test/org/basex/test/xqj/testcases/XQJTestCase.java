@@ -3,16 +3,20 @@ package org.basex.test.xqj.testcases;
 
 import java.io.FileInputStream;
 import java.util.Properties;
+
 import junit.framework.TestCase;
 import javax.xml.xquery.*;
 
 @SuppressWarnings("all")
-public class XQJTestCase extends TestCase {
+public class XQJTestCase extends TestCase{
   protected XQDataSource xqds;
   protected XQConnection xqc;
   
-  protected void setUp() throws Exception {
-    /* Get the file name of the properties file
+  protected void setUp() throws Exception{
+    System.setProperty("com.oracle.xqj.tck.datasource", "bxq.properties");
+    //System.setProperty("com.oracle.xqj.tck.datasource", "saxonxq.properties");
+    
+    // Get the file name of the properties file
     String fileName = System.getProperty("com.oracle.xqj.tck.datasource");
     if (fileName == null)
       throw new Exception("The property 'com.oracle.xqj.tck.datasource' must be set.");
@@ -30,16 +34,11 @@ public class XQJTestCase extends TestCase {
     if (!p.isEmpty()) 
       // set the remaining properties
       xqds.setProperties(p);
-    */
 
-    //String drv = "net.sf.saxon.xqj.SaxonXQDataSource";
-    String drv = "org.basex.api.xqj.BXQDataSource";
-    Class xqdsClass = Class.forName(drv);
-    xqds = (XQDataSource)xqdsClass.newInstance();
     xqc = xqds.getConnection();
   }
 
   protected void tearDown() throws Exception {
-    xqc.close();
+   xqc.close(); 
   }
 }

@@ -1,5 +1,8 @@
-package javax.xml.xquery;
+/*
+ * Copyright © 2003, 2004, 2005, 2006, 2007 Oracle.  All rights reserved.
+ */
 
+package javax.xml.xquery;
 import java.sql.Connection;
 import java.util.Properties;
  

@@ -19,7 +19,7 @@ public class XQDataSourceTest extends XQJTestCase {
       my_xqc = xqds.getConnection();
       my_xqc.close();
     } catch (XQException e) {
-      junit.framework.Assert.fail("A-XQDS-1.1: Creating an XQConnection failed with message: " + e.getMessage());
+      fail("A-XQDS-1.1: Creating an XQConnection failed with message: " + e.getMessage());
     }
   }
   
@@ -49,7 +49,7 @@ public class XQDataSourceTest extends XQJTestCase {
         my_xqc = xqds.getConnection(uid, pwd);
         my_xqc.close();
       } catch (XQException e) {
-        junit.framework.Assert.fail("A-XQDS-3.1: Creating an XQConnection specifying a uid/pwd failed with message: " + e.getMessage());
+        fail("A-XQDS-3.1: Creating an XQConnection specifying a uid/pwd failed with message: " + e.getMessage());
       }     
     }
   }
@@ -58,25 +58,25 @@ public class XQDataSourceTest extends XQJTestCase {
     try {
       xqds.getLoginTimeout();
     } catch (XQException e) {
-      junit.framework.Assert.fail("A-XQDS-4.1: Retrieving the login timeout failed with message: " + e.getMessage());
+      fail("A-XQDS-4.1: Retrieving the login timeout failed with message: " + e.getMessage());
     }
   }
 
   public void testGetLogWriter() throws XQException {
     try {
       Writer log = xqds.getLogWriter();
-      junit.framework.Assert.assertNull("A-XQDS-5.2: The default log writer is null", log);
+      assertNull("A-XQDS-5.2: The default log writer is null", log);
     } catch (XQException e) {
-      junit.framework.Assert.fail("A-XQDS-5.1: Retrieving the log writer failed with message: " + e.getMessage());
+      fail("A-XQDS-5.1: Retrieving the log writer failed with message: " + e.getMessage());
     }
   }
 
   public void testGetSupportedPropertyNames() throws XQException {
     try {
       String propertyNames[] = xqds.getSupportedPropertyNames();
-      junit.framework.Assert.assertNotNull("A-XQDS-6.2: getSupportedPropertyNames returns a non null array of String objects", propertyNames);
+      assertNotNull("A-XQDS-6.2: getSupportedPropertyNames returns a non null array of String objects", propertyNames);
     } catch (Exception e) {
-      junit.framework.Assert.fail("A-XQDS-6.1: Retrieving the supported property names failed with message: " + e.getMessage());
+      fail("A-XQDS-6.1: Retrieving the supported property names failed with message: " + e.getMessage());
     }
   }
 
@@ -84,22 +84,22 @@ public class XQDataSourceTest extends XQJTestCase {
 
     try {
       xqds.setProperty(null, "foo");
-      junit.framework.Assert.fail("A-XQDS-7.1: setProperty() throws an XQException when a null value is specified for the name parameter.");
+      fail("A-XQDS-7.1: setProperty() throws an XQException when a null value is specified for the name parameter.");
     } catch (XQException e) {
       // Expect an XQException
     } catch (Exception other_e) {
-      junit.framework.Assert.fail("A-XQDS-7.1: setProperty() throws an XQException when a null value is specified for the name parameter.");
+      fail("A-XQDS-7.1: setProperty() throws an XQException when a null value is specified for the name parameter.");
     }
 
     try {
       // OK, we could check the supported properties to make sure we're using an unknown property.
       // But, let's get reasonable... Use a hard coded name.
       xqds.setProperty("the_property_that_not_known_to_any_implementation", "foo");
-      junit.framework.Assert.fail("A-XQDS-7.2: setProperty() throws an XQException when an invalid property name is specified.");
+      fail("A-XQDS-7.2: setProperty() throws an XQException when an invalid property name is specified.");
     } catch (XQException e) {
       // Expect an XQException
     } catch (Exception other_e) {
-      junit.framework.Assert.fail("A-XQDS-7.2: setProperty() throws an XQException when an invalid property name is specified.");
+      fail("A-XQDS-7.2: setProperty() throws an XQException when an invalid property name is specified.");
     }
   }
 
@@ -107,22 +107,22 @@ public class XQDataSourceTest extends XQJTestCase {
  
     try {
       xqds.getProperty(null);
-      junit.framework.Assert.fail("A-XQDS-8.1: getProperty() throws an XQException when a null value is specified for the name parameter.");
+      fail("A-XQDS-8.1: getProperty() throws an XQException when a null value is specified for the name parameter.");
     } catch (XQException e) {
       // Expect an XQException
     } catch (Exception other_e) {
-      junit.framework.Assert.fail("A-XQDS-8.1: getProperty() throws an XQException when a null value is specified for the name parameter.");
+      fail("A-XQDS-8.1: getProperty() throws an XQException when a null value is specified for the name parameter.");
     }
 
     try {
       // OK, we could check the supported properties to make sure we're using an unknown property.
       // But, let's get reasonable... Use a hard coded name.
       xqds.getProperty("the_property_that_not_known_to_any_implementation");
-      junit.framework.Assert.fail("A-XQDS-8.2: getProperty() throws an XQException when an invalid property name is specified.");
+      fail("A-XQDS-8.2: getProperty() throws an XQException when an invalid property name is specified.");
     } catch (XQException e) {
       // Expect an XQException
     } catch (Exception other_e) {
-      junit.framework.Assert.fail("A-XQDS-8.2: getProperty() throws an XQException when an invalid property name is specified.");
+      fail("A-XQDS-8.2: getProperty() throws an XQException when an invalid property name is specified.");
     }
     
     String propertyNames[] = xqds.getSupportedPropertyNames();
@@ -131,7 +131,7 @@ public class XQDataSourceTest extends XQJTestCase {
       try {
         xqds.getProperty(propertyNames[i]);
       } catch (XQException e) {
-        junit.framework.Assert.fail("A-XQDS-8.3: getProperty() failed for property '" + propertyNames[i] + "' with message: " + e.getMessage());
+        fail("A-XQDS-8.3: getProperty() failed for property '" + propertyNames[i] + "' with message: " + e.getMessage());
       }
     }
   }
@@ -140,11 +140,11 @@ public class XQDataSourceTest extends XQJTestCase {
 
     try {
       xqds.setProperties(null);
-      junit.framework.Assert.fail("A-XQDS-9.1: setProperties() throws an XQException when a null value is specified for the properties.");
+      fail("A-XQDS-9.1: setProperties() throws an XQException when a null value is specified for the properties.");
     } catch (XQException e) {
       // Expect an XQException
     } catch (Exception other_e) {
-      junit.framework.Assert.fail("A-XQDS-9.1: setProperties() throws an XQException when a null value is specified for the propertiesr.");
+      fail("A-XQDS-9.1: setProperties() throws an XQException when a null value is specified for the propertiesr.");
     }
 
     try {
@@ -153,11 +153,11 @@ public class XQDataSourceTest extends XQJTestCase {
       Properties p = new Properties();
       p.put("the_property_that_not_known_to_any_implementation", "foo");
       xqds.setProperties(p);
-      junit.framework.Assert.fail("A-XQDS-9.2: setProperties() throws an XQException when an invalid property name is specified.");
+      fail("A-XQDS-9.2: setProperties() throws an XQException when an invalid property name is specified.");
     } catch (XQException e) {
       // Expect an XQException
     } catch (Exception other_e) {
-      junit.framework.Assert.fail("A-XQDS-9.2: setProperties() throws an XQException when an invalid property name is specified.");
+      fail("A-XQDS-9.2: setProperties() throws an XQException when an invalid property name is specified.");
     }
   }
 
@@ -166,7 +166,7 @@ public class XQDataSourceTest extends XQJTestCase {
       int timeout = xqds.getLoginTimeout();
       xqds.setLoginTimeout(timeout);
     } catch (XQException e) {
-      junit.framework.Assert.fail("A-XQDS-10.1: setting the login timeout failed with message: " + e.getMessage());
+      fail("A-XQDS-10.1: setting the login timeout failed with message: " + e.getMessage());
     }
   }
 
@@ -174,9 +174,9 @@ public class XQDataSourceTest extends XQJTestCase {
     try {
       xqds.setLogWriter(new PrintWriter(new StringWriter()));
       Writer log = xqds.getLogWriter();
-      junit.framework.Assert.assertNotNull("A-XQDS-11.1: Successfully set the log writer.", log);
+      assertNotNull("A-XQDS-11.1: Successfully set the log writer.", log);
     } catch (XQException e) {
-      junit.framework.Assert.fail("A-XQDS-11.1: Setting the log writer failed with message: " + e.getMessage());
+      fail("A-XQDS-11.1: Setting the log writer failed with message: " + e.getMessage());
     }
   }
 }

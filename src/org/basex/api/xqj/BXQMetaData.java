@@ -104,7 +104,7 @@ public class BXQMetaData extends BXQAbstract implements XQMetaData {
 
   public boolean isSerializationFeatureSupported() throws XQException {
     check();
-    return false;
+    return true;
   }
 
   public boolean isStaticTypingExtensionsSupported() throws XQException {

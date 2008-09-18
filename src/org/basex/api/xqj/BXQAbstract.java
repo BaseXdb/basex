@@ -1,7 +1,6 @@
 package org.basex.api.xqj;
 
 import static org.basex.api.xqj.BXQText.*;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -91,10 +90,10 @@ abstract class BXQAbstract {
   protected Type check(final XQItemType it, final Type t) throws XQException {
     check();
     final BXQItemType bit = (BXQItemType) it;
-    
-    //if(it != null && !bit.type.instance(t))
-    if(it != null && !bit.type.instance(t) && !t.instance(bit.type)) {
-    //if(it != null && !t.instance(bit.type))
+
+    // [CG] Check type conversion
+    if(it != null && (t != Type.ATM || ((BXQItemType) it).type.node) &&
+        !bit.type.instance(t) && !t.instance(bit.type)) {
       throw new BXQException(WRONG, t, bit.type);
     }
     return it != null ? bit.type : t;

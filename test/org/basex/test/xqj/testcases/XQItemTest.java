@@ -19,7 +19,7 @@ public class XQItemTest extends XQJTestCase {
       xqi.close();
       xqi.close();
     } catch (XQException e) {
-      junit.framework.Assert.fail("A-XQE-2.1: closing item failed with message: " + e.getMessage());
+      fail("A-XQE-2.1: closing item failed with message: " + e.getMessage());
     }
     xqe.close(); 
   }
@@ -34,9 +34,9 @@ public class XQItemTest extends XQJTestCase {
     xqs.next();
     xqi = xqs.getItem();
     
-    junit.framework.Assert.assertEquals("A-XQE-1.1: isClosed() on open item", false, xqi.isClosed());
+    assertEquals("A-XQE-1.1: isClosed() on open item", false, xqi.isClosed());
     xqi.close();
-    junit.framework.Assert.assertEquals("A-XQE-1.2: isClosed() on closed item", true, xqi.isClosed());
+    assertEquals("A-XQE-1.2: isClosed() on closed item", true, xqi.isClosed());
     
     xqe.close(); 
   }

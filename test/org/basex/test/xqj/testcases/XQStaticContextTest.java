@@ -697,6 +697,6 @@ public class XQStaticContextTest extends XQJTestCase {
     int timeout = xqsc.getQueryTimeout();
     // expect to get back 10 seconds, or
     // the implementation's default if it doesn't support timeout and decided to ignore the request
-    assertTrue("A-XQSC-35.2: Successfully set the timeout.",timeout == 10 ||timeout == originalTimeout);
+	assertTrue("A-XQSC-35.2: Successfully set the timeout.",timeout == 10 ||timeout == originalTimeout);
   }
 }

@@ -4,9 +4,12 @@ import static org.basex.api.xqj.BXQText.*;
 import javax.xml.namespace.QName;
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQPreparedExpression;
+import javax.xml.xquery.XQQueryException;
 import javax.xml.xquery.XQResultSequence;
 import javax.xml.xquery.XQSequenceType;
 import javax.xml.xquery.XQStaticContext;
+
+import org.basex.query.QueryException;
 import org.basex.query.xquery.item.QNm;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.item.Uri;
@@ -29,10 +32,17 @@ public final class BXQPreparedExpression extends BXQDynamicContext
    * @param input query instance
    * @param sc static context
    * @param c closer
+   * @throws XQException exception
    */
   public BXQPreparedExpression(final String input, final BXQStaticContext sc,
-      final BXQConnection c) {
+      final BXQConnection c) throws XQException {
     super(input, sc, c);
+    
+    try {
+      query.create();
+    } catch(final QueryException ex) {
+      throw new XQQueryException(ex.getMessage());
+    }
   }
 
   public void cancel() throws XQException {

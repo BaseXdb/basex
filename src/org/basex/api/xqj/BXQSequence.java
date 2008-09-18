@@ -1,7 +1,6 @@
 package org.basex.api.xqj;
 
 import static org.basex.api.xqj.BXQText.*;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
@@ -12,6 +11,7 @@ import javax.xml.transform.Result;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xquery.XQConnection;
+import javax.xml.xquery.XQConstants;
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItem;
 import javax.xml.xquery.XQItemType;
@@ -37,11 +37,9 @@ import org.xml.sax.ContentHandler;
  */
 public final class BXQSequence extends BXQAbstract implements XQResultSequence {
   /** Result iterator. */
-  private final Iter result;
+  final Iter result;
   /** Query context. */
   private final XQContext ctx;
-  /** Static context. */
-  private final BXQStaticContext sc;
   /** Current result. */
   private BXQItem it;
   /** Iterator position. */
@@ -50,23 +48,26 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
   private final BXQConnection conn;
   /** Next flag. */
   private boolean next;
+  /** Forward flag. */
+  boolean scrollable;
 
   /**
    * Constructor.
    * @param item result item
    * @param context query context
    * @param c closer
-   * @param scontext static context
    * @param connection connection
+   * @throws XQException xquery exception
    */
   public BXQSequence(final Iter item, final XQContext context,
-      final BXQAbstract c, final BXQStaticContext scontext,
-      final BXQConnection connection) {
+      final BXQAbstract c, final BXQConnection connection) throws XQException {
     super(c);
     result = item;
     ctx = context;
-    sc = scontext;
     conn = connection;
+    //scrollable = result.size() != -1;
+    scrollable = connection == null || connection.getStaticContext().
+      getScrollability() == XQConstants.SCROLLTYPE_SCROLLABLE;
   }
 
   public XQConnection getConnection() throws XQException {
@@ -223,7 +224,7 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
 
   public boolean isScrollable() throws XQException {
     check();
-    return sc.scrollable;
+    return scrollable;
   }
 
   public boolean last() throws XQException {
@@ -296,8 +297,9 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
     } else if(result instanceof SAXResult) {
       // SAXResult.. serialize result to underlying parser
       final SAXSerializer ser = new SAXSerializer(null);
-      ContentHandler h = ((SAXResult) result).getHandler();
-      ser.setContentHandler(h);
+      final SAXResult sax = (SAXResult) result;
+      ser.setContentHandler(sax.getHandler());
+      ser.setLexicalHandler(sax.getLexicalHandler());
       while(next()) serialize(item().it, ctx, ser);
     } else {
       BaseX.notimplemented();
@@ -317,7 +319,7 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
   private BXQItem item() throws XQException {
     pos();
     if(!next) throw new BXQException(TWICE);
-    next = sc.scrollable;
+    next = scrollable;
     return it;
   }
 
@@ -336,7 +338,7 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
    */
   private SeqIter sequence() throws XQException {
     check();
-    if(!sc.scrollable) throw new BXQException(FORWARD);
+    if(!scrollable) throw new BXQException(FORWARD);
     return (SeqIter) result;
   }
 

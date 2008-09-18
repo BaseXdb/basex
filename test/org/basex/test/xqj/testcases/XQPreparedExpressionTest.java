@@ -209,7 +209,7 @@ public class XQPreparedExpressionTest extends XQJTestCase {
       xqtype = xqpe.getStaticVariableType(new QName("v"));
     } catch (XQException e) {
       fail("A-XQPE-6.4: getStaticVariableType() failed with message: " + e.getMessage());
-    }
+    }    
     assertNotNull("A-XQPE-6.4: getStaticVariableType() failed", xqtype);
     assertEquals("A-XQPE-6.4: getStaticResultType() failed", XQItemType.OCC_ZERO_OR_MORE, xqtype.getItemOccurrence());
     assertEquals("A-XQPE-6.4: getStaticResultType() failed", XQItemType.XQITEMKIND_ITEM, xqtype.getItemType().getItemKind());

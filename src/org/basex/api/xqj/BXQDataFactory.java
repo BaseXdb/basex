@@ -25,6 +25,7 @@ import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Itr;
 import org.basex.query.xquery.item.Str;
 import org.basex.query.xquery.item.Type;
+import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
 import org.basex.util.Token;
 import org.w3c.dom.Node;
@@ -298,16 +299,21 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
   }
 
   public XQSequence createSequence(final Iterator it) throws XQException {
-    check(it, Iterator.class);
     check();
+    check(it, Iterator.class);
     final SeqIter iter = new SeqIter();
     while(it.hasNext()) iter.add(createItem(it.next()));
-    return new BXQSequence(iter, null, this, ctx, null);
+    return new BXQSequence(iter, null, this, null);
   }
 
   public XQSequence createSequence(final XQSequence seq) throws XQException {
     check();
-    return seq;
+    try {
+      final Iter it = new SeqIter(((BXQSequence) seq).result);
+      return new BXQSequence(it, null, this, null);
+    } catch(org.basex.query.xquery.XQException ex) {
+      throw new BXQException(ex);
+    }
   }
 
   public XQSequenceType createSequenceType(final XQItemType it, final int occ)
