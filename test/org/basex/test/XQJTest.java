@@ -413,4 +413,55 @@ public class XQJTest extends TestCase {
     final XQSequence seq = conn.createSequence(result);
     seq.beforeFirst();
   }
+
+  /**
+   * Test.
+   * @throws Exception exception
+   */
+  public void test21() throws Exception {
+    final XQConnection conn = conn(drv);
+    final XQItemType elm = conn.createAtomicType(
+        XQItemType.XQBASETYPE_INTEGER);
+    elm.getItemOccurrence();
+  }
+
+  /**
+   * Test.
+   * @throws Exception exception
+   */
+  public void test22() throws Exception {
+    final XQConnection conn = conn(drv);
+    XQStaticContext xqsc = conn.getStaticContext();
+    xqsc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
+    final XQExpression expr = conn.createExpression();
+    final XQResultSequence seq = expr.executeQuery("1,2,3,4");
+    seq.afterLast();
+    seq.relative(-4);
+    seq.relative(-1);
+  }
+
+  /**
+   * Test.
+   * @throws Exception exception
+   */
+  public void test23() throws Exception {
+    final XQConnection conn = conn(drv);
+    final XQItemType expr = conn.createItemType();
+    try {
+      expr.getTypeName();
+      fail("Test should fail");
+    } catch(final Exception ex) {
+    }
+  }
+
+  /**
+   * Test.
+   * @throws Exception exception
+   */
+  public void test24() throws Exception {
+    final XQConnection conn = conn(drv);
+    final XQItemType type = conn.createAtomicType(
+        XQItemType.XQBASETYPE_STRING);
+    System.out.println(type.getTypeName());
+  }
 }

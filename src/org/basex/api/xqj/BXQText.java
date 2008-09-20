@@ -31,16 +31,14 @@ public interface BXQText {
   /** Error Message. */
   String NUM = "Number is no integer.";
   /** Error Message. */
-  String ELMATT = "Node must be element, attribute or atomic.";
-  /** Error Message. */
-  String ELMATT1 = "Node must be element, attribute or atomic.";
+  String TYPE = "Item has wrong type.";
   /** Error Message. */
   String ATT = "Node must not be UNTYPED or ANYTYPE.";
   /** Error Message. */
   String ELM = "Node must not be ELEMENT.";
   /** Error Message. */
   String PI = "Node must be a processing instruction.";
-  /** Error Message. */
+    /** Error Message. */
   String NOBASE = "Item has no base type.";
   /** Error Message. */
   String TWICE = "Current item has already been requested.";

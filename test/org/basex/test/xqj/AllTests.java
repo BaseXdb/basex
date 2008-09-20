@@ -8,10 +8,10 @@ import junit.textui.TestRunner;
 
 @SuppressWarnings("all")
 public class AllTests {
-
+  /*
   public static void main(String[] args) {
     TestRunner.run(suite());
-  }
+  }*/
   
   public static Test suite() {
     TestSuite suite = new TestSuite("JSR 225 (XQJ) Technology Compatibility Kit");

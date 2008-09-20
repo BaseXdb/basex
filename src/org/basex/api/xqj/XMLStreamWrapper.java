@@ -1,7 +1,6 @@
 package org.basex.api.xqj;
 
 import static org.basex.Text.*;
-import static org.basex.api.xqj.BXQText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import javax.xml.stream.XMLStreamConstants;
@@ -11,7 +10,7 @@ import org.basex.BaseX;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.core.ProgressException;
-import org.basex.io.IO;
+import org.basex.io.IOContent;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -36,7 +35,7 @@ public final class XMLStreamWrapper extends Parser {
    * @param sr stream reader
    */
   public XMLStreamWrapper(final XMLStreamReader sr) {
-    super(new IO(Token.EMPTY, TMP));
+    super(new IOContent(Token.EMPTY));
     reader = sr;
   }
 

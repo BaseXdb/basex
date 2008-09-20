@@ -36,18 +36,18 @@ public final class IterStreamReader implements XMLStreamReader {
   private static final Properties PROPS = new Properties();
   /** Namespaces references. */
   private final Namespaces ns = new Namespaces();
+  /** Current state. */
+  protected int kind = START_DOCUMENT;
   /** Result iterator. */
   private final Iter result;
+  /** Current item. */
+  protected Item item;
   /** Next flag. */
   private boolean next;
   /** Node iterator. */
   private NodeReader read;
   /** Attributes. */
   private NodeBuilder atts;
-  /** Current item. */
-  protected Item item;
-  /** Current state. */
-  protected int kind;
 
   /**
    * Constructor.

@@ -1093,7 +1093,7 @@ public interface XQDataFactory
    *  Example -
    *  <pre>
    *   XQConnection conn = ..; // An XQuery connection
-   *   XQItemType anypi = conn.createProcessingInstructionType(); 
+   *   XQItemType anypi = conn.createProcessingInstructionType();
    *   XQItemType foopi = conn.createProcessingInstructionType("foo-format");
    *
    *   XQExpression expr = conn.createExpression();

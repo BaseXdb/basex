@@ -152,7 +152,7 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
 
   public boolean instanceOf(XQItemType type) throws XQException {
     check();
-    return it.type.instance(((BXQItemType) type).type);
+    return it.type.instance(((BXQItemType) type).getType());
   }
 
   public void writeItem(OutputStream os, Properties props) throws XQException {

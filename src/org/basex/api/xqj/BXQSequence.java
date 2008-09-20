@@ -76,15 +76,13 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
   }
 
   public boolean absolute(final int p) throws XQException {
-    final SeqIter iter = sequence();
-    final int ps = p >= 0 ? p - 1 : iter.size + p;
-    cursor(iter, ps);
-    return ps >= 0 && ps < iter.size;
+    final SeqIter seq = sequence();
+    cursor(seq, p >= 0 ? p - 1 : seq.size + p);
+    return pos > 0;
   }
 
   public void afterLast() throws XQException {
-    final SeqIter iter = sequence();
-    cursor(iter, iter.size);
+    cursor(sequence(), Integer.MAX_VALUE);
   }
 
   public void beforeFirst() throws XQException {
@@ -204,7 +202,7 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
 
   public boolean isBeforeFirst() throws XQException {
     sequence();
-    return pos == 0;
+    return pos == 0 && pos < sequence().size;
   }
 
   public boolean isFirst() throws XQException {
@@ -213,8 +211,7 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
   }
 
   public boolean isLast() throws XQException {
-    final SeqIter iter = sequence();
-    return pos == iter.size;
+    return pos == sequence().size;
   }
 
   public boolean isOnItem() throws XQException {
@@ -229,7 +226,7 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
 
   public boolean last() throws XQException {
     final SeqIter seq = sequence();
-    return cursor(seq, seq.size);
+    return cursor(seq, seq.size - 1);
   }
 
   public boolean next() throws XQException {
@@ -249,11 +246,12 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
   }
 
   public boolean previous() throws XQException {
-    return cursor(sequence(), pos - 1);
+    return relative(-1);
   }
 
   public boolean relative(final int p) throws XQException {
-    return absolute(pos + p);
+    final int ps = getPosition();
+    return cursor(sequence(), p >= 0 ? ps + p - 1 : ps + p - 1);
   }
 
   public void writeItem(final OutputStream os, final Properties p)
@@ -350,8 +348,8 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
    * @throws XQException xquery exception
    */
   private boolean cursor(final SeqIter seq, final int p) throws XQException {
-    pos = p == -1 ? 0 : p > seq.size ? -1 : p;
+    pos = p < 0 ? 0 : p >= seq.size ? -1 : p;
     seq.pos = pos - 1;
-    return p == -1 ? true : next();
+    return p < 0 ? false : next();
   }
 }

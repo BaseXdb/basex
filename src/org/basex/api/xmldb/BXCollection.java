@@ -187,7 +187,7 @@ public class BXCollection implements Collection {
       new DropDB("tmp").execute(ctx);
       */
       
-      Data tmp = new DiskBuilder().build(new XMLParser(new IO(cont)), "tmp");
+      Data tmp = new DiskBuilder().build(new XMLParser(IO.get(cont)), "tmp");
       ctx.data().insert(ctx.data().size, -1, tmp);
       ctx.data().flush();
       DropDB.drop("tmp");

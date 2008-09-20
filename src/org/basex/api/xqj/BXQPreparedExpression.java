@@ -8,15 +8,11 @@ import javax.xml.xquery.XQQueryException;
 import javax.xml.xquery.XQResultSequence;
 import javax.xml.xquery.XQSequenceType;
 import javax.xml.xquery.XQStaticContext;
-
 import org.basex.query.QueryException;
 import org.basex.query.xquery.item.QNm;
-import org.basex.query.xquery.item.Type;
-import org.basex.query.xquery.item.Uri;
 import org.basex.query.xquery.util.Var;
 import org.basex.query.xquery.util.Vars;
 import org.basex.util.Array;
-import org.basex.util.Token;
 
 /**
  * Java XQuery API - Prepared Expression.
@@ -56,17 +52,18 @@ public final class BXQPreparedExpression extends BXQDynamicContext
 
   public QName[] getAllExternalVariables() throws XQException {
     check();
-    QName[] names = new QName[0];
-    for(Var v : getVariables()) {
-      if(v.expr != null) names = Array.add(names, v.name.java());
-    }
+    final Var[] vars = getVariables();
+    final QName[] names = new QName[vars.length];
+    for(int v = 0; v < vars.length; v++) names[v] = vars[v].name.java();
     return names;
   }
 
   public QName[] getAllUnboundExternalVariables() throws XQException {
     check();
     QName[] names = new QName[0];
-    for(Var v : getVariables()) names = Array.add(names, v.name.java());
+    for(final Var v : getVariables()) {
+      if(v.expr == null) names = Array.add(names, v.name.java());
+    }
     return names;
   }
 
@@ -83,7 +80,7 @@ public final class BXQPreparedExpression extends BXQDynamicContext
 
   public XQSequenceType getStaticResultType() throws XQException {
     check();
-    return new BXQItemType(Type.ITEM, XQSequenceType.OCC_ZERO_OR_MORE);
+    return BXQItemType.DEFAULT;
   }
 
   public XQSequenceType getStaticVariableType(final QName qn) throws XQException {
@@ -92,12 +89,10 @@ public final class BXQPreparedExpression extends BXQDynamicContext
     String name = qn.getLocalPart();
     final String pre = qn.getPrefix();
     if(pre.length() != 0) name = pre + ":" + name; 
-    final QNm nm = new QNm(Token.token(name),
-        Uri.uri(Token.token(qn.getNamespaceURI())));
+    final QNm nm = new QNm(name, qn.getNamespaceURI());
     final Var var = query.ctx.vars.get(new Var(nm));
     if(var == null) throw new BXQException(VAR, nm);
-
     return var.type != null ? new BXQItemType(var.type.type) :
-      new BXQItemType(Type.ITEM, XQSequenceType.OCC_ZERO_OR_MORE);
+      BXQItemType.DEFAULT;
   }
 }

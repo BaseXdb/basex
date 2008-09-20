@@ -8,22 +8,26 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.Source;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItemType;
-import org.basex.build.xml.SAXWrapper;
+import org.basex.BaseX;
 import org.basex.core.proc.CreateDB;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.io.IO;
+import org.basex.io.IOContent;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.func.FunJava;
 import org.basex.query.xquery.item.DNode;
 import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Jav;
 import org.basex.query.xquery.item.Str;
 import org.basex.query.xquery.item.Type;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
+import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
 /**
@@ -89,14 +93,14 @@ abstract class BXQAbstract {
    */
   protected Type check(final XQItemType it, final Type t) throws XQException {
     check();
-    final BXQItemType bit = (BXQItemType) it;
+    final Type type = it != null ? ((BXQItemType) it).getType() : null;
 
     // [CG] Check type conversion
-    if(it != null && (t != Type.ATM || ((BXQItemType) it).type.node) &&
-        !bit.type.instance(t) && !t.instance(bit.type)) {
-      throw new BXQException(WRONG, t, bit.type);
+    if(it != null && (t != Type.ATM || type.node) &&
+        !type.instance(t) && !t.instance(type)) {
+      throw new BXQException(WRONG, t, type);
     }
-    return it != null ? bit.type : t;
+    return it != null ? type : t;
   }
 
   /**
@@ -105,14 +109,13 @@ abstract class BXQAbstract {
    * @return resulting item
    * @throws XQException exception
    */
-  protected static final Item createItem(Object v) throws XQException {
+  protected final Item createItem(Object v) throws XQException {
     try {
-      final Type t = FunJava.jType(v.getClass());
-      if(t != Type.JAVA) return t.e(new Jav(v), null);
+      final Item str = Str.get(Token.token(v instanceof BXQItem ?
+          ((BXQItem) v).getAtomicValue() : v.toString()));
       
-      final String s = v instanceof BXQItem ?
-          ((BXQItem) v).getAtomicValue() : v.toString();
-      return Str.get(Token.token(s));
+      final Type t = FunJava.jType(v);
+      return t != null ? t.e(str, null) : str;
     } catch(org.basex.query.xquery.XQException ex) {
       throw new BXQException(ex);
     }
@@ -124,15 +127,15 @@ abstract class BXQAbstract {
    * @return string
    * @throws XQException exception
    */
-  protected static final byte[] content(final Reader r) throws XQException {
+  protected final byte[] content(final Reader r) throws XQException {
     check(r, XMLReader.class);
     try {
-      final TokenBuilder sb = new TokenBuilder();
+      final TokenBuilder tb = new TokenBuilder();
       final BufferedReader br = new BufferedReader(r);
       int i = 0;
-      while((i = br.read()) != -1) sb.add((char) i);
+      while((i = br.read()) != -1) tb.add((char) i);
       br.close();
-      return sb.finish();
+      return tb.finish();
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
@@ -144,7 +147,7 @@ abstract class BXQAbstract {
    * @return string
    * @throws XQException exception
    */
-  protected static final byte[] content(final InputStream is) throws XQException {
+  protected final byte[] content(final InputStream is) throws XQException {
     check(is, InputStream.class);
     try {
       final ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -157,15 +160,54 @@ abstract class BXQAbstract {
       throw new BXQException(ex);
     }
   }
-  
+
   /**
    * Creates a database instance from the specified byte array.
-   * @param val XML contents
+   * @param s input source
+   * @param it item type
    * @return document node
    * @throws XQException exception
    */
-  protected static final DNode createDB(final byte[] val) throws XQException {
-    return checkDB(CreateDB.xml(new IO(val, TMP), TMP));
+  protected final DNode createDB(final Source s, final XQItemType it)
+      throws XQException {
+
+    check(s, Source.class);
+    check(it, Type.DOC);
+    if(s instanceof StreamSource) {
+      final StreamSource ss = (StreamSource) s;
+      final InputStream is = ss.getInputStream();
+      if(is != null) return createDB(is);
+      final Reader r = ss.getReader();
+      if(r != null) return createDB(r);
+      return createDB(new IOContent(Token.token(ss.getSystemId())));
+    }
+    BaseX.notimplemented();
+    return null;
+  }
+  
+  /**
+   * Creates a database instance from the specified byte array.
+   * @param is input stream
+   * @return document node
+   * @throws XQException exception
+   */
+  protected final DNode createDB(final InputStream is) throws XQException {
+    check();
+    check(is, InputStream.class);
+    return checkDB(CreateDB.xml(new SAXSource(new InputSource(is))));
+  }
+  
+  /**
+   * Creates a database instance from the specified byte array.
+   * @param r reader
+   * @return document node
+   * @throws XQException exception
+   */
+  protected final DNode createDB(final Reader r) 
+      throws XQException {
+    check();
+    check(r, Reader.class);
+    return checkDB(CreateDB.xml(new SAXSource(new InputSource(r))));
   }
   
   /**
@@ -174,10 +216,10 @@ abstract class BXQAbstract {
    * @return document node
    * @throws XQException exception
    */
-  protected static final DNode createDB(final XMLReader r) throws XQException {
+  protected final DNode createDB(final XMLReader r) throws XQException {
+    check();
     check(r, XMLReader.class);
-    final IO tmp = new IO(Token.EMPTY, TMP);
-    return checkDB(CreateDB.xml(new SAXWrapper(tmp, r), TMP));
+    return checkDB(CreateDB.xml(new SAXSource(r, null)));
   }
   
   /**
@@ -186,10 +228,21 @@ abstract class BXQAbstract {
    * @return document node
    * @throws XQException exception
    */
-  protected static final DNode createDB(final XMLStreamReader sr)
+  protected final DNode createDB(final XMLStreamReader sr)
       throws XQException {
+    check();
     check(sr, XMLStreamReader.class);
-    return checkDB(CreateDB.xml(new XMLStreamWrapper(sr), TMP));
+    return checkDB(CreateDB.xml(new XMLStreamWrapper(sr), "tmp"));
+  }
+
+  /**
+   * Creates a database instance from the specified byte array.
+   * @param io io reference
+   * @return document node
+   * @throws XQException exception
+   */
+  protected final DNode createDB(final IO io) throws XQException {
+    return checkDB(CreateDB.xml(io, TMP));
   }
   
   /**
@@ -198,7 +251,7 @@ abstract class BXQAbstract {
    * @return document node
    * @throws XQException exception
    */
-  private static DNode checkDB(final Data d) throws XQException {
+  private DNode checkDB(final Data d) throws XQException {
     check(d, Data.class);
     return new DNode(d, 0, null, Type.DOC);
   }

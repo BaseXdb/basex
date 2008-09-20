@@ -1,6 +1,7 @@
 package org.basex.api.xqj;
 
 import static org.basex.api.xqj.BXQText.*;
+import static org.basex.util.Token.*;
 import static javax.xml.xquery.XQConstants.*;
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItemType;
@@ -8,7 +9,6 @@ import javax.xml.xquery.XQStaticContext;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.QNm;
 import org.basex.query.xquery.item.Uri;
-import org.basex.util.Token;
 
 /**
  * Java XQuery API - Static Context.
@@ -36,15 +36,14 @@ public class BXQStaticContext implements XQStaticContext {
     try {
       BXQAbstract.check(prefix, String.class);
       BXQAbstract.check(uri, String.class);
-      ctx.ns.index(new QNm(Token.token(prefix),
-          Uri.uri(Token.token(uri))), true);
+      ctx.ns.index(new QNm(prefix, uri), true);
     } catch(final org.basex.query.xquery.XQException ex) {
       throw new BXQException(ex);
     }
   }
 
   public String getBaseURI() {
-    return Token.string(ctx.baseURI.str());
+    return string(ctx.baseURI.str());
   }
 
   public int getBindingMode() {
@@ -74,15 +73,15 @@ public class BXQStaticContext implements XQStaticContext {
   }
 
   public String getDefaultCollation() {
-    return Token.string(ctx.collation.str());
+    return string(ctx.collation.str());
   }
 
   public String getDefaultElementTypeNamespace() {
-    return Token.string(ctx.nsElem.str());
+    return string(ctx.nsElem.str());
   }
 
   public String getDefaultFunctionNamespace() {
-    return Token.string(ctx.nsFunc.str());
+    return string(ctx.nsFunc.str());
   }
 
   public int getDefaultOrderForEmptySequences() {
@@ -98,14 +97,14 @@ public class BXQStaticContext implements XQStaticContext {
   public String[] getNamespacePrefixes() {
     final String[] pre = new String[ctx.ns.size];
     for(int p = 0; p < ctx.ns.size; p++) 
-      pre[p] = Token.string(ctx.ns.names[p].ln());
+      pre[p] = string(ctx.ns.names[p].ln());
     return pre;
   }
 
   public String getNamespaceURI(String prefix) throws XQException {
     BXQAbstract.check(prefix, String.class);
-    final Uri uri = ctx.ns.find(Token.token(prefix));
-    if(uri != null) return Token.string(uri.str());
+    final Uri uri = ctx.ns.find(token(prefix));
+    if(uri != null) return string(uri.str());
     throw new BXQException(PRE, prefix);  }
 
   public int getOrderingMode() {
@@ -126,7 +125,7 @@ public class BXQStaticContext implements XQStaticContext {
 
   public void setBaseURI(String baseUri) throws XQException {
     BXQAbstract.check(baseUri, String.class);
-    ctx.baseURI = Uri.uri(Token.token(baseUri));
+    ctx.baseURI = Uri.uri(token(baseUri));
   }
 
   public void setBindingMode(int mode) throws BXQException {
@@ -156,17 +155,17 @@ public class BXQStaticContext implements XQStaticContext {
 
   public void setDefaultCollation(String uri) throws XQException {
     BXQAbstract.check(uri, String.class);
-    ctx.collation = Uri.uri(Token.token(uri));
+    ctx.collation = Uri.uri(token(uri));
   }
 
   public void setDefaultElementTypeNamespace(String uri) throws XQException {
     BXQAbstract.check(uri, String.class);
-    ctx.nsElem = Uri.uri(Token.token(uri));
+    ctx.nsElem = Uri.uri(token(uri));
   }
 
   public void setDefaultFunctionNamespace(String uri) throws XQException {
     BXQAbstract.check(uri, String.class);
-    ctx.nsFunc = Uri.uri(Token.token(uri));
+    ctx.nsFunc = Uri.uri(token(uri));
   }
 
   public void setDefaultOrderForEmptySequences(int mode) throws BXQException {

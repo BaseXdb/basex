@@ -10,14 +10,13 @@ import java.util.Iterator;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
 import javax.xml.xquery.XQDataFactory;
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItem;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQSequence;
 import javax.xml.xquery.XQSequenceType;
-import org.basex.BaseX;
+import org.basex.io.IOContent;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Dbl;
 import org.basex.query.xquery.item.Flt;
@@ -25,7 +24,6 @@ import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Itr;
 import org.basex.query.xquery.item.Str;
 import org.basex.query.xquery.item.Type;
-import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
 import org.basex.util.Token;
 import org.w3c.dom.Node;
@@ -50,29 +48,29 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     ctx = new BXQStaticContext();
   }
 
-  public BXQItemType createAtomicType(final int it, final QName qn,
+  public BXQItemType createAtomicType(final int b, final QName qn,
       final URI uri) throws XQException {
     check();
-    return new BXQItemType(it);
+    return new BXQItemType(b, qn);
   }
 
-  public BXQItemType createAtomicType(final int it) throws XQException {
+  public BXQItemType createAtomicType(final int b) throws XQException {
     check();
-    return new BXQItemType(it);
+    return new BXQItemType(b, null);
   }
 
   public BXQItemType createAttributeType(final QName qn, final int it,
       final QName qn2, final URI uri) throws XQException {
     check();
     checkAttr(it);
-    return new BXQItemType(Type.ATT, qn.getLocalPart(), it);
+    return new BXQItemType(Type.ATT, qn, it);
   }
 
   public BXQItemType createAttributeType(final QName qn, final int it)
       throws XQException {
     check();
     checkAttr(it);
-    return new BXQItemType(Type.ATT, qn.getLocalPart(), it);
+    return new BXQItemType(Type.ATT, qn, it);
   }
   
   private void checkAttr(final int it) throws XQException {
@@ -92,7 +90,8 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     check(it, XQItemType.class);
     if(it.getItemKind() != XQItemType.XQITEMKIND_ELEMENT)
       throw new BXQException(ELM);
-    return new BXQItemType(Type.ELM);
+    
+    return new BXQItemType(Type.DEL, it.getNodeName(), it.getBaseType());
   }
 
   public BXQItemType createDocumentSchemaElementType(final XQItemType it)
@@ -101,7 +100,7 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     check(it, XQItemType.class);
     if(it.getItemKind() != XQItemType.XQITEMKIND_SCHEMA_ELEMENT)
       throw new BXQException(ELM);
-    return new BXQItemType(Type.ELM);
+    return new BXQItemType(Type.DEL, it.getNodeName(), it.getBaseType());
   }
   
   public BXQItemType createDocumentType() throws XQException {
@@ -112,20 +111,19 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
   public BXQItemType createElementType(final QName qn, final int it,
       final QName qn2, final URI uri, final boolean arg4) throws XQException {
     check();
-    return new BXQItemType(Type.ELM, qn.getLocalPart(), it);
+    return new BXQItemType(Type.ELM, qn, it);
   }
 
   public BXQItemType createElementType(final QName qn, final int it)
       throws XQException {
-    check();
-    return new BXQItemType(Type.ELM, qn.getLocalPart(), it);
+    return createElementType(qn, it, null, null, false);
   }
 
   public XQItem createItem(final XQItem v) throws XQException {
     check();
     check(v, XQItem.class);
     try {
-      final Type type = ((BXQItemType) v.getItemType()).type;
+      final Type type = ((BXQItemType) v.getItemType()).getType();
       return new BXQItem(type.e(((BXQItem) v).it, null));
     } catch(org.basex.query.xquery.XQException ex) {
       throw new BXQException(ex);
@@ -136,7 +134,8 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
       final XQItemType it) throws XQException {
     check(v, String.class);
     try {
-      return new BXQItem(check(it, Type.STR).e(Str.get(Token.token(v)), null));
+      final Type type = check(it, Type.STR);
+      return new BXQItem(type.e(Str.get(Token.token(v)), null));
     } catch(org.basex.query.xquery.XQException ex) {
       throw new BXQException(ex);
     }
@@ -155,56 +154,36 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
 
   public XQItem createItemFromDocument(final InputStream is,
       final String base, final XQItemType it) throws XQException {
-    return createItemFromDocument(content(is), it);
+    check(it, Type.DOC);
+    return new BXQItem(createDB(is));
   }
 
   public XQItem createItemFromDocument(final Reader r, final String base,
       final XQItemType it) throws XQException {
-    return createItemFromDocument(content(r), it);
+    check(it, Type.DOC);
+    return new BXQItem(createDB(r));
   }
 
   public XQItem createItemFromDocument(final Source s, final XQItemType it)
       throws XQException {
-    
-    if(s instanceof StreamSource) {
-      final StreamSource ss = (StreamSource) s;
-      final InputStream is = ss.getInputStream();
-      if(is != null) return createItemFromDocument(is, null, it);
-      final Reader r = ss.getReader();
-      if(r != null) return createItemFromDocument(r, null, it);
-      return createItemFromDocument(ss.getSystemId(), null, it);
-    }
-    check();
-    check(it, Type.DOC);
-    check(s, Source.class);
-    BaseX.notimplemented();
-    return null;
+    return new BXQItem(createDB(s, it));
   }
 
   public XQItem createItemFromDocument(final String v, final String base,
       final XQItemType it) throws XQException {
     check(v, String.class);
-    return createItemFromDocument(Token.token(v), it);
-  }
-
-  private XQItem createItemFromDocument(final byte[] v,
-      final XQItemType it) throws XQException {
-    check();
     check(it, Type.DOC);
-    check(v, String.class);
-    return new BXQItem(createDB(v));
+    return new BXQItem(createDB(new IOContent(Token.token(v))));
   }
 
   public XQItem createItemFromDocument(final XMLReader r, final XQItemType it)
       throws XQException {
-    check();
     check(it, Type.DOC);
     return new BXQItem(createDB(r));
   }
 
   public XQItem createItemFromDocument(final XMLStreamReader sr,
       final XQItemType it) throws XQException {
-    check();
     check(it, Type.DOC);
     return new BXQItem(createDB(sr));
   }
@@ -243,7 +222,7 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
-    return new BXQItem(createDB(ba.toByteArray()));
+    return new BXQItem(createDB(new IOContent(ba.toByteArray())));
   }
 
   public XQItem createItemFromObject(final Object v, final XQItemType it)
@@ -282,20 +261,21 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
   public BXQItemType createProcessingInstructionType(final String nm)
       throws XQException {
     check();
-    return new BXQItemType(Type.PI, nm, -1);
+    final QName name = nm == null ? null : new QName(nm);
+    return new BXQItemType(Type.PI, name, -1);
   }
 
   public BXQItemType createSchemaAttributeType(final QName qn, final int it,
       final URI uri) throws XQException {
     check();
     checkAttr(it);
-    return new BXQItemType(Type.ATT, qn.getLocalPart(), it);
+    return new BXQItemType(Type.ATT, qn, it);
   }
 
-  public BXQItemType createSchemaElementType(final QName qn, final int arg1,
+  public BXQItemType createSchemaElementType(final QName qn, final int it,
       final URI uri) throws XQException {
     check();
-    return new BXQItemType(Type.ELM);
+    return new BXQItemType(Type.ELM, qn, it);
   }
 
   public XQSequence createSequence(final Iterator it) throws XQException {
@@ -309,7 +289,7 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
   public XQSequence createSequence(final XQSequence seq) throws XQException {
     check();
     try {
-      final Iter it = new SeqIter(((BXQSequence) seq).result);
+      final SeqIter it = new SeqIter(((BXQSequence) seq).result);
       return new BXQSequence(it, null, this, null);
     } catch(org.basex.query.xquery.XQException ex) {
       throw new BXQException(ex);
@@ -323,7 +303,9 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     if(occ == XQSequenceType.OCC_EMPTY && it != null ||
         occ == XQSequenceType.OCC_EXACTLY_ONE && it == null)
       throw new BXQException(OCC);
-    return new BXQItemType(Type.SEQ, null, it.getBaseType(), true, occ);
+    final Type type = ((BXQItemType) it).getType();
+    final QName name = type.node ? it.getNodeName() : null;
+    return new BXQItemType(type, name, it.getBaseType(), occ);
   }
 
   public BXQItemType createTextType() throws XQException {

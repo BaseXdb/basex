@@ -17,6 +17,7 @@ import javax.xml.xquery.XQResultSequence;
 import javax.xml.xquery.XQSequence;
 import org.basex.BaseX;
 import org.basex.core.ProgressException;
+import org.basex.io.IOContent;
 import org.basex.query.QueryException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQueryProcessor;
@@ -80,36 +81,32 @@ abstract class BXQDynamicContext extends BXQAbstract implements XQDynamicContext
 
   public void bindDocument(final QName qn, final InputStream is,
       final String base, final XQItemType it) throws XQException {
-    bind(qn, createDB(content(is)), it);
+    bind(qn, createDB(is), it);
   }
 
   public void bindDocument(final QName qn, final Reader r, final String base,
       final XQItemType it) throws XQException {
-    bind(qn, createDB(content(r)), it);
+    bind(qn, createDB(r), it);
   }
 
-  public void bindDocument(final QName qn, final Source is,
-      final XQItemType it) {
-    
-    // support all kinds of input sources...
-    BaseX.notimplemented();
+  public void bindDocument(final QName qn, final Source s,
+      final XQItemType it) throws XQException {
+    bind(qn, createDB(s, it), it);
   }
 
   public void bindDocument(final QName qn, final String val, final String base,
       final XQItemType it) throws XQException {
     check(val, String.class);
-    bind(qn, createDB(Token.token(val)), it);
+    bind(qn, createDB(new IOContent(Token.token(val))), it);
   }
 
   public void bindDocument(final QName qn, final XMLReader r,
       final XQItemType it) throws XQException {
-    check(r, XMLReader.class);
     bind(qn, createDB(r), it);
   }
 
   public void bindDocument(final QName qn, final XMLStreamReader sr,
       final XQItemType it) throws XQException {
-    check(sr, XMLStreamReader.class);
     bind(qn, createDB(sr), it);
   }
 
@@ -201,7 +198,7 @@ abstract class BXQDynamicContext extends BXQAbstract implements XQDynamicContext
     }
     
     try {
-      v.item(t == null || ((BXQItemType) t).type == it.type ? it :
+      v.item(t == null || ((BXQItemType) t).getType() == it.type ? it :
         check(t, it.type).e(it, null));
     } catch(final QueryException ex) {
       throw new BXQException(ex);
