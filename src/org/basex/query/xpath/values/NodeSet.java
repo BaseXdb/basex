@@ -55,19 +55,6 @@ public class NodeSet extends Item {
    * Constructor, creating a new node set from the specified node ids.
    * @param ids node ids
    * @param ctx query context
-   * @param ftIds ids and pos values for full-text queries
-   */
-  public NodeSet(final int[] ids, final XPContext ctx, final int[][] ftIds) {
-    data = ctx.local.data;
-    nodes = ids;
-    size = ids.length;
-    ftidpos = ftIds;
-  }
-
-  /**
-   * Constructor, creating a new node set from the specified node ids.
-   * @param ids node ids
-   * @param ctx query context
    * @param ftIds ids and pos values for fulltext queries
    * @param ftPointer Pointer for ftIds
    */
@@ -79,7 +66,6 @@ public class NodeSet extends Item {
     ftidpos = ftIds;
     ftpointer = ftPointer;
   }
-
   
   /**
    * Constructor, creating an empty node set.

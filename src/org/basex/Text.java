@@ -539,7 +539,11 @@ public interface Text {
   /** Command Info. */
   String GUISHOWTABLE = lang("c_showtable");
   /** Command Info. */
+  String GUISHOWPLOT = lang("c_showplot");
+  /** Command Info. */
   String GUISHOWTABLETT = lang("c_showtablett");
+  /** Command Info. */
+  String GUISHOWPLOTTT = lang("c_showplottt");
   /** Command Info. */
   String GUISHOWTEXT = lang("c_showtext");
   /** Command Info. */

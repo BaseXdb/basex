@@ -52,12 +52,8 @@ public abstract class Data  {
   protected Index txtindex;
   /** Attribute value index. */
   protected Index atvindex;
-  /** Word index. */
-  protected Index wrdindex;
   /** Fulltext index instance. **/
   protected Index ftxindex;
-  /** Fuzzy index instance. **/
-  protected Index fuzzyindex;
 
   /** File system indicator. */
   public boolean deepfs;

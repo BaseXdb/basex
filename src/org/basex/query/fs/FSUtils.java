@@ -132,19 +132,6 @@ public final class FSUtils {
   }
   
   /**
-   * Sets the name of a file.
-   * @param data data reference
-   * @param pre pre value
-   * @param name to set
-   */
-  public static void setName(final Data data, final int pre,
-      final byte[] name) {
-    data.update(pre + 1, NAME, name);
-    data.flush();
-  }
-  
-  
-  /**
    * Returns the size of a file.
    * @param data data reference
    * @param pre pre value
@@ -198,18 +185,6 @@ public final class FSUtils {
    */
   public static byte[] getSuffix(final Data data, final int pre) {
     return getAttr(data, pre, data.suffixID);
-  }
-  
-  /**
-   * Sets the suffix of a file.
-   * @param data data reference
-   * @param pre pre value
-   * @param suffix to set
-   */
-  public static void setSuffix(final Data data, final int pre,
-      final byte[] suffix) {
-    data.update(pre + 2, SUFFIX, suffix);
-    data.flush();
   }
 
   /**

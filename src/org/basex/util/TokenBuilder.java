@@ -93,18 +93,6 @@ public final class TokenBuilder {
   }
 
   /**
-   * Inserts a single character at the specified position.
-   * Use it carefully; might get pretty slow.
-   * @param b the character to be added
-   */
-  public void insert(final byte b) {
-    if(size == chars.length) chars = Array.extend(chars);
-    Array.move(chars, 0, 1, size);
-    chars[0] = b;
-    size++;
-  }
-
-  /**
    * Adds an integer to the token.
    * @param i the integer to be added
    */
@@ -196,15 +184,6 @@ public final class TokenBuilder {
     while(++s < size && ws(chars[s]));
     if(s != 0 && s != size) Array.move(chars, s, -s, size - s);
     size -= s;
-  }
-
-  /**
-   * Replaces a character at the specified position.
-   * @param b the character to be set
-   * @param pos position
-   */
-  public void replace(final byte b, final int pos) {
-    chars[pos] = b;
   }
 
   /**

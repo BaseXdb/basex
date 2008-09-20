@@ -116,39 +116,6 @@ public class IndexArrayIterator extends IndexIterator {
   }
 
   /**
-   * Getter FTTokenizer.
-   * @return FTTokenizer
-   */
-  public FTTokenizer[] getToken() {
-    return tok;
-  }
-
-  /**
-   * Get number of tokens.
-   * @return number of tokens
-   */
-  public int getTokenNum() {
-    return toknum;
-  }
-
-  /**
-   * Get fulltext data.
-   * @return int [][] fulltext data
-   */
-  public int[][] getFTData() {
-    return ftdata;
-  }
-
-  /**
-   * Get specified pre value.
-   * @param p int pointer
-   * @return pre value
-   */
-  public int getPre(final int p) {
-    return pres != null ? pres[p] : ftdata[p][0];
-  }
-
-  /**
    * Converts the ftdata in the style:.
    * pre1, pos0, ..., posn, pre2, ....
    *

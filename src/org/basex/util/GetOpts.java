@@ -9,6 +9,12 @@ package org.basex.util;
  * @version 0.1
  */
 public final class GetOpts {
+  /** Arguments found. */
+  private final StringList foundArgs;
+  /** Arguments passed to the program. */
+  private final String[] args;
+  /** The valid short options. */
+  private final String optString;
   /** Argument of an option is stored here. */
   private String optarg;
   /** The path expression is stored here. */
@@ -17,19 +23,9 @@ public final class GetOpts {
   private int optindex;
   /** Index of option to be checked. */
   private int multipleOptIndex;
-  /** The valid short options. */
-  private String optString;
-  /** Arguments found. */
-  private StringList foundArgs;
-  /** Arguments passed to the program. */
-  private String[] args;
   /** The variable optopt saves the last known option
    * character returned by getopt(). */
-  private int optopt = 0;
-  /** optreset must be set to 1 before the second and each
-   * additional set of calls to getopt(), and the variable
-   * optindex must be reinitialized. */
-  private final int optReset = 1;
+  private int optopt;
 
   /**
    * Construct a basic Getopt instance with the given input data.
@@ -42,39 +38,8 @@ public final class GetOpts {
   public GetOpts(final String arguments, final String options) {
     args = arguments.split(" ");
     optString = options;
-    optindex = 0;
-    optarg = null;
-    path = null;
     multipleOptIndex = 1;
     foundArgs = new StringList();
-  }
-  /**
-   * Construct a basic Getopt instance with the given input data.
-   *
-   * @param arguments The String passed from the command line
-   * @param options A String containing a description of the
-   *                  valid options
-   * @param firstOptionIndex start scanning at this index
-   */
-  public GetOpts(final String arguments, final String options,
-      final int firstOptionIndex) {
-    args = arguments.split(" ");
-    optString = options;
-    optindex = firstOptionIndex;
-    optarg = null;
-    path = null;
-    multipleOptIndex = 1;
-    foundArgs = new StringList();
-  }
-
-  /**
-   * Getter of the index.
-   *
-   * @return optindex - Index of the next option to be checked. Returns
-   *                    -1 if it is at the end of the optString.
-   */
-  public int getOptind() {
-    return optindex;
   }
 
   /**
@@ -204,15 +169,5 @@ public final class GetOpts {
     // return next option
     ++optindex;
     return getopt();
-  }
-
-  /**
-   * In order to use getopt() to evaluate multiple sets of arguments, or to
-   * evaluate a single set of arguments multiple times, the variable optreset
-   * must be set to 1 before the second and each additional set of calls to
-   * getopt(), and the variable optindex must be reinitialized.
-   */
-  public void reset() {
-    optindex = optReset;
   }
 }

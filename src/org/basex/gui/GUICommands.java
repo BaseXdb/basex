@@ -566,6 +566,24 @@ public enum GUICommands implements GUICommand {
     public boolean checked() { return true; }
   },
 
+  /** Show Plot View. */
+  SHOWPLOT(true, GUISHOWPLOT, "ctrl 5", GUISHOWPLOTTT) {
+    @Override
+    public void execute() {
+      GUIProp.showplot ^= true;
+      GUI.get().layoutViews();
+    }
+
+    @Override
+    public void refresh(final AbstractButton button) {
+      super.refresh(button);
+      BaseXLayout.select(button, GUIProp.showplot);
+    }
+
+    @Override
+    public boolean checked() { return true; }
+  },
+
   /** Fullscreen mode. */
   FULL(false, GUIFULL, "F11", GUIFULLTT) {
     @Override

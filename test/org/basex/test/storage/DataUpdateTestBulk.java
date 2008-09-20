@@ -57,7 +57,7 @@ public final class DataUpdateTestBulk {
     new CreateDB(TESTFILE, DBNAME).execute(CONTEXT);
     data = CONTEXT.data();
     size = data.size;
-    final IO file = new IO(INSERTFILE);
+    final IO file = IO.get(INSERTFILE);
     insertData = new MemBuilder().build(new XMLParser(file), INSERTFILE);
   }
 

@@ -26,15 +26,6 @@ public final class MemValues extends Index {
   }
 
   /**
-   * Returns the id for the specified key.
-   * @param key key
-   * @return id (negative if value wasn't found)
-   */
-  public int get(final byte[] key) {
-    return -index.id(key);
-  }
-
-  /**
    * Returns the token for the specified id.
    * @param id id
    * @return token

@@ -521,7 +521,7 @@ public final class XQParser extends QueryParser {
   private void module(final String f, final Uri u) throws XQException {
     if(ctx.modLoaded.contains(f)) return;
     // check specified path and path relative to query file
-    IO fl = new IO(f);
+    IO fl = IO.get(f);
     if(!fl.exists() && file != null) fl = file.merge(fl);
 
     String query = null;
@@ -2179,7 +2179,7 @@ public final class XQParser extends QueryParser {
             } while(consumeWS2(COMMA));
             check(PAR2);
           } else if(consumeWS2(AT)) {
-            IO fl = new IO(string(stringLiteral()));
+            IO fl = IO.get(string(stringLiteral()));
             if(!fl.exists() && ctx.file != null) {
               fl = file.merge(fl);
               if(!fl.exists()) Err.or(NOSTOPFILE, fl);

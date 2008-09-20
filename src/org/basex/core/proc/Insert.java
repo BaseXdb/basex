@@ -108,7 +108,7 @@ public final class Insert extends AUpdate {
     Data tmp;
     try {
       // parse xml input or filename
-      tmp = new MemBuilder().build(new XMLParser(new IO(args[0])), "tmp");
+      tmp = new MemBuilder().build(new XMLParser(IO.get(args[0])), "tmp");
     } catch(final IOException ex) {
       BaseX.debug(ex);
       return error(ex.getMessage());

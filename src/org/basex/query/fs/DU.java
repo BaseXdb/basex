@@ -22,9 +22,9 @@ public final class DU extends FSCmd {
   private String path;
 
   @Override
-  public void args(final String args, final int pos) throws FSException {
+  public void args(final String args) throws FSException {
     // get all Options
-    final GetOpts g = new GetOpts(args, "ahHs", pos);
+    final GetOpts g = new GetOpts(args, "ahHs");
     while(g.more()) {
       final int ch = checkOpt(g);
       switch (ch) {

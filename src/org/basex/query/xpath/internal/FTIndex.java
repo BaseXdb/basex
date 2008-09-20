@@ -10,7 +10,6 @@ import org.basex.index.IndexIterator;
 import org.basex.query.FTOpt;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.FTArrayExpr;
-import org.basex.query.xpath.expr.FTPositionFilter;
 import org.basex.query.xpath.locpath.Step;
 import org.basex.query.xpath.values.Bool;
 import org.basex.util.IntArrayList;
@@ -41,26 +40,10 @@ public final class FTIndex extends FTArrayExpr {
     option = opt;
   }
 
-  /**
-   * Setter for FTPostion Filter - used for fTContent.
-   * @param ftp FTPostionFilter
-   */
-  public void setFTPosFilter(final FTPositionFilter ftp) {
-    ftpos = ftp;
-  }
-
   @Override
   public FTArrayExpr indexEquivalent(final XPContext ctx, final Step curr, 
       final boolean seq) {
     return this;
-  }
-
-  /**
-   * Get FTOptions for index access.
-   * @return ft options
-   */
-  public FTOpt getFTOption() {
-    return option;
   }
 
   @Override

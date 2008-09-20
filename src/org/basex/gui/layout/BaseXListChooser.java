@@ -231,15 +231,6 @@ public final class BaseXListChooser extends BaseXBack {
   }
 
   /**
-   * Sets a tooltip.
-   * @param tooltip tooltip text
-   */
-  public void setToolTip(final String tooltip) {
-    text.setToolTipText(tooltip);
-    list.setToolTipText(tooltip);
-  }
-
-  /**
    * Resets the data shown in the list.
    * @param data list data
    */

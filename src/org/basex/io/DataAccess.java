@@ -88,16 +88,6 @@ public class DataAccess {
   }
 
   /**
-   * Reads an integer value from the specified file offset.
-   * @param p position
-   * @return integer value
-   */
-  public synchronized int read4(final long p) {
-    cursor(p);
-    return (read() << 24) + (read() << 16) + (read() << 8) + read();
-  }
-
-  /**
    * Reads an 5-byte value from the specified file offset.
    * @param p position
    * @return long value
@@ -118,32 +108,6 @@ public class DataAccess {
     return readNum();
   }
 
-
-  /**
-   * Reads a {@link Num} value from disk.
-   * @param p text position
-   * @param s number of num values
-   * @return read num
-   */
-  public synchronized int[] readNums(final long p, final int s) {
-    int[] r = new int[s];
-    cursor(p);
-    for (int i = 0; i < s; i++) r[i] = readNum();
-    return r;
-  }
-
-  /**
-   * Reads a {@link Num} value from disk.
-   * @param s number of num values
-   * @return read num
-   */
-  public synchronized int[] readNums(final int s) {
-    int[] r = new int[s];
-    for (int i = 0; i < s; i++) r[i] = readNum();
-    return r;
-  }
-
-  
   /**
    * Reads a token from disk.
    * @param p text position
@@ -181,18 +145,6 @@ public class DataAccess {
   }
 
   /**
-   * Returns the first id of an index.
-   * @param p position
-   * @return id
-   */
-  public synchronized int firstID(final int p) {
-    cursor(p);
-    readNum();
-    for(int i = 0; i < 4; i++) read();
-    return readNum();
-  }
-
-  /**
    * Reads an integer value from the specified position.
    * @param p position
    * @return integer value
@@ -212,19 +164,6 @@ public class DataAccess {
     final byte[] array = new byte[(int) (to - from)];
     cursor(from);
     for(int i = 0; i < array.length; i++) array[i] = (byte) read();
-    return array;
-  }
-   
-  /**
-   * Reads a number of int values in range from -> to and returns them as array.
-   * @param from starting position for reading
-   * @param to ending position for reading
-   * @return int array
-   */
-  public synchronized int[] readInts(final long from, final long to) {
-    final int[] array = new int[(int) (to - from) >> 2];
-    cursor(from);
-    for(int i = 0; i < array.length; i++) array[i] = readInt();
     return array;
   }
 

@@ -10,6 +10,7 @@ import org.basex.build.BuildException;
 import org.basex.build.BuildText.Type;
 import org.basex.core.Prop;
 import org.basex.io.IO;
+import org.basex.io.IOContent;
 import org.basex.util.TokenMap;
 import org.basex.util.TokenBuilder;
 
@@ -104,19 +105,11 @@ public final class XMLScanner {
   }
 
   /**
-   * Read and interpret all tokens from the input stream.
-   * @throws IOException I/O Exception
-   */
-  public void scan() throws IOException {
-    while(more());
-  }
-
-  /**
    * Reads and interprets the next token from the input stream.
    * @return true if the document scanning has been completed.
    * @throws IOException I/O Exception
    */
-  public boolean more() throws IOException {
+  boolean more() throws IOException {
     // gets next character from the input stream
     token.reset();
     final int ch = consume();
@@ -151,7 +144,7 @@ public final class XMLScanner {
    * Finishes file scanning.
    * @throws IOException I/O Exception
    */
-  public void finish() throws IOException {
+  void finish() throws IOException {
     input.finish();
     if(prolog) error(DOCEMPTY);
   }
@@ -460,7 +453,7 @@ public final class XMLScanner {
    * @return found quote
    * @throws IOException Build Exception
    */
-  public int qu() throws IOException {
+  private int qu() throws IOException {
     final int qu = consume();
     if(qu != '\'' && qu != '"') error(SCANQUOTE, (char) qu);
     return qu;
@@ -595,17 +588,6 @@ public final class XMLScanner {
   }
 
   /**
-   * Returns the current character.
-   * @return current character
-   * @throws IOException I/O Exception
-   */
-  char curr() throws IOException {
-    final int ch = consume();
-    prev(1);
-    return (char) ch;
-  }
-
-  /**
    * Consumes the specified character.
    * @param ch character to be found
    * @return true if token was found
@@ -714,9 +696,9 @@ public final class XMLScanner {
 
         final XMLInput tin = input;
         try {
-          final IO file = input.file.merge(new IO(name));
+          final IO file = input.file.merge(IO.get(name));
           cont = file.content();
-          input = new XMLInput(new IO(cont, name));
+          input = new XMLInput(new IOContent(cont, name));
         } catch(final IOException ex) {
           BaseX.debug(ex);
           error(DTDNP, name);
@@ -967,7 +949,7 @@ public final class XMLScanner {
     }
 
     final XMLInput tmp = input;
-    input = new XMLInput(new IO(tok.finish(), null));
+    input = new XMLInput(new IOContent(tok.finish()));
     tok = new TokenBuilder();
     while((ch = consume()) != 0) {
       if(ch == '&') tok.add(ref(false));
@@ -1062,7 +1044,6 @@ public final class XMLScanner {
   /**
    * Main method; used for testing purposes.
    * @param args command line arguments
-   */
   public static void main(final String[] args) {
     // get filename(s) or use default
     final String[] fn = args.length > 0 ? args : new String[] { "input.xml" };
@@ -1072,7 +1053,8 @@ public final class XMLScanner {
     for(final String f : fn) {
       try {
         final IO bxf = new IO(f);
-        new XMLScanner(bxf).scan();
+        final XMLScanner scan = new XMLScanner(bxf);
+        while(scan.more());
         sb.append(f + "\n");
       } catch(final IOException e) {
         BaseX.errln("%: %", f, e.getMessage());
@@ -1081,6 +1063,7 @@ public final class XMLScanner {
     BaseX.outln("% ms.", (System.nanoTime() - time) / 1000000);
     BaseX.outln(sb.toString());
   }
+   */
 }
 
 /* TODOS:

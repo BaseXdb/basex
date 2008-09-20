@@ -44,7 +44,6 @@ import org.basex.query.xpath.locpath.TestNode;
 import org.basex.query.xpath.locpath.TestPI;
 import org.basex.query.xpath.values.Calc;
 import org.basex.query.xpath.values.Comp;
-import org.basex.query.xpath.values.Item;
 import org.basex.query.xpath.values.Literal;
 import org.basex.query.xpath.values.NodeSet;
 import org.basex.query.xpath.values.Num;
@@ -492,7 +491,6 @@ public class XPParser extends QueryParser {
    */
   Expr primary() throws QueryException {
     consumeWS();
-    if(consume('$')) return varReference();
     if(consume('(')) {
       final Expr e = or();
       return consume(')') ? e : error(NOPARENTHESIS);
@@ -500,17 +498,6 @@ public class XPParser extends QueryParser {
     if(curr('"') || curr('\'')) return literal();
     if(digit(curr())) return number();
     return function();
-  }
-
-  /**
-   * Parses a VariableReference.
-   * @return resulting expression
-   * @throws QueryException query exception
-   */
-  Item varReference() throws QueryException {
-    final String var = name();
-    if(var.length() == 0) error(NOVARNAME);
-    return XPathContext.get().evalVariable(token(var));
   }
 
   /**
@@ -821,7 +808,7 @@ public class XPParser extends QueryParser {
               } while(consume(','));
               if(!consume(')')) error(FTSTOP);
             } else if(consume(AT)) {
-              IO fl = new IO(string(literal().str()));
+              IO fl = IO.get(string(literal().str()));
               if(!fl.exists()) error(FTSWFILE, fl);
               try {
                 for(final byte[] sl : split(norm(fl.content()), ' ')) {

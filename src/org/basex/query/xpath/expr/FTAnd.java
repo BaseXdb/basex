@@ -1,7 +1,5 @@
 package org.basex.query.xpath.expr;
 
-
-import org.basex.query.FTOpt;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.locpath.Step;
@@ -19,16 +17,6 @@ public final class FTAnd extends FTArrayExpr {
   private int[] pex;
   /** Saving index of negative expressions (FTNot). */
   private int[] nex;
-  
-  /**
-   * Constructor.
-   * @param e expressions
-   * @param options FTOptions
-   */
-  public FTAnd(final FTArrayExpr[] e, final FTOpt options) {
-    exprs = e;
-    super.fto = options;
-  }
   
   /**
    * Constructor.

@@ -3,7 +3,6 @@ package org.basex.query.xquery.item;
 import static org.basex.query.xquery.XQText.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Err;
@@ -47,15 +46,6 @@ public final class Dec extends Num {
   private Dec(final BigDecimal d) {
     super(Type.DEC);
     val = d;
-  }
-
-  /**
-   * Constructor.
-   * @param d double value
-   * @return value
-   */
-  public static Dec get(final double d) {
-    return get(BigDecimal.valueOf(d));
   }
 
   /**

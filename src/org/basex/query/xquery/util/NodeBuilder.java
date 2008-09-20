@@ -39,15 +39,6 @@ public final class NodeBuilder {
   }
 
   /**
-   * Adds several items.
-   * @param i item array
-   * @param s number of items to be added
-   */
-  public void add(final Node[] i, final int s) {
-    for(int n = 0; n < s; n++) add(i[n]);
-  }
-
-  /**
    * Adds a single node.
    * @param n node to be added
    */

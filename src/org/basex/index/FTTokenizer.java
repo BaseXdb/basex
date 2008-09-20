@@ -3,7 +3,6 @@ package org.basex.index;
 import static org.basex.util.Token.*;
 import org.basex.core.Prop;
 import org.basex.util.Stemming;
-import org.basex.util.Token;
 import org.basex.util.TokenList;
 
 /**
@@ -135,7 +134,6 @@ public final class FTTokenizer extends IndexToken {
    * 
    * @param tok FTTokenizer
    * @return mildnot
-   */
   public boolean mildNot(final FTTokenizer tok) {
     init();
     tok.init();
@@ -151,6 +149,7 @@ public final class FTTokenizer extends IndexToken {
     }
     return !m1;
   }
+   */
   
   /**
    * Counts the number of tokens.

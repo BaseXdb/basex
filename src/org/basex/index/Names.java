@@ -123,14 +123,6 @@ public final class Names extends Set {
   }
 
   /**
-   * Returns information if the indexed keys offer statistics.
-   * @return result of check
-   */
-  public boolean stats() {
-    return stats;
-  }
-
-  /**
    * Removes the statistics.
    */
   public void noStats() {

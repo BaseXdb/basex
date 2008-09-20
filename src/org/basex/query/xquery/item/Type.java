@@ -230,7 +230,7 @@ public enum Type {
     
     @Override
     public Object j(final Item it) throws XQException {
-      return it.dbl();
+      return it.dec();
     }
   },
   
@@ -716,6 +716,19 @@ public enum Type {
     @Override
     public Object j(final Item it) {
       return null;
+    }
+  },
+  
+  /** Document element type (needed by XQJ API). */
+  DEL("document-node(...)", NOD, EMPTY, false, true, false, false, true) {
+    @Override
+    public Item e(final Item it, final XQContext ctx) {
+      BaseX.notexpected(); return null;
+    }
+    
+    @Override
+    public Object j(final Item it) {
+      BaseX.notexpected(); return null;
     }
   },
   

@@ -4,6 +4,8 @@ import static org.basex.Text.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.sax.SAXSource;
+
 import org.basex.BaseX;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
@@ -13,6 +15,7 @@ import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
@@ -20,9 +23,9 @@ import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * This class parses an XML document via a conventional SAX parser.
- * Would be the easiest solution, but some large file cannot be parsed
- * with the default parser.
+ * This class parses an XML document with Java's default SAX parser.
+ * Note that large file cannot be parsed with the default parser due to
+ * entity handling (e.g. the DBLP data).
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
@@ -35,36 +38,43 @@ public final class SAXWrapper extends Parser {
   /** Builder reference. */
   Builder builder;
   /** Optional XML reader. */
-  XMLReader reader;
+  SAXSource source;
 
-  static {
-    // needed for XMLEntityManager: increase entity limit
-    System.setProperty("entityExpansionLimit", "536870912");
-  }
+  // needed for XMLEntityManager: increase entity limit
+  static { System.setProperty("entityExpansionLimit", "536870912"); }
 
   /**
    * Constructor.
    * @param in input file
    */
   public SAXWrapper(final IO in) {
-    this(in, null);
+    super(in);
   }
 
   /**
    * Constructor.
-   * @param in input file
-   * @param r reader reference
+   * @param s sax source
    */
-  public SAXWrapper(final IO in, final XMLReader r) {
-    super(in);
-    reader = r;
+  public SAXWrapper(final SAXSource s) {
+    this(io(s));
+    source = s;
+  }
+
+  /**
+   * Returns a filename from a SAX source.
+   * @param s source
+   * @return filename
+   */
+  private static IO io(final SAXSource s) {
+    final String fn = s.getSystemId();
+    return IO.get(fn != null ? fn : "tmp");
   }
 
   @Override
   public void parse(final Builder build) throws IOException {
     builder = build;
     try {
-      XMLReader r = reader;
+      XMLReader r = source != null ? source.getXMLReader() : null;
       if(r == null) {
         final SAXParserFactory f = SAXParserFactory.newInstance();
         f.setNamespaceAware(true);
@@ -78,8 +88,14 @@ public final class SAXWrapper extends Parser {
       r.setErrorHandler(p);
 
       builder.startDoc(token(file.name()));
-      if(reader == null) r.parse(file.next());
-      else r.parse(file.path());
+      // find correct input...
+      if(source == null) {
+        r.parse(file.inputSource());
+      } else {
+        final InputSource is = source.getInputSource();
+        if(is != null) r.parse(is);
+        else r.parse(source.getSystemId());
+      }
       builder.endDoc();
       
     } catch(final SAXParseException ex) {

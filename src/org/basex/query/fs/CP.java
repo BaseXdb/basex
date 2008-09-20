@@ -23,9 +23,9 @@ public final class CP extends FSCmd {
   private StringList paths;
 
   @Override
-  public void args(final String args, final int pos) throws FSException {
+  public void args(final String args) throws FSException {
     // get all Options
-    final GetOpts g = new GetOpts(args, "hR", pos);
+    final GetOpts g = new GetOpts(args, "hR");
     while(g.more()) {
       final int ch = checkOpt(g);
       switch (ch) {

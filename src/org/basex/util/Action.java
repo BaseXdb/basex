@@ -22,10 +22,9 @@ public abstract class Action implements Runnable {
   /**
    * Creates a new repeated action thread.
    * @param ms number of milliseconds to wait before executions
-   */
   public final void repeat(final int ms) {
     sf = sch.scheduleAtFixedRate(this, 0, ms, TimeUnit.MILLISECONDS);
-  }
+  }*/
   
   /**
    * Creates a new action thread.

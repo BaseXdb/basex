@@ -1,16 +1,9 @@
 package org.basex.io;
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.util.Token;
@@ -24,7 +17,7 @@ import org.xml.sax.InputSource;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class IO {
+public abstract class IO {
   /** Invalid file characters. */
   private static final String INVALID = " \"*./:<>?";
   /** BaseX Suffix. */
@@ -45,92 +38,50 @@ public final class IO {
   /** Fill Factor (greater than 0.0, maximum 1.0). */
   public static final double BLOCKFILL = 1;
   
-  /** File reference. */
-  private File file;
   /** File path and name. */
-  private String path;
-  /** URL flag. */
-  private boolean url;
-  /** Content flag. */
-  private boolean content;
+  protected String path = "";
   /** File contents. */
-  private byte[] cont;
-  /** File length. */
-  private long len;
+  protected byte[] cont;
+
+  /** First call. */
+  protected boolean more = false;
   
+  /** Empty Constructor. */
+  protected IO() { }
+
   /**
    * Constructor.
-   * @param f file reference
+   * @param s source
+   * @return IO reference
    */
-  public IO(final File f) {
-    file = f;
-    path = f.getAbsolutePath().replace('\\', '/');
+  public static IO get(final String s) {
+    if(s.startsWith("<")) return new IOContent(Token.token(s));
+    if(s.startsWith("http://")) return new IOUrl(s);
+    return new IOFile(s);
   }
   
   /**
-   * Constructor.
-   * @param f file reference
-   */
-  public IO(final String f) {
-    content = f.startsWith("<");
-    if(content) cont = Token.token(f);
-    url = !content && f.startsWith("http://");
-    path = content ? "tmp.xml" : url ? f :
-      new File(f).getAbsolutePath().replace('\\', '/');
-  }
-  
-  /**
-   * Constructor.
-   * @param f buffer contents
-   * @param fn file name
-   */
-  public IO(final byte[] f, final String fn) {
-    content = true;
-    cont = f;
-    path = fn;
-  }
-  
-  /**
-   * Returns the file contents.
+   * Returns the contents.
    * @return contents
    * @throws IOException I/O exception
    */
-  public byte[] content() throws IOException {
-    if(cont != null) return cont;
-    if(url) {
-      final URL u = new URL(path);
-      final BufferedInputStream bis = new BufferedInputStream(u.openStream());
-      final TokenBuilder tb = new TokenBuilder();
-      int b = 0;
-      while((b = bis.read()) != -1) tb.add((byte) b);
-      bis.close();
-      cont = tb.finish();
-    } else {
-      file();
-      cont = new byte[(int) file.length()];
-      final FileInputStream in = new FileInputStream(file);
-      in.read(cont);
-      in.close();
-    }
+  public final byte[] content() throws IOException {
+    if(cont == null) cache();
     return cont;
   }
+
+  /**
+   * Caches the contents.
+   * @throws IOException I/O exception
+   */
+  public abstract void cache() throws IOException;
   
   /**
    * Verifies if the file exists.
    * @return result of check
    */
   public boolean exists() {
-    if(content) return true;
-    if(!url) return file().exists();
-    try {
-      // enough?...
-      //new URL(path).openConnection();
-      new URL(path).openStream();
-      return true;
-    } catch(IOException ex) {
-      BaseX.debug(ex);
-      return false;
-    }
+    return true;
   }
   
   /**
@@ -138,8 +89,7 @@ public final class IO {
    * @return result of check
    */
   public boolean isDir() {
-    if(url) BaseX.notexpected();
-    return !content && file().isDirectory();
+    return false;
   }
   
   /**
@@ -147,30 +97,15 @@ public final class IO {
    * @return result of check
    */
   public String getDir() {
-    return isDir() ? path() : file().getParent();
+    return isDir() ? path() : path.substring(0, path.lastIndexOf('/') + 1);
   }
-  
-  /**
-   * Returns if this is a symbolic link.
-   * @return result of check
-   */
-  public boolean isLink() {
-    try {
-      return !path().equals(file().getCanonicalPath());
-    } catch(IOException ex) {
-      BaseX.debug(ex);
-      return false;
-    }
-  }
-
 
   /**
    * Returns the modification date of this file.
    * @return modification date
    */
   public long date() {
-    if(content || url) return System.currentTimeMillis();
-    return file().lastModified();
+    return System.currentTimeMillis();
   }
   
   /**
@@ -178,9 +113,7 @@ public final class IO {
    * @return file length
    */
   public long length() {
-    if(len != 0) return len;
-    if(cont != null) return cont.length;
-    return url ? 0 : file().length();
+    return cont != null ? cont.length : 0;
   }
 
   /**
@@ -188,81 +121,33 @@ public final class IO {
    * @return result of check
    * @throws IOException I/O exception
    */
+  @SuppressWarnings("unused")
   public boolean more() throws IOException {
-    // return cached content
-    if(content) {
-      is = is == null ? new ByteArrayInputStream(cont) : null;
-    } else if(is instanceof ZipInputStream || path.endsWith(ZIPSUFFIX)) {
-      if(is == null) is = new ZipInputStream(new FileInputStream(file));
-      // doesn't work yet with several zip entries
-      else return false;
-      while(is != null) {
-        ZipEntry e = ((ZipInputStream) is).getNextEntry();
-        if(e == null) {
-          is = null;
-        } else {
-          len = e.getSize();
-          path = e.getName();
-          if(!e.isDirectory()) break;
-        }
-      }
-    } else if(path.endsWith(GZSUFFIX)) {
-      is = is == null ? new GZIPInputStream(new FileInputStream(file)) : null;
-    } else {
-      simple ^= true;
-    }
-    return is != null || simple;
+    return more ^= true;
   }
-
-  /** Input stream reference. */
-  InputStream is;
-  /** Simple stream reference. */
-  boolean simple;
   
   /**
    * Returns the next input source.
    * @return input source
    */
-  public InputSource next() {
-    return is == null ? new InputSource(url ? path : "file:///" + path) :
-      new InputSource(is);
-  }
+  public abstract InputSource inputSource();
   
   /**
    * Returns a buffered reader for the file.
    * @return buffered reader
    * @throws IOException I/O exception
    */
-  public BufferInput buffer() throws IOException {
-    // return cached content
-    if(content || url) return new CachedInput(content());
-
-    // support for zipped files; the first file will be chosen
-    if(path.endsWith(ZIPSUFFIX)) {
-      ZipInputStream zip = new ZipInputStream(new FileInputStream(file));
-      ZipEntry entry = zip.getNextEntry();
-      final BufferInput in = new BufferInput(zip);
-      in.length(entry.getSize());
-      return in;
-    }
-    // support for gzipped files
-    if(path.endsWith(GZSUFFIX)) {
-      GZIPInputStream zip = new GZIPInputStream(new FileInputStream(file));
-      return new BufferInput(zip);
-    }
-    
-    // return file content
-    return new BufferInput(path);
-  }
-  
+  public abstract BufferInput buffer() throws IOException;
   
   /**
    * Merges two filenames.
    * @param f filename of the file
    * @return contents
    */
+  @SuppressWarnings("unused")
   public IO merge(final IO f) {
-    return f.url ? f : url ? this : new IO(file().getParent() + "/" + f.name());
+    BaseX.notexpected();
+    return null;
   }
   
   /**
@@ -271,15 +156,6 @@ public final class IO {
    */
   public void suffix(final String suf) {
     if(path.indexOf(".") == -1) path += suf;
-  }
-
-  /**
-   * Returns the file suffix in lower case.
-   * @return suffix
-   */
-  public String suffix() {
-    int i = path.lastIndexOf(".");
-    return i == -1 ? "" : path.substring(i + 1).toLowerCase();
   }
 
   /**
@@ -308,24 +184,12 @@ public final class IO {
   }
 
   /**
-   * Chops the path and the XML suffix of the specified filename.
-   * @return chopped filename
-   */
-  public File file() {
-    if(file == null) file = new File(path);
-    return file;
-  }
-
-  /**
    * Returns the children of a document.
    * @return chopped filename
    */
   public IO[] children() {
-    final File[] ch = file().listFiles();
-    final int l = ch != null ? ch.length : 0;
-    final IO[] io = new IO[l];
-    for(int i = 0; i < l; i++) io[i] = new IO(ch[i]);
-    return io;
+    BaseX.notexpected();
+    return null;
   }
 
   /**
@@ -333,12 +197,9 @@ public final class IO {
    * @param c contents
    * @throws IOException I/O exception
    */
+  @SuppressWarnings("unused")
   public void write(final byte[] c) throws IOException {
-    if(content || url) BaseX.notexpected();
-    final FileOutputStream out = new FileOutputStream(path);
-    out.write(c);
-    out.close();
-    cont = c;
+    BaseX.notexpected();
   }
 
   /**
@@ -346,10 +207,10 @@ public final class IO {
    * @return chopped filename
    */
   public boolean delete() {
-    if(content || url) BaseX.notexpected();
-    return file().delete();
+    BaseX.notexpected();
+    return false;
   }
-  
+
   /**
    * Compares the filename of the specified IO reference.
    * @param io io reference
@@ -362,6 +223,23 @@ public final class IO {
   @Override
   public String toString() {
     return path;
+  }
+  
+  /**
+   * Caches the contents of the specified input stream.
+   * @param i input stream
+   * @return cached contents
+   * @throws IOException exception
+   */
+  protected byte[] cache(final InputStream i) throws IOException {
+    final TokenBuilder tb = new TokenBuilder();
+    final InputStream bis = i instanceof BufferedInputStream ? i :
+      new BufferedInputStream(i);
+    int b;
+    while((b = bis.read()) != -1) tb.add((byte) b);
+    bis.close();
+    cont = tb.finish();
+    return cont;
   }
 
   // STATIC METHODS ===========================================================

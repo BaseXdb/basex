@@ -91,7 +91,6 @@ public final class FTMildNotExprs extends FTArrayExpr {
    * @param resA result allowed to be contained
    * @param resB result not allowed to be contained
    * @return data []
-   */
   public static int[][] determineNot(final int[][] resA,
       final int[][] resB) {
     if((resA == null && resB == null) || resA == null) {
@@ -148,6 +147,7 @@ public final class FTMildNotExprs extends FTArrayExpr {
     }
     return result;
   }
+   */
   
   /**
    * Each result wordA, is not allowed to be contained in result wordB.
@@ -157,7 +157,6 @@ public final class FTMildNotExprs extends FTArrayExpr {
    * @param resultWordA result allowed to be contained
    * @param resultWordB result not allowed to be contained
    * @return data []
-   */
   public static int[] determineNot(final int[] resultWordA,
       final int[] resultWordB) {
     if((resultWordA == null && resultWordB == null) || resultWordA == null) {
@@ -209,5 +208,5 @@ public final class FTMildNotExprs extends FTArrayExpr {
       }
     return result;
   }
-
+   */
 }

@@ -11,34 +11,31 @@ import org.basex.util.Token;
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Lukas Kircher
- *
  */
 public final class ScatterAxis {
-
+  /** Token for String operations. */
+  private static final byte[] AT = Token.token("@");
   /** Scatter data reference. */
-  ScatterData scatterData;
+  private final ScatterData scatterData;
+  /** Attribute selected by user. */
+  private byte[] attr;
+  /** True if attribute is a tag, false if attribute. */
+  private boolean isTag;
+  /** True if attribute is numerical. */
+  boolean numeric;
+  /** Number of different categories for x attribute. */
+  private int nrCats;
+
   /** Coordinates of items. */
-  Double[] co;
+  double[] co;
   /** Number of captions to display. */
   int nrCaptions;
-  /** Axis caption. */
-  String[] caption;
-  /** Attribute selected by user. */
-  byte[] attr;
   /** Minimum value in case selected attribute is numerical. */
   double min;
   /** Maximum  value in case selected attribute is numerical. */
   double max;
-  /** True if attribute is a tag, false if attribute. */
-  boolean isTag;
-  /** True if attribute is numerical. */
-  boolean numeric;
-  /** Number of different categories for x attribute. */
-  int nrCats;
   /** The different categories for the x attribute. */
   byte[][] cats;
-  /** Token for String operations. */
-  private static final byte[] AT = Token.token("@");
   
   /**
    * Constructor.
@@ -88,7 +85,7 @@ public final class ScatterAxis {
     }
 
     final int[] items = scatterData.pres;
-    co = new Double[items.length];
+    co = new double[items.length];
     for(int i = 0; i < items.length; i++) {
       int p = items[i];
       final int limit = p + data.size(p, Data.ELEM);

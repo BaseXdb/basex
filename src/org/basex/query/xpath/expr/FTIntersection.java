@@ -1,7 +1,6 @@
 package org.basex.query.xpath.expr;
 
 import org.basex.index.FTNode;
-import org.basex.query.FTOpt;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.values.Bool;
@@ -20,8 +19,6 @@ public final class FTIntersection extends FTArrayExpr {
   private int[] nex;
   /** Temp FTNode.  */
   private FTNode nod2;
-
-
   
   /**
    * Constructor.
@@ -36,22 +33,6 @@ public final class FTIntersection extends FTArrayExpr {
     pex = pexpr;
     nex = nexpr;
   }
-
-  /**
-   * Constructor.
-   * @param e operands joined with the union operator
-   * @param option FTOption with special features for the evaluation
-   * @param pexpr IntList with indexes of positive expressions
-   * @param nexpr IntList with indexes of negative expressions
-   */
-  public FTIntersection(final FTArrayExpr[] e, final FTOpt option, 
-      final int[] pexpr, final int[] nexpr) {
-    exprs = e;
-    fto = option;
-    pex = pexpr;
-    nex = nexpr;
-
-  }
   
   /**
    * Checks if more values are available.
@@ -59,34 +40,20 @@ public final class FTIntersection extends FTArrayExpr {
    * @return boolean
    */
   private boolean more(final int[] n) {
-    for (int i : n) {
-      if (!exprs[i].more()) return false;
-    }
+    for (int i : n) if (!exprs[i].more()) return false;
     return true;
   }
   
   @Override 
   public boolean pos() {
-    for (FTArrayExpr i : exprs) {
-      if (i.pos()) return true;
-    }
+    for (FTArrayExpr i : exprs) if (i.pos()) return true;
     return false;
   }
 
-  
   @Override
   public boolean more() {
-    if (pex.length > 0)
-      return more(pex);
+    if(pex.length > 0) return more(pex);
     return more(nex);
-
-/*    if (init) {
-      for (int i : nex) {
-        exprs[i].more();
-      }
-      init = false;
-    }
- */   
   }
   
   /**

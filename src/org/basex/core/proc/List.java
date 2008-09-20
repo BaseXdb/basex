@@ -2,7 +2,6 @@ package org.basex.core.proc;
 
 import static org.basex.Text.*;
 import java.io.IOException;
-
 import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.data.MetaData;
@@ -64,7 +63,7 @@ public final class List extends Process {
     // create database list
     final StringList db = new StringList();
 
-    final IO dir = new IO(Prop.dbpath);
+    final IO dir = IO.get(Prop.dbpath);
     // no database directory found...
     if(!dir.exists()) return db;
 

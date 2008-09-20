@@ -15,9 +15,9 @@ public final class TOUCH extends FSCmd {
   private String path;
 
   @Override
-  public void args(final String args, final int pos) throws FSException {
+  public void args(final String args) throws FSException {
     // check default options and get path
-    path = defaultOpts(args, pos).getPath();
+    path = defaultOpts(args).getPath();
     // no file/path was specified...
     if(path == null) error("", 100);
   }

@@ -27,9 +27,9 @@ public class CAT extends FSCmd {
   private String path;
 
   @Override
-  public void args(final String args, final int pos) throws FSException {
+  public void args(final String args) throws FSException {
     // get all Options
-    final GetOpts g = new GetOpts(args, "bhn", pos);
+    final GetOpts g = new GetOpts(args, "bhn");
     while(g.more()) {
       final int ch = checkOpt(g);
       switch (ch) {
@@ -72,7 +72,7 @@ public class CAT extends FSCmd {
     for(final int nodeToPrint : print) {
       if(FSUtils.isDir(context.data(), nodeToPrint)) continue;
 
-      final IO io = new IO(Token.string(
+      final IO io = IO.get(Token.string(
           FSUtils.getPath(context.data(), nodeToPrint)));
       int numberLines = 1;
       if(io.exists()) {

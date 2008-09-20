@@ -26,7 +26,7 @@ public final class CreateMAB extends ACreate {
   @Override
   protected boolean exec() {
     // check if file exists
-    final IO file = new IO(args[0]);
+    final IO file = IO.get(args[0]);
     if(!file.exists()) return error(FILEWHICH, file);
 
     Prop.chop  = true;

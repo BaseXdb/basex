@@ -18,16 +18,6 @@ public final class BaseXCheckBox extends JCheckBox {
    * Default Constructor.
    * @param hlp help text
    * @param label button title
-   * @param s initial selection state
-   */
-  public BaseXCheckBox(final String label, final byte[] hlp, final boolean s) {
-    this(label, hlp, s, 0, null);
-  }
-
-  /**
-   * Default Constructor.
-   * @param hlp help text
-   * @param label button title
    * @param sel initial selection state
    * @param list reference to the dialog listener
    */

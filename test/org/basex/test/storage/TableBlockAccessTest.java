@@ -51,7 +51,7 @@ public final class TableBlockAccessTest {
    */
   @Before
   public void setUp() throws Exception {
-    final XMLParser parser = new XMLParser(new IO(TESTFILE));
+    final XMLParser parser = new XMLParser(IO.get(TESTFILE));
     size = new DiskBuilder().build(parser, DBNAME).size;
     tba = new TableDiskAccess(DBNAME, DATATBL);
     final int bytecount = size * (1 << IO.NODEPOWER);

@@ -165,12 +165,4 @@ public final class PredSimple extends Pred {
     expr.plan(ser);
     ser.closeElement(this);
   }
-  /**
-   * Getter for expr.
-   * 
-   * @return expr Expression
-   */
-  public Expr getExpr() {
-    return expr;
-  }
 }

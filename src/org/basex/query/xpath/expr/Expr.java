@@ -1,7 +1,5 @@
 package org.basex.query.xpath.expr;
 
-import java.io.IOException;
-import org.basex.io.PrintOutput;
 import org.basex.query.ExprInfo;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
@@ -102,31 +100,5 @@ public abstract class Expr extends ExprInfo {
   public int indexSizes(final XPContext ctx, final Step step,
       final int min) {
     return Integer.MAX_VALUE;
-  }
-  
-  /**
-   * Opens a query plan tag.
-   * @param out print output
-   * @param l current level
-   * @param s tag string
-   * @throws IOException I/O exception
-   */
-  protected void openPlan(final PrintOutput out, final String s, final int l)
-      throws IOException {
-    for(int i = 0; i < l; i++) out.print(' ');
-    out.println("<" + s + ">");
-  }
-  
-  /**
-   * Opens a query plan tag.
-   * @param out print output
-   * @param l current level
-   * @param s tag string
-   * @throws IOException I/O exception
-   */
-  protected void closePlan(final PrintOutput out, final String s, final int l)
-      throws IOException {
-    for(int i = 0; i < l; i++) out.print(' ');
-    out.println("</" + s + ">");
   }
 }

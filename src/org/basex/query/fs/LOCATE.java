@@ -32,9 +32,9 @@ public final class LOCATE extends FSCmd {
   int limit = -1;
 
   @Override
-  public void args(final String args, final int pos) throws FSException {
+  public void args(final String args) throws FSException {
     // get all Options
-    final GetOpts g = new GetOpts(args, "chl:V:", pos);
+    final GetOpts g = new GetOpts(args, "chl:V:");
     while(g.more()) {
       final int ch = checkOpt(g);
       switch (ch) {

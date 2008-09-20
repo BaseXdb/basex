@@ -42,15 +42,12 @@ public final class FSWalker {
    * An empty path or '/' denotes that the complete FS should be parsed.
    * For Windows systems that means (C:/, D:/ ..), for Unix systems '/'.
    *
-   * @param path the traversal starts from.
+   * @param path path the traversal starts from.
    * @throws IOException I/O exception
    */
   public void fileHierarchyTraversal(final IO path) throws IOException {
-    File r = path.file().getCanonicalFile();
-    if(Prop.UNIX && isSymlink(r)) {
-      r = r.getCanonicalFile();
-      roots = new File[] { r };
-    } else if(path.path().equals("/") || path.path().length() == 0) {
+    File r = new File(path.path()).getCanonicalFile();
+    if(r.getPath().equals("/") || r.getPath().length() == 0) {
       roots = Prop.UNIX ? new File[] { new File("/") } : File.listRoots();
     } else {
       roots = new File[] { r };

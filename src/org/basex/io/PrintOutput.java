@@ -97,17 +97,6 @@ public class PrintOutput extends OutputStream {
   }
 
   /**
-   * Writes a string and newline to the output stream.
-   * @param str string to be written
-   * @param i number of spaces to indent
-   * @throws IOException in case of write errors
-   */
-  public final void println(final int i, final String str) throws IOException {
-    print(i, str);
-    print(Prop.NL);
-  }
-
-  /**
    * Writes a newline to the output stream.
    * @throws IOException in case of write errors
    */

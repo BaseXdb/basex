@@ -74,6 +74,8 @@ public final class GUIProp {
   public static boolean shownames = true;
   /** Flag for showing the simple file dialog. */
   public static boolean simplefd = false;
+  /** Flag for activated plot view. */
+  public static boolean showplot = true;
 
   // LAYOUT & INPUT OPTIONS ===================================================
 
@@ -128,9 +130,7 @@ public final class GUIProp {
   /** Flag for displaying the menu in the GUI window. */
   public static boolean showmenu = true;
   /** Flag for activated real tree view. */
-  public static boolean showreal = true;
-  /** Flag for activated scatterplot view. */
-  public static boolean showscatter = false;
+  public static boolean showreal = false;
 
   /** Flag for activated result view after starting. */
   public static boolean showstarttext = false;

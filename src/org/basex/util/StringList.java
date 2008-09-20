@@ -26,14 +26,6 @@ public final class StringList {
   }
 
   /**
-   * Adds a string array.
-   * @param sa array to be added
-   */
-  public void add(final String[] sa) {
-    for(final String s : sa) add(s);
-  }
-
-  /**
    * Removes an element of the array and returns it.
    * @param index of element to remove
    * @return the element that has been removed
@@ -52,13 +44,6 @@ public final class StringList {
    */
   public String[] finish() {
     return Array.finish(list, size);
-  }
-
-  /**
-   * Resets the string list.
-   */
-  public void reset() {
-    size = 0;
   }
 
   /**

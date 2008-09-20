@@ -287,4 +287,9 @@ public abstract class Date extends Item {
   public final String toString() {
     return "\"" + Token.string(str()) + "\"";
   }
+
+  @Override
+  public Object java() {
+    return df.newXMLGregorianCalendar(Token.string(str()));
+  }
 }

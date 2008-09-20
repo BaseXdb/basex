@@ -144,8 +144,8 @@ public final class DNode extends Node {
   @Override
   public byte[] base() {
     if(type != Type.DOC) return EMPTY;
-    final IO dir = new IO(data.meta.file.path());
-    final IO file = new IO(string(data.text(pre)));
+    final IO dir = IO.get(data.meta.file.path());
+    final IO file = IO.get(string(data.text(pre)));
     return token(dir.merge(file).path());
     
     //return concat(token(data.meta.file.path()), token('/'), data.text(pre));

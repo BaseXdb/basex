@@ -133,7 +133,7 @@ public abstract class QueryContext extends Progress {
     ser.closeElement(PLAN);
     out.print(NL);
     info.add(out.finish());
-    //new IO(fn).write(out.finish());
+    //IO.get(fn).write(out.finish());
   }
   
   /**
@@ -149,7 +149,7 @@ public abstract class QueryContext extends Progress {
     ser.closeElement(PLAN);
     //ser.close(1);
     
-    final IO f = new IO(PLANDOT);
+    final IO f = IO.get(PLANDOT);
     f.write(out.finish());
     new ProcessBuilder(Prop.dotty, PLANDOT).start().waitFor();
     //f.delete();

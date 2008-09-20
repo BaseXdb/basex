@@ -30,16 +30,6 @@ public final class Array {
    * @param ar array to be resized
    * @return finished array
    */
-  public static char[] extend(final char[] ar) {
-    final int s = ar.length;
-    return resize(ar, s, s << 1);
-  }
-
-  /**
-   * Doubles the array size.
-   * @param ar array to be resized
-   * @return finished array
-   */
   public static int[] extend(final int[] ar) {
     final int s = ar.length;
     return resize(ar, s, s << 1);
@@ -183,17 +173,6 @@ public final class Array {
    * @param size final size
    * @return finished array
    */
-  public static char[] finish(final char[] ar, final int size) {
-    final int s = ar.length;
-    return resize(ar, s > size ? size : s, size);
-  }
-
-  /**
-   * Optimizes the array size.
-   * @param ar array to be resized
-   * @param size final size
-   * @return finished array
-   */
   public static byte[][] finish(final byte[][] ar, final int size) {
     final int s = ar.length;
     return resize(ar, s > size ? size : s, size);
@@ -220,19 +199,6 @@ public final class Array {
    */
   public static String[] resize(final String[] ar, final int os, final int ns) {
     final String[] tmp = new String[ns];
-    System.arraycopy(ar, 0, tmp, 0, os);
-    return tmp;
-  }
-
-  /**
-   * Convenience method for resizing a character array.
-   * @param ar array to be resized
-   * @param os old size
-   * @param ns new size
-   * @return resized array
-   */
-  public static char[] resize(final char[] ar, final int os, final int ns) {
-    final char[] tmp = new char[ns];
     System.arraycopy(ar, 0, tmp, 0, os);
     return tmp;
   }

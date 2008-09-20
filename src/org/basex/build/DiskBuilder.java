@@ -3,10 +3,6 @@ package org.basex.build;
 import static org.basex.Text.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
-import org.basex.BaseX;
-import org.basex.build.xml.SAXWrapper;
-import org.basex.build.xml.XMLParser;
-import org.basex.core.Prop;
 import org.basex.core.proc.DropDB;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
@@ -17,7 +13,6 @@ import org.basex.io.DataOutput;
 import org.basex.io.TableAccess;
 import org.basex.io.TableDiskAccess;
 import org.basex.io.TableOutput;
-import org.basex.util.Performance;
 import org.basex.util.Token;
 
 /**
@@ -186,9 +181,8 @@ public final class DiskBuilder extends Builder {
   /**
    * Test method for building the database and storing the table to disk.
    * @param args files to be built
-   */
   public static void main(final String[] args) {
-    Prop.read();
+    org.basex.core.Prop.read();
     
     // get filename(s) or use default
     //final String[] fn = args.length > 0 ? args : new String[] { "input.xml" };
@@ -203,17 +197,17 @@ public final class DiskBuilder extends Builder {
    * @param r number of runs
    * @param fn files
    * @param s sax flag
-   */
-  static void run(final int r, final String[] fn, final boolean s) {
+  private static void run(final int r, final String[] fn, final boolean s) {
     int c = 0;
     int w = 0;
 
-    final Performance p = new Performance();
+    final org.basex.util.Performance p = new org.basex.util.Performance();
     for(int i = 0; i < r; i++) {
       for(final String f : fn) {
         try {
           final IO bxf = new IO(f);
-          final Parser parser = s ? new SAXWrapper(bxf) : new XMLParser(bxf);
+          final Parser parser = s ? new org.basex.build.xml.SAXWrapper(bxf) :
+            new org.basex.build.xml.XMLParser(bxf);
           new DiskBuilder().build(parser, "tmp");
           c++;
         } catch(final IOException e) {
@@ -222,9 +216,10 @@ public final class DiskBuilder extends Builder {
       }
     }
 
-    BaseX.outln((s ? "Xerces" : "BaseX") + " Parser, " + r + " runs.");
-    BaseX.outln("% documents built in %.", fn.length, p.getTimer(r));
-    BaseX.outln("% documents accepted.", c);
-    BaseX.outln("% documents rejected.\n", w);
+    org.basex.BaseX.outln((s ? "Java" : "BaseX") + " Parser, " + r + " runs.");
+    org.basex.BaseX.outln("% documents built in %.", fn.length, p.getTimer(r));
+    org.basex.BaseX.outln("% documents accepted.", c);
+    org.basex.BaseX.outln("% documents rejected.\n", w);
   }
+   */
 }

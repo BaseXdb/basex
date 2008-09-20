@@ -47,7 +47,6 @@ public final class FTUnaryNotExprs extends FTArrayExpr {
     return exprs[0].more();
   }
   
-  
   /*
   @Override
   public NodeSet eval(final XPContext ctx) throws QueryException {
@@ -73,13 +72,12 @@ public final class FTUnaryNotExprs extends FTArrayExpr {
     return null;  
   }
 */
-  /**
+  /*
    * Each result wordA, is not allowed to be contained in result wordB.
    *
    * @param resA result allowed to be contained
    * @param resB result not allowed to be contained
    * @return data []
-   */
   public static int[][] determineNot(final int[][] resA, final int[][] resB) {
     if((resA == null && resB == null) || resA == null || 
        resA[0].length == 0 && resB[0].length == 0 || resA[0].length == 0) {
@@ -150,9 +148,9 @@ public final class FTUnaryNotExprs extends FTArrayExpr {
     }
     return result;
   }
+   */
   
-  
-  /**
+  /*
    * Each result wordA, is not allowed to be contained in result wordB.
    * each result for wordA, that is not contained in result set wordB,
    * is added to returned result set.
@@ -160,7 +158,6 @@ public final class FTUnaryNotExprs extends FTArrayExpr {
    * @param resultWordA result allowed to be contained
    * @param resultWordB result not allowed to be contained
    * @return data []
-   */
    public static int[] determineNot(final int[] resultWordA,
       final int[] resultWordB) {
     if((resultWordA == null && resultWordB == null) || resultWordA == null) {
@@ -225,6 +222,7 @@ public final class FTUnaryNotExprs extends FTArrayExpr {
       }
     return result;
   }
+   */
 
    @Override
    public void plan(final Serializer ser) throws Exception {

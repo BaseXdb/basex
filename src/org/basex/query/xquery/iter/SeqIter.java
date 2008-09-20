@@ -2,7 +2,6 @@ package org.basex.query.xquery.iter;
 
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Item;
-import org.basex.util.Array;
 
 /**
  * Sequence Iterator.
@@ -89,18 +88,6 @@ public final class SeqIter extends Iter {
     final Item[] tmp = new Item[size << 1];
     System.arraycopy(item, 0, tmp, 0, size);
     item = tmp;
-  }
-
-  /**
-   * Inserts an item at the specified position.
-   * Note that the item must be no sequence.
-   * @param i entry to be added
-   * @param p insert position
-   */
-  public void insert(final Item i, final int p) {
-    if(size == item.length) resize();
-    Array.move(item, p, 1, size++);
-    item[p] = i;
   }
   
   @Override

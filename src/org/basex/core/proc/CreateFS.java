@@ -24,7 +24,7 @@ public final class CreateFS extends ACreate {
   
   @Override
   protected boolean exec() {
-    final IO f = new IO(args[0]);
+    final IO f = IO.get(args[0]);
     final String db = args[1] == null ? f.dbname() : args[1];
     Prop.chop = true;
     Prop.entity = true;

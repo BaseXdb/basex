@@ -8,12 +8,9 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
-import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -271,29 +268,6 @@ public final class BaseXLayout {
   }
 
   /**
-   * Prints the specified text on the graphics panel.
-   * @param g graphics reference
-   * @param t text to be printed
-   * @param p printing position
-   */
-  public static void textBox(final Graphics g, final String t, final Point p) {
-    g.setFont(new Font(GUIProp.font, 0, GUIProp.fontsize));
-    final FontMetrics fm = g.getFontMetrics();
-    final int w = fm.stringWidth(t);
-    final int h = fm.getHeight();
-    final int x = p.x;
-    final int y = p.y;
-
-    g.setColor(GUIConstants.color6);
-    g.fillRect(x - 3, y - h + 1, w + 9, h + 3);
-    g.setColor(Color.white);
-    g.fillRect(x - 4, y - h, w + 8, h + 2);
-    g.setColor(GUIConstants.color6);
-    g.drawRect(x - 4, y - h, w + 8, h + 2);
-    g.drawString(t, x, y - 2);
-  }
-
-  /**
    * Enables/Disables anti-aliasing.
    * @param g graphics reference
    */
@@ -315,18 +289,6 @@ public final class BaseXLayout {
   public static void drawCenter(final Graphics g, final String text,
       final int w, final int y) {
     g.drawString(text, (w - width(g, text)) / 2, y);
-  }
-
-  /**
-   * Draws a right aligned string to the panel.
-   * @param g graphics reference
-   * @param text text to be painted
-   * @param w panel width
-   * @param y vertical position
-   */
-  public static void drawRight(final Graphics g, final String text,
-      final int w, final int y) {
-    g.drawString(text, w - width(g, text), y);
   }
 
   /**
@@ -389,22 +351,6 @@ public final class BaseXLayout {
       if(sw >= ww) return -1;
     }
     return (ww - sw - 2) >> 1;
-  }
-
-  /**
-   * Calculates the width of a string.
-   * @param g graphics reference
-   * @param s string to be checked
-   * @return result of check
-   */
-  public static int calcWidth(final Graphics g, final byte[] s) {
-    final int[] cw = fontWidths(g.getFont());
-    int sw = 0;
-    final int j = s.length;
-    for(int k = 0; k < j; k += cl(s[k])) {
-      sw += width(g, cw, cp(s, k));
-    }
-    return sw;
   }
 
   /**

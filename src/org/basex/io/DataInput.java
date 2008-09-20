@@ -92,17 +92,6 @@ public final class DataInput extends BufferInput {
   }
 
   /**
-   * Reads a double byte array from the input stream.
-   * @return double array
-   */
-  public int[][] readNumsArray() {
-    final int l = readNum();
-    final int[][] array = new int[l][];
-    for(int i = 0; i < l; i++) array[i] = readNums();
-    return array;
-  }
-
-  /**
    * Reads and decompresses an integer value from the input stream.
    * @return read value
    */

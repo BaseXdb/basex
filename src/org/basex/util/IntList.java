@@ -112,18 +112,6 @@ public final class IntList {
     list = new int[is];
   }
 
-  
-  /**
-   * Removes all duplicates. Note that the integers must be sorted.
-   */
-  public void distinct() {
-    int c = 1;
-    for(int i = 1; i < size; i++) {
-      final int j = list[i];
-      if(list[c - 1] != j) list[c++] = j;
-    }
-  }
-
   /**
    * Sorts the array in the order of the specified token array.
    * This sort algorithm is derived from Java's highly optimized

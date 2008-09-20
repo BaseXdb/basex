@@ -3,9 +3,7 @@ package org.basex.io;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import org.basex.util.Array;
 import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
 
 /**
  * This is an output stream for project specific data types.
@@ -80,18 +78,6 @@ public final class DataOutput extends OutputStream {
   /**
    * Writes the specified token to the output stream.
    * @param text text to be written
-   * @return length of written bytes
-   * @throws IOException in case of write errors
-   */
-  public int writeToken(final TokenBuilder text) throws IOException {
-    final int s = writeNum(text.size);
-    for(int i = 0; i < text.size; i++) write(text.chars[i]);
-    return s + text.size;
-  }
-
-  /**
-   * Writes the specified token to the output stream.
-   * @param text text to be written
    * @return number of written bytes
    * @throws IOException in case of write errors
    */
@@ -133,17 +119,6 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
-   * Writes the specified array to the output stream; null references
-   * are replaced with an empty array.
-   * @param array array to be written
-   * @throws IOException in case of write errors
-   */
-  public void writeNumsArray(final int[][] array) throws IOException {
-    writeNum(array.length);
-    for(final int[] a : array) writeNums(a != null ? a : Array.NOINTS);
-  }
-
-  /**
    * Writes the specified array to the output stream.
    * @param array array to be written
    * @throws IOException in case of write errors
@@ -175,15 +150,6 @@ public final class DataOutput extends OutputStream {
     }
     write(v);
     return 1;
-  }
-
-  /**
-   * Writes the specified array to the output stream.
-   * @param array array to be written
-   * @throws IOException in case of write errors
-   */
-  public void writeInts(final int[] array) throws IOException {
-    for(final int a : array) writeInt(a);
   }
 
   /**

@@ -48,15 +48,6 @@ public final class Vars extends ExprInfo {
   }
 
   /**
-   * Returns the specified variable.
-   * @param o offset
-   * @return variable
-   */
-  public Var get(final int o) {
-    return vars[o];
-  }
-
-  /**
    * Compiles the variables.
    * @param ctx xquery context
    * @throws XQException xquery exception

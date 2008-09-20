@@ -51,8 +51,8 @@ public final class GUIConstants {
   public static final String HELPVIEW = "Help";
   /** Internal name of the Real Tree View. */
   public static final String REALVIEW = "Real";
-  /** Internal name of the Real Tree View. */
-  public static final String SCATTERVIEW = "Scatter";
+  /** Internal name of the Plot View. */
+  public static final String PLOTVIEW = "Plot";
   
    /**
    * Default GUI Layout. The layout is formatted as follows:
@@ -63,7 +63,7 @@ public final class GUIConstants {
    */
   public static final String LAYOUTOPENED = "H V " + QUERYVIEW + " " + TREEVIEW
       + " " + TEXTVIEW + " " + HELPVIEW + " - V " + MAPVIEW + " " + TABLEVIEW
-      + " " + INFOVIEW + " " + REALVIEW + " " + SCATTERVIEW + " - -";
+      + " " + INFOVIEW + " " + PLOTVIEW + " " + REALVIEW + " - -";
 
   /** This layout is shown when no database is opened. */
   public static final String LAYOUTCLOSED = "V " + TEXTVIEW + " " + HELPVIEW
@@ -74,7 +74,8 @@ public final class GUIConstants {
   /** Toolbar entries, containing the button commands. */
   public static final GUICommand[] TOOLBAR = {
     GOBACK, GOUP, GOFORWARD, ROOT, null, CREATE, OPEN, null,
-      SHOWSEARCH, SHOWINFO, null, SHOWTEXT, SHOWMAP, SHOWTREE, SHOWTABLE, null,
+      SHOWSEARCH, SHOWINFO, null, SHOWTEXT, SHOWMAP, SHOWTREE,
+      SHOWTABLE, SHOWPLOT, null,
       SHOWHELP, INFO
   };
 
@@ -100,7 +101,7 @@ public final class GUIConstants {
     SHOWSEARCH, SHOWINFO, null, COPYPATH, SELECT, FILTER
   }, {
     MENUMAIN, SHOWMENU, SHOWBUTTONS, SHOWINPUT, SHOWSTATUS, null,
-    MENUVIEWS, SHOWTEXT, SHOWMAP, SHOWTREE, SHOWTABLE, null, FULL
+    MENUVIEWS, SHOWTEXT, SHOWMAP, SHOWTREE, SHOWTABLE, SHOWPLOT, null, FULL
   }, {
     MENUINTER, RTEXEC, RTFILTER, null,
     MENULAYOUT, COLOR, FONTS, MAPLAYOUT, null, PREFS

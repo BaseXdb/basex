@@ -325,15 +325,6 @@ public final class GUIFS {
   }
 
   /**
-   * Returns the description for the specified file.
-   * @param suffix file suffix
-   * @return description
-   */
-  public static String desc(final byte[] suffix) {
-    return desc[get(suffix, 0)];
-  }
-
-  /**
    * Finds the specified token and returns its unique id.
    * @param tok token to be found
    * @param s start position

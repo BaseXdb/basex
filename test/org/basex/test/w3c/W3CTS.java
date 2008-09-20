@@ -303,7 +303,7 @@ public abstract class W3CTS {
 
     if(single != null && !outname.startsWith(single)) return true;
 
-    final IO file = new IO(queries + pth + inname + ".xq");
+    final IO file = IO.get(queries + pth + inname + ".xq");
     final String in = read(file);
 
     String output = "";
@@ -366,7 +366,7 @@ public abstract class W3CTS {
     for(int o = 0; o < outFiles.size; o++) {
       if(o != 0) tb.append(DELIM);
       final String resFile = string(data.atom(outFiles.pre[o]));
-      tb.append(read(new IO(expected + pth + resFile)));
+      tb.append(read(IO.get(expected + pth + resFile)));
     }
     String result = tb.toString();
     String expError = text("expected-error/text()", root);
@@ -580,7 +580,7 @@ public abstract class W3CTS {
 
     for(int c = 0; c < nod.size; c++) {
       final String file = pth + string(data.atom(nod.pre[c])) + ".xq";
-      final String in = read(new IO(queries + file));
+      final String in = read(IO.get(queries + file));
       final XQueryProcessor qu = new XQueryProcessor(in);
       final XQResult result = (XQResult) qu.query(null);
       final Var v = new Var(new QNm(data.atom(var.pre[c])));
@@ -617,7 +617,7 @@ public abstract class W3CTS {
    */
   private String error(final String nm, final String error) throws Exception {
     final String error2 = expected + nm + ".log";
-    final IO file  = new IO(error2);
+    final IO file  = IO.get(error2);
     return file.exists() ? error + "/" + read(file) : error;
   }
 

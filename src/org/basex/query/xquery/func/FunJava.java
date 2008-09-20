@@ -6,6 +6,12 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import javax.xml.datatype.DatatypeConstants;
+import javax.xml.datatype.Duration;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.namespace.QName;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
@@ -18,6 +24,12 @@ import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
 import org.basex.query.xquery.util.Err;
 import org.basex.util.Token;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Comment;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.ProcessingInstruction;
+import org.w3c.dom.Text;
 
 /**
  * Java function definition.
@@ -145,9 +157,45 @@ public final class FunJava extends Arr {
     }
     return val;
   }
-  
+
   /**
-   * Converts a Java class to an XQuery type.
+   * Returns an XQUery data type for a Java object.
+   * @param o object
+   * @return xquery type
+   */
+  public static Type jType(final Object o) {
+    final Type t = jType(o.getClass());
+    if(t != Type.JAVA) return t;
+
+    if(o instanceof Element) return Type.ELM;
+    if(o instanceof Document) return Type.DOC;
+    if(o instanceof Attr) return Type.ATT;
+    if(o instanceof Comment) return Type.COM;
+    if(o instanceof ProcessingInstruction) return Type.PI;
+    if(o instanceof Text) return Type.TXT;
+    
+    if(o instanceof Duration) {
+      final QName type = ((Duration) o).getXMLSchemaType();
+      if(type == DatatypeConstants.DURATION_DAYTIME) return Type.DTD;
+      if(type == DatatypeConstants.DURATION_YEARMONTH) return Type.YMD;
+      if(type == DatatypeConstants.DURATION) return Type.DUR;
+    }
+    if(o instanceof XMLGregorianCalendar) {
+      final QName type = ((XMLGregorianCalendar) o).getXMLSchemaType();
+      if(type == DatatypeConstants.DATE) return Type.DAT;
+      if(type == DatatypeConstants.DATETIME) return Type.DTM;
+      if(type == DatatypeConstants.TIME) return Type.TIM;
+      if(type == DatatypeConstants.GYEARMONTH) return Type.YMO;
+      if(type == DatatypeConstants.GMONTHDAY) return Type.MDA;
+      if(type == DatatypeConstants.GYEAR) return Type.YEA;
+      if(type == DatatypeConstants.GMONTH) return Type.MON;
+      if(type == DatatypeConstants.GDAY) return Type.DAY;
+    }
+    return null;
+  }
+
+  /**
+   * Returns an XQUery data type for a Java class.
    * @param par Java type
    * @return xquery type
    */
@@ -161,6 +209,9 @@ public final class FunJava extends Arr {
     if(par == long.class || par == Long.class) return Type.LNG;
     if(par == float.class || par == Float.class) return Type.FLT;
     if(par == double.class || par == Double.class) return Type.DBL;
+    if(par == BigDecimal.class) return Type.DEC;
+    if(par == BigInteger.class) return Type.ITR;
+    if(par == QName.class) return Type.QNM;
     return Type.JAVA;
   }
   

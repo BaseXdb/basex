@@ -28,16 +28,6 @@ public final class SeqBuilder {
 
   /**
    * Constructor.
-   * @param it items
-   * @param s number of items
-   */
-  public SeqBuilder(final Item[] it, final int s) {
-    item = it;
-    size = s;
-  }
-
-  /**
-   * Constructor.
    * @param it initial iteration
    * @throws XQException evaluation exception
    */

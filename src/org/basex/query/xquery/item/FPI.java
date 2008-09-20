@@ -3,7 +3,6 @@ package org.basex.query.xquery.item;
 import static org.basex.query.xquery.XQTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
-import org.basex.io.PrintOutput;
 import org.basex.query.xquery.XQContext;
 import org.basex.util.Token;
 
@@ -61,22 +60,6 @@ public final class FPI extends FNode {
   @Override
   public FPI copy() {
     return new FPI(name, val, par);
-  }
-
-  /**
-   * Serializes the specified processing-instruction.
-   * @param out output stream
-   * @param n name of processing instruction
-   * @param v value to be serialized
-   * @throws IOException I/O exception
-   */
-  public static void serialize(final PrintOutput out, final byte[] n,
-      final byte[] v) throws IOException {
-    out.print("<?");
-    out.print(n);
-    out.print(' ');
-    out.print(v);
-    out.print("?>");
   }
 
   @Override

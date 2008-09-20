@@ -121,7 +121,7 @@ public final class BaseXFileChooser {
    * @return file
    */
   public IO getFile() {
-    return new IO(fd != null ? fd.getDirectory() + "/" + fd.getFile() :
+    return IO.get(fd != null ? fd.getDirectory() + "/" + fd.getFile() :
       fc.getSelectedFile().getPath());
   }
   

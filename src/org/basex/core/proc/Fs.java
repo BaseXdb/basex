@@ -44,7 +44,7 @@ public final class Fs extends Process {
       // evaluate arguments...
       fs = cmd(args[0]);
       fs.context(context);
-      fs.args(args[1] == null ? "" : args[1], 0);
+      fs.args(args[1] == null ? "" : args[1]);
       return true;
     } catch(final FSException ex) {
       // internal command info..

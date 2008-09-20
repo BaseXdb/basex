@@ -183,7 +183,6 @@ public final class FTNode {
    * @param n second node
    * @param w distance to first node
    * @return boolean phrase
-   */
   public boolean phrase(final FTNode n, final int w) {
     boolean mp = morePos();
     boolean nmp = n.morePos();
@@ -209,6 +208,7 @@ public final class FTNode {
     p = (p != null) ? new IntList(pn.finish()) : null;
     return ip.size > 1; 
   }
+   */
   
   /**
    * Initialize pointer list.

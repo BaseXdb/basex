@@ -37,7 +37,7 @@ public final class DropDB extends Process {
    * @return success of operation
    */
   public static boolean drop(final String db) {
-    return IO.dbdelete(new IO(db).dbname(), null);
+    return IO.dbdelete(IO.get(db).dbname(), null);
   }
   
   @Override

@@ -54,6 +54,15 @@ public final class QNm extends Item {
   }
   
   /**
+   * Convenient method for converting a Java QName to a project specific one.
+   * @param name name
+   * @param u uri
+   */
+  public QNm(final String name, final String u) {
+    this(Token.token(name), Uri.uri(Token.token(u)));
+  }
+  
+  /**
    * Sets the name.
    * @param nm name
    */

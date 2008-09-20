@@ -231,7 +231,7 @@ public final class XQContext extends QueryContext {
     for(final DNode d : docs) if(d.data.meta.dbname.equals(dbname)) return d;
 
     // check if the database has already been read
-    final IO bxw = new IO(string(db));
+    final IO bxw = IO.get(string(db));
     for(final DNode d : docs) if(d.data.meta.file.eq(bxw)) return d;
 
     // get database instance

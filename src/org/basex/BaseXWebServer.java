@@ -2,7 +2,6 @@ package org.basex;
 
 import static org.basex.Text.*;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -309,7 +308,7 @@ public final class BaseXWebServer {
     // using a helper script to pass arguments
     final String phphelp = "<?$f=$argv[1];$s=preg_split('/ /',$argv[2]);" +
       "for($i=0;$i<sizeof($s);$i+=2){$_GET[$s[$i]]=$s[$i+1];}include($f);?>";
-    final IO file = new IO(Prop.webpath + "/php.tmp");
+    final IO file = IO.get(Prop.webpath + "/php.tmp");
     file.write(Token.token(phphelp));
 
     final StringBuilder args = new StringBuilder();
@@ -373,12 +372,12 @@ public final class BaseXWebServer {
     out.println("<td align='right'><b>Size</b></td></tr>");
     out.println("<tr><td colspan='5'" + col + "></td></tr>");
 
-    for(final File f : dir.file().listFiles()) {
-      out.print("<tr><td><a" + dec + " href='" + f.getName());
-      if(f.isDirectory()) out.print("/");
-      out.println("'>" + f.getName() + "</a></td><td></td>");
+    for(final IO f : dir.children()) {
+      out.print("<tr><td><a" + dec + " href='" + f.name());
+      if(f.isDir()) out.print("/");
+      out.println("'>" + f.name() + "</a></td><td></td>");
       final SimpleDateFormat sdm = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
-      final String mod = sdm.format(new Date(f.lastModified()));
+      final String mod = sdm.format(new Date(f.date()));
       out.println("<td>" + mod + "</td><td></td>");
       out.println("<td align='right'>" + f.length() + "</td></tr>");
     }
@@ -484,11 +483,11 @@ public final class BaseXWebServer {
      */
     Request(final String fn) {
       // no file specified - try alternatives
-      file = new IO(Prop.webpath + "/" + fn);
+      file = IO.get(Prop.webpath + "/" + fn);
       
       if(file.isDir()) {
         for(final String index : INDEXFILES) {
-          IO f = new IO(Prop.webpath + "/" + fn + "/" + index);
+          IO f = IO.get(Prop.webpath + "/" + fn + "/" + index);
           if(f.exists()) {
             code = 302;
             file = f;
@@ -511,7 +510,7 @@ public final class BaseXWebServer {
       }
 
       i = f.indexOf(".");
-      file = new IO(Prop.webpath + "/" + f);
+      file = IO.get(Prop.webpath + "/" + f);
       suf = i != -1 ? f.substring(i + 1) : "";
       
       if(!file.exists()) code = 404;

@@ -153,15 +153,6 @@ public final class MemData extends Data {
   }
 
   /**
-   * Returns the id for the specified attribute value.
-   * @param v attribute value
-   * @return id
-   */
-  public int attID(final byte[] v) {
-    return ((MemValues) atvindex).get(v);
-  }
-
-  /**
    * Returns the index value for the specified attribute value id.
    * @param id index id
    * @return value

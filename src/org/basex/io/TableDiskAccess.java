@@ -427,7 +427,7 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   /**
-   * Return the entryCount.
+   * Return the entryCount; needed for JUnit tests.
    * @return number of entries in storage.
    */
   public synchronized int size() {
@@ -435,7 +435,7 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   /**
-   * Return the number of used blocks.
+   * Return the number of used blocks; needed for JUnit tests.
    * @return number of used blocks.
    */
   public synchronized int blocks() {

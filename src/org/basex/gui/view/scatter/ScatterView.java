@@ -368,7 +368,7 @@ public class ScatterView extends View implements Runnable {
   protected void refreshInit() {
     final Data data = GUI.context.data();
     if(data != null) {
-      if(!GUIProp.showscatter) return;
+      if(!GUIProp.showplot) return;
       
       viewDimension = Integer.MAX_VALUE;
       scatterData = new ScatterData();

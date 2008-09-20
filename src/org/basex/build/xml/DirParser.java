@@ -34,15 +34,15 @@ public final class DirParser extends Parser {
   /**
    * Parse the specified file or parser its children.
    * @param b builder
-   * @param f file reference
+   * @param path file path
    * @throws IOException I/O exception
    */
-  private void parse(final Builder b, final IO f) throws IOException {
-    if(f.isDir()) {
-      for(final IO ch : f.children()) parse(b, ch);
+  private void parse(final Builder b, final IO path) throws IOException {
+    if(path.isDir()) {
+      for(final IO f : path.children()) parse(b, f);
     } else {
-      file = f;
-      while(f.more()) {
+      file = path;
+      while(path.more()) {
         // [CG] Create Collection: how to deal with non-XML documents?
         //if(!f.name().endsWith(IO.XMLSUFFIX)) continue;
         b.meta.filesize += file.length();

@@ -3,7 +3,6 @@ package org.basex.io;
 import java.io.File;
 import java.io.IOException;
 import org.basex.core.Prop;
-import org.basex.util.Num;
 import org.basex.util.Performance;
 
 /**
@@ -42,7 +41,6 @@ public final class DataAccessPerf extends DataAccess {
     super(f);
     rp = new Performance();
   }
-  
 
   /**
    * Reads a number of bytes in range from -> to and returns them as array.
@@ -58,7 +56,6 @@ public final class DataAccessPerf extends DataAccess {
     return array;
   }
   
-  
   /**
    * Reads an integer value from the specified position.
    * @param p position
@@ -71,7 +68,6 @@ public final class DataAccessPerf extends DataAccess {
     t += rp.getTime();
     return i;
   }
-
   
   /**
    * Reads an 5-byte value from the specified file offset.
@@ -86,50 +82,6 @@ public final class DataAccessPerf extends DataAccess {
     return l;
   }
 
-  
-  
-  /**
-   * Reads a {@link Num} value from disk.
-   * @param p text position
-   * @param s number of num values
-   * @return read num
-   */
-  @Override
-  public synchronized int[] readNums(final long p, final int s) {
-    rp.initTimer();
-    int[] r = super.readNums(p, s);
-    t += rp.getTime();
-    return r;
-  }
-
-  /**
-   * Reads a {@link Num} value from disk.
-   * @param s number of num values
-   * @return read num
-   */
-  @Override
-  public synchronized int[] readNums(final int s) {
-    rp.initTimer();
-    int[] r = super.readNums(s);
-    t += rp.getTime();
-    return r;
-  }
-
-   
-  /**
-   * Reads a number of int values in range from -> to and returns them as array.
-   * @param from starting position for reading
-   * @param to ending position for reading
-   * @return int array
-   */
-  @Override
-  public synchronized int[] readInts(final long from, final long to) {
-    rp.initTimer();
-    int[] r = super.readInts(from, to);
-    t += rp.getTime();
-    return r;
-  }
-  
   /**
    * Closes the data access.
    * @throws IOException in case of write errors

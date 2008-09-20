@@ -203,7 +203,7 @@ public final class DialogCreate extends Dialog {
     fc.addFilter(IO.XMLSUFFIX, CREATEXMLDESC);
 
     if(fc.select(BaseXFileChooser.MODE.OPENDIR)) {
-      IO file = fc.getFile();
+      final IO file = fc.getFile();
       input.setText(file.path());
       dbname.setText(file.dbname());
       //final int c = count(file);
@@ -238,7 +238,7 @@ public final class DialogCreate extends Dialog {
     }
     
     final String path = input();
-    final IO file = new IO(path);
+    final IO file = IO.get(path);
     final boolean exists = path.length() != 0 && file.exists();
     if(exists) GUIProp.createpath = file.getDir();
     

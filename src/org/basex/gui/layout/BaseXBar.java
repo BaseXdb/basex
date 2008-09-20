@@ -114,14 +114,6 @@ public final class BaseXBar extends BaseXPanel {
     height = h;
   }
 
-  /**
-   * Returns the panel height.
-   * @return panel height
-   */
-  public int height() {
-    return height;
-  }
-
   @Override
   public void paintComponent(final Graphics g) {
     hh = getHeight();

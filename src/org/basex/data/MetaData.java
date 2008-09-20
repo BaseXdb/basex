@@ -82,7 +82,7 @@ public final class MetaData {
       long t = 0;
       while((key = in.readString()).length() != 0) {
         final String val = in.readString();
-        if(key.equals(DBFNAME)) f = new IO(val);
+        if(key.equals(DBFNAME)) f = IO.get(val);
         if(key.equals(DBTIME)) t = Token.toLong(val);
       }
       in.close();
@@ -120,7 +120,7 @@ public final class MetaData {
 
       if(k.equals(DBSTORAGE)) storage = v;
       else if(k.equals(IDBSTORAGE)) istorage = v;
-      else if(k.equals(DBFNAME)) file = new IO(v);
+      else if(k.equals(DBFNAME)) file = IO.get(v);
       else if(k.equals(DBFSIZE)) filesize = Token.toLong(v);
       else if(k.equals(DBNDOCS)) ndocs = Token.toInt(v);
       else if(k.equals(DBFTDC)) ftdc = toBool(v);

@@ -653,30 +653,6 @@ public final class Token {
   }
 
   /**
-   * Checks if the first token contains the second fulltext term.
-   * @param tok first token
-   * @param sub second token
-   * @return result of test
-   */
-  public static boolean ftcontains(final byte[] tok, final byte[] sub) {
-    final byte[] tk = norm(tok);
-    final byte[] sb = norm(sub);
-
-    final int tl = tk.length;
-    final int sl = sb.length;
-    if(sl == 0 || sl > tl) return false;
-
-    // compare tokens character wise
-    for(int t = 0; t <= tl - sl; t++) {
-      if(t > 0 && letterOrDigit(tk[t - 1])) continue;
-      int s = -1;
-      while(++s != sl && ftNorm(sb[s]) == ftNorm(tk[t + s]));
-      if(s == sl && (t + s == tl || !letterOrDigit(tk[t + s]))) return true;
-    }
-    return false;
-  }
-
-  /**
    * Returns the position of the specified character or -1.
    * @param tok first token
    * @param c character
@@ -685,18 +661,6 @@ public final class Token {
   public static int indexOf(final byte[] tok, final int c) {
     final int tl = tok.length;
     for(int t = 0; t < tl; t++) if(tok[t] == c) return t;
-    return -1;
-  }
-
-  /**
-   * Returns the last position of the specified character or -1.
-   * @param tok first token
-   * @param c character
-   * @return result of test
-   */
-  public static int lastIndexOf(final byte[] tok, final int c) {
-    final int tl = tok.length;
-    for(int t = tl - 1; t >= 0; t--) if(tok[t] == c) return t;
     return -1;
   }
 

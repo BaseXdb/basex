@@ -31,7 +31,7 @@ public final class Check extends Process {
     final String name = args[0];
 
     // check open database...
-    if(data != null && data.meta.dbname.equals(new IO(name).dbname()))
+    if(data != null && data.meta.dbname.equals(IO.get(name).dbname()))
         return Prop.info ? info(DBINMEM) : true;
 
     // open or create new database
@@ -45,7 +45,7 @@ public final class Check extends Process {
    * @return data instance
    */
   public static Data check(final String path) {
-    final IO file = new IO(path);
+    final IO file = IO.get(path);
     final String db = file.dbname();
     return MetaData.found(path, db) ? Open.open(db) : CreateDB.xml(file, db);
   }

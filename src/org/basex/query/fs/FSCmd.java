@@ -33,10 +33,9 @@ public abstract class FSCmd {
   /**
    * Checks the command line arguments.
    * @param args command line arguments
-   * @param p argument position
    * @throws FSException file system exception
    */
-  public abstract void args(final String args, final int p) throws FSException;
+  public abstract void args(final String args) throws FSException;
   
   /**
    * Executes the command..
@@ -48,12 +47,11 @@ public abstract class FSCmd {
   /**
    * Checks the default options and returns the option parser.
    * @param args command arguments
-   * @param p start position
    * @return option parser
    * @throws FSException file system exception
    */
-  final GetOpts defaultOpts(final String args, final int p) throws FSException {
-    final GetOpts g = new GetOpts(args, "h", p);
+  final GetOpts defaultOpts(final String args) throws FSException {
+    final GetOpts g = new GetOpts(args, "h");
     while(g.more()) checkOpt(g);
     return g;
   }

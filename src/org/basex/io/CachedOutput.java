@@ -41,13 +41,6 @@ public final class CachedOutput extends PrintOutput {
     if(size == buf.length) buf = Array.extend(buf);
     buf[size++] = (byte) b;
   }
-
-  /**
-   * Resets the output array.
-   */
-  public void reset() {
-    size = 0;
-  }
   
   /**
    * Returns the output as byte array.

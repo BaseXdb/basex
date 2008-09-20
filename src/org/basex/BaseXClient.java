@@ -177,7 +177,7 @@ public class BaseXClient {
   private String content() {
     // open file
     try {
-      return Token.string(new IO(query).content()).trim();
+      return Token.string(IO.get(query).content()).trim();
     } catch(final IOException ex) {
       error(ex, ex.getMessage());
       BaseX.debug(ex);

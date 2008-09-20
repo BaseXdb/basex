@@ -107,8 +107,7 @@ public final class MAB2Parser extends Parser {
   @Override
   public void parse(final Builder b) throws IOException {
     // read in indexes
-    final File f = file.file();
-    final String dir = f.getAbsoluteFile().getParent();
+    final String dir = file.getDir();
     index(mediatypes, dir + "/mediatypes.dat");
     index(subjects, dir + "/subjects.dat");
     index(languages, dir + "/lang.dat");
@@ -123,7 +122,7 @@ public final class MAB2Parser extends Parser {
     }
 
     // create input reference
-    input = new RandomAccess(f);
+    input = new RandomAccess(file.path());
 
     // check beginning of input file
     if(input.read() != '#' || input.read() != '#' || input.read() != '#') {
@@ -595,7 +594,7 @@ public final class MAB2Parser extends Parser {
    */
   private void index(final TokenMap hash, final String fn) {
     try {
-      final RandomAccess in = new RandomAccess(new File(fn));
+      final RandomAccess in = new RandomAccess(fn);
       while(true) {
         final byte[] key = find(in, (byte) '\t');
         final byte[] val = find(in, (byte) '\n');

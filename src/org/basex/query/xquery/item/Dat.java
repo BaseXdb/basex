@@ -1,7 +1,6 @@
 package org.basex.query.xquery.item;
 
 import static org.basex.query.xquery.XQText.*;
-import javax.xml.datatype.XMLGregorianCalendar;
 import org.basex.query.xquery.XQException;
 import org.basex.util.TokenBuilder;
 
@@ -53,11 +52,5 @@ public final class Dat extends Date {
     date(tb);
     zone(tb);
     return tb.finish();
-  }
-
-  @Override
-  public XMLGregorianCalendar java() {
-    return df.newXMLGregorianCalendar(mon / 12,
-        mon % 12 + 1, (int) (sec / DAYSECONDS) + 1, 0, 0, 0, 0, zshift);
   }
 }

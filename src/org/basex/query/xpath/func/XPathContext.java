@@ -1,12 +1,8 @@
 package org.basex.query.xpath.func;
 
 import static org.basex.query.xpath.XPText.*;
-
 import org.basex.query.QueryException;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.values.Literal;
-import org.basex.query.xpath.values.Num;
-import org.basex.query.xpath.values.Item;
 import org.basex.util.Map;
 import org.basex.util.Token;
 
@@ -19,8 +15,6 @@ import org.basex.util.Token;
 public final class XPathContext {
   /** HashMap with XPath functions. */
   private Map<Class<? extends Func>> funcs = new Map<Class<? extends Func>>();
-  /** HashMap with XPath variables. */
-  private Map<Item> vars = new Map<Item>();
   /** Singleton instance. */
   private static XPathContext instance = new XPathContext();
   
@@ -99,18 +93,6 @@ public final class XPathContext {
   }
 
   /**
-   * Evaluates a variable.
-   * @param name name of the variable
-   * @return resulting XPathValue
-   * @throws QueryException query exception
-   */
-  public Item evalVariable(final byte[] name) throws QueryException {
-    final Item v = vars.get(name);
-    if(v == null) throw new QueryException(UNKNOWNVAR, name);
-    return v;
-  }
-
-  /**
    * Registers a function.
    * @param name name of the function.
    * @param function instance of the function.
@@ -118,32 +100,5 @@ public final class XPathContext {
   private void addFunction(final String name,
       final Class<? extends Func> function) {
     funcs.add(Token.token(name), function);
-  }
-
-  /**
-   * Registers a variable.
-   * @param name name of the variable.
-   * @param value variable as string.
-   */
-  public void addVariable(final String name, final byte[] value) {
-    addVariable(name, new Literal(value));
-  }
-
-  /**
-   * Registers a variable.
-   * @param variableName name of the variable.
-   * @param value double value of variable.
-   */
-  public void addVariable(final String variableName, final double value) {
-    addVariable(variableName, new Num(value));
-  }
-
-  /**
-   * Registers a variable.
-   * @param name name of the variable.
-   * @param value variable instance.
-   */
-  private void addVariable(final String name, final Item value) {
-    vars.add(Token.token(name), value);
   }
 }

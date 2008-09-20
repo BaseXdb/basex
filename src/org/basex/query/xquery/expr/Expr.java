@@ -68,14 +68,6 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Returns the sequence size or 0.
-   * @return result of check
-   */
-  public int size() {
-    return 0;
-  }
-
-  /**
    * Indicates if an expression uses the specified type.
    * Called by the compiler to check if expressions can be reformulated.
    * true is returned by default.

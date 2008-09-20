@@ -31,19 +31,6 @@ public final class NodeBuilder {
   /**
    * Constructor, creating a new node set from the specified node ids.
    * @param ids node ids
-   */
-  public NodeBuilder(final int[] ids) {
-    if(ids.length == 0) {
-      nodes = new int[1];
-    } else {
-      nodes = ids;
-      size = ids.length;
-    }
-  }
-
-  /**
-   * Constructor, creating a new node set from the specified node ids.
-   * @param ids node ids
    * @param ftprepos fulltext pre pos values
    * @param ftpointer fulltext pointer values
    */
@@ -58,7 +45,6 @@ public final class NodeBuilder {
       ftpoin = ftpointer;
     }
   }
-
   
   /**
    * Adds a pre value to the node set.
@@ -119,17 +105,5 @@ public final class NodeBuilder {
       sort = false;
     }
     return Array.finish(nodes, size);
-  }
-
-  /**
-   * Set node array with prevalues.
-   *
-   * @param pres to set
-   */
-  public void setNodes(final int[] pres) {
-    size = pres.length;
-    nodes = pres;
-    //nodes = new int[size];
-    //System.arraycopy(pres, 0, nodes, 0, size);
   }
 }

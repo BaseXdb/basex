@@ -292,7 +292,7 @@ public final class GUI extends JFrame {
       textpanel, helppanel }, {
         new ViewPanel(new TreeView(HELPTREE), TREEVIEW),
         new ViewPanel(new RealView(), REALVIEW),
-        new ViewPanel(new ScatterView(null), SCATTERVIEW),
+        new ViewPanel(new ScatterView(null), PLOTVIEW),
         new ViewPanel(new TableView(HELPTABLE), TABLEVIEW),
         new ViewPanel(new MapView(HELPMAP), MAPVIEW),
         new ViewPanel(query, QUERYVIEW),

@@ -3,11 +3,15 @@ package org.basex.core.proc;
 import static org.basex.Text.*;
 import static org.basex.core.Commands.*;
 import java.io.IOException;
+
+import javax.xml.transform.sax.SAXSource;
+
 import org.basex.BaseX;
 import org.basex.build.DiskBuilder;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.build.xml.DirParser;
+import org.basex.build.xml.SAXWrapper;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.index.FTBuilder;
@@ -42,7 +46,7 @@ public final class CreateDB extends ACreate {
   
   @Override
   protected boolean exec() {
-    final IO f = new IO(args[0]);
+    final IO f = IO.get(args[0]);
     if(!f.exists()) return error(FILEWHICH, f);
     return build(new DirParser(f), args[1] == null ? f.dbname() : args[1]);
   }
@@ -60,8 +64,17 @@ public final class CreateDB extends ACreate {
   }
 
   /**
+   * Creates and returns a database from the specified SAX source.
+   * @param s sax source
+   * @return database instance
+   */
+  public static Data xml(final SAXSource s) {
+    return xml(new SAXWrapper(s), "tmp");
+  }
+
+  /**
    * Creates and returns a database for the specified XML document.
-   * No warnings are thrown; instead, an empty reference is returned.
+   * If building fails, an empty reference is returned.
    * @param p xml parser
    * @param db name of the database to be created
    * @return database instance

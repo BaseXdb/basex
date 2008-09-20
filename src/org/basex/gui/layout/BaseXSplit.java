@@ -72,15 +72,6 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
     revalidate();
   }
 
-
-  /**
-   * Returns the panel positions.
-   * @return positions
-   */
-  public double[] positions() {
-    return s;
-  }
-  
   /**
    * Adds the specified component.
    * @param name the component name
