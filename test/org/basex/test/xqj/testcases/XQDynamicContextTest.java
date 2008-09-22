@@ -78,9 +78,9 @@ public class XQDynamicContextTest extends XQJTestCase {
     }    
     xqpe.close();
 
-    xqpe = xqc.prepareExpression("declare variable $vvv external; $vvv");
+    xqpe = xqc.prepareExpression("declare variable $v external; $v");
     try {
-      xqpe.bindAtomicValue(new QName("vvv"), "Hello world!", xqc.createCommentType());
+      xqpe.bindAtomicValue(new QName("v"), "Hello world!", xqc.createCommentType());
       fail("A-XQDC-1.3: An invalid type of the value to be bound must fail.");
     } catch (XQException e) {
       // Expect an XQException
@@ -1011,12 +1011,12 @@ public class XQDynamicContextTest extends XQJTestCase {
     Comment comment = document.createComment("comment");
     ProcessingInstruction pi = document.createProcessingInstruction("target", "data");
     Text text = document.createTextNode("text");
-    
+
     xqe.bindObject(new QName("v"), document, null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of document-node()");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
-    
+
     xqe.bindObject(new QName("v"), documentFragment, null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of document-node()");
     xqs.next();

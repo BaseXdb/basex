@@ -16,13 +16,16 @@ import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQResultItem;
 import org.basex.BaseX;
-import org.basex.api.jaxp.IterStreamReader;
 import org.basex.data.SAXSerializer;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
 import org.basex.io.PrintOutput;
 import org.basex.query.xquery.XQContext;
+import org.basex.query.xquery.item.Bln;
+import org.basex.query.xquery.item.Dbl;
+import org.basex.query.xquery.item.Flt;
 import org.basex.query.xquery.item.Item;
+import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.SeqIter;
 import org.basex.util.Token;
@@ -31,7 +34,7 @@ import org.xml.sax.ContentHandler;
 
 /**
  * Java XQuery API - Item.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
@@ -42,7 +45,7 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
   private final XQContext ctx;
   /** Item. */
   Item it;
-  
+
   /**
    * Constructor.
    * @param item item
@@ -65,19 +68,15 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
     ctx = context;
     it = item;
   }
-  
+
   public String getAtomicValue() throws XQException {
-    check();
-    if(it.node()) throw new BXQException(ATOM, it.type);
+    opened();
+    if(it.node()) throw new BXQException(ATOM);
     return Token.string(it.str());
   }
 
   public boolean getBoolean() throws XQException {
-    try {
-      return check(Type.BLN).bool();
-    } catch(final org.basex.query.xquery.XQException ex) {
-      throw new BXQException(ex);
-    }
+    return ((Bln) check(Type.BLN)).bool();
   }
 
   public byte getByte() throws XQException {
@@ -85,19 +84,11 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
   }
 
   public double getDouble() throws XQException {
-    try {
-      return check(Type.DBL).dbl();
-    } catch(final org.basex.query.xquery.XQException ex) {
-      throw new BXQException(ex);
-    }
+    return ((Dbl) check(Type.DBL)).dbl();
   }
 
   public float getFloat() throws XQException {
-    try {
-      return check(Type.FLT).flt();
-    } catch(final org.basex.query.xquery.XQException ex) {
-      throw new BXQException(ex);
-    }
+    return ((Flt) check(Type.FLT)).flt();
   }
 
   public int getInt() throws XQException {
@@ -110,12 +101,12 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
     return new IterStreamReader(seq);
   }
 
-  public String getItemAsString(Properties props) throws XQException {
+  public String getItemAsString(final Properties props) throws XQException {
     return serialize();
   }
 
   public XQItemType getItemType() throws XQException {
-    check();
+    opened();
     return new BXQItemType(it.type);
   }
 
@@ -124,16 +115,15 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
   }
 
   public Node getNode() throws XQException {
-    check();
-    BaseX.notimplemented();
-    return it.node() ? (Node) it : null;
+    opened();
+    if(!it.node()) throw new BXQException(WRONG, Type.NOD, it.type);
+    return ((Nod) it).java();
   }
 
   public URI getNodeUri() throws XQException {
-    check();
+    opened();
     if(!it.node()) throw new BXQException(NODE);
-    final org.basex.query.xquery.item.Node node =
-      (org.basex.query.xquery.item.Node) it;
+    final Nod node = (Nod) it;
     try {
       return new URI(Token.string(node.base()));
     } catch(final URISyntaxException ex) {
@@ -142,7 +132,7 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
   }
 
   public Object getObject() throws XQException {
-    check();
+    opened();
     return it.java();
   }
 
@@ -150,18 +140,19 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
     return (short) castItr(Type.SHR);
   }
 
-  public boolean instanceOf(XQItemType type) throws XQException {
-    check();
+  public boolean instanceOf(final XQItemType type) throws XQException {
+    opened();
     return it.type.instance(((BXQItemType) type).getType());
   }
 
-  public void writeItem(OutputStream os, Properties props) throws XQException {
-    check(os, OutputStream.class);
+  public void writeItem(final OutputStream os, final Properties props)
+      throws XQException {
+    valid(os, OutputStream.class);
     serialize(os);
   }
 
   /**
-   * Returns the current item in an output cache
+   * Serializes the item to the specified output stream.
    * @param os output stream
    * @throws XQException exception
    */
@@ -169,8 +160,9 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
     serialize(it, ctx, new XMLSerializer(new PrintOutput(os)));
   }
 
-  public void writeItem(Writer ow, Properties props) throws XQException {
-    check(ow, Writer.class);
+  public void writeItem(final Writer ow, final Properties props)
+      throws XQException {
+    valid(ow, Writer.class);
     try {
       ow.write(serialize());
     } catch(final IOException ex) {
@@ -179,21 +171,21 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
   }
 
   /**
-   * Returns the current item in an output cache
+   * Returns the serialized output.
    * @return cached output
    * @throws XQException exception
    */
   private String serialize() throws XQException {
-    check();
+    opened();
     final CachedOutput co = new CachedOutput();
     serialize(it, ctx, new XMLSerializer(co));
     return co.toString();
   }
 
-  public void writeItemToResult(Result result) throws XQException {
-    check();
-    check(result, Result.class);
-    
+  public void writeItemToResult(final Result result) throws XQException {
+    opened();
+    valid(result, Result.class);
+
     // evaluate different Result types...
     if(result instanceof StreamResult) {
       // StreamResult.. directly write result as string
@@ -201,34 +193,21 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
     } else if(result instanceof SAXResult) {
       // SAXResult.. serialize result to underlying parser
       final SAXSerializer ser = new SAXSerializer(null);
-      ContentHandler h = ((SAXResult) result).getHandler();
+      final ContentHandler h = ((SAXResult) result).getHandler();
       ser.setContentHandler(h);
       serialize(it, ctx, ser);
-      
-      /*
-      final ContentHandler handler = ((SAXResult) result).getHandler();
-      try {
-        final SAXParserFactory f = SAXParserFactory.newInstance();
-        f.setNamespaceAware(true);
-        f.setValidating(false);
-        final XMLReader r = f.newSAXParser().getXMLReader();
-        r.setContentHandler(handler);
-        r.parse(new InputSource(new StringReader(serialize())));
-      } catch(final Exception ex) {
-        throw new BXQException(ex);
-      }*/
     } else {
       BaseX.notimplemented();
     }
   }
 
-  public void writeItemToSAX(ContentHandler sax) throws XQException {
-    check(sax, ContentHandler.class);
+  public void writeItemToSAX(final ContentHandler sax) throws XQException {
+    valid(sax, ContentHandler.class);
     writeItemToResult(new SAXResult(sax));
   }
 
   public XQConnection getConnection() throws XQException {
-    check();
+    opened();
     return conn;
   }
 
@@ -239,8 +218,8 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
    * @throws XQException xquery exception
    */
   private Item check(final Type type) throws XQException {
-    check();
-    if(!it.type.instance(type)) throw new BXQException(WRONG, it.type, type);
+    opened();
+    if(it.type != type) throw new BXQException(WRONG, it.type, type);
     return it;
   }
 
@@ -250,28 +229,13 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
    * @return cast item
    * @throws XQException xquery exception
    */
-  private Item cast(final Type type) throws XQException {
-    check();
-    try {
-      return type.e(it, null);
-    } catch(org.basex.query.xquery.XQException ex) {
-      throw new BXQException(ex);
-    }
-  }
-
-  /**
-   * Casts the current item.
-   * @param type expected type
-   * @return cast item
-   * @throws XQException xquery exception
-   */
   private long castItr(final Type type) throws XQException {
-    check();
+    opened();
     try {
       final double d = it.dbl();
-      if(!it.n() || d != (long) d) throw new BXQException(NUM);
-      return cast(type).itr();
-    } catch(org.basex.query.xquery.XQException ex) {
+      if(!it.n() || d != (long) d) throw new BXQException(NUM, d);
+      return type.e(it, null).itr();
+    } catch(final org.basex.query.xquery.XQException ex) {
       throw new BXQException(ex);
     }
   }

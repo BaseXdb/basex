@@ -1,18 +1,20 @@
 package org.basex.api.xqj;
 
+import static javax.xml.xquery.XQConstants.*;
 import static org.basex.api.xqj.BXQText.*;
 import static org.basex.util.Token.*;
-import static javax.xml.xquery.XQConstants.*;
+
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQStaticContext;
+
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.QNm;
 import org.basex.query.xquery.item.Uri;
 
 /**
  * Java XQuery API - Static Context.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
@@ -32,10 +34,11 @@ public class BXQStaticContext implements XQStaticContext {
   /** Timeout. */
   int timeout = 0;
 
-  public void declareNamespace(String prefix, String uri) throws XQException {
+  public void declareNamespace(final String prefix, final String uri)
+      throws XQException {
     try {
-      BXQAbstract.check(prefix, String.class);
-      BXQAbstract.check(uri, String.class);
+      BXQAbstract.valid(prefix, String.class);
+      BXQAbstract.valid(uri, String.class);
       ctx.ns.index(new QNm(prefix, uri), true);
     } catch(final org.basex.query.xquery.XQException ex) {
       throw new BXQException(ex);
@@ -55,7 +58,7 @@ public class BXQStaticContext implements XQStaticContext {
   }
 
   public int getConstructionMode() {
-    return ctx.construct ? CONSTRUCTION_MODE_PRESERVE : CONSTRUCTION_MODE_STRIP; 
+    return ctx.construct ? CONSTRUCTION_MODE_PRESERVE : CONSTRUCTION_MODE_STRIP;
   }
 
   public XQItemType getContextItemStaticType() {
@@ -96,13 +99,13 @@ public class BXQStaticContext implements XQStaticContext {
 
   public String[] getNamespacePrefixes() {
     final String[] pre = new String[ctx.ns.size];
-    for(int p = 0; p < ctx.ns.size; p++) 
+    for(int p = 0; p < ctx.ns.size; p++)
       pre[p] = string(ctx.ns.names[p].ln());
     return pre;
   }
 
-  public String getNamespaceURI(String prefix) throws XQException {
-    BXQAbstract.check(prefix, String.class);
+  public String getNamespaceURI(final String prefix) throws XQException {
+    BXQAbstract.valid(prefix, String.class);
     final Uri uri = ctx.ns.find(token(prefix));
     if(uri != null) return string(uri.str());
     throw new BXQException(PRE, prefix);  }
@@ -123,74 +126,76 @@ public class BXQStaticContext implements XQStaticContext {
     return scrollable ? SCROLLTYPE_SCROLLABLE : SCROLLTYPE_FORWARD_ONLY;
   }
 
-  public void setBaseURI(String baseUri) throws XQException {
-    BXQAbstract.check(baseUri, String.class);
+  public void setBaseURI(final String baseUri) throws XQException {
+    BXQAbstract.valid(baseUri, String.class);
     ctx.baseURI = Uri.uri(token(baseUri));
   }
 
-  public void setBindingMode(int mode) throws BXQException {
+  public void setBindingMode(final int mode) throws BXQException {
     if(mode != 0 && mode != 1) throw new BXQException(ARG, ARGB);
     binding = mode == BINDING_MODE_IMMEDIATE;
   }
 
-  public void setBoundarySpacePolicy(int mode) throws BXQException {
+  public void setBoundarySpacePolicy(final int mode) throws BXQException {
     ctx.spaces = check(mode, ARGS) == BOUNDARY_SPACE_PRESERVE;
   }
 
-  public void setConstructionMode(int mode) throws XQException {
+  public void setConstructionMode(final int mode) throws XQException {
     ctx.construct = check(mode, ARGC) == CONSTRUCTION_MODE_PRESERVE;
   }
 
-  public void setContextItemStaticType(XQItemType contextItemType) {
+  public void setContextItemStaticType(final XQItemType contextItemType) {
     type = contextItemType;
   }
 
-  public void setCopyNamespacesModeInherit(int mode) throws BXQException {
+  public void setCopyNamespacesModeInherit(final int mode) throws BXQException {
     ctx.nsInherit = check(mode, ARGN) == COPY_NAMESPACES_MODE_INHERIT;
   }
 
-  public void setCopyNamespacesModePreserve(int mode) throws BXQException {
-    ctx.nsPreserve = check(mode, ARGN) == COPY_NAMESPACES_MODE_PRESERVE;
+  public void setCopyNamespacesModePreserve(final int m) throws BXQException {
+    ctx.nsPreserve = check(m, ARGN) == COPY_NAMESPACES_MODE_PRESERVE;
   }
 
-  public void setDefaultCollation(String uri) throws XQException {
-    BXQAbstract.check(uri, String.class);
+  public void setDefaultCollation(final String uri) throws XQException {
+    BXQAbstract.valid(uri, String.class);
     ctx.collation = Uri.uri(token(uri));
   }
 
-  public void setDefaultElementTypeNamespace(String uri) throws XQException {
-    BXQAbstract.check(uri, String.class);
+  public void setDefaultElementTypeNamespace(final String uri)
+      throws XQException {
+    BXQAbstract.valid(uri, String.class);
     ctx.nsElem = Uri.uri(token(uri));
   }
 
-  public void setDefaultFunctionNamespace(String uri) throws XQException {
-    BXQAbstract.check(uri, String.class);
+  public void setDefaultFunctionNamespace(final String uri) throws XQException {
+    BXQAbstract.valid(uri, String.class);
     ctx.nsFunc = Uri.uri(token(uri));
   }
 
-  public void setDefaultOrderForEmptySequences(int mode) throws BXQException {
+  public void setDefaultOrderForEmptySequences(final int mode)
+      throws BXQException {
     ctx.orderGreatest = check(mode, ARGO) ==
       DEFAULT_ORDER_FOR_EMPTY_SEQUENCES_GREATEST;
   }
 
-  public void setHoldability(int hold) throws BXQException {
+  public void setHoldability(final int hold) throws BXQException {
     holdability = check(hold, ARGH) == HOLDTYPE_HOLD_CURSORS_OVER_COMMIT;
   }
 
-  public void setOrderingMode(int mode) throws BXQException {
+  public void setOrderingMode(final int mode) throws BXQException {
     ctx.ordered = check(mode, ARGO) == ORDERING_MODE_ORDERED;
   }
 
-  public void setQueryLanguageTypeAndVersion(int mode) throws BXQException {
-    xqueryx = check(mode, ARGL) == LANGTYPE_XQUERYX;
+  public void setQueryLanguageTypeAndVersion(final int m) throws BXQException {
+    xqueryx = check(m, ARGL) == LANGTYPE_XQUERYX;
   }
 
-  public void setQueryTimeout(int seconds) throws BXQException {
+  public void setQueryTimeout(final int seconds) throws BXQException {
     if(seconds < 0) throw new BXQException(TIME);
     timeout = seconds;
   }
 
-  public void setScrollability(int mode) throws BXQException {
+  public void setScrollability(final int mode) throws BXQException {
     scrollable = check(mode, ARGR) == SCROLLTYPE_SCROLLABLE;
   }
 

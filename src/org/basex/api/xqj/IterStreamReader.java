@@ -1,4 +1,4 @@
-package org.basex.api.jaxp;
+package org.basex.api.xqj;
 
 import java.util.NoSuchElementException;
 import java.util.Properties;
@@ -9,12 +9,13 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import org.basex.BaseX;
+import org.basex.api.jaxp.NSContextImpl;
 import org.basex.data.Data;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.DNode;
 import org.basex.query.xquery.item.FNode;
 import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Node;
+import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.QNm;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.item.Uri;
@@ -104,9 +105,6 @@ public final class IterStreamReader implements XMLStreamReader {
     return Token.string(atts.list[i].str());
   }
 
-  /*
-   * @see javax.xml.stream.XMLStreamReader#getAttributeValue(java.lang.String, java.lang.String)
-   */
   public String getAttributeValue(final String s, final String s1) {
     getAttributes();
     for(int a = 0; a < atts.size; a++) {
@@ -122,10 +120,10 @@ public final class IterStreamReader implements XMLStreamReader {
     if(atts != null) return;
     checkType(START_ELEMENT, ATTRIBUTE);
     atts = new NodeBuilder(true);
-    final NodeIter iter = ((Node) item).attr();
+    final NodeIter iter = ((Nod) item).attr();
     try {
       while(true) {
-        final Node it = iter.next();
+        final Nod it = iter.next();
         if(it == null) return;
         atts.add(it);
       }
@@ -143,7 +141,7 @@ public final class IterStreamReader implements XMLStreamReader {
     next();
     
     final TokenBuilder tb = new TokenBuilder();
-    while(kind != END_ELEMENT ) {
+    while(kind != END_ELEMENT) {
       if(isType(CHARACTERS, CDATA, SPACE, ENTITY_REFERENCE)) {
         tb.add(item.str());
       } else if(isType(END_DOCUMENT)) {
@@ -168,7 +166,7 @@ public final class IterStreamReader implements XMLStreamReader {
 
   public String getLocalName() {
     checkType(START_ELEMENT, END_ELEMENT, ENTITY_REFERENCE);
-    return Token.string(((Node) item).nname());
+    return Token.string(((Nod) item).nname());
   }
 
   public Location getLocation() {
@@ -177,7 +175,7 @@ public final class IterStreamReader implements XMLStreamReader {
 
   public QName getName() {
     checkType(START_ELEMENT, END_ELEMENT, ENTITY_REFERENCE);
-    return ((Node) item).qname().java();
+    return ((Nod) item).qname().java();
   }
 
   public NamespaceContext getNamespaceContext() {
@@ -226,7 +224,7 @@ public final class IterStreamReader implements XMLStreamReader {
 
   public String getPrefix() {
     checkType(START_ELEMENT, END_ELEMENT);
-    final QNm qn = ((Node) item).qname();
+    final QNm qn = ((Nod) item).qname();
     return !qn.ns() ? null : Token.string(qn.pre());
   }
 
@@ -340,7 +338,7 @@ public final class IterStreamReader implements XMLStreamReader {
 
     next = false;
     // disallow top level attributes
-    if(item.type == Type.ATT && read == null) throw new XMLStreamException();     
+    if(item.type == Type.ATT && read == null) throw new XMLStreamException();
 
     return kind;
   }
@@ -477,7 +475,7 @@ public final class IterStreamReader implements XMLStreamReader {
     /** Iterator. */
     private NodeIter[] iter = new NodeIter[256];
     /** Iterator. */
-    private Node[] node = new Node[256];
+    private Nod[] node = new Nod[256];
     /** Iterator Level. */
     private int l;
     
@@ -490,7 +488,7 @@ public final class IterStreamReader implements XMLStreamReader {
     @Override
     boolean hasNext() {
       try {
-        final Node n = iter[l].next();
+        final Nod n = iter[l].next();
         if(n != null) {
           node[l] = n;
           item = n;

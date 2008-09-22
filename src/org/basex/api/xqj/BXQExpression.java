@@ -29,11 +29,11 @@ public final class BXQExpression extends BXQDynamicContext
   }
 
   public void cancel() throws XQException {
-    check();
+    opened();
   }
 
   public void executeCommand(final String cmd) throws XQException {
-    check();
+    opened();
     try {
       new CommandParser(cmd).parse();
     } catch(final QueryException ex) {
@@ -60,7 +60,7 @@ public final class BXQExpression extends BXQDynamicContext
   }
 
   public XQStaticContext getStaticContext() throws XQException {
-    check();
+    opened();
     return sc;
   }
 }

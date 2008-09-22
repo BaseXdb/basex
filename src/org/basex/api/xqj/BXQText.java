@@ -15,11 +15,13 @@ public interface BXQText {
   /** Error Message. */
   String CLOSED = " has been closed.";
   /** Error Message. */
-  String NULL = "Specified % is null.";
+  String NULL = "% argument mustn't be null.";
   /** Error Message. */
-  String WRONG = "Wrong data type; % expected, % found";
+  String WRONG = "Wrong data type; % expected, % found.";
   /** Error Message. */
-  String ATOM = "Atomic value expected, % found";
+  String ATOM = "Atomic value expected.";
+  /** Error Message. */
+  String CONV = "No mapping known for '%'.";
   /** Error Message. */
   String SQL = "SQL sources not supported.";
   /** Error Message. */
@@ -29,7 +31,7 @@ public interface BXQText {
   /** Error Message. */
   String ATTR = "Cannot serialize top-level attributes.";
   /** Error Message. */
-  String NUM = "Number is no integer.";
+  String NUM = "Number '%' is no integer.";
   /** Error Message. */
   String TYPE = "Item has wrong type.";
   /** Error Message. */
@@ -76,5 +78,4 @@ public interface BXQText {
   String TIMEOUT = "Query exceeded timeout.";
   /** Error Message. */
   String VAR = "Unknown variable %.";
-  
 }

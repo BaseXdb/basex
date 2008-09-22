@@ -44,7 +44,7 @@ public final class XMLStreamWrapper extends Parser {
     builder = build;
     
     try {
-      builder.startDoc(token(file.name()));
+      builder.startDoc(token(io.name()));
       while(reader.hasNext()) {
         final int kind = reader.next();
         switch(kind) {
@@ -103,7 +103,7 @@ public final class XMLStreamWrapper extends Parser {
 
   @Override
   public String det() {
-    return BaseX.info(NODESPARSED, file.name(), nodes);
+    return BaseX.info(NODESPARSED, io.name(), nodes);
   }
 
   @Override

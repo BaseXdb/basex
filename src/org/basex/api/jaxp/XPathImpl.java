@@ -7,9 +7,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFunctionResolver;
 import javax.xml.xpath.XPathVariableResolver;
-
 import org.basex.BaseX;
-import org.basex.core.Context;
 import org.xml.sax.InputSource;
 
 /**
@@ -23,15 +21,6 @@ public class XPathImpl implements XPath {
   private XPathVariableResolver variables;
   /** Functions. */
   private XPathFunctionResolver functions;
-  /** XPath processor. */
-  private Context context;
-
-  /**
-   * Constructor.
-   */
-  public XPathImpl() {
-    context = new Context();
-  }
   
   public void reset() { }
 
@@ -62,30 +51,30 @@ public class XPathImpl implements XPath {
   }
 
   public XPathExpression compile(final String expr) {
-    return new XPathExprImpl(expr, context);
+    return new XPathExprImpl(expr);
   }
 
   public Object evaluate(final String expr, final Object item,
       final QName res) throws XPathExpressionException {
 
-    return new XPathExprImpl(expr, context).evaluate(item, res);
+    return new XPathExprImpl(expr).evaluate(item, res);
   }
 
   public String evaluate(final String expr, final Object item)
       throws XPathExpressionException {
 
-    return new XPathExprImpl(expr, context).evaluate(item);
+    return new XPathExprImpl(expr).evaluate(item);
   }
 
   public Object evaluate(final String expr, final InputSource source,
       final QName res) throws XPathExpressionException {
 
-    return new XPathExprImpl(expr, context).evaluate(source, res);
+    return new XPathExprImpl(expr).evaluate(source, res);
   }
 
   public String evaluate(final String expr, final InputSource source)
       throws XPathExpressionException {
 
-    return new XPathExprImpl(expr, context).evaluate(source);
+    return new XPathExprImpl(expr).evaluate(source);
   }
 }

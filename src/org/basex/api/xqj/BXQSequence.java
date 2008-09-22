@@ -17,7 +17,6 @@ import javax.xml.xquery.XQItem;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQResultSequence;
 import org.basex.BaseX;
-import org.basex.api.jaxp.IterStreamReader;
 import org.basex.data.SAXSerializer;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
@@ -57,10 +56,10 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
    * @param context query context
    * @param c closer
    * @param connection connection
-   * @throws XQException xquery exception
+   * @throws BXQException xquery exception
    */
   public BXQSequence(final Iter item, final XQContext context,
-      final BXQAbstract c, final BXQConnection connection) throws XQException {
+      final BXQAbstract c, final BXQConnection connection) throws BXQException {
     super(c);
     result = item;
     ctx = context;
@@ -71,7 +70,7 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
   }
 
   public XQConnection getConnection() throws XQException {
-    check();
+    opened();
     return conn;
   }
 
@@ -126,7 +125,7 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
   }
 
   public synchronized XMLStreamReader getItemAsStream() throws XQException {
-    check();
+    opened();
     return item().getItemAsStream();
   }
 
@@ -162,13 +161,13 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
   }
 
   public synchronized XMLStreamReader getSequenceAsStream() throws XQException {
-    check();
+    opened();
     if(it != null && !next) throw new BXQException(TWICE);
     return new IterStreamReader(result);
   }
 
   public String getSequenceAsString(final Properties p) throws XQException {
-    check();
+    opened();
     if(it != null && !next) throw new BXQException(TWICE);
     if(!next && !next()) return "";
     
@@ -215,12 +214,12 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
   }
 
   public boolean isOnItem() throws XQException {
-    check();
+    opened();
     return pos > 0;
   }
 
   public boolean isScrollable() throws XQException {
-    check();
+    opened();
     return scrollable;
   }
 
@@ -230,7 +229,7 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
   }
 
   public boolean next() throws XQException {
-    check();
+    opened();
     if(pos < 0) return false;
 
     try {
@@ -284,18 +283,18 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
     while(next()) item().writeItem(ow, p);
   }
 
-  public void writeSequenceToResult(final Result result) throws XQException {
-    check(result, Result.class);
+  public void writeSequenceToResult(final Result res) throws XQException {
+    valid(res, Result.class);
     if(it != null && !next) throw new BXQException(TWICE);
 
     // evaluate different Result types...
-    if(result instanceof StreamResult) {
+    if(res instanceof StreamResult) {
       // StreamResult.. directly write result as string
-      writeSequence(((StreamResult) result).getWriter(), null);
-    } else if(result instanceof SAXResult) {
+      writeSequence(((StreamResult) res).getWriter(), null);
+    } else if(res instanceof SAXResult) {
       // SAXResult.. serialize result to underlying parser
       final SAXSerializer ser = new SAXSerializer(null);
-      final SAXResult sax = (SAXResult) result;
+      final SAXResult sax = (SAXResult) res;
       ser.setContentHandler(sax.getHandler());
       ser.setLexicalHandler(sax.getLexicalHandler());
       while(next()) serialize(item().it, ctx, ser);
@@ -305,7 +304,7 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
   }
 
   public void writeSequenceToSAX(final ContentHandler sax) throws XQException {
-    check(sax, ContentHandler.class);
+    valid(sax, ContentHandler.class);
     writeSequenceToResult(new SAXResult(sax));
   }
 
@@ -335,7 +334,7 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
    * @throws XQException xquery exception
    */
   private SeqIter sequence() throws XQException {
-    check();
+    opened();
     if(!scrollable) throw new BXQException(FORWARD);
     return (SeqIter) result;
   }

@@ -4,11 +4,12 @@ import javax.xml.namespace.QName;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
-import org.basex.api.dom.NodeImpl;
 import org.basex.api.jaxp.XPathImpl;
 import org.basex.core.proc.Check;
 import org.basex.data.Data;
+import org.basex.query.xquery.item.DNode;
 import org.basex.util.Performance;
+import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
 /**
@@ -19,7 +20,7 @@ import org.xml.sax.InputSource;
  */
 public final class JAXPExample {
   /** Input XML file. */
-  private static final String XMLFILE = "g:/media/xml/xmark/11MB.xml";
+  private static final String XMLFILE = "/media/C/xml/xmark/1mb.xml";
   /** Sample query. */
   private static final String QUERY = "//item[@id != 'item0']";
 
@@ -52,14 +53,14 @@ public final class JAXPExample {
       e.printStackTrace();
     }
     try {
-      Data d = Check.check(XMLFILE);
-      Object o = xpath.evaluate(QUERY, NodeImpl.get(d, 0), type);
+      final Data d = Check.check(XMLFILE);
+      final Node n = new DNode(d, 0).java();
+      final Object o = xpath.evaluate(QUERY, n, type);
       System.out.println(o + (o != null ? ": " + o.getClass() : ""));
       System.out.println(p.getTimer());
     } catch(Exception e) {
       e.printStackTrace();
     }
-    
   }
 }
 

@@ -26,7 +26,7 @@ public final class BXQDataSource implements XQDataSource {
    */
   public BXQDataSource() {
     Prop.read();
-    //Prop.onthefly = true;
+    Prop.onthefly = true;
     //Prop.debug = true;
   }
 
@@ -70,7 +70,8 @@ public final class BXQDataSource implements XQDataSource {
     throw new BXQException(PROPS);
   }
 
-  public void setProperty(final String key, final String val) throws XQException {
+  public void setProperty(final String key, final String val)
+      throws XQException {
     throw new BXQException(PROPS);
   }
 }

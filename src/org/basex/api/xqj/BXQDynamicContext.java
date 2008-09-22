@@ -3,6 +3,7 @@ package org.basex.api.xqj;
 import static org.basex.api.xqj.BXQText.*;
 import java.io.InputStream;
 import java.io.Reader;
+import java.math.BigDecimal;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import javax.xml.namespace.QName;
@@ -15,15 +16,14 @@ import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQQueryException;
 import javax.xml.xquery.XQResultSequence;
 import javax.xml.xquery.XQSequence;
-import org.basex.BaseX;
 import org.basex.core.ProgressException;
 import org.basex.io.IOContent;
 import org.basex.query.QueryException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQueryProcessor;
-import org.basex.query.xquery.item.Atm;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Dbl;
+import org.basex.query.xquery.item.Dec;
 import org.basex.query.xquery.item.Flt;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Itr;
@@ -45,11 +45,15 @@ import org.xml.sax.XMLReader;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-abstract class BXQDynamicContext extends BXQAbstract implements XQDynamicContext {
+abstract class BXQDynamicContext extends BXQAbstract
+    implements XQDynamicContext {
+
   /** Context. */
   protected final BXQStaticContext sc;
   /** Query processor. */
   protected final XQueryProcessor query;
+  /** Time zone. */
+  private TimeZone zone;
 
   /**
    * Constructor.
@@ -64,115 +68,115 @@ abstract class BXQDynamicContext extends BXQAbstract implements XQDynamicContext
     sc = s;
   }
   
-  public void bindAtomicValue(final QName qn, final String val,
-      final XQItemType it) throws XQException {
-    bind(qn, new Atm(Token.token(val)), it);
+  public void bindAtomicValue(final QName qn, final String v,
+      final XQItemType t) throws XQException {
+    bind(qn, Str.get(valid(v, String.class)), t);
   }
 
-  public void bindBoolean(final QName qn, final boolean val,
-      final XQItemType it) throws XQException {
-    bind(qn, Bln.get(val), it);
-  }
-
-  public void bindByte(final QName qn, final byte val, final XQItemType it)
+  public void bindBoolean(final QName qn, final boolean v, final XQItemType it)
       throws XQException {
-    bind(qn, new Itr(val, Type.BYT), it);
+    bind(qn, Bln.get(v), it);
+  }
+
+  public void bindByte(final QName qn, final byte v, final XQItemType t)
+      throws XQException {
+    bind(qn, new Itr(v, Type.BYT), t);
   }
 
   public void bindDocument(final QName qn, final InputStream is,
-      final String base, final XQItemType it) throws XQException {
-    bind(qn, createDB(is), it);
+      final String base, final XQItemType t) throws XQException {
+    bind(qn, createDB(is), t);
   }
 
   public void bindDocument(final QName qn, final Reader r, final String base,
-      final XQItemType it) throws XQException {
-    bind(qn, createDB(r), it);
+      final XQItemType t) throws XQException {
+    bind(qn, createDB(r), t);
   }
 
-  public void bindDocument(final QName qn, final Source s,
-      final XQItemType it) throws XQException {
-    bind(qn, createDB(s, it), it);
+  public void bindDocument(final QName qn, final Source s, final XQItemType t)
+      throws XQException {
+    bind(qn, createDB(s, t), t);
   }
 
-  public void bindDocument(final QName qn, final String val, final String base,
-      final XQItemType it) throws XQException {
-    check(val, String.class);
-    bind(qn, createDB(new IOContent(Token.token(val))), it);
+  public void bindDocument(final QName qn, final String v, final String base,
+      final XQItemType t) throws XQException {
+    valid(v, String.class);
+    bind(qn, createDB(new IOContent(Token.token(v))), t);
   }
 
   public void bindDocument(final QName qn, final XMLReader r,
-      final XQItemType it) throws XQException {
-    bind(qn, createDB(r), it);
+      final XQItemType t) throws XQException {
+    bind(qn, createDB(r), t);
   }
 
   public void bindDocument(final QName qn, final XMLStreamReader sr,
-      final XQItemType it) throws XQException {
-    bind(qn, createDB(sr), it);
+      final XQItemType t) throws XQException {
+    bind(qn, createDB(sr), t);
   }
 
-  public void bindDouble(final QName qn, final double val, 
-      final XQItemType it) throws XQException {
-    bind(qn, Dbl.get(val), it);
-  }
-
-  public void bindFloat(final QName qn, final float val, 
-      final XQItemType it) throws XQException {
-    bind(qn, Flt.get(val), it);
-  }
-
-  public void bindInt(final QName qn, final int val, final XQItemType it)
+  public void bindDouble(final QName qn, final double v, final XQItemType t)
       throws XQException {
-    bind(qn, Itr.get(val), it);
+    bind(qn, Dbl.get(v), t);
   }
 
-  public void bindItem(final QName qn, final XQItem it) throws XQException {
-    bind(qn, ((BXQItem) it).it, null);
-  }
-
-  public void bindLong(final QName qn, final long val, final XQItemType it)
-    throws XQException {
-    bind(qn, new Itr(val, Type.LNG), it);
-  }
-
-  public void bindNode(final QName qn, final Node n, final XQItemType it){
-    BaseX.notimplemented();
-  }
-
-  public void bindObject(final QName qn, final Object v,
-      final XQItemType it) throws XQException {
-    check(v, Object.class);
-    bind(qn, v instanceof XQItem ? ((BXQItem) v).it : createItem(v), it);
-  }
-
-  public void bindSequence(final QName qn, final XQSequence seq)
+  public void bindFloat(final QName qn, final float v, final XQItemType t)
       throws XQException {
+    bind(qn, Flt.get(v), t);
+  }
+
+  public void bindInt(final QName qn, final int v, final XQItemType t)
+      throws XQException {
+    bind(qn, Itr.get(v), t);
+  }
+
+  public void bindItem(final QName qn, final XQItem t) throws XQException {
+    valid(t, XQItem.class);
+    bind(qn, ((BXQItem) t).it, null);
+  }
+
+  public void bindLong(final QName qn, final long v, final XQItemType t)
+      throws XQException {
+    bind(qn, new Dec(new BigDecimal(v), Type.LNG), t);
+  }
+
+  public void bindNode(final QName qn, final Node n, final XQItemType t)
+      throws XQException {
+    bind(qn, create(n, null), t);
+  }
+
+  public void bindObject(final QName qn, final Object v, final XQItemType t)
+      throws XQException {
+    bind(qn, create(v, null), t);
+  }
+
+  public void bindSequence(final QName qn, final XQSequence s)
+      throws XQException {
+    
+    valid(s, XQSequence.class);
     try {
-      bind(qn, new SeqBuilder(((BXQSequence) seq).result).finish(), null);
+      bind(qn, new SeqBuilder(((BXQSequence) s).result).finish(), null);
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }      
   }
 
-  public void bindShort(final QName qn, final short val,
-      final XQItemType it) throws XQException {
-    bind(qn, new Itr(val, Type.SHR), it);
+  public void bindShort(final QName qn, final short v, final XQItemType t)
+      throws XQException {
+    bind(qn, new Itr(v, Type.SHR), t);
   }
 
-  public void bindString(final QName qn, final String val,
-      final XQItemType it) throws XQException {
-    check(val, String.class);
-    bind(qn, Str.get(Token.token(val)), it);
+  public void bindString(final QName qn, final String v, final XQItemType t)
+      throws XQException {
+    bind(qn, Str.get(valid(v, String.class)), t);
   }
-
-  private TimeZone zone;
 
   public TimeZone getImplicitTimeZone() throws XQException {
-    check();
+    opened();
     return zone != null ? zone : new GregorianCalendar().getTimeZone();
   }
 
   public void setImplicitTimeZone(final TimeZone tz) throws XQException {
-    check();
+    opened();
     zone = tz;
   }
 
@@ -185,8 +189,8 @@ abstract class BXQDynamicContext extends BXQAbstract implements XQDynamicContext
    */
   private void bind(final QName var, final Item it, final XQItemType t)
       throws XQException {
-    check();
-    check(var, QName.class);
+    opened();
+    valid(var, QName.class);
 
     final QNm name = new QNm(Token.token(var.getLocalPart()));
     Var v = new Var(name);
@@ -198,8 +202,8 @@ abstract class BXQDynamicContext extends BXQAbstract implements XQDynamicContext
     }
     
     try {
-      v.item(t == null || ((BXQItemType) t).getType() == it.type ? it :
-        check(t, it.type).e(it, null));
+      final Type tt = check(it.type, t);
+      v.item(tt == it.type ? it : tt.e(it, null));
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }
@@ -211,7 +215,7 @@ abstract class BXQDynamicContext extends BXQAbstract implements XQDynamicContext
    * @throws XQException exception
    */
   protected XQResultSequence execute() throws XQException {
-    check();
+    opened();
     final XQContext ctx = query.ctx;
     ctx.ns = sc.ctx.ns;
     
@@ -228,7 +232,8 @@ abstract class BXQDynamicContext extends BXQAbstract implements XQDynamicContext
       if(sc.scrollable && !(iter instanceof SeqIter)) iter = new SeqIter(iter);
       return new BXQSequence(iter, ctx, this, (BXQConnection) par);
     } catch(final QueryException ex) {
-      throw new XQQueryException(ex.getMessage());
+      throw new XQQueryException(ex.getMessage(), new QName(ex.code()), 
+          ex.line(), ex.col(), -1);
     } catch(final ProgressException ex) {
       throw new BXQException(TIMEOUT);
     }

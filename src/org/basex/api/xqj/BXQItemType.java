@@ -21,14 +21,14 @@ public final class BXQItemType implements XQItemType {
       Type.ITEM, null, -1, XQSequenceType.OCC_ZERO_OR_MORE);
   /** Base Types. */
   static final Type[] BASE = {
-      Type.AAT, Type.AAT, Type.AAT, Type.AAT, Type.AAT, Type.ATM, Type.DTD,// 0
-      Type.YMD, Type.URI, Type.B6B, Type.BLN, Type.DAT, Type.INT, Type.ITR,// 7
-      Type.SHR, Type.LNG, Type.DTM, Type.DEC, Type.DBL, Type.DUR, Type.FLT,// 14
-      Type.DAY, Type.MON, Type.MDA, Type.YEA, Type.YMO, Type.HEX, Type.NOT,// 21
-      Type.QNM, Type.STR, Type.TIM, Type.BYT, Type.NPI, Type.NNI, Type.NIN,// 28
-      Type.PIN, Type.ULN, Type.UIN, Type.USH, Type.UBY, Type.NST, Type.TOK,// 35
-      Type.LNG, Type.NAM, Type.NCN, Type.NMT, Type.ID , Type.IDR, Type.ENT,// 42
-      Type.IDR, null, Type.NMT // 49
+      null    , null    , null    , null    , Type.AAT, Type.ATM, Type.DTD, //0
+      Type.YMD, Type.URI, Type.B6B, Type.BLN, Type.DAT, Type.INT, Type.ITR, //7
+      Type.SHR, Type.LNG, Type.DTM, Type.DEC, Type.DBL, Type.DUR, Type.FLT, //14
+      Type.DAY, Type.MON, Type.MDA, Type.YEA, Type.YMO, Type.HEX, Type.NOT, //21
+      Type.QNM, Type.STR, Type.TIM, Type.BYT, Type.NPI, Type.NNI, Type.NIN, //28
+      Type.PIN, Type.ULN, Type.UIN, Type.USH, Type.UBY, Type.NST, Type.TOK, //35
+      Type.LAN, Type.NAM, Type.NCN, Type.NMT, Type.ID , Type.IDR, Type.ENT, //42
+      null, null, null // 49
   };
   /** Name. */
   private final QName name;
@@ -41,11 +41,12 @@ public final class BXQItemType implements XQItemType {
 
   /**
    * Constructor.
-   * @param n name
    * @param b item type
+   * @throws BXQException exception
    */
-  public BXQItemType(final int b, final QName n) {
-    this(BASE[b], n, b);
+  public BXQItemType(final int b) throws BXQException {
+    this(BASE[b], null, b);
+    if(type == null) throw new BXQException(ATOM);
   }
 
   /**

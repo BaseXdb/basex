@@ -25,16 +25,16 @@ public class NSContextImpl implements NamespaceContext {
     ns = n;
   }
   
-  public String getNamespaceURI(String pre) {
+  public String getNamespaceURI(final String pre) {
     final Uri uri = ns.find(Token.token(pre));
     return uri == null ? null : Token.string(uri.str());
   }
 
-  public String getPrefix(String uri) {
+  public String getPrefix(final String uri) {
     return Token.string(ns.prefix(Uri.uri(Token.token(uri))));
   }
 
-  public Iterator getPrefixes(String uri) {
+  public Iterator getPrefixes(final String uri) {
     final ArrayList<String> list = new ArrayList<String>();
     final String pre = Token.string(ns.prefix(Uri.uri(Token.token(uri))));
     if(pre.length() != 0) list.add(pre);

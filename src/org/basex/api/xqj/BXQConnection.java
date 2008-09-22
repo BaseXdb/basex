@@ -8,12 +8,11 @@ import javax.xml.xquery.XQExpression;
 import javax.xml.xquery.XQMetaData;
 import javax.xml.xquery.XQPreparedExpression;
 import javax.xml.xquery.XQStaticContext;
-
 import org.basex.util.Token;
 
 /**
  * Java XQuery API - Connection.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler
  */
@@ -32,18 +31,18 @@ public final class BXQConnection extends BXQDataFactory
     super();
   }
 
-  public void commit() throws XQException {
-    check();
+  public void commit() throws BXQException {
+    opened();
   }
 
-  public XQExpression createExpression() throws XQException {
+  public XQExpression createExpression() throws BXQException {
     return createExpression(ctx);
   }
 
   public XQExpression createExpression(final XQStaticContext sc)
-      throws XQException {
-    check();
-    check(sc, XQStaticContext.class);
+      throws BXQException {
+    opened();
+    valid(sc, XQStaticContext.class);
     final BXQStaticContext bsc = (BXQStaticContext) sc;
     return new BXQExpression(bsc, this);
   }
@@ -52,13 +51,13 @@ public final class BXQConnection extends BXQDataFactory
     return autoCommit;
   }
 
-  public XQMetaData getMetaData() throws XQException {
-    check();
+  public XQMetaData getMetaData() throws BXQException {
+    opened();
     return meta;
   }
 
-  public XQStaticContext getStaticContext() throws XQException {
-    check();
+  public XQStaticContext getStaticContext() throws BXQException {
+    opened();
     return ctx;
   }
 
@@ -84,9 +83,9 @@ public final class BXQConnection extends BXQDataFactory
 
   public XQPreparedExpression prepareExpression(final String query,
       final XQStaticContext sc) throws XQException {
-    check();
-    check(sc, XQStaticContext.class);
-    check(query, String.class);
+    opened();
+    valid(sc, XQStaticContext.class);
+    valid(query, String.class);
     final BXQStaticContext bsc = (BXQStaticContext) sc;
     return new BXQPreparedExpression(query, bsc, this);
   }
@@ -96,18 +95,18 @@ public final class BXQConnection extends BXQDataFactory
     return prepareExpression(query, ctx);
   }
 
-  public void rollback() throws XQException {
-    check();
+  public void rollback() throws BXQException {
+    opened();
   }
 
-  public void setAutoCommit(final boolean ac) throws XQException {
-    check();
+  public void setAutoCommit(final boolean ac) throws BXQException {
+    opened();
     autoCommit = ac;
   }
 
-  public void setStaticContext(final XQStaticContext sc) throws XQException {
-    check();
-    check(sc, XQStaticContext.class);
+  public void setStaticContext(final XQStaticContext sc) throws BXQException {
+    opened();
+    valid(sc, XQStaticContext.class);
     ctx = (BXQStaticContext) sc;
   }
 }

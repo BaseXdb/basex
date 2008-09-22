@@ -23,127 +23,128 @@ public class BXQMetaData extends BXQAbstract implements XQMetaData {
   }
 
   public int getMaxExpressionLength() throws XQException {
-    check();
+    opened();
     return Integer.MAX_VALUE;
   }
 
   public int getMaxUserNameLength() throws XQException {
-    check();
+    opened();
     return Integer.MAX_VALUE;
   }
 
   public int getProductMajorVersion() throws XQException {
-    check();
+    opened();
     return version(Text.VERSION, true);
   }
 
   public int getProductMinorVersion() throws XQException {
-    check();
+    opened();
     return version(Text.VERSION, false);
   }
 
   public String getProductName() throws XQException {
-    check();
+    opened();
     return Text.NAME;
   }
 
   public String getProductVersion() throws XQException {
-    check();
+    opened();
     return Text.VERSION;
   }
 
   public Set getSupportedXQueryEncodings() throws XQException {
-    check();
+    opened();
     return Charset.availableCharsets().keySet();
   }
 
   public String getUserName() throws XQException {
-    check();
+    opened();
     return null;
   }
 
   public int getXQJMajorVersion() throws XQException {
-    check();
+    opened();
     return version(VERSION, true);
   }
 
   public int getXQJMinorVersion() throws XQException {
-    check();
+    opened();
     return version(VERSION, false);
   }
 
   public String getXQJVersion() throws XQException {
-    check();
+    opened();
     return VERSION;
   }
 
   public boolean isFullAxisFeatureSupported() throws XQException {
-    check();
+    opened();
     return true;
   }
 
   public boolean isModuleFeatureSupported() throws XQException {
-    check();
+    opened();
     return true;
   }
 
   public boolean isReadOnly() throws XQException {
-    check();
+    opened();
     return true;
   }
 
   public boolean isSchemaImportFeatureSupported() throws XQException {
-    check();
+    opened();
     return false;
   }
 
   public boolean isSchemaValidationFeatureSupported() throws XQException {
-    check();
+    opened();
     return false;
   }
 
   public boolean isSerializationFeatureSupported() throws XQException {
-    check();
+    opened();
     return true;
   }
 
   public boolean isStaticTypingExtensionsSupported() throws XQException {
-    check();
+    opened();
     return false;
   }
 
   public boolean isStaticTypingFeatureSupported() throws XQException {
-    check();
+    opened();
     return false;
   }
 
   public boolean isTransactionSupported() throws XQException {
-    check();
+    opened();
     return false;
   }
 
   public boolean isUserDefinedXMLSchemaTypeSupported() throws XQException {
-    check();
+    opened();
     return false;
   }
 
   public boolean isXQueryEncodingDeclSupported() throws XQException {
-    check();
+    opened();
     return true;
   }
 
-  public boolean isXQueryEncodingSupported(String encoding) throws XQException {
-    check();
+  public boolean isXQueryEncodingSupported(final String encoding)
+      throws XQException {
+    opened();
     return true;
   }
 
   public boolean isXQueryXSupported() throws XQException {
-    check();
+    opened();
     return false;
   }
 
   public boolean wasCreatedFromJDBCConnection() throws XQException {
-    check();
+    opened();
     return false;
   }
 

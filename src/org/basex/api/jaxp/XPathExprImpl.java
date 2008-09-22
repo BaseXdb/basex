@@ -1,17 +1,20 @@
 package org.basex.api.jaxp;
 
+import java.io.IOException;
+
 import javax.xml.namespace.QName;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
-import org.basex.api.dom.NodeImpl;
-import org.basex.api.dom.NodeListImpl;
+import org.basex.api.dom.BXNodeList;
 import org.basex.core.Context;
 import org.basex.core.proc.Check;
+import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPathProcessor;
 import org.basex.query.xpath.values.Item;
 import org.basex.query.xpath.values.NodeSet;
+import org.basex.query.xquery.item.DNode;
 import org.basex.util.Token;
 import org.xml.sax.InputSource;
 
@@ -23,18 +26,16 @@ import org.xml.sax.InputSource;
  */
 public class XPathExprImpl implements XPathExpression {
   /** Query context. */
-  private XPathProcessor xproc;
+  private Context context = new Context();
   /** Query context. */
-  private Context context;
+  private XPathProcessor xproc;
 
   /**
    * Constructor.
    * @param expr query expression
-   * @param ctx query context
    */
-  public XPathExprImpl(final String expr, final Context ctx) {
+  public XPathExprImpl(final String expr) {
     xproc = new XPathProcessor(expr);
-    context = ctx;
   }
 
   public String evaluate(final Object item) throws XPathExpressionException {
@@ -47,15 +48,17 @@ public class XPathExprImpl implements XPathExpression {
 
   public Object evaluate(final Object item, final QName res)
       throws XPathExpressionException {
-
     return finish(eval(), res);
   }
 
   public Object evaluate(final InputSource is, final QName res)
       throws XPathExpressionException {
-
-    context.data(Check.check(is.getSystemId()));
-    return finish(eval(), res);
+    try {
+      context.data(Check.check(is.getSystemId()));
+      return finish(eval(), res);
+    } catch(IOException ex) {
+      throw new XPathExpressionException(ex);
+    }
   }
   
   /**
@@ -87,8 +90,9 @@ public class XPathExprImpl implements XPathExpression {
           "Result can't be cast to a nodeset");
       
       if(nodes.size == 0) return null;
-      return res == XPathConstants.NODESET ? new NodeListImpl(nodes) :
-        NodeImpl.get(nodes.data, nodes.nodes[0]);
+      final Data data = nodes.data;
+      return res == XPathConstants.NODESET ? new BXNodeList(nodes) :
+        new DNode(data, nodes.nodes[0]).java();
     }
 
     if(nodes != null) nodes.size = 1;

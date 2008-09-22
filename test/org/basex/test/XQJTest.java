@@ -1,8 +1,9 @@
 package org.basex.test;
 
-//import static javax.xml.stream.XMLStreamConstants.*;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Properties;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
@@ -31,6 +32,8 @@ import org.basex.test.xqj.TestXMLFilter;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
+import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
@@ -200,7 +203,8 @@ public class XQJTest extends TestCase {
     final XQConnection conn = conn(drv);
     final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     final DocumentBuilder parser = factory.newDocumentBuilder();
-    final Document doc = parser.parse(new InputSource(new StringReader("<a>b</a>")));
+    final Document doc = parser.parse(
+        new InputSource(new StringReader("<a>b</a>")));
 
     try {
       conn.createItemFromNode(doc, null);
@@ -368,20 +372,6 @@ public class XQJTest extends TestCase {
    * Test.
    * @throws Exception exception
    */
-  public void test18() throws Exception {
-    final XQConnection conn = conn(drv);
-    
-    try {
-      conn.prepareExpression("declare variable $var1 := $var1; true()");
-      fail("Exception expected for invalid XQuery expression.");
-    } catch (XQException e) {
-    }
-  }
-
-  /**
-   * Test.
-   * @throws Exception exception
-   */
   public void test19() throws Exception {
     final XQConnection conn = conn(drv);
     
@@ -420,8 +410,7 @@ public class XQJTest extends TestCase {
    */
   public void test21() throws Exception {
     final XQConnection conn = conn(drv);
-    final XQItemType elm = conn.createAtomicType(
-        XQItemType.XQBASETYPE_INTEGER);
+    final XQItemType elm = conn.createAtomicType(XQItemType.XQBASETYPE_INTEGER);
     elm.getItemOccurrence();
   }
 
@@ -458,10 +447,79 @@ public class XQJTest extends TestCase {
    * Test.
    * @throws Exception exception
    */
-  public void test24() throws Exception {
+  public void test25() throws Exception {
     final XQConnection conn = conn(drv);
-    final XQItemType type = conn.createAtomicType(
+    
+    Object[] objects = {
+        new Boolean(true), new Byte((byte) 2), new Float(3f),
+        new Double(4), new Integer(5), new Long(6),
+        new Short((short) 7), new String("8"), new BigDecimal(9),
+        new BigInteger("10"), new QName("elf"),
+    };
+
+    for(Object o : objects) {
+      for(int t = 1; t <= 51; t++) {
+        try {
+          conn.createItemFromObject(o, conn.createAtomicType(t));
+          //System.out.println("+ " + o.getClass() + " => " + t);
+        } catch(final Exception ex) {
+          //System.out.println("- " + o.getClass() + " => " + t);
+          //System.out.println("  (" + ex.getMessage() + ")");
+        }
+      }
+    }
+  }
+
+  /**
+   * Test.
+   * @throws Exception exception
+   */
+  public void test32() throws Exception {
+    final XQConnection conn = conn(drv);
+    final XQExpression xqe = conn.createExpression();
+    XQSequence xqs;
+
+    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    DocumentBuilder parser = factory.newDocumentBuilder();
+    Document document = parser.parse(new InputSource(
+        new StringReader("<e>Hello world!</e>")));
+    DocumentFragment frag = document.createDocumentFragment();
+    Element el1 = document.createElement("A");
+    Element el2 = document.createElement("B");
+    frag.appendChild(el1);
+    frag.appendChild(el2);
+
+    //xqe.bindNode(new QName("v"), frag, null);
+    xqe.bindNode(new QName("v"), document, null);
+    xqs = xqe.executeQuery("declare variable $v external; $v");
+    while(xqs.next()) {
+      System.out.println("> " + xqs.getNode());
+    }
+  }
+
+  /**
+   * Test.
+   * @throws Exception exception
+   */
+  public void test34() throws Exception {
+    final XQConnection conn = conn(drv);
+    final XQPreparedExpression expr = conn.prepareExpression(
+        "declare variable $v external; $v");
+
+    XQItemType type = conn.createAtomicType(
         XQItemType.XQBASETYPE_STRING);
-    System.out.println(type.getTypeName());
+    expr.bindAtomicValue(new QName("v"), "A", type);
+  }
+
+  /**
+   * Test.
+   * @throws Exception exception
+   */
+  public void test35() throws Exception {
+    final XQConnection conn = conn(drv);
+    final XQExpression xqe = conn.createExpression();
+    xqe.bindSequence(new QName("v"), null);
   }
 }
+
+
