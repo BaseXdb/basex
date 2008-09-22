@@ -2,7 +2,6 @@ package org.basex.io;
 
 import java.io.IOException;
 import java.net.URL;
-import org.basex.BaseX;
 import org.xml.sax.InputSource;
 
 /**
@@ -27,6 +26,8 @@ public final class IOUrl extends IO {
 
   @Override
   public boolean exists() {
+    return true;
+    /*
     try {
       // enough?...
       //new URL(path).openConnection();
@@ -35,7 +36,7 @@ public final class IOUrl extends IO {
     } catch(IOException ex) {
       BaseX.debug(ex);
       return false;
-    }
+    }*/
   }
 
   @Override

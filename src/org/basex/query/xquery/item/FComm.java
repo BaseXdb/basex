@@ -1,7 +1,6 @@
 package org.basex.query.xquery.item;
 
 import java.io.IOException;
-
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.util.Token;
@@ -21,7 +20,7 @@ public final class FComm extends FNode {
    * @param t text value
    * @param p parent
    */
-  public FComm(final byte[] t, final Node p) {
+  public FComm(final byte[] t, final Nod p) {
     super(Type.COM);
     val = t;
     par = p;

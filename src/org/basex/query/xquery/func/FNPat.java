@@ -92,10 +92,10 @@ final class FNPat extends Fun {
       final Matcher m = p.matcher(str);
       int s = 0;
       while(m.find()) {
-        sb.add(Str.get(Token.token(str.substring(s, m.start()))));
+        sb.add(Str.get(str.substring(s, m.start())));
         s = m.end();
       }
-      sb.add(Str.get(Token.token(str.substring(s, str.length()))));
+      sb.add(Str.get(str.substring(s, str.length())));
     }
     return sb;
   }

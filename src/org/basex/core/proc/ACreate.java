@@ -69,17 +69,12 @@ abstract class ACreate extends Process {
       return Prop.info ? info(DBCREATED, db, perf.getTimer()) : true;
     } catch(final FileNotFoundException ex) {
       BaseX.debug(ex);
-      err = BaseX.info(FILEWHICH, p.file);
-    } catch(final IOException ex) {
-      BaseX.debug(ex);
-      err = ex.getMessage();
+      err = BaseX.info(FILEWHICH, p.io);
     } catch(final ProgressException ex) {
       throw ex;
     } catch(final Exception ex) {
-      String msg = ex.getMessage();
-      if(msg == null) msg = ex.toString();
       BaseX.debug(ex);
-      err = BaseX.info(CREATEERR, args[0], msg.length() != 0 ? msg : "");
+      err = BaseX.info(CREATEERR, args[0]);
     }
 
     try {

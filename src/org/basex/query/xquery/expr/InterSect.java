@@ -3,7 +3,7 @@ package org.basex.query.xquery.expr;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Node;
+import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Err;
 import org.basex.query.xquery.util.NodeBuilder;
@@ -31,7 +31,7 @@ public final class InterSect extends Arr {
     Item it;
     while((it = iter.next()) != null) {
       if(!(it.node())) Err.nodes(this);
-      seq.add((Node) it);
+      seq.add((Nod) it);
     }
 
     for(int e = 1; e != expr.length; e++) {
@@ -39,7 +39,7 @@ public final class InterSect extends Arr {
       iter = ctx.iter(expr[e]);
       while((it = iter.next()) != null) {
         if(!(it.node())) Err.nodes(this);
-        final Node node = (Node) it;
+        final Nod node = (Nod) it;
         for(int s = 0; s < seq.size; s++) {
           if(CmpN.COMP.EQ.e(seq.list[s], node)) {
             res.add(node);

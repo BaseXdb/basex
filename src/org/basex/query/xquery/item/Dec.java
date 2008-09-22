@@ -34,7 +34,7 @@ public final class Dec extends Num {
    * @param d decimal value
    * @param t string representation
    */
-  protected Dec(final BigDecimal d, final Type t) {
+  public Dec(final BigDecimal d, final Type t) {
     super(t);
     val = d;
   }
@@ -135,7 +135,7 @@ public final class Dec extends Num {
       case ULN:
         return new BigInteger(val.toString());
       case LNG:
-        return new Long(val.longValue());
+        return val.longValue();
       default:
         return val;
     }

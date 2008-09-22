@@ -2,6 +2,8 @@ package org.basex.core.proc;
 
 import static org.basex.Text.*;
 
+import java.io.IOException;
+
 import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.data.Data;
@@ -43,8 +45,9 @@ public final class Check extends Process {
    * No warnings are thrown; instead, an empty reference is returned.
    * @param path file path
    * @return data instance
+   * @throws IOException exception
    */
-  public static Data check(final String path) {
+  public static Data check(final String path) throws IOException {
     final IO file = IO.get(path);
     final String db = file.dbname();
     return MetaData.found(path, db) ? Open.open(db) : CreateDB.xml(file, db);

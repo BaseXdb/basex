@@ -11,11 +11,11 @@ import org.basex.query.xquery.iter.NodeMore;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public abstract class FNode extends Node {
+public abstract class FNode extends Nod {
   /** Child nodes. */
-  NodIter children;
+  protected NodIter children;
   /** Attributes. */
-  NodIter atts;
+  protected NodIter atts;
 
   /**
    * Constructor.
@@ -27,37 +27,52 @@ public abstract class FNode extends Node {
   
   @Override
   public final NodeIter attr() {
-    return new NodeIter() {
-      /** Child counter. */
-      int c;
-
-      @Override
-      public Node next() {
-        return atts != null && c != atts.size ? atts.list[c++] : null;
-      }
-    };
+    return iter(atts);
   }
 
   @Override
   public final NodeMore child() {
+    return iter(children);
+  }
+  
+  /**
+   * Iterates all nodes of the specified iterator.
+   * @param iter iterator
+   * @return node iterator
+   */
+  private NodeMore iter(final NodIter iter) {
     return new NodeMore() {
       /** Child counter. */
       int c;
 
       @Override
       public boolean more() {
-        return children != null && c != children.size;
+        return iter != null && c != iter.size;
       }
 
       @Override
-      public Node next() {
-        return more() ? children.list[c++] : null;
+      public Nod next() {
+        return more() ? iter.list[c++] : null;
       }
     };
   }
 
   @Override
   public final NodeIter desc() {
+    return desc(false);
+  }
+
+  @Override
+  public final NodeIter descOrSelf() {
+    return desc(true);
+  }
+
+  /**
+   * Returns an iterator for all descendant nodes.
+   * @param self include self node
+   * @return node iterator
+   */
+  private NodeIter desc(final boolean self) {
     return new NodeIter() {
       /** Iterator. */
       private NodeMore[] it = new NodeMore[256];
@@ -67,43 +82,23 @@ public abstract class FNode extends Node {
       private boolean more;
 
       @Override
-      public Node next() throws XQException {
+      public Nod next() throws XQException {
         if(!more) {
-          it[0] = child();
+          it[0] = self ? self() : child();
           more = true;
         }
         if(l < 0) return null;
 
-        final Node node = it[l].next();
-        if(node == null) return null;
-        final NodeMore ch = node.child();
-        if(ch.more()) {
-          it[++l] = ch;
-        } else {
-          while(!it[l].more()) if(l-- <= 0) return node;
+        final Nod node = it[l].next();
+        if(node != null) {
+          final NodeMore ch = node.child();
+          if(ch.more()) {
+            it[++l] = ch;
+          } else {
+            while(!it[l].more()) if(l-- <= 0) break;
+          }
         }
         return node;
-      }
-    };
-  }
-
-  @Override
-  public final NodeIter descOrSelf() {
-    return new NodeIter() {
-      /** Iterator. */
-      private NodIter it;
-      /** First call. */
-      private boolean more;
-
-      @Override
-      public Node next() throws XQException {
-        if(!more) {
-          it = new NodIter();
-          it.add(FNode.this);
-          addDesc(child(), it);
-          more = true;
-        }
-        return it.next();
       }
     };
   }

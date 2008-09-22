@@ -2,11 +2,8 @@ package org.basex.query.xquery.item;
 
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
-
 import org.basex.data.Serializer;
-import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.iter.NodIter;
 import org.basex.util.Token;
@@ -37,7 +34,7 @@ public final class FElem extends FNode {
    * @param p parent
    */
   public FElem(final QNm n, final NodIter ch, final NodIter at,
-      final byte[] b, final FAttr[] ns, final Node p) {
+      final byte[] b, final FAttr[] ns, final Nod p) {
     super(Type.ELM);
     name = n;
     children = ch;
@@ -71,7 +68,7 @@ public final class FElem extends FNode {
   public byte[] str() {
     final TokenBuilder tb = new TokenBuilder();
     for(int n = 0; n < children.size; n++) {
-      final Node c = children.list[n];
+      final Nod c = children.list[n];
       if(c.type == Type.ELM || c.type == Type.TXT) tb.add(c.str());
     }
     return tb.finish();
@@ -95,7 +92,7 @@ public final class FElem extends FNode {
 
     // add attributes
     for(int n = 0; n < atts.size; n++) {
-      final Node a = atts.list[n];
+      final Nod a = atts.list[n];
       final byte[] at = a.nname();
       if(level == 0 && a.qname().ns()) {
         final byte[] pref = substring(at, 0, indexOf(at, ':'));
@@ -144,15 +141,7 @@ public final class FElem extends FNode {
   }
 
   @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder("<");
-    sb.append(Token.string(name.str()));
-    if(children.size != 0) sb.append("...");
-    return sb.append(">").toString();
-  }
-
-  @Override
-  public FElem copy() throws XQException {
+  public FElem copy() {
     final NodIter ch = new NodIter();
     final NodIter at = new NodIter();
     final FElem node = new FElem(name, ch, at, base, names, par);
@@ -166,6 +155,14 @@ public final class FElem extends FNode {
       at.list[c].parent(node);
     }
     return node;
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder("<");
+    sb.append(Token.string(name.str()));
+    if(children.size != 0) sb.append("...");
+    return sb.append(">").toString();
   }
 
   @Override

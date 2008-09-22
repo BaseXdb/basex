@@ -99,7 +99,7 @@ public final class Flt extends Num {
 
   @Override
   public Object java() {
-    return new Float(val);
+    return val;
   }
 
   /**

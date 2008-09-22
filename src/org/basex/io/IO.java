@@ -160,11 +160,13 @@ public abstract class IO {
 
   /**
    * Chops the path and the XML suffix of the specified filename.
+   * Returns "tmp" if name is empty.
    * @return chopped filename
    */
   public String dbname() {
     final String n = name();
-    return n.contains(".") ? n.substring(0, n.lastIndexOf(".")) : n;
+    final int i = n.lastIndexOf(".");
+    return i != -1 ? n.substring(0, i) : n.length() == 0 ? "tmp" : n;
   }
 
   /**

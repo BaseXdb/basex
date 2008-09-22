@@ -41,7 +41,7 @@ public final class Treat extends Single {
       Err.empty(this);
     }
     if(seq.occ < 2) {
-      if(iter.next() != null) Err.or(NOTREAT, info(), seq, Type.SEQ);
+      if(iter.next() != null) Err.or(NOTREATS, info(), seq);
       if(!it.type.instance(seq.type)) Err.or(NOTREAT, info(), seq, it.type);
       return it.iter();
     }

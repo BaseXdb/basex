@@ -57,7 +57,7 @@ public final class Var extends ExprInfo implements Cloneable {
   }
 
   /**
-   * Sets the specified expression.
+   * Binds the specified expression to the variable.
    * @param e expression to be set
    * @return self reference
    * @throws XQException evaluation exception
@@ -68,7 +68,7 @@ public final class Var extends ExprInfo implements Cloneable {
   }
 
   /**
-   * Sets the specified item.
+   * Binds the specified item to the variable.
    * @param it item to be set
    * @return self reference
    * @throws XQException evaluation exception

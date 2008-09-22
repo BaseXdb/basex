@@ -192,8 +192,6 @@ public final class DTd extends Dur {
 
   @Override
   public Object java() {
-      final int t = (int) (sec % DAYSECONDS);
-      return df.newDurationDayTime(minus, (int) (sec / DAYSECONDS) + 1,
-          t / 3600, t % 3600 / 60, t % 60);
+    return df.newDurationDayTime(Token.string(str()));
   }
 }

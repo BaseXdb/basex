@@ -114,7 +114,7 @@ public final class Dbl extends Num {
 
   @Override
   public Object java() {
-    return new Double(val);
+    return val;
   }
 
   /**

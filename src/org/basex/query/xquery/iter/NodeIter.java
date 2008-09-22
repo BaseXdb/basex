@@ -1,7 +1,7 @@
 package org.basex.query.xquery.iter;
 
 import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.item.Node;
+import org.basex.query.xquery.item.Nod;
 
 /**
  * Node iterator interface.
@@ -13,7 +13,7 @@ public abstract class NodeIter extends Iter {
   /** Empty node iterator. */
   public static final NodeIter NONE = new NodeIter() {
     @Override
-    public Node next() { return null; }
+    public Nod next() { return null; }
     @Override
     public long size() { return 0; }
     @Override
@@ -21,5 +21,5 @@ public abstract class NodeIter extends Iter {
   };
 
   @Override
-  public abstract Node next() throws XQException;
+  public abstract Nod next() throws XQException;
 }

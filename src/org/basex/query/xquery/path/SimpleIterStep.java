@@ -5,7 +5,7 @@ import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Node;
+import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.util.Err;
@@ -40,7 +40,7 @@ public final class SimpleIterStep extends Step {
       NodeIter ir;
       
       @Override
-      public Node next() throws XQException {
+      public Nod next() throws XQException {
         while(true) {
           if(ir == null) {
             final Item it = iter.next();
@@ -49,9 +49,9 @@ public final class SimpleIterStep extends Step {
               return null;
             }
             if(!it.node()) Err.or(NODESPATH, this, it);
-            ir = axis.init((Node) it);
+            ir = axis.init((Nod) it);
           }
-          final Node nod = ir.next();
+          final Nod nod = ir.next();
           if(nod == null) ir = null;
           else if(test.e(nod, ctx)) {
             ctx.item = item;

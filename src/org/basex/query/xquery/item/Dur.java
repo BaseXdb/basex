@@ -127,4 +127,9 @@ public class Dur extends Date {
     Err.cmp(it, this);
     return 0;
   }
+
+  @Override
+  public Object java() {
+    return df.newDuration(Token.string(str()));
+  }
 }

@@ -6,7 +6,7 @@ import org.basex.query.xquery.expr.CmpV;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Itr;
-import org.basex.query.xquery.item.Node;
+import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.NodeIter;
@@ -210,10 +210,10 @@ final class FNSeq extends Fun {
 
       // comparing nodes
       if(!(it1.node() && it2.node())) return false;
-      final NodeIter niter1 = ((Node) it1).descOrSelf();
-      final NodeIter niter2 = ((Node) it2).descOrSelf();
+      final NodeIter niter1 = ((Nod) it1).descOrSelf();
+      final NodeIter niter2 = ((Nod) it2).descOrSelf();
 
-      Node n1 = null, n2 = null;
+      Nod n1 = null, n2 = null;
       // non-short-circuit logic (one & sign) to run both iterators..
       while((n1 = niter1.next()) != null & (n2 = niter2.next()) != null) {
         if(n1.type != n2.type) return false;
@@ -234,7 +234,7 @@ final class FNSeq extends Fun {
         while(att2.next() != null) s2++;
         if(s1 != s2) return false;
 
-        Node a1 = null, a2 = null;
+        Nod a1 = null, a2 = null;
         att1 = n1.attr();
         while((a1 = att1.next()) != null) {
           att2 = n2.attr();

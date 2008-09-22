@@ -24,7 +24,7 @@ public final class FPI extends FNode {
    * @param v value
    * @param p parent
    */
-  public FPI(final QNm n, final byte[] v, final Node p) {
+  public FPI(final QNm n, final byte[] v, final Nod p) {
     super(Type.PI);
     name = n;
     val = v;
@@ -53,13 +53,13 @@ public final class FPI extends FNode {
   }
 
   @Override
-  public String toString() {
-    return "<? " + Token.string(name.str()) + " " + Token.string(val) + "?>";
-  }
-  
-  @Override
   public FPI copy() {
     return new FPI(name, val, par);
+  }
+
+  @Override
+  public String toString() {
+    return "<? " + Token.string(name.str()) + " " + Token.string(val) + "?>";
   }
 
   @Override

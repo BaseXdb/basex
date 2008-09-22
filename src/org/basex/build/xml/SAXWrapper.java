@@ -73,6 +73,7 @@ public final class SAXWrapper extends Parser {
   @Override
   public void parse(final Builder build) throws IOException {
     builder = build;
+
     try {
       XMLReader r = source != null ? source.getXMLReader() : null;
       if(r == null) {
@@ -87,10 +88,10 @@ public final class SAXWrapper extends Parser {
       r.setProperty("http://xml.org/sax/properties/lexical-handler", p);
       r.setErrorHandler(p);
 
-      builder.startDoc(token(file.name()));
+      builder.startDoc(token(io.name()));
       // find correct input...
       if(source == null) {
-        r.parse(file.inputSource());
+        r.parse(io.inputSource());
       } else {
         final InputSource is = source.getInputSource();
         if(is != null) r.parse(is);
@@ -120,7 +121,7 @@ public final class SAXWrapper extends Parser {
 
   @Override
   public String det() {
-    return BaseX.info(NODESPARSED, file.name(), nodes);
+    return BaseX.info(NODESPARSED, io.name(), nodes);
   }
 
   @Override
@@ -134,7 +135,7 @@ public final class SAXWrapper extends Parser {
     public void startElement(final String uri, final String ln, final String qn,
         final Attributes at) throws SAXException {
 
-     try {
+      try {
         finishText();
         final int as = at.getLength();
         byte[][] atts = null;

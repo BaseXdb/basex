@@ -2,102 +2,100 @@ package org.basex.query.xquery.item;
 
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
+import static org.basex.util.Token.*;
 import java.math.BigDecimal;
 import java.util.regex.Pattern;
+import javax.xml.namespace.QName;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import org.basex.BaseX;
-import org.basex.query.xquery.XQException;
+import org.basex.api.dom.BXAttr;
+import org.basex.api.dom.BXComment;
+import org.basex.api.dom.BXDoc;
+import org.basex.api.dom.BXElement;
+import org.basex.api.dom.BXPI;
+import org.basex.api.dom.BXText;
+import org.basex.core.proc.CreateDB;
+import org.basex.io.CachedOutput;
+import org.basex.io.IOContent;
 import org.basex.query.xquery.XQContext;
+import org.basex.query.xquery.XQException;
+import org.basex.query.xquery.iter.NodIter;
 import org.basex.query.xquery.util.Err;
+import org.basex.util.Token;
 import org.basex.util.XMLToken;
-import static org.basex.util.Token.*;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Comment;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.ProcessingInstruction;
+import org.w3c.dom.Text;
 
 /**
  * XQuery Data Types.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public enum Type {
-  /** Untyped type. */
-  ITEM("item", null, EMPTY, false, false, false, false, false) {
-    @Override
-    public Item e(final Item it, final XQContext ctx) {
-      return it;
-    }
-    
-    @Override
-    public Object j(final Item it) {
-      return null;
-    }
-  },
-  
-  /** Untyped type. */
-  AAT("anyAtomicType", ITEM, XSURI, false, false, false, false, false) {
-    @Override
-    public Item e(final Item it, final XQContext ctx) {
-      return it;
-    }
-    
-    @Override
-    public Object j(final Item it) {
-      return null;
-    }
-  },
-  
+  /** Item type. */
+  ITEM("item", null, EMPTY, false, false, false, false),
+
+  /** Any atomic type. */
+  AAT("anyAtomicType", ITEM, XSURI, false, false, false, false),
+
   /** Untyped Atomic type. */
-  ATM("untypedAtomic", AAT, XSURI, false, true, true, false, false) {
+  ATM("untypedAtomic", AAT, XSURI, false, true, true, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) {
       return new Atm(it.str());
     }
-    
     @Override
-    public Object j(final Item it) {
-      return null;
+    public Item e(final Object o) {
+      return new Atm(token(o.toString()));
     }
   },
 
   /** String type. */
-  STR("string", AAT, XSURI, false, false, true, false, false) {
+  STR("string", AAT, XSURI, false, false, true, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) {
       return Str.get(it.str());
     }
-    
     @Override
-    public Object j(final Item it) {
-      return string(it.str());
+    public Item e(final Object o) {
+      return Str.get(o);
     }
   },
-  
+
   /** Normalized String type. */
-  NST("normalizedString", STR, XSURI, false, false, true, false, false) {
+  NST("normalizedString", STR, XSURI, false, false, true, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) {
       return new Str(it.str(), this);
     }
-    
     @Override
-    public Object j(final Item it) {
-      return null;
+    public Item e(final Object o) {
+      return e(Str.get(o), null);
     }
   },
-  
+
   /** Token type. */
-  TOK("token", NST, XSURI, false, false, true, false, false) {
+  TOK("token", NST, XSURI, false, false, true, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) {
       return new Str(norm(it.str()), this);
     }
-    
     @Override
-    public Object j(final Item it) {
-      return null;
+    public Item e(final Object o) {
+      return e(Str.get(o), null);
     }
   },
-  
+
   /** Language type. */
-  LAN("language", TOK, XSURI, false, false, true, false, false) {
+  LAN("language", TOK, XSURI, false, false, true, false) {
     final Pattern pat = Pattern.compile("[A-Za-z]{1,8}(-[A-Za-z0-9]{1,8})*");
 
     @Override
@@ -106,246 +104,228 @@ public enum Type {
       if(!pat.matcher(string(v)).matches()) error(it);
       return new Str(v, this);
     }
-    
     @Override
-    public Object j(final Item it) {
-      return null;
+    public Item e(final Object o) throws XQException {
+      return e(Str.get(o), null);
     }
   },
-  
+
   /** NMTOKEN type. */
-  NMT("NMTOKEN", TOK, XSURI, false, false, true, false, false) {
+  NMT("NMTOKEN", TOK, XSURI, false, false, true, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
       final byte[] v = norm(it.str());
       if(!XMLToken.isNMToken(v)) error(it);
       return new Str(v, this);
     }
-    
     @Override
-    public Object j(final Item it) {
-      return null;
+    public Item e(final Object o) throws XQException {
+      return e(Str.get(o), null);
     }
   },
-  
+
   /** Name type. */
-  NAM("Name", TOK, XSURI, false, false, true, false, false) {
+  NAM("Name", TOK, XSURI, false, false, true, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
       final byte[] v = norm(it.str());
       if(!XMLToken.isName(v)) error(it);
       return new Str(v, this);
     }
-    
     @Override
-    public Object j(final Item it) {
-      return null;
+    public Item e(final Object o) throws XQException {
+      return e(Str.get(o), null);
     }
   },
-  
-  /** Name type. */
-  NCN("NCName", NAM, XSURI, false, false, true, false, false) {
+
+  /** NCName type. */
+  NCN("NCName", NAM, XSURI, false, false, true, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
       return new Str(checkName(it), this);
     }
-    
     @Override
-    public Object j(final Item it) {
-      return null;
+    public Item e(final Object o) throws XQException {
+      return e(Str.get(o), null);
     }
   },
-  
+
   /** ID type. */
-  ID("ID", NCN, XSURI, false, false, true, false, false) {
+  ID("ID", NCN, XSURI, false, false, true, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
       return new Str(checkName(it), this);
     }
-    
     @Override
-    public Object j(final Item it) {
-      return null;
+    public Item e(final Object o) throws XQException {
+      return e(Str.get(o), null);
     }
   },
-  
+
   /** IDREF type. */
-  IDR("IDREF", NCN, XSURI, false, false, true, false, false) {
+  IDR("IDREF", NCN, XSURI, false, false, true, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
       return new Str(checkName(it), this);
     }
-    
     @Override
-    public Object j(final Item it) {
-      return null;
+    public Item e(final Object o) throws XQException {
+      return e(Str.get(o), null);
     }
   },
-  
-  /** Name type. */
-  ENT("ENTITY", NCN, XSURI, false, false, true, false, false) {
+
+  /** Entity type. */
+  ENT("ENTITY", NCN, XSURI, false, false, true, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
       return new Str(checkName(it), this);
     }
-    
     @Override
-    public Object j(final Item it) {
-      return null;
+    public Item e(final Object o) throws XQException {
+      return e(Str.get(o), null);
     }
   },
-  
+
   /** Float type. */
-  FLT("float", AAT, XSURI, true, false, false, false, false) {
+  FLT("float", AAT, XSURI, true, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
       return Flt.get(checkNum(it).flt());
     }
-    
     @Override
-    public Object j(final Item it) throws XQException {
-      return it.flt();
+    public Item e(final Object o) {
+      return Flt.get(Float.parseFloat(o.toString()));
     }
   },
-  
+
   /** Double type. */
-  DBL("double", AAT, XSURI, true, false, false, false, false) {
+  DBL("double", AAT, XSURI, true, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
       return Dbl.get(checkNum(it).dbl());
     }
-    
     @Override
-    public Object j(final Item it) throws XQException {
-      return it.dbl();
+    public Item e(final Object o) {
+      return Dbl.get(Double.parseDouble(o.toString()));
     }
   },
-  
+
   /** Decimal type. */
-  DEC("decimal", AAT, XSURI, true, false, false, false, false) {
+  DEC("decimal", AAT, XSURI, true, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
       return Dec.get(checkNum(it).dec());
     }
-    
     @Override
-    public Object j(final Item it) throws XQException {
-      return it.dec();
+    public Item e(final Object o) {
+      return Dec.get(new BigDecimal(o.toString()));
     }
   },
-  
+
   /** Integer type. */
-  ITR("integer", DEC, XSURI, true, false, false, false, false) {
+  ITR("integer", DEC, XSURI, true, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
-      return Itr.get(checkItr(it, Long.MIN_VALUE, Long.MAX_VALUE));
+      return Itr.get(check(it, Long.MIN_VALUE, Long.MAX_VALUE));
     }
-    
     @Override
-    public Object j(final Item it) throws XQException {
-      return it.itr();
+    public Item e(final Object o) throws XQException {
+      return Itr.get(check(o, Long.MIN_VALUE, Long.MAX_VALUE));
     }
   },
-  
-  /** Positive integer type. */
-  NPI("nonPositiveInteger", ITR, XSURI, true, false, false, false, false) {
+
+  /** Non-positive integer type. */
+  NPI("nonPositiveInteger", ITR, XSURI, true, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
-      return new Itr(checkItr(it, Long.MIN_VALUE, 0), this);
+      return new Itr(check(it, Long.MIN_VALUE, 0), this);
     }
-    
     @Override
-    public Object j(final Item it) throws XQException {
-      return it.itr();
+    public Item e(final Object o) throws XQException {
+      return new Itr(check(o, Long.MIN_VALUE, 0), this);
     }
   },
-  
+
   /** Negative integer type. */
-  NIN("negativeInteger", NPI, XSURI, true, false, false, false, false) {
+  NIN("negativeInteger", NPI, XSURI, true, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
-      return new Itr(checkItr(it, Long.MIN_VALUE, -1), this);
+      return new Itr(check(it, Long.MIN_VALUE, -1), this);
     }
-    
     @Override
-    public Object j(final Item it) throws XQException {
-      return it.itr();
+    public Item e(final Object o) throws XQException {
+      return new Itr(check(o, Long.MIN_VALUE, -1), this);
     }
   },
-  
+
   /** Long type. */
-  LNG("long", ITR, XSURI, true, false, false, false, false) {
+  LNG("long", ITR, XSURI, true, false, false, false) {
     final BigDecimal min = new BigDecimal(Long.MIN_VALUE);
     final BigDecimal max = new BigDecimal(Long.MAX_VALUE);
 
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
       final BigDecimal v = checkNum(it).dec();
-      if(v.compareTo(min) < 0 || v.compareTo(max) > 0) 
+      if(v.compareTo(min) < 0 || v.compareTo(max) > 0)
         Err.or(FUNCAST, this, it);
       return new Dec(v, this);
     }
-    
     @Override
-    public Object j(final Item it) throws XQException {
-      return it.itr();
+    public Item e(final Object o) {
+      return new Dec(new BigDecimal(o.toString()), this);
     }
   },
-  
+
   /** Int type. */
-  INT("int", LNG, XSURI, true, false, false, false, false) {
+  INT("int", LNG, XSURI, true, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
-      return new Itr(checkItr(it, -0x80000000, 0x7FFFFFFF), this);
+      return new Itr(check(it, -0x80000000, 0x7FFFFFFF), this);
     }
-    
     @Override
-    public Object j(final Item it) throws XQException {
-      return (int) it.itr();
+    public Item e(final Object o) throws XQException {
+      return new Itr(check(o, -0x80000000, 0x7FFFFFFF), this);
     }
   },
-  
+
   /** Short type. */
-  SHR("short", INT, XSURI, true, false, false, false, false) {
+  SHR("short", INT, XSURI, true, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
-      return new Itr(checkItr(it, -0x8000, 0x7FFF), this);
+      return new Itr(check(it, -0x8000, 0x7FFF), this);
     }
-    
     @Override
-    public Object j(final Item it) throws XQException {
-      return (short) it.itr();
+    public Item e(final Object o) throws XQException {
+      return new Itr(check(o, -0x8000, 0x7FFF), this);
     }
   },
-  
+
   /** Byte type. */
-  BYT("byte", SHR, XSURI, true, false, false, false, false) {
+  BYT("byte", SHR, XSURI, true, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
-      return new Itr(checkItr(it, -0x80, 0x7F), this);
+      return new Itr(check(it, -0x80, 0x7F), this);
     }
-    
     @Override
-    public Object j(final Item it) throws XQException {
-      return (byte) it.itr();
+    public Item e(final Object o) throws XQException {
+      return new Itr(check(o, -0x80, 0x7F), this);
     }
   },
-  
-  /** Negative integer type. */
-  NNI("nonNegativeInteger", ITR, XSURI, true, false, false, false, false) {
+
+  /** Non-negative integer type. */
+  NNI("nonNegativeInteger", ITR, XSURI, true, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
-      return new Itr(checkItr(it, 0, Long.MAX_VALUE), this);
+      return new Itr(check(it, 0, Long.MAX_VALUE), this);
     }
-    
     @Override
-    public Object j(final Item it) throws XQException {
-      return it.itr();
+    public Item e(final Object o) throws XQException {
+      return new Itr(check(o, 0, Long.MAX_VALUE), this);
     }
   },
-  
-  /** Short type. */
-  ULN("unsignedLong", NNI, XSURI, true, false, false, false, false) {
+
+  /** Unsigned long type. */
+  ULN("unsignedLong", NNI, XSURI, true, false, false, false) {
     /** Maximum value. */
     final BigDecimal max = new BigDecimal(Long.MAX_VALUE).multiply(
         BigDecimal.valueOf(2)).add(BigDecimal.ONE);
@@ -356,276 +336,254 @@ public enum Type {
       if(v.signum() < 0 || v.compareTo(max) > 0) Err.or(FUNCAST, this, it);
       return new Dec(v, this);
     }
-    
     @Override
-    public Object j(final Item it) throws XQException {
-      return it.itr();
+    public Item e(final Object o) {
+      return new Dec(Token.token(o.toString()));
     }
   },
-  
+
   /** Short type. */
-  UIN("unsignedInt", ULN, XSURI, true, false, false, false, false) {
+  UIN("unsignedInt", ULN, XSURI, true, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
-      return new Itr(checkItr(it, 0, 0xFFFFFFFFL), this);
+      return new Itr(check(it, 0, 0xFFFFFFFFL), this);
     }
-    
     @Override
-    public Object j(final Item it) throws XQException {
-      return (int) it.itr();
+    public Item e(final Object o) throws XQException {
+      return new Itr(check(o, 0, 0xFFFFFFFFL), this);
     }
   },
-  
-  /** Short type. */
-  USH("unsignedShort", UIN, XSURI, true, false, false, false, false) {
+
+  /** Unsigned Short type. */
+  USH("unsignedShort", UIN, XSURI, true, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
-      return new Itr(checkItr(it, 0, 0xFFFF), this);
+      return new Itr(check(it, 0, 0xFFFF), this);
     }
-    
     @Override
-    public Object j(final Item it) throws XQException {
-      return (short) it.itr();
+    public Item e(final Object o) throws XQException {
+      return new Itr(check(o, 0, 0xFFFF), this);
     }
   },
-  
-  /** Short type. */
-  UBY("unsignedByte", USH, XSURI, true, false, false, false, false) {
+
+  /** Unsigned byte type. */
+  UBY("unsignedByte", USH, XSURI, true, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
-      return new Itr(checkItr(it, 0, 0xFF), this);
+      return new Itr(check(it, 0, 0xFF), this);
     }
-    
     @Override
-    public Object j(final Item it) throws XQException {
-      return (byte) it.itr();
+    public Item e(final Object o) throws XQException {
+      return new Itr(check(o, 0, 0xFF), this);
     }
   },
 
   /** Positive integer type. */
-  PIN("positiveInteger", NNI, XSURI, true, false, false, false, false) {
+  PIN("positiveInteger", NNI, XSURI, true, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
-      return new Itr(checkItr(it, 1, Long.MAX_VALUE), this);
+      return new Itr(check(it, 1, Long.MAX_VALUE), this);
     }
-    
     @Override
-    public Object j(final Item it) throws XQException {
-      return it.itr();
+    public Item e(final Object o) throws XQException {
+      return new Itr(check(o, 1, Long.MAX_VALUE), this);
     }
   },
-  
-  /** Date type. */
-  DUR("duration", AAT, XSURI, false, false, false, true, false) {
+
+  /** Duration type. */
+  DUR("duration", AAT, XSURI, false, false, false, true) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
       return it.d() ? new Dur((Dur) it) : checkStr(it) ?
           new Dur(it.str()) : error(it);
     }
-    
     @Override
-    public Object j(final Item it) {
-      return null;
+    public Item e(final Object o) throws XQException {
+      return new Dur(token(o.toString()));
     }
   },
 
-  /** Date type. */
-  YMD("yearMonthDuration", DUR, XSURI, false, false, false, true, false) {
+  /** Year month duration type. */
+  YMD("yearMonthDuration", DUR, XSURI, false, false, false, true) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
       return it.d() ? new YMd((Dur) it) : checkStr(it) ?
           new YMd(it.str()) : error(it);
     }
-    
     @Override
-    public Object j(final Item it) {
-      return null;
+    public Item e(final Object o) throws XQException {
+      return new YMd(token(o.toString()));
     }
   },
 
-  /** Date type. */
-  DTD("dayTimeDuration", DUR, XSURI, false, false, false, true, false) {
+  /** Day time duration type. */
+  DTD("dayTimeDuration", DUR, XSURI, false, false, false, true) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
       return it.d() ? new DTd((Dur) it) : checkStr(it) ?
           new DTd(it.str()) : error(it);
     }
-    
     @Override
-    public Object j(final Item it) {
-      return null;
+    public Item e(final Object o) throws XQException {
+      return new DTd(token(o.toString()));
     }
   },
 
   /** DateTime type. */
-  DTM("dateTime", AAT, XSURI, false, false, false, false, false) {
+  DTM("dateTime", AAT, XSURI, false, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
       return it.type == LNG ? new Dtm((Dec) it) : it.type == DAT ?
           new Dtm((Date) it) : checkStr(it) ? new Dtm(it.str()) : error(it);
     }
-    
     @Override
-    public Object j(final Item it) {
-      return null;
+    public Item e(final Object o) throws XQException {
+      return new Dtm(token(o.toString()));
     }
   },
-  
+
   /** Date type. */
-  DAT("date", AAT, XSURI, false, false, false, false, false) {
+  DAT("date", AAT, XSURI, false, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
       return it.type == DTM ? new Dat((Date) it) : checkStr(it) ?
           new Dat(it.str()) : error(it);
     }
-    
     @Override
-    public Object j(final Item it) {
-      return null;
+    public Item e(final Object o) throws XQException {
+      return new Dat(token(o.toString()));
     }
   },
-  
+
   /** Time type. */
-  TIM("time", AAT, XSURI, false, false, false, false, false) {
+  TIM("time", AAT, XSURI, false, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
       return it.type == DTM ? new Tim((Date) it) : checkStr(it) ?
           new Tim(it.str()) : error(it);
     }
-    
     @Override
-    public Object j(final Item it) {
-      return null;
+    public Item e(final Object o) throws XQException {
+      return new Tim(token(o.toString()));
     }
   },
-  
-  /** YearMonth type. */
-  YMO("gYearMonth", AAT, XSURI, false, false, false, false, false) {
+
+  /** Year month type. */
+  YMO("gYearMonth", AAT, XSURI, false, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
       return it.type == DTM || it.type == DAT ? new YMo((Date) it) :
         checkStr(it) ? new YMo(it.str()) : error(it);
     }
-    
     @Override
-    public Object j(final Item it) {
-      return null;
+    public Item e(final Object o) throws XQException {
+      return new YMo(token(o.toString()));
     }
   },
-  
+
   /** Year type. */
-  YEA("gYear", AAT, XSURI, false, false, false, false, false) {
+  YEA("gYear", AAT, XSURI, false, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
       return it.type == DTM || it.type == DAT ? new Yea((Date) it) :
         checkStr(it) ? new Yea(it.str()) : error(it);
     }
-    
     @Override
-    public Object j(final Item it) {
-      return null;
+    public Item e(final Object o) throws XQException {
+      return new Yea(token(o.toString()));
     }
   },
-  
-  /** YearMonth type. */
-  MDA("gMonthDay", AAT, XSURI, false, false, false, false, false) {
+
+  /** Month day type. */
+  MDA("gMonthDay", AAT, XSURI, false, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
       return it.type == DTM || it.type == DAT ? new MDa((Date) it) :
         checkStr(it) ? new MDa(it.str()) : error(it);
     }
-    
     @Override
-    public Object j(final Item it) {
-      return null;
+    public Item e(final Object o) throws XQException {
+      return new MDa(token(o.toString()));
     }
   },
-  
+
   /** Day type. */
-  DAY("gDay", AAT, XSURI, false, false, false, false, false) {
+  DAY("gDay", AAT, XSURI, false, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
       return it.type == DTM || it.type == DAT ? new Day((Date) it) :
         checkStr(it) ? new Day(it.str()) : error(it);
     }
-    
     @Override
-    public Object j(final Item it) {
-      return null;
+    public Item e(final Object o) throws XQException {
+      return new Day(token(o.toString()));
     }
   },
-  
+
   /** Month type. */
-  MON("gMonth", AAT, XSURI, false, false, false, false, false) {
+  MON("gMonth", AAT, XSURI, false, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
       return it.type == DTM || it.type == DAT ? new Mon((Date) it) :
         checkStr(it) ? new Mon(it.str()) : error(it);
     }
-    
     @Override
-    public Object j(final Item it) {
-      return null;
+    public Item e(final Object o) throws XQException {
+      return new Mon(token(o.toString()));
     }
   },
-  
+
   /** Boolean type. */
-  BLN("boolean", AAT, XSURI, false, false, false, false, false) {
+  BLN("boolean", AAT, XSURI, false, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
       return it.n() ? Bln.get(it.bool()) : checkStr(it) ?
           Bln.get(Bln.check(it.str())) : error(it);
     }
-    
     @Override
-    public Object j(final Item it) throws XQException {
-      return Bln.check(it.str());
+    public Item e(final Object o) {
+      return Bln.get((Boolean) o);
     }
   },
-  
-  /** Base64Binary type. */
-  B6B("base64Binary", AAT, XSURI, false, false, false, false, false) {
+
+  /** Base64 binary type. */
+  B6B("base64Binary", AAT, XSURI, false, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
       return it.type == HEX ? new B64((Hex) it) : checkStr(it) ?
           new B64(it.str()) : error(it);
     }
-    
     @Override
-    public Object j(final Item it) {
-      return null;
+    public Item e(final Object o) throws XQException {
+      return new B64((byte[]) o);
     }
   },
-  
-  /** HexBinary type. */
-  HEX("hexBinary", AAT, XSURI, false, false, false, false, false) {
+
+  /** Hex binary type. */
+  HEX("hexBinary", AAT, XSURI, false, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
       return it.type == B6B ? new Hex((B64) it) : checkStr(it) ?
           new Hex(it.str()) : error(it);
     }
-    
     @Override
-    public Object j(final Item it) {
-      return null;
+    public Item e(final Object o) throws XQException {
+      return new Hex((byte[]) o);
     }
   },
-  
-  /** URI type. */
-  URI("anyURI", AAT, XSURI, false, false, true, false, false) {
+
+  /** Any URI type. */
+  URI("anyURI", AAT, XSURI, false, false, true, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
       return it.s() ? Uri.uri(it.str()) : error(it);
     }
-    
     @Override
-    public Object j(final Item it) {
-      return null;
-    }
+    public Item e(final Object o) { return Uri.uri(token(o.toString())); }
   },
-  
-  /** QName. */
-  QNM("QName", AAT, XSURI, false, false, false, false, false) {
+
+  /** QName Type. */
+  QNM("QName", AAT, XSURI, false, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
       if(it.type != STR) error(it);
@@ -633,172 +591,106 @@ public enum Type {
       if(s.length == 0) Err.or(QNMINV, s);
       return new QNm(s, ctx);
     }
-    
     @Override
-    public Object j(final Item it) {
-      return null;
-    }
+    public Item e(final Object o) { return new QNm((QName) o); }
   },
-  
-  /** NOTATION. */
-  NOT("NOTATION", null, XSURI, false, false, false, false, false) {
-    @Override
-    public Item e(final Item it, final XQContext ctx) {
-      return null;
-    }
-    
-    @Override
-    public Object j(final Item it) {
-      return null;
-    }
-  },
+
+  /** NOTATION Type. */
+  NOT("NOTATION", null, XSURI, false, false, false, false),
 
   /** Node type. */
-  NOD("node", AAT, EMPTY, false, true, false, false, true) {
-    @Override
-    public Item e(final Item it, final XQContext ctx) {
-      return it;
-    }
-    
-    @Override
-    public Object j(final Item it) {
-      return null;
-    }
-  },
+  NOD("node", AAT, EMPTY, false, true, false, false),
 
   /** Text type. */
-  TXT("text", NOD, EMPTY, false, true, false, false, true) {
+  TXT("text", NOD, EMPTY, false, true, false, false) {
     @Override
-    public Item e(final Item it, final XQContext ctx) {
-      return it;
-    }
-    
-    @Override
-    public Object j(final Item it) {
-      return null;
-    }
-  },
-  
-  /** PI type. */
-  PI("processing-instruction", NOD, EMPTY, false, true, false, false,
-      true) {
-    @Override
-    public Item e(final Item it, final XQContext ctx) {
-      return it;
-    }
-    
-    @Override
-    public Object j(final Item it) {
-      return null;
-    }
-  },
-  
-  /** Element type. */
-  ELM("element", NOD, EMPTY, false, true, false, false, true) {
-    @Override
-    public Item e(final Item it, final XQContext ctx) {
-      return it;
-    }
-    
-    @Override
-    public Object j(final Item it) {
-      return null;
-    }
-  },
-  
-  /** Document type. */
-  DOC("document-node", NOD, EMPTY, false, true, false, false, true) {
-    @Override
-    public Item e(final Item it, final XQContext ctx) {
-      return it;
-    }
-    
-    @Override
-    public Object j(final Item it) {
-      return null;
-    }
-  },
-  
-  /** Document element type (needed by XQJ API). */
-  DEL("document-node(...)", NOD, EMPTY, false, true, false, false, true) {
-    @Override
-    public Item e(final Item it, final XQContext ctx) {
-      BaseX.notexpected(); return null;
-    }
-    
-    @Override
-    public Object j(final Item it) {
-      BaseX.notexpected(); return null;
-    }
-  },
-  
-  /** Attribute type. */
-  ATT("attribute", NOD, EMPTY, false, true, false, false, true) {
-    @Override
-    public Item e(final Item it, final XQContext ctx) {
-      return it;
-    }
-    
-    @Override
-    public Object j(final Item it) {
-      return null;
-    }
-  },
-  
-  /** Comment type. */
-  COM("comment", NOD, EMPTY, false, true, false, false, true) {
-    @Override
-    public Item e(final Item it, final XQContext ctx) {
-      return it;
-    }
-    
-    @Override
-    public Object j(final Item it) {
-      return null;
+    public Item e(final Object o) {
+      if(o instanceof BXText) return ((BXText) o).getNod();
+      return new FTxt(token(((Text) o).getNodeValue()), null);
     }
   },
 
-  /** Sequence type. */
-  SEQ("(Sequence)", null, EMPTY, false, false, false, false, false) {
+  /** PI type. */
+  PI("processing-instruction", NOD, EMPTY, false, true, false, false) {
     @Override
-    public Item e(final Item it, final XQContext ctx) {
-      BaseX.notexpected();
-      return null;
-    }
-    
-    @Override
-    public Object j(final Item it) {
-      return null;
+    public Item e(final Object o) {
+      if(o instanceof BXPI) return ((BXPI) o).getNod();
+      
+      final ProcessingInstruction pi = (ProcessingInstruction) o;
+      return new FPI(new QNm(token(pi.getNodeName())),
+          token(pi.getNodeValue()), null);
     }
   },
-  
-  /** Empty sequence type. */
-  EMP("empty-sequence", null, EMPTY, false, false, false, false, false) {
+
+  /** Element type. */
+  ELM("element", NOD, EMPTY, false, true, false, false) {
     @Override
-    public Item e(final Item it, final XQContext ctx) {
-      return Seq.EMPTY;
-    }
-    
-    @Override
-    public Object j(final Item it) {
-      return null;
+    public Item e(final Object o) {
+      if(o instanceof BXElement) return ((BXElement) o).getNod();
+
+      // [CG] add complete DOM object for elements
+      return new FElem(new QNm(token(((Element) o).getNodeName())),
+          new NodIter(), new NodIter(), Token.EMPTY, new FAttr[] {}, null);
     }
   },
-  
+
+  /** Document type. */
+  DOC("document-node", NOD, EMPTY, false, true, false, false) {
+    @Override
+    public Item e(final Object o) throws XQException {
+      try {
+        if(o instanceof BXDoc) return ((BXDoc) o).getNod();
+
+        // [CG] avoid database creation if possible
+        if(o instanceof Document) {
+          final TransformerFactory tf = TransformerFactory.newInstance();
+          final Transformer tr = tf.newTransformer();
+          final CachedOutput out = new CachedOutput();
+          tr.transform(new DOMSource((Document) o), new StreamResult(out));
+          final IOContent cont = new IOContent(out.finish());
+          return new DNode(CreateDB.xml(cont, "tmp"), 0);
+        }
+        
+        // [CG] add complete DOM object for document fragments
+        return new FDoc(new NodIter(), Token.EMPTY);
+
+      } catch(final Exception ex) {
+        throw new XQException(UNDOC, ex.getMessage());
+      }
+    }
+  },
+
+  /** Document element type (required by XQJ API). */
+  DEL("document-node(...)", NOD, EMPTY, false, true, false, false),
+
+  /** Attribute type. */
+  ATT("attribute", NOD, EMPTY, false, true, false, false) {
+    @Override
+    public Item e(final Object o) {
+      if(o instanceof BXAttr) return ((BXAttr) o).getNod();
+
+      final Attr at = (Attr) o;
+      return new FAttr(new QNm(token(at.getNodeName())),
+          token(at.getNodeValue()), null);
+    }
+  },
+
+  /** Comment type. */
+  COM("comment", NOD, EMPTY, false, true, false, false) {
+    @Override
+    public Item e(final Object o) {
+      if(o instanceof BXComment) return ((BXComment) o).getNod();
+
+      return new FComm(token(((Comment) o).getNodeValue()), null);
+    }
+  },
+
   /** Empty sequence type. */
-  JAVA("java", null, EMPTY, true, true, true, false, false) {
-    @Override
-    public Item e(final Item it, final XQContext ctx) {
-      BaseX.notexpected();
-      return null;
-    }
-    
-    @Override
-    public Object j(final Item it) {
-      return ((Jav) it).val;
-    }
-  };
-  
+  EMP("empty-sequence", null, EMPTY, false, false, false, false),
+
+  /** Java type. */
+  JAVA("java", null, EMPTY, true, true, true, false);
+
   /** String representation. */
   public final byte[] name;
   /** URI representation. */
@@ -813,8 +705,6 @@ public enum Type {
   public final boolean str;
   /** Duration flag. */
   public final boolean dur;
-  /** Node flag. */
-  public final boolean node;
 
   /**
    * Constructs a new item from the specified item.
@@ -823,16 +713,23 @@ public enum Type {
    * @return new item
    * @throws XQException evaluation exception
    */
-  public abstract Item e(Item it, final XQContext ctx) throws XQException;
+  @SuppressWarnings("unused")
+  public Item e(final Item it, final XQContext ctx) throws XQException {
+    BaseX.notexpected(); return null;
+  }
 
   /**
-   * Converts the specified item to a Java object.
-   * @param it item to be evaluated
+   * Constructs a new item from the specified Java object.
+   * The Java object is supposed to have a correct mapping type.
+   * @param o Java object
    * @return new item
    * @throws XQException evaluation exception
    */
-  public abstract Object j(final Item it) throws XQException;
-  
+  @SuppressWarnings("unused")
+  public Item e(final Object o) throws XQException {
+    BaseX.notexpected(); return null;
+  }
+
   /**
    * Constructor.
    * @param nm string representation
@@ -842,10 +739,9 @@ public enum Type {
    * @param u untyped flag
    * @param s string flag
    * @param d duration flag
-   * @param nd node flag
    */
   private Type(final String nm, final Type pr, final byte[] ur, final boolean n,
-      final boolean u, final boolean s, final boolean d, final boolean nd) {
+      final boolean u, final boolean s, final boolean d) {
     name = token(nm);
     uri = ur;
     par = pr;
@@ -853,9 +749,8 @@ public enum Type {
     unt = u;
     str = s;
     dur = d;
-    node = nd;
   }
-  
+
   /**
    * Throws an exception if the specified item can't be converted to a number.
    * @param it item
@@ -866,7 +761,7 @@ public enum Type {
     return it.type == URI || !it.s() && !it.n() && !it.u() &&
       it.type != BLN ? error(it) : it;
   }
-  
+
   /**
    * Checks the validity of the specified item and returns its long value.
    * @param it value to be checked
@@ -875,7 +770,7 @@ public enum Type {
    * @return integer value
    * @throws XQException possible converting exception
    */
-  protected long checkItr(final Item it, final long min, final long max)
+  protected long check(final Item it, final long min, final long max)
       throws XQException {
 
     checkNum(it);
@@ -890,8 +785,23 @@ public enum Type {
     if(l < min || l > max) Err.or(FUNCAST, this, it);
     return l;
   }
-  
-  
+
+  /**
+   * Checks the numeric range of the specified object and returns the value.
+   * @param o object to be checked
+   * @param min minimum value
+   * @param max maximum value
+   * @return integer value
+   * @throws XQException possible converting exception
+   */
+  protected long check(final Object o, final long min, final long max)
+      throws XQException {
+
+    final long l = Long.parseLong(o.toString());
+    if(l < min || l > max) Err.or(FUNCAST, this, o);
+    return l;
+  }
+
   /**
    * Checks if the specified item is a string.
    * @param it item
@@ -912,7 +822,7 @@ public enum Type {
     if(!XMLToken.isNCName(v)) error(it);
     return v;
   }
-  
+
   /**
    * Throws a casting exception.
    * @param it item to be included in the error message
@@ -942,9 +852,9 @@ public enum Type {
   public boolean node() {
     return this == NOD || par == NOD;
   }
-  
+
   /**
-   * Finds and returns the specified data type. 
+   * Finds and returns the specified data type.
    * @param type type as string
    * @param nodes flag for including node types
    * @return type or null
@@ -952,7 +862,7 @@ public enum Type {
   public static Type find(final QNm type, final boolean nodes) {
     final byte[] ln = type.ln();
     final byte[] uri = type.uri.str();
-    
+
     for(final Type t : Type.values()) {
       if(eq(t.name, ln) && eq(uri, t.uri) &&
           (nodes || t.par != null && t != AAT)) return t;

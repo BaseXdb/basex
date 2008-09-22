@@ -19,9 +19,13 @@ import org.basex.util.TokenList;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class DNode extends Node {
+public final class DNode extends Nod {
+  /** Node Types. */
+  private static final Type[] TYPES = {
+    Type.DOC, Type.ELM, Type.TXT, Type.ATT, Type.COM, Type.PI
+  };
   /** Root node (constructor). */
-  public Node root;
+  public Nod root;
   /** Data reference. */
   public Data data;
   /** Pre value. */
@@ -31,14 +35,34 @@ public final class DNode extends Node {
    * Constructor.
    * @param d data reference
    * @param p pre value
+   */
+  public DNode(final Data d, final int p) {
+    this(d, p, null, TYPES[d.kind(p)]);
+  }
+
+  /**
+   * Constructor.
+   * @param d data reference
+   * @param p pre value
    * @param r parent reference
    * @param t node type
    */
-  public DNode(final Data d, final int p, final Node r, final Type t) {
+  public DNode(final Data d, final int p, final Nod r, final Type t) {
     super(t);
     data = d;
     pre = p;
     par = r;
+  }
+
+  /**
+   * Sets the node type.
+   * @param p pre value
+   * @param k node kind
+   */
+  public void set(final int p, final int k) {
+    type = TYPES[k];
+    par = null;
+    pre = p;
   }
 
   @Override
@@ -153,14 +177,14 @@ public final class DNode extends Node {
   }
 
   @Override
-  public boolean is(final Node nod) {
+  public boolean is(final Nod nod) {
     if(nod == this) return true;
     if(!(nod instanceof DNode)) return false;
     return data == ((DNode) nod).data && pre == ((DNode) nod).pre;
   }
 
   @Override
-  public int diff(final Node nod) {
+  public int diff(final Nod nod) {
     if(!(nod instanceof DNode) || data != ((DNode) nod).data)
       return id - nod.id;
     return pre - ((DNode) nod).pre;
@@ -181,7 +205,7 @@ public final class DNode extends Node {
   }
 
   @Override
-  public Node parent() {
+  public Nod parent() {
     if(par != null) return par;
     final int p = data.parent(pre, data.kind(pre));
     
@@ -193,7 +217,7 @@ public final class DNode extends Node {
   }
 
   @Override
-  public void parent(final Node p) {
+  public void parent(final Nod p) {
     root = p;
     par = p;
   }
@@ -311,7 +335,7 @@ public final class DNode extends Node {
       private final int s = pre + data.attSize(pre, data.kind(pre));
 
       @Override
-      public Node next() {
+      public Nod next() {
         if(p == s) return null;
         node.set(p++, Data.ATTR);
         return node;
@@ -343,7 +367,7 @@ public final class DNode extends Node {
       }
 
       @Override
-      public Node next() {
+      public Nod next() {
         if(!more()) return null;
         final int k = data.kind(p);
         node.set(p, k);
@@ -364,7 +388,7 @@ public final class DNode extends Node {
       private final int s = pre + data.size(pre, data.kind(pre));
 
       @Override
-      public Node next() {
+      public Nod next() {
         if(p == s) return null;
         final int k = data.kind(p);
         node.set(p, k);
@@ -385,7 +409,7 @@ public final class DNode extends Node {
       private final int s = pre + data.size(pre, data.kind(pre));
 
       @Override
-      public Node next() {
+      public Nod next() {
         if(p == s) return null;
         final int k = data.kind(p);
         node.set(p, k);
@@ -393,22 +417,6 @@ public final class DNode extends Node {
         return node;
       }
     };
-  }
-
-  /** Node Types. */
-  private static final Type[] TYPES = {
-    Type.DOC, Type.ELM, Type.TXT, Type.ATT, Type.COM, Type.PI
-  };
-  
-  /**
-   * Sets the node type.
-   * @param p pre value
-   * @param k node kind
-   */
-  public void set(final int p, final int k) {
-    type = TYPES[k];
-    par = null;
-    pre = p;
   }
 
   @Override

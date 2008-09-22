@@ -79,8 +79,8 @@ public final class SeqType {
     Iter iter = item.iter();
     Item it = iter.next();
     if(it == null) {
-      if(type != Type.EMP && occ % 2 == 0) Err.cast(type, Seq.EMPTY);
-      return Seq.EMPTY;
+      if(type == Type.EMP || occ % 2 != 0) return Seq.EMPTY;
+      Err.cast(type, Seq.EMPTY);
     }
 
     boolean ins = it.type.instance(type);

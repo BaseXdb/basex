@@ -7,7 +7,7 @@ import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Node;
+import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Err;
@@ -117,9 +117,9 @@ public abstract class Fun extends Expr {
    * @return item
    * @throws XQException evaluation exception
    */
-  protected final Node checkNode(final Item it) throws XQException {
+  protected final Nod checkNode(final Item it) throws XQException {
     if(!it.node()) Err.type(info(), Type.NOD, it);
-    return (Node) it;
+    return (Nod) it;
   }
 
   /**

@@ -114,15 +114,15 @@ public class Itr extends Num {
   public Object java() {
     switch(type) {
       case BYT:
-        return new Byte((byte) val);
+        return (byte) val;
       case SHR:
       case UBY:
-        return new Short((short) val);
+        return (short) val;
       case INT:
       case USH:
-        return new Integer((int) val);
+        return (int) val;
       case UIN:
-        return new Long(val);
+        return val;
       default:
         return new BigInteger(Token.string(str()));
     }

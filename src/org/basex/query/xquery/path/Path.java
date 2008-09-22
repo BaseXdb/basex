@@ -11,7 +11,7 @@ import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.func.Fun;
 import org.basex.query.xquery.func.FunDef;
 import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Node;
+import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.QNm;
 import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.item.Type;
@@ -122,7 +122,7 @@ public final class Path extends Arr {
       if(ir.size == 1) return ir.list[0];
       
       final NodeBuilder nb = new NodeBuilder(false);
-      Node it;
+      Nod it;
       while((it = ir.next()) != null) nb.add(it);
       return nb.finish();
     }
@@ -155,10 +155,10 @@ public final class Path extends Arr {
       if(i.node()) {
         // [CG] XQuery/evaluate path: verify when results might be ordered
         final NodeBuilder nb = new NodeBuilder(false);
-        nb.add((Node) i);
+        nb.add((Nod) i);
         while((i = ir.next()) != null) {
           if(!i.node()) Err.or(EVALNODESVALS);
-          nb.add((Node) i);
+          nb.add((Nod) i);
         }
         return nb.finish();
       }
@@ -179,7 +179,7 @@ public final class Path extends Arr {
 
     final NodeIter ir = ((Step) expr[l]).iter(ctx);
     final boolean more = l + 1 != expr.length;
-    Node it;
+    Nod it;
     while((it = ir.next()) != null) {
       if(more) {
         ctx.item = it;

@@ -1,9 +1,7 @@
 package org.basex.query.xquery.item;
 
 import static org.basex.query.xquery.XQTokens.*;
-
 import java.io.IOException;
-
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.util.Token;
@@ -23,7 +21,7 @@ public final class FTxt extends FNode {
    * @param t text value
    * @param p parent
    */
-  public FTxt(final byte[] t, final Node p) {
+  public FTxt(final byte[] t, final Nod p) {
     super(Type.TXT);
     val = t;
     par = p;
@@ -41,13 +39,13 @@ public final class FTxt extends FNode {
   }
 
   @Override
-  public String toString() {
-    return Token.string(val);
-  }
-  
-  @Override
   public FTxt copy() {
     return new FTxt(val, par);
+  }
+
+  @Override
+  public String toString() {
+    return Token.string(val);
   }
 
   @Override

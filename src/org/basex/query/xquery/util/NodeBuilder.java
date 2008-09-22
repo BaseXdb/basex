@@ -1,7 +1,7 @@
 package org.basex.query.xquery.util;
 
 import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Node;
+import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.iter.NodIter;
 import org.basex.util.Array;
@@ -14,7 +14,7 @@ import org.basex.util.Array;
  */
 public final class NodeBuilder {
   /** Node array. */
-  public Node[] list = new Node[1];
+  public Nod[] list = new Nod[1];
   /** Number of entries. */
   public int size;
   /** Sort flag. */
@@ -42,7 +42,7 @@ public final class NodeBuilder {
    * Adds a single node.
    * @param n node to be added
    */
-  public void add(final Node n) {
+  public void add(final Nod n) {
     if(size == list.length) resize();
     if(!ordered && !sort) sort = size != 0 && list[size - 1].diff(n) > 0;
     list[size++] = n;
@@ -52,7 +52,7 @@ public final class NodeBuilder {
    * Resizes the sequence array.
    */
   private void resize() {
-    final Node[] tmp = new Node[size << 1];
+    final Nod[] tmp = new Nod[size << 1];
     System.arraycopy(list, 0, tmp, 0, size);
     list = tmp;
   }
@@ -68,7 +68,7 @@ public final class NodeBuilder {
     final SeqBuilder sq = new SeqBuilder();
     sq.a(list[0]);
     for(int s = 1; s < size; s++) {
-      if(!list[s].is((Node) sq.item[sq.size - 1])) sq.a(list[s]);
+      if(!list[s].is((Nod) sq.item[sq.size - 1])) sq.a(list[s]);
     }
     return sq.finish();
   }
@@ -113,7 +113,7 @@ public final class NodeBuilder {
       }
       m = m(l, m, n);
     }
-    final Node v = list[m];
+    final Nod v = list[m];
 
     int a = s, b = a, c = s + e - 1, d = c;
     while(true) {
@@ -173,7 +173,7 @@ public final class NodeBuilder {
    * @param b second position
    */
   private void s(final int a, final int b) {
-    final Node tmp = list[a];
+    final Nod tmp = list[a];
     list[a] = list[b];
     list[b] = tmp;
   }

@@ -71,7 +71,7 @@ public enum GUICommands implements GUICommand {
       if(!dialog.ok()) return;
       final String in = dialog.input();
       final String db = dialog.dbname();
-      build(PROGCREATE, new Process[] { new CreateDB(in, db) });
+      progress(PROGCREATE, new Process[] { new CreateDB(in, db) });
     }
   },
 
@@ -176,7 +176,7 @@ public enum GUICommands implements GUICommand {
       if(!new DialogImportFS(main).ok()) return;
       final String p = GUIProp.fsall ? "/" : GUIProp.fspath.replace('\\', '/');
       final String name = GUIProp.importfsname;
-      build(IMPORTFSTITLE, new Process[] { new CreateFS(p, name) });
+      progress(IMPORTFSTITLE, new Process[] { new CreateFS(p, name) });
     }
   },
 
@@ -724,7 +724,7 @@ public enum GUICommands implements GUICommand {
       final DialogInfo info = new DialogInfo(GUI.get());
       if(info.ok()) {
         if(info.opt) {
-          build(INFOOPT, new Process[] { new Optimize() });
+          progress(INFOOPT, new Process[] { new Optimize() });
         } else {
           final MetaData meta = GUI.context.data().meta;
           final boolean[] indexes = info.indexes();
@@ -736,7 +736,7 @@ public enum GUICommands implements GUICommand {
           if(indexes[2] != meta.ftxindex)
             proc = Array.add(proc, cmd(indexes[2], INDEX.FULLTEXT));
 
-          if(proc.length != 0) build(INFOBUILD, proc);
+          if(proc.length != 0) progress(INFOBUILD, proc);
         }
       }
     }
@@ -874,11 +874,11 @@ public enum GUICommands implements GUICommand {
   // =========================================================================
 
   /**
-   * Runs a building progress.
+   * Performs a process, showing a progress dialog.
    * @param title dialog title
    * @param procs processes
    */
-  static void build(final String title, final Process[] procs) {
+  static void progress(final String title, final Process[] procs) {
     final GUI main = GUI.get();
 
     // start database creation thread
@@ -898,7 +898,7 @@ public enum GUICommands implements GUICommand {
           final DialogProgress wait = new DialogProgress(
               main, title, !fs, !op, proc);
 
-          // create database
+          // execute process
           final Performance perf = new Performance();
           final boolean ok = proc.execute(GUI.context);
           wait.dispose();

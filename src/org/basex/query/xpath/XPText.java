@@ -60,6 +60,8 @@ public interface XPText {
   String UNKNOWNVAR = "Unknown variable $%.";
   /** Parsing exception. */
   String UNKNOWNFUNC = "Unknown function %(...).";
+  /** Parsing Exception. */
+  String UNKNOWNDOC = "Document not found: \"%\".";
   /** Parsing exception. */
   String FUNCEXCEPTION = "Cannot instantiate function %(...).";
   /** Parsing Exception. */

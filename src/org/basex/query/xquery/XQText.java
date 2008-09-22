@@ -60,6 +60,8 @@ public interface XQText {
   Object[] NORMUNI = { FOCH, 3, "Unsupported normalization form (%)." };
 
   /** FODC0002: Evaluation exception. */
+  Object[] UNDOC = { FODC, 2, "Document node could not be created (%)." };
+  /** FODC0002: Evaluation exception. */
   Object[] NODOC = { FODC, 2, "Document \"%\" could not be loaded." };
   /** FODC0004: Evaluation exception. */
   Object[] COLLINV = { FODC, 2, "Collection name \"%\" is invalid." };
@@ -156,6 +158,8 @@ public interface XQText {
   Object[] ROOTDOC = { XPDY, 50, "Context item must be a document node." };
   /** XPDY0050: Evaluation exception. */
   Object[] NOTREAT = { XPDY, 50, "%: % expected, % found." };
+  /** XPTY0004: Typing exception. */
+  Object[] NOTREATS = { XPDY, 50, "%: % expected, sequence found." };
 
   /** XPST0003: Parsing exception. */
   Object[] QUERYEMPTY = { XPST, 3, "Empty query." };
@@ -391,8 +395,7 @@ public interface XQText {
   /** XPTY0019: Typing exception. */
   Object[] EVALNODES = { XPTY, 19, "Nodes needed for expression '%'." };
   /** XPTY0019: Typing exception. */
-  Object[] NODESPATH = { XPTY, 19,
-    "Context node required for %; '%' found." };
+  Object[] NODESPATH = { XPTY, 19, "Context node required for %; '%' found." };
 
   /** XPDY0002: Parsing exception. */
   Object[] VAREMPTY = { XQDY, 2, "No value defined for \"%\"." };

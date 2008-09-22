@@ -1,9 +1,7 @@
 package org.basex.query.xquery.item;
 
 import static org.basex.query.xquery.XQTokens.*;
-
 import java.net.URI;
-//import java.net.URI;
 import org.basex.util.Token;
 
 /**

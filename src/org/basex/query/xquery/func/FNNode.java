@@ -5,7 +5,7 @@ import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Node;
+import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.QNm;
 import org.basex.query.xquery.item.Str;
 import org.basex.query.xquery.item.Type;
@@ -42,7 +42,7 @@ public final class FNNode extends Fun {
         return it.type != Type.ELM ? Iter.EMPTY : Bln.FALSE.iter();
       case BASEURI:
         if(empty) return Iter.EMPTY;
-        Node n = checkNode(it);
+        Nod n = checkNode(it);
         if(n.type != Type.ELM && n.type != Type.DOC && n.parent() == null)
           return Iter.EMPTY;
         Uri base = Uri.EMPTY;
@@ -65,7 +65,7 @@ public final class FNNode extends Fun {
         return qname != null ? Str.iter(qname.ln()) : Str.ZERO.iter();
       case NSURI:
         if(empty || it.type == Type.PI) return Uri.EMPTY.iter();
-        Node node = checkNode(it);
+        Nod node = checkNode(it);
         while(node != null) {
           qname = node.qname();
           if(qname == null) break;
@@ -91,8 +91,8 @@ public final class FNNode extends Fun {
    * @param node node to be checked
    * @return root node
    */
-  private static Node root(final Node node) {
-    Node n = node;
+  private static Nod root(final Nod node) {
+    Nod n = node;
     while(n.parent() != null) n = n.parent();
     return n;
   }

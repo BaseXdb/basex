@@ -7,7 +7,7 @@ import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.FAttr;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.NCN;
-import org.basex.query.xquery.item.Node;
+import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.QNm;
 import org.basex.query.xquery.item.Str;
 import org.basex.query.xquery.item.Type;
@@ -34,7 +34,7 @@ final class FNQName extends Fun {
         QNm name = new QNm(Token.trim(checkStr(it)), ctx);
         byte[] pre = name.pre();
         it = arg[1].atomic(this, false);
-        final Node n = (Node) check(it, Type.ELM);
+        final Nod n = (Nod) check(it, Type.ELM);
         name.uri = n.qname().uri;
         if(name.uri != Uri.EMPTY) return name.iter();
 
@@ -88,7 +88,7 @@ final class FNQName extends Fun {
         }
       case INSCOPE:
         it = arg[0].atomic(this, false);
-        return inscope(ctx, (Node) check(it, Type.ELM));
+        return inscope(ctx, (Nod) check(it, Type.ELM));
       case RESURI:
         it = arg[0].atomic(this, true);
         if(it == null) return Iter.EMPTY;
@@ -112,7 +112,7 @@ final class FNQName extends Fun {
    * @return prefix sequence
    * @throws XQException xquery exception
    */
-  private Iter inscope(final XQContext ctx, final Node node)
+  private Iter inscope(final XQContext ctx, final Nod node)
       throws XQException {
 
     final SeqIter seq = new SeqIter();
@@ -120,7 +120,7 @@ final class FNQName extends Fun {
     if(ctx.nsElem != Uri.EMPTY) seq.add(Str.ZERO);
 
     // [CG] XQuery/inscope; nested namespace handling
-    Node n = node;
+    Nod n = node;
     while(n != null) {
       final FAttr[] at = n.ns();
       if(at == null) break;

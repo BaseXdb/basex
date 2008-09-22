@@ -12,14 +12,14 @@ import org.basex.io.IO;
  */
 public abstract class Parser {
   /** Input file. */
-  public IO file;
+  public IO io;
 
   /**
    * Constructor.
    * @param f file reference.
    */
   public Parser(final IO f) {
-    file = f;
+    io = f;
   }
 
   /**

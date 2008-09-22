@@ -1,6 +1,13 @@
 package org.basex.query.xquery.item;
 
 import java.math.BigDecimal;
+import org.basex.api.dom.BXAttr;
+import org.basex.api.dom.BXComment;
+import org.basex.api.dom.BXDoc;
+import org.basex.api.dom.BXElement;
+import org.basex.api.dom.BXNode;
+import org.basex.api.dom.BXPI;
+import org.basex.api.dom.BXText;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.iter.NodIter;
 import org.basex.query.xquery.iter.NodeIter;
@@ -9,24 +16,23 @@ import org.basex.util.Token;
 
 /**
  * Node Type.
- * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public abstract class Node extends Item {
+public abstract class Nod extends Item {
   /** Static node counter. */
   private static int idcounter;
   /** Parent node. */
-  protected Node par;
+  protected Nod par;
   /** Unique node id. */
   // [CG] XQuery/unique node id: might not be sufficient
   protected int id;
-  
+
   /**
    * Constructor.
    * @param t data type
    */
-  protected Node(final Type t) {
+  protected Nod(final Type t) {
     super(t);
     id = idcounter++;
   }
@@ -65,15 +71,13 @@ public abstract class Node extends Item {
   public final int diff(final Item i) throws XQException {
     return i.n() ? -i.diff(this) : Token.diff(str(), i.str());
   }
-  
+
   /**
    * Creates a new copy (clone) of the node.
    * @return new copy
-   * @throws XQException evaluation exception
    */
-  @SuppressWarnings("unused")
-  public abstract Node copy() throws XQException;
-  
+  public abstract Nod copy();
+
   /**
    * Returns the node name.
    * @return name
@@ -81,7 +85,7 @@ public abstract class Node extends Item {
   public byte[] nname() {
     return null;
   }
-  
+
   /**
    * Returns the node name.
    * @return name
@@ -89,7 +93,7 @@ public abstract class Node extends Item {
   public QNm qname() {
     return null;
   }
-  
+
   /**
    * Returns a temporary node name.
    * @param nm temporary qname
@@ -108,7 +112,7 @@ public abstract class Node extends Item {
   public FAttr[] ns() {
     return null;
   }
-  
+
   /**
    * Returns the database name.
    * @return database name
@@ -116,49 +120,49 @@ public abstract class Node extends Item {
   public byte[] base() {
     return Token.EMPTY;
   }
-  
+
   /**
    * Compares two nodes for equality.
    * @param nod node to be compared
    * @return result of check
    */
-  public boolean is(final Node nod) {
+  public boolean is(final Nod nod) {
     return id == nod.id;
   }
-  
+
   /**
    * Compares two nodes for their unique order.
    * @param nod node to be compared
    * @return result of check
    */
-  public int diff(final Node nod) {
+  public int diff(final Nod nod) {
     return id - nod.id;
   }
-  
+
   /**
    * Returns a final node representation.
    * @return node
    */
-  public Node finish() {
+  public Nod finish() {
     return this;
   }
-  
+
   /**
    * Returns the parent node.
    * @return parent node
    */
-  public Node parent() {
+  public Nod parent() {
     return par;
   }
-  
+
   /**
    * Sets the parent node.
    * @param p parent node
    */
-  public void parent(final Node p) {
+  public void parent(final Nod p) {
     par = p;
   }
-  
+
   /**
    * Returns an ancestor axis iterator.
    * @return iterator
@@ -166,10 +170,10 @@ public abstract class Node extends Item {
   public final NodeIter anc() {
     return new NodeIter() {
       /** Temporary node. */
-      private Node node = Node.this;
+      private Nod node = Nod.this;
 
       @Override
-      public Node next() {
+      public Nod next() {
         node = node.parent();
         return node;
       }
@@ -183,12 +187,12 @@ public abstract class Node extends Item {
   public final NodeIter ancOrSelf() {
     return new NodeIter() {
       /** Temporary node. */
-      private Node node = Node.this;
+      private Nod node = Nod.this;
 
       @Override
-      public Node next() {
+      public Nod next() {
         if(node == null) return null;
-        final Node n = node;
+        final Nod n = node;
         node = n.parent();
         return n;
       }
@@ -200,25 +204,25 @@ public abstract class Node extends Item {
    * @return iterator
    */
   public abstract NodeIter attr();
-  
+
   /**
    * Returns a child axis iterator.
    * @return iterator
    */
   public abstract NodeMore child();
-  
+
   /**
    * Returns a descendant axis iterator.
    * @return iterator
    */
   public abstract NodeIter desc();
-  
+
   /**
    * Returns a descendant-or-self axis iterator.
    * @return iterator
    */
   public abstract NodeIter descOrSelf();
-  
+
   /**
    * Returns a following axis iterator.
    * @return iterator
@@ -231,15 +235,16 @@ public abstract class Node extends Item {
       private boolean more;
 
       @Override
-      public Node next() throws XQException {
+      public Nod next() throws XQException {
         if(!more) {
           it = new NodIter();
-          Node n = Node.this;
-          Node p = n.parent();
+          Nod n = Nod.this;
+          Nod p = n.parent();
           while(p != null) {
             final NodeIter i = p.child();
-            Node c;
-            while((c = i.next()) != null && !c.is(n));
+            Nod c;
+            while((c = i.next()) != null && !c.is(n))
+              ;
             while((c = i.next()) != null) {
               it.add(c.finish());
               addDesc(c.child(), it);
@@ -249,12 +254,12 @@ public abstract class Node extends Item {
           }
           more = true;
         }
-        
+
         return it.next();
       }
     };
   }
-  
+
   /**
    * Returns a following-sibling axis iterator.
    * @return iterator
@@ -267,15 +272,16 @@ public abstract class Node extends Item {
       private boolean more;
 
       @Override
-      public Node next() throws XQException {
+      public Nod next() throws XQException {
         if(!more) {
-          final Node r = parent();
+          final Nod r = parent();
           if(r == null) {
             it = NodeIter.NONE;
           } else {
             it = r.child();
-            Node n;
-            while((n = it.next()) != null && !n.is(Node.this));
+            Nod n;
+            while((n = it.next()) != null && !n.is(Nod.this))
+              ;
           }
           more = true;
         }
@@ -283,7 +289,7 @@ public abstract class Node extends Item {
       }
     };
   }
-  
+
   /**
    * Returns a parent axis iterator.
    * @return iterator
@@ -294,13 +300,13 @@ public abstract class Node extends Item {
       private boolean more;
 
       @Override
-      public Node next() {
+      public Nod next() {
         more ^= true;
         return more ? parent() : null;
       }
     };
   }
-  
+
   /**
    * Returns a preceding axis iterator.
    * @return iterator
@@ -313,20 +319,21 @@ public abstract class Node extends Item {
       private boolean more;
 
       @Override
-      public Node next() throws XQException {
+      public Nod next() throws XQException {
         if(!more) {
-          it = new NodIter(); 
-          Node n = Node.this;
-          Node p = n.parent();
+          it = new NodIter();
+          Nod n = Nod.this;
+          Nod p = n.parent();
           while(p != null) {
             final NodIter tmp = new NodIter();
             final NodeIter i = p.child();
-            Node c;
+            Nod c;
             while((c = i.next()) != null && !c.is(n)) {
               tmp.add(c.finish());
               addDesc(c.child(), tmp);
             }
-            for(int t = tmp.size - 1; t >= 0; t--) it.add(tmp.list[t]);
+            for(int t = tmp.size - 1; t >= 0; t--)
+              it.add(tmp.list[t]);
             n = p;
             p = p.parent();
           }
@@ -336,7 +343,7 @@ public abstract class Node extends Item {
       }
     };
   }
-  
+
   /**
    * Returns a preceding-sibling axis iterator.
    * @return iterator
@@ -351,16 +358,16 @@ public abstract class Node extends Item {
       private boolean more;
 
       @Override
-      public Node next() throws XQException {
+      public Nod next() throws XQException {
         if(!more) {
-          final Node r = parent();
+          final Nod r = parent();
           if(r == null) return null;
 
           ch = new NodIter();
           final NodeIter iter = r.child();
-          Node n;
+          Nod n;
           while((n = iter.next()) != null) {
-            if(n.is(Node.this)) break;
+            if(n.is(Nod.this)) break;
             ch.add(n.finish());
           }
           c = ch.size;
@@ -370,20 +377,25 @@ public abstract class Node extends Item {
       }
     };
   }
-  
+
   /**
    * Returns an self axis iterator.
    * @return iterator
    */
-  public final NodeIter self() {
-    return new NodeIter() {
+  public final NodeMore self() {
+    return new NodeMore() {
       /** First call. */
-      private boolean first;
-      
+      private boolean first = true;
+
       @Override
-      public Node next() {
-        first ^= true;
-        return first ? Node.this : null;
+      public boolean more() {
+        return first;
+      }
+      @Override
+      public Nod next() {
+        final boolean f = first;
+        first = false; 
+        return f ? Nod.this : null;
       }
     };
   }
@@ -394,12 +406,25 @@ public abstract class Node extends Item {
    * @param nodes node builder
    * @throws XQException query exception
    */
-  protected final void addDesc(final NodeIter children,
-      final NodIter nodes) throws XQException {
-    Node ch;
+  protected final void addDesc(final NodeIter children, final NodIter nodes)
+      throws XQException {
+    Nod ch;
     while((ch = children.next()) != null) {
       nodes.add(ch.finish());
       addDesc(ch.child(), nodes);
+    }
+  }
+
+  @Override
+  public final BXNode java() {
+    switch(type) {
+      case DOC: return new BXDoc(this);
+      case ELM: return new BXElement(this);
+      case TXT: return new BXText(this);
+      case ATT: return new BXAttr(this);
+      case COM: return new BXComment(this);
+      case PI : return new BXPI(this);
+      default : return null;
     }
   }
 }

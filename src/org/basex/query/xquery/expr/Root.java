@@ -5,7 +5,7 @@ import org.basex.data.Serializer;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Node;
+import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
@@ -32,7 +32,7 @@ public final class Root extends Expr {
     Item i;
     while((i = iter.next()) != null) {
       if(!i.node()) Err.or(XPNOCTX, this);
-      Node n = (Node) i;
+      Nod n = (Nod) i;
       while(n.parent() != null) n = n.parent();
       ir.add(n);
     }

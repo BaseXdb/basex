@@ -6,7 +6,7 @@ import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.FDoc;
 import org.basex.query.xquery.item.FTxt;
 import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Node;
+import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.NodIter;
@@ -48,10 +48,10 @@ public final class CDoc extends Single {
           text.reset();
         }
         if(it.type == Type.DOC) {
-          final NodeIter ni = ((Node) it).child();
-          if(ni.next() != null) nodes.add(((Node) it).copy());
+          final NodeIter ni = ((Nod) it).child();
+          if(ni.next() != null) nodes.add(((Nod) it).copy());
         } else {
-          nodes.add(((Node) it).copy());
+          nodes.add(((Nod) it).copy());
         }
         more = false;
       } else {

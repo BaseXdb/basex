@@ -6,7 +6,7 @@ import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Node;
+import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Err;
@@ -25,7 +25,7 @@ public final class CmpN extends Arr {
     EQ("is") {
       @Override
       public boolean e(final Item a, final Item b) {
-        return ((Node) a).is((Node) b);
+        return ((Nod) a).is((Nod) b);
       }
     },
 
@@ -33,7 +33,7 @@ public final class CmpN extends Arr {
     ET("<<") {
       @Override
       public boolean e(final Item a, final Item b) {
-        return ((Node) a).diff((Node) b) < 0;
+        return ((Nod) a).diff((Nod) b) < 0;
       }
     },
 
@@ -41,7 +41,7 @@ public final class CmpN extends Arr {
     GT(">>") {
       @Override
       public boolean e(final Item a, final Item b) {
-        return ((Node) a).diff((Node) b) > 0;
+        return ((Nod) a).diff((Nod) b) > 0;
       }
     };
 

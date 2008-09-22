@@ -25,7 +25,7 @@ public final class MemBuilder extends Builder {
     meta.txtindex = true;
     meta.atvindex = true;
     meta.ftxindex = false;
-    meta.file = parser.file;
+    meta.file = parser.io;
     data = new MemData(64, tags, atts, ns);
     data.meta = meta;
     return this;
@@ -52,9 +52,8 @@ public final class MemBuilder extends Builder {
   }
 
   @Override
-  protected void addElem(final int n, final int s, final int dis,
-      final int as) {
-    data.addElem(n, s, dis, as, as);
+  protected void addElem(final int n, final int s, final int dis, final int a) {
+    data.addElem(n, s, dis, a, a);
     size = data.size;
   }
 

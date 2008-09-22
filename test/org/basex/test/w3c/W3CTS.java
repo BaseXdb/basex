@@ -35,7 +35,7 @@ import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.func.FNIndex;
 import org.basex.query.xquery.func.Fun;
 import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Node;
+import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.QNm;
 import org.basex.query.xquery.item.Str;
 import org.basex.query.xquery.item.Type;
@@ -437,7 +437,7 @@ public abstract class W3CTS {
           logErr.append(Prop.NL);
           logErr.append(Prop.NL);
           final Item it = ((XQResult) res).item();
-          final boolean nodes = it instanceof Node && it.type != Type.TXT;
+          final boolean nodes = it instanceof Nod && it.type != Type.TXT;
           addLog(pth, outname + (nodes ? ".xml" : ".txt"), output);
         }
         if(reporting) logFile.append("fail");
@@ -450,7 +450,7 @@ public abstract class W3CTS {
           logOK.append(Prop.NL);
           logOK.append(Prop.NL);
           final Item it = ((XQResult) res).item();
-          final boolean nodes = it instanceof Node && it.type != Type.TXT;
+          final boolean nodes = it instanceof Nod && it.type != Type.TXT;
           addLog(pth, outname + (nodes ? ".xml" : ".txt"), output);
         }
         if(reporting) {
@@ -558,7 +558,7 @@ public abstract class W3CTS {
       } else {
         // assign document
         final Fun fun = FNIndex.get().get(token("doc"), Uri.FN,
-            new Expr[] { Str.get(token(src)) });
+            new Expr[] { Str.get(src) });
         final Var v = new Var(new QNm(data.atom(var.pre[c])));
         ctx.vars.addGlobal(v.expr(fun));
       }

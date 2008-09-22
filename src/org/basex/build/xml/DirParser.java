@@ -28,7 +28,7 @@ public final class DirParser extends Parser {
   @Override
   public void parse(final Builder b) throws IOException {
     b.meta.filesize = 0;
-    parse(b, file);
+    parse(b, io);
   }
   
   /**
@@ -41,12 +41,12 @@ public final class DirParser extends Parser {
     if(path.isDir()) {
       for(final IO f : path.children()) parse(b, f);
     } else {
-      file = path;
+      io = path;
       while(path.more()) {
         // [CG] Create Collection: how to deal with non-XML documents?
         //if(!f.name().endsWith(IO.XMLSUFFIX)) continue;
-        b.meta.filesize += file.length();
-        parser = Prop.intparse ? new XMLParser(file) : new SAXWrapper(file);
+        b.meta.filesize += io.length();
+        parser = Prop.intparse ? new XMLParser(io) : new SAXWrapper(io);
         parser.parse(b);
       }
     }

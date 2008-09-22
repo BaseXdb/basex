@@ -77,7 +77,7 @@ public abstract class Item extends Expr {
    * @return result of check
    */
   public final boolean node() {
-    return type.node;
+    return type.node();
   }
 
   /**
@@ -273,23 +273,4 @@ public abstract class Item extends Expr {
   public String toString() {
     return Token.string(str());
   }
-  
-  /**
-   * Creates an XQuery item from the specified Java object.
-   * @param o input object
-   * @return result or null
-  public static Item create(final Object o) {
-    if(o instanceof String) return Str.get(Token.token(o.toString()));
-    if(o instanceof Float) return Flt.get((Float) o);
-    if(o instanceof Double) return Dbl.get((Double) o);
-    if(o instanceof Float) return Flt.get((Float) o);
-    if(o instanceof BigDecimal) return Dec.get((BigDecimal) o);
-    if(o instanceof BigInteger) return Itr.get(((BigInteger) o).longValue());
-    if(o instanceof Long) return new Dec(new BigDecimal((Long) o), Type.LNG);
-    if(o instanceof Integer) return new Itr((Integer) o, Type.INT);
-    if(o instanceof Short) return new Itr((Short) o, Type.SHR);
-    if(o instanceof Byte) return new Itr((Byte) o, Type.BYT);
-    return null;
-  }
-   */
 }

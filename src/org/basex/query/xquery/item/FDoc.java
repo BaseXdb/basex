@@ -1,9 +1,7 @@
 package org.basex.query.xquery.item;
 
 import static org.basex.query.xquery.XQTokens.*;
-
 import java.io.IOException;
-
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.iter.NodIter;
@@ -48,18 +46,18 @@ public final class FDoc extends FNode {
   }
 
   @Override
-  public String toString() {
-    return Token.string(name()) + "(" + Token.string(base) + ")";
-  }
-
-  @Override
   public byte[] base() {
     return base;
   }
-  
+
   @Override
   public FDoc copy() {
     return new FDoc(children, base);
+  }
+
+  @Override
+  public String toString() {
+    return Token.string(name()) + "(" + Token.string(base) + ")";
   }
 
   @Override

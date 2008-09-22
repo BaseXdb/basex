@@ -55,13 +55,9 @@ public final class Open extends Process {
    * No warnings are thrown; instead, an empty reference is returned.
    * @param db database to be opened
    * @return data reference
+   * @throws IOException exception
    */
-  public static Data open(final String db) {
-    try {
-      return db.equals(DEEPDB) ? new DeepData(db) : new DiskData(db);
-    } catch(final IOException ex) {
-      BaseX.debug(ex);
-      return null;
-    }
+  public static Data open(final String db) throws IOException {
+    return db.equals(DEEPDB) ? new DeepData(db) : new DiskData(db);
   }
 }

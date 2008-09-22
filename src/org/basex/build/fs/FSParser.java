@@ -198,8 +198,8 @@ public final class FSParser extends Parser implements FSVisitor {
     final FSWalker f = new FSWalker();
     f.register(this);
     
-    builder.startDoc(token(file.name()));
-    f.fileHierarchyTraversal(file);
+    builder.startDoc(token(io.name()));
+    f.fileHierarchyTraversal(io);
     builder.endDoc();
   }
 

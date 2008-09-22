@@ -10,7 +10,7 @@ import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.func.Fun;
 import org.basex.query.xquery.func.FunDef;
 import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Node;
+import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.NodIter;
@@ -71,8 +71,8 @@ public class Step extends Arr {
     Item it;
     while((it = iter.next()) != null) {
       if(!it.node()) Err.or(NODESPATH, this, it);
-      final NodeIter ir = axis.init((Node) it);
-      Node nod;
+      final NodeIter ir = axis.init((Nod) it);
+      Nod nod;
       while((nod = ir.next()) != null) {
         if(test.e(nod, ctx)) {
           nod = nod.finish();

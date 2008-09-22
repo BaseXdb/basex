@@ -54,12 +54,31 @@ public final class QNm extends Item {
   }
   
   /**
-   * Convenient method for converting a Java QName to a project specific one.
+   * Constructor.
    * @param name name
    * @param u uri
    */
   public QNm(final String name, final String u) {
     this(Token.token(name), Uri.uri(Token.token(u)));
+  }
+  
+  /**
+   * Convenient method for converting a Java QName to a project specific one.
+   * @param qn qname
+   */
+  public QNm(final QName qn) {
+    this(qname(qn), qn.getNamespaceURI());
+  }
+  
+  /**
+   * Converts the specified QName to a string.
+   * @param qn qname
+   * @return string
+   */
+  private static String qname(final QName qn) {
+    String name = qn.getLocalPart();
+    final String pre = qn.getPrefix();
+    return pre.length() != 0 ?  pre + ":" + name : name;
   }
   
   /**

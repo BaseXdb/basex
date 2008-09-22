@@ -2,13 +2,13 @@ package org.basex.query.xquery.func;
 
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
+import static javax.xml.datatype.DatatypeConstants.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
@@ -27,6 +27,7 @@ import org.basex.util.Token;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.ProcessingInstruction;
 import org.w3c.dom.Text;
@@ -38,10 +39,24 @@ import org.w3c.dom.Text;
  * @author Christian Gruen
  */
 public final class FunJava extends Arr {
+  /** Input Java types. */
+  private static final Class<?>[] JAVA = {
+    String.class, boolean.class, Boolean.class, byte.class, Byte.class,
+    short.class, Short.class, int.class, Integer.class, long.class, Long.class,
+    float.class, Float.class, double.class, Double.class, BigDecimal.class,
+    BigInteger.class, QName.class
+  };
+  /** Resulting XQuery types. */
+  private static final Type[] XQUERY = {
+    Type.STR, Type.BLN, Type.BLN, Type.BYT, Type.BYT,
+    Type.SHR, Type.SHR, Type.INT, Type.INT, Type.LNG, Type.LNG,
+    Type.FLT, Type.FLT, Type.DBL, Type.DBL, Type.DEC, 
+    Type.ITR, Type.QNM
+  };
   /** Java class. */
-  public final Class<?> cls;
+  private final Class<?> cls;
   /** Java method. */
-  public final String mth;
+  private final String mth;
 
   /**
    * Constructor.
@@ -121,10 +136,9 @@ public final class FunJava extends Arr {
    * @param args arguments
    * @param stat static flag
    * @return argument array or null
-   * @throws XQException query exception
    */
   private Object[] args(final Class<?>[] params, final Item[] args,
-      final boolean stat) throws XQException {
+      final boolean stat) {
 
     int s = stat ? 0 : 1;
     int l = args.length - s;
@@ -136,7 +150,7 @@ public final class FunJava extends Arr {
     
     for(Class<?> par : params) {
       //BaseX.debug("-1- " + par.getCanonicalName());
-      final Type jType = jType(par);
+      final Type jType = type(par);
       if(jType == null) return null;
       
       final Item arg = args[s + a];
@@ -149,7 +163,7 @@ public final class FunJava extends Arr {
       if(!arg.type.instance(jType) && !jType.instance(arg.type)) return null;
       //BaseX.debug("-3- " + it);
       
-      final Object o = jType.j(arg);
+      final Object o = arg.java();
       if(o == null) return null;
       
       //BaseX.debug("-4- " + o.getClass() + " => " + par);
@@ -159,62 +173,52 @@ public final class FunJava extends Arr {
   }
 
   /**
-   * Returns an XQUery data type for a Java object.
+   * Returns an appropriate XQuery data type for the specified Java class.
+   * @param par Java type
+   * @return xquery type
+   */
+  public static Type type(final Class<?> par) {
+    for(int j = 0; j < JAVA.length; j++) if(par == JAVA[j]) return XQUERY[j];
+    return Type.JAVA;
+  }
+  
+  /**
+   * Returns an appropriate XQuery data type for the specified Java object.
    * @param o object
    * @return xquery type
    */
-  public static Type jType(final Object o) {
-    final Type t = jType(o.getClass());
+  public static Type type(final Object o) {
+    final Type t = type(o.getClass());
     if(t != Type.JAVA) return t;
 
     if(o instanceof Element) return Type.ELM;
     if(o instanceof Document) return Type.DOC;
+    if(o instanceof DocumentFragment) return Type.DOC;
     if(o instanceof Attr) return Type.ATT;
     if(o instanceof Comment) return Type.COM;
     if(o instanceof ProcessingInstruction) return Type.PI;
     if(o instanceof Text) return Type.TXT;
     
     if(o instanceof Duration) {
-      final QName type = ((Duration) o).getXMLSchemaType();
-      if(type == DatatypeConstants.DURATION_DAYTIME) return Type.DTD;
-      if(type == DatatypeConstants.DURATION_YEARMONTH) return Type.YMD;
-      if(type == DatatypeConstants.DURATION) return Type.DUR;
+      final Duration d = (Duration) o;
+      return !d.isSet(YEARS) && !d.isSet(MONTHS) ? Type.DTD :
+        !d.isSet(HOURS) && !d.isSet(MINUTES) && !d.isSet(SECONDS) ? Type.YMD :
+          Type.DUR;
     }
     if(o instanceof XMLGregorianCalendar) {
       final QName type = ((XMLGregorianCalendar) o).getXMLSchemaType();
-      if(type == DatatypeConstants.DATE) return Type.DAT;
-      if(type == DatatypeConstants.DATETIME) return Type.DTM;
-      if(type == DatatypeConstants.TIME) return Type.TIM;
-      if(type == DatatypeConstants.GYEARMONTH) return Type.YMO;
-      if(type == DatatypeConstants.GMONTHDAY) return Type.MDA;
-      if(type == DatatypeConstants.GYEAR) return Type.YEA;
-      if(type == DatatypeConstants.GMONTH) return Type.MON;
-      if(type == DatatypeConstants.GDAY) return Type.DAY;
+      if(type == DATE) return Type.DAT;
+      if(type == DATETIME) return Type.DTM;
+      if(type == TIME) return Type.TIM;
+      if(type == GYEARMONTH) return Type.YMO;
+      if(type == GMONTHDAY) return Type.MDA;
+      if(type == GYEAR) return Type.YEA;
+      if(type == GMONTH) return Type.MON;
+      if(type == GDAY) return Type.DAY;
     }
     return null;
   }
 
-  /**
-   * Returns an XQUery data type for a Java class.
-   * @param par Java type
-   * @return xquery type
-   */
-  public static Type jType(final Class<?> par) {
-    if(par == String.class) return Type.STR;
-    if(par == boolean.class || par == Boolean.class) return Type.BLN;
-    if(par == char.class || par == Character.class) return Type.USH;
-    if(par == byte.class || par == Byte.class) return Type.BYT;
-    if(par == short.class || par == Short.class) return Type.SHR;
-    if(par == int.class || par == Integer.class) return Type.INT;
-    if(par == long.class || par == Long.class) return Type.LNG;
-    if(par == float.class || par == Float.class) return Type.FLT;
-    if(par == double.class || par == Double.class) return Type.DBL;
-    if(par == BigDecimal.class) return Type.DEC;
-    if(par == BigInteger.class) return Type.ITR;
-    if(par == QName.class) return Type.QNM;
-    return Type.JAVA;
-  }
-  
   /**
    * Converts the specified object to an iterator.
    * @param res object

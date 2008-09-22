@@ -66,6 +66,11 @@ public final class Jav extends Item {
   }
 
   @Override
+  public Object java() {
+    return val;
+  }
+
+  @Override
   public String toString() {
     return "\"" + val + "\"";
   }

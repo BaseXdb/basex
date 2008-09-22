@@ -9,7 +9,7 @@ import org.basex.query.xquery.item.FAttr;
 import org.basex.query.xquery.item.FElem;
 import org.basex.query.xquery.item.FTxt;
 import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Node;
+import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.QNm;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
@@ -118,7 +118,7 @@ public final class CElem extends Arr {
       if(it == null) return false;
       
       if(it.node() && it.type != Type.TXT) {
-        final Node node = (Node) it;
+        final Nod node = (Nod) it;
 
         if(it.type == Type.ATT) {
           // text has already been added - no attribute allowed anymore
@@ -144,7 +144,7 @@ public final class CElem extends Arr {
         } else {
           if(it.type == Type.DOC) {
             final NodeIter iter = node.child();
-            Node ch;
+            Nod ch;
             while((ch = iter.next()) != null) add(ctx, ch);
           } else {
             // add text node

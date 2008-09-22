@@ -43,7 +43,7 @@ public final class DiskBuilder extends Builder {
   @Override
   public DiskBuilder init(final String db) throws IOException {
     meta = new MetaData(db);
-    meta.file = parser.file;
+    meta.file = parser.io;
     meta.filesize = meta.file.length();
     meta.time = meta.file.date();
     

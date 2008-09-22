@@ -4,6 +4,9 @@ import static org.basex.Text.*;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
+
+import java.io.IOException;
+
 import org.basex.core.Prop;
 import org.basex.core.proc.Check;
 import org.basex.data.Data;
@@ -19,7 +22,7 @@ import org.basex.query.xquery.item.DNode;
 import org.basex.query.xquery.item.Dat;
 import org.basex.query.xquery.item.Dtm;
 import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Node;
+import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.QNm;
 import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.item.Tim;
@@ -118,7 +121,7 @@ public final class XQContext extends QueryContext {
     if(nodes != null) {
       docs = new DNode[nodes.size];
       for(int d = 0; d < docs.length; d++) {
-        docs[d] = addNS(new DNode(nodes.data, nodes.pre[d], null, Type.DOC));
+        docs[d] = addNS(new DNode(nodes.data, nodes.pre[d]));
       }
       item = Seq.get(docs, docs.length);
       final NodIter col = new NodIter();
@@ -227,7 +230,7 @@ public final class XQContext extends QueryContext {
     }
     
     // check if the database has already been read
-    final String dbname = string(db);
+    String dbname = string(db);
     for(final DNode d : docs) if(d.data.meta.dbname.equals(dbname)) return d;
 
     // check if the database has already been read
@@ -235,13 +238,18 @@ public final class XQContext extends QueryContext {
     for(final DNode d : docs) if(d.data.meta.file.eq(bxw)) return d;
 
     // get database instance
-    Data data = Check.check(dbname);
-    if(data == null && file != null) data = Check.check(file.merge(bxw).path());
+    Data data = null;
+    try { data = Check.check(dbname); } catch(final IOException ex) { }
+
+    if(data == null && file != null) {
+      dbname = file.merge(bxw).path();
+      try { data = Check.check(dbname); } catch(final IOException ex) { }
+    }
     if(data == null) Err.or(NODOC, bxw);
 
     // add document to array
     final int dl = docs.length;
-    docs = Array.add(docs, new DNode(data, 0, null, Type.DOC));
+    docs = Array.add(docs, new DNode(data, 0));
     return addNS(docs[dl]);
   }
 
@@ -278,7 +286,7 @@ public final class XQContext extends QueryContext {
     final NodIter col = new NodIter();
     final Data data = db.data;
     for(int p = 0; p < data.size;) {
-      col.add(new DNode(data, p, null, Type.DOC));
+      col.add(new DNode(data, p));
       p += data.size(p, data.kind(p));
     }
     addColl(col, token(data.meta.dbname));
@@ -309,7 +317,7 @@ public final class XQContext extends QueryContext {
   private DNode addNS(final DNode doc) throws XQException {
     // add root namespaces
     NodeIter it = doc.child();
-    Node node = null;
+    Nod node = null;
     while((node = it.next()) != null) {
       if(node.type != Type.ELM) continue;
       it = node.attr();

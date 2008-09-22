@@ -7,7 +7,7 @@ import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Node;
+import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.NodeIter;
@@ -28,7 +28,7 @@ final class FNId extends Fun {
     final Item it = iter.atomic(this, true);
     if(it == null) Err.or(XPEMPTYPE, info(), Type.NOD);
 
-    final Node node = checkNode(it);
+    final Nod node = checkNode(it);
 
     switch(func) {
       case ID:    return id(arg[0], node);
@@ -45,7 +45,7 @@ final class FNId extends Fun {
    * @return resulting node list
    * @throws XQException xquery exception
    */
-  private Iter id(final Iter it, final Node node) throws XQException {
+  private Iter id(final Iter it, final Nod node) throws XQException {
     final NodeBuilder nb = new NodeBuilder(false);
     add(ids(it), nb, node);
     return nb.iter();
@@ -58,7 +58,7 @@ final class FNId extends Fun {
    * @return resulting node list
    * @throws XQException xquery exception
    */
-  private Iter idref(final Iter it, final Node node) throws XQException {
+  private Iter idref(final Iter it, final Nod node) throws XQException {
     final NodeBuilder nb = new NodeBuilder(false);
     addRef(ids(it), nb, node);
     return nb.iter();
@@ -71,12 +71,12 @@ final class FNId extends Fun {
    * @return resulting node list
    * @throws XQException xquery exception
    */
-  private Iter lang(final Iter it, final Node node) throws XQException {
+  private Iter lang(final Iter it, final Nod node) throws XQException {
     final byte[] lang = lc(checkStr(it));
-    Node n = node;
+    Nod n = node;
     while(n != null) {
       final NodeIter atts = n.attr();
-      Node at;
+      Nod at;
       while((at = atts.next()) != null) {
         if(!eq(at.qname().str(), LANG)) continue;
         final byte[] ln = lc(norm(checkStr(at)));
@@ -111,10 +111,10 @@ final class FNId extends Fun {
    * @throws XQException evaluation exception
    */
   private void add(final byte[][] ids, final NodeBuilder nb,
-      final Node nod) throws XQException {
+      final Nod nod) throws XQException {
 
     final NodeIter ni = nod.attr();
-    Node att;
+    Nod att;
     while((att = ni.next()) != null) {
       // [CG] XQuery/DTD Parsing
       for(final byte[] id : ids) {
@@ -135,10 +135,10 @@ final class FNId extends Fun {
    * @throws XQException evaluation exception
    */
   private void addRef(final byte[][] ids, final NodeBuilder nb,
-      final Node nod) throws XQException {
+      final Nod nod) throws XQException {
 
     final NodeIter ni = nod.attr();
-    Node att;
+    Nod att;
     while((att = ni.next()) != null) {
       // [CG] XQuery/DTD Parsing
       for(final byte[] id : ids) {

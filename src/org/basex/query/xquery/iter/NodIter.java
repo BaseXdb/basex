@@ -1,6 +1,6 @@
 package org.basex.query.xquery.iter;
 
-import org.basex.query.xquery.item.Node;
+import org.basex.query.xquery.item.Nod;
 
 /**
  * Simple node Iterator, ignoring duplicates.
@@ -10,7 +10,7 @@ import org.basex.query.xquery.item.Node;
  */
 public final class NodIter extends NodeIter {
   /** Items. */
-  public Node[] list;
+  public Nod[] list;
   /** Size. */
   public int size;
   /** Iterator. */
@@ -20,7 +20,7 @@ public final class NodIter extends NodeIter {
    * Constructor.
    */
   public NodIter() {
-    list = new Node[1];
+    list = new Nod[1];
   }
 
   /**
@@ -28,7 +28,7 @@ public final class NodIter extends NodeIter {
    * @param it item array
    * @param s size
    */
-  public NodIter(final Node[] it, final int s) {
+  public NodIter(final Nod[] it, final int s) {
     list = it;
     size = s;
   }
@@ -37,7 +37,7 @@ public final class NodIter extends NodeIter {
    * Adds a node.
    * @param n node to be added
    */
-  public void add(final Node n) {
+  public void add(final Nod n) {
     if(size == list.length) resize();
     list[size++] = n;
   }
@@ -47,7 +47,7 @@ public final class NodIter extends NodeIter {
    * @param i item array
    * @param s number of items to be added
    */
-  public void add(final Node[] i, final int s) {
+  public void add(final Nod[] i, final int s) {
     for(int n = 0; n < s; n++) add(i[n]);
   }
 
@@ -55,13 +55,13 @@ public final class NodIter extends NodeIter {
    * Resizes the sequence array.
    */
   private void resize() {
-    final Node[] tmp = new Node[size << 1];
+    final Nod[] tmp = new Nod[size << 1];
     System.arraycopy(list, 0, tmp, 0, size);
     list = tmp;
   }
   
   @Override
-  public Node next() {
+  public Nod next() {
     return ++pos < size ? list[pos] : null;
   }
   

@@ -3,10 +3,7 @@ package org.basex.core.proc;
 import static org.basex.Text.*;
 import static org.basex.core.Commands.*;
 import java.io.IOException;
-
 import javax.xml.transform.sax.SAXSource;
-
-import org.basex.BaseX;
 import org.basex.build.DiskBuilder;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
@@ -46,9 +43,9 @@ public final class CreateDB extends ACreate {
   
   @Override
   protected boolean exec() {
-    final IO f = IO.get(args[0]);
-    if(!f.exists()) return error(FILEWHICH, f);
-    return build(new DirParser(f), args[1] == null ? f.dbname() : args[1]);
+    final IO io = IO.get(args[0]);
+    if(!io.exists()) return error(FILEWHICH, io);
+    return build(new DirParser(io), args[1] == null ? io.dbname() : args[1]);
   }
 
   /**
@@ -56,19 +53,21 @@ public final class CreateDB extends ACreate {
    * No warnings are thrown; instead, an null reference is returned if
    * errors occur.
    * @param db name of the database to be created
-   * @param fn file name
+   * @param io file name
    * @return database instance
+   * @throws IOException exception
    */
-  public static Data xml(final IO fn, final String db) {
-    return fn.exists() ? xml(new DirParser(fn), db) : null;
+  public static Data xml(final IO io, final String db) throws IOException {
+    return io.exists() ? xml(new DirParser(io), db) : null;
   }
 
   /**
    * Creates and returns a database from the specified SAX source.
    * @param s sax source
    * @return database instance
+   * @throws IOException exception
    */
-  public static Data xml(final SAXSource s) {
+  public static Data xml(final SAXSource s) throws IOException {
     return xml(new SAXWrapper(s), "tmp");
   }
 
@@ -78,24 +77,20 @@ public final class CreateDB extends ACreate {
    * @param p xml parser
    * @param db name of the database to be created
    * @return database instance
+   * @throws IOException exception
    */
-  public static Data xml(final Parser p, final String db) {
-    try {
-      if(Prop.onthefly) return new MemBuilder().build(p, db);
+  public static Data xml(final Parser p, final String db) throws IOException {
+    if(Prop.onthefly) return new MemBuilder().build(p, db);
 
-      final Data data = new DiskBuilder().build(p, db);
-      if(data.meta.txtindex) data.openIndex(
-          IndexToken.TYPE.TXT, new ValueBuilder(true).build(data));
-      if(data.meta.atvindex) data.openIndex(
-          IndexToken.TYPE.ATV, new ValueBuilder(false).build(data));
-      if(data.meta.ftxindex) data.openIndex(
-          IndexToken.TYPE.FTX, data.meta.ftfuzzy ?
-              new FTFuzzyBuilder().build(data) : new FTBuilder().build(data));
-      return data;
-    } catch(final IOException ex) {
-      BaseX.debug(ex);
-      return null;
-    }
+    final Data data = new DiskBuilder().build(p, db);
+    if(data.meta.txtindex) data.openIndex(
+        IndexToken.TYPE.TXT, new ValueBuilder(true).build(data));
+    if(data.meta.atvindex) data.openIndex(
+        IndexToken.TYPE.ATV, new ValueBuilder(false).build(data));
+    if(data.meta.ftxindex) data.openIndex(
+        IndexToken.TYPE.FTX, data.meta.ftfuzzy ?
+            new FTFuzzyBuilder().build(data) : new FTBuilder().build(data));
+    return data;
   }
   
   @Override

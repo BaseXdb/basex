@@ -24,7 +24,7 @@ public final class FAttr extends FNode {
    * @param v value
    * @param p parent
    */
-  public FAttr(final QNm n, final byte[] v, final Node p) {
+  public FAttr(final QNm n, final byte[] v, final Nod p) {
     super(Type.ATT);
     name = n;
     val = v;
@@ -57,11 +57,6 @@ public final class FAttr extends FNode {
     return new FAttr(name, val, par);
   }
 
-  @Override
-  public Object java() {
-    return Token.string(str());
-  }
-  
   @Override
   public void serialize(final Serializer ser,  final XQContext ctx,
       final int level) throws IOException {
