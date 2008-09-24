@@ -1,5 +1,7 @@
 package org.basex.gui.view.scatter;
 
+import java.math.BigDecimal;
+
 import org.basex.data.Data;
 import org.basex.data.StatsKey;
 import org.basex.data.StatsKey.Kind;
@@ -25,11 +27,19 @@ public final class ScatterAxis {
   boolean numeric;
   /** Number of different categories for x attribute. */
   private int nrCats;
+  /** Type of data. */
+  int numType;
+  /** Data type integer. */
+  static final int TYPEINT = 0;
+  /** Data type double. */
+  static final int TYPEDBL = 1;
 
   /** Coordinates of items. */
   double[] co;
   /** Number of captions to display. */
   int nrCaptions;
+  /** Step for axis caption. */
+  double captionStep;
   /** Minimum value in case selected attribute is numerical. */
   double min;
   /** Maximum  value in case selected attribute is numerical. */
@@ -75,13 +85,13 @@ public final class ScatterAxis {
       data.atts.stat(data.atts.id(attr));
     numeric = key.kind == Kind.INT || key.kind == Kind.DBL;
     if(numeric) {
+      numType = key.kind == Kind.INT ? TYPEINT : TYPEDBL;
       min = key.min;
       max = key.max;
-//      nrCaptions = 10;
     } else {
       cats = key.cats.keys();
       nrCats = cats.length;
-      nrCaptions = nrCats;
+//      nrCaptions = nrCats;
     }
 
     final int[] items = scatterData.pres;
@@ -138,5 +148,71 @@ public final class ScatterAxis {
       }
     }
     return percentage;
+  }
+  
+  /**
+   * Returns the value of an attribute for a given relative coordinate.
+   * @param relative relative coordinate
+   * @return item value
+   */
+  String getValue(final double relative) {
+    if(numeric) {
+      if(numType == TYPEDBL) {
+        double d = min + (max - min) * relative;
+        return Double.toString(roundDouble(d, 2));
+      } else {
+        int i = (int) (min + (max - min) * relative);
+        return Integer.toString(i);
+      }
+    } else {
+      final double pos = relative / (1.0d / (nrCats - 1));
+      final int posI = (int) Math.floor(pos + 0.5d);
+      if(Math.abs(pos - posI) <= 0.3d) {
+        return Token.string(cats[posI]);
+      }
+      return "";
+    }
+  }
+  
+  /**
+   * Rounds a double value.
+   * @param d double value to be rounded
+   * @param decs number of decimals
+   * @return rounded double value
+   */
+  public static double roundDouble(final double d, final int decs) {
+    BigDecimal bd = new BigDecimal(d);
+    BigDecimal rounded = bd.setScale(decs, BigDecimal.ROUND_HALF_UP);
+    return rounded.doubleValue();
+  }
+  
+  /**
+   * Calculates axis caption depending on view width / height.
+   * @param space space of view axis available for captions
+   */
+  void calcCaption(final int space) {
+    if(numeric) {
+      if(numType == TYPEINT) {
+        final int minI = (int) min;
+        final int maxI = (int) max;
+        int tmpStep = 1;
+        do {
+          captionStep = tmpStep;
+          int tmpMin = minI - minI % tmpStep;
+          int tmpMax = (maxI + tmpStep - 1) / tmpStep * tmpStep;
+          nrCaptions = (tmpMax - tmpMin) / tmpStep;
+          if(String.valueOf(tmpStep).startsWith("1"))
+            tmpStep *= tmpStep == 1 ? 5 : 2.5;
+          else
+            tmpStep *= 2;
+        } while(nrCaptions * ScatterView.CAPTIONWHITESPACE > space);
+        
+      } else {
+        nrCaptions = 5;
+        captionStep = .5d;
+      }
+    } else {
+      nrCaptions = nrCats;
+    }
   }
 }

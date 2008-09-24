@@ -59,7 +59,7 @@ public class ScatterData {
       final StatsKey key = tags.stat(tags.id(tags.key(i)));
       final Kind kind = key.kind;
       if(kind == Kind.DBL || kind == Kind.INT || kind == Kind.CAT && 
-          key.cats.size() <= 20) {
+          key.cats.size() <= 50) {
         sl.add(Token.string(tags.key(i)));
       }
     }
@@ -70,7 +70,7 @@ public class ScatterData {
       final StatsKey key = atts.stat(atts.id(atts.key(i)));
       final Kind kind = key.kind;
       if(kind == Kind.DBL || kind == Kind.INT || kind == Kind.CAT && 
-          key.cats.size() <= 20) {
+          key.cats.size() <= 50) {
         sl.add("@" + Token.string(atts.key(i)));
       }
     }

@@ -37,7 +37,7 @@ public class ScatterView extends View implements Runnable {
   /** X paint margin. */
   private static final int XMARGIN = 150;
   /** Y paint margin. */ 
-  private static final int YMARGIN = 150;
+  private static final int YMARGIN = 200;
   /** Item size. */
   private static final int ITEMSIZE = 10;
   /** Focused item size. */
@@ -47,7 +47,7 @@ public class ScatterView extends View implements Runnable {
   /** Focus offset. */
   private static final int FOCUSOFFSET = 6;
   /** Whitespace between axis captions. */
-  private static final int CAPTIONWHITESPACE = 40;
+  static final int CAPTIONWHITESPACE = 40;
   /** Item image. */
   private BufferedImage itemImg;
   /** Focused item image. */
@@ -56,6 +56,12 @@ public class ScatterView extends View implements Runnable {
   private BufferedImage plotImg;
   /** Focused item. */
   private int focusedItem;
+  /** States if a plot value is focused. */ 
+  private boolean valueFocused;
+  /** Currently focused x value. */
+  private double focusedValueX;
+  /** Currently focused y value. */
+  private double focusedValueY;
   /** X coordinate of mouse pointer. */
   private int mouseX;
   /** Y coordinate of mouse pointer. */
@@ -191,15 +197,15 @@ public class ScatterView extends View implements Runnable {
     plotWidth = w - 2 * XMARGIN;
     plotHeight = h - 2 * YMARGIN;
     
-//    overdraw plot background for non value items
+    // overdraw plot background for non value items
     g.setColor(GUIConstants.color2);
     g.fillRect(XMARGIN + NOVALUEBORDER, YMARGIN, plotWidth - NOVALUEBORDER, 
       plotHeight - NOVALUEBORDER);
     
-    //draw axis and grid
+    // draw axis and grid
     drawXaxis(g);
     drawYaxis(g);
-    
+
     // draw items
     if(scatterData.size == 0) return;
     if(plotImg == null || plotChanged)
@@ -209,6 +215,15 @@ public class ScatterView extends View implements Runnable {
     if(focusedItem != -1)
     drawItem(g, scatterData.xAxis.co[focusedItem], 
         scatterData.yAxis.co[focusedItem], true);
+    if(valueFocused) {
+      g.setColor(GUIConstants.color6);
+      final String x = mouseX > XMARGIN + NOVALUEBORDER ? 
+          scatterData.xAxis.getValue(focusedValueX) : "";
+      final String y = mouseY < h - YMARGIN - NOVALUEBORDER ?
+          scatterData.yAxis.getValue(focusedValueY) : "";
+      g.drawString("x" + x, XMARGIN, h - 50);
+      g.drawString("y" + y, XMARGIN, h - 35);
+    }
     plotChanged = false;
   }
   
@@ -243,44 +258,49 @@ public class ScatterView extends View implements Runnable {
     g.setColor(GUIConstants.color1);
     g.drawLine(XMARGIN, h - YMARGIN, w - XMARGIN, 
         h - YMARGIN);
-
-    final boolean numeric = scatterData.xAxis.numeric;
     g.setFont(GUIConstants.font);
     g.setColor(GUIConstants.color1);
+
     final int textH = g.getFontMetrics().getHeight();
     final int pWidth = plotWidth - NOVALUEBORDER;
-    final int nrCaptions = numeric ? 
-        (pWidth / (textH * 2 + CAPTIONWHITESPACE)) :
-      scatterData.xAxis.nrCaptions;
+    final ScatterAxis axis = scatterData.xAxis;
+    axis.calcCaption(pWidth);
+    final int nrCaptions = axis.nrCaptions;
+    final double step = axis.captionStep;
     final double range = 1.0d / (nrCaptions - 1);
+    final int type = axis.numType;
+    final boolean numeric = axis.numeric;
+    
     for(int i = 0; i < nrCaptions; i++) {
       g.setColor(GUIConstants.color1);
-      final int x1 = XMARGIN + NOVALUEBORDER + ((int) ((i * range) * pWidth));
-      g.drawLine(x1, YMARGIN, x1, h - YMARGIN + 9);
-      g.setColor(Color.black);
-      String caption = new String();
+      final int x = XMARGIN + NOVALUEBORDER + ((int) ((i * range) * pWidth));
+      g.drawLine(x, YMARGIN, x, h - YMARGIN + 9);
+      String caption = "";
       if(numeric) {
-        final double value = scatterData.xAxis.min +
-          (scatterData.xAxis.max - scatterData.xAxis.min) * range * i;
-        caption = Double.toString(value);
+        final double min = axis.min;
+        final double captionValue = min + (i * step);
+        if(type == ScatterAxis.TYPEINT)
+          caption = Integer.toString((int) captionValue);
+        else
+          caption = "double";
       } else {
-        caption = Token.string(scatterData.xAxis.cats[i]);
+        caption = Token.string(axis.cats[i]);
       }
-      final int capW = BaseXLayout.width(g, caption);
-      g.drawString(caption, x1 - capW / 2, h - YMARGIN + 25);
       
-      // try to draw rotated string
-//      final int imgH = ((int) Math.pow(capW, 2));
-//      final BufferedImage img = new BufferedImage(capW + 50, textH + 50, 
-//          Transparency.TRANSLUCENT);
-//      Graphics2D g2d = (Graphics2D) img.getGraphics();
-//      g2d.setFont(GUIConstants.font);
-//      g2d.setColor(Color.black);
-//      g2d.drawString(caption, 0, 0);
-//      AffineTransform at = new AffineTransform();
-//      at.rotate(Math.PI / -1.41d);
-//      g2d.transform(at);
-//      g.drawImage(img, x1, h - YMARGIN + 25, this);
+      // draw rotated caption labels
+      final int capW = BaseXLayout.width(g, caption);
+      final int imgH = 160;
+      int imgW = 160;
+      final BufferedImage img = new BufferedImage(imgW, imgH, 
+          Transparency.BITMASK);
+      Graphics2D g2d = (Graphics2D) img.getGraphics();
+      g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
+          RenderingHints.VALUE_ANTIALIAS_ON);
+      g2d.setFont(GUIConstants.font);
+      g2d.setColor(Color.black);
+      g2d.rotate(Math.sin(30), imgW, 0 + textH);
+      g2d.drawString(caption, imgW - capW, 0);
+      g.drawImage(img, x - imgW + textH + 4, h - YMARGIN + 14, this);
     }
   }
   
@@ -293,6 +313,8 @@ public class ScatterView extends View implements Runnable {
     final int w = getWidth();
     g.setColor(GUIConstants.color1);
     g.drawLine(XMARGIN, YMARGIN, XMARGIN, getHeight() - YMARGIN);
+    
+    scatterData.yAxis.calcCaption(plotHeight - NOVALUEBORDER);
 
     final boolean numeric = scatterData.yAxis.numeric;
     g.setFont(GUIConstants.font);
@@ -300,7 +322,7 @@ public class ScatterView extends View implements Runnable {
     final int textH = g.getFontMetrics().getHeight();
     final int pHeight = plotHeight - NOVALUEBORDER;
     final int nrCaptions = numeric ? (pHeight / 
-        (textH * 2 + CAPTIONWHITESPACE)) :
+        (textH + CAPTIONWHITESPACE)) :
       scatterData.yAxis.nrCaptions;
     final double range = 1.0d / (nrCaptions - 1);
     for(int i = 0; i < nrCaptions; i++) {
@@ -414,14 +436,14 @@ public class ScatterView extends View implements Runnable {
    * @return item focused
    */
   private boolean focus() {
+    // get values focused by mouse pointer
+    valueFocused = true;
+    focusedValueX = calcFocusedValue(true);
+    focusedValueY = calcFocusedValue(false);
+    
+    // find focused item 
     int dist = Integer.MAX_VALUE;
     int currFocusedItem = -1;
-    if(mouseX < XMARGIN || mouseX > getWidth() - XMARGIN + ITEMSIZE / 2 ||
-        mouseY < YMARGIN - ITEMSIZE / 2 || mouseY > getHeight() - YMARGIN) {
-      focusedItem = -1;
-      return true;
-    }
-    
     for(int i = 0; i < scatterData.size; i++) {
       final int x = calcCoordinate(true, scatterData.xAxis.co[i]);
       final int y = calcCoordinate(false, scatterData.yAxis.co[i]);
@@ -444,10 +466,40 @@ public class ScatterView extends View implements Runnable {
     return false;
   }
   
+  /**
+   * Calculates the relative value focused by the mouse pointer.
+   * @param calcX value to be calculated is x value
+   * @return focused x or y value
+   */
+  private double calcFocusedValue(final boolean calcX) {
+    double relative = .0d;
+    if(calcX) {
+      final int pWidth = plotWidth - NOVALUEBORDER;
+      final int xStart = XMARGIN + NOVALUEBORDER;
+      relative = 1.0d / pWidth * (mouseX - xStart);
+    } else {
+      final int pHeight = plotHeight - NOVALUEBORDER;
+      final int yStart = YMARGIN;
+      relative = 1 - (1.0d / pHeight * (mouseY - yStart));
+    }
+    if(relative < 0)
+      relative = .0d;
+    return relative;
+  }
+  
   @Override
   public void mouseMoved(final MouseEvent e) {
     mouseX = e.getX();
     mouseY = e.getY();
-    if(focus()) repaint();
+    
+    if(mouseX < XMARGIN || mouseX > getWidth() - XMARGIN + ITEMSIZE / 2 ||
+        mouseY < YMARGIN - ITEMSIZE / 2 || mouseY > getHeight() - YMARGIN) {
+      valueFocused = false;
+      focusedItem = -1;
+      repaint();
+    } else {
+      focus();
+      repaint();
+    }
   }
 }
