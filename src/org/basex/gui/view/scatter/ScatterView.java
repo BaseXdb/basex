@@ -221,8 +221,8 @@ public class ScatterView extends View implements Runnable {
           scatterData.xAxis.getValue(focusedValueX) : "";
       final String y = mouseY < h - YMARGIN - NOVALUEBORDER ?
           scatterData.yAxis.getValue(focusedValueY) : "";
-      g.drawString("x" + x, XMARGIN, h - 50);
-      g.drawString("y" + y, XMARGIN, h - 35);
+      g.drawString("x  " + x, XMARGIN, h - 50);
+      g.drawString("y  " + y, XMARGIN, h - 35);
     }
     plotChanged = false;
   }
