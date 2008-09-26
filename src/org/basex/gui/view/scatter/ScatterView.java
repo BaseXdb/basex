@@ -238,9 +238,10 @@ public class ScatterView extends View implements Runnable {
     }
 
     // draw focused item
-    if(focusedItem != -1)
-    drawItem(g, scatterData.xAxis.co[focusedItem], 
-        scatterData.yAxis.co[focusedItem], true, false);
+    if(focusedItem > -1) {
+      drawItem(g, scatterData.xAxis.co[focusedItem], 
+          scatterData.yAxis.co[focusedItem], true, false);
+    }
     
     // draw focused x and y value
     if(valueFocused) {
@@ -406,7 +407,7 @@ public class ScatterView extends View implements Runnable {
     final int s = scatterData.size;
     int i = 0;
     while(i < s) {
-      if(scatterData.pres[i] == focusedItem) {
+      if(scatterData.pres[i] == focused) {
         focusedItem = i;
         repaint();
         break;
