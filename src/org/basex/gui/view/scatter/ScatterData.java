@@ -124,4 +124,17 @@ public class ScatterData {
     pres = tmpPres.finish();
     size = pres.length;
   }
+  
+  /**
+   * Returns the array position of a given pre value.
+   * @param pre pre value to be looked up
+   * @return array index if found, -1 if not 
+   */
+  int getPrePos(final int pre) {
+    for(int i = 0; i < size; i++) {
+      if(pres[i] == pre)
+        return i;
+    }
+    return -1;
+  }
 }
