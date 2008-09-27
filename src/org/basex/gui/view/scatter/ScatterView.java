@@ -538,14 +538,14 @@ public class ScatterView extends View implements Runnable {
     mouseY = e.getY();
 
     focus();
-    final Nodes marked = GUI.context.marked();
-    final int pre = focused;
     if(focused == -1) {
-      marked.find(pre);
-      notifyMark(GUI.context.marked());
+      Nodes n = new Nodes(GUI.context.data());
+      notifyMark(n);
       return;
     }
     
+    Nodes marked = GUI.context.marked();
+    final int pre = focused;
     final boolean left = SwingUtilities.isLeftMouseButton(e);
     if(!left) {
       // is right click
