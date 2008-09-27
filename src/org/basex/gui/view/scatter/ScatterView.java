@@ -184,11 +184,11 @@ public class ScatterView extends View implements Runnable {
     if(scatterData.size == 0)
       return img;
     g.setColor(GUIConstants.color6);
-    final Nodes marked = GUI.context.marked();
+//    final Nodes marked = GUI.context.marked();
     for(int i = 0; i < scatterData.size; i++) {
-      final int pre = scatterData.pres[i];
-      drawItem(g, scatterData.xAxis.co[i], scatterData.yAxis.co[i], false, 
-          marked.find(pre) > -1 ? true : false);
+//      final int pre = scatterData.pres[i];
+      drawItem(g, scatterData.xAxis.co[i], 
+          scatterData.yAxis.co[i], false, false);
     }
     return img;
   }
@@ -206,7 +206,8 @@ public class ScatterView extends View implements Runnable {
     }
 
     // draw solid background
-    g.fillRect(0, 0, w, h);
+//    g.fillRect(0, 0, w, h);
+    
     plotWidth = w - 2 * XMARGIN;
     plotHeight = h - 2 * YMARGIN;
     
@@ -308,7 +309,9 @@ public class ScatterView extends View implements Runnable {
       String caption = "";
       if(numeric) {
         final double min = axis.min;
-        final double captionValue = min + (i * step);
+        final double captionValue = i == nrCaptions - 1 ? axis.max : 
+          min + (i * step);
+          
         if(type == ScatterAxis.TYPEINT)
           caption = Integer.toString((int) captionValue);
         else

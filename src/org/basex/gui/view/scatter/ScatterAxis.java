@@ -200,7 +200,7 @@ public final class ScatterAxis {
           captionStep = tmpStep;
           int tmpMin = minI - minI % tmpStep;
           int tmpMax = (maxI + tmpStep - 1) / tmpStep * tmpStep;
-          nrCaptions = (tmpMax - tmpMin) / tmpStep;
+          nrCaptions = (tmpMax - tmpMin) / tmpStep + 1;
           if(String.valueOf(tmpStep).startsWith("1"))
             tmpStep *= tmpStep == 1 ? 5 : 2.5;
           else
