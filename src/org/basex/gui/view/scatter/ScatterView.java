@@ -10,11 +10,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
+
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
@@ -24,7 +26,6 @@ import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.View;
 import org.basex.util.IntList;
-import org.basex.util.Performance;
 import org.basex.util.Token;
 
 /**
@@ -91,7 +92,8 @@ public final class ScatterView extends View implements Runnable {
   /** Holds pre values of marked nodes that are displayed in the plot to 
    * solve performance issues.
    */
-  private int[] temporaryMarkedPos;
+  private IntList tmpMarkedPos;
+//  private int[] temporaryMarkedPos;
   /** Bounding box which supports selection of multiple items. */
   private ScatterBoundingBox selectionBox;
 
@@ -146,7 +148,7 @@ public final class ScatterView extends View implements Runnable {
     box.add(Box.createHorizontalGlue());
     add(box, BorderLayout.NORTH);
     
-    temporaryMarkedPos = new int[0];
+    tmpMarkedPos = new IntList();
     selectionBox = new ScatterBoundingBox();
     itemImg = createItemImage(false, false);
     markedItemImg = createItemImage(false, true);
@@ -230,9 +232,6 @@ public final class ScatterView extends View implements Runnable {
       plotChanged = true;
     }
 
-    // draw solid background
-//    g.fillRect(0, 0, w, h);
-    
     plotWidth = w - 2 * XMARGIN;
     plotHeight = h - 2 * YMARGIN;
     
@@ -253,23 +252,21 @@ public final class ScatterView extends View implements Runnable {
     
     // draw marked items
     if(markingChanged) {
-      Performance p = new Performance();
       final Nodes marked = GUI.context.marked();
       if(marked.size() > 0) {
-        final IntList tmpPre = new IntList();
+        tmpMarkedPos.reset();
         for(int i = 0; i < marked.size(); i++) {
           final int prePos = scatterData.getPrePos(marked.pre[i]);
           if(prePos > -1)
-            tmpPre.add(prePos);
+            tmpMarkedPos.add(prePos);
         }
-        temporaryMarkedPos = tmpPre.finish();
-        System.out.println(p.getTimer());
       }
       markingChanged = false;
     }
-    for(int i = 0; i < temporaryMarkedPos.length; i++) {
-      drawItem(g, scatterData.xAxis.co[temporaryMarkedPos[i]], 
-          scatterData.yAxis.co[temporaryMarkedPos[i]], false, true);
+    final int[] ti = tmpMarkedPos.finish();
+    for(int i = 0; i < ti.length; i++) {
+      drawItem(g, scatterData.xAxis.co[ti[i]], 
+          scatterData.yAxis.co[ti[i]], false, true);
     }
 
     // draw focused item
@@ -472,14 +469,15 @@ public final class ScatterView extends View implements Runnable {
   protected void refreshFocus() {
     final int s = scatterData.size;
     int i = 0;
+    focusedItem = -1;
     while(i < s) {
       if(scatterData.pres[i] == focused) {
         focusedItem = i;
-        repaint();
         break;
       }
       i++;
     }
+    repaint();
   }
 
   @Override
@@ -574,22 +572,35 @@ public final class ScatterView extends View implements Runnable {
     focusedValueY = calcFocusedValue(false);
     
     // find focused item
-    focusedItem = -1;
-    int dist = Integer.MAX_VALUE;
-    for(int i = 0; i < scatterData.size; i++) {
-      final int x = calcCoordinate(true, scatterData.xAxis.co[i]);
-      final int y = calcCoordinate(false, scatterData.yAxis.co[i]);
-      final int distX = Math.abs(mouseX - x);
-      final int distY = Math.abs(mouseY - y);
-      if(distX <= FOCUSOFFSET && distY <= FOCUSOFFSET) {
-        final int currDist = distX * distY;
-        if(currDist < dist) {
-          dist = currDist;
-          focusedItem = i;
+    if(!dragging) {
+      focusedItem = -1;
+      int dist = Integer.MAX_VALUE;
+      for(int i = 0; i < scatterData.size; i++) {
+        final int x = calcCoordinate(true, scatterData.xAxis.co[i]);
+        final int y = calcCoordinate(false, scatterData.yAxis.co[i]);
+        final int distX = Math.abs(mouseX - x);
+        final int distY = Math.abs(mouseY - y);
+        if(distX <= FOCUSOFFSET && distY <= FOCUSOFFSET) {
+          final int currDist = distX * distY;
+          if(currDist < dist) {
+            dist = currDist;
+            focusedItem = i;
+          }
         }
       }
+      notifyFocus(focusedItem > -1 ? scatterData.pres[focusedItem] : -1, this);
+    } else {
+      for(int i = 0; i < scatterData.size; i++) {
+        final int x = calcCoordinate(true, scatterData.xAxis.co[i]);
+        final int y = calcCoordinate(false, scatterData.yAxis.co[i]);
+        if(x >= selectionBox.x1 && x <= selectionBox.x2) {
+          if(y >= selectionBox.y1 && y <= selectionBox.y2) {
+            tmpMarkedPos.add(i);
+          }
+        }
+      }
+      markingChanged = true;
     }
-    notifyFocus(focusedItem > -1 ? scatterData.pres[focusedItem] : -1, this);
     return true;
   }
   
@@ -617,6 +628,12 @@ public final class ScatterView extends View implements Runnable {
   @Override
   public void mouseReleased(final MouseEvent e) {
     dragging = false;
+    final int[] tmp = new int[tmpMarkedPos.size];
+    final int[] tmpPos = tmpMarkedPos.finish();
+    for(int i = 0; i < tmp.length; i++) {
+      tmp[i] = scatterData.pres[tmpPos[i]];
+    }
+    notifyMark(new Nodes(tmp, GUI.context.data()));
     repaint();
   }
   
@@ -629,6 +646,7 @@ public final class ScatterView extends View implements Runnable {
     focus();
     if(focused == -1) {
       Nodes n = new Nodes(GUI.context.data());
+      tmpMarkedPos.reset();
       notifyMark(n);
       return;
     }
@@ -642,6 +660,7 @@ public final class ScatterView extends View implements Runnable {
       notifyMark(1);
     } else {
       if(marked.find(pre) < 0)
+        tmpMarkedPos.reset();
         notifyMark(0);
     }
   }
