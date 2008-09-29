@@ -3,9 +3,8 @@ package org.basex.api.xmldb;
 import java.io.IOException;
 import org.xmldb.api.base.*;
 import org.xmldb.api.modules.XMLResource;
-import org.basex.build.DiskBuilder;
-import org.basex.build.xml.XMLParser;
 import org.basex.core.Context;
+import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.Check;
 import org.basex.core.proc.Close;
@@ -42,7 +41,7 @@ public class BXCollection implements Collection {
 
   public Resource createResource(final String id, final String type)
       throws XMLDBException {
-    if(type.equals(XMLResource.RESOURCE_TYPE.toString())) {
+    if(type.equals(XMLResource.RESOURCE_TYPE)) {
       if(new Check(id).execute(ctx)) {
         return new BXXMLResource(ctx.current());
       }
@@ -132,7 +131,7 @@ public class BXCollection implements Collection {
       new DropDB("tmp").execute(ctx);
       */
       
-      Data tmp = new DiskBuilder().build(new XMLParser(IO.get(cont)), "tmp");
+      final Data tmp = CreateDB.xml(IO.get(cont), "tmp");
       ctx.data().insert(ctx.data().size, -1, tmp);
       ctx.data().flush();
       DropDB.drop("tmp");

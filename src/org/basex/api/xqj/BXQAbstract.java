@@ -23,6 +23,7 @@ import org.basex.query.xquery.func.FunJava;
 import org.basex.query.xquery.item.DNode;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Type;
+import org.basex.query.xquery.XQException;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.xml.sax.InputSource;
@@ -134,8 +135,7 @@ abstract class BXQAbstract {
     try {
       // return item with correct type 
       return check(e, t).e(v);
-    } catch(final Exception ex) {
-      // [CG] catch only XQuery exceptions
+    } catch(final XQException ex) {
       throw new BXQException(ex);
     }
   }

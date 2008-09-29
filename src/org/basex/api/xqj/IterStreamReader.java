@@ -29,7 +29,7 @@ import org.basex.util.TokenBuilder;
 /**
  * XML Stream Reader implementation.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-07, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public final class IterStreamReader implements XMLStreamReader {
@@ -510,7 +510,7 @@ public final class IterStreamReader implements XMLStreamReader {
   }
 
   /** Dummy Location Implementation. */
-  class LocationImpl implements Location {
+  static final class LocationImpl implements Location {
     public int getCharacterOffset() { return -1; }
     public int getColumnNumber() { return -1; }
     public int getLineNumber() { return -1; }

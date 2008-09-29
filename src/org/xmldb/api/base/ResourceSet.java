@@ -110,7 +110,6 @@ public interface ResourceSet {
    /**
     * Returns a Resource containing an XML representation of all resources 
     * stored in the set. <p />
-    * TODO: Specify the schema used for this
     *
     * @return A <code>Resource</code> instance containing an XML representation 
     *   of all set members.

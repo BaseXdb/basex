@@ -10,7 +10,7 @@ import org.basex.BaseX;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.core.ProgressException;
-import org.basex.io.IOContent;
+import org.basex.io.IO;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -25,8 +25,6 @@ import org.basex.util.TokenBuilder;
 public final class XMLStreamWrapper extends Parser {
   /** Element counter. */
   int nodes;
-  /** Builder reference. */
-  Builder builder;
   /** XML stream reader. */
   XMLStreamReader reader;
 
@@ -35,14 +33,12 @@ public final class XMLStreamWrapper extends Parser {
    * @param sr stream reader
    */
   public XMLStreamWrapper(final XMLStreamReader sr) {
-    super(new IOContent(Token.EMPTY));
+    super(IO.DUMMY);
     reader = sr;
   }
 
   @Override
-  public void parse(final Builder build) throws IOException {
-    builder = build;
-    
+  public void parse(final Builder builder) throws IOException {
     try {
       builder.startDoc(token(io.name()));
       while(reader.hasNext()) {

@@ -10,7 +10,7 @@ import org.basex.util.Token;
 /**
  * This class provides access to namespace context.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-07, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public class NSContextImpl implements NamespaceContext {

@@ -40,12 +40,12 @@ import org.xml.sax.XMLReader;
 /**
  * This class tests the XQJ features.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-07, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public class XQJTest extends TestCase {
   /** Test file. */
-  private final String input = "doc('/home/db/xml/input.xml')";
+  private static final String INPUT = "doc('/home/db/xml/input.xml')";
   /** Driver reference. */
   protected String drv;
 
@@ -72,7 +72,7 @@ public class XQJTest extends TestCase {
   @Test
   public void test1() throws Exception {
     final XQConnection conn = conn(drv);
-    final XQPreparedExpression expr = conn.prepareExpression(input + "//li");
+    final XQPreparedExpression expr = conn.prepareExpression(INPUT + "//li");
 
     // query execution
     final XQResultSequence result = expr.executeQuery();
@@ -451,10 +451,16 @@ public class XQJTest extends TestCase {
     final XQConnection conn = conn(drv);
     
     Object[] objects = {
-        new Boolean(true), new Byte((byte) 2), new Float(3f),
-        new Double(4), new Integer(5), new Long(6),
-        new Short((short) 7), new String("8"), new BigDecimal(9),
-        new BigInteger("10"), new QName("elf"),
+        Boolean.valueOf(true), 
+        Byte.valueOf((byte) 2), 
+        new Float(3f),
+        new Double(4), 
+        Integer.valueOf(5), 
+        Long.valueOf(6),
+        Short.valueOf((short) 7), "8", 
+        new BigDecimal(9),
+        new BigInteger("10"), 
+        new QName("elf"),
     };
 
     for(Object o : objects) {

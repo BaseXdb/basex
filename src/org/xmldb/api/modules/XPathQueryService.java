@@ -75,7 +75,6 @@ public interface XPathQueryService extends Service {
     * @exception XMLDBException with expected error codes.<br />
     *  <code>ErrorCodes.VENDOR_ERROR</code> for any vendor
     *  specific errors that occur.<br />
-    *  TODO: probably need some special error here.
     */
    void setNamespace( String prefix, String uri ) throws XMLDBException; 
 

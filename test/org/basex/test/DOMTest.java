@@ -11,7 +11,7 @@ import org.xml.sax.InputSource;
 /**
  * This class serves an example for executing XPath requests.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-07, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public final class DOMTest {

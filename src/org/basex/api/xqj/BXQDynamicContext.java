@@ -203,7 +203,7 @@ abstract class BXQDynamicContext extends BXQAbstract
     
     try {
       final Type tt = check(it.type, t);
-      v.item(tt == it.type ? it : tt.e(it, null));
+      v.item(tt == it.type ? it : tt.e(it, null), null);
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }

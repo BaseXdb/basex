@@ -64,7 +64,6 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
     result = item;
     ctx = context;
     conn = connection;
-    //scrollable = result.size() != -1;
     scrollable = connection == null || connection.getStaticContext().
       getScrollability() == XQConstants.SCROLLTYPE_SCROLLABLE;
   }
@@ -249,8 +248,7 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
   }
 
   public boolean relative(final int p) throws XQException {
-    final int ps = getPosition();
-    return cursor(sequence(), p >= 0 ? ps + p - 1 : ps + p - 1);
+    return cursor(sequence(), getPosition() + p - 1);
   }
 
   public void writeItem(final OutputStream os, final Properties p)

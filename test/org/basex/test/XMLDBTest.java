@@ -29,7 +29,8 @@ import junit.framework.TestCase;
 
 /**
  * This class tests the XMLDB features.
- * @author Workgroup DBIS, University of Konstanz 2005-07, ISC License
+ * 
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler
  */
 public class XMLDBTest extends TestCase {
