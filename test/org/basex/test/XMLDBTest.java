@@ -1,5 +1,7 @@
 package org.basex.test;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -10,6 +12,9 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLReaderFactory;
 import org.xmldb.api.DatabaseManager;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.Database;
@@ -49,10 +54,10 @@ public class XMLDBTest extends TestCase {
       System.err.println("XML:DB Exception occured " + e.errorCode);
       e.printStackTrace();
     }/* finally {
-              if(collection != null) {
-                collection.close();
-              }
-            }*/
+                      if(collection != null) {
+                        collection.close();
+                      }
+                    }*/
   }
 
   /**
@@ -133,21 +138,11 @@ public class XMLDBTest extends TestCase {
   }
 
   /**
-   * Test Deleting a Resource.
+   * Test Inserting a Text XML Document.
    * @throws Exception exception
    */
   @Test
   public void test6() throws Exception {
-    String id = "input";
-    collection.removeResource(collection.getResource(id));
-  }
-
-  /**
-   * Test DOM Node Retrieval.
-   * @throws Exception exception
-   */
-  @Test
-  public void test7() throws Exception {
     String id = "input";
     String document = "<xml>kjhjhjhj</xml>";
 
@@ -155,6 +150,60 @@ public class XMLDBTest extends TestCase {
         XMLResource.RESOURCE_TYPE);
     res.setContent(document);
     collection.storeResource(res);
+  }
+
+  /**
+   * Test Inserting a DOM Document.
+   * @throws Exception exception
+   */
+  @Test
+  public void test7() throws Exception {
+    // Document is assumed to be a valid DOM document. Where this comes from is
+    // outside the scope of the API
+    Document document;
+
+    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    DocumentBuilder builder = factory.newDocumentBuilder();
+    document = builder.newDocument();
+
+    String id = "input";
+    XMLResource resource = (XMLResource) collection.createResource(id,
+        XMLResource.RESOURCE_TYPE);
+
+    resource.setContentAsDOM(document);
+    collection.storeResource(resource);
+  }
+
+  /**
+   * Test Inserting a SAX Document.
+   * @throws Exception exception
+   */
+  @Test
+  public void test8() throws Exception {
+    // File containing the XML to be inserted
+    String fileName = "test.xml";
+
+    String id = "input";
+    XMLResource resource = (XMLResource) collection.createResource(id,
+        XMLResource.RESOURCE_TYPE);
+
+    ContentHandler handler = resource.setContentAsSAX();
+
+    XMLReader reader = XMLReaderFactory.createXMLReader();
+    reader.setContentHandler(handler);
+    reader.parse(new InputSource(fileName));
+
+    collection.storeResource(resource);
+  }
+
+  /**
+   * Test Deleting a Resource.
+   * @throws Exception exception
+   */
+  @Test
+  public void test9() throws Exception {
+    String id = "input";
+    collection.removeResource(collection.getResource(id));
   }
 
 }
