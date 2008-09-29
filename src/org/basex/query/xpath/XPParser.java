@@ -675,39 +675,45 @@ public class XPParser extends QueryParser {
    * @throws QueryException parsing exception
    */
   FTArrayExpr ftMildNot() throws QueryException {
-    final FTArrayExpr e = ftUnaryNot();
+    boolean[] notnext = new boolean[2];
+    final FTArrayExpr e = ftUnaryNot(notnext);
     if(!consume(NOT)) return e;
-
+    
     FTArrayExpr[] list = { e };
     do {
       consumeWS();
       if(!consume(IN)) error(WRONGTEXT, IN, curr());
-      if(consume(FTNOT)) error(FTNOTEXC);
-      list = add(list, ftUnaryNot());
+      consumeWS();
+      if(consume(FTNOT)) error(FTMILDNOT); //FTNOTEXC);
+      notnext[FTTIMES] = true;
+      list = add(list, ftUnaryNot(notnext));
     } while(consume(NOT));
     return new FTMildNot(list);
   }
 
   /**
    * Parses an FTUnaryNot expression.
+   * @param notnext boolean[] array with illegal steps
    * @return FTArrayExpr
    * @throws QueryException parsing exception
    */
-  FTArrayExpr ftUnaryNot() throws QueryException {
+  FTArrayExpr ftUnaryNot(final boolean[] notnext) throws QueryException {
     consumeWS();
     final boolean not = consume(FTNOT);
     consumeWS();
-    final FTArrayExpr e = ftPrimaryWithOptions();
+    final FTArrayExpr e = ftPrimaryWithOptions(notnext);
     return not ? new FTUnaryNot(new FTArrayExpr[] { e }) : e;
   }
 
   /**
    * Parses an FTPrimaryWithOptions expression.
+   * @param notnext boolean[] array with illegal steps
    * @return FTArrayExpr
    * @throws QueryException parsing exception
    */
-  FTArrayExpr ftPrimaryWithOptions() throws QueryException {
-    final FTArrayExpr e = ftPrimary();
+  FTArrayExpr ftPrimaryWithOptions(final boolean[] notnext) 
+  throws QueryException {
+    final FTArrayExpr e = ftPrimary(notnext);
     e.fto = new FTOpt();
     ftMatchOption(e.fto);
     return e;
@@ -715,10 +721,11 @@ public class XPParser extends QueryParser {
 
   /**
    * Parses an FTPrimary expression.
+   * @param notnext boolean[] array with illegal steps
    * @return FTPrimary expression
    * @throws QueryException parsing exception
    */
-  FTArrayExpr ftPrimary() throws QueryException {
+  FTArrayExpr ftPrimary(final boolean[] notnext) throws QueryException {
     if(consume('(')) {
       final FTArrayExpr e = ftSelection();
       consumeWS();
@@ -743,7 +750,7 @@ public class XPParser extends QueryParser {
         mode = FTMode.PHRASE;
       }
       consumeWS();
-      return new FTWords(word, mode, ftTimes());
+      return new FTWords(word, mode, ftTimes(notnext));
     }
     error("\', \" or ( expected");
     return null;
@@ -873,11 +880,13 @@ public class XPParser extends QueryParser {
 
   /**
    * Parses an FTTimes expression.
+   * @param notnext boolean[] array with illegal steps
    * @return FTPositionFilter
    * @throws QueryException parsing exception
    */
-  long[] ftTimes() throws QueryException {
+  long[] ftTimes(final boolean[] notnext) throws QueryException {
     if(consume(OCCURS)) {
+      if (notnext[FTTIMES]) error(FTMILDNOT);
       consumeWS();
       final long[] occ = ftRange();
       if(!consume(TIMES)) error("times expected");

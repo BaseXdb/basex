@@ -12,7 +12,8 @@ public class FTTest extends AbstractTest {
     doc =
       "<fttest>\n" +
       "  <co>\n" +
-      "     <w>xml</w>\n" +
+      "     <w>xml in the first sentence. second sentence. " +
+      "third sentence. fourth sentence. fifth sentence.</w>\n" +
       "     <w>XML xml XmL</w>\n" +
       "     <w>we have xml databases</w>\n" +
       "     <w>XML DATABASES</w>\n" +
@@ -35,6 +36,8 @@ public class FTTest extends AbstractTest {
       "</fttest>";
 
     queries = new Object[][] {
+        { "Simple 7", bool(false),
+        "//@key = 'values'" },
         { "Simple 1", bool(true),
           "'abc' ftcontains 'abc'" },
         { "Simple 2", bool(true),
@@ -101,6 +104,12 @@ public class FTTest extends AbstractTest {
           "/fttest/wc/w [text() ftcontains '.*' with wildcards]" },
         { "FTWildCard 8", nodes(14),
           "/fttest/wc/w [text() ftcontains '.+' with wildcards]" },
+        { "FTWildCard 9", nodes(6, 10, 12),
+          "/fttest/wc/w [text() ftcontains 'X.+' " +
+          "with wildcards case sensitive]" },
+        { "FTWildCard 10", nodes(6, 10, 12),
+          "/fttest/wc/w [text() ftcontains 'x.+' with wildcards uppercase]" },
+
           
         { "FTAnyAllOption 1", nodes(3, 5, 7, 9, 11),
           "/fttest/co/w [text() ftcontains 'xml' any]" },
@@ -183,11 +192,32 @@ public class FTTest extends AbstractTest {
           "//w [. ftcontains 'databases' at end]" },
         { "FTPosFilter 9", nodes(7, 9, 11),
           "//w [. ftcontains 'xml' ftand 'databases' at end]" },
-        { "FTPosFilter 10", nodes(14),
+        { "FTPosFilter 10", nodes(7, 9, 11),
+          "//w [. ftcontains 'xml' ftand 'databases' at end]" },
+        { "FTPosFilter 11", nodes(14),
           "//w [. ftcontains 'hello' entire content]" },
-        { "FTPosFilter 11", nodes(9, 11),
+        { "FTPosFilter 12", nodes(9, 11),
           "//w [. ftcontains 'xml databases' entire content]" },
-
+        { "FTPosFilter 13", nodes(3),
+          "//w [. ftcontains 'first' ftand 'fifth' " +
+          "distance exactly 3 sentences]" },
+        { "FTPosFilter 14", nodes(3),
+          "//w [. ftcontains 'first' ftand 'second' ftand 'fifth' " +
+          "distance exactly 3 sentences]" },
+        { "FTPosFilter 15", nodes(3),
+          "//w [. ftcontains 'first sentence' ftand 'third sentence' " +
+          "distance exactly 3 words]" },
+        { "FTPosFilter 16", nodes(3),
+          "//w [. ftcontains 'the first sentence' ftand 'third sentence' " +
+          "distance exactly 3 words]" },
+        { "FTPosFilter 17", nodes(3),
+          "//w [. ftcontains 'second' ftand 'fifth' window 6 words]" },
+        { "FTPosFilter 18", nodes(3),
+          "//w [. ftcontains 'sentence' ftand 'the' " +
+          "distance exactly 1 words]" },
+        { "FTPosFilter 19", nodes(3),
+          "//w [. ftcontains ('second' ftand 'fifth' " +
+          "window 6 words) ftand 'the' distance exactly 3 words]" },
         { "FTIndex1", nodes(25, 29),
           "/fttest/fti [text() ftcontains 'wordt ook wel eens']" },
         
@@ -215,7 +245,8 @@ public class FTTest extends AbstractTest {
       1   1  34   1  ELEM  fttest
       2   1  11   1  ELEM  co
       3   1   2   1  ELEM  w
-      4   1   1   1  TEXT  xml
+      4   1   1   1  TEXT  xml in the first sentence. second sentence. 
+      third sentence. fourth sentence. fifth sentence. 
       5   3   2   1  ELEM  w
       6   1   1   1  TEXT  XML xml XmL
       7   5   2   1  ELEM  w

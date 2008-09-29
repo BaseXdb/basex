@@ -84,6 +84,9 @@ public interface XPText {
   String FTSWFILE = "Stop word file not found: \"%\".";
   /** Parsing Exception. */
   String FTLANG = "Language '%' not supported.";
+  /** Parsing Exception. */
+  String FTMILDNOT = "\"ftnot\" or \"fttimes\" may not appear as " +
+  "right operand of \"ftmildnot\".";
   
   /** Evaluation exception. */
   String NODATA = "No data available.";
@@ -113,7 +116,11 @@ public interface XPText {
   String MIN = "min";
   /** Attribute name. */
   String MAX = "max";
-
+  
+  /** FTGrammer. **/
+  int FTUNARYNOT = 0;
+  /** FTGrammer. **/
+  int FTTIMES = 1;
   // XPath Optimizer ==========================================================
 
   /** Optimization info. */
