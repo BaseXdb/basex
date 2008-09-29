@@ -53,7 +53,7 @@ final class FNPat extends Fun {
    * @throws XQException xquery exception
    */
   private Iter replace(final byte[] val, final Iter[] arg) throws XQException {
-    Item repl = arg[2].atomic(this, false);
+    final Item repl = arg[2].atomic(this, false);
 
     final byte[] rep = checkStr(repl);
     for(int i = 0; i < rep.length; i++) {
@@ -111,12 +111,12 @@ final class FNPat extends Fun {
       throws XQException {
 
     // process modifiers
-    Item pat = pattern.atomic(this, false);
+    final Item pat = pattern.atomic(this, false);
 
     byte[] pt = checkStr(pat);
     int m = Pattern.UNIX_LINES;
     if(mod != null) {
-      Item md = mod.atomic(this, false);
+      final Item md = mod.atomic(this, false);
       for(final byte b : checkStr(md)) {
         if(b == 'i') m |= Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
         else if(b == 'm') m |= Pattern.MULTILINE;

@@ -9,9 +9,8 @@ import org.basex.query.xpath.*;
 
 /**
  * This class serves as an example for executing XPath requests.
- * [...]
  *
- * @author Workgroup DBIS, University of Konstanz 2005-07, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public final class XPathExample {

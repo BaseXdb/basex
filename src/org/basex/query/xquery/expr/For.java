@@ -41,7 +41,7 @@ public final class For extends ForLet {
     var = v;
     pos = p;
     score = s;
-    if(score != null) score.item(Dbl.ZERO);
+    if(score != null) score.item(Dbl.ZERO, null);
   }
 
   @Override
@@ -81,10 +81,10 @@ public final class For extends ForLet {
         final Item it = iter.next();
         more = it != null;
         if(more) {
-          v.item(it);
-          if(p != null) p.item(Itr.get(++c));
+          v.item(it, ctx);
+          if(p != null) p.item(Itr.get(++c), ctx);
           // assign score value
-          if(sc != null) sc.item(Dbl.get(Scoring.finish(it.score())));
+          if(sc != null) sc.item(Dbl.get(Scoring.finish(it.score())), ctx);
         } else {
           ctx.vars.reset(vs);
         }

@@ -35,7 +35,7 @@ public class BXNodeList implements NodeList {
     xpath = ns;
   }
   
-  public Node item(final int i) {
+  public final Node item(final int i) {
     Nod n = null;
     if(xquery != null) {
       if(i < xquery.size) n = xquery.list[i];
@@ -46,7 +46,7 @@ public class BXNodeList implements NodeList {
     throw new IndexOutOfBoundsException("Out of bounds: " + i);
   }
 
-  public int getLength() {
+  public final int getLength() {
     return xquery != null ? xquery.size : xpath.size;
   }
 }

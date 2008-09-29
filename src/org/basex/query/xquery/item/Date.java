@@ -1,9 +1,11 @@
 package org.basex.query.xquery.item;
 
 import static org.basex.query.xquery.XQText.*;
+import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import org.basex.BaseX;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.util.Err;
@@ -17,9 +19,22 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public abstract class Date extends Item {
+  /** Date pattern. */
+  protected static final String ZONE = "((\\+|-)([0-9]{2}):([0-9]{2})|Z)?";
+  /** Day per months. */
+  protected static final byte[] DAYS = {
+    31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+  /** Date pattern. */
+  protected static final Pattern DAT = Pattern.compile(
+      "(-?)([0-9]{4})-([0-9]{2})-([0-9]{2})" + ZONE);
+  /** Time pattern. */
+  private static final Pattern TIM = Pattern.compile(
+      "([0-9]{2}):([0-9]{2}):([0-9]{2})(\\.([0-9]+))?" + ZONE);
   /** Data factory. */
-  static DatatypeFactory df;
-
+  public static DatatypeFactory df;
+  /** Calendar instance. */
+  public XMLGregorianCalendar xc;
+  
   static {
     try {
       df = DatatypeFactory.newInstance();
@@ -28,33 +43,6 @@ public abstract class Date extends Item {
     }
   }
   
-  /** Seconds per day. */
-  protected static final int DAYSECONDS = 86400;
-  /** Day of months. */
-  protected static final byte[] DAYS = {
-    30, 27, 30, 29, 30, 29, 30, 30, 29, 30, 29, 30 };
-  /** Date pattern. */
-  protected static final String ZONE = "((\\+|-)([0-9]{2}):([0-9]{2})|Z)?";
-  /** Date pattern. */
-  private static final Pattern DATE = Pattern.compile(
-      "(-?)([0-9]{4})-([0-9]{2})-([0-9]{2})" + ZONE);
-  /** Time pattern. */
-  private static final Pattern TIME = Pattern.compile(
-      "([0-9]{2}):([0-9]{2}):([0-9]{2})(\\.([0-9]+))?" + ZONE);
-
-  /** Year and Month. */
-  public int mon;
-  /** Day and Time. */
-  public long sec;
-  /** Milliseconds. */
-  public double mil;
-  /** Minus Flag. */
-  public boolean minus;
-  /** Zone Flag. */
-  public boolean zone;
-  /** Zone Time. */
-  public int zshift;
-
   /**
    * Constructor.
    * @param typ data type
@@ -64,115 +52,61 @@ public abstract class Date extends Item {
   }
 
   /**
-   * Interprets a date.
-   * @param val date/time value
-   * @param ex example format
-   * @throws XQException evaluation exception
+   * Constructor.
+   * @param typ data type
+   * @param d date reference
    */
-  protected final void date(final byte[] val, final String ex)
-      throws XQException {
-    final Matcher mt = DATE.matcher(Token.string(val).trim());
-    if(!mt.matches()) Err.date(type, ex);
-
-    final int y = Token.toInt(mt.group(2));
-    final int m = Token.toInt(mt.group(3)) - 1;
-    final long d = Token.toInt(mt.group(4)) - 1;
-
-    if(y == 0 || m < 0 || m > 11 || d < 0 || d > dpm(y, m))
-      Err.range(type, val);
-
-    mon = y * 12 + m;
-    sec = d * DAYSECONDS;
-    minus = mt.group(1).length() != 0 && (mon != 0 || sec != 0);
-    zone(mt, 5, val);
+  protected Date(final Type typ, final Date d) {
+    super(typ);
+    xc = (XMLGregorianCalendar) d.xc.clone();
   }
 
   /**
-   * Add/subtract the specified duration.
-   * @param a duration
-   * @param p plus/minus flag
+   * Constructor.
+   * @param typ data type
+   * @param d date reference
+   * @param e expected format
+   * @throws XQException evaluation exception
    */
-  protected final void calc(final Dur a, final boolean p) {
-    final int m = a.mon;
-    final long s = a.sec;
-    final boolean min = p ? a.minus : !a.minus;
-
-    if(minus) {
-      mon = -mon + m;
-      sec += s;
-      mil += a.mil;
-    } else if(min) {
-      mon -= m;
-      sec -= s;
-      mil -= a.mil;
-    } else {
-      mon += m;
-      sec += s;
-      mil += a.mil;
+  protected Date(final Type typ, final byte[] d, final String e)
+      throws XQException {
+    super(typ);
+    try {
+      xc = df.newXMLGregorianCalendar(Token.string(d).trim());
+      if(xc.getHour() == 24) xc.add(df.newDuration(0));
+    } catch(final IllegalArgumentException ex) {
+      Err.date(type, e);
     }
-    if(mil < 0) { mil++; sec--; } else if(mil >= 1) { mil--; sec++; }
-
-    // correct date overflow
-    while(mon >= 0 && sec / DAYSECONDS > Date.dpm(mon / 12, mon % 12)) {
-      if(min || m % 12 == 0 && s == 0) {
-        sec -= DAYSECONDS;
-      } else {
-        sec -= DAYSECONDS * (Date.dpm(mon / 12, mon % 12) + 1);
-        mon++;
-      }
-    }
-    while(sec < 0) {
-      sec += DAYSECONDS;
-      if(--mon < 0) mon = 12 - mon;
-      if(sec < DAYSECONDS) sec += Date.dpm(mon / 12, mon % 12) * DAYSECONDS;
-    }
-
-    minus = mon < 0;
-    mon = Math.abs(mon);
-  }
-
-  /***
-   * Returns days per month.
-   * @param y year
-   * @param m month
-   * @return days
-   */
-  public static long dpm(final int y, final int m) {
-    return DAYS[m] + (m == 1 && y % 4 == 0 &&
-        (y % 100 != 0 || y % 400 == 0) ? 1 : 0);
   }
 
   /**
-   * Interprets a time.
-   * @param val date/time value
-   * @param ex example format
-   * @throws XQException evaluation exception
+   * Checks the date format.
+   * @param d input format
+   * @param e expected format
+   * @throws XQException query exception
    */
-  protected final void time(final byte[] val, final String ex)
-      throws XQException {
-    final Matcher mt = TIME.matcher(Token.string(val).trim());
-    if(!mt.matches()) Err.date(type, ex);
+  protected final void date(final byte[] d, final String e) throws XQException {
+    final Matcher mt = DAT.matcher(Token.string(d).trim());
+    if(!mt.matches()) Err.date(type, e);
+    zone(mt, 5, d);
+  }
 
+  /**
+   * Checks the time format.
+   * @param d input format
+   * @param e expected format
+   * @throws XQException query exception
+   */
+  protected final void time(final byte[] d, final String e) throws XQException {
+    final Matcher mt = TIM.matcher(Token.string(d).trim());
+    if(!mt.matches()) Err.date(type, e);
+    
     final int h = Token.toInt(mt.group(1));
-    final int m = Token.toInt(mt.group(2));
     final int s = Token.toInt(mt.group(3));
-    if(h > 24 || m > 59 || s > 59 || h == 24 && (m > 0 || s > 0))
-      Err.range(type, val);
-
-    if(mt.group(4) != null) {
-      mil = Double.parseDouble(mt.group(4));
-      if(h == 24 && mil > 0) Err.date(type, ex);
-    }
-    sec += h * 3600 + m * 60 + s;
-    minus &= sec != 0 || mil != 0;
-
-    // correct day overflow
-    if(sec / DAYSECONDS > dpm(mon / 12, mon % 12)) {
-      sec %= DAYSECONDS;
-      mon++;
-    }
-
-    zone(mt, 6, val);
+    if(s > 59) Err.range(type, d);
+    final double ms = mt.group(4) != null ? Double.parseDouble(mt.group(4)) : 0;
+    if(h == 24 && ms > 0) Err.date(type, e);
+    zone(mt, 6, d);
   }
 
   /**
@@ -185,111 +119,115 @@ public abstract class Date extends Item {
   protected final void zone(final Matcher mt, final int p, final byte[] val)
     throws XQException {
 
-    if(mt.group(p) != null) {
-      zone = mt.group(p).equals("Z");
-      if(!zone) {
-        final int th = Token.toInt(mt.group(p + 2));
-        final int tm = Token.toInt(mt.group(p + 3));
-        if(th > 14 || tm > 59 || th == 14 && tm != 0) Err.or(INVALIDZONE, val);
-        zshift = (short) (th * 60 + tm);
-        if(mt.group(p + 1).equals("-")) zshift = -zshift;
-        zone = true;
-      }
-    }
+    if(mt.group(p) == null || mt.group(p).equals("Z")) return;
+    final int th = Token.toInt(mt.group(p + 2));
+    final int tm = Token.toInt(mt.group(p + 3));
+    if(th > 14 || tm > 59 || th == 14 && tm != 0) Err.or(INVALIDZONE, val);
   }
 
   /**
-   * Adds a date to the output.
-   * @param tb token builder
+   * Add/subtract the specified duration.
+   * @param a duration
+   * @param p plus/minus flag
+   * @throws XQException evaluation exception
    */
-  protected final void date(final TokenBuilder tb) {
-    if(minus) tb.add('-');
-    format(mon / 12, 4, '-', tb);
-    format(mon % 12 + 1, 2, '-', tb);
-    format((int) (sec / DAYSECONDS) + 1, 2, (char) 0, tb);
+  protected final void calc(final Dur a, final boolean p) throws XQException {
+    if(xc.getYear() + a.mon / 12 > 9999) Err.range(type, a.str());
+    xc.add(p ? a.java() : a.java().negate());
   }
 
-  /**
-   * Adds a time  to the output.
-   * @param tb token builder
-   */
-  protected final void time(final TokenBuilder tb) {
-    final int t = (int) (sec % DAYSECONDS);
-    format(t / 3600, 2, ':', tb);
-    format(t % 3600 / 60, 2, ':', tb);
-    format(t % 60, 2, (char) 0, tb);
-    if(mil != 0) tb.add(Token.substring(Token.token(mil), 1));
-  }
-
-  /**
-   * Adds a timezone to the output.
-   * @param tb token builder
-   */
-  protected final void zone(final TokenBuilder tb) {
-    if(zone) {
-      if(zshift == 0) {
-        tb.add('Z');
-      } else {
-        tb.add(zshift < 0 ? '-' : '+');
-        final int s = Math.abs(zshift);
-        format(s / 60, 2, ':', tb);
-        format(s % 60, 2, (char) 0, tb);
-      }
-    }
-  }
-
-  /**
-   * Formats a digit.
-   * @param v value to be added
-   * @param n number of preceding zeroes
-   * @param o optional character
-   * @param tb token builder
-   */
-  protected final void format(final int v, final int n, final char o,
-      final TokenBuilder tb) {
-    final byte[] val = Token.token(v);
-    for(int c = val.length; c < n; c++) tb.add('0');
-    tb.add(val);
-    if(o != 0) tb.add(o);
+  @Override
+  public final byte[] str() {
+    String str = xc.toXMLFormat();
+    str = str.replaceAll("\\.0+(Z|-.*|\\+.*)?$", "$1");
+    str = str.replaceAll("(\\.\\d+?)0+(Z|-.*|\\+.*)?$", "$1$2");
+    return Token.token(str);
   }
 
   @Override
   public final boolean eq(final Item it) {
-    final Date d = (Date) it;
-    return minus == d.minus && mon == d.mon && sec - zshift * 60L ==
-      d.sec - d.zshift * 60L && mil == d.mil;
+    final long d1 = days();
+    final long d2 = ((Date) it).days();
+    return d1 == d2 && seconds().doubleValue() ==
+      (((Date) it).seconds()).doubleValue();
+    //return d1 == d2 && seconds().equals(((Date) it).seconds());
   }
 
   @Override
   @SuppressWarnings("unused")
   public int diff(final Item it) throws XQException {
-    return df(it);
-  }
-
-  /**
-   * Compares two dates.
-   * @param dt date to be compared
-   * @return difference
-   */
-  protected final int df(final Item dt) {
-    final Date d = (Date) dt;
-    final int m1 = minus ? -mon : mon;
-    final int m2 = d.minus ? -d.mon : d.mon;
-    if(m1 != m2) return m1 < m2 ? -1 : 1;
-    final long s1 = sec - zshift * 60L;
-    final long s2 = d.sec - d.zshift * 60L;
-    if(s1 != s2) return s1 < s2 ? -1 : 1;
-    if(mil != d.mil) return mil < d.mil ? -1 : 1;
-    return 0;
+    final long d1 = days();
+    final long d2 = ((Date) it).days();
+    if(d1 != d2) return (int) (d1 - d2);
+    return seconds().subtract(((Date) it).seconds()).signum();
   }
 
   @Override
   public final String toString() {
-    return "\"" + Token.string(str()) + "\"";
+    return new TokenBuilder('"').add(str()).add('"').toString();
   }
 
   @Override
-  public Object java() {
-    return df.newXMLGregorianCalendar(Token.string(str()));
+  public final Object java() {
+    return xc;
+  }
+  
+  /**
+   * Returns the date in seconds.
+   * @return seconds
+   */
+  public BigDecimal seconds() {
+    final int h = xc.getHour() == UNDEF ? 0 : xc.getHour();
+    final int m = xc.getMinute() == UNDEF ? 0 : xc.getMinute();
+    final int s = xc.getSecond() == UNDEF ? 0 : xc.getSecond();
+    final int z = xc.getTimezone() == UNDEF ? 0 : xc.getTimezone();
+    BigDecimal bd = xc.getFractionalSecond();
+    if(bd == null) bd = BigDecimal.valueOf(0);
+    return bd.add(BigDecimal.valueOf(h * 3600 + m * 60 - z * 60 + s));
+  }
+  
+  /**
+   * Returns the days.
+   * @return seconds
+   */
+  public long days() {
+    final int y = xc.getYear() == UNDEF ? 0 : xc.getYear();
+    final int m = xc.getMonth() == UNDEF ? 0 : xc.getMonth() - 1;
+    final int d = xc.getDay() == UNDEF ? 0 : xc.getDay() - 1;
+    long s = days(y, m, d);
+    return y > 0 ? s : -s;
+  }
+  
+  /***
+   * Returns days per month, considering leap years.
+   * @param y year
+   * @param m month
+   * @return days
+   */
+  private static long dpm(final int y, final int m) {
+    return DAYS[m] + (m == 1 && leap(y) ? 1 : 0);
+  }
+  
+  /***
+   * Checks if the specified year is a leap year.
+   * @param y year
+   * @return result of check
+   */
+  private static boolean leap(final int y) {
+    return y % 4 == 0 && (y % 100 != 0 || y % 400 == 0);
+  }
+
+  /***
+   * Returns the nth day of the year.
+   * @param y year
+   * @param m month
+   * @param d days
+   * @return days
+   */
+  private static long days(final int y, final int m, final int d) {
+    long n = 0;
+    for(int i = 0; i < Math.abs(y); i++) n += 365 + (leap(i) ? 1 : 0);
+    for(int i = 0; i < m; i++) n += dpm(y, i);
+    return n + d;
   }
 }

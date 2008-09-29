@@ -63,7 +63,7 @@ public final class QueryArea extends QueryPanel {
         String xq = Token.string(area.getText());
         if(!xq.equals(last)) {
           last = xq;
-          boolean module = xq.trim().startsWith("module namespace ");
+          final boolean module = xq.trim().startsWith("module namespace ");
           if(xq.trim().length() == 0) xq = ".";
           if(GUIProp.execrt && !module) {
             GUI.get().execute(new XQuery(xq));

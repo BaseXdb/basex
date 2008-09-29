@@ -49,11 +49,11 @@ public final class Case extends Single {
    * @throws XQException evaluation exception
    */
   Iter iter(final XQContext ctx, final SeqBuilder seq) throws XQException {
-    if(!var.type.instance(seq.iter(), true)) return null;
+    if(!var.type.instance(seq.iter())) return null;
     if(var.name == null) return ctx.iter(expr);
 
     final int s = ctx.vars.size();
-    ctx.vars.add(var.item(seq.finish()));
+    ctx.vars.add(var.item(seq.finish(), ctx));
     final Iter sb = ctx.iter(expr);
     ctx.vars.reset(s);
     return sb;

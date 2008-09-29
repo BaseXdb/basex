@@ -3,7 +3,7 @@ package org.basex.test.w3c;
 /**
  * XQuery Test Suite Wrapper.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-07, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public final class XQTS extends W3CTS {
@@ -20,6 +20,6 @@ public final class XQTS extends W3CTS {
    * Constructor.
    */
   public XQTS() {
-    super("XQTS", "/home/db/xml/xqts102/");
+    super("XQTS", "/home/db/xml/xqts/");
   }
 }

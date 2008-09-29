@@ -22,7 +22,7 @@ import org.basex.util.Token;
 public final class FNNode extends Fun {
   @Override
   public Iter iter(final XQContext ctx, final Iter[] arg) throws XQException {
-    final Iter iter = arg.length == 0 ? check(ctx) : arg[0];
+    final Iter iter = arg.length == 0 ? checkCtx(ctx) : arg[0];
     final Item it = iter.atomic(this, true);
     final boolean empty = it == null;
 

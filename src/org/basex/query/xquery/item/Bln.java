@@ -87,8 +87,8 @@ public final class Bln extends Item {
   }
 
   @Override
-  public Object java() {
-    return new Boolean(val);
+  public Boolean java() {
+    return val;
   }
 
   /**

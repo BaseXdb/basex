@@ -1,7 +1,6 @@
 package org.basex.gui.view.scatter;
 
 import java.util.Arrays;
-
 import org.basex.data.Data;
 import org.basex.data.StatsKey;
 import org.basex.data.StatsKey.Kind;
@@ -19,7 +18,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Lukas Kircher
  */
-public class ScatterData {
+public final class ScatterData {
   /** Items pre values. */
   int[] pres;
   /** Number of items displayed in plot. */ 
@@ -41,7 +40,7 @@ public class ScatterData {
     xAxis = new ScatterAxis(this);
     yAxis = new ScatterAxis(this);
     size = 0;
-    item = Token.token("");
+    item = Token.EMPTY;
   }
   
   /**
@@ -50,7 +49,7 @@ public class ScatterData {
    * @return key array
    */
   String[] getStatKeys() {
-    Data data = GUI.context.data();
+    final Data data = GUI.context.data();
     
     final Names tags = data.tags;
     final StringList sl = new StringList();

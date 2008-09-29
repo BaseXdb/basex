@@ -33,7 +33,7 @@ public final class Let extends ForLet {
     expr = e;
     var = v;
     score = s;
-    if(s) var.item(Dbl.ZERO);
+    if(s) var.item(Dbl.ZERO, null);
   }
 
   @Override
@@ -70,7 +70,7 @@ public final class Let extends ForLet {
           } else {
             it = iter.finish();
           }
-          ctx.vars.add(v.item(it));
+          ctx.vars.add(v.item(it, ctx));
         } else {
           ctx.vars.reset(vs);
         }

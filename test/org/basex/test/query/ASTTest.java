@@ -17,7 +17,8 @@ import static org.junit.Assert.*;
 
 /**
  * JUnit Test class.
- * @author Workgroup DBIS, University of Konstanz 2005-07, ISC License
+ * 
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Tim Petrowsky
  */
 public final class ASTTest {

@@ -25,13 +25,11 @@ public final class Root extends Expr {
   
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
-    if(ctx.item == null) Err.or(XPNOCTX, this);
-    
+    final Iter iter = checkCtx(ctx);;
     final SeqIter ir = new SeqIter();
-    final Iter iter = ctx.item.iter();
     Item i;
     while((i = iter.next()) != null) {
-      if(!i.node()) Err.or(XPNOCTX, this);
+      if(!i.node()) Err.or(CTXNODE, this);
       Nod n = (Nod) i;
       while(n.parent() != null) n = n.parent();
       ir.add(n);

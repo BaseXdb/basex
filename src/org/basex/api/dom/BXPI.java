@@ -27,7 +27,7 @@ public final class BXPI extends BXNode implements ProcessingInstruction {
 
   @Override
   public String getNodeName() {
-    return "pi";
+    return Token.string(node.nname());
   }
 
   public String getData() {
@@ -35,7 +35,7 @@ public final class BXPI extends BXNode implements ProcessingInstruction {
   }
 
   public String getTarget() {
-    return "pi";
+    return getNodeName();
   }
 
   public void setData(final String dat) {

@@ -36,17 +36,8 @@ public final class BXElement extends BXNode implements Element {
   }
 
   public String getAttribute(final String name) {
-    final NodeIter iter = node.attr();
-    final byte[] nm = Token.token(name);
-    try {
-      Nod n = null;
-      while((n = iter.next()) != null) {
-        if(Token.eq(nm, n.nname())) return Token.string(n.str());
-      }
-    } catch(final XQException ex) {
-      BaseX.notexpected();
-    }
-    return "";
+    final Nod n = attribute(name);
+    return n != null ? Token.string(n.str()) : "";
   }
 
   public String getAttributeNS(final String uri, final String ln) {
@@ -55,17 +46,8 @@ public final class BXElement extends BXNode implements Element {
   }
 
   public Attr getAttributeNode(final String name) {
-    final NodeIter iter = node.attr();
-    final byte[] nm = Token.token(name);
-    try {
-      Nod n = null;
-      while((n = iter.next()) != null) {
-        if(Token.eq(nm, n.nname())) return (Attr) n.java();
-      }
-    } catch(final XQException ex) {
-      BaseX.notexpected();
-    }
-    return null;
+    final Nod n = attribute(name);
+    return n != null ? (Attr) n.java() : null;
   }
 
   public Attr getAttributeNodeNS(final String uri, final String ln) {
@@ -92,7 +74,7 @@ public final class BXElement extends BXNode implements Element {
   }
 
   public boolean hasAttribute(final String name) {
-    return getAttribute(name) != null;
+    return attribute(name) != null;
   }
 
   public boolean hasAttributeNS(final String uri, final String ln) {
@@ -143,5 +125,24 @@ public final class BXElement extends BXNode implements Element {
 
   public void setIdAttributeNode(final Attr idAttr, final boolean isId) {
     BaseX.notimplemented();
+  }
+
+  /**
+   * Returns the specified attribute.
+   * @param name attribute name
+   * @return nod instance
+   */
+  private Nod attribute(final String name) {
+    final NodeIter iter = node.attr();
+    final byte[] nm = Token.token(name);
+    try {
+      Nod n = null;
+      while((n = iter.next()) != null) {
+        if(Token.eq(nm, n.nname())) return n;
+      }
+    } catch(final XQException ex) {
+      BaseX.notexpected();
+    }
+    return null;
   }
 }

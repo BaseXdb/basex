@@ -192,7 +192,8 @@ public class BufferInput {
       if(p == 4) return -CACHE[0];
       CACHE[p++] = ch;
       try {
-        CharBuffer cb = csd.decode(ByteBuffer.wrap(Array.finish(CACHE, p)));
+        final CharBuffer cb = csd.decode(
+            ByteBuffer.wrap(Array.finish(CACHE, p)));
         int i = 0;
         for(int c = 0; c < cb.limit(); c++) i |= cb.get(c) << (c << 3);
         return i;

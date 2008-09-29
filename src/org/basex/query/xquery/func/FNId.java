@@ -24,12 +24,11 @@ import org.basex.util.TokenList;
 final class FNId extends Fun {
   @Override
   public Iter iter(final XQContext ctx, final Iter[] arg) throws XQException {
-    final Iter iter = arg.length == 1 ? check(ctx) : arg[1];
+    final Iter iter = arg.length == 1 ? checkCtx(ctx) : arg[1];
     final Item it = iter.atomic(this, true);
     if(it == null) Err.or(XPEMPTYPE, info(), Type.NOD);
 
     final Nod node = checkNode(it);
-
     switch(func) {
       case ID:    return id(arg[0], node);
       case IDREF: return idref(arg[0], node);

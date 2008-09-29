@@ -107,7 +107,7 @@ public final class FSUtils {
     final TokenBuilder tb = new TokenBuilder();
     tb.add('.');
     final int s = il.size;
-    boolean keepSlash = pre > par;
+    final boolean keepSlash = pre > par;
     if(keepSlash) tb.add('/');
 
     for(int i = s - 2; i >= 0; i--) {

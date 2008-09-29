@@ -46,7 +46,7 @@ public final class FSWalker {
    * @throws IOException I/O exception
    */
   public void fileHierarchyTraversal(final IO path) throws IOException {
-    File r = new File(path.path()).getCanonicalFile();
+    final File r = new File(path.path()).getCanonicalFile();
     if(r.getPath().equals("/") || r.getPath().length() == 0) {
       roots = Prop.UNIX ? new File[] { new File("/") } : File.listRoots();
     } else {

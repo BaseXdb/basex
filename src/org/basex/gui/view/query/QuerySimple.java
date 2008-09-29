@@ -1,6 +1,7 @@
 package org.basex.gui.view.query;
 
 import static org.basex.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Insets;
@@ -9,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
+
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 
@@ -311,7 +313,8 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     final TokenBuilder tb = new TokenBuilder();
     final Data data = GUI.context.data();
 
-    for(int c = 0, cs = panel.getComponentCount(); c < cs; c += 2) {
+    final int cs = panel.getComponentCount();
+    for(int c = 0; c < cs; c += 2) {
       final BaseXCombo com = (BaseXCombo) panel.getComponent(c);
       final int k = com.getSelectedIndex();
       if(k <= 0) continue;

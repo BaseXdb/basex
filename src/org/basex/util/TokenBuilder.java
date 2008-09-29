@@ -56,18 +56,22 @@ public final class TokenBuilder {
   /**
    * Adds a single character to the token.
    * @param ch the character to be added
+   * @return instance
    */
-  public void add(final char ch) {
+  public TokenBuilder add(final char ch) {
     addUTF(ch);
+    return this;
   }
 
   /**
    * Adds a single character to the token.
    * @param b the character to be added
+   * @return instance
    */
-  public void add(final byte b) {
+  public TokenBuilder add(final byte b) {
     if(size == chars.length) chars = Array.extend(chars);
     chars[size++] = b;
+    return this;
   }
 
   /**
@@ -103,9 +107,11 @@ public final class TokenBuilder {
   /**
    * Adds a byte array to the token.
    * @param b the character array to be added
+   * @return instance
    */
-  public void add(final byte[] b) {
+  public TokenBuilder add(final byte[] b) {
     add(b, 0, b.length);
+    return this;
   }
 
   /**
@@ -169,17 +175,10 @@ public final class TokenBuilder {
   }
   
   /**
-   * Chops trailing whitespaces.
-   */
-  public void trim() {
-    while(size > 0 && ws(chars[size - 1])) size--;
-  }
-  
-  /**
-   * Chops trailing whitespaces.
+   * Chops leading and trailing whitespaces.
    */
   public void chop() {
-    trim();
+    while(size > 0 && ws(chars[size - 1])) size--;
     int s = -1;
     while(++s < size && ws(chars[s]));
     if(s != 0 && s != size) Array.move(chars, s, -s, size - s);

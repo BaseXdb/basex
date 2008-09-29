@@ -1,24 +1,25 @@
 package org.basex.util;
 
 import static org.basex.util.Token.*;
+
 import org.basex.core.Prop;
 
 /**
  * This class assembles methods for fuzzy token matching.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public final class Levenshtein {
   /** Static matrix for Levenshtein distance. */
   private static int[][] m = new int[32][32];
-  
+
   // lazy matrix initialization
   static { for(int i = 0; i < m.length; i++) { m[0][i] = i; m[i][0] = i; } }
 
   /** Private constructor, preventing class instantiation. */
   private Levenshtein() { }
-  
+
   /**
    * Compares two character arrays for similarity.
    * @param tok token to be compared
@@ -32,10 +33,10 @@ public final class Levenshtein {
     if(sl < 4) return eq(tok, sub);
     // large word - search for substrings
     if(sl > 30) return contains(tok, sub);
-    
+
     return ls(tok, 0, tok.length, sub);
   }
-  
+
   /**
    * Calculates a Levenshtein distance.
    * @param tok token to be compared
@@ -44,7 +45,7 @@ public final class Levenshtein {
    * @param sub sub token to be compared
    * @return true if the arrays are similar
    */
-  private static boolean ls(final byte[] tok, final int ts, final int tl, 
+  private static boolean ls(final byte[] tok, final int ts, final int tl,
       final byte[] sub) {
 
     if(tl == 0) return false;
@@ -57,10 +58,10 @@ public final class Levenshtein {
     int k = Prop.lserr;
     if(k == 0) k = Math.max(1, sl >> 2);
     if(Math.abs(sl - tl) > k) return false;
-    
+
     return ls(tok, ts, tl, sub, k) <= k;
-  }      
-  
+  }
+
   /**
    * Calculates a Levenshtein distance.
    * @param tok token to be compared
@@ -70,11 +71,11 @@ public final class Levenshtein {
    * @param k maximum number of accepted errors
    * @return true if the arrays are similar
    */
-  public static int ls(final byte[] tok, final int ts, final int tl, 
+  public static int ls(final byte[] tok, final int ts, final int tl,
       final byte[] sub, final int k) {
 
     int e2 = -1, f2 = -1;
-    int sl = sub.length;
+    final int sl = sub.length;
     for(int t = 0; t < tl; t++) {
       final int e = ftNorm(tok[ts + t]);
       int d = 32;
@@ -92,7 +93,7 @@ public final class Levenshtein {
     }
     return m[tl][sl];
   }
-  
+
   /**
    * Gets the minimum of three values.
    * @param a 1st value
@@ -104,7 +105,7 @@ public final class Levenshtein {
     final int d = a < b ? a : b;
     return d < c ? d : c;
   }
-  
+
   /**
    * Checks if the first token approximately contains the second fulltext term.
    * @param tok first token

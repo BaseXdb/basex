@@ -20,7 +20,7 @@ import org.basex.query.xpath.expr.FTArrayExpr;
 import org.basex.query.xpath.expr.FTContains;
 import org.basex.query.xpath.expr.FTMildNot;
 import org.basex.query.xpath.expr.FTOr;
-import org.basex.query.xpath.expr.FTSelectXP;
+import org.basex.query.xpath.expr.FTSelect;
 import org.basex.query.xpath.expr.FTPositionFilter;
 import org.basex.query.xpath.expr.FTWords;
 import org.basex.query.xpath.expr.FTUnaryNot;
@@ -74,7 +74,7 @@ public class XPParser extends QueryParser {
    * @return query context
    * @throws QueryException parsing exception
    */
-  public XPContext parse() throws QueryException {
+  public final XPContext parse() throws QueryException {
     return parse(true);
   }
 
@@ -84,7 +84,7 @@ public class XPParser extends QueryParser {
    * @return query context
    * @throws QueryException parsing exception
    */
-  public XPContext parse(final boolean end) throws QueryException {
+  public final XPContext parse(final boolean end) throws QueryException {
     try {
       final Expr e = or();
       if(end && qp != ql) error(QUERYEND, rest());
@@ -101,7 +101,7 @@ public class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  Expr or() throws QueryException {
+  final Expr or() throws QueryException {
     final Expr e = and();
     consumeWS();
     if(!consume(OR)) return e;
@@ -116,7 +116,7 @@ public class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  Expr and() throws QueryException {
+  final Expr and() throws QueryException {
     final Expr e = equality();
     consumeWS();
     if(!consume(AND)) return e;
@@ -131,7 +131,7 @@ public class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  Expr equality() throws QueryException {
+  final Expr equality() throws QueryException {
     Expr e = relational();
     consumeWS();
 
@@ -148,7 +148,7 @@ public class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  Expr relational() throws QueryException {
+  final Expr relational() throws QueryException {
     Expr e = ftContains();
     consumeWS();
 
@@ -164,7 +164,7 @@ public class XPParser extends QueryParser {
    * @param comp array with available comparators
    * @return found comparator or null
    */
-  Comp cmp(final Comp[] comp) {
+  final Comp cmp(final Comp[] comp) {
     for(final Comp c : comp) if(consume(c.name)) return c;
     return null;
   }
@@ -174,7 +174,7 @@ public class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  Expr ftContains() throws QueryException {
+  final Expr ftContains() throws QueryException {
     final Expr e = additive();
     consumeWS();
     if(!consume(FTCONTAINS)) return e;
@@ -188,7 +188,7 @@ public class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  Expr additive() throws QueryException {
+  final Expr additive() throws QueryException {
     Expr e = multiplicative();
     consumeWS();
 
@@ -204,7 +204,7 @@ public class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  Expr multiplicative() throws QueryException {
+  final Expr multiplicative() throws QueryException {
     Expr e = unary();
     consumeWS();
 
@@ -220,7 +220,7 @@ public class XPParser extends QueryParser {
    * @param calc array with available calculators
    * @return found comparator or null
    */
-  Calc calc(final Calc[] calc) {
+  final Calc calc(final Calc[] calc) {
     for(final Calc c : calc) if(consume(c.name)) return c;
     return null;
   }
@@ -230,7 +230,7 @@ public class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  Expr unary() throws QueryException {
+  final Expr unary() throws QueryException {
     Expr e = null;
     consumeWS();
 
@@ -243,7 +243,7 @@ public class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  Expr union() throws QueryException {
+  final Expr union() throws QueryException {
     final Expr e = path();
     consumeWS();
     if(!consume('|')) return e;
@@ -258,7 +258,7 @@ public class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  Expr path() throws QueryException {
+  final Expr path() throws QueryException {
     consumeWS();
 
     // simple LocationPath cases
@@ -295,7 +295,7 @@ public class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  LocPath locPath() throws QueryException {
+  final LocPath locPath() throws QueryException {
     return curr('/') ? absLocPath(new LocPathAbs()) :
       relLocPath(new LocPathRel());
   }
@@ -340,7 +340,7 @@ public class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  Step step() throws QueryException {
+  final Step step() throws QueryException {
     Axis axis = null;
     Test test = null;
 
@@ -391,7 +391,7 @@ public class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  Test test(final Axis axis) throws QueryException {
+  final Test test(final Axis axis) throws QueryException {
     final String test = name();
 
     // all elements/attributes
@@ -440,7 +440,7 @@ public class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  Axis axis() throws QueryException {
+  final Axis axis() throws QueryException {
     // AxisName '::' or default axis (child)
     final String name = name();
 
@@ -472,7 +472,7 @@ public class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  Expr filter() throws QueryException {
+  final Expr filter() throws QueryException {
     Expr e = primary();
     consumeWS();
     while(curr('[')) {
@@ -489,7 +489,7 @@ public class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException parsing exception
    */
-  Expr primary() throws QueryException {
+  final Expr primary() throws QueryException {
     consumeWS();
     if(consume('(')) {
       final Expr e = or();
@@ -505,7 +505,7 @@ public class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException query exception
    */
-  Literal literal() throws QueryException {
+  final Literal literal() throws QueryException {
     final char delim = consume();
     if(!quote(delim)) error(WRONGTEXT, QUOTE, delim);
     tk.reset();
@@ -518,7 +518,7 @@ public class XPParser extends QueryParser {
    * Parses a Number.
    * @return resulting expression
    */
-  Num number() {
+  final Num number() {
     return new Num(num());
   }
 
@@ -526,7 +526,7 @@ public class XPParser extends QueryParser {
    * Parses a Number.
    * @return resulting expression
    */
-  double num() {
+  final double num() {
     tk.reset();
     boolean dot = true;
     boolean exp = true;
@@ -549,7 +549,7 @@ public class XPParser extends QueryParser {
    * @return resulting expression
    * @throws QueryException query exception
    */
-  Func function() throws QueryException {
+  final Func function() throws QueryException {
     final String func = name();
     //if(!end && func.length() == 0) return null;
     
@@ -574,7 +574,7 @@ public class XPParser extends QueryParser {
    * Parses a name.
    * @return string
    */
-  String name() {
+  final String name() {
     tk.reset();
     // '-' not allowed as first char in name
     if(letter(curr())) {
@@ -594,7 +594,7 @@ public class XPParser extends QueryParser {
    * @return argument
    * @throws QueryException in case no NodeSet is returned
    */
-  Expr nodeCheck(final Expr e) throws QueryException {
+  final Expr nodeCheck(final Expr e) throws QueryException {
     if(e.returnedValue() != NodeSet.class) error(NONODESET, e.toString());
     return e;
   }
@@ -604,7 +604,7 @@ public class XPParser extends QueryParser {
    * @param tb token builder
    * @throws QueryException query exception
    */
-  void entity(final TokenBuilder tb) throws QueryException {
+  final void entity(final TokenBuilder tb) throws QueryException {
     final String ent = ent(tb);
     if(ent != null) error(ent);
   }
@@ -624,7 +624,7 @@ public class XPParser extends QueryParser {
    * Jumps some characters back.
    * @param off number of characters to jump back.
    */
-  void back(final int off) {
+  final void back(final int off) {
     qp -= off;
   }
 
@@ -633,9 +633,9 @@ public class XPParser extends QueryParser {
    * @return FTArrayExpr
    * @throws QueryException parsing exception
    */
-  FTArrayExpr ftSelection() throws QueryException {
+  final FTArrayExpr ftSelection() throws QueryException {
     final FTArrayExpr e = ftOr();
-    return new FTSelectXP(e, ftPosFilter());
+    return new FTSelect(e, ftPosFilter());
   }
 
   /**
@@ -643,7 +643,7 @@ public class XPParser extends QueryParser {
    * @return FTArrayExpr
    * @throws QueryException parsing exception
    */
-  FTArrayExpr ftOr() throws QueryException {
+  final FTArrayExpr ftOr() throws QueryException {
     final FTArrayExpr e = ftAnd();
     if(!consume(FTOR)) return e;
 
@@ -660,7 +660,7 @@ public class XPParser extends QueryParser {
    * @return FTArrayExpr
    * @throws QueryException parsing exception
    */
-  FTArrayExpr ftAnd() throws QueryException {
+  final FTArrayExpr ftAnd() throws QueryException {
     final FTArrayExpr e = ftMildNot();
     if(!consume(FTAND)) return e;
 
@@ -674,7 +674,7 @@ public class XPParser extends QueryParser {
    * @return FTArrayExpr
    * @throws QueryException parsing exception
    */
-  FTArrayExpr ftMildNot() throws QueryException {
+  final FTArrayExpr ftMildNot() throws QueryException {
     boolean[] notnext = new boolean[2];
     final FTArrayExpr e = ftUnaryNot(notnext);
     if(!consume(NOT)) return e;
@@ -697,7 +697,7 @@ public class XPParser extends QueryParser {
    * @return FTArrayExpr
    * @throws QueryException parsing exception
    */
-  FTArrayExpr ftUnaryNot(final boolean[] notnext) throws QueryException {
+  final FTArrayExpr ftUnaryNot(final boolean[] notnext) throws QueryException {
     consumeWS();
     final boolean not = consume(FTNOT);
     consumeWS();
@@ -711,7 +711,7 @@ public class XPParser extends QueryParser {
    * @return FTArrayExpr
    * @throws QueryException parsing exception
    */
-  FTArrayExpr ftPrimaryWithOptions(final boolean[] notnext) 
+  final FTArrayExpr ftPrimaryWithOptions(final boolean[] notnext)
   throws QueryException {
     final FTArrayExpr e = ftPrimary(notnext);
     e.fto = new FTOpt();
@@ -725,7 +725,7 @@ public class XPParser extends QueryParser {
    * @return FTPrimary expression
    * @throws QueryException parsing exception
    */
-  FTArrayExpr ftPrimary(final boolean[] notnext) throws QueryException {
+  final FTArrayExpr ftPrimary(final boolean[] notnext) throws QueryException {
     if(consume('(')) {
       final FTArrayExpr e = ftSelection();
       consumeWS();
@@ -761,10 +761,8 @@ public class XPParser extends QueryParser {
    * @param opt container for fulltext options
    * @throws QueryException parsing exception
    */
-  void ftMatchOption(final FTOpt opt) throws QueryException {
-    // [CG] XPath/FTMatchOptions: language, thesaurus, stemming, stop words
-
-    while(true) {
+  final void ftMatchOption(final FTOpt opt) throws QueryException {
+      while(true) {
       consumeWS();
       if(consume(LOWERCASE)) {
         opt.lc = true;
@@ -815,7 +813,7 @@ public class XPParser extends QueryParser {
               } while(consume(','));
               if(!consume(')')) error(FTSTOP);
             } else if(consume(AT)) {
-              IO fl = IO.get(string(literal().str()));
+              final IO fl = IO.get(string(literal().str()));
               if(!fl.exists()) error(FTSWFILE, fl);
               try {
                 for(final byte[] sl : split(norm(fl.content()), ' ')) {
@@ -870,7 +868,7 @@ public class XPParser extends QueryParser {
    * Parses an FTThesaurusID.
    * @throws QueryException xquery exception
    */
-  void ftThesaurusID() throws QueryException {
+  final void ftThesaurusID() throws QueryException {
     literal();
     consumeWS();
     if(consume(RELATIONSHIP)) literal();
@@ -884,7 +882,7 @@ public class XPParser extends QueryParser {
    * @return FTPositionFilter
    * @throws QueryException parsing exception
    */
-  long[] ftTimes(final boolean[] notnext) throws QueryException {
+  final long[] ftTimes(final boolean[] notnext) throws QueryException {
     if(consume(OCCURS)) {
       if (notnext[FTTIMES]) error(FTMILDNOT);
       consumeWS();
@@ -901,7 +899,7 @@ public class XPParser extends QueryParser {
    * @return numeric range
    * @throws QueryException parsing exception
    */
-  long[] ftRange() throws QueryException {
+  final long[] ftRange() throws QueryException {
     final long[] occ = { 1, Long.MAX_VALUE };
     if(consume(EXACTLY)) {
       consumeWS();
@@ -944,7 +942,7 @@ public class XPParser extends QueryParser {
    * @return FTPositionFilter ft position filter information
    * @throws QueryException parsing exception
    */
-  FTPositionFilter ftPosFilter() throws QueryException {
+  final FTPositionFilter ftPosFilter() throws QueryException {
     final FTPos pos = new FTPos();
     final FTPositionFilter ftpos = new FTPositionFilter(pos);
 
@@ -996,7 +994,7 @@ public class XPParser extends QueryParser {
    * @throws QueryException parsing exception
    * @return fulltext unit
    */
-  FTUnit ftUnit() throws QueryException {
+  final FTUnit ftUnit() throws QueryException {
     consumeWS();
     if(consume(WORDS)) return FTUnit.WORDS;
     if(consume(SENTENCES)) return FTUnit.SENTENCES;
@@ -1010,7 +1008,7 @@ public class XPParser extends QueryParser {
    * @return fulltext unit
    * @throws QueryException parsing exception
    */
-  FTUnit ftBigUnit() throws QueryException {
+  final FTUnit ftBigUnit() throws QueryException {
     consumeWS();
     if(consume(SENTENCE)) return FTUnit.SENTENCES;
     if(consume(PARAGRAPH)) return FTUnit.PARAGRAPHS;

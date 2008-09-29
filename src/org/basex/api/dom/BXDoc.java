@@ -93,8 +93,7 @@ public final class BXDoc extends BXNode implements Document {
 
   public Element getDocumentElement() {
     try {
-      final Nod n = node.child().next();
-      return n != null ? (Element) n.java() : null;
+      return (Element) finish(node.child().next());
     } catch(final Exception e) {
       BaseX.debug(e);
       return null;

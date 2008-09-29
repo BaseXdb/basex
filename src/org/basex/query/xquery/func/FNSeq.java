@@ -76,7 +76,10 @@ final class FNSeq extends Fun {
       @Override
       public Item next() throws XQException {
         Item i;
-        while((i = arg[0].next()) != null) if(map.index(i)) return i;
+        while((i = arg[0].next()) != null) {
+          i = FNGen.atom(i);
+          if(map.index(i)) return i;
+        }
         map = null;
         return null;
       }
@@ -99,7 +102,7 @@ final class FNSeq extends Fun {
       @Override
       public Item next() throws XQException {
         if(last) return p > 0 ? arg[2].next() : null;
-        boolean sub = p == 0 || --p == 0;
+        final boolean sub = p == 0 || --p == 0;
         final Item i = arg[sub ? 2 : 0].next();
         if(i != null) return i;
         if(sub) --p;
@@ -200,7 +203,7 @@ final class FNSeq extends Fun {
 
     Item it1 = null;
     Item it2 = null;
-    // non-short-circuit logic (one & sign) to run both iterators..
+    // explicit non-short-circuit..
     while((it1 = iter1.next()) != null & (it2 = iter2.next()) != null) {
       if(it1.n() && it2.n() && Double.isNaN(it1.dbl()) &&
           Double.isNaN(it2.dbl())) continue;
@@ -214,7 +217,7 @@ final class FNSeq extends Fun {
       final NodeIter niter2 = ((Nod) it2).descOrSelf();
 
       Nod n1 = null, n2 = null;
-      // non-short-circuit logic (one & sign) to run both iterators..
+      // explicit non-short-circuit..
       while((n1 = niter1.next()) != null & (n2 = niter2.next()) != null) {
         if(n1.type != n2.type) return false;
         if((n1.type == Type.ELM || n1.type == Type.PI) &&

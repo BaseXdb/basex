@@ -13,8 +13,7 @@ import org.basex.util.TokenList;
  */
 public final class FTTokenizer extends IndexToken {
   /** Stemming instance. */
-  private static final Stemming STEM = new Stemming();
-  
+  private final Stemming stem = new Stemming();
   /** Stemming flag. */
   public boolean st = Prop.ftstem;
   /** Diacritics flag. */
@@ -32,7 +31,6 @@ public final class FTTokenizer extends IndexToken {
   /** Flag for loading ftposition data. */
   public boolean lp;
 
-  
   /** Current sentence. */
   public int sent;
   /** Current paragraph. */
@@ -43,14 +41,14 @@ public final class FTTokenizer extends IndexToken {
   public int p;
   /** Character start position. */
   public int s;
-  
+
   /**
    * Empty constructor.
    */
   public FTTokenizer() {
     super(TYPE.FTX);
   }
-  
+
   /**
    * Constructor.
    * @param txt text
@@ -59,7 +57,7 @@ public final class FTTokenizer extends IndexToken {
     this();
     text = txt;
   }
-  
+
   /**
    * Sets the text.
    * @param txt text
@@ -68,7 +66,7 @@ public final class FTTokenizer extends IndexToken {
     text = txt;
     init();
   }
-  
+
   /**
    * Initializes the iterator.
    */
@@ -78,7 +76,7 @@ public final class FTTokenizer extends IndexToken {
     pos = -1;
     p = 0;
   }
-  
+
   /**
    * Checks if more tokens are to be returned.
    * @return result of check
@@ -93,7 +91,7 @@ public final class FTTokenizer extends IndexToken {
     for(; p < l; p += cl(text[p])) {
       final int c = cp(text, p);
       if(c == '.' && wc) break;
-      
+
       if(!sn && (c == '.' || c == '!' || c == '?')) {
         sn = true;
         sent++;
@@ -107,7 +105,7 @@ public final class FTTokenizer extends IndexToken {
     // end of text...
     s = p;
     if(p == l) return false;
-    
+
     // parse token
     for(; p < l; p += cl(text[p])) {
       final int c = cp(text, p);
@@ -117,21 +115,21 @@ public final class FTTokenizer extends IndexToken {
     }
     return true;
   }
-  
+
   @Override
   public byte[] get() {
     byte[] n = substring(text, s, p);
     if(!dc) n = dc(n);
     if(uc) n = uc(n);
     if(lc || !cs) n = lc(n);
-    if(st) n = STEM.word(n);
+    if(st) n = stem.word(n);
     return n;
   }
-  
+
   /**
    * Checks if all tokens from the current FTTokenizer are
    * contained in the FTTokenizer tok.
-   * 
+   *
    * @param tok FTTokenizer
    * @return mildnot
   public boolean mildNot(final FTTokenizer tok) {
@@ -142,7 +140,7 @@ public final class FTTokenizer extends IndexToken {
     while (m1 && m2 && Token.cmp(get(), tok.get()) != 0) {
       m2 = tok.more();
     }
-    
+
     while (m1 && m2 && Token.cmp(get(), tok.get()) == 0) {
       m1 = more();
       m2 = tok.more();
@@ -150,7 +148,7 @@ public final class FTTokenizer extends IndexToken {
     return !m1;
   }
    */
-  
+
   /**
    * Counts the number of tokens.
    * @return number of tokens
@@ -160,7 +158,7 @@ public final class FTTokenizer extends IndexToken {
     while(more());
     return pos;
   }
-  
+
   /**
    * Returns the text size.
    * @return size
@@ -168,20 +166,18 @@ public final class FTTokenizer extends IndexToken {
   public int size() {
     return text.length;
   }
-  
+
   /**
    * Converts the tokens to a TokenList.
-   * 
    * @return TokenList
    */
   public TokenList getTokenList() {
-    TokenList tl = new TokenList();
+    final TokenList tl = new TokenList();
     init();
-    while(more())
-      tl.add(get());
+    while(more()) tl.add(get());
     return tl;
   }
-  
+
   @Override
   public String toString() {
     return "FTTokenizer[" + string(text) + "]";

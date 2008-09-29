@@ -196,7 +196,6 @@ public final class CommandParser extends QueryParser {
           case ELEMENT: case TEXT: case COMMENT:
             return new Update(upd, name(cmd), xpath(cmd));
           case PI:
-            return new Update(upd, name(cmd), name(cmd), xpath(cmd));
           case ATTRIBUTE:
             return new Update(upd, name(cmd), name(cmd), xpath(cmd));
           default:
@@ -382,7 +381,7 @@ public final class CommandParser extends QueryParser {
 
     final StringList alt = list(cmp, token);
     if(token == null) {
-      if(par == null) error(alt, "Expecting command.");
+      if(par == null) error(alt, CMDNO);
       help(alt, par);
     }
 

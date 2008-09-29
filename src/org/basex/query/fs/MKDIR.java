@@ -10,7 +10,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Hannes Schwarz - Hannes.Schwarz@gmail.com
  */
-public class MKDIR extends FSCmd {
+public final class MKDIR extends FSCmd {
   /** Specified path. */
   private String path;
 

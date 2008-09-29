@@ -71,6 +71,8 @@ import org.basex.query.xquery.item.Str;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.item.Uri;
 import org.basex.query.xquery.path.Axis;
+import org.basex.query.xquery.path.KindTest;
+import org.basex.query.xquery.path.NameTest;
 import org.basex.query.xquery.path.Path;
 import org.basex.query.xquery.path.Step;
 import org.basex.query.xquery.path.Test;
@@ -191,8 +193,8 @@ public final class XQParser extends QueryParser {
         if(alter != null) error();
         if(ctx.root instanceof Step) {
           final Step step = (Step) ctx.root;
-          if(step.axis == Axis.CHILD && step.test.type == null &&
-              step.test.name != null) Err.or(QUERYSTEP, step);
+          if(step.axis == Axis.CHILD && step.test instanceof NameTest)
+            Err.or(QUERYSTEP, step);
         }
         Err.or(QUERYEND, rest());
       }
@@ -237,7 +239,8 @@ public final class XQParser extends QueryParser {
    * @throws XQException xquery exception
    */
   private Expr mainModule() throws XQException {
-    prolog();
+    prolog1();
+    prolog2();
     if(declColl) {
       final byte[] coll = ctx.baseURI.resolve(ctx.collation).str();
       if(!Token.eq(URLCOLL, coll)) Err.or(NOCOLL, coll);
@@ -263,7 +266,8 @@ public final class XQParser extends QueryParser {
     ctx.ns.index(module);
     skipWS();
     check(';');
-    prolog();
+    prolog1();
+    prolog2();
   }
 
   /**
@@ -271,37 +275,27 @@ public final class XQParser extends QueryParser {
    * [  7] Parses a Setter.
    * @throws XQException xquery exception
    */
-  private void prolog() throws XQException {
-    // [CG] XQuery/Prolog: separate prolog from setters
+  private void prolog1() throws XQException {
     while(true) {
       final int p = qp;
       if(consumeWS(DECLARE)) {
-        if(consumeWS(VARIABLE)) {
-          varDecl();
-        } else if(consumeWS(FUNCTION)) {
-          functionDecl();
-        } else if(consumeWS(CONSTRUCTION)) {
-          constructionDecl();
-        } else if(consumeWS(NAMESPACE)) {
-          namespaceDecl();
+        if(consumeWS(DEFAULT)) {
+          if(!defaultNamespaceDecl() && !defaultCollationDecl() &&
+              !emptyOrderDecl()) Err.or(list(ELEMENT, COLLATION, EMPTYORDER),
+                  DECLINCOMPLETE);
         } else if(consumeWS(BOUNDARY)) {
           boundarySpaceDecl();
-        } else if(consumeWS(OPTION)) {
-          optionDecl();
+        } else if(consumeWS(BASEURI)) {
+          baseURIDecl();
+        } else if(consumeWS(CONSTRUCTION)) {
+          constructionDecl();
         } else if(consumeWS(ORDERING)) {
           orderingModeDecl();
         } else if(consumeWS(COPYNS)) {
           copyNamespacesDecl();
-        } else if(consumeWS(BASEURI)) {
-          baseURIDecl();
-        } else if(consumeWS(DEFAULT)) {
-          if(!defaultNamespaceDecl() && !defaultCollationDecl() &&
-              !emptyOrderDecl()) Err.or(list(ELEMENT, COLLATION, EMPTYORDER),
-                  DECLINCOMPLETE);
-        } else if(consumeWS(FTOPTION)) {
-          ftMatchOption(ctx.ftopt);
+        } else if(consumeWS(NAMESPACE)) {
+          namespaceDecl();
         } else {
-          //alter = DECLINCOMPLETE;
           qp = p;
           return;
         }
@@ -311,12 +305,38 @@ public final class XQParser extends QueryParser {
         } else if(consumeWS(MODULE)) {
           moduleImport();
         } else {
-          //Err.or(DECLINCOMPLETE);
           qp = p;
           return;
         }
       } else {
-        break;
+        return;
+      }
+      skipWS();
+      check(';');
+    }
+  }
+
+  /**
+   * [  6] Parses a Prolog.
+   * [  7] Parses a Setter.
+   * @throws XQException xquery exception
+   */
+  private void prolog2() throws XQException {
+    while(true) {
+      final int p = qp;
+      if(!consumeWS(DECLARE)) return;
+
+      if(consumeWS(VARIABLE)) {
+        varDecl();
+      } else if(consumeWS(FUNCTION)) {
+        functionDecl();
+      } else if(consumeWS(OPTION)) {
+        optionDecl();
+      } else if(consumeWS(FTOPTION)) {
+        ftMatchOption(ctx.ftopt);
+      } else {
+        qp = p;
+        return;
       }
       skipWS();
       check(';');
@@ -373,13 +393,11 @@ public final class XQParser extends QueryParser {
    * @throws XQException xquery exception
    */
   private void optionDecl() throws XQException {
-    // [CG] XQuery/Option Declaration
+    // ignore option declarations
     final QNm name = new QNm(qName(QNAMEINV));
-    final byte[] ns = stringLiteral();
+    stringLiteral();
     name.check(ctx);
     if(!name.ns()) Err.or(NSMISS, name);
-    // will never be null...
-    if(ns == null) Err.or(DECLINCOMPLETE);
   }
 
   /**
@@ -555,12 +573,12 @@ public final class XQParser extends QueryParser {
         ctx.vars.addGlobal(var);
       } else if(type != null) {
         ext.type = type;
-        ext.check();
+        ext.item = ext.check(ext.item, ctx);
       }
     } else {
       if(ext != null) Err.or(VARDEFINE, var);
       check(ASSIGN);
-      ctx.vars.addGlobal(var.expr(check(single(), VARMISSING)));
+      ctx.vars.addGlobal(var.expr(check(single(), VARMISSING), ctx));
     }
   }
 
@@ -1149,7 +1167,7 @@ public final class XQParser extends QueryParser {
     if(!consumeWS2(PRAGMA)) return null;
 
     do {
-      // [CG] XQuery/Pragmas
+      // ignore all pragmas...
       final QNm name = new QNm(qName(PRAGMAINCOMPLETE));
       if(!name.ns()) Err.or(NSMISS, name);
       name.check(ctx);
@@ -1266,37 +1284,40 @@ public final class XQParser extends QueryParser {
     final char ch = curr();
     if(XMLToken.isXMLLetter(ch)) {
       final byte[] name = qName(null);
-      skipWS();
-      if(consume('(')) {
-        tok.reset();
-        while(!consume(')')) {
-          if(curr() == 0) Err.or(TESTINCOMPLETE);
-          tok.add(consume());
+      if(consumeWS(PAR1)) {
+        final Type type = Type.node(new QNm(name));
+        if(type != null) {
+          tok.reset();
+          while(!consumeWS(PAR2)) {
+            if(curr() == 0) Err.or(TESTINCOMPLETE);
+            tok.add(consume());
+          }
+          final byte[] ext = tok.finish();
+          final QNm qn = checkTest(type, ext);
+          if(type == Type.NOD) return Test.NODE;
+          return new KindTest(type, qn);
         }
-        final Type type = node(new QNm(name));
-        if(type == Type.NOD) return Test.NODE;
-        if(type != null) return new Test(type, trim(tok.finish()), ctx);
       } else {
         // nametest abcde:abcde
         if(contains(name, ':')) {
           skipWS();
-          return new Test(name, false, ctx);
+          return new NameTest(name, false, ctx);
         }
         // nametest abcde
         if(!consume(':')) {
           skipWS();
-          return new Test(name, false, ctx);
+          return new NameTest(name, false, ctx);
         }
         // nametest abcde:*
         if(consume('*')) {
-          return new Test(name, false, ctx);
+          return new NameTest(name, false, ctx);
         }
       }
     } else if(consume('*')) {
       // nametest *
-      if(!consume(':')) return new Test();
+      if(!consume(':')) return new NameTest();
       // nametest *:abcde
-      return new Test(qName(null), true, ctx);
+      return new NameTest(qName(null), true, ctx);
     }
     qp = p;
     return null;
@@ -1339,7 +1360,7 @@ public final class XQParser extends QueryParser {
           new TokenBuilder('.'));
     }
     // strings
-    if(quote(c)) return Str.get(stringLiteral());
+    if(quote(c)) return new Str(stringLiteral(), true);
     // variables
     if(c == '$') {
       final Var var = new Var(varName());
@@ -1426,7 +1447,7 @@ public final class XQParser extends QueryParser {
   private Expr functionCall() throws XQException {
     final int p = qp;
     final QNm name = new QNm(qName(null));
-    if(!consumeWS2(PAR1) || node(name) != null) {
+    if(!consumeWS2(PAR1) || Type.node(name) != null) {
       qp = p;
       return null;
     }
@@ -1831,7 +1852,7 @@ public final class XQParser extends QueryParser {
     final QNm type = new QNm(qName(TYPEINVALID));
     ctx.ns.uri(type);
     skipWS();
-    final SeqType seq = new SeqType(type, consume('?') ? 1 : 0, null);
+    final SeqType seq = new SeqType(type, consume('?') ? 1 : 0, false);
 
     if(seq.type == null) {
       final byte[] uri = type.uri.str();
@@ -1853,11 +1874,10 @@ public final class XQParser extends QueryParser {
   private SeqType sequenceType() throws XQException {
     final QNm type = new QNm(qName(TYPEINVALID));
     tok.reset();
-    final boolean par = consumeWS2(PAR1);
+    final boolean par = consumeWS(PAR1);
     if(par) {
-      while(!consumeWS2(PAR2)) {
+      while(!consumeWS(PAR2)) {
         if(curr() == 0) Err.or(FUNCMISS, type.str());
-        skipWS();
         tok.add(consume());
       }
     }
@@ -1866,12 +1886,39 @@ public final class XQParser extends QueryParser {
       consume('*') ? 3 : 0;
     if(type.ns()) type.uri = ctx.ns.uri(type.pre());
 
-    final SeqType seq = new SeqType(type, mode, tok.finish());
-    if(seq.type == Type.EMP && mode != 0) Err.or(EMPTYSEQOCC, seq.type);
+    final byte[] ext = tok.finish();
+    final SeqType seq = new SeqType(type, mode, true);
     if(seq.type == null) Err.or(par ? NOTYPE : TYPEUNKNOWN, type, par);
+    if(seq.type == Type.EMP && mode != 0) Err.or(EMPTYSEQOCC, seq.type);
+    seq.ext = checkTest(seq.type, ext);
     return seq;
   }
 
+  /**
+   * Checks the arguments of the kind test.
+   * @param t type
+   * @param k kind arguments
+   * @return arguments
+   * @throws XQException query exception
+   */
+  private QNm checkTest(final Type t, final byte[] k) throws XQException {
+    if(k.length == 0) return null;
+    if(!t.node() || t == Type.COM || t == Type.TXT || t == Type.DOC)
+      Err.or(TESTINVALID, t, k);
+    
+    byte[] nm = delete(delete(k, '\''), '"');
+    final int i = indexOf(nm, ',');
+    if(i != -1) {
+      final QNm test = new QNm(trim(substring(nm, i + 1)), ctx);
+      if(test.uri != Uri.XS) Err.or(TESTINVALID, t, test);
+      //if(Type.find(test, false) == null) Err.or(TESTINVALID, t, test);
+      nm = trim(substring(nm, 0, i));
+    }
+
+    return (t == Type.ELM || t == Type.ATT) && eq(nm, WILD) ? null :
+      new QNm(nm, ctx);
+  }
+  
   /**
    * [142] Parses a DecimalLiteral.
    * @param tb start of number
@@ -2450,20 +2497,6 @@ public final class XQParser extends QueryParser {
     if(alter.length != 1) Err.or(alter);
     ctx.fun.funError((QNm) alter[0]);
     Err.or(FUNCUNKNOWN, ((QNm) alter[0]).str());
-  }
-
-  /**
-   * Finds and returns the specified node type.
-   * @param type type as string
-   * @return type or null
-   */
-  public static Type node(final QNm type) {
-    final byte[] ln = type.ln();
-    final byte[] uri = type.uri.str();
-    for(final Type t : Type.values()) {
-      if(t.node() && eq(ln, t.name) && eq(uri, t.uri)) return t;
-    }
-    return null;
   }
 
   /**

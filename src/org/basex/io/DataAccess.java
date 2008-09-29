@@ -63,7 +63,7 @@ public class DataAccess {
    * Flushes the buffered data.
    * @throws IOException in case of write errors
    */
-  public synchronized void flush() throws IOException {
+  public final synchronized void flush() throws IOException {
     for(int i = 0; i < BUFFERS; i++) {
       if(dirty[i]) writeBlock(buffer[i], pos[i]);
     }
@@ -83,7 +83,7 @@ public class DataAccess {
    * Returns file length.
    * @return file length
    */
-  public synchronized long length() {
+  public final synchronized long length() {
     return len;
   }
 
@@ -103,7 +103,7 @@ public class DataAccess {
    * @param p text position
    * @return read num
    */
-  public synchronized int readNum(final long p) {
+  public final synchronized int readNum(final long p) {
     cursor(p);
     return readNum();
   }
@@ -113,7 +113,7 @@ public class DataAccess {
    * @param p text position
    * @return text as byte array
    */
-  public synchronized byte[] readToken(final long p) {
+  public final synchronized byte[] readToken(final long p) {
     cursor(p);
     int l = readNum();
     
@@ -140,7 +140,7 @@ public class DataAccess {
    * Returns the current file position.
    * @return text as byte array
    */
-  public synchronized long pos() {
+  public final synchronized long pos() {
     return pos[c] + off;
   }
 
@@ -172,7 +172,7 @@ public class DataAccess {
    * @param p write position
    * @param v byte array to be appended
    */
-  public synchronized void writeBytes(final long p, final byte[] v) {
+  public final synchronized void writeBytes(final long p, final byte[] v) {
     cursor(p);
     writeNum(v.length);
     for(final byte b : v) write(b);
@@ -191,11 +191,11 @@ public class DataAccess {
    * Sets the disk cursor.
    * @param p read position
    */
-  public synchronized void cursor(final long p) {
+  public final synchronized void cursor(final long p) {
     off = (int) (p & BUFLIMIT);
     
     final long ps = p - off;
-    int o = c;
+    final int o = c;
     do {
       if(pos[c] == ps) return;
     } while((c = (c + 1) % BUFFERS) != o);
@@ -235,7 +235,7 @@ public class DataAccess {
    * Reads the next byte.
    * @return next byte
    */
-  public synchronized int read() {
+  public final synchronized int read() {
     if(off == BUFSIZE) {
       nextBlock();
       off = 0;
@@ -247,7 +247,7 @@ public class DataAccess {
    * Reads the next compressed number and returns it as integer.
    * @return next integer
    */
-  public synchronized int readNum() {
+  public final synchronized int readNum() {
     final int v = read();
     switch(v & 0xC0) {
     case 0:
@@ -266,7 +266,7 @@ public class DataAccess {
    * (without cursor correction).
    * @return integer value
    */
-  public synchronized int readInt() {
+  public final synchronized int readInt() {
     return (read() << 24) + (read() << 16) + (read() << 8) + read();
   }
   

@@ -15,14 +15,14 @@ import org.basex.query.xquery.XQResult;
 /**
  * XPath Test class.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-07, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public final class QueryTest {
   /** Database Context. */
   private final Context context = new Context();
 
-  /** Test Information. */  
+  /** Test Information. */
   static final String TESTINFO =
     "\nUsage: Test [options]" +
     "\n -h  show this help" +
@@ -57,7 +57,7 @@ public final class QueryTest {
     test(false);
     test(true);
   }
-  
+
 
   /**
    * Tests the specified query implementation.
@@ -83,7 +83,7 @@ public final class QueryTest {
   private boolean test(final boolean xquery, final AbstractTest test) {
     boolean ok = true;
 
-    String name = test.getClass().getSimpleName();
+    final String name = test.getClass().getSimpleName();
     System.out.println(name + " (" + test.queries.length + " queries)...");
     out("\nBuilding database...\n");
 
@@ -98,14 +98,14 @@ public final class QueryTest {
 
     for(final Object[] qu : test.queries) {
       out("- " + qu[0] + ": ");
-      boolean correct = qu.length == 3;
-      String query = qu[correct ? 2 : 1].toString();
+      final boolean correct = qu.length == 3;
+      final String query = qu[correct ? 2 : 1].toString();
 
       proc = xquery ? new XQuery(query) : new XPath(query);
       if(proc.execute(context)) {
         Result value = proc.result();
         if(xquery) value = ((XQResult) value).xpResult(context.data());
-        
+
         final Result cmp = correct ? (Result) qu[1] : null;
         if(value instanceof Nodes && cmp instanceof Nodes) {
           ((Nodes) cmp).data = ((Nodes) value).data;
@@ -119,7 +119,8 @@ public final class QueryTest {
         }
         out("ok\n");
       } else {
-        String info = proc.info().replaceAll("Stopped.*\\n(\\[.*?\\] )?", "");
+        final String info = proc.info().replaceAll(
+            "Stopped.*\\n(\\[.*?\\] )?", "");
         if(correct) {
           err(info + "\n", qu[0].toString());
           ok = false;
@@ -130,7 +131,7 @@ public final class QueryTest {
     }
     out("\n");
 
-    String db = context.data().meta.dbname;
+    final String db = context.data().meta.dbname;
     new Close().execute(context);
     DropDB.drop(db);
     return ok;

@@ -3,10 +3,10 @@ package org.basex.test.query;
 /**
  * XPathMark Simple Tests.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-07, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class FTTest extends AbstractTest {
+public final class FTTest extends AbstractTest {
   /** Constructor. */
   FTTest() {
     doc =
@@ -29,9 +29,9 @@ public class FTTest extends AbstractTest {
       "  <at><b>B</b>ad one</at>\n" +
       "  <fti>adfas wordt ook wel eens</fti>" + 
       "  <fti>wordt ook wel een s</fti>" +
-      "  <fti>adfad wordt ook wel eens a</fti>" +
-      "  <fti>adfad wordt ook wel een s adf</fti>" +
-      "  <fti>adfad wordt ook wel een s</fti>" +
+      "  <fti>adfad. wordt\nook wel.eens a</fti>" +
+      "  <fti>adfad wordt. ook\nwel een s adf</fti>" +
+      "  <fti>adfad wordt ook. wel een s</fti>" +
       "  <atr key='value'/>" +
       "</fttest>";
 
@@ -53,7 +53,6 @@ public class FTTest extends AbstractTest {
         { "Simple 7", bool(false),
           "//@key ftcontains 'values'" },
 
-          
         { "FT 1", nodes(14),
           "//w [text() ftcontains 'HELLO']" },
         { "FT 2", nodes(14),
@@ -62,6 +61,8 @@ public class FTTest extends AbstractTest {
           "//w [text() ftcontains '    hello!...   ']" },
         { "FT 4", nodes(),
           "//w [  text  (   )  ftcontains  '  crap  '  ]  " },
+        { "FT 5", nodes(),
+          "//w [text() ftcontains 'db']" },
 
         { "Phrase 1", nodes(7, 9, 11),
           "//w [text() ftcontains 'xml databases']" },
@@ -69,6 +70,8 @@ public class FTTest extends AbstractTest {
           "//w [text() ftcontains 'xml &amp; databases']" },
         { "Phrase 3", nodes(7, 9, 11),
           "//w [text() ftcontains 'xml :) databases :|']" },
+        { "Phrase 4", nodes(),
+          "//w [text() ftcontains 'xml db']" },
 
         { "FTDiacritics 1", nodes(17, 19),
           "//s [text() ftcontains 'diat joghurt']" },
@@ -218,6 +221,17 @@ public class FTTest extends AbstractTest {
         { "FTPosFilter 19", nodes(3),
           "//w [. ftcontains ('second' ftand 'fifth' " +
           "window 6 words) ftand 'the' distance exactly 3 words]" },
+        { "FTScope 1", nodes(25, 27, 31, 33),
+          "//fti [. ftcontains 'wordt ook' same sentence]" },
+        /*  
+        { "FTScope 2", nodes(29),
+          "//fti [. ftcontains 'wordt ook' different sentence]" },
+        { "FTScope 3", nodes(25),
+          "//fti [. ftcontains 'ook wel' same paragraph]" },
+        { "FTScope 4", nodes(29),
+          "//fti [. ftcontains 'ook wel' different paragraph]" },
+        */
+
         { "FTIndex1", nodes(25, 29),
           "/fttest/fti [text() ftcontains 'wordt ook wel eens']" },
         
@@ -272,11 +286,11 @@ public class FTTest extends AbstractTest {
      27  26   2   1  ELEM  fti
      28   1   1   1  TEXT  wordt ook wel een s
      29  28   2   1  ELEM  fti
-     30   1   1   1  TEXT  adfad wordt ook wel eens a
+     30   1   1   1  TEXT  adfad. wordt\nook wel eens a
      31  30   2   1  ELEM  fti
-     32   1   1   1  TEXT  adfad wordt ook wel een s adf
+     32   1   1   1  TEXT  adfad wordt. ook\nwel een s adf
      33  32   2   1  ELEM  fti
-     34   1   1   1  TEXT  adfad wordt ook wel een s
+     34   1   1   1  TEXT  adfad wordt ook. wel een s
      35  34   2   2  ELEM  atr
      36   1   1   1  ATTR  key="value"
      **/

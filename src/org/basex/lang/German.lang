@@ -53,7 +53,8 @@ d_info=Information
 d_fctitle=Verzeichnis
 d_export=XML-Dokument speichern
 
-dc_title=XML-Dokument or -Verzeichnis auswählen 
+dc_filter=Filter
+dc_title=XML-Dokument oder Verzeichnis
 dc_name=Name der Datenbank
 dc_xmldesc=XML-Dokumente
 dc_zipdesc=Gezippte XML-Dokumente
@@ -72,7 +73,7 @@ dc_ftcs=Groß- und Kleinschreibung
 dc_mainmem=Hauptspeicher-Modus
 dc_chopinfo=Diese Option entfernt Leerzeichen zwischen Tags und Textknoten
 dc_intparseinfo=Wenn die Option deaktiviert ist, wird der Java XML-Parser genutzt
-dc_entitiesinfo=Unbekannte Entities können mit dieser Option ignoriert werden
+dc_entitiesinfo=Unbekannte Entities (&...;) können mit dieser Option ignoriert werden
 dc_txtinfo=Die Indexierung von Textknoten beschleunigt XPath-Anfragen
 dc_attinfo=Die Indexierung von Attributknoten beschleunigt XPath-Anfragen
 dc_ftxinfo=Ein Volltext-Index beschleunigt XPath-FullText Anfragen
@@ -274,6 +275,7 @@ proc_nodb=Der Befehl benötigt eine Datenbank.
 proc_mm=Der Befehl ist im Hauptspeicher-Modus nicht verfügbar.
 proc_outmem=Der Hauptspeicher ist voll.\nDie folgenden Hinweise helfen vielleicht weiter:\n- Der verfügbare Speicher kann mit dem Java-Flag -Xmx<size> erhöht werden.\n- Mit 'set intparse on' kann der interne XML-Parser ausgewählt werden\n- Das Deaktivieren von Indizes spart Speicher.
 
+cmd_no=Befehl erwartet.
 cmd_unknown=Unbekannter Befehl "%"
 cmd_similar=Alternative: "%"
 cmd_ping=Verbindung erfolgreich.

@@ -1,9 +1,9 @@
 package org.basex.test;
 
+import static org.junit.Assert.*;
 import org.basex.util.GetOpts;
 import org.basex.util.StringList;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  * GetOpt Test class.
@@ -24,7 +24,7 @@ public final class GetOptTest {
 
   /**
    * Test of GetOpt.
-   * 
+   *
    * Testcases:
    *    "fs ls"
    *    "fs ls /music/IckeUndEr"
@@ -47,62 +47,62 @@ public final class GetOptTest {
      */
     g = new GetOpts("/music/IckeUndEr", "ahR");
     assertEquals("No Options entered - return -1", -1, g.getopt());
-    assertEquals("Path of fs testopt /music/IckeUndEr", 
+    assertEquals("Path of fs testopt /music/IckeUndEr",
         "/music/IckeUndEr", g.getPath());
   }
 
   /**
    * Test of GetOpt.
-   * 
+   *
    * Testcase:
    *  "fs ls -a";
    */
   @Test
   public void testOption1() {
-    String command = "-a";
-    int[] enteredOptions =  {'a'};    
-    int[] getOptResult = optionHelp(command, enteredOptions.length, "ahRli");
+    final String command = "-a";
+    final int[] enteredOptions =  {'a'};
+    final int[] res = optionHelp(command, enteredOptions.length, "ahRli");
 
-    for(int i = 0; i < enteredOptions.length; i++) {     
-      assertEquals(command, enteredOptions[i], getOptResult[i]);
+    for(int i = 0; i < enteredOptions.length; i++) {
+      assertEquals(command, enteredOptions[i], res[i]);
     }
     assertEquals("Path of " + command, null, returnedPath);
   }
 
   /**
    * Test of GetOpt.
-   * 
+   *
    * Testcase:
    *  % fs testopt -a -b
    *  aflag = 1, bflag = 1, cvalue = (null)
    */
   @Test
   public void testOption2() {
-    String command = "-a -b";
-    int[] enteredOptions =  {'a', 'b'};    
-    int[] getOptResult = optionHelp(command, enteredOptions.length, "ahRbli");
+    final String command = "-a -b";
+    final int[] enteredOptions =  {'a', 'b'};
+    final int[] res = optionHelp(command, enteredOptions.length, "ahRbli");
 
-    for(int i = 0; i < enteredOptions.length; i++) {          
-      assertEquals(command, enteredOptions[i], getOptResult[i]);
+    for(int i = 0; i < enteredOptions.length; i++) {
+      assertEquals(command, enteredOptions[i], res[i]);
     }
     assertEquals("Path of " + command, null, returnedPath);
   }
 
   /**
    * Test of GetOpt.
-   * 
+   *
    * Testcase:
    *  % fs testopt -ab
    *  aflag = 1, bflag = 1, cvalue = (null)
    */
   @Test
   public void testOption3() {
-    String command = "-ab";
-    int[] enteredOptions =  {'a', 'b'};    
-    int[] getOptResult = optionHelp(command, enteredOptions.length, "ahRbli");
+    final String command = "-ab";
+    final int[] enteredOptions =  {'a', 'b'};
+    final int[] res = optionHelp(command, enteredOptions.length, "ahRbli");
 
-    for(int i = 0; i < enteredOptions.length; i++) {          
-      assertEquals(command, enteredOptions[i], getOptResult[i]);
+    for(int i = 0; i < enteredOptions.length; i++) {
+      assertEquals(command, enteredOptions[i], res[i]);
       assertEquals("Argument of " + command, null, returnedArgument);
     }
     assertEquals("Path of " + command, null, returnedPath);
@@ -110,18 +110,18 @@ public final class GetOptTest {
 
   /**
    * Test of GetOpt.
-   * 
+   *
    * Testcase:
    *  % fs testopt -a -X
    */
   @Test
   public void testOption4() {
-    String command = "-a -X";
-    int[] enteredOptions =  {'a', 0 };    
-    int[] getOptResult = optionHelp(command, enteredOptions.length, "ahRbli");
+    final String command = "-a -X";
+    final int[] enteredOptions =  {'a', 0 };
+    final int[] res = optionHelp(command, enteredOptions.length, "ahRbli");
 
-    for(int i = 0; i < enteredOptions.length; i++) {          
-      assertEquals(command, enteredOptions[i], getOptResult[i]);
+    for(int i = 0; i < enteredOptions.length; i++) {
+      assertEquals(command, enteredOptions[i], res[i]);
       assertEquals("Argument of " + command, null, returnedArgument);
     }
     assertEquals("Path of " + command, null, returnedPath);
@@ -130,19 +130,19 @@ public final class GetOptTest {
 
   /**
    * Test of GetOpt.
-   * 
+   *
    * Testcase:
    *  % fs testopt -ab
    *  aflag = 1, bflag = 1, cvalue = (null)
    */
   @Test
   public void testOption5() {
-    String command = "-ab -c";
-    int[] enteredOptions =  {'a', 'b' , 'c'};    
-    int[] getOptResult = optionHelp(command, enteredOptions.length, "ahRblci");
+    final String command = "-ab -c";
+    final int[] enteredOptions =  {'a', 'b' , 'c'};
+    final int[] res = optionHelp(command, enteredOptions.length, "ahRblci");
 
-    for(int i = 0; i < enteredOptions.length; i++) {          
-      assertEquals(command, enteredOptions[i], getOptResult[i]);
+    for(int i = 0; i < enteredOptions.length; i++) {
+      assertEquals(command, enteredOptions[i], res[i]);
       assertEquals("Argument of " + command, null, returnedArgument);
     }
     assertEquals("Path of " + command, null, returnedPath);
@@ -150,19 +150,19 @@ public final class GetOptTest {
 
   /**
    * Test of GetOpt.
-   * 
+   *
    * Testcase:
    *  % fs testopt -ab
    *  aflag = 1, bflag = 1, cvalue = (null)
    */
   @Test
   public void testOption6() {
-    String command = "-YXb";
-    int[] enteredOptions =  {'Y', 0, 'b'};    
-    int[] getOptResult = optionHelp(command, enteredOptions.length, "YahRbli");
+    final String command = "-YXb";
+    final int[] enteredOptions =  {'Y', 0, 'b'};
+    final int[] res = optionHelp(command, enteredOptions.length, "YahRbli");
 
-    for(int i = 0; i < enteredOptions.length; i++) {          
-      assertEquals(command, enteredOptions[i], getOptResult[i]);
+    for(int i = 0; i < enteredOptions.length; i++) {
+      assertEquals(command, enteredOptions[i], res[i]);
       assertEquals("Argument of " + command, null, returnedArgument);
     }
     assertEquals("Path of " + command, null, returnedPath);
@@ -170,21 +170,21 @@ public final class GetOptTest {
 
   /**
    * Test of GetOpt.
-   * 
+   *
    * Testcase:
    *  % fs testopt -d ickeUndEr
    */
   @Test
   public void testOptionArgument1() {
-    String command = "-d ickeUndEr -a";
-    int[] enteredOptions =  {'d' , 'a'};    
-    String args = "ahRbd:li";
-    GetOpts g = new GetOpts(command, args);
+    final String command = "-d ickeUndEr -a";
+    final int[] enteredOptions =  {'d' , 'a'};
+    final String args = "ahRbd:li";
+    final GetOpts g = new GetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
 
-    while (ch != -1) {   
+    while (ch != -1) {
       assertEquals("Command " + command, enteredOptions[i], ch);
       if(ch == 'd') {
         assertEquals("Argument of " + command, "ickeUndEr", g.getOptarg());
@@ -199,22 +199,22 @@ public final class GetOptTest {
 
   /**
    * Test of GetOpt.
-   * 
+   *
    * Testcase:
    *  % fs testopt -dickeUndEr -R
    */
   @Test
   public void testOptionArgument2() {
-    String command = "-dickeUndEr -R";
-    int[] enteredOptions =  {'d', 'R'};    
-    String args = "ahRbd:li";
-    GetOpts g = new GetOpts(command, args);
+    final String command = "-dickeUndEr -R";
+    final int[] enteredOptions =  {'d', 'R'};
+    final String args = "ahRbd:li";
+    final GetOpts g = new GetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
 
-    while (ch != -1) {   
-      assertEquals("Command " + command, enteredOptions[i], ch);      
+    while (ch != -1) {
+      assertEquals("Command " + command, enteredOptions[i], ch);
       if(ch == 'd') {
         assertEquals("Argument of " + command, "ickeUndEr", g.getOptarg());
       } else {
@@ -230,22 +230,22 @@ public final class GetOptTest {
 
   /**
    * Test of GetOpt.
-   * 
+   *
    * Testcase:
    *  % fs testopt -d ickeUndEr
    */
   @Test
   public void testOptionArgument3() {
-    String command = "-d ickeUndEr -X";
-    int[] enteredOptions =  {'d', 0};    
-    String args = "ahRbd:li";
-    GetOpts g = new GetOpts(command, args);
+    final String command = "-d ickeUndEr -X";
+    final int[] enteredOptions =  {'d', 0};
+    final String args = "ahRbd:li";
+    final GetOpts g = new GetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
 
-    while (ch != -1) {   
-      assertEquals(command, enteredOptions[i], ch);      
+    while (ch != -1) {
+      assertEquals(command, enteredOptions[i], ch);
       if(ch == 'd') {
         assertEquals("Argument of " + command, "ickeUndEr", g.getOptarg());
       } else {
@@ -260,22 +260,22 @@ public final class GetOptTest {
 
   /**
    * Test of GetOpt.
-   * 
+   *
    * Testcase:
    *  % fs testopt -d ickeUndEr
    */
   @Test
   public void testOptionArgument4() {
-    String command = "-d icke -u";
-    int[] enteredOptions =  {'d', 'u'};   
-    String args = "ahRbd:lu";
-    GetOpts g = new GetOpts(command, args);
+    final String command = "-d icke -u";
+    final int[] enteredOptions =  {'d', 'u'};
+    final String args = "ahRbd:lu";
+    final GetOpts g = new GetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
 
-    while (ch != -1) {   
-      assertEquals(command, enteredOptions[i], ch);      
+    while (ch != -1) {
+      assertEquals(command, enteredOptions[i], ch);
       if(ch == 'd') {
         assertEquals("Argument of " + command, "icke", g.getOptarg());
       } else {
@@ -292,22 +292,22 @@ public final class GetOptTest {
 
   /**
    * Test of GetOpt.
-   * 
+   *
    * Testcase:
    *  % fs testopt -d ickeUndEr -iTest
    */
   @Test
   public void testOptionArgument5() {
-    String command = "-d ickeUndEr -iTest";
-    int[] enteredOptions =  {'d', 'i'}; 
-    String args = "ahRbd:li:";
-    GetOpts g = new GetOpts(command, args);
+    final String command = "-d ickeUndEr -iTest";
+    final int[] enteredOptions =  {'d', 'i'};
+    final String args = "ahRbd:li:";
+    final GetOpts g = new GetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
 
-    while (ch != -1) {   
-      assertEquals(command, enteredOptions[i], ch);      
+    while (ch != -1) {
+      assertEquals(command, enteredOptions[i], ch);
       if(ch == 'd') {
         assertEquals("Argument of " + command, "ickeUndEr", g.getOptarg());
       } else {
@@ -326,22 +326,22 @@ public final class GetOptTest {
 
   /**
    * Test of GetOpt.
-   * 
+   *
    * Testcase:
    *  % fs testopt -d ickeUndEr -R -iTest
    */
   @Test
   public void testOptionArgument6() {
-    String command = "-d ickeUndEr -R -iTest -h";
-    int[] enteredOptions =  {'d', 'R', 'i', 'h'}; 
-    String args = "ahRbd:li:";
-    GetOpts g = new GetOpts(command, args);
+    final String command = "-d ickeUndEr -R -iTest -h";
+    final int[] enteredOptions =  {'d', 'R', 'i', 'h'};
+    final String args = "ahRbd:li:";
+    final GetOpts g = new GetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
 
-    while (ch != -1) {   
-      assertEquals(command, enteredOptions[i], ch);      
+    while (ch != -1) {
+      assertEquals(command, enteredOptions[i], ch);
       if(ch == 'd') {
         assertEquals("Argument of " + command, "ickeUndEr", g.getOptarg());
       } else {
@@ -359,22 +359,22 @@ public final class GetOptTest {
 
   /**
    * Test of GetOpt.
-   * 
+   *
    * Testcase:
    *  % fs testopt -d ickeUndEr -R -iTest
    */
   @Test
   public void testOptionArgument7() {
-    String command = "-d ickeUndEr -R -iTest -h";
-    int[] enteredOptions =  {'d', 'R', 'i', 'h'}; 
-    String args = "ah:Rbd:li:";
-    GetOpts g = new GetOpts(command, args);
+    final String command = "-d ickeUndEr -R -iTest -h";
+    final int[] enteredOptions =  {'d', 'R', 'i', 'h'};
+    final String args = "ah:Rbd:li:";
+    final GetOpts g = new GetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
 
-    while (ch != -1) {   
-      assertEquals(command, enteredOptions[i], ch);      
+    while (ch != -1) {
+      assertEquals(command, enteredOptions[i], ch);
       if(ch == 'd') {
         assertEquals("Argument of " + command, "ickeUndEr", g.getOptarg());
       } else {
@@ -393,32 +393,32 @@ public final class GetOptTest {
     }
     assertEquals("Path of " + command, null, g.getPath());
   }
-  
+
   /**
    * Test of GetOpt.
-   * 
+   *
    * Testcase:
    *  % testopt -d ickeUndEr -R -iTest -h
    */
   @Test
   public void testOptionArgument8() {
-    String command = "-d ickeUndEr -R -iTest -h";
-    int[] enteredOptions =  {'d', 'R', 'h'}; 
-    String args = "ahR:bd:li:";
-    GetOpts g = new GetOpts(command, args);
+    final String command = "-d ickeUndEr -R -iTest -h";
+    final int[] enteredOptions =  {'d', 'R', 'h'};
+    final String args = "ahR:bd:li:";
+    final GetOpts g = new GetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
 
-    while (ch != -1) {   
-      assertEquals(command, enteredOptions[i], ch);      
+    while (ch != -1) {
+      assertEquals(command, enteredOptions[i], ch);
       if(ch == 'd') {
         assertEquals("Argument of " + command, "ickeUndEr", g.getOptarg());
       } else {
         if(ch == 'i') {
           assertEquals("Argument of " + command, "Test", g.getOptarg());
         } else {
-          if(ch == 'R') {   
+          if(ch == 'R') {
 //            assertEquals("Argument of " + command, ":", g.getOptarg());
           } else {
             assertEquals("Argument of " + command, null, g.getOptarg());
@@ -433,22 +433,22 @@ public final class GetOptTest {
 
   /**
    * Test of GetOpt.
-   * 
+   *
    * Testcase:
    *  % fs testopt -d ickeUndEr -R -iTest /Itunes/music/
    */
   @Test
   public void testAll1() {
-    String command = "-d ickeUndEr -R -iTest /Itunes/music/";
-    int[] enteredOptions =  {'d', 'R', 'i'};    
-    String args = "ahRbd:li:";
-    GetOpts g = new GetOpts(command, args);
+    final String command = "-d ickeUndEr -R -iTest /Itunes/music/";
+    final int[] enteredOptions =  {'d', 'R', 'i'};
+    final String args = "ahRbd:li:";
+    final GetOpts g = new GetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
 
-    while (ch != -1) {   
-      assertEquals(command, enteredOptions[i], ch);      
+    while (ch != -1) {
+      assertEquals(command, enteredOptions[i], ch);
       if(ch == 'd') {
         assertEquals("Argument of " + command, "ickeUndEr", g.getOptarg());
       } else {
@@ -466,23 +466,23 @@ public final class GetOptTest {
 
   /**
    * Test of GetOpt.
-   * 
+   *
    * Testcase:
    *  % fs testopt /Itunes/music/ -d ickeUndEr -R -iTest
    *  X is a nonvalid option
    */
   @Test
   public void testAll2() {
-    String command = "/Itunes/music/ -d ickeUndEr -R -iTest ";
-    int[] enteredOptions =  {'d', 'R', 'i'};    
-    String args = "ahRbd:li:";
-    GetOpts g = new GetOpts(command, args);
+    final String command = "/Itunes/music/ -d ickeUndEr -R -iTest ";
+    final int[] enteredOptions =  {'d', 'R', 'i'};
+    final String args = "ahRbd:li:";
+    final GetOpts g = new GetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
 
-    while (ch != -1) {   
-      assertEquals(command, enteredOptions[i], ch);      
+    while (ch != -1) {
+      assertEquals(command, enteredOptions[i], ch);
       if(ch == 'd') {
         assertEquals("Argument of " + command, "ickeUndEr", g.getOptarg());
       } else {
@@ -501,23 +501,23 @@ public final class GetOptTest {
 
   /**
    * Test of GetOpt.
-   * 
+   *
    * Testcase:
    *  % fs testopt /Itunes/music/ -d ickeUndEr -R -iTest
    *  X is a nonvalid option
    */
   @Test
   public void testAll3() {
-    String command = "-d ickeUndEr /Itunes/music/ -R -iTest -X";
-    int[] enteredOptions =  {'d', 'R', 'i', 0}; 
-    String args = "ahRbd:li:";
-    GetOpts g = new GetOpts(command, args);
+    final String command = "-d ickeUndEr /Itunes/music/ -R -iTest -X";
+    final int[] enteredOptions =  {'d', 'R', 'i', 0};
+    final String args = "ahRbd:li:";
+    final GetOpts g = new GetOpts(command, args);
 
     int ch = g.getopt();
     int i = 0;
 
-    while (ch != -1) {   
-      assertEquals(command, enteredOptions[i], ch);      
+    while (ch != -1) {
+      assertEquals(command, enteredOptions[i], ch);
       if(ch == 'd') {
         assertEquals("Argument of " + command, "ickeUndEr", g.getOptarg());
       } else {
@@ -535,29 +535,29 @@ public final class GetOptTest {
 
   /**
    * Test of GetOpt.
-   * 
+   *
    * Testcase:
    *  % fs testopt /Itunes/music/ -d ickeUndEr -R -iTest
    *  X is a nonvalid option
    */
   @Test
   public void testSourceAndTarget() {
-    String command = "ickeUndEr.txt icke.txt";    
-    String args = "ahRbd:li:";
-    GetOpts g = new GetOpts(command, args);
-    g.getopt();   
-    StringList argsOfGetopt = g.getFoundArgs();    
+    final String command = "ickeUndEr.txt icke.txt";
+    final String args = "ahRbd:li:";
+    final GetOpts g = new GetOpts(command, args);
+    g.getopt();
+    final StringList argsOfGetopt = g.getFoundArgs();
     if(argsOfGetopt.size == 2) {
       assertEquals("Path of " + command,
           "ickeUndEr.txt", argsOfGetopt.remove(0));
-      assertEquals("Path of " + command, 
+      assertEquals("Path of " + command,
           "icke.txt", argsOfGetopt.remove(0));
     }
   }
 
   /**
    * Performs a getopt command and returns the arguments returned by getopt.
-   * 
+   *
    * @param length  expected results.
    * @param args  arguments.
    * @param command  passed by the "command line".
@@ -566,18 +566,18 @@ public final class GetOptTest {
   public int[] optionHelp(final String command, final int length,
       final String args) {
 
-    int[] getOptResult = new int[length]; 
+    final int[] res = new int[length];
     int index;
-    GetOpts g = new GetOpts(command, args);
+    final GetOpts g = new GetOpts(command, args);
     int ch = g.getopt();
     index = 0;
-    while (ch != -1) {      
-      getOptResult[index] = ch;
+    while (ch != -1) {
+      res[index] = ch;
       ch = g.getopt();
       ++index;
     }
     returnedArgument = g.getOptarg();
     returnedPath = g.getPath();
-    return getOptResult;
+    return res;
   }
 }

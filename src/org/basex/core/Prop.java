@@ -100,6 +100,8 @@ public final class Prop {
   public static boolean mainmem = false;
   /** Flag for creating databases on-the-fly (in memory). */
   public static boolean onthefly = false;
+  /** Path for filtering XML Documents. */
+  public static String createfilter = "*.*";
 
   /** Flag for creating a fuzzy index. */
   public static boolean ftfuzzy = true;

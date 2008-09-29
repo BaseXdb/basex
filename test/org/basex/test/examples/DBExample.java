@@ -8,7 +8,7 @@ import org.basex.io.*;
  * This class serves as an example for creating and processing database
  * instances.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-07, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public final class DBExample {

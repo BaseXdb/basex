@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.util.HashMap;
+
 import org.basex.data.Data;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
@@ -125,9 +126,9 @@ public final class RealView extends View {
 
     }
 
-    //  
+    //
     //  // TODO: overlap
-    //  
+    //
 
     //    System.out.println("Perf: " + perf.getTime());
   }
@@ -141,8 +142,7 @@ public final class RealView extends View {
     final Data data = GUI.context.data();
     int level = 0;
     sumNodeSizeInLine = data.size;
-    parentList = new IntList();
-    parentList.add(root);
+    parentList = new IntList(root);
     parentPos = null;
     while(parentList.size > 0) {
       drawTemperature(g, level);
@@ -153,7 +153,7 @@ public final class RealView extends View {
   }
 
   /**
-   * Saves node line in parentList. 
+   * Saves node line in parentList.
    */
   private void getNextNodeLine() {
     final Data data = GUI.context.data();
@@ -162,7 +162,7 @@ public final class RealView extends View {
     int sumNodeSize = 0;
 
     for(int i = 0; i < l; i++) {
-      int p = parentList.get(i);
+      final int p = parentList.get(i);
 
       if(p == -1) {
         continue;
@@ -194,13 +194,13 @@ public final class RealView extends View {
   private void drawTemperature(final Graphics g, final int level) {
     final Data data = GUI.context.data();
     final int size = parentList.size;
-    HashMap<Integer, Integer> temp = new HashMap<Integer, Integer>();
+    final HashMap<Integer, Integer> temp = new HashMap<Integer, Integer>();
     int x = 0;
     final int y = 1 * level * fontHeight * 2;
     final double width = this.getSize().width - 1;
     final int ratio = (int) Math.rint(width / size);
     final int minSpace = 39; // minimum Space for Tags
-    boolean space = ratio > minSpace ? true : false;
+    final boolean space = ratio > minSpace ? true : false;
 
     for(int i = 0; i < size; i++) {
       final int pre = parentList.get(i);
@@ -220,21 +220,21 @@ public final class RealView extends View {
       g.setColor(new Color(c, 0, 255 - c));
       g.fillRect(x + 1, y + 1, ratio - 1, fontHeight - 1);
 
-      int boxMiddle = x + Math.round(ratio / 2f);
+      final int boxMiddle = x + Math.round(ratio / 2f);
       g.setColor(Color.black);
 
-      if(space) { 
-        String s = Token.string(data.tag(pre));
-        int textWidth = BaseXLayout.width(g, s);
+      if(space) {
+        final String s = Token.string(data.tag(pre));
+        final int textWidth = BaseXLayout.width(g, s);
         g.drawString(s, boxMiddle - textWidth / 2, y + fontHeight - 2);
       }
-        
+
       //      System.out.println(boxMiddle);
 
       if(parentPos != null) {
 
-        int line = Math.round(fontHeight / 4f);
-        int parentMiddle = parentPos.get(data.parent(pre, Data.ELEM));
+        final int line = Math.round(fontHeight / 4f);
+        final int parentMiddle = parentPos.get(data.parent(pre, Data.ELEM));
         g.drawLine(boxMiddle, y, boxMiddle, y - line);
 
         g.drawLine(boxMiddle, y - line, parentMiddle, y - line);
@@ -275,8 +275,8 @@ public final class RealView extends View {
     g.drawRect(xstart - margin, y - fontHeight, textWidth + 2 * margin,
         fontHeight + margin);
 
-    //    g.drawRoundRect(xstart - margin, y - fontHeight, textWidth 
-    //    + 2 * margin, 
+    //    g.drawRoundRect(xstart - margin, y - fontHeight, textWidth
+    //    + 2 * margin,
     //        fontHeight + margin, arcWH, arcWH);
   }
 
@@ -299,7 +299,7 @@ public final class RealView extends View {
     int pre;
     /** The x-value of the left frame border. */
     int border = frameleft;
-    /** To engage inaccuracies during the measure method, this measures 
+    /** To engage inaccuracies during the measure method, this measures
      * the size that is left after a child got it's space. */
     int sizeleft = space;
     int childframewidth = -1;
@@ -443,7 +443,7 @@ public final class RealView extends View {
 
   }
 
-  /** 
+  /**
    * Draws pre-post-tree.
    * @param g graphics reference
    * @param pre the pre value of the current node

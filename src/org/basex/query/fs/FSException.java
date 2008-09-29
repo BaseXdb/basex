@@ -10,7 +10,7 @@ import org.basex.BaseX;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class FSException extends IOException {
+public final class FSException extends IOException {
   /** Error strings. */
   private static final String[] FSERR = new String[128];
 

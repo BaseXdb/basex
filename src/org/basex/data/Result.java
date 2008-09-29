@@ -28,4 +28,6 @@ public interface Result {
    * @throws IOException exception
    */
   void serialize(Serializer ser) throws IOException;
+  
+  // <CG> add iterator
 }

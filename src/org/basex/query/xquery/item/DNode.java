@@ -148,7 +148,7 @@ public final class DNode extends Nod {
     final byte[] name = nname();
     nm.name(name);
     // [CG] next line slows it down pretty much...
-    int n = data.ns.get(name, pre);
+    final int n = data.ns.get(name, pre);
     if(n > 0) nm.uri = Uri.uri(data.ns.key(n));
     
     /* [CG] DNode/Namespaces: introduce correct namespace handling

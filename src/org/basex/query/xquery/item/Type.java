@@ -3,13 +3,10 @@ package org.basex.query.xquery.item;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.regex.Pattern;
 import javax.xml.namespace.QName;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import org.basex.BaseX;
 import org.basex.api.dom.BXAttr;
 import org.basex.api.dom.BXComment;
@@ -17,9 +14,9 @@ import org.basex.api.dom.BXDoc;
 import org.basex.api.dom.BXElement;
 import org.basex.api.dom.BXPI;
 import org.basex.api.dom.BXText;
+import org.basex.build.xml.DOCWrapper;
 import org.basex.core.proc.CreateDB;
-import org.basex.io.CachedOutput;
-import org.basex.io.IOContent;
+import org.basex.data.Data;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.iter.NodIter;
@@ -399,7 +396,7 @@ public enum Type {
     }
     @Override
     public Item e(final Object o) throws XQException {
-      return new Dur(token(o.toString()));
+      return e(Str.get(o), null);
     }
   },
 
@@ -412,7 +409,7 @@ public enum Type {
     }
     @Override
     public Item e(final Object o) throws XQException {
-      return new YMd(token(o.toString()));
+      return e(Str.get(o), null);
     }
   },
 
@@ -425,7 +422,7 @@ public enum Type {
     }
     @Override
     public Item e(final Object o) throws XQException {
-      return new DTd(token(o.toString()));
+      return e(Str.get(o), null);
     }
   },
 
@@ -438,7 +435,7 @@ public enum Type {
     }
     @Override
     public Item e(final Object o) throws XQException {
-      return new Dtm(token(o.toString()));
+      return e(Str.get(o), null);
     }
   },
 
@@ -451,7 +448,7 @@ public enum Type {
     }
     @Override
     public Item e(final Object o) throws XQException {
-      return new Dat(token(o.toString()));
+      return e(Str.get(o), null);
     }
   },
 
@@ -464,7 +461,7 @@ public enum Type {
     }
     @Override
     public Item e(final Object o) throws XQException {
-      return new Tim(token(o.toString()));
+      return e(Str.get(o), null);
     }
   },
 
@@ -472,12 +469,12 @@ public enum Type {
   YMO("gYearMonth", AAT, XSURI, false, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
-      return it.type == DTM || it.type == DAT ? new YMo((Date) it) :
-        checkStr(it) ? new YMo(it.str()) : error(it);
+      return it.type == DTM || it.type == DAT ? new DSim((Date) it, this) :
+        checkStr(it) ? new DSim(it.str(), this) : error(it);
     }
     @Override
     public Item e(final Object o) throws XQException {
-      return new YMo(token(o.toString()));
+      return e(Str.get(o), null);
     }
   },
 
@@ -485,12 +482,12 @@ public enum Type {
   YEA("gYear", AAT, XSURI, false, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
-      return it.type == DTM || it.type == DAT ? new Yea((Date) it) :
-        checkStr(it) ? new Yea(it.str()) : error(it);
+      return it.type == DTM || it.type == DAT ? new DSim((Date) it, this) :
+        checkStr(it) ? new DSim(it.str(), this) : error(it);
     }
     @Override
     public Item e(final Object o) throws XQException {
-      return new Yea(token(o.toString()));
+      return e(Str.get(o), null);
     }
   },
 
@@ -498,12 +495,12 @@ public enum Type {
   MDA("gMonthDay", AAT, XSURI, false, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
-      return it.type == DTM || it.type == DAT ? new MDa((Date) it) :
-        checkStr(it) ? new MDa(it.str()) : error(it);
+      return it.type == DTM || it.type == DAT ? new DSim((Date) it, this) :
+        checkStr(it) ? new DSim(it.str(), this) : error(it);
     }
     @Override
     public Item e(final Object o) throws XQException {
-      return new MDa(token(o.toString()));
+      return e(Str.get(o), null);
     }
   },
 
@@ -511,12 +508,12 @@ public enum Type {
   DAY("gDay", AAT, XSURI, false, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
-      return it.type == DTM || it.type == DAT ? new Day((Date) it) :
-        checkStr(it) ? new Day(it.str()) : error(it);
+      return it.type == DTM || it.type == DAT ? new DSim((Date) it, this) :
+        checkStr(it) ? new DSim(it.str(), this) : error(it);
     }
     @Override
     public Item e(final Object o) throws XQException {
-      return new Day(token(o.toString()));
+      return e(Str.get(o), null);
     }
   },
 
@@ -524,12 +521,12 @@ public enum Type {
   MON("gMonth", AAT, XSURI, false, false, false, false) {
     @Override
     public Item e(final Item it, final XQContext ctx) throws XQException {
-      return it.type == DTM || it.type == DAT ? new Mon((Date) it) :
-        checkStr(it) ? new Mon(it.str()) : error(it);
+      return it.type == DTM || it.type == DAT ? new DSim((Date) it, this) :
+        checkStr(it) ? new DSim(it.str(), this) : error(it);
     }
     @Override
     public Item e(final Object o) throws XQException {
-      return new Mon(token(o.toString()));
+      return e(Str.get(o), null);
     }
   },
 
@@ -579,7 +576,9 @@ public enum Type {
       return it.s() ? Uri.uri(it.str()) : error(it);
     }
     @Override
-    public Item e(final Object o) { return Uri.uri(token(o.toString())); }
+    public Item e(final Object o) {
+      return Uri.uri(token(o.toString()));
+    }
   },
 
   /** QName Type. */
@@ -589,10 +588,14 @@ public enum Type {
       if(it.type != STR) error(it);
       final byte[] s = trim(it.str());
       if(s.length == 0) Err.or(QNMINV, s);
+      // tiresome test to disallow "xs:QName(xs:string(...))"
+      if(!((Str) it).direct) Err.cast(this, it);
       return new QNm(s, ctx);
     }
     @Override
-    public Item e(final Object o) { return new QNm((QName) o); }
+    public Item e(final Object o) {
+      return new QNm((QName) o);
+    }
   },
 
   /** NOTATION Type. */
@@ -604,7 +607,7 @@ public enum Type {
   /** Text type. */
   TXT("text", NOD, EMPTY, false, true, false, false) {
     @Override
-    public Item e(final Object o) {
+    public Nod e(final Object o) {
       if(o instanceof BXText) return ((BXText) o).getNod();
       return new FTxt(token(((Text) o).getNodeValue()), null);
     }
@@ -613,7 +616,7 @@ public enum Type {
   /** PI type. */
   PI("processing-instruction", NOD, EMPTY, false, true, false, false) {
     @Override
-    public Item e(final Object o) {
+    public Nod e(final Object o) {
       if(o instanceof BXPI) return ((BXPI) o).getNod();
       
       final ProcessingInstruction pi = (ProcessingInstruction) o;
@@ -625,7 +628,7 @@ public enum Type {
   /** Element type. */
   ELM("element", NOD, EMPTY, false, true, false, false) {
     @Override
-    public Item e(final Object o) {
+    public Nod e(final Object o) {
       if(o instanceof BXElement) return ((BXElement) o).getNod();
 
       // [CG] add complete DOM object for elements
@@ -637,26 +640,20 @@ public enum Type {
   /** Document type. */
   DOC("document-node", NOD, EMPTY, false, true, false, false) {
     @Override
-    public Item e(final Object o) throws XQException {
-      try {
-        if(o instanceof BXDoc) return ((BXDoc) o).getNod();
-
-        // [CG] avoid database creation if possible
-        if(o instanceof Document) {
-          final TransformerFactory tf = TransformerFactory.newInstance();
-          final Transformer tr = tf.newTransformer();
-          final CachedOutput out = new CachedOutput();
-          tr.transform(new DOMSource((Document) o), new StreamResult(out));
-          final IOContent cont = new IOContent(out.finish());
-          return new DNode(CreateDB.xml(cont, "tmp"), 0);
+    public Nod e(final Object o) throws XQException {
+      if(o instanceof BXDoc) return ((BXDoc) o).getNod();
+      
+      if(o instanceof Document) {
+        try {
+          final Data data = CreateDB.xml(new DOCWrapper((Document) o), "tmp");
+          return new DNode(data, 0);
+        } catch(final IOException ex) {
+          throw new XQException(UNDOC, ex.getMessage());
         }
-        
-        // [CG] add complete DOM object for document fragments
-        return new FDoc(new NodIter(), Token.EMPTY);
-
-      } catch(final Exception ex) {
-        throw new XQException(UNDOC, ex.getMessage());
       }
+        
+      // [CG] add complete DOM object for document fragments
+      return new FDoc(new NodIter(), Token.EMPTY);
     }
   },
 
@@ -666,7 +663,7 @@ public enum Type {
   /** Attribute type. */
   ATT("attribute", NOD, EMPTY, false, true, false, false) {
     @Override
-    public Item e(final Object o) {
+    public Nod e(final Object o) {
       if(o instanceof BXAttr) return ((BXAttr) o).getNod();
 
       final Attr at = (Attr) o;
@@ -678,7 +675,7 @@ public enum Type {
   /** Comment type. */
   COM("comment", NOD, EMPTY, false, true, false, false) {
     @Override
-    public Item e(final Object o) {
+    public Nod e(final Object o) {
       if(o instanceof BXComment) return ((BXComment) o).getNod();
 
       return new FComm(token(((Comment) o).getNodeValue()), null);
@@ -715,7 +712,7 @@ public enum Type {
    */
   @SuppressWarnings("unused")
   public Item e(final Item it, final XQContext ctx) throws XQException {
-    BaseX.notexpected(); return null;
+    return it.type != this ? error(it) : it;
   }
 
   /**
@@ -727,7 +724,8 @@ public enum Type {
    */
   @SuppressWarnings("unused")
   public Item e(final Object o) throws XQException {
-    BaseX.notexpected(); return null;
+    BaseX.notexpected(o);
+    return null;
   }
 
   /**
@@ -863,9 +861,23 @@ public enum Type {
     final byte[] ln = type.ln();
     final byte[] uri = type.uri.str();
 
-    for(final Type t : Type.values()) {
+    for(final Type t : values()) {
       if(eq(t.name, ln) && eq(uri, t.uri) &&
           (nodes || t.par != null && t != AAT)) return t;
+    }
+    return null;
+  }
+
+  /**
+   * Finds and returns the specified node type.
+   * @param type type as string
+   * @return type or null
+   */
+  public static Type node(final QNm type) {
+    final byte[] ln = type.ln();
+    final byte[] uri = type.uri.str();
+    for(final Type t : Type.values()) {
+      if(t.node() && eq(ln, t.name) && eq(uri, t.uri)) return t;
     }
     return null;
   }

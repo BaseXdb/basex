@@ -27,7 +27,7 @@ public final class CmpV extends Arr {
       @Override
       public boolean e(final Item a, final Item b) throws XQException {
         final int v = a.diff(b);
-        return v != Integer.MIN_VALUE && v <= 0;
+        return v != UNDEF && v <= 0;
       }
     },
 
@@ -36,7 +36,7 @@ public final class CmpV extends Arr {
       @Override
       public boolean e(final Item a, final Item b) throws XQException {
         final int v = a.diff(b);
-        return v != Integer.MIN_VALUE && v < 0;
+        return v != UNDEF && v < 0;
       }
     },
 
@@ -45,7 +45,7 @@ public final class CmpV extends Arr {
       @Override
       public boolean e(final Item a, final Item b) throws XQException {
         final int v = a.diff(b);
-        return v != Integer.MIN_VALUE && v >= 0;
+        return v != UNDEF && v >= 0;
       }
     },
 
@@ -54,7 +54,7 @@ public final class CmpV extends Arr {
       @Override
       public boolean e(final Item a, final Item b) throws XQException {
         final int v = a.diff(b);
-        return v != Integer.MIN_VALUE && v > 0;
+        return v != UNDEF && v > 0;
       }
     },
 

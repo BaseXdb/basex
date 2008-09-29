@@ -32,36 +32,36 @@ import org.basex.util.Token;
  */
 public final class DialogCreate extends Dialog {
   /** Database Input. */
-  BaseXTextField input;
+  private final BaseXTextField input;
+  /** Database Input. */
+  private final BaseXTextField filter;
   /** Input info. */
-  final BaseXLabel info1;
+  private final BaseXLabel info1;
   /** Database name. */
-  BaseXTextField dbname;
+  private final BaseXTextField dbname;
   /** Database info. */
-  final BaseXLabel info2;
+  private final BaseXLabel info2;
   
-  /** File counter. */
-  private BaseXLabel count;
   /** Internal XML parsing. */
-  private BaseXCheckBox intparse;
+  private final BaseXCheckBox intparse;
   /** Whitespace chopping. */
-  private BaseXCheckBox chop;
+  private final BaseXCheckBox chop;
   /** Entities mode. */
-  private BaseXCheckBox entities;
+  private final BaseXCheckBox entities;
   /** Indexing mode. */
-  private BaseXCheckBox txtindex;
+  private final BaseXCheckBox txtindex;
   /** Indexing mode. */
-  private BaseXCheckBox atvindex;
+  private final BaseXCheckBox atvindex;
   /** Word Indexing mode. */
-  private BaseXCheckBox ftxindex;
+  private final BaseXCheckBox ftxindex;
   /** Fulltext indexing. */
-  private BaseXCheckBox[] ft = new BaseXCheckBox[4];
+  private final BaseXCheckBox[] ft = new BaseXCheckBox[4];
   /** Fulltext labels. */
-  private BaseXLabel[] fl = new BaseXLabel[4];
+  private final BaseXLabel[] fl = new BaseXLabel[4];
   /** Buttons. */
-  private BaseXBack buttons;
+  private final BaseXBack buttons;
   /** Available databases. */
-  final StringList db = List.list();
+  private final StringList db = List.list();
 
   /**
    * Default Constructor.
@@ -75,18 +75,22 @@ public final class DialogCreate extends Dialog {
     p1.setLayout(new TableLayout(7, 1));
     p1.setBorder(8, 8, 8, 8);
  
-    count = new BaseXLabel(CREATETITLE + " (*.xml):");
-    p1.add(count);
-
     final BaseXBack p = new BaseXBack();
-    p.setLayout(new TableLayout(1, 3, 6, 0));
+    p.setLayout(new TableLayout(2, 3, 6, 0));
 
     input = new BaseXTextField(GUIProp.createpath, null, this);
     input.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) { action(null); }
     });
-    BaseXLayout.setWidth(input, 300);
+    BaseXLayout.setWidth(input, 240);
+
+    filter = new BaseXTextField(Prop.createfilter, null, this);
+    input.addKeyListener(new KeyAdapter() {
+      @Override
+      public void keyReleased(final KeyEvent e) { action(null); }
+    });
+    BaseXLayout.setWidth(filter, 54);
 
     final BaseXButton button = new BaseXButton(BUTTONBROWSE, HELPBROWSE, this);
     button.addActionListener(new ActionListener() {
@@ -95,7 +99,11 @@ public final class DialogCreate extends Dialog {
       }
     });
 
+    p.add(new BaseXLabel(CREATETITLE + ":"));
+    p.add(new BaseXLabel(CREATEFILTER + ":"));
+    p.add(new BaseXLabel(""));
     p.add(input);
+    p.add(filter);
     p.add(button);
     p1.add(p);
     
@@ -145,12 +153,12 @@ public final class DialogCreate extends Dialog {
     p3.setLayout(new TableLayout(10, 1, 0, 0));
     p3.setBorder(8, 8, 8, 8);
 
-    txtindex = new BaseXCheckBox(INFOTXTINDEX, Token.token(TXTINDEXINFO),
+    txtindex = new BaseXCheckBox(INFOTEXTINDEX, Token.token(TXTINDEXINFO),
         Prop.textindex, 0, this);
     p3.add(txtindex);
     p3.add(new BaseXLabel(TXTINDEXINFO, 8));
 
-    atvindex = new BaseXCheckBox(INFOATVINDEX, Token.token(ATTINDEXINFO),
+    atvindex = new BaseXCheckBox(INFOATTRINDEX, Token.token(ATTINDEXINFO),
         Prop.attrindex, 0, this);
     p3.add(atvindex);
     p3.add(new BaseXLabel(ATTINDEXINFO, 8));
@@ -241,12 +249,13 @@ public final class DialogCreate extends Dialog {
     final IO file = IO.get(path);
     final boolean exists = path.length() != 0 && file.exists();
     if(exists) GUIProp.createpath = file.getDir();
-    
+    filter.setEnabled(exists && file.isDir());
+
     final String nm = dbname();
     dbname.setEnabled(exists);
     ok = exists && nm.length() != 0;
     
-    String inf1 = !exists ? PATHWHICH : " ";
+    final String inf1 = !exists ? PATHWHICH : " ";
     String inf2 = "";
     if(ok) {
       ok = IO.valid(nm);
@@ -263,6 +272,7 @@ public final class DialogCreate extends Dialog {
     if(!ok) return;
     super.close();
     Prop.chop  = chop.isSelected();
+    Prop.createfilter = filter.getText();
     Prop.entity   = entities.isSelected();
     Prop.textindex = txtindex.isSelected();
     Prop.attrindex = atvindex.isSelected();

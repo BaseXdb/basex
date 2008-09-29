@@ -59,9 +59,9 @@ public final class Id extends Func {
     for(final byte[] v : values) {
       if(data.meta.atvindex) {
         final ValuesToken tok = new ValuesToken(false, v);
-        IndexIterator it = data.ids(tok);
+        final IndexIterator it = data.ids(tok);
         while(it.more()) {
-          int i = it.next();
+          final int i = it.next();
           if(data.attNameID(i) == id) tmp.add(data.parent(i, data.kind(i)));
         }
       } else {

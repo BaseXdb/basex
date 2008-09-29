@@ -22,7 +22,7 @@ import org.basex.gui.GUIConstants.FILL;
  */
 public final class BaseXDSlider extends BaseXPanel {
   /** Slider width. */
-  public static final DateFormat DATE = new SimpleDateFormat("dd.MM.yyyy");
+  public final DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
   /** Slider width. */
   public static final int ARROW = 17;
   /** Label space. */
@@ -114,7 +114,7 @@ public final class BaseXDSlider extends BaseXPanel {
       if(sz > (1L << 10)) return ((sz + (1L <<  9)) >> 10) + " KB";
       return sz + " Bytes";
     }
-    if(date) return DATE.format(new Date((long) size * 60000));
+    if(date) return df.format(new Date((long) size * 60000));
 
     return (long) size == size ? Long.toString((long) size) :
       Double.toString(size);

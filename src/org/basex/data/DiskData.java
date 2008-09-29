@@ -96,12 +96,12 @@ public final class DiskData extends Data {
     values = new DataAccess(db, DATAATV);
 
     if(index) {
-      if(meta.txtindex) openIndex(
-          IndexToken.TYPE.TXT, new Values(this, db, true));
-      if(meta.atvindex) openIndex(
-          IndexToken.TYPE.ATV, new Values(this, db, false));
-      if(meta.ftxindex) openIndex(IndexToken.TYPE.FTX, meta.ftfuzzy ?
-          new FTFuzzy(this, db) : new FTTrie(this, db));
+      if(meta.txtindex) openIndex(IndexToken.TYPE.TXT,
+          new Values(this, db, true));
+      if(meta.atvindex) openIndex(IndexToken.TYPE.ATV,
+          new Values(this, db, false));
+      if(meta.ftxindex) openIndex(IndexToken.TYPE.FTX,
+          meta.ftfz ? new FTFuzzy(this, db) : new FTTrie(this, db));
     }
     initNames();
   }
@@ -426,7 +426,7 @@ public final class DiskData extends Data {
     // increase sizes
     int p = par;
     while(p >= 0) {
-      int k = kind(p);
+      final int k = kind(p);
       size(p, k, size(p, k) + s);
       p = parent(p, k);
     }
@@ -441,7 +441,7 @@ public final class DiskData extends Data {
   private void updateDist(final int pre, final int s) {
     int p = pre;
     while(p < size) {
-      int k = kind(p);
+      final int k = kind(p);
       //if(k == DOC) break;
       dist(p, k, dist(p, k) + s);
       p += size(p, kind(p));

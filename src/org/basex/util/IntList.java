@@ -8,17 +8,27 @@ package org.basex.util;
  */
 public final class IntList {
   /** Value array. */
-  private int[] list = new int[8];
+  private int[] list;
   /** Current array size. */
   public int size;
 
   /**
    * Default constructor.
    */
-  public IntList() { }
+  public IntList() {
+    list = new int[8];
+  }
   
   /**
-   * Default constructor.
+   * Constructor, specifying an initial value.
+   * @param v initial list values
+   */
+  public IntList(final int v) {
+    this(new int[] { v });
+  }
+  
+  /**
+   * Constructor, specifying an initial array.
    * @param v initial list values
    */
   public IntList(final int[] v) {
@@ -82,7 +92,7 @@ public final class IntList {
    */
   public int remove(final int index) {
     if(size == 0 || size < index) throw new IndexOutOfBoundsException();
-    int elem = list[index];
+    final int elem = list[index];
     System.arraycopy(list, index + 1, list, index, size - index);
     --size;
     return elem;
@@ -247,5 +257,12 @@ public final class IntList {
     return list[a] < list[b] ?
         (list[b] < list[c] ? b : list[a] < list[c] ? c : a) :
         (list[b] > list[c] ? b : list[a] > list[c] ? c : a);
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder("IntList[");
+    for(int i = 0; i < size; i++) sb.append((i == 0 ? "" : ",") + list[i]);
+    return sb.append("]").toString();
   }
 }

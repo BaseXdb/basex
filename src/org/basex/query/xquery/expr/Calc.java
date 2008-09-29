@@ -36,8 +36,8 @@ public enum Calc {
       if(t1 && t2) {
         final Type t = type(a, b);
         if(t == Type.ITR) {
-          long l1 = a.itr();
-          long l2 = b.itr();
+          final long l1 = a.itr();
+          final long l2 = b.itr();
           checkRange(l1 + (double) l2);
           return Itr.get(l1 + l2);
         }
@@ -78,8 +78,8 @@ public enum Calc {
       if(t1 && t2) {
         final Type t = type(a, b);
         if(t == Type.ITR) {
-          long l1 = a.itr();
-          long l2 = b.itr();
+          final long l1 = a.itr();
+          final long l2 = b.itr();
           checkRange(l1 - (double) l2);
           return Itr.get(l1 - l2);
         }
@@ -95,10 +95,8 @@ public enum Calc {
         if(a.type == Type.DTD) return new DTd((DTd) a, (DTd) b, false);
         errNum(!t1 ? a : b);
       }
-      if(a.type == Type.DTM)
-        return new Dtm((Date) a, checkDur(b), false);
-      if(a.type == Type.DAT)
-        return new Dat((Date) a, checkDur(b), false);
+      if(a.type == Type.DTM) return new Dtm((Date) a, checkDur(b), false);
+      if(a.type == Type.DAT) return new Dat((Date) a, checkDur(b), false);
       if(a.type == Type.TIM) {
         if(b.type != Type.DTD) errType(Type.DTD, b);
         return new Tim((Tim) a, (DTd) b, false);
@@ -135,8 +133,8 @@ public enum Calc {
       if(t1 && t2) {
         final Type t = type(a, b);
         if(t == Type.ITR) {
-          long l1 = a.itr();
-          long l2 = b.itr();
+          final long l1 = a.itr();
+          final long l2 = b.itr();
           checkRange(l1 * (double) l2);
           return Itr.get(l1 * l2);
         }
@@ -155,22 +153,13 @@ public enum Calc {
     public Item ev(final Item a, final Item b) throws XQException {
       if(a.type == b.type) {
         if(a.type == Type.YMD) {
-          final YMd d1 = (YMd) a;
-          final YMd d2 = (YMd) b;
-          final double v1 = d1.minus ? -d1.mon : d1.mon;
-          final double v2 = d2.minus ? -d2.mon : d2.mon;
-          if(v2 == 0) Err.or(DIVZERO, d1);
-          return Dec.get(BigDecimal.valueOf(v1).divide(
-              BigDecimal.valueOf(v2), 20, BigDecimal.ROUND_HALF_EVEN));
+          return Dec.get(BigDecimal.valueOf(((YMd) a).ymd()).divide(
+              BigDecimal.valueOf(((YMd) b).ymd()), 20,
+              BigDecimal.ROUND_HALF_EVEN));
         }
         if(a.type == Type.DTD) {
-          final DTd d1 = (DTd) a;
-          final DTd d2 = (DTd) b;
-          final double v1 = d1.minus ? -d1.sec - d1.mil : d1.sec + d1.mil;
-          final double v2 = d2.minus ? -d2.sec - d2.mil : d2.sec + d2.mil;
-          if(v2 == 0) Err.or(DIVZERO, d1);
-          return Dec.get(BigDecimal.valueOf(v1).divide(
-              BigDecimal.valueOf(v2), 20, BigDecimal.ROUND_HALF_EVEN));
+          return Dec.get(((DTd) a).dtd().divide(((DTd) b).dtd(), 20,
+              BigDecimal.ROUND_HALF_EVEN));
         }
       }
 
@@ -205,7 +194,7 @@ public enum Calc {
       final double d2 = b.dbl();
       if(d2 == 0) Err.or(DIVZERO, a);
       final double d = d1 / d2;
-      if(d != d || d == 1 / 0.0 || d == -1 / 0.0) Err.or(DIVFLOW, d1, d2);
+      if(Double.isNaN(d) || Double.isInfinite(d)) Err.or(DIVFLOW, d1, d2);
 
       final Type t = type(a, b);
       return Itr.get(t == Type.ITR ? a.itr() / b.itr() : (long) d);
@@ -232,7 +221,7 @@ public enum Calc {
       final BigDecimal b2 = b.dec();
       if(b2.signum() == 0) Err.or(DIVZERO, a);
       final BigDecimal q = b1.divide(b2, 0, BigDecimal.ROUND_DOWN);
-      return Dec.get(b1.subtract(q.multiply(b2)));       
+      return Dec.get(b1.subtract(q.multiply(b2)));
     }
   };
 
@@ -300,7 +289,7 @@ public enum Calc {
   }
 
   /**
-   * Checks if the specified items are numeric or untyped. 
+   * Checks if the specified items are numeric or untyped.
    * @param a first item
    * @param b second item
    * @throws XQException evaluation exception
@@ -309,9 +298,9 @@ public enum Calc {
     if(!a.u() && !a.n()) errNum(a);
     if(!b.u() && !b.n()) errNum(b);
   }
-  
+
   /**
-   * Checks if the specified value is outside the integer range. 
+   * Checks if the specified value is outside the integer range.
    * @param d value to be checked
    * @throws XQException evaluation exception
    */

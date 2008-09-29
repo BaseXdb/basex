@@ -99,7 +99,7 @@ public final class FTBuilder extends Progress implements IndexBuilder {
 
     // document contains any text nodes -> empty index created;
     //only root node is kept
-    if(index != null && index.count != 1) {
+    if(index.count != 1) {
       // index.next[i] : [p, n1, ..., s, d]
       // index.tokens[p], index.next[n1], ..., index.pre[d]
 
@@ -128,7 +128,8 @@ public final class FTBuilder extends Progress implements IndexBuilder {
       int lp;
       int[] tmp;
       // all other nodes
-      for (int i = 1, il = index.next.size; i < il; i++) {
+      final int il = index.next.size;
+      for (int i = 1; i < il; i++) {
         //System.out.println("id:" + i);
         // check pointer on data needs 1 or 2 ints
         lp = (next[i][next[i].length - 2] > -1) ?
@@ -181,7 +182,8 @@ public final class FTBuilder extends Progress implements IndexBuilder {
 
     if (!index.bl) {
       // write data
-      for (int i = 0, il = index.pre.size; i < il; i++) {
+      final int il = index.pre.size;
+      for (int i = 0; i < il; i++) {
         writeData(outD, pre[i]);
         writeData(outD, pos[i]);
       }

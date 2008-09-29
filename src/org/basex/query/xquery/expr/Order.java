@@ -68,7 +68,7 @@ public final class Order {
         
         while(true) {
           if(ir != null) {
-            Item i = ir.next();
+            final Item i = ir.next();
             if(i != null) return i;
             ir = null;
           } else {

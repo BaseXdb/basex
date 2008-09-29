@@ -102,7 +102,7 @@ public final class DialogInfo extends Dialog {
     p3.setLayout(new TableLayout(6, 1, 0, 0));
     p3.setBorder(8, 8, 8, 8);
 
-    indexes[0] = new BaseXCheckBox(INFOTXTINDEX, Token.token(TXTINDEXINFO),
+    indexes[0] = new BaseXCheckBox(INFOTEXTINDEX, Token.token(TXTINDEXINFO),
         meta.txtindex, 0, this);
     p3.add(indexes[0]);
 
@@ -115,7 +115,7 @@ public final class DialogInfo extends Dialog {
       p3.add(new BaseXLabel(TXTINDEXINFO, 8));
     }
 
-    indexes[1] = new BaseXCheckBox(INFOATVINDEX, Token.token(ATTINDEXINFO),
+    indexes[1] = new BaseXCheckBox(INFOATTRINDEX, Token.token(ATTINDEXINFO),
         meta.atvindex, 0, this);
     p3.add(indexes[1]);
     
@@ -141,7 +141,7 @@ public final class DialogInfo extends Dialog {
       p4.add(new BaseXLabel(FTINDEXINFO, edit ? 8 : 0));
       final String[] cb = { CREATEFZ, CREATESTEM, CREATEDC, CREATECS };
       final String[] desc = { FZINDEXINFO, FTSTEMINFO, FTDCINFO, FTCSINFO };
-      final boolean[] val = { meta.ftfuzzy, meta.ftstem, meta.ftdc, meta.ftcs };
+      final boolean[] val = { meta.ftfz, meta.ftst, meta.ftdc, meta.ftcs };
       for(int f = 0; f < ft.length; f++) {
         ft[f] = new BaseXCheckBox(cb[f], Token.token(desc[f]), val[f], 0, this);
         fl[f] = new BaseXLabel(desc[f], 8);
@@ -217,8 +217,8 @@ public final class DialogInfo extends Dialog {
     final Data data = GUI.context.data();
     final MetaData meta = data.meta;
     if(!edit) return;
-    meta.ftfuzzy = ft[0].isSelected();
-    meta.ftstem = ft[1].isSelected();
+    meta.ftfz = ft[0].isSelected();
+    meta.ftst = ft[1].isSelected();
     meta.ftcs = ft[2].isSelected();
     meta.ftdc = ft[3].isSelected();
   }

@@ -68,7 +68,7 @@ public final class And extends ArrayExpr {
       final LocPath p1 = (LocPath) r1.expr1;
       final LocPath p2 = (LocPath) r2.expr1;
       
-      // <CG> support GT & LT
+      // [CG] support GT & LT
       if(r1.type == Comp.GE && r2.type == Comp.LE && p1.sameAs(p2)) {
         ctx.compInfo(OPTRANGE);
         return new Range(p1, (Item) r1.expr2, (Item) r2.expr2);

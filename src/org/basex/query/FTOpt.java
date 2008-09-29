@@ -52,7 +52,7 @@ public final class FTOpt {
    * Checks if the first token contains the second fulltext term.
    * @param tk ft tokenizer
    * @param pos ft position filter
-   * @param sub second token
+   * @param sub query token
    * @return number of occurrences
    */
   public int contains(final FTTokenizer tk, final FTPos pos, final byte[] sub) {

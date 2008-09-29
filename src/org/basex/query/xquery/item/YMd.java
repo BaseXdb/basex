@@ -26,7 +26,6 @@ public final class YMd extends Dur {
   public YMd(final Dur it) {
     super(Type.YMD);
     mon = it.mon;
-    minus  = it.minus && it.mon != 0;
   }
 
   /**
@@ -37,11 +36,7 @@ public final class YMd extends Dur {
    */
   public YMd(final YMd it, final YMd a, final boolean p) {
     this(it);
-
-    if(minus) mon = -mon;
-    mon += p ^ a.minus ? a.mon : -a.mon;
-    minus = mon < 0;
-    mon = Math.abs(mon);
+    mon += p ? a.mon : -a.mon;
   }
 
   /**
@@ -51,15 +46,11 @@ public final class YMd extends Dur {
    * @param m multiplication/division flag
    * @throws XQException evaluation exception
    */
-  public YMd(final Dur it, final double f, final boolean m)
-      throws XQException {
+  public YMd(final Dur it, final double f, final boolean m) throws XQException {
     this(it);
-
     if(f != f) Err.or(DATECALC, info(), f);
     if(m ? f == 1 / 0d || f == -1 / 0d : f == 0) Err.or(DATEZERO, info(), f);
     mon = (int) Math.round(m ? mon * f : mon / f);
-    minus = mon < 0;
-    mon = Math.abs(mon);
   }
 
   /**
@@ -69,7 +60,6 @@ public final class YMd extends Dur {
    */
   public YMd(final byte[] v) throws XQException {
     super(Type.YMD);
-
     final String val = Token.string(v).trim();
     final Matcher mt = DUR.matcher(val);
     if(!mt.matches() || val.endsWith("P")) Err.date(type, XPYMD);
@@ -78,30 +68,36 @@ public final class YMd extends Dur {
     final int m = mt.group(4) != null ? Token.toInt(mt.group(5)) : 0;
 
     mon = y * 12 + m;
-    minus = mt.group(1).length() != 0 && mon != 0;
+    if(mt.group(1).length() != 0) mon = -mon;
+  }
+
+  /**
+   * Returns the years and months.
+   * @return year
+   */
+  public int ymd() {
+    return mon;
   }
 
   @Override
   public byte[] str() {
     final TokenBuilder tb = new TokenBuilder();
-    if(minus) tb.add('-');
+    if(mon < 0) tb.add('-');
     tb.add('P');
-    final int y = mon / 12;
-    final int m = mon % 12;
-    if(y != 0) { tb.add(y); tb.add('Y'); }
-    if(m != 0) { tb.add(m); tb.add('M'); }
-    if(mon == 0) tb.add(Token.token("0M"));
+    if(yea() != 0) { tb.add(Math.abs(yea())); tb.add('Y'); }
+    if(mon() != 0) { tb.add(Math.abs(mon())); tb.add('M'); }
+    if(mon == 0) tb.add("0M");
     return tb.finish();
+  }
+
+  @Override
+  public int hash() {
+    return mon;
   }
 
   @Override
   public int diff(final Item it) throws XQException {
     if(it.type != type) Err.cmp(it, this);
-    return df(it);
-  }
-
-  @Override
-  public Object java() {
-    return df.newDurationYearMonth(Token.string(str()));
+    return mon - ((Dur) it).mon;
   }
 }

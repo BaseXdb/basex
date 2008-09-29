@@ -5,7 +5,6 @@ import java.text.SimpleDateFormat;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.util.Err;
 import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
 
 /**
  * DateTime item.
@@ -23,13 +22,12 @@ public final class Dtm extends Date {
    * @param d date
    */
   public Dtm(final Date d) {
-    super(Type.DTM);
-    mon = d.mon;
-    sec = d.sec;
-    mil = d.mil;
-    minus = d.minus;
-    zone = d.zone;
-    zshift = d.zshift;
+    super(Type.DTM, d);
+    if(xc.getHour() == UNDEF) {
+      xc.setHour(0);
+      xc.setMinute(0);
+      xc.setSecond(0);
+    }
   }
 
   /**
@@ -38,7 +36,7 @@ public final class Dtm extends Date {
    * @throws XQException evaluation exception
    */
   public Dtm(final byte[] dt) throws XQException {
-    super(Type.DTM);
+    super(Type.DTM, dt, XPDTM);
     final int i = Token.indexOf(dt, 'T');
     if(i == -1) Err.date(type, XPDTM);
     date(Token.substring(dt, 0, i), XPDTM);
@@ -59,20 +57,10 @@ public final class Dtm extends Date {
    * @param d date
    * @param a duration
    * @param p plus/minus flag
+   * @throws XQException evaluation exception
    */
-  public Dtm(final Date d, final Dur a, final boolean p) {
+  public Dtm(final Date d, final Dur a, final boolean p) throws XQException {
     this(d);
     calc(a, p);
   }
-
-  @Override
-  public byte[] str() {
-    final TokenBuilder tb = new TokenBuilder();
-    date(tb);
-    tb.add('T');
-    time(tb);
-    zone(tb);
-    return tb.finish();
-  }
 }
-

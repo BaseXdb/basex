@@ -31,7 +31,7 @@ public class Pred extends Arr {
   }
 
   @Override
-  public Expr comp(final XQContext ctx) throws XQException {
+  public final Expr comp(final XQContext ctx) throws XQException {
     root = root.comp(ctx);
     super.comp(ctx);
     // LAST
@@ -46,8 +46,7 @@ public class Pred extends Arr {
 
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
-    Iter iter = ctx.iter(root);
-
+    final Iter iter = ctx.iter(root);
     final Item ci = ctx.item;
     final int cs = ctx.size;
     final int cp = ctx.pos;
@@ -78,7 +77,7 @@ public class Pred extends Arr {
   }
   
   @Override
-  public boolean uses(final Using u) {
+  public final boolean uses(final Using u) {
     switch(u) {
       case POS:
         for(final Expr e : expr) {
@@ -92,17 +91,17 @@ public class Pred extends Arr {
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     return Token.string(name()) + "(" + root + ", " + toString(", ") + ")";
   }
 
   @Override
-  public String info() {
+  public final String info() {
     return "Predicate";
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public final void plan(final Serializer ser) throws Exception {
     ser.openElement(this);
     root.plan(ser);
     for(final Expr e : expr) e.plan(ser);
@@ -110,7 +109,7 @@ public class Pred extends Arr {
   }
 
   @Override
-  public String color() {
+  public final String color() {
     return "FF6666";
   }
 }

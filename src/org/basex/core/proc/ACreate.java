@@ -72,6 +72,10 @@ abstract class ACreate extends Process {
       err = BaseX.info(FILEWHICH, p.io);
     } catch(final ProgressException ex) {
       throw ex;
+    } catch(final IOException ex) {
+      BaseX.debug(ex);
+      final String msg = ex.getMessage();
+      err = BaseX.info(msg != null ? msg : args[0]);
     } catch(final Exception ex) {
       BaseX.debug(ex);
       err = BaseX.info(CREATEERR, args[0]);
@@ -98,7 +102,7 @@ abstract class ACreate extends Process {
     switch(i) {
       case TXT: buildIndex(i, new ValueBuilder(true), d);  break;
       case ATV: buildIndex(i, new ValueBuilder(false), d); break;
-      case FTX: buildIndex(i, d.meta.ftfuzzy ?
+      case FTX: buildIndex(i, d.meta.ftfz ?
           new FTFuzzyBuilder() : new FTBuilder(), d); break;
       default: break;
     }

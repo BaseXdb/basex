@@ -66,24 +66,17 @@ public final class FTIndex extends FTArrayExpr {
     // (has still to be checked, maybe ft options cause troubles here)
     // ideal solution for phrases would be to process small results first
     // and end up with the largest ones.. but this seems tiresome
-    int sum = 0;
-    int n = 0;
-    iat = new IndexArrayIterator();
-    
     while(ft.more()) {
-      n = data.nrIDs(ft);
-      if(n == 0) return Bool.FALSE;
+      if(data.nrIDs(ft) == 0) return Bool.FALSE;
       ctx.checkStop();
-      sum += n;
     }
     
     ft.init();
     int w = 0;
-    IndexIterator it;
     while(ft.more()) {
-      it = data.ids(ft);
-      if (it == IndexIterator.EMPTY) return Bool.FALSE;
-      if (w == 0) {
+      final IndexIterator it = data.ids(ft);
+      if(it == IndexIterator.EMPTY) return Bool.FALSE;
+      if(w == 0) {
         iat = (IndexArrayIterator) it;  
       } else {
         iat = phrase(iat, (IndexArrayIterator) it, w);
@@ -119,25 +112,20 @@ public final class FTIndex extends FTArrayExpr {
    */
   private IndexArrayIterator phrase(final IndexArrayIterator i1, 
       final IndexArrayIterator i2, final int w) {
-    IntArrayList ial = new IntArrayList();
+    final IntArrayList ial = new IntArrayList();
     i1.more();
     i2.more();
     while(true) {
-      int d = i1.next() - i2.next();
+      final int d = i1.next() - i2.next();
       if(d == 0) {
-        FTNode n1 = i1.nextFTNode();
-        FTNode n2 = i2.nextFTNode();
+        final FTNode n1 = i1.nextFTNode();
+        final FTNode n2 = i2.nextFTNode();
         if (n1.merge(n2, w)) {
         //if (n1.phrase(n2, w)) {
           ial.add(n1.getFTNode());
         }
       }
-      if (d <= 0 && !i1.more()) break;
-       
-      if (d >= 0 && !i2.more()) break;
-      
-
-  //    if((d <= 0 && !i1.more()) | (d >= 0 && !i1.more())) break;
+      if(d <= 0 && !i1.more() || d >= 0 && !i2.more()) break;
     }
     return new IndexArrayIterator(ial.list, ial.size, false);
   }

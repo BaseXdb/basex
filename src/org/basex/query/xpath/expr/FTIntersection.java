@@ -101,7 +101,7 @@ public final class FTIntersection extends FTArrayExpr {
 
   @Override
   public FTNode next(final XPContext ctx) {
-    FTNode n1 = calcFTAnd(pex, ctx);
+    final FTNode n1 = calcFTAnd(pex, ctx);
     
 /*    nod2 = (nex.length > 0 && nod2 == null && more(nex)) ? 
         calcFTAnd(nex, ctx) : nod2;

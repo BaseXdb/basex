@@ -17,7 +17,7 @@ import org.basex.query.xquery.util.Var;
  */
 public final class VarCall extends Expr {
   /** Variable name. */
-  private Var var;
+  public Var var;
   
   /**
    * Constructor.

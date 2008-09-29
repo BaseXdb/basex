@@ -40,13 +40,6 @@ public final class FTWords extends FTArrayExpr {
 
   @Override
   public Item eval(final XPContext ctx) {
-    /* <SG> conceptually moved to FTContains class
-    if (ctx.ftitem.text.length == 0) {
-      ctx.ftitem.init(ctx.local.data.atom(ctx.local.nodes[0]));
-      final boolean r = contains(ctx);
-      ctx.ftitem.text = Token.EMPTY;
-      return Bool.get(r);
-    }*/
     return Bool.get(contains(ctx));
   }
   
@@ -61,39 +54,33 @@ public final class FTWords extends FTArrayExpr {
    * @return result of matching
    */
   private boolean contains(final XPContext ctx) {
-    int len = 0;
     int o = 0;
     
     switch(mode) {
       case ALL:
         final int o1 = fto.contains(ctx.ftitem, ctx.ftpos.pos, token);
         if(o1 == 0) return false;
-        len += token.length * o1;
         o += o1;
         break;
       case ALLWORDS:
         for(final byte[] t2 : split(token, ' ')) {
           final int o2 = fto.contains(ctx.ftitem, ctx.ftpos.pos, t2);
           if(o2 == 0) return false;
-          len += t2.length * o2;
           o += o2;
         }
         break;
       case ANY:
         final int o3 = fto.contains(ctx.ftitem, ctx.ftpos.pos, token);
-        len += token.length * o3;
         o += o3;
         break;
       case ANYWORD:
         for(final byte[] t4 : split(token, ' ')) {
           final int o4 = fto.contains(ctx.ftitem, ctx.ftpos.pos, t4);
-          len += t4.length * o4;
           o += o4;
         }
         break;
       case PHRASE:
         final int o5 = fto.contains(ctx.ftitem, ctx.ftpos.pos, token);
-        len += token.length * o5;
         o += o5;
         break;
     }
@@ -109,8 +96,8 @@ public final class FTWords extends FTArrayExpr {
     // - no FTTimes option is specified
     // <SG> I (temporarily) readded case sensitivity check for fuzzy index 
     return meta.ftcs == fto.cs && 
-      meta.ftdc == fto.dc && meta.ftstem == fto.st &&
-      fto.sw == null && (!fto.wc || !meta.ftfuzzy) &&
+      meta.ftdc == fto.dc && meta.ftst == fto.st &&
+      fto.sw == null && (!fto.wc || !meta.ftfz) &&
       occ[0] == 1  && occ[1] == Long.MAX_VALUE;
   }
   
@@ -132,7 +119,7 @@ public final class FTWords extends FTArrayExpr {
     
     int i = 0;
     while(fto.sb.more()) {
-      int n = ctx.local.data.nrIDs(fto.sb);
+      final int n = ctx.local.data.nrIDs(fto.sb);
       if(n == 0) return 0;
       i = Math.max(i, n);
     }

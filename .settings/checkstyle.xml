@@ -94,6 +94,7 @@
         </module>
         <module name="MultipleStringLiterals">
             <property name="severity" value="ignore"/>
+            <property name="allowedDuplicates" value="9"/>
         </module>
         <module name="ParameterAssignment"/>
         <module name="StringLiteralEquality"/>
@@ -116,6 +117,10 @@
             <property name="severity" value="ignore"/>
         </module>
         <module name="EmptyForInitializerPad"/>
+        <module name="ThrowsCount"/>
+        <module name="MutableException">
+            <property name="severity" value="ignore"/>
+        </module>
     </module>
     <module name="PackageHtml"/>
     <module name="Translation"/>

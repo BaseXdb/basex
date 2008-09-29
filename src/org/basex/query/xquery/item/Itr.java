@@ -102,7 +102,7 @@ public class Itr extends Num {
   @Override
   public final int diff(final Item it) throws XQException {
     final double n = it.dbl();
-    return n != n ? Integer.MIN_VALUE : val < n ? -1 : val > n ? 1 : 0;
+    return n != n ? UNDEF : val < n ? -1 : val > n ? 1 : 0;
   }
 
   @Override
@@ -146,7 +146,7 @@ public class Itr extends Num {
     for(; t < l; t++) {
       final byte c = val[t];
       if(c < '0' || c > '9') break;
-      long w = (v << 3) + (v << 1) + c - '0';
+      final long w = (v << 3) + (v << 1) + c - '0';
       if(w < v) ZERO.castErr(val);
       v = w;
     }

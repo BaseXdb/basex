@@ -25,8 +25,7 @@ public final class Help extends Process {
   protected void out(final PrintOutput out) throws IOException {
     try {
       out.print(COMMANDS.valueOf(args[0]).help(true, true));
-      return;
-    } catch(Exception ex) {
+    } catch(final Exception ex) {
       out.println(CMDHELP);
       final boolean all = ALL.equalsIgnoreCase(args[0]);
       for(final COMMANDS c : COMMANDS.values()) out.print(c.help(false, all));

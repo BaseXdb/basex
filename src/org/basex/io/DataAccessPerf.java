@@ -64,7 +64,7 @@ public final class DataAccessPerf extends DataAccess {
   @Override
   public synchronized int readInt(final long p) {
     rp.initTimer();
-    int i = super.readInt(p);
+    final int i = super.readInt(p);
     t += rp.getTime();
     return i;
   }
@@ -77,7 +77,7 @@ public final class DataAccessPerf extends DataAccess {
   @Override
   public synchronized long read5(final long p) {
     rp.initTimer();
-    long l = super.read5(p);
+    final long l = super.read5(p);
     t += rp.getTime();
     return l;
   }

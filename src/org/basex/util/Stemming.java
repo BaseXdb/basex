@@ -7,7 +7,7 @@ package org.basex.util;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class Stemming {
+public final class Stemming {
   /** Step 2. */
   private static final String[][] ST2 = { { "ational", "ate" },
     { "tional", "tion" }, { "enci", "ence" }, { "anci", "ance" },
@@ -46,7 +46,10 @@ public class Stemming {
     ts = 0;
     te = str.length;
     word();
-    return f();
+    
+    final byte[] word = new byte[te - ts];
+    System.arraycopy(tok, ts, word, 0, te - ts);
+    return word;
   }
 
   /**
@@ -114,16 +117,6 @@ public class Stemming {
       if(m > 1 || m == 1 && !cvc(te - 1)) te--;
     }
     if(e("ll") && e("l") && m() > 1) te--;
-  }
-
-  /**
-   * Finishes the token.
-   * @return result of check
-   */
-  private byte[] f() {
-    final TokenBuilder tb = new TokenBuilder();
-    for(int i = ts; i < te; i++) tb.add(tok[i]);
-    return tb.finish();
   }
 
   /**

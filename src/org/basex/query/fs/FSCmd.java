@@ -133,7 +133,7 @@ public abstract class FSCmd {
    * @param size file size
    * @return formatted size value
    */
-  String format(final long size) {
+  final String format(final long size) {
     if(size > (1 << 30)) return ((size + (1 << 29)) >> 30) + "G";
     if(size > (1 << 20)) return ((size + (1 << 19)) >> 20) + "M";
     if(size > (1 << 10)) return ((size + (1 <<  9)) >> 10) + "K";

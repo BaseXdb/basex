@@ -17,6 +17,8 @@ import org.basex.query.xquery.util.Err;
  * @author Christian Gruen
  */
 public abstract class Expr extends ExprInfo {
+  /** Undefined value. */
+  protected static final int UNDEF = Integer.MIN_VALUE;
   /** Used types, evaluated by the compiler. */
   public enum Using {
     /** Context position. */ POS,
@@ -145,5 +147,17 @@ public abstract class Expr extends ExprInfo {
     final Item it = iter.atomic(this, true);
     if(it == null) Err.or(XPEMPTYPE, info(), Type.ITR);
     return checkItr(it);
+  }
+
+  /**
+   * Throws an exception if the context item is not set.
+   * @param ctx xquery context
+   * @return item if everything is ok
+   * @throws XQException evaluation exception
+   */
+  protected final Iter checkCtx(final XQContext ctx) throws XQException {
+    final Item it = ctx.item;
+    if(it == null) Err.or(XPNOCTX, this);
+    return it.iter();
   }
 }

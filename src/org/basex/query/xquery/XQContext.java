@@ -125,7 +125,8 @@ public final class XQContext extends QueryContext {
       }
       item = Seq.get(docs, docs.length);
       final NodIter col = new NodIter();
-      for(int d = 0; d < docs.length; d++) col.add(docs[d]);
+      for(final DNode doc : docs)
+        col.add(doc);
       collect = Array.add(collect, col);
       collName = Array.add(collName, token(nodes.data.meta.dbname));
     }
@@ -174,23 +175,22 @@ public final class XQContext extends QueryContext {
 
   /**
    * Evaluates the specified expression and returns an iterator.
-   * @param expr expression to be evaluated
+   * @param e expression to be evaluated
    * @return iterator
    * @throws XQException evaluation exception
    */
-  public Iter iter(final Expr expr) throws XQException {
+  public Iter iter(final Expr e) throws XQException {
     checkStop();
 
     // skip query info for items
-    final Iter iter = expr.iter(this);
-    
-    if(inf && !expr.i()) {
-      final double t = ((System.nanoTime() - evalTime) / 10000) / 100.0;
-      evalInfo(t + MS + ": " + expr.getClass().getSimpleName() + ": " + expr);
+    final Iter ir = e.iter(this);
+    if(inf && !e.i()) {
+      final double t = ((System.nanoTime() - evalTime) / 10000) / 100d;
+      evalInfo(t + MS + ": " + e.getClass().getSimpleName() + ": " + e);
       inf = ++cc < MAXDUMP;
       if(!inf) evalInfo(EVALSKIP);
     }
-    return iter;
+    return ir;
   }
 
   /**
@@ -228,7 +228,7 @@ public final class XQContext extends QueryContext {
         if(eq(db, ni.list[n].base())) return (DNode) ni.list[n];
       }
     }
-    
+
     // check if the database has already been read
     String dbname = string(db);
     for(final DNode d : docs) if(d.data.meta.dbname.equals(dbname)) return d;
@@ -265,12 +265,13 @@ public final class XQContext extends QueryContext {
       if(collName.length == 0) Err.or(COLLDEF);
       return new NodIter(collect[0].list, collect[0].size);
     }
-    
+
     // invalid collection reference
     if(contains(coll, '<') || contains(coll, '\\'))
       Err.or(COLLINV, cut(coll, 20));
 
-    int c = -1, cl = collName.length;
+    int c = -1;
+    final int cl = collName.length;
     while(true) {
       if(++c == cl) addDocs(doc(coll));
       else if(!eq(collName[c], coll)) continue;
@@ -307,7 +308,7 @@ public final class XQContext extends QueryContext {
     try { for(final DNode doc : docs) doc.data.close(); }
     catch(final IOException ex) { BaseX.debug(ex); }
   }*/
-  
+
   /**
    * Adds namespaces from the specified document.
    * @param doc document
@@ -329,7 +330,7 @@ public final class XQContext extends QueryContext {
     }
     return doc;
   }
-  
+
   @Override
   public String toString() {
     return "Context[" + file + "]";

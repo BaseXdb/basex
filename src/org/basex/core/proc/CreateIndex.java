@@ -17,7 +17,7 @@ import org.basex.index.IndexToken;
  */
 public final class CreateIndex extends ACreate {
   /** Index type. */
-  protected final INDEX type;
+  private final INDEX type;
 
   /**
    * Constructor.

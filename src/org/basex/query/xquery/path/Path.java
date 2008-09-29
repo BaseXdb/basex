@@ -2,12 +2,12 @@ package org.basex.query.xquery.path;
 
 import static org.basex.query.xquery.XQText.*;
 import org.basex.data.Serializer;
-import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
+import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Arr;
 import org.basex.query.xquery.expr.CAttr;
-import org.basex.query.xquery.expr.CDoc;
 import org.basex.query.xquery.expr.Expr;
+import org.basex.query.xquery.expr.VarCall;
 import org.basex.query.xquery.func.Fun;
 import org.basex.query.xquery.func.FunDef;
 import org.basex.query.xquery.item.Item;
@@ -21,6 +21,7 @@ import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.util.Err;
 import org.basex.query.xquery.util.NodeBuilder;
 import org.basex.query.xquery.util.SeqBuilder;
+import org.basex.query.xquery.util.Var;
 import org.basex.util.Array;
 
 /**
@@ -40,7 +41,7 @@ public final class Path extends Arr {
   private Item res;
   /** Cached item. */
   private Item item;
-  
+
   /**
    * Constructor.
    * @param r root expression
@@ -54,30 +55,36 @@ public final class Path extends Arr {
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
     root = root.comp(ctx);
-    if(root instanceof CDoc || (root instanceof Fun &&
-        ((Fun) root).func == FunDef.DOC)) {
+    Expr e = root;
+    if(e instanceof VarCall) {
+      final Var v = ctx.vars.get(((VarCall) e).var);
+      if(v != null) e = v.expr;
+    }
+    if(e instanceof Fun && ((Fun) e).func == FunDef.DOC) {
       if(expr[0] instanceof Step) {
-        if(((Step) expr[0]).axis == Axis.ATTR) Err.or(DOCATTR);
+        final Step s = (Step) expr[0];
+        if(s.axis == Axis.ATTR || s.axis == Axis.PARENT || s.axis == Axis.SELF
+            && s.test != Test.NODE) Err.or(COMPSELF, expr[0]);
       }
     }
-    if(root instanceof CAttr) {
+    if(e instanceof CAttr) {
       if(expr[0] instanceof Step) {
-        if(((Step) expr[0]).axis == Axis.CHILD) Err.or(ATTRCHILD);
+        if(((Step) expr[0]).axis == Axis.CHILD) Err.or(COMPSELF, expr[0]);
       }
     }
 
-    for(int e = 0; e != expr.length; e++) {
-      expr[e] = expr[e].comp(ctx);
-      steps &= expr[e] instanceof Step;
+    for(int i = 0; i != expr.length; i++) {
+      expr[i] = expr[i].comp(ctx);
+      steps &= expr[i] instanceof Step;
     }
-    
+
     if(steps) {
       mergeDesc(ctx);
       checkEmpty();
       // analyze if result set can be cached
       cache = true;
-      for(Expr e : expr) {
-        if(((Step) e).expr.length != 0 && (e.uses(Using.VAR))) {
+      for(final Expr ex : expr) {
+        if(((Step) ex).expr.length != 0 && (ex.uses(Using.VAR))) {
           cache = false;
           break;
         }
@@ -92,7 +99,7 @@ public final class Path extends Arr {
 
     if(cache && res != null && item == it && it.type == Type.DOC)
       return res.iter();
-    
+
     item = it;
     final Item c = ctx.item;
     final int cs = ctx.size;
@@ -105,7 +112,7 @@ public final class Path extends Arr {
     ctx.pos = cp;
     return res.iter();
   }
-  
+
   /**
    * Evaluates the location path.
    * @param ctx query context
@@ -120,13 +127,13 @@ public final class Path extends Arr {
 
       if(ir.size == 0) return Seq.EMPTY;
       if(ir.size == 1) return ir.list[0];
-      
+
       final NodeBuilder nb = new NodeBuilder(false);
       Nod it;
       while((it = ir.next()) != null) nb.add(it);
       return nb.finish();
     }
-      
+
     Item it = ctx.item;
     for(final Expr e : expr) {
       if(e instanceof Step) {
@@ -228,13 +235,13 @@ public final class Path extends Arr {
 
       if(step.axis == Axis.SELF) {
         if(step.test == Test.NODE) continue;
-        final QNm name = step.test.name;
-        final QNm name0 = step0.test.name;
 
         if(step0.axis == Axis.ATTR) warning(step);
         if(step0.test.type == Type.TXT && step.test.type != Type.TXT)
           warning(step);
 
+        final QNm name = step.test.name;
+        final QNm name0 = step0.test.name;
         if(name0 == null || name == null) continue;
         if(!name.eq(name0)) warning(step);
 
@@ -250,7 +257,7 @@ public final class Path extends Arr {
       }
     }
   }
-  
+
   @Override
   public boolean uses(final Using u) {
     return super.uses(u) || root.uses(u);

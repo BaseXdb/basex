@@ -196,7 +196,7 @@ public abstract class Process extends AbstractProcess {
    * Returns if the current command yields some output.
    * @return result of check
    */
-  public boolean printing() {
+  public final boolean printing() {
     return check(PRINTING);
   }
 
@@ -204,7 +204,7 @@ public abstract class Process extends AbstractProcess {
    * Returns if the current command needs a data reference for processing.
    * @return result of check
    */
-  public boolean data() {
+  public final boolean data() {
     return check(DATAREF);
   }
 
@@ -212,7 +212,7 @@ public abstract class Process extends AbstractProcess {
    * Returns if the current command generates updates in the data structure.
    * @return result of check
    */
-  public boolean updating() {
+  public final boolean updating() {
     return check(UPDATING);
   }
 
@@ -256,7 +256,7 @@ public abstract class Process extends AbstractProcess {
    * Returns the list of arguments.
    * @return arguments
    */
-  public String args() {
+  public final String args() {
     final StringBuilder sb = new StringBuilder();
     for(final String a : args) if(a != null) sb.append(" " + a);
     return sb.toString();
@@ -266,7 +266,7 @@ public abstract class Process extends AbstractProcess {
    * Returns the class name.
    * @return class name
    */
-  public String name() {
+  public final String name() {
     return getClass().getSimpleName().toUpperCase();
   }
 

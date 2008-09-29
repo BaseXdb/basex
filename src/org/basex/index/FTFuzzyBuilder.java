@@ -126,10 +126,10 @@ public final class FTFuzzyBuilder extends Progress implements IndexBuilder {
 
       tre.init();
       while(tre.more()) {
-        int p = tre.next();
+        final int p = tre.next();
         
          // write token value
-        byte[] key = tre.key();
+        final byte[] key = tre.key();
         for(int x = 0; x != j; x++) outy.write(key[x]);
 
         // write pointer on data
@@ -154,8 +154,6 @@ public final class FTFuzzyBuilder extends Progress implements IndexBuilder {
     }
     tree = null;
 
-    // <SG> pointer on last word list was too big,
-    //   so 'databases' wasn't found in the FTTest cases
     outx.write(--j);
     outx.writeInt(tr - j - 9);
 

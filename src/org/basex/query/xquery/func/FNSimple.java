@@ -55,9 +55,9 @@ public final class FNSimple extends Fun {
       case BOOL:  return arg[0] instanceof Bln ? arg[0] : this;
       case NOT:
         if(arg[0] instanceof Fun) {
-          Fun fs = (Fun) arg[0];
+          final Fun fs = (Fun) arg[0];
           if(fs.func == FunDef.EMPTY) {
-            Fun f = new FNSimple();
+            final Fun f = new FNSimple();
             f.args = fs.args;
             f.func = FunDef.EXISTS;
             return f;

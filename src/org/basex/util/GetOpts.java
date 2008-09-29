@@ -79,7 +79,7 @@ public final class GetOpts {
   public boolean more() {
     return getopt() != -1;
   }
-  
+
   /**
    * Returns the next option.
    * @return next option
@@ -105,13 +105,13 @@ public final class GetOpts {
       return optopt;
     }
 
-    String arg = args[optindex];
-    int argLength = arg.length();
+    final String arg = args[optindex];
+    final int argLength = arg.length();
     // option found
     if(arg.startsWith("-") && argLength > 1) {
       //get argument
       optopt = args[optindex].charAt(multipleOptIndex);
-      int optPos = optString.indexOf(optopt);
+      final int optPos = optString.indexOf(optopt);
       // valid option ?
       if(optPos > -1) {
         if(optString.length() - 1  > optPos &&
@@ -130,7 +130,7 @@ public final class GetOpts {
           }
           // if(optString.charAt(optPos + 2) == ':')
           // not yet implemented - optional argument
-          
+
           /* no argument allowed if argLength is bigger than
            * multipleOptIndex + 1 (=2) there must be another
            * option -> just return this option / increment multipleOptIndex */
@@ -142,7 +142,7 @@ public final class GetOpts {
         }
         return optopt;
       }
-      
+
       // Unknown option -> any options left ? set pointer
       if(argLength == multipleOptIndex + 1) { // e.g. -X (X = unknown)
         optindex++;
@@ -159,7 +159,7 @@ public final class GetOpts {
       path = args[optindex];
       foundArgs.add(args[optindex]);
     }
-    
+
     // all options parsed
     if(optindex + 1 == args.length) {
       optopt = -1;

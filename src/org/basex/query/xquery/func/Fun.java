@@ -123,18 +123,6 @@ public abstract class Fun extends Expr {
   }
 
   /**
-   * Throws an exception if the context item is not set.
-   * @param ctx xquery context
-   * @return item if everything is ok
-   * @throws XQException evaluation exception
-   */
-  protected final Iter check(final XQContext ctx) throws XQException {
-    Item it = ctx.item;
-    if(it == null) Err.or(XPNOCTX, this);
-    return it.iter();
-  }
-
-  /**
    * Checks if the specified collation is supported.
    * @param col collation
    * @throws XQException evaluation exception

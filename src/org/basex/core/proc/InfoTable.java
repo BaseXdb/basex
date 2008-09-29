@@ -15,7 +15,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class InfoTable extends AInfo {
+public final class InfoTable extends AInfo {
   /**
    * Constructor.
    * @param a arguments

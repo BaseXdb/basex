@@ -85,7 +85,7 @@ public abstract class Iter {
   public final Item atomic(final Expr expr, final boolean empty)
       throws XQException {
     
-    long s = size();
+    final long s = size();
     if(s != -1) {
       if(s == 1) return next();
       if(s == 0) {

@@ -14,7 +14,7 @@ import org.basex.io.PrintOutput;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class InfoIndex extends AInfo {
+public final class InfoIndex extends AInfo {
   /**
    * Constructor.
    */
@@ -30,11 +30,11 @@ public class InfoIndex extends AInfo {
     out.println(INFOATNINDEX);
     out.println(data.info(IndexToken.TYPE.ATN));
     if(data.meta.txtindex) {
-      out.println(INFOTXTINDEX);
+      out.println(INFOTEXTINDEX);
       out.println(data.info(IndexToken.TYPE.TXT));
     }
     if(data.meta.atvindex) {
-      out.println(INFOATVINDEX);
+      out.println(INFOATTRINDEX);
       out.println(data.info(IndexToken.TYPE.ATV));
     }
     if(data.meta.ftxindex) {

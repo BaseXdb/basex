@@ -22,40 +22,7 @@ import org.basex.util.Token;
  * In fact it is used to interface with a mounted filesystem in userspace to
  * realize the queryable DeepFS filesystem/database hybrid.
  * <br/>
- * All nodes in the table are accessed by their implicit pre value. Some
- * restrictions on the data are currently given:
- * <ul>
- * <li>The table is limited to 2^31 entries (pre values are signed int's)</li>
- * <li>A maximum of 2^16 different tag and attribute names is allowed</li>
- * <li>A tag can have a maximum of 256 attributes</li>
- * </ul>
- * Each node occupies 128 bits. The current storage layout looks like follows:
- *
- * <pre>
- * ELEMENT NODES:
- * - Byte     0:  KIND: Node kind (ELEM)
- * - Byte   1-2:  NSPC: Namespace and Tag Reference
- * - Byte     3:  ATTS: Number of attributes
- * - Byte  4- 7:  DIST: Relative parent reference
- * - Byte  8-11:  SIZE: Number of descendants
- * - Byte 12-15:  UNID: Unique Node ID
- * DOCUMENT NODES:
- * - Byte     0:  KIND: Node kind (DOC)
- * - Byte  3- 7:  TEXT: Text reference
- * - Byte  8-11:  SIZE: Number of descendants
- * - Byte 12-15:  UNID: Unique Node ID
- * TEXT NODES:
- * - Byte     0:  KIND: Node kind (TEXT/COMM/PI)
- * - Byte  3- 7:  TEXT: Text reference
- * - Byte  8-11:  DIST: Relative parent reference
- * - Byte 12-15:  UNID: Unique Node ID
- * ATTRIBUTE NODES:
- * - Byte     0:  KIND: Node kind (ATTR)
- * - Byte   1-2:  NSPC: Namespace and Attribute name reference
- * - Byte  3- 7:  TEXT: Attribute value reference
- * - Byte    11:  DIST: Relative parent reference
- * - Byte 12-15:  UNID: Unique Node ID
- * </pre>
+ * Find more info on the table structure in {@link DiskData}.
  *
  * @author Workgroup DBIS, University of Konstanz 2008, ISC License
  * @author Christian Gruen
@@ -77,7 +44,7 @@ public final class DeepData extends Data {
   static {
     try {
       System.loadLibrary(DEEPLIB);
-    } catch (UnsatisfiedLinkError e) {
+    } catch (final UnsatisfiedLinkError e) {
       libError = e.getMessage();
     }
   }
@@ -117,12 +84,12 @@ public final class DeepData extends Data {
     values = new DataAccess(db, DATAATV);
 
     if(index) {
-      if(meta.txtindex) openIndex(
-          IndexToken.TYPE.TXT, new Values(this, db, true));
-      if(meta.atvindex) openIndex(
-          IndexToken.TYPE.ATV, new Values(this, db, false));
-      if(meta.ftxindex) openIndex(IndexToken.TYPE.FTX, meta.ftfuzzy ?
-          new FTFuzzy(this, db) : new FTTrie(this, db));
+      if(meta.txtindex) openIndex(IndexToken.TYPE.TXT,
+          new Values(this, db, true));
+      if(meta.atvindex) openIndex(IndexToken.TYPE.ATV,
+          new Values(this, db, false));
+      if(meta.ftxindex) openIndex(IndexToken.TYPE.FTX,
+          meta.ftfz ? new FTFuzzy(this, db) : new FTTrie(this, db));
     }
     initNames();
   }
@@ -447,7 +414,7 @@ public final class DeepData extends Data {
     // increase sizes
     int p = par;
     while(p >= 0) {
-      int k = kind(p);
+      final int k = kind(p);
       size(p, k, size(p, k) + s);
       p = parent(p, k);
     }
@@ -462,7 +429,7 @@ public final class DeepData extends Data {
   private void updateDist(final int pre, final int s) {
     int p = pre;
     while(p < size) {
-      int k = kind(p);
+      final int k = kind(p);
       //if(k == DOC) break;
       dist(p, k, dist(p, k) + s);
       p += size(p, kind(p));

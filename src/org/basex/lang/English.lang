@@ -54,6 +54,7 @@ d_fctitle=Choose Directory
 d_export=Save XML Document
 
 dc_title=Input file or directory
+dc_filter=Filter
 dc_name=Name of Database
 dc_xmldesc=XML Documents
 dc_zipdesc=Zipped XML Documents
@@ -72,7 +73,7 @@ dc_ftcs=Case Sensitivity
 dc_mainmem=Main-Memory Mode
 dc_chopinfo=This option removes all whitespaces between tags and contents
 dc_intparseinfo=You can switch this option off to use Java's default XML parser
-dc_entitiesinfo=Switch this option off to skip unknown entities
+dc_entitiesinfo=Switch this option off to skip unknown entities (&...;)
 dc_txtinfo=Text nodes can be indexed to speedup XPath queries
 dc_attinfo=Attribute values can be indexed to speedup XPath queries
 dc_ftxinfo=A fulltext index speeds up XPath Full-Text queries
@@ -274,6 +275,7 @@ proc_nodb=Please open a database first.
 proc_mm=Command is not available in main memory mode.
 proc_outmem=Out of Main Memory.\nThe following hints might help you:\n- you can increase Java's heap size with the flag -Xmx<size>\n- you can try BaseX's internal XML parser with 'set intparse on'\n- you can save memory by deactivating some indexes
 
+cmd_no=Expecting command.
 cmd_unknown=Unknown command '%'
 cmd_similar=did you mean '%'?
 cmd_ping=Connection successful.

@@ -26,6 +26,10 @@ public interface Text {
   String DOT = ".";
   /** Dots. */
   String DOTS = "...";
+  /** List. */
+  String LI = "- ";
+  /** Space. */
+  String S = " ";
   /** On flag. */
   String ON = "ON";
   /** Off flag. */
@@ -43,7 +47,7 @@ public interface Text {
   String COMPANY = "DBIS, University of Konstanz";
 
   /** BaseX GUI title. */
-  String TITLE = NAME + " " + VERSION;
+  String TITLE = NAME + S + VERSION;
   /** BaseX Text. */
   String CONSOLEINFO = TITLE + "; " + COMPANY;
 
@@ -64,7 +68,7 @@ public interface Text {
   /** Console Prompt. */
   String INPUT = "> ";
   /** Continued prompt. */
-  String INPUTCONT = DOTS + " ";
+  String INPUTCONT = DOTS + S;
 
   /** Start Information. */
   String CLIENTINFO = CONSOLEINFO + NL +
@@ -152,9 +156,9 @@ public interface Text {
   String CREATE1 = lang("ch_create1");
   /** Command help. */
   String CREATE2 = lang("ch_create2") + NL + NL +
-    "- " + CREATE.DB + lang("ch_file") + NL + lang("ch_create3") + NL +
-    "- " + CREATE.FS + lang("ch_create4") + NL + lang("ch_create5") + NL +
-    "- " + CREATE.INDEX + " [" + INDEX.TEXT + "|" + INDEX.ATTRIBUTE +
+    LI + CREATE.DB + lang("ch_file") + NL + lang("ch_create3") + NL +
+    LI + CREATE.FS + lang("ch_create4") + NL + lang("ch_create5") + NL +
+    LI + CREATE.INDEX + " [" + INDEX.TEXT + "|" + INDEX.ATTRIBUTE +
     "|" + INDEX.FULLTEXT + "]: " + NL + lang("ch_create6");
   /** Command help. */
   String OPEN0 = lang("ch_open0");
@@ -168,9 +172,9 @@ public interface Text {
   String INFO1 = lang("ch_info1");
   /** Command help. */
   String INFO2 = lang("ch_info21") + NL + lang("ch_info22") + NL +
-    "- " + INFO.DB + lang("ch_info23") + NL +
-    "- " + INFO.INDEX + lang("ch_info24") + NL +
-    "- " + INFO.TABLE + lang("ch_info25");
+    LI + INFO.DB + lang("ch_info23") + NL +
+    LI + INFO.INDEX + lang("ch_info24") + NL +
+    LI + INFO.TABLE + lang("ch_info25");
   /** Command help. */
   String CHECK0 = lang("ch_check0");
   /** Command help. */
@@ -195,8 +199,8 @@ public interface Text {
   String DROP1 = lang("ch_drop1");
   /** Command help. */
   String DROP2 = lang("ch_drop2") + NL +
-    "- " + DROP.DB + lang("ch_drop21") + NL + lang("ch_drop22") + NL +
-    "- " + DROP.INDEX + " [" + INDEX.TEXT + "|" + INDEX.ATTRIBUTE + "|" +
+    LI + DROP.DB + lang("ch_drop21") + NL + lang("ch_drop22") + NL +
+    LI + DROP.INDEX + " [" + INDEX.TEXT + "|" + INDEX.ATTRIBUTE + "|" +
   INDEX.FULLTEXT + "]:" + NL + lang("ch_drop23");
   /** Command help. */
   String OPTIMIZE0 = "";
@@ -258,16 +262,16 @@ public interface Text {
   String FS1 = lang("ch_fs1");
   /** Command Help. */
   String FS2 = lang("ch_fs2") + NL +
-    "- " + FS.CAT      + lang("ch_fs25") + NL +
-    "- " + FS.CD       + lang("ch_fs23") + NL +  
-    "- " + FS.CP       + lang("ch_fs30") + NL +    
-    "- " + FS.DU       + lang("ch_fs21") + NL +
-    "- " + FS.LOCATE   + lang("ch_fs26") + NL +
-    "- " + FS.LS       + lang("ch_fs22") + NL +
-    "- " + FS.MKDIR    + lang("ch_fs27") + NL +
-    "- " + FS.PWD      + lang("ch_fs24") + NL +
-    "- " + FS.RM       + lang("ch_fs28") + NL +  
-    "- " + FS.TOUCH    + lang("ch_fs29");
+    LI + FS.CAT      + lang("ch_fs25") + NL +
+    LI + FS.CD       + lang("ch_fs23") + NL +  
+    LI + FS.CP       + lang("ch_fs30") + NL +    
+    LI + FS.DU       + lang("ch_fs21") + NL +
+    LI + FS.LOCATE   + lang("ch_fs26") + NL +
+    LI + FS.LS       + lang("ch_fs22") + NL +
+    LI + FS.MKDIR    + lang("ch_fs27") + NL +
+    LI + FS.PWD      + lang("ch_fs24") + NL +
+    LI + FS.RM       + lang("ch_fs28") + NL +  
+    LI + FS.TOUCH    + lang("ch_fs29");
 
   /** Command Help. */
   String DUMMYUPDATE0 = lang("ch_dummyupdate0");
@@ -293,12 +297,12 @@ public interface Text {
   String INSERT1 = lang("ch_insert1");
   /** Command Help. */
   String INSERT2 = lang("ch_insert2") + NL + NL +
-    "- " + UPDATE.ELEMENT   + " " + lang("ch_insert21") + NL +
-    "- " + UPDATE.TEXT      + " " + lang("ch_insert22") + NL +
-    "- " + UPDATE.ATTRIBUTE + " " + lang("ch_insert23") + NL +
-    "- " + UPDATE.COMMENT   + " " + lang("ch_insert24") + NL +
-    "- " + UPDATE.PI        + " " + lang("ch_insert25") + NL +
-    "- " + UPDATE.FRAGMENT  + " " + lang("ch_insert26");
+    LI + UPDATE.ELEMENT   + S + lang("ch_insert21") + NL +
+    LI + UPDATE.TEXT      + S + lang("ch_insert22") + NL +
+    LI + UPDATE.ATTRIBUTE + S + lang("ch_insert23") + NL +
+    LI + UPDATE.COMMENT   + S + lang("ch_insert24") + NL +
+    LI + UPDATE.PI        + S + lang("ch_insert25") + NL +
+    LI + UPDATE.FRAGMENT  + S + lang("ch_insert26");
   /** Command Help. */
   String UPDATE0 = "[" + UPDATE.ELEMENT + "|" + UPDATE.ATTRIBUTE + "|" +
     UPDATE.TEXT + "|" + UPDATE.COMMENT + "|" + UPDATE.PI + "] [...]";
@@ -306,11 +310,11 @@ public interface Text {
   String UPDATE1 = lang("ch_update1");
   /** Command Help. */
   String UPDATE2 = lang("ch_update2") + NL + NL +
-    "- " + UPDATE.ELEMENT   + " " + lang("ch_update21") + NL +
-    "- " + UPDATE.TEXT      + " " + lang("ch_update22") + NL +
-    "- " + UPDATE.ATTRIBUTE + " " + lang("ch_update23") + NL +
-    "- " + UPDATE.COMMENT   + " " + lang("ch_update24") + NL +
-    "- " + UPDATE.PI        + " " + lang("ch_update25");
+    LI + UPDATE.ELEMENT   + S + lang("ch_update21") + NL +
+    LI + UPDATE.TEXT      + S + lang("ch_update22") + NL +
+    LI + UPDATE.ATTRIBUTE + S + lang("ch_update23") + NL +
+    LI + UPDATE.COMMENT   + S + lang("ch_update24") + NL +
+    LI + UPDATE.PI        + S + lang("ch_update25");
 
   /** Command Help. */
   String DUMMYGENERAL0 = lang("ch_dummygeneral0");
@@ -321,27 +325,27 @@ public interface Text {
   String SET1 = lang("ch_set1");
   /** Command Help. */
   String SET2 = lang("ch_set2") + NL +
-    "- " + SET.INFO      + lang("ch_set21") + NL +
-    "- " + SET.DEBUG     + lang("ch_set22") + NL +
-    "- " + SET.SERIALIZE + lang("ch_set23") + NL +
-    "- " + SET.XMLOUTPUT + lang("ch_set24") + NL +
-    "- " + SET.MAINMEM   + lang("ch_set25") + NL +
-    "- " + SET.CHOP      + lang("ch_set26") + NL +
-    "- " + SET.ENTITY    + lang("ch_set27") + NL +
-    "- " + SET.TEXTINDEX + lang("ch_set28") + NL +
-    "- " + SET.ATTRINDEX + lang("ch_set29") + NL +
-    "- " + SET.FTINDEX   + lang("ch_set31");
+    LI + SET.INFO      + lang("ch_set21") + NL +
+    LI + SET.DEBUG     + lang("ch_set22") + NL +
+    LI + SET.SERIALIZE + lang("ch_set23") + NL +
+    LI + SET.XMLOUTPUT + lang("ch_set24") + NL +
+    LI + SET.MAINMEM   + lang("ch_set25") + NL +
+    LI + SET.CHOP      + lang("ch_set26") + NL +
+    LI + SET.ENTITY    + lang("ch_set27") + NL +
+    LI + SET.TEXTINDEX + lang("ch_set28") + NL +
+    LI + SET.ATTRINDEX + lang("ch_set29") + NL +
+    LI + SET.FTINDEX   + lang("ch_set31");
 
   /** Command Help. */
   String HELP0 = "[command]?";
   /** Command Help. */
-  String HELP1 = lang("ch_help1") + ' ' + NAME + lang("ch_help11");
+  String HELP1 = lang("ch_help1") + S + NAME + lang("ch_help11");
   /** Command Help. */
   String HELP2 = lang("ch_help2");
   /** Command Help. */
   String EXIT0 = "";
   /** Command Help. */
-  String EXIT1 = lang("ch_exit1") + ' ' + NAME + DOT;
+  String EXIT1 = lang("ch_exit1") + S + NAME + DOT;
   /** Command Help. */
   String EXIT2 = EXIT1;
   /** Command Help. */
@@ -354,9 +358,9 @@ public interface Text {
   // STARTER WINDOW ===========================================================
 
   /** Waiting info. */
-  String WAIT1 = lang("launch") + " " + TITLE;
+  String WAIT1 = lang("launch") + S + TITLE;
   /** Waiting info. */
-  String WAIT2 = "..." + lang("wait") + "...";
+  String WAIT2 = DOTS + lang("wait") + DOTS;
 
   // MENU ENTRIES =============================================================
 
@@ -387,7 +391,7 @@ public interface Text {
   // GUI COMMANDS =============================================================
 
   /** Command Info. */
-  String GUIABOUT = lang("c_about") + " " + NAME + DOTS;
+  String GUIABOUT = lang("c_about") + S + NAME + DOTS;
   /** Command Info. */
   String GUIABOUTTT = lang("c_abouttt");
   /** Command Info. */
@@ -629,8 +633,10 @@ public interface Text {
   /** Dialog title for choosing a directory. */
   String DIALOGFC = lang("d_fctitle");
 
-  /** Dialog title for creating a database. */
+  /** Dialog title for choosing a file. */
   String CREATETITLE = lang("dc_title");
+  /** Database creation filter. */
+  String CREATEFILTER = lang("dc_filter");
   /** Dialog title for creating a database. */
   String CREATENAME = lang("dc_name") + COLS;
   /** XML File Description. */
@@ -670,7 +676,7 @@ public interface Text {
   /** Whitespaces information. */
   String INTPARSEINFO = lang("dc_intparseinfo");
   /** Entities information. */
-  String ENTITIESINFO = lang("dc_entitiesinfo") + " (&...;).";
+  String ENTITIESINFO = lang("dc_entitiesinfo");
   /** Main-Memory Mode. */
   String MMEMINFO =  lang("dc_mminfo");
 
@@ -706,7 +712,7 @@ public interface Text {
   String OPENNODBINFO = lang("do_nodb") + DOT;
   /** Dialog title for deleting nodes. */
   String NODBQUESTION = OPENNODBINFO + DOT + NL +
-  lang("do_nodbquestion") + NL + " ";
+  lang("do_nodbquestion") + NL + S;
 
   /** File Dialog title. */
   String XQOPENTITLE = lang("dq_open");
@@ -769,7 +775,7 @@ public interface Text {
   /** Dialog title for dropping a database. */
   String DROPTITLE = lang("dd_title");
   /** Dialog title for dropping a database. */
-  String DROPCONF = lang("dd_question") + NL + " ";
+  String DROPCONF = lang("dd_question") + NL + S;
 
   /** Dialog Title for Import Options. */
   String PREFSTITLE = lang("dp_title");
@@ -856,7 +862,7 @@ public interface Text {
   String MEMHELP = lang("dz_help");
 
   /** About text. */
-  String ABOUTTITLE = lang("da_title") + " " + NAME;
+  String ABOUTTITLE = lang("da_title") + S + NAME;
   /** BaseX Copyright. */
   String COPYRIGHT = "© 2005-08 " + COMPANY;
   /** BaseX License. */
@@ -884,6 +890,8 @@ public interface Text {
   /** Update Error. */
   String PROCOUTMEM = lang("proc_outmem");
 
+  /** Unknown Command error. */
+  String CMDNO = lang("cmd_no");
   /** Unknown Command error. */
   String CMDUNKNOWN = lang("cmd_unknown");
   /** Unknown Command error. */
@@ -917,7 +925,7 @@ public interface Text {
   /** Builder error. */
   String LIMITATTS = lang("pc_atts");
   /** Create Database information. */
-  String NODESPARSED = " " + lang("pc_parse");
+  String NODESPARSED = S + lang("pc_parse");
   /** Scanner Position. */
   String SCANPOS = lang("pc_pos");
 
@@ -1024,7 +1032,7 @@ public interface Text {
   /** Query Info: Plan. */
   String QUERYPLAN = lang("qu_plan");
   /** Query Info: Compiler. */
-  String QUERYSEP = "- ";
+  String QUERYSEP = LI;
   /** Query Info: Plan. */
   String PLANXML = "plan.xml";
   /** Query Info: Plan. */
@@ -1055,7 +1063,7 @@ public interface Text {
   /** Query Hits. */
   String HITS = lang("qu_hits");
   /** Milliseconds. */
-  String MS = " " + lang("qu_ms");
+  String MS = S + lang("qu_ms");
 
   /** Query Hits. */
   String VALHIT = "Item";
@@ -1168,21 +1176,21 @@ public interface Text {
   /** Info on Whitespace Chopping. */
   String INFOCHOP = lang("info_chop");
   /** Info on Entity Parsing. */
-  String INFOENTITIES = lang("info_entities");
+  String INFOENTITY = lang("info_entities");
   /** Info on result serialization. */
   String INFOSERIALIZE = lang("info_serialize");
   /** Info on well formed XML serialization. */
   String INFOXMLOUTPUT = lang("info_xmloutput");
   /** Info on Main Memory mode. */
-  String INFOMM = lang("info_mainmem");
+  String INFOMAINMEM = lang("info_mainmem");
   /** Info on Text Indexing. */
   String INFOTAGINDEX = lang("info_tagindex");
   /** Info on Text Indexing. */
   String INFOATNINDEX = lang("info_atnindex");
   /** Info on Text Indexing. */
-  String INFOTXTINDEX = lang("info_txtindex");
+  String INFOTEXTINDEX = lang("info_txtindex");
   /** Info on Attribute Indexing. */
-  String INFOATVINDEX = lang("info_atvindex");
+  String INFOATTRINDEX = lang("info_atvindex");
   /** Info on Fulltext Indexing. */
   String INFOFTINDEX = lang("info_ftindex");
   /** Info on Fuzzy Indexing. */

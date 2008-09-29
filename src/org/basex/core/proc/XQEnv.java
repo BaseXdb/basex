@@ -37,7 +37,7 @@ public final class XQEnv extends AQuery {
     try {
       for(int i = 0; i < Prop.runs; i++) {
         if(query == null) {
-          qu = new XQueryProcessor(query);
+          qu = new XQueryProcessor(null);
           query = "()";
         }
   

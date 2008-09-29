@@ -23,16 +23,13 @@ public final class FTUnaryNot extends FTArrayExpr {
 
   @Override
   public Bool eval(final XPContext ctx) throws QueryException {
-    final Bool b0 = (Bool) exprs[0].eval(ctx); 
-    return Bool.get(!b0.bool()); 
+    return Bool.get(!exprs[0].eval(ctx).bool()); 
   }
 
   @Override
   public FTArrayExpr compile(final XPContext ctx) throws QueryException {
     for(int i = 0; i != exprs.length; i++) {
-      if (fto != null) {
-        if (exprs[i].fto == null) exprs[i].fto = fto;
-      }
+      if(exprs[i].fto == null) exprs[i].fto = fto;
       exprs[i] = exprs[i].compile(ctx);
     }
     return this;

@@ -16,7 +16,7 @@ import org.basex.util.TokenBuilder;
 /**
  * XML Conformance Test Suite Wrapper.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-07, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public final class XMLTS {

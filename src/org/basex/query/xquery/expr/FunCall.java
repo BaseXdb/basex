@@ -41,7 +41,7 @@ public final class FunCall extends Arr {
     // add function variables
     final Func func = ctx.fun.get(id);
     for(int a = 0; a < func.args.length; a++) {
-      ctx.vars.add(func.args[a].item(ctx.iter(expr[a]).finish()).clone());
+      ctx.vars.add(func.args[a].item(ctx.iter(expr[a]).finish(), ctx).clone());
     }
 
     // evaluate function and reset variable scope
@@ -53,8 +53,7 @@ public final class FunCall extends Arr {
 
     // cast return type
     final SeqType t = func.var.type;
-    if(t != null) i = t.cast(i, ctx);
-    return i.iter();
+    return (t != null ? t.cast(i, ctx) : i).iter();
   }
 
   @Override

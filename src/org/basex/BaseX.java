@@ -28,13 +28,13 @@ public final class BaseX extends BaseXClient {
   }
 
   @Override
-  void init(final String[] args) {
+  protected void init(final String[] args) {
     standalone = true;
     super.init(args);
   }
 
   @Override
-  synchronized void quit(final boolean force) {
+  protected synchronized void quit(final boolean force) {
     super.quit(force);
     if(!force) Prop.write();
     context.close();
@@ -137,17 +137,19 @@ public final class BaseX extends BaseXClient {
 
   /**
    * Throws a runtime exception for unimplemented methods.
+   * @param ext optional extension
    * @return dummy object
    */
-  public static Object notimplemented() {
-    throw new UnsupportedOperationException();
+  public static Object notimplemented(final Object... ext) {
+    throw new UnsupportedOperationException(info("%", ext));
   }
 
   /**
    * Throws a runtime exception for unexpected exceptions.
+   * @param ext optional extension
    * @return dummy object
    */
-  public static Object notexpected() {
-    throw new RuntimeException("Not expected.");
+  public static Object notexpected(final Object... ext) {
+    throw new RuntimeException(info("Not expected (%).", ext));
   }
 }

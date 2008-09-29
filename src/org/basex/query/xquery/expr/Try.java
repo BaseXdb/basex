@@ -42,8 +42,8 @@ public final class Try extends Arr {
       return ctx.iter(expr[0]);
     } catch(final XQException e) {
       final int s = ctx.vars.size();
-      if(var1 != null) ctx.vars.add(var1.item(Str.get(e.msg())));
-      if(var2 != null) ctx.vars.add(var2.item(Str.get(e.code())));
+      if(var1 != null) ctx.vars.add(var1.item(Str.get(e.msg()), ctx));
+      if(var2 != null) ctx.vars.add(var2.item(Str.get(e.code()), ctx));
       final Iter iter = ctx.iter(expr[1]);
       ctx.vars.reset(s);
       return iter;

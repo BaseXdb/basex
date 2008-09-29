@@ -174,6 +174,8 @@ public interface XQTokens {
   String PIPE = "|";
   /** Parser token. */
   String PRAGMA = "(#";
+  /** Parser token. */
+  byte[] WILD = { '*' };
 
   // URIS =====================================================================
 

@@ -1,6 +1,7 @@
 package org.basex;
 
 import static org.basex.Text.*;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,11 +17,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.data.XMLSerializer;
-import org.basex.io.IO;
 import org.basex.io.BufferedOutput;
+import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQueryProcessor;
@@ -50,7 +52,7 @@ public final class BaseXWebServer {
   static final String[] INDEXFILES = {
     "index." + XQSUFFIX, "index." + PHPSUFFIX, "index.html", "index.htm",
   };
-  
+
   /** Document header. */
   static final String DOCTYPE =
     "<!DOCTYPE html PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN'" +
@@ -155,7 +157,7 @@ public final class BaseXWebServer {
               send(file, s);
             }
             is.close();
-      
+
             if(verbose) {
               final InetAddress addr = s.getInetAddress();
               BaseX.outln("%:% => % [%]", addr.getHostAddress(),
@@ -188,11 +190,11 @@ public final class BaseXWebServer {
       if(line.length() == 0) break;
       final Matcher m = QUERY.matcher(line);
       if(m.matches()) input = m.group(1);
-      stop |= line.equals("STOP"); 
+      stop |= line.equals("STOP");
     }
     if(stop) return new Request(0);
     if(input == null) return new Request(400);
-    
+
     // decode input...
     return new Request(URLDecoder.decode(input.replaceAll("&", "|"), "UTF-8"));
   }
@@ -207,7 +209,7 @@ public final class BaseXWebServer {
     final OutputStream os = s.getOutputStream();
     os.write(file.content());
     os.close();
-    
+
     /*
     final FileInputStream is = new FileInputStream(file.name);
     byte[] buf = new byte[s.getSendBufferSize()];
@@ -230,7 +232,7 @@ public final class BaseXWebServer {
    */
   protected void send(final String code, final String head, final String msg,
       final Socket s) throws IOException {
-    
+
     final OutputStream os = s.getOutputStream();
     final PrintOutput out = new PrintOutput(new BufferedOutput(os));
     out.println("HTTP/1.1 " + code);
@@ -281,14 +283,14 @@ public final class BaseXWebServer {
       for(final String[] arg : req.args) {
         final Var v = new Var(new QNm(Token.token(arg[0])));
         final String val = arg.length == 2 ? arg[1] : "";
-        xq.ctx.vars.addGlobal(v.item(Str.get(val)));
+        xq.ctx.vars.addGlobal(v.item(Str.get(val), null));
       }
       xq.query(null).serialize(new XMLSerializer(out));
     } catch(final Exception ex) {
       if(ex instanceof IOException) {
         out.println(SERVERERR);
       } else if(ex instanceof XQException) {
-        out.println(HEADER + "<pre><font color='red'>" + 
+        out.println(HEADER + "<pre><font color='red'>" +
             ex.getMessage() + "</font></pre>" + FOOTER);
       } else {
         out.println(ex.toString());
@@ -297,7 +299,7 @@ public final class BaseXWebServer {
     }
     out.close();
   }
-  
+
   /**
    * Evaluates a PHP script.
    * @param req request instance
@@ -350,7 +352,7 @@ public final class BaseXWebServer {
     os.write(out[out[1].length == 0 ? 0 : 1]);
     os.close();
   }
-  
+
   /**
    * Sends a directory output.
    * @param dir directory reference
@@ -362,8 +364,8 @@ public final class BaseXWebServer {
 
     final OutputStream os = s.getOutputStream();
     final PrintOutput out = new PrintOutput(new BufferedOutput(os));
-    String col = " style='background-color:grey; height:1px;'";
-    String dec = " style='text-decoration:none;'";
+    final String col = " style='background-color:grey; height:1px;'";
+    final String dec = " style='text-decoration:none;'";
     out.println(HEADER);
     out.println("<h2>Index of " + absPath(dir) + "/</h2>");
     out.println("<table cellpadding='0' cellspacing='2'>");
@@ -396,7 +398,7 @@ public final class BaseXWebServer {
   protected String absPath(final IO f) {
     return f.path().replace(Prop.webpath.replace('\\', '/'), "");
   }
-  
+
   /**
    * Parses the command line arguments.
    * @param args the command line arguments
@@ -476,7 +478,7 @@ public final class BaseXWebServer {
     Request(final int c) {
       code = c;
     }
-    
+
     /**
      * Constructor.
      * @param fn filename
@@ -484,10 +486,10 @@ public final class BaseXWebServer {
     Request(final String fn) {
       // no file specified - try alternatives
       file = IO.get(Prop.webpath + "/" + fn);
-      
+
       if(file.isDir()) {
         for(final String index : INDEXFILES) {
-          IO f = IO.get(Prop.webpath + "/" + fn + "/" + index);
+          final IO f = IO.get(Prop.webpath + "/" + fn + "/" + index);
           if(f.exists()) {
             code = 302;
             file = f;
@@ -512,7 +514,7 @@ public final class BaseXWebServer {
       i = f.indexOf(".");
       file = IO.get(Prop.webpath + "/" + f);
       suf = i != -1 ? f.substring(i + 1) : "";
-      
+
       if(!file.exists()) code = 404;
     }
   }

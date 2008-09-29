@@ -20,7 +20,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class InfoDB extends AInfo {
+public final class InfoDB extends AInfo {
   /** Date Format. */
   private static final SimpleDateFormat DATE =
     new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
@@ -81,10 +81,10 @@ public class InfoDB extends AInfo {
       if(meta.newindex) {
         tb.add(" " + INDUPDATE + NL);
       } else {
-        format(tb, INFOTXTINDEX, BaseX.flag(meta.txtindex), true, 0);
-        format(tb, INFOATVINDEX, BaseX.flag(meta.atvindex), true, 0);
+        format(tb, INFOTEXTINDEX, BaseX.flag(meta.txtindex), true, 0);
+        format(tb, INFOATTRINDEX, BaseX.flag(meta.atvindex), true, 0);
         format(tb, INFOFTINDEX, BaseX.flag(meta.ftxindex) + (meta.ftxindex &&
-            meta.ftfuzzy ? " (" + INFOFZINDEX + ")" : ""), true, 0);
+            meta.ftfz ? " (" + INFOFZINDEX + ")" : ""), true, 0);
       }
     }
     return tb.finish();

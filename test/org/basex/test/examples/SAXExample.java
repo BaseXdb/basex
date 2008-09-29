@@ -12,8 +12,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * This class serves as an example for evaluating XQuery requests
- * and receiving the results via the SAX API. Note that the SAX output
- * doesn't support namespaces yet.
+ * and serializing the results via the SAX API.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen

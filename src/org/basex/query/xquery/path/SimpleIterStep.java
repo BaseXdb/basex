@@ -29,10 +29,8 @@ public final class SimpleIterStep extends Step {
   
   @Override
   public NodeIter iter(final XQContext ctx) throws XQException {
+    final Iter iter = checkCtx(ctx);
     final Item item = ctx.item;
-
-    if(item == null) Err.or(XPNOCTX, this);
-    final Iter iter = item.iter();
 
     // no special predicate treatment?
     return new NodeIter() {

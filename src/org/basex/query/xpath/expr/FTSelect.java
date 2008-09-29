@@ -14,13 +14,13 @@ import org.basex.query.xpath.values.Item;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Sebastian Gath
  */
-public final class FTSelectXP extends FTArrayExpr {
+public final class FTSelect extends FTArrayExpr {
   /**
    * Constructor.
    * @param e expressions
    * @param ftps FTPositionFilter
    */
-  public FTSelectXP(final FTArrayExpr e, final FTPositionFilter ftps) {
+  public FTSelect(final FTArrayExpr e, final FTPositionFilter ftps) {
     exprs = new FTArrayExpr[] { e };
     ftpos = ftps;   
   }

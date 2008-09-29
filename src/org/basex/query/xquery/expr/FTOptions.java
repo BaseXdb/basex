@@ -14,7 +14,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class FTOptions extends Single implements Cloneable {
+public final class FTOptions extends Single {
   /** FTOptions. */
   public FTOpt opt;
 
@@ -44,15 +44,6 @@ public final class FTOptions extends Single implements Cloneable {
     final Iter it = ctx.iter(expr);
     ctx.ftopt = tmp;
     return it;
-  }
-
-  @Override
-  public FTOptions clone() {
-    try {
-      return (FTOptions) super.clone();
-    } catch(final CloneNotSupportedException e) {
-      return null;
-    }
   }
 
   @Override

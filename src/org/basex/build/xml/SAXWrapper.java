@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXSource;
-
 import org.basex.BaseX;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
@@ -45,29 +44,11 @@ public final class SAXWrapper extends Parser {
 
   /**
    * Constructor.
-   * @param in input file
-   */
-  public SAXWrapper(final IO in) {
-    super(in);
-  }
-
-  /**
-   * Constructor.
    * @param s sax source
    */
   public SAXWrapper(final SAXSource s) {
-    this(io(s));
+    super(IO.get(s.getSystemId()));
     source = s;
-  }
-
-  /**
-   * Returns a filename from a SAX source.
-   * @param s source
-   * @return filename
-   */
-  private static IO io(final SAXSource s) {
-    final String fn = s.getSystemId();
-    return IO.get(fn != null ? fn : "tmp");
   }
 
   @Override
@@ -89,16 +70,11 @@ public final class SAXWrapper extends Parser {
       r.setErrorHandler(p);
 
       builder.startDoc(token(io.name()));
-      // find correct input...
-      if(source == null) {
-        r.parse(io.inputSource());
-      } else {
-        final InputSource is = source.getInputSource();
-        if(is != null) r.parse(is);
-        else r.parse(source.getSystemId());
-      }
+      final InputSource is = source.getInputSource();
+      if(is != null) r.parse(is);
+      else r.parse(source.getSystemId());
       builder.endDoc();
-      
+
     } catch(final SAXParseException ex) {
       final String msg = BaseX.info(SCANPOS, ex.getSystemId(),
           ex.getLineNumber(), ex.getColumnNumber()) + ": " + ex.getMessage();
@@ -167,13 +143,14 @@ public final class SAXWrapper extends Parser {
 
     @Override
     public void characters(final char[] ch, final int s, final int l) {
-      for(int i = s, e = s + l; i < e; i++) tb.addUTF(ch[i]);
+      final int e = s + l;
+      for(int i = s; i < e; i++) tb.addUTF(ch[i]);
     }
 
     @Override
     public void processingInstruction(final String name, final String cont)
         throws SAXException {
-      
+
       if(dtd) return;
       try {
         finishText();
@@ -187,7 +164,7 @@ public final class SAXWrapper extends Parser {
     /** {@inheritDoc} */
     public void comment(final char[] ch, final int s, final int l)
         throws SAXException {
-      
+
       if(dtd) return;
       try {
         finishText();
@@ -201,9 +178,9 @@ public final class SAXWrapper extends Parser {
     /** Temporary string builder. */
     private final TokenBuilder tb = new TokenBuilder();
     /** Temporary namespace prefix. */
-    private TokenList np = new TokenList();
+    private final TokenList np = new TokenList();
     /** Temporary namespace value. */
-    private TokenList nv = new TokenList();
+    private final TokenList nv = new TokenList();
 
     /**
      * Checks if a text node has to be written.
@@ -249,11 +226,11 @@ public final class SAXWrapper extends Parser {
       np.add(Token.token(prefix));
       nv.add(Token.token(uri));
     }
-    
+
     /*public void endPrefixMapping(final String prefix) { } */
     /*public void ignorableWhitespace(char[] ch, int s, int l) { } */
     /*public void skippedEntity(final String name) { } */
-    
+
     // ErrorHandler
     /* public void warning(final SAXParseException e) { } */
     /* public void fatalError(final SAXParseException e) { } */

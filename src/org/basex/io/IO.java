@@ -18,6 +18,9 @@ import org.xml.sax.InputSource;
  * @author Christian Gruen
  */
 public abstract class IO {
+  /** Return IO dummy instance. */
+  public static final IO DUMMY = new IOContent(Token.EMPTY);
+  
   /** Invalid file characters. */
   private static final String INVALID = " \"*./:<>?";
   /** BaseX Suffix. */
@@ -55,6 +58,7 @@ public abstract class IO {
    * @return IO reference
    */
   public static IO get(final String s) {
+    if(s == null) return new IOFile("tmp");
     if(s.startsWith("<")) return new IOContent(Token.token(s));
     if(s.startsWith("http://")) return new IOUrl(s);
     return new IOFile(s);
@@ -96,7 +100,7 @@ public abstract class IO {
    * Returns the directory of this path.
    * @return result of check
    */
-  public String getDir() {
+  public final String getDir() {
     return isDir() ? path() : path.substring(0, path.lastIndexOf('/') + 1);
   }
 
@@ -154,7 +158,7 @@ public abstract class IO {
    * Sets the specified suffix if none exists.
    * @param suf suffix
    */
-  public void suffix(final String suf) {
+  public final void suffix(final String suf) {
     if(path.indexOf(".") == -1) path += suf;
   }
 
@@ -163,7 +167,7 @@ public abstract class IO {
    * Returns "tmp" if name is empty.
    * @return chopped filename
    */
-  public String dbname() {
+  public final String dbname() {
     final String n = name();
     final int i = n.lastIndexOf(".");
     return i != -1 ? n.substring(0, i) : n.length() == 0 ? "tmp" : n;
@@ -173,7 +177,7 @@ public abstract class IO {
    * Chops the path and the XML suffix of the specified filename.
    * @return chopped filename
    */
-  public String name() {
+  public final String name() {
     return path.substring(path.lastIndexOf('/') + 1);
   }
 
@@ -181,7 +185,7 @@ public abstract class IO {
    * Chops the path and the XML suffix of the specified filename.
    * @return chopped filename
    */
-  public String path() {
+  public final String path() {
     return path;
   }
 
@@ -218,12 +222,12 @@ public abstract class IO {
    * @param io io reference
    * @return result of check
    */
-  public boolean eq(final IO io) {
+  public final boolean eq(final IO io) {
     return path.equals(io.path);
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     return path;
   }
   
@@ -233,7 +237,7 @@ public abstract class IO {
    * @return cached contents
    * @throws IOException exception
    */
-  protected byte[] cache(final InputStream i) throws IOException {
+  protected final byte[] cache(final InputStream i) throws IOException {
     final TokenBuilder tb = new TokenBuilder();
     final InputStream bis = i instanceof BufferedInputStream ? i :
       new BufferedInputStream(i);
@@ -297,5 +301,22 @@ public abstract class IO {
           INVALID.indexOf(c) != -1)) return false;
     }
     return true;
+  }
+
+  /**
+   * Creates a URL from the specified path.
+   * @param path path to be converted
+   * @return URL
+   */
+  public static final String url(final String path) {
+    String pre = "file://";
+    if(!path.startsWith("/")) {
+      pre += "/";
+      if(path.length() < 2 || path.charAt(1) != ':') {
+        pre += "/" + Prop.WORK.replace('\\', '/');
+        if(!pre.endsWith("/")) pre += "/";
+      }
+    }
+    return pre + path.replace('\\', '/');
   }
 }

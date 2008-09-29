@@ -5,6 +5,7 @@ import static org.basex.core.Commands.*;
 import static org.basex.util.Token.*;
 import java.lang.reflect.Field;
 import org.basex.BaseX;
+import org.basex.Text;
 import org.basex.core.Process;
 import org.basex.core.Prop;
 
@@ -33,7 +34,6 @@ public final class Set extends Process {
     
     try {
       final Field f = Prop.class.getField(option.toLowerCase());
-      final String desc = s != null ? s.desc : option;
       final Object key = f.get(null);
       String val = args[1];
       
@@ -55,7 +55,9 @@ public final class Set extends Process {
       } else {
         throw new Exception();
       }
-      return info(desc + " " + val);
+      
+      return info(s == null ? option :
+        Text.class.getField("INFO" + s).get(null).toString() + " " + val);
     } catch(final Exception ex) {
       BaseX.debug(ex);
       return error("Could not assign \"%\"", option);

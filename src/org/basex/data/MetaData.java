@@ -43,9 +43,9 @@ public final class MetaData {
   /** Flag for creating a fulltext index. */
   public boolean ftxindex = Prop.ftindex;
   /** Flag for removing the index structures. */
-  public boolean ftfuzzy = Prop.ftfuzzy;
+  public boolean ftfz = Prop.ftfuzzy;
   /** Flag for fulltext stemming. */
-  public boolean ftstem = Prop.ftstem;
+  public boolean ftst = Prop.ftstem;
   /** Flag for fulltext case sensitivity. */
   public boolean ftcs = Prop.ftcs;
   /** Flag for fulltext diacritics removal. */
@@ -132,8 +132,8 @@ public final class MetaData {
       else if(k.equals(DBTXTINDEX)) txtindex = toBool(v);
       else if(k.equals(DBATVINDEX)) atvindex = toBool(v);
       else if(k.equals(DBFTXINDEX)) ftxindex = toBool(v);
-      else if(k.equals(DBFZINDEX)) ftfuzzy = toBool(v);
-      else if(k.equals(DBFTSTEM)) ftstem = toBool(v);
+      else if(k.equals(DBFZINDEX)) ftfz = toBool(v);
+      else if(k.equals(DBFTSTEM)) ftst = toBool(v);
       else if(k.equals(DBFTCS)) ftcs = toBool(v);
       else if(k.equals(DBFTDC)) ftdc = toBool(v);
       else if(k.equals(DBTIME)) time = Token.toLong(v);
@@ -175,8 +175,8 @@ public final class MetaData {
     writeInfo(inf, DBTXTINDEX, txtindex);
     writeInfo(inf, DBATVINDEX, atvindex);
     writeInfo(inf, DBFTXINDEX, ftxindex);
-    writeInfo(inf, DBFZINDEX, ftfuzzy);
-    writeInfo(inf, DBFTSTEM, ftstem);
+    writeInfo(inf, DBFZINDEX, ftfz);
+    writeInfo(inf, DBFTSTEM, ftst);
     writeInfo(inf, DBFTCS, ftcs);
     writeInfo(inf, DBFTDC, ftdc);
     writeInfo(inf, DBTIME, Long.toString(time));

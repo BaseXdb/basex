@@ -81,7 +81,7 @@ public final class QuerySyntax extends BaseXSyntax {
       return VAR;
     }
     if(var) {
-      var &= XMLToken.isLetterOrDigit(ch);
+      var = XMLToken.isLetterOrDigit(ch);
       return VAR;
     }
 

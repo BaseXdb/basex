@@ -33,16 +33,14 @@ public final class FTMildNotExprs extends FTArrayExpr {
   
   @Override
   public FTNode next(final XPContext ctx) {
-    FTNode n0 = exprs[0].next(ctx);
+    final FTNode n0 = exprs[0].next(ctx);
     if (n1 == null) {
       if (exprs[1].more()) n1 = exprs[1].next(ctx);
       else return n0;
     } 
     
-    IntList pos = new IntList();
-    IntList poi = new IntList();
-    pos.add(n0.getPre());
-    poi.add(n0.getNumTokens());
+    final IntList pos = new IntList(n0.getPre());
+    final IntList poi = new IntList(n0.getNumTokens());
     
     if (n0.getPre() < n1.getPre()) {
       return n0;

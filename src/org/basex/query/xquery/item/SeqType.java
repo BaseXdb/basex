@@ -1,11 +1,13 @@
 package org.basex.query.xquery.item;
 
+import static org.basex.query.xquery.XQText.*;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Err;
 import org.basex.query.xquery.util.SeqBuilder;
+import org.basex.util.Token;
 
 /**
  * Stores a sequence type definition.
@@ -15,8 +17,7 @@ import org.basex.query.xquery.util.SeqBuilder;
  */
 public final class SeqType {
   /** Extended type info. */
-  // [CG] XQuery/SeqType: process extended info (currently ignored).
-  byte[] ext;
+  public QNm ext;
   /** Sequence type. */
   public Type type;
   /** Occurrence mode: 0 = default, 1 = "?", 2 = "+", 3 = "*". */
@@ -26,29 +27,26 @@ public final class SeqType {
    * Constructor.
    * @param name sequence type
    * @param o occurrences
-   * @param e extended type info
+   * @param e extended info
    */
-  public SeqType(final QNm name, final int o, final byte[] e) {
-    type = Type.find(name, e != null);
-    ext = e;
+  public SeqType(final QNm name, final int o, final boolean e) {
+    type = Type.find(name, e);
     occ = o;
   }
 
   /**
    * Checks the instance of the specified iterator.
    * @param iter iteration to be checked
-   * @param f force instance check for untyped values
    * @return result of check
    * @throws XQException evaluation exception
    */
-  public boolean instance(final Iter iter, final boolean f) throws XQException {
+  public boolean instance(final Iter iter) throws XQException {
     Item it = iter.next();
     if(it == null) return type == Type.EMP || occ % 2 != 0;
-    if(occ < 2) return iter.next() == null && (!f && it.u() && !type.node() ||
-        it.type.instance(type));
+    if(occ < 2) return iter.next() == null && it.type.instance(type);
 
     do {
-      if((f || !it.u() || type.node()) && !it.type.instance(type)) return false;
+      if(!it.type.instance(type)) return false;
     } while((it = iter.next()) != null);
     return true;
   }
@@ -65,7 +63,13 @@ public final class SeqType {
       throws XQException {
 
     final Item it = iter.atomic(expr, occ != 0);
-    return it == null ? Seq.EMPTY : it.type == type ? it : type.e(it, ctx);
+    if(it == null) return Seq.EMPTY;
+    // tiresome test to disallow "xs:QName(xs:string(...))"
+    if(it.type == type) {
+      if(it.type == Type.STR) ((Str) it).direct = false;
+      return it;
+    }
+    return check(type.e(it, ctx));
   }
 
   /**
@@ -76,7 +80,7 @@ public final class SeqType {
    * @throws XQException evaluation exception
    */
   public Item cast(final Item item, final XQContext ctx) throws XQException {
-    Iter iter = item.iter();
+    final Iter iter = item.iter();
     Item it = iter.next();
     if(it == null) {
       if(type == Type.EMP || occ % 2 != 0) return Seq.EMPTY;
@@ -86,7 +90,7 @@ public final class SeqType {
     boolean ins = it.type.instance(type);
     if(type == Type.EMP || !it.u() && !ins) Err.cast(type, it);
 
-    it = ins ? it : type.e(it, ctx);
+    it = check(ins ? it : type.e(it, ctx));
     Item n = iter.next();
     if(occ < 2 && n != null) Err.cast(type, item);
 
@@ -95,10 +99,31 @@ public final class SeqType {
     while(n != null) {
       ins = n.type.instance(type);
       if(!n.u() && !ins) Err.cast(type, n);
-      sb.a(ins ? n : type.e(n, ctx));
+      sb.a(check(ins ? n : type.e(n, ctx)));
       n = iter.next();
     }
     return sb.finish();
+  }
+  
+  /**
+   * Checks the sequence extension. 
+   * @param it item
+   * @return same item
+   * @throws XQException exception
+   */
+  private Item check(final Item it) throws XQException {
+    if(ext != null) {
+      switch(type) {
+        case PI:
+          if(!Token.eq(ext.str(), ((Nod) it).nname()))
+              Err.or(XPCAST, it.type, ext);
+          break;
+        // [CG] check other types, similar to {@link Test} classes
+        default:
+      }
+      //Err.cast(type, item);
+    }
+    return it;
   }
 
   @Override

@@ -1,6 +1,7 @@
 package org.basex.test.w3c;
 
 import static org.basex.util.Token.*;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
@@ -16,16 +17,17 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.regex.Pattern;
+
 import org.basex.BaseX;
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.proc.Check;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.data.XMLSerializer;
 import org.basex.data.Result;
-import org.basex.io.IO;
+import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
+import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPathProcessor;
 import org.basex.query.xquery.XQContext;
@@ -49,7 +51,7 @@ import org.basex.util.TokenList;
 /**
  * XQuery Test Suite Wrapper.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-07, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public abstract class W3CTS {
@@ -170,7 +172,7 @@ public abstract class W3CTS {
         return;
       }
     }
-    
+
     queries = path + "Queries/XQuery/";
     expected = path + "ExpectedTestResults/";
     results = path + "ReportingResults/Results/";
@@ -285,7 +287,7 @@ public abstract class W3CTS {
    * @return percentage
    */
   private String pc(final int v, final int t) {
-    return (t == 0 ? 100 : (v * 10000 / t) / 100.0) + "%";
+    return (t == 0 ? 100 : (v * 10000 / t) / 100d) + "%";
   }
 
   /**
@@ -304,6 +306,11 @@ public abstract class W3CTS {
     if(single != null && !outname.startsWith(single)) return true;
 
     final IO file = IO.get(queries + pth + inname + ".xq");
+    if(!file.exists()) {
+      BaseX.errln("Not found: " + file);
+      return true;
+    }
+
     final String in = read(file);
 
     String output = "";
@@ -313,7 +320,7 @@ public abstract class W3CTS {
     final TokenBuilder files = new TokenBuilder();
     try {
       final Context context = new Context();
-      
+
       final XQueryProcessor xq = new XQueryProcessor(in, file);
       final Nodes cont = nodes("contextItem", root);
       if(cont.size != 0) new Check(sources + string(data.atom(cont.pre[0])) +
@@ -366,7 +373,8 @@ public abstract class W3CTS {
     for(int o = 0; o < outFiles.size; o++) {
       if(o != 0) tb.append(DELIM);
       final String resFile = string(data.atom(outFiles.pre[o]));
-      tb.append(read(IO.get(expected + pth + resFile)));
+      final IO exp = IO.get(expected + pth + resFile);
+      tb.append(exp.exists() ? read(exp) : ("Not Found: " + exp));
     }
     String result = tb.toString();
     String expError = text("expected-error/text()", root);
@@ -507,8 +515,9 @@ public abstract class W3CTS {
     final StringBuilder sb = new StringBuilder();
     int m = 0;
     boolean s = false;
-    for(int c = 0, cl = in.length(); c < cl; c++) {
-      char ch = in.charAt(c);
+    final int cl = in.length();
+    for(int c = 0; c < cl; c++) {
+      final char ch = in.charAt(c);
       if(ch == '(' && c + 1 < cl && in.charAt(c + 1) == ':') {
         if(m == 0 && !s) {
           sb.append(' ');
@@ -526,7 +535,7 @@ public abstract class W3CTS {
     }
     return sb.toString().trim();
   }
-  
+
   /**
    * Initializes the input files, specified by the context nodes.
    * @param nod variables
@@ -553,14 +562,14 @@ public abstract class W3CTS {
 
         if(var != null) {
           final Var v = new Var(new QNm(data.atom(var.pre[c])));
-          ctx.vars.addGlobal(v.item(Uri.uri(nm)));
+          ctx.vars.addGlobal(v.item(Uri.uri(nm), ctx));
         }
       } else {
         // assign document
         final Fun fun = FNIndex.get().get(token("doc"), Uri.FN,
             new Expr[] { Str.get(src) });
         final Var v = new Var(new QNm(data.atom(var.pre[c])));
-        ctx.vars.addGlobal(v.expr(fun));
+        ctx.vars.addGlobal(v.expr(fun, ctx));
       }
     }
     return tb.finish();
@@ -584,7 +593,7 @@ public abstract class W3CTS {
       final XQueryProcessor qu = new XQueryProcessor(in);
       final XQResult result = (XQResult) qu.query(null);
       final Var v = new Var(new QNm(data.atom(var.pre[c])));
-      ctx.vars.addGlobal(v.item(result.item()));
+      ctx.vars.addGlobal(v.item(result.item(), ctx));
     }
   }
 

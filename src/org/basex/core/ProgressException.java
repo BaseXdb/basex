@@ -6,4 +6,4 @@ package org.basex.core;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class ProgressException extends RuntimeException { }
+public final class ProgressException extends RuntimeException { }

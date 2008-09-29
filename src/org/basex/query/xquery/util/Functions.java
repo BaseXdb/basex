@@ -3,10 +3,11 @@ package org.basex.query.xquery.util;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
+
 import org.basex.data.Serializer;
 import org.basex.query.ExprInfo;
-import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
+import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Cast;
 import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.expr.FunCall;
@@ -60,7 +61,7 @@ public final class Functions extends ExprInfo {
 
     // parse data type constructors
     if(uri.eq(Uri.XS)) {
-      final SeqType seq = new SeqType(name, 1, null);
+      final SeqType seq = new SeqType(name, 1, false);
       if(seq.type == null) typeErr(name);
       if(args.length != 1) Err.or(FUNCTYPE, name.str());
       return new Cast(args[0], seq);
@@ -70,10 +71,10 @@ public final class Functions extends ExprInfo {
     if(Token.startsWith(uri.str(), JAVAPRE)) {
       final String c = Token.string(Token.substring(uri.str(), JAVAPRE.length));
       // convert dashes to upper-case initials
-      StringBuilder sb = new StringBuilder(c);
+      final StringBuilder sb = new StringBuilder(c);
       sb.append(".");
       boolean dash = false;
-      for(char b : Token.string(ln).toCharArray()) {
+      for(final char b : Token.string(ln).toCharArray()) {
         if(dash) {
           sb.append(Character.toUpperCase(b));
           dash = false;
@@ -89,15 +90,15 @@ public final class Functions extends ExprInfo {
         final Class<?> cls = Class.forName(java.substring(0, i));
         final String mth = java.substring(i + 1);
         return new FunJava(cls, mth, args);
-      } catch(ClassNotFoundException ex) {
+      } catch(final ClassNotFoundException ex) {
         Err.or(FUNCJAVA, java);
       }
     }
 
     // check predefined functions
-    Fun fun = FNIndex.get().get(ln, uri, args);
+    final Fun fun = FNIndex.get().get(ln, uri, args);
     if(fun != null) return fun;
-    
+
     // find local function
     for(int l = 0; l < size; l++) {
       final QNm qn = func[l].var.name;
@@ -117,7 +118,7 @@ public final class Functions extends ExprInfo {
   }
 
   /**
-   * Throws an error for the specified name. 
+   * Throws an error for the specified name.
    * @param type type as string
    * @throws XQException query exception
    */

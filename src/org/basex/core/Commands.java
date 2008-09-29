@@ -96,20 +96,7 @@ public interface Commands {
   
   /** Set commands. */
   enum SET {
-    INFO(INFOINFO), DEBUG(INFODEBUG), SERIALIZE(INFOSERIALIZE), 
-    XMLOUTPUT(INFOXMLOUTPUT), MAINMEM(INFOMM), CHOP(INFOCHOP),
-    ENTITY(INFOENTITIES), TEXTINDEX(INFOTXTINDEX), ATTRINDEX(INFOATVINDEX),
-    FTINDEX(INFOFTINDEX);
-    
-    /** Description. */
-    public final String desc;
-    
-    /**
-     * Constructor.
-     * @param d descriptions
-     */
-    SET(final String d) {
-      desc = d;
-    }
+    INFO, DEBUG, SERIALIZE, XMLOUTPUT, MAINMEM, CHOP,
+    ENTITY, TEXTINDEX, ATTRINDEX, FTINDEX
   }
 }

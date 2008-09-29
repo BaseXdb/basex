@@ -25,16 +25,11 @@ public final class XPContext extends QueryContext {
   /** Leaf flag. */
   public boolean leaf;
   /** Count number of xpath fulltext query tokens. **/
-  public int ftcount = 0;
-  // TODO... use fulltext flags
-  
+  public int ftcount;
   /** Current fulltext item. */
   public FTTokenizer ftitem;
   /** Current fulltext position filter. */
   public FTPositionFilter ftpos;
-  /** Current fulltext options. */
-  //public FTOpt ftopt;
-  
   /** Reference to the root expression. */
   private Expr root;
 
@@ -80,14 +75,14 @@ public final class XPContext extends QueryContext {
   public Item eval(final Expr e) throws QueryException {
     checkStop();
 
-    final Item v = e.eval(this);
-    if(!inf || cc >= MAXDUMP) return v;
-
-    final double time = ((System.nanoTime() - evalTime) / 10000) / 100.0;
-    evalInfo(time + MS + ": " + e + " -> " + v);
-    if(++cc == MAXDUMP) evalInfo(XPText.EVALSKIP);
-    return v;
+    final Item it = e.eval(this);
+    if(inf) {
+      final double t = ((System.nanoTime() - evalTime) / 10000) / 100d;
+      evalInfo(t + MS + ": " + e + " -> " + it);
+      inf = ++cc < MAXDUMP;
+      if(!inf) evalInfo(XPText.EVALSKIP);
+    }
+    return it;
   }
-  
 }
 

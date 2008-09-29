@@ -10,6 +10,8 @@ import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.QNm;
 import org.basex.query.xquery.item.SeqType;
+import org.basex.query.xquery.item.Str;
+import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.util.TokenBuilder;
 
@@ -59,24 +61,25 @@ public final class Var extends ExprInfo implements Cloneable {
   /**
    * Binds the specified expression to the variable.
    * @param e expression to be set
+   * @param ctx query context
    * @return self reference
    * @throws XQException evaluation exception
    */
-  public Var expr(final Expr e) throws XQException {
+  public Var expr(final Expr e, final XQContext ctx) throws XQException {
     expr = e;
-    return e.i() ? item((Item) e) : this;
+    return e.i() ? item((Item) e, ctx) : this;
   }
 
   /**
    * Binds the specified item to the variable.
    * @param it item to be set
+   * @param ctx query context
    * @return self reference
    * @throws XQException evaluation exception
    */
-  public Var item(final Item it) throws XQException {
+  public Var item(final Item it, final XQContext ctx) throws XQException {
     expr = it;
-    item = it;
-    check();
+    item = check(it, ctx);
     return this;
   }
   
@@ -92,22 +95,22 @@ public final class Var extends ExprInfo implements Cloneable {
       
       final Item it = ctx.item;
       ctx.item = null;
-      item = ctx.iter(expr).finish();
+      item = check(ctx.iter(expr).finish(), ctx);
       ctx.item = it;
-      check();
     }
     return item.iter();
   }
   
   /**
    * Checks the variable type.
+   * @param it input item
+   * @param ctx query context
+   * @return cast item
    * @throws XQException query exception
    */
-  public void check() throws XQException {
-    if(type != null) {
-      // [CG] check untyped/node types..
-      if(!type.instance(item.iter(), true)) Err.cast(type.type, item);
-    }
+  public Item check(final Item it, final XQContext ctx) throws XQException {
+    if(it.type == Type.STR) ((Str) it).direct = false;
+    return type == null ? it : type.cast(it, ctx);
   }
 
   @Override

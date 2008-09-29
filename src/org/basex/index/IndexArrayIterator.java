@@ -9,7 +9,7 @@ import org.basex.util.IntArrayList;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class IndexArrayIterator extends IndexIterator {
+public final class IndexArrayIterator extends IndexIterator {
   /** Result array. */
   private int[] pres = null;
   /** Number of results. */
@@ -22,13 +22,6 @@ public class IndexArrayIterator extends IndexIterator {
   private int toknum = 0;
   /** Token from query. */
   private FTTokenizer[] tok;
-
-  /**
-   * Constructor.
-   */
-  public IndexArrayIterator() {
-    size = 0;
-  }
 
   /**
    * Constructor.
@@ -88,7 +81,7 @@ public class IndexArrayIterator extends IndexIterator {
   public FTNode nextFTNode() {
     final FTNode n = pres != null ? new FTNode(pres[d])
       : new FTNode(ftdata[d], toknum);
-    if (tok != null) n.setToken(tok);
+    if(tok != null) n.setToken(tok);
     return n;
   }
 

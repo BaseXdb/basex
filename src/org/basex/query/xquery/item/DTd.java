@@ -1,6 +1,7 @@
 package org.basex.query.xquery.item;
 
 import static org.basex.query.xquery.XQText.*;
+import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.basex.query.xquery.XQException;
@@ -17,17 +18,15 @@ import org.basex.util.TokenBuilder;
 public final class DTd extends Dur {
   /** DayTime pattern. */
   private static final Pattern DUR = Pattern.compile("(-?)P(([0-9]+)D)?" +
-    "(T(([0-9]+)H)?(([0-9]+)M)?(([0-9]+)(\\.[0-9]+)?S)?)?");
+    "(T(([0-9]+)H)?(([0-9]+)M)?(([0-9]+(\\.[0-9]+)?)?S)?)?");
 
   /**
    * Constructor.
-   * @param it duration item
+   * @param d duration item
    */
-  public DTd(final Dur it) {
+  public DTd(final Dur d) {
     super(Type.DTD);
-    sec = it.sec;
-    mil = it.mil;
-    minus  = it.minus && (it.sec != 0 || it.mil != 0);
+    sc = d.sc == null ? BigDecimal.valueOf(0) : d.sc;
   }
 
   /**
@@ -36,9 +35,7 @@ public final class DTd extends Dur {
    */
   public DTd(final int shift) {
     super(Type.DTD);
-    zone = true;
-    sec = Math.abs(shift * 60);
-    minus = shift < 0;
+    sc = BigDecimal.valueOf(shift * 60);
   }
 
   /**
@@ -49,13 +46,7 @@ public final class DTd extends Dur {
    */
   public DTd(final DTd it, final DTd a, final boolean p) {
     this(it);
-
-    if(minus) { sec = -sec; mil = -mil; }
-    sec += p ^ a.minus ? a.sec : -a.sec;
-    mil += p ^ a.minus ? a.mil : -a.mil;
-    minus = sec < 0 || mil < 0;
-    sec = Math.abs(sec);
-    mil = Math.abs(mil);
+    sc = p ? sc.add(a.sc) : sc.subtract(a.sc);
   }
 
   /**
@@ -65,48 +56,28 @@ public final class DTd extends Dur {
    * @param m multiplication flag
    * @throws XQException evaluation exception
    */
-  public DTd(final Dur it, final double f, final boolean m)
-      throws XQException {
+  public DTd(final Dur it, final double f, final boolean m) throws XQException {
     this(it);
-
     if(f != f) Err.or(DATECALC, info(), f);
     if(m ? f == 1 / 0d || f == -1 / 0d : f == 0) Err.or(DATEZERO, info(), f);
-    final double d = m ? (sec + mil) * f : (sec + mil) / f;
-    sec = Math.abs((long) d);
-    mil = Math.abs(Math.floor((Math.abs(d) - sec) * 1000000 + .5) / 1000000);
-    minus = d < 0 && (sec != 0 || mil != 0);
+    sc = sc.multiply(BigDecimal.valueOf(m ? f : 1 / f));
+    if(Math.abs(sc.doubleValue()) < 1E-13) sc = BigDecimal.valueOf(0);
   }
 
   /**
    * Constructor.
-   * @param it date item
+   * @param dat date item
    * @param sub date to be subtracted
    */
-  public DTd(final Date it, final Date sub) {
+  public DTd(final Date dat, final Date sub) {
     super(Type.DTD);
-
-    sec = (sub.zshift - it.zshift) * 60L;
-
-    minus = false;
-    if(it.type == Type.DAT || it.type == Type.DTM) {
-      minus = it.mon < sub.mon || it.mon == sub.mon && it.sec < sub.sec;
-      final long s = (minus ? days(it, sub) : days(sub, it)) * DAYSECONDS;
-      sec = minus ? sec - s : sec + s;
-    }
-    if(it.type == Type.TIM || it.type == Type.DTM) {
-      sec += it.sec % DAYSECONDS - sub.sec % DAYSECONDS;
-      mil = it.mil - sub.mil;
-      minus |= sec < 0 || sec == 0 && mil < 0;
-      if(sec > 0 && mil < 0) {
-        sec--;
-        mil = 1 + mil;
-      }
-    }
-    mon = Math.abs(mon);
-    sec = Math.abs(sec);
-    mil = Math.abs(mil);
+    final long d1 = dat.days();
+    final BigDecimal s1 = dat.seconds();
+    final long d2 = sub.days();
+    final BigDecimal s2 = sub.seconds();
+    sc = BigDecimal.valueOf((d1 - d2) * DAYSECONDS).add(s1.subtract(s2));
   }
-
+  
   /**
    * Constructor.
    * @param v value
@@ -114,84 +85,54 @@ public final class DTd extends Dur {
    */
   public DTd(final byte[] v) throws XQException {
     super(Type.DTD);
-
+    
     final String val = Token.string(v).trim();
     final Matcher mt = DUR.matcher(val);
     if(!mt.matches() || val.endsWith("P") || val.endsWith("T"))
       Err.date(type, XPDTD);
+    final long d = mt.group(2) != null ? Token.toInt(mt.group(3)) : 0;
+    final long h = mt.group(5) != null ? Token.toInt(mt.group(6)) : 0;
+    final long n = mt.group(7) != null ? Token.toInt(mt.group(8)) : 0;
+    final double s = mt.group(9) != null ?
+        Token.toDouble(Token.token(mt.group(10))) : 0;
 
-    final int d = mt.group(2) != null ? Token.toInt(mt.group(3)) : 0;
-    final int h = mt.group(5) != null ? Token.toInt(mt.group(6)) : 0;
-    final int n = mt.group(7) != null ? Token.toInt(mt.group(8)) : 0;
-    final int s = mt.group(9) != null ? Token.toInt(mt.group(10)) : 0;
-
-    sec = d * (long) DAYSECONDS + h * 3600L + n * 60L + s;
-    mil = mt.group(11) != null ? Double.parseDouble(mt.group(11)) : 0;
-    minus = mt.group(1).length() != 0 && (sec != 0 || mil != 0);
+    sc = BigDecimal.valueOf(d * DAYSECONDS + h * 3600 + n * 60);
+    sc = sc.add(BigDecimal.valueOf(s));
+    if(mt.group(1).length() != 0) sc = sc.negate();
   }
 
   /**
-   * Returns the number of days after the specified date.
-   * @param s start date
-   * @param e end date
-   * @return days
+   * Returns the date and time.
+   * @return year
    */
-  private long days(final Date s, final Date e) {
-    int ys = s.mon / 12;
-    int ms = s.mon % 12;
-    int ds = (int) (s.sec / DAYSECONDS);
-    final int ye = e.mon / 12;
-    final int me = e.mon % 12;
-    final int de = (int) (e.sec / DAYSECONDS);
-    long days = 0;
-    while(ys < ye || ms < me || ds < de) {
-      ds++;
-      if(ds > dpm(ys, ms)) {
-        ds = 0;
-        ms++;
-      }
-      if(ms == 12) {
-        ms = 0;
-        ys++;
-      }
-      days++;
-    }
-    return days;
+  public BigDecimal dtd() {
+    return sc;
   }
 
   @Override
   public byte[] str() {
     final TokenBuilder tb = new TokenBuilder();
-    if(minus) tb.add('-');
+    if(sc.signum() < 0) tb.add('-');
     tb.add('P');
-    final int d = (int) (sec / DAYSECONDS);
-    final int t = (int) (sec % DAYSECONDS);
-    if(d != 0) { tb.add(d); tb.add('D'); }
-    if(t != 0 || mil != 0) {
+    if(day() != 0) { tb.add(Math.abs(day())); tb.add('D'); }
+    if(sc.remainder(BigDecimal.valueOf(DAYSECONDS)).signum() != 0) {
       tb.add('T');
-      final int h = t / 3600;
-      if(h != 0) { tb.add(h); tb.add('H'); }
-      final int n = t % 3600 / 60;
-      if(n != 0) { tb.add(n); tb.add('M'); }
-      final int s = t % 60;
-      if(s != 0 || mil != 0) {
-        tb.add(s != 0 ? s : 0);
-        if(mil != 0) tb.add(Token.substring(Token.token(mil), 1));
-        tb.add('S');
-      }
+      if(hou() != 0) { tb.add(Math.abs(hou())); tb.add('H'); }
+      if(min() != 0) { tb.add(Math.abs(min())); tb.add('M'); }
+      if(sec().signum() != 0) { tb.add(sc()); tb.add('S'); }
     }
-    if(sec == 0 && mil == 0) tb.add(Token.token("T0S"));
+    if(sc.signum() == 0) tb.add("T0S");
     return tb.finish();
+  }
+
+  @Override
+  public int hash() {
+    return sc.intValue();
   }
 
   @Override
   public int diff(final Item it) throws XQException {
     if(it.type != type) Err.cmp(it, this);
-    return df(it);
-  }
-
-  @Override
-  public Object java() {
-    return df.newDurationDayTime(Token.string(str()));
+    return sc.subtract(((Dur) it).sc).signum();
   }
 }

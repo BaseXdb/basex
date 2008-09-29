@@ -32,13 +32,4 @@ public final class FTPositionFilter {
     pos.same = p.same;
     pos.different = p.different;
   }
-  
-  @Override
-  protected FTPositionFilter clone() {
-    try {
-      return (FTPositionFilter) super.clone();
-    } catch(final CloneNotSupportedException e) {
-      return null;
-    }
-  }
 }

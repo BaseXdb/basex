@@ -1,8 +1,8 @@
 package org.basex.api.dom;
 
 import org.basex.BaseX;
-import org.basex.core.Prop;
 import org.basex.data.Data;
+import org.basex.io.IO;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.Type;
@@ -89,7 +89,7 @@ public abstract class BXNode implements Node {
   }
 
   public final String getBaseURI() {
-    return url(Token.string(node.base()));
+    return IO.url(Token.string(node.base()));
   }
 
   public final NodeList getChildNodes() {
@@ -97,13 +97,12 @@ public abstract class BXNode implements Node {
   }
   
   public final Node getFirstChild() {
-    Nod n = null;
     try {
-      n = node.child().next();
+      return finish(node.child().next());
     } catch(final XQException ex) {
       BaseX.notexpected();
+      return null;
     }
-    return n != null ? n.java() : null;
   }
 
   public final Node getLastChild() {
@@ -115,7 +114,7 @@ public abstract class BXNode implements Node {
     } catch(final XQException ex) {
       BaseX.notexpected();
     }
-    return n != null ? n.java() : null;
+    return finish(n);
   }
 
   public final String getNamespaceURI() {
@@ -123,27 +122,33 @@ public abstract class BXNode implements Node {
   }
 
   public Node getNextSibling() {
-    Nod n = null;
     try {
-      n = node.follSibl().next();
+      return finish(node.follSibl().next());
     } catch(final XQException ex) {
       BaseX.notexpected();
+      return null;
     }
-    return n != null ? n.java() : null;
   }
 
   public Node getPreviousSibling() {
-    Nod n = null;
     try {
-      n = node.precSibl().next();
+      return finish(node.precSibl().next());
     } catch(final XQException ex) {
       BaseX.notexpected();
+      return null;
     }
-    return n != null ? n.java() : null;
   }
 
   public Node getParentNode() {
-    final Nod n = node.parent();
+    return finish(node.parent());
+  }
+
+  /**
+   * Returns a Java node for the specified argument or null.
+   * @param n node instance
+   * @return resulting node
+   */
+  protected Node finish(final Nod n) {
     return n != null ? n.java() : null;
   }
 
@@ -157,8 +162,8 @@ public abstract class BXNode implements Node {
 
   public final Document getOwnerDocument() {
     Nod n = node;
-    Nod p = node.parent();
-    while((p = node.parent()) != null) n = p;
+    Nod p = n;
+    while((p = n.parent()) != null) n = p;
     return n.type == Type.DOC ? (Document) n.java() : null;
   }
 
@@ -258,7 +263,7 @@ public abstract class BXNode implements Node {
    * @param tag tag name
    * @return nodes
    */
-  protected NodeList getElements(final String tag) {
+  protected final NodeList getElements(final String tag) {
     final NodeBuilder nb = new NodeBuilder(true);
     final NodeIter iter = node.desc();
     final byte[] nm = tag.equals("*") ? null : Token.token(tag);
@@ -290,27 +295,10 @@ public abstract class BXNode implements Node {
   }
 
   /**
-   * Creates a URL from the specified path.
-   * @param path path to be converted
-   * @return URL
-   */
-  public static final String url(final String path) {
-    String pre = "file://";
-    if(!path.startsWith("/")) {
-      pre += "/";
-      if(path.length() < 2 || path.charAt(1) != ':') {
-        pre += "/" + Prop.WORK.replace('\\', '/');
-        if(!pre.endsWith("/")) pre += "/";
-      }
-    }
-    return pre + path.replace('\\', '/');
-  }
-
-  /**
    * Returns the XQuery node.
    * @return xquery node
    */
-  public Nod getNod() {
+  public final Nod getNod() {
     return node;
   }
 }

@@ -32,7 +32,7 @@ public final class Instance extends Single {
   
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
-    return Bln.get(seq.instance(ctx.iter(expr), true)).iter();
+    return Bln.get(seq.instance(ctx.iter(expr))).iter();
   }
   
   @Override

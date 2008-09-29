@@ -33,7 +33,7 @@ public final class MapFS extends MapPainter {
   /** Image offset. */
   private static final int PICOFFSET = 2;
   /** Image cache. */
-  private static MapImages images;
+  private static volatile MapImages images;
   /** Flag for error message. */
   private boolean error;
   /** File buffer. */

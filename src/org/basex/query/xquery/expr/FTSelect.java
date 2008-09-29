@@ -18,7 +18,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class FTSelect extends Single implements Cloneable {
+public final class FTSelect extends Single {
   /** Position filter. */
   public FTPos pos;
   /** Window. */
@@ -82,15 +82,6 @@ public final class FTSelect extends Single implements Cloneable {
   public Expr comp(final XQContext ctx) throws XQException {
     weight = weight.comp(ctx);
     return super.comp(ctx);
-  }
-
-  @Override
-  public FTOptions clone() {
-    try {
-      return (FTOptions) super.clone();
-    } catch(final CloneNotSupportedException e) {
-      return null;
-    }
   }
 
   @Override

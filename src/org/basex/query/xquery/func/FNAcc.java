@@ -21,7 +21,7 @@ import org.basex.query.xquery.iter.Iter;
 final class FNAcc extends Fun {
   @Override
   public Iter iter(final XQContext ctx, final Iter[] arg) throws XQException {
-    final Iter iter = arg.length == 0 ? check(ctx) : arg[0];
+    final Iter iter = arg.length == 0 ? checkCtx(ctx) : arg[0];
  
     switch(func) {
       case POS:

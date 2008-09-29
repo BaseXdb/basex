@@ -53,6 +53,7 @@ d_info=情報
 d_fctitle=ディレクトリの選択
 d_export=Save XML Document
 
+dc_filter=Filter
 dc_title=XML文書の保存
 dc_name=Name of Database
 dc_xmldesc=XML文書
@@ -72,7 +73,7 @@ dc_ftcs=Case Sensitivity
 dc_mainmem=メインメモリモード
 dc_chopinfo=このオプションはタグとコンテンツの間にある全ての空白を削除します。
 dc_intparseinfo=このオプションをオフにすると、Java標準のXMLパーサーが使用されます。
-dc_entitiesinfo=このオプションをオフにすると、未知の実体のパースを省略します。
+dc_entitiesinfo=このオプションをオフにすると、未知の実体のパースを省略します (&...;)。
 dc_txtinfo=XPathクエリーを高速化するためにテキストノードにインデックスが作成されます。
 dc_attinfo=XPathクエリーを高速化するために属性値にインデックスが作成されます。
 dc_ftxinfo=XPath全文検索を高速化するために全文インデックスが作成されます。
@@ -274,6 +275,7 @@ proc_nodb=データベースを先に開いて下さい。
 proc_mm=メインメモリモードでは（この？）コマンドは使用できません。
 proc_outmem=Out of Main Memory.\nThe following hints might help you:\n- you can increase Java's heap size with the flag -Xmx<size>\n- you can try BaseX's internal XML parser with 'set intparse on'\n- you can save memory by deactivating some indexes
 
+cmd_no=Expecting command.
 cmd_unknown=不明なコマンドです '%'
 cmd_similar='%' の間違いではないですか。
 cmd_ping=接続に成功しました。

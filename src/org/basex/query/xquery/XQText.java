@@ -19,6 +19,7 @@ public interface XQText {
   /** FORG Error type. */ String FORG = "FORG";
   /** FORX Error type. */ String FORX = "FORX";
   /** FOTY Error type. */ String FOTY = "FOTY";
+  /** FTST Error type. */ String FTDY = "FTDY";
   /** FTST Error type. */ String FTST = "FTST";
   /** XPDY Error type. */ String XPDY = "XPDY";
   /** XPST Error type. */ String XPST = "XPST";
@@ -139,6 +140,9 @@ public interface XQText {
   /** FORX0004: Evaluation exception. */
   Object[] REGERR = { FORX, 4, "Regular expression: '%'." };
 
+  /** FTDY0016: Evaluation exception. */
+  Object[] FTWEIGHT = { FTDY, 16, "Invalid weight: %." };
+
   /** FTST0000: Parsing exception. */
   Object[] FTTHES = { FTST, 0, "Thesaurus not supported yet." };
   /** FTST0000: Parsing exception. */
@@ -155,10 +159,10 @@ public interface XQText {
   /** XPDY0002: Evaluation Exception. */
   Object[] XPNOCTX = { XPDY, 2, "No context item set for '%'." };
   /** XPDY0050: Evaluation exception. */
-  Object[] ROOTDOC = { XPDY, 50, "Context item must be a document node." };
+  Object[] CTXNODE = { XPDY, 50, "Context item must be a node." };
   /** XPDY0050: Evaluation exception. */
   Object[] NOTREAT = { XPDY, 50, "%: % expected, % found." };
-  /** XPTY0004: Typing exception. */
+  /** XPTY0004: Evaluation exception. */
   Object[] NOTREATS = { XPDY, 50, "%: % expected, sequence found." };
 
   /** XPST0003: Parsing exception. */
@@ -279,7 +283,7 @@ public interface XQText {
   /** XPST0003: Parsing exception. */
   Object[] EMPTYSEQOCC = { XPST, 3, "No occurrence indicator defined for %." };
   /** XPST0003: Parsing exception. */
-  Object[] TESTINVALID = { XPST, 3, "Invalid % test: \"%\"." };
+  Object[] TESTINVALID = { XPST, 3, "Invalid % test: %." };
   /** XPST0003: Parsing exception. */
   Object[] BOUNDS = { XPST, 3, "Integer value % out of bounds." };
   /** XPQST0003: Evaluation exception. */
@@ -296,10 +300,6 @@ public interface XQText {
 
   /** XPST0005: Parsing exception. */
   Object[] COMPSELF = { XPST, 5, "Warning: '%' won't yield any results." };
-  /** XPST0005: Parsing exception. */
-  Object[] DOCATTR = { XPST, 5, "Warning: doc nodes can't have attributes." };
-  /** XPST0005: Parsing exception. */
-  Object[] ATTRCHILD = { XPST, 5, "Warning: attributes can't have children." };
 
   /** XPST0008: Parsing exception. */
   Object[] VARNOTDEFINED = { XPST, 8, "Undefined variable \"%\"." };
@@ -331,7 +331,7 @@ public interface XQText {
   /** XPTY0004: Typing exception. */
   Object[] XPINVCAST = { XPTY, 4, "Invalid cast from % to %: %." };
   /** XPTY0004: Typing exception. */
-  Object[] XPCAST = { XPTY, 4, "Invalid % cast: %." };
+  Object[] XPCAST = { XPTY, 4, "Invalid %(%) cast." };
   /** XPTY0004: Typing Exception. */
   Object[] XPTYPE = { XPTY, 4, "%: % expected, % found." };
   /** XPTY0004: Typing Exception. */
@@ -363,8 +363,6 @@ public interface XQText {
   Object[] NAMEWRONG = { XPTY, 4, "Invalid value for name: \"%\"." };
   /** XPTY0004: Typing exception. */
   Object[] NOSCORE = { XPTY, 4, "Variable % needs a scores as result." };
-  /** XPTY0004: Typing exception. */
-  Object[] FTWEIGHT = { XPTY, 4, "Invalid weight: %." };
   
   /** Example for a Date format. */
   String XPDATE = "2000-12-31";

@@ -13,7 +13,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Hannes Schwarz - Hannes.Schwarz@gmail.com
  */
-public class CAT extends FSCmd {
+public final class CAT extends FSCmd {
   /** Line Feed. */
   private static final byte LF = 10;
   /** Carriage Return. */

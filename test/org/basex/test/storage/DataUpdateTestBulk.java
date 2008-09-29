@@ -2,92 +2,31 @@ package org.basex.test.storage;
 
 import org.basex.build.MemBuilder;
 import org.basex.build.xml.XMLParser;
-import org.basex.core.Context;
-import org.basex.core.Prop;
 import org.basex.core.proc.Copy;
-import org.basex.core.proc.CreateDB;
-import org.basex.core.proc.DropDB;
 import org.basex.data.Data;
-import org.basex.data.DiskData;
 import org.basex.io.IO;
-import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
  * This class tests the update features of the Data class.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-07, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Tim Petrowsky
  */
-public final class DataUpdateTestBulk {
-  /** Context. */
-  private static final Context CONTEXT = new Context();
-  /** Test file size in nodes. */
-  private int size;
-  /** Data. */
-  private Data data;
+public final class DataUpdateTestBulk extends DataUpdateTest {
   /** InsertData. */
   private Data insertData;
   /** Test file we do updates with. */
-  private static final String TESTFILE = "etc/xml/test.xml";
-  /** Test file we do updates with. */
   private static final String INSERTFILE = "input.xml";
-  /** Test database name. */
-  private static final String DBNAME = "DataUpdateTestBulk";
 
-  /**
-   * Delete the test-database.
-   */
-  @BeforeClass
-  public static void setUpBeforeClass() {
-    Prop.textindex = false;
-    Prop.attrindex = false;
-    Prop.chop = true;
-  }
-
-  /**
-   * Create the database.
-   * @throws Exception in case of problems.
-   */
   @Before
+  @Override
   public void setUp() throws Exception {
-    new CreateDB(TESTFILE, DBNAME).execute(CONTEXT);
-    data = CONTEXT.data();
-    size = data.size;
+    super.setUp();
     final IO file = IO.get(INSERTFILE);
     insertData = new MemBuilder().build(new XMLParser(file), INSERTFILE);
-  }
-
-  /**
-   * Delete the test-database.
-   * @throws Exception in case of problems.
-   */
-  @After
-  public void tearDown() throws Exception {
-    data.close();
-    DropDB.drop(DBNAME);
-  }
-
-  /**
-   * Reload Data class.
-   * @throws Exception in case of problems.
-   */
-  private void reload() throws Exception {
-    data.close();
-    data = new DiskData(DBNAME);
-  }
-
-  /**
-   * Test byte-arrays for equality.
-   * @param exp expected value
-   * @param actual actual value
-   */
-  private void assertByteArraysEqual(final byte[] exp, final byte[] actual) {
-    assertEquals("array lengths don't equal", exp.length, actual.length);
-    for(int i = 0; i < exp.length; i++) assertEquals(exp[i], actual[i]);
   }
 
   /**
@@ -133,17 +72,6 @@ public final class DataUpdateTestBulk {
    */
   private void assertParentEqual(final int par, final int pre, final Data d) {
     assertEquals(par, d.parent(pre, d.kind(pre)));
-  }
-
-  /**
-   * Test for correct data size.
-   * @throws Exception in case of problems.
-   */
-  @Test
-  public void testSize() throws Exception {
-    assertEquals("Unexpected size!", size, data.size);
-    reload();
-    assertEquals("Unexpected size!", size, data.size);
   }
 
   /**

@@ -32,12 +32,12 @@ public final class StringList {
    */
   public String remove(final int index) {
     if(size == 0 || size < index) throw new IndexOutOfBoundsException();
-    String elem = list[index];
+    final String elem = list[index];
     System.arraycopy(list, index + 1, list, index, size - index);
     --size;
     return elem;
   }
-  
+
   /**
    * Returns the string array.
    * @return array

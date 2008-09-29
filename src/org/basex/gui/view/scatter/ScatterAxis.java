@@ -35,7 +35,7 @@ public final class ScatterAxis {
   static final int TYPEDBL = 1;
 
   /** Coordinates of items. */
-  double[] co;
+  double[] co = {};
   /** Number of captions to display. */
   int nrCaptions;
   /** Step for axis caption. */
@@ -77,9 +77,8 @@ public final class ScatterAxis {
    * only numerical data is considered for plotting.
    */
   void refreshAxis() {
-    if(attr == null) return;
-    if(Token.eq(attr, Token.token("")))
-      return;
+    if(attr == null || attr.length == 0) return;
+
     final Data data = GUI.context.data();
     final StatsKey key = isTag ? data.tags.stat(data.tags.id(attr)) :
       data.atts.stat(data.atts.id(attr));

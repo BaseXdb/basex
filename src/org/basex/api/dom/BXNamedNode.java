@@ -12,7 +12,7 @@ import org.w3c.dom.Node;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class BXNamedNode extends BXNodeList implements NamedNodeMap {
+public final class BXNamedNode extends BXNodeList implements NamedNodeMap {
   /**
    * Constructor.
    * @param nb nodes

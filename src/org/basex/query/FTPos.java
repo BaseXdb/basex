@@ -47,7 +47,7 @@ public final class FTPos {
 
   /** Position list. */
   private IntList[] pos = new IntList[0];
-  /** Number of entries. */
+  /** Number of position lists. */
   private int size;
 
   /**
@@ -63,7 +63,7 @@ public final class FTPos {
 
   /**
    * Adds the specified fulltext term and position list. This method is
-   * called every time an FTWords test was successful.
+   * called every time a test in {@link FTOpt#contains} was successful.
    * @param t term to be added
    * @param il positions to be added
    */
@@ -84,11 +84,64 @@ public final class FTPos {
   }
   
   /**
-   * Performs common position tests.
+   * Performs common position tests. As {@link #distance} and {@link #window}
+   * have variable arguments, they have to be called on their own.
    * @return result of check
    */
   public boolean valid() {
     return ordered() && content() && same() && different();
+  }
+
+  /**
+   * Checks if the position values are ordered.
+   * @param mn minimum distance
+   * @param mx maximum distance
+   * @return result of check
+   */
+  public boolean distance(final long mn, final long mx) {
+    if(dunit == null) return true;
+
+    // ...to be revised...
+    int l = -1;
+    for(int i = 0; i < size; i++) {
+      boolean o = false;
+      for(int j = 0; j < pos[i].size; j++) {
+        final int p = calcPosition(pos[i].get(j), dunit);
+        final int d = Math.abs(p - l) - 1;
+        if(i == 0 || (d >= mn && d <= mx)) {
+          o = true;
+          l = p;
+          break;
+        }
+      }
+      if(!o) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Checks if the specified window is correct.
+   * @param win window value
+   * @return result of check
+   */
+  public boolean window(final long win) {
+    if(wunit == null) return true;
+
+    // ...to be revised...
+    int l = -1;
+    for(int i = 0; i < size; i++) {
+      boolean o = false;
+      for(int j = 0; j < pos[i].size; j++) {
+        final int p = calcPosition(pos[i].get(j), wunit);
+        if(i == 0 || (Math.abs(p - l) - 1 < win)) {
+          o = true;
+          l = p;
+          break;
+        }
+      }
+      if(!o) return false;
+    }
+    return true;
   }
 
   /**
@@ -158,58 +211,6 @@ public final class FTPos {
   }
 
   /**
-   * Checks if the position values are ordered.
-   * @param mn minimum distance
-   * @param mx maximum distance
-   * @return result of check
-   */
-  public boolean distance(final long mn, final long mx) {
-    if(dunit == null) return true;
-
-    // ...to be revised...
-    int l = -1;
-    for(int i = 0; i < size; i++) {
-      boolean o = false;
-      for(int j = 0; j < pos[i].size; j++) {
-        final int p = calcPosition(pos[i].get(j), dunit);
-        final int d = Math.abs(p - l) - 1;
-        if(i == 0 || (d >= mn && d <= mx)) {
-          o = true;
-          l = p;
-          break;
-        }
-      }
-      if(!o) return false;
-    }
-    return true;
-  }
-
-  /**
-   * Checks if the specified window is correct.
-   * @param win window value
-   * @return result of check
-   */
-  public boolean window(final long win) {
-    if(wunit == null) return true;
-
-    // ...to be revised...
-    int l = -1;
-    for(int i = 0; i < size; i++) {
-      boolean o = false;
-      for(int j = 0; j < pos[i].size; j++) {
-        final int p = calcPosition(pos[i].get(j), wunit);
-        if(i == 0 || (Math.abs(p - l) - 1 < win)) {
-          o = true;
-          l = p;
-          break;
-        }
-      }
-      if(!o) return false;
-    }
-    return true;
-  }
-
-  /**
    * Checks if all words are found in the same unit.
    * @return result of check
    */
@@ -260,7 +261,7 @@ public final class FTPos {
    * @param u unit
    * @return new position
    */
-  public int calcPosition(final int p, final FTUnit u) {
+  private int calcPosition(final int p, final FTUnit u) {
     if(u == FTUnit.WORDS) return p;
     final FTTokenizer iter = ft;
     iter.init();

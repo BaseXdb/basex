@@ -1,12 +1,10 @@
 package org.basex.query.xquery.func;
 
 import static org.basex.query.xquery.XQText.*;
-
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
+import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.DTd;
 import org.basex.query.xquery.item.Dat;
 import org.basex.query.xquery.item.Date;
@@ -19,7 +17,6 @@ import org.basex.query.xquery.item.Tim;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Err;
-import org.basex.util.Token;
 
 /**
  * Date functions.
@@ -69,9 +66,8 @@ final class FNDate extends Fun {
    * @return time.
    */
   private Iter yea(final Item it) {
-    final Date d = (Date) it;
-    final long l = d.mon / 12;
-    return Itr.iter(d.minus ? -l : l);
+    return Itr.iter(it instanceof Dur ? ((Dur) it).yea() :
+      ((Date) it).xc.getYear());
   }
 
   /**
@@ -80,9 +76,8 @@ final class FNDate extends Fun {
    * @return time.
    */
   private Iter mon(final Item it) {
-    final Date d = (Date) it;
-    final int t = d.mon % 12;
-    return finish(d, d.d() ? t : t + 1);
+    return Itr.iter(it instanceof Dur ? ((Dur) it).mon() :
+      ((Date) it).xc.getMonth());
   }
 
   /**
@@ -91,9 +86,8 @@ final class FNDate extends Fun {
    * @return time.
    */
   private Iter day(final Item it) {
-    final Date d = (Date) it;
-    final long t = d.sec / 86400;
-    return finish(d, d.d() ? t : t + 1);
+    return Itr.iter(it instanceof Dur ? (int) ((Dur) it).day() :
+      ((Date) it).xc.getDay());
   }
 
   /**
@@ -102,8 +96,8 @@ final class FNDate extends Fun {
    * @return time.
    */
   private Iter hou(final Item it) {
-    final Date d = (Date) it;
-    return finish(d, d.sec % 86400 / 3600);
+    return Itr.iter(it instanceof Dur ? (int) ((Dur) it).hou() :
+      ((Date) it).xc.getHour());
   }
 
   /**
@@ -112,8 +106,8 @@ final class FNDate extends Fun {
    * @return time.
    */
   private Iter min(final Item it) {
-    final Date d = (Date) it;
-    return finish(d, d.sec % 3600 / 60);
+    return Itr.iter(it instanceof Dur ? ((Dur) it).min() :
+      ((Date) it).xc.getMinute());
   }
 
   /**
@@ -122,10 +116,10 @@ final class FNDate extends Fun {
    * @return time.
    */
   private Iter sec(final Item it) {
-    final Date d = (Date) it;
-    final BigDecimal b = BigDecimal.valueOf(d.sec % 60).add(
-        BigDecimal.valueOf(d.mil));
-    return Dec.iter(d.minus ? b.negate() : b);
+    if(it instanceof Dur) return Dec.iter(((Dur) it).sec().doubleValue());
+    final int s = ((Date) it).xc.getSecond();
+    final BigDecimal d = ((Date) it).xc.getFractionalSecond();
+    return Dec.iter(s + (d != null ? d.doubleValue() : 0));
   }
 
   /**
@@ -134,8 +128,8 @@ final class FNDate extends Fun {
    * @return timezone
    */
   private Iter zon(final Item it) {
-    final Date date = (Date) it;
-    return !date.zone ? Iter.EMPTY : new DTd(date.zshift).iter();
+    final int z = ((Date) it).xc.getTimezone();
+    return z == UNDEF ? Iter.EMPTY : new DTd(z).iter();
   }
 
   /**
@@ -150,16 +144,6 @@ final class FNDate extends Fun {
   private Item checkDate(final Item it, final Type t, final XQContext ctx)
       throws XQException {
     return it.u() ? t.e(it, ctx) : check(it, t);
-  }
-
-  /**
-   * Adds the sign to the specified date.
-   * @param d date
-   * @param l value
-   * @return date.
-   */
-  private Iter finish(final Date d, final long l) {
-    return d.d() ? Itr.iter(d.minus ? -l : l) : Itr.iter(l);
   }
 
   /**
@@ -184,9 +168,7 @@ final class FNDate extends Fun {
    */
   private Iter datzon(final Item it, final Iter zon) throws XQException {
     final Item i = it.u() ? new Dat(it.str()) : check(it, Type.DAT);
-    final Date v = adjust((Date) i, zon);
-    v.sec -= v.sec % 86400;
-    return v.iter();
+    return adjust((Date) i, zon).iter();
   }
 
   /**
@@ -210,10 +192,7 @@ final class FNDate extends Fun {
    */
   private Iter timzon(final Item it, final Iter zon) throws XQException {
     final Item i = it.u() ? new Tim(it.str()) : check(it, Type.TIM);
-    final Date v = adjust((Date) i, zon);
-    v.sec = v.sec % 86400;
-    if(v.sec < 0) v.sec += 86400;
-    return v.iter();
+    return adjust((Date) i, zon).iter();
   }
 
   /**
@@ -226,20 +205,21 @@ final class FNDate extends Fun {
   private Iter dattim(final Item date, final Iter zon) throws XQException {
     final Item time = zon.atomic(this, true);
     if(time == null) return Iter.EMPTY;
-    
+
     final Item d = date.u() ? new Dat(date.str()) : date;
     final Item t = time.u() ? new Tim(time.str()) : time;
 
     final Dtm dtm = new Dtm((Dat) check(d, Type.DAT));
     final Tim tim = (Tim) check(t, Type.TIM);
-    dtm.sec += tim.sec;
-    dtm.mil = dtm.mil;
+    
+    dtm.xc.setTime(tim.xc.getHour(), tim.xc.getMinute(), tim.xc.getSecond(),
+        tim.xc.getMillisecond());
 
-    if(dtm.zone && tim.zone && dtm.zshift != tim.zshift)
+    final int zone = tim.xc.getTimezone();
+    if(dtm.xc.getTimezone() == UNDEF) {
+      dtm.xc.setTimezone(zone);
+    } else if(dtm.xc.getTimezone() != zone && zone != UNDEF) {
       Err.or(FUNZONE, dtm, tim);
-    if(!dtm.zone) {
-      dtm.zone = tim.zone;
-      dtm.zshift = tim.zshift;
     }
     return dtm.iter();
   }
@@ -252,44 +232,24 @@ final class FNDate extends Fun {
    * @throws XQException evaluation exception
    */
   private Date adjust(final Date date, final Iter z) throws XQException {
-    Item zon = z != null ? z.next() : null;
+    final Item zon = z != null ? z.next() : null;
     if(z != null && zon == null) {
-      date.zone = false;
-      date.zshift = 0;
+      date.xc.setTimezone(UNDEF);
       return date;
     }
 
-    final java.util.Date d = Calendar.getInstance().getTime();
-    final byte[] zone = Token.token(new SimpleDateFormat("Z").format(d));
-    final int cshift = Token.toInt(Token.substring(zone, 0, 3)) * 60 +
-      Token.toInt(Token.substring(zone, 3));
-
+    final int zn = date.xc.getTimezone();
+    int tz = 0;
     if(zon == null) {
-      if(date.zone) date.sec -= 60L * (date.zshift - cshift);
-      date.zone = true;
-      date.zshift = cshift;
+      final Calendar c = Calendar.getInstance();
+      tz = (c.get(Calendar.ZONE_OFFSET) + c.get(Calendar.DST_OFFSET)) / 60000;
     } else {
-      check(zon, Type.DTD);
-      final DTd dtd = (DTd) zon;
-      if(dtd.sec % 60 != 0 || dtd.mil != 0 || dtd.sec > 50400)
-        Err.or(INVALZONE, zon);
-
-      final long nsec = dtd.minus ? -dtd.sec : dtd.sec;
-      if(date.zone) date.sec -= date.zshift * 60 - nsec;
-      date.zshift = (int) (nsec / 60);
-      date.zone  = true;
+      final DTd dtd = (DTd) check(zon, Type.DTD);;
+      tz = (int) (dtd.min() + dtd.hou() * 60);
+      if(dtd.sec().signum() != 0 || Math.abs(tz) > 840) Err.or(INVALZONE, zon);
     }
-    // correct day overflow
-    if(date.sec / 86400 > Date.dpm(date.mon / 12, date.mon % 12)) {
-      date.sec %= 86400;
-      date.mon++;
-    }
-    if(date.sec < 0) {
-      date.sec += 86400;
-      if(--date.mon >= 0 && date.sec < 86400) {
-        date.sec += Date.dpm(date.mon / 12, date.mon % 12) * 86400;
-      }
-    }
+    if(zn != UNDEF) date.xc.add(Date.df.newDuration(-60000L * (zn - tz)));
+    date.xc.setTimezone(tz);
     return date;
   }
 }

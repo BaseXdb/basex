@@ -1,17 +1,20 @@
 package org.basex.query.xquery.func;
 
+import static javax.xml.datatype.DatatypeConstants.*;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
-import static javax.xml.datatype.DatatypeConstants.*;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
+
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
@@ -50,7 +53,7 @@ public final class FunJava extends Arr {
   private static final Type[] XQUERY = {
     Type.STR, Type.BLN, Type.BLN, Type.BYT, Type.BYT,
     Type.SHR, Type.SHR, Type.INT, Type.INT, Type.LNG, Type.LNG,
-    Type.FLT, Type.FLT, Type.DBL, Type.DBL, Type.DEC, 
+    Type.FLT, Type.FLT, Type.DBL, Type.DBL, Type.DEC,
     Type.ITR, Type.QNM
   };
   /** Java class. */
@@ -76,11 +79,11 @@ public final class FunJava extends Arr {
     for(int a = 0; a < expr.length; a++) {
       arg[a] = ctx.iter(expr[a]).atomic(this, false);
     }
-    
+
     Object result = null;
     try {
       result = mth.equals("new") ? constructor(arg) : method(arg);
-    } catch(Exception ex) {
+    } catch(final Exception ex) {
       //ex.getCause().toString()
       Err.or(FUNJAVA, info());
     }
@@ -89,7 +92,7 @@ public final class FunJava extends Arr {
     return result == null ? Iter.EMPTY : iter(result);
     //return iter(result);
   }
-  
+
   /**
    * Calls a constructor.
    * @param ar arguments
@@ -97,13 +100,13 @@ public final class FunJava extends Arr {
    * @throws Exception exception
    */
   private Object constructor(final Item[] ar) throws Exception {
-    for(Constructor<?> con : cls.getConstructors()) {
+    for(final Constructor<?> con : cls.getConstructors()) {
       final Object[] arg = args(con.getParameterTypes(), ar, true);
       if(arg != null) return con.newInstance(arg);
     }
     return null;
   }
-  
+
   /**
    * Calls a constructor.
    * @param ar arguments
@@ -118,10 +121,10 @@ public final class FunJava extends Arr {
       if(ar.length == (st ? 0 : 1)) {
         return f.get(st ? null : ((Jav) ar[0]).val);
       }
-    } catch(NoSuchFieldException ex) {
+    } catch(final NoSuchFieldException ex) {
     }
 
-    for(Method meth : cls.getMethods()) {
+    for(final Method meth : cls.getMethods()) {
       if(!meth.getName().equals(mth)) continue;
       final boolean st = Modifier.isStatic(meth.getModifiers());
       final Object[] arg = args(meth.getParameterTypes(), ar, st);
@@ -129,7 +132,7 @@ public final class FunJava extends Arr {
     }
     return null;
   }
-  
+
   /**
    * Checks if the arguments fit to the specified parameters.
    * @param params parameters
@@ -140,32 +143,30 @@ public final class FunJava extends Arr {
   private Object[] args(final Class<?>[] params, final Item[] args,
       final boolean stat) {
 
-    int s = stat ? 0 : 1;
-    int l = args.length - s;
+    final int s = stat ? 0 : 1;
+    final int l = args.length - s;
     if(l != params.length) return null;
-    
+
     /** Function arguments. */
     final Object[] val = new Object[l];
     int a = 0;
-    
-    for(Class<?> par : params) {
+
+    for(final Class<?> par : params) {
       //BaseX.debug("-1- " + par.getCanonicalName());
       final Type jType = type(par);
       if(jType == null) return null;
-      
+
       final Item arg = args[s + a];
 
       //BaseX.debug("-2- " + xq + " = Java?");
       if(jType == Type.JAVA && arg.type != Type.JAVA) return null;
-      
+
       //BaseX.debug("-3- " + xq + " instance of " + it.type + " ?");
       //if(!xq.instance(it.type)) return null;
       if(!arg.type.instance(jType) && !jType.instance(arg.type)) return null;
       //BaseX.debug("-3- " + it);
-      
+
       final Object o = arg.java();
-      if(o == null) return null;
-      
       //BaseX.debug("-4- " + o.getClass() + " => " + par);
       val[a++] = o;
     }
@@ -181,7 +182,7 @@ public final class FunJava extends Arr {
     for(int j = 0; j < JAVA.length; j++) if(par == JAVA[j]) return XQUERY[j];
     return Type.JAVA;
   }
-  
+
   /**
    * Returns an appropriate XQuery data type for the specified Java object.
    * @param o object
@@ -198,7 +199,7 @@ public final class FunJava extends Arr {
     if(o instanceof Comment) return Type.COM;
     if(o instanceof ProcessingInstruction) return Type.PI;
     if(o instanceof Text) return Type.TXT;
-    
+
     if(o instanceof Duration) {
       final Duration d = (Duration) o;
       return !d.isSet(YEARS) && !d.isSet(MONTHS) ? Type.DTD :
@@ -226,26 +227,26 @@ public final class FunJava extends Arr {
    */
   private Iter iter(final Object res) {
     if(!res.getClass().isArray()) return new Jav(res).iter();
-    
+
     final SeqIter seq = new SeqIter();
     if(res instanceof boolean[]) {
-      for(Object o : (boolean[]) res) seq.add(new Jav(o));
+      for(final Object o : (boolean[]) res) seq.add(new Jav(o));
     } else if(res instanceof char[]) {
-      for(Object o : (char[]) res) seq.add(new Jav(o));
+      for(final Object o : (char[]) res) seq.add(new Jav(o));
     } else if(res instanceof byte[]) {
-      for(Object o : (byte[]) res) seq.add(new Jav(o));
+      for(final Object o : (byte[]) res) seq.add(new Jav(o));
     } else if(res instanceof short[]) {
-      for(Object o : (short[]) res) seq.add(new Jav(o));
+      for(final Object o : (short[]) res) seq.add(new Jav(o));
     } else if(res instanceof int[]) {
-      for(Object o : (int[]) res) seq.add(new Jav(o));
+      for(final Object o : (int[]) res) seq.add(new Jav(o));
     } else if(res instanceof long[]) {
-      for(Object o : (long[]) res) seq.add(new Jav(o));
+      for(final Object o : (long[]) res) seq.add(new Jav(o));
     } else if(res instanceof float[]) {
-      for(Object o : (float[]) res) seq.add(new Jav(o));
+      for(final Object o : (float[]) res) seq.add(new Jav(o));
     } else if(res instanceof double[]) {
-      for(Object o : (double[]) res) seq.add(new Jav(o));
+      for(final Object o : (double[]) res) seq.add(new Jav(o));
     } else {
-      for(Object o : (Object[]) res) seq.add(new Jav(o));
+      for(final Object o : (Object[]) res) seq.add(new Jav(o));
     }
     return seq;
   }
@@ -263,7 +264,7 @@ public final class FunJava extends Arr {
   @Override
   public void plan(final Serializer ser) throws Exception {
     ser.openElement(this, NAM, Token.token(cls + "." + mth));
-    for(Expr arg : expr) arg.plan(ser);
+    for(final Expr arg : expr) arg.plan(ser);
     ser.closeElement(this);
   }
 }

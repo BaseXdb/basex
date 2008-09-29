@@ -76,7 +76,7 @@ public abstract class Func extends Expr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public final void plan(final Serializer ser) throws Exception {
     ser.openElement(this);
     for(final Expr arg : args) arg.plan(ser);
     ser.closeElement(this);

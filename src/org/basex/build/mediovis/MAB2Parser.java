@@ -176,7 +176,7 @@ public final class MAB2Parser extends Parser {
       final MAB2Entry entry = ids.value(i);
       final long pos = entry.pos;
       // check if top entry exists...
-      byte[] l = pos != 0 ? addEntry(input, pos, entry.size, null) : null;
+      final byte[] l = pos != 0 ? addEntry(input, pos, entry.size, null) : null;
       // loop through all children...
       for(int j = 0; j < entry.size; j++) {
         addEntry(input, entry.children[j], 0, l);
@@ -513,7 +513,7 @@ public final class MAB2Parser extends Parser {
   private byte[] language(final byte[] token) {
     final byte[] t = string(token);
     for(int i = 0; i < t.length; i++) if(t[i] == '?' || t[i] == '$') t[i] = '+';
-    TokenBuilder tb = new TokenBuilder();
+    final TokenBuilder tb = new TokenBuilder();
     for(byte[] lang : split(t, '+')) {
       final byte[] l = languages.get(lang);
       if(tb.size != 0) tb.add('+');

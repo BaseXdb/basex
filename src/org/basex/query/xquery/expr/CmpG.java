@@ -113,7 +113,7 @@ public final class CmpG extends Arr {
     if(ir1.size() == 0 || ir2.size() == 0) return false;
     
     Item it1, it2;
-    SeqIter seq = new SeqIter();
+    final SeqIter seq = new SeqIter();
     if((it1 = ir1.next()) != null) {
       while((it2 = ir2.next()) != null) {
         if(ev(it1, it2, cmp.cmp)) return true;

@@ -2,7 +2,6 @@ package org.basex.query.xquery.item;
 
 import static org.basex.query.xquery.XQText.*;
 import org.basex.query.xquery.XQException;
-import org.basex.util.TokenBuilder;
 
 /**
  * Date item.
@@ -16,12 +15,9 @@ public final class Dat extends Date {
    * @param d date
    */
   public Dat(final Date d) {
-    super(Type.DAT);
-    mon = d.mon;
-    sec = d.sec - d.sec % DAYSECONDS;
-    minus = d.minus;
-    zone = d.zone;
-    zshift = d.zshift;
+    super(Type.DAT, d);
+    xc.setTime(UNDEF, UNDEF, UNDEF);
+    xc.setMillisecond(UNDEF);
   }
 
   /**
@@ -29,28 +25,20 @@ public final class Dat extends Date {
    * @param d date
    * @param a duration
    * @param p plus/minus flag
+   * @throws XQException evaluation exception
    */
-  public Dat(final Date d, final Dur a, final boolean p) {
+  public Dat(final Date d, final Dur a, final boolean p) throws XQException {
     this(d);
     calc(a, p);
-    sec -= sec % DAYSECONDS;
   }
 
   /**
    * Constructor.
-   * @param dt date
+   * @param d date
    * @throws XQException evaluation exception
    */
-  public Dat(final byte[] dt) throws XQException {
-    super(Type.DAT);
-    date(dt, XPDATE);
-  }
-
-  @Override
-  public byte[] str() {
-    final TokenBuilder tb = new TokenBuilder();
-    date(tb);
-    zone(tb);
-    return tb.finish();
+  public Dat(final byte[] d) throws XQException {
+    super(Type.DAT, d, XPDATE);
+    date(d, XPDATE);
   }
 }

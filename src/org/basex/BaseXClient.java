@@ -73,7 +73,7 @@ public class BaseXClient {
    * interacting with the server instance.
    * @param args command line arguments
    */
-  void init(final String[] args) {
+  protected void init(final String[] args) {
     if(!parseArguments(args)) return;
     run();
   }
@@ -148,7 +148,7 @@ public class BaseXClient {
    * @param force tells if quit was forced
    * (e.g., by pressing CTRL-c).
    */
-  synchronized void quit(final boolean force) {
+  protected synchronized void quit(final boolean force) {
     if(!force) BaseX.outln(CLIENTBYE[new Random().nextInt(4)]);
   }
 
@@ -218,7 +218,7 @@ public class BaseXClient {
           }
         }
 
-        if(set && p.args[0].equals(SET.INFO)) {
+        if(set && p.args[0].equals(SET.INFO.name())) {
           info = inf.contains(INFOON);
         }
       }
@@ -318,7 +318,7 @@ public class BaseXClient {
             }
             if(a == args.length) break;
             // turn off result serialization
-            int runs = Math.max(1, Token.toInt(args[a].substring(i)));
+            final int runs = Math.max(1, Token.toInt(args[a].substring(i)));
             process(new Set("RUNS", Integer.toString(runs)), false);
             i = args[a].length();
             ok = true;

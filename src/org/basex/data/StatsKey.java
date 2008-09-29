@@ -129,8 +129,7 @@ public final class StatsKey {
       case DBL:  return ", numeric(" + min + " - " + max + ")";
       case INT:  return ", numeric(" + (int) min + " - " + (int) max + ")";
       case TEXT: return ", strings";
-      case NONE: return "";
+      default: return "";
     }
-    return null;
   }
 }

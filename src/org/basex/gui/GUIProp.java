@@ -75,7 +75,7 @@ public final class GUIProp {
   /** Flag for showing the simple file dialog. */
   public static boolean simplefd = false;
   /** Flag for activated plot view. */
-  public static boolean showplot = true;
+  public static boolean showplot = false;
 
   // LAYOUT & INPUT OPTIONS ===================================================
 
@@ -102,9 +102,9 @@ public final class GUIProp {
   /** Dialog location. */
   public static int[] maplayoutloc = { 100, 100 };
   /** Dialog location. */
-   public static int[] fontsloc = { 100, 100 };
-   /** Dialog location. */
-   public static int[] colorsloc = { 100, 100 };
+  public static int[] fontsloc = { 100, 100 };
+  /** Dialog location. */
+  public static int[] colorsloc = { 100, 100 };
 
   /** Path for creating new XML Documents. */
   public static String createpath = Prop.WORK;

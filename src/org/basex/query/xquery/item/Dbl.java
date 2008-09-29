@@ -103,7 +103,7 @@ public final class Dbl extends Num {
   @Override
   public int diff(final Item it) throws XQException {
     final double n = it.dbl();
-    if(n != n || val != val) return Integer.MIN_VALUE;
+    if(n != n || val != val) return UNDEF;
     return val < n ? -1 : val > n ? 1 : 0;
   }
 

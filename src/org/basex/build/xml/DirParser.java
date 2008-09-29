@@ -1,6 +1,9 @@
 package org.basex.build.xml;
 
 import java.io.IOException;
+
+import javax.xml.transform.sax.SAXSource;
+
 import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.core.Prop;
@@ -16,6 +19,8 @@ import org.basex.io.IO;
 public final class DirParser extends Parser {
   /** Parser reference. */
   private Parser parser;
+  /** File filter. */
+  private String filter;
 
   /**
    * Constructor.
@@ -23,6 +28,12 @@ public final class DirParser extends Parser {
    */
   public DirParser(final IO f) {
     super(f);
+    if(f.isDir()) {
+      filter = Prop.createfilter.replaceAll("\\*", ".*");
+      if(!filter.contains(".")) filter = ".*" + filter + ".*";
+    } else {
+      filter = ".*";
+    }
   }
 
   @Override
@@ -43,10 +54,11 @@ public final class DirParser extends Parser {
     } else {
       io = path;
       while(path.more()) {
-        // [CG] Create Collection: how to deal with non-XML documents?
-        //if(!f.name().endsWith(IO.XMLSUFFIX)) continue;
+        // [CG] Create Collection: how to deal with exceptions?
+        if(!path.name().matches(filter)) continue;
         b.meta.filesize += io.length();
-        parser = Prop.intparse ? new XMLParser(io) : new SAXWrapper(io);
+        final SAXSource s = new SAXSource(io.inputSource());
+        parser = Prop.intparse ? new XMLParser(io) : new SAXWrapper(s);
         parser.parse(b);
       }
     }

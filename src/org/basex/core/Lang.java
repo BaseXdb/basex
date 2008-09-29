@@ -90,7 +90,7 @@ public final class Lang {
       return null;
     }
 
-    String val = texts.get(key);
+    final String val = texts.get(key);
     if(val == null) {
       if(texts.size() != 0) {
         BaseX.errln("%.lang: '%' missing", Prop.language, key);

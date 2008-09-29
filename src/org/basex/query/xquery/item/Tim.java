@@ -2,7 +2,6 @@ package org.basex.query.xquery.item;
 
 import static org.basex.query.xquery.XQText.*;
 import org.basex.query.xquery.XQException;
-import org.basex.util.TokenBuilder;
 
 /**
  * Time item.
@@ -16,11 +15,10 @@ public final class Tim extends Date {
    * @param d date
    */
   public Tim(final Date d) {
-    super(Type.TIM);
-    sec = d.sec % DAYSECONDS;
-    mil = d.mil;
-    zone = d.zone;
-    zshift = d.zshift;
+    super(Type.TIM, d);
+    xc.setYear(UNDEF);
+    xc.setMonth(UNDEF);
+    xc.setDay(UNDEF);
   }
 
   /**
@@ -28,14 +26,11 @@ public final class Tim extends Date {
    * @param d date
    * @param a duration to be added/subtracted
    * @param p plus/minus flag
+   * @throws XQException evaluation exception
    */
-  public Tim(final Tim d, final DTd a, final boolean p) {
+  public Tim(final Tim d, final DTd a, final boolean p) throws XQException {
     this(d);
-    sec = p ^ a.minus ? sec + a.sec % DAYSECONDS : sec - a.sec % DAYSECONDS;
-    mil = p ^ a.minus ? mil + a.mil : mil - a.mil;
-    if(mil > 1) { mil--; sec++; } else if(mil < 0) { mil++; sec--; }
-    if(sec < 0) sec += DAYSECONDS;
-    sec %= DAYSECONDS;
+    calc(a, p);
   }
 
   /**
@@ -44,16 +39,7 @@ public final class Tim extends Date {
    * @throws XQException evaluation exception
    */
   public Tim(final byte[] tim) throws XQException {
-    super(Type.TIM);
+    super(Type.TIM, tim, XPTIME);
     time(tim, XPTIME);
-    sec %= DAYSECONDS;
-  }
-
-  @Override
-  public byte[] str() {
-    final TokenBuilder tb = new TokenBuilder();
-    time(tb);
-    zone(tb);
-    return tb.finish();
   }
 }

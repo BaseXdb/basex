@@ -121,7 +121,7 @@ public final class Dec extends Num {
   public int diff(final Item it) throws XQException {
     final double d = it.dbl();
     return d == 1 / 0.0 ? -1 : d == -1 / 0.0 ? 1 :
-      d != d ? Integer.MIN_VALUE : val.compareTo(it.dec());
+      d != d ? UNDEF : val.compareTo(it.dec());
   }
 
   @Override

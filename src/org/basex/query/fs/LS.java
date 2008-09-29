@@ -1,7 +1,9 @@
 package org.basex.query.fs;
 
 import static org.basex.Text.*;
+
 import java.io.IOException;
+
 import org.basex.io.PrintOutput;
 import org.basex.util.GetOpts;
 import org.basex.util.IntList;
@@ -46,7 +48,7 @@ public final class LS extends FSCmd {
           break;
         case 's':
           fSorted = true;
-          break;  
+          break;
         case 'H':
           fHuman = true;
           break;
@@ -105,7 +107,7 @@ public final class LS extends FSCmd {
   private int[] print(final int[] result, final PrintOutput out)
     throws IOException {
 
-    TokenList b = new TokenList();
+    final TokenList b = new TokenList();
 
     final IntList allDir = new IntList();
     for(final int j : result) {
@@ -119,7 +121,7 @@ public final class LS extends FSCmd {
 
       if(fPrintLong) {
         if(fSorted) error("", 102);
-        
+
         final long size = Token.toLong(FSUtils.getSize(data, j));
         final String time = FSUtils.getMtime(data, j);
 

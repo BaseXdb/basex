@@ -88,8 +88,8 @@ public final class CreateDB extends ACreate {
     if(data.meta.atvindex) data.openIndex(
         IndexToken.TYPE.ATV, new ValueBuilder(false).build(data));
     if(data.meta.ftxindex) data.openIndex(
-        IndexToken.TYPE.FTX, data.meta.ftfuzzy ?
-            new FTFuzzyBuilder().build(data) : new FTBuilder().build(data));
+        IndexToken.TYPE.FTX, data.meta.ftfz ?
+          new FTFuzzyBuilder().build(data) : new FTBuilder().build(data));
     return data;
   }
   

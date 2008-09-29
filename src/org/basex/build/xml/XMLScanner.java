@@ -4,15 +4,17 @@ import static org.basex.Text.*;
 import static org.basex.build.BuildText.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.XMLToken.*;
+
 import java.io.IOException;
+
 import org.basex.BaseX;
 import org.basex.build.BuildException;
 import org.basex.build.BuildText.Type;
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
-import org.basex.util.TokenMap;
 import org.basex.util.TokenBuilder;
+import org.basex.util.TokenMap;
 
 /**
  * This class scans an XML document and creates atomic tokens.
@@ -34,7 +36,7 @@ public final class XMLScanner {
   private static final byte[] E_GT = token("gt");
   /** LessThan Entity. */
   private static final byte[] E_LT = token("lt");
-  
+
   /** Scanning states. */
   private static enum State {
     /** Content state.   */ CONTENT,
@@ -53,9 +55,9 @@ public final class XMLScanner {
   /** Document encoding (currently not used). */
   String encoding = UTF8;
   /** Index for all entity names. */
-  private TokenMap ents;
+  private final TokenMap ents;
   /** Index for all PEReferences. */
-  private TokenMap pents;
+  private final TokenMap pents;
   /** Parameter entity parsing. */
   private boolean pe;
 
@@ -294,7 +296,7 @@ public final class XMLScanner {
     int c = ch;
     while(c != 0) {
       if(c != '<') {
-        ws &= ws(c);
+        if(ws) ws = ws(c);
         if(c == '&') {
           // verify...
           final byte[] r = ref(true);
@@ -993,7 +995,7 @@ public final class XMLScanner {
     }
     check((char) d);
     if(enc.size == 0) error(DECLENCODE, enc);
-    String e = string(enc.finish());
+    final String e = string(enc.finish());
     input.encoding(e);
     return e;
   }

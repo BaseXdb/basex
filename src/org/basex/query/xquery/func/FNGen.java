@@ -1,7 +1,7 @@
 package org.basex.query.xquery.func;
 
-import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
+import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Atm;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.DNode;
@@ -23,7 +23,7 @@ final class FNGen extends Fun {
   private Item docName;
   /** Database instance. */
   private DNode doc;
-  
+
   @Override
   public Iter iter(final XQContext ctx, final Iter[] arg) throws XQException {
     final Iter iter = arg.length != 0 ? arg[0] : null;
@@ -62,7 +62,7 @@ final class FNGen extends Fun {
         throw new RuntimeException("Not defined: " + func);
     }
   }
-  
+
   /**
    * Atomizes the specified item.
    * @param it input item

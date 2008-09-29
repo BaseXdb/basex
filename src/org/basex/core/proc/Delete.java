@@ -45,7 +45,8 @@ public final class Delete extends Process {
     // delete all nodes
     final int size = nodes.size;
     for(int i = size - 1; i >= 0; i--) {
-      if(nodes.pre[i] == 0) return error(DELETEROOT);
+      // <CG> delete root nodes...
+      //if(nodes.pre[i] == 0) return error(DELETEROOT);
       data.delete(nodes.pre[i]);
     }
     

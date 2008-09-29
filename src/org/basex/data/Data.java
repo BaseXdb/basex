@@ -333,7 +333,7 @@ public abstract class Data  {
    * Returns the document nodes.
    * @return root nodes
    */
-  public int[] doc() {
+  public final int[] doc() {
     final IntList il = new IntList();
     for(int i = 0; i < size; i += size(i, Data.DOC)) il.add(i);
     return il.finish();

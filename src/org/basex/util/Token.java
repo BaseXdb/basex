@@ -284,7 +284,7 @@ public final class Token {
   }
 
   /** US charset. */
-  private static final java.text.DecimalFormatSymbols LOC =
+  public static final java.text.DecimalFormatSymbols LOC =
     new java.text.DecimalFormatSymbols(java.util.Locale.US);
   /** Scientific double output. */
   private static final java.text.DecimalFormat SD =
@@ -313,6 +313,7 @@ public final class Token {
     return chopNumber(token(a >= 1e-6 && a < 1e6 ?
         DD.format(d) : SD.format(d)));
   }
+
 
   /**
    * Creates a byte array representation from the specified float value.
@@ -446,40 +447,13 @@ public final class Token {
     for(; t < te; t++) {
       final byte c = to[t];
       if(c < '0' || c > '9') break;
-      long w = (v << 3) + (v << 1) + c - '0';
+      final long w = (v << 3) + (v << 1) + c - '0';
       if(w < v) return Long.MIN_VALUE;
       v = w;
     }
     while(t < te && to[t] <= ' ') t++;
     return t < te ? Long.MIN_VALUE : m ? -v : v;
   }
-
-  /**
-   * Converts a long value to a int-array.
-   * @param l long value to convert
-   * @return int-array with the long value
-   */
-  public static int[] longToInt(final long l) {
-    int[] i = new int[2];
-    i[1] = (int) (l & 0x7FFFFFFF);
-    if (l < 0x7FFFFFFF) return new int[]{i[1]};
-    i[0] = (int) (l >> 31) * -1;
-    return i;
-  }
-  
-  
-  /**
-   * Converts an int-array to a long value.
-   * @param i int-array with the long value
-   * @return long value
-   */
-  public static long intArrayToLong(final int[] i) {
-    if (i.length == 1) return i[0];
-    long l = i[0] * -1; // & 0x7FFFFFFF;
-    l = l << 31;
-    l = i[1] | l;
-    return l;
- }
   
   /**
    * Converts the specified string into an integer value.
@@ -1096,4 +1070,30 @@ public final class Token {
     'O', ' ', 'O', 'U', 'U', 'U', 'U', 'Y', 'D', 'S', 'a', 'a', 'a', 'a', 'a',
     'a', 'a', 'c', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i', 'd', 'n', 'o',
     'o', 'o', 'o', 'o', ' ', 'o', 'u', 'u', 'u', 'u', 'y', 'd', 's' };
+
+  /**
+   * Converts a long value to a int-array.
+   * @param l long value to convert
+   * @return int-array with the long value
+   */
+  public static int[] longToInt(final long l) {
+    final int[] i = new int[2];
+    i[1] = (int) (l & 0x7FFFFFFF);
+    if (l < 0x7FFFFFFF) return new int[]{i[1]};
+    i[0] = (int) (l >> 31) * -1;
+    return i;
+  }
+  
+  /**
+   * Converts an int-array to a long value.
+   * @param i int-array with the long value
+   * @return long value
+   */
+  public static long intArrayToLong(final int[] i) {
+    if (i.length == 1) return i[0];
+    long l = i[0] * -1; // & 0x7FFFFFFF;
+    l = l << 31;
+    l = i[1] | l;
+    return l;
+  }
 }

@@ -127,3 +127,7 @@ holdability
 str
 tokenize
 tmp
+poi
+materialization
+html
+timezone

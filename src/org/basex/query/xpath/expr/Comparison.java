@@ -30,7 +30,7 @@ public abstract class Comparison extends DualExpr {
   }
 
   @Override
-  public Bool eval(final XPContext ctx) throws QueryException {
+  public final Bool eval(final XPContext ctx) throws QueryException {
     final Item v1 = ctx.eval(expr1);
     final Item v2 = ctx.eval(expr2);
    

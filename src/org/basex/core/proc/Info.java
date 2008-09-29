@@ -26,7 +26,7 @@ public final class Info extends AInfo {
     Performance.gc(1);
     
     final int l = maxLength(new String[] {
-        INFODBPATH, INFOMEM, INFOMM, INFOINFO
+        INFODBPATH, INFOMEM, INFOMAINMEM, INFOINFO
     });
 
     final TokenBuilder tb = new TokenBuilder();
@@ -39,11 +39,11 @@ public final class Info extends AInfo {
     
     tb.add(NL + INFOCREATE + NL);
     format(tb, INFOCHOP, BaseX.flag(Prop.chop), true, 0);
-    format(tb, INFOENTITIES, BaseX.flag(Prop.entity), true, 0);
+    format(tb, INFOENTITY, BaseX.flag(Prop.entity), true, 0);
 
     tb.add(NL + INFOINDEX + NL);
-    format(tb, INFOTXTINDEX, BaseX.flag(Prop.textindex), true, 0);
-    format(tb, INFOATVINDEX, BaseX.flag(Prop.attrindex), true, 0);
+    format(tb, INFOTEXTINDEX, BaseX.flag(Prop.textindex), true, 0);
+    format(tb, INFOATTRINDEX, BaseX.flag(Prop.attrindex), true, 0);
     format(tb, INFOFTINDEX, BaseX.flag(Prop.ftindex) + (Prop.ftindex &&
         Prop.ftfuzzy ? " (" + INFOFZINDEX + ")" : ""), true, 0);
     out.print(tb.finish());

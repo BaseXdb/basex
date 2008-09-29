@@ -53,7 +53,7 @@ public final class Treat extends Single {
       public Item next() throws XQException {
         if(i == null) return null;
         if(!i.type.instance(seq.type)) Err.or(NOTREAT, info(), seq, i.type);
-        Item ii = i;
+        final Item ii = i;
         i = iter.next();
         return ii;
       }

@@ -79,7 +79,7 @@ public class BaseXTextField extends JTextField {
   }
 
   @Override
-  public void setEnabled(final boolean sel) {
+  public final void setEnabled(final boolean sel) {
     super.setEnabled(sel);
     setOpaque(sel);
   }
@@ -88,7 +88,7 @@ public class BaseXTextField extends JTextField {
    * Sets the text field help text.
    * @param hlp help text
    */
-  public void help(final byte[] hlp) {
+  public final void help(final byte[] hlp) {
     help = hlp;
   }
 }

@@ -91,7 +91,7 @@ public final class FTUnion extends FTArrayExpr {
     
    // if (nex.length == 0) {
       minp = -1;
-      FTNode m = exprs[pex[cp.get(0)]].next(ctx);
+      final FTNode m = exprs[pex[cp.get(0)]].next(ctx);
       for (int i = 1; i < cp.size; i++) {
         m.merge(exprs[pex[cp.get(i)]].next(ctx), 0);
       }

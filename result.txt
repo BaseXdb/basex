@@ -1,0 +1,2 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<results><result><li>Exercise 1</li></result><result><li>Exercise 2</li></result></results>

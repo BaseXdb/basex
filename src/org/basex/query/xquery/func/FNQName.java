@@ -54,7 +54,7 @@ final class FNQName extends Fun {
         return name.iter();
       case QNAME:
         it = arg[0].atomic(this, true);
-        Uri uri = Uri.uri(it == null ? Token.EMPTY :
+        final Uri uri = Uri.uri(it == null ? Token.EMPTY :
           check(it, Type.STR).str());
         it = arg[1].atomic(this, true);
         it = it == null ? Str.ZERO : check(it, Type.STR);

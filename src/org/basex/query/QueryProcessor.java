@@ -59,7 +59,7 @@ public abstract class QueryProcessor extends Progress {
     try {
       if(Prop.xmlplan) context.planXML();
       if(Prop.dotplan) context.planDot();
-    } catch(Exception ex) {
+    } catch(final Exception ex) {
       ex.printStackTrace();
     }
     compiled = true;

@@ -44,7 +44,7 @@ public final class Num {
   public static byte[] add(final byte[] array, final int val) {
     final int len = len(val);
     final int pos = size(array);
-    byte[] tmp = check(array, pos, len);
+    final byte[] tmp = check(array, pos, len);
     add(tmp, val, pos, len);
     size(tmp, pos + len);
     return tmp;
@@ -58,7 +58,7 @@ public final class Num {
    */
   public static byte[] create(final int[] vals) {
     byte[] tmp = new byte[vals.length << 1];
-    int vs = vals[0];
+    final int vs = vals[0];
     int pos = 4;
     for(int i = 1; i <= vs; i++) {
       final int len = len(vals[i]);

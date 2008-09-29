@@ -10,13 +10,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
-
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
@@ -33,7 +31,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Lukas Kircher
  */
-public class ScatterView extends View implements Runnable {
+public final class ScatterView extends View implements Runnable {
   /** Data reference. */
   ScatterData scatterData;
   /** X paint margin. */
@@ -151,7 +149,7 @@ public class ScatterView extends View implements Runnable {
         18, 18, Transparency.TRANSLUCENT) : new BufferedImage(
             10, 10, Transparency.TRANSLUCENT);
     final Graphics g = img.getGraphics();
-    Graphics2D g2d = (Graphics2D) g;
+    final Graphics2D g2d = (Graphics2D) g;
     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
         RenderingHints.VALUE_ANTIALIAS_ON);
     if(focusedImage) {
@@ -178,7 +176,7 @@ public class ScatterView extends View implements Runnable {
     final BufferedImage img = new BufferedImage(getWidth(), getHeight(), 
         Transparency.BITMASK);
     final Graphics g = img.getGraphics();
-    Graphics2D g2d = (Graphics2D) g;
+    final Graphics2D g2d = (Graphics2D) g;
     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
         RenderingHints.VALUE_ANTIALIAS_ON);
     if(scatterData.size == 0)
@@ -195,6 +193,14 @@ public class ScatterView extends View implements Runnable {
   
   @Override
   public void paintComponent(final Graphics g) {
+    final Data data = GUI.context.data();
+    if(data == null) return;
+    
+    if(scatterData == null) {
+      refreshInit();
+      return;
+    }
+    
     super.paintComponent(g);
     g.setColor(new Color(90, 90, 150, 90));
     
@@ -306,7 +312,7 @@ public class ScatterView extends View implements Runnable {
       g.setColor(GUIConstants.color1);
       final int x = XMARGIN + NOVALUEBORDER + ((int) ((i * range) * pWidth));
       g.drawLine(x, YMARGIN, x, h - YMARGIN + 9);
-      String caption = "";
+      String caption = null;
       if(numeric) {
         final double min = axis.min;
         final double captionValue = i == nrCaptions - 1 ? axis.max : 
@@ -364,7 +370,7 @@ public class ScatterView extends View implements Runnable {
       ((int) ((i * range) * pHeight));
       g.drawLine(XMARGIN - 9, y1, w - XMARGIN, y1);
       g.setColor(Color.black);
-      String caption = new String();
+      String caption = null;
       if(numeric) {
         final double value = scatterData.yAxis.min +
           (scatterData.yAxis.max - scatterData.yAxis.min) * range * i;
@@ -421,6 +427,8 @@ public class ScatterView extends View implements Runnable {
 
   @Override
   protected void refreshInit() {
+    scatterData = null;
+
     final Data data = GUI.context.data();
     if(data != null) {
       if(!GUIProp.showplot) return;
@@ -436,9 +444,13 @@ public class ScatterView extends View implements Runnable {
         items[i] = Token.string(tmpItems[i]);
       }
       itemCombo.setModel(new DefaultComboBoxModel(items));
-      itemCombo.setSelectedIndex(0);
-      xCombo.setSelectedIndex(0);
-      yCombo.setSelectedIndex(0);
+      if(items.length != 0) {
+        itemCombo.setSelectedIndex(0);
+      }
+      if(keys.length != 0) {
+        xCombo.setSelectedIndex(0);
+        yCombo.setSelectedIndex(0);
+      }
       focusedItem = -1;
       plotChanged = true;
       repaint();

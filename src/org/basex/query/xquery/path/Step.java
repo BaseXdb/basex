@@ -61,10 +61,7 @@ public class Step extends Arr {
 
   @Override
   public NodeIter iter(final XQContext ctx) throws XQException {
-    final Item ci = ctx.item;
-
-    if(ci == null) Err.or(XPNOCTX, this);
-    final Iter iter = ci.iter();
+    final Iter iter = checkCtx(ctx);
 
     final NodIter ni = new NodIter();
     NodIter nb = new NodIter();
@@ -156,7 +153,7 @@ public class Step extends Arr {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("");
-    if(test.type == Type.NOD) {
+    if(test == Test.NODE) {
       if(axis == Axis.PARENT) return "..";
       if(axis == Axis.SELF) return ".";
     }

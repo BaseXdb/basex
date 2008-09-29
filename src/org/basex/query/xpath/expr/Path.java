@@ -29,11 +29,9 @@ public final class Path extends DualExpr {
     final Item val = ctx.eval(expr1);
     final NodeSet local = ctx.local;
     ctx.local = (NodeSet) val;
-    int[][] ftprepos =  ctx.local.ftidpos;
-    int[] ftpoin = ctx.local.ftpointer;
     final NodeSet ns = (NodeSet) ctx.eval(expr2);
-    ns.ftidpos = ftprepos;
-    ns.ftpointer = ftpoin;
+    ns.ftidpos = ctx.local.ftidpos;
+    ns.ftpointer = ctx.local.ftpointer;
     ctx.local = local;
     return ns;
   }

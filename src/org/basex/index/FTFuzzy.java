@@ -2,7 +2,9 @@ package org.basex.index;
 
 import static org.basex.Text.*;
 import static org.basex.data.DataText.*;
+
 import java.io.IOException;
+
 import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.Data;
@@ -59,7 +61,7 @@ public final class FTFuzzy extends Index {
   /** Token positions. */
   final int[] tp = new int[Token.MAXLEN + 1];
   /** Cache for number of hits and data reference per token. **/
-  private FTTokenMap cache;
+  private final FTTokenMap cache;
 
 
   /**
@@ -91,7 +93,7 @@ public final class FTFuzzy extends Index {
   public byte[] info() {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(FUZZY + NL);
-    tb.add("- %: %\n", CREATESTEM, BaseX.flag(data.meta.ftstem));
+    tb.add("- %: %\n", CREATESTEM, BaseX.flag(data.meta.ftst));
     tb.add("- %: %\n", CREATECS, BaseX.flag(data.meta.ftcs));
     tb.add("- %: %\n", CREATEDC, BaseX.flag(data.meta.ftdc));
     final long l = li.length() + ti.length() + dat.length();
@@ -197,7 +199,7 @@ public final class FTFuzzy extends Index {
    */
   private IndexIterator getData(final long p, final int s) {
     dat.cursor(p);
-    int[][] d = new int[2][s];
+    final int[][] d = new int[2][s];
     for(int i = 0; i < s; i++) d[0][i] = dat.readNum();
     for(int i = 0; i < s; i++) d[1][i] = dat.readNum();
     return new IndexArrayIterator(d, true);
@@ -208,7 +210,6 @@ public final class FTFuzzy extends Index {
    * @param it iterator
    * @return array
    */
-  // <SG> must be rewritten...
   private int[][] finish(final IndexIterator it) {
     final int s = it.size();
     final int[] pre = new int[s];
@@ -298,26 +299,26 @@ public final class FTFuzzy extends Index {
     if(!ft.cs) return ii;
 
     // case sensitive search
-    int[][] ids = finish(ii);
+    final int[][] ids = finish(ii);
     //int c = 0;
 
     // check real case of each result node
     final FTTokenizer ftdb = new FTTokenizer();
     ftdb.st = ft.st;
-    int c = csDBCheck(ids, data, ftdb, tok);
+    final int c = csDBCheck(ids, data, ftdb, tok);
 
     return new IndexArrayIterator(ids, c, true);
   }
 
   /**
-   * Performs db-access and checks real case of a token. 
+   * Performs db-access and checks real case of a token.
    * @param ids full-text ids
    * @param d Data-reference
    * @param ftdb Fulltext Tokenizer
    * @param tok token
-   * @return counter 
+   * @return counter
    */
-  public static int csDBCheck(final int[][] ids, final Data d, 
+  public static int csDBCheck(final int[][] ids, final Data d,
       final FTTokenizer ftdb, final byte[] tok) {
     int c = 0;
     for(int i = 0; i < ids[0].length;) {
@@ -345,11 +346,11 @@ public final class FTFuzzy extends Index {
     }
     return c;
   }
-  
+
   @Override
   public int nrIDs(final IndexToken index) {
     // hack, should find general solution
-    FTTokenizer fto = (FTTokenizer) index;
+    final FTTokenizer fto = (FTTokenizer) index;
     if(fto.fz) return 1;
 
     // specified ft options are not checked yet...
@@ -364,8 +365,8 @@ public final class FTFuzzy extends Index {
       return size;
     } else {
       cache.add(tok, 0, 0);
-      return 0;        
-    }        
+      return 0;
+    }
   }
 
   @Override
@@ -430,8 +431,9 @@ public final class FTFuzzy extends Index {
       return new IndexArrayIterator(dt, true);
     }
 
-    BaseX.debug("Sorry, FuzzyIndex supports only \'.*\' as wildcard.");
-    return IndexIterator.EMPTY;
+    // FuzzyIndex supports only '.*' as wildcard...
+    BaseX.notexpected();
+    return null;
   }
 
   /**

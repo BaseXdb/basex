@@ -59,7 +59,7 @@ final class FTHash extends Set {
    * be reordered - but this way, memory is saved.
    */
   void init() {
-    int[] ids = new int[size];
+    final int[] ids = new int[size];
     for(int i = 0; i < size; i++) ids[i] = i;
     il = new IntList(ids);
     il.sort(keys, false, true);
