@@ -26,7 +26,7 @@ public final class ScatterAxis {
   /** True if attribute is numerical. */
   boolean numeric;
   /** Number of different categories for x attribute. */
-  private int nrCats;
+  int nrCats;
   /** Type of data. */
   int numType;
   /** Data type integer. */
@@ -134,17 +134,20 @@ public final class ScatterAxis {
     double percentage = 0d;
     if(numeric) {
       final double range = max - min;
-      if(range == 0) {
+      if(range == 0)
         percentage = 0.5d;
-      } else {
+      else
         percentage = 1 / range * (d - min);
-      }
+     
     } else {
-      for(int i = 0; i < nrCats; i++) {
-        if(Token.eq(value, cats[i])) {
-          percentage = (1.0d / (nrCats - 1)) * i;
+      if(nrCats == 1)
+        percentage = 0.5d;
+      else
+        for(int i = 0; i < nrCats; i++) {
+          if(Token.eq(value, cats[i])) {
+            percentage = (1.0d / (nrCats - 1)) * i;
+          }
         }
-      }
     }
     return percentage;
   }

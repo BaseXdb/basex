@@ -82,6 +82,10 @@ public final class ScatterView extends View implements Runnable {
   BaseXCombo yCombo;
   /** Item selector combo. */
   BaseXCombo itemCombo;
+  /** Flag for mouse dragging actions. */
+  private boolean dragging;
+  /** Bounding box which supports selection of multiple items. */
+  private ScatterBoundingBox selectionBox;
 
   /**
    * Default Constructor.
@@ -132,6 +136,7 @@ public final class ScatterView extends View implements Runnable {
     box.add(Box.createHorizontalGlue());
     add(box, BorderLayout.NORTH);
     
+    selectionBox = new ScatterBoundingBox();
     itemImg = createItemImage(false, false);
     markedItemImg = createItemImage(false, true);
     itemFocusedImg = createItemImage(true, false);
@@ -260,6 +265,25 @@ public final class ScatterView extends View implements Runnable {
       g.drawString("x  " + x, XMARGIN, h - 50);
       g.drawString("y  " + y, XMARGIN, h - 35);
     }
+    
+    // draw selection box
+    if(dragging) {
+      g.setColor(ScatterBoundingBox.back);
+      final int selW = selectionBox.getWidth();
+      final int selH = selectionBox.getHeight();
+      final int x1 = selectionBox.x1;
+      final int y1 = selectionBox.y1;
+      final int x2 = selectionBox.x2;
+      final int y2 = selectionBox.y2;
+      g.fillRect(selW > 0 ? x1 : x1 + selW, selH > 0 ? y1 : y1 + selH, 
+          Math.abs(selW), Math.abs(selH));
+      g.setColor(ScatterBoundingBox.frame);
+      g.drawLine(x1, y1, x2, y1);
+      g.drawLine(x1, y1, x1, y2);
+      g.drawLine(x1, y2, x2, y2);
+      g.drawLine(x2, y1, x2, y2);
+    }
+    
     plotChanged = false;
   }
   
@@ -302,7 +326,7 @@ public final class ScatterView extends View implements Runnable {
     final int pWidth = plotWidth - NOVALUEBORDER;
     final ScatterAxis axis = scatterData.xAxis;
     axis.calcCaption(pWidth);
-    final int nrCaptions = axis.nrCaptions;
+    final int nrCaptions = axis.nrCats != 1 ? axis.nrCaptions : 3;
     final double step = axis.captionStep;
     final double range = 1.0d / (nrCaptions - 1);
     final int type = axis.numType;
@@ -321,9 +345,14 @@ public final class ScatterView extends View implements Runnable {
         if(type == ScatterAxis.TYPEINT)
           caption = Integer.toString((int) captionValue);
         else
-          caption = "double";
+          caption = "double dummy";
       } else {
-        caption = Token.string(axis.cats[i]);
+        if(axis.nrCats == 1) {
+          if(i == 1)
+            caption = Token.string(axis.cats[0]);
+        } else {
+          caption = Token.string(axis.cats[i]);
+        }
       }
       
       // draw rotated caption labels
@@ -540,6 +569,24 @@ public final class ScatterView extends View implements Runnable {
     mouseX = e.getX();
     mouseY = e.getY();
     focus();
+    repaint();
+  }
+  
+  @Override
+  public void mouseDragged(final MouseEvent e) {
+    if(!dragging) {
+      dragging = true;
+      selectionBox.setStart(mouseX, mouseY);
+    }
+    mouseX = e.getX();
+    mouseY = e.getY();
+    selectionBox.setEnd(mouseX, mouseY);
+    repaint();
+  }
+  
+  @Override
+  public void mouseReleased(final MouseEvent e) {
+    dragging = false;
     repaint();
   }
   
