@@ -23,6 +23,8 @@ import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.View;
+import org.basex.util.IntList;
+import org.basex.util.Performance;
 import org.basex.util.Token;
 
 /**
@@ -84,6 +86,12 @@ public final class ScatterView extends View implements Runnable {
   BaseXCombo itemCombo;
   /** Flag for mouse dragging actions. */
   private boolean dragging;
+  /** Holds if context marking has changed. */
+  boolean markingChanged;
+  /** Holds pre values of marked nodes that are displayed in the plot to 
+   * solve performance issues.
+   */
+  private int[] temporaryMarkedPos;
   /** Bounding box which supports selection of multiple items. */
   private ScatterBoundingBox selectionBox;
 
@@ -117,8 +125,10 @@ public final class ScatterView extends View implements Runnable {
     itemCombo = new BaseXCombo();
     itemCombo.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        if(scatterData.setItem((String) itemCombo.getSelectedItem()))
+        if(scatterData.setItem((String) itemCombo.getSelectedItem())) {
           plotChanged = true;
+          markingChanged = true;
+        }
           repaint();
       }
     });
@@ -136,6 +146,7 @@ public final class ScatterView extends View implements Runnable {
     box.add(Box.createHorizontalGlue());
     add(box, BorderLayout.NORTH);
     
+    temporaryMarkedPos = new int[0];
     selectionBox = new ScatterBoundingBox();
     itemImg = createItemImage(false, false);
     markedItemImg = createItemImage(false, true);
@@ -164,10 +175,13 @@ public final class ScatterView extends View implements Runnable {
       g.setColor(new Color(180, 80, 80, 200));
       g.fillOval(0, 0, ITEMSIZEFOCUSED, ITEMSIZEFOCUSED);
     } else {
-//      g.setColor(GUIConstants.color6);
       g.setColor(new Color(50, 60, 130, 150));
+      Color c = new Color(GUIConstants.colormark1.getRed(),
+          GUIConstants.colormark1.getGreen(), GUIConstants.colormark1.getBlue(),
+          150);
       if(marked)
-        g.setColor(GUIConstants.colormark1);
+//        g.setColor(GUIConstants.colormark1);
+        g.setColor(c);
       g.fillOval(0, 0, ITEMSIZE, ITEMSIZE);
     }
     return img;
@@ -238,15 +252,24 @@ public final class ScatterView extends View implements Runnable {
     g.drawImage(plotImg, 0, 0, this);
     
     // draw marked items
-    final Nodes marked = GUI.context.marked();
-    if(marked.size() > 0) {
-      final int[] pres = marked.pre;
-      for(int i = 0; i < marked.size(); i++) {
-        final int prePos = scatterData.getPrePos(pres[i]);
-        if(prePos > -1)
-          drawItem(g, scatterData.xAxis.co[prePos], 
-              scatterData.yAxis.co[prePos], false, true);
+    if(markingChanged) {
+      Performance p = new Performance();
+      final Nodes marked = GUI.context.marked();
+      if(marked.size() > 0) {
+        final IntList tmpPre = new IntList();
+        for(int i = 0; i < marked.size(); i++) {
+          final int prePos = scatterData.getPrePos(marked.pre[i]);
+          if(prePos > -1)
+            tmpPre.add(prePos);
+        }
+        temporaryMarkedPos = tmpPre.finish();
+        System.out.println(p.getTimer());
       }
+      markingChanged = false;
+    }
+    for(int i = 0; i < temporaryMarkedPos.length; i++) {
+      drawItem(g, scatterData.xAxis.co[temporaryMarkedPos[i]], 
+          scatterData.yAxis.co[temporaryMarkedPos[i]], false, true);
     }
 
     // draw focused item
@@ -262,8 +285,8 @@ public final class ScatterView extends View implements Runnable {
           scatterData.xAxis.getValue(focusedValueX) : "";
       final String y = mouseY < h - YMARGIN - NOVALUEBORDER ?
           scatterData.yAxis.getValue(focusedValueY) : "";
-      g.drawString("x  " + x, XMARGIN, h - 50);
-      g.drawString("y  " + y, XMARGIN, h - 35);
+      g.drawString("x  " + x, XMARGIN, YMARGIN - 50);
+      g.drawString("y  " + y, XMARGIN, YMARGIN - 35);
     }
     
     // draw selection box
@@ -336,7 +359,7 @@ public final class ScatterView extends View implements Runnable {
       g.setColor(GUIConstants.color1);
       final int x = XMARGIN + NOVALUEBORDER + ((int) ((i * range) * pWidth));
       g.drawLine(x, YMARGIN, x, h - YMARGIN + 9);
-      String caption = null;
+      String caption = "";
       if(numeric) {
         final double min = axis.min;
         final double captionValue = i == nrCaptions - 1 ? axis.max : 
@@ -356,7 +379,12 @@ public final class ScatterView extends View implements Runnable {
       }
       
       // draw rotated caption labels
-      final int capW = BaseXLayout.width(g, caption);
+      if(caption.length() > 22) {
+        caption = caption.substring(0, 25);
+        caption += "...";
+      }
+
+      int capW = BaseXLayout.width(g, caption);
       final int imgH = 160;
       int imgW = 160;
       final BufferedImage img = new BufferedImage(imgW, imgH, 
@@ -493,6 +521,7 @@ public final class ScatterView extends View implements Runnable {
 
   @Override
   protected void refreshMark() {
+    markingChanged = true;
     repaint();
   }
 
@@ -581,6 +610,7 @@ public final class ScatterView extends View implements Runnable {
     mouseX = e.getX();
     mouseY = e.getY();
     selectionBox.setEnd(mouseX, mouseY);
+    focus();
     repaint();
   }
   
