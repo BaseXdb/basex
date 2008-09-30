@@ -43,7 +43,7 @@ abstract class ACreate extends Process {
    * @return success of operation
    */
   protected final boolean build(final Parser p, final String db) {
-    String err = "";
+    String err = null;
     Builder builder = null;
     try {
       if(Prop.onthefly) {
@@ -71,7 +71,7 @@ abstract class ACreate extends Process {
       BaseX.debug(ex);
       err = BaseX.info(FILEWHICH, p.io);
     } catch(final ProgressException ex) {
-      throw ex;
+      err = CANCELCREATE;
     } catch(final IOException ex) {
       BaseX.debug(ex);
       final String msg = ex.getMessage();

@@ -85,7 +85,8 @@ public final class IOFile extends IO {
       more = true;
     } else if(path.endsWith(GZSUFFIX)) {
       if(is == null) is = new GZIPInputStream(new FileInputStream(file));
-      more = false;
+      else return false;
+      more = true;
     } else {
       more ^= true;
     }
