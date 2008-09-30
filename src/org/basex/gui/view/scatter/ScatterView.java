@@ -590,13 +590,15 @@ public final class ScatterView extends View implements Runnable {
       }
       notifyFocus(focusedItem > -1 ? scatterData.pres[focusedItem] : -1, this);
     } else {
+      tmpMarkedPos.reset();
       for(int i = 0; i < scatterData.size; i++) {
         final int x = calcCoordinate(true, scatterData.xAxis.co[i]);
         final int y = calcCoordinate(false, scatterData.yAxis.co[i]);
-        if(x >= selectionBox.x1 && x <= selectionBox.x2) {
-          if(y >= selectionBox.y1 && y <= selectionBox.y2) {
-            tmpMarkedPos.add(i);
-          }
+        if(((x >= selectionBox.x1 && x <= selectionBox.x2) || 
+            (x <= selectionBox.x1 && x >= selectionBox.x2)) && 
+            ((y >= selectionBox.y1 && y <= selectionBox.y2) || 
+                (y <= selectionBox.y1 && y >= selectionBox.y2))) {
+          tmpMarkedPos.add(i);
         }
       }
       markingChanged = true;
