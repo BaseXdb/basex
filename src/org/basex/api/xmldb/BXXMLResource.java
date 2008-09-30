@@ -1,14 +1,22 @@
 package org.basex.api.xmldb;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.StringReader;
+
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import org.basex.BaseX;
 import org.basex.data.Nodes;
+import org.basex.data.SAXSerializer;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
 import org.w3c.dom.Document;
@@ -32,13 +40,21 @@ public class BXXMLResource implements XMLResource {
   Nodes nodes;
   /** String content. */
   Object content;
+  /** String id. */
+  String id;
+  /** Int pre. */
+  int pre;
 
   /**
    * Standard constructor.
    * @param n nodes
+   * @param iD String
+   * @param preV int
    */
-  public BXXMLResource(final Nodes n) {
+  public BXXMLResource(final Nodes n, final String iD, final int preV) {
     nodes = n;
+    id = iD;
+    pre = preV;
   }
 
   public Object getContent() {
@@ -56,18 +72,17 @@ public class BXXMLResource implements XMLResource {
   }
 
   public Node getContentAsDOM() {
-    if(content != null) getContent();
-    // <AW> ...process content (see eXist)
+    if(content == null) getContent();
 
     try {
       // Create a builder factory
       final DocumentBuilderFactory factory =
         DocumentBuilderFactory.newInstance();
       factory.setValidating(false);
-
+      System.out.println(content);
       // Create the builder and parse the file
       final Document doc = factory.newDocumentBuilder().parse(
-          new File(nodes.data.meta.file.toString()));
+          new InputSource(new StringReader(content.toString())));
       return doc;
     } catch(final SAXException e) {
       // A parsing error occurred; the xml input is not valid
@@ -78,8 +93,7 @@ public class BXXMLResource implements XMLResource {
 
   public void getContentAsSAX(final ContentHandler handler)
       throws XMLDBException {
-    if(content != null) getContent();
-    // <AW> ...process content (see eXist)
+    if(content == null) getContent();
 
     XMLReader reader = null;
     final SAXParserFactory saxFactory = SAXParserFactory.newInstance();
@@ -96,8 +110,7 @@ public class BXXMLResource implements XMLResource {
     }
     try {
       reader.setContentHandler(handler);
-      reader.parse(new InputSource(new FileInputStream(new File(
-          nodes.data.meta.file.toString()))));
+      reader.parse(new InputSource(new StringReader(content.toString())));
     } catch(final SAXException saxe) {
       saxe.printStackTrace();
       throw new XMLDBException(1, saxe.getMessage());
@@ -112,7 +125,7 @@ public class BXXMLResource implements XMLResource {
   }
 
   public String getId() {
-    return nodes.data.meta.dbname;
+    return id;
   }
 
   public Collection getParentCollection() {
@@ -130,11 +143,34 @@ public class BXXMLResource implements XMLResource {
   }
 
   public void setContentAsDOM(final Node cont) {
-    // TODO Auto-generated method stub
+    String test = "";
+    try {
+      TransformerFactory.newInstance().newTransformer().transform(
+          new DOMSource(cont),  new StreamResult(test));
+    } catch(TransformerConfigurationException e) {
+      e.printStackTrace();
+    } catch(TransformerException e) {
+      e.printStackTrace();
+    } catch(TransformerFactoryConfigurationError e) {
+      e.printStackTrace();
+    }
+    content = test;
   }
 
   public ContentHandler setContentAsSAX() {
-    // TODO Auto-generated method stub
-    return null;
+    SAXSerializer sax = new SAXSerializer(null);
+    // A custom SAX Content Handler is required to handle the SAX events
+    ContentHandler handler = sax.getContentHandler();
+    return handler;
   }
+  
+  /**
+   * Returns the pre value of the Doc
+   * @return int Prevalue
+   */
+  public int getPre() {
+    return pre;
+  }
+  
+  
 }

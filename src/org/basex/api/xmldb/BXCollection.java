@@ -5,7 +5,6 @@ import org.xmldb.api.base.*;
 import org.xmldb.api.modules.XMLResource;
 import org.basex.core.Context;
 import org.basex.core.proc.CreateDB;
-import org.basex.core.proc.Open;
 import org.basex.core.proc.Check;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.DropDB;
@@ -42,9 +41,7 @@ public class BXCollection implements Collection {
   public Resource createResource(final String id, final String type)
       throws XMLDBException {
     if(type.equals(XMLResource.RESOURCE_TYPE)) {
-      if(new Check(id).execute(ctx)) {
-        return new BXXMLResource(ctx.current());
-      }
+        return new BXXMLResource(ctx.current(), id, -1);
     }
     throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED);
   }
@@ -74,13 +71,22 @@ public class BXCollection implements Collection {
   }
 
   public Resource getResource(final String id) throws XMLDBException {
-    if(new Open(id).execute(ctx)) return new BXXMLResource(ctx.current());
+    
+    for (int i = 0; i < ctx.data().doc().length; i++) {
+      int test = ctx.data().doc()[i];
+      String name = new String(ctx.data().text(test));
+      if(name.endsWith(".xml")) {
+        name = name.substring(0, name.length()-4);
+      }
+      if(name.equals(id)) {
+        return new BXXMLResource(ctx.current(), id, test);
+      }
+    };
     throw new XMLDBException(ErrorCodes.NO_SUCH_RESOURCE);
   }
 
   public int getResourceCount() {
-    // TODO Auto-generated method stub
-    return 0;
+    return ctx.data().doc().length;
   }
 
   public Service getService(final String name, final String version)
@@ -107,13 +113,10 @@ public class BXCollection implements Collection {
     // TODO Auto-generated method stub
     return null;
   }
-
-  public void removeResource(final Resource res) throws XMLDBException {
-    if(new Check(res.getId()).execute(ctx)) {
-      new DropDB(res.getId()).execute(ctx);
-    } else {
-      throw new XMLDBException(ErrorCodes.NO_SUCH_RESOURCE);
-    }
+  
+  public void removeResource(Resource res) {
+    ctx.data().delete(((BXXMLResource) res).getPre());
+    ctx.data().flush();
   }
 
   public void setProperty(final String name, final String value) {
@@ -130,11 +133,10 @@ public class BXCollection implements Collection {
       ctx.data().flush();
       new DropDB("tmp").execute(ctx);
       */
-      
-      final Data tmp = CreateDB.xml(IO.get(cont), "tmp");
+      final Data tmp = CreateDB.xml(IO.get(cont), res.getId());
       ctx.data().insert(ctx.data().size, -1, tmp);
       ctx.data().flush();
-      DropDB.drop("tmp");
+      DropDB.drop(res.getId());
       
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);

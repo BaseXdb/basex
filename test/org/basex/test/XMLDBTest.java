@@ -54,11 +54,7 @@ public class XMLDBTest extends TestCase {
     } catch(XMLDBException e) {
       System.err.println("XML:DB Exception occured " + e.errorCode);
       e.printStackTrace();
-    }/* finally {
-                      if(collection != null) {
-                        collection.close();
-                      }
-                    }*/
+    }
   }
 
   /**
@@ -70,7 +66,6 @@ public class XMLDBTest extends TestCase {
     XPathQueryService service = (XPathQueryService) collection.getService(
         "XPathQueryService", "1.0");
     ResourceSet resultSet = service.query(query);
-
     ResourceIterator results = resultSet.getIterator();
 
     while(results.hasMoreResources()) {
@@ -103,10 +98,10 @@ public class XMLDBTest extends TestCase {
     String id = "input";
     XMLResource resource = (XMLResource) collection.getResource(id);
     Document doc = (Document) resource.getContentAsDOM();
-    System.out.println("------DOC Document Retrieval------");
+    System.out.println("------DOM Document Retrieval------");
     TransformerFactory.newInstance().newTransformer().transform(
         new DOMSource(doc), new StreamResult(System.out));
-    System.out.println("------DOC Document Retrieval END------");
+    System.out.println("------DOM Document Retrieval END------");
   }
 
   /**
@@ -144,13 +139,13 @@ public class XMLDBTest extends TestCase {
    */
   @Test
   public void test6() throws Exception {
-    String id = "input";
+    String id = "test6";
     String document = "<xml>kjhjhjhj</xml>";
 
-    XMLResource res = (XMLResource) collection.createResource(id,
+    XMLResource resource = (XMLResource) collection.createResource(id,
         XMLResource.RESOURCE_TYPE);
-    res.setContent(document);
-    collection.storeResource(res);
+    resource.setContent(document);
+    collection.storeResource(resource);
   }
 
   /**
@@ -167,7 +162,7 @@ public class XMLDBTest extends TestCase {
     DocumentBuilder builder = factory.newDocumentBuilder();
     document = builder.newDocument();
 
-    String id = "input";
+    String id = "test7";
     XMLResource resource = (XMLResource) collection.createResource(id,
         XMLResource.RESOURCE_TYPE);
 
@@ -184,7 +179,7 @@ public class XMLDBTest extends TestCase {
     // File containing the XML to be inserted
     String fileName = "test.xml";
 
-    String id = "input";
+    String id = "test8";
     XMLResource resource = (XMLResource) collection.createResource(id,
         XMLResource.RESOURCE_TYPE);
 
@@ -203,7 +198,7 @@ public class XMLDBTest extends TestCase {
    */
   @Test
   public void test9() throws Exception {
-    String id = "input";
+    String id = "tmp";
     collection.removeResource(collection.getResource(id));
   }
 
