@@ -46,6 +46,17 @@ public final class IntList {
   }
 
   /**
+   * Adds next value.
+   * @param v value to be added
+   */
+  public void add(final IntList v) {
+    if(size == list.length) list = Array.extend(list);
+    for (int i = 0; i < v.size; i++)
+      list[size++] = v.get(i);
+  }
+
+  
+  /**
    * Sets a value at the specified position.
    * @param v value to be added
    * @param p position

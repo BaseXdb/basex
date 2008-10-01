@@ -67,8 +67,8 @@ public final class QueryTest {
   private boolean test(final boolean xquery) {
     System.out.println("Testing " + (xquery ? "XQuery" : "XPath"));
     boolean ok = true;
-    //ok &= test(xquery, new SimpleTest());
-    //ok &= test(xquery, new XPathMarkFTTest());
+    ok &= test(xquery, new SimpleTest());
+    ok &= test(xquery, new XPathMarkFTTest());
     ok &= test(xquery, new FTTest());
     System.out.println(ok ? "All tests correct.\n" : "Wrong results...\n");
     return ok;

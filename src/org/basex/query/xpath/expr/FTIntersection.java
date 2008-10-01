@@ -95,6 +95,7 @@ public final class FTIntersection extends FTArrayExpr {
       n2 = exprs[n[i]].next(ctx);
       //n1.merge(n2, i - 1);
       n1.merge(n2, 0);
+      n1.reset();
     }
     return n1;
   }

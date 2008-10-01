@@ -82,7 +82,8 @@ public final class FTSelect extends FTArrayExpr {
     ctx.ftpos = ftpos;
     ctx.ftpos.st = ctx.ftpos.pos.content || ctx.ftpos.pos.different 
       || ctx.ftpos.pos.end || ctx.ftpos.pos.ordered || ctx.ftpos.pos.same 
-      || ctx.ftpos.pos.start;
+      || ctx.ftpos.pos.start || ftpos.pos.dunit != null 
+      || ftpos.pos.wunit != null;
     ftpos.pos.init(ctx.ftitem);
     final Item i = exprs[0].eval(ctx);
     ctx.ftpos = tmp;

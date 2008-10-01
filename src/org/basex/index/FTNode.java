@@ -93,6 +93,13 @@ public final class FTNode {
   }
 
   /**
+   * Reset position iterator.
+   */
+  public void reset() {
+    c = 0;
+  }
+  
+  /**
    * Setter for FTTokenizer.
    * @param token FTTokenizer
    */
@@ -174,6 +181,15 @@ public final class FTNode {
       System.arraycopy(n.tok, 0, tmp, tok.length, n.tok.length);
       tok = tmp;
     }
+    
+    if (tok != null && n.tok != null) {
+        FTTokenizer[] ntok = new FTTokenizer[tok.length + n.tok.length];
+        Array.copy(tok, ntok, 0);
+        Array.copy(n.tok, ntok, tok.length);
+    } else {
+      tok = null;
+    }   
+    
     p = (p != null) ? new IntList(pn.finish()) : null;
     return ip.size > 1;
   }

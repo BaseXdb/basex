@@ -92,57 +92,6 @@ public final class FTPos {
     return ordered() && content() && same() && different();
   }
 
-  /**
-   * Checks if the position values are ordered.
-   * @param mn minimum distance
-   * @param mx maximum distance
-   * @return result of check
-   */
-  public boolean distance(final long mn, final long mx) {
-    if(dunit == null) return true;
-
-    // ...to be revised...
-    int l = -1;
-    for(int i = 0; i < size; i++) {
-      boolean o = false;
-      for(int j = 0; j < pos[i].size; j++) {
-        final int p = calcPosition(pos[i].get(j), dunit);
-        final int d = Math.abs(p - l) - 1;
-        if(i == 0 || (d >= mn && d <= mx)) {
-          o = true;
-          l = p;
-          break;
-        }
-      }
-      if(!o) return false;
-    }
-    return true;
-  }
-
-  /**
-   * Checks if the specified window is correct.
-   * @param win window value
-   * @return result of check
-   */
-  public boolean window(final long win) {
-    if(wunit == null) return true;
-
-    // ...to be revised...
-    int l = -1;
-    for(int i = 0; i < size; i++) {
-      boolean o = false;
-      for(int j = 0; j < pos[i].size; j++) {
-        final int p = calcPosition(pos[i].get(j), wunit);
-        if(i == 0 || (Math.abs(p - l) - 1 < win)) {
-          o = true;
-          l = p;
-          break;
-        }
-      }
-      if(!o) return false;
-    }
-    return true;
-  }
 
   /**
    * Checks if the position values are ordered.
@@ -211,6 +160,153 @@ public final class FTPos {
   }
 
   /**
+<<<<<<< .mine
+   * Checks if the position values are ordered.
+   * @param mn minimum distance
+   * @param mx maximum distance
+   * @return result of check
+   */
+  public boolean distance(final long mn, final long mx) {
+    if(dunit == null) return true;
+    
+    //return sortPos(mn, mx);
+    
+    int p1 = -1;
+    int p2 = -1;
+    int j = 0;
+    int[] k = new int[size];
+    boolean o = false;
+    while(j + 1 < pos.length && checkSize(k)) {
+      p1 = calcPosition(pos[j].get(k[j]), dunit);
+      p2 = calcPosition(pos[j + 1].get(k[j + 1]), dunit);
+      final int d = Math.abs(p1 - p2) - 1;
+      if(d >= mn && d <= mx) {
+        o = true;
+        j++;
+      } else if (p1 < p2) {
+        if (j == 0) k[j]++;
+        else {
+          j = 0;
+          k[j]++;
+        }
+      } else if (p1 > p2) {
+        k[j + 1]++;
+      } else {
+        k[j]++;
+        k[j + 1]++;
+      }
+    }
+    
+    return o;
+/*
+    // ...to be revised...
+    int l = -1;
+    for(int i = 0; i < size; i++) {
+      boolean o = false;
+      for(int j = 0; j < pos[i].size; j++) {
+        final int p = calcPosition(pos[i].get(j), dunit);
+        final int d = Math.abs(p - l) - 1;
+        if(i == 0 || (d >= mn && d <= mx)) {
+          o = true;
+          l = p;
+          break;
+        }
+      }
+      if(!o) return false;
+    }
+    return true; */
+  }
+
+  /**
+   * Checks if there are unprocessed values in k.
+   * @param k values
+   * @return boolean
+   */
+  private boolean checkSize(final int[] k) {
+    for (int i = 0; i < k.length; i++) {
+      if (k[i] == pos[i].size) return false;
+    }
+    return true;
+  }
+   /* 
+  private boolean sortPos(final long mn, final long mx){
+    IntList p = new IntList();
+    IntList pp = new IntList();
+    int[] k = new int[size];
+    int min = 0;
+    int p1;
+    int p2;
+    boolean q = false;
+    while(true) {
+      min = 0;
+      q = true;
+      for (int j = 0; j < size; j++) {
+        if (k[j] > -1) {
+          if (k[min] == -1) min = j;
+          q = false;
+          if (pos[min].get(k[min]) > pos[j].get(k[j])) min = j;
+        }  
+      }
+      
+      if(q) break;
+      
+      p.add(pos[min].get(k[min]));
+      pp.add(min);
+      k[min]++;
+      if (k[min] == pos[min].size) k[min] = -1;
+    }
+    
+    int i = 0;
+    int j;
+    int l;
+    while(i < pp.size) {
+      j = i + 1;
+      while(j < pp.size && pp.get(i) == pp.get(j)) j++;
+      l = j;
+      while(l < pp.size && pp.get(j) == pp.get(l)) l++;
+      p1 = calcPosition(p.get(k[j]), dunit);
+      for (int t = i; t < j; t++) {
+        p2 = calcPosition(pp.get(t), dunit);
+        final int d = Math.abs(p1 - p2) - 1;
+        if(d >= mn && d <= mx) {
+          
+        }
+      }
+      
+    }
+   return !q;
+  }
+  
+  */
+  
+  /**
+   * Checks if the specified window is correct.
+   * @param win window value
+   * @return result of check
+   */
+  public boolean window(final long win) {
+    if(wunit == null) return true;
+
+    // ...to be revised...
+    int l = -1;
+    for(int i = 0; i < size; i++) {
+      boolean o = false;
+      for(int j = 0; j < pos[i].size; j++) {
+        final int p = calcPosition(pos[i].get(j), wunit);
+        if(i == 0 || (Math.abs(p - l) - 1 < win)) {
+          o = true;
+          l = p;
+          break;
+        }
+      }
+      if(!o) return false;
+    }
+    return true;
+  }
+
+  /**
+=======
+>>>>>>> .r370
    * Checks if all words are found in the same unit.
    * @return result of check
    */
