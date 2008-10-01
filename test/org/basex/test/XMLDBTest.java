@@ -1,5 +1,7 @@
 package org.basex.test;
 
+import java.io.File;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerFactory;
@@ -80,7 +82,7 @@ public class XMLDBTest extends TestCase {
    */
   @Test
   public void test2() throws Exception {
-    String id = "input";
+    String id = "input.xml";
     XMLResource resource = (XMLResource) collection.getResource(id);
 
     String cont = (String) resource.getContent();
@@ -95,7 +97,7 @@ public class XMLDBTest extends TestCase {
    */
   @Test
   public void test3() throws Exception {
-    String id = "input";
+    String id = "input.xml";
     XMLResource resource = (XMLResource) collection.getResource(id);
     Document doc = (Document) resource.getContentAsDOM();
     System.out.println("------DOM Document Retrieval------");
@@ -110,12 +112,14 @@ public class XMLDBTest extends TestCase {
    */
   @Test
   public void test4() throws Exception {
-    String id = "input";
+    String id = "input.xml";
     XMLResource resource = (XMLResource) collection.getResource(id);
     SAXSerializer sax = new SAXSerializer(null);
     // A custom SAX Content Handler is required to handle the SAX events
     ContentHandler handler = sax.getContentHandler();
+    System.out.println("------SAX Document Retrieval START------");
     resource.getContentAsSAX(handler);
+    System.out.println("------SAX Document Retrieval END------");
   }
 
   /**
@@ -124,7 +128,7 @@ public class XMLDBTest extends TestCase {
    */
   @Test
   public void test5() throws Exception {
-    String id = "input";
+    String id = "input.xml";
     XMLResource resource = (XMLResource) collection.getResource(id);
     Node node = resource.getContentAsDOM();
     System.out.println("------DOM Node Retrieval------");
@@ -160,8 +164,7 @@ public class XMLDBTest extends TestCase {
 
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder builder = factory.newDocumentBuilder();
-    document = builder.newDocument();
-
+    document = builder.parse(new File("test.xml"));
     String id = "test7";
     XMLResource resource = (XMLResource) collection.createResource(id,
         XMLResource.RESOURCE_TYPE);
@@ -189,7 +192,7 @@ public class XMLDBTest extends TestCase {
     reader.setContentHandler(handler);
     reader.parse(new InputSource(fileName));
 
-    collection.storeResource(resource);
+    //collection.storeResource(resource);
   }
 
   /**

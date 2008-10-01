@@ -75,9 +75,6 @@ public class BXCollection implements Collection {
     for (int i = 0; i < ctx.data().doc().length; i++) {
       int test = ctx.data().doc()[i];
       String name = new String(ctx.data().text(test));
-      if(name.endsWith(".xml")) {
-        name = name.substring(0, name.length()-4);
-      }
       if(name.equals(id)) {
         return new BXXMLResource(ctx.current(), id, test);
       }

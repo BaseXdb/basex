@@ -2,6 +2,7 @@ package org.basex.api.xmldb;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -143,10 +144,10 @@ public class BXXMLResource implements XMLResource {
   }
 
   public void setContentAsDOM(final Node cont) {
-    String test = "";
+    StringWriter writer = new StringWriter();
     try {
       TransformerFactory.newInstance().newTransformer().transform(
-          new DOMSource(cont),  new StreamResult(test));
+          new DOMSource(cont), new StreamResult(writer));
     } catch(TransformerConfigurationException e) {
       e.printStackTrace();
     } catch(TransformerException e) {
@@ -154,7 +155,8 @@ public class BXXMLResource implements XMLResource {
     } catch(TransformerFactoryConfigurationError e) {
       e.printStackTrace();
     }
-    content = test;
+    //System.out.println(writer.getBuffer().toString());
+    content = writer.getBuffer().toString();
   }
 
   public ContentHandler setContentAsSAX() {
@@ -171,6 +173,4 @@ public class BXXMLResource implements XMLResource {
   public int getPre() {
     return pre;
   }
-  
-  
 }
