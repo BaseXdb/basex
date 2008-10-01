@@ -42,13 +42,9 @@ public final class Delete extends Process {
     // reset indexes
     data.noIndex();
 
-    // delete all nodes
+    // delete all nodes backwards to preserve pre values of earlier nodes
     final int size = nodes.size;
-    for(int i = size - 1; i >= 0; i--) {
-      // <CG> delete root nodes...
-      //if(nodes.pre[i] == 0) return error(DELETEROOT);
-      data.delete(nodes.pre[i]);
-    }
+    for(int i = size - 1; i >= 0; i--) data.delete(nodes.pre[i]);
     
     // recreate root node
     //if(data.size == 0) data.insert(0, 1, Token.EMPTY, Data.DOC);
@@ -59,6 +55,7 @@ public final class Delete extends Process {
       context.current(new Nodes(0, data));
     }
     data.flush();
+    context.current(new Nodes(data.doc(), data));
 
     return Prop.info ? info(DELETEINFO, nodes.size, perf.getTimer()) : true;
   }

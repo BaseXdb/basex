@@ -99,9 +99,11 @@ public final class TokenBuilder {
   /**
    * Adds an integer to the token.
    * @param i the integer to be added
+   * @return instance
    */
-  public void add(final int i) {
+  public TokenBuilder add(final int i) {
     add(token(i));
+    return this;
   }
 
   /**
@@ -134,9 +136,11 @@ public final class TokenBuilder {
   /**
    * Adds a string to the token.
    * @param s the string to be added
+   * @return instance
    */
-  public void add(final String s) {
+  public TokenBuilder add(final String s) {
     add(token(s));
+    return this;
   }
 
   /**

@@ -3,8 +3,8 @@ package org.basex.query.xquery.func;
 import static org.basex.query.xquery.XQText.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
+import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Str;
@@ -21,6 +21,11 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 final class FNPat extends Fun {
+  /** From-To Pattern. */
+  static final Pattern CLS = Pattern.compile(".*?\\[([a-zA-Z])-([a-zA-Z]).*");
+  /** From-To Pattern. */
+  static final Pattern CLSEX = Pattern.compile(".*?\\[(.*?)-\\[(.*?)\\]");
+
   @Override
   public Iter iter(final XQContext ctx, final Iter[] arg) throws XQException {
     final byte[] val = checkStr(arg[0]);
@@ -68,8 +73,8 @@ final class FNPat extends Fun {
       final String res = p.matcher(Token.string(val)).replaceAll(
           Token.string(rep));
       return Str.iter(Token.token(res));
-    } catch(final Exception e) {
-      final String m = e.getMessage();
+    } catch(final Exception ex) {
+      final String m = ex.getMessage();
       if(m.contains("No group")) Err.or(REGROUP);
       Err.or(REGERR, m);
       return null;
@@ -136,15 +141,45 @@ final class FNPat extends Fun {
       }
     }
 
-    try {
-      final TokenBuilder tb = new TokenBuilder();
-      for(int i = 0; i < pt.length; i++) {
-        final byte b = pt[i];
-        tb.add(b);
-        if(b == '\\' && (i + 1 != pt.length && pt[i + 1] == ' ')) tb.add('\\');
+    final TokenBuilder tb = new TokenBuilder();
+    for(int i = 0; i < pt.length; i++) {
+      final byte b = pt[i];
+      tb.add(b);
+      if(b == '\\' && (i + 1 != pt.length && pt[i + 1] == ' ')) tb.add(b);
+    }
+
+    String str = tb.toString();
+    if(str.indexOf('[') != -1 && str.indexOf('-') != -1) {
+      // Replace classes by single characters to support Unicode matches
+      while(true) {
+        final Matcher mt = CLS.matcher(str);
+        if(!mt.matches()) break;
+        final char c1 = mt.group(1).charAt(0);
+        final char c2 = mt.group(2).charAt(0);
+        if(c1 < c2) {
+          final TokenBuilder sb = new TokenBuilder("[");
+          for(char c = c1; c <= c2; c++) sb.add(c);
+          str = str.replaceAll("\\[" + c1 + "-" + c2, sb.toString());
+        }
       }
-      return Pattern.compile(Token.string(tb.finish()), m);
-    } catch(final Exception e) {
+
+      // Remove excluded characters in classes
+      while(true) {
+        final Matcher mt = CLSEX.matcher(str);
+        if(!mt.matches()) break;
+        final String in = mt.group(1);
+        final String ex = mt.group(2);
+        String out = in;
+        for(int e = 0; e < ex.length(); e++) {
+          out = out.replaceAll(ex.substring(e, e + 1), "");
+        }
+        str = str.replaceAll("\\[" + in + "-\\[.*?\\]", "[" + out);
+      }
+    }
+
+    try {
+      return Pattern.compile(str, m);
+    } catch(final Exception ex) {
       Err.or(REGINV, pt);
       return null;
     }

@@ -606,7 +606,7 @@ public final class DiskData extends Data {
    */
   private void dist(final int pre, final int kind, final int v) {
     if(kind == ATTR) table.write1(pre, 11, v);
-    else table.write4(pre, kind == ELEM ? 4 : 8, v);
+    else if(kind != DOC) table.write4(pre, kind == ELEM ? 4 : 8, v);
   }
 
   /**

@@ -336,6 +336,8 @@ public final class MapView extends View implements Runnable {
   private void calcMap(final MapRect r, final IntList l,
       final int ns, final int ne, final boolean first) {
 
+    if(ne - ns == 0) return;
+
     // one rectangle left.. continue with children
     if(ne - ns == 1) {
       // calculate rectangle sizes

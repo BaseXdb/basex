@@ -221,7 +221,7 @@ public final class BaseXText extends BaseXPanel {
     super.setEnabled(e);
     rend.setEnabled(e);
     scroll.setEnabled(e);
-    cursor(true);
+    cursor(e);
   }
 
   /**
@@ -624,7 +624,7 @@ public final class BaseXText extends BaseXPanel {
   protected void cursor(final boolean start) {
     cursor.stop();
     if(start) cursor.start();
-    rend.cursor(true);
+    rend.cursor(start);
     rend.repaint();
   }
 

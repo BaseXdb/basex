@@ -279,7 +279,7 @@ public final class DNode extends Nod {
             values.add(data.attValue(p));
             
             // add xmlns attribute for tag
-            final int i = data.ns.get(at, pre);
+            final int i = data.ns.get(at, as + 1);
             if(i > 0) {
               final byte[] pref = substring(at, 0, indexOf(at, ':'));
               final byte[] atr = concat(XMLNSCOL, pref);

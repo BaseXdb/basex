@@ -150,14 +150,14 @@ public final class BaseXServer {
             dis.close();
           } catch(final Exception ex) {
             if(ex instanceof IOException) BaseX.errln(SERVERERR);
-            else ex.printStackTrace();
+            ex.printStackTrace();
           }
           if(verbose) BaseX.outln("[%:%] %", ha, sp, perf.getTimer());
         }
       }.start();
     } catch(final Exception ex) {
       if(ex instanceof IOException) BaseX.errln(SERVERERR);
-      else ex.printStackTrace();
+      ex.printStackTrace();
     }
   }
 
