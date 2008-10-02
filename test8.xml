@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+
+<dining-room>
+  <table type="round" wood="maple">
+    <manufacturer>The Wood Shop</manufacturer>
+  </table>
+
+  <chair wood="maple">
+    <quantity>2</quantity>
+    <quality>excellent</quality>
+    <cushion included="true">
+      <color>blue</color>
+    </cushion>
+  </chair>
+
+  <chair wood="oak">
+    <quantity>3</quantity>
+    <quality>average</quality>
+  </chair>
+</dining-room>
