@@ -329,4 +329,12 @@ public final class FTPos {
     while(iter.more() && iter.pos != p);
     return u == FTUnit.SENTENCES ? iter.sent : iter.para;
   }
+  
+  /**
+   * Get position values.
+   * @return IntList pos values
+   */
+  public IntList[] getPos() {
+    return pos;
+  }
 }

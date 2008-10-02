@@ -30,8 +30,11 @@ public final class XPContext extends QueryContext {
   public FTTokenizer ftitem;
   /** Current fulltext position filter. */
   public FTPositionFilter ftpos;
+  /** Flag for fulltext index use. */
+  public boolean iu;
   /** Reference to the root expression. */
   private Expr root;
+  
 
   /**
    * Constructor.

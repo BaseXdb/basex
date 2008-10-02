@@ -5,6 +5,7 @@ import org.basex.index.FTNode;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.locpath.Step;
+import org.basex.query.xpath.values.Bool;
 import org.basex.query.xpath.values.Item;
 
 
@@ -58,7 +59,7 @@ public final class FTSelect extends FTArrayExpr {
   }
   
   /**
-   * Init FTPos for next seqEval.
+   * Init FTPos for next seqEval with index use.
    * @param ftn current FTNode 
    * @param ctx current XPContext
    */
@@ -70,7 +71,7 @@ public final class FTSelect extends FTArrayExpr {
       ftpos.pos.term = ftpos.pos.ft.getTokenList();
     }
   }
-
+  
   @Override
   public boolean more() {
     return exprs[0].more();
@@ -87,13 +88,8 @@ public final class FTSelect extends FTArrayExpr {
     ftpos.pos.init(ctx.ftitem);
     final Item i = exprs[0].eval(ctx);
     ctx.ftpos = tmp;
-
-    // <SG> ..an own FTIndexSelect could be created for the index version...
-    //if(i instanceof NodeSet) return indexEval(ctx, (FTNodeSet) i);
-    return i;
-    
-    // sequential traversal..
-    //return Bool.get(i.bool() && seqEval());
+    if (ctx.iu) return i; 
+    return Bool.get(i.bool() && seqEval());
   }
 
   /**

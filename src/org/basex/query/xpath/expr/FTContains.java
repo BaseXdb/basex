@@ -263,6 +263,7 @@ public final class FTContains extends DualExpr {
     // check all ftcontains options recursively if they comply
     // to the index options..
     iu = ((FTArrayExpr) expr2).indexOptions(meta);
+    ctx.iu = iu;
     if(!iu) return Integer.MAX_VALUE;
 
     // TODO... check number of index results

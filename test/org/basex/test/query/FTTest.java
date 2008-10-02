@@ -13,7 +13,7 @@ public final class FTTest extends AbstractTest {
       "<fttest>\n" +
       "  <co>\n" +
       "     <w>xml in the first sentence. second sentence. " +
-      "third sentence. fourth sentence. fifth sentence.</w>\n" +
+      "third sentence. fourth sentence. fifth sentence.</w>\n" + 
       "     <w>XML xml XmL</w>\n" +
       "     <w>we have xml databases</w>\n" +
       "     <w>XML DATABASES</w>\n" +
@@ -38,6 +38,13 @@ public final class FTTest extends AbstractTest {
       "</fttest>";
 
     queries = new Object[][] {
+        
+        { "FTMildNot1", nodes(3, 5),
+        "//w [text() ftcontains 'xml' not in 'xml databases']" },
+      
+        
+        { "FTMildNot2", nodes(14),
+        "//w [text() ftcontains 'hello' not in 'xml']" },
         { "Simple 1", bool(true),
           "'abc' ftcontains 'abc'" },
         { "Simple 2", bool(true),
