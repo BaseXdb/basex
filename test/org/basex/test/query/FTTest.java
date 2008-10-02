@@ -27,7 +27,7 @@ public final class FTTest extends AbstractTest {
       "     <s>diat-joghurt</s>\n" +
       "  </sc>\n" +
       "  <at><b>B</b>ad one</at>\n" +
-      "  <fti>adfas wordt ook wel eens</fti>" + 
+      "  <fti>adfas wordt. ook wel eens</fti>" + 
       "  <fti>wordt ook wel een s</fti>" +
       "  <fti>adfad. wordt\nook wel.eens a</fti>" +
       "  <fti>adfad wordt. ook\nwel een s adf</fti>" +
@@ -38,10 +38,6 @@ public final class FTTest extends AbstractTest {
       "</fttest>";
 
     queries = new Object[][] {
-        { "FTPosFilter 20", nodes(3),
-          "//w [. ftcontains 'third' ftand 'first' " +
-          " ftand 'second' distance exactly 1 words]" },
-
         { "Simple 1", bool(true),
           "'abc' ftcontains 'abc'" },
         { "Simple 2", bool(true),
@@ -223,31 +219,40 @@ public final class FTTest extends AbstractTest {
         { "FTPosFilter 17", nodes(3, 37),
           "//w [. ftcontains 'second' ftand 'fifth' window 6 words]" },
         { "FTPosFilter 18", nodes(3, 37),
+        "//w [. ftcontains 'second sentence' ftand 'fifth sentence' " +
+        "window 6 words]" },
+        { "FTPosFilter 19", nodes(3, 37),
+          "//w [. ftcontains 'third' ftand 'second' " +
+          "ftand 'fifth' window 6 words]" },
+        { "FTPosFilter 20", nodes(37),
+          "//w [. ftcontains 'fifth' ftand 'third' " +
+          "ftand 'second' window 6 words ordered]" },
+        { "FTPosFilter 21", nodes(3, 37),
           "//w [. ftcontains 'sentence' ftand 'the' " +
           "distance exactly 1 words]" },
-        { "FTPosFilter 19", nodes(3),
-          "//w [. ftcontains ('second' ftand 'fifth' " +
-          "window 6 words) ftand 'the' distance exactly 3 words]" },
-        
-        { "FTPosFilter 20", nodes(3),
-          "//w [. ftcontains 'second' ftand 'fifth' " +
-          " ftand 'the' distance exactly 8 words]" },
-        { "FTPosFilter 21", nodes(3),
-          "//w [. ftcontains 'the' ftand 'fifth' " +
-          " distance exactly 8 words]" },
-        { "FTPosFilter 22", nodes(37),
-          "//w [. ftcontains 'second' ftand 'fifth' " +
-          " ftand 'the' distance exactly 8 words ordered]" },
-        
+        { "FTPosFilter 22", nodes(3, 37),
+          "//w [. ftcontains ('second' ftand 'third' " +
+          "window 3 words) ftand 'sentence' distance exactly 1 words]" },
+        { "FTPosFilter 23", nodes(3),
+          "//w [. ftcontains ('second' ftand 'third' " +
+          "window 3 words) ftand 'sentence' " +
+          "distance exactly 1 words ordered]" },
+        { "FTPosFilter 24", nodes(37),
+          "//w [. ftcontains 'third' ftand 'second' " +
+          " ftand 'first' distance exactly 1 words ordered]" },
+        { "FTPosFilter 25", nodes(3),
+          "//w [. ftcontains 'first' ftand 'second' " +
+          " ftand 'third' distance exactly 1 words ordered]" },          
           
-        { "FTScope 1", nodes(25, 27, 31, 33),
+        { "FTScope 1", nodes(27, 29, 33),
           "//fti [. ftcontains 'wordt ook' same sentence]" },
-          
-        { "FTScope 2", nodes(29),
+        { "FTScope 2", nodes(25, 27, 31, 33),
+          "//fti [. ftcontains 'wordt ook' same sentence]" },
+        { "FTScope 3", nodes(29),
           "//fti [. ftcontains 'wordt ook' different sentence]" },
-        { "FTScope 3", nodes(25),
+        { "FTScope 4", nodes(25),
           "//fti [. ftcontains 'ook wel' same paragraph]" },
-        { "FTScope 4", nodes(29),
+        { "FTScope 5", nodes(29),
           "//fti [. ftcontains 'ook wel' different paragraph]" },
         
 

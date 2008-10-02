@@ -985,6 +985,7 @@ public class XPParser extends QueryParser {
       } else {
         break;
       }
+      consumeWS();
     }
     return ftpos;
   }

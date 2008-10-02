@@ -78,7 +78,7 @@ public final class FTTokenizer extends IndexToken {
   }
 
   /**
-   * Checks if more tokens are to be returned.
+   * Checks if more tokens are to be returned. 
    * @return result of check
    */
   public boolean more() {
@@ -115,7 +115,7 @@ public final class FTTokenizer extends IndexToken {
     }
     return true;
   }
-
+  
   @Override
   public byte[] get() {
     byte[] n = substring(text, s, p);
