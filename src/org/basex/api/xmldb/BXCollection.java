@@ -136,37 +136,20 @@ public class BXCollection implements Collection {
   }
 
   public void storeResource(final Resource res) throws XMLDBException {
-    if(res.getContent() instanceof Document) {
-      try {
-        final Data tmp = CreateDB.xml(new DOCWrapper((Document)res.getContent()), res.getId());
-        ctx.data().atts.noStats();
-        ctx.data().insert(ctx.data().size, -1, tmp);
-        ctx.data().flush();
-        tmp.close();
-        DropDB.drop(res.getId());
-        
-      } catch(final IOException ex) {
-        throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
-      }
-    } else {
-    String cont = res.getContent().toString();
+    final String id = res.getId();
+    Data tmp = null;
     try {
-      /*
-      Context ctx = new Context();
-      new CreateDB(cont, "tmp").execute(ctx);
-      ctx.data().insert(ctx.data().size, -1, ctx.data());
-      ctx.data().flush();
-      new DropDB("tmp").execute(ctx);
-      */
-      final Data tmp = CreateDB.xml(IO.get(cont), res.getId());
+      if(res.getContent() instanceof Document) {
+        tmp = CreateDB.xml(new DOCWrapper((Document) res.getContent()), id);
+      } else {
+        tmp = CreateDB.xml(IO.get(res.getContent().toString()), id);
+      }
       ctx.data().insert(ctx.data().size, -1, tmp);
       ctx.data().flush();
       tmp.close();
-      DropDB.drop(res.getId());
-      
+      DropDB.drop(id);
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
-    }
     }
   }
 }
