@@ -1,14 +1,18 @@
 package org.basex.api.xmldb;
 
 import java.io.IOException;
+
+import org.w3c.dom.Document;
 import org.xmldb.api.base.*;
 import org.xmldb.api.modules.XMLResource;
+import org.basex.build.xml.DOCWrapper;
 import org.basex.core.Context;
 import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.Check;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.DropDB;
 import org.basex.data.Data;
+import org.basex.data.Nodes;
 import org.basex.io.IO;
 
 /**
@@ -71,14 +75,25 @@ public class BXCollection implements Collection {
   }
 
   public Resource getResource(final String id) throws XMLDBException {
-    
+    if(ctx.data().doc().length == 1) {
+      if(new String(ctx.data().text(0)).equals(id)) {
+        return new BXXMLResource(ctx.current(), id, 0);
+      }
+    } else {
     for (int i = 0; i < ctx.data().doc().length; i++) {
       int test = ctx.data().doc()[i];
       String name = new String(ctx.data().text(test));
       if(name.equals(id)) {
-        return new BXXMLResource(ctx.current(), id, test);
+        Context tmpCtx = new Context();
+        Nodes nodes = new Nodes(test, ctx.data());
+        for (int j = test+1; j < ctx.data().doc()[i+1]; j++) {
+          nodes.add(j);
+        }
+        tmpCtx.current(nodes);
+        return new BXXMLResource(tmpCtx.current(), id, test);
+        }
       }
-    };
+    }
     throw new XMLDBException(ErrorCodes.NO_SUCH_RESOURCE);
   }
 
@@ -121,6 +136,19 @@ public class BXCollection implements Collection {
   }
 
   public void storeResource(final Resource res) throws XMLDBException {
+    if(res.getContent() instanceof Document) {
+      try {
+        final Data tmp = CreateDB.xml(new DOCWrapper((Document)res.getContent()), res.getId());
+        ctx.data().atts.noStats();
+        ctx.data().insert(ctx.data().size, -1, tmp);
+        ctx.data().flush();
+        tmp.close();
+        DropDB.drop(res.getId());
+        
+      } catch(final IOException ex) {
+        throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
+      }
+    } else {
     String cont = res.getContent().toString();
     try {
       /*
@@ -133,10 +161,12 @@ public class BXCollection implements Collection {
       final Data tmp = CreateDB.xml(IO.get(cont), res.getId());
       ctx.data().insert(ctx.data().size, -1, tmp);
       ctx.data().flush();
+      tmp.close();
       DropDB.drop(res.getId());
       
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
+    }
     }
   }
 }

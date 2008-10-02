@@ -2,18 +2,11 @@ package org.basex.api.xmldb;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.StringWriter;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.basex.BaseX;
 import org.basex.data.Nodes;
@@ -144,19 +137,7 @@ public class BXXMLResource implements XMLResource {
   }
 
   public void setContentAsDOM(final Node cont) {
-    StringWriter writer = new StringWriter();
-    try {
-      TransformerFactory.newInstance().newTransformer().transform(
-          new DOMSource(cont), new StreamResult(writer));
-    } catch(TransformerConfigurationException e) {
-      e.printStackTrace();
-    } catch(TransformerException e) {
-      e.printStackTrace();
-    } catch(TransformerFactoryConfigurationError e) {
-      e.printStackTrace();
-    }
-    //System.out.println(writer.getBuffer().toString());
-    content = writer.getBuffer().toString();
+    content = cont;
   }
 
   public ContentHandler setContentAsSAX() {

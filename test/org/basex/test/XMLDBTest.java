@@ -164,7 +164,7 @@ public class XMLDBTest extends TestCase {
 
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder builder = factory.newDocumentBuilder();
-    document = builder.parse(new File("test.xml"));
+    document = builder.parse(new File("test7.xml"));
     String id = "test7";
     XMLResource resource = (XMLResource) collection.createResource(id,
         XMLResource.RESOURCE_TYPE);
@@ -180,14 +180,14 @@ public class XMLDBTest extends TestCase {
   @Test
   public void test8() throws Exception {
     // File containing the XML to be inserted
-    String fileName = "test.xml";
+    String fileName = "test8.xml";
 
     String id = "test8";
     XMLResource resource = (XMLResource) collection.createResource(id,
         XMLResource.RESOURCE_TYPE);
 
     ContentHandler handler = resource.setContentAsSAX();
-
+    
     XMLReader reader = XMLReaderFactory.createXMLReader();
     reader.setContentHandler(handler);
     reader.parse(new InputSource(fileName));
@@ -204,5 +204,4 @@ public class XMLDBTest extends TestCase {
     String id = "tmp";
     collection.removeResource(collection.getResource(id));
   }
-
 }
