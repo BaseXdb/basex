@@ -1,6 +1,8 @@
 package org.basex.query.xquery.func;
 
 import static org.basex.query.xquery.XQText.*;
+
+import org.basex.BaseX;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Item;
@@ -47,7 +49,7 @@ final class FNOut extends Fun {
         //BaseX.outln(msg);
         return arg[0];
       default:
-        throw new RuntimeException("Not defined: " + func);
+        BaseX.notexpected(func); return null;
     }
   }
 }

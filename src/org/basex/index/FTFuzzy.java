@@ -119,9 +119,9 @@ public final class FTFuzzy extends Index {
     // binary search
     while(l < r) {
       final int m = l + (r - l) / 2 / o * o;
-      final int c = Token.cmp(ti.readBytes(m, m + tl), tok);
+      final int c = Token.diff(ti.readBytes(m, m + tl), tok);
       if(c == 0) return m;
-      else if(c > 0) l = m + o;
+      else if(c < 0) l = m + o;
       else r = m - o;
     }
     return r == l && Token.eq(ti.readBytes(l, l + tl), tok) ? l : -1;

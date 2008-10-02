@@ -1,5 +1,6 @@
 package org.basex.query.xquery.func;
 
+import org.basex.BaseX;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.CmpV;
@@ -32,7 +33,7 @@ final class FNSeq extends Fun {
       case REMOVE:   return remove(arg);
       case SUBSEQ:   return subseq(arg);
       case DEEPEQ:   return Bln.get(deep(arg)).iter();
-      default: throw new RuntimeException("Not defined: " + func);
+      default: BaseX.notexpected(func); return null;
     }
   }
 
@@ -141,8 +142,9 @@ final class FNSeq extends Fun {
    * @throws XQException evaluation exception
    */
   private Iter subseq(final Iter[] arg) throws XQException {
-    final long start = checkItr(arg[1]);
-    final long end = arg.length > 2 ? start + checkItr(arg[2]) : Long.MAX_VALUE;
+    final long s = Math.round(checkDbl(arg[1]));
+    final long e = arg.length > 2 ? s + Math.round(checkDbl(arg[2])) :
+      Long.MAX_VALUE;
     
     return new Iter() {
       long c = 0;
@@ -151,8 +153,8 @@ final class FNSeq extends Fun {
       public Item next() throws XQException {
         while(true) {
           final Item i = arg[0].next();
-          if(i == null || ++c >= end) return null;
-          if(c >= start) return i;
+          if(i == null || ++c >= e) return null;
+          if(c >= s) return i;
         }
       }
     };

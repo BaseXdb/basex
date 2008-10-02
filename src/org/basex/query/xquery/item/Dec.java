@@ -1,12 +1,12 @@
 package org.basex.query.xquery.item;
 
 import static org.basex.query.xquery.XQText.*;
+import static org.basex.util.Token.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Err;
-import org.basex.util.Token;
 
 /**
  * Decimal item.
@@ -26,7 +26,7 @@ public final class Dec extends Num {
    */
   public Dec(final byte[] t) {
     super(Type.DEC);
-    val = new BigDecimal(Token.string(Token.trim(t)));
+    val = new BigDecimal(string(trim(t)));
   }
 
   /**
@@ -68,7 +68,7 @@ public final class Dec extends Num {
       @Override
       public Item next() { return (more ^= true) ? get(v) : null; }
       @Override
-      public String toString() { return Token.string(get(v).str()); }
+      public String toString() { return string(get(v).str()); }
     };
   }
 
@@ -83,7 +83,7 @@ public final class Dec extends Num {
 
   @Override
   public byte[] str() {
-    return Token.chopNumber(Token.token(val.toPlainString()));
+    return chopNumber(token(val.toPlainString()));
   }
 
   @Override
@@ -134,8 +134,6 @@ public final class Dec extends Num {
     switch(type) {
       case ULN:
         return new BigInteger(val.toString());
-      case LNG:
-        return val.longValue();
       default:
         return val;
     }
@@ -159,11 +157,9 @@ public final class Dec extends Num {
    * @throws XQException possible converting exception
    */
   public static BigDecimal parse(final byte[] val) throws XQException {
-    if(Token.contains(val, 'e') || Token.contains(val, 'E'))
-      Err.or(FUNCAST, Type.DEC, val);
-
+    if(contains(val, 'e') || contains(val, 'E')) Err.or(FUNCAST, Type.DEC, val);
     try {
-      return new BigDecimal(Token.string(val).trim());
+      return new BigDecimal(string(val).trim());
     } catch(final NumberFormatException ex) {
       ZERO.castErr(val);
       return null;

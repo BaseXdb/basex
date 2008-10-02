@@ -161,7 +161,7 @@ public final class DOTSerializer extends Serializer {
    */
   protected void print(final byte[] t, final String col) throws IOException {
     final byte[] text = t.length > 60 ? Token.concat(
-        Token.substring(t, 0, 60), Token.DOTS) : t;
+        Token.substring(t, 0, 60), Token.token("...")) : t;
     out.println(BaseX.info(NODE, count, text, col));
     nodes.set(count, level);
     if(level - 1 >= 0) children[level - 1].add(count);

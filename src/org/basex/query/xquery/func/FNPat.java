@@ -3,6 +3,8 @@ package org.basex.query.xquery.func;
 import static org.basex.query.xquery.XQText.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.basex.BaseX;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Bln;
@@ -34,7 +36,7 @@ final class FNPat extends Fun {
       case MATCH:   return match(val, arg);
       case REPLACE: return replace(val, arg);
       case TOKEN:   return token(val, arg);
-      default:      throw new RuntimeException("Not defined: " + func);
+      default:      BaseX.notexpected(func); return null;
     }
   }
 

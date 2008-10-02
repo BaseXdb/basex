@@ -1,5 +1,6 @@
 package org.basex.query.xquery.item;
 
+import static org.basex.util.Token.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.basex.query.xquery.XQException;
@@ -13,14 +14,14 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public class Itr extends Num {
-  /** Decimal value. */
-  protected long val;
   /** Zero value. */
   public static final Itr ZERO = new Itr(0);
   /** Constant values. */
   private static final Itr[] NUM = { ZERO, new Itr(1), new Itr(2),
     new Itr(3), new Itr(4), new Itr(5), new Itr(6), new Itr(7),
     new Itr(8), new Itr(9) };
+  /** Integer value. */
+  protected long val;
 
   /**
    * Constructor.
@@ -121,6 +122,7 @@ public class Itr extends Num {
       case INT:
       case USH:
         return (int) val;
+      case LNG:
       case UIN:
         return val;
       default:
@@ -135,23 +137,12 @@ public class Itr extends Num {
    * @throws XQException possible converting exception
    */
   static long parse(final byte[] val) throws XQException {
-    int t = 0;
-    final int l = val.length;
-    while(t < l && val[t] >= 0 && val[t] <= ' ') t++;
-    if(t == l) ZERO.castErr(val);
-    boolean m = false;
-    if(val[t] == '-' || val[t] == '+') m = val[t++] == '-';
-    if(t == l) ZERO.castErr(val);
-    long v = 0;
-    for(; t < l; t++) {
-      final byte c = val[t];
-      if(c < '0' || c > '9') break;
-      final long w = (v << 3) + (v << 1) + c - '0';
-      if(w < v) ZERO.castErr(val);
-      v = w;
+    try {
+      final String v = string(trim(val));
+      return Long.parseLong(v.startsWith("+") ? v.substring(1) : v);
+    } catch(final NumberFormatException ex) {
+      ZERO.castErr(val);
+      return 0;
     }
-    while(t < l && val[t] >= 0 && val[t] <= ' ') t++;
-    if(t != l) ZERO.castErr(val);
-    return m ? -v : v;
   }
 }

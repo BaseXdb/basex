@@ -3,6 +3,8 @@ package org.basex.query.xquery.func;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+
+import org.basex.BaseX;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.DTd;
@@ -31,7 +33,7 @@ final class FNContext extends Fun {
       case COLLAT:    return ctx.baseURI.resolve(ctx.collation).iter();
       case STBASEURI: return ctx.baseURI != Uri.EMPTY ? ctx.baseURI.iter() :
         Iter.EMPTY;
-      default: throw new RuntimeException("Not defined: " + func);
+      default: BaseX.notexpected(func); return null;
     }
   }
 

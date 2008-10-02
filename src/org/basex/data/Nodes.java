@@ -1,6 +1,8 @@
 package org.basex.data;
 
 import java.io.IOException;
+
+import org.basex.BaseX;
 import org.basex.core.Context;
 import org.basex.util.Array;
 import org.basex.util.TokenBuilder;
@@ -47,7 +49,7 @@ public final class Nodes implements Result {
    * @param d data reference
    */
   public Nodes(final int[] n, final Data d) {
-    if(d == null) throw new RuntimeException("No data available.");
+    if(d == null) BaseX.notexpected("No data available");
     pre = n;
     size = n.length;
     data = d;

@@ -4,9 +4,7 @@ import static org.basex.Text.*;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
-
 import org.basex.core.Prop;
 import org.basex.core.proc.Check;
 import org.basex.data.Data;
@@ -267,8 +265,10 @@ public final class XQContext extends QueryContext {
     }
 
     // invalid collection reference
-    if(contains(coll, '<') || contains(coll, '\\'))
-      Err.or(COLLINV, cut(coll, 20));
+    if(contains(coll, '<') || contains(coll, '\\')) {
+      Err.or(COLLINV, coll.length > 20 ? 
+          concat(substring(coll, 0 , 20), token("...")) : coll);
+    }
 
     int c = -1;
     final int cl = collName.length;

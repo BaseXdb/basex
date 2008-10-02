@@ -1,6 +1,8 @@
 package org.basex.query.xquery.func;
 
 import static org.basex.query.xquery.XQText.*;
+
+import org.basex.BaseX;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.expr.Expr;
@@ -43,7 +45,8 @@ public final class FNSimple extends Fun {
         return seq;
       case UNORDER:
         return iter;
-      default: throw new RuntimeException("Not defined: " + func);
+      default:
+        BaseX.notexpected(func); return null;
     }
   }
 

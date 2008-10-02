@@ -1,6 +1,6 @@
 package org.basex.build;
 
-import org.basex.util.Token;
+import static org.basex.util.Token.*;
 
 /**
  * This interface organizes textual information for the builder package.
@@ -92,86 +92,84 @@ public interface BuildText {
   String ERRDT = "Error in DTD.";
 
   /** Ampersand. */
-  byte[] SEMI = Token.token(";");
+  byte[] SEMI = token(";");
   /** CDATA token. */
-  byte[] CDATA = Token.token("CDATA[");
-  /** XML Document Declaration. */
-  byte[] XMLDECL = Token.token("xml");
+  byte[] CDATA = token("CDATA[");
   /** XML Document Version. */
-  byte[] VERS = Token.token("version");
+  byte[] VERS = token("version");
   /** XML Document Version. */
-  byte[] VERS10 = Token.token("1.0");
+  byte[] VERS10 = token("1.0");
   /** XML Document Version. */
-  byte[] VERS11 = Token.token("1.1");
+  byte[] VERS11 = token("1.1");
   /** XML Document Encoding. */
-  byte[] ENCOD = Token.token("encoding");
+  byte[] ENCOD = token("encoding");
   /** XML Document Standalone flag. */
-  byte[] STANDALONE = Token.token("standalone");
+  byte[] STANDALONE = token("standalone");
   /** XML Document Standalone flag. */
-  byte[] STANDYES = Token.token("yes");
+  byte[] STANDYES = token("yes");
   /** XML Document Standalone flag. */
-  byte[] STANDNO = Token.token("no");
+  byte[] STANDNO = token("no");
 
   /** DTD: XML. */
-  byte[] DOCDECL = Token.token("<?xml");
+  byte[] DOCDECL = token("<?xml");
   /** DTD: Doctype. */
-  byte[] DOCTYPE = Token.token("DOCTYPE");
+  byte[] DOCTYPE = token("DOCTYPE");
   /** DTD: System. */
-  byte[] SYSTEM = Token.token("SYSTEM");
+  byte[] SYSTEM = token("SYSTEM");
   /** DTD: Public. */
-  byte[] PUBLIC = Token.token("PUBLIC");
+  byte[] PUBLIC = token("PUBLIC");
   /** DTD: <!--. */
-  byte[] COMS = Token.token("<!--");
+  byte[] COMS = token("<!--");
   /** DTD: NOTATION. */
-  byte[] NOTA = Token.token("<!NOTATION");
+  byte[] NOTA = token("<!NOTATION");
   /** DTD: ELEMENT. */
-  byte[] ELEM = Token.token("<!ELEMENT");
+  byte[] ELEM = token("<!ELEMENT");
   /** DTD: ATTLIST. */
-  byte[] ATTL = Token.token("<!ATTLIST");
+  byte[] ATTL = token("<!ATTLIST");
   /** DTD: ENTITY. */
-  byte[] ENT = Token.token("<!ENTITY");
+  byte[] ENT = token("<!ENTITY");
   /** DTD: NOTATION. */
-  byte[] COND = Token.token("<![");
+  byte[] COND = token("<![");
   /** DTD: NOTATION. */
-  byte[] CONE = Token.token("]]>");
+  byte[] CONE = token("]]>");
   /** DTD: NOTATION. */
-  byte[] INCL = Token.token("INCLUDE");
+  byte[] INCL = token("INCLUDE");
   /** DTD: NOTATION. */
-  byte[] IGNO = Token.token("IGNORE");
+  byte[] IGNO = token("IGNORE");
   /** DTD: XML. */
-  byte[] XML = Token.token("<?");
+  byte[] XDECL = token("<?");
   /** DTD: EMPTY ELEMENT. */
-  byte[] EMP = Token.token("EMPTY");
+  byte[] EMP = token("EMPTY");
   /** DTD: ANY ELEMENT. */
-  byte[] ANY = Token.token("ANY");
+  byte[] ANY = token("ANY");
   /** DTD: #PCDATA ELEMENT. */
-  byte[] PC = Token.token("#PCDATA");
+  byte[] PC = token("#PCDATA");
   /** DTD: CDATA ELEMENT. */
-  byte[] CD = Token.token("CDATA");
+  byte[] CD = token("CDATA");
   /** DTD: NDATA ELEMENT. */
-  byte[] ND = Token.token("NDATA");
+  byte[] ND = token("NDATA");
   /** DTD: ID ELEMENT. */
-  byte[] ID = Token.token("ID");
+  byte[] ID = token("ID");
   /** DTD: IDREF ELEMENT. */
-  byte[] IDR = Token.token("IDREF");
+  byte[] IDR = token("IDREF");
   /** DTD: IDREFS ELEMENT. */
-  byte[] IDRS = Token.token("IDREFS");
+  byte[] IDRS = token("IDREFS");
   /** DTD: ENTITIES ELEMENT. */
-  byte[] ENTS = Token.token("ENTITIES");
+  byte[] ENTS = token("ENTITIES");
   /** DTD: ENTITY ELEMENT. */
-  byte[] ENT1 = Token.token("ENTITY");
+  byte[] ENT1 = token("ENTITY");
   /** DTD: NMTOKEN ELEMENT. */
-  byte[] NMT = Token.token("NMTOKEN");
+  byte[] NMT = token("NMTOKEN");
   /** DTD: NMTOKENS ELEMENT. */
-  byte[] NMTS = Token.token("NMTOKENS");
+  byte[] NMTS = token("NMTOKENS");
   /** DTD: NOTATION ELEMENT. */
-  byte[] NOT = Token.token("NOTATION");
+  byte[] NOT = token("NOTATION");
   /** DTD: REQUIRED ELEMENT. */
-  byte[] REQ = Token.token("#REQUIRED");
+  byte[] REQ = token("#REQUIRED");
   /** DTD: IMPLIED ELEMENT. */
-  byte[] IMP = Token.token("#IMPLIED");
+  byte[] IMP = token("#IMPLIED");
   /** DTD: FIXED ELEMENT. */
-  byte[] FIX = Token.token("#FIXED");
+  byte[] FIX = token("#FIXED");
   
   /** Token types. */
   enum Type {

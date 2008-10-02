@@ -380,7 +380,7 @@ public final class XMLScanner {
    */
   private void pi() throws IOException {
     final byte[] tok = name(true);
-    if(eq(lc(tok), XMLDECL)) error(PIRES);
+    if(eq(lc(tok), XML)) error(PIRES);
     token.add(tok);
 
     int ch = nextChar();
@@ -706,8 +706,8 @@ public final class XMLScanner {
           error(DTDNP, name);
         }
 
-        if(consume(XML)) {
-          check(XMLDECL); s();
+        if(consume(XDECL)) {
+          check(XML); s();
           if(version()) checkS();
           s(); if(encoding() == null) error(TEXTENC);
           ch = nextChar();

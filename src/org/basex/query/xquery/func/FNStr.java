@@ -3,6 +3,8 @@ package org.basex.query.xquery.func;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.util.Token.*;
 import java.util.regex.Pattern;
+
+import org.basex.BaseX;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Bln;
@@ -97,7 +99,7 @@ final class FNStr extends Fun {
         final int pb = indexOf(sb, checkStr(arg[1]));
         return pb > 0 ? Str.iter(substring(sb, 0, pb)) : Str.ZERO.iter();
       default:
-        throw new RuntimeException("Not defined: " + func);
+        BaseX.notexpected(func); return null;
     }
   }
 
@@ -141,10 +143,10 @@ final class FNStr extends Fun {
    * @throws XQException xquery exception
    */
   private Iter substr(final Iter[] arg) throws XQException {
-    final double ds = checkDbl(arg[1]);
-    final boolean end = arg.length == 3;
     // normalize positions
+    final double ds = checkDbl(arg[1]);
     final byte[] str = checkStr(arg[0]);
+    final boolean end = arg.length == 3;
     int l = len(str);
     if(ds != ds) return Str.ZERO.iter();
     int s = (int) Math.floor(ds - .5);
@@ -153,7 +155,7 @@ final class FNStr extends Fun {
       e += s;
       s = 0;
     }
-    e = Math.min(l, s + e);
+    e = Math.min(l, end ? s + e : Integer.MAX_VALUE);
     if(s >= e) return Str.ZERO.iter();
     if(ascii(str)) return Str.iter(substring(str, s, e));
     if(s == 0 && e == str.length) return Str.iter(str);

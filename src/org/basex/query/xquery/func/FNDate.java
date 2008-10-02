@@ -3,6 +3,8 @@ package org.basex.query.xquery.func;
 import static org.basex.query.xquery.XQText.*;
 import java.math.BigDecimal;
 import java.util.Calendar;
+
+import org.basex.BaseX;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.DTd;
@@ -56,7 +58,7 @@ final class FNDate extends Fun {
       case DTMZON: return dtmzon(it, arg.length == 1 ? null : arg[1]);
       case TIMZON: return timzon(it, arg.length == 1 ? null : arg[1]);
       case DATETIME: return dattim(it, arg[1]);
-      default: throw new RuntimeException("Not defined: " + func);
+      default: BaseX.notexpected(func); return null;
     }
   }
 

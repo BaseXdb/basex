@@ -3,6 +3,8 @@ package org.basex.query.xquery.func;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
+
+import org.basex.BaseX;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Bln;
@@ -33,7 +35,7 @@ final class FNId extends Fun {
       case ID:    return id(arg[0], node);
       case IDREF: return idref(arg[0], node);
       case LANG:  return lang(arg[0], node);
-      default:    throw new RuntimeException("Not defined: " + func);
+      default:    BaseX.notexpected(func); return null;
     }
   }
 

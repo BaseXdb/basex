@@ -1,6 +1,8 @@
 package org.basex.query.xquery.func;
 
 import static org.basex.query.xquery.XQText.*;
+
+import org.basex.BaseX;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.item.Uri;
@@ -39,7 +41,7 @@ public final class FNIndex extends Set {
       final String dsc = def.desc;
       final byte[] key = Token.token(dsc.substring(0, dsc.indexOf("(")));
       final int i = add(key);
-      if(i < 0) throw new RuntimeException("Function defined twice:" + def);
+      if(i < 0) BaseX.notexpected("Function defined twice:" + def);
       funcs[i] = def;
     }
   }
@@ -72,7 +74,7 @@ public final class FNIndex extends Set {
       } catch(final XQException ex) {
         throw ex;
       } catch(final Exception ex) {
-        throw new RuntimeException("Can't run " + Token.string(name));
+        BaseX.notexpected("Can't run " + Token.string(name));
       }
     }
     return null;

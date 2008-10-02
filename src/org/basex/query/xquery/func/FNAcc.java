@@ -1,6 +1,8 @@
 package org.basex.query.xquery.func;
 
 import static org.basex.util.Token.*;
+
+import org.basex.BaseX;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.expr.Expr;
@@ -51,7 +53,7 @@ final class FNAcc extends Fun {
       case NORM:
         return Str.iter(norm(checkStr(iter)));
       default:
-        throw new RuntimeException("Not defined: " + func);
+        BaseX.notexpected(func); return null;
     }
   }
 

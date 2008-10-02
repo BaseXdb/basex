@@ -276,8 +276,20 @@ final class FTArray {
    */
   void insertSorted(final byte[] v, final int s, final long offset) {
     count++;
-    insertNodeSorted(0, v, s, Token.longToInt(offset));
+    insertNodeSorted(0, v, s, toArray(offset));
     return;
+  }
+
+  /**
+   * Converts a long value to a int-array.
+   * @param l long value to convert
+   * @return int-array with the long value
+   */
+  public static int[] toArray(final long l) {
+    final int v = (int) (l & 0x7FFFFFFF);
+    if(l == v) return new int[] { v };
+    final int w = -(int) (l >> 31);
+    return new int[] { v, w };
   }
 
   /**

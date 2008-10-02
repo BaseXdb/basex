@@ -2,6 +2,7 @@ package org.basex.query.xquery.func;
 
 import java.math.BigDecimal;
 
+import org.basex.BaseX;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Dbl;
@@ -27,14 +28,13 @@ final class FNNum extends Fun {
     if(it == null) return Iter.EMPTY;
     if(!it.u() && !it.n()) Err.num(info(), it);
     final double d = it.dbl();
-
     switch(func) {
       case ABS:    return abs(it);
       case CEIL:   return num(it, d, Math.ceil(d));
       case FLOOR:  return num(it, d, Math.floor(d));
-      case RND:    return num(it, d, Math.floor(d + .5));
+      case RND:    return num(it, d, Math.rint(d));
       case RNDHLF: return rnd(it, d, arg.length == 2 ? arg[1] : null);
-      default:     throw new RuntimeException("Not defined: " + func);
+      default: BaseX.notexpected(func); return null;
     }
   }
 

@@ -244,37 +244,36 @@ public final class FTTest extends AbstractTest {
           "//w [. ftcontains 'first' ftand 'second' " +
           " ftand 'third' distance exactly 1 words ordered]" },          
           
-        { "FTScope 1", nodes(27, 29, 33),
+        { "FTScope 1", nodes(25, 27, 29, 31, 33),
           "//fti [. ftcontains 'wordt ook' same sentence]" },
-        { "FTScope 2", nodes(25, 27, 31, 33),
-          "//fti [. ftcontains 'wordt ook' same sentence]" },
-        { "FTScope 3", nodes(29),
-          "//fti [. ftcontains 'wordt ook' different sentence]" },
-        { "FTScope 4", nodes(25),
-          "//fti [. ftcontains 'ook wel' same paragraph]" },
-        { "FTScope 5", nodes(29),
-          "//fti [. ftcontains 'ook wel' different paragraph]" },
+        { "FTScope 2", nodes(27, 29, 33),
+          "//fti [. ftcontains 'wordt' ftand 'ook' same sentence]" },
+        { "FTScope 3", nodes(25, 31),
+          "//fti [. ftcontains 'wordt' ftand 'ook' different sentence]" },
+        { "FTScope 4", nodes(25, 27, 29, 33),
+          "//fti [. ftcontains 'ook' ftand 'wel' same paragraph]" },
+        { "FTScope 5", nodes(31),
+          "//fti [. ftcontains 'ook' ftand 'wel' different paragraph]" },
         
-
         { "FTIndex1", nodes(25, 29),
-        "/fttest/fti [text() ftcontains 'wordt ook wel eens']" },
+          "/fttest/fti [text() ftcontains 'wordt ook wel eens']" },
         
         { "FTMildNot1", nodes(3, 5),
-        "//w [text() ftcontains 'xml' not in 'xml databases']" },
+          "//w [text() ftcontains 'xml' not in 'xml databases']" },
         { "FTMildNot2", nodes(14),
-        "//w [text() ftcontains 'hello' not in 'xml']" },
+          "//w [text() ftcontains 'hello' not in 'xml']" },
         
         { "FTUnaryNot1", nodes(14, 37),
-        "//w [text() ftcontains ftnot 'xml']" },
+          "//w [text() ftcontains ftnot 'xml']" },
         { "FTUnaryNot2", nodes(3, 5),
-        "//w [text() ftcontains 'xml' ftand ftnot 'databases']" },
+          "//w [text() ftcontains 'xml' ftand ftnot 'databases']" },
         { "FTUnaryNot3", nodes(3, 5, 9, 11),
-        "//w [text() ftcontains 'xml' ftand ftnot 'databases' " +
-          "case sensitive]" },
+          "//w [text() ftcontains 'xml' ftand ftnot 'databases' " +
+            "case sensitive]" },
         { "FTUnaryNot4", nodes(7, 9, 11, 14, 37),
-        "//w [text() ftcontains 'databases' ftor ftnot 'xml']" },
+          "//w [text() ftcontains 'databases' ftor ftnot 'xml']" },
         { "FTUnaryNot5", nodes(3, 5, 14, 37),
-        "//w [text() ftcontains 'hello' ftor ftnot 'databases']" },
+          "//w [text() ftcontains 'hello' ftor ftnot 'databases']" },
     };
 
     /** TABLE REPRESENTATION

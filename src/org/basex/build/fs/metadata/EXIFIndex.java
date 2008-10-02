@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import java.util.HashMap;
 import org.basex.BaseX;
 import org.basex.util.Array;
+import org.basex.util.TokenBuilder;
 
 /**
  * This class indexes EXIF meta data.
@@ -450,14 +451,14 @@ public final class EXIFIndex {
       // ExifVersion
       if(type == 1) {
         // Alternative: return val;
-        byte[] tok = {};
+        final TokenBuilder tb = new TokenBuilder();
         for(int i = 0; i < 4; i++) {
           if(val[i] > 0x30 && val[i] < 0x3A) {
-            if(tok.length != 0) tok = append(tok, (byte) '.');
-            tok = append(tok, val[i]);
+            if(tb.size != 0) tb.add('.');
+            tb.add(val[i]);
           }
         }
-        return tok;
+        return tb.finish();
       }
       
       // ComponentsConfiguration

@@ -83,9 +83,6 @@ public interface XQText {
   Object[] NSDECL = { FONS, 4, "Namespace prefix not declared: \"%\"." };
 
   /** FORG0001: Evaluation exception. */
-  Object[] INVFUNCAST = { FORG, 1, "Invalid cast from % to %: %." };
-
-  /** FORG0001: Evaluation exception. */
   Object[] LANINVALID = { FORG, 1, "Invalid language: \"%\"" };
   /** FORG0001: Evaluation exception. */
   Object[] INVALIDZONE = { FORG, 1, "Invalid timezone: %." };

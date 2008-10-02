@@ -125,15 +125,12 @@ public final class FTBuilder extends Progress implements IndexBuilder {
       outN.write5(-1); // pointer on data - root has no data
       outS.writeInt(s);
       s += 2L + (next[0].length - 3) * 5L + 9L;
-      int lp;
-      int[] tmp;
       // all other nodes
       final int il = index.next.size;
       for (int i = 1; i < il; i++) {
         //System.out.println("id:" + i);
         // check pointer on data needs 1 or 2 ints
-        lp = (next[i][next[i].length - 2] > -1) ?
-            0 : -1;
+        int lp = (next[i][next[i].length - 2] > -1) ? 0 : -1;
         // write token size as byte
     //System.out.print((byte) tokens[next[i][0]].length + ",");
         outN.write((byte) tokens[next[i][0]].length);
@@ -162,10 +159,7 @@ public final class FTBuilder extends Progress implements IndexBuilder {
             if (lp == 0) {
               outN.write5(next[i][j + 1]);
             } else {
-              tmp = new int[2];
-              System.arraycopy(next[i], next[i].length - 2,
-                  tmp, 0, tmp.length);
-              outN.write5(Token.intArrayToLong(tmp));
+              outN.write5(toLong(next[i], next[i].length - 2));
             }
           } else {
             writeData(outD, pre[next[i][next[i].length - 1]]);
@@ -195,7 +189,16 @@ public final class FTBuilder extends Progress implements IndexBuilder {
     outS.close();
     return new FTTrie(data, db);
   }
-
+  
+  /**
+   * Converts an int-array to a long value.
+   * @param i int-array with the long value
+   * @param p position to read from
+   * @return long value
+   */
+  private static long toLong(final int[] i, final int p) {
+    return ((long) -i[p] << 31) | i[p + 1];
+  }
 
   /**
    * Adds the data to each token.

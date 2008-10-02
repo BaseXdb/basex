@@ -292,8 +292,8 @@ public enum FunDef {
 
   /** Project specific function - evaluates the specified query. */
   EVAL(Uri.BX, FNBaseX.class, 1, 1, "eval(string)", Type.ITEM),
-  /** Project specific function - returns a random sequence entry. */
-  RANDOM(Uri.BX, FNBaseX.class, 1, 1, "random(seq)", Type.ITEM),
+  /** Project specific function - returns a random number. */
+  RANDOM(Uri.BX, FNBaseX.class, 1, 1, "random()", Type.DBL),
   /** XQuery function - allows a case insensitive substring search. */
   CONTAINSLC(Uri.BX, FNBaseX.class, 2, 3, "containslc(item, item)", Type.BLN),
   /** XQuery function - returns the name of the query file. */

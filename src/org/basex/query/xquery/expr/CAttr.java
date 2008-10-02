@@ -2,7 +2,7 @@ package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
-
+import static org.basex.util.Token.*;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
@@ -13,7 +13,6 @@ import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.item.Uri;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Err;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.XMLToken;
 
@@ -53,13 +52,12 @@ public final class CAttr extends Arr {
     final QNm name = name(ctx, ctx.atomic(atn, this, false));
     final byte[] pre = name.pre();
     final byte[] ln = name.ln();
-    if(comp && (Token.eq(name.str(), XMLNS) || Token.eq(pre, XMLNS)))
-      Err.or(NSATTCONS);
+    if(comp && (eq(name.str(), XMLNS) || eq(pre, XMLNS))) Err.or(NSATTCONS);
 
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr e : expr) CText.add(tb, ctx.iter(e));
     byte[] val = tb.finish();
-    if(Token.eq(pre, XML) && Token.eq(ln, ID)) val = Token.norm(val);
+    if(eq(pre, XML) && eq(ln, ID)) val = norm(val);
 
     return new FAttr(name, val, null).iter();
   }
@@ -79,7 +77,7 @@ public final class CAttr extends Arr {
       name = (QNm) it;
     } else {
       final byte[] nm = it.str();
-      if(Token.contains(nm, ' ')) Err.or(INVAL, nm);
+      if(contains(nm, ' ')) Err.or(INVAL, nm);
       if(!XMLToken.isQName(nm)) Err.or(NAMEWRONG, nm);
       name = new QNm(nm);
     }

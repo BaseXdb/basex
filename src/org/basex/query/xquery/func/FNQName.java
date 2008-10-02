@@ -1,7 +1,8 @@
 package org.basex.query.xquery.func;
 
 import static org.basex.query.xquery.XQText.*;
-import static org.basex.query.xquery.XQTokens.*;
+
+import org.basex.BaseX;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.FAttr;
@@ -101,7 +102,7 @@ final class FNQName extends Fun {
 
         return base.resolve(rel).iter();
       default:
-        throw new RuntimeException("Not defined: " + func);
+        BaseX.notexpected(func); return null;
     }
   }
 
@@ -116,7 +117,7 @@ final class FNQName extends Fun {
       throws XQException {
 
     final SeqIter seq = new SeqIter();
-    seq.add(new NCN(XML).iter());
+    seq.add(new NCN(Token.XML).iter());
     if(ctx.nsElem != Uri.EMPTY) seq.add(Str.ZERO);
 
     // [CG] XQuery/inscope; nested namespace handling

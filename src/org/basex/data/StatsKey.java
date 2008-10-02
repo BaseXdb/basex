@@ -1,10 +1,10 @@
 package org.basex.data;
 
+import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.util.Set;
-import org.basex.util.Token;
 
 /**
  * This class contains statistics for the tag or attribute name of a document.
@@ -49,8 +49,8 @@ public final class StatsKey {
   public StatsKey(final DataInput in) {
     kind = Kind.values()[in.readNum()];
     if(kind == Kind.INT || kind == Kind.DBL) {
-      min = Token.toDouble(in.readBytes());
-      max = Token.toDouble(in.readBytes());
+      min = toDouble(in.readBytes());
+      max = toDouble(in.readBytes());
     } else if(kind == Kind.CAT) {
       cats = new Set();
       final int cl = in.readNum();
@@ -68,8 +68,8 @@ public final class StatsKey {
     
     out.writeNum(kind.ordinal());
     if(kind == Kind.INT || kind == Kind.DBL) {
-      out.writeBytes(Token.token(min));
-      out.writeBytes(Token.token(max));
+      out.writeBytes(token(min));
+      out.writeBytes(token(max));
     } else if(kind == Kind.CAT) {
       final int cl = cats.size();
       out.writeNum(cl);
@@ -86,11 +86,10 @@ public final class StatsKey {
    * @param val value to be added
    */
   public void add(final byte[] val) {
-    if(val == null || val.length == 0 || kind == Kind.TEXT ||
-        Token.ws(val)) return;
+    if(val == null || val.length == 0 || kind == Kind.TEXT || ws(val)) return;
     
     if(cats != null && cats.size() < MAXCATS) {
-      if(val.length > Token.MAXLEN) {
+      if(val.length > MAXLEN) {
         kind = Kind.TEXT;
         cats = null;
       } else {
@@ -98,7 +97,7 @@ public final class StatsKey {
       }
     }
     if(kind == Kind.INT) {
-      final long d = Token.toLong(val);
+      final long d = toLong(val);
       if(d == Long.MIN_VALUE) {
         kind = Kind.DBL;
       } else {
@@ -107,7 +106,7 @@ public final class StatsKey {
       }
     }
     if(kind == Kind.DBL) {
-      final double d = Token.toDouble(val);
+      final double d = toDouble(val);
       if(d != d) {
         kind = cats.size() < MAXCATS ? Kind.CAT : Kind.TEXT;
       } else {

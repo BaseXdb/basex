@@ -81,7 +81,6 @@ import org.basex.query.xquery.util.Namespaces;
 import org.basex.query.xquery.util.Var;
 import org.basex.util.Array;
 import org.basex.util.Set;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 import org.basex.util.XMLToken;
@@ -243,7 +242,7 @@ public final class XQParser extends QueryParser {
     prolog2();
     if(declColl) {
       final byte[] coll = ctx.baseURI.resolve(ctx.collation).str();
-      if(!Token.eq(URLCOLL, coll)) Err.or(NOCOLL, coll);
+      if(!eq(URLCOLL, coll)) Err.or(NOCOLL, coll);
     }
     return expr();
   }
@@ -544,7 +543,7 @@ public final class XQParser extends QueryParser {
 
     String query = null;
     try {
-      query = Token.string(fl.content());
+      query = string(fl.content());
     } catch(final IOException ex) {
       Err.or(NOMODULEFILE, fl);
     }
@@ -821,7 +820,7 @@ public final class XQParser extends QueryParser {
     }
     if(consumeWS(COLLATION)) {
       final byte[] coll = stringLiteral();
-      if(!Token.eq(URLCOLL, coll)) Err.or(INVCOLL, coll);
+      if(!eq(URLCOLL, coll)) Err.or(INVCOLL, coll);
     }
     if(e.e()) return order;
     final Ord ord = new Ord(e, desc, least);
@@ -1687,7 +1686,7 @@ public final class XQParser extends QueryParser {
     if(consumeWSS()) Err.or(PIXML, EMPTY);
     final byte[] str = qName(PIWRONG);
     final Expr pi = Str.get(str);
-    if(str.length == 0 || Token.eq(Token.lc(str), XML)) Err.or(PIXML, pi);
+    if(str.length == 0 || eq(lc(str), XML)) Err.or(PIXML, pi);
 
     final boolean space = skipWS();
     final TokenBuilder tb = new TokenBuilder();
@@ -1858,8 +1857,8 @@ public final class XQParser extends QueryParser {
       final byte[] uri = type.uri.str();
       if(uri.length == 0 && type.ns()) Err.or(PREUNKNOWN, type.pre());
       final byte[] ln = type.ln();
-      Err.or(Token.eq(uri, Type.NOT.uri) && (Token.eq(Type.NOT.name, ln) ||
-        Token.eq(Type.AAT.name, ln))  ? CASTUNKNOWN : TYPEUNKNOWN, type);
+      Err.or(eq(uri, Type.NOT.uri) && (eq(Type.NOT.name, ln) ||
+        eq(Type.AAT.name, ln))  ? CASTUNKNOWN : TYPEUNKNOWN, type);
     }
     return seq;
   }
@@ -1891,6 +1890,7 @@ public final class XQParser extends QueryParser {
     if(seq.type == null) Err.or(par ? NOTYPE : TYPEUNKNOWN, type, par);
     if(seq.type == Type.EMP && mode != 0) Err.or(EMPTYSEQOCC, seq.type);
     seq.ext = checkTest(seq.type, ext);
+    skipWS();
     return seq;
   }
 
@@ -2284,7 +2284,7 @@ public final class XQParser extends QueryParser {
     tok.reset();
     if(ncName(true)) return tok.finish();
     if(err != null) Err.or(err);
-    return Token.EMPTY;
+    return EMPTY;
   }
 
   /**

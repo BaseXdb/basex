@@ -46,11 +46,11 @@ public enum Type {
   /** Untyped Atomic type. */
   ATM("untypedAtomic", AAT, XSURI, false, true, true, false) {
     @Override
-    public Item e(final Item it, final XQContext ctx) {
+    public Atm e(final Item it, final XQContext ctx) {
       return new Atm(it.str());
     }
     @Override
-    public Item e(final Object o) {
+    public Atm e(final Object o) {
       return new Atm(token(o.toString()));
     }
   },
@@ -58,11 +58,11 @@ public enum Type {
   /** String type. */
   STR("string", AAT, XSURI, false, false, true, false) {
     @Override
-    public Item e(final Item it, final XQContext ctx) {
+    public Str e(final Item it, final XQContext ctx) {
       return Str.get(it.str());
     }
     @Override
-    public Item e(final Object o) {
+    public Str e(final Object o) {
       return Str.get(o);
     }
   },
@@ -70,11 +70,11 @@ public enum Type {
   /** Normalized String type. */
   NST("normalizedString", STR, XSURI, false, false, true, false) {
     @Override
-    public Item e(final Item it, final XQContext ctx) {
+    public Str e(final Item it, final XQContext ctx) {
       return new Str(it.str(), this);
     }
     @Override
-    public Item e(final Object o) {
+    public Str e(final Object o) {
       return e(Str.get(o), null);
     }
   },
@@ -82,11 +82,11 @@ public enum Type {
   /** Token type. */
   TOK("token", NST, XSURI, false, false, true, false) {
     @Override
-    public Item e(final Item it, final XQContext ctx) {
+    public Str e(final Item it, final XQContext ctx) {
       return new Str(norm(it.str()), this);
     }
     @Override
-    public Item e(final Object o) {
+    public Str e(final Object o) {
       return e(Str.get(o), null);
     }
   },
@@ -96,13 +96,13 @@ public enum Type {
     final Pattern pat = Pattern.compile("[A-Za-z]{1,8}(-[A-Za-z0-9]{1,8})*");
 
     @Override
-    public Item e(final Item it, final XQContext ctx) throws XQException {
+    public Str e(final Item it, final XQContext ctx) throws XQException {
       final byte[] v = norm(it.str());
       if(!pat.matcher(string(v)).matches()) error(it);
       return new Str(v, this);
     }
     @Override
-    public Item e(final Object o) throws XQException {
+    public Str e(final Object o) throws XQException {
       return e(Str.get(o), null);
     }
   },
@@ -110,13 +110,13 @@ public enum Type {
   /** NMTOKEN type. */
   NMT("NMTOKEN", TOK, XSURI, false, false, true, false) {
     @Override
-    public Item e(final Item it, final XQContext ctx) throws XQException {
+    public Str e(final Item it, final XQContext ctx) throws XQException {
       final byte[] v = norm(it.str());
       if(!XMLToken.isNMToken(v)) error(it);
       return new Str(v, this);
     }
     @Override
-    public Item e(final Object o) throws XQException {
+    public Str e(final Object o) throws XQException {
       return e(Str.get(o), null);
     }
   },
@@ -124,13 +124,13 @@ public enum Type {
   /** Name type. */
   NAM("Name", TOK, XSURI, false, false, true, false) {
     @Override
-    public Item e(final Item it, final XQContext ctx) throws XQException {
+    public Str e(final Item it, final XQContext ctx) throws XQException {
       final byte[] v = norm(it.str());
       if(!XMLToken.isName(v)) error(it);
       return new Str(v, this);
     }
     @Override
-    public Item e(final Object o) throws XQException {
+    public Str e(final Object o) throws XQException {
       return e(Str.get(o), null);
     }
   },
@@ -138,11 +138,11 @@ public enum Type {
   /** NCName type. */
   NCN("NCName", NAM, XSURI, false, false, true, false) {
     @Override
-    public Item e(final Item it, final XQContext ctx) throws XQException {
+    public Str e(final Item it, final XQContext ctx) throws XQException {
       return new Str(checkName(it), this);
     }
     @Override
-    public Item e(final Object o) throws XQException {
+    public Str e(final Object o) throws XQException {
       return e(Str.get(o), null);
     }
   },
@@ -150,11 +150,11 @@ public enum Type {
   /** ID type. */
   ID("ID", NCN, XSURI, false, false, true, false) {
     @Override
-    public Item e(final Item it, final XQContext ctx) throws XQException {
+    public Str e(final Item it, final XQContext ctx) throws XQException {
       return new Str(checkName(it), this);
     }
     @Override
-    public Item e(final Object o) throws XQException {
+    public Str e(final Object o) throws XQException {
       return e(Str.get(o), null);
     }
   },
@@ -162,11 +162,11 @@ public enum Type {
   /** IDREF type. */
   IDR("IDREF", NCN, XSURI, false, false, true, false) {
     @Override
-    public Item e(final Item it, final XQContext ctx) throws XQException {
+    public Str e(final Item it, final XQContext ctx) throws XQException {
       return new Str(checkName(it), this);
     }
     @Override
-    public Item e(final Object o) throws XQException {
+    public Str e(final Object o) throws XQException {
       return e(Str.get(o), null);
     }
   },
@@ -174,11 +174,11 @@ public enum Type {
   /** Entity type. */
   ENT("ENTITY", NCN, XSURI, false, false, true, false) {
     @Override
-    public Item e(final Item it, final XQContext ctx) throws XQException {
+    public Str e(final Item it, final XQContext ctx) throws XQException {
       return new Str(checkName(it), this);
     }
     @Override
-    public Item e(final Object o) throws XQException {
+    public Str e(final Object o) throws XQException {
       return e(Str.get(o), null);
     }
   },
@@ -186,35 +186,35 @@ public enum Type {
   /** Float type. */
   FLT("float", AAT, XSURI, true, false, false, false) {
     @Override
-    public Item e(final Item it, final XQContext ctx) throws XQException {
+    public Flt e(final Item it, final XQContext ctx) throws XQException {
       return Flt.get(checkNum(it).flt());
     }
     @Override
-    public Item e(final Object o) {
-      return Flt.get(Float.parseFloat(o.toString()));
+    public Flt e(final Object o) throws XQException {
+      return e(Str.get(o), null);
     }
   },
 
   /** Double type. */
   DBL("double", AAT, XSURI, true, false, false, false) {
     @Override
-    public Item e(final Item it, final XQContext ctx) throws XQException {
+    public Dbl e(final Item it, final XQContext ctx) throws XQException {
       return Dbl.get(checkNum(it).dbl());
     }
     @Override
-    public Item e(final Object o) {
-      return Dbl.get(Double.parseDouble(o.toString()));
+    public Dbl e(final Object o) throws XQException {
+      return e(Str.get(o), null);
     }
   },
 
   /** Decimal type. */
   DEC("decimal", AAT, XSURI, true, false, false, false) {
     @Override
-    public Item e(final Item it, final XQContext ctx) throws XQException {
+    public Dec e(final Item it, final XQContext ctx) throws XQException {
       return Dec.get(checkNum(it).dec());
     }
     @Override
-    public Item e(final Object o) {
+    public Dec e(final Object o) {
       return Dec.get(new BigDecimal(o.toString()));
     }
   },
@@ -222,23 +222,23 @@ public enum Type {
   /** Integer type. */
   ITR("integer", DEC, XSURI, true, false, false, false) {
     @Override
-    public Item e(final Item it, final XQContext ctx) throws XQException {
-      return Itr.get(check(it, Long.MIN_VALUE, Long.MAX_VALUE));
+    public Itr e(final Item it, final XQContext ctx) throws XQException {
+      return e(it);
     }
     @Override
-    public Item e(final Object o) throws XQException {
-      return Itr.get(check(o, Long.MIN_VALUE, Long.MAX_VALUE));
+    public Itr e(final Object o) throws XQException {
+      return Itr.get(check(o, 0, 0));
     }
   },
 
   /** Non-positive integer type. */
   NPI("nonPositiveInteger", ITR, XSURI, true, false, false, false) {
     @Override
-    public Item e(final Item it, final XQContext ctx) throws XQException {
-      return new Itr(check(it, Long.MIN_VALUE, 0), this);
+    public Itr e(final Item it, final XQContext ctx) throws XQException {
+      return e(it);
     }
     @Override
-    public Item e(final Object o) throws XQException {
+    public Itr e(final Object o) throws XQException {
       return new Itr(check(o, Long.MIN_VALUE, 0), this);
     }
   },
@@ -246,41 +246,35 @@ public enum Type {
   /** Negative integer type. */
   NIN("negativeInteger", NPI, XSURI, true, false, false, false) {
     @Override
-    public Item e(final Item it, final XQContext ctx) throws XQException {
-      return new Itr(check(it, Long.MIN_VALUE, -1), this);
+    public Itr e(final Item it, final XQContext ctx) throws XQException {
+      return e(it);
     }
     @Override
-    public Item e(final Object o) throws XQException {
+    public Itr e(final Object o) throws XQException {
       return new Itr(check(o, Long.MIN_VALUE, -1), this);
     }
   },
 
   /** Long type. */
   LNG("long", ITR, XSURI, true, false, false, false) {
-    final BigDecimal min = new BigDecimal(Long.MIN_VALUE);
-    final BigDecimal max = new BigDecimal(Long.MAX_VALUE);
-
     @Override
-    public Item e(final Item it, final XQContext ctx) throws XQException {
-      final BigDecimal v = checkNum(it).dec();
-      if(v.compareTo(min) < 0 || v.compareTo(max) > 0)
-        Err.or(FUNCAST, this, it);
-      return new Dec(v, this);
+    public Itr e(final Item it, final XQContext ctx) throws XQException {
+      return e(it);
     }
     @Override
-    public Item e(final Object o) {
-      return new Dec(new BigDecimal(o.toString()), this);
+    public Itr e(final Object o) throws XQException {
+      return new Itr(check(o, 0, 0), this);
     }
   },
 
   /** Int type. */
   INT("int", LNG, XSURI, true, false, false, false) {
     @Override
-    public Item e(final Item it, final XQContext ctx) throws XQException {
-      return new Itr(check(it, -0x80000000, 0x7FFFFFFF), this);
+    public Itr e(final Item it, final XQContext ctx) throws XQException {
+      return e(it);
     }
     @Override
-    public Item e(final Object o) throws XQException {
+    public Itr e(final Object o) throws XQException {
       return new Itr(check(o, -0x80000000, 0x7FFFFFFF), this);
     }
   },
@@ -288,11 +282,11 @@ public enum Type {
   /** Short type. */
   SHR("short", INT, XSURI, true, false, false, false) {
     @Override
-    public Item e(final Item it, final XQContext ctx) throws XQException {
-      return new Itr(check(it, -0x8000, 0x7FFF), this);
+    public Itr e(final Item it, final XQContext ctx) throws XQException {
+      return e(it);
     }
     @Override
-    public Item e(final Object o) throws XQException {
+    public Itr e(final Object o) throws XQException {
       return new Itr(check(o, -0x8000, 0x7FFF), this);
     }
   },
@@ -300,11 +294,11 @@ public enum Type {
   /** Byte type. */
   BYT("byte", SHR, XSURI, true, false, false, false) {
     @Override
-    public Item e(final Item it, final XQContext ctx) throws XQException {
-      return new Itr(check(it, -0x80, 0x7F), this);
+    public Itr e(final Item it, final XQContext ctx) throws XQException {
+      return e(it);
     }
     @Override
-    public Item e(final Object o) throws XQException {
+    public Itr e(final Object o) throws XQException {
       return new Itr(check(o, -0x80, 0x7F), this);
     }
   },
@@ -312,11 +306,11 @@ public enum Type {
   /** Non-negative integer type. */
   NNI("nonNegativeInteger", ITR, XSURI, true, false, false, false) {
     @Override
-    public Item e(final Item it, final XQContext ctx) throws XQException {
-      return new Itr(check(it, 0, Long.MAX_VALUE), this);
+    public Itr e(final Item it, final XQContext ctx) throws XQException {
+      return e(it);
     }
     @Override
-    public Item e(final Object o) throws XQException {
+    public Itr e(final Object o) throws XQException {
       return new Itr(check(o, 0, Long.MAX_VALUE), this);
     }
   },
@@ -328,13 +322,14 @@ public enum Type {
         BigDecimal.valueOf(2)).add(BigDecimal.ONE);
 
     @Override
-    public Item e(final Item it, final XQContext ctx) throws XQException {
+    public Dec e(final Item it, final XQContext ctx) throws XQException {
       final BigDecimal v = checkNum(it).dec();
-      if(v.signum() < 0 || v.compareTo(max) > 0) Err.or(FUNCAST, this, it);
+      if(v.signum() < 0 || v.compareTo(max) > 0 ||
+          it.s() && contains(it.str(), '.')) Err.or(FUNCAST, this, it);
       return new Dec(v, this);
     }
     @Override
-    public Item e(final Object o) {
+    public Dec e(final Object o) {
       return new Dec(Token.token(o.toString()));
     }
   },
@@ -342,11 +337,11 @@ public enum Type {
   /** Short type. */
   UIN("unsignedInt", ULN, XSURI, true, false, false, false) {
     @Override
-    public Item e(final Item it, final XQContext ctx) throws XQException {
-      return new Itr(check(it, 0, 0xFFFFFFFFL), this);
+    public Itr e(final Item it, final XQContext ctx) throws XQException {
+      return e(it);
     }
     @Override
-    public Item e(final Object o) throws XQException {
+    public Itr e(final Object o) throws XQException {
       return new Itr(check(o, 0, 0xFFFFFFFFL), this);
     }
   },
@@ -354,11 +349,11 @@ public enum Type {
   /** Unsigned Short type. */
   USH("unsignedShort", UIN, XSURI, true, false, false, false) {
     @Override
-    public Item e(final Item it, final XQContext ctx) throws XQException {
-      return new Itr(check(it, 0, 0xFFFF), this);
+    public Itr e(final Item it, final XQContext ctx) throws XQException {
+      return e(it);
     }
     @Override
-    public Item e(final Object o) throws XQException {
+    public Itr e(final Object o) throws XQException {
       return new Itr(check(o, 0, 0xFFFF), this);
     }
   },
@@ -366,11 +361,11 @@ public enum Type {
   /** Unsigned byte type. */
   UBY("unsignedByte", USH, XSURI, true, false, false, false) {
     @Override
-    public Item e(final Item it, final XQContext ctx) throws XQException {
-      return new Itr(check(it, 0, 0xFF), this);
+    public Itr e(final Item it, final XQContext ctx) throws XQException {
+      return e(it);
     }
     @Override
-    public Item e(final Object o) throws XQException {
+    public Itr e(final Object o) throws XQException {
       return new Itr(check(o, 0, 0xFF), this);
     }
   },
@@ -378,11 +373,11 @@ public enum Type {
   /** Positive integer type. */
   PIN("positiveInteger", NNI, XSURI, true, false, false, false) {
     @Override
-    public Item e(final Item it, final XQContext ctx) throws XQException {
-      return new Itr(check(it, 1, Long.MAX_VALUE), this);
+    public Itr e(final Item it, final XQContext ctx) throws XQException {
+      return e(it);
     }
     @Override
-    public Item e(final Object o) throws XQException {
+    public Itr e(final Object o) throws XQException {
       return new Itr(check(o, 1, Long.MAX_VALUE), this);
     }
   },
@@ -761,32 +756,8 @@ public enum Type {
   }
 
   /**
-   * Checks the validity of the specified item and returns its long value.
-   * @param it value to be checked
-   * @param min minimum value
-   * @param max maximum value
-   * @return integer value
-   * @throws XQException possible converting exception
-   */
-  protected long check(final Item it, final long min, final long max)
-      throws XQException {
-
-    checkNum(it);
-    if(it.type == Type.DBL || it.type == Type.FLT) {
-      final double d = it.dbl();
-      if(d != d || d == 1 / 0d || d == -1 / 0d) Err.value(this, it);
-      if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) Err.or(INTRANGE, d);
-      if(d < min || d > max) Err.or(FUNCAST, this, it);
-      return (long) d;
-    }
-    final long l = it.itr();
-    if(l < min || l > max) Err.or(FUNCAST, this, it);
-    return l;
-  }
-
-  /**
-   * Checks the numeric range of the specified object and returns the value.
-   * @param o object to be checked
+   * Checks the validity of the specified object and returns its long value.
+   * @param o value to be checked
    * @param min minimum value
    * @param max maximum value
    * @return integer value
@@ -795,8 +766,22 @@ public enum Type {
   protected long check(final Object o, final long min, final long max)
       throws XQException {
 
-    final long l = Long.parseLong(o.toString());
-    if(l < min || l > max) Err.or(FUNCAST, this, o);
+    final Item it = o instanceof Item ? (Item) o : Str.get(o.toString());
+    checkNum(it);
+    
+    if(it.type == Type.DBL || it.type == Type.FLT) {
+      final double d = it.dbl();
+      if(d != d || d == 1 / 0d || d == -1 / 0d) Err.value(this, it);
+      if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) Err.or(INTRANGE, d);
+      if(min != max && (d < min || d > max)) Err.or(FUNCAST, this, it);
+      return (long) d;
+    }
+    final long l = it.itr();
+    if(min == max) {
+      final double d = it.dbl();
+      if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) Err.or(FUNCAST, this, it);
+    }
+    if(min != max && (l < min || l > max)) Err.or(FUNCAST, this, it);
     return l;
   }
 

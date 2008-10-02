@@ -1,7 +1,6 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQText.*;
-import static org.basex.query.xquery.XQTokens.*;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.FPI;
@@ -39,7 +38,7 @@ public final class CPI extends Arr {
     if(!it.u() && !it.s() && it.type != Type.QNM) Err.or(CPIWRONG, it.type, it);
 
     final byte[] nm = Token.trim(it.str());
-    if(Token.eq(Token.lc(nm), XML)) Err.or(CPIXML, nm);
+    if(Token.eq(Token.lc(nm), Token.XML)) Err.or(CPIXML, nm);
     if(!XMLToken.isNCName(nm)) Err.or(CPIINVAL, nm);
 
     final Iter iter = ctx.iter(expr[1]);

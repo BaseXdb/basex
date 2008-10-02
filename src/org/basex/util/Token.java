@@ -1,5 +1,7 @@
 package org.basex.util;
 
+import org.basex.BaseX;
+
 /**
  * This class provides convenience operations for handling so-called
  * 'Tokens'. Tokens in BaseX are nothing else than UTF8 encoded strings,
@@ -15,6 +17,8 @@ public final class Token {
   /** Maximum length for hash calculation and index terms. */
   public static final int MAXLEN = 64;
 
+  /** XML Token. */
+  public static final byte[] XML = token("xml");
   /** True token. */
   public static final byte[] TRUE = token("true");
   /** False token. */
@@ -25,8 +29,6 @@ public final class Token {
   public static final byte[] INF = token("INF");
   /** Infinity. */
   public static final byte[] NINF = token("-INF");
-  /** Dots. */
-  public static final byte[] DOTS = token("...");
   /** Dots. */
   public static final byte[] NULL = token("null");
   /** Empty token. */
@@ -157,13 +159,13 @@ public final class Token {
    */
   public static byte[] utf8(final byte[] s, final String enc) {
     // no UTF8 (string constant..) & no special characters: return input string
-    if(enc == Token.UTF8 || Token.ascii(s)) return s;
+    if(enc == UTF8 || ascii(s)) return s;
     // convert to utf8
     try {
       return new String(s, enc).getBytes(UTF8);
     } catch(final Exception e) {
-      e.printStackTrace();
-      throw new RuntimeException(e.getMessage());
+      BaseX.notexpected(e.getMessage());
+      return EMPTY;
     }
   }
 
@@ -360,7 +362,6 @@ public final class Token {
    */
   public static byte[] chopNumber(final byte[] t) {
     if(!contains(t, '.') || contains(t, 'e') || contains(t, 'E')) return t;
-
     // remove trailing zeroes
     int l = t.length;
     while(--l > 0 && t[l] == '0');
@@ -485,8 +486,7 @@ public final class Token {
    */
   public static int toInt(final byte[] to, final int ts, final int te) {
     int t = ts;
-    while(t < te && to[t] <= ' ')
-      t++;
+    while(t < te && to[t] <= ' ') t++;
     if(t == te) return Integer.MIN_VALUE;
     boolean m = false;
     if(to[t] == '-' || to[t] == '+') m = to[t++] == '-';
@@ -545,28 +545,6 @@ public final class Token {
     if(tl != tok.length) return false;
     for(int t = 0; t != tl; t++) if(tok2[t] != tok[t]) return false;
     return true;
-  }
-
-  
-  /**
-   * Compares two character arrays for equality.
-   * @param tok token to be compared
-   * @param tok2 second token to be compared
-   * @return 0 if tok equals tok2, -1 tok > tok0, 1 tok < tok2
-   */
-  public static int cmp(final byte[] tok, final byte[] tok2) {
-    /*final int l = (tok.length > tok2.length) ? tok2.length 
-        : tok.length;
-    */
-    if (tok.length > tok2.length) return -1;
-    if (tok.length < tok2.length) return 1;
-    
-    //for(int t = 0; t != l; t++) {
-    for(int t = 0; t != tok.length; t++) {
-      if(tok2[t] > tok[t]) return 1;
-      else if(tok2[t] < tok[t]) return -1;
-    }
-    return 0;
   }
 
   /**
@@ -805,17 +783,6 @@ public final class Token {
   }
 
   /**
-   * Cuts the token if it's too long, and adds dots. Otherwise, returns the
-   * original string
-   * @param t tokens
-   * @param m maximal length
-   * @return resulting array
-   */
-  public static byte[] cut(final byte[] t, final int m) {
-    return t.length > m ? concat(substring(t, 0 , m), DOTS) : t;
-  }
-
-  /**
    * Concatenates the specified tokens.
    * @param t tokens
    * @return resulting array
@@ -829,19 +796,6 @@ public final class Token {
       Array.copy(tt, tmp, l);
       l += tt.length;
     }
-    return tmp;
-  }
-
-  /**
-   * Appends a character to the specified byte array.
-   * @param t original token
-   * @param a token to be appended
-   * @return resulting array
-   */
-  public static byte[] append(final byte[] t, final byte a) {
-    final int tl = t.length;
-    final byte[] tmp = Array.resize(t, tl, tl + 1);
-    tmp[tl] = a;
     return tmp;
   }
 
@@ -1039,7 +993,7 @@ public final class Token {
    * @param ch character to be converted
    * @return converted character
    */
-  public static int ft(final int ch) {
+  private static int ft(final int ch) {
     return ch < 0 && ch > -64 ? NORM[ch + 64] : ch;
   }
 
@@ -1070,30 +1024,4 @@ public final class Token {
     'O', ' ', 'O', 'U', 'U', 'U', 'U', 'Y', 'D', 'S', 'a', 'a', 'a', 'a', 'a',
     'a', 'a', 'c', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i', 'd', 'n', 'o',
     'o', 'o', 'o', 'o', ' ', 'o', 'u', 'u', 'u', 'u', 'y', 'd', 's' };
-
-  /**
-   * Converts a long value to a int-array.
-   * @param l long value to convert
-   * @return int-array with the long value
-   */
-  public static int[] longToInt(final long l) {
-    final int[] i = new int[2];
-    i[1] = (int) (l & 0x7FFFFFFF);
-    if (l < 0x7FFFFFFF) return new int[]{i[1]};
-    i[0] = (int) (l >> 31) * -1;
-    return i;
-  }
-  
-  /**
-   * Converts an int-array to a long value.
-   * @param i int-array with the long value
-   * @return long value
-   */
-  public static long intArrayToLong(final int[] i) {
-    if (i.length == 1) return i[0];
-    long l = i[0] * -1; // & 0x7FFFFFFF;
-    l = l << 31;
-    l = i[1] | l;
-    return l;
-  }
 }

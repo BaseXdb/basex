@@ -1,5 +1,6 @@
 package org.basex.query.xquery.func;
 
+import org.basex.BaseX;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Atm;
@@ -59,7 +60,7 @@ final class FNGen extends Fun {
           return Bln.FALSE.iter();
         }
       default:
-        throw new RuntimeException("Not defined: " + func);
+        BaseX.notexpected(func); return null;
     }
   }
 

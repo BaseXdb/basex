@@ -200,8 +200,6 @@ public interface XQTokens {
 //
   // PREFIXES =================================================================
 
-  /** XML token. */
-  byte[] XML = token("xml");
   /** Namespaces Declaration. */
   byte[] XMLNS = token("xmlns");
   /** Namespaces Declaration. */

@@ -3,6 +3,7 @@ package org.basex.query.xquery.func;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.item.Type.*;
 
+import org.basex.BaseX;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Calc;
@@ -48,7 +49,7 @@ final class FNAggr extends Fun {
         it = iter.next();
         return it == null ? Iter.EMPTY : sum(iter, it, true);
       default:
-        throw new RuntimeException("Not defined: " + func);
+        BaseX.notexpected(func); return null;
     }
   }
 

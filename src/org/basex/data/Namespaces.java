@@ -9,7 +9,7 @@ import org.basex.io.DataOutput;
 import org.basex.io.IO;
 import org.basex.util.Array;
 import org.basex.util.Set;
-import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 
 /**
  * This class stores namespaces during the creation of a database.
@@ -18,15 +18,13 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class Namespaces extends Set {
-  /** XML Token. */
-  private static final byte[] XML = Token.token("xml");
   /** Prefixes. */
   private byte[][] pref = new byte[CAP][];
   /** Values. */
   private int[] vals = new int[CAP];
   /** Pre values. */
   private int[] pre = new int[CAP];
-  /** Number of entries. */
+  /** Number of namespace entries. */
   private int sz;
 
   /**
@@ -147,5 +145,14 @@ public final class Namespaces extends Set {
     out.writeNum(sz);
     out.close();
   }
-}
   
+  @Override
+  public String toString() {
+    final TokenBuilder tb = new TokenBuilder("Namespaces[");
+    for(int i = 0; i < sz; i++) {
+      
+      tb.add('\n');
+    }
+    return tb.add("]").toString();
+  }
+}

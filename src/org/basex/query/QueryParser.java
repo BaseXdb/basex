@@ -169,8 +169,9 @@ public class QueryParser {
           final boolean h = b == 16 && (c >= 'a' && c <= 'f' ||
               c >= 'A' && c <= 'F');
           if(!m && !h) return invalidEnt(p);
+          int nn = n;
           n = n * b + (consume() & 15);
-          if(n < 0) return invalidEnt(p);
+          if(n < nn) return invalidEnt(p);
           if(!m) n += 9;
         } while(!consume(';'));
         if(!XMLToken.valid(n)) return invalidEnt(p);

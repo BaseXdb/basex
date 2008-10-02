@@ -1,14 +1,16 @@
 package org.basex.query.xquery.func;
 
 import static org.basex.util.Token.*;
+
+import org.basex.BaseX;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQParser;
 import org.basex.query.xquery.item.Bln;
+import org.basex.query.xquery.item.Dbl;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Str;
 import org.basex.query.xquery.iter.Iter;
-import org.basex.query.xquery.iter.SeqIter;
 
 /**
  * Project specific functions.
@@ -21,10 +23,10 @@ final class FNBaseX extends Fun {
   public Iter iter(final XQContext ctx, final Iter[] arg) throws XQException {
     switch(func) {
       case EVAL:       return eval(arg);
-      case RANDOM:     return random(arg);
+      case RANDOM:     return random();
       case CONTAINSLC: return contains(arg);
       case FILENAME:   return filename(ctx);
-      default: throw new RuntimeException("Not defined: " + func);
+      default: BaseX.notexpected(func); return null;
     }
   }
 
@@ -42,11 +44,11 @@ final class FNBaseX extends Fun {
 
   /**
    * Performs the random function.
-   * @param arg arguments
    * @return iterator
-   * @throws XQException query exception
    */
-  private Iter random(final Iter[] arg) throws XQException {
+  private Iter random() {
+    return Dbl.iter(Math.random());
+    /*
     Iter iter = arg[0];
     long s = iter.size();
     if(s == -1) {
@@ -57,6 +59,7 @@ final class FNBaseX extends Fun {
     long r = (long) (Math.random() * s);
     while(r-- != 0) i = iter.next();
     return i.iter();
+    */
   }
 
   /**

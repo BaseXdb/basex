@@ -2,6 +2,7 @@ package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
+import static org.basex.util.Token.*;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
@@ -16,7 +17,6 @@ import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.NodIter;
 import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.util.Err;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -81,7 +81,7 @@ public final class CElem extends Arr {
     /** Space separator flag. */
     boolean more;
     /** Base URI. */
-    byte[] base = Token.EMPTY;
+    byte[] base = EMPTY;
 
     /**
      * Constructs the element node.
@@ -128,14 +128,14 @@ public final class CElem extends Arr {
           final QNm name = node.qname();
           final byte[] ln = name.ln();
           final byte[] pre = name.pre();
-          if(Token.eq(pre, XML) && Token.eq(ln, BASE)) base = it.str();
+          if(eq(pre, XML) && eq(ln, BASE)) base = it.str();
 
           // check for duplicate attribute names
           final QNm qname = node.qname();
           for(int a = 0; a < ats.size; a++) {
             if(qname.eq(ats.list[a].qname())) {
               final byte[] nm = qname.str();
-              if(!Token.contains(nm, ':')) Err.or(ATTDUPL, nm);
+              if(!contains(nm, ':')) Err.or(ATTDUPL, nm);
               else Err.or(ATTNSDUPL, qname, ats.list[a].qname());
             }
           }
