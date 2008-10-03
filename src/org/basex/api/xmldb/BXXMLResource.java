@@ -2,6 +2,8 @@ package org.basex.api.xmldb;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Enumeration;
+import java.util.Hashtable;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -10,22 +12,22 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.basex.BaseX;
 import org.basex.data.Nodes;
-import org.basex.data.SAXSerializer;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.XMLDBException;
 import org.xmldb.api.modules.XMLResource;
 
 /**
  * Implementation of the XMLResource Interface for the XMLDB:API.
- * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler
  */
@@ -70,8 +72,8 @@ public class BXXMLResource implements XMLResource {
 
     try {
       // Create a builder factory
-      final DocumentBuilderFactory factory =
-        DocumentBuilderFactory.newInstance();
+      final DocumentBuilderFactory factory = DocumentBuilderFactory
+          .newInstance();
       factory.setValidating(false);
       System.out.println(content);
       // Create the builder and parse the file
@@ -80,8 +82,7 @@ public class BXXMLResource implements XMLResource {
       return doc;
     } catch(final SAXException e) {
       // A parsing error occurred; the xml input is not valid
-    } catch(final ParserConfigurationException e) {
-    } catch(final IOException e) { }
+    } catch(final ParserConfigurationException e) {} catch(final IOException e) {}
     return null;
   }
 
@@ -141,12 +142,136 @@ public class BXXMLResource implements XMLResource {
   }
 
   public ContentHandler setContentAsSAX() {
-    SAXSerializer sax = new SAXSerializer(null);
     // A custom SAX Content Handler is required to handle the SAX events
-    ContentHandler handler = sax.getContentHandler();
-    return handler;
+    return new SAXeParser(this);
   }
-  
+
+  /** SAX Parser. */
+  class SAXeParser extends DefaultHandler {
+    /**
+     * Standard Constructor.
+     * @param xmlresource
+     */
+    public SAXeParser(XMLResource xmlresource) {
+        resource = null;
+        newContent = null;
+        namespaces = null;
+        resource = xmlresource;
+        namespaces = new Hashtable<String, String>();
+    }
+    @Override
+    public void characters(char ac[], int i, int j) {
+      for(int k = 0; k < j; k++) {
+        char c = ac[i + k];
+        switch(c) {
+          case 38: /* '&' */
+            newContent.append("&amp;");
+            break;
+
+          case 60: /* '<' */
+            newContent.append("&lt;");
+            break;
+
+          case 62: /* '>' */
+            newContent.append("&gt;");
+            break;
+
+          case 34: /* '"' */
+            newContent.append("&quot;");
+            break;
+
+          case 39: /* '\'' */
+            newContent.append("&apos;");
+            break;
+
+          default:
+            if(c > '\177') newContent.append("&#" + (int) c + ";");
+            else newContent.append(c);
+            break;
+        }
+      }
+    }
+    @Override
+    public void endDocument() throws SAXException {
+      try {
+        resource.setContent(newContent.toString());
+      } catch(XMLDBException e) {
+        throw new SAXException(e.getMessage());
+      }
+      //System.out.println(newContent.toString());
+    }
+    @Override
+    public void endElement(String s, String s1, String s2) {
+      newContent.append("</");
+      newContent.append(s2);
+      newContent.append(">");
+    }
+    @Override
+    public void endPrefixMapping(String s) {
+      namespaces.remove(s);
+    }
+    @Override
+    public void ignorableWhitespace(char ac[], int i, int j) {
+      for(int k = 0; k < j; k++)
+        newContent.append(ac[i + k]);
+
+    }
+    @Override
+    public void processingInstruction(String s, String s1) {
+      newContent.append("<?");
+      newContent.append(s);
+      newContent.append(" ");
+      if(s1 != null) newContent.append(s1);
+      newContent.append("?>");
+    }
+    @Override
+    public void skippedEntity(String s) {}
+    @Override
+    public void startDocument() {
+      newContent = new StringBuffer();
+      newContent.append("<?xml version=\"1.0\"?>");
+    }
+    @Override
+    public void startElement(String s, String s1, String s2,
+        Attributes attributes) {
+      newContent.append("<");
+      newContent.append(s2);
+      for(int i = 0; i < attributes.getLength(); i++) {
+        newContent.append(" ");
+        newContent.append(attributes.getQName(i));
+        newContent.append("=");
+        newContent.append("\"");
+        newContent.append(attributes.getValue(i));
+        newContent.append("\"");
+      }
+
+      String s3;
+      for(Enumeration enumeration = namespaces.keys(); enumeration
+          .hasMoreElements(); namespaces.remove(s3)) {
+        s3 = (String) enumeration.nextElement();
+        newContent.append(" xmlns:");
+        newContent.append(s3);
+        newContent.append("=");
+        newContent.append("\"");
+        newContent.append(namespaces.get(s3));
+        newContent.append("\"");
+      }
+
+      newContent.append(">");
+    }
+    
+    @Override
+    public void startPrefixMapping(String s, String s1) {
+      namespaces.put(s, s1);
+    }
+    /** XMLResource. */
+    protected XMLResource resource;
+    /** StringBuffer */
+    protected StringBuffer newContent;
+    /** Hashtable */
+    protected Hashtable<String, String> namespaces;
+  }
+
   /**
    * Returns the pre value of the Doc
    * @return int Prevalue

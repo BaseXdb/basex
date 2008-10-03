@@ -187,12 +187,11 @@ public class XMLDBTest extends TestCase {
         XMLResource.RESOURCE_TYPE);
 
     ContentHandler handler = resource.setContentAsSAX();
-    
     XMLReader reader = XMLReaderFactory.createXMLReader();
     reader.setContentHandler(handler);
     reader.parse(new InputSource(fileName));
 
-    //collection.storeResource(resource);
+    collection.storeResource(resource);
   }
 
   /**
