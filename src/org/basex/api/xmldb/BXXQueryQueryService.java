@@ -5,20 +5,20 @@ import org.basex.core.Context;
 import org.basex.data.Nodes;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
-import org.basex.query.xpath.XPathProcessor;
 import org.basex.query.xpath.values.Item;
+import org.basex.query.xquery.XQueryProcessor;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.ResourceSet;
 import org.xmldb.api.modules.XPathQueryService;
 
 /**
  * Implementation of the XPathQueryService Interface for the XMLDB:API.
- * XPath-Version
+ * XQuery-Version
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler
  */
-public class BXXPathQueryService implements XPathQueryService {
+public class BXXQueryQueryService implements XPathQueryService {
   /** Context. */
   Context ctx;
 
@@ -26,7 +26,7 @@ public class BXXPathQueryService implements XPathQueryService {
    * Standard constructor.
    * @param c for Context
    */
-  public BXXPathQueryService(final Context c) {
+  public BXXQueryQueryService(final Context c) {
     ctx = c;
   }
 
@@ -56,12 +56,12 @@ public class BXXPathQueryService implements XPathQueryService {
 
   public ResourceSet query(final String query) {
     // Creates a query instance
-    final QueryProcessor xpath = new XPathProcessor(query);
+    final QueryProcessor xquery = new XQueryProcessor(query);
     // Start a query with the default context set (root node).
     final Nodes nodes = ctx.current();
     // Executes the query
     try {
-      final Item result = (Item) xpath.query(nodes);
+      final Item result = (Item) xquery.query(nodes);
       return new BXResourceSet(result);
     } catch(final QueryException qe) {
       System.out.println(qe);

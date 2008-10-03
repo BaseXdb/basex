@@ -109,7 +109,7 @@ public class BXCollection implements Collection {
   }
 
   public Service[] getServices() {
-    Service[] services = {new BXXPathQueryService(ctx)};
+    Service[] services = {new BXXPathQueryService(ctx), new BXXQueryQueryService(ctx)};
     return services;
   }
 
