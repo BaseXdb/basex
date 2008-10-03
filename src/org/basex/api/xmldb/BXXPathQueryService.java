@@ -1,5 +1,6 @@
 package org.basex.api.xmldb;
 
+import org.basex.BaseX;
 import org.basex.core.Context;
 import org.basex.data.Nodes;
 import org.basex.query.QueryException;
@@ -29,26 +30,26 @@ public class BXXPathQueryService implements XPathQueryService {
   }
 
   public void clearNamespaces() {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
   }
 
   public String getName() {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
     return null;
   }
 
   public String getNamespace(final String prefix) {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
     return null;
   }
 
   public String getProperty(final String name) {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
     return null;
   }
 
   public String getVersion() {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
     return null;
   }
 
@@ -68,23 +69,23 @@ public class BXXPathQueryService implements XPathQueryService {
   }
 
   public ResourceSet queryResource(final String id, final String query) {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
     return null;
   }
 
   public void removeNamespace(final String prefix) {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
   }
 
   public void setCollection(final Collection col) {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
   }
 
   public void setNamespace(final String prefix, final String uri) {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
   }
 
   public void setProperty(final String name, final String value) {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
   }
 }

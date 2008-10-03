@@ -1,5 +1,6 @@
 package org.basex.api.xmldb;
 
+import org.basex.BaseX;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.Service;
 
@@ -12,25 +13,25 @@ import org.xmldb.api.base.Service;
 public class BXService implements Service {
 
   public String getName() {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
     return null;
   }
 
   public String getProperty(final String name) {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
     return null;
   }
 
   public String getVersion() {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
     return null;
   }
 
   public void setCollection(final Collection col) {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
   }
 
   public void setProperty(final String name, final String value) {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
   }
 }

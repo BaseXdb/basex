@@ -4,6 +4,7 @@ import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.Database;
 import org.xmldb.api.base.ErrorCodes;
 import org.xmldb.api.base.XMLDBException;
+import org.basex.BaseX;
 import org.basex.core.Context;
 import org.basex.core.proc.*;
 
@@ -59,15 +60,12 @@ public class BXDatabaseImpl implements Database {
     return INSTANCE_NAME;
   }
 
-  public String getProperty(final String name) throws XMLDBException {
-    // TODO Auto-generated method stub
-    throw new XMLDBException();
-    //return null;
+  public String getProperty(final String name) {
+    BaseX.notimplemented();
+    return null;
   }
 
-  public void setProperty(final String name, final String value)
-      throws XMLDBException {
-    // TODO Auto-generated method stub
-    throw new XMLDBException();
+  public void setProperty(final String name, final String value) {
+    BaseX.notimplemented();
   }
 }

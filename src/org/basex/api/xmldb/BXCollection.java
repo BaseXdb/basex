@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.w3c.dom.Document;
 import org.xmldb.api.base.*;
 import org.xmldb.api.modules.XMLResource;
+import org.basex.BaseX;
 import org.basex.build.xml.DOCWrapper;
 import org.basex.core.Context;
 import org.basex.core.proc.CreateDB;
@@ -38,25 +39,25 @@ public class BXCollection implements Collection {
   }
 
   public String createId() {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
     return null;
   }
 
   public Resource createResource(final String id, final String type)
       throws XMLDBException {
     if(type.equals(XMLResource.RESOURCE_TYPE)) {
-        return new BXXMLResource(ctx.current(), id, -1);
+        return new BXXMLResource(null, id, -1);
     }
     throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED);
   }
 
   public Collection getChildCollection(final String name) {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
     return null;
   }
 
   public int getChildCollectionCount() {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
     return 0;
   }
 
@@ -65,12 +66,12 @@ public class BXCollection implements Collection {
   }
 
   public Collection getParentCollection() {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
     return null;
   }
 
   public String getProperty(final String name) {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
     return null;
   }
 
@@ -108,8 +109,8 @@ public class BXCollection implements Collection {
   }
 
   public Service[] getServices() {
-    // TODO Auto-generated method stub
-    return null;
+    Service[] services = {new BXXPathQueryService(ctx)};
+    return services;
   }
 
   public boolean isOpen() {
@@ -117,13 +118,16 @@ public class BXCollection implements Collection {
   }
 
   public String[] listChildCollections() {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
     return null;
   }
 
   public String[] listResources() {
-    // TODO Auto-generated method stub
-    return null;
+    String[] resources = {};
+    for(int i = 0; i < ctx.data().doc().length; i++) {
+      resources[i] = new String(ctx.data().text(ctx.data().doc()[i]));
+    }
+    return resources;
   }
   
   public void removeResource(Resource res) {
@@ -132,7 +136,7 @@ public class BXCollection implements Collection {
   }
 
   public void setProperty(final String name, final String value) {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
   }
 
   public void storeResource(final Resource res) throws XMLDBException {

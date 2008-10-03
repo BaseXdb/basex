@@ -2,6 +2,7 @@ package org.basex.api.xmldb;
 
 import java.io.IOException;
 
+import org.basex.BaseX;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
 import org.basex.query.xpath.values.Item;
@@ -50,12 +51,12 @@ public class BXResource implements Resource {
   }
 
   public String getId() {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
     return null;
   }
 
   public Collection getParentCollection() {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
     return null;
   }
 
@@ -64,6 +65,6 @@ public class BXResource implements Resource {
   }
 
   public void setContent(final Object value) {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
   }
 }

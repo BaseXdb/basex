@@ -1,5 +1,6 @@
 package org.basex.api.xmldb;
 
+import org.basex.BaseX;
 import org.basex.query.xpath.values.Item;
 import org.xmldb.api.base.Resource;
 import org.xmldb.api.base.ResourceIterator;
@@ -24,34 +25,33 @@ public class BXResourceSet implements ResourceSet {
   }
 
   public void addResource(final Resource res) {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
   }
 
   public void clear() {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
   }
 
   public ResourceIterator getIterator() {
-    // TODO Auto-generated method stub
     return new BXResourceIterator(result);
   }
 
   public Resource getMembersAsResource() {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
     return null;
   }
 
   public Resource getResource(final long index) {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
     return null;
   }
 
   public long getSize() {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
     return 0;
   }
 
   public void removeResource(final long index) {
-    // TODO Auto-generated method stub
+    BaseX.notimplemented();
   }
 }
