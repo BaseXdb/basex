@@ -14,7 +14,7 @@ import org.basex.core.proc.*;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler
  */
-public class BXDatabaseImpl implements Database {
+public class BXDatabase implements Database {
   /** DB URI. */
   public static final String BASEXDB_URI = "basex://";
   /** Instance Name. */
@@ -27,7 +27,7 @@ public class BXDatabaseImpl implements Database {
   /**
    * Constructor.
    */
-  public BXDatabaseImpl() {
+  public BXDatabase() {
     super();
   }
 
@@ -43,10 +43,8 @@ public class BXDatabaseImpl implements Database {
     if(uri.startsWith(BASEXDB_URI)) {
       final String host = uri.substring(BASEXDB_URI.length());
       if(host.startsWith(LOCALHOST)) {
-      final String tmp = host.substring(LOCALHOST.length());
-      if(new Open(tmp).execute(ctx)) {
-        return new BXCollection(ctx);
-        }
+        final String tmp = host.substring(LOCALHOST.length());
+        if(new Open(tmp).execute(ctx)) return new BXCollection(ctx);
       }
     }
     throw new XMLDBException(ErrorCodes.INVALID_URI);

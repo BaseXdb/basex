@@ -4,17 +4,16 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Enumeration;
 import java.util.Hashtable;
-
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-
 import org.basex.BaseX;
+import org.basex.api.dom.BXDoc;
+import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
-import org.w3c.dom.Document;
+import org.basex.query.xquery.item.DNode;
 import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -23,6 +22,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xmldb.api.base.Collection;
+import org.xmldb.api.base.ErrorCodes;
 import org.xmldb.api.base.XMLDBException;
 import org.xmldb.api.modules.XMLResource;
 
@@ -31,64 +31,47 @@ import org.xmldb.api.modules.XMLResource;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler
  */
-public class BXXMLResource implements XMLResource {
-  /** Current node context. */
-  Nodes nodes;
+public final class BXXMLResource implements XMLResource {
+  /** Current data reference. */
+  private final Data data;
+  /** String id. */
+  private final String id;
+  /** Int pre. */
+  private final int pre;
   /** String content. */
   Object content;
-  /** String id. */
-  String id;
-  /** Int pre. */
-  int pre;
 
   /**
    * Standard constructor.
-   * @param n nodes
+   * @param d data reference
    * @param iD String
    * @param preV int
    */
-  public BXXMLResource(final Nodes n, final String iD, final int preV) {
-    nodes = n;
+  public BXXMLResource(final Data d, final String iD, final int preV) {
+    data = d;
     id = iD;
     pre = preV;
   }
 
-  public Object getContent() {
+  public Object getContent() throws XMLDBException {
     if(content == null) {
       try {
         final CachedOutput out = new CachedOutput();
-        final boolean chop = nodes.data.meta.chop;
-        nodes.serialize(new XMLSerializer(out, false, chop));
+        new Nodes(pre, data).serialize(new XMLSerializer(out), 0);
         content = out.toString();
-      } catch(final Exception ex) {
-        BaseX.debug(ex);
+      } catch(final IOException ex) {
+        throw new XMLDBException(ErrorCodes.UNKNOWN_ERROR, ex.getMessage());
       }
     }
     return content;
   }
 
   public Node getContentAsDOM() {
-    if(content == null) getContent();
-
-    try {
-      // Create a builder factory
-      final DocumentBuilderFactory factory = DocumentBuilderFactory
-          .newInstance();
-      factory.setValidating(false);
-      System.out.println(content);
-      // Create the builder and parse the file
-      final Document doc = factory.newDocumentBuilder().parse(
-          new InputSource(new StringReader(content.toString())));
-      return doc;
-    } catch(final SAXException e) {
-      // A parsing error occurred; the xml input is not valid
-    } catch(final ParserConfigurationException e) {} catch(final IOException e) {}
-    return null;
+    return new BXDoc(new DNode(data, pre));
   }
 
   public void getContentAsSAX(final ContentHandler handler)
       throws XMLDBException {
-    if(content == null) getContent();
 
     XMLReader reader = null;
     final SAXParserFactory saxFactory = SAXParserFactory.newInstance();
@@ -105,7 +88,7 @@ public class BXXMLResource implements XMLResource {
     }
     try {
       reader.setContentHandler(handler);
-      reader.parse(new InputSource(new StringReader(content.toString())));
+      reader.parse(new InputSource(new StringReader(getContent().toString())));
     } catch(final SAXException saxe) {
       saxe.printStackTrace();
       throw new XMLDBException(1, saxe.getMessage());
@@ -149,9 +132,9 @@ public class BXXMLResource implements XMLResource {
   class BXSAXContentHandler extends DefaultHandler {
     
     /** XMLResource. */
-    protected XMLResource res;
+    protected BXXMLResource res;
     /** StringBuffer */
-    protected StringBuffer cont;
+    protected StringBuilder cont;
     /** Hashtable */
     protected Hashtable<String, String> ns;
     
@@ -159,7 +142,7 @@ public class BXXMLResource implements XMLResource {
      * Standard Constructor.
      * @param xmlresource XMLResource 
      */
-    public BXSAXContentHandler(XMLResource xmlresource) {
+    public BXSAXContentHandler(BXXMLResource xmlresource) {
         res = xmlresource;
         ns = new Hashtable<String, String>();
     }
@@ -196,12 +179,8 @@ public class BXXMLResource implements XMLResource {
       }
     }
     @Override
-    public void endDocument() throws SAXException {
-      try {
-        res.setContent(cont);
-      } catch(XMLDBException e) {
-        throw new SAXException(e.getMessage());
-      }
+    public void endDocument() {
+      res.setContent(cont);
     }
     @Override
     public void endElement(String s, String s1, String s2) {
@@ -217,7 +196,6 @@ public class BXXMLResource implements XMLResource {
     public void ignorableWhitespace(char ac[], int i, int j) {
       for(int k = 0; k < j; k++)
         cont.append(ac[i + k]);
-
     }
     @Override
     public void processingInstruction(String s, String s1) {
@@ -231,8 +209,7 @@ public class BXXMLResource implements XMLResource {
     public void skippedEntity(String s) {}
     @Override
     public void startDocument() {
-      cont = new StringBuffer();
-      cont.append("<?xml version=\"1.0\"?>");
+      cont = new StringBuilder();
     }
     @Override
     public void startElement(String s, String s1, String s2,
@@ -271,7 +248,7 @@ public class BXXMLResource implements XMLResource {
 
   /**
    * Returns the pre value of the Doc
-   * @return int Prevalue
+   * @return pre value
    */
   public int getPre() {
     return pre;

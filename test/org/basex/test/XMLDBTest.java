@@ -6,6 +6,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import org.basex.core.Context;
+import org.basex.core.proc.CreateDB;
 import org.basex.data.SAXSerializer;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,16 +36,22 @@ import junit.framework.TestCase;
  */
 public class XMLDBTest extends TestCase {
   /** XMLDB driver. */
-  static String driver = "org.basex.api.xmldb.BXDatabaseImpl";
+  static String driver = "org.basex.api.xmldb.BXDatabase";
   /** Database/document path. */
   static String url = "xmldb:basex://localhost:8080/input";
   /** Collection. */
-  Collection collection = null;
+  static Collection collection = null;
 
   @Before
   @Override
   protected void setUp() throws Exception {
+    if(collection != null) return;
+    
     try {
+      Context ctx = new Context();
+      new CreateDB("input.xml").execute(ctx, null);
+      ctx.close();
+      
       Class<?> c = Class.forName(driver);
       Database database = (Database) c.newInstance();
       DatabaseManager.registerDatabase(database);
@@ -158,8 +166,8 @@ public class XMLDBTest extends TestCase {
 
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder builder = factory.newDocumentBuilder();
-    document = builder.parse(new File("test7.xml"));
-    String id = "test7";
+    String id = "test7.xml";
+    document = builder.parse(new File(id));
     XMLResource resource = (XMLResource) collection.createResource(id,
         XMLResource.RESOURCE_TYPE);
 
@@ -174,16 +182,14 @@ public class XMLDBTest extends TestCase {
   @Test
   public void test8() throws Exception {
     // File containing the XML to be inserted
-    String fileName = "test8.xml";
-
-    String id = "test8";
+    String id = "test8.xml";
     XMLResource resource = (XMLResource) collection.createResource(id,
         XMLResource.RESOURCE_TYPE);
 
     ContentHandler handler = resource.setContentAsSAX();
     XMLReader reader = XMLReaderFactory.createXMLReader();
     reader.setContentHandler(handler);
-    reader.parse(new InputSource(fileName));
+    reader.parse(new InputSource(id));
 
     collection.storeResource(resource);
   }
@@ -194,7 +200,7 @@ public class XMLDBTest extends TestCase {
    */
   @Test
   public void test9() throws Exception {
-    String id = "tmp";
+    String id = "test7.xml";
     collection.removeResource(collection.getResource(id));
   }
 }

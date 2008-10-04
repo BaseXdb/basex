@@ -28,11 +28,11 @@ public class BXCollectionManagementService implements
   }
 
   public String getName() {
-    return new String("CollectionManagementService");
+    return "CollectionManagementService";
   }
 
   public String getVersion() {
-    return new String("Version 1.0");
+    return "1.0";
   }
 
   public void setCollection(Collection col) {

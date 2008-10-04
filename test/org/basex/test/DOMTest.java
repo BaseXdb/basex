@@ -49,13 +49,10 @@ public final class DOMTest {
   /**
    * Performs some DOM tests.
    * @param node node reference
+   * @throws Exception exception
    */
-  private static void test(final Node node) {
-    try {
-      System.out.println("! " + ((Text) node).substringData(0, 8));
-    } catch(Exception ex) {
-      ex.printStackTrace();
-    }
+  private static void test(final Node node) throws Exception {
+    System.out.println("! " + ((Text) node).substringData(0, 8));
   }
 }
 

@@ -8,12 +8,11 @@ import org.basex.BaseX;
 import org.basex.build.xml.DOCWrapper;
 import org.basex.core.Context;
 import org.basex.core.proc.CreateDB;
-import org.basex.core.proc.Check;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.DropDB;
 import org.basex.data.Data;
-import org.basex.data.Nodes;
 import org.basex.io.IO;
+import org.basex.util.Token;
 
 /**
  * Implementation of the Collection Interface for the XMLDB:API.
@@ -44,9 +43,10 @@ public class BXCollection implements Collection {
 
   public Resource createResource(final String id, final String type)
       throws XMLDBException {
-    if(type.equals(XMLResource.RESOURCE_TYPE)) {
-        return new BXXMLResource(null, id, -1);
-    }
+    
+    if(type.equals(XMLResource.RESOURCE_TYPE))
+      return new BXXMLResource(null, id, -1);
+
     throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED);
   }
 
@@ -75,23 +75,12 @@ public class BXCollection implements Collection {
   }
 
   public Resource getResource(final String id) throws XMLDBException {
-    if(ctx.data().doc().length == 1) {
-      if(new String(ctx.data().text(0)).equals(id)) {
-        return new BXXMLResource(ctx.current(), id, 0);
-      }
-    } else {
-      for (int i = 0; i < ctx.data().doc().length; i++) {
-        int test = ctx.data().doc()[i];
-        String name = new String(ctx.data().text(test));
-        if(name.equals(id)) {
-          Context tmpCtx = new Context();
-          Nodes nodes = new Nodes(test, ctx.data());
-          for (int j = test+1; j < ctx.data().doc()[i+1]; j++) {
-            nodes.add(j);
-          }
-          tmpCtx.current(nodes);
-          return new BXXMLResource(tmpCtx.current(), id, test);
-        }
+    byte[] idd = Token.token(id);
+    int[] docs = ctx.data().doc();
+    for (int i = 0; i < docs.length; i++) {
+      int pre = docs[i];
+      if(Token.eq(ctx.data().text(pre), idd)) {
+        return new BXXMLResource(ctx.data(), id, pre);
       }
     }
     throw new XMLDBException(ErrorCodes.NO_SUCH_RESOURCE);
@@ -118,7 +107,7 @@ public class BXCollection implements Collection {
   }
 
   public boolean isOpen() {
-    return new Check(ctx.data().meta.dbname).execute(ctx);
+    return ctx.data() != null;
   }
 
   public String[] listChildCollections() {
@@ -127,9 +116,10 @@ public class BXCollection implements Collection {
   }
 
   public String[] listResources() {
-    String[] resources = {};
-    for(int i = 0; i < ctx.data().doc().length; i++) {
-      resources[i] = new String(ctx.data().text(ctx.data().doc()[i]));
+    int[] docs = ctx.data().doc();
+    String[] resources = new String[docs.length];
+    for(int i = 0; i < docs.length; i++) {
+      resources[i] = Token.string(ctx.data().text(docs[i]));
     }
     return resources;
   }
@@ -145,20 +135,24 @@ public class BXCollection implements Collection {
 
   public void storeResource(final Resource res) throws XMLDBException {
     final String id = res.getId();
+    
     Data tmp = null;
     try {
-      if(res.getContent() instanceof Document) {
-        tmp = CreateDB.xml(new DOCWrapper((Document) res.getContent()), id);
+      final Object cont = res.getContent();
+      
+      if(cont instanceof Document) {
+        tmp = CreateDB.xml(new DOCWrapper((Document) cont, id), id);
       } else {
-        tmp = CreateDB.xml(IO.get(res.getContent().toString()), id);
+        tmp = CreateDB.xml(IO.get(cont.toString()), id);
       }
-      ctx.data().insert(ctx.data().size, -1, tmp);
-      ctx.data().flush();
+      
+      final Data data = ctx.data();
+      data.insert(data.size, -1, tmp);
+      data.flush();
       tmp.close();
       DropDB.drop(id);
     } catch(final IOException ex) {
-      ex.printStackTrace();
-      
+      BaseX.debug(ex);
       throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
     }
   }
