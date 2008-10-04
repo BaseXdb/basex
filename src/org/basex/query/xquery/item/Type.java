@@ -640,7 +640,8 @@ public enum Type {
       
       if(o instanceof Document) {
         try {
-          final Data data = CreateDB.xml(new DOCWrapper((Document) o), "tmp");
+          final DOCWrapper p = new DOCWrapper((Document) o, "tmp");
+          final Data data = CreateDB.xml(p, "tmp");
           return new DNode(data, 0);
         } catch(final IOException ex) {
           throw new XQException(UNDOC, ex.getMessage());

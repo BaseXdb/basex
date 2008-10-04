@@ -143,13 +143,11 @@ public final class BXDoc extends BXNode implements Document {
   }
 
   public boolean getXmlStandalone() {
-    BaseX.notimplemented();
     return false;
   }
 
   public String getXmlVersion() {
-    BaseX.notimplemented();
-    return null;
+    return "1.0";
   }
 
   public Node importNode(final Node importedNode, final boolean deep) {

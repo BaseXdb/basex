@@ -270,12 +270,12 @@ public final class BaseXWebServer {
         final String key = req.file + "/" + req.file.date();
         xq = map.get(key);
         if(xq == null) {
-          final String query = new String(req.file.content(), "UTF-8");
+          final String query = Token.string(req.file.content());
           xq = new XQueryProcessor(query, req.file);
           map.put(key, xq);
         }
       } else {
-        final String query = new String(req.file.content(), "UTF-8");
+        final String query = Token.string(req.file.content());
         xq = new XQueryProcessor(query, req.file);
       }
 

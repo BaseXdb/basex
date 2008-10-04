@@ -317,8 +317,7 @@ public final class FSUtils {
         run.exec("rundll32.exe url.dll,FileProtocolHandler " + path);
       }
     } catch(final IOException ex) {
-      BaseX.debug("Could not open \"%\"", path);
-      ex.printStackTrace();
+      BaseX.debug(ex);
     }
   }
 

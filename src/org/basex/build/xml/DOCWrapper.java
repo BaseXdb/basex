@@ -2,10 +2,8 @@ package org.basex.build.xml;
 
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
 import java.util.Stack;
-
 import org.basex.BaseX;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
@@ -30,23 +28,27 @@ import org.w3c.dom.Text;
  * @author Christian Gruen
  */
 public final class DOCWrapper extends Parser {
-  /** Element counter. */
-  int nodes;
+  /** Name of the document. */
+  private final String filename;
   /** Root document. */
-  Node doc;
+  private final Node doc;
+  /** Element counter. */
+  private int nodes;
 
   /**
    * Constructor.
    * @param d document instance
+   * @param fn filename
    */
-  public DOCWrapper(final Document d) {
+  public DOCWrapper(final Document d, final String fn) {
     super(IO.DUMMY);
     doc = d;
+    filename = fn;
   }
 
   @Override
   public void parse(final Builder builder) throws IOException {
-    builder.startDoc(token(io.name()));
+    builder.startDoc(token(filename));
 
     final Stack<NodeIterator> stack = new Stack<NodeIterator>();
     stack.push(new NodeIterator(doc));
@@ -95,7 +97,7 @@ public final class DOCWrapper extends Parser {
 
   @Override
   public String det() {
-    return BaseX.info(NODESPARSED, io.name(), nodes);
+    return BaseX.info(NODESPARSED, filename, nodes);
   }
 
   @Override

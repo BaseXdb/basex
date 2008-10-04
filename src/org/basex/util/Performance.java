@@ -106,12 +106,7 @@ public final class Performance {
    * @param ms time in milliseconds to wait
    */
   public static void sleep(final int ms) {
-    try {
-      Thread.sleep(ms);
-    } catch(final InterruptedException ex) {
-      // should never occur..
-      ex.printStackTrace();
-    }
+    try { Thread.sleep(ms); } catch(final InterruptedException ex) { }
   }
 
   /**

@@ -1,6 +1,8 @@
 package org.basex.query.fs;
 
 import java.io.IOException;
+
+import org.basex.BaseX;
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.io.PrintOutput;
@@ -115,7 +117,7 @@ public abstract class FSCmd {
       final String cmd = getClass().getSimpleName();
       return FSText.class.getField("FS" + cmd).get(null).toString();
     } catch(final Exception ex) {
-      ex.printStackTrace();
+      BaseX.debug(ex);
       return "";
     }
   }
