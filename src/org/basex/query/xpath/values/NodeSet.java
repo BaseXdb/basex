@@ -1,8 +1,10 @@
 package org.basex.query.xpath.values;
 
+import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.query.xpath.XPContext;
+import org.basex.util.Array;
 import org.basex.util.Levenshtein;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -22,21 +24,16 @@ public final class NodeSet extends Item {
   public int currSize;
   /** Node array. */
   public int[] nodes;
-  /** FTIdPos array. */
-  public int[][] ftidpos;
-  /** Pointer for FTQueries - each idpos has a pointer at 
-   * its search string position in the xpath query. */
-  public int[] ftpointer;
   /** Data reference.. */
   public Data data;
   /** Number of stored values.. */
   public int size;
 
-  /**
-   * Standard constructor.
-   *
-   */
-  public NodeSet() { };
+  /* FTIdPos array.
+  public int[][] ftidpos;
+  /* Pointer for FTQueries - each idpos has a pointer at 
+   * its search string position in the xpath query.
+  public int[] ftpointer;*/
   
   /**
    * Constructor, creating a new node set from the specified node ids.
@@ -47,17 +44,14 @@ public final class NodeSet extends Item {
     data = ctx.local.data;
     nodes = ids;
     size = ids.length;
-    ftidpos = new int[0][0];
-    ftpointer = new int[0];
   }
 
-  /**
+  /*
    * Constructor, creating a new node set from the specified node ids.
    * @param ids node ids
    * @param ctx query context
    * @param ftIds ids and pos values for fulltext queries
    * @param ftPointer Pointer for ftIds
-   */
   public NodeSet(final int[] ids, final XPContext ctx, 
       final int[][] ftIds, final int[] ftPointer) {
     data = ctx.local.data;
@@ -66,6 +60,7 @@ public final class NodeSet extends Item {
     ftidpos = ftIds;
     ftpointer = ftPointer;
   }
+   */
   
   /**
    * Constructor, creating an empty node set.
@@ -80,7 +75,7 @@ public final class NodeSet extends Item {
    * @param d data reference
    */
   public NodeSet(final Data d) {
-    this(new int[0], d);
+    this(Array.NOINTS, d);
   }
 
   /**
@@ -107,6 +102,23 @@ public final class NodeSet extends Item {
   @Override
   public int size() {
     return size;
+  }
+  
+  @Override
+  public void serialize(final Serializer ser) throws IOException {
+    ser.open(size);
+    for(int c = 0; c < size; c++) {
+      if(ser.finished()) break;
+      ser.openResult();
+      ser.xml(data, nodes[c]);
+      ser.closeResult();
+    }
+    ser.close(size);
+  }
+
+  @Override
+  public void serialize(final Serializer ser, final int n) throws IOException {
+    ser.xml(data, nodes[n]);
   }
 
   @Override
@@ -212,7 +224,7 @@ public final class NodeSet extends Item {
 
   @Override
   public String toString() {
-    return "NodeSet [" + size + " Nodes]";
+    return name() + "[" + size + " Nodes]";
   }
 
   @Override

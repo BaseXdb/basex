@@ -107,11 +107,11 @@ public final class Nodes implements Result {
    * 
    * @param ftprepos pre values and position values
    * @param ftpointer pointer for pre values
-   */
   public void setFTData(final int[][] ftprepos, final int[] ftpointer) {
     ftpos = ftprepos;
     ftpoin = ftpointer;
   }
+   */
   
   /**
    * The specified pre value is added to or removed from the context set.
@@ -164,6 +164,11 @@ public final class Nodes implements Result {
       ser.closeResult();
     }
     ser.close(size);
+  }
+
+  /** {@inheritDoc} */
+  public void serialize(final Serializer ser, final int n) throws IOException {
+    ser.xml(data, pre[n]);
   }
 
   @Override

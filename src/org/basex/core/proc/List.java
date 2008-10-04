@@ -1,10 +1,13 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
+import static org.basex.data.DataText.*;
+
 import java.io.IOException;
 import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.data.MetaData;
+import org.basex.io.DataInput;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.util.StringList;
@@ -34,8 +37,10 @@ public final class List extends Process {
     for(final String name : list) {
       tb.add(name, ml);
       try {
+        final DataInput in = new DataInput(name, DATAINFO);
         final MetaData md = new MetaData(name);
-        md.read();
+        md.read(in);
+        in.close();
         tb.add(md.file);
         c++;
       } catch(final IOException ex) {

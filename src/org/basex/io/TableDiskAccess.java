@@ -14,9 +14,11 @@ import org.basex.util.Array;
  */
 public final class TableDiskAccess extends TableAccess {
   /** Max entries per block. */
-  private static final int ENTRIES = (1 << IO.BLOCKPOWER) >>> IO.NODEPOWER;
+  private static final int ENTRIES = IO.BLOCKSIZE >>> IO.NODEPOWER;
   /** Entries per new block. */
   private static final int NEWENTRIES = (int) (IO.BLOCKFILL * ENTRIES);
+  /** The current block buffer. */
+  private final byte[] buffer = new byte[IO.BLOCKSIZE];
 
   /** File storing all blocks. */
   private final RandomAccessFile file;
@@ -24,11 +26,6 @@ public final class TableDiskAccess extends TableAccess {
   private final String db;
   /** Filename. */
   private final String fn;
-
-  /** The current block buffer. */
-  private final byte[] buffer;
-  /** Number of the current block. */
-  private int block = -1;
 
   /** Index array storing the FirstPre values. this one is sorted ascending. */
   private int[] firstPres;
@@ -39,6 +36,8 @@ public final class TableDiskAccess extends TableAccess {
   private int firstPre = -1;
   /** FirstPre of the next block. */
   private int nextPre = -1;
+  /** Number of the current block. */
+  private int block = -1;
 
   /** Number of entries in the index (used blocks). */
   private int indexSize;
@@ -64,31 +63,17 @@ public final class TableDiskAccess extends TableAccess {
     db = nm;
     fn = f;
 
-    // READ INFO FILE
-    final DataInput info = new DataInput(nm, f + 'i');
-    nrBlocks = info.readInt();
-    indexSize = info.readInt();
-    count = info.readInt();
-    info.close();
-
-    // INITIALIZE CURRENT BLOCK
-    buffer = new byte[1 << IO.BLOCKPOWER];
-
-    // READ INDEX
-    firstPres = new int[indexSize];
-    blocks = new int[indexSize];
-
-    final DataInput in = new DataInput(nm, f + 'x');
-    for(int i = 0; i < indexSize; i++) {
-      firstPres[i] = in.readInt();
-      blocks[i] = in.readInt();
-    }
+    // READ INFO FILE AND INDEX
+    final DataInput in = new DataInput(nm, f + 'i');
+    nrBlocks = in.readNum();
+    indexSize = in.readNum();
+    count = in.readNum();
+    firstPres = in.readNums();
+    blocks = in.readNums();
     in.close();
 
     // INITIALIZE FILE
     file = new RandomAccessFile(IO.dbfile(nm, f), "rw");
-
-    // READ FIRST BLOCK
     readBlock(0, 0, indexSize > 1 ? firstPres[1] : count);
   }
 
@@ -135,7 +120,7 @@ public final class TableDiskAccess extends TableAccess {
     try {
       final int b = blocks[ind];
       writeBlock();
-      file.seek((long) b << IO.BLOCKPOWER);
+      file.seek((long) b * IO.BLOCKSIZE);
       file.read(buffer);
       block = b;
       index = ind;
@@ -151,11 +136,10 @@ public final class TableDiskAccess extends TableAccess {
    * @throws IOException in case of problems
    */
   private synchronized void writeBlock() throws IOException {
-    if(dirty) {
-      file.seek((long) block << IO.BLOCKPOWER);
-      file.write(buffer);
-      dirty = false;
-    }
+    if(!dirty) return;
+    file.seek((long) block * IO.BLOCKSIZE);
+    file.write(buffer);
+    dirty = false;
   }
 
   /**
@@ -169,20 +153,16 @@ public final class TableDiskAccess extends TableAccess {
   @Override
   public synchronized void flush() throws IOException {
     writeBlock();
-    if(indexdirty) {
-      DataOutput out = new DataOutput(db, fn + 'x');
-      for(int i = 0; i < indexSize; i++) {
-        out.writeInt(firstPres[i]);
-        out.writeInt(blocks[i]);
-      }
-      out.close();
-      out =  new DataOutput(db, fn + 'i');
-      out.writeInt(nrBlocks);
-      out.writeInt(indexSize);
-      out.writeInt(count);
-      out.close();
-      indexdirty = false;
-    }
+    if(!indexdirty) return;
+
+    final DataOutput out = new DataOutput(db, fn + 'i');
+    out.writeNum(nrBlocks);
+    out.writeNum(indexSize);
+    out.writeNum(count);
+    out.writeNums(firstPres);
+    out.writeNums(blocks);
+    out.close();
+    indexdirty = false;
   }
 
   @Override

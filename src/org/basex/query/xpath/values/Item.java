@@ -129,11 +129,16 @@ public abstract class Item extends Expr implements Result {
   }
   
   /** {@inheritDoc} */
-  public final void serialize(final Serializer ser) throws IOException {
+  public void serialize(final Serializer ser) throws IOException {
     ser.open(1);
     ser.openResult();
     ser.item(str());
     ser.closeResult();
     ser.close(1);
+  }
+  
+  /** {@inheritDoc} */
+  public void serialize(final Serializer ser, final int n) throws IOException {
+    ser.item(str());
   }
 }

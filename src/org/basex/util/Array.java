@@ -113,6 +113,19 @@ public final class Array {
    * Resizes an array and adds an entry at the end.
    * @param ar array to be resized
    * @param e entry to be added
+   * @return finished array
+   */
+  public static int[] add(final int[] ar, final int e) {
+    final int s = ar.length;
+    final int[] b = resize(ar, s, s + 1);
+    b[s] = e;
+    return b;
+  }
+
+  /**
+   * Resizes an array and adds an entry at the end.
+   * @param ar array to be resized
+   * @param e entry to be added
    * @param <T> array type
    * @return array
    */

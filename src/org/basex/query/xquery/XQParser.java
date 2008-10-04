@@ -626,7 +626,7 @@ public final class XQParser extends QueryParser {
     final SeqType type = consumeWS(AS) ? sequenceType() : null;
     final Func func = new Func(new Var(name, type), args, true);
 
-    ctx.fun.add(ctx, func);
+    ctx.fun.add(func);
     if(!consumeWS(EXTERNAL)) func.expr = enclosed(NOFUNBODY);
     ctx.vars.reset(s);
   }
@@ -1460,7 +1460,7 @@ public final class XQParser extends QueryParser {
         ctx.ns.uri(name);
         name.uri = name.ns() ? ctx.ns.uri(name.pre()) : ctx.nsFunc;
         final Expr[] args = exprs;
-        final Expr func = ctx.fun.get(ctx, name, args);
+        final Expr func = ctx.fun.get(name, args);
         if(func != null) {
           alter = null;
           return func;
@@ -1569,9 +1569,10 @@ public final class XQParser extends QueryParser {
       if(!consumeWSS()) break;
     }
 
-    // ...parse function arguments
-    if(taguri == null) ctx.ns.uri(open);
-    else open.uri = taguri;
+    // ...add namespace
+    ctx.ns.uri(open);
+    if(open.uri == Uri.EMPTY && taguri != null)
+      open.uri = taguri == Uri.EMPTY ? null : taguri;
 
     if(consume('/')) {
       check('>');

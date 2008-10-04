@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
-import org.basex.io.IO;
 import org.basex.util.Array;
 import org.basex.util.StringList;
 import org.basex.util.Token;
@@ -31,16 +30,10 @@ public final class Skeleton {
 
   /**
    * Constructor, specifying an input file.
-   * @param db name of the database
-   * @throws IOException I/O exception
+   * @param in input stream
    */
-  public Skeleton(final String db) throws IOException {
-    // ignore missing namespace input
-    if(!IO.dbfile(db, DATASTR).exists()) return;
-
-    final DataInput in = new DataInput(db, DATASTR);
-    if(in.length() != 0) root = new Node(in);
-    in.close();
+  public Skeleton(final DataInput in) {
+    if(in.readBool()) root = new Node(in);
   }
 
   /**
@@ -68,13 +61,12 @@ public final class Skeleton {
 
   /**
    * Finishes the structure.
-   * @param db name of the database
+   * @param out output stream
    * @throws IOException I/O exception
    */
-  public synchronized void finish(final String db) throws IOException {
-    final DataOutput out = new DataOutput(db, DATASTR);
+  public synchronized void finish(final DataOutput out) throws IOException {
+    out.writeBool(root != null);
     if(root != null) root.finish(out);
-    out.close();
   }
 
   /**
@@ -189,8 +181,7 @@ public final class Skeleton {
       name = (short) in.readNum();
       kind = in.readByte();
       count = in.readNum();
-      final int cl = in.readNum();
-      ch = new Node[cl];
+      ch = new Node[in.readNum()];
       for(int i = 0; i < ch.length; i++) ch[i] = new Node(in);
     }
 

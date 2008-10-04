@@ -2,6 +2,7 @@ package org.basex.build;
 
 import static org.basex.Text.*;
 import static org.basex.data.DataText.*;
+
 import java.io.IOException;
 import org.basex.core.proc.DropDB;
 import org.basex.data.Data;
@@ -51,7 +52,7 @@ public final class DiskBuilder extends Builder {
     IO.dbpath(db).mkdirs();
 
     // calculate output buffer sizes: (1 << BLOCKPOWER) < bs < (1 << 22)
-    int bs = 1 << IO.BLOCKPOWER;
+    int bs = IO.BLOCKSIZE;
     while(bs < meta.filesize && bs < (1 << 22)) bs <<= 1;
 
     tout = new DataOutput(new TableOutput(db, DATATBL));
@@ -66,15 +67,17 @@ public final class DiskBuilder extends Builder {
     // check if data ranges exceed database limits
     if(tags.size() > 0xFFFF) throw new IOException(LIMITTAGS);
     if(atts.size() > 0xFFFF) throw new IOException(LIMITATTS);
+    close();
     
     // close files
     final String db = meta.dbname;
-    tags.finish(db);
-    atts.finish(db);
-    ns.finish(db);
-    skel.finish(db);
-    meta.finish(size);
-    close();
+    final DataOutput out = new DataOutput(meta.dbname, DATAINFO);
+    meta.finish(out, size);
+    tags.finish(out);
+    atts.finish(out);
+    skel.finish(out);
+    ns.finish(out);
+    out.close();
     
     // write size attribute into main table
     final TableAccess ta = new TableDiskAccess(db, DATATBL);
@@ -163,10 +166,10 @@ public final class DiskBuilder extends Builder {
       v |= 0x8000000000L;
     } else if(txt) {
       v = txtlen;
-      txtlen += xout.writeToken(val);
+      txtlen += xout.writeBytes(val);
     } else {
       v = vallen;
-      vallen += vout.writeToken(val);
+      vallen += vout.writeBytes(val);
     }
     return v;
   }

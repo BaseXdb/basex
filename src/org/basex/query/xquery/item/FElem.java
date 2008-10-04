@@ -106,16 +106,14 @@ public final class FElem extends FNode {
     
     // add global namespaces
     if(level == 0) {
-      byte[] pre = name.pre();
-      final Uri uri = name.uri;
-
-      if(uri != Uri.EMPTY) {
-        final byte[] p = ctx.ns.prefix(uri);
+      final QNm ns = nsAnc();
+      if(ns != null) {
+        final byte[] p = ctx.ns.prefix(ns.uri);
         if(!Token.eq(p, XML)) {
-          pre = p.length == 0 ? XMLNS : Token.concat(XMLNSCOL, pre);
+          byte[] pre = p.length == 0 ? XMLNS : concat(XMLNSCOL, ns.pre());
           if(!nms.contains(pre)) {
             nms.add(pre);
-            vls.add(uri.str());
+            vls.add(ns.uri.str());
           }
         }
       } else if(ctx.nsElem != Uri.EMPTY) {
@@ -139,6 +137,19 @@ public final class FElem extends FNode {
       ser.closeElement(nm);
     }
   }
+  
+  /**
+   * Returns the next ancestor with a namespace definition. 
+   * @return ancestor
+   */
+  private QNm nsAnc() {
+    FElem nm = this;
+    while(nm.name.uri == Uri.EMPTY) {
+      if(!(nm.par instanceof FElem)) return null;
+      nm = (FElem) nm.par;
+    }
+    return nm.name.uri == null ? null : nm.name;
+  }
 
   @Override
   public FElem copy() {
@@ -160,7 +171,7 @@ public final class FElem extends FNode {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("<");
-    sb.append(Token.string(name.str()));
+    sb.append(string(name.str()));
     if(children.size != 0) sb.append("...");
     return sb.append(">").toString();
   }

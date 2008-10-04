@@ -10,10 +10,8 @@ import java.io.RandomAccessFile;
  * @author Christian Gruen
  */
 public final class RandomAccess {
-  /** Default buffer size - must be a power of two. */
-  private static final int BUFSIZE = 1 << IO.BLOCKPOWER;
   /** Buffer limit (buffer size - 1). */
-  private static final int BUFLIMIT = BUFSIZE - 1;
+  private static final int BUFLIMIT = IO.BLOCKSIZE - 1;
   /** Reference to the data input stream. */
   private final RandomAccessFile file;
   /** File length. */
@@ -66,8 +64,8 @@ public final class RandomAccess {
    * @throws IOException I/O exception
    */
   public int read() throws IOException {
-    if(off == BUFSIZE) {
-      pos += BUFSIZE;
+    if(off == IO.BLOCKSIZE) {
+      pos += IO.BLOCKSIZE;
       off = 0;
       file.read(buffer);
     }

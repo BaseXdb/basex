@@ -1,93 +1,120 @@
 package org.basex.data;
 
-import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import org.basex.BaseX;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
-import org.basex.io.IO;
 import org.basex.util.Array;
 import org.basex.util.Set;
-import org.basex.util.TokenBuilder;
 
 /**
- * This class stores namespaces during the creation of a database.
+ * This class organizes the namespaces of a database.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public final class Namespaces extends Set {
-  /** Prefixes. */
-  private byte[][] pref = new byte[CAP][];
-  /** Values. */
-  private int[] vals = new int[CAP];
-  /** Pre values. */
-  private int[] pre = new int[CAP];
-  /** Number of namespace entries. */
-  private int sz;
+  /** Root node. */
+  private Node root;
+  /** Current node. */
+  private Node tmp;
 
   /**
    * Default Constructor.
    */
-  public Namespaces() { }
+  public Namespaces() {
+    root = new Node();
+  }
 
   /**
    * Constructor, specifying an input file.
-   * @param db name of the database
-   * @throws IOException I/O exception
+   * @param in input stream
    */
-  public Namespaces(final String db) throws IOException {
-    // ignore missing namespace input
-    if(!IO.dbfile(db, DATANS).exists()) return;
-    
-    final DataInput in = new DataInput(db, DATANS);
+  public Namespaces(final DataInput in) {
     keys = in.readBytesArray();
     next = in.readNums();
     bucket = in.readNums();
-    pref = in.readBytesArray();
-    vals = in.readNums();
-    pre = in.readNums();
     size = in.readNum();
-    sz = in.readNum();
-    in.close();
+    root = new Node(in, null);
+  }
+
+  /**
+   * Writes the namespaces to disk.
+   * @param out output stream
+   * @throws IOException I/O exception
+   */
+  public synchronized void finish(final DataOutput out) throws IOException {
+    out.writeBytesArray(keys);
+    out.writeNums(next);
+    out.writeNums(bucket);
+    out.writeNum(size);
+    root.finish(out);
+  }
+
+  /**
+   * Opens a node.
+   * @param p current pre value
+   */
+  public void start(final int p) {
+    if(tmp == null) return;
+    tmp.par = root;
+    tmp.pre = p;
+    root.add(tmp);
+    root = tmp;
+    tmp = null;
+  }
+
+  /**
+   * Closes a node.
+   * @param p current pre value
+   */
+  public void end(final int p) {
+    while(root.pre > p) root = root.par;
   }
 
   /**
    * Adds the specified namespace.
    * @param p namespace prefix
    * @param u namespace uri
-   * @param s current document size
    */
-  public void add(final byte[] p, final byte[] u, final int s) {
-    final int i = add(u);
-    check();
-    pref[sz] = p;
-    vals[sz] = i < 0 ? -i : i;
-    pre[sz++] = s;
+  public void add(final byte[] p, final byte[] u) {
+    if(tmp == null) tmp = new Node();
+    tmp.add(Math.abs(add(p)), Math.abs(add(u)));
   }
 
   /**
    * Returns the namespace for the specified qname and pre value.
    * @param n tag/attribute name
    * @param p pre value
-   * @return namespace reference, -1 if no prefix was found or 0 if no
-   * namespace was found
+   * @return namespace reference or 0 if no namespace was found
    */
   public int get(final byte[] n, final int p) {
-    if(sz == 0) return 0;
+    final Node node = find(root, p);
+    final byte[] pre = substring(n, 0, Math.max(0, indexOf(n, ':')));
+    return ns(pre, node);
+  }
+
+  /**
+   * Recursively finds the namespaces for the specified node.
+   * @param n node
+   * @param p pre value
+   * @return node
+   */
+  private Node find(final Node n, final int p) {
+    if(n.ch.length == 0) return n;
     
-    // too slow.. binary search!..
-    int i = sz;
-    while(--i > 0 && p < pre[i]);
-    
-    i = Math.min(sz - 1, i + 1);
-    final int s = indexOf(n, ':');
-    if(s == -1) {
-      for(; i >= 0; i--) if(pref[i].length == 0) return vals[i];
-      return -1;
+    final Node[] ch = n.ch;
+    int l = 0, m = 0, h = ch.length - 1;
+    while(l <= h) {
+      m = (l + h) >>> 1;
+      int v = ch[m].pre;
+      if(v < p) l = m + 1;
+      else if(v > p) h = m - 1;
+      else break;
     }
-    return ns(n, s, i);
+    while(p >= ch[m].pre && ++m < ch.length);
+    
+    return find(ch[Math.max(0, m - 1)], p);
   }
 
   /**
@@ -97,62 +124,102 @@ public final class Namespaces extends Set {
    */
   public int get(final byte[] n) {
     final int s = indexOf(n, ':');
-    if(s <= 0) return 0;
-    return ns(n, s, sz - 1);
+    return s <= 0 ? 0 : ns(substring(n, 0, s), root);
   }
 
   /**
    * Returns the namespace for the specified qname.
-   * @param n prefix
-   * @param s prefix index
-   * @param p index offset to start with
+   * @param p prefix
+   * @param node node to start with
    * @return namespace
    */
-  private int ns(final byte[] n, final int s, final int p) {
-    final byte[] pr = substring(n, 0, s);
-    if(eq(XML, pr)) return 0;
-    
-    for(int i = p; i >= 0; i--) if(eq(pref[i], pr)) return vals[i];
-    BaseX.notexpected();
+  private int ns(final byte[] p, final Node node) {
+    if(eq(XML, p)) return 0;
+
+    Node nd = node;
+    final int k = id(p);
+    while(nd != null) {
+      final int i = nd.get(k);
+      if(i != 0) return i;
+      nd = nd.par;
+    }
     return 0;
   }
 
-  /**
-   * Checks the array sizes.
-   */
-  private void check() {
-    if(sz == pref.length) {
-      pref = Array.extend(pref);
-      vals = Array.extend(vals);
-      pre = Array.extend(pre);
-    }
-  }
+  /** Document node. */
+  static final class Node {
+    /** Children. */
+    Node[] ch;
+    /** Keys. */
+    int[] key;
+    /** Values. */
+    int[] val;
+    /** Parent node. */
+    Node par;
+    /** Pre value. */
+    int pre;
 
-  /**
-   * Finishes the structure.
-   * @param db name of the database
-   * @throws IOException I/O exception
-   */
-  public synchronized void finish(final String db) throws IOException {
-    final DataOutput out = new DataOutput(db, DATANS);
-    out.writeBytesArray(keys);
-    out.writeNums(next);
-    out.writeNums(bucket);
-    out.writeBytesArray(pref);
-    out.writeNums(vals);
-    out.writeNums(pre);
-    out.writeNum(size);
-    out.writeNum(sz);
-    out.close();
-  }
-  
-  @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder("Namespaces[");
-    for(int i = 0; i < sz; i++) {
-      
-      tb.add('\n');
+    /** Default constructor. */
+    Node() {
+      key = Array.NOINTS;
+      val = Array.NOINTS;
+      ch = new Node[0];
     }
-    return tb.add("]").toString();
+
+    /**
+     * Constructor, specifying an input stream.
+     * @param in input stream
+     * @param p parent reference
+     */
+    Node(final DataInput in, final Node p) {
+      par = p;
+      pre = in.readNum();
+      key = in.readNums();
+      val = in.readNums();
+      final int cl = in.readNum();
+      ch = new Node[cl];
+      for(int c = 0; c < cl; c++) ch[c] = new Node(in, this);
+    }
+
+    /**
+     * Finishes the tree structure.
+     * @param out output stream
+     * @throws IOException I/O exception
+     */
+    void finish(final DataOutput out) throws IOException {
+      out.writeNum(pre);
+      out.writeNums(key);
+      out.writeNums(val);
+      out.writeNum(ch.length);
+      for(final Node c : ch) c.finish(out);
+    }
+
+    /**
+     * Adds the specified key and value.
+     * @param k key
+     * @param v value
+     */
+    void add(final int k, final int v) {
+      key = Array.add(key, k);
+      val = Array.add(val, v);
+    }
+
+    /**
+     * Adds the specified child.
+     * @param c child
+     */
+    void add(final Node c) {
+      ch = Array.add(ch, c);
+    }
+
+    /**
+     * Returns the value reference for the specified key.
+     * @param k key to be found
+     * @return v value or 0
+     */
+    int get(final int k) {
+      for(int i = 0; i < key.length; i++) if(key[i] == k) return val[i];
+      return 0;
+    }
   }
 }

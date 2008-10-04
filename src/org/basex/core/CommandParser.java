@@ -203,7 +203,7 @@ public final class CommandParser extends QueryParser {
         break;
       case SET:
         final String opt = name(cmd).toUpperCase();
-        String val = name(null);
+        String val = path(null, true);
         try {
           final Object o = Prop.class.getField(opt.toLowerCase()).get(null);
           if(val != null) {

@@ -57,7 +57,7 @@ public final class DropIndex extends Process {
   private boolean drop(final IndexToken.TYPE index, final String pat) {
     try {
       final Data data = context.data();
-      data.meta.finish(data.size);
+      data.flush();
       data.closeIndex(index);
       return IO.dbdelete(data.meta.dbname, pat + "." + IO.BASEXSUFFIX) ?
           info(DBDROP, perf.getTimer()) : error(DBDROPERR);

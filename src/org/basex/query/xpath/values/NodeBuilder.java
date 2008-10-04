@@ -12,10 +12,10 @@ import org.basex.util.Array;
 public final class NodeBuilder {
   /** Node array. */
   public int[] nodes;
-  /** FTPre and Position values.**/
+  /* FTPre and Position values.
   public int[][] ftpre;
-  /** FTPointer values. **/
-  public int[] ftpoin;
+  /* FTPointer values.
+  public int[] ftpoin; */
   /** Size of node array. */
   public int size;
   /** Sorting flag. */
@@ -31,9 +31,20 @@ public final class NodeBuilder {
   /**
    * Constructor, creating a new node set from the specified node ids.
    * @param ids node ids
+   */
+  public NodeBuilder(final int[] ids) {
+    if(ids.length == 0) {
+      nodes = new int[1];
+    } else {
+      nodes = ids;
+    }
+  }
+
+  /*
+   * Constructor, creating a new node set from the specified node ids.
+   * @param ids node ids
    * @param ftprepos fulltext pre pos values
    * @param ftpointer fulltext pointer values
-   */
   public NodeBuilder(final int[] ids, final int[][] ftprepos, 
       final int[] ftpointer) {
     if(ids.length == 0) {
@@ -45,6 +56,7 @@ public final class NodeBuilder {
       ftpoin = ftpointer;
     }
   }
+   */
   
   /**
    * Adds a pre value to the node set.

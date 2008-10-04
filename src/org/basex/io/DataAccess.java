@@ -12,10 +12,8 @@ import org.basex.util.Num;
  * @author Christian Gruen
  */
 public class DataAccess {
-  /** Default buffer size - must be a power of two. */
-  private static final int BUFSIZE = 1 << IO.BLOCKPOWER;
   /** Buffer limit (buffer size - 1). */
-  private static final int BUFLIMIT = BUFSIZE - 1;
+  private static final int BUFLIMIT = IO.BLOCKSIZE - 1;
   /** Number of buffers. */
   private static final int BUFFERS = 3;
 
@@ -25,7 +23,7 @@ public class DataAccess {
   private long len;
 
   /** Buffers. */
-  private final byte[][] buffer = new byte[BUFFERS][BUFSIZE];
+  private final byte[][] buffer = new byte[BUFFERS][IO.BLOCKSIZE];
   /** Positions. */
   private final long[] pos = new long[BUFFERS];
   /** Positions. */
@@ -118,17 +116,17 @@ public class DataAccess {
     int l = readNum();
     
     final byte[] b = new byte[l];
-    int ll = BUFSIZE - off;
+    int ll = IO.BLOCKSIZE - off;
     if(ll >= l) {
       System.arraycopy(buffer[c], off, b, 0, l);
     } else {
       System.arraycopy(buffer[c], off, b, 0, ll);
       l -= ll;
-      while(l > BUFSIZE) {
+      while(l > IO.BLOCKSIZE) {
         nextBlock();
-        System.arraycopy(buffer[c], 0, b, ll, BUFSIZE);
-        l -= BUFSIZE;
-        ll += BUFSIZE;
+        System.arraycopy(buffer[c], 0, b, ll, IO.BLOCKSIZE);
+        l -= IO.BLOCKSIZE;
+        ll += IO.BLOCKSIZE;
       }
       nextBlock();
       System.arraycopy(buffer[c], 0, b, ll, l);
@@ -184,7 +182,7 @@ public class DataAccess {
    * Reads the next block from disk.
    */
   private synchronized void nextBlock() {
-    cursor(pos[c] + BUFSIZE);
+    cursor(pos[c] + IO.BLOCKSIZE);
   }
   
   /**
@@ -236,7 +234,7 @@ public class DataAccess {
    * @return next byte
    */
   public final synchronized int read() {
-    if(off == BUFSIZE) {
+    if(off == IO.BLOCKSIZE) {
       nextBlock();
       off = 0;
     }
@@ -292,7 +290,7 @@ public class DataAccess {
    * @param b byte to be written
    */
   private synchronized void write(final int b) {
-    if(off == BUFSIZE) {
+    if(off == IO.BLOCKSIZE) {
       nextBlock();
       off = 0;
     }

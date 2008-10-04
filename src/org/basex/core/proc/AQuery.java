@@ -69,7 +69,7 @@ abstract class AQuery extends Process {
       if(result instanceof NodeSet) {
         final NodeSet ns = (NodeSet) result;
         final Nodes nodes = new Nodes(ns.nodes, ns.data);
-        nodes.setFTData(ns.ftidpos, ns.ftpointer);
+        //nodes.setFTData(ns.ftidpos, ns.ftpointer);
         result = nodes;
       }
       // dump some query info

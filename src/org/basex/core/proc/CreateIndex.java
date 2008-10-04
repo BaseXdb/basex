@@ -47,7 +47,7 @@ public final class CreateIndex extends ACreate {
           index = IndexToken.TYPE.FTX;
           break;
       }
-      data.meta.finish(data.size);
+      data.flush();
       buildIndex(index, data);
       return info(DBINDEXED, perf.getTimer());
     } catch(final IOException ex) {

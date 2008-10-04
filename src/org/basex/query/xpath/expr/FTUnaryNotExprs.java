@@ -161,7 +161,7 @@ public final class FTUnaryNotExprs extends FTArrayExpr {
    public static int[] determineNot(final int[] resultWordA,
       final int[] resultWordB) {
     if((resultWordA == null && resultWordB == null) || resultWordA == null) {
-      return new int[0];
+      return Array.NOINTS;
     }
 
     // all resultWordA are hits
@@ -207,7 +207,7 @@ public final class FTUnaryNotExprs extends FTArrayExpr {
     int[] result;
     // all done for resultWordA
     if(i == resultWordA.length) {
-      if(count == 0) return new int[0];
+      if(count == 0) return Array.NOINTS;
 
       // copy only filled cells
       result = new int[count];

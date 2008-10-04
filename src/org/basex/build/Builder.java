@@ -55,8 +55,8 @@ public abstract class Builder extends Progress {
    * Constructor.
    */
   protected Builder() {
-    tags = new Names(true);
-    atts = new Names(false);
+    tags = new Names();
+    atts = new Names();
   }
 
   // abstract methods
@@ -180,7 +180,7 @@ public abstract class Builder extends Progress {
    * @param val attribute value
    */
   public final void startNS(final byte[] name, final byte[] val) {
-    ns.add(name, val, size);
+    ns.add(name, val);
   }
 
   /**
@@ -192,6 +192,7 @@ public abstract class Builder extends Progress {
   public final void startElem(final byte[] tag, final byte[][] att)
       throws IOException {
 
+    ns.start(size);
     addElem(tag, att, true);
   }
 
@@ -204,7 +205,9 @@ public abstract class Builder extends Progress {
   public final void emptyElem(final byte[] tag, final byte[][] att)
       throws IOException {
 
+    ns.start(size);
     addElem(tag, att, false);
+    ns.end(parStack[level]);
   }
   
   /**
@@ -219,6 +222,7 @@ public abstract class Builder extends Progress {
       error(CLOSINGTAG, parser.det(), t, tags.key(tagStack[level]));
 
     addSize(parStack[level]);
+    ns.end(parStack[level]);
   }
 
   /**
@@ -228,7 +232,7 @@ public abstract class Builder extends Progress {
    * @param open opening tag
    * @throws IOException in case of parsing or writing problems 
    */
-  protected final void addElem(final byte[] name, final byte[][] att,
+  private void addElem(final byte[] name, final byte[][] att,
       final boolean open) throws IOException {
     
     // convert tag to utf8

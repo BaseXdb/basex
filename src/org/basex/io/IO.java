@@ -34,8 +34,8 @@ public abstract class IO {
   /** GZIP Suffix. */
   public static final String GZSUFFIX = ".gz";
 
-  /** BlockSize Power. */
-  public static final int BLOCKPOWER = 12;
+  /** Block size. */
+  public static final int BLOCKSIZE = 1 << 12;
   /** Table NodeSize Power. */
   public static final int NODEPOWER = 4;
   /** Fill Factor (greater than 0.0, maximum 1.0). */

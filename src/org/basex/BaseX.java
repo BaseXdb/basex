@@ -141,7 +141,8 @@ public final class BaseX extends BaseXClient {
    * @return dummy object
    */
   public static Object notimplemented(final Object... ext) {
-    throw new UnsupportedOperationException(info("%", ext));
+    throw new UnsupportedOperationException(ext.length == 0 ? "Not expected." :
+      info("Not expected (%).", ext));
   }
 
   /**
@@ -150,6 +151,7 @@ public final class BaseX extends BaseXClient {
    * @return dummy object
    */
   public static Object notexpected(final Object... ext) {
-    throw new RuntimeException(info("Not expected (%).", ext));
+    throw new RuntimeException(ext.length == 0 ? "Not expected." :
+      info("Not expected (%).", ext));
   }
 }

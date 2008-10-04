@@ -240,8 +240,8 @@ public abstract class Serializer {
    */
   public final int elem(final Data data, final int pr) throws IOException {
     // stacks
-    final int[] parent = new int[256];
-    final byte[][] token = new byte[256][];
+    final int[] parent = new int[data.meta.height];
+    final byte[][] token = new byte[data.meta.height][];
     // current output level
     int l = 0;
 

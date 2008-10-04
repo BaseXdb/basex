@@ -60,7 +60,7 @@ public final class Uri extends Str {
    * @return result of check
    */
   public boolean eq(final Uri uri) {
-    return val == uri.val || Token.eq(val, uri.val);
+    return uri != null && (val == uri.val || Token.eq(val, uri.val));
   }
 
   /**

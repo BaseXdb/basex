@@ -1,6 +1,8 @@
 package org.basex.gui.dialog;
 
 import static org.basex.Text.*;
+import static org.basex.data.DataText.*;
+
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.io.File;
@@ -22,6 +24,7 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXListChooser;
 import org.basex.gui.layout.BaseXText;
+import org.basex.io.DataInput;
 import org.basex.io.IO;
 import org.basex.util.StringList;
 import org.basex.util.Token;
@@ -160,8 +163,10 @@ public final class DialogOpen extends Dialog {
 
     try {
       ok = true;
+      final DataInput in = new DataInput(db, DATAINFO);
       final MetaData meta = new MetaData(db);
-      final int size = meta.read();
+      final int size = meta.read(in);
+      in.close();
       detail.setText(InfoDB.db(meta, size, false, true));
     } catch(final IOException ex) {
       detail.setText(Token.token(ex.getMessage()));

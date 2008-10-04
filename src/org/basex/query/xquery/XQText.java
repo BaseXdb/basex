@@ -390,7 +390,7 @@ public interface XQText {
   /** XPTY0019: Typing exception. */
   Object[] EVALNODES = { XPTY, 19, "Nodes needed for expression '%'." };
   /** XPTY0019: Typing exception. */
-  Object[] NODESPATH = { XPTY, 19, "Context node required for %; '%' found." };
+  Object[] NODESPATH = { XPTY, 19, "Context node required for %; % found." };
 
   /** XPDY0002: Parsing exception. */
   Object[] VAREMPTY = { XQDY, 2, "No value defined for \"%\"." };

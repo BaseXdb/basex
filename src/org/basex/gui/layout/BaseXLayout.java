@@ -272,11 +272,20 @@ public final class BaseXLayout {
    * @param g graphics reference
    */
   public static void antiAlias(final Graphics g) {
-    ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-        // JAVA 1.6 needed...
-        //GUIProp.fontalias ? RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB :
-        GUIProp.fontalias ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON :
-          RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+    Object hint = RenderingHints.VALUE_TEXT_ANTIALIAS_OFF;
+
+    if(GUIProp.fontalias) {
+      // Check out Java 1.6 rendering; if not available, use default rendering
+      try {
+        final Class<?> rh = RenderingHints.class;
+        //hint = rh.getField("VALUE_TEXT_ANTIALIAS_LCD_HRGB").get(null);
+        hint = rh.getField("VALUE_TEXT_ANTIALIAS_GASP").get(null);
+      } catch(final Exception e) {
+        hint = RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
+      }
+    }
+    final Graphics2D gg = (Graphics2D) g;
+    gg.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, hint);
   }
 
   /**

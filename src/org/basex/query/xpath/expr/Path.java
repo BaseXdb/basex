@@ -30,8 +30,6 @@ public final class Path extends DualExpr {
     final NodeSet local = ctx.local;
     ctx.local = (NodeSet) val;
     final NodeSet ns = (NodeSet) ctx.eval(expr2);
-    ns.ftidpos = ctx.local.ftidpos;
-    ns.ftpointer = ctx.local.ftpointer;
     ctx.local = local;
     return ns;
   }
@@ -58,6 +56,6 @@ public final class Path extends DualExpr {
 
   @Override
   public String toString() {
-    return "Path(" + expr1 + ", " + expr2 + ')';
+    return name() + "(" + expr1 + ", " + expr2 + ')';
   }
 }

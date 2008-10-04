@@ -56,8 +56,8 @@ public final class IndexMatch extends InternalExpr {
     }
 
     ctx.local = old;
-    return new NodeSet(result.finish(), ctx, ctx.local.ftidpos, 
-        ctx.local.ftpointer);
+    return new NodeSet(result.finish(), ctx);
+    //, ctx.local.ftidpos, ctx.local.ftpointer);
   }
 
   /**

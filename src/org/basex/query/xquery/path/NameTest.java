@@ -19,7 +19,7 @@ public final class NameTest extends Test {
   private byte[] ln;
   /** Prefix flag. */
   private boolean pre;
-  /** Wildcard flag. */
+  /** Namespace wildcard flag. */
   private boolean wild;
 
   /**
@@ -47,13 +47,16 @@ public final class NameTest extends Test {
   @Override
   public boolean e(final Nod tmp, final XQContext ctx) throws XQException {
     if(tmp.type != Type.ELM && tmp.type != Type.ATT) return false;
+    // wildcard - accepting all names
     if(name == null) return true;
 
+    // namespace wildcard
     if(wild) {
       final byte[] nm = tmp.nname();
       return eq(ln, substring(nm, indexOf(nm, ':') + 1));
     }
 
+    // namespace and name
     final QNm nm = tmp.qname(qname);
     if(!pre && !nm.ns()) return eq(nm.str(), ln);
     

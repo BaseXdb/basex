@@ -59,8 +59,7 @@ public final class TableBlockAccessTest {
     for(int i = 0; i < bytecount; i++) {
       storage[i] = (byte) tba.read1(i >> IO.NODEPOWER, i % (1 << IO.NODEPOWER));
     }
-    maxEntriesPerBlock =
-      (1 << IO.BLOCKPOWER) >>> IO.NODEPOWER;
+    maxEntriesPerBlock = IO.BLOCKSIZE >>> IO.NODEPOWER;
     blocks = (int) Math.ceil(size /
         Math.floor(maxEntriesPerBlock * IO.BLOCKFILL));
     nodesPerBlock = (int) (maxEntriesPerBlock * IO.BLOCKFILL);

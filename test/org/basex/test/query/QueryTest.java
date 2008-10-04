@@ -50,14 +50,15 @@ public final class QueryTest {
   private QueryTest() {
     Prop.textindex = true;
     Prop.attrindex = true;
-    Prop.ftindex = true;
     Prop.ftfuzzy = true;
     Prop.chop = true;
 
+    Prop.ftindex = true;
+    test(false);
+    Prop.ftindex = false;
     test(false);
     test(true);
   }
-
 
   /**
    * Tests the specified query implementation.
@@ -65,7 +66,8 @@ public final class QueryTest {
    * @return true if everything went alright
    */
   private boolean test(final boolean xquery) {
-    System.out.println("Testing " + (xquery ? "XQuery" : "XPath"));
+    System.out.println("Testing " + (xquery ? "XQuery" : "XPath") +
+        " (Index " + (Prop.ftindex ? "ON" : "OFF") + ")");
     boolean ok = true;
     ok &= test(xquery, new SimpleTest());
     ok &= test(xquery, new XPathMarkFTTest());

@@ -12,44 +12,37 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class NSIndex {
+public final class GlobalNS {
   /** Default namespaces. */
-  private QNm[] names = {
+  private static final QNm[] NAMES = {
       new QNm(LOCAL, Uri.LOCAL), new QNm(XS, Uri.XS), new QNm(XSI, Uri.XSI), 
       new QNm(FN, Uri.FN), new QNm(XMLNS, Uri.XMLNS), new QNm(XML, Uri.XML),
       new QNm(BASEX, Uri.BX)
   };
-  /** Singleton instance. */
-  private static NSIndex instance = new NSIndex();
 
-  /**
-   * Gets the function instance.
-   * @return instance
-   */
-  public static NSIndex get() {
-    return instance;
-  }
+  /** Private constructor. */
+  private GlobalNS() { }
 
   /**
    * Finds the specified namespace uri.
    * @param pre prefix of the namespace
    * @return uri
    */
-  public Uri uri(final byte[] pre) {
-    for(int s = names.length - 1; s >= 0; s--) {
-      if(eq(pre, names[s].str())) return names[s].uri;
+  public static Uri uri(final byte[] pre) {
+    for(int s = NAMES.length - 1; s >= 0; s--) {
+      if(eq(NAMES[s].str(), pre)) return NAMES[s].uri;
     }
     return Uri.EMPTY;
   }
 
   /**
-   * Checks if the specified uri is a default uri.
+   * Checks if the specified uri is a standard uri.
    * @param uri uri to be checked
    * @return result of check
    */
-  public boolean standard(final Uri uri) {
-    for(int s = names.length - 1; s >= 1; s--) {
-      if(uri.eq(names[s].uri)) return true;
+  static boolean standard(final Uri uri) {
+    for(int s = NAMES.length - 1; s > 0; s--) {
+      if(NAMES[s].uri.eq(uri)) return true;
     }
     return false;
   }
@@ -59,9 +52,9 @@ public final class NSIndex {
    * @param uri URI
    * @return prefix
    */
-  public byte[] prefix(final Uri uri) {
-    for(int s = names.length - 1; s >= 0; s--) {
-      if(uri.eq(names[s].uri)) return names[s].str();
+  static byte[] prefix(final Uri uri) {
+    for(int s = NAMES.length - 1; s >= 0; s--) {
+      if(NAMES[s].uri.eq(uri)) return NAMES[s].str();
     }
     return Token.EMPTY;
   }

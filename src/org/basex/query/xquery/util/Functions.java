@@ -46,15 +46,12 @@ public final class Functions extends ExprInfo {
 
   /**
    * Returns the specified function.
-   * @param ctx query context
    * @param name name of the function
    * @param args optional arguments
    * @return function instance
    * @throws XQException evaluation exception
    */
-  public Expr get(final XQContext ctx, final QNm name, final Expr[] args)
-      throws XQException {
-
+  public Expr get(final QNm name, final Expr[] args) throws XQException {
     // find function
     final Uri uri = name.uri;
     final byte[] ln = name.ln();
@@ -112,7 +109,7 @@ public final class Functions extends ExprInfo {
 
     if(Type.find(name, true) == null) {
       final Func f = new Func(new Var(name), new Var[args.length], false);
-      return new FunCall(add(ctx, f), args);
+      return new FunCall(add(f), args);
     }
     return null;
   }
@@ -133,18 +130,17 @@ public final class Functions extends ExprInfo {
 
   /**
    * Adds a local function.
-   * @param ctx query context
    * @param fun function instance
    * @return function id
    * @throws XQException evaluation exception
    */
-  public int add(final XQContext ctx, final Func fun) throws XQException {
+  public int add(final Func fun) throws XQException {
     final QNm name = fun.var.name;
 
     final Uri uri = name.uri;
     if(uri == Uri.EMPTY) Err.or(FUNNONS, name.str());
 
-    if(ctx.ns.standard(uri)) {
+    if(GlobalNS.standard(uri)) {
       if(fun.decl) Err.or(NAMERES, name.str());
       else funError(fun.var.name);
     }

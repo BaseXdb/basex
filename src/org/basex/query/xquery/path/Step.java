@@ -67,7 +67,7 @@ public class Step extends Arr {
     NodIter nb = new NodIter();
     Item it;
     while((it = iter.next()) != null) {
-      if(!it.node()) Err.or(NODESPATH, this, it);
+      if(!it.node()) Err.or(NODESPATH, this, it.type);
       final NodeIter ir = axis.init((Nod) it);
       Nod nod;
       while((nod = ir.next()) != null) {

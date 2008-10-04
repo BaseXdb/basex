@@ -10,7 +10,7 @@ import org.basex.io.IO;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.iter.NodeMore;
-import org.basex.query.xquery.util.Namespaces;
+import org.basex.query.xquery.util.GlobalNS;
 import org.basex.util.TokenList;
 
 /**
@@ -76,23 +76,12 @@ public final class DNode extends Nod {
 
     switch(type) {
       case DOC:
-      case ELM:
-        serElem(ser, pre, level);
-        break;
-      case ATT:
-        ser.attribute(data.attName(pre), data.attValue(pre));
-        break;
-      case COM:
-        ser.comment(str());
-        break;
-      case PI:
-        ser.pi(str());
-        break;
-      case TXT:
-        ser.text(str());
-        break;
-      default:
-        BaseX.notexpected();
+      case ELM: serElem(ser, pre, level); break;
+      case ATT: ser.attribute(data.attName(pre), data.attValue(pre)); break;
+      case COM: ser.comment(str()); break;
+      case PI : ser.pi(str()); break;
+      case TXT: ser.text(str()); break;
+      default: BaseX.notexpected();
     }
   }
 
@@ -132,37 +121,17 @@ public final class DNode extends Nod {
 
   @Override
   public QNm qname() {
-    final byte[] nm = nname();
-    final int i = data.ns.get(nm, pre);
-    Uri uri = Uri.EMPTY;
-    if(i > 0) {
-      uri = Uri.uri(data.ns.key(i));
-    } else if(i == 0) {
-      uri = Namespaces.DEFAULT.uri(substring(nm, 0, indexOf(nm, ':')));
-    }
-    return new QNm(nm, uri);
+    return qname(new QNm(EMPTY));
   }
   
   @Override
-  public QNm qname(final QNm nm) {
-    final byte[] name = nname();
-    nm.name(name);
-    // [CG] next line slows it down pretty much...
-    final int n = data.ns.get(name, pre);
-    if(n > 0) nm.uri = Uri.uri(data.ns.key(n));
-    
-    /* [CG] DNode/Namespaces: introduce correct namespace handling
-    if(data.xmlnsID != 0) {
-      int s = pre + data.attSize(pre, data.kind(pre));
-      int p = pre;
-      while(++p != s) {
-        if(data.attNameID(p) == data.xmlnsID) {
-          nm.uri = Uri.uri(data.attValue(p));
-          break;
-        }
-      }
-    }*/
-    return nm;
+  public QNm qname(final QNm name) {
+    final byte[] nm = nname();
+    name.name(nm);
+    final int n = data.ns.get(nm, pre);
+    if(n > 0) name.uri = Uri.uri(data.ns.key(n));
+    else name.uri = GlobalNS.uri(substring(nm, 0, indexOf(nm, ':')));
+    return name;
   }
 
   @Override
@@ -171,9 +140,6 @@ public final class DNode extends Nod {
     final IO dir = IO.get(data.meta.file.path());
     final IO file = IO.get(string(data.text(pre)));
     return token(dir.merge(file).path());
-    
-    //return concat(token(data.meta.file.path()), token('/'), data.text(pre));
-    //return data.text(pre);
   }
 
   @Override
@@ -236,8 +202,8 @@ public final class DNode extends Nod {
     final TokenList names = new TokenList();
     final TokenList values = new TokenList();
     // stacks
-    final int[] parent = new int[256];
-    final byte[][] token = new byte[256][];
+    final int[] parent = new int[data.meta.height];
+    final byte[][] token = new byte[data.meta.height][];
     // current output level
     int l = 0;
 
@@ -297,7 +263,6 @@ public final class DNode extends Nod {
             final int j = indexOf(name, ':');
             final byte[] uri = data.ns.key(i);
             final byte[] pref = j == -1 ? null : substring(name, 0, j);
-            //final byte[] uri = ctx.ns.uri(pref).str();
             final byte[] at = j == -1 ? XMLNS : concat(XMLNSCOL, pref);
             if(!names.contains(at)) {
               names.add(at);

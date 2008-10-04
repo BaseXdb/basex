@@ -1,6 +1,5 @@
 package org.basex.index;
 
-import static org.basex.data.DataText.*;
 import java.io.IOException;
 import org.basex.data.StatsKey;
 import org.basex.io.DataInput;
@@ -24,31 +23,27 @@ public final class Names extends Set {
   private boolean[] noleaf;
   /** Statistic information. */
   private StatsKey[] stat;
-  /** Index type (tags/attribute names). */
-  private final boolean tag;
   /** Statistics flag. */
   public boolean stats;
+  /** Dirty flag. */
+  public boolean dirty;
 
   /**
    * Empty Constructor.
-   * @param t index type (tags/attribute names).
    */
-  public Names(final boolean t) {
+  public Names() {
     counter = new int[CAP];
     noleaf = new boolean[CAP];
     stat = new StatsKey[CAP];
     stats = true;
-    tag = t;
+    dirty = true;
   }
 
   /**
    * Constructor, specifying an input file.
-   * @param db name of the database
-   * @param t index type (tags/attribute names).
-   * @throws IOException IO Exception
+   * @param in input stream
    */
-  public Names(final String db, final boolean t) throws IOException {
-    final DataInput in = new DataInput(db, t ? DATATAG : DATAATN);
+  public Names(final DataInput in) {
     keys = in.readBytesArray();
     next = in.readNums();
     bucket = in.readNums();
@@ -58,22 +53,22 @@ public final class Names extends Set {
     stats = in.readBool();
     stat = new StatsKey[next.length];
     for(int s = 1; s < size; s++) stat[s] = new StatsKey(in);
-    tag = t;
-    in.close();
   }
 
   /**
-   * Indexes a key, evaluates the value, and returns its unique id.
-   * @param k key to be found
-   * @param v value, used for statistics
-   * @return token id or -1 if token was not found
+   * Indexes a name and returns its unique id.
+   * @param k name to be found
+   * @param v value, evaluated in statistics
+   * @return name id
    */
   public int index(final byte[] k, final byte[] v) {
-    int i = add(k);
-    if(i > 0) stat[i] = new StatsKey();
-    else i = -i;
-    counter[i]++;
-    stat[i].add(v);
+    final int i = Math.abs(add(k));
+    if(stats) {
+      if(stat[i] == null) stat[i] = new StatsKey();
+      counter[i]++;
+      stat[i].add(v);
+    }
+    dirty = true;
     return i;
   }
 
@@ -84,15 +79,15 @@ public final class Names extends Set {
    */
   public void index(final int i, final byte[] v) {
     stat[i].add(v);
+    dirty = true;
   }
 
   /**
-   * Finishes the index structure and optimizes its memory usage.
-   * @param db name of the database
+   * Writes the names to the specified output stream.
+   * @param out output stream
    * @throws IOException in case the file could not be written
    */
-  public synchronized void finish(final String db) throws IOException {
-    final DataOutput out = new DataOutput(db, tag ? DATATAG : DATAATN);
+  public synchronized void finish(final DataOutput out) throws IOException {
     out.writeBytesArray(keys);
     out.writeNums(next);
     out.writeNums(bucket);
@@ -101,7 +96,6 @@ public final class Names extends Set {
     out.writeNum(size);
     out.writeBool(stats);
     for(int s = 1; s < size; s++) stat[s].finish(out);
-    out.close();
   }
 
   /**
@@ -127,6 +121,7 @@ public final class Names extends Set {
    */
   public void noStats() {
     stats = false;
+    dirty = true;
     for(int i = 1; i < size; i++) {
       stat[i] = new StatsKey();
       counter[i] = 0;

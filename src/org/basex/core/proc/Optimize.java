@@ -1,8 +1,6 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
-import java.io.IOException;
-
 import org.basex.core.Process;
 import org.basex.data.Data;
 
@@ -70,14 +68,7 @@ public final class Optimize extends Process {
     data.meta.newindex = false;
     data.tags.stats = true;
     data.atts.stats = true;
-
-    try {
-      data.tags.finish(data.meta.dbname);
-      data.atts.finish(data.meta.dbname);
-      data.meta.finish(data.size);
-    } catch(final IOException ex) {
-      return false;
-    }
+    data.flush();
     return true;
   }
 

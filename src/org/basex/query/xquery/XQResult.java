@@ -16,7 +16,6 @@ import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.util.SeqBuilder;
-import org.basex.util.Token;
 
 /**
  * This is a container for XQuery results.
@@ -65,15 +64,16 @@ public final class XQResult implements Result {
 
   /** {@inheritDoc} */
   public void serialize(final Serializer ser) throws IOException {
-    try {
-      ser.open(seq.size);
-      for(int i = 0; i < seq.size; i++) {
-        if(ser.finished()) break;
-        ser.openResult();
-        seq.item[i].serialize(ser, ctx, 0);
-        ser.closeResult();
-      }
-      ser.close(seq.size);
+    ser.open(seq.size);
+    for(int i = 0; i < seq.size; i++) {
+      if(ser.finished()) break;
+      ser.openResult();
+      seq.item[i].serialize(ser, ctx, 0);
+      ser.closeResult();
+    }
+    ser.close(seq.size);
+    
+    /*
     } catch(final IOException ex) {
       BaseX.debug(ex);
       try {
@@ -81,7 +81,12 @@ public final class XQResult implements Result {
       } catch(final IOException exx) {
         throw exx;
       }
-    }
+    }*/
+  }
+
+  /** {@inheritDoc} */
+  public void serialize(final Serializer ser, final int n) throws IOException {
+    seq.item[n].serialize(ser, ctx, 0);
   }
 
   /**

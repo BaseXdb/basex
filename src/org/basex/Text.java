@@ -42,7 +42,7 @@ public interface Text {
   /** URL. */
   String URL = "http://www.basex.org";
   /** Code version. */
-  String VERSION = "4.11";
+  String VERSION = "4.13";
   /** Company Info. */
   String COMPANY = "DBIS, University of Konstanz";
 
@@ -863,17 +863,17 @@ public interface Text {
 
   /** About text. */
   String ABOUTTITLE = lang("da_title") + S + NAME;
-  /** BaseX Copyright. */
+  /** Copyright Info. */
   String COPYRIGHT = "© 2005-08 " + COMPANY;
-  /** BaseX License. */
+  /** License Info. */
   String LICENSE = lang("da_license");
-  /** BaseX Developer Info. */
+  /** Developer Info. */
   String DEVELOPER = lang("da_dev") + ": Christian Grün";
-  /** BaseX Contributors Info. */
+  /** Contributors Info. */
   String CONTRIBUTE1 = lang("da_cont1") +
-    ": Alexander Holupirek, Tim Petrowsky,";
-  /** BaseX Developer Names. */
-  String CONTRIBUTE2 = "Sebastian Gath, Lukas Kircher " + lang("da_cont2");
+    ": Alexander Holupirek, Sebastian Gath,";
+  /** Developer Names. */
+  String CONTRIBUTE2 = "Lukas Kircher, Andreas Weiler " + lang("da_cont2");
 
   // PROCESS INFOS ============================================================
 

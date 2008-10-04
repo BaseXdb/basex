@@ -29,25 +29,27 @@ public final class TableMemAccess extends TableAccess {
     buf1 = new long[size];
     buf2 = new long[size];
 
-    final byte[] array = new byte[1 << IO.BLOCKPOWER];
-    final RandomAccessFile f = new RandomAccessFile(IO.dbfile(db, fn), "r");
-    final DataInput in = new DataInput(db, fn + 'x');
+    // read index info
+    final DataInput in = new DataInput(db, fn + 'i');
+    in.readNum(); in.readNum(); in.readNum();
+    final int[] firstPres = in.readNums();
+    final int[] blocks = in.readNums();
+    in.close();
 
-    int nextPre = in.readInt();
-    long nextBlock = in.readInt() << IO.BLOCKPOWER;
-    for(int i = 0, k = 0, l = 0; i != size; i++, k++) {
-      while(k == nextPre) {
-        f.seek(nextBlock);
+    // read blocks
+    final RandomAccessFile f = new RandomAccessFile(IO.dbfile(db, fn), "r");
+    final byte[] array = new byte[IO.BLOCKSIZE];
+    int np = 0;
+    for(int c = 0, i = 0, l = 0; i != size; i++) {
+      while(i == np) {
+        f.seek((long) blocks[c++] * IO.BLOCKSIZE);
         f.read(array);
-        nextPre = in.readInt();
-        if(nextPre == 0) nextPre = Integer.MAX_VALUE;
-        nextBlock = in.readInt() << IO.BLOCKPOWER;
+        np = c == firstPres.length ? Integer.MAX_VALUE : firstPres[c];
         l = 0;
       }
       buf1[i] = getLong(array, l++);
       buf2[i] = getLong(array, l++);
     }
-    in.close();
     f.close();
   }
   

@@ -189,10 +189,11 @@ public interface XQTokens {
   byte[] LOCALURI = token("http://www.w3.org/2005/xquery-local-functions");
   /** XMLSchema URI. */
   byte[] XSURI = token("http://www.w3.org/2001/XMLSchema");
-  /** BaseX URI. */
-  byte[] BXURI = token("http://www.basex.org");
   /** XMLSchema Instance URI. */
   byte[] XSIURI = token("http://www.w3.org/2001/XMLSchema-instance");
+  /** BaseX URI. */
+  byte[] BXURI = token(org.basex.Text.URL);
+
   /** Java prefix. */
   byte[] JAVAPRE = token("java:");
   /** Default collation. */

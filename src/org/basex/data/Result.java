@@ -28,6 +28,12 @@ public interface Result {
    * @throws IOException exception
    */
   void serialize(Serializer ser) throws IOException;
-  
-  // <CG> add iterator
+
+  /**
+   * Serializes the nth result.
+   * @param ser serializer
+   * @param n number of result to serialize
+   * @throws IOException exception
+   */
+  void serialize(Serializer ser, int n) throws IOException;
 }

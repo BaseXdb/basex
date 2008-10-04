@@ -10,6 +10,8 @@ import org.basex.index.Names;
 import org.basex.index.Values;
 import org.basex.index.FTTrie;
 import org.basex.io.DataAccess;
+import org.basex.io.DataInput;
+import org.basex.io.DataOutput;
 import org.basex.io.TableAccess;
 import org.basex.io.TableDiskAccess;
 import org.basex.io.TableMemAccess;
@@ -80,14 +82,15 @@ public final class DiskData extends Data {
    * @throws IOException IO Exception
    */
   public DiskData(final String db, final boolean index) throws IOException {
+    final DataInput in = new DataInput(db, DATAINFO);
     meta = new MetaData(db);
-    size = meta.read();
+    size = meta.read(in);
 
     // read indexes
-    tags = new Names(db, true);
-    atts = new Names(db, false);
-    ns = new Namespaces(db);
-    skel = new Skeleton(db);
+    tags = new Names(in);
+    atts = new Names(in);
+    skel = new Skeleton(in);
+    ns = new Namespaces(in);
 
     // main memory mode.. keep table in memory
     table = Prop.mainmem ? new TableMemAccess(db, DATATBL, size) :
@@ -112,10 +115,14 @@ public final class DiskData extends Data {
       table.flush();
       texts.flush();
       values.flush();
-      meta.finish(size);
-      tags.finish(meta.dbname);
-      atts.finish(meta.dbname);
-      ns.finish(meta.dbname);
+      
+      final DataOutput out = new DataOutput(meta.dbname, DATAINFO);
+      meta.finish(out, size);
+      tags.finish(out);
+      atts.finish(out);
+      skel.finish(out);
+      ns.finish(out);
+      out.close();
     } catch(final IOException e) {
       e.printStackTrace();
     }
@@ -123,11 +130,7 @@ public final class DiskData extends Data {
 
   @Override
   public synchronized void close() throws IOException {
-    // [CG] necessary to always write meta data when closing db?
-    meta.finish(size);
-    tags.finish(meta.dbname);
-    atts.finish(meta.dbname);
-    ns.finish(meta.dbname);
+    flush();
     cls();
   }
 

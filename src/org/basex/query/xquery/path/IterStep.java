@@ -73,7 +73,7 @@ public final class IterStep extends Step {
               }
               return null;
             }
-            if(!it.node()) Err.or(NODESPATH, this, it);
+            if(!it.node()) Err.or(NODESPATH, this, it.type);
             ir = axis.init((Nod) it);
           }
           nod = ir.next();

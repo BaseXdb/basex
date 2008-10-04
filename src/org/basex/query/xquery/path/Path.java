@@ -146,7 +146,7 @@ public final class Path extends Arr {
         ctx.pos = 1;
         Item i;
         while((i = ir.next()) != null) {
-          if(!i.node()) Err.or(NODESPATH, this, i);
+          if(!i.node()) Err.or(NODESPATH, this, i.type);
           ctx.item = i;
           sb.add(ctx.iter(e));
           ctx.pos++;

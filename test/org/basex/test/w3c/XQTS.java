@@ -20,6 +20,6 @@ public final class XQTS extends W3CTS {
    * Constructor.
    */
   public XQTS() {
-    super("XQTS", "/home/db/xml/xqts/dl/");
+    super("XQTS", "/home/db/xml/xqts/");
   }
 }

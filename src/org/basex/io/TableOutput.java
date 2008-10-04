@@ -3,6 +3,8 @@ package org.basex.io;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import org.basex.util.IntList;
+
 /**
  * This class allows a blockwise output of the database table.
  * 
@@ -12,20 +14,19 @@ import java.io.IOException;
 public final class TableOutput extends FileOutputStream {
   /** Buffer Threshold. */
   private static final int THRESHOLD = (int) Math.floor(IO.BLOCKFILL
-      * ((1 << IO.BLOCKPOWER) >>> IO.NODEPOWER)) << IO.NODEPOWER;
+      * (IO.BLOCKSIZE >>> IO.NODEPOWER)) << IO.NODEPOWER;
   /** Buffer. **/
   private final byte[] buffer = new byte[THRESHOLD];
+  /** Index Entries. */
+  private IntList firstPres = new IntList();
+  /** Index Entries. */
+  private IntList blocks = new IntList();
   /** Position inside buffer. **/
   private int pos;
-  /** Block Filler. */
-  private static final byte[] BLOCKFILLER = new byte[(1 << IO.BLOCKPOWER)
-      - THRESHOLD];
   /** Block Count. */
   private int blockCount;
   /** First pre value of current block. */
   private int firstPre;
-  /** Index File. */
-  private DataOutput indexFile;
   /** Name of the database. */
   private String database;
   /** Current Filename. */
@@ -40,7 +41,6 @@ public final class TableOutput extends FileOutputStream {
    */
   public TableOutput(final String db, final String fn) throws IOException {
     super(IO.dbfile(db, fn));
-    indexFile = new DataOutput(db, fn + 'x');
     database = db;
     filename = fn;
   }
@@ -54,15 +54,10 @@ public final class TableOutput extends FileOutputStream {
   @Override
   public void flush() throws IOException {
     if(pos == 0) return;
-
-    super.write(buffer, 0, pos);
-
-    indexFile.writeInt(firstPre);
-    indexFile.writeInt(blockCount++);
+    super.write(buffer);
+    firstPres.add(firstPre);
+    blocks.add(blockCount++);
     firstPre += pos >>> IO.NODEPOWER;
-
-    while(pos++ < THRESHOLD) super.write(0);
-    super.write(BLOCKFILLER);
     pos = 0;
   }
 
@@ -70,12 +65,15 @@ public final class TableOutput extends FileOutputStream {
   public void close() throws IOException {
     flush();
     super.close();
-    indexFile.close();
 
     final DataOutput info = new DataOutput(database, filename + 'i');
-    info.writeInt(blockCount);
-    info.writeInt(blockCount);
-    info.writeInt(firstPre);
+    info.writeNum(blockCount);
+    info.writeNum(blockCount);
+    info.writeNum(firstPre);
+    info.writeNum(blockCount);
+    for(int i = 0; i < blockCount; i++) info.writeNum(firstPres.get(i));
+    info.writeNum(blockCount);
+    for(int i = 0; i < blockCount; i++) info.writeNum(blocks.get(i));
     info.close();
   }
 }

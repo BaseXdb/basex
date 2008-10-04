@@ -18,7 +18,7 @@ import org.basex.util.Token;
  */
 abstract class AbstractTest {
   /** Dummy data reference. */
-  static final Data DATA = new MemData(1, new Names(true), new Names(false),
+  static final Data DATA = new MemData(1, new Names(), new Names(),
       new Namespaces());
   /** Document. */
   String doc;

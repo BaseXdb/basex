@@ -105,11 +105,11 @@ public final class MetaData {
 
   /**
    * Opens the metadata for the current database and returns the table size.
+   * @param in input stream
    * @return table size
    * @throws IOException I/O Exception
    */
-  public int read() throws IOException {
-    final DataInput in = new DataInput(dbname, DATAINFO);
+  public int read(final DataInput in) throws IOException {
     String storage = "";
     String istorage = "";
     int size = 0;
@@ -139,7 +139,6 @@ public final class MetaData {
       else if(k.equals(DBTIME)) time = Token.toLong(v);
       else if(k.equals(DBLASTID)) lastid = Token.toInt(v);
     }
-    in.close();
 
     if(!storage.equals(STORAGE)) throw new BuildException(DBUPDATE, storage);
     if(!istorage.equals(ISTORAGE)) noIndex();
@@ -157,33 +156,32 @@ public final class MetaData {
 
   /**
    * Writes the database to the specified path.
+   * @param out output stream
    * @param siz current database size
    * @throws IOException IO Exception
    */
-  public synchronized void finish(final int siz) throws IOException {
-    final DataOutput inf = new DataOutput(dbname, DATAINFO);
-    writeInfo(inf, DBSTORAGE, STORAGE);
-    writeInfo(inf, IDBSTORAGE, ISTORAGE);
-    writeInfo(inf, DBFNAME, file.path());
-    writeInfo(inf, DBFSIZE, Long.toString(filesize));
-    writeInfo(inf, DBNDOCS, Integer.toString(ndocs));
-    writeInfo(inf, DBENCODING, encoding);
-    writeInfo(inf, DBHEIGHT, Integer.toString(height));
-    writeInfo(inf, DBSIZE, Integer.toString(siz));
-    writeInfo(inf, DBCHOPPED, chop);
-    writeInfo(inf, DBENTITY, entity);
-    writeInfo(inf, DBTXTINDEX, txtindex);
-    writeInfo(inf, DBATVINDEX, atvindex);
-    writeInfo(inf, DBFTXINDEX, ftxindex);
-    writeInfo(inf, DBFZINDEX, ftfz);
-    writeInfo(inf, DBFTSTEM, ftst);
-    writeInfo(inf, DBFTCS, ftcs);
-    writeInfo(inf, DBFTDC, ftdc);
-    writeInfo(inf, DBTIME, Long.toString(time));
-    writeInfo(inf, DBLASTID, Integer.toString(lastid));
-
-    inf.writeString("");
-    inf.close();
+  public synchronized void finish(final DataOutput out, final int siz)
+      throws IOException {
+    writeInfo(out, DBSTORAGE, STORAGE);
+    writeInfo(out, IDBSTORAGE, ISTORAGE);
+    writeInfo(out, DBFNAME, file.path());
+    writeInfo(out, DBFSIZE, Long.toString(filesize));
+    writeInfo(out, DBNDOCS, Integer.toString(ndocs));
+    writeInfo(out, DBENCODING, encoding);
+    writeInfo(out, DBHEIGHT, Integer.toString(height));
+    writeInfo(out, DBSIZE, Integer.toString(siz));
+    writeInfo(out, DBCHOPPED, chop);
+    writeInfo(out, DBENTITY, entity);
+    writeInfo(out, DBTXTINDEX, txtindex);
+    writeInfo(out, DBATVINDEX, atvindex);
+    writeInfo(out, DBFTXINDEX, ftxindex);
+    writeInfo(out, DBFZINDEX, ftfz);
+    writeInfo(out, DBFTSTEM, ftst);
+    writeInfo(out, DBFTCS, ftcs);
+    writeInfo(out, DBFTDC, ftdc);
+    writeInfo(out, DBTIME, Long.toString(time));
+    writeInfo(out, DBLASTID, Integer.toString(lastid));
+    out.writeString("");
   }
 
   /**
