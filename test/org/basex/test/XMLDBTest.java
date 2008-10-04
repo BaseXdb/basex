@@ -116,10 +116,9 @@ public class XMLDBTest extends TestCase {
     XMLResource resource = (XMLResource) collection.getResource(id);
     SAXSerializer sax = new SAXSerializer(null);
     // A custom SAX Content Handler is required to handle the SAX events
+    // For example with the ContentHandler from the SAXSerializer
     ContentHandler handler = sax.getContentHandler();
-    System.out.println("------SAX Document Retrieval START------");
     resource.getContentAsSAX(handler);
-    System.out.println("------SAX Document Retrieval END------");
   }
 
   /**

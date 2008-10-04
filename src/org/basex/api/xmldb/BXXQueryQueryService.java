@@ -35,8 +35,7 @@ public class BXXQueryQueryService implements XPathQueryService {
   }
 
   public String getName() {
-    BaseX.notimplemented();
-    return null;
+    return new String("XQueryQueryService");
   }
 
   public String getNamespace(final String prefix) {
@@ -50,8 +49,7 @@ public class BXXQueryQueryService implements XPathQueryService {
   }
 
   public String getVersion() {
-    BaseX.notimplemented();
-    return null;
+    return new String("Version 1.0");
   }
 
   public ResourceSet query(final String query) {

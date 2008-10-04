@@ -142,20 +142,26 @@ public class BXXMLResource implements XMLResource {
 
   public ContentHandler setContentAsSAX() {
     // A custom SAX Content Handler is required to handle the SAX events
-    return new SAXeParser(this);
+    return new BXSAXContentHandler(this);
   }
 
   /** SAX Parser. */
-  class SAXeParser extends DefaultHandler {
+  class BXSAXContentHandler extends DefaultHandler {
+    
+    /** XMLResource. */
+    protected XMLResource res;
+    /** StringBuffer */
+    protected StringBuffer cont;
+    /** Hashtable */
+    protected Hashtable<String, String> ns;
+    
     /**
      * Standard Constructor.
      * @param xmlresource XMLResource 
      */
-    public SAXeParser(XMLResource xmlresource) {
-        xmlContent = null;
-        namespaces = null;
-        resource = xmlresource;
-        namespaces = new Hashtable<String, String>();
+    public BXSAXContentHandler(XMLResource xmlresource) {
+        res = xmlresource;
+        ns = new Hashtable<String, String>();
     }
     @Override
     public void characters(char ac[], int i, int j) {
@@ -163,28 +169,28 @@ public class BXXMLResource implements XMLResource {
         char c = ac[i + k];
         switch(c) {
           case 38: /* '&' */
-            xmlContent.append("&amp;");
+            cont.append("&amp;");
             break;
 
           case 60: /* '<' */
-            xmlContent.append("&lt;");
+            cont.append("&lt;");
             break;
 
           case 62: /* '>' */
-            xmlContent.append("&gt;");
+            cont.append("&gt;");
             break;
 
           case 34: /* '"' */
-            xmlContent.append("&quot;");
+            cont.append("&quot;");
             break;
 
           case 39: /* '\'' */
-            xmlContent.append("&apos;");
+            cont.append("&apos;");
             break;
 
           default:
-            if(c > '\177') xmlContent.append("&#" + (int) c + ";");
-            else xmlContent.append(c);
+            if(c > '\177') cont.append("&#" + (int) c + ";");
+            else cont.append(c);
             break;
         }
       }
@@ -192,81 +198,75 @@ public class BXXMLResource implements XMLResource {
     @Override
     public void endDocument() throws SAXException {
       try {
-        resource.setContent(xmlContent);
+        res.setContent(cont);
       } catch(XMLDBException e) {
         throw new SAXException(e.getMessage());
       }
     }
     @Override
     public void endElement(String s, String s1, String s2) {
-      xmlContent.append("</");
-      xmlContent.append(s2);
-      xmlContent.append(">");
+      cont.append("</");
+      cont.append(s2);
+      cont.append(">");
     }
     @Override
     public void endPrefixMapping(String s) {
-      namespaces.remove(s);
+      ns.remove(s);
     }
     @Override
     public void ignorableWhitespace(char ac[], int i, int j) {
       for(int k = 0; k < j; k++)
-        xmlContent.append(ac[i + k]);
+        cont.append(ac[i + k]);
 
     }
     @Override
     public void processingInstruction(String s, String s1) {
-      xmlContent.append("<?");
-      xmlContent.append(s);
-      xmlContent.append(" ");
-      if(s1 != null) xmlContent.append(s1);
-      xmlContent.append("?>");
+      cont.append("<?");
+      cont.append(s);
+      cont.append(" ");
+      if(s1 != null) cont.append(s1);
+      cont.append("?>");
     }
     @Override
     public void skippedEntity(String s) {}
     @Override
     public void startDocument() {
-      xmlContent = new StringBuffer();
-      xmlContent.append("<?xml version=\"1.0\"?>");
+      cont = new StringBuffer();
+      cont.append("<?xml version=\"1.0\"?>");
     }
     @Override
     public void startElement(String s, String s1, String s2,
         Attributes attributes) {
-      xmlContent.append("<");
-      xmlContent.append(s2);
+      cont.append("<");
+      cont.append(s2);
       for(int i = 0; i < attributes.getLength(); i++) {
-        xmlContent.append(" ");
-        xmlContent.append(attributes.getQName(i));
-        xmlContent.append("=");
-        xmlContent.append("\"");
-        xmlContent.append(attributes.getValue(i));
-        xmlContent.append("\"");
+        cont.append(" ");
+        cont.append(attributes.getQName(i));
+        cont.append("=");
+        cont.append("\"");
+        cont.append(attributes.getValue(i));
+        cont.append("\"");
       }
 
       String s3;
-      for(Enumeration enumeration = namespaces.keys(); enumeration
-          .hasMoreElements(); namespaces.remove(s3)) {
+      for(Enumeration enumeration = ns.keys(); enumeration
+          .hasMoreElements(); ns.remove(s3)) {
         s3 = (String) enumeration.nextElement();
-        xmlContent.append(" xmlns:");
-        xmlContent.append(s3);
-        xmlContent.append("=");
-        xmlContent.append("\"");
-        xmlContent.append(namespaces.get(s3));
-        xmlContent.append("\"");
+        cont.append(" xmlns:");
+        cont.append(s3);
+        cont.append("=");
+        cont.append("\"");
+        cont.append(ns.get(s3));
+        cont.append("\"");
       }
 
-      xmlContent.append(">");
+      cont.append(">");
     }
     
     @Override
     public void startPrefixMapping(String s, String s1) {
-      namespaces.put(s, s1);
+      ns.put(s, s1);
     }
-    /** XMLResource. */
-    protected XMLResource resource;
-    /** StringBuffer */
-    protected StringBuffer xmlContent;
-    /** Hashtable */
-    protected Hashtable<String, String> namespaces;
   }
 
   /**
