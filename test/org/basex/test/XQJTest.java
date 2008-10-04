@@ -38,7 +38,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
 /**
- * This class tests the XQJ features.
+ * This class tests some XQJ features (arbitrary samples).
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
@@ -515,16 +515,6 @@ public class XQJTest extends TestCase {
     XQItemType type = conn.createAtomicType(
         XQItemType.XQBASETYPE_STRING);
     expr.bindAtomicValue(new QName("v"), "A", type);
-  }
-
-  /**
-   * Test.
-   * @throws Exception exception
-   */
-  public void test35() throws Exception {
-    final XQConnection conn = conn(drv);
-    final XQExpression xqe = conn.createExpression();
-    xqe.bindSequence(new QName("v"), null);
   }
 }
 

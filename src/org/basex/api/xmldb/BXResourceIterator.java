@@ -1,6 +1,6 @@
 package org.basex.api.xmldb;
 
-import org.basex.query.xpath.values.Item;
+import org.basex.data.Result;
 import org.xmldb.api.base.Resource;
 import org.xmldb.api.base.ResourceIterator;
 
@@ -10,9 +10,9 @@ import org.xmldb.api.base.ResourceIterator;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler
  */
-public class BXResourceIterator implements ResourceIterator {
+public final class BXResourceIterator implements ResourceIterator {
   /** Result. */
-  Item result;
+  Result result;
   /** Start value for iterator. */
   int start = -1;
 
@@ -20,7 +20,7 @@ public class BXResourceIterator implements ResourceIterator {
    * Standard constructor with result.
    * @param r Result
    */
-  public BXResourceIterator(final Item r) {
+  public BXResourceIterator(final Result r) {
     result = r;
   }
 

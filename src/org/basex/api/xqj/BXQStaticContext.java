@@ -39,7 +39,9 @@ public class BXQStaticContext implements XQStaticContext {
     try {
       BXQAbstract.valid(prefix, String.class);
       BXQAbstract.valid(uri, String.class);
-      ctx.ns.index(new QNm(prefix, uri), true);
+      final QNm name = new QNm(prefix, uri);
+      if(name.uri == Uri.EMPTY) name.uri = null;
+      ctx.ns.index(name);
     } catch(final org.basex.query.xquery.XQException ex) {
       throw new BXQException(ex);
     }

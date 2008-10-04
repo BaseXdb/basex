@@ -1,7 +1,6 @@
 package org.basex.api.xmldb;
 
 import java.io.IOException;
-
 import org.w3c.dom.Document;
 import org.xmldb.api.base.*;
 import org.xmldb.api.modules.XMLResource;
@@ -24,7 +23,7 @@ import org.basex.io.IO;
  */
 public class BXCollection implements Collection {
   /** Context reference. */
-  private Context ctx;
+  Context ctx;
 
   /**
    * Standard constructor.
@@ -81,17 +80,17 @@ public class BXCollection implements Collection {
         return new BXXMLResource(ctx.current(), id, 0);
       }
     } else {
-    for (int i = 0; i < ctx.data().doc().length; i++) {
-      int test = ctx.data().doc()[i];
-      String name = new String(ctx.data().text(test));
-      if(name.equals(id)) {
-        Context tmpCtx = new Context();
-        Nodes nodes = new Nodes(test, ctx.data());
-        for (int j = test+1; j < ctx.data().doc()[i+1]; j++) {
-          nodes.add(j);
-        }
-        tmpCtx.current(nodes);
-        return new BXXMLResource(tmpCtx.current(), id, test);
+      for (int i = 0; i < ctx.data().doc().length; i++) {
+        int test = ctx.data().doc()[i];
+        String name = new String(ctx.data().text(test));
+        if(name.equals(id)) {
+          Context tmpCtx = new Context();
+          Nodes nodes = new Nodes(test, ctx.data());
+          for (int j = test+1; j < ctx.data().doc()[i+1]; j++) {
+            nodes.add(j);
+          }
+          tmpCtx.current(nodes);
+          return new BXXMLResource(tmpCtx.current(), id, test);
         }
       }
     }
@@ -104,13 +103,18 @@ public class BXCollection implements Collection {
 
   public Service getService(final String name, final String version)
       throws XMLDBException {
-    if(name.equals("XPathQueryService")) return new BXXPathQueryService(ctx);
+    
+    if(name.equals(BXQueryService.XPATH) || name.equals(BXQueryService.XQUERY))
+      return new BXQueryService(this, name);
+    
     throw new XMLDBException(ErrorCodes.NO_SUCH_SERVICE);
   }
 
-  public Service[] getServices() {
-    Service[] services = {new BXXPathQueryService(ctx), new BXXQueryQueryService(ctx)};
-    return services;
+  public Service[] getServices() throws XMLDBException {
+    return new Service[] {
+        getService(BXQueryService.XPATH, null),
+        getService(BXQueryService.XQUERY, null)
+    };
   }
 
   public boolean isOpen() {
@@ -153,6 +157,8 @@ public class BXCollection implements Collection {
       tmp.close();
       DropDB.drop(id);
     } catch(final IOException ex) {
+      ex.printStackTrace();
+      
       throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
     }
   }

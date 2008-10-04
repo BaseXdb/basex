@@ -1,12 +1,10 @@
 package org.basex.api.xmldb;
 
 import java.io.IOException;
-
 import org.basex.BaseX;
+import org.basex.data.Result;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
-import org.basex.query.xpath.values.Item;
-import org.basex.query.xpath.values.NodeSet;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.ErrorCodes;
 import org.xmldb.api.base.Resource;
@@ -18,9 +16,9 @@ import org.xmldb.api.base.XMLDBException;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler
  */
-public class BXResource implements Resource {
+public final class BXResource implements Resource {
   /** Result. */
-  Item result;
+  Result result;
   /** Position for value. */
   int pos;
 
@@ -29,7 +27,7 @@ public class BXResource implements Resource {
    * @param r result
    * @param p position
    */
-  public BXResource(final Item r, final int p) {
+  public BXResource(final Result r, final int p) {
     result = r;
     pos = p;
   }
@@ -37,13 +35,7 @@ public class BXResource implements Resource {
   public Object getContent() throws XMLDBException {
     try {
       final CachedOutput out = new CachedOutput();
-      final XMLSerializer ser = new XMLSerializer(out);
-      if(result instanceof NodeSet) {
-        final NodeSet nodes = (NodeSet) result;
-        ser.xml(nodes.data, nodes.nodes[pos]);
-      } else {
-        ser.item(result.str());
-      }
+      result.serialize(new XMLSerializer(out), pos);
       return out.toString();
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.UNKNOWN_ERROR, ex.getMessage());

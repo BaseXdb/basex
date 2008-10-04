@@ -1,7 +1,7 @@
 package org.basex.api.xmldb;
 
 import org.basex.BaseX;
-import org.basex.query.xpath.values.Item;
+import org.basex.data.Result;
 import org.xmldb.api.base.Resource;
 import org.xmldb.api.base.ResourceIterator;
 import org.xmldb.api.base.ResourceSet;
@@ -12,15 +12,15 @@ import org.xmldb.api.base.ResourceSet;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler
  */
-public class BXResourceSet implements ResourceSet {
+public final class BXResourceSet implements ResourceSet {
   /** Result. */
-  Item result;
+  Result result;
 
   /**
    * Standard Constructor with result.
    * @param r Result
    */
-  public BXResourceSet(final Item r) {
+  public BXResourceSet(final Result r) {
     result = r;
   }
 

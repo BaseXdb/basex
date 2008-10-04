@@ -1,13 +1,11 @@
 package org.basex.test;
 
 import java.io.File;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
 import org.basex.data.SAXSerializer;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +24,6 @@ import org.xmldb.api.base.ResourceSet;
 import org.xmldb.api.base.XMLDBException;
 import org.xmldb.api.modules.XMLResource;
 import org.xmldb.api.modules.XPathQueryService;
-
 import junit.framework.TestCase;
 
 /**
@@ -40,8 +37,6 @@ public class XMLDBTest extends TestCase {
   static String driver = "org.basex.api.xmldb.BXDatabaseImpl";
   /** Database/document path. */
   static String url = "xmldb:basex://localhost:8080/input";
-  /** Query. */
-  static String query = "//li";
   /** Collection. */
   Collection collection = null;
 
@@ -67,7 +62,7 @@ public class XMLDBTest extends TestCase {
   public void test1() throws Exception {
     XPathQueryService service = (XPathQueryService) collection.getService(
         "XPathQueryService", "1.0");
-    ResourceSet resultSet = service.query(query);
+    ResourceSet resultSet = service.query("//li");
     ResourceIterator results = resultSet.getIterator();
 
     while(results.hasMoreResources()) {
