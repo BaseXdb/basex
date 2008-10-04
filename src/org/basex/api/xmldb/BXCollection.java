@@ -5,11 +5,12 @@ import org.w3c.dom.Document;
 import org.xmldb.api.base.*;
 import org.xmldb.api.modules.XMLResource;
 import org.basex.BaseX;
+import org.basex.build.MemBuilder;
+import org.basex.build.Parser;
 import org.basex.build.xml.DOCWrapper;
+import org.basex.build.xml.DirParser;
 import org.basex.core.Context;
-import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.Close;
-import org.basex.core.proc.DropDB;
 import org.basex.data.Data;
 import org.basex.io.IO;
 import org.basex.util.Token;
@@ -137,20 +138,19 @@ public class BXCollection implements Collection {
     final String id = res.getId();
     
     Data tmp = null;
+    final Object cont = res.getContent();
+    Parser p = null;
+    if(cont instanceof Document) {
+      p = new DOCWrapper((Document) cont, id);
+    } else {
+      p = new DirParser(IO.get(cont.toString()));
+    }
+    
     try {
-      final Object cont = res.getContent();
-      
-      if(cont instanceof Document) {
-        tmp = CreateDB.xml(new DOCWrapper((Document) cont, id), id);
-      } else {
-        tmp = CreateDB.xml(IO.get(cont.toString()), id);
-      }
-      
+      tmp = new MemBuilder().build(p, id);
       final Data data = ctx.data();
       data.insert(data.size, -1, tmp);
       data.flush();
-      tmp.close();
-      DropDB.drop(id);
     } catch(final IOException ex) {
       BaseX.debug(ex);
       throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
