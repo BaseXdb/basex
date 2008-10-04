@@ -50,15 +50,13 @@ public final class CreateDB extends ACreate {
 
   /**
    * Creates and returns a database for the specified XML document.
-   * No warnings are thrown; instead, an null reference is returned if
-   * errors occur.
    * @param db name of the database to be created
    * @param io file name
    * @return database instance
    * @throws IOException exception
    */
   public static Data xml(final IO io, final String db) throws IOException {
-    return io.exists() ? xml(new DirParser(io), db) : null;
+    return xml(new DirParser(io), db);
   }
 
   /**
