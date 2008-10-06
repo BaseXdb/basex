@@ -3,19 +3,12 @@ package org.basex.data;
 import static org.basex.data.DataText.*;
 
 import java.io.IOException;
-import org.basex.core.Prop;
-import org.basex.index.FTFuzzy;
+
 import org.basex.index.Index;
 import org.basex.index.IndexToken;
-import org.basex.index.Names;
-import org.basex.index.Values;
-import org.basex.index.FTTrie;
 import org.basex.io.DataAccess;
-import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.TableAccess;
-import org.basex.io.TableDiskAccess;
-import org.basex.io.TableMemAccess;
 import org.basex.util.Token;
 
 /**
@@ -52,13 +45,23 @@ public final class DeepData extends Data {
     }
   }
 
+  /** Initialize native storage (constructor). 
+   * @param index whether to use one
+   * @return initialization status
+   */
+  private native boolean jni_init(boolean index);
+  /** Get the size of the file hierarchy table. 
+   * @return size of table
+   */
+  private native int jni_get_file_table_size();
+  
   /**
    * Default Constructor.
    * @param db name of database
    * @throws IOException IO Exception
    */
   public DeepData(final String db) throws IOException {
-    this(db, true);
+    this(db, false);
   }
 
   /**
@@ -71,31 +74,21 @@ public final class DeepData extends Data {
     // is caught by proc.Open.java
     if(libError != null) throw new IOException(libError);
     
-    final DataInput in = new DataInput(db, DATAINFO);
+    jni_init(index);
+    
     meta = new MetaData(db);
-    size = meta.read(in);
+    size = jni_get_file_table_size();
 
     // read indexes
-    tags = new Names(in);
-    atts = new Names(in);
-    skel = new Skeleton(in);
-    ns = new Namespaces(in);
+    tags = null;
+    atts = null;
+    skel = null;
+    ns = new Namespaces();
 
     // main memory mode.. keep table in memory
-    table = Prop.mainmem ? new TableMemAccess(db, DATATBL, size) :
-      new TableDiskAccess(db, DATATBL);
-    texts = new DataAccess(db, DATATXT);
-    values = new DataAccess(db, DATAATV);
-
-    if(index) {
-      if(meta.txtindex) openIndex(IndexToken.TYPE.TXT,
-          new Values(this, db, true));
-      if(meta.atvindex) openIndex(IndexToken.TYPE.ATV,
-          new Values(this, db, false));
-      if(meta.ftxindex) openIndex(IndexToken.TYPE.FTX,
-          meta.ftfz ? new FTFuzzy(this, db) : new FTTrie(this, db));
-    }
-    initNames();
+    table = null;
+    texts = null;
+    values = null;
   }
 
   @Override

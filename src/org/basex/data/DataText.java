@@ -190,6 +190,6 @@ public interface DataText {
 
   // DEEPFS STRINGS ===========================================================
   /** Name of the current deepfs shared library. */
-  String DEEPLIB = "deepfs__V1.00.0";
+  String DEEPLIB = "deepstorage";
 }
 
