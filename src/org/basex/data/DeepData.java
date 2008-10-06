@@ -49,11 +49,11 @@ public final class DeepData extends Data {
    * @param index whether to use one
    * @return initialization status
    */
-  private native boolean jni_init(boolean index);
+  private native boolean jniInit(final boolean index);
   /** Get the size of the file hierarchy table. 
    * @return size of table
    */
-  private native int jni_get_file_table_size();
+  private native int jniGetFileTableSize();
   
   /**
    * Default Constructor.
@@ -74,10 +74,10 @@ public final class DeepData extends Data {
     // is caught by proc.Open.java
     if(libError != null) throw new IOException(libError);
     
-    jni_init(index);
+    jniInit(index);
     
     meta = new MetaData(db);
-    size = jni_get_file_table_size();
+    size = jniGetFileTableSize();
 
     // read indexes
     tags = null;
