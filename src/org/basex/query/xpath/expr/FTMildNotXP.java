@@ -12,12 +12,12 @@ import org.basex.util.IntList;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Sebastian Gath
  */
-public final class FTMildNot extends FTArrayExpr {
+public final class FTMildNotXP extends FTArrayExpr {
   /**
    * Constructor.
    * @param e expressions
    */
-  public FTMildNot(final FTArrayExpr[] e) {
+  public FTMildNotXP(final FTArrayExpr[] e) {
     exprs = e;
   }
 
@@ -39,7 +39,7 @@ public final class FTMildNot extends FTArrayExpr {
    * @param pos IntList[] with position values
    * @return boolean result of mildnot
    */
-  public boolean evalMildNot(final IntList[] pos) {
+  public static boolean evalMildNot(final IntList[] pos) {
     if (pos.length == 1) return true;
     for (int i = 1; i < pos.length; i++) {
       for (int k = 0; k < pos[i].size; k++) {

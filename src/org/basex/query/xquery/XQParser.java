@@ -2056,7 +2056,7 @@ public final class XQParser extends QueryParser {
 
     Expr[] list = { e };
     do { check(IN); list = add(list, ftUnaryNot()); } while(consumeWS(NOT));
-    Err.or(FTMILD);
+    //Err.or(FTMILD);
     return new FTMildNot(list);
   }
 

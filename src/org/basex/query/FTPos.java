@@ -98,8 +98,26 @@ public final class FTPos {
    * @return result of check
    */
   private boolean ordered() {
-    if(!ordered) return true;
+    if(!ordered || size == 1) return true;
 
+    final IntList[] il = sortPositions();
+    IntList p = il[0]; // new IntList();
+    IntList pp = il[1]; // new IntList();
+    int i = 0;
+    int lp;
+    while (i < p.size && pp.get(i) != 0) i++;
+    lp = i;
+    i++;
+    while (i < p.size) {
+      if (pp.get(i) == pp.get(lp) + 1) lp = i;
+      else if (pp.get(i) < pp.get(lp)) return false;
+      if (pp.get(lp) == size - 1) return true;
+      i++;
+    }
+    
+    
+    return false;
+    /*
     int c = -1;
     int d = -1;
     for(int i = 0; i < size; i++) {
@@ -111,6 +129,7 @@ public final class FTPos {
       c = d;
     }
     return true;
+    */
   }
 
   /**
@@ -160,6 +179,43 @@ public final class FTPos {
   }
 
   /**
+   * Sorts the position values in numeric order.
+   * IntList[0] = position values sorted
+   * IntList[1] = pointer to the position values.
+   * 
+   * Each pos value has a pointer, showing which token
+   * from the query cloud be found at that pos.
+   * 
+   * @return IntList[] position values and pointer
+   */
+  private IntList[] sortPositions() {
+    IntList p = new IntList();
+    IntList pp = new IntList();
+    int[] k = new int[size];
+    int min = 0;
+    boolean q = false;
+    while(true) {
+      min = 0;
+      q = true;
+      for (int j = 0; j < size; j++) {
+        if (k[j] > -1) {
+          if (k[min] == -1) min = j;
+          q = false;
+          if (pos[min].get(k[min]) > pos[j].get(k[j])) min = j;
+        }  
+      }
+      
+      if(q) break;
+      
+      p.add(pos[min].get(k[min]));
+      pp.add(min);
+      k[min]++;
+      if (k[min] == pos[min].size) k[min] = -1;
+    }
+    return new IntList[]{p, pp};
+  }
+  
+  /**
    * Checks if the position values are ordered.
    * @param mn minimum distance
    * @param mx maximum distance
@@ -167,10 +223,13 @@ public final class FTPos {
    */
   public boolean distance(final long mn, final long mx) {
     if(dunit == null) return true;
-    
-    IntList p = new IntList();
-    IntList pp = new IntList();
-    int[] k = new int[size];
+    final IntList[] il = sortPositions();
+    IntList p = il[0]; // new IntList();
+    IntList pp = il[1]; // new IntList();
+    int p1;
+    int p2;
+
+    /*  int[] k = new int[size];
     int min = 0;
     int p1;
     int p2;
@@ -193,7 +252,7 @@ public final class FTPos {
       k[min]++;
       if (k[min] == pos[min].size) k[min] = -1;
     }
-
+*/
     int[] res = new int[p.size];
     int c = 0;
     int i = 0;

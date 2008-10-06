@@ -33,9 +33,9 @@ public final class FTSelect extends FTArrayExpr {
   
   @Override
   public FTNode next(final XPContext ctx) {
-    FTNode ftn = exprs[0].next(ctx);
     final FTPositionFilter tmp = ctx.ftpos;
     ctx.ftpos = ftpos;
+    FTNode ftn = exprs[0].next(ctx);
     
     ftpos.pos.init(ctx.ftitem);
     if (ftn.size > 0) {
@@ -86,10 +86,13 @@ public final class FTSelect extends FTArrayExpr {
       || ctx.ftpos.pos.start || ftpos.pos.dunit != null 
       || ftpos.pos.wunit != null;
     ftpos.pos.init(ctx.ftitem);
-    final Item i = exprs[0].eval(ctx);
+    Item i = exprs[0].eval(ctx);
+    ftpos.pos.setPos(ctx.ftpos.pos.getPos(), ctx.ftpos.pos.getPos().length);
+    if (!ctx.iu) i = Bool.get(i.bool() && seqEval());
     ctx.ftpos = tmp;
-    if (ctx.iu) return i; 
-    return Bool.get(i.bool() && seqEval());
+    if (ctx.ftpos != null) 
+      ctx.ftpos.pos.setPos(ftpos.pos.getPos(), ftpos.pos.getPos().length);
+    return i;
   }
 
   /**

@@ -94,6 +94,7 @@ public final class FTIntersection extends FTArrayExpr {
     for (int i = 1; i < n.length; i++) {
       n2 = exprs[n[i]].next(ctx);
       //n1.merge(n2, i - 1);
+      n1.reset();
       n1.merge(n2, 0);
       n1.reset();
     }
@@ -102,6 +103,9 @@ public final class FTIntersection extends FTArrayExpr {
 
   @Override
   public FTNode next(final XPContext ctx) {
+    final FTPositionFilter tmp = ctx.ftpos;
+    ctx.ftpos = ftpos;
+    
     final FTNode n1 = calcFTAnd(pex, ctx);
     
 /*    nod2 = (nex.length > 0 && nod2 == null && more(nex)) ? 
@@ -129,26 +133,28 @@ public final class FTIntersection extends FTArrayExpr {
           } else return new FTNode();
         }
       }
+      ctx.ftpos = tmp;
       return n1;
     }
-    return calcFTAnd(nex, ctx);
+    final FTNode n2 = calcFTAnd(nex, ctx);  
+    ctx.ftpos = tmp;
+    return n2;
   }
   
   @Override
   public Bool eval(final XPContext ctx) throws QueryException {
+    
     // check each positive expression
     for (int i : pex) {
       final Bool it = (Bool) exprs[i].eval(ctx);
       if (!it.bool()) return it;
     }
     
-    //if (nex.length > 1) {
-      for (int i : nex) {
-        final Bool it = (Bool) exprs[i].eval(ctx);
-        if (!it.bool()) return it;
-      }
-   // }
-    
+    for (int i : nex) {
+      final Bool it = (Bool) exprs[i].eval(ctx);
+      if (!it.bool()) return it;
+    }
+  
     return Bool.TRUE;
   }
 }

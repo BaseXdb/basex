@@ -38,13 +38,12 @@ public final class FTTest extends AbstractTest {
       "</fttest>";
 
     queries = new Object[][] {
-        
         { "FTMildNot1", nodes(3, 5),
         "//w [text() ftcontains 'xml' not in 'xml databases']" },
-      
-        
-        { "FTMildNot2", nodes(14),
+      { "FTMildNot2", nodes(14),
         "//w [text() ftcontains 'hello' not in 'xml']" },
+          
+          
         { "Simple 1", bool(true),
           "'abc' ftcontains 'abc'" },
         { "Simple 2", bool(true),
@@ -239,11 +238,11 @@ public final class FTTest extends AbstractTest {
           "distance exactly 1 words]" },
         { "FTPosFilter 22", nodes(3, 37),
           "//w [. ftcontains ('second' ftand 'third' " +
-          "window 3 words) ftand 'sentence' distance exactly 1 words]" },
+          "window 3 words) ftand 'sentence' distance exactly 0 words]" },
         { "FTPosFilter 23", nodes(3),
           "//w [. ftcontains ('second' ftand 'third' " +
           "window 3 words) ftand 'sentence' " +
-          "distance exactly 1 words ordered]" },
+          "distance exactly 0 words ordered]" },
         { "FTPosFilter 24", nodes(37),
           "//w [. ftcontains 'third' ftand 'second' " +
           " ftand 'first' distance exactly 1 words ordered]" },

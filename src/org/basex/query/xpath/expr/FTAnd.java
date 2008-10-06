@@ -28,14 +28,18 @@ public final class FTAnd extends FTArrayExpr {
 
   @Override
   public Bool eval(final XPContext ctx) throws QueryException {
-    for(final Expr e : exprs) if(!ctx.eval(e).bool()) return Bool.get(false);
+    for(final Expr e : exprs) 
+      if(!ctx.eval(e).bool()) 
+        return Bool.get(false);
+    
+    
     return Bool.get(true);
   }
 
   @Override
   public FTArrayExpr compile(final XPContext ctx) throws QueryException {
     for(int i = 0; i != exprs.length; i++) {
-      if(exprs[i].fto == null) exprs[i].fto = fto;
+      //if(exprs[i].fto == null) exprs[i].fto = fto;
       exprs[i] = exprs[i].compile(ctx);
     }
     return this;

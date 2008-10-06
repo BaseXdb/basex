@@ -18,7 +18,7 @@ import org.basex.query.xpath.expr.Expr;
 import org.basex.query.xpath.expr.FTAnd;
 import org.basex.query.xpath.expr.FTArrayExpr;
 import org.basex.query.xpath.expr.FTContains;
-import org.basex.query.xpath.expr.FTMildNot;
+import org.basex.query.xpath.expr.FTMildNotXP;
 import org.basex.query.xpath.expr.FTOr;
 import org.basex.query.xpath.expr.FTSelect;
 import org.basex.query.xpath.expr.FTPositionFilter;
@@ -688,7 +688,7 @@ public class XPParser extends QueryParser {
       notnext[FTTIMES] = true;
       list = add(list, ftUnaryNot(notnext));
     } while(consume(NOT));
-    return new FTMildNot(list);
+    return new FTMildNotXP(list);
   }
 
   /**
