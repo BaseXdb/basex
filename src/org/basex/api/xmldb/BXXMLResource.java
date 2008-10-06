@@ -38,6 +38,8 @@ public final class BXXMLResource implements XMLResource {
   private final String id;
   /** Int pre. */
   private final int pre;
+  /** Collection reference. */
+  private Collection coll;
   /** String content. */
   Object content;
 
@@ -46,11 +48,13 @@ public final class BXXMLResource implements XMLResource {
    * @param d data reference
    * @param iD String
    * @param preV int
+   * @param col Collection
    */
-  public BXXMLResource(final Data d, final String iD, final int preV) {
+  public BXXMLResource(final Data d, final String iD, final int preV, final Collection col) {
     data = d;
     id = iD;
     pre = preV;
+    coll = col;
   }
 
   public Object getContent() throws XMLDBException {
@@ -60,7 +64,7 @@ public final class BXXMLResource implements XMLResource {
         new Nodes(pre, data).serialize(new XMLSerializer(out), 0);
         content = out.toString();
       } catch(final IOException ex) {
-        throw new XMLDBException(ErrorCodes.UNKNOWN_ERROR, ex.getMessage());
+        throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
       }
     }
     return content;
@@ -81,34 +85,34 @@ public final class BXXMLResource implements XMLResource {
       final SAXParser sax = saxFactory.newSAXParser();
       reader = sax.getXMLReader();
     } catch(final ParserConfigurationException pce) {
-      throw new XMLDBException(1, pce.getMessage());
+      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, pce.getMessage());
     } catch(final SAXException saxe) {
       saxe.printStackTrace();
-      throw new XMLDBException(1, saxe.getMessage());
+      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, saxe.getMessage());
     }
     try {
       reader.setContentHandler(handler);
       reader.parse(new InputSource(new StringReader(getContent().toString())));
     } catch(final SAXException saxe) {
       saxe.printStackTrace();
-      throw new XMLDBException(1, saxe.getMessage());
+      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, saxe.getMessage());
     } catch(final IOException ioe) {
-      throw new XMLDBException(1, ioe.getMessage());
+      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ioe.getMessage());
     }
   }
 
   public String getDocumentId() {
-    BaseX.notimplemented();
-    return null;
-  }
-
-  public String getId() {
     return id;
   }
 
-  public Collection getParentCollection() {
+  public String getId() {
+  //<CG> Methode zur Erstellung einer eindeutigen ID?
     BaseX.notimplemented();
     return null;
+  }
+
+  public Collection getParentCollection() {
+    return coll;
   }
 
   public String getResourceType() {
@@ -253,4 +257,13 @@ public final class BXXMLResource implements XMLResource {
   public int getPre() {
     return pre;
   }
+  
+  /**
+   * Returns the Data of the Doc
+   * @return Data value
+   */
+  public Data getData() {
+    return data;
+  }
+ 
 }

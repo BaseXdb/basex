@@ -38,6 +38,7 @@ public class BXCollection implements Collection {
   }
 
   public String createId() {
+    //<CG> Methode zur Erstellung einer eindeutigen ID?
     BaseX.notimplemented();
     return null;
   }
@@ -46,18 +47,16 @@ public class BXCollection implements Collection {
       throws XMLDBException {
     
     if(type.equals(XMLResource.RESOURCE_TYPE))
-      return new BXXMLResource(null, id, -1);
+      return new BXXMLResource(null, id, -1, this);
 
-    throw new XMLDBException(ErrorCodes.NOT_IMPLEMENTED);
+    throw new XMLDBException(ErrorCodes.UNKNOWN_RESOURCE_TYPE);
   }
 
   public Collection getChildCollection(final String name) {
-    BaseX.notimplemented();
     return null;
   }
 
   public int getChildCollectionCount() {
-    BaseX.notimplemented();
     return 0;
   }
 
@@ -66,11 +65,11 @@ public class BXCollection implements Collection {
   }
 
   public Collection getParentCollection() {
-    BaseX.notimplemented();
     return null;
   }
 
   public String getProperty(final String name) {
+    //<CG> Was für Properties gibt es?
     BaseX.notimplemented();
     return null;
   }
@@ -81,10 +80,10 @@ public class BXCollection implements Collection {
     for (int i = 0; i < docs.length; i++) {
       int pre = docs[i];
       if(Token.eq(ctx.data().text(pre), idd)) {
-        return new BXXMLResource(ctx.data(), id, pre);
+        return new BXXMLResource(ctx.data(), id, pre, this);
       }
     }
-    throw new XMLDBException(ErrorCodes.NO_SUCH_RESOURCE);
+    throw new XMLDBException(ErrorCodes.VENDOR_ERROR);
   }
 
   public int getResourceCount() {
@@ -97,7 +96,7 @@ public class BXCollection implements Collection {
     if(name.equals(BXQueryService.XPATH) || name.equals(BXQueryService.XQUERY))
       return new BXQueryService(this, name);
     
-    throw new XMLDBException(ErrorCodes.NO_SUCH_SERVICE);
+    throw new XMLDBException(ErrorCodes.VENDOR_ERROR);
   }
 
   public Service[] getServices() throws XMLDBException {
@@ -112,8 +111,8 @@ public class BXCollection implements Collection {
   }
 
   public String[] listChildCollections() {
-    BaseX.notimplemented();
-    return null;
+    String[] empty = {};
+    return empty;
   }
 
   public String[] listResources() {
@@ -131,6 +130,7 @@ public class BXCollection implements Collection {
   }
 
   public void setProperty(final String name, final String value) {
+  //<CG> Was für Properties gibt es?
     BaseX.notimplemented();
   }
 
@@ -145,7 +145,6 @@ public class BXCollection implements Collection {
     } else {
       p = new DirParser(IO.get(cont.toString()));
     }
-    
     try {
       tmp = new MemBuilder().build(p, id);
       final Data data = ctx.data();

@@ -1,7 +1,6 @@
 package org.basex.api.xmldb;
 
 import java.io.IOException;
-import org.basex.BaseX;
 import org.basex.data.Result;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
@@ -38,17 +37,18 @@ public final class BXResource implements Resource {
       result.serialize(new XMLSerializer(out), pos);
       return out.toString();
     } catch(final IOException ex) {
-      throw new XMLDBException(ErrorCodes.UNKNOWN_ERROR, ex.getMessage());
+      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
     }
   }
 
   public String getId() {
-    BaseX.notimplemented();
+  //<CG> Methode zur Erstellung einer eindeutigen ID?
     return null;
   }
 
   public Collection getParentCollection() {
-    BaseX.notimplemented();
+  //<CG> Wie erhalte ich denn die zugehörige Collection?
+    // bei exist gibts gar keine normale Resource
     return null;
   }
 
@@ -57,6 +57,6 @@ public final class BXResource implements Resource {
   }
 
   public void setContent(final Object value) {
-    BaseX.notimplemented();
+    result = (Result) value;
   }
 }

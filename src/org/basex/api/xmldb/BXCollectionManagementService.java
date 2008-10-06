@@ -15,6 +15,17 @@ import org.xmldb.api.modules.CollectionManagementService;
  */
 public class BXCollectionManagementService implements
     CollectionManagementService {
+  
+  /** BXCollection col. */
+  protected BXCollection col;
+  
+  /**
+   * Standard Constructor.
+   * @param bxcol BXCollection
+   */
+  public BXCollectionManagementService(BXCollection bxcol) {
+    this.col = bxcol;
+  }
 
   public Collection createCollection(String name) {
     // Creates a new database context
@@ -36,15 +47,19 @@ public class BXCollectionManagementService implements
   }
 
   public void setCollection(Collection col) {
-    BaseX.notimplemented();
+    this.col = (BXCollection) col;
   }
 
   public String getProperty(String name) {
+    //<CG> Was für Properties gibt es?
+    // exist hat hier keine
     BaseX.notimplemented();
     return null;
   }
 
   public void setProperty(String name, String value) {
+    //<CG> Was für Properties gibt es?
+    // exist hat hier keine
     BaseX.notimplemented();
   }
 }

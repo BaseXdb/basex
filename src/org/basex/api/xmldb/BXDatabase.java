@@ -16,7 +16,9 @@ import org.basex.core.proc.*;
  */
 public class BXDatabase implements Database {
   /** DB URI. */
-  public static final String BASEXDB_URI = "basex://";
+  public static final String BASEXDB_URI_1 = "xmldb:basex://";
+  /** DB URI. */
+  public static final String BASEXDB_URI_2 = "basex://";
   /** Instance Name. */
   public static final String INSTANCE_NAME = "basex";
   /** Localhost Name. */
@@ -32,16 +34,18 @@ public class BXDatabase implements Database {
   }
 
   public boolean acceptsURI(final String uri) throws XMLDBException {
-    throw new XMLDBException();
-    //return false;
+    if(uri.startsWith(BASEXDB_URI_1)) {
+      return true;
+    } 
+    throw new XMLDBException(ErrorCodes.INVALID_URI);
   }
 
   public Collection getCollection(final String uri, final String username,
       final String password) throws XMLDBException {
     // create database context
     final Context ctx = new Context();
-    if(uri.startsWith(BASEXDB_URI)) {
-      final String host = uri.substring(BASEXDB_URI.length());
+    if(uri.startsWith(BASEXDB_URI_2)) {
+      final String host = uri.substring(BASEXDB_URI_2.length());
       if(host.startsWith(LOCALHOST)) {
         final String tmp = host.substring(LOCALHOST.length());
         if(new Open(tmp).execute(ctx)) return new BXCollection(ctx);
@@ -59,11 +63,13 @@ public class BXDatabase implements Database {
   }
 
   public String getProperty(final String name) {
+  //<CG> Was für Properties gibt es?
     BaseX.notimplemented();
     return null;
   }
 
   public void setProperty(final String name, final String value) {
+  //<CG> Was für Properties gibt es?
     BaseX.notimplemented();
   }
 }

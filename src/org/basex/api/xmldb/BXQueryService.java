@@ -1,6 +1,10 @@
 package org.basex.api.xmldb;
 
+import java.util.Hashtable;
+import java.util.Iterator;
+
 import org.basex.BaseX;
+import org.basex.data.Nodes;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.xpath.XPathProcessor;
@@ -13,7 +17,6 @@ import org.xmldb.api.modules.XPathQueryService;
 
 /**
  * Abstract QueryService definition for the XMLDB:API.
- * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler
  */
@@ -26,6 +29,8 @@ public final class BXQueryService implements XPathQueryService {
   private final String name;
   /** Collection reference. */
   private BXCollection coll;
+  /** Hashtable for namespaceMapping. */
+  private Hashtable<String, String> nsMaps;
 
   /**
    * Standard constructor.
@@ -35,22 +40,23 @@ public final class BXQueryService implements XPathQueryService {
   public BXQueryService(final BXCollection c, final String n) {
     coll = c;
     name = n;
+    nsMaps = new Hashtable<String, String>(5);
   }
 
   public void clearNamespaces() {
-    BaseX.notimplemented();
+    nsMaps.clear();
   }
 
   public String getName() {
     return name;
   }
 
-  public String getNamespace(final String prefix) {
-    BaseX.notimplemented();
-    return null;
+  public String getNamespace(String prefix) {
+    return nsMaps.get(prefix);
   }
 
   public String getProperty(final String name) {
+  //<CG> Was für Properties gibt es?
     BaseX.notimplemented();
     return null;
   }
@@ -62,10 +68,10 @@ public final class BXQueryService implements XPathQueryService {
   public ResourceSet query(final String query) throws XMLDBException {
     try {
       // Creates a query instance
-      final QueryProcessor proc = name.equals(XPATH) ?
-          new XPathProcessor(query) : new XQueryProcessor(query);
+      final QueryProcessor proc = name.equals(XPATH) ? new XPathProcessor(query)
+          : new XQueryProcessor(query);
       // Executes the query and returns the result
-      return new BXResourceSet(proc.query(coll.ctx.current()));
+      return new BXResourceSet(proc.query(coll.ctx.current()), coll);
     } catch(final QueryException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
     } catch(final Exception ex) {
@@ -74,13 +80,28 @@ public final class BXQueryService implements XPathQueryService {
     }
   }
 
-  public ResourceSet queryResource(final String id, final String query) {
-    BaseX.notimplemented();
-    return null;
-  }
+  public ResourceSet queryResource(final String id, final String query) throws XMLDBException {
+    // Creates a query instance
+    final QueryProcessor proc = name.equals(XPATH) ? new XPathProcessor(query)
+        : new XQueryProcessor(query);
+    // Executes the query and returns the result
+    try {
+      return new BXResourceSet(proc.query(new Nodes(((BXXMLResource) coll.getResource(id)).getData())), coll);
+    } catch(final QueryException ex) {
+      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
+    } catch(final Exception ex) {
+      BaseX.notexpected();
+      return null;
+    }
+}
 
   public void removeNamespace(final String prefix) {
-    BaseX.notimplemented();
+    Iterator i = nsMaps.values().iterator();
+    while(i.hasNext()) {
+      if(((String)i.next()).equals(prefix)) {
+        i.remove();
+      }
+    }
   }
 
   public void setCollection(final Collection col) {
@@ -88,10 +109,11 @@ public final class BXQueryService implements XPathQueryService {
   }
 
   public void setNamespace(final String prefix, final String uri) {
-    BaseX.notimplemented();
+    nsMaps.put(prefix, uri);
   }
 
   public void setProperty(final String name, final String value) {
+  //<CG> Was für Properties gibt es?
     BaseX.notimplemented();
   }
 }
