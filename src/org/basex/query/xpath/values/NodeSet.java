@@ -225,7 +225,7 @@ public final class NodeSet extends Item {
 
   @Override
   public String toString() {
-    return name() + "[" + size + " Nodes]";
+    return "NodeSet[" + size + " Nodes]";
   }
 
   @Override

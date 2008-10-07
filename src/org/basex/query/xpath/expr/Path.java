@@ -58,6 +58,6 @@ public final class Path extends DualExpr {
 
   @Override
   public String toString() {
-    return name() + "(" + expr1 + ", " + expr2 + ')';
+    return "Path(" + expr1 + ", " + expr2 + ')';
   }
 }

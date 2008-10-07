@@ -39,10 +39,9 @@ public final class FTTest extends AbstractTest {
 
     queries = new Object[][] {
         { "FTMildNot1", nodes(3, 5),
-        "//w [text() ftcontains 'xml' not in 'xml databases']" },
-      { "FTMildNot2", nodes(14),
-        "//w [text() ftcontains 'hello' not in 'xml']" },
-          
+          "//w [text() ftcontains 'xml' not in 'xml databases']" },
+        { "FTMildNot2", nodes(14),
+          "//w [text() ftcontains 'hello' not in 'xml']" },
           
         { "Simple 1", bool(true),
           "'abc' ftcontains 'abc'" },
@@ -60,15 +59,19 @@ public final class FTTest extends AbstractTest {
           "//@key ftcontains 'values'" },
 
         { "FT 1", nodes(14),
-          "//w [text() ftcontains 'HELLO']" },
+          "//w[text() ftcontains 'HELLO']" },
         { "FT 2", nodes(14),
-          "//w [text() ftcontains 'hello']" },
+          "//w[text() ftcontains 'hello']" },
         { "FT 3", nodes(14),
-          "//w [text() ftcontains '    hello!...   ']" },
+          "//w[text() ftcontains '    hello!...   ']" },
         { "FT 4", nodes(),
-          "//w [  text  (   )  ftcontains  '  crap  '  ]  " },
+          "//w[  text  (   )  ftcontains  '  crap  '  ]  " },
         { "FT 5", nodes(),
-          "//w [text() ftcontains 'db']" },
+          "//w[text() ftcontains 'db']" },
+        { "FT 6", nodes(7, 9, 11),
+          "//w[text() ftcontains 'xml'][text() ftcontains 'Databases']" },
+        { "FT 7", nodes(37),
+          "//fttest[co/w ftcontains 'xml'][w ftcontains 'fifth']/atr" },
 
         { "Phrase 1", nodes(7, 9, 11),
           "//w [text() ftcontains 'xml databases']" },
