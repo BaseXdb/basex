@@ -8,7 +8,6 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.SimpleTimeZone;
-
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -20,7 +19,6 @@ import javax.xml.xquery.XQItem;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQPreparedExpression;
 import javax.xml.xquery.XQSequence;
-
 import org.basex.test.xqj.TestXMLFilter;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Comment;

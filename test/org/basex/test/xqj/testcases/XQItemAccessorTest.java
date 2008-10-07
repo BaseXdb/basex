@@ -9,14 +9,12 @@ import java.io.Writer;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Properties;
-
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Result;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xquery.*;
-
 import org.basex.test.xqj.TestContentHandler;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.helpers.DefaultHandler;

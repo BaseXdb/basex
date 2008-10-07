@@ -5,7 +5,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Properties;
-
 import javax.xml.xquery.XQConnection;
 import javax.xml.xquery.XQException;
 

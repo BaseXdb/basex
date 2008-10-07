@@ -4,13 +4,11 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import org.basex.BaseX;
 import org.basex.api.dom.BXDoc;
 import org.basex.data.Data;
-import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
 import org.basex.query.xquery.item.DNode;
@@ -18,7 +16,6 @@ import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xmldb.api.base.Collection;
@@ -61,7 +58,7 @@ public final class BXXMLResource implements XMLResource {
     if(content == null) {
       try {
         final CachedOutput out = new CachedOutput();
-        new Nodes(pre, data).serialize(new XMLSerializer(out), 0);
+        new XMLSerializer(out).xml(data, pre);
         content = out.toString();
       } catch(final IOException ex) {
         throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
@@ -71,12 +68,15 @@ public final class BXXMLResource implements XMLResource {
   }
 
   public Node getContentAsDOM() {
-    return new BXDoc(new DNode(data, pre));
+    return content instanceof Node ? (Node) content :
+      new BXDoc(new DNode(data, pre));
   }
 
   public void getContentAsSAX(final ContentHandler handler)
       throws XMLDBException {
 
+    if(handler == null) throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
+    
     XMLReader reader = null;
     final SAXParserFactory saxFactory = SAXParserFactory.newInstance();
     saxFactory.setNamespaceAware(true);
@@ -84,20 +84,10 @@ public final class BXXMLResource implements XMLResource {
     try {
       final SAXParser sax = saxFactory.newSAXParser();
       reader = sax.getXMLReader();
-    } catch(final ParserConfigurationException pce) {
-      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, pce.getMessage());
-    } catch(final SAXException saxe) {
-      saxe.printStackTrace();
-      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, saxe.getMessage());
-    }
-    try {
       reader.setContentHandler(handler);
       reader.parse(new InputSource(new StringReader(getContent().toString())));
-    } catch(final SAXException saxe) {
-      saxe.printStackTrace();
-      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, saxe.getMessage());
-    } catch(final IOException ioe) {
-      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ioe.getMessage());
+    } catch(final Exception pce) {
+      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, pce.getMessage());
     }
   }
 
@@ -123,7 +113,8 @@ public final class BXXMLResource implements XMLResource {
     content = value;
   }
 
-  public void setContentAsDOM(final Node cont) {
+  public void setContentAsDOM(final Node cont) throws XMLDBException {
+    if(cont == null) throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
     content = cont;
   }
 

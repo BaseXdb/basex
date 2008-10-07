@@ -3,7 +3,6 @@ package org.basex.test.xqj;
 
 import java.io.IOException;
 import java.io.StringReader;
-
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.XMLFilterImpl;
