@@ -5,7 +5,6 @@ import java.awt.BorderLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.JFrame;
-
 import org.basex.core.proc.List;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXBack;

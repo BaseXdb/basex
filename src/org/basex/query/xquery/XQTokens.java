@@ -198,13 +198,9 @@ public interface XQTokens {
   byte[] JAVAPRE = token("java:");
   /** Default collation. */
   byte[] URLCOLL = concat(FNURI, token("/collation/codepoint"));
-//
+
   // PREFIXES =================================================================
 
-  /** Namespaces Declaration. */
-  byte[] XMLNS = token("xmlns");
-  /** Namespaces Declaration. */
-  byte[] XMLNSCOL = token("xmlns:");
   /** Base token. */
   byte[] BASE = token("base");
   /** ID token. */

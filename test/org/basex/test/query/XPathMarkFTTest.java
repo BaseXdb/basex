@@ -264,5 +264,5 @@ public final class XPathMarkFTTest extends AbstractTest {
   126  122  ATTR  idrefs="n8 n17"
   127  122  ATTR  xml:lang="it"
   128  122  TEXT  zuzzurellone
-  **/
+  */
 }

@@ -96,7 +96,7 @@ public final class FElem extends FNode {
       final byte[] at = a.nname();
       if(level == 0 && a.qname().ns()) {
         final byte[] pref = substring(at, 0, indexOf(at, ':'));
-        final byte[] atr = concat(XMLNSCOL, pref);
+        final byte[] atr = concat(XMLNSC, pref);
         boolean f = Token.eq(pref, XML);
         for(final FAttr ns : names) f |= Token.eq(ns.nname(), atr);
         if(!f) ser.attribute(atr, a.qname().uri.str());
@@ -110,7 +110,7 @@ public final class FElem extends FNode {
       if(ns != null) {
         final byte[] p = ctx.ns.prefix(ns.uri);
         if(!Token.eq(p, XML)) {
-          byte[] pre = p.length == 0 ? XMLNS : concat(XMLNSCOL, ns.pre());
+          byte[] pre = p.length == 0 ? XMLNS : concat(XMLNSC, ns.pre());
           if(!nms.contains(pre)) {
             nms.add(pre);
             vls.add(ns.uri.str());

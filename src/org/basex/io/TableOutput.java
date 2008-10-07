@@ -2,7 +2,6 @@ package org.basex.io;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-
 import org.basex.util.IntList;
 
 /**
@@ -15,13 +14,13 @@ public final class TableOutput extends FileOutputStream {
   /** Buffer Threshold. */
   private static final int THRESHOLD = (int) Math.floor(IO.BLOCKFILL
       * (IO.BLOCKSIZE >>> IO.NODEPOWER)) << IO.NODEPOWER;
-  /** Buffer. **/
+  /** Buffer. */
   private final byte[] buffer = new byte[THRESHOLD];
   /** Index Entries. */
   private IntList firstPres = new IntList();
   /** Index Entries. */
   private IntList blocks = new IntList();
-  /** Position inside buffer. **/
+  /** Position inside buffer. */
   private int pos;
   /** Block Count. */
   private int blockCount;

@@ -1,7 +1,6 @@
 package org.basex.test.w3c;
 
 import static org.basex.util.Token.*;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
@@ -17,7 +16,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.regex.Pattern;
-
 import org.basex.BaseX;
 import org.basex.core.Context;
 import org.basex.core.Prop;
@@ -194,7 +192,7 @@ public abstract class W3CTS {
         text("/test-suite/@version", root));
 
     BaseX.outln("\nCaching Sources...");
-    for(final int s : nodes("//source", root).pre) {
+    for(final int s : nodes("//source", root).nodes) {
       final Nodes srcRoot = new Nodes(s, data);
       final String source = (path +
           text("@FileName", srcRoot)).replace('\\', '/');
@@ -202,7 +200,7 @@ public abstract class W3CTS {
     }
 
     BaseX.outln("Caching Modules...");
-    for(final int s : nodes("//module", root).pre) {
+    for(final int s : nodes("//module", root).nodes) {
       final Nodes srcRoot = new Nodes(s, data);
       final String module = (path +
           text("@FileName", srcRoot)).replace('\\', '/');
@@ -210,14 +208,14 @@ public abstract class W3CTS {
     }
 
     BaseX.outln("Caching Collections...");
-    for(final int c : nodes("//collection", root).pre) {
+    for(final int c : nodes("//collection", root).nodes) {
       final Nodes nodes = new Nodes(c, data);
       final String cname = text("@ID", nodes);
 
       final TokenList dl = new TokenList();
       final Nodes doc = nodes("input-document", nodes);
       for(int d = 0; d < doc.size; d++) {
-        dl.add(token(sources + string(data.atom(doc.pre[d])) + ".xml"));
+        dl.add(token(sources + string(data.atom(doc.nodes[d])) + ".xml"));
       }
       colls.put(cname, dl.finish());
     }
@@ -230,7 +228,7 @@ public abstract class W3CTS {
     BaseX.out("Parsing Queries");
     final Nodes nodes = nodes("//test-case | //ts:test-case", root);
     for(int t = 0; t < nodes.size; t++) {
-      if(!parse(new Nodes(nodes.pre[t], data))) break;
+      if(!parse(new Nodes(nodes.nodes[t], data))) break;
       if(t % 1000 == 0) BaseX.out(".");
     }
     BaseX.outln("");
@@ -323,7 +321,7 @@ public abstract class W3CTS {
 
       final XQueryProcessor xq = new XQueryProcessor(in, file);
       final Nodes cont = nodes("contextItem", root);
-      if(cont.size != 0) new Check(sources + string(data.atom(cont.pre[0])) +
+      if(cont.size != 0) new Check(sources + string(data.atom(cont.nodes[0])) +
           IO.XMLSUFFIX).execute(context, null);
 
       final XQContext ctx = xq.ctx;
@@ -336,7 +334,7 @@ public abstract class W3CTS {
       var(nodes("input-query/@name", root),
           nodes("input-query/@variable", root), pth, ctx);
 
-      for(final int p : nodes("module", root).pre) {
+      for(final int p : nodes("module", root).nodes) {
         final String ns = text("@namespace", new Nodes(p, data));
         final String f = modules.get(string(data.atom(p))) + ".xq";
         xq.module(ns, f);
@@ -372,7 +370,7 @@ public abstract class W3CTS {
     final StringBuilder tb = new StringBuilder();
     for(int o = 0; o < outFiles.size; o++) {
       if(o != 0) tb.append(DELIM);
-      final String resFile = string(data.atom(outFiles.pre[o]));
+      final String resFile = string(data.atom(outFiles.nodes[o]));
       final IO exp = IO.get(expected + pth + resFile);
       tb.append(exp.exists() ? read(exp) : ("Not Found: " + exp));
     }
@@ -428,7 +426,7 @@ public abstract class W3CTS {
       final String[] split = CHOP.split(result, 0);
       int s = -1;
       while(++s < split.length) {
-        inspect |= s < cmpFiles.pre.length && eq(data.atom(cmpFiles.pre[s]),
+        inspect |= s < cmpFiles.nodes.length && eq(data.atom(cmpFiles.nodes[s]),
             INSPECT);
         if(split[s].equals(output)) break;
       }
@@ -549,7 +547,7 @@ public abstract class W3CTS {
 
     final TokenBuilder tb = new TokenBuilder();
     for(int c = 0; c < nod.size; c++) {
-      final byte[] nm = data.atom(nod.pre[c]);
+      final byte[] nm = data.atom(nod.nodes[c]);
       final String src = srcFiles.get(string(nm));
       if(tb.size != 0) tb.add(", ");
       tb.add(nm);
@@ -561,14 +559,14 @@ public abstract class W3CTS {
         ctx.addColl(col, nm);
 
         if(var != null) {
-          final Var v = new Var(new QNm(data.atom(var.pre[c])));
+          final Var v = new Var(new QNm(data.atom(var.nodes[c])));
           ctx.vars.addGlobal(v.item(Uri.uri(nm), ctx));
         }
       } else {
         // assign document
         final Fun fun = FNIndex.get().get(token("doc"), Uri.FN,
             new Expr[] { Str.get(src) });
-        final Var v = new Var(new QNm(data.atom(var.pre[c])));
+        final Var v = new Var(new QNm(data.atom(var.nodes[c])));
         ctx.vars.addGlobal(v.expr(fun, ctx));
       }
     }
@@ -588,11 +586,11 @@ public abstract class W3CTS {
       final XQContext ctx) throws Exception {
 
     for(int c = 0; c < nod.size; c++) {
-      final String file = pth + string(data.atom(nod.pre[c])) + ".xq";
+      final String file = pth + string(data.atom(nod.nodes[c])) + ".xq";
       final String in = read(IO.get(queries + file));
       final XQueryProcessor qu = new XQueryProcessor(in);
       final XQResult result = (XQResult) qu.query(null);
-      final Var v = new Var(new QNm(data.atom(var.pre[c])));
+      final Var v = new Var(new QNm(data.atom(var.nodes[c])));
       ctx.vars.addGlobal(v.item(result.item(), ctx));
     }
   }
@@ -643,7 +641,7 @@ public abstract class W3CTS {
     final TokenBuilder sb = new TokenBuilder();
     for(int i = 0; i < n.size; i++) {
       if(i != 0) sb.add('/');
-      sb.add(data.atom(n.pre[i]));
+      sb.add(data.atom(n.nodes[i]));
     }
     return sb.toString();
   }

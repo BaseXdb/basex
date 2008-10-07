@@ -2,7 +2,6 @@ package org.basex.io;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
-
 import org.basex.BaseX;
 import org.basex.util.Array;
 

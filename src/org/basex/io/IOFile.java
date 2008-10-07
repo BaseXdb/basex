@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
 import org.xml.sax.InputSource;
 
 /**

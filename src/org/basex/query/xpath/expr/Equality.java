@@ -85,6 +85,6 @@ public final class Equality extends Comparison {
     if(index == null) return Integer.MAX_VALUE;
 
     // return number of expected index results
-    return ctx.local.data.nrIDs(index);
+    return ctx.item.data.nrIDs(index);
   }
 }

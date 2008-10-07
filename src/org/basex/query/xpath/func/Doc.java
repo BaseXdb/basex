@@ -28,8 +28,8 @@ public final class Doc extends Func {
   public NodeSet eval(final XPContext ctx) throws QueryException {
     final String db = Token.string(evalArgs(ctx)[0].str());
     try {
-      ctx.local = new NodeSet(Check.check(db));
-      return ctx.local;
+      ctx.item = new NodeSet(Check.check(db));
+      return ctx.item;
     } catch(final IOException ex) {
       throw new QueryException(UNKNOWNDOC, db);
     }

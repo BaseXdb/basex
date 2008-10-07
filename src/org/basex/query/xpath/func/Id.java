@@ -29,7 +29,7 @@ public final class Id extends Func {
 
   @Override
   public NodeSet eval(final XPContext ctx) throws QueryException {
-    final NodeSet local = ctx.local;
+    final NodeSet local = ctx.item;
     final Data data = local.data;
     // should actually depend on DTD
     final int id = data.attNameID(Token.token("id"));
@@ -74,8 +74,8 @@ public final class Id extends Func {
         }
       }
     }
-    ctx.local = new NodeSet(tmp.finish(), ctx);
-    return ctx.local;
+    ctx.item = new NodeSet(tmp.finish(), ctx);
+    return ctx.item;
   }
 
   @Override

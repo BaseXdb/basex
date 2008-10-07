@@ -23,7 +23,7 @@ public final class Last extends Func {
 
   @Override
   public Num eval(final XPContext ctx) throws QueryException {
-    if(ctx.local.currSize > 0) return new Num(ctx.local.currSize);
+    if(ctx.item.currSize > 0) return new Num(ctx.item.currSize);
     throw new QueryException(LASTEXC);
   }
 

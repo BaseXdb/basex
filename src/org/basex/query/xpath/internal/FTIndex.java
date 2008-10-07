@@ -48,7 +48,7 @@ public final class FTIndex extends FTArrayExpr {
 
   @Override
   public Bool eval(final XPContext ctx) {
-    final Data data = ctx.local.data;
+    final Data data = ctx.item.data;
 
     final FTTokenizer ft = new FTTokenizer();
     ft.init(token);

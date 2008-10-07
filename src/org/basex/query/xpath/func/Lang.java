@@ -27,14 +27,14 @@ public final class Lang extends Func {
       throws QueryException {
 
     // should actually be treated as XML namespace
-    final Data data = ctx.local.data;
+    final Data data = ctx.item.data;
     final int lang = data.attNameID(Token.token("xml:lang"));
     // no lang attribute specified - return false
     if(lang == 0) return Bool.FALSE;
     final byte[] lng = evalArgs(ctx)[0].str();
 
     // parse current node and all ancestors for the lang attribute
-    int r = ctx.local.nodes[0];
+    int r = ctx.item.nodes[0];
     while(r != 0) {
       final int pre = r;
       final byte[] att = data.attValue(lang, pre);

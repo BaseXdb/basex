@@ -19,6 +19,10 @@ public final class Token {
 
   /** XML Token. */
   public static final byte[] XML = token("xml");
+  /** XMLNS Token. */
+  public static final byte[] XMLNS = token("xmlns");
+  /** XMLNS Token with colon. */
+  public static final byte[] XMLNSC = token("xmlns:");
   /** True token. */
   public static final byte[] TRUE = token("true");
   /** False token. */

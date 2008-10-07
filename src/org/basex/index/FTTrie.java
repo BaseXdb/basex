@@ -44,7 +44,7 @@ public final class FTTrie extends Index {
   private long did;
   /** Flag for case sensitive index. */
   private boolean cs = false;
-  /** Cache for number of hits and data reference per token. **/
+  /** Cache for number of hits and data reference per token. */
   private final FTTokenMap cache;
 
   /**

@@ -162,7 +162,7 @@ public final class MapView extends View implements Runnable {
     final Nodes context = GUI.context.current();
     final boolean page = !more && rectHist[hist + 1] != null &&
       rectHist[hist + 1].p == 0 || more && (context.size != 1 ||
-          focusedRect == null || context.pre[0] != focusedRect.p);
+          focusedRect == null || context.nodes[0] != focusedRect.p);
     if(page) focusedRect = new MapRect(0, 0, getWidth(), 1);
 
     zoom(more, quick);
@@ -301,7 +301,7 @@ public final class MapView extends View implements Runnable {
     // call recursive TreeMap algorithm
     final Performance perf = new Performance();
     final Nodes nodes = GUI.context.current();
-    calcMap(rect, new IntList(nodes.pre), 0, nodes.size, true);
+    calcMap(rect, new IntList(nodes.nodes), 0, nodes.size, true);
 
     // output timing information
     final StringBuilder sb = new StringBuilder();
@@ -688,13 +688,13 @@ public final class MapView extends View implements Runnable {
       notifySwitch(new Nodes(focused, data));
     } else if(key == KeyEvent.VK_N || key == KeyEvent.VK_B) {
       // jump to next node
-      int pre = (current.pre[0] + 1) % size;
+      int pre = (current.nodes[0] + 1) % size;
       while(data.kind(pre) != Data.ELEM || !ViewData.isLeaf(data, pre))
         pre = (pre + 1) % size;
       notifySwitch(new Nodes(pre, data));
     } else if(key == KeyEvent.VK_P || key == KeyEvent.VK_Z) {
       // jump to previous node
-      int pre = (current.pre[0] == 0 ? size : current.pre[0]) - 1;
+      int pre = (current.nodes[0] == 0 ? size : current.nodes[0]) - 1;
       while(data.kind(pre) != Data.ELEM || !ViewData.isLeaf(data, pre))
         pre = (pre == 0 ? size : pre) - 1;
       notifySwitch(new Nodes(pre, data));
@@ -704,7 +704,7 @@ public final class MapView extends View implements Runnable {
       new Action() {
         public void run() {
           while(slide) {
-            int pre = context.current().pre[0];
+            int pre = context.current().nodes[0];
             if(slideForward) {
               pre = (pre + 1) % size;
               while(!ViewData.isLeaf(data, pre)) pre = (pre + 1) % size;

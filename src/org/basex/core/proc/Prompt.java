@@ -1,7 +1,6 @@
 package org.basex.core.proc;
 
 import java.io.IOException;
-
 import org.basex.core.Process;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
@@ -27,7 +26,7 @@ public final class Prompt extends Process {
     final Data data = context.data();
     if(data != null) {
       final Nodes nodes = context.current();
-      final int pre = nodes.pre[0];
+      final int pre = nodes.nodes[0];
       if(data.deepfs && pre != 0) {
         out.print(FSUtils.getName(data, pre));
       } else {

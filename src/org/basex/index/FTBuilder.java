@@ -21,7 +21,7 @@ import org.basex.util.Token;
 public final class FTBuilder extends Progress implements IndexBuilder {
   /** Word parser. */
   private final FTTokenizer wp = new FTTokenizer();
-  /** CTArray for tokens. **/
+  /** CTArray for tokens. */
   private FTArray index;
   /** Current parsing value. */
   private int id;

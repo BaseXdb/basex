@@ -52,7 +52,7 @@ public final class MetaData {
   public boolean ftdc = Prop.ftdc;
 
   /** Flag for removed index structures. */
-  public boolean newindex = false;
+  public boolean newindex;
   /** Last (highest) id assigned to a node. */
   public int lastid = -1;
   

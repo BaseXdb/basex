@@ -24,7 +24,7 @@ public final class StringLength extends Func {
   @Override
   public Num eval(final XPContext ctx) throws QueryException {
     final Item[] v = evalArgs(ctx);
-    return new Num((v.length == 0 ? ctx.local : v[0]).str().length);
+    return new Num((v.length == 0 ? ctx.item : v[0]).str().length);
   }
 
   @Override

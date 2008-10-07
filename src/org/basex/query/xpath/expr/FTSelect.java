@@ -67,7 +67,7 @@ public final class FTSelect extends FTArrayExpr {
     ftpos.pos.setPos(ftn.convertPos(), ftn.p.get(0));
     if (ftn.getToken() != null) {
       // Diskaccess could be optimized??? 
-      ftpos.pos.ft.init(ctx.local.data.text(ftn.getPre()));
+      ftpos.pos.ft.init(ctx.item.data.text(ftn.getPre()));
       ftpos.pos.term = ftpos.pos.ft.getTokenList();
     }
   }

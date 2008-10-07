@@ -116,11 +116,6 @@ public interface XPText {
   String MIN = "min";
   /** Attribute name. */
   String MAX = "max";
-  
-  /** FTGrammer. **/
-  int FTUNARYNOT = 0;
-  /** FTGrammer. **/
-  int FTTIMES = 1;
   // XPath Optimizer ==========================================================
 
   /** Optimization info. */

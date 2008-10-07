@@ -18,16 +18,17 @@ import org.basex.util.TokenBuilder;
 public final class NodeSet extends Item {
   /** Precedence. */
   static final int PREC = Integer.MAX_VALUE;
-  /** Current node set position. */
-  public int currPos;
-  /** Current node set size. */
-  public int currSize;
   /** Node array. */
   public int[] nodes;
   /** Data reference.. */
   public Data data;
   /** Number of stored values.. */
   public int size;
+
+  /** Current node set position. */
+  public int currPos;
+  /** Current node set size. */
+  public int currSize;
 
   /* FTIdPos array.
   public int[][] ftidpos;
@@ -41,7 +42,7 @@ public final class NodeSet extends Item {
    * @param ctx query context
    */
   public NodeSet(final int[] ids, final XPContext ctx) {
-    data = ctx.local.data;
+    data = ctx.item.data;
     nodes = ids;
     size = ids.length;
   }
@@ -67,7 +68,7 @@ public final class NodeSet extends Item {
    * @param ctx query context
    */
   public NodeSet(final XPContext ctx) {
-    this(ctx.local.data);
+    this(ctx.item.data);
   }
 
   /**

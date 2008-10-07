@@ -445,7 +445,6 @@ public final class DiskData extends Data {
     int p = pre;
     while(p < size) {
       final int k = kind(p);
-      //if(k == DOC) break;
       dist(p, k, dist(p, k) + s);
       p += size(p, kind(p));
     }

@@ -187,7 +187,7 @@ public final class XMark extends AQuery {
       final Nodes c2 = eval(stepRef2, b, bi);
       if(c2.size == 0) continue;
 
-      if(c1.pre[0] < c2.pre[0]) {
+      if(c1.nodes[0] < c2.nodes[0]) {
         writeSep(hits++);
         writeTag(hist, b, bi, stepReserve);
       }
@@ -448,10 +448,10 @@ public final class XMark extends AQuery {
       writeSep(pi);
       final Nodes tmp = eval(stepIncome, p, pi);
       out.openElement(items, name, tmp.size != 0 ?
-          data.atom(tmp.pre[0]) : EMPTY);
+          data.atom(tmp.nodes[0]) : EMPTY);
 
       if(tmp.size != 0) {
-        parse("count(.[" + data.atomNum(tmp.pre[0]) + " > 5000 * text()])").
+        parse("count(.[" + data.atomNum(tmp.nodes[0]) + " > 5000 * text()])").
           query(i).serialize(out);
       } else {
         out.out.print("0");
@@ -481,8 +481,8 @@ public final class XMark extends AQuery {
     for(int pi = 0; pi < ps; pi++) {
       writeSep(pi);
       final Nodes tmp = eval(stepIncome, p, pi);
-      out.openElement(items, pers, data.atom(tmp.pre[0]));
-      parse("count(.[" + data.atomNum(tmp.pre[0]) + " > 5000 * text()])").
+      out.openElement(items, pers, data.atom(tmp.nodes[0]));
+      parse("count(.[" + data.atomNum(tmp.nodes[0]) + " > 5000 * text()])").
         query(i).serialize(out);
       out.closeElement(items);
     }
@@ -547,7 +547,7 @@ public final class XMark extends AQuery {
     for(int ai = 0; ai < as; ai++) {
       writeSep(ai);
       out.openElement(text);
-      out.text(data.atom(a.pre[ai]));
+      out.text(data.atom(a.nodes[ai]));
       out.closeElement(text);
     }
     return a.size;
@@ -572,7 +572,7 @@ public final class XMark extends AQuery {
     final int as = a.size;
     for(int ai = 0; ai < as; ai++) {
       writeSep(ai);
-      out.emptyElement(pers, id, data.atom(eval(stepPerson, a, ai).pre[0]));
+      out.emptyElement(pers, id, data.atom(eval(stepPerson, a, ai).nodes[0]));
     }
     return a.size;
   }
@@ -612,7 +612,7 @@ public final class XMark extends AQuery {
     final int is = i.size;
     for(int ii = 0; ii != is; ii++) {
       writeSep(ii);
-      out.out.print(token(convert(data.atomNum(i.pre[ii]))));
+      out.out.print(token(convert(data.atomNum(i.nodes[ii]))));
     }
     return i.size;
   }
@@ -706,7 +706,7 @@ public final class XMark extends AQuery {
    */
   private byte[] atom(final Nodes in, final int pre,
       final XPathProcessor xpath) throws QueryException {
-    return data.atom(eval(xpath, in, pre).pre[0]);
+    return data.atom(eval(xpath, in, pre).nodes[0]);
   }
 
   /**
@@ -738,7 +738,7 @@ public final class XMark extends AQuery {
    */
   private Nodes eval(final XPathProcessor xp, final Nodes in,
       final int pre) throws QueryException {
-    return eval(xp, new Nodes(in.pre[pre], data));
+    return eval(xp, new Nodes(in.nodes[pre], data));
   }
 
   /**
@@ -781,7 +781,7 @@ public final class XMark extends AQuery {
       out.emptyElement();
     } else {
       out.finishElement();
-      for(int t = 0; t < tmp.size; t++) out.text(data.atom(tmp.pre[0]));
+      for(int t = 0; t < tmp.size; t++) out.text(data.atom(tmp.nodes[0]));
       out.closeElement(tag);
     }
   }
@@ -797,7 +797,7 @@ public final class XMark extends AQuery {
     final byte[][] values = new byte[in.size][];
 
     for(int i = 0; i < is; i++) {
-      final byte[] token = data.atom(in.pre[i]);
+      final byte[] token = data.atom(in.nodes[i]);
       int j = -1;
       while(++j < vs) if(equal(values[j], token)) break;
       if(j == vs) values[vs++] = token;
@@ -813,7 +813,7 @@ public final class XMark extends AQuery {
   private void sort(final Nodes in, final Nodes sort) {
     final int size = in.size;
     final byte[][] st = new byte[size][];
-    for(int i = 0; i < size; i++) st[i] = data.atom(sort.pre[i]);
+    for(int i = 0; i < size; i++) st[i] = data.atom(sort.nodes[i]);
     sort(in, st, 0, in.size - 1);
   }
 
@@ -861,9 +861,9 @@ public final class XMark extends AQuery {
    * @param b second position
    */
   private void swap(final Nodes nodes, final int a, final int b) {
-    final int p = nodes.pre[a];
-    nodes.pre[a] = nodes.pre[b];
-    nodes.pre[b] = p;
+    final int p = nodes.nodes[a];
+    nodes.nodes[a] = nodes.nodes[b];
+    nodes.nodes[b] = p;
   }
 
   /**

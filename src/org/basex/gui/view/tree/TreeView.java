@@ -131,7 +131,7 @@ public final class TreeView extends View {
     startY = 0;
     scroll.pos(0);
 
-    if(more) jumpTo(GUI.context.current().pre[0], true);
+    if(more) jumpTo(GUI.context.current().nodes[0], true);
     refreshHeight();
     repaint();
   }
@@ -155,7 +155,7 @@ public final class TreeView extends View {
     scroll.pos(0);
 
     final Nodes marked = GUI.context.marked();
-    if(marked.size != 0) jumpTo(marked.pre[0], true);
+    if(marked.size != 0) jumpTo(marked.nodes[0], true);
     refreshHeight();
     repaint();
   }
@@ -211,11 +211,11 @@ public final class TreeView extends View {
     final int kind = data.kind(pre);
     final boolean elem = kind == Data.ELEM || kind == Data.DOC;
 
-    while(mpos < marked.size && marked.pre[mpos] < pre) mpos++;
+    while(mpos < marked.size && marked.nodes[mpos] < pre) mpos++;
 
     Color col = Color.black;
     Font fnt = GUIConstants.font;
-    if(mpos < marked.size && marked.pre[mpos] == pre) {
+    if(mpos < marked.size && marked.nodes[mpos] == pre) {
       // mark node
       col = GUIConstants.colormark3;
       fnt = GUIConstants.bfont;
@@ -513,11 +513,11 @@ public final class TreeView extends View {
     // calculate new tree position
     focused = -1;
     final Nodes curr = GUI.context.current();
-    int pre = curr.pre[0];
+    int pre = curr.nodes[0];
     final TreeIterator it = new TreeIterator(this);
     while(it.more() && focus-- != 0) pre = it.pre;
 
-    if(pre == curr.pre[0] && key == KeyEvent.VK_DOWN) pre++;
+    if(pre == curr.nodes[0] && key == KeyEvent.VK_DOWN) pre++;
     notifyFocus(pre, this);
     jumpTo(pre, false);
     repaint();

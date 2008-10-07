@@ -41,7 +41,7 @@ public final class InfoTable extends AInfo {
     if(result != null) {
       final Nodes nodes = (Nodes) result;
       tableHeader(out, data);
-      for(int i = 0; i < nodes.size; i++) table(out, data, nodes.pre[i]);
+      for(int i = 0; i < nodes.size; i++) table(out, data, nodes.nodes[i]);
     } else {
       int ps = 0;
       int pe = data.size;
@@ -71,6 +71,7 @@ public final class InfoTable extends AInfo {
       final int ps, final int pe) throws IOException {
     tableHeader(out, data);
     for(int p = ps; p < pe; p++) table(out, data, p);
+    data.ns.print(out, Token.numDigits(data.size) + 1);
   }
 
   /**
@@ -83,11 +84,12 @@ public final class InfoTable extends AInfo {
       throws IOException {
     // write table header
     final int len = Token.numDigits(data.size);
-    format(out, Token.token(TABLEHEAD1), len + 1);
-    format(out, Token.token(TABLEHEAD2), len + 2);
-    format(out, Token.token(TABLEHEAD3), len + 2);
-    format(out, Token.token(TABLEHEAD4), 4);
-    out.print(TABLEHEAD5);
+    format(out, Token.token(TABLEPRE), len + 1);
+    format(out, Token.token(TABLEDIST), len + 2);
+    format(out, Token.token(TABLESIZE), len + 2);
+    format(out, Token.token(TABLEATS), 4);
+    format(out, Token.token(TABLENS), 4);
+    out.print(TABLEKIND);
   }
 
   /**
@@ -107,13 +109,9 @@ public final class InfoTable extends AInfo {
     format(out, p - data.parent(p, k), len + 2);
     format(out, data.size(p, k), len + 2);
     format(out, data.attSize(p, k), 4);
-
-    if(k == Data.ELEM) out.print(TABLEELEM);
-    else if(k == Data.DOC) out.print(TABLEDOC);
-    else if(k == Data.TEXT) out.print(TABLETEXT);
-    else if(k == Data.COMM) out.print(TABLECOMM);
-    else if(k == Data.ATTR) out.print(TABLEATTR);
-    else if(k == Data.PI) out.print(TABLEPI);
+    format(out, data.tagNS(p), 4);
+    out.print("  ");
+    out.print(TABLEKINDS[k]);
 
     out.print("  ");
     out.print(k == Data.ELEM ? data.tag(p) : k == Data.ATTR ?

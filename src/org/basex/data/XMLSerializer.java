@@ -63,8 +63,7 @@ public final class XMLSerializer extends Serializer {
   @Override
   public void open(final int size) throws IOException {
     if(xml) {
-      // [CG] XML/Serialize: convert back to original/specified encoding
-      // (data.meta.encoding)
+      // [CG] XML/Serialize: allow different encodings (incl. original one)
       out.println("<?xml version='1.0' encoding='" + UTF8 + "' ?>");
       startElement(RESULTS);
       if(size == 0) emptyElement();

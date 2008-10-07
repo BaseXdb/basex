@@ -21,10 +21,11 @@ import org.basex.query.xpath.values.Item;
  */
 public final class XPContext extends QueryContext {
   /** Data reference. */
-  public NodeSet local;
+  public NodeSet item;
+  
   /** Leaf flag. */
   public boolean leaf;
-  /** Count number of xpath fulltext query tokens. **/
+  /** Count number of xpath fulltext query tokens. */
   public int ftcount;
   /** Current fulltext item. */
   public FTTokenizer ftitem;
@@ -35,7 +36,6 @@ public final class XPContext extends QueryContext {
   /** Reference to the root expression. */
   private Expr root;
   
-
   /**
    * Constructor.
    * @param expr root expression
@@ -50,7 +50,7 @@ public final class XPContext extends QueryContext {
   public XPContext compile(final Nodes n) throws QueryException {
     inf = Prop.allInfo;
     if(inf) compInfo(QUERYCOMP);
-    local = n != null ? new NodeSet(n.pre, n.data) : null;
+    item = n != null ? new NodeSet(n.nodes, n.data) : null;
     root = root.compile(this);
     if(inf) compInfo(QUERYRESULT + "%", root);
     return this;
@@ -59,7 +59,7 @@ public final class XPContext extends QueryContext {
   @Override
   public Result eval(final Nodes nodes) throws QueryException {
     evalTime = System.nanoTime();
-    local = new NodeSet(nodes.pre, nodes.data);
+    item = new NodeSet(nodes.nodes, nodes.data);
     return eval(root);
   }
   

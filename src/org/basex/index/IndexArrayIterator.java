@@ -16,7 +16,7 @@ public final class IndexArrayIterator extends IndexIterator {
   private int size;
   /** Counter. */
   private int d = -1;
-  /** Pre and Pos values. **/
+  /** Pre and Pos values. */
   private int[][] ftdata = null;
   /** Each token in the query has a number. */
   private int toknum = 0;

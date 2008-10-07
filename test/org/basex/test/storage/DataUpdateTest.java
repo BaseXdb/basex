@@ -2,7 +2,6 @@ package org.basex.test.storage;
 
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
-
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.proc.CreateDB;

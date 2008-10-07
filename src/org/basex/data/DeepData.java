@@ -1,7 +1,6 @@
 package org.basex.data;
 
 import static org.basex.data.DataText.*;
-
 import java.io.IOException;
 
 import org.basex.index.Index;
@@ -104,6 +103,7 @@ public final class DeepData extends Data {
       atts.finish(out);
       skel.finish(out);
       ns.finish(out);
+      out.close();
     } catch(final IOException e) {
       e.printStackTrace();
     }
@@ -426,7 +426,6 @@ public final class DeepData extends Data {
     int p = pre;
     while(p < size) {
       final int k = kind(p);
-      //if(k == DOC) break;
       dist(p, k, dist(p, k) + s);
       p += size(p, kind(p));
     }
@@ -590,7 +589,7 @@ public final class DeepData extends Data {
    */
   private void dist(final int pre, final int kind, final int v) {
     if(kind == ATTR) table.write1(pre, 11, v);
-    else table.write4(pre, kind == ELEM ? 4 : 8, v);
+    else if(kind != DOC) table.write4(pre, kind == ELEM ? 4 : 8, v);
   }
 
   /**

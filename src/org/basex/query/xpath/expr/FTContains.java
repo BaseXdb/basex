@@ -161,13 +161,13 @@ public final class FTContains extends DualExpr {
      ftn = (ftn == null && ftae.more()) ? ftae.next(ctx) : ftn;
 
      if (ftn != null) {
-        while (ftn.getPre() < ctx.local.nodes[0] + 1) {
+        while (ftn.getPre() < ctx.item.nodes[0] + 1) {
           if (ftae.more()) ftn = ftae.next(ctx);
           else break;
         }
         if (ftn.size > 0) {
           final boolean not = ftn.not;
-          if (ftn.getPre() == ctx.local.nodes[0] + 1) {
+          if (ftn.getPre() == ctx.item.nodes[0] + 1) {
             ftn = null;
             return Bool.get(!not); // false
           }
@@ -248,7 +248,7 @@ public final class FTContains extends DualExpr {
   public int indexSizes(final XPContext ctx, final Step curr, final int min) {
 
     // check if first expression is a location path and if fulltext index exists
-    final MetaData meta = ctx.local.data.meta;
+    final MetaData meta = ctx.item.data.meta;
     if(!(expr1 instanceof LocPathRel && meta.ftxindex))
       return Integer.MAX_VALUE;
 

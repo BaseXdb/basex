@@ -184,7 +184,7 @@ public final class GUIConstants {
   /** Fifth mark color. */
   public static Color colormark5;
   
-  /** Thumbnail colors. **/
+  /** Thumbnail colors. */
   public static Color[] thumbnailcolor;
 
   /** Cached treemap colors. */

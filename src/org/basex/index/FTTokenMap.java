@@ -10,9 +10,9 @@ import org.basex.util.Set;
  * @author Sebastian Gath
  */
 final class FTTokenMap extends Set {
-  /** Number of position values. **/
+  /** Number of position values. */
   private int[] sizes = new int[CAP];
-  /** Pointer on token data. **/
+  /** Pointer on token data. */
   private long[] pointers = new long[CAP];
 
   /**

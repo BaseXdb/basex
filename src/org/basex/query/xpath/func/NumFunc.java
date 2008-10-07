@@ -22,7 +22,7 @@ public final class NumFunc extends Func {
 
   @Override
   public Num eval(final XPContext ctx) throws QueryException {
-    return new Num((args.length == 0 ? ctx.local : evalArgs(ctx)[0]).num());
+    return new Num((args.length == 0 ? ctx.item : evalArgs(ctx)[0]).num());
   }
 
   @Override

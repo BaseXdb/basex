@@ -26,7 +26,7 @@ public final class Distinct extends Func {
   public NodeSet eval(final XPContext ctx) 
       throws QueryException {
     
-    final NodeSet local = ctx.local;
+    final NodeSet local = ctx.item;
     final int[] n = ((NodeSet) evalArgs(ctx)[0]).nodes;
     final byte[][] v = new byte[n.length][];
     for(int i = 0; i != v.length; i++) v[i] = local.data.atom(n[i]);

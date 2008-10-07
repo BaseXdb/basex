@@ -28,7 +28,7 @@ public final class Nodes extends Func {
 
   @Override
   public NodeSet eval(final XPContext ctx) throws QueryException {
-    final Data data = ctx.local.data;
+    final Data data = ctx.item.data;
     final int size = data.size;
     final NodeBuilder tmp = new NodeBuilder();
 

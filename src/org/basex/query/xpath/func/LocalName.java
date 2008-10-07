@@ -28,9 +28,9 @@ public final class LocalName extends Func {
   public Literal eval(final XPContext ctx) throws QueryException {
     final Item[] v = evalArgs(ctx);
     final NodeSet set = v.length != 0 && v[0].size() != 0 ?
-        (NodeSet) v[0] : ctx.local;
+        (NodeSet) v[0] : ctx.item;
 
-    final Data data = ctx.local.data;
+    final Data data = ctx.item.data;
     final int node = set.nodes[0];
     final int kind = data.kind(node);
     if(kind == Data.ELEM) return new Literal(data.tag(node));

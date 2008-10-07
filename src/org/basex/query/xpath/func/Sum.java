@@ -30,7 +30,7 @@ public final class Sum extends Func {
 
     final NodeSet set = (NodeSet) v[0];
     double sum = 0;
-    final Data data = ctx.local.data;
+    final Data data = ctx.item.data;
     for(final int node : set.nodes) sum += data.atomNum(node);
     return new Num(sum);
   }

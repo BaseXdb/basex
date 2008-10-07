@@ -1,7 +1,6 @@
 package org.basex.query.fs;
 
 import java.io.IOException;
-
 import org.basex.BaseX;
 import org.basex.core.Context;
 import org.basex.data.Data;
@@ -29,7 +28,7 @@ public abstract class FSCmd {
   public final void context(final Context ctx) {
     context = ctx;
     data = context.data();
-    curPre = ctx.current().pre[0];
+    curPre = ctx.current().nodes[0];
   }
   
   /**

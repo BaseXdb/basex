@@ -230,7 +230,7 @@ public enum GUICommands implements GUICommand {
       // disallow copy of empty node set or root node
       final Nodes nodes = GUI.context.marked();
       BaseXLayout.enable(button, !Prop.mainmem && nodes != null &&
-          nodes.size != 0 && (nodes.size != 1 || nodes.pre[0] != 0));
+          nodes.size != 0 && (nodes.size != 1 || nodes.nodes[0] != 0));
     }
   },
 
@@ -238,7 +238,7 @@ public enum GUICommands implements GUICommand {
   COPYPATH(true, GUICPPATH, "ctrl shift C", GUICPPATHTT) {
     @Override
     public void execute() {
-      final int pre = GUI.context.marked().pre[0];
+      final int pre = GUI.context.marked().nodes[0];
       final byte[] txt = ViewData.path(GUI.context.data(), pre);
       // copy path to clipboard
       final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -266,11 +266,11 @@ public enum GUICommands implements GUICommand {
       // disallow copy of empty node set or root node
       final Nodes nodes = context.marked();
       boolean s = !Prop.mainmem && context.copied() != null && nodes != null &&
-        nodes.size != 0 && (nodes.size != 1 || nodes.pre[0] != 0);
+        nodes.size != 0 && (nodes.size != 1 || nodes.nodes[0] != 0);
       if(s) {
         final Data d = nodes.data;
         for(int n = 0; n < nodes.size; n++) {
-          if(d.kind(nodes.pre[n]) != Data.ELEM) {
+          if(d.kind(nodes.nodes[n]) != Data.ELEM) {
             s = false;
             break;
           }
@@ -313,8 +313,8 @@ public enum GUICommands implements GUICommand {
       final Nodes nodes = context.marked();
       final Data d = context.data();
       BaseXLayout.enable(button, !Prop.mainmem && nodes != null &&
-          nodes.size == 1 && (d.kind(nodes.pre[0]) == Data.ELEM ||
-              d.kind(nodes.pre[0]) == Data.DOC));
+          nodes.size == 1 && (d.kind(nodes.nodes[0]) == Data.ELEM ||
+              d.kind(nodes.nodes[0]) == Data.DOC));
     }
   },
 
@@ -323,7 +323,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void execute() {
       final Nodes nodes = GUI.context.marked();
-      final DialogEdit edit = new DialogEdit(GUI.get(), nodes.pre[0]);
+      final DialogEdit edit = new DialogEdit(GUI.get(), nodes.nodes[0]);
       if(edit.result == null) return;
       final UPDATE type = UPDATE.values()[edit.kind];
       GUI.get().execute(new Update(true, type, edit.result));
@@ -334,7 +334,7 @@ public enum GUICommands implements GUICommand {
       final Context context = GUI.context;
       final Nodes nodes = context.marked();
       BaseXLayout.enable(button, !Prop.mainmem && nodes != null &&
-          nodes.size == 1 && context.data().kind(nodes.pre[0]) != Data.DOC);
+          nodes.size == 1 && context.data().kind(nodes.nodes[0]) != Data.DOC);
     }
   },
 
@@ -807,7 +807,7 @@ public enum GUICommands implements GUICommand {
     public void refresh(final AbstractButton button) {
       final Nodes current = GUI.context.current();
       final boolean enabled = !GUI.context.root() ||
-        current != null && (current.size == 1 || current.pre[0] != 0);
+        current != null && (current.size == 1 || current.nodes[0] != 0);
       BaseXLayout.enable(button, enabled);
     }
   },
@@ -823,7 +823,7 @@ public enum GUICommands implements GUICommand {
     public void refresh(final AbstractButton button) {
       final Nodes current = GUI.context.current();
       final boolean enabled = !GUI.context.root() ||
-        current != null && (current.size == 1 || current.pre[0] != 0);
+        current != null && (current.size == 1 || current.nodes[0] != 0);
       BaseXLayout.enable(button, enabled);
     }
   };

@@ -43,11 +43,11 @@ public abstract class Step extends ExprInfo {
    */
   final NodeSet eval(final XPContext ctx) throws QueryException {
     // return if nodeset is empty
-    if(ctx.local.size == 0) return ctx.local;
+    if(ctx.item.size == 0) return ctx.item;
 
     result.reset();
-    final Data data = ctx.local.data;
-    final int[] nodes = ctx.local.nodes;
+    final Data data = ctx.item.data;
+    final int[] nodes = ctx.item.nodes;
 
     // choose the evaluation plan
     if(simple) {
@@ -103,7 +103,7 @@ public abstract class Step extends ExprInfo {
    */
   final boolean compile(final XPContext ctx) throws QueryException {
     // set leaf flag if tag in location step has no further leaf tags
-    final Data data = ctx.local.data;
+    final Data data = ctx.item.data;
     test.compile(data);
     if(test instanceof TestName) {
       final TestName t = (TestName) test;

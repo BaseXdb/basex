@@ -44,14 +44,14 @@ public final class Delete extends Process {
 
     // delete all nodes backwards to preserve pre values of earlier nodes
     final int size = nodes.size;
-    for(int i = size - 1; i >= 0; i--) data.delete(nodes.pre[i]);
+    for(int i = size - 1; i >= 0; i--) data.delete(nodes.nodes[i]);
     
     // recreate root node
     //if(data.size == 0) data.insert(0, 1, Token.EMPTY, Data.DOC);
 
     // refresh current context
     final Nodes curr = context.current();
-    if(gui && curr.size > 1 || curr.pre[0] == nodes.pre[0]) {
+    if(gui && curr.size > 1 || curr.nodes[0] == nodes.nodes[0]) {
       context.current(new Nodes(0, data));
     }
     data.flush();

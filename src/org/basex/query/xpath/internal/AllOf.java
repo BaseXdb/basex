@@ -76,7 +76,7 @@ public final class AllOf extends InternalExpr {
       final IndexToken index = path.indexable(ctx, val, cmp);
       if(index == null) return Integer.MAX_VALUE;
       
-      final int nrIDs = ctx.local.data.nrIDs(index);
+      final int nrIDs = ctx.item.data.nrIDs(index);
       if(nrIDs == 0 || nrIDs > min) return nrIDs;
       if(max < nrIDs) max = nrIDs;
     }

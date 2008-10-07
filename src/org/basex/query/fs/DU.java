@@ -112,7 +112,7 @@ public final class DU extends FSCmd {
    */
   private void print(final PrintOutput out, final long s, final byte[] pt)
       throws IOException {
-    out.print(12, fHuman ? format(s) : Long.toString(s));
+    out.print(12, Token.token(fHuman ? format(s) : Long.toString(s)));
     out.print("  ");
     out.println(pt);
   }

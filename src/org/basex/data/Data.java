@@ -1,12 +1,12 @@
 package org.basex.data;
 
+import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.index.Index;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
 import org.basex.index.Names;
 import org.basex.util.IntList;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -52,7 +52,7 @@ public abstract class Data  {
   protected Index txtindex;
   /** Attribute value index. */
   protected Index atvindex;
-  /** Fulltext index instance. **/
+  /** Fulltext index instance. */
   protected Index ftxindex;
 
   /** File system indicator. */
@@ -79,7 +79,7 @@ public abstract class Data  {
    */
   public final void initNames() {
     deepfs = tags.id(DataText.DEEPFS) != 0;
-    xmlnsID = atts.id(DataText.XMLNS);
+    xmlnsID = atts.id(XMLNS);
     nameID = atts.id(DataText.NAME);    
     if(deepfs) {
       fileID = tags.id(DataText.FILE);
@@ -113,10 +113,8 @@ public abstract class Data  {
    * Opens the specified index.
    * @param type index to be opened
    * @param ind index instance
-   * @throws IOException in case the index could not be opened
    */
-  public abstract void openIndex(IndexToken.TYPE type, Index ind)
-    throws IOException;
+  public abstract void openIndex(IndexToken.TYPE type, Index ind);
 
   /**
    * Returns a unique node id.
@@ -288,7 +286,7 @@ public abstract class Data  {
    * @return id array
    */
   public final IndexIterator ids(final IndexToken token) {
-    if(token.get().length > Token.MAXLEN) return null;
+    if(token.get().length > MAXLEN) return null;
     switch(token.type) {
       case TXT: return txtindex.ids(token);
       case ATV: return atvindex.ids(token);
@@ -304,7 +302,7 @@ public abstract class Data  {
    */
   public final int nrIDs(final IndexToken token) {
     // token to long.. no results can be expected
-    if(token.get().length > Token.MAXLEN) return Integer.MAX_VALUE;
+    if(token.get().length > MAXLEN) return Integer.MAX_VALUE;
     switch(token.type) {
       case TXT: return txtindex.nrIDs(token);
       case ATV: return atvindex.nrIDs(token);
@@ -325,7 +323,7 @@ public abstract class Data  {
       case TXT: return txtindex.info();
       case ATV: return atvindex.info();
       case FTX: return ftxindex.info();
-      default: return Token.EMPTY;
+      default: return EMPTY;
     }
   }
   
@@ -360,7 +358,7 @@ public abstract class Data  {
   public final double atomNum(final int pre) {
     final int k = kind(pre);
     return k == TEXT || k == COMM || k == PI ? textNum(pre) : 
-           k == ATTR ? attNum(pre) : Token.toDouble(atm(pre));
+           k == ATTR ? attNum(pre) : toDouble(atm(pre));
   }
 
   /**

@@ -50,7 +50,7 @@ public final class Count extends Func {
         final int nameID = step.simpleName(Axis.DESC, true);
         if(nameID != Integer.MIN_VALUE) {
           ctx.compInfo(OPTFUNC, desc);
-          return new Num(ctx.local.data.tags.counter(nameID));
+          return new Num(ctx.item.data.tags.counter(nameID));
         }
       } else if(steps.size() == 2) {
         Step step = steps.get(0);
@@ -60,7 +60,7 @@ public final class Count extends Func {
           final int name2 = step.simpleName(Axis.DESC, true);
           if(name2 != Integer.MIN_VALUE) {
             ctx.compInfo(OPTFUNC, desc);
-            return new Num(ctx.local.data.tags.counter(name2) -
+            return new Num(ctx.item.data.tags.counter(name2) -
                 (name1 == name2 ? 1 : 0));
           }
         }

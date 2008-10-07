@@ -116,7 +116,7 @@ public final class Find extends AQuery {
 
     final Nodes current = context.current();
     final TokenBuilder xpath = new TokenBuilder();
-    final boolean r = root || current.size == 1 && current.pre[0] < 2;
+    final boolean r = root || current.size == 1 && current.nodes[0] < 2;
 
     if(r) xpath.add("/");
     xpath.add("descendant-or-self::*");

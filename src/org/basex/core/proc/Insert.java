@@ -75,7 +75,7 @@ public final class Insert extends AUpdate {
 
     // check if all nodes are elements
     for(int i = nodes.size - 1; i >= 0; i--) {
-      final int par = nodes.pre[i];
+      final int par = nodes.nodes[i];
       final int kind = data.kind(par);
       if(kind != Data.ELEM) return error(COPYTAGS);
 
@@ -89,7 +89,7 @@ public final class Insert extends AUpdate {
     // perform updates
     data.noIndex();
     for(int i = nodes.size - 1; i >= 0; i--) {
-      final int par = nodes.pre[i];
+      final int par = nodes.nodes[i];
       data.insert(par + data.attSize(par, data.kind(par)), par, n, v);
     }
     return true;
@@ -116,13 +116,13 @@ public final class Insert extends AUpdate {
 
     // check if all nodes are elements
     for(int i = nodes.size - 1; i >= 0; i--) {
-      if(data.kind(nodes.pre[i]) != Data.ELEM) return error(COPYTAGS);
+      if(data.kind(nodes.nodes[i]) != Data.ELEM) return error(COPYTAGS);
     }
 
     // insert temporary instance of document
     data.noIndex();
     for(int i = nodes.size - 1; i >= 0; i--) {
-      final int par = nodes.pre[i];
+      final int par = nodes.nodes[i];
       data.insert(pre(par, pos, data), par, tmp);
     }
     return true;
@@ -149,7 +149,7 @@ public final class Insert extends AUpdate {
     // check correctness of query
     final int pos = gui ? 0 : toInt(args[pi ? 2 : 1]);
     for(int i = nodes.size - 1; i >= 0; i--) {
-      final int k = data.kind(nodes.pre[i]);
+      final int k = data.kind(nodes.nodes[i]);
       if(k == Data.TEXT) return error(COPYTAGS);
       if(k == Data.DOC && (kind == Data.TEXT || kind == Data.ELEM &&
           data.size > 1)) return error(COPYROOT);
@@ -158,7 +158,7 @@ public final class Insert extends AUpdate {
     // perform updates
     data.noIndex();
     for(int i = nodes.size - 1; i >= 0; i--) {
-      final int par = nodes.pre[i];
+      final int par = nodes.nodes[i];
       final int pre = pre(par, pos, data);
 
       // merge text nodes if necessary

@@ -17,6 +17,7 @@ import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
 import org.basex.query.xquery.util.Err;
 import org.basex.util.Token;
+import org.basex.util.TokenList;
 import org.basex.util.XMLToken;
 
 /**
@@ -111,26 +112,27 @@ final class FNQName extends Fun {
    * @param ctx query context
    * @param node node
    * @return prefix sequence
-   * @throws XQException xquery exception
    */
-  private Iter inscope(final XQContext ctx, final Nod node)
-      throws XQException {
+  private Iter inscope(final XQContext ctx, final Nod node) {
+    final TokenList tl = new TokenList();
+    tl.add(Token.XML);
+    if(ctx.nsElem != Uri.EMPTY) tl.add(Token.EMPTY);
 
-    final SeqIter seq = new SeqIter();
-    seq.add(new NCN(Token.XML).iter());
-    if(ctx.nsElem != Uri.EMPTY) seq.add(Str.ZERO);
-
-    // [CG] XQuery/inscope; nested namespace handling
     Nod n = node;
     while(n != null) {
       final FAttr[] at = n.ns();
       if(at == null) break;
       for(final FAttr ns : at) {
         final QNm name = ns.qname();
-        if(name.ns()) seq.add(Str.get(name.ln()).iter());
+        if(name.ns()) {
+          final byte[] pre = name.ln();
+          if(!tl.contains(pre)) tl.add(pre);
+        }
       }
       n = n.parent();
     }
+    final SeqIter seq = new SeqIter();
+    for(int t = 0; t < tl.size; t++) seq.add(Str.get(tl.list[t]));
     return seq;
   }
 }

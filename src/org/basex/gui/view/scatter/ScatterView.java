@@ -256,7 +256,7 @@ public final class ScatterView extends View implements Runnable {
       if(marked.size() > 0) {
         tmpMarkedPos.reset();
         for(int i = 0; i < marked.size(); i++) {
-          final int prePos = scatterData.getPrePos(marked.pre[i]);
+          final int prePos = scatterData.getPrePos(marked.nodes[i]);
           if(prePos > -1)
             tmpMarkedPos.add(prePos);
         }

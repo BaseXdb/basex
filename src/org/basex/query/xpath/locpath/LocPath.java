@@ -33,7 +33,7 @@ public abstract class LocPath extends Expr {
   @Override
   public final Expr compile(final XPContext ctx) throws QueryException {
     // At this point a data reference has to be available;
-    if(ctx.local == null) throw new QueryException(NODATA);
+    if(ctx.item == null) throw new QueryException(NODATA);
 
     // replacing self::node() with child::text() for possible index integration
     if(ctx.leaf && steps.size() == 1 && steps.get(0).simple(Axis.SELF)) {
@@ -91,7 +91,7 @@ public abstract class LocPath extends Expr {
       //if(this instanceof LocPathRel && min > ctx.local.data.size / 10) 
       //continue;
       if(!seq && 
-          this instanceof LocPathRel && min > ctx.local.data.size / 10) 
+          this instanceof LocPathRel && min > ctx.item.data.size / 10) 
         continue;
       
       // predicates that are optimized to use index and results of index queries
@@ -221,7 +221,7 @@ public abstract class LocPath extends Expr {
 
     if(!(this instanceof LocPathRel && exp instanceof Literal)) return null;
 
-    final Data data = ctx.local.data;
+    final Data data = ctx.item.data;
     final boolean txt = data.meta.txtindex && cmp == Comp.EQ;
     final boolean atv = data.meta.atvindex && cmp == Comp.EQ;
     

@@ -135,6 +135,12 @@ public final class DNode extends Nod {
   }
 
   @Override
+  public FAttr[] ns() {
+    // [CG] include namespace handling
+    return null;
+  }
+
+  @Override
   public byte[] base() {
     if(type != Type.DOC) return EMPTY;
     final IO dir = IO.get(data.meta.file.path());
@@ -248,7 +254,7 @@ public final class DNode extends Nod {
             final int i = data.ns.get(at, as + 1);
             if(i > 0) {
               final byte[] pref = substring(at, 0, indexOf(at, ':'));
-              final byte[] atr = concat(XMLNSCOL, pref);
+              final byte[] atr = concat(XMLNSC, pref);
               if(!names.contains(atr)) {
                 names.add(atr);
                 values.add(data.ns.key(i));
@@ -259,11 +265,11 @@ public final class DNode extends Nod {
           // add xmlns attribute for tag
           final int i = data.ns.get(name, pre);
           if(i > 0) {
-            // [CG] check namespace handling..
+            // [CG] check namespace handling
             final int j = indexOf(name, ':');
             final byte[] uri = data.ns.key(i);
             final byte[] pref = j == -1 ? null : substring(name, 0, j);
-            final byte[] at = j == -1 ? XMLNS : concat(XMLNSCOL, pref);
+            final byte[] at = j == -1 ? XMLNS : concat(XMLNSC, pref);
             if(!names.contains(at)) {
               names.add(at);
               values.add(uri);

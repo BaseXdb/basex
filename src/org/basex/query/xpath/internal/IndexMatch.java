@@ -47,15 +47,15 @@ public final class IndexMatch extends InternalExpr {
     final NodeBuilder result = new NodeBuilder();
 
     // match rest of path
-    final NodeSet old = ctx.local;
+    final NodeSet old = ctx.item;
     final NodeSet tmp = new NodeSet(ctx);
     for(final int res : ((NodeSet) ctx.eval(expr)).nodes) {
       tmp.set(res);
-      ctx.local = tmp;
+      ctx.item = tmp;
       if(found(loc.nodes, match.eval(ctx).nodes)) result.add(res);
     }
 
-    ctx.local = old;
+    ctx.item = old;
     return new NodeSet(result.finish(), ctx);
     //, ctx.local.ftidpos, ctx.local.ftpointer);
   }

@@ -43,9 +43,9 @@ public abstract class View extends BaseXPanel {
   
   /** Currently focused node (pre value). */
   public static int focused = -1;
-  /** Current FTPrePos values. **/
+  /** Current FTPrePos values. */
   public static int[][] ftPos;
-  /** Current FTPointer on FTPrePos values. **/
+  /** Current FTPointer on FTPrePos values. */
   public static int[] ftPoi; 
   
   /** Popup reference. */

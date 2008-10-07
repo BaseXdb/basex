@@ -11,11 +11,11 @@ import org.basex.util.TokenList;
  * @author Sebastian Gath
  */
 final class FTArray {
-  /** counts all nodes in the trie. **/
+  /** counts all nodes in the trie. */
   int count;
 
-  /** THE LISTS ARE USED TO CREATE THE STRUCTURE. **/
-  /** List saving the token values. **/
+  /** THE LISTS ARE USED TO CREATE THE STRUCTURE. */
+  /** List saving the token values. */
   TokenList tokens;
   /** List saving the structure: [t, n1, ..., nk, s, p0, p1]
    * t = pointer on tokens; n1, ..., nk are the children of the node

@@ -162,7 +162,7 @@ public final class MapFS extends MapPainter {
     // show full path in top rectangle
     final Nodes current = context.current();
     final byte[] name = kind == Data.DOC ? ViewData.content(data, pre, true) :
-      current.size == 1 && pre != 0 && !file && pre == current.pre[0] ?
+      current.size == 1 && pre != 0 && !file && pre == current.nodes[0] ?
           ViewData.path(data, pre) : ViewData.tag(data, pre);
 
     // image display

@@ -27,10 +27,12 @@ public final class Path extends DualExpr {
   @Override
   public Item eval(final XPContext ctx) throws QueryException {
     final Item val = ctx.eval(expr1);
-    final NodeSet local = ctx.local;
-    ctx.local = (NodeSet) val;
+    final NodeSet local = ctx.item;
+    ctx.item = (NodeSet) val;
     final NodeSet ns = (NodeSet) ctx.eval(expr2);
-    ctx.local = local;
+    /*ns.ftidpos = ctx.local.ftidpos;
+    ns.ftpointer = ctx.local.ftpointer;*/
+    ctx.item = local;
     return ns;
   }
 

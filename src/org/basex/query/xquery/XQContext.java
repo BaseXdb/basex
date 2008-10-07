@@ -119,7 +119,7 @@ public final class XQContext extends QueryContext {
     if(nodes != null) {
       docs = new DNode[nodes.size];
       for(int d = 0; d < docs.length; d++) {
-        docs[d] = addNS(new DNode(nodes.data, nodes.pre[d]));
+        docs[d] = addNS(new DNode(nodes.data, nodes.nodes[d]));
       }
       item = Seq.get(docs, docs.length);
       final NodIter col = new NodIter();
@@ -227,11 +227,11 @@ public final class XQContext extends QueryContext {
       }
     }
 
-    // check if the database has already been read
+    // check if the database has already been opened
     String dbname = string(db);
     for(final DNode d : docs) if(d.data.meta.dbname.equals(dbname)) return d;
 
-    // check if the database has already been read
+    // check if the document has already been opened
     final IO bxw = IO.get(string(db));
     for(final DNode d : docs) if(d.data.meta.file.eq(bxw)) return d;
 

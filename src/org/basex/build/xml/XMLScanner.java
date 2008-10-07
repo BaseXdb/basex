@@ -4,9 +4,7 @@ import static org.basex.Text.*;
 import static org.basex.build.BuildText.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.XMLToken.*;
-
 import java.io.IOException;
-
 import org.basex.BaseX;
 import org.basex.build.BuildException;
 import org.basex.build.BuildText.Type;

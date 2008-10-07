@@ -31,12 +31,12 @@ public final class IndexAccess extends InternalExpr {
 
   @Override
   public NodeSet eval(final XPContext ctx) {
-    final IndexIterator it = ctx.local.data.ids(ind);
+    final IndexIterator it = ctx.item.data.ids(ind);
     final int[] ids = new int[it.size()];
     int i = 0;
     while(it.more()) ids[i++] = it.next();
-    ctx.local = new NodeSet(ids, ctx);
-    return ctx.local;
+    ctx.item = new NodeSet(ids, ctx);
+    return ctx.item;
   }
 
   @Override

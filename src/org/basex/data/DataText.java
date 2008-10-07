@@ -2,7 +2,6 @@ package org.basex.data;
 
 import static org.basex.util.Token.*;
 import org.basex.core.Prop;
-import org.basex.util.Token;
 
 /**
  * This class assembles texts which are used in the data classes.
@@ -83,10 +82,6 @@ public interface DataText {
   byte[] SUFFIX = token("suffix");
   /** Suffix attribute. */
   byte[] CONTENT = token("content");
-  /** XMLNS attribute. */
-  byte[] XMLNS = token("xmlns");
-  /** XMLNS attribute. */
-  byte[] XMLNSC = token("xmlns:");
 
   // XML SERIALIZATION ========================================================
 
@@ -126,27 +121,23 @@ public interface DataText {
   // TABLE SERIALIZATION ======================================================
 
   /** First table Header. */
-  String TABLEHEAD1 = "PRE";
+  String TABLEPRE = "PRE";
   /** Second table Header. */
-  String TABLEHEAD2 = "DIS";
+  String TABLEDIST = "DIS";
   /** Third table Header. */
-  String TABLEHEAD3 = "SIZ";
+  String TABLESIZE = "SIZ";
   /** Fourth table Header. */
-  String TABLEHEAD4 = "ATS";
+  String TABLEATS = "ATS";
+  /** Namespace header. */
+  String TABLENS = "NS";
+  /** Prefix header. */
+  String TABLEPREF = "PREFIX";
+  /** URI header. */
+  String TABLEURI = "NAMESPACE";
   /** Fifth table Header. */
-  String TABLEHEAD5 = "  KIND  CONTENT" + Prop.NL;
-  /** Table Document. */
-  String TABLEDOC = "  DOC ";
-  /** Table Element. */
-  String TABLEELEM = "  ELEM";
-  /** Table Text. */
-  String TABLETEXT = "  TEXT";
-  /** Table Text. */
-  String TABLEATTR = "  ATTR";
-  /** Table Comment. */
-  String TABLECOMM = "  COMM";
-  /** Table Text. */
-  String TABLEPI = "  PI  ";
+  String TABLEKIND = "  KIND  CONTENT" + Prop.NL;
+  /** Table Kinds. */
+  String[] TABLEKINDS = { "DOC ", "ELEM", "TEXT", "ATTR", "COMM", "PI  " };
 
   // DATABASE FILES ===========================================================
 
@@ -156,37 +147,12 @@ public interface DataText {
   String DATATBL = "tbl";
   /** Database - Temporary Size References. */
   String DATATMP = "tmp";
-  /** Database - Tag index. */
-  String DATATAG = "tag";
-  /** Database - Attribute name index. */
-  String DATAATN = "atn";
   /** Database - Text index. */
   String DATATXT = "txt";
   /** Database - Attribute value index. */
   String DATAATV = "atv";
-  /** Database - Word index. */
-  String DATAWRD = "wrd";
   /** Database - Fulltext index. */
   String DATAFTX = "ftx";
-  /** Database - Documents statistic. */
-  String DATASTAT = "sta";
-  /** Database - Namespaces. */
-  String DATANS = "nsp";
-  /** Database - Structure. */
-  String DATASTR = "str";
-
-  // Document Statistics ======================================================
-
-  /** Statistics - Integer value. */
-  byte[] STATINT = Token.token("INT");
-  /** Statistics - Double value. */
-  byte[] STATDBL = Token.token("DBL");
-  /** Statistics - TEXT/NONE. */
-  byte[] STATNONE = Token.token("NONE");
-  /** Statistics - TEXT/NONE. */
-  byte[] STATTEXT = Token.token("TEXT");
-  /** Statistics - Categories. */
-  byte[] STATCAT = Token.token("CAT");
 
   // DEEPFS STRINGS ===========================================================
   /** Name of the current deepfs shared library. */

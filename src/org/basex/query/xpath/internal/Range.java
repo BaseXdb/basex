@@ -88,7 +88,7 @@ public final class Range extends InternalExpr {
     if(!(expr instanceof LocPathRel)) return Integer.MAX_VALUE;
     final LocPathRel path = (LocPathRel) expr;
     
-    final Data data = ctx.local.data;
+    final Data data = ctx.item.data;
     final boolean txt = data.meta.txtindex;
     final boolean atv = data.meta.atvindex;
     

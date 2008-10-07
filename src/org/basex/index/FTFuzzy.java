@@ -60,7 +60,7 @@ public final class FTFuzzy extends Index {
   final DataAccess dat;
   /** Token positions. */
   final int[] tp = new int[Token.MAXLEN + 1];
-  /** Cache for number of hits and data reference per token. **/
+  /** Cache for number of hits and data reference per token. */
   private final FTTokenMap cache;
 
 

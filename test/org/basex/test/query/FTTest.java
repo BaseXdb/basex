@@ -325,6 +325,6 @@ public final class FTTest extends AbstractTest {
      37  36   2   1  ELEM  w
      38   1   1   1  TEXT  the fifth sentence. fourth sentence.
      third sentence. second sentence. first sentence.
-     **/
+     */
   }
 }

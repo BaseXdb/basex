@@ -39,12 +39,12 @@ abstract class MapPainter {
 
     final Nodes marked = GUI.context.marked();
     // checks if the current node is a queried context node
-    while(mpos < marked.size && marked.pre[mpos] < pre) mpos++;
+    while(mpos < marked.size && marked.nodes[mpos] < pre) mpos++;
     if(mpos < marked.size) {
-      if(marked.pre[mpos] == pre) {
+      if(marked.nodes[mpos] == pre) {
         // mark node
         return GUIConstants.colormark1;
-      } else if(ri + 1 < rs && marked.pre[mpos] < rects.get(ri + 1).p) {
+      } else if(ri + 1 < rs && marked.nodes[mpos] < rects.get(ri + 1).p) {
         // mark ancestor of invisible node
         return GUIConstants.colormark2;
       }

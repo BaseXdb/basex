@@ -25,8 +25,6 @@ public final class Names extends Set {
   private StatsKey[] stat;
   /** Statistics flag. */
   public boolean stats;
-  /** Dirty flag. */
-  public boolean dirty;
 
   /**
    * Empty Constructor.
@@ -36,7 +34,6 @@ public final class Names extends Set {
     noleaf = new boolean[CAP];
     stat = new StatsKey[CAP];
     stats = true;
-    dirty = true;
   }
 
   /**
@@ -68,7 +65,6 @@ public final class Names extends Set {
       counter[i]++;
       stat[i].add(v);
     }
-    dirty = true;
     return i;
   }
 
@@ -79,7 +75,6 @@ public final class Names extends Set {
    */
   public void index(final int i, final byte[] v) {
     stat[i].add(v);
-    dirty = true;
   }
 
   /**
@@ -121,7 +116,6 @@ public final class Names extends Set {
    */
   public void noStats() {
     stats = false;
-    dirty = true;
     for(int i = 1; i < size; i++) {
       stat[i] = new StatsKey();
       counter[i] = 0;

@@ -7,7 +7,6 @@ import java.io.IOException;
 import org.basex.build.BuildException;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
-import org.basex.data.DataText;
 import org.basex.io.IO;
  
 /**
@@ -103,10 +102,10 @@ public final class XMLParser extends Parser {
       consume(Type.QUOTE);
 
       final int s = indexOf(attName, ':');
-      if(s != -1 && startsWith(attName, DataText.XMLNSC)) {
+      if(s != -1 && startsWith(attName, XMLNSC)) {
         // open namespace...
         builder.startNS(substring(attName, s + 1), attValue);
-      } else if(eq(attName, DataText.XMLNS)) {
+      } else if(eq(attName, XMLNS)) {
         // open namespace...
         builder.startNS(EMPTY, attValue);
       } else {

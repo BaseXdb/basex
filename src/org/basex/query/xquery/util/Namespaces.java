@@ -1,7 +1,6 @@
 package org.basex.query.xquery.util;
 
 import static org.basex.query.xquery.XQText.*;
-import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.QNm;

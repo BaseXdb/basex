@@ -61,6 +61,11 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public class XPParser extends QueryParser {
+  /** FTGrammar.
+  private static final int FTUNARYNOT = 0; */
+  /** FTGrammar. */
+  private static final int FTTIMES = 1;
+  
   /**
    * Constructor.
    * @param q query

@@ -43,12 +43,12 @@ public final class PredSimple extends Pred {
     final int[] nodes = set.nodes;
     final int size = set.size;
     final NodeBuilder tmp = new NodeBuilder();
-    ctx.local.currSize = size;
+    ctx.item.currSize = size;
 
     for(int n = 0; n != size; n++) {
       final int pre = nodes[n];
-      ctx.local.set(pre);
-      ctx.local.currPos = n + 1;
+      ctx.item.set(pre);
+      ctx.item.currPos = n + 1;
 
       final Item v = ctx.eval(expr);
       if(v instanceof Num) {

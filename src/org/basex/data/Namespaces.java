@@ -1,11 +1,14 @@
 package org.basex.data;
 
+import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
+import org.basex.io.PrintOutput;
 import org.basex.util.Array;
 import org.basex.util.Set;
+import org.basex.util.Token;
 
 /**
  * This class organizes the namespaces of a database.
@@ -69,7 +72,7 @@ public final class Namespaces extends Set {
    * @param p current pre value
    */
   public void end(final int p) {
-    while(root.pre > p) root = root.par;
+    while(root.pre >= p) root = root.par;
   }
 
   /**
@@ -89,32 +92,9 @@ public final class Namespaces extends Set {
    * @return namespace reference or 0 if no namespace was found
    */
   public int get(final byte[] n, final int p) {
-    final Node node = find(root, p);
+    final Node node = root.find(p);
     final byte[] pre = substring(n, 0, Math.max(0, indexOf(n, ':')));
     return ns(pre, node);
-  }
-
-  /**
-   * Recursively finds the namespaces for the specified node.
-   * @param n node
-   * @param p pre value
-   * @return node
-   */
-  private Node find(final Node n, final int p) {
-    if(n.ch.length == 0) return n;
-    
-    final Node[] ch = n.ch;
-    int l = 0, m = 0, h = ch.length - 1;
-    while(l <= h) {
-      m = (l + h) >>> 1;
-      int v = ch[m].pre;
-      if(v < p) l = m + 1;
-      else if(v > p) h = m - 1;
-      else break;
-    }
-    while(p >= ch[m].pre && ++m < ch.length);
-    
-    return find(ch[Math.max(0, m - 1)], p);
   }
 
   /**
@@ -145,9 +125,25 @@ public final class Namespaces extends Set {
     }
     return 0;
   }
+  
+  /**
+   * Prints the namespace structure to the specified output stream.
+   * @param out output stream
+   * @param s space for pre value
+   * @throws IOException I/O exception
+   */
+  public void print(final PrintOutput out, final int s) throws IOException {
+    if(root.ch.length == 0) return;
+    out.print(s, Token.token(TABLEPRE));
+    out.print(s + 1, Token.token(TABLEDIST));
+    out.print(' ');
+    out.print(Token.token(TABLEPREF), 10);
+    out.println(Token.token(TABLEURI));
+    root.print(out, s);
+  }
 
   /** Document node. */
-  static final class Node {
+  final class Node {
     /** Children. */
     Node[] ch;
     /** Keys. */
@@ -220,6 +216,43 @@ public final class Namespaces extends Set {
     int get(final int k) {
       for(int i = 0; i < key.length; i++) if(key[i] == k) return val[i];
       return 0;
+    }
+
+    /**
+     * Finds the namespaces for the specified node.
+     * @param p pre value
+     * @return node
+     */
+    Node find(final int p) {
+      if(ch.length == 0) return this;
+      int l = 0, m = 0, h = ch.length - 1;
+      while(l <= h) {
+        m = (l + h) >>> 1;
+        int v = ch[m].pre;
+        if(v < p) l = m + 1;
+        else if(v > p) h = m - 1;
+        else break;
+      }
+      while(p >= ch[m].pre && ++m < ch.length);
+      return ch[Math.max(0, m - 1)].find(p);
+    }
+    
+    /**
+     * Creates a string representation of the node and its descendants.
+     * @param out output stream
+     * @param s space for pre value
+     * @throws IOException I/O exception
+     */
+    void print(final PrintOutput out, final int s) throws IOException {
+      for(int i = 0; i < key.length; i++) {
+        out.print(s, Token.token(pre));
+        out.print(s + 1, Token.token(pre - par.pre));
+        out.print(' ');
+        out.print(key(key[i]), 10);
+        out.print(key(val[i]));
+        out.println(" (" + val[i] + ")");
+      }
+      for(int i = 0; i < ch.length; i++) ch[i].print(out, s);
     }
   }
 }

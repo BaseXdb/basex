@@ -2,7 +2,6 @@ package org.basex.build;
 
 import static org.basex.Text.*;
 import static org.basex.data.DataText.*;
-
 import java.io.IOException;
 import org.basex.core.proc.DropDB;
 import org.basex.data.Data;

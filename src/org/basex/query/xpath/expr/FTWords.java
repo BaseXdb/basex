@@ -119,7 +119,7 @@ public final class FTWords extends FTArrayExpr {
     
     int i = 0;
     while(fto.sb.more()) {
-      final int n = ctx.local.data.nrIDs(fto.sb);
+      final int n = ctx.item.data.nrIDs(fto.sb);
       if(n == 0) return 0;
       i = Math.max(i, n);
     }

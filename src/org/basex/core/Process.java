@@ -178,7 +178,7 @@ public abstract class Process extends AbstractProcess {
       if(err != null) {
         final Data data = context.data();
         for(int i = nodes.size - 1; i >= 0; i--) {
-          if(data.kind(nodes.pre[i]) != Data.ELEM) {
+          if(data.kind(nodes.nodes[i]) != Data.ELEM) {
             error(err);
             return null;
           }

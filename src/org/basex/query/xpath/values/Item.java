@@ -1,7 +1,6 @@
 package org.basex.query.xpath.values;
 
 import java.io.IOException;
-
 import org.basex.data.Result;
 import org.basex.data.Serializer;
 import org.basex.query.xpath.XPContext;

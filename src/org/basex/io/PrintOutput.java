@@ -61,9 +61,9 @@ public class PrintOutput extends OutputStream {
    * @param i number of spaces to indent
    * @throws IOException in case of write errors
    */
-  public final void print(final int i, final String str) throws IOException {
-    for(int a = 0; a < i - str.length(); a++) print(' ');
-    print(Token.token(str));
+  public final void print(final int i, final byte[] str) throws IOException {
+    for(int a = 0; a < i - str.length; a++) print(' ');
+    print(str);
   }
 
   /**
@@ -72,9 +72,9 @@ public class PrintOutput extends OutputStream {
    * @param i number of spaces to indent
    * @throws IOException in case of write errors
    */
-  public final void print(final String str, final int i) throws IOException {
-    print(Token.token(str));
-    for(int a = 0; a < i - str.length(); a++) print(' ');
+  public final void print(final byte[] str, final int i) throws IOException {
+    print(str);
+    for(int a = 0; a < i - str.length; a++) print(' ');
   }
 
   /**

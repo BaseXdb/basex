@@ -162,7 +162,7 @@ public final class LOCATE extends FSCmd {
       filesfound = result.size;
       if(!cFlag) {
         for(int i = 0; i < filesfound && (!lFlag || i < limit); i++) {
-          out.println(FSUtils.getPath(data, result.pre[i]));
+          out.println(FSUtils.getPath(data, result.nodes[i]));
         }
       }
     } catch(final QueryException e) {

@@ -22,7 +22,7 @@ public final class StringFunc extends Func {
 
   @Override
   public Literal eval(final XPContext ctx) throws QueryException {
-    return new Literal((args.length == 0 ? ctx.local :
+    return new Literal((args.length == 0 ? ctx.item :
       evalArgs(ctx)[0]).str());
   }
 

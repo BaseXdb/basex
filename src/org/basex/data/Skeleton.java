@@ -73,6 +73,7 @@ public final class Skeleton {
    * Removes the statistics.
    */
   public void noStats() {
+    stack = new Node[256];
     root = null;
   }
 

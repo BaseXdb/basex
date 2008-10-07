@@ -76,7 +76,7 @@ public final class OneOf extends InternalExpr {
       final IndexToken index = path.indexable(ctx, val, cmp);
       if(index == null) return Integer.MAX_VALUE;
 
-      final int nrIDs = ctx.local.data.nrIDs(index);
+      final int nrIDs = ctx.item.data.nrIDs(index);
       sum += nrIDs;
       if(sum > min) return min;
     }

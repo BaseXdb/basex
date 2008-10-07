@@ -94,7 +94,7 @@ public final class XPathMV extends AQuery {
 
         // gather IDs for titles on top
         final Nodes res = (Nodes) result;
-        final int[] pres = res.pre;
+        final int[] pres = res.nodes;
         final int size = res.size;
         ids = new IDSet();
         

@@ -526,10 +526,11 @@ public final class GUI extends JFrame {
         if(context.current() != current || GUIProp.filterrt) {
           // refresh context
           if(nodes != null) {
+            /*
             if(GUIProp.filterrt) {
-              View.ftPos = nodes.ftpos;
-              View.ftPoi = nodes.ftpoin;
-            }
+            View.ftPos = nodes.ftpos;
+            View.ftPoi = nodes.ftpoin;
+            }*/
             View.notifyContext((Nodes) result, GUIProp.filterrt);
           }
         } else if(marked != null) {
@@ -543,9 +544,10 @@ public final class GUI extends JFrame {
           }
           // highlights have changed.. refresh views
           if(!marked.sameAs(context.marked())) {
-            View.ftPos = marked.ftpos;
+            /*
             View.ftPoi = marked.ftpoin;
             View.notifyMark(marked);
+            */
           }
           if(thread != threadID) {
             proc = null;

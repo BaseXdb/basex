@@ -22,7 +22,7 @@ public final class BooleanFunc extends Func {
 
   @Override
   public Bool eval(final XPContext ctx) throws QueryException {
-    return Bool.get((args.length == 0 ? ctx.local :
+    return Bool.get((args.length == 0 ? ctx.item :
       evalArgs(ctx)[0]).bool());
   }
 

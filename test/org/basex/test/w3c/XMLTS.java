@@ -77,7 +77,7 @@ public final class XMLTS {
     BaseX.outln("\nXML Conformance Tests\n");
     BaseX.outln("file = (expected result) -> BaseX result");
 
-    for(final int t : nodes("//TEST", root).pre) {
+    for(final int t : nodes("//TEST", root).nodes) {
       final Nodes srcRoot = new Nodes(t, data);
       final String uri = text("@URI", srcRoot);
       final boolean valid = text("@TYPE", srcRoot).equals("valid");
@@ -139,7 +139,7 @@ public final class XMLTS {
     final TokenBuilder sb = new TokenBuilder();
     for(int i = 0; i < n.size; i++) {
       if(i != 0) sb.add("/");
-      sb.add(data.atom(n.pre[i]));
+      sb.add(data.atom(n.nodes[i]));
     }
     return sb.toString();
   }

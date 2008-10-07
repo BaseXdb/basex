@@ -88,13 +88,13 @@ public final class Steps {
    * @throws QueryException evaluation exception
    */
   public NodeSet eval(final XPContext ctx) throws QueryException {
-    final NodeSet tmp = ctx.local;
+    final NodeSet tmp = ctx.item;
     for(int s = 0; s < size; s++) {
-      ctx.local = steps[s].eval(ctx);
+      ctx.item = steps[s].eval(ctx);
       ctx.checkStop();
     }
-    final NodeSet res = ctx.local;
-    ctx.local = tmp;
+    final NodeSet res = ctx.item;
+    ctx.item = tmp;
     return res;
   }
 

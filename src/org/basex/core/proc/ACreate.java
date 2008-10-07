@@ -60,10 +60,7 @@ abstract class ACreate extends Process {
       final Data data = builder.build(p, db);
       if(Prop.allInfo) info(CREATETABLE + NL, pp.getTimer());
       builder = null;
-
-      if(data.meta.txtindex) buildIndex(IndexToken.TYPE.TXT, data);
-      if(data.meta.atvindex) buildIndex(IndexToken.TYPE.ATV, data);
-      if(data.meta.ftxindex) buildIndex(IndexToken.TYPE.FTX, data);
+      index(data);
       context.data(data);
       
       return Prop.info ? info(DBCREATED, db, perf.getTimer()) : true;
@@ -88,6 +85,17 @@ abstract class ACreate extends Process {
     }
     DropDB.drop(db);
     return error(err);
+  }
+
+  /**
+   * Builds the indexes.
+   * @param data data reference
+   * @throws IOException I/O exception
+   */
+  void index(final Data data) throws IOException {
+    if(data.meta.txtindex) buildIndex(IndexToken.TYPE.TXT, data);
+    if(data.meta.atvindex) buildIndex(IndexToken.TYPE.ATV, data);
+    if(data.meta.ftxindex) buildIndex(IndexToken.TYPE.FTX, data);
   }
 
   /**

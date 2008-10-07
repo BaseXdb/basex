@@ -100,7 +100,7 @@ public final class TableData {
    */
   void context() {
     final Nodes n = GUI.context.current();
-    final boolean root = n.size == 1 && n.pre[0] < 2;
+    final boolean root = n.size == 1 && n.nodes[0] < 2;
     if(rootRows != null && root) {
       rows = rootRows;
       sortCol = -1;
@@ -111,7 +111,6 @@ public final class TableData {
 
     // calculate column widths
     if(colW == null) calcWidths();
-
   }
 
   /**
@@ -199,7 +198,7 @@ public final class TableData {
 
     rows = new IntList();
     for(int c = 0; c < n.size; c++) {
-      int p = n.pre[c];
+      int p = n.nodes[c];
 
       final int s = p + data.size(p, data.kind(p));
       // find first root tag

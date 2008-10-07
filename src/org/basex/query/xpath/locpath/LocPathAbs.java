@@ -19,10 +19,10 @@ public final class LocPathAbs extends LocPath {
   public NodeSet eval(final XPContext ctx) throws QueryException {
     // only evaluated once as result for absolute traversals is always the same
     if(nodeset == null) {
-      final NodeSet ns = ctx.local;
-      ctx.local = new NodeSet(ns.data.doc(), ctx);
+      final NodeSet ns = ctx.item;
+      ctx.item = new NodeSet(ns.data.doc(), ctx);
       nodeset = steps.eval(ctx);
-      ctx.local = ns;
+      ctx.item = ns;
     }
     return nodeset;
   }

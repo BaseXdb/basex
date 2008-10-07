@@ -66,7 +66,7 @@ public final class Update extends AUpdate {
     
     // check if errors can occur
     for(int i = nodes.size - 1; i >= 0; i--) {
-      final int pre = nodes.pre[i];
+      final int pre = nodes.nodes[i];
       if(data.kind(pre) != Data.ATTR)
         return error(UPDATENODE, UPDATE.values()[Data.ATTR]);
       // check existence of attribute
@@ -80,7 +80,7 @@ public final class Update extends AUpdate {
     
     // perform updates
     data.noIndex();
-    for(int i = nodes.size - 1; i >= 0; i--) data.update(nodes.pre[i], n, v);
+    for(int i = nodes.size - 1; i >= 0; i--) data.update(nodes.nodes[i], n, v);
     return true;
   }
   
@@ -107,13 +107,13 @@ public final class Update extends AUpdate {
     
     // check if nodes to be updated have the same type
     for(int i = nodes.size - 1; i >= 0; i--) {
-      final int k = data.kind(nodes.pre[i]);
+      final int k = data.kind(nodes.nodes[i]);
       if(k != kind) return error(UPDATENODE, UPDATE.values()[kind]);
     }
     
     // perform updates
     data.noIndex();
-    for(int i = nodes.size - 1; i >= 0; i--) data.update(nodes.pre[i], v);
+    for(int i = nodes.size - 1; i >= 0; i--) data.update(nodes.nodes[i], v);
     return true;
   }
 

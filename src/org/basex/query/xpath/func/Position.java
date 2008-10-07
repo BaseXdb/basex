@@ -25,7 +25,7 @@ public final class Position extends Func {
   public Num eval(final XPContext ctx) throws QueryException {
     // size == 0 means no size (nodeset) available
     // size == -1 means we are in early predicate evaluation
-    if(ctx.local.currSize != 0) return new Num(ctx.local.currPos);
+    if(ctx.item.currSize != 0) return new Num(ctx.item.currPos);
     throw new QueryException(INVALIDPOS);
   }
 

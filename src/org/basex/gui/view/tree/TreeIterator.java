@@ -95,7 +95,7 @@ final class TreeIterator {
   boolean moreCS() {
     final Nodes current = GUI.context.current();
     if(current == null || ++cp >= current.size) return false;
-    par = current.pre[cp];
+    par = current.nodes[cp];
     pre = par;
     level = 0;
     ll = 0;

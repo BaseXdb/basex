@@ -57,13 +57,15 @@ public final class Copy extends AUpdate {
 
     final int size = source.size;
     final Data[] srcDocs = new Data[source.size];
-    for(int c = 0; c < size; c++) srcDocs[c] = copy(source.data, source.pre[c]);
+    for(int c = 0; c < size; c++) {
+      srcDocs[c] = copy(source.data, source.nodes[c]);
+    }
 
     final IntList marked = gui ? new IntList() : null;
     int copied = 0;
 
     for(int n = target.size - 1; n >= 0; n--) {
-      final int par = target.pre[n];
+      final int par = target.nodes[n];
       if(data.kind(par) != Data.ELEM) return error(COPYTAGS);
 
       for(int c = 0; c < size; c++) {
@@ -88,7 +90,7 @@ public final class Copy extends AUpdate {
     
     if(gui) {
       if(context.current().size > 1 || 
-          context.current().pre[0] == source.pre[0]) {
+          context.current().nodes[0] == source.nodes[0]) {
         context.current(new Nodes(0, data));
       }
       context.marked(new Nodes(marked.finish(), data));

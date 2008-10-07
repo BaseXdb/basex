@@ -85,15 +85,15 @@ public final class Preds extends ExprInfo {
   public void eval(final XPContext ctx, final NodeBuilder nodes,
       final NodeBuilder result) throws QueryException {
 
-    final NodeSet ns = ctx.local;
+    final NodeSet ns = ctx.item;
     NodeBuilder n = nodes;
-    ctx.local = tmp;
+    ctx.item = tmp;
     for(int s = 0; s < size; s++) {
       if(n.size == 0) break;
       n = preds[s].eval(ctx, n);
     }
     result.add(n);
-    ctx.local = ns;
+    ctx.item = ns;
     nodes.reset();
   }
 
@@ -109,21 +109,21 @@ public final class Preds extends ExprInfo {
   boolean earlyEval(final XPContext ctx, final NodeBuilder result,
       final int pre, final int[] pos) throws QueryException {
 
-    final NodeSet ns = ctx.local;
-    ctx.local = tmp;
+    final NodeSet ns = ctx.item;
+    ctx.item = tmp;
     tmp.set(pre);
     tmp.currSize = -1;
     boolean more = true;
     for(int j = 0; j != size; j++) {
       final Pred pred = preds[j];
       if(!pred.eval(ctx, tmp, ++pos[j])) {
-        ctx.local = ns;
+        ctx.item = ns;
         return pred.more;
       }
       more &= pred.more;
     }
     result.add(pre);
-    ctx.local = ns;
+    ctx.item = ns;
     return more;
   }
 
@@ -137,17 +137,17 @@ public final class Preds extends ExprInfo {
   void posEval(final XPContext ctx, final int pre,
       final NodeBuilder result) throws QueryException {
 
-    final NodeSet ns = ctx.local;
-    ctx.local = tmp;
+    final NodeSet ns = ctx.item;
+    ctx.item = tmp;
     tmp.set(pre);
     tmp.currSize = 1;
     for(int j = 1; j != size; j++) {
       if(!preds[j].eval(ctx, tmp, 1)) {
-        ctx.local = ns;
+        ctx.item = ns;
         return;
       }
     }
-    ctx.local = ns;
+    ctx.item = ns;
     result.add(pre);
   }
 

@@ -1,9 +1,7 @@
 package org.basex.query.fs;
 
 import static org.basex.Text.*;
-
 import java.io.IOException;
-
 import org.basex.io.PrintOutput;
 import org.basex.util.GetOpts;
 import org.basex.util.IntList;
@@ -127,8 +125,8 @@ public final class LS extends FSCmd {
 
         out.print(FSUtils.isFile(data, j) ? 'f' : 'd');
         out.print(' ');
-        out.print(11, fHuman ? format(size) : Long.toString(size));
-        out.print(11, time);
+        out.print(11, Token.token(fHuman ? format(size) : Long.toString(size)));
+        out.print(11, Token.token(time));
         out.print("  ");
         out.println(name);
       } else {

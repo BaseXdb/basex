@@ -15,16 +15,17 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class Nodes implements Result {
+  /** Pre values container. */
+  public int[] nodes;
   /** Root Node. */
   public Data data;
-  /** Pre values container. */
-  public int[] pre;
   /** Number of stored nodes. */
   public int size;
-  /** Fulltext data (pre values and positions). */
+
+  /* Fulltext data (pre values and positions).
   public int[][] ftpos;
-  /** Fulltext pointer values, linking pre values and query strings. */
-  public int[] ftpoin;
+  /** Fulltext pointer values, linking pre values and query strings.
+  public int[] ftpoin;*/
   
   /**
    * Node Set constructor.
@@ -50,7 +51,7 @@ public final class Nodes implements Result {
    */
   public Nodes(final int[] n, final Data d) {
     if(d == null) BaseX.notexpected("No data available");
-    pre = n;
+    nodes = n;
     size = n.length;
     data = d;
   }
@@ -63,8 +64,8 @@ public final class Nodes implements Result {
    */
   public int find(final int p) {
     for(int s = 0; s < size; s++) {
-      if(pre[s] == p) return s;
-      if(pre[s] > p) return -s - 1;
+      if(nodes[s] == p) return s;
+      if(nodes[s] > p) return -s - 1;
     }
     return -size - 1;
   }
@@ -77,7 +78,7 @@ public final class Nodes implements Result {
   public boolean sameAs(final Nodes n) {
     if(this == n) return true;
     if(data != n.data || size != n.size) return false;
-    for(int s = 0; s != size; s++) if(pre[s] != n.pre[s]) return false;
+    for(int s = 0; s != size; s++) if(nodes[s] != n.nodes[s]) return false;
     return true;
   }
 
@@ -90,14 +91,14 @@ public final class Nodes implements Result {
     int i = find(p);
     if(i >= 0) {
       // remove pre value
-      if(i < --size) Array.move(pre, i + 1, -1, size - i);
+      if(i < --size) Array.move(nodes, i + 1, -1, size - i);
     } else {
       // insert pre value
-      if(size == 0) pre = new int[1];
-      else if(size == pre.length) pre = Array.extend(pre);
+      if(size == 0) nodes = new int[1];
+      else if(size == nodes.length) nodes = Array.extend(nodes);
       i = -i - 1;
-      Array.move(pre, i, 1, size++ - i);
-      pre[i] = p;
+      Array.move(nodes, i, 1, size++ - i);
+      nodes[i] = p;
     }
     return this;
   }
@@ -122,11 +123,11 @@ public final class Nodes implements Result {
     int i = find(p);
     if(i < 0) {
       // insert pre value
-      if(size == 0) pre = new int[1];
-      else if(size == pre.length) pre = Array.extend(pre);
+      if(size == 0) nodes = new int[1];
+      else if(size == nodes.length) nodes = Array.extend(nodes);
       i = -i - 1;
-      Array.move(pre, i, 1, size++ - i);
-      pre[i] = p;
+      Array.move(nodes, i, 1, size++ - i);
+      nodes[i] = p;
     }
     return this;
   }
@@ -141,7 +142,7 @@ public final class Nodes implements Result {
    * @return copy
    */
   public Nodes copy() {
-    return new Nodes(Array.finish(pre, size), data);
+    return new Nodes(Array.finish(nodes, size), data);
   }
   
   /** {@inheritDoc} */
@@ -150,7 +151,7 @@ public final class Nodes implements Result {
 
     final Nodes n = (Nodes) v;
     if(data != n.data) return false;
-    for(int c = 0; c < size; c++) if(n.pre[c] != pre[c]) return false;
+    for(int c = 0; c < size; c++) if(n.nodes[c] != nodes[c]) return false;
     return true;
   }
 
@@ -160,7 +161,7 @@ public final class Nodes implements Result {
     for(int c = 0; c < size; c++) {
       if(ser.finished()) break;
       ser.openResult();
-      ser.xml(data, pre[c]);
+      ser.xml(data, nodes[c]);
       ser.closeResult();
     }
     ser.close(size);
@@ -168,7 +169,7 @@ public final class Nodes implements Result {
 
   /** {@inheritDoc} */
   public void serialize(final Serializer ser, final int n) throws IOException {
-    ser.xml(data, pre[n]);
+    ser.xml(data, nodes[n]);
   }
 
   @Override
@@ -177,7 +178,7 @@ public final class Nodes implements Result {
     tb.add('[');
     for(int i = 0; i < size; i++) {
       if(i > 0) tb.add(',');
-      tb.add(pre[i]);
+      tb.add(nodes[i]);
     }
     tb.add(']');
     return tb.toString();

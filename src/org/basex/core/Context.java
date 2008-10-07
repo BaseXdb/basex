@@ -46,7 +46,7 @@ public final class Context {
   public boolean root() {
     if(current == null) return true;
     for(int c = 0; c < current.size; c++) {
-      if(data.kind(current.pre[c]) != Data.DOC) return false;
+      if(data.kind(current.nodes[c]) != Data.DOC) return false;
     }
     return true;
   }

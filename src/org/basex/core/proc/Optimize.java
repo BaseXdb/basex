@@ -1,7 +1,8 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
-import org.basex.core.Process;
+import java.io.IOException;
+import org.basex.BaseX;
 import org.basex.data.Data;
 
 /**
@@ -10,7 +11,7 @@ import org.basex.data.Data;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Optimize extends Process {
+public final class Optimize extends ACreate {
   /** Current pre value. */
   private int pre;
   /** Data size. */
@@ -38,8 +39,15 @@ public final class Optimize extends Process {
    * @return true if operation was successful
    */
   private boolean stats(final Data data) {
-    data.noIndex();
+    // refresh statistics
+    boolean txtindex = data.meta.txtindex;
+    boolean atvindex = data.meta.atvindex;
+    boolean ftxindex = data.meta.ftxindex;
 
+    data.noIndex();
+    data.tags.stats = true;
+    data.atts.stats = true;
+    
     final int[] parStack = new int[256];
     final int[] tagStack = new int[256];
     int h = 0;
@@ -47,28 +55,42 @@ public final class Optimize extends Process {
 
     size = data.size;
     for(pre = 0; pre < size; pre++) {
-      final int kind = data.kind(pre);
+      final byte kind = (byte) data.kind(pre);
       final int par = data.parent(pre, kind);
       while(l > 0 && parStack[l - 1] > par) --l;
 
       if(kind == Data.ELEM) {
         final int id = data.tagID(pre);
-        final byte[] tag = data.tags.key(id);
-        data.tags.index(tag, null);
+        data.tags.index(data.tags.key(id), null);
         tagStack[l] = id;
         parStack[l] = pre;
         if(h < ++l) h = l;
+        data.skel.add(id, l, Data.ELEM);
       } else if(kind == Data.ATTR) {
-        data.atts.index(data.attName(pre), data.attValue(pre));
+        final int id = data.attNameID(pre);
+        data.atts.index(data.atts.key(id), data.attValue(pre));
+        data.skel.add(id, l + 1, Data.ATTR);
       } else if(kind == Data.TEXT || kind == Data.DOC) {
         if(l > 0) data.tags.index(tagStack[l - 1], data.text(pre));
+        data.skel.add(0, l, kind);
       }
     }
+    
     data.meta.height = h;
     data.meta.newindex = false;
+    data.meta.txtindex = txtindex;
+    data.meta.atvindex = atvindex;
+    data.meta.ftxindex = ftxindex;
     data.tags.stats = true;
     data.atts.stats = true;
+    
+    try {
+      index(data);
+    } catch(final IOException e) {
+      BaseX.debug(e);
+    }
     data.flush();
+    
     return true;
   }
 

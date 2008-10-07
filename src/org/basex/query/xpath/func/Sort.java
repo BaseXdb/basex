@@ -31,7 +31,7 @@ public final class Sort extends Func {
 
     final int[] n = ns.nodes;
     final byte[][] val = new byte[n.length][];
-    for(int i = 0; i < val.length; i++) val[i] = ctx.local.data.atom(n[i]);
+    for(int i = 0; i < val.length; i++) val[i] = ctx.item.data.atom(n[i]);
 
     final IntList list = new IntList(n);
     list.sort(val, false, true);
