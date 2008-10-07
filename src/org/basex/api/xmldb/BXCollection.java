@@ -135,8 +135,7 @@ public class BXCollection implements Collection {
   }
 
   public void storeResource(final Resource res) throws XMLDBException {
-    final String id = res.getId();
-    
+    final String id = ((BXXMLResource)res).getDocumentId();
     Data tmp = null;
     final Object cont = res.getContent();
     Parser p = null;
