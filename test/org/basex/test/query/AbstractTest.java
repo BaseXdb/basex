@@ -4,6 +4,7 @@ import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.data.Namespaces;
 import org.basex.data.Nodes;
+import org.basex.data.Skeleton;
 import org.basex.index.Names;
 import org.basex.query.xpath.values.Bool;
 import org.basex.query.xpath.values.Literal;
@@ -19,16 +20,11 @@ import org.basex.util.Token;
 abstract class AbstractTest {
   /** Dummy data reference. */
   static final Data DATA = new MemData(1, new Names(), new Names(),
-      new Namespaces());
+      new Namespaces(), new Skeleton());
   /** Document. */
   String doc;
   /** Queries. */
   Object[][] queries;
-
-  /**
-   * Constructor.
-   */
-  protected AbstractTest() { }
   
   /**
    * Create an {@link org.basex.data.Nodes} instance

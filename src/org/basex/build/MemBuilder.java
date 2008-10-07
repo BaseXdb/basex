@@ -2,7 +2,6 @@ package org.basex.build;
 
 import static org.basex.Text.*;
 import java.io.IOException;
-import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.data.MetaData;
 
@@ -26,7 +25,7 @@ public final class MemBuilder extends Builder {
     meta.atvindex = true;
     meta.ftxindex = false;
     meta.file = parser.io;
-    data = new MemData(64, tags, atts, ns);
+    data = new MemData(64, tags, atts, ns, skel);
     data.meta = meta;
     return this;
   }
@@ -52,15 +51,16 @@ public final class MemBuilder extends Builder {
   }
 
   @Override
-  protected void addElem(final int n, final int s, final int dis, final int a) {
-    data.addElem(n, s, dis, a, a);
+  protected void addElem(final int tok, final int s, final int dis,
+      final int a, final boolean n) {
+    data.addElem(tok, s, dis, a, 0, n);
     size = data.size;
   }
 
   @Override
   protected void addAttr(final int n, final int s, final byte[] v,
       final int d) {
-    data.addAtt(n, s, v, d, Data.ATTR);
+    data.addAtt(n, s, v, d);
     size = data.size;
   }
 

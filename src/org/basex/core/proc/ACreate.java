@@ -129,7 +129,7 @@ abstract class ACreate extends Process {
     final Performance pp = new Performance();
     progress((Progress) builder);
     data.closeIndex(index);
-    data.openIndex(index, builder.build(data));
+    data.setIndex(index, builder.build(data));
 
     if(Prop.debug) {
       BaseX.err("% Index: % (%)\n", index, pp.getTimer(), Performance.getMem());

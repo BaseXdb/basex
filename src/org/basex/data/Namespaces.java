@@ -57,21 +57,23 @@ public final class Namespaces extends Set {
   /**
    * Opens a node.
    * @param p current pre value
+   * @return true if namespaces have been registered
    */
-  public void start(final int p) {
-    if(tmp == null) return;
+  public boolean open(final int p) {
+    if(tmp == null) return false;
     tmp.par = root;
     tmp.pre = p;
     root.add(tmp);
     root = tmp;
     tmp = null;
+    return true;
   }
 
   /**
    * Closes a node.
    * @param p current pre value
    */
-  public void end(final int p) {
+  public void close(final int p) {
     while(root.pre >= p) root = root.par;
   }
 
@@ -95,6 +97,21 @@ public final class Namespaces extends Set {
     final Node node = root.find(p);
     final byte[] pre = substring(n, 0, Math.max(0, indexOf(n, ':')));
     return ns(pre, node);
+  }
+
+  /**
+   * Returns the namespace keys and values for the specified pre value.
+   * @param p pre value
+   * @return namespace reference or 0 if no namespace was found
+   */
+  public int[] get(final int p) {
+    final Node node = root.find(p);
+    final int[] ns = new int[node.key.length << 1];
+    for(int n = 0; n < ns.length; n += 2) {
+      ns[n] = node.key[n >> 1];
+      ns[n + 1] = node.val[n >> 1];
+    }
+    return ns;
   }
 
   /**

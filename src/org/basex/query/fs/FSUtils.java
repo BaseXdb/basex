@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.Data;
+import org.basex.data.DataText;
 import org.basex.util.Array;
 import org.basex.util.IntList;
 import org.basex.util.Token;
@@ -39,7 +40,8 @@ public final class FSUtils {
    * @return result of comparison
    */
   public static boolean isFile(final Data data, final int pre) {
-    return data.kind(pre) == Data.ELEM && data.tagID(pre) == data.fileID;
+    return data.kind(pre) == Data.ELEM &&
+      data.tagID(pre) == data.tags.id(DataText.FILE);
   }
 
   /**
@@ -49,7 +51,8 @@ public final class FSUtils {
    * @return result of comparison
    */
   public static boolean isDir(final Data data, final int pre) {
-    return data.kind(pre) == Data.ELEM && data.tagID(pre) == data.dirID;
+    return data.kind(pre) == Data.ELEM &&
+      data.tagID(pre) == data.tags.id(DataText.DIR);
   }
 
   /**
@@ -138,7 +141,7 @@ public final class FSUtils {
    * @return file size
    */
   public static byte[] getSize(final Data data, final int pre) {
-    return getAttr(data, pre, data.sizeID);
+    return getAttr(data, pre, data.atts.id(DataText.SIZE));
   }
 
   /**
@@ -161,7 +164,8 @@ public final class FSUtils {
    * @return file name.
    */
   public static String getMtime(final Data data, final int pre) {
-    final long l = Token.toLong(getAttr(data, pre, data.timeID)) * 60000;
+    final long l = Token.toLong(getAttr(data, pre,
+        data.atts.id(DataText.MTIME))) * 60000;
     return DATE.format(new Date(l));
   }
 
@@ -184,7 +188,7 @@ public final class FSUtils {
    * @return file name.
    */
   public static byte[] getSuffix(final Data data, final int pre) {
-    return getAttr(data, pre, data.suffixID);
+    return getAttr(data, pre, data.atts.id(DataText.SUFFIX));
   }
 
   /**

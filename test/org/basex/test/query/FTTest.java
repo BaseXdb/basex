@@ -70,7 +70,7 @@ public final class FTTest extends AbstractTest {
           "//w[text() ftcontains 'db']" },
         { "FT 6", nodes(7, 9, 11),
           "//w[text() ftcontains 'xml'][text() ftcontains 'Databases']" },
-        { "FT 7", nodes(37),
+        { "FT 7", nodes(35),
           "//fttest[co/w ftcontains 'xml'][w ftcontains 'fifth']/atr" },
 
         { "Phrase 1", nodes(7, 9, 11),

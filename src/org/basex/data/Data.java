@@ -57,38 +57,15 @@ public abstract class Data  {
 
   /** File system indicator. */
   public boolean deepfs;
-  /** Index Reference for xmlns attribute. */
-  public int xmlnsID;
   /** Index Reference for name tag. */
   public int nameID;
-  /** Index Reference for size attribute. */
-  public int sizeID;
-  /** Index Reference for suffix attribute. */
-  public int suffixID;
-  /** Index Reference for time attribute. */
-  public int timeID;
-  /** Index Reference for directory tag. */
-  public int dirID;
-  /** Index Reference for file tag. */
-  public int fileID;
-  /** Index Reference for content tag. */
-  public int contentID;
 
   /**
    * Dissolves the references to often used tag names and attributes.
    */
   public final void initNames() {
     deepfs = tags.id(DataText.DEEPFS) != 0;
-    xmlnsID = atts.id(XMLNS);
     nameID = atts.id(DataText.NAME);    
-    if(deepfs) {
-      fileID = tags.id(DataText.FILE);
-      dirID = tags.id(DataText.DIR);
-      contentID = tags.id(DataText.CONTENT);
-      sizeID = atts.id(DataText.SIZE);
-      suffixID = atts.id(DataText.SUFFIX);
-      timeID = atts.id(DataText.MTIME);
-    }
   }
   
   /**
@@ -110,11 +87,11 @@ public abstract class Data  {
   public abstract void closeIndex(IndexToken.TYPE index) throws IOException;
 
   /**
-   * Opens the specified index.
+   * Assigns the specified index.
    * @param type index to be opened
    * @param ind index instance
    */
-  public abstract void openIndex(IndexToken.TYPE type, Index ind);
+  public abstract void setIndex(IndexToken.TYPE type, Index ind);
 
   /**
    * Returns a unique node id.
@@ -184,6 +161,13 @@ public abstract class Data  {
    * @return token reference
    */
   public abstract int tagNS(int pre);
+
+  /**
+   * Returns namespace key and value ids.
+   * @param pre pre value
+   * @return key and value ids
+   */
+  public abstract int[] ns(int pre);
 
   /**
    * Returns a text.

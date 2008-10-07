@@ -110,7 +110,8 @@ public final class Copy extends AUpdate {
     // size of the data instance
     final int size = data.size(pre, data.kind(pre));
     // create temporary data instance, adopting the indexes of the source data
-    final MemData tmp = new MemData(size, data.tags, data.atts, data.ns);
+    final MemData tmp = new MemData(size, data.tags, data.atts, data.ns,
+        data.skel);
 
     // copy all nodes
     for(int p = pre; p < pre + size; p++) {
@@ -122,10 +123,10 @@ public final class Copy extends AUpdate {
           break;
         case Data.ELEM:
           tmp.addElem(data.tagID(p), data.tagNS(p), d, data.attSize(p, k),
-              data.size(p, k));
+              data.size(p, k), data.ns(p) != null);
           break;
         case Data.ATTR:
-          tmp.addAtt(data.attNameID(p), data.attNS(p), data.attValue(p), d, k);
+          tmp.addAtt(data.attNameID(p), data.attNS(p), data.attValue(p), d);
           break;
         case Data.TEXT:
         case Data.COMM:

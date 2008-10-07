@@ -116,11 +116,11 @@ public final class DiskBuilder extends Builder {
   }
   
   @Override
-  protected void addElem(final int n, final int s, final int dis,
-      final int as) throws IOException {
+  protected void addElem(final int t, final int s, final int dis,
+      final int as, final boolean n) throws IOException {
 
     tout.write(Data.ELEM);
-    tout.write2(n + (s << 12));
+    tout.write2(t + (s << 12) + (n ? 1 << 11 : 0));
     tout.write(as);
     tout.writeInt(dis);
     tout.writeInt(as);
@@ -129,11 +129,11 @@ public final class DiskBuilder extends Builder {
   }
 
   @Override
-  public void addAttr(final int n, final int s, final byte[] txt,
+  public void addAttr(final int t, final int s, final byte[] txt,
       final int dis) throws IOException {
 
     tout.write(Data.ATTR);
-    tout.write2(n + (s << 12));
+    tout.write2(t + (s << 12));
     tout.write5(inline(txt, false));
     tout.writeInt(dis);
     tout.writeInt(size++);

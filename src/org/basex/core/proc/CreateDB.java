@@ -81,11 +81,11 @@ public final class CreateDB extends ACreate {
     if(Prop.onthefly) return new MemBuilder().build(p, db);
 
     final Data data = new DiskBuilder().build(p, db);
-    if(data.meta.txtindex) data.openIndex(
+    if(data.meta.txtindex) data.setIndex(
         IndexToken.TYPE.TXT, new ValueBuilder(true).build(data));
-    if(data.meta.atvindex) data.openIndex(
+    if(data.meta.atvindex) data.setIndex(
         IndexToken.TYPE.ATV, new ValueBuilder(false).build(data));
-    if(data.meta.ftxindex) data.openIndex(
+    if(data.meta.ftxindex) data.setIndex(
         IndexToken.TYPE.FTX, data.meta.ftfz ?
           new FTFuzzyBuilder().build(data) : new FTBuilder().build(data));
     return data;

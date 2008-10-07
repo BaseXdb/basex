@@ -95,9 +95,10 @@ public abstract class Builder extends Progress {
    * @param tns the tag namespace
    * @param dis distance (relative parent reference)
    * @param as number of attributes
+   * @param n element has namespaces
    * @throws IOException in case of parsing or writing problems 
    */
-  protected abstract void addElem(int tok, int tns, int dis, int as)
+  protected abstract void addElem(int tok, int tns, int dis, int as, boolean n)
     throws IOException;
   
   /**
@@ -191,8 +192,6 @@ public abstract class Builder extends Progress {
    */
   public final void startElem(final byte[] tag, final byte[][] att)
       throws IOException {
-
-    ns.start(size);
     addElem(tag, att, true);
   }
 
@@ -205,9 +204,8 @@ public abstract class Builder extends Progress {
   public final void emptyElem(final byte[] tag, final byte[][] att)
       throws IOException {
 
-    ns.start(size);
     addElem(tag, att, false);
-    ns.end(parStack[level]);
+    ns.close(parStack[level]);
   }
   
   /**
@@ -222,7 +220,7 @@ public abstract class Builder extends Progress {
       error(CLOSINGTAG, parser.det(), t, tags.key(tagStack[level]));
 
     addSize(parStack[level]);
-    ns.end(parStack[level]);
+    ns.close(parStack[level]);
   }
 
   /**
@@ -234,7 +232,7 @@ public abstract class Builder extends Progress {
    */
   private void addElem(final byte[] name, final byte[][] att,
       final boolean open) throws IOException {
-    
+
     // convert tag to utf8
     final byte[] tag = utf8(name, meta.encoding);
 
@@ -253,10 +251,13 @@ public abstract class Builder extends Progress {
     tagStack[level] = tid;
     parStack[level] = size;
 
+    // store namespaces
+    final boolean n = ns.open(size);
+
     // add node
     final int dis = level != 0 ? size - parStack[level - 1] : 1;
     final int al = att != null ? att.length : 0;
-    addElem(tid, tns, dis, (al >> 1) + 1);
+    addElem(tid, tns, dis, (al >> 1) + 1, n);
 
     // create numeric attribute references
     for(int a = 0; a < al; a += 2) {

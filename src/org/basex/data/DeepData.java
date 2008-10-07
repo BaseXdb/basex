@@ -2,7 +2,6 @@ package org.basex.data;
 
 import static org.basex.data.DataText.*;
 import java.io.IOException;
-
 import org.basex.index.Index;
 import org.basex.index.IndexToken;
 import org.basex.io.DataAccess;
@@ -145,7 +144,7 @@ public final class DeepData extends Data {
   }
 
   @Override
-  public void openIndex(final IndexToken.TYPE type, final Index index) {
+  public void setIndex(final IndexToken.TYPE type, final Index index) {
     switch(type) {
       case TXT: if(meta.txtindex) txtindex = index; break;
       case ATV: if(meta.atvindex) atvindex = index; break;
@@ -213,6 +212,11 @@ public final class DeepData extends Data {
   @Override
   public int tagNS(final int pre) {
     return (table.read2(pre, 1) >>> 12) & 0x0F;
+  }
+
+  @Override
+  public int[] ns(final int pre) {
+    return null;
   }
 
   @Override

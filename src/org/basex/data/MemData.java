@@ -10,37 +10,16 @@ import org.basex.util.Token;
 
 /**
  * This class stores and organizes the database table and the index structures
- * for textual content in a compressed memory structure.
- * Each node occupies 64 bits. The current storage layout looks like follows:
- *
- * <pre>
- * ELEMENTS:
- * - Bit 0-2   : Node kind (ELEM)
- * - Bit 3-7   : Number of attributes
- * - Byte  1- 3: Number of descendants (size)
- * - Byte  4   : Namespace and tag name
- * - Byte  5- 7: Relative parent reference
- * DOCUMENTS:
- * - Bit 0-2   : Node kind (DOC)
- * - Byte  0- 3: Text reference
- * - Byte  5- 7: Number of descendants (size)
- * TEXTS:
- * - Bit 0-2   : Node kind (TEXT/PI/COMM)
- * - Byte  0- 3: Text reference
- * - Byte  5- 7: Relative parent reference
- * ATTRIBUTES:
- * - Bit 0-2   : Node kind (ATTR)
- * - Byte  0- 3: Attribute value
- * - Byte     4: Namespace and attribute name
- * - Byte     7: Relative parent reference
- * </pre>
- *
+ * for textual content in a compressed memory structure. The storage equals the
+ * disk storage in {@link DiskData}.
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public final class MemData extends Data {
   /** Value array. */
-  private long[] val;
+  private long[] val1;
+  /** Value array. */
+  private long[] val2;
 
   /**
    * Constructor.
@@ -48,15 +27,18 @@ public final class MemData extends Data {
    * @param tag tag index
    * @param att attribute name index
    * @param n namespaces
+   * @param s skeleton
    */
   public MemData(final int cap, final Names tag, final Names att,
-      final Namespaces n) {
-    val = new long[cap];
+      final Namespaces n, final Skeleton s) {
+    val1 = new long[cap];
+    val2 = new long[cap];
     txtindex = new MemValues();
     atvindex = new MemValues();
     tags = tag;
     atts = att;
     ns = n;
+    skel = s;
   }
 
   @Override
@@ -69,52 +51,8 @@ public final class MemData extends Data {
   public void closeIndex(final IndexToken.TYPE index) { }
 
   @Override
-  public void openIndex(final IndexToken.TYPE type, final Index ind) { }
-
-  @Override
-  public int kind(final int pre) {
-    return (int) (val[pre] >>> 61);
-  }
-
-  @Override
-  public int parent(final int pre, final int kind) {
-    return kind == DOC ? -1 : pre - (int) (val[pre] & 0xFFFFFF);
-  }
-
-  @Override
-  public int size(final int pre, final int kind) {
-    return kind == ELEM ? (int) (val[pre] >> 32 & 0xFFFFFF) :
-      kind == DOC ? (int) (val[pre] & 0xFFFFFF) : 1;
-  }
-
-  @Override
-  public int tagID(final int pre) {
-    return (int) (val[pre] >>> 24) & 0x7F;
-  }
-
-  @Override
-  public int tagNS(final int pre) {
-    return (int) (val[pre] >>> 30) & 0x1;
-  }
-
-  @Override
-  public int attSize(final int pre, final int kind) {
-    return kind == ELEM ? (int) (val[pre] >> 56 & 0x1F) : 1;
-  }
-
-  @Override
-  public int attNameID(final int pre) {
-    return (int) (val[pre] >>> 24) & 0x7F;
-  }
-
-  @Override
-  public int attNS(final int pre) {
-    return (int) (val[pre] >>> 30) & 0x1;
-  }
-
-  @Override
-  public byte[] text(final int pre) {
-    return textToken((int) (val[pre] >> 32) & 0x1FFFFFFF);
+  public void setIndex(final IndexToken.TYPE type, final Index ind) {
+    BaseX.notimplemented();
   }
 
   @Override
@@ -128,13 +66,84 @@ public final class MemData extends Data {
   }
 
   @Override
+  public int kind(final int pre) {
+    return (int) (val1[pre] >>> 56);
+  }
+
+  @Override
+  public int parent(final int pre, final int k) {
+    return pre - dist(pre, k);
+  }
+
+  /**
+   * Returns the distance of the specified node.
+   * @param pre pre value
+   * @param k node kind
+   * @return distance
+   */
+  private int dist(final int pre, final int k) {
+    switch(k) {
+      case ELEM:
+        return (int) (val1[pre] & 0xFFFF);
+      case TEXT:
+      case COMM:
+      case PI:
+        return (int) (val2[pre] >> 32);
+      case ATTR:
+        return (int) (val2[pre] >> 32);
+      default:
+        return pre + 1;
+    }
+  }
+
+  @Override
+  public int attSize(final int pre, final int kind) {
+    return kind == ELEM ? (int) (val1[pre] >> 32) & 0xFF : 1;
+  }
+
+  @Override
+  public int size(final int pre, final int k) {
+    return k == ELEM || k == DOC ? (int) (val2[pre] >> 32) : 1;
+  }
+
+  @Override
+  public int tagID(final int pre) {
+    return (int) (val1[pre] >> 40) & 0x07FF;
+  }
+
+  @Override
+  public int tagNS(final int pre) {
+    return (int) (val1[pre] >>> 52) & 0x0F;
+  }
+
+  @Override
+  public int[] ns(final int pre) {
+    return (val1[pre] >>> 51) != 0 ? ns.get(pre) : null;
+  }
+
+  @Override
+  public int attNameID(final int pre) {
+    return (int) (val1[pre] >> 40) & 0x07FF;
+  }
+
+  @Override
+  public int attNS(final int pre) {
+    return (int) (val1[pre] >>> 52) & 0x0F;
+  }
+
+  @Override
+  public byte[] text(final int pre) {
+    return ((MemValues) txtindex).token((int) val1[pre]);
+  }
+
+  @Override
   public double textNum(final int pre) {
     return Token.toDouble(text(pre));
   }
 
   @Override
   public byte[] attValue(final int pre) {
-    return attToken((int) (val[pre] >> 32) & 0x1FFFFFFF);
+    return ((MemValues) atvindex).token((int) val1[pre]);
   }
 
   @Override
@@ -180,21 +189,14 @@ public final class MemData extends Data {
   }
 
   /**
-   * Returns the index value for the specified index id.
-   * @param id index id
-   * @return value
-   */
-  public byte[] textToken(final int id) {
-    return ((MemValues) txtindex).token(id);
-  }
-
-  /**
    * Adds an element.
    * @param t document name
    * @param s node size
    */
-  public void addDoc(final byte[] t, final int s) {
-    addText(t, s, DOC);
+  public void addDoc(final byte[] t, final long s) {
+    check();
+    val1[size] = ((long) DOC << 56) + textIndex(t);
+    val2[size++] = (s << 32) + size;
   }
 
   /**
@@ -203,30 +205,29 @@ public final class MemData extends Data {
    * @param n namespace
    * @param d distance
    * @param a number of attributes
+   * @param ne element has namespaces
    * @param s node size
    */
-  public void addElem(final int t, final int n, final int d, final int a,
-      final int s) {
+  public void addElem(final long t, final long n, final long d, final long a,
+      final long s, final boolean ne) {
 
     check();
-    val[size++] = ((long) ELEM << 61) + ((long) a << 56) +
-      ((long) n << 39) + ((long) s << 32) + ((long) t << 24) + d;
+    val1[size] = ((long) ELEM << 56) + (n << 52) + (ne ? 1L << 51 : 0)
+        + (t << 40) + (a << 32) + d;
+    val2[size++] = (s << 32) + size;
   }
 
   /**
    * Adds an attribute.
-   * @param a attribute name
+   * @param t attribute name
    * @param n namespace
    * @param v attribute value
    * @param d distance
-   * @param k node kind
    */
-  public void addAtt(final int a, final int n, final byte[] v, final int d,
-      final int k) {
+  public void addAtt(final long t, final long n, final byte[] v, final long d) {
     check();
-    final long ai = attIndex(v);
-    val[size++] = ((long) k << 61) + ((long) n << 39) + (ai << 32) +
-      ((long) a << 24) + d;
+    val1[size] = ((long) ATTR << 56) + (n << 52) + (t << 40) + attIndex(v);
+    val2[size++] = (d << 32) + size;
   }
 
   /**
@@ -235,10 +236,10 @@ public final class MemData extends Data {
    * @param d distance
    * @param k node kind
    */
-  public void addText(final byte[] t, final int d, final int k) {
+  public void addText(final byte[] t, final long d, final long k) {
     check();
-    final long l = textIndex(t);
-    val[size++] = ((long) k << 61) + (l << 32) + d;
+    val1[size] = (k << 56) + textIndex(t);
+    val2[size++] = (d << 32) + size;
   }
 
   /**
@@ -246,17 +247,17 @@ public final class MemData extends Data {
    * @param pre closing pre tag
    */
   public void finishElem(final int pre) {
-    final long s = size - pre;
-    final boolean e = kind(pre) == ELEM;
-    final long o = e ? 0xFF000000FFFFFFFFL : 0xFFFFFFFFFF000000L;
-    val[pre] = (val[pre] & o) + (e ? (s << 32) : s);
+    val2[pre] |= (long) (size - pre) << 32;
   }
 
   /**
    * Checks the array sizes.
    */
   private void check() {
-    if(size == val.length) val = Array.extend(val);
+    if(size == val1.length) {
+      val1 = Array.extend(val1);
+      val2 = Array.extend(val2);
+    }
   }
 
   @Override
@@ -292,4 +293,3 @@ public final class MemData extends Data {
     BaseX.notimplemented();
   }
 }
-

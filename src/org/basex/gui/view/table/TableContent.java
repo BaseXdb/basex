@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.basex.core.Context;
 import org.basex.data.Data;
+import org.basex.data.DataText;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIFS;
@@ -129,7 +130,7 @@ public final class TableContent extends BaseXBack {
         
         if(tb[c].size != 0) tb[c].add("; ");
         byte[] txt = ti.elem ? data.text(ti.pre) : data.attValue(ti.pre);
-        if(tdata.cols.get(c) == data.timeID) {
+        if(tdata.cols.get(c) == data.atts.id(DataText.MTIME)) {
           txt = Token.token(new SimpleDateFormat("dd.MM.yyyy").
               format(new Date(Token.toLong(txt) * 60000)));
         }

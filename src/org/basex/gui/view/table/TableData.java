@@ -4,6 +4,7 @@ import org.basex.core.Context;
 import org.basex.core.proc.Find;
 import org.basex.core.proc.XPath;
 import org.basex.data.Data;
+import org.basex.data.DataText;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
@@ -74,7 +75,7 @@ public final class TableData {
     rowH = 1;
 
     if(data.deepfs) {
-      rootTag = data.fileID;
+      rootTag = data.tags.id(DataText.FILE);
       addCol("suffix", false);
       addCol("name", false);
       addCol("size", false);
@@ -280,7 +281,8 @@ public final class TableData {
       else if(tokens[r][0] < 0) tokens[r][0] = 126;
     }
     rows.sort(tokens, !e && data.deepfs &&
-        (c == data.sizeID || c == data.timeID), asc);
+        (c == data.atts.id(DataText.SIZE) ||
+         c == data.atts.id(DataText.MTIME)), asc);
   }
 
   /** Last token. */

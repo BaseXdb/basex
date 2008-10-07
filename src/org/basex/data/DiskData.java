@@ -33,7 +33,7 @@ import org.basex.util.Token;
  * - Byte     0:  KIND: Node kind (ELEM)
  * - Byte   1-2:  NSPC: Namespace and Tag Reference
  * - Byte     3:  ATTS: Number of attributes
- * - Byte  4- 7:  DIST: Relative parent reference
+ * - Byte  4- 7:  DIST: Distance to parent node
  * - Byte  8-11:  SIZE: Number of descendants
  * - Byte 12-15:  UNID: Unique Node ID
  * DOCUMENT NODES:
@@ -44,13 +44,13 @@ import org.basex.util.Token;
  * TEXT NODES:
  * - Byte     0:  KIND: Node kind (TEXT/COMM/PI)
  * - Byte  3- 7:  TEXT: Text reference
- * - Byte  8-11:  DIST: Relative parent reference
+ * - Byte  8-11:  DIST: Distance to parent node
  * - Byte 12-15:  UNID: Unique Node ID
  * ATTRIBUTE NODES:
  * - Byte     0:  KIND: Node kind (ATTR)
  * - Byte   1-2:  NSPC: Namespace and Attribute name reference
  * - Byte  3- 7:  TEXT: Attribute value reference
- * - Byte    11:  DIST: Relative parent reference
+ * - Byte    11:  DIST: Distance to parent node
  * - Byte 12-15:  UNID: Unique Node ID
  * </pre>
  *
@@ -99,12 +99,10 @@ public final class DiskData extends Data {
     values = new DataAccess(db, DATAATV);
 
     if(index) {
-      if(meta.txtindex) openIndex(IndexToken.TYPE.TXT,
-          new Values(this, db, true));
-      if(meta.atvindex) openIndex(IndexToken.TYPE.ATV,
-          new Values(this, db, false));
-      if(meta.ftxindex) openIndex(IndexToken.TYPE.FTX,
-          meta.ftfz ? new FTFuzzy(this, db) : new FTTrie(this, db));
+      if(meta.txtindex) txtindex = new Values(this, db, true);
+      if(meta.atvindex) atvindex = new Values(this, db, false);
+      if(meta.ftxindex) ftxindex =
+        meta.ftfz ? new FTFuzzy(this, db) : new FTTrie(this, db);
     }
     initNames();
   }
@@ -115,7 +113,7 @@ public final class DiskData extends Data {
       table.flush();
       texts.flush();
       values.flush();
-      
+      // write meta data...
       final DataOutput out = new DataOutput(meta.dbname, DATAINFO);
       meta.finish(out, size);
       tags.finish(out);
@@ -164,7 +162,7 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public void openIndex(final IndexToken.TYPE type, final Index index) {
+  public void setIndex(final IndexToken.TYPE type, final Index index) {
     switch(type) {
       case TXT: if(meta.txtindex) txtindex = index; break;
       case ATV: if(meta.atvindex) atvindex = index; break;
@@ -226,22 +224,27 @@ public final class DiskData extends Data {
 
   @Override
   public int tagID(final int pre) {
-    return table.read2(pre, 1) & 0x0FFF;
+    return table.read2(pre, 1) & 0x07FF;
   }
 
   @Override
   public int tagNS(final int pre) {
-    return (table.read2(pre, 1) >>> 12) & 0x0F;
+    return (table.read1(pre, 1) >>> 4) & 0x0F;
+  }
+
+  @Override
+  public int[] ns(final int pre) {
+    return (table.read1(pre, 1) & 0x08) != 0 ? ns.get(pre) : null;
   }
 
   @Override
   public int attNameID(final int pre) {
-    return table.read2(pre, 1) & 0x0FFF;
+    return table.read2(pre, 1) & 0x07FF;
   }
 
   @Override
   public int attNS(final int pre) {
-    return (table.read2(pre, 1) >>> 12) & 0x0F;
+    return (table.read1(pre, 1) >>> 4) & 0x0F;
   }
 
   @Override
