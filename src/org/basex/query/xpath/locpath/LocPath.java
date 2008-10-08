@@ -7,6 +7,7 @@ import org.basex.index.ValuesToken;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
+import org.basex.query.xpath.expr.FTContains;
 import org.basex.query.xpath.expr.Filter;
 import org.basex.query.xpath.expr.InterSect;
 import org.basex.query.xpath.expr.Path;
@@ -153,7 +154,18 @@ public abstract class LocPath extends Expr {
       if(!indexMatch && invPath.steps.size() != 0) newPreds.add(invPath);
 
       for(int p = 0; p != step.preds.size(); p++) {
-        if(!oldPreds.contains(p)) newPreds.add(step.preds.get(p));
+        if(!oldPreds.contains(p)) {
+          Pred pred = step.preds.get(p);
+          if (pred instanceof PredSimple) {
+            Expr e = ((PredSimple) pred).getExpr();
+            if (e instanceof FTContains) {
+              e = e.indexEquivalent(ctx, null, true);
+            }
+            pred = new PredSimple(e);
+          }
+          //newPreds.add(step.preds.get(p));
+          newPreds.add(pred);
+        }
       }
       result = new InterSect(new Expr[] { indexArg }).compile(ctx);
 

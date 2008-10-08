@@ -42,7 +42,7 @@ public final class FTTest extends AbstractTest {
           "//w [text() ftcontains 'xml' not in 'xml databases']" },
         { "FTMildNot2", nodes(14),
           "//w [text() ftcontains 'hello' not in 'xml']" },
-          
+
         { "Simple 1", bool(true),
           "'abc' ftcontains 'abc'" },
         { "Simple 2", bool(true),
@@ -283,6 +283,9 @@ public final class FTTest extends AbstractTest {
           "//w [text() ftcontains 'databases' ftor ftnot 'xml']" },
         { "FTUnaryNot5", nodes(3, 5, 14, 37),
           "//w [text() ftcontains 'hello' ftor ftnot 'databases']" },
+        { "FTUnaryNot6", nodes(3, 5, 7, 9, 11, 14, 37),
+          "//w [text() ftcontains ftnot 'bier']" },
+
     };
 
     /** TABLE REPRESENTATION

@@ -38,6 +38,16 @@ final class FTTokenMap extends Set {
     return id != 0 ? sizes[id] : -1;
   }
 
+  /**
+   * Returns the pointer for the specified key.
+   * @param id key to be found
+   * @return pointer or -1 if nothing was found
+   */
+  long getPointer(final int id) {
+    return id != 0 ? pointers[id] : -1;
+  }
+
+  
   @Override
   protected void rehash() {
     super.rehash();

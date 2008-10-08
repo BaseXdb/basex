@@ -34,6 +34,7 @@ public final class NodeBuilder {
    */
   public NodeBuilder(final int[] ids) {
     if(ids.length == 0) {
+      size = 0;
       nodes = new int[1];
     } else {
       nodes = ids;

@@ -50,6 +50,9 @@ public final class MetaData {
   public boolean ftcs = Prop.ftcs;
   /** Flag for fulltext diacritics removal. */
   public boolean ftdc = Prop.ftdc;
+  /** Flag for itterator optimized storage within ftindex. */
+  public boolean ftittr = false;
+
 
   /** Flag for removed index structures. */
   public boolean newindex;

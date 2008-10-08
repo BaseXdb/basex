@@ -74,10 +74,7 @@ public final class IndexArrayIterator extends IndexIterator {
     return pres != null ? pres[d] : ftdata[d][0];
   }
 
-  /**
-   * Get next ftnode.
-   * @return ftnode next ftnode
-   */
+  @Override
   public FTNode nextFTNode() {
     final FTNode n = pres != null ? new FTNode(pres[d])
       : new FTNode(ftdata[d], toknum);

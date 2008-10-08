@@ -102,6 +102,8 @@ public final class Prop {
   public static boolean onthefly = false;
   /** Path for filtering XML Documents. */
   public static String createfilter = "*.*";
+  /** Flag for itterator optimized storage within ftindex. */
+  public static boolean ftittr = true;
 
   /** Flag for creating a fuzzy index. */
   public static boolean ftfuzzy = true;
@@ -111,7 +113,7 @@ public final class Prop {
   public static boolean ftcs = false;
   /** Flag for fulltext diacritics. */
   public static boolean ftdc = false;
-
+  
   /** Flow for showing the XQuery error code. */
   public static boolean xqerrcode = true;
   /** Fulltext details. */

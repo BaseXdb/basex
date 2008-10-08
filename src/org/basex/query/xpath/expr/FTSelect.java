@@ -66,9 +66,14 @@ public final class FTSelect extends FTArrayExpr {
   private void init(final FTNode ftn, final XPContext ctx) {
     ftpos.pos.setPos(ftn.convertPos(), ftn.p.get(0));
     if (ftn.getToken() != null) {
-      // Diskaccess could be optimized??? 
-      ftpos.pos.ft.init(ctx.item.data.text(ftn.getPre()));
-      ftpos.pos.term = ftpos.pos.ft.getTokenList();
+      // [SG] disk is only accessed essential cases.
+      /*if (!(ftpos.pos.ordered || ftpos.dist == null 
+          || ftpos.pos.wunit != null && ftpos.pos.wunit != FTUnit.WORDS
+          || ftpos.pos.dunit != null && ftpos.pos.dunit != FTUnit.WORDS)
+          || ftpos.pos.start || ftpos.pos.end || ftpos.pos.content) {*/
+        ftpos.pos.ft.init(ctx.item.data.text(ftn.getPre()));
+        ftpos.pos.term = ftpos.pos.ft.getTokenList();
+      //}
     }
   }
   

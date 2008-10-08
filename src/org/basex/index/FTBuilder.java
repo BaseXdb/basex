@@ -61,9 +61,9 @@ public final class FTBuilder extends Progress implements IndexBuilder {
     }
 
     final String db = data.meta.dbname;
-    final DataOutput outD = new DataOutput(db, DATAFTX + 'b');
+    final DataOutput outPre = new DataOutput(db, DATAFTX + 'b');
     if(index.bl) {
-      bulkLoad(outD);
+      bulkLoad(outPre, data.meta.ftittr);
     }
 
     if(Prop.debug) {
@@ -93,12 +93,11 @@ public final class FTBuilder extends Progress implements IndexBuilder {
     // [byte, byte[l], byte, int, byte, ..., int, long]
     final DataOutput outN = new DataOutput(db, DATAFTX + 'a');
     // ftdata is stored here, with pre1, ..., preu, pos1, ..., posu
-    //DataOutput outD = new DataOutput(db, DATAFTX + 'b');
     // each node entries size is stored here
     final DataOutput outS = new DataOutput(db, DATAFTX + 'c');
 
     // document contains any text nodes -> empty index created;
-    //only root node is kept
+    // only root node is kept
     if(index.count != 1) {
       // index.next[i] : [p, n1, ..., s, d]
       // index.tokens[p], index.next[n1], ..., index.pre[d]
@@ -106,20 +105,15 @@ public final class FTBuilder extends Progress implements IndexBuilder {
       // first root node
       // write token size as byte
       outN.write((byte) 1);
-      //System.out.print("1,-1,");
       // write token
       outN.write((byte) -1);
       // write next pointer
       int j = 1;
       for (; j < next[0].length - 2; j++) {
-        //System.out.print(next[0][j] + "," +
-        //(char) tokens[next[next[0][j]][0]][0] + ",");
         outN.writeInt(next[0][j]); // pointer
         // first char of next node
         outN.write(tokens[next[next[0][j]][0]][0]);
       }
-      //System.out.print("0,-1");
-      //System.out.println();
 
       outN.writeInt(next[0][j]); // data size
       outN.write5(-1); // pointer on data - root has no data
@@ -128,31 +122,23 @@ public final class FTBuilder extends Progress implements IndexBuilder {
       // all other nodes
       final int il = index.next.size;
       for (int i = 1; i < il; i++) {
-        //System.out.println("id:" + i);
         // check pointer on data needs 1 or 2 ints
         int lp = (next[i][next[i].length - 2] > -1) ? 0 : -1;
         // write token size as byte
-    //System.out.print((byte) tokens[next[i][0]].length + ",");
         outN.write((byte) tokens[next[i][0]].length);
         // write token
         outN.write(tokens[next[i][0]]);
-    //System.out.print(new String(tokens[next[i][0]]) + ",");
         // write next pointer
         j = 1;
         for (; j < next[i].length - 2 + lp; j++) {
-          //System.out.print(next[i][j] +",");
           outN.writeInt(next[i][j]); // pointer
           // first char of next node
           outN.write(tokens[next[next[i][j]][0]][0]);
-          //System.out.print((char)
-          //tokens[next[next[i][j]][0]][0] + ",");
         }
         outN.writeInt(next[i][j]); // data size
-        //System.out.print(next[i][j] + ",");
         if (next[i][j] == 0 && next[i][j + 1] == 0) {
           // node has no data
           outN.write5(next[i][j + 1]);
-          //System.out.print(next[i][j + 1]);
         } else {
           // write pointer on data
           if (index.bl) {
@@ -162,14 +148,12 @@ public final class FTBuilder extends Progress implements IndexBuilder {
               outN.write5(toLong(next[i], next[i].length - 2));
             }
           } else {
-            writeData(outD, pre[next[i][next[i].length - 1]]);
-            writeData(outD, pos[next[i][next[i].length - 1]]);
+            writeData(outPre, pre[next[i][next[i].length - 1]]);
+            writeData(outPre, pos[next[i][next[i].length - 1]]);
           }
         }
-        //System.out.println();
         outS.writeInt(s);
         s += 1L + tokens[next[i][0]].length * 1L
-             //+ (next[i].length - 3) * 5L + 9L;
         + (next[i].length - 3 + lp) * 5L + 9L;
       }
     }
@@ -178,13 +162,13 @@ public final class FTBuilder extends Progress implements IndexBuilder {
       // write data
       final int il = index.pre.size;
       for (int i = 0; i < il; i++) {
-        writeData(outD, pre[i]);
-        writeData(outD, pos[i]);
+        writeData(outPre, pre[i]);
+        writeData(outPre, pos[i]);
       }
     }
 
     outS.writeInt(s);
-    outD.close();
+    outPre.close();
     outN.close();
     outS.close();
     return new FTTrie(data, db);
@@ -202,28 +186,49 @@ public final class FTBuilder extends Progress implements IndexBuilder {
 
   /**
    * Adds the data to each token.
-   * @param outD DataOutput
+   * @param outPre DataOutput
+   * @param ittr boolean itterator optimated storage
    * @throws IOException IOEXception
    */
-  private void bulkLoad(final DataOutput outD)  throws IOException {
-    // ftdata is stored here, with pre1, ..., preu, pos1, ..., posu
+  private void bulkLoad(final DataOutput outPre, 
+      final boolean ittr)  throws IOException {
     hash.init();
-    long c;
-    int ds, p;
-    byte[] val, tok;
+    long cpre;
+    int ds, p, lpre, lpos, spre, spos;
+    byte[] tok, vpre, vpos;
+    
     while(hash.more()) {
       p = hash.next();
       tok = hash.key();
       ds = hash.ns[p];
-      c = outD.size();
-
-      val = hash.pre[p];
-      int is = Num.size(val);
-      for (int z = 4; z < is; z++) outD.write(val[z]);
-      val = hash.pos[p];
-      is = Num.size(val);
-      for (int z = 4; z < is; z++) outD.write(val[z]);
-      index.insertSorted(tok, ds, c);
+      cpre = outPre.size();
+      
+      vpre = hash.pre[p];
+      vpos = hash.pos[p];
+      lpre = 4;
+      lpos = 4;
+      spre = Num.size(vpre);
+      spos = Num.size(vpos);
+      
+      if (ittr) {
+        // ftdata is stored here, with pre1, pos1, ..., preu, posu 
+        while(lpre < Num.size(vpre) && lpos < Num.size(vpos)) {
+          int z = 0;
+          while (z < Num.len(vpre, lpre))
+            outPre.write(vpre[lpre + z++]);
+          lpre += z;
+          z = 0;
+          while (z < Num.len(vpos, lpos))
+            outPre.write(vpre[lpos + z++]);
+          lpos += z;
+        }
+      } else {
+        // ftdata is stored here, with pre1, ..., preu in outPre and 
+        // pos1, ..., posu in outPos
+        for (int z = 4; z < spre; z++) outPre.write(vpre[z]);
+        for (int z = 4; z < spos; z++) outPre.write(vpos[z]);
+      }
+      index.insertSorted(tok, ds, cpre);
     }
   }
 

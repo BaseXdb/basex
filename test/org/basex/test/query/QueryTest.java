@@ -55,7 +55,7 @@ public final class QueryTest {
     Prop.chop = true;
 
     Prop.ftindex = true;
-    test(true);
+    test(false);
     Prop.ftindex = false;
     test(false);
     test(true);

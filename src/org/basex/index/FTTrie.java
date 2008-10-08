@@ -136,7 +136,20 @@ public final class FTTrie extends Index {
         new IndexArrayIterator(ids, count, true);
     }
 
-    final int[][] tmp = getNodeFromTrieRecursive(0, tok, ft.cs);
+    // check if result was cached
+    final int id = cache.id(tok);
+    final int[][] tmp;
+    if (id > -1) {
+      final int size = cache.getSize(id);
+      final long p = cache.getPointer(id);
+      if (data.meta.ftittr) {
+        
+        
+      }
+      tmp = getDataFromDataArray(size, p);
+    } else {
+      tmp = getNodeFromTrieRecursive(0, tok, ft.cs);
+    }
     return (tmp == null) ? IndexIterator.EMPTY
         : new IndexArrayIterator(tmp, true);
   }
@@ -863,7 +876,6 @@ public final class FTTrie extends Index {
     return r;
   }
 
-
   /**
    * Extracts data from disk and returns it in
    * [[pre1, ..., pres], [pos1, ..., poss]] representation.
@@ -875,11 +887,20 @@ public final class FTTrie extends Index {
   private int[][] getDataFromDataArray(final int s, final long ldid) {
     if(s == 0 || ldid < 0) return null;
     final int[][] dt = new int[2][s];
-
     dt[0][0] = inD.readNum(ldid);
-    for(int i = 1; i < s; i++) dt[0][i] = inD.readNum();
-    for(int i = 0; i < s; i++) dt[1][i] = inD.readNum();
+
+    if (data.meta.ftittr) {
+      dt[1][0] = inD.readNum(ldid);
+      for(int i = 1; i < s; i++) {
+        dt[0][i] = inD.readNum();
+        dt[1][i] = inD.readNum();
+      }
+    } else {
+      for(int i = 1; i < s; i++) dt[0][i] = inD.readNum();
+      for(int i = 0; i < s; i++) dt[1][i] = inD.readNum();
+    }
     return dt;
+
   }
 
   /**

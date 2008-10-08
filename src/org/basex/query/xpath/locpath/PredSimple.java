@@ -127,6 +127,14 @@ public final class PredSimple extends Pred {
     return -1;
   }
 
+  /**
+   * Getter for expr.
+   * @return expr Expr
+   */
+  public Expr getExpr() {
+    return expr;
+  }
+  
   @Override
   boolean alwaysFalse() {
     return expr instanceof Item ? !((Item) expr).bool() : false;
