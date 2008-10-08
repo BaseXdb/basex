@@ -193,7 +193,8 @@ public class BXCollection implements Collection {
         BaseX.debug(ex);
         throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
       }
-    }
+    } else {
     throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
+    }
   }
 }
