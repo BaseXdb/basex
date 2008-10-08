@@ -109,7 +109,7 @@ public abstract class Nod extends Item {
    * Returns a namespace array.
    * @return namespace array
    */
-  public FAttr[] ns() {
+  public QNm[] ns() {
     return null;
   }
 

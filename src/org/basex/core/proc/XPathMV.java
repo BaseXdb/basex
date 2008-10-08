@@ -181,13 +181,13 @@ public final class XPathMV extends AQuery {
       int pp = par + data.attSize(par, data.kind(par));
       while(pp != data.size) {
         if(data.tagID(pp) == medid) break;
-        pp = ser.xml(data, pp);
+        pp = ser.node(data, pp, 0);
       }
 
       // print subordinate titles of query results first
       final int maxsubs = Math.min(medium.size, sub + 1);
       for(int s = 1; s < maxsubs; s++) {
-        ser.xml(data, medium.get(s));
+        ser.node(data, medium.get(s), 0);
       }
 
       // print remaining subordinate titles
@@ -198,7 +198,7 @@ public final class XPathMV extends AQuery {
           m++;
           pp += data.size(pp, data.kind(pp));
         } else {
-          pp = ser.xml(data, pp);
+          pp = ser.node(data, pp, 0);
           s++;
         }
       }

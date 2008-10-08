@@ -62,7 +62,6 @@ import org.basex.query.xquery.expr.Union;
 import org.basex.query.xquery.expr.VarCall;
 import org.basex.query.xquery.item.Dbl;
 import org.basex.query.xquery.item.Dec;
-import org.basex.query.xquery.item.FAttr;
 import org.basex.query.xquery.item.Itr;
 import org.basex.query.xquery.item.QNm;
 import org.basex.query.xquery.item.Seq;
@@ -1499,8 +1498,7 @@ public final class XQParser extends QueryParser {
     consumeWSS();
 
     Expr[] cont = {};
-    Uri taguri = null;
-    FAttr[] ns = {};
+    QNm[] ns = {};
 
     // parse attributes...
     while(XMLToken.isXMLLetter(curr())) {
@@ -1553,26 +1551,22 @@ public final class XQParser extends QueryParser {
 
       if(eq(atn.str(), XMLNS)) {
         if(!simple) Err.or(NSCONS);
-        if(taguri != null) Err.or(DUPLNSDEF, atn);
         final byte[] v = attv.length == 0 ? EMPTY : attv[0].str();
-        taguri = Uri.uri(v);
+        atn.uri = Uri.uri(v);
+        open.uri = atn.uri;
+        ns = addNS(ns, atn);
       } else if(eq(atn.pre(), XMLNS)) {
         if(!simple) Err.or(NSCONS);
         final byte[] v = attv.length == 0 ? EMPTY : attv[0].str();
         if(v.length == 0) Err.or(NSEMPTYURI);
         atn.uri = Uri.uri(v);
         ctx.ns.index(atn);
-        ns = checkNS(ns, atn, v);
+        ns = addNS(ns, atn);
       } else {
         cont = add(cont, new CAttr(atn, attv, false));
       }
       if(!consumeWSS()) break;
     }
-
-    // ...add namespace
-    ctx.ns.uri(open);
-    if(open.uri == Uri.EMPTY && taguri != null)
-      open.uri = taguri == Uri.EMPTY ? null : taguri;
 
     if(consume('/')) {
       check('>');
@@ -1598,15 +1592,14 @@ public final class XQParser extends QueryParser {
    * Checks the uniqueness of the namespace and adds it to the array.
    * @param ns namespace array
    * @param a namespace to be checked
-   * @param v namespace value
    * @return new array
    * @throws XQException xquery exception
    */
-  private FAttr[] checkNS(final FAttr[] ns, final QNm a,
-      final byte[] v) throws XQException {
-    final int xl = ns.length;
-    for(int x = 0; x < xl; x++) if(ns[x].qname().eq(a)) Err.or(DUPLNSDEF, a);
-    return Array.add(ns, new FAttr(a, v, null));
+  private QNm[] addNS(final QNm[] ns, final QNm a) throws XQException {
+    for(int n = 0, nl = ns.length; n < nl; n++) {
+      if(eq(ns[n].str(), a.str())) Err.or(DUPLNSDEF, a);
+    }
+    return Array.add(ns, a);
   }
 
   /**
@@ -1770,7 +1763,7 @@ public final class XQParser extends QueryParser {
     final Expr e = expr();
     check(BRACE2);
     return new CElem(name, e == null ? new Expr[0] : new Expr[] { e },
-        new FAttr[] {});
+        new QNm[] {});
   }
 
   /**

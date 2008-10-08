@@ -1,8 +1,9 @@
 package org.basex.data;
 
+import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.query.ExprInfo;
-import org.basex.util.Token;
+import org.basex.util.TokenList;
 
 /**
  * This is an interface for serializing XML results.
@@ -13,6 +14,14 @@ import org.basex.util.Token;
 public abstract class Serializer {
   /** XML output flag. */
   protected boolean xml;
+  /** Attribute Names. */
+  private final TokenList nms = new TokenList();
+  /** Attribute values. */
+  private final TokenList vls = new TokenList();
+  /** Parent Stack. */
+  private final int[] parent = new int[256];
+  /** Token Stack. */
+  private final byte[][] token = new byte[256][];
 
   /**
    * Initializes the serializer.
@@ -172,11 +181,11 @@ public abstract class Serializer {
    */
   public final void pi(final byte[] c) throws IOException {
     byte[] n = c;
-    byte[] v = Token.EMPTY;
-    final int i = Token.indexOf(n, ' ');
+    byte[] v = EMPTY;
+    final int i = indexOf(n, ' ');
     if(i != -1) {
-      v = Token.substring(n, i + 1);
-      n = Token.substring(n, 0, i);
+      v = substring(n, i + 1);
+      n = substring(n, 0, i);
     }
     pi(n, v);
   }
@@ -204,55 +213,30 @@ public abstract class Serializer {
   protected byte[] name(final ExprInfo expr) {
     return expr.name();
   }
-  
+
   /**
-   * Serializes the specified node and all its sub nodes.
+   * Serializes a node of the specified data reference.
    * @param data data reference
-   * @param pre table position
-   * @return last p value
-   * @throws IOException exception
-   */
-  public final int xml(final Data data, final int pre) throws IOException {
-    int p = pre;
-    final int kind = data.kind(p);
-    if(kind == Data.TEXT) {
-      text(data.text(p++));
-    } else if(kind == Data.ATTR) {
-      attribute(data.attName(p), data.attValue(p++));
-    } else if(kind == Data.DOC) {
-      p = elem(data, p);
-    } else if(kind == Data.COMM) {
-      comment(data.text(p++));
-    } else if(kind == Data.PI) {
-      pi(data.text(p++));
-    } else {
-      p = elem(data, p);
-    }
-    return p;
-  }
-  
-  /**
-   * Writes the specified node and all its sub nodes.
-   * @param data data reference
-   * @param pr pre value to be written
+   * @param pre pre value to start from
+   * @param level starting level
    * @return last pre value
    * @throws IOException exception
    */
-  public final int elem(final Data data, final int pr) throws IOException {
-    // stacks
-    final int[] parent = new int[data.meta.height];
-    final byte[][] token = new byte[data.meta.height][];
+  public final int node(final Data data, final int pre, final int level)
+      throws IOException {
+
     // current output level
     int l = 0;
+    int p = pre;
+    final int s = pre + data.size(pre, data.kind(p));
 
     // loop through all table entries
-    int p = pr;
-    final int s = pr + data.size(pr, data.kind(pr));
     while(p < s) {
       if(finished()) return s;
 
-      final int k = data.kind(p);
+      int k = data.kind(p);
       final int pa = data.parent(p, k);
+
       // close opened tags...
       while(l > 0 && parent[l - 1] >= pa) closeElement(token[--l]);
 
@@ -269,13 +253,32 @@ public abstract class Serializer {
         final byte[] name = data.tag(p);
         startElement(name);
 
-        // add element attributes
+        nms.reset();
+        vls.reset();
+
         final int ps = p + data.size(p, k);
         final int as = p + data.attSize(p, k);
+        int pp = p;
+
+        // serialize attributes
         while(++p != as) attribute(data.attName(p), data.attValue(p));
+        
+        // add namespace definitions
+        if(level == 0 && l == 0) {
+          do {
+            addNS(data, pp);
+            pp = data.parent(pp, k);
+            k = data.kind(pp);
+          } while(k == Data.ELEM);
+        } else {
+          addNS(data, pp);
+        }
+        
+        // serialize namespaces
+        for(int n = 0; n < nms.size; n++) attribute(nms.list[n], vls.list[n]);
 
         // check if this is an empty tag
-        if(p == ps) {
+        if(as == ps) {
           emptyElement();
         } else {
           finishElement();
@@ -287,5 +290,22 @@ public abstract class Serializer {
     // process nodes that remain in the stack
     while(l > 0) closeElement(token[--l]);
     return p;
+  }
+  
+  /**
+   * Adds namespaces for the specified arguments to the temporary
+   * attribute arrays.
+   * @param data data reference 
+   * @param pre pre value
+   */
+  private void addNS(final Data data, final int pre) {
+    final int[] ns = data.ns(pre);
+    for(int n = 0; n < ns.length; n += 2) {
+      byte[] key = data.ns.key(ns[n]);
+      key = key.length == 0 ? XMLNS : concat(XMLNSC, key);
+      if(nms.contains(key)) continue;
+      nms.add(key);
+      vls.add(data.ns.key(ns[n + 1]));
+    }
   }
 }

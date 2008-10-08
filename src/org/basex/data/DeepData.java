@@ -7,6 +7,7 @@ import org.basex.index.IndexToken;
 import org.basex.io.DataAccess;
 import org.basex.io.DataOutput;
 import org.basex.io.TableAccess;
+import org.basex.util.Array;
 import org.basex.util.Token;
 
 /**
@@ -206,27 +207,27 @@ public final class DeepData extends Data {
 
   @Override
   public int tagID(final int pre) {
-    return table.read2(pre, 1) & 0x0FFF;
+    return table.read2(pre, 1) & 0x07FF;
   }
 
   @Override
   public int tagNS(final int pre) {
-    return (table.read2(pre, 1) >>> 12) & 0x0F;
+    return (table.read1(pre, 1) >>> 4) & 0x0F;
   }
 
   @Override
   public int[] ns(final int pre) {
-    return null;
+    return (table.read1(pre, 1) & 0x08) != 0 ? ns.get(pre) : Array.NOINTS;
   }
 
   @Override
   public int attNameID(final int pre) {
-    return table.read2(pre, 1) & 0x0FFF;
+    return table.read2(pre, 1) & 0x07FF;
   }
 
   @Override
   public int attNS(final int pre) {
-    return (table.read2(pre, 1) >>> 12) & 0x0F;
+    return (table.read1(pre, 1) >>> 4) & 0x0F;
   }
 
   @Override

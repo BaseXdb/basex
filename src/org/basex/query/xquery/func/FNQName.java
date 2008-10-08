@@ -1,11 +1,9 @@
 package org.basex.query.xquery.func;
 
 import static org.basex.query.xquery.XQText.*;
-
 import org.basex.BaseX;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
-import org.basex.query.xquery.item.FAttr;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.NCN;
 import org.basex.query.xquery.item.Nod;
@@ -33,12 +31,12 @@ final class FNQName extends Fun {
       case RESQNAME:
         Item it = arg[0].atomic(this, true);
         if(it == null) return Iter.EMPTY;
-        QNm name = new QNm(Token.trim(checkStr(it)), ctx);
-        byte[] pre = name.pre();
+        QNm nm = new QNm(Token.trim(checkStr(it)), ctx);
+        byte[] pre = nm.pre();
         it = arg[1].atomic(this, false);
         final Nod n = (Nod) check(it, Type.ELM);
-        name.uri = n.qname().uri;
-        if(name.uri != Uri.EMPTY) return name.iter();
+        nm.uri = n.qname().uri;
+        if(nm.uri != Uri.EMPTY) return nm.iter();
 
         Item i;
         final Iter iter = inscope(ctx, n);
@@ -46,14 +44,14 @@ final class FNQName extends Fun {
           final byte[] ns = i.str();
           if(ns.length == 0) continue;
           if(Token.eq(pre, ns)) {
-            name.uri = ctx.ns.uri(ns);
-            return name.iter();
+            nm.uri = ctx.ns.uri(ns);
+            return nm.iter();
           }
         }
 
         if(pre.length != 0) Err.or(NSDECL, pre);
-        name.uri = ctx.nsElem;
-        return name.iter();
+        nm.uri = ctx.nsElem;
+        return nm.iter();
       case QNAME:
         it = arg[0].atomic(this, true);
         final Uri uri = Uri.uri(it == null ? Token.EMPTY :
@@ -62,14 +60,9 @@ final class FNQName extends Fun {
         it = it == null ? Str.ZERO : check(it, Type.STR);
         final byte[] str = it.str();
         if(!XMLToken.isQName(str)) Err.value(Type.QNM, it);
-        name = new QNm(str, uri);
-
-        if(name.ns()) {
-          if(uri == Uri.EMPTY || name.pre().length == 0)
-            Err.value(Type.QNM, name);
-          ctx.ns.index(name);
-        }
-        return name.iter();
+        nm = new QNm(str, uri);
+        if(nm.ns() && uri == Uri.EMPTY) Err.value(Type.URI, uri);
+        return nm.iter();
       case LOCNAMEQNAME:
         it = arg[0].atomic(this, true);
         if(it == null) return Iter.EMPTY;
@@ -77,8 +70,8 @@ final class FNQName extends Fun {
       case PREQNAME:
         it = arg[0].atomic(this, true);
         if(it == null) return Iter.EMPTY;
-        name = (QNm) check(it, Type.QNM);
-        return !name.ns() ? Iter.EMPTY : new NCN(name.pre()).iter();
+        nm = (QNm) check(it, Type.QNM);
+        return !nm.ns() ? Iter.EMPTY : new NCN(nm.pre()).iter();
       case NSURIPRE:
         it = arg[1].atomic(this, false);
         check(it, Type.ELM);
@@ -120,10 +113,9 @@ final class FNQName extends Fun {
 
     Nod n = node;
     while(n != null) {
-      final FAttr[] at = n.ns();
+      final QNm[] at = n.ns();
       if(at == null) break;
-      for(final FAttr ns : at) {
-        final QNm name = ns.qname();
+      for(final QNm name : at) {
         if(name.ns()) {
           final byte[] pre = name.ln();
           if(!tl.contains(pre)) tl.add(pre);

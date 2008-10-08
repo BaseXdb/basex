@@ -20,15 +20,11 @@ import org.basex.query.xquery.item.DNode;
 import org.basex.query.xquery.item.Dat;
 import org.basex.query.xquery.item.Dtm;
 import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Nod;
-import org.basex.query.xquery.item.QNm;
 import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.item.Tim;
-import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.item.Uri;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.NodIter;
-import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.util.Err;
 import org.basex.query.xquery.util.Functions;
 import org.basex.query.xquery.util.Namespaces;
@@ -119,7 +115,7 @@ public final class XQContext extends QueryContext {
     if(nodes != null) {
       docs = new DNode[nodes.size];
       for(int d = 0; d < docs.length; d++) {
-        docs[d] = addNS(new DNode(nodes.data, nodes.nodes[d]));
+        docs[d] = new DNode(nodes.data, nodes.nodes[d]);
       }
       item = Seq.get(docs, docs.length);
       final NodIter col = new NodIter();
@@ -248,7 +244,7 @@ public final class XQContext extends QueryContext {
     // add document to array
     final int dl = docs.length;
     docs = Array.add(docs, new DNode(data, 0));
-    return addNS(docs[dl]);
+    return docs[dl];
   }
 
   /**
@@ -301,34 +297,6 @@ public final class XQContext extends QueryContext {
   public void addColl(final NodIter nod, final byte[] name) {
     collect = Array.add(collect, nod);
     collName = Array.add(collName, name);
-  }
-
-  /** Finishes the query execution.
-  public void finish() {
-    try { for(final DNode doc : docs) doc.data.close(); }
-    catch(final IOException ex) { BaseX.debug(ex); }
-  }*/
-
-  /**
-   * Adds namespaces from the specified document.
-   * @param doc document
-   * @return document
-   * @throws XQException evaluation exception
-   */
-  private DNode addNS(final DNode doc) throws XQException {
-    // add root namespaces
-    NodeIter it = doc.child();
-    Nod node = null;
-    while((node = it.next()) != null) {
-      if(node.type != Type.ELM) continue;
-      it = node.attr();
-      while((node = it.next()) != null) {
-        final QNm name = node.qname();
-        if(eq(name.pre(), XMLNS)) ns.index(name);
-      }
-      break;
-    }
-    return doc;
   }
 
   @Override

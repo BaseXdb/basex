@@ -123,7 +123,7 @@ public final class Copy extends AUpdate {
           break;
         case Data.ELEM:
           tmp.addElem(data.tagID(p), data.tagNS(p), d, data.attSize(p, k),
-              data.size(p, k), data.ns(p) != null);
+              data.size(p, k), data.ns(p).length != 0);
           break;
         case Data.ATTR:
           tmp.addAtt(data.attNameID(p), data.attNS(p), data.attValue(p), d);

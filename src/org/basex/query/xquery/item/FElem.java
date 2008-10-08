@@ -6,8 +6,8 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.iter.NodIter;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Token;
 import org.basex.util.TokenList;
 
 /**
@@ -18,7 +18,7 @@ import org.basex.util.TokenList;
  */
 public final class FElem extends FNode {
   /** Namespaces. */
-  private final FAttr[] names;
+  private final QNm[] names;
   /** Tag name. */
   private final QNm name;
   /** Base URI. */
@@ -34,7 +34,7 @@ public final class FElem extends FNode {
    * @param p parent
    */
   public FElem(final QNm n, final NodIter ch, final NodIter at,
-      final byte[] b, final FAttr[] ns, final Nod p) {
+      final byte[] b, final QNm[] ns, final Nod p) {
     super(Type.ELM);
     name = n;
     children = ch;
@@ -60,7 +60,7 @@ public final class FElem extends FNode {
   }
 
   @Override
-  public FAttr[] ns() {
+  public QNm[] ns() {
     return names;
   }
 
@@ -78,30 +78,70 @@ public final class FElem extends FNode {
   public void serialize(final Serializer ser,  final XQContext ctx,
       final int level) throws IOException {
 
-    final byte[] nm = name.str();
-    ser.startElement(nm);
+    final byte[] tag = name.str();
+    ser.startElement(tag);
 
-    final TokenList nms = new TokenList();
-    final TokenList vls = new TokenList();
+    // serialize attributes
+    for(int n = 0; n < atts.size; n++) {
+      ser.attribute(atts.list[n].nname(), atts.list[n].str());
+    }
+    
+    // serialize namespace definitions
+    if(level == 0) {
+      // top level...
+      final TokenList nms = new TokenList();
 
-    // add namespace attributes
-    for(final FAttr ns : names) {
-      nms.add(ns.nname());
-      vls.add(ns.str());
+      Nod elm = this;
+      boolean xmlns = false;
+      do {
+        for(final QNm ns : ((FElem) elm).names) {
+          final byte[] key = ns.str();
+          final Uri val = ns.uri;
+          
+          if(nms.contains(key)) continue;
+          nms.add(key);
+          if(Token.eq(key, XMLNS)) {
+            xmlns = true;
+            if(val == Uri.EMPTY) continue;
+          }
+          ser.attribute(key, val.str());
+        }
+        elm = elm.parent();
+      } while(elm instanceof FElem);
+
+      final QNm[] qn = ctx.ns.ns();
+      for(int p = 0; p < qn.length; p++) {
+        byte[] key = qn[p].str();
+        key = key.length == 0 ? XMLNS : concat(XMLNSC, key);
+        final byte[] val = qn[p].uri.str();
+        
+        if(nms.contains(key)) continue;
+        nms.add(key);
+        if(Token.eq(key, XMLNS)) {
+          xmlns = true;
+          if(val.length == 0) continue;
+        }
+        ser.attribute(key, val);
+      }
+      
+      if(ctx.nsElem != Uri.EMPTY && !xmlns) {
+        ser.attribute(XMLNS, ctx.nsElem.str());
+      }
+    } else {
+      for(final QNm ns : names) ser.attribute(ns.str(), ns.uri.str());
     }
 
-    // add attributes
+    /* add attributes
     for(int n = 0; n < atts.size; n++) {
       final Nod a = atts.list[n];
-      final byte[] at = a.nname();
       if(level == 0 && a.qname().ns()) {
+        final byte[] at = a.nname();
         final byte[] pref = substring(at, 0, indexOf(at, ':'));
         final byte[] atr = concat(XMLNSC, pref);
         boolean f = Token.eq(pref, XML);
         for(final FAttr ns : names) f |= Token.eq(ns.nname(), atr);
         if(!f) ser.attribute(atr, a.qname().uri.str());
       }
-      ser.attribute(at, atts.list[n].str());
     }
     
     // add global namespaces
@@ -120,35 +160,18 @@ public final class FElem extends FNode {
         nms.add(XMLNS);
         vls.add(ctx.nsElem.str());
       }
-    }
+    }*/
 
-    // serialize attributes
-    for(int n = 0; n < nms.size; n++) ser.attribute(nms.list[n], vls.list[n]);
-    
     // serialize children
     if(children.size == 0) {
       ser.emptyElement();
     } else {
       ser.finishElement();
       for(int n = 0; n < children.size; n++) {
-        final Item child = children.list[n];
-        child.serialize(ser, ctx, level + 1);
+        children.list[n].serialize(ser, ctx, level + 1);
       }
-      ser.closeElement(nm);
+      ser.closeElement(tag);
     }
-  }
-  
-  /**
-   * Returns the next ancestor with a namespace definition. 
-   * @return ancestor
-   */
-  private QNm nsAnc() {
-    FElem nm = this;
-    while(nm.name.uri == Uri.EMPTY) {
-      if(!(nm.par instanceof FElem)) return null;
-      nm = (FElem) nm.par;
-    }
-    return nm.name.uri == null ? null : nm.name;
   }
 
   @Override

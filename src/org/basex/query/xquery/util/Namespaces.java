@@ -15,9 +15,9 @@ import org.basex.util.Array;
  */
 public final class Namespaces {
   /** Namespaces. */
-  public QNm[] names = new QNm[1];
+  private QNm[] names = new QNm[1];
   /** Number of stored namespaces. */
-  public int size;
+  private int size;
 
   /**
    * Indexes the specified namespace.
@@ -27,16 +27,11 @@ public final class Namespaces {
    */
   public boolean index(final QNm name) throws XQException {
     final byte[] ln = name.ln();
-    final boolean del = name.uri == null;
     if(eq(ln, XML) || eq(ln, XMLNS)) Err.or(NSDEF, name);
     if(Uri.XML.eq(name.uri)) Err.or(NOXMLNS, name);
 
-    for(int s = 0; s < size; s++) {
-      if(eq(ln, names[s].ln())) {
-        if(del) Array.move(names, s + 1, -1, --size - s);
-        return false;
-      }
-    }
+    // check if namespace exists already..
+    for(int s = 0; s < size; s++) if(eq(ln, names[s].ln())) return false;
 
     if(size == names.length) names = Array.extend(names);
     names[size++] = new QNm(ln, name.uri);
@@ -90,5 +85,13 @@ public final class Namespaces {
       if(uri.eq(names[s].uri)) return names[s].str();
     }
     return GlobalNS.prefix(uri);
+  }
+
+  /**
+   * Returns the currently available namespaces.
+   * @return namespaces
+   */
+  public QNm[] ns() {
+    return Array.finish(names, size);
   }
 }

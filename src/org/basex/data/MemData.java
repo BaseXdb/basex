@@ -118,7 +118,7 @@ public final class MemData extends Data {
 
   @Override
   public int[] ns(final int pre) {
-    return (val1[pre] >>> 51) != 0 ? ns.get(pre) : null;
+    return (val1[pre] & 1L << 51) != 0 ? ns.get(pre) : Array.NOINTS;
   }
 
   @Override

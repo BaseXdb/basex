@@ -628,7 +628,7 @@ public enum Type {
 
       // [CG] add complete DOM object for elements
       return new FElem(new QNm(token(((Element) o).getNodeName())),
-          new NodIter(), new NodIter(), Token.EMPTY, new FAttr[] {}, null);
+          new NodIter(), new NodIter(), Token.EMPTY, new QNm[] {}, null);
     }
   },
 

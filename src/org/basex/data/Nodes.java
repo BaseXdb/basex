@@ -160,16 +160,16 @@ public final class Nodes implements Result {
     ser.open(size);
     for(int c = 0; c < size; c++) {
       if(ser.finished()) break;
-      ser.openResult();
-      ser.xml(data, nodes[c]);
-      ser.closeResult();
+      serialize(ser, c);
     }
     ser.close(size);
   }
 
   /** {@inheritDoc} */
   public void serialize(final Serializer ser, final int n) throws IOException {
-    ser.xml(data, nodes[n]);
+    ser.openResult();
+    ser.node(data, nodes[n], 0);
+    ser.closeResult();
   }
 
   @Override

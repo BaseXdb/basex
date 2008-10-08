@@ -3,10 +3,10 @@ package org.basex.query.xquery.expr;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
+
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
-import org.basex.query.xquery.item.FAttr;
 import org.basex.query.xquery.item.FElem;
 import org.basex.query.xquery.item.FTxt;
 import org.basex.query.xquery.item.Item;
@@ -27,7 +27,7 @@ import org.basex.util.TokenBuilder;
  */
 public final class CElem extends Arr {
   /** Namespaces. */
-  final FAttr[] names;
+  final QNm[] names;
   /** Tag name. */
   Expr tag;
 
@@ -37,7 +37,7 @@ public final class CElem extends Arr {
    * @param cont element content
    * @param ns namespaces
    */
-  public CElem(final Expr t, final Expr[] cont, final FAttr[] ns) {
+  public CElem(final Expr t, final Expr[] cont, final QNm[] ns) {
     super(cont);
     tag = t;
     names = ns;
@@ -71,7 +71,7 @@ public final class CElem extends Arr {
   }
   
   /** Construction helper class. */
-  class Constr {
+  final class Constr {
     /** Text cache. */
     final TokenBuilder text = new TokenBuilder();
     /** Node array. */
@@ -89,7 +89,7 @@ public final class CElem extends Arr {
      * @throws XQException xquery exception
      * @return element
      */
-    public Iter construct(final XQContext ctx) throws XQException {
+    Iter construct(final XQContext ctx) throws XQException {
       final Item it = ctx.atomic(tag, CElem.this, false);
       final QNm tname = CAttr.name(ctx, it);
 
@@ -100,7 +100,16 @@ public final class CElem extends Arr {
       }
       if(text.size != 0) nodes.add(new FTxt(text.finish(), null));
 
-      final FElem node = new FElem(tname, nodes, ats, base, names, null);
+      QNm[] nms = names;
+      /*if(tname.ns()) {
+        byte[] key = tname.pre();
+        if(!eq(key, XML)) {
+          key = key.length == 0 ? XMLNS : concat(XMLNSC, key);
+          nms = Array.add(nms, new QNm(key, tname.uri));
+        }
+      }*/
+      
+      final FElem node = new FElem(tname, nodes, ats, base, nms, null);
       for(int n = 0; n < nodes.size; n++) nodes.list[n].parent(node);
       for(int n = 0; n < ats.size; n++) ats.list[n].parent(node);
       return node.iter();

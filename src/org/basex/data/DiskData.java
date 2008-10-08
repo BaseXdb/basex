@@ -15,6 +15,7 @@ import org.basex.io.DataOutput;
 import org.basex.io.TableAccess;
 import org.basex.io.TableDiskAccess;
 import org.basex.io.TableMemAccess;
+import org.basex.util.Array;
 import org.basex.util.Token;
 
 /**
@@ -31,7 +32,7 @@ import org.basex.util.Token;
  * <pre>
  * ELEMENT NODES:
  * - Byte     0:  KIND: Node kind (ELEM)
- * - Byte   1-2:  NSPC: Namespace and Tag Reference
+ * - Byte   1-2:  NSPC: Namespace (4), NS Definition flag (1) and Name (11 bits)
  * - Byte     3:  ATTS: Number of attributes
  * - Byte  4- 7:  DIST: Distance to parent node
  * - Byte  8-11:  SIZE: Number of descendants
@@ -48,7 +49,7 @@ import org.basex.util.Token;
  * - Byte 12-15:  UNID: Unique Node ID
  * ATTRIBUTE NODES:
  * - Byte     0:  KIND: Node kind (ATTR)
- * - Byte   1-2:  NSPC: Namespace and Attribute name reference
+ * - Byte   1-2:  NSPC: Namespace (4) and Name (11 bits)
  * - Byte  3- 7:  TEXT: Attribute value reference
  * - Byte    11:  DIST: Distance to parent node
  * - Byte 12-15:  UNID: Unique Node ID
@@ -234,7 +235,7 @@ public final class DiskData extends Data {
 
   @Override
   public int[] ns(final int pre) {
-    return (table.read1(pre, 1) & 0x08) != 0 ? ns.get(pre) : null;
+    return (table.read1(pre, 1) & 0x08) != 0 ? ns.get(pre) : Array.NOINTS;
   }
 
   @Override

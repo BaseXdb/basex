@@ -11,8 +11,6 @@ public final class Array {
   public static final int[] NOINTS = {};
   /** Empty integer array. */
   public static final int[][] NOINTS2 = {};
-  /** Empty bytes array. */
-  public static final byte[][] NOBYTES = {};
 
   /** Private constructor. */
   private Array() { }
