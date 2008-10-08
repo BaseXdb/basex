@@ -160,12 +160,15 @@ public class BXCollection implements Collection {
             tmp.getDocumentId())) {
           ctx.data().delete(((BXXMLResource) res).getPre());
           ctx.data().flush();
-        }
+        } else {
         throw new XMLDBException(ErrorCodes.NO_SUCH_RESOURCE);
-      }
+        }
+      } else {
       throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
-    }
+      }
+    } else {
     throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
+    }
   }
 
   public void setProperty(final String name, final String value) {
