@@ -97,8 +97,8 @@ public class BXCollection implements Collection {
         if(Token.eq(ctx.data().text(pre), idd)) {
           return new BXXMLResource(ctx.data(), id, pre, this);
         }
-        return null;
       }
+      return null;
     }
     throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
   }
@@ -163,7 +163,7 @@ public class BXCollection implements Collection {
         } else {
         throw new XMLDBException(ErrorCodes.NO_SUCH_RESOURCE);
         }
-      } else {
+       } else {
       throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
       }
     } else {
