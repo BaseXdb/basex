@@ -52,14 +52,12 @@ public class BXCollectionManagementService implements
 
   public String getProperty(String name) {
     //<CG> Was für Properties gibt es?
-    // exist hat hier keine
     BaseX.notimplemented();
     return null;
   }
 
   public void setProperty(String name, String value) {
     //<CG> Was für Properties gibt es?
-    // exist hat hier keine
     BaseX.notimplemented();
   }
 }

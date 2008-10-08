@@ -48,7 +48,6 @@ public final class BXResource implements Resource {
 
   public Collection getParentCollection() {
   //<CG> Wie erhalte ich denn die zugehörige Collection?
-    // bei exist gibts gar keine normale Resource
     return null;
   }
 

@@ -66,26 +66,30 @@ public final class BXQueryService implements XPathQueryService {
   }
 
   public ResourceSet query(final String query) throws XMLDBException {
-    try {
-      // Creates a query instance
-      final QueryProcessor proc = name.equals(XPATH) ? new XPathProcessor(query)
-          : new XQueryProcessor(query);
-      // Executes the query and returns the result
-      return new BXResourceSet(proc.query(coll.ctx.current()), coll);
-    } catch(final QueryException ex) {
-      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
-    } catch(final Exception ex) {
-      BaseX.notexpected();
-      return null;
-    }
+    return queryAll(null, query);
   }
 
   public ResourceSet queryResource(final String id, final String query) throws XMLDBException {
-    // Creates a query instance
+    return queryAll(id, query);
+}
+  
+  /**
+   * Method for both query Actions.
+   * @param id
+   * @param query
+   * @return BXResourceSet
+   * @throws XMLDBException
+   */
+  private ResourceSet queryAll(final String id, final String query) throws XMLDBException {
+ // Creates a query instance
     final QueryProcessor proc = name.equals(XPATH) ? new XPathProcessor(query)
         : new XQueryProcessor(query);
-    // Executes the query and returns the result
     try {
+      if(id == null) {
+     // Executes the query and returns the result
+        return new BXResourceSet(proc.query(coll.ctx.current()), coll);
+      }
+   // Executes the query and returns the result
       return new BXResourceSet(proc.query(new Nodes(((BXXMLResource) coll.getResource(id)).getData())), coll);
     } catch(final QueryException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
@@ -93,7 +97,7 @@ public final class BXQueryService implements XPathQueryService {
       BaseX.notexpected();
       return null;
     }
-}
+  }
 
   public void removeNamespace(final String prefix) {
     Iterator i = nsMaps.values().iterator();

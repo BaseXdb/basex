@@ -12,6 +12,7 @@ import org.basex.data.Data;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
 import org.basex.query.xquery.item.DNode;
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -115,7 +116,11 @@ public final class BXXMLResource implements XMLResource {
 
   public void setContentAsDOM(final Node cont) throws XMLDBException {
     if(cont == null) throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
-    content = cont;
+    if(cont instanceof Document) {
+      content = cont;
+    } else {
+      throw new XMLDBException(ErrorCodes.WRONG_CONTENT_TYPE);
+    }
   }
 
   public ContentHandler setContentAsSAX() {

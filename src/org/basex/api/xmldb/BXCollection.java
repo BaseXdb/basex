@@ -17,13 +17,14 @@ import org.basex.util.Token;
 
 /**
  * Implementation of the Collection Interface for the XMLDB:API.
- * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler
  */
 public class BXCollection implements Collection {
   /** Context reference. */
   Context ctx;
+  /** Boolean value if Collection is closed. */
+  boolean closed;
 
   /**
    * Standard constructor.
@@ -31,10 +32,12 @@ public class BXCollection implements Collection {
    */
   public BXCollection(final Context c) {
     ctx = c;
+    closed = false;
   }
 
   public void close() {
     new Close().execute(ctx);
+    closed = true;
   }
 
   public String createId() {
@@ -45,27 +48,38 @@ public class BXCollection implements Collection {
 
   public Resource createResource(final String id, final String type)
       throws XMLDBException {
-    
-    if(type.equals(XMLResource.RESOURCE_TYPE))
-      return new BXXMLResource(null, id, -1, this);
-
-    throw new XMLDBException(ErrorCodes.UNKNOWN_RESOURCE_TYPE);
+    if(isOpen()) {
+      if(type.equals(XMLResource.RESOURCE_TYPE)) {
+        return new BXXMLResource(null, id, -1, this);
+      }
+      throw new XMLDBException(ErrorCodes.UNKNOWN_RESOURCE_TYPE);
+    }
+    throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
   }
 
-  public Collection getChildCollection(final String name) {
-    return null;
+  public Collection getChildCollection(final String name) throws XMLDBException {
+    if(isOpen()) {
+      return null;
+    }
+    throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
   }
 
-  public int getChildCollectionCount() {
-    return 0;
+  public int getChildCollectionCount() throws XMLDBException {
+    if(isOpen()) {
+      return 0;
+    }
+    throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
   }
 
   public String getName() {
     return ctx.data().meta.dbname;
   }
 
-  public Collection getParentCollection() {
-    return null;
+  public Collection getParentCollection() throws XMLDBException {
+    if(isOpen()) {
+      return null;
+    }
+    throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
   }
 
   public String getProperty(final String name) {
@@ -75,83 +89,111 @@ public class BXCollection implements Collection {
   }
 
   public Resource getResource(final String id) throws XMLDBException {
-    byte[] idd = Token.token(id);
-    int[] docs = ctx.data().doc();
-    for (int i = 0; i < docs.length; i++) {
-      int pre = docs[i];
-      if(Token.eq(ctx.data().text(pre), idd)) {
-        return new BXXMLResource(ctx.data(), id, pre, this);
+    if(isOpen()) {
+      byte[] idd = Token.token(id);
+      int[] docs = ctx.data().doc();
+      for(int i = 0; i < docs.length; i++) {
+        int pre = docs[i];
+        if(Token.eq(ctx.data().text(pre), idd)) {
+          return new BXXMLResource(ctx.data(), id, pre, this);
+        }
+        return null;
       }
     }
-    throw new XMLDBException(ErrorCodes.VENDOR_ERROR);
+    throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
   }
 
-  public int getResourceCount() {
-    return ctx.data().doc().length;
+  public int getResourceCount() throws XMLDBException {
+    if(isOpen()) {
+      return ctx.data().doc().length;
+    }
+    throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
   }
 
   public Service getService(final String name, final String version)
       throws XMLDBException {
-    
-    if(name.equals(BXQueryService.XPATH) || name.equals(BXQueryService.XQUERY))
-      return new BXQueryService(this, name);
-    
-    throw new XMLDBException(ErrorCodes.VENDOR_ERROR);
+    if(isOpen()) {
+      if(name.equals(BXQueryService.XPATH)
+          || name.equals(BXQueryService.XQUERY)) return new BXQueryService(
+          this, name);
+    }
+    throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
   }
 
   public Service[] getServices() throws XMLDBException {
-    return new Service[] {
-        getService(BXQueryService.XPATH, null),
-        getService(BXQueryService.XQUERY, null)
-    };
+    if(isOpen()) {
+      return new Service[] { getService(BXQueryService.XPATH, null),
+          getService(BXQueryService.XQUERY, null) };
+    }
+    throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
   }
 
   public boolean isOpen() {
-    return ctx.data() != null;
+    return !closed;
   }
 
-  public String[] listChildCollections() {
-    String[] empty = {};
-    return empty;
-  }
-
-  public String[] listResources() {
-    int[] docs = ctx.data().doc();
-    String[] resources = new String[docs.length];
-    for(int i = 0; i < docs.length; i++) {
-      resources[i] = Token.string(ctx.data().text(docs[i]));
+  public String[] listChildCollections() throws XMLDBException {
+    if(isOpen()) {
+      String[] empty = {};
+      return empty;
     }
-    return resources;
+    throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
   }
-  
-  public void removeResource(Resource res) {
-    ctx.data().delete(((BXXMLResource) res).getPre());
-    ctx.data().flush();
+
+  public String[] listResources() throws XMLDBException {
+    if(isOpen()) {
+      int[] docs = ctx.data().doc();
+      String[] resources = new String[docs.length];
+      for(int i = 0; i < docs.length; i++) {
+        resources[i] = Token.string(ctx.data().text(docs[i]));
+      }
+      return resources;
+    }
+    throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
+  }
+
+  public void removeResource(Resource res) throws XMLDBException {
+    if(isOpen()) {
+      if(res instanceof BXXMLResource) {
+        BXXMLResource tmp = (BXXMLResource) res;
+        if(Token.string(ctx.data().text(tmp.getPre())).equals(
+            tmp.getDocumentId())) {
+          ctx.data().delete(((BXXMLResource) res).getPre());
+          ctx.data().flush();
+        }
+        throw new XMLDBException(ErrorCodes.NO_SUCH_RESOURCE);
+      }
+      throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
+    }
+    throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
   }
 
   public void setProperty(final String name, final String value) {
-  //<CG> Was für Properties gibt es?
+    //<CG> Was für Properties gibt es?
     BaseX.notimplemented();
   }
 
   public void storeResource(final Resource res) throws XMLDBException {
-    final String id = ((BXXMLResource)res).getDocumentId();
-    Data tmp = null;
-    final Object cont = res.getContent();
-    Parser p = null;
-    if(cont instanceof Document) {
-      p = new DOCWrapper((Document) cont, id);
-    } else {
-      p = new DirParser(IO.get(cont.toString()));
+    if(isOpen()) {
+      final String id = ((BXXMLResource) res).getDocumentId();
+      Data tmp = null;
+      final Object cont = res.getContent();
+      Parser p = null;
+      if(cont instanceof Document) {
+        p = new DOCWrapper((Document) cont, id);
+      } else {
+        p = new DirParser(IO.get(cont.toString()));
+      }
+      try {
+        tmp = new MemBuilder().build(p, id);
+        final Data data = ctx.data();
+        data.insert(data.size, -1, tmp);
+        data.flush();
+      } catch(final IOException ex) {
+        BaseX.debug(ex);
+        throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
+      }
     }
-    try {
-      tmp = new MemBuilder().build(p, id);
-      final Data data = ctx.data();
-      data.insert(data.size, -1, tmp);
-      data.flush();
-    } catch(final IOException ex) {
-      BaseX.debug(ex);
-      throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
-    }
+    throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
   }
 }

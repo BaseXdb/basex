@@ -49,6 +49,7 @@ public class BXDatabase implements Database {
       if(host.startsWith(LOCALHOST)) {
         final String tmp = host.substring(LOCALHOST.length());
         if(new Open(tmp).execute(ctx)) return new BXCollection(ctx);
+        return null;
       }
     }
     throw new XMLDBException(ErrorCodes.INVALID_URI);

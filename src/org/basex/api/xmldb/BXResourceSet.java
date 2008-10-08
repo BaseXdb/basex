@@ -64,8 +64,11 @@ public final class BXResourceSet implements ResourceSet {
     return null;
   }
 
-  public Resource getResource(final long index) {
+  public Resource getResource(final long index) throws XMLDBException {
+    if(index < resources.size()) {
     return resources.get((int) index);
+    }
+    throw new XMLDBException(ErrorCodes.NO_SUCH_RESOURCE);
   }
 
   public long getSize() {
