@@ -37,9 +37,7 @@ public class BXQStaticContext implements XQStaticContext {
     try {
       BXQAbstract.valid(prefix, String.class);
       BXQAbstract.valid(uri, String.class);
-      final QNm name = new QNm(prefix, uri);
-      if(name.uri == Uri.EMPTY) name.uri = null;
-      ctx.ns.index(name);
+      ctx.ns.index(new QNm(prefix, uri));
     } catch(final org.basex.query.xquery.XQException ex) {
       throw new BXQException(ex);
     }
@@ -98,9 +96,9 @@ public class BXQStaticContext implements XQStaticContext {
   }
 
   public String[] getNamespacePrefixes() {
-    final String[] pre = new String[ctx.ns.size];
-    for(int p = 0; p < ctx.ns.size; p++)
-      pre[p] = string(ctx.ns.names[p].ln());
+    final QNm[] names = ctx.ns.ns();
+    final String[] pre = new String[names.length];
+    for(int p = 0; p < pre.length; p++) pre[p] = string(names[p].ln());
     return pre;
   }
 
