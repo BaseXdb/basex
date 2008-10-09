@@ -38,9 +38,13 @@ public final class ScatterView extends View implements Runnable {
   /** Data reference. */
   ScatterData scatterData;
   /** X paint margin. */
-  private static final int XMARGIN = 150;
+  private static final int MARGINBOTTOM = 150;
   /** Y paint margin. */ 
-  private static final int YMARGIN = 200;
+  private static final int MARGINTOP = 65;
+  /** Y paint margin. */ 
+  private static final int MARGINLEFT = 150;
+  /** Y paint margin. */ 
+  private static final int MARGINRIGHT = 40;
   /** Item size. */
   private static final int ITEMSIZE = 10;
   /** Focused item size. */
@@ -134,6 +138,7 @@ public final class ScatterView extends View implements Runnable {
           repaint();
       }
     });
+    box.add(Box.createHorizontalGlue());
     box.add(new JLabel("X"));
     box.add(Box.createHorizontalStrut(3));
     box.add(xCombo);
@@ -145,7 +150,7 @@ public final class ScatterView extends View implements Runnable {
     box.add(new JLabel("Item"));
     box.add(Box.createHorizontalStrut(3));
     box.add(itemCombo);
-    box.add(Box.createHorizontalGlue());
+    box.add(Box.createHorizontalStrut(32));
     add(box, BorderLayout.NORTH);
     
     tmpMarkedPos = new IntList();
@@ -232,12 +237,13 @@ public final class ScatterView extends View implements Runnable {
       plotChanged = true;
     }
 
-    plotWidth = w - 2 * XMARGIN;
-    plotHeight = h - 2 * YMARGIN;
+    plotWidth = w - (MARGINLEFT + MARGINRIGHT);
+    plotHeight = h - (MARGINTOP + MARGINBOTTOM);
     
     // overdraw plot background for non value items
     g.setColor(GUIConstants.color2);
-    g.fillRect(XMARGIN + NOVALUEBORDER, YMARGIN, plotWidth - NOVALUEBORDER, 
+    g.fillRect(MARGINLEFT + NOVALUEBORDER, MARGINTOP, 
+        plotWidth - NOVALUEBORDER, 
       plotHeight - NOVALUEBORDER);
     
     // draw axis and grid
@@ -278,12 +284,12 @@ public final class ScatterView extends View implements Runnable {
     // draw focused x and y value
     if(valueFocused) {
       g.setColor(GUIConstants.color6);
-      final String x = mouseX > XMARGIN + NOVALUEBORDER ? 
+      final String x = mouseX > MARGINLEFT + NOVALUEBORDER ? 
           scatterData.xAxis.getValue(focusedValueX) : "";
-      final String y = mouseY < h - YMARGIN - NOVALUEBORDER ?
+      final String y = mouseY < h - MARGINBOTTOM - NOVALUEBORDER ?
           scatterData.yAxis.getValue(focusedValueY) : "";
-      g.drawString("x  " + x, XMARGIN, YMARGIN - 50);
-      g.drawString("y  " + y, XMARGIN, YMARGIN - 35);
+      g.drawString("x  " + x, MARGINLEFT, MARGINTOP - 20);
+      g.drawString("y  " + y, MARGINLEFT, MARGINTOP - 6);
     }
     
     // draw selection box
@@ -337,8 +343,8 @@ public final class ScatterView extends View implements Runnable {
     final int h = getHeight();
     final int w = getWidth();
     g.setColor(GUIConstants.color1);
-    g.drawLine(XMARGIN, h - YMARGIN, w - XMARGIN, 
-        h - YMARGIN);
+    g.drawLine(MARGINLEFT, h - MARGINBOTTOM, w - MARGINRIGHT, 
+        h - MARGINBOTTOM);
     g.setFont(GUIConstants.font);
     g.setColor(GUIConstants.color1);
 
@@ -354,8 +360,8 @@ public final class ScatterView extends View implements Runnable {
     
     for(int i = 0; i < nrCaptions; i++) {
       g.setColor(GUIConstants.color1);
-      final int x = XMARGIN + NOVALUEBORDER + ((int) ((i * range) * pWidth));
-      g.drawLine(x, YMARGIN, x, h - YMARGIN + 9);
+      final int x = MARGINLEFT + NOVALUEBORDER + ((int) ((i * range) * pWidth));
+      g.drawLine(x, MARGINTOP, x, h - MARGINBOTTOM + 9);
       String caption = "";
       if(numeric) {
         final double min = axis.min;
@@ -393,7 +399,7 @@ public final class ScatterView extends View implements Runnable {
       g2d.setColor(Color.black);
       g2d.rotate(Math.sin(30), imgW, 0 + textH);
       g2d.drawString(caption, imgW - capW, 0);
-      g.drawImage(img, x - imgW + textH + 4, h - YMARGIN + 14, this);
+      g.drawImage(img, x - imgW + textH + 4, h - MARGINBOTTOM + 14, this);
     }
   }
   
@@ -405,7 +411,7 @@ public final class ScatterView extends View implements Runnable {
     final int h = getHeight();
     final int w = getWidth();
     g.setColor(GUIConstants.color1);
-    g.drawLine(XMARGIN, YMARGIN, XMARGIN, getHeight() - YMARGIN);
+    g.drawLine(MARGINLEFT, MARGINTOP, MARGINLEFT, getHeight() - MARGINBOTTOM);
     
     scatterData.yAxis.calcCaption(plotHeight - NOVALUEBORDER);
 
@@ -420,20 +426,20 @@ public final class ScatterView extends View implements Runnable {
     final double range = 1.0d / (nrCaptions - 1);
     for(int i = 0; i < nrCaptions; i++) {
       g.setColor(GUIConstants.color1);
-      final int y1 = h - YMARGIN - NOVALUEBORDER - 
+      final int y1 = h - MARGINBOTTOM - NOVALUEBORDER - 
       ((int) ((i * range) * pHeight));
-      g.drawLine(XMARGIN - 9, y1, w - XMARGIN, y1);
+      g.drawLine(MARGINLEFT - 9, y1, w - MARGINRIGHT, y1);
       g.setColor(Color.black);
       String caption = null;
       if(numeric) {
         final double value = scatterData.yAxis.min +
           (scatterData.yAxis.max - scatterData.yAxis.min) * range * i;
-        caption = Double.toString(value);
+        caption = Double.toString(ScatterAxis.roundDouble(value, 3));
       } else {
         caption = Token.string(scatterData.yAxis.cats[i]);
       }
       final int capW = BaseXLayout.width(g, caption);
-      g.drawString(caption, XMARGIN - capW - 15, y1 + textH / 2 - 1);
+      g.drawString(caption, MARGINLEFT - capW - 15, y1 + textH / 2 - 1);
     }
   }
   
@@ -446,18 +452,18 @@ public final class ScatterView extends View implements Runnable {
   private int calcCoordinate(final boolean xAxis, final double d) {
     if(xAxis) {
       if(d == -1)
-        return XMARGIN + NOVALUEBORDER / 2;
+        return MARGINLEFT + NOVALUEBORDER / 2;
       final int width = getWidth();
-      final int xSpace = width - 2 * XMARGIN - NOVALUEBORDER;
+      final int xSpace = width - (MARGINLEFT + MARGINRIGHT) - NOVALUEBORDER;
       final int x = (int) (d * xSpace);
-      return x + XMARGIN + NOVALUEBORDER;
+      return x + MARGINLEFT + NOVALUEBORDER;
     } else {
       final int height = getHeight();
       if(d == -1)
-        return height - YMARGIN - NOVALUEBORDER / 2; 
-      final int ySpace = height - 2 * YMARGIN - NOVALUEBORDER;
+        return height - MARGINBOTTOM - NOVALUEBORDER / 2; 
+      final int ySpace = height - (MARGINTOP + MARGINBOTTOM) - NOVALUEBORDER;
       final int y = ySpace - (int) (d * ySpace);
-      return y + YMARGIN;
+      return y + MARGINTOP;
     }
   }
 
@@ -542,11 +548,11 @@ public final class ScatterView extends View implements Runnable {
     double relative = .0d;
     if(calcX) {
       final int pWidth = plotWidth - NOVALUEBORDER;
-      final int xStart = XMARGIN + NOVALUEBORDER;
+      final int xStart = MARGINLEFT + NOVALUEBORDER;
       relative = 1.0d / pWidth * (mouseX - xStart);
     } else {
       final int pHeight = plotHeight - NOVALUEBORDER;
-      final int yStart = YMARGIN;
+      final int yStart = MARGINTOP;
       relative = 1 - (1.0d / pHeight * (mouseY - yStart));
     }
     if(relative < 0)
@@ -559,8 +565,10 @@ public final class ScatterView extends View implements Runnable {
    * @return item focused
    */
   private boolean focus() {
-    if(mouseX < XMARGIN || mouseX > getWidth() - XMARGIN + ITEMSIZE / 2 ||
-        mouseY < YMARGIN - ITEMSIZE / 2 || mouseY > getHeight() - YMARGIN) {
+    if(mouseX < MARGINLEFT || 
+        mouseX > getWidth() - MARGINRIGHT + ITEMSIZE / 2 ||
+        mouseY < MARGINTOP - ITEMSIZE / 2 || mouseY > 
+        getHeight() - MARGINBOTTOM) {
       valueFocused = false;
       focusedItem = -1;
       return false;
