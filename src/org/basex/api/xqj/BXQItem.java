@@ -51,7 +51,7 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
    * @param item item
    */
   public BXQItem(final Item item) {
-    this(item, null, null, null);
+    this(item, null, new XQContext(), null);
   }
 
   /**

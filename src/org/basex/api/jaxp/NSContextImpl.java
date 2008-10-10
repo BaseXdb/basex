@@ -1,11 +1,11 @@
 package org.basex.api.jaxp;
 
+import static org.basex.util.Token.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import javax.xml.namespace.NamespaceContext;
 import org.basex.query.xquery.item.Uri;
-import org.basex.query.xquery.util.Namespaces;
-import org.basex.util.Token;
+import org.basex.query.xquery.util.NSLocal;
 
 /**
  * This class provides access to namespace context.
@@ -15,28 +15,28 @@ import org.basex.util.Token;
  */
 public class NSContextImpl implements NamespaceContext {
   /** Namespaces references. */
-  private final Namespaces ns;
+  private final NSLocal ns;
 
   /**
    * Constructor.
    * @param n namespace references.
    */
-  public NSContextImpl(final Namespaces n) {
+  public NSContextImpl(final NSLocal n) {
     ns = n;
   }
   
   public String getNamespaceURI(final String pre) {
-    final Uri uri = ns.find(Token.token(pre));
-    return uri == null ? null : Token.string(uri.str());
+    final Uri uri = ns.find(token(pre));
+    return uri == null ? null : string(uri.str());
   }
 
   public String getPrefix(final String uri) {
-    return Token.string(ns.prefix(Uri.uri(Token.token(uri))));
+    return string(ns.prefix(Uri.uri(token(uri))));
   }
 
-  public Iterator getPrefixes(final String uri) {
+  public Iterator<String> getPrefixes(final String uri) {
     final ArrayList<String> list = new ArrayList<String>();
-    final String pre = Token.string(ns.prefix(Uri.uri(Token.token(uri))));
+    final String pre = getPrefix(uri);
     if(pre.length() != 0) list.add(pre);
     return list.iterator();
   }

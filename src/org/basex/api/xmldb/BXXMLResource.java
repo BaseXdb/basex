@@ -59,7 +59,7 @@ public final class BXXMLResource implements XMLResource {
     if(content == null) {
       try {
         final CachedOutput out = new CachedOutput();
-        new XMLSerializer(out).node(data, pre, 0);
+        new XMLSerializer(out).node(data, pre);
         content = out.toString();
       } catch(final IOException ex) {
         throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());

@@ -306,7 +306,7 @@ abstract class BXQAbstract {
     opened();
     try {
       if(it.type == Type.ATT) throw new BXQException(ATTR);
-      it.serialize(ser, ctx, 0);
+      ctx.serialize(ser, it);
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }

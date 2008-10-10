@@ -277,7 +277,7 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     valid(it, Iterator.class);
     final SeqIter iter = new SeqIter();
     while(it.hasNext()) iter.add(create(it.next(), null));
-    return new BXQSequence(iter, null, this, null);
+    return new BXQSequence(iter, this);
   }
 
   public BXQSequence createSequence(final XQSequence seq) throws BXQException {
@@ -285,7 +285,7 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     valid(seq, XQSequence.class);
     try {
       final SeqIter it = new SeqIter(((BXQSequence) seq).result);
-      return new BXQSequence(it, null, this, null);
+      return new BXQSequence(it, this);
     } catch(org.basex.query.xquery.XQException ex) {
       throw new BXQException(ex);
     }

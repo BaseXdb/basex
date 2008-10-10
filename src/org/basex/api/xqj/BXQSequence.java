@@ -1,7 +1,6 @@
 package org.basex.api.xqj;
 
 import static org.basex.api.xqj.BXQText.*;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URI;
@@ -22,7 +21,6 @@ import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
 import org.w3c.dom.Node;
@@ -53,18 +51,28 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
   /**
    * Constructor.
    * @param item result item
+   * @param c closer
+   * @throws BXQException xquery exception
+   */
+  public BXQSequence(final Iter item, final BXQAbstract c) throws BXQException {
+    this(item, new XQContext(), c, null);
+  }
+
+  /**
+   * Constructor.
+   * @param item result item
    * @param context query context
    * @param c closer
-   * @param connection connection
+   * @param cn connection
    * @throws BXQException xquery exception
    */
   public BXQSequence(final Iter item, final XQContext context,
-      final BXQAbstract c, final BXQConnection connection) throws BXQException {
+      final BXQAbstract c, final BXQConnection cn) throws BXQException {
     super(c);
     result = item;
     ctx = context;
-    conn = connection;
-    scrollable = connection == null || connection.getStaticContext().
+    conn = cn;
+    scrollable = cn == null || cn.getStaticContext().
       getScrollability() == XQConstants.SCROLLTYPE_SCROLLABLE;
   }
 
@@ -172,15 +180,10 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
     
     final CachedOutput out = new CachedOutput();
     final XMLSerializer ser = new XMLSerializer(out);
-    try {
-      do {
-        final Item item = item().it;
-        if(item.type == Type.ATT) throw new BXQException(ATTR);
-        item.serialize(ser, ctx, 0);
-      } while(next());
-    } catch(final IOException ex) {
-      throw new BXQException(ex);
-    }
+    do {
+      final BXQItem  item = item();
+      item.serialize(item.it, ctx, ser);
+    } while(next());
     return out.toString();
   }
 

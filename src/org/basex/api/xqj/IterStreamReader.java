@@ -21,7 +21,7 @@ import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.item.Uri;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.NodeIter;
-import org.basex.query.xquery.util.Namespaces;
+import org.basex.query.xquery.util.NSLocal;
 import org.basex.query.xquery.util.NodeBuilder;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -36,7 +36,7 @@ public final class IterStreamReader implements XMLStreamReader {
   /** Properties. */
   private static final Properties PROPS = new Properties();
   /** Namespaces references. */
-  private final Namespaces ns = new Namespaces();
+  private final NSLocal ns = new NSLocal();
   /** Current state. */
   protected int kind = START_DOCUMENT;
   /** Result iterator. */
