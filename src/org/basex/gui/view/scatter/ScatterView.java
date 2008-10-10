@@ -434,7 +434,7 @@ public final class ScatterView extends View implements Runnable {
       if(numeric) {
         final double value = scatterData.yAxis.min +
           (scatterData.yAxis.max - scatterData.yAxis.min) * range * i;
-        caption = Double.toString(ScatterAxis.roundDouble(value, 3));
+        caption = Double.toString(value);
       } else {
         caption = Token.string(scatterData.yAxis.cats[i]);
       }
