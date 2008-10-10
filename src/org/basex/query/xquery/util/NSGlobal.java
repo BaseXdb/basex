@@ -7,12 +7,12 @@ import org.basex.query.xquery.item.Uri;
 import org.basex.util.Token;
 
 /**
- * Global namespace index.
+ * Global namespaces.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class GlobalNS {
+public final class NSGlobal {
   /** Default namespaces. */
   private static final QNm[] NAMES = {
       new QNm(LOCAL, Uri.LOCAL), new QNm(XS, Uri.XS), new QNm(XSI, Uri.XSI), 
@@ -21,7 +21,7 @@ public final class GlobalNS {
   };
 
   /** Private constructor. */
-  private GlobalNS() { }
+  private NSGlobal() { }
 
   /**
    * Finds the specified namespace uri.
@@ -40,7 +40,7 @@ public final class GlobalNS {
    * @param uri uri to be checked
    * @return result of check
    */
-  static boolean standard(final Uri uri) {
+  public static boolean standard(final Uri uri) {
     for(int s = NAMES.length - 1; s > 0; s--) {
       if(NAMES[s].uri.eq(uri)) return true;
     }
@@ -52,7 +52,7 @@ public final class GlobalNS {
    * @param uri URI
    * @return prefix
    */
-  static byte[] prefix(final Uri uri) {
+  public static byte[] prefix(final Uri uri) {
     for(int s = NAMES.length - 1; s >= 0; s--) {
       if(NAMES[s].uri.eq(uri)) return NAMES[s].str();
     }

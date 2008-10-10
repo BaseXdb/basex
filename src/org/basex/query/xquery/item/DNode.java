@@ -6,10 +6,10 @@ import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.io.IO;
-import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.iter.NodeMore;
-import org.basex.query.xquery.util.GlobalNS;
+import org.basex.query.xquery.util.NSGlobal;
+import org.basex.util.Atts;
 
 /**
  * Disk-based Node item.
@@ -24,6 +24,8 @@ public final class DNode extends Nod {
   };
   /** Root node (constructor). */
   public Nod root;
+  /** Namespaces. */
+  private Atts nsp;
   /** Data reference. */
   public Data data;
   /** Pre value. */
@@ -69,9 +71,14 @@ public final class DNode extends Nod {
   }
 
   @Override
-  public void serialize(final Serializer ser, final XQContext ctx,
-      final int level) throws IOException {
-    ser.node(data, pre, level);
+  public void serialize(final Serializer ser) throws IOException {
+    final int s = ser.ns.size;
+    final byte[] dn = ser.dn;
+    
+    ser.node(data, pre);
+    
+    ser.ns.size = s;
+    ser.dn = dn;
   }
 
   @Override
@@ -110,7 +117,7 @@ public final class DNode extends Nod {
 
   @Override
   public QNm qname() {
-    return qname(new QNm(EMPTY));
+    return qname(new QNm());
   }
   
   @Override
@@ -118,15 +125,19 @@ public final class DNode extends Nod {
     final byte[] nm = nname();
     name.name(nm);
     final int n = data.ns.get(nm, pre);
-    if(n > 0) name.uri = Uri.uri(data.ns.key(n));
-    else name.uri = GlobalNS.uri(substring(nm, 0, indexOf(nm, ':')));
+    name.uri = n > 0 ? Uri.uri(data.ns.key(n)) : NSGlobal.uri(pre(nm));
     return name;
   }
 
   @Override
-  public QNm[] ns() {
-    // [CG] include namespace handling
-    return null;
+  public Atts ns() {
+    if(type != Type.ELM || nsp != null) return nsp;
+    nsp = new Atts();
+    final int[] ns = data.ns(pre);
+    for(int n = 0; n < ns.length; n += 2) {
+      nsp.add(data.ns.key(ns[n]), data.ns.key(ns[n + 1]));
+    }
+    return nsp;
   }
 
   @Override
@@ -279,7 +290,7 @@ public final class DNode extends Nod {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.emptyElement(this, PRE, token(pre));
   }
 }

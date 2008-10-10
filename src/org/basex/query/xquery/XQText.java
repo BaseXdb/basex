@@ -475,7 +475,8 @@ public interface XQText {
   /** XQST0070: Parsing exception. */
   Object[] NOXMLNS = { XQST, 70, "Can't declare XML namespace." };
   /** XQST0071: Parsing exception. */
-  Object[] DUPLNSDEF = { XQST, 71, "Duplicate declaration of namespace %." };
+  Object[] DUPLNSDEF = { XQST, 71,
+      "Duplicate declaration of namespace \"%\"." };
   /** XQST0073: Parsing exception. */
   Object[] CIRCMODULE = { XQST, 73, "Circular module definition." };
   /** XQST0075: Parsing exception. */

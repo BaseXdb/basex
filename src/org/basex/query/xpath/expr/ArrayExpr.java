@@ -1,5 +1,7 @@
 package org.basex.query.xpath.expr;
 
+import java.io.IOException;
+
 import org.basex.data.Serializer;
 import org.basex.util.TokenBuilder;
 
@@ -49,9 +51,9 @@ public abstract class ArrayExpr extends Expr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     for(final Expr expr : exprs) expr.plan(ser);
-    ser.closeElement(this);
+    ser.closeElement();
   }
 }

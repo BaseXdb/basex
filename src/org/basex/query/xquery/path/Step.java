@@ -2,6 +2,7 @@ package org.basex.query.xquery.path;
 
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.query.xquery.XQText.*;
+import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
@@ -131,7 +132,7 @@ public class Step extends Arr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.startElement(this);
     ser.attribute(AXIS, Token.token(axis.name));
     ser.attribute(TEST, Token.token(test.toString()));
@@ -139,7 +140,7 @@ public class Step extends Arr {
     if(expr.length != 0) {
       ser.finishElement();
       for(Expr e : expr) e.plan(ser);
-      ser.closeElement(this);
+      ser.closeElement();
     } else {
       ser.emptyElement();
     }

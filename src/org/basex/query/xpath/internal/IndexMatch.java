@@ -1,5 +1,6 @@
 package org.basex.query.xpath.internal;
 
+import java.io.IOException;
 import java.util.Arrays;
 import org.basex.data.Serializer;
 import org.basex.query.QueryException;
@@ -74,12 +75,12 @@ public final class IndexMatch extends InternalExpr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     path.plan(ser);
     expr.plan(ser);
     match.plan(ser);
-    ser.closeElement(this);
+    ser.closeElement();
   }
 
   @Override

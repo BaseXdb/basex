@@ -242,7 +242,7 @@ public final class MP3Extractor extends AbstractExtractor {
   
         // ID3 frames
         found = true;
-        builder.startElem(AUDIO, new byte[][] { TYPE, TYPEMP3 });
+        builder.startElem(AUDIO, atts.set(TYPE, TYPEMP3));
 
         exthea = (hflag & 0x40) != 0;
         experi = (hflag & 0x20) != 0;
@@ -256,12 +256,13 @@ public final class MP3Extractor extends AbstractExtractor {
         getTechInfo(builder, size);
   
         // insert ID3 info
-        builder.startElem(ID3, new byte[][] {
-            ID3VERS, token("2." + major + '.' + minor),
-            ID3FLAG_EXTHEA, token(exthea),
-            ID3FLAG_EXPERI, token(experi),
-            ID3FLAG_FOOTER, token(footer)
-        });
+        atts.reset();
+        atts.add(ID3VERS, token("2." + major + '.' + minor));
+        atts.add(ID3FLAG_EXTHEA, token(exthea));
+        atts.add(ID3FLAG_EXPERI, token(experi));
+        atts.add(ID3FLAG_FOOTER, token(footer));
+        builder.startElem(ID3, atts);
+        
         for(int i = 0; i < frames.size() - 1; i += 2) {
           builder.nodeAndText(frames.get(i), frames.get(i + 1));
         }
@@ -269,7 +270,7 @@ public final class MP3Extractor extends AbstractExtractor {
   
       } else if(fileLen > 0x80) { // ID3V1...
         found = true;
-        builder.startElem(AUDIO, new byte[][] { TYPE, TYPEMP3 });
+        builder.startElem(AUDIO, atts.set(TYPE, TYPEMP3));
 
         if(first != 0xFF) while(read() != 0xFF);
 
@@ -291,7 +292,7 @@ public final class MP3Extractor extends AbstractExtractor {
           final byte[] year = getTag(id3v1, 93, 4);
           final byte[] comment = getTag(id3v1, 97, 30);
   
-          builder.startElem(ID3, new byte[][] { ID3VERS, new byte[] { '1' } });
+          builder.startElem(ID3, atts.set(ID3VERS, new byte[] { '1' }));
           add(builder, ID3TITLE, title);
           add(builder, ID3ARTIST, artist);
           add(builder, ID3ALBUM, album);

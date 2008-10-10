@@ -1,6 +1,7 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQText.*;
+import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
@@ -48,7 +49,7 @@ public final class Root extends Expr {
   }
   
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.emptyElement(this);
   }
 

@@ -1,6 +1,9 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQTokens.*;
+
+import java.io.IOException;
+
 import org.basex.data.Serializer;
 import org.basex.query.ExprInfo;
 import org.basex.query.xquery.XQContext;
@@ -52,12 +55,12 @@ public final class Func extends ExprInfo {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.startElement(this);
     ser.attribute(NAM, var.name.str());
     for(int i = 0; i < args.length; i++) ser.attribute(ARG, args[i].name.str());
     ser.finishElement();
     expr.plan(ser);
-    ser.closeElement(this);
+    ser.closeElement();
   }
 }

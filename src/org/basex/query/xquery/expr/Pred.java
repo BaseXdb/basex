@@ -1,4 +1,6 @@
 package org.basex.query.xquery.expr;
+
+import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
@@ -101,11 +103,11 @@ public class Pred extends Arr {
   }
 
   @Override
-  public final void plan(final Serializer ser) throws Exception {
+  public final void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     root.plan(ser);
     for(final Expr e : expr) e.plan(ser);
-    ser.closeElement(this);
+    ser.closeElement();
   }
 
   @Override

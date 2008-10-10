@@ -1,5 +1,7 @@
 package org.basex.query.xquery.util;
 
+import java.io.IOException;
+
 import org.basex.data.Serializer;
 import org.basex.query.ExprInfo;
 import org.basex.query.xquery.XQException;
@@ -65,10 +67,10 @@ public final class Vars extends ExprInfo {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     if(size == 0) return;
     ser.openElement(this);
     for(int i = 0; i < size; i++) vars[i].plan(ser);
-    ser.closeElement(this);
+    ser.closeElement();
   }
 }

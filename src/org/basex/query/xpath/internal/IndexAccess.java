@@ -2,6 +2,8 @@ package org.basex.query.xpath.internal;
 
 import static org.basex.query.xpath.XPText.*;
 
+import java.io.IOException;
+
 import org.basex.BaseX;
 import org.basex.data.Serializer;
 import org.basex.index.IndexIterator;
@@ -40,10 +42,10 @@ public final class IndexAccess extends InternalExpr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.openElement(this, Token.token(TYPE), Token.token(ind.type.toString()));
     ser.item(ind.get());
-    ser.closeElement(this);
+    ser.closeElement();
   }
 
   @Override

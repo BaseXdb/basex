@@ -114,13 +114,9 @@ public final class SAXWrapper extends Parser {
       try {
         finishText();
         final int as = at.getLength();
-        byte[][] atts = null;
-        if(as != 0) {
-          atts = new byte[as << 1][];
-          for(int a = 0; a < as; a++) {
-            atts[a << 1] = Token.token(at.getQName(a));
-            atts[(a << 1) + 1] = Token.token(at.getValue(a));
-          }
+        atts.reset();
+        for(int a = 0; a < as; a++) {
+          atts.add(Token.token(at.getQName(a)), Token.token(at.getValue(a)));
         }
         builder.startElem(Token.token(qn), atts);
         nodes++;

@@ -1,5 +1,7 @@
 package org.basex.query.xpath.locpath;
 
+import java.io.IOException;
+
 import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.query.ExprInfo;
@@ -213,7 +215,7 @@ public abstract class Step extends ExprInfo {
   }
 
   @Override
-  public final void plan(final Serializer ser) throws Exception {
+  public final void plan(final Serializer ser) throws IOException {
     ser.startElement(this);
     ser.attribute(Token.token("test"), Token.token(test.toString()));
     if(simple) ser.attribute(Token.token("simple"), Token.TRUE);
@@ -222,7 +224,7 @@ public abstract class Step extends ExprInfo {
     if(preds.size() != 0) {
       ser.finishElement();
       preds.plan(ser);
-      ser.closeElement(this);
+      ser.closeElement();
     } else {
       ser.emptyElement();
     }

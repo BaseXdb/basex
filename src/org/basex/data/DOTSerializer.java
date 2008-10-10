@@ -35,8 +35,6 @@ public final class DOTSerializer extends Serializer {
   
   /** Output stream. */
   public final PrintOutput out;
-  /** Current level. */
-  private int level;
   /** Cached children. */
   private IntList[] children = new IntList[256];
   /** Current color. */
@@ -70,7 +68,7 @@ public final class DOTSerializer extends Serializer {
 
   @Override
   public void close(final int s) throws IOException {
-    if(s != 1) closeElement(RESULTS);
+    if(s != 1) closeElement();
     out.println("}");
   }
 
@@ -79,22 +77,13 @@ public final class DOTSerializer extends Serializer {
     openElement(RESULT);
   }
 
-  /*@Override
-  public void openElement(final byte[] t, final byte[]... a) throws Exception {
-    if(Token.eq(t, PLAN)) {
-      
-    }
-    openElement(RESULT);
-  }*/
-
   @Override
   public void closeResult() throws IOException {
-    closeElement(RESULT);
-    if(level == -1) BaseX.debug("Tree has more closing than opening nodes.");
+    closeElement();
   }
   
   @Override
-  public void startElement(final byte[] t) {
+  protected void start(final byte[] t) {
     tag = t;
     tb.reset();
   }
@@ -109,28 +98,26 @@ public final class DOTSerializer extends Serializer {
   }
 
   @Override
-  public void emptyElement() throws IOException {
-    finishElement();
-    closeElement(tag);
+  public void empty() throws IOException {
+    finish();
+    close(tag);
   }
 
   @Override
-  public void finishElement() throws IOException {
+  public void finish() throws IOException {
     final byte[] attr = tb.finish();
     if(color == null) color = attr.length == 0 ? COLELEM1 : COLELEM2;
     print(Token.concat(tag, attr), color);
-    level++;
   }
 
   @Override
-  public void closeElement(final byte[] t) throws IOException {
-    level--;
-    if(level == -1) return;
-    final int c = nodes.get(level);
-    for(int i = 0; i < children[level].size; i++) {
-      out.println(BaseX.info(LINK, c, children[level].get(i)));
+  public void close(final byte[] t) throws IOException {
+    final int c = nodes.get(tags.size);
+    final IntList il = children[tags.size];
+    for(int i = 0; i < il.size; i++) {
+      out.println(BaseX.info(LINK, c, il.get(i)));
     }
-    children[level].reset();
+    il.reset();
   }
 
   @Override
@@ -163,8 +150,8 @@ public final class DOTSerializer extends Serializer {
     final byte[] text = t.length > 60 ? Token.concat(
         Token.substring(t, 0, 60), Token.token("...")) : t;
     out.println(BaseX.info(NODE, count, text, col));
-    nodes.set(count, level);
-    if(level - 1 >= 0) children[level - 1].add(count);
+    nodes.set(count, tags.size);
+    if(tags.size > 0) children[tags.size - 1].add(count);
     color = null;
     count++;
   }

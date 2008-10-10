@@ -3,6 +3,7 @@ package org.basex.data;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.query.ExprInfo;
+import org.basex.util.Atts;
 import org.basex.util.TokenList;
 
 /**
@@ -12,16 +13,14 @@ import org.basex.util.TokenList;
  * @author Christian Gruen
  */
 public abstract class Serializer {
-  /** XML output flag. */
-  protected boolean xml;
-  /** Attribute Names. */
-  private final TokenList nms = new TokenList();
-  /** Attribute values. */
-  private final TokenList vls = new TokenList();
-  /** Parent Stack. */
-  private final int[] parent = new int[256];
-  /** Token Stack. */
-  private final byte[][] token = new byte[256][];
+  /** Namespaces. */
+  public Atts ns = new Atts();
+  /** Opened tags. */
+  public TokenList tags = new TokenList();
+  /** Current default namespace. */
+  public byte[] dn = EMPTY;
+
+  // === abstract methods =====================================================
 
   /**
    * Initializes the serializer.
@@ -31,7 +30,7 @@ public abstract class Serializer {
   public abstract void open(final int s) throws IOException;
 
   /**
-   * Initializes the serializer.
+   * Finishes the serializer.
    * @param s number of results
    * @throws IOException exception
    */
@@ -44,52 +43,17 @@ public abstract class Serializer {
   public abstract void openResult() throws IOException;
 
   /**
-   * Ends a result.
+   * Closes a result.
    * @throws IOException exception
    */
   public abstract void closeResult() throws IOException;
 
   /**
    * Starts an element.
-   * @param expr expression info
-   * @throws Exception exception
-   */
-  public final void startElement(final ExprInfo expr) throws Exception {
-    startElement(name(expr));
-  }
-
-  /**
-   * Starts an element.
    * @param t tag
    * @throws IOException exception
    */
-  public abstract void startElement(final byte[] t) throws IOException;
-
-  /**
-   * Opens an element.
-   * @param expr expression info
-   * @param a attributes
-   * @throws Exception exception
-   */
-  public final void openElement(final ExprInfo expr, final byte[]... a)
-      throws Exception {
-    startElement(name(expr));
-    for(int i = 0; i < a.length; i += 2) attribute(a[i], a[i + 1]);
-    finishElement();
-  }
-
-  /**
-   * Opens an element.
-   * @param t tag
-   * @param a attributes
-   * @throws IOException exception
-   */
-  public final void openElement(final byte[] t, final byte[]... a)
-      throws IOException {
-    startElement(t);
-    for(int i = 0; i < a.length; i += 2) attribute(a[i], a[i + 1]);
-    finishElement();
-  }
+  protected abstract void start(final byte[] t) throws IOException;
 
   /**
    * Serializes an attribute.
@@ -102,55 +66,22 @@ public abstract class Serializer {
 
   /**
    * Finishes an empty element.
-   * @param expr expression info
-   * @param a attributes
-   * @throws Exception exception
-   */
-  public final void emptyElement(final ExprInfo expr, final byte[]... a)
-      throws Exception {
-    emptyElement(name(expr), a);
-  }
-
-  /**
-   * Finishes an empty element.
-   * @param t tag
-   * @param a attributes
-   * @throws Exception exception
-   */
-  public final void emptyElement(final byte[] t, final byte[]... a)
-      throws Exception {
-    startElement(t);
-    for(int i = 0; i < a.length; i += 2) attribute(a[i], a[i + 1]);
-    emptyElement();
-  }
-
-  /**
-   * Finishes an empty element.
    * @throws IOException exception
    */
-  public abstract void emptyElement() throws IOException;
+  public abstract void empty() throws IOException;
 
   /**
    * Finishes an element.
    * @throws IOException exception
    */
-  public abstract void finishElement() throws IOException;
-
-  /**
-   * Closes an element.
-   * @param expr expression info
-   * @throws Exception exception
-   */
-  public final void closeElement(final ExprInfo expr) throws Exception {
-    closeElement(name(expr));
-  }
+  public abstract void finish() throws IOException;
 
   /**
    * Closes an element.
    * @param t tag
    * @throws IOException exception
    */
-  public abstract void closeElement(final byte[] t) throws IOException;
+  public abstract void close(final byte[] t) throws IOException;
 
   /**
    * Serializes a text.
@@ -175,6 +106,122 @@ public abstract class Serializer {
   public abstract void pi(final byte[] n, final byte[] v) throws IOException;
 
   /**
+   * Serializes an item.
+   * @param b text bytes
+   * @throws IOException exception
+   */
+  public abstract void item(final byte[] b) throws IOException;
+
+  // === implemented methods ==================================================
+  
+  /**
+   * Starts a new element node.
+   * @param expr expression info
+   * @throws IOException exception
+   */
+  public final void startElement(final ExprInfo expr) throws IOException {
+    startElement(name(expr));
+  }
+
+  /**
+   * Starts a new element node.
+   * @param t tag
+   * @throws IOException exception
+   */
+  public final void startElement(final byte[] t) throws IOException {
+    tags.add(t);
+    start(t);
+  }
+
+  /**
+   * Opens an element.
+   * @param expr expression info
+   * @param a attributes
+   * @throws IOException exception
+   */
+  public final void openElement(final ExprInfo expr, final byte[]... a)
+      throws IOException {
+    startElement(name(expr));
+    for(int i = 0; i < a.length; i += 2) attribute(a[i], a[i + 1]);
+    finishElement();
+  }
+
+  /**
+   * Opens an element.
+   * @param t tag
+   * @param a attributes
+   * @throws IOException exception
+   */
+  public final void openElement(final byte[] t, final byte[]... a)
+      throws IOException {
+    startElement(t);
+    for(int i = 0; i < a.length; i += 2) attribute(a[i], a[i + 1]);
+    finishElement();
+  }
+
+  /**
+   * Serializes a namespace.
+   * @param n name
+   * @param v value
+   * @throws IOException exception
+   */
+  public final void namespace(final byte[] n, final byte[] v)
+      throws IOException {
+    attribute(n.length == 0 ? XMLNS : concat(XMLNSC, n), v);
+    ns.add(n, v);
+  }
+
+  /**
+   * Opens and closes an empty element.
+   * @param expr expression info
+   * @param a attributes
+   * @throws IOException exception
+   */
+  public final void emptyElement(final ExprInfo expr, final byte[]... a)
+      throws IOException {
+    emptyElement(name(expr), a);
+  }
+
+  /**
+   * Opens and closes an empty element.
+   * @param t tag
+   * @param a attributes
+   * @throws IOException exception
+   */
+  public final void emptyElement(final byte[] t, final byte[]... a)
+      throws IOException {
+    startElement(t);
+    for(int i = 0; i < a.length; i += 2) attribute(a[i], a[i + 1]);
+    tags.size--;
+    emptyElement();
+  }
+
+  /**
+   * Finishes a new element node.
+   * @throws IOException exception
+   */
+  public final void emptyElement() throws IOException {
+    tags.size--;
+    empty();
+  }
+
+  /**
+   * Finishes a new element node.
+   * @throws IOException exception
+   */
+  public final void finishElement() throws IOException {
+    finish();
+  }
+
+  /**
+   * Closes an element.
+   * @throws IOException exception
+   */
+  public final void closeElement() throws IOException {
+    close(tags.list[--tags.size]);
+  }
+
+  /**
    * Serializes a processing instruction.
    * @param c content
    * @throws IOException exception
@@ -189,13 +236,6 @@ public abstract class Serializer {
     }
     pi(n, v);
   }
-
-  /**
-   * Serializes an item.
-   * @param b text bytes
-   * @throws IOException exception
-   */
-  public abstract void item(final byte[] b) throws IOException;
 
   /**
    * Tests if the serialization was interrupted.
@@ -218,13 +258,15 @@ public abstract class Serializer {
    * Serializes a node of the specified data reference.
    * @param data data reference
    * @param pre pre value to start from
-   * @param level starting level
    * @return last pre value
    * @throws IOException exception
    */
-  public final int node(final Data data, final int pre, final int level)
-      throws IOException {
-
+  public final int node(final Data data, final int pre) throws IOException {
+    /** Namespaces. */
+    final Atts nsp = new Atts();
+    /** Parent Stack. */
+    final int[] parent = new int[256];
+    
     // current output level
     int l = 0;
     int p = pre;
@@ -238,7 +280,10 @@ public abstract class Serializer {
       final int pa = data.parent(p, k);
 
       // close opened tags...
-      while(l > 0 && parent[l - 1] >= pa) closeElement(token[--l]);
+      while(l > 0 && parent[l - 1] >= pa) {
+        closeElement();
+        l--;
+      }
 
       if(k == Data.DOC) {
         p++;
@@ -253,59 +298,63 @@ public abstract class Serializer {
         final byte[] name = data.tag(p);
         startElement(name);
 
-        nms.reset();
-        vls.reset();
+        nsp.reset();
 
         final int ps = p + data.size(p, k);
         final int as = p + data.attSize(p, k);
         int pp = p;
 
-        // serialize attributes
-        while(++p != as) attribute(data.attName(p), data.attValue(p));
-        
         // add namespace definitions
-        if(level == 0 && l == 0) {
-          do {
-            addNS(data, pp);
-            pp = data.parent(pp, k);
-            k = data.kind(pp);
-          } while(k == Data.ELEM);
-        } else {
-          addNS(data, pp);
-        }
+        do {
+          addNS(data, pp, nsp);
+          pp = data.parent(pp, k);
+          k = data.kind(pp);
+        } while(tags.size == 1 && l == 0 && k == Data.ELEM);
         
         // serialize namespaces
-        for(int n = 0; n < nms.size; n++) attribute(nms.list[n], vls.list[n]);
+        for(int n = 0; n < nsp.size; n++) namespace(nsp.key[n], nsp.val[n]);
+        
+        // add namespace for tag
+        final byte[] key = pre(name);
+        byte[] uri = data.ns.key(data.tagNS(p));
+        if(uri == null) uri = EMPTY;
+        if(key != EMPTY) {
+          if(ns.get(key) == -1) namespace(key, uri);
+        } else if(!eq(uri, dn)) {
+          dn = uri;
+          namespace(EMPTY, uri);
+        }
+
+        // serialize attributes
+        while(++p != as) attribute(data.attName(p), data.attValue(p));
 
         // check if this is an empty tag
         if(as == ps) {
           emptyElement();
         } else {
           finishElement();
-          token[l] = name;
           parent[l++] = pa;
         }
       }
     }
     // process nodes that remain in the stack
-    while(l > 0) closeElement(token[--l]);
+    while(--l >= 0) closeElement();
     return p;
   }
-  
+
   /**
    * Adds namespaces for the specified arguments to the temporary
    * attribute arrays.
-   * @param data data reference 
+   * @param data data reference
    * @param pre pre value
+   * @param nsp attribute reference
    */
-  private void addNS(final Data data, final int pre) {
-    final int[] ns = data.ns(pre);
-    for(int n = 0; n < ns.length; n += 2) {
-      byte[] key = data.ns.key(ns[n]);
-      key = key.length == 0 ? XMLNS : concat(XMLNSC, key);
-      if(nms.contains(key)) continue;
-      nms.add(key);
-      vls.add(data.ns.key(ns[n + 1]));
+  private void addNS(final Data data, final int pre, final Atts nsp) {
+    final int[] nm = data.ns(pre);
+    for(int n = 0; n < nm.length; n += 2) {
+      final byte[] key = data.ns.key(nm[n]);
+      nsp.addUnique(key, data.ns.key(nm[n + 1]));
+      if(key.length == 0) dn = data.ns.key(nm[n + 1]);
     }
   }
 }

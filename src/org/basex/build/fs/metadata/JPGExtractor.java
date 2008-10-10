@@ -52,13 +52,14 @@ public final class JPGExtractor extends EXIFExtractor {
     in.close();
 
     // open image tag
-    listener.startElem(IMAGE, new byte[][] { TYPE, TYPEJPG });
+    listener.startElem(IMAGE, atts.set(TYPE, TYPEJPG));
 
     listener.nodeAndText(WIDTH, Token.token(w));
     listener.nodeAndText(HEIGHT, Token.token(h));
 
     if(!exif.isEmpty()) {
-      listener.startElem(EXIF, null);
+      atts.reset();
+      listener.startElem(EXIF, atts);
       final Iterator<byte[]> it = exif.iterator();
       while(it.hasNext()) listener.nodeAndText(it.next(), it.next());
       listener.endElem(EXIF);

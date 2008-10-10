@@ -1,6 +1,7 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.QueryTokens.*;
+import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.FTOpt;
 import org.basex.query.xquery.XQException;
@@ -47,7 +48,7 @@ public final class FTOptions extends Single {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.startElement(this);
     if(opt.st) ser.attribute(Token.token(STEMMING), Token.TRUE);
     if(opt.wc) ser.attribute(Token.token(WILDCARDS), Token.TRUE);
@@ -57,7 +58,7 @@ public final class FTOptions extends Single {
     if(opt.lc) ser.attribute(Token.token(LOWERCASE), Token.TRUE);
     ser.finishElement();
     expr.plan(ser);
-    ser.closeElement(this);
+    ser.closeElement();
   }
 
   @Override

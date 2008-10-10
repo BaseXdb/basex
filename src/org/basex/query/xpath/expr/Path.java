@@ -1,5 +1,7 @@
 package org.basex.query.xpath.expr;
 
+import java.io.IOException;
+
 import org.basex.data.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
@@ -44,11 +46,11 @@ public final class Path extends DualExpr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     expr1.plan(ser);
     expr2.plan(ser);
-    ser.closeElement(this);
+    ser.closeElement();
   }
 
   @Override

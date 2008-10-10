@@ -2,6 +2,7 @@ package org.basex.build;
 
 import java.io.IOException;
 import org.basex.io.IO;
+import org.basex.util.Atts;
 
 /**
  * This is class defines methods for parser implementations.
@@ -11,6 +12,8 @@ import org.basex.io.IO;
  * @author Christian Gruen
  */
 public abstract class Parser {
+  /** Temporary attribute array. */
+  public final Atts atts = new Atts();
   /** Input file. */
   public IO io;
 

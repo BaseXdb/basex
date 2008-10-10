@@ -12,6 +12,7 @@ import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.iter.NodIter;
 import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.iter.NodeMore;
+import org.basex.util.Atts;
 import org.basex.util.Token;
 
 /**
@@ -109,7 +110,7 @@ public abstract class Nod extends Item {
    * Returns a namespace array.
    * @return namespace array
    */
-  public QNm[] ns() {
+  public Atts ns() {
     return null;
   }
 

@@ -1,5 +1,7 @@
 package org.basex.query.xpath.locpath;
 
+import java.io.IOException;
+
 import org.basex.data.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
@@ -59,7 +61,7 @@ public final class Steps {
    * @param step step to be added
    */
   public void add(final int s, final Step step) {
-    if(size == steps.length) steps = Array.extend(steps);
+    steps = Array.check(steps, size);
     Array.move(steps, s, 1, size++ - s);
     steps[s] = step;
   }
@@ -69,7 +71,7 @@ public final class Steps {
    * @param step step to be added
    */
   public void add(final Step step) {
-    if(size == steps.length) steps = Array.extend(steps);
+    steps = Array.check(steps, size);
     steps[size++] = step;
   }
   
@@ -188,9 +190,9 @@ public final class Steps {
   /**
    * Serializes the abstract syntax tree.
    * @param ser serializer
-   * @throws Exception exception
+   * @throws IOException exception
    */
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     for(int s = 0; s < size; s++) steps[s].plan(ser);
   }
 }

@@ -34,7 +34,6 @@ public final class SAXSerializer extends Serializer implements XMLReader {
    */
   public SAXSerializer(final Result res) {
     result = res;
-    xml = true;
   }
 
   /* Implements XMLReader method. */
@@ -136,7 +135,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
 
   @Override
   public void close(final int s) throws IOException {
-    if(s != 0) closeElement(RESULTS);
+    if(s != 0) closeElement();
   }
 
   @Override
@@ -146,11 +145,11 @@ public final class SAXSerializer extends Serializer implements XMLReader {
 
   @Override
   public void closeResult() throws IOException {
-    closeElement(RESULT);
+    closeElement();
   }
   
   @Override
-  public void startElement(final byte[] t) {
+  protected void start(final byte[] t) {
     tag = Token.string(t);
     atts = new AttributesImpl();
   }
@@ -162,8 +161,8 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  public void emptyElement() throws IOException {
-    finishElement();
+  public void empty() throws IOException {
+    finish();
     try {
       content.endElement("", tag, tag);
     } catch(final SAXException ex) {
@@ -172,7 +171,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  public void finishElement() throws IOException {
+  public void finish() throws IOException {
     try {
       content.startElement("", tag, tag, atts);
     } catch(final SAXException ex) {
@@ -181,7 +180,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  public void closeElement(final byte[] t) throws IOException {
+  public void close(final byte[] t) throws IOException {
     try {
       tag = Token.string(t);
       content.endElement("", tag, tag);

@@ -1,6 +1,7 @@
 package org.basex.query.xpath.expr;
 
 import static org.basex.query.xpath.XPText.*;
+import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.data.Serializer;
@@ -319,10 +320,10 @@ public final class FTContains extends DualExpr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     expr1.plan(ser);
     expr2.plan(ser);
-    ser.closeElement(this);
+    ser.closeElement();
   }
 }

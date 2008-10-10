@@ -1,6 +1,9 @@
 package org.basex.query.xpath.internal;
 
 import static org.basex.query.xpath.XPText.*;
+
+import java.io.IOException;
+
 import org.basex.data.Serializer;
 import org.basex.index.IndexToken;
 import org.basex.query.QueryException;
@@ -96,10 +99,10 @@ public final class AllOf extends InternalExpr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.openElement(this, Token.token(TYPE), Token.token(cmp.toString()));
     path.plan(ser);
     for(final Expr val : vals) val.plan(ser);
-    ser.closeElement(this);
+    ser.closeElement();
   }
 }

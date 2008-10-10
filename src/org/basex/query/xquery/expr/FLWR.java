@@ -1,6 +1,7 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQTokens.*;
+import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
@@ -89,14 +90,14 @@ public class FLWR extends Single {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.openElement(this, EVAL, ITER);
     for(final ForLet f : fl) f.plan(ser);
     if(where != null) where.plan(ser);
     ser.openElement(RET);
     expr.plan(ser);
-    ser.closeElement(RET);
-    ser.closeElement(this);
+    ser.closeElement();
+    ser.closeElement();
   }
 
   @Override

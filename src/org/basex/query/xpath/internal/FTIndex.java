@@ -1,5 +1,6 @@
 package org.basex.query.xpath.internal;
 
+import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
@@ -136,10 +137,10 @@ public final class FTIndex extends FTArrayExpr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     ser.text(token);
-    ser.closeElement(this);
+    ser.closeElement();
   }
 
   @Override

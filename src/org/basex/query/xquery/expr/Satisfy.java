@@ -1,5 +1,6 @@
 package org.basex.query.xquery.expr;
 
+import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
@@ -81,10 +82,10 @@ public final class Satisfy extends Single {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     for(ForLet f : fl) f.plan(ser);
     expr.plan(ser);
-    ser.closeElement(this);
+    ser.closeElement();
   }
 }

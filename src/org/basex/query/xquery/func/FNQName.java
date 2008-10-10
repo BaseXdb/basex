@@ -1,9 +1,11 @@
 package org.basex.query.xquery.func;
 
 import static org.basex.query.xquery.XQText.*;
+import static org.basex.util.Token.*;
+
 import org.basex.BaseX;
-import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
+import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.NCN;
 import org.basex.query.xquery.item.Nod;
@@ -14,7 +16,7 @@ import org.basex.query.xquery.item.Uri;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
 import org.basex.query.xquery.util.Err;
-import org.basex.util.Token;
+import org.basex.util.Atts;
 import org.basex.util.TokenList;
 import org.basex.util.XMLToken;
 
@@ -30,37 +32,17 @@ final class FNQName extends Fun {
     switch(func) {
       case RESQNAME:
         Item it = arg[0].atomic(this, true);
-        if(it == null) return Iter.EMPTY;
-        QNm nm = new QNm(Token.trim(checkStr(it)), ctx);
-        byte[] pre = nm.pre();
-        it = arg[1].atomic(this, false);
-        final Nod n = (Nod) check(it, Type.ELM);
-        nm.uri = n.qname().uri;
-        if(nm.uri != Uri.EMPTY) return nm.iter();
-
-        Item i;
-        final Iter iter = inscope(ctx, n);
-        while((i = iter.next()) != null) {
-          final byte[] ns = i.str();
-          if(ns.length == 0) continue;
-          if(Token.eq(pre, ns)) {
-            nm.uri = ctx.ns.uri(ns);
-            return nm.iter();
-          }
-        }
-
-        if(pre.length != 0) Err.or(NSDECL, pre);
-        nm.uri = ctx.nsElem;
-        return nm.iter();
+        return it == null ? Iter.EMPTY :
+          resolve(ctx, it, arg[1].atomic(this, false));
       case QNAME:
         it = arg[0].atomic(this, true);
-        final Uri uri = Uri.uri(it == null ? Token.EMPTY :
+        final Uri uri = Uri.uri(it == null ? EMPTY :
           check(it, Type.STR).str());
         it = arg[1].atomic(this, true);
         it = it == null ? Str.ZERO : check(it, Type.STR);
         final byte[] str = it.str();
         if(!XMLToken.isQName(str)) Err.value(Type.QNM, it);
-        nm = new QNm(str, uri);
+        QNm nm = new QNm(str, uri);
         if(nm.ns() && uri == Uri.EMPTY) Err.value(Type.URI, uri);
         return nm.iter();
       case LOCNAMEQNAME:
@@ -73,23 +55,22 @@ final class FNQName extends Fun {
         nm = (QNm) check(it, Type.QNM);
         return !nm.ns() ? Iter.EMPTY : new NCN(nm.pre()).iter();
       case NSURIPRE:
-        it = arg[1].atomic(this, false);
-        check(it, Type.ELM);
-        try {
-          pre = checkStr(arg[0]);
-          return (pre.length == 0 ? ctx.nsElem : ctx.ns.uri(pre)).iter();
-        } catch(final XQException e) {
-          return Iter.EMPTY;
+        it = check(arg[1].atomic(this, false), Type.ELM);
+        final byte[] pre = checkStr(arg[0]);
+        if(pre.length == 0) return ctx.nsElem.iter();
+        final Atts at = ((Nod) it).ns();
+        for(int a = 0; a < at.size; a++) {
+          if(eq(pre, at.key[a])) return Uri.uri(at.val[a]).iter();
         }
+        return Iter.EMPTY;
       case INSCOPE:
-        it = arg[0].atomic(this, false);
-        return inscope(ctx, (Nod) check(it, Type.ELM));
+        return inscope(ctx, (Nod) check(arg[0].atomic(this, false), Type.ELM));
       case RESURI:
         it = arg[0].atomic(this, true);
         if(it == null) return Iter.EMPTY;
         final Uri rel = Uri.uri(checkStr(it));
         if(!rel.valid()) Err.or(URIINV, it);
-        
+
         final Uri base = arg.length == 1 ? ctx.baseURI :
           Uri.uri(checkStr(arg[1].atomic(this, false)));
         if(!base.valid()) Err.or(URIINV, base);
@@ -101,6 +82,41 @@ final class FNQName extends Fun {
   }
 
   /**
+   * Resolves a QName.
+   * @param ctx query context
+   * @param q qname
+   * @param it item
+   * @return prefix sequence
+   * @throws XQException query exception
+   */
+  private Iter resolve(final XQContext ctx, final Item q, final Item it)
+      throws XQException {
+
+    final byte[] name = trim(checkStr(q));
+    if(!XMLToken.isQName(name)) Err.value(Type.QNM, q);
+    final QNm nm = new QNm(name);
+    
+    final byte[] pre = nm.pre();
+    Nod n = (Nod) check(it, Type.ELM);
+    nm.uri = n.qname().uri;
+    if(nm.uri != Uri.EMPTY) return nm.iter();
+
+    while(n != null) {
+      final Atts at = n.ns();
+      if(at == null) break;
+      final int i = at.get(pre);
+      if(i != -1) {
+        nm.uri = Uri.uri(at.val[i]);
+        return nm.iter();
+      }
+      n = n.parent();
+    }
+    if(pre.length != 0) Err.or(NSDECL, pre);
+    nm.uri = ctx.nsElem;
+    return nm.iter();
+  }
+
+  /**
    * Returns the in-scope prefixes for the specified node.
    * @param ctx query context
    * @param node node
@@ -108,18 +124,15 @@ final class FNQName extends Fun {
    */
   private Iter inscope(final XQContext ctx, final Nod node) {
     final TokenList tl = new TokenList();
-    tl.add(Token.XML);
-    if(ctx.nsElem != Uri.EMPTY) tl.add(Token.EMPTY);
+    tl.add(XML);
+    if(ctx.nsElem != Uri.EMPTY) tl.add(EMPTY);
 
     Nod n = node;
     while(n != null) {
-      final QNm[] at = n.ns();
+      final Atts at = n.ns();
       if(at == null) break;
-      for(final QNm name : at) {
-        if(name.ns()) {
-          final byte[] pre = name.ln();
-          if(!tl.contains(pre)) tl.add(pre);
-        }
+      for(int a = 0; a < at.size; a++) {
+        if(!tl.contains(at.key[a])) tl.add(at.key[a]);
       }
       n = n.parent();
     }

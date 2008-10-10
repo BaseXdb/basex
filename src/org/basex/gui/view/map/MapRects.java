@@ -19,7 +19,7 @@ final class MapRects {
    * @param r rectangle to be added.
    */
   void add(final MapRect r) {
-    if(size == rect.length) rect = Array.extend(rect);
+    rect = Array.check(rect, size);
     rect[size++] = r;
   }
   

@@ -12,8 +12,6 @@ import org.basex.data.MetaData;
  * @author Christian Gruen
  */
 public final class MemBuilder extends Builder {
-  // [CG] namespaces are currently ignored...
-  
   /** Data reference. */
   private MemData data;
 
@@ -36,7 +34,6 @@ public final class MemBuilder extends Builder {
     if(size > 0x1FFFFF) throw new IOException(LIMITRANGE);
     if(tags.size() > 0xFF) throw new IOException(LIMITTAGS);
     if(atts.size() > 0xFF) throw new IOException(LIMITATTS);
-
     data.initNames();
     return data;
   }

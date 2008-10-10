@@ -1,6 +1,9 @@
 package org.basex.query.xpath.internal;
 
 import static org.basex.query.xpath.XPText.*;
+
+import java.io.IOException;
+
 import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.data.StatsKey;
@@ -136,11 +139,11 @@ public final class Range extends InternalExpr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.openElement(this, Token.token(MIN), Token.token(min),
         Token.token(MAX), Token.token(max));
     expr.plan(ser);
-    ser.closeElement(this);
+    ser.closeElement();
   }
   
   @Override

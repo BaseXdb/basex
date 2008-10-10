@@ -28,7 +28,7 @@ public final class GIFExtractor extends AbstractExtractor {
        !Token.startsWith(data, HEADERGIF89)) return;
 
     // open image tag
-    listener.startElem(IMAGE, new byte[][] { TYPE, TYPEGIF });
+    listener.startElem(IMAGE, atts.set(TYPE, TYPEGIF));
 
     // extract image dimensions
     final int w = (data[6] & 0xFF) + ((data[7] & 0xFF) << 8);

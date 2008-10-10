@@ -130,7 +130,7 @@ public abstract class QueryContext extends Progress {
     final XMLSerializer ser = new XMLSerializer(out, true, true);
     ser.openElement(PLAN);
     plan(ser);
-    ser.closeElement(PLAN);
+    ser.closeElement();
     out.print(NL);
     info.add(out.finish());
     //IO.get(fn).write(out.finish());
@@ -143,11 +143,9 @@ public abstract class QueryContext extends Progress {
   public final void planDot() throws Exception {
     final CachedOutput out = new CachedOutput();
     final DOTSerializer ser = new DOTSerializer(out);
-    //ser.open(1);
     ser.openElement(PLAN);
     plan(ser);
-    ser.closeElement(PLAN);
-    //ser.close(1);
+    ser.closeElement();
     
     final IO f = IO.get(PLANDOT);
     f.write(out.finish());

@@ -1,5 +1,7 @@
 package org.basex.query.xpath.func;
 
+import java.io.IOException;
+
 import org.basex.data.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
@@ -76,9 +78,9 @@ public abstract class Func extends Expr {
   }
 
   @Override
-  public final void plan(final Serializer ser) throws Exception {
+  public final void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
-    for(final Expr arg : args) arg.plan(ser);
-    ser.closeElement(this);
+    for(final Expr a : args) a.plan(ser);
+    ser.closeElement();
   }
 }

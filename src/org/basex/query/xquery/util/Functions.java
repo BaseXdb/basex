@@ -4,6 +4,8 @@ import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
 
+import java.io.IOException;
+
 import org.basex.data.Serializer;
 import org.basex.query.ExprInfo;
 import org.basex.query.xquery.XQContext;
@@ -140,7 +142,7 @@ public final class Functions extends ExprInfo {
     final Uri uri = name.uri;
     if(uri == Uri.EMPTY) Err.or(FUNNONS, name.str());
 
-    if(GlobalNS.standard(uri)) {
+    if(NSGlobal.standard(uri)) {
       if(fun.decl) Err.or(NAMERES, name.str());
       else funError(fun.var.name);
     }
@@ -161,7 +163,7 @@ public final class Functions extends ExprInfo {
       }
     }
 
-    if(size == func.length) func = Array.extend(func);
+    func = Array.check(func, size);
     func[size] = fun;
     return size++;
   }
@@ -203,11 +205,11 @@ public final class Functions extends ExprInfo {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     if(size == 0) return;
     ser.openElement(this);
     for(int i = 0; i < size; i++) func[i].plan(ser);
-    ser.closeElement(this);
+    ser.closeElement();
   }
 
   @Override

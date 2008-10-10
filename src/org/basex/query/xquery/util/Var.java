@@ -2,6 +2,9 @@ package org.basex.query.xquery.util;
 
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
+
+import java.io.IOException;
+
 import org.basex.data.Serializer;
 import org.basex.query.ExprInfo;
 import org.basex.query.xquery.XQException;
@@ -133,9 +136,9 @@ public final class Var extends ExprInfo implements Cloneable {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.openElement(this, NAM, name.str());
     expr.plan(ser);
-    ser.closeElement(this);
+    ser.closeElement();
   }
 }

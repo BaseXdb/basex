@@ -1,5 +1,6 @@
 package org.basex.query.xpath.locpath;
 
+import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
@@ -104,7 +105,7 @@ public final class PredPos extends Pred {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.emptyElement(this, Token.token("min"), Token.token(min),
         Token.token("max"), Token.token(max));
   }

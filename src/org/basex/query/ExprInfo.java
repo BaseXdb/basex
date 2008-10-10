@@ -1,5 +1,7 @@
 package org.basex.query;
 
+import java.io.IOException;
+
 import org.basex.data.Serializer;
 import org.basex.util.Token;
 
@@ -24,9 +26,9 @@ public abstract class ExprInfo {
    * Recursively sends the abstract syntax of this expression to the
    * specified serializer.
    * @param ser serializer
-   * @throws Exception exception
+   * @throws IOException exception
    */
-  public abstract void plan(Serializer ser) throws Exception;
+  public abstract void plan(Serializer ser) throws IOException;
 
   /**
    * Returns a string description of the expression. Contrary to the

@@ -544,10 +544,8 @@ public final class GUI extends JFrame {
           }
           // highlights have changed.. refresh views
           if(!marked.sameAs(context.marked())) {
-            /*
-            View.ftPoi = marked.ftpoin;
+            // View.ftPoi = marked.ftpoin;
             View.notifyMark(marked);
-            */
           }
           if(thread != threadID) {
             proc = null;

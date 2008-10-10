@@ -2,6 +2,7 @@ package org.basex.query.xquery.expr;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.xquery.XQTokens.*;
+import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
@@ -104,13 +105,13 @@ public final class For extends ForLet {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.startElement(this);
     ser.attribute(VAR, var.name.str());
     if(pos != null) ser.attribute(POS, pos.name.str());
     if(score != null) ser.attribute(Token.token(SCORE), score.name.str());
     ser.finishElement();
     expr.plan(ser);
-    ser.closeElement(this);
+    ser.closeElement();
   }
 }

@@ -2,7 +2,7 @@ package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
-
+import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
@@ -61,9 +61,9 @@ public final class Castable extends Single {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.openElement(this, TYPE, Token.token(seq.toString()));
     expr.plan(ser);
-    ser.closeElement(this);
+    ser.closeElement();
   }
 }

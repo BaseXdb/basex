@@ -1,5 +1,7 @@
 package org.basex.query.xquery.util;
 
+import java.io.IOException;
+
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
@@ -83,9 +85,9 @@ public final class Variables {
   /**
    * Serializes the variables.
    * @param ser serializer
-   * @throws Exception exception
+   * @throws IOException exception
    */
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     global.plan(ser);
   }
 }

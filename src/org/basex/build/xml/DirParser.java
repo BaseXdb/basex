@@ -52,7 +52,7 @@ public final class DirParser extends Parser {
     } else {
       io = path;
       while(path.more()) {
-        // [CG] Create Collection: how to deal with exceptions?
+        // [CG] Create Collection: handle exceptions
         if(!path.name().matches(filter)) continue;
         b.meta.filesize += io.length();
         final SAXSource s = new SAXSource(io.inputSource());

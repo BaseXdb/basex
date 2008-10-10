@@ -1,6 +1,7 @@
 package org.basex.query.xpath.expr;
 
 import static org.basex.query.xpath.XPText.*;
+import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
@@ -54,10 +55,10 @@ public abstract class Comparison extends DualExpr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.openElement(this, Token.token(TYPE), Token.token(type.toString()));
     expr1.plan(ser);
     expr2.plan(ser);
-    ser.closeElement(this);
+    ser.closeElement();
   }
 }

@@ -6,7 +6,6 @@ import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.QNm;
 import org.basex.query.xquery.item.Type;
-import org.basex.query.xquery.item.Uri;
 
 /**
  * XQuery Name Test.
@@ -37,8 +36,7 @@ public final class NameTest extends Test {
   public NameTest(final byte[] n, final boolean w, final XQContext ctx)
       throws XQException {
     
-    name = new QNm(n);
-    name.check(ctx);
+    name = new QNm(n, ctx);
     ln = name.ln();
     pre = !eq(ln, name.str());
     wild = w;
@@ -47,22 +45,16 @@ public final class NameTest extends Test {
   @Override
   public boolean e(final Nod tmp, final XQContext ctx) throws XQException {
     if(tmp.type != Type.ELM && tmp.type != Type.ATT) return false;
+
     // wildcard - accepting all names
     if(name == null) return true;
 
     // namespace wildcard
-    if(wild) {
-      final byte[] nm = tmp.nname();
-      return eq(ln, substring(nm, indexOf(nm, ':') + 1));
-    }
+    if(wild) return eq(ln, ln(tmp.nname()));
 
     // namespace and name
     final QNm nm = tmp.qname(qname);
-    if(!pre && !nm.ns()) return eq(nm.str(), ln);
-    
-    ctx.ns.uri(nm);
-    return eq(ln, nm.ln()) && (name.uri.eq(nm.uri) ||
-      name.uri == Uri.EMPTY && nm.uri == Uri.XMLNS);
+    return !pre && !nm.ns() ? eq(ln, nm.str()) : name.eq(nm);
   }
 
   @Override

@@ -3,7 +3,6 @@ package org.basex.query.xquery.item;
 import static org.basex.query.xquery.XQTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
-import org.basex.query.xquery.XQContext;
 import org.basex.util.Token;
 
 /**
@@ -47,8 +46,7 @@ public final class FPI extends FNode {
   }
   
   @Override
-  public void serialize(final Serializer ser,  final XQContext ctx,
-      final int level) throws IOException {
+  public void serialize(final Serializer ser) throws IOException {
     ser.pi(name.str(), val);
   }
 
@@ -63,7 +61,7 @@ public final class FPI extends FNode {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.emptyElement(this, NAM, name.str(), VAL, val);
   }
 }

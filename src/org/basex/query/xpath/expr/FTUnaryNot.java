@@ -1,5 +1,6 @@
 package org.basex.query.xpath.expr;
 
+import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
@@ -80,9 +81,9 @@ public final class FTUnaryNot extends FTArrayExpr {
   }
   
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
-    for (Expr e : exprs) e.plan(ser);
-    ser.closeElement(this);
+    for(Expr e : exprs) e.plan(ser);
+    ser.closeElement();
   }
 }

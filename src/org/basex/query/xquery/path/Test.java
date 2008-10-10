@@ -1,7 +1,5 @@
 package org.basex.query.xquery.path;
 
-import static org.basex.util.Token.*;
-
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Nod;
@@ -31,7 +29,7 @@ public abstract class Test {
   /** Node test. */
   public Type type;
   /** Temporary QName instance. */
-  protected QNm qname = new QNm(EMPTY);
+  protected QNm qname = new QNm();
   
   /**
    * Tests the specified node.

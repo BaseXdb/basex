@@ -258,7 +258,7 @@ public final class XMark extends AQuery {
       out.openElement(item, person, atom(p, pi, stepName));
       parse("count(.[buyer/@person = '" + string(atom(p, pi, stepID)) + "'])").
         query(c).serialize(out);
-      out.closeElement(item);
+      out.closeElement();
     }
     return p.size;
   }
@@ -305,10 +305,10 @@ public final class XMark extends AQuery {
             out.openElement(item);
             final int ns = n.size;
             for(int ni = 0; ni < ns; ni++) out.text(atom(n, ni, stepName));
-            out.closeElement(item);
+            out.closeElement();
           }
         }
-        out.closeElement(person);
+        out.closeElement();
       }
     }
     return p.size;
@@ -364,7 +364,7 @@ public final class XMark extends AQuery {
       out.out.print(NL);
       out.openElement(id);
       out.out.print(category);
-      out.closeElement(cat);
+      out.closeElement();
       out.out.print(NL);
 
       final Nodes p = eval(parse(".[profile/interest/@category = '" +
@@ -388,7 +388,7 @@ public final class XMark extends AQuery {
         out.out.print("    ");
         writeTag(rev, p, pi, stepIncome);
         out.out.print(NL);
-        out.closeElement(stat);
+        out.closeElement();
         out.out.print(NL);
         out.openElement(cord);
         out.out.print(NL);
@@ -413,17 +413,17 @@ public final class XMark extends AQuery {
         out.out.print("      ");
         writeTag(page, p, pi, stepHomepage);
         out.out.print(NL);
-        out.closeElement(reseau);
+        out.closeElement();
         out.out.print(NL);
-        out.closeElement(cord);
+        out.closeElement();
         out.out.print(NL);
         out.out.print("  ");
         writeTag(carte, p, pi, stepCreditcard);
         out.out.print(NL);
-        out.closeElement(pers);
+        out.closeElement();
         out.out.print(NL);
       }
-      out.closeElement(cat);
+      out.closeElement();
     }
     return idist.length;
   }
@@ -456,7 +456,7 @@ public final class XMark extends AQuery {
       } else {
         out.out.print("0");
       }
-      out.closeElement(items);
+      out.closeElement();
     }
     return p.size;
   }
@@ -484,7 +484,7 @@ public final class XMark extends AQuery {
       out.openElement(items, pers, data.atom(tmp.nodes[0]));
       parse("count(.[" + data.atomNum(tmp.nodes[0]) + " > 5000 * text()])").
         query(i).serialize(out);
-      out.closeElement(items);
+      out.closeElement();
     }
     return hits;
   }
@@ -510,7 +510,7 @@ public final class XMark extends AQuery {
       writeSep(ii);
       out.openElement(item, name, atom(i, ii, stepName));
       eval(stepDesc, i, ii).serialize(out);
-      out.closeElement(item);
+      out.closeElement();
     }
     return hits;
   }
@@ -548,7 +548,7 @@ public final class XMark extends AQuery {
       writeSep(ai);
       out.openElement(text);
       out.text(data.atom(a.nodes[ai]));
-      out.closeElement(text);
+      out.closeElement();
     }
     return a.size;
   }
@@ -649,7 +649,7 @@ public final class XMark extends AQuery {
       writeSep(bi);
       out.openElement(item, name, atom(b, bi, stepName));
       out.text(atom(b, bi, stepLocation));
-      out.closeElement(item);
+      out.closeElement();
     }
     return b.size;
   }
@@ -674,25 +674,25 @@ public final class XMark extends AQuery {
     out.openElement(pref);
     parse("count(/site/people/person/profile[@income >= 100000])").
       query(root).serialize(out);
-    out.closeElement(pref);
+    out.closeElement();
     out.out.print(NL);
 
     out.openElement(std);
     qu("count(/site/people/person/profile[@income < 100000 and " +
       "@income >= 30000])").serialize(out);
-    out.closeElement(std);
+    out.closeElement();
     out.out.print(NL);
 
     out.openElement(chal);
     qu("count(/site/people/person/profile[@income < 30000])").serialize(out);
-    out.closeElement(chal);
+    out.closeElement();
     out.out.print(NL);
 
     out.openElement(na);
     qu("count(/site/people/person[not(profile/@income)])").serialize(out);
-    out.closeElement(na);
+    out.closeElement();
     out.out.print(NL);
-    out.closeElement(res);
+    out.closeElement();
     return 1;
   }
 
@@ -782,7 +782,7 @@ public final class XMark extends AQuery {
     } else {
       out.finishElement();
       for(int t = 0; t < tmp.size; t++) out.text(data.atom(tmp.nodes[0]));
-      out.closeElement(tag);
+      out.closeElement();
     }
   }
 

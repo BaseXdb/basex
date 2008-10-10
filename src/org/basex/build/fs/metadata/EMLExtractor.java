@@ -124,8 +124,7 @@ public final class EMLExtractor extends AbstractExtractor {
     }
 
     // write body tag & content
-    listener.startElem(EMLBODY, mBodyType == null ? null : new byte[][] { TYPE,
-        token(mBodyType) });
+    listener.startElem(EMLBODY, atts.set(TYPE, token(mBodyType)));
     listener.text(quotePrint ?
         new TokenBuilder(decodeQP(tb.finish())) : tb, false);
     listener.endElem(EMLBODY);
@@ -392,9 +391,7 @@ public final class EMLExtractor extends AbstractExtractor {
       final GregorianCalendar cal = new GregorianCalendar(toInt(yea),
           toInt(mon), toInt(day), toInt(tim[0]), toInt(tim[1]), toInt(tim[2]));
       final long min = cal.getTimeInMillis() / 60000;
-      listener.startElem(EMLDATE, new byte[][] { EMLTIME, token(min) });
-
-      listener.endElem(EMLDATE);
+      listener.emptyElem(EMLDATE, atts.set(EMLTIME, token(min)));
     } catch(final Exception e) {
       BaseX.debug("EMLExtractor.getDate: " + mCurrLine);
     }

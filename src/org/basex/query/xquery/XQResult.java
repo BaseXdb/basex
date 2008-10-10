@@ -67,9 +67,7 @@ public final class XQResult implements Result {
     ser.open(seq.size);
     for(int i = 0; i < seq.size; i++) {
       if(ser.finished()) break;
-      ser.openResult();
-      seq.item[i].serialize(ser, ctx, 0);
-      ser.closeResult();
+      serialize(ser, i);
     }
     ser.close(seq.size);
     
@@ -86,7 +84,9 @@ public final class XQResult implements Result {
 
   /** {@inheritDoc} */
   public void serialize(final Serializer ser, final int n) throws IOException {
-    seq.item[n].serialize(ser, ctx, 0);
+    ser.openResult();
+    ctx.serialize(ser, seq.item[n]);
+    ser.closeResult();
   }
 
   /**

@@ -21,7 +21,7 @@ import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.iter.NodIter;
 import org.basex.query.xquery.util.Err;
-import org.basex.util.Token;
+import org.basex.util.Atts;
 import org.basex.util.XMLToken;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Comment;
@@ -330,7 +330,7 @@ public enum Type {
     }
     @Override
     public Dec e(final Object o) {
-      return new Dec(Token.token(o.toString()));
+      return new Dec(token(o.toString()));
     }
   },
 
@@ -628,7 +628,7 @@ public enum Type {
 
       // [CG] add complete DOM object for elements
       return new FElem(new QNm(token(((Element) o).getNodeName())),
-          new NodIter(), new NodIter(), Token.EMPTY, new QNm[] {}, null);
+          new NodIter(), new NodIter(), EMPTY, new Atts(), null);
     }
   },
 
@@ -649,7 +649,7 @@ public enum Type {
       }
         
       // [CG] add complete DOM object for document fragments
-      return new FDoc(new NodIter(), Token.EMPTY);
+      return new FDoc(new NodIter(), EMPTY);
     }
   },
 

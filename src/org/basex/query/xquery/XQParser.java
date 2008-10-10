@@ -4,6 +4,7 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import org.basex.io.IO;
 import org.basex.query.FTOpt;
@@ -76,9 +77,10 @@ import org.basex.query.xquery.path.Path;
 import org.basex.query.xquery.path.Step;
 import org.basex.query.xquery.path.Test;
 import org.basex.query.xquery.util.Err;
-import org.basex.query.xquery.util.Namespaces;
+import org.basex.query.xquery.util.NSLocal;
 import org.basex.query.xquery.util.Var;
 import org.basex.util.Array;
+import org.basex.util.Atts;
 import org.basex.util.Set;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
@@ -261,7 +263,7 @@ public final class XQParser extends QueryParser {
     // skip uri check for empty input uri...
     if(u != Uri.EMPTY && !u.eq(module.uri))
       Err.or(WRONGMODULE, module.uri, file);
-    ctx.ns.index(module);
+    ctx.ns.add(module);
     skipWS();
     check(';');
     prolog1();
@@ -349,7 +351,7 @@ public final class XQParser extends QueryParser {
     final QNm name = new QNm(ncName(XPNAME));
     check(IS);
     name.uri = Uri.uri(stringLiteral());
-    if(!ctx.ns.index(name)) Err.or(DUPLNSDECL, name);
+    if(!ctx.ns.add(name)) Err.or(DUPLNSDECL, name);
   }
 
   /**
@@ -392,9 +394,8 @@ public final class XQParser extends QueryParser {
    */
   private void optionDecl() throws XQException {
     // ignore option declarations
-    final QNm name = new QNm(qName(QNAMEINV));
+    final QNm name = new QNm(qName(QNAMEINV), ctx);
     stringLiteral();
-    name.check(ctx);
     if(!name.ns()) Err.or(NSMISS, name);
   }
 
@@ -496,12 +497,12 @@ public final class XQParser extends QueryParser {
       name = new QNm(ncName(null));
       check(IS);
     } else {
-      name = new QNm(EMPTY);
+      name = new QNm();
     }
     final byte[] uri = stringLiteral();
     if(uri.length == 0) Err.or(NSMODURI);
     name.uri = Uri.uri(uri);
-    ctx.ns.index(name);
+    ctx.ns.add(name);
 
     final TokenList fl = new TokenList();
     if(consumeWS(AT)) do fl.add(stringLiteral()); while(consumeWS(COMMA));
@@ -547,8 +548,8 @@ public final class XQParser extends QueryParser {
       Err.or(NOMODULEFILE, fl);
     }
 
-    final Namespaces ns = ctx.ns;
-    ctx.ns = new Namespaces();
+    final NSLocal ns = ctx.ns;
+    ctx.ns = new NSLocal();
     new XQParser(ctx).parse(query, fl, u);
     ctx.ns = ns;
     ctx.modLoaded.add(f);
@@ -1166,9 +1167,8 @@ public final class XQParser extends QueryParser {
 
     do {
       // ignore all pragmas...
-      final QNm name = new QNm(qName(PRAGMAINCOMPLETE));
+      final QNm name = new QNm(qName(PRAGMAINCOMPLETE), ctx);
       if(!name.ns()) Err.or(NSMISS, name);
-      name.check(ctx);
       char c = curr();
       if(c != '#' && !ws(c)) Err.or(PRAGMAINCOMPLETE);
 
@@ -1495,14 +1495,16 @@ public final class XQParser extends QueryParser {
   private Expr dirElemConstructor() throws XQException {
     if(skipWS()) Err.or(NOTAGNAME);
     final QNm open = new QNm(qName(NOTAGNAME));
+    if(!open.ns()) open.uri = ctx.nsElem;
     consumeWSS();
 
     Expr[] cont = {};
-    QNm[] ns = {};
+    final Atts ns = new Atts();
+    final int s = ctx.ns.size;
 
     // parse attributes...
     while(XMLToken.isXMLLetter(curr())) {
-      final QNm atn = new QNm(qName(null));
+      final byte[] atn = qName(null);
       Expr[] attv = {};
 
       consumeWSS();
@@ -1549,21 +1551,19 @@ public final class XQParser extends QueryParser {
 
       if(tb.size != 0) attv = add(attv, Str.get(tb.finish()));
 
-      if(eq(atn.str(), XMLNS)) {
+      if(eq(atn, XMLNS)) {
         if(!simple) Err.or(NSCONS);
         final byte[] v = attv.length == 0 ? EMPTY : attv[0].str();
-        atn.uri = Uri.uri(v);
-        open.uri = atn.uri;
-        ns = addNS(ns, atn);
-      } else if(eq(atn.pre(), XMLNS)) {
+        open.uri = Uri.uri(v);
+        addNS(ns, atn, v);
+      } else if(startsWith(atn, XMLNS)) {
         if(!simple) Err.or(NSCONS);
         final byte[] v = attv.length == 0 ? EMPTY : attv[0].str();
         if(v.length == 0) Err.or(NSEMPTYURI);
-        atn.uri = Uri.uri(v);
-        ctx.ns.index(atn);
-        ns = addNS(ns, atn);
+        ctx.ns.add(new QNm(atn, Uri.uri(v)));
+        addNS(ns, atn, v);
       } else {
-        cont = add(cont, new CAttr(atn, attv, false));
+        cont = add(cont, new CAttr(new QNm(atn), attv, false));
       }
       if(!consumeWSS()) break;
     }
@@ -1585,21 +1585,24 @@ public final class XQParser extends QueryParser {
       check('>');
       if(!eq(open.str(), close)) Err.or(TAGWRONG, open.str(), close);
     }
+    
+    ctx.ns.size = s;
     return new CElem(open, cont, ns);
   }
 
   /**
-   * Checks the uniqueness of the namespace and adds it to the array.
+   * Checks the uniqueness of the namespace and adds it to the attributes.
    * @param ns namespace array
-   * @param a namespace to be checked
-   * @return new array
+   * @param k namespace
+   * @param v uri
    * @throws XQException xquery exception
    */
-  private QNm[] addNS(final QNm[] ns, final QNm a) throws XQException {
-    for(int n = 0, nl = ns.length; n < nl; n++) {
-      if(eq(ns[n].str(), a.str())) Err.or(DUPLNSDEF, a);
-    }
-    return Array.add(ns, a);
+  private void addNS(final Atts ns, final byte[] k, final byte[] v)
+      throws XQException {
+    
+    final int i = indexOf(k, ':');
+    final byte[] key = i == -1 ? EMPTY : substring(k, i + 1);
+    if(!ns.addUnique(key, v)) Err.or(DUPLNSDEF, k);
   }
 
   /**
@@ -1763,7 +1766,7 @@ public final class XQParser extends QueryParser {
     final Expr e = expr();
     check(BRACE2);
     return new CElem(name, e == null ? new Expr[0] : new Expr[] { e },
-        new QNm[] {});
+        new Atts());
   }
 
   /**

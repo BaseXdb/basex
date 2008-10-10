@@ -23,6 +23,7 @@ import org.basex.core.proc.CreateFS;
 import org.basex.io.IO;
 import org.basex.Text;
 import org.basex.util.Array;
+import org.basex.util.Atts;
 import org.basex.util.Map;
 
 /** Imports/shreds/parses a file hierarchy into a BaseX database.
@@ -61,11 +62,6 @@ public final class FSParser extends Parser implements FSVisitor {
   private byte[] cache;
   /** Reference to the database builder. */
   private Builder builder;
-  /** Cached attribute array. */
-  private static final byte[][] ATS1 = { NAME, null, SUFFIX, null, SIZE, null,
-      MTIME, null };
-  /** Cached attribute array. */
-  private static final byte[][] ATS2 = { NAME, null, SUFFIX, null, SIZE, null };
 
   /**
    * Constructor.
@@ -96,7 +92,7 @@ public final class FSParser extends Parser implements FSVisitor {
   public void preTraversal(final String path, final boolean docOpen)
       throws IOException {
     if(docOpen) builder.startElem(DEEPFS, null);
-    builder.startElem(DIR, new byte[][] { NAME, token(path) });
+    builder.startElem(DIR, atts.set(NAME, token(path)));
   }
 
   /**
@@ -207,7 +203,7 @@ public final class FSParser extends Parser implements FSVisitor {
    * @param f file name
    * @return attributes as byte[][]
    */
-  private byte[][] atts(final File f) {
+  private Atts atts(final File f) {
     
     final String name = f.getName();
     final int s = name.lastIndexOf('.');
@@ -216,17 +212,11 @@ public final class FSParser extends Parser implements FSVisitor {
     final long time = f.lastModified() / 60000;
     final byte[] suf = s != -1 ? lc(token(name.substring(s + 1))) : EMPTY;
 
-    if(time == 0) {
-      ATS2[1] = token(name);
-      ATS2[3] = suf;
-      ATS2[5] = token(f.length());
-      return ATS2;
-    }
-    ATS1[1] = token(name);
-    ATS1[3] = suf;
-    ATS1[5] = token(f.length());
-    ATS1[7] = token(time);
-    return ATS1;
+    atts.reset();
+    atts.add(NAME, token(name));
+    atts.add(SUFFIX, suf);
+    atts.add(SIZE, token(f.length()));
+    if(time != 0) atts.add(MTIME, token(time));
+    return atts;
   }
-
 }

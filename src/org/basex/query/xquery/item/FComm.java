@@ -2,7 +2,6 @@ package org.basex.query.xquery.item;
 
 import java.io.IOException;
 import org.basex.data.Serializer;
-import org.basex.query.xquery.XQContext;
 import org.basex.util.Token;
 
 /**
@@ -32,8 +31,7 @@ public final class FComm extends FNode {
   }
   
   @Override
-  public void serialize(final Serializer ser,  final XQContext ctx,
-      final int level) throws IOException {
+  public void serialize(final Serializer ser) throws IOException {
     ser.comment(val);
   }
 

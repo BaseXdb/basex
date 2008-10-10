@@ -1,6 +1,9 @@
 package org.basex.query.xpath.locpath;
 
 import static org.basex.query.xpath.XPText.*;
+
+import java.io.IOException;
+
 import org.basex.data.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
@@ -168,9 +171,9 @@ public final class PredSimple extends Pred {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     expr.plan(ser);
-    ser.closeElement(this);
+    ser.closeElement();
   }
 }

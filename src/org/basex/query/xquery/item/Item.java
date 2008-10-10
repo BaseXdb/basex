@@ -232,13 +232,10 @@ public abstract class Item extends Expr {
   /**
    * Serializes the item.
    * @param ser serializer
-   * @param ctx query context
-   * @param level current level
    * @throws IOException exception
    */
   @SuppressWarnings("unused")
-  public void serialize(final Serializer ser, final XQContext ctx,
-      final int level) throws IOException {
+  public void serialize(final Serializer ser) throws IOException {
     ser.item(str());
   }
 
@@ -258,10 +255,10 @@ public abstract class Item extends Expr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     ser.text(str());
-    ser.closeElement(this);
+    ser.closeElement();
   }
 
   @Override

@@ -1,5 +1,7 @@
 package org.basex.query.xpath.locpath;
 
+import java.io.IOException;
+
 import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.index.IndexToken;
@@ -305,10 +307,10 @@ public abstract class LocPath extends Expr {
   }
 
   @Override
-  public final void plan(final Serializer ser) throws Exception {
+  public final void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     steps.plan(ser);
-    ser.closeElement(this);
+    ser.closeElement();
   }
 
   @Override

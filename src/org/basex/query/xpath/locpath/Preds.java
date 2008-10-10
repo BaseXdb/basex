@@ -1,6 +1,9 @@
 package org.basex.query.xpath.locpath;
 
 import static org.basex.query.xpath.XPText.*;
+
+import java.io.IOException;
+
 import org.basex.data.Serializer;
 import org.basex.query.ExprInfo;
 import org.basex.query.QueryException;
@@ -46,7 +49,7 @@ public final class Preds extends ExprInfo {
    * @param pred predicate to be added
    */
   public void add(final Pred pred) {
-    if(size == preds.length) preds = Array.extend(preds);
+    preds = Array.check(preds, size);
     preds[size++] = pred;
   }
   
@@ -209,7 +212,7 @@ public final class Preds extends ExprInfo {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     for(int s = 0; s < size; s++) preds[s].plan(ser);
   }
 

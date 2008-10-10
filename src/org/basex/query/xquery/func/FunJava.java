@@ -3,18 +3,16 @@ package org.basex.query.xquery.func;
 import static javax.xml.datatype.DatatypeConstants.*;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
-
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
-
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
@@ -262,9 +260,9 @@ public final class FunJava extends Arr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.openElement(this, NAM, Token.token(cls + "." + mth));
     for(final Expr arg : expr) arg.plan(ser);
-    ser.closeElement(this);
+    ser.closeElement();
   }
 }

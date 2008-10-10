@@ -4,7 +4,6 @@ import static org.basex.Text.*;
 import org.basex.core.AbstractProcess;
 import org.basex.core.Process;
 import org.basex.core.Prop;
-import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -142,7 +141,6 @@ public final class BaseX extends BaseXClient {
    * @return dummy object
    */
   public static Object notimplemented(final Object... ext) {
-    Performance.stack();
     throw new UnsupportedOperationException(ext.length == 0 ? "Not expected." :
       info("Not expected (%).", ext));
   }

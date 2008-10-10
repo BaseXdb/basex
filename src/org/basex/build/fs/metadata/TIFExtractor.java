@@ -52,7 +52,7 @@ public final class TIFExtractor extends EXIFExtractor {
     if(w == -1 || h == -1) return;
 
     // open image tag
-    listener.startElem(IMAGE, new byte[][] { TYPE, TYPEJPG });
+    listener.startElem(IMAGE, atts.set(TYPE, TYPEJPG));
     listener.nodeAndText(WIDTH, Token.token(w));
     listener.nodeAndText(HEIGHT, Token.token(h));
     listener.endElem(IMAGE);

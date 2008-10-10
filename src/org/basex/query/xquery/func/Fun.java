@@ -2,6 +2,7 @@ package org.basex.query.xquery.func;
 
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
+import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
@@ -149,13 +150,13 @@ public abstract class Fun extends Expr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     if(args.length == 0) {
       ser.emptyElement(this, NAM, Token.token(func.desc));
     } else {
       ser.openElement(this, NAM, Token.token(func.desc));
       for(Expr arg : args) arg.plan(ser);
-      ser.closeElement(this);
+      ser.closeElement();
     }
   }
 

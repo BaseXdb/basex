@@ -22,6 +22,7 @@ public final class XMLParser extends Parser {
   /** Builder reference. */
   private Builder builder;
 
+
   /**
    * Constructor.
    * @param f file reference
@@ -78,16 +79,13 @@ public final class XMLParser extends Parser {
     }
 
     consume(Type.L_BR);
-
-    // start parsing for opening tag
-    byte[][] atts = null;
+    atts.reset();
 
     // get tag name
     final byte[] tag = consumeToken(Type.TAGNAME);
     skipSpace();
 
     // parse optional attributes
-    int as = 0;
     while(scanner.type != Type.R_BR && scanner.type != Type.CLOSE_R_BR) {
       final byte[] attName = consumeToken(Type.ATTNAME);
       skipSpace();
@@ -101,20 +99,15 @@ public final class XMLParser extends Parser {
       }
       consume(Type.QUOTE);
 
-      final int s = indexOf(attName, ':');
-      if(s != -1 && startsWith(attName, XMLNSC)) {
+      if(startsWith(attName, XMLNSC)) {
         // open namespace...
-        builder.startNS(substring(attName, s + 1), attValue);
+        builder.startNS(ln(attName), attValue);
       } else if(eq(attName, XMLNS)) {
         // open namespace...
         builder.startNS(EMPTY, attValue);
       } else {
         // add attribute
-        final byte[][] tmp = new byte[as + 2][];
-        if(as > 0) System.arraycopy(atts, 0, tmp, 0, as);
-        atts = tmp;
-        atts[as++] = attName;
-        atts[as++] = attValue;
+        atts.add(attName, attValue);
       }
 
       if(scanner.type != Type.R_BR && scanner.type != Type.CLOSE_R_BR) {

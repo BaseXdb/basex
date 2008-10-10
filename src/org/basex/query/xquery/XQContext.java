@@ -4,6 +4,7 @@ import static org.basex.Text.*;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.core.proc.Check;
@@ -27,10 +28,11 @@ import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.NodIter;
 import org.basex.query.xquery.util.Err;
 import org.basex.query.xquery.util.Functions;
-import org.basex.query.xquery.util.Namespaces;
+import org.basex.query.xquery.util.NSLocal;
 import org.basex.query.xquery.util.SeqBuilder;
 import org.basex.query.xquery.util.Variables;
 import org.basex.util.Array;
+import org.basex.util.Atts;
 import org.basex.util.StringList;
 
 /**
@@ -41,7 +43,7 @@ import org.basex.util.StringList;
  */
 public final class XQContext extends QueryContext {
   /** Namespaces. */
-  public Namespaces ns = new Namespaces();
+  public NSLocal ns = new NSLocal();
   /** Functions. */
   public Functions fun = new Functions();
   /** Variables. */
@@ -159,9 +161,25 @@ public final class XQContext extends QueryContext {
       return null;
     }
   }
+  
+  /**
+   * Serializes the specified item.
+   * @param ser serializer
+   * @param it item to serialize
+   * @throws IOException query exception
+   */
+  public void serialize(final Serializer ser, final Item it)
+      throws IOException {
+
+    // sets initial namespaces
+    final Atts nsp = ser.ns;
+    nsp.reset();
+    if(nsElem != Uri.EMPTY) nsp.add(EMPTY, nsElem.str());
+    it.serialize(ser);
+  }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     vars.plan(ser);
     fun.plan(ser);
     root.plan(ser);

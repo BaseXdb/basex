@@ -97,6 +97,17 @@ public final class Array {
   }
 
   /**
+   * Doubles the array size if necessary.
+   * @param ar array to be resized
+   * @param s array size
+   * @param <T> array type
+   * @return array
+   */
+  public static <T> T[] check(final T[] ar, final int s) {
+    return s == ar.length ? resize(ar, s, s << 1) : ar;
+  }
+
+  /**
    * Resizes an array and adds an entry at the end.
    * @param ar array to be resized
    * @param e entry to be added

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import org.basex.build.Builder;
+import org.basex.util.Atts;
 
 /**
  * This is an abstract class for defining meta data extractors.
@@ -12,6 +13,9 @@ import org.basex.build.Builder;
  * @author Christian Gruen
  */
 public abstract class AbstractExtractor {
+  /** Attribute container. */
+  final Atts atts = new Atts();
+  
   /**
    * Extracts the file content.
    * @param listener reference to the parser listener

@@ -34,10 +34,10 @@ public final class XMLSerializer extends Serializer {
   public final PrintOutput out;
   /** Pretty printing flag. */
   private final boolean pretty;
+  /** XML output flag. */
+  private final boolean xml;
   /** Indent flag. */
   private boolean indent;
-  /** Current level. */
-  private int level;
 
   /**
    * Constructor.
@@ -73,7 +73,7 @@ public final class XMLSerializer extends Serializer {
 
   @Override
   public void close(final int s) throws IOException {
-    if(xml && s != 0) closeElement(RESULTS);
+    if(xml && s != 0) closeElement();
   }
 
   @Override
@@ -83,11 +83,11 @@ public final class XMLSerializer extends Serializer {
 
   @Override
   public void closeResult() throws IOException {
-    if(xml) closeElement(RESULT);
+    if(xml) closeElement();
   }
 
   @Override
-  public void startElement(final byte[] t) throws IOException {
+  protected void start(final byte[] t) throws IOException {
     if(indent) indent();
     out.print(ELEM1);
     out.print(t);
@@ -115,19 +115,17 @@ public final class XMLSerializer extends Serializer {
   }
   
   @Override
-  public void emptyElement() throws IOException {
+  public void empty() throws IOException {
     out.print(ELEM4);
   }
 
   @Override
-  public void finishElement() throws IOException {
+  public void finish() throws IOException {
     out.print(ELEM2);
-    level++;
   }
 
   @Override
-  public void closeElement(final byte[] t) throws IOException {
-    level--;
+  public void close(final byte[] t) throws IOException {
     if(indent) indent();
     out.print(ELEM3);
     out.print(t);
@@ -143,7 +141,7 @@ public final class XMLSerializer extends Serializer {
         case '>': out.print(E_GT); break;
         case '<': out.print(E_LT); break;
         case 0xD: out.print(E_CR); break;
-        default: out.write(ch);
+        default : out.write(ch);
       }
     }
     indent = false;
@@ -203,7 +201,7 @@ public final class XMLSerializer extends Serializer {
    */
   public void indent() throws IOException {
     out.println();
-    for(int l = 0; l < level; l++) out.print(INDENT);
+    for(int l = 1; l < tags.size; l++) out.print(INDENT);
   }
   
   /**

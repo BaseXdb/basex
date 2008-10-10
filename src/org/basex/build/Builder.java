@@ -10,6 +10,7 @@ import org.basex.data.MetaData;
 import org.basex.data.Namespaces;
 import org.basex.data.Skeleton;
 import org.basex.index.Names;
+import org.basex.util.Atts;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -46,6 +47,8 @@ public abstract class Builder extends Progress {
   private final int[] parStack = new int[CAP];
   /** Tag stack. */
   private final int[] tagStack = new int[CAP];
+  /** Namespace stack. */
+  private final int[] nsStack = new int[CAP];
   /** Flag for parsing inside the document. */
   private boolean inDoc;
   /** Current tree height. */
@@ -182,6 +185,8 @@ public abstract class Builder extends Progress {
    */
   public final void startNS(final byte[] name, final byte[] val) {
     ns.add(name, val);
+    // default namespace...
+    if(name.length == 0) nsStack[level] = ns.id(val);
   }
 
   /**
@@ -190,7 +195,7 @@ public abstract class Builder extends Progress {
    * @param att the tag attributes
    * @throws IOException in case of parsing or writing problems 
    */
-  public final void startElem(final byte[] tag, final byte[][] att)
+  public final void startElem(final byte[] tag, final Atts att)
       throws IOException {
     addElem(tag, att, true);
   }
@@ -201,7 +206,7 @@ public abstract class Builder extends Progress {
    * @param att the tag attributes
    * @throws IOException in case of parsing or writing problems 
    */
-  public final void emptyElem(final byte[] tag, final byte[][] att)
+  public final void emptyElem(final byte[] tag, final Atts att)
       throws IOException {
 
     addElem(tag, att, false);
@@ -230,7 +235,7 @@ public abstract class Builder extends Progress {
    * @param open opening tag
    * @throws IOException in case of parsing or writing problems 
    */
-  private void addElem(final byte[] name, final byte[][] att,
+  private void addElem(final byte[] name, final Atts att,
       final boolean open) throws IOException {
 
     // convert tag to utf8
@@ -242,9 +247,8 @@ public abstract class Builder extends Progress {
       tags.noleaf(tagStack[level - 1], true);
     }
 
-    // get tag and namespaces references
+    // get tag reference
     final int tid = tags.index(tag, null);
-    final int tns = ns.get(tag);
     skel.add(tid, level, Data.ELEM);
 
     // remember tag id and parent reference
@@ -256,19 +260,27 @@ public abstract class Builder extends Progress {
 
     // add node
     final int dis = level != 0 ? size - parStack[level - 1] : 1;
-    final int al = att != null ? att.length : 0;
-    addElem(tid, tns, dis, (al >> 1) + 1, n);
+    final int al = att.size;
+    
+    // get namespaces reference
+    int tns = ns.get(tag);
+    if(tns == 0) tns = nsStack[level];
+
+    addElem(tid, tns, dis, al + 1, n);
 
     // create numeric attribute references
-    for(int a = 0; a < al; a += 2) {
-      final byte[] av = att[a + 1];
-      final int an = atts.index(att[a], av);
-      final int ans = ns.get(att[a]);
+    for(int a = 0; a < al; a++) {
+      final byte[] av = att.val[a];
+      final int an = atts.index(att.key[a], av);
+      final int ans = ns.get(att.key[a]);
       skel.add(an, level + 1, Data.ATTR);
-      addAttr(an, ans, av, (a >> 1) + 1);
+      addAttr(an, ans, av, a + 1);
     }
 
-    if(open && meta.height < ++level) meta.height = level;
+    if(open) {
+      if(meta.height < ++level) meta.height = level;
+      nsStack[level] = nsStack[level - 1];
+    }
     if(size != 1) inDoc = true;
   }
 

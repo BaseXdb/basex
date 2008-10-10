@@ -1,6 +1,7 @@
 package org.basex.query.xquery.item;
 
 import static org.basex.query.xquery.XQText.*;
+import static org.basex.util.Token.*;
 import javax.xml.namespace.QName;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
@@ -23,6 +24,22 @@ public final class QNm extends Item {
   private int ns;
   
   /**
+   * Empty Constructor.
+   */
+  public QNm() {
+    super(Type.QNM);
+  }
+  
+  /**
+   * Constructor.
+   * @param n name
+   */
+  public QNm(final byte[] n) {
+    this();
+    name(n);
+  }
+  
+  /**
    * Constructor.
    * @param n name
    * @param ctx xquery context
@@ -36,30 +53,12 @@ public final class QNm extends Item {
 
   /**
    * Constructor.
-   * @param q quick name
+   * @param n name
    * @param u uri
    */
-  public QNm(final byte[] q, final Uri u) {
-    this(q);
+  public QNm(final byte[] n, final Uri u) {
+    this(n);
     uri = u;
-  }
-  
-  /**
-   * Constructor.
-   * @param q quick name
-   */
-  public QNm(final byte[] q) {
-    super(Type.QNM);
-    name(q);
-  }
-  
-  /**
-   * Constructor.
-   * @param name name
-   * @param u uri
-   */
-  public QNm(final String name, final String u) {
-    this(Token.token(name), Uri.uri(Token.token(u)));
   }
   
   /**
@@ -67,7 +66,7 @@ public final class QNm extends Item {
    * @param qn qname
    */
   public QNm(final QName qn) {
-    this(qname(qn), qn.getNamespaceURI());
+    this(token(qname(qn)), Uri.uri(token(qn.getNamespaceURI())));
   }
   
   /**
@@ -87,7 +86,7 @@ public final class QNm extends Item {
    */
   public void name(final byte[] nm) {
     val = nm;
-    ns = Token.indexOf(val, ':');
+    ns = indexOf(val, ':');
   }
 
   @Override
@@ -135,7 +134,7 @@ public final class QNm extends Item {
    * @return prefix
    */
   public byte[] pre() {
-    return ns == -1 ? Token.EMPTY : Token.substring(val, 0, ns);
+    return ns == -1 ? EMPTY : substring(val, 0, ns);
   }
   
   /**
@@ -143,26 +142,16 @@ public final class QNm extends Item {
    * @return local name
    */
   public byte[] ln() {
-    return ns == -1 ? val : Token.substring(val, ns + 1);
-  }
-
-  /**
-   * Checks the validity of the QName.
-   * @param ctx xquery context
-   * @throws XQException query exception
-   */
-  public void check(final XQContext ctx) throws XQException {
-    if(ns()) uri = ctx.ns.uri(pre());
+    return ns == -1 ? val : substring(val, ns + 1);
   }
 
   @Override
   public QName java() {
-    return new QName(Token.string(uri.str()),
-        Token.string(ln()), Token.string(pre()));
+    return new QName(string(uri.str()), string(ln()), string(pre()));
   }
 
   @Override
   public String toString() {
-    return "\"" + Token.string(val) + "\"";
+    return "\"" + string(val) + "\"";
   }
 }

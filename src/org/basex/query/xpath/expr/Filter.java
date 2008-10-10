@@ -1,5 +1,7 @@
 package org.basex.query.xpath.expr;
 
+import java.io.IOException;
+import org.basex.BaseX;
 import org.basex.data.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
@@ -57,11 +59,11 @@ public final class Filter extends Expr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     expr.plan(ser);
     preds.plan(ser);
-    ser.closeElement(this);
+    ser.closeElement();
   }
 
   @Override
@@ -71,6 +73,6 @@ public final class Filter extends Expr {
 
   @Override
   public String toString() {
-    return "Filter(" + expr.toString() + preds.toString() + ')';
+    return BaseX.info("%(%%)", name(), expr, preds);
   }
 }

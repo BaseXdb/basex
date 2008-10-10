@@ -1,5 +1,6 @@
 package org.basex.query.xpath.values;
 
+import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xpath.XPContext;
 import org.basex.util.Levenshtein;
@@ -89,9 +90,9 @@ public final class Num extends Item {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
-    ser.text(Token.token(num));
-    ser.closeElement(this);
+    ser.text(str());
+    ser.closeElement();
   }
 }

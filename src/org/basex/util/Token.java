@@ -1,7 +1,5 @@
 package org.basex.util;
 
-import org.basex.BaseX;
-
 /**
  * This class provides convenience operations for handling so-called
  * 'Tokens'. Tokens in BaseX are nothing else than UTF8 encoded strings,
@@ -168,7 +166,7 @@ public final class Token {
     try {
       return new String(s, enc).getBytes(UTF8);
     } catch(final Exception e) {
-      BaseX.notexpected(e.getMessage());
+      org.basex.BaseX.notexpected(e.getMessage());
       return EMPTY;
     }
   }
@@ -804,6 +802,21 @@ public final class Token {
   }
 
   /**
+   * Concatenates the specified characters.
+   * @param t tokens
+   * @param c characters to be added
+   * @return resulting array
+   */
+  public static byte[] concat(final byte[] t, final byte... c) {
+    int l = t.length;
+    int s = l + c.length;
+    final byte[] tmp = new byte[s];
+    Array.copy(t, tmp, 0);
+    for(final byte cc : c) tmp[l++] = cc;
+    return tmp;
+  }
+
+  /**
    * Deletes the specified character out of the token.
    * @param t token to be checked
    * @param c character to be removed
@@ -1017,6 +1030,26 @@ public final class Token {
       sb.append(c < 192 || c > 255 ? c : (char) NORM[c - 192]);
     }
     return token(sb.toString());
+  }
+  
+  /**
+   * Returns the prefix of the specified token.
+   * @param name name
+   * @return prefix or empty token if no prefix exists
+   */
+  public static byte[] pre(final byte[] name) {
+    final int i = indexOf(name, ':');
+    return i == -1 ? EMPTY : substring(name, 0, i);
+  }
+  
+  /**
+   * Returns the local name of the specified name.
+   * @param name name
+   * @return local name
+   */
+  public static byte[] ln(final byte[] name) {
+    final int i = indexOf(name, ':');
+    return i == -1 ? name : substring(name, i + 1);
   }
 
   /**

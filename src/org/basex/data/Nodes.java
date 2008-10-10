@@ -168,7 +168,7 @@ public final class Nodes implements Result {
   /** {@inheritDoc} */
   public void serialize(final Serializer ser, final int n) throws IOException {
     ser.openResult();
-    ser.node(data, nodes[n], 0);
+    ser.node(data, nodes[n]);
     ser.closeResult();
   }
 

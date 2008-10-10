@@ -118,7 +118,7 @@ public final class NodeSet extends Item {
   @Override
   public void serialize(final Serializer ser, final int n) throws IOException {
     ser.openResult();
-    ser.node(data, nodes[n], 0);
+    ser.node(data, nodes[n]);
     ser.closeResult();
   }
 
@@ -229,7 +229,7 @@ public final class NodeSet extends Item {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.emptyElement(this, Token.token("size"), Token.token(size));
   }
 }

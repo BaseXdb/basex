@@ -3,7 +3,6 @@ package org.basex.query.xquery.item;
 import static org.basex.query.xquery.XQTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
-import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.iter.NodIter;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -37,12 +36,8 @@ public final class FDoc extends FNode {
   }
 
   @Override
-  public void serialize(final Serializer ser,  final XQContext ctx,
-      final int level) throws IOException {
-
-    for(int c = 0; c < children.size; c++) {
-      children.list[c].serialize(ser, ctx, level);
-    }
+  public void serialize(final Serializer ser) throws IOException {
+    for(int c = 0; c < children.size; c++) children.list[c].serialize(ser);
   }
 
   @Override
@@ -61,7 +56,7 @@ public final class FDoc extends FNode {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.emptyElement(this, BASE, base);
   }
 }

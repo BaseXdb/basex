@@ -1,6 +1,7 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQText.*;
+import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
@@ -100,9 +101,9 @@ public final class Ord {
   /**
    * Serializes the abstract syntax tree.
    * @param ser serializer
-   * @throws Exception exception
+   * @throws IOException exception
    */
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     expr.plan(ser);
   }
 }

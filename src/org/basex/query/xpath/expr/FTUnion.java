@@ -1,5 +1,6 @@
 package org.basex.query.xpath.expr;
 
+import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.index.FTNode;
 import org.basex.query.QueryException;
@@ -192,10 +193,10 @@ public final class FTUnion extends FTArrayExpr {
   }
   
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
-    for (Expr e : exprs) e.plan(ser);
-    ser.closeElement(this);
+    for(Expr e : exprs) e.plan(ser);
+    ser.closeElement();
   }
 }
  

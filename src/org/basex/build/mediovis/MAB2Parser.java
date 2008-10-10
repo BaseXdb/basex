@@ -382,13 +382,10 @@ public final class MAB2Parser extends Parser {
           if(nrSigs == 0) sig[nrSigs++] = string(line);
         }
       } else {
-        byte[][] atts = null;
-        if(sub == 0 || Prop.mab2flat) {
-          atts = new byte[][] { MV_ID, mvID, BIB_ID, bibID };
-        } else {
-          atts = new byte[][] { MV_ID, mvID, BIB_ID, bibID, MAX,
-              Token.token(sub) };
-        }
+        atts.reset();
+        atts.add(MV_ID, mvID);
+        atts.add(BIB_ID, bibID);
+        if(sub != 0 && !Prop.mab2flat) atts.add(MAX, Token.token(sub));
 
         // merge super and sub titles
         if(last != null) {
@@ -397,7 +394,6 @@ public final class MAB2Parser extends Parser {
         }
 
         // add line below to omit root nodes
-        //if(!top || !Prop.mab2flat || sub == 0) {
         builder.startElem(MEDIUM, atts);
         addTag(TYPE, type);
         addTag(LANGUAGE, language);
@@ -423,7 +419,6 @@ public final class MAB2Parser extends Parser {
         addTag(POSTER, posters.get(bibID));
         addTag(GENRE, genres.get(mvID));
         if(sub == 0 || Prop.mab2flat) builder.endElem(MEDIUM);
-        //if(sub == 0) builder.endElem(MEDIUM);          
 
         return title;
       }

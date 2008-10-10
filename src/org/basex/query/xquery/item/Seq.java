@@ -2,6 +2,7 @@ package org.basex.query.xquery.item;
 
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.query.xquery.XQText.*;
+import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQException;
@@ -114,7 +115,7 @@ public class Seq extends Item {
   }
 
   @Override
-  public void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws IOException {
     ser.emptyElement(this, SIZE, Token.token(size));
   }
 }

@@ -62,13 +62,10 @@ public final class DOCWrapper extends Parser {
 
           final NamedNodeMap at = n.getAttributes();
           final int as = at.getLength();
-          byte[][] atts = null;
-          if(as != 0) {
-            atts = new byte[as << 1][];
-            for(int a = 0; a < as; a++) {
-              atts[a << 1] = Token.token(at.item(a).getNodeName());
-              atts[(a << 1) + 1] = Token.token(at.item(a).getNodeValue());
-            }
+          atts.reset();
+          for(int a = 0; a < as; a++) {
+            atts.add(Token.token(at.item(a).getNodeName()),
+                Token.token(at.item(a).getNodeValue()));
           }
           builder.startElem(Token.token(n.getNodeName()), atts);
         } else if(n instanceof Text) {
