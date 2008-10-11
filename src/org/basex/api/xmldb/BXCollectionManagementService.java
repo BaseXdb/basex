@@ -16,6 +16,8 @@ import org.xmldb.api.modules.CollectionManagementService;
 public class BXCollectionManagementService implements
     CollectionManagementService {
   
+  /** XPath service constant. */
+  public static final String MANAGEMENT = "CollectionManagementService";
   /** BXCollection col. */
   protected BXCollection col;
   
@@ -39,7 +41,7 @@ public class BXCollectionManagementService implements
   }
 
   public String getName() {
-    return "CollectionManagementService";
+    return MANAGEMENT;
   }
 
   public String getVersion() {

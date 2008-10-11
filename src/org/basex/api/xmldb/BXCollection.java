@@ -116,6 +116,8 @@ public class BXCollection implements Collection {
       if(name.equals(BXQueryService.XPATH)
           || name.equals(BXQueryService.XQUERY)) return new BXQueryService(
           this, name);
+      if(name.equals(BXCollectionManagementService.MANAGEMENT)) return new
+      BXCollectionManagementService(this);
     }
     throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
   }
