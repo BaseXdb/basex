@@ -69,6 +69,7 @@ public final class Context {
       BaseX.debug("Warning: Database still open.");
       close();
     }
+    Prop.fsmode = d.fs != null;
     data = d;
     copied = null;
     marked = new Nodes(d);
