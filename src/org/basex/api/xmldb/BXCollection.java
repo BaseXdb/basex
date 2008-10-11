@@ -125,7 +125,7 @@ public class BXCollection implements Collection {
   public Service[] getServices() throws XMLDBException {
     if(isOpen()) {
       return new Service[] { getService(BXQueryService.XPATH, null),
-          getService(BXQueryService.XQUERY, null) };
+          getService(BXQueryService.XQUERY, null), getService(BXCollectionManagementService.MANAGEMENT, null) };
     }
     throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
   }
