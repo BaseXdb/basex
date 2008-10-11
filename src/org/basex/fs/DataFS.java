@@ -265,26 +265,6 @@ public final class DataFS {
   }
 
   /**
-   * Opens the file which is defined by the specified pre value.
-   * @param pre pre value
-   */
-  public void launch(final int pre) {
-    if(pre == -1 || !isFile(pre)) return;
-
-    final String path = string(path(pre));
-    try {
-      final Runtime run = Runtime.getRuntime();
-      if(Prop.UNIX) {
-        run.exec(new String[] { "open", path }); // xdg-open
-      } else {
-        run.exec("rundll32.exe url.dll,FileProtocolHandler " + path);
-      }
-    } catch(final IOException ex) {
-      BaseX.debug(ex);
-    }
-  }
-
-  /**
    * Tests if wildcards are used. If true it returns
    * the regular expression. If not null will be returned.
    * @param expr - the expression of the user
@@ -338,5 +318,25 @@ public final class DataFS {
     data.insert(pre + 3, pre, SIZE, size);
     data.insert(pre + 4, pre, MTIME, mtime);
     data.flush();
+  }
+
+  /**
+   * Opens the file which is defined by the specified pre value.
+   * @param pre pre value
+   */
+  public void launch(final int pre) {
+    if(pre == -1 || !isFile(pre)) return;
+
+    final String path = string(path(pre));
+    try {
+      final Runtime run = Runtime.getRuntime();
+      if(Prop.UNIX) {
+        run.exec(new String[] { "open", path }); // xdg-open
+      } else {
+        run.exec("rundll32.exe url.dll,FileProtocolHandler " + path);
+      }
+    } catch(final IOException ex) {
+      BaseX.debug(ex);
+    }
   }
 }

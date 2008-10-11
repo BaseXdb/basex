@@ -30,10 +30,8 @@ import org.basex.query.xquery.item.QNm;
 import org.basex.query.xquery.item.Str;
 import org.basex.query.xquery.util.Var;
 import org.basex.util.Action;
-import org.basex.util.Array;
 import org.basex.util.Performance;
 import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
 
 /**
  * This is a simple web server.
@@ -327,29 +325,13 @@ public final class BaseXWebServer {
    * @throws Exception exception
    */
   private void eval(final Socket s, final String... exec) throws Exception {
-    final Process pr = new ProcessBuilder(exec).start();
-    final byte[][] out = new byte[2][];
-
-    // receive input stream
-    final Thread t1 = new Thread() {
-      @Override
-      public void run() { out[0] = getStream(pr.getInputStream()); }
-    };
-
-    // receive error stream
-    final Thread t2 = new Thread() {
-      @Override
-      public void run() { out[1] = getStream(pr.getErrorStream()); }
-    };
-
-    // waiting for input
-    t1.start();
-    t2.start();
-    t1.join();
-    t2.join();
+    final ProcessBuilder pb = new ProcessBuilder(exec);
+    pb.redirectErrorStream(true);
 
     final OutputStream os = s.getOutputStream();
-    os.write(out[out[1].length == 0 ? 0 : 1]);
+    final InputStream is = pb.start().getInputStream();
+    int i = 0;
+    while((i = is.read()) != -1) os.write(i);
     os.close();
   }
 
@@ -516,26 +498,6 @@ public final class BaseXWebServer {
       suf = i != -1 ? f.substring(i + 1) : "";
 
       if(!file.exists()) code = 404;
-    }
-  }
-
-  /**
-   * Returns content of an input stream.
-   * @param input stream reference
-   * @return content
-   */
-  byte[] getStream(final InputStream input) {
-    try {
-      final TokenBuilder tb = new TokenBuilder();
-      final byte[] buf = new byte[2048];
-      int i = 0;
-      while((i = input.read(buf)) != -1) {
-        tb.add(i == buf.length ? buf : Array.finish(buf, i));
-      }
-      return tb.finish();
-    } catch(final IOException ex) {
-      BaseX.debug(ex);
-      return Token.EMPTY;
     }
   }
 }

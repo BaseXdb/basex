@@ -9,21 +9,9 @@ import org.basex.core.Prop;
 import org.basex.core.Commands.FS;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.fs.Cat;
-import org.basex.fs.Cd;
-import org.basex.fs.Cp;
-import org.basex.fs.Du;
 import org.basex.fs.DataFS;
-import org.basex.fs.Ext;
 import org.basex.fs.FSCmd;
 import org.basex.fs.FSException;
-import org.basex.fs.Help;
-import org.basex.fs.Locate;
-import org.basex.fs.Ls;
-import org.basex.fs.Mkdir;
-import org.basex.fs.Pwd;
-import org.basex.fs.Rm;
-import org.basex.fs.Touch;
 import org.basex.io.PrintOutput;
 
 /**
@@ -54,7 +42,7 @@ public final class Fs extends Process {
       if(cmd == Commands.FS.EXIT) return fsmode(false);
       
       // evaluate arguments...
-      fs = cmd(cmd);
+      fs = FSCmd.get(cmd);
       fs.context(context);
       fs.args(args[1] == null ? "" : args[1]);
       return true;
@@ -62,28 +50,6 @@ public final class Fs extends Process {
       // internal command info..
       BaseX.debug(ex);
       return error(ex.getMessage());
-    }
-  }
-  
-  /**
-   * Returns an instance for the specified command.
-   * @param cmd command
-   * @return command
-   */
-  private FSCmd cmd(final Commands.FS cmd) {
-    switch(cmd) {
-      case CAT:     return new Cat();
-      case CD:      return new Cd();
-      case CP:      return new Cp();
-      case DU:      return new Du();
-      case HELP:    return new Help();
-      case LOCATE:  return new Locate();
-      case LS:      return new Ls();
-      case MKDIR:   return new Mkdir();
-      case PWD:     return new Pwd();
-      case RM:      return new Rm();
-      case TOUCH:   return new Touch();
-      default:      return new Ext();
     }
   }
   

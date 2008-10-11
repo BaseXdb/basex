@@ -25,52 +25,59 @@ public final class Ext extends FSCmd {
   }
 
   @Override
-  public void exec(final PrintOutput out) throws IOException {
+  public void exec(final PrintOutput out) throws FSException {
+    // build process... splitting by spaces might be too simple here
     final ProcessBuilder pb = new ProcessBuilder(cmd.split(" "));
     pb.directory(new File(Token.string(fs.path(curPre))));
+    final byte[][] cache = new byte[2][];
     
     try {
+      // catch standard and error output
       final Process pr = pb.start();
-      final byte[][] cache = new byte[2][];
-      
-      // receive input stream
-      final Thread t1 = new Thread() {
-        @Override
-        public void run() { cache[0] = getStream(pr.getInputStream()); }
-      };
-      // receive error stream
-      final Thread t2 = new Thread() {
-        @Override
-        public void run() { cache[1] = getStream(pr.getErrorStream()); }
-      };
+      final Thread t1 = getThread(pr.getInputStream(), cache, 0);
+      final Thread t2 = getThread(pr.getErrorStream(), cache, 1);
       t1.start();
       t2.start();
       t1.join();
       t2.join();
-      out.print(cache[cache[1].length == 0 ? 0 : 1]);
+      
+      // successful execution
+      if(cache[1].length == 0) out.print(cache[0]);
+      // error occurred
+      else throw new Exception(Token.string(Token.trim(cache[1])));
+      
     } catch(final Exception ex) {
+      // catch other exceptions (file not found, stream interrupted, ...)
       BaseX.debug(ex);
-      out.println(ex.getMessage());
+      // throw simplified error message
+      throw new FSException(ex.getMessage().replaceAll(": java.io.*", ""));
     }
   }
 
   /**
    * Returns content of an input stream.
-   * @param input stream reference
+   * @param is stream reference
+   * @param c output cache
+   * @param n cache number
    * @return content
    */
-  byte[] getStream(final InputStream input) {
-    try {
-      final TokenBuilder tb = new TokenBuilder();
-      final byte[] buf = new byte[2048];
-      int i = 0;
-      while((i = input.read(buf)) != -1) {
-        tb.add(i == buf.length ? buf : Array.finish(buf, i));
+  private Thread getThread(final InputStream is, final byte[][] c,
+      final int n) {
+    return new Thread() {
+      @Override
+      public void run() {
+        final TokenBuilder tb = new TokenBuilder();
+        final byte[] buf = new byte[2048];
+        try {
+          int i = 0;
+          while((i = is.read(buf)) != -1) {
+            tb.add(i == buf.length ? buf : Array.finish(buf, i));
+          }
+        } catch(final IOException ex) {
+          BaseX.debug(ex);
+        }
+        c[n] = tb.finish();
       }
-      return tb.finish();
-    } catch(final IOException ex) {
-      BaseX.debug(ex);
-      return Token.EMPTY;
-    }
+    };
   }
 }

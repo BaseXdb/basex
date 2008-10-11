@@ -1,6 +1,9 @@
 package org.basex.fs;
 
 import java.io.IOException;
+
+import org.basex.BaseX;
+import org.basex.core.Commands;
 import org.basex.core.Context;
 import org.basex.io.PrintOutput;
 import org.basex.util.GetOpts;
@@ -20,6 +23,29 @@ public abstract class FSCmd {
   protected DataFS fs;
   /** Current dir. */
   protected int curPre;
+  
+  /**
+   * Returns an instance for the specified command.
+   * @param cmd command
+   * @return command
+   */
+  public static FSCmd get(final Commands.FS cmd) {
+    switch(cmd) {
+      case CAT:     return new Cat();
+      case CD:      return new Cd();
+      case CP:      return new Cp();
+      case DU:      return new Du();
+      case EXT:     return new Ext();
+      case HELP:    return new Help();
+      case LOCATE:  return new Locate();
+      case LS:      return new Ls();
+      case MKDIR:   return new Mkdir();
+      case PWD:     return new Pwd();
+      case RM:      return new Rm();
+      case TOUCH:   return new Touch();
+      default:      BaseX.notimplemented(cmd); return null;
+    }
+  }
 
   /**
    * Sets the query context.
