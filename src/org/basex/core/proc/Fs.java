@@ -14,6 +14,7 @@ import org.basex.fs.Cd;
 import org.basex.fs.Cp;
 import org.basex.fs.Du;
 import org.basex.fs.DataFS;
+import org.basex.fs.Ext;
 import org.basex.fs.FSCmd;
 import org.basex.fs.FSException;
 import org.basex.fs.Help;
@@ -82,7 +83,7 @@ public final class Fs extends Process {
       case PWD:     return new Pwd();
       case RM:      return new Rm();
       case TOUCH:   return new Touch();
-      default:      BaseX.notexpected(cmd); return null;
+      default:      return new Ext();
     }
   }
   

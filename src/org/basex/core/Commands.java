@@ -89,7 +89,8 @@ public interface Commands {
   enum DROP { DATABASE, DB, INDEX }
   
   /** Filesystem commands. */
-  enum FS { CAT, CD, CP, DU, EXIT, HELP, LOCATE, LS, MKDIR, PWD, RM, TOUCH }
+  enum FS { CAT, CD, CP, DU, EXT, EXIT, HELP, LOCATE,
+    LS, MKDIR, PWD, RM, TOUCH }
   
   /** Insert commands. */
   enum UPDATE { FRAGMENT, ELEMENT, TEXT, ATTRIBUTE, COMMENT, PI }

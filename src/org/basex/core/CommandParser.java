@@ -99,8 +99,16 @@ public final class CommandParser extends QueryParser {
       COMMANDS cmd = null;
       if(fsmode) {
         cmd = COMMANDS.BASH;
-        proc = new Fs(consume(FS.class, cmd).name(), path(null, false));
-        if(FS.valueOf(proc.args[0]) == Commands.FS.EXIT) fsmode = false;
+        FS fs = FS.EXT;
+        String args = name(null);
+        try {
+          fs = Enum.valueOf(FS.class, args.toUpperCase());
+          if(fs == Commands.FS.EXIT) fsmode = false;
+          args = "";
+        } catch(final IllegalArgumentException ex) {
+        }
+        final String a = path(null, false);
+        proc = new Fs(fs.name(), a == null ? args : args + " " + a);
       } else {
         cmd = consume(COMMANDS.class, null);
         proc = parse(cmd);
