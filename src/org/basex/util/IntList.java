@@ -16,15 +16,15 @@ public final class IntList {
    * Default constructor.
    */
   public IntList() {
-    list = new int[8];
+    this(8);
   }
   
   /**
-   * Constructor, specifying an initial value.
-   * @param v initial list values
+   * Constructor, specifying an initial list size.
+   * @param is initial size of the list
    */
-  public IntList(final int v) {
-    this(new int[] { v });
+  public IntList(final int is) {
+    list = new int[is];
   }
   
   /**

@@ -9,6 +9,7 @@ import org.basex.BaseX;
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
+import org.basex.fs.DataFS;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIFS;
 import org.basex.gui.GUIProp;
@@ -17,7 +18,6 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewData;
 import org.basex.io.BufferInput;
-import org.basex.query.fs.FSUtils;
 import org.basex.util.Array;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -33,7 +33,9 @@ public final class MapFS extends MapPainter {
   /** Image offset. */
   private static final int PICOFFSET = 2;
   /** Image cache. */
-  private static volatile MapImages images;
+  private static MapImages images;
+  /** Data FS reference. */
+  private static DataFS fs;
   /** Flag for error message. */
   private boolean error;
   /** File buffer. */
@@ -42,9 +44,11 @@ public final class MapFS extends MapPainter {
   /**
    * Constructor.
    * @param m map reference.
+   * @param f fs reference
    */
-  MapFS(final MapView m) {
+  MapFS(final MapView m, final DataFS f) {
     super(m);
+    fs = f;
     if(images == null) images = new MapImages(m);
   }
 
@@ -73,8 +77,7 @@ public final class MapFS extends MapPainter {
       final int lvl = r.l;
       if(lvl == 0) mpos = 0;
 
-      final boolean isImage = GUIFS.mime(FSUtils.getName(data, r.p)) ==
-        GUIFS.Type.IMAGE;
+      final boolean isImage = GUIFS.mime(fs.name(r.p)) == GUIFS.Type.IMAGE;
       final boolean full = r.w == ww && r.h == hh;
 
       // draw rectangle
@@ -156,8 +159,8 @@ public final class MapFS extends MapPainter {
     final int pre = rect.p;
     final int kind = data.kind(pre);
     final boolean tag = kind == Data.ELEM || kind == Data.DOC;
-    final boolean file = FSUtils.isFile(data, pre);
-    final boolean dir = !file && FSUtils.isDir(data, pre);
+    final boolean file = fs.isFile(pre);
+    final boolean dir = !file && fs.isDir(pre);
 
     // show full path in top rectangle
     final Nodes current = context.current();
@@ -228,7 +231,7 @@ public final class MapFS extends MapPainter {
         g.setColor(Color.black);
         BaseXLayout.drawText(g, rect, text);
         if(h == GUIProp.fontsize && img != null) {
-          final long size = Token.toLong(FSUtils.getSize(data, pre));
+          final long size = Token.toLong(fs.size(pre));
           final byte[] info = Token.token(Performance.formatSize(size, false));
           w = BaseXLayout.width(g, info);
           if(BaseXLayout.width(g, text) < rect.w - w - 10) {
@@ -259,7 +262,7 @@ public final class MapFS extends MapPainter {
         final int w = BaseXLayout.chopString(g, text, rect.x + off + 3,
             rect.y, rect.w - off - 3);
 
-        final long size = Token.toLong(FSUtils.getSize(data, pre));
+        final long size = Token.toLong(fs.size(pre));
         final String info = GUIFS.desc(text, dir) + ", " +
           Performance.formatSize(size, true);
 
@@ -338,23 +341,21 @@ public final class MapFS extends MapPainter {
   boolean highlight(final MapRect r, final int mx, final int my,
       final boolean click) {
 
-    final Data data = GUI.context.data();
     final boolean active = r.w >= 16 && r.h >= 16 && my - r.y < 16 &&
-      mx - r.x < 16 && FSUtils.isFile(data, r.p) &&
-      GUIFS.mime(FSUtils.getName(data, r.p)) != GUIFS.Type.IMAGE;
+      mx - r.x < 16 && fs.isFile(r.p) &&
+      GUIFS.mime(fs.name(r.p)) != GUIFS.Type.IMAGE;
 
-    if(active && click) FSUtils.launch(data, View.focused);
+    if(active && click) fs.launch(View.focused);
     return active;
   }
 
   @Override
   void init(final MapRects rects) {
     final int off = Math.max(GUIProp.fontsize, 16);
-    final Data data = GUI.context.data();
     for(int i = 0; i < rects.size; i++) {
       final MapRect r = rects.get(i);
-      if(r.w > off && r.h > off && FSUtils.isFile(data, r.p)) {
-        final byte[] name = FSUtils.getName(data, r.p);
+      if(r.w > off && r.h > off && fs.isFile(r.p)) {
+        final byte[] name = fs.name(r.p);
         if(r.type == -1) r.type = GUIFS.type(name);
         if(GUIFS.mime(name) == GUIFS.Type.IMAGE) {
           final int o = PICOFFSET << 1;

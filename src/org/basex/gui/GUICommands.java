@@ -14,7 +14,7 @@ import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.core.Commands.INDEX;
 import org.basex.core.Commands.UPDATE;
-import org.basex.core.proc.Cd;
+import org.basex.core.proc.Cs;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.Copy;
 import org.basex.core.proc.CreateDB;
@@ -800,7 +800,7 @@ public enum GUICommands implements GUICommand {
   GOUP(true, GUIGOUP, "alt UP", GUIGOUPTT) {
     @Override
     public void execute() {
-      GUI.get().execute(new Cd(".."));
+      GUI.get().execute(new Cs(".."));
     }
 
     @Override
@@ -816,7 +816,7 @@ public enum GUICommands implements GUICommand {
   ROOT(true, GUIROOT, "alt HOME", GUIROOTTT) {
     @Override
     public void execute() {
-      GUI.get().execute(new Cd("/"));
+      GUI.get().execute(new Cs("/"));
     }
 
     @Override

@@ -36,7 +36,9 @@ public final class Open extends Process {
     
     try {
       // open new database instance
-      final Data data = db.equals(DEEPDB) ? new DeepData(db) : new DiskData(db);
+      final Data data = open(db);
+      Prop.fsmode = data.fs != null;
+      
       context.data(data);
       if(Prop.info) {
         if(data.meta.newindex) info(INDUPDATE + NL);

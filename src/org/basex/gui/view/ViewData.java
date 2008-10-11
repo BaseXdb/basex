@@ -3,7 +3,6 @@ package org.basex.gui.view;
 import org.basex.data.Data;
 import org.basex.data.XMLSerializer;
 import org.basex.gui.GUIProp;
-import org.basex.query.fs.FSUtils;
 import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
 
@@ -30,7 +29,7 @@ public final class ViewData {
   public static boolean isLeaf(final Data data, final int pre) {
     final int kind = data.kind(pre);
     if(kind == Data.ATTR) return true;
-    if(data.deepfs && FSUtils.isFile(data, pre)) return true;
+    if(data.fs != null && data.fs.isFile(pre)) return true;
 
     final int last = pre + (GUIProp.mapatts ? 1 : data.attSize(pre, kind));
     return last == data.size || data.parent(pre, kind) >=
@@ -44,7 +43,7 @@ public final class ViewData {
    * @return current path
    */
   public static byte[] path(final Data data, final int pre) {
-    if(data.deepfs) return FSUtils.getPath(data, pre);
+    if(data.fs != null) return data.fs.path(pre);
 
     int p = pre;
     int k = data.kind(p);
@@ -86,8 +85,8 @@ public final class ViewData {
    * @return name
    */
   public static byte[] tag(final Data data, final int pre) {
-    if(data.deepfs) {
-      final byte[] name = FSUtils.getName(data, pre);
+    if(data.fs != null) {
+      final byte[] name = data.fs.name(pre);
       if(name.length != 0) return name;
     }
 

@@ -17,7 +17,7 @@ public interface Commands {
     CLOSE(true), LIST(true), DROP(true), OPTIMIZE(true), EXPORT(true),
     // QUERY COMMANDS
     DUMMYQUERY(), XPATH(true), XPATHMV(false), XQUERY(true), XQUENV(),
-    FIND(true), XMARK(), CD(true), FS(true),
+    FIND(true), XMARK(), CS(true), BASH(true),
     // UPDATE COMMANDS
     DUMMYUPDATE(), COPY(true), DELETE(true), INSERT(true), UPDATE(true),
     // GENERAL COMMANDS
@@ -89,7 +89,7 @@ public interface Commands {
   enum DROP { DATABASE, DB, INDEX }
   
   /** Filesystem commands. */
-  enum FS { CAT, CD, CP, DU, LOCATE, LS, MKDIR, PWD, RM, TOUCH }
+  enum FS { CAT, CD, CP, DU, EXIT, HELP, LOCATE, LS, MKDIR, PWD, RM, TOUCH }
   
   /** Insert commands. */
   enum UPDATE { FRAGMENT, ELEMENT, TEXT, ATTRIBUTE, COMMENT, PI }

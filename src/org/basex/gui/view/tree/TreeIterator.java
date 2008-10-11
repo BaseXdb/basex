@@ -111,7 +111,7 @@ final class TreeIterator {
   boolean moreData(final Data data) {
     level = ll;
     int kind = data.kind(pre);
-    final boolean fs = data.deepfs;
+    final boolean fs = data.fs != null;
 
     final boolean[] open = view.opened;
     if(open == null) return false;

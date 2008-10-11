@@ -62,7 +62,8 @@ public final class FTNode {
    */
   FTNode(final int prevalue) {
     pre = prevalue;
-    ip = new IntList(prevalue);
+    ip = new IntList();
+    ip.add(prevalue);
     size = 1;
   }
 
@@ -200,7 +201,9 @@ public final class FTNode {
    * @return IntList
    */
   private IntList initNewPointer(final IntList n) {
-    return new IntList(p.get(0) > n.get(0) ? p.get(0) : n.get(0));
+    final IntList il = new IntList();
+    il.add(p.get(0) > n.get(0) ? p.get(0) : n.get(0));
+    return il;
   }
 
   /**

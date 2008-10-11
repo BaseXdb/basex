@@ -48,21 +48,19 @@ abstract class ACreate extends Process {
     try {
       if(Prop.onthefly) {
         context.data(new MemBuilder().build(p, db));
-        return true;
+      } else {
+        if(db.equals(DEEPDB)) return error(CREATENODEEPDB);
+  
+        context.close();
+        final Performance pp = new Performance();
+        builder = new DiskBuilder();
+        progress(builder);
+        final Data data = builder.build(p, db);
+        if(Prop.allInfo) info(CREATETABLE + NL, pp.getTimer());
+        builder = null;
+        index(data);
+        context.data(data);
       }
-
-      if(db.equals(DEEPDB)) return error(CREATENODEEPDB);
-
-      context.close();
-      final Performance pp = new Performance();
-      builder = new DiskBuilder();
-      progress(builder);
-      final Data data = builder.build(p, db);
-      if(Prop.allInfo) info(CREATETABLE + NL, pp.getTimer());
-      builder = null;
-      index(data);
-      context.data(data);
-      
       return Prop.info ? info(DBCREATED, db, perf.getTimer()) : true;
     } catch(final FileNotFoundException ex) {
       BaseX.debug(ex);

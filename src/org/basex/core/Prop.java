@@ -27,6 +27,8 @@ public final class Prop {
   public static final String WORK = System.getProperty("user.dir") + "/";
   /** User's home directory. */
   public static final String HOME = System.getProperty("user.home");
+  /** User name. */
+  public static final String USER = System.getProperty("user.name");
   /** OS Flag (should be ignored whenever possible). */
   public static final String OS = System.getProperty("os.name");
   /** Flag denoting if OS belongs to UNIX or Windows family. */
@@ -127,6 +129,8 @@ public final class Prop {
   public static boolean fsmeta = false;
   /** Maximum size for textual imports. */
   public static int fstextmax = 10240;
+  /** Filesystem mode. */
+  public static boolean fsmode = false;
 
   /** Levenshtein default error. */
   public static int lserr = 0;

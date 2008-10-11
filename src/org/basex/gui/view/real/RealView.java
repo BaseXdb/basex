@@ -9,7 +9,7 @@ import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.View;
-import org.basex.query.fs.DirIterator;
+import org.basex.query.ChildIterator;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -141,7 +141,8 @@ public final class RealView extends View {
     final Data data = GUI.context.data();
     int level = 0;
     sumNodeSizeInLine = data.size;
-    parentList = new IntList(root);
+    parentList = new IntList();
+    parentList.add(root);
     parentPos = null;
     while(parentList.size > 0) {
       drawTemperature(g, level);
@@ -167,7 +168,7 @@ public final class RealView extends View {
         continue;
       }
 
-      final DirIterator iterator = new DirIterator(data, p);
+      final ChildIterator iterator = new ChildIterator(data, p);
 
       if(i > 0) {
         temp.add(-1);
@@ -290,7 +291,7 @@ public final class RealView extends View {
   void drawTree(final Graphics g, final int root, final int lv,
       final int frameleft, final int space) {
     final Data data = GUI.context.data();
-    final DirIterator iterator = new DirIterator(data, root);
+    final ChildIterator iterator = new ChildIterator(data, root);
 
     final int level = lv + 1;
     final int nodetype = Data.ELEM;
@@ -457,7 +458,7 @@ public final class RealView extends View {
 
     drawPrePostNode(g, pre, post, lv);
 
-    final DirIterator iterator = new DirIterator(data, pre);
+    final ChildIterator iterator = new ChildIterator(data, pre);
 
     while(iterator.more()) {
       final int newPre = iterator.next();

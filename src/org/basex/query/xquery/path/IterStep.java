@@ -78,7 +78,7 @@ public final class IterStep extends Step {
           }
           nod = ir.next();
           if(nod != null) {
-            if(test.e(nod, ctx)) {
+            if(test.e(nod)) {
               // evaluates predicates
               boolean add = true;
 

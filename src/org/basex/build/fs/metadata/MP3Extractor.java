@@ -264,7 +264,7 @@ public final class MP3Extractor extends AbstractExtractor {
         builder.startElem(ID3, atts);
         
         for(int i = 0; i < frames.size() - 1; i += 2) {
-          builder.nodeAndText(frames.get(i), frames.get(i + 1));
+          builder.nodeAndText(frames.get(i), atts.reset(), frames.get(i + 1));
         }
         builder.endElem(ID3);
   
@@ -320,7 +320,7 @@ public final class MP3Extractor extends AbstractExtractor {
   private void add(final Builder builder, final byte[] tag, final byte[] value)
       throws IOException {
     if(value == null) return;
-    builder.nodeAndText(tag, value);
+    builder.nodeAndText(tag, atts.reset(), value);
   }
 
   /**
@@ -379,13 +379,14 @@ public final class MP3Extractor extends AbstractExtractor {
       }
     }
 
-    builder.nodeAndText(MP3CODEC, Token.concat(VERSIONS[vers], LAYERS[layr]));
-    builder.nodeAndText(MP3RATE, token(bitrate));
-    builder.nodeAndText(MP3SAMPLE, token(samples));
-    builder.nodeAndText(MP3MODE, MODES[mode]);
-    builder.nodeAndText(MP3EMPH, EMPH[emph]);
-    builder.nodeAndText(MP3ENCODE, ENCODE[encoding]);
-    builder.nodeAndText(MP3SEC, token(seconds));
+    builder.nodeAndText(MP3CODEC, atts.reset(),
+        Token.concat(VERSIONS[vers], LAYERS[layr]));
+    builder.nodeAndText(MP3RATE, atts, token(bitrate));
+    builder.nodeAndText(MP3SAMPLE, atts, token(samples));
+    builder.nodeAndText(MP3MODE, atts, MODES[mode]);
+    builder.nodeAndText(MP3EMPH, atts, EMPH[emph]);
+    builder.nodeAndText(MP3ENCODE, atts, ENCODE[encoding]);
+    builder.nodeAndText(MP3SEC, atts, token(seconds));
   }
 
   /**

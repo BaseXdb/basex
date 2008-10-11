@@ -1,7 +1,6 @@
 package org.basex.query.xquery.path;
 
 import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.QNm;
 import org.basex.query.xquery.item.Type;
@@ -32,7 +31,7 @@ public class KindTest extends Test {
   }
   
   @Override
-  public boolean e(final Nod tmp, final XQContext ctx) throws XQException {
+  public boolean e(final Nod tmp) throws XQException {
     return tmp.type != type ? false : name == null || tmp.qname(qname).eq(name);
   }
 

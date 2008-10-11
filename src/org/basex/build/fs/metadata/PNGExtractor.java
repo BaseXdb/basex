@@ -36,9 +36,8 @@ public final class PNGExtractor extends AbstractExtractor {
     final int h = ((data[20] & 0xFF) << 24) + ((data[21] & 0xFF) << 16) +
       ((data[22] & 0xFF) << 8) + (data[23] & 0xFF);
 
-    listener.nodeAndText(WIDTH, Token.token(w));
-    listener.nodeAndText(HEIGHT, Token.token(h));
-    
+    listener.nodeAndText(WIDTH, atts.reset(), Token.token(w));
+    listener.nodeAndText(HEIGHT, atts, Token.token(h));
     listener.endElem(IMAGE);
   }
 }

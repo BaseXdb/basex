@@ -154,7 +154,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     BaseXLayout.enable(filter, !GUIProp.filterrt && marked.size != 0);
     BaseXLayout.enable(exec, !GUIProp.execrt);
 
-    all.help(GUI.context.data().deepfs ? HELPSEARCHFS : HELPSEARCHXML);
+    all.help(GUI.context.data().fs != null ? HELPSEARCHFS : HELPSEARCHXML);
     if(GUIProp.showquery && panel.getComponentCount() == 0) {
       create();
       main.revalidate();

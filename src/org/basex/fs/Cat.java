@@ -1,4 +1,4 @@
-package org.basex.query.fs;
+package org.basex.fs;
 
 import static org.basex.Text.*;
 import java.io.IOException;
@@ -13,12 +13,9 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Hannes Schwarz - Hannes.Schwarz@gmail.com
  */
-public final class CAT extends FSCmd {
+public final class Cat extends FSCmd {
   /** Line Feed. */
   private static final byte LF = 10;
-  /** Carriage Return. */
-  private static final byte CR = 13;
-
   /**  Number the non-blank output lines, starting at 1.*/
   private boolean fnumberNonBlankLines;
   /** Number the output lines, starting at 1. */
@@ -29,7 +26,7 @@ public final class CAT extends FSCmd {
   @Override
   public void args(final String args) throws FSException {
     // get all Options
-    final GetOpts g = new GetOpts(args, "bhn");
+    final GetOpts g = new GetOpts(args, "bn");
     while(g.more()) {
       final int ch = checkOpt(g);
       switch (ch) {
@@ -49,31 +46,25 @@ public final class CAT extends FSCmd {
 
   @Override
   public void exec(final PrintOutput out) throws IOException {
-    final int[] nodes = checkPre(path,
-        FSUtils.getChildren(context.data(), curPre, path));
-
-    if(nodes.length == 1 && FSUtils.isDir(context.data(), nodes[0])) {
-      error(path, 21);
-    } else {
-      cat(nodes, out);
-    }
+    final int[] nodes = children(path);
+    if(nodes.length == 1 && fs.isDir(nodes[0])) error(path, 21);
+    cat(nodes, out);
   }
 
   /**
    * Performs a cat command.
    *
-   *  @param print The pre value of the file
+   *  @param nodes pre value of the files
    *  @param out output stream
    *  @throws IOException I/O exception
    */
-  private void cat(final int[] print, final PrintOutput out)
+  private void cat(final int[] nodes, final PrintOutput out)
       throws IOException {
     
-    for(final int nodeToPrint : print) {
-      if(FSUtils.isDir(context.data(), nodeToPrint)) continue;
+    for(final int pre : nodes) {
+      if(fs.isDir(pre)) continue;
 
-      final IO io = IO.get(Token.string(
-          FSUtils.getPath(context.data(), nodeToPrint)));
+      final IO io = IO.get(Token.string(fs.path(pre)));
       int numberLines = 1;
       if(io.exists()) {
         final byte[] content = io.content();
@@ -82,7 +73,7 @@ public final class CAT extends FSCmd {
           final byte c = content[i];
           if(fnumberLines || fnumberNonBlankLines) {
             // Firstline
-            if(fnumberNonBlankLines && lastChar == 0 && c != CR && c != LF) {
+            if(fnumberNonBlankLines && lastChar == 0 && c != LF) {
               out.print(numberLines++ + " ");
               out.print((char) c);
               lastChar = c;
@@ -96,8 +87,7 @@ public final class CAT extends FSCmd {
                 out.print((char) c);
               }
               //  after line 1
-            } else if (fnumberNonBlankLines && lastChar == LF &&
-                c != CR && c != LF) {
+            } else if (fnumberNonBlankLines && lastChar == LF && c != LF) {
               out.print(numberLines++ + " ");
               out.print((char) c);
               lastChar = c;
@@ -114,7 +104,7 @@ public final class CAT extends FSCmd {
         }
         out.print(NL);
       } else {
-        error(FSUtils.getName(context.data(), nodeToPrint), 21);
+        error(io, 2);
       }
     }
   }

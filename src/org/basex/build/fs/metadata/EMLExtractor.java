@@ -144,7 +144,7 @@ public final class EMLExtractor extends AbstractExtractor {
    */
   private void printException(final Builder listener, final String s)
       throws IOException {
-    listener.nodeAndText(token("Exception"), token(s));
+    listener.nodeAndText(token("Exception"), atts.reset(), token(s));
   }
 
   /**
@@ -192,7 +192,8 @@ public final class EMLExtractor extends AbstractExtractor {
       // check simple attributes
       for(int i = 0; i < EMLATTR.length; i++) {
         if(type.equals(EMLATTR[i])) {
-          listener.nodeAndText(ATTRIBUTETOKENS[i], token(mCurrLine));
+          listener.nodeAndText(ATTRIBUTETOKENS[i], atts.reset(),
+              token(mCurrLine));
           return;
         }
       }
@@ -278,7 +279,7 @@ public final class EMLExtractor extends AbstractExtractor {
         // store content type
         final String contentType = type.toLowerCase();
         mContentType = contentType.split("/")[0];
-        listener.nodeAndText(EMLCONTENTTYPE, token(contentType));
+        listener.nodeAndText(EMLCONTENTTYPE, atts.reset(), token(contentType));
       } else if(type.trim().startsWith("boundary=")) {
         // store boundary
         mBoundary = type.split("boundary=")[1];
@@ -309,7 +310,7 @@ public final class EMLExtractor extends AbstractExtractor {
     }
 
     for(final Matcher m = MAILPATTERN.matcher(addressPool); m.find();) {
-      listener.nodeAndText(EMLTO, token(m.group()));
+      listener.nodeAndText(EMLTO, atts.reset(), token(m.group()));
     }
   }
 
@@ -348,7 +349,7 @@ public final class EMLExtractor extends AbstractExtractor {
         if(text[i] == 0x5f) text[i] = 0x20;
       }
     }
-    listener.nodeAndText(EMLSUBJECT, text);
+    listener.nodeAndText(EMLSUBJECT, atts.reset(), text);
   }
 
   /**
@@ -359,7 +360,7 @@ public final class EMLExtractor extends AbstractExtractor {
   private void getSender(final Builder listener) throws IOException {
     final Matcher m = MAILPATTERN.matcher(mCurrLine);
     if(m.find()) {
-      listener.nodeAndText(EMLFROM, token(m.group()));
+      listener.nodeAndText(EMLFROM, atts.reset(), token(m.group()));
     } else {
       printException(listener, mCurrLine);
     }

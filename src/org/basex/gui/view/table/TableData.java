@@ -74,7 +74,7 @@ public final class TableData {
     last = "";
     rowH = 1;
 
-    if(data.deepfs) {
+    if(data.fs != null) {
       rootTag = data.tags.id(DataText.FILE);
       addCol("suffix", false);
       addCol("name", false);
@@ -262,7 +262,7 @@ public final class TableData {
     final boolean e = elms.list[sortCol];
 
     final Data data = GUI.context.data();
-    final boolean fsxml = data.deepfs;
+    final boolean fs = data.fs != null;
     final byte[][] tokens = new byte[rows.size][];
 
     for(int r = 0; r < rows.size; r++) {
@@ -275,12 +275,12 @@ public final class TableData {
           tokens[r] = data.atom(p);
           break;
         }
-        p += fsxml ? 1 : data.attSize(p, k);
+        p += fs ? 1 : data.attSize(p, k);
       }
       if(tokens[r] == null || tokens[r].length == 0) tokens[r] = LAST;
       else if(tokens[r][0] < 0) tokens[r][0] = 126;
     }
-    rows.sort(tokens, !e && data.deepfs &&
+    rows.sort(tokens, !e && fs &&
         (c == data.atts.id(DataText.SIZE) ||
          c == data.atts.id(DataText.MTIME)), asc);
   }

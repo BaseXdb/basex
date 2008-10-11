@@ -1,4 +1,4 @@
-package org.basex.query.fs;
+package org.basex.fs;
 
 import java.io.IOException;
 import org.basex.data.Nodes;
@@ -10,7 +10,7 @@ import org.basex.io.PrintOutput;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Hannes Schwarz - Hannes.Schwarz@gmail.com
  */
-public final class CD extends FSCmd {
+public final class Cd extends FSCmd {
   /** Specified path. */
   private String path;
 
@@ -23,11 +23,8 @@ public final class CD extends FSCmd {
   @Override
   public void exec(final PrintOutput out) throws IOException {
     // if there is path expression go to work
-    if(path != null) {
-      curPre = checkPre(path, FSUtils.goToDir(context.data(), curPre, path));
-      context.current(new Nodes(curPre, context.data()));
-    } else {
-      context.current(new Nodes(FSUtils.getROOTDIR(), context.data()));
-    }
+    if(path != null) curPre(path);
+    else curPre = DataFS.ROOTDIR;
+    context.current(new Nodes(curPre, context.data()));
   }
 }

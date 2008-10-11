@@ -68,6 +68,8 @@ public final class IOFile extends IO {
     // return cached content
     if(is instanceof ZipInputStream || path.endsWith(ZIPSUFFIX)) {
       // doesn't work yet with several zip entries
+      //  (only works with internal parser as default XML parser
+      //   seems to close the input stream)
       if(is == null) is = new ZipInputStream(new FileInputStream(file));
       else return false;
 
@@ -81,7 +83,7 @@ public final class IOFile extends IO {
           if(!e.isDirectory()) break;
         }
       }
-      more = true;
+      more = is != null;
     } else if(path.endsWith(GZSUFFIX)) {
       if(is == null) is = new GZIPInputStream(new FileInputStream(file));
       else return false;

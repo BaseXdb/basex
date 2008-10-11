@@ -144,16 +144,6 @@ public final class TokenBuilder {
   }
 
   /**
-   * Adds a string and fills up with spaces.
-   * @param s the string to be added
-   * @param l maximum string length
-   */
-  public void add(final String s, final int l) {
-    add(s);
-    for(int i = 0; i < l - s.length(); i++) add(' ');
-  }
-
-  /**
    * Replaces all % characters in the input string by the specified extension
    * objects, which can be byte arrays or any other object.
    * If a digit is found after %, it is interpreted as insertion position.

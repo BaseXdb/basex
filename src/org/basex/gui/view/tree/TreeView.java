@@ -25,7 +25,6 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewData;
-import org.basex.query.fs.FSUtils;
 import org.basex.util.Array;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -225,8 +224,9 @@ public final class TreeView extends View {
     g.setColor(GUIConstants.color2);
     g.drawLine(2, y + boxMargin - 1, totalW - 5, y + boxMargin - 1);
 
-    final boolean file = data.deepfs && FSUtils.isFile(data, pre);
-    final boolean dir = data.deepfs && FSUtils.isDir(data, pre);
+    final boolean fs = data.fs != null;
+    final boolean file = fs && data.fs.isFile(pre);
+    final boolean dir = fs && data.fs.isDir(pre);
     final byte[] name = file || dir ? ViewData.tag(data, pre) :
       ViewData.content(data, pre, false);
 
@@ -240,7 +240,7 @@ public final class TreeView extends View {
     final int yy = y;
 
     if(elem) {
-      if(data.deepfs) {
+      if(fs) {
         // print file icon
         Image img = null;
         if(file) {
@@ -263,7 +263,7 @@ public final class TreeView extends View {
 
     int tw = totalW + 6;
     if(file && tw - xx > 140) {
-      final long size = Token.toLong(FSUtils.getSize(data, pre));
+      final long size = Token.toLong(data.fs.size(pre));
       final String text = Performance.formatSize(size, false);
       tw -= BaseXLayout.width(g, text) + 10;
       g.drawString(text, tw, yy);
@@ -431,8 +431,10 @@ public final class TreeView extends View {
       return;
 
     // launch a program
-    if(getCursor() == GUIConstants.CURSORHAND)
-      FSUtils.launch(GUI.context.data(), focused);
+    final Data data = GUI.context.data();
+    if(getCursor() == GUIConstants.CURSORHAND && data.fs != null) {
+      data.fs.launch(focused);
+    }
   }
 
   @Override
@@ -464,13 +466,13 @@ public final class TreeView extends View {
     int kind = data.kind(focusPre);
     int key = e.getKeyCode();
 
+    final boolean fs = data.fs != null;
     if(e.isShiftDown() && key == KeyEvent.VK_ENTER && focusPre != -1) {
       // launch file
-      FSUtils.launch(data, focused);
+      if(fs) data.fs.launch(focused);
     } else if(key == KeyEvent.VK_RIGHT || key == KeyEvent.VK_LEFT) {
       // open/close subtree
       final boolean open = key == KeyEvent.VK_RIGHT;
-      final boolean fs = data.deepfs;
       if(e.isShiftDown()) {
         opened[focusPre] = open;
         final int s = data.size;

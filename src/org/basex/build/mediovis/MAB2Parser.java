@@ -134,7 +134,7 @@ public final class MAB2Parser extends Parser {
 
     builder = b;
     builder.startDoc(token(io.name()));
-    builder.startElem(LIBRARY, null);
+    builder.startElem(LIBRARY, atts.reset());
 
     // find file offsets of all titles
     final Performance p = new Performance();
@@ -432,7 +432,7 @@ public final class MAB2Parser extends Parser {
    * @throws IOException in case of parse or write problems
    */
   private void addTag(final byte[] tag, final byte[] cont) throws IOException {
-    if(cont != null) builder.nodeAndText(tag, cont);
+    if(cont != null) builder.nodeAndText(tag, atts.reset(), cont);
   }
 
   /**

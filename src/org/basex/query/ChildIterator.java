@@ -1,4 +1,4 @@
-package org.basex.query.fs;
+package org.basex.query;
 
 import org.basex.data.Data;
 import org.basex.util.IntList;
@@ -10,7 +10,7 @@ import org.basex.util.IntList;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class DirIterator {
+public final class ChildIterator {
   /** Data reference. */
   final Data data;
   /** Maximum size. */
@@ -23,7 +23,7 @@ public final class DirIterator {
    * @param d data reference
    * @param p value of directory node
    */
-  public DirIterator(final Data d, final int p) {
+  public ChildIterator(final Data d, final int p) {
     data = d;
     init(p);
   }

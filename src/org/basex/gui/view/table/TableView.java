@@ -16,7 +16,6 @@ import org.basex.gui.layout.BaseXBar;
 import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewData;
-import org.basex.query.fs.FSUtils;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -208,7 +207,7 @@ public final class TableView extends View implements Runnable {
     final String str = content.focusedString;
     final Data data = GUI.context.data();
     GUI.get().cursor(valid && (str != null &&
-        str.length() <= Token.MAXLEN || data.deepfs && tdata.mouseX < 20) ?
+        str.length() <= Token.MAXLEN || data.fs != null && tdata.mouseX < 20) ?
         GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
   }
 
@@ -222,7 +221,7 @@ public final class TableView extends View implements Runnable {
   public void mousePressed(final MouseEvent e) {
     super.mousePressed(e);
     final Data data = GUI.context.data();
-    if(tdata.invalid || data.deepfs && tdata.mouseX < 20) return;
+    if(tdata.invalid || data.fs != null && tdata.mouseX < 20) return;
     
     if(e.getY() < header.getHeight()) return;
     
@@ -261,8 +260,8 @@ public final class TableView extends View implements Runnable {
   public void mouseClicked(final MouseEvent e) {
     final Data data = GUI.context.data();
     
-    if(data.deepfs && tdata.mouseX < 20) {
-      FSUtils.launch(data, ViewData.parent(data, focused));
+    if(data.fs != null && tdata.mouseX < 20) {
+      data.fs.launch(ViewData.parent(data, focused));
     }
   }
   

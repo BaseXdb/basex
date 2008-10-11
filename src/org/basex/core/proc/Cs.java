@@ -3,17 +3,17 @@ package org.basex.core.proc;
 import org.basex.data.Nodes;
 
 /**
- * Evaluates the 'cd' command.
+ * Evaluates the 'cs' command.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Cd extends AQuery {
+public final class Cs extends AQuery {
   /**
    * Constructor.
    * @param q query
    */
-  public Cd(final String q) {
+  public Cs(final String q) {
     super(DATAREF, q);
   }
   

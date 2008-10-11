@@ -34,8 +34,8 @@ public final class GIFExtractor extends AbstractExtractor {
     final int w = (data[6] & 0xFF) + ((data[7] & 0xFF) << 8);
     final int h = (data[8] & 0xFF) + ((data[9] & 0xFF) << 8);
 
-    listener.nodeAndText(WIDTH, Token.token(w));
-    listener.nodeAndText(HEIGHT, Token.token(h));
+    listener.nodeAndText(WIDTH, atts.reset(), Token.token(w));
+    listener.nodeAndText(HEIGHT, atts, Token.token(h));
 
     listener.endElem(IMAGE);
   }

@@ -39,8 +39,10 @@ public final class FTMildNotExprs extends FTArrayExpr {
       else return n0;
     } 
     
-    final IntList pos = new IntList(n0.getPre());
-    final IntList poi = new IntList(n0.getNumTokens());
+    final IntList pos = new IntList();
+    pos.add(n0.getPre());
+    final IntList poi = new IntList();
+    poi.add(n0.getNumTokens());
     
     if (n0.getPre() < n1.getPre()) {
       return n0;

@@ -10,7 +10,7 @@ import org.basex.core.Commands.INDEX;
 import org.basex.core.Commands.INFO;
 import org.basex.core.Commands.SET;
 import org.basex.core.Commands.UPDATE;
-import org.basex.core.proc.Cd;
+import org.basex.core.proc.Cs;
 import org.basex.core.proc.Check;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.Copy;
@@ -54,7 +54,6 @@ import org.basex.query.xquery.XQParser;
 import org.basex.util.Array;
 import org.basex.util.Levenshtein;
 import org.basex.util.StringList;
-import org.basex.util.Token;
 
 /**
  * This is a parser for command strings, creating {@link Process} instances.
@@ -94,9 +93,20 @@ public final class CommandParser extends QueryParser {
     Process[] list = new Process[0];
     if(!more()) return list;
 
+    boolean fsmode = Prop.fsmode;
     while(true) {
-      final COMMANDS cmd = consume(COMMANDS.class, null);
-      list = Array.add(list, parse(cmd));
+      Process proc;
+      COMMANDS cmd = null;
+      if(fsmode) {
+        cmd = COMMANDS.BASH;
+        proc = new Fs(consume(FS.class, cmd).name(), path(null, false));
+        if(FS.valueOf(proc.args[0]) == Commands.FS.EXIT) fsmode = false;
+      } else {
+        cmd = consume(COMMANDS.class, null);
+        proc = parse(cmd);
+        if(proc instanceof Fs) fsmode = true;
+      }
+      list = Array.add(list, proc);
       consumeWS();
       if(!more()) return list;
       if(!consume(';')) help(null, cmd);
@@ -170,10 +180,8 @@ public final class CommandParser extends QueryParser {
         return new Find(path(cmd, false));
       case XMARK:
         return new XMark(number(cmd));
-      case CD:
-        return new Cd(xpath(null));
-      case FS:
-        return new Fs(consume(FS.class, cmd).name(), xpath(null));
+      case CS:
+        return new Cs(xpath(null));
       case COPY:
         return new Copy(number(cmd), xpath(cmd), xpath(cmd));
       case DELETE:
@@ -244,6 +252,8 @@ public final class CommandParser extends QueryParser {
         return new GetResult(number(null));
       case GETINFO:
         return new GetInfo(number(null));
+      case BASH:
+        return new Fs();
       case EXIT:
       case QUIT:
         return new Exit();
@@ -385,10 +395,12 @@ public final class CommandParser extends QueryParser {
       help(alt, par);
     }
 
-    final byte[] name = Token.lc(Token.token(token));
-    for(final String a : alt.finish()) {
-      final byte[] sim = Token.lc(Token.token(a));
-      if(Levenshtein.similar(name, sim)) error(alt, CMDSIMILAR, name, sim);
+    // find similar commands
+    final byte[] name = lc(token(token));
+    for(final Enum<?> e : cmp.getEnumConstants()) {
+      if(e instanceof COMMANDS && !((COMMANDS) e).official) continue;
+      final byte[] sm = lc(token(e.name()));
+      if(Levenshtein.similar(name, sm)) error(alt, CMDSIMILAR, name, sm);
     }
 
     if(par == null) error(alt, CMDWHICH, token);
@@ -404,6 +416,9 @@ public final class CommandParser extends QueryParser {
    */
   private void help(final StringList alt, final COMMANDS cmd)
       throws QueryException {
+    
+    if(cmd == COMMANDS.BASH) throw new QueryException(
+        org.basex.fs.Help.help(""));
     error(alt, PROCSYNTAX, cmd.help(true, true));
   }
 

@@ -2,26 +2,31 @@ package org.basex.core.proc;
 
 import static org.basex.Text.*;
 import java.io.IOException;
+import org.basex.BaseX;
+import org.basex.core.Commands;
 import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.core.Commands.FS;
+import org.basex.data.Data;
+import org.basex.data.Nodes;
+import org.basex.fs.Cat;
+import org.basex.fs.Cd;
+import org.basex.fs.Cp;
+import org.basex.fs.Du;
+import org.basex.fs.DataFS;
+import org.basex.fs.FSCmd;
+import org.basex.fs.FSException;
+import org.basex.fs.Help;
+import org.basex.fs.Locate;
+import org.basex.fs.Ls;
+import org.basex.fs.Mkdir;
+import org.basex.fs.Pwd;
+import org.basex.fs.Rm;
+import org.basex.fs.Touch;
 import org.basex.io.PrintOutput;
-import org.basex.query.fs.CAT;
-import org.basex.query.fs.CD;
-import org.basex.query.fs.CP;
-import org.basex.query.fs.DU;
-import org.basex.query.fs.FSCmd;
-import org.basex.query.fs.FSException;
-import org.basex.query.fs.LOCATE;
-import org.basex.query.fs.LS;
-import org.basex.query.fs.MKDIR;
-import org.basex.query.fs.PWD;
-import org.basex.query.fs.RM;
-import org.basex.query.fs.TOUCH;
 
 /**
- * Evaluates the 'close' command. Removes the current database from
- * memory and releases memory resources.
+ * Evaluates the 'fs' command.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
@@ -40,43 +45,64 @@ public final class Fs extends Process {
   
   @Override
   protected boolean exec() {
+    if(context.data().fs == null) return error(PROCNOFS);
+    if(args.length == 0) return fsmode(true);
+    
     try {
+      final Commands.FS cmd = FS.valueOf(args[0]);
+      if(cmd == Commands.FS.EXIT) return fsmode(false);
+      
       // evaluate arguments...
-      fs = cmd(args[0]);
+      fs = cmd(cmd);
       fs.context(context);
       fs.args(args[1] == null ? "" : args[1]);
       return true;
     } catch(final FSException ex) {
       // internal command info..
+      BaseX.debug(ex);
       return error(ex.getMessage());
     }
   }
   
   /**
-   * Returns a filesystem command for the specified argument.
-   * @param c command
+   * Returns an instance for the specified command.
+   * @param cmd command
    * @return command
    */
-  private FSCmd cmd(final String c) {
-    switch(FS.valueOf(c)) {
-      case CAT:     return new CAT();
-      case CD:      return new CD();
-      case CP:      return new CP();
-      case DU:      return new DU();
-      case LOCATE:  return new LOCATE();
-      case LS:      return new LS();
-      case MKDIR:   return new MKDIR();
-      case PWD:     return new PWD();
-      case RM:      return new RM();
-      case TOUCH:   return new TOUCH();
-      default:      return null;
+  private FSCmd cmd(final Commands.FS cmd) {
+    switch(cmd) {
+      case CAT:     return new Cat();
+      case CD:      return new Cd();
+      case CP:      return new Cp();
+      case DU:      return new Du();
+      case HELP:    return new Help();
+      case LOCATE:  return new Locate();
+      case LS:      return new Ls();
+      case MKDIR:   return new Mkdir();
+      case PWD:     return new Pwd();
+      case RM:      return new Rm();
+      case TOUCH:   return new Touch();
+      default:      BaseX.notexpected(cmd); return null;
     }
+  }
+  
+  /**
+   * Start/stop filesystem mode.
+   * @param start start flag
+   * @return true
+   */
+  private boolean fsmode(final boolean start) {
+    final Data data = context.data();
+    context.current(start ? new Nodes(DataFS.ROOTDIR, data) :
+      new Nodes(data.doc(), context.data()));
+    Prop.fsmode = start;
+    return true;
   }
 
   @Override
   protected void out(final PrintOutput out) throws IOException {
     try {
-      fs.exec(out);
+      if(fs != null) fs.exec(out);
       if(Prop.info) info(PROCTIME, perf.getTimer());
     } catch(final FSException ex) {
       // exception.. print as normal text

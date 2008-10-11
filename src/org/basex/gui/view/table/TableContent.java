@@ -67,8 +67,6 @@ public final class TableContent extends BaseXBack {
 
     final int rfocus = tdata.getRoot(data, View.focused);
     final int focus = View.focused;
-    
-    final boolean fs = data.deepfs;
     int mpos = 0;
 
     final int nCols = tdata.cols.size;
@@ -148,7 +146,7 @@ public final class TableContent extends BaseXBack {
 
         final byte[] str = tb[c].size != 0 ? tb[c].finish() : null;
         if(str != null) {
-          if(fs && c == 0) {
+          if(data.fs != null && c == 0) {
             g.drawImage(GUIFS.images(str, false), (int) x + 1, posY + 3, this);
             x += 20;
             cw -= 20;

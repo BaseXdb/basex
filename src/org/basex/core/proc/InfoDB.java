@@ -51,7 +51,7 @@ public final class InfoDB extends AInfo {
     
     final File dir = IO.dbpath(meta.dbname);
     long len = 0;
-    for(final File f : dir.listFiles()) len += f.length();
+    if(dir.exists()) for(final File f : dir.listFiles()) len += f.length();
 
     final TokenBuilder tb = new TokenBuilder();
     final int l = maxLength(new String[] {

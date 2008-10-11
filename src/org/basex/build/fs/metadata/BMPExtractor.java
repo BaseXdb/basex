@@ -34,8 +34,8 @@ public final class BMPExtractor extends AbstractExtractor {
 
     // open image tag
     listener.startElem(IMAGE, atts.set(TYPE, TYPEBMP));
-    listener.nodeAndText(WIDTH, Token.token(w));
-    listener.nodeAndText(HEIGHT, Token.token(h));
+    listener.nodeAndText(WIDTH, atts.reset(), Token.token(w));
+    listener.nodeAndText(HEIGHT, atts, Token.token(h));
     listener.endElem(IMAGE);
   }
 }

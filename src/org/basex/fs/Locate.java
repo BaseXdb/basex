@@ -1,4 +1,4 @@
-package org.basex.query.fs;
+package org.basex.fs;
 
 import static org.basex.Text.*;
 import java.io.IOException;
@@ -17,10 +17,10 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Hannes Schwarz - Hannes.Schwarz@gmail.com
  */
-public final class LOCATE extends FSCmd {
+public final class Locate extends FSCmd {
   /** limit output. */
   private boolean lFlag = false;
-  /** Just print filesfound. */
+  /** Just print number of found files. */
   private boolean cFlag = false;
   /** filename to search for. */
   private String path;
@@ -34,7 +34,7 @@ public final class LOCATE extends FSCmd {
   @Override
   public void args(final String args) throws FSException {
     // get all Options
-    final GetOpts g = new GetOpts(args, "chl:V:");
+    final GetOpts g = new GetOpts(args, "cl:V:");
     while(g.more()) {
       final int ch = checkOpt(g);
       switch (ch) {
@@ -54,11 +54,7 @@ public final class LOCATE extends FSCmd {
       }
     }
     path = g.getPath();
-    // no file/path was specified...
     if(path == null) error("", 100);
-
-    //out.print("usage: locate  [-l limit] [-c] [-h] -V 1 ...");
-    //out.print(NL);
   }
 
   @Override
@@ -69,21 +65,19 @@ public final class LOCATE extends FSCmd {
     //            3 = use xquery + index
     switch (version) {
       case '1':
-        path = FSUtils.transformToRegex(path);
-        locateTable(FSUtils.getROOTDIR(), out);
+        path = fs.regex(path);
+        locateTable(DataFS.ROOTDIR, out);
         break;
       case '2':
         locateXQuery(out);
         break;
       default:
-        path = FSUtils.transformToRegex(path);
-        locateTable(FSUtils.getROOTDIR(), out);
+        path = fs.regex(path);
+        locateTable(DataFS.ROOTDIR, out);
       break;
     }
 
-    if(cFlag) {
-      printCount(out);
-    }
+    if(cFlag) printCount(out);
   }
 
   /**
@@ -96,16 +90,16 @@ public final class LOCATE extends FSCmd {
       throws IOException {
 
     if(!lFlag || filesfound < limit) {
-      final int[] contentDir = FSUtils.getChildren(data, pre);
+      final int[] contentDir = fs.children(pre);
       final IntList res = new IntList();
 
       for(final int i : contentDir) {
-        if(FSUtils.isDir(data, i)) {
-          final byte[] name = FSUtils.getName(data, i);
-          path = FSUtils.transformToRegex(path);
+        if(fs.isDir(i)) {
+          final byte[] name = fs.name(i);
+          path = fs.regex(path);
           if(Pattern.matches(path, Token.string(name))) {
             if(!cFlag) {
-              out.print(FSUtils.getPath(data, i));
+              out.print(fs.path(i));
               out.print(NL);
             }
             ++filesfound;
@@ -113,14 +107,14 @@ public final class LOCATE extends FSCmd {
           } else {
             res.add(i);
           }
-        } else if(FSUtils.isFile(data, i)) {
+        } else if(fs.isFile(i)) {
           // if found print with path
-          final byte[] name = FSUtils.getName(data, i);
+          final byte[] name = fs.name(i);
           //if(Token.eq(name, fileToFindByte)) {
           if(Pattern.matches(path, Token.string(name))) {
             ++filesfound;
             if(!cFlag) {
-              out.print(FSUtils.getPath(data, i));
+              out.print(fs.path(i));
               out.print(NL);
             }
           }
@@ -162,7 +156,7 @@ public final class LOCATE extends FSCmd {
       filesfound = result.size;
       if(!cFlag) {
         for(int i = 0; i < filesfound && (!lFlag || i < limit); i++) {
-          out.println(FSUtils.getPath(data, result.nodes[i]));
+          out.println(fs.path(result.nodes[i]));
         }
       }
     } catch(final QueryException e) {
@@ -177,7 +171,6 @@ public final class LOCATE extends FSCmd {
    */
   private String filter(final String name) {
     return "[contains(@name, \"" + name + "\")]";
-    //return "[@name=\"" + name + "\"]";
   }
 
 
@@ -189,15 +182,15 @@ public final class LOCATE extends FSCmd {
    */
   private void printDir(final int i, final PrintOutput out) throws IOException {
     final int toScan = i;
-    final int[] subContentDir = FSUtils.getChildren(data, toScan);
+    final int[] subContentDir = fs.children(toScan);
     final IntList allDir = new IntList();
 
     for(final int j : subContentDir) {
       if(!cFlag) {
-        out.print(FSUtils.getPath(data, j));
+        out.print(fs.path(j));
         out.print(NL);
       }
-      if(FSUtils.isDir(data, j)) {
+      if(fs.isDir(j)) {
         allDir.add(j);
       }
       ++filesfound;

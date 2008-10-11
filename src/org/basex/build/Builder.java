@@ -364,12 +364,13 @@ public abstract class Builder extends Progress {
    * Convenience method for adding a tag and a text node;
    * called by the building instance.
    * @param tag the tag to be processed
+   * @param att attributes
    * @param txt text node
    * @throws IOException in case of parsing or writing problems
    */
-  public final void nodeAndText(final byte[] tag, final byte[] txt)
-      throws IOException {
-    startElem(tag, null);
+  public final void nodeAndText(final byte[] tag, final Atts att,
+      final byte[] txt) throws IOException {
+    startElem(tag, att);
     text(new TokenBuilder(txt), false);
     endElem(tag);
   }

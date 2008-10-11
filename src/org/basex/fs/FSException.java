@@ -1,6 +1,5 @@
-package org.basex.query.fs;
+package org.basex.fs;
 
-import static org.basex.query.fs.FSText.*;
 import java.io.IOException;
 import org.basex.BaseX;
 
@@ -15,7 +14,9 @@ public final class FSException extends IOException {
   private static final String[] FSERR = new String[128];
 
   // Initializes the error strings after the first class class.
-  static { for(final String[] c : CODES) FSERR[Integer.parseInt(c[0])] = c[1]; }
+  static {
+    for(final String[] c : FSText.CODES) FSERR[Integer.parseInt(c[0])] = c[1];
+  }
 
   /**
    * Constructor.
@@ -42,9 +43,9 @@ public final class FSException extends IOException {
    * @param c error code
    * @return error string
    */
-  private static String error(final String cmd, final Object s, final int c) {
+  public static String error(final String cmd, final Object s, final int c) {
     final int e = Math.min(c, FSERR.length - 1);
     final String err = FSERR[e] != null ? FSERR[e] : FSERR[0];
-    return BaseX.info("%: %: %", cmd, s, err);
+    return BaseX.info("%: \"%\" %", cmd, s, err);
   }
 }

@@ -91,7 +91,7 @@ public final class FSParser extends Parser implements FSVisitor {
    */
   public void preTraversal(final String path, final boolean docOpen)
       throws IOException {
-    if(docOpen) builder.startElem(DEEPFS, null);
+    if(docOpen) builder.startElem(DEEPFS, atts.reset());
     builder.startElem(DIR, atts.set(NAME, token(path)));
   }
 
@@ -145,7 +145,9 @@ public final class FSParser extends Parser implements FSVisitor {
         }
         if(s == size) {
           while(--s >= 0 && cache[s] <= 0x20 && cache[s] >= 0);
-          if(++s != 0) builder.nodeAndText(CONTENT, Array.finish(cache, s));
+          if(++s != 0) {
+            builder.nodeAndText(CONTENT, atts.reset(), Array.finish(cache, s));
+          }
         }
       }
     }

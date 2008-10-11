@@ -200,7 +200,7 @@ public final class GUI extends JFrame {
         if(s == t || !mode.isEnabled()) return;
 
         input.setText("");
-        input.help(s == 0 ? context.data().deepfs ? HELPSEARCHFS :
+        input.help(s == 0 ? context.data().fs != null ? HELPSEARCHFS :
           HELPSEARCHXML : s == 1 ? HELPXPATH : HELPCMD);
 
         exec.setEnabled(s == 2 || !GUIProp.execrt);
@@ -664,7 +664,7 @@ public final class GUI extends JFrame {
     final int t = mode.getSelectedIndex();
     final int s = !db ? 2 : GUIProp.searchmode;
 
-    input.help(s == 0 ? data.deepfs ? HELPSEARCHFS : HELPSEARCHXML :
+    input.help(s == 0 ? data.fs != null ? HELPSEARCHFS : HELPSEARCHXML :
       s == 1 ? HELPXPATH : HELPCMD);
     mode.setEnabled(db);
     exec.setEnabled(s == 2 || !GUIProp.execrt);

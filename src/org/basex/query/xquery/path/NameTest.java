@@ -2,10 +2,10 @@ package org.basex.query.xquery.path;
 
 import static org.basex.util.Token.*;
 import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.QNm;
 import org.basex.query.xquery.item.Type;
+import org.basex.query.xquery.item.Uri;
 
 /**
  * XQuery Name Test.
@@ -14,51 +14,54 @@ import org.basex.query.xquery.item.Type;
  * @author Christian Gruen
  */
 public final class NameTest extends Test {
+  /** Test types. */
+  public enum TYPE {
+    /** Accept all nodes (*).     */ ALL,
+    /** Test names (*:tag).       */ NAME,
+    /** Test namespaces (pre:*).  */ NS,
+    /** Test all nodes (pre:tag). */ STD
+  };
   /** Local name. */
   private byte[] ln;
-  /** Prefix flag. */
-  private boolean pre;
-  /** Namespace wildcard flag. */
-  private boolean wild;
+  /** Test type. */
+  private TYPE test;
 
   /**
-   * Empty Constructor ("*" test).
+   * Empty Constructor ('*').
    */
-  public NameTest() { }
+  public NameTest() {
+    test = TYPE.ALL;
+  }
 
   /**
    * Constructor.
-   * @param n name
-   * @param ctx xquery context
-   * @param w wildcard flag
-   * @throws XQException evaluation exception
+   * @param nm name
+   * @param t test type
    */
-  public NameTest(final byte[] n, final boolean w, final XQContext ctx)
-      throws XQException {
-    
-    name = new QNm(n, ctx);
+  public NameTest(final QNm nm, final TYPE t) {
+    name = nm;
     ln = name.ln();
-    pre = !eq(ln, name.str());
-    wild = w;
+    test = t;
   }
   
   @Override
-  public boolean e(final Nod tmp, final XQContext ctx) throws XQException {
+  public boolean e(final Nod tmp) throws XQException {
+    // only elements and attributes will yield results
     if(tmp.type != Type.ELM && tmp.type != Type.ATT) return false;
-
-    // wildcard - accepting all names
-    if(name == null) return true;
-
-    // namespace wildcard
-    if(wild) return eq(ln, ln(tmp.nname()));
-
-    // namespace and name
+    
+    if(test == TYPE.ALL) return true;
+    if(test == TYPE.NAME) return eq(ln, ln(tmp.nname()));
+    
     final QNm nm = tmp.qname(qname);
-    return !pre && !nm.ns() ? eq(ln, nm.str()) : name.eq(nm);
+    return test == TYPE.NS ? nm.uri.eq(name.uri) : name.eq(nm);
   }
 
   @Override
   public String toString() {
-    return name != null ? string(name.str()) : "*";
+    if(test == TYPE.ALL) return "*";
+    if(test == TYPE.NAME) return "*:" + string(name.str());
+    final String uri = name.uri == Uri.EMPTY || name.ns() ? "" :
+      "{" + string(name.uri.str()) + "}";
+    return uri + (test == TYPE.NS ? "*" : string(name.str()));
   }
 }

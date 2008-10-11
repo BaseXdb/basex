@@ -115,7 +115,7 @@ public class BaseXClient {
     String input = null;
     do {
       process(new Prompt(), false);
-      input = input(INPUT);
+      input = input("");
       if("xquery".equals(input)) {
         String in = "";
         while((in = input(INPUTCONT)).length() != 0) input += " " + in;

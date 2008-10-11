@@ -66,8 +66,10 @@ public final class Atts {
 
   /**
    * Resets the integer list.
+   * @return self reference
    */
-  public void reset() {
+  public Atts reset() {
     size = 0;
+    return this;
   }
 }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
+import org.basex.fs.DataFS;
 import org.basex.util.Performance;
 
 /**
@@ -71,7 +72,8 @@ public final class Context {
     data = d;
     copied = null;
     marked = new Nodes(d);
-    current = new Nodes(d.doc(), d);
+    current = Prop.fsmode ? new Nodes(DataFS.ROOTDIR, data) :
+      new Nodes(d.doc(), d);
   }
     
   /**
@@ -89,6 +91,7 @@ public final class Context {
         d.close();
         if(Prop.mainmem) Performance.gc(1);
       }
+      Prop.fsmode = false;
       return true;
     } catch(final IOException ex) {
       BaseX.debug(ex);

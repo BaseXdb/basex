@@ -51,7 +51,7 @@ public final class SimpleIterStep extends Step {
           }
           final Nod nod = ir.next();
           if(nod == null) ir = null;
-          else if(test.e(nod, ctx)) {
+          else if(test.e(nod)) {
             ctx.item = item;
             return nod.finish();
           }

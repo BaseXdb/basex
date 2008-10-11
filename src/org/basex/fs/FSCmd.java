@@ -1,14 +1,14 @@
-package org.basex.query.fs;
+package org.basex.fs;
 
 import java.io.IOException;
-import org.basex.BaseX;
 import org.basex.core.Context;
-import org.basex.data.Data;
 import org.basex.io.PrintOutput;
 import org.basex.util.GetOpts;
 
 /**
  * Defines common methods for file system commands.
+ * The implementing class names are supposed to equal the command names
+ * (case sensitivity doesn't matter)
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Hannes Schwarz - Hannes.Schwarz@gmail.com
@@ -16,8 +16,8 @@ import org.basex.util.GetOpts;
 public abstract class FSCmd {
   /** Data reference. */
   protected Context context;
-  /** Data reference. */
-  protected Data data;
+  /** Data FS reference. */
+  protected DataFS fs;
   /** Current dir. */
   protected int curPre;
 
@@ -27,7 +27,7 @@ public abstract class FSCmd {
    */
   public final void context(final Context ctx) {
     context = ctx;
-    data = context.data();
+    fs = context.data().fs;
     curPre = ctx.current().nodes[0];
   }
   
@@ -41,7 +41,7 @@ public abstract class FSCmd {
   /**
    * Executes the command..
    * @param out output stream
-   * @throws IOException - in case of problems with the PrintOutput 
+   * @throws IOException in case of problems with the PrintOutput 
    */
   public abstract void exec(final PrintOutput out) throws IOException;
 
@@ -52,7 +52,7 @@ public abstract class FSCmd {
    * @throws FSException file system exception
    */
   final GetOpts defaultOpts(final String args) throws FSException {
-    final GetOpts g = new GetOpts(args, "h");
+    final GetOpts g = new GetOpts(args, "");
     while(g.more()) checkOpt(g);
     return g;
   }
@@ -66,59 +66,61 @@ public abstract class FSCmd {
    */
   final int checkOpt(final GetOpts g) throws FSException {
     final int c = g.next();
-    if(c == 'h') throw new FSException(help());
     if(c == ':') error(g.getPath(), 99);
-    if(c == 0) error("", 102);
+    if(c == 0) help();
     return c;
   }
 
   /**
-   * Checks the specified pre value for validity.
-   * @param path path for optional error message
-   * @param pre pre value
-   * @return pre value
-   * @throws FSException file system exception
+   * Throws an error, containing help on the current command.
+   * @throws FSException help exception
    */
-  final int checkPre(final String path, final int pre) throws FSException {
-    if(pre == -1) error(path, 2);
-    return pre;
+  final void help() throws FSException {
+    throw new FSException(Help.help(getClass().getSimpleName()));
   }
 
   /**
-   * Checks the specified pre array for entries.
+   * Evaluates the specified path and sets the current pre value.
    * @param path path for optional error message
-   * @param pre pre array
-   * @return pre value
    * @throws FSException file system exception
    */
-  final int[] checkPre(final String path, final int[] pre) throws FSException {
-    if(pre.length == 0) error(path, 2);
-    return pre;
+  final void curPre(final String path) throws FSException {
+    curPre = fs.goTo(curPre, path);
+    if(curPre == -1) error(path, 2);
+  }
+
+  /**
+   * Evaluates the specified path and checks the resulting array for entries.
+   * @param path path
+   * @return resulting array
+   * @throws FSException file system exception
+   */
+  final int[] children(final String path) throws FSException {
+    final int[] nodes = fs.children(curPre, path);
+    if(nodes.length == 0) error(path, 2);
+    return nodes;
   }
   
   /**
    * Creates a filesystem exception.
-   * @param arg - exception message
-   * @param error - error code
-   * @throws FSException - in case of problems with the PrintOutput
+   * @param arg exception message
+   * @param error error code
+   * @throws FSException in case of problems with the PrintOutput
    */
   final void error(final Object arg, final int error) throws FSException {
     throw new FSException(name(), arg, error);
   }
   
   /**
-   * Returns the command help.
-   * @return help string
+   * Creates a warning.
+   * @param out output stream
+   * @param arg exception message
+   * @param error error code
+   * @throws IOException exception
    */
-  private String help() {
-    try {
-      // Get FS Help Text via Reflection (FSText.FS...)
-      final String cmd = getClass().getSimpleName();
-      return FSText.class.getField("FS" + cmd).get(null).toString();
-    } catch(final Exception ex) {
-      BaseX.debug(ex);
-      return "";
-    }
+  final void warning(final PrintOutput out, final Object arg, final int error)
+      throws IOException {
+    out.println(FSException.error(name(), arg, error));
   }
 
   /**

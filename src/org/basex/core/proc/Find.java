@@ -58,7 +58,7 @@ public final class Find extends AQuery {
 
     // deepfs instance
     final Data data = ctx.data();
-    if(data.deepfs) return findFS(query, ctx, root);
+    if(data.fs != null) return findFS(query, ctx, root);
 
     // parse user input
     final String qu = query.replaceAll(" \\+", " ");
@@ -227,7 +227,7 @@ public final class Find extends AQuery {
       final byte[] tag, final Data data, final boolean root) {
 
     final TokenBuilder tb = new TokenBuilder();
-    final boolean fs = data.deepfs;
+    final boolean fs = data.fs != null;
     for(int i = 0; i < filter.length; i++) {
       if(filter[i].length() < 3) continue;
 

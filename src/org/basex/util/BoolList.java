@@ -8,14 +8,24 @@ package org.basex.util;
  */
 public final class BoolList {
   /** Value array. */
-  public boolean[] list = new boolean[8];
+  public boolean[] list;
   /** Current array size. */
   public int size;
 
   /**
    * Default constructor.
    */
-  public BoolList() { }
+  public BoolList() {
+    this(8);
+  }
+
+  /**
+   * Constructor, specifying the initial array size.
+   * @param c initial size
+   */
+  public BoolList(final int c) {
+    list = new boolean[c];    
+  }
 
   /**
    * Adds next value.

@@ -85,6 +85,7 @@ public final class CAttr extends Arr {
       name = new QNm(nm);
     }
     if(name.ns() && name.uri == Uri.EMPTY) name.uri = ctx.ns.uri(name.pre());
+    //else if(name.uri == Uri.EMPTY) name.uri = ctx.nsElem;
     return name;
   }
 

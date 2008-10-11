@@ -1,6 +1,7 @@
-package org.basex.query.fs;
+package org.basex.fs;
 
 import java.io.IOException;
+
 import org.basex.io.PrintOutput;
 import org.basex.util.Token;
 
@@ -10,7 +11,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Hannes Schwarz - Hannes.Schwarz@gmail.com
  */
-public final class TOUCH extends FSCmd {
+public final class Touch extends FSCmd {
   /** Specified path. */
   private String path;
 
@@ -24,35 +25,28 @@ public final class TOUCH extends FSCmd {
 
   @Override
   public void exec(final PrintOutput out) throws IOException {
-    final int beginIndex = path.lastIndexOf('/');
-    if(beginIndex > -1) {
-      curPre = checkPre(path, FSUtils.goToDir(context.data(), curPre,
-          path.substring(0, beginIndex)));
+    final int i = path.lastIndexOf('/');
+    String file = path;
+    if(i > -1) {
+      curPre(path.substring(0, i));
+      file = path.substring(i + 1);
     }
 
-    final String file = path.substring(path.lastIndexOf('/') + 1);
-
-    final int[] preFound =  FSUtils.getChildren(context.data(),
-        curPre, file);
-
-    if(preFound.length > 0) {
-      for(final int i : preFound) {
-        if(FSUtils.isFile(context.data(), i)) {
-          FSUtils.setMtime(data, i, FSUtils.currTime());
-        }
+    final int[] nodes =  fs.children(curPre, file);
+    if(nodes.length > 0) {
+      for(final int p : nodes) {
+        if(fs.isFile(p)) fs.time(p, fs.currTime());
       }
     } else {
       // add new file
-      if(!FSUtils.validFileName(file)) error(file, 101);
+      if(!fs.valid(file)) error(file, 101);
 
       try {
-        int preNewFile = 4;
-        if(!(curPre == FSUtils.getROOTDIR())) {
-          preNewFile = curPre + FSUtils.NUMATT;
-        }
-        FSUtils.insert(context.data(), false, Token.token(file),
-            getSuffix(file), Token.ZERO, FSUtils.currTime(),
-            curPre, preNewFile);
+        int pn = 4;
+        if(!(curPre == DataFS.ROOTDIR)) pn = curPre + DataFS.NUMATT;
+
+        fs.insert(false, Token.token(file), getSuffix(file), Token.ZERO,
+            fs.currTime(), curPre, pn);
       } catch(final Exception e) {
         e.printStackTrace();
       }

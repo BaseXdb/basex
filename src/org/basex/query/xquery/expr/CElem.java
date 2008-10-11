@@ -131,6 +131,9 @@ public final class CElem extends Arr {
       }
       if(text.size != 0) children.add(new FTxt(text.finish(), null));
 
+      // set default element namespace if no other was defined
+      if(tname.uri == Uri.EMPTY && nsp.get(EMPTY) == -1) tname.uri = ctx.nsElem;
+
       final FElem node = new FElem(tname, children, ats, base, nsp, null);
       for(int n = 0; n < children.size; n++) children.list[n].parent(node);
       for(int n = 0; n < ats.size; n++) ats.list[n].parent(node);

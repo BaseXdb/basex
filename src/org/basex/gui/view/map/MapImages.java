@@ -10,7 +10,6 @@ import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.gui.GUI;
 import org.basex.gui.view.View;
-import org.basex.query.fs.FSUtils;
 import org.basex.util.Action;
 import org.basex.util.Token;
 
@@ -119,7 +118,7 @@ public final class MapImages {
           }
           
           // load image and wait until it's done
-          final File f = new File(Token.string(FSUtils.getPath(data, id)));
+          final File f = new File(Token.string(data.fs.path(id)));
           BufferedImage image = ImageIO.read(f);
           
           // calculate optimal image size

@@ -4,7 +4,6 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
 import org.basex.io.IO;
 import org.basex.query.FTOpt;
@@ -1242,7 +1241,7 @@ public final class XQParser extends QueryParser {
       test = Test.NODE;
     } else if(consume('@')) {
       ax = Axis.ATTR;
-      test = test();
+      test = test(true);
     } else {
       for(final Axis a : Axis.values()) {
         if(consumeWS(a.name, COL2, NOLOCSTEP)) {
@@ -1250,14 +1249,14 @@ public final class XQParser extends QueryParser {
           alter = NOLOCSTEP;
           ap = qp;
           ax = a;
-          test = test();
+          test = test(false);
           break;
         }
       }
     }
     if(ax == null) {
       ax = Axis.CHILD;
-      test = test();
+      test = test(false);
       if(test != null && test.type == Type.ATT) ax = Axis.ATTR;
     }
     if(test == null) return null;
@@ -1274,10 +1273,11 @@ public final class XQParser extends QueryParser {
    * [ 78] Parses a NodeTest.
    * [ 79] Parses a NameTest.
    * [123] Parses a KindTest.
+   * @param att attribute flag
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Test test() throws XQException {
+  private Test test(final boolean att) throws XQException {
     final int p = qp;
     final char ch = curr();
     if(XMLToken.isXMLLetter(ch)) {
@@ -1296,26 +1296,29 @@ public final class XQParser extends QueryParser {
           return new KindTest(type, qn);
         }
       } else {
-        // nametest abcde:abcde
+        // name test "pre:tag"
         if(contains(name, ':')) {
           skipWS();
-          return new NameTest(name, false, ctx);
+          return new NameTest(new QNm(name, ctx), NameTest.TYPE.STD);
         }
-        // nametest abcde
+        // name test "tag"
         if(!consume(':')) {
           skipWS();
-          return new NameTest(name, false, ctx);
+          return att ? new NameTest(new QNm(name), NameTest.TYPE.NAME) :
+            new NameTest(new QNm(name, ctx.nsElem), NameTest.TYPE.STD);
         }
-        // nametest abcde:*
+        // name test "pre:*"
         if(consume('*')) {
-          return new NameTest(name, false, ctx);
+          final QNm nm = new QNm(EMPTY);
+          nm.uri = ctx.ns.uri(name);
+          return new NameTest(nm, NameTest.TYPE.NS);
         }
       }
     } else if(consume('*')) {
-      // nametest *
+      // name test "*"
       if(!consume(':')) return new NameTest();
-      // nametest *:abcde
-      return new NameTest(qName(null), true, ctx);
+      // name test "*:tag"
+      return new NameTest(new QNm(qName(null)), NameTest.TYPE.NAME);
     }
     qp = p;
     return null;
@@ -1495,7 +1498,6 @@ public final class XQParser extends QueryParser {
   private Expr dirElemConstructor() throws XQException {
     if(skipWS()) Err.or(NOTAGNAME);
     final QNm open = new QNm(qName(NOTAGNAME));
-    if(!open.ns()) open.uri = ctx.nsElem;
     consumeWSS();
 
     Expr[] cont = {};

@@ -1,7 +1,6 @@
 package org.basex.query.xquery.path;
 
 import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.QNm;
 import org.basex.query.xquery.item.Type;
@@ -16,7 +15,7 @@ public abstract class Test {
   /** Static node test. */
   public static final Test NODE = new Test() {
     @Override
-    public boolean e(final Nod tmp, final XQContext ctx) {
+    public boolean e(final Nod tmp) {
       return true;
     }
     @Override
@@ -34,10 +33,9 @@ public abstract class Test {
   /**
    * Tests the specified node.
    * @param tmp temporary node
-   * @param ctx xquery context
    * @return result of check
    * @throws XQException evaluation exception
    */
-  public abstract boolean e(final Nod tmp, final XQContext ctx)
+  public abstract boolean e(final Nod tmp)
       throws XQException;
 }

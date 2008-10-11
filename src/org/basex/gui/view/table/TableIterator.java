@@ -55,7 +55,7 @@ public final class TableIterator {
   boolean more() {
     while(true) {
       // skip attributes or descendant nodes
-      pre += data.deepfs ? 1 : data.attSize(pre, data.kind(pre));
+      pre += data.fs != null ? 1 : data.attSize(pre, data.kind(pre));
       if(pre >= last) return false;
       
       final int k = data.kind(pre);

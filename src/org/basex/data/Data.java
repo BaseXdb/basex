@@ -2,6 +2,7 @@ package org.basex.data;
 
 import static org.basex.util.Token.*;
 import java.io.IOException;
+import org.basex.fs.DataFS;
 import org.basex.index.Index;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
@@ -56,7 +57,7 @@ public abstract class Data  {
   protected Index ftxindex;
 
   /** File system indicator. */
-  public boolean deepfs;
+  public DataFS fs;
   /** Index Reference for name tag. */
   public int nameID;
 
@@ -64,7 +65,7 @@ public abstract class Data  {
    * Dissolves the references to often used tag names and attributes.
    */
   public final void initNames() {
-    deepfs = tags.id(DataText.DEEPFS) != 0;
+    if(tags.id(DataText.DEEPFS) != 0) fs = new DataFS(this);
     nameID = atts.id(DataText.NAME);    
   }
   

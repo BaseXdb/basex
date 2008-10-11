@@ -1,7 +1,6 @@
-package org.basex.query.fs;
+package org.basex.fs;
 
 import java.io.IOException;
-
 import org.basex.io.PrintOutput;
 import org.basex.util.GetOpts;
 
@@ -11,7 +10,7 @@ import org.basex.util.GetOpts;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Hannes Schwarz - Hannes.Schwarz@gmail.com
  */
-public final class RM extends FSCmd {
+public final class Rm extends FSCmd {
   /** Remove the all. */
   private boolean fRecursive;
   /** Specified path. */
@@ -20,7 +19,7 @@ public final class RM extends FSCmd {
   @Override
   public void args(final String args) throws FSException {
     // get all Options
-    final GetOpts g = new GetOpts(args, "Rh");
+    final GetOpts g = new GetOpts(args, "R");
     while(g.more()) {
       final int ch = checkOpt(g);
       switch (ch) {
@@ -30,23 +29,23 @@ public final class RM extends FSCmd {
       }
     }
     path = g.getPath();
-    // no file/path was specified...
     if(path == null) error("", 100);
   }
 
   @Override
   public void exec(final PrintOutput out) throws IOException {
-    final int[] del = checkPre(path, FSUtils.getChildren(data, curPre, path));
+    // get nodes to be deleted
+    final int[] nodes = children(path);
 
-    // following Pre Values change if nodes are deleted -> delete backwards
-    for(int d = del.length - 1; d >= 0; d--) {
-      final int toDel = del[d];
-      if((FSUtils.isDir(data, toDel) && fRecursive) ||
-          (FSUtils.isFile(data, toDel))) {
-        FSUtils.delete(data, toDel);
+    // nodes are deleted backwards
+    for(int n = nodes.length - 1; n >= 0; n--) {
+      final int pre = nodes[n];
+      if(fs.isFile(pre) || fs.isDir(pre) && fRecursive) {
+        fs.data.delete(pre);
       } else {
-        error(path, 21);
+        warning(out, fs.name(pre), 21);
       }
     }
+    fs.data.flush();
   }
 }

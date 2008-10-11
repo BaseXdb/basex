@@ -31,9 +31,8 @@ public final class MemBuilder extends Builder {
   @Override
   public MemData finish() throws IOException {
     // check if data ranges exceed database limits
-    if(size > 0x1FFFFF) throw new IOException(LIMITRANGE);
-    if(tags.size() > 0xFF) throw new IOException(LIMITTAGS);
-    if(atts.size() > 0xFF) throw new IOException(LIMITATTS);
+    if(tags.size() > 0xFFF) throw new IOException(LIMITTAGS);
+    if(atts.size() > 0xFFF) throw new IOException(LIMITATTS);
     data.initNames();
     return data;
   }
@@ -49,9 +48,10 @@ public final class MemBuilder extends Builder {
 
   @Override
   protected void addElem(final int tok, final int s, final int dis,
-      final int a, final boolean n) {
+      final int a, final boolean n) throws IOException {
     data.addElem(tok, s, dis, a, 0, n);
     size = data.size;
+    if(size < 0) throw new IOException(LIMITRANGE);
   }
 
   @Override

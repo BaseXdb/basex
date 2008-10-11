@@ -55,9 +55,8 @@ public final class Set extends Process {
       } else {
         throw new Exception();
       }
-      
-      return info(s == null ? option :
-        Text.class.getField("INFO" + s).get(null).toString() + " " + val);
+      return info((s == null ? option :
+        Text.class.getField("INFO" + s).get(null).toString()) + ": " + val);
     } catch(final Exception ex) {
       BaseX.debug(ex);
       return error("Could not assign \"%\"", option);

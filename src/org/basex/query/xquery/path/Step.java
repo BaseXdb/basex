@@ -72,7 +72,7 @@ public class Step extends Arr {
       final NodeIter ir = axis.init((Nod) it);
       Nod nod;
       while((nod = ir.next()) != null) {
-        if(test.e(nod, ctx)) {
+        if(test.e(nod)) {
           nod = nod.finish();
           nod.score(Scoring.step(it.score()));
           nb.add(nod);

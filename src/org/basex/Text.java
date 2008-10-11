@@ -42,7 +42,7 @@ public interface Text {
   /** URL. */
   String URL = "http://www.basex.org";
   /** Code version. */
-  String VERSION = "4.13";
+  String VERSION = "4.2";
   /** Company Info. */
   String COMPANY = "DBIS, University of Konstanz";
 
@@ -65,8 +65,6 @@ public interface Text {
   String LOCALMODE = lang("cs_local");
   /** Client Mode. */
   String CLIENTMODE = lang("cs_client");
-  /** Console Prompt. */
-  String INPUT = "> ";
   /** Continued prompt. */
   String INPUTCONT = DOTS + S;
 
@@ -249,29 +247,17 @@ public interface Text {
   /** Command Help. */
   String XMARK2 = lang("ch_xmark2");
   /** Command Help. */
-  String CD0 = lang("ch_cd0");
+  String CS0 = lang("ch_cs0");
   /** Command Help. */
-  String CD1 = lang("ch_cd1");
+  String CS1 = lang("ch_cs1");
   /** Command Help. */
-  String CD2 = lang("ch_cd2");
+  String CS2 = lang("ch_cs2");
   /** Command Help. */
-  String FS0 = "[" + FS.CAT + "|" + FS.CP + "|" + FS.CD + "|" + FS.DU + "|" +
-    FS.LOCATE + "|" + FS.LS + "|" + FS.MKDIR + "|" +
-    FS.PWD + "|" + FS.RM + "|" + FS.TOUCH + "]";
+  String BASH0 = "";
   /** Command Help. */
-  String FS1 = lang("ch_fs1");
+  String BASH1 = lang("ch_bash1");
   /** Command Help. */
-  String FS2 = lang("ch_fs2") + NL +
-    LI + FS.CAT      + lang("ch_fs25") + NL +
-    LI + FS.CD       + lang("ch_fs23") + NL +  
-    LI + FS.CP       + lang("ch_fs30") + NL +    
-    LI + FS.DU       + lang("ch_fs21") + NL +
-    LI + FS.LOCATE   + lang("ch_fs26") + NL +
-    LI + FS.LS       + lang("ch_fs22") + NL +
-    LI + FS.MKDIR    + lang("ch_fs27") + NL +
-    LI + FS.PWD      + lang("ch_fs24") + NL +
-    LI + FS.RM       + lang("ch_fs28") + NL +  
-    LI + FS.TOUCH    + lang("ch_fs29");
+  String BASH2 = lang("ch_bash2");
 
   /** Command Help. */
   String DUMMYUPDATE0 = lang("ch_dummyupdate0");
@@ -885,6 +871,8 @@ public interface Text {
   String PROCERR = lang("proc_err") + COL + NL + "%";
   /** No Database Error. */
   String PROCNODB = lang("proc_nodb");
+  /** No Filesystem Error. */
+  String PROCNOFS = lang("proc_nofs");
   /** Update Error. */
   String PROCMM = lang("proc_mm");
   /** Update Error. */
