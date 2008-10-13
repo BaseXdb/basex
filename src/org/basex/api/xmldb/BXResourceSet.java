@@ -52,22 +52,16 @@ public final class BXResourceSet implements ResourceSet {
  // <CG> Alle Resources auslesen und in eine XMLResource stecken? 
     StringWriter content = new StringWriter();
     for(int i = 0; i < resources.size(); i++) {
-      try {
-        content.append(coll.getResource(((BXXMLResource)resources.get(i)).getDocumentId()).getContent().toString());
-        BXXMLResource test = new BXXMLResource(null, "TEST", -1, coll);
-        test.setContent(content.toString());
-        return test;
-      } catch(XMLDBException e) {
-        throw new XMLDBException(ErrorCodes.VENDOR_ERROR);
-      }
+      content.append(coll.getResource(((BXXMLResource)resources.get(i)).getDocumentId()).getContent().toString());
+      BXXMLResource test = new BXXMLResource(null, "TEST", -1, coll);
+      test.setContent(content.toString());
+      return test;
     }
     return null;
   }
 
   public Resource getResource(final long index) throws XMLDBException {
-    if(index < resources.size()) {
-    return resources.get((int) index);
-    }
+    if(index < resources.size()) return resources.get((int) index);
     throw new XMLDBException(ErrorCodes.NO_SUCH_RESOURCE);
   }
 

@@ -2,7 +2,6 @@ package org.basex.api.xmldb;
 
 import java.util.Hashtable;
 import java.util.Iterator;
-
 import org.basex.BaseX;
 import org.basex.data.Nodes;
 import org.basex.query.QueryException;

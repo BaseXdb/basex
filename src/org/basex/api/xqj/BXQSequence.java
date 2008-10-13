@@ -52,9 +52,9 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
    * Constructor.
    * @param item result item
    * @param c closer
-   * @throws BXQException xquery exception
+   * @throws XQException xquery exception
    */
-  public BXQSequence(final Iter item, final BXQAbstract c) throws BXQException {
+  public BXQSequence(final Iter item, final BXQAbstract c) throws XQException {
     this(item, new XQContext(), c, null);
   }
 
@@ -64,10 +64,10 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
    * @param context query context
    * @param c closer
    * @param cn connection
-   * @throws BXQException xquery exception
+   * @throws XQException xquery exception
    */
   public BXQSequence(final Iter item, final XQContext context,
-      final BXQAbstract c, final BXQConnection cn) throws BXQException {
+      final BXQAbstract c, final BXQConnection cn) throws XQException {
     super(c);
     result = item;
     ctx = context;

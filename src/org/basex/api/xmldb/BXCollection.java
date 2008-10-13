@@ -13,6 +13,7 @@ import org.basex.core.Context;
 import org.basex.core.proc.Close;
 import org.basex.data.Data;
 import org.basex.io.IO;
+import org.basex.util.StringList;
 import org.basex.util.Token;
 
 /**
@@ -90,12 +91,10 @@ public class BXCollection implements Collection {
 
   public Resource getResource(final String id) throws XMLDBException {
     if(isOpen()) {
-      byte[] idd = Token.token(id);
-      int[] docs = ctx.data().doc();
-      for(int i = 0; i < docs.length; i++) {
-        int pre = docs[i];
-        if(Token.eq(ctx.data().text(pre), idd)) {
-          return new BXXMLResource(ctx.data(), id, pre, this);
+      final byte[] idd = Token.token(id);
+      for(final int d : ctx.data().doc()) {
+        if(Token.eq(ctx.data().text(d), idd)) {
+          return new BXXMLResource(ctx.data(), id, d, this);
         }
       }
       return null;
@@ -144,12 +143,9 @@ public class BXCollection implements Collection {
 
   public String[] listResources() throws XMLDBException {
     if(isOpen()) {
-      int[] docs = ctx.data().doc();
-      String[] resources = new String[docs.length];
-      for(int i = 0; i < docs.length; i++) {
-        resources[i] = Token.string(ctx.data().text(docs[i]));
-      }
-      return resources;
+      final StringList sl = new StringList();
+      for(int d : ctx.data().doc()) sl.add(Token.string(ctx.data().text(d)));
+      return sl.finish();
     }
     throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
   }

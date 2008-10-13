@@ -1,7 +1,5 @@
 package org.basex.api.jaxp;
 
-import java.io.IOException;
-
 import javax.xml.namespace.QName;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -53,12 +51,10 @@ public class XPathExprImpl implements XPathExpression {
 
   public Object evaluate(final InputSource is, final QName res)
       throws XPathExpressionException {
-    try {
-      context.data(Check.check(is.getSystemId()));
-      return finish(eval(), res);
-    } catch(IOException ex) {
-      throw new XPathExpressionException(ex);
-    }
+
+    final Check check = new Check(is.getSystemId());
+    if(check.execute(context)) return finish(eval(), res);
+    throw new XPathExpressionException(check.info());
   }
   
   /**

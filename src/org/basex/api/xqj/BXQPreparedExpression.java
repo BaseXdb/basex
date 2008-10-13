@@ -42,7 +42,7 @@ public final class BXQPreparedExpression extends BXQDynamicContext
     }
   }
 
-  public void cancel() throws BXQException {
+  public void cancel() throws XQException {
     opened();
     query.ctx.stop();
   }
@@ -51,7 +51,7 @@ public final class BXQPreparedExpression extends BXQDynamicContext
     return execute();
   }
 
-  public QName[] getAllExternalVariables() throws BXQException {
+  public QName[] getAllExternalVariables() throws XQException {
     opened();
     final Var[] vars = getVariables();
     final QName[] names = new QName[vars.length];
@@ -59,7 +59,7 @@ public final class BXQPreparedExpression extends BXQDynamicContext
     return names;
   }
 
-  public QName[] getAllUnboundExternalVariables() throws BXQException {
+  public QName[] getAllUnboundExternalVariables() throws XQException {
     opened();
     QName[] names = new QName[0];
     for(final Var v : getVariables()) {
@@ -68,24 +68,24 @@ public final class BXQPreparedExpression extends BXQDynamicContext
     return names;
   }
 
-  private Var[] getVariables() throws BXQException {
+  private Var[] getVariables() throws XQException {
     opened();
     final Vars vars = query.ctx.vars.getGlobal();
     return Array.finish(vars.vars, vars.size);
   }
 
-  public XQStaticContext getStaticContext() throws BXQException {
+  public XQStaticContext getStaticContext() throws XQException {
     opened();
     return sc;
   }
 
-  public XQSequenceType getStaticResultType() throws BXQException {
+  public XQSequenceType getStaticResultType() throws XQException {
     opened();
     return BXQItemType.DEFAULT;
   }
 
   public XQSequenceType getStaticVariableType(final QName qn)
-      throws BXQException {
+      throws XQException {
     opened();
     valid(qn, String.class);
     final QNm nm = new QNm(qn);

@@ -11,6 +11,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItemType;
 import org.basex.BaseX;
 import org.basex.core.proc.CreateDB;
@@ -18,12 +19,12 @@ import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
+import org.basex.query.QueryException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.func.FunJava;
 import org.basex.query.xquery.item.DNode;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Type;
-import org.basex.query.xquery.XQException;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.xml.sax.InputSource;
@@ -66,9 +67,9 @@ abstract class BXQAbstract {
 
   /**
    * Checks if the object is open.
-   * @throws BXQException exception
+   * @throws XQException exception
    */
-  protected final void opened() throws BXQException {
+  protected final void opened() throws XQException {
     if(isClosed()) throw new BXQException(getClass().getSimpleName() + CLOSED);
   }
 
@@ -90,9 +91,9 @@ abstract class BXQAbstract {
    * @param e expected type
    * @param tar target type
    * @return target type
-   * @throws BXQException xquery exception
+   * @throws XQException xquery exception
    */
-  protected Type check(final Type e, final XQItemType tar) throws BXQException {
+  protected Type check(final Type e, final XQItemType tar) throws XQException {
     opened();
     if(tar == null) return e;
 
@@ -117,10 +118,10 @@ abstract class BXQAbstract {
    * @param v input object
    * @param t target type
    * @return resulting item
-   * @throws BXQException exception
+   * @throws XQException exception
    */
   protected final Item create(final Object v, final XQItemType t)
-      throws BXQException {
+      throws XQException {
     
     // check if object exists
     valid(v, Object.class);
@@ -135,7 +136,7 @@ abstract class BXQAbstract {
     try {
       // return item with correct type 
       return check(e, t).e(v);
-    } catch(final XQException ex) {
+    } catch(final QueryException ex) {
       throw new BXQException(ex);
     }
   }
@@ -185,10 +186,10 @@ abstract class BXQAbstract {
    * @param s input source
    * @param it item type
    * @return document node
-   * @throws BXQException exception
+   * @throws XQException exception
    */
   protected final DNode createDB(final Source s, final XQItemType it)
-      throws BXQException {
+      throws XQException {
 
     valid(s, Source.class);
     check(Type.DOC, it);
@@ -208,9 +209,9 @@ abstract class BXQAbstract {
    * Creates a database instance from the specified byte array.
    * @param is input stream
    * @return document node
-   * @throws BXQException exception
+   * @throws XQException exception
    */
-  protected final DNode createDB(final InputStream is) throws BXQException {
+  protected final DNode createDB(final InputStream is) throws XQException {
     opened();
     valid(is, InputStream.class);
     try {
@@ -224,9 +225,9 @@ abstract class BXQAbstract {
    * Creates a database instance from the specified byte array.
    * @param r reader
    * @return document node
-   * @throws BXQException exception
+   * @throws XQException exception
    */
-  protected final DNode createDB(final Reader r) throws BXQException {
+  protected final DNode createDB(final Reader r) throws XQException {
     opened();
     valid(r, Reader.class);
     try {
@@ -240,9 +241,9 @@ abstract class BXQAbstract {
    * Creates a database instance from the specified xml reader.
    * @param r xml reader
    * @return document node
-   * @throws BXQException exception
+   * @throws XQException exception
    */
-  protected final DNode createDB(final XMLReader r) throws BXQException {
+  protected final DNode createDB(final XMLReader r) throws XQException {
     opened();
     valid(r, XMLReader.class);
     try {
@@ -256,10 +257,9 @@ abstract class BXQAbstract {
    * Creates a database instance from the specified xml reader.
    * @param sr xml stream reader
    * @return document node
-   * @throws BXQException exception
+   * @throws XQException exception
    */
-  protected final DNode createDB(final XMLStreamReader sr)
-      throws BXQException {
+  protected final DNode createDB(final XMLStreamReader sr) throws XQException {
     opened();
     valid(sr, XMLStreamReader.class);
     try {
@@ -299,10 +299,10 @@ abstract class BXQAbstract {
    * @param it item
    * @param ctx context
    * @param ser serializer
-   * @throws BXQException exception
+   * @throws XQException exception
    */
   protected void serialize(final Item it, final XQContext ctx,
-      final Serializer ser) throws BXQException {
+      final Serializer ser) throws XQException {
     opened();
     try {
       if(it.type == Type.ATT) throw new BXQException(ATTR);
