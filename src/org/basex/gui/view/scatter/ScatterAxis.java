@@ -201,13 +201,32 @@ public final class ScatterAxis {
         do {
           captionStep = tmpStep;
           int tmpMin = minI - minI % tmpStep;
-          int tmpMax = (maxI + tmpStep - 1) / tmpStep * tmpStep;
+          int tmpMax = maxI + maxI % tmpStep;
           nrCaptions = (tmpMax - tmpMin) / tmpStep + 1;
           if(String.valueOf(tmpStep).startsWith("1"))
             tmpStep *= tmpStep == 1 ? 5 : 2.5;
           else
             tmpStep *= 2;
         } while(nrCaptions * ScatterView.CAPTIONWHITESPACE > space);
+        
+      } else if(numType == TYPEDBL) {
+        final double minD = min;
+        final double maxD = max;
+        double tmpStep = .01d;
+        if(maxD - minD > 500)
+          tmpStep = 1;
+        do {
+          captionStep = tmpStep;
+//          double tmpMin = (int) (minD / tmpStep) * tmpStep;
+//          double tmpMax = (int) ((maxD + tmpStep - .01d) / tmpStep) * tmpStep;
+          nrCaptions = (int) ((maxD - minD) / tmpStep) + 1;
+          if(String.valueOf(tmpStep).indexOf("1") > -1) {
+            tmpStep *= 2.5;
+          } else {
+            tmpStep *= 2;
+          }
+        } while(nrCaptions * ScatterView.CAPTIONWHITESPACE > space &&
+            maxD - minD > tmpStep);
         
       } else {
         nrCaptions = 5;

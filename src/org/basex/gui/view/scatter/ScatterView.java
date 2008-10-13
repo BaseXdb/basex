@@ -42,7 +42,7 @@ public final class ScatterView extends View implements Runnable {
   /** Y paint margin. */ 
   private static final int MARGINTOP = 65;
   /** Y paint margin. */ 
-  private static final int MARGINLEFT = 150;
+  private static final int MARGINLEFT = 170;
   /** Y paint margin. */ 
   private static final int MARGINRIGHT = 40;
   /** Item size. */
@@ -351,7 +351,8 @@ public final class ScatterView extends View implements Runnable {
     final int textH = g.getFontMetrics().getHeight();
     final int pWidth = plotWidth - NOVALUEBORDER;
     final ScatterAxis axis = scatterData.xAxis;
-    axis.calcCaption(pWidth);
+    if(plotChanged)
+      axis.calcCaption(pWidth);
     final int nrCaptions = axis.nrCats != 1 ? axis.nrCaptions : 3;
     final double step = axis.captionStep;
     final double range = 1.0d / (nrCaptions - 1);
@@ -371,7 +372,7 @@ public final class ScatterView extends View implements Runnable {
         if(type == ScatterAxis.TYPEINT)
           caption = Integer.toString((int) captionValue);
         else
-          caption = "double dummy";
+          caption = Double.toString(captionValue);
       } else {
         if(axis.nrCats == 1) {
           if(i == 1)
@@ -383,7 +384,7 @@ public final class ScatterView extends View implements Runnable {
       
       // draw rotated caption labels
       if(caption.length() > 22) {
-        caption = caption.substring(0, 25);
+        caption = caption.substring(0, 20);
         caption += "...";
       }
 
@@ -412,35 +413,85 @@ public final class ScatterView extends View implements Runnable {
     final int w = getWidth();
     g.setColor(GUIConstants.color1);
     g.drawLine(MARGINLEFT, MARGINTOP, MARGINLEFT, getHeight() - MARGINBOTTOM);
-    
-    scatterData.yAxis.calcCaption(plotHeight - NOVALUEBORDER);
-
-    final boolean numeric = scatterData.yAxis.numeric;
     g.setFont(GUIConstants.font);
     g.setColor(GUIConstants.color1);
+
     final int textH = g.getFontMetrics().getHeight();
     final int pHeight = plotHeight - NOVALUEBORDER;
-    final int nrCaptions = numeric ? (pHeight / 
-        (textH + CAPTIONWHITESPACE)) :
-      scatterData.yAxis.nrCaptions;
+    final ScatterAxis axis = scatterData.yAxis;
+    if(plotChanged)
+      axis.calcCaption(pHeight);
+    final int nrCaptions = axis.nrCats != 1 ? axis.nrCaptions : 3;
+    final double step = axis.captionStep;
     final double range = 1.0d / (nrCaptions - 1);
+    final int type = axis.numType;
+    final boolean numeric = axis.numeric;
+    
     for(int i = 0; i < nrCaptions; i++) {
       g.setColor(GUIConstants.color1);
       final int y1 = h - MARGINBOTTOM - NOVALUEBORDER - 
       ((int) ((i * range) * pHeight));
       g.drawLine(MARGINLEFT - 9, y1, w - MARGINRIGHT, y1);
       g.setColor(Color.black);
-      String caption = null;
+      String caption = "";
       if(numeric) {
-        final double value = scatterData.yAxis.min +
-          (scatterData.yAxis.max - scatterData.yAxis.min) * range * i;
-        caption = Double.toString(value);
+        final double min = axis.min;
+        final double captionValue = i == nrCaptions - 1 ? axis.max : 
+          min + (i * step);
+        if(type == ScatterAxis.TYPEINT)
+          caption = Integer.toString((int) captionValue);
+        else
+          caption = Double.toString(captionValue);
       } else {
-        caption = Token.string(scatterData.yAxis.cats[i]);
+        if(axis.nrCats == 1) {
+          if(i == 1)
+            caption = Token.string(axis.cats[0]);
+        } else {
+          caption = Token.string(axis.cats[i]);
+        }
+      }
+      if(caption.length() > 22) {
+        caption = caption.substring(0, 20);
+        caption += "...";
       }
       final int capW = BaseXLayout.width(g, caption);
       g.drawString(caption, MARGINLEFT - capW - 15, y1 + textH / 2 - 1);
     }
+    
+//    final int h = getHeight();
+//    final int w = getWidth();
+//    g.setColor(GUIConstants.color1);
+//    g.drawLine(MARGINLEFT, MARGINTOP, MARGINLEFT, getHeight() - MARGINBOTTOM);
+//    
+//    if(plotChanged)
+//      scatterData.yAxis.calcCaption(plotHeight - NOVALUEBORDER);
+//
+//    final boolean numeric = scatterData.yAxis.numeric;
+//    g.setFont(GUIConstants.font);
+//    g.setColor(GUIConstants.color1);
+//    final int textH = g.getFontMetrics().getHeight();
+//    final int pHeight = plotHeight - NOVALUEBORDER;
+//    final int nrCaptions = numeric ? (pHeight / 
+//        (textH + CAPTIONWHITESPACE)) :
+//      scatterData.yAxis.nrCaptions;
+//    final double range = 1.0d / (nrCaptions - 1);
+//    for(int i = 0; i < nrCaptions; i++) {
+//      g.setColor(GUIConstants.color1);
+//      final int y1 = h - MARGINBOTTOM - NOVALUEBORDER - 
+//      ((int) ((i * range) * pHeight));
+//      g.drawLine(MARGINLEFT - 9, y1, w - MARGINRIGHT, y1);
+//      g.setColor(Color.black);
+//      String caption = null;
+//      if(numeric) {
+//        final double value = scatterData.yAxis.min +
+//          (scatterData.yAxis.max - scatterData.yAxis.min) * range * i;
+//        caption = Double.toString(value);
+//      } else {
+//        caption = Token.string(scatterData.yAxis.cats[i]);
+//      }
+//      final int capW = BaseXLayout.width(g, caption);
+//      g.drawString(caption, MARGINLEFT - capW - 15, y1 + textH / 2 - 1);
+//    }
   }
   
   /**
