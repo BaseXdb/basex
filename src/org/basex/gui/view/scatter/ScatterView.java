@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -240,8 +241,9 @@ public final class ScatterView extends View implements Runnable {
     plotWidth = w - (MARGINLEFT + MARGINRIGHT);
     plotHeight = h - (MARGINTOP + MARGINBOTTOM);
     
-    // overdraw plot background for non value items
-    g.setColor(GUIConstants.color2);
+    // overdraw plot background
+//    g.setColor(GUIConstants.color2);
+    g.setColor(new Color(90, 90, 90, 40));
     g.fillRect(MARGINLEFT + NOVALUEBORDER, MARGINTOP, 
         plotWidth - NOVALUEBORDER, 
       plotHeight - NOVALUEBORDER);
@@ -419,8 +421,10 @@ public final class ScatterView extends View implements Runnable {
     final int textH = g.getFontMetrics().getHeight();
     final int pHeight = plotHeight - NOVALUEBORDER;
     final ScatterAxis axis = scatterData.yAxis;
-    if(plotChanged)
+    if(plotChanged) {
       axis.calcCaption(pHeight);
+      System.out.println(axis.firstCap);
+    }
     final int nrCaptions = axis.nrCats != 1 ? axis.nrCaptions : 3;
     final double step = axis.captionStep;
     final double range = 1.0d / (nrCaptions - 1);
@@ -555,6 +559,7 @@ public final class ScatterView extends View implements Runnable {
       for(int i = 0; i < items.length; i++) {
         items[i] = Token.string(tmpItems[i]);
       }
+      Arrays.sort(items);
       itemCombo.setModel(new DefaultComboBoxModel(items));
       if(items.length != 0) {
         itemCombo.setSelectedIndex(0);

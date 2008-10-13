@@ -1,6 +1,7 @@
 package org.basex.gui.view.scatter;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 
 import org.basex.data.Data;
 import org.basex.data.StatsKey;
@@ -44,6 +45,8 @@ public final class ScatterAxis {
   double min;
   /** Maximum  value in case selected attribute is numerical. */
   double max;
+  /** First caption value after minimum. */
+  double firstCap;
   /** The different categories for the x attribute. */
   byte[][] cats;
   
@@ -89,6 +92,14 @@ public final class ScatterAxis {
       max = key.max;
     } else {
       cats = key.cats.keys();
+      final String[] tmpCats = new String[cats.length];
+      for(int i = 0; i < tmpCats.length; i++) {
+        tmpCats[i] = Token.string(cats[i]);
+      }
+      Arrays.sort(tmpCats);
+      for(int i = 0; i < tmpCats.length; i++) {
+        cats[i] = Token.token(tmpCats[i]);
+      }
       nrCats = cats.length;
 //      nrCaptions = nrCats;
     }
@@ -129,7 +140,7 @@ public final class ScatterAxis {
    * @param value item value
    * @return relative x or y value of the item
    */
-  private double calcPosition(final byte[] value) {
+  double calcPosition(final byte[] value) {
     final double d = Token.toDouble(value);
     double percentage = 0d;
     if(numeric) {
@@ -208,6 +219,14 @@ public final class ScatterAxis {
           else
             tmpStep *= 2;
         } while(nrCaptions * ScatterView.CAPTIONWHITESPACE > space);
+        // calculate first caption value after minimum
+        final int l = (int) (min + captionStep);
+        firstCap = minI + 1;
+        while(firstCap <= l) {
+          if(firstCap % captionStep == 0)
+            return;
+          firstCap++;
+        }
         
       } else if(numType == TYPEDBL) {
         final double minD = min;
@@ -227,11 +246,18 @@ public final class ScatterAxis {
           }
         } while(nrCaptions * ScatterView.CAPTIONWHITESPACE > space &&
             maxD - minD > tmpStep);
-        
-      } else {
-        nrCaptions = 5;
-        captionStep = .5d;
+     // calculate first caption value after minimum
+        final double l = min + captionStep;
+        final double c = Math.ceil(captionStep);
+        firstCap = minD + .01d;
+        while(firstCap <= l) {
+          if(firstCap % c == 0) {
+            return;
+          }
+          firstCap++;
+        }
       }
+      
     } else {
       nrCaptions = nrCats;
     }
