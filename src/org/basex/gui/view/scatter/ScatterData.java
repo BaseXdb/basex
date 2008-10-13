@@ -1,14 +1,12 @@
 package org.basex.gui.view.scatter;
 
-import java.util.Arrays;
+import static org.basex.util.Token.*;
 import org.basex.data.Data;
-import org.basex.data.StatsKey;
 import org.basex.data.StatsKey.Kind;
 import org.basex.gui.GUI;
 import org.basex.index.Names;
 import org.basex.util.IntList;
 import org.basex.util.StringList;
-import org.basex.util.Token;
 
 /**
  * An additional abstraction layer which prepares the data for the scatter plot.
@@ -40,43 +38,38 @@ public final class ScatterData {
     xAxis = new ScatterAxis(this);
     yAxis = new ScatterAxis(this);
     size = 0;
-    item = Token.EMPTY;
+    item = EMPTY;
   }
   
   /**
    * Returns a string array with all distinct keys
    * and the keys of the specified set.
+   * @param ks input keys
    * @return key array
    */
-  String[] getStatKeys() {
+  String[] getStatKeys(final StringList ks) {
     final Data data = GUI.context.data();
-    
+
+    final String[] keys = data.skel.desc(ks);
+    /**
     final Names tags = data.tags;
-    final StringList sl = new StringList();
-    for(int i = 1; i <= tags.size(); i++) {
-      if(tags.counter(i) == 0) continue;
-      final StatsKey key = tags.stat(tags.id(tags.key(i)));
-      final Kind kind = key.kind;
-      if(kind == Kind.DBL || kind == Kind.INT || kind == Kind.CAT && 
-          key.cats.size() <= 50) {
-        sl.add(Token.string(tags.key(i)));
-      }
-    }
-    
+    for(int i = 1; i <= tags.size(); i++) sl.add(string(tags.key(i)));
     final Names atts = data.atts;
-    for(int i = 0; i <= data.atts.size(); i++) {
-      if(data.atts.counter(i) == 0) continue;
-      final StatsKey key = atts.stat(atts.id(atts.key(i)));
-      final Kind kind = key.kind;
-      if(kind == Kind.DBL || kind == Kind.INT || kind == Kind.CAT && 
-          key.cats.size() <= 50) {
-        sl.add("@" + Token.string(atts.key(i)));
+    for(int i = 1; i <= atts.size(); i++) sl.add("@" + string(atts.key(i)));
+    */
+
+    final StringList sl = new StringList();
+    for(int k = 0; k < keys.length; k++) {
+      boolean att = keys[k].startsWith("@");
+      final Names index = att ? data.atts : data.tags;
+      final byte[] name = substring(token(keys[k]), att ? 1 : 0);
+      final Kind kind = index.stat(index.id(name)).kind;
+      if(kind == Kind.DBL || kind == Kind.INT || kind == Kind.CAT) {
+        sl.add(keys[k]);
       }
     }
-    final String[] vals = sl.finish();
-    Arrays.sort(vals);
-    
-    return vals;
+    sl.sort();
+    return sl.finish();
   }
   
   /**
@@ -88,8 +81,8 @@ public final class ScatterData {
    */
   boolean setItem(final String newItem) {
     if(newItem == null) return false;
-    final byte[] b = Token.token(newItem);
-    if(Token.eq(b, item)) return false;
+    final byte[] b = token(newItem);
+    if(eq(b, item)) return false;
     item = b;
     refreshItems();
     xAxis.refreshAxis();

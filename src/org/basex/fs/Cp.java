@@ -42,11 +42,11 @@ public final class Cp extends FSCmd {
   @Override
   public void exec(final PrintOutput out) throws IOException {
     // Last element of arguments is the target
-    String targetfile = paths.remove(paths.size - 1);
+    String targetfile = paths.list[paths.size - 1];
 
     // All other argument should be copied
-    while(paths.size > 0) {
-      String sourcefile = paths.remove(0);
+    for(int p = 0; p < paths.size - 1; p++) {
+      String sourcefile = paths.list[p];
       // Get all pre values of the source files
       final int[] sources = fs.children(curPre, sourcefile);
       sourcefile = sourcefile.substring(sourcefile.lastIndexOf('/') + 1);

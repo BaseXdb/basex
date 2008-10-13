@@ -10,10 +10,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
-
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-
 import org.basex.core.proc.Find;
 import org.basex.core.proc.XPath;
 import org.basex.data.Data;
@@ -35,6 +33,7 @@ import org.basex.gui.layout.TableLayout;
 import org.basex.index.Names;
 import org.basex.query.xpath.func.ContainsLC;
 import org.basex.util.Set;
+import org.basex.util.StringList;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -191,17 +190,16 @@ final class QuerySimple extends QueryPanel implements ActionListener {
    * @param data data reference
    */
   void addKeys(final Data data) {
+    final StringList sl = new StringList();
     final int cs = panel.getComponentCount();
-    final StringBuilder sb = new StringBuilder("//");
     for(int c = 0; c < cs; c += 2) {
       final BaseXCombo combo = (BaseXCombo) panel.getComponent(c);
       if(combo.getSelectedIndex() == 0) continue;
       final String elem = combo.getSelectedItem().toString();
-      if(elem.startsWith("@")) continue;
-      sb.append(elem + "//");
+      if(!elem.startsWith("@")) sl.add(elem);
     }
 
-    final String[] tmp = data.skel.suggest(data, sb.toString()).finish();
+    final String[] tmp = data.skel.desc(sl);
     if(tmp.length == 0) return;
 
     final String[] keys = new String[tmp.length + 1];
@@ -354,8 +352,9 @@ final class QuerySimple extends QueryPanel implements ActionListener {
       }
 
       if(attr) {
-        tb.add("//.");
+        //tb.add("//.");
         if(pattern.length() == 0) pattern = PATSIMPLE;
+        key = ".//" + key;
       } else {
         tb.add("//" + key);
         key = "text()";
@@ -381,6 +380,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     if(!force && last.equals(qu)) return;
     last = qu;
     BaseXLayout.enable(copy, last.length() != 0);
+    
     GUI.get().execute(new XPath(qu));
   }
 

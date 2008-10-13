@@ -27,6 +27,7 @@ import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.View;
 import org.basex.util.IntList;
+import org.basex.util.StringList;
 import org.basex.util.Token;
 
 /**
@@ -132,14 +133,25 @@ public final class ScatterView extends View implements Runnable {
     itemCombo = new BaseXCombo();
     itemCombo.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        if(scatterData.setItem((String) itemCombo.getSelectedItem())) {
+        final String item = (String) itemCombo.getSelectedItem();
+        if(scatterData.setItem(item)) {
           plotChanged = true;
           markingChanged = true;
+          
+          final StringList input = new StringList();
+          input.add(item);
+          final String[] keys = scatterData.getStatKeys(input);
+          xCombo.setModel(new DefaultComboBoxModel(keys));
+          yCombo.setModel(new DefaultComboBoxModel(keys));
         }
-          repaint();
+        repaint();
       }
     });
     box.add(Box.createHorizontalGlue());
+    box.add(new JLabel("Item"));
+    box.add(Box.createHorizontalStrut(3));
+    box.add(itemCombo);
+    box.add(Box.createHorizontalStrut(10));
     box.add(new JLabel("X"));
     box.add(Box.createHorizontalStrut(3));
     box.add(xCombo);
@@ -147,10 +159,6 @@ public final class ScatterView extends View implements Runnable {
     box.add(new JLabel("Y"));
     box.add(Box.createHorizontalStrut(3));
     box.add(yCombo);
-    box.add(Box.createHorizontalStrut(10));
-    box.add(new JLabel("Item"));
-    box.add(Box.createHorizontalStrut(3));
-    box.add(itemCombo);
     box.add(Box.createHorizontalStrut(32));
     add(box, BorderLayout.NORTH);
     
@@ -423,7 +431,6 @@ public final class ScatterView extends View implements Runnable {
     final ScatterAxis axis = scatterData.yAxis;
     if(plotChanged) {
       axis.calcCaption(pHeight);
-      System.out.println(axis.firstCap);
     }
     final int nrCaptions = axis.nrCats != 1 ? axis.nrCaptions : 3;
     final double step = axis.captionStep;
@@ -551,9 +558,11 @@ public final class ScatterView extends View implements Runnable {
       
       viewDimension = Integer.MAX_VALUE;
       scatterData = new ScatterData();
-      final String[] keys = scatterData.getStatKeys();
+      
+      final String[] keys = scatterData.getStatKeys(new StringList());
       xCombo.setModel(new DefaultComboBoxModel(keys));
       yCombo.setModel(new DefaultComboBoxModel(keys));
+
       final byte[][] tmpItems = data.tags.keys();
       final String[] items = new String[tmpItems.length];
       for(int i = 0; i < items.length; i++) {

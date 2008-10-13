@@ -707,11 +707,11 @@ public final class Token {
   }
 
   /**
-   * Returns a subtoken of the specified token.
+   * Returns a substring of the specified token.
    * @param tok token
    * @param s start position
    * @param e end position
-   * @return subtoken
+   * @return substring
    */
   public static byte[] substring(final byte[] tok, final int s, final int e) {
     if(s == 0 && e == tok.length) return tok;

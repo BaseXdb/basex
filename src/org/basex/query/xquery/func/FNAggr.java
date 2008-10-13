@@ -65,8 +65,9 @@ final class FNAggr extends Fun {
       case AVG:
         return args[0].e() ? Seq.EMPTY : this;
       case COUNT:
-        // just a dirty sample to show which steps are necessary here...        
         if(args[0].i()) return Itr.get(1);
+
+        // just a dirty sample to show which steps are necessary here...        
         if(!(args[0] instanceof Path)) return this;
         final Path path = (Path) args[0];
         if(path.expr.length != 1) return this;
@@ -75,6 +76,7 @@ final class FNAggr extends Fun {
         if(s.axis != Axis.DESC) return this;
         // could also be something else (NAME, ...)..
         if(s.test.kind != Test.Kind.STD) return this;
+
         // might not be the current context set...
         if(ctx.item == null) return this;
         if(ctx.item.type != Type.DOC) return this;

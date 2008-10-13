@@ -548,10 +548,8 @@ public final class GetOptTest {
     g.getopt();
     final StringList argsOfGetopt = g.getFoundArgs();
     if(argsOfGetopt.size == 2) {
-      assertEquals("Path of " + command,
-          "ickeUndEr.txt", argsOfGetopt.remove(0));
-      assertEquals("Path of " + command,
-          "icke.txt", argsOfGetopt.remove(0));
+      assertEquals("Path of " + command, "ickeUndEr.txt", argsOfGetopt.list[0]);
+      assertEquals("Path of " + command, "icke.txt", argsOfGetopt.list[1]);
     }
   }
 

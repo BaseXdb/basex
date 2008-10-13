@@ -90,7 +90,7 @@ public final class DiskData extends Data {
     // read indexes
     tags = new Names(in);
     atts = new Names(in);
-    skel = new Skeleton(in);
+    skel = new Skeleton(this, in);
     ns = new Namespaces(in);
 
     // main memory mode.. keep table in memory

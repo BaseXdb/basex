@@ -9,8 +9,6 @@ import java.util.Arrays;
  * @author Christian Gruen
  */
 public final class StringList {
-  /** Empty string list. */
-  public static final StringList EMPTY = new StringList();
   /** Current string array. */
   public String[] list = new String[8];
   /** Number of strings. */
@@ -23,19 +21,6 @@ public final class StringList {
   public void add(final String s) {
     if(size == list.length) list = Array.extend(list);
     list[size++] = s;
-  }
-
-  /**
-   * Removes an element of the array and returns it.
-   * @param index of element to remove
-   * @return the element that has been removed
-   */
-  public String remove(final int index) {
-    if(size == 0 || size < index) throw new IndexOutOfBoundsException();
-    final String elem = list[index];
-    System.arraycopy(list, index + 1, list, index, size - index);
-    --size;
-    return elem;
   }
 
   /**

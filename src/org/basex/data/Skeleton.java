@@ -16,6 +16,8 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class Skeleton {
+  /** Data reference. */
+  private Data data;
   /** Parent stack. */
   private Node[] stack;
   /** Root node. */
@@ -30,11 +32,13 @@ public final class Skeleton {
 
   /**
    * Constructor, specifying an input file.
+   * @param d data reference
    * @param in input stream
    * @throws IOException I/O exception
    */
-  public Skeleton(final DataInput in) throws IOException {
+  public Skeleton(final Data d, final DataInput in) throws IOException {
     if(in.readBool()) root = new Node(in);
+    data = d;
   }
 
   /**
@@ -77,68 +81,53 @@ public final class Skeleton {
     stack = new Node[256];
     root = null;
   }
-
+  
   /**
-   * Suggest completions for the specified xpath in a string list,
+   * Return completions for the specified descendant steps.
    * based on the document tree structure.
    * Note that only basic completions will be recognized.
-   * @param data data reference
-   * @param xpath input xpath
+   * @param desc descendant steps
    * @return children
    */
-  public StringList suggest(final Data data, final String xpath) {
+  public String[] desc(final StringList desc) {
     final StringList sl = new StringList();
-    if(root == null) return sl;
-    
-    ArrayList<Node> n = new ArrayList<Node>();
-    n.add(root);
-
-    final String input = xpath.startsWith("/") ? xpath : "/" + xpath;
-    final int il = input.length();
-    int s = 0;
-    for(int i = 0; i < il; i++) {
-      final char c = input.charAt(i);
-      if(c == '/' || c == '[') {
-        final boolean desc = i + 1 < il && input.charAt(i + 1) == '/';
-        if(desc && i + 2 < il && input.charAt(i + 2) == '/') return sl;
-        n = child(n, data, input.substring(s, i), desc);
-        if(n.size() == 0) return sl;
-        if(desc) i++;
-        s = i + 1;
+    if(root != null) {
+      ArrayList<Node> n = new ArrayList<Node>();
+      n.add(root);
+      n = desc(n, "", true);
+      for(int i = 0; i < desc.size; i++) n = desc(n, desc.list[i], true);
+  
+      for(final Node r : n) {
+        final String name = Token.string(r.token(data));
+        if(!sl.contains(name) && !name.contains("(")) sl.add(name);
       }
+      sl.sort();
     }
-
-    for(final Node r : n) {
-      final String name = Token.string(r.token(data));
-      if(name.length() != 0 && !sl.contains(name)) sl.add(name);
-    }
-    sl.sort();
-    return sl;
+    return sl.finish();
   }
 
   /**
    * Returns the child node for the specified name.
    * @param n node
-   * @param data data reference
    * @param name name
    * @param desc descendant flag
    * @return child node
    */
-  public ArrayList<Node> child(final ArrayList<Node> n, final Data data,
-      final String name, final boolean desc) {
+  public ArrayList<Node> desc(final ArrayList<Node> n, final String name,
+      final boolean desc) {
 
     if(name.startsWith("@")) return new ArrayList<Node>();
-    return child(n, data.tagID(Token.token(name)), desc);
+    return desc(n, data.tagID(Token.token(name)), desc);
   }
 
   /**
-   * Returns the child node for the specified name.
+   * Returns the descendant for the specified nodes.
    * @param n node
    * @param t name reference
-   * @param desc descendant flag
-   * @return child node
+   * @param desc if false, return only children
+   * @return descendant nodes
    */
-  public ArrayList<Node> child(final ArrayList<Node> n, final int t,
+  public ArrayList<Node> desc(final ArrayList<Node> n, final int t,
       final boolean desc) {
 
     final ArrayList<Node> ch = new ArrayList<Node>();
