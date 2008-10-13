@@ -22,6 +22,10 @@ public class Seq extends Item {
   public static final Seq EMPTY = new Seq() {
     @Override
     public Iter iter() { return Iter.EMPTY; }
+    @Override
+    public void plan(final Serializer ser) throws IOException {
+      ser.emptyElement(Token.token("sequence"), SIZE, Token.ZERO);
+    }
   };
   /** Item array. */
   public Item[] val;
@@ -54,11 +58,6 @@ public class Seq extends Item {
     this();
     val = v;
     size = s;
-  }
-
-  @Override
-  public boolean e() {
-    return size == 0;
   }
 
   @Override
@@ -116,6 +115,8 @@ public class Seq extends Item {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(this, SIZE, Token.token(size));
+    ser.openElement(Token.token("sequence"), SIZE, Token.token(size));
+    for(int v = 0; v != Math.min(size, 5); v++) val[v].plan(ser);
+    ser.closeElement();
   }
 }

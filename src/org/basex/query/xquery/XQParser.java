@@ -1299,26 +1299,26 @@ public final class XQParser extends QueryParser {
         // name test "pre:tag"
         if(contains(name, ':')) {
           skipWS();
-          return new NameTest(new QNm(name, ctx), NameTest.TYPE.STD);
+          return new NameTest(new QNm(name, ctx), NameTest.Kind.STD);
         }
         // name test "tag"
         if(!consume(':')) {
           skipWS();
-          return att ? new NameTest(new QNm(name), NameTest.TYPE.NAME) :
-            new NameTest(new QNm(name, ctx.nsElem), NameTest.TYPE.STD);
+          return att ? new NameTest(new QNm(name), NameTest.Kind.NAME) :
+            new NameTest(new QNm(name, ctx.nsElem), NameTest.Kind.STD);
         }
         // name test "pre:*"
         if(consume('*')) {
           final QNm nm = new QNm(EMPTY);
           nm.uri = ctx.ns.uri(name);
-          return new NameTest(nm, NameTest.TYPE.NS);
+          return new NameTest(nm, NameTest.Kind.NS);
         }
       }
     } else if(consume('*')) {
       // name test "*"
       if(!consume(':')) return new NameTest();
       // name test "*:tag"
-      return new NameTest(new QNm(qName(null)), NameTest.TYPE.NAME);
+      return new NameTest(new QNm(qName(null)), NameTest.Kind.NAME);
     }
     qp = p;
     return null;

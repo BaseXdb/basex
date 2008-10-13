@@ -678,7 +678,7 @@ public enum Type {
     }
   },
 
-  /** Empty sequence type. */
+  /** Virtual sequence type. */
   EMP("empty-sequence", null, EMPTY, false, false, false, false),
 
   /** Java type. */

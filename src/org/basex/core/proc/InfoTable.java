@@ -1,6 +1,7 @@
 package org.basex.core.proc;
 
 import static org.basex.data.DataText.*;
+import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.core.Commands.COMMANDS;
@@ -8,7 +9,6 @@ import org.basex.core.Commands.INFO;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.io.PrintOutput;
-import org.basex.util.Token;
 
 /**
  * Database info.
@@ -27,7 +27,7 @@ public final class InfoTable extends AInfo {
   @Override
   protected boolean exec() {
     // evaluate input as number range or xpath
-    if(args[0] != null && Token.toInt(args[0]) == Integer.MIN_VALUE) {
+    if(args[0] != null && toInt(args[0]) == Integer.MIN_VALUE) {
       result = query(args[0], null);
       if(result == null) return false;
     }
@@ -48,14 +48,14 @@ public final class InfoTable extends AInfo {
 
       if(args[0] != null) {
         if(args[1] != null) {
-          ps = Token.toInt(args[0]);
-          pe = Token.toInt(args[1]) + 1;
+          ps = toInt(args[0]);
+          pe = toInt(args[1]) + 1;
         } else {
-          ps = Token.toInt(args[0]);
+          ps = toInt(args[0]);
           pe = ps + 1;
         }
       }
-      table(out, data, Math.max(0, ps), Math.min(data.size, pe));
+      table(out, data, ps, pe);
     }
   }
 
@@ -63,15 +63,18 @@ public final class InfoTable extends AInfo {
    * Prints the specified range of the table.
    * @param out output stream
    * @param data data reference
-   * @param ps first node to be printed
-   * @param pe last node to be printed
+   * @param s first node to be printed
+   * @param e last node to be printed
    * @throws IOException build or write error
    */
   public static void table(final PrintOutput out, final Data data,
-      final int ps, final int pe) throws IOException {
+      final int s, final int e) throws IOException {
+    
+    final int ps = Math.max(0, s);
+    final int pe = Math.min(data.size, e);
     tableHeader(out, data);
     for(int p = ps; p < pe; p++) table(out, data, p);
-    data.ns.print(out, Token.numDigits(data.size) + 1);
+    data.ns.print(out, numDigits(data.size) + 1);
   }
 
   /**
@@ -83,12 +86,12 @@ public final class InfoTable extends AInfo {
   private static void tableHeader(final PrintOutput out, final Data data)
       throws IOException {
     // write table header
-    final int len = Token.numDigits(data.size);
-    format(out, Token.token(TABLEPRE), len + 1);
-    format(out, Token.token(TABLEDIST), len + 2);
-    format(out, Token.token(TABLESIZE), len + 2);
-    format(out, Token.token(TABLEATS), 4);
-    format(out, Token.token(TABLENS), 4);
+    final int len = Math.max(2, numDigits(data.size));
+    format(out, token(TABLEPRE), len + 1);
+    format(out, token(TABLEDIST), len + 2);
+    format(out, token(TABLESIZE), len + 2);
+    format(out, token(TABLEATS), 4);
+    format(out, token(TABLENS), 4);
     out.print(TABLEKIND);
   }
 
@@ -103,7 +106,7 @@ public final class InfoTable extends AInfo {
   private static void table(final PrintOutput out, final Data data,
       final int p) throws IOException {
     
-    final int len = Token.numDigits(data.size);
+    final int len = Math.max(2, numDigits(data.size));
     format(out, p, len + 1);
     final int k = data.kind(p);
     format(out, p - data.parent(p, k), len + 2);
@@ -134,7 +137,7 @@ public final class InfoTable extends AInfo {
    */
   private static void format(final PrintOutput out, final int n,
       final int left) throws IOException {
-    format(out, Token.token(n), left);
+    format(out, token(n), left);
   }
 
   /**

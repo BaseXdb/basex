@@ -14,23 +14,14 @@ import org.basex.query.xquery.item.Uri;
  * @author Christian Gruen
  */
 public final class NameTest extends Test {
-  /** Test types. */
-  public enum TYPE {
-    /** Accept all nodes (*).     */ ALL,
-    /** Test names (*:tag).       */ NAME,
-    /** Test namespaces (pre:*).  */ NS,
-    /** Test all nodes (pre:tag). */ STD
-  };
   /** Local name. */
-  private byte[] ln;
-  /** Test type. */
-  private TYPE test;
+  public byte[] ln;
 
   /**
    * Empty Constructor ('*').
    */
   public NameTest() {
-    test = TYPE.ALL;
+    kind = Kind.ALL;
   }
 
   /**
@@ -38,10 +29,10 @@ public final class NameTest extends Test {
    * @param nm name
    * @param t test type
    */
-  public NameTest(final QNm nm, final TYPE t) {
+  public NameTest(final QNm nm, final Kind t) {
     name = nm;
     ln = name.ln();
-    test = t;
+    kind = t;
   }
   
   @Override
@@ -49,19 +40,24 @@ public final class NameTest extends Test {
     // only elements and attributes will yield results
     if(tmp.type != Type.ELM && tmp.type != Type.ATT) return false;
     
-    if(test == TYPE.ALL) return true;
-    if(test == TYPE.NAME) return eq(ln, ln(tmp.nname()));
+    // wildcard - accept all nodes
+    if(kind == Kind.ALL) return true;
+    // namespaces wildcard - check only name
+    if(kind == Kind.NAME) return eq(ln, ln(tmp.nname()));
     
     final QNm nm = tmp.qname(qname);
-    return test == TYPE.NS ? nm.uri.eq(name.uri) : name.eq(nm);
+    // name wildcard - check only namespace
+    if(kind == Kind.NS) return nm.uri.eq(name.uri);
+    // check everything
+    return name.eq(nm);
   }
 
   @Override
   public String toString() {
-    if(test == TYPE.ALL) return "*";
-    if(test == TYPE.NAME) return "*:" + string(name.str());
+    if(kind == Kind.ALL) return "*";
+    if(kind == Kind.NAME) return "*:" + string(name.str());
     final String uri = name.uri == Uri.EMPTY || name.ns() ? "" :
       "{" + string(name.uri.str()) + "}";
-    return uri + (test == TYPE.NS ? "*" : string(name.str()));
+    return uri + (kind == Kind.NS ? "*" : string(name.str()));
   }
 }

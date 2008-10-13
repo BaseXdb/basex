@@ -1,8 +1,6 @@
 package org.basex.fs;
 
-import static org.basex.Text.*;
 import java.io.IOException;
-import java.util.regex.Pattern;
 import org.basex.data.Nodes;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
@@ -10,6 +8,7 @@ import org.basex.query.xpath.XPathProcessor;
 import org.basex.util.GetOpts;
 import org.basex.util.IntList;
 import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 
 /**
  * Performs a locate command.
@@ -18,8 +17,6 @@ import org.basex.util.Token;
  * @author Hannes Schwarz - Hannes.Schwarz@gmail.com
  */
 public final class Locate extends FSCmd {
-  /** limit output. */
-  private boolean lFlag = false;
   /** Just print number of found files. */
   private boolean cFlag = false;
   /** filename to search for. */
@@ -29,7 +26,7 @@ public final class Locate extends FSCmd {
   /** Version. */
   char version = (char) -1;
   /** Limit output to number of file names and exit. */
-  int limit = -1;
+  int limit = Integer.MAX_VALUE;
 
   @Override
   public void args(final String args) throws FSException {
@@ -39,14 +36,10 @@ public final class Locate extends FSCmd {
       final int ch = checkOpt(g);
       switch (ch) {
         case 'c':
-          //Suppress normal output; instead print a
-          //count of matching file names.
           cFlag = true;
           break;
         case 'l':
-          // Limit output to number of file names and exit.
           limit = Integer.parseInt(g.getOptarg());
-          lFlag = true;
           break;
         case 'V':
           version = g.getOptarg().charAt(0);
@@ -59,25 +52,20 @@ public final class Locate extends FSCmd {
 
   @Override
   public void exec(final PrintOutput out) throws IOException {
-    //fileToFindByte = Token.token(fileToFind);
-    // Version -  1 = use table
-    //            2 = use xquery
-    //            3 = use xquery + index
+    // Version: 1 = use table, 2 = use xquery
     switch (version) {
       case '1':
         path = fs.regex(path);
         locateTable(DataFS.ROOTDIR, out);
         break;
       case '2':
-        locateXQuery(out);
+        locateQuery(out);
         break;
-      default:
-        path = fs.regex(path);
-        locateTable(DataFS.ROOTDIR, out);
-      break;
     }
 
-    if(cFlag) printCount(out);
+    if(cFlag) {
+      out.println(Integer.toString(filesfound));
+    }
   }
 
   /**
@@ -89,41 +77,45 @@ public final class Locate extends FSCmd {
   private void locateTable(final int pre, final PrintOutput out)
       throws IOException {
 
-    if(!lFlag || filesfound < limit) {
-      final int[] contentDir = fs.children(pre);
-      final IntList res = new IntList();
+    final IntList dirs = new IntList();
+    final byte[] pat = Token.token(path);
+    
+    for(final int c : fs.children(pre)) {
+      if(filesfound >= limit) return;
 
-      for(final int i : contentDir) {
-        if(fs.isDir(i)) {
-          final byte[] name = fs.name(i);
-          path = fs.regex(path);
-          if(Pattern.matches(path, Token.string(name))) {
-            if(!cFlag) {
-              out.print(fs.path(i));
-              out.print(NL);
-            }
-            ++filesfound;
-            printDir(i, out);
-          } else {
-            res.add(i);
-          }
-        } else if(fs.isFile(i)) {
-          // if found print with path
-          final byte[] name = fs.name(i);
-          //if(Token.eq(name, fileToFindByte)) {
-          if(Pattern.matches(path, Token.string(name))) {
-            ++filesfound;
-            if(!cFlag) {
-              out.print(fs.path(i));
-              out.print(NL);
-            }
-          }
-        }
+      //if(Pattern.matches(path, Token.string(name))) {
+      final boolean dir = fs.isDir(c);
+      if(Token.contains(fs.name(c), pat)) {
+        if(!cFlag) out.println(fs.path(c));
+        if(dir) printDir(c, out);
+        ++filesfound;
+      } else {
+        if(dir) dirs.add(c);
       }
-      // repeat for all dirs
-      for(final int dir : res.finish()) {
-        locateTable(dir, out);
-      }
+    }
+    // repeat for all dirs
+    for(final int dir : dirs.finish()) {
+      locateTable(dir, out);
+    }
+  }
+
+  /**
+   * Print recursive all content of the dir.
+   * @param i pre value of the dir to print
+   * @param out output stream
+   * @throws IOException in case of problems with the PrintOutput
+   */
+  private void printDir(final int i, final PrintOutput out) throws IOException {
+    final IntList dirs = new IntList();
+
+    for(final int c : fs.children(i)) {
+      if(filesfound++ >= limit) return;
+      if(!cFlag) out.println(fs.path(c));
+      if(fs.isDir(c)) dirs.add(c);
+    }
+    
+    for(final int dir : dirs.finish()) {
+      printDir(dir, out);
     }
   }
 
@@ -132,30 +124,29 @@ public final class Locate extends FSCmd {
    * @param out output stream
    * @throws IOException in case of problems with the PrintOutput
    */
-  private void locateXQuery(final PrintOutput out) throws IOException {
-    String query = "";
-    int slash = path.indexOf('/');
-    int lastSlash = 0;
-    final int lastrIndexOfSlash = path.lastIndexOf('/');
-
-    if(slash > 0) {
-      query = "//*" + filter(path.substring(lastSlash, slash));
-      while(slash < lastrIndexOfSlash) {
-        query += "/*" + filter(path.substring(lastSlash, slash));
-        lastSlash = slash;
-        slash = path.indexOf('/', lastSlash);
-      }
-      query += "/*" + filter(path.substring(lastrIndexOfSlash + 1,
-          path.length())) + "/descendant-or-self::*";
+  private void locateQuery(final PrintOutput out) throws IOException {
+    final TokenBuilder query = new TokenBuilder("/");
+    final String[] names = path.split("/");
+    
+    // build query string
+    if(names.length > 1) {
+      add(query, "ends-with", names[0]);
+      final int nl = names.length - 1;
+      for(int n = 1; n < nl; n++) add(query, "contains", names[n]);
+      add(query, "starts-with", names[nl]);
     } else {
-      query = "//*" + filter(path) + "/descendant-or-self::*";
+      add(query, "contains", path);
     }
-    final XPathProcessor qu = new XPathProcessor(query);
+
+    // include limit in query
+    final XPathProcessor qu = new XPathProcessor(
+        "(/descendant-or-self::*" + query + ")[position() <= " + limit + "]");
+    
     try {
       final Nodes result = qu.queryNodes(context.current());
       filesfound = result.size;
       if(!cFlag) {
-        for(int i = 0; i < filesfound && (!lFlag || i < limit); i++) {
+        for(int i = 0; i < filesfound; i++) {
           out.println(fs.path(result.nodes[i]));
         }
       }
@@ -165,47 +156,12 @@ public final class Locate extends FSCmd {
   }
 
   /**
-   * Returns an XPath filter expression on the file name.
+   * Adds an XPath step with the specified function and file.
+   * @param tb token builder
+   * @param fun function
    * @param name file name
-   * @return filter expression
    */
-  private String filter(final String name) {
-    return "[contains(@name, \"" + name + "\")]";
-  }
-
-
-  /**
-   * Print recursive all content of the dir.
-   * @param i pre value of the dir to print
-   * @param out output stream
-   * @throws IOException in case of problems with the PrintOutput
-   */
-  private void printDir(final int i, final PrintOutput out) throws IOException {
-    final int toScan = i;
-    final int[] subContentDir = fs.children(toScan);
-    final IntList allDir = new IntList();
-
-    for(final int j : subContentDir) {
-      if(!cFlag) {
-        out.print(fs.path(j));
-        out.print(NL);
-      }
-      if(fs.isDir(j)) {
-        allDir.add(j);
-      }
-      ++filesfound;
-    }
-    while(allDir.size > 0) {
-      printDir(allDir.remove(0), out);
-    }
-  }
-
-  /**
-   * Print the number of files found.
-   * @param out output stream
-   * @throws IOException in case of problems with the PrintOutput
-   */
-  private void printCount(final PrintOutput out) throws IOException {
-    out.print("" + filesfound);
+  private void add(final TokenBuilder tb, final String fun, final String name) {
+    tb.add("/*[" + fun + "(@name, \"" + name + "\")]");
   }
 }

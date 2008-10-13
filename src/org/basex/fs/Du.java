@@ -45,7 +45,7 @@ public final class Du extends FSCmd {
 
   @Override
   public void exec(final PrintOutput out) throws IOException {
-    if(path != null) curPre(path);
+    if(path != null) goTo(path);
     du(new int[] { curPre }, out, true);
   }
 

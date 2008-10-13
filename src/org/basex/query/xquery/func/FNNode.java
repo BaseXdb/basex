@@ -3,7 +3,6 @@ package org.basex.query.xquery.func;
 import org.basex.BaseX;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
-import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Nod;
@@ -80,11 +79,6 @@ public final class FNNode extends Fun {
         BaseX.notexpected(func); return null;
 
     }
-  }
-
-  @Override
-  public Expr comp(final XQContext ctx, final Expr[] arg) {
-    return this;
   }
 
   /**

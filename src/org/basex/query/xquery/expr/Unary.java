@@ -38,7 +38,7 @@ public final class Unary extends Single {
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
     super.comp(ctx);
-    return expr.n() ? unary((Item) expr) : this;
+    return expr.i() && ((Item) expr).n() ? unary((Item) expr) : this;
   }
   
   @Override

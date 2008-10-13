@@ -49,7 +49,7 @@ public final class MemBuilder extends Builder {
   @Override
   protected void addElem(final int tok, final int s, final int dis,
       final int a, final boolean n) throws IOException {
-    data.addElem(tok, s, dis, a, 0, n);
+    data.addElem(tok, s, dis, a, a, n);
     size = data.size;
     if(size < 0) throw new IOException(LIMITRANGE);
   }

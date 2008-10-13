@@ -204,8 +204,8 @@ public final class MemData extends Data {
    * @param t tag
    * @param n namespace
    * @param d distance
-   * @param a number of attributes
    * @param ne element has namespaces
+   * @param a number of attributes
    * @param s node size
    */
   public void addElem(final long t, final long n, final long d, final long a,
@@ -247,7 +247,7 @@ public final class MemData extends Data {
    * @param pre closing pre tag
    */
   public void finishElem(final int pre) {
-    val2[pre] |= (long) (size - pre) << 32;
+    val2[pre] = (int) val2[pre] + (((long) size - pre) << 32);
   }
 
   /**

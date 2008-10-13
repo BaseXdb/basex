@@ -151,7 +151,7 @@ public interface QueryTokens {
   String FOUND = ", found \"%\"";
   
   /** Parsing exception. */
-  String UNENTITY = "Unknown entity \"%\".";
+  String UNENTITY = "Undefined entity \"%\".";
   /** Parsing exception. */
   String INVENTITY = "Invalid entity \"%\".";
 }

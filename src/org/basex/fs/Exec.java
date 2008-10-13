@@ -15,7 +15,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Hannes Schwarz - Hannes.Schwarz@gmail.com
  */
-public final class Ext extends FSCmd {
+public final class Exec extends FSCmd {
   /** Specified command. */
   private String cmd;
 

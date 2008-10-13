@@ -300,6 +300,8 @@ public interface XQText {
 
   /** XPST0008: Parsing exception. */
   Object[] VARNOTDEFINED = { XPST, 8, "Undefined variable \"%\"." };
+  /** XPST0008: Parsing exception. */
+  Object[] VARNOTDEF = { XPST, 8, "Undefined variable??? \"%\"." };
   /** XPST0017: Parsing Exception. */
   Object[] XPARGS = { XPST, 17, "Wrong arguments: % expected." };
   /** XPST0017: Parsing exception. */
@@ -501,7 +503,9 @@ public interface XQText {
   // OPTIMIZATIONS
 
   /** Compiler info. */
-  String OPTPREEVAL = "Pre-evaluating %";
+  //String OPTPREEVAL = "Pre-evaluating %";
+  /** Compiler info. */
+  String OPTSIMPLE = "% => %";
   /** Compiler info. */
   String OPTCAST = "Casting %";
   /** Compiler info. */

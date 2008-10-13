@@ -34,7 +34,7 @@ public final class Satisfy extends Single {
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
     for(int f = 0; f != fl.length; f++) {
-      final Expr e = fl[f].comp(ctx);
+      final Expr e = ctx.comp(fl[f]);
       if(e.e()) return Bln.get(every);
       fl[f] = (ForLet) e;
     }
@@ -44,7 +44,7 @@ public final class Satisfy extends Single {
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
     final Iter[] iter = new Iter[fl.length];
-    for(int f = 0; f < fl.length; f++) iter[f] = fl[f].iter(ctx);
+    for(int f = 0; f < fl.length; f++) iter[f] = ctx.iter(fl[f]);
     return Bln.get(iter(ctx, iter, 0)).iter();
   }
 

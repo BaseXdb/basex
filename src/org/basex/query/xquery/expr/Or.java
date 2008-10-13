@@ -6,6 +6,7 @@ import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Scoring;
+import org.basex.util.Array;
 
 /**
  * Or expression.
@@ -21,6 +22,20 @@ public final class Or extends Arr {
   public Or(final Expr[] e) {
     super(e);
   }
+
+  @Override
+  public Expr comp(final XQContext ctx) throws XQException {
+    int el = expr.length;
+    for(int e = 0; e < el; e++) {
+      expr[e] = ctx.comp(expr[e]);
+      if(!expr[e].i()) continue;
+      if(((Item) expr[e]).bool()) return Bln.TRUE;
+      Array.move(expr, e + 1, -1, --el - e);
+      --e;
+    }
+    return el == expr.length ? this : el == 0 ?  Bln.FALSE :
+      new Or(Array.finish(expr, el));
+  }
   
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
@@ -35,7 +50,7 @@ public final class Or extends Arr {
         found = true;
       }
     }
-    return new Bln(found, d).iter();
+    return (d == 0 ? Bln.get(found) : new Bln(true, d)).iter();
   }
 
   @Override

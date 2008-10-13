@@ -39,8 +39,9 @@ public final class Names extends Set {
   /**
    * Constructor, specifying an input file.
    * @param in input stream
+   * @throws IOException I/O exception
    */
-  public Names(final DataInput in) {
+  public Names(final DataInput in) throws IOException {
     keys = in.readBytesArray();
     next = in.readNums();
     bucket = in.readNums();
@@ -60,8 +61,8 @@ public final class Names extends Set {
    */
   public int index(final byte[] k, final byte[] v) {
     final int i = Math.abs(add(k));
+    if(stat[i] == null) stat[i] = new StatsKey();
     if(stats) {
-      if(stat[i] == null) stat[i] = new StatsKey();
       counter[i]++;
       stat[i].add(v);
     }

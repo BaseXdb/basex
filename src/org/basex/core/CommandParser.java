@@ -107,7 +107,7 @@ public final class CommandParser extends QueryParser {
           args = "";
         } catch(final IllegalArgumentException ex) {
         }
-        final String a = path(null, false);
+        final String a = string(null);
         proc = new Fs(fs.name(), a == null ? args : args + " " + a);
       } else {
         cmd = consume(COMMANDS.class, null);
@@ -132,11 +132,11 @@ public final class CommandParser extends QueryParser {
       case CREATE:
         switch(consume(CREATE.class, cmd)) {
           case DATABASE: case DB: case XML:
-            return new CreateDB(path(cmd, true), name(null));
+            return new CreateDB(path(cmd), name(null));
           case MAB: case MAB2:
-            return new CreateMAB(path(cmd, true), name(null));
+            return new CreateMAB(path(cmd), name(null));
           case FS:
-            return new CreateFS(path(cmd, true), name(null));
+            return new CreateFS(path(cmd), name(null));
           case INDEX:
             return new CreateIndex(consume(INDEX.class, cmd));
         }
@@ -175,7 +175,7 @@ public final class CommandParser extends QueryParser {
       case OPTIMIZE:
         return new Optimize();
       case EXPORT:
-        return new Export(path(cmd, true));
+        return new Export(path(cmd));
       case XPATH:
         return new XPath(xpath(null));
       case XPATHMV:
@@ -185,7 +185,7 @@ public final class CommandParser extends QueryParser {
       case XQUENV:
         return new XQEnv(xquery(null));
       case FIND:
-        return new Find(path(cmd, false));
+        return new Find(string(cmd));
       case XMARK:
         return new XMark(number(cmd));
       case CS:
@@ -197,7 +197,9 @@ public final class CommandParser extends QueryParser {
       case INSERT:
         final UPDATE ins = consume(UPDATE.class, cmd);
         switch(ins) {
-          case FRAGMENT: case ELEMENT: case TEXT: case COMMENT:
+          case FRAGMENT:
+            return new Insert(ins, string(cmd, true), number(cmd), xpath(cmd));
+          case ELEMENT: case TEXT: case COMMENT:
             return new Insert(ins, name(cmd), number(cmd), xpath(cmd));
           case PI:
             return new Insert(ins, name(cmd), name(cmd), number(cmd),
@@ -219,7 +221,7 @@ public final class CommandParser extends QueryParser {
         break;
       case SET:
         final String opt = name(cmd).toUpperCase();
-        String val = path(null, true);
+        String val = string(null, false);
         try {
           final Object o = Prop.class.getField(opt.toLowerCase()).get(null);
           if(val != null) {
@@ -277,7 +279,7 @@ public final class CommandParser extends QueryParser {
    * @return path
    * @throws QueryException query exception
    */
-  private String path(final COMMANDS cmd, final boolean spc)
+  private String string(final COMMANDS cmd, final boolean spc)
       throws QueryException {
     final StringBuilder tb = new StringBuilder();
     consumeWS();
@@ -295,6 +297,26 @@ public final class CommandParser extends QueryParser {
       consume();
     }
     return finish(cmd, tb);
+  }
+
+  /**
+   * Parses and returns a string delimited by a space.
+   * @param cmd referring command; if specified, the result mustn't be empty
+   * @return path
+   * @throws QueryException query exception
+   */
+  private String string(final COMMANDS cmd) throws QueryException {
+    return string(cmd, false);
+  }
+
+  /**
+   * Parses and returns a file path.
+   * @param cmd referring command; if specified, the result mustn't be empty
+   * @return path
+   * @throws QueryException query exception
+   */
+  private String path(final COMMANDS cmd) throws QueryException {
+    return string(cmd, true);
   }
 
   /**

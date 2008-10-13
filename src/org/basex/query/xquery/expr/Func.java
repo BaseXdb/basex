@@ -1,9 +1,7 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQTokens.*;
-
 import java.io.IOException;
-
 import org.basex.data.Serializer;
 import org.basex.query.ExprInfo;
 import org.basex.query.xquery.XQContext;
@@ -45,7 +43,10 @@ public final class Func extends ExprInfo {
    * @throws XQException xquery exception
    */
   public void comp(final XQContext ctx) throws XQException {
-    expr = expr.comp(ctx);
+    final int s = ctx.vars.size();
+    for(int a = 0; a < args.length; a++) ctx.vars.add(args[a]);
+    expr = ctx.comp(expr);
+    ctx.vars.reset(s);
   }
 
   @Override

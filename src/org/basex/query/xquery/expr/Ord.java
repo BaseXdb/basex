@@ -52,7 +52,7 @@ public final class Ord {
    * @throws XQException query exception
    */
   public void comp(final XQContext ctx) throws XQException {
-    if(expr != null) expr = expr.comp(ctx);
+    if(expr != null) expr = ctx.comp(expr);
   }
 
   /**

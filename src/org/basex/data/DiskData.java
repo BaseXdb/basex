@@ -133,12 +133,6 @@ public final class DiskData extends Data {
     cls();
   }
 
-  @Override
-  protected void finalize() throws Throwable {
-    super.finalize();
-    cls();
-  }
-
   /**
    * Closes the database without writing data back to disk.
    * @throws IOException I/O exception
@@ -406,13 +400,13 @@ public final class DiskData extends Data {
       par = parent(par, ATTR);
       attSize(par, ELEM, attSize(par, ELEM) - 1);
       size(par, ELEM, size(par, ELEM) - 1);
+      k = kind(par);
     }
 
     // reduce size of remaining ancestors
-    while(par > 0) {
-      k = kind(par);
-      if(k == DOC) break;
+    while(par > 0 && k != DOC) {
       par = parent(par, k);
+      k = kind(par);
       size(par, k, size(par, k) - s);
     }
 
@@ -420,11 +414,18 @@ public final class DiskData extends Data {
     table.delete(pre, s);
     size -= s;
 
+    if(size == 0) {
+      size = 1;
+      size(0, DOC);
+    }
+    
     updateDist(pre, -s);
   }
 
   /**
-   * Updates the ancestor sizes and parent references of the following nodes.
+   * This method is called after a table modification. It updates the
+   * size values of the ancestors and the distance values of the
+   * following siblings.
    * @param pre root node
    * @param par parent node
    * @param s size to be added
@@ -441,7 +442,8 @@ public final class DiskData extends Data {
   }
 
   /**
-   * Updates the distance values.
+   * This method updates the distance values of the specified pre value
+   * and the following siblings.
    * @param pre root node
    * @param s size to be added/removed
    */
@@ -479,40 +481,45 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public void insert(final int pre, final int par, final Data td) {
+  public void insert(final int pre, final int par, final Data dt) {
     // reference to root tag
-    final int tr = 0;
-    final int ts = td.size(tr, td.kind(tr));
-    final int tl = tr + ts;
+    final int pr = par > 0 ? par : -1;
+    final int ta = dt.kind(0) == DOC && pr > 0 ? 1 : 0;
+    final int ts = dt.size(ta, dt.kind(ta));
+    final int tb = ta + ts;
 
-    for(int i = tr; i < tl; i++) {
-      final int tk = td.kind(i);
-      int dis = i - td.parent(i, tk);
-      if(dis > i) dis = pre - par;
-      final int p = pre + i - tr - 1;
+    // add all single nodes
+    for(int t = ta; t < tb; t++) {
+      final int k = dt.kind(t);
+      final int r = dt.parent(t, k);
+      // recalculate distance for top nodes
+      final int d = r < ta ? pre - pr : t - r;
+      final int p = pre + t - ta - 1;
 
-      switch(tk) {
+      // [CG] include namespace references
+      
+      switch(k) {
         case ELEM:
           // add element
-          insertElem(p, dis, td.tag(i), td.attSize(i, tk), td.size(i, tk));
+          insertElem(p, d, dt.tag(t), dt.attSize(t, k), dt.size(t, k));
           break;
         case DOC:
           // add document
-          insertDoc(p, td.size(i, tk), td.text(i));
+          insertDoc(p, dt.size(t, k), dt.text(t));
           break;
         case TEXT:
         case COMM:
         case PI:
           // add text
-          insertText(p, dis, td.text(i), tk);
+          insertText(p, d, dt.text(t), k);
           break;
         case ATTR:
           // add attribute
-          insertAttr(p, dis, td.attName(i), td.attValue(i));
+          insertAttr(p, d, dt.attName(t), dt.attValue(t));
           break;
       }
     }
-    updateTable(pre, par, ts);
+    updateTable(pre, pr, ts);
   }
 
   /**
@@ -527,6 +534,7 @@ public final class DiskData extends Data {
   private void insertElem(final int pre, final int dis,
       final byte[] tag, final int as, final int s) {
 
+    // [CG] add namespace support
     final long id = ++meta.lastid;
     final int t = tags.index(tag, null);
     table.insert(pre, new byte[] { ELEM, (byte) (t >> 8), (byte) t, (byte) as,
@@ -549,6 +557,7 @@ public final class DiskData extends Data {
     final long txt = texts.length();
     texts.writeBytes(txt, val);
 
+    // [CG] add namespace support
     table.insert(pre, new byte[] { DOC, 0, 0, (byte) (txt >> 32),
         (byte) (txt >> 24), (byte) (txt >> 16), (byte) (txt >> 8), (byte) txt,
         (byte) (s >> 24), (byte) (s >> 16), (byte) (s >> 8), (byte) s,
@@ -566,6 +575,8 @@ public final class DiskData extends Data {
    */
   private void insertText(final int pre, final int dis, final byte[] val,
       final int kind) {
+
+    // [CG] add namespace support
 
     // build and insert new entry
     final long id = ++meta.lastid;
@@ -589,6 +600,8 @@ public final class DiskData extends Data {
    */
   private void insertAttr(final int pre, final int dis, final byte[] name,
       final byte[] val) {
+
+    // [CG] add namespace support
 
     // add attribute to text storage
     final long len = values.length();
@@ -648,17 +661,17 @@ public final class DiskData extends Data {
    * @param kind node kind
    * @param v value
    */
-  public void attSize(final int pre, final int kind, final int v) {
+  private void attSize(final int pre, final int kind, final int v) {
     if(kind == ELEM) table.write1(pre, 3, v);
   }
 
   /**
-   * Writes the attribute size.
+   * Writes the size values.
    * @param pre pre value
    * @param kind node kind
    * @param v value
    */
-  public void size(final int pre, final int kind, final int v) {
+  private void size(final int pre, final int kind, final int v) {
     if(kind == ELEM || kind == DOC) table.write4(pre, 8, v);
   }
 }

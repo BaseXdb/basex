@@ -3,6 +3,7 @@ package org.basex.core;
 import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.BaseX;
+import org.basex.core.proc.Fs;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
@@ -78,7 +79,9 @@ public abstract class Process extends AbstractProcess {
     if(updating() && (Prop.mainmem || Prop.onthefly)) return error(PROCMM);
 
     try {
-      return exec();
+      final boolean ok = exec();
+      if(updating() && !(this instanceof Fs)) context.flush();
+      return ok;
     } catch(final Throwable ex) {
       // not expected...
       ex.printStackTrace();

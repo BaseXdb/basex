@@ -81,7 +81,7 @@ public final class FTSelect extends Single {
   
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
-    weight = weight.comp(ctx);
+    weight = ctx.comp(weight);
     return super.comp(ctx);
   }
 

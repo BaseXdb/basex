@@ -2,12 +2,12 @@ package org.basex.test.storage;
 
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
-import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.DropDB;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
+import org.basex.io.IO;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -22,8 +22,6 @@ import org.junit.Test;
 public abstract class DataUpdateTest {
   /** JUnit tag. */
   static final byte[] JUNIT = token("junit");
-  /** Context. */
-  static final Context CONTEXT = new Context();
   /** Test file we do updates with. */
   static final String TESTFILE = "etc/xml/test.xml";
   /** Test database name. */
@@ -51,8 +49,7 @@ public abstract class DataUpdateTest {
   @Before
   @SuppressWarnings("unused")
   public void setUp() throws Exception {
-    new CreateDB(TESTFILE, dbname).execute(CONTEXT);
-    data = CONTEXT.data();
+    data = CreateDB.xml(IO.get(TESTFILE), dbname);
     size = data.size;
   }
   

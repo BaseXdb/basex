@@ -16,6 +16,9 @@ import org.basex.util.Set;
  * @author Christian Gruen
  */
 public final class Namespaces extends Set {
+
+  // [CG] add support for updates/disallow updates for documents with namespaces
+
   /** Root node. */
   private Node root;
   /** Current node. */
@@ -31,8 +34,9 @@ public final class Namespaces extends Set {
   /**
    * Constructor, specifying an input file.
    * @param in input stream
+   * @throws IOException I/O exception
    */
-  public Namespaces(final DataInput in) {
+  public Namespaces(final DataInput in) throws IOException {
     keys = in.readBytesArray();
     next = in.readNums();
     bucket = in.readNums();
@@ -180,8 +184,9 @@ public final class Namespaces extends Set {
      * Constructor, specifying an input stream.
      * @param in input stream
      * @param p parent reference
+     * @throws IOException I/O exception
      */
-    Node(final DataInput in, final Node p) {
+    Node(final DataInput in, final Node p) throws IOException {
       par = p;
       pre = in.readNum();
       key = in.readNums();
@@ -257,11 +262,12 @@ public final class Namespaces extends Set {
      * @throws IOException I/O exception
      */
     void print(final PrintOutput out, final int s) throws IOException {
+      final byte[] quote = { '"' };
       for(int i = 0; i < key.length; i++) {
         out.print(s, token(pre));
         out.print(s + 1, token(pre - par.pre));
-        out.print(" \"");
-        out.print(concat(key(key[i]), (byte) '"'), 10);
+        out.print(' ');
+        out.print(concat(quote, key(key[i]), quote), 11);
         out.print(key(val[i]));
         out.println(" (" + val[i] + ")");
       }

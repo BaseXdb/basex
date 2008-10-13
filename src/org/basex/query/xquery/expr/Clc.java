@@ -1,6 +1,5 @@
 package org.basex.query.xquery.expr;
 
-import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
@@ -40,8 +39,6 @@ public final class Clc extends Arr {
     final Expr e2 = expr[1];
     final boolean empty = e1.e() || e2.e();
     if(!(empty || e1.i() && e2.i())) return this;
-    
-    ctx.compInfo(OPTPREEVAL, this);
     return empty ? Seq.EMPTY : calc.ev((Item) e1, (Item) e2);
   }
 

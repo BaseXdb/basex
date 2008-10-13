@@ -1,7 +1,6 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQTokens.*;
-import static org.basex.query.xquery.XQText.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQException;
@@ -117,11 +116,9 @@ public final class CmpV extends Arr {
 
     final Expr e1 = expr[0];
     final Expr e2 = expr[1];
-    final boolean empty = e1.e() || e2.e();
-    if(!(empty || e1.i() && e2.i())) return this;
-    
-    ctx.compInfo(OPTPREEVAL, this);
-    if(empty) return Seq.EMPTY;
+    final boolean e = e1.e() || e2.e();
+    if(e) return Seq.EMPTY;
+    if(!e1.i() || !e2.i()) return this;
 
     final Item i1 = (Item) expr[0];
     final Item i2 = (Item) expr[1];

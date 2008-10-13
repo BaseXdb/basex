@@ -33,6 +33,8 @@ public final class Var extends ExprInfo implements Cloneable {
   public Expr expr;
   /** Variable results. */
   public Item item;
+  /** Global flag. */
+  public boolean global;
 
   /**
    * Constructor.
@@ -58,7 +60,7 @@ public final class Var extends ExprInfo implements Cloneable {
    * @throws XQException xquery exception
    */
   public void comp(final XQContext ctx) throws XQException {
-    if(expr != null) expr = expr.comp(ctx);
+    if(expr != null) expr = ctx.comp(expr);
   }
 
   /**
@@ -93,15 +95,24 @@ public final class Var extends ExprInfo implements Cloneable {
    * @throws XQException query exception
    */
   public Iter iter(final XQContext ctx) throws XQException {
+    return item(ctx).iter();
+  }
+  
+  /**
+   * Evaluates the variable.
+   * @param ctx query context
+   * @return iterator
+   * @throws XQException query exception
+   */
+  public Item item(final XQContext ctx) throws XQException {
     if(item == null) {
       if(expr == null) Err.or(VAREMPTY, this);
-      
       final Item it = ctx.item;
       ctx.item = null;
       item = check(ctx.iter(expr).finish(), ctx);
       ctx.item = it;
     }
-    return item.iter();
+    return item;
   }
   
   /**
@@ -137,8 +148,13 @@ public final class Var extends ExprInfo implements Cloneable {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, NAM, name.str());
-    expr.plan(ser);
-    ser.closeElement();
+    ser.startElement(this);
+    ser.attribute(NAM, name.str());
+    if(expr == null) {
+      ser.emptyElement();
+    } else {
+      expr.plan(ser);
+      ser.closeElement();
+    }
   }
 }

@@ -32,7 +32,7 @@ public final class Prompt extends Process {
       final Nodes nodes = context.current();
       final int pre = nodes.nodes[0];
       if(data.kind(pre) == Data.ELEM) {
-        curr.add(Prop.fsmode ? data.fs.name(pre) : data.tag(pre));
+        curr.add(Prop.fsmode ? data.fs.path(pre) : data.tag(pre));
       }
       if(nodes.size != 1) curr.add("[...]");
     }

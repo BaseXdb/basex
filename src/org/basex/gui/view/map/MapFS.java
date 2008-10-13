@@ -1,9 +1,13 @@
 package org.basex.gui.view.map;
 
+import static org.basex.build.BuildText.*;
 import static org.basex.Text.*;
+import static org.basex.util.Token.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.Context;
@@ -17,10 +21,7 @@ import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewData;
-import org.basex.io.BufferInput;
-import org.basex.util.Array;
 import org.basex.util.Performance;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -38,8 +39,6 @@ public final class MapFS extends MapPainter {
   private static DataFS fs;
   /** Flag for error message. */
   private boolean error;
-  /** File buffer. */
-  private byte[] fileBuf = new byte[128];
 
   /**
    * Constructor.
@@ -50,12 +49,6 @@ public final class MapFS extends MapPainter {
     super(m);
     fs = f;
     if(images == null) images = new MapImages(m);
-  }
-
-  @Override
-  protected void finalize() throws Throwable {
-    super.finalize();
-    images.reset();
   }
 
   @Override
@@ -190,25 +183,23 @@ public final class MapFS extends MapPainter {
       }
     }
 
-    final boolean leaf = ViewData.isLeaf(data, pre);
     final boolean full = !isImage && rect.w >= GUIProp.fontsize * 12 &&
       rect.h >= GUIProp.fontsize * 8 || rect.w == view.getWidth() &&
       rect.h == view.getHeight();
 
-    final int fullsize = full && (leaf || file) ? 1 : 0;
+    final int fullsize = full && file ? 1 : 0;
     final int off = (16 << fullsize) + fullsize * 8;
 
     final byte[] text = tag ? name : data.text(pre);
     g.setFont(tag ? fullsize == 1 ? GUIConstants.lfont : GUIConstants.font :
       GUIConstants.mfont);
 
-    final Image img = file ? GUIFS.images(name, fullsize) :
-      dir && leaf ? GUIFS.folder2[fullsize] : null;
+    final Image img = file ? GUIFS.images(name, fullsize) : null;
     final int fh = g.getFontMetrics().getHeight();
 
     if(fullsize == 0) {
       // Rectangle display
-      if(img == null && !leaf) {
+      if(img == null && !file) {
         g.setColor(Color.black);
         BaseXLayout.chopString(g, text, rect.x + 2, rect.y, rect.w);
       } else {
@@ -231,8 +222,8 @@ public final class MapFS extends MapPainter {
         g.setColor(Color.black);
         BaseXLayout.drawText(g, rect, text);
         if(h == GUIProp.fontsize && img != null) {
-          final long size = Token.toLong(fs.size(pre));
-          final byte[] info = Token.token(Performance.formatSize(size, false));
+          final long size = toLong(fs.size(pre));
+          final byte[] info = token(Performance.formatSize(size, false));
           w = BaseXLayout.width(g, info);
           if(BaseXLayout.width(g, text) < rect.w - w - 10) {
             final int ox = rect.x;
@@ -262,7 +253,7 @@ public final class MapFS extends MapPainter {
         final int w = BaseXLayout.chopString(g, text, rect.x + off + 3,
             rect.y, rect.w - off - 3);
 
-        final long size = Token.toLong(fs.size(pre));
+        final long size = toLong(fs.size(pre));
         final String info = GUIFS.desc(text, dir) + ", " +
           Performance.formatSize(size, true);
 
@@ -270,7 +261,7 @@ public final class MapFS extends MapPainter {
         final int sw = BaseXLayout.width(g, info);
         if(w + sw + 40 < rect.w) {
           g.setColor(GUIConstants.COLORS[rect.l + 10]);
-          BaseXLayout.chopString(g, Token.token(info),
+          BaseXLayout.chopString(g, token(info),
               rect.x + rect.w - sw, rect.y, rect.w);
         }
         rect.x += 10;
@@ -294,46 +285,47 @@ public final class MapFS extends MapPainter {
     rect.h -= o >> 1;
 
     // prepare content display; read in first bytes
-    long b = 0;
+    long s = 0;
     final byte[] path = ViewData.path(data, pre);
+    byte[] fileBuf = null;
     try {
       boolean binary = GUIFS.mime(name) == GUIFS.Type.IMAGE;
 
       if(!binary) {
         // approximate number of bytes that will be displayed
-        b = rect.h * rect.w / o * 4 / GUIConstants.mfwidth['A'];
-        while(b >= fileBuf.length) fileBuf = Array.extend(fileBuf);
+        s = rect.h * rect.w / o * 4 / GUIConstants.mfwidth['A'];
 
-        final BufferInput bi = new BufferInput(Token.string(path), fileBuf);
-        bi.read();
-        bi.close();
-        b = Math.min(bi.length(), b);
-        if(b > fileBuf.length) b = fileBuf.length;
+        // minimize buffer size
+        final File f = new File(string(path));
+        s = Math.min(s, f.length());
+        
+        // read file contents
+        final FileInputStream fis = new FileInputStream(f);
+        fileBuf = new byte[(int) s];
+        fis.read(fileBuf);
+        fis.close();
 
         // check if file contains mainly ASCII characters
         int n = 0;
-        for(int i = 0; i < b; i++) {
-          final byte bb = fileBuf[i];
-          if(bb > 31 || bb == 0x0D || bb == 0x0A) n++;
-        }
-        binary = (n << 3) + n < (b << 3);
+        for(final byte b : fileBuf) if(b >= ' ' || ws(b)) n++;
+        binary = (n << 3) + n < (s << 3);
       }
 
       // set binary string for images and binary files
       if(binary) {
-        if(!file && leaf || file && !leaf) return true;
         fileBuf = MAPBINARY;
-        b = fileBuf.length;
+        s = fileBuf.length;
       }
     } catch(final IOException ex) {
-      if(!error) BaseX.debug("Could not parse \"%\".", path);
+      if(!error) BaseX.debug(FILEERR, path);
       BaseX.debug(ex);
       error = true;
       return true;
     }
 
+    // draw file contents or binary information
     g.setFont(GUIConstants.mfont);
-    BaseXLayout.drawText(g, rect, fileBuf, (int) b, true);
+    BaseXLayout.drawText(g, rect, fileBuf, (int) s, true);
     return false;
   }
 

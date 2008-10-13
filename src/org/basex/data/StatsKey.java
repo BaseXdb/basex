@@ -45,8 +45,9 @@ public final class StatsKey {
   /**
    * Constructor, specifying an input stream.
    * @param in input stream
+   * @throws IOException I/O exception
    */
-  public StatsKey(final DataInput in) {
+  public StatsKey(final DataInput in) throws IOException {
     kind = Kind.values()[in.readNum()];
     if(kind == Kind.INT || kind == Kind.DBL) {
       min = toDouble(in.readBytes());

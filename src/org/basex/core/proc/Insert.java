@@ -3,14 +3,18 @@ package org.basex.core.proc;
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
+import javax.xml.transform.sax.SAXSource;
 import org.basex.BaseX;
 import org.basex.build.MemBuilder;
+import org.basex.build.Parser;
+import org.basex.build.xml.SAXWrapper;
 import org.basex.build.xml.XMLParser;
 import org.basex.core.Prop;
 import org.basex.core.Commands.UPDATE;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.io.IO;
+import org.basex.io.IOContent;
 import org.basex.util.Token;
 
 /**
@@ -107,17 +111,20 @@ public final class Insert extends AUpdate {
     
     Data tmp;
     try {
-      // parse xml input or filename
-      tmp = new MemBuilder().build(new XMLParser(IO.get(args[0])), "tmp");
+      final IO io = IO.get(args[0]);
+      final Parser parser = Prop.intparse || io instanceof IOContent ?
+          new XMLParser(io) : new SAXWrapper(new SAXSource(io.inputSource()));
+
+      tmp = new MemBuilder().build(parser, "tmp");
     } catch(final IOException ex) {
       BaseX.debug(ex);
       return error(ex.getMessage());
     }
-
-    // check if all nodes are elements
+    
+    /* check if all nodes are elements
     for(int i = nodes.size - 1; i >= 0; i--) {
       if(data.kind(nodes.nodes[i]) != Data.ELEM) return error(COPYTAGS);
-    }
+    }*/
 
     // insert temporary instance of document
     data.noIndex();

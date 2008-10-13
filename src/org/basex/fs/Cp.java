@@ -154,6 +154,7 @@ public final class Cp extends FSCmd {
         break;
       }
     }
+    fs.flush();
   }
 
   /**
@@ -203,7 +204,7 @@ public final class Cp extends FSCmd {
     }
     // pre value of the dir of insertion
     int copyRoot;
-    // pre value of the parrent node
+    // pre value of the parent node
     int parPre;
     // need to calculate the pre value of the new directory
     int preOfNewFile = 4;

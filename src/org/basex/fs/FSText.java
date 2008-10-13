@@ -97,7 +97,7 @@ public interface FSText {
     "associated information.", "",
     "The following options are available:",
     "-a     Include directory entries whose names begin with a dot ('.')",
-    "-H     Print sizes in human readable format",
+    "-h     Print sizes in human readable format",
     "-l     List files in the long format",
     "-R     Recursively list subdirectories encountered",
     "-S     Sort by file size",

@@ -99,8 +99,8 @@ public final class TableDiskAccess extends TableAccess {
       fp = firstPres[mid];
       np = mid == last ? fp + ENTRIES : firstPres[mid + 1];
     }
-    if(low > high) BaseX.notexpected("Invalid Data Access:\nPre: " + pre +
-        ", IndexSize: " + indexSize + ", Access: " + mid + " (" + low + ")");
+    if(low > high) BaseX.notexpected("Invalid Data Access [pre:" + pre +
+        ",indexSize:" + indexSize + ",access:" + low + ">" + high + "]");
     
     readBlock(mid, fp, np);
     return (pre - firstPre) << IO.NODEPOWER;

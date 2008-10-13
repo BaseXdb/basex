@@ -802,21 +802,6 @@ public final class Token {
   }
 
   /**
-   * Concatenates the specified characters.
-   * @param t tokens
-   * @param c characters to be added
-   * @return resulting array
-   */
-  public static byte[] concat(final byte[] t, final byte... c) {
-    int l = t.length;
-    int s = l + c.length;
-    final byte[] tmp = new byte[s];
-    Array.copy(t, tmp, 0);
-    for(final byte cc : c) tmp[l++] = cc;
-    return tmp;
-  }
-
-  /**
    * Deletes the specified character out of the token.
    * @param t token to be checked
    * @param c character to be removed

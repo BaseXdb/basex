@@ -21,8 +21,6 @@ public final class Pwd extends FSCmd {
 
   @Override
   public void exec(final PrintOutput out) throws IOException {
-    // if there is path expression go to dir
-    if(path != null) curPre(path);
-    out.println(fs.path(curPre));
+    out.println(fs.path(path != null ? goTo(path) : curPre));
   }
 }

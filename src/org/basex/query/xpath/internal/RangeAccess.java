@@ -1,9 +1,7 @@
 package org.basex.query.xpath.internal;
 
 import static org.basex.query.xpath.XPText.*;
-
 import java.io.IOException;
-
 import org.basex.BaseX;
 import org.basex.data.Serializer;
 import org.basex.index.IndexIterator;

@@ -179,49 +179,4 @@ public final class DiskBuilder extends Builder {
     sout.writeNum(size - pre);
     ssize++;
   }
-
-  /**
-   * Test method for building the database and storing the table to disk.
-   * @param args files to be built
-  public static void main(final String[] args) {
-    org.basex.core.Prop.read();
-    
-    // get filename(s) or use default
-    //final String[] fn = args.length > 0 ? args : new String[] { "input.xml" };
-    final String[] fn = new String[] { "/home/db/xml/11mb.xml" };    
-    final int runs = 2;
-    run(runs, fn, true);
-    run(runs, fn, false);
-  }
-
-  /**
-   * Runs the test.
-   * @param r number of runs
-   * @param fn files
-   * @param s sax flag
-  private static void run(final int r, final String[] fn, final boolean s) {
-    int c = 0;
-    int w = 0;
-
-    final org.basex.util.Performance p = new org.basex.util.Performance();
-    for(int i = 0; i < r; i++) {
-      for(final String f : fn) {
-        try {
-          final IO bxf = new IO(f);
-          final Parser parser = s ? new org.basex.build.xml.SAXWrapper(bxf) :
-            new org.basex.build.xml.XMLParser(bxf);
-          new DiskBuilder().build(parser, "tmp");
-          c++;
-        } catch(final IOException e) {
-          w++;
-        }
-      }
-    }
-
-    org.basex.BaseX.outln((s ? "Java" : "BaseX") + " Parser, " + r + " runs.");
-    org.basex.BaseX.outln("% documents built in %.", fn.length, p.getTimer(r));
-    org.basex.BaseX.outln("% documents accepted.", c);
-    org.basex.BaseX.outln("% documents rejected.\n", w);
-  }
-   */
 }

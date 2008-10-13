@@ -1,6 +1,7 @@
 package org.basex;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Random;
@@ -82,6 +83,15 @@ public class BaseXClient {
    * Runs the application, dependent on the command-line arguments.
    */
   final void run() {
+    // guarantee correct shutdown...
+    Runtime.getRuntime().addShutdownHook(new Thread() {
+      @Override
+      public void run() {
+        Prop.write();
+        context.close();
+      }
+    });
+    
     if(allInfo || info) process(new Set(SET.INFO, allInfo ? ALL : ON), false);
 
     try {
@@ -148,7 +158,7 @@ public class BaseXClient {
    * @param force tells if quit was forced
    * (e.g., by pressing CTRL-c).
    */
-  protected synchronized void quit(final boolean force) {
+  protected final void quit(final boolean force) {
     if(!force) BaseX.outln(CLIENTBYE[new Random().nextInt(4)]);
   }
 
@@ -223,10 +233,12 @@ public class BaseXClient {
         }
       }
       return ok;
+    } catch(final FileNotFoundException ex) {
+      error(ex, ex.getMessage());
     } catch(final IOException ex) {
       error(ex, SERVERERR);
-      return false;
     }
+    return false;
   }
 
   /**

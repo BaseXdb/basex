@@ -63,8 +63,9 @@ public class BufferInput {
   /**
    * Initializes the file reader.
    * @param is input stream
+   * @throws IOException IO Exception
    */
-  public BufferInput(final InputStream is) {
+  public BufferInput(final InputStream is) throws IOException {
     this(is, new byte[4096]);
   }
 
@@ -81,10 +82,11 @@ public class BufferInput {
   /**
    * Initializes the file reader.
    * @param is input stream
-   * @param buf input buffer
+   * @param b input buffer
+   * @throws IOException IO Exception
    */
-  public BufferInput(final InputStream is, final byte[] buf) {
-    this(buf);
+  public BufferInput(final InputStream is, final byte[] b) throws IOException {
+    this(b);
     in = is;
     next();
   }
@@ -137,16 +139,18 @@ public class BufferInput {
   /**
    * Reads a single byte and returns it as integer.
    * @return read byte
+   * @throws IOException I/O exception
    */
-  public final int read() {
+  public final int read() throws IOException {
     return readByte() & 0xFF;
   }
 
   /**
    * Returns the next byte or 0 if all bytes have been read.
    * @return next byte
+   * @throws IOException I/O exception
    */
-  public byte readByte() {
+  public byte readByte() throws IOException {
     if(pos >= size) {
       next();
       if(size <= 0) return 0;
@@ -156,23 +160,21 @@ public class BufferInput {
 
   /**
    * Reads the next buffer entry.
+   * @throws IOException I/O exception
    */
-  protected final void next() {
-    try {
-      pos = 0;
-      len += size;
-      size = in.read(buffer);
-    } catch(final IOException ex) {
-      ex.printStackTrace();
-    }
+  protected final void next() throws IOException {
+    pos = 0;
+    len += size;
+    size = in.read(buffer);
   }
 
   /**
    * Returns the next character, 0 if all bytes have been read or 
    * a negative character value -1 if the read byte is invalid.
    * @return next character
+   * @throws IOException I/O exception
    */
-  public final int readChar() {
+  public final int readChar() throws IOException {
     // support encodings..
     byte ch = readByte();
     if(enc == Token.UTF16LE) return (ch & 0xFF) | ((readByte() & 0xFF) << 8);

@@ -65,47 +65,40 @@ public final class Cat extends FSCmd {
       if(fs.isDir(pre)) continue;
 
       final IO io = IO.get(Token.string(fs.path(pre)));
-      int numberLines = 1;
-      if(io.exists()) {
-        final byte[] content = io.content();
-        byte lastChar = 0;
-        for(int i = 0; i < content.length; ++i) {
-          final byte c = content[i];
-          if(fnumberLines || fnumberNonBlankLines) {
-            // Firstline
-            if(fnumberNonBlankLines && lastChar == 0 && c != LF) {
-              out.print(numberLines++ + " ");
-              out.print((char) c);
-              lastChar = c;
-            } else if(fnumberLines && numberLines == 1) {
-              if(c == LF) {
-                out.print(numberLines++ + " ");
-                out.print((char) c);
-                out.print(numberLines++ + " ");
-              } else {
-                out.print(numberLines++ + " ");
-                out.print((char) c);
-              }
-              //  after line 1
-            } else if (fnumberNonBlankLines && lastChar == LF && c != LF) {
-              out.print(numberLines++ + " ");
-              out.print((char) c);
-              lastChar = c;
-            } else if (fnumberLines && c == LF && i < content.length - 1) {
-              out.print((char) c);
-              out.print(numberLines++ + " ");
-            } else {
-              out.print((char) c);
-              lastChar = c;
-            }
+      if(!io.exists()) error(io, 2);
+
+      final byte[] content = io.content();
+      int lines = 1;
+      char lastChar = 0;
+      for(int i = 0; i < content.length; ++i) {
+        final char c = (char) content[i];
+        if(fnumberLines || fnumberNonBlankLines) {
+          if(fnumberNonBlankLines && lastChar == 0 && c != LF) {
+            // first line
+            out.print(lines++ + " ");
+            out.print(c);
+            lastChar = c;
+          } else if(fnumberLines && lines == 1) {
+            out.print(lines++ + " ");
+            out.print(c);
+            if(c == LF) out.print(lines++ + " ");
+          } else if (fnumberNonBlankLines && lastChar == LF && c != LF) {
+            //  after line 1
+            out.print(lines++ + " ");
+            out.print(c);
+            lastChar = c;
+          } else if (fnumberLines && c == LF && i < content.length - 1) {
+            out.print(c);
+            out.print(lines++ + " ");
           } else {
-            out.print((char) c);
+            out.print(c);
+            lastChar = c;
           }
+        } else {
+          out.print(c);
         }
-        out.print(NL);
-      } else {
-        error(io, 2);
       }
+      out.print(NL);
     }
   }
 }

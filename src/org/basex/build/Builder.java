@@ -93,7 +93,9 @@ public abstract class Builder extends Progress {
   protected abstract void addDoc(byte[] tok) throws IOException;
   
   /**
-   * Adds an element node to the database.
+   * Adds an element node to the database. This method stores a preliminary
+   * size value; if this node has further descendants, {@link #addSize} has
+   * to be called eventually to finish this node.
    * @param tok the tag name reference
    * @param tns the tag namespace
    * @param dis distance (relative parent reference)
@@ -229,7 +231,7 @@ public abstract class Builder extends Progress {
   }
 
   /**
-   * Stores a node.
+   * Stores an element node.
    * @param name tag to be processed
    * @param att attribute names and values
    * @param open opening tag
@@ -292,7 +294,7 @@ public abstract class Builder extends Progress {
    */
   public final void text(final TokenBuilder t, final boolean w)
       throws IOException {
-    
+
     // checks if text appears before or after root node
     final boolean out = !inDoc || level == 1;
     if(!w) {

@@ -82,11 +82,6 @@ public final class Bln extends Item {
   }
 
   @Override
-  public double score() {
-    return score;
-  }
-
-  @Override
   public Boolean java() {
     return val;
   }

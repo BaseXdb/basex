@@ -88,7 +88,7 @@ public final class XMLSerializer extends Serializer {
 
   @Override
   protected void start(final byte[] t) throws IOException {
-    if(indent) indent();
+    if(indent) indent(false);
     out.print(ELEM1);
     out.print(t);
     indent = pretty;
@@ -126,7 +126,7 @@ public final class XMLSerializer extends Serializer {
 
   @Override
   public void close(final byte[] t) throws IOException {
-    if(indent) indent();
+    if(indent) indent(true);
     out.print(ELEM3);
     out.print(t);
     out.print(ELEM2);
@@ -149,7 +149,7 @@ public final class XMLSerializer extends Serializer {
 
   @Override
   public void comment(final byte[] n) throws IOException {
-    if(indent) indent();
+    if(indent) indent(false);
     out.print(COM1);
     out.print(n);
     out.print(COM2);
@@ -157,7 +157,7 @@ public final class XMLSerializer extends Serializer {
 
   @Override
   public void pi(final byte[] n, final byte[] v) throws IOException {
-    if(indent) indent();
+    if(indent) indent(false);
     out.print(PI1);
     out.print(n);
     out.print(' ');
@@ -197,11 +197,13 @@ public final class XMLSerializer extends Serializer {
 
   /**
    * Prints the text declaration to the output stream.
+   * @param close close flag
    * @throws IOException in case of problems with the PrintOutput
    */
-  public void indent() throws IOException {
+  public void indent(final boolean close) throws IOException {
     out.println();
-    for(int l = 1; l < tags.size; l++) out.print(INDENT);
+    final int s = tags.size + (close ? 1 : 0);
+    for(int l = 1; l < s; l++) out.print(INDENT);
   }
   
   /**

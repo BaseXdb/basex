@@ -7,7 +7,7 @@ import org.basex.util.Token;
  * NodeTest testing for a name match.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
- * @author Tim Petrowsky
+ * @author Christian Gruen
  */
 public final class TestName extends Test {
   /** Test accepting all names. */
@@ -44,8 +44,15 @@ public final class TestName extends Test {
 
   @Override
   public boolean eval(final Data data, final int pre, final int kind) {
-    return kind == Data.ELEM  && (id == ALL || id == data.tagID(pre)) ||
-      kind == Data.ATTR && (id == ALL || id == data.attNameID(pre));
+    // only elements and attributes will yield results
+    if(kind != Data.ELEM && kind != Data.ATTR) return false;
+
+    // wildcard - accept all nodes
+    if(id == ALL) return true;
+    
+    // [CG] add support for namespace tests
+    int nm = kind == Data.ELEM ? data.tagID(pre) : data.attNameID(pre);
+    return id == nm;
   }
 
   @Override

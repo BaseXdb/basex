@@ -34,13 +34,13 @@ public class Pred extends Arr {
 
   @Override
   public final Expr comp(final XQContext ctx) throws XQException {
-    root = root.comp(ctx);
+    root = ctx.comp(root);
     super.comp(ctx);
     // LAST
     final boolean last = expr[0] instanceof Fun &&
       ((Fun) expr[0]).func == FunDef.LAST;
     // Numeric value
-    final boolean num = expr[0].n();
+    final boolean num = expr[0].i() && ((Item) expr[0]).n();
     // Multiple Predicates or POS
     return expr.length > 1 || (!last && !num && uses(Using.POS)) ? this :
       new PredIter(root, expr, last, num);

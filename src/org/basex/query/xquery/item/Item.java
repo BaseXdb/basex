@@ -43,7 +43,10 @@ public abstract class Item extends Expr {
     return true;
   }
 
-  @Override
+  /**
+   * Checks if this is a numeric item.
+   * @return result of check
+   */
   public final boolean n() {
     return type.num;
   }

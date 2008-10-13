@@ -1,7 +1,6 @@
 package org.basex.query.xquery.util;
 
 import java.io.IOException;
-
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
@@ -24,6 +23,7 @@ public final class Variables {
    */
   public void addGlobal(final Var v) {
     global.add(v);
+    v.global = true;
   }
   
   /**

@@ -28,21 +28,18 @@ public abstract class Fun extends Expr {
 
   @Override
   public final Expr comp(final XQContext ctx) throws XQException {
-    for(int a = 0; a < args.length; a++) args[a] = args[a].comp(ctx);
-    final Expr expr = comp(ctx, args);
-    if(expr != this) ctx.compInfo(OPTPREEVAL, this);
-    return expr;
+    for(int a = 0; a < args.length; a++) args[a] = ctx.comp(args[a]);
+    return c(ctx);
   }
 
   /**
    * Compiles the function.
    * @param ctx xquery context
-   * @param arg evaluated arguments
    * @return evaluated item
    * @throws XQException evaluation exception
    */
   @SuppressWarnings("unused")
-  public Expr comp(final XQContext ctx, final Expr[] arg) throws XQException {
+  public Expr c(final XQContext ctx) throws XQException {
     return this;
   }
 

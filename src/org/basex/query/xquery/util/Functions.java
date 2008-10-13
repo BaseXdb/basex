@@ -3,9 +3,7 @@ package org.basex.query.xquery.util;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
-
 import org.basex.data.Serializer;
 import org.basex.query.ExprInfo;
 import org.basex.query.xquery.XQContext;

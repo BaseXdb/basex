@@ -36,8 +36,8 @@ public final class FTWords extends Single {
 
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
-    occ[0] = occ[0].comp(ctx);
-    occ[1] = occ[1].comp(ctx);
+    occ[0] = ctx.comp(occ[0]);
+    occ[1] = ctx.comp(occ[1]);
     return super.comp(ctx);
   }
 

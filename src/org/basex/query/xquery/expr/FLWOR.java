@@ -15,9 +15,6 @@ import org.basex.query.xquery.iter.SeqIter;
  * @author Christian Gruen
  */
 public final class FLWOR extends FLWR {
-  /** Order Expressions. */
-  private final Order order;
-
   /**
    * Constructor.
    * @param f variable inputs
@@ -31,16 +28,10 @@ public final class FLWOR extends FLWR {
   }
 
   @Override
-  public Expr comp(final XQContext ctx) throws XQException {
-    order.comp(ctx);
-    return super.comp(ctx);
-  }
-
-  @Override
   public Iter iter(final XQContext ctx) throws XQException {
     final SeqIter seq = new SeqIter();
     final Iter[] iter = new Iter[fl.length];
-    for(int f = 0; f < fl.length; f++) iter[f] = fl[f].iter(ctx);
+    for(int f = 0; f < fl.length; f++) iter[f] = ctx.iter(fl[f]);
     iter(ctx, seq, iter, 0);
     return order.iter(seq);
   }

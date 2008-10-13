@@ -75,11 +75,11 @@ public final class Ls extends FSCmd {
   @Override
   public void exec(final PrintOutput out) throws IOException {
     // if there is path expression set new pre value
-    if(path != null) curPre(path);
+    if(path != null) goTo(path);
 
     // go to work
     if(fRecursive) {
-      lsRecursive(curPre, out);
+      ls(curPre, out);
     } else {
       print(fs.children(curPre), out);
     }
@@ -92,18 +92,14 @@ public final class Ls extends FSCmd {
    * @param out output stream
    * @throws IOException in case of problems with the PrintOutput
    */
-  private void lsRecursive(final int pre, final PrintOutput out)
-      throws IOException {
-
+  private void ls(final int pre, final PrintOutput out) throws IOException {
     for(final int dir : print(fs.children(pre), out)) {
-      if(!fListDot) {
-        // don´t crawl dirs starting with '.'
-        if(startsWith(fs.name(dir), '.')) continue;
-      }
+      // don´t crawl dirs starting with '.'
+      if(!fListDot && startsWith(fs.name(dir), '.')) continue;
       out.print(NL);
-      out.print(fs.path(dir));
-      out.print(NL);
-      lsRecursive(dir, out);
+      out.print(fs.path(dir, curPre, false));
+      out.println(":");
+      ls(dir, out);
     }
   }
 
@@ -164,9 +160,10 @@ public final class Ls extends FSCmd {
 
       if(fLong) {
         final byte[] size = sizes.list[c];
+        final long time = Token.toLong(times.list[c]);
         out.print(dir ? 'd' : 'f');
         out.print(maxS, fHuman ? token(format(toLong(size))) : size);
-        out.print(18, time(times.list[c]));
+        out.print(18, token(date.format(new Date(time * 60000))));
         out.print("  ");
         out.println(name);
       } else {
@@ -178,14 +175,5 @@ public final class Ls extends FSCmd {
     if(col != 0) out.print(NL);
     
     return dpre.finish();
-  }
-
-  /**
-   * Returns the time as formatted string.
-   * @param time time value
-   * @return file name.
-   */
-  public byte[] time(final byte[] time) {
-    return token(date.format(new Date(Token.toLong(time) * 60000)));
   }
 }

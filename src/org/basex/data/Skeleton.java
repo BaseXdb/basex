@@ -31,8 +31,9 @@ public final class Skeleton {
   /**
    * Constructor, specifying an input file.
    * @param in input stream
+   * @throws IOException I/O exception
    */
-  public Skeleton(final DataInput in) {
+  public Skeleton(final DataInput in) throws IOException {
     if(in.readBool()) root = new Node(in);
   }
 
@@ -177,8 +178,9 @@ public final class Skeleton {
     /**
      * Constructor, specifying an input stream.
      * @param in input stream
+     * @throws IOException I/O exception
      */
-    Node(final DataInput in) {
+    Node(final DataInput in) throws IOException {
       name = (short) in.readNum();
       kind = in.readByte();
       count = in.readNum();

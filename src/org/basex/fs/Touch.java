@@ -1,7 +1,6 @@
 package org.basex.fs;
 
 import java.io.IOException;
-
 import org.basex.io.PrintOutput;
 import org.basex.util.Token;
 
@@ -28,28 +27,25 @@ public final class Touch extends FSCmd {
     final int i = path.lastIndexOf('/');
     String file = path;
     if(i > -1) {
-      curPre(path.substring(0, i));
+      goTo(path.substring(0, i));
       file = path.substring(i + 1);
     }
 
     final int[] nodes =  fs.children(curPre, file);
     if(nodes.length > 0) {
+      // refresh time stamps
       for(final int p : nodes) {
-        if(fs.isFile(p)) fs.time(p, fs.currTime());
+        fs.time(p, fs.currTime());
       }
     } else {
       // add new file
       if(!fs.valid(file)) error(file, 101);
 
-      try {
-        int pn = 4;
-        if(!(curPre == DataFS.ROOTDIR)) pn = curPre + DataFS.NUMATT;
-
-        fs.insert(false, Token.token(file), getSuffix(file), Token.ZERO,
-            fs.currTime(), curPre, pn);
-      } catch(final Exception e) {
-        e.printStackTrace();
-      }
+      // add new entry at the end of directory
+      final int pn = curPre + fs.data.size(curPre, fs.data.kind(curPre));
+      fs.insert(false, Token.token(file), getSuffix(file), Token.ZERO,
+          fs.currTime(), curPre, pn);
+      fs.flush();
     }
   }
 

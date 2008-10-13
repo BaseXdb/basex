@@ -1,7 +1,6 @@
 package org.basex.gui.layout;
 
 import static org.basex.Text.*;
-
 import java.awt.Component;
 import java.awt.FileDialog;
 import java.io.File;
@@ -9,7 +8,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
-
 import org.basex.BaseX;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;

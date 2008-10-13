@@ -2,7 +2,7 @@ package org.basex.query.xquery.util;
 
 /**
  * Scoring class, assembling all scoring calculations.
- * Current scoring is very simple and mainly used for testing.
+ * Current scoring model is very simple.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
@@ -53,7 +53,7 @@ public final class Scoring {
    * @return result
    */
   public static double or(final double s1, final double s2) {
-    return 1 - ((1 - s1) * (1 - s2));
+    return and(s1, s2);
   }
 
   /**

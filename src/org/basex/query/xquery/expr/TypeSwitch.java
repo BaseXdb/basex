@@ -44,7 +44,7 @@ public final class TypeSwitch extends Single {
 
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
-    ts = ts.comp(ctx);
+    ts = ctx.comp(ts);
     return this;
   }
   
@@ -87,7 +87,9 @@ public final class TypeSwitch extends Single {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, VAR, var.name.str());
+    ser.startElement(this);
+    if(var.name != null) ser.attribute(VAR, var.name.str());
+    ser.finishElement();
     for(Case c : cs) c.plan(ser);
     ts.plan(ser);
     expr.plan(ser);

@@ -23,8 +23,7 @@ public final class Cd extends FSCmd {
   @Override
   public void exec(final PrintOutput out) throws IOException {
     // if there is path expression go to work
-    if(path != null) curPre(path);
-    else curPre = DataFS.ROOTDIR;
+    curPre = goTo(path != null ? path : "");
     context.current(new Nodes(curPre, context.data()));
   }
 }

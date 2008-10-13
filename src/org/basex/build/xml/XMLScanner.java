@@ -701,7 +701,7 @@ public final class XMLScanner {
           input = new XMLInput(new IOContent(cont, name));
         } catch(final IOException ex) {
           BaseX.debug(ex);
-          error(DTDNP, name);
+          error(FILEERR, name);
         }
 
         if(consume(XDECL)) {

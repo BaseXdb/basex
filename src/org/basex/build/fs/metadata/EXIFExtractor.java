@@ -178,7 +178,7 @@ abstract class EXIFExtractor extends AbstractExtractor {
           exif.add(v);
         }
       } catch(final Exception ex) {
-        throw new MetaDataException(BaseX.info("Could not parse '%'",  v));
+        throw new MetaDataException("Could not parse '%'",  v);
       }
     }
   }

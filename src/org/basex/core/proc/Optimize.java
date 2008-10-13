@@ -89,8 +89,6 @@ public final class Optimize extends ACreate {
     } catch(final IOException e) {
       BaseX.debug(e);
     }
-    data.flush();
-    
     return true;
   }
 

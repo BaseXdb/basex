@@ -12,7 +12,7 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class MemValues extends Index {
-  /** Initial hash capacity. */
+  /** Index instance. */
   private final MemValueIndex index = new MemValueIndex();
 
   /**

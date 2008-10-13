@@ -91,7 +91,7 @@ public final class XQContext extends QueryContext {
   byte[][] collName = new byte[0][];
 
   /** Default fulltext options. */
-  private final FTOpt ftoptions = new FTOpt();
+  final FTOpt ftoptions = new FTOpt();
   /** Default boundary-space. */
   public boolean spaces = false;
   /** Empty Order mode. */
@@ -113,31 +113,39 @@ public final class XQContext extends QueryContext {
 
   @Override
   public XQContext compile(final Nodes nodes) throws XQException {
-    // adds an existing document to the database array
-    if(nodes != null) {
-      docs = new DNode[nodes.size];
-      for(int d = 0; d < docs.length; d++) {
-        docs[d] = new DNode(nodes.data, nodes.nodes[d]);
+    try {
+      // cache the initial context nodes
+      if(nodes != null) {
+        docs = new DNode[nodes.size];
+        for(int d = 0; d < docs.length; d++) {
+          docs[d] = new DNode(nodes.data, nodes.nodes[d]);
+        }
+        item = Seq.get(docs, docs.length);
+        
+        // add collection instances
+        final NodIter col = new NodIter();
+        for(final DNode doc : docs) col.add(doc);
+        collect = Array.add(collect, col);
+        collName = Array.add(collName, token(nodes.data.meta.dbname));
       }
-      item = Seq.get(docs, docs.length);
-      final NodIter col = new NodIter();
-      for(final DNode doc : docs)
-        col.add(doc);
-      collect = Array.add(collect, col);
-      collName = Array.add(collName, token(nodes.data.meta.dbname));
+
+      // evaluates the query and returns the result
+      inf = Prop.allInfo;
+      if(inf) compInfo(QUERYCOMP);
+      fun.comp(this);
+      vars.comp(this);
+      ftopt = ftoptions;
+      root = comp(root);
+      //root = root.comp(this);
+      if(inf) compInfo(QUERYRESULT + "%", root);
+
+      evalTime = System.nanoTime();
+      return this;
+    } catch(final StackOverflowError e) {
+      if(Prop.debug) e.printStackTrace();
+      Err.or(XPSTACK);
+      return null;
     }
-
-    // evaluates the query and returns the result
-    inf = Prop.allInfo;
-    if(inf) compInfo(QUERYCOMP);
-    fun.comp(this);
-    vars.comp(this);
-    ftopt = ftoptions;
-    root = root.comp(this);
-    if(inf) compInfo(QUERYRESULT + "%", root);
-
-    evalTime = System.nanoTime();
-    return this;
   }
 
   @Override
@@ -184,6 +192,24 @@ public final class XQContext extends QueryContext {
     fun.plan(ser);
     root.plan(ser);
   }
+  
+
+  /**
+   * Evaluates the specified expression and returns an iterator.
+   * @param e expression to be evaluated
+   * @return iterator
+   * @throws XQException evaluation exception
+   */
+  public Expr comp(final Expr e) throws XQException {
+    final Expr ex = e.comp(this);
+    if(ex != e) {
+      /*System.out.println(e.getClass().getSimpleName() + " => " +
+          ex.getClass().getSimpleName() + ": " + e + " => " + ex); */
+      compInfo(OPTSIMPLE, e, ex);
+    }
+    return ex;
+  }
+
 
   /**
    * Evaluates the specified expression and returns an iterator.

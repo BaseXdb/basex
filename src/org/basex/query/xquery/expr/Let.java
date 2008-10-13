@@ -39,7 +39,8 @@ public final class Let extends ForLet {
 
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
-    expr = expr.comp(ctx);
+    ctx.vars.add(var);
+    expr = ctx.comp(expr);
     return this;
   }
 

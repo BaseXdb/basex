@@ -95,21 +95,6 @@ public final class IntList {
   }
   
   /**
-   * Removes the element at the specified position in this list. 
-   * Shifts any subsequent elements to the left (subtracts one 
-   * from their indices). 
-   * @param index - the index of the element to removed.
-   * @return the element that was removed from the list.
-   */
-  public int remove(final int index) {
-    if(size == 0 || size < index) throw new IndexOutOfBoundsException();
-    final int elem = list[index];
-    System.arraycopy(list, index + 1, list, index, size - index);
-    --size;
-    return elem;
-  }
-
-  /**
    * Finishes the int array.
    * @return int array
    */

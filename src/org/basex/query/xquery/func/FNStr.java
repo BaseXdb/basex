@@ -3,7 +3,6 @@ package org.basex.query.xquery.func;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.util.Token.*;
 import java.util.regex.Pattern;
-
 import org.basex.BaseX;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;

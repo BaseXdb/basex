@@ -2,7 +2,6 @@ package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQTokens.*;
 import java.io.IOException;
-import org.basex.BaseX;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
@@ -36,7 +35,7 @@ public final class FunCall extends Arr {
     final int s = ctx.vars.size();
 
     // [CG] XQuery/Recursive Functions... fixed already?
-    if(s > 1000) BaseX.notexpected();;
+    //if(s > 1000) BaseX.notexpected();
 
     // add function variables
     final Func func = ctx.fun.get(id);

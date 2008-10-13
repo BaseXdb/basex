@@ -46,6 +46,6 @@ public final class Rm extends FSCmd {
         warning(out, fs.name(pre), 21);
       }
     }
-    fs.data.flush();
+    fs.flush();
   }
 }

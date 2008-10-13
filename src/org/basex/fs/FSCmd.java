@@ -1,7 +1,6 @@
 package org.basex.fs;
 
 import java.io.IOException;
-
 import org.basex.BaseX;
 import org.basex.core.Commands;
 import org.basex.core.Context;
@@ -35,7 +34,7 @@ public abstract class FSCmd {
       case CD:      return new Cd();
       case CP:      return new Cp();
       case DU:      return new Du();
-      case EXT:     return new Ext();
+      case EXT:     return new Exec();
       case HELP:    return new Help();
       case LOCATE:  return new Locate();
       case LS:      return new Ls();
@@ -106,13 +105,15 @@ public abstract class FSCmd {
   }
 
   /**
-   * Evaluates the specified path and sets the current pre value.
+   * Evaluates the specified path and sets and returns the current pre value.
    * @param path path for optional error message
+   * @return resulting pre value
    * @throws FSException file system exception
    */
-  final void curPre(final String path) throws FSException {
+  final int goTo(final String path) throws FSException {
     curPre = fs.goTo(curPre, path);
     if(curPre == -1) error(path, 2);
+    return curPre;
   }
 
   /**

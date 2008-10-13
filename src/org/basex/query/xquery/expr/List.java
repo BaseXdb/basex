@@ -6,6 +6,7 @@ import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
 import org.basex.query.xquery.util.SeqBuilder;
+import org.basex.util.TokenBuilder;
 
 /**
  * Expression List.
@@ -29,7 +30,7 @@ public final class List extends Arr {
 
     // all values are items - return simple sequence
     final SeqBuilder seq = new SeqBuilder();
-    for(final Expr e : expr) seq.add(e.iter(ctx));
+    for(final Expr e : expr) seq.add(ctx.iter(e));
     return seq.finish();
   }
 
@@ -45,14 +46,14 @@ public final class List extends Arr {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("(");
+    final TokenBuilder sb = new TokenBuilder(name()).add('(');
     for(int v = 0; v != expr.length; v++) {
-      sb.append((v != 0 ? ", " : "") + expr[v]);
-      if(sb.length() > 15 && v + 1 != expr.length) {
-        sb.append(", ...");
+      sb.add((v != 0 ? ", " : "") + expr[v]);
+      if(sb.size > 15 && v + 1 != expr.length) {
+        sb.add(", ...");
         break;
       }
     }
-    return sb.append(")").toString();
+    return sb.add(')').toString();
   }
 }

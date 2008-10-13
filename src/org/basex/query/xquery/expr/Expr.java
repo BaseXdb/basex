@@ -6,6 +6,7 @@ import org.basex.query.ExprInfo;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Item;
+import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Err;
@@ -50,23 +51,15 @@ public abstract class Expr extends ExprInfo {
    * @return result of check
    */
   public boolean i() {
-    return false;
-  }
-
-  /**
-   * Checks if this is a numeric item.
-   * @return result of check
-   */
-  public boolean n() {
-    return false;
+    return this instanceof Item;
   }
 
   /**
    * Returns if this is an empty sequence.
    * @return result of check
    */
-  public boolean e() {
-    return false;
+  public final boolean e() {
+    return this == Seq.EMPTY;
   }
 
   /**

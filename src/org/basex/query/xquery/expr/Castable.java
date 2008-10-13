@@ -1,6 +1,5 @@
 package org.basex.query.xquery.expr;
 
-import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
@@ -36,7 +35,6 @@ public final class Castable extends Single {
     super.comp(ctx);
     if(!expr.i()) return this;
 
-    ctx.compInfo(OPTPREEVAL, this);
     try {
       seq.cast(iter(expr), this, ctx);
       return Bln.TRUE;

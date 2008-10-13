@@ -1,5 +1,7 @@
 package org.basex.query.xquery.path;
 
+import static org.basex.query.xquery.path.Axis.*;
+import static org.basex.query.xquery.path.Test.NODE;
 import static org.basex.query.xquery.XQText.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
@@ -8,9 +10,7 @@ import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Arr;
 import org.basex.query.xquery.expr.CAttr;
 import org.basex.query.xquery.expr.Expr;
-import org.basex.query.xquery.expr.VarCall;
-import org.basex.query.xquery.func.Fun;
-import org.basex.query.xquery.func.FunDef;
+import org.basex.query.xquery.item.DNode;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.QNm;
@@ -22,7 +22,6 @@ import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.util.Err;
 import org.basex.query.xquery.util.NodeBuilder;
 import org.basex.query.xquery.util.SeqBuilder;
-import org.basex.query.xquery.util.Var;
 import org.basex.util.Array;
 
 /**
@@ -55,27 +54,18 @@ public final class Path extends Arr {
 
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
-    root = root.comp(ctx);
+    root = ctx.comp(root);
     Expr e = root;
-    if(e instanceof VarCall) {
-      final Var v = ctx.vars.get(((VarCall) e).var);
-      if(v != null) e = v.expr;
-    }
-    if(e instanceof Fun && ((Fun) e).func == FunDef.DOC) {
-      if(expr[0] instanceof Step) {
-        final Step s = (Step) expr[0];
-        if(s.axis == Axis.ATTR || s.axis == Axis.PARENT || s.axis == Axis.SELF
-            && s.test != Test.NODE) Err.or(COMPSELF, expr[0]);
-      }
-    }
-    if(e instanceof CAttr) {
-      if(expr[0] instanceof Step) {
-        if(((Step) expr[0]).axis == Axis.CHILD) Err.or(COMPSELF, expr[0]);
-      }
+
+    if(expr[0] instanceof Step) {
+      final Step s = (Step) expr[0];
+      if(e instanceof DNode && (s.axis == ATTR || s.axis == PARENT ||
+          s.axis == SELF && s.test != NODE) || e instanceof CAttr &&
+          s.axis == CHILD) Err.or(COMPSELF, s);
     }
 
     for(int i = 0; i != expr.length; i++) {
-      expr[i] = expr[i].comp(ctx);
+      expr[i] = ctx.comp(expr[i]);
       steps &= expr[i] instanceof Step;
     }
 
@@ -85,10 +75,7 @@ public final class Path extends Arr {
       // analyze if result set can be cached
       cache = true;
       for(final Expr ex : expr) {
-        if(((Step) ex).expr.length != 0 && (ex.uses(Using.VAR))) {
-          cache = false;
-          break;
-        }
+        cache &= ((Step) ex).expr.length != 0 && ex.uses(Using.VAR);
       }
     }
     return this;
@@ -207,11 +194,11 @@ public final class Path extends Arr {
   private void mergeDesc(final XQContext ctx) {
     int ll = expr.length;
     for(int l = 1; l < ll; l++) {
-      if(!((Step) expr[l - 1]).simple(Axis.DESCORSELF)) continue;
+      if(!((Step) expr[l - 1]).simple(DESCORSELF)) continue;
       final Step next = (Step) expr[l];
-      if(next.axis == Axis.CHILD && !next.uses(Using.POS)) {
+      if(next.axis == CHILD && !next.uses(Using.POS)) {
         Array.move(expr, l, -1, ll-- - l);
-        next.axis = Axis.DESC;
+        next.axis = DESC;
       }
     }
     if(ll != expr.length) {
@@ -234,10 +221,10 @@ public final class Path extends Arr {
       final Step step = (Step) expr[l];
       final Step step0 = (Step) expr[l - 1];
 
-      if(step.axis == Axis.SELF) {
-        if(step.test == Test.NODE) continue;
+      if(step.axis == SELF) {
+        if(step.test == NODE) continue;
 
-        if(step0.axis == Axis.ATTR) warning(step);
+        if(step0.axis == ATTR) warning(step);
         if(step0.test.type == Type.TXT && step.test.type != Type.TXT)
           warning(step);
 
@@ -246,14 +233,14 @@ public final class Path extends Arr {
         if(name0 == null || name == null) continue;
         if(!name.eq(name0)) warning(step);
 
-      } else if(step.axis == Axis.DESCORSELF) {
-        if(step.test == Test.NODE) continue;
-        if(step0.axis == Axis.ATTR) warning(step);
+      } else if(step.axis == DESCORSELF) {
+        if(step.test == NODE) continue;
+        if(step0.axis == ATTR) warning(step);
 
         if(step0.test.type == Type.TXT && step.test.type != Type.TXT)
           warning(step);
-      } else if(step.axis == Axis.DESC || step.axis == Axis.CHILD) {
-        if(step0.axis == Axis.ATTR || step0.test.type == Type.TXT)
+      } else if(step.axis == DESC || step.axis == CHILD) {
+        if(step0.axis == ATTR || step0.test.type == Type.TXT)
           warning(step);
       }
     }

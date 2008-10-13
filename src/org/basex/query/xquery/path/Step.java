@@ -54,7 +54,7 @@ public class Step extends Arr {
     final boolean last = expr[0] instanceof Fun &&
       ((Fun) expr[0]).func == FunDef.LAST;
     // Numeric value
-    final boolean num = expr[0].n();
+    final boolean num = expr[0].i() && ((Item) expr[0]).n();
     // Multiple Predicates or POS
     return expr.length > 1 || (!last && !num && uses(Using.POS)) ? this : 
       new IterStep(axis, test, expr, last, num);

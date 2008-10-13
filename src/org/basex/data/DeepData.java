@@ -115,12 +115,6 @@ public final class DeepData extends Data {
     cls();
   }
 
-  @Override
-  protected void finalize() throws Throwable {
-    super.finalize();
-    cls();
-  }
-
   /**
    * Closes the database without writing data back to disk.
    * @throws IOException I/O exception

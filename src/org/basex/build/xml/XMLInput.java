@@ -64,8 +64,9 @@ final class XMLInput {
   /**
    * Reads the next character from the cached input buffers.
    * @return next character
+   * @throws IOException IO Exception
    */
-  int next() {
+  int next() throws IOException {
     if(pp != 0) return last[(lp + pp++) & 0x0F];
 
     int ch = in[ip].readChar();

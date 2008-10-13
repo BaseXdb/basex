@@ -18,6 +18,8 @@ import org.basex.query.xquery.iter.Iter;
 public class FLWR extends Single {
   /** For/Let expressions. */
   protected final ForLet[] fl;
+  /** Order Expressions. */
+  protected Order order;
   /** Where Expression. */
   protected Expr where;
 
@@ -34,14 +36,18 @@ public class FLWR extends Single {
   }
 
   @Override
-  public Expr comp(final XQContext ctx) throws XQException {
+  public final Expr comp(final XQContext ctx) throws XQException {
+    final int vs = ctx.vars.size();
     for(int f = 0; f != fl.length; f++) {
-      final Expr e = fl[f].comp(ctx);
+      final Expr e = ctx.comp(fl[f]);
       if(e.e()) return Seq.EMPTY;
       fl[f] = (ForLet) e;
     }
-    if(where != null) where = where.comp(ctx);
-    return super.comp(ctx);
+    if(where != null) where = ctx.comp(where);
+    if(order != null) order.comp(ctx);
+    expr = ctx.comp(expr);
+    ctx.vars.reset(vs);
+    return this;
   }
 
   @Override
@@ -56,7 +62,7 @@ public class FLWR extends Single {
       public Item next() throws XQException {
         if(iter == null) {
           iter = new Iter[fl.length];
-          for(int f = 0; f < fl.length; f++) iter[f] = fl[f].iter(ctx);
+          for(int f = 0; f < fl.length; f++) iter[f] = ctx.iter(fl[f]);
         }
         
         while(true) {

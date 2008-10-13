@@ -34,13 +34,6 @@ public final class BaseX extends BaseXClient {
   }
 
   @Override
-  protected synchronized void quit(final boolean force) {
-    super.quit(force);
-    if(!force) Prop.write();
-    context.close();
-  }
-
-  @Override
   protected AbstractProcess getProcess(final Process p) {
     return p;
   }
@@ -141,8 +134,8 @@ public final class BaseX extends BaseXClient {
    * @return dummy object
    */
   public static Object notimplemented(final Object... ext) {
-    throw new UnsupportedOperationException(ext.length == 0 ? "Not expected." :
-      info("Not expected (%).", ext));
+    throw new UnsupportedOperationException(
+        ext.length == 0 ? "Not expected." : info("Not expected (%).", ext));
   }
 
   /**
@@ -151,7 +144,7 @@ public final class BaseX extends BaseXClient {
    * @return dummy object
    */
   public static Object notexpected(final Object... ext) {
-    throw new RuntimeException(ext.length == 0 ? "Not expected." :
-      info("Not expected (%).", ext));
+    throw new RuntimeException(
+        ext.length == 0 ? "Not expected." : info("Not expected (%).", ext));
   }
 }

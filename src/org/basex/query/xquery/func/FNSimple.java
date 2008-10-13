@@ -1,7 +1,6 @@
 package org.basex.query.xquery.func;
 
 import static org.basex.query.xquery.XQText.*;
-
 import org.basex.BaseX;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
@@ -51,14 +50,20 @@ public final class FNSimple extends Fun {
   }
 
   @Override
-  public Expr comp(final XQContext ctx, final Expr[] arg) {
+  public Expr c(final XQContext ctx) throws XQException {
+    final Item it = args.length != 0 && args[0].i() ? (Item) args[0] : null;
+    
     switch(func) {
-      case TRUE:  return Bln.TRUE;
-      case FALSE: return Bln.FALSE;
-      case BOOL:  return arg[0] instanceof Bln ? arg[0] : this;
+      case TRUE:   return Bln.TRUE;
+      case FALSE:  return Bln.FALSE;
+      case EMPTY:  return it != null ? Bln.FALSE : this;
+      case EXISTS: return it != null ? Bln.TRUE : this;
+      case BOOL:
+        return it != null ? Bln.get(it.bool()) : this;
       case NOT:
-        if(arg[0] instanceof Fun) {
-          final Fun fs = (Fun) arg[0];
+        if(it != null) return Bln.get(!it.bool());
+        if(args[0] instanceof Fun) {
+          final Fun fs = (Fun) args[0];
           if(fs.func == FunDef.EMPTY) {
             final Fun f = new FNSimple();
             f.args = fs.args;
@@ -67,6 +72,7 @@ public final class FNSimple extends Fun {
           }
         }
         return this;
+      case ZEROONE:
       default: return this;
     }
   }

@@ -2,13 +2,14 @@ package org.basex.query.xquery.func;
 
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.item.Type.*;
-
 import org.basex.BaseX;
+import org.basex.data.Data;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Calc;
 import org.basex.query.xquery.expr.CmpV;
 import org.basex.query.xquery.expr.Expr;
+import org.basex.query.xquery.item.DNode;
 import org.basex.query.xquery.item.Date;
 import org.basex.query.xquery.item.Dbl;
 import org.basex.query.xquery.item.Item;
@@ -16,6 +17,11 @@ import org.basex.query.xquery.item.Itr;
 import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
+import org.basex.query.xquery.path.Axis;
+import org.basex.query.xquery.path.NameTest;
+import org.basex.query.xquery.path.Path;
+import org.basex.query.xquery.path.Step;
+import org.basex.query.xquery.path.Test;
 import org.basex.query.xquery.util.Err;
 
 /**
@@ -54,12 +60,37 @@ final class FNAggr extends Fun {
   }
 
   @Override
-  public Expr comp(final XQContext ctx, final Expr[] arg) {
+  public Expr c(final XQContext ctx) {
     switch(func) {
-      case AVG: return arg[0].e() ? Seq.EMPTY : this;
-      default:  return this;
+      case AVG:
+        return args[0].e() ? Seq.EMPTY : this;
+      case COUNT:
+        // just a dirty sample to show which steps are necessary here...        
+        if(args[0].i()) return Itr.get(1);
+        if(!(args[0] instanceof Path)) return this;
+        final Path path = (Path) args[0];
+        if(path.expr.length != 1) return this;
+        if(!(path.expr[0] instanceof Step)) return this;
+        final Step s = (Step) path.expr[0];
+        if(s.axis != Axis.DESC) return this;
+        // could also be something else (NAME, ...)..
+        if(s.test.kind != Test.Kind.STD) return this;
+        // might not be the current context set...
+        if(ctx.item == null) return this;
+        if(ctx.item.type != Type.DOC) return this;
+        if(!(ctx.item instanceof DNode)) return this;
+        final Data data = ((DNode) ctx.item).data;
+        if(!data.tags.stats) return this;
+        //if(!(ctx.item instanceof DNode)) return this;
+        final byte[] nm = ((NameTest) s.test).ln;
+        final int id = data.tagID(nm);
+        final int c = data.tags.counter(id);
+        return Itr.get(c);
+      default:
+        return this;
     }
   }
+  
 
   /**
    * Sums up the specified item(s).

@@ -73,8 +73,15 @@ public final class Context {
     data = d;
     copied = null;
     marked = new Nodes(d);
+    flush();
+  }
+  
+  /**
+   * Flushes the context (i.e., updates references).
+   */
+  public void flush() {
     current = Prop.fsmode ? new Nodes(DataFS.ROOTDIR, data) :
-      new Nodes(d.doc(), d);
+      new Nodes(data.doc(), data);
   }
     
   /**

@@ -26,7 +26,7 @@ public abstract class Arr extends Expr {
 
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
-    for(int e = 0; e != expr.length; e++) expr[e] = expr[e].comp(ctx);
+    for(int e = 0; e != expr.length; e++) expr[e] = ctx.comp(expr[e]);
     return this;
   }
 

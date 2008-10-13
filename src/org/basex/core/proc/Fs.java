@@ -7,9 +7,6 @@ import org.basex.core.Commands;
 import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.core.Commands.FS;
-import org.basex.data.Data;
-import org.basex.data.Nodes;
-import org.basex.fs.DataFS;
 import org.basex.fs.FSCmd;
 import org.basex.fs.FSException;
 import org.basex.io.PrintOutput;
@@ -59,10 +56,8 @@ public final class Fs extends Process {
    * @return true
    */
   private boolean fsmode(final boolean start) {
-    final Data data = context.data();
-    context.current(start ? new Nodes(DataFS.ROOTDIR, data) :
-      new Nodes(data.doc(), context.data()));
     Prop.fsmode = start;
+    context.flush();
     return true;
   }
 

@@ -12,6 +12,16 @@ import org.basex.query.xquery.item.Type;
  * @author Christian Gruen
  */
 public abstract class Test {
+  /** Test types. */
+  public enum Kind {
+    /** Accept all nodes (*).     */ ALL,
+    /** Test names (*:tag).       */ NAME,
+    /** Test namespaces (pre:*).  */ NS,
+    /** Test all nodes (pre:tag). */ STD
+  };
+  /** Test type. */
+  public Kind kind;
+
   /** Static node test. */
   public static final Test NODE = new Test() {
     @Override
@@ -20,7 +30,7 @@ public abstract class Test {
     }
     @Override
     public String toString() {
-      return type + "()";
+      return "node()";
     }
   };
   /** Name test. */

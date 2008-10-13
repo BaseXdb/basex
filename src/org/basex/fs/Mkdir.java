@@ -1,7 +1,6 @@
 package org.basex.fs;
 
 import java.io.IOException;
-
 import org.basex.io.PrintOutput;
 import org.basex.util.Token;
 
@@ -28,7 +27,7 @@ public final class Mkdir extends FSCmd {
     final int i = path.lastIndexOf('/');
     String dir = path;
     if(i != -1) {
-      curPre(path.substring(0, i));
+      goTo(path.substring(0, i));
       dir = path.substring(i + 1);
     }
 
@@ -36,11 +35,11 @@ public final class Mkdir extends FSCmd {
     if(!fs.valid(dir)) error(dir, 101);
     // dir exists already?
     if(fs.dir(curPre, dir) > -1) error(path, 17);
-
-    // add new dir
-    final int pn = curPre == DataFS.ROOTDIR ? 4 : curPre + DataFS.NUMATT;
+    
+    // add new entry at the end of directory
+    final int pn = curPre + fs.data.size(curPre, fs.data.kind(curPre));
     fs.insert(true, Token.token(dir), Token.EMPTY, Token.ZERO,
         fs.currTime(), curPre, pn);
+    fs.flush();
   }
 }
-

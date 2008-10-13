@@ -1,13 +1,11 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQTokens.*;
-import static org.basex.query.xquery.XQText.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.iter.Iter;
-import org.basex.query.xquery.util.Err;
 import org.basex.query.xquery.util.Var;
 
 /**
@@ -29,16 +27,15 @@ public final class VarCall extends Expr {
   }
   
   @Override
-  public Expr comp(final XQContext ctx) {
-    return this;
+  public Expr comp(final XQContext ctx) throws XQException {
+    var = ctx.vars.get(var);
+    return var.global ? var.item(ctx) : this;
   }
   
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
-    final Var v = ctx.vars.get(var);
-    if(v == null) Err.or(VARNOTDEFINED, var);
-    var = v;
-    return v.iter(ctx);
+    var = ctx.vars.get(var);
+    return var.iter(ctx);
   }
 
   @Override

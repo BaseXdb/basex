@@ -77,8 +77,13 @@ public final class DialogProgress extends Dialog implements ActionListener {
 
   @Override
   public void close() {
-    timer.stop();
     dispose();
+  }
+
+  @Override
+  public void dispose() {
+    timer.stop();
+    super.dispose();
   }
 
   public void actionPerformed(final ActionEvent e) {

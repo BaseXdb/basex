@@ -49,13 +49,6 @@ public abstract class Serializer {
   public abstract void closeResult() throws IOException;
 
   /**
-   * Starts an element.
-   * @param t tag
-   * @throws IOException exception
-   */
-  protected abstract void start(final byte[] t) throws IOException;
-
-  /**
    * Serializes an attribute.
    * @param n name
    * @param v value
@@ -63,25 +56,6 @@ public abstract class Serializer {
    */
   public abstract void attribute(final byte[] n, final byte[] v)
     throws IOException;
-
-  /**
-   * Finishes an empty element.
-   * @throws IOException exception
-   */
-  public abstract void empty() throws IOException;
-
-  /**
-   * Finishes an element.
-   * @throws IOException exception
-   */
-  public abstract void finish() throws IOException;
-
-  /**
-   * Closes an element.
-   * @param t tag
-   * @throws IOException exception
-   */
-  public abstract void close(final byte[] t) throws IOException;
 
   /**
    * Serializes a text.
@@ -111,6 +85,34 @@ public abstract class Serializer {
    * @throws IOException exception
    */
   public abstract void item(final byte[] b) throws IOException;
+
+  // === protected abstract methods ===========================================
+
+  /**
+   * Starts an element.
+   * @param t tag
+   * @throws IOException exception
+   */
+  protected abstract void start(final byte[] t) throws IOException;
+
+  /**
+   * Finishes an empty element.
+   * @throws IOException exception
+   */
+  protected abstract void empty() throws IOException;
+
+  /**
+   * Finishes an element.
+   * @throws IOException exception
+   */
+  protected abstract void finish() throws IOException;
+
+  /**
+   * Closes an element.
+   * @param t tag
+   * @throws IOException exception
+   */
+  protected abstract void close(final byte[] t) throws IOException;
 
   // === implemented methods ==================================================
   
@@ -192,7 +194,6 @@ public abstract class Serializer {
       throws IOException {
     startElement(t);
     for(int i = 0; i < a.length; i += 2) attribute(a[i], a[i + 1]);
-    tags.size--;
     emptyElement();
   }
 

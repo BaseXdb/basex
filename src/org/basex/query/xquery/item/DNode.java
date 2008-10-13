@@ -88,7 +88,7 @@ public final class DNode extends Nod {
         return type + "(" + string(data.attName(pre)) + "=\"" +
         string(data.attValue(pre)) + "\")";
       case DOC:
-        return type + "(" + data.meta.file + ")";
+        return type + "(\"" + data.meta.file + "\")";
       case ELM:
         return type + "(" + string(data.tag(pre)) + "/" + pre + ")";
       default:
