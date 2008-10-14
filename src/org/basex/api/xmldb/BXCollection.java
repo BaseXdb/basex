@@ -42,9 +42,7 @@ public class BXCollection implements Collection {
   }
 
   public String createId() {
-    //<CG> Methode zur Erstellung einer eindeutigen ID?
-    BaseX.notimplemented();
-    return null;
+    return String.valueOf(ctx.data().size + 1);
   }
 
   public Resource createResource(final String id, final String type)

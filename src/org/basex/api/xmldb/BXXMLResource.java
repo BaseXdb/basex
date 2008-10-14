@@ -6,7 +6,6 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import org.basex.BaseX;
 import org.basex.api.dom.BXDoc;
 import org.basex.data.Data;
 import org.basex.data.XMLSerializer;
@@ -97,9 +96,7 @@ public final class BXXMLResource implements XMLResource {
   }
 
   public String getId() {
-  //<CG> Methode zur Erstellung einer eindeutigen ID?
-    BaseX.notimplemented();
-    return null;
+    return String.valueOf(pre);
   }
 
   public Collection getParentCollection() {
