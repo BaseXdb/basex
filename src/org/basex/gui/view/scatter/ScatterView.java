@@ -45,13 +45,15 @@ public final class ScatterView extends View implements Runnable {
   /** Y paint margin. */ 
   private static final int MARGINRIGHT = 40;
   /** Item size. */
-  private static final int ITEMSIZE = 10;
+  private static final int ITEMSIZE = 14;
   /** Focused item size. */
-  private static final int ITEMSIZEFOCUSED = 18;
+  private static final int ITEMSIZEFOCUSED = 16;
   /** Place holder for items which lack value. */
   private static final int NOVALUEBORDER = 28;
   /** Focus offset. */
-  private static final int FOCUSOFFSET = 6;
+  private static final int FOCUSOFFSET = 4;
+  /** Mark offset. */
+  private static final int MARKOFFSET = 3;
   /** Whitespace between axis captions. */
   static final int CAPTIONWHITESPACE = 40;
   /** Item image. */
@@ -179,8 +181,8 @@ public final class ScatterView extends View implements Runnable {
   private BufferedImage createItemImage(final boolean focusedImage, 
       final boolean marked) {
     final BufferedImage img = focusedImage ? new BufferedImage(
-        18, 18, Transparency.TRANSLUCENT) : new BufferedImage(
-            10, 10, Transparency.TRANSLUCENT);
+        ITEMSIZEFOCUSED, ITEMSIZEFOCUSED, Transparency.TRANSLUCENT) : 
+          new BufferedImage(ITEMSIZE, ITEMSIZE, Transparency.TRANSLUCENT);
     final Graphics g = img.getGraphics();
     final Graphics2D g2d = (Graphics2D) g;
     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
@@ -615,8 +617,7 @@ public final class ScatterView extends View implements Runnable {
   }
   
   /**
-   * Locates the nearest item to the mouse pointer, also takes care of 
-   * node marking operations. 
+   * Locates the nearest item to the mouse pointer. 
    * @return item focused
    */
   private boolean focus() {
@@ -626,33 +627,40 @@ public final class ScatterView extends View implements Runnable {
         getHeight() - MARGINBOTTOM) {
       valueFocused = false;
       focusedItem = -1;
-    } else {
-      // get values focused by mouse pointer
-      valueFocused = true;
-      focusedValueX = calcFocusedValue(true);
-      focusedValueY = calcFocusedValue(false);
+      return false;
     }
+    // get values focused by mouse pointer
+    valueFocused = true;
+    focusedValueX = calcFocusedValue(true);
+    focusedValueY = calcFocusedValue(false);
     
     // find focused item
-    if(!dragging) {
-      focusedItem = -1;
-      int dist = Integer.MAX_VALUE;
-      for(int i = 0; i < scatterData.size; i++) {
-        final int x = calcCoordinate(true, scatterData.xAxis.co[i]);
-        final int y = calcCoordinate(false, scatterData.yAxis.co[i]);
-        final int distX = Math.abs(mouseX - x);
-        final int distY = Math.abs(mouseY - y);
-        if(distX <= FOCUSOFFSET && distY <= FOCUSOFFSET) {
-          final int currDist = distX * distY;
-          if(currDist < dist) {
-            dist = currDist;
-            focusedItem = i;
-          }
+    focusedItem = -1;
+    int dist = Integer.MAX_VALUE;
+    for(int i = 0; i < scatterData.size; i++) {
+      final int x = calcCoordinate(true, scatterData.xAxis.co[i]);
+      final int y = calcCoordinate(false, scatterData.yAxis.co[i]);
+      final int distX = Math.abs(mouseX - x);
+      final int distY = Math.abs(mouseY - y);
+      if(distX <= FOCUSOFFSET && distY <= FOCUSOFFSET) {
+        final int currDist = distX * distY;
+        if(currDist < dist) {
+          dist = currDist;
+          focusedItem = i;
         }
       }
-      notifyFocus(focusedItem > -1 ? scatterData.pres[focusedItem] : -1, this);
-    } else {
-      tmpMarkedPos.reset();
+    }
+    notifyFocus(focusedItem > -1 ? scatterData.pres[focusedItem] : -1, this);
+    return true;
+  }
+  
+  /**
+   * Takes care of node marking operations.
+   * @return marking changed
+   */
+  private boolean mark() {
+    tmpMarkedPos.reset();
+    if(dragging) {
       for(int i = 0; i < scatterData.size; i++) {
         final int x = calcCoordinate(true, scatterData.xAxis.co[i]);
         final int y = calcCoordinate(false, scatterData.yAxis.co[i]);
@@ -663,9 +671,21 @@ public final class ScatterView extends View implements Runnable {
           tmpMarkedPos.add(i);
         }
       }
-      markingChanged = true;
+    
+    } else {
+      for(int i = 0; i < scatterData.size; i++) {
+        final int x = calcCoordinate(true, scatterData.xAxis.co[i]);
+        final int y = calcCoordinate(false, scatterData.yAxis.co[i]);
+        final int distX = Math.abs(mouseX - x);
+        final int distY = Math.abs(mouseY - y);
+        if(distX <= MARKOFFSET && distY <= MARKOFFSET) {
+          tmpMarkedPos.add(i);
+        }
+      }
     }
-    return true;
+    
+    markingChanged = true;
+    return false;
   }
   
   @Override
@@ -686,7 +706,7 @@ public final class ScatterView extends View implements Runnable {
     mouseX = e.getX();
     mouseY = e.getY();
     selectionBox.setEnd(mouseX, mouseY);
-    focus();
+    mark();
     repaint();
   }
   
@@ -708,24 +728,30 @@ public final class ScatterView extends View implements Runnable {
     mouseX = e.getX();
     mouseY = e.getY();
 
-    focus();
     if(focused == -1) {
       Nodes n = new Nodes(GUI.context.data());
       tmpMarkedPos.reset();
       notifyMark(n);
       return;
     }
+
+    mark();
+    Nodes n = new Nodes(GUI.context.data());
+    final int[] ti = tmpMarkedPos.finish();
+    for(int i = 0; i < ti.length; i++) {
+      n.add(scatterData.pres[ti[i]]);
+    }
     
-    Nodes marked = GUI.context.marked();
-    final int pre = focused;
     final boolean left = SwingUtilities.isLeftMouseButton(e);
     if(!left) {
     } else if(e.isShiftDown()) {
-      notifyMark(1);
+      final Nodes marked = GUI.context.marked();
+      for(int i = 0; i < n.size; i++) {
+        marked.add(n.nodes[i]);
+      }
+      notifyMark(marked);
     } else {
-      if(marked.find(pre) < 0)
-        tmpMarkedPos.reset();
-        notifyMark(0);
+      notifyMark(n);
     }
   }
 }

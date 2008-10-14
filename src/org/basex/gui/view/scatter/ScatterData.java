@@ -47,10 +47,10 @@ public final class ScatterData {
   String[] getItems() {
     final Data data = GUI.context.data();
 
-    final StringList ks = new StringList();
+    StringList ks = new StringList();
     final StringList sl = new StringList();
     for(final String key : data.skel.desc(ks)) {
-      ks.reset();
+      ks = new StringList();
       ks.add(key);
       if(getCategories(ks).length != 0) sl.add(key);
     }
