@@ -180,9 +180,8 @@ public final class ScatterAxis {
     } else {
       final double pos = relative / (1.0d / (nrCats - 1));
       final int posI = (int) Math.floor(pos + 0.5d);
-      if(Math.abs(pos - posI) <= 0.3d) {
+      if(Math.abs(pos - posI) <= 0.3d)
         return Token.string(cats[posI]);
-      }
       return "";
     }
   }
@@ -223,8 +222,9 @@ public final class ScatterAxis {
         final int l = (int) (min + captionStep);
         firstCap = minI + 1;
         while(firstCap <= l) {
-          if(firstCap % captionStep == 0)
+          if(firstCap % captionStep == 0) {
             return;
+          }
           firstCap++;
         }
         

@@ -40,11 +40,11 @@ public final class ScatterView extends View implements Runnable {
   /** Data reference. */
   ScatterData scatterData;
   /** X paint margin. */
-  private static final int MARGINBOTTOM = 150;
+  private static final int MARGINBOTTOM = 100;
   /** Y paint margin. */ 
   private static final int MARGINTOP = 65;
   /** Y paint margin. */ 
-  private static final int MARGINLEFT = 170;
+  private static final int MARGINLEFT = 120;
   /** Y paint margin. */ 
   private static final int MARGINRIGHT = 40;
   /** Item size. */
@@ -52,7 +52,7 @@ public final class ScatterView extends View implements Runnable {
   /** Focused item size. */
   private static final int ITEMSIZEFOCUSED = 18;
   /** Place holder for items which lack value. */
-  private static final int NOVALUEBORDER = 60;
+  private static final int NOVALUEBORDER = 28;
   /** Focus offset. */
   private static final int FOCUSOFFSET = 6;
   /** Whitespace between axis captions. */
@@ -273,7 +273,7 @@ public final class ScatterView extends View implements Runnable {
     // draw marked items
     if(markingChanged) {
       final Nodes marked = GUI.context.marked();
-      if(marked.size() > 0) {
+      if(marked.size() > 0 && !dragging) {
         tmpMarkedPos.reset();
         for(int i = 0; i < marked.size(); i++) {
           final int prePos = scatterData.getPrePos(marked.nodes[i]);
@@ -290,7 +290,7 @@ public final class ScatterView extends View implements Runnable {
     }
 
     // draw focused item
-    if(focusedItem > -1) {
+    if(focusedItem > -1 && !dragging) {
       drawItem(g, scatterData.xAxis.co[focusedItem], 
           scatterData.yAxis.co[focusedItem], true, false);
     }
@@ -397,8 +397,8 @@ public final class ScatterView extends View implements Runnable {
       }
       
       // draw rotated caption labels
-      if(caption.length() > 22) {
-        caption = caption.substring(0, 20);
+      if(caption.length() > 10) {
+        caption = caption.substring(0, 10);
         caption += "...";
       }
 
@@ -465,8 +465,8 @@ public final class ScatterView extends View implements Runnable {
           caption = Token.string(axis.cats[i]);
         }
       }
-      if(caption.length() > 22) {
-        caption = caption.substring(0, 20);
+      if(caption.length() >= 10) {
+        caption = caption.substring(0, 10);
         caption += "...";
       }
       final int capW = BaseXLayout.width(g, caption);
@@ -630,7 +630,8 @@ public final class ScatterView extends View implements Runnable {
   }
   
   /**
-   * Locates the nearest item to the mouse pointer. 
+   * Locates the nearest item to the mouse pointer, also takes care of 
+   * node marking operations. 
    * @return item focused
    */
   private boolean focus() {
@@ -640,13 +641,12 @@ public final class ScatterView extends View implements Runnable {
         getHeight() - MARGINBOTTOM) {
       valueFocused = false;
       focusedItem = -1;
-      return false;
+    } else {
+      // get values focused by mouse pointer
+      valueFocused = true;
+      focusedValueX = calcFocusedValue(true);
+      focusedValueY = calcFocusedValue(false);
     }
-    
-    // get values focused by mouse pointer
-    valueFocused = true;
-    focusedValueX = calcFocusedValue(true);
-    focusedValueY = calcFocusedValue(false);
     
     // find focused item
     if(!dragging) {
@@ -696,6 +696,7 @@ public final class ScatterView extends View implements Runnable {
     if(!dragging) {
       dragging = true;
       selectionBox.setStart(mouseX, mouseY);
+      focusedItem = -1;
     }
     mouseX = e.getX();
     mouseY = e.getY();
@@ -734,7 +735,6 @@ public final class ScatterView extends View implements Runnable {
     final int pre = focused;
     final boolean left = SwingUtilities.isLeftMouseButton(e);
     if(!left) {
-      // is right click
     } else if(e.isShiftDown()) {
       notifyMark(1);
     } else {
