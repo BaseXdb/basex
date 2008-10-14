@@ -143,6 +143,10 @@ public final class ScatterView extends View implements Runnable {
           final String[] keys = scatterData.getStatKeys(input);
           xCombo.setModel(new DefaultComboBoxModel(keys));
           yCombo.setModel(new DefaultComboBoxModel(keys));
+          if(keys.length > 0) {
+            xCombo.setSelectedIndex(0);
+            yCombo.setSelectedIndex(0);
+          }
         }
         repaint();
       }
