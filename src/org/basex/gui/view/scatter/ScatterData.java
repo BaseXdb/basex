@@ -17,66 +17,71 @@ import org.basex.util.StringList;
  * @author Lukas Kircher
  */
 public final class ScatterData {
+  /** The x axis of the plot. */
+  final ScatterAxis xAxis;
+  /** The y axis of the plot. */
+  final ScatterAxis yAxis;
   /** Items pre values. */
   int[] pres;
-  /** Number of items displayed in plot. */ 
+  /** Number of items displayed in plot. */
   int size;
-  /** The x axis of the plot. */
-  ScatterAxis xAxis;
-  /** The y axis of the plot. */
-  ScatterAxis yAxis;
-  
+
   /** A temporary list for pre values which match the given item. */
   private IntList tmpPres;
   /** Item token selected by user. */
-  private byte[] item;
-  
+  private byte[] item = EMPTY;
+
   /**
    * Default Constructor.
    */
   public ScatterData() {
     xAxis = new ScatterAxis(this);
     yAxis = new ScatterAxis(this);
-    size = 0;
-    item = EMPTY;
   }
-  
+
+  /**
+   * Returns a string array with all distinct keys
+   * and the keys of the specified set.
+   * @return key array
+   */
+  String[] getItems() {
+    final Data data = GUI.context.data();
+
+    final StringList ks = new StringList();
+    final StringList sl = new StringList();
+    for(final String key : data.skel.desc(ks)) {
+      ks.reset();
+      ks.add(key);
+      if(getCategories(ks).length != 0) sl.add(key);
+    }
+    return sl.finish();
+  }
+
   /**
    * Returns a string array with all distinct keys
    * and the keys of the specified set.
    * @param ks input keys
    * @return key array
    */
-  String[] getStatKeys(final StringList ks) {
+  String[] getCategories(final StringList ks) {
     final Data data = GUI.context.data();
-
-    final String[] keys = data.skel.desc(ks);
-    /**
-    final Names tags = data.tags;
-    for(int i = 1; i <= tags.size(); i++) sl.add(string(tags.key(i)));
-    final Names atts = data.atts;
-    for(int i = 1; i <= atts.size(); i++) sl.add("@" + string(atts.key(i)));
-    */
-
     final StringList sl = new StringList();
-    for(int k = 0; k < keys.length; k++) {
-      boolean att = keys[k].startsWith("@");
+    for(final String key : data.skel.desc(ks)) {
+      final boolean att = key.startsWith("@");
       final Names index = att ? data.atts : data.tags;
-      final byte[] name = substring(token(keys[k]), att ? 1 : 0);
+      final byte[] name = substring(token(key), att ? 1 : 0);
       final Kind kind = index.stat(index.id(name)).kind;
-      if(kind == Kind.DBL || kind == Kind.INT || kind == Kind.CAT) {
-        sl.add(keys[k]);
-      }
+      if(kind == Kind.DBL || kind == Kind.INT || kind == Kind.CAT) sl.add(key);
     }
-    sl.sort();
     return sl.finish();
   }
-  
+
+
   /**
    * Called if the user changes the item level displayed in the plot. If a new
    * item was selected the plot data is recalculated.
    * @param newItem item selected by the user
-   * @return true if a new item was selected and the plot data has been 
+   * @return true if a new item was selected and the plot data has been
    * recalculated
    */
   boolean setItem(final String newItem) {
@@ -89,7 +94,7 @@ public final class ScatterData {
     yAxis.refreshAxis();
     return true;
   }
-  
+
   /**
    * Refreshes item list and coordinates if the selection has changed. So far
    * only numerical data is considered for plotting.
@@ -116,11 +121,11 @@ public final class ScatterData {
     pres = tmpPres.finish();
     size = pres.length;
   }
-  
+
   /**
    * Returns the array position of a given pre value.
    * @param pre pre value to be looked up
-   * @return array index if found, -1 if not 
+   * @return array index if found, -1 if not
    */
   int getPrePos(final int pre) {
     for(int i = 0; i < size; i++) {

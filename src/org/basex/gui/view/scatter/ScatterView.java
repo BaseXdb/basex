@@ -10,14 +10,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
-
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
-
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
@@ -140,7 +137,7 @@ public final class ScatterView extends View implements Runnable {
           
           final StringList input = new StringList();
           input.add(item);
-          final String[] keys = scatterData.getStatKeys(input);
+          final String[] keys = scatterData.getCategories(input);
           xCombo.setModel(new DefaultComboBoxModel(keys));
           yCombo.setModel(new DefaultComboBoxModel(keys));
           if(keys.length > 0) {
@@ -562,25 +559,13 @@ public final class ScatterView extends View implements Runnable {
       
       viewDimension = Integer.MAX_VALUE;
       scatterData = new ScatterData();
-      
-      final String[] keys = scatterData.getStatKeys(new StringList());
-      xCombo.setModel(new DefaultComboBoxModel(keys));
-      yCombo.setModel(new DefaultComboBoxModel(keys));
 
-      final byte[][] tmpItems = data.tags.keys();
-      final String[] items = new String[tmpItems.length];
-      for(int i = 0; i < items.length; i++) {
-        items[i] = Token.string(tmpItems[i]);
-      }
-      Arrays.sort(items);
+      final String[] items = scatterData.getItems();
       itemCombo.setModel(new DefaultComboBoxModel(items));
-      if(items.length != 0) {
-        itemCombo.setSelectedIndex(0);
-      }
-      if(keys.length != 0) {
-        xCombo.setSelectedIndex(0);
-        yCombo.setSelectedIndex(0);
-      }
+
+      // set first item and trigger assignment of axis assignments
+      if(items.length != 0) itemCombo.setSelectedIndex(0);
+
       focusedItem = -1;
       plotChanged = true;
       repaint();
