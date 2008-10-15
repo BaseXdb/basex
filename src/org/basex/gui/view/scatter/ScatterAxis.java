@@ -290,15 +290,6 @@ public final class ScatterAxis {
           else
             tmpStep *= 2;
         } while(nrCaptions * ScatterView.CAPTIONWHITESPACE > space);
-        // calculate first caption value after minimum
-        final int l = (int) (min + captionStep);
-        firstCap = minI + 1;
-        while(firstCap <= l) {
-          if(firstCap % captionStep == 0) {
-            return;
-          }
-          firstCap++;
-        }
         
       } else if(numType == TYPEDBL) {
         final double minD = min;
@@ -308,8 +299,6 @@ public final class ScatterAxis {
           tmpStep = 1;
         do {
           captionStep = tmpStep;
-//          double tmpMin = (int) (minD / tmpStep) * tmpStep;
-//          double tmpMax = (int) ((maxD + tmpStep - .01d) / tmpStep) * tmpStep;
           nrCaptions = (int) ((maxD - minD) / tmpStep) + 1;
           if(String.valueOf(tmpStep).indexOf("1") > -1) {
             tmpStep *= 2.5;
@@ -318,16 +307,6 @@ public final class ScatterAxis {
           }
         } while(nrCaptions * ScatterView.CAPTIONWHITESPACE > space &&
             maxD - minD > tmpStep);
-     // calculate first caption value after minimum
-        final double l = min + captionStep;
-        final double c = Math.ceil(captionStep);
-        firstCap = minD + .01d;
-        while(firstCap <= l) {
-          if(firstCap % c == 0) {
-            return;
-          }
-          firstCap++;
-        }
       }
       
     } else {
