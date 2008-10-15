@@ -304,7 +304,7 @@ public final class ScatterAxis {
         final double minD = min;
         final double maxD = max;
         double tmpStep = .01d;
-        if(maxD - minD > 500)
+        if(maxD - minD > 100)
           tmpStep = 1;
         do {
           captionStep = tmpStep;
