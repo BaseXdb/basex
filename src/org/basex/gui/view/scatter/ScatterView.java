@@ -51,7 +51,7 @@ public final class ScatterView extends View implements Runnable {
   /** Place holder for items which lack value. */
   private static final int NOVALUEBORDER = 28;
   /** Focus offset. */
-  private static final int FOCUSOFFSET = 4;
+  private static final int FOCUSOFFSET = 5;
   /** Mark offset. */
   private static final int MARKOFFSET = 3;
   /** Whitespace between axis captions. */
@@ -188,11 +188,11 @@ public final class ScatterView extends View implements Runnable {
     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
         RenderingHints.VALUE_ANTIALIAS_ON);
     if(focusedImage) {
-      g.setColor(Color.black);
+      g.setColor(new Color(80, 80, 255, 255));
+      g.fillOval(0, 0, ITEMSIZEFOCUSED, ITEMSIZEFOCUSED);
+      g.setColor(new Color(0, 0, 255, 255));
       final int diff = (ITEMSIZEFOCUSED - ITEMSIZE) / 2;
       g.fillOval(diff, diff, ITEMSIZE, ITEMSIZE);
-      g.setColor(new Color(180, 80, 80, 200));
-      g.fillOval(0, 0, ITEMSIZEFOCUSED, ITEMSIZEFOCUSED);
     } else {
       g.setColor(new Color(50, 60, 130, 150));
       Color c = new Color(GUIConstants.colormark1.getRed(),

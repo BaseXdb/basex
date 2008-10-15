@@ -37,6 +37,8 @@ public final class ScatterAxis {
 
   /** Coordinates of items. */
   double[] co = {};
+  /** Item values. */
+  byte[][] vals = {};
   /** Number of captions to display. */
   int nrCaptions;
   /** Step for axis caption. */
@@ -106,10 +108,12 @@ public final class ScatterAxis {
 
     final int[] items = scatterData.pres;
     co = new double[items.length];
+    vals = new byte[items.length][];
     for(int i = 0; i < items.length; i++) {
       int p = items[i];
       final int limit = p + data.size(p, Data.ELEM);
-      double currentValue = -1;
+//      double currentValue = -1;
+      byte[] value = {};
       p++;
       while(p < limit) {
         final int kind = data.kind(p);
@@ -117,21 +121,89 @@ public final class ScatterAxis {
           final byte[] currName = data.tag(p);
           if((Token.eq(attr, currName)) && isTag) {
             final int attSize = data.attSize(p, kind);
-            final byte[] value = data.text(p + attSize);
-            currentValue = calcPosition(value);
+            value = data.text(p + attSize);
+//            currentValue = calcPosition(value);
             break;
           }
         } else if(kind == Data.ATTR) {
           final byte[] currName = data.attName(p);
           if((Token.eq(attr, currName)) && !isTag) {
-            final byte[] value = data.attValue(p);
-            currentValue = calcPosition(value);
+            value = data.attValue(p);
+//            currentValue = calcPosition(value);
             break;
           }
         }
         p++;
       }
-      co[i] = currentValue;
+//      co[i] = currentValue;
+      vals[i] = value;
+    }
+    
+    calcExtremeValues();
+    for(int i = 0; i < vals.length; i++) {
+      final byte[] val = vals[i];
+      if(val.length > 0) {
+        co[i] = calcPosition(val);
+      }
+    }
+  }
+  
+  /**
+   * Determines the smallest and greatest occurring values for a specific item.
+   * Afterwards the extremes are slightly rounded to support a decent axis
+   * caption.
+   *
+   * If range between min/max < 10 extremes are calculated by floor/ceil 
+   * function.
+   * If range >=10 the minimum is allowed to lie 15% of the range under the
+   * actual minimum. After that the final extreme is calculated as the value
+   * between the smallest allowed minimum and the actual minimum which is 
+   * dividable by pow(10, log10(range)-1).
+   * 
+   * Maximum v.v. . 
+   */
+  private void calcExtremeValues() {
+    min = Integer.MAX_VALUE;
+    max = Integer.MIN_VALUE;
+    for(int i = 0; i < vals.length; i++) {
+      if(vals[i].length < 1)
+        continue;
+      double d = Token.toDouble(vals[i]);
+      if(d < min)
+        min = d;
+      if(d > max) 
+        max = d;
+    }
+    
+    final double range = max - min;
+    if(range < 10) {
+      min = Math.floor(min);
+      max = Math.ceil(max);
+      return;
+    }
+    final int lmin = (int) (min - (range / (15 / 100)));
+    final int lmax = (int) (max + (range / (15 / 100)));
+    int tmin = (int) Math.floor(min);
+    int tmax = (int) Math.ceil(max);
+    final double rangePow = Math.floor(Math.log10(range) + .5d);
+    final int step = (int) (Math.pow(10, rangePow - 1));
+    min = tmin;
+    while(tmin > lmin) {
+      if(tmin % step == 0) {
+        min = tmin;
+        break;
+      } else {
+        tmin--;
+      }
+    }
+    max = tmax;
+    while(tmax < lmax) {
+      if(tmax % step == 0) {
+        max = tmax;
+        break;
+      } else {
+        tmax++;
+      }
     }
   }
   
