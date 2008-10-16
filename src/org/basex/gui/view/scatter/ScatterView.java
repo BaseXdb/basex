@@ -234,6 +234,17 @@ public final class ScatterView extends View implements Runnable {
     final Data data = GUI.context.data();
     if(data == null) return;
     
+    final int w = getWidth();
+    final int h = getHeight();
+    if(w < 250 || h < 250) {
+      super.paintComponent(g);
+      final String s = "insufficient space for plot drawing";
+      final int sw = BaseXLayout.width(g, s);
+      g.setColor(Color.black);
+      g.drawString(s, w / 2 - sw / 2, h / 2);
+      return;
+    }
+    
     if(scatterData == null) {
       refreshInit();
       return;
@@ -242,8 +253,6 @@ public final class ScatterView extends View implements Runnable {
     super.paintComponent(g);
     g.setColor(new Color(90, 90, 150, 90));
     
-    final int w = getWidth();
-    final int h = getHeight();
     if(w + h != viewDimension) {
       viewDimension = w + h;
       plotChanged = true;
@@ -401,9 +410,9 @@ public final class ScatterView extends View implements Runnable {
         caption += "...";
       }
 
-      int capW = BaseXLayout.width(g, caption);
+      final int capW = BaseXLayout.width(g, caption);
       final int imgH = 160;
-      int imgW = 160;
+      final int imgW = 160;
       final BufferedImage img = new BufferedImage(imgW, imgH, 
           Transparency.BITMASK);
       Graphics2D g2d = (Graphics2D) img.getGraphics();
@@ -471,41 +480,6 @@ public final class ScatterView extends View implements Runnable {
       final int capW = BaseXLayout.width(g, caption);
       g.drawString(caption, MARGINLEFT - capW - 15, y1 + textH / 2 - 1);
     }
-    
-//    final int h = getHeight();
-//    final int w = getWidth();
-//    g.setColor(GUIConstants.color1);
-//    g.drawLine(MARGINLEFT, MARGINTOP, MARGINLEFT, getHeight() - MARGINBOTTOM);
-//    
-//    if(plotChanged)
-//      scatterData.yAxis.calcCaption(plotHeight - NOVALUEBORDER);
-//
-//    final boolean numeric = scatterData.yAxis.numeric;
-//    g.setFont(GUIConstants.font);
-//    g.setColor(GUIConstants.color1);
-//    final int textH = g.getFontMetrics().getHeight();
-//    final int pHeight = plotHeight - NOVALUEBORDER;
-//    final int nrCaptions = numeric ? (pHeight / 
-//        (textH + CAPTIONWHITESPACE)) :
-//      scatterData.yAxis.nrCaptions;
-//    final double range = 1.0d / (nrCaptions - 1);
-//    for(int i = 0; i < nrCaptions; i++) {
-//      g.setColor(GUIConstants.color1);
-//      final int y1 = h - MARGINBOTTOM - NOVALUEBORDER - 
-//      ((int) ((i * range) * pHeight));
-//      g.drawLine(MARGINLEFT - 9, y1, w - MARGINRIGHT, y1);
-//      g.setColor(Color.black);
-//      String caption = null;
-//      if(numeric) {
-//        final double value = scatterData.yAxis.min +
-//          (scatterData.yAxis.max - scatterData.yAxis.min) * range * i;
-//        caption = Double.toString(value);
-//      } else {
-//        caption = Token.string(scatterData.yAxis.cats[i]);
-//      }
-//      final int capW = BaseXLayout.width(g, caption);
-//      g.drawString(caption, MARGINLEFT - capW - 15, y1 + textH / 2 - 1);
-//    }
   }
   
   /**
@@ -569,6 +543,7 @@ public final class ScatterView extends View implements Runnable {
       if(items.length != 0) itemCombo.setSelectedIndex(0);
 
       focusedItem = -1;
+      tmpMarkedPos.reset();
       plotChanged = true;
       repaint();
     }
@@ -683,7 +658,6 @@ public final class ScatterView extends View implements Runnable {
         }
       }
     }
-    
     markingChanged = true;
     return false;
   }
@@ -698,13 +672,23 @@ public final class ScatterView extends View implements Runnable {
   
   @Override
   public void mouseDragged(final MouseEvent e) {
+    mouseX = e.getX();
+    mouseY = e.getY();
+    final int h = getHeight();
+    final int w = getWidth();
+    final int th = 5;
+    final int lb = MARGINLEFT - th;
+    final int rb = w - MARGINRIGHT + th;
+    final int tb = MARGINTOP - th;
+    final int bb = h - MARGINBOTTOM + th;
+    if(!(mouseY > tb && mouseY < bb && mouseX > lb && mouseX < rb))
+      return;
+      
     if(!dragging) {
       dragging = true;
       selectionBox.setStart(mouseX, mouseY);
       focusedItem = -1;
     }
-    mouseX = e.getX();
-    mouseY = e.getY();
     selectionBox.setEnd(mouseX, mouseY);
     mark();
     repaint();

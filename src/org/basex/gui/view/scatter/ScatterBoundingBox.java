@@ -18,9 +18,9 @@ public class ScatterBoundingBox {
   /** Y coordinate of lower right corner. */
   int y2;
   /** Background color of selection box. */
-  static Color back = new Color(100, 100, 100, 20);
+  static Color back = new Color(100, 100, 100, 50);
   /** Color of selection frame. */
-  static Color frame = new Color(100, 100, 100, 100);
+  static Color frame = new Color(100, 100, 100, 200);
   
   
   /**

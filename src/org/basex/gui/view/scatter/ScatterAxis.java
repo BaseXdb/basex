@@ -103,7 +103,6 @@ public final class ScatterAxis {
         cats[i] = Token.token(tmpCats[i]);
       }
       nrCats = cats.length;
-//      nrCaptions = nrCats;
     }
 
     final int[] items = scatterData.pres;
@@ -186,7 +185,7 @@ public final class ScatterAxis {
     int tmin = (int) Math.floor(min);
     int tmax = (int) Math.ceil(max);
     final double rangePow = Math.floor(Math.log10(range) + .5d);
-    final int step = (int) (Math.pow(10, rangePow - 1));
+    final int step = (int) (Math.pow(10, rangePow));
     min = tmin;
     while(tmin > lmin) {
       if(tmin % step == 0) {
