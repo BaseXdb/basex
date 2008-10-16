@@ -24,6 +24,9 @@ public final class IOFile extends IO {
   private final File file;
   /** File length. */
   protected long len;
+  /** Zip entry. */
+  protected ZipEntry zip;
+
 
   /**
    * Constructor.
@@ -54,6 +57,11 @@ public final class IOFile extends IO {
   }
 
   @Override
+  public boolean isSymLink() throws IOException {
+    return !path.equals(file.getCanonicalPath());
+  }
+
+  @Override
   public long date() {
     return file.lastModified();
   }
@@ -65,56 +73,57 @@ public final class IOFile extends IO {
 
   @Override
   public boolean more() throws IOException {
-    // return cached content
+    // process zip files
     if(is instanceof ZipInputStream || path.endsWith(ZIPSUFFIX)) {
-      // doesn't work yet with several zip entries
-      //  (only works with internal parser as default XML parser
-      //   seems to close the input stream)
-      if(is == null) is = new ZipInputStream(new FileInputStream(file));
-      else return false;
-
-      while(is != null) {
-        final ZipEntry e = ((ZipInputStream) is).getNextEntry();
-        if(e == null) {
-          is = null;
-        } else {
-          len = e.getSize();
-          path = e.getName();
-          if(!e.isDirectory()) break;
-        }
+      if(is == null) {
+        // keep stream open until last file was parsed...
+        is = new ZipInputStream(new FileInputStream(file)) {
+          @Override
+          public void close() throws IOException {
+            if(zip == null) super.close();
+          }
+        };
       }
-      more = is != null;
-    } else if(path.endsWith(GZSUFFIX)) {
-      if(is == null) is = new GZIPInputStream(new FileInputStream(file));
-      else return false;
-      more = true;
-    } else {
-      more ^= true;
+      while(true) {
+        zip = ((ZipInputStream) is).getNextEntry();
+        if(zip == null) break;
+        len = zip.getSize();
+        path = zip.getName();
+        if(!zip.isDirectory()) return true;
+      }
+      is.close();
+      is = null;
+      return false;
     }
-    return more;
+    
+    // process gzip files
+    if(path.endsWith(GZSUFFIX)) {
+      if(is == null) {
+        is = new GZIPInputStream(new FileInputStream(file));
+      } else {
+        is.close();
+        is = null;
+      }
+      return is != null;
+    }
+    
+    // work on normal files
+    return more ^= true;
   }
 
   @Override
   public InputSource inputSource() {
-    return is == null ? new InputSource(url(path)) :
-      new InputSource(is);
+    return is == null ? new InputSource(url(path)) : new InputSource(is);
   }
 
   @Override
   public BufferInput buffer() throws IOException {
-    // support for zipped files; the first file will be chosen
-    if(path.endsWith(ZIPSUFFIX)) {
-      final ZipInputStream zip = new ZipInputStream(new FileInputStream(file));
-      final ZipEntry entry = zip.getNextEntry();
-      final BufferInput in = new BufferInput(zip);
-      in.length(entry.getSize());
+    if(is != null) {
+      if(zip == null) return new BufferInput(is);
+      final BufferInput in = new BufferInput(is);
+      in.length(zip.getSize());
       return in;
     }
-    // support for gzipped files
-    if(path.endsWith(GZSUFFIX)) {
-      return new BufferInput(new GZIPInputStream(new FileInputStream(file)));
-    }
-
     // return file content
     return new BufferInput(path);
   }

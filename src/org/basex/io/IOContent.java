@@ -41,4 +41,9 @@ public final class IOContent extends IO {
   public BufferInput buffer() {
     return new CachedInput(cont);
   }
+
+  @Override
+  public IO merge(final IO f) {
+    return f;
+  }
 }

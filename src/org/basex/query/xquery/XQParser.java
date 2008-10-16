@@ -198,6 +198,7 @@ public final class XQParser extends QueryParser {
         Err.or(QUERYEND, rest());
       }
       ctx.fun.check();
+      ctx.ns.finish(ctx.nsElem);
     } catch(final XQException ex) {
       mark();
       ex.pos(this);
@@ -255,7 +256,7 @@ public final class XQParser extends QueryParser {
   private void moduleDecl(final Uri u) throws XQException {
     check(MODULE);
     check(NAMESPACE);
-    module = new QNm(ncName(null));
+    module = new QNm(ncName(XPNAME));
     check(IS);
     module.uri = Uri.uri(stringLiteral());
     if(module.uri == Uri.EMPTY) Err.or(NSMODURI);
@@ -350,7 +351,8 @@ public final class XQParser extends QueryParser {
     final QNm name = new QNm(ncName(XPNAME));
     check(IS);
     name.uri = Uri.uri(stringLiteral());
-    if(!ctx.ns.add(name)) Err.or(DUPLNSDECL, name);
+    if(ctx.ns.find(name.ln()) != null) Err.or(DUPLNSDECL, name);
+    ctx.ns.add(name);
   }
 
   /**
@@ -377,11 +379,11 @@ public final class XQParser extends QueryParser {
     final byte[] ns = stringLiteral();
     if(elem) {
       if(declElem) Err.or(DUPLNS);
-      ctx.nsElem = Uri.uri(ns);
+      ctx.nsElem = ns;
       declElem = true;
     } else {
       if(declFunc) Err.or(DUPLNS);
-      ctx.nsFunc = Uri.uri(ns);
+      ctx.nsFunc = ns;
       declFunc = true;
     }
     return true;
@@ -474,7 +476,7 @@ public final class XQParser extends QueryParser {
    */
   private void schemaImport() throws XQException {
     if(consumeWS(NAMESPACE)) {
-      ncName(null);
+      ncName(XPNAME);
       check(IS);
     } else if(consumeWS(DEFAULT)) {
       check(ELEMENT);
@@ -493,7 +495,7 @@ public final class XQParser extends QueryParser {
   private void moduleImport() throws XQException {
     QNm name = null;
     if(consumeWS(NAMESPACE)) {
-      name = new QNm(ncName(null));
+      name = new QNm(ncName(XPNAME));
       check(IS);
     } else {
       name = new QNm();
@@ -598,7 +600,7 @@ public final class XQParser extends QueryParser {
    */
   private void functionDecl() throws XQException {
     final QNm name = new QNm(qName(DECLFUNC));
-    name.uri = name.ns() ? ctx.ns.uri(name.pre()) : ctx.nsFunc;
+    name.uri = Uri.uri(name.ns() ? ctx.ns.uri(name.pre()) : ctx.nsFunc);
 
     if(name.pre().length == 0 && Type.find(name, true) != null)
       Err.or(FUNCRES, name);
@@ -1305,12 +1307,12 @@ public final class XQParser extends QueryParser {
         if(!consume(':')) {
           skipWS();
           return att ? new NameTest(new QNm(name), NameTest.Kind.NAME) :
-            new NameTest(new QNm(name, ctx.nsElem), NameTest.Kind.STD);
+            new NameTest(new QNm(name, Uri.uri(ctx.nsElem)), NameTest.Kind.STD);
         }
         // name test "pre:*"
         if(consume('*')) {
           final QNm nm = new QNm(EMPTY);
-          nm.uri = ctx.ns.uri(name);
+          nm.uri = Uri.uri(ctx.ns.uri(name));
           return new NameTest(nm, NameTest.Kind.NS);
         }
       }
@@ -1423,7 +1425,7 @@ public final class XQParser extends QueryParser {
   private QNm varName() throws XQException {
     check(DOLLAR);
     final QNm name = new QNm(qName(NOVARNAME));
-    if(name.ns()) name.uri = ctx.ns.uri(name.pre());
+    if(name.ns()) name.uri = Uri.uri(ctx.ns.uri(name.pre()));
     ctx.ns.uri(name);
     return name;
   }
@@ -1460,7 +1462,7 @@ public final class XQParser extends QueryParser {
         alter = new Object[] { name };
         ap = qp;
         ctx.ns.uri(name);
-        name.uri = name.ns() ? ctx.ns.uri(name.pre()) : ctx.nsFunc;
+        name.uri = Uri.uri(name.ns() ? ctx.ns.uri(name.pre()) : ctx.nsFunc);
         final Expr[] args = exprs;
         final Expr func = ctx.fun.get(name, args);
         if(func != null) {
@@ -1502,7 +1504,7 @@ public final class XQParser extends QueryParser {
 
     Expr[] cont = {};
     final Atts ns = new Atts();
-    final int s = ctx.ns.size;
+    final int s = ctx.ns.size();
 
     // parse attributes...
     while(XMLToken.isXMLLetter(curr())) {
@@ -1556,7 +1558,7 @@ public final class XQParser extends QueryParser {
       if(eq(atn, XMLNS)) {
         if(!simple) Err.or(NSCONS);
         final byte[] v = attv.length == 0 ? EMPTY : attv[0].str();
-        open.uri = Uri.uri(v);
+        if(!open.ns()) open.uri = Uri.uri(v);
         addNS(ns, atn, v);
       } else if(startsWith(atn, XMLNS)) {
         if(!simple) Err.or(NSCONS);
@@ -1588,7 +1590,7 @@ public final class XQParser extends QueryParser {
       if(!eq(open.str(), close)) Err.or(TAGWRONG, open.str(), close);
     }
     
-    ctx.ns.size = s;
+    ctx.ns.size(s);
     return new CElem(open, cont, ns);
   }
 
@@ -1882,7 +1884,7 @@ public final class XQParser extends QueryParser {
     skipWS();
     final int mode = consume('?') ? 1 : consume('+') ? 2 :
       consume('*') ? 3 : 0;
-    if(type.ns()) type.uri = ctx.ns.uri(type.pre());
+    if(type.ns()) type.uri = Uri.uri(ctx.ns.uri(type.pre()));
 
     final byte[] ext = tok.finish();
     final SeqType seq = new SeqType(type, mode, true);
@@ -1909,8 +1911,7 @@ public final class XQParser extends QueryParser {
     final int i = indexOf(nm, ',');
     if(i != -1) {
       final QNm test = new QNm(trim(substring(nm, i + 1)), ctx);
-      if(test.uri != Uri.XS) Err.or(TESTINVALID, t, test);
-      //if(Type.find(test, false) == null) Err.or(TESTINVALID, t, test);
+      if(!eq(test.uri.str(), XSURI)) Err.or(TESTINVALID, t, test);
       nm = trim(substring(nm, 0, i));
     }
 

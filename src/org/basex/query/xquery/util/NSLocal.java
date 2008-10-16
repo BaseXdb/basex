@@ -1,12 +1,12 @@
 package org.basex.query.xquery.util;
 
 import static org.basex.query.xquery.XQText.*;
+import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
-
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.QNm;
 import org.basex.query.xquery.item.Uri;
-import org.basex.util.Array;
+import org.basex.util.Atts;
 
 /**
  * Local Namespaces.
@@ -16,28 +16,21 @@ import org.basex.util.Array;
  */
 public final class NSLocal {
   /** Namespaces. */
-  private QNm[] names = new QNm[1];
-  /** Number of stored namespaces. */
-  public int size;
+  public Atts atts = new Atts();
+  /** Number of default namespaces. */
+  private int def;
 
   /**
    * Adds the specified namespace.
    * @param name namespace
-   * @return true if namespace is already known
    * @throws XQException evaluation exception
    */
-  public boolean add(final QNm name) throws XQException {
+  public void add(final QNm name) throws XQException {
     final byte[] ln = name.ln();
     if(eq(ln, XML) || eq(ln, XMLNS)) Err.or(NSDEF, name);
-    if(Uri.XML.eq(name.uri)) Err.or(NOXMLNS, name);
-
-    // check if namespace exists already..
-    boolean n = true;
-    for(int s = size - 1; s >= 0; s--) n &= !eq(ln, names[s].ln());
-
-    names = Array.check(names, size);
-    names[size++] = new QNm(ln, name.uri);
-    return n;
+    final byte[] uri = name.uri.str();
+    if(eq(XMLURI, uri)) Err.or(NOXMLNS, name);
+    atts.add(ln, uri);
   }
 
   /**
@@ -46,8 +39,8 @@ public final class NSLocal {
    */
   public void delete(final QNm name) {
     final byte[] ln = name.ln();
-    for(int s = size - 1; s >= 0; s--) {
-      if(eq(ln, names[s].ln())) Array.move(names, s + 1, -1, --size - s);
+    for(int s = atts.size - 1; s >= 0; s--) {
+      if(eq(ln, atts.key[s])) atts.delete(s);
     }
   }
   
@@ -56,10 +49,10 @@ public final class NSLocal {
    * @param qname qname
    */
   public void uri(final QNm qname) {
-    if(!qname.ns()) return;
     final byte[] pre = qname.pre();
-    final Uri uri = find(pre);
-    qname.uri = uri != null ? uri : NSGlobal.uri(pre);
+    if(pre.length == 0) return;
+    final byte[] uri = find(pre);
+    qname.uri = Uri.uri(uri != null ? uri : NSGlobal.uri(pre));
   }
 
   /**
@@ -68,21 +61,21 @@ public final class NSLocal {
    * @return uri
    * @throws XQException evaluation exception
    */
-  public Uri uri(final byte[] pre) throws XQException {
-    Uri uri = find(pre);
+  public byte[] uri(final byte[] pre) throws XQException {
+    byte[] uri = find(pre);
     if(uri == null) uri = NSGlobal.uri(pre);
-    if(uri == Uri.EMPTY) Err.or(PREUNKNOWN, pre);
+    if(uri.length == 0 && pre.length != 0) Err.or(PREUNKNOWN, pre);
     return uri;
   }
 
   /**
-   * Finds the uri for the specified prefix.
+   * Finds the URI for the specified prefix.
    * @param pre prefix of the namespace
    * @return uri or null value
    */
-  public Uri find(final byte[] pre) {
-    for(int s = size - 1; s >= 0; s--) {
-      if(eq(names[s].str(), pre)) return names[s].uri;
+  public byte[] find(final byte[] pre) {
+    for(int s = atts.size - 1; s >= 0; s--) {
+      if(eq(atts.key[s], pre)) return atts.val[s];
     }
     return null;
   }
@@ -92,18 +85,45 @@ public final class NSLocal {
    * @param uri URI
    * @return prefix
    */
-  public byte[] prefix(final Uri uri) {
-    for(int s = size - 1; s >= 0; s--) {
-      if(names[s].uri.eq(uri)) return names[s].str();
+  public byte[] prefix(final byte[] uri) {
+    for(int s = atts.size - 1; s >= 0; s--) {
+      if(eq(atts.val[s], uri)) return atts.key[s];
     }
     return NSGlobal.prefix(uri);
   }
+  
+  /**
+   * Finishes the creation of default namespaces.
+   * @param elem default element namespace
+   */
+  public void finish(final byte[] elem) {
+    if(elem.length != 0) atts.add(EMPTY, elem);
+    def = atts.size;
+  }
+  
+  /**
+   * Creates a copy with the default namespaces.
+   * @return copy
+   */
+  public NSLocal copy() {
+    final NSLocal local = new NSLocal();
+    for(int i = 0; i < def; i++) local.atts.add(atts.key[i], atts.val[i]);
+    return local;
+  }
 
   /**
-   * Returns the currently available namespaces.
+   * Returns the number of namespaces.
    * @return namespaces
    */
-  public QNm[] ns() {
-    return Array.finish(names, size);
+  public int size() {
+    return atts.size;
+  }
+
+  /**
+   * Sets the number of namespaces.
+   * @param s namespaces
+   */
+  public void size(final int s) {
+    atts.size = s;
   }
 }

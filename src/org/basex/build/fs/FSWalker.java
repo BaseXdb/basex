@@ -62,16 +62,6 @@ public final class FSWalker {
   }
 
   /**
-   * Determines a symbolic link.
-   * @param f file to be tested.
-   * @return true for a symbolic link
-   * @throws IOException I/O exception
-   */
-  private boolean isSymlink(final File f) throws IOException {
-    return !f.getPath().equals(f.getCanonicalPath());
-  }
-
-  /**
    * Visit files in directory or step further down.
    * @param d the directory to be visited.
    */
@@ -84,7 +74,7 @@ public final class FSWalker {
       try {
         curr = f;
         //if(Prop.debug) BaseX.debug(curr.getAbsolutePath());
-        if(isSymlink(f)) for(final FSVisitor v : visitors)
+        if(IO.isSymlink(f)) for(final FSVisitor v : visitors)
           v.symlinkEvent(f);
         else if(f.isDirectory()) descend(f);
         else for(final FSVisitor v : visitors)
@@ -102,7 +92,7 @@ public final class FSWalker {
    */
   private void descend(final File d) throws IOException {
     // do not descend into symlinked directories.
-    if(isSymlink(d)) {
+    if(IO.isSymlink(d)) {
       for(final FSVisitor v : visitors)
         v.symlinkEvent(d);
       return;

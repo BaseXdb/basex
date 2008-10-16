@@ -48,6 +48,8 @@ public final class DialogCreate extends Dialog {
   private final BaseXCheckBox chop;
   /** Entities mode. */
   private final BaseXCheckBox entities;
+  /** DTD mode. */
+  private final BaseXCheckBox dtd;
   /** Indexing mode. */
   private final BaseXCheckBox txtindex;
   /** Indexing mode. */
@@ -56,8 +58,6 @@ public final class DialogCreate extends Dialog {
   private final BaseXCheckBox ftxindex;
   /** Fulltext indexing. */
   private final BaseXCheckBox[] ft = new BaseXCheckBox[4];
-  /** Fulltext labels. */
-  private final BaseXLabel[] fl = new BaseXLabel[4];
   /** Buttons. */
   private final BaseXBack buttons;
   /** Available databases. */
@@ -133,18 +133,21 @@ public final class DialogCreate extends Dialog {
     p2.setLayout(new TableLayout(9, 1));
     p2.setBorder(8, 8, 8, 8);
 
-    intparse = new BaseXCheckBox(CREATEINTPARSE, Token.token(INTPARSEINFO),
-        Prop.intparse, 0, this);
+    intparse = new BaseXCheckBox(CREATEINTPARSE + COL,
+        Token.token(INTPARSEINFO), Prop.intparse, 0, this);
     p2.add(intparse);
     p2.add(new BaseXLabel(INTPARSEINFO, 8));
 
-    entities = new BaseXCheckBox(CREATEENTITIES, Token.token(ENTITIESINFO),
-        Prop.entity, 0, this);
+    entities = new BaseXCheckBox(CREATEENTITIES,
+        Token.token(ENTITIESINFO), Prop.entity, 0, this);
     p2.add(entities);
-    p2.add(new BaseXLabel(ENTITIESINFO, 8));
 
-    chop = new BaseXCheckBox(CREATECHOP, Token.token(CHOPPINGINFO),
-        Prop.chop, 0, this);
+    dtd = new BaseXCheckBox(CREATEDTD,
+        Token.token(DTDINFO), Prop.entity, 12, this);
+    p2.add(dtd);
+
+    chop = new BaseXCheckBox(CREATECHOP,
+        Token.token(CHOPPINGINFO), Prop.chop, 0, this);
     p2.add(chop);
     p2.add(new BaseXLabel(CHOPPINGINFO, 16));
 
@@ -153,13 +156,13 @@ public final class DialogCreate extends Dialog {
     p3.setLayout(new TableLayout(10, 1, 0, 0));
     p3.setBorder(8, 8, 8, 8);
 
-    txtindex = new BaseXCheckBox(INFOTEXTINDEX, Token.token(TXTINDEXINFO),
-        Prop.textindex, 0, this);
+    txtindex = new BaseXCheckBox(INFOTEXTINDEX,
+        Token.token(TXTINDEXINFO), Prop.textindex, 0, this);
     p3.add(txtindex);
     p3.add(new BaseXLabel(TXTINDEXINFO, 8));
 
-    atvindex = new BaseXCheckBox(INFOATTRINDEX, Token.token(ATTINDEXINFO),
-        Prop.attrindex, 0, this);
+    atvindex = new BaseXCheckBox(INFOATTRINDEX,
+        Token.token(ATTINDEXINFO), Prop.attrindex, 0, this);
     p3.add(atvindex);
     p3.add(new BaseXLabel(ATTINDEXINFO, 8));
 
@@ -168,8 +171,8 @@ public final class DialogCreate extends Dialog {
     p4.setLayout(new TableLayout(10, 1, 0, 0));
     p4.setBorder(8, 8, 8, 8);
 
-    ftxindex = new BaseXCheckBox(INFOFTINDEX, Token.token(FTINDEXINFO),
-        Prop.ftindex, 0, this);
+    ftxindex = new BaseXCheckBox(INFOFTINDEX + COL,
+        Token.token(FTINDEXINFO), Prop.ftindex, 0, this);
     p4.add(ftxindex);
     p4.add(new BaseXLabel(FTINDEXINFO, 8));
 
@@ -178,7 +181,6 @@ public final class DialogCreate extends Dialog {
     final boolean[] val = { Prop.ftfuzzy, Prop.ftstem, Prop.ftdc, Prop.ftcs };
     for(int f = 0; f < ft.length; f++) {
       ft[f] = new BaseXCheckBox(cb[f], Token.token(desc[f]), val[f], 0, this);
-      fl[f] = new BaseXLabel(desc[f], 8);
       p4.add(ft[f]);
     }
 
@@ -240,10 +242,10 @@ public final class DialogCreate extends Dialog {
   @Override
   public void action(final String cmd) {
     final boolean ftx = ftxindex.isSelected();
-    for(int f = 0; f < ft.length; f++) {
-      ft[f].setEnabled(ftx);
-      fl[f].setEnabled(ftx);
-    }
+    for(int f = 0; f < ft.length; f++) ft[f].setEnabled(ftx);
+
+    entities.setEnabled(intparse.isSelected());
+    dtd.setEnabled(intparse.isSelected());
     
     final String path = input();
     final IO file = IO.get(path);
@@ -274,6 +276,7 @@ public final class DialogCreate extends Dialog {
     Prop.chop  = chop.isSelected();
     Prop.createfilter = filter.getText();
     Prop.entity   = entities.isSelected();
+    Prop.dtd = dtd.isSelected();
     Prop.textindex = txtindex.isSelected();
     Prop.attrindex = atvindex.isSelected();
     Prop.ftindex = ftxindex.isSelected();

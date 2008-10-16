@@ -82,7 +82,7 @@ public final class FTNode {
    * @return pre value
    */
   public int getPre() {
-    return ip != null ? ip.get(0) : pre;
+    return ip != null ? ip.list[0] : pre;
   }
 
   /**
@@ -121,7 +121,7 @@ public final class FTNode {
    * @return pos value
    */
   public int nextPos() {
-    return ip.get(c);
+    return ip.list[c];
   }
 
   /**
@@ -129,7 +129,7 @@ public final class FTNode {
    * @return number of tokens
    */
   public int getNumTokens() {
-    return p.get(0);
+    return p.list[0];
   }
 
   /**
@@ -202,7 +202,7 @@ public final class FTNode {
    */
   private IntList initNewPointer(final IntList n) {
     final IntList il = new IntList();
-    il.add(p.get(0) > n.get(0) ? p.get(0) : n.get(0));
+    il.add(p.list[0] > n.list[0] ? p.list[0] : n.list[0]);
     return il;
   }
 
@@ -223,7 +223,7 @@ public final class FTNode {
    * @return IntList[]
    */
   public IntList[] convertPos() {
-    final IntList[] il = new IntList[p.get(0)];
+    final IntList[] il = new IntList[p.list[0]];
     for (int k = 0; k < il.length; k++) il[k] = new IntList();
     c = 0;
     while(morePos()) {
@@ -237,7 +237,7 @@ public final class FTNode {
    * @return next pointer
    */
   public int nextPoi() {
-    return p.get(c);
+    return p.list[c];
   }
 
   /**

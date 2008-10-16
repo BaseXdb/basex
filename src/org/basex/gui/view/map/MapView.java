@@ -342,7 +342,7 @@ public final class MapView extends View implements Runnable {
     // one rectangle left.. continue with children
     if(ne - ns == 1) {
       // calculate rectangle sizes
-      final MapRect t = new MapRect(r.x, r.y, r.w, r.h, l.get(ns), r.l);
+      final MapRect t = new MapRect(r.x, r.y, r.w, r.h, l.list[ns], r.l);
       mainRects.add(t);
 
       final int x = t.x + layout.x;
@@ -357,7 +357,7 @@ public final class MapView extends View implements Runnable {
           !ViewData.isLeaf(GUI.context.data(), t.p)) {
         final IntList ch = children(t.p);
         if(ch.size != 0) calcMap(new MapRect(x, y, w, h,
-            l.get(ns), r.l + 1), ch, 0, ch.size - 1, false);
+            l.list[ns], r.l + 1), ch, 0, ch.size - 1, false);
       }
     } else {
       // recursively split current nodes
@@ -367,10 +367,10 @@ public final class MapView extends View implements Runnable {
 
       // consider number of descendants to calculate split point
       if(!GUIProp.mapsimple && !first) {
-        nn = l.get(ne) - l.get(ns);
+        nn = l.list[ne] - l.list[ns];
         ni = ns + 1;
-        for(; ni < ne - 1; ni++) if(l.get(ni) - l.get(ns) >= (nn >> 1)) break;
-        ln = l.get(ni) - l.get(ns);
+        for(; ni < ne - 1; ni++) if(l.list[ni] - l.list[ns] >= (nn >> 1)) break;
+        ln = l.list[ni] - l.list[ns];
       }
 
       // determine rectangle orientation (horizontal/vertical)
@@ -643,9 +643,7 @@ public final class MapView extends View implements Runnable {
         np = rect.p + data.size(rect.p, data.kind(rect.p));
       }
     }
-    final Nodes marked = new Nodes(list.get(), data);
-    marked.size = list.size;
-    View.notifyMark(marked);
+    View.notifyMark(new Nodes(list.finish(), data));
   }
 
   @Override

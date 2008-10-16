@@ -90,7 +90,7 @@ public interface Commands {
   
   /** Filesystem commands. */
   enum FS { CAT, CD, CP, DU, EXT, EXIT, HELP, LOCATE,
-    LS, MKDIR, PWD, RM, TOUCH }
+    L, LS, MKDIR, PWD, RM, TOUCH }
   
   /** Insert commands. */
   enum UPDATE { FRAGMENT, ELEMENT, TEXT, ATTRIBUTE, COMMENT, PI }

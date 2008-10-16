@@ -95,8 +95,8 @@ public final class CommandParser extends QueryParser {
 
     boolean fsmode = Prop.fsmode;
     while(true) {
-      Process proc;
       COMMANDS cmd = null;
+      Process proc;
       if(fsmode) {
         cmd = COMMANDS.BASH;
         FS fs = FS.EXT;
@@ -105,8 +105,7 @@ public final class CommandParser extends QueryParser {
           fs = Enum.valueOf(FS.class, args.toUpperCase());
           if(fs == Commands.FS.EXIT) fsmode = false;
           args = "";
-        } catch(final IllegalArgumentException ex) {
-        }
+        } catch(final Exception ex) { }
         final String a = string(null);
         proc = new Fs(fs.name(), a == null ? args : args + " " + a);
       } else {
@@ -191,7 +190,11 @@ public final class CommandParser extends QueryParser {
       case CS:
         return new Cs(xpath(null));
       case COPY:
-        return new Copy(number(cmd), xpath(cmd), xpath(cmd));
+        final String num = number(cmd);
+        final String xp1 = xpath(cmd);
+        consume(',');
+        final String xp2 = xpath(cmd);
+        return new Copy(num, xp1, xp2);
       case DELETE:
         return new Delete(xpath(cmd));
       case INSERT:
@@ -368,7 +371,7 @@ public final class CommandParser extends QueryParser {
   private String name(final COMMANDS cmd) throws QueryException {
     consumeWS();
     final StringBuilder sb = new StringBuilder();
-    while(curr('.') || letterOrDigit(curr())) sb.append(consume());
+    while(curr('.') || curr('-') || letterOrDigit(curr())) sb.append(consume());
     return finish(cmd, sb);
   }
 

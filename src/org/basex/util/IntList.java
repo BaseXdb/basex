@@ -8,7 +8,7 @@ package org.basex.util;
  */
 public final class IntList {
   /** Value array. */
-  private int[] list;
+  public int[] list;
   /** Current array size. */
   public int size;
 
@@ -46,17 +46,6 @@ public final class IntList {
   }
 
   /**
-   * Adds next value.
-   * @param v value to be added
-   */
-  public void add(final IntList v) {
-    if(size == list.length) list = Array.extend(list);
-    for (int i = 0; i < v.size; i++)
-      list[size++] = v.get(i);
-  }
-
-  
-  /**
    * Sets a value at the specified position.
    * @param v value to be added
    * @param p position
@@ -65,23 +54,6 @@ public final class IntList {
     while(p >= list.length) list = Array.extend(list);
     list[p] = v;
     size = Math.max(size, p + 1);
-  }
-
-  /**
-   * Returns the value at the specified position.
-   * @param p position
-   * @return value
-   */
-  public int get(final int p) {
-    return list[p];
-  }
-
-  /**
-   * Returns the value array.
-   * @return value
-   */
-  public int[] get() {
-    return list;
   }
 
   /**
@@ -107,15 +79,6 @@ public final class IntList {
    */
   public void reset() {
     size = 0;
-  }
-
-  /**
-   * Resets the integer list.
-   * @param is initial size
-   */
-  public void reset(final int is) {
-    size = 0;
-    list = new int[is];
   }
 
   /**

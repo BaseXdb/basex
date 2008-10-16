@@ -357,6 +357,11 @@ public class BaseXClient {
             // activate well-formed XML output
             process(new Set(SET.XMLOUTPUT, ON), false);
             ok = true;
+          } else if(c == 'X') {
+            // hidden option: show xml query plan
+            Prop.xmlplan = true;
+            info = true;
+            ok = true;
           } else if(c == 'y' && standalone) {
             // hidden option: activate main memory mode
             Prop.mainmem = true;

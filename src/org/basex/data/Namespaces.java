@@ -122,7 +122,7 @@ public final class Namespaces extends Set {
    */
   public int get(final byte[] n) {
     final byte[] pre = pre(n);
-    return pre == EMPTY ? 0 : ns(pre, root);
+    return pre.length == 0 ? 0 : ns(pre, root);
   }
 
   /**

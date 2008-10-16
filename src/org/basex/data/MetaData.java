@@ -1,14 +1,14 @@
 package org.basex.data;
 
-import static org.basex.data.DataText.*;
 import static org.basex.Text.*;
+import static org.basex.data.DataText.*;
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.build.BuildException;
 import org.basex.core.Prop;
-import org.basex.io.IO;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
+import org.basex.io.IO;
 import org.basex.util.Token;
 
 /**
@@ -57,7 +57,7 @@ public final class MetaData {
   public boolean newindex;
   /** Last (highest) id assigned to a node. */
   public int lastid = -1;
-  
+
   /**
    * Constructor, specifying the database name.
    * @param db database name
@@ -74,21 +74,23 @@ public final class MetaData {
    */
   public static boolean found(final String path, final String db) {
     // true is returned if path and database name are equal and if the db exists
-    if(path.equals(db) && IO.dbpath(db).exists()) return true; 
-    
+    if(path.equals(db) && IO.dbpath(db).exists()) return true;
+
     try {
       // match filename of database instance
       final DataInput in = new DataInput(db, DATAINFO);
-      String key;
+      String str = "", k;
       IO f = null;
       long t = 0;
-      while((key = in.readString()).length() != 0) {
-        final String val = in.readString();
-        if(key.equals(DBFNAME)) f = IO.get(val);
-        if(key.equals(DBTIME)) t = Token.toLong(val);
+      while((k = in.readString()).length() != 0) {
+        final String v = in.readString();
+        if(k.equals(DBSTORAGE)) str = v;
+        else if(k.equals(DBFNAME)) f = IO.get(v);
+        else if(k.equals(DBTIME)) t = Token.toLong(v);
       }
       in.close();
-      return f != null && f.path().equals(path) && f.date() == t;
+      return f != null && f.path().equals(path) && f.date() == t &&
+        STORAGE.equals(str);
     } catch(final IOException ex) {
       BaseX.debug(ex);
       return false;
@@ -112,34 +114,33 @@ public final class MetaData {
    * @throws IOException I/O Exception
    */
   public int read(final DataInput in) throws IOException {
-    String storage = "";
-    String istorage = "";
+    String storage = "", istorage = "";
     int size = 0;
     while(true) {
       final String k = in.readString();
       if(k.length() == 0) break;
       final String v = in.readString();
 
-      if(k.equals(DBSTORAGE)) storage = v;
+      if(k.equals(DBSTORAGE))       storage  = v;
       else if(k.equals(IDBSTORAGE)) istorage = v;
-      else if(k.equals(DBFNAME)) file = IO.get(v);
-      else if(k.equals(DBFSIZE)) filesize = Token.toLong(v);
-      else if(k.equals(DBNDOCS)) ndocs = Token.toInt(v);
-      else if(k.equals(DBFTDC)) ftdc = toBool(v);
+      else if(k.equals(DBSIZE))     size     = Token.toInt(v);
+      else if(k.equals(DBFNAME))    file     = IO.get(v);
+      else if(k.equals(DBFSIZE))    filesize = Token.toLong(v);
+      else if(k.equals(DBNDOCS))    ndocs    = Token.toInt(v);
+      else if(k.equals(DBFTDC))     ftdc     = toBool(v);
       else if(k.equals(DBENCODING)) encoding = v;
-      else if(k.equals(DBHEIGHT)) height = Token.toInt(v);
-      else if(k.equals(DBSIZE)) size = Token.toInt(v);
-      else if(k.equals(DBCHOPPED)) chop = toBool(v);
-      else if(k.equals(DBENTITY)) entity = toBool(v);
+      else if(k.equals(DBHEIGHT))   height   = Token.toInt(v);
+      else if(k.equals(DBCHOPPED))  chop     = toBool(v);
+      else if(k.equals(DBENTITY))   entity   = toBool(v);
       else if(k.equals(DBTXTINDEX)) txtindex = toBool(v);
       else if(k.equals(DBATVINDEX)) atvindex = toBool(v);
       else if(k.equals(DBFTXINDEX)) ftxindex = toBool(v);
-      else if(k.equals(DBFZINDEX)) ftfz = toBool(v);
-      else if(k.equals(DBFTSTEM)) ftst = toBool(v);
-      else if(k.equals(DBFTCS)) ftcs = toBool(v);
-      else if(k.equals(DBFTDC)) ftdc = toBool(v);
-      else if(k.equals(DBTIME)) time = Token.toLong(v);
-      else if(k.equals(DBLASTID)) lastid = Token.toInt(v);
+      else if(k.equals(DBFZINDEX))  ftfz     = toBool(v);
+      else if(k.equals(DBFTSTEM))   ftst     = toBool(v);
+      else if(k.equals(DBFTCS))     ftcs     = toBool(v);
+      else if(k.equals(DBFTDC))     ftdc     = toBool(v);
+      else if(k.equals(DBTIME))     time     = Token.toLong(v);
+      else if(k.equals(DBLASTID))   lastid   = Token.toInt(v);
     }
 
     if(!storage.equals(STORAGE)) throw new BuildException(DBUPDATE, storage);
@@ -153,7 +154,7 @@ public final class MetaData {
    * @return result
    */
   private boolean toBool(final String v) {
-    return v.equals(ON) || v.equals("1");
+    return v.equals("1");
   }
 
   /**
@@ -164,25 +165,25 @@ public final class MetaData {
    */
   public synchronized void finish(final DataOutput out, final int siz)
       throws IOException {
-    writeInfo(out, DBSTORAGE, STORAGE);
+    writeInfo(out, DBSTORAGE,  STORAGE);
     writeInfo(out, IDBSTORAGE, ISTORAGE);
-    writeInfo(out, DBFNAME, file.path());
-    writeInfo(out, DBFSIZE, Long.toString(filesize));
-    writeInfo(out, DBNDOCS, Integer.toString(ndocs));
+    writeInfo(out, DBFNAME,    file.path());
+    writeInfo(out, DBFSIZE,    Long.toString(filesize));
+    writeInfo(out, DBNDOCS,    Integer.toString(ndocs));
     writeInfo(out, DBENCODING, encoding);
-    writeInfo(out, DBHEIGHT, Integer.toString(height));
-    writeInfo(out, DBSIZE, Integer.toString(siz));
-    writeInfo(out, DBCHOPPED, chop);
-    writeInfo(out, DBENTITY, entity);
+    writeInfo(out, DBHEIGHT,   Integer.toString(height));
+    writeInfo(out, DBSIZE,     Integer.toString(siz));
+    writeInfo(out, DBCHOPPED,  chop);
+    writeInfo(out, DBENTITY,   entity);
     writeInfo(out, DBTXTINDEX, txtindex);
     writeInfo(out, DBATVINDEX, atvindex);
     writeInfo(out, DBFTXINDEX, ftxindex);
-    writeInfo(out, DBFZINDEX, ftfz);
-    writeInfo(out, DBFTSTEM, ftst);
-    writeInfo(out, DBFTCS, ftcs);
-    writeInfo(out, DBFTDC, ftdc);
-    writeInfo(out, DBTIME, Long.toString(time));
-    writeInfo(out, DBLASTID, Integer.toString(lastid));
+    writeInfo(out, DBFZINDEX,  ftfz);
+    writeInfo(out, DBFTSTEM,   ftst);
+    writeInfo(out, DBFTCS,     ftcs);
+    writeInfo(out, DBFTDC,     ftdc);
+    writeInfo(out, DBTIME,     Long.toString(time));
+    writeInfo(out, DBLASTID,   Integer.toString(lastid));
     out.writeString("");
   }
 

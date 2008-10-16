@@ -121,7 +121,6 @@ public final class FTTest extends AbstractTest {
           "with wildcards case sensitive]" },
         { "FTWildCard 10", nodes(5, 9, 11),
           "/fttest/co/w [text() ftcontains 'x.+' with wildcards uppercase]" },
-
           
         { "FTAnyAllOption 1", nodes(3, 5, 7, 9, 11),
           "/fttest/co/w [text() ftcontains 'xml' any]" },
@@ -149,16 +148,16 @@ public final class FTTest extends AbstractTest {
           
         { "FTAndOr 1", nodes(7, 9, 11),
           "//w [text() ftcontains 'XmL' ftand 'Databases']" },
-        { "FTAndOr 3", nodes(14),
-          "//w [text() ftcontains 'HELLO' ftand 'hello']" },
         { "FTAndOr 2", nodes(7, 9, 11, 14),
           "//w [text() ftcontains 'databases' ftor 'hello']" },
+        { "FTAndOr 3", nodes(14),
+          "//w [text() ftcontains 'HELLO' ftand 'hello']" },
         { "FTAndOr 4", nodes(7, 9, 11, 14),
           "//w [text() ftcontains 'xml' ftand 'databases'  ftor 'hello' ]" },
         { "FTAndOr 5", nodes(7, 9, 11),
           "//w [text() ftcontains 'databases' ftand ('xml' ftor 'hello')]" },
         { "FTAndOr 6", nodes(31, 33),
-        "//fti [text() ftcontains 'adfad' ftand 'wordt' ftand 'ook' " +
+          "//fti [text() ftcontains 'adfad' ftand 'wordt' ftand 'ook' " +
           "ftand 'wel' ftand 'een' ftand 's']" },
 
         { "FTStemming 1", nodes(7, 9, 11),
@@ -228,8 +227,8 @@ public final class FTTest extends AbstractTest {
         { "FTPosFilter 17", nodes(3, 37),
           "//w [. ftcontains 'second' ftand 'fifth' window 6 words]" },
         { "FTPosFilter 18", nodes(3, 37),
-        "//w [. ftcontains 'second sentence' ftand 'fifth sentence' " +
-        "window 6 words]" },
+          "//w [. ftcontains 'second sentence' ftand 'fifth sentence' " +
+          "window 6 words]" },
         { "FTPosFilter 19", nodes(3, 37),
           "//w [. ftcontains 'third' ftand 'second' " +
           "ftand 'fifth' window 6 words]" },
@@ -285,7 +284,6 @@ public final class FTTest extends AbstractTest {
           "//w [text() ftcontains 'hello' ftor ftnot 'databases']" },
         { "FTUnaryNot6", nodes(3, 5, 7, 9, 11, 14, 37),
           "//w [text() ftcontains ftnot 'bier']" },
-
     };
 
     /** TABLE REPRESENTATION

@@ -1,6 +1,5 @@
 package org.basex.query.xquery.item;
 
-import static org.basex.query.xquery.XQTokens.*;
 import java.net.URI;
 import org.basex.util.Token;
 
@@ -13,36 +12,13 @@ import org.basex.util.Token;
 public final class Uri extends Str {
   /** Empty URI. */
   public static final Uri EMPTY = new Uri(Token.EMPTY);
-  /** Default namespace. */
-  public static final Uri LOCAL = new Uri(LOCALURI);
-  /** Default namespace. */
-  public static final Uri XMLNS = new Uri(XMLNSURI);
-  /** Default namespace. */
-  public static final Uri XML = new Uri(XMLURI);
-  /** Default namespace. */
-  public static final Uri FN = new Uri(FNURI);
-  /** Default namespace. */
-  public static final Uri XS = new Uri(XSURI);
-  /** Default namespace. */
-  public static final Uri XSI = new Uri(XSIURI);
-  /** Default namespace. */
-  public static final Uri BX = new Uri(BXURI);
 
   /**
    * Constructor.
    * @param v value
    */
   private Uri(final byte[] v) {
-    super(Token.norm(v), Type.URI);
-  }
-
-  /**
-   * Constructor.
-   * @param v value
-   * @param t type (URI)
-   */
-  private Uri(final byte[] v, final Type t) {
-    super(Token.norm(v), t);
+    super(v, Type.URI);
   }
 
   /**
@@ -51,7 +27,7 @@ public final class Uri extends Str {
    * @return uri instance
    */
   public static Uri uri(final byte[] v) {
-    return v.length == 0 ? Uri.EMPTY : new Uri(v, Type.URI);
+    return v.length == 0 ? Uri.EMPTY : new Uri(Token.norm(v));
   }
 
   /**
@@ -60,7 +36,7 @@ public final class Uri extends Str {
    * @return result of check
    */
   public boolean eq(final Uri uri) {
-    return uri != null && (val == uri.val || Token.eq(val, uri.val));
+    return val == uri.val || Token.eq(val, uri.val);
   }
 
   /**

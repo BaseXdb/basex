@@ -18,7 +18,6 @@ import org.basex.query.xquery.func.FunJava;
 import org.basex.query.xquery.item.QNm;
 import org.basex.query.xquery.item.SeqType;
 import org.basex.query.xquery.item.Type;
-import org.basex.query.xquery.item.Uri;
 import org.basex.util.Array;
 import org.basex.util.Levenshtein;
 import org.basex.util.Token;
@@ -53,11 +52,11 @@ public final class Functions extends ExprInfo {
    */
   public Expr get(final QNm name, final Expr[] args) throws XQException {
     // find function
-    final Uri uri = name.uri;
+    final byte[] uri = name.uri.str();
     final byte[] ln = name.ln();
 
     // parse data type constructors
-    if(uri.eq(Uri.XS)) {
+    if(eq(uri, XSURI)) {
       final SeqType seq = new SeqType(name, 1, false);
       if(seq.type == null) typeErr(name);
       if(args.length != 1) Err.or(FUNCTYPE, name.str());
@@ -65,8 +64,8 @@ public final class Functions extends ExprInfo {
     }
 
     // check Java functions
-    if(Token.startsWith(uri.str(), JAVAPRE)) {
-      final String c = Token.string(Token.substring(uri.str(), JAVAPRE.length));
+    if(Token.startsWith(uri, JAVAPRE)) {
+      final String c = Token.string(Token.substring(uri, JAVAPRE.length));
       // convert dashes to upper-case initials
       final StringBuilder sb = new StringBuilder(c);
       sb.append(".");
@@ -99,12 +98,8 @@ public final class Functions extends ExprInfo {
     // find local function
     for(int l = 0; l < size; l++) {
       final QNm qn = func[l].var.name;
-      final Uri u = qn.uri;
-      final byte[] nm = qn.ln();
-
-      if(Token.eq(ln, nm) && uri.eq(u) && args.length == func[l].args.length) {
-        return new FunCall(l, args);
-      }
+      if(Token.eq(ln, qn.ln()) && eq(uri, qn.uri.str()) &&
+          args.length == func[l].args.length) return new FunCall(l, args);
     }
 
     if(Type.find(name, true) == null) {
@@ -137,8 +132,8 @@ public final class Functions extends ExprInfo {
   public int add(final Func fun) throws XQException {
     final QNm name = fun.var.name;
 
-    final Uri uri = name.uri;
-    if(uri == Uri.EMPTY) Err.or(FUNNONS, name.str());
+    final byte[] uri = name.uri.str();
+    if(uri.length == 0) Err.or(FUNNONS, name.str());
 
     if(NSGlobal.standard(uri)) {
       if(fun.decl) Err.or(NAMERES, name.str());
@@ -148,10 +143,10 @@ public final class Functions extends ExprInfo {
     final byte[] ln = name.ln();
     for(int l = 0; l < size; l++) {
       final QNm qn = func[l].var.name;
-      final Uri u = qn.uri;
+      final byte[] u = qn.uri.str();
       final byte[] nm = qn.ln();
 
-      if(Token.eq(ln, nm) && uri.eq(u) &&
+      if(Token.eq(ln, nm) && eq(uri, u) &&
           fun.args.length == func[l].args.length) {
         if(!func[l].decl) {
           func[l] = fun;

@@ -2,6 +2,7 @@ package org.basex.query.xquery.item;
 
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.iter.NodIter;
@@ -129,6 +130,7 @@ public final class FElem extends FNode {
     }
     
     byte[] uri = name.uri.str();
+    
     if(!xmlns && !name.ns() && !Token.eq(uri, ser.dn)) {
       ser.namespace(EMPTY, uri);
       ser.dn = uri;
@@ -139,7 +141,7 @@ public final class FElem extends FNode {
       final Nod nod = atts.list[n];
       final QNm atn = nod.qname();
       if(atn.ns()) {
-        if(!NSGlobal.standard(atn.uri)) {
+        if(!NSGlobal.standard(atn.uri.str())) {
           final byte[] pre = atn.pre();
           final int i = ser.ns.get(pre);
           if(i == -1) ser.namespace(pre, atn.uri.str());

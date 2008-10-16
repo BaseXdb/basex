@@ -39,13 +39,24 @@ public final class Ls extends FSCmd {
   /** Specified path. */
   private String path;
 
+  /** Default constructor. */
+  public Ls() { }
+  
+  /**
+   * Constructor, specifying default options.
+   * @param opt options
+   */
+  public Ls(final String opt) {
+    try { args(opt); } catch(final Exception e) { e.printStackTrace(); }
+  }
+  
   @Override
   public void args(final String args) throws FSException {
     // get all Options
     final GetOpts g = new GetOpts(args, "ahlrRSt");
     while(g.more()) {
       final int ch = checkOpt(g);
-      switch (ch) {
+      switch(ch) {
         case 'a':
           fListDot = true;
           break;
@@ -149,7 +160,7 @@ public final class Ls extends FSCmd {
     // output list and cache directory entries
     final IntList dpre = new IntList();
     for(int i = 0; i < nodes.size; i++) {
-      c = nodes.get(i);
+      c = nodes.list[i];
       
       final boolean dir = dirs.list[c];
       if(dir) dpre.add(result[c]);

@@ -162,7 +162,7 @@ public final class RealView extends View {
     int sumNodeSize = 0;
 
     for(int i = 0; i < l; i++) {
-      final int p = parentList.get(i);
+      final int p = parentList.list[i];
 
       if(p == -1) {
         continue;
@@ -203,7 +203,7 @@ public final class RealView extends View {
     final boolean space = ratio > minSpace ? true : false;
 
     for(int i = 0; i < size; i++) {
-      final int pre = parentList.get(i);
+      final int pre = parentList.list[i];
 
       if(pre == -1) {
         x += ratio;

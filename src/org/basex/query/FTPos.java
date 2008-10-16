@@ -105,13 +105,13 @@ public final class FTPos {
     IntList pp = il[1]; // new IntList();
     int i = 0;
     int lp;
-    while (i < p.size && pp.get(i) != 0) i++;
+    while (i < p.size && pp.list[i] != 0) i++;
     lp = i;
     i++;
     while (i < p.size) {
-      if (pp.get(i) == pp.get(lp) + 1) lp = i;
-      else if (pp.get(i) < pp.get(lp)) return false;
-      if (pp.get(lp) == size - 1) return true;
+      if (pp.list[i] == pp.list[lp] + 1) lp = i;
+      else if (pp.list[i] < pp.list[lp]) return false;
+      if (pp.list[lp] == size - 1) return true;
       i++;
     }
     
@@ -144,7 +144,7 @@ public final class FTPos {
         boolean o = false;
         final int ts = pos[i].size;
         for(int j = 0; j < (ordered ? Math.min(1, ts) : ts); j++) {
-          if(pos[i].get(j) == l) {
+          if(pos[i].list[j] == l) {
             l += new FTTokenizer(term.list[i]).count();
             o = true;
           }
@@ -165,7 +165,7 @@ public final class FTPos {
         boolean o = false;
         final int ts = pos[i].size;
         for(int j = ordered ? Math.max(0, ts - 1) : 0; j < ts; j++) {
-          if(l + pos[i].get(j) == c) {
+          if(l + pos[i].list[j] == c) {
             o = true;
             break;
           }
@@ -201,13 +201,13 @@ public final class FTPos {
         if (k[j] > -1) {
           if (k[min] == -1) min = j;
           q = false;
-          if (pos[min].get(k[min]) > pos[j].get(k[j])) min = j;
+          if (pos[min].list[k[min]] > pos[j].list[k[j]]) min = j;
         }  
       }
       
       if(q) break;
       
-      p.add(pos[min].get(k[min]));
+      p.add(pos[min].list[k[min]]);
       pp.add(min);
       k[min]++;
       if (k[min] == pos[min].size) k[min] = -1;
@@ -257,7 +257,7 @@ public final class FTPos {
     int c = 0;
     int i = 0;
     int lp = 0;
-    while (i < pp.size && pp.get(lp) == pp.get(i)) {
+    while (i < pp.size && pp.list[lp] == pp.list[i]) {
       res[c++] = i;
       i++;
     }
@@ -265,11 +265,11 @@ public final class FTPos {
       int[] tmp = new int[p.size];
       int tc = 0;
       lp = i;
-      while (i < pp.size && pp.get(lp) == pp.get(i)) {
-        p1 = calcPosition(p.get(i), dunit);
+      while (i < pp.size && pp.list[lp] == pp.list[i]) {
+        p1 = calcPosition(p.list[i], dunit);
         boolean o = false;
         for(int z = 0; z < c; z++) {
-          p2 = calcPosition(p.get(res[z]), dunit);
+          p2 = calcPosition(p.list[res[z]], dunit);
           final int d = Math.abs(p1 - p2) - 1;
           if(d >= mn && d <= mx) {
             o = true;
@@ -318,7 +318,7 @@ public final class FTPos {
     for(int i = 0; i < size; i++) {
       boolean o = false;
       for(int j = 0; j < pos[i].size; j++) {
-        final int p = calcPosition(pos[i].get(j), wunit);
+        final int p = calcPosition(pos[i].list[j], wunit);
         if(i == 0 || (Math.abs(p - l) - 1 < win)) {
           o = true;
           l = p;
@@ -340,11 +340,11 @@ public final class FTPos {
     final IntList il = pos[0];
     int p = -1, q = 0;
     for(int i = 0; i < il.size && p != q; i++) {
-      p = calcPosition(il.get(i), sdunit);
+      p = calcPosition(il.list[i], sdunit);
       q = p;
       for(int j = 1; j < size && p == q; j++) {
         for(int k = 0; k < pos[j].size; k++) {
-          q = calcPosition(pos[j].get(k), sdunit);
+          q = calcPosition(pos[j].list[k], sdunit);
           if(p == q) break;
         }
       }
@@ -363,7 +363,7 @@ public final class FTPos {
     for(int i = 0; i < size; i++) {
       boolean o = false;
       for(int j = 0; j < pos[i].size; j++) {
-        final int p = calcPosition(pos[i].get(j), sdunit);
+        final int p = calcPosition(pos[i].list[j], sdunit);
         if(i != 0 && p != l) {
           o = true;
           break;
@@ -395,5 +395,18 @@ public final class FTPos {
    */
   public IntList[] getPos() {
     return pos;
+  }
+
+  /**
+   * Evaluates the mild not expression.
+   * @return boolean result
+   */
+  public boolean mildNot() {
+    for(int i = 1; i < pos.length; i++) {
+      for(int k = 0; k < pos[i].size; k++) {
+        if(pos[0].contains(pos[i].list[k])) return false;
+      }
+    }
+    return true;
   }
 }

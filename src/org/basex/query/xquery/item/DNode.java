@@ -125,7 +125,7 @@ public final class DNode extends Nod {
     final byte[] nm = nname();
     name.name(nm);
     final int n = data.ns.get(nm, pre);
-    name.uri = n > 0 ? Uri.uri(data.ns.key(n)) : NSGlobal.uri(pre(nm));
+    name.uri = Uri.uri(n > 0 ? data.ns.key(n) : NSGlobal.uri(pre(nm)));
     return name;
   }
 

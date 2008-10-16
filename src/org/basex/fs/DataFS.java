@@ -113,7 +113,7 @@ public final class DataFS {
     if(!abs && keepSlash) tb.add('/');
 
     for(int i = s - 2; i >= 0; i--) {
-      final byte[] node = replace(name(il.get(i)), '\\', '/');
+      final byte[] node = replace(name(il.list[i]), '\\', '/');
       tb.add(node);
       if(!endsWith(node, '/')) tb.add('/');
     }

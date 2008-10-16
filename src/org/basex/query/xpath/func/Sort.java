@@ -35,7 +35,7 @@ public final class Sort extends Func {
 
     final IntList list = new IntList(n);
     list.sort(val, false, true);
-    return new NodeSet(list.get(), ctx);
+    return new NodeSet(n, ctx);
   }
 
   @Override

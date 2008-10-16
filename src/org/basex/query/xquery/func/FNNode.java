@@ -72,7 +72,7 @@ public final class FNNode extends Fun {
           if(qname.uri != Uri.EMPTY) return qname.uri.iter();
           node = node.parent();
         }
-        return ctx.nsElem.iter();
+        return Uri.uri(ctx.nsElem).iter();
       case ROOT:
         return empty ? Iter.EMPTY : root(checkNode(it)).iter();
       default:

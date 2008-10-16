@@ -47,11 +47,11 @@ public final class CElem extends Arr {
 
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
-    final int s = ctx.ns.size;
+    final int s = ctx.ns.size();
     addNS(ctx);
     super.comp(ctx);
     tag = ctx.comp(tag);
-    ctx.ns.size = s;
+    ctx.ns.size(s);
     return this;
   }
 
@@ -82,9 +82,7 @@ public final class CElem extends Arr {
    */
   void addNS(final XQContext ctx) throws XQException {
     for(int n = nsp.size - 1; n >= 0; n--) {
-      if(nsp.key[n].length != 0) {
-        ctx.ns.add(new QNm(concat(XMLNSC, nsp.key[n]), Uri.uri(nsp.val[n])));
-      }
+      ctx.ns.add(new QNm(concat(XMLNSC, nsp.key[n]), Uri.uri(nsp.val[n])));
     }
   }
 
@@ -110,17 +108,16 @@ public final class CElem extends Arr {
     Iter construct(final XQContext ctx) throws XQException {
       final Item it = ctx.atomic(tag, CElem.this, false);
       
-      final int s = ctx.ns.size;
+      final int s = ctx.ns.size();
       addNS(ctx);
 
       final QNm tname = CAttr.name(ctx, it);
-      if(tname.uri != Uri.EMPTY) {
+      final byte[] uri = tname.uri.str();
+      if(uri.length != 0) {
         final byte[] key = tname.pre();
         if(!eq(key, XML)) {
           int i = nsp.get(key);
-          if(i == -1 || !eq(nsp.val[i], tname.uri.str())) {
-            nsp.add(key, tname.uri.str());
-          }
+          if(i == -1 || !eq(nsp.val[i], uri)) nsp.add(key, uri);
         }
       }
 
@@ -131,13 +128,10 @@ public final class CElem extends Arr {
       }
       if(text.size != 0) children.add(new FTxt(text.finish(), null));
 
-      // set default element namespace if no other was defined
-      if(tname.uri == Uri.EMPTY && nsp.get(EMPTY) == -1) tname.uri = ctx.nsElem;
-
       final FElem node = new FElem(tname, children, ats, base, nsp, null);
       for(int n = 0; n < children.size; n++) children.list[n].parent(node);
       for(int n = 0; n < ats.size; n++) ats.list[n].parent(node);
-      ctx.ns.size = s;
+      ctx.ns.size(s);
       return node.iter();
     }
 

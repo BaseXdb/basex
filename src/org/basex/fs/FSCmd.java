@@ -38,6 +38,7 @@ public abstract class FSCmd {
       case HELP:    return new Help();
       case LOCATE:  return new Locate();
       case LS:      return new Ls();
+      case L:       return new Ls("-al");
       case MKDIR:   return new Mkdir();
       case PWD:     return new Pwd();
       case RM:      return new Rm();

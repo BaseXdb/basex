@@ -30,6 +30,7 @@ import org.basex.query.QueryException;
 import org.basex.query.xpath.XPathProcessor;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQResult;
+import org.basex.query.xquery.XQTokens;
 import org.basex.query.xquery.XQueryProcessor;
 import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.func.FNIndex;
@@ -564,7 +565,7 @@ public abstract class W3CTS {
         }
       } else {
         // assign document
-        final Fun fun = FNIndex.get().get(token("doc"), Uri.FN,
+        final Fun fun = FNIndex.get().get(token("doc"), XQTokens.FNURI,
             new Expr[] { Str.get(src) });
         final Var v = new Var(new QNm(data.atom(var.nodes[c])));
         ctx.vars.addGlobal(v.expr(fun, ctx));

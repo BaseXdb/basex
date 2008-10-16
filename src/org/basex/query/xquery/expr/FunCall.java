@@ -8,6 +8,7 @@ import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.SeqType;
 import org.basex.query.xquery.iter.Iter;
+import org.basex.query.xquery.util.NSLocal;
 import org.basex.util.Token;
 
 /**
@@ -29,13 +30,12 @@ public final class FunCall extends Arr {
     super(e);
     id = i;
   }
-
+  
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
     final int s = ctx.vars.size();
-
-    // [CG] XQuery/Recursive Functions... fixed already?
-    //if(s > 1000) BaseX.notexpected();
+    final NSLocal lc = ctx.ns;
+    ctx.ns = lc.copy();
 
     // add function variables
     final Func func = ctx.fun.get(id);
@@ -46,9 +46,10 @@ public final class FunCall extends Arr {
     // evaluate function and reset variable scope
     final Item it = ctx.item;
     ctx.item = null;
-    Item i = ctx.iter(func.expr).finish();
+    final Item i = ctx.iter(func.expr).finish();
     ctx.vars.reset(s);
     ctx.item = it;
+    ctx.ns = lc;
 
     // cast return type
     final SeqType t = func.var.type;

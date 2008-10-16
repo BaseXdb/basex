@@ -60,7 +60,7 @@ public final class ViewData {
     sb.add("\")");
     for(int i = il.size - 1; i >= 0; i--) {
       sb.add('/');
-      sb.add(content(data, il.get(i), true));
+      sb.add(content(data, il.list[i], true));
     }
     return sb.finish();
   }

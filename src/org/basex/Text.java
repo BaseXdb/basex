@@ -643,6 +643,8 @@ public interface Text {
   String CREATECHOP = lang("dc_chop");
   /** Entities information. */
   String CREATEENTITIES = lang("dc_entities");
+  /** Entities information. */
+  String CREATEDTD = lang("dc_dtd");
   /** SAX parsing information. */
   String CREATEINTPARSE = lang("dc_intparse");
   /** Main-Memory Mode. */
@@ -663,6 +665,8 @@ public interface Text {
   String INTPARSEINFO = lang("dc_intparseinfo");
   /** Entities information. */
   String ENTITIESINFO = lang("dc_entitiesinfo");
+  /** Entities information. */
+  String DTDINFO = lang("dc_dtdinfo");
   /** Main-Memory Mode. */
   String MMEMINFO =  lang("dc_mminfo");
 

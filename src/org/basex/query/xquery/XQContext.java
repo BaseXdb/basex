@@ -4,7 +4,6 @@ import static org.basex.Text.*;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.core.proc.Check;
@@ -32,7 +31,6 @@ import org.basex.query.xquery.util.NSLocal;
 import org.basex.query.xquery.util.SeqBuilder;
 import org.basex.query.xquery.util.Variables;
 import org.basex.util.Array;
-import org.basex.util.Atts;
 import org.basex.util.StringList;
 
 /**
@@ -71,11 +69,11 @@ public final class XQContext extends QueryContext {
   public Tim time;
 
   /** Default function namespace. */
-  public Uri nsFunc = Uri.FN;
+  public byte[] nsFunc = FNURI;
   /** Static Base URI. */
   public Uri baseURI = Uri.EMPTY;
   /** Default element namespace. */
-  public Uri nsElem = Uri.EMPTY;
+  public byte[] nsElem = EMPTY;
   /** Default collation. */
   public Uri collation = Uri.uri(URLCOLL);
 
@@ -100,9 +98,9 @@ public final class XQContext extends QueryContext {
   /** Default encoding (currently ignored). */
   public byte[] encoding = token(Prop.ENCODING);
   /** Preserve Namespaces (currently ignored). */
-  public boolean nsPreserve = false;
+  public boolean nsPreserve = true;
   /** Inherit Namespaces (currently ignored). */
-  public boolean nsInherit = false;
+  public boolean nsInherit = true;
   /** Ordering mode (currently ignored). */
   public boolean ordered = false;
   /** Construction mode (currently ignored). */
@@ -136,7 +134,6 @@ public final class XQContext extends QueryContext {
       vars.comp(this);
       ftopt = ftoptions;
       root = comp(root);
-      //root = root.comp(this);
       if(inf) compInfo(QUERYRESULT + "%", root);
 
       evalTime = System.nanoTime();
@@ -160,30 +157,18 @@ public final class XQContext extends QueryContext {
    * @throws XQException query exception
    */
   public Iter iter() throws XQException {
-    // evaluates the query and returns the result
-    try {
-      return iter(root);
-    } catch(final StackOverflowError e) {
-      if(Prop.debug) e.printStackTrace();
-      Err.or(XPSTACK);
-      return null;
-    }
+    return iter(root);
   }
-  
+
   /**
    * Serializes the specified item.
    * @param ser serializer
-   * @param it item to serialize
+   * @param i item to serialize
    * @throws IOException query exception
    */
-  public void serialize(final Serializer ser, final Item it)
-      throws IOException {
-
-    // sets initial namespaces
-    final Atts nsp = ser.ns;
-    nsp.reset();
-    if(nsElem != Uri.EMPTY) nsp.add(EMPTY, nsElem.str());
-    it.serialize(ser);
+  public void serialize(final Serializer ser, final Item i) throws IOException {
+    ser.ns.reset();
+    i.serialize(ser);
   }
 
   @Override

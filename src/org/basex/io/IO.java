@@ -11,16 +11,15 @@ import org.basex.util.TokenBuilder;
 import org.xml.sax.InputSource;
 
 /**
- * BaseX file representation, pointing to a local or remote file or
- * byte array contents.
- *
+ * BaseX file representation, pointing to a local or remote file or byte array
+ * contents.
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public abstract class IO {
   /** Return IO dummy instance. */
   public static final IO DUMMY = new IOContent(Token.EMPTY);
-  
+
   /** Invalid file characters. */
   private static final String INVALID = " \"*./:<>?";
   /** BaseX Suffix. */
@@ -40,7 +39,7 @@ public abstract class IO {
   public static final int NODEPOWER = 4;
   /** Fill Factor (greater than 0.0, maximum 1.0). */
   public static final double BLOCKFILL = 1;
-  
+
   /** File path and name. */
   protected String path = "";
   /** File contents. */
@@ -48,7 +47,7 @@ public abstract class IO {
 
   /** First call. */
   protected boolean more = false;
-  
+
   /** Empty Constructor. */
   protected IO() { }
 
@@ -63,7 +62,7 @@ public abstract class IO {
     if(s.startsWith("http://")) return new IOUrl(s);
     return new IOFile(s);
   }
-  
+
   /**
    * Returns the contents.
    * @return contents
@@ -79,7 +78,7 @@ public abstract class IO {
    * @throws IOException I/O exception
    */
   public abstract void cache() throws IOException;
-  
+
   /**
    * Verifies if the file exists.
    * @return result of check
@@ -87,7 +86,7 @@ public abstract class IO {
   public boolean exists() {
     return true;
   }
-  
+
   /**
    * Returns if this is a directory instance.
    * @return result of check
@@ -95,7 +94,17 @@ public abstract class IO {
   public boolean isDir() {
     return false;
   }
-  
+
+  /**
+   * Returns if this is a directory instance.
+   * @return result of check
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("unused")
+  public boolean isSymLink() throws IOException {
+    return false;
+  }
+
   /**
    * Returns the directory of this path.
    * @return result of check
@@ -111,7 +120,7 @@ public abstract class IO {
   public long date() {
     return System.currentTimeMillis();
   }
-  
+
   /**
    * Returns the file length.
    * @return file length
@@ -129,20 +138,20 @@ public abstract class IO {
   public boolean more() throws IOException {
     return more ^= true;
   }
-  
+
   /**
    * Returns the next input source.
    * @return input source
    */
   public abstract InputSource inputSource();
-  
+
   /**
    * Returns a buffered reader for the file.
    * @return buffered reader
    * @throws IOException I/O exception
    */
   public abstract BufferInput buffer() throws IOException;
-  
+
   /**
    * Merges two filenames.
    * @param f filename of the file
@@ -153,7 +162,7 @@ public abstract class IO {
     BaseX.notexpected();
     return null;
   }
-  
+
   /**
    * Sets the specified suffix if none exists.
    * @param suf suffix
@@ -230,7 +239,7 @@ public abstract class IO {
   public final String toString() {
     return path;
   }
-  
+
   /**
    * Caches the contents of the specified input stream.
    * @param i input stream
@@ -239,17 +248,18 @@ public abstract class IO {
    */
   protected final byte[] cache(final InputStream i) throws IOException {
     final TokenBuilder tb = new TokenBuilder();
-    final InputStream bis = i instanceof BufferedInputStream ? i :
-      new BufferedInputStream(i);
+    final InputStream bis = i instanceof BufferedInputStream ? i
+        : new BufferedInputStream(i);
     int b;
-    while((b = bis.read()) != -1) tb.add((byte) b);
+    while((b = bis.read()) != -1)
+      tb.add((byte) b);
     bis.close();
     cont = tb.finish();
     return cont;
   }
 
   // STATIC METHODS ===========================================================
-  
+
   /**
    * Adds the database suffix to the specified filename and creates
    * a file instance.
@@ -260,7 +270,7 @@ public abstract class IO {
   public static File dbfile(final String db, final String file) {
     return new File(Prop.dbpath + '/' + db + '/' + file + BASEXSUFFIX);
   }
-  
+
   /**
    * Returns a file instance for the current database path.
    * @param db name of the database
@@ -269,7 +279,7 @@ public abstract class IO {
   public static File dbpath(final String db) {
     return new File(Prop.dbpath + '/' + db);
   }
-  
+
   /**
    * Recursively deletes a directory.
    * @param db database to delete
@@ -297,8 +307,8 @@ public abstract class IO {
     // . / * "   : < > ?
     for(int i = 0; i < fn.length(); i++) {
       final char c = fn.charAt(i);
-      if(!Token.letterOrDigit(c) && (c < ' ' || c > '@' ||
-          INVALID.indexOf(c) != -1)) return false;
+      if(!Token.letterOrDigit(c)
+          && (c < ' ' || c > '@' || INVALID.indexOf(c) != -1)) return false;
     }
     return true;
   }
@@ -318,5 +328,15 @@ public abstract class IO {
       }
     }
     return pre + path.replace('\\', '/');
+  }
+
+  /**
+   * Determines if the specified file is a symbolic link.
+   * @param f file to be tested.
+   * @return true for a symbolic link
+   * @throws IOException I/O exception
+   */
+  public static boolean isSymlink(final File f) throws IOException {
+    return !f.getPath().equals(f.getCanonicalPath());
   }
 }

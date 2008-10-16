@@ -57,7 +57,7 @@ final class FNQName extends Fun {
       case NSURIPRE:
         it = check(arg[1].atomic(this, false), Type.ELM);
         final byte[] pre = checkStr(arg[0]);
-        if(pre.length == 0) return ctx.nsElem.iter();
+        if(pre.length == 0) return Uri.uri(ctx.nsElem).iter();
         final Atts at = ((Nod) it).ns();
         for(int a = 0; a < at.size; a++) {
           if(eq(pre, at.key[a])) return Uri.uri(at.val[a]).iter();
@@ -112,7 +112,7 @@ final class FNQName extends Fun {
       n = n.parent();
     }
     if(pre.length != 0) Err.or(NSDECL, pre);
-    nm.uri = ctx.nsElem;
+    nm.uri = Uri.uri(ctx.nsElem);
     return nm.iter();
   }
 
@@ -125,17 +125,20 @@ final class FNQName extends Fun {
   private Iter inscope(final XQContext ctx, final Nod node) {
     final TokenList tl = new TokenList();
     tl.add(XML);
-    if(ctx.nsElem != Uri.EMPTY) tl.add(EMPTY);
+    if(ctx.nsElem.length != 0) tl.add(EMPTY);
 
     Nod n = node;
-    while(n != null) {
+    do {
       final Atts at = n.ns();
       if(at == null) break;
-      for(int a = 0; a < at.size; a++) {
-        if(!tl.contains(at.key[a])) tl.add(at.key[a]);
+      if(n != node || ctx.nsPreserve) {
+        for(int a = 0; a < at.size; a++) {
+          if(!tl.contains(at.key[a])) tl.add(at.key[a]);
+        }
       }
       n = n.parent();
-    }
+    } while(n != null && ctx.nsInherit);
+    
     final SeqIter seq = new SeqIter();
     for(int t = 0; t < tl.size; t++) seq.add(Str.get(tl.list[t]));
     return seq;

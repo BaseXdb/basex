@@ -43,6 +43,15 @@ public final class Atts {
   }
   
   /**
+   * Deletes the specified entry.
+   * @param i entry to be deleted
+   */
+  public void delete(final int i) {
+    Array.move(key, i + 1, -1, --size - i);
+    Array.move(val, i + 1, -1, size - i);
+  }
+  
+  /**
    * Adds the specified values if the key is new.
    * @param k key to be checked
    * @param v value to be added

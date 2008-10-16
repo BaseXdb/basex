@@ -68,24 +68,22 @@ public final class CAttr extends Arr {
   /**
    * Returns an updated name expression.
    * @param ctx query context
-   * @param it item
+   * @param i item
    * @return result
    * @throws XQException query exception
    */
-  public static QNm name(final XQContext ctx, final Item it)
-      throws XQException {
-
+  public static QNm name(final XQContext ctx, final Item i) throws XQException {
     QNm name = null;
-    if(it.type == Type.QNM) {
-      name = (QNm) it;
+    if(i.type == Type.QNM) {
+      name = (QNm) i;
     } else {
-      final byte[] nm = it.str();
+      final byte[] nm = i.str();
       if(contains(nm, ' ')) Err.or(INVAL, nm);
       if(!XMLToken.isQName(nm)) Err.or(NAMEWRONG, nm);
       name = new QNm(nm);
     }
-    if(name.ns() && name.uri == Uri.EMPTY) name.uri = ctx.ns.uri(name.pre());
-    //else if(name.uri == Uri.EMPTY) name.uri = ctx.nsElem;
+
+    if(name.uri == Uri.EMPTY) name.uri = Uri.uri(ctx.ns.uri(name.pre()));
     return name;
   }
 

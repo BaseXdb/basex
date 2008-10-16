@@ -319,7 +319,7 @@ public abstract class Serializer {
         final byte[] key = pre(name);
         byte[] uri = data.ns.key(data.tagNS(p));
         if(uri == null) uri = EMPTY;
-        if(key != EMPTY) {
+        if(key.length != 0) {
           if(ns.get(key) == -1) namespace(key, uri);
         } else if(!eq(uri, dn)) {
           dn = uri;

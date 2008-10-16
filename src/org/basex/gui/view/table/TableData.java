@@ -229,7 +229,7 @@ public final class TableData {
     final int nRows = rows.size;
     final TableIterator ti = new TableIterator(data, this);
     for(int l = 0; l < MAXROWS && l < nRows; l++) {
-      final int pre = rows.get(l);
+      final int pre = rows.list[l];
 
       // find all row contents
       ti.init(pre);
@@ -258,7 +258,7 @@ public final class TableData {
    */
   private void sort() {
     if(sortCol == -1) return;
-    final int c = cols.get(sortCol);
+    final int c = cols.list[sortCol];
     final boolean e = elms.list[sortCol];
 
     final Data data = GUI.context.data();
@@ -266,7 +266,7 @@ public final class TableData {
     final byte[][] tokens = new byte[rows.size][];
 
     for(int r = 0; r < rows.size; r++) {
-      int p = rows.get(r);
+      int p = rows.list[r];
       final int s = p + data.size(p, data.kind(p));
       while(p != s) {
         final int k = data.kind(p);

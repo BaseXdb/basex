@@ -136,7 +136,7 @@ public final class FTContains extends DualExpr {
           //ctx.local.set(ftn.getPre());
           //ctx.local.size = 1;
           //if (expr1.eval(ctx).bool())
-            il.add(ftn.getPre());
+          il.add(ftn.getPre());
         }
         //return new NodeSet(il.finish(), ctx);
         res = new NodeSet(il.finish(), ctx);

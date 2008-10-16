@@ -47,6 +47,9 @@ public final class DirParser extends Parser {
    * @throws IOException I/O exception
    */
   private void parse(final Builder b, final IO path) throws IOException {
+    // might slow down the process..
+    // if(path.isSymLink()) return;
+    
     if(path.isDir()) {
       for(final IO f : path.children()) parse(b, f);
     } else {
@@ -61,7 +64,6 @@ public final class DirParser extends Parser {
       }
     }
   }
-  
   
   @Override
   public String head() {

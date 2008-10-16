@@ -64,7 +64,7 @@ public final class FTSelect extends FTArrayExpr {
    * @param ctx current XPContext
    */
   private void init(final FTNode ftn, final XPContext ctx) {
-    ftpos.pos.setPos(ftn.convertPos(), ftn.p.get(0));
+    ftpos.pos.setPos(ftn.convertPos(), ftn.p.list[0]);
     if (ftn.getToken() != null) {
       // [SG] disk is only accessed essential cases.
       /*if (!(ftpos.pos.ordered || ftpos.dist == null 

@@ -1,16 +1,14 @@
 package org.basex.query.xquery.func;
 
 import static org.basex.query.xquery.XQText.*;
-
+import static org.basex.util.Token.*;
 import org.basex.BaseX;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Expr;
-import org.basex.query.xquery.item.Uri;
 import org.basex.query.xquery.util.Err;
 import org.basex.util.Array;
 import org.basex.util.Levenshtein;
 import org.basex.util.Set;
-import org.basex.util.Token;
 
 /**
  * Global expression context.
@@ -39,7 +37,7 @@ public final class FNIndex extends Set {
     funcs = new FunDef[CAP];
     for(final FunDef def : FunDef.values()) {
       final String dsc = def.desc;
-      final byte[] key = Token.token(dsc.substring(0, dsc.indexOf("(")));
+      final byte[] key = token(dsc.substring(0, dsc.indexOf("(")));
       final int i = add(key);
       if(i < 0) BaseX.notexpected("Function defined twice:" + def);
       funcs[i] = def;
@@ -54,7 +52,7 @@ public final class FNIndex extends Set {
    * @return function instance
    * @throws XQException evaluation exception
    */
-  public Fun get(final byte[] name, final Uri uri, final Expr[] args)
+  public Fun get(final byte[] name, final byte[] uri, final Expr[] args)
       throws XQException {
     
     final int id = id(name);
@@ -62,7 +60,7 @@ public final class FNIndex extends Set {
       try {
         // create function
         final FunDef fl = funcs[id];
-        if(fl.uri != uri) return null;
+        if(!eq(fl.uri, uri)) return null;
         
         final Fun f = fl.func.newInstance();
         f.args = args;
@@ -74,7 +72,7 @@ public final class FNIndex extends Set {
       } catch(final XQException ex) {
         throw ex;
       } catch(final Exception ex) {
-        BaseX.notexpected("Can't run " + Token.string(name));
+        BaseX.notexpected("Can't run " + string(name));
       }
     }
     return null;
@@ -87,9 +85,9 @@ public final class FNIndex extends Set {
    */
   public void error(final byte[] name) throws XQException {
     // check similar predefined function
-    final byte[] nm = Token.lc(name);
+    final byte[] nm = lc(name);
     for(int k = 1; k < size; k++) {
-      if(Levenshtein.similar(nm, Token.lc(keys[k]))) {
+      if(Levenshtein.similar(nm, lc(keys[k]))) {
         Err.or(FUNSIMILAR, name, keys[k]);
       }
     }

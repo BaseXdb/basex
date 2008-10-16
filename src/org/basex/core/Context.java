@@ -132,8 +132,8 @@ public final class Context {
   }
   
   /**
-   * Sets the current node set copy.
-   * @param copy current node set copy.
+   * Sets the current node set as copy.
+   * @param copy current node set as copy.
    */
   public void copy(final Nodes copy) {
     copied = copy;

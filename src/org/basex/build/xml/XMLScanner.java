@@ -693,6 +693,7 @@ public final class XMLScanner {
         while((ch = nextChar()) != qu) tok.addUTF(ch);
         if(!f) return null;
         final String name = string(tok.finish());
+        if(!Prop.dtd && r) return cont;
 
         final XMLInput tin = input;
         try {

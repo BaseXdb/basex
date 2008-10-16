@@ -85,13 +85,15 @@ public final class Prop {
   public static boolean xqformat = true;
   /** Use internal XML parser. */
   public static boolean intparse = false;
+  /** Flag for parsing DTDs in internal parser. */
+  public static boolean dtd = true;
+  /** Flag for entity parsing in internal parser. */
+  public static boolean entity = true;
   
   /** Number of query executions. */
   public static int runs = 1;
   /** Flag for whitespace chopping. */
   public static boolean chop = false;
-  /** Flag for entity parsing. */
-  public static boolean entity = true;
   /** Flag for creating a fulltext index. */
   public static boolean ftindex = false;
   /** Flag for creating a text index. */

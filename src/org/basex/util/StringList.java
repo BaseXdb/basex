@@ -24,6 +24,16 @@ public final class StringList {
   }
 
   /**
+   * Checks if the specified string is found in the list.
+   * @param v string to be checked
+   * @return true if value is found
+   */
+  public boolean contains(final String v) {
+    for(int i = 0; i < size; i++) if(list[i].equals(v)) return true;
+    return false;
+  }
+
+  /**
    * Returns the string array.
    * @return array
    */
@@ -32,13 +42,10 @@ public final class StringList {
   }
 
   /**
-   * Checks if the specified string is found in the list.
-   * @param v string to be checked
-   * @return true if value is found
+   * Resets the integer list.
    */
-  public boolean contains(final String v) {
-    for(int i = 0; i < size; i++) if(list[i].equals(v)) return true;
-    return false;
+  public void reset() {
+    size = 0;
   }
 
   /**

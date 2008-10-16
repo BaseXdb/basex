@@ -55,7 +55,7 @@ public final class CmpG extends Arr {
   };
 
   /** Comparator. */
-  private final COMP cmp;
+  final COMP cmp;
 
   /**
    * Constructor.
@@ -74,10 +74,9 @@ public final class CmpG extends Arr {
 
     final Expr e1 = expr[0];
     final Expr e2 = expr[1];
-    final boolean e = e1.e() || e2.e();
-    if(e) return Bln.FALSE;
+    if(e1.e() || e2.e()) return Bln.FALSE;
     if(!e1.i() || !e2.i()) return this;
-    return e ? Bln.FALSE : Bln.get(ev((Item) expr[0], (Item) expr[1], cmp.cmp));
+    return Bln.get(ev((Item) expr[0], (Item) expr[1], cmp.cmp));
   }
 
   @Override
@@ -90,8 +89,10 @@ public final class CmpG extends Arr {
         if(!(more ^= true)) return null;
         final Expr e1 = expr[0];
         final Expr e2 = expr[1];
-        final Iter i1 = ctx.iter(e1);
-        return Bln.get(e2.i() ? ev(i1, (Item) e2) : ev(i1, ctx.iter(e2)));
+        final boolean i1 = e1.i();
+        final boolean i2 = e2.i();
+        return Bln.get(i1 && i2 ? ev((Item) e1, (Item) e2, cmp.cmp) :
+          i2 ? ev(ctx.iter(e1), (Item) e2) : ev(ctx.iter(e1), ctx.iter(e2)));
       }
       @Override
       public String toString() {
@@ -107,7 +108,7 @@ public final class CmpG extends Arr {
    * @return result of check
    * @throws XQException evaluation exception
    */
-  protected boolean ev(final Iter ir1, final Iter ir2) throws XQException {
+  boolean ev(final Iter ir1, final Iter ir2) throws XQException {
     if(ir1.size() == 0 || ir2.size() == 0) return false;
     
     Item it1, it2;
@@ -119,9 +120,8 @@ public final class CmpG extends Arr {
       }
     }
     while((it1 = ir1.next()) != null) {
-      final Iter ir3 = seq;
-      ir3.reset();
-      while((it2 = ir3.next()) != null) if(ev(it1, it2, cmp.cmp)) return true;
+      seq.reset();
+      while((it2 = seq.next()) != null) if(ev(it1, it2, cmp.cmp)) return true;
     }
     return false;
   }
@@ -133,7 +133,7 @@ public final class CmpG extends Arr {
    * @return result of check
    * @throws XQException evaluation exception
    */
-  protected boolean ev(final Iter ir, final Item it) throws XQException {
+  boolean ev(final Iter ir, final Item it) throws XQException {
     Item i;
     while((i = ir.next()) != null) if(ev(i, it, cmp.cmp)) return true;
     return false;
@@ -147,11 +147,11 @@ public final class CmpG extends Arr {
    * @return result of check
    * @throws XQException thrown if the items can't be compared
    */
-  private static boolean ev(final Item a, final Item b, final CmpV.COMP c)
+  static boolean ev(final Item a, final Item b, final CmpV.COMP c)
       throws XQException {
 
-    if(a.type != b.type && !(a.s() && b.s()) && !a.u() && !b.u() &&
-        (a.n() && !b.n() || b.n() && !a.n() || !a.n() && !b.n())) Err.cmp(a, b);
+    if(a.type != b.type && !a.u() && !b.u() && !(a.s() && b.s()) && 
+        !(a.n() && b.n())) Err.cmp(a, b);
     return c.e(a, b);
   }
   

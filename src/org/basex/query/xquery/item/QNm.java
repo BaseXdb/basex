@@ -28,6 +28,7 @@ public final class QNm extends Item {
    */
   public QNm() {
     super(Type.QNM);
+    val = EMPTY;
   }
   
   /**
@@ -48,7 +49,7 @@ public final class QNm extends Item {
   public QNm(final byte[] n, final XQContext ctx) throws XQException {
     this(n);
     if(!XMLToken.isQName(val)) Err.value(type, val);
-    if(ns()) uri = ctx.ns.uri(pre());
+    if(ns()) uri = Uri.uri(ctx.ns.uri(pre()));
   }
 
   /**

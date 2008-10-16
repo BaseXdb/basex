@@ -9,6 +9,8 @@ import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
+import java.util.zip.ZipInputStream;
+
 import org.basex.util.Array;
 import org.basex.util.Token;
 
@@ -213,7 +215,7 @@ public class BufferInput {
    * @throws IOException IO Exception
    */
   public final void close() throws IOException {
-    if(in != null) in.close();
+    if(in != null && !(in instanceof ZipInputStream)) in.close();
   }
 
   /**

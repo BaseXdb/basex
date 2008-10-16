@@ -4,7 +4,6 @@ import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.locpath.Step;
 import org.basex.query.xpath.values.Bool;
-import org.basex.util.IntList;
 
 /**
  * Logical FTMildNot expression.
@@ -23,30 +22,11 @@ public final class FTMildNotXP extends FTArrayExpr {
 
   @Override
   public Bool eval(final XPContext ctx) throws QueryException {
-    Bool b0 = (Bool) exprs[0].eval(ctx);
-    if (!b0.bool()) return b0;
+    if(!ctx.eval(exprs[0]).bool()) return Bool.FALSE;
+    
     boolean f = false;
-    for (int i = 1; i < exprs.length; i++) {
-      f |= exprs[i].eval(ctx).bool();
-    }
-
-    if (f) return Bool.get(evalMildNot(ctx.ftpos.pos.getPos()));
-    return Bool.get(!f);
-  }
-
-  /**
-   * Evaluate MildNot sequential.
-   * @param pos IntList[] with position values
-   * @return boolean result of mildnot
-   */
-  public static boolean evalMildNot(final IntList[] pos) {
-    if (pos.length == 1) return true;
-    for (int i = 1; i < pos.length; i++) {
-      for (int k = 0; k < pos[i].size; k++) {
-        if (pos[0].contains(pos[i].get(k))) return false;
-      }
-    }
-    return true;
+    for(int i = 1; i < exprs.length; i++) f |= ctx.eval(exprs[i]).bool();
+    return Bool.get(!f || ctx.ftpos.pos.mildNot());
   }
   
   @Override

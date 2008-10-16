@@ -87,7 +87,7 @@ public final class TableContent extends BaseXBack {
       if(posY > h || l >= tdata.rows.size) break;
       posY += rowH;
 
-      final int pre = tdata.rows.get(l);
+      final int pre = tdata.rows.list[l];
       while(mpos < marked.size && marked.nodes[mpos] < pre) mpos++;
 
       // draw line
@@ -128,7 +128,7 @@ public final class TableContent extends BaseXBack {
         
         if(tb[c].size != 0) tb[c].add("; ");
         byte[] txt = ti.elem ? data.text(ti.pre) : data.attValue(ti.pre);
-        if(tdata.cols.get(c) == data.atts.id(DataText.MTIME)) {
+        if(tdata.cols.list[c] == data.atts.id(DataText.MTIME)) {
           txt = Token.token(new SimpleDateFormat("dd.MM.yyyy").
               format(new Date(Token.toLong(txt) * 60000)));
         }

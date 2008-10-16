@@ -70,9 +70,9 @@ public final class TableOutput extends FileOutputStream {
     info.writeNum(blockCount);
     info.writeNum(firstPre);
     info.writeNum(blockCount);
-    for(int i = 0; i < blockCount; i++) info.writeNum(firstPres.get(i));
+    for(int i = 0; i < blockCount; i++) info.writeNum(firstPres.list[i]);
     info.writeNum(blockCount);
-    for(int i = 0; i < blockCount; i++) info.writeNum(blocks.get(i));
+    for(int i = 0; i < blockCount; i++) info.writeNum(blocks.list[i]);
     info.close();
   }
 }

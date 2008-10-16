@@ -153,6 +153,7 @@ public final class Var extends ExprInfo implements Cloneable {
     if(expr == null) {
       ser.emptyElement();
     } else {
+      ser.finishElement();
       expr.plan(ser);
       ser.closeElement();
     }

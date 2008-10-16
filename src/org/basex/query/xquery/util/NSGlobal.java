@@ -2,8 +2,7 @@ package org.basex.query.xquery.util;
 
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
-import org.basex.query.xquery.item.QNm;
-import org.basex.query.xquery.item.Uri;
+import org.basex.util.Atts;
 import org.basex.util.Token;
 
 /**
@@ -13,13 +12,19 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class NSGlobal {
-  /** Default namespaces. */
-  private static final QNm[] NAMES = {
-      new QNm(LOCAL, Uri.LOCAL), new QNm(XS, Uri.XS), new QNm(XSI, Uri.XSI), 
-      new QNm(FN, Uri.FN), new QNm(XMLNS, Uri.XMLNS), new QNm(XML, Uri.XML),
-      new QNm(BASEX, Uri.BX)
-  };
+  /** Namespaces. */
+  private static Atts atts = new Atts();
 
+  static {
+    atts.add(LOCAL, LOCALURI);
+    atts.add(XS, XSURI);
+    atts.add(XSI, XSIURI);
+    atts.add(FN, FNURI);
+    atts.add(XMLNS, XMLNSURI);
+    atts.add(XML, XMLURI);
+    atts.add(BASEX, BXURI);
+  }
+  
   /** Private constructor. */
   private NSGlobal() { }
 
@@ -28,23 +33,11 @@ public final class NSGlobal {
    * @param pre prefix of the namespace
    * @return uri
    */
-  public static Uri uri(final byte[] pre) {
-    for(int s = NAMES.length - 1; s >= 0; s--) {
-      if(eq(NAMES[s].str(), pre)) return NAMES[s].uri;
+  public static byte[] uri(final byte[] pre) {
+    for(int s = atts.size - 1; s >= 0; s--) {
+      if(eq(atts.key[s], pre)) return atts.val[s];
     }
-    return Uri.EMPTY;
-  }
-
-  /**
-   * Checks if the specified uri is a standard uri.
-   * @param uri uri to be checked
-   * @return result of check
-   */
-  public static boolean standard(final Uri uri) {
-    for(int s = NAMES.length - 1; s > 0; s--) {
-      if(NAMES[s].uri.eq(uri)) return true;
-    }
-    return false;
+    return EMPTY;
   }
 
   /**
@@ -52,10 +45,23 @@ public final class NSGlobal {
    * @param uri URI
    * @return prefix
    */
-  public static byte[] prefix(final Uri uri) {
-    for(int s = NAMES.length - 1; s >= 0; s--) {
-      if(NAMES[s].uri.eq(uri)) return NAMES[s].str();
+  public static byte[] prefix(final byte[] uri) {
+    for(int s = atts.size - 1; s >= 0; s--) {
+      if(eq(atts.val[s], uri)) return atts.key[s];
     }
     return Token.EMPTY;
+  }
+
+  /**
+   * Checks if the specified uri is a standard uri.
+   * @param uri uri to be checked
+   * @return result of check
+   */
+  public static boolean standard(final byte[] uri) {
+    // 'local' namespace is skipped
+    for(int s = atts.size - 1; s > 0; s--) {
+      if(eq(atts.val[s], uri)) return true;
+    }
+    return false;
   }
 }

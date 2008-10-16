@@ -61,8 +61,8 @@ public final class Vars extends ExprInfo {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(int i = 0; i < size; i++) sb.append((i == 0 ? "" : "\n") + i + ": " +
-        vars[i]);
+    for(int i = 0; i < size; i++)
+      sb.append((i == 0 ? "" : "\n") + i + ": " + vars[i]);
     return sb.toString();
   }
 

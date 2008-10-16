@@ -125,7 +125,7 @@ public interface FSText {
     "[-R] file ...",
     "The rm utility removes files specified on the command line.",
     "The options are as follows:",
-    "-R    Attempt to remove the file hierarchy rooted in each file argument"
+    "-R    Remove directories and their contents recursively"
   };
   
   /** Help text. */

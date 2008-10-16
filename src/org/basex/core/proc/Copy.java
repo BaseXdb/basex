@@ -38,34 +38,29 @@ public final class Copy extends AUpdate {
     final int pos = Token.toInt(args[0]);
     if(pos < 0) return error(POSINVALID, args[0]);
 
-    Nodes source;
-    Nodes target;
+    Nodes src;
+    Nodes trg;
     if(gui) {
-      source = context.copied();
-      target = context.marked();
+      src = context.copied();
+      trg = context.marked();
       context.copy(null);
     } else {
       // perform query and check if all result nodes reference tags
-      query(args[1], null);
-      source = (Nodes) result;
-      query(args[2], COPYTAGS);
-      target = (Nodes) result;
+      src = query(args[1], null);
+      trg = query(args[2], COPYTAGS);
+      if(src == null || trg == null) return false;
     }
-    if(source == null || target == null) return false;
-
     data.noIndex();
 
-    final int size = source.size;
-    final Data[] srcDocs = new Data[source.size];
-    for(int c = 0; c < size; c++) {
-      srcDocs[c] = copy(source.data, source.nodes[c]);
-    }
+    final int size = src.size;
+    final Data[] srcDocs = new Data[src.size];
+    for(int c = 0; c < size; c++) srcDocs[c] = copy(src.data, src.nodes[c]);
 
     final IntList marked = gui ? new IntList() : null;
     int copied = 0;
 
-    for(int n = target.size - 1; n >= 0; n--) {
-      final int par = target.nodes[n];
+    for(int n = trg.size - 1; n >= 0; n--) {
+      final int par = trg.nodes[n];
       if(data.kind(par) != Data.ELEM) return error(COPYTAGS);
 
       for(int c = 0; c < size; c++) {
@@ -90,13 +85,14 @@ public final class Copy extends AUpdate {
     
     if(gui) {
       if(context.current().size > 1 || 
-          context.current().nodes[0] == source.nodes[0]) {
+          context.current().nodes[0] == src.nodes[0]) {
         context.current(new Nodes(0, data));
       }
       context.marked(new Nodes(marked.finish(), data));
     }
 
     data.flush();
+    System.out.println(data.size);
     return Prop.info ? info(INSERTINFO, copied, perf.getTimer()) : true;
   }
 
@@ -136,5 +132,10 @@ public final class Copy extends AUpdate {
       }
     }
     return tmp;
+  }
+
+  @Override
+  public String toString() {
+    return name() +  " " + args[0] + " " + args[1] + ", " + args[2];
   }
 }

@@ -1,7 +1,9 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
+
 import java.io.IOException;
+
 import org.basex.BaseX;
 import org.basex.data.Data;
 
@@ -16,14 +18,14 @@ public final class Optimize extends ACreate {
   private int pre;
   /** Data size. */
   private int size;
-  
+
   /**
    * Constructor.
    */
   public Optimize() {
     super(DATAREF | UPDATING);
   }
-  
+
   @Override
   protected boolean exec() {
     // rebuild statistics
@@ -40,14 +42,14 @@ public final class Optimize extends ACreate {
    */
   private boolean stats(final Data data) {
     // refresh statistics
-    boolean txtindex = data.meta.txtindex;
-    boolean atvindex = data.meta.atvindex;
-    boolean ftxindex = data.meta.ftxindex;
+    final boolean txtindex = data.meta.txtindex;
+    final boolean atvindex = data.meta.atvindex;
+    final boolean ftxindex = data.meta.ftxindex;
 
     data.noIndex();
     data.tags.stats = true;
     data.atts.stats = true;
-    
+
     final int[] parStack = new int[256];
     final int[] tagStack = new int[256];
     int h = 0;
@@ -65,17 +67,17 @@ public final class Optimize extends ACreate {
         tagStack[l] = id;
         parStack[l] = pre;
         if(h < ++l) h = l;
-        data.skel.add(id, l, Data.ELEM);
+        data.skel.add(id, l, kind);
       } else if(kind == Data.ATTR) {
         final int id = data.attNameID(pre);
         data.atts.index(data.atts.key(id), data.attValue(pre));
-        data.skel.add(id, l + 1, Data.ATTR);
+        data.skel.add(id, l + 1, kind);
       } else if(kind == Data.TEXT || kind == Data.DOC) {
         if(l > 0) data.tags.index(tagStack[l - 1], data.text(pre));
         data.skel.add(0, l, kind);
       }
     }
-    
+
     data.meta.height = h;
     data.meta.newindex = false;
     data.meta.txtindex = txtindex;
@@ -83,7 +85,7 @@ public final class Optimize extends ACreate {
     data.meta.ftxindex = ftxindex;
     data.tags.stats = true;
     data.atts.stats = true;
-    
+
     try {
       index(data);
     } catch(final IOException e) {

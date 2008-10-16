@@ -161,7 +161,7 @@ public final class InfoView extends View {
       add(tb, QUERYTIME, strings);
       add(tb, QUERYPLAN, plan);
       tm = strings.list[il.size - 1] + ": " + Performance.getTimer(
-          stat.get(il.size - 1) * 10000L * Prop.runs, Prop.runs);
+          stat.list[il.size - 1] * 10000L * Prop.runs, Prop.runs);
     }
 
     area.setText(tb.finish());
@@ -186,7 +186,7 @@ public final class InfoView extends View {
     for(int i = 0; i < list.size; i++) {
       String line = list.list[i];
       if(list == strings) line = " " + QUERYSEP + line + ":  " +
-        Performance.getTimer(stat.get(i) * 10000L * Prop.runs, Prop.runs);
+        Performance.getTimer(stat.list[i] * 10000L * Prop.runs, Prop.runs);
       tb.add(line);
       tb.add((byte) 0x0A);
     }
@@ -224,7 +224,7 @@ public final class InfoView extends View {
 
     final int f = focus == -1 ? l - 1 : focus;
     timer.setText(f == -1 ? "" : " " + strings.list[f] + ": " +
-        Performance.getTimer(stat.get(f) * 10000L * Prop.runs, Prop.runs));
+        Performance.getTimer(stat.list[f] * 10000L * Prop.runs, Prop.runs));
     repaint();
   }
   
@@ -242,7 +242,7 @@ public final class InfoView extends View {
 
     // find maximum value
     int m = 0;
-    for(int i = 0; i < l; i++) m = Math.max(m, stat.get(i));
+    for(int i = 0; i < l; i++) m = Math.max(m, stat.list[i]);
 
     // draw focused bar
     final int by = 10;
@@ -259,7 +259,7 @@ public final class InfoView extends View {
     for(int i = 0; i < l; i++) {
       final int bx = w - bw + bs * i;
       g.setColor(COLORS[(i == focus ? 3 : 2) + i * 2]);
-      final int p = Math.max(1, stat.get(i) * bh / m);
+      final int p = Math.max(1, stat.list[i] * bh / m);
       g.fillRect(bx, by + bh - p, bs, p);
       g.setColor(COLORBUTTON);
       g.drawRect(bx, by + bh - p, bs, p - 1);
