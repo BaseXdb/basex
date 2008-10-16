@@ -9,6 +9,7 @@ import javax.xml.xquery.XQStaticContext;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.QNm;
 import org.basex.query.xquery.item.Uri;
+import org.basex.util.Atts;
 
 /**
  * Java XQuery API - Static Context.
@@ -80,11 +81,11 @@ public class BXQStaticContext implements XQStaticContext {
   }
 
   public String getDefaultElementTypeNamespace() {
-    return string(ctx.nsElem.str());
+    return string(ctx.nsElem);
   }
 
   public String getDefaultFunctionNamespace() {
-    return string(ctx.nsFunc.str());
+    return string(ctx.nsFunc);
   }
 
   public int getDefaultOrderForEmptySequences() {
@@ -98,16 +99,16 @@ public class BXQStaticContext implements XQStaticContext {
   }
 
   public String[] getNamespacePrefixes() {
-    final QNm[] names = ctx.ns.ns();
-    final String[] pre = new String[names.length];
-    for(int p = 0; p < pre.length; p++) pre[p] = string(names[p].ln());
+    final Atts atts = ctx.ns.atts;
+    final String[] pre = new String[atts.size];
+    for(int p = 0; p < pre.length; p++) pre[p] = string(atts.key[p]);
     return pre;
   }
 
   public String getNamespaceURI(final String prefix) throws XQException {
     BXQAbstract.valid(prefix, String.class);
-    final Uri uri = ctx.ns.find(token(prefix));
-    if(uri != null) return string(uri.str());
+    final byte[] uri = ctx.ns.find(token(prefix));
+    if(uri != null) return string(uri);
     throw new BXQException(PRE, prefix);  }
 
   public int getOrderingMode() {
@@ -164,12 +165,12 @@ public class BXQStaticContext implements XQStaticContext {
   public void setDefaultElementTypeNamespace(final String uri)
       throws XQException {
     BXQAbstract.valid(uri, String.class);
-    ctx.nsElem = Uri.uri(token(uri));
+    ctx.nsElem = token(uri);
   }
 
   public void setDefaultFunctionNamespace(final String uri) throws XQException {
     BXQAbstract.valid(uri, String.class);
-    ctx.nsFunc = Uri.uri(token(uri));
+    ctx.nsFunc = token(uri);
   }
 
   public void setDefaultOrderForEmptySequences(final int mode)

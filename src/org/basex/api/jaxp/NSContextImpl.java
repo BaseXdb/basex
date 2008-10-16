@@ -4,7 +4,6 @@ import static org.basex.util.Token.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import javax.xml.namespace.NamespaceContext;
-import org.basex.query.xquery.item.Uri;
 import org.basex.query.xquery.util.NSLocal;
 
 /**
@@ -26,12 +25,12 @@ public class NSContextImpl implements NamespaceContext {
   }
   
   public String getNamespaceURI(final String pre) {
-    final Uri uri = ns.find(token(pre));
-    return uri == null ? null : string(uri.str());
+    final byte[] uri = ns.find(token(pre));
+    return uri == null ? null : string(uri);
   }
 
   public String getPrefix(final String uri) {
-    return string(ns.prefix(Uri.uri(token(uri))));
+    return string(ns.prefix(token(uri)));
   }
 
   public Iterator<String> getPrefixes(final String uri) {

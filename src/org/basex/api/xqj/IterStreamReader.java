@@ -18,7 +18,6 @@ import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.QNm;
 import org.basex.query.xquery.item.Type;
-import org.basex.query.xquery.item.Uri;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.util.NSLocal;
@@ -199,8 +198,8 @@ public final class IterStreamReader implements XMLStreamReader {
   public String getNamespaceURI(final String s) {
     if(s == null) throw new IllegalArgumentException();
     checkType(START_ELEMENT, END_ELEMENT, NAMESPACE);
-    final Uri uri = ns.find(Token.token(s));
-    return uri == null ? null : Token.string(uri.str());
+    final byte[] uri = ns.find(Token.token(s));
+    return uri == null ? null : Token.string(uri);
   }
 
   public String getNamespaceURI(final int i) {
