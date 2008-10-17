@@ -80,6 +80,24 @@ public final class IntList {
   public void reset() {
     size = 0;
   }
+  
+
+  /**
+   * Sorts the specified tokens and returns an {@link IntList} instance
+   * with the sort order of all tokens.
+   * @param tok token array to sort by
+   * @param num numeric sort
+   * @param asc ascending
+   * @return sorted integer list
+   */
+  public static IntList createOrder(final byte[][] tok, final boolean num,
+      final boolean asc) {
+    final IntList il = new IntList();
+    for(int i = 0; i < tok.length; i++) il.add(i);
+    il.sort(tok, num, asc);
+    return il;
+  }
+
 
   /**
    * Sorts the array in the order of the specified token array.
@@ -165,7 +183,7 @@ public final class IntList {
    * @return result
    */
   private int s(final byte[] a, final byte[] b) {
-    final long n = Token.toLong(a) - Token.toLong(b);
+    final double n = Token.toDouble(a) - Token.toDouble(b);
     return n > 0 ? 1 : n < 0 ? -1 : 0;
   }
 

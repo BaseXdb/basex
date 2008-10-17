@@ -1360,7 +1360,7 @@ public final class XQParser extends QueryParser {
     if(c == '.' && next() != '.') {
       consume('.');
       return !digit(curr()) ? new Context() : decimalLiteral(
-          new TokenBuilder('.'));
+          new TokenBuilder().add('.'));
     }
     // strings
     if(quote(c)) return new Str(stringLiteral(), true);

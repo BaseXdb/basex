@@ -1,6 +1,8 @@
 package org.basex.gui;
 
 import static org.basex.Text.*;
+import static org.basex.gui.GUIConstants.*;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -160,7 +162,15 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
     g.fillRect(ww, 0, MEMW - 1, hh - 2);
     g.setColor(full ? GUIConstants.colormark4 : GUIConstants.color4);
     g.fillRect(ww + 2, 2, (int) (used * (MEMW - 7) / max), hh - 5);
-    BaseXLayout.rect(g, true, ww, 0, ww + MEMW - 3, hh - 2);
+    
+    g.setColor(COLORBUTTON);
+    int xe = ww + MEMW - 3;
+    int ye = hh - 2;
+    g.drawLine(ww, 0, xe, 0);
+    g.drawLine(ww, 0, ww, ye);
+    g.setColor(Color.white);
+    g.drawLine(xe, 1, xe, ye);
+    g.drawLine(ww + 1, ye, xe, ye);
     g.setColor(full ? GUIConstants.colormark3 : GUIConstants.color6);
 
     FontMetrics fm = g.getFontMetrics();

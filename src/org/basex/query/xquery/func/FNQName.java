@@ -2,7 +2,6 @@ package org.basex.query.xquery.func;
 
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.util.Token.*;
-
 import org.basex.BaseX;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
@@ -140,7 +139,7 @@ final class FNQName extends Fun {
     } while(n != null && ctx.nsInherit);
     
     final SeqIter seq = new SeqIter();
-    for(int t = 0; t < tl.size; t++) seq.add(Str.get(tl.list[t]));
+    for(final byte[] t : tl) seq.add(Str.get(t));
     return seq;
   }
 }

@@ -1,12 +1,15 @@
 package org.basex.util;
 
+import java.util.Iterator;
+import org.basex.BaseX;
+
 /**
  * This is a simple container for native int array values.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class IntArrayList {
+public final class IntArrayList implements Iterable<int[]> {
   /** Value array. */
   public int[][] list;
   /** Current array size. */
@@ -43,5 +46,14 @@ public final class IntArrayList {
    */
   public int[][] finish() {
     return size == list.length ? list : Array.finish(list, size);
+  }
+
+  public Iterator<int[]> iterator() {
+    return new Iterator<int[]>() {
+      private int c = -1;
+      public boolean hasNext() { return ++c < size; }
+      public int[] next() { return list[c]; }
+      public void remove() { BaseX.notimplemented(); }
+    };
   }
 }

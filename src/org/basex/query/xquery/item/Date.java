@@ -164,7 +164,7 @@ public abstract class Date extends Item {
 
   @Override
   public final String toString() {
-    return new TokenBuilder('"').add(str()).add('"').toString();
+    return new TokenBuilder().add('"').add(str()).add('"').toString();
   }
 
   @Override

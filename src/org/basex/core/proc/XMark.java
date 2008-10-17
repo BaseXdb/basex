@@ -775,13 +775,13 @@ public final class XMark extends AQuery {
    */
   private void writeTag(final byte[] tag, final Nodes in, final int pre,
       final XPathProcessor steps) throws Exception {
-    final Nodes tmp = eval(steps, in, pre);
+    final int[] tmp = eval(steps, in, pre).nodes;
     out.startElement(tag);
-    if(tmp.size == 0) {
+    if(tmp.length == 0) {
       out.emptyElement();
     } else {
       out.finishElement();
-      for(int t = 0; t < tmp.size; t++) out.text(data.atom(tmp.nodes[0]));
+      for(final int n : tmp) out.text(data.atom(n));
       out.closeElement();
     }
   }

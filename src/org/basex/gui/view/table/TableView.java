@@ -73,8 +73,7 @@ public final class TableView extends View implements Runnable {
   
   @Override
   public void refreshContext(final boolean more, final boolean quick) {
-    if(tdata.invalid) return;
-    if(!GUIProp.showtable) {
+    if(tdata.invalid || !GUIProp.showtable) {
       tdata.invalid = true;
       tdata.rows = null;
       return;
@@ -115,7 +114,7 @@ public final class TableView extends View implements Runnable {
   public void refreshLayout() {
     if(tdata.invalid) return;
     scroll.height(tdata.rows.size * tdata.rowH(1));
-    refreshUpdate();
+    refreshContext(false, true);
   }
   
   @Override
@@ -233,6 +232,7 @@ public final class TableView extends View implements Runnable {
         if(!e.isShiftDown()) tdata.resetFilter();
         tdata.filter[tdata.column(getWidth() - BaseXBar.SIZE, e.getX())] = str;
         tdata.find();
+        repaint();
       } else {
         Nodes nodes = GUI.context.marked();
         if(getCursor() == GUIConstants.CURSORARROW) {

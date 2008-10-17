@@ -1,13 +1,14 @@
 package org.basex.data;
 
 import static org.basex.data.DataText.*;
+import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.util.Array;
-import org.basex.util.StringList;
-import org.basex.util.Token;
+import org.basex.util.IntList;
+import org.basex.util.TokenList;
 
 /**
  * This class stores the tree structure of a document.
@@ -83,67 +84,80 @@ public final class Skeleton {
   }
   
   /**
-   * Return completions for the specified descendant steps.
-   * based on the document tree structure.
-   * Note that only basic completions will be recognized.
-   * @param desc descendant steps
+   * Return descendant tags and attributes for the specified start key.
+   * @param k input key
+   * @param d if false, return only children
+   * @param o true/false: sort by occurrence/lexicographically
    * @return children
    */
-  public String[] desc(final StringList desc) {
-    final StringList sl = new StringList();
-    if(root != null) {
-      ArrayList<Node> n = new ArrayList<Node>();
-      n.add(root);
-      n = desc(n, "", true);
-      for(int i = 0; i < desc.size; i++) n = desc(n, desc.list[i], true);
-  
-      for(final Node r : n) {
-        final String name = Token.string(r.token(data));
-        if(!sl.contains(name) && !name.contains("(")) sl.add(name);
-      }
-      sl.sort();
-    }
-    return sl.finish();
+  public TokenList desc(final byte[] k, final boolean d, final boolean o) {
+    final TokenList tl = new TokenList();
+    if(k.length != 0) tl.add(k);
+    return desc(tl, d, o);
   }
 
   /**
-   * Returns the child node for the specified name.
-   * @param n node
-   * @param name name
-   * @param desc descendant flag
-   * @return child node
+   * Return descendant tags and attributes for the specified descendant path.
+   * @param in input steps
+   * @param d if false, return only children
+   * @param o true/false: sort by occurrence/lexicographically
+   * @return children
    */
-  public ArrayList<Node> desc(final ArrayList<Node> n, final String name,
-      final boolean desc) {
+  public TokenList desc(final TokenList in, final boolean d, final boolean o) {
+    if(root == null) return new TokenList();
+    // follow the specified descendant/child steps
+    ArrayList<Node> n = new ArrayList<Node>();
+    n.add(root);
+    n = desc(n, 0, Data.DOC, true);
 
-    if(name.startsWith("@")) return new ArrayList<Node>();
-    return desc(n, data.tagID(Token.token(name)), desc);
+    for(final byte[] i : in) {
+      final boolean att = startsWith(i, '@');
+      final byte kind = att ? Data.ATTR : Data.ELEM;
+      final int id = att ? data.attNameID(substring(i, 1)) : data.tagID(i);
+      n = desc(n, id, kind, d);
+    }
+    
+    // sort by number of occurrences
+    final TokenList tmp = new TokenList();
+    for(final Node r : n) tmp.add(token(r.count));
+    final IntList occ = IntList.createOrder(tmp.finish(), true, false);
+
+    // remove non-text/attribute nodes
+    final TokenList out = new TokenList();
+    for(int i = 0; i < n.size(); i++) {
+      final Node r = n.get(o ? occ.list[i] : i);
+      final byte[] name = r.token(data);
+      if(!out.contains(name) && !contains(name, '(')) out.add(name);
+    }
+    if(!o) out.sort(false);
+    return out;
   }
 
   /**
    * Returns the descendant for the specified nodes.
-   * @param n node
+   * @param in input nodes
    * @param t name reference
+   * @param k node kind
    * @param desc if false, return only children
    * @return descendant nodes
    */
-  public ArrayList<Node> desc(final ArrayList<Node> n, final int t,
-      final boolean desc) {
+  public ArrayList<Node> desc(final ArrayList<Node> in, final int t,
+      final int k, final boolean desc) {
 
-    final ArrayList<Node> ch = new ArrayList<Node>();
-    for(final Node r : n) {
-      if(t != 0 && r.name != t) continue;
-      for(final Node c : r.ch) {
-        if(desc) c.desc(ch);
-        else ch.add(c);
+    final ArrayList<Node> out = new ArrayList<Node>();
+    for(final Node n : in) {
+      if(t != 0 && (n.name != t || n.kind != k || n.count < 2)) continue;
+      for(final Node c : n.ch) {
+        if(desc) c.desc(out);
+        else out.add(c);
       }
     }
-    return ch;
+    return out;
   }
 
-  /** Document node. */
+  /** Skeleton node. */
   public static final class Node {
-    /** Tag reference. */
+    /** Tag/attribute name reference. */
     public final short name;
     /** Node kind. */
     public final byte kind;
@@ -209,7 +223,7 @@ public final class Skeleton {
     }
 
     /**
-     * Recursively adds the descendants to the specified node list.
+     * Recursively adds the node and its descendants to the specified list.
      * @param nodes node list
      */
     public void desc(final ArrayList<Node> nodes) {
@@ -225,11 +239,11 @@ public final class Skeleton {
     public byte[] token(final Data data) {
       switch(kind) {
         case Data.ELEM: return data.tags.key(name);
-        case Data.ATTR: return Token.concat(ATT, data.atts.key(name));
+        case Data.ATTR: return concat(ATT, data.atts.key(name));
         case Data.TEXT: return TEXT;
         case Data.COMM: return COMM;
         case Data.PI:   return PI;
-        default:        return Token.EMPTY;
+        default:        return EMPTY;
       }
     }
 

@@ -1,10 +1,9 @@
 package org.basex.data;
 
 import java.io.IOException;
-
 import org.basex.BaseX;
 import org.basex.core.Context;
-import org.basex.util.Array;
+import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -71,38 +70,85 @@ public final class Nodes implements Result {
   }
 
   /**
-   * Compares the node set with the specified node set.
-   * @param n node set
-   * @return result of check
+   * The specified pre value is added to or removed from the context set.
+   * @param p pre value
    */
-  public boolean sameAs(final Nodes n) {
-    if(this == n) return true;
-    if(data != n.data || size != n.size) return false;
-    for(int s = 0; s != size; s++) if(nodes[s] != n.nodes[s]) return false;
-    return true;
+  public void toggle(final int p) {
+    final int[] n = new int[] { p };
+    nodes = find(p) < 0 ? union(nodes, n) : except(nodes, n);
+    size = nodes.length;
+  }
+  
+  /**
+   * The specified nodes are merged.
+   * @param p pre value
+   */
+  public void union(final int[] p) {
+    nodes = union(nodes, p);
+    size = nodes.length;
   }
 
   /**
-   * The specified pre value is added to or removed from the context set.
-   * @param p pre value
-   * @return self reference
+   * Merges two integer arrays via union.
+   * Note that the input arrays must be sorted.
+   * @param ai first set
+   * @param bi second set
+   * @return resulting set
    */
-  public Nodes toggle(final int p) {
-    int i = find(p);
-    if(i >= 0) {
-      // remove pre value
-      if(i < --size) Array.move(nodes, i + 1, -1, size - i);
-    } else {
-      // insert pre value
-      if(size == 0) nodes = new int[1];
-      else if(size == nodes.length) nodes = Array.extend(nodes);
-      i = -i - 1;
-      Array.move(nodes, i, 1, size++ - i);
-      nodes[i] = p;
+  public static int[] union(final int[] ai, final int[] bi) {
+    final int al = ai.length, bl = bi.length;
+    final IntList c = new IntList();
+    int a = 0, b = 0;
+    while(a != al && b != bl) {
+      final int d = ai[a] - bi[b];
+      c.add(d <= 0 ? ai[a++] : bi[b++]);
+      if(d == 0) b++;
     }
-    return this;
+    while(a != al) c.add(ai[a++]);
+    while(b != bl) c.add(bi[b++]);
+    return c.finish();
   }
 
+  /**
+   * Intersects two integer arrays via union.
+   * Note that the input arrays must be sorted.
+   * @param ai first set
+   * @param bi second set
+   * @return resulting set
+   */
+  public static int[] intersect(final int[] ai, final int[] bi) {
+    final int al = ai.length, bl = bi.length;
+    final IntList c = new IntList();
+    for(int a = 0, b = 0; a != al && b != bl;) {
+      final int d = ai[a] - bi[b];
+      if(d == 0) c.add(ai[a++]);
+      if(d > 0) b++;
+      else a++;
+    }
+    return c.finish();
+  }
+
+  /**
+   * Subtracts the second from the first array.
+   * Note that the input arrays must be sorted.
+   * @param ai first set
+   * @param bi second set
+   * @return resulting set
+   */
+  public static int[] except(final int[] ai, final int[] bi) {
+    final int al = ai.length, bl = bi.length;
+    final IntList c = new IntList();
+    int a = 0, b = 0;
+    while(a != al && b != bl) {
+      final int d = ai[a] - bi[b];
+      if(d < 0) c.add(ai[a]);
+      else b++;
+      if(d <= 0) a++;
+    }
+    while(a != al) c.add(ai[a++]);
+    return c.finish();
+  }
+  
   /**
    * Setter for FTData. Used for visualization purpose.
    * 
@@ -113,24 +159,6 @@ public final class Nodes implements Result {
     ftpoin = ftpointer;
   }
    */
-  
-  /**
-   * The specified pre value is added to or removed from the context set.
-   * @param p pre value
-   * @return self reference
-   */
-  public Nodes add(final int p) {
-    int i = find(p);
-    if(i < 0) {
-      // insert pre value
-      if(size == 0) nodes = new int[1];
-      else if(size == nodes.length) nodes = Array.extend(nodes);
-      i = -i - 1;
-      Array.move(nodes, i, 1, size++ - i);
-      nodes[i] = p;
-    }
-    return this;
-  }
 
   /** {@inheritDoc} */
   public int size() {
@@ -142,7 +170,7 @@ public final class Nodes implements Result {
    * @return copy
    */
   public Nodes copy() {
-    return new Nodes(Array.finish(nodes, size), data);
+    return new Nodes(nodes, data);
   }
   
   /** {@inheritDoc} */

@@ -131,7 +131,8 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     final int h = getHeight();
     final int hh = Math.max(320, Math.min(700, h));
     final Insets i = getInsets();
-    BaseXLayout.fill(g, FILL.DOWN, i.left, i.top, w - i.right, h - i.bottom);
+    BaseXLayout.fill(g, GUIConstants.color1, GUIConstants.color2,
+        i.left, i.top, w - i.right, h - i.bottom);
     if(w < 150 || h < 125) return;
 
     final int lw = logo.getWidth(this);

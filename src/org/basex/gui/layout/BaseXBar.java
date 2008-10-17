@@ -1,5 +1,6 @@
 package org.basex.gui.layout;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import javax.swing.JComponent;
@@ -24,7 +25,7 @@ public final class BaseXBar extends BaseXPanel {
   static final int[] STEPS = { -MAXSTEP, -14, -11, -8, -6, -4, -3,
       -2, -1, -1, 0, 0, 1, 1, 2, 3, 4, 6, 8, 11, 14, MAXSTEP };
   /** Minimum size for the scrollbar slider. */
-  private static final int MINSIZE = 10;
+  private static final int MINSIZE = 16;
 
   /** Current scrolling speed. */
   int step = STEPS.length / 2;
@@ -132,16 +133,17 @@ public final class BaseXBar extends BaseXPanel {
     barSize = Math.min(size, barH - 1);
 
     // paint scrollbar background
-    g.setColor(GUIConstants.color5);
-    g.drawLine(0, 0, 0, hh);
-    g.drawLine(ww - 1, 0, ww - 1, hh);
+    g.setColor(GUIConstants.COLORSCROLL);
+    g.fillRect(0, 0, ww, hh);
+
+    // draw scroll slider
+    BaseXLayout.drawCell(g, 0, ww, ww - 2 + barPos,
+        ww - 2 + barPos + barSize, false);
 
     // draw scroll up button
     int x = 0;
     int y = 0;
-
     BaseXLayout.drawCell(g, 0, ww, y, y + ww - 1, false);
-
     int xx = x + SIZE / 2 - 3;
     int yy = y + SIZE / 2 - 3;
     if(button && up) { xx++; yy++; }
@@ -155,22 +157,21 @@ public final class BaseXBar extends BaseXPanel {
     // draw scroll down button
     x = 0;
     y = Math.max(SIZE, hh - ww);
-
     BaseXLayout.drawCell(g, 0, ww, y, y + ww, false);
-
     xx = x + SIZE / 2 - 3;
     yy = y + SIZE / 2 - 3;
     if(button && down) { xx++; yy++; }
-    g.setColor(GUIConstants.color6);
+    g.setColor(Color.black);
     g.drawLine(xx + 2, yy + 4, xx + 2, yy + 4);
     g.drawLine(xx + 1, yy + 3, xx + 3, yy + 3);
     g.drawLine(xx + 1, yy + 2, xx + 3, yy + 2);
     g.drawLine(xx    , yy + 1, xx + 4, yy + 1);
     g.drawLine(xx    , yy    , xx + 4, yy);
 
-    // draw scroll slider
-    BaseXLayout.drawCell(g, 0, ww, ww - 2 + barPos, ww - 2 + barPos + barSize,
-        false);
+    // paint scrollbar lines
+    g.setColor(GUIConstants.COLORBUTTON);
+    g.drawLine(0, 0, 0, hh);
+    g.drawLine(ww - 1, 0, ww - 1, hh);
   }
 
   @Override

@@ -152,7 +152,7 @@ public final class MAB2Parser extends Parser {
       final byte[] key = child ? par : id;
       MAB2Entry entry = ids.get(key);
       if(entry == null) {
-        entry = new MAB2Entry(key);
+        entry = new MAB2Entry();
         ids.add(key, entry);
       }
       if(child) entry.add(pos);
@@ -598,6 +598,39 @@ public final class MAB2Parser extends Parser {
       }
     } catch(final IOException e) {
       BaseX.debug(new File(fn).getAbsolutePath() + " not found.");
+    }
+  }
+
+  /**
+   * This is a simple data structure for storing MAB2 entries.
+   *
+   * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+   * @author Christian Gruen
+   */
+  static final class MAB2Entry {
+    /** Children offsets. */
+    long[] children;
+    /** File offset; 0 if no parent node exists. */
+    long pos;
+    /** Number of children. */
+    int size;
+
+    /**
+     * Adds a child.
+     * @param c child to be added
+     */
+    void add(final long c) {
+      if(children == null) children = new long[1];
+      else if(children.length == size) children = Array.extend(children);
+      children[size++] = c;
+    }
+
+    /**
+     * Sets the file offset.
+     * @param p file offset
+     */
+    void pos(final long p) {
+      pos = p;
     }
   }
 }

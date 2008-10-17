@@ -41,14 +41,12 @@ public final class Context {
   }
   
   /**
-   * Returns true if the current node set refers to the root node.
+   * Returns true if all current nodes refer to document nodes.
    * @return result of check
-  */
+   */
   public boolean root() {
     if(current == null) return true;
-    for(int c = 0; c < current.size; c++) {
-      if(data.kind(current.nodes[c]) != Data.DOC) return false;
-    }
+    for(final int n : current.nodes) if(data.kind(n) != Data.DOC) return false;
     return true;
   }
   

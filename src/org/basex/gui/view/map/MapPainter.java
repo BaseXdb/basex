@@ -2,6 +2,8 @@ package org.basex.gui.view.map;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.ArrayList;
+
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
@@ -34,7 +36,7 @@ abstract class MapPainter {
    * @param rs array size
    * @return next color mark
    */
-  Color nextMark(final MapRects rects, final int pre, final int ri,
+  Color nextMark(final ArrayList<MapRect> rects, final int pre, final int ri,
       final int rs) {
 
     final Nodes marked = GUI.context.marked();
@@ -57,7 +59,8 @@ abstract class MapPainter {
    * @param g graphics reference
    * @param rects rectangle array
    */
-  abstract void drawRectangles(final Graphics g, final MapRects rects);
+  abstract void drawRectangles(final Graphics g,
+      final ArrayList<MapRect> rects);
 
   /**
    * Checks mouse activity.
@@ -73,7 +76,7 @@ abstract class MapPainter {
    * Initializes the skipping of nodes.
    * @param rects rectangle array
    */
-  abstract void init(MapRects rects);
+  abstract void init(ArrayList<MapRect> rects);
 
   /**
    * Resets the painter.

@@ -39,9 +39,9 @@ public final class InfoTable extends AInfo {
     final Data data = context.data();
 
     if(result != null) {
-      final Nodes nodes = (Nodes) result;
+      final int[] nodes = ((Nodes) result).nodes;
       tableHeader(out, data);
-      for(int i = 0; i < nodes.size; i++) table(out, data, nodes.nodes[i]);
+      for(final int n : nodes) table(out, data, n);
     } else {
       int ps = 0;
       int pe = data.size;

@@ -119,21 +119,20 @@ public final class TableContent extends BaseXBack {
         if(ti.pre == focus || data.parent(ti.pre, data.kind(ti.pre)) == focus)
             fcol = c;
 
-        // add content to column...
-        if(tb[c].size > 100) {
-          // don't add content if string is already too long
-          tb[c].add("...");
-          break;
+        // add content to column (skip too long contents)...
+        if(tb[c].size < 100) {
+          if(tb[c].size != 0) tb[c].add("; ");
+          byte[] txt = ti.elem ? data.text(ti.pre) : data.attValue(ti.pre);
+          if(tdata.cols.list[c] == data.atts.id(DataText.MTIME)) {
+            txt = Token.token(new SimpleDateFormat("dd.MM.yyyy").
+                format(new Date(Token.toLong(txt) * 60000)));
+          }
+          tb[c].add(txt);
         }
-        
-        if(tb[c].size != 0) tb[c].add("; ");
-        byte[] txt = ti.elem ? data.text(ti.pre) : data.attValue(ti.pre);
-        if(tdata.cols.list[c] == data.atts.id(DataText.MTIME)) {
-          txt = Token.token(new SimpleDateFormat("dd.MM.yyyy").
-              format(new Date(Token.toLong(txt) * 60000)));
-        }
-        tb[c].add(txt);
       }
+
+      // add dots if content is too long
+      for(int t = 0; t < tb.length; t++) if(tb[t].size > 100) tb[t].add("...");
 
       // draw row contents
       byte[] focusStr = null;

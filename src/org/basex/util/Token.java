@@ -808,10 +808,9 @@ public final class Token {
    * @return new instance
    */
   public static byte[] delete(final byte[] t, final int c) {
-    int e = t.length;
-    for(int r = t.length - 1; r >= 0; r--)
-      if(t[r] == c && r < --e) Array.move(t, r + 1, -1, e - r);
-    return Array.finish(t, e);
+    final TokenBuilder sb = new TokenBuilder(t.length);
+    for(final byte b : t) if(b != c) sb.add(b);
+    return sb.finish();
   }
 
   /**
@@ -821,17 +820,13 @@ public final class Token {
    * @return new instance
    */
   public static byte[] delete(final byte[] t, final byte[] c) {
-    final int cl = c.length;
-    byte[] res = t;
-    int i;
-    while((i = indexOf(res, c)) != -1) {
-      final int rl = res.length;
-      final byte[] tmp = new byte[rl - cl];
-      System.arraycopy(res, 0, tmp, 0, i);
-      System.arraycopy(res, i + cl, tmp, i, rl - cl - i);
-      res = tmp;
+    final TokenBuilder sb = new TokenBuilder(t.length);
+    int i = indexOf(t, c);
+    for(int b = 0; b < t.length;) {
+      if(i == b) i = indexOf(t, c, b += c.length);
+      else sb.add(t[b++]);
     }
-    return res;
+    return sb.finish();
   }
 
   /**

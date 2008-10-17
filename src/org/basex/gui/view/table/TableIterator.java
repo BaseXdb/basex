@@ -53,11 +53,7 @@ public final class TableIterator {
    * @return result of check
    */
   boolean more() {
-    while(true) {
-      // skip attributes or descendant nodes
-      pre += data.fs != null ? 1 : data.attSize(pre, data.kind(pre));
-      if(pre >= last) return false;
-      
+    while(++pre < last) {
       final int k = data.kind(pre);
       elem = k == Data.TEXT;
 
@@ -66,8 +62,9 @@ public final class TableIterator {
         final int t = elem ? tag : data.attNameID(pre);
         // find correct column...
         for(col = 0; col < tdata.cols.size; col++) {
-          if(tdata.cols.list[col] == t && tdata.elms.list[col] == elem)
+          if(tdata.cols.list[col] == t && tdata.elms.list[col] == elem) {
             return true;
+          }
         }
       } else if(k == Data.ELEM) {
         // remember last tag
@@ -75,5 +72,6 @@ public final class TableIterator {
         if(tag == rootTag) return false;
       }
     }
+    return false;
   }
 }

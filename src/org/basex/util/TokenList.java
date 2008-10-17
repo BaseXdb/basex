@@ -1,7 +1,10 @@
 package org.basex.util;
 
+import static org.basex.util.Token.*;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Iterator;
+import org.basex.BaseX;
 
 /**
  * This is a simple container for native byte[] values (tokens).
@@ -9,7 +12,7 @@ import java.util.Comparator;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class TokenList {
+public final class TokenList implements Iterable<byte[]> {
   /** Value array. */
   public byte[][] list = new byte[8][];
   /** Current array size. */
@@ -38,18 +41,6 @@ public final class TokenList {
   }
   
   /**
-   * Removes the specified value.
-   * @param i value index
-   * @return removed value
-   */
-  public byte[] delete(final int i) {
-    if(size == 0 || size < i) throw new IndexOutOfBoundsException();
-    final byte[] l = list[i];
-    System.arraycopy(list, i + 1, list, i, size-- - i);
-    return l;
-  }
-  
-  /**
    * Checks if the specified token is found in the list.
    * @param v token to be checked
    * @return true if value is found
@@ -60,11 +51,21 @@ public final class TokenList {
   }
 
   /**
-   * Finishes the int array.
-   * @return int array
+   * Finishes the array.
+   * @return array
    */
   public byte[][] finish() {
     return size == list.length ? list : Array.finish(list, size);
+  }
+
+  /**
+   * Finishes the list as string array.
+   * @return array
+   */
+  public String[] finishString() {
+    final String[] items = new String[size];
+    for(int i = 0; i < items.length; i++) items[i] = string(list[i]);
+    return items;
   }
 
   /**
@@ -94,5 +95,14 @@ public final class TokenList {
         return cs ? Token.diff(s1, s2) : Token.diff(Token.lc(s1), Token.lc(s2));
       }
     });
+  }
+
+  public Iterator<byte[]> iterator() {
+    return new Iterator<byte[]>() {
+      private int c = -1;
+      public boolean hasNext() { return ++c < size; }
+      public byte[] next() { return list[c]; }
+      public void remove() { BaseX.notimplemented(); }
+    };
   }
 }

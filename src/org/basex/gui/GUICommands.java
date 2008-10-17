@@ -269,8 +269,8 @@ public enum GUICommands implements GUICommand {
         nodes.size != 0 && (nodes.size != 1 || nodes.nodes[0] != 0);
       if(s) {
         final Data d = nodes.data;
-        for(int n = 0; n < nodes.size; n++) {
-          if(d.kind(nodes.nodes[n]) != Data.ELEM) {
+        for(final int n : nodes.nodes) {
+          if(d.kind(n) != Data.ELEM) {
             s = false;
             break;
           }

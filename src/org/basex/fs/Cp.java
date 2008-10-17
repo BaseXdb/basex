@@ -147,9 +147,9 @@ public final class Cp extends FSCmd {
           toInsert.add(fs.suffix(i));
           toInsert.add(fs.size(i));
         }
-        for(int j = 0; j < toInsert.size; ++j) {
-          fs.insert(false, toInsert.delete(0), toInsert.delete(0),
-              toInsert.delete(0), fs.currTime(), target[0], preOfNewFile);
+        for(int j = 0; j < toInsert.size; j += 3) {
+          fs.insert(false, toInsert.list[j], toInsert.list[j + 1],
+              toInsert.list[j + 2], fs.currTime(), target[0], preOfNewFile);
         }
         break;
       }
@@ -231,15 +231,15 @@ public final class Cp extends FSCmd {
     // insert fs hierarchy
     copyRoot = parPre;
     final byte[] f = Token.token("f");
-    while(toInsert.size != 0) {
-      if(toInsert.list[0] == null) {
-        toInsert.delete(0);
-        parPre = fs.goTo(copyRoot, Token.string(toInsert.delete(0)));
+    for(int i = 0; i < toInsert.size;) {
+      if(toInsert.list[i] == null) {
+        i++;
+        parPre = fs.goTo(copyRoot, Token.string(toInsert.list[i++]));
         continue;
       }
-      final boolean isDir = !Token.eq(toInsert.delete(0), f);
-      fs.insert(isDir, toInsert.delete(0), toInsert.delete(0),
-          toInsert.delete(0), fs.currTime(), parPre,
+      final boolean isDir = !Token.eq(toInsert.list[i++], f);
+      fs.insert(isDir, toInsert.list[i++], toInsert.list[i++],
+          toInsert.list[i++], fs.currTime(), parPre,
           parPre + DataFS.NUMATT);
     }
   }

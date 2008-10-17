@@ -65,7 +65,7 @@ public final class XPSuggest extends XPParser {
       list = new ArrayList<Node>();
       list.add(skel.root());
     } else {
-      list = skel.desc(stack.peek(), 0, false);
+      list = skel.desc(stack.peek(), 0, Data.ELEM, false);
     }
 
     stack.push(list);
@@ -86,14 +86,16 @@ public final class XPSuggest extends XPParser {
   void checkStep(final Axis axis, final Test test) {
     filter(true);
     if(axis == null) {
-      stack.push(skel.desc(stack.pop(), 0, false));
+      stack.push(skel.desc(stack.pop(), 0, Data.ELEM, false));
       return;
     }
 
-    if(axis == Axis.CHILD || axis == Axis.ATTR) {
-      stack.push(skel.desc(stack.pop(), 0, false));
+    if(axis == Axis.CHILD) {
+      stack.push(skel.desc(stack.pop(), 0, Data.ELEM, false));
+    } else if(axis == Axis.ATTR) {
+      stack.push(skel.desc(stack.pop(), 0, Data.ATTR, false));
     } else if(axis == Axis.DESC || axis == Axis.DESCORSELF) {
-      stack.push(skel.desc(stack.pop(), 0, true));
+      stack.push(skel.desc(stack.pop(), 0, Data.ELEM, true));
     } else {
       stack.peek().clear();
     }

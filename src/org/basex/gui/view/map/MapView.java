@@ -9,6 +9,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Random;
 import javax.swing.SwingUtilities;
 import org.basex.core.Context;
@@ -47,7 +48,7 @@ public final class MapView extends View implements Runnable {
   /** Layout rectangle. */
   MapRect layout;
   /** Array of current rectangles. */
-  private MapRects mainRects;
+  private ArrayList<MapRect> mainRects;
   /** Data specific map layout. */
   private MapPainter painter;
 
@@ -133,8 +134,7 @@ public final class MapView extends View implements Runnable {
     if(focused == -1 && focusedRect != null) focusedRect = null;
 
     final MapRect m = focusedRect;
-    int mi = 0;
-    for(final int ms = mainRects.size; mi < ms; mi++) {
+    for(int mi = 0, ms = mainRects.size(); mi < ms; mi++) {
       final MapRect rect = mainRects.get(mi);
       if(focused == rect.p || mi + 1 < ms &&
           focused < mainRects.get(mi + 1).p) {
@@ -253,7 +253,7 @@ public final class MapView extends View implements Runnable {
     /* Loop through all rectangles. As the rectangles are sorted by pre
      * order and small rectangles are descendants of bigger ones, the
      * focused rectangle can be found by simply parsing the array backward. */
-    int r = mainRects.size;
+    int r = mainRects.size();
     while(--r >= 0) {
       final MapRect rect = mainRects.get(r);
       if(rect.contains(mouseX, mouseY)) break;
@@ -284,7 +284,7 @@ public final class MapView extends View implements Runnable {
 
     // calculate new main rectangles
     if(painter == null) return null;
-    mainRects = new MapRects();
+    mainRects = new ArrayList<MapRect>();
     painter.reset();
 
     layout = null;
@@ -445,7 +445,7 @@ public final class MapView extends View implements Runnable {
     }
 
     // skip node path view
-    if(focusedRect == null || mainRects.size == 1 &&
+    if(focusedRect == null || mainRects.size() == 1 &&
         focusedRect == mainRects.get(0)) {
       painting = false;
       return;
@@ -453,7 +453,7 @@ public final class MapView extends View implements Runnable {
 
     if(GUIProp.maplayout == 0) {
       g.setColor(GUIConstants.COLORS[32]);
-      int pre = mainRects.size;
+      int pre = mainRects.size();
       int par = ViewData.parent(data, focusedRect.p);
       while(--pre >= 0) {
         final MapRect rect = mainRects.get(pre);
@@ -606,7 +606,7 @@ public final class MapView extends View implements Runnable {
       // right mouse button
       if(marked.find(pre) < 0) notifyMark(0);
     } else if(e.getClickCount() == 2) {
-      if(mainRects.size != 1) notifyContext(marked, false);
+      if(mainRects.size() != 1) notifyContext(marked, false);
     } else if(e.isShiftDown()) {
       notifyMark(1);
     } else if(e.isControlDown()) {
@@ -634,8 +634,7 @@ public final class MapView extends View implements Runnable {
     final Data data = context.data();
     final IntList list = new IntList();
     int np = 0;
-    int r = -1;
-    while(++r < mainRects.size) {
+    for(int r = 0, rl = mainRects.size(); r < rl; r++) {
       final MapRect rect = mainRects.get(r);
       if(mainRects.get(r).p < np) continue;
       if(dragRect.contains(rect)) {

@@ -4,11 +4,18 @@ import static org.basex.Text.*;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
+import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
@@ -18,6 +25,7 @@ import org.basex.gui.layout.BaseXBar;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPanel;
 import org.basex.gui.view.View;
+import org.basex.util.Token;
 
 /**
  * This is the header of the table view.
@@ -30,6 +38,8 @@ public final class TableHeader extends BaseXPanel {
   TableView view;
   /** Table Data. */
   TableData tdata;
+  /** Header flag. */
+  boolean header;
   /** Clicked column. */
   int clickCol = -1;
   /** Input column. */
@@ -78,6 +88,9 @@ public final class TableHeader extends BaseXPanel {
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
+    BaseXLayout.antiAlias(g);
+    ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
+        RenderingHints.VALUE_ANTIALIAS_ON);
     
     g.setFont(GUIConstants.font);
     if(tdata.cols == null || tdata.colW == null || tdata.cols.size == 0) {
@@ -90,7 +103,7 @@ public final class TableHeader extends BaseXPanel {
     int w = getWidth();
     final int h = getHeight();
     final int hh = h >> 1;
-    g.setColor(Color.white);
+    g.setColor(GUIConstants.color1);
     g.drawLine(0, h - 1, w, h - 1);
 
     w -= bs;
@@ -101,7 +114,8 @@ public final class TableHeader extends BaseXPanel {
       final double ce = x + cw;
 
       // header
-      BaseXLayout.drawCell(g, (int) x, (int) ce, 0, hh, false);
+      final boolean clicked = n == clickCol && moveC == -1 && header;
+      BaseXLayout.drawCell(g, (int) x, (int) ce + 1, 0, hh, clicked);
       // input field
       g.setColor(Color.white);
       g.fillRect((int) x + 1, hh, (int) ce - (int) x - 2, hh - 2);
@@ -109,40 +123,47 @@ public final class TableHeader extends BaseXPanel {
       g.setColor(GUIConstants.color5);
       g.drawLine((int) ce, hh - 1, (int) ce, h - 2);
       
-      // header
+      // draw headers
       g.setColor(GUIConstants.color6);
       g.setFont(GUIConstants.bfont);
-      final int off = n == clickCol ? 1 : 0;
+
+      final int off = clicked ? 1 : 0;
       BaseXLayout.chopString(g, tdata.colNames.list[n],
           (int) x + 4 + off, 2 + off, (int) cw);
       
       if(n == tdata.sortCol) {
-        if(tdata.asc) g.drawPolygon(new int[] { (int) ce - 12 + off,
-            (int) ce - 6 + off, (int) ce - 9 + off },
+        if(tdata.asc) g.fillPolygon(new int[] { (int) ce - 9 + off,
+            (int) ce - 3 + off, (int) ce - 6 + off },
             new int[] { 4 + off, 4 + off, 8 + off }, 3);
-        else g.drawPolygon(new int[] { (int) ce - 12 + off, (int) ce - 6 + off,
-            (int) ce - 9 + off }, new int[] { 8 + off, 8 + off, 4 + off }, 3);
+        else g.fillPolygon(new int[] { (int) ce - 9 + off, (int) ce - 3 + off,
+            (int) ce - 6 + off }, new int[] { 8 + off, 8 + off, 4 + off }, 3);
       }
       
+      // draw filter texts
       if(box != null && inputCol == n) {
         box.paint(g, (int) x, hh, (int) ce - (int) x, hh);
       } else {
-        g.setColor(Color.black);
+        g.setColor(GUIConstants.color6);
         g.setFont(GUIConstants.font);
         g.drawString(tdata.filter[n], (int) x + 5, h - 7);
       }
       x = ce;
     }
-    final byte[] reset = { 'x' };
-    int p = (bs - BaseXLayout.width(g, reset)) / 2;
-    BaseXLayout.drawCell(g, (int) x, w + bs, 0, hh, false);
-    BaseXLayout.drawCell(g, (int) x, w + bs, hh - 1, h, false);
+    
+    final boolean clicked =  nc == clickCol;
+    BaseXLayout.drawCell(g, (int) x, w + bs, 0, hh, clicked && header);
+    BaseXLayout.drawCell(g, (int) x, w + bs, hh - 1, h, clicked && !header);
     g.setColor(GUIConstants.color6);
-    p += nc == clickCol ? 1 : 0;
-    final int y = nc == clickCol ? 3 : 2;
     g.setFont(GUIConstants.bfont);
-    BaseXLayout.chopString(g, reset, (int) x + p, y, w);
-    BaseXLayout.chopString(g, reset, (int) x + p, hh + y - 1, w);
+       
+    int o = header && clicked ? 1 : 0;
+    g.fillPolygon(new int[] { (int) x + o + 3, (int) x + o + bs - 5,
+        (int) x + o + bs / 2 - 1 }, new int[] { o + 6, o + 6, o + bs - 3 }, 3);
+    
+    o = !header && clicked ? 1 : 0;
+    final byte[] reset = { 'x' };
+    x += (bs - BaseXLayout.width(g, reset)) / 2;
+    BaseXLayout.chopString(g, reset, (int) x + o, hh + o + 1, w);
   }
 
   @Override
@@ -180,71 +201,105 @@ public final class TableHeader extends BaseXPanel {
     return -1;
   }
 
-
-
-  @Override
-  public void mouseReleased(final MouseEvent e) {
-    if(header(e.getY())) {
-      clickCol = -1;
-      repaint();
-    }
-  }
-
   @Override
   public void mouseDragged(final MouseEvent e) {
-    if(moveC == -1) return;
-    
-    final int x = e.getX();
-    final double p = (double) (x - mouseX) / (getWidth() - BaseXBar.SIZE);
-    final double[] ww = tdata.colW.clone();
-    
-    if(e.isShiftDown()) {
-      ww[moveC - 1] += p;
-      ww[moveC] -= p;
-    } else {
-      for(int i = 0; i < moveC; i++) ww[i] += p / moveC;
-      for(int i = moveC; i < ww.length; i++) ww[i] -= p / (ww.length - moveC);
+    if(moveC != -1) {
+      final int x = e.getX();
+      final double p = (double) (x - mouseX) / (getWidth() - BaseXBar.SIZE);
+      final double[] ww = tdata.colW.clone();
+      
+      if(e.isShiftDown()) {
+        ww[moveC - 1] += p;
+        ww[moveC] -= p;
+      } else {
+        for(int i = 0; i < moveC; i++) ww[i] += p / moveC;
+        for(int i = moveC; i < ww.length; i++) ww[i] -= p / (ww.length - moveC);
+      }
+      for(final double w : ww) if(w < 0.0001) return;
+      mouseX = x;
+      tdata.colW = ww;
+    } else if(clickCol != -1) {
+      int c = tdata.column(getWidth() - BaseXBar.SIZE, e.getX());
+      if(c == -1) c = tdata.cols.size;
+      if(c != clickCol || header != header(e.getY())) clickCol = -1;
     }
-    for(double w : ww) if(w < 0.0001) return;
-    mouseX = x;
-    tdata.colW = ww;
-    
     view.repaint();
   }
   
   @Override
   public void mouseExited(final MouseEvent e) {
     GUI.get().cursor(GUIConstants.CURSORARROW);
+    clickCol = -1;
   }
 
   @Override
   public void mousePressed(final MouseEvent e) {
     super.mousePressed(e);
-
     if(!SwingUtilities.isLeftMouseButton(e)) return;
+    clickCol = tdata.column(getWidth() - BaseXBar.SIZE, mouseX);
+    if(clickCol == -1) clickCol = tdata.cols.size;
+    header = header(e.getY());
+    repaint();
+  }
+  
+  @Override
+  public void mouseReleased(final MouseEvent e) {
+    super.mouseReleased(e);
+    if(clickCol == -1) return;
     
     // header
-    final int col = tdata.column(getWidth(), mouseX);
     if(header(e.getY())) {
       if(moveC == -1) {
-        // sort data in current column
-        clickCol = col;
-        tdata.asc = tdata.sortCol == col ? !tdata.asc : true;
-        tdata.sortCol = col;
-        if(col == -1) tdata.calcWidths();
-        tdata.createRows();
-        view.repaint();
+        if(clickCol == tdata.cols.size) {
+          //tdata.calcWidths();
+          chooseRoot(e);
+        } else {
+          // sort data in current column
+          GUI.get().cursor(GUIConstants.CURSORWAIT);
+          tdata.asc = tdata.sortCol == clickCol ? !tdata.asc : true;
+          tdata.sortCol = clickCol;
+          tdata.createRows();
+          GUI.get().cursor(GUIConstants.CURSORARROW, true);
+        }
       }
     } else {
       // activate table filter
-      if(col != -1) {
-        filter(col);
+      if(clickCol != tdata.cols.size) {
+        filter(clickCol);
       } else {
         // reset table filter
         tdata.resetFilter();
         tdata.find();
       }
     }
+    clickCol = -1;
+    view.repaint();
+  }
+
+  /**
+   * Shows a popup menu to choose main category to be displayed.
+   * @param e event reference
+   */
+  private void chooseRoot(final MouseEvent e) {
+    if(tdata.roots.size == 0) return;
+      
+    final Data data = GUI.context.data();
+    final JPopupMenu popup = new JPopupMenu("History");
+    final ActionListener al = new ActionListener() {
+      public void actionPerformed(final ActionEvent ac) {
+        final int root = data.tags.id(Token.token(ac.getActionCommand()));
+        tdata.init(data, root);
+        view.refreshContext(true, false);
+        popup.setVisible(false);
+      }
+    };
+    
+    for(final byte[] en : tdata.roots) {
+      final JMenuItem jmi = new JMenuItem(Token.string(en));
+      jmi.addActionListener(al);
+      popup.add(jmi);
+    }
+    popup.show(this, e.getX(), e.getY());
   }
   
   /**

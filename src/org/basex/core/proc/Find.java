@@ -256,10 +256,9 @@ public final class Find extends AQuery {
           } else if(att) {
             tb.add(" = ");
           } else {
-            if(data.meta.ftxindex) {
+            if(data.meta.ftxindex || spl.length > 1 ||
+                !data.meta.txtindex && !att) {
               tb.add(" ftcontains ");
-            } else if(spl.length > 1 || !data.meta.txtindex && !att) {
-              tb.add(" contains ");
             } else {
               tb.add(" = ");
             }

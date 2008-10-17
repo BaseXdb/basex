@@ -1,5 +1,6 @@
 package org.basex.gui.view.table;
 
+import static org.basex.util.Token.*;
 import org.basex.core.Context;
 import org.basex.core.proc.Find;
 import org.basex.core.proc.XPath;
@@ -8,6 +9,7 @@ import org.basex.data.DataText;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
+import org.basex.index.Names;
 import org.basex.util.BoolList;
 import org.basex.util.IntList;
 import org.basex.util.Token;
@@ -23,14 +25,16 @@ public final class TableData {
   /** Number of rows which is parsed for a new document. */
   private static final int MAXROWS = 1000;
 
+  /** Root nodes. */
+  TokenList roots;
   /** Row references. */
   IntList rows;
   /** Tag/Attribute flag. */
   TokenList colNames = new TokenList();
   /** Column IDs. */
-  final IntList cols = new IntList();
+  IntList cols = new IntList();
   /** Tag/Attribute flags. */
-  final BoolList elms = new BoolList();
+  BoolList elms = new BoolList();
   /** Column widths. */
   double[] colW;
   /** Row height. */
@@ -62,6 +66,19 @@ public final class TableData {
    * @param data data reference
    */
   void init(final Data data) {
+    roots = new TokenList();
+    for(final byte[] k : data.skel.desc(Token.EMPTY, true, true)) {
+      if(data.skel.desc(k, true, false).size > 1) roots.add(k);
+    }
+    init(data, -1);
+  }
+  
+  /**
+   * Initializes the table data.
+   * @param root optional root node (ignored if -1)
+   * @param data data reference
+   */
+  void init(final Data data, final int root) {
     colNames.reset();
     cols.reset();
     elms.reset();
@@ -75,7 +92,7 @@ public final class TableData {
     rowH = 1;
 
     if(data.fs != null) {
-      rootTag = data.tags.id(DataText.FILE);
+      rootTag = root != -1 ? root : data.tags.id(DataText.FILE);
       addCol("suffix", false);
       addCol("name", false);
       addCol("size", false);
@@ -89,7 +106,7 @@ public final class TableData {
       addCol("Seconds", true);
     } else {
       // choose root element and columns to be shown
-      createTable();
+      createTable(root);
     }
     filter = new String[cols.size];
     resetFilter();
@@ -132,74 +149,38 @@ public final class TableData {
 
   /**
    * Creates the table layout.
+   * @param root optional root tag (ignored if -1)
    * ...better algorithm needed to support more documents!
    */
-  private void createTable() {
+  void createTable(final int root) {
+    if(roots.size == 0) return;
+    
     final Data data = GUI.context.data();
-    int p = 0;
-    int pre = 0;
-    while(++p < data.size) {
-      final int kind = data.kind(p);
-      // skip nodes other than elements
-      if(kind != Data.ELEM) continue;
+    rootTag = root == -1 ? data.tags.id(roots.list[0]) : root;
 
-      final int tag = data.tagID(p);
-      // get number of tag occurrences
-      final int occ = data.tags.counter(rootTag);
-      // select tag as root node if it occurs often, but not too often..
-      if(occ > data.tags.counter(tag) / 2 && occ > data.size / 100) {
-        createCols(pre);
-        return;
-      }
-      rootTag = tag;
-      pre = p;
-    }
-  }
-
-  /**
-   * Creates the columns of the table.
-   * @param pre pre value to start from (root tag)
-   */
-  private void createCols(final int pre) {
-    final Data data = GUI.context.data();
-    final byte[] tag = data.tag(pre);
-
-    final int s = pre + data.size(pre, data.kind(pre));
-    if(data.size != s && !Token.eq(tag, data.tag(s))) return;
-
-    // scan first MAXROWS root tags
-    int p = pre;
-    for(int i = 0; i < MAXROWS && p < data.size; i++) {
-      final int size = p + data.size(p, data.kind(p));
-      p += data.attSize(p, Data.ELEM);
-      while(p < size) {
-        final int k = data.kind(p);
-        final int np = p + data.attSize(p, k);
-        if(k == Data.ELEM && np != size && data.kind(np) == Data.TEXT) {
-          final int nt = data.tagID(p);
-          if(!cols.contains(nt)) {
-            cols.add(nt);
-            elms.add(true);
-            colNames.add(data.tag(p));
-          }
-        }
-        p += data.size(p, k);
-      }
+    for(final byte[] k : data.skel.desc(data.tags.key(rootTag), true, true)) {
+      final boolean elem = !startsWith(k, '@');
+      final byte[] key = delete(k, '@');
+      final Names index = elem ? data.tags : data.atts;
+      final int id = index.id(key);
+      if(index.noLeaf(id)) continue;
+      cols.add(id);
+      elms.add(elem);
+      colNames.add(key);
     }
   }
 
   /**
    * Creates the row list for the specified nodes.
-   * ...recursive tags work for the file system, but not for other data.
    */
   void createRows() {
     final Context context = GUI.context;
-    final Nodes n = context.current();
     final Data data = context.data();
+    final int[] n = context.current().nodes;
 
     rows = new IntList();
-    for(int c = 0; c < n.size; c++) {
-      int p = n.nodes[c];
+    for(int c = 0; c < n.length; c++) {
+      int p = n[c];
 
       final int s = p + data.size(p, data.kind(p));
       // find first root tag
@@ -211,7 +192,6 @@ public final class TableData {
       while(p < s) {
         final int k = data.kind(p);
         if(k == Data.ELEM && data.tagID(p) == rootTag) rows.add(p);
-        //p += fs ? data.attSize(p, k) : data.size(p, k);
         p += data.attSize(p, k);
       }
     }
@@ -223,11 +203,13 @@ public final class TableData {
    */
   void calcWidths() {
     final Data data = GUI.context.data();
-    colW = new double[cols.size];
+    final int cs = cols.size;
+    colW = new double[cs];
 
     // scan first MAXROWS root tags
     final int nRows = rows.size;
     final TableIterator ti = new TableIterator(data, this);
+    
     for(int l = 0; l < MAXROWS && l < nRows; l++) {
       final int pre = rows.list[l];
 
@@ -235,22 +217,46 @@ public final class TableData {
       ti.init(pre);
       while(ti.more()) {
         // add string length...
+        //if(colW[c].size < 100) {
         colW[ti.col] += ti.elem ? data.textLen(ti.pre) :
           data.attValue(ti.pre).length;
       }
     }
+    for(int c = 0; c < cs; c++) {
+      System.out.println(c + ": " + colW[c]);
+    }
+    System.out.println("---------");
 
     // calculate width of each column
     double sum = 0;
-    for(int c = 0; c < cols.size; c++) sum += colW[c];
+    for(int c = 0; c < cs; c++) sum += colW[c];
     // avoid too small columns
-    for(int c = 0; c < cols.size; c++) {
-      colW[c] = Math.max(1.0 / cols.size, colW[c] / sum);
-    }
+    for(int c = 0; c < cs; c++) colW[c] = Math.max(0.5 / cs, colW[c] / sum);
     // normalize widths
     sum = 0;
-    for(int c = 0; c < cols.size; c++) sum += colW[c];
-    for(int c = 0; c < cols.size; c++) colW[c] /= sum;
+    for(int c = 0; c < cs; c++) sum += colW[c];
+    for(int c = 0; c < cs; c++) colW[c] /= sum;
+    
+    // sort columns by string lengths
+    final TokenList tl = new TokenList();
+    for(int c = 0; c < cs; c++) tl.add(Token.token(colW[c]));
+    final IntList il = IntList.createOrder(tl.finish(), true, false);
+    
+    final double[] cw = new double[cs];
+    final IntList co = new IntList();
+    final BoolList ce = new BoolList();
+    final TokenList cn = new TokenList();
+    for(int c = 0; c < cs; c++) {
+      final int i = il.list[c];
+      cw[c] = colW[i];
+      co.add(cols.list[i]);
+      ce.add(elms.list[i]);
+      cn.add(colNames.list[i]);
+    }
+    colW = cw;
+    cols = co;
+    elms = ce;
+    colNames = cn;
   }
 
   /**
@@ -312,12 +318,12 @@ public final class TableData {
    * @return column
    */
   int column(final int w, final int mx) {
-    double x = 0;
+    double cs = 0;
     for(int i = 0; i < cols.size; i++) {
       final double cw = w * colW[i];
-      final double ce = x + cw;
-      if(mx > x && mx < ce) return i;
-      x = ce;
+      final double ce = cs + cw;
+      if(mx > cs && mx < ce) return i;
+      cs = ce;
     }
     return -1;
   }

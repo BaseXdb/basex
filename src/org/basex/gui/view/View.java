@@ -139,7 +139,7 @@ public abstract class View extends BaseXPanel {
     if(mode == 0) {
       nodes = new Nodes(focused, context.data());
     } else if(mode == 1) {
-      nodes.add(focused);
+      nodes.union(new int[] { focused });
     } else {
       nodes.toggle(focused);
     }
@@ -196,7 +196,7 @@ public abstract class View extends BaseXPanel {
       maxhist = hist;
     } else {
       // check if current node set has already been cached
-      if(!NODEHIST[hist].sameAs(context.current())) {
+      if(!NODEHIST[hist].same(context.current())) {
         checkHist();
         // add new entry
         QUERYHIST[hist] = "";

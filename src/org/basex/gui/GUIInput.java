@@ -227,11 +227,6 @@ public final class GUIInput extends BaseXTextField {
 
     if(comboChanged(sl)) {
       box.setSelectedItem(null);
-      /*
-      box.removeAllItems();
-      for(int i = 0; i < sl.size; i++) box.addItem(sl.list[i]);
-      box.setSelectedIndex(0);
-      */
       box.setModel(new DefaultComboBoxModel(sl.finish()));
       pop = new ComboPopup(box);
     }

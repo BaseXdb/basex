@@ -6,6 +6,8 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Font;
+import java.awt.SystemColor;
+
 import javax.swing.UIManager;
 import org.basex.Text;
 
@@ -159,6 +161,10 @@ public final class GUIConstants {
   public static final Color COLORQUOTE = new Color(0, 0, 192);
   /** Button color. */
   public static final Color COLORBUTTON = Color.gray;
+  /** Scrollbar color. */
+  public static final Color COLORSCROLL = SystemColor.control;
+  /** Background color. */
+  public static final Color COLORBACK = SystemColor.control;
 
   /** Bright GUI color. */
   public static Color color1;

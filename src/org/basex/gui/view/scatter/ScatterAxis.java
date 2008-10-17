@@ -2,7 +2,6 @@ package org.basex.gui.view.scatter;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-
 import org.basex.data.Data;
 import org.basex.data.StatsKey;
 import org.basex.data.StatsKey.Kind;
@@ -68,11 +67,9 @@ public final class ScatterAxis {
    */
   boolean setAxis(final String attribute) {
     if(attribute == null) return false;
-    byte[] b = Token.token(attribute);
-    final boolean tmp = !Token.contains(b, AT);
-    b = Token.delete(b, AT);
-    isTag = tmp;
-    attr = b;
+    final byte[] b = Token.token(attribute);
+    isTag = !Token.contains(b, AT);
+    attr = Token.delete(b, '@');
     refreshAxis();
     return true;
   }

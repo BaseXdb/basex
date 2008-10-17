@@ -130,10 +130,8 @@ public final class Ls extends FSCmd {
     final TokenList sizes = new TokenList(n);
     final TokenList times = new TokenList(n);
     final BoolList dirs = new BoolList(n);
-    final IntList nodes = new IntList(n);
     // max width of file names and sizes
     int maxN = 1, maxS = 1;
-    int c = 0;
     for(final int pre : result) {
       byte[] tok = fs.name(pre);
       names.add(fs.name(pre));
@@ -143,13 +141,13 @@ public final class Ls extends FSCmd {
       maxS = Math.max(maxS, tok.length);
       times.add(fs.time(pre));
       dirs.add(fs.isDir(pre));
-      nodes.add(c++);
     }
     
     // define sort key and sort entries
     final TokenList sort = fSize ? sizes : fTime ? times : names;
     final boolean num = fSize || fTime;
-    nodes.sort(Array.finish(sort.finish(), n), num, !(num ^ fReverse));
+    final IntList nodes = IntList.createOrder(
+        Array.finish(sort.finish(), n), num, !(num ^ fReverse));
 
     // calculate output widths
     int col = 0;
@@ -160,7 +158,7 @@ public final class Ls extends FSCmd {
     // output list and cache directory entries
     final IntList dpre = new IntList();
     for(int i = 0; i < nodes.size; i++) {
-      c = nodes.list[i];
+      int c = nodes.list[i];
       
       final boolean dir = dirs.list[c];
       if(dir) dpre.add(result[c]);

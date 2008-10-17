@@ -1,10 +1,9 @@
 package org.basex.query.xpath.expr;
 
+import org.basex.data.Nodes;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
-import org.basex.query.xpath.values.NodeBuilder;
 import org.basex.query.xpath.values.NodeSet;
-import org.basex.util.Array;
 
 /**
  * XPath Union Expression. This expresses the union of two node sets.
@@ -24,29 +23,8 @@ public final class Union extends ArrayExpr {
   @Override
   public NodeSet eval(final XPContext ctx) throws QueryException {
     int[] result = ((NodeSet) (ctx.eval(exprs[0]))).nodes;
-    final NodeBuilder tmp = new NodeBuilder();
-
     for(int i = 1; i != exprs.length; i++) {
-      final int rl = result.length;
-
-      final int[] merge = ((NodeSet) (ctx.eval(exprs[i]))).nodes;
-      final int ml = merge.length;
-
-      int m = 0;
-      int r = 0;
-      while(m != ml && r != rl) {
-        final int d = merge[m] - result[r];
-        if(d <= 0) {
-          tmp.add(merge[m++]);
-          if(d == 0) r++;
-        } else {
-          tmp.add(result[r++]);
-        }
-      }
-      while(m != ml) tmp.add(merge[m++]);
-      while(r != rl) tmp.add(result[r++]);
-      result = Array.finish(tmp.nodes, tmp.size);
-      tmp.reset();
+      result = Nodes.union(((NodeSet) (ctx.eval(exprs[i]))).nodes, result);
     }
     return new NodeSet(result, ctx);
   }

@@ -33,9 +33,9 @@ import org.basex.gui.layout.TableLayout;
 import org.basex.index.Names;
 import org.basex.query.xpath.func.ContainsLC;
 import org.basex.util.Set;
-import org.basex.util.StringList;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
+import org.basex.util.TokenList;
 
 /**
  * This is a simple user search panel.
@@ -190,22 +190,21 @@ final class QuerySimple extends QueryPanel implements ActionListener {
    * @param data data reference
    */
   void addKeys(final Data data) {
-    final StringList sl = new StringList();
+    final TokenList sl = new TokenList();
     final int cs = panel.getComponentCount();
     for(int c = 0; c < cs; c += 2) {
       final BaseXCombo combo = (BaseXCombo) panel.getComponent(c);
       if(combo.getSelectedIndex() == 0) continue;
       final String elem = combo.getSelectedItem().toString();
-      if(!elem.startsWith("@")) sl.add(elem);
+      if(!elem.startsWith("@")) sl.add(Token.token(elem));
     }
 
-    final String[] tmp = data.skel.desc(sl);
-    if(tmp.length == 0) return;
+    final TokenList tmp = data.skel.desc(sl, true, false);
+    if(tmp.size == 0) return;
 
-    final String[] keys = new String[tmp.length + 1];
-    System.arraycopy(tmp, 0, keys, 1, tmp.length);
-    keys[0] = "(" + (tmp.length) + " entries)";
-
+    final String[] keys = new String[tmp.size + 1];
+    for(int k = 0; k < tmp.size; k++) keys[k + 1] = Token.string(tmp.list[k]);
+    keys[0] = "(" + (tmp.size) + " entries)";
 
     final BaseXCombo combo = new BaseXCombo(keys, HELPSEARCHCAT, false);
     combo.addActionListener(this);

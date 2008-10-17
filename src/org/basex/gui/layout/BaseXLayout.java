@@ -12,6 +12,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.RenderingHints;
+import java.awt.SystemColor;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -19,9 +20,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.AbstractButton;
 import javax.swing.JComponent;
 import org.basex.gui.GUI;
-import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
-import org.basex.gui.GUIConstants.FILL;
 import org.basex.gui.dialog.Dialog;
 import org.basex.gui.view.View;
 import org.basex.gui.view.map.MapRect;
@@ -185,26 +184,24 @@ public final class BaseXLayout {
   /**
    * Fills the specified area with a color gradient.
    * @param gg graphics reference
-   * @param mode mode for filling the component
+   * @param c1 first color
+   * @param c2 second color
    * @param xs horizontal start position
    * @param ys vertical start position
    * @param xe horizontal end position
    * @param ye vertical end position
    */
-  public static void fill(final Graphics gg, final FILL mode,
-      final int xs, final int ys, final int xe, final int ye) {
-
-    final Color col1 = mode == FILL.DOWN ? color1 : color2;
-    final Color col2 = mode == FILL.DOWN ? color2 : color1;
+  public static void fill(final Graphics gg, final Color c1,
+      final Color c2, final int xs, final int ys, final int xe, final int ye) {
 
     final int w = xe - xs;
     final int h = ye - ys;
-    final int r = col1.getRed();
-    final int g = col1.getGreen();
-    final int b = col1.getBlue();
-    final float rf = (col2.getRed() - r) / (float) h;
-    final float gf = (col2.getGreen() - g) / (float) h;
-    final float bf = (col2.getBlue() - b) / (float) h;
+    final int r = c1.getRed();
+    final int g = c1.getGreen();
+    final int b = c1.getBlue();
+    final float rf = (c2.getRed() - r) / (float) h;
+    final float gf = (c2.getGreen() - g) / (float) h;
+    final float bf = (c2.getBlue() - b) / (float) h;
 
     int nr = 0, ng = 0, nb = 0;
     int cr = 0, cg = 0, cb = 0;
@@ -227,28 +224,6 @@ public final class BaseXLayout {
   }
 
   /**
-   * Draws a shadowed rectangle.
-   * @param g graphics reference
-   * @param active active flag
-   * @param xs horizontal start position
-   * @param ys vertical start position
-   * @param xe horizontal end position
-   * @param ye vertical end position
-   */
-  public static void rect(final Graphics g, final boolean active, final int xs,
-      final int ys, final int xe, final int ye) {
-
-    final Color col1 = active ? COLORBUTTON : Color.white;
-    final Color col2 = active ? Color.white : COLORBUTTON;
-    g.setColor(col1);
-    g.drawLine(xs, ys, xe, ys);
-    g.drawLine(xs, ys, xs, ye);
-    g.setColor(col2);
-    g.drawLine(xe, ys + 1, xe, ye);
-    g.drawLine(xs + 1, ye, xe, ye);
-  }
-
-  /**
    * Draw the header of the scrollbar.
    * @param g graphics reference
    * @param xs horizontal start position
@@ -260,11 +235,13 @@ public final class BaseXLayout {
   public static void drawCell(final Graphics g, final int xs,
       final int xe, final int ys, final int ye, final boolean high) {
 
-    g.setColor(high ? color6 : color5);
+    g.setColor(COLORBUTTON);
     g.fillRect(xs, ys, xe - xs, ye - ys);
-    g.setColor(Color.white);
-    g.fillRect(xs + 1, ys + 1, xe - xs - 2, ye - ys  - 2);
-    fill(g, FILL.UP, xs + 2, ys + 2, xe - 2, ye - 2);
+    g.setColor(COLORBACK);
+    Color c1 = SystemColor.controlLtHighlight;
+    Color c2 = SystemColor.controlHighlight;
+    if(high) { Color t = c1; c1 = c2; c2 = t; }
+    fill(g, c1, c2, xs + 1, ys + 1, xe - 1, ye - 1);
   }
 
   /**
@@ -447,9 +424,8 @@ public final class BaseXLayout {
       if(draw) {
         // draw word
         if(c && k > -1)  {
-          g.setColor(View.ftPoi != null ?
-            GUIConstants.thumbnailcolor[View.ftPoi[k]] :
-              GUIConstants.COLORERROR);
+          g.setColor(View.ftPoi != null ? thumbnailcolor[View.ftPoi[k]] :
+            COLORERROR);
           c = ww == r.w;
         } else {
           g.setColor(textc);
@@ -515,9 +491,8 @@ public final class BaseXLayout {
 
         // draw word
         if(c && k > -1)  {
-          g.setColor(View.ftPoi != null ?
-            GUIConstants.thumbnailcolor[View.ftPoi[k]] :
-              GUIConstants.COLORERROR);
+          g.setColor(View.ftPoi != null ? thumbnailcolor[View.ftPoi[k]] :
+            COLORERROR);
           c = false;
         } else {
           g.setColor(textc);

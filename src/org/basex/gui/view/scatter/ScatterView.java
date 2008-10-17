@@ -1,5 +1,6 @@
 package org.basex.gui.view.scatter;
 
+import static org.basex.util.Token.*;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -24,8 +25,6 @@ import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.View;
 import org.basex.util.IntList;
-import org.basex.util.StringList;
-import org.basex.util.Token;
 
 /**
  * A scatter plot visualization of the database.
@@ -137,9 +136,8 @@ public final class ScatterView extends View implements Runnable {
           plotChanged = true;
           markingChanged = true;
           
-          final StringList input = new StringList();
-          input.add(item);
-          final String[] keys = scatterData.getCategories(input);
+          final String[] keys =
+            scatterData.getCategories(token(item)).finishString();
           xCombo.setModel(new DefaultComboBoxModel(keys));
           yCombo.setModel(new DefaultComboBoxModel(keys));
           if(keys.length > 0) {
@@ -231,13 +229,13 @@ public final class ScatterView extends View implements Runnable {
   
   @Override
   public void paintComponent(final Graphics g) {
+    super.paintComponent(g);
     final Data data = GUI.context.data();
     if(data == null) return;
     
     final int w = getWidth();
     final int h = getHeight();
     if(w < 250 || h < 250) {
-      super.paintComponent(g);
       final String s = "insufficient space for plot drawing";
       final int sw = BaseXLayout.width(g, s);
       g.setColor(Color.black);
@@ -250,7 +248,6 @@ public final class ScatterView extends View implements Runnable {
       return;
     }
     
-    super.paintComponent(g);
     g.setColor(new Color(90, 90, 150, 90));
     
     if(w + h != viewDimension) {
@@ -394,13 +391,14 @@ public final class ScatterView extends View implements Runnable {
         if(type == ScatterAxis.TYPEINT)
           caption = Integer.toString((int) captionValue);
         else
-          caption = Double.toString(captionValue);
+          //caption = Double.toString(captionValue);
+          caption = string(chopNumber(token(captionValue)));
       } else {
         if(axis.nrCats == 1) {
           if(i == 1)
-            caption = Token.string(axis.cats[0]);
+            caption = string(axis.cats[0]);
         } else {
-          caption = Token.string(axis.cats[i]);
+          caption = string(axis.cats[i]);
         }
       }
       
@@ -468,9 +466,9 @@ public final class ScatterView extends View implements Runnable {
       } else {
         if(axis.nrCats == 1) {
           if(i == 1)
-            caption = Token.string(axis.cats[0]);
+            caption = string(axis.cats[0]);
         } else {
-          caption = Token.string(axis.cats[i]);
+          caption = string(axis.cats[i]);
         }
       }
       if(caption.length() >= 10) {
@@ -536,7 +534,7 @@ public final class ScatterView extends View implements Runnable {
       viewDimension = Integer.MAX_VALUE;
       scatterData = new ScatterData();
 
-      final String[] items = scatterData.getItems();
+      final String[] items = scatterData.getItems().finishString();
       itemCombo.setModel(new DefaultComboBoxModel(items));
 
       // set first item and trigger assignment of axis assignments
@@ -748,22 +746,20 @@ public final class ScatterView extends View implements Runnable {
     }
 
     mark();
-    Nodes n = new Nodes(GUI.context.data());
+    final IntList il = new IntList();
     final int[] ti = tmpMarkedPos.finish();
     for(int i = 0; i < ti.length; i++) {
-      n.add(scatterData.pres[ti[i]]);
+      il.add(scatterData.pres[ti[i]]);
     }
     
     final boolean left = SwingUtilities.isLeftMouseButton(e);
     if(!left) {
     } else if(e.isShiftDown()) {
       final Nodes marked = GUI.context.marked();
-      for(int i = 0; i < n.size; i++) {
-        marked.add(n.nodes[i]);
-      }
+      marked.union(il.finish());
       notifyMark(marked);
     } else {
-      notifyMark(n);
+      notifyMark(new Nodes(il.finish(), GUI.context.data()));
     }
   }
 }

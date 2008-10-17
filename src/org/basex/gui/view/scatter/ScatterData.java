@@ -6,7 +6,7 @@ import org.basex.data.StatsKey.Kind;
 import org.basex.gui.GUI;
 import org.basex.index.Names;
 import org.basex.util.IntList;
-import org.basex.util.StringList;
+import org.basex.util.TokenList;
 
 /**
  * An additional abstraction layer which prepares the data for the scatter plot.
@@ -40,42 +40,34 @@ public final class ScatterData {
   }
 
   /**
-   * Returns a string array with all distinct keys
+   * Returns a string array with all top items
    * and the keys of the specified set.
    * @return key array
    */
-  String[] getItems() {
+  TokenList getItems() {
     final Data data = GUI.context.data();
-
-    StringList ks = new StringList();
-    final StringList sl = new StringList();
-    for(final String key : data.skel.desc(ks)) {
-      ks = new StringList();
-      ks.add(key);
-      if(getCategories(ks).length != 0) sl.add(key);
+    final TokenList tl = new TokenList();
+    for(final byte[] k : data.skel.desc(EMPTY, true, false)) {
+      if(getCategories(k).size > 1) tl.add(k);
     }
-    return sl.finish();
+    return tl;
   }
 
   /**
-   * Returns a string array with all distinct keys
-   * and the keys of the specified set.
-   * @param ks input keys
+   * Returns a string array with suitable categories for the specified item.
+   * @param it top item
    * @return key array
    */
-  String[] getCategories(final StringList ks) {
+  TokenList getCategories(final byte[] it) {
     final Data data = GUI.context.data();
-    final StringList sl = new StringList();
-    for(final String key : data.skel.desc(ks)) {
-      final boolean att = key.startsWith("@");
-      final Names index = att ? data.atts : data.tags;
-      final byte[] name = substring(token(key), att ? 1 : 0);
-      final Kind kind = index.stat(index.id(name)).kind;
-      if(kind == Kind.DBL || kind == Kind.INT || kind == Kind.CAT) sl.add(key);
+    final TokenList tl = new TokenList();
+    for(final byte[] k : data.skel.desc(it, true, false)) {
+      final Names index = startsWith(k, '@') ? data.atts : data.tags;
+      final Kind kind = index.stat(index.id(delete(k, '@'))).kind;
+      if(kind == Kind.DBL || kind == Kind.INT || kind == Kind.CAT) tl.add(k);
     }
-    return sl.finish();
+    return tl;
   }
-
 
   /**
    * Called if the user changes the item level displayed in the plot. If a new

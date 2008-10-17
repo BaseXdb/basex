@@ -1,6 +1,8 @@
 package org.basex.util;
 
 import java.util.Arrays;
+import java.util.Iterator;
+import org.basex.BaseX;
 
 /**
  * This is a simple container for string values.
@@ -8,7 +10,7 @@ import java.util.Arrays;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class StringList {
+public final class StringList implements Iterable<String> {
   /** Current string array. */
   public String[] list = new String[8];
   /** Number of strings. */
@@ -53,5 +55,14 @@ public final class StringList {
    */
   public void sort() {
     Arrays.sort(list, 0, size);
+  }
+
+  public Iterator<String> iterator() {
+    return new Iterator<String>() {
+      private int c = -1;
+      public boolean hasNext() { return ++c < size; }
+      public String next() { return list[c]; }
+      public void remove() { BaseX.notimplemented(); }
+    };
   }
 }

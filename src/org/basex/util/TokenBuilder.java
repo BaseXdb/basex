@@ -15,19 +15,21 @@ public final class TokenBuilder {
   /** Entity flag. */
   public boolean ent;
   /** Character array. */
-  public byte[] chars = new byte[8];
+  public byte[] chars;
   
   /**
    * Empty constructor.
    */
-  public TokenBuilder() { }
+  public TokenBuilder() {
+    this(8);
+  }
   
   /**
-   * Constructor, specifying an initial character.
-   * @param ch first character
+   * Constructor, specifying an initial array size.
+   * @param i size
    */
-  public TokenBuilder(final char ch) { 
-    add(ch);
+  public TokenBuilder(final int i) {
+    chars = new byte[i];
   }
   
   /**
@@ -35,7 +37,7 @@ public final class TokenBuilder {
    * @param str initial string
    */
   public TokenBuilder(final String str) { 
-    add(str);
+    this(token(str));
   }
   
   /**
@@ -43,7 +45,8 @@ public final class TokenBuilder {
    * @param str initial string
    */
   public TokenBuilder(final byte[] str) { 
-    add(str);
+    chars = str;
+    size = str.length;
   }
   
   /**

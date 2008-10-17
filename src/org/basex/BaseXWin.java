@@ -84,18 +84,26 @@ public final class BaseXWin {
       ToolTipManager.sharedInstance().setDismissDelay(20000);
       // refresh views when windows are resized
       Toolkit.getDefaultToolkit().setDynamicLayout(true);
+      
+      /*
+      for(java.lang.reflect.Field f : java.awt.SystemColor.class.getFields()) {
+        final Object o = f.get(null);
+        if(!(o instanceof java.awt.SystemColor)) continue;
+        final Color c = (Color) o;
+        BaseX.outln("%: %,%,%", f, c.getRed(), c.getGreen(), c.getBlue());
+      }*/
+
+      /*
+      UIDefaults def = UIManager.getDefaults();
+      Enumeration<?> en = def.keys();
+      while(en.hasMoreElements()) {
+        Object o = en.nextElement();
+        BaseX.outln(o + ": " + def.get(o));
+      }*/
+      
     } catch(final Exception e) {
       e.printStackTrace();
     }
-    
-    /*
-    UIDefaults def = UIManager.getDefaults();
-    Enumeration<?> en = def.keys();
-    while(en.hasMoreElements()) {
-      Object o = en.nextElement();
-      BaseX.outln(o + ": " + def.get(o));
-    }
-     */
   }
 
   /**

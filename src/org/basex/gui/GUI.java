@@ -543,7 +543,7 @@ public final class GUI extends JFrame {
             marked = new Nodes(data);
           }
           // highlights have changed.. refresh views
-          if(!marked.sameAs(context.marked())) {
+          if(!marked.same(context.marked())) {
             // View.ftPoi = marked.ftpoin;
             View.notifyMark(marked);
           }
