@@ -681,15 +681,43 @@ public final class ScatterView extends View implements Runnable {
     final int rb = w - MARGINRIGHT + th;
     final int tb = MARGINTOP - th;
     final int bb = h - MARGINBOTTOM + th;
-    if(!(mouseY > tb && mouseY < bb && mouseX > lb && mouseX < rb))
+    boolean inBox = false;
+    if(mouseY > tb && mouseY < bb && mouseX > lb && mouseX < rb)
+      inBox = true;
+    if(!dragging && !inBox)
       return;
-      
     if(!dragging) {
       dragging = true;
       selectionBox.setStart(mouseX, mouseY);
       focusedItem = -1;
     }
-    selectionBox.setEnd(mouseX, mouseY);
+    
+    if(!inBox) {
+      if(mouseX < lb) {
+        if(mouseY > bb) {
+          selectionBox.setEnd(lb, bb);
+        } else if(mouseY < tb) {
+          selectionBox.setEnd(lb, tb);
+        } else {
+          selectionBox.setEnd(lb, mouseY);
+        }
+      } else if(mouseX > rb) {
+        if(mouseY > bb) {
+          selectionBox.setEnd(rb, bb);
+        } else if(mouseY < tb) {
+          selectionBox.setEnd(rb, tb);
+        } else {
+          selectionBox.setEnd(rb, mouseY);
+        }
+      } else if(mouseY < tb) {
+        selectionBox.setEnd(mouseX, tb);
+      } else
+        selectionBox.setEnd(mouseX, bb);
+      
+    } else {
+      selectionBox.setEnd(mouseX, mouseY);
+    }
+      
     mark();
     repaint();
   }
