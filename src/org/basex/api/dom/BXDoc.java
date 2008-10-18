@@ -1,8 +1,18 @@
 package org.basex.api.dom;
 
+import static org.basex.util.Token.*;
 import org.basex.BaseX;
+import org.basex.io.IO;
+import org.basex.query.xquery.item.FAttr;
+import org.basex.query.xquery.item.FComm;
+import org.basex.query.xquery.item.FDoc;
+import org.basex.query.xquery.item.FElem;
+import org.basex.query.xquery.item.FPI;
+import org.basex.query.xquery.item.FTxt;
 import org.basex.query.xquery.item.Nod;
-import org.basex.util.Token;
+import org.basex.query.xquery.item.QNm;
+import org.basex.query.xquery.item.Uri;
+import org.basex.query.xquery.iter.NodIter;
 import org.w3c.dom.Attr;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Comment;
@@ -32,59 +42,59 @@ public final class BXDoc extends BXNode implements Document {
     super(n);
   }
   
-  public Node adoptNode(final Node source) {
-    BaseX.notimplemented();
+  @Override
+  public Document getOwnerDocument() {
     return null;
   }
 
-  public Attr createAttribute(final String name) {
-    BaseX.notimplemented();
+  public Node adoptNode(final Node source) {
+    error();
     return null;
+  }
+
+  public Attr createAttribute(final String nm) {
+    final QNm name = new QNm(token(nm));
+    return new BXAttr(new FAttr(name, EMPTY, null));
   }
 
   public Attr createAttributeNS(final String uri, final String qn) {
-    BaseX.notimplemented();
-    return null;
+    final QNm name = new QNm(token(qn), Uri.uri(token(uri)));
+    return new BXAttr(new FAttr(name, EMPTY, null));
   }
 
   public CDATASection createCDATASection(final String dat) {
-    BaseX.notimplemented();
-    return null;
+    return new BXCData(new FTxt(token(dat), null));
   }
 
   public Comment createComment(final String dat) {
-    BaseX.notimplemented();
-    return null;
+    return new BXComm(new FComm(token(dat), null));
   }
 
   public DocumentFragment createDocumentFragment() {
-    BaseX.notimplemented();
-    return null;
+    return new BXDocFrag(new FDoc(new NodIter(), node.base()));
   }
 
-  public Element createElement(final String tagName) {
-    BaseX.notimplemented();
-    return null;
+  public Element createElement(final String nm) {
+    final QNm name = new QNm(token(nm));
+    return new BXElem(new FElem(name, node.base(), null));
   }
 
   public Element createElementNS(final String uri, final String qn) {
-    BaseX.notimplemented();
-    return null;
+    final QNm name = new QNm(token(qn), Uri.uri(token(uri)));
+    return new BXElem(new FElem(name, node.base(), null));
   }
 
   public EntityReference createEntityReference(final String name) {
-    BaseX.notimplemented();
+    error();
     return null;
   }
 
   public BXPI createProcessingInstruction(final String t, final String dat) {
-    BaseX.notimplemented();
-    return null;
+    return new BXPI(new FPI(new QNm(token(t)), token(dat), null));
   }
 
   public Text createTextNode(final String dat) {
-    BaseX.notimplemented();
-    return null;
+    return new BXText(new FTxt(token(dat), null));
   }
 
   public DocumentType getDoctype() {
@@ -92,12 +102,8 @@ public final class BXDoc extends BXNode implements Document {
   }
 
   public Element getDocumentElement() {
-    try {
-      return (Element) finish(node.child().next());
-    } catch(final Exception e) {
-      BaseX.debug(e);
-      return null;
-    }
+    final QNm name = new QNm(token(IO.get(string(node.base())).dbname()));
+    return new BXElem(new FElem(name, node.base(), node));
   }
 
   public String getDocumentURI() {
@@ -125,12 +131,11 @@ public final class BXDoc extends BXNode implements Document {
   }
 
   public DOMImplementation getImplementation() {
-    BaseX.notimplemented();
-    return null;
+    return BXDomImpl.get();
   }
 
   public String getInputEncoding() {
-    return Token.UTF8;
+    return UTF8;
   }
 
   public boolean getStrictErrorChecking() {
@@ -139,7 +144,7 @@ public final class BXDoc extends BXNode implements Document {
   }
 
   public String getXmlEncoding() {
-    return Token.UTF8;
+    return UTF8;
   }
 
   public boolean getXmlStandalone() {
@@ -156,17 +161,17 @@ public final class BXDoc extends BXNode implements Document {
   }
 
   public void normalizeDocument() {
-    BaseX.notimplemented();
+    error();
   }
 
   public Node renameNode(final Node n, final String namespaceURI,
       final String qualifiedName) {
-    BaseX.notimplemented();
+    error();
     return null;
   }
 
   public void setDocumentURI(final String documentURI) {
-    BaseX.notimplemented();
+    error();
   }
 
   public void setStrictErrorChecking(final boolean strictErrorChecking) {

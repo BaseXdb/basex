@@ -41,6 +41,8 @@ public interface Text {
   String NAME = "BaseX";
   /** URL. */
   String URL = "http://www.basex.org";
+  /** Mail. */
+  String MAIL = "info@basex.org";
   /** Code version. */
   String VERSION = "4.2";
   /** Company Info. */
@@ -360,10 +362,16 @@ public interface Text {
   String PROCNODB = lang("proc_nodb");
   /** No Filesystem Error. */
   String PROCNOFS = lang("proc_nofs");
-  /** Update Error. */
+  /** Main Memory Error. */
   String PROCMM = lang("proc_mm");
-  /** Update Error. */
+  /** Out of Memory Error. */
   String PROCOUTMEM = lang("proc_outmem");
+  /** Implementation Error. */
+  String PROCIMPL = lang("proc_outmem");
+  /** Implementation Bug. */
+  String PROCBUG = "Implementation Bug?";
+  /** Implementation Bug. */
+  String PROCBUG2 = NL + "You are invited to send this to " + MAIL;
 
   /** Unknown Command error. */
   String CMDNO = lang("cmd_no");
@@ -656,7 +664,7 @@ public interface Text {
   /** Option flag. */
   String INFOOFF = lang("info_off");
   /** Error info. */
-  String INFOERROR = lang("info_error");
+  String INFOERROR = lang("info_error") + COLS;
 
   // MENU ENTRIES =============================================================
 
@@ -1173,6 +1181,8 @@ public interface Text {
     ": Alexander Holupirek, Sebastian Gath,";
   /** Developer Names. */
   String CONTRIBUTE2 = "Lukas Kircher, Andreas Weiler " + lang("da_cont2");
+  /** Developer Names. */
+  String CONTACT = lang("da_contact") + COLS + MAIL;
 
   // HELP TEXTS ===============================================================
 

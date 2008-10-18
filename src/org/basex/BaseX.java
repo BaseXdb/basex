@@ -80,6 +80,7 @@ public final class BaseX extends BaseXClient {
    */
   public static boolean debug(final Exception ex) {
     if(Prop.debug && ex != null) ex.printStackTrace();
+    //BaseX.errln(ex);
     return false;
   }
 
@@ -120,6 +121,13 @@ public final class BaseX extends BaseXClient {
   }
 
   /**
+   * Global method for printing a newline.
+   */
+  public static void outln() {
+    out(NL);
+  }
+
+  /**
    * Returns an info message for the specified flag.
    * @param flag current flag status
    * @return ON/OFF message
@@ -134,8 +142,9 @@ public final class BaseX extends BaseXClient {
    * @return dummy object
    */
   public static Object notimplemented(final Object... ext) {
-    throw new UnsupportedOperationException(
-        ext.length == 0 ? "Not expected." : info("Not expected (%).", ext));
+    final TokenBuilder sb = new TokenBuilder(PROCIMPL);
+    if(ext.length != 0) sb.add(" (%)", ext);
+    throw new UnsupportedOperationException(sb.add('.').toString());
   }
 
   /**
@@ -144,7 +153,17 @@ public final class BaseX extends BaseXClient {
    * @return dummy object
    */
   public static Object notexpected(final Object... ext) {
-    throw new RuntimeException(
-        ext.length == 0 ? "Not expected." : info("Not expected (%).", ext));
+    throw new RuntimeException(bug(ext));
+  }
+
+  /**
+   * Throws a runtime exception for unexpected exceptions.
+   * @param ext optional extension
+   * @return dummy object
+   */
+  public static String bug(final Object... ext) {
+    final TokenBuilder sb = new TokenBuilder(PROCBUG);
+    if(ext.length != 0) sb.add(" (%)", ext);
+    return sb.add('.').add(PROCBUG).toString();
   }
 }

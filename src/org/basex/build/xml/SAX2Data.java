@@ -14,7 +14,7 @@ import org.xml.sax.helpers.DefaultHandler;
 /**
  * SAX Parser wrapper.
  */
-public class SAX2BaseX extends DefaultHandler implements LexicalHandler {
+public class SAX2Data extends DefaultHandler implements LexicalHandler {
   /** Temporary attribute array. */
   final Atts atts = new Atts();
   /** Builder reference. */
@@ -34,7 +34,7 @@ public class SAX2BaseX extends DefaultHandler implements LexicalHandler {
    * @param build builder reference
    * @param doc document name
    */
-  public SAX2BaseX(final Builder build, final String doc) {
+  public SAX2Data(final Builder build, final String doc) {
     builder = build;
     name = doc;
   }

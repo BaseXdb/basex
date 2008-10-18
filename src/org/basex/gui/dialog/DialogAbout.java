@@ -43,21 +43,22 @@ public final class DialogAbout extends Dialog {
     p.add(label, BorderLayout.WEST);
 
     final BaseXBack pp = new BaseXBack(GUIConstants.FILL.NONE);
-    pp.setLayout(new TableLayout(13, 1));
+    pp.setLayout(new TableLayout(15, 1));
 
     label = new BaseXLabel(Text.TITLE);
     label.setFont(getFont().deriveFont(1));
     pp.add(label);
-    pp.add(new BaseXLabel(Text.URL));
+    pp.add(label(Text.URL));
     pp.add(Box.createVerticalStrut(7));
-    pp.add(new BaseXLabel(COPYRIGHT));
-    pp.add(new BaseXLabel(LICENSE));
+    pp.add(label(COPYRIGHT));
+    pp.add(label(LICENSE));
     pp.add(Box.createVerticalStrut(7));
-    pp.add(new BaseXLabel(DEVELOPER));
+    pp.add(label(DEVELOPER));
     pp.add(Box.createVerticalStrut(7));
-    pp.add(new BaseXLabel(CONTRIBUTE1));
-    pp.add(new BaseXLabel(CONTRIBUTE2));
-
+    pp.add(label(CONTRIBUTE1));
+    pp.add(label(CONTRIBUTE2));
+    pp.add(Box.createVerticalStrut(7));
+    pp.add(label(CONTACT));
     p.add(pp, BorderLayout.EAST);
     add(p, BorderLayout.NORTH);
 
@@ -66,5 +67,16 @@ public final class DialogAbout extends Dialog {
     add(p, BorderLayout.EAST);
 
     finish(parent, null);
+  }
+  
+  /**
+   * Returns a standard text label. 
+   * @param txt label text
+   * @return label
+   */
+  private BaseXLabel label(final String txt) {
+    final BaseXLabel label = new BaseXLabel(txt);
+    label.setFont(getFont().deriveFont(0));
+    return label;
   }
 }

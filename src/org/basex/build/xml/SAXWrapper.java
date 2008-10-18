@@ -23,9 +23,9 @@ import org.xml.sax.XMLReader;
  */
 public final class SAXWrapper extends Parser {
   /** Optional XML reader. */
-  SAXSource source;
+  private SAXSource source;
   /** Parser reference. */
-  SAX2BaseX parse;
+  private SAX2Data sax;
 
   /**
    * Constructor.
@@ -39,18 +39,18 @@ public final class SAXWrapper extends Parser {
   @Override
   public void parse(final Builder build) throws IOException {
     try {
-      XMLReader r = source != null ? source.getXMLReader() : null;
+      XMLReader r = source.getXMLReader();
       if(r == null) {
         final SAXParserFactory f = SAXParserFactory.newInstance();
         f.setNamespaceAware(true);
         f.setValidating(false);
         r = f.newSAXParser().getXMLReader();
       }
-      parse = new SAX2BaseX(build, io.name());
-      r.setDTDHandler(parse);
-      r.setContentHandler(parse);
-      r.setProperty("http://xml.org/sax/properties/lexical-handler", parse);
-      r.setErrorHandler(parse);
+      sax = new SAX2Data(build, io.name());
+      r.setDTDHandler(sax);
+      r.setContentHandler(sax);
+      r.setProperty("http://xml.org/sax/properties/lexical-handler", sax);
+      r.setErrorHandler(sax);
 
       final InputSource is = source.getInputSource();
       if(is != null) r.parse(is);
@@ -78,11 +78,11 @@ public final class SAXWrapper extends Parser {
 
   @Override
   public String det() {
-    return BaseX.info(NODESPARSED, io.name(), parse != null ? parse.nodes : 0);
+    return BaseX.info(NODESPARSED, io.name(), sax != null ? sax.nodes : 0);
   }
 
   @Override
   public double percent() {
-    return (parse != null ? parse.nodes : 0 / 1000000d) % 1;
+    return (sax != null ? sax.nodes : 0 / 1000000d) % 1;
   }
 }

@@ -9,19 +9,18 @@ import java.util.regex.Pattern;
 import javax.xml.namespace.QName;
 import org.basex.BaseX;
 import org.basex.api.dom.BXAttr;
-import org.basex.api.dom.BXComment;
+import org.basex.api.dom.BXComm;
 import org.basex.api.dom.BXDoc;
-import org.basex.api.dom.BXElement;
+import org.basex.api.dom.BXElem;
 import org.basex.api.dom.BXPI;
 import org.basex.api.dom.BXText;
+import org.basex.build.MemBuilder;
 import org.basex.build.xml.DOCWrapper;
-import org.basex.core.proc.CreateDB;
 import org.basex.data.Data;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.iter.NodIter;
 import org.basex.query.xquery.util.Err;
-import org.basex.util.Atts;
 import org.basex.util.XMLToken;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Comment;
@@ -624,11 +623,11 @@ public enum Type {
   ELM("element", NOD, EMPTY, false, true, false, false) {
     @Override
     public Nod e(final Object o) {
-      if(o instanceof BXElement) return ((BXElement) o).getNod();
+      if(o instanceof BXElem) return ((BXElem) o).getNod();
 
       // [CG] add complete DOM object for elements
       return new FElem(new QNm(token(((Element) o).getNodeName())),
-          new NodIter(), new NodIter(), EMPTY, new Atts(), null);
+          EMPTY, null);
     }
   },
 
@@ -641,7 +640,7 @@ public enum Type {
       if(o instanceof Document) {
         try {
           final DOCWrapper p = new DOCWrapper((Document) o, "tmp");
-          final Data data = CreateDB.xml(p, "tmp");
+          final Data data = new MemBuilder().build(p, "tmp");
           return new DNode(data, 0);
         } catch(final IOException ex) {
           throw new XQException(UNDOC, ex.getMessage());
@@ -672,7 +671,7 @@ public enum Type {
   COM("comment", NOD, EMPTY, false, true, false, false) {
     @Override
     public Nod e(final Object o) {
-      if(o instanceof BXComment) return ((BXComment) o).getNod();
+      if(o instanceof BXComm) return ((BXComm) o).getNod();
 
       return new FComm(token(((Comment) o).getNodeValue()), null);
     }

@@ -2,7 +2,6 @@ package org.basex.query.xquery.item;
 
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.iter.NodIter;
@@ -26,6 +25,16 @@ public final class FElem extends FNode {
   /** Base URI. */
   private final byte[] base;
 
+  /**
+   * Constructor.
+   * @param n tag name
+   * @param b base uri
+   * @param p parent
+   */
+  public FElem(final QNm n, final byte[] b, final Nod p) {
+    this(n, new NodIter(), new NodIter(), b, new Atts(), p);
+  }
+  
   /**
    * Constructor.
    * @param n tag name

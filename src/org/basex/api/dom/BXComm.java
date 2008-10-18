@@ -9,12 +9,12 @@ import org.w3c.dom.Comment;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class BXComment extends BXChar implements Comment {
+public final class BXComm extends BXChar implements Comment {
   /**
    * Constructor.
    * @param n node reference
    */
-  public BXComment(final Nod n) {
+  public BXComm(final Nod n) {
     super(n);
   }
 }

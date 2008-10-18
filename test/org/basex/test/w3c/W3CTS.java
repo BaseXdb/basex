@@ -232,7 +232,7 @@ public abstract class W3CTS {
       if(!parse(new Nodes(nodes.nodes[t], data))) break;
       if(t % 1000 == 0) BaseX.out(".");
     }
-    BaseX.outln("");
+    BaseX.outln();
 
     final String time = perf.getTimer();
 

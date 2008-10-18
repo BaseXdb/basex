@@ -4,6 +4,7 @@ import org.basex.BaseX;
 import org.basex.query.xquery.item.Nod;
 import org.basex.util.Token;
 import org.w3c.dom.CharacterData;
+import org.w3c.dom.NamedNodeMap;
 
 /**
  * DOM - Character Data Implementation.
@@ -36,6 +37,11 @@ public abstract class BXChar extends BXNode implements CharacterData {
   public final String substringData(final int off, final int count) {
     final String val = getNodeValue();
     return val.substring(off, Math.min(val.length(), off + count));
+  }
+
+  @Override
+  public NamedNodeMap getAttributes() {
+    return null;
   }
 
   public final void appendData(final String arg) {

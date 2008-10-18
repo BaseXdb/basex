@@ -179,7 +179,8 @@ da_title=Info über
 da_license=BSD-Lizenz (ISC)
 da_dev=Hauptentwickler
 da_cont1=Team
-da_cont2=und viele andere
+da_cont2=und andere
+da_contact=Kontakt
 
 c_about=Über
 c_abouttt=Zeigt allgemeine Projektinfos an.

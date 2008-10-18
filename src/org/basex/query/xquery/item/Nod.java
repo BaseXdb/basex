@@ -2,9 +2,9 @@ package org.basex.query.xquery.item;
 
 import java.math.BigDecimal;
 import org.basex.api.dom.BXAttr;
-import org.basex.api.dom.BXComment;
+import org.basex.api.dom.BXComm;
 import org.basex.api.dom.BXDoc;
-import org.basex.api.dom.BXElement;
+import org.basex.api.dom.BXElem;
 import org.basex.api.dom.BXNode;
 import org.basex.api.dom.BXPI;
 import org.basex.api.dom.BXText;
@@ -420,10 +420,10 @@ public abstract class Nod extends Item {
   public final BXNode java() {
     switch(type) {
       case DOC: return new BXDoc(this);
-      case ELM: return new BXElement(this);
+      case ELM: return new BXElem(this);
       case TXT: return new BXText(this);
       case ATT: return new BXAttr(this);
-      case COM: return new BXComment(this);
+      case COM: return new BXComm(this);
       case PI : return new BXPI(this);
       default : return null;
     }

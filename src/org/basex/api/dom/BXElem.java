@@ -16,12 +16,12 @@ import org.w3c.dom.TypeInfo;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class BXElement extends BXNode implements Element {
+public final class BXElem extends BXNode implements Element {
   /**
    * Constructor.
    * @param n node reference
    */
-  public BXElement(final Nod n) {
+  public BXElem(final Nod n) {
     super(n);
   }
   
@@ -83,48 +83,48 @@ public final class BXElement extends BXNode implements Element {
   }
 
   public void removeAttribute(final String name) {
-    BaseX.notimplemented();
+    error();
   }
 
   public void removeAttributeNS(final String uri, final String ln) {
-    BaseX.notimplemented();
+    error();
   }
 
   public Attr removeAttributeNode(final Attr oldAttr) {
-    BaseX.notimplemented();
+    error();
     return null;
   }
 
   public void setAttribute(final String name, final String value) {
-    BaseX.notimplemented();
+    error();
   }
 
   public void setAttributeNS(final String uri, final String qn,
       final String value) {
-    BaseX.notimplemented();
+    error();
   }
 
-  public Attr setAttributeNode(final Attr newAttr) {
-    BaseX.notimplemented();
+  public Attr setAttributeNode(final Attr at) {
+    error();
     return null;
   }
 
-  public Attr setAttributeNodeNS(final Attr newAttr) {
-    BaseX.notimplemented();
+  public Attr setAttributeNodeNS(final Attr at) {
+    error();
     return null;
   }
 
   public void setIdAttribute(final String name, final boolean isId) {
-    BaseX.notimplemented();
+    error();
   }
 
   public void setIdAttributeNS(final String uri, final String ln,
       final boolean isId) {
-    BaseX.notimplemented();
+    error();
   }
 
-  public void setIdAttributeNode(final Attr idAttr, final boolean isId) {
-    BaseX.notimplemented();
+  public void setIdAttributeNode(final Attr at, final boolean isId) {
+    error();
   }
 
   /**
@@ -133,10 +133,10 @@ public final class BXElement extends BXNode implements Element {
    * @return nod instance
    */
   private Nod attribute(final String name) {
-    final NodeIter iter = node.attr();
-    final byte[] nm = Token.token(name);
     try {
       Nod n = null;
+      final NodeIter iter = node.attr();
+      final byte[] nm = Token.token(name);
       while((n = iter.next()) != null) {
         if(Token.eq(nm, n.nname())) return n;
       }

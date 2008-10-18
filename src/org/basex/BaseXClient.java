@@ -148,7 +148,7 @@ public class BaseXClient {
       return new BufferedReader(isr).readLine().trim();
     } catch(final Exception ex) {
       // also catches interruptions such as ctrl+c, etc.
-      BaseX.outln("");
+      BaseX.outln();
       return null;
     }
   }
@@ -223,7 +223,7 @@ public class BaseXClient {
           } else {
             if(info || console) {
               BaseX.outln(inf);
-              if(console) BaseX.outln("");
+              if(console) BaseX.outln();
             }
           }
         }
@@ -391,7 +391,7 @@ public class BaseXClient {
    * @param msg message
    */
   protected final void error(final Exception ex, final String msg) {
-    BaseX.errln((console ? "" : INFOERROR + ": ") + msg);
+    BaseX.errln((console ? "" : INFOERROR) + msg);
     BaseX.debug(ex);
   }
 }

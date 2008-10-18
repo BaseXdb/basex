@@ -1,6 +1,5 @@
 package org.basex.api.dom;
 
-import org.basex.BaseX;
 import org.basex.query.xquery.item.Nod;
 import org.basex.util.Token;
 import org.w3c.dom.ProcessingInstruction;
@@ -39,6 +38,6 @@ public final class BXPI extends BXNode implements ProcessingInstruction {
   }
 
   public void setData(final String dat) {
-    BaseX.notimplemented();
+    error();
   }
 }

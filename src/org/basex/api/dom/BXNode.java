@@ -1,5 +1,6 @@
 package org.basex.api.dom;
 
+import static org.basex.util.Token.*;
 import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.io.IO;
@@ -8,7 +9,7 @@ import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.util.NodeBuilder;
-import org.basex.util.Token;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -26,11 +27,13 @@ public abstract class BXNode implements Node {
   static final short[] TYPES = {
     Node.DOCUMENT_NODE, Node.ELEMENT_NODE,
     Node.TEXT_NODE, Node.ATTRIBUTE_NODE,
-    Node.COMMENT_NODE, Node.PROCESSING_INSTRUCTION_NODE
+    Node.COMMENT_NODE, Node.PROCESSING_INSTRUCTION_NODE,
+    Node.CDATA_SECTION_NODE, Node.DOCUMENT_FRAGMENT_NODE
   };
   /** Node name mapping (see {@link Data} interface). */
   static final String[] NAMES = {
-    "#document", null, "#text", null, "#comment", null
+    "#document", null, "#text", null, "#comment", null, "#cdata-section",
+    "#document-fragment"
   };
   /** Data reference. */
   protected final Nod node;
@@ -55,7 +58,7 @@ public abstract class BXNode implements Node {
    * Returns a numeric value for the node kind.
    * @return node kind
    */
-  private int kind() {
+  protected int kind() {
     switch(node.type) {
       case DOC: return Data.DOC;
       case ELM: return Data.ELEM;
@@ -84,19 +87,19 @@ public abstract class BXNode implements Node {
     return (short) (d < 0 ? -1 : d > 0 ? 1 : 0);
   }
 
-  public final NamedNodeMap getAttributes() {
-    return new BXNamedNode(finish(node.attr()));
+  public NamedNodeMap getAttributes() {
+    return new BXNNode(finish(node.attr()));
   }
 
   public final String getBaseURI() {
-    return IO.url(Token.string(node.base()));
+    return IO.url(string(node.base()));
   }
 
-  public final NodeList getChildNodes() {
-    return new BXNodeList(finish(node.child()));
+  public NodeList getChildNodes() {
+    return new BXNList(finish(node.child()));
   }
   
-  public final Node getFirstChild() {
+  public Node getFirstChild() {
     try {
       return finish(node.child().next());
     } catch(final XQException ex) {
@@ -160,7 +163,7 @@ public abstract class BXNode implements Node {
     return this == other;
   }
 
-  public final Document getOwnerDocument() {
+  public Document getOwnerDocument() {
     Nod n = node;
     Nod p = n;
     while((p = n.parent()) != null) n = p;
@@ -180,11 +183,11 @@ public abstract class BXNode implements Node {
   }
 
   public final String getTextContent() {
-    return Token.string(node.str());
+    return string(node.str());
   }
 
   public final Node appendChild(final Node newChild) {
-    BaseX.notimplemented();
+    error();
     return null;
   }
 
@@ -197,7 +200,7 @@ public abstract class BXNode implements Node {
   }
 
   public final Node insertBefore(final Node newChild, final Node refChild) {
-    BaseX.notimplemented();
+    error();
     return null;
   }
 
@@ -222,34 +225,34 @@ public abstract class BXNode implements Node {
   }
 
   public final void normalize() {
-    BaseX.notimplemented();
+    error();
   }
 
   public final Node removeChild(final Node oldChild) {
-    BaseX.notimplemented();
+    error();
     return null;
   }
 
   public final Node replaceChild(final Node newChild, final Node oldChild) {
-    BaseX.notimplemented();
+    error();
     return null;
   }
 
   public final void setNodeValue(final String nodeValue) {
-    BaseX.notimplemented();
+    error();
   }
 
   public final void setPrefix(final String prefix) {
-    BaseX.notimplemented();
+    error();
   }
 
   public final void setTextContent(final String textContent) {
-    BaseX.notimplemented();
+    error();
   }
 
   public final Object setUserData(final String key, final Object dat,
       final UserDataHandler handler) {
-    BaseX.notimplemented();
+    error();
     return null;
   }
   
@@ -266,16 +269,16 @@ public abstract class BXNode implements Node {
   protected final NodeList getElements(final String tag) {
     final NodeBuilder nb = new NodeBuilder(true);
     final NodeIter iter = node.desc();
-    final byte[] nm = tag.equals("*") ? null : Token.token(tag);
+    final byte[] nm = tag.equals("*") ? null : token(tag);
     try {
       Nod n = null;
       while((n = iter.next()) != null) {
-        if(nm == null || Token.eq(nm, n.nname())) nb.add(n);
+        if(nm == null || eq(nm, n.nname())) nb.add(n.copy());
       }
     } catch(final XQException ex) {
       BaseX.notexpected();
     }
-    return new BXNodeList(nb);
+    return new BXNList(nb);
   }
 
   /**
@@ -287,7 +290,7 @@ public abstract class BXNode implements Node {
     final NodeBuilder nb = new NodeBuilder(true);
     try {
       Nod n = null;
-      while((n = it.next()) != null) nb.add(n);
+      while((n = it.next()) != null) nb.add(n.copy());
     } catch(final XQException ex) {
       BaseX.notexpected();
     }
@@ -300,5 +303,12 @@ public abstract class BXNode implements Node {
    */
   public final Nod getNod() {
     return node;
+  }
+
+  /**
+   * Throws a DOM modification exception.
+   */
+  public final void error() {
+    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
   }
 }

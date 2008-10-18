@@ -180,6 +180,7 @@ da_license=BSD license (ISC)
 da_dev=メイン開発者
 da_cont1=チーム
 da_cont2=その他の貢献者
+da_contact=Contact
 
 c_about=BaseXについて
 c_abouttt=このプロジェクトについての概要を表示します。

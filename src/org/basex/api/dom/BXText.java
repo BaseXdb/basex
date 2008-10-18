@@ -1,6 +1,5 @@
 package org.basex.api.dom;
 
-import org.basex.BaseX;
 import org.basex.query.xquery.item.Nod;
 import org.basex.util.Token;
 import org.w3c.dom.Text;
@@ -11,7 +10,7 @@ import org.w3c.dom.Text;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class BXText extends BXChar implements Text {
+public class BXText extends BXChar implements Text {
   /**
    * Constructor.
    * @param n node reference
@@ -29,12 +28,12 @@ public final class BXText extends BXChar implements Text {
   }
 
   public Text replaceWholeText(final String content) {
-    BaseX.notimplemented();
+    error();
     return null;
   }
 
   public Text splitText(final int off) {
-    BaseX.notimplemented();
+    error();
     return null;
   }
 }

@@ -13,7 +13,7 @@ import org.w3c.dom.NodeList;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class BXNodeList implements NodeList {
+public class BXNList implements NodeList {
   /** XQuery node set. */
   protected NodeBuilder xquery;
   /** XPath node set. */
@@ -23,7 +23,7 @@ public class BXNodeList implements NodeList {
    * Constructor.
    * @param nb nodes
    */
-  public BXNodeList(final NodeBuilder nb) {
+  public BXNList(final NodeBuilder nb) {
     xquery = nb;
   }
   
@@ -31,7 +31,7 @@ public class BXNodeList implements NodeList {
    * Constructor.
    * @param ns node set
    */
-  public BXNodeList(final NodeSet ns) {
+  public BXNList(final NodeSet ns) {
     xpath = ns;
   }
   
@@ -42,8 +42,7 @@ public class BXNodeList implements NodeList {
     } else {
       if(i < xpath.size) n = new DNode(xpath.data, xpath.nodes[i]);
     }
-    if(n != null) return n.java();
-    throw new IndexOutOfBoundsException("Out of bounds: " + i);
+    return n != null ? n.java() : null;
   }
 
   public final int getLength() {

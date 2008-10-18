@@ -1,5 +1,7 @@
 package org.basex.util;
 
+import org.basex.BaseX;
+
 /**
  * This class provides convenience operations for handling so-called
  * 'Tokens'. Tokens in BaseX are nothing else than UTF8 encoded strings,
@@ -165,8 +167,9 @@ public final class Token {
     // convert to utf8
     try {
       return new String(s, enc).getBytes(UTF8);
-    } catch(final Exception e) {
-      org.basex.BaseX.notexpected(e.getMessage());
+    } catch(final Exception ex) {
+      BaseX.debug(ex);
+      BaseX.errln(ex);
       return EMPTY;
     }
   }

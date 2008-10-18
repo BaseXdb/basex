@@ -1,11 +1,15 @@
 package org.basex.api.dom;
 
 import org.basex.BaseX;
+import org.basex.query.xquery.item.FTxt;
 import org.basex.query.xquery.item.Nod;
+import org.basex.query.xquery.util.NodeBuilder;
 import org.basex.util.Token;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.w3c.dom.TypeInfo;
 
 /**
@@ -70,7 +74,7 @@ public final class BXAttr extends BXNode implements Attr {
   }
 
   public boolean getSpecified() {
-    return true;
+    return false;
   }
 
   public TypeInfo getSchemaTypeInfo() {
@@ -78,7 +82,26 @@ public final class BXAttr extends BXNode implements Attr {
     return null;
   }
 
+  @Override
+  public NamedNodeMap getAttributes() {
+    return null;
+  }
+
   public void setValue(final String value) {
-    BaseX.notimplemented();
+    error();
+  }
+
+  @Override
+  public Node getFirstChild() {
+    // TestCase "hc_attrsetvalue1" ...correct?
+    return new BXText(new FTxt(node.str(), node));
+  }
+
+  @Override
+  // TestCase "hc_attrchildnodes1" ...correct?
+  public NodeList getChildNodes() {
+    final NodeBuilder nb = new NodeBuilder(true);
+    nb.add(new FTxt(node.str(), node));
+    return new BXNList(nb);
   }
 }
