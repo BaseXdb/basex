@@ -4,7 +4,7 @@ import javax.xml.namespace.QName;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
-import org.basex.api.dom.BXNodeList;
+import org.basex.api.dom.BXNList;
 import org.basex.core.Context;
 import org.basex.core.proc.Check;
 import org.basex.data.Data;
@@ -87,7 +87,7 @@ public class XPathExprImpl implements XPathExpression {
       
       if(nodes.size == 0) return null;
       final Data data = nodes.data;
-      return res == XPathConstants.NODESET ? new BXNodeList(nodes) :
+      return res == XPathConstants.NODESET ? new BXNList(nodes) :
         new DNode(data, nodes.nodes[0]).java();
     }
 

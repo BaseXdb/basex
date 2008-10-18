@@ -438,7 +438,7 @@ public class XQMetaDataTest extends XQJTestCase {
     boolean supportsModules = true;
     
     try {
-      supportsModules = xqmd.isModuleFeatureSupported();
+      xqmd.isModuleFeatureSupported();
     } catch (XQException e) {
       fail("A-XQMD-1.2: XQMetaData method failed with message: " + e.getMessage());
     }
@@ -466,7 +466,7 @@ public class XQMetaDataTest extends XQJTestCase {
     boolean supportsSerialization = true;
     
     try {
-      supportsSerialization = xqmd.isSerializationFeatureSupported();
+      xqmd.isSerializationFeatureSupported();
     } catch (XQException e) {
       fail("A-XQMD-1.2: XQMetaData method failed with message: " + e.getMessage());
     }
@@ -494,7 +494,7 @@ public class XQMetaDataTest extends XQJTestCase {
     boolean supportsStaticTypingExtensions = true;
     
     try {
-      supportsStaticTypingExtensions = xqmd.isStaticTypingExtensionsSupported();
+      xqmd.isStaticTypingExtensionsSupported();
     } catch (XQException e) {
       fail("A-XQMD-1.2: XQMetaData method failed with message: " + e.getMessage());
     }
@@ -619,7 +619,7 @@ public class XQMetaDataTest extends XQJTestCase {
     boolean supportsXQueryEncodingDecls = true;
     
     try {
-      supportsXQueryEncodingDecls = xqmd.isXQueryEncodingDeclSupported();
+      xqmd.isXQueryEncodingDeclSupported();
     } catch (XQException e) {
       fail("A-XQMD-1.2: XQMetaData method failed with message: " + e.getMessage());
     }

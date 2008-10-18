@@ -21,7 +21,9 @@ public class XQJTestCase extends TestCase{
       throw new Exception("The property 'com.oracle.xqj.tck.datasource' must be set.");
     // load the properties file
     Properties p = new Properties();
-    p.load(new FileInputStream(fileName));
+    FileInputStream fis = new FileInputStream(fileName);
+    p.load(fis);
+    fis.close();
     // create an XQDataSource instance using reflection
     String xqdsClassName = p.getProperty("XQDataSourceClassName");
     Class xqdsClass = Class.forName(xqdsClassName);

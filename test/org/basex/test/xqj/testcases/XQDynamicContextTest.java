@@ -870,32 +870,32 @@ public class XQDynamicContextTest extends XQJTestCase {
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
 
-    xqe.bindObject(new QName("v"), new Byte((byte)1), null);
+    xqe.bindObject(new QName("v"), Byte.valueOf((byte)1), null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:byte");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
     
-    xqe.bindObject(new QName("v"), new Float(1), null);
+    xqe.bindObject(new QName("v"), Float.valueOf(1), null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:float");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
     
-    xqe.bindObject(new QName("v"), new Double(1), null);
+    xqe.bindObject(new QName("v"), Double.valueOf(1), null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:double");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
     
-    xqe.bindObject(new QName("v"), new Integer(1), null);
+    xqe.bindObject(new QName("v"), Integer.valueOf(1), null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:int");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
     
-    xqe.bindObject(new QName("v"), new Long(1), null);
+    xqe.bindObject(new QName("v"), Long.valueOf(1), null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:long");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
     
-    xqe.bindObject(new QName("v"), new Short((short)1), null);
+    xqe.bindObject(new QName("v"), Short.valueOf((short)1), null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:short");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
@@ -905,12 +905,12 @@ public class XQDynamicContextTest extends XQJTestCase {
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
    
-    xqe.bindObject(new QName("v"), new BigDecimal("1"), null);
+    xqe.bindObject(new QName("v"), BigDecimal.valueOf(1), null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:decimal");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
     
-    xqe.bindObject(new QName("v"), new BigInteger("1"), null);
+    xqe.bindObject(new QName("v"), BigInteger.valueOf(1), null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:integer");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());

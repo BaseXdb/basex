@@ -30,7 +30,6 @@ public class XQItemTypeTest extends XQJTestCase {
     assertEquals("A-XQIT-6.2: getSchemaURI() returns null.", null, xqtype.getSchemaURI());
     try {
       xqtype.getTypeName();
-      System.out.println("----------- " + xqtype.getTypeName());
       fail("A-XQIT-7.2: getTypeName() must throw an XQException.");
     } catch (XQException e) {
       // Expect an XQException

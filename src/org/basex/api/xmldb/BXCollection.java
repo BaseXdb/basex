@@ -47,27 +47,22 @@ public class BXCollection implements Collection {
 
   public Resource createResource(final String id, final String type)
       throws XMLDBException {
-    if(isOpen()) {
-      if(type.equals(XMLResource.RESOURCE_TYPE)) {
-        return new BXXMLResource(null, id, -1, this);
-      }
-      throw new XMLDBException(ErrorCodes.UNKNOWN_RESOURCE_TYPE);
+
+    check();
+    if(type.equals(XMLResource.RESOURCE_TYPE)) {
+      return new BXXMLResource(null, id, -1, this);
     }
-    throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
+    throw new XMLDBException(ErrorCodes.UNKNOWN_RESOURCE_TYPE);
   }
 
   public Collection getChildCollection(final String name) throws XMLDBException {
-    if(isOpen()) {
-      return null;
-    }
-    throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
+    check();
+    return null;
   }
 
   public int getChildCollectionCount() throws XMLDBException {
-    if(isOpen()) {
-      return 0;
-    }
-    throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
+    check();
+    return 0;
   }
 
   public String getName() {
@@ -75,10 +70,8 @@ public class BXCollection implements Collection {
   }
 
   public Collection getParentCollection() throws XMLDBException {
-    if(isOpen()) {
-      return null;
-    }
-    throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
+    check();
+    return null;
   }
 
   public String getProperty(final String name) {
@@ -88,43 +81,38 @@ public class BXCollection implements Collection {
   }
 
   public Resource getResource(final String id) throws XMLDBException {
-    if(isOpen()) {
-      final byte[] idd = Token.token(id);
-      for(final int d : ctx.data().doc()) {
-        if(Token.eq(ctx.data().text(d), idd)) {
-          return new BXXMLResource(ctx.data(), id, d, this);
-        }
+    check();
+    final byte[] idd = Token.token(id);
+    for(final int d : ctx.data().doc()) {
+      if(Token.eq(ctx.data().text(d), idd)) {
+        return new BXXMLResource(ctx.data(), id, d, this);
       }
-      return null;
     }
-    throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
+    return null;
   }
 
   public int getResourceCount() throws XMLDBException {
-    if(isOpen()) {
-      return ctx.data().doc().length;
-    }
-    throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
+    check();
+    return ctx.data().doc().length;
   }
 
   public Service getService(final String name, final String version)
       throws XMLDBException {
-    if(isOpen()) {
-      if(name.equals(BXQueryService.XPATH)
-          || name.equals(BXQueryService.XQUERY)) return new BXQueryService(
-          this, name);
-      if(name.equals(BXCollectionManagementService.MANAGEMENT)) return new
-      BXCollectionManagementService(this);
-    }
-    throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
+
+    check();
+    if(name.equals(BXQueryService.XPATH) || name.equals(BXQueryService.XQUERY))
+      return new BXQueryService(this, name);
+    if(name.equals(BXCollectionManagementService.MANAGEMENT))
+      return new BXCollectionManagementService(this);
+    return null;
   }
 
   public Service[] getServices() throws XMLDBException {
-    if(isOpen()) {
-      return new Service[] { getService(BXQueryService.XPATH, null),
-          getService(BXQueryService.XQUERY, null), getService(BXCollectionManagementService.MANAGEMENT, null) };
-    }
-    throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
+    check();
+    return new Service[] {
+        getService(BXQueryService.XPATH, null),
+        getService(BXQueryService.XQUERY, null),
+        getService(BXCollectionManagementService.MANAGEMENT, null) };
   }
 
   public boolean isOpen() {
@@ -132,38 +120,30 @@ public class BXCollection implements Collection {
   }
 
   public String[] listChildCollections() throws XMLDBException {
-    if(isOpen()) {
-      String[] empty = {};
-      return empty;
-    }
-    throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
+    check();
+    return new String[] {};
   }
 
   public String[] listResources() throws XMLDBException {
-    if(isOpen()) {
-      final StringList sl = new StringList();
-      for(int d : ctx.data().doc()) sl.add(Token.string(ctx.data().text(d)));
-      return sl.finish();
-    }
-    throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
+    check();
+    final StringList sl = new StringList();
+    for(int d : ctx.data().doc()) sl.add(Token.string(ctx.data().text(d)));
+    return sl.finish();
   }
 
   public void removeResource(Resource res) throws XMLDBException {
-    if(isOpen()) {
-      if(res instanceof BXXMLResource) {
-        BXXMLResource tmp = (BXXMLResource) res;
-        if(Token.string(ctx.data().text(tmp.getPre())).equals(
-            tmp.getDocumentId())) {
-          ctx.data().delete(((BXXMLResource) res).getPre());
-          ctx.data().flush();
-        } else {
+    check();
+    if(res instanceof BXXMLResource) {
+      BXXMLResource tmp = (BXXMLResource) res;
+      if(Token.string(ctx.data().text(tmp.getPre()))
+          .equals(tmp.getDocumentId())) {
+        ctx.data().delete(((BXXMLResource) res).getPre());
+        ctx.data().flush();
+      } else {
         throw new XMLDBException(ErrorCodes.NO_SUCH_RESOURCE);
-        }
-       } else {
-      throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
       }
     } else {
-    throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
+      throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
     }
   }
 
@@ -173,27 +153,32 @@ public class BXCollection implements Collection {
   }
 
   public void storeResource(final Resource res) throws XMLDBException {
-    if(isOpen()) {
-      final String id = ((BXXMLResource) res).getDocumentId();
-      Data tmp = null;
-      final Object cont = res.getContent();
-      Parser p = null;
-      if(cont instanceof Document) {
-        p = new DOCWrapper((Document) cont, id);
-      } else {
-        p = new DirParser(IO.get(cont.toString()));
-      }
-      try {
-        tmp = new MemBuilder().build(p, id);
-        final Data data = ctx.data();
-        data.insert(data.size, -1, tmp);
-        data.flush();
-      } catch(final IOException ex) {
-        BaseX.debug(ex);
-        throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
-      }
+    check();
+    final String id = ((BXXMLResource) res).getDocumentId();
+    Data tmp = null;
+    final Object cont = res.getContent();
+    Parser p = null;
+    if(cont instanceof Document) {
+      p = new DOCWrapper((Document) cont, id);
     } else {
-    throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
+      p = new DirParser(IO.get(cont.toString()));
     }
+    try {
+      tmp = new MemBuilder().build(p, id);
+      final Data data = ctx.data();
+      data.insert(data.size, -1, tmp);
+      data.flush();
+    } catch(final IOException ex) {
+      BaseX.debug(ex);
+      throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
+    }
+  }
+
+  /**
+   * Checks if the collection is currently open.
+   * @throws XMLDBException exception
+   */
+  public void check() throws XMLDBException {
+    if(closed) throw new XMLDBException(ErrorCodes.COLLECTION_CLOSED);
   }
 }

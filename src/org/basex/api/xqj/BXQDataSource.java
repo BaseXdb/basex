@@ -26,7 +26,7 @@ public final class BXQDataSource implements XQDataSource {
    */
   public BXQDataSource() {
     Prop.read();
-    Prop.onthefly = true;
+    //Prop.onthefly = true;
     //Prop.debug = true;
   }
 

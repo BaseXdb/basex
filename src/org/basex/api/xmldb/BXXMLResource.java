@@ -126,8 +126,7 @@ public final class BXXMLResource implements XMLResource {
   }
 
   /** SAX Parser. */
-  class BXSAXContentHandler extends DefaultHandler {
-    
+  static final class BXSAXContentHandler extends DefaultHandler {
     /** XMLResource. */
     protected BXXMLResource res;
     /** StringBuffer */
@@ -137,12 +136,13 @@ public final class BXXMLResource implements XMLResource {
     
     /**
      * Standard Constructor.
-     * @param xmlresource XMLResource 
+     * @param xmlresource XMLResource
      */
-    public BXSAXContentHandler(BXXMLResource xmlresource) {
-        res = xmlresource;
-        ns = new Hashtable<String, String>();
+    BXSAXContentHandler(BXXMLResource xmlresource) {
+      res = xmlresource;
+      ns = new Hashtable<String, String>();
     }
+    
     @Override
     public void characters(char ac[], int i, int j) {
       for(int k = 0; k < j; k++) {

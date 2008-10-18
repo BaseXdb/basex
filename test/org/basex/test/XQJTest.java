@@ -271,13 +271,7 @@ public class XQJTest extends TestCase {
       if(ev.isStartElement()) {
         final StartElement se = ev.asStartElement();
         se.getName();
-      } else if(ev.isCharacters()) {
-        //Characters ch = ev.asCharacters();
-        //ch.getData());
-      } else {
-        //ev.getEventType());
       }
-      //System.out.println(xer.getElementText());
     }
   }
 
