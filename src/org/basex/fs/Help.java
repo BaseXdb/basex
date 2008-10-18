@@ -94,9 +94,10 @@ public final class Help extends FSCmd {
       }
     } catch(final Exception ex) {
       final byte[] n = lc(token(cmd));
+      final Levenshtein ls = new Levenshtein();
       for(final Commands.FS c : Commands.FS.values()) {
         final byte[] s = lc(token(c.name()));
-        if(Levenshtein.similar(n, s)) {
+        if(ls.similar(n, s)) {
           out.println(BaseX.info(CMDSIMILAR, n, s));
           return;
         }

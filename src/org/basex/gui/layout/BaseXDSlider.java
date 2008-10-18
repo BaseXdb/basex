@@ -8,9 +8,6 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIConstants.FILL;
 
@@ -21,8 +18,6 @@ import org.basex.gui.GUIConstants.FILL;
  * @author Christian Gruen
  */
 public final class BaseXDSlider extends BaseXPanel {
-  /** Slider width. */
-  public final DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
   /** Slider width. */
   public static final int ARROW = 17;
   /** Label space. */
@@ -114,7 +109,7 @@ public final class BaseXDSlider extends BaseXPanel {
       if(sz > (1L << 10)) return ((sz + (1L <<  9)) >> 10) + " KB";
       return sz + " Bytes";
     }
-    if(date) return df.format(new Date((long) size * 60000));
+    if(date) return BaseXLayout.date((long) size);
 
     return (long) size == size ? Long.toString((long) size) :
       Double.toString(size);

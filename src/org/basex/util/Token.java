@@ -964,37 +964,6 @@ public final class Token {
   }
 
   /**
-   * Checks if the specified character is a letter; special characters are
-   * converted to the standard ASCII charset.
-   * Note that this method does not support unicode characters.
-   * @param ch character to be converted
-   * @return converted character
-   */
-  public static boolean ftChar(final byte ch) {
-    return letterOrDigit(ft(ch));
-  }
-  
-  /**
-   * Returns a lowercase ASCII character of the specified fulltext character.
-   * Note that this method does not support unicode characters.
-   * @param ch character to be converted
-   * @return converted character
-   */
-  public static int ftNorm(final int ch) {
-    return lc(ft(ch));
-  }
-
-  /**
-   * Returns a fulltext character of the specified character.
-   * Note that this method does not support unicode characters.
-   * @param ch character to be converted
-   * @return converted character
-   */
-  private static int ft(final int ch) {
-    return ch < 0 && ch > -64 ? NORM[ch + 64] : ch;
-  }
-
-  /**
    * Removes diacritics from the specified token.
    * Note that this method does only support ISO-8859-1.
    * @param t token to be converted
@@ -1036,7 +1005,7 @@ public final class Token {
    * Normalize special characters.
    * To be extended for UTF8 support.
    */
-  private static final byte[] NORM = { 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'C',
+  public static final byte[] NORM = { 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'C',
     'E', 'E', 'E', 'E', 'I', 'I', 'I', 'I', 'D', 'N', 'O', 'O', 'O', 'O',
     'O', ' ', 'O', 'U', 'U', 'U', 'U', 'Y', 'D', 'S', 'a', 'a', 'a', 'a', 'a',
     'a', 'a', 'c', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i', 'd', 'n', 'o',

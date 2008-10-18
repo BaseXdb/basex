@@ -7,7 +7,6 @@ import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.SystemColor;
-
 import javax.swing.UIManager;
 import org.basex.Text;
 

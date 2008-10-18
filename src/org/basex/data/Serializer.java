@@ -292,6 +292,8 @@ public abstract class Serializer {
         text(data.text(p++));
       } else if(k == Data.COMM) {
         comment(data.text(p++));
+      } else if(k == Data.ATTR) {
+        attribute(data.attName(p), data.attValue(p++));
       } else if(k == Data.PI) {
         pi(data.text(p++));
       } else {

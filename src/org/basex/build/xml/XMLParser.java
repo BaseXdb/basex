@@ -45,10 +45,9 @@ public final class XMLParser extends Parser {
         builder.text(scanner.token, scanner.ws);
       } else if(scanner.type == Type.COMMENT) {
         builder.comment(scanner.token);
-      } else if(scanner.type == Type.DTD) {
       } else if(scanner.type == Type.PI) {
         builder.pi(scanner.token); 
-      } else {
+      } else if(scanner.type != Type.DTD) {
         if(!parseTag()) break;
         continue;
       }

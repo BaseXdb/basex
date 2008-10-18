@@ -10,6 +10,7 @@ import org.basex.io.DataInput;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.util.StringList;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -29,33 +30,29 @@ public final class List extends Process {
   @Override
   protected void out(final PrintOutput o) throws IOException {
     final String[] list = list().finish();
-    final int ml = maxLength(list) + 1;
+    final int ml = maxLength(list) + 2;
 
-    final TokenBuilder tb = new TokenBuilder();
-    int c = 0;
-    for(final String name : list) {
-      tb.add(name, ml);
-      try {
-        final DataInput in = new DataInput(name, DATAINFO);
-        final MetaData md = new MetaData(name);
-        md.read(in);
-        in.close();
-        tb.add(md.file);
-        c++;
-      } catch(final IOException ex) {
-        tb.add(INFODBERR);
-      }
-      tb.add(NL);
-    }
-    if(c == 0) {
-      o.print(INFONODB + NL);
+    if(list.length == 0) {
+      o.println(INFONODB);
     } else {
       final TokenBuilder t = new TokenBuilder();
-      t.add("Database", ml);
-      t.add("XML Document" + NL);
-      t.add("--------------------------------------------" + NL);
+      o.print(Token.token("Database"), ml);
+      o.println("XML Document");
+      o.println("--------------------------------------------");
+      for(final String name : list) {
+        o.print(Token.token(name), ml);
+        try {
+          final DataInput in = new DataInput(name, DATAINFO);
+          final MetaData md = new MetaData(name);
+          md.read(in);
+          in.close();
+          o.println(md.file.toString());
+        } catch(final IOException ex) {
+          o.println(INFODBERR);
+        }
+      }
       o.print(t.finish());
-      o.print(tb + NL + c + INFODBLIST + NL);
+      o.print(NL + list.length + INFODBLIST + NL);
     }
   }
 

@@ -32,7 +32,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class MapFS extends MapPainter {
+final class MapFS extends MapPainter {
   /** Image offset. */
   private static final int PICOFFSET = 2;
   /** Image cache. */

@@ -82,6 +82,7 @@ public final class BaseXBar extends BaseXPanel {
     comp = cmp;
     visible = vis;
     addMouseListener(this);
+    addKeyListener(this);
     addMouseMotionListener(this);
     setMode(FILL.NONE);
     BaseXLayout.setWidth(this, SIZE);
@@ -147,7 +148,7 @@ public final class BaseXBar extends BaseXPanel {
     int xx = x + SIZE / 2 - 3;
     int yy = y + SIZE / 2 - 3;
     if(button && up) { xx++; yy++; }
-    g.setColor(GUIConstants.color6);
+    g.setColor(Color.black);
     g.drawLine(xx + 2, yy    , xx + 2, yy);
     g.drawLine(xx + 1, yy + 1, xx + 3, yy + 1);
     g.drawLine(xx + 1, yy + 2, xx + 3, yy + 2);

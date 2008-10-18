@@ -60,27 +60,23 @@ public final class TableView extends View implements Runnable {
 
   @Override
   public void refreshInit() {
-    scroll.pos(0);
-    scroll.height(0);
+    tdata.rootRows = null;
     tdata.rows = null;
-    tdata.invalid = true;
 
-    final Context context = GUI.context;
-    if(!context.db() || !GUIProp.showtable) return;
-    tdata.init(context.data());
+    final Data data = GUI.context.data();
+    if(!GUIProp.showtable || data == null) return;
+    tdata.init(data);
     refreshContext(true, false);
   }
   
   @Override
   public void refreshContext(final boolean more, final boolean quick) {
-    if(tdata.invalid || !GUIProp.showtable) {
-      tdata.invalid = true;
-      tdata.rows = null;
-      return;
-    }
+    if(!GUIProp.showtable || tdata.cols.length == 0) return;
     
-    tdata.context();
+    tdata.context(false);
     scroll.pos(0);
+    if(tdata.rows == null) return;
+
     if(quick) {
       scroll.height(tdata.rows.size * tdata.rowH(1));
       findFocus();
@@ -93,13 +89,13 @@ public final class TableView extends View implements Runnable {
   
   @Override
   public void refreshFocus() {
-    if(tdata.invalid) return;
+    if(!GUIProp.showtable || tdata.rows == null) return;
     repaint();
   }
 
   @Override
   public void refreshMark() {
-    if(tdata.invalid) return;
+    if(!GUIProp.showtable || tdata.rows == null) return;
 
     final Context context = GUI.context;
     final Nodes marked = context.marked();
@@ -112,25 +108,22 @@ public final class TableView extends View implements Runnable {
 
   @Override
   public void refreshLayout() {
-    if(tdata.invalid) return;
+    if(!GUIProp.showtable || tdata.rows == null) return;
+
     scroll.height(tdata.rows.size * tdata.rowH(1));
     refreshContext(false, true);
   }
   
   @Override
   public void refreshUpdate() {
-    if(tdata.invalid || !GUIProp.showtable) return;
-    tdata.init(GUI.context.data());
-    refreshContext(false, true);
+    refreshInit();
+    repaint();
   }
 
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
-    if(tdata.rows == null && GUIProp.showtable) {
-      refreshInit();
-      return;
-    }
+    if(tdata.rows == null && GUIProp.showtable) refreshInit();
   }
 
   /**
@@ -175,7 +168,7 @@ public final class TableView extends View implements Runnable {
   @Override
   public void mouseMoved(final MouseEvent e) {
     super.mouseMoved(e);
-    if(tdata.invalid) return;
+    if(!GUIProp.showtable || tdata.rows == null) return;
 
     tdata.mouseX = e.getX();
     tdata.mouseY = e.getY();
@@ -220,7 +213,7 @@ public final class TableView extends View implements Runnable {
   public void mousePressed(final MouseEvent e) {
     super.mousePressed(e);
     final Data data = GUI.context.data();
-    if(tdata.invalid || data.fs != null && tdata.mouseX < 20) return;
+    if(tdata.rows == null || data.fs != null && tdata.mouseX < 20) return;
     
     if(e.getY() < header.getHeight()) return;
     
@@ -230,7 +223,8 @@ public final class TableView extends View implements Runnable {
         final String str = content.focusedString;
         if(str == null || str.length() > Token.MAXLEN) return;
         if(!e.isShiftDown()) tdata.resetFilter();
-        tdata.filter[tdata.column(getWidth() - BaseXBar.SIZE, e.getX())] = str;
+        final int c = tdata.column(getWidth() - BaseXBar.SIZE, e.getX());
+        tdata.cols[c].filter = str;
         tdata.find();
         repaint();
       } else {
@@ -267,7 +261,8 @@ public final class TableView extends View implements Runnable {
   
   @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
-    if(tdata.invalid) return;
+    if(tdata.rows == null) return;
+
     scroll.pos(scroll.pos() + e.getUnitsToScroll() * tdata.rowH);
     mouseMoved(e);
     repaint();
@@ -276,7 +271,8 @@ public final class TableView extends View implements Runnable {
   @Override
   public void keyPressed(final KeyEvent e) {
     super.keyPressed(e);
-    if(tdata.invalid || e.isAltDown()) return;
+    if(tdata.rows == null) return;
+
     final int key = e.getKeyCode();
     
     final int lines = (getHeight() - header.getHeight()) / tdata.rowH;

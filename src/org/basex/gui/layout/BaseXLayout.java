@@ -3,6 +3,7 @@ package org.basex.gui.layout;
 import static org.basex.Text.*;
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -17,14 +18,17 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.swing.AbstractButton;
 import javax.swing.JComponent;
+
+import org.basex.BaseX;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.dialog.Dialog;
 import org.basex.gui.view.View;
 import org.basex.gui.view.map.MapRect;
-import org.basex.util.Token;
 
 /**
  * This class assembles layout and paint methods which are frequently
@@ -34,6 +38,9 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class BaseXLayout {
+  /** Date Format. */
+  public static final SimpleDateFormat DATE =
+    new SimpleDateFormat("dd.MM.yyyy hh:mm");
   /** Private constructor. */
   private BaseXLayout() { }
 
@@ -182,6 +189,15 @@ public final class BaseXLayout {
   }
 
   /**
+   * Converts the specified long value into a date representation.
+   * @param time time value
+   * @return date as string
+   */
+  public static String date(final long time) {
+    return DATE.format(new Date(time * 60000));
+  }
+
+  /**
    * Fills the specified area with a color gradient.
    * @param gg graphics reference
    * @param c1 first color
@@ -305,16 +321,21 @@ public final class BaseXLayout {
     int j = s.length;
     int fw = 0;
     int l = 0;
-    for(int k = 0; k < j; k += l) {
-      final int ww = width(g, cw, cp(s, k));
-      if(fw + ww >= w - 4) {
-        j = Math.max(1, k - l);
-        if(k > 1) fw -= width(g, cw, cp(s, k - 1));
-        g.drawString("..", x + fw, y + GUIProp.fontsize);
-        break;
+    try {
+      // ignore faulty character sets
+      for(int k = 0; k < j; k += l) {
+        final int ww = width(g, cw, cp(s, k));
+        if(fw + ww >= w - 4) {
+          j = Math.max(1, k - l);
+          if(k > 1) fw -= width(g, cw, cp(s, k - 1));
+          g.drawString("..", x + fw, y + GUIProp.fontsize);
+          break;
+        }
+        fw += ww;
+        l = cl(s[k]);
       }
-      fw += ww;
-      l = cl(s[k]);
+    } catch(final Exception ex) {
+      BaseX.debug(ex);
     }
     g.drawString(string(s, 0, j), x, y + GUIProp.fontsize);
     return fw;
@@ -413,7 +434,7 @@ public final class BaseXLayout {
           ww = r.w;
           break;
         }
-        if(Token.ws(s[n])) {
+        if(ws(s[n])) {
           j = n + 1;
           ww -= sw;
           break;
@@ -481,7 +502,7 @@ public final class BaseXLayout {
          c = true;
       }
 
-      if(i == s.length || Token.ws(s[i])) {
+      if(i == s.length || ws(s[i])) {
         // check if rectangle fits in line and if it's not the first word
         if(f * (ll + wl) > ww && ll != 0) {
           yy += lh;
@@ -527,7 +548,12 @@ public final class BaseXLayout {
     final int[] cw = fontWidths(g.getFont());
     final int l = s.length;
     int fw = 0;
-    for(int k = 0; k < l; k += cl(s[k])) fw += width(g, cw, cp(s, k));
+    try {
+      // ignore faulty character sets
+      for(int k = 0; k < l; k += cl(s[k])) fw += width(g, cw, cp(s, k));
+    } catch(final Exception ex) {
+      BaseX.debug(ex);
+    }
     return fw;
   }
 

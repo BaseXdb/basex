@@ -59,10 +59,10 @@ public final class TableIterator {
 
       // content found...
       if(elem || k == Data.ATTR) {
-        final int t = elem ? tag : data.attNameID(pre);
+        final int id = elem ? tag : data.attNameID(pre);
         // find correct column...
-        for(col = 0; col < tdata.cols.size; col++) {
-          if(tdata.cols.list[col] == t && tdata.elms.list[col] == elem) {
+        for(col = 0; col < tdata.cols.length; col++) {
+          if(tdata.cols[col].id == id && tdata.cols[col].elem == elem) {
             return true;
           }
         }

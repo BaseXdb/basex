@@ -207,7 +207,7 @@ final class FNStr extends Fun {
   }
 
   /** Normalization types. */
-  private enum NORM {
+  private enum Norm {
     /** C Normalization.      */ C("NFC"),
     /** D Normalization.      */ D("NFD"),
     /** KC Normalization.     */ KC("NFKC"),
@@ -219,7 +219,7 @@ final class FNStr extends Fun {
      * Constructor.
      * @param n name
      */
-    NORM(final String n) {
+    Norm(final String n) {
       name = token(n);
     }
   }
@@ -232,13 +232,13 @@ final class FNStr extends Fun {
    */
   private Iter normuni(final Iter[] arg) throws XQException {
     final byte[] str = checkStr(arg[0]);
-    NORM norm = null;
+    Norm norm = null;
     if(arg.length == 2) {
       final byte[] n = uc(trim(checkStr(arg[1])));
-      for(final NORM f : NORM.values()) if(eq(f.name, n)) norm = f;
+      for(final Norm f : Norm.values()) if(eq(f.name, n)) norm = f;
       if(norm == null) Err.or(NORMUNI, n);
     } else {
-      norm = NORM.C;
+      norm = Norm.C;
     }
     // [CG] XQuery/normalize-unicode
     return Str.iter(str);

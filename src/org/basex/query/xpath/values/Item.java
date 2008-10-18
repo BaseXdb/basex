@@ -15,6 +15,9 @@ import org.basex.util.Levenshtein;
  * @author Christian Gruen
  */
 public abstract class Item extends Expr implements Result {
+  /** Levenshtein reference. */
+  protected Levenshtein ls;
+  
   /**
    * Returns the evaluation precedence.
    * @return evaluation precedence
@@ -95,8 +98,9 @@ public abstract class Item extends Expr implements Result {
    * @return result of comparison.
    */
   protected boolean apprContains(final Item v) {
-    return v instanceof NodeSet ? ((NodeSet) v).apprContainedIn(this) :
-      Levenshtein.contains(str(), v.str());
+    if(v instanceof NodeSet) return ((NodeSet) v).apprContainedIn(this);
+    if(ls == null) ls = new Levenshtein();
+    return ls.contains(str(), v.str());
   }
 
   @Override

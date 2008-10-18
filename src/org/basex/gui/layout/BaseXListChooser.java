@@ -127,8 +127,6 @@ public final class BaseXListChooser extends BaseXBack {
             list.setSelectedValue(values[i], true);
             text.setText(values[i]);
             text.select(c, values[i].length());
-          } else if(num) {
-            //parent.action(null);
           }
         }
         parent.action(null);

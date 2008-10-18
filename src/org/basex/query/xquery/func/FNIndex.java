@@ -86,10 +86,9 @@ public final class FNIndex extends Set {
   public void error(final byte[] name) throws XQException {
     // check similar predefined function
     final byte[] nm = lc(name);
+    final Levenshtein ls = new Levenshtein();
     for(int k = 1; k < size; k++) {
-      if(Levenshtein.similar(nm, lc(keys[k]))) {
-        Err.or(FUNSIMILAR, name, keys[k]);
-      }
+      if(ls.similar(nm, lc(keys[k]))) Err.or(FUNSIMILAR, name, keys[k]);
     }
   }
 

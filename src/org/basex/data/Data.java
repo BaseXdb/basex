@@ -1,6 +1,7 @@
 package org.basex.data;
 
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import org.basex.fs.DataFS;
 import org.basex.index.Index;
@@ -65,7 +66,7 @@ public abstract class Data  {
    * Dissolves the references to often used tag names and attributes.
    */
   public final void initNames() {
-    if(tags.id(DataText.DEEPFS) != 0) fs = new DataFS(this);
+    if(tags.id(token(DataText.DEEPFS)) != 0) fs = new DataFS(this);
     nameID = atts.id(DataText.NAME);    
   }
   

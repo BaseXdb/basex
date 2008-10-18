@@ -90,6 +90,17 @@ public interface FSText {
   /** MP3 info. */
   byte[] MP3ENCODE = token("Encoding");
 
+  /** MP3 tag. */
+  byte[] PERSON = token("Person");
+  /** MP3 tag. */
+  byte[] TITLE = token("Title");
+  /** MP3 tag. */
+  byte[] ALBUM = token("Album");
+  /** MP3 tag. */
+  byte[] BITRATE = token("Bitrate");
+  /** MP3 tag. */
+  byte[] SECONDS = token("Seconds");
+
   /** ID3v1 header info. */
   byte[] HEADERID3V1 = token("TAG");
   /** ID3v1 tag. */

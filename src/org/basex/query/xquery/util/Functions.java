@@ -116,8 +116,9 @@ public final class Functions extends ExprInfo {
    */
   public static void typeErr(final QNm type) throws XQException {
     final byte[] ln = type.ln();
+    final Levenshtein ls = new Levenshtein();
     for(final Type t : Type.values()) {
-      if(t.par != null &&  Levenshtein.similar(lc(ln), lc(t.name)))
+      if(t.par != null &&  ls.similar(lc(ln), lc(t.name)))
         Err.or(FUNSIMILAR, ln, t.name);
     }
     Err.or(FUNCUNKNOWN, type.str());
@@ -191,8 +192,9 @@ public final class Functions extends ExprInfo {
     FNIndex.get().error(nm);
 
     // find similar local function
+    final Levenshtein ls = new Levenshtein();
     for(int n = 0; n < size; n++) {
-      if(Levenshtein.similar(nm, Token.lc(func[n].var.name.ln())))
+      if(ls.similar(nm, Token.lc(func[n].var.name.ln())))
         Err.or(FUNSIMILAR, name.str(), func[n].var.name.str());
     }
   }

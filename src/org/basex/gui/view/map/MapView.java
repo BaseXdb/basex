@@ -1,7 +1,6 @@
 package org.basex.gui.view.map;
 
 import static org.basex.Text.*;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.ComponentEvent;
@@ -87,8 +86,6 @@ public final class MapView extends View implements Runnable {
   public MapView(final byte[] help) {
     super(help);
     setMode(GUIConstants.FILL.NONE);
-    mainMap = createImage();
-    zoomMap = createImage();
     popup = new BaseXPopup(this, GUIConstants.POPUP);
   }
 
@@ -97,17 +94,8 @@ public final class MapView extends View implements Runnable {
    * @return buffered image
    */
   private BufferedImage createImage() {
-    final Dimension screen = getToolkit().getScreenSize();
-    final int w = Math.max(1, screen.width);
-    final int h = Math.max(1, screen.height);
-    // Screenshot version: int w = {width}, h = {height}...
-
-    final BufferedImage img = new BufferedImage(w, h,
-        BufferedImage.TYPE_INT_BGR);
-    final Graphics g = img.getGraphics();
-    g.setColor(GUIConstants.COLORS[0]);
-    g.fillRect(0, 0, w, h);
-    return img;
+    return new BufferedImage(Math.max(1, getWidth()),
+        Math.max(1, getHeight()), BufferedImage.TYPE_INT_BGR);
   }
 
   @Override
@@ -123,6 +111,8 @@ public final class MapView extends View implements Runnable {
       if(!GUIProp.showmap) return;
       painter = data.fs != null ? new MapFS(this, data.fs) :
         new MapDefault(this);
+      mainMap = createImage();
+      zoomMap = createImage();
       calc();
       repaint();
     }
@@ -147,7 +137,7 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public void refreshMark() {
-    if(getWidth() == 0) return;
+    if(getWidth() == 0 || mainMap == null) return;
     drawMap();
     repaint();
   }
@@ -283,7 +273,7 @@ public final class MapView extends View implements Runnable {
     final MapRect rect = new MapRect(0, 0, w, h, 0, 0);
 
     // calculate new main rectangles
-    if(painter == null) return null;
+    if(painter == null) return "";
     mainRects = new ArrayList<MapRect>();
     painter.reset();
 
@@ -423,7 +413,10 @@ public final class MapView extends View implements Runnable {
   @Override
   public void paintComponent(final Graphics g) {
     final Data data = GUI.context.data();
-    if(data == null) return;
+    if(data == null || data.size == 0) {
+      super.paintComponent(g);
+      return;
+    }
 
     if(mainRects == null) {
       refreshInit();
@@ -768,6 +761,8 @@ public final class MapView extends View implements Runnable {
   public void componentResized(final ComponentEvent e) {
     if(working) return;
     focusedRect = null;
+    mainMap = createImage();
+    zoomMap = createImage();
     GUI.get().status.setPerformance(calc());
     repaint();
   }

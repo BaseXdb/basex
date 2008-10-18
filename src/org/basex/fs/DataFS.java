@@ -30,15 +30,15 @@ public final class DataFS {
   /** Data reference. */
   final Data data;
   /** Index References. */
-  int fileID;
+  public int fileID;
   /** Index References. */
-  int dirID;
+  public int dirID;
   /** Index References. */
-  int sizeID;
+  public int sizeID;
   /** Index References. */
-  int suffID;
+  public int suffID;
   /** Index References. */
-  int timeID;
+  public int timeID;
 
   /**
    * Constructor.

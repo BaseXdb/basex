@@ -418,9 +418,7 @@ public final class GetOptTest {
         if(ch == 'i') {
           assertEquals("Argument of " + command, "Test", g.getOptarg());
         } else {
-          if(ch == 'R') {
-//            assertEquals("Argument of " + command, ":", g.getOptarg());
-          } else {
+          if(ch != 'R') {
             assertEquals("Argument of " + command, null, g.getOptarg());
           }
         }

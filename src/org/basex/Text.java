@@ -348,6 +348,316 @@ public interface Text {
   /** Waiting info. */
   String WAIT2 = DOTS + lang("wait") + DOTS;
 
+  // PROCESS INFOS ============================================================
+
+  /** Process time. */
+  String PROCTIME = lang("proc_time") + ": %";
+  /** No Document Warning. */
+  String PROCSYNTAX = lang("proc_syntax") + ": %";
+  /** Command Execution Error. */
+  String PROCERR = lang("proc_err") + COL + NL + "%";
+  /** No Database Error. */
+  String PROCNODB = lang("proc_nodb");
+  /** No Filesystem Error. */
+  String PROCNOFS = lang("proc_nofs");
+  /** Update Error. */
+  String PROCMM = lang("proc_mm");
+  /** Update Error. */
+  String PROCOUTMEM = lang("proc_outmem");
+
+  /** Unknown Command error. */
+  String CMDNO = lang("cmd_no");
+  /** Unknown Command error. */
+  String CMDUNKNOWN = lang("cmd_unknown");
+  /** Unknown Command error. */
+  String CMDWHICH = CMDUNKNOWN + "; " + lang("help_short") + DOT;
+  /** Unknown Command error. */
+  String CMDSIMILAR = CMDUNKNOWN + "; " + lang("cmd_similar");
+  /** Database Closed. */
+  String CMDHELP = lang("help_long");
+
+  /** Database Closed. */
+  String PINGINFO = lang("cmd_ping") + NL;
+  /** XMark Error. */
+  String XMARKWHICH = lang("cmd_xmark");
+
+  // CREATE COMMAND ===========================================================
+
+  /** Create Database information. */
+  String PROGCREATE = lang("pc_create");
+  /** Create Database information. */
+  String PROGINDEX = lang("pc_index");
+  /** Database Update. */
+  String DBUPDATE = lang("pc_update");
+  /** Index Update. */
+  String INDUPDATE = lang("pc_indupdate");
+  /** Builder error. */
+  String CANCELCREATE = lang("pc_cancel");
+  /** Builder error. */
+  String LIMITRANGE = lang("pc_range");
+  /** Builder error. */
+  String LIMITTAGS = lang("pc_tags");
+  /** Builder error. */
+  String LIMITATTS = lang("pc_atts");
+  /** Create Database information. */
+  String NODESPARSED = S + lang("pc_parse");
+  /** Scanner Position. */
+  String SCANPOS = lang("pc_pos");
+
+  /** Create Database information. */
+  String INDEXTXT = lang("pc_indextxt") + DOTS;
+  /** Create Database information. */
+  String INDEXATT = lang("pc_indexatt") + DOTS;
+  /** Create Database information. */
+  String INDEXFTX = lang("pc_indexftx") + DOTS;
+
+  /** Database created. */
+  String DBCREATED = lang("pc_created");
+
+  /** Create information. */
+  String CREATETABLE = lang("pc_tbl");
+  /** Parse error. */
+  String CREATEERR = lang("pc_err");
+  /** Not allowed to create 'deepfs' special database. */
+  String CREATENODEEPDB = lang("pc_err_deepfs");
+
+  /** File not found. */
+  String FILEWHICH = lang("pc_filenf");
+  /** Path not found. */
+  String PATHWHICH = lang("pc_pathnf");
+
+  // DATABASE COMMANDS ========================================================
+
+  /** Database not found. */
+  String DBNOTFOUND = lang("db_no");
+  /** Database is open. */
+  String DBINMEM = lang("db_open");
+  /** Help String. */
+  String DBNOSTATS = lang("db_nostats");
+  /** Database closed. */
+  String DBCLOSED = lang("db_closed");
+  /** Database not closed. */
+  String DBCLOSEERR = lang("db_closeerr");
+  /** Database Dropped. */
+  String DBDROPPED = lang("db_dropped");
+  /** Database not dropped. */
+  String DBNOTDROPPED = lang("db_notdropped");
+  /** Database not opened. */
+  String DBOPENERR = lang("db_notopened");
+  /** Database opened. */
+  String DBOPENED = lang("db_opened");
+  /** Database exported. */
+  String DBEXPORTED = lang("db_exported");
+
+  /** Database Optimized. */
+  String DBOPTIMIZED = lang("db_optimized");
+  /** Database Optimization. */
+  String DBOPT1 = "Statistics rebuilt in %." + NL;
+  /** Database Optimization. */
+  String DBOPTERR1 = "Could not write statistics...";
+
+  /** Index created. */
+  String DBINDEXED = lang("in_created");
+  /** Index error. */
+  String DBINDEXERR = lang("in_err");
+  /** Index dropped. */
+  String DBDROP = lang("in_dropped");
+  /** Index not dropped. */
+  String DBDROPERR = lang("in_notdropped");
+
+  // DATABASE/INDEX INFORMATION ===============================================
+
+  /** Index info. */
+  String TRIE = "- Compressed Trie";
+  /** Index info. */
+  String FUZZY = "- Fuzzy Index";
+  /** Index info. */
+  String TXTINDEX = "- Tree Structure";
+  /** Index info. */
+  String IDXENTRIES = "- Entries: ";
+  /** Index info. */
+  String SIZEDISK = "- Size on Disk: ";
+
+  // XPATH COMMAND ============================================================
+
+  /** Query Info: Optimizing. */
+  String QUERYPARS = lang("qu_pars") + COL;
+  /** Query Info: Optimizing. */
+  String QUERYCOMP = lang("qu_comp") + COL;
+  /** Query Info: Evaluating. */
+  String QUERYEVAL = lang("qu_eval") + COL;
+  /** Query Info: Querying. */
+  String QUERYTIME = lang("qu_time") + COL;
+  /** Query Info: Result . */
+  String QUERYRESULT = lang("qu_result") + COLS;
+  /** Query Info: Plan. */
+  String QUERYPLAN = lang("qu_plan");
+  /** Query Info: Compiler. */
+  String QUERYSEP = LI;
+  /** Query Info: Plan. */
+  String PLANXML = "plan.xml";
+  /** Query Info: Plan. */
+  String PLANDOT = "plan.dot";
+  /** Query Info: Plan. */
+  String RESULTDOT = "result.dot";
+
+  /** Query Info: Query. */
+  String QUERYSTRING = lang("qu_tabquery") + COLS;
+  /** Query Info: Compiling. */
+  String QUERYPARSE = lang("qu_tabpars") + COLS;
+  /** Query Info: Compiling. */
+  String QUERYCOMPILE = lang("qu_tabcomp") + COLS;
+  /** Query Info: Evaluating. */
+  String QUERYEVALUATE = lang("qu_tabeval") + COLS;
+  /** Query Info: Finishing. */
+  String QUERYFINISH = lang("qu_tabfinish") + COLS;
+  /** Query Info: Time for printing. */
+  String QUERYPRINT = lang("qu_tabprint") + COLS;
+  /** Query Info: Total Time. */
+  String QUERYTOTAL = lang("qu_tabtotal") + COLS;
+  /** Query Hits. */
+  String QUERYHITS = lang("qu_tabhits") + COLS;
+  /** Query Info: Printed Data. */
+  String QUERYPRINTED = lang("qu_tabprinted") + COLS;
+  /** Query Info: Memory. */
+  String QUERYMEM = lang("qu_tabmem") + ": %";
+  /** Query Hits. */
+  String HITS = lang("qu_hits");
+  /** Milliseconds. */
+  String MS = S + lang("qu_ms");
+
+  /** Query Hits. */
+  String VALHIT = "Item";
+  /** Query Hits. */
+  String VALHITS = "Items";
+
+  // UPDATE COMMANDS ==========================================================
+
+  /** Insert query info. */
+  String QUERYNODESERR = lang("uc_querynodeserr");
+
+  /** Deletion info. */
+  String DELETEINFO = lang("uc_deleteinfo");
+  /** Deletion error. */
+  String DELETEROOT = lang("uc_deleteroot");
+  /** Insert query info. */
+  String COPYROOT = lang("uc_copyroot");
+
+  /** Copy query info. */
+  String COPYINFO = lang("uc_copyinfo");
+  /** Insert query info. */
+  String INSERTINFO = lang("uc_insertinfo");
+  /** Update query info. */
+  String UPDATEINFO = lang("uc_updateinfo");
+  /** Update node info. */
+  String UPDATENODE = lang("uc_updatenode");
+  /** Insert query info. */
+  String COPYTAGS = lang("uc_copytags");
+  /** Insert query info. */
+  String INSERTTEXT = lang("uc_inserttext");
+  /** Update element info. */
+  String ATTINVALID = lang("uc_attinvalid");
+  /** Duplicate attribute info. */
+  String ATTDUPL = lang("uc_attdupl");
+  /** Invalid position. */
+  String POSINVALID = lang("uc_posinvalid");
+  /** Update PI info. */
+  String NAMEINVALID = lang("uc_invalid");
+  /** Update text info. */
+  String TXTINVALID = lang("uc_txtinvalid");
+
+  // INFO STRINGS =============================================================
+
+  /** Process information. */
+  String INFOWAIT = lang("wait");
+  /** Title of Information Dialog. */
+  String INFOTITLE = lang("info_title");
+  /** Index information. */
+  String INFOINDEX = lang("info_index");
+  /** Index information. */
+  String INFOBUILD = lang("info_build") + DOTS;
+  /** Optimize information. */
+  String INFOOPT = lang("info_opt") + DOTS;
+  /** Optimize information. */
+  String INFOOPTIM = lang("info_optim");
+  /** Statistics information. */
+  String INFOSTATS = lang("info_stats") + DOTS;
+
+  /** Info on source document. */
+  String INFODBNAME = lang("info_dbname");
+  /** Info on database size. */
+  String INFODBSIZE = lang("info_dbsize");
+  /** Info on source document. */
+  String INFODOC = lang("info_doc");
+  /** Info on database time stamp. */
+  String INFOTIME = lang("info_time");
+  /** Info on number of documents. */
+  String INFONDOCS = lang("info_ndocs");
+  /** Info on document size. */
+  String INFODOCSIZE = lang("info_docsize");
+  /** Document encoding. */
+  String INFOENCODING = lang("info_encoding");
+  /** Info on database table size. */
+  String INFONODES = lang("info_nodes");
+  /** Maximum tree height. */
+  String INFOHEIGHT = lang("info_height");
+
+  /** Info on used main memory. */
+  String INFOMEM = lang("info_mem");
+
+  /** Info on database path. */
+  String INFODBPATH = lang("info_dbpath");
+  /** No Document opened. */
+  String INFONODB = lang("info_nodb");
+  /** Info on database. */
+  String INFODBLIST = lang("info_dblist");
+  /** Info on database. */
+  String INFODBERR = lang("info_dberror");
+
+  /** Info on Query Verbosity. */
+  String INFOINFO = lang("info_info");
+  /** Info on Query Verbosity. */
+  String INFOALL = lang("info_all");
+  /** Info on Debug Mode. */
+  String INFODEBUG = lang("info_debug");
+  /** Info on Whitespace Chopping. */
+  String INFOCHOP = lang("info_chop");
+  /** Info on Entity Parsing. */
+  String INFOENTITY = lang("info_entities");
+  /** Info on result serialization. */
+  String INFOSERIALIZE = lang("info_serialize");
+  /** Info on well formed XML serialization. */
+  String INFOXMLOUTPUT = lang("info_xmloutput");
+  /** Info on Main Memory mode. */
+  String INFOMAINMEM = lang("info_mainmem");
+  /** Info on Text Indexing. */
+  String INFOTAGINDEX = lang("info_tagindex");
+  /** Info on Text Indexing. */
+  String INFOATNINDEX = lang("info_atnindex");
+  /** Info on Text Indexing. */
+  String INFOTEXTINDEX = lang("info_txtindex");
+  /** Info on Attribute Indexing. */
+  String INFOATTRINDEX = lang("info_atvindex");
+  /** Info on Fulltext Indexing. */
+  String INFOFTINDEX = lang("info_ftindex");
+  /** Info on Fuzzy Indexing. */
+  String INFOFZINDEX = lang("info_fzindex");
+
+  /** Info on Document Creation. */
+  String INFODB = lang("info_db");
+  /** Info on Document Creation. */
+  String INFOCREATE = lang("info_create");
+  /** Database Info. */
+  String INFOGENERAL = lang("info_general");
+  /** Database Info. */
+  String RESULTCHOP = lang("info_resultchop");
+  /** Option flag. */
+  String INFOON = lang("info_on");
+  /** Option flag. */
+  String INFOOFF = lang("info_off");
+  /** Error info. */
+  String INFOERROR = lang("info_error");
+
   // MENU ENTRIES =============================================================
 
   /** Menu entry. */
@@ -600,7 +910,9 @@ public interface Text {
   /** Text find information. */
   String RESULTFIND = lang("text_find") + COLS;
   /** Help String. */
-  String NOTABLE = lang("table_no") + DOT;
+  String NOTABLE = lang("no_table") + DOT;
+  /** Help String. */
+  String NOSPACE = lang("no_space");
   /** Binary file. */
   byte[] MAPBINARY = token(lang("map_binary"));
   /** Query Info title. */
@@ -698,11 +1010,8 @@ public interface Text {
 
   /** Dialog title for opening a database. */
   String OPENTITLE = lang("do_title");
-  /** Open Dialog - No database information. */
-  String OPENNODBINFO = lang("do_nodb") + DOT;
   /** Dialog title for deleting nodes. */
-  String NODBQUESTION = OPENNODBINFO + DOT + NL +
-  lang("do_nodbquestion") + NL + S;
+  String NODBQUESTION = INFONODB + DOT + NL + lang("do_nodbquestion") + NL + S;
 
   /** File Dialog title. */
   String XQOPENTITLE = lang("dq_open");
@@ -865,348 +1174,6 @@ public interface Text {
   /** Developer Names. */
   String CONTRIBUTE2 = "Lukas Kircher, Andreas Weiler " + lang("da_cont2");
 
-  // PROCESS INFOS ============================================================
-
-  /** Process time. */
-  String PROCTIME = lang("proc_time") + ": %";
-  /** No Document Warning. */
-  String PROCSYNTAX = lang("proc_syntax") + ": %";
-  /** Command Execution Error. */
-  String PROCERR = lang("proc_err") + COL + NL + "%";
-  /** No Database Error. */
-  String PROCNODB = lang("proc_nodb");
-  /** No Filesystem Error. */
-  String PROCNOFS = lang("proc_nofs");
-  /** Update Error. */
-  String PROCMM = lang("proc_mm");
-  /** Update Error. */
-  String PROCOUTMEM = lang("proc_outmem");
-
-  /** Unknown Command error. */
-  String CMDNO = lang("cmd_no");
-  /** Unknown Command error. */
-  String CMDUNKNOWN = lang("cmd_unknown");
-  /** Unknown Command error. */
-  String CMDWHICH = CMDUNKNOWN + "; " + lang("help_short") + DOT;
-  /** Unknown Command error. */
-  String CMDSIMILAR = CMDUNKNOWN + "; " + lang("cmd_similar");
-  /** Database Closed. */
-  String CMDHELP = lang("help_long");
-
-  /** Database Closed. */
-  String PINGINFO = lang("cmd_ping") + NL;
-  /** XMark Error. */
-  String XMARKWHICH = lang("cmd_xmark");
-
-  // CREATE COMMAND ===========================================================
-
-  /** Create Database information. */
-  String PROGCREATE = lang("pc_create");
-  /** Create Database information. */
-  String PROGINDEX = lang("pc_index");
-  /** Database Update. */
-  String DBUPDATE = lang("pc_update");
-  /** Index Update. */
-  String INDUPDATE = lang("pc_indupdate");
-  /** Builder error. */
-  String CANCELCREATE = lang("pc_cancel");
-  /** Builder error. */
-  String LIMITRANGE = lang("pc_range");
-  /** Builder error. */
-  String LIMITTAGS = lang("pc_tags");
-  /** Builder error. */
-  String LIMITATTS = lang("pc_atts");
-  /** Create Database information. */
-  String NODESPARSED = S + lang("pc_parse");
-  /** Scanner Position. */
-  String SCANPOS = lang("pc_pos");
-
-  /** Create Database information. */
-  String INDEXTXT = lang("pc_indextxt") + DOTS;
-  /** Create Database information. */
-  String INDEXATT = lang("pc_indexatt") + DOTS;
-  /** Create Database information. */
-  String INDEXFTX = lang("pc_indexftx") + DOTS;
-
-  /** Database created. */
-  String DBCREATED = lang("pc_created");
-
-  /** Create information. */
-  String CREATETABLE = lang("pc_tbl");
-  /** Create information. */
-  //String CREATEATTR = lang("pc_att");
-  /** Create information. */
-  //String CREATETEXT = lang("pc_txt");
-  /** Create information. */
-  //String CREATEFT = lang("pc_ftx");
-  /** Parse error. */
-  String CREATEERR = lang("pc_err");
-  /** Not allowed to create 'deepfs' special database. */
-  String CREATENODEEPDB = lang("pc_err_deepfs");
-
-  /** File not found. */
-  String FILEWHICH = lang("pc_filenf");
-  /** Path not found. */
-  String PATHWHICH = lang("pc_pathnf");
-
-  // DATABASE COMMANDS ========================================================
-
-  /** Database not found. */
-  String DBNOTFOUND = lang("db_no");
-  /** Database is open. */
-  String DBINMEM = lang("db_open");
-  /** No Document in memory Warning. */
-  String DBEMPTY = lang("db_nodb");
-  /** Database closed. */
-  String DBCLOSED = lang("db_closed");
-  /** Database not closed. */
-  String DBCLOSEERR = lang("db_closeerr");
-  /** Database Dropped. */
-  String DBDROPPED = lang("db_dropped");
-  /** Database not dropped. */
-  String DBNOTDROPPED = lang("db_notdropped");
-  /** Database not opened. */
-  String DBOPENERR = lang("db_notopened");
-  /** Database opened. */
-  String DBOPENED = lang("db_opened");
-  /** Database exported. */
-  String DBEXPORTED = lang("db_exported");
-
-  /** Database Optimized. */
-  String DBOPTIMIZED = lang("db_optimized");
-  /** Database Optimization. */
-  String DBOPT1 = "Statistics rebuilt in %." + NL;
-  /** Database Optimization. */
-  String DBOPTERR1 = "Could not write statistics...";
-
-  /** Index created. */
-  String DBINDEXED = lang("in_created");
-  /** Index error. */
-  String DBINDEXERR = lang("in_err");
-  /** Index dropped. */
-  String DBDROP = lang("in_dropped");
-  /** Index not dropped. */
-  String DBDROPERR = lang("in_notdropped");
-
-  // DATABASE/INDEX INFORMATION ===============================================
-
-  /** Data info. */
-  //String TAGINDEX = "Tag Names";
-  /** Data info. */
-  //String ATTINDEX = "Attribute Names";
-  /** Data info. */
-  //String TEXTINDEX = "Texts";
-  /** Data info. */
-  //String VALUEINDEX = "Attribute Values";
-  /** Index info. */
-  String TRIE = "- Compressed Trie";
-  /** Index info. */
-  String FUZZY = "- Fuzzy Index";
-  /** Index info. */
-  String TXTINDEX = "- Tree Structure";
-  /** Index info. */
-  String IDXENTRIES = "- Entries: ";
-  /** Index info. */
-  String SIZEDISK = "- Size on Disk: ";
-
-  // XPATH COMMAND ============================================================
-
-  /** Query Info: Optimizing. */
-  String QUERYPARS = lang("qu_pars") + COL;
-  /** Query Info: Optimizing. */
-  String QUERYCOMP = lang("qu_comp") + COL;
-  /** Query Info: Evaluating. */
-  String QUERYEVAL = lang("qu_eval") + COL;
-  /** Query Info: Querying. */
-  String QUERYTIME = lang("qu_time") + COL;
-  /** Query Info: Result . */
-  String QUERYRESULT = lang("qu_result") + COLS;
-  /** Query Info: Plan. */
-  String QUERYPLAN = lang("qu_plan");
-  /** Query Info: Compiler. */
-  String QUERYSEP = LI;
-  /** Query Info: Plan. */
-  String PLANXML = "plan.xml";
-  /** Query Info: Plan. */
-  String PLANDOT = "plan.dot";
-  /** Query Info: Plan. */
-  String RESULTDOT = "result.dot";
-
-  /** Query Info: Query. */
-  String QUERYSTRING = lang("qu_tabquery") + COLS;
-  /** Query Info: Compiling. */
-  String QUERYPARSE = lang("qu_tabpars") + COLS;
-  /** Query Info: Compiling. */
-  String QUERYCOMPILE = lang("qu_tabcomp") + COLS;
-  /** Query Info: Evaluating. */
-  String QUERYEVALUATE = lang("qu_tabeval") + COLS;
-  /** Query Info: Finishing. */
-  String QUERYFINISH = lang("qu_tabfinish") + COLS;
-  /** Query Info: Time for printing. */
-  String QUERYPRINT = lang("qu_tabprint") + COLS;
-  /** Query Info: Total Time. */
-  String QUERYTOTAL = lang("qu_tabtotal") + COLS;
-  /** Query Hits. */
-  String QUERYHITS = lang("qu_tabhits") + COLS;
-  /** Query Info: Printed Data. */
-  String QUERYPRINTED = lang("qu_tabprinted") + COLS;
-  /** Query Info: Memory. */
-  String QUERYMEM = lang("qu_tabmem") + ": %";
-  /** Query Hits. */
-  String HITS = lang("qu_hits");
-  /** Milliseconds. */
-  String MS = S + lang("qu_ms");
-
-  /** Query Hits. */
-  String VALHIT = "Item";
-  /** Query Hits. */
-  String VALHITS = "Items";
-
-  // UPDATE COMMANDS ==========================================================
-
-  /** Insert query info. */
-  String QUERYNODESERR = lang("uc_querynodeserr");
-
-  /** Deletion info. */
-  String DELETEINFO = lang("uc_deleteinfo");
-  /** Deletion error. */
-  String DELETEROOT = lang("uc_deleteroot");
-  /** Insert query info. */
-  String COPYROOT = lang("uc_copyroot");
-
-  /** Copy query info. */
-  String COPYINFO = lang("uc_copyinfo");
-  /** Insert query info. */
-  String INSERTINFO = lang("uc_insertinfo");
-  /** Update query info. */
-  String UPDATEINFO = lang("uc_updateinfo");
-  /** Update node info. */
-  String UPDATENODE = lang("uc_updatenode");
-  /** Update element info. */
-  //String UPDATEELEM = lang("uc_updateelem");
-  /** Update attribute info. */
-  //String UPDATEATTR = lang("uc_updateattr");
-  /** Insert query info. */
-  String COPYTAGS = lang("uc_copytags");
-  /** Insert query info. */
-  String INSERTTEXT = lang("uc_inserttext");
-  /** Update element info. */
-  //String TAGINVALID = lang("uc_taginvalid");
-  /** Update element info. */
-  String ATTINVALID = lang("uc_attinvalid");
-  /** Duplicate attribute info. */
-  String ATTDUPL = lang("uc_attdupl");
-  /** Invalid position. */
-  String POSINVALID = lang("uc_posinvalid");
-  /** Update PI info. */
-  String NAMEINVALID = lang("uc_invalid");
-  /** Update text info. */
-  String TXTINVALID = lang("uc_txtinvalid");
-
-  // INFO STRINGS =============================================================
-
-  /** Process information. */
-  String INFOWAIT = lang("wait");
-  /** Title of Information Dialog. */
-  String INFOTITLE = lang("info_title");
-  /** Index information. */
-  String INFOINDEX = lang("info_index");
-  /** Index information. */
-  String INFOBUILD = lang("info_build") + DOTS;
-  /** Optimize information. */
-  String INFOOPT = lang("info_opt") + DOTS;
-  /** Optimize information. */
-  String INFOOPTIM = lang("info_optim");
-  /** Statistics information. */
-  String INFOSTATS = lang("info_stats") + DOTS;
-
-  /** Info on source document. */
-  String INFODBNAME = lang("info_dbname");
-  /** Info on database size. */
-  String INFODBSIZE = lang("info_dbsize");
-  /** Info on source document. */
-  String INFODOC = lang("info_doc");
-  /** Info on database time stamp. */
-  String INFOTIME = lang("info_time");
-  /** Info on number of documents. */
-  String INFONDOCS = lang("info_ndocs");
-  /** Info on document size. */
-  String INFODOCSIZE = lang("info_docsize");
-  /** Document encoding. */
-  String INFOENCODING = lang("info_encoding");
-  /** Info on database table size. */
-  String INFONODES = lang("info_nodes");
-  /** Maximum tree height. */
-  String INFOHEIGHT = lang("info_height");
-
-  /** Info on document path. */
-  //String INFOPATH = lang("info_path");
-  /** Info on used main memory. */
-  String INFOMEM = lang("info_mem");
-  /** Info on execution times. */
-  //String INFORUNS = lang("info_runs");
-
-  /** Info on database path. */
-  String INFODBPATH = lang("info_dbpath");
-  /** Info on database. */
-  String INFONODB = lang("info_nodb");
-  /** Info on database. */
-  String INFODBLIST = lang("info_dblist");
-  /** Info on database. */
-  String INFODBERR = lang("info_dberror");
-
-  /** Info on database path. */
-  //String INFONEWPATH = lang("info_newpath") + COLS;
-  /** Info on database path. */
-  //String INFOPATHERR = lang("info_patherr") + COLS;
-  /** Info on Query Verbosity. */
-  String INFOINFO = lang("info_info");
-  /** Info on Query Verbosity. */
-  String INFOALL = lang("info_all");
-  /** Info on Debug Mode. */
-  String INFODEBUG = lang("info_debug");
-  /** Info on Whitespace Chopping. */
-  String INFOCHOP = lang("info_chop");
-  /** Info on Entity Parsing. */
-  String INFOENTITY = lang("info_entities");
-  /** Info on result serialization. */
-  String INFOSERIALIZE = lang("info_serialize");
-  /** Info on well formed XML serialization. */
-  String INFOXMLOUTPUT = lang("info_xmloutput");
-  /** Info on Main Memory mode. */
-  String INFOMAINMEM = lang("info_mainmem");
-  /** Info on Text Indexing. */
-  String INFOTAGINDEX = lang("info_tagindex");
-  /** Info on Text Indexing. */
-  String INFOATNINDEX = lang("info_atnindex");
-  /** Info on Text Indexing. */
-  String INFOTEXTINDEX = lang("info_txtindex");
-  /** Info on Attribute Indexing. */
-  String INFOATTRINDEX = lang("info_atvindex");
-  /** Info on Fulltext Indexing. */
-  String INFOFTINDEX = lang("info_ftindex");
-  /** Info on Fuzzy Indexing. */
-  String INFOFZINDEX = lang("info_fzindex");
-  /** Info on Fulltext Fuzzy indexing. */
-  //String INFOFTCOMPRESS = lang("info_fcompress");
-
-  /** Info on Document Creation. */
-  String INFODB = lang("info_db");
-  /** Info on Document Creation. */
-  String INFOCREATE = lang("info_create");
-  /** Info on Index Creation. */
-  //String INFOINDEXES = lang("info_indexes");
-  /** Database Info. */
-  String INFOGENERAL = lang("info_general");
-  /** Database Info. */
-  String RESULTCHOP = lang("info_resultchop");
-  /** Option flag. */
-  String INFOON = lang("info_on");
-  /** Option flag. */
-  String INFOOFF = lang("info_off");
-  /** Error info. */
-  String INFOERROR = lang("info_error");
-
   // HELP TEXTS ===============================================================
 
   /** Help String. */
@@ -1324,10 +1291,6 @@ public interface Text {
   /** Help String. */
   byte[] HELPMEM = token(lang("h_mem"));
 
-  // DEEPFS STRINGS ===========================================================
-  /** Special db name to indicate a deepfs instance. */
-  String DEEPDB = "deepfs";
-  
   /** Dummy string to check if all language strings have been assigned. */
   String DUMMY = lang(null);
 }

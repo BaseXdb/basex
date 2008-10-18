@@ -420,7 +420,7 @@ public final class BaseXText extends BaseXPanel {
     if(shf) text.endMark();
 
     text.setCaret();
-    if(txt != text.text) rend.calc();
+    if(txt != text.text) rend.calc(); // comparison by reference
     showCursor(down ? 2 : 0);
   }
 
@@ -478,6 +478,7 @@ public final class BaseXText extends BaseXPanel {
 
   @Override
   public void keyTyped(final KeyEvent e) {
+    super.keyTyped(e);
     if(!editable) return;
 
     final char ch = e.getKeyChar();
@@ -517,7 +518,7 @@ public final class BaseXText extends BaseXPanel {
     }
     e.consume();
     text.setCaret();
-    if(txt != text.text) rend.calc();
+    if(txt != text.text) rend.calc(); // comparison by reference
     showCursor(down ? 2 : 0);
   }
 

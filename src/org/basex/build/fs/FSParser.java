@@ -91,7 +91,7 @@ public final class FSParser extends Parser implements FSVisitor {
    */
   public void preTraversal(final String path, final boolean docOpen)
       throws IOException {
-    if(docOpen) builder.startElem(DEEPFS, atts.reset());
+    if(docOpen) builder.startElem(token(DEEPFS), atts.reset());
     builder.startElem(DIR, atts.set(NAME, token(path)));
   }
 
@@ -164,7 +164,7 @@ public final class FSParser extends Parser implements FSVisitor {
    */
   public void postTraversal(final boolean docClose) throws IOException {
     builder.endElem(DIR);
-    if(docClose) builder.endElem(DEEPFS);
+    if(docClose) builder.endElem(token(DEEPFS));
   }
 
   @Override

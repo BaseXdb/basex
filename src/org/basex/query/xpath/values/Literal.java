@@ -62,8 +62,9 @@ public final class Literal extends Item {
 
   @Override
   public boolean appr(final Item val) {
-    return val.prec() > PREC ? val.appr(this) :
-      Levenshtein.similar(val.str(), str());
+    if(val.prec() > PREC) return val.appr(this);
+    if(ls == null) ls = new Levenshtein();
+    return ls.similar(val.str(), str());
   }
 
   @Override

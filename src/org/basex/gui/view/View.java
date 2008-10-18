@@ -7,7 +7,6 @@ import org.basex.core.Context;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
 import org.basex.gui.GUICommands;
-import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPanel;
@@ -322,11 +321,11 @@ public abstract class View extends BaseXPanel {
 
   @Override
   public void keyPressed(final KeyEvent e) {
+    super.keyPressed(e);
     if(working) return;
-    final int key = e.getKeyCode();
-    final boolean alt = e.isAltDown();
     final boolean ctrl = e.isControlDown();
     final boolean shift = e.isShiftDown();
+    final int key = e.getKeyCode();
 
     if(key == KeyEvent.VK_ESCAPE) {
       GUI.get().fullscreen(false);
@@ -334,25 +333,8 @@ public abstract class View extends BaseXPanel {
       GUICommands.FILTER.execute();
     } else if(key == KeyEvent.VK_SPACE) {
       notifyMark(ctrl ? 2 : shift ? 1 : 0);
-    } else if(key == KeyEvent.VK_BACK_SPACE || alt && key == KeyEvent.VK_LEFT) {
+    } else if(key == KeyEvent.VK_BACK_SPACE) {
       GUICommands.GOBACK.execute();
-    } else if(alt && key == KeyEvent.VK_RIGHT) {
-      GUICommands.GOFORWARD.execute();
-    } else if(alt && key == KeyEvent.VK_UP) {
-      GUICommands.GOUP.execute();
-    } else if(alt && key == KeyEvent.VK_HOME) {
-      GUICommands.ROOT.execute();
-    }
-  }
-
-  @Override
-  public void keyTyped(final KeyEvent e) {
-    if(working) return;
-
-    final char key = e.getKeyChar();
-    if(key == '+' || key == '-') {
-      GUIProp.fontsize = Math.max(1, GUIProp.fontsize + (key == '+' ? 1 : -1));
-      notifyLayout();
     }
   }
 

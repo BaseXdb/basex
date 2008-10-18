@@ -13,6 +13,7 @@ import org.basex.core.Progress;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.data.Data;
+import org.basex.data.DataText;
 import org.basex.index.FTBuilder;
 import org.basex.index.FTFuzzyBuilder;
 import org.basex.index.IndexBuilder;
@@ -49,7 +50,7 @@ abstract class ACreate extends Process {
       if(Prop.onthefly) {
         context.data(new MemBuilder().build(p, db));
       } else {
-        if(db.equals(DEEPDB)) return error(CREATENODEEPDB);
+        if(db.equals(DataText.DEEPFS)) return error(CREATENODEEPDB);
   
         context.close();
         final Performance pp = new Performance();

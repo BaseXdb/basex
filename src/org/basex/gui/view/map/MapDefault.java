@@ -18,7 +18,7 @@ import org.basex.gui.view.ViewData;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class MapDefault extends MapPainter {
+final class MapDefault extends MapPainter {
   /**
    * Constructor.
    * @param m map reference.

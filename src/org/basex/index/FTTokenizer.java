@@ -127,29 +127,6 @@ public final class FTTokenizer extends IndexToken {
   }
 
   /**
-   * Checks if all tokens from the current FTTokenizer are
-   * contained in the FTTokenizer tok.
-   *
-   * @param tok FTTokenizer
-   * @return mildnot
-  public boolean mildNot(final FTTokenizer tok) {
-    init();
-    tok.init();
-    boolean m1 = more();
-    boolean m2 = tok.more();
-    while (m1 && m2 && Token.cmp(get(), tok.get()) != 0) {
-      m2 = tok.more();
-    }
-
-    while (m1 && m2 && Token.cmp(get(), tok.get()) == 0) {
-      m1 = more();
-      m2 = tok.more();
-    }
-    return !m1;
-  }
-   */
-
-  /**
    * Counts the number of tokens.
    * @return number of tokens
    */

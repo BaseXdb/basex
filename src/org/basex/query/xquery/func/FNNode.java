@@ -11,7 +11,6 @@ import org.basex.query.xquery.item.Str;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.item.Uri;
 import org.basex.query.xquery.iter.Iter;
-import org.basex.util.Token;
 
 /**
  * Node functions.
@@ -35,7 +34,7 @@ public final class FNNode extends Fun {
       case DOCURI:
         if(empty) return Iter.EMPTY;
         final byte[] uri = checkNode(it).base();
-        return uri == Token.EMPTY ? Iter.EMPTY : Uri.uri(uri).iter();
+        return uri.length == 0 ? Iter.EMPTY : Uri.uri(uri).iter();
       case NILLED: // [CG] XQuery/nilled flag
         if(empty) return Iter.EMPTY;
         checkNode(it);

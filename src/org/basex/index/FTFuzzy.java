@@ -2,9 +2,7 @@ package org.basex.index;
 
 import static org.basex.Text.*;
 import static org.basex.data.DataText.*;
-
 import java.io.IOException;
-
 import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.Data;
@@ -44,6 +42,8 @@ import org.basex.util.TokenBuilder;
  * @author Sebastian Gath
  */
 public final class FTFuzzy extends Index {
+  /** Levenshtein reference. */
+  final Levenshtein ls = new Levenshtein();
   /** Number of index entries. */
   int indexsize;
   /** Number of ftdata entries. */
@@ -386,15 +386,13 @@ public final class FTFuzzy extends Index {
    * @param e number of errors allowed
    * @return boolean as result
    */
-  private static boolean calcEQ(final byte[] tok1, final int sp,
+  private boolean calcEQ(final byte[] tok1, final int sp,
       final byte[] tok2, final int e) {
-    final int df = Math.abs(tok1.length - tok2.length);
-    if (df > e) return false;
 
-    final int d = (tok1.length > tok2.length) ?
-        Levenshtein.ls(tok1, sp, tok1.length, tok2, e) :
-      Levenshtein.ls(tok2, sp, tok2.length, tok1, e);
-    return d <= e;
+    final int df = Math.abs(tok1.length - tok2.length);
+    return df <= e && (tok1.length > tok2.length ?
+        ls.ls(tok1, sp, tok1.length, tok2, e) :
+        ls.ls(tok2, sp, tok2.length, tok1, e)) <= e;
   }
 
   /**

@@ -44,12 +44,13 @@ public class BaseXBack extends JPanel {
   
   @Override
   public void paintComponent(final Graphics g) {
-    super.paintComponent(g);
     if(mode == FILL.UP || mode == FILL.DOWN) {
       Color c1 = GUIConstants.color1;
       Color c2 = GUIConstants.color2;
       if(mode == FILL.UP) { Color t = c1; c1 = c2; c2 = t; }
       BaseXLayout.fill(g, c1, c2, 0, 0, getWidth(), getHeight());
+    } else {
+      super.paintComponent(g);
     }
   }
 

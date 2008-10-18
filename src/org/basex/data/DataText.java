@@ -65,7 +65,7 @@ public interface DataText {
   // TAGS/ATTRIBUTE NAMES ====================================================
 
   /** DeepFS tag. */
-  byte[] DEEPFS = token("deepfs");
+  String DEEPFS = "deepfs";
   /** Directory tag. */
   byte[] DIR = token("dir");
   /** File tag. */

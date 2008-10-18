@@ -9,6 +9,9 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import org.basex.gui.GUICommands;
+import org.basex.gui.GUIProp;
+import org.basex.gui.view.View;
 
 /**
  * Abstract panel implementation with a number of predefined listeners.
@@ -35,8 +38,33 @@ public abstract class BaseXPanel extends BaseXBack implements MouseListener,
   public void mouseMoved(final MouseEvent e) { }
   public void mouseDragged(final MouseEvent e) { }
 
-  public void keyPressed(final KeyEvent e) { }
-  public void keyTyped(final KeyEvent e) { }
+  public void keyPressed(final KeyEvent e) {
+    if(View.working || !e.isAltDown()) return;
+    
+    final int key = e.getKeyCode();
+    if(key == KeyEvent.VK_LEFT) {
+      GUICommands.GOBACK.execute();
+    } else if(key == KeyEvent.VK_RIGHT) {
+      GUICommands.GOFORWARD.execute();
+    } else if(key == KeyEvent.VK_UP) {
+      GUICommands.GOUP.execute();
+    } else if(key == KeyEvent.VK_HOME) {
+      GUICommands.ROOT.execute();
+    }
+  }
+
+  public void keyTyped(final KeyEvent e) {
+    if(View.working || !e.isControlDown()) return;
+    final char key = e.getKeyChar();
+    if(key == '+' || key == '-' || key == '=') {
+      GUIProp.fontsize = Math.max(1, GUIProp.fontsize + (key == '-' ? -1 : 1));
+      View.notifyLayout();
+    } else if(key == '0') {
+      GUIProp.fontsize = 12;
+      View.notifyLayout();
+    }
+   
+  }
   public void keyReleased(final KeyEvent e) { }
 
   public void componentResized(final ComponentEvent e) { }

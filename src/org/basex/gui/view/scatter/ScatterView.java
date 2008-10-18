@@ -1,5 +1,6 @@
 package org.basex.gui.view.scatter;
 
+import static org.basex.Text.*;
 import static org.basex.util.Token.*;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -36,13 +37,13 @@ public final class ScatterView extends View implements Runnable {
   /** Data reference. */
   ScatterData scatterData;
   /** X paint margin. */
-  private static final int MARGINBOTTOM = 100;
+  private static final int MARGINBOTTOM = 90;
   /** Y paint margin. */ 
-  private static final int MARGINTOP = 65;
+  private static final int MARGINTOP = 50;
   /** Y paint margin. */ 
-  private static final int MARGINLEFT = 120;
+  private static final int MARGINLEFT = 90;
   /** Y paint margin. */ 
-  private static final int MARGINRIGHT = 40;
+  private static final int MARGINRIGHT = 20;
   /** Item size. */
   private static final int ITEMSIZE = 14;
   /** Focused item size. */
@@ -229,17 +230,21 @@ public final class ScatterView extends View implements Runnable {
   
   @Override
   public void paintComponent(final Graphics g) {
-    super.paintComponent(g);
     final Data data = GUI.context.data();
     if(data == null) return;
+
+    super.paintComponent(g);
+    BaseXLayout.antiAlias(g);
     
     final int w = getWidth();
     final int h = getHeight();
-    if(w < 250 || h < 250) {
-      final String s = "insufficient space for plot drawing";
-      final int sw = BaseXLayout.width(g, s);
+    final boolean nostats = !data.tags.stats;
+
+    if(nostats || w < 200 || h < 200) {
+      final String s = nostats ? DBNOSTATS : NOSPACE;
+      g.setFont(GUIConstants.font);
       g.setColor(Color.black);
-      g.drawString(s, w / 2 - sw / 2, h / 2);
+      BaseXLayout.drawCenter(g, s, getWidth(), h / 2);
       return;
     }
     
@@ -471,7 +476,7 @@ public final class ScatterView extends View implements Runnable {
           caption = string(axis.cats[i]);
         }
       }
-      if(caption.length() >= 10) {
+      if(caption.length() > 10) {
         caption = caption.substring(0, 10);
         caption += "...";
       }
@@ -560,6 +565,7 @@ public final class ScatterView extends View implements Runnable {
 
   @Override
   protected void refreshUpdate() {
+    refreshInit();
   }
 
   /**

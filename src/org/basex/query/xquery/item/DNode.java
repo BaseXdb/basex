@@ -76,7 +76,6 @@ public final class DNode extends Nod {
     final byte[] dn = ser.dn;
     
     ser.node(data, pre);
-    
     ser.ns.size = s;
     ser.dn = dn;
   }

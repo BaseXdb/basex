@@ -68,7 +68,7 @@ public final class DialogRename extends Dialog {
   @Override
   public void action(final String cmd) {
     final String nm = name.getText().trim();
-    ok = !db.contains(nm) | nm.equals(old);
+    ok = !db.contains(nm) || nm.equals(old);
     String inf = ok ? "" : RENAMEEXISTS;
     if(ok) {
       ok = nm.length() != 0 && IO.valid(nm);

@@ -430,10 +430,11 @@ public final class CommandParser extends QueryParser {
 
     // find similar commands
     final byte[] name = lc(token(token));
+    final Levenshtein ls = new Levenshtein();
     for(final Enum<?> e : cmp.getEnumConstants()) {
       if(e instanceof COMMANDS && !((COMMANDS) e).official) continue;
       final byte[] sm = lc(token(e.name()));
-      if(Levenshtein.similar(name, sm)) error(alt, CMDSIMILAR, name, sm);
+      if(ls.similar(name, sm)) error(alt, CMDSIMILAR, name, sm);
     }
 
     if(par == null) error(alt, CMDWHICH, token);

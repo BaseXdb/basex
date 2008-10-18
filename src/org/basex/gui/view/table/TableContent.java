@@ -1,10 +1,9 @@
 package org.basex.gui.view.table;
 
+import static org.basex.util.Token.*;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.DataText;
@@ -18,7 +17,6 @@ import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXBar;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.View;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -52,24 +50,24 @@ public final class TableContent extends BaseXBack {
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
 
-    final Context context = GUI.context;
-    final Data data = context.data();
     // skip if view is unavailable
-    if(data == null || tdata.cols == null || tdata.cols.size == 0 ||
-        tdata.colW == null) return;
+    if(tdata.rows == null) return;
 
-    g.setFont(GUIConstants.font);
-    BaseXLayout.antiAlias(g);
     View.painting = true;
+
+    BaseXLayout.antiAlias(g);
+    g.setFont(GUIConstants.font);
 
     final int w = getWidth() - scroll.getWidth();
     final int h = getHeight();
 
+    final Context context = GUI.context;
+    final Data data = context.data();
     final int rfocus = tdata.getRoot(data, View.focused);
     final int focus = View.focused;
     int mpos = 0;
 
-    final int nCols = tdata.cols.size;
+    final int nCols = tdata.cols.length;
     final int nRows = tdata.rows.size;
     final int rowH = tdata.rowH;
 
@@ -123,9 +121,8 @@ public final class TableContent extends BaseXBack {
         if(tb[c].size < 100) {
           if(tb[c].size != 0) tb[c].add("; ");
           byte[] txt = ti.elem ? data.text(ti.pre) : data.attValue(ti.pre);
-          if(tdata.cols.list[c] == data.atts.id(DataText.MTIME)) {
-            txt = Token.token(new SimpleDateFormat("dd.MM.yyyy").
-                format(new Date(Token.toLong(txt) * 60000)));
+          if(tdata.cols[c].id == data.atts.id(DataText.MTIME)) {
+            txt = token(BaseXLayout.date(toLong(txt)));
           }
           tb[c].add(txt);
         }
@@ -137,25 +134,28 @@ public final class TableContent extends BaseXBack {
       // draw row contents
       byte[] focusStr = null;
       int fx = -1;
-      double x = 0;
+      double x = 1;
       for(int c = 0; c < nCols; c++) {
         // draw single column
-        double cw = w * tdata.colW[c];
+        double cw = w * tdata.cols[c].width;
         final double ce = x + cw;
 
-        final byte[] str = tb[c].size != 0 ? tb[c].finish() : null;
-        if(str != null) {
-          if(data.fs != null && c == 0) {
-            g.drawImage(GUIFS.images(str, false), (int) x + 1, posY + 3, this);
-            x += 20;
-            cw -= 20;
+        if(ce != 0) {
+          final byte[] str = tb[c].size != 0 ? tb[c].finish() : null;
+          if(str != null) {
+            if(data.fs != null && tdata.cols[c].id == data.fs.suffID) {
+              g.drawImage(GUIFS.images(str, false), (int) x + 2,
+                  posY - 8 + rowH / 2, this);
+              x += 22;
+              cw -= 22;
+            }
+            if(tdata.mouseX > x && tdata.mouseX < ce || fcol == c) {
+              fx = (int) x;
+              focusStr = str;
+            }
+            BaseXLayout.chopString(g, str, (int) x + 1, posY + 2, (int) cw - 4);
+            tb[c].reset();
           }
-          if(tdata.mouseX > x && tdata.mouseX < ce || fcol == c) {
-            fx = (int) x;
-            focusStr = str;
-          }
-          BaseXLayout.chopString(g, str, (int) x + 2, posY + 2, (int) cw - 4);
-          tb[c].reset();
         }
         x = ce;
       }
@@ -168,10 +168,10 @@ public final class TableContent extends BaseXBack {
           g.setColor(GUIConstants.COLORS[col + 2]);
           g.fillRect(fx - 2, posY, sw, rowH - 1);
           g.setColor(Color.black);
-          BaseXLayout.chopString(g, focusStr, fx + 2, posY + 2, sw);
+          BaseXLayout.chopString(g, focusStr, fx + 1, posY + 2, sw);
 
           // cache focused string
-          focusedString = Token.string(focusStr);
+          focusedString = string(focusStr);
           final int i = focusedString.indexOf("; ");
           if(i != -1) focusedString = focusedString.substring(0, i);
         }

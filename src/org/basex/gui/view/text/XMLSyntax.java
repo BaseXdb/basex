@@ -24,7 +24,7 @@ public final class XMLSyntax extends BaseXSyntax {
 
   @Override
   public Color getColor(final String word) {
-    final char ch = word.charAt(0);
+    final char ch = word.length() != 0 ?  word.charAt(0) : 0;
     if(tag) {
       if(quote != 0) {
         if(quote == ch) quote = 0;

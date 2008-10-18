@@ -10,6 +10,8 @@ import org.basex.io.PrintOutput;
 import org.basex.query.xpath.XPathProcessor;
 import org.basex.query.xpath.func.ContainsLC;
 import org.basex.util.Array;
+import org.basex.util.BoolList;
+import org.basex.util.StringList;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
@@ -218,20 +220,22 @@ public final class Find extends AQuery {
    * Creates an XPath representation for the specified table query.
    * @param filter filter terms
    * @param cols filter columns
+   * @param elem element flag
    * @param tag root tag
    * @param data data reference
    * @param root root flag
    * @return XPath xpath expression
    */
-  public static String findTable(final String[] filter, final TokenList cols,
-      final byte[] tag, final Data data, final boolean root) {
+  public static String findTable(final StringList filter, final TokenList cols,
+      final BoolList elem, final byte[] tag, final Data data,
+      final boolean root) {
 
     final TokenBuilder tb = new TokenBuilder();
     final boolean fs = data.fs != null;
-    for(int i = 0; i < filter.length; i++) {
-      if(filter[i].length() < 3) continue;
+    for(int i = 0; i < filter.size; i++) {
+      if(filter.list[i].length() < 3) continue;
 
-      final String[] spl = split(filter[i]);
+      final String[] spl = split(filter.list[i]);
       for(final String s : spl) {
         byte[] term = Token.token(s);
         if(Token.contains(term, '"')) term = Token.replace(term, '\"', ' ');
@@ -244,8 +248,8 @@ public final class Find extends AQuery {
           tb.add(term);
           tb.add("\")");
         } else {
-          final boolean att = fs && i < 4;
-          if(fs) tb.add(att ? "@" : "*//");
+          final boolean elm = elem.list[i];
+          tb.add(elm ? ".//" : "@");
           tb.add(cols.list[i]);
           String quote = "\"";
 
@@ -253,15 +257,13 @@ public final class Find extends AQuery {
             tb.add(term[0]);
             quote = "";
             term = Token.token(calcNum(Token.substring(term, 1)));
-          } else if(att) {
+          } else if(data.meta.ftxindex && elm) {
+            tb.add(" ftcontains ");
+          } else if(spl.length == 1 && (elm && data.meta.txtindex ||
+              !elm && data.meta.atvindex)) {
             tb.add(" = ");
           } else {
-            if(data.meta.ftxindex || spl.length > 1 ||
-                !data.meta.txtindex && !att) {
-              tb.add(" ftcontains ");
-            } else {
-              tb.add(" = ");
-            }
+            tb.add(" ftcontains ");
           }
           tb.add(quote);
           tb.add(term);

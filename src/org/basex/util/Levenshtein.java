@@ -1,7 +1,6 @@
 package org.basex.util;
 
 import static org.basex.util.Token.*;
-
 import org.basex.core.Prop;
 
 /**
@@ -12,13 +11,17 @@ import org.basex.core.Prop;
  */
 public final class Levenshtein {
   /** Static matrix for Levenshtein distance. */
-  private static int[][] m = new int[32][32];
+  private int[][] m = new int[32][32];
 
-  // lazy matrix initialization
-  static { for(int i = 0; i < m.length; i++) { m[0][i] = i; m[i][0] = i; } }
-
-  /** Private constructor, preventing class instantiation. */
-  private Levenshtein() { }
+  /**
+   * Constructor.
+   */
+  public Levenshtein() {
+    for(int i = 0; i < m.length; i++) {
+      m[0][i] = i;
+      m[i][0] = i;
+    }
+  }
 
   /**
    * Compares two character arrays for similarity.
@@ -26,7 +29,7 @@ public final class Levenshtein {
    * @param sub second token to be compared
    * @return true if the arrays are similar
    */
-  public static boolean similar(final byte[] tok, final byte[] sub) {
+  public boolean similar(final byte[] tok, final byte[] sub) {
     // use exact search for too short and too long values
     final int sl = sub.length;
     // small word - use exact search
@@ -45,7 +48,7 @@ public final class Levenshtein {
    * @param sub sub token to be compared
    * @return true if the arrays are similar
    */
-  private static boolean ls(final byte[] tok, final int ts, final int tl,
+  private boolean ls(final byte[] tok, final int ts, final int tl,
       final byte[] sub) {
 
     if(tl == 0) return false;
@@ -71,7 +74,7 @@ public final class Levenshtein {
    * @param k maximum number of accepted errors
    * @return true if the arrays are similar
    */
-  public static int ls(final byte[] tok, final int ts, final int tl,
+  public int ls(final byte[] tok, final int ts, final int tl,
       final byte[] sub, final int k) {
 
     int e2 = -1, f2 = -1;
@@ -101,7 +104,7 @@ public final class Levenshtein {
    * @param c 3rd value
    * @return minimum
    */
-  private static int min(final int a, final int b, final int c) {
+  private int min(final int a, final int b, final int c) {
     final int d = a < b ? a : b;
     return d < c ? d : c;
   }
@@ -112,7 +115,7 @@ public final class Levenshtein {
    * @param sub second token
    * @return result of test
    */
-  public static boolean contains(final byte[] tok, final byte[] sub) {
+  public boolean contains(final byte[] tok, final byte[] sub) {
     final int tl = tok.length;
     final int sl = sub.length;
     if(sl == 0) return false;
@@ -137,12 +140,43 @@ public final class Levenshtein {
    * @param sub second token to be compared
    * @return true if the arrays are equal
    */
-  private static boolean equals(final byte[] tok, final int ts, final int tl,
+  private boolean equals(final byte[] tok, final int ts, final int tl,
       final byte[] sub) {
     if(tl != sub.length) return false;
     for(int t = 0; t < tl; t++) {
       if(ftNorm(tok[ts + t]) != ftNorm(sub[t])) return false;
     }
     return true;
+  }
+
+  /**
+   * Checks if the specified character is a letter; special characters are
+   * converted to the standard ASCII charset.
+   * Note that this method does not support unicode characters.
+   * @param ch character to be converted
+   * @return converted character
+   */
+  public boolean ftChar(final byte ch) {
+    return letterOrDigit(ft(ch));
+  }
+  
+  /**
+   * Returns a lowercase ASCII character of the specified fulltext character.
+   * Note that this method does not support unicode characters.
+   * @param ch character to be converted
+   * @return converted character
+   */
+  public int ftNorm(final int ch) {
+    return lc(ft(ch));
+  }
+
+  /**
+   * Returns a fulltext character of the specified character.
+   * Note that this method does not support unicode characters.
+   * @param ch character to be converted
+   * @return converted character
+   */
+  private int ft(final int ch) {
+    return ch < 0 && ch > -64 ? NORM[ch + 64] : ch;
   }
 }

@@ -203,10 +203,10 @@ public final class NodeSet extends Item {
 
   @Override
   public boolean apprContains(final Item v) {
+    if(ls == null) ls = new Levenshtein();
     final byte[] qu = v.str();
-    
     for(int i = 0; i < size; i++) {
-      if(Levenshtein.contains(data.atom(nodes[i]), qu)) return true;
+      if(ls.contains(data.atom(nodes[i]), qu)) return true;
     }
     return false;
   }

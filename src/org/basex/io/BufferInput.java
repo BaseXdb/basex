@@ -179,6 +179,7 @@ public class BufferInput {
   public final int readChar() throws IOException {
     // support encodings..
     byte ch = readByte();
+    // comparison by references
     if(enc == Token.UTF16LE) return (ch & 0xFF) | ((readByte() & 0xFF) << 8);
     if(enc == Token.UTF16BE) return ((ch & 0xFF) << 8) | readByte() & 0xFF;
     if(enc == Token.UTF8) {

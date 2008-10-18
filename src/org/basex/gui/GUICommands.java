@@ -102,7 +102,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void execute() {
       if(new DialogOpen(GUI.get(), true).nodb()) {
-        JOptionPane.showMessageDialog(GUI.get(), OPENNODBINFO, DIALOGINFO,
+        JOptionPane.showMessageDialog(GUI.get(), INFONODB, DIALOGINFO,
             JOptionPane.INFORMATION_MESSAGE);
       }
     }
@@ -805,10 +805,7 @@ public enum GUICommands implements GUICommand {
 
     @Override
     public void refresh(final AbstractButton button) {
-      final Nodes current = GUI.context.current();
-      final boolean enabled = !GUI.context.root() ||
-        current != null && (current.size == 1 || current.nodes[0] != 0);
-      BaseXLayout.enable(button, enabled);
+      BaseXLayout.enable(button, !GUI.context.root());
     }
   },
 
@@ -821,10 +818,7 @@ public enum GUICommands implements GUICommand {
 
     @Override
     public void refresh(final AbstractButton button) {
-      final Nodes current = GUI.context.current();
-      final boolean enabled = !GUI.context.root() ||
-        current != null && (current.size == 1 || current.nodes[0] != 0);
-      BaseXLayout.enable(button, enabled);
+      BaseXLayout.enable(button, !GUI.context.root());
     }
   };
 

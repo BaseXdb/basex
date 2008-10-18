@@ -31,6 +31,7 @@ public final class ViewMover extends BaseXPanel {
   public ViewMover() {
     super(HELPMOVER);
     setPreferredSize(new Dimension((int) getPreferredSize().getWidth(), SIZE));
+    addKeyListener(this);
     addMouseListener(this);
     addMouseMotionListener(this);
     setCursor(HAND);

@@ -14,6 +14,9 @@ import org.basex.util.Set;
  * @author Christian Gruen
  */
 public final class FTOpt {
+  /** Levenshtein reference. */
+  final Levenshtein ls = new Levenshtein();
+
   /** Words mode. */
   public enum FTMode {
     /** All option. */       ALL,
@@ -94,7 +97,7 @@ public final class FTOpt {
           f = !(s1 ^ s2);
           if(s1 || s2) continue;
         }
-        f = sb.fz ? Levenshtein.similar(t, s) : sb.wc ?
+        f = sb.fz ? ls.similar(t, s) : sb.wc ?
             string(t).matches(string(s)) : eq(t, s);
       }
 

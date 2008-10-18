@@ -75,8 +75,9 @@ public final class Num extends Item {
 
   @Override
   public boolean appr(final Item v) {
-    return v.prec() > PREC ? v.eq(this) :
-      Levenshtein.similar(v.str(), str());
+    if(v.prec() > PREC) return v.appr(this);
+    if(ls == null) ls = new Levenshtein();
+    return ls.similar(v.str(), str());
   }
 
   @Override
