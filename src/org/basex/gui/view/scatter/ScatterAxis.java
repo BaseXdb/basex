@@ -6,6 +6,7 @@ import org.basex.data.Data;
 import org.basex.data.StatsKey;
 import org.basex.data.StatsKey.Kind;
 import org.basex.gui.GUI;
+import org.basex.util.Performance;
 import org.basex.util.Token;
 
 /**
@@ -42,6 +43,8 @@ public final class ScatterAxis {
   int nrCaptions;
   /** Step for axis caption. */
   double captionStep;
+  /** Calculated caption step, view size not considered for calculation. */
+  private double calculatedCaptionStep;
   /** Minimum value in case selected attribute is numerical. */
   double min;
   /** Maximum  value in case selected attribute is numerical. */
@@ -142,65 +145,7 @@ public final class ScatterAxis {
         co[i] = calcPosition(val);
       }
     }
-  }
-  
-  /**
-   * Determines the smallest and greatest occurring values for a specific item.
-   * Afterwards the extremes are slightly rounded to support a decent axis
-   * caption.
-   *
-   * If range between min/max < 10 extremes are calculated by floor/ceil 
-   * function.
-   * If range >=10 the minimum is allowed to lie 15% of the range under the
-   * actual minimum. After that the final extreme is calculated as the value
-   * between the smallest allowed minimum and the actual minimum which is 
-   * dividable by pow(10, log10(range)-1).
-   * 
-   * Maximum v.v. . 
-   */
-  private void calcExtremeValues() {
-    min = Integer.MAX_VALUE;
-    max = Integer.MIN_VALUE;
-    for(int i = 0; i < vals.length; i++) {
-      if(vals[i].length < 1)
-        continue;
-      double d = Token.toDouble(vals[i]);
-      if(d < min)
-        min = d;
-      if(d > max) 
-        max = d;
-    }
-    
-    final double range = max - min;
-    if(range < 10) {
-      min = Math.floor(min);
-      max = Math.ceil(max);
-      return;
-    }
-    final int lmin = (int) (min - (range / (15 / 100)));
-    final int lmax = (int) (max + (range / (15 / 100)));
-    int tmin = (int) Math.floor(min);
-    int tmax = (int) Math.ceil(max);
-    final double rangePow = Math.floor(Math.log10(range) + .5d);
-    final int step = (int) (Math.pow(10, rangePow));
-    min = tmin;
-    while(tmin > lmin) {
-      if(tmin % step == 0) {
-        min = tmin;
-        break;
-      } else {
-        tmin--;
-      }
-    }
-    max = tmax;
-    while(tmax < lmax) {
-      if(tmax % step == 0) {
-        max = tmax;
-        break;
-      } else {
-        tmax++;
-      }
-    }
+    vals = null;
   }
   
   /**
@@ -240,7 +185,7 @@ public final class ScatterAxis {
     if(numeric) {
       if(numType == TYPEDBL) {
         double d = min + (max - min) * relative;
-        return Double.toString(roundDouble(d, 2));
+        return Double.toString(d);
       } else {
         int i = (int) (min + (max - min) * relative);
         return Integer.toString(i);
@@ -267,42 +212,90 @@ public final class ScatterAxis {
   }
   
   /**
+   * Determines the smallest and greatest occurring values for a specific item.
+   * Afterwards the extremes are slightly rounded to support a decent axis
+   * caption.
+   *
+   * If range between min/max < 10 extremes are calculated by floor/ceil 
+   * function.
+   * If range >=10 the minimum is allowed to lie 25% of the range under the
+   * actual minimum. After that the final extreme is calculated as the value
+   * between the smallest allowed minimum and the actual minimum which is 
+   * dividable by pow(10, log10(range)-1).
+   * 
+   * Maximum v.v. . 
+   */
+  private void calcExtremeValues() {
+    final Performance p = new Performance();
+    
+    min = Integer.MAX_VALUE;
+    max = Integer.MIN_VALUE;
+    for(int i = 0; i < vals.length; i++) {
+      if(vals[i].length < 1)
+        continue;
+      double d = Token.toDouble(vals[i]);
+      if(d < min)
+        min = d;
+      if(d > max) 
+        max = d;
+    }
+    
+    final double range = max - min;
+//    if(range < 10) {
+//      min = Math.floor(min);
+//      max = Math.ceil(max);
+//      return;
+//    }
+    final int lmin = (int) (min - (range / 2));
+    final int lmax = (int) (max + (range / 2));
+    int tmin = (int) Math.floor(min);
+    int tmax = (int) Math.ceil(max);
+    final double rangePow = Math.floor(Math.log10(range) + .5d);
+    calculatedCaptionStep = (int) (Math.pow(10, rangePow - 1));
+    final double tmpStepL = (int) (Math.pow(10, rangePow));
+    
+    boolean sFound = false;
+    min = tmin;
+    while(tmin > lmin) {
+      if(tmin % tmpStepL == 0) {
+        min = tmin;
+        break;
+      }
+      if(!sFound && tmin % calculatedCaptionStep == 0) {
+        min = tmin;
+        sFound = true;
+      }
+      tmin--;
+    }
+    
+    max = tmax;
+    while(tmax < lmax) {
+      final int tmpRange = (int) (tmax - min);
+      if(tmax % tmpStepL == 0) {
+        max = tmax;
+        break;
+      }
+      if(!sFound && tmax % calculatedCaptionStep == 0 && 
+          (tmpRange / calculatedCaptionStep) % 2 == 0) {
+        max = tmax;
+        sFound = true;
+      }
+      tmax++;
+    }
+    System.out.println(p.getTimer());
+  }
+  
+  /**
    * Calculates axis caption depending on view width / height.
    * @param space space of view axis available for captions
    */
   void calcCaption(final int space) {
+    captionStep = calculatedCaptionStep;
     if(numeric) {
-      if(numType == TYPEINT) {
-        final int minI = (int) min;
-        final int maxI = (int) max;
-        int tmpStep = 1;
-        do {
-          captionStep = tmpStep;
-          int tmpMin = minI - minI % tmpStep;
-          int tmpMax = maxI + maxI % tmpStep;
-          nrCaptions = (tmpMax - tmpMin) / tmpStep + 1;
-          if(String.valueOf(tmpStep).startsWith("1"))
-            tmpStep *= tmpStep == 1 ? 5 : 2.5;
-          else
-            tmpStep *= 2;
-        } while(nrCaptions * ScatterView.CAPTIONWHITESPACE > space);
-        
-      } else if(numType == TYPEDBL) {
-        final double minD = min;
-        final double maxD = max;
-        double tmpStep = .01d;
-        if(maxD - minD > 100)
-          tmpStep = 1;
-        do {
-          captionStep = tmpStep;
-          nrCaptions = (int) ((maxD - minD) / tmpStep) + 1;
-          if(String.valueOf(tmpStep).indexOf("1") > -1) {
-            tmpStep *= 2.5;
-          } else {
-            tmpStep *= 2;
-          }
-        } while(nrCaptions * ScatterView.CAPTIONWHITESPACE > space &&
-            maxD - minD > tmpStep);
+      nrCaptions = (int) ((max - min) / captionStep) + 1;
+      if(nrCaptions * ScatterView.CAPTIONWHITESPACE > space) {
+        captionStep *= 2;
+        nrCaptions = (int) ((max - min) / captionStep) + 1;
       }
       
     } else {
