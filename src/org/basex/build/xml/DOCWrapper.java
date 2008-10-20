@@ -41,7 +41,7 @@ public final class DOCWrapper extends Parser {
    * @param fn filename
    */
   public DOCWrapper(final Document d, final String fn) {
-    super(IO.DUMMY);
+    super(IO.get(fn));
     doc = d;
     filename = fn;
   }

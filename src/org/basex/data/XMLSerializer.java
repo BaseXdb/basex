@@ -13,22 +13,8 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class XMLSerializer extends Serializer {
-  /** Ampersand Entity. */
-  private static final byte[] E_AMP = token("&amp;");
-  /** Quote Entity. */
-  private static final byte[] E_QU = token("&quot;");
-  /** GreaterThan Entity. */
-  private static final byte[] E_GT = token("&gt;");
-  /** LessThan Entity. */
-  private static final byte[] E_LT = token("&lt;");
-  /** Tab Entity. */
-  private static final byte[] E_TAB = token("&#x9;");
-  /** NewLine Entity. */
-  private static final byte[] E_NL = token("&#xA;");
-  /** CarriageReturn Entity. */
-  private static final byte[] E_CR = token("&#xD;");
   /** Indentation. */
-  private static final String INDENT = "  ";
+  public static final String INDENT = "  ";
 
   /** Output stream. */
   public final PrintOutput out;
@@ -115,17 +101,17 @@ public final class XMLSerializer extends Serializer {
   }
   
   @Override
-  public void empty() throws IOException {
+  protected void empty() throws IOException {
     out.print(ELEM4);
   }
 
   @Override
-  public void finish() throws IOException {
+  protected void finish() throws IOException {
     out.print(ELEM2);
   }
 
   @Override
-  public void close(final byte[] t) throws IOException {
+  protected void close(final byte[] t) throws IOException {
     if(indent) indent(true);
     out.print(ELEM3);
     out.print(t);

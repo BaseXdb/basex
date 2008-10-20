@@ -1,5 +1,6 @@
 package org.basex.test.w3c;
 
+import static org.basex.Text.*;
 import static org.basex.util.Token.*;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -216,7 +217,7 @@ public abstract class W3CTS {
       final TokenList dl = new TokenList();
       final Nodes doc = nodes("input-document", nodes);
       for(int d = 0; d < doc.size; d++) {
-        dl.add(token(sources + string(data.atom(doc.nodes[d])) + ".xml"));
+        dl.add(token(sources + string(data.atom(doc.nodes[d])) + IO.XMLSUFFIX));
       }
       colls.put(cname, dl.finish());
     }
@@ -265,10 +266,10 @@ public abstract class W3CTS {
 
     if(reporting) {
       bw = new BufferedWriter(new OutputStreamWriter(
-          new FileOutputStream(report + "BaseX.xml"), UTF8));
-      write(bw, report + "BaseXPre.xml");
+          new FileOutputStream(report + NAME + IO.XMLSUFFIX), UTF8));
+      write(bw, report + NAME + "Pre" + IO.XMLSUFFIX);
       bw.write(logFile.toString());
-      write(bw, report + "BaseXPos.xml");
+      write(bw, report + NAME + "Pos" + IO.XMLSUFFIX);
       bw.close();
     }
 
@@ -445,7 +446,7 @@ public abstract class W3CTS {
           logErr.append(Prop.NL);
           final Item it = ((XQResult) res).item();
           final boolean nodes = it instanceof Nod && it.type != Type.TXT;
-          addLog(pth, outname + (nodes ? ".xml" : ".txt"), output);
+          addLog(pth, outname + (nodes ? IO.XMLSUFFIX : IO.TXTSUFFIX), output);
         }
         if(reporting) logFile.append("fail");
         err++;
@@ -458,7 +459,7 @@ public abstract class W3CTS {
           logOK.append(Prop.NL);
           final Item it = ((XQResult) res).item();
           final boolean nodes = it instanceof Nod && it.type != Type.TXT;
-          addLog(pth, outname + (nodes ? ".xml" : ".txt"), output);
+          addLog(pth, outname + (nodes ? IO.XMLSUFFIX : IO.TXTSUFFIX), output);
         }
         if(reporting) {
           logFile.append("pass");

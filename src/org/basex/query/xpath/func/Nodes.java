@@ -1,5 +1,6 @@
 package org.basex.query.xpath.func;
 
+import static org.basex.Text.*;
 import static org.basex.query.xpath.XPText.*;
 import org.basex.data.Data;
 import org.basex.query.QueryException;
@@ -18,12 +19,15 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class Nodes extends Func {
+  /** Name of function. */
+  public static final String NAME = NAMESPACE + ":nodes";
+
   /**
    * Function Constructor.
    * @param arg expression array
    */
   public Nodes(final Expr[] arg) {
-    super(arg, "nodes(item)");
+    super(arg, NAME + "(item)");
   }
 
   @Override

@@ -2,7 +2,6 @@ package org.basex.core.proc;
 
 import static org.basex.Text.*;
 import static org.basex.core.Commands.*;
-import static org.basex.util.Token.*;
 import java.lang.reflect.Field;
 import org.basex.BaseX;
 import org.basex.Text;
@@ -51,9 +50,9 @@ public final class Set extends Process {
       } else if(key instanceof String) {
         f.set(null, val);
       } else if(key instanceof Integer) {
-        f.setInt(null, toInt(val));
+        f.setInt(null, Integer.parseInt(val));
       } else {
-        throw new Exception();
+        BaseX.notexpected();
       }
       return info((s == null ? option :
         Text.class.getField("INFO" + s).get(null).toString()) + ": " + val);

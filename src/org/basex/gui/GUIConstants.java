@@ -121,7 +121,7 @@ public final class GUIConstants {
   /** Name of application logo. */
   public static final String IMGICON = "icon";
   /** Name of application logo. */
-  public static final String IMGBASEX = "basex";
+  public static final String IMGBASEX = NAMESPACE;
   /** Name of application logo. */
   public static final String IMGERROR = "error";
   /** Name of application logo. */

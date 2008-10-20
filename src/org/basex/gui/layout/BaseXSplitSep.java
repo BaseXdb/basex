@@ -68,9 +68,4 @@ public final class BaseXSplitSep extends BaseXBack {
     final Point p = getLocationOnScreen();
     return l ? p.x + e.getX() : p.y + e.getY();
   }
-
-  @Override
-  public String toString() {
-    return "BaseXSplitSep[" + (l ? "Horizontal" : "Vertical") + ']';
-  }
 }

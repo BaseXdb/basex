@@ -1,5 +1,7 @@
 package org.basex.query.xpath.func;
 
+import static org.basex.Text.*;
+
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
@@ -14,12 +16,15 @@ import org.basex.util.IntList;
  * @author Christian Gruen
  */
 public final class Sort extends Func {
+  /** Name of function. */
+  public static final String NAME = NAMESPACE + ":sort";
+
   /**
    * Function Constructor.
    * @param arg expression array
    */
   public Sort(final Expr[] arg) {
-    super(arg, "sort(nodeset)");
+    super(arg, NAME + "(nodeset)");
   }
 
   @Override

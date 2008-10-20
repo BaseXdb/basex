@@ -43,7 +43,7 @@ public final class Prop {
   public static final String[] LANGUAGES = { "English", "German", "Japanese" };
   /** Translation credits. */
   public static final String[] LANGCREDS = {
-    "BaseX Team", "Andreas Weiler, BaseX Team", "Kazuo Kashima" };
+    "Project Team", "Andreas Weiler, BaseX Team", "Kazuo Kashima" };
 
   // DATABASE & PROGRAM PATHS =================================================
   

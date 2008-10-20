@@ -1,5 +1,6 @@
 package org.basex.query.xquery;
 
+import static org.basex.Text.*;
 import static org.basex.util.Token.*;
 
 /**
@@ -85,7 +86,7 @@ public interface XQTokens {
   /** Parser token. */
   String MODULE = "module";
   /** Parser token. */
-  String NAMESPACE = "namespace";
+  String NSPACE = "namespace";
   /** Parser token. */
   String NOINHERIT = "no-inherit";
   /** Parser token. */
@@ -210,7 +211,7 @@ public interface XQTokens {
   /** FN token. */
   byte[] FN = token("fn");
   /** BaseX token. */
-  byte[] BASEX = token("basex");
+  byte[] BASEX = token(NAMESPACE);
   /** XS token. */
   byte[] XS = token("xs");
   /** XS token. */

@@ -39,10 +39,12 @@ public interface Text {
 
   /** Project name. */
   String NAME = "BaseX";
+  /** Project namespace. */
+  String NAMESPACE = NAME.toLowerCase();
   /** URL. */
-  String URL = "http://www.basex.org";
+  String URL = "http://www." + NAMESPACE + ".org";
   /** Mail. */
-  String MAIL = "info@basex.org";
+  String MAIL = "info@" + NAMESPACE + ".org";
   /** Code version. */
   String VERSION = "4.2";
   /** Company Info. */
@@ -367,7 +369,7 @@ public interface Text {
   /** Out of Memory Error. */
   String PROCOUTMEM = lang("proc_outmem");
   /** Implementation Error. */
-  String PROCIMPL = lang("proc_outmem");
+  String PROCIMPL = "Not Implemented.";
   /** Implementation Bug. */
   String PROCBUG = "Implementation Bug?";
   /** Implementation Bug. */

@@ -129,9 +129,4 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
         v += z;
       }
   }
-
-  @Override
-  public String toString() {
-    return "BaseXSplit[" + (l ? "Horizontal" : "Vertical") + ']';
-  }
 }

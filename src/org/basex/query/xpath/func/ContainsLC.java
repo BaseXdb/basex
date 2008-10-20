@@ -1,5 +1,6 @@
 package org.basex.query.xpath.func;
 
+import static org.basex.Text.*;
 import static org.basex.query.xpath.XPText.*;
 import org.basex.data.Data;
 import org.basex.query.QueryException;
@@ -19,7 +20,7 @@ import org.basex.util.Token;
  */
 public final class ContainsLC extends Func {
   /** Name of function. */
-  public static final String NAME = "basex:containslc";
+  public static final String NAME = NAMESPACE + ":containslc";
   
   /**
    * Function Constructor.

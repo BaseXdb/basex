@@ -61,11 +61,11 @@ public final class XPathContext {
     addFunction("true", True.class);
     // BaseX specific functions
     addFunction(ContainsLC.NAME, ContainsLC.class);
-    addFunction("basex:matches", Matches.class);
-    addFunction("basex:distinct", Distinct.class);
-    addFunction("basex:sort", Sort.class);
-    addFunction("basex:random", Random.class);
-    addFunction("basex:nodes", Nodes.class);
+    addFunction(Matches.NAME, Matches.class);
+    addFunction(Distinct.NAME, Distinct.class);
+    addFunction(Sort.NAME, Sort.class);
+    addFunction(Random.NAME, Random.class);
+    addFunction(Nodes.NAME, Nodes.class);
   }
 
   /**

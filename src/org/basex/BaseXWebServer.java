@@ -367,7 +367,7 @@ public final class BaseXWebServer {
     }
     out.println("<tr><td colspan='5'" + col + "></td></tr>");
     out.println("<tr><td colspan='5' align='right'><font size='1'>");
-    out.println("BaseX WebServer</font></td></tr>");
+    out.println(NAME + " WebServer</font></td></tr>");
     out.println("</table></body></html>");
     out.close();
   }

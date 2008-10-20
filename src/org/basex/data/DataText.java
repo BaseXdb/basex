@@ -1,6 +1,7 @@
 package org.basex.data;
 
 import static org.basex.util.Token.*;
+
 import org.basex.core.Prop;
 
 /**
@@ -84,6 +85,21 @@ public interface DataText {
   byte[] CONTENT = token("content");
 
   // XML SERIALIZATION ========================================================
+
+  /** Ampersand Entity. */
+  byte[] E_AMP = token("&amp;");
+  /** Quote Entity. */
+  byte[] E_QU = token("&quot;");
+  /** GreaterThan Entity. */
+  byte[] E_GT = token("&gt;");
+  /** LessThan Entity. */
+  byte[] E_LT = token("&lt;");
+  /** Tab Entity. */
+  byte[] E_TAB = token("&#x9;");
+  /** NewLine Entity. */
+  byte[] E_NL = token("&#xA;");
+  /** CarriageReturn Entity. */
+  byte[] E_CR = token("&#xD;");
 
   /** Opening results tag. */
   byte[] RESULTS = token("results");

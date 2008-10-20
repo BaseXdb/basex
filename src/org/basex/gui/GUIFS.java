@@ -62,7 +62,6 @@ public final class GUIFS {
     { Type.NONE, "au audio", "au", "audio" },
     { Type.NONE, "avi video", "avi" },
     { Type.NONE, "library", "ax", "dll" },
-    { Type.NONE, "basex database", "basex" },
     { Type.TEXT, "batch script", "bat" },
     { Type.NONE, "binary file", "bin" },
     { Type.NONE, "bitmap image", "bmp", "pic" },

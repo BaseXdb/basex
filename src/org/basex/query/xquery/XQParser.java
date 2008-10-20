@@ -255,7 +255,7 @@ public final class XQParser extends QueryParser {
    */
   private void moduleDecl(final Uri u) throws XQException {
     check(MODULE);
-    check(NAMESPACE);
+    check(NSPACE);
     module = new QNm(ncName(XPNAME));
     check(IS);
     module.uri = Uri.uri(stringLiteral());
@@ -293,7 +293,7 @@ public final class XQParser extends QueryParser {
           orderingModeDecl();
         } else if(consumeWS(COPYNS)) {
           copyNamespacesDecl();
-        } else if(consumeWS(NAMESPACE)) {
+        } else if(consumeWS(NSPACE)) {
           namespaceDecl();
         } else {
           qp = p;
@@ -375,7 +375,7 @@ public final class XQParser extends QueryParser {
   private boolean defaultNamespaceDecl() throws XQException {
     final boolean elem = consumeWS(ELEMENT);
     if(!elem && !consumeWS(FUNCTION)) return false;
-    check(NAMESPACE);
+    check(NSPACE);
     final byte[] ns = stringLiteral();
     if(elem) {
       if(declElem) Err.or(DUPLNS);
@@ -475,12 +475,12 @@ public final class XQParser extends QueryParser {
    * @throws XQException xquery exception
    */
   private void schemaImport() throws XQException {
-    if(consumeWS(NAMESPACE)) {
+    if(consumeWS(NSPACE)) {
       ncName(XPNAME);
       check(IS);
     } else if(consumeWS(DEFAULT)) {
       check(ELEMENT);
-      check(NAMESPACE);
+      check(NSPACE);
     }
     final byte[] ns = stringLiteral();
     if(ns.length == 0) Err.or(NSEMPTY);
@@ -494,7 +494,7 @@ public final class XQParser extends QueryParser {
    */
   private void moduleImport() throws XQException {
     QNm name = null;
-    if(consumeWS(NAMESPACE)) {
+    if(consumeWS(NSPACE)) {
       name = new QNm(ncName(XPNAME));
       check(IS);
     } else {

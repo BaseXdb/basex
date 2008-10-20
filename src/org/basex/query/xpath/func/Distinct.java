@@ -1,5 +1,7 @@
 package org.basex.query.xpath.func;
 
+import static org.basex.Text.*;
+
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
@@ -14,12 +16,15 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class Distinct extends Func {
+  /** Name of function. */
+  public static final String NAME = NAMESPACE + ":distinct";
+
   /**
    * Function Constructor.
    * @param arg expression array
    */
   public Distinct(final Expr[] arg) {
-    super(arg, "distinct(nodeset)");
+    super(arg, NAME + "(nodeset)");
   }
 
   @Override

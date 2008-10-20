@@ -414,11 +414,11 @@ public final class DiskData extends Data {
     table.delete(pre, s);
     size -= s;
 
+    // database cannot be empty; instead, an empty root node is kept
     if(size == 0) {
       size = 1;
       size(0, DOC);
     }
-    
     updateDist(pre, -s);
   }
 
@@ -482,12 +482,13 @@ public final class DiskData extends Data {
 
   @Override
   public void insert(final int pre, final int par, final Data dt) {
+    
     // reference to root tag
     final int pr = par > 0 ? par : -1;
     final int ta = dt.kind(0) == DOC && pr > 0 ? 1 : 0;
     final int ts = dt.size(ta, dt.kind(ta));
     final int tb = ta + ts;
-
+    
     // add all single nodes
     for(int t = ta; t < tb; t++) {
       final int k = dt.kind(t);
@@ -520,6 +521,9 @@ public final class DiskData extends Data {
       }
     }
     updateTable(pre, pr, ts);
+    
+    // delete old empty root node
+    if(size(0, DOC) == 1) delete(0);
   }
 
   /**

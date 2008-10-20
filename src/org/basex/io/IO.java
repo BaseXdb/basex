@@ -26,6 +26,8 @@ public abstract class IO {
   public static final String BASEXSUFFIX = ".basex";
   /** XQuery Suffix. */
   public static final String XQSUFFIX = ".xq";
+  /** Text Suffix. */
+  public static final String TXTSUFFIX = ".txt";
   /** XML Suffix. */
   public static final String XMLSUFFIX = ".xml";
   /** ZIP Suffix. */

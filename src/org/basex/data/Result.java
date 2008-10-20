@@ -23,14 +23,14 @@ public interface Result {
   boolean same(Result v);
 
   /**
-   * Serializes the result.
+   * Serializes the complete result.
    * @param ser serializer
    * @throws IOException exception
    */
   void serialize(Serializer ser) throws IOException;
 
   /**
-   * Serializes the nth result.
+   * Serializes the specified result.
    * @param ser serializer
    * @param n number of result to serialize
    * @throws IOException exception
