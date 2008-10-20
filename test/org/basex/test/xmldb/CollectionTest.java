@@ -147,7 +147,7 @@ public class CollectionTest extends TestCase {
     };
     final String[] res = code.strings();
     assertEquals("One document expected.", 1, res.length);
-    assertEquals(AllTests.DOC1, res[0]);
+    assertEquals("Wrong document name.", AllTests.DOC1, res[0]);
     checkClosed(code);
   }
 
