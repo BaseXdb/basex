@@ -8,7 +8,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.basex.core.Context;
 import org.basex.core.proc.CreateDB;
-import org.basex.data.SAXSerializer;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -16,6 +15,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 import org.xmldb.api.DatabaseManager;
 import org.xmldb.api.base.Collection;
@@ -38,9 +38,11 @@ public class XMLDBTest extends TestCase {
   /** XMLDB driver. */
   static String driver = "org.basex.api.xmldb.BXDatabase";
   /** Database/document path. */
-  static String url = "xmldb:basex://localhost:8080/input";
+  static String url = "xmldb:basex://localhost:1984/input";
   /** Collection. */
-  static Collection collection = null;
+  static Database database;
+  /** Collection. */
+  static Collection collection;
 
   @Before
   @Override
@@ -53,7 +55,7 @@ public class XMLDBTest extends TestCase {
       ctx.close();
       
       Class<?> c = Class.forName(driver);
-      Database database = (Database) c.newInstance();
+      database = (Database) c.newInstance();
       DatabaseManager.registerDatabase(database);
       collection = DatabaseManager.getCollection(url);
     } catch(XMLDBException e) {
@@ -115,13 +117,10 @@ public class XMLDBTest extends TestCase {
    */
   @Test
   public void test4() throws Exception {
+    final DefaultHandler ch = new DefaultHandler();
     String id = "input.xml";
     XMLResource resource = (XMLResource) collection.getResource(id);
-    SAXSerializer sax = new SAXSerializer(null);
-    // A custom SAX Content Handler is required to handle the SAX events
-    // For example with the ContentHandler from the SAXSerializer
-    ContentHandler handler = sax.getContentHandler();
-    resource.getContentAsSAX(handler);
+    resource.getContentAsSAX(ch);
   }
 
   /**

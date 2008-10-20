@@ -57,7 +57,7 @@ package org.xmldb.api.base;
  * <code>Database</code> is an encapsulation of the database driver 
  * functionality that is
  * necessary to access an XML database. Each vendor must provide their own
- * implmentation of the <code>Database</code> interface. The implementation 
+ * implementation of the <code>Database</code> interface. The implementation 
  * is registered with the
  * <code>DatabaseManager</code> to provide access to the resources of the XML database.
  * <p />

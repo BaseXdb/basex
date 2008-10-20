@@ -1,21 +1,23 @@
 package org.basex.api.xmldb;
 
+import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import javax.xml.parsers.SAXParser;
+import java.util.HashMap;
 import javax.xml.parsers.SAXParserFactory;
 import org.basex.api.dom.BXDoc;
 import org.basex.data.Data;
+import org.basex.data.Result;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
 import org.basex.query.xquery.item.DNode;
+import org.basex.util.TokenBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xmldb.api.base.Collection;
@@ -28,62 +30,138 @@ import org.xmldb.api.modules.XMLResource;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler
  */
-public final class BXXMLResource implements XMLResource {
-  /** Current data reference. */
-  private final Data data;
-  /** String id. */
-  private final String id;
-  /** Int pre. */
-  private final int pre;
+public final class BXXMLResource implements XMLResource, BXXMLDBText {
   /** Collection reference. */
-  private Collection coll;
-  /** String content. */
+  private final Collection coll;
+  /** String id. */
+  private String id;
+  /** Cached content. */
   Object content;
+  /** Query result. */
+  Result result;
+  /** Data reference. */
+  Data data;
+  /** Pre value or result position. */
+  int pos;
+
+  /**
+   * Constructor for generated results.
+   * @param d content data
+   * @param c Collection
+   */
+  public BXXMLResource(final byte[] d, final Collection c) {
+    content = d;
+    coll = c;
+  }
+
+  /**
+   * Constructor for query results.
+   * @param res query result
+   * @param p query counter
+   * @param c Collection
+   */
+  public BXXMLResource(final Result res, final int p, final Collection c) {
+    result = res;
+    coll = c;
+    pos = p;
+  }
 
   /**
    * Standard constructor.
    * @param d data reference
-   * @param iD String
-   * @param preV int
-   * @param col Collection
+   * @param p pre value
+   * @param i id
+   * @param c collection
    */
-  public BXXMLResource(final Data d, final String iD, final int preV, final Collection col) {
+  public BXXMLResource(final Data d, final int p, final String i,
+      final Collection c) {
+    id = i;
+    coll = c;
     data = d;
-    id = iD;
-    pre = preV;
-    coll = col;
+    pos = p;
+  }
+
+  public Collection getParentCollection() {
+    return coll;
+  }
+
+  public String getId() {
+    return id;
+  }
+
+  public String getResourceType() {
+    return XMLResource.RESOURCE_TYPE;
   }
 
   public Object getContent() throws XMLDBException {
     if(content == null) {
       try {
+        // serialize and cache content
         final CachedOutput out = new CachedOutput();
-        new XMLSerializer(out).node(data, pre);
-        content = out.toString();
+        final XMLSerializer ser = new XMLSerializer(out);
+        if(data != null) {
+          new DNode(data, pos).serialize(ser);
+        } else if(result != null) {
+          result.serialize(ser, pos);
+        } else {
+          return null;
+        }
+        content = out.finish();
       } catch(final IOException ex) {
         throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
       }
     }
-    return content;
+    return content instanceof byte[] ? string((byte[]) content) : content;
+  }
+
+  public void setContent(final Object value) throws XMLDBException {
+    // allow only strings and byte arrays
+    if(value instanceof byte[]) content = value;
+    else if(value instanceof String) content = token(value.toString());
+    else throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_CONT);
+  }
+
+  public String getDocumentId() throws XMLDBException {
+    // throw exception if resource result from query; does not conform to the
+    // specs, but many query results are not related to a document anymore.
+    if(result != null)
+      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_DOC);
+    
+    // resource does not result from a query - return normal id
+    if(id != null) return id;
+    // get document root id
+    int p = pos;
+    while(p >= 0) {
+      int k = data.kind(p);
+      if(k == Data.DOC) return string(data.text(p));
+      p = data.parent(p, k);
+    }
+    return null;
   }
 
   public Node getContentAsDOM() {
-    return content instanceof Node ? (Node) content :
-      new BXDoc(new DNode(data, pre));
+    if(!(content instanceof Node)) content = new BXDoc(new DNode(data, pos));
+    return (Node) content;
+  }
+
+  public void setContentAsDOM(final Node cont) throws XMLDBException {
+    // allow only Document instances...
+    if(cont == null) throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
+    if(cont instanceof Document) content = cont;
+    else throw new XMLDBException(ErrorCodes.WRONG_CONTENT_TYPE);
   }
 
   public void getContentAsSAX(final ContentHandler handler)
       throws XMLDBException {
 
     if(handler == null) throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
-    
-    XMLReader reader = null;
-    final SAXParserFactory saxFactory = SAXParserFactory.newInstance();
-    saxFactory.setNamespaceAware(true);
-    saxFactory.setValidating(false);
+
+    final SAXParserFactory factory = SAXParserFactory.newInstance();
+    factory.setNamespaceAware(true);
+    factory.setValidating(false);
     try {
-      final SAXParser sax = saxFactory.newSAXParser();
-      reader = sax.getXMLReader();
+      // caching should be avoided and replaced by a stream reader...
+      final XMLReader reader = factory.newSAXParser().getXMLReader();
       reader.setContentHandler(handler);
       reader.parse(new InputSource(new StringReader(getContent().toString())));
     } catch(final Exception pce) {
@@ -91,172 +169,98 @@ public final class BXXMLResource implements XMLResource {
     }
   }
 
-  public String getDocumentId() {
-    return id;
-  }
-
-  public String getId() {
-    return String.valueOf(pre);
-  }
-
-  public Collection getParentCollection() {
-    return coll;
-  }
-
-  public String getResourceType() {
-    return XMLResource.RESOURCE_TYPE;
-  }
-
-  public void setContent(final Object value) {
-    content = value;
-  }
-
-  public void setContentAsDOM(final Node cont) throws XMLDBException {
-    if(cont == null) throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
-    if(cont instanceof Document) {
-      content = cont;
-    } else {
-      throw new XMLDBException(ErrorCodes.WRONG_CONTENT_TYPE);
-    }
-  }
-
   public ContentHandler setContentAsSAX() {
-    // A custom SAX Content Handler is required to handle the SAX events
+    // ..might be replaced by a custom SAX Content Handler in future.
     return new BXSAXContentHandler(this);
   }
 
   /** SAX Parser. */
   static final class BXSAXContentHandler extends DefaultHandler {
+    /** HashMap. */
+    protected final HashMap<String, String> ns = new HashMap<String, String>();
+    /** Cached output. */
+    protected final CachedOutput out = new CachedOutput();
+    /** Serializer. */
+    protected final XMLSerializer xml;
     /** XMLResource. */
     protected BXXMLResource res;
-    /** StringBuffer */
-    protected StringBuilder cont;
-    /** Hashtable */
-    protected Hashtable<String, String> ns;
-    
+
     /**
      * Standard Constructor.
-     * @param xmlresource XMLResource
+     * @param r resource
      */
-    BXSAXContentHandler(BXXMLResource xmlresource) {
-      res = xmlresource;
-      ns = new Hashtable<String, String>();
+    BXSAXContentHandler(final BXXMLResource r) {
+      xml = new XMLSerializer(out);
+      res = r;
     }
-    
+
     @Override
-    public void characters(char ac[], int i, int j) {
-      for(int k = 0; k < j; k++) {
-        char c = ac[i + k];
-        switch(c) {
-          case 38: /* '&' */
-            cont.append("&amp;");
-            break;
-
-          case 60: /* '<' */
-            cont.append("&lt;");
-            break;
-
-          case 62: /* '>' */
-            cont.append("&gt;");
-            break;
-
-          case 34: /* '"' */
-            cont.append("&quot;");
-            break;
-
-          case 39: /* '\'' */
-            cont.append("&apos;");
-            break;
-
-          default:
-            if(c > '\177') cont.append("&#" + (int) c + ";");
-            else cont.append(c);
-            break;
-        }
+    public void characters(final char ac[], final int i, final int j)
+        throws SAXException {
+      try {
+        final TokenBuilder tb = new TokenBuilder();
+        for(int k = 0; k < j; k++) tb.add(ac[i + k]);
+        xml.text(tb.finish());
+      } catch(final IOException ex) {
+        throw new SAXException(ex);
       }
     }
+
     @Override
     public void endDocument() {
-      res.setContent(cont);
+      res.content = out.finish();
     }
-    @Override
-    public void endElement(String s, String s1, String s2) {
-      cont.append("</");
-      cont.append(s2);
-      cont.append(">");
-    }
-    @Override
-    public void endPrefixMapping(String s) {
-      ns.remove(s);
-    }
-    @Override
-    public void ignorableWhitespace(char ac[], int i, int j) {
-      for(int k = 0; k < j; k++)
-        cont.append(ac[i + k]);
-    }
-    @Override
-    public void processingInstruction(String s, String s1) {
-      cont.append("<?");
-      cont.append(s);
-      cont.append(" ");
-      if(s1 != null) cont.append(s1);
-      cont.append("?>");
-    }
-    @Override
-    public void skippedEntity(String s) {}
-    @Override
-    public void startDocument() {
-      cont = new StringBuilder();
-    }
-    @Override
-    public void startElement(String s, String s1, String s2,
-        Attributes attributes) {
-      cont.append("<");
-      cont.append(s2);
-      for(int i = 0; i < attributes.getLength(); i++) {
-        cont.append(" ");
-        cont.append(attributes.getQName(i));
-        cont.append("=");
-        cont.append("\"");
-        cont.append(attributes.getValue(i));
-        cont.append("\"");
-      }
 
-      String s3;
-      for(Enumeration enumeration = ns.keys(); enumeration
-          .hasMoreElements(); ns.remove(s3)) {
-        s3 = (String) enumeration.nextElement();
-        cont.append(" xmlns:");
-        cont.append(s3);
-        cont.append("=");
-        cont.append("\"");
-        cont.append(ns.get(s3));
-        cont.append("\"");
-      }
-
-      cont.append(">");
-    }
-    
     @Override
-    public void startPrefixMapping(String s, String s1) {
+    public void endElement(final String s, final String s1, final String s2)
+        throws SAXException {
+      try {
+        xml.closeElement();
+      } catch(final IOException ex) {
+        throw new SAXException(ex);
+      }
+    }
+
+    @Override
+    public void ignorableWhitespace(final char ac[], final int i, final int j)
+        throws SAXException {
+      characters(ac, i, j);
+    }
+
+    @Override
+    public void processingInstruction(final String s, final String s1)
+        throws SAXException {
+      try {
+        xml.pi(token(s), s1 != null ? token(s1) : EMPTY);
+      } catch(final IOException ex)  {
+        throw new SAXException(ex);
+      }
+    }
+
+    @Override
+    public void startElement(final String s, final String s1, final String s2,
+        final Attributes attributes) throws SAXException {
+
+      try {
+        xml.startElement(token(s2));
+        for(int i = 0; i < attributes.getLength(); i++) xml.attribute(
+            token(attributes.getQName(i)), token(attributes.getValue(i)));
+        for(final String k : ns.keySet()) xml.attribute(
+            concat(XMLNS, token(k)), token(ns.get(k)));
+        xml.finishElement();
+      } catch(final IOException ex)  {
+        throw new SAXException(ex);
+      }
+    }
+
+    @Override
+    public void startPrefixMapping(final String s, final String s1) {
       ns.put(s, s1);
     }
-  }
 
-  /**
-   * Returns the pre value of the Doc
-   * @return pre value
-   */
-  public int getPre() {
-    return pre;
+    @Override
+    public void endPrefixMapping(final String s) {
+      ns.remove(s);
+    }
   }
-  
-  /**
-   * Returns the Data of the Doc
-   * @return Data value
-   */
-  public Data getData() {
-    return data;
-  }
- 
 }

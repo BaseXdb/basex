@@ -7,7 +7,7 @@ import junit.framework.TestCase;
 import javax.xml.xquery.*;
 
 @SuppressWarnings("all")
-public class XQJTestCase extends TestCase{
+public class XQJTestCase extends TestCase {
   protected XQDataSource xqds;
   protected XQConnection xqc;
   

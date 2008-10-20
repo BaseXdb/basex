@@ -66,7 +66,7 @@ public class XPathExprImpl implements XPathExpression {
     try {
       return (Item) xproc.query(context.current());
     } catch(QueryException ex) {
-      throw new XPathExpressionException(ex.getMessage());
+      throw new XPathExpressionException(ex);
     }
   }
   

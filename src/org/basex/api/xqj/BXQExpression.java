@@ -21,11 +21,11 @@ public final class BXQExpression extends BXQDynamicContext
 
   /**
    * Constructor.
-   * @param sc static context
+   * @param s static context
    * @param c closer
    */
-  BXQExpression(final BXQStaticContext sc, final BXQConnection c) {
-    super(null, sc, c);
+  BXQExpression(final BXQStaticContext s, final BXQConnection c) {
+    super(null, s, c);
   }
 
   public void cancel() throws XQException {
@@ -50,13 +50,13 @@ public final class BXQExpression extends BXQDynamicContext
     return execute();
   }
 
-  public XQResultSequence executeQuery(final Reader query) throws XQException {
-    return executeQuery(Token.string(content(query)));
+  public XQResultSequence executeQuery(final Reader qu) throws XQException {
+    return executeQuery(Token.string(content(qu)));
   }
 
-  public XQResultSequence executeQuery(final InputStream query)
+  public XQResultSequence executeQuery(final InputStream qu)
       throws XQException {
-    return executeQuery(Token.string(content(query)));
+    return executeQuery(Token.string(content(qu)));
   }
 
   public XQStaticContext getStaticContext() throws XQException {

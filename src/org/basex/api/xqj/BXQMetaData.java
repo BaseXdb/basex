@@ -52,7 +52,7 @@ public class BXQMetaData extends BXQAbstract implements XQMetaData {
     return Text.VERSION;
   }
 
-  public Set getSupportedXQueryEncodings() throws XQException {
+  public Set<String> getSupportedXQueryEncodings() throws XQException {
     opened();
     return Charset.availableCharsets().keySet();
   }

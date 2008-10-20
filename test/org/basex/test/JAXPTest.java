@@ -1,10 +1,11 @@
-package org.basex.test.examples;
+package org.basex.test;
 
 import javax.xml.namespace.QName;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
-import org.basex.api.jaxp.XPathImpl;
+import org.basex.api.dom.BXDoc;
+import org.basex.api.jaxp.BXPath;
 import org.basex.core.proc.Check;
 import org.basex.data.Data;
 import org.basex.query.xquery.item.DNode;
@@ -18,21 +19,21 @@ import org.xml.sax.InputSource;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class JAXPExample {
+public final class JAXPTest {
   /** Input XML file. */
-  private static final String XMLFILE = "/media/C/xml/xmark/1mb.xml";
+  private static final String XMLFILE = "input.xml";
   /** Sample query. */
-  private static final String QUERY = "//item[@id != 'item0']";
+  private static final String QUERY = "//li";
 
   /** Private constructor. */
-  private JAXPExample() { }
+  private JAXPTest() { }
 
   /**
    * Main method of the example class.
    * @param args (ignored) command-line arguments
    */
   public static void main(final String[] args) {
-    eval(new XPathImpl());
+    eval(new BXPath());
     eval(XPathFactory.newInstance().newXPath());
   }
   
@@ -54,7 +55,7 @@ public final class JAXPExample {
     }
     try {
       final Data d = Check.check(XMLFILE);
-      final Node n = new DNode(d, 0).java();
+      final Node n = new BXDoc(new DNode(d, 0));
       final Object o = xpath.evaluate(QUERY, n, type);
       System.out.println(o + (o != null ? ": " + o.getClass() : ""));
       System.out.println(p.getTimer());

@@ -12,7 +12,6 @@ import org.basex.build.Parser;
 import org.basex.core.ProgressException;
 import org.basex.io.IO;
 import org.basex.util.Atts;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -47,16 +46,16 @@ public final class XMLStreamWrapper extends Parser {
         switch(kind) {
           case XMLStreamConstants.START_ELEMENT:
             final int as = reader.getAttributeCount();
-            final Atts atts = new Atts();
+            final Atts att = new Atts();
             for(int a = 0; a < as; a++) {
-              atts.add(Token.token(reader.getAttributeLocalName(a)), 
-                  Token.token(reader.getAttributeValue(a)));
+              att.add(token(reader.getAttributeLocalName(a)), 
+                  token(reader.getAttributeValue(a)));
             }
-            builder.startElem(Token.token(reader.getLocalName()), atts);
+            builder.startElem(token(reader.getLocalName()), att);
             nodes++;
             break;
           case XMLStreamConstants.END_ELEMENT:
-            builder.endElem(Token.token(reader.getLocalName()));
+            builder.endElem(token(reader.getLocalName()));
             break;
           case XMLStreamConstants.CHARACTERS:
             builder.text(new TokenBuilder(reader.getText()), false);

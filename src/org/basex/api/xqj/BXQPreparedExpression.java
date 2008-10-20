@@ -26,13 +26,13 @@ public final class BXQPreparedExpression extends BXQDynamicContext
   /**
    * Constructor.
    * @param input query instance
-   * @param sc static context
+   * @param s static context
    * @param c closer
    * @throws XQQueryException exception
    */
-  public BXQPreparedExpression(final String input, final BXQStaticContext sc,
+  public BXQPreparedExpression(final String input, final BXQStaticContext s,
       final BXQConnection c) throws XQQueryException {
-    super(input, sc, c);
+    super(input, s, c);
     
     try {
       query.create();
