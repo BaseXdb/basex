@@ -90,8 +90,8 @@ public final class ScatterAxis {
     numeric = key.kind == Kind.INT || key.kind == Kind.DBL;
     if(numeric) {
       numType = key.kind == Kind.INT ? TYPEINT : TYPEDBL;
-      min = key.min;
-      max = key.max;
+//      min = key.min;
+//      max = key.max;
     } else {
       cats = key.cats.keys();
       final String[] tmpCats = new String[cats.length];
@@ -111,7 +111,6 @@ public final class ScatterAxis {
     for(int i = 0; i < items.length; i++) {
       int p = items[i];
       final int limit = p + data.size(p, Data.ELEM);
-//      double currentValue = -1;
       byte[] value = {};
       p++;
       while(p < limit) {
@@ -121,20 +120,17 @@ public final class ScatterAxis {
           if((Token.eq(attr, currName)) && isTag) {
             final int attSize = data.attSize(p, kind);
             value = data.text(p + attSize);
-//            currentValue = calcPosition(value);
             break;
           }
         } else if(kind == Data.ATTR) {
           final byte[] currName = data.attName(p);
           if((Token.eq(attr, currName)) && !isTag) {
             value = data.attValue(p);
-//            currentValue = calcPosition(value);
             break;
           }
         }
         p++;
       }
-//      co[i] = currentValue;
       vals[i] = value;
     }
     
@@ -159,6 +155,7 @@ public final class ScatterAxis {
     if(numeric) {
       final double range = max - min;
       if(range == 0)
+        
         percentage = 0.5d;
       else
         percentage = 1 / range * (d - min);
