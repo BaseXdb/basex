@@ -39,7 +39,7 @@ public final class ScatterView extends View implements Runnable {
   /** X paint margin. */
   private static final int MARGINBOTTOM = 90;
   /** Y paint margin. */ 
-  private static final int MARGINTOP = 50;
+  private static final int MARGINTOP = 60;
   /** Y paint margin. */ 
   private static final int MARGINLEFT = 90;
   /** Y paint margin. */ 
@@ -240,7 +240,7 @@ public final class ScatterView extends View implements Runnable {
     final int h = getHeight();
     final boolean nostats = !data.tags.stats;
 
-    if(nostats || w < 200 || h < 200) {
+    if(nostats || w < 300 || h < 300) {
       final String s = nostats ? DBNOSTATS : NOSPACE;
       g.setFont(GUIConstants.font);
       g.setColor(Color.black);
@@ -264,7 +264,6 @@ public final class ScatterView extends View implements Runnable {
     plotHeight = h - (MARGINTOP + MARGINBOTTOM);
     
     // overdraw plot background
-//    g.setColor(GUIConstants.color2);
     g.setColor(new Color(90, 90, 90, 40));
     g.fillRect(MARGINLEFT + NOVALUEBORDER, MARGINTOP, 
         plotWidth - NOVALUEBORDER, 

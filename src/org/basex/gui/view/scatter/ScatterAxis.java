@@ -2,11 +2,11 @@ package org.basex.gui.view.scatter;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+
 import org.basex.data.Data;
 import org.basex.data.StatsKey;
 import org.basex.data.StatsKey.Kind;
 import org.basex.gui.GUI;
-import org.basex.util.Performance;
 import org.basex.util.Token;
 
 /**
@@ -87,6 +87,7 @@ public final class ScatterAxis {
     final Data data = GUI.context.data();
     final StatsKey key = isTag ? data.tags.stat(data.tags.id(attr)) :
       data.atts.stat(data.atts.id(attr));
+    System.out.println(key.kind);
     numeric = key.kind == Kind.INT || key.kind == Kind.DBL;
     if(numeric) {
       numType = key.kind == Kind.INT ? TYPEINT : TYPEDBL;
@@ -134,7 +135,8 @@ public final class ScatterAxis {
       vals[i] = value;
     }
     
-    calcExtremeValues();
+    if(numeric)
+      calcExtremeValues();
     for(int i = 0; i < vals.length; i++) {
       final byte[] val = vals[i];
       if(val.length > 0) {
@@ -223,7 +225,7 @@ public final class ScatterAxis {
    * Maximum v.v. . 
    */
   private void calcExtremeValues() {
-    final Performance p = new Performance();
+//    final Performance p = new Performance();
     
     min = Integer.MAX_VALUE;
     max = Integer.MIN_VALUE;
@@ -238,11 +240,6 @@ public final class ScatterAxis {
     }
     
     final double range = max - min;
-//    if(range < 10) {
-//      min = Math.floor(min);
-//      max = Math.ceil(max);
-//      return;
-//    }
     final int lmin = (int) (min - (range / 2));
     final int lmax = (int) (max + (range / 2));
     int tmin = (int) Math.floor(min);
@@ -279,7 +276,8 @@ public final class ScatterAxis {
       }
       tmax++;
     }
-    System.out.println(p.getTimer());
+    
+//    System.out.println(p.getTimer());
   }
   
   /**
@@ -287,12 +285,14 @@ public final class ScatterAxis {
    * @param space space of view axis available for captions
    */
   void calcCaption(final int space) {
-    captionStep = calculatedCaptionStep;
+    System.out.println(numeric);
     if(numeric) {
-      nrCaptions = (int) ((max - min) / captionStep) + 1;
-      if(nrCaptions * ScatterView.CAPTIONWHITESPACE > space) {
+      final int range = (int) (max - min);
+      captionStep = calculatedCaptionStep;
+      nrCaptions = (int) (range / captionStep) + 1;
+      if(nrCaptions * ScatterView.CAPTIONWHITESPACE > space) { 
         captionStep *= 2;
-        nrCaptions = (int) ((max - min) / captionStep) + 1;
+        nrCaptions = (int) (range / captionStep) + 1;
       }
       
     } else {

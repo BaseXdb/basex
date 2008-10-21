@@ -82,8 +82,6 @@ public final class ScatterData {
     if(eq(b, item)) return false;
     item = b;
     refreshItems();
-    xAxis.refreshAxis();
-    yAxis.refreshAxis();
     return true;
   }
 
