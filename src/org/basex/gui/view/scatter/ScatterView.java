@@ -375,22 +375,22 @@ public final class ScatterView extends View implements Runnable {
     if(drawX) {
       g.drawLine(MARGINLEFT, h - MARGINBOTTOM, w - MARGINRIGHT, 
           h - MARGINBOTTOM);
-      if(plotChanged)
+//      if(plotChanged)
         axis.calcCaption(pWidth);
     } else {
       g.drawLine(MARGINLEFT, MARGINTOP, MARGINLEFT, 
           getHeight() - MARGINBOTTOM);
-      if(plotChanged)
+//      if(plotChanged)
         axis.calcCaption(pHeight);
     }
     
     g.setFont(GUIConstants.font);
     g.setColor(GUIConstants.color1);
-    final int nrCaptions = axis.nrCats != 1 ? axis.nrCaptions : 3;
+    final boolean numeric = axis.numeric;
+    final int nrCaptions = (!numeric && axis.nrCats == 1) ? 3 : axis.nrCaptions;
     final double step = axis.captionStep;
     final double range = 1.0d / (nrCaptions - 1);
     final int type = axis.numType;
-    final boolean numeric = axis.numeric;
     
     for(int i = 0; i < nrCaptions; i++) {
       String caption = "";

@@ -7,6 +7,7 @@ import org.basex.data.Data;
 import org.basex.data.StatsKey;
 import org.basex.data.StatsKey.Kind;
 import org.basex.gui.GUI;
+import org.basex.util.Performance;
 import org.basex.util.Token;
 
 /**
@@ -87,7 +88,6 @@ public final class ScatterAxis {
     final Data data = GUI.context.data();
     final StatsKey key = isTag ? data.tags.stat(data.tags.id(attr)) :
       data.atts.stat(data.atts.id(attr));
-    System.out.println(key.kind);
     numeric = key.kind == Kind.INT || key.kind == Kind.DBL;
     if(numeric) {
       numType = key.kind == Kind.INT ? TYPEINT : TYPEDBL;
@@ -225,7 +225,7 @@ public final class ScatterAxis {
    * Maximum v.v. . 
    */
   private void calcExtremeValues() {
-//    final Performance p = new Performance();
+    final Performance p = new Performance();
     
     min = Integer.MAX_VALUE;
     max = Integer.MIN_VALUE;
@@ -277,7 +277,7 @@ public final class ScatterAxis {
       tmax++;
     }
     
-//    System.out.println(p.getTimer());
+    System.out.println(p.getTimer());
   }
   
   /**
@@ -285,7 +285,6 @@ public final class ScatterAxis {
    * @param space space of view axis available for captions
    */
   void calcCaption(final int space) {
-    System.out.println(numeric);
     if(numeric) {
       final int range = (int) (max - min);
       captionStep = calculatedCaptionStep;
