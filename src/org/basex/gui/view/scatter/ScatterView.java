@@ -98,7 +98,6 @@ public final class ScatterView extends View implements Runnable {
    * solve performance issues.
    */
   private IntList tmpMarkedPos;
-//  private int[] temporaryMarkedPos;
   /** Bounding box which supports selection of multiple items. */
   private ScatterBoundingBox selectionBox;
 
@@ -198,7 +197,6 @@ public final class ScatterView extends View implements Runnable {
           GUIConstants.colormark1.getGreen(), GUIConstants.colormark1.getBlue(),
           150);
       if(marked)
-//        g.setColor(GUIConstants.colormark1);
         g.setColor(c);
       g.fillOval(0, 0, ITEMSIZE, ITEMSIZE);
     }
@@ -219,9 +217,7 @@ public final class ScatterView extends View implements Runnable {
     if(scatterData.size == 0)
       return img;
     g.setColor(GUIConstants.color6);
-//    final Nodes marked = GUI.context.marked();
     for(int i = 0; i < scatterData.size; i++) {
-//      final int pre = scatterData.pres[i];
       drawItem(g, scatterData.xAxis.co[i], 
           scatterData.yAxis.co[i], false, false);
     }
@@ -375,12 +371,12 @@ public final class ScatterView extends View implements Runnable {
     if(drawX) {
       g.drawLine(MARGINLEFT, h - MARGINBOTTOM, w - MARGINRIGHT, 
           h - MARGINBOTTOM);
-//      if(plotChanged)
+      if(plotChanged)
         axis.calcCaption(pWidth);
     } else {
       g.drawLine(MARGINLEFT, MARGINTOP, MARGINLEFT, 
           getHeight() - MARGINBOTTOM);
-//      if(plotChanged)
+      if(plotChanged)
         axis.calcCaption(pHeight);
     }
     
@@ -402,7 +398,6 @@ public final class ScatterView extends View implements Runnable {
         if(type == ScatterAxis.TYPEINT)
           caption = Integer.toString((int) captionValue);
         else
-          //caption = Double.toString(captionValue);
           caption = string(chopNumber(token(captionValue)));
       } else {
         if(axis.nrCats == 1) {

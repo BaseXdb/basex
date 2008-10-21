@@ -1,14 +1,13 @@
 package org.basex.gui.view.scatter;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 
+import static org.basex.util.Token.*;
 import org.basex.data.Data;
 import org.basex.data.StatsKey;
 import org.basex.data.StatsKey.Kind;
 import org.basex.gui.GUI;
 import org.basex.util.Performance;
-import org.basex.util.Token;
 
 /**
  * Axis component of the scatter plot visualization.
@@ -18,7 +17,7 @@ import org.basex.util.Token;
  */
 public final class ScatterAxis {
   /** Token for String operations. */
-  private static final byte[] AT = Token.token("@");
+  private static final byte[] AT = token("@");
   /** Scatter data reference. */
   private final ScatterData scatterData;
   /** Attribute selected by user. */
@@ -71,9 +70,9 @@ public final class ScatterAxis {
    */
   boolean setAxis(final String attribute) {
     if(attribute == null) return false;
-    final byte[] b = Token.token(attribute);
-    isTag = !Token.contains(b, AT);
-    attr = Token.delete(b, '@');
+    final byte[] b = token(attribute);
+    isTag = !contains(b, AT);
+    attr = delete(b, '@');
     refreshAxis();
     return true;
   }
@@ -89,19 +88,18 @@ public final class ScatterAxis {
     final StatsKey key = isTag ? data.tags.stat(data.tags.id(attr)) :
       data.atts.stat(data.atts.id(attr));
     numeric = key.kind == Kind.INT || key.kind == Kind.DBL;
+
     if(numeric) {
       numType = key.kind == Kind.INT ? TYPEINT : TYPEDBL;
-//      min = key.min;
-//      max = key.max;
     } else {
       cats = key.cats.keys();
       final String[] tmpCats = new String[cats.length];
       for(int i = 0; i < tmpCats.length; i++) {
-        tmpCats[i] = Token.string(cats[i]);
+        tmpCats[i] = string(cats[i]);
       }
       Arrays.sort(tmpCats);
       for(int i = 0; i < tmpCats.length; i++) {
-        cats[i] = Token.token(tmpCats[i]);
+        cats[i] = token(tmpCats[i]);
       }
       nrCats = cats.length;
     }
@@ -118,14 +116,14 @@ public final class ScatterAxis {
         final int kind = data.kind(p);
         if(kind == Data.ELEM) {
           final byte[] currName = data.tag(p);
-          if((Token.eq(attr, currName)) && isTag) {
+          if((eq(attr, currName)) && isTag) {
             final int attSize = data.attSize(p, kind);
             value = data.text(p + attSize);
             break;
           }
         } else if(kind == Data.ATTR) {
           final byte[] currName = data.attName(p);
-          if((Token.eq(attr, currName)) && !isTag) {
+          if((eq(attr, currName)) && !isTag) {
             value = data.attValue(p);
             break;
           }
@@ -152,7 +150,7 @@ public final class ScatterAxis {
    * @return relative x or y value of the item
    */
   double calcPosition(final byte[] value) {
-    final double d = Token.toDouble(value);
+    final double d = toDouble(value);
     double percentage = 0d;
     if(numeric) {
       final double range = max - min;
@@ -167,7 +165,7 @@ public final class ScatterAxis {
         percentage = 0.5d;
       else
         for(int i = 0; i < nrCats; i++) {
-          if(Token.eq(value, cats[i])) {
+          if(eq(value, cats[i])) {
             percentage = (1.0d / (nrCats - 1)) * i;
           }
         }
@@ -193,21 +191,9 @@ public final class ScatterAxis {
       final double pos = relative / (1.0d / (nrCats - 1));
       final int posI = (int) Math.floor(pos + 0.5d);
       if(Math.abs(pos - posI) <= 0.3d)
-        return Token.string(cats[posI]);
+        return string(cats[posI]);
       return "";
     }
-  }
-  
-  /**
-   * Rounds a double value.
-   * @param d double value to be rounded
-   * @param decs number of decimals
-   * @return rounded double value
-   */
-  public static double roundDouble(final double d, final int decs) {
-    BigDecimal bd = new BigDecimal(d);
-    BigDecimal rounded = bd.setScale(decs, BigDecimal.ROUND_HALF_UP);
-    return rounded.doubleValue();
   }
   
   /**
@@ -232,7 +218,7 @@ public final class ScatterAxis {
     for(int i = 0; i < vals.length; i++) {
       if(vals[i].length < 1)
         continue;
-      double d = Token.toDouble(vals[i]);
+      double d = toDouble(vals[i]);
       if(d < min)
         min = d;
       if(d > max) 
