@@ -723,11 +723,14 @@ public enum GUICommands implements GUICommand {
     public void execute() {
       final DialogInfo info = new DialogInfo(GUI.get());
       if(info.ok()) {
+        final MetaData meta = GUI.context.data().meta;
+        final boolean[] indexes = info.indexes();
         if(info.opt) {
+          meta.txtindex = indexes[0];
+          meta.atvindex = indexes[1];
+          meta.ftxindex = indexes[2];
           progress(INFOOPT, new Process[] { new Optimize() });
         } else {
-          final MetaData meta = GUI.context.data().meta;
-          final boolean[] indexes = info.indexes();
           Process[] proc = new Process[0];
           if(indexes[0] != meta.txtindex)
             proc = Array.add(proc, cmd(indexes[0], INDEX.TEXT));

@@ -1,5 +1,13 @@
 package org.basex.gui.view.query;
 
+import static org.basex.Text.*;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import org.basex.gui.GUI;
+import org.basex.gui.layout.BaseXButton;
+import org.basex.gui.layout.BaseXLayout;
+
 /**
  * This interface defines methods for search panel implementations.
  *
@@ -7,6 +15,12 @@ package org.basex.gui.view.query;
  * @author Christian Gruen
  */
 abstract class QueryPanel {
+  /** Main panel. */
+  QueryView main;
+  /** Execute button. */
+  BaseXButton go;
+  /** Execute Button. */
+  BaseXButton stop;
   /** Last Query. */
   String last = "";
 
@@ -18,6 +32,31 @@ abstract class QueryPanel {
   abstract void finish();
   /** Reacts on the GUI termination. */
   abstract void quit();
+
+  /**
+   * Initializes components which are equal in all panels.
+   */
+  void initPanel() {
+    stop = new BaseXButton(GUI.icon("stop"), HELPSTOP);
+    stop.trim();
+    stop.addKeyListener(main);
+    stop.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent e) {
+        BaseXLayout.enable(stop, false);
+        GUI.get().stop();
+      }
+    });
+    BaseXLayout.enable(stop, false);
+
+    go = new BaseXButton(GUI.icon("go"), HELPGO);
+    go.trim();
+    go.addKeyListener(main);
+    go.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent e) {
+        query(true);
+      }
+    });
+  }
 
   /**
    * Runs a query.

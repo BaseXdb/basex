@@ -36,6 +36,9 @@ final class MapDefault extends MapPainter {
 
     mpos = 0;
     for(int ri = 0; ri < rects.size(); ri++) {
+
+      // [CG] synchronization issues? ..rects.get(ri) is sometimes null
+      
       // get rectangle information
       final MapRect r = rects.get(ri);
       final int pre = r.p;

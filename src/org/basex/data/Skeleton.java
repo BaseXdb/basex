@@ -12,7 +12,6 @@ import org.basex.util.TokenList;
 
 /**
  * This class stores the tree structure of a document.
- *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
@@ -82,7 +81,7 @@ public final class Skeleton {
     stack = new Node[256];
     root = null;
   }
-  
+
   /**
    * Return descendant tags and attributes for the specified start key.
    * @param k input key
@@ -116,10 +115,11 @@ public final class Skeleton {
       final int id = att ? data.attNameID(substring(i, 1)) : data.tagID(i);
       n = desc(n, id, kind, d);
     }
-    
+
     // sort by number of occurrences
     final TokenList tmp = new TokenList();
-    for(final Node r : n) tmp.add(token(r.count));
+    for(final Node r : n)
+      tmp.add(token(r.count));
     final IntList occ = IntList.createOrder(tmp.finish(), true, false);
 
     // remove non-text/attribute nodes
@@ -146,7 +146,7 @@ public final class Skeleton {
 
     final ArrayList<Node> out = new ArrayList<Node>();
     for(final Node n : in) {
-      if(t != 0 && (n.name != t || n.kind != k || n.count < 2)) continue;
+      if(t != 0 && (n.name != t || n.kind != k)) continue;
       for(final Node c : n.ch) {
         if(desc) c.desc(out);
         else out.add(c);
@@ -188,7 +188,8 @@ public final class Skeleton {
       kind = in.readByte();
       count = in.readNum();
       ch = new Node[in.readNum()];
-      for(int i = 0; i < ch.length; i++) ch[i] = new Node(in);
+      for(int i = 0; i < ch.length; i++)
+        ch[i] = new Node(in);
     }
 
     /**
@@ -219,7 +220,8 @@ public final class Skeleton {
       out.write1(kind);
       out.writeNum(count);
       out.writeNum(ch.length);
-      for(final Node c : ch) c.finish(out);
+      for(final Node c : ch)
+        c.finish(out);
     }
 
     /**
@@ -228,7 +230,8 @@ public final class Skeleton {
      */
     public void desc(final ArrayList<Node> nodes) {
       nodes.add(this);
-      for(final Node n : ch) n.desc(nodes);
+      for(final Node n : ch)
+        n.desc(nodes);
     }
 
     /**
@@ -238,12 +241,18 @@ public final class Skeleton {
      */
     public byte[] token(final Data data) {
       switch(kind) {
-        case Data.ELEM: return data.tags.key(name);
-        case Data.ATTR: return concat(ATT, data.atts.key(name));
-        case Data.TEXT: return TEXT;
-        case Data.COMM: return COMM;
-        case Data.PI:   return PI;
-        default:        return EMPTY;
+        case Data.ELEM:
+          return data.tags.key(name);
+        case Data.ATTR:
+          return concat(ATT, data.atts.key(name));
+        case Data.TEXT:
+          return TEXT;
+        case Data.COMM:
+          return COMM;
+        case Data.PI:
+          return PI;
+        default:
+          return EMPTY;
       }
     }
 

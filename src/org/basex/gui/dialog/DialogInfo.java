@@ -4,12 +4,10 @@ import static org.basex.Text.*;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.io.File;
 import javax.swing.JTabbedPane;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
-
 import org.basex.core.proc.InfoDB;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
@@ -22,7 +20,6 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.TableLayout;
 import org.basex.index.IndexToken;
-import org.basex.io.IO;
 import org.basex.util.Token;
 
 /**
@@ -39,7 +36,7 @@ public final class DialogInfo extends Dialog {
   /** Fulltext labels. */
   private BaseXLabel[] fl = new BaseXLabel[4];
   /** Editable fulltext options. */
-  private boolean edit;
+  private boolean ftedit;
   /** Optimize flag. */
   public boolean opt;
 
@@ -64,15 +61,8 @@ public final class DialogInfo extends Dialog {
     doc.setBorder(0, 0, 5, 0);
     p1.add(doc, BorderLayout.NORTH);
 
-    BaseXText text = text();
+    final BaseXText text = text(InfoDB.db(meta, data.size, false, false));
     BaseXLayout.setHeight(text, 220);
-
-    // get size of database
-    final File dir = IO.dbpath(meta.dbname);
-    long len = 0;
-    for(final File f : dir.listFiles()) len += f.length();
-
-    text.setText(InfoDB.db(meta, data.size, false, false));
     p1.add(text, BorderLayout.CENTER);
 
     final BaseXBack p2 = new BaseXBack();
@@ -82,9 +72,7 @@ public final class DialogInfo extends Dialog {
     BaseXBack p = new BaseXBack();
     p.setLayout(new BorderLayout());
     p.add(new BaseXLabel(INFOTAGINDEX), BorderLayout.NORTH);
-    text = text();
-    text.setText(data.info(IndexToken.TYPE.TAG));
-    p.add(text, BorderLayout.CENTER);
+    p.add(text(data.info(IndexToken.TYPE.TAG)), BorderLayout.CENTER);
     p2.add(p);
 
     p = new BaseXBack();
@@ -93,67 +81,62 @@ public final class DialogInfo extends Dialog {
     final BaseXLabel label = new BaseXLabel(INFOATNINDEX); 
     label.setBorder(8, 0, 0, 0);
     p.add(label, BorderLayout.NORTH);
-    text = text();
-    text.setText(data.info(IndexToken.TYPE.ATN));
-    p.add(text, BorderLayout.CENTER);
+    p.add(text(data.info(IndexToken.TYPE.ATN)), BorderLayout.CENTER);
     p2.add(p);
 
     final BaseXBack p3 = new BaseXBack();
-    p3.setLayout(new TableLayout(6, 1, 0, 0));
-    p3.setBorder(8, 8, 8, 8);
+    p3.setLayout(new GridLayout(2, 1));
+    p3.setBorder(8, 8, 0, 8);
+
+    p = new BaseXBack();
+    p.setLayout(new BorderLayout());
 
     indexes[0] = new BaseXCheckBox(INFOTEXTINDEX, Token.token(TXTINDEXINFO),
         meta.txtindex, 0, this);
-    p3.add(indexes[0]);
+    p.add(indexes[0], BorderLayout.NORTH);
 
-    if(meta.txtindex) {
-      text = text();
-      text.setText(data.info(IndexToken.TYPE.TXT));
-      BaseXLayout.setHeight(text, 75);
-      p3.add(text);
-    } else {
-      p3.add(new BaseXLabel(TXTINDEXINFO, 8));
-    }
+    p.add(text(meta.txtindex ? data.info(IndexToken.TYPE.TXT) :
+      Token.token(TXTINDEXINFO)), BorderLayout.CENTER);
+    p3.add(p);
+
+    p = new BaseXBack();
+    p.setLayout(new BorderLayout());
 
     indexes[1] = new BaseXCheckBox(INFOATTRINDEX, Token.token(ATTINDEXINFO),
         meta.atvindex, 0, this);
-    p3.add(indexes[1]);
+    p.add(indexes[1], BorderLayout.NORTH);
     
-    if(meta.atvindex) {
-      text = text();
-      text.setText(data.info(IndexToken.TYPE.ATV));
-      BaseXLayout.setHeight(text, 75);
-      p3.add(text);
-    } else {
-      p3.add(new BaseXLabel(ATTINDEXINFO, 8));
-    }
+    p.add(text(meta.atvindex ? data.info(IndexToken.TYPE.ATV) :
+      Token.token(ATTINDEXINFO)), BorderLayout.CENTER);
+    p3.add(p);
 
     final BaseXBack p4 = new BaseXBack();
-    p4.setLayout(new TableLayout(10, 1, 0, 0));
+    p4.setLayout(new GridLayout(1, 1));
     p4.setBorder(8, 8, 8, 8);
 
-    edit = !meta.ftxindex;
+    ftedit = !meta.ftxindex;
     indexes[2] = new BaseXCheckBox(INFOFTINDEX, Token.token(FTINDEXINFO),
         meta.ftxindex, 0, this);
-    p4.add(indexes[2]);
+    
+    p = new BaseXBack();
+    p.setLayout(ftedit ? new TableLayout(10, 1) : new BorderLayout());
+    p.add(indexes[2], BorderLayout.NORTH);
 
-    if(edit) {
-      p4.add(new BaseXLabel(FTINDEXINFO, edit ? 8 : 0));
+    if(ftedit) {
+      p.add(new BaseXLabel(FTINDEXINFO, ftedit ? 8 : 0));
       final String[] cb = { CREATEFZ, CREATESTEM, CREATEDC, CREATECS };
       final String[] desc = { FZINDEXINFO, FTSTEMINFO, FTDCINFO, FTCSINFO };
       final boolean[] val = { meta.ftfz, meta.ftst, meta.ftdc, meta.ftcs };
       for(int f = 0; f < ft.length; f++) {
         ft[f] = new BaseXCheckBox(cb[f], Token.token(desc[f]), val[f], 0, this);
         fl[f] = new BaseXLabel(desc[f], 8);
-        p4.add(ft[f]);
-        p4.add(fl[f]);
+        p.add(ft[f]);
+        p.add(fl[f]);
       }
     } else {
-      text = text();
-      text.setText(data.info(IndexToken.TYPE.FTX));
-      BaseXLayout.setHeight(text, 150);
-      p4.add(text);
+      p.add(text(data.info(IndexToken.TYPE.FTX)), BorderLayout.CENTER);
     }
+    p4.add(p);
     
     final JTabbedPane tabs = new JTabbedPane();
     BaseXLayout.addDefaultKeys(tabs, this);
@@ -176,11 +159,13 @@ public final class DialogInfo extends Dialog {
   
   /**
    * Returns a text box.
+   * @param txt contents
    * @return text box
    */
-  private BaseXText text() {
+  private BaseXText text(final byte[] txt) {
     final BaseXText text = new BaseXText(null, false, this);
     text.setBorder(new EmptyBorder(5, 5, 5, 5));
+    text.setText(txt);
     text.setFocusable(false);
     BaseXLayout.setWidth(text, 450);
     return text;
@@ -203,7 +188,7 @@ public final class DialogInfo extends Dialog {
       opt = true;
       close();
     }
-    if(!edit) return;
+    if(!ftedit) return;
     final boolean ftx = indexes[2].isSelected();
     for(int f = 0; f < ft.length; f++) {
       ft[f].setEnabled(ftx);
@@ -216,7 +201,7 @@ public final class DialogInfo extends Dialog {
     super.close();
     final Data data = GUI.context.data();
     final MetaData meta = data.meta;
-    if(!edit) return;
+    if(!ftedit) return;
     meta.ftfz = ft[0].isSelected();
     meta.ftst = ft[1].isSelected();
     meta.ftcs = ft[2].isSelected();

@@ -41,7 +41,7 @@ public final class ScatterView extends View implements Runnable {
   /** Y paint margin. */ 
   private static final int MARGINTOP = 60;
   /** Y paint margin. */ 
-  private static final int MARGINLEFT = 90;
+  private static final int MARGINLEFT = 70;
   /** Y paint margin. */ 
   private static final int MARGINRIGHT = 20;
   /** Item size. */
@@ -55,7 +55,7 @@ public final class ScatterView extends View implements Runnable {
   /** Mark offset. */
   private static final int MARKOFFSET = 3;
   /** Whitespace between axis captions. */
-  static final int CAPTIONWHITESPACE = 40;
+  static final int CAPTIONWHITESPACE = 30;
   /** Item image. */
   private BufferedImage itemImg;
   /** Marked item image. */
@@ -142,7 +142,7 @@ public final class ScatterView extends View implements Runnable {
           yCombo.setModel(new DefaultComboBoxModel(keys));
           if(keys.length > 0) {
             xCombo.setSelectedIndex(0);
-            yCombo.setSelectedIndex(0);
+            yCombo.setSelectedIndex(keys.length > 1 ? 1 : 0);
           }
         }
         repaint();

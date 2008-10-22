@@ -37,7 +37,6 @@ import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.core.proc.Find;
 import org.basex.core.proc.XPath;
-import org.basex.core.proc.XQuery;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
@@ -247,7 +246,7 @@ public final class GUI extends JFrame {
     b.add(input, BorderLayout.CENTER);
     nav.add(b, BorderLayout.CENTER);
 
-    exec = new BaseXButton(icon("go"), HELPEXEC);
+    exec = new BaseXButton(icon("go"), HELPGO);
     exec.trim();
     exec.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
@@ -441,6 +440,17 @@ public final class GUI extends JFrame {
   /** Current process. */
   private Process proc;
 
+
+  /**
+   * Stops the current process.
+   */
+  public void stop() {
+    if(proc != null) proc.stop();
+    cursor(CURSORARROW, true);
+    proc = null;
+  }
+
+  
   /**
    * Launches the specified process.
    * @param pr process to be launched
@@ -501,8 +511,8 @@ public final class GUI extends JFrame {
       }
 
       // check if query feedback was evaluated in the query view
-      final boolean feedback = pr.printing() && data != null &&
-        GUIProp.showquery && pr instanceof XQuery && query.info(inf, ok);
+      final boolean feedback = data != null && GUIProp.showquery &&
+        query.info(inf, ok);
 
       if(!ok) {
         // show error info
@@ -563,6 +573,7 @@ public final class GUI extends JFrame {
 
       // show status info
       status.setText(BaseX.info(PROCTIME, time));
+      
     } catch(final Exception ex) {
       // unexpected error
       ex.printStackTrace();

@@ -1,7 +1,6 @@
 package org.basex.gui.view.query;
 
 import static org.basex.Text.*;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Insets;
@@ -32,7 +31,6 @@ import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.index.Names;
 import org.basex.query.xpath.func.ContainsLC;
-import org.basex.util.Set;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
@@ -55,8 +53,6 @@ final class QuerySimple extends QueryPanel implements ActionListener {
   /** Simple search pattern. */
   private static final String PATSIMPLE = "[%]";
 
-  /** Main panel. */
-  QueryView main;
   /** Content panel. */
   BaseXBack cont;
   /** Main panel. */
@@ -65,8 +61,6 @@ final class QuerySimple extends QueryPanel implements ActionListener {
   BaseXTextField all;
   /** Filter button. */
   BaseXButton filter;
-  /** Execute button. */
-  BaseXButton exec;
   /** Copy to XQuery button. */
   BaseXButton copy;
 
@@ -97,14 +91,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     final BaseXBack p = new BaseXBack(GUIConstants.FILL.NONE);
     p.setLayout(new BorderLayout());
 
-    exec = new BaseXButton(GUI.icon("go"), HELPEXEC);
-    exec.trim();
-    exec.addKeyListener(main);
-    exec.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent e) {
-        query(true);
-      }
-    });
+    initPanel();
 
     filter = GUIToolBar.newButton(GUICommands.FILTER);
     filter.addKeyListener(main);
@@ -121,7 +108,9 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     BaseXLayout.enable(copy, false);
 
     final Box box = new Box(BoxLayout.X_AXIS);
-    box.add(exec);
+    box.add(stop);
+    box.add(Box.createHorizontalStrut(4));
+    box.add(go);
     box.add(Box.createHorizontalStrut(4));
     box.add(filter);
     box.add(Box.createHorizontalStrut(6));
@@ -151,7 +140,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     final Nodes marked = GUI.context.marked();
     if(marked == null) return;
     BaseXLayout.enable(filter, !GUIProp.filterrt && marked.size != 0);
-    BaseXLayout.enable(exec, !GUIProp.execrt);
+    BaseXLayout.enable(go, !GUIProp.execrt);
 
     all.help(GUI.context.data().fs != null ? HELPSEARCHFS : HELPSEARCHXML);
     if(GUIProp.showquery && panel.getComponentCount() == 0) {
@@ -198,14 +187,11 @@ final class QuerySimple extends QueryPanel implements ActionListener {
       final String elem = combo.getSelectedItem().toString();
       if(!elem.startsWith("@")) sl.add(Token.token(elem));
     }
-
+    
     final TokenList tmp = data.skel.desc(sl, true, false);
     if(tmp.size == 0) return;
 
-    final String[] keys = new String[tmp.size + 1];
-    for(int k = 0; k < tmp.size; k++) keys[k + 1] = Token.string(tmp.list[k]);
-    keys[0] = "(" + (tmp.size) + " entries)";
-
+    final String[] keys = entries(tmp.finish());
     final BaseXCombo combo = new BaseXCombo(keys, HELPSEARCHCAT, false);
     combo.addActionListener(this);
     combo.addKeyListener(main);
@@ -255,6 +241,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
 
     final Object source = e.getSource();
 
+    // find modified component
     int cp = 0;
     final int cs = panel.getComponentCount();
     for(int c = 0; c < cs; c++) if(panel.getComponent(c) == source) cp = c;
@@ -262,11 +249,11 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     if((cp & 1) == 0) {
       // ComboBox with tags/attributes
       final BaseXCombo combo = (BaseXCombo) source;
-
       panel.remove(cp + 1);
 
       final Data data = GUI.context.data();
-      if(combo.getSelectedIndex() != 0) {
+      final boolean selected = combo.getSelectedIndex() != 0;
+      if(selected) {
         final String item = combo.getSelectedItem().toString();
         final boolean att = item.startsWith("@");
         final Names names = att ? data.atts : data.tags;
@@ -281,7 +268,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
             addSlider(stat.min, stat.max, cp + 1, false, false, false);
             break;
           case CAT:
-            addCombo(keys(stat.cats), cp + 1);
+            addCombo(entries(stat.cats.keys()), cp + 1);
             break;
           case TEXT:
             addInput(cp + 1);
@@ -297,7 +284,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
         panel.remove(cp + 2);
         panel.remove(cp + 2);
       }
-      addKeys(data);
+      if(selected) addKeys(data);
 
       panel.validate();
       panel.repaint();
@@ -351,9 +338,8 @@ final class QuerySimple extends QueryPanel implements ActionListener {
       }
 
       if(attr) {
-        //tb.add("//.");
+        if(tb.size == 0) tb.add("//*");
         if(pattern.length() == 0) pattern = PATSIMPLE;
-        key = ".//" + key;
       } else {
         tb.add("//" + key);
         key = "text()";
@@ -375,11 +361,11 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     if(qu.length() == 0) {
       qu = GUIProp.filterrt || GUI.context.root() ? "/" : ".";
     }
-
+    
     if(!force && last.equals(qu)) return;
     last = qu;
     BaseXLayout.enable(copy, last.length() != 0);
-    
+    BaseXLayout.enable(stop, true);
     GUI.get().execute(new XPath(qu));
   }
 
@@ -387,19 +373,20 @@ final class QuerySimple extends QueryPanel implements ActionListener {
   void quit() { }
 
   @Override
-  void info(final String info, final boolean ok) { }
+  void info(final String info, final boolean ok) {
+    BaseXLayout.enable(stop, false);
+  }
 
   /**
-   * Returns a string array with all distinct keys
+   * Returns the combo box selections
    * and the keys of the specified set.
-   * @param set keys
+   * @param key keys
    * @return key array
    */
-  String[] keys(final Set set) {
-    final byte[][] tmp = set.keys();
-    final int tl = tmp.length;
+  String[] entries(final byte[][] key) {
+    final int tl = key.length;
     final String[] vals = new String[tl + 1];
-    for(int t = 0; t < tl; t++) vals[t + 1] = Token.string(tmp[t]);
+    for(int t = 0; t < tl; t++) vals[t + 1] = Token.string(key[t]);
     vals[0] = "";
     Arrays.sort(vals);
     vals[0] = "(" + tl + " entries)";

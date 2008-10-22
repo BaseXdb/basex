@@ -1197,7 +1197,7 @@ public interface Text {
   /** Help String. */
   byte[] HELPFILTER = token(lang("h_filter"));
   /** Help String. */
-  byte[] HELPEXEC = token(lang("h_exec"));
+  byte[] HELPGO = token(lang("h_go"));
   /** Help String. */
   byte[] HELPHIST = token(lang("h_hist"));
   /** Help String. */

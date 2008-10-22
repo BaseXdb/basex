@@ -3,8 +3,6 @@ package org.basex.gui.view.query;
 import static org.basex.Text.*;
 import static org.basex.gui.GUIConstants.*;
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -18,7 +16,6 @@ import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXText;
@@ -40,12 +37,8 @@ public final class QueryArea extends QueryPanel {
       ".* line ([0-9]+), column ([0-9]+).*", Pattern.DOTALL);
   /** Info label. */
   BaseXLabel info;
-  /** Main panel. */
-  QueryView main;
   /** Text Area. */
   BaseXText area;
-  /** Execute Button. */
-  BaseXButton exec;
   /** Scroll Pane. */
   BaseXBack south;
 
@@ -60,49 +53,24 @@ public final class QueryArea extends QueryPanel {
     area.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {
-        String xq = Token.string(area.getText());
-        if(!xq.equals(last)) {
-          last = xq;
-          final boolean module = xq.trim().startsWith("module namespace ");
-          if(xq.trim().length() == 0) xq = ".";
-          if(GUIProp.execrt && !module) {
-            GUI.get().execute(new XQuery(xq));
-          } else {
-            final XQParser parser = new XQParser(new XQContext());
-            try {
-              if(module) parser.module(xq);
-              else parser.parse(xq);
-              info("", true);
-            } catch(final QueryException ex) {
-              info(ex.getMessage(), false);
-            }
+        if(GUIProp.execrt) {
+          query(false);
+        } else {
+          final String xq = Token.string(area.getText());
+          final boolean mod = xq.trim().startsWith("module namespace ");
+          final XQParser parser = new XQParser(new XQContext());
+          try {
+            if(mod) parser.module(xq);
+            else parser.parse(xq);
+            info("", true);
+          } catch(final QueryException ex) {
+            info(ex.getMessage(), false);
           }
         }
       }
     });
     south = new BaseXBack(GUIConstants.FILL.NONE);
     south.setLayout(new BorderLayout(8, 8));
-    initPanel();
-  }
-
-  @Override
-  public void init() {
-    main.add(area, BorderLayout.CENTER);
-    main.add(south, BorderLayout.SOUTH);
-    area.setText(Token.token(last));
-    area.setCaret(0);
-    area.setFont(GUIConstants.mfont);
-    refresh();
-  }
-
-  @Override
-  public void finish() { }
-
-  /**
-   * Initializes the components.
-   */
-  void initPanel() {
-    final Box box = new Box(BoxLayout.X_AXIS);
 
     info = new BaseXLabel("");
     info.setFont(info.getFont().deriveFont((float) 13));
@@ -119,40 +87,55 @@ public final class QueryArea extends QueryPanel {
     BaseXLayout.enable(info, false);
     south.add(info, BorderLayout.CENTER);
 
-    exec = new BaseXButton(GUI.icon("go"), HELPEXEC);
-    exec.trim();
-    exec.addKeyListener(main);
-    exec.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent e) {
-        query(true);
-      }
-    });
-    box.add(exec);
+    initPanel();
 
+    final Box box = new Box(BoxLayout.X_AXIS);
+    box.add(stop);
+    box.add(Box.createHorizontalStrut(4));
+    box.add(go);
     south.add(box, BorderLayout.EAST);
+
   }
 
   @Override
+  public void init() {
+    main.add(area, BorderLayout.CENTER);
+    main.add(south, BorderLayout.SOUTH);
+    area.setText(Token.token(last));
+    area.setCaret(0);
+    area.setFont(GUIConstants.mfont);
+    refresh();
+  }
+
+  @Override
+  public void finish() { }
+
+  @Override
   void refresh() {
-    BaseXLayout.enable(exec, !GUIProp.execrt);
+    BaseXLayout.enable(go, !GUIProp.execrt);
   }
 
   @Override
   void query(final boolean force) {
-    final String xq = Token.string(area.getText());
-    if(force || !xq.equals(last)) {
-      last = xq;
-      final String xqt = xq.trim();
-      if(xqt.length() == 0 || xqt.startsWith("module namespace ")) return;
-      GUI.get().execute(new XQuery(xq));
+    String xquery = Token.string(area.getText());
+    if(force || !xquery.equals(last)) {
+      last = xquery;
+      final String xq = xquery.trim();
+      if(xq.startsWith("module namespace ")) return;
+      if(xq.length() == 0) xquery = ".";
+      BaseXLayout.enable(stop, true);
+      GUI.get().execute(new XQuery(xquery));
     }
   }
-
+  
   @Override
   void quit() { }
 
   @Override
   void info(final String inf, final boolean ok) {
+    BaseXLayout.enable(stop, false);
+    if(inf == null) return;
+    
     final String text = ok ? "" : inf.replaceAll("Stopped.*", "");
     info.setText(text);
     info.setToolTipText(ok ? null : text);

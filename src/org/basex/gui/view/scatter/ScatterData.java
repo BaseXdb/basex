@@ -63,9 +63,7 @@ public final class ScatterData {
     final TokenList tl = new TokenList();
     for(final byte[] k : data.skel.desc(it, true, false)) {
       final Names index = startsWith(k, '@') ? data.atts : data.tags;
-      final Kind kind = index.stat(index.id(delete(k, '@'))).kind;
-      if(kind == Kind.DBL || kind == Kind.INT || kind == Kind.CAT ||
-          kind == Kind.TEXT) tl.add(k);
+      if(index.stat(index.id(delete(k, '@'))).kind != Kind.NONE) tl.add(k);
     }
     return tl;
   }

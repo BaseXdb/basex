@@ -40,7 +40,7 @@ public final class QueryView extends View {
 
   /** Input mode buttons. */
   private final BaseXButton[] input = new BaseXButton[NPANELS];
-  /** Query panel. */
+  /** Current query panel. */
   private QueryPanel search;
   /** Header string. */
   final BaseXLabel header;

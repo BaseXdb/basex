@@ -263,8 +263,6 @@ public final class ScatterAxis {
    * Maximum v.v. . 
    */
   private void calcExtremeValues() {
-//    final Performance p = new Performance();
-    
     min = Integer.MAX_VALUE;
     max = Integer.MIN_VALUE;
     for(int i = 0; i < vals.length; i++) {
@@ -278,44 +276,35 @@ public final class ScatterAxis {
     }
     
     final double range = max - min;
-    final int lmin = (int) (min - (range / 2));
-    final int lmax = (int) (max + (range / 2));
-    int tmin = (int) Math.floor(min);
-    int tmax = (int) Math.ceil(max);
+    final double lmin = min - range / 2;
+    final double lmax = max + range / 2;
     final double rangePow = Math.floor(Math.log10(range) + .5d);
+    final double lstep = (int) (Math.pow(10, rangePow));
     calculatedCaptionStep = (int) (Math.pow(10, rangePow - 1));
-    final double tmpStepL = (int) (Math.pow(10, rangePow));
     
-    boolean sFound = false;
-    min = tmin;
-    while(tmin > lmin) {
-      if(tmin % tmpStepL == 0) {
-        min = tmin;
+    // find minimum axis assignment
+    double c = Math.floor(min);
+    double m = c - c % calculatedCaptionStep;
+    if(m > lmin) min = m;
+    m = c - c % lstep;
+    if(m > lmin) min = m;
+    
+    // find maximum axis assignment
+    c = Math.ceil(max);
+    boolean f = false;
+    while(c < lmax) {
+      if(c % lstep == 0) {
+        max = c;
         break;
       }
-      if(!sFound && tmin % calculatedCaptionStep == 0) {
-        min = tmin;
-        sFound = true;
+      if(!f && c % calculatedCaptionStep == 0 && 
+          ((c - min) / calculatedCaptionStep) % 2 == 0) {
+        max = c;
+        f = true;
       }
-      tmin--;
+      c -= c % calculatedCaptionStep;
+      c += calculatedCaptionStep;
     }
-    
-    max = tmax;
-    while(tmax < lmax) {
-      final int tmpRange = (int) (tmax - min);
-      if(tmax % tmpStepL == 0) {
-        max = tmax;
-        break;
-      }
-      if(!sFound && tmax % calculatedCaptionStep == 0 && 
-          (tmpRange / calculatedCaptionStep) % 2 == 0) {
-        max = tmax;
-        sFound = true;
-      }
-      tmax++;
-    }
-    
-//    System.out.println(p.getTimer());
   }
   
   /**
@@ -324,14 +313,13 @@ public final class ScatterAxis {
    */
   void calcCaption(final int space) {
     if(numeric) {
-      final int range = (int) (max - min);
+      final double range = max - min;
       captionStep = calculatedCaptionStep;
       nrCaptions = (int) (range / captionStep) + 1;
       if(nrCaptions * ScatterView.CAPTIONWHITESPACE > space) { 
         captionStep *= 2;
         nrCaptions = (int) (range / captionStep) + 1;
       }
-      
     } else {
       nrCaptions = nrCats;
     }
