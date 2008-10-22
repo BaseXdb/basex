@@ -37,7 +37,7 @@ public final class ScatterAxis {
   /** Data type text. */
   static final int TYPETEXT = 2;
   /** Text length limit for text to number transformation. */
-  static final int TEXTLENGTH = 4;
+  static final int TEXTLENGTH = 8;
 
   /** Coordinates of items. */
   double[] co = {};
@@ -190,7 +190,7 @@ public final class ScatterAxis {
       int v = 0;
       final int vl = vals[i].length;
       for(int j = 0; j < vl; j++) {
-        v += vals[i][j];
+        v += vals[i][j] & 0xFF;
       }
       vals[i] = token(v);
     }
