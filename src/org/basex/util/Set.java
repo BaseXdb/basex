@@ -32,10 +32,29 @@ public class Set {
   /**
    * Indexes the specified key.
    * @param key key
+   * @param p pointer
+   * @return offset of added key, negative offset otherwise
+   */
+  public int add(final byte[] key, final int p) {
+    if(size == next.length) rehash();
+    for(int id = bucket[p]; id != 0; id = next[id]) {
+      if(Token.eq(key, keys[id])) return -id;
+    }
+
+    next[size] = bucket[p];
+    keys[size] = key;
+    bucket[p] = size;
+    return size++;
+  }
+  
+  /**
+   * Indexes the specified key.
+   * @param key key
    * @return offset of added key, negative offset otherwise
    */
   public int add(final byte[] key) {
-    if(size == next.length) rehash();
+    return add(key, getPointer(key));
+    /*if(size == next.length) rehash();
 
     final int p = Token.hash(key) & bucket.length - 1;
     for(int id = bucket[p]; id != 0; id = next[id]) {
@@ -46,8 +65,19 @@ public class Set {
     keys[size] = key;
     bucket[p] = size;
     return size++;
+*/
   }
 
+  /**
+   * Get pointer.
+   * @param key key
+   * @return p pointer
+   */
+  public int getPointer(final byte[] key) {
+    if(size == next.length) rehash();
+    return Token.hash(key) & bucket.length - 1;
+  }
+  
   /**
    * Deletes the specified key.
    * @param key key

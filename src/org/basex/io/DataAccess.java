@@ -3,6 +3,7 @@ package org.basex.io;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+
 import org.basex.util.Num;
 
 /**
@@ -56,7 +57,7 @@ public class DataAccess {
     for(int i = 1; i < BUFFERS; i++) pos[i] = -1;
     len = file.length();
   }
-  
+
   /**
    * Flushes the buffered data.
    * @throws IOException in case of write errors

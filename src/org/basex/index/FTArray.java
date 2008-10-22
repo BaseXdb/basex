@@ -86,7 +86,6 @@ final class FTArray {
         if(!found) {
           // any child has an appropriate value to valueToInsert;
           // create new node and append it; save data
-
           int[] e;
           e = new int[3];
           e[0] = tokens.size;
@@ -101,7 +100,6 @@ final class FTArray {
 
           next.add(e);
           insertNodeInNextArray(cn, next.size - 1, p);
-          //System.out.println("fall1");
           return next.size - 1;
         } else {
           return insertNodeIntoTrie(next.list[cn][p], v, d);
@@ -137,7 +135,6 @@ final class FTArray {
               next.list[cn][next.list[cn].length - 2] += d[0].length;
             }
           }
-          //System.out.println("fall2");
           return cn;
         } else {
           // char1 == null && char2 != null
@@ -160,13 +157,11 @@ final class FTArray {
             }
             next.add(e);
             insertNodeInNextArray(cn, next.size - 1, posti);
-            //System.out.println("fall3");
             return next.size - 1;
           } else {
             return insertNodeIntoTrie(next.list[cn][posti], r2, d);
           }
         }
-
       } else {
         if(r2 == null) {
           // char1 != null &&  char2 == null
@@ -206,10 +201,12 @@ final class FTArray {
           final int[] one = next.list[cn];
           int[] ne = new int[5];
           ne[0] = one[0];
-          //if (r2[0] < r1[0]) {
-          if (Token.lc(r2[0]) < Token.lc(r1[0]) ||
+/*          if (Token.lc(r2[0]) < Token.lc(r1[0]) ||
               (Token.lc(r2[0]) == Token.lc(r1[0])
-                  && Token.uc(r2[0]) == r1[0])) {
+                  && Token.uc(r2[0]) == r1[0])) { */
+          if (Token.diff((byte) Token.lc(r2[0]), (byte) Token.lc(r1[0])) < 0 ||
+              (Token.diff((byte) Token.lc(r2[0]), (byte) Token.lc(r1[0])) == 0
+                  && Token.diff((byte) Token.uc(r2[0]), r1[0]) == 0)) {
             ne[1] = next.size;
             ne[2] = next.size + 1;
           } else {
@@ -238,7 +235,6 @@ final class FTArray {
           ne[0] = tokens.size;
           tokens.add(r1);
           next.add(ne);
-          //System.out.println("fall5");
           return next.size - 1;
 
         }
@@ -261,8 +257,6 @@ final class FTArray {
 
       final int ip = getInsertingPosition(cn, v[0]);
       insertNodeInNextArray(cn, next.size - 1, ip);
-
-      //System.out.println("fall6");
       return next.size - 1;
     }
   }
@@ -276,22 +270,53 @@ final class FTArray {
    */
   void insertSorted(final byte[] v, final int s, final long offset) {
     count++;
+    //System.out.println("<w>" + new String(v) + "</w>");
     insertNodeSorted(0, v, s, toArray(offset));
     return;
   }
-
+/*
+  public static void main(String[] args) {
+    int[] t = toArray(Integer.MAX_VALUE);
+    System.out.println(t[0]);
+    long l = Integer.MAX_VALUE ;
+    l++;
+    t = toArrayNew(l);
+    System.out.println(t[0] + "," + t[1] + ":" + toLongNew(t, 0) + "=" + l);
+    l += 5000;
+    t = toArrayNew(l);
+    System.out.println(t[0] + "," + t[1] + ":" + toLongNew(t, 0) + "=" + l);
+  }
+  */
   /**
    * Converts a long value to a int-array.
+   * The first 3 bytes are stores in int[1] and
+   * the fourth and fifth byte are stored in int[0]
+   * as a negative value. 
    * @param l long value to convert
    * @return int-array with the long value
    */
   public static int[] toArray(final long l) {
-    final int v = (int) (l & 0x7FFFFFFF);
-    if(l == v) return new int[] { v };
-    final int w = -(int) (l >> 31);
+    if (l <= Integer.MAX_VALUE) return new int[]{(int) l};
+    final int w = -(int) (l & 0xFFFF);
+    // 0xFFFFFF0000
+    final int v = (int) ((l >> 16) & 0XFFFFFF);
     return new int[] { v, w };
+    //11111111 11111111 11111111 00000000 00000000
+    //                           11111111 11111111
   }
 
+  /**
+   * Converts long values splitted with toArray back. 
+   * @param ar int[] with values
+   * @param p pointer where the first value is found
+   * @return long l
+   */
+  public static long toLong(final int[] ar, final int p) {
+   long l = ((long) ar[p]) << 16;
+    l += -ar[p + 1] & 0xFFFF;
+    return l;
+  }
+  
   /**
    * Inserts a node into the trie.
    *
@@ -308,28 +333,23 @@ final class FTArray {
     if(cn == 0) {
       // root has successors
       if(next.list[cn].length > 3) {
-        final int p = getPointer(cn); //nextL.list[cn].length - 3;
-        if(tokens.list[next.list[next.list[cn][p]][0]][0] != v[0]) {
-          //System.out.println("fall1");
-          //if(!found) {
+        final int p = getPointer(cn); 
+        if(Token.diff(tokens.list[next.list[next.list[cn][p]][0]][0], v[0]) 
+            != 0) {
+        //if(tokens.list[next.list[next.list[cn][p]][0]][0] != v[0]) {
           // any child has an appropriate value to valueToInsert;
           // create new node and append it; save data
-
           int[] e;
-          e = new int[2 + offset.length]; //new int[3];
+          e = new int[2 + offset.length]; 
           e[0] = tokens.size;
           tokens.add(v);
           e[1] = s;
           System.arraycopy(offset, 0, e, 2, offset.length);
-          //e[2] = offset;
-
+          
           next.add(e);
-          //insertNodeInNextArray(cn, nextL.size - 1, p);
           insertNodeInNextArray(cn, next.size - 1, p + 1);
-          //System.out.println("fall1");
           return next.size - 1;
         } else {
-          //System.out.println("fall1a");
           return insertNodeSorted(next.list[cn][p], v, s, offset);
         }
       }
@@ -349,66 +369,48 @@ final class FTArray {
     if(is !=  null) {
       if(r1 == null) {
         if(r2 != null) {
-          // char1 == null && char2 != null
           // value of currentNode equals valueToInsert,
-          //but valueToInset is longer
+          // but valueToInset is longer
           final int p = getPointer(cn); //nextL.list[cn].length - 3;
-          if(p == 0 || //nextL.list[nextL.list[cn][p]][0] == -1 ||
-              tokens.list[next.list[next.list[cn][p]][0]][0] != r2[0]) {
-            //System.out.println("fall2");
-            //(!found) {
+          if(p == 0 || 
+              //tokens.list[next.list[next.list[cn][p]][0]][0] != r2[0]) {
+            Token.diff(
+                tokens.list[next.list[next.list[cn][p]][0]][0], r2[0]) != 0) {
             // create new node and append it, because any child from curretnNode
             // start with the same letter than reamin2.
             int[] e;
-            e = new int[2 + offset.length]; // new int[3];
+            e = new int[2 + offset.length]; 
             e[0] = tokens.size;
             tokens.add(r2);
             e[1] = s;
-            //e[2] = offset;
             System.arraycopy(offset, 0, e, 2, offset.length);
-
             next.add(e);
-            insertNodeInNextArray(cn, next.size - 1, p + 1); //posti);
-            //System.out.println("fall2");
+            insertNodeInNextArray(cn, next.size - 1, p + 1); 
             return next.size - 1;
           } else {
-            //System.out.println("fall2a");
-            //return insertNodeIntoTrie(nextL.list[cn][posti], r2, d);
             return insertNodeSorted(next.list[cn][p], r2, s, offset);
           }
         }
 
       } else {
         if(r2 == null) {
-          //System.out.println("fall3");
           // char1 != null &&  char2 == null
           // value of currentNode equals valuteToInsert,
           // but current has a longer value
           // update value of currentNode.value with intersection
-          final int[] oe = new int [3 + offset.length]; //new int[4];
+          final int[] oe = new int [3 + offset.length];
           tokens.list[next.list[cn][0]] = is;
           oe[0] = next.list[cn][0];
-          //int did = nextL.list[cn][nextL.list[cn].length - 1];
-          //oe[3] = offset;
           System.arraycopy(offset, 0, oe, 3, offset.length);
           oe[2] = s;
 
-          //int[] ne = new int[nextL.list[cn].length];
-          //System.arraycopy(nextL.list[cn], 0, ne, 0, ne.length);
           next.list[cn][0] = tokens.size;
           tokens.add(r1);
-          //ne[ne.length - 1] = did;
-          //ne[ne.length - 2] = preL.list[did].length;
-
-          //next[countNodes] = next[cn];
-          //nextL.add(ne);
           next.add(next.list[cn]);
           oe[1] = next.size - 1;
           next.list[cn] = oe;
-          //System.out.println("fall3");
           return next.size - 1;
         } else {
-          //System.out.println("fall3a");
           // char1 != null && char2 != null
           // value of current node and value to insert have only one common
           // letter update value of current node with intersection
@@ -416,7 +418,8 @@ final class FTArray {
           final int[] one = next.list[cn];
           int[] ne = new int[5];
           ne[0] = one[0];
-          if (r2[0] < r1[0]) {
+          //if (r2[0] < r1[0]) {
+          if (Token.diff(r2[0], r1[0]) < 0) {
             ne[1] = next.size;
             ne[2] = next.size + 1;
           } else {
@@ -427,12 +430,11 @@ final class FTArray {
           ne[4] = 0;
           next.list[cn] = ne;
 
-          ne = new int[2 + offset.length]; //new int[3];
+          ne = new int[2 + offset.length]; 
           ne[0] = tokens.size;
           tokens.add(r2);
 
           ne[1] = s;
-          //ne[2] = offset;
           System.arraycopy(offset, 0, ne, 2, offset.length);
 
           next.add(ne);
@@ -442,28 +444,21 @@ final class FTArray {
           ne[0] = tokens.size;
           tokens.add(r1);
           next.add(ne);
-          //System.out.println("fall3a");
           return next.size - 1;
-
         }
       }
     }  else {
-      //System.out.println("fall4");
       // abort recursion
       // no intersection between current node an valuetoinsert
-      final int[] ne = new int[2 + offset.length]; //new int[3];
+      final int[] ne = new int[2 + offset.length]; 
       ne[0] = tokens.size;
       tokens.add(v);
       System.arraycopy(offset, 0, ne, 2, offset.length);
-      //ne[2] = offset;
       ne[1] = s;
 
       next.add(ne);
       final int p = next.list[cn].length - 2;
-      //final int ip = getInsertingPosition(cn, v[0]);
       insertNodeInNextArray(cn, next.size - 1, p);
-
-      //System.out.println("fall4");
       return next.size - 1;
     }
     return -1;
@@ -571,22 +566,34 @@ final class FTArray {
     if (s == i)
       return i;
     while (i < s
-        && Token.lc(tokens.list[next.list[next.list[cn][i]][0]][0])
-        < Token.lc(toInsert)) {
+//        && Token.lc(tokens.list[next.list[next.list[cn][i]][0]][0])
+//        < Token.lc(toInsert)) {
+      && Token.diff(
+          (byte) Token.lc(tokens.list[next.list[next.list[cn][i]][0]][0]),
+          (byte) Token.lc(toInsert)) < 0) {
       i++;
     }
 
     if (i < s) {
-      if(tokens.list[next.list[next.list[cn][i]][0]][0] == toInsert) {
+      //if(tokens.list[next.list[next.list[cn][i]][0]][0] == toInsert) {
+      if(Token.diff(
+          tokens.list[next.list[next.list[cn][i]][0]][0], toInsert) == 0) {
         found = true;
         return i;
-      } else if(Token.lc(tokens.list[next.list[next.list[cn][i]][0]][0])
-          == Token.lc(toInsert)) {
-        if (tokens.list[next.list[next.list[cn][i]][0]][0]
-           == Token.uc(toInsert))
+  //    } else if(Token.lc(tokens.list[next.list[next.list[cn][i]][0]][0])
+  //        == Token.lc(toInsert)) {
+      } else if(Token.diff(
+          (byte) Token.lc(tokens.list[next.list[next.list[cn][i]][0]][0]),
+          (byte) Token.lc(toInsert)) == 0) {
+        //if (tokens.list[next.list[next.list[cn][i]][0]][0]
+        //   == Token.uc(toInsert))
+        if (Token.diff(tokens.list[next.list[next.list[cn][i]][0]][0],
+            (byte) Token.uc(toInsert)) == 0)
           return i;
         if (i + 1 < s &&
-            tokens.list[next.list[next.list[cn][i + 1]][0]][0] == toInsert) {
+            //tokens.list[next.list[next.list[cn][i + 1]][0]][0] == toInsert) {
+            Token.diff(tokens.list[next.list[next.list[cn][i + 1]][0]][0], 
+                toInsert) == 0) {
           found = true;
         }
         return i + 1;
@@ -615,8 +622,12 @@ final class FTArray {
       while (l <= r) {
         m = l + (r - l) / 2;
         m = (m == 0) ? 1 : m;
-        if (tokens.list[next.list[next.list[cn][m]][0]][0] < toi) l = m + 1;
-        else if (tokens.list[next.list[next.list[cn][m]][0]][0] > toi)
+        //if (tokens.list[next.list[next.list[cn][m]][0]][0] < toi) l = m + 1;
+        if (Token.diff(tokens.list[next.list[next.list[cn][m]][0]][0], toi) 
+            < 0) l = m + 1;
+        //else if (tokens.list[next.list[next.list[cn][m]][0]][0] > toi)
+        else if (
+            Token.diff(tokens.list[next.list[next.list[cn][m]][0]][0], toi) > 0)
           r = m - 1;
         else {
           found = true;
@@ -624,7 +635,9 @@ final class FTArray {
         }
       }
       if (l < next.list[cn].length - 2
-        && tokens.list[next.list[next.list[cn][m]][0]][0] == toi) {
+        //&& tokens.list[next.list[next.list[cn][m]][0]][0] == toi) {
+          && Token.diff(
+              tokens.list[next.list[next.list[cn][m]][0]][0], toi) == 0) {
       found = true;
       return l + 1;
     }
@@ -646,10 +659,13 @@ final class FTArray {
       return 1;
 
     while (i > s
-        && tokens.list[next.list[next.list[cn][i]][0]][0] > toInsert) i--;
-
+        //&& tokens.list[next.list[next.list[cn][i]][0]][0] > toInsert) i--;
+        && Token.diff(tokens.list[next.list[next.list[cn][i]][0]][0], 
+            toInsert) > 0) i--;
     if (i > s
-        && tokens.list[next.list[next.list[cn][i]][0]][0] == toInsert) {
+        //&& tokens.list[next.list[next.list[cn][i]][0]][0] == toInsert) {
+        && Token.diff(
+            tokens.list[next.list[next.list[cn][i]][0]][0], toInsert) == 0) {
       found = true;
       return i;
     }
@@ -665,9 +681,11 @@ final class FTArray {
   private byte[] calculateIntersection(final byte[] b1, final byte[] b2) {
     if(b1 == null || b2 == null) return null;
 
-    final int ml = Math.min(b1.length, b2.length);
+    final int ml = (b1.length < b2.length) ? b1.length : b2.length; 
+    //final int ml = Math.min(b1.length, b2.length);
     int i = -1;
-    while(++i < ml && b1[i] == b2[i]);
+    //while(++i < ml && b1[i] == b2[i]);
+    while(++i < ml && Token.diff(b1[i], b2[i]) == 0);
     return getBytes(b1, 0, i);
   }
 
@@ -696,7 +714,8 @@ final class FTArray {
    * @return index of the data pointer
    */
   private int getPointer(final int cn) {
-    final int[] nl = next.list[cn]; 
-    return nl[nl.length - 2] >= 0 ? nl.length - 3 : nl.length - 4;
+    final int[] nl = next.list[cn];
+    //return nl[nl.length - 2] >= 0 ? nl.length - 3 : nl.length - 4;
+    return nl[nl.length - 1] >= 0 ? nl.length - 3 : nl.length - 4;
   }
 }

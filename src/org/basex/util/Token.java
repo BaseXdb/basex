@@ -537,8 +537,8 @@ public final class Token {
     final int l = Math.min(tok.length, MAXLEN);
     for(int i = 0; i != l; i++) h = (h << 5) - h + tok[i];
     return h;
-  }
-
+  }  
+  
   /**
    * Compares two character arrays for equality.
    * @param tok token to be compared
@@ -552,6 +552,17 @@ public final class Token {
     return true;
   }
 
+  /**
+   * Compares two character arrays for equality.
+   * @param tok token to be compared
+   * @param tok2 second token to be compared
+   * @return true if the arrays are equal
+   */
+  public static boolean eq(final byte tok, final byte tok2) {
+    return tok == tok2;
+  }
+
+  
   /**
    * Calculates the difference of two character arrays.
    * @param tok token to be compared
@@ -567,6 +578,18 @@ public final class Token {
     return tok.length - tok2.length;
   }
 
+  /**
+   * Calculates the difference of two character arrays.
+   * @param tok token to be compared
+   * @param tok2 second token to be compared
+   * @return 0 if tokens are equal, negative if first token is smaller,
+   * positive if first token is bigger
+   */
+  public static int diff(final byte tok, final byte tok2) {
+    return diff(new byte[] {tok}, new byte[] {tok2});
+  }
+  
+  
   /**
    * Checks if the first token contains the second token in lowercase.
    * @param tok first token

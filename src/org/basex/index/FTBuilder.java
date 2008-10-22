@@ -123,7 +123,8 @@ public final class FTBuilder extends Progress implements IndexBuilder {
       final int il = index.next.size;
       for (int i = 1; i < il; i++) {
         // check pointer on data needs 1 or 2 ints
-        int lp = (next[i][next[i].length - 2] > -1) ? 0 : -1;
+        //int lp = (next[i][next[i].length - 2] > -1) ? 0 : -1;
+        int lp = (next[i][next[i].length - 1] > -1) ? 0 : -1;
         // write token size as byte
         outN.write((byte) tokens[next[i][0]].length);
         // write token
@@ -145,7 +146,7 @@ public final class FTBuilder extends Progress implements IndexBuilder {
             if (lp == 0) {
               outN.write5(next[i][j + 1]);
             } else {
-              outN.write5(toLong(next[i], next[i].length - 2));
+              outN.write5(FTArray.toLong(next[i], next[i].length - 2));
             }
           } else {
             writeData(outPre, pre[next[i][next[i].length - 1]]);
@@ -180,7 +181,7 @@ public final class FTBuilder extends Progress implements IndexBuilder {
    * @param p position to read from
    * @return long value
    */
-  private static long toLong(final int[] i, final int p) {
+  public static long toLong(final int[] i, final int p) {
     return ((long) -i[p] << 31) | i[p + 1];
   }
 
@@ -214,12 +215,14 @@ public final class FTBuilder extends Progress implements IndexBuilder {
         // ftdata is stored here, with pre1, pos1, ..., preu, posu 
         while(lpre < Num.size(vpre) && lpos < Num.size(vpos)) {
           int z = 0;
-          while (z < Num.len(vpre, lpre))
+          while (z < Num.len(vpre, lpre)) {
             outPre.write(vpre[lpre + z++]);
+          }
           lpre += z;
           z = 0;
-          while (z < Num.len(vpos, lpos))
-            outPre.write(vpre[lpos + z++]);
+          while (z < Num.len(vpos, lpos)) {
+            outPre.write(vpos[lpos + z++]);
+          }
           lpos += z;
         }
       } else {

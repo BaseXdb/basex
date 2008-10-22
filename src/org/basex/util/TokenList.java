@@ -49,7 +49,7 @@ public final class TokenList implements Iterable<byte[]> {
     for(int i = 0; i < size; i++) if(Token.eq(list[i], v)) return true;
     return false;
   }
-
+  
   /**
    * Finishes the array.
    * @return array

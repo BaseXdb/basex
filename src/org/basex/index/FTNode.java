@@ -218,8 +218,8 @@ public final class FTNode {
 
   /**
    * Converts the pos values in the following style.
-   * poi0, pos0, ..., posk
-   * poi1, pos0, ..., posj
+   * [poi0]: pos0, ..., posk
+   * [poi1]: pos0, ..., posj
    * @return IntList[]
    */
   public IntList[] convertPos() {

@@ -7,10 +7,12 @@ import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataAccess;
+import org.basex.util.IntList;
 import org.basex.util.Levenshtein;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
+import org.basex.util.TokenList;
 
 /**
  * This class provides access to attribute values and text contents
@@ -98,6 +100,10 @@ public final class FTFuzzy extends Index {
     tb.add("- %: %\n", CREATEDC, BaseX.flag(data.meta.ftdc));
     final long l = li.length() + ti.length() + dat.length();
     tb.add(SIZEDISK + Performance.formatSize(l, true) + NL);
+    IntList sizes = new IntList();
+    TokenList toks = new TokenList();
+    getTokenSizes(sizes, toks);
+    FTTrie.infoTopNSizes(5, sizes, toks, tb);
     return tb.finish();
   }
 
@@ -127,6 +133,31 @@ public final class FTFuzzy extends Index {
     return r == l && Token.eq(ti.readBytes(l, l + tl), tok) ? l : -1;
   }
 
+  /**
+   * Collects all tokens and their sizes found in the index structure.
+   *
+   * @param sizes IntList with sizes
+   * @param toks TokenList with tokens
+   */
+  private void getTokenSizes(final IntList sizes, final TokenList toks) {
+    int i = 0;
+    while(i < tp.length && tp[i] == -1) i++;
+    int p = tp[i];
+    int j = i + 1;
+    while(j < tp.length && tp[j] == -1) j++;
+    
+    while (p < tp[tp.length - 1]) {
+      toks.add(ti.readBytes(p, p + i));
+      sizes.add(getDataSize(p, i));
+      p += i + 4L + 5L;
+      if (p == tp[j]) {
+        i = j;
+        while(j + 1 < tp.length && tp[++j] == -1);
+      }
+    }
+  }
+
+  
   /** Saves the last pointer on the index. Used for wildcardsearch. */
   private int lastIndex = -1;
 
@@ -450,12 +481,15 @@ public final class FTFuzzy extends Index {
 
     // check token before wildcard
     for(int t = 0; t < posw; t++) {
-      if (tokww[t] != tok2[t]) return false;
+      //if (tokww[t] != tok2[t]) return false;
+      if (Token.diff(tokww[t], tok2[t]) != 0) return false;
     }
 
     // check token after wildcard
     for(int t = tokww.length - posw - 2; t > 0; t--) {
-      if (tokww[tokww.length - t] != tok2[tok2.length - t]) return false;
+      //if (tokww[tokww.length - t] != tok2[tok2.length - t]) return false;
+      if (Token.diff(tokww[tokww.length - t], tok2[tok2.length - t]) != 0) 
+        return false;
     }
 
     return true;

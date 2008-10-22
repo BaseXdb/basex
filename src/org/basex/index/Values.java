@@ -79,7 +79,7 @@ public final class Values extends Index {
       @Override
       public int size() { return s; }
       @Override
-      public FTNode nextFTNode() {
+      public FTNode nextFTNodeFD() {
         return new FTNode(p += idxl.readNum());
       }
     };
