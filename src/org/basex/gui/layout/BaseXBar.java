@@ -134,7 +134,7 @@ public final class BaseXBar extends BaseXPanel {
     barSize = Math.min(size, barH - 1);
 
     // paint scrollbar background
-    g.setColor(GUIConstants.COLORSCROLL);
+    g.setColor(GUIConstants.COLORBACK);
     g.fillRect(0, 0, ww, hh);
 
     // draw scroll slider

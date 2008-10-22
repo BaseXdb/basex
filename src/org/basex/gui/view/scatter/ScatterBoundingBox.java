@@ -1,7 +1,5 @@
 package org.basex.gui.view.scatter;
 
-import java.awt.Color;
-
 /**
  * A bounding box to support item selection.
  *
@@ -17,10 +15,6 @@ public class ScatterBoundingBox {
   int x2;
   /** Y coordinate of lower right corner. */
   int y2;
-  /** Background color of selection box. */
-  static Color back = new Color(100, 100, 100, 50);
-  /** Color of selection frame. */
-  static Color frame = new Color(100, 100, 100, 200);
   
   
   /**

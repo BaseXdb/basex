@@ -152,19 +152,25 @@ public final class GUIConstants {
 
   // COLORS ===================================================================
 
+  /** Button color. */
+  public static final Color COLORTEXT = SystemColor.textText;
   /** Error color. */
   public static final Color COLORERROR = new Color(208, 0, 0);
   /** Error color. */
   public static final Color COLORMARK = new Color(255, 200, 180);
-  /** Error color. */
-  public static final Color COLORQUOTE = new Color(0, 0, 192);
   /** Button color. */
-  public static final Color COLORBUTTON = Color.gray;
-  /** Scrollbar color. */
-  public static final Color COLORSCROLL = SystemColor.control;
+  public static final Color COLORBUTTON = new Color(160, 160, 160);
   /** Background color. */
   public static final Color COLORBACK = SystemColor.control;
+  /** Transparent background color. */
+  public static Color back;
+  /** Transparent frame color. */
+  public static Color frame;
+  /** Focus color. */
+  public static Color focus;
 
+  /** Bright GUI color. */
+  public static Color color;
   /** Bright GUI color. */
   public static Color color1;
   /** Second bright GUI color. */
@@ -178,6 +184,8 @@ public final class GUIConstants {
   /** Dark color. */
   public static Color color6;
 
+  /** Mark color. */
+  public static Color colormark;
   /** Mark color. */
   public static Color colormark1;
   /** Second mark color. */
@@ -234,12 +242,14 @@ public final class GUIConstants {
 
     // calculate color c:
     // c = (255 - expectedColor) * 10 / factor (= GUIRED/BLUE/GUIProps.GREEN)
+    color  = new Color(col(r, 110), col(g, 150), col(b, 160), 100);
     color1 = new Color(col(r,   8), col(g,   7), col(b,   6));
     color2 = new Color(col(r,  24), col(g,  25), col(b,  40));
     color3 = new Color(col(r,  32), col(g,  32), col(b,  44));
     color4 = new Color(col(r,  48), col(g,  50), col(b,  40));
     color5 = new Color(col(r,  56), col(g,  60), col(b,  80));
-    color6 = new Color(col(r, 140), col(g, 140), col(b, 140));
+    color6 = new Color(col(r, 140), col(g, 100), col(b, 70));
+    colormark = new Color(col(r, 16), col(g, 120), col(b, 240), 100);
     colormark1 = new Color(col(r, 16), col(g, 120), col(b, 240));
     colormark2 = new Color(col(r, 16), col(g,  80), col(b, 160));
     colormark3 = new Color(col(r, 32), col(g, 160), col(b, 320));
@@ -253,6 +263,9 @@ public final class GUIConstants {
         Math.max(255 - l * GUIProp.colorgreen, 0),
         Math.max(255 - l * GUIProp.colorblue, 0));
     }
+    focus = COLORS[16];
+    back = new Color(focus.getRed(), focus.getGreen(), focus.getBlue(),  40);
+    frame = new Color(focus.getRed(), focus.getGreen(), focus.getBlue(),  100);
     
     // create thumbnail colors
     thumbnailcolor = new Color[] {

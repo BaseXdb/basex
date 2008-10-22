@@ -1,7 +1,6 @@
 package org.basex.gui.view.query;
 
 import static org.basex.Text.*;
-import static org.basex.gui.GUIConstants.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -152,7 +151,6 @@ public final class QueryView extends View {
   void refresh() {
     BaseXLayout.select(input[mode], true);
     header.setFont(GUIConstants.lfont);
-    header.setForeground(COLORS[16]);
   }
 
   @Override

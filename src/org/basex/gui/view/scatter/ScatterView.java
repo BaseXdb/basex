@@ -19,6 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
+import org.basex.data.StatsKey.Kind;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
@@ -34,28 +35,12 @@ import org.basex.util.IntList;
  * @author Lukas Kircher
  */
 public final class ScatterView extends View implements Runnable {
+  /** Rotate factor. */
+  private static final double ROTATE = Math.sin(30);
+  /** Plot margin: top, left, bottom, right margin. */
+  private static final int[] MARGIN = new int[4];
   /** Data reference. */
   ScatterData scatterData;
-  /** X paint margin. */
-  private static final int MARGINBOTTOM = 90;
-  /** Y paint margin. */ 
-  private static final int MARGINTOP = 60;
-  /** Y paint margin. */ 
-  private static final int MARGINLEFT = 70;
-  /** Y paint margin. */ 
-  private static final int MARGINRIGHT = 20;
-  /** Item size. */
-  private static final int ITEMSIZE = 14;
-  /** Focused item size. */
-  private static final int ITEMSIZEFOCUSED = 16;
-  /** Place holder for items which lack value. */
-  private static final int NOVALUEBORDER = 28;
-  /** Focus offset. */
-  private static final int FOCUSOFFSET = 5;
-  /** Mark offset. */
-  private static final int MARKOFFSET = 3;
-  /** Whitespace between axis captions. */
-  static final int CAPTIONWHITESPACE = 30;
   /** Item image. */
   private BufferedImage itemImg;
   /** Marked item image. */
@@ -64,14 +49,8 @@ public final class ScatterView extends View implements Runnable {
   private BufferedImage itemFocusedImg;
   /** Buffered plot image. */
   private BufferedImage plotImg;
-  /** States if a plot value is focused. */ 
-  private boolean valueFocused;
   /** Array position of focused item - not pre value!. */
   private int focusedItem;
-  /** Currently focused x value. */
-  private double focusedValueX;
-  /** Currently focused y value. */
-  private double focusedValueY;
   /** X coordinate of mouse pointer. */
   private int mouseX;
   /** Y coordinate of mouse pointer. */
@@ -165,41 +144,32 @@ public final class ScatterView extends View implements Runnable {
     
     tmpMarkedPos = new IntList();
     selectionBox = new ScatterBoundingBox();
-    itemImg = createItemImage(false, false);
-    markedItemImg = createItemImage(false, true);
-    itemFocusedImg = createItemImage(true, false);
+    refreshLayout();
   }
   
   /**
    * Creates a buffered image for items.
-   * @param focusedImage create image of focused item if true
+   * @param focus create image of focused item if true
    * @param marked create image of marked item
    * @return item image
    */
-  private BufferedImage createItemImage(final boolean focusedImage, 
+  private BufferedImage createItemImage(final boolean focus, 
       final boolean marked) {
-    final BufferedImage img = focusedImage ? new BufferedImage(
-        ITEMSIZEFOCUSED, ITEMSIZEFOCUSED, Transparency.TRANSLUCENT) : 
-          new BufferedImage(ITEMSIZE, ITEMSIZE, Transparency.TRANSLUCENT);
+
+    final int size =  itemSize(focus);
+    final BufferedImage img = new BufferedImage(size, size,
+        Transparency.TRANSLUCENT);
+    
     final Graphics g = img.getGraphics();
-    final Graphics2D g2d = (Graphics2D) g;
-    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
-        RenderingHints.VALUE_ANTIALIAS_ON);
-    if(focusedImage) {
-      g.setColor(new Color(80, 80, 255, 255));
-      g.fillOval(0, 0, ITEMSIZEFOCUSED, ITEMSIZEFOCUSED);
-      g.setColor(new Color(0, 0, 255, 255));
-      final int diff = (ITEMSIZEFOCUSED - ITEMSIZE) / 2;
-      g.fillOval(diff, diff, ITEMSIZE, ITEMSIZE);
-    } else {
-      g.setColor(new Color(50, 60, 130, 150));
-      Color c = new Color(GUIConstants.colormark1.getRed(),
-          GUIConstants.colormark1.getGreen(), GUIConstants.colormark1.getBlue(),
-          150);
-      if(marked)
-        g.setColor(c);
-      g.fillOval(0, 0, ITEMSIZE, ITEMSIZE);
-    }
+    ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
+       RenderingHints.VALUE_ANTIALIAS_ON);
+    
+    Color c = GUIConstants.color;
+    if(marked) c = GUIConstants.colormark;
+    if(focus) c = GUIConstants.color6;
+
+    g.setColor(c);
+    g.fillOval(0, 0, size, size);
     return img;
   }
   
@@ -211,11 +181,9 @@ public final class ScatterView extends View implements Runnable {
     final BufferedImage img = new BufferedImage(getWidth(), getHeight(), 
         Transparency.BITMASK);
     final Graphics g = img.getGraphics();
-    final Graphics2D g2d = (Graphics2D) g;
-    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
+    ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
         RenderingHints.VALUE_ANTIALIAS_ON);
-    if(scatterData.size == 0)
-      return img;
+    
     g.setColor(GUIConstants.color6);
     for(int i = 0; i < scatterData.size; i++) {
       drawItem(g, scatterData.xAxis.co[i], 
@@ -236,7 +204,9 @@ public final class ScatterView extends View implements Runnable {
     final int h = getHeight();
     final boolean nostats = !data.tags.stats;
 
-    if(nostats || w < 300 || h < 300) {
+    final int novalue = noValueSize();
+    final int minSize = novalue * 8;
+    if(nostats || w < minSize || h < minSize) {
       final String s = nostats ? DBNOSTATS : NOSPACE;
       g.setFont(GUIConstants.font);
       g.setColor(Color.black);
@@ -249,21 +219,18 @@ public final class ScatterView extends View implements Runnable {
       return;
     }
     
-    g.setColor(new Color(90, 90, 150, 90));
-    
     if(w + h != viewDimension) {
       viewDimension = w + h;
       plotChanged = true;
     }
 
-    plotWidth = w - (MARGINLEFT + MARGINRIGHT);
-    plotHeight = h - (MARGINTOP + MARGINBOTTOM);
+    plotWidth = w - (MARGIN[1] + MARGIN[3]);
+    plotHeight = h - (MARGIN[0] + MARGIN[2]);
     
     // overdraw plot background
-    g.setColor(new Color(90, 90, 90, 40));
-    g.fillRect(MARGINLEFT + NOVALUEBORDER, MARGINTOP, 
-        plotWidth - NOVALUEBORDER, 
-      plotHeight - NOVALUEBORDER);
+    g.setColor(GUIConstants.back);
+    g.fillRect(MARGIN[1] + novalue, MARGIN[0],
+        plotWidth - novalue, plotHeight - novalue);
     
     // draw axis and grid
     drawAxis(g, true);
@@ -295,38 +262,37 @@ public final class ScatterView extends View implements Runnable {
     }
 
     // draw focused item
-    if(focusedItem > -1 && !dragging) {
-      drawItem(g, scatterData.xAxis.co[focusedItem], 
-          scatterData.yAxis.co[focusedItem], true, false);
-    }
-    
-    // draw focused x and y value
-    if(valueFocused) {
-      g.setColor(GUIConstants.color6);
-      final String x = mouseX > MARGINLEFT + NOVALUEBORDER ? 
-          scatterData.xAxis.getValue(focusedValueX) : "";
-      final String y = mouseY < h - MARGINBOTTOM - NOVALUEBORDER ?
-          scatterData.yAxis.getValue(focusedValueY) : "";
-      g.drawString("x  " + x, MARGINLEFT, MARGINTOP - 20);
-      g.drawString("y  " + y, MARGINLEFT, MARGINTOP - 6);
+    if(focusedItem != -1) {
+      if(!dragging) {
+        drawItem(g, scatterData.xAxis.co[focusedItem], 
+            scatterData.yAxis.co[focusedItem], true, false);
+        // draw focused x and y value
+        g.setFont(GUIConstants.font);
+        final String x = string(scatterData.xAxis.getValue(focused));
+        final String y = string(scatterData.yAxis.getValue(focused));
+        final String label = x + "/" + y;
+        final int tw = BaseXLayout.width(g, label);
+        final int th = g.getFontMetrics().getHeight();
+        final int xx = Math.min(getWidth() - tw - 8, mouseX);
+        g.setColor(GUIConstants.COLORS[10]);
+        g.fillRect(xx - 1, mouseY - th, tw + 4, th);
+        g.setColor(GUIConstants.color1);
+        g.drawString(label, xx, mouseY - 4);
+      }
     }
     
     // draw selection box
     if(dragging) {
-      g.setColor(ScatterBoundingBox.back);
+      g.setColor(GUIConstants.back);
       final int selW = selectionBox.getWidth();
       final int selH = selectionBox.getHeight();
       final int x1 = selectionBox.x1;
       final int y1 = selectionBox.y1;
-      final int x2 = selectionBox.x2;
-      final int y2 = selectionBox.y2;
       g.fillRect(selW > 0 ? x1 : x1 + selW, selH > 0 ? y1 : y1 + selH, 
           Math.abs(selW), Math.abs(selH));
-      g.setColor(ScatterBoundingBox.frame);
-      g.drawLine(x1, y1, x2, y1);
-      g.drawLine(x1, y1, x1, y2);
-      g.drawLine(x1, y2, x2, y2);
-      g.drawLine(x2, y1, x2, y2);
+      g.setColor(GUIConstants.frame);
+      g.drawRect(selW > 0 ? x1 : x1 + selW, selH > 0 ? y1 : y1 + selH, 
+          Math.abs(selW), Math.abs(selH));
     }
     
     plotChanged = false;
@@ -338,20 +304,18 @@ public final class ScatterView extends View implements Runnable {
    * @param g graphics reference
    * @param x x coordinate
    * @param y y coordinate
-   * @param drawFocused a focused item is drawn
+   * @param focus a focused item is drawn
    * @param marked item is marked
    */
   private void drawItem(final Graphics g, final double x, final double y, 
-      final boolean drawFocused, final boolean marked) {
+      final boolean focus, final boolean marked) {
     final int x1 = calcCoordinate(true, x);
     final int y1 = calcCoordinate(false, y);
-    if(drawFocused) {
-      g.drawImage(itemFocusedImg, x1 - ITEMSIZEFOCUSED / 2, 
-          y1 - ITEMSIZEFOCUSED / 2, this); 
-    } else {
-      g.drawImage(!marked ? itemImg : markedItemImg, x1 - ITEMSIZE / 2, 
-          y1 - ITEMSIZE / 2, this);
-    }
+    
+    final BufferedImage img = focus ? itemFocusedImg : marked ?
+        markedItemImg : itemImg;
+    final int size =  img.getWidth() / 2;
+    g.drawImage(img, x1 - size, y1 - size, this); 
   }
   
   /**
@@ -364,30 +328,27 @@ public final class ScatterView extends View implements Runnable {
     final int w = getWidth();
     g.setColor(GUIConstants.color1);
     
+    final int novalue = noValueSize();
     final int textH = g.getFontMetrics().getHeight();
-    final int pWidth = plotWidth - NOVALUEBORDER;
-    final int pHeight = plotHeight - NOVALUEBORDER;
+    final int pWidth = plotWidth - novalue;
+    final int pHeight = plotHeight - novalue;
     final ScatterAxis axis = drawX ? scatterData.xAxis : scatterData.yAxis;
     if(drawX) {
-      g.drawLine(MARGINLEFT, h - MARGINBOTTOM, w - MARGINRIGHT, 
-          h - MARGINBOTTOM);
-      if(plotChanged)
-        axis.calcCaption(pWidth);
+      g.drawLine(MARGIN[1], h - MARGIN[2], w - MARGIN[3], h - MARGIN[2]);
+      if(plotChanged) axis.calcCaption(pWidth);
     } else {
-      g.drawLine(MARGINLEFT, MARGINTOP, MARGINLEFT, 
-          getHeight() - MARGINBOTTOM);
-      if(plotChanged)
-        axis.calcCaption(pHeight);
+      g.drawLine(MARGIN[1], MARGIN[0], MARGIN[1], getHeight() - MARGIN[2]);
+      if(plotChanged) axis.calcCaption(pHeight);
     }
     
-    g.setFont(GUIConstants.font);
-    g.setColor(GUIConstants.color1);
     final boolean numeric = axis.numeric;
     final int nrCaptions = axis.nrCats == 1 ? 3 : axis.nrCaptions;
     final double step = axis.captionStep;
     final double range = 1.0d / (nrCaptions - 1);
-    final int type = axis.numType;
+    final Kind type = axis.numType;
+    final int fs = GUIProp.fontsize;
     
+    g.setFont(GUIConstants.font);
     for(int i = 0; i < nrCaptions; i++) {
       String caption = "";
       if(numeric) {
@@ -395,7 +356,7 @@ public final class ScatterView extends View implements Runnable {
         final double captionValue = i == nrCaptions - 1 ? axis.max : 
           min + (i * step);
           
-        if(type == ScatterAxis.TYPEINT)
+        if(type == Kind.INT)
           caption = Integer.toString((int) captionValue);
         else
           caption = string(chopNumber(token(captionValue)));
@@ -414,34 +375,32 @@ public final class ScatterView extends View implements Runnable {
       }
 
       // draw rotated caption labels
-      final int capW = BaseXLayout.width(g, caption);
+      final int imgW = BaseXLayout.width(g, caption) + fs;
       final int imgH = 160;
-      final int imgW = 160;
       final BufferedImage img = new BufferedImage(imgW, imgH, 
           Transparency.BITMASK);
-      Graphics2D g2d = (Graphics2D) img.getGraphics();
+      Graphics2D g2d = img.createGraphics();
       g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
           RenderingHints.VALUE_ANTIALIAS_ON);
+      g2d.rotate(ROTATE, imgW, 0 + textH);
       g2d.setFont(GUIConstants.font);
       g2d.setColor(Color.black);
-      g2d.rotate(Math.sin(30), imgW, 0 + textH);
-      g2d.drawString(caption, imgW - capW, 0);
-      g.setColor(GUIConstants.color1);
+      g2d.drawString(caption, fs, fs);
 
+      g.setColor(GUIConstants.color1);
       if(drawX) {
-        final int x = MARGINLEFT + NOVALUEBORDER + 
-          ((int) ((i * range) * pWidth));
-        g.drawImage(img, x - imgW + textH + 4, h - MARGINBOTTOM + 14, this);
-        g.drawLine(x, MARGINTOP, x, h - MARGINBOTTOM + 9);
+        final int x = MARGIN[1] + novalue + (int) (i * range * pWidth);
+        final int y = h - MARGIN[2];
+        g.drawImage(img, x - imgW + textH - fs, y + fs / 4, this);
+        g.drawLine(x, MARGIN[0], x, y + fs / 2);
       } else {
-        final int y = h - MARGINBOTTOM - NOVALUEBORDER - 
-        ((int) ((i * range) * pHeight));
-        g.drawLine(MARGINLEFT - 14, y, w - MARGINRIGHT, y);
-        g.drawImage(img, MARGINLEFT - imgW - 5, y - 6, this);
+        final int y = h - MARGIN[2] - novalue - (int) (i * range * pHeight);
+        g.drawImage(img, MARGIN[1] - imgW - fs, y - fs, this);
+        g.drawLine(MARGIN[1] - fs / 2, y, w - MARGIN[3], y);
       }
     }
   }
-  
+
   /**
    * Returns a coordinate for a specific double value of an item.
    * @param d relative coordinate of specific item
@@ -449,20 +408,19 @@ public final class ScatterView extends View implements Runnable {
    * @return absolute coordinate
    */
   private int calcCoordinate(final boolean xAxis, final double d) {
+    final int novalue = noValueSize();
     if(xAxis) {
-      if(d == -1)
-        return MARGINLEFT + NOVALUEBORDER / 2;
+      if(d == -1) return MARGIN[1] + novalue / 2;
       final int width = getWidth();
-      final int xSpace = width - (MARGINLEFT + MARGINRIGHT) - NOVALUEBORDER;
+      final int xSpace = width - (MARGIN[1] + MARGIN[3]) - novalue;
       final int x = (int) (d * xSpace);
-      return x + MARGINLEFT + NOVALUEBORDER;
+      return x + MARGIN[1] + novalue;
     } else {
       final int height = getHeight();
-      if(d == -1)
-        return height - MARGINBOTTOM - NOVALUEBORDER / 2; 
-      final int ySpace = height - (MARGINTOP + MARGINBOTTOM) - NOVALUEBORDER;
+      if(d == -1) return height - MARGIN[2] - novalue / 2; 
+      final int ySpace = height - (MARGIN[0] + MARGIN[2]) - novalue;
       final int y = ySpace - (int) (d * ySpace);
-      return y + MARGINTOP;
+      return y + MARGIN[0];
     }
   }
 
@@ -511,6 +469,15 @@ public final class ScatterView extends View implements Runnable {
 
   @Override
   protected void refreshLayout() {
+    itemImg = createItemImage(false, false);
+    markedItemImg = createItemImage(false, true);
+    itemFocusedImg = createItemImage(true, false);
+    final int size = itemSize(false);
+    MARGIN[0] = 32 + size;
+    MARGIN[1] = size * 5;
+    MARGIN[2] = size * 6;
+    MARGIN[3] = size;
+    plotChanged = true;
     repaint();
   }
 
@@ -535,50 +502,47 @@ public final class ScatterView extends View implements Runnable {
    * Calculates the relative value focused by the mouse pointer.
    * @param calcX value to be calculated is x value
    * @return focused x or y value
-   */
   private double calcFocusedValue(final boolean calcX) {
+    final int novalue = noValueSize();
     double relative = .0d;
     if(calcX) {
-      final int pWidth = plotWidth - NOVALUEBORDER;
-      final int xStart = MARGINLEFT + NOVALUEBORDER;
+      final int pWidth = plotWidth - novalue;
+      final int xStart = MARGIN[1] + novalue;
       relative = 1.0d / pWidth * (mouseX - xStart);
     } else {
-      final int pHeight = plotHeight - NOVALUEBORDER;
-      final int yStart = MARGINTOP;
+      final int pHeight = plotHeight - novalue;
+      final int yStart = MARGIN[0];
       relative = 1 - (1.0d / pHeight * (mouseY - yStart));
     }
     if(relative < 0)
       relative = .0d;
     return relative;
   }
+   */
   
   /**
    * Locates the nearest item to the mouse pointer. 
    * @return item focused
    */
   private boolean focus() {
-    if(mouseX < MARGINLEFT || 
-        mouseX > getWidth() - MARGINRIGHT + ITEMSIZE / 2 ||
-        mouseY < MARGINTOP - ITEMSIZE / 2 || mouseY > 
-        getHeight() - MARGINBOTTOM) {
-      valueFocused = false;
+    final int size =  itemImg.getWidth() / 2;
+    if(mouseX < MARGIN[1] || 
+        mouseX > getWidth() - MARGIN[3] + size ||
+        mouseY < MARGIN[0] - size || mouseY > getHeight() - MARGIN[2]) {
       focusedItem = -1;
       return false;
     }
-    // get values focused by mouse pointer
-    valueFocused = true;
-    focusedValueX = calcFocusedValue(true);
-    focusedValueY = calcFocusedValue(false);
     
     // find focused item
     focusedItem = -1;
     int dist = Integer.MAX_VALUE;
-    for(int i = 0; i < scatterData.size; i++) {
+    for(int i = 0; i < scatterData.size && dist != 0; i++) {
       final int x = calcCoordinate(true, scatterData.xAxis.co[i]);
       final int y = calcCoordinate(false, scatterData.yAxis.co[i]);
       final int distX = Math.abs(mouseX - x);
       final int distY = Math.abs(mouseY - y);
-      if(distX <= FOCUSOFFSET && distY <= FOCUSOFFSET) {
+      final int off = itemSize(false) / 2;
+      if(distX < off && distY < off) {
         final int currDist = distX * distY;
         if(currDist < dist) {
           dist = currDist;
@@ -592,35 +556,53 @@ public final class ScatterView extends View implements Runnable {
   
   /**
    * Takes care of node marking operations.
-   * @return marking changed
    */
-  private boolean mark() {
+  private void mark() {
     tmpMarkedPos.reset();
+    
+    final ScatterAxis xAxis = scatterData.xAxis;
+    final ScatterAxis yAxis = scatterData.yAxis;
     if(dragging) {
       for(int i = 0; i < scatterData.size; i++) {
-        final int x = calcCoordinate(true, scatterData.xAxis.co[i]);
-        final int y = calcCoordinate(false, scatterData.yAxis.co[i]);
+        final int x = calcCoordinate(true, xAxis.co[i]);
+        final int y = calcCoordinate(false, yAxis.co[i]);
         if(((x >= selectionBox.x1 && x <= selectionBox.x2) || 
             (x <= selectionBox.x1 && x >= selectionBox.x2)) && 
             ((y >= selectionBox.y1 && y <= selectionBox.y2) || 
-                (y <= selectionBox.y1 && y >= selectionBox.y2))) {
+             (y <= selectionBox.y1 && y >= selectionBox.y2))) {
           tmpMarkedPos.add(i);
         }
       }
-    
-    } else {
+    } else if(focusedItem != -1) {
+      final int mx = calcCoordinate(true, xAxis.co[focusedItem]);
+      final int my = calcCoordinate(false, yAxis.co[focusedItem]);
+
       for(int i = 0; i < scatterData.size; i++) {
-        final int x = calcCoordinate(true, scatterData.xAxis.co[i]);
-        final int y = calcCoordinate(false, scatterData.yAxis.co[i]);
-        final int distX = Math.abs(mouseX - x);
-        final int distY = Math.abs(mouseY - y);
-        if(distX <= MARKOFFSET && distY <= MARKOFFSET) {
+        final int x = calcCoordinate(true, xAxis.co[i]);
+        final int y = calcCoordinate(false, yAxis.co[i]);
+        if(mx == x && my == y) {
           tmpMarkedPos.add(i);
         }
       }
     }
     markingChanged = true;
-    return false;
+  }
+  
+  /**
+   * Returns the size of the place holder for items lacking values.
+   * @return size value
+   */
+  static int noValueSize() {
+    return itemSize(false) * 2;
+  }
+  
+  /**
+   * Returns the item size.
+   * @param focus focus flag 
+   * @return size value
+   */
+  static int itemSize(final boolean focus) {
+    return GUIProp.fontsize + (focus ? 4 : 2);
   }
   
   @Override
@@ -638,10 +620,10 @@ public final class ScatterView extends View implements Runnable {
     final int h = getHeight();
     final int w = getWidth();
     final int th = 5;
-    final int lb = MARGINLEFT - th;
-    final int rb = w - MARGINRIGHT + th;
-    final int tb = MARGINTOP - th;
-    final int bb = h - MARGINBOTTOM + th;
+    final int lb = MARGIN[1] - th;
+    final int rb = w - MARGIN[3] + th;
+    final int tb = MARGIN[0] - th;
+    final int bb = h - MARGIN[2] + th;
     boolean inBox = false;
     if(mouseY > tb && mouseY < bb && mouseX > lb && mouseX < rb)
       inBox = true;

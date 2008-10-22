@@ -1,13 +1,11 @@
 package org.basex.gui.view.scatter;
 
 import static org.basex.util.Token.*;
-
-import java.util.Arrays;
-
 import org.basex.data.Data;
 import org.basex.data.StatsKey;
 import org.basex.data.StatsKey.Kind;
 import org.basex.gui.GUI;
+import org.basex.util.TokenList;
 
 /**
  * Axis component of the scatter plot visualization.
@@ -16,28 +14,20 @@ import org.basex.gui.GUI;
  * @author Lukas Kircher
  */
 public final class ScatterAxis {
-  /** Token for String operations. */
-  private static final byte[] AT = token("@");
+  /** Text length limit for text to number transformation. */
+  private static final int TEXTLENGTH = 8;
   /** Scatter data reference. */
   private final ScatterData scatterData;
-  /** Attribute selected by user. */
-  private byte[] attr;
+  /** Tag reference to selected attribute. */
+  private int attrID;
   /** True if attribute is a tag, false if attribute. */
   private boolean isTag;
   /** True if attribute is numerical. */
   boolean numeric;
   /** Number of different categories for x attribute. */
   int nrCats;
-  /** Type of data. */
-  int numType;
-  /** Data type integer. */
-  static final int TYPEINT = 0;
-  /** Data type double. */
-  static final int TYPEDBL = 1;
-  /** Data type text. */
-  static final int TYPETEXT = 2;
-  /** Text length limit for text to number transformation. */
-  static final int TEXTLENGTH = 8;
+  /** Data type. */
+  Kind numType;
 
   /** Coordinates of items. */
   double[] co = {};
@@ -69,9 +59,8 @@ public final class ScatterAxis {
    */
   private void initialize() {
     isTag = false;
-    attr = EMPTY;
     numeric = false;
-    numType = TYPEINT;
+    numType = Kind.INT;
     co = new double[0];
     vals = new byte[0][];
     nrCats = -1;
@@ -93,9 +82,7 @@ public final class ScatterAxis {
     if(attribute == null) return false;
     final byte[] b = token(attribute);
     initialize();
-    isTag = !contains(b, AT);
-    attr = delete(b, '@');
-    refreshAxis();
+    refreshAxis(b);
     return true;
   }
   
@@ -103,31 +90,28 @@ public final class ScatterAxis {
    * Refreshes item list and coordinates if the selection has changed. So far
    * only numerical data is considered for plotting. If the selected attribute
    * is of kind TEXT, it is treated as INT.
+   * @param attr attribute
    */
-  void refreshAxis() {
-    if(attr == null || attr.length == 0) return;
+  void refreshAxis(final byte[] attr) {
+    if(attr.length == 0) return;
+    isTag = !contains(attr, '@');
+    final byte[] a = delete(attr, '@');
 
     final Data data = GUI.context.data();
-    final StatsKey key = isTag ? data.tags.stat(data.tags.id(attr)) :
-      data.atts.stat(data.atts.id(attr));
+    attrID = isTag ? data.tags.id(a) : data.atts.id(a);
+
+    final StatsKey key = isTag ? data.tags.stat(attrID) :
+      data.atts.stat(attrID);
     numeric = key.kind == Kind.INT || key.kind == Kind.DBL || 
       key.kind == Kind.TEXT;
 
     if(numeric) {
-      if(key.kind == Kind.TEXT)
-        numType = TYPETEXT;
-      else
-        numType = key.kind == Kind.INT ? TYPEINT : TYPEDBL;
+      numType = key.kind;
     } else {
-      cats = key.cats.keys();
-      final String[] tmpCats = new String[cats.length];
-      for(int i = 0; i < tmpCats.length; i++) {
-        tmpCats[i] = string(cats[i]);
-      }
-      Arrays.sort(tmpCats);
-      for(int i = 0; i < tmpCats.length; i++) {
-        cats[i] = token(tmpCats[i]);
-      }
+      final TokenList tl = new TokenList();
+      for(final byte[] k : key.cats.keys()) tl.add(k);
+      tl.sort(true);
+      cats = tl.finish();
       nrCats = cats.length;
     }
 
@@ -135,47 +119,19 @@ public final class ScatterAxis {
     co = new double[items.length];
     vals = new byte[items.length][];
     for(int i = 0; i < items.length; i++) {
-      int p = items[i];
-      final int limit = p + data.size(p, Data.ELEM);
-      byte[] value = {};
-      p++;
-      while(p < limit) {
-        final int kind = data.kind(p);
-        if(kind == Data.ELEM) {
-          final byte[] currName = data.tag(p);
-          if(isTag && (eq(attr, currName))) {
-            final int attSize = data.attSize(p, kind);
-            if(numeric && numType == 2) {
-              final int tl = data.textLen(p + attSize);
-              value = tl >= TEXTLENGTH ? 
-                  substring(data.text(p + attSize), 0, TEXTLENGTH) : 
-                substring(data.text(p + attSize), 0, value.length);
-            } else
-              value = data.text(p + attSize);
-            break;
-          }
-        } else if(kind == Data.ATTR) {
-          final byte[] currName = data.attName(p);
-          if((eq(attr, currName)) && !isTag) {
-            value = data.attValue(p);
-            break;
-          }
-        }
-        p++;
+      byte[] value = getValue(items[i]);
+      if(numeric && numType == Kind.TEXT && value.length > TEXTLENGTH) {
+        value = substring(value, 0, TEXTLENGTH);
       }
       vals[i] = value;
     }
     
     if(numeric) {
-      if(numType == TYPETEXT)
-        textToNum();
+      if(numType == Kind.TEXT) textToNum();
       calcExtremeValues();
     }
     for(int i = 0; i < vals.length; i++) {
-      final byte[] val = vals[i];
-      if(val.length > 0) {
-        co[i] = calcPosition(val);
-      }
+      co[i] = calcPosition(vals[i]);
     }
     vals = null;
   }
@@ -202,6 +158,10 @@ public final class ScatterAxis {
    * @return relative x or y value of the item
    */
   double calcPosition(final byte[] value) {
+    if(value.length == 0) {
+      return -1;
+    }
+    
     double percentage = 0d;
     if(numeric) {
       final double d = toDouble(value);
@@ -229,10 +189,9 @@ public final class ScatterAxis {
    * Returns the value of an attribute for a given relative coordinate.
    * @param relative relative coordinate
    * @return item value
-   */
   String getValue(final double relative) {
     if(numeric) {
-      if(numType == TYPEDBL) {
+      if(numType == Kind.DBL) {
         double d = min + (max - min) * relative;
         return Double.toString(d);
       } else {
@@ -246,6 +205,27 @@ public final class ScatterAxis {
         return string(cats[posI]);
       return "";
     }
+  }
+   */
+  
+  /**
+   * Returns the value for the specified pre value.
+   * @param pre pre value
+   * @return item value
+   */
+  byte[] getValue(final int pre) {
+    final Data data = GUI.context.data();
+    final int limit = pre + data.size(pre, Data.ELEM);
+    for(int p = pre; p < limit; p++) {
+      final int kind = data.kind(p);
+      if(kind == Data.ELEM && isTag && attrID == data.tagID(p)) {
+        return data.atom(p);
+      }
+      if(kind == Data.ATTR && !isTag && attrID == data.attNameID(p)) {
+        return data.atom(p);
+      }
+    }
+    return EMPTY;
   }
   
   /**
@@ -316,7 +296,7 @@ public final class ScatterAxis {
       final double range = max - min;
       captionStep = calculatedCaptionStep;
       nrCaptions = (int) (range / captionStep) + 1;
-      if(nrCaptions * ScatterView.CAPTIONWHITESPACE > space) { 
+      if(nrCaptions * ScatterView.itemSize(false) * 2 > space) {
         captionStep *= 2;
         nrCaptions = (int) (range / captionStep) + 1;
       }

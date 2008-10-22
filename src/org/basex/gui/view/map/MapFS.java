@@ -274,14 +274,14 @@ final class MapFS extends MapPainter {
         rect.y += 12;
         rect.w -= 24;
         rect.h -= 24;
-        g.setColor(GUIConstants.COLORS[16]);
+        g.setColor(GUIConstants.COLORTEXT);
         BaseXLayout.drawText(g, rect, data.text(pre));
       }
     }
 
     if(!file || rect.w < (o << 1) || rect.h < (o << 1)) return false;
 
-    g.setColor(GUIConstants.COLORS[16]);
+    g.setColor(GUIConstants.COLORTEXT);
 
     rect.y += o >> 1;
     rect.h -= o >> 1;

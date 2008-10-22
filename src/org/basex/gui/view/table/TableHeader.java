@@ -130,7 +130,7 @@ final class TableHeader extends BaseXPanel {
       g.drawLine((int) ce, hh - 1, (int) ce, h - 2);
 
       // draw headers
-      g.setColor(GUIConstants.color6);
+      g.setColor(Color.black);
       g.setFont(GUIConstants.bfont);
 
       final int off = clicked ? 1 : 0;
@@ -149,7 +149,7 @@ final class TableHeader extends BaseXPanel {
       if(box != null && inputCol == n) {
         box.paint(g, (int) x, hh, (int) ce - (int) x, hh);
       } else {
-        g.setColor(GUIConstants.color6);
+        g.setColor(Color.black);
         g.setFont(GUIConstants.font);
         g.drawString(tdata.cols[n].filter, (int) x + 5, h - 7);
       }
@@ -159,7 +159,7 @@ final class TableHeader extends BaseXPanel {
     final boolean clicked =  nc == clickCol;
     BaseXLayout.drawCell(g, (int) x, w + bs, 0, hh, clicked && header);
     BaseXLayout.drawCell(g, (int) x, w + bs, hh - 1, h, clicked && !header);
-    g.setColor(GUIConstants.color6);
+    g.setColor(Color.black);
     g.setFont(GUIConstants.bfont);
 
     int o = header && clicked ? 1 : 0;

@@ -103,7 +103,6 @@ public final class InfoView extends View {
   @Override
   public void refreshLayout() {
     header.setFont(GUIConstants.lfont);
-    header.setForeground(COLORS[16]);
     timer.setFont(GUIConstants.font);
     area.setFont(GUIConstants.font);
   }
@@ -145,7 +144,6 @@ public final class InfoView extends View {
 
     final TokenBuilder tb = new TokenBuilder();
     String tm = INFONO;
-
 
     stat = il;
     strings = sl;
@@ -261,7 +259,7 @@ public final class InfoView extends View {
       g.setColor(COLORS[(i == focus ? 3 : 2) + i * 2]);
       final int p = Math.max(1, stat.list[i] * bh / m);
       g.fillRect(bx, by + bh - p, bs, p);
-      g.setColor(COLORBUTTON);
+      g.setColor(COLORS[8]);
       g.drawRect(bx, by + bh - p, bs, p - 1);
     }
   }

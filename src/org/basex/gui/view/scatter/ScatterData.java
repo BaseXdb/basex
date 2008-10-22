@@ -26,8 +26,6 @@ public final class ScatterData {
   /** Number of items displayed in plot. */
   int size;
 
-  /** A temporary list for pre values which match the given item. */
-  private IntList tmpPres;
   /** Item token selected by user. */
   private byte[] item = EMPTY;
 
@@ -90,7 +88,7 @@ public final class ScatterData {
    */
   void refreshItems() {
     final Data data = GUI.context.data();
-    tmpPres = new IntList();
+    final IntList tmpPres = new IntList();
     final int s = data.size;
     final int itmID = data.tagID(item);
     int p = 1;

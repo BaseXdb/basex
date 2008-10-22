@@ -86,7 +86,7 @@ public final class QuerySyntax extends BaseXSyntax {
     }
 
     // special characters
-    if(keys.contains(word)) return GUIConstants.COLORQUOTE;
+    if(keys.contains(word)) return GUIConstants.COLORS[16];
     // special characters
     if(funs.contains(word)) return FUNS;
 

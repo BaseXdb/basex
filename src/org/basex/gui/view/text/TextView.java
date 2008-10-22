@@ -1,7 +1,6 @@
 package org.basex.gui.view.text;
 
 import static org.basex.Text.*;
-import static org.basex.gui.GUIConstants.*;
 import java.awt.BorderLayout;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -113,7 +112,6 @@ public final class TextView extends View {
   @Override
   public void refreshLayout() {
     header.setFont(GUIConstants.lfont);
-    header.setForeground(COLORS[16]);
     area.setFont(GUIConstants.mfont);
   }
 
