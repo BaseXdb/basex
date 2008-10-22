@@ -64,7 +64,8 @@ public final class ScatterData {
     for(final byte[] k : data.skel.desc(it, true, false)) {
       final Names index = startsWith(k, '@') ? data.atts : data.tags;
       final Kind kind = index.stat(index.id(delete(k, '@'))).kind;
-      if(kind == Kind.DBL || kind == Kind.INT || kind == Kind.CAT) tl.add(k);
+      if(kind == Kind.DBL || kind == Kind.INT || kind == Kind.CAT ||
+          kind == Kind.TEXT) tl.add(k);
     }
     return tl;
   }

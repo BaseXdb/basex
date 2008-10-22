@@ -383,7 +383,7 @@ public final class ScatterView extends View implements Runnable {
     g.setFont(GUIConstants.font);
     g.setColor(GUIConstants.color1);
     final boolean numeric = axis.numeric;
-    final int nrCaptions = (!numeric && axis.nrCats == 1) ? 3 : axis.nrCaptions;
+    final int nrCaptions = axis.nrCats == 1 ? 3 : axis.nrCaptions;
     final double step = axis.captionStep;
     final double range = 1.0d / (nrCaptions - 1);
     final int type = axis.numType;
