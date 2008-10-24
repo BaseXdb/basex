@@ -264,20 +264,21 @@ public final class ScatterView extends View implements Runnable {
     // draw focused item
     if(focusedItem != -1) {
       if(!dragging) {
-        drawItem(g, scatterData.xAxis.co[focusedItem], 
-            scatterData.yAxis.co[focusedItem], true, false);
+        final double x1 = scatterData.xAxis.co[focusedItem];
+        final double y1 = scatterData.yAxis.co[focusedItem];
+        drawItem(g, x1, y1, true, false);
         // draw focused x and y value
         g.setFont(GUIConstants.font);
         final String x = string(scatterData.xAxis.getValue(focused));
         final String y = string(scatterData.yAxis.getValue(focused));
-        final String label = x + "/" + y;
+        final String label = x + " / " + y;
         final int tw = BaseXLayout.width(g, label);
         final int th = g.getFontMetrics().getHeight();
-        final int xx = Math.min(getWidth() - tw - 8, mouseX);
+        final int xx = Math.min(getWidth() - tw - 8, calcCoordinate(true, x1));
         g.setColor(GUIConstants.COLORS[10]);
-        g.fillRect(xx - 1, mouseY - th, tw + 4, th);
+        g.fillRect(xx - 1, calcCoordinate(false, y1) - th, tw + 4, th);
         g.setColor(GUIConstants.color1);
-        g.drawString(label, xx, mouseY - 4);
+        g.drawString(label, xx, calcCoordinate(false, y1) - 4);
       }
     }
     
@@ -497,28 +498,6 @@ public final class ScatterView extends View implements Runnable {
    */
   public void run() {
   }
-  
-  /**
-   * Calculates the relative value focused by the mouse pointer.
-   * @param calcX value to be calculated is x value
-   * @return focused x or y value
-  private double calcFocusedValue(final boolean calcX) {
-    final int novalue = noValueSize();
-    double relative = .0d;
-    if(calcX) {
-      final int pWidth = plotWidth - novalue;
-      final int xStart = MARGIN[1] + novalue;
-      relative = 1.0d / pWidth * (mouseX - xStart);
-    } else {
-      final int pHeight = plotHeight - novalue;
-      final int yStart = MARGIN[0];
-      relative = 1 - (1.0d / pHeight * (mouseY - yStart));
-    }
-    if(relative < 0)
-      relative = .0d;
-    return relative;
-  }
-   */
   
   /**
    * Locates the nearest item to the mouse pointer. 
