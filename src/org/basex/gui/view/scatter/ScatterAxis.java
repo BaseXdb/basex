@@ -5,6 +5,7 @@ import org.basex.data.Data;
 import org.basex.data.StatsKey;
 import org.basex.data.StatsKey.Kind;
 import org.basex.gui.GUI;
+import org.basex.util.Performance;
 import org.basex.util.TokenList;
 
 /**
@@ -142,14 +143,17 @@ public final class ScatterAxis {
    * the value of the empty ones is 0. 
    */
   private void textToNum() {
+    Performance perf = new Performance();
+    final double p = Math.pow(10, 5);
     for(int i = 0; i < vals.length; i++) {
       int v = 0;
       final int vl = vals[i].length;
       for(int j = 0; j < vl; j++) {
-        v += vals[i][j] & 0xFF;
+        v += ((vals[i][j] & 0xFF) << ((TEXTLENGTH - 1 - j) << 3)) % p;
       }
       vals[i] = token(v);
     }
+    System.out.println(perf.getTimer());
   }
   
   /**
@@ -184,29 +188,6 @@ public final class ScatterAxis {
     }
     return percentage;
   }
-  
-  /**
-   * Returns the value of an attribute for a given relative coordinate.
-   * @param relative relative coordinate
-   * @return item value
-  String getValue(final double relative) {
-    if(numeric) {
-      if(numType == Kind.DBL) {
-        double d = min + (max - min) * relative;
-        return Double.toString(d);
-      } else {
-        int i = (int) (min + (max - min) * relative);
-        return Integer.toString(i);
-      }
-    } else {
-      final double pos = relative / (1.0d / (nrCats - 1));
-      final int posI = (int) Math.floor(pos + 0.5d);
-      if(Math.abs(pos - posI) <= 0.3d)
-        return string(cats[posI]);
-      return "";
-    }
-  }
-   */
   
   /**
    * Returns the value for the specified pre value.

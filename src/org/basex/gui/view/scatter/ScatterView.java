@@ -271,7 +271,8 @@ public final class ScatterView extends View implements Runnable {
         g.setFont(GUIConstants.font);
         final String x = string(scatterData.xAxis.getValue(focused));
         final String y = string(scatterData.yAxis.getValue(focused));
-        final String label = x + " / " + y;
+        final String label = (x.length() > 15 ? x.substring(0, 15) : x) + " / " 
+            + (y.length() > 15 ? y.substring(0, 15) : y);
         final int tw = BaseXLayout.width(g, label);
         final int th = g.getFontMetrics().getHeight();
         final int xx = Math.min(getWidth() - tw - 8, calcCoordinate(true, x1));
