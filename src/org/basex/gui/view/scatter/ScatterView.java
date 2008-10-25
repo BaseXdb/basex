@@ -25,6 +25,7 @@ import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXLayout;
+import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.View;
 import org.basex.util.IntList;
 
@@ -142,6 +143,7 @@ public final class ScatterView extends View implements Runnable {
     box.add(Box.createHorizontalStrut(32));
     add(box, BorderLayout.NORTH);
     
+    popup = new BaseXPopup(this, GUIConstants.POPUP);
     tmpMarkedPos = new IntList();
     selectionBox = new ScatterBoundingBox();
     refreshLayout();
@@ -428,6 +430,16 @@ public final class ScatterView extends View implements Runnable {
 
   @Override
   protected void refreshContext(final boolean more, final boolean quick) {
+//    if(!GUIProp.showscatter) return;
+    scatterData.refreshItems(more);
+    scatterData.xAxis.refreshAxis();
+    scatterData.yAxis.refreshAxis();
+
+    focusedItem = -1;
+    tmpMarkedPos.reset();
+    
+    plotChanged = true;
+    repaint();
   }
 
   @Override
@@ -678,8 +690,7 @@ public final class ScatterView extends View implements Runnable {
     }
     
     final boolean left = SwingUtilities.isLeftMouseButton(e);
-    if(!left) {
-    } else if(e.isShiftDown()) {
+    if(e.isShiftDown() || !left) {
       final Nodes marked = GUI.context.marked();
       marked.union(il.finish());
       notifyMark(marked);

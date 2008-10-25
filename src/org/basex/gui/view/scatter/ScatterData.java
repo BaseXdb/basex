@@ -78,33 +78,47 @@ public final class ScatterData {
     final byte[] b = token(newItem);
     if(eq(b, item)) return false;
     item = b;
-    refreshItems();
+    refreshItems(false);
     return true;
   }
 
   /**
    * Refreshes item list and coordinates if the selection has changed. So far
    * only numerical data is considered for plotting.
+   * @param newContext a new context has been selected
    */
-  void refreshItems() {
+  void refreshItems(final boolean newContext) {
     final Data data = GUI.context.data();
     final IntList tmpPres = new IntList();
-    final int s = data.size;
     final int itmID = data.tagID(item);
-    int p = 1;
-    while(p < s) {
-      final int kind = data.kind(p);
-      if(kind == Data.ELEM && data.tagID(p) == itmID) {
-        if(data.tagID(p) == itmID) {
-          tmpPres.add(p);
-          p += data.size(p, kind);
+    
+    if(newContext) {
+      final int[] contextPres = GUI.context.current().nodes;
+      for(int i = 0; i < contextPres.length; i++) {
+        final int pre = contextPres[i];
+        final int kind = data.kind(pre);
+        if(kind == Data.ELEM && data.tagID(pre) == itmID)
+          tmpPres.add(pre);
+      }
+
+    } else {
+      final int s = data.size;
+      int p = 1;
+      while(p < s) {
+        final int kind = data.kind(p);
+        if(kind == Data.ELEM && data.tagID(p) == itmID) {
+          if(data.tagID(p) == itmID) {
+            tmpPres.add(p);
+            p += data.size(p, kind);
+          } else {
+            p += data.attSize(p, kind);
+          }
         } else {
-          p += data.attSize(p, kind);
+          p++;
         }
-      } else {
-        p++;
       }
     }
+      
     pres = tmpPres.finish();
     size = pres.length;
   }

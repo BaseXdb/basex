@@ -81,9 +81,16 @@ public final class ScatterAxis {
    */
   boolean setAxis(final String attribute) {
     if(attribute == null) return false;
-    final byte[] b = token(attribute);
     initialize();
-    refreshAxis(b);
+    byte[] b = token(attribute);
+    // ??
+//    if(b.length == 0) return false;
+    //
+    isTag = !contains(b, '@');
+    b = delete(b, '@');
+    final Data data = GUI.context.data();
+    attrID = isTag ? data.tags.id(b) : data.atts.id(b);
+    refreshAxis();
     return true;
   }
   
@@ -91,16 +98,9 @@ public final class ScatterAxis {
    * Refreshes item list and coordinates if the selection has changed. So far
    * only numerical data is considered for plotting. If the selected attribute
    * is of kind TEXT, it is treated as INT.
-   * @param attr attribute
    */
-  void refreshAxis(final byte[] attr) {
-    if(attr.length == 0) return;
-    isTag = !contains(attr, '@');
-    final byte[] a = delete(attr, '@');
-
+  void refreshAxis() {
     final Data data = GUI.context.data();
-    attrID = isTag ? data.tags.id(a) : data.atts.id(a);
-
     final StatsKey key = isTag ? data.tags.stat(attrID) :
       data.atts.stat(attrID);
     numeric = key.kind == Kind.INT || key.kind == Kind.DBL || 
