@@ -1,11 +1,11 @@
 package org.basex.gui.view.scatter;
 
 import static org.basex.util.Token.*;
+
 import org.basex.data.Data;
 import org.basex.data.StatsKey;
 import org.basex.data.StatsKey.Kind;
 import org.basex.gui.GUI;
-import org.basex.util.Performance;
 import org.basex.util.TokenList;
 
 /**
@@ -143,8 +143,7 @@ public final class ScatterAxis {
    * the value of the empty ones is 0. 
    */
   private void textToNum() {
-    Performance perf = new Performance();
-    final double p = Math.pow(10, 5);
+    final double p = 987331;
     for(int i = 0; i < vals.length; i++) {
       int v = 0;
       final int vl = vals[i].length;
@@ -153,7 +152,6 @@ public final class ScatterAxis {
       }
       vals[i] = token(v);
     }
-    System.out.println(perf.getTimer());
   }
   
   /**
