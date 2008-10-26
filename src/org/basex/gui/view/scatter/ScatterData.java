@@ -1,6 +1,9 @@
 package org.basex.gui.view.scatter;
 
 import static org.basex.util.Token.*;
+
+import java.util.Arrays;
+
 import org.basex.data.Data;
 import org.basex.data.StatsKey.Kind;
 import org.basex.gui.GUI;
@@ -110,6 +113,7 @@ public final class ScatterData {
       }
     }
     pres = tmpPres.finish();
+    Arrays.sort(pres);
     size = pres.length;
   }
 
@@ -118,11 +122,7 @@ public final class ScatterData {
    * @param pre pre value to be looked up
    * @return array index if found, -1 if not
    */
-  int getPrePos(final int pre) {
-    for(int i = 0; i < size; i++) {
-      if(pres[i] == pre)
-        return i;
-    }
-    return -1;
+  int findPre(final int pre) {
+    return Arrays.binarySearch(pres, pre);
   }
 }
