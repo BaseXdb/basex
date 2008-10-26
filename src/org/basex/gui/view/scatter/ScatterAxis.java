@@ -107,8 +107,10 @@ public final class ScatterAxis {
       numType = key.kind;
     } else {
       final TokenList tl = new TokenList();
+      tl.add(EMPTY);
       for(final byte[] k : key.cats.keys()) tl.add(k);
       tl.sort(true);
+      tl.add(EMPTY);
       cats = tl.finish();
       nrCats = cats.length;
     }
@@ -172,14 +174,11 @@ public final class ScatterAxis {
         percentage = 1 / range * (d - min);
      
     } else {
-      if(nrCats == 1)
-        percentage = 0.5d;
-      else
-        for(int i = 0; i < nrCats; i++) {
-          if(eq(value, cats[i])) {
-            percentage = (1.0d / (nrCats - 1)) * i;
-          }
+      for(int i = 0; i < nrCats; i++) {
+        if(eq(value, cats[i])) {
+          percentage = (1.0d / (nrCats - 1)) * i;
         }
+      }
     }
     return percentage;
   }
@@ -261,6 +260,9 @@ public final class ScatterAxis {
       c -= c % calculatedCaptionStep;
       c += calculatedCaptionStep;
     }
+    
+    System.out.println(min);
+    System.out.println(max);
   }
   
   /**
@@ -270,6 +272,11 @@ public final class ScatterAxis {
   void calcCaption(final int space) {
     if(numeric) {
       final double range = max - min;
+      if(range == 0) {
+        nrCaptions = 3;
+        captionStep = 0;
+        return;
+      }
       captionStep = calculatedCaptionStep;
       nrCaptions = (int) (range / captionStep) + 1;
       if(nrCaptions * ScatterView.itemSize(false) * 2 > space) {

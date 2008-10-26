@@ -346,7 +346,7 @@ public final class ScatterView extends View implements Runnable {
     }
     
     final boolean numeric = axis.numeric;
-    final int nrCaptions = axis.nrCats == 1 ? 3 : axis.nrCaptions;
+    final int nrCaptions = axis.nrCaptions;
     final double step = axis.captionStep;
     final double range = 1.0d / (nrCaptions - 1);
     final Kind type = axis.numType;
@@ -365,12 +365,7 @@ public final class ScatterView extends View implements Runnable {
         else
           caption = string(chopNumber(token(captionValue)));
       } else {
-        if(axis.nrCats == 1) {
-          if(i == 1)
-            caption = string(axis.cats[0]);
-        } else {
           caption = string(axis.cats[i]);
-        }
       }
       
       if(caption.length() > 10) {
@@ -694,6 +689,10 @@ public final class ScatterView extends View implements Runnable {
       final Nodes marked = GUI.context.marked();
       marked.union(il.finish());
       notifyMark(marked);
+    } else if(e.getClickCount() == 2) {
+      final Nodes marked = new Nodes(GUI.context.data());
+      marked.union(il.finish());
+      notifyContext(marked, false);
     } else {
       notifyMark(new Nodes(il.finish(), GUI.context.data()));
     }
