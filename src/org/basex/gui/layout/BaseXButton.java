@@ -35,6 +35,7 @@ public final class BaseXButton extends JButton {
    */
   public BaseXButton(final String l, final byte[] hlp, final Dialog d) {
     super(l);
+    setOpaque(false);
     BaseXLayout.addHelp(this, hlp);
     if(d == null) return;
       
@@ -61,6 +62,7 @@ public final class BaseXButton extends JButton {
    */
   public BaseXButton(final ImageIcon image, final byte[] hlp) {
     super(image);
+    setOpaque(false);
     BaseXLayout.addHelp(this, hlp);
     if(hlp != null) setToolTipText(Token.string(hlp));
   }

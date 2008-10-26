@@ -435,6 +435,8 @@ public interface Text {
   String FILEWHICH = lang("pc_filenf");
   /** Path not found. */
   String PATHWHICH = lang("pc_pathnf");
+  /** Missing database name. */
+  String DBWHICH = lang("pc_dbnf");
 
   // DATABASE COMMANDS ========================================================
 
@@ -1015,6 +1017,8 @@ public interface Text {
   String NAMESINFO =  lang("dc_names");
   /** Indexing info. */
   String INDEXINFO =  lang("dc_index");
+  /** General info. */
+  String METAINFO =  lang("dc_meta");
   /** Indexing info. */
   String FTINFO =  lang("dc_ft");
 
@@ -1041,10 +1045,6 @@ public interface Text {
   String IMPORTPROG = "Parse filesystem...";
   /** Dialog Title for Import Options. */
   String IMPORTFSTITLE = lang("dfs_title");
-  /** Import Options. */
-  String IMPORTSAVE = lang("dfs_save") + COL;
-  /** Import Options. */
-  String IMPORTDIR = lang("dfs_dir") + COL;
   /** Import Options. */
   String IMPORTALL = lang("dfs_all");
   /** Import Options. */

@@ -34,7 +34,8 @@ public final class CreateMAB extends ACreate {
     Prop.textindex = true;
     Prop.attrindex = true;
     Prop.ftindex = true;
-    return build(new MAB2Parser(file), file.dbname().replaceAll("\\..*", ""));
+    final String db = args.length > 1 ? args[1] : null;
+    return build(new MAB2Parser(file), db == null ? file.dbname() : db);
   }
   
   @Override

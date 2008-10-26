@@ -44,7 +44,7 @@ public final class DialogProgress extends Dialog implements ActionListener {
       final boolean pb, final boolean cnc, final Progress prg) {
     super(par, msg, false);
 
-    info = new BaseXLabel(" ", true);
+    info = new BaseXLabel(" ", true, true);
     set(info, BorderLayout.NORTH);
     
     if(!pb) {

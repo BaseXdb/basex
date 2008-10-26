@@ -252,12 +252,14 @@ public final class BaseXLayout {
       final int xe, final int ys, final int ye, final boolean high) {
 
     g.setColor(COLORBUTTON);
-    g.fillRect(xs, ys, xe - xs, ye - ys);
-    g.setColor(COLORBACK);
+    g.drawRect(xs, ys, xe - xs - 1, ye - ys - 1);
+    g.setColor(Color.white);
+    g.drawRect(xs + 1, ys + 1, xe - xs - 3, ye - ys - 3);
+    
     Color c1 = SystemColor.controlLtHighlight;
     Color c2 = SystemColor.controlHighlight;
-    if(high) { Color t = c1; c1 = c2; c2 = t; }
-    fill(g, c1, c2, xs + 1, ys + 1, xe - 1, ye - 1);
+    if(high) { final Color t = c1; c1 = c2; c2 = t; }
+    fill(g, c1, c2, xs + 2, ys + 2, xe - 1, ye - 1);
   }
 
   /**

@@ -76,7 +76,7 @@ public final class InfoView extends View {
     header = new BaseXLabel(INFOTIT);
     north.add(header, BorderLayout.NORTH);
     north.add(header, BorderLayout.NORTH);
-    timer = new BaseXLabel(" ", 10);
+    timer = new BaseXLabel(" ", true, false);
     north.add(timer, BorderLayout.SOUTH);
     add(north, BorderLayout.NORTH);
 

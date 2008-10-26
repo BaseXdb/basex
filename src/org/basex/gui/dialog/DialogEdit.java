@@ -60,7 +60,7 @@ public final class DialogEdit extends Dialog {
     kind = data.kind(pre);
 
     final String title = BaseX.info(EDITTEXT, EDITKIND[kind]);
-    final BaseXLabel label = new BaseXLabel(title, true);
+    final BaseXLabel label = new BaseXLabel(title, true, true);
     pp.add(label, BorderLayout.NORTH);
 
     if(kind == Data.ELEM || kind == Data.DOC) {

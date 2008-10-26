@@ -2,6 +2,7 @@ package org.basex.gui.layout;
 
 import static org.basex.Text.*;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -19,8 +20,7 @@ import java.awt.event.MouseWheelEvent;
 import javax.swing.AbstractButton;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import javax.swing.UIManager;
-import javax.swing.border.EtchedBorder;
+import javax.swing.border.MatteBorder;
 import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.gui.GUI;
@@ -106,15 +106,13 @@ public final class BaseXText extends BaseXPanel {
     setLayout(new BorderLayout(4, 0));
     scroll = new BaseXBar(this);
     rend = new BaseXTextRenderer(text, scroll);
-    //rend.setFont(GUIConstants.mfont);
 
     add(rend, BorderLayout.CENTER);
     add(scroll, BorderLayout.EAST);
 
     if(edit) {
-      setBackground(UIManager.getColor("TextPane.background"));
-      //setBorder(UIManager.getBorder("TextField.border"));
-      setBorder(new EtchedBorder());
+      setBackground(Color.white);
+      setBorder(new MatteBorder(1, 1, 1, 1, GUIConstants.COLORS[6]));
       setMode(FILL.PLAIN);
       undo = new Undo();
     } else {

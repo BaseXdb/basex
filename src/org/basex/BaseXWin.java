@@ -3,14 +3,17 @@ package org.basex;
 import static org.basex.Text.*;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
+import java.util.Enumeration;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
+import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -79,6 +82,17 @@ public final class BaseXWin {
       UIManager.setLookAndFeel(GUIProp.javalook ?
           UIManager.getCrossPlatformLookAndFeelClassName() :
           UIManager.getSystemLookAndFeelClassName());
+
+      if(GUIProp.javalook) {
+        // apply non-bold fonts in Java look & feel
+        final UIDefaults def = UIManager.getDefaults();
+        final Enumeration<?> en = def.keys();
+        while(en.hasMoreElements()) {
+          final Object k = en.nextElement();
+          final Object v = def.get(k);
+          if(v instanceof Font) def.put(k, ((Font) v).deriveFont(0));
+        }
+      }
       
       // delay tooltip disappearance
       ToolTipManager.sharedInstance().setDismissDelay(20000);
@@ -94,11 +108,13 @@ public final class BaseXWin {
       }*/
 
       /*
-      UIDefaults def = UIManager.getDefaults();
-      Enumeration<?> en = def.keys();
+      final UIDefaults def = UIManager.getDefaults();
+      final Enumeration<?> en = def.keys();
       while(en.hasMoreElements()) {
-        Object o = en.nextElement();
-        BaseX.outln(o + ": " + def.get(o));
+        final Object k = en.nextElement();
+        final Object v = def.get(k);
+        BaseX.outln("%: % (%)", k, v,
+            v != null ? v.getClass().getSimpleName() : null);
       }*/
       
     } catch(final Exception e) {

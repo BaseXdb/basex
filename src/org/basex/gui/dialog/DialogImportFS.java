@@ -1,14 +1,19 @@
 package org.basex.gui.dialog;
 
 import static org.basex.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
 import org.basex.core.Prop;
+import org.basex.core.proc.List;
+import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
@@ -20,6 +25,7 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.io.IO;
+import org.basex.util.StringList;
 
 /**
  * Dialog window for specifying the options for importing a file system.
@@ -28,10 +34,14 @@ import org.basex.io.IO;
  * @author Christian Gruen
  */
 public final class DialogImportFS  extends Dialog {
+  /** Available databases. */
+  private final StringList db = List.list();
   /** Directory path. */
   BaseXTextField path;
   /** Database name. */
   BaseXTextField dbname;
+  /** Database info. */
+  private final BaseXLabel info;
   /** Parsing complete filesystem. */
   private BaseXCheckBox all;
   /** Browse button. */
@@ -52,24 +62,26 @@ public final class DialogImportFS  extends Dialog {
   public DialogImportFS(final JFrame parent) {
     super(parent, IMPORTFSTITLE);
 
-    // create checkboxes
-    final BaseXBack pp = new BaseXBack();
-    pp.setLayout(new TableLayout(10, 1, 0, 0));
-    pp.add(new BaseXLabel(IMPORTFSTEXT, true));
+    // create panels
+    final BaseXBack p1 = new BaseXBack();
+    p1.setLayout(new TableLayout(7, 1));
+    p1.setBorder(8, 8, 8, 8);
+
+    p1.add(new BaseXLabel(IMPORTFSTEXT, false, true));
 
     BaseXBack p = new BaseXBack();
-    p.setLayout(new TableLayout(2, 3, 6, 0));
+    p.setLayout(new TableLayout(3, 2, 6, 0));
     
-    p.add(new BaseXLabel(IMPORTDIR + "   "));
     path = new BaseXTextField(GUIProp.fspath, HELPFSPATH, this);
     path.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {
-        check();
+        action(null);
       }
     });
+    BaseXLayout.setWidth(path, 240);
     p.add(path);
-    
+
     button = new BaseXButton(BUTTONBROWSE, HELPBROWSE, this);
     button.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
@@ -84,14 +96,17 @@ public final class DialogImportFS  extends Dialog {
     });
     p.add(button);
     
-    p.add(new BaseXLabel(IMPORTSAVE + "   "));
+    p.add(new BaseXLabel(CREATENAME, false, true));
+    p.add(new BaseXLabel(""));
+
     dbname = new BaseXTextField(GUIProp.importfsname, HELPFSNAME, this);
     dbname.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {
-        check();
+        action(null);
       }
     });
+    BaseXLayout.setWidth(dbname, 240);
     p.add(dbname);
 
     all = new BaseXCheckBox(IMPORTALL, HELPFSALL, GUIProp.fsall, this);
@@ -99,21 +114,28 @@ public final class DialogImportFS  extends Dialog {
     all.setBorder(new EmptyBorder(4, 4, 0, 0));
     all.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        check();
+        action(null);
       }
     });
     p.add(all);
-    pp.add(p);
+    p1.add(p);
 
-    BaseXLabel label = new BaseXLabel(IMPORTFSTEXT1, true);
-    label.setBorder(15, 0, 8, 0);
-    pp.add(label);
+    info = new BaseXLabel(" ");
+    info.setBorder(30, 0, 0, 0);
+    p1.add(info);
+
+    // create checkboxes
+    final BaseXBack p2 = new BaseXBack();
+    p2.setLayout(new TableLayout(9, 1));
+    p2.setBorder(8, 8, 8, 8);
+    
+    BaseXLabel label = new BaseXLabel(IMPORTFSTEXT1, false, true);
+    p2.add(label);
     meta = new BaseXCheckBox(IMPORTMETA, HELPMETA, Prop.fsmeta, this);
-    pp.add(meta);
+    p2.add(meta);
 
-    label = new BaseXLabel(IMPORTFSTEXT2, true);
-    label.setBorder(10, 0, 8, 0);
-    pp.add(label);
+    label = new BaseXLabel(IMPORTFSTEXT2, false, true);
+    p2.add(label);
 
     p = new BaseXBack();
     p.setLayout(new BorderLayout());
@@ -121,7 +143,7 @@ public final class DialogImportFS  extends Dialog {
     cont = new BaseXCheckBox(IMPORTCONT, HELPCONT, Prop.fscont, this);
     cont.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        check();
+        action(null);
       }
     });
     p.add(cont, BorderLayout.WEST);
@@ -136,38 +158,63 @@ public final class DialogImportFS  extends Dialog {
     maxsize.setSelectedIndex(i);
 
     p.add(maxsize, BorderLayout.EAST);
-    BaseXLayout.setWidth(p, pp.getPreferredSize().width);
-    pp.add(p);
+    BaseXLayout.setWidth(p, p2.getPreferredSize().width);
+    p2.add(p);
 
-    set(pp, BorderLayout.CENTER);
-
+    final JTabbedPane tabs = new JTabbedPane();
+    BaseXLayout.addDefaultKeys(tabs, this);
+    tabs.addTab(GENERALINFO, p1);
+    tabs.addTab(METAINFO, p2);
+    set(tabs, BorderLayout.CENTER);
+    
     // create buttons
     buttons = BaseXLayout.okCancel(this);
     set(buttons, BorderLayout.SOUTH);
-
-    check();
+    action(null);
     finish(parent);
   }
 
-  /**
-   * Checks data, disables/enables the OK button and returns validity.
-   * @return true if data is valid
-   */
-  boolean check() {
+  @Override
+  public void action(final String cmd) {
     final boolean sel = !all.isSelected();
     BaseXLayout.enable(path, sel);
     BaseXLayout.enable(button, sel);
     BaseXLayout.enable(maxsize, cont.isSelected());
 
-    final boolean valid = dbname.getText().length() != 0 &&
-      (all.isSelected() || path.getText().length() > 0);
-    BaseXLayout.enableOK(buttons, valid);
-    return valid;
+    final String nm = dbname.getText().trim();
+    ok = nm.length() != 0;
+    if(ok) GUIProp.importfsname = nm;
+    
+    boolean exists = all.isSelected();
+    if(!exists) {
+      final String p = path.getText().trim();;
+      final IO file = IO.get(p);
+      exists = p.length() != 0 && file.exists();
+      if(exists) GUIProp.fspath = path.getText();
+    }
+    ok &= exists;
+    
+    String inf = !exists ? PATHWHICH : !ok ? DBWHICH : " ";
+    ImageIcon img = null;
+    if(ok) {
+      ok = IO.valid(nm);
+      if(!ok) {
+        inf = RENAMEINVALID;
+      } else if(db.contains(nm)) {
+        inf = RENAMEOVER;
+        img = GUI.icon("warn");
+      }
+    }
+    
+    final boolean err = inf.trim().length() != 0;
+    info.setText(inf);
+    info.setIcon(err ? img != null ? img : GUI.icon("error") : null);
+    BaseXLayout.enableOK(buttons, ok);
   }
-
+  
   @Override
   public void close() {
-    if(!check()) return;
+    if(!ok) return;
 
     super.close();
     Prop.fscont = cont.isSelected();

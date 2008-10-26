@@ -66,7 +66,7 @@ public final class DialogPrefs extends Dialog {
     // create checkboxes
     final BaseXBack pp = new BaseXBack();
     pp.setLayout(new TableLayout(10, 1, 0, 0));
-    pp.add(new BaseXLabel(DATABASEPATH, true));
+    pp.add(new BaseXLabel(DATABASEPATH, true, true));
 
     BaseXBack p = new BaseXBack();
     p.setLayout(new TableLayout(1, 2, 6, 0));
@@ -86,7 +86,7 @@ public final class DialogPrefs extends Dialog {
     p.add(button);
     pp.add(p);
 
-    final BaseXLabel label = new BaseXLabel(PREFINTER, true);
+    final BaseXLabel label = new BaseXLabel(PREFINTER, true, true);
     label.setBorder(10, 0, 8, 0);
     pp.add(label);
 
@@ -109,7 +109,7 @@ public final class DialogPrefs extends Dialog {
     pp.add(names);
 
     // checkbox for simple file dialog
-    pp.add(new BaseXLabel(PREFLANG, true));
+    pp.add(new BaseXLabel(PREFLANG, true, true));
 
     p = new BaseXBack();
     p.setLayout(new TableLayout(1, 2, 12, 0));

@@ -51,7 +51,7 @@ public final class TextView extends View {
     area = new BaseXText(help, false);
     add(area, BorderLayout.CENTER);
     
-    header = new BaseXLabel(head, 10);
+    header = new BaseXLabel(head, true);
     export = GUIToolBar.newButton(GUICommands.EXPORT);
 
     final Box box = new Box(BoxLayout.X_AXIS);

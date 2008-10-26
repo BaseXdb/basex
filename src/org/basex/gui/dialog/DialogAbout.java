@@ -1,6 +1,5 @@
 package org.basex.gui.dialog;
 
-import static org.basex.gui.GUIConstants.*;
 import static org.basex.Text.*;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -38,27 +37,27 @@ public final class DialogAbout extends Dialog {
     p.setBorder(new CompoundBorder(new EtchedBorder(),
         new EmptyBorder(10, 10, 15, 22)));
 
-    BaseXLabel label = new BaseXLabel(GUI.icon(IMGLOGO));
+    BaseXLabel label = new BaseXLabel(null);
+    label.setIcon(GUI.icon("logo"));
     label.setVerticalAlignment(SwingConstants.TOP);
     p.add(label, BorderLayout.WEST);
 
     final BaseXBack pp = new BaseXBack(GUIConstants.FILL.NONE);
     pp.setLayout(new TableLayout(15, 1));
 
-    label = new BaseXLabel(Text.TITLE);
-    label.setFont(getFont().deriveFont(1));
+    label = new BaseXLabel(Text.TITLE, false, true);
     pp.add(label);
-    pp.add(label(Text.URL));
+    pp.add(new BaseXLabel(Text.URL));
     pp.add(Box.createVerticalStrut(7));
-    pp.add(label(COPYRIGHT));
-    pp.add(label(LICENSE));
+    pp.add(new BaseXLabel(COPYRIGHT));
+    pp.add(new BaseXLabel(LICENSE));
     pp.add(Box.createVerticalStrut(7));
-    pp.add(label(DEVELOPER));
+    pp.add(new BaseXLabel(DEVELOPER));
     pp.add(Box.createVerticalStrut(7));
-    pp.add(label(CONTRIBUTE1));
-    pp.add(label(CONTRIBUTE2));
+    pp.add(new BaseXLabel(CONTRIBUTE1));
+    pp.add(new BaseXLabel(CONTRIBUTE2));
     pp.add(Box.createVerticalStrut(7));
-    pp.add(label(CONTACT));
+    pp.add(new BaseXLabel(CONTACT));
     p.add(pp, BorderLayout.EAST);
     add(p, BorderLayout.NORTH);
 
@@ -67,16 +66,5 @@ public final class DialogAbout extends Dialog {
     add(p, BorderLayout.EAST);
 
     finish(parent, null);
-  }
-  
-  /**
-   * Returns a standard text label. 
-   * @param txt label text
-   * @return label
-   */
-  private BaseXLabel label(final String txt) {
-    final BaseXLabel label = new BaseXLabel(txt);
-    label.setFont(getFont().deriveFont(0));
-    return label;
   }
 }

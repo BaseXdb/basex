@@ -17,6 +17,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.net.URL;
+import java.util.HashMap;
+
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -110,7 +112,7 @@ public final class GUI extends JFrame {
   /** Current input Mode. */
   final BaseXCombo mode;
   /** Execution Button. */
-  final BaseXButton exec;
+  final BaseXButton go;
   /** Fullscreen Window. */
   private JFrame fullscr;
 
@@ -139,7 +141,7 @@ public final class GUI extends JFrame {
     setTitle(Text.TITLE);
 
     // set program icon
-    setIconImage(image(IMGICON));
+    setIconImage(image("icon"));
 
     // set window size
     final Dimension scr = Toolkit.getDefaultToolkit().getScreenSize();
@@ -179,14 +181,14 @@ public final class GUI extends JFrame {
 
     BaseXBack b = new BaseXBack();
     b.add(hits);
-    b.add(Box.createHorizontalStrut(4));
+    //b.add(Box.createHorizontalStrut(1));
 
     buttons.add(b, BorderLayout.EAST);
     if(GUIProp.showbuttons) control.add(buttons, BorderLayout.CENTER);
 
     nav = new BaseXBack();
-    nav.setLayout(new BorderLayout(6, 0));
-    nav.setBorder(2, 2, 0, 4);
+    nav.setLayout(new BorderLayout(5, 0));
+    nav.setBorder(2, 2, 0, 2);
 
     mode = new BaseXCombo(new String[] {
         BUTTONSEARCH, BUTTONXPATH, BUTTONCMD }, HELPMODE, false);
@@ -202,7 +204,7 @@ public final class GUI extends JFrame {
         input.help(s == 0 ? context.data().fs != null ? HELPSEARCHFS :
           HELPSEARCHXML : s == 1 ? HELPXPATH : HELPCMD);
 
-        exec.setEnabled(s == 2 || !GUIProp.execrt);
+        go.setEnabled(s == 2 || !GUIProp.execrt);
         GUIProp.searchmode = s;
       }
     });
@@ -216,7 +218,7 @@ public final class GUI extends JFrame {
 
     input = new GUIInput(this);
 
-    hist = new BaseXButton(icon("hist"), HELPHIST);
+    hist = new BaseXButton(icon("cmd-hist"), HELPHIST);
     hist.trim();
     hist.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
@@ -241,19 +243,19 @@ public final class GUI extends JFrame {
     });
 
     b = new BaseXBack();
-    b.setLayout(new BorderLayout());
+    b.setLayout(new BorderLayout(5, 0));
     b.add(hist, BorderLayout.WEST);
     b.add(input, BorderLayout.CENTER);
     nav.add(b, BorderLayout.CENTER);
 
-    exec = new BaseXButton(icon("go"), HELPGO);
-    exec.trim();
-    exec.addActionListener(new ActionListener() {
+    go = new BaseXButton(icon("cmd-go"), HELPGO);
+    go.trim();
+    go.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         execute();
       }
     });
-    exec.addKeyListener(new KeyAdapter() {
+    go.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
         checkKeys(e);
@@ -270,8 +272,8 @@ public final class GUI extends JFrame {
 
     b = new BaseXBack();
     b.setLayout(new TableLayout(1, 3));
-    b.add(exec);
-    b.add(Box.createHorizontalStrut(4));
+    b.add(go);
+    b.add(Box.createHorizontalStrut(1));
     b.add(filter);
     nav.add(b, BorderLayout.EAST);
 
@@ -678,7 +680,7 @@ public final class GUI extends JFrame {
     input.help(s == 0 ? data.fs != null ? HELPSEARCHFS : HELPSEARCHXML :
       s == 1 ? HELPXPATH : HELPCMD);
     mode.setEnabled(db);
-    exec.setEnabled(s == 2 || !GUIProp.execrt);
+    go.setEnabled(s == 2 || !GUIProp.execrt);
 
     if(s != t) {
       mode.setSelectedIndex(s);
@@ -727,13 +729,21 @@ public final class GUI extends JFrame {
     return new ImageIcon(image(name));
   }
 
+  /** Cached images. */
+  private static final HashMap<String, Image> IMAGES =
+    new HashMap<String, Image>();
+  
   /**
    * Returns the specified image.
    * @param name name of image
    * @return image
    */
   public static Image image(final String name) {
-    return Toolkit.getDefaultToolkit().getImage(imageURL(name));
+    Image img = IMAGES.get(name);
+    if(img != null) return img;
+    img = Toolkit.getDefaultToolkit().getImage(imageURL(name));
+    IMAGES.put(name, img);
+    return img;
   }
 
   /**

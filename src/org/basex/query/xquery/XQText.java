@@ -1,7 +1,5 @@
 package org.basex.query.xquery;
 
-import org.basex.core.Prop;
-
 /**
  * This class assembles textual information of the XQuery package.
  *
@@ -28,15 +26,6 @@ public interface XQText {
   /** XQST Error type. */ String XQST = "XQST";
   /** XQTY Error type. */ String XQTY = "XQTY";
 
-  /** Position info. */
-  String STOPPED = "Stopped at ";
-  /** Position info. */
-  String POSINFO = STOPPED + "line %, column %:" + Prop.NL;
-  /** Position info. */
-  String POSFILEINFO = STOPPED + "line %, column % in %:" + Prop.NL;
-  /** Position info. */
-  String FILE = "File not found: %" + Prop.NL;
-
   /** FOAR0001: Evaluation exception. */
   Object[] DIVZERO = { FOAR, 1, "'%' was divided by zero." };
   /** FOAR0002: Evaluation exception. */
@@ -44,8 +33,6 @@ public interface XQText {
   /** FOAR0002: Evaluation exception. */
   Object[] RANGE = { FOAR, 2, "Value out of range: %" };
 
-  /** FOCA0001: Evaluation exception. */
-  Object[] DECRANGE = { FOCA, 1, "Decimal value out of range: %" };
   /** FOCA0002: Evaluation exception. */
   Object[] INVALUE = { FOCA, 2, "Invalid value for %: %" };
   /** FOCA0003: Evaluation exception. */
@@ -83,8 +70,6 @@ public interface XQText {
   Object[] NSDECL = { FONS, 4, "Namespace prefix not declared: \"%\"." };
 
   /** FORG0001: Evaluation exception. */
-  Object[] LANINVALID = { FORG, 1, "Invalid language: \"%\"" };
-  /** FORG0001: Evaluation exception. */
   Object[] INVALIDZONE = { FORG, 1, "Invalid timezone: %." };
   /** FORG0001: Evaluation exception. */
   Object[] CASTBOOL = { FORG, 1, "Invalid boolean cast: \"%\"." };
@@ -96,17 +81,15 @@ public interface XQText {
   Object[] DATEFORMAT = { FORG, 1, "Wrong % format (Example: '%')." };
   /** FORG0001: Evaluation exception. */
   Object[] QNMINV = { FORG, 1, "Invalid QName: \"%\"" };
-  /** FORG0001: Evaluation exception. */
-  Object[] FUNPRE = { FORG, 1, "Unknown prefix: \"%\"" };
   /** FORG0002: Evaluation exception. */
   Object[] URIINV = { FORG, 2, "Invalid URI: %" };
   
   /** FORG0003: Evaluation exception. */
-  Object[] ZEROONE = { FORG, 3, "Zero or one values expected." };
+  Object[] ZEROONE = { FORG, 3, "Zero or one value expected." };
   /** FORG0004: Evaluation exception. */
   Object[] ONEMORE = { FORG, 4, "One or more values expected." };
   /** FORG0005: Evaluation exception. */
-  Object[] EXONE = { FORG, 5, "One or more values expected." };
+  Object[] EXONE = { FORG, 5, "Exactly one value expected." };
   /** FORG0006: Evaluation exception. */
   Object[] FUNCMP = { FORG, 6, "%: % expected, % found." };
   /** FORG0006: Evaluation exception. */
@@ -188,8 +171,6 @@ public interface XQText {
   Object[] NOEXPR = { XPST, 3, "Expecting expression." };
   /** XPST0003: Parsing exception. */
   Object[] WRONGCHAR = { XPST, 3, "Expecting \"%\"%." };
-  /** FTST0000: Parsing exception. */
-  Object[] FTMATCH = { XPST, 3, "Missing ftcontains option after '%'." };
   
   /** XPST0003: Parsing exception. */
   Object[] WRONGEND = { XPST, 3, "Expecting \"%\"." };
@@ -210,8 +191,6 @@ public interface XQText {
   Object[] PREDMISSING = { XPST, 3, "Expecting expression before predicate." };
   /** XPST0003: Parsing exception. */
   Object[] NOVARNAME = { XPST, 3, "Expecting variable name." };
-  /** XPST0003: Parsing exception. */
-  Object[] NONAME = { XPST, 3, "Expecting name." };
   /** XPST0003: Parsing exception. */
   Object[] TAGWRONG = { XPST, 3, "Start and end tag are different (%/%)." };
   /** XPST0003: Parsing exception. */
@@ -241,8 +220,6 @@ public interface XQText {
   Object[] TESTINCOMPLETE = { XPST, 3, "Incomplete node test." };
   /** XPST0003: Parsing exception. */
   Object[] CALCEXPR = { XPST, 3, "Calculation is incomplete." };
-  /** XPST0003: Parsing exception. */
-  Object[] FLWORSTABLE = { XPST, 3, "Stable order not implemented yet." };
   /** XPST0003: Parsing exception. */
   Object[] NORETURN = { XPST, 3, "Expecting return value." };
   /** XPST0003: Parsing exception. */
@@ -300,8 +277,6 @@ public interface XQText {
 
   /** XPST0008: Parsing exception. */
   Object[] VARNOTDEFINED = { XPST, 8, "Undefined variable \"%\"." };
-  /** XPST0008: Parsing exception. */
-  Object[] VARNOTDEF = { XPST, 8, "Undefined variable??? \"%\"." };
   /** XPST0017: Parsing Exception. */
   Object[] XPARGS = { XPST, 17, "Wrong arguments: % expected." };
   /** XPST0017: Parsing exception. */
@@ -326,8 +301,6 @@ public interface XQText {
   /** XPTY0004: Typing exception. */
   Object[] XPSEQ = { XPTY, 4, "No sequence % allowed in %." };
   /** XPTY0004: Typing exception. */
-  Object[] XPNOSEQ = { XPTY, 4, "No sequence allowed in %." };
-  /** XPTY0004: Typing exception. */
   Object[] XPINVCAST = { XPTY, 4, "Invalid cast from % to %: %." };
   /** XPTY0004: Typing exception. */
   Object[] XPCAST = { XPTY, 4, "Invalid %(%) cast." };
@@ -347,21 +320,15 @@ public interface XQText {
   /** XPTY0004: Typing exception. */
   Object[] XPTYPENUM = { XPTY, 4, "%: number expected, % found." };
   /** XPTY0004: Typing exception. */
-  Object[] XPSINGLE = { XPTY, 4, "% expects single nodes as input." };
-  /** XPTY0004: Typing exception. */
   Object[] XPINVNAME = { XPTY, 4, "Invalid name: %." };
   /** XPTY0004: Typing exception. */
   Object[] XPNAME = { XPTY, 4, "Expecting name." };
   /** XPTY0004: Typing exception. */
   Object[] XPATT = { XPTY, 4, "Can't add attributes to a document node." };
   /** XPTY0004: Typing exception. */
-  Object[] XPUNARY = { XPTY, 4, "Unary operator expects a numeric value." };
-  /** XPTY0004: Typing exception. */
   Object[] CPIWRONG = { XPTY, 4, "% not allowed as PI name: \"%\"." };
   /** XPTY0004: Typing exception. */
   Object[] NAMEWRONG = { XPTY, 4, "Invalid value for name: \"%\"." };
-  /** XPTY0004: Typing exception. */
-  Object[] NOSCORE = { XPTY, 4, "Variable % needs a scores as result." };
   
   /** Example for a Date format. */
   String XPDATE = "2000-12-31";
@@ -411,9 +378,7 @@ public interface XQText {
   Object[] INVAL = { XQDY, 74, "Invalid name: \"%\"" };
 
   /** XQST0009: Parsing exception. */
-  Object[] IMPLSCHEMA = { XQST, 9, "Schema import not supported yet." };
-  /** XQST0016: Parsing exception. */
-  Object[] IMPLMODULE = { XQST, 16, "Module import not supported yet." };
+  Object[] IMPLSCHEMA = { XQST, 9, "Schema import not supported." };
   /** XQST0022: Parsing exception. */
   Object[] NSCONS = { XQST, 22, "Constant namespace value expected." };
   /** XQST0031: Parsing exception. */
@@ -502,8 +467,6 @@ public interface XQText {
 
   // OPTIMIZATIONS
 
-  /** Compiler info. */
-  //String OPTPREEVAL = "Pre-evaluating %";
   /** Compiler info. */
   String OPTSIMPLE = "% => %";
   /** Compiler info. */

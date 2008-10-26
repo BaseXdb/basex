@@ -3,7 +3,6 @@ package org.basex.gui;
 import static org.basex.Text.*;
 import static org.basex.gui.GUIConstants.*;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
@@ -114,6 +113,7 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
+    BaseXLayout.antiAlias(g);
 
     final int ww = getWidth() - MEMW;
     final int hh = getHeight();
@@ -141,7 +141,6 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
     final int h = fm.getHeight() - 2;
     g.drawString(mem, fw, h);
 
-    g.setFont(g.getFont().deriveFont(Font.BOLD));
     fm = g.getFontMetrics();
     final int w = ww - fm.stringWidth(perf) - 10;
     g.setColor(Color.black);

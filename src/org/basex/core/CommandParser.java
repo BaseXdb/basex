@@ -135,7 +135,7 @@ public final class CommandParser extends QueryParser {
           case MAB: case MAB2:
             return new CreateMAB(path(cmd), name(null));
           case FS:
-            return new CreateFS(path(cmd), name(null));
+            return new CreateFS(path(cmd), name(cmd));
           case INDEX:
             return new CreateIndex(consume(INDEX.class, cmd));
         }

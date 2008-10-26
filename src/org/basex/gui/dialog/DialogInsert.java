@@ -51,9 +51,9 @@ public final class DialogInsert extends Dialog {
     final BaseXBack b = new BaseXBack();
     b.setLayout(new TableLayout(5, 1, 0, 8));
 
-    final BaseXLabel label = new BaseXLabel(INSERTNAME, true);
+    final BaseXLabel label = new BaseXLabel(INSERTNAME, true, true);
     label.setBorder(0, 0, 0, 0);
-    final BaseXLabel label2 = new BaseXLabel(" ", true);
+    final BaseXLabel label2 = new BaseXLabel(" ", true, true);
     label2.setBorder(0, 0, 0, 0);
     label2.setEnabled(false);
 

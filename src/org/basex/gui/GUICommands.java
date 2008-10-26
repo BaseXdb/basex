@@ -69,7 +69,7 @@ public enum GUICommands implements GUICommand {
       // open file chooser for XML creation
       final DialogCreate dialog = new DialogCreate(GUI.get());
       if(!dialog.ok()) return;
-      final String in = dialog.input();
+      final String in = dialog.path();
       final String db = dialog.dbname();
       progress(PROGCREATE, new Process[] { new CreateDB(in, db) });
     }

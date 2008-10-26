@@ -1,7 +1,6 @@
 package org.basex.gui.view.query;
 
 import static org.basex.Text.*;
-import static org.basex.gui.GUIConstants.*;
 import java.awt.BorderLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -11,11 +10,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import org.basex.core.proc.XQuery;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
-import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXText;
@@ -40,8 +39,14 @@ public final class QueryArea extends QueryPanel {
   /** Text Area. */
   BaseXText area;
   /** Scroll Pane. */
-  BaseXBack south;
-
+  Box south;
+  /** Ok icon. */
+  ImageIcon okIcon;
+  /** Error icon. */
+  ImageIcon errIcon;
+  /** Last error position. */
+  int err;
+  
   /**
    * Default constructor.
    * @param view main panel
@@ -53,13 +58,13 @@ public final class QueryArea extends QueryPanel {
     area.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {
-        if(GUIProp.execrt) {
+        final String xq = Token.string(area.getText());
+        final boolean mod = xq.trim().startsWith("module namespace ");
+        if(GUIProp.execrt && !mod) {
           query(false);
         } else {
-          final String xq = Token.string(area.getText());
-          final boolean mod = xq.trim().startsWith("module namespace ");
-          final XQParser parser = new XQParser(new XQContext());
           try {
+            final XQParser parser = new XQParser(new XQContext());
             if(mod) parser.module(xq);
             else parser.parse(xq);
             info("", true);
@@ -69,12 +74,9 @@ public final class QueryArea extends QueryPanel {
         }
       }
     });
-    south = new BaseXBack(GUIConstants.FILL.NONE);
-    south.setLayout(new BorderLayout(8, 8));
 
-    info = new BaseXLabel("");
-    info.setFont(info.getFont().deriveFont((float) 13));
-    info.setIcon(GUI.icon(IMGERROR));
+    south = new Box(BoxLayout.X_AXIS);
+    info = new BaseXLabel(" ");
     info.setName(Integer.toString(0));
     info.setCursor(GUIConstants.CURSORHAND);
     info.addMouseListener(new MouseAdapter() {
@@ -84,17 +86,18 @@ public final class QueryArea extends QueryPanel {
         area.requestFocusInWindow();
       }
     });
+    south.add(info);
     BaseXLayout.enable(info, false);
-    south.add(info, BorderLayout.CENTER);
 
     initPanel();
 
-    final Box box = new Box(BoxLayout.X_AXIS);
-    box.add(stop);
-    box.add(Box.createHorizontalStrut(4));
-    box.add(go);
-    south.add(box, BorderLayout.EAST);
+    south.add(Box.createHorizontalGlue());
+    south.add(stop);
+    south.add(Box.createHorizontalStrut(1));
+    south.add(go);
 
+    okIcon = GUI.icon("ok");
+    errIcon = GUI.icon("error");
   }
 
   @Override
@@ -136,10 +139,11 @@ public final class QueryArea extends QueryPanel {
     BaseXLayout.enable(stop, false);
     if(inf == null) return;
     
-    final String text = ok ? "" : inf.replaceAll("Stopped.*", "");
+    final String text = ok ? STATUSOK : inf.replaceAll("Stopped.*", "");
     info.setText(text);
-    info.setToolTipText(ok ? null : text);
+    info.setIcon(ok ? okIcon : errIcon);
     BaseXLayout.enable(info, !ok);
+    info.setToolTipText(ok ? null : text);
 
     err = -1;
     if(!ok) {
@@ -151,10 +155,8 @@ public final class QueryArea extends QueryPanel {
         ec = Integer.parseInt(m.group(2));
       }
 
-      int l = 1;
-      int c = 1;
       final int ll = last.length();
-      for(int i = 0; i < ll; c++, i++) {
+      for(int i = 0, l = 1, c = 1; i < ll; c++, i++) {
         if(l == el && c == ec) {
           err = i;
           break;
@@ -170,9 +172,6 @@ public final class QueryArea extends QueryPanel {
     info.setName(Integer.toString(err));
     error.delay(500);
   }
-
-  /** Last error position. */
-  int err;
 
   /** Delays the display of error information. */
   Action error = new Action() {

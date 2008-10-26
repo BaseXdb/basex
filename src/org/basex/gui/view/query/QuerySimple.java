@@ -109,11 +109,11 @@ final class QuerySimple extends QueryPanel implements ActionListener {
 
     final Box box = new Box(BoxLayout.X_AXIS);
     box.add(stop);
-    box.add(Box.createHorizontalStrut(4));
+    box.add(Box.createHorizontalStrut(1));
     box.add(go);
-    box.add(Box.createHorizontalStrut(4));
+    box.add(Box.createHorizontalStrut(1));
     box.add(filter);
-    box.add(Box.createHorizontalStrut(6));
+    box.add(Box.createHorizontalStrut(3));
     box.add(copy);
 
     p.add(box, BorderLayout.EAST);

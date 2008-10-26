@@ -37,7 +37,7 @@ abstract class QueryPanel {
    * Initializes components which are equal in all panels.
    */
   void initPanel() {
-    stop = new BaseXButton(GUI.icon("stop"), HELPSTOP);
+    stop = new BaseXButton(GUI.icon("cmd-stop"), HELPSTOP);
     stop.trim();
     stop.addKeyListener(main);
     stop.addActionListener(new ActionListener() {
@@ -48,7 +48,7 @@ abstract class QueryPanel {
     });
     BaseXLayout.enable(stop, false);
 
-    go = new BaseXButton(GUI.icon("go"), HELPGO);
+    go = new BaseXButton(GUI.icon("cmd-go"), HELPGO);
     go.trim();
     go.addKeyListener(main);
     go.addActionListener(new ActionListener() {

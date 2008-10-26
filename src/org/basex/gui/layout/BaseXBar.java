@@ -2,6 +2,8 @@ package org.basex.gui.layout;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import javax.swing.JComponent;
 import org.basex.gui.GUIConstants;
@@ -25,7 +27,7 @@ public final class BaseXBar extends BaseXPanel {
   static final int[] STEPS = { -MAXSTEP, -14, -11, -8, -6, -4, -3,
       -2, -1, -1, 0, 0, 1, 1, 2, 3, 4, 6, 8, 11, 14, MAXSTEP };
   /** Minimum size for the scrollbar slider. */
-  private static final int MINSIZE = 16;
+  private static final int MINSIZE = 20;
 
   /** Current scrolling speed. */
   int step = STEPS.length / 2;
@@ -120,7 +122,6 @@ public final class BaseXBar extends BaseXPanel {
   public void paintComponent(final Graphics g) {
     hh = getHeight();
     super.paintComponent(g);
-    
     if(!visible && hh >= height) return;
 
     // calculate bar size
@@ -138,36 +139,23 @@ public final class BaseXBar extends BaseXPanel {
     g.fillRect(0, 0, ww, hh);
 
     // draw scroll slider
-    BaseXLayout.drawCell(g, 0, ww, ww - 2 + barPos,
-        ww - 2 + barPos + barSize, false);
+    int bh = ww - 2 + barPos;
+    BaseXLayout.drawCell(g, 0, ww, bh, bh + barSize, false);
+    
+    bh += barSize >> 1;
+    g.setColor(GUIConstants.COLORDARK);
+    g.drawLine(5, bh, ww - 6, bh);
+    g.drawLine(5, bh - 2, ww - 6, bh - 2);
+    g.drawLine(5, bh + 2, ww - 6, bh + 2);
 
-    // draw scroll up button
-    int x = 0;
-    int y = 0;
-    BaseXLayout.drawCell(g, 0, ww, y, y + ww - 1, false);
-    int xx = x + SIZE / 2 - 3;
-    int yy = y + SIZE / 2 - 3;
-    if(button && up) { xx++; yy++; }
-    g.setColor(Color.black);
-    g.drawLine(xx + 2, yy    , xx + 2, yy);
-    g.drawLine(xx + 1, yy + 1, xx + 3, yy + 1);
-    g.drawLine(xx + 1, yy + 2, xx + 3, yy + 2);
-    g.drawLine(xx    , yy + 3, xx + 4, yy + 3);
-    g.drawLine(xx    , yy + 4, xx + 4, yy + 4);
+    ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+        RenderingHints.VALUE_ANTIALIAS_ON);
 
-    // draw scroll down button
-    x = 0;
-    y = Math.max(SIZE, hh - ww);
-    BaseXLayout.drawCell(g, 0, ww, y, y + ww, false);
-    xx = x + SIZE / 2 - 3;
-    yy = y + SIZE / 2 - 3;
-    if(button && down) { xx++; yy++; }
-    g.setColor(Color.black);
-    g.drawLine(xx + 2, yy + 4, xx + 2, yy + 4);
-    g.drawLine(xx + 1, yy + 3, xx + 3, yy + 3);
-    g.drawLine(xx + 1, yy + 2, xx + 3, yy + 2);
-    g.drawLine(xx    , yy + 1, xx + 4, yy + 1);
-    g.drawLine(xx    , yy    , xx + 4, yy);
+    // draw scroll buttons
+    drawButton(g, new int[][] { { 0, 6, 3 }, { 6, 6, 0 } },
+        0, button && up);
+    drawButton(g, new int[][] { { 0, 6, 3 }, { 0, 0, 6 } },
+        Math.max(SIZE, hh - ww), button && down);
 
     // paint scrollbar lines
     g.setColor(GUIConstants.COLORBUTTON);
@@ -175,6 +163,24 @@ public final class BaseXBar extends BaseXPanel {
     g.drawLine(ww - 1, 0, ww - 1, hh);
   }
 
+  /**
+   * Draws the down/up button.
+   * @param g graphics reference
+   * @param pol polygons
+   * @param y vertical start value
+   * @param focus focus flag
+   */
+  void drawButton(final Graphics g, final int[][] pol, final int y,
+      final boolean focus) {
+    BaseXLayout.drawCell(g, 0, ww, y, y + ww, false);
+    for(int i = 0; i < pol[0].length; i++) {
+      pol[0][i] += SIZE / 2 - 3;
+      pol[1][i] += y + SIZE / 2 - 3;
+    }
+    g.setColor(focus ? Color.black : GUIConstants.COLORDARK);
+    g.fillPolygon(pol[0], pol[1], 3);
+  }
+  
   @Override
   public void mousePressed(final MouseEvent e) {
     final int y = e.getY();

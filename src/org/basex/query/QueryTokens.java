@@ -2,6 +2,8 @@ package org.basex.query;
 
 import static org.basex.util.Token.*;
 
+import org.basex.core.Prop;
+
 /**
  * This class contains common tokens for the query implementations.
  *
@@ -141,6 +143,10 @@ public interface QueryTokens {
 
   /** Position info. */
   String STOPPED = "Stopped at ";
+  /** Position info. */
+  String POSINFO = STOPPED + "line %, column %:" + Prop.NL;
+  /** Position info. */
+  String POSFILEINFO = STOPPED + "line %, column % in %:" + Prop.NL;
   /** Position info. */
   String LINEINFO = "line %";
   /** Position info. */

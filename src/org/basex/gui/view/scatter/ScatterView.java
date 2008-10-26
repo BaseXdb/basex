@@ -425,7 +425,8 @@ public final class ScatterView extends View implements Runnable {
 
   @Override
   protected void refreshContext(final boolean more, final boolean quick) {
-//    if(!GUIProp.showscatter) return;
+    if(!GUIProp.showplot) return;
+    
     scatterData.refreshItems();
     scatterData.xAxis.refreshAxis();
     scatterData.yAxis.refreshAxis();

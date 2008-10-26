@@ -123,13 +123,13 @@ public final class DialogInfo extends Dialog {
     p.add(indexes[2], BorderLayout.NORTH);
 
     if(ftedit) {
-      p.add(new BaseXLabel(FTINDEXINFO, ftedit ? 8 : 0));
+      p.add(new BaseXLabel(FTINDEXINFO, ftedit, false));
       final String[] cb = { CREATEFZ, CREATESTEM, CREATEDC, CREATECS };
       final String[] desc = { FZINDEXINFO, FTSTEMINFO, FTDCINFO, FTCSINFO };
       final boolean[] val = { meta.ftfz, meta.ftst, meta.ftdc, meta.ftcs };
       for(int f = 0; f < ft.length; f++) {
         ft[f] = new BaseXCheckBox(cb[f], Token.token(desc[f]), val[f], 0, this);
-        fl[f] = new BaseXLabel(desc[f], 8);
+        fl[f] = new BaseXLabel(desc[f], true, false);
         p.add(ft[f]);
         p.add(fl[f]);
       }

@@ -76,13 +76,7 @@ public final class GUIConstants {
   public static final GUICommand[] TOOLBAR = {
     GOBACK, GOUP, GOFORWARD, ROOT, null, CREATE, OPEN, null,
       SHOWSEARCH, SHOWINFO, null, SHOWTEXT, SHOWMAP, SHOWTREE,
-      SHOWTABLE, SHOWPLOT, null,
-      SHOWHELP, INFO
-  };
-
-  /** Toolbar entries, containing the xquery button commands. */
-  public static final GUICommand[] TOOLXQ = {
-    XQOPEN, XQSAVE
+      SHOWTABLE, SHOWPLOT, null, SHOWHELP, INFO
   };
 
   // MENUBARS =================================================================
@@ -112,20 +106,9 @@ public final class GUIConstants {
 
   /** Context menu entries. */
   public static final GUICommand[] POPUP = {
-      GOBACK, null, COPY, PASTE, DELETE, INSERT, EDIT, null, COPYPATH,
-      SELECT, FILTER
+    GOBACK, FILTER, null, COPY, PASTE, DELETE, INSERT, EDIT, null,
+    COPYPATH, SELECT
   };
-
-  // IMAGES ===================================================================
-
-  /** Name of application logo. */
-  public static final String IMGICON = "icon";
-  /** Name of application logo. */
-  public static final String IMGBASEX = NAMESPACE;
-  /** Name of application logo. */
-  public static final String IMGERROR = "error";
-  /** Name of application logo. */
-  public static final String IMGLOGO = "logo";
 
   // CURSORS ==================================================================
   
@@ -152,16 +135,16 @@ public final class GUIConstants {
 
   // COLORS ===================================================================
 
-  /** Button color. */
-  public static final Color COLORTEXT = SystemColor.textText;
   /** Error color. */
   public static final Color COLORERROR = new Color(208, 0, 0);
   /** Error color. */
   public static final Color COLORMARK = new Color(255, 200, 180);
+  /** Background color. */
+  public static final Color COLORBACK = SystemColor.control;
   /** Button color. */
   public static final Color COLORBUTTON = new Color(160, 160, 160);
   /** Background color. */
-  public static final Color COLORBACK = SystemColor.control;
+  public static final Color COLORDARK = new Color(96, 96, 96);
   /** Transparent background color. */
   public static Color back;
   /** Transparent frame color. */

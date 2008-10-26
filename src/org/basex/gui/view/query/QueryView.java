@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.border.EmptyBorder;
 import org.basex.gui.GUI;
 import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
@@ -28,8 +27,6 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class QueryView extends View {
-  /** Reference to the simple query mode. */
-  private static final int SIMPLE = 1;
   /** Input mode panels. */
   private static final int NPANELS = SEARCHMODE.length;
   /** Input mode panels. */
@@ -56,16 +53,16 @@ public final class QueryView extends View {
    */
   public QueryView(final byte[] help) {
     super(help);
-    setLayout(new BorderLayout());
+    setLayout(new BorderLayout(0, 4));
     setBorder(4, 8, 8, 8);
 
     back = new BaseXBack(FILL.NONE);
     back.setLayout(new BorderLayout());
-    header = new BaseXLabel(GUIConstants.QUERYVIEW, 10);
+    header = new BaseXLabel(GUIConstants.QUERYVIEW, true);
     back.add(header, BorderLayout.NORTH);
 
     final Box box = new Box(BoxLayout.X_AXIS);
-    box.setBorder(new EmptyBorder(0, 0, 8, 0));
+    //box.setBorder(new EmptyBorder(0, 0, 0, 0));
     
     for(int i = 0; i < NPANELS; i++) {
       final int m = i;
@@ -77,19 +74,15 @@ public final class QueryView extends View {
         }
       });
       box.add(input[i]);
-      box.add(Box.createHorizontalStrut(4));
-      if(i == 0) {
-        panels[i] = new QueryArea(this);
-      } else if(i == SIMPLE) {
-        panels[i] = new QuerySimple(this);
-      }
+      box.add(Box.createHorizontalStrut(1));
+      panels[i] = i == 0 ? new QueryArea(this) : new QuerySimple(this);
     }
 
     open = GUIToolBar.newButton(GUICommands.XQOPEN);
     save = GUIToolBar.newButton(GUICommands.XQSAVE);
     box.add(Box.createHorizontalGlue());
     box.add(open);
-    box.add(Box.createHorizontalStrut(4));
+    box.add(Box.createHorizontalStrut(1));
     box.add(save);
 
     back.add(box, BorderLayout.CENTER);
@@ -166,7 +159,7 @@ public final class QueryView extends View {
    */
   public boolean info(final String info, final boolean ok) {
     if(search != null) search.info(info, ok);
-    return search != null && mode != SIMPLE;
+    return search != null && mode != 1;
   }
 
   /**

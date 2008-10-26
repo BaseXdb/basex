@@ -87,9 +87,9 @@ public abstract class Process extends AbstractProcess {
       ex.printStackTrace();
       if(ex instanceof OutOfMemoryError) {
         Performance.gc(2);
-        return error(PROCOUTMEM, (Object[]) args);
+        return error(PROCOUTMEM);
       }
-      return error(PROCERR, (Object[]) args);
+      return error(PROCERR, this, ex.toString());
     }
   }
 

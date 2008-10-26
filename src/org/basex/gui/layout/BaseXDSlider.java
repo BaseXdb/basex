@@ -274,7 +274,7 @@ public final class BaseXDSlider extends BaseXPanel {
     pol.xpoints = new int[] { r.xe + 5, r.xe + 12, r.xe + 12, r.xe + 5 };
     g.fillPolygon(pol);
 
-    g.setColor(focus ? Color.black : GUIConstants.color6);
+    g.setColor(focus ? Color.black : GUIConstants.COLORDARK);
     g.drawLine(r.xs + 11, hh - 5, r.xs + 11, hh + 4);
     g.drawLine(r.xs + 11, hh - 5, r.xs + 6, hh - 1);
     g.drawLine(r.xe + 5, hh - 5, r.xe + 5, hh + 4);
