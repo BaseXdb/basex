@@ -320,13 +320,17 @@ public final class ScatterView extends View implements Runnable {
     
     final int novalue = noValueSize();
     final int textH = g.getFontMetrics().getHeight();
+    // the painting space provided for items which lack no value
     final int pWidth = plotWidth - novalue;
     final int pHeight = plotHeight - novalue;
+    
     final ScatterAxis axis = drawX ? scatterData.xAxis : scatterData.yAxis;
+    // drawing horizontal axis line
     if(drawX) {
       g.drawLine(MARGIN[1], h - MARGIN[2], w - MARGIN[3], h - MARGIN[2]);
       if(plotChanged) axis.calcCaption(pWidth);
     } else {
+      // drawing vertical axis line
       g.drawLine(MARGIN[1], MARGIN[0], MARGIN[1], getHeight() - MARGIN[2]);
       if(plotChanged) axis.calcCaption(pHeight);
     }
@@ -350,16 +354,21 @@ public final class ScatterView extends View implements Runnable {
           caption = Integer.toString((int) captionValue);
         else
           caption = string(chopNumber(token(captionValue)));
+
+        // category data, each category is displayed as a caption 
       } else {
           caption = string(axis.cats[i]);
       }
       
+      // if assignment consists of more than 10 characters the caption string
+      // is chopped to the length 10 to avoid layout issues
       if(caption.length() > 10) {
         caption = caption.substring(0, 10);
         caption += "...";
       }
 
-      // draw rotated caption labels
+      // caption labels are rotated, for both x and y axis. first a buffered
+      // image is created which displays the rotated label ...
       final int imgW = BaseXLayout.width(g, caption) + fs;
       final int imgH = 160;
       final BufferedImage img = new BufferedImage(imgW, imgH, 
@@ -372,6 +381,8 @@ public final class ScatterView extends View implements Runnable {
       g2d.setColor(Color.black);
       g2d.drawString(caption, fs, fs);
 
+      // ... after that
+      // the image is drawn beside x / y axis
       g.setColor(GUIConstants.color1);
       if(drawX) {
         final int x = MARGIN[1] + novalue + (int) (i * range * pWidth);
@@ -395,6 +406,7 @@ public final class ScatterView extends View implements Runnable {
   private int calcCoordinate(final boolean xAxis, final double d) {
     final int novalue = noValueSize();
     if(xAxis) {
+      // items with value -1 lack a value for the specific attribute
       if(d == -1) return MARGIN[1] + novalue / 2;
       final int width = getWidth();
       final int xSpace = width - (MARGIN[1] + MARGIN[3]) - novalue;
@@ -413,6 +425,7 @@ public final class ScatterView extends View implements Runnable {
   protected void refreshContext(final boolean more, final boolean quick) {
     if(!GUIProp.showplot) return;
     
+    // all plot data is recalculated, assignments stay the same
     scatterData.refreshItems();
     scatterData.xAxis.refreshAxis();
     scatterData.yAxis.refreshAxis();
@@ -485,39 +498,49 @@ public final class ScatterView extends View implements Runnable {
   private boolean focus() {
     final int size =  itemImg.getWidth() / 2;
     int focusedPre = focused;
+    // if mouse pointer is outside of the plot the focused item is set to -1,
+    // focus may be refreshed, if necessary
     if(mouseX < MARGIN[1] || 
         mouseX > getWidth() - MARGIN[3] + size ||
         mouseY < MARGIN[0] - size || mouseY > getHeight() - MARGIN[2]) {
+      // focused item already -1, no refresh needed
       if(focusedPre == -1) {
         return false;
       }
       notifyFocus(-1, this);
       return true;
+    }
     
-    } else {
-      // find focused item
-      focusedPre = -1;
-      int dist = Integer.MAX_VALUE;
-      for(int i = 0; i < scatterData.size && dist != 0; i++) {
-        final int x = calcCoordinate(true, scatterData.xAxis.co[i]);
-        final int y = calcCoordinate(false, scatterData.yAxis.co[i]);
-        final int distX = Math.abs(mouseX - x);
-        final int distY = Math.abs(mouseY - y);
-        final int off = itemSize(false) / 2;
-        if(distX < off && distY < off) {
-          final int currDist = distX * distY;
-          if(currDist < dist) {
-            dist = currDist;
-            focusedPre = scatterData.pres[i];
-          }
+    // find focused item. 
+    focusedPre = -1;
+    int dist = Integer.MAX_VALUE;
+    // all displayed items are tested for focus
+    for(int i = 0; i < scatterData.size && dist != 0; i++) {
+      // coordinates of current tested item are calculated
+      final int x = calcCoordinate(true, scatterData.xAxis.co[i]);
+      final int y = calcCoordinate(false, scatterData.yAxis.co[i]);
+      final int distX = Math.abs(mouseX - x);
+      final int distY = Math.abs(mouseY - y);
+      final int off = itemSize(false) / 2;
+      // if x and y distances are smaller than offset value and the
+      // product of x and y distances is smaller than the actual minimal
+      // distance of any item tested so far, the current item is considered 
+      // as a focus candidate
+      if(distX < off && distY < off) {
+        final int currDist = distX * distY;
+        if(currDist < dist) {
+          dist = currDist;
+          focusedPre = scatterData.pres[i];
         }
       }
-      if(focusedPre != focused) {
-        notifyFocus(focusedPre, this);
-        return true;
-      }
-      return false;
     }
+    
+    // if the focus changed, views are refreshed
+    if(focusedPre != focused) {
+      notifyFocus(focusedPre, this);
+      return true;
+    }
+    return false;
   }
   
   /**
@@ -555,15 +578,18 @@ public final class ScatterView extends View implements Runnable {
     final int rb = w - MARGIN[3] + th;
     final int tb = MARGIN[0] - th;
     final int bb = h - MARGIN[2] + th;
+    // flag which indicates if mouse pointer is located on the plot inside.
     boolean inBox = mouseY > tb && mouseY < bb && mouseX > lb && mouseX < rb;
     if(!dragging && !inBox)
       return;
+    // first time method is called when mouse dragged
     if(!dragging) {
       dragging = true;
       selectionBox.setStart(mouseX, mouseY);
     }
     
-    // keeps selection box on the plot inside
+    // keeps selection box on the plot inside. if mouse pointer is outside box
+    // the corners of the selection box are set to the predefined values s.a. 
     if(!inBox) {
       if(mouseX < lb) {
         if(mouseY > bb) {
@@ -621,25 +647,30 @@ public final class ScatterView extends View implements Runnable {
     mouseY = e.getY();
     // no item is focused. no nodes marked after mouse click
     if(focused == -1) {
+      // a marking update is triggered with an empty node set as argument
       Nodes n = new Nodes(GUI.context.data());
       notifyMark(n);
       return;
     }
     
     // node marking if item focused. if more than one icon is in focus range
-    // all of these are marked
+    // all of these are marked. focus range means exact same x AND y coordinate.
     final int pre = scatterData.findPre(focused);
     if(pre < 0) return;
     final IntList il = new IntList();
+    // get coordinates for focused item
     final int mx = calcCoordinate(true, scatterData.xAxis.co[pre]);
     final int my = calcCoordinate(false, scatterData.yAxis.co[pre]);
     for(int i = 0; i < scatterData.size; i++) {
+      // get coordinates for current item 
       final int x = calcCoordinate(true, scatterData.xAxis.co[i]);
       final int y = calcCoordinate(false, scatterData.yAxis.co[i]);
       if(mx == x && my == y) {
         il.add(scatterData.pres[i]);
       }
     }
+    
+    // marking operation is executed depending on mouse action
     final boolean left = SwingUtilities.isLeftMouseButton(e);
     // right mouse or shift down
     if(e.isShiftDown() || !left) {
