@@ -83,9 +83,6 @@ public final class ScatterAxis {
     if(attribute == null) return false;
     initialize();
     byte[] b = token(attribute);
-    // ??
-//    if(b.length == 0) return false;
-    //
     isTag = !contains(b, '@');
     b = delete(b, '@');
     final Data data = GUI.context.data();

@@ -264,7 +264,7 @@ public final class ScatterView extends View implements Runnable {
     }
 
     // draw focused item
-    if(focusedItem != -1) {
+    if(focusedItem > -1) {
       if(!dragging) {
         final double x1 = scatterData.xAxis.co[focusedItem];
         final double y1 = scatterData.yAxis.co[focusedItem];
@@ -431,14 +431,14 @@ public final class ScatterView extends View implements Runnable {
   @Override
   protected void refreshContext(final boolean more, final boolean quick) {
 //    if(!GUIProp.showscatter) return;
-    scatterData.refreshItems(more);
+    scatterData.refreshItems();
     scatterData.xAxis.refreshAxis();
     scatterData.yAxis.refreshAxis();
 
     focusedItem = -1;
-    tmpMarkedPos.reset();
-    
     plotChanged = true;
+    tmpMarkedPos.reset();
+    markingChanged = true;
     repaint();
   }
 
