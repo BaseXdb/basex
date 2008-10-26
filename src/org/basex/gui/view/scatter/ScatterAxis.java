@@ -260,9 +260,6 @@ public final class ScatterAxis {
       c -= c % calculatedCaptionStep;
       c += calculatedCaptionStep;
     }
-    
-    System.out.println(min);
-    System.out.println(max);
   }
   
   /**
