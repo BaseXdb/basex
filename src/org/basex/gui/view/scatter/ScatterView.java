@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -189,7 +190,6 @@ public final class ScatterView extends View implements Runnable {
   
   @Override
   public void paintComponent(final Graphics g) {
-//    Performance perf = new Performance();
     final Data data = GUI.context.data();
     if(data == null) return;
 
@@ -248,16 +248,6 @@ public final class ScatterView extends View implements Runnable {
               scatterData.yAxis.co[prePos], false, true);
       }
     }
-//    Nodes marked = GUI.context.marked();
-//    Arrays.sort(marked.nodes);
-//    if(marked.size() > 0) {
-//      marked = new Nodes(Nodes.intersect(marked.nodes, scatterData.pres), 
-//          GUI.context.data());
-//      for(int i = 0; i < marked.size(); i++) {
-//        drawItem(g, scatterData.xAxis.co[i], 
-//            scatterData.yAxis.co[i], false, true);
-//      }
-//    }
 
     // draw focused item
     final int f = scatterData.findPre(focused);
@@ -295,10 +285,7 @@ public final class ScatterView extends View implements Runnable {
       g.drawRect(selW > 0 ? x1 : x1 + selW, selH > 0 ? y1 : y1 + selH, 
           Math.abs(selW), Math.abs(selH));
     }
-    
     plotChanged = false;
-    
-//    System.out.println(perf.getTimer());
   }
   
   /**
@@ -632,6 +619,7 @@ public final class ScatterView extends View implements Runnable {
     super.mousePressed(e);
     mouseX = e.getX();
     mouseY = e.getY();
+    // no item is focused. no nodes marked after mouse click
     if(focused == -1) {
       Nodes n = new Nodes(GUI.context.data());
       notifyMark(n);
@@ -640,36 +628,34 @@ public final class ScatterView extends View implements Runnable {
     
     // node marking if item focused. if more than one icon is in focus range
     // all of these are marked
-    if(focused > -1) {
-      final IntList il = new IntList();
-      final int pre = scatterData.findPre(focused);
-      final int mx = calcCoordinate(true, scatterData.xAxis.co[pre]);
-      final int my = calcCoordinate(false, scatterData.yAxis.co[pre]);
-      for(int i = 0; i < scatterData.size; i++) {
-        final int x = calcCoordinate(true, scatterData.xAxis.co[i]);
-        final int y = calcCoordinate(false, scatterData.yAxis.co[i]);
-        if(mx == x && my == y) {
-          il.add(scatterData.pres[i]);
-        }
+    final int pre = scatterData.findPre(focused);
+    if(pre < 0) return;
+    final IntList il = new IntList();
+    final int mx = calcCoordinate(true, scatterData.xAxis.co[pre]);
+    final int my = calcCoordinate(false, scatterData.yAxis.co[pre]);
+    for(int i = 0; i < scatterData.size; i++) {
+      final int x = calcCoordinate(true, scatterData.xAxis.co[i]);
+      final int y = calcCoordinate(false, scatterData.yAxis.co[i]);
+      if(mx == x && my == y) {
+        il.add(scatterData.pres[i]);
       }
-      
-      final boolean left = SwingUtilities.isLeftMouseButton(e);
-      // right mouse or shift down
-      if(e.isShiftDown() || !left) {
-        final Nodes marked = GUI.context.marked();
-        marked.union(il.finish());
-        notifyMark(marked);
-        // double click
-      } else if(e.getClickCount() == 2) {
-        final Nodes marked = new Nodes(GUI.context.data());
-        marked.union(il.finish());
-        notifyContext(marked, false);
-        // simple mouse click
-      } else {
-        final Nodes marked = new Nodes(GUI.context.data());
-        marked.union(il.finish());
-        notifyMark(marked);
-      }
+    }
+    final boolean left = SwingUtilities.isLeftMouseButton(e);
+    // right mouse or shift down
+    if(e.isShiftDown() || !left) {
+      final Nodes marked = GUI.context.marked();
+      marked.union(il.finish());
+      notifyMark(marked);
+      // double click
+    } else if(e.getClickCount() == 2) {
+      final Nodes marked = new Nodes(GUI.context.data());
+      marked.union(il.finish());
+      notifyContext(marked, false);
+      // simple mouse click
+    } else {
+      final Nodes marked = new Nodes(GUI.context.data());
+      marked.union(il.finish());
+      notifyMark(marked);
     }
   }
 }
