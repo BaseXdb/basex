@@ -48,5 +48,5 @@ public abstract class Parser {
    * Returns a value from 0 to 1, representing the current progress.
    * @return progress information
    */
-  public double percent() { return 0; }
+  public double prog() { return 0; }
 }

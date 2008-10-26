@@ -178,7 +178,7 @@ public final class FSParser extends Parser implements FSVisitor {
   }
 
   @Override
-  public double percent() {
+  public double prog() {
     return 0;
   }
   

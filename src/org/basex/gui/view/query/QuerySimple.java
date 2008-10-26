@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.Arrays;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import org.basex.core.proc.Find;
@@ -31,6 +30,7 @@ import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.index.Names;
 import org.basex.query.xpath.func.ContainsLC;
+import org.basex.util.StringList;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
@@ -384,12 +384,10 @@ final class QuerySimple extends QueryPanel implements ActionListener {
    * @return key array
    */
   String[] entries(final byte[][] key) {
-    final int tl = key.length;
-    final String[] vals = new String[tl + 1];
-    for(int t = 0; t < tl; t++) vals[t + 1] = Token.string(key[t]);
-    vals[0] = "";
-    Arrays.sort(vals);
-    vals[0] = "(" + tl + " entries)";
-    return vals;
+    final StringList sl = new StringList();
+    sl.add("(" + key.length + " entries)");
+    for(final byte[] k : key) sl.add(Token.string(k));
+    sl.sort();
+    return sl.finish();
   }
 }

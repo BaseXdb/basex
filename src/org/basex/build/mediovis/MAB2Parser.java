@@ -578,7 +578,7 @@ public final class MAB2Parser extends Parser {
   }
 
   @Override
-  public double percent() {
+  public double prog() {
     return 0;
   }
 

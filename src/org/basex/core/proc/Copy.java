@@ -50,7 +50,7 @@ public final class Copy extends AUpdate {
       trg = query(args[2], COPYTAGS);
       if(src == null || trg == null) return false;
     }
-    data.noIndex();
+    data.update();
 
     final int size = src.size;
     final Data[] srcDocs = new Data[src.size];

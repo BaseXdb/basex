@@ -42,13 +42,10 @@ public final class Optimize extends ACreate {
    */
   private boolean stats(final Data data) {
     // refresh statistics
-    final boolean txtindex = data.meta.txtindex;
-    final boolean atvindex = data.meta.atvindex;
-    final boolean ftxindex = data.meta.ftxindex;
-
-    data.noIndex();
-    data.tags.stats = true;
-    data.atts.stats = true;
+    data.meta.newindex = false;
+    data.skel.init();
+    data.tags.init();
+    data.atts.init();
 
     final int[] parStack = new int[256];
     final int[] tagStack = new int[256];
@@ -77,14 +74,7 @@ public final class Optimize extends ACreate {
         data.skel.add(0, l, kind);
       }
     }
-
     data.meta.height = h;
-    data.meta.newindex = false;
-    data.meta.txtindex = txtindex;
-    data.meta.atvindex = atvindex;
-    data.meta.ftxindex = ftxindex;
-    data.tags.stats = true;
-    data.atts.stats = true;
 
     try {
       index(data);

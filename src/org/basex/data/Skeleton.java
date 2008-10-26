@@ -27,7 +27,15 @@ public final class Skeleton {
    * Default Constructor.
    */
   public Skeleton() {
+    init();
+  }
+
+  /**
+   * Initializes the data structures.
+   */
+  public void init() {
     stack = new Node[256];
+    root = null;
   }
 
   /**
@@ -72,14 +80,6 @@ public final class Skeleton {
   public synchronized void finish(final DataOutput out) throws IOException {
     out.writeBool(root != null);
     if(root != null) root.finish(out);
-  }
-
-  /**
-   * Removes the statistics.
-   */
-  public void noStats() {
-    stack = new Node[256];
-    root = null;
   }
 
   /**

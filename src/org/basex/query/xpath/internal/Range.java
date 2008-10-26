@@ -98,8 +98,7 @@ public final class Range extends InternalExpr {
     final Step step = path.steps.last();
     final boolean text = txt && step.test == TestNode.TEXT &&
       step.preds.size() == 0 && data.meta.chop;
-    if(!text && !atv || !path.checkAxes())
-      return Integer.MAX_VALUE;
+    if(!text && !atv || !path.checkAxes()) return Integer.MAX_VALUE;
 
     ind = new RangeToken(text, min, max);
     final StatsKey key = getKey(path, data, text);
@@ -127,14 +126,14 @@ public final class Range extends InternalExpr {
     
     final int st = path.steps.size();
     if(text) {
-      if(st == 1) return null;
+      if(st == 1 || !data.tags.uptodate) return null;
       final Step step = path.steps.get(st - 2);
       if(!(step.test instanceof TestName)) return null;
       return data.tags.stat(((TestName) step.test).id);
     }
     
     final int id = path.steps.last().simpleName(Axis.ATTR, true);
-    if(id == Integer.MIN_VALUE) return null;
+    if(id == Integer.MIN_VALUE || !data.atts.uptodate) return null;
     return data.atts.stat(id);
   }
 

@@ -24,7 +24,7 @@ public final class Names extends Set {
   /** Statistic information. */
   private StatsKey[] stat;
   /** Statistics flag. */
-  public boolean stats;
+  public boolean uptodate;
 
   /**
    * Empty Constructor.
@@ -33,7 +33,7 @@ public final class Names extends Set {
     counter = new int[CAP];
     noleaf = new boolean[CAP];
     stat = new StatsKey[CAP];
-    stats = true;
+    uptodate = true;
   }
 
   /**
@@ -48,9 +48,20 @@ public final class Names extends Set {
     counter = in.readNums();
     noleaf = in.readBooleans();
     size = in.readNum();
-    stats = in.readBool();
+    uptodate = in.readBool();
     stat = new StatsKey[next.length];
     for(int s = 1; s < size; s++) stat[s] = new StatsKey(in);
+  }
+
+  /**
+   * Initializes the statistics.
+   */
+  public void init() {
+    uptodate = true;
+    for(int i = 1; i < size; i++) {
+      stat[i] = new StatsKey();
+      counter[i] = 0;
+    }
   }
 
   /**
@@ -62,7 +73,7 @@ public final class Names extends Set {
   public int index(final byte[] k, final byte[] v) {
     final int i = Math.abs(add(k));
     if(stat[i] == null) stat[i] = new StatsKey();
-    if(stats) {
+    if(uptodate) {
       counter[i]++;
       stat[i].add(v);
     }
@@ -90,7 +101,7 @@ public final class Names extends Set {
     out.writeNums(counter);
     out.writeBooleans(noleaf);
     out.writeNum(size);
-    out.writeBool(stats);
+    out.writeBool(uptodate);
     for(int s = 1; s < size; s++) stat[s].finish(out);
   }
 
@@ -110,17 +121,6 @@ public final class Names extends Set {
    */
   public void noleaf(final int id, final boolean l) {
     noleaf[id] = l;
-  }
-
-  /**
-   * Removes the statistics.
-   */
-  public void noStats() {
-    stats = false;
-    for(int i = 1; i < size; i++) {
-      stat[i] = new StatsKey();
-      counter[i] = 0;
-    }
   }
 
   /**

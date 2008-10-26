@@ -1,9 +1,7 @@
 package org.basex.gui.view.scatter;
 
 import static org.basex.util.Token.*;
-
 import java.util.Arrays;
-
 import org.basex.data.Data;
 import org.basex.data.StatsKey.Kind;
 import org.basex.gui.GUI;

@@ -116,8 +116,7 @@ public final class TableView extends View implements Runnable {
   
   @Override
   public void refreshUpdate() {
-    refreshInit();
-    repaint();
+    refreshContext(false, true);
   }
 
   @Override

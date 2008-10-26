@@ -98,9 +98,10 @@ public final class MetaData {
   }
 
   /**
+   * Notifies the meta structures of an update.
    * Deletes/resets the indexes.
    */
-  public void noIndex() {
+  public void update() {
     txtindex = false;
     atvindex = false;
     ftxindex = false;
@@ -144,7 +145,7 @@ public final class MetaData {
     }
 
     if(!storage.equals(STORAGE)) throw new BuildException(DBUPDATE, storage);
-    if(!istorage.equals(ISTORAGE)) noIndex();
+    if(!istorage.equals(ISTORAGE)) update();
     return size;
   }
 

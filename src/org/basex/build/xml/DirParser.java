@@ -76,7 +76,7 @@ public final class DirParser extends Parser {
   }
 
   @Override
-  public double percent() {
-    return parser != null ? parser.percent() : 0;
+  public double prog() {
+    return parser != null ? parser.prog() : 0;
   }
 }

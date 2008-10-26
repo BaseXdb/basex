@@ -2,7 +2,6 @@ package org.basex.gui.view.scatter;
 
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -13,13 +12,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
-
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.StatsKey.Kind;
@@ -197,15 +194,14 @@ public final class ScatterView extends View implements Runnable {
     
     final int w = getWidth();
     final int h = getHeight();
-    final boolean nostats = !data.tags.stats;
+    //final boolean nostats = !data.tags.uptodate;
 
     final int novalue = noValueSize();
     final int minSize = novalue * 8;
-    if(nostats || w < minSize || h < minSize) {
-      final String s = nostats ? DBNOSTATS : NOSPACE;
+    if(w < minSize || h < minSize) {
       g.setFont(GUIConstants.font);
       g.setColor(Color.black);
-      BaseXLayout.drawCenter(g, s, getWidth(), h / 2);
+      BaseXLayout.drawCenter(g, NOSPACE, getWidth(), h / 2);
       return;
     }
     
@@ -481,7 +477,7 @@ public final class ScatterView extends View implements Runnable {
 
   @Override
   protected void refreshUpdate() {
-    refreshInit();
+    refreshContext(false, true);
   }
 
   /**

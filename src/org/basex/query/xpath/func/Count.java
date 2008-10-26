@@ -46,13 +46,15 @@ public final class Count extends Func {
     // pre-evaluate absolute location paths
     if(args[0] instanceof LocPathAbs) {
       // check if statistics are available
-      if(!ctx.item.data.tags.stats) return this;
+      if(!ctx.item.data.tags.uptodate) return this;
       
       final LocPathAbs path = (LocPathAbs) args[0];
       final Steps steps = path.steps;
       if(steps.size() > 2) return this;
       
       final Names tags = ctx.item.data.tags;
+      if(!tags.uptodate) return this;
+      
       int num = 0;
       if(steps.size() == 1) {
         // return number of descendant tags

@@ -60,6 +60,7 @@ public final class XPOptimizer {
         step.axis == Axis.CHILD) &&
         step.test instanceof TestName &&
         ((TestName) step.test).id != TestName.ALL &&
+        ctx.item.data.tags.uptodate &&
         !ctx.item.data.tags.noLeaf(((TestName) step.test).id)) {
       path.steps.add(Axis.create(Axis.CHILD, TestNode.TEXT));
       ctx.compInfo(OPTTEXT);

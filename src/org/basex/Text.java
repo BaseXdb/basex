@@ -444,8 +444,6 @@ public interface Text {
   String DBNOTFOUND = lang("db_no");
   /** Database is open. */
   String DBINMEM = lang("db_open");
-  /** Help String. */
-  String DBNOSTATS = lang("db_nostats");
   /** Database closed. */
   String DBCLOSED = lang("db_closed");
   /** Database not closed. */
@@ -642,9 +640,9 @@ public interface Text {
   String INFOXMLOUTPUT = lang("info_xmloutput");
   /** Info on Main Memory mode. */
   String INFOMAINMEM = lang("info_mainmem");
-  /** Info on Text Indexing. */
+  /** Info on Tag Index. */
   String INFOTAGINDEX = lang("info_tagindex");
-  /** Info on Text Indexing. */
+  /** Info on Attribut value Index. */
   String INFOATNINDEX = lang("info_atnindex");
   /** Info on Text Indexing. */
   String INFOTEXTINDEX = lang("info_txtindex");
@@ -654,6 +652,8 @@ public interface Text {
   String INFOFTINDEX = lang("info_ftindex");
   /** Info on Fuzzy Indexing. */
   String INFOFZINDEX = lang("info_fzindex");
+  /** Info on Index. */
+  String INFOOUTOFDATED = lang("info_outofdated");
 
   /** Info on Document Creation. */
   String INFODB = lang("info_db");

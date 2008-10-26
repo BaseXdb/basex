@@ -40,7 +40,7 @@ public final class Delete extends Process {
     if(nodes.size == 0) return true;
     
     // reset indexes
-    data.noIndex();
+    data.update();
 
     // delete all nodes backwards to preserve pre values of earlier nodes
     final int size = nodes.size;

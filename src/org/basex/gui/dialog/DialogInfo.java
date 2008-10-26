@@ -20,6 +20,7 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.TableLayout;
 import org.basex.index.IndexToken;
+import org.basex.index.IndexToken.TYPE;
 import org.basex.util.Token;
 
 /**
@@ -47,11 +48,11 @@ public final class DialogInfo extends Dialog {
   public DialogInfo(final GUI gui) {
     super(gui, INFOTITLE);
     
-    // create checkboxes
-    final BaseXBack p1 = new BaseXBack();
-    p1.setBorder(new CompoundBorder(new EtchedBorder(),
+    // first tab
+    final BaseXBack tab1 = new BaseXBack();
+    tab1.setBorder(new CompoundBorder(new EtchedBorder(),
         new EmptyBorder(8, 8, 8, 8)));
-    p1.setLayout(new BorderLayout());
+    tab1.setLayout(new BorderLayout());
 
     final Data data = GUI.context.data();
     final MetaData meta = data.meta;
@@ -59,36 +60,25 @@ public final class DialogInfo extends Dialog {
     final BaseXLabel doc = new BaseXLabel(meta.dbname);
     doc.setFont(new Font(GUIProp.font, 0, 18));
     doc.setBorder(0, 0, 5, 0);
-    p1.add(doc, BorderLayout.NORTH);
+    tab1.add(doc, BorderLayout.NORTH);
 
     final BaseXText text = text(InfoDB.db(meta, data.size, false, false));
     BaseXLayout.setHeight(text, 220);
-    p1.add(text, BorderLayout.CENTER);
+    tab1.add(text, BorderLayout.CENTER);
 
-    final BaseXBack p2 = new BaseXBack();
-    p2.setLayout(new GridLayout(2, 1));
-    p2.setBorder(8, 8, 0, 8);
+    // second tab
+    final BaseXBack tab2 = new BaseXBack();
+    tab2.setLayout(new GridLayout(2, 1, 0, 8));
+    tab2.setBorder(8, 8, 0, 8);
+    tab2.add(addIndex(true, data));
+    tab2.add(addIndex(false, data));
+
+    // third tab
+    final BaseXBack tab3 = new BaseXBack();
+    tab3.setLayout(new GridLayout(2, 1));
+    tab3.setBorder(8, 8, 0, 8);
 
     BaseXBack p = new BaseXBack();
-    p.setLayout(new BorderLayout());
-    p.add(new BaseXLabel(INFOTAGINDEX), BorderLayout.NORTH);
-    p.add(text(data.info(IndexToken.TYPE.TAG)), BorderLayout.CENTER);
-    p2.add(p);
-
-    p = new BaseXBack();
-    p.setLayout(new BorderLayout());
-
-    final BaseXLabel label = new BaseXLabel(INFOATNINDEX); 
-    label.setBorder(8, 0, 0, 0);
-    p.add(label, BorderLayout.NORTH);
-    p.add(text(data.info(IndexToken.TYPE.ATN)), BorderLayout.CENTER);
-    p2.add(p);
-
-    final BaseXBack p3 = new BaseXBack();
-    p3.setLayout(new GridLayout(2, 1));
-    p3.setBorder(8, 8, 0, 8);
-
-    p = new BaseXBack();
     p.setLayout(new BorderLayout());
 
     indexes[0] = new BaseXCheckBox(INFOTEXTINDEX, Token.token(TXTINDEXINFO),
@@ -97,7 +87,7 @@ public final class DialogInfo extends Dialog {
 
     p.add(text(meta.txtindex ? data.info(IndexToken.TYPE.TXT) :
       Token.token(TXTINDEXINFO)), BorderLayout.CENTER);
-    p3.add(p);
+    tab3.add(p);
 
     p = new BaseXBack();
     p.setLayout(new BorderLayout());
@@ -108,11 +98,12 @@ public final class DialogInfo extends Dialog {
     
     p.add(text(meta.atvindex ? data.info(IndexToken.TYPE.ATV) :
       Token.token(ATTINDEXINFO)), BorderLayout.CENTER);
-    p3.add(p);
+    tab3.add(p);
 
-    final BaseXBack p4 = new BaseXBack();
-    p4.setLayout(new GridLayout(1, 1));
-    p4.setBorder(8, 8, 8, 8);
+    // fourth tab
+    final BaseXBack tab4 = new BaseXBack();
+    tab4.setLayout(new GridLayout(1, 1));
+    tab4.setBorder(8, 8, 8, 8);
 
     ftedit = !meta.ftxindex;
     indexes[2] = new BaseXCheckBox(INFOFTINDEX, Token.token(FTINDEXINFO),
@@ -136,14 +127,14 @@ public final class DialogInfo extends Dialog {
     } else {
       p.add(text(data.info(IndexToken.TYPE.FTX)), BorderLayout.CENTER);
     }
-    p4.add(p);
+    tab4.add(p);
     
     final JTabbedPane tabs = new JTabbedPane();
     BaseXLayout.addDefaultKeys(tabs, this);
-    tabs.addTab(GENERALINFO, p1);
-    tabs.addTab(NAMESINFO, p2);
-    tabs.addTab(INDEXINFO, p3);
-    tabs.addTab(FTINFO, p4);
+    tabs.addTab(GENERALINFO, tab1);
+    tabs.addTab(NAMESINFO, tab2);
+    tabs.addTab(INDEXINFO, tab3);
+    tabs.addTab(FTINFO, tab4);
 
     set(tabs, BorderLayout.CENTER);
 
@@ -155,6 +146,23 @@ public final class DialogInfo extends Dialog {
     setResizable(true);
     setMinimumSize(getPreferredSize());
     finish(gui);
+  }
+
+  /**
+   * Adds an index panel.
+   * @param tag tag/attribute flag 
+   * @param data data reference
+   * @return panel
+   */
+  private BaseXBack addIndex(final boolean tag, final Data data) {
+    final BaseXBack p = new BaseXBack();
+    p.setLayout(new BorderLayout());
+    String lbl = tag ? INFOTAGINDEX : INFOATNINDEX;
+    if(!data.tags.uptodate) lbl += " (" + INFOOUTOFDATED + ")";
+    p.add(new BaseXLabel(lbl, false, true), BorderLayout.NORTH);
+    final TYPE index = tag ? IndexToken.TYPE.TAG : IndexToken.TYPE.ATN;
+    p.add(text(data.info(index)), BorderLayout.CENTER);
+    return p;
   }
   
   /**

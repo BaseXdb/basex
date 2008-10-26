@@ -99,9 +99,7 @@ final class TableHeader extends BaseXPanel {
     g.setFont(GUIConstants.font);
     g.setColor(Color.black);
     if(tdata.rows == null) {
-      final boolean nostats = !GUI.context.data().tags.stats;
-      final String s = nostats ? DBNOSTATS : NOTABLE;
-      BaseXLayout.drawCenter(g, s, getWidth(), getHeight() / 2);
+      BaseXLayout.drawCenter(g, NOTABLE, getWidth(), getHeight() / 2);
       return;
     }
 

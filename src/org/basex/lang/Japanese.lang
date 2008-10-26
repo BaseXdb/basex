@@ -319,7 +319,6 @@ pc_pos=% (%行、%列)
 # Database commands
 db_no=データベース '%' が見付かりませんでした。
 db_open=データベースを開きました。
-db_nostats=No Database Statistics available.
 db_closed=データベースを閉じました。
 db_closeerr=データベースを閉じる事が出来ませんでした。
 db_optimized=データベース % 最適化されました。（？）
@@ -437,6 +436,7 @@ info_txtindex=テキストインデックス
 info_atvindex=属性インデックス
 info_ftindex=全文インデックス
 info_fzindex=曖昧
+info_outofdated=out-of-dated
 info_db=データベース情報
 info_create=Database Creation
 #info_create=文書作成

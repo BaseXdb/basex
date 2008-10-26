@@ -82,7 +82,8 @@ final class FNAggr extends Fun {
         if(ctx.item.type != Type.DOC) return this;
         if(!(ctx.item instanceof DNode)) return this;
         final Data data = ((DNode) ctx.item).data;
-        if(!data.tags.stats) return this;
+        if(!data.tags.uptodate) return this;
+        
         //if(!(ctx.item instanceof DNode)) return this;
         final byte[] nm = ((NameTest) s.test).ln;
         final int id = data.tagID(nm);

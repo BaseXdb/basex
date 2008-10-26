@@ -171,7 +171,7 @@ public final class XMLParser extends Parser {
   }
 
   @Override
-  public double percent() {
+  public double prog() {
     return scanner.percent();
   }
 }

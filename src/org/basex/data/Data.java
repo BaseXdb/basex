@@ -414,12 +414,11 @@ public abstract class Data  {
   public abstract void insert(int pre, int par, Data d);
   
   /**
-   * Resets indexes and statistics.
+   * Notifies meta structures of an update.
    */
-  public final void noIndex() {
-    meta.noIndex();
-    tags.noStats();
-    atts.noStats();
-    skel.noStats();
+  public final void update() {
+    meta.update();
+    tags.uptodate = false;
+    atts.uptodate = false;
   }
 }

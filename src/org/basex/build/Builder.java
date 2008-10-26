@@ -389,6 +389,6 @@ public abstract class Builder extends Progress {
 
   @Override
   public final double prog() {
-    return parser.percent();
+    return parser.prog();
   }
 }

@@ -121,7 +121,7 @@ public final class DialogImportFS  extends Dialog {
     p1.add(p);
 
     info = new BaseXLabel(" ");
-    info.setBorder(30, 0, 0, 0);
+    info.setBorder(20, 0, 10, 0);
     p1.add(info);
 
     // create checkboxes

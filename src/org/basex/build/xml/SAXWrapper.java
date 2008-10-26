@@ -82,7 +82,7 @@ public final class SAXWrapper extends Parser {
   }
 
   @Override
-  public double percent() {
-    return (sax != null ? sax.nodes : 0 / 1000000d) % 1;
+  public double prog() {
+    return sax == null ? 0 : sax.nodes / 1000000d % 1;
   }
 }

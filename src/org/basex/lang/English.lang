@@ -317,7 +317,6 @@ pc_pos="%" (Line %, Col %)
 # Database commands
 db_no=Database '%' was not found.
 db_open=Database is open.
-db_nostats=No Database Statistics available.
 db_closed=Database was closed.
 db_closeerr=Database could not be closed.
 db_optimized=Database optimized in %.
@@ -432,6 +431,7 @@ info_txtindex=Text Index
 info_atvindex=Attribute Index
 info_ftindex=Fulltext Index
 info_fzindex=fuzzy
+info_outofdated=out-of-dated
 info_db=Database Information
 info_create=Database Creation
 info_general=General Information
