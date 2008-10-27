@@ -119,7 +119,7 @@ public final class FTTrie extends Index {
     tb.add("- %: %\n", CREATECS, BaseX.flag(data.meta.ftcs));
     tb.add("- %: %\n", CREATEDC, BaseX.flag(data.meta.ftdc));
     final long l = inN.length() + inD.length() + inS.length();
-    tb.add(SIZEDISK + Performance.formatSize(l, true) + NL);
+    tb.add(SIZEDISK + Performance.format(l, true) + NL);
     final IntList sizes = new IntList();
     final TokenList toks = new TokenList();
     getTokenSizes(0, sizes, toks, new byte[]{});

@@ -101,18 +101,8 @@ public final class BaseXDSlider extends BaseXPanel {
    * @param size value to be formatted
    * @return formatted size value
    */
-  public String kb(final double size) {
-    if(kb) {
-      final long sz = (long) size;
-      if(sz > (1L << 30)) return ((sz + (1L << 29)) >> 30) + " GB";
-      if(sz > (1L << 20)) return ((sz + (1L << 19)) >> 20) + " MB";
-      if(sz > (1L << 10)) return ((sz + (1L <<  9)) >> 10) + " KB";
-      return sz + " Bytes";
-    }
-    if(date) return BaseXLayout.date((long) size);
-
-    return (long) size == size ? Long.toString((long) size) :
-      Double.toString(size);
+  public String value(final double size) {
+    return BaseXLayout.value(size, kb, date);
   }
 
   @Override
@@ -163,7 +153,7 @@ public final class BaseXDSlider extends BaseXPanel {
   private void setToolTip() {
     final double mn = (long) (min * 100) / 100.0;
     final double mx = (long) (max * 100) / 100.0;
-    setToolTipText(kb(mn) + " - " + kb(mx));
+    setToolTipText(value(mn) + " - " + value(mx));
   }
 
   @Override
@@ -288,7 +278,7 @@ public final class BaseXDSlider extends BaseXPanel {
     g.setColor(Color.black);
     final double mn = (long) (min * 100) / 100.0;
     final double mx = (long) (max * 100) / 100.0;
-    g.drawString(kb(mn) + " - " + kb(mx), w + 15,
+    g.drawString(value(mn) + " - " + value(mx), w + 15,
         h - (h - getFont().getSize()) / 2);
   }
 

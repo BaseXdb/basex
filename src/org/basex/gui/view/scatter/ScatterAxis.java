@@ -20,9 +20,9 @@ public final class ScatterAxis {
   /** Scatter data reference. */
   private final ScatterData scatterData;
   /** Tag reference to selected attribute. */
-  private int attrID;
+  int attrID;
   /** True if attribute is a tag, false if attribute. */
-  private boolean isTag;
+  boolean isTag;
   /** True if attribute is numerical. */
   boolean numeric;
   /** Number of different categories for x attribute. */

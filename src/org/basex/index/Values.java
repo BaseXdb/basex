@@ -54,7 +54,7 @@ public final class Values extends Index {
     tb.add(TXTINDEX + NL);
     tb.add(IDXENTRIES + size + NL);
     final long l = idxl.length() + idxr.length();
-    tb.add(SIZEDISK + Performance.formatSize(l, true) + NL);
+    tb.add(SIZEDISK + Performance.format(l, true) + NL);
     return tb.finish();
   }
 

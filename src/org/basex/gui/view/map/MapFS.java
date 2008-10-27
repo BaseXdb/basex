@@ -225,7 +225,7 @@ final class MapFS extends MapPainter {
         BaseXLayout.drawText(g, rect, text);
         if(h == GUIProp.fontsize && img != null) {
           final long size = toLong(fs.size(pre));
-          final byte[] info = token(Performance.formatSize(size, false));
+          final byte[] info = token(Performance.format(size, false));
           w = BaseXLayout.width(g, info);
           if(BaseXLayout.width(g, text) < rect.w - w - 10) {
             final int ox = rect.x;
@@ -257,7 +257,7 @@ final class MapFS extends MapPainter {
 
         final long size = toLong(fs.size(pre));
         final String info = GUIFS.desc(text, dir) + ", " +
-          Performance.formatSize(size, true);
+          Performance.format(size, true);
 
         rect.w -= 10;
         final int sw = BaseXLayout.width(g, info);

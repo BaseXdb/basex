@@ -254,26 +254,8 @@ public final class ScatterView extends View implements Runnable {
         // draw focused x and y value
         g.setFont(GUIConstants.font);
         // strings are formatted if deepfs
-        String x = "";
-        byte[] tVal = scatterData.xAxis.getValue(focused);
-        Kind numType = scatterData.xAxis.numType;
-        if(tVal.length > 0)
-          x = !(numType == Kind.TEXT) ? 
-              formatString(toDouble(scatterData.xAxis.getValue(focused)), 
-                  true) : string(scatterData.xAxis.getValue(focused));
-        if(!scatterData.xAxis.numeric)
-          x = string(tVal);
-        
-        String y = "";
-        tVal = scatterData.yAxis.getValue(focused);
-        numType = scatterData.yAxis.numType;
-        if(tVal.length > 0)
-          y = !(numType == Kind.TEXT) ? 
-              formatString(toDouble(scatterData.yAxis.getValue(focused)), 
-                  false) : string(scatterData.yAxis.getValue(focused));
-        if(!scatterData.yAxis.numeric)
-        y = string(tVal);
-        
+        final String x = formatAxis(true);
+        final String y = formatAxis(false);
         final String label = (x.length() > 16 ? x.substring(0, 16) : x) + " / " 
             + (y.length() > 15 ? y.substring(0, 15) : y);
         final int tw = BaseXLayout.width(g, label);
@@ -571,41 +553,28 @@ public final class ScatterView extends View implements Runnable {
   }
   
   /**
-   * Formats a number according to the binary size orders (KB, MB, ...).
-   * @param size value to be formatted
-   * @param deepFSType value converted to a readable file size representation
-   * @return formatted size value
+   * Formats an axis caption.
+   * @param drawX x/y axis flag
+   * @return formatted string
    */
-  public String deepFsFormat(final double size, final int deepFSType) {
-    if(deepFSType == 0) {
-      final long sz = (long) size;
-      if(sz > (1L << 30)) return ((sz + (1L << 29)) >> 30) + " GB";
-      if(sz > (1L << 20)) return ((sz + (1L << 19)) >> 20) + " MB";
-      if(sz > (1L << 10)) return ((sz + (1L <<  9)) >> 10) + " KB";
-      return sz + " Bytes";
-    }
-    if(deepFSType == 1) return BaseXLayout.date((long) size);
-    if(deepFSType == 2);
-    return (long) size == size ? Long.toString((long) size) :
-      Double.toString(size);
+  private String formatAxis(final boolean drawX) {
+    final ScatterAxis axis = drawX ? scatterData.xAxis : scatterData.yAxis;
+    final byte[] val = axis.getValue(focused);
+    if(val.length == 0) return "";
+    return scatterData.xAxis.numType == Kind.TEXT ? string(val) :
+      formatString(toDouble(val), drawX);
   }
   
   /**
    * Formats a string.
-   * @param value
-   * @param xAxis formatted string is x axis value
+   * @param value double value
+   * @param drawX formatted string is x axis value
    * @return formatted string
    */
-  private String formatString(final double value, final boolean xAxis) {
-    final String selAttr = xAxis ? (String) xCombo.getSelectedItem() : 
-      (String) yCombo.getSelectedItem();
-    if(GUI.context.data().fs != null) {
-      if(selAttr.equals("@mtime")) 
-        return deepFsFormat(value, 1);
-      if(selAttr.equals("@size")) 
-        return deepFsFormat(value, 0);
-    }
-    return string(chopNumber(token(value)));
+  private String formatString(final double value, final boolean drawX) {
+    final String attr = (String) (drawX ? xCombo : yCombo).getSelectedItem();
+    return BaseXLayout.value(value, attr.equals("@size"),
+        attr.equals("@mtime"));
   }
   
   @Override

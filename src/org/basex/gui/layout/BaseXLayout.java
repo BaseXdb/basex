@@ -22,13 +22,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.AbstractButton;
 import javax.swing.JComponent;
-
 import org.basex.BaseX;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.dialog.Dialog;
 import org.basex.gui.view.View;
 import org.basex.gui.view.map.MapRect;
+import org.basex.util.Performance;
 
 /**
  * This class assembles layout and paint methods which are frequently
@@ -189,12 +189,18 @@ public final class BaseXLayout {
   }
 
   /**
-   * Converts the specified long value into a date representation.
-   * @param time time value
-   * @return date as string
+   * Returns the value of the specified pre value and attribute.
+   * @param val value to be evaluated
+   * @param size size flag
+   * @param date date flag
+   * @return value as string
    */
-  public static String date(final long time) {
-    return DATE.format(new Date(time * 60000));
+  public static String value(final double val, final boolean size,
+      final boolean date) {
+
+    if(size) return Performance.format((long) val, true);
+    if(date) return DATE.format(new Date((long) val * 60000));
+    return string(chopNumber(token(val)));
   }
 
   /**

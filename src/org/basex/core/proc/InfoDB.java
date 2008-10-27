@@ -63,7 +63,7 @@ public final class InfoDB extends AInfo {
       tb.add(INFODB + NL);
       format(tb, INFODBNAME, meta.dbname, header, l);
     }
-    format(tb, INFODBSIZE, Performance.formatSize(len), header, l);
+    format(tb, INFODBSIZE, Performance.format(len), header, l);
     format(tb, INFOENCODING, meta.encoding, header, l);
     format(tb, INFONODES, Integer.toString(size), header, l);
     format(tb, INFOHEIGHT, Integer.toString(meta.height), header, l);
@@ -71,7 +71,7 @@ public final class InfoDB extends AInfo {
     tb.add(NL + INFOCREATE + NL);
     format(tb, INFODOC, meta.file.path(), header, l);
     format(tb, INFOTIME, DATE.format(new Date(meta.time)), header, l);
-    format(tb, INFODOCSIZE, Performance.formatSize(meta.filesize), header, l);
+    format(tb, INFODOCSIZE, Performance.format(meta.filesize), header, l);
     format(tb, INFONDOCS, Integer.toString(meta.ndocs), header, l);
     //format(tb, INFOCHOP, BaseX.flag(meta.chop), true, 0);
     //format(tb, INFOENTITIES, BaseX.flag(meta.entity), true, 0);

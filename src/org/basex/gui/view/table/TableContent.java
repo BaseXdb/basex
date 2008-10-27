@@ -6,7 +6,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import org.basex.core.Context;
 import org.basex.data.Data;
-import org.basex.data.DataText;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIFS;
@@ -120,11 +119,19 @@ public final class TableContent extends BaseXBack {
         // add content to column (skip too long contents)...
         if(tb[c].size < 100) {
           if(tb[c].size != 0) tb[c].add("; ");
-          byte[] txt = ti.elem ? data.text(ti.pre) : data.attValue(ti.pre);
-          if(tdata.cols[c].id == data.atts.id(DataText.MTIME)) {
-            txt = token(BaseXLayout.date(toLong(txt)));
+          if(ti.elem) {
+            tb[c].add(data.text(ti.pre));
+          } else {
+            byte[] txt = data.attValue(ti.pre);
+            if(data.fs != null) {
+              final boolean size = tdata.cols[c].id == data.fs.sizeID;
+              final boolean time = tdata.cols[c].id == data.fs.timeID;
+              if(size || time) {
+                txt = token(BaseXLayout.value(toDouble(txt), size, time));
+              }
+            }
+            tb[c].add(txt);
           }
-          tb[c].add(txt);
         }
       }
 

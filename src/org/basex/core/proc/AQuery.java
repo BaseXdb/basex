@@ -129,7 +129,7 @@ abstract class AQuery extends Process {
     info(QUERYPRINT + per.getTimer(Prop.runs) + NL);
     info(QUERYTOTAL + perf.getTimer(Prop.runs) + NL);
     info(QUERYHITS + hits + " " + (hits == 1 ? VALHIT : VALHITS) + NL);
-    info(QUERYPRINTED + Performance.formatSize(out.size()));
+    info(QUERYPRINTED + Performance.format(out.size()));
     //info(QUERYMEM, Performance.getMem() + NL);
   }
 }

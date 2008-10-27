@@ -99,7 +99,7 @@ public final class FTFuzzy extends Index {
     tb.add("- %: %\n", CREATECS, BaseX.flag(data.meta.ftcs));
     tb.add("- %: %\n", CREATEDC, BaseX.flag(data.meta.ftdc));
     final long l = li.length() + ti.length() + dat.length();
-    tb.add(SIZEDISK + Performance.formatSize(l, true) + NL);
+    tb.add(SIZEDISK + Performance.format(l, true) + NL);
     IntList sizes = new IntList();
     TokenList toks = new TokenList();
     getTokenSizes(sizes, toks);

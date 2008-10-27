@@ -74,7 +74,7 @@ public final class Performance {
   public static String getMem() {
     final Runtime rt = Runtime.getRuntime();
     final long mem = rt.totalMemory() - rt.freeMemory();
-    return formatSize(mem);
+    return format(mem);
   }
 
   /**
@@ -82,11 +82,8 @@ public final class Performance {
    * @param size value to be formatted
    * @return formatted size value
    */
-  public static String formatSize(final long size) {
-    if(size > (1L << 35)) return ((size + (1L << 29)) >> 30) + " GB";
-    if(size > (1L << 25)) return ((size + (1L << 19)) >> 20) + " MB";
-    if(size > (1L << 15)) return ((size + (1L <<  9)) >> 10) + " KB";
-    return size + " Bytes";
+  public static String format(final long size) {
+    return format(size, false, 5);
   }
 
   /**
@@ -95,9 +92,23 @@ public final class Performance {
    * @param det detailed suffix
    * @return formatted size value
    */
-  public static String formatSize(final long size, final boolean det) {
-    if(size > (1 << 20)) return ((size + (1 << 19)) >> 20) + " MB";
-    if(size > (1 << 10)) return ((size + (1 <<  9)) >> 10) + " KB";
+  public static String format(final long size, final boolean det) {
+    return format(size, det, 0);
+  }
+
+  /**
+   * Formats a file size according to the binary size orders (KB, MB, ...),
+   * adding the specified offset to the orders of magnitude.
+   * @param size file size
+   * @param det detailed suffix
+   * @param off offset
+   * @return formatted size value
+   */
+  private static String format(final long size, final boolean det,
+      final int off) {
+    if(size > (1L << (30 + off))) return ((size + (1L << 29)) >> 30) + " GB";
+    if(size > (1L << (20 + off))) return ((size + (1L << 19)) >> 20) + " MB";
+    if(size > (1L << (10 + off))) return ((size + (1L <<  9)) >> 10) + " KB";
     return size + (det ? " Bytes" : " B");
   }
 

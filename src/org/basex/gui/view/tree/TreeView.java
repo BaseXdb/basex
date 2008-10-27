@@ -264,7 +264,7 @@ public final class TreeView extends View {
     int tw = totalW + 6;
     if(file && tw - xx > 140) {
       final long size = Token.toLong(data.fs.size(pre));
-      final String text = Performance.formatSize(size, false);
+      final String text = Performance.format(size, false);
       tw -= BaseXLayout.width(g, text) + 10;
       g.drawString(text, tw, yy);
     }

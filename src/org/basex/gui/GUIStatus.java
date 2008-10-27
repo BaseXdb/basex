@@ -136,7 +136,7 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
     g.setColor(full ? GUIConstants.colormark3 : GUIConstants.color6);
 
     FontMetrics fm = g.getFontMetrics();
-    final String mem = Performance.formatSize(used, true);
+    final String mem = Performance.format(used, true);
     int fw = ww + (MEMW - 4 - fm.stringWidth(mem)) / 2;
     final int h = fm.getHeight() - 2;
     g.drawString(mem, fw, h);
@@ -170,9 +170,9 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
       max = rt.maxMemory();
       used = occ - rt.freeMemory();
 
-      final String inf = MEMTOTAL + Performance.formatSize(max, true) + Prop.NL
-          + MEMRESERVED + Performance.formatSize(occ, true) + Prop.NL + MEMUSED
-          + Performance.formatSize(used, true) + Prop.NL + Prop.NL + MEMHELP;
+      final String inf = MEMTOTAL + Performance.format(max, true) + Prop.NL
+          + MEMRESERVED + Performance.format(occ, true) + Prop.NL + MEMUSED
+          + Performance.format(used, true) + Prop.NL + Prop.NL + MEMHELP;
 
       JOptionPane.showMessageDialog(GUI.get(), inf, MEMTITLE,
           JOptionPane.INFORMATION_MESSAGE);
