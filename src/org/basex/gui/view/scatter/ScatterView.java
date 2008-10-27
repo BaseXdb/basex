@@ -557,6 +557,7 @@ public final class ScatterView extends View implements Runnable {
   
   @Override
   public void mouseMoved(final MouseEvent e) {
+    if(working) return;
     mouseX = e.getX();
     mouseY = e.getY();
     if(focus()) repaint();
@@ -564,6 +565,7 @@ public final class ScatterView extends View implements Runnable {
   
   @Override
   public void mouseDragged(final MouseEvent e) {
+    if(working) return;
     mouseX = e.getX();
     mouseY = e.getY();
     final int h = getHeight();
@@ -631,12 +633,14 @@ public final class ScatterView extends View implements Runnable {
   
   @Override
   public void mouseReleased(final MouseEvent e) {
+    if(working) return;
     dragging = false;
     repaint();
   }
   
   @Override
   public void mousePressed(final MouseEvent e) {
+    if(working) return;
     super.mousePressed(e);
     mouseX = e.getX();
     mouseY = e.getY();
