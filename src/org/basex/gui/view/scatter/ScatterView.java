@@ -258,17 +258,21 @@ public final class ScatterView extends View implements Runnable {
         byte[] tVal = scatterData.xAxis.getValue(focused);
         Kind numType = scatterData.xAxis.numType;
         if(tVal.length > 0)
-          x = !(numType == Kind.TEXT || numType == Kind.CAT) ? 
+          x = !(numType == Kind.TEXT) ? 
               formatString(toDouble(scatterData.xAxis.getValue(focused)), 
                   true) : string(scatterData.xAxis.getValue(focused));
+        if(!scatterData.xAxis.numeric)
+          x = string(tVal);
         
         String y = "";
         tVal = scatterData.yAxis.getValue(focused);
         numType = scatterData.yAxis.numType;
         if(tVal.length > 0)
-          y = !(numType == Kind.TEXT || numType == Kind.CAT) ? 
+          y = !(numType == Kind.TEXT) ? 
               formatString(toDouble(scatterData.yAxis.getValue(focused)), 
                   false) : string(scatterData.yAxis.getValue(focused));
+        if(!scatterData.yAxis.numeric)
+        y = string(tVal);
         
         final String label = (x.length() > 16 ? x.substring(0, 16) : x) + " / " 
             + (y.length() > 15 ? y.substring(0, 15) : y);
