@@ -254,8 +254,8 @@ public final class ScatterView extends View implements Runnable {
         // draw focused x and y value
         g.setFont(GUIConstants.font);
         // strings are formatted if deepfs
-        final String x = formatAxis(true);
-        final String y = formatAxis(false);
+        final String x = formatString(true);
+        final String y = formatString(false);
         final String label = (x.length() > 16 ? x.substring(0, 16) : x) + " / " 
             + (y.length() > 15 ? y.substring(0, 15) : y);
         final int tw = BaseXLayout.width(g, label);
@@ -349,15 +349,12 @@ public final class ScatterView extends View implements Runnable {
 
         // category data, each category is displayed as a caption 
       } else {
-          caption = string(axis.cats[i]);
+        caption = string(axis.cats[i]);
       }
       
       // if assignment consists of more than 10 characters the caption string
       // is chopped to the length 10 to avoid layout issues
-      if(caption.length() > 10) {
-        caption = caption.substring(0, 10);
-        caption += "...";
-      }
+      if(caption.length() > 10) caption = caption.substring(0, 10) + "...";
 
       // caption labels are rotated, for both x and y axis. first a buffered
       // image is created which displays the rotated label ...
@@ -557,11 +554,11 @@ public final class ScatterView extends View implements Runnable {
    * @param drawX x/y axis flag
    * @return formatted string
    */
-  private String formatAxis(final boolean drawX) {
+  private String formatString(final boolean drawX) {
     final ScatterAxis axis = drawX ? scatterData.xAxis : scatterData.yAxis;
     final byte[] val = axis.getValue(focused);
     if(val.length == 0) return "";
-    return scatterData.xAxis.numType == Kind.TEXT ? string(val) :
+    return axis.numType == Kind.TEXT ? string(val) :
       formatString(toDouble(val), drawX);
   }
   
