@@ -253,9 +253,24 @@ public final class ScatterView extends View implements Runnable {
         drawItem(g, x1, y1, true, false);
         // draw focused x and y value
         g.setFont(GUIConstants.font);
-        final String x = string(scatterData.xAxis.getValue(focused));
-        final String y = string(scatterData.yAxis.getValue(focused));
-        final String label = (x.length() > 15 ? x.substring(0, 15) : x) + " / " 
+        // strings are formatted if deepfs
+        String x = "";
+        byte[] tVal = scatterData.xAxis.getValue(focused);
+        Kind numType = scatterData.xAxis.numType;
+        if(tVal.length > 0)
+          x = !(numType == Kind.TEXT || numType == Kind.CAT) ? 
+              formatString(toDouble(scatterData.xAxis.getValue(focused)), 
+                  true) : string(scatterData.xAxis.getValue(focused));
+        
+        String y = "";
+        tVal = scatterData.yAxis.getValue(focused);
+        numType = scatterData.yAxis.numType;
+        if(tVal.length > 0)
+          y = !(numType == Kind.TEXT || numType == Kind.CAT) ? 
+              formatString(toDouble(scatterData.yAxis.getValue(focused)), 
+                  false) : string(scatterData.yAxis.getValue(focused));
+        
+        final String label = (x.length() > 16 ? x.substring(0, 16) : x) + " / " 
             + (y.length() > 15 ? y.substring(0, 15) : y);
         final int tw = BaseXLayout.width(g, label);
         final int th = g.getFontMetrics().getHeight();
@@ -334,7 +349,6 @@ public final class ScatterView extends View implements Runnable {
     final int nrCaptions = axis.nrCaptions;
     final double step = axis.captionStep;
     final double range = 1.0d / (nrCaptions - 1);
-    final Kind type = axis.numType;
     final int fs = GUIProp.fontsize;
     
     g.setFont(GUIConstants.font);
@@ -344,11 +358,8 @@ public final class ScatterView extends View implements Runnable {
         final double min = axis.min;
         final double captionValue = i == nrCaptions - 1 ? axis.max : 
           min + (i * step);
-          
-        if(type == Kind.INT)
-          caption = Integer.toString((int) captionValue);
-        else
-          caption = string(chopNumber(token(captionValue)));
+
+        caption = formatString(captionValue, drawX);
 
         // category data, each category is displayed as a caption 
       } else {
@@ -553,6 +564,44 @@ public final class ScatterView extends View implements Runnable {
    */
   static int itemSize(final boolean focus) {
     return GUIProp.fontsize + (focus ? 4 : 2);
+  }
+  
+  /**
+   * Formats a number according to the binary size orders (KB, MB, ...).
+   * @param size value to be formatted
+   * @param deepFSType value converted to a readable file size representation
+   * @return formatted size value
+   */
+  public String deepFsFormat(final double size, final int deepFSType) {
+    if(deepFSType == 0) {
+      final long sz = (long) size;
+      if(sz > (1L << 30)) return ((sz + (1L << 29)) >> 30) + " GB";
+      if(sz > (1L << 20)) return ((sz + (1L << 19)) >> 20) + " MB";
+      if(sz > (1L << 10)) return ((sz + (1L <<  9)) >> 10) + " KB";
+      return sz + " Bytes";
+    }
+    if(deepFSType == 1) return BaseXLayout.date((long) size);
+    if(deepFSType == 2);
+    return (long) size == size ? Long.toString((long) size) :
+      Double.toString(size);
+  }
+  
+  /**
+   * Formats a string.
+   * @param value
+   * @param xAxis formatted string is x axis value
+   * @return formatted string
+   */
+  private String formatString(final double value, final boolean xAxis) {
+    final String selAttr = xAxis ? (String) xCombo.getSelectedItem() : 
+      (String) yCombo.getSelectedItem();
+    if(GUI.context.data().fs != null) {
+      if(selAttr.equals("@mtime")) 
+        return deepFsFormat(value, 1);
+      if(selAttr.equals("@size")) 
+        return deepFsFormat(value, 0);
+    }
+    return string(chopNumber(token(value)));
   }
   
   @Override
