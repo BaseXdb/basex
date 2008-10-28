@@ -1,5 +1,6 @@
 package org.basex.index;
 
+import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.data.StatsKey;
 import org.basex.io.DataInput;
@@ -146,7 +147,7 @@ public final class Names extends Set {
    * @return statistics string
    */
   public byte[] info() {
-    final TokenBuilder sb = new TokenBuilder();
+    final TokenBuilder tb = new TokenBuilder();
     final int[] ids = sort();
     int len = 0;
     for(int i = 1; i < size; i++) if(len < keys[i].length) len = keys[i].length;
@@ -157,14 +158,14 @@ public final class Names extends Set {
       final int s = ids[i];
       if(counter[s] == 0) continue;
       final byte[] key = keys[s];
-      sb.add("- ");
-      sb.add(key);
-      for(int j = 0; j < len - key.length; j++) sb.add(' ');
-      sb.add(counter[s] + "x" + stat[s]);
-      if(!noleaf[s]) sb.add(", leaf");
-      sb.add("\n");
+      tb.add(LI);
+      tb.add(key);
+      for(int j = 0; j < len - key.length; j++) tb.add(' ');
+      tb.add(counter[s] + "x" + stat[s]);
+      if(!noleaf[s]) tb.add(", leaf");
+      tb.add(NL);
     }
-    return sb.finish();
+    return tb.finish();
   }
 
   /**

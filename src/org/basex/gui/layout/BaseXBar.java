@@ -135,7 +135,7 @@ public final class BaseXBar extends BaseXPanel {
     barSize = Math.min(size, barH - 1);
 
     // paint scrollbar background
-    g.setColor(GUIConstants.COLORBACK);
+    g.setColor(GUIConstants.COLORCELL);
     g.fillRect(0, 0, ww, hh);
 
     // draw scroll slider
@@ -172,7 +172,7 @@ public final class BaseXBar extends BaseXPanel {
    */
   void drawButton(final Graphics g, final int[][] pol, final int y,
       final boolean focus) {
-    BaseXLayout.drawCell(g, 0, ww, y, y + ww, false);
+    BaseXLayout.drawCell(g, 0, ww, y, y + ww, focus);
     for(int i = 0; i < pol[0].length; i++) {
       pol[0][i] += SIZE / 2 - 3;
       pol[1][i] += y + SIZE / 2 - 3;

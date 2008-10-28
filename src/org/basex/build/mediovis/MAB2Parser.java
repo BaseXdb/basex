@@ -182,12 +182,6 @@ public final class MAB2Parser extends Parser {
         addEntry(input, entry.children[j], 0, l);
       }
       if(entry.size != 0 && pos != 0 && !Prop.mab2flat) builder.endElem(MEDIUM);
-      
-      if(Prop.debug) {
-        if(i % 50000 == 0) BaseX.err(" " + i + "\n");
-        else if(i % 5000 == 0) BaseX.err("!");
-        else if(i % 1000 == 0) BaseX.err(".");
-      }
     }
 
     if(Prop.debug) {

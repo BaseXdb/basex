@@ -62,7 +62,9 @@ public final class Equality extends Comparison {
   public Expr indexEquivalent(final XPContext ctx, final Step curr, 
       final boolean seq) {
 
+    // no index access possible - return self reference
     if(index == null) return this;
+
     final LocPath path = (LocPath) expr1;
     final LocPath inv = path.invertPath(curr);
 

@@ -1,7 +1,6 @@
 package org.basex.data;
 
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
 import org.basex.fs.DataFS;
 import org.basex.index.Index;

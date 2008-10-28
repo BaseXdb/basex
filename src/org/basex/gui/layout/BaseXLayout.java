@@ -3,7 +3,6 @@ package org.basex.gui.layout;
 import static org.basex.Text.*;
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -13,7 +12,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.RenderingHints;
-import java.awt.SystemColor;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -252,20 +250,18 @@ public final class BaseXLayout {
    * @param xe horizontal end position
    * @param ys vertical start position
    * @param ye vertical end position
-   * @param high highlighting flag
+   * @param focus highlighting flag
    */
   public static void drawCell(final Graphics g, final int xs,
-      final int xe, final int ys, final int ye, final boolean high) {
+      final int xe, final int ys, final int ye, final boolean focus) {
 
     g.setColor(COLORBUTTON);
     g.drawRect(xs, ys, xe - xs - 1, ye - ys - 1);
     g.setColor(Color.white);
     g.drawRect(xs + 1, ys + 1, xe - xs - 3, ye - ys - 3);
     
-    Color c1 = SystemColor.controlLtHighlight;
-    Color c2 = SystemColor.controlHighlight;
-    if(high) { final Color t = c1; c1 = c2; c2 = t; }
-    fill(g, c1, c2, xs + 2, ys + 2, xe - 1, ye - 1);
+    fill(g, focus ? COLORCELL : Color.white, COLORCELL,
+        xs + 2, ys + 2, xe - 1, ye - 1);
   }
 
   /**

@@ -240,7 +240,7 @@ public final class BaseXDSlider extends BaseXPanel {
     g.drawLine(0, hh + 4, w, hh + 4);
 
     final Range r = new Range();
-    BaseXLayout.drawCell(g, r.xs, r.xe + ARROW, 2, h - 2, true);
+    BaseXLayout.drawCell(g, r.xs, r.xe + ARROW, 2, h - 2, false);
 
     if(r.xs + ARROW < r.xe) {
       g.setColor(GUIConstants.color6);

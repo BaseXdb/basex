@@ -6,7 +6,6 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Font;
-import java.awt.SystemColor;
 import javax.swing.UIManager;
 import org.basex.Text;
 
@@ -139,20 +138,20 @@ public final class GUIConstants {
   public static final Color COLORERROR = new Color(208, 0, 0);
   /** Error color. */
   public static final Color COLORMARK = new Color(255, 200, 180);
-  /** Background color. */
-  public static final Color COLORBACK = SystemColor.control;
+
+  /** Cell color. */
+  public static final Color COLORCELL = new Color(224, 224, 224);
   /** Button color. */
   public static final Color COLORBUTTON = new Color(160, 160, 160);
   /** Background color. */
-  public static final Color COLORDARK = new Color(96, 96, 96);
+  public static final Color COLORDARK = new Color(64, 64, 64);
+
   /** Transparent background color. */
   public static Color back;
   /** Transparent frame color. */
   public static Color frame;
-  /** Focus color. */
-  public static Color focus;
 
-  /** Bright GUI color. */
+  /** GUI color. */
   public static Color color;
   /** Bright GUI color. */
   public static Color color1;
@@ -246,9 +245,9 @@ public final class GUIConstants {
         Math.max(255 - l * GUIProp.colorgreen, 0),
         Math.max(255 - l * GUIProp.colorblue, 0));
     }
-    focus = COLORS[16];
-    back = new Color(focus.getRed(), focus.getGreen(), focus.getBlue(),  40);
-    frame = new Color(focus.getRed(), focus.getGreen(), focus.getBlue(),  100);
+    final Color c = COLORS[16];
+    back = new Color(c.getRed(), c.getGreen(), c.getBlue(),  40);
+    frame = new Color(c.getRed(), c.getGreen(), c.getBlue(),  100);
     
     // create thumbnail colors
     thumbnailcolor = new Color[] {

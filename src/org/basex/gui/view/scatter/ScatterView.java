@@ -192,24 +192,13 @@ public final class ScatterView extends View implements Runnable {
     super.paintComponent(g);
     BaseXLayout.antiAlias(g);
     
-    final int w = getWidth();
-    final int h = getHeight();
-    //final boolean nostats = !data.tags.uptodate;
-
-    final int novalue = noValueSize();
-    final int minSize = novalue * 8;
-    if(w < minSize || h < minSize) {
-      g.setFont(GUIConstants.font);
-      g.setColor(Color.black);
-      BaseXLayout.drawCenter(g, NOSPACE, getWidth(), h / 2);
-      return;
-    }
-    
     if(scatterData == null) {
       refreshInit();
       return;
     }
     
+    final int w = getWidth();
+    final int h = getHeight();
     if(w + h != viewDimension) {
       viewDimension = w + h;
       plotChanged = true;
@@ -217,6 +206,14 @@ public final class ScatterView extends View implements Runnable {
 
     plotWidth = w - (MARGIN[1] + MARGIN[3]);
     plotHeight = h - (MARGIN[0] + MARGIN[2]);
+
+    final int novalue = noValueSize();
+    if(plotWidth - novalue < 0 || plotHeight - novalue < 0) {
+      g.setFont(GUIConstants.font);
+      g.setColor(Color.black);
+      BaseXLayout.drawCenter(g, NOSPACE, getWidth(), (h + MARGIN[0]) / 2);
+      return;
+    }
     
     // overdraw plot background
     g.setColor(GUIConstants.back);
@@ -229,8 +226,7 @@ public final class ScatterView extends View implements Runnable {
 
     // draw items
     if(scatterData.size == 0) return;
-    if(plotImg == null || plotChanged)
-      plotImg = createPlotImage();
+    if(plotImg == null || plotChanged) plotImg = createPlotImage();
     g.drawImage(plotImg, 0, 0, this);
     
     // draw marked items

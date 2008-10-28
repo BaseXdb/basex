@@ -83,7 +83,6 @@ public class SAX2Data extends DefaultHandler implements LexicalHandler {
     try {
       finishText();
       builder.pi(new TokenBuilder(nm + ' ' + cont));
-      nodes++;
     } catch(final IOException ex) {
       error(ex);
     }
@@ -97,7 +96,6 @@ public class SAX2Data extends DefaultHandler implements LexicalHandler {
     try {
       finishText();
       builder.comment(new TokenBuilder(new String(ch, s, l)));
-      nodes++;
     } catch(final IOException ex) {
       error(ex);
     }
@@ -116,7 +114,6 @@ public class SAX2Data extends DefaultHandler implements LexicalHandler {
     if(tb.size != 0) {
       builder.text(tb, false);
       tb.reset();
-      nodes++;
     }
     for(int i = 0; i < ns.size; i++) builder.startNS(ns.key[i], ns.val[i]);
     ns.reset();

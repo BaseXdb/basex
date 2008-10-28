@@ -53,7 +53,6 @@ public final class FTUnaryNot extends FTArrayExpr {
     final Expr[] ex = XPOptimizer.getIndexExpr(indexExprs);
     if(ex != null) return new Path(new FTNotExprs(ex),
         ((Path) indexExprs[0]).path);*/
-    // <SG> add compiler infos??
     return new FTUnaryNotExprs(indexExprs);
   }
   

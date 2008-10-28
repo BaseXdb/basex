@@ -71,18 +71,22 @@ public final class Range extends InternalExpr {
   }
   
   /** Index type. */
-  private RangeToken ind;
+  private RangeToken index;
   
   @Override
   public Expr indexEquivalent(final XPContext ctx, final Step curr, 
       final boolean seq) {
+    
+    // no index access possible - return self reference
+    if(index == null) return this;
+    
     final LocPath path = (LocPath) expr;
     final LocPath inv = path.invertPath(curr);
 
-    final boolean txt = ind.type == IndexToken.TYPE.TXT;
+    final boolean txt = index.type == IndexToken.TYPE.TXT;
     ctx.compInfo(txt ? OPTINDEX : OPTATTINDEX);
     if(!txt) inv.steps.add(0, Axis.create(Axis.SELF, path.steps.last().test));
-    return new Path(new RangeAccess(ind), inv);
+    return new Path(new RangeAccess(index), inv);
   }
   
   @Override
@@ -100,14 +104,16 @@ public final class Range extends InternalExpr {
       step.preds.size() == 0 && data.meta.chop;
     if(!text && !atv || !path.checkAxes()) return Integer.MAX_VALUE;
 
-    ind = new RangeToken(text, min, max);
+    index = new RangeToken(text, min, max);
     final StatsKey key = getKey(path, data, text);
     if(key == null) return Integer.MAX_VALUE;
 
     // all values out of range - no results
-    if(ind.min > ind.max || ind.max < key.min || ind.min > key.max) return 0;
-    ind.min = Math.max(ind.min, key.min);
-    ind.max = Math.min(ind.max, key.max);
+    if(index.min > index.max || index.max < key.min || index.min > key.max)
+      return 0;
+
+    index.min = Math.max(index.min, key.min);
+    index.max = Math.min(index.max, key.max);
 
     // if index can be applied, assume data size / 10 as costs
     return key.kind != StatsKey.Kind.DBL && key.kind !=

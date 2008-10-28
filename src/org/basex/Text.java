@@ -478,15 +478,15 @@ public interface Text {
   // DATABASE/INDEX INFORMATION ===============================================
 
   /** Index info. */
-  String TRIE = "- Compressed Trie";
+  String TRIE = LI + "Compressed Trie";
   /** Index info. */
-  String FUZZY = "- Fuzzy Index";
+  String FUZZY = LI + "Fuzzy Index";
   /** Index info. */
-  String TXTINDEX = "- Tree Structure";
+  String TXTINDEX = LI + "Tree Structure";
   /** Index info. */
-  String IDXENTRIES = "- Entries: ";
+  String SIZEDISK = LI + "Size on Disk: ";
   /** Index info. */
-  String SIZEDISK = "- Size on Disk: ";
+  String IDXENTRIES = LI + "Entries: ";
 
   // XPATH COMMAND ============================================================
 

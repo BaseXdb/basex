@@ -92,7 +92,6 @@ public final class Copy extends AUpdate {
     }
 
     data.flush();
-    System.out.println(data.size);
     return Prop.info ? info(INSERTINFO, copied, perf.getTimer()) : true;
   }
 

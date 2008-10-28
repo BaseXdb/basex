@@ -105,9 +105,9 @@ public final class ScatterData {
           } else {
             p += data.attSize(p, kind);
           }
-          } else {
-            p++;
-          }
+        } else {
+          p++;
+        }
       }
     }
     pres = tmpPres.finish();

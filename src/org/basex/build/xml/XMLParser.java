@@ -4,9 +4,11 @@ import static org.basex.build.BuildText.*;
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
+import org.basex.BaseX;
 import org.basex.build.BuildException;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
+import org.basex.core.Prop;
 import org.basex.io.IO;
  
 /**
@@ -21,7 +23,6 @@ public final class XMLParser extends Parser {
   private XMLScanner scanner;
   /** Builder reference. */
   private Builder builder;
-
 
   /**
    * Constructor.
@@ -57,6 +58,7 @@ public final class XMLParser extends Parser {
     
     builder.encoding(scanner.encoding);
     builder.endDoc();
+    if(Prop.debug) BaseX.err("\n");
   }
 
   /**

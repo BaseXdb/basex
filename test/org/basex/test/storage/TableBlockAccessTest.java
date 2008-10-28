@@ -103,22 +103,6 @@ public final class TableBlockAccessTest {
   }
 
   /**
-   * Dump storage.
-   *
-  private void dumpStorage() {
-    for(int i = 0; i < (tba.getSize() << IOConstants.NODEPOWER); i++) {
-      byte currentByte = (byte) tba.read1(i >> IOConstants.NODEPOWER, i
-          % (1 << IOConstants.NODEPOWER));
-      if((i % (1 << IOConstants.NODEPOWER)) == 0) System.out.printf(
-          "\nEntry %3d : ", i >> IOConstants.NODEPOWER);
-      System.out.printf("%02x ", currentByte);
-    }
-    System.out.println();
-    System.out.println();
-  }
-   */
-
-  /**
    * Test size of file.
    */
   @Test

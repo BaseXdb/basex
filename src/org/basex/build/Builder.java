@@ -3,6 +3,7 @@ package org.basex.build;
 import static org.basex.build.BuildText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
+import org.basex.BaseX;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.data.Data;
@@ -41,7 +42,9 @@ public abstract class Builder extends Progress {
   /** Parser instance. */
   protected Parser parser;
   /** Table size. */
-  protected int size;
+  public int size;
+  /** Element counter. */
+  public int elms;
 
   /** Parent stack. */
   private final int[] parStack = new int[CAP];
@@ -178,6 +181,7 @@ public abstract class Builder extends Progress {
     addSize(parStack[--level]);
     meta.ndocs++;
     inDoc = false;
+    if(Prop.debug) BaseX.err("\n");
   }
 
   /**
@@ -284,6 +288,12 @@ public abstract class Builder extends Progress {
       nsStack[level] = nsStack[level - 1];
     }
     if(size != 1) inDoc = true;
+
+    if(Prop.debug) {
+      if(++elms % 500000 == 0) BaseX.err(" " + elms + "\n");
+      else if(elms % 50000 == 0) BaseX.err("!");
+      else if(elms % 10000 == 0) BaseX.err(".");
+    }
   }
 
   /**

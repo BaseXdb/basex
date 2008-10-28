@@ -10,7 +10,6 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.util.zip.ZipInputStream;
-
 import org.basex.util.Array;
 import org.basex.util.Token;
 

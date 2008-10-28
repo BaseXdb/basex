@@ -11,16 +11,16 @@ import org.basex.util.Num;
 import org.basex.util.Token;
 
 /**
- * This class builds an index for attribute values and text contents
- * in a hash map.
+ * This main-memory based class builds an index for attribute values and
+ * text contents in a tree structure and stores the result to disk.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public final class ValueBuilder extends Progress implements IndexBuilder {
-  /** Value type (attributes/texts). */
+  /** Index type (attributes/texts). */
   private final boolean text;
-  /** Value type (attributes/texts). */
+  /** Temporary value tree. */
   private final ValueTree index = new ValueTree();
   /** Current parsing value. */
   private int id;

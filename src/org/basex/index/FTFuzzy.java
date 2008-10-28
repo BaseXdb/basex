@@ -7,12 +7,10 @@ import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataAccess;
-import org.basex.util.IntList;
 import org.basex.util.Levenshtein;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
-import org.basex.util.TokenList;
 
 /**
  * This class provides access to attribute values and text contents
@@ -65,7 +63,6 @@ public final class FTFuzzy extends Index {
   /** Cache for number of hits and data reference per token. */
   private final FTTokenMap cache;
 
-
   /**
    * Constructor, initializing the index structure.
    * @param d data reference
@@ -100,10 +97,10 @@ public final class FTFuzzy extends Index {
     tb.add("- %: %\n", CREATEDC, BaseX.flag(data.meta.ftdc));
     final long l = li.length() + ti.length() + dat.length();
     tb.add(SIZEDISK + Performance.format(l, true) + NL);
-    IntList sizes = new IntList();
-    TokenList toks = new TokenList();
-    getTokenSizes(sizes, toks);
-    FTTrie.infoTopNSizes(5, sizes, toks, tb);
+
+    final IndexStats stats = new IndexStats();
+    addOccurrences(stats);
+    stats.print(tb);
     return tb.finish();
   }
 
@@ -135,20 +132,20 @@ public final class FTFuzzy extends Index {
 
   /**
    * Collects all tokens and their sizes found in the index structure.
-   *
-   * @param sizes IntList with sizes
-   * @param toks TokenList with tokens
+   * 
+   * @param stats statistic reference
    */
-  private void getTokenSizes(final IntList sizes, final TokenList toks) {
+  private void addOccurrences(final IndexStats stats) {
     int i = 0;
     while(i < tp.length && tp[i] == -1) i++;
     int p = tp[i];
     int j = i + 1;
     while(j < tp.length && tp[j] == -1) j++;
     
-    while (p < tp[tp.length - 1]) {
-      toks.add(ti.readBytes(p, p + i));
-      sizes.add(getDataSize(p, i));
+    while(p < tp[tp.length - 1]) {
+      final byte[] txt = ti.readBytes(p, p + i);
+      final int oc = getDataSize(p, i);
+      stats.add(txt, oc);
       p += i + 4L + 5L;
       if (p == tp[j]) {
         i = j;
@@ -349,7 +346,7 @@ public final class FTFuzzy extends Index {
    * @param tok token
    * @return counter
    */
-  public static int csDBCheck(final int[][] ids, final Data d,
+  static int csDBCheck(final int[][] ids, final Data d,
       final FTTokenizer ftdb, final byte[] tok) {
     int c = 0;
     for(int i = 0; i < ids[0].length;) {

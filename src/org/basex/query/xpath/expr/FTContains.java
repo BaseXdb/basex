@@ -119,6 +119,13 @@ public final class FTContains extends DualExpr {
       return expr2.eval(ctx);
     } 
 
+    // [SG] Cause for troubles.. resulting item can have different type
+    // (Bool/NodeSet). In the other XPath expressions, return type is always
+    // the same (moreover, in indexEquivalent(), this class is specified as
+    // argument for the Path expression; this expression expects the first
+    // argument to return a node set..) A possible solution might be to split
+    // this class into two in the compilation step.
+    
     Item res;
     if (s) res = evalSeq(ctx);
     else if (!s && isc && !iec) res = evalWithoutIndex(ctx);

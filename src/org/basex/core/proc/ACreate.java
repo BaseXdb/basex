@@ -130,8 +130,7 @@ abstract class ACreate extends Process {
     data.closeIndex(index);
     data.setIndex(index, builder.build(data));
 
-    if(Prop.debug) {
-      BaseX.err("% Index: % (%)\n", index, pp.getTimer(), Performance.getMem());
-    }
+    if(Prop.debug) BaseX.err("- % Index: % (%)\n", index, pp.getTimer(),
+        Performance.getMem());
   }
 }

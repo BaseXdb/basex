@@ -28,7 +28,7 @@ public final class BaseXSlider extends BaseXPanel {
   /** Current slider value. */
   private int curr;
   /** Current slider value. */
-  private int oldCurr;
+  private int oldCurr = -1;
   /** Mouse position for dragging operations. */
   private int mouseX;
   
@@ -99,6 +99,12 @@ public final class BaseXSlider extends BaseXPanel {
   }
 
   @Override
+  public void mouseReleased(final MouseEvent e) {
+    oldCurr = -1;
+    repaint();
+  }
+
+  @Override
   public void mouseDragged(final MouseEvent e) {
     final double prop = (max - min) * (mouseX - e.getX()) /
       (getWidth() - SLIDERW);
@@ -138,16 +144,17 @@ public final class BaseXSlider extends BaseXPanel {
     final int h = getHeight();
     final int hh = h / 2;
     
-    g.setColor(hasFocus() ? Color.white : GUIConstants.color2);
+    g.setColor(hasFocus() ? Color.white : GUIConstants.COLORCELL);
     g.fillRect(0, hh - 2, w, 4);
     g.setColor(Color.black);
     g.drawLine(0, hh - 2, w, hh - 2);
     g.drawLine(0, hh - 2, 0, hh + 2);
-    g.setColor(GUIConstants.color3);
+    g.setColor(GUIConstants.COLORBUTTON);
     g.drawLine(w - 1, hh - 2, w - 1, hh + 2);
     g.drawLine(0, hh + 2, w, hh + 2);
     
     final double x = (curr - min) * (w - SLIDERW) / (max - min);
-    BaseXLayout.drawCell(g, (int) x, (int) (x + SLIDERW), 2, h - 2, true);
+    BaseXLayout.drawCell(g, (int) x, (int) (x + SLIDERW), 2, h - 2,
+        oldCurr != -1);
   }
 }

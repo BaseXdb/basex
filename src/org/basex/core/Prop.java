@@ -106,8 +106,10 @@ public final class Prop {
   public static boolean onthefly = false;
   /** Path for filtering XML Documents. */
   public static String createfilter = "*.*";
-  /** Flag for itterator optimized storage within ftindex. */
+  /** Flag for iterator optimized storage within ftindex. */
   public static boolean ftittr = false;
+  /** Number of index occurrences to print in the index info. */
+  public static int indexocc = 100;
 
   /** Flag for creating a fuzzy index. */
   public static boolean ftfuzzy = false;

@@ -52,12 +52,18 @@ public final class Values extends Index {
   public byte[] info() {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(TXTINDEX + NL);
-    tb.add(IDXENTRIES + size + NL);
     final long l = idxl.length() + idxr.length();
     tb.add(SIZEDISK + Performance.format(l, true) + NL);
+    final IndexStats stats = new IndexStats();
+    for(int m = 0; m < size; m++) {
+      final int oc = idxl.readNum(idxr.read5(m * 5L));
+      final int p = idxl.readNum();
+      stats.add(text ? data.text(p) : data.attValue(p), oc);
+    }
+    stats.print(tb);
     return tb.finish();
   }
-
+  
   @Override
   public IndexIterator ids(final IndexToken tok) {
     if(tok.range()) return idRange((RangeToken) tok);

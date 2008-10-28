@@ -45,9 +45,10 @@ public final class TextView extends View {
    */
   public TextView(final FILL mode, final String head, final byte[] help) {
     super(help);
-    setMode(mode);
+    setLayout(new BorderLayout(0, 4));
     setBorder(4, 8, 8, 8);
-    setLayout(new BorderLayout());
+    setMode(mode);
+    
     area = new BaseXText(help, false);
     add(area, BorderLayout.CENTER);
     

@@ -2,11 +2,7 @@ package org.basex.index;
 
 import static org.basex.Text.*;
 import static org.basex.data.DataText.*;
-
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Comparator;
-
 import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.Data;
@@ -16,7 +12,6 @@ import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
-import org.basex.util.TokenList;
 import org.basex.util.XMLToken;
 
 /**
@@ -67,49 +62,6 @@ public final class FTTrie extends Index {
     cs = data.meta.ftcs;
     cache = new FTTokenMap();
   }
-
-  /**
-   * Prints the n tokens with maximum and minimum size.
-   * 
-   * @param n number of tokens to print
-   * @param sizes IntList with sizes
-   * @param toks TokenList with tokens
-   * @param tb TokenBuilder for output
-   */
-  public static void infoTopNSizes(final int n, final IntList sizes, 
-      final TokenList toks, final TokenBuilder tb) {
-    int[][] top = new int[sizes.size][2];
-    int max = (n < sizes.size) ? n : sizes.size;
-    for (int i = 0; i < top.length; i++) {
-      top[i][0] = sizes.list[i];
-      top[i][1] = i;
-    }
-    
-    Arrays.sort(top, 0, top.length, new Comparator<int[]>() {
-      public int compare(final int[] s1, final int[] s2) {
-        return  (s1[0] < s2[0]) ? -1 : (s1 == s2) ? 0 : 1;
-      }
-    });
-    
-    final byte[][] tok = toks.finish();
-    for (int i = top.length - 1; i > top.length - max - 1; i--) {
-      tb.add("- ");
-      tb.add(tok[top[i][1]]);
-      tb.add('\t');
-      tb.add(Token.token(top[i][0]));
-      tb.add("x ");
-      tb.add(NL);
-    }
-    tb.add(NL);    
-    for (int i = 0; i < max && i < top.length; i++) {
-      tb.add("- ");
-      tb.add(tok[top[i][1]]);
-      tb.add('\t');
-      tb.add(Token.token(top[i][0]));
-      tb.add("x ");
-      tb.add(NL);
-    }   
-  }
   
   @Override
   public byte[] info() {
@@ -120,10 +72,9 @@ public final class FTTrie extends Index {
     tb.add("- %: %\n", CREATEDC, BaseX.flag(data.meta.ftdc));
     final long l = inN.length() + inD.length() + inS.length();
     tb.add(SIZEDISK + Performance.format(l, true) + NL);
-    final IntList sizes = new IntList();
-    final TokenList toks = new TokenList();
-    getTokenSizes(0, sizes, toks, new byte[]{});
-    infoTopNSizes(100, sizes, toks, tb);
+    final IndexStats stats = new IndexStats();
+    addOccurrences(0, stats, new byte[] {});
+    stats.print(tb);
     return tb.finish();
   }
 
@@ -879,12 +830,11 @@ public final class FTTrie extends Index {
    * Collects all tokens and their sizes found in the index structure.
    *
    * @param cn id on nodeArray, current node
-   * @param sizes IntList with sizes
-   * @param toks TokenList with tokens
+   * @param stats statistics reference
    * @param tok current token
    */
-  private void getTokenSizes(final int cn, final IntList sizes, 
-      final TokenList toks, final byte[] tok) {
+  private void addOccurrences(final int cn, final IndexStats stats,
+      final byte[] tok) {
     final int[] ne = getNodeEntry(cn);
     byte[] ntok;
     if(cn > 0) {
@@ -893,15 +843,14 @@ public final class FTTrie extends Index {
       for (int i = 0; i < ne[0]; i++) ntok[tok.length + i] = (byte) ne[i + 1];
       final int size = ne[ne.length - 1];
       if (size > 0) {
-        sizes.add(size);
-        toks.add(ntok);
+        stats.add(ntok, size);
       }
     } else {
       ntok = tok;
     }
     if (hasNextNodes(ne)) {
      for (int i = ne[0] + 1; i < ne.length - 1; i += 2) {
-        getTokenSizes(ne[i], sizes, toks, ntok);
+       addOccurrences(ne[i], stats, ntok);
      }
     }
     return;
@@ -974,8 +923,6 @@ public final class FTTrie extends Index {
       for(int i = 0; i < s; i++) {
         dt[1][i] = inD.readNum();
       }
-      System.out.println();
-      
     }
     return dt;
   }

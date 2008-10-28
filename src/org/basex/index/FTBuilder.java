@@ -3,6 +3,8 @@ package org.basex.index;
 import static org.basex.Text.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
+
+import org.basex.BaseX;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.data.Data;
@@ -37,6 +39,8 @@ public final class FTBuilder extends Progress implements IndexBuilder {
    * @throws IOException IO Exception
    */
   public FTTrie build(final Data data) throws IOException {
+    final Performance p = new Performance();
+    
     wp.cs = data.meta.ftcs;
     int s = 0;
     index = new FTArray(128, data.meta.ftcs);
@@ -55,9 +59,8 @@ public final class FTBuilder extends Progress implements IndexBuilder {
     }
 
     if(Prop.debug) {
-      System.out.println("Hash in Hauptspeicher gehalten:");
-      Performance.gc(5);
-      System.out.println(Performance.getMem());
+      Performance.gc(3);
+      BaseX.outln("- Indexed: % (%)", p, Performance.getMem());
     }
 
     final String db = data.meta.dbname;
@@ -67,17 +70,15 @@ public final class FTBuilder extends Progress implements IndexBuilder {
     }
 
     if(Prop.debug) {
-      System.out.println("Hash und Trie in Hauptspeicher gehalten:");
-      Performance.gc(5);
-      System.out.println(Performance.getMem());
+      Performance.gc(3);
+      BaseX.outln("- Hash&Trie: % (%)", p, Performance.getMem());
     }
 
     hash = null;
 
     if(Prop.debug) {
-      System.out.println("Trie in komprimierte Form überführt.");
-      Performance.gc(5);
-      System.out.println(Performance.getMem());
+      Performance.gc(3);
+      BaseX.outln("- Compressed: % (%)", p, Performance.getMem());
     }
 
     final byte[][] tokens = index.tokens.list;
@@ -172,6 +173,11 @@ public final class FTBuilder extends Progress implements IndexBuilder {
     outPre.close();
     outN.close();
     outS.close();
+
+    if(Prop.debug) {
+      Performance.gc(3);
+      BaseX.outln("- Written: % (%)", p, Performance.getMem());
+    }
     return new FTTrie(data, db);
   }
   

@@ -111,8 +111,6 @@ public final class RealView extends View {
     pointerx = getWidth() / 2;
     pointery = topdistance;
 
-    //TODO: choose visualization here
-
     switch(3) {
       case 1:
         drawTree(g, 0, 0, 0, getWidth());
@@ -122,14 +120,7 @@ public final class RealView extends View {
         break;
       case 3:
         temperature(0, g);
-
     }
-
-    //
-    //  // TODO: overlap
-    //
-
-    //    System.out.println("Perf: " + perf.getTime());
   }
 
   /**
@@ -178,9 +169,7 @@ public final class RealView extends View {
         final int pre = iterator.next();
         if(data.kind(pre) == Data.ELEM) temp.add(pre);
         sumNodeSize += data.size(pre, data.kind(pre));
-        //        System.out.print(Token.string(data.tag(pre)) + " ");
       }
-      //      System.out.println();
     }
     parentList = temp;
     sumNodeSizeInLine = sumNodeSize;
@@ -229,8 +218,6 @@ public final class RealView extends View {
         g.drawString(s, boxMiddle - textWidth / 2, y + fontHeight - 2);
       }
 
-      //      System.out.println(boxMiddle);
-
       if(parentPos != null) {
 
         final int line = Math.round(fontHeight / 4f);
@@ -247,9 +234,6 @@ public final class RealView extends View {
       x += ratio;
     }
     parentPos = temp;
-
-    //    System.out.printf("%s\n", parentPos);
-
   }
 
   /**
@@ -316,10 +300,6 @@ public final class RealView extends View {
         pointerx = border + childframewidth / 2;
         pointery = topdistance + level * lvdistance;
         drawNode(g, pre, pointerx, pointery, elementColor);
-        /** System.out.println(Token.string(data.tag(pre))
-         *  + "; Percent: " + percent + "; Framewidth: "
-         *  + getWidth() + "; framex1: " + (space - childframewidth)
-         *  + "; space: " + space); */
 
         //        checkOverlap(g, pre, pointerx, pointery, elementColor);
         drawTree(g, pre, level, border, childframewidth);
@@ -437,7 +417,7 @@ public final class RealView extends View {
 
       final int parX = par * prePostMulti;
       final int parY = parPost * prePostMulti;
-      //TODO: improve line connection between nodes.
+      // [WM] improve line connection between nodes.
       g.drawLine(parX, parY, x, y);
     }
 
@@ -452,8 +432,6 @@ public final class RealView extends View {
   private void drawPrePost(final Graphics g, final int pre, final int level) {
     final Data data = GUI.context.data();
     final int post = calcPost(pre, level);
-    System.out.println("pre: " + pre + " | post: " + post + " | tag: "
-        + Token.string(data.tag(pre)) + " | level: " + level);
     final int lv = level;
 
     drawPrePostNode(g, pre, post, lv);

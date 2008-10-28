@@ -102,7 +102,7 @@ public final class BaseXWin {
       /*
       for(java.lang.reflect.Field f : java.awt.SystemColor.class.getFields()) {
         final Object o = f.get(null);
-        if(!(o instanceof java.awt.SystemColor)) continue;
+        //if(!(o instanceof java.awt.SystemColor)) continue;
         final Color c = (Color) o;
         BaseX.outln("%: %,%,%", f, c.getRed(), c.getGreen(), c.getBlue());
       }*/
@@ -116,7 +116,6 @@ public final class BaseXWin {
         BaseX.outln("%: % (%)", k, v,
             v != null ? v.getClass().getSimpleName() : null);
       }*/
-      
     } catch(final Exception e) {
       e.printStackTrace();
     }
