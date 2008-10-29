@@ -39,6 +39,17 @@ public final class BaseXWin {
    * @param args command-line arguments
    */
   private BaseXWin(final String[] args) {
+    // some mac issues
+    System.setProperty("apple.laf.useScreenMenuBar", "true");
+    System.setProperty("com.apple.mrj.application.apple.menu.about.name", NAME);
+
+    /* handle default application menu on macs
+    com.apple.mrj.MRJApplicationUtils.registerQuitHandler(
+        new com.apple.mrj.MRJQuitHandler() {
+          public void handleQuit() throws IllegalStateException { }
+        }
+    );*/
+    
     // read properties
     Prop.read();
     GUIProp.read();
@@ -157,9 +168,6 @@ public final class BaseXWin {
    * @param args command line arguments (ignored).
    */
   public static void main(final String[] args) {
-    // use screen menu bar on mac systems
-    System.setProperty("apple.laf.useScreenMenuBar", "true");
-
     new BaseXWin(args);
   }
 }

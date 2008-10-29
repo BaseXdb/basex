@@ -322,16 +322,18 @@ public final class BaseXText extends BaseXPanel {
   public void keyPressed(final KeyEvent e) {
     final int c = e.getKeyCode();
 
-    if(e.isAltDown() || e.isMetaDown() || c == KeyEvent.VK_SHIFT ||
+    final boolean ctrl = (Toolkit.getDefaultToolkit().
+        getMenuShortcutKeyMask() & e.getModifiers()) != 0;
+
+    if(e.isAltDown() || c == KeyEvent.VK_SHIFT || c == KeyEvent.VK_META ||
         c == KeyEvent.VK_CONTROL || c == KeyEvent.VK_ESCAPE) return;
 
     text.pos(text.cursor());
     cursor(true);
 
     final byte[] txt = text.text;
-    final boolean ctrl = e.isControlDown();
     final boolean shf = e.isShiftDown();
-
+    
     boolean down = true;
     if(!ctrl && !e.isActionKey()) return;
 
@@ -483,12 +485,14 @@ public final class BaseXText extends BaseXPanel {
     final byte[] txt = text.text;
     boolean down = true;
 
+    final boolean ctrl = (Toolkit.getDefaultToolkit().
+        getMenuShortcutKeyMask() & e.getModifiers()) != 0;
+
     // not nice here.. no alternative, though
-    if(!Prop.MAC && e.isAltDown() || e.isMetaDown() || e.isActionKey() ||
+    if(!Prop.MAC && e.isAltDown() || e.isActionKey() ||
       ch == KeyEvent.VK_ESCAPE) return;
 
     text.pos(text.cursor());
-    final boolean ctrl = e.isControlDown();
     if(ch == KeyEvent.VK_BACK_SPACE) {
       if(text.start() == -1) {
         if(text.pos() == 0) return;
