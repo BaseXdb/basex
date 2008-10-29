@@ -63,7 +63,7 @@ public enum GUICommands implements GUICommand {
   /* FILE MENU */
 
   /** Create database. */
-  CREATE(false, GUICREATE, "ctrl N", GUICREATETT) {
+  CREATE(false, GUICREATE, "% N", GUICREATETT) {
     @Override
     public void execute() {
       // open file chooser for XML creation
@@ -76,7 +76,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Open database. */
-  OPEN(false, GUIOPEN, "ctrl O", GUIOPENTT) {
+  OPEN(false, GUIOPEN, "% O", GUIOPENTT) {
     @Override
     public void execute() {
       final GUI main = GUI.get();
@@ -109,7 +109,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Reset database. */
-  CLOSE(true, GUICLOSE, "ctrl F4", GUICLOSETT) {
+  CLOSE(true, GUICLOSE, "% W", GUICLOSETT) {
     @Override
     public void execute() {
       GUI.get().execute(new Close());
@@ -117,7 +117,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Open XQuery. */
-  XQOPEN(true, GUIXQOPEN, "ctrl R", GUIXQOPENTT) {
+  XQOPEN(true, GUIXQOPEN, "% R", GUIXQOPENTT) {
     @Override
     public void execute() {
       // open file chooser for XML creation
@@ -142,7 +142,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Save XQuery. */
-  XQSAVE(true, GUIXQSAVE, "ctrl S", GUIXQSAVETT) {
+  XQSAVE(true, GUIXQSAVE, "% S", GUIXQSAVETT) {
     @Override
     public void execute() {
       // open file chooser for XML creation
@@ -181,7 +181,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Export document. */
-  EXPORT(true, GUIEXPORT, "ctrl E", GUIEXPORTTT) {
+  EXPORT(true, GUIEXPORT, "% E", GUIEXPORTTT) {
     @Override
     public void execute() {
       // open file chooser for XML creation
@@ -218,7 +218,7 @@ public enum GUICommands implements GUICommand {
   /* EDIT COMMANDS */
 
   /** Copy the currently marked nodes. */
-  COPY(true, GUICOPY, "ctrl C", GUICOPYTT) {
+  COPY(true, GUICOPY, "% C", GUICOPYTT) {
     @Override
     public void execute() {
       final Context context = GUI.context;
@@ -235,7 +235,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Copy the current path. */
-  COPYPATH(true, GUICPPATH, "ctrl shift C", GUICPPATHTT) {
+  COPYPATH(true, GUICPPATH, "% shift C", GUICPPATHTT) {
     @Override
     public void execute() {
       final int pre = GUI.context.marked().nodes[0];
@@ -254,7 +254,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Paste the copied nodes. */
-  PASTE(true, GUIPASTE, "ctrl V", GUIPASTETT) {
+  PASTE(true, GUIPASTE, "% V", GUIPASTETT) {
     @Override
     public void execute() {
       GUI.get().execute(new Copy(true, "0"));
@@ -373,7 +373,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Show search. */
-  SHOWSEARCH(true, GUISHOWSEARCH, "ctrl F", GUISHOWSEARCHTT) {
+  SHOWSEARCH(true, GUISHOWSEARCH, "% F", GUISHOWSEARCHTT) {
     @Override
     public void execute() {
       GUIProp.showquery ^= true;
@@ -391,7 +391,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Show info. */
-  SHOWINFO(true, GUISHOWINFO, "ctrl G", GUISHOWINFOTT) {
+  SHOWINFO(true, GUISHOWINFO, "% G", GUISHOWINFOTT) {
     @Override
     public void execute() {
       GUIProp.showinfo ^= true;
@@ -492,7 +492,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Show Text View. */
-  SHOWTEXT(false, GUISHOWTEXT, "ctrl 1", GUISHOWTEXTTT) {
+  SHOWTEXT(false, GUISHOWTEXT, "% 1", GUISHOWTEXTTT) {
     @Override
     public void execute() {
       if(!GUI.context.db()) GUIProp.showstarttext ^= true;
@@ -512,7 +512,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Show map. */
-  SHOWMAP(true, GUISHOWMAP, "ctrl 2", GUISHOWMAPTT) {
+  SHOWMAP(true, GUISHOWMAP, "% 2", GUISHOWMAPTT) {
     @Override
     public void execute() {
       GUIProp.showmap ^= true;
@@ -531,7 +531,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Show Tree View. */
-  SHOWTREE(true, GUISHOWTREE, "ctrl 3", GUISHOWTREETT) {
+  SHOWTREE(true, GUISHOWTREE, "% 3", GUISHOWTREETT) {
     @Override
     public void execute() {
       GUIProp.showtree ^= true;
@@ -549,7 +549,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Show Table View. */
-  SHOWTABLE(true, GUISHOWTABLE, "ctrl 4", GUISHOWTABLETT) {
+  SHOWTABLE(true, GUISHOWTABLE, "% 4", GUISHOWTABLETT) {
     @Override
     public void execute() {
       GUIProp.showtable ^= true;
@@ -567,7 +567,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Show Plot View. */
-  SHOWPLOT(true, GUISHOWPLOT, "ctrl 5", GUISHOWPLOTTT) {
+  SHOWPLOT(true, GUISHOWPLOT, "% 5", GUISHOWPLOTTT) {
     @Override
     public void execute() {
       GUIProp.showplot ^= true;
@@ -680,7 +680,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Map layout. */
-  MAPLAYOUT(true, GUIMAPLAYOUT, "ctrl L", GUIMAPLAYOUTTT) {
+  MAPLAYOUT(true, GUIMAPLAYOUT, "% L", GUIMAPLAYOUTTT) {
     @Override
     public void execute() {
       DialogMapLayout.get(GUI.get()).setVisible(true);
@@ -688,7 +688,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Database path. */
-  PREFS(false, GUIPREFS, "ctrl P", GUIPREFSTT) {
+  PREFS(false, GUIPREFS, "% P", GUIPREFSTT) {
     @Override
     public void execute() {
       new DialogPrefs(GUI.get());
@@ -718,7 +718,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Show Database info. */
-  INFO(true, GUIINFO, "ctrl I", GUIINFOTT) {
+  INFO(true, GUIINFO, "% I", GUIINFOTT) {
     @Override
     public void execute() {
       final DialogInfo info = new DialogInfo(GUI.get());

@@ -1,5 +1,7 @@
 package org.basex.gui;
 
+import java.awt.Event;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JCheckBoxMenuItem;
@@ -9,6 +11,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
+import org.basex.BaseX;
 import org.basex.gui.layout.BaseXLabel;
 import static org.basex.gui.GUIConstants.*;
 
@@ -28,6 +31,9 @@ public final class GUIMenu extends JMenuBar {
    * Initializes the menu bar.
    */
   public GUIMenu() {
+    final String sm = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ==
+      Event.META_MASK ? "meta" : "ctrl";
+    
     // create menu for each top level menu entries
     int c = 0;
     for(int i = 0; i < MENUBAR.length; i++)
@@ -66,8 +72,10 @@ public final class GUIMenu extends JMenuBar {
             item.setMnemonic(cmd.desc().charAt(0));
             item.setToolTipText(cmd.help());
 
-            if(cmd.key() != null) item.setAccelerator(
-                KeyStroke.getKeyStroke(cmd.key()));
+            final String sc = cmd.key();
+            if(sc != null) {
+              item.setAccelerator(KeyStroke.getKeyStroke(BaseX.info(sc, sm)));
+            }
             comp = item;
             items[c++] = item;
           }
