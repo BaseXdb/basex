@@ -3,8 +3,8 @@ body {
   margin        : 0;
   background    : #FFFFFF;
   color         : #000000;
-  font-family   : myriad web, arial, verdana, sans-serif;
-  font-size     : 100%
+  font-family   : verdana, arial, sans-serif;
+  font-size     : 12px;
 }
 
 #content {
@@ -33,7 +33,7 @@ body {
   background-repeat : no-repeat;
   font-size         : 160%;
   color             : #aaaaaa;
-  margin-top        : -30px;
+  margin-top        : -50px;
   margin-left       : 140px;
 }
 
@@ -94,7 +94,7 @@ dl {
 
 #footer {
   text-align  : right;
-  font-size   : 75%;
+  font-size   : 80%;
   color       : #999999;
   background  : #FFFFFF;
   border-top  : 1px solid #999999;
@@ -116,7 +116,7 @@ dl {
   color          : #E00000;
   background        : #FFFFFF;
   text-decoration      : none;
-  font-size        : 120%;
+  font-size        : 140%;
 }
 
 #links p {
@@ -131,7 +131,7 @@ dl {
 
 #sublinks a
 {
-	font-size   : 95%;
+	font-size   : 100%;
 	margin-left : 10px;
 }	
 

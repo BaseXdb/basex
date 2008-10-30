@@ -27,7 +27,7 @@ include("inc/nav.inc");
  */</span>
 <span class="orange">public final</span> class XQueryExample {
 <span class="comment">  /** Sample query. */</span>
-  <span class="orange">private static final</span> String QUERY = <span class="red">"<xml>This is a test</xml>/text()"</span>;
+  <span class="orange">private static final</span> String QUERY = <span class="red">"&lt;xml&gt;This is a test&lt;/xml&gt;/text()"</span>;
 
 <span class="comment">  /** Private constructor. */</span>
   <span class="orange">private</span> XQueryExample() { }

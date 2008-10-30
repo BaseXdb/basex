@@ -35,7 +35,6 @@ If you can't find an answer on your question, please write to<code> info@basex.o
 <dl>
 <dt><a href="#3.1">3.1 Views and Panels</a><br/></dt>
 <dd><a href="#3.1.1">3.1.1 How many views are there and what do they do?</a><br/>
-<a href="#3.1.2">3.1.2 A Table View for hierachical data. Sorry, but sounds brain-damaged.</a><br/></dd>
 <dt><a href="#3.2">3.2 What is realtime filtering?</a><br/></dt>
 <a href="#3.3">3.3 What does the Filter button exactly do?</a><br/>
 <a href="#3.4">3.4 How can I search without XPath/XQuery?</a><br/>
@@ -264,16 +263,6 @@ replace tags with @name attributes.</div>
     <dd>This view provides context sensitive information to use all the BaseX features.</dd>
   </dl>
 </div>
-
-<a name="3.1.2"></a><h4>3.1.2 A Table View for hierachical data. Sorry, but sounds brain-damaged.</h4>
-It sounds brain-damaged but it's really useful for many kinds of data. It's just another visualization which provides
-an efficient and effective way to display data. See the following example:
-
-<h6>Food Menu</h6>
-
-<p><img border="1" src="gfx/TableView.png"/></p>
-
-It's possible to edit/add/delete elements in the table view directly.
 
 <a name="3.2"></a><h3>3.2 What is Realtime Filtering?</h3>
 <div>

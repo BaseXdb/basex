@@ -10,8 +10,7 @@ include("inc/nav.inc");
 <h1>Contact</h1>
     <p>Feel free to send an email to <code>info@basex.org</code> to get more information.<br/>
     You find further information on the project on our <a
-href="http://www.inf.uni-konstanz.de/dbis/research/basex">Research Page</a> and
-on <a href="http://sourceforge.net/projects/basex/">Sourceforge</a>.
+href="http://www.informatik.uni-konstanz.de/arbeitsgruppen/dbis/">University Site</a>.
     </p>
 
     <h2>Students @ BaseX</h2>
@@ -26,15 +25,12 @@ internal facts from your fellow students:
     </p> 
 
     <ul>
-      <li>Elmedin Dedovic (B.Sc. Cand.) works on XQuery FS Commands</li>
-      <li>Sebastian Faller (M. Sc. Cand.) works on View Schemas, Layout Views</li>
       <li>Sebastian Gath (M. Sc. Cand.) works on fulltext indexes</li>
-      <li>Tino Gruse (B.Sc. Cand.) works on Namespaces</li>
+      <li>Lukas Kircher (B.Sc. Cand.) works on two-dimensional XML visualizations</li>
+      <li>Andreas Weiler (M. Sc. Cand.) works on DTD and XMLDB API support</li>
+      <li>Sebastian Faller (M. Sc. Cand.) works on View Schemas, Layout Views</li>
       <li>J&ouml;rg Hauser (B.Sc. Cand.) works on TreeMap Layouts</li>
-      <li>Lukas Kircher (B.Sc. Cand.) has written an e-mail extractor and is currently involved in frontend development</li>
       <li>Hannes Schwarz (M. Sc. Cand.) works on BX Filesystem Commands</li>
-      <li>Fatih Ulusoy (B.Sc. Cand.) works on Backend (Opt./Indexes)</li>
-      <li>Andreas Weiler (M. Sc. Cand.) works on DTD support</li>
     </ul>
 
     <h2>Alumni</h2>

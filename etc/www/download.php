@@ -3,7 +3,9 @@ $webpage= basename($_SERVER['SCRIPT_NAME']);
 
 if($_GET['dl']) {
 	$file = $_GET['dl'];
-	$url = $file == 'latest' ? "download/BaseX-latest.jar" : "http://downloads.sourceforge.net/basex/$file";
+	$url = $file == 'latest' ?
+		"http://www.inf.uni-konstanz.de/dbis/basex/download/BaseX-latest.jar" :
+		"http://downloads.sourceforge.net/basex/$file";
 	$meta = "<meta http-equiv=\"REFRESH\" content=\"0; URL=$url\">";
 	$addr = $HTTP_SERVER_VARS['REMOTE_ADDR'];
 	$host = gethostbyaddr($addr);
@@ -12,7 +14,7 @@ if($_GET['dl']) {
 	     preg_match("/search.live/", $host) ||
 	     preg_match("/crawl.yahoo/", $host) ||
 	     preg_match("/inktomisearch/", $host))) {
-		$fp = fopen("/www_io_mnt/ibh_wiki/images/basex.log", "a");
+		$fp = fopen("/www_io_mnt/gruen/bx/basexdl.log", "a");
 		fwrite($fp, date('j.m.y, G:i')." Uhr [$addr, $host] $file\n");
 		fclose($fp);
 	}
@@ -26,7 +28,7 @@ include("inc/nav.inc");
 
 <div id="main">
 <h1>Download</h1>
-<h2>Current Version</h2>
+<h2>Official Version</h2>
 <p>
 <table cellspacing='0' cellpadding='0' border='0'>
   <tr>
@@ -46,12 +48,15 @@ include("inc/nav.inc");
 </table>
 </p>
 
-<h2>Latest Version (unstable)</h2>
+<h2>Latest Build (4.2)</h2>
 <p>
 <table cellspacing='0' cellpadding='0' border='0'>
   <tr>
-    <td width='200'>
-		<img src="gfx/download.gif"/> <a href="download.php?dl=latest">BaseX-latest.jar</a></td>
+    <td>
+		<img src="gfx/download.gif"/>
+		<a href="http://www.inf.uni-konstanz.de/dbis/basex/download/BaseX-latest.jar">BaseX-latest.jar</a>
+		<!--<img src="gfx/download.gif"/> <a href="download.php?dl=latest">BaseX-latest.jar</a>-->
+		(13 Oct 2008, 1.4 MB)</td>
   </tr>
 </table>
 </p>
