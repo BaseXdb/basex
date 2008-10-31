@@ -43,6 +43,8 @@ public final class ScatterView extends View implements Runnable {
   private static final double ROTATE = Math.sin(30);
   /** Plot margin: top, left, bottom, right margin. */
   private static final int[] MARGIN = new int[4];
+  /** Whitespace between captions. */
+  static final int CAPTIONWHITESPACE = 30;
   /** Data reference. */
   ScatterData scatterData;
   /** Item image. */
@@ -330,7 +332,7 @@ public final class ScatterView extends View implements Runnable {
     }
     
     final Kind type = axis.type;
-    if(type == Kind.TEXT) return;
+//    if(type == Kind.TEXT) return;
     final int nrCaptions = axis.nrCaptions;
     final double step = axis.captionStep;
     final double range = 1.0d / (nrCaptions - 1);
@@ -339,16 +341,19 @@ public final class ScatterView extends View implements Runnable {
     g.setFont(GUIConstants.font);
     for(int i = 0; i < nrCaptions; i++) {
       String caption = "";
-      if(type != Kind.CAT) {
+      if(type == Kind.CAT) {
+        // categoric data, each category is displayed as a caption 
+        caption = string(axis.cats[i]);
+
+      } else if(type == Kind.TEXT) {
+        caption = "TEXT";
+
+      } else {
+        // ... for numeric data captions are calculated
         final double min = axis.min;
         final double captionValue = i == nrCaptions - 1 ? axis.max : 
           min + (i * step);
-
         caption = formatString(captionValue, drawX);
-
-        // category data, each category is displayed as a caption 
-      } else {
-        caption = string(axis.cats[i]);
       }
       
       // if assignment consists of more than 10 characters the caption string

@@ -241,17 +241,8 @@ public final class ScatterAxis {
   
   /**
    * Determines the smallest and greatest occurring values for a specific item.
-   * Afterwards the extremes are slightly rounded to support a decent axis
+   * Afterwards the extremes are rounded to support a decent axis
    * caption.
-   *
-   * If range between min/max < 10 extremes are calculated by floor/ceil 
-   * function.
-   * If range >=10 the minimum is allowed to lie 25% of the range under the
-   * actual minimum. After that the final extreme is calculated as the value
-   * between the smallest allowed minimum and the actual minimum which is 
-   * dividable by pow(10, log10(range)-1).
-   * 
-   * Maximum v.v. . 
    */
   private void calcExtremeValues() {
     min = Integer.MAX_VALUE;
@@ -313,7 +304,7 @@ public final class ScatterAxis {
    * @param space space of view axis available for captions
    */
   void calcCaption(final int space) {
-    if(type != Kind.CAT) {
+    if(type == Kind.DBL || type == Kind.INT) {
       final double range = max - min;
       if(range == 0) {
         nrCaptions = 3;
@@ -326,8 +317,18 @@ public final class ScatterAxis {
         captionStep *= 2;
         nrCaptions = (int) (range / captionStep) + 1;
       }
-    } else {
+    
+    } else if(type == Kind.CAT) {
       nrCaptions = nrCats;
+    
+    } else {
+//      if(nrCats > 20) {
+//        final int c = space / (3 * ScatterView.CAPTIONWHITESPACE);
+//        nrCaptions = c >= 2 ? c : 2;
+//      } else {
+//        nrCaptions = nrCats;
+//      }
+      nrCaptions = 2;
     }
   }
 }
