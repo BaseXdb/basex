@@ -2,6 +2,7 @@ package org.basex.gui.view.scatter;
 
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -12,11 +13,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
+
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.StatsKey.Kind;
@@ -327,7 +330,8 @@ public final class ScatterView extends View implements Runnable {
       if(plotChanged) axis.calcCaption(pHeight);
     }
     
-    final boolean numeric = axis.numeric;
+    final Kind type = axis.type;
+    if(type == Kind.TEXT) return;
     final int nrCaptions = axis.nrCaptions;
     final double step = axis.captionStep;
     final double range = 1.0d / (nrCaptions - 1);
@@ -336,7 +340,7 @@ public final class ScatterView extends View implements Runnable {
     g.setFont(GUIConstants.font);
     for(int i = 0; i < nrCaptions; i++) {
       String caption = "";
-      if(numeric) {
+      if(type != Kind.CAT) {
         final double min = axis.min;
         final double captionValue = i == nrCaptions - 1 ? axis.max : 
           min + (i * step);
@@ -379,6 +383,11 @@ public final class ScatterView extends View implements Runnable {
         g.drawImage(img, MARGIN[1] - imgW - fs, y - fs, this);
         g.drawLine(MARGIN[1] - fs / 2, y, w - MARGIN[3], y);
       }
+      
+      //
+//      }
+      //
+      
     }
   }
 
@@ -501,14 +510,14 @@ public final class ScatterView extends View implements Runnable {
     int dist = Integer.MAX_VALUE;
     // all displayed items are tested for focus
     for(int i = 0; i < scatterData.size && dist != 0; i++) {
-      // coordinates of current tested item are calculated
+      // coordinates and distances for current tested item are calculated
       final int x = calcCoordinate(true, scatterData.xAxis.co[i]);
       final int y = calcCoordinate(false, scatterData.yAxis.co[i]);
       final int distX = Math.abs(mouseX - x);
       final int distY = Math.abs(mouseY - y);
       final int off = itemSize(false) / 2;
       // if x and y distances are smaller than offset value and the
-      // product of x and y distances is smaller than the actual minimal
+      // x and y distances combined is smaller than the actual minimal
       // distance of any item tested so far, the current item is considered 
       // as a focus candidate
       if(distX < off && distY < off) {
@@ -554,7 +563,7 @@ public final class ScatterView extends View implements Runnable {
     final ScatterAxis axis = drawX ? scatterData.xAxis : scatterData.yAxis;
     final byte[] val = axis.getValue(focused);
     if(val.length == 0) return "";
-    return axis.numType == Kind.TEXT ? string(val) :
+    return axis.type == Kind.TEXT ? string(val) :
       formatString(toDouble(val), drawX);
   }
   
@@ -581,11 +590,16 @@ public final class ScatterView extends View implements Runnable {
   @Override
   public void mouseDragged(final MouseEvent e) {
     if(working) return;
-    mouseX = e.getX();
-    mouseY = e.getY();
+    if(dragging) {
+      // to avoid significant offset between coordinates of mouse click and the
+      // start coordinates of the bounding box, mouseX and mouseY are determined
+      // by mousePressed()
+      mouseX = e.getX();
+      mouseY = e.getY();
+    }
     final int h = getHeight();
     final int w = getWidth();
-    final int th = 5;
+    final int th = 17;
     final int lb = MARGIN[1] - th;
     final int rb = w - MARGIN[3] + th;
     final int tb = MARGIN[0] - th;
@@ -650,6 +664,7 @@ public final class ScatterView extends View implements Runnable {
   public void mouseReleased(final MouseEvent e) {
     if(working) return;
     dragging = false;
+    notifyFocus(-1, this);
     repaint();
   }
   
@@ -659,6 +674,7 @@ public final class ScatterView extends View implements Runnable {
     super.mousePressed(e);
     mouseX = e.getX();
     mouseY = e.getY();
+    focus();
     // no item is focused. no nodes marked after mouse click
     if(focused == -1) {
       // a marking update is triggered with an empty node set as argument
@@ -703,4 +719,23 @@ public final class ScatterView extends View implements Runnable {
       notifyMark(marked);
     }
   }
+  
+  
+  //
+  // testing
+  //
+//  public static void main(String[] args) {
+//    final byte[][] t = { token("ab"), token("aa"), token(""), token("cab") }; 
+////        token(112), token(86),  token(64),  token(325) };
+//    IntList il = new IntList();
+//    il = IntList.createOrder(t, false, true);
+//    final int[] res = il.finish();
+//    for(int i = 0; i < res.length; i++) {
+//      System.out.println(res[i]);
+//    }
+//    System.out.println("\nog: ");
+//    for(int i = 0; i < t.length; i++) {
+//      System.out.println(string(t[i]));
+//    }
+//  }
 }

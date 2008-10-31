@@ -116,7 +116,8 @@ public final class ScatterData {
   }
 
   /**
-   * Returns the array position of a given pre value.
+   * Returns the array position of a given pre value by performing a binary
+   * on the sorted pre values array currently displayed in the plot.
    * @param pre pre value to be looked up
    * @return array index if found, -1 if not
    */

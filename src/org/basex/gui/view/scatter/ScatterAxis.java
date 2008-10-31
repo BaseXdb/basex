@@ -1,10 +1,13 @@
 package org.basex.gui.view.scatter;
 
 import static org.basex.util.Token.*;
+
 import org.basex.data.Data;
 import org.basex.data.StatsKey;
 import org.basex.data.StatsKey.Kind;
 import org.basex.gui.GUI;
+import org.basex.util.IntList;
+import org.basex.util.Set;
 import org.basex.util.TokenList;
 
 /**
@@ -15,19 +18,19 @@ import org.basex.util.TokenList;
  */
 public final class ScatterAxis {
   /** Text length limit for text to number transformation. */
-  private static final int TEXTLENGTH = 8;
+  private static final int TEXTLENGTH = 11;
   /** Scatter data reference. */
   private final ScatterData scatterData;
   /** Tag reference to selected attribute. */
   int attrID;
+  /** Constant to determine whether axis attribute equals deepFS "@size". */
+  private static final byte[] ATSIZE = token("size");
   /** True if attribute is a tag, false if attribute. */
   boolean isTag;
-  /** True if attribute is numerical. */
-  boolean numeric;
   /** Number of different categories for x attribute. */
   int nrCats;
   /** Data type. */
-  Kind numType;
+  Kind type;
 
   /** Coordinates of items. */
   double[] co = {};
@@ -59,8 +62,7 @@ public final class ScatterAxis {
    */
   private void initialize() {
     isTag = false;
-    numeric = false;
-    numType = Kind.INT;
+    type = Kind.INT;
     co = new double[0];
     vals = new byte[0][];
     nrCats = -1;
@@ -99,12 +101,9 @@ public final class ScatterAxis {
     final Data data = GUI.context.data();
     final StatsKey key = isTag ? data.tags.stat(attrID) :
       data.atts.stat(attrID);
-    numeric = key.kind == Kind.INT || key.kind == Kind.DBL || 
-      key.kind == Kind.TEXT;
+    type = key.kind;
 
-    if(numeric) {
-      numType = key.kind;
-    } else {
+    if(type == Kind.CAT) {
       final TokenList tl = new TokenList();
       tl.add(EMPTY);
       for(final byte[] k : key.cats.keys()) tl.add(k);
@@ -119,36 +118,74 @@ public final class ScatterAxis {
     vals = new byte[items.length][];
     for(int i = 0; i < items.length; i++) {
       byte[] value = getValue(items[i]);
-      if(numeric && numType == Kind.TEXT && value.length > TEXTLENGTH) {
+      if(type == Kind.TEXT && value.length > TEXTLENGTH) {
         value = substring(value, 0, TEXTLENGTH);
       }
       vals[i] = value;
     }
     
-    if(numeric) {
-      if(numType == Kind.TEXT) textToNum();
-      calcExtremeValues();
+    if(type != Kind.CAT) {
+      if(type == Kind.TEXT) {
+        textToNum();
+      } else {
+        calcExtremeValues();
+      }
     }
-    for(int i = 0; i < vals.length; i++) {
-      co[i] = calcPosition(vals[i]);
+    // coordinates for TEXT already calculated in textToNum()
+    if(type != Kind.TEXT) {
+      for(int i = 0; i < vals.length; i++)
+        co[i] = calcPosition(vals[i]);
     }
     vals = null;
   }
   
   /**
-   * Transforms TEXT data to numerical data by summing up the unicode value
-   * of the first four characters. If a node has less than four characters
-   * the value of the empty ones is 0. 
+   * TEXT data is transformed to categories, meaning each unique string forms
+   * a category. The text values of the items are first sorted. The coordinate
+   * for an item is then calculated as the position of the text value of this
+   * item in the sorted category set.   
    */
   private void textToNum() {
-    final double p = 987331;
+    // sort text values alphabetical (asc).
+    Set set = new Set();
     for(int i = 0; i < vals.length; i++) {
-      int v = 0;
-      final int vl = vals[i].length;
-      for(int j = 0; j < vl; j++) {
-        v += ((vals[i][j] & 0xFF) << ((TEXTLENGTH - 1 - j) << 3)) % p;
+      set.add(vals[i]);
+    }
+    // items lacking values are painted outside of plot and 2 additional empty
+    // categories are added for layout reasons -> +2
+    nrCats = set.size() + 2;
+    set = null;
+    
+    // get sorted indexes for values
+    final int[] tmpI = IntList.createOrder(vals, false, true).finish();
+    final int vl = vals.length;
+    int i = 0;
+    
+    // find first non empty value
+    while(i < vl && vals[i].length == 0) {
+      co[tmpI[i]] = -1;
+      i++;
+    }
+    
+    // number of current category / position of item value in ordered 
+    // text set. first category remains empty for layout reasons
+    int p = 1;
+    while(i < vl) {
+      // next string category to be tested
+      final byte[] b = vals[i];
+      // l: highest index for value b
+      int l = i;
+      // determing highest index of value/category b
+      while(l < vl && eq(vals[l], b)) {
+        l++;
       }
-      vals[i] = token(v);
+      // calculating positions for all items with value b in current category
+      while(i < l) {
+        final double d = (1.0d / (nrCats - 1)) * p;
+        co[tmpI[i]] = d;
+        i++;
+      }
+      p++;
     }
   }
   
@@ -163,7 +200,7 @@ public final class ScatterAxis {
     }
     
     double percentage = 0d;
-    if(numeric) {
+    if(type != Kind.CAT) {
       final double d = toDouble(value);
       final double range = max - min;
       if(range == 0)
@@ -228,13 +265,23 @@ public final class ScatterAxis {
       if(d > max) 
         max = d;
     }
+    if(max - min == 0) return;
     
+    // flag for deepFS @size attribute
+    final Data data = GUI.context.data();
+    int fsplus = 6;
+    final boolean fss = data.fs != null && eq(data.atts.key(attrID), ATSIZE);
+//    final boolean fss = false;
     final double range = max - min;
     final double lmin = min - range / 2;
     final double lmax = max + range / 2;
-    final double rangePow = Math.floor(Math.log10(range) + .5d);
-    final double lstep = (int) (Math.pow(10, rangePow));
-    calculatedCaptionStep = (int) (Math.pow(10, rangePow - 1));
+    final double rangePow = Math.floor(fss ? 
+        Math.log(Math.pow(Math.E, Math.exp(2))) : Math.log10(range) + .5d);
+    final double lstep = (int) (Math.pow(fss ? 2 : 10, 
+        fss ? rangePow + fsplus : rangePow));
+    calculatedCaptionStep = (int) (Math.pow(fss ? 2 : 10, rangePow - 
+        (fss ? -fsplus : 1)));
+//    calculatedCaptionStep = (int) (Math.pow(10, rangePow - 1));
     
     // find minimum axis assignment
     double c = Math.floor(min);
@@ -266,7 +313,7 @@ public final class ScatterAxis {
    * @param space space of view axis available for captions
    */
   void calcCaption(final int space) {
-    if(numeric) {
+    if(type != Kind.CAT) {
       final double range = max - min;
       if(range == 0) {
         nrCaptions = 3;
