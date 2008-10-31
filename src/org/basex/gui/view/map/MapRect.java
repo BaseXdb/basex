@@ -71,8 +71,7 @@ public final class MapRect implements Cloneable {
    * @return result of comparison
    */
   boolean contains(final MapRect r) {
-    return r.x >= x  - 15 && r.y >= y - 15 && r.x + r.w <= x + w + 15 && 
-    r.y + r.h <= y + h + 15;
+    return r.x >= x && r.y >= y && r.x + r.w <= x + w && r.y + r.h <= y + h;
   }
 
   @Override
