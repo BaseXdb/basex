@@ -53,7 +53,7 @@ public final class RealView extends View {
   /** the list of all parent nodes of a node line. */
   private IntList parentList = null;
   /** array with position of the parent node. */
-  private HashMap<Integer, Integer> parentPos = null;
+  private HashMap<Integer, Double> parentPos = null;
 
   /**
    * Default Constructor.
@@ -183,12 +183,12 @@ public final class RealView extends View {
   private void drawTemperature(final Graphics g, final int level) {
     final Data data = GUI.context.data();
     final int size = parentList.size;
-    final HashMap<Integer, Integer> temp = new HashMap<Integer, Integer>();
-    int x = 0;
+    final HashMap<Integer, Double> temp = new HashMap<Integer, Double>();
+    double x = 0;
     final int y = 1 * level * fontHeight * 2;
     final double width = this.getSize().width - 1;
-    final int ratio = (int) Math.rint(width / size);
-    final int minSpace = 39; // minimum Space for Tags
+    final double ratio = width / size;
+    final int minSpace = 35; // minimum Space for Tags
     final boolean space = ratio > minSpace ? true : false;
 
     for(int i = 0; i < size; i++) {
@@ -203,29 +203,40 @@ public final class RealView extends View {
 
       final double nodePercent = nodeSize / (double) sumNodeSizeInLine;
       g.setColor(Color.black);
-      g.drawRect(x, y, ratio, fontHeight);
+      g.drawRect((int) x, y, (int) ratio, fontHeight);
       int c = (int) Math.rint(255 * nodePercent * 40);
       c = c > 255 ? 255 : c;
       g.setColor(new Color(c, 0, 255 - c));
-      g.fillRect(x + 1, y + 1, ratio - 1, fontHeight - 1);
+      g.fillRect((int) x + 1, y + 1, (int) (ratio - 1), fontHeight - 1);
 
-      final int boxMiddle = x + Math.round(ratio / 2f);
+      final double boxMiddle = x + ratio / 2f;
       g.setColor(Color.black);
 
       if(space) {
-        final String s = Token.string(data.tag(pre));
-        final int textWidth = BaseXLayout.width(g, s);
-        g.drawString(s, boxMiddle - textWidth / 2, y + fontHeight - 2);
+        String s = Token.string(data.tag(pre));
+        int textWidth = 0;
+        
+        while((textWidth = BaseXLayout.width(g, s)) + 4 > ratio) {
+            s = s.substring(0, s.length() / 2).concat("?");
+        }
+        
+        g.drawString(s, (int) boxMiddle - textWidth / 2, y + fontHeight - 2);
       }
 
       if(parentPos != null) {
 
-        final int line = Math.round(fontHeight / 4f);
-        final int parentMiddle = parentPos.get(data.parent(pre, Data.ELEM));
-        g.drawLine(boxMiddle, y, boxMiddle, y - line);
+        
+        final double parentMiddle = parentPos.get(data.parent(pre, Data.ELEM));
+        
+        g.setColor(new Color(c, 0, 255 - c, 100));
+        g.drawLine((int) boxMiddle, y - 1, (int) parentMiddle, 
+            y - fontHeight + 1);
 
-        g.drawLine(boxMiddle, y - line, parentMiddle, y - line);
-        g.drawLine(parentMiddle, y - line, parentMiddle, y - fontHeight);
+//        final int line = Math.round(fontHeight / 4f);
+//        g.drawLine((int) boxMiddle, y, (int) boxMiddle, y - line);
+//        g.drawLine((int) boxMiddle, y - line, (int) parentMiddle, y - line);
+//        g.drawLine((int) parentMiddle, y - line, (int) parentMiddle, y
+//            - fontHeight);
 
       }
 
