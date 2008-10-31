@@ -252,7 +252,6 @@ public final class ScatterView extends View implements Runnable {
         drawItem(g, x1, y1, true, false);
         // draw focused x and y value
         g.setFont(GUIConstants.font);
-        // strings are formatted if deepfs
         final String x = formatString(true);
         final String y = formatString(false);
         final String label = (x.length() > 16 ? x.substring(0, 16) : x) + " / " 
@@ -563,7 +562,7 @@ public final class ScatterView extends View implements Runnable {
     final ScatterAxis axis = drawX ? scatterData.xAxis : scatterData.yAxis;
     final byte[] val = axis.getValue(focused);
     if(val.length == 0) return "";
-    return axis.type == Kind.TEXT ? string(val) :
+    return axis.type == Kind.TEXT || axis.type == Kind.CAT ? string(val) :
       formatString(toDouble(val), drawX);
   }
   
