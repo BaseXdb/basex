@@ -190,22 +190,24 @@ public final class FTContains extends DualExpr {
     }
 
     if (v2.bool()) {
-      final FTArrayExpr ftae = (FTArrayExpr) expr2;
-      ftn = (ftn == null && ftae.more()) ? ftae.next(ctx) : ftn;
-
-      if (ftn != null) {
-        while (ftn.getPre() < ns.nodes[0]) {
-          if (ftae.more()) ftn = ftae.next(ctx);
-          else break;
-        }
-      
-        if (ftn.size > 0) {
-          final boolean not = ftn.not;
-          if (ftn.getPre() == ns.nodes[0]) {
-            ftn = null;
-            return Bool.get(!not); // false
+      if (expr2 instanceof FTArrayExpr) {
+        final FTArrayExpr ftae = (FTArrayExpr) expr2;
+        ftn = (ftn == null && ftae.more()) ? ftae.next(ctx) : ftn;
+  
+        if (ftn != null) {
+          while (ftn.getPre() < ns.nodes[0]) {
+            if (ftae.more()) ftn = ftae.next(ctx);
+            else break;
           }
-          return Bool.get(not); //Bool.TRUE;
+        
+          if (ftn.size > 0) {
+            final boolean not = ftn.not;
+            if (ftn.getPre() == ns.nodes[0]) {
+              ftn = null;
+              return Bool.get(!not); // false
+            }
+            return Bool.get(not); //Bool.TRUE;
+          }
         }
       }
      return Bool.TRUE;
@@ -318,6 +320,7 @@ public final class FTContains extends DualExpr {
     if (nrIDs < Integer.MAX_VALUE && nrIDs > -1) {
       s = false;
     }
+    if (nrIDs == -1) expr2 = Bool.TRUE;
     return nrIDs == -1 ? Integer.MAX_VALUE : nrIDs;
   }
 

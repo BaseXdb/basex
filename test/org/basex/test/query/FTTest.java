@@ -38,11 +38,9 @@ public final class FTTest extends AbstractTest {
       "</fttest>";
 
     queries = new Object[][] {
-        { "FTMildNot1", nodes(3, 5),
-          "//w [text() ftcontains 'xml' not in 'xml databases']" },
-        { "FTMildNot2", nodes(14),
-          "//w [text() ftcontains 'hello' not in 'xml']" },
-
+        { "FTUnaryNot6", nodes(3, 5, 7, 9, 11, 14, 37),
+        "//w [text() ftcontains ftnot 'bier']" },
+        
         { "Simple 1", bool(true),
           "'abc' ftcontains 'abc'" },
         { "Simple 2", bool(true),

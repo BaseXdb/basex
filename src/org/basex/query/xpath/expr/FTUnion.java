@@ -41,17 +41,8 @@ public final class FTUnion extends FTArrayExpr {
   @Override
   public boolean more() {
     boolean b = false;
-/*    if (cn.size > 0) {
-      for (int i = 0; i < cn.size; i++) {
-        mn[i] = exprs[nex[i]].more();
-        if (!b) b = mn[i];
-      }
-      cn.reset(nex.length);
-    }
-  */  
     if (cp.size > 0) {
       for (int i = 0; i < cp.size; i++) {
-        //mp[i] = exprs[pex[cp.get(i)]].more();
         mp[pex[cp.list[i]]] = exprs[pex[cp.list[i]]].more();
         if (!b) b = mp[i];
       }
@@ -78,12 +69,13 @@ public final class FTUnion extends FTArrayExpr {
       cp.set(minp, 0);
       for (int ip = minp + 1; ip < pex.length; ip++) {       
         if (mp[ip]) { 
-          if (exprs[pex[ip]].next(ctx).getPre() < 
-              exprs[pex[minp]].next(ctx).getPre()) {
+          final FTNode n1 = exprs[pex[ip]].next(ctx);
+          final FTNode n2 = exprs[pex[minp]].next(ctx);
+          
+          if (n1.getPre() < n2.getPre()) {
             minp = ip;
             cp.set(ip, 0);
-          } else if (exprs[pex[ip]].next(ctx).getPre() == 
-              exprs[pex[minp]].next(ctx).getPre()) {
+          } else if (n1.getPre() == n2.getPre()) {
               cp.add(ip);
           }
         } 

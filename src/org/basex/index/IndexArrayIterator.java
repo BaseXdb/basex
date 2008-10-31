@@ -92,6 +92,7 @@ public class IndexArrayIterator extends IndexIterator {
    * @return FTNode next FTNode
    */
   public FTNode nextFTNode() {
+    if (d == size) return new FTNode();
     final FTNode n = pres != null ? new FTNode(pres[d])
       : (ftdata == null ? nextFTNodeFD() : 
         new FTNode(ftdata[d], toknum));

@@ -191,6 +191,9 @@ public final class FTPos {
   private IntList[] sortPositions() {
     IntList p = new IntList();
     IntList pp = new IntList();
+    for (int i = 0; i < pos.length; i++) 
+      if (pos[i].size == 0) return new IntList[]{new IntList(), new IntList()};
+    
     int[] k = new int[size];
     int min = 0;
     boolean q = false;

@@ -40,7 +40,9 @@ public final class FTIntersection extends FTArrayExpr {
    * @return boolean
    */
   private boolean more(final int[] n) {
-    for (int i : n) if (!exprs[i].more()) return false;
+    for (int i : n) if (!exprs[i].more()) {
+      return false;
+    }
     return true;
   }
   
@@ -63,7 +65,7 @@ public final class FTIntersection extends FTArrayExpr {
    * @return FTNode as resultnode
    */
   private FTNode calcFTAnd(final int[] n, final XPContext ctx) {
-    if (n.length == 0) return null;
+    if (n.length == 0) return  new FTNode();
     else if (n.length == 1) return exprs[n[0]].next(ctx);
     
     FTNode n1 = exprs[n[0]].next(ctx);
@@ -76,7 +78,7 @@ public final class FTIntersection extends FTArrayExpr {
         if (d < 0) {
           if (i != 1) {
             i = 1;
-            n2 = exprs[n[i]].next(ctx);
+            n2 = exprs[n[i]].next(ctx);            
           }
           if (exprs[n[0]].more())
             n1 = exprs[n[0]].next(ctx);
@@ -107,11 +109,8 @@ public final class FTIntersection extends FTArrayExpr {
     ctx.ftpos = ftpos;
     
     final FTNode n1 = calcFTAnd(pex, ctx);
-    
-/*    nod2 = (nex.length > 0 && nod2 == null && more(nex)) ? 
-        calcFTAnd(nex, ctx) : nod2;
-*/
-    if (n1 != null) {
+
+    if (n1 != null && n1.size > 0) {
       nod2 = (nex.length > 0 && nod2 == null && more(nex)) ? 
           calcFTAnd(nex, ctx) : nod2;
       if (nod2 != null) {

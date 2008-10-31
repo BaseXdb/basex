@@ -59,24 +59,13 @@ public final class FTUnaryNot extends FTArrayExpr {
   @Override
   public int indexSizes(final XPContext ctx, final Step curr, final int min) {
     if (exprs.length == 1) {
-      exprs[0].indexSizes(ctx, curr, min);
-      return Integer.MAX_VALUE;
-      //if (nrIDs == 0) return Integer.MAX_VALUE;
-      //return nrIDs;
+      final int nrIds = exprs[0].indexSizes(ctx, curr, min);
+      //return exprs[0].indexSizes(ctx, curr, min);
+      return nrIds == 0 ? -1 : Integer.MAX_VALUE;
     }
     
     // should not happen
     return Integer.MAX_VALUE;
-    //return Integer.MAX_VALUE;
-/*    int sum = 0;
-    for(final Expr expr : exprs) {
-      final int nrIDs = expr.indexSizes(ctx, curr, min);
-      if(nrIDs == Integer.MAX_VALUE) return nrIDs;
-      sum += nrIDs;
-      if(sum > min) return min;
-    }
-    return sum > min ? min : sum;
-*/
   }
   
   @Override

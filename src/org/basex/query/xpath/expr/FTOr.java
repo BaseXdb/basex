@@ -63,7 +63,7 @@ public final class FTOr extends FTArrayExpr {
 
     for (int i = 0; i < exprs.length; i++) {
       final int nrIDs = exprs[i].indexSizes(ctx, curr, min);
-      if (!(exprs[i] instanceof FTUnaryNot)) {
+      if (!(exprs[i] instanceof FTUnaryNot) && nrIDs > 0) {
         i1.add(i);
         sum += nrIDs;
       } else if (nrIDs > 0) {
