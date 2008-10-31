@@ -1135,6 +1135,7 @@ public final class XQParser extends QueryParser {
 
   /**
    * [ 59] Parses a ValueExpr.
+   * [ 65] Parses an ExtensionExpr.
    * @return query expression
    * @throws XQException xquery exception
    */
@@ -1143,7 +1144,7 @@ public final class XQParser extends QueryParser {
     if(lax || consumeWS(VALIDATE, STRICT, NOVALIDATE)) validate();
 
     final Expr e = path();
-    return e != null ? e : extension();
+    return e != null ? e : pragma() ? enclosed(NOPRAGMA) : null;
   }
 
   /**
@@ -1159,12 +1160,12 @@ public final class XQParser extends QueryParser {
   }
 
   /**
-   * [ 65] Parses an ExtensionExpr.
-   * @return query expression
+   * [ 66] Parses a Pragma.
+   * @return true if pragma was found
    * @throws XQException xquery exception
    */
-  private Expr extension() throws XQException {
-    if(!consumeWS2(PRAGMA)) return null;
+  private boolean pragma() throws XQException {
+    if(!consumeWS2(PRAGMA)) return false;
 
     do {
       // ignore all pragmas...
@@ -1182,8 +1183,7 @@ public final class XQParser extends QueryParser {
       tok.finish();
       qp += 2;
     } while(consumeWS(PRAGMA));
-
-    return enclosed(NOPRAGMA);
+    return true;
   }
 
   /**
@@ -2092,6 +2092,13 @@ public final class XQParser extends QueryParser {
    * @throws XQException xquery exception
    */
   private Expr ftPrimary() throws XQException {
+    if(pragma()) {
+      check(BRACE1);
+      final Expr e = ftSelection();
+      check(BRACE2);
+      return e;
+    }
+    
     if(consumeWS(PAR1)) {
       final Expr e = ftSelection();
       check(PAR2);
