@@ -166,9 +166,17 @@ public final class RealView extends View {
         if(r[i].contains(mousePosX, mousePosY)) {
 
           final int pre = r[i].p;
-          System.out.print(Token.string(data.tag(pre)) + " ");
+          String s = "";
+          
+          if(data.kind(pre) == Data.ELEM) {
+            s = Token.string(data.tag(pre));
+          } else {
+            s = Token.string(data.text(pre));
+          }
+          
+          System.out.print(s + " ");
 
-          for(int y = 0; y < data.attSize(pre, Data.ELEM) - 1; y++) {
+          for(int y = 0; y < data.attSize(pre, data.kind(pre)) - 1; y++) {
             System.out.print(Token.string(data.attName(pre + y + 1)) + "="
                 + "\"" + Token.string(data.attValue(pre + y + 1)) + "\" ");
           }
@@ -228,10 +236,10 @@ public final class RealView extends View {
 
       while(iterator.more()) {
         final int pre = iterator.next();
-        if(data.kind(pre) == Data.ELEM) {
-          temp.add(pre);
-          ++rCount;
-        }
+        //        if(data.kind(pre) == Data.ELEM) {
+        temp.add(pre);
+        ++rCount;
+        //        }
         sumNodeSize += data.size(pre, data.kind(pre));
       }
     }
@@ -271,8 +279,9 @@ public final class RealView extends View {
         x += ratio;
         continue;
       }
+      int nodeKind = data.kind(pre);
 
-      final int nodeSize = data.size(pre, Data.ELEM);
+      final int nodeSize = data.size(pre, nodeKind);
 
       final double nodePercent = nodeSize / (double) sumNodeSizeInLine;
       g.setColor(Color.black);
@@ -289,10 +298,33 @@ public final class RealView extends View {
       g.fillRect((int) x + 1, y + 1, l - 1, h - 1);
 
       final double boxMiddle = x + ratio / 2f;
-      g.setColor(Color.WHITE);
 
       if(space) {
-        String s = Token.string(data.tag(pre));
+        String s = "";
+
+        switch(nodeKind) {
+          case Data.ELEM:
+            s = Token.string(data.tag(pre));
+            g.setColor(Color.WHITE);
+            break;
+          case Data.COMM:
+            s = Token.string(data.text(pre));
+            g.setColor(Color.GREEN);
+            break;
+          case Data.PI:
+            s = Token.string(data.text(pre));
+            g.setColor(Color.PINK);
+            break;
+          case Data.DOC:
+            s = Token.string(data.text(pre));
+            g.setColor(Color.BLUE);
+            break;
+          default:
+            s = Token.string(data.text(pre));
+            g.setColor(Color.YELLOW);
+        }
+
+        Token.string(data.text(pre));
         int textWidth = 0;
 
         while((textWidth = BaseXLayout.width(g, s)) + 4 > ratio) {
@@ -304,7 +336,7 @@ public final class RealView extends View {
 
       if(parentPos != null) {
 
-        final double parentMiddle = parentPos.get(data.parent(pre, Data.ELEM));
+        final double parentMiddle = parentPos.get(data.parent(pre, nodeKind));
 
         g.setColor(new Color(c, 0, 255 - c, 100));
         g.drawLine((int) boxMiddle, y - 1, (int) parentMiddle, y - fontHeight
