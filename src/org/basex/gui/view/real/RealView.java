@@ -3,7 +3,11 @@ package org.basex.gui.view.real;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+
 import org.basex.data.Data;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
@@ -54,6 +58,14 @@ public final class RealView extends View {
   private IntList parentList = null;
   /** array with position of the parent node. */
   private HashMap<Integer, Double> parentPos = null;
+  /** array of current rectangles. */
+  private ArrayList<RealRect[]> rects = null;
+  /** nodes in current line. */
+  private int rectCount = 0;
+  /** current mouse position x. */
+  private int mousePosX = -1;
+  /** current mouse position y. */
+  private int mousePosY = -1;
 
   /**
    * Default Constructor.
@@ -69,11 +81,13 @@ public final class RealView extends View {
 
   @Override
   protected void refreshFocus() {
+
     repaint();
   }
 
   @Override
   protected void refreshInit() {
+
     repaint();
   }
 
@@ -84,6 +98,7 @@ public final class RealView extends View {
 
   @Override
   protected void refreshMark() {
+
     repaint();
   }
 
@@ -111,6 +126,8 @@ public final class RealView extends View {
     pointerx = getWidth() / 2;
     pointery = topdistance;
 
+    System.out.println();
+
     switch(3) {
       case 1:
         drawTree(g, 0, 0, 0, getWidth());
@@ -123,6 +140,47 @@ public final class RealView extends View {
     }
   }
 
+  @Override
+  public void mouseMoved(final MouseEvent e) {
+    if(working) return;
+    super.mouseMoved(e);
+    // refresh mouse focus
+    mousePosX = e.getX();
+    mousePosY = e.getY();
+    //    System.out.println("x: "+ mousePosX + "y: " + mousePosY);
+    focus();
+  }
+
+  /** Finds rectangle at cursor position.
+   * 
+   */
+  public void focus() {
+    //    int level = mousePosY / (fontHeight * 2);
+    final Data data = GUI.context.data();
+    final Iterator<RealRect[]> it = rects.iterator();
+
+    while(it.hasNext()) {
+      final RealRect[] r = it.next();
+
+      for(int i = 0; i < r.length; i++) {
+        if(r[i].contains(mousePosX, mousePosY)) {
+
+          final int pre = r[i].p;
+          System.out.print(Token.string(data.tag(pre)) + " ");
+
+          for(int y = 0; y < data.attSize(pre, Data.ELEM) - 1; y++) {
+            System.out.print(Token.string(data.attName(pre + y + 1)) + "="
+                + "\"" + Token.string(data.attValue(pre + y + 1)) + "\" ");
+          }
+          System.out.println();
+          break;
+        }
+      }
+
+    }
+
+  }
+
   /**
    * controls the node temperature drawing.
    * @param root the root node
@@ -130,10 +188,12 @@ public final class RealView extends View {
    */
   private void temperature(final int root, final Graphics g) {
     final Data data = GUI.context.data();
+    rects = new ArrayList<RealRect[]>();
     int level = 0;
     sumNodeSizeInLine = data.size;
     parentList = new IntList();
     parentList.add(root);
+    this.rectCount = 1;
     parentPos = null;
     while(parentList.size > 0) {
       drawTemperature(g, level);
@@ -151,6 +211,7 @@ public final class RealView extends View {
     final int l = parentList.size;
     final IntList temp = new IntList();
     int sumNodeSize = 0;
+    int rCount = 0; //counts nodes
 
     for(int i = 0; i < l; i++) {
       final int p = parentList.list[i];
@@ -167,12 +228,16 @@ public final class RealView extends View {
 
       while(iterator.more()) {
         final int pre = iterator.next();
-        if(data.kind(pre) == Data.ELEM) temp.add(pre);
+        if(data.kind(pre) == Data.ELEM) {
+          temp.add(pre);
+          ++rCount;
+        }
         sumNodeSize += data.size(pre, data.kind(pre));
       }
     }
-    parentList = temp;
-    sumNodeSizeInLine = sumNodeSize;
+    this.rectCount = rCount;
+    this.parentList = temp;
+    this.sumNodeSizeInLine = sumNodeSize;
   }
 
   /**
@@ -181,6 +246,12 @@ public final class RealView extends View {
    * @param level the current level
    */
   private void drawTemperature(final Graphics g, final int level) {
+    // array with all rects of a level
+    //    System.out.print("RectCount: " + rectCount + " level " 
+    //    + level + " size :"
+    //        + parentList.size);
+    final RealRect[] tRect = new RealRect[rectCount];
+
     final Data data = GUI.context.data();
     final int size = parentList.size;
     final HashMap<Integer, Double> temp = new HashMap<Integer, Double>();
@@ -190,6 +261,8 @@ public final class RealView extends View {
     final double ratio = width / size;
     final int minSpace = 35; // minimum Space for Tags
     final boolean space = ratio > minSpace ? true : false;
+
+    int r = 0;
 
     for(int i = 0; i < size; i++) {
       final int pre = parentList.list[i];
@@ -203,40 +276,46 @@ public final class RealView extends View {
 
       final double nodePercent = nodeSize / (double) sumNodeSizeInLine;
       g.setColor(Color.black);
-      g.drawRect((int) x, y, (int) ratio, fontHeight);
+
+      final int l = (int) ratio; //rectangle length
+      final int h = fontHeight; //rectangle height
+
+      g.drawRect((int) x, y, l, h);
+      tRect[r++] = new RealRect(pre, (int) x, y, (int) x + l, y + h);
+
       int c = (int) Math.rint(255 * nodePercent * 40);
       c = c > 255 ? 255 : c;
       g.setColor(new Color(c, 0, 255 - c));
-      g.fillRect((int) x + 1, y + 1, (int) (ratio - 1), fontHeight - 1);
+      g.fillRect((int) x + 1, y + 1, l - 1, h - 1);
 
       final double boxMiddle = x + ratio / 2f;
-      g.setColor(Color.black);
+      g.setColor(Color.WHITE);
 
       if(space) {
         String s = Token.string(data.tag(pre));
         int textWidth = 0;
-        
+
         while((textWidth = BaseXLayout.width(g, s)) + 4 > ratio) {
-            s = s.substring(0, s.length() / 2).concat("?");
+          s = s.substring(0, s.length() / 2).concat("?");
         }
-        
+
         g.drawString(s, (int) boxMiddle - textWidth / 2, y + fontHeight - 2);
       }
 
       if(parentPos != null) {
 
-        
         final double parentMiddle = parentPos.get(data.parent(pre, Data.ELEM));
-        
-        g.setColor(new Color(c, 0, 255 - c, 100));
-        g.drawLine((int) boxMiddle, y - 1, (int) parentMiddle, 
-            y - fontHeight + 1);
 
-//        final int line = Math.round(fontHeight / 4f);
-//        g.drawLine((int) boxMiddle, y, (int) boxMiddle, y - line);
-//        g.drawLine((int) boxMiddle, y - line, (int) parentMiddle, y - line);
-//        g.drawLine((int) parentMiddle, y - line, (int) parentMiddle, y
-//            - fontHeight);
+        g.setColor(new Color(c, 0, 255 - c, 100));
+        g.drawLine((int) boxMiddle, y - 1, (int) parentMiddle, y - fontHeight
+            + 1);
+
+        //        final int line = Math.round(fontHeight / 4f);
+        //        g.drawLine((int) boxMiddle, y, (int) boxMiddle, y - line);
+        //        g.drawLine((int) boxMiddle, y - line, 
+        //        (int) parentMiddle, y - line);
+        //        g.drawLine((int) parentMiddle, y - line, (int) parentMiddle, y
+        //            - fontHeight);
 
       }
 
@@ -244,6 +323,7 @@ public final class RealView extends View {
 
       x += ratio;
     }
+    rects.add(tRect);
     parentPos = temp;
   }
 
