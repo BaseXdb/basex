@@ -143,9 +143,7 @@ public final class FTFuzzy extends Index {
     while(j < tp.length && tp[j] == -1) j++;
     
     while(p < tp[tp.length - 1]) {
-      final byte[] txt = ti.readBytes(p, p + i);
-      final int oc = getDataSize(p, i);
-      stats.add(txt, oc);
+      if(stats.adding(getDataSize(p, i))) stats.add(ti.readBytes(p, p + i));
       p += i + 4L + 5L;
       if (p == tp[j]) {
         i = j;

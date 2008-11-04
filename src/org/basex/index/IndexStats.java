@@ -24,6 +24,8 @@ public class IndexStats {
   private int nr;
   /** Number of index entries. */
   private int size;
+  /** Current number of occurrence. */
+  private int co;
 
   /**
    * Default constructor.
@@ -42,21 +44,28 @@ public class IndexStats {
   }
 
   /**
+   * Checks if the specified number of occurrence will be remembered.
+   * @param oc number of occurrences
+   * @return result of check
+   */
+  boolean adding(final int oc) {
+    co = oc;
+    size++;
+    return oc > occMax[nr - 1] || oc < occMin[nr - 1];
+  }
+  
+  /**
    * Adds the specified token.
    * @param tx token to be added
-   * @param oc number of occurrences
    */
-  void add(final byte[] tx, final int oc) {
-    size++;
-    if(oc <= occMax[nr - 1] && oc >= occMin[nr - 1]) return;
-    
-    final boolean dsc = oc > occMax[nr - 1];
+  void add(final byte[] tx) {
+    final boolean dsc = co > occMax[nr - 1];
     final byte[][] txt = dsc ? txtMax : txtMin;
     final int[] ocs = dsc ? occMax : occMin;
     for(int a = nr - 1; a >= 0; a--) {
-      if(a == 0 || dsc && oc < ocs[a - 1] || !dsc && oc > ocs[a - 1]) {
+      if(a == 0 || dsc && co < ocs[a - 1] || !dsc && co > ocs[a - 1]) {
         txt[a] = tx;
-        ocs[a] = oc;
+        ocs[a] = co;
         break;
       }
       txt[a] = txt[a - 1];

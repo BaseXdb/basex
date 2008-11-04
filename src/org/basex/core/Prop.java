@@ -109,7 +109,7 @@ public final class Prop {
   /** Flag for iterator optimized storage within ftindex. */
   public static boolean ftittr = false;
   /** Number of index occurrences to print in the index info. */
-  public static int indexocc = 100;
+  public static int indexocc = 20;
 
   /** Flag for creating a fuzzy index. */
   public static boolean ftfuzzy = false;

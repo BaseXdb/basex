@@ -57,8 +57,10 @@ public final class Values extends Index {
     final IndexStats stats = new IndexStats();
     for(int m = 0; m < size; m++) {
       final int oc = idxl.readNum(idxr.read5(m * 5L));
-      final int p = idxl.readNum();
-      stats.add(text ? data.text(p) : data.attValue(p), oc);
+      if(stats.adding(oc)) {
+        final int p = idxl.readNum();
+        stats.add(text ? data.text(p) : data.attValue(p));
+      }
     }
     stats.print(tb);
     return tb.finish();

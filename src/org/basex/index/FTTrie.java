@@ -842,9 +842,7 @@ public final class FTTrie extends Index {
       System.arraycopy(tok, 0, ntok, 0, tok.length);
       for (int i = 0; i < ne[0]; i++) ntok[tok.length + i] = (byte) ne[i + 1];
       final int size = ne[ne.length - 1];
-      if (size > 0) {
-        stats.add(ntok, size);
-      }
+      if(size > 0 && stats.adding(size)) stats.add(ntok);
     } else {
       ntok = tok;
     }
