@@ -151,8 +151,7 @@ public final class ScatterAxis {
     for(int i = 0; i < vals.length; i++) {
       set.add(vals[i]);
     }
-    // items lacking values are painted outside of plot and 2 additional empty
-    // categories are added for layout reasons -> +2
+    // 2 additional empty categories are added for layout reasons -> +2
     nrCats = set.size() + 2;
     set = null;
     
@@ -173,7 +172,7 @@ public final class ScatterAxis {
     while(i < vl) {
       // next string category to be tested
       final byte[] b = vals[i];
-      // l: highest index for value b
+      // l: highest index in sorted array for value b
       int l = i;
       // determing highest index of value/category b
       while(l < vl && eq(vals[l], b)) {
@@ -322,13 +321,13 @@ public final class ScatterAxis {
       nrCaptions = nrCats;
     
     } else {
-//      if(nrCats > 20) {
-//        final int c = space / (3 * ScatterView.CAPTIONWHITESPACE);
-//        nrCaptions = c >= 2 ? c : 2;
-//      } else {
-//        nrCaptions = nrCats;
-//      }
-      nrCaptions = 2;
+      if(nrCats > 20) {
+        final int c = space / (3 * ScatterView.CAPTIONWHITESPACE);
+        nrCaptions = c >= 2 ? c : 2;
+      } else {
+        nrCaptions = nrCats;
+      }
+//      nrCaptions = 2;
     }
   }
 }
