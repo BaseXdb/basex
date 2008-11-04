@@ -128,7 +128,7 @@ public final class FTContains extends DualExpr {
     
     Item res;
     if (s) res = evalSeq(ctx);
-    else if (!s && isc && !iec) res = evalWithoutIndex(ctx);
+    else if (isc && !iec) res = evalWithoutIndex(ctx);
     else {
       final FTTokenizer tmp = ctx.ftitem;
       ctx.ftitem = ft;
@@ -140,30 +140,13 @@ public final class FTContains extends DualExpr {
         while (ftae.more()) {
           ftn = ftae.next(ctx);
           if (ftn.size == 0) break;
-          //ctx.local.set(ftn.getPre());
-          //ctx.local.size = 1;
-          //if (expr1.eval(ctx).bool())
           il.add(ftn.getPre());
         }
-        //return new NodeSet(il.finish(), ctx);
         res = new NodeSet(il.finish(), ctx);
       }
-      
-      
-      
+      ctx.item = (NodeSet) res;
       ctx.ftitem = tmp;
     }
-    
-  /*  if (v1 instanceof Bool) {
-      if (expr1.eval(ctx).bool()) return v1;
-      else return Bool.FALSE;
-    } else {
-      NodeSet n = (NodeSet) v1;
-      ctx.local = n;
-      if(expr1.eval(ctx).bool()) return n;
-      else return new NodeSet(ctx);
-    }*/
-    
     return res;
   }
 
@@ -189,32 +172,29 @@ public final class FTContains extends DualExpr {
       f = true;
     }
 
-    if (v2.bool()) {
-      if (expr2 instanceof FTArrayExpr) {
+    if(v2.bool()) {
+      if(expr2 instanceof FTArrayExpr) {
         final FTArrayExpr ftae = (FTArrayExpr) expr2;
         ftn = (ftn == null && ftae.more()) ? ftae.next(ctx) : ftn;
-  
-        if (ftn != null) {
-          while (ftn.getPre() < ns.nodes[0]) {
-            if (ftae.more()) ftn = ftae.next(ctx);
-            else break;
+        for(int z = 0; z < ns.size(); z++) {
+          while(ftn != null && ns.nodes[z] > ftn.getPre()) {
+            ftn = ftae.more() ? ftae.next(ctx) : null;
           }
-        
-          if (ftn.size > 0) {
+          if(ftn != null) {
             final boolean not = ftn.not;
-            if (ftn.getPre() == ns.nodes[0]) {
-              ftn = null;
-              return Bool.get(!not); // false
+            if(ftn.getPre() == ns.nodes[z]) {
+              return Bool.get(!not);
             }
-            return Bool.get(not); //Bool.TRUE;
           }
         }
+      } else if(expr2 instanceof Bool) {
+        if(expr1.eval(ctx).bool()) return (Bool) expr2;
       }
-     return Bool.TRUE;
-   }
+      return Bool.TRUE;
+    }
 
-   ctx.ftitem = tmp;
-   return Bool.FALSE;
+    ctx.ftitem = tmp;
+    return Bool.FALSE;
   }
 
   /**
