@@ -221,9 +221,8 @@ public final class ScatterView extends View implements Runnable {
     }
     
     // overdraw plot background
-    g.setColor(GUIConstants.back);
-    g.fillRect(MARGIN[1] + novalue, MARGIN[0],
-        plotWidth - novalue, plotHeight - novalue);
+    g.setColor(GUIConstants.color1);
+    g.fillRect(MARGIN[1] , MARGIN[0], plotWidth, plotHeight);
     
     // draw axis and grid
     drawAxis(g, true);
@@ -312,7 +311,7 @@ public final class ScatterView extends View implements Runnable {
   private void drawAxis(final Graphics g, final boolean drawX) {
     final int h = getHeight();
     final int w = getWidth();
-    g.setColor(GUIConstants.color1);
+    g.setColor(GUIConstants.back);
     
     final int novalue = noValueSize();
     final int textH = g.getFontMetrics().getHeight();
@@ -376,7 +375,7 @@ public final class ScatterView extends View implements Runnable {
 
       // ... after that
       // the image is drawn beside x / y axis
-      g.setColor(GUIConstants.color1);
+      g.setColor(GUIConstants.back);
       if(drawX) {
         final int x = MARGIN[1] + novalue + (int) (i * range * pWidth);
         final int y = h - MARGIN[2];
@@ -603,7 +602,7 @@ public final class ScatterView extends View implements Runnable {
     }
     final int h = getHeight();
     final int w = getWidth();
-    final int th = 17;
+    final int th = 14;
     final int lb = MARGIN[1] - th;
     final int rb = w - MARGIN[3] + th;
     final int tb = MARGIN[0] - th;
