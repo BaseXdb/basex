@@ -90,9 +90,9 @@ public class IndexStats {
       else if(max < tl) max = tl;
     }
 
-    print(tb, txtMax, occMax, max + 1);
+    print(tb, txtMax, occMax, max + 2);
     if(c == 0) tb.add("  " + DOTS + NL);
-    print(tb, txtMin, occMin, max + 1);
+    print(tb, txtMin, occMin, max + 2);
   }
 
   /**
@@ -110,6 +110,7 @@ public class IndexStats {
       tb.add(txt[o]);
       for(int j = 0; j < len - txt[o].length; j++) tb.add(' ');
       tb.add(ocs[o]);
+      tb.add('x');
       tb.add(NL);
     }
   }

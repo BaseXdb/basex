@@ -480,9 +480,11 @@ public interface Text {
   /** Index info. */
   String TRIE = LI + "Compressed Trie";
   /** Index info. */
+  String NAMINDEX = LI + "Hash Index";
+  /** Index info. */
   String FUZZY = LI + "Fuzzy Index";
   /** Index info. */
-  String TXTINDEX = LI + "Tree Structure";
+  String TXTINDEX = LI + "Tree Index";
   /** Index info. */
   String SIZEDISK = LI + "Size on Disk: ";
   /** Index info. */

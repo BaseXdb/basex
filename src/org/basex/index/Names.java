@@ -1,12 +1,15 @@
 package org.basex.index;
 
 import static org.basex.Text.*;
+
 import java.io.IOException;
 import org.basex.data.StatsKey;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.util.Array;
+import org.basex.util.IntList;
 import org.basex.util.Set;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -147,18 +150,25 @@ public final class Names extends Set {
    * @return statistics string
    */
   public byte[] info() {
-    final TokenBuilder tb = new TokenBuilder();
-    final int[] ids = sort();
+    final byte[][] tl = new byte[size][];
     int len = 0;
-    for(int i = 1; i < size; i++) if(len < keys[i].length) len = keys[i].length;
-    len += 3;
+    for(int i = 0; i < size; i++) {
+      if(len < keys[i].length) len = keys[i].length;
+      tl[i] = Token.token(counter[i]);
+    }
+    len += 2;
 
     // print all entries in descending number of occurrences
-    for(int i = 1; i < size; i++) {
-      final int s = ids[i];
+    final IntList ids = IntList.createOrder(tl, true, false);
+    
+    final TokenBuilder tb = new TokenBuilder();
+    tb.add(NAMINDEX + NL);
+    tb.add(IDXENTRIES + (size - 1) + NL);
+    for(int i = 0; i < size - 1; i++) {
+      final int s = ids.list[i];
       if(counter[s] == 0) continue;
       final byte[] key = keys[s];
-      tb.add(LI);
+      tb.add("  ");
       tb.add(key);
       for(int j = 0; j < len - key.length; j++) tb.add(' ');
       tb.add(counter[s] + "x" + stat[s]);
@@ -166,26 +176,6 @@ public final class Names extends Set {
       tb.add(NL);
     }
     return tb.finish();
-  }
-
-  /**
-   * Sorts names by their number of occurrences.
-   * @return sorted ids
-   */
-  private int[] sort() {
-    final int[] ids = new int[size];
-    for(int i = 0; i < size; i++) ids[i] = i;
-
-    for(int i = 0; i < size; i++) {
-      for(int j = 1; j < size; j++) {
-        if(counter[ids[i]] > counter[ids[j]]) {
-          final int t = ids[i];
-          ids[i] = ids[j];
-          ids[j] = t;
-        }
-      }
-    }
-    return ids;
   }
 
   @Override

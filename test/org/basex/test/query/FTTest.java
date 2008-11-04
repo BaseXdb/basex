@@ -39,7 +39,7 @@ public final class FTTest extends AbstractTest {
 
     queries = new Object[][] {
         { "FTUnaryNot6", nodes(3, 5, 7, 9, 11, 14, 37),
-        "//w [text() ftcontains ftnot 'bier']" },
+          "//w [text() ftcontains ftnot 'bier']" },
         
         { "Simple 1", bool(true),
           "'abc' ftcontains 'abc'" },
@@ -66,10 +66,19 @@ public final class FTTest extends AbstractTest {
           "//w[  text  (   )  ftcontains  '  crap  '  ]  " },
         { "FT 5", nodes(),
           "//w[text() ftcontains 'db']" },
-        { "FT 6", nodes(7, 9, 11),
+
+        { "Preds 1", nodes(7, 9, 11),
           "//w[text() ftcontains 'xml'][text() ftcontains 'Databases']" },
-        { "FT 7", nodes(35),
+        { "Preds 2", nodes(35),
           "//fttest[co/w ftcontains 'xml'][w ftcontains 'fifth']/atr" },
+        { "Preds 3", nodes(1),
+          "//fttest[*/text() ftcontains 'ook'][*/text() ftcontains 'een']" },
+        { "Preds 4", nodes(2),
+          "*[*/text() ftcontains 'ook'][*/text() ftcontains 'een']/co" },
+        { "Preds 5", nodes(7),
+          "//*[text() ftcontains 'have'][text() ftcontains 'xml']" },
+        { "Preds 6", nodes(13),
+          "//*[*/text() ftcontains 'hello'][*/text() = 'hello']" },
 
         { "Phrase 1", nodes(7, 9, 11),
           "//w [text() ftcontains 'xml databases']" },
@@ -79,6 +88,8 @@ public final class FTTest extends AbstractTest {
           "//w [text() ftcontains 'xml :) databases :|']" },
         { "Phrase 4", nodes(),
           "//w [text() ftcontains 'xml db']" },
+        { "Phrase 5", nodes(25, 29),
+          "/fttest/fti [text() ftcontains 'wordt ook wel eens']" },
 
         { "FTDiacritics 1", nodes(17, 19),
           "//s [text() ftcontains 'diat joghurt']" },
@@ -260,9 +271,6 @@ public final class FTTest extends AbstractTest {
           "//fti [. ftcontains 'ook' ftand 'wel' same paragraph]" },
         { "FTScope 5", nodes(31),
           "//fti [. ftcontains 'ook' ftand 'wel' different paragraph]" },
-        
-        { "FTIndex1", nodes(25, 29),
-          "/fttest/fti [text() ftcontains 'wordt ook wel eens']" },
         
         { "FTMildNot1", nodes(3, 5),
           "//w [text() ftcontains 'xml' not in 'xml databases']" },
