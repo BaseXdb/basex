@@ -286,10 +286,10 @@ public final class RealView extends View {
       final double nodePercent = nodeSize / (double) sumNodeSizeInLine;
       g.setColor(Color.black);
 
-      final int l = (int) ratio; //rectangle length
+      final int l = Math.max(2, (int) ratio); //rectangle length
       final int h = fontHeight; //rectangle height
 
-      g.drawRect((int) x, y, l, h);
+      //g.drawRect((int) x, y, l, h);
       tRect[r++] = new RealRect(pre, (int) x, y, (int) x + l, y + h);
 
       int c = (int) Math.rint(255 * nodePercent * 40);
@@ -338,7 +338,7 @@ public final class RealView extends View {
 
         final double parentMiddle = parentPos.get(data.parent(pre, nodeKind));
 
-        g.setColor(new Color(c, 0, 255 - c, 100));
+        g.setColor(new Color(192 + c / 4, 192, 255 - c / 4));
         g.drawLine((int) boxMiddle, y - 1, (int) parentMiddle, y - fontHeight
             + 1);
 
