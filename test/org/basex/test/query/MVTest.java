@@ -24,26 +24,27 @@ public final class MVTest {
   private static final int MAX = 1000;
   /** Maximum subhits. */
   private static final int SUB = 10;
+  /** Stop after the specified number of queries. */
+  private static final int STOPAFTER = Integer.MAX_VALUE;
+  /** Query counter. */
+  int curr = 0;
   
   /**
    * Constructor.
    * @param db database instance
-   * @param mm main memory mode
    * @throws Exception exception
    */
-  private MVTest(final String db, final boolean mm) throws Exception {
-    // toggle main memory mode
-    Prop.mainmem = mm; // false
-    
+  private MVTest(final String db) throws Exception {
     new Open(db).execute(context, null);
 
     // open query file
-    final File file = new File("tests/queries.mv");
+    final File file = new File("etc/xml/mv.txt");
     if(!file.exists()) {
       System.out.println("Could not read \"" + file.getAbsolutePath() + "\"");
       return;
     }
     Prop.serialize = true;
+    Prop.info = true;
     
     // scan all queries
     final FileInputStream fis = new FileInputStream(file);
@@ -54,10 +55,10 @@ public final class MVTest {
       final String[] split = line.split(" ");
 
       // convert query to XPath
-      final StringBuilder query = new StringBuilder("\"/descendant::MEDIUM");
+      final StringBuilder query = new StringBuilder("/descendant::MEDIUM");
       for(int s = 0; s < split.length; s++) {
         String type = "node()/text()";
-        String op = "contains";
+        String op = "ftcontains";
         String val = split[s];
         
         if(val.startsWith("<")) {
@@ -90,35 +91,36 @@ public final class MVTest {
         }
         query.append("[" + val + "]");
       }
-      query.append("[position() <= " + MAX + "]\"");
+      query.append("[position() <= " + MAX + "]");
 
       // process query
       final Process proc = new XPathMV(Integer.toString(MAX),
           Integer.toString(SUB), query.toString());
 
       if(!proc.execute(context)) {
-        System.out.println("ERR\t" + query);
+        System.out.println("- " + proc.info());
+        System.out.println("Query: " + query);
       } else {
         // run serialization
         proc.output(new NullOutput());
         
         // extract and print processing time
         final String info = proc.info();
+        
         int i = info.indexOf("Total Time: ");
         int j = info.indexOf(" ms", i);
         String time = info.substring(i + "Total Time: ".length(), j);
-        time = time.replace('.', ',');
+        //time = time.replace('.', ',');
         i = info.indexOf("Results   : ");
-        j = info.indexOf(" Node", i);
+        j = info.indexOf(" Item", i);
         final String nodes = info.substring(i + "Results   : ".length(), j);
         
         System.out.println(time + "\t" + nodes + "\t" + query);
       }
-      //if(ii++ > 20) break;
+      if(++curr >= STOPAFTER) break;
     }
     br.close();
   }
-  //int ii = 0;
   
   /**
    * Main test method.
@@ -126,13 +128,7 @@ public final class MVTest {
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
-    if(args.length != 2) {
-      System.out.println("MVTest db mm");
-      System.out.println("- db: database instance");
-      System.out.println("- mm: 'on'/'off' (main memory)");
-      return;
-    }
-    new MVTest(args[0], args[1].equals("on"));
+    new MVTest(args.length == 1 ? args[0] : "mediothek");
   }
 }
 
