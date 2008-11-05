@@ -43,13 +43,6 @@ public final class BaseXWin {
     System.setProperty("apple.laf.useScreenMenuBar", "true");
     System.setProperty("com.apple.mrj.application.apple.menu.about.name", NAME);
 
-    /* handle default application menu on macs
-    com.apple.mrj.MRJApplicationUtils.registerQuitHandler(
-        new com.apple.mrj.MRJQuitHandler() {
-          public void handleQuit() throws IllegalStateException { }
-        }
-    );*/
-    
     // read properties
     Prop.read();
     GUIProp.read();
