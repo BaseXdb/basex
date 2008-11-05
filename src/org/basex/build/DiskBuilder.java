@@ -78,11 +78,14 @@ public final class DiskBuilder extends Builder {
     ns.finish(out);
     out.close();
     
-    // write size attribute into main table
+    // write cached size and attribute values into main table
     final TableAccess ta = new TableDiskAccess(db, DATATBL);
     final DataInput in = new DataInput(db, DATATMP);
     for(int pre = 0; pre < ssize; pre++) {
-      ta.write4(in.readNum(), 8, in.readNum());
+      final boolean sz = in.readBool();
+      final int p = in.readNum();
+      if(sz) ta.write4(p, 8, in.readNum());
+      else ta.write5(p, 3, in.readNum());
     }
     ta.close();
     in.close();
@@ -174,9 +177,19 @@ public final class DiskBuilder extends Builder {
   }
 
   @Override
-  public void addSize(final int pre) throws IOException {
+  public void setSize(final int pre, final int val) throws IOException {
+    sout.writeBool(true);
     sout.writeNum(pre);
-    sout.writeNum(size - pre);
+    sout.writeNum(val);
+    ssize++;
+  }
+
+  @Override
+  public void setAttValue(final int pre, final byte[] val) throws IOException {
+    sout.writeBool(false);
+    sout.writeNum(pre);
+    // assumes that there attribute value references will at most be 32 bit long
+    sout.writeNum((int) inline(val, false));
     ssize++;
   }
 }

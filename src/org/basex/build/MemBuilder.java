@@ -68,7 +68,12 @@ public final class MemBuilder extends Builder {
   }
 
   @Override
-  protected void addSize(final int pre) {
-    data.finishElem(pre);
+  public void setSize(final int pre, final int val) {
+    data.setSize(pre, val);
+  }
+
+  @Override
+  public void setAttValue(final int pre, final byte[] val) {
+    data.setAttValue(pre, val);
   }
 }

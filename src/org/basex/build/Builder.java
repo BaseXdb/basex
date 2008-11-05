@@ -97,8 +97,8 @@ public abstract class Builder extends Progress {
   
   /**
    * Adds an element node to the database. This method stores a preliminary
-   * size value; if this node has further descendants, {@link #addSize} has
-   * to be called eventually to finish this node.
+   * size value; if this node has further descendants, {@link #setSize} has
+   * to be called with the final size value.
    * @param tok the tag name reference
    * @param tns the tag namespace
    * @param dis distance (relative parent reference)
@@ -108,13 +108,6 @@ public abstract class Builder extends Progress {
    */
   protected abstract void addElem(int tok, int tns, int dis, int as, boolean n)
     throws IOException;
-  
-  /**
-   * Adds the size value to the table.
-   * @param pre closing pre tag
-   * @throws IOException in case of parsing or writing problems 
-   */
-  protected abstract void addSize(int pre) throws IOException;
 
   /**
    * Adds an attribute to the database.
@@ -137,6 +130,23 @@ public abstract class Builder extends Progress {
   protected abstract void addText(byte[] tok, int dis, byte kind)
     throws IOException;
 
+  /**
+   * Stores the size value to the table.
+   * @param pre pre reference
+   * @param val value to be stored
+   * @throws IOException in case of parsing or writing problems 
+   */
+  protected abstract void setSize(int pre, int val)
+    throws IOException;
+
+  /**
+   * Stores the size value to the table.
+   * @param pre pre reference
+   * @param val value to be stored
+   * @throws IOException in case of parsing or writing problems 
+   */
+  protected abstract void setAttValue(int pre, byte[] val)
+    throws IOException;
 
   // Final Methods ============================================================
     
@@ -157,7 +167,7 @@ public abstract class Builder extends Progress {
     meta.lastid = size;
     if(size == 0) {
       addDoc(utf8(token("empty"), Prop.ENCODING));
-      addSize(0);
+      setSize(0, size);
     }
     return finish();
   }
@@ -178,7 +188,8 @@ public abstract class Builder extends Progress {
    * @throws IOException in case of parsing or writing problems 
    */
   public final void endDoc() throws IOException {
-    addSize(parStack[--level]);
+    final int pre = parStack[--level];
+    setSize(pre, size - pre);
     meta.ndocs++;
     inDoc = false;
     if(Prop.debug) BaseX.err("\n");
@@ -230,8 +241,9 @@ public abstract class Builder extends Progress {
     if(level-- == 0 || tags.id(t) != tagStack[level])
       error(CLOSINGTAG, parser.det(), t, tags.key(tagStack[level]));
 
-    addSize(parStack[level]);
-    ns.close(parStack[level]);
+    final int pre = parStack[level];
+    setSize(pre, size - pre);
+    ns.close(pre);
   }
 
   /**

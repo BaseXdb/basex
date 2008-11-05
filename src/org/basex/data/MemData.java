@@ -243,11 +243,21 @@ public final class MemData extends Data {
   }
 
   /**
-   * Adds the size value to the table.
-   * @param pre closing pre tag
+   * Stores a size value to the table.
+   * @param pre pre reference
+   * @param val value to be stored
    */
-  public void finishElem(final int pre) {
-    val2[pre] = (int) val2[pre] + (((long) size - pre) << 32);
+  public void setSize(final int pre, final long val) {
+    val2[pre] = (int) val2[pre] | val << 32;
+  }
+
+  /**
+   * Stores an attribute value to the table.
+   * @param pre pre reference
+   * @param val value to be stored
+   */
+  public void setAttValue(final int pre, final byte[] val) {
+    val1[pre] = val1[pre] & 0xFFFFFFFF00000000L | textIndex(val);
   }
 
   /**
