@@ -75,7 +75,8 @@ public final class Help extends FSCmd {
       } else {
         final String cl = cmd.toLowerCase();
         final String cu = cmd.toUpperCase();
-        final String[] help = (String[]) FSText.class.getField(cu).get(null);
+        final String[] help = (String[])
+          FSText.class.getDeclaredField(cu).get(null);
 
         if(VERBOSE) {
           out.println(String.format("%-23s%-35s%18s", cu + "(1)",

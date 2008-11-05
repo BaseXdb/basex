@@ -105,9 +105,11 @@ public final class CommandParser extends QueryParser {
           fs = Enum.valueOf(FS.class, args.toUpperCase());
           if(fs == Commands.FS.EXIT) fsmode = false;
           args = "";
-        } catch(final Exception ex) { }
+        } catch(final Exception ex) {
+          args += " ";
+        }
         final String a = string(null);
-        proc = new Fs(fs.name(), a == null ? args : args + " " + a);
+        proc = new Fs(fs.name(), a == null ? args : args + a);
       } else {
         cmd = consume(COMMANDS.class, null);
         proc = parse(cmd);
