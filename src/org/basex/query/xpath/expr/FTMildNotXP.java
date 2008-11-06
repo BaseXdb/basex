@@ -30,10 +30,10 @@ public final class FTMildNotXP extends FTArrayExpr {
   }
   
   @Override
-  public FTArrayExpr compile(final XPContext ctx) throws QueryException {
+  public FTArrayExpr comp(final XPContext ctx) throws QueryException {
     for(int i = 0; i != exprs.length; i++) {
       if(exprs[i].fto == null) exprs[i].fto = fto;
-      exprs[i] = exprs[i].compile(ctx);
+      exprs[i] = exprs[i].comp(ctx);
     }
     return this;
   }

@@ -34,7 +34,7 @@ public final class And extends ArrayExpr {
   }
 
   @Override
-  public Expr compile(final XPContext ctx) throws QueryException {
+  public Expr comp(final XPContext ctx) throws QueryException {
     for(int e = 0; e != exprs.length; e++) {
       // check if we can add a position predicate to match only the first title
       if(exprs[e] instanceof LocPath) {
@@ -54,7 +54,7 @@ public final class And extends ArrayExpr {
         System.arraycopy(exprs, e + 1, tmp, e, exprs.length - e-- - 1);
         exprs = tmp;
       }
-      exprs[e] = exprs[e].compile(ctx);
+      exprs[e] = exprs[e].comp(ctx);
     }
     if(exprs.length == 0) return Bool.TRUE;
     if(exprs.length == 1) return exprs[0];
@@ -126,7 +126,7 @@ public final class And extends ArrayExpr {
         ((Path) indexExprs[0]).expr2);
 
     ctx.compInfo(OPTAND4);
-    return new InterSect(indexExprs).compile(ctx);
+    return new InterSect(indexExprs).comp(ctx);
   }
   
   @Override

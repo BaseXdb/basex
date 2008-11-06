@@ -503,15 +503,13 @@ public interface Text {
   /** Query Info: Result . */
   String QUERYRESULT = lang("qu_result") + COLS;
   /** Query Info: Plan. */
-  String QUERYPLAN = lang("qu_plan");
+  String QUERYPLAN = lang("qu_plan") + COLS;
   /** Query Info: Compiler. */
   String QUERYSEP = LI;
   /** Query Info: Plan. */
   String PLANXML = "plan.xml";
   /** Query Info: Plan. */
   String PLANDOT = "plan.dot";
-  /** Query Info: Plan. */
-  String RESULTDOT = "result.dot";
 
   /** Query Info: Query. */
   String QUERYSTRING = lang("qu_tabquery") + COLS;
@@ -577,6 +575,8 @@ public interface Text {
   String NAMEINVALID = lang("uc_invalid");
   /** Update text info. */
   String TXTINVALID = lang("uc_txtinvalid");
+  /** Update namespaces error. */
+  String UPDATENS = lang("uc_namespaces");
 
   // INFO STRINGS =============================================================
 

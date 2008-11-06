@@ -13,7 +13,6 @@ import org.basex.BaseX;
 import org.basex.build.Builder;
 import org.basex.build.fs.FSText;
 import org.basex.util.Array;
-import org.basex.util.Token;
 
 /**
  * Extractor for MP3s and ID3v2 meta data.
@@ -63,11 +62,11 @@ public final class MP3Extractor extends AbstractExtractor {
 
   /** MP3 Types. */
   private static final byte[][] VERSIONS = new byte[][] {
-    token("MPEG-2.5 "), Token.EMPTY, token("MPEG-2 "), token("MPEG-1 "),
+    token("MPEG-2.5 "), EMPTY, token("MPEG-2 "), token("MPEG-1 "),
   };
   /** MP3 Types. */
   private static final byte[][] LAYERS = new byte[][] {
-    token("Layer 1"), token("Layer 2"), token("Layer 3"), Token.EMPTY
+    token("Layer 1"), token("Layer 2"), token("Layer 3"), EMPTY
   };
   /** Available Bit Rates. */
   private static final int[][][] BITRATES = { {
@@ -160,7 +159,7 @@ public final class MP3Extractor extends AbstractExtractor {
       // get readable version of ID3 tag name
       byte[][] tt = null;
       for(final byte[][] t : TAGS) {
-        if(Token.eq(tag, t[0])) {
+        if(eq(tag, t[0])) {
           tt = t;
           break;
         }
@@ -198,7 +197,7 @@ public final class MP3Extractor extends AbstractExtractor {
     // find last valid character
     int i = fs;
     while(--i >= 0 && content[i] == 0);
-    if(i == -1) return Token.EMPTY;
+    if(i == -1) return EMPTY;
 
     int j = i;
     // check if there are still zero bytes
@@ -285,7 +284,7 @@ public final class MP3Extractor extends AbstractExtractor {
         raf.close();
   
         // ...header tag always upper case?
-        if(Token.startsWith(id3v1, HEADERID3V1)) {
+        if(startsWith(id3v1, HEADERID3V1)) {
           final byte[] title = getTag(id3v1, 3, 30);
           final byte[] artist = getTag(id3v1, 33, 30);
           final byte[] album = getTag(id3v1, 63, 30);
@@ -368,7 +367,7 @@ public final class MP3Extractor extends AbstractExtractor {
     skip(in, fsize);
     final byte[] vbrh = new byte[4];
     in.read(vbrh);
-    if(Token.eq(MP3XING, vbrh)) {
+    if(eq(MP3XING, vbrh)) {
       skip(in, 3);
       if((read() & 0x01) != 0) {
         final int nf = (read() << 24) + (read() << 16) + (read() << 8) + read();
@@ -380,7 +379,7 @@ public final class MP3Extractor extends AbstractExtractor {
     }
 
     builder.nodeAndText(MP3CODEC, atts.reset(),
-        Token.concat(VERSIONS[vers], LAYERS[layr]));
+        concat(VERSIONS[vers], LAYERS[layr]));
     builder.nodeAndText(MP3RATE, atts, token(bitrate));
     builder.nodeAndText(MP3SAMPLE, atts, token(samples));
     builder.nodeAndText(MP3MODE, atts, MODES[mode]);

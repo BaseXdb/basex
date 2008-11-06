@@ -23,6 +23,9 @@ public final class GUIProp {
   public static int fontsize = 12;
   /** Flag for anti-aliasing results in GUI mode. */
   public static boolean fontalias = false;
+  /** Anti-aliasing type. Supported variants:
+   * LCD_HRGB / LCD_HBGR / LCD_VRGB / LCD_VBGR / GASP */
+  public static String fontaa = "LCD_HRGB";
 
   /** Red GUI color factor. */
   public static int colorred = 20;

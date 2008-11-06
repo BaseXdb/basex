@@ -3,7 +3,6 @@ package org.basex.io;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-
 import org.basex.util.Num;
 
 /**
@@ -12,7 +11,7 @@ import org.basex.util.Num;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class DataAccess {
+public final class DataAccess {
   /** Buffer limit (buffer size - 1). */
   private static final int BUFLIMIT = IO.BLOCKSIZE - 1;
   /** Number of buffers. */
@@ -62,7 +61,7 @@ public class DataAccess {
    * Flushes the buffered data.
    * @throws IOException in case of write errors
    */
-  public final synchronized void flush() throws IOException {
+  public synchronized void flush() throws IOException {
     for(int i = 0; i < BUFFERS; i++) {
       if(dirty[i]) writeBlock(buffer[i], pos[i]);
     }
@@ -82,7 +81,7 @@ public class DataAccess {
    * Returns file length.
    * @return file length
    */
-  public final synchronized long length() {
+  public synchronized long length() {
     return len;
   }
 
@@ -102,7 +101,7 @@ public class DataAccess {
    * @param p text position
    * @return read num
    */
-  public final synchronized int readNum(final long p) {
+  public synchronized int readNum(final long p) {
     cursor(p);
     return readNum();
   }
@@ -112,7 +111,7 @@ public class DataAccess {
    * @param p text position
    * @return text as byte array
    */
-  public final synchronized byte[] readToken(final long p) {
+  public synchronized byte[] readToken(final long p) {
     cursor(p);
     int l = readNum();
     
@@ -139,7 +138,7 @@ public class DataAccess {
    * Returns the current file position.
    * @return text as byte array
    */
-  public final synchronized long pos() {
+  public synchronized long pos() {
     return pos[c] + off;
   }
 
@@ -171,7 +170,7 @@ public class DataAccess {
    * @param p write position
    * @param v byte array to be appended
    */
-  public final synchronized void writeBytes(final long p, final byte[] v) {
+  public synchronized void writeBytes(final long p, final byte[] v) {
     cursor(p);
     writeNum(v.length);
     for(final byte b : v) write(b);
@@ -190,7 +189,7 @@ public class DataAccess {
    * Sets the disk cursor.
    * @param p read position
    */
-  public final synchronized void cursor(final long p) {
+  public synchronized void cursor(final long p) {
     off = (int) (p & BUFLIMIT);
     
     final long ps = p - off;
@@ -234,7 +233,7 @@ public class DataAccess {
    * Reads the next byte.
    * @return next byte
    */
-  public final synchronized int read() {
+  public synchronized int read() {
     if(off == IO.BLOCKSIZE) {
       nextBlock();
       off = 0;
@@ -246,7 +245,7 @@ public class DataAccess {
    * Reads the next compressed number and returns it as integer.
    * @return next integer
    */
-  public final synchronized int readNum() {
+  public synchronized int readNum() {
     final int v = read();
     switch(v & 0xC0) {
     case 0:
@@ -265,7 +264,7 @@ public class DataAccess {
    * (without cursor correction).
    * @return integer value
    */
-  public final synchronized int readInt() {
+  public synchronized int readInt() {
     return (read() << 24) + (read() << 16) + (read() << 8) + read();
   }
   

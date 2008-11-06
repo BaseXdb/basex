@@ -37,9 +37,9 @@ public final class Calculation extends DualExpr {
   }
 
   @Override
-  public Expr compile(final XPContext ctx) throws QueryException {
-    expr1 = expr1.compile(ctx);
-    expr2 = expr2.compile(ctx);
+  public Expr comp(final XPContext ctx) throws QueryException {
+    expr1 = expr1.comp(ctx);
+    expr2 = expr2.comp(ctx);
     if(expr1 instanceof Item && expr2 instanceof Item) {
       ctx.compInfo(OPTCALC);
       final double d1 = ((Item) expr1).num();

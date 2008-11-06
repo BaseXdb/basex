@@ -33,7 +33,7 @@ public abstract class LocPath extends Expr {
   public abstract NodeSet eval(final XPContext ctx) throws QueryException;
 
   @Override
-  public final Expr compile(final XPContext ctx) throws QueryException {
+  public final Expr comp(final XPContext ctx) throws QueryException {
     // At this point a data reference has to be available;
     if(ctx.item == null) throw new QueryException(NODATA);
 
@@ -168,11 +168,11 @@ public abstract class LocPath extends Expr {
           newPreds.add(pred);
         }
       }
-      result = new InterSect(new Expr[] { indexArg }).compile(ctx);
+      result = new InterSect(new Expr[] { indexArg }).comp(ctx);
 
       // add rest of predicates
       if(newPreds.size() != 0) result =
-        new Filter(result, newPreds).compile(ctx);
+        new Filter(result, newPreds).comp(ctx);
 
       // add match with initial nodes
       //if(indexMatch && checkMatch(invPath)) {

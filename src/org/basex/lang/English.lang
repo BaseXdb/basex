@@ -356,7 +356,7 @@ qu_comp=Compiling
 qu_eval=Evaluating
 qu_time=Timing
 qu_result=Result
-qu_plan=Saving query plan in '%'...
+qu_plan=Query plan
 qu_hits=Hit(s)
 qu_ms=ms
 
@@ -381,16 +381,14 @@ uc_copyinfo=% node(s) copied in %.
 uc_insertinfo=% node(s) inserted in %.
 uc_updateinfo=% node(s) updated in %.
 uc_updatenode=Node to be updated must be %.
-#uc_updateelem=Node to be updated must be an element.
-#uc_updateattr=Node to be updated must be an attribute.
 uc_copytags=Target nodes must be elements.
 uc_inserttext=Cannot insert text node after/before another text node.
-#uc_taginvalid="%" is not a valid tag name.
 uc_attinvalid="%" is not a valid attribute name.
 uc_attdupl=Attribute "%" is already defined.
 uc_posinvalid=Invalid position value "%".
 uc_invalid=Name "%" is invalid.
 uc_txtinvalid=Text nodes cannot be empty.
+uc_namespaces=Cannot update documents with namespaces.
 
 # Info Strings
 info_title=Database Information

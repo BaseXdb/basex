@@ -15,7 +15,10 @@ import org.basex.io.IO;
 import org.basex.query.FTOpt;
 import org.basex.query.FTPos;
 import org.basex.query.QueryContext;
+import org.basex.query.xquery.expr.Cast;
 import org.basex.query.xquery.expr.Expr;
+import org.basex.query.xquery.expr.List;
+import org.basex.query.xquery.expr.VarCall;
 import org.basex.query.xquery.item.DNode;
 import org.basex.query.xquery.item.Dat;
 import org.basex.query.xquery.item.Dtm;
@@ -178,7 +181,6 @@ public final class XQContext extends QueryContext {
     root.plan(ser);
   }
   
-
   /**
    * Evaluates the specified expression and returns an iterator.
    * @param e expression to be evaluated
@@ -187,14 +189,12 @@ public final class XQContext extends QueryContext {
    */
   public Expr comp(final Expr e) throws XQException {
     final Expr ex = e.comp(this);
-    if(ex != e) {
-      /*System.out.println(e.getClass().getSimpleName() + " => " +
-          ex.getClass().getSimpleName() + ": " + e + " => " + ex); */
+    if(inf && ex != e && !(e instanceof VarCall) && !(e instanceof Cast) &&
+        !(e instanceof List) && !(ex.getClass().getName().contains("Iter"))) {
       compInfo(OPTSIMPLE, e, ex);
     }
     return ex;
   }
-
 
   /**
    * Evaluates the specified expression and returns an iterator.
@@ -205,7 +205,16 @@ public final class XQContext extends QueryContext {
   public Iter iter(final Expr e) throws XQException {
     checkStop();
 
-    // skip query info for items
+    if(inf && !e.i()) {
+      e.time1();
+      final Iter ir = e.iter(this);
+      e.time2();
+      return ir;
+    } else {
+      return e.iter(this);
+    }
+    
+    /* skip query info for items
     final Iter ir = e.iter(this);
     if(inf && !e.i()) {
       final double t = ((System.nanoTime() - evalTime) / 10000) / 100d;
@@ -214,6 +223,7 @@ public final class XQContext extends QueryContext {
       if(!inf) evalInfo(EVALSKIP);
     }
     return ir;
+    */
   }
 
   /**

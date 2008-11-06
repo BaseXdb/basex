@@ -136,6 +136,8 @@ public final class Namespaces extends Set {
 
     Node nd = node;
     final int k = id(p);
+    if(k == 0) return 0;
+    
     while(nd != null) {
       final int i = nd.get(k);
       if(i != 0) return i;

@@ -68,6 +68,7 @@ abstract class QueryPanel {
    * Handles info messages resulting from a query execution.
    * @param info info message
    * @param ok true if query was successful
+   * @return true if info was evaluated
    */
-  abstract void info(final String info, final boolean ok);
+  abstract boolean info(final String info, final boolean ok);
 }

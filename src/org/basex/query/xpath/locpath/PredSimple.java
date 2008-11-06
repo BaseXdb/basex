@@ -87,7 +87,7 @@ public final class PredSimple extends Pred {
 
   @Override
   Pred compile(final XPContext ctx) throws QueryException {
-    expr = expr.compile(ctx);
+    expr = expr.comp(ctx);
 
     if(expr instanceof LocPath) {
       ((LocPath) expr).addPosPred(ctx);

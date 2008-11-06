@@ -32,8 +32,8 @@ public final class Not extends Func {
   }
 
   @Override
-  public Expr compile(final XPContext ctx) throws QueryException {
-    super.compile(ctx);
+  public Expr comp(final XPContext ctx) throws QueryException {
+    super.comp(ctx);
     if(args[0] instanceof LocPath) {
       ((LocPath) args[0]).addPosPred(ctx);
     }

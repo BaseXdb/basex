@@ -57,8 +57,8 @@ public final class Matches extends Func {
   }
 
   @Override
-  public Expr compile(final XPContext ctx) throws QueryException {
-    super.compile(ctx);
+  public Expr comp(final XPContext ctx) throws QueryException {
+    super.comp(ctx);
     if(args[0] instanceof NodeSet && ((NodeSet) args[0]).size == 0) {
       ctx.compInfo(OPTFUNC, desc);
       return Bool.FALSE;

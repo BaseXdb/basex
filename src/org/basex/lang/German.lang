@@ -356,7 +356,7 @@ qu_comp=Kompilierung
 qu_eval=Evaluation
 qu_time=Zeitmessung
 qu_result=Ergebnis
-qu_plan=Speichere Ausführungsplan in '%'...
+qu_plan=Ausführungsplan
 qu_hits=Treffer
 qu_ms=ms
 
@@ -391,6 +391,7 @@ uc_attdupl=Attribut "%" ist bereits definiert.
 uc_posinvalid=Ungültiger Positionswert "%".
 uc_invalid=Name "%" ist ungültig.
 uc_txtinvalid=Textknoten können nicht leer sein.
+uc_namespaces=Dokumente mit Namespaces können nicht verändert werden.
 
 # Info Strings
 info_title=Datenbank-Information

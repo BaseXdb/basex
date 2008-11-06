@@ -92,6 +92,15 @@ public abstract class Item extends Expr {
   }
 
   /**
+   * Returns an atomized string.
+   * @return string representation
+   */
+  public byte[] str() {
+    BaseX.notexpected();
+    return null;
+  }
+
+  /**
    * Returns a hash code.
    * @return hash code
    */

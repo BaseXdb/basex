@@ -51,7 +51,7 @@ public final class XPContext extends QueryContext {
     inf = Prop.allInfo;
     if(inf) compInfo(QUERYCOMP);
     item = n != null ? new NodeSet(n.nodes, n.data) : null;
-    root = root.compile(this);
+    root = root.comp(this);
     if(inf) compInfo(QUERYRESULT + "%", root);
     return this;
   }

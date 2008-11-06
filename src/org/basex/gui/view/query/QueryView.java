@@ -158,8 +158,7 @@ public final class QueryView extends View {
    * @return true if info was processed
    */
   public boolean info(final String info, final boolean ok) {
-    if(search != null) search.info(info, ok);
-    return search != null && mode != 1;
+    return search != null && search.info(info, ok);
   }
 
   /**

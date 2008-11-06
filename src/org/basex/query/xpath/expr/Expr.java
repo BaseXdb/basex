@@ -17,12 +17,12 @@ public abstract class Expr extends ExprInfo {
   private static final Class<?>[] EVALARGS = { XPContext.class };
   
   /**
-   * Tries to optimize the Expression.
+   * Optimizes the expression.
    * @param ctx expression context
    * @return optimized Expression
    * @throws QueryException evaluation exception
    */
-  public abstract Expr compile(final XPContext ctx) throws QueryException;
+  public abstract Expr comp(final XPContext ctx) throws QueryException;
   
   /**
    * Evaluates the expression with the specified context set. Additionally
@@ -34,8 +34,8 @@ public abstract class Expr extends ExprInfo {
   public abstract Item eval(XPContext ctx) throws QueryException;
 
   /**
-   * Gets the expected return type. This may be XPathValue itself.
-   * @return the expected class returned by the eval() method
+   * Gets the expected return type. This may be the value itself.
+   * @return the expected class returned by the {@link #eval} method
    */
   public final Class<?> returnedValue() {
     try {

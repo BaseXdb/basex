@@ -28,8 +28,6 @@ public final class GUIInput extends BaseXTextField {
   ComboPopup pop;
   /** JComboBox. */
   BaseXCombo box;
-  /** Main window reference. */
-  GUI main;
   /** String for temporary input. */
   String pre = "";
 
@@ -42,7 +40,6 @@ public final class GUIInput extends BaseXTextField {
     final Font f = getFont();
     setFont(f.deriveFont((float) f.getSize() + 2));
 
-    main = m;
     box = new BaseXCombo();
     box.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
@@ -54,7 +51,7 @@ public final class GUIInput extends BaseXTextField {
     addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
-        main.checkKeys(e);
+        m.checkKeys(e);
 
         final int count = box.getItemCount();
         final int c = e.getKeyCode();
@@ -79,7 +76,7 @@ public final class GUIInput extends BaseXTextField {
             else GUIProp.commands = sl.finish();
 
             // evaluate the input
-            main.execute();
+            m.execute();
           }
           return;
         }
@@ -117,7 +114,7 @@ public final class GUIInput extends BaseXTextField {
         if(!enter) showPopup();
 
         // skip commands
-        if(GUIProp.execrt && !cmdMode()) main.execute();
+        if(GUIProp.execrt && !cmdMode()) m.execute();
       }
     });
   }
@@ -144,6 +141,7 @@ public final class GUIInput extends BaseXTextField {
   protected void completeInput() {
     Object sel = box.getSelectedItem();
     if(sel == null) sel = box.getItemAt(0);
+    if(sel == null) return;
     final String suf = sel.toString();
     final int pl = pre.length();
     final int ll = pl > 0 ? pre.charAt(pl - 1) : ' ';

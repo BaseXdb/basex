@@ -33,8 +33,8 @@ public final class Round extends Func {
   }
 
   @Override
-  public Expr compile(final XPContext ctx) throws QueryException {
-    super.compile(ctx);
+  public Expr comp(final XPContext ctx) throws QueryException {
+    super.comp(ctx);
     if(args[0] instanceof Item) {
       ctx.compInfo(OPTFUNC, desc);
       return new Num(Math.round(((Item) args[0]).num()));

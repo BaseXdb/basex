@@ -1,6 +1,7 @@
 package org.basex.core;
 
 import static org.basex.Text.*;
+
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.proc.Fs;
@@ -75,8 +76,13 @@ public abstract class Process extends AbstractProcess {
     context = ctx;
 
     // database does not exist...
-    if(data() && context.data() == null) return error(PROCNODB);
-    if(updating() && (Prop.mainmem || Prop.onthefly)) return error(PROCMM);
+    if(data() && context.data() == null) {
+      return error(PROCNODB);
+    }
+    if(updating()) {
+      if(Prop.mainmem || Prop.onthefly) return error(PROCMM);
+      if(context.data().ns.size() != 0) return error(UPDATENS);
+    }
 
     try {
       final boolean ok = exec();

@@ -82,7 +82,7 @@ public abstract class W3CTS {
   private static final byte[] INSPECT = token("Inspect");
 
   /** Maximum length of result output. */
-  private static int maxout = 100000;
+  private static int maxout = 500;
 
   /** Delimiter. */
   private static final String DELIM = "#~%~#";

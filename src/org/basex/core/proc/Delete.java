@@ -44,16 +44,8 @@ public final class Delete extends Process {
 
     // delete all nodes backwards to preserve pre values of earlier nodes
     final int size = nodes.size;
-    for(int i = size - 1; i >= 0; i--) {
-      // single document can't be deleted..
-      //if(nodes.nodes[i] == 0 && data.size == data.size(0, Data.DOC))
-      //  return error(DELETEROOT);
-      data.delete(nodes.nodes[i]);
-    }
+    for(int i = size - 1; i >= 0; i--) data.delete(nodes.nodes[i]);
     
-    // recreate root node
-    //if(data.size == 0) data.insert(0, 1, Token.EMPTY, Data.DOC);
-
     // refresh current context
     final Nodes curr = context.current();
     if(gui && curr.size > 1 || curr.nodes[0] == nodes.nodes[0]) {

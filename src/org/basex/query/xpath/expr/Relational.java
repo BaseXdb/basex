@@ -28,9 +28,9 @@ public final class Relational extends Comparison {
   }
 
   @Override
-  public Expr compile(final XPContext ctx) throws QueryException {
-    expr1 = expr1.compile(ctx);
-    expr2 = expr2.compile(ctx);
+  public Expr comp(final XPContext ctx) throws QueryException {
+    expr1 = expr1.comp(ctx);
+    expr2 = expr2.comp(ctx);
 
     if(expr1 instanceof Item && ((Item) expr1).size() == 0 ||
        expr2 instanceof Item && ((Item) expr2).size() == 0) {

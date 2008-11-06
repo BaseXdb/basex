@@ -30,10 +30,10 @@ public final class Union extends ArrayExpr {
   }
 
   @Override
-  public Expr compile(final XPContext ctx) throws QueryException {
+  public Expr comp(final XPContext ctx) throws QueryException {
     int el = exprs.length;
     for(int e = 0; e != el; e++) {
-      exprs[e] = exprs[e].compile(ctx);
+      exprs[e] = exprs[e].comp(ctx);
       if(exprs[e] instanceof NodeSet && ((NodeSet) exprs[e]).size == 0) {
         final Expr[] tmp = new Expr[exprs.length - 1];
         System.arraycopy(exprs, 0, tmp, 0, e);

@@ -11,7 +11,7 @@ import org.basex.query.xpath.expr.Expr;
  */
 public abstract class InternalExpr extends Expr {
   @Override
-  public final Expr compile(final XPContext ctx) {
+  public final Expr comp(final XPContext ctx) {
     return this;
   }
 

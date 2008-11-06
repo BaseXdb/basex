@@ -1,7 +1,6 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQText.*;
-import org.basex.BaseX;
 import org.basex.query.ExprInfo;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
@@ -10,6 +9,7 @@ import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Err;
+import org.basex.util.Token;
 
 /**
  * Abstract Expression.
@@ -30,8 +30,13 @@ public abstract class Expr extends ExprInfo {
     /** Numeric value.    */ NUM,
   };
 
+  /** Timer. */
+  private long timer;
+  /** Cached time. */
+  private long timm;
+
   /**
-   * Optimizes and compiles the expression tree.
+   * Optimizes and compiles the expression.
    * @param ctx query context
    * @return optimized Expression
    * @throws XQException evaluation exception
@@ -85,12 +90,25 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Returns an atomized string.
-   * @return string representation
+   * Starts time measurement.
    */
-  public byte[] str() {
-    BaseX.notexpected();
-    return null;
+  public final void time1() {
+    timm = System.nanoTime();
+  }
+  
+  /**
+   * Adds measured to total time.
+   */
+  public final void time2() {
+    timer += System.nanoTime() - timm;
+  }
+
+  /**
+   * Returns measured time.
+   * @return time as token
+   */
+  protected final byte[] timer() {
+    return Token.token(timer);
   }
 
   /**

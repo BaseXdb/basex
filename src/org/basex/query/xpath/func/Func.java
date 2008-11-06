@@ -60,8 +60,8 @@ public abstract class Func extends Expr {
   }
   
   @Override
-  public Expr compile(final XPContext ctx) throws QueryException {
-    for(int a = 0; a < args.length; a++) args[a] = args[a].compile(ctx);
+  public Expr comp(final XPContext ctx) throws QueryException {
+    for(int a = 0; a < args.length; a++) args[a] = args[a].comp(ctx);
     return this;
   }
 

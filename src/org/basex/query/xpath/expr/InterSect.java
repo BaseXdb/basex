@@ -32,9 +32,9 @@ public final class InterSect extends ArrayExpr {
   }
 
   @Override
-  public Expr compile(final XPContext ctx) throws QueryException {
+  public Expr comp(final XPContext ctx) throws QueryException {
     final int el = exprs.length;
-    for(int e = 0; e != el; e++) exprs[e] = exprs[e].compile(ctx);
+    for(int e = 0; e != el; e++) exprs[e] = exprs[e].comp(ctx);
     return el == 0 ? new NodeSet(ctx) : el == 1 ? exprs[0] : this;
   }
 }

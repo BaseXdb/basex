@@ -3,9 +3,7 @@ package org.basex.query.xquery.expr;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
-
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
@@ -89,7 +87,7 @@ public final class CAttr extends Arr {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
+    ser.openElement(this, NS, timer());
     ser.openElement(NAME);
     atn.plan(ser);
     ser.closeElement();

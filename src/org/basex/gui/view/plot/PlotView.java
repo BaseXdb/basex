@@ -311,20 +311,17 @@ public final class PlotView extends View implements Runnable {
     
     final int novalue = noValueSize();
     final int textH = g.getFontMetrics().getHeight();
-    // the painting space provided for items which lack no value
-    final int pWidth = plotWidth - novalue;
-    final int pHeight = plotHeight - novalue;
+    final int pSize = (drawX ? plotWidth : plotHeight) - novalue;
     
     final PlotAxis axis = drawX ? plotData.xAxis : plotData.yAxis;
     // drawing horizontal axis line
     if(drawX) {
       g.drawLine(MARGIN[1], h - MARGIN[2], w - MARGIN[3], h - MARGIN[2]);
-      if(plotChanged) axis.calcCaption(pWidth);
     } else {
       // drawing vertical axis line
       g.drawLine(MARGIN[1], MARGIN[0], MARGIN[1], getHeight() - MARGIN[2]);
-      if(plotChanged) axis.calcCaption(pHeight);
     }
+    axis.calcCaption(pSize);
     
     final Kind type = axis.type;
 //    if(type == Kind.TEXT) return;
@@ -333,11 +330,10 @@ public final class PlotView extends View implements Runnable {
     final double range = 1.0d / (nrCaptions - 1);
     final int fs = itemSize(false);
     
-    g.setFont(GUIConstants.font);
     for(int i = 0; i < nrCaptions; i++) {
       String caption = "";
       if(type == Kind.CAT) {
-        // categoric data, each category is displayed as a caption 
+        // categorical data, each category is displayed as a caption
         caption = string(axis.cats[i]);
 
       } else if(type == Kind.TEXT) {
@@ -371,22 +367,16 @@ public final class PlotView extends View implements Runnable {
 
       // ... after that
       // the image is drawn beside x / y axis
-      g.setColor(GUIConstants.back);
       if(drawX) {
-        final int x = MARGIN[1] + novalue + (int) (i * range * pWidth);
+        final int x = MARGIN[1] + novalue + (int) (i * range * pSize);
         final int y = h - MARGIN[2];
         g.drawImage(img, x - imgW + textH - fs, y + fs / 4, this);
         g.drawLine(x, MARGIN[0], x, y + fs / 2);
       } else {
-        final int y = h - MARGIN[2] - novalue - (int) (i * range * pHeight);
+        final int y = h - MARGIN[2] - novalue - (int) (i * range * pSize);
         g.drawImage(img, MARGIN[1] - imgW - fs, y - fs, this);
         g.drawLine(MARGIN[1] - fs / 2, y, w - MARGIN[3], y);
       }
-      
-      //
-//      }
-      //
-      
     }
   }
 

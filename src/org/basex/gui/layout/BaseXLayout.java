@@ -275,8 +275,7 @@ public final class BaseXLayout {
       // Check out Java 1.6 rendering; if not available, use default rendering
       try {
         final Class<?> rh = RenderingHints.class;
-        //hint = rh.getField("VALUE_TEXT_ANTIALIAS_LCD_HRGB").get(null);
-        hint = rh.getField("VALUE_TEXT_ANTIALIAS_GASP").get(null);
+        hint = rh.getField("VALUE_TEXT_ANTIALIAS_" + GUIProp.fontaa).get(null);
       } catch(final Exception e) {
         hint = RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
       }

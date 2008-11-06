@@ -47,7 +47,7 @@ public final class NameTest extends Test {
     
     final QNm nm = tmp.qname(qname);
     // name wildcard - check only namespace
-    if(kind == Kind.NS) return nm.uri.eq(name.uri);
+    if(kind == Kind.NS) return name.uri.eq(nm.uri);
     // check everything
     return name.eq(nm);
   }

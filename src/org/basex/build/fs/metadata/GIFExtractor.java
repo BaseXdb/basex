@@ -1,9 +1,9 @@
 package org.basex.build.fs.metadata;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import org.basex.build.Builder;
+import org.basex.io.BufferInput;
 import org.basex.util.Token;
 import static org.basex.build.fs.FSText.*;
 
@@ -19,9 +19,7 @@ public final class GIFExtractor extends AbstractExtractor {
   
   @Override
   public void extract(final Builder listener, final File f) throws IOException {
-    final FileInputStream in = new FileInputStream(f);
-    in.read(data);
-    in.close();
+    BufferInput.read(f, data);
     
     // check if the header is valid
     if(!Token.startsWith(data, HEADERGIF87) &&

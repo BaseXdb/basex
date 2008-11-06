@@ -42,8 +42,8 @@ public final class Unary extends Expr {
   }
 
   @Override
-  public Expr compile(final XPContext ctx) throws QueryException {
-    expr = expr.compile(ctx);
+  public Expr comp(final XPContext ctx) throws QueryException {
+    expr = expr.comp(ctx);
     return expr instanceof Item ? new Num(-((Item) expr).num()) :
       this;
   }

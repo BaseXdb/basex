@@ -40,8 +40,8 @@ public final class Count extends Func {
   }
 
   @Override
-  public Expr compile(final XPContext ctx) throws QueryException {
-    super.compile(ctx);
+  public Expr comp(final XPContext ctx) throws QueryException {
+    super.comp(ctx);
     
     // pre-evaluate absolute location paths
     if(args[0] instanceof LocPathAbs) {

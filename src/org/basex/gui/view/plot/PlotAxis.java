@@ -1,6 +1,7 @@
 package org.basex.gui.view.plot;
 
 import static org.basex.util.Token.*;
+import static org.basex.data.DataText.*;
 import org.basex.data.Data;
 import org.basex.data.StatsKey;
 import org.basex.data.StatsKey.Kind;
@@ -22,8 +23,6 @@ public final class PlotAxis {
   private final PlotData plotData;
   /** Tag reference to selected attribute. */
   int attrID;
-  /** Constant to determine whether axis attribute equals deepFS "@size". */
-  private static final byte[] ATSIZE = token("size");
   /** True if attribute is a tag, false if attribute. */
   boolean isTag;
   /** Number of different categories for x attribute. */
@@ -33,8 +32,6 @@ public final class PlotAxis {
 
   /** Coordinates of items. */
   double[] co = {};
-  /** Item values. */
-  byte[][] vals = {};
   /** Number of captions to display. */
   int nrCaptions;
   /** Step for axis caption. */
@@ -63,7 +60,6 @@ public final class PlotAxis {
     isTag = false;
     type = Kind.INT;
     co = new double[0];
-    vals = new byte[0][];
     nrCats = -1;
     cats = new byte[0][];
     nrCaptions = -1;
@@ -114,7 +110,7 @@ public final class PlotAxis {
 
     final int[] items = plotData.pres;
     co = new double[items.length];
-    vals = new byte[items.length][];
+    final byte[][] vals = new byte[items.length][];
     for(int i = 0; i < items.length; i++) {
       byte[] value = getValue(items[i]);
       if(type == Kind.TEXT && value.length > TEXTLENGTH) {
@@ -125,9 +121,9 @@ public final class PlotAxis {
     
     if(type != Kind.CAT) {
       if(type == Kind.TEXT) {
-        textToNum();
+        textToNum(vals);
       } else {
-        calcExtremeValues();
+        calcExtremeValues(vals);
       }
     }
     // coordinates for TEXT already calculated in textToNum()
@@ -135,7 +131,6 @@ public final class PlotAxis {
       for(int i = 0; i < vals.length; i++)
         co[i] = calcPosition(vals[i]);
     }
-    vals = null;
   }
   
   /**
@@ -143,8 +138,9 @@ public final class PlotAxis {
    * a category. The text values of the items are first sorted. The coordinate
    * for an item is then calculated as the position of the text value of this
    * item in the sorted category set.   
+   * @param vals text values
    */
-  private void textToNum() {
+  private void textToNum(final byte[][] vals) {
     // sort text values alphabetical (asc).
     Set set = new Set();
     for(int i = 0; i < vals.length; i++) {
@@ -241,8 +237,9 @@ public final class PlotAxis {
    * Determines the smallest and greatest occurring values for a specific item.
    * Afterwards the extremes are rounded to support a decent axis
    * caption.
+   * @param vals text values
    */
-  private void calcExtremeValues() {
+  private void calcExtremeValues(final byte[][] vals) {
     min = Integer.MAX_VALUE;
     max = Integer.MIN_VALUE;
     for(int i = 0; i < vals.length; i++) {
@@ -259,8 +256,7 @@ public final class PlotAxis {
     // flag for deepFS @size attribute
     final Data data = GUI.context.data();
     int fsplus = 6;
-    final boolean fss = data.fs != null && eq(data.atts.key(attrID), ATSIZE);
-//    final boolean fss = false;
+    final boolean fss = data.fs != null && eq(data.atts.key(attrID), SIZE);
     final double range = max - min;
     final double lmin = min - range / 2;
     final double lmax = max + range / 2;
@@ -270,7 +266,7 @@ public final class PlotAxis {
         fss ? rangePow + fsplus : rangePow));
     calculatedCaptionStep = (int) (Math.pow(fss ? 2 : 10, rangePow - 
         (fss ? -fsplus : 1)));
-//    calculatedCaptionStep = (int) (Math.pow(10, rangePow - 1));
+    //    calculatedCaptionStep = (int) (Math.pow(10, rangePow - 1));
     
     // find minimum axis assignment
     double c = Math.floor(min);

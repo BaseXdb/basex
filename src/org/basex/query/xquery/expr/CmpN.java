@@ -102,7 +102,7 @@ public final class CmpN extends Arr {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, TYPE, Token.token(cmp.name));
+    ser.openElement(this, TYPE, Token.token(cmp.name), NS, timer());
     for(final Expr e : expr) e.plan(ser);
     ser.closeElement();
   }

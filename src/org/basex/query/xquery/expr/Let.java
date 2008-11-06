@@ -94,7 +94,8 @@ public final class Let extends ForLet {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, score ? Token.token(SCORE) : VAR, var.name.str());
+    ser.openElement(this, score ? Token.token(SCORE) : VAR,
+        var.name.str(), NS, timer());
     expr.plan(ser);
     ser.closeElement();
   }

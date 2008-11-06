@@ -123,8 +123,12 @@ public final class DNode extends Nod {
   public QNm qname(final QNm name) {
     final byte[] nm = nname();
     name.name(nm);
-    final int n = data.ns.get(nm, pre);
-    name.uri = Uri.uri(n > 0 ? data.ns.key(n) : NSGlobal.uri(pre(nm)));
+    if(!name.ns() && data.ns.size() == 0) {
+      name.uri = Uri.EMPTY;
+    } else {
+      final int n = data.ns.get(nm, pre);
+      name.uri = Uri.uri(n > 0 ? data.ns.key(n) : NSGlobal.uri(pre(nm)));
+    }
     return name;
   }
 

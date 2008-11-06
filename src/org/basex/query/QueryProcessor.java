@@ -56,12 +56,6 @@ public abstract class QueryProcessor extends Progress {
   public final void compile(final Nodes nodes) throws QueryException {
     if(context == null) parse();
     context.compile(nodes);
-    try {
-      if(Prop.xmlplan) context.planXML();
-      if(Prop.dotplan) context.planDot();
-    } catch(final Exception ex) {
-      ex.printStackTrace();
-    }
     compiled = true;
   }
 
@@ -95,11 +89,17 @@ public abstract class QueryProcessor extends Progress {
    * @return background information
    */
   public final String getInfo() {
-    final TokenBuilder tb = new TokenBuilder(context.info());
-
-    //if(Prop.xmlplan) tb.add(QUERYPLAN + NL, PLANXML);
-    //if(Prop.dotplan) tb.add(QUERYPLAN + NL, PLANDOT);
+    try {
+      if(Prop.xmlplan) {
+        context.info.add(QUERYPLAN + NL);
+        context.planXML();
+      }
+      if(Prop.dotplan) context.planDot();
+    } catch(final Exception ex) {
+      ex.printStackTrace();
+    }
     
+    final TokenBuilder tb = new TokenBuilder(context.info());
     if(Prop.allInfo) {
       tb.add(NL + QUERYSTRING);
       tb.add(query);

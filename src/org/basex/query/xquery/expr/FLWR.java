@@ -97,9 +97,13 @@ public class FLWR extends Single {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, EVAL, ITER);
+    ser.openElement(this, EVAL, ITER, NS, timer());
     for(final ForLet f : fl) f.plan(ser);
-    if(where != null) where.plan(ser);
+    if(where != null) {
+      ser.openElement(WHR);
+      where.plan(ser);
+      ser.closeElement();
+    }
     ser.openElement(RET);
     expr.plan(ser);
     ser.closeElement();

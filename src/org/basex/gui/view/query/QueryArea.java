@@ -135,9 +135,9 @@ public final class QueryArea extends QueryPanel {
   void quit() { }
 
   @Override
-  void info(final String inf, final boolean ok) {
+  boolean info(final String inf, final boolean ok) {
     BaseXLayout.enable(stop, false);
-    if(inf == null) return;
+    if(inf == null) return false;
     
     final String text = ok ? STATUSOK : inf.replaceAll("Stopped.*", "");
     info.setText(text);
@@ -171,6 +171,7 @@ public final class QueryArea extends QueryPanel {
     area.error(-1);
     info.setName(Integer.toString(err));
     error.delay(500);
+    return true;
   }
 
   /** Delays the display of error information. */

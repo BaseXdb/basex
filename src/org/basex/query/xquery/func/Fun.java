@@ -149,9 +149,9 @@ public abstract class Fun extends Expr {
   @Override
   public void plan(final Serializer ser) throws IOException {
     if(args.length == 0) {
-      ser.emptyElement(this, NAM, Token.token(func.desc));
+      ser.emptyElement(this, NAM, Token.token(func.desc), NS, timer());
     } else {
-      ser.openElement(this, NAM, Token.token(func.desc));
+      ser.openElement(this, NAM, Token.token(func.desc), NS, timer());
       for(Expr arg : args) arg.plan(ser);
       ser.closeElement();
     }

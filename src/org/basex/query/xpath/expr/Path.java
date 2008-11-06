@@ -38,9 +38,9 @@ public final class Path extends DualExpr {
   }
 
   @Override
-  public Expr compile(final XPContext ctx) throws QueryException {
-    expr1 = expr1.compile(ctx);
-    expr2 = expr2.compile(ctx);
+  public Expr comp(final XPContext ctx) throws QueryException {
+    expr1 = expr1.comp(ctx);
+    expr2 = expr2.comp(ctx);
     return this;
   }
 

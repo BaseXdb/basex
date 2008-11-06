@@ -3,6 +3,7 @@ package org.basex.query.xquery.func;
 import static javax.xml.datatype.DatatypeConstants.*;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
+
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -261,7 +262,7 @@ public final class FunJava extends Arr {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, NAM, Token.token(cls + "." + mth));
+    ser.openElement(this, NAM, Token.token(cls + "." + mth), NS, timer());
     for(final Expr arg : expr) arg.plan(ser);
     ser.closeElement();
   }

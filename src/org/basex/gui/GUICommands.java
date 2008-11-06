@@ -266,7 +266,8 @@ public enum GUICommands implements GUICommand {
       // disallow copy of empty node set or root node
       final Nodes nodes = context.marked();
       boolean s = !Prop.mainmem && context.copied() != null && nodes != null &&
-        nodes.size != 0 && (nodes.size != 1 || nodes.nodes[0] != 0);
+        nodes.size != 0 && (nodes.size != 1 || nodes.nodes[0] != 0) &&
+        nodes.data.ns.size() == 0;
       if(s) {
         final Data d = nodes.data;
         for(final int n : nodes.nodes) {
@@ -293,7 +294,8 @@ public enum GUICommands implements GUICommand {
     public void refresh(final AbstractButton button) {
       // disallow deletion of empty node set or root node
       final Nodes n = GUI.context.marked();
-      BaseXLayout.enable(button, !Prop.mainmem && n != null && n.size != 0);
+      BaseXLayout.enable(button, !Prop.mainmem && n != null && n.size != 0 &&
+          n.data.ns.size() == 0);
     }
   },
 
@@ -313,8 +315,8 @@ public enum GUICommands implements GUICommand {
       final Nodes nodes = context.marked();
       final Data d = context.data();
       BaseXLayout.enable(button, !Prop.mainmem && nodes != null &&
-          nodes.size == 1 && (d.kind(nodes.nodes[0]) == Data.ELEM ||
-              d.kind(nodes.nodes[0]) == Data.DOC));
+        nodes.size == 1 && (d.kind(nodes.nodes[0]) == Data.ELEM ||
+        d.kind(nodes.nodes[0]) == Data.DOC) && nodes.data.ns.size() == 0);
     }
   },
 
@@ -334,7 +336,8 @@ public enum GUICommands implements GUICommand {
       final Context context = GUI.context;
       final Nodes nodes = context.marked();
       BaseXLayout.enable(button, !Prop.mainmem && nodes != null &&
-          nodes.size == 1 && context.data().kind(nodes.nodes[0]) != Data.DOC);
+        nodes.size == 1 && context.data().kind(nodes.nodes[0]) != Data.DOC &&
+        nodes.data.ns.size() == 0);
     }
   },
 
@@ -395,8 +398,6 @@ public enum GUICommands implements GUICommand {
     @Override
     public void execute() {
       GUIProp.showinfo ^= true;
-      Prop.allInfo = GUIProp.showinfo;
-      Prop.info = GUIProp.showinfo;
       GUI.get().layoutViews();
     }
 

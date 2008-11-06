@@ -4,7 +4,6 @@ import static org.basex.build.fs.FSText.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.build.Builder;
@@ -20,6 +19,7 @@ import org.basex.build.fs.metadata.PNGExtractor;
 import org.basex.build.fs.metadata.TIFExtractor;
 import org.basex.core.Prop;
 import org.basex.core.proc.CreateFS;
+import org.basex.io.BufferInput;
 import org.basex.io.IO;
 import org.basex.Text;
 import org.basex.util.Array;
@@ -134,10 +134,7 @@ public final class FSParser extends Parser implements FSVisitor {
 
       // import textual content
       if(Prop.fscont && f.isFile()) {
-        final FileInputStream in = new FileInputStream(f);
-        final int size = in.read(cache);
-        in.close();
-
+        final int size = BufferInput.read(f, cache);
         int s = -1;
         while(++s < size) {
           final byte b = cache[s];

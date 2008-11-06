@@ -131,14 +131,14 @@ public final class InfoView extends View {
       } else if(line.startsWith(QUERYSTRING)) {
         query = line.substring(s + 1).trim();
       } else if(line.startsWith(QUERYPLAN)) {
-        while(++i < split.length && split[i].length() != 0)
-          pln.add(split[i]);
+        while(split[++i].length() != 0) pln.add(split[i]);
         --i;
       } else if(line.startsWith(QUERYCOMP)) {
         while(!split[++i].contains(QUERYRESULT)) cmp.add(split[i]);
         result = split[i].substring(split[i].indexOf(':') + 1).trim();
       } else if(line.startsWith(QUERYEVAL)) {
         while(split[++i].startsWith(QUERYSEP)) eval.add(split[i]);
+        --i;
       }
     }
 
@@ -155,9 +155,9 @@ public final class InfoView extends View {
       add(tb, "Query:  ", query);
       add(tb, QUERYCOMP, compile);
       if(compile.size != 0) add(tb, QUERYRESULT, result);
+      add(tb, QUERYPLAN, plan);
       add(tb, QUERYEVAL, evaluate);
       add(tb, QUERYTIME, strings);
-      add(tb, QUERYPLAN, plan);
       tm = strings.list[il.size - 1] + ": " + Performance.getTimer(
           stat.list[il.size - 1] * 10000L * Prop.runs, Prop.runs);
     }

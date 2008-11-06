@@ -45,7 +45,7 @@ public final class FTWords extends FTArrayExpr {
   }
   
   @Override
-  public FTArrayExpr compile(final XPContext ctx) {
+  public FTArrayExpr comp(final XPContext ctx) {
     return this;
   }
   

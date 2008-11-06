@@ -18,7 +18,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.net.URL;
 import java.util.HashMap;
-
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -39,6 +38,7 @@ import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.core.proc.Find;
 import org.basex.core.proc.XPath;
+import org.basex.core.proc.XQuery;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
@@ -181,7 +181,6 @@ public final class GUI extends JFrame {
 
     BaseXBack b = new BaseXBack();
     b.add(hits);
-    //b.add(Box.createHorizontalStrut(1));
 
     buttons.add(b, BorderLayout.EAST);
     if(GUIProp.showbuttons) control.add(buttons, BorderLayout.CENTER);
@@ -196,16 +195,12 @@ public final class GUI extends JFrame {
 
     mode.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        final int t = GUIProp.searchmode;
         final int s = mode.getSelectedIndex();
-        if(s == t || !mode.isEnabled()) return;
+        if(s == GUIProp.searchmode || !mode.isEnabled()) return;
 
-        input.setText("");
-        input.help(s == 0 ? context.data().fs != null ? HELPSEARCHFS :
-          HELPSEARCHXML : s == 1 ? HELPXPATH : HELPCMD);
-
-        go.setEnabled(s == 2 || !GUIProp.execrt);
         GUIProp.searchmode = s;
+        input.setText("");
+        refreshControls();
       }
     });
     mode.addKeyListener(new KeyAdapter() {
@@ -326,8 +321,6 @@ public final class GUI extends JFrame {
     refreshControls();
 
     Prop.xqerrcode = false;
-    Prop.allInfo = GUIProp.showinfo;
-    Prop.info = GUIProp.showinfo;
     Prop.chop = true;
     input.requestFocusInWindow();
 
@@ -512,9 +505,9 @@ public final class GUI extends JFrame {
         text.setText(out.buffer(), out.size(), false);
       }
 
-      // check if query feedback was evaluated in the query view
+      // check if query feedback was processed in the query view
       final boolean feedback = data != null && GUIProp.showquery &&
-        query.info(inf, ok);
+        query.info(pr instanceof XQuery ? inf : null, ok);
 
       if(!ok) {
         // show error info
@@ -676,6 +669,11 @@ public final class GUI extends JFrame {
     final boolean db = data != null;
     final int t = mode.getSelectedIndex();
     final int s = !db ? 2 : GUIProp.searchmode;
+
+    final boolean inf = GUIProp.showinfo;
+    Prop.allInfo = inf;
+    Prop.xmlplan = inf;
+    Prop.info = inf;
 
     input.help(s == 0 ? data.fs != null ? HELPSEARCHFS : HELPSEARCHXML :
       s == 1 ? HELPXPATH : HELPCMD);

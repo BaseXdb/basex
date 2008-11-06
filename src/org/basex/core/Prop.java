@@ -11,14 +11,13 @@ import org.basex.BaseX;
 import org.basex.io.IO;
 
 /**
- * This class assembles properties which are used all around the
- * project. They are initially read from and finally written to disk.
- *
+ * This class assembles properties which are used all around the project. They
+ * are initially read from and finally written to disk.
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public final class Prop {
-  
+
   // STATIC PROPERTIES ========================================================
 
   /** Returns the system's default encoding. */
@@ -42,17 +41,17 @@ public final class Prop {
    * problems with JAR file. Someone knows what to do?) */
   public static final String[] LANGUAGES = { "English", "German", "Japanese" };
   /** Translation credits. */
-  public static final String[] LANGCREDS = {
-    "Project Team", "Andreas Weiler, BaseX Team", "Kazuo Kashima" };
+  public static final String[] LANGCREDS = { "Project Team",
+      "Andreas Weiler, BaseX Team", "Kazuo Kashima" };
 
   // DATABASE & PROGRAM PATHS =================================================
-  
+
   /** Database path. */
   public static String dbpath = HOME + "/BaseXData";
   /** Web Server path. */
   public static String webpath = WORK + "web";
   /** Path to dotty. */
-  public static String dotty = "dotty";  
+  public static String dotty = "dotty";
   /** Language Name (currently: English or German). */
   public static String language = "English";
   /** Port for client/server communication. */
@@ -61,7 +60,7 @@ public final class Prop {
   public static int webport = 8080;
 
   // TRANSIENT OPTIONS ========================================================
-  
+
   /** The following options are not saved/read; don't remove this flag. */
   public static final boolean SKIP = true;
 
@@ -89,7 +88,7 @@ public final class Prop {
   public static boolean dtd = true;
   /** Flag for entity parsing in internal parser. */
   public static boolean entity = true;
-  
+
   /** Number of query executions. */
   public static int runs = 1;
   /** Flag for whitespace chopping. */
@@ -119,7 +118,7 @@ public final class Prop {
   public static boolean ftcs = false;
   /** Flag for fulltext diacritics. */
   public static boolean ftdc = false;
-  
+
   /** Flow for showing the XQuery error code. */
   public static boolean xqerrcode = true;
   /** Fulltext details. */
@@ -149,9 +148,9 @@ public final class Prop {
   // CONFIG OPTIONS ===========================================================
 
   /** Property information. */
-  private static final String PROPHEADER =  "# BaseX Property File." + NL +
-    "# This here will be overwritten every time, but" + NL +
-    "# you can set fix options at the end of the file." + NL;
+  private static final String PROPHEADER = "# BaseX Property File." + NL
+      + "# This here will be overwritten every time, but" + NL
+      + "# you can set fix options at the end of the file." + NL;
   /** Property information. */
   private static final String PROPUSER = "# User defined section";
 
@@ -172,7 +171,7 @@ public final class Prop {
     read(CONFIGFILE, Prop.class.getFields());
     read = true;
   }
-  
+
   /**
    * Assigns the properties from the specified file to the field array.
    * @param filename file to be read
@@ -181,7 +180,7 @@ public final class Prop {
   public static void read(final String filename, final Field[] fields) {
     final File file = new File(filename);
     if(!file.exists()) return;
-    
+
     try {
       final BufferedReader br = new BufferedReader(new FileReader(file));
       String line = null;
@@ -196,7 +195,7 @@ public final class Prop {
         }
         final String key = line.substring(0, d).trim().toLowerCase();
         final String val = line.substring(d + 1).trim();
-        
+
         if(!assign(fields, key, val)) {
           BaseX.debug("\"%\" ignored in \"%\"", line, filename);
         }
@@ -207,7 +206,7 @@ public final class Prop {
       ex.printStackTrace();
     }
   }
-  
+
   /**
    * Assigns the specified keys and values to one the specified fields.
    * @param fields field array
@@ -229,11 +228,11 @@ public final class Prop {
         break;
       }
     }
-    
+
     // parse all fields
     for(final Field f : fields) {
       final String name = f.getName();
-      
+
       // field found...
       if(name.equals(k.toLowerCase())) {
         final String t = f.getType().getSimpleName();
@@ -267,7 +266,7 @@ public final class Prop {
   public static void write() {
     write(CONFIGFILE, Prop.class.getFields());
   }
-  
+
   /**
    * Writes the properties from field array to the specified file.
    * @param filename file to be read
@@ -275,7 +274,7 @@ public final class Prop {
    */
   public static void write(final String filename, final Field[] fields) {
     final File file = new File(filename);
-    
+
     try {
       // caches options specified by the user
       final StringBuilder user = new StringBuilder();
@@ -291,10 +290,10 @@ public final class Prop {
         }
         br.close();
       }
-      
+
       final BufferedWriter bw = new BufferedWriter(new FileWriter(file));
       bw.write(PROPHEADER + NL);
-  
+
       for(final Field f : fields) {
         final String name = f.getName();
         if(name.equals("SKIP")) break;
@@ -315,7 +314,7 @@ public final class Prop {
           bw.write(name + " = " + f.get(null).toString() + NL);
         }
       }
-      
+
       bw.write(NL + PROPUSER + NL + user);
       bw.close();
     } catch(final Exception ex) {

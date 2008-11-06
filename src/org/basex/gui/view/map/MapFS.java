@@ -7,10 +7,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-
 import org.basex.BaseX;
 import org.basex.core.Context;
 import org.basex.data.Data;
@@ -23,6 +21,7 @@ import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewData;
+import org.basex.io.BufferInput;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 
@@ -301,10 +300,8 @@ final class MapFS extends MapPainter {
         s = Math.min(s, f.length());
         
         // read file contents
-        final FileInputStream fis = new FileInputStream(f);
         fileBuf = new byte[(int) s];
-        fis.read(fileBuf);
-        fis.close();
+        BufferInput.read(f, fileBuf);
 
         // check if file contains mainly ASCII characters
         int n = 0;

@@ -76,11 +76,17 @@ public final class FLWOR extends FLWR {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
+    ser.openElement(this, EVAL, ITER, NS, timer());
     for(final ForLet f : fl) f.plan(ser);
-    if(where != null) where.plan(ser);
+    if(where != null) {
+      ser.openElement(WHR);
+      where.plan(ser);
+      ser.closeElement();
+    }
     order.plan(ser);
     ser.openElement(RET);
     expr.plan(ser);
+    ser.closeElement();
     ser.closeElement();
   }
 }

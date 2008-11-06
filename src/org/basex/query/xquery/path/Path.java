@@ -3,6 +3,7 @@ package org.basex.query.xquery.path;
 import static org.basex.query.xquery.path.Axis.*;
 import static org.basex.query.xquery.path.Test.NODE;
 import static org.basex.query.xquery.XQText.*;
+import static org.basex.query.xquery.XQTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
@@ -72,10 +73,10 @@ public final class Path extends Arr {
     if(steps) {
       mergeDesc(ctx);
       checkEmpty();
-      // analyze if result set can be cached
+      // analyze if result set can be cached - no predicates or no variables...
       cache = true;
       for(final Expr ex : expr) {
-        cache &= ((Step) ex).expr.length != 0 && ex.uses(Using.VAR);
+        cache &= ((Step) ex).expr.length == 0 || !ex.uses(Using.VAR);
       }
     }
     return this;
@@ -172,7 +173,7 @@ public final class Path extends Arr {
   private void iter(final int l, final NodIter ni, final XQContext ctx)
       throws XQException {
 
-    final NodeIter ir = ((Step) expr[l]).iter(ctx);
+    final NodeIter ir = (NodeIter) (ctx.iter(expr[l]));
     final boolean more = l + 1 != expr.length;
     Nod it;
     while((it = ir.next()) != null) {
@@ -287,7 +288,7 @@ public final class Path extends Arr {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
+    ser.openElement(this, NS, timer());
     root.plan(ser);
     for(final Expr e : expr) e.plan(ser);
     ser.closeElement();

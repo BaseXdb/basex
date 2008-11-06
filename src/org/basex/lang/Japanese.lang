@@ -358,7 +358,8 @@ qu_comp=コンパイル中
 qu_eval=計算中
 qu_time=タイミング
 qu_result=結果
-qu_plan='%' のクエリー計画を保存しています。
+#qu_plan='%' のクエリー計画を保存しています。
+qu_plan=Query plan
 qu_hits=ヒット
 qu_ms=ミリ秒
 
@@ -396,6 +397,7 @@ uc_attdupl=属性「%」は既に定義されています。
 uc_posinvalid=不正な位置 "%".
 uc_invalid=不正な名 "%"
 uc_txtinvalid=テキストノードを空に出来ません。
+uc_namespaces=Cannot update documents with namespaces.
 
 # Info Strings
 info_title=データベース情報

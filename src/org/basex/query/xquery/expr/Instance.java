@@ -43,7 +43,7 @@ public final class Instance extends Single {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, TYPE, Token.token(seq.toString()));
+    ser.openElement(this, TYPE, Token.token(seq.toString()), NS, timer());
     expr.plan(ser);
     ser.closeElement();
   }

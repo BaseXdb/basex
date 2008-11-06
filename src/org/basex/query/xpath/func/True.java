@@ -30,7 +30,7 @@ public final class True extends Func {
   }
 
   @Override
-  public Bool compile(final XPContext ctx) {
+  public Bool comp(final XPContext ctx) {
     return Bool.TRUE;
   }
 }

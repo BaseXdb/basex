@@ -104,7 +104,7 @@ public abstract class Item extends Expr implements Result {
   }
 
   @Override
-  public final Expr compile(final XPContext ctx) {
+  public final Expr comp(final XPContext ctx) {
     return this;
   }
 

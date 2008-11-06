@@ -1557,12 +1557,12 @@ public final class XQParser extends QueryParser {
 
       if(eq(atn, XMLNS)) {
         if(!simple) Err.or(NSCONS);
-        final byte[] v = attv.length == 0 ? EMPTY : attv[0].str();
+        final byte[] v = attv.length == 0 ? EMPTY : ((Str) attv[0]).str();
         if(!open.ns()) open.uri = Uri.uri(v);
         addNS(ns, atn, v);
       } else if(startsWith(atn, XMLNS)) {
         if(!simple) Err.or(NSCONS);
-        final byte[] v = attv.length == 0 ? EMPTY : attv[0].str();
+        final byte[] v = attv.length == 0 ? EMPTY : ((Str) attv[0]).str();
         if(v.length == 0) Err.or(NSEMPTYURI);
         ctx.ns.add(new QNm(atn, Uri.uri(v)));
         addNS(ns, atn, v);

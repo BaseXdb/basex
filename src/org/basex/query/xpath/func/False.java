@@ -30,7 +30,7 @@ public final class False extends Func {
   }
 
   @Override
-  public Bool compile(final XPContext ctx) {
+  public Bool comp(final XPContext ctx) {
     return Bool.FALSE;
   }
 }

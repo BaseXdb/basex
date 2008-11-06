@@ -2,6 +2,8 @@ package org.basex.query.xquery.expr;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.xquery.XQText.*;
+import static org.basex.query.xquery.XQTokens.*;
+
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.FTPos;
@@ -92,6 +94,7 @@ public final class FTSelect extends Single {
     if(pos.start) ser.attribute(Token.token(START), Token.TRUE);
     if(pos.end) ser.attribute(Token.token(END), Token.TRUE);
     if(pos.content) ser.attribute(Token.token(CONTENT), Token.TRUE);
+    ser.attribute(NS, timer());
     ser.finishElement();
     expr.plan(ser);
     ser.closeElement();

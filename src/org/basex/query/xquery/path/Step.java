@@ -136,6 +136,7 @@ public class Step extends Arr {
     ser.startElement(this);
     ser.attribute(AXIS, Token.token(axis.name));
     ser.attribute(TEST, Token.token(test.toString()));
+    ser.attribute(NS, timer());
 
     if(expr.length != 0) {
       ser.finishElement();

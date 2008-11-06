@@ -373,8 +373,9 @@ final class QuerySimple extends QueryPanel implements ActionListener {
   void quit() { }
 
   @Override
-  void info(final String info, final boolean ok) {
+  boolean info(final String info, final boolean ok) {
     BaseXLayout.enable(stop, false);
+    return false;
   }
 
   /**

@@ -59,7 +59,9 @@ public final class Func extends ExprInfo {
   public void plan(final Serializer ser) throws IOException {
     ser.startElement(this);
     ser.attribute(NAM, var.name.str());
-    for(int i = 0; i < args.length; i++) ser.attribute(ARG, args[i].name.str());
+    for(int i = 0; i < args.length; i++) {
+      ser.attribute(Token.token(ARG + i), args[i].name.str());
+    }
     ser.finishElement();
     expr.plan(ser);
     ser.closeElement();

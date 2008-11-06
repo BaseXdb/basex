@@ -224,6 +224,8 @@ public interface XQTokens {
   // QUERY PLAN ===============================================================
   
   /** Query Plan. */
+  byte[] NS = token("timer");
+  /** Query Plan. */
   byte[] POS = token("pos");
   /** Query Plan. */
   byte[] VAR = token("var");
@@ -240,9 +242,9 @@ public interface XQTokens {
   /** Query Plan. */
   byte[] ITER = token("iter");
   /** Query Plan. */
-  byte[] RET = token("Return");
+  byte[] WHR = token("Where");
   /** Query Plan. */
-  byte[] ARG = token("arg");
+  byte[] RET = token("Return");
   /** Query Plan. */
   byte[] ORDER = token("Order");
   /** Query Plan. */
@@ -259,4 +261,6 @@ public interface XQTokens {
   byte[] TEST = token("test");
   /** Query Plan. */
   byte[] PREDS = token("Preds");
+  /** Query Plan. */
+  String ARG = "arg";
 }

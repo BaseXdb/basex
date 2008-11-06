@@ -205,11 +205,11 @@ final class FNDate extends Fun {
    * @throws XQException evaluation exception
    */
   private Iter dattim(final Item date, final Iter zon) throws XQException {
-    final Item time = zon.atomic(this, true);
-    if(time == null) return Iter.EMPTY;
+    final Item tm = zon.atomic(this, true);
+    if(tm == null) return Iter.EMPTY;
 
     final Item d = date.u() ? new Dat(date.str()) : date;
-    final Item t = time.u() ? new Tim(time.str()) : time;
+    final Item t = tm.u() ? new Tim(tm.str()) : tm;
 
     final Dtm dtm = new Dtm((Dat) check(d, Type.DAT));
     final Tim tim = (Tim) check(t, Type.TIM);

@@ -111,9 +111,9 @@ abstract class AQuery extends Process {
     if(Prop.dotresult) {
       final CachedOutput out = new CachedOutput();
       result.serialize(new DOTSerializer(out));
-      IO.get(RESULTDOT).write(out.finish());
+      IO.get(PLANDOT).write(out.finish());
       try {
-        new ProcessBuilder(Prop.dotty, RESULTDOT).start().waitFor();
+        new ProcessBuilder(Prop.dotty, PLANDOT).start().waitFor();
       } catch(final InterruptedException ex) {
         throw new IOException(ex.toString());
       }

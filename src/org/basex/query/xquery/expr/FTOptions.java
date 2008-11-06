@@ -1,6 +1,7 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.QueryTokens.*;
+import static org.basex.query.xquery.XQTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.FTOpt;
@@ -56,6 +57,7 @@ public final class FTOptions extends Single {
     if(opt.dc) ser.attribute(Token.token(DIACRITICS), Token.TRUE);
     if(opt.uc) ser.attribute(Token.token(UPPERCASE), Token.TRUE);
     if(opt.lc) ser.attribute(Token.token(LOWERCASE), Token.TRUE);
+    ser.attribute(NS, timer());
     ser.finishElement();
     expr.plan(ser);
     ser.closeElement();

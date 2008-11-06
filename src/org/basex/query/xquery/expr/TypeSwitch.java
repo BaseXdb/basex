@@ -2,9 +2,7 @@ package org.basex.query.xquery.expr;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.xquery.XQTokens.*;
-
 import java.io.IOException;
-
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
@@ -89,6 +87,7 @@ public final class TypeSwitch extends Single {
   public void plan(final Serializer ser) throws IOException {
     ser.startElement(this);
     if(var.name != null) ser.attribute(VAR, var.name.str());
+    ser.attribute(NS, timer());
     ser.finishElement();
     for(Case c : cs) c.plan(ser);
     ts.plan(ser);

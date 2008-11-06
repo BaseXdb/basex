@@ -53,8 +53,8 @@ public final class Filter extends Expr {
   }
 
   @Override
-  public Expr compile(final XPContext ctx) throws QueryException {
-    expr = expr.compile(ctx);
+  public Expr comp(final XPContext ctx) throws QueryException {
+    expr = expr.comp(ctx);
     return preds.compile(ctx) ? this : new NodeSet(ctx);
   }
 

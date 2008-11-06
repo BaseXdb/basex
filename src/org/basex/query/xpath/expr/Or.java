@@ -32,10 +32,10 @@ public final class Or extends ArrayExpr {
   }
 
   @Override
-  public Expr compile(final XPContext ctx) throws QueryException {
+  public Expr comp(final XPContext ctx) throws QueryException {
     for(int i = 0; i != exprs.length; i++) {
       // optimize operand
-      exprs[i] = exprs[i].compile(ctx);
+      exprs[i] = exprs[i].comp(ctx);
 
       // check if we can simplify a location path
       if(exprs[i] instanceof LocPath) {

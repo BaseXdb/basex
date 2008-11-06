@@ -19,7 +19,6 @@ import static org.basex.build.fs.FSText.*;
 public final class JPGExtractor extends EXIFExtractor {
   @Override
   public void extract(final Builder listener, final File f) throws IOException {
-    //byte[] data = new BufferInput(f, 10).firstBlock();
     final BufferedInputStream in =
       new BufferedInputStream(new FileInputStream(f));
 

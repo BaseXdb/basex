@@ -25,8 +25,8 @@ public abstract class FTArrayExpr extends Expr {
   public FTPositionFilter ftpos;
   
   @Override
-  public FTArrayExpr compile(final XPContext ctx) throws QueryException {
-    for(int i = 0; i < exprs.length; i++) exprs[i] = exprs[i].compile(ctx);
+  public FTArrayExpr comp(final XPContext ctx) throws QueryException {
+    for(int i = 0; i < exprs.length; i++) exprs[i] = exprs[i].comp(ctx);
     return this;
   }
 
