@@ -22,7 +22,7 @@ import org.basex.query.xpath.values.Item;
  */
 public final class PredSimple extends Pred {
   /** Predicate expression. */
-  private Expr expr;
+  public Expr expr;
 
   /**
    * Empty Constructor.
@@ -60,7 +60,7 @@ public final class PredSimple extends Pred {
     }
     return tmp;
   }
-
+  
   @Override
   boolean eval(final XPContext ctx, final NodeSet nodes, final int pos)
       throws QueryException {

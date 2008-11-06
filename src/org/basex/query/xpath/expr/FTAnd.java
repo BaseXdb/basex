@@ -59,6 +59,17 @@ public final class FTAnd extends FTArrayExpr {
 
     return new FTIntersection(indexExprs, pex, nex);
   }
+  
+  /**
+   * Add Expr to list.
+   * @param ex new Expr
+   */
+  public void add(final FTArrayExpr ex) {
+    FTArrayExpr[] ne = new FTArrayExpr[exprs.length + 1];
+    System.arraycopy(exprs, 0, ne, 0, exprs.length);
+    ne[exprs.length] = ex;
+    exprs = ne;
+  }
 
   @Override
   public int indexSizes(final XPContext ctx, final Step curr, final int min) {

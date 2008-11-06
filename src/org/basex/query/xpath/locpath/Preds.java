@@ -12,6 +12,7 @@ import org.basex.query.xpath.expr.Expr;
 import org.basex.query.xpath.values.NodeBuilder;
 import org.basex.query.xpath.values.NodeSet;
 import org.basex.util.Array;
+import org.basex.util.PredSimpleList;
 
 /**
  * Location Steps.
@@ -162,6 +163,7 @@ public final class Preds extends ExprInfo {
    */
   public boolean compile(final XPContext ctx) throws QueryException {
     tmp = new NodeSet(ctx);
+    PredSimpleList p = new PredSimpleList(size);
     for(int j = 0; j < size; j++) {
       final Pred pred = preds[j].compile(ctx);
       if(pred.alwaysFalse()) {
@@ -176,7 +178,16 @@ public final class Preds extends ExprInfo {
       } else {
         preds[j] = pred;
       }
+      
+      if (pred instanceof PredSimple) p.add((PredSimple) pred);
     }
+    
+    if (p.size > 0 && p.size < size) {
+      preds = p.finish();
+      size = p.size;
+      ctx.compInfo(OPTSUMPREDS);
+    }
+    
     return true;
   }
 

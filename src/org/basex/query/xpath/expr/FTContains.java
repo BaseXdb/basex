@@ -217,8 +217,7 @@ public final class FTContains extends DualExpr {
 
     //s = seq;
     final LocPath path = (LocPath) expr1;
-    ctx.compInfo(OPTFTINDEX);
-
+    
     // all FTArrayExpr are recursively converted to for indexaccess
     final FTArrayExpr ae = (FTArrayExpr)
       (iu ? expr2.indexEquivalent(ctx, curr, seq) : expr2);
@@ -227,6 +226,7 @@ public final class FTContains extends DualExpr {
     if (!seq) {
       // standard index evaluation
       //expr = new FTContains(expr1, ae, option, seq, iu);
+      ctx.compInfo(OPTFTINDEX);
       expr = new FTContainsNS(expr1, ae);
       if (curr != null) return new Path(expr, path.invertPath(curr));
       else return expr;
@@ -237,6 +237,7 @@ public final class FTContains extends DualExpr {
         expr = new FTContains(expr1, expr2, option, iu);
       } else {
         // with index access
+        ctx.compInfo(OPTFTINDEX);
         expr = new FTContains(expr1, ae, option, iu);
       }
   
