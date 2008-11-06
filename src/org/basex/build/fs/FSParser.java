@@ -113,6 +113,13 @@ public final class FSParser extends Parser implements FSVisitor {
   /**
    * {@inheritDoc}
    */
+  public void postEvent(final File dir) throws IOException {
+    builder.endElem(DIR);
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
   public void regfileEvent(final File f) throws IOException {
     guimsg = f.toString();
     builder.startElem(FILE, atts(f));
