@@ -1,4 +1,4 @@
-package org.basex.gui.view.scatter;
+package org.basex.gui.view.plot;
 
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
@@ -35,7 +35,7 @@ import org.basex.util.IntList;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Lukas Kircher
  */
-public final class ScatterView extends View implements Runnable {
+public final class PlotView extends View implements Runnable {
   /** Rotate factor. */
   private static final double ROTATE = Math.sin(30);
   /** Plot margin: top, left, bottom, right margin. */
@@ -43,7 +43,7 @@ public final class ScatterView extends View implements Runnable {
   /** Whitespace between captions. */
   static final int CAPTIONWHITESPACE = 30;
   /** Data reference. */
-  ScatterData scatterData;
+  PlotData plotData;
   /** Item image. */
   private BufferedImage itemImg;
   /** Marked item image. */
@@ -73,13 +73,13 @@ public final class ScatterView extends View implements Runnable {
   /** Flag for mouse dragging actions. */
   private boolean dragging;
   /** Bounding box which supports selection of multiple items. */
-  private ScatterBoundingBox selectionBox;
+  private PlotBoundingBox selectionBox;
 
   /**
    * Default Constructor.
    * @param hlp help text
    */
-  public ScatterView(final byte[] hlp) {
+  public PlotView(final byte[] hlp) {
     super(hlp);
     setLayout(new BorderLayout());
     setBorder(5, 5, 5, 5);
@@ -87,7 +87,7 @@ public final class ScatterView extends View implements Runnable {
     xCombo = new BaseXCombo();
     xCombo.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        if(scatterData.xAxis.setAxis((String) xCombo.getSelectedItem())) {
+        if(plotData.xAxis.setAxis((String) xCombo.getSelectedItem())) {
           plotChanged = true;
           repaint();
         }
@@ -96,7 +96,7 @@ public final class ScatterView extends View implements Runnable {
     yCombo = new BaseXCombo();
     yCombo.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        if(scatterData.yAxis.setAxis((String) yCombo.getSelectedItem())) {
+        if(plotData.yAxis.setAxis((String) yCombo.getSelectedItem())) {
           plotChanged = true;
           repaint();
         }
@@ -106,11 +106,11 @@ public final class ScatterView extends View implements Runnable {
     itemCombo.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         final String item = (String) itemCombo.getSelectedItem();
-        if(scatterData.setItem(item)) {
+        if(plotData.setItem(item)) {
           plotChanged = true;
           
           final String[] keys =
-            scatterData.getCategories(token(item)).finishString();
+            plotData.getCategories(token(item)).finishString();
           xCombo.setModel(new DefaultComboBoxModel(keys));
           yCombo.setModel(new DefaultComboBoxModel(keys));
           if(keys.length > 0) {
@@ -137,7 +137,7 @@ public final class ScatterView extends View implements Runnable {
     add(box, BorderLayout.NORTH);
     
     popup = new BaseXPopup(this, GUIConstants.POPUP);
-    selectionBox = new ScatterBoundingBox();
+    selectionBox = new PlotBoundingBox();
     refreshLayout();
   }
   
@@ -188,9 +188,9 @@ public final class ScatterView extends View implements Runnable {
 
     // draw items
     g.setColor(GUIConstants.color6);
-    for(int i = 0; i < scatterData.size; i++) {
-      drawItem(g, scatterData.xAxis.co[i], 
-          scatterData.yAxis.co[i], false, false);
+    for(int i = 0; i < plotData.size; i++) {
+      drawItem(g, plotData.xAxis.co[i], 
+          plotData.yAxis.co[i], false, false);
     }
     return img;
   }
@@ -203,7 +203,7 @@ public final class ScatterView extends View implements Runnable {
     super.paintComponent(g);
     BaseXLayout.antiAlias(g);
     
-    if(scatterData == null) {
+    if(plotData == null) {
       refreshInit();
       return;
     }
@@ -233,19 +233,19 @@ public final class ScatterView extends View implements Runnable {
     final Nodes marked = GUI.context.marked();
     if(marked.size() > 0) {
       for(int i = 0; i < marked.size(); i++) {
-        final int prePos = scatterData.findPre(marked.nodes[i]);
+        final int prePos = plotData.findPre(marked.nodes[i]);
         if(prePos > -1)
-          drawItem(g, scatterData.xAxis.co[prePos], 
-              scatterData.yAxis.co[prePos], false, true);
+          drawItem(g, plotData.xAxis.co[prePos], 
+              plotData.yAxis.co[prePos], false, true);
       }
     }
 
     // draw focused item
-    final int f = scatterData.findPre(focused);
+    final int f = plotData.findPre(focused);
     if(f > -1) {
       if(!dragging) {
-        final double x1 = scatterData.xAxis.co[f];
-        final double y1 = scatterData.yAxis.co[f];
+        final double x1 = plotData.xAxis.co[f];
+        final double y1 = plotData.yAxis.co[f];
         drawItem(g, x1, y1, true, false);
         // draw focused x and y value
         g.setFont(GUIConstants.font);
@@ -315,7 +315,7 @@ public final class ScatterView extends View implements Runnable {
     final int pWidth = plotWidth - novalue;
     final int pHeight = plotHeight - novalue;
     
-    final ScatterAxis axis = drawX ? scatterData.xAxis : scatterData.yAxis;
+    final PlotAxis axis = drawX ? plotData.xAxis : plotData.yAxis;
     // drawing horizontal axis line
     if(drawX) {
       g.drawLine(MARGIN[1], h - MARGIN[2], w - MARGIN[3], h - MARGIN[2]);
@@ -419,9 +419,9 @@ public final class ScatterView extends View implements Runnable {
     if(!GUIProp.showplot) return;
     
     // all plot data is recalculated, assignments stay the same
-    scatterData.refreshItems();
-    scatterData.xAxis.refreshAxis();
-    scatterData.yAxis.refreshAxis();
+    plotData.refreshItems();
+    plotData.xAxis.refreshAxis();
+    plotData.yAxis.refreshAxis();
 
     plotChanged = true;
     repaint();
@@ -434,16 +434,16 @@ public final class ScatterView extends View implements Runnable {
 
   @Override
   protected void refreshInit() {
-    scatterData = null;
+    plotData = null;
 
     final Data data = GUI.context.data();
     if(data != null) {
       if(!GUIProp.showplot) return;
       
       viewDimension = Integer.MAX_VALUE;
-      scatterData = new ScatterData();
+      plotData = new PlotData();
 
-      final String[] items = scatterData.getItems().finishString();
+      final String[] items = plotData.getItems().finishString();
       itemCombo.setModel(new DefaultComboBoxModel(items));
 
       // set first item and trigger assignment of axis assignments
@@ -508,10 +508,10 @@ public final class ScatterView extends View implements Runnable {
     focusedPre = -1;
     int dist = Integer.MAX_VALUE;
     // all displayed items are tested for focus
-    for(int i = 0; i < scatterData.size && dist != 0; i++) {
+    for(int i = 0; i < plotData.size && dist != 0; i++) {
       // coordinates and distances for current tested item are calculated
-      final int x = calcCoordinate(true, scatterData.xAxis.co[i]);
-      final int y = calcCoordinate(false, scatterData.yAxis.co[i]);
+      final int x = calcCoordinate(true, plotData.xAxis.co[i]);
+      final int y = calcCoordinate(false, plotData.yAxis.co[i]);
       final int distX = Math.abs(mouseX - x);
       final int distY = Math.abs(mouseY - y);
       final int off = itemSize(false) / 2;
@@ -523,7 +523,7 @@ public final class ScatterView extends View implements Runnable {
         final int currDist = distX * distY;
         if(currDist < dist) {
           dist = currDist;
-          focusedPre = scatterData.pres[i];
+          focusedPre = plotData.pres[i];
         }
       }
     }
@@ -559,7 +559,7 @@ public final class ScatterView extends View implements Runnable {
    * @return formatted string
    */
   private String formatString(final boolean drawX) {
-    final ScatterAxis axis = drawX ? scatterData.xAxis : scatterData.yAxis;
+    final PlotAxis axis = drawX ? plotData.xAxis : plotData.yAxis;
     final byte[] val = axis.getValue(focused);
     if(val.length == 0) return "";
     return axis.type == Kind.TEXT || axis.type == Kind.CAT ? string(val) :
@@ -644,14 +644,14 @@ public final class ScatterView extends View implements Runnable {
     
     // searches for items located in the selection box
     final IntList il = new IntList();
-    for(int i = 0; i < scatterData.size; i++) {
-      final int x = calcCoordinate(true, scatterData.xAxis.co[i]);
-      final int y = calcCoordinate(false, scatterData.yAxis.co[i]);
+    for(int i = 0; i < plotData.size; i++) {
+      final int x = calcCoordinate(true, plotData.xAxis.co[i]);
+      final int y = calcCoordinate(false, plotData.yAxis.co[i]);
       if(((x >= selectionBox.x1 && x <= selectionBox.x2) || 
           (x <= selectionBox.x1 && x >= selectionBox.x2)) && 
           ((y >= selectionBox.y1 && y <= selectionBox.y2) || 
              (y <= selectionBox.y1 && y >= selectionBox.y2))) {
-        il.add(scatterData.pres[i]);
+        il.add(plotData.pres[i]);
       }
     }
     notifyMark(new Nodes(il.finish(), GUI.context.data()));
@@ -684,18 +684,18 @@ public final class ScatterView extends View implements Runnable {
     
     // node marking if item focused. if more than one icon is in focus range
     // all of these are marked. focus range means exact same x AND y coordinate.
-    final int pre = scatterData.findPre(focused);
+    final int pre = plotData.findPre(focused);
     if(pre < 0) return;
     final IntList il = new IntList();
     // get coordinates for focused item
-    final int mx = calcCoordinate(true, scatterData.xAxis.co[pre]);
-    final int my = calcCoordinate(false, scatterData.yAxis.co[pre]);
-    for(int i = 0; i < scatterData.size; i++) {
+    final int mx = calcCoordinate(true, plotData.xAxis.co[pre]);
+    final int my = calcCoordinate(false, plotData.yAxis.co[pre]);
+    for(int i = 0; i < plotData.size; i++) {
       // get coordinates for current item 
-      final int x = calcCoordinate(true, scatterData.xAxis.co[i]);
-      final int y = calcCoordinate(false, scatterData.yAxis.co[i]);
+      final int x = calcCoordinate(true, plotData.xAxis.co[i]);
+      final int y = calcCoordinate(false, plotData.yAxis.co[i]);
       if(mx == x && my == y) {
-        il.add(scatterData.pres[i]);
+        il.add(plotData.pres[i]);
       }
     }
     

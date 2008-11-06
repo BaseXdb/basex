@@ -1,7 +1,6 @@
-package org.basex.gui.view.scatter;
+package org.basex.gui.view.plot;
 
 import static org.basex.util.Token.*;
-
 import org.basex.data.Data;
 import org.basex.data.StatsKey;
 import org.basex.data.StatsKey.Kind;
@@ -16,11 +15,11 @@ import org.basex.util.TokenList;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Lukas Kircher
  */
-public final class ScatterAxis {
+public final class PlotAxis {
   /** Text length limit for text to number transformation. */
   private static final int TEXTLENGTH = 11;
-  /** Scatter data reference. */
-  private final ScatterData scatterData;
+  /** Plot data reference. */
+  private final PlotData plotData;
   /** Tag reference to selected attribute. */
   int attrID;
   /** Constant to determine whether axis attribute equals deepFS "@size". */
@@ -53,8 +52,8 @@ public final class ScatterAxis {
    * Constructor.
    * @param data scatte data reference
    */
-  ScatterAxis(final ScatterData data) {
-    scatterData = data;
+  PlotAxis(final PlotData data) {
+    plotData = data;
   }
   
   /**
@@ -113,7 +112,7 @@ public final class ScatterAxis {
       nrCats = cats.length;
     }
 
-    final int[] items = scatterData.pres;
+    final int[] items = plotData.pres;
     co = new double[items.length];
     vals = new byte[items.length][];
     for(int i = 0; i < items.length; i++) {
@@ -312,7 +311,7 @@ public final class ScatterAxis {
       }
       captionStep = calculatedCaptionStep;
       nrCaptions = (int) (range / captionStep) + 1;
-      if(nrCaptions * ScatterView.itemSize(false) * 2 > space) {
+      if(nrCaptions * PlotView.itemSize(false) * 2 > space) {
         captionStep *= 2;
         nrCaptions = (int) (range / captionStep) + 1;
       }
@@ -322,7 +321,7 @@ public final class ScatterAxis {
     
     } else {
       if(nrCats > 20) {
-        final int c = space / (3 * ScatterView.CAPTIONWHITESPACE);
+        final int c = space / (3 * PlotView.CAPTIONWHITESPACE);
         nrCaptions = c >= 2 ? c : 2;
       } else {
         nrCaptions = nrCats;

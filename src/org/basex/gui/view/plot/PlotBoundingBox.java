@@ -1,4 +1,4 @@
-package org.basex.gui.view.scatter;
+package org.basex.gui.view.plot;
 
 /**
  * A bounding box to support item selection.
@@ -6,7 +6,7 @@ package org.basex.gui.view.scatter;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Lukas Kircher
  */
-public class ScatterBoundingBox {
+public class PlotBoundingBox {
   /** X coordinate of upper left corner. */
   int x1;
   /** Y coordinate of upper left corner. */

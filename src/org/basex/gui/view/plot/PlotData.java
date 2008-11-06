@@ -1,4 +1,4 @@
-package org.basex.gui.view.scatter;
+package org.basex.gui.view.plot;
 
 import static org.basex.util.Token.*;
 import java.util.Arrays;
@@ -17,11 +17,11 @@ import org.basex.util.TokenList;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Lukas Kircher
  */
-public final class ScatterData {
+public final class PlotData {
   /** The x axis of the plot. */
-  final ScatterAxis xAxis;
+  final PlotAxis xAxis;
   /** The y axis of the plot. */
-  final ScatterAxis yAxis;
+  final PlotAxis yAxis;
   /** Items pre values. */
   int[] pres;
   /** Number of items displayed in plot. */
@@ -33,9 +33,9 @@ public final class ScatterData {
   /**
    * Default Constructor.
    */
-  public ScatterData() {
-    xAxis = new ScatterAxis(this);
-    yAxis = new ScatterAxis(this);
+  public PlotData() {
+    xAxis = new PlotAxis(this);
+    yAxis = new PlotAxis(this);
   }
 
   /**
