@@ -43,6 +43,12 @@ public interface FSVisitor {
    * @throws IOException I/O exception
    */
   void postEvent() throws IOException;
+  
+  /** Invoked when directory is left.
+   * @param dir name
+   * @throws IOException I/O exception
+   */
+  void postEvent(final File dir) throws IOException;
 
   /** Invoked when a regular file is visited.
    * @param file name
