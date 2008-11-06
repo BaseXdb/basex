@@ -32,7 +32,6 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.View;
 import org.basex.util.IntList;
-import org.basex.util.Performance;
 
 /**
  * A scatter plot visualization of the database.
@@ -311,7 +310,6 @@ public final class PlotView extends View implements Runnable {
    * @param drawX drawn axis is x axis
    */
   private void drawAxis(final Graphics g, final boolean drawX) {
-    Performance pe = new Performance();
     final int h = getHeight();
     final int w = getWidth();
     g.setColor(GUIConstants.back);
@@ -344,17 +342,17 @@ public final class PlotView extends View implements Runnable {
     // determine axis caption for TEXT / INT / DBL data
     if(type == Kind.TEXT) {
 //      final int nrCats = axis.nrCats; 
-//      final double catRange = 1.0d / (nrCats - 1);
       final double[] coSorted = Arrays.copyOf(axis.co, axis.co.length);
+      // draw min / max caption
       drawCaptionAndGrid(g, drawX, string(axis.firstCat), 0);
       drawCaptionAndGrid(g, drawX, string(axis.lastCat), 1);
 
       // get sorted axis item coordinates
       Arrays.sort(coSorted);
-      int i = 0;
       // optimum caption position
       double op = capRange;
       final int cl = coSorted.length;
+      int i = 0;
       // find first non .0d coordinate value
       while(i < cl && coSorted[i] == 0) i++;
       // find nearest position for next axis caption
@@ -369,6 +367,7 @@ public final class PlotView extends View implements Runnable {
           while(j < axis.co.length && axis.co[j] != op) j++;
           drawCaptionAndGrid(g, drawX, 
               string(axis.getValue(plotData.pres[j])), op);
+          // increase to next optimum caption position
           op += capRange;
         }
         i++;
@@ -378,17 +377,18 @@ public final class PlotView extends View implements Runnable {
       int i = 1;
       // draw min caption
       drawCaptionAndGrid(g, drawX, formatString(axis.min, drawX), 0);
+      // draw max caption
+      drawCaptionAndGrid(g, drawX, formatString(axis.max, drawX), 1);
+
       // draw captions between min and max
+//      <LK> ugly workaround - will be fixed
+      if(nrCaptions < 0) return;
       while(i < nrCaptions - 1) {
         drawCaptionAndGrid(g, drawX, 
             formatString(axis.min + i * step, drawX), capRange * i);
         i++;
       }
-      // draw max caption
-      drawCaptionAndGrid(g, drawX, formatString(axis.max, drawX), 1);
     }
-    
-    System.out.println(pe.getTimer());
   }
   
   /**
