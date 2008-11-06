@@ -1,12 +1,14 @@
 <?php
 
-$pages = array( "index.php" => "Database for the XML addicted", 
+$pages = array( "index.php" => "Processing and Visualizing XML Data", 
 				"documentation.php" => "Documentation",
 				"commands.php" => "Commands",
 				"xml.php" => "Create a Database",
 				"fs.php" => "Import your Filesystem",
 				"faq.php" => "FAQ",
 				"frontend.php" => "Frontend",
+				"xpath.php" => "XPath Example",
+				"xquery.php" => "XQuery Example",
 				"download.php" => "Downloads",
 				"publications.php" => "Publications",	
 				"contact.php" => "Contact");
@@ -33,11 +35,17 @@ or something like that.
 
     <head>
 				'.$meta.'
-        <meta http-equiv="Content-Language" content="en-gb" />
+		    <meta http-equiv="Content-Language" content="en-us"/>
         <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+		    <meta name="author" content="BaseX Team"/>
+		    <meta name="description" content="BaseX - Processing and Visualizing XML Data"/>
+		    <meta name="keywords" content="BaseX,XML,XQuery,Database,Fulltext,Visualization"/>
+		    <meta name="robots" content="all"/>
         <link rel="stylesheet" type="text/css" href="style.css" />
-        <link rel="SHORTCUT ICON" href="gfx/BaseX.ico" />
-        <title>BaseX - '.$title.'</title>
+        <link rel="SHORTCUT ICON"
+				     href="http://www.inf.uni-konstanz.de/dbis/basex/gfx/BaseX.ico"
+						 type="image/ico" />
+				<title>BaseX - '.$title.'</title>
     </head>
     
     <body>
@@ -54,7 +62,7 @@ or something like that.
 -->
             <div id="header">
 	        <a href="index.php"><img src="gfx/BaseX.png" alt="BaseX Logo"/></a>
-                <p>Visual exploration and querying of XML data</p>
+                <p>Processing and Visualizing XML Data<br/>with a native XML Database</p>
             </div>
 
             <div id="body">
