@@ -818,11 +818,6 @@ public enum GUICommands implements GUICommand {
     public void execute() {
       GUI.get().execute(new Cs("/"));
     }
-
-    @Override
-    public void refresh(final AbstractButton button) {
-      BaseXLayout.enable(button, !GUI.context.root());
-    }
   };
 
   /** States if the command needs a data reference. */

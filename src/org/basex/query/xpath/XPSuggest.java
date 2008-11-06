@@ -115,9 +115,9 @@ public final class XPSuggest extends XPParser {
     final ArrayList<Node> list = stack.peek();
     for(int c = list.size() - 1; c >= 0; c--) {
       final Node n = list.get(c);
-      final byte[] t = n.token(ctx.data());
       if(n.kind == Data.ELEM && tn == TestName.ALLNODES) continue;
 
+      final byte[] t = n.token(ctx.data());
       final boolean eq = Token.eq(t, tn);
       if(finish) {
         if(!eq) list.remove(c);

@@ -118,8 +118,7 @@ public final class Skeleton {
 
     // sort by number of occurrences
     final TokenList tmp = new TokenList();
-    for(final Node r : n)
-      tmp.add(token(r.count));
+    for(final Node r : n) tmp.add(token(r.count));
     final IntList occ = IntList.createOrder(tmp.finish(), true, false);
 
     // remove non-text/attribute nodes
@@ -127,7 +126,9 @@ public final class Skeleton {
     for(int i = 0; i < n.size(); i++) {
       final Node r = n.get(o ? occ.list[i] : i);
       final byte[] name = r.token(data);
-      if(!out.contains(name) && !contains(name, '(')) out.add(name);
+      if(name.length != 0 && !out.contains(name) && !contains(name, '(')) {
+        out.add(name);
+      }
     }
     if(!o) out.sort(false);
     return out;

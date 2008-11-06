@@ -2,7 +2,6 @@ package org.basex.gui.view.scatter;
 
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -13,13 +12,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
-
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.StatsKey.Kind;
@@ -180,7 +177,16 @@ public final class ScatterView extends View implements Runnable {
     final Graphics g = img.getGraphics();
     ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
         RenderingHints.VALUE_ANTIALIAS_ON);
+
+    // overdraw plot background
+    g.setColor(GUIConstants.color1);
+    g.fillRect(MARGIN[1] , MARGIN[0], plotWidth, plotHeight);
     
+    // draw axis and grid
+    drawAxis(g, true);
+    drawAxis(g, false);
+
+    // draw items
     g.setColor(GUIConstants.color6);
     for(int i = 0; i < scatterData.size; i++) {
       drawItem(g, scatterData.xAxis.co[i], 
@@ -220,16 +226,6 @@ public final class ScatterView extends View implements Runnable {
       return;
     }
     
-    // overdraw plot background
-    g.setColor(GUIConstants.color1);
-    g.fillRect(MARGIN[1] , MARGIN[0], plotWidth, plotHeight);
-    
-    // draw axis and grid
-    drawAxis(g, true);
-    drawAxis(g, false);
-
-    // draw items
-    if(scatterData.size == 0) return;
     if(plotImg == null || plotChanged) plotImg = createPlotImage();
     g.drawImage(plotImg, 0, 0, this);
     
@@ -335,7 +331,7 @@ public final class ScatterView extends View implements Runnable {
     final int nrCaptions = axis.nrCaptions;
     final double step = axis.captionStep;
     final double range = 1.0d / (nrCaptions - 1);
-    final int fs = GUIProp.fontsize;
+    final int fs = itemSize(false);
     
     g.setFont(GUIConstants.font);
     for(int i = 0; i < nrCaptions; i++) {
@@ -554,7 +550,7 @@ public final class ScatterView extends View implements Runnable {
    * @return size value
    */
   static int itemSize(final boolean focus) {
-    return GUIProp.fontsize + (focus ? 4 : 2);
+    return Math.max(1, GUIProp.fontsize + (focus ? 0 : -2));
   }
   
   /**
