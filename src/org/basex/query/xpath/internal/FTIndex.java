@@ -81,6 +81,7 @@ public final class FTIndex extends FTArrayExpr {
         iat = (IndexArrayIterator) it;  
       } else {
         iat = phrase(iat, (IndexArrayIterator) it, w);
+        if (iat.size() == 0) return Bool.FALSE;
       }
       w++;
     }

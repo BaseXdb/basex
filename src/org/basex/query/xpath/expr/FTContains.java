@@ -24,6 +24,7 @@ import org.basex.util.IntList;
 
 /**
  * FTContains Expression; used for fulltext operations.
+ * Used for sequential processing.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
@@ -39,14 +40,8 @@ public final class FTContains extends DualExpr {
   private boolean f = false;
   /** Temporary result node.*/
   private FTNode ftn = null;
-  /** Flag for sequential evaluation. */
-  boolean s = true;
   /** Flag for index use. */
   private boolean iu;
-  /** Flag for indexSizes call. */
-  private boolean isc = false;
-  /** Flag for indexEquivalent call. */
-  private boolean iec = false;
 
   /**
    * Constructor.
@@ -73,14 +68,12 @@ public final class FTContains extends DualExpr {
    * @param e1 first expression
    * @param e2 second expression to compare with first
    * @param opt fulltext options
-   * @param seq flag for sequential processing
    * @param indexuse flag for index use
    */
   public FTContains(final Expr e1, final Expr e2, final FTOpt opt,
-      final boolean seq, final boolean indexuse) {
+      final boolean indexuse) {
     super(e1, e2);
     option = opt;
-    s = seq;
     iu = indexuse;
   }
 
@@ -90,11 +83,7 @@ public final class FTContains extends DualExpr {
     expr1 = expr1.comp(ctx);
     expr2 = expr2.comp(ctx);
 
-    //
     if (expr1 instanceof LocPathAbs) {
-    //if (expr1 instanceof LocPathAbs || expr1 instanceof LocPathRel) {
-      s = true;
-      //s = false;
       iu = false;
       return this;
     }
@@ -125,29 +114,9 @@ public final class FTContains extends DualExpr {
     // argument for the Path expression; this expression expects the first
     // argument to return a node set..) A possible solution might be to split
     // this class into two in the compilation step.
-    
-    Item res;
-    if (s) res = evalSeq(ctx);
-    else if (isc && !iec) res = evalWithoutIndex(ctx);
-    else {
-      final FTTokenizer tmp = ctx.ftitem;
-      ctx.ftitem = ft;
-  
-      res = ctx.eval(expr2);
-      if (res.bool()) {
-        final FTArrayExpr ftae = (FTArrayExpr) expr2;
-        final IntList il = new IntList();
-        while (ftae.more()) {
-          ftn = ftae.next(ctx);
-          if (ftn.size == 0) break;
-          il.add(ftn.getPre());
-        }
-        res = new NodeSet(il.finish(), ctx);
-      }
-      ctx.item = (NodeSet) res;
-      ctx.ftitem = tmp;
-    }
-    return res;
+
+    if (iu) return evalSeq(ctx);
+    else return evalWithoutIndex(ctx);
   }
 
   /**
@@ -160,7 +129,6 @@ public final class FTContains extends DualExpr {
    * @throws QueryException Exception
    */
   private Bool evalSeq(final XPContext ctx) throws QueryException {
-    if (!iu) return evalWithoutIndex(ctx);
     final FTTokenizer tmp = ctx.ftitem;
     ctx.ftitem = ft;
 
@@ -207,6 +175,7 @@ public final class FTContains extends DualExpr {
     final FTTokenizer tmp = ctx.ftitem;
     ctx.ftitem = ft;
     Item it = expr1.eval(ctx);
+    if (!it.bool()) return Bool.FALSE;
     if(it instanceof NodeSet) {
       it = evalNS(ctx, it);
     } else {
@@ -227,10 +196,15 @@ public final class FTContains extends DualExpr {
       throws QueryException {
 
     final NodeSet nodes = (NodeSet) it;
+    IntList res = new IntList();
     final Data data = nodes.data;
     for(int n = 0; n < nodes.size; n++) {
       ft.init(data.atom(nodes.nodes[n]));
-      if(expr2.eval(ctx).bool()) return Bool.TRUE;
+      if(expr2.eval(ctx).bool()) res.add(nodes.nodes[n]);
+    }
+    if (res.size > 0) {
+      ctx.item = new NodeSet(res.finish(), ctx);
+      return Bool.TRUE;
     }
     return Bool.FALSE;
   }
@@ -250,21 +224,22 @@ public final class FTContains extends DualExpr {
       (iu ? expr2.indexEquivalent(ctx, curr, seq) : expr2);
       
     Expr expr;
-    iec = true;
     if (!seq) {
       // standard index evaluation
-      expr = new FTContains(expr1, ae, option, seq, iu);
+      //expr = new FTContains(expr1, ae, option, seq, iu);
+      expr = new FTContainsNS(expr1, ae);
       if (curr != null) return new Path(expr, path.invertPath(curr));
       else return expr;
     } else {
       // sequential evaluation
       if (!iu) {
         // without index access
-        expr = new FTContains(expr1, expr2, option, seq, iu);
+        expr = new FTContains(expr1, expr2, option, iu);
       } else {
         // with index access
-        expr = new FTContains(expr1, ae, option, seq, iu);
+        expr = new FTContains(expr1, ae, option, iu);
       }
+  
       if (curr == null) return expr;
       return new Path(expr, path);
     }
@@ -272,8 +247,6 @@ public final class FTContains extends DualExpr {
 
    @Override
   public int indexSizes(final XPContext ctx, final Step curr, final int min) {
-     isc = true;
-     s = true;
     // check if first expression is a location path and if fulltext index exists
     final MetaData meta = ctx.item.data.meta;
     if(!(expr1 instanceof LocPathRel && meta.ftxindex))
@@ -297,16 +270,16 @@ public final class FTContains extends DualExpr {
     // Integer.MAX_VALUE is return if an ftnot does not occure
     // after an ftand
     final int nrIDs = expr2.indexSizes(ctx, curr, min);
-    if (nrIDs < Integer.MAX_VALUE && nrIDs > -1) {
+  /*  if (nrIDs < Integer.MAX_VALUE && nrIDs > -1) {
       s = false;
-    }
+    }*/
     if (nrIDs == -1) expr2 = Bool.TRUE;
     return nrIDs == -1 ? Integer.MAX_VALUE : nrIDs;
   }
 
   @Override
   public String toString() {
-    return expr1 + " ftcontains " + expr2;
+    return expr1 + " ftcontainsBool " + expr2;
   }
 
   @Override

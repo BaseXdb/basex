@@ -38,9 +38,7 @@ public final class FTTest extends AbstractTest {
       "</fttest>";
 
     queries = new Object[][] {
-        { "FTUnaryNot6", nodes(3, 5, 7, 9, 11, 14, 37),
-          "//w [text() ftcontains ftnot 'bier']" },
-        
+       
         { "Simple 1", bool(true),
           "'abc' ftcontains 'abc'" },
         { "Simple 2", bool(true),

@@ -1,8 +1,10 @@
 package org.basex.test.query;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.InputStreamReader;
 import org.basex.core.Context;
 import org.basex.core.Process;
@@ -38,7 +40,10 @@ public final class MVTest {
     new Open(db).execute(context, null);
 
     // open query file
-    final File file = new File("etc/xml/mv.txt");
+    BufferedWriter out = 
+      new BufferedWriter(new FileWriter(new File("mv1.log")));
+    //final File file = new File("etc/xml/mv.txt");
+    final File file = new File("mv.txt");
     if(!file.exists()) {
       System.out.println("Could not read \"" + file.getAbsolutePath() + "\"");
       return;
@@ -48,7 +53,8 @@ public final class MVTest {
     
     // scan all queries
     final FileInputStream fis = new FileInputStream(file);
-    final InputStreamReader isr = new InputStreamReader(fis, "ISO-8859-15");
+    //final InputStreamReader isr = new InputStreamReader(fis, "ISO-8859-15");
+    final InputStreamReader isr = new InputStreamReader(fis, "UTF8");
     final BufferedReader br = new BufferedReader(isr);
     String line = null;
     while((line = br.readLine()) != null) {
@@ -116,6 +122,8 @@ public final class MVTest {
         final String nodes = info.substring(i + "Results   : ".length(), j);
         
         System.out.println(time + "\t" + nodes + "\t" + query);
+        out.write(nodes + "\t" + query);
+        out.newLine();
       }
       if(++curr >= STOPAFTER) break;
     }
