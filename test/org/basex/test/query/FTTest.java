@@ -78,6 +78,18 @@ public final class FTTest extends AbstractTest {
         { "Preds 6", nodes(13),
           "//*[*/text() ftcontains 'hello'][*/text() = 'hello']" },
 
+        { "AndOr 1", nodes(7, 9, 11),
+          "//w[text() ftcontains 'xml' and text() ftcontains 'databases']" },
+        { "AndOr 2", nodes(2),
+          "//*[*/text() ftcontains 'have' and */text() ftcontains 'first']" },
+        { "AndOr 3", nodes(25, 29),
+          "//fti[text() ftcontains 'eens' or text() ftcontains 'a']" },
+        { "AndOr 4", nodes(25, 29),
+          "//fti[text() ftcontains 'eens' and text() ftcontains 'ook' or " +
+          "text() ftcontains 'a']" },
+        { "AndOr 5", nodes(31),
+          "//fti[text() ftcontains 'adf s' or text() ftcontains 's adf']" },
+          
         { "Phrase 1", nodes(7, 9, 11),
           "//w [text() ftcontains 'xml databases']" },
         { "Phrase 2", nodes(7, 9, 11),

@@ -1,12 +1,10 @@
 package org.basex.util;
 
 import static org.basex.util.Token.*;
-import org.basex.build.xml.XMLScanner;
 
 /**
  * This class provides convenience operations for XML-specific character
- * operations. This class is mainly called by the {@link XMLScanner} and
- * XQuery methods.
+ * operations.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen

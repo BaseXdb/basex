@@ -1,6 +1,5 @@
 package org.basex.util;
 
-import static org.basex.util.Token.*;
 import org.basex.core.Prop;
 
 /**
@@ -33,7 +32,7 @@ public final class Levenshtein {
     // use exact search for too short and too long values
     final int sl = sub.length;
     // small word - use exact search
-    if(sl < 4) return eq(tok, sub);
+    if(sl < 4) return Token.eq(tok, sub);
     // large word - search for substrings
     if(sl > 30) return contains(tok, sub);
 
@@ -157,7 +156,7 @@ public final class Levenshtein {
    * @return converted character
    */
   public boolean ftChar(final byte ch) {
-    return letterOrDigit(ft(ch));
+    return Token.letterOrDigit(ft(ch));
   }
   
   /**
@@ -167,7 +166,7 @@ public final class Levenshtein {
    * @return converted character
    */
   public int ftNorm(final int ch) {
-    return lc(ft(ch));
+    return Token.lc(ft(ch));
   }
 
   /**
@@ -177,6 +176,6 @@ public final class Levenshtein {
    * @return converted character
    */
   private int ft(final int ch) {
-    return ch < 0 && ch > -64 ? NORM[ch + 64] : ch;
+    return ch < 0 && ch > -64 ? Token.NORM[ch + 64] : ch;
   }
 }
