@@ -602,7 +602,7 @@ public final class PlotView extends View implements Runnable {
    * @return size value
    */
   static int itemSize(final boolean focus) {
-    return GUIProp.fontsize + (focus ? 4 : 2);
+    return GUIProp.fontsize + (focus ? 2 : 1);
   }
   
   /**
