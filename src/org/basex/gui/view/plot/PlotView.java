@@ -357,7 +357,6 @@ public final class PlotView extends View implements Runnable {
       int i = 0;
       // find first non .0d coordinate value
       while(i < cl && coSorted[i] == 0) i++;
-      System.out.println(nrCaptions);
       // find nearest position for next axis caption
       while(i < cl && op < 1.0d - 0.4d * capRange) {
         if(coSorted[i] > op) {
