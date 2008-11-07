@@ -1,9 +1,12 @@
-package org.basex.util;
+package org.basex.query.xpath.locpath;
 
+import org.basex.query.FTPos;
 import org.basex.query.xpath.expr.FTAnd;
 import org.basex.query.xpath.expr.FTArrayExpr;
 import org.basex.query.xpath.expr.FTContains;
-import org.basex.query.xpath.locpath.PredSimple;
+import org.basex.query.xpath.expr.FTPositionFilter;
+import org.basex.query.xpath.expr.FTSelect;
+import org.basex.util.Array;
 
 /**
  * This is a simple container for PredSimple expressions.
@@ -51,15 +54,24 @@ public final class PredSimpleList {
         ftc2 = (FTContains) list[i].expr;
         if (ftc1.expr1.sameAs(ftc2.expr1)) {
           // sum 
-          if (ftc2.expr2 instanceof FTAnd) {
-            FTAnd ftand = (FTAnd) ftc2.expr2;
-            ftand.add((FTArrayExpr) ftc1.expr2);
-          } else {
-            FTAnd fta = new FTAnd(new FTArrayExpr[]{
-                (FTArrayExpr) ftc1.expr2, (FTArrayExpr) ftc2.expr2});
-            // FTSelect could be summed as well???
-            ftc2.expr2 = fta;
-            
+            if (check(ftc1, ftc2)) {
+              final FTSelect fts1 = (FTSelect) ftc1.expr2;
+              final FTSelect fts2 = (FTSelect) ftc2.expr2;
+              if (fts2.getExpr() instanceof FTAnd) {
+                FTAnd ftand = (FTAnd) fts2.getExpr();
+                ftand.add(fts1.getExpr());
+              } else {
+                final FTAnd fta = new FTAnd(new FTArrayExpr[]{
+                  fts1.getExpr(), fts2.getExpr()});
+                fts2.setExpr(fta);
+              }
+            } else {
+              FTAnd fta = new FTAnd(new FTArrayExpr[]{
+                  (FTArrayExpr) ftc2.expr2, (FTArrayExpr) ftc1.expr2});
+              final FTSelect fts 
+                = new FTSelect(fta, new FTPositionFilter(new FTPos()));
+              
+              ftc2.expr2 = fts;
           }
           return i;
         }
@@ -71,6 +83,21 @@ public final class PredSimpleList {
     }
     
     return -1;
+  }
+  
+  /**
+   * Check if two FTContains expressions could be summed up.
+   * @param ftc1 FTContains expression1 
+   * @param ftc2 FTContains expression2
+   * @return boolean result
+   */
+  private boolean check(final FTContains ftc1, final FTContains ftc2) {
+    if (ftc1.expr2 instanceof FTSelect && ftc2.expr2 instanceof FTSelect) {
+      final FTSelect fts1 = (FTSelect) ftc1.expr2;
+      final FTSelect fts2 = (FTSelect) ftc2.expr2;
+      return fts1.checkSumUp(fts2.ftpos);
+    }
+    return false;
   }
   
   /**

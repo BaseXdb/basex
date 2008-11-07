@@ -77,6 +77,23 @@ public final class FTSelect extends FTArrayExpr {
     }
   }
   
+  /**
+   * Getter for expr.
+   * @return expr FTArrayExpr
+   */
+  public FTArrayExpr getExpr() {
+    return exprs[0];
+  }
+  
+  
+  /**
+   * Setter expr.
+   * @param e FTArrayExpr
+   */
+  public void setExpr(final FTArrayExpr e) {
+    exprs[0] = e;
+  }
+
   @Override
   public boolean more() {
     return exprs[0].more();
@@ -159,6 +176,25 @@ public final class FTSelect extends FTArrayExpr {
     return this;
   }
 
+  
+  /**
+   * Checks if FTContains Expr could be summed up.
+   * 
+   * @param ftpos1 FTPositionFilter second expr
+   * @return int 
+   */
+  
+  public boolean checkSumUp(final FTPositionFilter ftpos1) {
+    return !ftpos.pos.ordered == !ftpos1.pos.ordered 
+        && ftpos.window == null && ftpos1.window == null
+        && ftpos.dist == null && ftpos.dist == null
+        && ftpos.pos.sdunit == null && ftpos1.pos.sdunit == null
+        && ftpos.pos.content == ftpos1.pos.content
+        && ftpos.pos.start == ftpos1.pos.start
+        && ftpos.pos.end == ftpos1.pos.end;
+  }
+  
+  
   @Override
   public int indexSizes(final XPContext ctx, final Step curr, final int min) {
     final FTPositionFilter tmp = ctx.ftpos;

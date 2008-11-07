@@ -12,7 +12,6 @@ import org.basex.query.xpath.expr.Expr;
 import org.basex.query.xpath.values.NodeBuilder;
 import org.basex.query.xpath.values.NodeSet;
 import org.basex.util.Array;
-import org.basex.util.PredSimpleList;
 
 /**
  * Location Steps.
@@ -179,7 +178,9 @@ public final class Preds extends ExprInfo {
         preds[j] = pred;
       }
       
-      if (pred instanceof PredSimple) p.add((PredSimple) pred);
+      if (pred instanceof PredSimple) {
+        p.add((PredSimple) pred);
+      }
     }
     
     if (p.size > 0 && p.size < size) {

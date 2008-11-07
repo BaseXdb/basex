@@ -280,7 +280,7 @@ public final class FTContains extends DualExpr {
 
   @Override
   public String toString() {
-    return expr1 + " ftcontainsBool " + expr2;
+    return expr1 + " ftcontainsBool" + (iu ? "_I " : " ")  + expr2;
   }
 
   @Override
