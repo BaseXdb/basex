@@ -38,7 +38,6 @@ public final class FTTest extends AbstractTest {
       "</fttest>";
 
     queries = new Object[][] {
-       
         { "Simple 1", bool(true),
           "'abc' ftcontains 'abc'" },
         { "Simple 2", bool(true),
@@ -53,6 +52,10 @@ public final class FTTest extends AbstractTest {
           "//@key[. ftcontains 'value']" },
         { "Simple 7", bool(false),
           "//@key ftcontains 'values'" },
+        { "Simple 8", bool(true),
+          "number('100') + 23 ftcontains '123'" },
+        { "Simple 9", bool(true),
+          "string(true()) ftcontains 'true'" },
 
         { "FT 1", nodes(14),
           "//w[text() ftcontains 'HELLO']" },
@@ -89,6 +92,8 @@ public final class FTTest extends AbstractTest {
           "text() ftcontains 'a']" },
         { "AndOr 5", nodes(31),
           "//fti[text() ftcontains 'adf s' or text() ftcontains 's adf']" },
+        { "AndOr 6", nodes(31),
+          "//fti[contains(text(), 'adf') and text() ftcontains 'adf']" },
           
         { "Phrase 1", nodes(7, 9, 11),
           "//w [text() ftcontains 'xml databases']" },
