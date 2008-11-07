@@ -346,7 +346,9 @@ public final class PlotView extends View implements Runnable {
       // draw min / max caption
       drawCaptionAndGrid(g, drawX, string(axis.firstCat), 0);
       drawCaptionAndGrid(g, drawX, string(axis.lastCat), 1);
-
+      // return if insufficient plot space
+      if(nrCaptions == 0) return;
+      
       // get sorted axis item coordinates
       Arrays.sort(coSorted);
       // optimum caption position
@@ -355,8 +357,9 @@ public final class PlotView extends View implements Runnable {
       int i = 0;
       // find first non .0d coordinate value
       while(i < cl && coSorted[i] == 0) i++;
+      System.out.println(nrCaptions);
       // find nearest position for next axis caption
-      while(i < cl && op < 1.0d - 0.6d * capRange) {
+      while(i < cl && op < 1.0d - 0.4d * capRange) {
         if(coSorted[i] > op) {
           final double distL = Math.abs(coSorted[i - 1] - op);
           final double distG = Math.abs(coSorted[i] - op);
@@ -375,10 +378,12 @@ public final class PlotView extends View implements Runnable {
       
     } else {
       int i = 1;
-      // draw min caption
+      // draw min/max caption
       drawCaptionAndGrid(g, drawX, formatString(axis.min, drawX), 0);
-      // draw max caption
       drawCaptionAndGrid(g, drawX, formatString(axis.max, drawX), 1);
+      // return if insufficient plot space
+      if(nrCaptions == 0) return;
+
 
       // draw captions between min and max
 //      <LK> ugly workaround - will be fixed
