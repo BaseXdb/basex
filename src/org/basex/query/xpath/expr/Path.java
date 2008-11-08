@@ -4,8 +4,8 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
-import org.basex.query.xpath.values.NodeSet;
-import org.basex.query.xpath.values.Item;
+import org.basex.query.xpath.item.Item;
+import org.basex.query.xpath.item.Nod;
 
 /**
  * Path Expression.
@@ -15,7 +15,7 @@ import org.basex.query.xpath.values.Item;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Tim Petrowsky
  */
-public final class Path extends DualExpr {
+public final class Path extends Arr {
   /**
    * Constructor for a relative location path.
    * @param e Expression evaluating to a nodeset
@@ -27,10 +27,10 @@ public final class Path extends DualExpr {
 
   @Override
   public Item eval(final XPContext ctx) throws QueryException {
-    final Item val = ctx.eval(expr1);
-    final NodeSet local = ctx.item;
-    ctx.item = (NodeSet) val;
-    final NodeSet ns = (NodeSet) ctx.eval(expr2);
+    final Item val = ctx.eval(expr[0]);
+    final Nod local = ctx.item;
+    ctx.item = (Nod) val;
+    final Nod ns = (Nod) ctx.eval(expr[1]);
     /*ns.ftidpos = ctx.local.ftidpos;
     ns.ftpointer = ctx.local.ftpointer;*/
     ctx.item = local;
@@ -38,27 +38,15 @@ public final class Path extends DualExpr {
   }
 
   @Override
-  public Expr comp(final XPContext ctx) throws QueryException {
-    expr1 = expr1.comp(ctx);
-    expr2 = expr2.comp(ctx);
-    return this;
-  }
-
-  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
-    expr1.plan(ser);
-    expr2.plan(ser);
+    expr[0].plan(ser);
+    expr[1].plan(ser);
     ser.closeElement();
   }
 
   @Override
-  public String color() {
-    return "FF9900";
-  }
-
-  @Override
   public String toString() {
-    return "Path(" + expr1 + ", " + expr2 + ')';
+    return "Path(" + expr[0] + ", " + expr[1] + ')';
   }
 }

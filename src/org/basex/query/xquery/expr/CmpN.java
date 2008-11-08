@@ -108,11 +108,6 @@ public final class CmpN extends Arr {
   }
 
   @Override
-  public String color() {
-    return "FF9999";
-  }
-
-  @Override
   public String info() {
     return "'" + cmp + "' operator";
   }

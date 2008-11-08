@@ -3,8 +3,8 @@ package org.basex.query.xpath.func;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.values.Bool;
-import org.basex.query.xpath.values.Item;
+import org.basex.query.xpath.item.Bln;
+import org.basex.query.xpath.item.Item;
 import org.basex.util.Token;
 
 /**
@@ -23,9 +23,9 @@ public final class StartsWith extends Func {
   }
 
   @Override
-  public Bool eval(final XPContext ctx) throws QueryException {
+  public Bln eval(final XPContext ctx) throws QueryException {
     final Item[] v = evalArgs(ctx);
-    return Bool.get(Token.startsWith(v[0].str(), v[1].str()));
+    return Bln.get(Token.startsWith(v[0].str(), v[1].str()));
   }
 
   @Override

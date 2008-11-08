@@ -1,4 +1,4 @@
-package org.basex.query.xpath.values;
+package org.basex.query.xpath.item;
 
 import java.util.Arrays;
 import org.basex.util.Array;

@@ -1,4 +1,4 @@
-package org.basex.query.xpath.values;
+package org.basex.query.xpath.item;
 
 import java.io.IOException;
 import org.basex.data.Serializer;
@@ -11,13 +11,13 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Tim Petrowsky
  */
-public final class Bool extends Item {
+public final class Bln extends Item {
   /** Precedence. */
   private static final int PREC = 4;
   /** Static true value. */
-  public static final Bool TRUE = new Bool(true);
+  public static final Bln TRUE = new Bln(true);
   /** Static false value. */
-  public static final Bool FALSE = new Bool(false);
+  public static final Bln FALSE = new Bln(false);
   /** boolean value. */
   private final boolean value;
   
@@ -25,7 +25,7 @@ public final class Bool extends Item {
    * Constructor.
    * @param val boolean to be represented
    */
-  private Bool(final boolean val) {
+  private Bln(final boolean val) {
     value = val;
   }
 
@@ -34,12 +34,12 @@ public final class Bool extends Item {
    * @param val boolean value
    * @return class instance
    */
-  public static Bool get(final boolean val) {
+  public static Bln get(final boolean val) {
     return val ? TRUE : FALSE;
   }
 
   @Override
-  public Bool eval(final XPContext ctx) {
+  public Bln eval(final XPContext ctx) {
     return this;
   }
 

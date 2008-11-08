@@ -2,7 +2,7 @@ package org.basex.query.xpath.locpath;
 
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
-import org.basex.query.xpath.values.NodeSet;
+import org.basex.query.xpath.item.Nod;
 
 /**
  * Absolute Location Path Expression. This location path is evaluated from the
@@ -13,14 +13,14 @@ import org.basex.query.xpath.values.NodeSet;
  */
 public final class LocPathAbs extends LocPath {
   /** Root node. */
-  private NodeSet nodeset;
+  private Nod nodeset;
   
   @Override
-  public NodeSet eval(final XPContext ctx) throws QueryException {
-    // only evaluated once as result for absolute traversals is always the same
+  public Nod eval(final XPContext ctx) throws QueryException {
+    // only evaluated once as result for absolute paths is always the same
     if(nodeset == null) {
-      final NodeSet ns = ctx.item;
-      ctx.item = new NodeSet(ns.data.doc(), ctx);
+      final Nod ns = ctx.item;
+      ctx.item = new Nod(ns.data.doc(), ctx);
       nodeset = steps.eval(ctx);
       ctx.item = ns;
     }
@@ -29,6 +29,6 @@ public final class LocPathAbs extends LocPath {
  
   @Override
   public String toString() {
-    return steps.toString();
+    return "/" + super.toString();
   }
 }

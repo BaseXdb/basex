@@ -4,9 +4,12 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.values.NodeBuilder;
-import org.basex.query.xpath.values.NodeSet;
+import org.basex.query.xpath.expr.Pos;
+import org.basex.query.xpath.item.Bln;
+import org.basex.query.xpath.item.Nod;
+import org.basex.query.xpath.item.NodeBuilder;
 import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 
 /**
  * Position predicate.
@@ -16,18 +19,30 @@ import org.basex.util.Token;
  */
 public final class PredPos extends Pred {
   /** Minimum value. */
-  final int min;
+  int min;
   /** Maximum value. */
-  final int max;
+  int max;
 
   /**
    * Constructor.
    * @param mn minimum value
    * @param mx maximum value
    */
-  PredPos(final int mn, final int mx) {
-    min = mn;
+  public PredPos(final int mn, final int mx) {
+    min = Math.max(1, mn);
     max = mx;
+  }
+
+  /**
+   * Creates a position predicate or a <code>null</code> reference.
+   * @param e expression to be tested
+   * @return comparator
+   */
+  static Pred create(final Expr e) {
+    if(!(e instanceof Pos)) return null;
+    final int mn = ((Pos) e).min;
+    final int mx = ((Pos) e).max;
+    return mx < mn ? new PredSimple(Bln.FALSE) : new PredPos(mn, mx);
   }
 
   @Override
@@ -42,8 +57,7 @@ public final class PredPos extends Pred {
   }
 
   @Override
-  boolean eval(final XPContext ctx, final NodeSet nodes,
-      final int pos) {
+  boolean eval(final XPContext ctx, final Nod nodes, final int pos) {
     more = pos < max;
     return pos >= min && pos <= max;
   }
@@ -59,7 +73,7 @@ public final class PredPos extends Pred {
   }
 
   @Override
-  int posPred() {
+  double posPred() {
     return min <= 0 ? -1 : min != max ? 0 : min;
   }
 
@@ -79,17 +93,6 @@ public final class PredPos extends Pred {
   }
 
   @Override
-  public Expr indexEquivalent(final XPContext ctx, final Step step, 
-      final boolean seq) {
-    return null;
-  }
-
-  @Override
-  public int indexSizes(final XPContext r, final Step c, final int m) {
-    return Integer.MAX_VALUE;
-  }
-
-  @Override
   public boolean sameAs(final Pred pred) {
     if(!(pred instanceof PredPos)) return false;
     final PredPos p = (PredPos) pred;
@@ -98,10 +101,9 @@ public final class PredPos extends Pred {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("[pos ");
-    sb.append(min != max ? max == Integer.MAX_VALUE ? "> 2" : "= " +
-        min + " - " + max : "= " + min);
-    return sb.append("]").toString();
+    return new TokenBuilder("[pos ").add(min == max ? "= " + min :
+      max == Integer.MAX_VALUE ? ">= " + min :
+      "= " + min + "-" + max).add("]").toString();
   }
 
   @Override

@@ -13,15 +13,15 @@ import org.basex.query.xpath.expr.Filter;
 import org.basex.query.xpath.expr.InterSect;
 import org.basex.query.xpath.expr.Path;
 import org.basex.query.xpath.internal.IndexMatch;
-import org.basex.query.xpath.values.Comp;
-import org.basex.query.xpath.values.Literal;
-import org.basex.query.xpath.values.NodeSet;
+import org.basex.query.xpath.item.Comp;
+import org.basex.query.xpath.item.Nod;
+import org.basex.query.xpath.item.Str;
 import org.basex.util.IntList;
 import static org.basex.query.xpath.XPText.*;
 
 /**
  * LocationPath (absolute or relative).
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Tim Petrowsky
  */
@@ -30,21 +30,21 @@ public abstract class LocPath extends Expr {
   public Steps steps = new Steps();
 
   @Override
-  public abstract NodeSet eval(final XPContext ctx) throws QueryException;
+  public abstract Nod eval(final XPContext ctx) throws QueryException;
 
   @Override
   public final Expr comp(final XPContext ctx) throws QueryException {
-    // At this point a data reference has to be available;
+    // at this point, a data reference must be available
     if(ctx.item == null) throw new QueryException(NODATA);
 
-    // replacing self::node() with child::text() for possible index integration
+    // replacing . with text() for possible index integration
     if(ctx.leaf && steps.size() == 1 && steps.get(0).simple(Axis.SELF)) {
       steps.set(0, Axis.create(Axis.CHILD, TestNode.TEXT));
       ctx.compInfo(OPTTEXT);
     }
 
     // check if all steps yield results
-    if(!steps.compile(ctx) || steps.emptyPath(ctx)) return new NodeSet(ctx);
+    if(!steps.compile(ctx) || steps.emptyPath(ctx)) return new Nod(ctx);
 
     // remove superfluous self axes
     steps.mergeSelf(ctx);
@@ -52,50 +52,50 @@ public abstract class LocPath extends Expr {
     // merge descendant and child steps
     steps.mergeDescendant(ctx);
 
-    // check with paths if the available indexes can be applied
+    // check if the available indexes can be applied
     Expr result = this;
 
+    MAIN:
     for(int i = 0; i < steps.size(); i++) {
       final Step step = steps.get(i);
       final Preds preds = step.preds;
 
-      // skip optimization if no preds are specified or if a pos.pred is found
-      // [CG] XPath/Path optimization: enough to check first predicate?
-      if(preds.size() == 0 || step.posPred() > 0) continue;
-      
-      // don't optimize non-forward axes
+      // don't optimize non-invertible axes
       if(invertAxis(step.axis) == null) continue;
 
       // find predicate with lowest number of occurrences
+      boolean pos = false;
       int min = Integer.MAX_VALUE;
-      int minP = -1; 
+      int minP = -1;
       for(int p = 0; p < preds.size(); p++) {
         final Pred pred = preds.get(p);
         final int nrIDs = pred.indexSizes(ctx, step, min);
 
+        // zero results - predicates will always yield false
+        if(nrIDs == 0) {
+          ctx.compInfo(OPTLOC);
+          return new Nod(ctx);
+        }
+
+        // remember cheapest index access
         if(min > nrIDs) {
-          if(nrIDs == 0) {
-            ctx.compInfo(OPTLOC);
-            return new NodeSet(ctx);
-          }
+          // skip step if position predicate was found before
+          if(pos) continue MAIN;
           min = nrIDs;
           minP = p;
         }
+        
+        // check if position predicate is found
+        pos |= pred.usesPos() || pred.usesSize();
       }
-      
-      // [CG] seq flag is used for method call of index equivalant in the case
-      // that the query has to be processed sequential, but index access is 
-      // possible. maybe there will be a more elegant solution. SG
+
+      // check if query has to be processed sequentially
       final boolean seq = min == Integer.MAX_VALUE;
-      //if(min == Integer.MAX_VALUE) continue;
-      
-      // ..what is the optimal maximum for index access?
-      //if(this instanceof LocPathRel && min > ctx.local.data.size / 10) 
-      //continue;
-      if(!seq && 
-          this instanceof LocPathRel && min > ctx.item.data.size / 10) 
+
+      // ..skip index evaluation for too large results and relative paths
+      if(!seq && this instanceof LocPathRel && min > ctx.item.data.size / 10)
         continue;
-      
+
       // predicates that are optimized to use index and results of index queries
       final IntList oldPreds = new IntList();
       Expr indexArg = null;
@@ -103,18 +103,14 @@ public abstract class LocPath extends Expr {
       for(int p = 0; p < preds.size(); p++) {
         final Pred pred = preds.get(p);
 
-        //if(p == minP && indexArg == null) {
         if(seq || p == minP && indexArg == null) {
           oldPreds.add(p);
-          //indexArg = pred.indexEquivalent(ctx, step);
           indexArg = pred.indexEquivalent(ctx, step, seq);
         }
       }
 
-      if (seq) {
-        continue;
-      }
-      
+      if (seq) continue;
+
       // hold all steps following this step
       final LocPath oldPath = new LocPathRel();
       for(final int j = i + 1; j < steps.size();) {
@@ -158,11 +154,10 @@ public abstract class LocPath extends Expr {
         if(!oldPreds.contains(p)) {
           Pred pred = step.preds.get(p);
           if (pred instanceof PredSimple) {
-            Expr e = ((PredSimple) pred).getExpr();
+            Expr e = ((PredSimple) pred).expr;
             if (e instanceof FTContains) {
-              e = e.indexEquivalent(ctx, null, true);
+              ((PredSimple) pred).expr = e.indexEquivalent(ctx, null, true);
             }
-            pred = new PredSimple(e);
           }
           //newPreds.add(step.preds.get(p));
           newPreds.add(pred);
@@ -177,13 +172,13 @@ public abstract class LocPath extends Expr {
       // add match with initial nodes
       //if(indexMatch && checkMatch(invPath)) {
       if(indexMatch) result = new IndexMatch(this, result, invPath);
-      
+
       // add rest of location path
       if(oldPath.steps.size() != 0) result = new Path(result, oldPath);
     }
     return result;
   }
-  
+
   /*
    * Check if the inverted path needs to be matched.
    * @param path location path
@@ -221,7 +216,7 @@ public abstract class LocPath extends Expr {
       ctx.compInfo(OPTPOSPRED1);
     }
   }
-  
+
   /**
    * Checks if the path is indexable.
    * @param ctx query context
@@ -232,12 +227,12 @@ public abstract class LocPath extends Expr {
   public final IndexToken indexable(final XPContext ctx, final Expr exp,
       final Comp cmp) {
 
-    if(!(this instanceof LocPathRel && exp instanceof Literal)) return null;
+    if(!(this instanceof LocPathRel && exp instanceof Str)) return null;
 
     final Data data = ctx.item.data;
     final boolean txt = data.meta.txtindex && cmp == Comp.EQ;
     final boolean atv = data.meta.atvindex && cmp == Comp.EQ;
-    
+
     final Step step = steps.last();
     final boolean text = txt && step.test == TestNode.TEXT &&
       step.preds.size() == 0;
@@ -245,7 +240,7 @@ public abstract class LocPath extends Expr {
       Integer.MIN_VALUE;
 
     return text || attr && checkAxes() ?
-        new ValuesToken(text, ((Literal) exp).str()) : null;
+        new ValuesToken(text, ((Str) exp).str()) : null;
   }
 
   /**
@@ -256,10 +251,10 @@ public abstract class LocPath extends Expr {
     for(int s = 0; s < steps.size() - 1; s++) {
       final Step curr = steps.get(s);
       // not the last text step
-      if(curr.preds.size() != 0 || curr.axis != Axis.ANC
-          && curr.axis != Axis.ANCORSELF && curr.axis != Axis.DESC
-          && curr.axis != Axis.SELF && curr.axis != Axis.DESCORSELF
-          && curr.axis != Axis.CHILD && curr.axis != Axis.PARENT) return false;
+      if(curr.preds.size() != 0 || curr.axis != Axis.ANC &&
+         curr.axis != Axis.ANCORSELF && curr.axis != Axis.DESC &&
+         curr.axis != Axis.SELF && curr.axis != Axis.DESCORSELF &&
+         curr.axis != Axis.CHILD && curr.axis != Axis.PARENT) return false;
     }
     return true;
   }
@@ -316,5 +311,9 @@ public abstract class LocPath extends Expr {
   public final String color() {
     return "FFCC33";
   }
-}
 
+  @Override
+  public String toString() {
+    return steps.toString();
+  }
+}

@@ -4,7 +4,7 @@ import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.values.Bool;
+import org.basex.query.xpath.item.Bln;
 import org.basex.util.Token;
 
 /**
@@ -23,14 +23,14 @@ public final class Lang extends Func {
   }
 
   @Override
-  public Bool eval(final XPContext ctx)
+  public Bln eval(final XPContext ctx)
       throws QueryException {
 
     // should actually be treated as XML namespace
     final Data data = ctx.item.data;
     final int lang = data.attNameID(Token.token("xml:lang"));
     // no lang attribute specified - return false
-    if(lang == 0) return Bool.FALSE;
+    if(lang == 0) return Bln.FALSE;
     final byte[] lng = evalArgs(ctx)[0].str();
 
     // parse current node and all ancestors for the lang attribute
@@ -38,10 +38,10 @@ public final class Lang extends Func {
     while(r != 0) {
       final int pre = r;
       final byte[] att = data.attValue(lang, pre);
-      if(att != null) return Bool.get(found(att, lng));
+      if(att != null) return Bln.get(found(att, lng));
       r = data.parent(r, data.kind(r));
     }
-    return Bool.FALSE;
+    return Bln.FALSE;
   }
 
   /**

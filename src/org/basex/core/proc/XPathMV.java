@@ -13,7 +13,7 @@ import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.xpath.XPathProcessor;
-import org.basex.query.xpath.values.NodeSet;
+import org.basex.query.xpath.item.Nod;
 import org.basex.util.Array;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
@@ -74,10 +74,10 @@ public final class XPathMV extends AQuery {
         result = qu.query(nodes);
         eval += per.getTime();
 
-        if(!(result instanceof NodeSet))
+        if(!(result instanceof Nod))
           throw new QueryException(QUERYNODESERR);
         
-        final NodeSet ns = (NodeSet) result;
+        final Nod ns = (Nod) result;
         result = new Nodes(ns.nodes, ns.data);
 
         /* no results found.. try approximate search

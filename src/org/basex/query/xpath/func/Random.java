@@ -1,12 +1,11 @@
 package org.basex.query.xpath.func;
 
 import static org.basex.Text.*;
-
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.values.NodeSet;
-import org.basex.query.xpath.values.Item;
+import org.basex.query.xpath.item.Item;
+import org.basex.query.xpath.item.Nod;
 import org.basex.util.IntList;
 
 /**
@@ -31,7 +30,7 @@ public final class Random extends Func {
   public Item eval(final XPContext ctx) 
       throws QueryException {
     
-    final NodeSet ns = (NodeSet) evalArgs(ctx)[0];
+    final Nod ns = (Nod) evalArgs(ctx)[0];
     if(ns.size < 2) return ns;
 
     final IntList list = new IntList();
@@ -46,11 +45,11 @@ public final class Random extends Func {
         c--;
       }
     }
-    return new NodeSet(list.finish(), ctx);
+    return new Nod(list.finish(), ctx);
   }
 
   @Override
   public boolean checkArguments() {
-    return args.length == 1 && args[0].returnedValue() == NodeSet.class;
+    return args.length == 1 && args[0].returnedValue() == Nod.class;
   }
 }

@@ -5,7 +5,7 @@ import org.basex.data.Serializer;
 import org.basex.index.FTNode;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
-import org.basex.query.xpath.values.Bool;
+import org.basex.query.xpath.item.Bln;
 
 /**
  * FTUnaryNotExprs. This expresses the mild combination of ftand and ftnot.
@@ -30,8 +30,8 @@ public final class FTUnaryNotExprs extends FTArrayExpr {
   }
   
   @Override
-  public Bool eval(final XPContext ctx) throws QueryException {
-    final Bool b = (Bool) exprs[0].eval(ctx);
+  public Bln eval(final XPContext ctx) throws QueryException {
+    final Bln b = (Bln) exprs[0].eval(ctx);
     return b;
     
   }

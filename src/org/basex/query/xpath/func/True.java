@@ -2,7 +2,7 @@ package org.basex.query.xpath.func;
 
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.values.Bool;
+import org.basex.query.xpath.item.Bln;
 
 /**
  * Constructor for true() function.
@@ -20,8 +20,8 @@ public final class True extends Func {
   }
 
   @Override
-  public Bool eval(final XPContext ctx) {
-    return Bool.TRUE;
+  public Bln eval(final XPContext ctx) {
+    return Bln.TRUE;
   }
 
   @Override
@@ -30,7 +30,7 @@ public final class True extends Func {
   }
 
   @Override
-  public Bool comp(final XPContext ctx) {
-    return Bool.TRUE;
+  public Bln comp(final XPContext ctx) {
+    return Bln.TRUE;
   }
 }

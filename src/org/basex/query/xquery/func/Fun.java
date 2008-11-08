@@ -156,9 +156,4 @@ public abstract class Fun extends Expr {
       ser.closeElement();
     }
   }
-
-  @Override
-  public final String color() {
-    return "9999FF";
-  }
 }

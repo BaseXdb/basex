@@ -1,18 +1,16 @@
 package org.basex.query.xpath.locpath;
 
-import static org.basex.query.xpath.XPText.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
-import org.basex.query.xpath.expr.Comparison;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.func.Position;
-import org.basex.query.xpath.values.Comp;
-import org.basex.query.xpath.values.NodeBuilder;
-import org.basex.query.xpath.values.NodeSet;
-import org.basex.query.xpath.values.Num;
-import org.basex.query.xpath.values.Item;
+import org.basex.query.xpath.expr.Pos;
+import org.basex.query.xpath.item.Comp;
+import org.basex.query.xpath.item.Dbl;
+import org.basex.query.xpath.item.Item;
+import org.basex.query.xpath.item.Nod;
+import org.basex.query.xpath.item.NodeBuilder;
 
 /**
  * XPath predicate.
@@ -52,7 +50,8 @@ public final class PredSimple extends Pred {
       ctx.item.currPos = n + 1;
 
       final Item v = ctx.eval(expr);
-      if(v instanceof Num) {
+      if(v instanceof Dbl) {
+        // occurs e.g. for last() function
         if(v.num() == n + 1) tmp.add(pre);
       } else if(v.bool()) {
         tmp.add(pre);
@@ -62,12 +61,12 @@ public final class PredSimple extends Pred {
   }
   
   @Override
-  boolean eval(final XPContext ctx, final NodeSet nodes, final int pos)
+  boolean eval(final XPContext ctx, final Nod nodes, final int pos)
       throws QueryException {
 
     nodes.currPos = pos;
     final Item v = ctx.eval(expr);
-    return v instanceof Num ? v.num() == pos : v.bool();
+    return v instanceof Dbl ? v.num() == pos : v.bool();
   }
 
   @Override
@@ -81,7 +80,7 @@ public final class PredSimple extends Pred {
   }
 
   @Override
-  int posPred() {
+  double posPred() {
     return 0;
   }
 
@@ -89,51 +88,18 @@ public final class PredSimple extends Pred {
   Pred compile(final XPContext ctx) throws QueryException {
     expr = expr.comp(ctx);
 
+    // add position predicate [1] to evaluate only first hits
     if(expr instanceof LocPath) {
       ((LocPath) expr).addPosPred(ctx);
       return this;
     }
 
-    if(expr instanceof Num) {
-      ctx.compInfo(OPTPOS);
-      final int pos = (int) ((Num) expr).num();
-      return new PredPos(pos, pos);
-    }
+    // number: create explicit position predicate
+    if(expr instanceof Dbl) expr = Pos.create(((Dbl) expr).num(), Comp.EQ);
 
-    final int pos = getPos(expr);
-    if(pos >= 0) {
-      ctx.compInfo(OPTPOS);
-      final Comparison cmp = (Comparison) expr;
-      if(cmp.type == Comp.EQ) return new PredPos(pos, pos);
-      if(cmp.type == Comp.GT) return new PredPos(pos + 1, Integer.MAX_VALUE);
-      if(cmp.type == Comp.GE) return new PredPos(pos, Integer.MAX_VALUE);
-      if(cmp.type == Comp.LT) return new PredPos(1, pos - 1);
-      if(cmp.type == Comp.LE) return new PredPos(1, pos);
-    }
-    return this;
-  }
-
-  /**
-   * Returns a position, defined in a position function.
-   * @param ex expression to be checked
-   * @return position
-   */
-  private int getPos(final Expr ex) {
-    if(ex instanceof Comparison) {
-      final Comparison cmp = (Comparison) ex;
-      if(cmp.expr1 instanceof Position && cmp.expr2 instanceof Num) {
-        return (int) ((Num) cmp.expr2).num();
-      }
-    }
-    return -1;
-  }
-
-  /**
-   * Getter for expr.
-   * @return expr Expr
-   */
-  public Expr getExpr() {
-    return expr;
+    // check position test
+    final Pred pred = PredPos.create(expr);
+    return pred != null ? pred : this;
   }
   
   @Override
@@ -148,8 +114,7 @@ public final class PredSimple extends Pred {
 
   @Override
   public Expr indexEquivalent(final XPContext ctx, final Step step, 
-      final boolean seq)
-      throws QueryException {
+      final boolean seq) throws QueryException {
     return expr.indexEquivalent(ctx, step, seq);
   }
 

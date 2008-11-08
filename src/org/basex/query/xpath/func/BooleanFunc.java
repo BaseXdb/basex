@@ -3,7 +3,7 @@ package org.basex.query.xpath.func;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.values.Bool;
+import org.basex.query.xpath.item.Bln;
 
 /**
  * Constructor for boolean() function.
@@ -21,8 +21,8 @@ public final class BooleanFunc extends Func {
   }
 
   @Override
-  public Bool eval(final XPContext ctx) throws QueryException {
-    return Bool.get((args.length == 0 ? ctx.item :
+  public Bln eval(final XPContext ctx) throws QueryException {
+    return Bln.get((args.length == 0 ? ctx.item :
       evalArgs(ctx)[0]).bool());
   }
 

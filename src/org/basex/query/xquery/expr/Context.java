@@ -35,11 +35,6 @@ public final class Context extends Expr {
   }
 
   @Override
-  public String color() {
-    return "FFCC66";
-  }
-
-  @Override
   public String toString() {
     return ".";
   }

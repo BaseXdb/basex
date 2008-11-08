@@ -1,4 +1,4 @@
-package org.basex.query.xpath.values;
+package org.basex.query.xpath.item;
 
 import java.io.IOException;
 import org.basex.data.Serializer;
@@ -12,11 +12,11 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Tim Petrowsky
  */
-public final class Num extends Item {
+public final class Dbl extends Item {
   /** Static number. */
-  public static final Num ZERO = new Num(0);
+  public static final Dbl ZERO = new Dbl(0);
   /** Static number. */
-  public static final Num ONE = new Num(1);
+  public static final Dbl ONE = new Dbl(1);
   /** Precedence. */
   private static final int PREC = 3;
   /** Number value. */
@@ -26,7 +26,7 @@ public final class Num extends Item {
    * Constructor.
    * @param n number to be represented.
    */
-  public Num(final double n) {
+  public Dbl(final double n) {
     num = n;
   }
 
@@ -34,7 +34,7 @@ public final class Num extends Item {
    * Constructor.
    * @param n number to be represented.
    */
-  public Num(final long n) {
+  public Dbl(final long n) {
     num = n;
   }
 
@@ -42,12 +42,12 @@ public final class Num extends Item {
    * Constructor.
    * @param n number to be represented.
    */
-  public Num(final byte[] n) {
+  public Dbl(final byte[] n) {
     num = Token.toDouble(n);
   }
 
   @Override
-  public Num eval(final XPContext ctx) {
+  public Dbl eval(final XPContext ctx) {
     return this;
   }
 

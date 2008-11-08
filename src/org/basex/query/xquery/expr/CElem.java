@@ -213,9 +213,4 @@ public final class CElem extends Arr {
     for(final Expr e : expr) e.plan(ser);
     ser.closeElement();
   }
-
-  @Override
-  public String color() {
-    return "FF3333";
-  }
 }

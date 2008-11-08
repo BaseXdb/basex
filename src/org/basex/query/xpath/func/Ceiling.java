@@ -3,8 +3,8 @@ package org.basex.query.xpath.func;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.values.Num;
-import org.basex.query.xpath.values.Item;
+import org.basex.query.xpath.item.Item;
+import org.basex.query.xpath.item.Dbl;
 import static org.basex.query.xpath.XPText.*;
 
 /**
@@ -23,8 +23,8 @@ public final class Ceiling extends Func {
   }
 
   @Override
-  public Num eval(final XPContext ctx) throws QueryException {
-    return new Num(Math.ceil(evalArgs(ctx)[0].num()));
+  public Dbl eval(final XPContext ctx) throws QueryException {
+    return new Dbl(Math.ceil(evalArgs(ctx)[0].num()));
   }
 
   @Override
@@ -37,7 +37,7 @@ public final class Ceiling extends Func {
     super.comp(ctx);
     if(args[0] instanceof Item) {
       ctx.compInfo(OPTFUNC, desc);
-      return new Num(Math.ceil(((Item) args[0]).num()));
+      return new Dbl(Math.ceil(((Item) args[0]).num()));
     }
     return this;
   }

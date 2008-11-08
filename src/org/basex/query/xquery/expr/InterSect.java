@@ -1,7 +1,7 @@
 package org.basex.query.xquery.expr;
 
-import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
+import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.iter.Iter;
@@ -53,12 +53,7 @@ public final class InterSect extends Arr {
   }
 
   @Override
-  public String color() {
-    return "FF3300";
-  }
-  
-  @Override
   public String toString() {
-    return toString(" intersect ");
+    return toString(" & ");
   }
 }

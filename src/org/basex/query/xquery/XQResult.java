@@ -6,10 +6,10 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.data.Serializer;
-import org.basex.query.xpath.values.Bool;
-import org.basex.query.xpath.values.Literal;
-import org.basex.query.xpath.values.NodeBuilder;
-import org.basex.query.xpath.values.Num;
+import org.basex.query.xpath.item.Bln;
+import org.basex.query.xpath.item.Dbl;
+import org.basex.query.xpath.item.NodeBuilder;
+import org.basex.query.xpath.item.Str;
 import org.basex.query.xquery.item.DNode;
 import org.basex.query.xquery.item.FNode;
 import org.basex.query.xquery.item.Item;
@@ -100,9 +100,9 @@ public final class XQResult implements Result {
       if(seq.size == 0) return new Nodes(data);
       if(seq.size == 1) {
         final Item it = seq.item[0];
-        if(it.type == Type.BLN) return Bool.get(it.bool());
-        if(it.n()) return new Num(it.dbl());
-        if(it.s()) return new Literal(it.str());
+        if(it.type == Type.BLN) return Bln.get(it.bool());
+        if(it.n()) return new Dbl(it.dbl());
+        if(it.s()) return new Str(it.str());
       }
     
       final NodeBuilder nb = new NodeBuilder();

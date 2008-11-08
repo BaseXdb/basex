@@ -3,7 +3,7 @@ package org.basex.query.xpath.expr;
 import org.basex.index.FTNode;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
-import org.basex.query.xpath.values.Bool;
+import org.basex.query.xpath.item.Bln;
 
 /**
  * FTIntersection Expression. 
@@ -141,19 +141,19 @@ public final class FTIntersection extends FTArrayExpr {
   }
   
   @Override
-  public Bool eval(final XPContext ctx) throws QueryException {
+  public Bln eval(final XPContext ctx) throws QueryException {
     
     // check each positive expression
     for (int i : pex) {
-      final Bool it = (Bool) exprs[i].eval(ctx);
+      final Bln it = (Bln) exprs[i].eval(ctx);
       if (!it.bool()) return it;
     }
     
     for (int i : nex) {
-      final Bool it = (Bool) exprs[i].eval(ctx);
+      final Bln it = (Bln) exprs[i].eval(ctx);
       if (!it.bool()) return it;
     }
   
-    return Bool.TRUE;
+    return Bln.TRUE;
   }
 }

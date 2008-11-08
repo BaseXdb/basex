@@ -3,8 +3,8 @@ package org.basex.query.xpath.func;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
+import org.basex.query.xpath.item.Bln;
 import org.basex.query.xpath.locpath.LocPath;
-import org.basex.query.xpath.values.Bool;
 
 /**
  * Constructor for not() function.
@@ -22,8 +22,8 @@ public final class Not extends Func {
   }
 
   @Override
-  public Bool eval(final XPContext ctx) throws QueryException {
-    return Bool.get(!evalArgs(ctx)[0].bool());
+  public Bln eval(final XPContext ctx) throws QueryException {
+    return Bln.get(!evalArgs(ctx)[0].bool());
   }
 
   @Override

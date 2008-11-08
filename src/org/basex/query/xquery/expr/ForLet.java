@@ -13,9 +13,4 @@ public abstract class ForLet extends Expr {
   protected Expr expr;
   /** Variable. */
   protected Var var;
-
-  @Override
-  public final String color() {
-    return "66FF66";
-  }
 }

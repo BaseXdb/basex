@@ -274,11 +274,6 @@ public abstract class Item extends Expr {
   }
 
   @Override
-  public final String color() {
-    return "66CCFF";
-  }
-
-  @Override
   public String toString() {
     return Token.string(str());
   }

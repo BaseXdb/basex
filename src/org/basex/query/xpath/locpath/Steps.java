@@ -1,11 +1,10 @@
 package org.basex.query.xpath.locpath;
 
 import java.io.IOException;
-
 import org.basex.data.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
-import org.basex.query.xpath.values.NodeSet;
+import org.basex.query.xpath.item.Nod;
 import org.basex.util.Array;
 import static org.basex.query.xpath.XPText.*;
 
@@ -89,13 +88,13 @@ public final class Steps {
    * @return result of check
    * @throws QueryException evaluation exception
    */
-  public NodeSet eval(final XPContext ctx) throws QueryException {
-    final NodeSet tmp = ctx.item;
+  public Nod eval(final XPContext ctx) throws QueryException {
+    final Nod tmp = ctx.item;
     for(int s = 0; s < size; s++) {
       ctx.item = steps[s].eval(ctx);
       ctx.checkStop();
     }
-    final NodeSet res = ctx.item;
+    final Nod res = ctx.item;
     ctx.item = tmp;
     return res;
   }
@@ -183,8 +182,8 @@ public final class Steps {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(int s = 0; s < size; s++) sb.append('/' + steps[s].toString());
-    return sb.toString();
+    for(int s = 0; s < size; s++) sb.append("/" + steps[s]);
+    return sb.toString().substring(1);
   }
 
   /**

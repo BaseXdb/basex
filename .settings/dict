@@ -138,3 +138,6 @@ precalculates
 bool
 pragma
 eval
+preds
+pred
+comp

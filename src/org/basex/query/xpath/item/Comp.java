@@ -1,4 +1,4 @@
-package org.basex.query.xpath.values;
+package org.basex.query.xpath.item;
 
 /**
  * This enumeration assembles different value comparisons.

@@ -6,9 +6,9 @@ import org.basex.index.ValuesToken;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.values.NodeBuilder;
-import org.basex.query.xpath.values.NodeSet;
-import org.basex.query.xpath.values.Item;
+import org.basex.query.xpath.item.Item;
+import org.basex.query.xpath.item.NodeBuilder;
+import org.basex.query.xpath.item.Nod;
 import org.basex.util.Array;
 import org.basex.util.Token;
 
@@ -28,19 +28,19 @@ public final class Id extends Func {
   }
 
   @Override
-  public NodeSet eval(final XPContext ctx) throws QueryException {
-    final NodeSet local = ctx.item;
+  public Nod eval(final XPContext ctx) throws QueryException {
+    final Nod local = ctx.item;
     final Data data = local.data;
     // should actually depend on DTD
     final int id = data.attNameID(Token.token("id"));
-    if(id == 0) return new NodeSet(ctx);
+    if(id == 0) return new Nod(ctx);
 
     final Item arg = evalArgs(ctx)[0];
     byte[][] values = null;
 
     // create atomized texts
-    if(arg instanceof NodeSet) {
-      final int[] nodes = ((NodeSet) arg).nodes;
+    if(arg instanceof Nod) {
+      final int[] nodes = ((Nod) arg).nodes;
       values = new byte[nodes.length][];
       int c = 0;
       for(final int node : nodes) {
@@ -74,7 +74,7 @@ public final class Id extends Func {
         }
       }
     }
-    ctx.item = new NodeSet(tmp.finish(), ctx);
+    ctx.item = new Nod(tmp.finish(), ctx);
     return ctx.item;
   }
 

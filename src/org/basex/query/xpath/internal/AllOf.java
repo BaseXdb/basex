@@ -11,11 +11,11 @@ import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
 import org.basex.query.xpath.expr.InterSect;
 import org.basex.query.xpath.expr.Path;
+import org.basex.query.xpath.item.Bln;
+import org.basex.query.xpath.item.Comp;
+import org.basex.query.xpath.item.Item;
 import org.basex.query.xpath.locpath.LocPath;
 import org.basex.query.xpath.locpath.Step;
-import org.basex.query.xpath.values.Bool;
-import org.basex.query.xpath.values.Comp;
-import org.basex.query.xpath.values.Item;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -47,12 +47,12 @@ public final class AllOf extends InternalExpr {
   }
 
   @Override
-  public Bool eval(final XPContext ctx) throws QueryException {
+  public Bln eval(final XPContext ctx) throws QueryException {
     final Item v = ctx.eval(path);
-    if(v.size() == 0) return Bool.FALSE;
+    if(v.size() == 0) return Bln.FALSE;
 
-    for(final Item val : vals) if(!Comp.EQ.eval(v, val)) return Bool.FALSE;
-    return Bool.TRUE;
+    for(final Item val : vals) if(!Comp.EQ.eval(v, val)) return Bln.FALSE;
+    return Bln.TRUE;
   }
 
   @Override

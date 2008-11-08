@@ -5,7 +5,7 @@ import org.basex.data.Serializer;
 import org.basex.index.FTNode;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
-import org.basex.query.xpath.values.Bool;
+import org.basex.query.xpath.item.Bln;
 import org.basex.util.IntList;
 
 /**
@@ -169,11 +169,11 @@ public final class FTUnion extends FTArrayExpr {
   }
   
   @Override
-  public Bool eval(final XPContext ctx) throws QueryException {
+  public Bln eval(final XPContext ctx) throws QueryException {
     boolean b = false;
     // check each positive expression
     for (int i : pex) {
-      final Bool it = (Bool) exprs[i].eval(ctx);
+      final Bln it = (Bln) exprs[i].eval(ctx);
       if (!b) b = it.bool();
     }
 
@@ -181,7 +181,7 @@ public final class FTUnion extends FTArrayExpr {
       exprs[i].eval(ctx);
     }
 */
-    return Bool.get(b);
+    return Bln.get(b);
   }
   
   @Override

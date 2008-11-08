@@ -3,7 +3,7 @@ package org.basex.query.xpath.expr;
 import org.basex.index.FTNode;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
-import org.basex.query.xpath.values.Bool;
+import org.basex.query.xpath.item.Bln;
 import org.basex.util.IntList;
 
 /**
@@ -76,9 +76,9 @@ public final class FTMildNotExprs extends FTArrayExpr {
   }
   
   @Override
-  public Bool eval(final XPContext ctx) throws QueryException {
+  public Bln eval(final XPContext ctx) throws QueryException {
     ctx.ftpos.st = true;
-    final Bool b0 = (Bool) exprs[0].eval(ctx);
+    final Bln b0 = (Bln) exprs[0].eval(ctx);
     exprs[1].eval(ctx);
     return b0;
   }  

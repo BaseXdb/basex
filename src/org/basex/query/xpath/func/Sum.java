@@ -4,9 +4,9 @@ import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.values.NodeSet;
-import org.basex.query.xpath.values.Num;
-import org.basex.query.xpath.values.Item;
+import org.basex.query.xpath.item.Dbl;
+import org.basex.query.xpath.item.Item;
+import org.basex.query.xpath.item.Nod;
 
 /**
  * Constructor for sum() function.
@@ -24,15 +24,15 @@ public final class Sum extends Func {
   }
 
   @Override
-  public Num eval(final XPContext ctx) throws QueryException {
+  public Dbl eval(final XPContext ctx) throws QueryException {
     final Item[] v = evalArgs(ctx);
-    if(!(v[0] instanceof NodeSet)) return new Num(v[0].num());
+    if(!(v[0] instanceof Nod)) return new Dbl(v[0].num());
 
-    final NodeSet set = (NodeSet) v[0];
+    final Nod set = (Nod) v[0];
     double sum = 0;
     final Data data = ctx.item.data;
     for(final int node : set.nodes) sum += data.atomNum(node);
-    return new Num(sum);
+    return new Dbl(sum);
   }
 
   @Override

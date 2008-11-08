@@ -1,4 +1,4 @@
-package org.basex.query.xpath.values;
+package org.basex.query.xpath.item;
 
 import java.io.IOException;
 import org.basex.data.Data;
@@ -15,7 +15,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Tim Petrowsky
  */
-public final class NodeSet extends Item {
+public final class Nod extends Item {
   /** Precedence. */
   static final int PREC = Integer.MAX_VALUE;
   /** Node array. */
@@ -41,7 +41,7 @@ public final class NodeSet extends Item {
    * @param ids node ids
    * @param ctx query context
    */
-  public NodeSet(final int[] ids, final XPContext ctx) {
+  public Nod(final int[] ids, final XPContext ctx) {
     data = ctx.item.data;
     nodes = ids;
     size = ids.length;
@@ -67,7 +67,7 @@ public final class NodeSet extends Item {
    * Constructor, creating an empty node set.
    * @param ctx query context
    */
-  public NodeSet(final XPContext ctx) {
+  public Nod(final XPContext ctx) {
     this(ctx.item.data);
   }
 
@@ -75,7 +75,7 @@ public final class NodeSet extends Item {
    * Constructor, creating a new node set from the specified node ids.
    * @param d data reference
    */
-  public NodeSet(final Data d) {
+  public Nod(final Data d) {
     this(Array.NOINTS, d);
   }
 
@@ -84,7 +84,7 @@ public final class NodeSet extends Item {
    * @param ids node ids
    * @param d data reference
    */
-  public NodeSet(final int[] ids, final Data d) {
+  public Nod(final int[] ids, final Data d) {
     nodes = ids;
     size = ids.length;
     data = d;
@@ -123,7 +123,7 @@ public final class NodeSet extends Item {
   }
 
   @Override
-  public NodeSet eval(final XPContext ctx) {
+  public Nod eval(final XPContext ctx) {
     return this;
   }
 
@@ -188,7 +188,7 @@ public final class NodeSet extends Item {
   @Override
   public boolean eq(final Item v) {
     for(int i = 0; i < size; i++) {
-      if(new Literal(data.atom(nodes[i])).eq(v)) return true;
+      if(new Str(data.atom(nodes[i])).eq(v)) return true;
     }
     return false;
   }
@@ -196,7 +196,7 @@ public final class NodeSet extends Item {
   @Override
   public boolean appr(final Item v) {
     for(int i = 0; i < size; i++) {
-      if(new Literal(data.atom(nodes[i])).appr(v)) return true;
+      if(new Str(data.atom(nodes[i])).appr(v)) return true;
     }
     return false;
   }
@@ -218,7 +218,7 @@ public final class NodeSet extends Item {
    */
   public boolean apprContainedIn(final Item val) {
     for(int i = 0; i < size; i++) {
-      if(val.apprContains(new Literal(data.atom(nodes[i])))) return true;
+      if(val.apprContains(new Str(data.atom(nodes[i])))) return true;
     }
     return false;
   }

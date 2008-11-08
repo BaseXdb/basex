@@ -59,11 +59,6 @@ public final class Clc extends Arr {
   }
 
   @Override
-  public String color() {
-    return "FF9999";
-  }
-
-  @Override
   public String toString() {
     return toString(" " + calc.name + " ");
   }

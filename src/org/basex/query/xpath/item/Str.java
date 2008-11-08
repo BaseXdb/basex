@@ -1,4 +1,4 @@
-package org.basex.query.xpath.values;
+package org.basex.query.xpath.item;
 
 import java.io.IOException;
 import org.basex.data.Serializer;
@@ -12,7 +12,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Tim Petrowsky
  */
-public final class Literal extends Item {
+public final class Str extends Item {
   /** Precedence. */
   private static final int PREC = 1;
   /** byte[] value. */
@@ -24,12 +24,12 @@ public final class Literal extends Item {
    * Constructor.
    * @param chars Characters to represent
    */
-  public Literal(final byte[] chars) {
+  public Str(final byte[] chars) {
     bytes = chars;
   }
 
   @Override
-  public Literal eval(final XPContext ctx) {
+  public Str eval(final XPContext ctx) {
     return this;
   }
 

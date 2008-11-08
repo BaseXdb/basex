@@ -10,8 +10,8 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryContext;
 import org.basex.query.xpath.expr.Expr;
 import org.basex.query.xpath.expr.FTPositionFilter;
-import org.basex.query.xpath.values.NodeSet;
-import org.basex.query.xpath.values.Item;
+import org.basex.query.xpath.item.Item;
+import org.basex.query.xpath.item.Nod;
 
 /**
  * Query context.
@@ -21,7 +21,7 @@ import org.basex.query.xpath.values.Item;
  */
 public final class XPContext extends QueryContext {
   /** Data reference. */
-  public NodeSet item;
+  public Nod item;
   
   /** Leaf flag. */
   public boolean leaf;
@@ -50,7 +50,7 @@ public final class XPContext extends QueryContext {
   public XPContext compile(final Nodes n) throws QueryException {
     inf = Prop.allInfo;
     if(inf) compInfo(QUERYCOMP);
-    item = n != null ? new NodeSet(n.nodes, n.data) : null;
+    item = n != null ? new Nod(n.nodes, n.data) : null;
     root = root.comp(this);
     if(inf) compInfo(QUERYRESULT + "%", root);
     return this;
@@ -59,7 +59,7 @@ public final class XPContext extends QueryContext {
   @Override
   public Result eval(final Nodes nodes) throws QueryException {
     evalTime = System.nanoTime();
-    item = new NodeSet(nodes.nodes, nodes.data);
+    item = new Nod(nodes.nodes, nodes.data);
     return eval(root);
   }
   

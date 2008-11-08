@@ -79,9 +79,4 @@ public final class CDoc extends Single {
   public String info() {
     return "Document constructor";
   }
-
-  @Override
-  public String color() {
-    return "FF3333";
-  }
 }

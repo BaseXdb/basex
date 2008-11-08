@@ -1,10 +1,10 @@
 package org.basex.query.xpath.func;
 
+import static org.basex.query.xpath.XPText.*;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.values.Num;
-import static org.basex.query.xpath.XPText.*;
+import org.basex.query.xpath.item.Dbl;
 
 /**
  * Constructor for last() function.
@@ -22,8 +22,8 @@ public final class Last extends Func {
   }
 
   @Override
-  public Num eval(final XPContext ctx) throws QueryException {
-    if(ctx.item.currSize > 0) return new Num(ctx.item.currSize);
+  public Dbl eval(final XPContext ctx) throws QueryException {
+    if(ctx.item.currSize > 0) return new Dbl(ctx.item.currSize);
     throw new QueryException(LASTEXC);
   }
 

@@ -1,15 +1,13 @@
-package org.basex.query.xquery.expr;
+package org.basex.query.xpath.expr;
 
-import static org.basex.query.xquery.XQTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
-import org.basex.query.xquery.XQContext;
-import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.item.Type;
+import org.basex.query.QueryException;
+import org.basex.query.xpath.XPContext;
 
 /**
  * Abstract array expression.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
@@ -24,22 +22,34 @@ public abstract class Arr extends Expr {
   protected Arr(final Expr... e) {
     expr = e;
   }
-
+  
   @Override
-  public Expr comp(final XQContext ctx) throws XQException {
-    for(int e = 0; e != expr.length; e++) expr[e] = ctx.comp(expr[e]);
+  public Expr comp(final XPContext ctx) throws QueryException {
+    for(int e = 0; e != expr.length; e++) expr[e] = expr[e].comp(ctx);
     return this;
   }
 
   @Override
-  public boolean uses(final Using u) {
-    for(final Expr e : expr) if(e.uses(u)) return true;
+  public final boolean usesPos() {
+    for(final Expr e : expr) if(e.usesPos()) return true;
     return false;
   }
 
   @Override
-  public Type returned() {
-    return null;
+  public final boolean usesSize() {
+    for(final Expr e : expr) if(e.usesSize()) return true;
+    return false;
+  }
+
+  @Override
+  public boolean sameAs(final Expr cmp) {
+    if(cmp.getClass() != getClass()) return false;
+    final Arr ex = (Arr) cmp;
+    if(expr.length != ex.expr.length) return false;
+    for(final Expr e : expr) {
+      if(!e.sameAs(ex)) return false;
+    }
+    return true;
   }
 
   /**
@@ -57,7 +67,7 @@ public abstract class Arr extends Expr {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, NS, timer());
+    ser.openElement(this);
     for(final Expr e : expr) e.plan(ser);
     ser.closeElement();
   }

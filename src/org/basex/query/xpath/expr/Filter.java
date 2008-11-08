@@ -5,9 +5,9 @@ import org.basex.BaseX;
 import org.basex.data.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
+import org.basex.query.xpath.item.NodeBuilder;
+import org.basex.query.xpath.item.Nod;
 import org.basex.query.xpath.locpath.Preds;
-import org.basex.query.xpath.values.NodeBuilder;
-import org.basex.query.xpath.values.NodeSet;
 
 /**
  * Filter Expression filtering a nodeset. This Expression is invalid for other
@@ -33,13 +33,13 @@ public final class Filter extends Expr {
   }
 
   @Override
-  public NodeSet eval(final XPContext ctx) throws QueryException {
-    final NodeSet nodes = (NodeSet) ctx.eval(expr);
+  public Nod eval(final XPContext ctx) throws QueryException {
+    final Nod nodes = (Nod) ctx.eval(expr);
     final NodeBuilder input = new NodeBuilder(nodes.nodes);
     // new NodeBuilder(nodes.nodes, nodes.ftidpos, nodes.ftpointer);
     final NodeBuilder result = new NodeBuilder();
     preds.eval(ctx, input, result);
-    return new NodeSet(result.finish(), ctx);
+    return new Nod(result.finish(), ctx);
   }
 
   @Override
@@ -55,7 +55,7 @@ public final class Filter extends Expr {
   @Override
   public Expr comp(final XPContext ctx) throws QueryException {
     expr = expr.comp(ctx);
-    return preds.compile(ctx) ? this : new NodeSet(ctx);
+    return preds.compile(ctx) ? this : new Nod(ctx);
   }
 
   @Override

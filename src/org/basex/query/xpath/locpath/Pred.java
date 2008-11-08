@@ -4,8 +4,8 @@ import org.basex.query.ExprInfo;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.values.NodeBuilder;
-import org.basex.query.xpath.values.NodeSet;
+import org.basex.query.xpath.item.Nod;
+import org.basex.query.xpath.item.NodeBuilder;
 
 /**
  * XPath predicate.
@@ -35,13 +35,13 @@ public abstract class Pred extends ExprInfo {
    * @return result of evaluation
    * @throws QueryException evaluation exception
    */
-  abstract boolean eval(final XPContext ctx, final NodeSet nodes, final int pos)
+  abstract boolean eval(final XPContext ctx, final Nod nodes, final int pos)
       throws QueryException;
 
   /**
    * Whether this Predicate uses the set-size.
    * If it doesn't, early evaluation is possible.
-   * @return whether setsize is used
+   * @return whether size is used
    */
   abstract boolean usesSize();
 
@@ -53,12 +53,12 @@ public abstract class Pred extends ExprInfo {
 
   /**
    * Returns the value of a position predicate. Possible return values:
-   * <li>-1 - impossible number predicate</li>
-   * <li> 0 - no number predicate</li>
-   * <li>>0 - number predicate</li>
-   * @return number of predicates
+   * <li>-1: impossible position predicate</li>
+   * <li> 0: no position predicate</li>
+   * <li>>0: position predicate</li>
+   * @return predicate position
    */
-  abstract int posPred();
+  abstract double posPred();
 
   /**
    * Optimizes the Predicate.
@@ -81,24 +81,31 @@ public abstract class Pred extends ExprInfo {
   abstract boolean alwaysTrue();
 
   /**
-   * For predicate optimization.
+   * Returns an equivalent expression which accesses an index structure.
    * @param ctx root
    * @param step location step
    * @param seq flag for sequential evaluation
    * @return Equivalent index-expression or null
    * @throws QueryException evaluation exception
    */
-  abstract Expr indexEquivalent(final XPContext ctx, final Step step, 
-      final boolean seq) throws QueryException;
+  @SuppressWarnings("unused")
+  Expr indexEquivalent(final XPContext ctx, final Step step, 
+      final boolean seq) throws QueryException {
+    return null;
+  }
 
   /**
-   * For predicate optimization.
+   * Returns the number of results if this query is evaluated by an index.
+   * If {@link Integer#MAX_VALUE} is returned, no index access is possible.
    * @param ctx root
-   * @param curr the location step
-   * @param min current minimum size
-   * @return Equivalent index-expression or null
+   * @param step the current location step
+   * @param min current minimum index hits
+   * @return number of expected results
    */ 
-  abstract int indexSizes(final XPContext ctx, final Step curr, final int min);
+  @SuppressWarnings("unused")
+  int indexSizes(final XPContext ctx, final Step step, final int min) {
+    return Integer.MAX_VALUE;
+  }
 
   /**
    * Compares the predicate for equality.

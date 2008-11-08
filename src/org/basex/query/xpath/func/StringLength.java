@@ -3,8 +3,8 @@ package org.basex.query.xpath.func;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.values.Num;
-import org.basex.query.xpath.values.Item;
+import org.basex.query.xpath.item.Item;
+import org.basex.query.xpath.item.Dbl;
 
 /**
  * Constructor for string-length() function.
@@ -22,9 +22,9 @@ public final class StringLength extends Func {
   }
 
   @Override
-  public Num eval(final XPContext ctx) throws QueryException {
+  public Dbl eval(final XPContext ctx) throws QueryException {
     final Item[] v = evalArgs(ctx);
-    return new Num((v.length == 0 ? ctx.item : v[0]).str().length);
+    return new Dbl((v.length == 0 ? ctx.item : v[0]).str().length);
   }
 
   @Override

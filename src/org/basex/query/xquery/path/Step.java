@@ -148,11 +148,6 @@ public class Step extends Arr {
   }
 
   @Override
-  public final String color() {
-    return "FFFF66";
-  }
-
-  @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("");
     if(test == Test.NODE) {

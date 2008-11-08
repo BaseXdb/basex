@@ -98,11 +98,6 @@ public final class CAttr extends Arr {
   }
 
   @Override
-  public String color() {
-    return "FF3333";
-  }
-
-  @Override
   public String info() {
     return "Attribute constructor";
   }

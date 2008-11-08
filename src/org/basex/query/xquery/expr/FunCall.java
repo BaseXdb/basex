@@ -69,11 +69,6 @@ public final class FunCall extends Arr {
   }
 
   @Override
-  public String color() {
-    return "9999FF";
-  }
-
-  @Override
   public String toString() {
     return Token.string(name()) + "(" + id + ")";
   }

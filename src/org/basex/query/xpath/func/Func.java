@@ -5,8 +5,8 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.values.Num;
-import org.basex.query.xpath.values.Item;
+import org.basex.query.xpath.item.Dbl;
+import org.basex.query.xpath.item.Item;
 
 /**
  * Interface for XPath functions.
@@ -56,7 +56,7 @@ public abstract class Func extends Expr {
   
   @Override
   public boolean usesPos() {
-    return returnedValue() == Num.class;
+    return returnedValue() == Dbl.class;
   }
   
   @Override

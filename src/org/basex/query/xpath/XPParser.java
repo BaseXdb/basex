@@ -12,7 +12,7 @@ import org.basex.query.QueryException;
 import org.basex.query.FTOpt.FTMode;
 import org.basex.query.FTPos.FTUnit;
 import org.basex.query.xpath.expr.And;
-import org.basex.query.xpath.expr.Calculation;
+import org.basex.query.xpath.expr.Clc;
 import org.basex.query.xpath.expr.Equality;
 import org.basex.query.xpath.expr.Expr;
 import org.basex.query.xpath.expr.FTAnd;
@@ -32,6 +32,11 @@ import org.basex.query.xpath.expr.Unary;
 import org.basex.query.xpath.expr.Union;
 import org.basex.query.xpath.func.Func;
 import org.basex.query.xpath.func.XPathContext;
+import org.basex.query.xpath.item.Calc;
+import org.basex.query.xpath.item.Comp;
+import org.basex.query.xpath.item.Nod;
+import org.basex.query.xpath.item.Dbl;
+import org.basex.query.xpath.item.Str;
 import org.basex.query.xpath.locpath.Axis;
 import org.basex.query.xpath.locpath.LocPath;
 import org.basex.query.xpath.locpath.LocPathAbs;
@@ -42,11 +47,6 @@ import org.basex.query.xpath.locpath.Test;
 import org.basex.query.xpath.locpath.TestName;
 import org.basex.query.xpath.locpath.TestNode;
 import org.basex.query.xpath.locpath.TestPI;
-import org.basex.query.xpath.values.Calc;
-import org.basex.query.xpath.values.Comp;
-import org.basex.query.xpath.values.Literal;
-import org.basex.query.xpath.values.NodeSet;
-import org.basex.query.xpath.values.Num;
 import org.basex.util.Array;
 import org.basex.util.Set;
 import org.basex.util.Token;
@@ -200,7 +200,7 @@ public class XPParser extends QueryParser {
     while(true) {
       final Calc c = calc(new Calc[] { Calc.PLUS, Calc.MINUS });
       if(c == null) return e;
-      e = new Calculation(e, multiplicative(), c);
+      e = new Clc(e, multiplicative(), c);
     }
   }
 
@@ -216,7 +216,7 @@ public class XPParser extends QueryParser {
     while(true) {
       final Calc c = calc(new Calc[] { Calc.MULT, Calc.DIV, Calc.MOD });
       if(c == null) return e;
-      e = new Calculation(e, unary(), c);
+      e = new Clc(e, unary(), c);
     }
   }
 
@@ -506,29 +506,29 @@ public class XPParser extends QueryParser {
   }
 
   /**
-   * Parses a Literal and expects the first character to be a quote.
+   * Parses a Str and expects the first character to be a quote.
    * @return resulting expression
    * @throws QueryException query exception
    */
-  final Literal literal() throws QueryException {
+  final Str literal() throws QueryException {
     final char delim = consume();
     if(!quote(delim)) error(WRONGTEXT, QUOTE, delim);
     tk.reset();
     while(!curr(0) && !curr(delim)) entity(tk);
     if(!consume(delim)) error(QUOTECLOSE);
-    return new Literal(tk.finish());
+    return new Str(tk.finish());
   }
 
   /**
-   * Parses a Number.
+   * Parses a number.
    * @return resulting expression
    */
-  final Num number() {
-    return new Num(num());
+  final Dbl number() {
+    return new Dbl(num());
   }
 
   /**
-   * Parses a Number.
+   * Parses a number.
    * @return resulting expression
    */
   final double num() {
@@ -594,13 +594,13 @@ public class XPParser extends QueryParser {
   }
 
   /**
-   * Check if the given expression evaluates to a NodeSet.
+   * Check if the given expression evaluates to a Nod.
    * @param e Expression to check
    * @return argument
-   * @throws QueryException in case no NodeSet is returned
+   * @throws QueryException in case no Nod is returned
    */
   final Expr nodeCheck(final Expr e) throws QueryException {
-    if(e.returnedValue() != NodeSet.class) error(NONODESET, e.toString());
+    if(e.returnedValue() != Nod.class) error(NONODESET, e.toString());
     return e;
   }
 

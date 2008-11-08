@@ -3,8 +3,8 @@ package org.basex.query.xpath.func;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.values.Literal;
-import org.basex.query.xpath.values.Item;
+import org.basex.query.xpath.item.Item;
+import org.basex.query.xpath.item.Str;
 import org.basex.util.Token;
 
 /**
@@ -23,11 +23,11 @@ public final class Translate extends Func {
   }
 
   @Override
-  public Literal eval(final XPContext ctx)
+  public Str eval(final XPContext ctx)
       throws QueryException {
     
     final Item[] v = evalArgs(ctx);
-    return new Literal(Token.translate(v[0].str(),  v[1].str(),
+    return new Str(Token.translate(v[0].str(),  v[1].str(),
         v[2].str()));
   }
 

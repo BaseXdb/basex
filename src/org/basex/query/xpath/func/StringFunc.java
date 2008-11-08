@@ -3,7 +3,7 @@ package org.basex.query.xpath.func;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.values.Literal;
+import org.basex.query.xpath.item.Str;
 
 /**
  * Constructor for string() function.
@@ -21,8 +21,8 @@ public final class StringFunc extends Func {
   }
 
   @Override
-  public Literal eval(final XPContext ctx) throws QueryException {
-    return new Literal((args.length == 0 ? ctx.item :
+  public Str eval(final XPContext ctx) throws QueryException {
+    return new Str((args.length == 0 ? ctx.item :
       evalArgs(ctx)[0]).str());
   }
 

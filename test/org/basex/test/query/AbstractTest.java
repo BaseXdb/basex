@@ -6,9 +6,9 @@ import org.basex.data.Namespaces;
 import org.basex.data.Nodes;
 import org.basex.data.Skeleton;
 import org.basex.index.Names;
-import org.basex.query.xpath.values.Bool;
-import org.basex.query.xpath.values.Literal;
-import org.basex.query.xpath.values.Num;
+import org.basex.query.xpath.item.Bln;
+import org.basex.query.xpath.item.Dbl;
+import org.basex.query.xpath.item.Str;
 import org.basex.util.Token;
 
 /**
@@ -37,32 +37,32 @@ abstract class AbstractTest {
   }
   
   /**
-   * Create a {@link org.basex.query.xpath.values.Literal} instance for the 
+   * Create a {@link org.basex.query.xpath.item.Str} instance for the 
    * specified string.
    * @param str string
    * @return literal
    */
-  static Literal string(final String str) {
-    return new Literal(Token.token(str));
+  static Str string(final String str) {
+    return new Str(Token.token(str));
   }
   
   /**
-   * Create a {@link org.basex.query.xpath.values.Num} instance for the
+   * Create a {@link org.basex.query.xpath.item.Dbl} instance for the
    * specified double.
    * @param d double value
    * @return literal
    */
-  static Num num(final double d) {
-    return new Num(d);
+  static Dbl num(final double d) {
+    return new Dbl(d);
   }
   
   /**
-   * Create a {@link org.basex.query.xpath.values.Bool} instance for the
+   * Create a {@link org.basex.query.xpath.item.Bln} instance for the
    * specified boolean.
    * @param b boolean value
    * @return literal
    */
-  static Bool bool(final boolean b) {
-    return Bool.get(b);
+  static Bln bool(final boolean b) {
+    return Bln.get(b);
   }
 }

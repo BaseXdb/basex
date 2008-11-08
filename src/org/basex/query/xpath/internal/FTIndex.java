@@ -11,8 +11,8 @@ import org.basex.index.IndexIterator;
 import org.basex.query.FTOpt;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.FTArrayExpr;
+import org.basex.query.xpath.item.Bln;
 import org.basex.query.xpath.locpath.Step;
-import org.basex.query.xpath.values.Bool;
 import org.basex.util.IntArrayList;
 
 /**
@@ -48,7 +48,7 @@ public final class FTIndex extends FTArrayExpr {
   }
 
   @Override
-  public Bool eval(final XPContext ctx) {
+  public Bln eval(final XPContext ctx) {
     final Data data = ctx.item.data;
 
     final FTTokenizer ft = new FTTokenizer();
@@ -68,7 +68,7 @@ public final class FTIndex extends FTArrayExpr {
     // ideal solution for phrases would be to process small results first
     // and end up with the largest ones.. but this seems tiresome
     while(ft.more()) {
-      if(data.nrIDs(ft) == 0) return Bool.FALSE;
+      if(data.nrIDs(ft) == 0) return Bln.FALSE;
       ctx.checkStop();
     }
     
@@ -76,12 +76,12 @@ public final class FTIndex extends FTArrayExpr {
     int w = 0;
     while(ft.more()) {
       final IndexIterator it = data.ids(ft);
-      if(it == IndexIterator.EMPTY) return Bool.FALSE;
+      if(it == IndexIterator.EMPTY) return Bln.FALSE;
       if(w == 0) {
         iat = (IndexArrayIterator) it;  
       } else {
         iat = phrase(iat, (IndexArrayIterator) it, w);
-        if (iat.size() == 0) return Bool.FALSE;
+        if (iat.size() == 0) return Bln.FALSE;
       }
       w++;
     }
@@ -89,10 +89,10 @@ public final class FTIndex extends FTArrayExpr {
     if (iat.size() > 0) {
       if (ctx.ftpos.st) iat.setToken(new FTTokenizer[]{ft});
       iat.setTokenNum(++ctx.ftcount);
-      return Bool.TRUE;
+      return Bln.TRUE;
     }
     
-    return Bool.FALSE;
+    return Bln.FALSE;
   }
 
   @Override

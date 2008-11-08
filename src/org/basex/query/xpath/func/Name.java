@@ -4,9 +4,9 @@ import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.values.Literal;
-import org.basex.query.xpath.values.NodeSet;
-import org.basex.query.xpath.values.Item;
+import org.basex.query.xpath.item.Item;
+import org.basex.query.xpath.item.Str;
+import org.basex.query.xpath.item.Nod;
 import org.basex.util.Token;
 
 /**
@@ -25,22 +25,22 @@ public final class Name extends Func {
   }
 
   @Override
-  public Literal eval(final XPContext ctx) throws QueryException {
+  public Str eval(final XPContext ctx) throws QueryException {
     final Item[] v = evalArgs(ctx);
-    final NodeSet set = v.length != 0 && v[0].size() != 0 ?
-        (NodeSet) v[0] : ctx.item;
+    final Nod set = v.length != 0 && v[0].size() != 0 ?
+        (Nod) v[0] : ctx.item;
 
     final Data data = ctx.item.data;
     final int node = set.nodes[0];
     final int kind = data.kind(node);
-    if(kind == Data.ELEM) return new Literal(data.tag(node));
-    if(kind == Data.ATTR) return new Literal(data.attName(node));
-    return new Literal(Token.EMPTY);
+    if(kind == Data.ELEM) return new Str(data.tag(node));
+    if(kind == Data.ATTR) return new Str(data.attName(node));
+    return new Str(Token.EMPTY);
   }
 
   @Override
   public boolean checkArguments() {
     return args.length == 0 || args.length == 1 &&
-      args[0].returnedValue() == NodeSet.class;
+      args[0].returnedValue() == Nod.class;
   }
 }

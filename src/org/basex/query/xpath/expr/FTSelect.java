@@ -4,9 +4,9 @@ import org.basex.data.MetaData;
 import org.basex.index.FTNode;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
+import org.basex.query.xpath.item.Bln;
+import org.basex.query.xpath.item.Item;
 import org.basex.query.xpath.locpath.Step;
-import org.basex.query.xpath.values.Bool;
-import org.basex.query.xpath.values.Item;
 
 
 /**
@@ -110,7 +110,7 @@ public final class FTSelect extends FTArrayExpr {
     ftpos.pos.init(ctx.ftitem);
     Item i = exprs[0].eval(ctx);
     ftpos.pos.setPos(ctx.ftpos.pos.getPos(), ctx.ftpos.pos.getPos().length);
-    if (!ctx.iu) i = Bool.get(i.bool() && seqEval());
+    if (!ctx.iu) i = Bln.get(i.bool() && seqEval());
     ctx.ftpos = tmp;
     if (ctx.ftpos != null) 
       ctx.ftpos.pos.setPos(ftpos.pos.getPos(), ftpos.pos.getPos().length);

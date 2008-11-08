@@ -63,9 +63,4 @@ public final class CPI extends Arr {
   public String info() {
     return "PI constructor";
   }
-
-  @Override
-  public String color() {
-    return "FF3333";
-  }
 }

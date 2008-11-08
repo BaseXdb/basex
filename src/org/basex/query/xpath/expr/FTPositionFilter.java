@@ -1,7 +1,7 @@
 package org.basex.query.xpath.expr;
 
 import org.basex.query.FTPos;
-import org.basex.query.xpath.values.Num;
+import org.basex.query.xpath.item.Dbl;
 
 /**
  * FTOption; defines options for a fulltext expression.
@@ -13,7 +13,7 @@ public final class FTPositionFilter {
   /** Position filter. */
   public FTPos pos;
   /** Window occurrences. */
-  public Num window;
+  public Dbl window;
   /** Distances. */
   public long[] dist;
   /** Flag for loading ft position values. */

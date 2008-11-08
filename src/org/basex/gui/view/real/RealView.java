@@ -201,7 +201,7 @@ public final class RealView extends View {
     sumNodeSizeInLine = data.size;
     parentList = new IntList();
     parentList.add(root);
-    this.rectCount = 1;
+    rectCount = 1;
     parentPos = null;
     while(parentList.size > 0) {
       drawTemperature(g, level);
@@ -243,9 +243,9 @@ public final class RealView extends View {
         sumNodeSize += data.size(pre, data.kind(pre));
       }
     }
-    this.rectCount = rCount;
-    this.parentList = temp;
-    this.sumNodeSizeInLine = sumNodeSize;
+    rectCount = rCount;
+    parentList = temp;
+    sumNodeSizeInLine = sumNodeSize;
   }
 
   /**
@@ -265,7 +265,7 @@ public final class RealView extends View {
     final HashMap<Integer, Double> temp = new HashMap<Integer, Double>();
     double x = 0;
     final int y = 1 * level * fontHeight * 2;
-    final double width = this.getSize().width - 1;
+    final double width = getSize().width - 1;
     final double ratio = width / size;
     final int minSpace = 35; // minimum Space for Tags
     final boolean space = ratio > minSpace ? true : false;

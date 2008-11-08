@@ -2,7 +2,7 @@ package org.basex.query.xpath.func;
 
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.values.Bool;
+import org.basex.query.xpath.item.Bln;
 
 /**
  * Constructor for false() function.
@@ -20,8 +20,8 @@ public final class False extends Func {
   }
 
   @Override
-  public Bool eval(final XPContext ctx) {
-    return Bool.FALSE;
+  public Bln eval(final XPContext ctx) {
+    return Bln.FALSE;
   }
 
   @Override
@@ -30,7 +30,7 @@ public final class False extends Func {
   }
 
   @Override
-  public Bool comp(final XPContext ctx) {
-    return Bool.FALSE;
+  public Bln comp(final XPContext ctx) {
+    return Bln.FALSE;
   }
 }

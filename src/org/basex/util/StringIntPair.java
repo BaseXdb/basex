@@ -20,8 +20,8 @@ public class StringIntPair {
    */
   public StringIntPair(final String s, final int v) {
     super();
-    this.str = s;
-    this.val = v;
+    str = s;
+    val = v;
   }
   
   /**
@@ -38,7 +38,7 @@ public class StringIntPair {
    * @param s String to assign
    */
   public void setStr(final String s) {
-    this.str = s;
+    str = s;
   }
   
   /**
@@ -56,7 +56,7 @@ public class StringIntPair {
    * @param v Value to assign
    */
   public void setVal(final int v) {
-    this.val = v;
+    val = v;
   }
 
   @Override

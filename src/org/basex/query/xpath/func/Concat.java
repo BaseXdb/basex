@@ -3,8 +3,8 @@ package org.basex.query.xpath.func;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.values.Literal;
-import org.basex.query.xpath.values.Item;
+import org.basex.query.xpath.item.Item;
+import org.basex.query.xpath.item.Str;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -23,10 +23,10 @@ public final class Concat extends Func {
   }
 
   @Override
-  public Literal eval(final XPContext ctx) throws QueryException {
+  public Str eval(final XPContext ctx) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
     for(final Item v : evalArgs(ctx)) tb.add(v.str());
-    return new Literal(tb.finish());
+    return new Str(tb.finish());
   }
 
   @Override

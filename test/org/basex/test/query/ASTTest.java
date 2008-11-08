@@ -8,8 +8,8 @@ import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPathProcessor;
-import org.basex.query.xpath.values.NodeSet;
-import org.basex.query.xpath.values.Num;
+import org.basex.query.xpath.item.Dbl;
+import org.basex.query.xpath.item.Nod;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -43,9 +43,9 @@ public final class ASTTest {
    * @return context set
    * @throws QueryException query exception
    */
-  private NodeSet evalNodes(final String str) throws QueryException {
+  private Nod evalNodes(final String str) throws QueryException {
     final Result result = eval(str, new Nodes(0, CONTEXT.data()));
-    if(result instanceof NodeSet) return (NodeSet) result;
+    if(result instanceof Nod) return (Nod) result;
     fail("No nodes returned!");
     return null;
   }
@@ -57,11 +57,11 @@ public final class ASTTest {
    * @return context set
    * @throws QueryException query exception
    */
-  private NodeSet evalNodes(final String str, final Nodes cont)
+  private Nod evalNodes(final String str, final Nodes cont)
       throws QueryException {
 
     final Result result = eval(str, cont);
-    if(result instanceof NodeSet) return (NodeSet) result;
+    if(result instanceof Nod) return (Nod) result;
     fail("No nodes returned!");
     return null;
   }
@@ -94,8 +94,8 @@ public final class ASTTest {
    * @param cs context set
    * @param nodes node array
    */
-  private void assertNodeSetEquals(final NodeSet cs, final int[] nodes) {
-    if(!cs.same(new NodeSet(nodes, CONTEXT.data()))) fail();
+  private void assertNodeSetEquals(final Nod cs, final int[] nodes) {
+    if(!cs.same(new Nod(nodes, CONTEXT.data()))) fail();
   }
 
   /**
@@ -103,7 +103,7 @@ public final class ASTTest {
    * @param cs context set
    * @param nodes node array
    */
-  private void assertNodeSetContains(final NodeSet cs, final int[] nodes) {
+  private void assertNodeSetContains(final Nod cs, final int[] nodes) {
     for(final int result : nodes) {
       int j = 0;
       if(j == cs.size) fail();
@@ -118,7 +118,7 @@ public final class ASTTest {
    * @param cs context set
    * @param node node array
    */
-  private void assertNodeSetNotContains(final NodeSet cs, final int node) {
+  private void assertNodeSetNotContains(final Nod cs, final int node) {
     for(final int result : cs.nodes) {
       if(result == node) fail();
     }
@@ -131,7 +131,7 @@ public final class ASTTest {
   @Test
   public void testBasic() throws QueryException {
     final Result res = eval("3", new Nodes(0, CONTEXT.data()));
-    assertTrue(new Num(3).same(res));
+    assertTrue(new Dbl(3).same(res));
   }
 
   /**
@@ -186,7 +186,7 @@ public final class ASTTest {
    */
   @Test
   public void allNamesBug() throws QueryException {
-    final NodeSet res = evalNodes("//*");
+    final Nod res = evalNodes("//*");
     // checking only some of the wanted results
     assertNodeSetContains(res, new int[] { 1, 2, 13 });
     // and an unwanted one

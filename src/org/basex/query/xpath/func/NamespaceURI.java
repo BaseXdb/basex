@@ -2,8 +2,8 @@ package org.basex.query.xpath.func;
 
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.values.Literal;
-import org.basex.query.xpath.values.NodeSet;
+import org.basex.query.xpath.item.Nod;
+import org.basex.query.xpath.item.Str;
 import org.basex.util.Token;
 
 /**
@@ -22,14 +22,14 @@ public final class NamespaceURI extends Func {
   }
 
   @Override
-  public Literal eval(final XPContext ctx) {
+  public Str eval(final XPContext ctx) {
     // Namespaces not supported
-    return new Literal(Token.EMPTY);
+    return new Str(Token.EMPTY);
   }
 
   @Override
   public boolean checkArguments() {
     return args.length == 0 || args.length == 1 &&
-      args[0].returnedValue() == NodeSet.class;
+      args[0].returnedValue() == Nod.class;
   }
 }

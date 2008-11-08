@@ -11,15 +11,15 @@ import org.basex.query.FTOpt;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.XPOptimizer;
+import org.basex.query.xpath.item.Bln;
+import org.basex.query.xpath.item.Item;
+import org.basex.query.xpath.item.Nod;
+import org.basex.query.xpath.item.Str;
 import org.basex.query.xpath.locpath.LocPath;
 import org.basex.query.xpath.locpath.LocPathAbs;
 import org.basex.query.xpath.locpath.LocPathRel;
 import org.basex.query.xpath.locpath.Step;
 import org.basex.query.xpath.locpath.TestNode;
-import org.basex.query.xpath.values.Bool;
-import org.basex.query.xpath.values.Item;
-import org.basex.query.xpath.values.Literal;
-import org.basex.query.xpath.values.NodeSet;
 import org.basex.util.IntList;
 
 /**
@@ -29,7 +29,7 @@ import org.basex.util.IntList;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class FTContains extends DualExpr {
+public final class FTContains extends Arr {
   /** Fulltext parser. */
   private final FTTokenizer ft = new FTTokenizer();
   /** FullText options. */
@@ -80,43 +80,34 @@ public final class FTContains extends DualExpr {
   
   @Override
   public Expr comp(final XPContext ctx) throws QueryException {
-    expr1 = expr1.comp(ctx);
-    expr2 = expr2.comp(ctx);
+    super.comp(ctx);
 
-    if (expr1 instanceof LocPathAbs) {
+    if (expr[0] instanceof LocPathAbs) {
       iu = false;
       return this;
     }
 
-    final Item i1 = expr1 instanceof Item ? (Item) expr1 : null;
-    final Item i2 = expr2 instanceof Item ? (Item) expr2 : null;
+    final Item i1 = expr[0] instanceof Item ? (Item) expr[0] : null;
+    final Item i2 = expr[1] instanceof Item ? (Item) expr[1] : null;
     if(i1 != null && i1.size() == 0 || i2 != null && i2.size() == 0) {
       ctx.compInfo(OPTEQ1);
-      return Bool.FALSE;
+      return Bln.FALSE;
     }
 
-    XPOptimizer.addText(expr1, ctx);
+    XPOptimizer.addText(expr[0], ctx);
     return this;
   }
 
   @Override
   public Item eval(final XPContext ctx) throws QueryException {
-    if (expr1 instanceof Literal) {
-      final Literal lit = (Literal) expr1;
+    if (expr[0] instanceof Str) {
+      final Str lit = (Str) expr[0];
       ctx.ftitem = new FTTokenizer();
       ctx.ftitem.init(lit.str());
-      return expr2.eval(ctx);
+      return expr[1].eval(ctx);
     } 
 
-    // [SG] Cause for troubles.. resulting item can have different type
-    // (Bool/NodeSet). In the other XPath expressions, return type is always
-    // the same (moreover, in indexEquivalent(), this class is specified as
-    // argument for the Path expression; this expression expects the first
-    // argument to return a node set..) A possible solution might be to split
-    // this class into two in the compilation step.
-
-    if (iu) return evalSeq(ctx);
-    else return evalWithoutIndex(ctx);
+    return iu ? evalSeq(ctx) : evalWithoutIndex(ctx);
   }
 
   /**
@@ -128,21 +119,21 @@ public final class FTContains extends DualExpr {
    * @return resulting result
    * @throws QueryException Exception
    */
-  private Bool evalSeq(final XPContext ctx) throws QueryException {
+  private Bln evalSeq(final XPContext ctx) throws QueryException {
     final FTTokenizer tmp = ctx.ftitem;
     ctx.ftitem = ft;
 
-    final NodeSet ns = (NodeSet) expr1.eval(ctx); 
-    if (!ns.bool()) return Bool.FALSE;
+    final Nod ns = (Nod) expr[0].eval(ctx); 
+    if (!ns.bool()) return Bln.FALSE;
     
     if (!f) {
-      v2 = ctx.eval(expr2);
+      v2 = ctx.eval(expr[1]);
       f = true;
     }
 
     if(v2.bool()) {
-      if(expr2 instanceof FTArrayExpr) {
-        final FTArrayExpr ftae = (FTArrayExpr) expr2;
+      if(expr[1] instanceof FTArrayExpr) {
+        final FTArrayExpr ftae = (FTArrayExpr) expr[1];
         ftn = (ftn == null && ftae.more()) ? ftae.next(ctx) : ftn;
         for(int z = 0; z < ns.size(); z++) {
           while(ftn != null && ns.nodes[z] > ftn.getPre()) {
@@ -151,18 +142,18 @@ public final class FTContains extends DualExpr {
           if(ftn != null) {
             final boolean not = ftn.not;
             if(ftn.getPre() == ns.nodes[z]) {
-              return Bool.get(!not);
+              return Bln.get(!not);
             }
           }
         }
-      } else if(expr2 instanceof Bool) {
-        if(expr1.eval(ctx).bool()) return (Bool) expr2;
+      } else if(expr[1] instanceof Bln) {
+        if(expr[0].eval(ctx).bool()) return (Bln) expr[1];
       }
-      return Bool.TRUE;
+      return Bln.TRUE;
     }
 
     ctx.ftitem = tmp;
-    return Bool.FALSE;
+    return Bln.FALSE;
   }
 
   /**
@@ -171,18 +162,18 @@ public final class FTContains extends DualExpr {
    * @return resulting item
    * @throws QueryException Exception
    */
-  private Bool evalWithoutIndex(final XPContext ctx) throws QueryException {
+  private Bln evalWithoutIndex(final XPContext ctx) throws QueryException {
     final FTTokenizer tmp = ctx.ftitem;
     ctx.ftitem = ft;
-    Item it = expr1.eval(ctx);
-    if (!it.bool()) return Bool.FALSE;
-    if(it instanceof NodeSet) {
+    Item it = expr[0].eval(ctx);
+    if (!it.bool()) return Bln.FALSE;
+    if(it instanceof Nod) {
       it = evalNS(ctx, it);
     } else {
-      it = expr2.eval(ctx);
+      it = expr[1].eval(ctx);
     }
     ctx.ftitem = tmp;
-    return Bool.get(it.bool());
+    return Bln.get(it.bool());
   }
 
   /**
@@ -195,99 +186,99 @@ public final class FTContains extends DualExpr {
   private Item evalNS(final XPContext ctx, final Item it)
       throws QueryException {
 
-    final NodeSet nodes = (NodeSet) it;
+    final Nod nodes = (Nod) it;
     IntList res = new IntList();
     final Data data = nodes.data;
     for(int n = 0; n < nodes.size; n++) {
       ft.init(data.atom(nodes.nodes[n]));
-      if(expr2.eval(ctx).bool()) res.add(nodes.nodes[n]);
+      if(expr[1].eval(ctx).bool()) res.add(nodes.nodes[n]);
     }
     if (res.size > 0) {
-      ctx.item = new NodeSet(res.finish(), ctx);
-      return Bool.TRUE;
+      ctx.item = new Nod(res.finish(), ctx);
+      return Bln.TRUE;
     }
-    return Bool.FALSE;
+    return Bln.FALSE;
   }
 
   @Override
   public Expr indexEquivalent(final XPContext ctx, final Step curr,
       final boolean seq) throws QueryException {
     
-    if(!(expr1 instanceof LocPathRel)) return this;
+    if(!(expr[0] instanceof LocPathRel)) return this;
 
     //s = seq;
-    final LocPath path = (LocPath) expr1;
+    final LocPath path = (LocPath) expr[0];
     
-    // all FTArrayExpr are recursively converted to for indexaccess
+    // all FTArrayExpr are recursively converted to for index access
     final FTArrayExpr ae = (FTArrayExpr)
-      (iu ? expr2.indexEquivalent(ctx, curr, seq) : expr2);
+      (iu ? expr[1].indexEquivalent(ctx, curr, seq) : expr[1]);
       
-    Expr expr;
+    Expr ex;
     if (!seq) {
       // standard index evaluation
-      //expr = new FTContains(expr1, ae, option, seq, iu);
+      //expr = new FTContains(expr[0], ae, option, seq, iu);
       ctx.compInfo(OPTFTINDEX);
-      expr = new FTContainsNS(expr1, ae);
-      if (curr != null) return new Path(expr, path.invertPath(curr));
-      else return expr;
+      ex = new FTContainsNS(expr[0], ae);
+      if (curr != null) return new Path(ex, path.invertPath(curr));
+      else return ex;
     } else {
       // sequential evaluation
       if (!iu) {
         // without index access
-        expr = new FTContains(expr1, expr2, option, iu);
+        ex = new FTContains(expr[0], expr[1], option, iu);
       } else {
         // with index access
         ctx.compInfo(OPTFTINDEX);
-        expr = new FTContains(expr1, ae, option, iu);
+        ex = new FTContains(expr[0], ae, option, iu);
       }
   
-      if (curr == null) return expr;
-      return new Path(expr, path);
+      if (curr == null) return ex;
+      return new Path(ex, path);
     }
   }
 
-   @Override
+  @Override
   public int indexSizes(final XPContext ctx, final Step curr, final int min) {
     // check if first expression is a location path and if fulltext index exists
     final MetaData meta = ctx.item.data.meta;
-    if(!(expr1 instanceof LocPathRel && meta.ftxindex))
+    if(!(expr[0] instanceof LocPathRel && meta.ftxindex))
       return Integer.MAX_VALUE;
 
     // check if index can be applied
-    final LocPath path = (LocPathRel) expr1;
+    final LocPath path = (LocPathRel) expr[0];
     final Step step = path.steps.last();
     final boolean text = step.test == TestNode.TEXT && step.preds.size() == 0;
     if(!text || !path.checkAxes()) return Integer.MAX_VALUE;
 
     // check all ftcontains options recursively if they comply
-    // to the index options..
-    iu = ((FTArrayExpr) expr2).indexOptions(meta);
+    // with the index options..
+    iu = ((FTArrayExpr) expr[1]).indexOptions(meta);
     ctx.iu = iu;
     if(!iu) {
       // sequential processing necessary - no index use
       return Integer.MAX_VALUE;
     }
 
-    // Integer.MAX_VALUE is return if an ftnot does not occure
+    // Integer.MAX_VALUE is return if an ftnot does not occur
     // after an ftand
-    final int nrIDs = expr2.indexSizes(ctx, curr, min);
+    final int nrIDs = expr[1].indexSizes(ctx, curr, min);
   /*  if (nrIDs < Integer.MAX_VALUE && nrIDs > -1) {
       s = false;
     }*/
-    if (nrIDs == -1) expr2 = Bool.TRUE;
+    if (nrIDs == -1) expr[1] = Bln.TRUE;
     return nrIDs == -1 ? Integer.MAX_VALUE : nrIDs;
   }
 
   @Override
   public String toString() {
-    return expr1 + " ftcontainsBool" + (iu ? "_I " : " ")  + expr2;
+    return expr[0] + " ftcontainsBool" + (iu ? "_I " : " ")  + expr[1];
   }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
-    expr1.plan(ser);
-    expr2.plan(ser);
+    expr[0].plan(ser);
+    expr[1].plan(ser);
     ser.closeElement();
   }
 }

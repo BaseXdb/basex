@@ -27,11 +27,11 @@ public class RealRect {
 
   public RealRect(final int pp, final int xx1, final int yy1, final int xx2,
       final int yy2) {
-    this.p = pp;
-    this.x1 = xx1;
-    this.x2 = xx2;
-    this.y1 = yy1;
-    this.y2 = yy2;
+    p = pp;
+    x1 = xx1;
+    x2 = xx2;
+    y1 = yy1;
+    y2 = yy2;
   }
 
   /**returns true if position is in specific rect.

@@ -1,10 +1,10 @@
 package org.basex.query.xpath.func;
 
+import static org.basex.query.xpath.XPText.*;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.values.Num;
-import static org.basex.query.xpath.XPText.*;
+import org.basex.query.xpath.item.Dbl;
 
 /**
  * Constructor for position() function.
@@ -22,10 +22,10 @@ public final class Position extends Func {
   }
 
   @Override
-  public Num eval(final XPContext ctx) throws QueryException {
+  public Dbl eval(final XPContext ctx) throws QueryException {
     // size == 0 means no size (nodeset) available
     // size == -1 means we are in early predicate evaluation
-    if(ctx.item.currSize != 0) return new Num(ctx.item.currPos);
+    if(ctx.item.currSize != 0) return new Dbl(ctx.item.currPos);
     throw new QueryException(INVALIDPOS);
   }
 

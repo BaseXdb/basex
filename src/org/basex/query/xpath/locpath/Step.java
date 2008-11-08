@@ -6,8 +6,8 @@ import org.basex.data.Serializer;
 import org.basex.query.ExprInfo;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
-import org.basex.query.xpath.values.NodeBuilder;
-import org.basex.query.xpath.values.NodeSet;
+import org.basex.query.xpath.item.Nod;
+import org.basex.query.xpath.item.NodeBuilder;
 import org.basex.util.Token;
 
 /**
@@ -30,7 +30,7 @@ public abstract class Step extends ExprInfo {
   /** Temporary nodes. */
   private final NodeBuilder tmp = new NodeBuilder();
   /** Position predicate. */
-  protected int posPred;
+  protected double posPred;
   /** Early evaluation. */
   private boolean early;
   /** No predicates. */
@@ -42,7 +42,7 @@ public abstract class Step extends ExprInfo {
    * @return the resulting node set
    * @throws QueryException evaluation exception
    */
-  final NodeSet eval(final XPContext ctx) throws QueryException {
+  final Nod eval(final XPContext ctx) throws QueryException {
     // return if nodeset is empty
     if(ctx.item.size == 0) return ctx.item;
 
@@ -64,7 +64,7 @@ public abstract class Step extends ExprInfo {
         preds.eval(ctx, tmp, result);
       }
     }
-    return new NodeSet(result.finish(), ctx);
+    return new Nod(result.finish(), ctx);
   }
 
   /**
@@ -136,7 +136,7 @@ public abstract class Step extends ExprInfo {
     // skip optimization if position predicate does already exist
     if(preds.size() != 0 && preds.get(0) instanceof PredPos ||
         axis == Axis.PARENT || axis == Axis.SELF) return false;
-    preds.add(1, 1);
+    preds.add(new PredPos(1, 1));
     return true;
   }
 
@@ -202,15 +202,6 @@ public abstract class Step extends ExprInfo {
     for(int p = 0; p < preds.size(); p++)
       sb.append(preds.get(p));
     return sb.toString();
-  }
-
-  /**
-   * Returns the position predicate of the specified predicate array
-   * or 0 if no position predicate is specified.
-   * @return position predicate
-   */
-  protected final int posPred() {
-    return preds.size() != 0 ? preds.get(0).posPred() : 0;
   }
 
   @Override

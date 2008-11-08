@@ -1,7 +1,7 @@
 package org.basex.query.xpath.locpath;
 
 import org.basex.data.Data;
-import org.basex.query.xpath.values.NodeBuilder;
+import org.basex.query.xpath.item.NodeBuilder;
 
 /**
  * Abstract NodeTest. Can be a node name test, node type test, ...

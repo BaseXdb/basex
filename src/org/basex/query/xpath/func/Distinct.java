@@ -1,12 +1,11 @@
 package org.basex.query.xpath.func;
 
 import static org.basex.Text.*;
-
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.values.NodeBuilder;
-import org.basex.query.xpath.values.NodeSet;
+import org.basex.query.xpath.item.NodeBuilder;
+import org.basex.query.xpath.item.Nod;
 import org.basex.util.Token;
 
 /**
@@ -28,11 +27,11 @@ public final class Distinct extends Func {
   }
 
   @Override
-  public NodeSet eval(final XPContext ctx) 
+  public Nod eval(final XPContext ctx) 
       throws QueryException {
     
-    final NodeSet local = ctx.item;
-    final int[] n = ((NodeSet) evalArgs(ctx)[0]).nodes;
+    final Nod local = ctx.item;
+    final int[] n = ((Nod) evalArgs(ctx)[0]).nodes;
     final byte[][] v = new byte[n.length][];
     for(int i = 0; i != v.length; i++) v[i] = local.data.atom(n[i]);
     
@@ -45,11 +44,11 @@ public final class Distinct extends Func {
         if(v[j] != null && Token.eq(v[i], v[j])) v[j] = null;
       }
     }
-    return new NodeSet(tmp.finish(), ctx);
+    return new Nod(tmp.finish(), ctx);
   }
 
   @Override
   public boolean checkArguments() {
-    return args.length == 1 && args[0].returnedValue() == NodeSet.class;
+    return args.length == 1 && args[0].returnedValue() == Nod.class;
   }
 }

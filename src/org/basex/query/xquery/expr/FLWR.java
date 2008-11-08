@@ -111,11 +111,6 @@ public class FLWR extends Single {
   }
 
   @Override
-  public final String color() {
-    return "99FF99";
-  }
-
-  @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     for(int i = 0; i != fl.length; i++) sb.append((i != 0 ? " " : "") + fl[i]);

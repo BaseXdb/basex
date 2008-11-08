@@ -3,8 +3,8 @@ package org.basex.query.xpath.expr;
 import org.basex.query.ExprInfo;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
+import org.basex.query.xpath.item.Item;
 import org.basex.query.xpath.locpath.Step;
-import org.basex.query.xpath.values.Item;
 
 /**
  * Common interface for all expressions.
@@ -71,34 +71,29 @@ public abstract class Expr extends ExprInfo {
   public abstract boolean usesPos();
   
   /**
-   * For predicate optimization.
-   * If possible return an expression yielding the same results using the index.
-   * This may not do any changes to the current expression.
+   * Returns an equivalent expression which accesses an index structure.
    * @param ctx root
-   * @param step the LocationStep this Expression is a predicate of
+   * @param step location step
    * @param seq flag for sequential evaluation
    * @return Equivalent index-expression or null
    * @throws QueryException evaluation exception
    */
   @SuppressWarnings("unused")
   public Expr indexEquivalent(final XPContext ctx, final Step step, 
-      final boolean seq)
-      throws QueryException {
+      final boolean seq) throws QueryException {
     return null;
   }
   
   /**
-   * For predicate optimization.
-   * If possible return the number of entries an index returns.
-   * This may not do any changes to the current expression.
+   * Returns the number of results if this query is evaluated by an index.
+   * If {@link Integer#MAX_VALUE} is returned, no index access is possible.
    * @param ctx root
-   * @param step the LocationStep this Expression is a predicate of
-   * @param min current minimum size
-   * @return Equivalent index-expression or null
+   * @param step the current location step
+   * @param min current minimum index hits
+   * @return number of expected results
    */
   @SuppressWarnings("unused")
-  public int indexSizes(final XPContext ctx, final Step step,
-      final int min) {
+  public int indexSizes(final XPContext ctx, final Step step, final int min) {
     return Integer.MAX_VALUE;
   }
 }

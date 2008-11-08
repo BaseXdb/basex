@@ -4,60 +4,59 @@ import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.XPOptimizer;
 import org.basex.query.xpath.internal.OneOf;
+import org.basex.query.xpath.item.Bln;
+import org.basex.query.xpath.item.Item;
 import org.basex.query.xpath.locpath.LocPath;
 import org.basex.query.xpath.locpath.Step;
-import org.basex.query.xpath.values.Bool;
-import org.basex.query.xpath.values.Item;
 import static org.basex.query.xpath.XPText.*;
 
 /**
- * Logical OR expression.
+ * Or expression.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Tim Petrowsky
  */
-public final class Or extends ArrayExpr {
+public final class Or extends Arr {
   /**
    * Constructor.
    * @param e expressions
    */
   public Or(final Expr[] e) {
-    exprs = e;
+    super(e);
   }
 
   @Override
-  public Bool eval(final XPContext ctx) throws QueryException {
-    for(final Expr e : exprs) if(e.eval(ctx).bool()) return Bool.TRUE;
-    return Bool.FALSE;
+  public Bln eval(final XPContext ctx) throws QueryException {
+    for(final Expr e : expr) if(e.eval(ctx).bool()) return Bln.TRUE;
+    return Bln.FALSE;
   }
 
   @Override
   public Expr comp(final XPContext ctx) throws QueryException {
-    for(int i = 0; i != exprs.length; i++) {
-      // optimize operand
-      exprs[i] = exprs[i].comp(ctx);
-
+    super.comp(ctx);
+    
+    for(int i = 0; i != expr.length; i++) {
       // check if we can simplify a location path
-      if(exprs[i] instanceof LocPath) {
-        ((LocPath) exprs[i]).addPosPred(ctx);
-      } else if(exprs[i] instanceof Item) {
+      if(expr[i] instanceof LocPath) {
+        ((LocPath) expr[i]).addPosPred(ctx);
+      } else if(expr[i] instanceof Item) {
         // simplify operand
-        if(((Item) exprs[i]).bool()) {
+        if(((Item) expr[i]).bool()) {
           // this expression is always true
           ctx.compInfo(OPTOR1);
-          return Bool.TRUE;
+          return Bln.TRUE;
         }
 
         // remove element from or expression that is always false
         ctx.compInfo(OPTOR2);
-        final Expr[] tmp = new Expr[exprs.length - 1];
-        System.arraycopy(exprs, 0, tmp, 0, i);
-        System.arraycopy(exprs, i + 1, tmp, i, exprs.length - i-- - 1);
-        exprs = tmp;
+        final Expr[] tmp = new Expr[expr.length - 1];
+        System.arraycopy(expr, 0, tmp, 0, i);
+        System.arraycopy(expr, i + 1, tmp, i, expr.length - i-- - 1);
+        expr = tmp;
       }
     }
-    if(exprs.length == 0) return Bool.FALSE;
-    if(exprs.length == 1) return exprs[0];
+    if(expr.length == 0) return Bln.FALSE;
+    if(expr.length == 1) return expr[0];
     return oneOf(ctx);
   }
   
@@ -68,25 +67,25 @@ public final class Or extends ArrayExpr {
    * @return expression
    */
   private Expr oneOf(final XPContext ctx) {
-    if(!(exprs[0] instanceof Comparison)) return this;
+    if(!(expr[0] instanceof Cmp)) return this;
 
-    final Comparison e1 = (Comparison) exprs[0];
-    if(!e1.simple()) return this;
+    final Cmp e1 = (Cmp) expr[0];
+    if(!e1.standard()) return this;
 
-    for(int e = 1; e != exprs.length; e++) {
-      if(!(exprs[e] instanceof Comparison)) return this;
-      final Comparison e2 = (Comparison) exprs[e];
-      if(!e2.simple() || e1.type != e2.type ||
-          !e1.expr1.sameAs(e2.expr1)) return this;
+    for(int e = 1; e != expr.length; e++) {
+      if(!(expr[e] instanceof Cmp)) return this;
+      final Cmp e2 = (Cmp) expr[e];
+      if(!e2.standard() || e1.type != e2.type ||
+          !e1.expr[0].sameAs(e2.expr[0])) return this;
     }
     
-    final Item[] ex = new Item[exprs.length];
-    for(int e = 0; e != exprs.length; e++) {
-      ex[e] = (Item) ((Comparison) exprs[e]).expr2;
+    final Item[] ex = new Item[expr.length];
+    for(int e = 0; e != expr.length; e++) {
+      ex[e] = (Item) ((Cmp) expr[e]).expr[1];
     }
 
     ctx.compInfo(OPTOR5);
-    return new OneOf((LocPath) e1.expr1, ex, e1.type);
+    return new OneOf((LocPath) e1.expr[0], ex, e1.type);
   }
   
   @Override
@@ -94,18 +93,18 @@ public final class Or extends ArrayExpr {
       final boolean seq)
       throws QueryException {
 
-    final Expr[] indexExprs = new Expr[exprs.length];
+    final Expr[] indexExprs = new Expr[expr.length];
     
     // find index equivalents
-    for(int i = 0; i != exprs.length; i++) {
-      indexExprs[i] = exprs[i].indexEquivalent(ctx, curr, seq);
+    for(int i = 0; i != expr.length; i++) {
+      indexExprs[i] = expr[i].indexEquivalent(ctx, curr, seq);
       if(indexExprs[i] == null) return null;
     }
 
     // perform path step only once if all path expressions are the same
     final Expr[] ex = XPOptimizer.getIndexExpr(indexExprs);
     if(ex != null) return new Path(new Union(ex),
-        ((Path) indexExprs[0]).expr2);
+        ((Path) indexExprs[0]).expr[1]);
 
     ctx.compInfo(OPTOR4);
     return new Union(indexExprs);
@@ -114,12 +113,17 @@ public final class Or extends ArrayExpr {
   @Override
   public int indexSizes(final XPContext ctx, final Step curr, final int min) {
     int sum = 0;
-    for(final Expr expr : exprs) {
-      final int nrIDs = expr.indexSizes(ctx, curr, min);
+    for(final Expr e : expr) {
+      final int nrIDs = e.indexSizes(ctx, curr, min);
       if(nrIDs == Integer.MAX_VALUE) return nrIDs;
       sum += nrIDs;
       if(sum > min) return min;
     }
     return sum > min ? min : sum;
+  }
+
+  @Override
+  public String toString() {
+    return toString(" or ");
   }
 }

@@ -7,7 +7,7 @@ import org.basex.data.Serializer;
 import org.basex.index.IndexIterator;
 import org.basex.index.RangeToken;
 import org.basex.query.xpath.XPContext;
-import org.basex.query.xpath.values.NodeSet;
+import org.basex.query.xpath.item.Nod;
 import org.basex.util.Token;
 
 /**
@@ -29,12 +29,12 @@ public final class RangeAccess extends InternalExpr {
   }
 
   @Override
-  public NodeSet eval(final XPContext ctx) {
+  public Nod eval(final XPContext ctx) {
     final IndexIterator it = ctx.item.data.ids(ind);
     final int[] ids = new int[it.size()];
     int i = 0;
     while(it.more()) ids[i++] = it.next();
-    ctx.item = new NodeSet(ids, ctx);
+    ctx.item = new Nod(ids, ctx);
     return ctx.item;
   }
 

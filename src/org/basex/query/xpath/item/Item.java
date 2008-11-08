@@ -1,4 +1,4 @@
-package org.basex.query.xpath.values;
+package org.basex.query.xpath.item;
 
 import java.io.IOException;
 import org.basex.data.Result;
@@ -48,7 +48,7 @@ public abstract class Item extends Expr implements Result {
    * @return result of comparison.
    */
   protected boolean lt(final Item v) {
-    return v instanceof NodeSet ? v.gt(this) : num() < v.num();
+    return v instanceof Nod ? v.gt(this) : num() < v.num();
   }
 
   /**
@@ -57,7 +57,7 @@ public abstract class Item extends Expr implements Result {
    * @return result of comparison.
    */
   protected boolean le(final Item v) {
-    return v instanceof NodeSet ? v.ge(this) : num() <= v.num();
+    return v instanceof Nod ? v.ge(this) : num() <= v.num();
   }
 
   /**
@@ -66,7 +66,7 @@ public abstract class Item extends Expr implements Result {
    * @return result of comparison.
    */
   protected boolean gt(final Item v) {
-    return v instanceof NodeSet ? v.lt(this) : num() > v.num();
+    return v instanceof Nod ? v.lt(this) : num() > v.num();
   }
 
   /**
@@ -75,7 +75,7 @@ public abstract class Item extends Expr implements Result {
    * @return result of comparison.
    */
   protected boolean ge(final Item v) {
-    return v instanceof NodeSet ? v.le(this) : num() >= v.num();
+    return v instanceof Nod ? v.le(this) : num() >= v.num();
   }
 
   /**
@@ -98,7 +98,7 @@ public abstract class Item extends Expr implements Result {
    * @return result of comparison.
    */
   protected boolean apprContains(final Item v) {
-    if(v instanceof NodeSet) return ((NodeSet) v).apprContainedIn(this);
+    if(v instanceof Nod) return ((Nod) v).apprContainedIn(this);
     if(ls == null) ls = new Levenshtein();
     return ls.contains(str(), v.str());
   }

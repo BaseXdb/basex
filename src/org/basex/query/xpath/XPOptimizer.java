@@ -30,13 +30,13 @@ public final class XPOptimizer {
     final Path pe = (Path) ex[0];
     
     final Expr[] tmp = new Expr[ex.length];
-    tmp[0] = pe.expr1;
+    tmp[0] = pe.expr[0];
     
     for(int e = 1; e != ex.length; e++) {
       if(!(ex[e] instanceof Path)) return null;
       final Path pe2 = (Path) ex[e];
-      if(!pe.expr2.sameAs(pe2.expr2)) return null;
-      tmp[e] = pe2.expr1;
+      if(!pe.expr[1].sameAs(pe2.expr[1])) return null;
+      tmp[e] = pe2.expr[0];
     }
     return tmp;
   }

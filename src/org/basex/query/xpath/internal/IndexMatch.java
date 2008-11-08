@@ -6,9 +6,9 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
+import org.basex.query.xpath.item.NodeBuilder;
+import org.basex.query.xpath.item.Nod;
 import org.basex.query.xpath.locpath.LocPath;
-import org.basex.query.xpath.values.NodeBuilder;
-import org.basex.query.xpath.values.NodeSet;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -39,25 +39,25 @@ public final class IndexMatch extends InternalExpr {
   }
 
   @Override
-  public NodeSet eval(final XPContext ctx) throws QueryException {
+  public Nod eval(final XPContext ctx) throws QueryException {
     // evaluate standard path
-    final NodeSet loc = path.eval(ctx);
+    final Nod loc = path.eval(ctx);
     if(loc.size == 0) return loc;
     
     // evaluate optimized expression
     final NodeBuilder result = new NodeBuilder();
 
     // match rest of path
-    final NodeSet old = ctx.item;
-    final NodeSet tmp = new NodeSet(ctx);
-    for(final int res : ((NodeSet) ctx.eval(expr)).nodes) {
+    final Nod old = ctx.item;
+    final Nod tmp = new Nod(ctx);
+    for(final int res : ((Nod) ctx.eval(expr)).nodes) {
       tmp.set(res);
       ctx.item = tmp;
       if(found(loc.nodes, match.eval(ctx).nodes)) result.add(res);
     }
 
     ctx.item = old;
-    return new NodeSet(result.finish(), ctx);
+    return new Nod(result.finish(), ctx);
     //, ctx.local.ftidpos, ctx.local.ftpointer);
   }
 

@@ -2,7 +2,7 @@ package org.basex.query.xpath.locpath;
 
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
-import org.basex.query.xpath.values.NodeSet;
+import org.basex.query.xpath.item.Nod;
 
 /**
  * Relative Location Path Expression.
@@ -12,13 +12,7 @@ import org.basex.query.xpath.values.NodeSet;
  */
 public final class LocPathRel extends LocPath {
   @Override
-  public NodeSet eval(final XPContext ctx) throws QueryException {
+  public Nod eval(final XPContext ctx) throws QueryException {
     return steps.eval(ctx);
-  }
-
-  @Override
-  public String toString() {
-    final String path = steps.toString();
-    return path.length() != 0 ? path.substring(1) : path;
   }
 }

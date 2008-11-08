@@ -2,8 +2,8 @@ package org.basex.query.xpath.expr;
 
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
+import org.basex.query.xpath.item.Bln;
 import org.basex.query.xpath.locpath.Step;
-import org.basex.query.xpath.values.Bool;
 
 /**
  * Logical FTMildNot expression.
@@ -21,12 +21,12 @@ public final class FTMildNotXP extends FTArrayExpr {
   }
 
   @Override
-  public Bool eval(final XPContext ctx) throws QueryException {
-    if(!ctx.eval(exprs[0]).bool()) return Bool.FALSE;
+  public Bln eval(final XPContext ctx) throws QueryException {
+    if(!ctx.eval(exprs[0]).bool()) return Bln.FALSE;
     
     boolean f = false;
     for(int i = 1; i < exprs.length; i++) f |= ctx.eval(exprs[i]).bool();
-    return Bool.get(!f || ctx.ftpos.pos.mildNot());
+    return Bln.get(!f || ctx.ftpos.pos.mildNot());
   }
   
   @Override

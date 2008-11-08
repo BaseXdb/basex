@@ -5,73 +5,86 @@ import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.XPOptimizer;
 import org.basex.query.xpath.internal.AllOf;
 import org.basex.query.xpath.internal.Range;
+import org.basex.query.xpath.item.Bln;
+import org.basex.query.xpath.item.Comp;
+import org.basex.query.xpath.item.Item;
 import org.basex.query.xpath.locpath.LocPath;
 import org.basex.query.xpath.locpath.Step;
-import org.basex.query.xpath.values.Bool;
-import org.basex.query.xpath.values.Comp;
-import org.basex.query.xpath.values.Item;
 import static org.basex.query.xpath.XPText.*;
 
 /**
- * Logical AND Expression.
+ * And expression.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Tim Petrowsky
  */
-public final class And extends ArrayExpr {
+public final class And extends Arr {
   /**
    * Constructor.
    * @param e expressions
    */
   public And(final Expr[] e) {
-    exprs = e;
+    super(e);
   }
 
   @Override
-  public Bool eval(final XPContext ctx) throws QueryException {
-    for(final Expr e : exprs) if(!ctx.eval(e).bool()) return Bool.FALSE;
-    return Bool.TRUE;
+  public Bln eval(final XPContext ctx) throws QueryException {
+    for(final Expr e : expr) if(!ctx.eval(e).bool()) return Bln.FALSE;
+    return Bln.TRUE;
   }
 
   @Override
   public Expr comp(final XPContext ctx) throws QueryException {
-    for(int e = 0; e != exprs.length; e++) {
+    super.comp(ctx);
+    
+    for(int e = 0; e != expr.length; e++) {
       // check if we can add a position predicate to match only the first title
-      if(exprs[e] instanceof LocPath) {
-        ((LocPath) exprs[e]).addPosPred(ctx);
-      } else if(exprs[e] instanceof Item) {
+      if(expr[e] instanceof LocPath) {
+        ((LocPath) expr[e]).addPosPred(ctx);
+      } else if(expr[e] instanceof Item) {
         // simplify operand
-        if(!((Item) exprs[e]).bool()) {
+        if(!((Item) expr[e]).bool()) {
           // this expression will always be false; remove expression
           ctx.compInfo(OPTAND1);
-          return Bool.FALSE;
+          return Bln.FALSE;
         }
 
         // remove element from and expression that is always true
         ctx.compInfo(OPTAND2);
-        final Expr[] tmp = new Expr[exprs.length - 1];
-        System.arraycopy(exprs, 0, tmp, 0, e);
-        System.arraycopy(exprs, e + 1, tmp, e, exprs.length - e-- - 1);
-        exprs = tmp;
+        final Expr[] tmp = new Expr[expr.length - 1];
+        System.arraycopy(expr, 0, tmp, 0, e);
+        System.arraycopy(expr, e + 1, tmp, e, expr.length - e-- - 1);
+        expr = tmp;
       }
-      exprs[e] = exprs[e].comp(ctx);
     }
-    if(exprs.length == 0) return Bool.TRUE;
-    if(exprs.length == 1) return exprs[0];
+    if(expr.length == 0) return Bln.TRUE;
+    if(expr.length == 1) return expr[0];
+
+    // merge several position tests to a single one
+    Pos pos = new Pos(Integer.MIN_VALUE, Integer.MAX_VALUE);
+    for(final Expr e : expr) {
+      if(!(e instanceof Pos)) {
+        pos = null;
+        break;
+      }
+      pos.min = Math.max(pos.min, ((Pos) e).min);
+      pos.max = Math.min(pos.max, ((Pos) e).max);
+    }
+    if(pos != null) return pos;
     
     // optimization to speedup range queries (not that elegant yet)
-    if(exprs.length == 2 && exprs[0] instanceof Comparison &&
-        exprs[1] instanceof Comparison) {
-      final Comparison r1 = (Comparison) exprs[0];
-      final Comparison r2 = (Comparison) exprs[1];
-      if(!r1.simple() || !r2.simple()) return this;
-      final LocPath p1 = (LocPath) r1.expr1;
-      final LocPath p2 = (LocPath) r2.expr1;
+    if(expr.length == 2 && expr[0] instanceof Cmp &&
+        expr[1] instanceof Cmp) {
+      final Cmp r1 = (Cmp) expr[0];
+      final Cmp r2 = (Cmp) expr[1];
+      if(!r1.standard() || !r2.standard()) return this;
+      final LocPath p1 = (LocPath) r1.expr[0];
+      final LocPath p2 = (LocPath) r2.expr[0];
       
       // [CG] support GT & LT
       if(r1.type == Comp.GE && r2.type == Comp.LE && p1.sameAs(p2)) {
         ctx.compInfo(OPTRANGE);
-        return new Range(p1, (Item) r1.expr2, (Item) r2.expr2);
+        return new Range(p1, (Item) r1.expr[1], (Item) r2.expr[1]);
       }
     }
     return allOf(ctx);
@@ -84,46 +97,45 @@ public final class And extends ArrayExpr {
    * @return expression
    */
   private Expr allOf(final XPContext ctx) {
-    if(!(exprs[0] instanceof Comparison)) return this;
+    if(!(expr[0] instanceof Cmp)) return this;
 
-    final Comparison e1 = (Comparison) exprs[0];
-    if(!e1.simple()) return this;
+    final Cmp e1 = (Cmp) expr[0];
+    if(!e1.standard()) return this;
 
-    for(int e = 1; e != exprs.length; e++) {
-      if(!(exprs[e] instanceof Comparison)) return this;
-      final Comparison e2 = (Comparison) exprs[e];
-      if(!e2.simple() || e1.type != e2.type ||
-          !e1.expr1.sameAs(e2.expr1)) return this;
+    for(int e = 1; e != expr.length; e++) {
+      if(!(expr[e] instanceof Cmp)) return this;
+      final Cmp e2 = (Cmp) expr[e];
+      if(!e2.standard() || e1.type != e2.type ||
+         !e1.expr[0].sameAs(e2.expr[0])) return this;
     }
     
-    final Item[] ex = new Item[exprs.length];
-    for(int e = 0; e != exprs.length; e++) {
-      ex[e] = (Item) ((Comparison) exprs[e]).expr2;
+    final Item[] ex = new Item[expr.length];
+    for(int e = 0; e != expr.length; e++) {
+      ex[e] = (Item) ((Cmp) expr[e]).expr[1];
     }
     
     ctx.compInfo(OPTAND5);
-    return new AllOf((LocPath) e1.expr1, ex, e1.type);
+    return new AllOf((LocPath) e1.expr[0], ex, e1.type);
   }
   
   @Override
   public Expr indexEquivalent(final XPContext ctx, final Step curr, 
-      final boolean seq)
-      throws QueryException {
+      final boolean seq) throws QueryException {
     
-    final int el = exprs.length;
+    final int el = expr.length;
     if(el == 0) return null;
     final Expr[] indexExprs = new Expr[el];
     
     // find index equivalents
     for(int i = 0; i != el; i++) {
-      indexExprs[i] = exprs[i].indexEquivalent(ctx, curr, seq);
+      indexExprs[i] = expr[i].indexEquivalent(ctx, curr, seq);
       if(indexExprs[i] == null) return null;
     }
 
     // perform path step only once if all path expressions are the same
     final Expr[] ex = XPOptimizer.getIndexExpr(indexExprs);
     if(ex != null) return new Path(new InterSect(ex),
-        ((Path) indexExprs[0]).expr2);
+        ((Path) indexExprs[0]).expr[1]);
 
     ctx.compInfo(OPTAND4);
     return new InterSect(indexExprs).comp(ctx);
@@ -132,11 +144,16 @@ public final class And extends ArrayExpr {
   @Override
   public int indexSizes(final XPContext ctx, final Step curr, final int min) {
     int max = Integer.MIN_VALUE;
-    for(final Expr expr : exprs) {
-      final int nrIDs = expr.indexSizes(ctx, curr, min);
+    for(final Expr e : expr) {
+      final int nrIDs = e.indexSizes(ctx, curr, min);
       if(nrIDs == 0 || nrIDs > min) return nrIDs;
       if(max < nrIDs) max = nrIDs;
     }
     return max;
+  }
+
+  @Override
+  public String toString() {
+    return toString(" and ");
   }
 }

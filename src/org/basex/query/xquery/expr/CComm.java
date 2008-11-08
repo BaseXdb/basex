@@ -56,9 +56,4 @@ public final class CComm extends Single {
   public String info() {
     return "Comment constructor";
   }
-
-  @Override
-  public String color() {
-    return "FF3333";
-  }
 }

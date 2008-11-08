@@ -3,8 +3,8 @@ package org.basex.query.xpath.func;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.values.Literal;
-import org.basex.query.xpath.values.Item;
+import org.basex.query.xpath.item.Item;
+import org.basex.query.xpath.item.Str;
 import org.basex.util.Token;
 
 /**
@@ -23,13 +23,13 @@ public final class SubstringAfter extends Func {
   }
 
   @Override
-  public Literal eval(final XPContext ctx) throws QueryException {
+  public Str eval(final XPContext ctx) throws QueryException {
     final Item[] v = evalArgs(ctx);
     final byte[] b1 = v[0].str();
     final byte[] b2 = v[1].str();
     final int i = Token.indexOf(b1, b2);
-    return i == -1 ? new Literal(Token.EMPTY) :
-      new Literal(Token.substring(b1, i + b2.length, b1.length));
+    return i == -1 ? new Str(Token.EMPTY) :
+      new Str(Token.substring(b1, i + b2.length, b1.length));
   }
 
   @Override

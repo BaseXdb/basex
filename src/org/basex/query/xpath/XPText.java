@@ -121,9 +121,9 @@ public interface XPText {
   /** Optimization info. */
   String OPTCALC = "Pre-evaluating expression";
   /** Optimization info. */
-  String OPTFUNC = "Pre-evaluating %";
+  String OPTCMP = "Pre-evaluating constant comparison";
   /** Optimization info. */
-  String OPTRELATIONAL = "Pre-evaluating relational expression";
+  String OPTFUNC = "Pre-evaluating %";
   /** Optimization info. */
   String OPTLOC = "Removing location path with no results";
   /** Optimization info. */
@@ -152,8 +152,6 @@ public interface XPText {
   String OPTOR5 = "Replacing OR by ONEOF expression";
   /** Optimization info. */
   String OPTEQ1 = "Removing comparison for empty nodeset";
-  /** Optimization info. */
-  String OPTEQ2 = "Removing constant comparison";
   /** Optimization info. */
   String OPTSELF = "Removing superfluous self axes";
   /** Optimization info. */

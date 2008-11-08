@@ -4,8 +4,8 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
+import org.basex.query.xpath.item.Bln;
 import org.basex.query.xpath.locpath.Step;
-import org.basex.query.xpath.values.Bool;
 
 /**
  * Logical FTUnaryNot expression.
@@ -23,8 +23,8 @@ public final class FTUnaryNot extends FTArrayExpr {
   }
 
   @Override
-  public Bool eval(final XPContext ctx) throws QueryException {
-    return Bool.get(!exprs[0].eval(ctx).bool()); 
+  public Bln eval(final XPContext ctx) throws QueryException {
+    return Bln.get(!exprs[0].eval(ctx).bool()); 
   }
 
   @Override

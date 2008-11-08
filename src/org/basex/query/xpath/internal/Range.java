@@ -1,9 +1,7 @@
 package org.basex.query.xpath.internal;
 
 import static org.basex.query.xpath.XPText.*;
-
 import java.io.IOException;
-
 import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.data.StatsKey;
@@ -13,15 +11,15 @@ import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
 import org.basex.query.xpath.expr.Path;
+import org.basex.query.xpath.item.Bln;
+import org.basex.query.xpath.item.Item;
+import org.basex.query.xpath.item.Nod;
 import org.basex.query.xpath.locpath.Axis;
 import org.basex.query.xpath.locpath.LocPath;
 import org.basex.query.xpath.locpath.LocPathRel;
 import org.basex.query.xpath.locpath.Step;
 import org.basex.query.xpath.locpath.TestName;
 import org.basex.query.xpath.locpath.TestNode;
-import org.basex.query.xpath.values.Bool;
-import org.basex.query.xpath.values.NodeSet;
-import org.basex.query.xpath.values.Item;
 import org.basex.util.Token;
 
 /**
@@ -51,23 +49,23 @@ public final class Range extends InternalExpr {
   }
 
   @Override
-  public Bool eval(final XPContext ctx)
+  public Bln eval(final XPContext ctx)
       throws QueryException {
 
     final Item v = ctx.eval(expr);
-    if(v.size() == 0) return Bool.FALSE;
+    if(v.size() == 0) return Bln.FALSE;
 
-    if(v instanceof NodeSet) {
-      final NodeSet nodes = (NodeSet) v;
+    if(v instanceof Nod) {
+      final Nod nodes = (Nod) v;
       final Data data = nodes.data;
       for(int n = 0; n < nodes.size; n++) {
         final double d = data.atomNum(nodes.nodes[n]);
-        if(d >= min && d <= max) return Bool.TRUE;
+        if(d >= min && d <= max) return Bln.TRUE;
       }
-      return Bool.FALSE;
+      return Bln.FALSE;
     }
     final double d = v.num();
-    return Bool.get(d >= min && d <= max);
+    return Bln.get(d >= min && d <= max);
   }
   
   /** Index type. */

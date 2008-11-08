@@ -8,9 +8,9 @@ import org.basex.data.Serializer;
 import org.basex.query.FTOpt.FTMode;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.internal.FTIndex;
+import org.basex.query.xpath.item.Bln;
+import org.basex.query.xpath.item.Item;
 import org.basex.query.xpath.locpath.Step;
-import org.basex.query.xpath.values.Bool;
-import org.basex.query.xpath.values.Item;
 
 /**
  * Fulltext primary expression and FTTimes.
@@ -41,7 +41,7 @@ public final class FTWords extends FTArrayExpr {
 
   @Override
   public Item eval(final XPContext ctx) {
-    return Bool.get(contains(ctx));
+    return Bln.get(contains(ctx));
   }
   
   @Override

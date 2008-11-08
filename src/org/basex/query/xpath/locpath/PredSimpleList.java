@@ -52,11 +52,11 @@ public final class PredSimpleList {
       
       for (int i = 0; i < size; i++) {
         ftc2 = (FTContains) list[i].expr;
-        if (ftc1.expr1.sameAs(ftc2.expr1)) {
+        if (ftc1.expr[0].sameAs(ftc2.expr[0])) {
           // sum 
             if (check(ftc1, ftc2)) {
-              final FTSelect fts1 = (FTSelect) ftc1.expr2;
-              final FTSelect fts2 = (FTSelect) ftc2.expr2;
+              final FTSelect fts1 = (FTSelect) ftc1.expr[1];
+              final FTSelect fts2 = (FTSelect) ftc2.expr[1];
               if (fts2.getExpr() instanceof FTAnd) {
                 FTAnd ftand = (FTAnd) fts2.getExpr();
                 ftand.add(fts1.getExpr());
@@ -67,11 +67,11 @@ public final class PredSimpleList {
               }
             } else {
               FTAnd fta = new FTAnd(new FTArrayExpr[]{
-                  (FTArrayExpr) ftc2.expr2, (FTArrayExpr) ftc1.expr2});
+                  (FTArrayExpr) ftc2.expr[1], (FTArrayExpr) ftc1.expr[1]});
               final FTSelect fts 
                 = new FTSelect(fta, new FTPositionFilter(new FTPos()));
               
-              ftc2.expr2 = fts;
+              ftc2.expr[1] = fts;
           }
           return i;
         }
@@ -92,9 +92,9 @@ public final class PredSimpleList {
    * @return boolean result
    */
   private boolean check(final FTContains ftc1, final FTContains ftc2) {
-    if (ftc1.expr2 instanceof FTSelect && ftc2.expr2 instanceof FTSelect) {
-      final FTSelect fts1 = (FTSelect) ftc1.expr2;
-      final FTSelect fts2 = (FTSelect) ftc2.expr2;
+    if (ftc1.expr[1] instanceof FTSelect && ftc2.expr[1] instanceof FTSelect) {
+      final FTSelect fts1 = (FTSelect) ftc1.expr[1];
+      final FTSelect fts2 = (FTSelect) ftc2.expr[1];
       return fts1.checkSumUp(fts2.ftpos);
     }
     return false;

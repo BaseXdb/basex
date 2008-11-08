@@ -4,12 +4,12 @@ import org.basex.index.Names;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
+import org.basex.query.xpath.item.Dbl;
+import org.basex.query.xpath.item.Item;
+import org.basex.query.xpath.item.Nod;
 import org.basex.query.xpath.locpath.Axis;
 import org.basex.query.xpath.locpath.LocPathAbs;
 import org.basex.query.xpath.locpath.Steps;
-import org.basex.query.xpath.values.NodeSet;
-import org.basex.query.xpath.values.Num;
-import org.basex.query.xpath.values.Item;
 import static org.basex.query.xpath.XPText.*;
 
 /**
@@ -28,10 +28,10 @@ public final class Count extends Func {
   }
 
   @Override
-  public Num eval(final XPContext ctx) throws QueryException {
+  public Dbl eval(final XPContext ctx) throws QueryException {
     final Item[] v = evalArgs(ctx);
-    return v[0] instanceof NodeSet ?
-        new Num(((NodeSet) v[0]).nodes.length) : Num.ONE;
+    return v[0] instanceof Nod ?
+        new Dbl(((Nod) v[0]).nodes.length) : Dbl.ONE;
   }
 
   @Override
@@ -70,14 +70,14 @@ public final class Count extends Func {
         num = tags.counter(n2) - (n1 == n2 ? 1 : 0);
       }
       ctx.compInfo(OPTFUNC, desc);
-      return new Num(num);
+      return new Dbl(num);
     }
     
     // return number of static items
     if(args[0] instanceof Item) {
       ctx.compInfo(OPTFUNC, desc);
-      return args[0] instanceof NodeSet ?
-          new Num(((NodeSet) args[0]).nodes.length) : Num.ONE;
+      return args[0] instanceof Nod ?
+          new Dbl(((Nod) args[0]).nodes.length) : Dbl.ONE;
     }
     return this;
   }

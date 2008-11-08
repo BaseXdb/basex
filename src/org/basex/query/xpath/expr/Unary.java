@@ -4,8 +4,8 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
-import org.basex.query.xpath.values.Num;
-import org.basex.query.xpath.values.Item;
+import org.basex.query.xpath.item.Item;
+import org.basex.query.xpath.item.Dbl;
 
 /**
  * XPath Unary Expression. The result of this expression is the change of the
@@ -27,8 +27,14 @@ public final class Unary extends Expr {
   }
 
   @Override
-  public Num eval(final XPContext ctx) throws QueryException {
-    return new Num(-ctx.eval(expr).num());
+  public Expr comp(final XPContext ctx) throws QueryException {
+    expr = expr.comp(ctx);
+    return expr instanceof Item ? new Dbl(-((Item) expr).num()) : this;
+  }
+
+  @Override
+  public Dbl eval(final XPContext ctx) throws QueryException {
+    return new Dbl(-ctx.eval(expr).num());
   }
 
   @Override
@@ -42,15 +48,8 @@ public final class Unary extends Expr {
   }
 
   @Override
-  public Expr comp(final XPContext ctx) throws QueryException {
-    expr = expr.comp(ctx);
-    return expr instanceof Item ? new Num(-((Item) expr).num()) :
-      this;
-  }
-
-  @Override
   public String toString() {
-    return '-' + expr.toString();
+    return "-" + expr;
   }
 
   @Override

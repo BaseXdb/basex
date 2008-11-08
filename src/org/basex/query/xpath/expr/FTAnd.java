@@ -2,8 +2,8 @@ package org.basex.query.xpath.expr;
 
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
+import org.basex.query.xpath.item.Bln;
 import org.basex.query.xpath.locpath.Step;
-import org.basex.query.xpath.values.Bool;
 import org.basex.util.IntList;
 
 /**
@@ -27,13 +27,13 @@ public final class FTAnd extends FTArrayExpr {
   }
 
   @Override
-  public Bool eval(final XPContext ctx) throws QueryException {
+  public Bln eval(final XPContext ctx) throws QueryException {
     for(final Expr e : exprs) 
       if(!ctx.eval(e).bool()) 
-        return Bool.get(false);
+        return Bln.get(false);
     
     
-    return Bool.get(true);
+    return Bln.get(true);
   }
 
   @Override

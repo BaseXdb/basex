@@ -55,11 +55,6 @@ public final class Root extends Expr {
   }
 
   @Override
-  public String color() {
-    return "FFCC66";
-  }
-
-  @Override
   public String toString() {
     return "root()";
   }

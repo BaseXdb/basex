@@ -9,7 +9,7 @@ import org.basex.query.xquery.util.Err;
 import org.basex.query.xquery.util.NodeBuilder;
 
 /**
- * Expression List.
+ * Union Expression.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
@@ -44,10 +44,5 @@ public final class Union extends Arr {
   @Override
   public String toString() {
     return toString(" | ");
-  }
-
-  @Override
-  public String color() {
-    return "FF3300";
   }
 }

@@ -3,7 +3,7 @@ package org.basex.query.xpath.locpath;
 import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
-import org.basex.query.xpath.values.NodeBuilder;
+import org.basex.query.xpath.item.NodeBuilder;
 
 /**
  * Self Step.

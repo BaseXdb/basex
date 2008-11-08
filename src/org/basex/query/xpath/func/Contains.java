@@ -5,9 +5,9 @@ import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.values.Bool;
-import org.basex.query.xpath.values.NodeSet;
-import org.basex.query.xpath.values.Item;
+import org.basex.query.xpath.item.Bln;
+import org.basex.query.xpath.item.Item;
+import org.basex.query.xpath.item.Nod;
 import org.basex.util.Token;
 
 /**
@@ -26,22 +26,22 @@ public final class Contains extends Func {
   }
 
   @Override
-  public Bool eval(final XPContext ctx) throws QueryException {
+  public Bln eval(final XPContext ctx) throws QueryException {
     final Item[] v = evalArgs(ctx);
     // don't evaluate empty node sets
     final int s1 = v[0].size();
     final int s2 = v[1].size();
-    if(s1 == 0 || s2 == 0) return Bool.FALSE;
-    if(v[0] instanceof NodeSet && s2 == 1) {
-      final NodeSet nodes = (NodeSet) v[0];
+    if(s1 == 0 || s2 == 0) return Bln.FALSE;
+    if(v[0] instanceof Nod && s2 == 1) {
+      final Nod nodes = (Nod) v[0];
       final Data data = nodes.data;
       final byte[] lit = v[1].str();
       for(int n = 0; n < nodes.size; n++) {
-        if(Token.contains(data.atom(nodes.nodes[n]), lit)) return Bool.TRUE;
+        if(Token.contains(data.atom(nodes.nodes[n]), lit)) return Bln.TRUE;
       }
-      return Bool.FALSE;
+      return Bln.FALSE;
     }
-    return Bool.get(Token.contains(v[0].str(), v[1].str()));
+    return Bln.get(Token.contains(v[0].str(), v[1].str()));
   }
 
   @Override
@@ -52,9 +52,9 @@ public final class Contains extends Func {
   @Override
   public Expr comp(final XPContext ctx) throws QueryException {
     super.comp(ctx);
-    if(args[0] instanceof NodeSet && ((NodeSet) args[0]).size == 0) {
+    if(args[0] instanceof Nod && ((Nod) args[0]).size == 0) {
       ctx.compInfo(OPTFUNC, desc);
-      return Bool.FALSE;
+      return Bln.FALSE;
     }
     return this;
   }

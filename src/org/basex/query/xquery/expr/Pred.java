@@ -111,9 +111,4 @@ public class Pred extends Arr {
     for(final Expr e : expr) e.plan(ser);
     ser.closeElement();
   }
-
-  @Override
-  public final String color() {
-    return "FF6666";
-  }
 }

@@ -6,9 +6,9 @@ import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.values.NodeBuilder;
-import org.basex.query.xpath.values.NodeSet;
-import org.basex.query.xpath.values.Item;
+import org.basex.query.xpath.item.Item;
+import org.basex.query.xpath.item.NodeBuilder;
+import org.basex.query.xpath.item.Nod;
 import org.basex.util.Token;
 
 /**
@@ -31,7 +31,7 @@ public final class Nodes extends Func {
   }
 
   @Override
-  public NodeSet eval(final XPContext ctx) throws QueryException {
+  public Nod eval(final XPContext ctx) throws QueryException {
     final Data data = ctx.item.data;
     final int size = data.size;
     final NodeBuilder tmp = new NodeBuilder();
@@ -42,7 +42,7 @@ public final class Nodes extends Func {
       if(pre < 0 || pre >= size) throw new QueryException(INVALIDPRE, v);
       tmp.add(pre);
     }
-    return new NodeSet(tmp.finish(), ctx);
+    return new Nod(tmp.finish(), ctx);
   }
 
   @Override

@@ -1,16 +1,14 @@
 package org.basex.query.xpath.locpath;
 
 import static org.basex.query.xpath.XPText.*;
-
 import java.io.IOException;
-
 import org.basex.data.Serializer;
 import org.basex.query.ExprInfo;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.values.NodeBuilder;
-import org.basex.query.xpath.values.NodeSet;
+import org.basex.query.xpath.item.Nod;
+import org.basex.query.xpath.item.NodeBuilder;
 import org.basex.util.Array;
 
 /**
@@ -25,7 +23,7 @@ public final class Preds extends ExprInfo {
   /** Number of steps. */
   private int size;
   /** Temporary node set. */
-  private NodeSet tmp;
+  private Nod tmp;
   
   /**
    * Returns the number of location steps.
@@ -70,15 +68,6 @@ public final class Preds extends ExprInfo {
   }
 
   /**
-   * Adds a position predicate.
-   * @param min minimum value
-   * @param max maximum value
-   */
-  public void add(final int min, final int max) {
-    add(new PredPos(min, max));
-  }
-
-  /**
    * Evaluates the predicates.
    * @param ctx query context
    * @param nodes nodes to be evaluated
@@ -88,7 +77,7 @@ public final class Preds extends ExprInfo {
   public void eval(final XPContext ctx, final NodeBuilder nodes,
       final NodeBuilder result) throws QueryException {
 
-    final NodeSet ns = ctx.item;
+    final Nod ns = ctx.item;
     NodeBuilder n = nodes;
     ctx.item = tmp;
     for(int s = 0; s < size; s++) {
@@ -112,7 +101,7 @@ public final class Preds extends ExprInfo {
   boolean earlyEval(final XPContext ctx, final NodeBuilder result,
       final int pre, final int[] pos) throws QueryException {
 
-    final NodeSet ns = ctx.item;
+    final Nod ns = ctx.item;
     ctx.item = tmp;
     tmp.set(pre);
     tmp.currSize = -1;
@@ -140,7 +129,7 @@ public final class Preds extends ExprInfo {
   void posEval(final XPContext ctx, final int pre,
       final NodeBuilder result) throws QueryException {
 
-    final NodeSet ns = ctx.item;
+    final Nod ns = ctx.item;
     ctx.item = tmp;
     tmp.set(pre);
     tmp.currSize = 1;
@@ -161,34 +150,19 @@ public final class Preds extends ExprInfo {
    * @throws QueryException evaluation exception
    */
   public boolean compile(final XPContext ctx) throws QueryException {
-    tmp = new NodeSet(ctx);
-    PredSimpleList p = new PredSimpleList(size);
+    tmp = new Nod(ctx);
+    
     for(int j = 0; j < size; j++) {
-      final Pred pred = preds[j].compile(ctx);
-      if(pred.alwaysFalse()) {
+      preds[j] = preds[j].compile(ctx);
+      if(preds[j].alwaysFalse()) {
         ctx.compInfo(OPTEMPTY);
-        size = 0;
         return false;
       }
-
-      if(pred.alwaysTrue()) {
+      if(preds[j].alwaysTrue()) {
         ctx.compInfo(OPTTRUE);
-        remove(j);
-      } else {
-        preds[j] = pred;
-      }
-      
-      if (pred instanceof PredSimple) {
-        p.add((PredSimple) pred);
+        remove(j--);
       }
     }
-    
-    if (p.size > 0 && p.size < size) {
-      preds = p.finish();
-      size = p.size;
-      ctx.compInfo(OPTSUMPREDS);
-    }
-    
     return true;
   }
 

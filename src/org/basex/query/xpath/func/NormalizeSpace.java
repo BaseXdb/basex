@@ -3,7 +3,7 @@ package org.basex.query.xpath.func;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.values.Literal;
+import org.basex.query.xpath.item.Str;
 import org.basex.util.Token;
 
 /**
@@ -22,8 +22,8 @@ public final class NormalizeSpace extends Func {
   }
 
   @Override
-  public Literal eval(final XPContext ctx) throws QueryException {
-    return new Literal(Token.norm(evalArgs(ctx)[0].str()));
+  public Str eval(final XPContext ctx) throws QueryException {
+    return new Str(Token.norm(evalArgs(ctx)[0].str()));
   }
 
   @Override

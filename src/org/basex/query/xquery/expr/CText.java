@@ -64,9 +64,4 @@ public final class CText extends Single {
   public String info() {
     return "Text constructor";
   }
-
-  @Override
-  public String color() {
-    return "FF3333";
-  }
 }
