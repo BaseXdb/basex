@@ -45,7 +45,7 @@ public final class PlotView extends View implements Runnable {
   /** Plot margin: top, left, bottom, right margin. */
   private static final int[] MARGIN = new int[4];
   /** Whitespace between captions. */
-  static final int CAPTIONWHITESPACE = 30;
+  static final int CAPTIONWHITESPACE = 10;
   /** Data reference. */
   PlotData plotData;
   /** Item image. */
@@ -411,9 +411,8 @@ public final class PlotView extends View implements Runnable {
     final int fs = GUIProp.fontsize;
     String cap = caption;
     
-    // if assignment consists of more than 10 characters the caption string
-    // is chopped to the length 10 to avoid layout issues
-    if(cap.length() > 10) cap = cap.substring(0, 10) + "...";
+    // if label is too long, it is is chopped to the first characters
+    if(cap.length() > 10) cap = cap.substring(0, 9) + "..";
 
     // caption labels are rotated, for both x and y axis. first a buffered
     // image is created which displays the rotated label ...
@@ -434,10 +433,10 @@ public final class PlotView extends View implements Runnable {
     g.setColor(GUIConstants.back);
     if(drawX) {
       final int y = h - MARGIN[2];
-      g.drawImage(img, pos - imgW + textH - fs, y + fs / 4, this);
+      g.drawImage(img, pos - imgW + textH - fs, y, this);
       g.drawLine(pos, MARGIN[0], pos, y + fs / 2);
     } else {
-      g.drawImage(img, MARGIN[1] - imgW - fs, pos - fs, this);
+      g.drawImage(img, MARGIN[1] - imgW - fs / 2, pos - fs, this);
       g.drawLine(MARGIN[1] - fs / 2, pos, w - MARGIN[3], pos);
     }
   }

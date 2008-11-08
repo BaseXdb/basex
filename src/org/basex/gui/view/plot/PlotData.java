@@ -46,7 +46,7 @@ public final class PlotData {
   TokenList getItems() {
     final Data data = GUI.context.data();
     final TokenList tl = new TokenList();
-    for(final byte[] k : data.skel.desc(EMPTY, true, false)) {
+    for(final byte[] k : data.skel.desc(EMPTY, true, true)) {
       if(getCategories(k).size > 1) tl.add(k);
     }
     return tl;

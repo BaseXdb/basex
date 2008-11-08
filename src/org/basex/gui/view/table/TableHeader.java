@@ -418,7 +418,7 @@ final class TableHeader extends BaseXPanel {
 
   @Override
   public void keyReleased(final KeyEvent e) {
-    if(tdata.roots.size == 0) return;
+    if(tdata.roots == null || tdata.roots.size == 0) return;
     shift = e.isShiftDown();
     ctrl = e.isControlDown();
     alt = e.isAltDown();

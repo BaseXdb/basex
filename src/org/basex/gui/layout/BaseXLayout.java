@@ -325,7 +325,6 @@ public final class BaseXLayout {
     int fw = 0;
     int l = 0;
     try {
-      // ignore faulty character sets
       for(int k = 0; k < j; k += l) {
         final int ww = width(g, cw, cp(s, k));
         if(fw + ww >= w - 4) {

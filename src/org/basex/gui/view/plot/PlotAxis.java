@@ -2,7 +2,6 @@ package org.basex.gui.view.plot;
 
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
-
 import org.basex.data.Data;
 import org.basex.data.StatsKey;
 import org.basex.data.StatsKey.Kind;
@@ -170,7 +169,7 @@ public final class PlotAxis {
       final byte[] b = vals[i];
       // l: highest index in sorted array for value b
       int l = i;
-      // determing highest index of value/category b
+      // determining highest index of value/category b
       while(l < vl && eq(vals[l], b)) {
         l++;
       }
@@ -251,17 +250,15 @@ public final class PlotAxis {
     int fsplus = 6;
     final boolean fss = data.fs != null && !isTag && 
       eq(data.atts.key(attrID), SIZE);
-//    final boolean fss = false;
+
     final double range = max - min;
     final double lmin = min - range / 2;
     final double lmax = max + range / 2;
-    final double rangePow = Math.floor(fss ? 
-        Math.log(Math.pow(Math.E, Math.exp(2))) : Math.log10(range) + .5d);
+    final double rangePow = Math.floor(fss ? 10 : Math.log10(range) + .5d);
     final double lstep = (int) (Math.pow(fss ? 2 : 10, 
         fss ? rangePow + fsplus : rangePow));
     calculatedCaptionStep = (int) (Math.pow(fss ? 2 : 10, rangePow - 
         (fss ? -fsplus : 1)));
-//    calculatedCaptionStep = (int) (Math.pow(10, rangePow - 1));
     
     // find minimum axis assignment
     double c = Math.floor(min);
