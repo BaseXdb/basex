@@ -343,11 +343,11 @@ public final class PlotView extends View implements Runnable {
     
     // determine axis caption for TEXT / INT / DBL data
     if(type == Kind.TEXT) {
-//      final int nrCats = axis.nrCats; 
+      final int nrCats = axis.nrCats;
       final double[] coSorted = Arrays.copyOf(axis.co, axis.co.length);
       // draw min / max caption
-      drawCaptionAndGrid(g, drawX, string(axis.firstCat), 0);
-      drawCaptionAndGrid(g, drawX, string(axis.lastCat), 1);
+      drawCaptionAndGrid(g, drawX, nrCats > 1 ? string(axis.firstCat) : "", 0);
+      drawCaptionAndGrid(g, drawX, nrCats > 1 ? string(axis.lastCat) : "", 1);
       // return if insufficient plot space
       if(nrCaptions == 0) return;
       
@@ -375,6 +375,14 @@ public final class PlotView extends View implements Runnable {
           op += capRange;
         }
         i++;
+      }
+      if(nrCats == 1) {
+        op = .5d;
+        int j = 0;
+        // find value for given plot position
+        while(j < axis.co.length && axis.co[j] != op) j++;
+        drawCaptionAndGrid(g, drawX, 
+            string(axis.getValue(plotData.pres[j])), op);
       }
       
     } else {
