@@ -1,8 +1,9 @@
 package org.basex.gui.view.plot;
 
-import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
+
 import org.basex.data.Data;
+import org.basex.data.DataText;
 import org.basex.data.StatsKey;
 import org.basex.data.StatsKey.Kind;
 import org.basex.gui.GUI;
@@ -152,14 +153,13 @@ public final class PlotAxis {
 
     // 2 additional empty categories are added for layout reasons -> +2
     nrCats = set.size();
+    // empty string is treated as non existing value -> coordinate = -1
     if(i > 0) nrCats--;
     set = null;
     
     // get first/last category for axis caption
-    byte[] c = vals[i];
-    firstCat = c.length == 0 ? token("\" \"") : c;
-    c = vals[vl - 1];
-    lastCat = c.length == 0 ? token("\" \"") : c;
+    firstCat = vals[i];
+    lastCat = vals[vl - 1];
     
     // number of current category / position of item value in ordered 
     // text set.
@@ -249,7 +249,7 @@ public final class PlotAxis {
     final Data data = GUI.context.data();
     int fsplus = 6;
     final boolean fss = data.fs != null && !isTag && 
-      eq(data.atts.key(attrID), SIZE);
+      eq(data.atts.key(attrID), DataText.SIZE);
 
     final double range = max - min;
     final double lmin = min - range / 2;
@@ -310,15 +310,5 @@ public final class PlotAxis {
         nrCaptions = nrCats;
       captionStep = 1.0d / (nrCaptions - 1);
     }
-  }
-  
-  /**
-   * Returns the caption text for a specific relative coordinate in the plot.
-   * @param i nrCaption index
-   * @return calculated caption
-   */
-  String getCaption(final int i) {
-    String s = Integer.toString(i);
-    return s;
   }
 }

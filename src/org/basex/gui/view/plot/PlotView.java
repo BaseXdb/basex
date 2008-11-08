@@ -184,7 +184,9 @@ public final class PlotView extends View implements Runnable {
     
     // overdraw plot background
     g.setColor(GUIConstants.color1);
-    g.fillRect(MARGIN[1] , MARGIN[0], plotWidth, plotHeight);
+    final int noval = noValueSize();
+    g.fillRect(MARGIN[1] + noval, MARGIN[0], plotWidth - noval, 
+        plotHeight - noval);
     
     // draw axis and grid
     drawAxis(g, true);
@@ -451,7 +453,7 @@ public final class PlotView extends View implements Runnable {
     final int novalue = noValueSize();
     if(drawX) {
       // items with value -1 lack a value for the specific attribute
-      if(d == -1) return MARGIN[1] + novalue / 4;
+      if(d == -1) return (int) (MARGIN[1] + novalue * .35d);
       final int width = getWidth();
       final int xSpace = width - (MARGIN[1] + MARGIN[3]) - novalue;
       final int x = (int) (d * xSpace);
