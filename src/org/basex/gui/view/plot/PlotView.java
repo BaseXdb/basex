@@ -387,9 +387,12 @@ public final class PlotView extends View implements Runnable {
       
     } else {
       int i = 1;
+      final boolean noRange = axis.max - axis.min == 0;
       // draw min/max caption
-      drawCaptionAndGrid(g, drawX, formatString(axis.min, drawX), 0);
-      drawCaptionAndGrid(g, drawX, formatString(axis.max, drawX), 1);
+      drawCaptionAndGrid(g, drawX, noRange ? "" : 
+        formatString(axis.min, drawX), 0);
+      drawCaptionAndGrid(g, drawX, noRange ? "" : 
+        formatString(axis.max, drawX), 1);
       // return if insufficient plot space
       if(nrCaptions == 0) return;
 

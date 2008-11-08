@@ -245,7 +245,7 @@ public final class PlotAxis {
     if(min == Integer.MAX_VALUE) min = 0;
     if(max == Integer.MIN_VALUE) max = 0;
     
-    // flag for deepFS @size attribute
+//    // flag for deepFS @size attribute
     final Data data = GUI.context.data();
     int fsplus = 6;
     final boolean fss = data.fs != null && !isTag && 
