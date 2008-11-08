@@ -1,0 +1,35 @@
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>BaseX4.jar</jar>
+  <outfile>BaseX.exe</outfile>
+  <errTitle></errTitle>
+  <cmdLine></cmdLine>
+  <chdir></chdir>
+  <priority>normal</priority>
+  <downloadUrl></downloadUrl>
+  <supportUrl></supportUrl>
+  <customProcName>false</customProcName>
+  <stayAlive>false</stayAlive>
+  <manifest></manifest>
+  <icon>BaseX.ico</icon>
+  <jre>
+    <path></path>
+    <minVersion>1.5.0</minVersion>
+    <maxVersion></maxVersion>
+    <jdkPreference>preferJre</jdkPreference>
+    <maxHeapSize>1024</maxHeapSize>
+  </jre>
+  <versionInfo>
+    <fileVersion>5.0.0.0</fileVersion>
+    <txtFileVersion>BaseX 5.0</txtFileVersion>
+    <fileDescription>Native XML Database</fileDescription>
+    <copyright>� University of Konstanz, 2008</copyright>
+    <productVersion>5.0.0.0</productVersion>
+    <txtProductVersion>BaseX 5.0</txtProductVersion>
+    <productName>BaseX</productName>
+    <companyName>University of Konstanz</companyName>
+    <internalName>BaseX</internalName>
+    <originalFilename>BaseX.exe</originalFilename>
+  </versionInfo>
+</launch4jConfig>
