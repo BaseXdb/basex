@@ -158,8 +158,8 @@ public final class PlotAxis {
     set = null;
     
     // get first/last category for axis caption
-    firstCat = vals[i];
-    lastCat = vals[vl - 1];
+    firstCat = i < vl ? vals[i] : EMPTY;
+    lastCat = i < vl ? vals[vl - 1] : EMPTY;
     
     // number of current category / position of item value in ordered 
     // text set.
