@@ -258,10 +258,8 @@ public final class PlotAxis {
 //
 //    final int pow = (int) (Math.floor(Math.log10(range) + .5d)) - 1;
 //    final int lstep = (int) (Math.pow(10, pow));
-//    final double d = range * .7d;
+//    final double d = min > 0 ? range * .6d : min + range * .55d;
 //    sigVal = d - d % lstep;
-//    if(min < 0)
-//      sigVal = (min + sigVal) - (min + sigVal) % lstep;
     
     
     if(min == Integer.MAX_VALUE) min = 0;
