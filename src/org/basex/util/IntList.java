@@ -46,6 +46,16 @@ public final class IntList {
   }
 
   /**
+   * Remove a value.
+   * @param i index of the value to be remove
+   */
+  public void remove(final int i) {
+    System.arraycopy(list, i + 1, list, i, size - i - 1);
+    size--;
+  }
+
+  
+  /**
    * Sets a value at the specified position.
    * @param v value to be added
    * @param p position

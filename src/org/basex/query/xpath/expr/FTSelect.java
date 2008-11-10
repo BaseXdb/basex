@@ -197,6 +197,7 @@ public final class FTSelect extends FTArrayExpr {
   
   @Override
   public int indexSizes(final XPContext ctx, final Step curr, final int min) {
+    
     final FTPositionFilter tmp = ctx.ftpos;
     ctx.ftpos = ftpos;   
     final int n = exprs[0].indexSizes(ctx, curr, min);

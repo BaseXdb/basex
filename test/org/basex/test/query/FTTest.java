@@ -38,6 +38,11 @@ public final class FTTest extends AbstractTest {
       "</fttest>";
 
     queries = new Object[][] {
+        { "AndOr 4", nodes(25, 29),
+          "//fti[text() ftcontains 'eens' and text() ftcontains 'ook' or " +
+          "text() ftcontains 'a']" },
+        
+        
         { "Simple 1", bool(true),
           "'abc' ftcontains 'abc'" },
         { "Simple 2", bool(true),

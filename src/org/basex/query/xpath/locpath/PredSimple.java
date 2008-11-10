@@ -1,16 +1,22 @@
 package org.basex.query.xpath.locpath;
 
+import static org.basex.query.xpath.XPText.*;
+
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
+import org.basex.query.xpath.expr.Or;
+import org.basex.query.xpath.expr.And;
 import org.basex.query.xpath.expr.Pos;
 import org.basex.query.xpath.item.Comp;
 import org.basex.query.xpath.item.Dbl;
 import org.basex.query.xpath.item.Item;
 import org.basex.query.xpath.item.Nod;
 import org.basex.query.xpath.item.NodeBuilder;
+
+
 
 /**
  * XPath predicate.
@@ -97,6 +103,36 @@ public final class PredSimple extends Pred {
     // number: create explicit position predicate
     if(expr instanceof Dbl) expr = Pos.create(((Dbl) expr).num(), Comp.EQ);
 
+    // sum up and predicates
+    if (expr instanceof And) {
+      final ExprInfoList eil = new ExprInfoList();
+      final And o = (And) expr;
+      for (int i = 0; i < o.expr.length; i++)
+        eil.add(o.expr[i], true);
+
+      if (eil.size > 0 && eil.size < o.expr.length) {
+        Expr[] e = eil.finishE();
+        if (e.length == 1) expr = e[0];
+        else o.expr = eil.finishE();
+       ctx.compInfo(OPTSUMPREDS);
+     }
+   }
+    
+    // sum up or predicates
+    if (expr instanceof Or) {
+      final ExprInfoList eil = new ExprInfoList();
+      final Or o = (Or) expr;
+      for (int i = 0; i < o.expr.length; i++)
+        eil.add(o.expr[i], false);
+
+      if (eil.size > 0 && eil.size < o.expr.length) {
+        Expr[] e = eil.finishE();
+        if (e.length == 1) expr = e[0];
+        else o.expr = eil.finishE();
+       ctx.compInfo(OPTSUMPREDS);
+     }
+    }
+   
     // check position test
     final Pred pred = PredPos.create(expr);
     return pred != null ? pred : this;

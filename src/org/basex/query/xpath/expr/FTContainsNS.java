@@ -68,6 +68,8 @@ public final class FTContainsNS extends Arr {
         }
         res = new Nod(il.finish(), ctx);
         ctx.item = (Nod) res;
+      } else {
+        res = new Nod(ctx);
       }
       ctx.ftitem = tmp;
     
@@ -76,7 +78,7 @@ public final class FTContainsNS extends Arr {
 
   @Override
   public String toString() {
-    return toString("ftcontainsNS");
+    return expr[0] + " ftcontainsNS " + expr[1];
   }
 
   @Override

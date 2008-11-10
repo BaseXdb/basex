@@ -75,4 +75,16 @@ public final class FTOr extends FTArrayExpr {
     pex = i1.finish();
     return seq ? Integer.MAX_VALUE : sum > min ? min : sum;
   }
+  
+  /**
+   * Add Expr to list.
+   * @param ex new Expr
+   */
+  public void add(final FTArrayExpr ex) {
+    FTArrayExpr[] ne = new FTArrayExpr[exprs.length + 1];
+    System.arraycopy(exprs, 0, ne, 0, exprs.length);
+    ne[exprs.length] = ex;
+    exprs = ne;
+  }
+
 }

@@ -8,6 +8,7 @@ import org.basex.query.xpath.internal.Range;
 import org.basex.query.xpath.item.Bln;
 import org.basex.query.xpath.item.Comp;
 import org.basex.query.xpath.item.Item;
+import org.basex.query.xpath.locpath.ExprInfoList;
 import org.basex.query.xpath.locpath.LocPath;
 import org.basex.query.xpath.locpath.Step;
 import static org.basex.query.xpath.XPText.*;
@@ -29,6 +30,8 @@ public final class And extends Arr {
 
   @Override
   public Bln eval(final XPContext ctx) throws QueryException {
+    ctx.iu = false; 
+    
     for(final Expr e : expr) if(!ctx.eval(e).bool()) return Bln.FALSE;
     return Bln.TRUE;
   }
@@ -55,8 +58,22 @@ public final class And extends Arr {
         System.arraycopy(expr, 0, tmp, 0, e);
         System.arraycopy(expr, e + 1, tmp, e, expr.length - e-- - 1);
         expr = tmp;
-      }
+      } else if (expr[e] instanceof Or) {
+        // sum up and predicates
+        final ExprInfoList eil = new ExprInfoList();
+        final Or o = (Or) expr[e];
+        for (int j = 0; j < o.expr.length; j++)
+          eil.add(o.expr[j], true);
+
+        if (eil.size > 0 && eil.size < o.expr.length) {
+          Expr[] ex = eil.finishE();
+          if (ex.length == 1) expr[e] = ex[0];
+          else o.expr = eil.finishE();
+         ctx.compInfo(OPTSUMPREDS);
+       }
+     }
     }
+    
     if(expr.length == 0) return Bln.TRUE;
     if(expr.length == 1) return expr[0];
 
@@ -87,6 +104,7 @@ public final class And extends Arr {
         return new Range(p1, (Item) r1.expr[1], (Item) r2.expr[1]);
       }
     }
+    
     return allOf(ctx);
   }
   

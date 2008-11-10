@@ -6,8 +6,10 @@ import org.basex.query.xpath.XPOptimizer;
 import org.basex.query.xpath.internal.OneOf;
 import org.basex.query.xpath.item.Bln;
 import org.basex.query.xpath.item.Item;
+import org.basex.query.xpath.locpath.ExprInfoList;
 import org.basex.query.xpath.locpath.LocPath;
 import org.basex.query.xpath.locpath.Step;
+
 import static org.basex.query.xpath.XPText.*;
 
 /**
@@ -27,14 +29,18 @@ public final class Or extends Arr {
 
   @Override
   public Bln eval(final XPContext ctx) throws QueryException {
-    for(final Expr e : expr) if(e.eval(ctx).bool()) return Bln.TRUE;
+    ctx.iu = false;
+    
+    for(final Expr e : expr) 
+      if(e.eval(ctx).bool()) 
+        return Bln.TRUE;
     return Bln.FALSE;
   }
 
   @Override
   public Expr comp(final XPContext ctx) throws QueryException {
     super.comp(ctx);
-    
+
     for(int i = 0; i != expr.length; i++) {
       // check if we can simplify a location path
       if(expr[i] instanceof LocPath) {
@@ -53,10 +59,24 @@ public final class Or extends Arr {
         System.arraycopy(expr, 0, tmp, 0, i);
         System.arraycopy(expr, i + 1, tmp, i, expr.length - i-- - 1);
         expr = tmp;
-      }
+      } else if (expr[i] instanceof And) {
+        // sum up and predicates
+        final ExprInfoList eil = new ExprInfoList();
+        final And o = (And) expr[i];
+        for (int j = 0; j < o.expr.length; j++)
+          eil.add(o.expr[j], true);
+
+        if (eil.size > 0 && eil.size < o.expr.length) {
+          Expr[] e = eil.finishE();
+          if (e.length == 1) expr[i] = e[0];
+          o.expr = eil.finishE();
+         ctx.compInfo(OPTSUMPREDS);
+       }
+     }
     }
     if(expr.length == 0) return Bln.FALSE;
     if(expr.length == 1) return expr[0];
+    
     return oneOf(ctx);
   }
   

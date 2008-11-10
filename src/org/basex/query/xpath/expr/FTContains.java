@@ -8,6 +8,7 @@ import org.basex.data.Serializer;
 import org.basex.index.FTNode;
 import org.basex.index.FTTokenizer;
 import org.basex.query.FTOpt;
+import org.basex.query.FTPos;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.XPOptimizer;
@@ -85,7 +86,7 @@ public final class FTContains extends Arr {
     if (expr[0] instanceof LocPathAbs) {
       iu = false;
       return this;
-    }
+    } 
 
     final Item i1 = expr[0] instanceof Item ? (Item) expr[0] : null;
     final Item i2 = expr[1] instanceof Item ? (Item) expr[1] : null;
@@ -107,7 +108,7 @@ public final class FTContains extends Arr {
       return expr[1].eval(ctx);
     } 
 
-    return iu ? evalSeq(ctx) : evalWithoutIndex(ctx);
+    return ctx.iu ? evalSeq(ctx) : evalWithoutIndex(ctx);
   }
 
   /**
@@ -165,15 +166,25 @@ public final class FTContains extends Arr {
   private Bln evalWithoutIndex(final XPContext ctx) throws QueryException {
     final FTTokenizer tmp = ctx.ftitem;
     ctx.ftitem = ft;
-    Item it = expr[0].eval(ctx);
+
+    final Nod c = ctx.item;
+    final Item it = expr[0].eval(ctx);
+    
     if (!it.bool()) return Bln.FALSE;
+    Item res;
     if(it instanceof Nod) {
-      it = evalNS(ctx, it);
+      ctx.item = (Nod) it;
+      res = evalNS(ctx, it);
+    } else if (it instanceof Bln) {
+      res = expr[1].eval(ctx);
     } else {
-      it = expr[1].eval(ctx);
+      ctx.ftitem = new FTTokenizer(it.str());
+      res = expr[1].eval(ctx);
     }
+    
     ctx.ftitem = tmp;
-    return Bln.get(it.bool());
+    ctx.item = c;  
+    return Bln.get(res.bool());
   }
 
   /**
@@ -191,13 +202,10 @@ public final class FTContains extends Arr {
     final Data data = nodes.data;
     for(int n = 0; n < nodes.size; n++) {
       ft.init(data.atom(nodes.nodes[n]));
+      ctx.ftitem = ft;
       if(expr[1].eval(ctx).bool()) res.add(nodes.nodes[n]);
     }
-    if (res.size > 0) {
-      ctx.item = new Nod(res.finish(), ctx);
-      return Bln.TRUE;
-    }
-    return Bln.FALSE;
+    return new Nod(res.finish(), ctx);
   }
 
   @Override
@@ -205,8 +213,6 @@ public final class FTContains extends Arr {
       final boolean seq) throws QueryException {
     
     if(!(expr[0] instanceof LocPathRel)) return this;
-
-    //s = seq;
     final LocPath path = (LocPath) expr[0];
     
     // all FTArrayExpr are recursively converted to for index access
@@ -216,7 +222,6 @@ public final class FTContains extends Arr {
     Expr ex;
     if (!seq) {
       // standard index evaluation
-      //expr = new FTContains(expr[0], ae, option, seq, iu);
       ctx.compInfo(OPTFTINDEX);
       ex = new FTContainsNS(expr[0], ae);
       if (curr != null) return new Path(ex, path.invertPath(curr));
@@ -262,13 +267,84 @@ public final class FTContains extends Arr {
     // Integer.MAX_VALUE is return if an ftnot does not occur
     // after an ftand
     final int nrIDs = expr[1].indexSizes(ctx, curr, min);
-  /*  if (nrIDs < Integer.MAX_VALUE && nrIDs > -1) {
-      s = false;
-    }*/
     if (nrIDs == -1) expr[1] = Bln.TRUE;
     return nrIDs == -1 ? Integer.MAX_VALUE : nrIDs;
   }
 
+  /**
+   * Sum up two FTContains Expr to one.
+   * If Summing up isn't possible, return null.
+   * 
+   * @param ftc1 FTContains 1
+   * @param ftc2 FTContains 2
+   * @param and Flag for FTAnd or FTOr
+   * @return FTContains or null
+   */
+  public static Expr sumUp(final FTContains ftc1, final FTContains ftc2, 
+      final boolean and) {
+    final LocPathRel l1 = (LocPathRel) ftc1.expr[0];
+    final LocPathRel l2 = (LocPathRel) ftc2.expr[0];
+    
+    if (l1.sameAs(l2) && l1.steps.size() == 1) {
+      // sum 
+      if (check(ftc1, ftc2)) {
+        final FTSelect fts1 = (FTSelect) ftc1.expr[1];
+        final FTSelect fts2 = (FTSelect) ftc2.expr[1];
+        if (and) {
+          if (fts2.getExpr() instanceof FTAnd) {
+            FTAnd ftand = (FTAnd) fts2.getExpr();
+            ftand.add(fts1.getExpr());
+          } else {
+            final FTAnd fta = new FTAnd(new FTArrayExpr[]{
+              fts1.getExpr(), fts2.getExpr()});
+            fts2.setExpr(fta);
+          }
+          return ftc2;
+        } else {
+          if (fts2.getExpr() instanceof FTOr) {
+            FTOr ftor = (FTOr) fts2.getExpr();
+            ftor.add(fts1.getExpr());
+          } else {
+            final FTOr ftor = new FTOr(new FTArrayExpr[]{
+              fts1.getExpr(), fts2.getExpr()});
+            fts2.setExpr(ftor);
+          } 
+        }
+        //return ftc2;
+      } else {
+        FTSelect fts;
+        if (and) {
+          FTAnd fta = new FTAnd(new FTArrayExpr[]{
+              (FTArrayExpr) ftc2.expr[1], (FTArrayExpr) ftc1.expr[1]});
+          fts = new FTSelect(fta, new FTPositionFilter(new FTPos()));          
+        } else {
+          FTAnd fta = new FTAnd(new FTArrayExpr[]{
+              (FTArrayExpr) ftc2.expr[1], (FTArrayExpr) ftc1.expr[1]});
+          fts = new FTSelect(fta, new FTPositionFilter(new FTPos()));
+        }
+        ftc2.expr[1] = fts;
+      }
+      return ftc2;
+    }
+    return null;
+  }
+  
+  /**
+   * Check if two FTContains expressions could be summed up.
+   * @param ftc1 FTContains expression1 
+   * @param ftc2 FTContains expression2
+   * @return boolean result
+   */
+  private static boolean check(final FTContains ftc1, final FTContains ftc2) {
+    if (ftc1.expr[1] instanceof FTSelect && ftc2.expr[1] instanceof FTSelect) {
+      final FTSelect fts1 = (FTSelect) ftc1.expr[1];
+      final FTSelect fts2 = (FTSelect) ftc2.expr[1];
+      return fts1.checkSumUp(fts2.ftpos);
+    }
+    return false;
+  }
+
+  
   @Override
   public String toString() {
     return expr[0] + " ftcontainsBool" + (iu ? "_I " : " ")  + expr[1];

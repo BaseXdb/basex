@@ -32,7 +32,7 @@ public final class XPContext extends QueryContext {
   /** Current fulltext position filter. */
   public FTPositionFilter ftpos;
   /** Flag for fulltext index use. */
-  public boolean iu;
+  public boolean iu = false;
   /** Reference to the root expression. */
   private Expr root;
   

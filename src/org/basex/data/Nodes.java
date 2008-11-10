@@ -121,7 +121,7 @@ public final class Nodes implements Result {
     final IntList c = new IntList();
     for(int a = 0, b = 0; a != al && b != bl;) {
       final int d = ai[a] - bi[b];
-      if(d == 0) c.add(ai[a++]);
+      if(d == 0) c.add(ai[a]);
       if(d > 0) b++;
       else a++;
     }
