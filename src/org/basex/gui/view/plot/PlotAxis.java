@@ -258,27 +258,30 @@ public final class PlotAxis {
 //    
 //    if(range < 1) {
 //      double dec = 1.0d / range;
-//      double pow = (int) (Math.floor(Math.log10(dec) + .5d)) * 2;
+//      double pow = (int) (Math.floor(Math.log10(dec) + .5d) + 2) * 2;
 //      double fac = (int) (Math.pow(10, pow));
 //      double tmin = min * fac;
 //      double tmax = max * fac;
 //      range = Math.abs(tmax - tmin);
-//      final double d = tmin + range * .55d;
+//      final double d = tmin + range * .6d;
 //      
 //      pow = range < 10 ? 0 : (int) (Math.floor(Math.log10(range) + .5d)) - 1;
-//      final int lstep = (int) (Math.pow(10, pow));
+//      double lstep = (int) (Math.pow(10, pow));
 //      sigVal = d - d % lstep;
-//      sigVal = sigVal / fac;
+//      sigVal /= fac;
+//      lstep /= fac;
+////      calculatedCaptionStep = lstep;
 //      
 //      return;
 //    }
 //    
 //    final int pow = range < 10 ? 0 : 
 //      (int) (Math.floor(Math.log10(range) + .5d)) - 1;
-//    final int lstep = (int) (Math.pow(10, pow));
-//    final double d = min + range * .55d;
+//    double lstep = (int) (Math.pow(10, pow));
+//    final double d = min + range * .6d;
 //    sigVal = d - d % lstep;
-//    int i = 0;
+//    calculatedCaptionStep = lstep;
+    
     
     if(min == Integer.MAX_VALUE) min = 0;
     if(max == Integer.MIN_VALUE) max = 0;

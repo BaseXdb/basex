@@ -391,14 +391,13 @@ public final class PlotView extends View implements Runnable {
       }
       
     } else {
-      int i = 1;
       final boolean noRange = axis.max - axis.min == 0;
       // draw min/max caption
       drawCaptionAndGrid(g, drawX, noRange ? "" : 
         formatString(axis.min, drawX), 0);
       drawCaptionAndGrid(g, drawX, noRange ? "" : 
         formatString(axis.max, drawX), 1);
-      // draw significant value
+//      // draw significant value
 //      drawCaptionAndGrid(g, drawX, formatString(axis.sigVal, drawX), 
 //          axis.calcPosition(axis.sigVal));
       // return if insufficient plot space
@@ -406,8 +405,10 @@ public final class PlotView extends View implements Runnable {
 
 
       // draw captions between min and max
-//      <LK> ugly workaround - will be fixed
+      // <LK> ugly workaround - will be fixed
       if(nrCaptions < 0) return;
+      int i = 1;
+      // first and last label already painted, thus loop from 0 to -1
       while(i < nrCaptions - 1) {
         drawCaptionAndGrid(g, drawX, 
             formatString(axis.min + i * step, drawX), capRange * i);
