@@ -1,9 +1,7 @@
 package org.basex.gui.view.plot;
 
 import static org.basex.util.Token.*;
-
 import org.basex.data.Data;
-import org.basex.data.DataText;
 import org.basex.data.StatsKey;
 import org.basex.data.StatsKey.Kind;
 import org.basex.gui.GUI;
@@ -246,10 +244,11 @@ public final class PlotAxis {
     if(max == Integer.MIN_VALUE) max = 0;
     
 //    // flag for deepFS @size attribute
-    final Data data = GUI.context.data();
+    //final Data data = GUI.context.data();
     int fsplus = 6;
-    final boolean fss = data.fs != null && !isTag && 
-      eq(data.atts.key(attrID), DataText.SIZE);
+    //final boolean fss = data.fs != null && !isTag && 
+    //  eq(data.atts.key(attrID), DataText.SIZE);
+    final boolean fss = false;
 
     final double range = max - min;
     final double lmin = min - range / 2;

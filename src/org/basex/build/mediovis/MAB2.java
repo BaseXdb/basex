@@ -69,6 +69,10 @@ public interface MAB2 {
   byte[] TYPE = token("TYP");
   /** Tag. */
   byte[] YEAR = token("YEA");
+  /** Tag. */
+  byte[] LENDINGS = token("Lendings");
+  /** Tag. */
+  byte[] STATUS = token("Status");
   /** Missing MV ID. */
   byte[] MISSING = token("#");
   /** Semicolon. */

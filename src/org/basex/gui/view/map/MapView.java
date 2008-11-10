@@ -480,15 +480,9 @@ public final class MapView extends View implements Runnable {
       // draw tag label
       if(data.kind(focusedRect.p) == Data.ELEM) {
         g.setFont(GUIConstants.font);
-        final byte[] tag = ViewData.tag(data, focusedRect.p);
-        final int tw = BaseXLayout.width(g, tag);
-        final int th = g.getFontMetrics().getHeight();
-        final int xx = Math.min(getWidth() - tw - 8, x);
-
-        g.setColor(GUIConstants.COLORS[focusedRect.l + 5]);
-        g.fillRect(xx - 1, y - th, tw + 4, th);
-        g.setColor(GUIConstants.color1);
-        g.drawString(Token.string(tag), xx, y - 4);
+        String tt = Token.string(ViewData.tag(data, focusedRect.p));
+        if(tt.length() > 32) tt = tt.substring(0, 30) + DOTS;
+        BaseXLayout.drawTooltip(g, tt, x, y, getWidth(), focusedRect.l + 5);
       }
 
       // add interactions for current thumbnail rectangle...

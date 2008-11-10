@@ -22,6 +22,7 @@ import javax.swing.AbstractButton;
 import javax.swing.JComponent;
 import org.basex.BaseX;
 import org.basex.gui.GUI;
+import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.dialog.Dialog;
 import org.basex.gui.view.View;
@@ -294,6 +295,26 @@ public final class BaseXLayout {
   public static void drawCenter(final Graphics g, final String text,
       final int w, final int y) {
     g.drawString(text, (w - width(g, text)) / 2, y);
+  }
+
+  /**
+   * Draws a visualization tooltip.
+   * @param g graphics reference
+   * @param tt tooltip label
+   * @param x horizontal position
+   * @param y vertical position
+   * @param w width
+   * @param c color color depth
+   */
+  public static void drawTooltip(final Graphics g, final String tt,
+      final int x, final int y, final int w, final int c) {
+    final int tw = BaseXLayout.width(g, tt);
+    final int th = g.getFontMetrics().getHeight();
+    final int xx = Math.min(w - tw - 8, x);
+    g.setColor(GUIConstants.COLORS[c]);
+    g.fillRect(xx - 1, y - th, tw + 4, th);
+    g.setColor(GUIConstants.color1);
+    g.drawString(tt, xx, y - 4);
   }
 
   /**

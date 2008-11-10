@@ -2,7 +2,6 @@ package org.basex.gui.view.plot;
 
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -14,13 +13,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
-
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
-
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.StatsKey.Kind;
@@ -118,27 +115,39 @@ public final class PlotView extends View implements Runnable {
           xCombo.setModel(new DefaultComboBoxModel(keys));
           yCombo.setModel(new DefaultComboBoxModel(keys));
           if(keys.length > 0) {
-            xCombo.setSelectedIndex(0);
-            yCombo.setSelectedIndex(keys.length > 1 ? 1 : 0);
+            // choose name category as default for horizontal axis
+            int x = 0;
+            for(int k = 0; k < keys.length; k++) {
+              if(keys[k].equals("@name") || keys[k].equals("name")) {
+                x = k;
+                break;
+              }
+            }
+            // choose size category as default for vertical axis
+            int y = x == 0 ? Math.min(1, keys.length) : 0;
+            for(int k = 0; k < keys.length; k++) {
+              if(keys[k].equals("@size") || keys[k].equals("size")) {
+                y = k;
+                break;
+              }
+            }
+            xCombo.setSelectedIndex(x);
+            yCombo.setSelectedIndex(y);
           }
         }
         repaint();
       }
     });
-    box.add(Box.createHorizontalGlue());
-    box.add(new JLabel("Item"));
+    box.add(yCombo);
     box.add(Box.createHorizontalStrut(3));
+    box.add(new JLabel("Y"));
+    box.add(Box.createHorizontalGlue());
     box.add(itemCombo);
-    box.add(Box.createHorizontalStrut(10));
+    box.add(Box.createHorizontalGlue());
     box.add(new JLabel("X"));
     box.add(Box.createHorizontalStrut(3));
     box.add(xCombo);
-    box.add(Box.createHorizontalStrut(10));
-    box.add(new JLabel("Y"));
-    box.add(Box.createHorizontalStrut(3));
-    box.add(yCombo);
-    box.add(Box.createHorizontalStrut(32));
-    add(box, BorderLayout.NORTH);
+    add(box, BorderLayout.SOUTH);
     
     popup = new BaseXPopup(this, GUIConstants.POPUP);
     selectionBox = new PlotBoundingBox();
@@ -258,15 +267,11 @@ public final class PlotView extends View implements Runnable {
         g.setFont(GUIConstants.font);
         final String x = formatString(true);
         final String y = formatString(false);
-        final String label = (x.length() > 16 ? x.substring(0, 16) : x) + " / " 
-            + (y.length() > 15 ? y.substring(0, 15) : y);
-        final int tw = BaseXLayout.width(g, label);
-        final int th = g.getFontMetrics().getHeight();
-        final int xx = Math.min(getWidth() - tw - 8, calcCoordinate(true, x1));
-        g.setColor(GUIConstants.COLORS[10]);
-        g.fillRect(xx - 1, calcCoordinate(false, y1) - th, tw + 4, th);
-        g.setColor(GUIConstants.color1);
-        g.drawString(label, xx, calcCoordinate(false, y1) - 4);
+        final String label = (x.length() > 16 ?
+            x.substring(0, 14) + ".." : x) + " / "
+            + (y.length() > 16 ? y.substring(0, 14) + ".." : y);
+        BaseXLayout.drawTooltip(g, label, calcCoordinate(true, x1),
+            calcCoordinate(false, y1), getWidth(), 10);
       }
     }
     
@@ -524,9 +529,9 @@ public final class PlotView extends View implements Runnable {
     markedItemImg = createItemImage(false, true);
     itemFocusedImg = createItemImage(true, false);
     final int size = itemSize(false);
-    MARGIN[0] = 32 + size;
-    MARGIN[1] = size * 5;
-    MARGIN[2] = size * 6;
+    MARGIN[0] = size;
+    MARGIN[1] = size * 6;
+    MARGIN[2] = 35 + size * 7;
     MARGIN[3] = size;
     plotChanged = true;
     repaint();
@@ -614,7 +619,7 @@ public final class PlotView extends View implements Runnable {
    * @return size value
    */
   static int itemSize(final boolean focus) {
-    return GUIProp.fontsize + (focus ? 2 : 1);
+    return Math.max(2, GUIProp.fontsize + (focus ? 1 : -1));
   }
   
   /**

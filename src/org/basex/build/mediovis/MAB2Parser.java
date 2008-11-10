@@ -36,6 +36,10 @@ public final class MAB2Parser extends Parser {
   private final TokenMap languages = new TokenMap();
   /** MedioVis ID assignments. */
   private final TokenMap mvids = new TokenMap();
+  /** Optional lending numbers. */
+  private final TokenMap lendings = new TokenMap();
+  /** Optional lending status. */
+  private final TokenMap status = new TokenMap();
   /** Image assignments. */
   private final TokenMap posters = new TokenMap();
   /** Genre assignments. */
@@ -112,6 +116,8 @@ public final class MAB2Parser extends Parser {
     index(subjects, dir + "/subjects.dat");
     index(languages, dir + "/lang.dat");
     index(mvids, dir + "/mvids.dat");
+    index(lendings, dir + "/lendings.dat");
+    index(status, dir + "/status.dat");
     index(posters, dir + "/posters.dat");
     index(genres, dir + "/genres.dat");
 
@@ -412,6 +418,8 @@ public final class MAB2Parser extends Parser {
         addTag(ISBN, isbn);
         addTag(POSTER, posters.get(bibID));
         addTag(GENRE, genres.get(mvID));
+        addTag(STATUS, status.get(bibID));
+        addTag(LENDINGS, lendings.get(bibID));
         if(sub == 0 || Prop.mab2flat) builder.endElem(MEDIUM);
 
         return title;

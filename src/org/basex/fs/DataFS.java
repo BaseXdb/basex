@@ -349,8 +349,10 @@ public final class DataFS {
     final String path = string(path(pre));
     try {
       final Runtime run = Runtime.getRuntime();
-      if(Prop.UNIX) {
-        run.exec(new String[] { "xdg-open", path }); // xdg-open
+      if(Prop.MAC) {
+        run.exec(new String[] { "open", path });
+      } else if(Prop.UNIX) {
+        run.exec(new String[] { "xdg-open", path });
       } else {
         run.exec("rundll32.exe url.dll,FileProtocolHandler " + path);
       }

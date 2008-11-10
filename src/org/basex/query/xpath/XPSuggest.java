@@ -86,18 +86,22 @@ public final class XPSuggest extends XPParser {
   void checkStep(final Axis axis, final Test test) {
     filter(true);
     if(axis == null) {
-      stack.push(skel.desc(stack.pop(), 0, Data.ELEM, false));
+      if(!stack.empty())
+        stack.push(skel.desc(stack.pop(), 0, Data.ELEM, false));
       return;
     }
 
-    if(axis == Axis.CHILD) {
-      stack.push(skel.desc(stack.pop(), 0, Data.ELEM, false));
-    } else if(axis == Axis.ATTR) {
-      stack.push(skel.desc(stack.pop(), 0, Data.ATTR, false));
-    } else if(axis == Axis.DESC || axis == Axis.DESCORSELF) {
-      stack.push(skel.desc(stack.pop(), 0, Data.ELEM, true));
-    } else {
-      stack.peek().clear();
+    // [CG] check when stack is empty at this stage
+    if(!stack.empty()) {
+      if(axis == Axis.CHILD) {
+        stack.push(skel.desc(stack.pop(), 0, Data.ELEM, false));
+      } else if(axis == Axis.ATTR) {
+        stack.push(skel.desc(stack.pop(), 0, Data.ATTR, false));
+      } else if(axis == Axis.DESC || axis == Axis.DESCORSELF) {
+        stack.push(skel.desc(stack.pop(), 0, Data.ELEM, true));
+      } else {
+        stack.peek().clear();
+      }
     }
     laxis = axis;
     ltest = test;
