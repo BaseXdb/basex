@@ -101,13 +101,6 @@ public final class FTContains extends Arr {
 
   @Override
   public Item eval(final XPContext ctx) throws QueryException {
-    if (expr[0] instanceof Str) {
-      final Str lit = (Str) expr[0];
-      ctx.ftitem = new FTTokenizer();
-      ctx.ftitem.init(lit.str());
-      return expr[1].eval(ctx);
-    } 
-
     return ctx.iu ? evalSeq(ctx) : evalWithoutIndex(ctx);
   }
 
