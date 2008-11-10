@@ -398,6 +398,9 @@ public final class PlotView extends View implements Runnable {
         formatString(axis.min, drawX), 0);
       drawCaptionAndGrid(g, drawX, noRange ? "" : 
         formatString(axis.max, drawX), 1);
+//      // draw significant value
+//      drawCaptionAndGrid(g, drawX, formatString(axis.sigVal, drawX), 
+//          axis.calcPosition(axis.sigVal));
       // return if insufficient plot space
       if(nrCaptions == 0) return;
 

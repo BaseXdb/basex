@@ -40,6 +40,8 @@ public final class PlotAxis {
   double min;
   /** Maximum  value in case selected attribute is numerical. */
   double max;
+  /** Significant value for axis caption. */
+  double sigVal;
   /** The first category for text data. */
   byte[] firstCat;
   /** The last category for text data. */
@@ -68,6 +70,7 @@ public final class PlotAxis {
     calculatedCaptionStep = -1;
     min = Integer.MIN_VALUE;
     max = Integer.MAX_VALUE;
+    sigVal = 0;
   }
   
   /**
@@ -202,6 +205,15 @@ public final class PlotAxis {
   }
   
   /**
+   * Calculates relative coordinate for a given value.
+   * @param value given value
+   * @return relative coordinate
+   */
+  double calcPosition(final double value) {
+    return calcPosition(token(value));
+  }
+  
+  /**
    * Returns the value for the specified pre value.
    * @param pre pre value
    * @return item value
@@ -240,10 +252,21 @@ public final class PlotAxis {
         max = d;
     }
     if(max - min == 0) return;
+//    // range as driving force for following calculations, no matter if INT
+//    // or DBL ... whatsoever
+//    final double range = Math.abs(max - min);
+//
+//    final int pow = (int) (Math.floor(Math.log10(range) + .5d)) - 1;
+//    final int lstep = (int) (Math.pow(10, pow));
+//    final double d = range * .7d;
+//    sigVal = d - d % lstep;
+//    if(min < 0)
+//      sigVal = (min + sigVal) - (min + sigVal) % lstep;
+    
+    
     if(min == Integer.MAX_VALUE) min = 0;
     if(max == Integer.MIN_VALUE) max = 0;
-    
-//    // flag for deepFS @size attribute
+    // flag for deepFS @size attribute
     //final Data data = GUI.context.data();
     int fsplus = 6;
     //final boolean fss = data.fs != null && !isTag && 
