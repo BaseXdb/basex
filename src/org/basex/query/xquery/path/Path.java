@@ -31,9 +31,9 @@ import org.basex.util.Array;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Path extends Arr {
+public class Path extends Arr {
   /** Top expression. */
-  private Expr root;
+  public Expr root;
   /** Steps flag. */
   private boolean steps = true;
   /** Flag for result caching. */
@@ -75,9 +75,26 @@ public final class Path extends Arr {
       checkEmpty();
       // analyze if result set can be cached - no predicates or no variables...
       cache = true;
+      boolean noPreds = true;
       for(final Expr ex : expr) {
-        cache &= ((Step) ex).expr.length == 0 || !ex.uses(Using.VAR);
+        // check if we have a predicate
+        if(((Step) ex).expr.length != 0) {
+          noPreds = false;
+          // check if we also find a variable
+          if(ex.uses(Using.VAR)) {
+            cache = false;
+            break;
+          }
+        }
       }
+      // no predicates, one child or descendant step...
+      final Axis axis = ((Step) expr[0]).axis;
+      // if we've found a variable, cache will be true. But we can't 
+      // handle variables in SimpleIterPath yet.
+      if(!cache && noPreds && expr.length == 1 && (axis == Axis.DESC || 
+          axis == Axis.DESCORSELF || axis == Axis.CHILD)) {
+        return new SimpleIterPath(root, expr);
+      }      
     }
     return this;
   }
