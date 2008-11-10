@@ -163,7 +163,8 @@ public final class Preds extends ExprInfo {
         ctx.compInfo(OPTTRUE);
         remove(j--);
       }
-       if (preds[j] instanceof PredSimple) p.add(preds[j], true);
+      if (j > -1 && preds[j] instanceof PredSimple) 
+        p.add(preds[j], true);
     }
     
     if (p.size > 0 && p.size < size) {
