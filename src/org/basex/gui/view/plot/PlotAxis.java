@@ -311,9 +311,9 @@ public final class PlotAxis {
         nrCaptions = (int) (range / captionStep);
       }
         
-      // DBL and INT
+      // find first label after minimum value
       firstLabel = sigVal;
-      while(firstLabel > min + captionStep * 1.4d)
+      while(firstLabel > min + captionStep * 1.2d)
         firstLabel -= captionStep;
 
       // type == TEXT / CAT
