@@ -291,12 +291,14 @@ public final class PlotAxis {
    * @param space space of view axis available for captions
    */
   void calcCaption(final int space) {
-    // caption calculations for DBL data
-    if(type == Kind.DBL) {
+    if(type == Kind.DBL || type == Kind.INT) {
       final double range = Math.abs(max - min);
+      final boolean dbl = type == Kind.DBL;
+
       captionStep = calculatedCaptionStep;
       nrCaptions = (int) (range / captionStep) + 1;
-      while(2 * nrCaptions * PlotView.CAPTIONWHITESPACE * 2 < space) {
+      while(2 * nrCaptions * PlotView.CAPTIONWHITESPACE * 2 < space &&
+          dbl ? dbl : captionStep % 2 == 0) {
         captionStep /= 2;
         nrCaptions = (int) (range / captionStep);
       }
@@ -304,24 +306,13 @@ public final class PlotAxis {
         captionStep *= 2;
         nrCaptions = (int) (range / captionStep);
       }
+        
+      // DBL and INT
       firstLabel = sigVal;
       while(firstLabel > min + captionStep * 1.4d)
         firstLabel -= captionStep;
 
-      // caption calculation for INT data, mostly similar to DBL
-    } else if(type == Kind.INT) {
-      final double range = Math.abs(max - min);
-      captionStep = calculatedCaptionStep;
-      nrCaptions = (int) (range / captionStep) + 1;
-      while(2 * nrCaptions * PlotView.CAPTIONWHITESPACE * 2 < space &&
-          captionStep % 2 == 0) {
-        captionStep /= 2;
-        nrCaptions = (int) (range / captionStep);
-      }
-      firstLabel = sigVal;
-      while(firstLabel > min + captionStep * 1.4d)
-        firstLabel -= captionStep;
-    
+      // type == TEXT / CAT
     } else {
       nrCaptions = space / (PlotView.CAPTIONWHITESPACE);
       if(nrCaptions > nrCats)
