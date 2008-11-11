@@ -243,6 +243,8 @@ public final class PlotAxis {
    * @param vals item values
    */
   private void calcExtremeValues(final byte[][] vals) {
+    min = Integer.MAX_VALUE;
+    max = Integer.MIN_VALUE;
     int i = 0;
     boolean b = false;
     while(i < vals.length) {
