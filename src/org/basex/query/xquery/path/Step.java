@@ -8,6 +8,8 @@ import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Arr;
 import org.basex.query.xquery.expr.Expr;
+import org.basex.query.xquery.expr.FTContains;
+import org.basex.query.xquery.expr.FTIndexInfo;
 import org.basex.query.xquery.func.Fun;
 import org.basex.query.xquery.func.FunDef;
 import org.basex.query.xquery.item.Item;
@@ -56,8 +58,14 @@ public class Step extends Arr {
     // Numeric value
     final boolean num = expr[0].i() && ((Item) expr[0]).n();
     // Multiple Predicates or POS
-    return expr.length > 1 || (!last && !num && uses(Using.POS)) ? this : 
+    /*return expr.length > 1 || (!last && !num && uses(Using.POS)) ? this : 
+      new IterStep(axis, test, expr, last, num);*/
+    Expr e = expr.length > 1 || (!last && !num && uses(Using.POS)) ? this : 
       new IterStep(axis, test, expr, last, num);
+    if (expr[0] instanceof FTContains && FTIndexInfo.optimize) {
+      System.out.println(expr[0].indexEquivalent(ctx, new FTIndexInfo(), this));
+    }
+    return e;
   }
 
   @Override

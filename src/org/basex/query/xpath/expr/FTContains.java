@@ -15,11 +15,11 @@ import org.basex.query.xpath.XPOptimizer;
 import org.basex.query.xpath.item.Bln;
 import org.basex.query.xpath.item.Item;
 import org.basex.query.xpath.item.Nod;
-import org.basex.query.xpath.item.Str;
 import org.basex.query.xpath.locpath.LocPath;
 import org.basex.query.xpath.locpath.LocPathAbs;
 import org.basex.query.xpath.locpath.LocPathRel;
 import org.basex.query.xpath.locpath.Step;
+import org.basex.query.xpath.locpath.TestName;
 import org.basex.query.xpath.locpath.TestNode;
 import org.basex.util.IntList;
 
@@ -278,7 +278,9 @@ public final class FTContains extends Arr {
     final LocPathRel l1 = (LocPathRel) ftc1.expr[0];
     final LocPathRel l2 = (LocPathRel) ftc2.expr[0];
     
-    if (l1.sameAs(l2) && l1.steps.size() == 1) {
+    if (l1.steps.get(0).test instanceof TestName 
+        && l1.steps.get(0).test.sameAs(l2.steps.get(0).test) 
+        && l1.steps.size() == 1) {
       // sum 
       if (check(ftc1, ftc2)) {
         final FTSelect fts1 = (FTSelect) ftc1.expr[1];

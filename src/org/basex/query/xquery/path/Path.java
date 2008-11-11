@@ -264,6 +264,81 @@ public class Path extends Arr {
     }
   }
 
+  
+  /**
+   * Inverts a path.
+   * @param curr current location step
+   * @return inverted path
+   */
+  public Path invertPath(final Step curr) {
+    final Expr[] el = new Expr[expr.length + 1];
+    int c = 0;
+    
+    if (!steps) {
+      return this;      
+    }
+    
+    // add inverted pretext steps
+    Axis lastAxis;
+    int k = expr.length;
+    
+    while(k > -1 && !(expr[k] instanceof Step)) k--;
+    if (k > -1) {
+      lastAxis = invertAxis(((Step) expr[k]).axis);
+      while (k > -1) {
+        if (expr[k] instanceof Step) {
+          final Step step = (Step) expr[k];
+          final Step inv = new Step(lastAxis, step.test, step.expr);
+          //final Step inv = Axis.create(lastAxis, step.test, step.expr);
+          lastAxis = invertAxis(step.axis);
+          el[c++] = inv;
+        }
+      }
+      el[c++] = new Step(lastAxis, curr.test, new Expr[]{});
+    }
+    //el[c++] = Axis.create(lastAxis, curr.test);
+    
+    return c > 0 ? new Path(root, Array.finish(el, c)) : this;
+  }
+
+  /**
+   * Inverts a path.
+   * @param sis SimpleIterStep
+   * @param curr current location step
+   * @param expr Expression
+   * @return inverted path
+   */
+  public static Path invertSIStep(final SimpleIterStep sis, final Step curr,
+      final Expr expr) {
+    // add inverted pretext steps
+    Axis lastAxis = invertAxis(sis.axis);
+    Expr  e = new Step(lastAxis, curr.test, new Expr[]{});
+    
+    return new Path(null, new Expr[]{expr, e});
+  }
+
+  
+  
+  /**
+   * Inverts an XPath axis.
+   * @param axis axis to be inverted.
+   * @return inverted axis
+   */
+  private static Axis invertAxis(final Axis axis) {
+    switch(axis) {
+      case ANC:        return Axis.DESC;
+      case ANCORSELF:  return Axis.DESCORSELF;
+      case ATTR:
+      case CHILD:      return Axis.PARENT;
+      case DESC:       return Axis.ANC;
+      case DESCORSELF: return Axis.ANCORSELF;
+      case PARENT:     return Axis.CHILD;
+      case SELF:       return Axis.SELF;
+      default:         return null;
+    }
+  }
+
+  
   @Override
   public boolean uses(final Using u) {
     return super.uses(u) || root.uses(u);

@@ -37,6 +37,7 @@ public final class IterStep extends Step {
     numFlag = num;
   }
   
+
   @Override
   public NodeIter iter(final XQContext ctx) throws XQException {
     final Item ci = ctx.item;

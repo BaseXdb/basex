@@ -8,6 +8,7 @@ import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
+import org.basex.query.xquery.path.Step;
 import org.basex.query.xquery.util.Err;
 import org.basex.util.Token;
 
@@ -171,4 +172,19 @@ public abstract class Expr extends ExprInfo {
     if(it == null) Err.or(XPNOCTX, this);
     return it.iter();
   }
+  
+  /**
+   * Returns an equivalent expression which accesses an index structure.
+   * @param ctx root
+   * @param ii FTIndexInfo 
+   * @param curr Step
+   * @return Equivalent index-expression or null
+   * @throws XQException evaluation exception
+   */
+  @SuppressWarnings("unused")
+  public Expr indexEquivalent(final XQContext ctx, final FTIndexInfo ii, 
+      final Step curr) throws XQException {
+    return null;
+  }
+  
 }
