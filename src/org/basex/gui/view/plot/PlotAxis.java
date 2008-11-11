@@ -254,14 +254,14 @@ public final class PlotAxis {
       if(d > max) 
         max = d;
     }
-    if(max - min == 0) return;
     // range as driving force for following calculations, no matter if INT
     // or DBL ... whatsoever
     double range = Math.abs(max - min);
-    
+    if(range == 0) return;
+
     if(range < 1) {
       double dec = 1.0d / range;
-      double pow = (int) (Math.floor(Math.log10(dec) + .5d) + 2) * 2;
+      double pow = (int) (Math.floor(Math.log10(dec) + .5d) + 1) * 2;
       double fac = (int) (Math.pow(10, pow));
       double tmin = min * fac;
       double tmax = max * fac;
@@ -293,6 +293,10 @@ public final class PlotAxis {
   void calcCaption(final int space) {
     if(type == Kind.DBL || type == Kind.INT) {
       final double range = Math.abs(max - min);
+      if(range == 0) {
+        nrCaptions = 1;
+        return;
+      }
       final boolean dbl = type == Kind.DBL;
 
       captionStep = calculatedCaptionStep;

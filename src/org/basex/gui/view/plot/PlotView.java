@@ -416,6 +416,12 @@ public final class PlotView extends View implements Runnable {
       // return if insufficient plot space
       if(nrCaptions == 0) return;
 
+      // if min equal max, draw min in plot middle
+      if(noRange) {
+        drawCaptionAndGrid(g, drawX, formatString(axis.min, drawX), .5d);
+        return;
+      }
+      
       // draw captions between min and max
       if(nrCaptions == 0) return;
       // first and last label already painted, thus loop from 0 to -1
