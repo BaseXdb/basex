@@ -268,22 +268,21 @@ public final class PlotAxis {
     double range = Math.abs(max - min);
     if(range == 0) return;
 
+    // small ranges between min and max value
     if(range < 1) {
-      double dec = 1.0d / range;
+      final double dec = 1.0d / range;
       double pow = (int) (Math.floor(Math.log10(dec) + .5d) + 1) * 2;
-      double fac = (int) (Math.pow(10, pow));
-      double tmin = min * fac;
-      double tmax = max * fac;
+      final double fac = (int) (Math.pow(10, pow));
+      final double tmin = min * fac;
+      final double tmax = max * fac;
       range = Math.abs(tmax - tmin);
       final double d = tmin + range * .55d;
       
       pow = range < 10 ? 0 : (int) (Math.floor(Math.log10(range) + .5d)) - 1;
-      double lstep = (int) (Math.pow(10, pow));
+      final double lstep = (int) (Math.pow(10, pow));
       sigVal = d - d % lstep;
       sigVal /= fac;
-      lstep /= fac;
-      calculatedCaptionStep = lstep;
-      
+      calculatedCaptionStep = lstep / fac;
       return;
     }
     
