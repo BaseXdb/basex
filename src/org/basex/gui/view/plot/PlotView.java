@@ -42,7 +42,7 @@ public final class PlotView extends View implements Runnable {
   /** Plot margin: top, left, bottom, right margin. */
   private static final int[] MARGIN = new int[4];
   /** Whitespace between captions. */
-  static final int CAPTIONWHITESPACE = 10;
+  static final int CAPTIONWHITESPACE = 30;
   /** Data reference. */
   PlotData plotData;
   /** Item image. */
@@ -200,6 +200,17 @@ public final class PlotView extends View implements Runnable {
     // draw axis and grid
     drawAxis(g, true);
     drawAxis(g, false);
+    
+    // draw dark plot bounder
+    g.setColor(GUIConstants.color6);
+    final int w = getWidth();
+    final int h = getHeight();
+    g.drawLine(MARGIN[1] + noval, MARGIN[0], w - MARGIN[3], MARGIN[0]);
+    g.drawLine(MARGIN[1] + noval, h - MARGIN[2] - noval, w - MARGIN[3], 
+        h - MARGIN[2] - noval);
+    g.drawLine(MARGIN[1] + noval, MARGIN[0], MARGIN[1] + noval, 
+        h - MARGIN[2] - noval);
+    g.drawLine(w - MARGIN[3], MARGIN[0], w - MARGIN[3], h - MARGIN[2] - noval);
 
     // draw items
     g.setColor(GUIConstants.color6);
@@ -393,27 +404,32 @@ public final class PlotView extends View implements Runnable {
     } else {
       final boolean noRange = axis.max - axis.min == 0;
       // draw min/max caption
-      drawCaptionAndGrid(g, drawX, noRange ? "" : 
-        formatString(axis.min, drawX), 0);
-      drawCaptionAndGrid(g, drawX, noRange ? "" : 
-        formatString(axis.max, drawX), 1);
-//      // draw significant value
-//      drawCaptionAndGrid(g, drawX, formatString(axis.sigVal, drawX), 
-//          axis.calcPosition(axis.sigVal));
+//      drawCaptionAndGrid(g, drawX, noRange ? "" : 
+//        formatString(axis.min, drawX), 0);
+//      drawCaptionAndGrid(g, drawX, noRange ? "" : 
+//        formatString(axis.max, drawX), 1);
+      
+      // draw min and max grid line
+      drawCaptionAndGrid(g, drawX, noRange ? "" : "", 0);
+      drawCaptionAndGrid(g, drawX, noRange ? "" : "", 1);
+
       // return if insufficient plot space
       if(nrCaptions == 0) return;
 
-
       // draw captions between min and max
-      // <LK> ugly workaround - will be fixed
-      if(nrCaptions < 0) return;
-      int i = 1;
+      if(nrCaptions == 0) return;
       // first and last label already painted, thus loop from 0 to -1
-      while(i < nrCaptions - 1) {
+      int i = 1;
+      double d = axis.calcPosition(axis.firstLabel);
+      double f = axis.firstLabel;
+      while(d < 1.0d - .25d / nrCaptions) {
         drawCaptionAndGrid(g, drawX, 
-            formatString(axis.min + i * step, drawX), capRange * i);
+            formatString(f, drawX), d);
+        d = axis.calcPosition(f + step);
+        f = f + step;
         i++;
       }
+      i = 0;
     }
   }
   

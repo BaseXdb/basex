@@ -42,6 +42,8 @@ public final class PlotAxis {
   double max;
   /** Significant value for axis caption. */
   double sigVal;
+  /** First label to be drawn after minimum label. */
+  double firstLabel;
   /** The first category for text data. */
   byte[] firstCat;
   /** The last category for text data. */
@@ -65,12 +67,13 @@ public final class PlotAxis {
     nrCats = -1;
     firstCat = EMPTY;
     lastCat = EMPTY;
-    nrCaptions = -1;
+    nrCaptions = 0;
     captionStep = -1;
     calculatedCaptionStep = -1;
     min = Integer.MIN_VALUE;
     max = Integer.MAX_VALUE;
     sigVal = 0;
+    firstLabel = 0;
   }
   
   /**
@@ -252,78 +255,35 @@ public final class PlotAxis {
         max = d;
     }
     if(max - min == 0) return;
-//    // range as driving force for following calculations, no matter if INT
-//    // or DBL ... whatsoever
-//    double range = Math.abs(max - min);
-//    
-//    if(range < 1) {
-//      double dec = 1.0d / range;
-//      double pow = (int) (Math.floor(Math.log10(dec) + .5d) + 2) * 2;
-//      double fac = (int) (Math.pow(10, pow));
-//      double tmin = min * fac;
-//      double tmax = max * fac;
-//      range = Math.abs(tmax - tmin);
-//      final double d = tmin + range * .6d;
-//      
-//      pow = range < 10 ? 0 : (int) (Math.floor(Math.log10(range) + .5d)) - 1;
-//      double lstep = (int) (Math.pow(10, pow));
-//      sigVal = d - d % lstep;
-//      sigVal /= fac;
-//      lstep /= fac;
-////      calculatedCaptionStep = lstep;
-//      
-//      return;
-//    }
-//    
-//    final int pow = range < 10 ? 0 : 
-//      (int) (Math.floor(Math.log10(range) + .5d)) - 1;
-//    double lstep = (int) (Math.pow(10, pow));
-//    final double d = min + range * .6d;
-//    sigVal = d - d % lstep;
-//    calculatedCaptionStep = lstep;
+    // range as driving force for following calculations, no matter if INT
+    // or DBL ... whatsoever
+    double range = Math.abs(max - min);
     
-    
-    if(min == Integer.MAX_VALUE) min = 0;
-    if(max == Integer.MIN_VALUE) max = 0;
-    // flag for deepFS @size attribute
-    //final Data data = GUI.context.data();
-    int fsplus = 6;
-    //final boolean fss = data.fs != null && !isTag && 
-    //  eq(data.atts.key(attrID), DataText.SIZE);
-    final boolean fss = false;
-
-    final double range = max - min;
-    final double lmin = min - range / 2;
-    final double lmax = max + range / 2;
-    final double rangePow = Math.floor(fss ? 10 : Math.log10(range) + .5d);
-    final double lstep = (int) (Math.pow(fss ? 2 : 10, 
-        fss ? rangePow + fsplus : rangePow));
-    calculatedCaptionStep = (int) (Math.pow(fss ? 2 : 10, rangePow - 
-        (fss ? -fsplus : 1)));
-    
-    // find minimum axis assignment
-    double c = Math.floor(min);
-    double m = c - c % calculatedCaptionStep;
-    if(m > lmin) min = m;
-    m = c - c % lstep;
-    if(m > lmin) min = m;
-    
-    // find maximum axis assignment
-    c = Math.ceil(max);
-    boolean f = false;
-    while(c < lmax) {
-      if(c % lstep == 0) {
-        max = c;
-        break;
-      }
-      if(!f && c % calculatedCaptionStep == 0 &&
-          ((c - min) / calculatedCaptionStep) % 2 == 0) {
-        max = c;
-        f = true;
-      }
-      c -= c % calculatedCaptionStep;
-      c += calculatedCaptionStep;
+    if(range < 1) {
+      double dec = 1.0d / range;
+      double pow = (int) (Math.floor(Math.log10(dec) + .5d) + 2) * 2;
+      double fac = (int) (Math.pow(10, pow));
+      double tmin = min * fac;
+      double tmax = max * fac;
+      range = Math.abs(tmax - tmin);
+      final double d = tmin + range * .55d;
+      
+      pow = range < 10 ? 0 : (int) (Math.floor(Math.log10(range) + .5d)) - 1;
+      double lstep = (int) (Math.pow(10, pow));
+      sigVal = d - d % lstep;
+      sigVal /= fac;
+      lstep /= fac;
+      calculatedCaptionStep = lstep;
+      
+      return;
     }
+    
+    final int pow = range < 10 ? 0 : 
+      (int) (Math.floor(Math.log10(range) + .5d)) - 1;
+    double lstep = (int) (Math.pow(10, pow));
+    final double d = min + range * .6d;
+    sigVal = d - d % lstep;
+    calculatedCaptionStep = lstep;
   }
   
   /**
@@ -331,22 +291,39 @@ public final class PlotAxis {
    * @param space space of view axis available for captions
    */
   void calcCaption(final int space) {
-    if(type == Kind.DBL || type == Kind.INT) {
-      final double range = max - min;
-      if(range == 0) {
-        nrCaptions = 3;
-        captionStep = 0;
-        return;
-      }
+    // caption calculations for DBL data
+    if(type == Kind.DBL) {
+      final double range = Math.abs(max - min);
       captionStep = calculatedCaptionStep;
       nrCaptions = (int) (range / captionStep) + 1;
-      if(nrCaptions * PlotView.itemSize(false) * 2 > space) {
-        captionStep *= 2;
-        nrCaptions = (int) (range / captionStep) + 1;
+      while(2 * nrCaptions * PlotView.CAPTIONWHITESPACE * 2 < space) {
+        captionStep /= 2;
+        nrCaptions = (int) (range / captionStep);
       }
+      while(nrCaptions * PlotView.CAPTIONWHITESPACE * 2 > space) {
+        captionStep *= 2;
+        nrCaptions = (int) (range / captionStep);
+      }
+      firstLabel = sigVal;
+      while(firstLabel > min + captionStep * 1.4d)
+        firstLabel -= captionStep;
+
+      // caption calculation for INT data, mostly similar to DBL
+    } else if(type == Kind.INT) {
+      final double range = Math.abs(max - min);
+      captionStep = calculatedCaptionStep;
+      nrCaptions = (int) (range / captionStep) + 1;
+      while(2 * nrCaptions * PlotView.CAPTIONWHITESPACE * 2 < space &&
+          captionStep % 2 == 0) {
+        captionStep /= 2;
+        nrCaptions = (int) (range / captionStep);
+      }
+      firstLabel = sigVal;
+      while(firstLabel > min + captionStep * 1.4d)
+        firstLabel -= captionStep;
     
     } else {
-      nrCaptions = space / (PlotView.CAPTIONWHITESPACE * 3);
+      nrCaptions = space / (PlotView.CAPTIONWHITESPACE);
       if(nrCaptions > nrCats)
         nrCaptions = nrCats;
       captionStep = 1.0d / (nrCaptions - 1);
