@@ -33,7 +33,7 @@ public final class PlotAxis {
   /** Number of captions to display. */
   int nrCaptions;
   /** Step for axis caption. */
-  double captionStep;
+  double actlCaptionStep;
   /** Calculated caption step, view size not considered for calculation. */
   private double calculatedCaptionStep;
   /** Minimum value in case selected attribute is numerical. */
@@ -68,7 +68,7 @@ public final class PlotAxis {
     firstCat = EMPTY;
     lastCat = EMPTY;
     nrCaptions = 0;
-    captionStep = -1;
+    actlCaptionStep = -1;
     calculatedCaptionStep = -1;
     min = Integer.MIN_VALUE;
     max = Integer.MAX_VALUE;
@@ -243,16 +243,23 @@ public final class PlotAxis {
    * @param vals item values
    */
   private void calcExtremeValues(final byte[][] vals) {
-    min = Integer.MAX_VALUE;
-    max = Integer.MIN_VALUE;
-    for(int i = 0; i < vals.length; i++) {
-      if(vals[i].length < 1)
-        continue;
-      double d = toDouble(vals[i]);
-      if(d < min)
-        min = d;
-      if(d > max) 
-        max = d;
+    int i = 0;
+    boolean b = false;
+    while(i < vals.length) {
+      if(vals[i].length > 0) {
+        b = true;
+        double d = toDouble(vals[i]);
+        if(d < min)
+          min = d;
+        if(d > max) 
+          max = d;
+      }
+      i++;
+    }
+    if(!b) {
+      min = 0;
+      max = 0;
+      return;
     }
     // range as driving force for following calculations, no matter if INT
     // or DBL ... whatsoever
@@ -299,29 +306,29 @@ public final class PlotAxis {
       }
       final boolean dbl = type == Kind.DBL;
 
-      captionStep = calculatedCaptionStep;
-      nrCaptions = (int) (range / captionStep) + 1;
+      actlCaptionStep = calculatedCaptionStep;
+      nrCaptions = (int) (range / actlCaptionStep) + 1;
       while(2 * nrCaptions * PlotView.CAPTIONWHITESPACE * 2 < space &&
-          dbl ? dbl : captionStep % 2 == 0) {
-        captionStep /= 2;
-        nrCaptions = (int) (range / captionStep);
+          dbl ? dbl : actlCaptionStep % 2 == 0) {
+        actlCaptionStep /= 2;
+        nrCaptions = (int) (range / actlCaptionStep);
       }
       while(nrCaptions * PlotView.CAPTIONWHITESPACE * 2 > space) {
-        captionStep *= 2;
-        nrCaptions = (int) (range / captionStep);
+        actlCaptionStep *= 2;
+        nrCaptions = (int) (range / actlCaptionStep);
       }
         
       // find first label after minimum value
       firstLabel = sigVal;
-      while(firstLabel > min + captionStep * 1.2d)
-        firstLabel -= captionStep;
+      while(firstLabel > min + actlCaptionStep * 1.2d)
+        firstLabel -= actlCaptionStep;
 
       // type == TEXT / CAT
     } else {
       nrCaptions = space / (PlotView.CAPTIONWHITESPACE);
       if(nrCaptions > nrCats)
         nrCaptions = nrCats;
-      captionStep = 1.0d / (nrCaptions - 1);
+      actlCaptionStep = 1.0d / (nrCaptions - 1);
     }
   }
 }

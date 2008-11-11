@@ -351,7 +351,7 @@ public final class PlotView extends View implements Runnable {
     // getting some axis specific data
     final Kind type = axis.type;
     final int nrCaptions = axis.nrCaptions/* > 1 ? axis.nrCaptions : 3*/;
-    final double step = axis.captionStep;
+    final double step = axis.actlCaptionStep;
     final double capRange = 1.0d / (nrCaptions - 1);
 
     g.setFont(GUIConstants.font);
@@ -423,7 +423,6 @@ public final class PlotView extends View implements Runnable {
       }
       
       // draw captions between min and max
-      if(nrCaptions == 0) return;
       // first and last label already painted, thus loop from 0 to -1
       int i = 1;
       double d = axis.calcPosition(axis.firstLabel);
