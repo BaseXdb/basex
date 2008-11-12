@@ -61,7 +61,7 @@ public final class FTWords extends FTArrayExpr {
       case ALL:
         final int o1 = fto.contains(ctx.ftitem, ctx.ftpos.pos, token);
         if(o1 == 0) return false;
-        o += o1;
+        o += o1 / fto.sb.count();
         break;
       case ALLWORDS:
         for(final byte[] t2 : split(token, ' ')) {
@@ -72,7 +72,7 @@ public final class FTWords extends FTArrayExpr {
         break;
       case ANY:
         final int o3 = fto.contains(ctx.ftitem, ctx.ftpos.pos, token);
-        o += o3;
+        o += o3 / fto.sb.count();
         break;
       case ANYWORD:
         for(final byte[] t4 : split(token, ' ')) {
@@ -82,7 +82,7 @@ public final class FTWords extends FTArrayExpr {
         break;
       case PHRASE:
         final int o5 = fto.contains(ctx.ftitem, ctx.ftpos.pos, token);
-        o += o5;
+        o += o5 / fto.sb.count();
         break;
     }
     return o >= occ[0] && o <= occ[1];

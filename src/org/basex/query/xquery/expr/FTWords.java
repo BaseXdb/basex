@@ -68,7 +68,7 @@ public final class FTWords extends Single {
           final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftpos, txt);
           if(oc == 0) return 0;
           len += txt.length * oc;
-          o += oc;
+          o += oc / ctx.ftopt.sb.count();
         }
         break;
       case ALLWORDS:
@@ -86,7 +86,7 @@ public final class FTWords extends Single {
           final byte[] txt = i.str();
           final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftpos, txt);
           len += txt.length * oc;
-          o += oc;
+          o += oc / ctx.ftopt.sb.count();
         }
         break;
       case ANYWORD:
@@ -106,7 +106,7 @@ public final class FTWords extends Single {
         }
         final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftpos, txt.finish());
         len += txt.size * oc;
-        o += oc;
+        o += oc / ctx.ftopt.sb.count();
         break;
     }
     return o < mn || o > mx ? 0 : Math.max(1, len);

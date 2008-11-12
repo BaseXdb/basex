@@ -183,7 +183,7 @@ public final class Steps {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     for(int s = 0; s < size; s++) sb.append("/" + steps[s]);
-    return sb.toString().substring(1);
+    return sb.toString().substring(size != 0 ? 1 : 0);
   }
 
   /**

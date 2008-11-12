@@ -103,7 +103,7 @@ public final class FTOpt {
 
       if(f) {
         if(il == null) il = new IntList();
-        // each wordposition has to be safed for phrases 
+        // each word position has to be saved for phrases
         for (int i = 0; i < sb.pos; i++)
           il.add(tpos + i);
       }

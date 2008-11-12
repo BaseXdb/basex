@@ -38,11 +38,6 @@ public final class FTTest extends AbstractTest {
       "</fttest>";
 
     queries = new Object[][] {
-        { "AndOr 4", nodes(25, 29),
-          "//fti[text() ftcontains 'eens' and text() ftcontains 'ook' or " +
-          "text() ftcontains 'a']" },
-        
-        
         { "Simple 1", bool(true),
           "'abc' ftcontains 'abc'" },
         { "Simple 2", bool(true),
@@ -174,6 +169,12 @@ public final class FTTest extends AbstractTest {
           "//w [text() ftcontains 'XmL' occurs at most 2 times]" },
         { "FTTimes 6", nodes(3, 7, 9, 11, 14, 37),
           "//w [text() ftcontains 'XmL' occurs from 0 to 1 times]" },
+        { "FTTimes 7", nodes(5),
+          "//w [text() ftcontains 'xml xml' occurs at least 2 times]" },
+        { "FTTimes 8", nodes(),
+          "//w [text() ftcontains 'xml xml' occurs at least 4 times]" },
+          
+        //introduction[. ftcontains "be used" occurs at least 2 times]
           
         { "FTAndOr 1", nodes(7, 9, 11),
           "//w [text() ftcontains 'XmL' ftand 'Databases']" },

@@ -83,7 +83,13 @@ public final class FTSelect extends Single {
   
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
+    if(weight == null) Err.or(INCOMPLETE);
     weight = ctx.comp(weight);
+    if(weight.i()) {
+      Item wg = (Item) weight;
+      if(!wg.n()) Err.or(XPTYPENUM, WEIGHT, weight);
+      if(wg.dbl() < 0 || wg.dbl() > 1000) Err.or(FTWEIGHT, wg);
+    }
     return super.comp(ctx);
   }
 
