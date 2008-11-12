@@ -44,8 +44,6 @@ public final class DialogImportFS  extends Dialog {
   private final BaseXLabel info;
   /** Parsing complete filesystem. */
   private BaseXCheckBox all;
-  /** Import hidden Files. */
-  private BaseXCheckBox hidden;
   /** Browse button. */
   private BaseXButton button;
   /** ID3 parsing. */

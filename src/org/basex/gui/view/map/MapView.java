@@ -295,9 +295,11 @@ public final class MapView extends View implements Runnable {
     int mymapalgo = 0;
     // [JH] should bee set globally, easier for developing
     switch(mymapalgo){ //GUIProp.mapalgo) {
-      case 0: calcMap(rect, new IntList(nodes.nodes), 0, nodes.size, true); break;
+      case 0: calcMap(rect, new IntList(nodes.nodes), 0, nodes.size, true); 
+        break;
       // simple form of slice and dice tremapalgorithm
-      case 1: calcSliceMap(rect, new IntList(nodes.nodes), 0, nodes.size, 0); break;
+      case 1: calcSliceMap(rect, new IntList(nodes.nodes), 0, nodes.size, 0);
+        break;
 //    case 2: any other layout, to be implemented
       default: calcMap(rect, new IntList(nodes.nodes), 0, nodes.size, true);
     }
@@ -335,14 +337,15 @@ public final class MapView extends View implements Runnable {
    * @param ne end array position
    * @param first first traversal
    */
-  private void calcMap(final MapRect r, final IntList l, final int ns, final int ne, final boolean first) {  
+  private void calcMap(final MapRect r, final IntList l, final int ns, 
+      final int ne, final boolean first) {  
     // one rectangle left.. continue with this child
     if(ne - ns == 1) {
       // calculate rectangle sizes
       final MapRect t = new MapRect(r.x, r.y, r.w, r.h, l.list[ns], r.l);
       mainRects.add(t);
 
-      // position, with and height are calculated using sizes of former recursion level
+      // position, with and height calculated using sizes of former level
       final int x = t.x + layout.x;
       final int y = t.y + layout.y;
       final int w = t.w - layout.w;
@@ -351,13 +354,14 @@ public final class MapView extends View implements Runnable {
       // get children
       final int o = GUIProp.fontsize + 4;
       // skip too small rectangles and leaf nodes (= meta data in deepfs)
-      if((w >= o || h >= o) && w > 0 && h > 0 && !ViewData.isLeaf(GUI.context.data(), t.p)) {
+      if((w >= o || h >= o) && w > 0 && h > 0 && 
+          !ViewData.isLeaf(GUI.context.data(), t.p)) {
         final IntList ch = children(t.p);
-        if(ch.size != 0) calcMap(new MapRect(x, y, w, h, l.list[ns], r.l + 1), ch, 0, ch.size - 1, false);
+        if(ch.size != 0) calcMap(new MapRect(x, y, w, h, l.list[ns], r.l + 1), 
+            ch, 0, ch.size - 1, false);
       }
     } else {
-      final Data data = GUI.context.data();
-      int nn, ln, ni, size;
+      int nn, ln, ni;
       // number of nodes used to calculate space
       nn = ne - ns;
       // nn / 2, pretends to be the middle of the handled list
@@ -390,7 +394,8 @@ public final class MapView extends View implements Runnable {
       // mapprop contains prefered alignment influence
       final int p = GUIProp.mapprop;
       
-      final boolean v = p > 4 ? r.w > r.h * (p + 4) / 8 : r.w * (13 - p) / 8 > r.h;
+      final boolean v = p > 4 ? r.w > r.h * (p + 4) / 8 : 
+        r.w * (13 - p) / 8 > r.h;
 
       int xx = r.x;
       int yy = r.y;
@@ -402,15 +407,21 @@ public final class MapView extends View implements Runnable {
 //      slows the application down a lot, leave this if not needed
 //      int mysize = l.get(ni)-l.get(ns);
 //      int mytest = l.get(ni-1) - l.get(ns);
-//      System.out.println("ns_Pfad: " +  Token.string(ViewData.path(GUI.context.data(), l.get(ns))) + " ni_Pfad: " +  Token.string(ViewData.path(GUI.context.data(), l.get(ni))) + " ln: " + ln + " nn/2: " + nn/2 + " ln davor: " + mytest);
-//      System.out.println("Breite: " + ww + " Höhe: " + hh + " Fläche: " + ww*hh + " Größe: " + mysize);
+//      System.out.println("ns_Pfad: " +  Token.string(
+//      ViewData.path(GUI.context.data(), l.get(ns))) + " ni_Pfad: " +  
+//      Token.string(ViewData.path(GUI.context.data(), l.get(ni))) + " ln: " + 
+//      ln + " nn/2: " + nn/2 + " ln davor: " + mytest);
+//      System.out.println("Breite: " + ww + " Höhe: " + hh + " Fläche: " + 
+//      ww*hh + " Größe: " + mysize);
 //      int mywidth = v ? r.w-ww : ww;
 //      int myheight = !v ? r.h-hh : hh;
 //      mysize = l.get(ne)-l.get(ni);
-//      System.out.println("Breite: " + mywidth + " Höhe: " + myheight + " Fläche: " + mywidth*myheight + " Größe: " + mysize + "\n");
+//      System.out.println("Breite: " + mywidth + " Höhe: " + myheight + 
+//      " Fläche: " + mywidth*myheight + " Größe: " + mysize + "\n");
       
       // paint both rectangles if enough space is left
-      if(ww > 0 && hh > 0) calcMap(new MapRect(xx, yy, ww, hh, 0, r.l), l, ns, ni, first);
+      if(ww > 0 && hh > 0) calcMap(new MapRect(xx, yy, ww, hh, 0, r.l), l, ns,
+          ni, first);
       if(v) {
         xx += ww;
         ww = r.w - ww;
@@ -418,7 +429,8 @@ public final class MapView extends View implements Runnable {
         yy += hh;
         hh = r.h - hh;
       }
-      if(ww > 0 && hh > 0) calcMap(new MapRect(xx, yy, ww, hh, 0, r.l), l, ni, ne, first);
+      if(ww > 0 && hh > 0) calcMap(new MapRect(xx, yy, ww, hh, 0, r.l), l, ni, 
+          ne, first);
     }
   }
   
@@ -431,8 +443,9 @@ public final class MapView extends View implements Runnable {
    * @param ne end array position
    * @param level levelcounter to calculate direction
    */
-  private void calcSliceMap(final MapRect r, final IntList l, final int ns, final int ne, final int level){
-    final int o = GUIProp.fontsize + 4;
+  private void calcSliceMap(final MapRect r, final IntList l, final int ns, 
+      final int ne, final int level) {
+//    final int o = GUIProp.fontsize + 4;
 
     // one rectangle left.. continue with this child
     if(ne - ns == 1) {
@@ -440,7 +453,8 @@ public final class MapView extends View implements Runnable {
       // calculate rectangle sizes
       final MapRect t = new MapRect(r.x, r.y, r.w, r.h, l.list[ns], r.l);
 
-      // position, with and height are calculated using splittet sizes of former recursion level
+      // position, with and height are calculated using splittet sizes of 
+      //  former recursion level
       final int x = t.x + layout.x;
       final int y = t.y + layout.y;
       final int w = t.w - layout.w;
@@ -449,7 +463,8 @@ public final class MapView extends View implements Runnable {
       // skip too small rectangles and leaf nodes (= meta data in deepfs)
       if(w > 0 && h > 0 && !ViewData.isLeaf(GUI.context.data(), t.p)) {
         final IntList ch = children(t.p);
-        if(ch.size >= 0) calcSliceMap(new MapRect(x, y, w, h, l.list[ns], t.l + 1), ch, 0, ch.size - 1, level + 1);
+        if(ch.size >= 0) calcSliceMap(new MapRect(x, y, w, h, 
+            l.list[ns], t.l + 1), ch, 0, ch.size - 1, level + 1);
       }
     } else {
       // number of nodes used to calculate rect size
@@ -458,12 +473,11 @@ public final class MapView extends View implements Runnable {
       
       int lines = 1;
       int perline = (int) Math.ceil((float) nn / lines);
-//      System.out.println(perline);
       final boolean v = (level % 2) == 0 ? true : false;
       int xx = r.x;
       int yy = r.y;
       
-      // take the ceiling for width and height of some rects to avoid white spaces
+      // use ceiling for width and height of some rects to avoid white spaces
       int ww, hh, ceilcount;
       if(v) {
         ww = (int) Math.ceil((float) r.w * lines / nn);
@@ -474,7 +488,6 @@ public final class MapView extends View implements Runnable {
         hh = (int) Math.ceil((float) r.h * lines / nn);
         ceilcount = (r.h  - (hh * (nn / 2))) / (hh - 1);
       }
-//      System.out.println("ceilcount: " + ceilcount + " nn: " + nn + " hh: " + hh + " ww: " + ww + " r.h: " + r.h + " gesamthöhe: " + ((ceilcount * hh) + (l.size - ceilcount) * (hh - 1)));
       
       // calculate map for each rectangel on this level
       for(int i = 0; i < l.size - 1; i++) {
@@ -484,29 +497,25 @@ public final class MapView extends View implements Runnable {
           if(v) {
             if(i == ceilcount) {
               ww -= 1;
-//            System.out.println("ceilcount ist gleich i");
             }
-            // irgendwie die treemap anhand von baumstatistiken auf mehrere zeilen oder spalten aufteilen
+            // dividing treemap to more than one column
             if(i % perline == 0 && i != 0) {
-//              System.out.println("perline: " + perline + " i: " + i);
               yy += hh;
               xx  = r.x;
             }
-            calcSliceMap(new MapRect(xx, yy, ww, hh, 0, r.l), new IntList(liste), 0, 1, level);
+            calcSliceMap(new MapRect(xx, yy, ww, hh, 0, r.l), 
+                new IntList(liste), 0, 1, level);
             xx += ww;
           } else {
             if(i == ceilcount) {
               hh -= 1;
-//              System.out.println("ceilcount ist gleich i");
             }
             if(i % perline == 0 && i != 0) {
-//              System.out.print("xx: " + xx + " ");
               xx += ww;
               yy = r.y;
-//              System.out.println("perline: " + perline + " i: " + i + " xx: " + xx);
             }
-//            System.out.println("xx nacher: " + xx);
-            calcSliceMap(new MapRect(xx, yy, ww, hh, 0, r.l), new IntList(liste), 0, 1, level);
+            calcSliceMap(new MapRect(xx, yy, ww, hh, 0, r.l), 
+                new IntList(liste), 0, 1, level);
             yy += hh;
           }
         }  

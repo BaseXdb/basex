@@ -57,8 +57,6 @@ public abstract class Builder extends Progress {
   /** Namespace stack. */
   private final int[] nsStack = new int[IO.CAP];
   /** Size Stack. */
-  private final long[] sizeStack = new long[IO.CAP];
-  /** Flag for parsing inside the document. */
   private boolean inDoc;
   /** Current tree height. */
   private int level;
@@ -216,6 +214,7 @@ public abstract class Builder extends Progress {
    * Opens a new tag; called by the building instance.
    * @param tag the tag to be processed
    * @param att the tag attributes
+   * @return preValue of the created node
    * @throws IOException in case of parsing or writing problems 
    */
   public final int startElem(final byte[] tag, final Atts att)
