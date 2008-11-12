@@ -2,6 +2,7 @@ package org.basex.gui.view.plot;
 
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -13,11 +14,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
+
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
+
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.StatsKey.Kind;
@@ -261,6 +264,33 @@ public final class PlotView extends View implements Runnable {
     g.drawImage(plotImg, 0, 0, this);
     
     // draw marked items
+//    Performance per = new Performance();
+//    final Nodes marked = GUI.context.marked();
+//    if(marked.size() > 0) {
+//      final int[] m = Arrays.copyOf(marked.nodes, marked.nodes.length);
+//      final int[] p = plotData.pres;
+//      Arrays.sort(m);
+//      int i = 0;
+//      int j = Math.abs(plotData.findPre(m[0]));
+//      if(j > 0) j--;
+//      while(i < m.length && j < p.length) {
+//        final int a = m[i];
+//        final int b = p[j];
+//        final int ns = data.size(a, data.kind(a));
+//        if(a == b) {
+//          drawItem(g, plotData.xAxis.co[j], plotData.yAxis.co[j], 
+//              false, true, false);
+//          j++;
+//        } else if(a + ns > b) {
+//          drawItem(g, plotData.xAxis.co[j], plotData.yAxis.co[j], 
+//              false, false, true);
+//          j++;
+//        } else 
+//          i++;
+//      }
+//    }
+//    System.out.println(per.getTimer());
+    
     final Nodes marked = GUI.context.marked();
     if(marked.size() > 0) {
       for(int i = 0; i < marked.size(); i++) {
