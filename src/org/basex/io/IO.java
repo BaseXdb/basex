@@ -41,6 +41,8 @@ public abstract class IO {
   public static final int NODEPOWER = 4;
   /** Fill Factor (greater than 0.0, maximum 1.0). */
   public static final double BLOCKFILL = 1;
+  /** Maximum Tree depth. */
+  public static final int CAP =  1 << 8;
 
   /** File path and name. */
   protected String path = "";

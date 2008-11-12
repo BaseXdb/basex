@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.io.IO;
@@ -25,6 +26,7 @@ public final class FSWalker {
   private List<FSVisitor> visitors;
   /** Root Directory in UNIX, Partitions in Windows or given directory. */
   private File[] roots;
+
 
   /**
    * Registers another visitor to the file hierarchy traversal.

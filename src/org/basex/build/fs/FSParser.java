@@ -5,6 +5,7 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.File;
 import java.io.IOException;
+
 import org.basex.BaseX;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
@@ -62,6 +63,14 @@ public final class FSParser extends Parser implements FSVisitor {
   private byte[] cache;
   /** Reference to the database builder. */
   private Builder builder;
+  /** Level counter. */
+  private int level;
+  /** Diretory size Stack. */
+  private final long[] sizeStack = new long[1 << 8];
+  /** Pre valStack. */
+  private final int[] preStack = new int[1 << 8];
+  /** Only use stacks if this is true. */
+  private boolean sumSizes = false;
 
   /**
    * Constructor.
@@ -84,6 +93,11 @@ public final class FSParser extends Parser implements FSVisitor {
     meta.add(TYPEEML, new EMLExtractor());
     meta.add(TYPEMBS, new EMLExtractor());
     meta.add(TYPEMBX, new EMLExtractor());
+    
+    level = 0;
+    // only using stack for file sizes if running in mainmermory mode
+    // while bugfix for DiskBuilder.setAttValue is owing
+    if (Prop.onthefly) sumSizes = true;
   }
 
   /**
@@ -92,35 +106,45 @@ public final class FSParser extends Parser implements FSVisitor {
   public void preTraversal(final String path, final boolean docOpen)
       throws IOException {
     if(docOpen) builder.startElem(token(DEEPFS), atts.reset());
-    builder.startElem(DIR, atts.set(NAME, token(path)));
+    preStack[level] = builder.startElem(DIR, atts(new File(path)));
+    if(sumSizes) sizeStack[level] = new File(path).length();
   }
 
   /**
    * {@inheritDoc}
    */
   public void preEvent(final File dir) throws IOException {
+    level++;
     guimsg = dir.toString();
-    builder.startElem(DIR, atts(dir));
-  }
-
+    preStack[level] = builder.startElem(DIR, atts(dir));
+    if(sumSizes) sizeStack[level] = dir.length();
+  }  
+  
   /**
    * {@inheritDoc}
+   * 
    */
   public void postEvent() throws IOException {
+    // closing tag
     builder.endElem(DIR);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public void postEvent(final File dir) throws IOException {
-    builder.endElem(DIR);
+    if(sumSizes) {
+      //adding folder size to parent folder
+      sizeStack[level - 1] = sizeStack[level - 1] + sizeStack[level];
+      // calling builder actualization
+      // take into account that stored pre value is the one of the element node,
+      // not the attributes one!
+      builder.setAttValue(preStack[level] + 3, token(sizeStack[level]));
+      level--;
+    }
   }
   
   /**
    * {@inheritDoc}
    */
   public void regfileEvent(final File f) throws IOException {
+    // pushing Filesize to sizes Stack
+    if(sumSizes) sizeStack[level] = sizeStack[level] + f.length();
+    
     guimsg = f.toString();
     builder.startElem(FILE, atts(f));
     if (f.canRead()) {
@@ -168,6 +192,10 @@ public final class FSParser extends Parser implements FSVisitor {
    */
   public void postTraversal(final boolean docClose) throws IOException {
     builder.endElem(DIR);
+    if(sumSizes) {
+      sizeStack[level] = sizeStack[level] + sizeStack[level + 1];
+      builder.setAttValue(preStack[level] + 3, token(sizeStack[level]));
+    }
     if(docClose) builder.endElem(token(DEEPFS));
   }
 

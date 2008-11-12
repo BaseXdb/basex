@@ -2,7 +2,9 @@ package org.basex.build;
 
 import static org.basex.build.BuildText.*;
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
+
 import org.basex.BaseX;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
@@ -13,6 +15,7 @@ import org.basex.data.Skeleton;
 import org.basex.index.Names;
 import org.basex.util.Atts;
 import org.basex.util.TokenBuilder;
+import org.basex.io.IO;
 
 /**
  * This class provides an interface for building database instances.
@@ -25,7 +28,8 @@ import org.basex.util.TokenBuilder;
  */
 public abstract class Builder extends Progress {
   /** Maximum level depth. */
-  private static final int CAP = 1 << 8;
+  // switched to org.basex.io.IO.CAP
+//  private static final int CAP = 1 << 8;
 
   /** Meta data on built database. */
   public MetaData meta;
@@ -47,11 +51,13 @@ public abstract class Builder extends Progress {
   public int elms;
 
   /** Parent stack. */
-  private final int[] parStack = new int[CAP];
+  private final int[] parStack = new int[IO.CAP];
   /** Tag stack. */
-  private final int[] tagStack = new int[CAP];
+  private final int[] tagStack = new int[IO.CAP];
   /** Namespace stack. */
-  private final int[] nsStack = new int[CAP];
+  private final int[] nsStack = new int[IO.CAP];
+  /** Size Stack. */
+  private final long[] sizeStack = new long[IO.CAP];
   /** Flag for parsing inside the document. */
   private boolean inDoc;
   /** Current tree height. */
@@ -145,7 +151,7 @@ public abstract class Builder extends Progress {
    * @param val value to be stored
    * @throws IOException in case of parsing or writing problems 
    */
-  protected abstract void setAttValue(int pre, byte[] val)
+  public abstract void setAttValue(int pre, byte[] val)
     throws IOException;
 
   // Final Methods ============================================================
@@ -212,9 +218,9 @@ public abstract class Builder extends Progress {
    * @param att the tag attributes
    * @throws IOException in case of parsing or writing problems 
    */
-  public final void startElem(final byte[] tag, final Atts att)
+  public final int startElem(final byte[] tag, final Atts att)
       throws IOException {
-    addElem(tag, att, true);
+    return addElem(tag, att, true);
   }
 
   /**
@@ -251,9 +257,10 @@ public abstract class Builder extends Progress {
    * @param name tag to be processed
    * @param att attribute names and values
    * @param open opening tag
+   * @return preVal pre value of the created node
    * @throws IOException in case of parsing or writing problems 
    */
-  private void addElem(final byte[] name, final Atts att,
+  private int addElem(final byte[] name, final Atts att,
       final boolean open) throws IOException {
 
     // convert tag to utf8
@@ -268,10 +275,11 @@ public abstract class Builder extends Progress {
     // get tag reference
     final int tid = tags.index(tag, null);
     skel.add(tid, level, Data.ELEM);
-
     // remember tag id and parent reference
     tagStack[level] = tid;
     parStack[level] = size;
+    // storing pre value to return to caller
+    int preVal = size;
 
     // store namespaces
     final boolean n = ns.open(size);
@@ -306,6 +314,9 @@ public abstract class Builder extends Progress {
       else if(elms % 50000 == 0) BaseX.err("!");
       else if(elms % 10000 == 0) BaseX.err(".");
     }
+
+    // returning created pre value
+    return preVal;
   }
 
   /**
