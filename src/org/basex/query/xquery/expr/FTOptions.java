@@ -33,6 +33,7 @@ public final class FTOptions extends Single {
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
     final FTOpt tmp = ctx.ftopt;
+    opt.compile(tmp);
     ctx.ftopt = opt;
     expr = ctx.comp(expr);
     ctx.ftopt = tmp;

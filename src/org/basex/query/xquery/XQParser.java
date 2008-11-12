@@ -2137,20 +2137,20 @@ public final class XQParser extends QueryParser {
   private Expr[] ftRange() throws XQException {
     final Expr[] occ = { Itr.get(1), Itr.get(Long.MAX_VALUE) };
     if(consumeWS(EXACTLY)) {
-      occ[0] = union();
+      occ[0] = additive();
       occ[1] = occ[0];
     } else if(consumeWS(AT)) {
       if(consumeWS(LEAST)) {
-        occ[0] = union();
+        occ[0] = additive();
       } else {
         check(MOST);
         occ[0] = Itr.get(0);
-        occ[1] = union();
+        occ[1] = additive();
       }
     } else if(consumeWS(FROM)) {
-      occ[0] = union();
+      occ[0] = additive();
       check(TO);
-      occ[1] = union();
+      occ[1] = additive();
     } else {
       return null;
     }
@@ -2198,6 +2198,8 @@ public final class XQParser extends QueryParser {
     } else if(consumeWS(LANGUAGE)) {
       opt.ln = lc(stringLiteral());
       if(!eq(opt.ln, EN)) Err.or(FTLAN, opt.ln);
+    } else if(consumeWS(OPTION)) {
+      optionDecl();
     } else {
       final int p = qp;
       final boolean with = consumeWS(WITH);

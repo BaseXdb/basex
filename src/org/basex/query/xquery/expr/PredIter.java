@@ -66,6 +66,7 @@ public final class PredIter extends Pred {
           if(found) {
             // if item is numeric it will be returned and the rest of expr
             // will be skipped. next call of next() will return null.
+            ctx.item.score(i.score());
             if(numFlag) finished = true;
             return ctx.item;
           }

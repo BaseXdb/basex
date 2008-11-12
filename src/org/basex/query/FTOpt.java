@@ -51,6 +51,23 @@ public final class FTOpt {
   public final FTTokenizer sb = new FTTokenizer();
 
   /**
+   * Compiles the fulltext options.
+   * @param opt parent fulltext options
+   */
+  public void compile(final FTOpt opt) {
+    // [CG] add check if ftoption was defined or not
+    if(opt.cs) cs = true;
+    if(opt.lc) lc = true;
+    if(opt.uc) uc = true;
+    if(opt.dc) dc = true;
+    if(opt.st) st = true;
+    if(opt.wc) wc = true;
+    if(opt.fz) fz = true;
+    if(opt.sw != null) sw = opt.sw;
+    if(ln != null) ln = opt.ln;
+  }
+  
+  /**
    * Checks if the first token contains the second fulltext term.
    * @param tk ft tokenizer
    * @param pos ft position filter

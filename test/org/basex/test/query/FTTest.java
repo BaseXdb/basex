@@ -200,6 +200,8 @@ public final class FTTest extends AbstractTest {
           "//w [text() ftcontains 'hello' ftor 'database' with stemming]" },
         { "FTStemming 5", nodes(3, 5, 14, 37),
           "//w [text() ftcontains ftnot 'database' with stemming]" },
+        { "FTStemming 6", nodes(7, 9, 11),
+          "//w [text() ftcontains ('database') with stemming]" },
                     
         { "FTLanguage 1", nodes(14),
           "//* [text() ftcontains 'hello' language 'en']" },
