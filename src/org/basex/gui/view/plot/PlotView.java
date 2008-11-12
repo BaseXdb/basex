@@ -48,9 +48,11 @@ public final class PlotView extends View implements Runnable {
   /** Item image. */
   private BufferedImage itemImg;
   /** Marked item image. */
-  private BufferedImage markedItemImg;
+  private BufferedImage itemImgMarked;
   /** Focused item image. */
-  private BufferedImage itemFocusedImg;
+  private BufferedImage itemImgFocused;
+  /** Child node of marked node. */
+  private BufferedImage itemImgSub;
   /** Buffered plot image. */
   private BufferedImage plotImg;
   /** X coordinate of mouse pointer. */
@@ -158,10 +160,11 @@ public final class PlotView extends View implements Runnable {
    * Creates a buffered image for items.
    * @param focus create image of focused item if true
    * @param marked create image of marked item
+   * @param markedSub child node of marked node
    * @return item image
    */
   private BufferedImage createItemImage(final boolean focus, 
-      final boolean marked) {
+      final boolean marked, final boolean markedSub) {
 
     final int size =  itemSize(focus);
     final BufferedImage img = new BufferedImage(size, size,
@@ -172,7 +175,8 @@ public final class PlotView extends View implements Runnable {
        RenderingHints.VALUE_ANTIALIAS_ON);
     
     Color c = GUIConstants.color;
-    if(marked) c = GUIConstants.colormark;
+    if(marked) c = GUIConstants.colormarkA;
+    if(markedSub) c = GUIConstants.colormark2A;
     if(focus) c = GUIConstants.color6;
 
     g.setColor(c);
@@ -216,7 +220,7 @@ public final class PlotView extends View implements Runnable {
     g.setColor(GUIConstants.color6);
     for(int i = 0; i < plotData.size; i++) {
       drawItem(g, plotData.xAxis.co[i], 
-          plotData.yAxis.co[i], false, false);
+          plotData.yAxis.co[i], false, false, false);
     }
     return img;
   }
@@ -260,10 +264,32 @@ public final class PlotView extends View implements Runnable {
     final Nodes marked = GUI.context.marked();
     if(marked.size() > 0) {
       for(int i = 0; i < marked.size(); i++) {
-        final int prePos = plotData.findPre(marked.nodes[i]);
-        if(prePos > -1)
+        // get intersection set between plot nodes and the child nodes of the
+        // current node p (element of marked node set)
+        final int p = marked.nodes[i];
+        int prePos = plotData.findPre(p);
+        if(prePos > -1) {
           drawItem(g, plotData.xAxis.co[prePos], 
-              plotData.yAxis.co[prePos], false, true);
+              plotData.yAxis.co[prePos], false, true, false);
+        
+        
+        // if current node p not found, check for intersection 
+        // between plot nodes and child nodes of p if p is greater or equal
+        // than the minimal plot pre node and smaller or equal the maximum
+        // pre value
+        } else {
+          prePos *= -1;
+          prePos--;
+          final int pl = plotData.pres.length;
+          final int ns = data.size(p, data.kind(p));
+          while(prePos < pl) {
+            if(plotData.pres[prePos] - p < ns) {
+              drawItem(g, plotData.xAxis.co[prePos], 
+                  plotData.yAxis.co[prePos], false, false, true);
+            }
+            prePos++;
+          }
+        }
       }
     }
 
@@ -273,7 +299,7 @@ public final class PlotView extends View implements Runnable {
       if(!dragging) {
         final double x1 = plotData.xAxis.co[f];
         final double y1 = plotData.yAxis.co[f];
-        drawItem(g, x1, y1, true, false);
+        drawItem(g, x1, y1, true, false, false);
         // draw focused x and y value
         g.setFont(GUIConstants.font);
         final String x = formatString(true);
@@ -310,14 +336,15 @@ public final class PlotView extends View implements Runnable {
    * @param y y coordinate
    * @param focus a focused item is drawn
    * @param marked item is marked
+   * @param sub item is a child of a marked node
    */
   private void drawItem(final Graphics g, final double x, final double y, 
-      final boolean focus, final boolean marked) {
+      final boolean focus, final boolean marked, final boolean sub) {
     final int x1 = calcCoordinate(true, x);
     final int y1 = calcCoordinate(false, y);
     
-    final BufferedImage img = focus ? itemFocusedImg : marked ?
-        markedItemImg : itemImg;
+    final BufferedImage img = focus ? itemImgFocused : marked ?
+        itemImgMarked : sub ? itemImgSub : itemImg;
     final int size =  img.getWidth() / 2;
     g.drawImage(img, x1 - size, y1 - size, this); 
   }
@@ -550,14 +577,15 @@ public final class PlotView extends View implements Runnable {
 
   @Override
   protected void refreshLayout() {
-    itemImg = createItemImage(false, false);
-    markedItemImg = createItemImage(false, true);
-    itemFocusedImg = createItemImage(true, false);
+    itemImg = createItemImage(false, false, false);
+    itemImgMarked = createItemImage(false, true, false);
+    itemImgFocused = createItemImage(true, false, false);
+    itemImgSub = createItemImage(false, false, true);
     final int size = itemSize(false);
-    MARGIN[0] = size;
+    MARGIN[0] = size + 7;
     MARGIN[1] = size * 6;
     MARGIN[2] = 35 + size * 7;
-    MARGIN[3] = size;
+    MARGIN[3] = size + 3;
     plotChanged = true;
     repaint();
   }
