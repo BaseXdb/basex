@@ -75,7 +75,6 @@ public final class FTIndex extends Single {
           DNode dn = new DNode(data, ftn.getPre(), null, Type.TXT);
           ctx.item = dn;
           ftn.convertPos();
-          System.out.println(ftn.p.list[0]);
           ctx.ftpos = new FTPos();
           ctx.ftpos.setPos(ftn.convertPos(), ftn.p.list[0]);
           
