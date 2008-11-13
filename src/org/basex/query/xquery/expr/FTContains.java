@@ -50,18 +50,18 @@ public final class FTContains extends Arr {
 
   @Override
   public Expr indexEquivalent(final XQContext ctx, final FTIndexInfo ii, 
-      final Step curr) {
+      final Step curr) throws XQException {
     if(!(expr[0] instanceof SimpleIterStep)) return this;
     final SimpleIterStep sis = (SimpleIterStep) expr[0];
-    final Expr ae = expr[1]; //expr[1].indexEquivalent(ctx, ii, curr);
+    final Expr ae = expr[1].indexEquivalent(ctx, ii, curr);
       
     Expr ex;
     if (!ii.seq) {
       // standard index evaluation
       ctx.compInfo(OPTFTINDEX);
       //ex = new FTContainsNS(expr[0], ae);
-      ex = new FTContains(expr[0], ae);
-      if (curr != null) return Path.invertSIStep(sis, curr, this);
+      ex = new FTContainsIndex(expr[0], ae);
+      if (curr != null) return Path.invertSIStep(sis, curr, ex);
       else return ex;
     } else {
       /*

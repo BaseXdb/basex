@@ -1,8 +1,15 @@
 package org.basex.query.xquery.item;
 
 import java.math.BigDecimal;
+
+import org.basex.index.FTTokenizer;
+import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
+import org.basex.query.xquery.expr.Expr;
+import org.basex.query.xquery.expr.FTIndex;
+import org.basex.query.xquery.expr.FTIndexInfo;
 import org.basex.query.xquery.iter.Iter;
+import org.basex.query.xquery.path.Step;
 import org.basex.util.Token;
 
 /**
@@ -110,6 +117,26 @@ public class Str extends Item {
     return Dec.parse(str());
   }
 
+  @Override
+  public Expr indexEquivalent(final XQContext ctx, final FTIndexInfo ii, 
+      final Step curr) throws XQException {
+    ii.tn++;
+    DNode dn = (DNode) ctx.coll(null).next();
+    FTTokenizer fto = new FTTokenizer(val);
+    int i = 0;
+    while(fto.more()) {
+      final int n = dn.data.nrIDs(fto);
+      // final int n = ctx.item.data.nrIDs(fto.sb);
+      if(n == 0) {
+        ii.indexSize = 0;
+        return Bln.FALSE;
+      }
+      i = Math.max(i, n);
+     }
+     ii.indexSize = i;
+    return new FTIndex(val, ii.lt, ii.tn);
+  }
+  
   @Override
   @SuppressWarnings("unused")
   public boolean eq(final Item it) throws XQException {

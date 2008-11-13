@@ -117,6 +117,21 @@ public final class FTNode {
   }
 
   /**
+   * Convert all tokens to one byte[].
+   *
+   * @return byte[] tokens
+   * 
+   */
+  public byte[] getTokens() {
+    StringBuffer sb = new StringBuffer();
+    for (int i = 0; i < tok.length; i++) {
+      sb.append(tok[i].text);
+      if (i < tok.length - 1) sb.append(" ");
+    }
+    return sb.toString().getBytes();
+  }
+  
+  /**
    * Get next pos value.
    * @return pos value
    */

@@ -10,6 +10,7 @@ import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Dbl;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.iter.Iter;
+import org.basex.query.xquery.path.Step;
 import org.basex.query.xquery.util.Err;
 
 /**
@@ -76,6 +77,12 @@ public final class FTSelect extends FTExpr {
       if(!pos.window(c)) return false;
     }
     return true;
+  }
+  
+  @Override
+  public Expr indexEquivalent(final XQContext ctx, final FTIndexInfo ii, 
+      final Step curr) throws XQException {
+    return expr[0].indexEquivalent(ctx, ii, curr);
   }
   
   @Override

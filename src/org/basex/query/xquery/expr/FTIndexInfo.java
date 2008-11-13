@@ -12,13 +12,17 @@ package org.basex.query.xquery.expr;
 
 public class FTIndexInfo {
   /** Flag for optimization of fulltext queries. */
-  public static boolean optimize = true;
+  public static boolean optimize = false;
   /** Flag for sequential prozessing. */
   public boolean seq = true;
   /** Flag for index use. */
   public boolean ui = false;
   /** Number of index results. */
   public int indexSize = 0;
+  /** Flag for loading text from disk. */
+  public boolean lt = false;
+  /** Number of tokens in the query. */
+  public int tn = 0;
   
   /**
    * Constructor.
