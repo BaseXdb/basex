@@ -33,6 +33,7 @@ import org.basex.query.xquery.expr.FLWOR;
 import org.basex.query.xquery.expr.FLWR;
 import org.basex.query.xquery.expr.FTAnd;
 import org.basex.query.xquery.expr.FTContains;
+import org.basex.query.xquery.expr.FTExpr;
 import org.basex.query.xquery.expr.FTMildNot;
 import org.basex.query.xquery.expr.FTNot;
 import org.basex.query.xquery.expr.FTOptions;
@@ -970,10 +971,10 @@ public final class XQParser extends QueryParser {
     if(!consumeWS(FTCONTAINS)) return e;
 
     // [CG] XQuery/FTIgnoreOption
-    final Expr select = ftSelection();
+    final FTExpr select = ftSelection();
     //Expr ignore = null;
     if(consumeWS2(WITHOUT) && consumeWS2(CONTENT)) {
-      //ignore = unionExpr();
+      //ignore = union();
       union();
       Err.or(FTIGNORE);
     }
@@ -1589,7 +1590,7 @@ public final class XQParser extends QueryParser {
       check('>');
       if(!eq(open.str(), close)) Err.or(TAGWRONG, open.str(), close);
     }
-    
+
     ctx.ns.size(s);
     return new CElem(open, cont, ns);
   }
@@ -1603,7 +1604,7 @@ public final class XQParser extends QueryParser {
    */
   private void addNS(final Atts ns, final byte[] k, final byte[] v)
       throws XQException {
-    
+
     final int i = indexOf(k, ':');
     final byte[] key = i == -1 ? EMPTY : substring(k, i + 1);
     if(!ns.addUnique(key, v)) Err.or(DUPLNSDEF, k);
@@ -1906,7 +1907,7 @@ public final class XQParser extends QueryParser {
     if(k.length == 0) return null;
     if(!t.node() || t == Type.COM || t == Type.TXT || t == Type.DOC)
       Err.or(TESTINVALID, t, k);
-    
+
     byte[] nm = delete(delete(k, '\''), '"');
     final int i = indexOf(nm, ',');
     if(i != -1) {
@@ -1918,7 +1919,7 @@ public final class XQParser extends QueryParser {
     return (t == Type.ELM || t == Type.ATT) && eq(nm, WILD) ? null :
       new QNm(nm, ctx);
   }
-  
+
   /**
    * [142] Parses a DecimalLiteral.
    * @param tb start of number
@@ -1978,8 +1979,8 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr ftSelection() throws XQException {
-    final Expr e = ftOr();
+  private FTExpr ftSelection() throws XQException {
+    final FTExpr e = ftOr();
     final FTPos pos = new FTPos();
     final FTSelect sel = new FTSelect(e, pos);
 
@@ -2021,12 +2022,12 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr ftOr() throws XQException {
-    final Expr e = ftAnd();
+  private FTExpr ftOr() throws XQException {
+    final FTExpr e = ftAnd();
     if(!consumeWS(FTOR)) return e;
 
-    Expr[] list = { e };
-    do list = add(list, ftAnd()); while(consumeWS(FTOR));
+    FTExpr[] list = { e };
+    do list = Array.add(list, ftAnd()); while(consumeWS(FTOR));
     return new FTOr(list);
   }
 
@@ -2035,12 +2036,12 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr ftAnd() throws XQException {
-    final Expr e = ftMildNot();
+  private FTExpr ftAnd() throws XQException {
+    final FTExpr e = ftMildNot();
     if(!consumeWS(FTAND)) return e;
 
-    Expr[] list = { e };
-    do list = add(list, ftMildNot()); while(consumeWS(FTAND));
+    FTExpr[] list = { e };
+    do list = Array.add(list, ftMildNot()); while(consumeWS(FTAND));
     return new FTAnd(list);
   }
 
@@ -2049,13 +2050,14 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr ftMildNot() throws XQException {
-    final Expr e = ftUnaryNot();
+  private FTExpr ftMildNot() throws XQException {
+    final FTExpr e = ftUnaryNot();
     if(!consumeWS(NOT)) return e;
 
-    Expr[] list = { e };
-    do { check(IN); list = add(list, ftUnaryNot()); } while(consumeWS(NOT));
-    //Err.or(FTMILD);
+    FTExpr[] list = { e };
+    do {
+      check(IN); list = Array.add(list, ftUnaryNot());
+    } while(consumeWS(NOT));
     return new FTMildNot(list);
   }
 
@@ -2064,7 +2066,7 @@ public final class XQParser extends QueryParser {
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr ftUnaryNot() throws XQException {
+  private FTExpr ftUnaryNot() throws XQException {
     final boolean not = consumeWS(FTNOT);
     final FTOptions e = ftPrimaryWithOptions();
     return not ? new FTNot(e) : e;
@@ -2083,24 +2085,24 @@ public final class XQParser extends QueryParser {
   }
 
   /**
-   * [FT150] Parses an FTWordsSelection.
+   * [FT150] Parses FTPrimary.
    * [FT151] Parses FTWords.
-   * [FT152] Parses an FTWordsValue.
+   * [FT152] Parses FTWordsValue.
    * [FT154] Parses FTAnyallOption.
    * [FT155] Parses FTTimes.
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr ftPrimary() throws XQException {
+  private FTExpr ftPrimary() throws XQException {
     if(pragma()) {
       check(BRACE1);
-      final Expr e = ftSelection();
+      final FTExpr e = ftSelection();
       check(BRACE2);
       return e;
     }
-    
+
     if(consumeWS(PAR1)) {
-      final Expr e = ftSelection();
+      final FTExpr e = ftSelection();
       check(PAR2);
       return e;
     }
@@ -2180,21 +2182,24 @@ public final class XQParser extends QueryParser {
     // [CG] XQuery/FTMatchOptions: thesaurus
 
     if(consumeWS(LOWERCASE)) {
-      if(opt.lc || opt.uc || opt.cs) Err.or(FTCASE);
-      opt.lc = true;
-      opt.cs = true;
+      if(opt.is(FTOpt.LC) || opt.is(FTOpt.UC) || opt.is(FTOpt.CS))
+        Err.or(FTCASE);
+      opt.set(FTOpt.CS, true);
+      opt.set(FTOpt.LC, true);
     } else if(consumeWS(UPPERCASE)) {
-      if(opt.lc || opt.uc || opt.cs) Err.or(FTCASE);
-      opt.uc = true;
-      opt.cs = true;
+      if(opt.is(FTOpt.LC) || opt.is(FTOpt.UC) || opt.is(FTOpt.CS))
+        Err.or(FTCASE);
+      opt.set(FTOpt.CS, true);
+      opt.set(FTOpt.UC, true);
     } else if(consumeWS(CASE)) {
-      if(opt.lc || opt.uc || opt.cs) Err.or(FTCASE);
-      opt.cs = consumeWS(SENSITIVE);
-      if(!opt.cs) check(INSENSITIVE);
+      if(opt.is(FTOpt.LC) || opt.is(FTOpt.UC) || opt.is(FTOpt.CS))
+        Err.or(FTCASE);
+      opt.set(FTOpt.CS, consumeWS(SENSITIVE));
+      if(!opt.is(FTOpt.CS)) check(INSENSITIVE);
     } else if(consumeWS(DIACRITICS)) {
-      if(opt.dc) Err.or(FTDIA);
-      opt.dc = consumeWS(SENSITIVE);
-      if(!opt.dc) check(INSENSITIVE);
+      if(opt.is(FTOpt.DC)) Err.or(FTDIA);
+      opt.set(FTOpt.DC, consumeWS(SENSITIVE));
+      if(!opt.is(FTOpt.DC)) check(INSENSITIVE);
     } else if(consumeWS(LANGUAGE)) {
       opt.ln = lc(stringLiteral());
       if(!eq(opt.ln, EN)) Err.or(FTLAN, opt.ln);
@@ -2206,9 +2211,9 @@ public final class XQParser extends QueryParser {
       if(!with && !consumeWS(WITHOUT)) return false;
 
       if(consumeWS2(STEMMING)) {
-        opt.st = with;
+        opt.set(FTOpt.ST, with);
       } else if(consumeWS2(THESAURUS)) {
-        opt.ts = with;
+        opt.set(FTOpt.TS, with);
         if(with) {
           final boolean par = consumeWS2(PAR1);
           if(consumeWS2(AT)) {
@@ -2259,11 +2264,11 @@ public final class XQParser extends QueryParser {
         check(STOP);
         check(WORDS);
       } else if(consumeWS2(WILDCARDS)) {
-        if(opt.fz) Err.or(FTFZWC);
-        opt.wc = with;
+        if(opt.is(FTOpt.FZ)) Err.or(FTFZWC);
+        opt.set(FTOpt.WC, with);
       } else if(consumeWS2(FUZZY)) {
-        if(opt.wc) Err.or(FTFZWC);
-        opt.fz = with;
+        if(opt.is(FTOpt.WC)) Err.or(FTFZWC);
+        opt.set(FTOpt.FZ, with);
       } else {
         qp = p;
         return false;

@@ -1,6 +1,9 @@
 package org.basex.query.xquery.expr;
 
+import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
+import java.io.IOException;
+import org.basex.data.Serializer;
 import org.basex.query.FTOpt.FTMode;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
@@ -16,7 +19,9 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class FTWords extends Single {
+public final class FTWords extends FTExpr {
+  /** Expression list. */
+  public Expr query;
   /** Minimum and maximum occurrences. */
   final Expr[] occ;
   /** Search mode. */
@@ -29,16 +34,17 @@ public final class FTWords extends Single {
    * @param o occurrences
    */
   public FTWords(final Expr e, final FTMode m, final Expr[] o) {
-    super(e);
+    query = e;
     mode = m;
     occ = o;
   }
 
   @Override
-  public Expr comp(final XQContext ctx) throws XQException {
+  public FTExpr comp(final XQContext ctx) throws XQException {
     occ[0] = ctx.comp(occ[0]);
     occ[1] = ctx.comp(occ[1]);
-    return super.comp(ctx);
+    query = ctx.comp(query);
+    return this;
   }
 
   @Override
@@ -54,7 +60,7 @@ public final class FTWords extends Single {
    * @throws XQException xquery exception
    */
   private int contains(final XQContext ctx) throws XQException {
-    final Iter iter = ctx.iter(expr);
+    final Iter iter = ctx.iter(query);
     final long mn = checkItr(ctx.iter(occ[0]));
     final long mx = checkItr(ctx.iter(occ[1]));
     int len = 0;
@@ -113,7 +119,14 @@ public final class FTWords extends Single {
   }
 
   @Override
+  public void plan(final Serializer ser) throws IOException {
+    ser.openElement(this, NS, timer());
+    query.plan(ser);
+    ser.closeElement();
+  }
+
+  @Override
   public String toString() {
-    return expr.toString();
+    return query.toString();
   }
 }

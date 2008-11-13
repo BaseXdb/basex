@@ -83,7 +83,7 @@ public final class Performance {
    * @return formatted size value
    */
   public static String format(final long size) {
-    return format(size, false, 5);
+    return format(size, true, 5);
   }
 
   /**

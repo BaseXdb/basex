@@ -1,6 +1,5 @@
 package org.basex.query.xquery.expr;
 
-import static org.basex.query.QueryTokens.*;
 import static org.basex.query.xquery.XQTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
@@ -8,7 +7,6 @@ import org.basex.query.FTOpt;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.iter.Iter;
-import org.basex.util.Token;
 
 /**
  * FTOptions expression.
@@ -16,7 +14,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class FTOptions extends Single {
+public final class FTOptions extends FTExpr {
   /** FTOptions. */
   public FTOpt opt;
 
@@ -25,17 +23,17 @@ public final class FTOptions extends Single {
    * @param e expression
    * @param o ft options
    */
-  public FTOptions(final Expr e, final FTOpt o) {
+  public FTOptions(final FTExpr e, final FTOpt o) {
     super(e);
     opt = o;
   }
 
   @Override
-  public Expr comp(final XQContext ctx) throws XQException {
+  public FTExpr comp(final XQContext ctx) throws XQException {
     final FTOpt tmp = ctx.ftopt;
     opt.compile(tmp);
     ctx.ftopt = opt;
-    expr = ctx.comp(expr);
+    expr[0] = expr[0].comp(ctx);
     ctx.ftopt = tmp;
     return this;
   }
@@ -44,7 +42,7 @@ public final class FTOptions extends Single {
   public Iter iter(final XQContext ctx) throws XQException {
     final FTOpt tmp = ctx.ftopt;
     ctx.ftopt = opt;
-    final Iter it = ctx.iter(expr);
+    final Iter it = ctx.iter(expr[0]);
     ctx.ftopt = tmp;
     return it;
   }
@@ -52,15 +50,10 @@ public final class FTOptions extends Single {
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.startElement(this);
-    if(opt.st) ser.attribute(Token.token(STEMMING), Token.TRUE);
-    if(opt.wc) ser.attribute(Token.token(WILDCARDS), Token.TRUE);
-    if(opt.fz) ser.attribute(Token.token(FUZZY), Token.TRUE);
-    if(opt.dc) ser.attribute(Token.token(DIACRITICS), Token.TRUE);
-    if(opt.uc) ser.attribute(Token.token(UPPERCASE), Token.TRUE);
-    if(opt.lc) ser.attribute(Token.token(LOWERCASE), Token.TRUE);
+    opt.plan(ser);
     ser.attribute(NS, timer());
     ser.finishElement();
-    expr.plan(ser);
+    expr[0].plan(ser);
     ser.closeElement();
   }
 
@@ -68,12 +61,7 @@ public final class FTOptions extends Single {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append(expr != null ? expr.toString() : "FTOptions");
-    if(opt.st) sb.append(" " + WITH + " " + STEMMING);
-    if(opt.wc) sb.append(" " + WITH + " " + WILDCARDS);
-    if(opt.fz) sb.append(" " + WITH + " " + FUZZY);
-    if(opt.dc) sb.append(" " + DIACRITICS + " " + SENSITIVE);
-    if(opt.uc) sb.append(" " + UPPERCASE);
-    if(opt.lc) sb.append(" " + LOWERCASE);
+    sb.append(opt.toString());
     return sb.toString();
   }
 }

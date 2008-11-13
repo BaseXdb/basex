@@ -23,7 +23,7 @@ public final class FTContainsNS extends Arr {
   private final FTTokenizer ft = new FTTokenizer();
   /** FullText options. */
   /** Temporary result node.*/
-  private FTNode ftn = null;
+  private FTNode ftn;
 
   /**
    * Constructor.
@@ -33,52 +33,37 @@ public final class FTContainsNS extends Arr {
   public FTContainsNS(final Expr e1, final FTArrayExpr e2) {
     super(e1, e2);
   }
-
-  /**
-   * Constructor.
-   * @param e1 first expression
-   * @param e2 second expression to compare with first
-   */
-  public FTContainsNS(final Expr e1, final Expr e2) {
-    super(e1, e2);
-  }
-
   
   @Override
   public Expr comp(final XPContext ctx) throws QueryException {
     super.comp(ctx);
-
     XPOptimizer.addText(expr[0], ctx);
     return this;
   }
 
   @Override
-  public Item eval(final XPContext ctx) throws QueryException {
-      final FTTokenizer tmp = ctx.ftitem;
-      ctx.ftitem = ft;
-      
-      Item res = ctx.eval(expr[1]);
-      if (res.bool()) {
-        final FTArrayExpr ftae = (FTArrayExpr) expr[1];
-        final IntList il = new IntList();
-        while (ftae.more()) {
-          ftn = ftae.next(ctx);
-          if (ftn.size == 0) break;
-          il.add(ftn.getPre());
-        }
-        res = new Nod(il.finish(), ctx);
-        ctx.item = (Nod) res;
-      } else {
-        res = new Nod(ctx);
-      }
-      ctx.ftitem = tmp;
+  public Nod eval(final XPContext ctx) throws QueryException {
+    final Item res = ctx.eval(expr[1]);
+    if(!res.bool()) return new Nod(ctx);
+
+    final FTTokenizer tmp = ctx.ftitem;
+    ctx.ftitem = ft;
     
-      return res;
+    final FTArrayExpr ftae = (FTArrayExpr) expr[1];
+    final IntList il = new IntList();
+    while (ftae.more()) {
+      ftn = ftae.next(ctx);
+      if (ftn.size == 0) break;
+      il.add(ftn.getPre());
+    }
+    ctx.item = new Nod(il.finish(), ctx);
+    ctx.ftitem = tmp;
+    return ctx.item;
   }
 
   @Override
   public String toString() {
-    return expr[0] + " ftcontainsNS " + expr[1];
+    return toString(" ftcontainsNS ");
   }
 
   @Override

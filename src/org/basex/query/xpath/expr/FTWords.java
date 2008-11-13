@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.data.MetaData;
 import org.basex.data.Serializer;
+import org.basex.query.FTOpt;
 import org.basex.query.FTOpt.FTMode;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.internal.FTIndex;
@@ -95,9 +96,9 @@ public final class FTWords extends FTArrayExpr {
     // - no stop words are specified
     // - if wildcards are specified, the fulltext index is a trie
     // - no FTTimes option is specified
-    return meta.ftcs == fto.cs && 
-      meta.ftdc == fto.dc && meta.ftst == fto.st &&
-      fto.sw == null && (!fto.wc || !meta.ftfz) &&
+    return meta.ftcs == fto.is(FTOpt.CS) && 
+      meta.ftdc == fto.is(FTOpt.DC) && meta.ftst == fto.is(FTOpt.ST) &&
+      fto.sw == null && (!fto.is(FTOpt.WC) || !meta.ftfz) &&
       occ[0] == 1  && occ[1] == Long.MAX_VALUE;
   }
   
@@ -112,11 +113,11 @@ public final class FTWords extends FTArrayExpr {
     
     // not correct; all ft options should be checked
     fto.sb.init(token);
-    fto.sb.fz = fto.fz;
-    fto.sb.wc = fto.wc;
-    fto.sb.st = fto.st;
-    fto.sb.cs = fto.cs;
-    fto.sb.dc = fto.dc;
+    fto.sb.fz = fto.is(FTOpt.FZ);
+    fto.sb.wc = fto.is(FTOpt.WC);
+    fto.sb.st = fto.is(FTOpt.ST);
+    fto.sb.cs = fto.is(FTOpt.CS);
+    fto.sb.dc = fto.is(FTOpt.DC);
     
     int i = 0;
     while(fto.sb.more()) {

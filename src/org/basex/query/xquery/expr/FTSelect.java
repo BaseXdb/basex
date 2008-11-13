@@ -1,9 +1,7 @@
 package org.basex.query.xquery.expr;
 
-import static org.basex.query.QueryTokens.*;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
-
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.FTPos;
@@ -13,7 +11,6 @@ import org.basex.query.xquery.item.Dbl;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Err;
-import org.basex.util.Token;
 
 /**
  * FTSelect expression.
@@ -21,7 +18,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class FTSelect extends Single {
+public final class FTSelect extends FTExpr {
   /** Position filter. */
   public FTPos pos;
   /** Window. */
@@ -36,7 +33,7 @@ public final class FTSelect extends Single {
    * @param e expression
    * @param u fulltext selections
    */
-  public FTSelect(final Expr e, final FTPos u) {
+  public FTSelect(final FTExpr e, final FTPos u) {
     super(e);
     pos = u;
   }
@@ -47,7 +44,7 @@ public final class FTSelect extends Single {
     ctx.ftpos = pos;
     pos.init(ctx.ftitem);
 
-    final Item it = ctx.iter(expr).next();
+    final Item it = ctx.iter(expr[0]).next();
     ctx.ftpos = tmp;
     final double s = it.dbl();
     if(s == 0 || !posFilter(ctx)) return Dbl.iter(0);
@@ -82,11 +79,11 @@ public final class FTSelect extends Single {
   }
   
   @Override
-  public Expr comp(final XQContext ctx) throws XQException {
+  public FTExpr comp(final XQContext ctx) throws XQException {
     if(weight == null) Err.or(INCOMPLETE);
     weight = ctx.comp(weight);
     if(weight.i()) {
-      Item wg = (Item) weight;
+      final Item wg = (Item) weight;
       if(!wg.n()) Err.or(XPTYPENUM, WEIGHT, weight);
       if(wg.dbl() < 0 || wg.dbl() > 1000) Err.or(FTWEIGHT, wg);
     }
@@ -96,13 +93,10 @@ public final class FTSelect extends Single {
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.startElement(this);
-    if(pos.ordered) ser.attribute(Token.token(ORDERED), Token.TRUE);
-    if(pos.start) ser.attribute(Token.token(START), Token.TRUE);
-    if(pos.end) ser.attribute(Token.token(END), Token.TRUE);
-    if(pos.content) ser.attribute(Token.token(CONTENT), Token.TRUE);
+    pos.plan(ser);
     ser.attribute(NS, timer());
     ser.finishElement();
-    expr.plan(ser);
+    expr[0].plan(ser);
     ser.closeElement();
   }
 
@@ -110,10 +104,7 @@ public final class FTSelect extends Single {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append(expr);
-    if(pos.ordered) sb.append(" " + ORDERED);
-    if(pos.start) sb.append(" " + AT + " " + START);
-    if(pos.end) sb.append(" " + AT + " " + END);
-    if(pos.content) sb.append(" " + ENTIRE + " " + CONTENT);
+    sb.append(pos);
     if(pos.dunit != null) {
       sb.append(" distance(");
       sb.append(dist[0]);

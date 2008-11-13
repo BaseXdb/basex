@@ -34,7 +34,7 @@ public final class FTContains extends Arr {
   /** Fulltext parser. */
   private final FTTokenizer ft = new FTTokenizer();
   /** FullText options. */
-  private FTOpt option;
+  private FTOpt opt;
   /** Result item. */
   private Item v2 = null;
   /** Flag for initial run. */
@@ -57,27 +57,15 @@ public final class FTContains extends Arr {
    * Constructor.
    * @param e1 first expression
    * @param e2 second expression to compare with first
-   * @param opt fulltext options
-   */
-  public FTContains(final Expr e1, final Expr e2, final FTOpt opt) {
-    super(e1, e2);
-    option = opt;
-  }
-
-  /**
-   * Constructor.
-   * @param e1 first expression
-   * @param e2 second expression to compare with first
-   * @param opt fulltext options
+   * @param o fulltext options
    * @param indexuse flag for index use
    */
-  public FTContains(final Expr e1, final Expr e2, final FTOpt opt,
+  public FTContains(final Expr e1, final Expr e2, final FTOpt o,
       final boolean indexuse) {
     super(e1, e2);
-    option = opt;
+    opt = o;
     iu = indexuse;
   }
-
   
   @Override
   public Expr comp(final XPContext ctx) throws QueryException {
@@ -223,11 +211,11 @@ public final class FTContains extends Arr {
       // sequential evaluation
       if (!iu) {
         // without index access
-        ex = new FTContains(expr[0], expr[1], option, iu);
+        ex = new FTContains(expr[0], expr[1], opt, iu);
       } else {
         // with index access
         ctx.compInfo(OPTFTINDEX);
-        ex = new FTContains(expr[0], ae, option, iu);
+        ex = new FTContains(expr[0], ae, opt, iu);
       }
   
       if (curr == null) return ex;

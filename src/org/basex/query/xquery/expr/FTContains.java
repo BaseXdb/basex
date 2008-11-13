@@ -1,7 +1,6 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.xpath.XPText.*;
-
 import org.basex.index.FTTokenizer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;

@@ -60,7 +60,7 @@ public final class XQContext extends QueryContext {
   /** Current fulltext item. */
   public FTTokenizer ftitem;
   /** Current fulltext options. */
-  public FTOpt ftopt;
+  public FTOpt ftopt = new FTOpt();
   /** Current fulltext position filter. */
   public FTPos ftpos;
 

@@ -770,36 +770,36 @@ public class XPParser extends QueryParser {
       while(true) {
       consumeWS();
       if(consume(LOWERCASE)) {
-        opt.lc = true;
-        opt.cs = true;
+        opt.set(FTOpt.CS, true);
+        opt.set(FTOpt.LC, true);
       } else if(consume(UPPERCASE)) {
-        opt.uc = true;
-        opt.cs = true;
+        opt.set(FTOpt.CS, true);
+        opt.set(FTOpt.UC, true);
       } else if(consume(CASE)) {
         consumeWS();
-        if(consume(SENSITIVE))        opt.cs = true;
-        else if(consume(INSENSITIVE)) opt.cs = false;
+        if(consume(SENSITIVE))        opt.set(FTOpt.CS, true);
+        else if(consume(INSENSITIVE)) opt.set(FTOpt.CS, false);
         else error(FTCASE);
       } else if(consume(DIACRITICS)) {
         consumeWS();
-        if(consume(SENSITIVE))        opt.dc = true;
-        else if(consume(INSENSITIVE)) opt.dc = false;
+        if(consume(SENSITIVE))        opt.set(FTOpt.DC, true);
+        else if(consume(INSENSITIVE)) opt.set(FTOpt.DC, false);
         else error(FTDIA);
       } else if(consume(WITHOUT)) {
         consumeWS();
-        if(consume(WILDCARDS)) opt.wc = false;
-        else if(consume(FUZZY)) opt.fz = false;
-        else if(consume(STEMMING)) opt.st = false;
-        else if(consume(THESAURUS)) opt.ts = false;
+        if(consume(WILDCARDS)) opt.set(FTOpt.WC, false);
+        else if(consume(FUZZY)) opt.set(FTOpt.FZ, false);
+        else if(consume(STEMMING)) opt.set(FTOpt.ST, false);
+        else if(consume(THESAURUS)) opt.set(FTOpt.TS, false);
         else if(consume(STOP)) {
           if(!consume(WORDS)) error(FTSTOP);
-          opt.sw = null;
+          opt.sw = new Set();
         }
       } else if(consume(WITH)) {
         consumeWS();
-        if(consume(WILDCARDS)) opt.wc = true;
-        else if(consume(FUZZY)) opt.fz = true;
-        else if(consume(STEMMING)) opt.st = true;
+        if(consume(WILDCARDS)) opt.set(FTOpt.WC, true);
+        else if(consume(FUZZY)) opt.set(FTOpt.FZ, true);
+        else if(consume(STEMMING)) opt.set(FTOpt.ST, true);
         else if(consume(STOP)) {
           consumeWS();
           if(!consume(WORDS)) error(FTSTOP);
@@ -838,7 +838,7 @@ public class XPParser extends QueryParser {
           }
         } else if(consume(THESAURUS)) {
           consumeWS();
-          opt.ts = true;
+          opt.set(FTOpt.TS, true);
           final boolean par = consume('(');
           consumeWS();
           if(consume(AT)) {

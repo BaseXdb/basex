@@ -12,12 +12,12 @@ import org.basex.query.xquery.iter.Iter;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class FTMildNot extends Arr {
+public final class FTMildNot extends FTExpr {
   /**
    * Constructor.
    * @param l expression list
    */
-  public FTMildNot(final Expr[] l) {
+  public FTMildNot(final FTExpr... l) {
     super(l);
   }
 

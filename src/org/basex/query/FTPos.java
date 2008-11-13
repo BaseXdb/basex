@@ -1,5 +1,8 @@
 package org.basex.query;
 
+import static org.basex.util.Token.*;
+import java.io.IOException;
+import org.basex.data.Serializer;
 import org.basex.index.FTTokenizer;
 import org.basex.util.Array;
 import org.basex.util.IntList;
@@ -14,7 +17,7 @@ import org.basex.util.TokenList;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class FTPos {
+public final class FTPos extends ExprInfo {
   /** Units. */
   public enum FTUnit {
     /** Word unit. */      WORDS,
@@ -406,10 +409,28 @@ public final class FTPos {
    */
   public boolean mildNot() {
     for(int i = 1; i < pos.length; i++) {
-      for(int k = 0; k < pos[i].size; k++) {
-        if(pos[0].contains(pos[i].list[k])) return false;
+      for(int j = 0; j < pos[i].size; j++) {
+        if(pos[0].contains(pos[i].list[j])) return false;
       }
     }
     return true;
+  }
+
+  @Override
+  public void plan(final Serializer ser) throws IOException {
+    if(ordered) ser.attribute(token(QueryTokens.ORDERED), TRUE);
+    if(start) ser.attribute(token(QueryTokens.START), TRUE);
+    if(end) ser.attribute(token(QueryTokens.END), TRUE);
+    if(content) ser.attribute(token(QueryTokens.CONTENT), TRUE);
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    if(ordered) sb.append(" " + QueryTokens.ORDERED);
+    if(start) sb.append(" " + QueryTokens.AT + " " + QueryTokens.START);
+    if(end) sb.append(" " + QueryTokens.AT + " " + QueryTokens.END);
+    if(content) sb.append(" " + QueryTokens.ENTIRE + " " + QueryTokens.CONTENT);
+    return sb.toString();
   }
 }

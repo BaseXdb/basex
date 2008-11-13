@@ -26,19 +26,19 @@ public final class FTIndex extends FTArrayExpr {
   /** Token. */
   final byte[] token;
   /** FullText options. */
-  private FTOpt option;
+  private FTOpt opt;
   /** Collection for the index results. */
   private IndexArrayIterator iat = null;
   
   /**
    * Constructor.
    * @param tok index token
-   * @param opt FTOption for index token
+   * @param o FTOption for index token
    */
-  public FTIndex(final byte[] tok, final FTOpt opt) {
+  public FTIndex(final byte[] tok, final FTOpt o) {
     exprs = new FTArrayExpr[] {};
     token = tok;
-    option = opt;
+    opt = o;
   }
 
   @Override
@@ -53,14 +53,13 @@ public final class FTIndex extends FTArrayExpr {
 
     final FTTokenizer ft = new FTTokenizer();
     ft.init(token);
-    ft.st = option.st;
-    ft.dc = option.dc;
-    ft.lc = option.lc;
-    ft.uc = option.uc;
-    ft.cs = option.cs;
-    ft.wc = option.wc;
-    ft.fz = option.fz;
-   
+    ft.st = opt.is(FTOpt.ST);
+    ft.dc = opt.is(FTOpt.DC);
+    ft.lc = opt.is(FTOpt.LC);
+    ft.uc = opt.is(FTOpt.UC);
+    ft.cs = opt.is(FTOpt.CS);
+    ft.wc = opt.is(FTOpt.WC);
+    ft.fz = opt.is(FTOpt.FZ);
     ft.lp = ctx.ftpos.lp;
     
     // check if all terms return a result at all... if not, skip node retrieval

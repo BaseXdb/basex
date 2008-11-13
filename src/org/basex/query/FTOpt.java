@@ -1,6 +1,8 @@
 package org.basex.query;
 
 import static org.basex.util.Token.*;
+import java.io.IOException;
+import org.basex.data.Serializer;
 import org.basex.index.FTTokenizer;
 import org.basex.util.IntList;
 import org.basex.util.Levenshtein;
@@ -13,9 +15,9 @@ import org.basex.util.Set;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class FTOpt {
+public final class FTOpt extends ExprInfo {
   /** Levenshtein reference. */
-  final Levenshtein ls = new Levenshtein();
+  Levenshtein ls;
 
   /** Words mode. */
   public enum FTMode {
@@ -25,48 +27,70 @@ public final class FTOpt {
     /** Any words option. */ ANYWORD,
     /** Phrase search. */    PHRASE
   }
-
   /** Sensitive flag. */
-  public boolean cs;
+  public static final int CS = 0;
   /** Lowercase flag. */
-  public boolean lc;
+  public static final int LC = 1;
   /** Uppercase flag. */
-  public boolean uc;
+  public static final int UC = 2;
   /** Diacritics flag. */
-  public boolean dc;
+  public static final int DC = 3;
   /** Stemming flag. */
-  public boolean st;
+  public static final int ST = 4;
   /** Wildcards flag. */
-  public boolean wc;
+  public static final int WC = 5;
   /** Fuzzy flag. */
-  public boolean fz;
+  public static final int FZ = 6;
+  /** Thesaurus flag. */
+  public static final int TS = 7;
+
+  /** Flag values. */
+  private final boolean[] flag = new boolean[TS + 1];
+  /** States which flags are assigned. */
+  private final boolean[] set = new boolean[flag.length];
+
   /** Stopwords. */
   public Set sw;
-  /** Thesaurus flag. */
-  public boolean ts;
   /** Language. */
   public byte[] ln;
-  
+
   /** Fulltext tokenizer. */
   public final FTTokenizer sb = new FTTokenizer();
 
   /**
-   * Compiles the fulltext options.
+   * Compiles the fulltext options, inheriting the parent.options.
    * @param opt parent fulltext options
    */
   public void compile(final FTOpt opt) {
-    // [CG] add check if ftoption was defined or not
-    if(opt.cs) cs = true;
-    if(opt.lc) lc = true;
-    if(opt.uc) uc = true;
-    if(opt.dc) dc = true;
-    if(opt.st) st = true;
-    if(opt.wc) wc = true;
-    if(opt.fz) fz = true;
-    if(opt.sw != null) sw = opt.sw;
-    if(ln != null) ln = opt.ln;
+    for(int i = 0; i < flag.length; i++) {
+      if(!set[i]) {
+        set[i] = opt.set[i];
+        flag[i] = opt.flag[i];
+      }
+    }
+    if(sw == null) sw = opt.sw;
+    if(ln == null) ln = opt.ln;
   }
-  
+
+  /**
+   * Sets the specified flag.
+   * @param f flag to be set
+   * @param v value
+   */
+  public void set(final int f, final boolean v) {
+    flag[f] = v;
+    set[f] = true;
+  }
+
+  /**
+   * Returns the specified flag.
+   * @param f flag index
+   * @return flag
+   */
+  public boolean is(final int f) {
+    return flag[f];
+  }
+
   /**
    * Checks if the first token contains the second fulltext term.
    * @param tk ft tokenizer
@@ -77,19 +101,20 @@ public final class FTOpt {
   public int contains(final FTTokenizer tk, final FTPos pos, final byte[] sub) {
     if(sub.length == 0) return 0;
 
-    tk.st = st;
-    tk.dc = dc;
-    tk.cs = cs;
+    tk.st = is(ST);
+    tk.dc = is(DC);
+    tk.cs = is(CS);
     tk.init();
 
+    if(is(FZ) && ls == null) ls = new Levenshtein();
     sb.init(sub);
     sb.st = tk.st;
     sb.dc = tk.dc;
     sb.cs = tk.cs;
-    sb.uc = uc;
-    sb.lc = lc;
-    sb.wc = wc;
-    sb.fz = fz;
+    sb.uc = is(UC);
+    sb.lc = is(LC);
+    sb.wc = is(WC);
+    sb.fz = is(FZ);
 
     IntList il = null;
     while(tk.more()) {
@@ -126,8 +151,36 @@ public final class FTOpt {
       }
       tk.p = tp;
     }
-    
+
     if(il != null) pos.add(sub, il);
     return il == null ? 0 : il.size;
+  }
+
+  @Override
+  public void plan(final Serializer ser) throws IOException {
+    if(is(ST)) ser.attribute(token(QueryTokens.STEMMING), TRUE);
+    if(is(WC)) ser.attribute(token(QueryTokens.WILDCARDS), TRUE);
+    if(is(FZ)) ser.attribute(token(QueryTokens.FUZZY), TRUE);
+    if(is(DC)) ser.attribute(token(QueryTokens.DIACRITICS), TRUE);
+    if(is(UC)) ser.attribute(token(QueryTokens.UPPERCASE), TRUE);
+    if(is(LC)) ser.attribute(token(QueryTokens.LOWERCASE), TRUE);
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder s = new StringBuilder();
+    if(is(ST))
+      s.append(" " + QueryTokens.WITH + " " + QueryTokens.STEMMING);
+    if(is(WC))
+      s.append(" " + QueryTokens.WITH + " " + QueryTokens.WILDCARDS);
+    if(is(FZ))
+      s.append(" " + QueryTokens.WITH + " " + QueryTokens.FUZZY);
+    if(is(DC))
+      s.append(" " + QueryTokens.DIACRITICS + " " + QueryTokens.SENSITIVE);
+    if(is(UC))
+      s.append(" " + QueryTokens.UPPERCASE);
+    if(is(LC))
+      s.append(" " + QueryTokens.LOWERCASE);
+    return s.toString();
   }
 }

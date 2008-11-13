@@ -13,12 +13,12 @@ import org.basex.query.xquery.util.Scoring;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class FTOr extends Arr {
+public final class FTOr extends FTExpr {
   /**
    * Constructor.
    * @param e expression list
    */
-  public FTOr(final Expr[] e) {
+  public FTOr(final FTExpr... e) {
     super(e);
   }
 
