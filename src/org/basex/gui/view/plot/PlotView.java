@@ -78,6 +78,10 @@ public final class PlotView extends View implements Runnable {
   BaseXCombo itemCombo;
   /** Flag for mouse dragging actions. */
   private boolean dragging;
+  /** Marking operation was self implied or triggered by another view. */
+  private boolean selfImplied;
+  /** Holds marked items in the plot during a self implied marking operation. */
+  private IntList tmpMarked;
   /** Bounding box which supports selection of multiple items. */
   private PlotBoundingBox selectionBox;
 
@@ -156,6 +160,7 @@ public final class PlotView extends View implements Runnable {
     
     popup = new BaseXPopup(this, GUIConstants.POPUP);
     selectionBox = new PlotBoundingBox();
+    tmpMarked = new IntList();
     refreshLayout();
   }
   
@@ -264,32 +269,15 @@ public final class PlotView extends View implements Runnable {
     g.drawImage(plotImg, 0, 0, this);
     
     // draw marked items
-//    Performance per = new Performance();
-//    final Nodes marked = GUI.context.marked();
-//    if(marked.size() > 0) {
-//      final int[] m = Arrays.copyOf(marked.nodes, marked.nodes.length);
-//      final int[] p = plotData.pres;
-//      Arrays.sort(m);
-//      int i = 0;
-//      int j = Math.abs(plotData.findPre(m[0]));
-//      if(j > 0) j--;
-//      while(i < m.length && j < p.length) {
-//        final int a = m[i];
-//        final int b = p[j];
-//        final int ns = data.size(a, data.kind(a));
-//        if(a == b) {
-//          drawItem(g, plotData.xAxis.co[j], plotData.yAxis.co[j], 
-//              false, true, false);
-//          j++;
-//        } else if(a + ns > b) {
-//          drawItem(g, plotData.xAxis.co[j], plotData.yAxis.co[j], 
-//              false, false, true);
-//          j++;
-//        } else 
-//          i++;
+//    if(selfImplied) {
+//      final int[] t = tmpMarked.finish();
+//      for(int i = 0; i < t.length; i++) {
+//        drawItem(g, plotData.xAxis.co[t[i]], 
+//            plotData.yAxis.co[t[i]], false, true, false);
 //      }
+//      tmpMarked.reset();
+//    } else {
 //    }
-//    System.out.println(per.getTimer());
     
     final Nodes marked = GUI.context.marked();
     if(marked.size() > 0) {
@@ -600,6 +588,7 @@ public final class PlotView extends View implements Runnable {
       // set first item and trigger assignment of axis assignments
       if(items.length != 0) itemCombo.setSelectedIndex(0);
 
+      selfImplied = false;
       plotChanged = true;
       repaint();
     }
@@ -617,6 +606,7 @@ public final class PlotView extends View implements Runnable {
     MARGIN[2] = 35 + size * 7;
     MARGIN[3] = size + 3;
     plotChanged = true;
+    selfImplied = false;
     repaint();
   }
 
@@ -762,6 +752,7 @@ public final class PlotView extends View implements Runnable {
     // first time method is called when mouse dragged
     if(!dragging) {
       dragging = true;
+      selfImplied = true;
       selectionBox.setStart(mouseX, mouseY);
     }
     
@@ -795,7 +786,7 @@ public final class PlotView extends View implements Runnable {
     }
     
     // searches for items located in the selection box
-    final IntList il = new IntList();
+    IntList il = new IntList();
     for(int i = 0; i < plotData.size; i++) {
       final int x = calcCoordinate(true, plotData.xAxis.co[i]);
       final int y = calcCoordinate(false, plotData.yAxis.co[i]);
@@ -803,6 +794,7 @@ public final class PlotView extends View implements Runnable {
           (x <= selectionBox.x1 && x >= selectionBox.x2)) && 
           ((y >= selectionBox.y1 && y <= selectionBox.y2) || 
              (y <= selectionBox.y1 && y >= selectionBox.y2))) {
+        tmpMarked.add(i);
         il.add(plotData.pres[i]);
       }
     }
@@ -817,11 +809,13 @@ public final class PlotView extends View implements Runnable {
     dragging = false;
     notifyFocus(-1, this);
     repaint();
+    selfImplied = false;
   }
   
   @Override
   public void mousePressed(final MouseEvent e) {
     if(working) return;
+    selfImplied = true;
     super.mousePressed(e);
     mouseX = e.getX();
     mouseY = e.getY();
@@ -831,6 +825,7 @@ public final class PlotView extends View implements Runnable {
       // a marking update is triggered with an empty node set as argument
       Nodes n = new Nodes(GUI.context.data());
       notifyMark(n);
+      selfImplied = false;
       return;
     }
     
@@ -848,6 +843,7 @@ public final class PlotView extends View implements Runnable {
       final int y = calcCoordinate(false, plotData.yAxis.co[i]);
       if(mx == x && my == y) {
         il.add(plotData.pres[i]);
+        tmpMarked.add(i);
       }
     }
     
@@ -869,24 +865,6 @@ public final class PlotView extends View implements Runnable {
       marked.union(il.finish());
       notifyMark(marked);
     }
+    selfImplied = false;
   }
-  
-  
-  //
-  // testing
-  //
-//  public static void main(String[] args) {
-//    final byte[][] t = { token("ab"), token("aa"), token(""), token("cab") }; 
-////        token(112), token(86),  token(64),  token(325) };
-//    IntList il = new IntList();
-//    il = IntList.createOrder(t, false, true);
-//    final int[] res = il.finish();
-//    for(int i = 0; i < res.length; i++) {
-//      System.out.println(res[i]);
-//    }
-//    System.out.println("\nog: ");
-//    for(int i = 0; i < t.length; i++) {
-//      System.out.println(string(t[i]));
-//    }
-//  }
 }
