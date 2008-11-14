@@ -22,7 +22,7 @@ public abstract class FTArrayExpr extends Expr {
   /** Fulltext option. */
   public FTOpt fto;
   /** Fulltext position filter. */
-  public FTPositionFilter ftpos;
+  //public FTPositionFilter ftpos;
   
   @Override
   public FTArrayExpr comp(final XPContext ctx) throws QueryException {

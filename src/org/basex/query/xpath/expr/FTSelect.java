@@ -16,6 +16,8 @@ import org.basex.query.xpath.locpath.Step;
  * @author Sebastian Gath
  */
 public final class FTSelect extends FTArrayExpr {
+  /** FTPositionFilter. */
+  public FTPositionFilter ftpos;
   /**
    * Constructor.
    * @param e expressions
@@ -24,7 +26,18 @@ public final class FTSelect extends FTArrayExpr {
   public FTSelect(final FTArrayExpr e, final FTPositionFilter ftps) {
     exprs = new FTArrayExpr[] { e };
     ftpos = ftps;   
+    // ftopt???
   }
+  
+  @Override
+  public FTArrayExpr comp(final XPContext ctx) throws QueryException {
+    for(int i = 0; i != exprs.length; i++) {
+      if(exprs[i].fto == null) exprs[i].fto = fto;
+      else if (fto != null) exprs[i].fto.merge(fto);
+      exprs[i] = exprs[i].comp(ctx);
+    }
+    return this;
+   }
 
   @Override 
   public boolean pos() {

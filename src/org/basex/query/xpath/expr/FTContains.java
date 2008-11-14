@@ -266,7 +266,8 @@ public final class FTContains extends Arr {
     final LocPathRel l1 = (LocPathRel) ftc1.expr[0];
     final LocPathRel l2 = (LocPathRel) ftc2.expr[0];
     
-    if (l1.steps.get(0).test instanceof TestName 
+    if ((l1.steps.get(0).test instanceof TestName ||
+        l1.steps.get(0).test == TestNode.TEXT)
         && l1.steps.get(0).test.sameAs(l2.steps.get(0).test) 
         && l1.steps.size() == 1) {
       // sum 

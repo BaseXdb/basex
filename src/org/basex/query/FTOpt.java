@@ -156,6 +156,22 @@ public final class FTOpt extends ExprInfo {
     return il == null ? 0 : il.size;
   }
 
+  /**
+   * Merge to FTOpts.
+   * 
+   * @param ftopt1 FTOpt to merge
+   */
+  public void merge(final FTOpt ftopt1) {
+    for (int i = 0; i < set.length; i++) {
+      if(!flag[i]) {
+        flag[i] = ftopt1.flag[i];
+        set[i] = ftopt1.set[i];
+      } else {
+        set[i] |= ftopt1.set[i];
+      }
+    }
+  }
+  
   @Override
   public void plan(final Serializer ser) throws IOException {
     if(is(ST)) ser.attribute(token(QueryTokens.STEMMING), TRUE);

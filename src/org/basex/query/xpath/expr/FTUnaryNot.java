@@ -31,6 +31,7 @@ public final class FTUnaryNot extends FTArrayExpr {
   public FTArrayExpr comp(final XPContext ctx) throws QueryException {
     for(int i = 0; i != exprs.length; i++) {
       if(exprs[i].fto == null) exprs[i].fto = fto;
+      else if (fto != null) exprs[i].fto.merge(fto);
       exprs[i] = exprs[i].comp(ctx);
     }
     return this;
