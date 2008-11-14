@@ -80,6 +80,10 @@ public final class PlotView extends View implements Runnable {
   private boolean dragging;
   /** Marking operation was self implied or triggered by another view. */
   private boolean selfImplied;
+  /** Indicates if global marked nodes should be drawn. */
+  private boolean drawContextMarked;
+  /** Indicates if a previous entry in the context history was restored. */
+  private boolean stepBack;
   /** Holds marked items in the plot during a self implied marking operation. */
   private IntList tmpMarked;
   /** Bounding box which supports selection of multiple items. */
@@ -264,52 +268,12 @@ public final class PlotView extends View implements Runnable {
       return;
     }
 
-    // draw items
+    // draw buffered plot image
     if(plotImg == null || plotChanged) plotImg = createPlotImage();
     g.drawImage(plotImg, 0, 0, this);
-    
+
     // draw marked items
-//    if(selfImplied) {
-//      final int[] t = tmpMarked.finish();
-//      for(int i = 0; i < t.length; i++) {
-//        drawItem(g, plotData.xAxis.co[t[i]], 
-//            plotData.yAxis.co[t[i]], false, true, false);
-//      }
-//      tmpMarked.reset();
-//    } else {
-//    }
-    
-    final Nodes marked = GUI.context.marked();
-    if(marked.size() > 0) {
-      for(int i = 0; i < marked.size(); i++) {
-        // get intersection set between plot nodes and the child nodes of the
-        // current node p (element of marked node set)
-        final int p = marked.nodes[i];
-        int prePos = plotData.findPre(p);
-        if(prePos > -1) {
-          drawItem(g, plotData.xAxis.co[prePos], 
-              plotData.yAxis.co[prePos], false, true, false);
-        
-        
-        // if current node p not found, check for intersection 
-        // between plot nodes and child nodes of p if p is greater or equal
-        // than the minimal plot pre node and smaller or equal the maximum
-        // pre value
-        } else {
-          prePos *= -1;
-          prePos--;
-          final int pl = plotData.pres.length;
-          final int ns = data.size(p, data.kind(p));
-          while(prePos < pl) {
-            if(plotData.pres[prePos] - p < ns) {
-              drawItem(g, plotData.xAxis.co[prePos], 
-                  plotData.yAxis.co[prePos], false, false, true);
-            }
-            prePos++;
-          }
-        }
-      }
-    }
+    drawMarkedNodes(g);
 
     // draw focused item
     final int f = plotData.findPre(focused);
@@ -344,6 +308,82 @@ public final class PlotView extends View implements Runnable {
           Math.abs(selW), Math.abs(selH));
     }
     plotChanged = false;
+  }
+  
+  /**
+   * Draws marked nodes.
+   * @param g graphics reference
+   */
+  private void drawMarkedNodes(final Graphics g) {
+//  Performance per = new Performance();
+    
+    final Data data = GUI.context.data();
+    if(!drawContextMarked) {
+      final int[] t = tmpMarked.finish();
+      for(int i = 0; i < t.length; i++) {
+        drawItem(g, plotData.xAxis.co[t[i]], 
+            plotData.yAxis.co[t[i]], false, true, false);
+      }
+      return;
+    }
+
+    // if nodes are marked in another view, the given nodes as well as their
+    // descendents are checked for intersection with the nodes displayed in
+    // the plot
+    final Nodes marked = GUI.context.marked();
+    if(marked.size() <= 0) return;
+    final int[] m = Arrays.copyOf(marked.nodes, marked.nodes.length);
+    Arrays.sort(m);
+    final int[] p = plotData.pres;
+    int i = 0;
+    int k = plotData.findPre(m[0]);
+      
+    if(k > -1) {
+      drawItem(g, plotData.xAxis.co[k], plotData.yAxis.co[k], false, 
+          true, false);
+      k++;
+    } else {
+      k *= -1;
+      k--;
+    }
+
+    // context change with less detail
+    if(stepBack) {
+      tmpMarked.reset();
+      while(i < m.length && k < p.length) {
+        final int a = m[i];
+        final int b = p[k];
+        if(a == b) {
+          drawItem(g, plotData.xAxis.co[k], plotData.yAxis.co[k], false, 
+              true, false);
+          tmpMarked.add(k);
+          i++;
+          k++;
+        } else if(a < b) i++;
+          else k++;
+      }
+      stepBack = false;
+      drawContextMarked = false;
+      return;
+    }
+    
+    // context change with more detail, descendents of marked node set are 
+    // also checked for intersection with plotted nodes
+    while(i < m.length && k < p.length) {
+      final int ns = data.size(m[i], data.kind(m[i])) - 1;
+      if(m[i] == p[k]) {
+        drawItem(g, plotData.xAxis.co[k], plotData.yAxis.co[k], false, 
+            true, false);
+        k++;
+      } else if(m[i] + ns >= p[k]) {
+        drawItem(g, plotData.xAxis.co[k], plotData.yAxis.co[k], false, 
+            false, true);
+        k++;
+      } else 
+        i++;
+    }
+      
+//    System.out.println(per.getTimer());
   }
   
   /**
@@ -562,6 +602,9 @@ public final class PlotView extends View implements Runnable {
     plotData.xAxis.refreshAxis();
     plotData.yAxis.refreshAxis();
 
+    tmpMarked.reset();
+    drawContextMarked = true;
+    if(!more) stepBack = true;
     plotChanged = true;
     repaint();
   }
@@ -589,6 +632,7 @@ public final class PlotView extends View implements Runnable {
       if(items.length != 0) itemCombo.setSelectedIndex(0);
 
       selfImplied = false;
+      drawContextMarked = true;
       plotChanged = true;
       repaint();
     }
@@ -612,6 +656,8 @@ public final class PlotView extends View implements Runnable {
 
   @Override
   protected void refreshMark() {
+    if(!selfImplied) drawContextMarked = true;
+    else drawContextMarked = false;
     repaint();
   }
 
@@ -731,6 +777,7 @@ public final class PlotView extends View implements Runnable {
   @Override
   public void mouseDragged(final MouseEvent e) {
     if(working) return;
+    selfImplied = true;
     if(dragging) {
       // to avoid significant offset between coordinates of mouse click and the
       // start coordinates of the bounding box, mouseX and mouseY are determined
@@ -752,7 +799,6 @@ public final class PlotView extends View implements Runnable {
     // first time method is called when mouse dragged
     if(!dragging) {
       dragging = true;
-      selfImplied = true;
       selectionBox.setStart(mouseX, mouseY);
     }
     
@@ -787,6 +833,7 @@ public final class PlotView extends View implements Runnable {
     
     // searches for items located in the selection box
     IntList il = new IntList();
+    tmpMarked.reset();
     for(int i = 0; i < plotData.size; i++) {
       final int x = calcCoordinate(true, plotData.xAxis.co[i]);
       final int y = calcCoordinate(false, plotData.yAxis.co[i]);
@@ -799,7 +846,6 @@ public final class PlotView extends View implements Runnable {
       }
     }
     notifyMark(new Nodes(il.finish(), GUI.context.data()));
-    
     repaint();
   }
   
@@ -825,7 +871,7 @@ public final class PlotView extends View implements Runnable {
       // a marking update is triggered with an empty node set as argument
       Nodes n = new Nodes(GUI.context.data());
       notifyMark(n);
-      selfImplied = false;
+      tmpMarked.reset();
       return;
     }
     
@@ -834,6 +880,7 @@ public final class PlotView extends View implements Runnable {
     final int pre = plotData.findPre(focused);
     if(pre < 0) return;
     final IntList il = new IntList();
+    tmpMarked.reset();
     // get coordinates for focused item
     final int mx = calcCoordinate(true, plotData.xAxis.co[pre]);
     final int my = calcCoordinate(false, plotData.yAxis.co[pre]);
@@ -865,6 +912,5 @@ public final class PlotView extends View implements Runnable {
       marked.union(il.finish());
       notifyMark(marked);
     }
-    selfImplied = false;
   }
 }

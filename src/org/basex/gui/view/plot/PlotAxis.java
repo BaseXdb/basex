@@ -100,7 +100,6 @@ public final class PlotAxis {
    * is of kind TEXT, it is treated as INT.
    */
   void refreshAxis() {
-    if(plotData.size == 0) return;
     final Data data = GUI.context.data();
     final StatsKey key = isTag ? data.tags.stat(attrID) :
       data.atts.stat(attrID);
