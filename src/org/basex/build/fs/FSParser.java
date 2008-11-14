@@ -66,11 +66,13 @@ public final class FSParser extends Parser implements FSVisitor {
   /** Level counter. */
   private int level;
   /** Diretory size Stack. */
-  private final long[] sizeStack = new long[1 << 8];
+  private final long[] sizeStack = new long[IO.CAP];
   /** Pre valStack. */
-  private final int[] preStack = new int[1 << 8];
+  private final int[] preStack = new int[IO.CAP];
   /** Only use stacks if this is true. */
   private boolean sumSizes = false;
+  /** sizeAtt offset. */
+  public static final int SIZEOFFSET = 3;
 
   /**
    * Constructor.
@@ -133,7 +135,8 @@ public final class FSParser extends Parser implements FSVisitor {
       // calling builder actualization
       // take into account that stored pre value is the one of the element node,
       // not the attributes one!
-      builder.setAttValue(preStack[level] + 3, token(sizeStack[level]));
+      builder.setAttValue(preStack[level] + SIZEOFFSET, 
+          token(sizeStack[level]));
       level--;
     }
   }
@@ -194,7 +197,8 @@ public final class FSParser extends Parser implements FSVisitor {
     builder.endElem(DIR);
     if(sumSizes) {
       sizeStack[level] = sizeStack[level] + sizeStack[level + 1];
-      builder.setAttValue(preStack[level] + 3, token(sizeStack[level]));
+      builder.setAttValue(preStack[level] + SIZEOFFSET, 
+          token(sizeStack[level]));
     }
     if(docClose) builder.endElem(token(DEEPFS));
   }
