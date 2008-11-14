@@ -25,6 +25,7 @@ import org.basex.util.Action;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
+import org.basex.build.fs.FSParser;
 
 /**
  * This view is a TreeMap implementation.
@@ -446,6 +447,7 @@ public final class MapView extends View implements Runnable {
   private void calcSliceMap(final MapRect r, final IntList l, final int ns, 
       final int ne, final int level) {
 //    final int o = GUIProp.fontsize + 4;
+    final Data data = GUI.context.data();
 
     // one rectangle left.. continue with this child
     if(ne - ns == 1) {
@@ -471,54 +473,73 @@ public final class MapView extends View implements Runnable {
 //      int nn = ne - ns;
       int nn = l.size - 1;
       
+      int par = data.parent(l.list[ns], Data.ELEM);
+      long parsize = Token.toLong(data.attValue(par + FSParser.SIZEOFFSET));
+      
+      // print preval and its size
+//      System.out.println("pre val: " + l.list[ns] + " size: " + 
+//          Token.string(data.attValue(l.list[ns] + FSParser.SIZEOFFSET)));
+      // print pre val of parent and this size
+//      System.out.println("paret pre: " + data.parent(l.list[ns], Data.ELEM) +
+//          " und so groß: " + parsize);
+      
       int lines = 1;
       int perline = (int) Math.ceil((float) nn / lines);
       final boolean v = (level % 2) == 0 ? true : false;
-      int xx = r.x;
-      int yy = r.y;
+      float xx = r.x;
+      float yy = r.y;
       
       // use ceiling for width and height of some rects to avoid white spaces
-      int ww, hh, ceilcount;
-      if(v) {
-        ww = (int) Math.ceil((float) r.w * lines / nn);
-        ceilcount = (r.w - (ww * (nn / 2))) / (ww - 1);
-        hh = r.h / lines;
-      } else {
-        ww = r.w / lines;
-        hh = (int) Math.ceil((float) r.h * lines / nn);
-        ceilcount = (r.h  - (hh * (nn / 2))) / (hh - 1);
-      }
-      
+//      int ww, hh, ceilcount;
+//      if(v) {
+//        ww = r.w / lines;
+//        hh = (int) Math.ceil((float) r.h * lines / nn);
+//      } else {
+//        ww = (int) Math.ceil((float) r.w * lines / nn);
+//        hh = r.h / lines;
+//      }
+      float hh = 0;
+      float ww = 0;
       // calculate map for each rectangel on this level
       for(int i = 0; i < l.size - 1; i++) {
+        if(v) {
+          yy += hh;
+          float hoehe = (float) Token.toLong(data.attValue(l.list[i] + FSParser.SIZEOFFSET)) * r.h / parsize;
+//          System.out.println("hoehe double: " + hoehe + " hoehe int: " + (int) hoehe);
+          hh = hoehe;
+          ww = r.w / lines;
+        } else {
+          xx += ww;
+          float breite = (float) Token.toLong(data.attValue(l.list[i] + FSParser.SIZEOFFSET)) * r.w / parsize;
+//          System.out.println("breiete double: " + breite + " breite int: "+ (int) breite);
+          ww = breite;
+          hh = r.h / lines;
+        }
         int[] liste = new int[1]; 
         liste[0] = l.list[i];
-        if(ww > 0 && hh > 0) {
-          if(v) {
-            if(i == ceilcount) {
-              ww -= 1;
-            }
-            // dividing treemap to more than one column
-            if(i % perline == 0 && i != 0) {
-              yy += hh;
-              xx  = r.x;
-            }
-            calcSliceMap(new MapRect(xx, yy, ww, hh, 0, r.l), 
-                new IntList(liste), 0, 1, level);
-            xx += ww;
-          } else {
-            if(i == ceilcount) {
-              hh -= 1;
-            }
-            if(i % perline == 0 && i != 0) {
-              xx += ww;
-              yy = r.y;
-            }
-            calcSliceMap(new MapRect(xx, yy, ww, hh, 0, r.l), 
-                new IntList(liste), 0, 1, level);
-            yy += hh;
-          }
-        }  
+        calcSliceMap(new MapRect((int) xx, (int) yy, (int) ww, (int) hh, 0, r.l), new IntList(liste), 0, 1, level);
+//        if(ww > 0 && hh > 0) 
+        
+//        if(ww > 0 && hh > 0) {
+//          if(v) {
+//            // dividing treemap to more than one column
+//            if(i % perline == 0 && i != 0) {
+//              yy += hh;
+//              xx  = r.x;
+//            }
+//            calcSliceMap(new MapRect(xx, yy, ww, hh, 0, r.l), 
+//                new IntList(liste), 0, 1, level);
+//            xx += ww;
+//          } else {
+//            if(i % perline == 0 && i != 0) {
+//              xx += ww;
+//              yy = r.y;
+//            }
+//            calcSliceMap(new MapRect(xx, yy, ww, hh, 0, r.l), 
+//                new IntList(liste), 0, 1, level);
+//            yy += hh;
+//          }
+//        }  
       }
     }
   }
