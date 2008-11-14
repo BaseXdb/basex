@@ -196,7 +196,6 @@ public final class FSParser extends Parser implements FSVisitor {
   public void postTraversal(final boolean docClose) throws IOException {
     builder.endElem(DIR);
     if(sumSizes) {
-      sizeStack[level] = sizeStack[level] + sizeStack[level + 1];
       builder.setAttValue(preStack[level] + SIZEOFFSET, 
           token(sizeStack[level]));
     }
