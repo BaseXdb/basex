@@ -48,7 +48,9 @@ abstract class ACreate extends Process {
     Builder builder = null;
     try {
       if(Prop.onthefly) {
-        context.data(new MemBuilder().build(p, db));
+        builder = new MemBuilder();
+        progress(builder);
+        context.data(builder.build(p, db));
       } else {
         if(db.equals(DataText.DEEPFS)) return error(CREATENODEEPDB);
   
