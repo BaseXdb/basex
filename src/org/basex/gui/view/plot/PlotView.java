@@ -81,7 +81,7 @@ public final class PlotView extends View implements Runnable {
   /** Marking operation was self implied or triggered by another view. */
   private boolean selfImplied;
   /** Indicates if global marked nodes should be drawn. */
-  private boolean drawContextMarked;
+  boolean drawContextMarked;
   /** Indicates if a previous entry in the context history was restored. */
   private boolean stepBack;
   /** Holds marked items in the plot during a self implied marking operation. */
@@ -122,6 +122,7 @@ public final class PlotView extends View implements Runnable {
         final String item = (String) itemCombo.getSelectedItem();
         if(plotData.setItem(item)) {
           plotChanged = true;
+          drawContextMarked = true;
           
           final String[] keys =
             plotData.getCategories(token(item)).finishString();
@@ -879,8 +880,11 @@ public final class PlotView extends View implements Runnable {
     // all of these are marked. focus range means exact same x AND y coordinate.
     final int pre = plotData.findPre(focused);
     if(pre < 0) return;
+    // marking operation is executed depending on mouse action
+    final boolean left = SwingUtilities.isLeftMouseButton(e);
+    
     final IntList il = new IntList();
-    tmpMarked.reset();
+    if(left) tmpMarked.reset();
     // get coordinates for focused item
     final int mx = calcCoordinate(true, plotData.xAxis.co[pre]);
     final int my = calcCoordinate(false, plotData.yAxis.co[pre]);
@@ -894,8 +898,6 @@ public final class PlotView extends View implements Runnable {
       }
     }
     
-    // marking operation is executed depending on mouse action
-    final boolean left = SwingUtilities.isLeftMouseButton(e);
     // right mouse or shift down
     if(e.isShiftDown() || !left) {
       final Nodes marked = GUI.context.marked();
