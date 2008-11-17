@@ -100,7 +100,7 @@ public final class XMLStreamWrapper extends Parser {
   }
 
   @Override
-  public double percent() {
+  public double prog() {
     return (nodes / 1000000d) % 1;
   }
 }

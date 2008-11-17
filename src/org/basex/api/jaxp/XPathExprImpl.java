@@ -10,8 +10,8 @@ import org.basex.core.proc.Check;
 import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPathProcessor;
-import org.basex.query.xpath.values.Item;
-import org.basex.query.xpath.values.NodeSet;
+import org.basex.query.xpath.item.Item;
+import org.basex.query.xpath.item.Nod;
 import org.basex.query.xquery.item.DNode;
 import org.basex.util.Token;
 import org.xml.sax.InputSource;
@@ -80,7 +80,7 @@ public class XPathExprImpl implements XPathExpression {
   private Object finish(final Item item, final QName res)
       throws XPathExpressionException {
     
-    NodeSet nodes = item instanceof NodeSet ? (NodeSet) item : null;
+    Nod nodes = item instanceof Nod ? (Nod) item : null;
     if(res == XPathConstants.NODESET || res == XPathConstants.NODE) {
       if(nodes == null) throw new XPathExpressionException(
           "Result can't be cast to a nodeset");
