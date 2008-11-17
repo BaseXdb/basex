@@ -95,16 +95,14 @@ public final class PlotData {
     final int[] contextPres = GUI.context.current().nodes;
     for(int i = 0; i < contextPres.length; i++) {
       int p = contextPres[i];
-      final int ns = p + data.size(p, Data.ELEM);
-      while(p < ns) {
+      final int nl = p + data.size(p, Data.ELEM);
+      while(p < nl) {
         final int kind = data.kind(p);
         if(kind == Data.ELEM) {
           if(data.tagID(p) == itmID) {
             tmpPres.add(p);
-            p += data.size(p, kind);
-          } else {
-            p += data.attSize(p, kind);
           }
+          p += data.attSize(p, kind);
         } else {
           p++;
         }
