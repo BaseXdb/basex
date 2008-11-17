@@ -345,7 +345,7 @@ public enum GUICommands implements GUICommand {
   SELECT(true, GUISELECT, null, GUISELECTTT) {
     @Override
     public void execute() {
-      View.notifyMark(GUI.context.current().copy());
+      View.notifyMark(GUI.context.current().copy(), null);
     }
 
     @Override
@@ -365,7 +365,7 @@ public enum GUICommands implements GUICommand {
         if(pre == -1) return;
         marked = new Nodes(pre, context.data());
       }
-      View.notifyContext(marked, false);
+      View.notifyContext(marked, false, null);
     }
 
     @Override
@@ -640,16 +640,16 @@ public enum GUICommands implements GUICommand {
 
       if(!GUIProp.filterrt) {
         if(!root) {
-          View.notifyContext(new Nodes(0, context.data()), true);
-          View.notifyMark(context.current());
+          View.notifyContext(new Nodes(0, context.data()), true, null);
+          View.notifyMark(context.current(), null);
         }
       } else {
         if(root) {
-          View.notifyMark(new Nodes(context.data()));
+          View.notifyMark(new Nodes(context.data()), null);
         } else {
           final Nodes mark = context.marked();
           context.marked(new Nodes(context.data()));
-          View.notifyContext(mark, true);
+          View.notifyContext(mark, true, null);
         }
       }
     }

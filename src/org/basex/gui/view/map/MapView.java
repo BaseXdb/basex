@@ -755,15 +755,15 @@ public final class MapView extends View implements Runnable {
     final Nodes marked = GUI.context.marked();
     if(!left) {
       // right mouse button
-      if(marked.find(pre) < 0) notifyMark(0);
+      if(marked.find(pre) < 0) notifyMark(0, null);
     } else if(e.getClickCount() == 2) {
-      if(mainRects.size() != 1) notifyContext(marked, false);
+      if(mainRects.size() != 1) notifyContext(marked, false, null);
     } else if(e.isShiftDown()) {
-      notifyMark(1);
+      notifyMark(1, null);
     } else if(e.isControlDown()) {
-      notifyMark(2);
+      notifyMark(2, null);
     } else {
-      if(marked.find(pre) < 0) notifyMark(0);
+      if(marked.find(pre) < 0) notifyMark(0, null);
     }
   }
 
@@ -793,7 +793,7 @@ public final class MapView extends View implements Runnable {
         np = rect.p + data.size(rect.p, data.kind(rect.p));
       }
     }
-    View.notifyMark(new Nodes(list.finish(), data));
+    View.notifyMark(new Nodes(list.finish(), data), null);
   }
 
   @Override
@@ -809,7 +809,7 @@ public final class MapView extends View implements Runnable {
   public void mouseWheelMoved(final MouseWheelEvent e) {
     if(working || focused == -1) return;
     if(e.getWheelRotation() > 0) notifyContext(
-        new Nodes(focused, GUI.context.data()), false);
+        new Nodes(focused, GUI.context.data()), false, null);
     else notifyHist(false);
   }
 

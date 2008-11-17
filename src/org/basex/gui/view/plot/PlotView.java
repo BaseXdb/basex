@@ -75,12 +75,8 @@ public final class PlotView extends View implements Runnable {
   BaseXCombo itemCombo;
   /** Flag for mouse dragging actions. */
   private boolean dragging;
-  /** Marking operation was self implied or triggered by another view. */
-  private boolean selfImplied;
   /** Indicates if global marked nodes should be drawn. */
   boolean drawContextMarked;
-  /** Indicates if a previous entry in the context history was restored. */
-  private boolean stepBack;
   /** Holds marked items in the plot during a self implied marking operation. */
   private IntList tmpMarked;
   /** Bounding box which supports selection of multiple items. */
@@ -119,7 +115,6 @@ public final class PlotView extends View implements Runnable {
         final String item = (String) itemCombo.getSelectedItem();
         if(plotData.setItem(item)) {
           plotChanged = true;
-          drawContextMarked = true;
           
           final String[] keys =
             plotData.getCategories(token(item)).finishString();
@@ -323,8 +318,6 @@ public final class PlotView extends View implements Runnable {
    * @param g graphics reference
    */
   private void drawMarkedNodes(final Graphics g) {
-//  Performance per = new Performance();
-    
     final Data data = GUI.context.data();
     if(!drawContextMarked) {
       final int[] t = tmpMarked.finish();
@@ -356,24 +349,23 @@ public final class PlotView extends View implements Runnable {
     }
 
     // context change with less detail
-    if(stepBack) {
-      tmpMarked.reset();
-      while(i < m.length && k < p.length) {
-        final int a = m[i];
-        final int b = p[k];
-        if(a == b) {
-          drawItem(g, plotData.xAxis.co[k], plotData.yAxis.co[k], false, 
-              true, false);
-          tmpMarked.add(k);
-          i++;
-          k++;
-        } else if(a < b) i++;
-          else k++;
-      }
-      stepBack = false;
-      drawContextMarked = false;
-      return;
-    }
+//    if(stepBack) {
+//      tmpMarked.reset();
+//      while(i < m.length && k < p.length) {
+//        final int a = m[i];
+//        final int b = p[k];
+//        if(a == b) {
+//          drawItem(g, plotData.xAxis.co[k], plotData.yAxis.co[k], false, 
+//              true, false);
+//          tmpMarked.add(k);
+//          i++;
+//          k++;
+//        } else if(a < b) i++;
+//          else k++;
+//      }
+//      drawContextMarked = false;
+//      return;
+//    }
     
     // context change with more detail, descendents of marked node set are 
     // also checked for intersection with plotted nodes
@@ -390,8 +382,6 @@ public final class PlotView extends View implements Runnable {
       } else 
         i++;
     }
-      
-//    System.out.println(per.getTimer());
   }
   
   /**
@@ -625,7 +615,6 @@ public final class PlotView extends View implements Runnable {
 
     tmpMarked.reset();
     drawContextMarked = true;
-    if(!more) stepBack = true;
     plotChanged = true;
     repaint();
   }
@@ -652,7 +641,6 @@ public final class PlotView extends View implements Runnable {
       // set first item and trigger assignment of axis assignments
       if(items.length != 0) itemCombo.setSelectedIndex(0);
 
-      selfImplied = false;
       drawContextMarked = true;
       plotChanged = true;
       repaint();
@@ -671,14 +659,12 @@ public final class PlotView extends View implements Runnable {
     MARGIN[2] = 35 + size * 7;
     MARGIN[3] = size + 3;
     plotChanged = true;
-    selfImplied = false;
     repaint();
   }
 
   @Override
   protected void refreshMark() {
-    if(!selfImplied) drawContextMarked = true;
-    else drawContextMarked = false;
+    drawContextMarked = true;
     repaint();
   }
 
@@ -789,7 +775,6 @@ public final class PlotView extends View implements Runnable {
   @Override
   public void mouseDragged(final MouseEvent e) {
     if(working || painting) return;
-    selfImplied = true;
     if(dragging) {
       // to avoid significant offset between coordinates of mouse click and the
       // start coordinates of the bounding box, mouseX and mouseY are determined
@@ -813,6 +798,7 @@ public final class PlotView extends View implements Runnable {
       dragging = true;
       selectionBox.setStart(mouseX, mouseY);
     }
+    drawContextMarked = false;
     
     // keeps selection box on the plot inside. if mouse pointer is outside box
     // the corners of the selection box are set to the predefined values s.a. 
@@ -857,7 +843,7 @@ public final class PlotView extends View implements Runnable {
         il.add(plotData.pres[i]);
       }
     }
-    notifyMark(new Nodes(il.finish(), GUI.context.data()));
+    notifyMark(new Nodes(il.finish(), GUI.context.data()), this);
     repaint();
   }
   
@@ -867,13 +853,11 @@ public final class PlotView extends View implements Runnable {
     dragging = false;
     notifyFocus(-1, this);
     repaint();
-    selfImplied = false;
   }
   
   @Override
   public void mousePressed(final MouseEvent e) {
     if(working || painting) return;
-    selfImplied = true;
     super.mousePressed(e);
     mouseX = e.getX();
     mouseY = e.getY();
@@ -882,10 +866,11 @@ public final class PlotView extends View implements Runnable {
     if(focused == -1) {
       // a marking update is triggered with an empty node set as argument
       Nodes n = new Nodes(GUI.context.data());
-      notifyMark(n);
+      notifyMark(n, this);
       tmpMarked.reset();
       return;
     }
+    drawContextMarked = false;
     
     // node marking if item focused. if more than one icon is in focus range
     // all of these are marked. focus range means exact same x AND y coordinate.
@@ -913,17 +898,17 @@ public final class PlotView extends View implements Runnable {
     if(e.isShiftDown() || !left) {
       final Nodes marked = GUI.context.marked();
       marked.union(il.finish());
-      notifyMark(marked);
+      notifyMark(marked, this);
       // double click
     } else if(e.getClickCount() == 2) {
       final Nodes marked = new Nodes(GUI.context.data());
       marked.union(il.finish());
-      notifyContext(marked, false);
+      notifyContext(marked, false, null);
       // simple mouse click
     } else {
       final Nodes marked = new Nodes(GUI.context.data());
       marked.union(il.finish());
-      notifyMark(marked);
+      notifyMark(marked, this);
     }
   }
 }

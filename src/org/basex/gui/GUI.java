@@ -536,7 +536,7 @@ public final class GUI extends JFrame {
             View.ftPos = nodes.ftpos;
             View.ftPoi = nodes.ftpoin;
             }*/
-            View.notifyContext((Nodes) result, GUIProp.filterrt);
+            View.notifyContext((Nodes) result, GUIProp.filterrt, null);
           }
         } else if(marked != null) {
           // refresh highlight
@@ -550,7 +550,7 @@ public final class GUI extends JFrame {
           // highlights have changed.. refresh views
           if(!marked.same(context.marked())) {
             // View.ftPoi = marked.ftpoin;
-            View.notifyMark(marked);
+            View.notifyMark(marked, null);
           }
           if(thread != threadID) {
             proc = null;

@@ -399,7 +399,7 @@ final class TableHeader extends BaseXPanel {
       box.stop();
       inputCol = -1;
       final Nodes marked = GUI.context.marked();
-      if(marked.size != 0) View.notifyContext(marked, false);
+      if(marked.size != 0) View.notifyContext(marked, false, null);
     } else if(c == KeyEvent.VK_TAB) {
       if(box != null) {
         tdata.cols[inputCol].filter = box.text;

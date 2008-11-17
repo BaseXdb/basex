@@ -231,7 +231,7 @@ public final class TableView extends View implements Runnable {
         if(getCursor() == GUIConstants.CURSORARROW) {
           nodes = new Nodes(tdata.getRoot(nodes.data, pre), nodes.data);
         }
-        View.notifyContext(nodes, false);
+        View.notifyContext(nodes, false, null);
       }
     } else {
       if(pre != -1) {
@@ -241,7 +241,7 @@ public final class TableView extends View implements Runnable {
         it.init(pre);
         while(it.more()) {
           if(it.col == c) {
-            notifyMark(new Nodes(it.pre, context.data()));
+            notifyMark(new Nodes(it.pre, context.data()), null);
             return;
           }
         }

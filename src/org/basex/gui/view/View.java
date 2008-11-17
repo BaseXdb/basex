@@ -112,11 +112,12 @@ public abstract class View extends BaseXPanel {
   /**
    * Notifies all views of a selection change.
    * @param mark marked nodes
+   * @param vw the calling view
    */
-  public static void notifyMark(final Nodes mark) {
+  public static void notifyMark(final Nodes mark, final View vw) {
     final Context context = GUI.context;
     context.marked(mark);
-    for(final View v : view) if(v.isValid()) v.refreshMark();
+    for(final View v : view) if(v != vw && v.isValid()) v.refreshMark();
     final GUI gui = GUI.get();
     BaseXLayout.enable(gui.filter, context.marked().size != 0);
     gui.refreshControls();
@@ -129,8 +130,9 @@ public abstract class View extends BaseXPanel {
    * <li>1: add currently focused node</li>
    * <li>2: toggle currently focused node</li>
    * @param mode mark mode
+   * @param vw the calling view
    */
-  public static void notifyMark(final int mode) {
+  public static void notifyMark(final int mode, final View vw) {
     if(focused == -1) return;
 
     final Context context = GUI.context;
@@ -142,7 +144,7 @@ public abstract class View extends BaseXPanel {
     } else {
       nodes.toggle(focused);
     }
-    notifyMark(nodes);
+    notifyMark(nodes, vw);
   }
 
   /**
@@ -174,8 +176,10 @@ public abstract class View extends BaseXPanel {
    * Notifies all views of a context change.
    * @param nodes new context set
    * @param quick quick switch
+   * @param vw the calling view
    */
-  public static void notifyContext(final Nodes nodes, final boolean quick) {
+  public static void notifyContext(final Nodes nodes, final boolean quick,
+      final View vw) {
     if(nodes.size == 0) return;
 
     final GUI gui = GUI.get();
@@ -206,7 +210,7 @@ public abstract class View extends BaseXPanel {
     }
     init(context, nodes, n);
     
-    for(final View v : view) v.refreshContext(true, quick);
+    for(final View v : view) if(v != vw) v.refreshContext(true, quick);
     gui.refreshControls();
   }
   
@@ -332,7 +336,7 @@ public abstract class View extends BaseXPanel {
     } else if(key == KeyEvent.VK_ENTER) {
       GUICommands.FILTER.execute();
     } else if(key == KeyEvent.VK_SPACE) {
-      notifyMark(ctrl ? 2 : shift ? 1 : 0);
+      notifyMark(ctrl ? 2 : shift ? 1 : 0, null);
     } else if(key == KeyEvent.VK_BACK_SPACE) {
       GUICommands.GOBACK.execute();
     }

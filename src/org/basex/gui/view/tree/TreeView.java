@@ -408,20 +408,20 @@ public final class TreeView extends View {
     // add or remove marked node
     final Nodes marked = GUI.context.marked();
     if(!left) {
-      if(marked.find(pre) < 0) notifyMark(0);
+      if(marked.find(pre) < 0) notifyMark(0, null);
     } else if(getCursor() == GUIConstants.CURSORHAND) {
       // open/close entry
       opened[pre] ^= true;
       refreshHeight();
       repaint();
     } else if(e.getClickCount() == 2) {
-      notifyContext(marked, false);
+      notifyContext(marked, false, null);
     } else if(e.isShiftDown()) {
-      notifyMark(1);
+      notifyMark(1, null);
     } else if(e.isControlDown()) {
-      notifyMark(2);
+      notifyMark(2, null);
     } else {
-      if(marked.find(pre) < 0) notifyMark(0);
+      if(marked.find(pre) < 0) notifyMark(0, null);
     }
   }
 
@@ -444,7 +444,7 @@ public final class TreeView extends View {
     super.mouseDragged(e);
 
     // marks currently focused node
-    if(focus(e.getX(), e.getY())) notifyMark(1);
+    if(focus(e.getX(), e.getY())) notifyMark(1, null);
   }
 
   @Override
