@@ -347,36 +347,19 @@ public final class PlotView extends View implements Runnable {
       k *= -1;
       k--;
     }
-
-    // context change with less detail
-//    if(stepBack) {
-//      tmpMarked.reset();
-//      while(i < m.length && k < p.length) {
-//        final int a = m[i];
-//        final int b = p[k];
-//        if(a == b) {
-//          drawItem(g, plotData.xAxis.co[k], plotData.yAxis.co[k], false, 
-//              true, false);
-//          tmpMarked.add(k);
-//          i++;
-//          k++;
-//        } else if(a < b) i++;
-//          else k++;
-//      }
-//      drawContextMarked = false;
-//      return;
-//    }
     
-    // context change with more detail, descendents of marked node set are 
+    // context change. descendents of marked node set are 
     // also checked for intersection with plotted nodes
     while(i < m.length && k < p.length) {
-      final int ns = data.size(m[i], data.kind(m[i])) - 1;
-      if(m[i] == p[k]) {
+      final int a = m[i];
+      final int b = p[k];
+      final int ns = data.size(a, data.kind(a)) - 1;
+      if(a == b) {
         drawItem(g, plotData.xAxis.co[k], plotData.yAxis.co[k], false, 
             true, false);
         k++;
-      } else if(m[i] + ns >= p[k]) {
-        drawItem(g, plotData.xAxis.co[k], plotData.yAxis.co[k], false, 
+      } else if(a + ns >= b) {
+        if(a < b) drawItem(g, plotData.xAxis.co[k], plotData.yAxis.co[k], false, 
             false, true);
         k++;
       } else 
