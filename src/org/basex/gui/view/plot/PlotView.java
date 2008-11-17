@@ -253,11 +253,6 @@ public final class PlotView extends View implements Runnable {
     
     final int w = getWidth();
     final int h = getHeight();
-    if(w + h != viewDimension) {
-      viewDimension = w + h;
-      plotChanged = true;
-    }
-
     plotWidth = w - (MARGIN[1] + MARGIN[3]);
     plotHeight = h - (MARGIN[0] + MARGIN[2]);
 
@@ -265,8 +260,15 @@ public final class PlotView extends View implements Runnable {
     if(plotWidth - novalue < 0 || plotHeight - novalue < 0) {
       g.setFont(GUIConstants.font);
       g.setColor(Color.black);
-      BaseXLayout.drawCenter(g, NOSPACE, getWidth(), (h + MARGIN[0]) / 2);
+      BaseXLayout.drawCenter(g, NOSPACE, w, (h + MARGIN[0]) / 2);
       return;
+    }
+    
+    painting = true;
+    
+    if(w + h != viewDimension) {
+      viewDimension = w + h;
+      plotChanged = true;
     }
 
     // draw buffered plot image
@@ -309,6 +311,7 @@ public final class PlotView extends View implements Runnable {
           Math.abs(selW), Math.abs(selH));
     }
     plotChanged = false;
+    painting = false;
   }
   
   /**
@@ -489,12 +492,6 @@ public final class PlotView extends View implements Runnable {
       
     } else {
       final boolean noRange = axis.max - axis.min == 0;
-      // draw min/max caption
-//      drawCaptionAndGrid(g, drawX, noRange ? "" : 
-//        formatString(axis.min, drawX), 0);
-//      drawCaptionAndGrid(g, drawX, noRange ? "" : 
-//        formatString(axis.max, drawX), 1);
-      
       // draw min and max grid line
       drawCaptionAndGrid(g, drawX, noRange ? "" : "", 0);
       drawCaptionAndGrid(g, drawX, noRange ? "" : "", 1);
@@ -510,19 +507,38 @@ public final class PlotView extends View implements Runnable {
       
       // draw captions between min and max
       // first and last label already painted, thus loop from 0 to -1
-      int i = 1;
       double d = axis.calcPosition(axis.firstLabel);
       double f = axis.firstLabel;
-      while(d < 1.0d - .25d / nrCaptions) {
+      while(d < 1.0d - .25d / nrCaptions) { 
         drawCaptionAndGrid(g, drawX, 
             formatString(f, drawX), d);
         d = axis.calcPosition(f + step);
         f = f + step;
-        i++;
+//        if(step < .2) {
+//          // round f - java is not able to do that 
+//          f = roundCaption(f, step);
+//        }
       }
-      i = 0;
     }
   }
+  
+//  /**
+//   * Whatever.
+//   * @param val val
+//   * @param step step
+//   * @return rounded value
+//   */
+//  private double roundCaption(final double val, final double step) {
+//    double d = val;
+//    final double dec = 1.0d / step;
+//    double pow = (int) (Math.floor(Math.log10(dec) + .5d) + 2);
+//    final double fac = (int) (Math.pow(10, pow));
+//    d *= fac;
+//    d = (int) d;
+//    d /= fac;
+//    
+//    return d;
+//  }
   
   /**
    * Draws an axis caption to the specified position.
@@ -769,7 +785,7 @@ public final class PlotView extends View implements Runnable {
   
   @Override
   public void mouseMoved(final MouseEvent e) {
-    if(working) return;
+    if(working || painting) return;
     mouseX = e.getX();
     mouseY = e.getY();
     if(focus()) repaint();
@@ -777,7 +793,7 @@ public final class PlotView extends View implements Runnable {
   
   @Override
   public void mouseDragged(final MouseEvent e) {
-    if(working) return;
+    if(working || painting) return;
     selfImplied = true;
     if(dragging) {
       // to avoid significant offset between coordinates of mouse click and the
@@ -852,7 +868,7 @@ public final class PlotView extends View implements Runnable {
   
   @Override
   public void mouseReleased(final MouseEvent e) {
-    if(working) return;
+    if(working || painting) return;
     dragging = false;
     notifyFocus(-1, this);
     repaint();
@@ -861,7 +877,7 @@ public final class PlotView extends View implements Runnable {
   
   @Override
   public void mousePressed(final MouseEvent e) {
-    if(working) return;
+    if(working || painting) return;
     selfImplied = true;
     super.mousePressed(e);
     mouseX = e.getX();
