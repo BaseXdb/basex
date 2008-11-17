@@ -483,10 +483,11 @@ public final class PlotView extends View implements Runnable {
       }
       
       // draw captions between min and max
-      // first and last label already painted, thus loop from 0 to -1
       double d = axis.calcPosition(axis.firstLabel);
       double f = axis.firstLabel;
-      while(d < 1.0d - .25d / nrCaptions) { 
+      int c = 0;
+      while(d < 1.0d - .25d / nrCaptions) {
+        c++;
         drawCaptionAndGrid(g, drawX, 
             formatString(f, drawX), d);
         d = axis.calcPosition(f + step);
@@ -495,6 +496,10 @@ public final class PlotView extends View implements Runnable {
 //          // round f - java is not able to do that 
 //          f = roundCaption(f, step);
 //        }
+      }
+      if(c < 2) {
+        drawCaptionAndGrid(g, drawX, formatString(axis.min, drawX), 0.0);
+        drawCaptionAndGrid(g, drawX, formatString(axis.max, drawX), 1.0);
       }
     }
   }

@@ -15,6 +15,10 @@ public class PlotBoundingBox {
   int x2;
   /** Y coordinate of lower right corner. */
   int y2;
+  /** Indicates if box is growing or not. Needed to solve some performance
+   * issues concerning node marking operations.
+   */
+  boolean growing;
   
   
   /**
@@ -33,6 +37,8 @@ public class PlotBoundingBox {
    * @param y y coordinate
    */
   void setEnd(final int x, final int y) {
+    growing = Math.abs(x1 - x) > Math.abs(x1 - x2) && 
+      Math.abs(y1 - y) > Math.abs(y1 - y2); 
     x2 = x;
     y2 = y;
   }
@@ -51,5 +57,13 @@ public class PlotBoundingBox {
    */
   int getHeight() {
     return y2 - y1;
+  }
+  
+  /**
+   * Box is growing while being dragged.
+   * @return growing or not
+   */
+  boolean isGrowing() {
+    return growing;
   }
 }
