@@ -471,7 +471,7 @@ public final class MapView extends View implements Runnable {
     } else {
       // number of nodes used to calculate rect size
 //      int nn = ne - ns;
-      int nn = l.size - 1;
+//      int nn = l.size - 1;
       
       int par = data.parent(l.list[ns], Data.ELEM);
       long parsize = Token.toLong(data.attValue(par + FSParser.SIZEOFFSET));
@@ -484,7 +484,7 @@ public final class MapView extends View implements Runnable {
 //          " und so groß: " + parsize);
       
       int lines = 1;
-      int perline = (int) Math.ceil((float) nn / lines);
+//      int perline = (int) Math.ceil((float) nn / lines);
       final boolean v = (level % 2) == 0 ? true : false;
       float xx = r.x;
       float yy = r.y;
@@ -504,21 +504,29 @@ public final class MapView extends View implements Runnable {
       for(int i = 0; i < l.size - 1; i++) {
         if(v) {
           yy += hh;
-          float hoehe = (float) Token.toLong(data.attValue(l.list[i] + FSParser.SIZEOFFSET)) * r.h / parsize;
-//          System.out.println("hoehe double: " + hoehe + " hoehe int: " + (int) hoehe);
+          float hoehe = (float) Token.toLong(data.attValue(l.list[i] + 
+              FSParser.SIZEOFFSET)) * r.h / parsize;
+//          System.out.println("hoehe double: " + hoehe + 
+//          " hoehe int: " + (int) hoehe);
           hh = hoehe;
           ww = r.w / lines;
         } else {
           xx += ww;
-          float breite = (float) Token.toLong(data.attValue(l.list[i] + FSParser.SIZEOFFSET)) * r.w / parsize;
-//          System.out.println("breiete double: " + breite + " breite int: "+ (int) breite);
+          float breite = (float) Token.toLong(data.attValue(l.list[i] + 
+              FSParser.SIZEOFFSET)) * r.w / parsize;
+//          System.out.println("breiete double: " + breite + 
+//          " breite int: "+ (int) breite);
           ww = breite;
           hh = r.h / lines;
         }
         int[] liste = new int[1]; 
         liste[0] = l.list[i];
-        calcSliceMap(new MapRect((int) xx, (int) yy, (int) ww, (int) hh, 0, r.l), new IntList(liste), 0, 1, level);
-//        if(ww > 0 && hh > 0) 
+        
+        if(ww > 0 && hh > 0) calcSliceMap(
+            new MapRect((int) xx, (int) yy, (int) ww, (int) hh, 0, r.l), 
+            new IntList(liste), 0, 1, level);
+//        else System.out.println("pre: " + l.list[i] + " ww: " + ww + 
+//        " hh: " + hh);
         
 //        if(ww > 0 && hh > 0) {
 //          if(v) {
