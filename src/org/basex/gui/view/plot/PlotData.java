@@ -28,7 +28,9 @@ public final class PlotData {
   int size;
 
   /** Item token selected by user. */
-  private byte[] item = EMPTY;
+  byte[] item = EMPTY;
+  /** Name attribute. */
+  int nameID;
 
   /**
    * Default Constructor.
@@ -36,6 +38,7 @@ public final class PlotData {
   public PlotData() {
     xAxis = new PlotAxis(this);
     yAxis = new PlotAxis(this);
+    nameID = GUI.context.data().atts.id(token("name"));
   }
 
   /**
@@ -119,5 +122,22 @@ public final class PlotData {
    */
   int findPre(final int pre) {
     return Arrays.binarySearch(pres, pre);
+  }
+  
+  /**
+   * Finds a tag name if available (@name). 
+   * @param pre pre value
+   * @return value of @name attribute for given node
+   */
+  String getName(final int pre) {
+    final Data data = GUI.context.data();
+    final int limit = pre + data.size(pre, Data.ELEM);
+    for(int p = pre; p < limit; p++) {
+      final int kind = data.kind(p);
+      if(kind == Data.ATTR && data.attNameID(p) == nameID) {
+        return string(data.atom(p));
+      }
+    }
+    return "";
   }
 }

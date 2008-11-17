@@ -290,8 +290,14 @@ public final class PlotView extends View implements Runnable {
         final String label = (x.length() > 16 ?
             x.substring(0, 14) + ".." : x) + " / "
             + (y.length() > 16 ? y.substring(0, 14) + ".." : y);
-        BaseXLayout.drawTooltip(g, label, calcCoordinate(true, x1),
-            calcCoordinate(false, y1), getWidth(), 10);
+        final int xa = calcCoordinate(true, x1);
+        final int ya = calcCoordinate(false, y1);
+        BaseXLayout.drawTooltip(g, label, xa, ya, getWidth(), 10);
+
+        final String name = plotData.getName(focused);
+        if(name.length() > 0 && plotData.xAxis.attrID != plotData.nameID &&
+            plotData.yAxis.attrID != plotData.nameID)
+          BaseXLayout.drawTooltip(g, name, xa, ya - 15, getWidth(), 10);
       }
     }
     
