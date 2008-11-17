@@ -31,16 +31,16 @@ public final class TableView extends View implements Runnable {
   static final double[] ZOOM = {
     1, .99, .98, .97, 1, 1.03, 1.05, .9, .8, .6, .35, .18, .13, .09, .05, .03
   };
-  /** Zoom table. */
+  /** Current zoom step. */
   private int zoomstep;
   /** Table data. */
   private TableData tdata = new TableData();
 
-  /** Scrollbar reference. */
+  /** Table header. */
   private TableHeader header;
-  /** Scrollbar reference. */
+  /** Table content area. */
   private TableContent content;
-  /** Scrollbar reference. */
+  /** Table scrollbar. */
   private BaseXBar scroll;
 
   /**

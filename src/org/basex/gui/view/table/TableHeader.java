@@ -38,27 +38,26 @@ import org.basex.gui.view.table.TableData.TableCol;
  */
 final class TableHeader extends BaseXPanel {
   /** View reference. */
-  TableView view;
+  final TableView view;
   /** Table Data. */
-  TableData tdata;
-  /** Header flag. */
-  boolean header;
-  /** Clicked column. */
-  int clickCol = -1;
-  /** Input column. */
-  int inputCol = -1;
-  /** Moved column. */
-  int moveC = -1;
-  /** Moved X position. */
-  int mouseX = -1;
-  /** Shift flag. */
-  boolean shift;
-  /** Ctrl flag. */
-  boolean ctrl;
-  /** Alt flag. */
-  boolean alt;
-  /** Input Box. */
+  final TableData tdata;
+  /** Temporary Input Box. */
   TableInput box;
+  /** Current input column. */
+  int inputCol = -1;
+
+  /** Header flag. */
+  private boolean header;
+  /** Clicked column. */
+  private int clickCol = -1;
+  /** Moved column. */
+  private int moveC = -1;
+  /** Moved X position. */
+  private int mouseX = -1;
+  /** Shift flag. */
+  private boolean shift;
+  /** Alt flag. */
+  private boolean alt;
 
   /**
    * Constructor.
@@ -116,7 +115,7 @@ final class TableHeader extends BaseXPanel {
     for(int n = 0; n < nc; n++) {
       final double cw = w * tdata.cols[n].width;
       final double ce = x + cw;
-      
+
       // header
       final boolean clicked = n == clickCol && moveC == -1 && header;
       BaseXLayout.drawCell(g, (int) x, (int) ce + 1, 0, hh, clicked);
@@ -330,7 +329,7 @@ final class TableHeader extends BaseXPanel {
           boolean vis = sel;
           // disallow removal of last visible column
           for(final TableCol c : tdata.cols) vis |= c != col && c.width != 0;
-          
+
           if(vis) {
             final double vw = sel ? col.hwidth : 0;
             final double hw = sel ? 0 : col.width;
@@ -392,7 +391,6 @@ final class TableHeader extends BaseXPanel {
 
     GUI.get().checkKeys(e);
     shift = e.isShiftDown();
-    ctrl = e.isControlDown();
     alt = e.isAltDown();
     if(box == null && alt || inputCol == -1) return;
 
@@ -420,7 +418,6 @@ final class TableHeader extends BaseXPanel {
   public void keyReleased(final KeyEvent e) {
     if(tdata.roots == null || tdata.roots.size == 0) return;
     shift = e.isShiftDown();
-    ctrl = e.isControlDown();
     alt = e.isAltDown();
   }
 }

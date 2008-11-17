@@ -78,6 +78,7 @@ public final class IndexMatch extends Expr {
     //<SG> fill me
     return true;
   }
+  
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);

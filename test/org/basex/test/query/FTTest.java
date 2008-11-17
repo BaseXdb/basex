@@ -178,8 +178,6 @@ public final class FTTest extends AbstractTest {
         { "FTTimes 8", nodes(),
           "//w [text() ftcontains 'xml xml' occurs at least 4 times]" },
           
-        //introduction[. ftcontains "be used" occurs at least 2 times]
-          
         { "FTAndOr 1", nodes(7, 9, 11),
           "//w [text() ftcontains 'XmL' ftand 'Databases']" },
         { "FTAndOr 2", nodes(7, 9, 11, 14),
@@ -281,12 +279,11 @@ public final class FTTest extends AbstractTest {
           "//w [. ftcontains 'sentence' ftand 'the' " +
           "distance exactly 1 words]" },
         { "FTPosFilter 22", nodes(3, 37),
-          "//w [. ftcontains ('second' ftand 'third' " +
-          "window 3 words) ftand 'sentence' distance exactly 0 words]" },
+          "//w [. ftcontains ('second' ftand 'third' window 3 words) " +
+          "ftand 'sentence' distance exactly 0 words]" },
         { "FTPosFilter 23", nodes(3),
-          "//w [. ftcontains ('second' ftand 'third' " +
-          "window 3 words) ftand 'sentence' " +
-          "distance exactly 0 words ordered]" },
+          "//w [. ftcontains ('second' ftand 'third' window 3 words) " +
+          "ftand 'sentence' distance exactly 0 words ordered]" },
         { "FTPosFilter 24", nodes(37),
           "//w [. ftcontains 'third' ftand 'second' " +
           " ftand 'first' distance exactly 1 words ordered]" },
@@ -326,48 +323,50 @@ public final class FTTest extends AbstractTest {
     };
 
     /** TABLE REPRESENTATION
-    PRE DIS SIZ ATS  KIND  CONTENT
-      0   1  35   1  DOC   tmp
-      1   1  34   1  ELEM  fttest
-      2   1  11   1  ELEM  co
-      3   1   2   1  ELEM  w
-      4   1   1   1  TEXT  xml in the first sentence. second sentence. 
-      third sentence. fourth sentence. fifth sentence. 
-      5   3   2   1  ELEM  w
-      6   1   1   1  TEXT  XML xml XmL
-      7   5   2   1  ELEM  w
-      8   1   1   1  TEXT  we have xml databases
-      9   7   2   1  ELEM  w
-     10   1   1   1  TEXT  XML DATABASES
-     11   9   2   1  ELEM  w
-     12   1   1   1  TEXT  XML & Databases
-     13  12   3   1  ELEM  wc
-     14   1   2   1  ELEM  w
-     15   1   1   1  TEXT  hello
-     16  15   5   1  ELEM  sc
-     17   1   2   1  ELEM  s
-     18   1   1   1  TEXT  diät-joghurt
-     19   3   2   1  ELEM  s
-     20   1   1   1  TEXT  diat-joghurt
-     21  20   4   1  ELEM  at
-     22   1   2   1  ELEM  b
-     23   1   1   1  TEXT  B
-     24   3   1   1  TEXT  ad one
-     25  24   2   1  ELEM  fti
-     26   1   1   1  TEXT  adfas wordt ook wel eens
-     27  26   2   1  ELEM  fti
-     28   1   1   1  TEXT  wordt ook wel een s
-     29  28   2   1  ELEM  fti
-     30   1   1   1  TEXT  adfad. wordt\nook wel eens a
-     31  30   2   1  ELEM  fti
-     32   1   1   1  TEXT  adfad wordt. ook\nwel een s adf
-     33  32   2   1  ELEM  fti
-     34   1   1   1  TEXT  adfad wordt ook. wel een s
-     35  34   2   2  ELEM  atr
-     36   1   1   1  ATTR  key="value"
-     37  36   2   1  ELEM  w
-     38   1   1   1  TEXT  the fifth sentence. fourth sentence.
-     third sentence. second sentence. first sentence.
+    PRE DIS SIZ ATS  NS  KIND  CONTENT
+      0   1  39   1   0  DOC   tmp
+      1   1  38   1   0  ELEM  fttest
+      2   1  11   1   0  ELEM  co
+      3   1   2   1   0  ELEM  w
+      4   1   1   1   0  TEXT  xml in the first sentence. second sentence.
+        third sentence. fourth sentence. fifth sentence.
+      5   3   2   1   0  ELEM  w
+      6   1   1   1   0  TEXT  XML xml XmL
+      7   5   2   1   0  ELEM  w
+      8   1   1   1   0  TEXT  we have xml databases
+      9   7   2   1   0  ELEM  w
+     10   1   1   1   0  TEXT  XML DATABASES
+     11   9   2   1   0  ELEM  w
+     12   1   1   1   0  TEXT  XML & Databases
+     13  12   3   1   0  ELEM  wc
+     14   1   2   1   0  ELEM  w
+     15   1   1   1   0  TEXT  hello
+     16  15   5   1   0  ELEM  sc
+     17   1   2   1   0  ELEM  s
+     18   1   1   1   0  TEXT  diät-joghurt
+     19   3   2   1   0  ELEM  s
+     20   1   1   1   0  TEXT  diat-joghurt
+     21  20   4   1   0  ELEM  at
+     22   1   2   1   0  ELEM  b
+     23   1   1   1   0  TEXT  B
+     24   3   1   1   0  TEXT  ad one
+     25  24   2   1   0  ELEM  fti
+     26   1   1   1   0  TEXT  adfas wordt. ook wel eens
+     27  26   2   1   0  ELEM  fti
+     28   1   1   1   0  TEXT  wordt ook wel een s
+     29  28   2   1   0  ELEM  fti
+     30   1   1   1   0  TEXT  adfad. wordt
+    ook wel.eens a
+     31  30   2   1   0  ELEM  fti
+     32   1   1   1   0  TEXT  adfad wordt. ook
+    wel een s adf
+     33  32   2   1   0  ELEM  fti
+     34   1   1   1   0  TEXT  adfad wordt ook. wel een s
+     35  34   2   2   0  ELEM  atr
+     36   1   1   1   0  ATTR  key="value"
+     37  36   2   1   0  ELEM  w
+     38   1   1   1   0  TEXT  the fifth sentence. fourth sentence.
+       third sentence. second sentence. first sentence.
      */
   }
 }

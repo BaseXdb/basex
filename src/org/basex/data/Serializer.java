@@ -2,6 +2,8 @@ package org.basex.data;
 
 import static org.basex.util.Token.*;
 import java.io.IOException;
+
+import org.basex.io.IO;
 import org.basex.query.ExprInfo;
 import org.basex.util.Atts;
 import org.basex.util.TokenList;
@@ -266,7 +268,7 @@ public abstract class Serializer {
     /** Namespaces. */
     final Atts nsp = new Atts();
     /** Parent Stack. */
-    final int[] parent = new int[256];
+    final int[] parent = new int[IO.MAXHEIGHT];
     
     // current output level
     int l = 0;

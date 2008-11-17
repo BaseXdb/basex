@@ -8,6 +8,7 @@ import java.awt.Cursor;
 import java.awt.Font;
 import javax.swing.UIManager;
 import org.basex.Text;
+import org.basex.io.IO;
 
 /**
  * GUI Constants used in different views.
@@ -185,7 +186,7 @@ public final class GUIConstants {
   public static Color[] thumbnailcolor;
 
   /** Cached treemap colors. */
-  public static final Color[] COLORS = new Color[256];
+  public static final Color[] COLORS = new Color[IO.MAXHEIGHT];
 
   // FONTS ====================================================================
 

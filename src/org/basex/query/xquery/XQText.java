@@ -127,8 +127,6 @@ public interface XQText {
   Object[] FTTHES = { FTST, 0, "Thesaurus not supported yet." };
   /** FTST0000: Parsing exception. */
   Object[] FTFZWC = { FTST, 0, "Only wildcards or Fuzzy search allowed." };
-  /** FTST0001: Parsing exception. */
-  Object[] FTMILD = { FTST, 1, "'mild not' operator not supported yet." };
   /** FTST0007: Parsing exception. */
   Object[] FTIGNORE = { FTST, 7, "Ignore option not supported yet." };
   /** FTST0008: Parsing exception. */

@@ -2,9 +2,7 @@ package org.basex.build;
 
 import static org.basex.build.BuildText.*;
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
-
 import org.basex.BaseX;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
@@ -27,10 +25,6 @@ import org.basex.io.IO;
  * @author Christian Gruen
  */
 public abstract class Builder extends Progress {
-  /** Maximum level depth. */
-  // switched to org.basex.io.IO.CAP
-//  private static final int CAP = 1 << 8;
-
   /** Meta data on built database. */
   public MetaData meta;
 
@@ -51,11 +45,11 @@ public abstract class Builder extends Progress {
   public int elms;
 
   /** Parent stack. */
-  private final int[] parStack = new int[IO.CAP];
+  private final int[] parStack = new int[IO.MAXHEIGHT];
   /** Tag stack. */
-  private final int[] tagStack = new int[IO.CAP];
+  private final int[] tagStack = new int[IO.MAXHEIGHT];
   /** Namespace stack. */
-  private final int[] nsStack = new int[IO.CAP];
+  private final int[] nsStack = new int[IO.MAXHEIGHT];
   /** Size Stack. */
   private boolean inDoc;
   /** Current tree height. */

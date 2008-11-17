@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
+import org.basex.io.IO;
 import org.basex.util.Array;
 import org.basex.util.IntList;
 import org.basex.util.TokenList;
@@ -34,7 +35,7 @@ public final class Skeleton {
    * Initializes the data structures.
    */
   public void init() {
-    stack = new Node[256];
+    stack = new Node[IO.MAXHEIGHT];
     root = null;
   }
 
@@ -189,8 +190,7 @@ public final class Skeleton {
       kind = in.readByte();
       count = in.readNum();
       ch = new Node[in.readNum()];
-      for(int i = 0; i < ch.length; i++)
-        ch[i] = new Node(in);
+      for(int i = 0; i < ch.length; i++) ch[i] = new Node(in);
     }
 
     /**
@@ -221,8 +221,7 @@ public final class Skeleton {
       out.write1(kind);
       out.writeNum(count);
       out.writeNum(ch.length);
-      for(final Node c : ch)
-        c.finish(out);
+      for(final Node c : ch) c.finish(out);
     }
 
     /**
@@ -242,18 +241,12 @@ public final class Skeleton {
      */
     public byte[] token(final Data data) {
       switch(kind) {
-        case Data.ELEM:
-          return data.tags.key(name);
-        case Data.ATTR:
-          return concat(ATT, data.atts.key(name));
-        case Data.TEXT:
-          return TEXT;
-        case Data.COMM:
-          return COMM;
-        case Data.PI:
-          return PI;
-        default:
-          return EMPTY;
+        case Data.ELEM: return data.tags.key(name);
+        case Data.ATTR: return concat(ATT, data.atts.key(name));
+        case Data.TEXT: return TEXT;
+        case Data.COMM: return COMM;
+        case Data.PI:   return PI;
+        default:        return EMPTY;
       }
     }
 

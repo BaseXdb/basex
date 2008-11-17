@@ -66,9 +66,9 @@ public final class FSParser extends Parser implements FSVisitor {
   /** Level counter. */
   private int level;
   /** Diretory size Stack. */
-  private final long[] sizeStack = new long[IO.CAP];
+  private final long[] sizeStack = new long[IO.MAXHEIGHT];
   /** Pre valStack. */
-  private final int[] preStack = new int[IO.CAP];
+  private final int[] preStack = new int[IO.MAXHEIGHT];
   /** Only use stacks if this is true. */
   private boolean sumSizes = false;
   /** sizeAtt offset. */

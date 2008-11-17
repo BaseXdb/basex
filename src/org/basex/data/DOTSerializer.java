@@ -3,6 +3,7 @@ package org.basex.data;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
 import org.basex.BaseX;
+import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.query.ExprInfo;
 import org.basex.util.IntList;
@@ -36,7 +37,7 @@ public final class DOTSerializer extends Serializer {
   /** Output stream. */
   public final PrintOutput out;
   /** Cached children. */
-  private IntList[] children = new IntList[256];
+  private IntList[] children = new IntList[IO.MAXHEIGHT];
   /** Current color. */
   private String color;
   /** Cached nodes. */
@@ -49,7 +50,7 @@ public final class DOTSerializer extends Serializer {
    * @param o output stream
    */
   public DOTSerializer(final PrintOutput o) {
-    for(int i = 0; i < 256; i++) children[i] = new IntList();
+    for(int i = 0; i < IO.MAXHEIGHT; i++) children[i] = new IntList();
     out = o;
   }
 

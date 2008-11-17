@@ -4,6 +4,7 @@ import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.data.Data;
+import org.basex.io.IO;
 
 /**
  * Evaluates the 'optimize' command.
@@ -45,8 +46,8 @@ public final class Optimize extends ACreate {
     data.tags.init();
     data.atts.init();
 
-    final int[] parStack = new int[256];
-    final int[] tagStack = new int[256];
+    final int[] parStack = new int[IO.MAXHEIGHT];
+    final int[] tagStack = new int[IO.MAXHEIGHT];
     int h = 0;
     int l = 0;
 
