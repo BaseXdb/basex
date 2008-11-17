@@ -2,7 +2,6 @@ package org.basex.gui.view.plot;
 
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -14,13 +13,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
-
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
-
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.StatsKey.Kind;
@@ -129,19 +126,19 @@ public final class PlotView extends View implements Runnable {
           xCombo.setModel(new DefaultComboBoxModel(keys));
           yCombo.setModel(new DefaultComboBoxModel(keys));
           if(keys.length > 0) {
-            // choose name category as default for horizontal axis
-            int x = 0;
-            for(int k = 0; k < keys.length; k++) {
-              if(keys[k].equals("@name") || keys[k].equals("name")) {
-                x = k;
-                break;
-              }
-            }
             // choose size category as default for vertical axis
-            int y = x == 0 ? Math.min(1, keys.length) : 0;
+            int y = 0;
             for(int k = 0; k < keys.length; k++) {
               if(keys[k].equals("@size") || keys[k].equals("size")) {
                 y = k;
+                break;
+              }
+            }
+            // choose name category as default for horizontal axis
+            int x = y == 0 ? Math.min(1, keys.length) : 0;
+            for(int k = 0; k < keys.length; k++) {
+              if(keys[k].equals("@name") || keys[k].equals("name")) {
+                x = k;
                 break;
               }
             }
@@ -179,7 +176,8 @@ public final class PlotView extends View implements Runnable {
   private BufferedImage createItemImage(final boolean focus, 
       final boolean marked, final boolean markedSub) {
 
-    final int size =  itemSize(focus);
+    final int size = Math.max(2,
+        GUIProp.fontsize + GUIProp.plotdots + (focus ? 1 : -1));
     final BufferedImage img = new BufferedImage(size, size,
         Transparency.TRANSLUCENT);
     
@@ -661,7 +659,7 @@ public final class PlotView extends View implements Runnable {
     itemImgMarked = createItemImage(false, true, false);
     itemImgFocused = createItemImage(true, false, false);
     itemImgSub = createItemImage(false, false, true);
-    final int size = itemSize(false);
+    final int size = noValueSize() / 2;
     MARGIN[0] = size + 7;
     MARGIN[1] = size * 6;
     MARGIN[2] = 35 + size * 7;
@@ -719,7 +717,7 @@ public final class PlotView extends View implements Runnable {
       final int y = calcCoordinate(false, plotData.yAxis.co[i]);
       final int distX = Math.abs(mouseX - x);
       final int distY = Math.abs(mouseY - y);
-      final int off = itemSize(false) / 2;
+      final int off = noValueSize() / 4;
       // if x and y distances are smaller than offset value and the
       // x and y distances combined is smaller than the actual minimal
       // distance of any item tested so far, the current item is considered 
@@ -746,16 +744,7 @@ public final class PlotView extends View implements Runnable {
    * @return size value
    */
   static int noValueSize() {
-    return itemSize(false) * 2;
-  }
-  
-  /**
-   * Returns the item size.
-   * @param focus focus flag 
-   * @return size value
-   */
-  static int itemSize(final boolean focus) {
-    return Math.max(2, GUIProp.fontsize + (focus ? 1 : -1));
+    return Math.max(2, GUIProp.fontsize * 2);
   }
   
   /**

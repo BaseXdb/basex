@@ -18,6 +18,7 @@ import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
+import org.basex.gui.layout.BaseXSlider;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.gui.view.View;
@@ -43,6 +44,8 @@ public final class DialogPrefs extends Dialog {
   private BaseXCheckBox simpfd;
   /** Simple file dialog checkbox. */
   private BaseXCheckBox javalook;
+  /** Dot size in plot view. */
+  private BaseXSlider dots;
   /** Focus flag. */
   private boolean lf;
   /** Focus flag. */
@@ -51,6 +54,8 @@ public final class DialogPrefs extends Dialog {
   private boolean nam;
   /** File dialog flag. */
   private boolean fd;
+  /** Plot dots flag. */
+  private int pd;
 
   /**
    * Default Constructor.
@@ -62,10 +67,11 @@ public final class DialogPrefs extends Dialog {
     nam = GUIProp.shownames;
     fd = GUIProp.simplefd;
     lf = GUIProp.javalook;
+    pd = GUIProp.plotdots;
 
     // create checkboxes
     final BaseXBack pp = new BaseXBack();
-    pp.setLayout(new TableLayout(10, 1, 0, 0));
+    pp.setLayout(new TableLayout(11, 1, 0, 0));
     pp.add(new BaseXLabel(DATABASEPATH, true, true));
 
     BaseXBack p = new BaseXBack();
@@ -86,7 +92,7 @@ public final class DialogPrefs extends Dialog {
     p.add(button);
     pp.add(p);
 
-    final BaseXLabel label = new BaseXLabel(PREFINTER, true, true);
+    BaseXLabel label = new BaseXLabel(PREFINTER, true, true);
     label.setBorder(10, 0, 8, 0);
     pp.add(label);
 
@@ -108,8 +114,19 @@ public final class DialogPrefs extends Dialog {
     names.setEnabled(data != null && data.fs == null && data.nameID != 0);
     pp.add(names);
 
+    // checkbox for realtime mouse focus
+    p = new BaseXBack();
+    p.setLayout(new TableLayout(1, 2, 6, 0));
+    dots = new BaseXSlider(-10, 10, pd, null, this);
+    BaseXLayout.setWidth(dots, 150);
+    p.add(new BaseXLabel(PREFDOTS));
+    p.add(dots);
+    pp.add(p);
+
     // checkbox for simple file dialog
-    pp.add(new BaseXLabel(PREFLANG, true, true));
+    label = new BaseXLabel(PREFLANG, true, true);
+    label.setBorder(16, 0, 8, 0);
+    pp.add(label);
 
     p = new BaseXBack();
     p.setLayout(new TableLayout(1, 2, 12, 0));
@@ -165,7 +182,8 @@ public final class DialogPrefs extends Dialog {
     GUIProp.shownames = names.isSelected();
     GUIProp.simplefd = simpfd.isSelected();
     GUIProp.javalook = javalook.isSelected();
-    if(GUI.context.db()) View.notifyUpdate();
+    GUIProp.plotdots = dots.value();
+    if(GUI.context.db()) View.notifyLayout();
   }
 
   @Override
@@ -175,7 +193,8 @@ public final class DialogPrefs extends Dialog {
     GUIProp.shownames = nam;
     GUIProp.simplefd = fd;
     GUIProp.javalook = lf;
-    if(GUI.context.db()) View.notifyUpdate();
+    GUIProp.plotdots = pd;
+    if(GUI.context.db()) View.notifyLayout();
   }
 
   @Override

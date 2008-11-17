@@ -133,6 +133,7 @@ dp_lf=Use Javaのルック＆フィール(再起動が必要です)
 dp_focus=リアルタイムマウスフォーカス
 dp_simplefd=簡易版ファイル選択画面を使用
 dp_names=タグを@name属性で置き換え
+dp_dots=Dots in Plot View
 dp_lang=言語(再起動が必要です)
 
 dn_title=新規データの作成

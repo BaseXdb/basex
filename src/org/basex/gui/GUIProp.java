@@ -101,6 +101,8 @@ public final class GUIProp {
   public static int maplayout = 4;
   /** Treemap Proportion. */
   public static int mapprop = 4;
+  /** Dot sizes in plot. */
+  public static int plotdots = 0;
   
   /** Dialog location. */
   public static int[] maplayoutloc = { 100, 100 };

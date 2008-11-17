@@ -1100,9 +1100,11 @@ public interface Text {
   String PREFFOCUS = lang("dp_focus");
   /** Simple File Dialog. */
   String SIMPLEFD = lang("dp_simplefd");
-  /** Name Attributes. */
+  /** Name display flag. */
   String PREFNAMES = lang("dp_names");
-  /** Name Attributes. */
+  /** Dot size in plot view. */
+  String PREFDOTS = lang("dp_dots") + COL;
+  /** Language preference. */
   String PREFLANG = lang("dp_lang");
 
   /** Dialog title for deleting nodes. */

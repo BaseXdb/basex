@@ -131,6 +131,7 @@ dp_lf=Use Java Look & Feel (requires a restart)
 dp_focus=Realtime mouse focus
 dp_simplefd=Use simple file chooser
 dp_names=Replace tags with @name attributes
+dp_dots=Dots in Plot View
 dp_lang=Language (requires a restart)
 
 dn_title=Insert new data
