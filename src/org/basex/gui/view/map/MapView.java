@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import javax.swing.SwingUtilities;
 import org.basex.core.Context;
+import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
@@ -372,6 +373,7 @@ public final class MapView extends View implements Runnable {
       ni = ns + ln;    
         // consider number of descendants to calculate split point
       if(!GUIProp.mapsimple && !first) {
+        final Data data = GUI.context.data();
         // calculating real number of nodes of this recursion
         // nodes are preordered, therefore last pre value of this level
         // subtracted by first one is the actual amount of nodes
@@ -380,12 +382,25 @@ public final class MapView extends View implements Runnable {
         // pivot will be startnode + 1
         ni = ns + 1;
         
+        // parents size
+        int par = data.parent(l.list[ns], Data.ELEM);
+        long parsize = Token.toLong(data.attValue(par + FSParser.SIZEOFFSET));
+        // temporary to sum the childs sizes
+        long sum = 0;
+        
         // increment pivot until left rectangle contains more or equal
         // than the half descendants or if left node is greater than half of 
         // all descendants leave with just setting it to ne - 1
         for(; ni < ne - 1; ni++)  {
-          if(l.list[ni] - l.list[ns] >= (nn >> 1)) {
-            break;
+          // use file sizes to calculate breakpoint
+          if(Prop.onthefly && data.fs != null) {
+            if(sum >= parsize / 2) break;
+            else sum += Token.toLong(data.attValue(ni + FSParser.SIZEOFFSET));
+          // use number of descendants 
+          } else {
+            if(l.list[ni] - l.list[ns] >= (nn >> 1)) {
+              break;
+            }
           }
         }
         ln = l.list[ni] - l.list[ns];
