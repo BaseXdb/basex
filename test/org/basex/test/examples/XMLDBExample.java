@@ -25,8 +25,8 @@ public final class XMLDBExample {
              // Registers the Database.
          DatabaseManager.registerDatabase(database);
          
-             // Creates a new collection = Database with the ID = New Database.
-         final Collection coll = new BXCollection("New Database");
+         // Creates a new collection = Database with the ID = New Database.
+         new BXCollection("New Database");
       }
       catch (XMLDBException e) {
          System.err.println("XML:DB Exception occured " + e.errorCode);
