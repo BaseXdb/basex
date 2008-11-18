@@ -50,4 +50,15 @@ public final class BoolList {
   public void reset() {
     size = 0;
   }
+  
+  /**
+   * Checks if all values are b.
+   * @param b boolean b
+   * @return boolean all b
+   */
+  public boolean all(final boolean b) {
+    for (boolean bl : list) if(!bl && b) return false;
+    return true;
+  }
+  
 }

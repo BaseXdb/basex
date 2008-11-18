@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.index.FTTokenizer;
 import org.basex.util.Array;
+import org.basex.util.BoolList;
 import org.basex.util.IntList;
 import org.basex.util.TokenList;
 
@@ -17,7 +18,7 @@ import org.basex.util.TokenList;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class FTPos extends ExprInfo {
+public class FTPos extends ExprInfo {
   /** Units. */
   public enum FTUnit {
     /** Word unit. */      WORDS,
@@ -112,8 +113,7 @@ public final class FTPos extends ExprInfo {
     lp = i;
     i++;
     while (i < p.size) {
-      if (pp.list[i] == pp.list[lp] + 1) lp = i;
-      else if (pp.list[i] < pp.list[lp]) return false;
+      if (pp.list[i] < pp.list[lp] || pp.list[i] == pp.list[lp] + 1) lp = i;
       if (pp.list[lp] == size - 1) return true;
       i++;
     }
@@ -232,33 +232,23 @@ public final class FTPos extends ExprInfo {
     final IntList[] il = sortPositions();
     IntList p = il[0]; // new IntList();
     IntList pp = il[1]; // new IntList();
-    int p1;
-    int p2;
-
-    /*  int[] k = new int[size];
-    int min = 0;
-    int p1;
-    int p2;
-    boolean q = false;
-    while(true) {
-      min = 0;
-      q = true;
-      for (int j = 0; j < size; j++) {
-        if (k[j] > -1) {
-          if (k[min] == -1) min = j;
-          q = false;
-          if (pos[min].get(k[min]) > pos[j].get(k[j])) min = j;
-        }  
+    
+    
+    boolean b = false;
+    for (int z = 0; z < pp.size; z++) {
+      BoolList bl = new BoolList(size);
+      if (checkDist(z, p, pp, mn, mx, bl, true)) {
+        b = true;
+        break;
       }
-      
-      if(q) break;
-      
-      p.add(pos[min].get(k[min]));
-      pp.add(min);
-      k[min]++;
-      if (k[min] == pos[min].size) k[min] = -1;
     }
-*/
+    return b;
+
+    /*
+    int p1;
+    int p2;
+    int[] poi = new int[size];
+
     int[] res = new int[p.size];
     int c = 0;
     int i = 0;
@@ -290,24 +280,71 @@ public final class FTPos extends ExprInfo {
     }
     
     return c > 0;
-
-/*
-    // ...to be revised...
-    int l = -1;
-    for(int i = 0; i < size; i++) {
-      boolean o = false;
-      for(int j = 0; j < pos[i].size; j++) {
-        final int p = calcPosition(pos[i].get(j), dunit);
-        final int d = Math.abs(p - l) - 1;
-        if(i == 0 || (d >= mn && d <= mx)) {
-          o = true;
-          l = p;
-          break;
+*/
+  }
+  /*
+  private boolean check(final int[][] dis, final int x, 
+    final IntList p,  final IntList pp, final BoolList bl) {
+    //if (l == size - 1) return true;
+    if(bl.all(true)) return true;
+    boolean f = false;
+    int i = x + 1;
+   
+    while (i < dis[x].length){ // && dis[x][i] != 0) {
+//      if (dis[x][i] > -1 && l == pp.list[x]) {
+      if (dis[x][i] > -1 && !bl.list[pp.list[i]]) {
+        bl.list[pp.list[x]] = true;
+        bl.list[pp.list[i]] = true;
+        f |= check(dis, i, p, pp, bl); 
+      }
+      i++;
+    }
+    return f;
+  }
+*/
+  /**
+   * Checks if each token is reached by the ftdistance query.
+   * 
+   * @param x current posvalue
+   * @param p pos list
+   * @param pp pointer list
+   * @param mn minimum number
+   * @param mx maximum number
+   * @param bl BollList for each token
+   * @param dist flag for ftdistance
+   * @return boolean result
+   * 
+   */
+  private boolean checkDist(final int x, final IntList p,  final IntList pp, 
+      final long mn, final long mx, final BoolList bl, final boolean dist) {
+    //if (l == size - 1) return true;
+    if(bl.all(true)) return true;
+    boolean f = false;
+    int i = x + 1;
+    
+    final int p1 = calcPosition(p.list[x], dist ? dunit : wunit);
+    while (i < p.size) {
+      final int p2 = calcPosition(p.list[i], dist ? dunit : wunit);
+      if (dist) {
+        // ftdistance
+        final int d = Math.abs(p1 - p2) - 1;
+        if (d >= mn && d <= mx && !bl.list[pp.list[i]]) {
+          bl.list[pp.list[x]] = true;
+          bl.list[pp.list[i]] = true;
+          f |= checkDist(i, p, pp, mn, mx, bl, dist);         
+        }
+      } else {
+        // ftwindow
+        final int d = Math.abs(p1 - p2);
+        if (mn + d <= mx && !bl.list[pp.list[i]]) {
+          bl.list[pp.list[x]] = true;
+          bl.list[pp.list[i]] = true;
+          f |= checkDist(i, p, pp, mn + d, mx, bl, dist);         
         }
       }
-      if(!o) return false;
+      i++;
     }
-    return true; */
+    return f;
   }
 
   
@@ -319,6 +356,22 @@ public final class FTPos extends ExprInfo {
   public boolean window(final long win) {
     if(wunit == null) return true;
 
+    final IntList[] il = sortPositions();
+    IntList p = il[0]; // new IntList();
+    IntList pp = il[1]; // new IntList();
+    
+    
+    boolean b = false;
+    for (int z = 0; z < pp.size; z++) {
+      BoolList bl = new BoolList(size);
+      if (checkDist(z, p, pp, 1, win, bl, false)) {
+        b = true;
+        break;
+      }
+    }
+    return b;
+
+    /*
     // ...to be revised...
     int l = -1;
     for(int i = 0; i < size; i++) {
@@ -334,6 +387,7 @@ public final class FTPos extends ExprInfo {
       if(!o) return false;
     }
     return true;
+    */
   }
 
   /**
@@ -433,4 +487,293 @@ public final class FTPos extends ExprInfo {
     if(content) sb.append(" " + QueryTokens.ENTIRE + " " + QueryTokens.CONTENT);
     return sb.toString();
   }
+  /**
+   * Test FTDistance.
+   */
+  public static void testWindow() {
+    System.out.println("Test FTWindow: ");
+    boolean e = false;
+    FTPos ftpos = new FTPos();
+    ftpos.size = 2;
+    ftpos.wunit = FTPos.FTUnit.WORDS;
+    ftpos.pos = new IntList[2];
+    ftpos.pos[0] = new IntList(new int[]{3, 10});
+    ftpos.pos[1] = new IntList(new int[]{7, 11});
+    if (ftpos.window(0)) {
+      System.out.println("Q1: ERROR");
+      e = true;
+    }
+    if (ftpos.window(1)) {
+      System.out.println("Q2: ERROR");
+      e = true;
+    }
+    if (!ftpos.window(2)) {
+      System.out.println("Q3: ERROR");
+      e = true;
+    }
+
+    ftpos.size = 4;
+    ftpos.pos = new IntList[4];
+    ftpos.pos[0] = new IntList(new int[]{1});
+    ftpos.pos[1] = new IntList(new int[]{5, 6, 7});
+    ftpos.pos[2] = new IntList(new int[]{8, 9, 10, 11});
+    ftpos.pos[3] = new IntList(new int[]{12, 13, 14, 15, 16});
+
+    if (ftpos.window(6)) {
+      System.out.println("Q4: ERROR");
+      e = true;
+    }
+
+    if (ftpos.window(11)) {
+      System.out.println("Q5: ERROR");
+      e = true;
+    }
+
+    if (!ftpos.window(12)) {
+      System.out.println("Q6: ERROR");
+      e = true;
+    }
+
+    
+    ftpos.size = 4;
+    ftpos.pos = new IntList[4];
+    ftpos.pos[0] = new IntList(new int[]{1, 2, 3, 4});
+    ftpos.pos[1] = new IntList(new int[]{5, 6, 7});
+    ftpos.pos[2] = new IntList(new int[]{8, 9, 10, 11});
+    ftpos.pos[3] = new IntList(new int[]{12, 13, 14, 15, 16});
+
+    if (ftpos.window(8)) {
+      System.out.println("Q7: ERROR");
+      e = true;
+    }
+
+    if (!ftpos.window(9)) {
+      System.out.println("Q8: ERROR");
+      e = true;
+    }
+    if (!e) System.out.println("\t no errors");
+  }
+  
+  /**
+   * Test FTDistance.
+   */
+  public static void testDistance() {
+    System.out.println("Test FTOrdered: ");
+    boolean e = false;
+    FTPos ftpos = new FTPos();
+    ftpos.size = 2;
+    ftpos.dunit = FTPos.FTUnit.WORDS;
+    ftpos.pos = new IntList[2];
+    ftpos.pos[0] = new IntList(new int[]{3, 10});
+    ftpos.pos[1] = new IntList(new int[]{7, 11});
+    if (!ftpos.distance(0, 0)) {
+      System.out.println("Q1: ERROR");
+      e = true;
+    }
+    
+    
+    ftpos.size = 3;
+    ftpos.pos = new IntList[3];
+    ftpos.pos[0] = new IntList(new int[]{1, 10, 21});
+    ftpos.pos[1] = new IntList(new int[]{5, 13, 14, 15});
+    ftpos.pos[2] = new IntList(new int[]{6, 16, 17, 18, 19, 20, 22, 23});
+    ftpos.dunit = FTPos.FTUnit.WORDS;
+    if (!ftpos.distance(4, 4)) {
+      System.out.println("Q2: ERROR");
+      e = true;
+    }
+
+    if (ftpos.distance(7, 7)) {
+      System.out.println("Q3: ERROR");
+      e = true;
+    }
+    
+    
+    ftpos.size = 3;
+    ftpos.pos = new IntList[3];
+    ftpos.pos[0] = new IntList(new int[]{1, 10, 21});
+    ftpos.pos[1] = new IntList(new int[]{5, 15, 23, 25, 26, 27, 28});
+    ftpos.pos[2] = new IntList(new int[]{6, 16, 29, 30, 31, 32, 33});
+    ftpos.dunit = FTPos.FTUnit.WORDS;
+    if (!ftpos.distance(4, 4)) {
+      System.out.println("Q4: ERROR");
+      e = true;
+    }
+
+    if (ftpos.distance(7, 7)) {
+      System.out.println("Q5: ERROR");
+      e = true;
+    }
+
+
+    ftpos.size = 4;
+    ftpos.pos = new IntList[4];
+    ftpos.pos[0] = new IntList(new int[]{1});
+    ftpos.pos[1] = new IntList(new int[]{3, 4, 5, 6, 7});
+    ftpos.pos[2] = new IntList(new int[]{8, 9, 10, 11});
+    ftpos.pos[3] = new IntList(new int[]{12, 13, 14, 15, 16});
+    ftpos.dunit = FTPos.FTUnit.WORDS;
+    if (!ftpos.distance(2, 4)) {
+      System.out.println("Q6: ERROR");
+      e = true;
+    }
+
+    if (ftpos.distance(1, 2)) {
+      System.out.println("Q7: ERROR");
+      e = true;
+    }
+
+    
+    if (!e) System.out.println("\t no errors");
+  }
+  
+  /**
+   * Test FTContent.
+   */
+  public static void testContent() {
+    System.out.println("Test FTContent: ");
+    boolean e = false;
+    FTPos ftpos = new FTPos();
+    ftpos.size = 1;
+    ftpos.term = new TokenList();
+    ftpos.ordered = false;
+    ftpos.content = true;
+    ftpos.ft = new FTTokenizer();
+    for (byte c = 'a'; c < 'e'; c++) 
+      ftpos.term.add(new byte[]{c});
+    for (byte c = 'a'; c < 'e'; c++) 
+      ftpos.term.add(new byte[]{c});
+    ftpos.ft.init(new byte[]{'a', 'b', 'c', 'd', 
+        'a', 'b', 'c', 'd'});
+    ftpos.pos = new IntList[1];
+    ftpos.pos[0] = new IntList(new int[]{0});
+    if (!ftpos.content()) {
+      System.out.println("Q1: ERROR");
+      e = true;
+    }
+    
+    ftpos.size = 4;
+    ftpos.pos = new IntList[4];
+    ftpos.pos[0] = new IntList(new int[]{0, 4});
+    ftpos.pos[1] = new IntList(new int[]{1, 5});
+    ftpos.pos[2] = new IntList(new int[]{2, 6});
+    ftpos.pos[3] = new IntList(new int[]{3, 7});
+    ftpos.ft.init(new byte[]{'a', 'b', 'c', 'd', 
+        'a', 'b', 'c', 'd'});
+    if (!ftpos.content()) {
+      System.out.println("Q2: ERROR");
+      e = true;
+    }
+    
+    ftpos.size = 1;
+    ftpos.ft.init(new byte[]{'a', ' ', 'b', ' ', 'c', ' ', 'd'});
+    ftpos.content = false;
+    ftpos.start = true;
+    if (!ftpos.content()) {
+      System.out.println("Q3: ERROR");
+      e = true;
+    }
+    
+    ftpos.size = 4;
+    ftpos.pos = new IntList[4];
+    ftpos.pos[0] = new IntList(new int[]{0, 4});
+    ftpos.pos[1] = new IntList(new int[]{1, 5});
+    ftpos.pos[2] = new IntList(new int[]{2, 6});
+    ftpos.pos[3] = new IntList(new int[]{3, 7});
+    ftpos.ft.init(new byte[]{'a', ' ', 'b', ' ', 'c', ' ', 'd'});
+    if (!ftpos.content()) {
+      System.out.println("Q4: ERROR");
+      e = true;
+    }
+
+    ftpos.size = 1;
+    ftpos.pos = new IntList[1];
+    ftpos.pos[0] = new IntList(new int[]{0, 3, 4, 7});
+    ftpos.ft.init(new byte[]{'a', ' ', 'b', ' ', 'c', ' ', 'd'});
+    ftpos.start = false;
+    ftpos.end = true;
+    if (!ftpos.content()) {
+      System.out.println("Q5: ERROR");
+      e = true;
+    }
+    
+    ftpos.size = 4;
+    ftpos.pos = new IntList[4];
+    ftpos.pos[0] = new IntList(new int[]{0, 4});
+    ftpos.pos[1] = new IntList(new int[]{1, 5});
+    ftpos.pos[2] = new IntList(new int[]{2, 6});
+    ftpos.pos[3] = new IntList(new int[]{3, 7});
+    ftpos.ft.init(new byte[]{'a', ' ', 'b', ' ', 'c', ' ', 'd'});
+    if (!ftpos.content()) {
+      System.out.println("Q6: ERROR");
+      e = true;
+    }
+    
+    if (!e) System.out.println("\t no errors");
+  }
+  
+  /**
+   * Test FTOrdered.
+   */
+  public static void testOrdered() {
+    System.out.println("Test FTOrdered: ");
+    boolean e = false;
+    FTPos ftpos = new FTPos();
+    ftpos.ordered = true;
+    ftpos.size = 1;
+    IntList tok1 = new IntList(new int[]{6, 12, 16, 35});
+    ftpos.pos = new IntList[]{tok1};
+    if (!ftpos.ordered()) {
+      System.out.println("Q1: ERROR");
+      e = true;
+    }
+    
+    ftpos.size = 3;
+    IntList tok2 = new IntList(new int[]{4, 21, 36, 40});
+    IntList tok3 = new IntList(new int[]{13, 14, 31, 37});
+    ftpos.pos = new IntList[]{tok1, tok2, tok3};
+    if (!ftpos.ordered()) {
+      System.out.println("Q2: ERROR");
+      e = true;
+    }
+
+    tok2 = new IntList(new int[]{4, 21, 36, 40});
+    tok3 = new IntList(new int[]{13, 14, 15, 37});
+    ftpos.pos = new IntList[]{tok1, tok2, tok3};
+    if (!ftpos.ordered()) {
+      System.out.println("Q3: ERROR");
+      e = true;
+    }
+
+    tok2 = new IntList(new int[]{4, 5, 36, 40});
+    tok3 = new IntList(new int[]{13, 14, 17, 43});
+    ftpos.pos = new IntList[]{tok1, tok2, tok3};
+    if (!ftpos.ordered()) {
+      System.out.println("Q4: ERROR");
+      e = true;
+    }
+
+    tok2 = new IntList(new int[]{4, 5, 36});
+    tok3 = new IntList(new int[]{13, 14, 17, 34});
+    ftpos.pos = new IntList[]{tok1, tok2, tok3};
+    if (ftpos.ordered()) {
+      System.out.println("Q5: ERROR");
+      e = true;
+    }
+    if (!e) System.out.println("\t no errors");
+  }
+
+  
+  
+  /**
+   * Main test method.
+   * @param args String[] 
+   */
+  public static void main(final String[] args) {
+    testOrdered();
+    testContent();
+    testDistance();
+    testWindow();
+  }
+
 }

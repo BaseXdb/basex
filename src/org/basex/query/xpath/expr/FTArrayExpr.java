@@ -24,6 +24,12 @@ public abstract class FTArrayExpr extends Expr {
   /** Fulltext position filter. */
   //public FTPositionFilter ftpos;
   
+  /**
+   * Optimizes the expression.
+   * @param ctx expression context
+   * @return optimized Expression
+   * @throws QueryException evaluation exception
+   */
   @Override
   public FTArrayExpr comp(final XPContext ctx) throws QueryException {
     for(int i = 0; i < exprs.length; i++) exprs[i] = exprs[i].comp(ctx);

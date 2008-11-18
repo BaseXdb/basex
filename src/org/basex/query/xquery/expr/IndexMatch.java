@@ -75,6 +75,7 @@ public final class IndexMatch extends Expr {
    * @return boolean
    */
   private boolean found(final Iter i1, final Iter i2) {
+    System.out.println(i1.toString() + i2.toString());
     //<SG> fill me
     return true;
   }

@@ -38,9 +38,9 @@ public final class FTTest extends AbstractTest {
       "</fttest>";
 
     queries = new Object[][] {
-        { "AndOr 4", nodes(25, 29),
-          "//fti[text() ftcontains 'eens' and text() ftcontains 'ook' or " +
-          "text() ftcontains 'a']" },
+        { "FTPosFilter 14", nodes(3, 37),
+          "//w [. ftcontains 'first' ftand 'second' ftand 'third' " +
+            "distance exactly 1 words]" },
           
         { "Simple 1", bool(true),
           "'abc' ftcontains 'abc'" },
@@ -265,16 +265,16 @@ public final class FTTest extends AbstractTest {
           "//w [. ftcontains 'the first sentence' ftand 'third sentence' " +
           "distance exactly 2 words]" },
         { "FTPosFilter 17", nodes(3, 37),
-          "//w [. ftcontains 'second' ftand 'fifth' window 6 words]" },
+          "//w [. ftcontains 'second' ftand 'fifth' window 7 words]" },
         { "FTPosFilter 18", nodes(3, 37),
           "//w [. ftcontains 'second sentence' ftand 'fifth sentence' " +
           "window 6 words]" },
         { "FTPosFilter 19", nodes(3, 37),
           "//w [. ftcontains 'third' ftand 'second' " +
-          "ftand 'fifth' window 6 words]" },
+          "ftand 'fifth' window 7 words]" },
         { "FTPosFilter 20", nodes(37),
           "//w [. ftcontains 'fifth' ftand 'third' " +
-          "ftand 'second' window 6 words ordered]" },
+          "ftand 'second' window 7 words ordered]" },
         { "FTPosFilter 21", nodes(3, 37),
           "//w [. ftcontains 'sentence' ftand 'the' " +
           "distance exactly 1 words]" },
