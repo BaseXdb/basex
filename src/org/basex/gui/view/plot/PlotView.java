@@ -81,7 +81,7 @@ public final class PlotView extends View implements Runnable {
   /** Indicates if global marked nodes should be drawn. */
   boolean drawContextMarked;
   /** Holds marked items in the plot during a self implied marking operation. */
-  private IntList tmpMarked;
+  IntList tmpMarked;
   /** Bounding box which supports selection of multiple items. */
   private PlotBoundingBox selectionBox;
 
@@ -144,6 +144,7 @@ public final class PlotView extends View implements Runnable {
             yCombo.setSelectedIndex(y);
           }
         }
+        tmpMarked.reset();
         repaint();
       }
     });
