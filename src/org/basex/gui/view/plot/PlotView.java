@@ -6,10 +6,12 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.MouseInfo;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
@@ -280,19 +282,35 @@ public final class PlotView extends View implements Runnable {
         drawItem(g, x1, y1, true, false, false);
         // draw focused x and y value
         g.setFont(GUIConstants.font);
+        final int textH = g.getFontMetrics().getHeight();
+        final String name = plotData.getName(focused);
         final String x = formatString(true);
         final String y = formatString(false);
         final String label = (x.length() > 16 ?
             x.substring(0, 14) + ".." : x) + " / "
             + (y.length() > 16 ? y.substring(0, 14) + ".." : y);
-        final int xa = calcCoordinate(true, x1);
-        final int ya = calcCoordinate(false, y1);
-        BaseXLayout.drawTooltip(g, label, xa, ya, getWidth(), 10);
+        int xa = calcCoordinate(true, x1);
+        int ya = calcCoordinate(false, y1) + GUIProp.plotdots;
 
-        final String name = plotData.getName(focused);
         if(name.length() > 0 && plotData.xAxis.attrID != plotData.nameID &&
-            plotData.yAxis.attrID != plotData.nameID)
-          BaseXLayout.drawTooltip(g, name, xa, ya - 15, getWidth(), 10);
+            plotData.yAxis.attrID != plotData.nameID) {
+          final int lw = BaseXLayout.width(g, label);
+          if(ya < MARGIN[0] + textH & !(xa > w - lw)) {
+            ya += 2 * textH - GUIProp.plotdots;
+            xa += 15;
+          }
+          if(xa > w - lw)
+            BaseXLayout.drawTooltip(g, name + ": " + label, xa, ya, 
+                getWidth(), 10);
+          else {
+            BaseXLayout.drawTooltip(g, name, xa, ya - textH, 
+                getWidth(), 10);
+            BaseXLayout.drawTooltip(g, label, xa, ya, 
+                getWidth(), 10);
+          }
+        
+        } else
+          BaseXLayout.drawTooltip(g, label, xa, ya, getWidth(), 10);
       }
     }
     
@@ -359,8 +377,8 @@ public final class PlotView extends View implements Runnable {
             true, false);
         k++;
       } else if(a + ns >= b) {
-        if(a < b) drawItem(g, plotData.xAxis.co[k], plotData.yAxis.co[k], false, 
-            false, true);
+        if(a < b) drawItem(g, plotData.xAxis.co[k], plotData.yAxis.co[k], 
+            false, false, true);
         k++;
       } else 
         i++;
