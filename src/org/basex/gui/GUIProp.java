@@ -146,7 +146,7 @@ public final class GUIProp {
   /** Map algorithm. */
   public static int mapalgo = 0;
   /** Map alignment by size aggregation. */
-  public static boolean mapaggr = false;
+  public static boolean mapaggr = true;
   
   /** Default path to the BaseX configuration file. */
   private static String cfg = Prop.HOME + "/.basexwin";

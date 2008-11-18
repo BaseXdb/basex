@@ -69,8 +69,6 @@ public final class FSParser extends Parser implements FSVisitor {
   private final long[] sizeStack = new long[IO.MAXHEIGHT];
   /** Pre valStack. */
   private final int[] preStack = new int[IO.MAXHEIGHT];
-  /** Only use stacks if this is true. */
-  private boolean sumSizes = false;
   /** sizeAtt offset. */
   public static final int SIZEOFFSET = 3;
 
@@ -106,7 +104,7 @@ public final class FSParser extends Parser implements FSVisitor {
       throws IOException {
     if(docOpen) builder.startElem(token(DEEPFS), atts.reset());
     preStack[level] = builder.startElem(DIR, atts(new File(path)));
-    if(sumSizes) sizeStack[level] = 0;
+    sizeStack[level] = 0;
   }
 
   /**
@@ -116,7 +114,7 @@ public final class FSParser extends Parser implements FSVisitor {
     level++;
     guimsg = dir.toString();
     preStack[level] = builder.startElem(DIR, atts(dir));
-    if(sumSizes) sizeStack[level] = 0;
+    sizeStack[level] = 0;
   }  
   
   /**
@@ -126,24 +124,23 @@ public final class FSParser extends Parser implements FSVisitor {
   public void postEvent() throws IOException {
     // closing tag
     builder.endElem(DIR);
-    if(sumSizes) {
-      //adding folder size to parent folder
-      sizeStack[level - 1] = sizeStack[level - 1] + sizeStack[level];
-      // calling builder actualization
-      // take into account that stored pre value is the one of the element node,
-      // not the attributes one!
-      builder.setAttValue(preStack[level] + SIZEOFFSET, 
-          token(sizeStack[level]));
-      level--;
-    }
+
+    //adding folder size to parent folder
+    sizeStack[level - 1] = sizeStack[level - 1] + sizeStack[level];
+    // calling builder actualization
+    // take into account that stored pre value is the one of the element node,
+    // not the attributes one!
+    builder.setAttValue(preStack[level] + SIZEOFFSET, 
+        token(sizeStack[level]));
+    level--;
   }
   
   /**
    * {@inheritDoc}
    */
   public void regfileEvent(final File f) throws IOException {
-    // pushing Filesize to sizes Stack
-    if(sumSizes) sizeStack[level] = sizeStack[level] + f.length();
+    // pushing file size to sizes Stack
+    sizeStack[level] += f.length();
     
     guimsg = f.toString();
     builder.startElem(FILE, atts(f));
@@ -192,10 +189,7 @@ public final class FSParser extends Parser implements FSVisitor {
    */
   public void postTraversal(final boolean docClose) throws IOException {
     builder.endElem(DIR);
-    if(sumSizes) {
-      builder.setAttValue(preStack[level] + SIZEOFFSET, 
-          token(sizeStack[level]));
-    }
+    builder.setAttValue(preStack[level] + SIZEOFFSET, token(sizeStack[level]));
     if(docClose) builder.endElem(token(DEEPFS));
   }
 
