@@ -34,8 +34,6 @@ public final class DataFS {
   /** Index References. */
   public int dirID;
   /** Index References. */
-  public int sizeID;
-  /** Index References. */
   public int suffID;
   /** Index References. */
   public int timeID;
@@ -46,7 +44,6 @@ public final class DataFS {
    */
   public DataFS(final Data d) {
     data = d;
-    sizeID = d.atts.id(DataText.SIZE);
     suffID = d.atts.id(DataText.SUFFIX);
     timeID = d.atts.id(DataText.MTIME);
     fileID = d.tags.id(DataText.FILE);
@@ -139,7 +136,7 @@ public final class DataFS {
    * @return file size
    */
   public byte[] size(final int pre) {
-    return attr(pre, sizeID);
+    return attr(pre, data.sizeID);
   }
 
   /**
@@ -334,7 +331,7 @@ public final class DataFS {
     md.addElem(isDir ? dirID : fileID, 0, 1, 5, 5, false);
     md.addAtt(data.nameID, 0, name, 1);
     md.addAtt(suffID, 0, suffix, 2);
-    md.addAtt(sizeID, 0, size, 3);
+    md.addAtt(data.sizeID, 0, size, 3);
     md.addAtt(timeID, 0, mtime, 4);
     data.insert(pre, parent, md);
   }

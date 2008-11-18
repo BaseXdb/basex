@@ -164,6 +164,17 @@ public final class Array {
    * @param size final size
    * @return finished array
    */
+  public static double[] finish(final double[] ar, final int size) {
+    final int s = ar.length;
+    return resize(ar, s > size ? size : s, size);
+  }
+
+  /**
+   * Optimizes the array size.
+   * @param ar array to be resized
+   * @param size final size
+   * @return finished array
+   */
   public static String[] finish(final String[] ar, final int size) {
     final int s = ar.length;
     return resize(ar, s > size ? size : s, size);
@@ -236,6 +247,19 @@ public final class Array {
    */
   public static int[] resize(final int[] ar, final int os, final int ns) {
     final int[] tmp = new int[ns];
+    System.arraycopy(ar, 0, tmp, 0, os);
+    return tmp;
+  }
+
+  /**
+   * Convenience method for resizing a double array.
+   * @param ar array to be resized
+   * @param os old size
+   * @param ns new size
+   * @return resized array
+   */
+  public static double[] resize(final double[] ar, final int os, final int ns) {
+    final double[] tmp = new double[ns];
     System.arraycopy(ar, 0, tmp, 0, os);
     return tmp;
   }

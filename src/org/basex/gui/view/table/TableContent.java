@@ -124,7 +124,7 @@ public final class TableContent extends BaseXBack {
           } else {
             byte[] txt = data.attValue(ti.pre);
             if(data.fs != null) {
-              final boolean size = tdata.cols[c].id == data.fs.sizeID;
+              final boolean size = tdata.cols[c].id == data.sizeID;
               final boolean time = tdata.cols[c].id == data.fs.timeID;
               if(size || time) {
                 txt = token(BaseXLayout.value(toDouble(txt), size, time));

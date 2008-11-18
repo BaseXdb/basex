@@ -31,6 +31,7 @@ import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.View;
+import org.basex.util.Array;
 import org.basex.util.IntList;
 
 /**
@@ -349,11 +350,11 @@ public final class PlotView extends View implements Runnable {
     }
 
     // if nodes are marked in another view, the given nodes as well as their
-    // descendents are checked for intersection with the nodes displayed in
+    // descendants are checked for intersection with the nodes displayed in
     // the plot
     final Nodes marked = GUI.context.marked();
     if(marked.size() <= 0) return;
-    final int[] m = Arrays.copyOf(marked.nodes, marked.nodes.length);
+    final int[] m = Array.finish(marked.nodes, marked.nodes.length);
     Arrays.sort(m);
     final int[] p = plotData.pres;
     int i = 0;
@@ -368,7 +369,7 @@ public final class PlotView extends View implements Runnable {
       k--;
     }
     
-    // context change. descendents of marked node set are 
+    // context change. descendants of marked node set are
     // also checked for intersection with plotted nodes
     while(i < m.length && k < p.length) {
       final int a = m[i];
@@ -382,8 +383,9 @@ public final class PlotView extends View implements Runnable {
         if(a < b) drawItem(g, plotData.xAxis.co[k], plotData.yAxis.co[k], 
             false, false, true);
         k++;
-      } else 
+      } else {
         i++;
+      }
     }
   }
   
@@ -446,7 +448,7 @@ public final class PlotView extends View implements Runnable {
     // determine axis caption for TEXT / INT / DBL data
     if(type == Kind.TEXT) {
       final int nrCats = axis.nrCats;
-      final double[] coSorted = Arrays.copyOf(axis.co, axis.co.length);
+      final double[] coSorted = Array.finish(axis.co, axis.co.length);
       // draw min / max caption
       drawCaptionAndGrid(g, drawX, nrCats > 1 ? string(axis.firstCat) : "", 0);
       drawCaptionAndGrid(g, drawX, nrCats > 1 ? string(axis.lastCat) : "", 1);

@@ -60,6 +60,8 @@ public abstract class Data  {
   public DataFS fs;
   /** Index Reference for name tag. */
   public int nameID;
+  /** Index References. */
+  public int sizeID;
 
   /**
    * Dissolves the references to often used tag names and attributes.
@@ -67,6 +69,7 @@ public abstract class Data  {
   public final void initNames() {
     if(tags.id(token(DataText.DEEPFS)) != 0) fs = new DataFS(this);
     nameID = atts.id(DataText.NAME);    
+    sizeID = atts.id(DataText.SIZE);
   }
   
   /**

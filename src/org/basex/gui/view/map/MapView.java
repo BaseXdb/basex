@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Random;
 import javax.swing.SwingUtilities;
 import org.basex.core.Context;
-import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
@@ -294,9 +293,8 @@ public final class MapView extends View implements Runnable {
     // call recursive TreeMap algorithm
     final Performance perf = new Performance();
     final Nodes nodes = GUI.context.current();
-    int mymapalgo = 0;
     // [JH] should bee set globally, easier for developing
-    switch(mymapalgo){ //GUIProp.mapalgo) {
+    switch(GUIProp.mapalgo){
       case 0: calcMap(rect, new IntList(nodes.nodes), 0, nodes.size, true); 
         break;
       // simple form of slice and dice tremapalgorithm
@@ -373,34 +371,36 @@ public final class MapView extends View implements Runnable {
       ni = ns + ln;    
         // consider number of descendants to calculate split point
       if(!GUIProp.mapsimple && !first) {
-        final Data data = GUI.context.data();
         // calculating real number of nodes of this recursion
-        // nodes are preordered, therefore last pre value of this level
+        // nodes are pre-ordered, therefore last pre value of this level
         // subtracted by first one is the actual amount of nodes
         nn = l.list[ne] - l.list[ns];
         
-        // pivot will be startnode + 1
+        // pivot will be start node + 1
         ni = ns + 1;
         
-        // parents size
-        int par = data.parent(l.list[ns], Data.ELEM);
-        long parsize = Token.toLong(data.attValue(par + FSParser.SIZEOFFSET));
-        // temporary to sum the childs sizes
-        long sum = 0;
-        
-        // increment pivot until left rectangle contains more or equal
-        // than the half descendants or if left node is greater than half of 
-        // all descendants leave with just setting it to ne - 1
-        for(; ni < ne - 1; ni++)  {
-          // use file sizes to calculate breakpoint
-          if(Prop.onthefly && data.fs != null) {
+        final Data data = GUI.context.data();
+        if(data.fs != null && GUIProp.mapaggr) {
+          // parents size
+          int par = data.parent(l.list[ns], Data.ELEM);
+          long parsize = Token.toLong(data.attValue(data.sizeID, par));
+          // temporary to sum up the child sizes
+          long sum = 0;
+          
+          // increment pivot until left rectangle contains more or equal
+          // than the half descendants or if left node is greater than half of 
+          // all descendants leave with just setting it to ne - 1
+          for(; ni < ne - 1; ni++)  {
+            // use file sizes to calculate breakpoint
             if(sum >= parsize / 2) break;
-            else sum += Token.toLong(data.attValue(ni + FSParser.SIZEOFFSET));
-          // use number of descendants 
-          } else {
-            if(l.list[ni] - l.list[ns] >= (nn >> 1)) {
-              break;
-            }
+            sum += Token.toLong(data.attValue(data.sizeID, par));
+          }
+        } else {
+          // increment pivot until left rectangle contains more or equal
+          // than the half descendants or if left node is greater than half of 
+          // all descendants leave with just setting it to ne - 1
+          for(; ni < ne - 1; ni++)  {
+            if(l.list[ni] - l.list[ns] >= (nn >> 1)) break;
           }
         }
         ln = l.list[ni] - l.list[ns];
@@ -499,27 +499,27 @@ public final class MapView extends View implements Runnable {
 //          " und so groß: " + parsize);
       
       int lines = 1;
-//      int perline = (int) Math.ceil((float) nn / lines);
+//      int perline = (int) Math.ceil((double) nn / lines);
       final boolean v = (level % 2) == 0 ? true : false;
-      float xx = r.x;
-      float yy = r.y;
+      double xx = r.x;
+      double yy = r.y;
       
       // use ceiling for width and height of some rects to avoid white spaces
 //      int ww, hh, ceilcount;
 //      if(v) {
 //        ww = r.w / lines;
-//        hh = (int) Math.ceil((float) r.h * lines / nn);
+//        hh = (int) Math.ceil((double) r.h * lines / nn);
 //      } else {
-//        ww = (int) Math.ceil((float) r.w * lines / nn);
+//        ww = (int) Math.ceil((double) r.w * lines / nn);
 //        hh = r.h / lines;
 //      }
-      float hh = 0;
-      float ww = 0;
+      double hh = 0;
+      double ww = 0;
       // calculate map for each rectangel on this level
       for(int i = 0; i < l.size - 1; i++) {
         if(v) {
           yy += hh;
-          float hoehe = (float) Token.toLong(data.attValue(l.list[i] + 
+          double hoehe = (double) Token.toLong(data.attValue(l.list[i] + 
               FSParser.SIZEOFFSET)) * r.h / parsize;
 //          System.out.println("hoehe double: " + hoehe + 
 //          " hoehe int: " + (int) hoehe);
@@ -527,7 +527,7 @@ public final class MapView extends View implements Runnable {
           ww = r.w / lines;
         } else {
           xx += ww;
-          float breite = (float) Token.toLong(data.attValue(l.list[i] + 
+          double breite = (double) Token.toLong(data.attValue(l.list[i] + 
               FSParser.SIZEOFFSET)) * r.w / parsize;
 //          System.out.println("breiete double: " + breite + 
 //          " breite int: "+ (int) breite);

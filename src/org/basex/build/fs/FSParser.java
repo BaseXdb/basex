@@ -97,9 +97,6 @@ public final class FSParser extends Parser implements FSVisitor {
     meta.add(TYPEMBX, new EMLExtractor());
     
     level = 0;
-    // only using stack for file sizes if running in mainmermory mode
-    // while bugfix for DiskBuilder.setAttValue is owing
-    if (Prop.onthefly) sumSizes = true;
   }
 
   /**
@@ -109,7 +106,7 @@ public final class FSParser extends Parser implements FSVisitor {
       throws IOException {
     if(docOpen) builder.startElem(token(DEEPFS), atts.reset());
     preStack[level] = builder.startElem(DIR, atts(new File(path)));
-    if(sumSizes) sizeStack[level] = new File(path).length();
+    if(sumSizes) sizeStack[level] = 0;
   }
 
   /**
@@ -119,7 +116,7 @@ public final class FSParser extends Parser implements FSVisitor {
     level++;
     guimsg = dir.toString();
     preStack[level] = builder.startElem(DIR, atts(dir));
-    if(sumSizes) sizeStack[level] = dir.length();
+    if(sumSizes) sizeStack[level] = 0;
   }  
   
   /**

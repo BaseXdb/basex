@@ -143,6 +143,10 @@ public final class GUIProp {
   public static boolean showstarthelp = false;
   /** Fullscreen flag. */
   static boolean fullscreen = false;
+  /** Map algorithm. */
+  public static int mapalgo = 0;
+  /** Map alignment by size aggregation. */
+  public static boolean mapaggr = false;
   
   /** Default path to the BaseX configuration file. */
   private static String cfg = Prop.HOME + "/.basexwin";
