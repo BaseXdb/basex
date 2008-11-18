@@ -1,5 +1,6 @@
 package org.basex.test.examples;
 
+import org.basex.api.xmldb.BXCollection;
 import org.xmldb.api.base.*;
 import org.xmldb.api.*;
 
@@ -20,10 +21,12 @@ public final class XMLDBExample {
   public static void main(final String[] args) throws Exception {
   try {
          Class c = Class.forName(DRIVER);
-
          Database database = (Database) c.newInstance();
-             //Registers the Database.
+             // Registers the Database.
          DatabaseManager.registerDatabase(database);
+         
+             // Creates a new collection = Database with the ID = New Database.
+         final Collection coll = new BXCollection("New Database");
       }
       catch (XMLDBException e) {
          System.err.println("XML:DB Exception occured " + e.errorCode);
