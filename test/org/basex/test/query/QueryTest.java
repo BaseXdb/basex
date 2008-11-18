@@ -70,8 +70,8 @@ public final class QueryTest {
     System.out.println("Testing " + (xquery ? "XQuery" : "XPath") +
         " (Index " + (Prop.ftindex ? "ON" : "OFF") + ")");
     boolean ok = true;
-  //  ok &= test(xquery, new SimpleTest());
-  //  ok &= test(xquery, new XPathMarkFTTest());
+    ok &= test(xquery, new SimpleTest());
+    ok &= test(xquery, new XPathMarkFTTest());
     ok &= test(xquery, new FTTest());
     System.out.println(ok ? "All tests correct.\n" : "Wrong results...\n");
     return ok;

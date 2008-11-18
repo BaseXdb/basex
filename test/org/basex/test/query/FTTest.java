@@ -38,9 +38,9 @@ public final class FTTest extends AbstractTest {
       "</fttest>";
 
     queries = new Object[][] {
-        { "FTPosFilter 14", nodes(3, 37),
-          "//w [. ftcontains 'first' ftand 'second' ftand 'third' " +
-            "distance exactly 1 words]" },
+        { "FTPosFilter 22", nodes(3, 37),
+          "//w [. ftcontains ('second' ftand 'third' window 3 words) " +
+          "ftand 'sentence' distance exactly 0 words]" },
           
         { "Simple 1", bool(true),
           "'abc' ftcontains 'abc'" },
