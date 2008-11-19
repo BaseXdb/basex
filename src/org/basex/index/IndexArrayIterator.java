@@ -30,7 +30,7 @@ public class IndexArrayIterator extends IndexIterator {
   public IndexArrayIterator(final int s) {
     size = s;
   }
-  
+
   /**
    * Constructor.
    * @param res pres array
@@ -145,5 +145,68 @@ public class IndexArrayIterator extends IndexIterator {
     }
     ftdata = ia.finish();
     size = ftdata.length;
+  }
+  
+  /**
+   * Get all FTData from index.
+   * @return int[][] ftdata
+   */
+  public int[][] getFTData() {
+    return ftdata;
+  }
+  
+  /**
+   * Merge to indexarrayiterator.
+   * @param iai1 first indexarrayiterator to merge
+   * @param iai2 second indexarrayiterator to merge
+   * @return IndexArrayIterator
+   */
+  public static IndexArrayIterator merge(final IndexArrayIterator iai1, 
+      final IndexArrayIterator iai2) {
+    return new IndexArrayIterator(1) {
+      FTNode[] n = new FTNode[2];
+      FTNode r;
+      int c = -1;
+      
+      @Override
+      public boolean more() {
+        r = null;
+        n[0] = (c == 0 || c == -1) && iai1.more() ? iai1.nextFTNode() : null;
+        n[1] = (c == 1 || c == -1) && iai2.more() ? iai2.nextFTNode() : null;
+        if (n[0] != null) {
+          if (n[1] != null) {
+            final int dis = n[0].getPre() - n[1].getPre();
+            if (dis < 0) {
+              r = n[0];
+              c = 0;
+            } else if (dis > 0) {
+              r = n[1];
+              c = 1;
+            } else {
+              n[0].merge(n[1], 0);
+              r = n[0];
+              c = -1;
+            }
+          } else {
+            c = 0;
+            r = n[0];
+          }
+        } else if (n[1] != null) {
+          c = 1;
+          r = n[1];
+        }
+        return r != null;
+      }
+      
+      @Override
+      public FTNode nextFTNode() {
+        return r;
+      }
+      @Override
+      public void setTokenNum(final int t) {
+        iai1.setTokenNum(t);
+        iai2.setTokenNum(t);
+      }
+    };
   }
 }

@@ -218,31 +218,51 @@ public final class FTFuzzy extends Index {
   }
 
   /**
-   * Creates an index iterator for all pre/pos values.
-   * @param p pointer of pre/pos data
-   * @param s number of pre values
-   * @return iterator
+   * Extracts data from disk and returns it in
+   * [[pre1, ..., pres], [pos1, ..., poss]] representation.
+   *
+   * @param s number of pre/pos values
+   * @param p pointer on data
+   * @return  int[][] data
    */
-  private IndexIterator getData(final long p, final int s) {
+  private IndexArrayIterator getData(final long p, final int s) {
+    if(s == 0 || p < 0) return null;
+    final int[][] dt = new int[2][s];
     dat.cursor(p);
-    final int[][] d = new int[2][s];
-    for(int i = 0; i < s; i++) d[0][i] = dat.readNum();
-    for(int i = 0; i < s; i++) d[1][i] = dat.readNum();
-    return new IndexArrayIterator(d, true);
+
+    if (data.meta.ftittr) {
+      for(int i = 0; i < s; i++) {
+        dt[0][i] = dat.readNum();
+        dt[1][i] = dat.readNum();
+      }
+    } else {
+      for(int i = 0; i < s; i++) dt[0][i] = dat.readNum();
+      for(int i = 0; i < s; i++) dt[1][i] = dat.readNum();  
+    }
+    return new IndexArrayIterator(dt, true);
   }
 
+
+  
   /**
    * Caches the iterator values and returns an int array (temporary).
    * @param it iterator
    * @return array
    */
   private int[][] finish(final IndexIterator it) {
+    final IndexArrayIterator iat = (IndexArrayIterator) it;
+    return iat.getFTData();
+    /*
     final int s = it.size();
     final int[] pre = new int[s];
     final int[] pos = new int[s];
-    for(int i = 0; i < s; i++) pre[i] = it.next();
-    for(int i = 0; i < s; i++) pos[i] = it.next();
+
+    for(int i = 0; i < s && it.more(); i++) {
+      pre[i] = it.next();      
+    }
+    for(int i = 0; i < s && it.more(); i++) pos[i] = it.next();
     return new int[][] { pre, pos };
+    */
   }
 
   /**
@@ -254,7 +274,7 @@ public final class FTFuzzy extends Index {
    * @return int[][] data
    */
   private IndexIterator getFuzzy(final byte[] tok, final int e) {
-    int[][] ft = null;
+    IndexArrayIterator it = new IndexArrayIterator(0);
     byte[] to;
 
     int i = 0;
@@ -279,8 +299,8 @@ public final class FTFuzzy extends Index {
         to = ti.readBytes(p, p + ts);
         if (calcEQ(to, 0, tok, e)) {
           // read data
-          ft = FTTrie.calculateFTOr(ft,
-              finish(getData(getPointerOnData(p, ts), getDataSize(p, ts))));
+          it = IndexArrayIterator.merge(getData(getPointerOnData(p, ts), 
+              getDataSize(p, ts)), it);
         }
         p += ts + 4L  + 5L;
      }
@@ -288,7 +308,7 @@ public final class FTFuzzy extends Index {
       ts = li.readBytes(1L + i * 5L, 1L + i * 5L + 1L)[0];
       dif = Math.abs(tok.length - ts);
     }
-    return new IndexArrayIterator(ft, true);
+    return it;
   }
 
   /**
@@ -431,7 +451,7 @@ public final class FTFuzzy extends Index {
   private IndexIterator getTokenWildCard(final byte[] tok, final int posw) {
     if (tok[posw] == '.' && tok.length > posw + 1 && tok[posw + 1] == '*') {
       int[][] b;
-      int[][] dt = null;
+      IndexArrayIterator it = new IndexArrayIterator(0);
       byte[] dtok;
       b = getBoundPointer(tok.length - 2);
       while (true) {
@@ -442,17 +462,20 @@ public final class FTFuzzy extends Index {
           if (b[1] == null) break; //return data;
         }
         dtok = ti.readBytes(b[0][1], b[0][0] + b[0][1]);
-        if (contains(tok, posw, dtok)) dt = FTTrie.calculateFTOr(dt,
-            finish(getData(getPointerOnData(b[0][1], b[0][0]),
-                getDataSize(b[0][1], b[0][0]))));
+        if (contains(tok, posw, dtok)) {
+          it = IndexArrayIterator.merge(
+            getData(getPointerOnData(b[0][1], b[0][0]),
+                getDataSize(b[0][1], b[0][0])), it);
+        }
         b[0][1] += b[0][0] * 1L + 9L;
       }
       dtok = ti.readBytes(b[0][1], b[0][0] + b[0][1]);
-      if (contains(tok, posw, dtok)) dt = FTTrie.calculateFTOr(dt,
-          finish(getData(getPointerOnData(b[0][1], b[0][0]),
-              getDataSize(b[0][1], b[0][0]))));
-
-      return new IndexArrayIterator(dt, true);
+      if (contains(tok, posw, dtok)) {
+        it = IndexArrayIterator.merge(
+            getData(getPointerOnData(b[0][1], b[0][0]),
+                getDataSize(b[0][1], b[0][0])), it);
+      }
+      return it;
     }
 
     // FuzzyIndex supports only '.*' as wildcard...
