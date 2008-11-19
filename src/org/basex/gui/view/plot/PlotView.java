@@ -80,7 +80,7 @@ public final class PlotView extends View implements Runnable {
   /** Flag for mouse dragging actions. */
   private boolean dragging;
   /** Indicates if global marked nodes should be drawn. */
-  boolean drawContextMarked;
+  boolean drawMarkedContext;
   /** Holds marked items in the plot during a self implied marking operation. */
   IntList tmpMarked;
   /** Bounding box which supports selection of multiple items. */
@@ -146,6 +146,7 @@ public final class PlotView extends View implements Runnable {
           }
         }
         tmpMarked.reset();
+        drawMarkedContext = true;
         repaint();
       }
     });
@@ -340,14 +341,14 @@ public final class PlotView extends View implements Runnable {
    */
   private void drawMarkedNodes(final Graphics g) {
     final Data data = GUI.context.data();
-    if(!drawContextMarked) {
-      final int[] t = tmpMarked.finish();
-      for(int i = 0; i < t.length; i++) {
-        drawItem(g, plotData.xAxis.co[t[i]], 
-            plotData.yAxis.co[t[i]], false, true, false);
-      }
-      return;
-    }
+//    if(!drawMarkedContext) {
+//      final int[] t = tmpMarked.finish();
+//      for(int i = 0; i < t.length; i++) {
+//        drawItem(g, plotData.xAxis.co[t[i]], 
+//            plotData.yAxis.co[t[i]], false, true, false);
+//      }
+//      return;
+//    }
 
     // if nodes are marked in another view, the given nodes as well as their
     // descendants are checked for intersection with the nodes displayed in
@@ -624,7 +625,7 @@ public final class PlotView extends View implements Runnable {
     plotData.yAxis.refreshAxis();
 
     tmpMarked.reset();
-    drawContextMarked = true;
+    drawMarkedContext = true;
     plotChanged = true;
     repaint();
   }
@@ -651,7 +652,7 @@ public final class PlotView extends View implements Runnable {
       // set first item and trigger assignment of axis assignments
       if(items.length != 0) itemCombo.setSelectedIndex(0);
 
-      drawContextMarked = true;
+      drawMarkedContext = true;
       plotChanged = true;
       repaint();
     }
@@ -674,7 +675,7 @@ public final class PlotView extends View implements Runnable {
 
   @Override
   protected void refreshMark() {
-    drawContextMarked = true;
+    drawMarkedContext = true;
     repaint();
   }
 
@@ -808,7 +809,7 @@ public final class PlotView extends View implements Runnable {
       dragging = true;
       selectionBox.setStart(mouseX, mouseY);
     }
-    drawContextMarked = false;
+    drawMarkedContext = false;
     
     // keeps selection box on the plot inside. if mouse pointer is outside box
     // the corners of the selection box are set to the predefined values s.a. 
@@ -868,7 +869,7 @@ public final class PlotView extends View implements Runnable {
   @Override
   public void mousePressed(final MouseEvent e) {
     if(working || painting) return;
-    super.mousePressed(e);
+//    super.mousePressed(e);
     mouseX = e.getX();
     mouseY = e.getY();
     focus();
@@ -880,8 +881,7 @@ public final class PlotView extends View implements Runnable {
       tmpMarked.reset();
       return;
     }
-    drawContextMarked = false;
-    
+
     // node marking if item focused. if more than one icon is in focus range
     // all of these are marked. focus range means exact same x AND y coordinate.
     final int pre = plotData.findPre(focused);
@@ -890,7 +890,7 @@ public final class PlotView extends View implements Runnable {
     final boolean left = SwingUtilities.isLeftMouseButton(e);
     
     final IntList il = new IntList();
-    if(left) tmpMarked.reset();
+    if(left && !e.isShiftDown()) tmpMarked.reset();
     // get coordinates for focused item
     final int mx = calcCoordinate(true, plotData.xAxis.co[pre]);
     final int my = calcCoordinate(false, plotData.yAxis.co[pre]);
@@ -904,8 +904,9 @@ public final class PlotView extends View implements Runnable {
       }
     }
     
+    if(SwingUtilities.isRightMouseButton(e)) drawMarkedContext = false;
     // right mouse or shift down
-    if(e.isShiftDown() || !left) {
+    if(e.isShiftDown()) {
       final Nodes marked = GUI.context.marked();
       marked.union(il.finish());
       notifyMark(marked, this);

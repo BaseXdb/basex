@@ -115,7 +115,7 @@ public final class PlotAxis {
       if(type == Kind.TEXT && value.length > TEXTLENGTH) {
         value = substring(value, 0, TEXTLENGTH);
       }
-      vals[i] = value;
+      vals[i] = lc(value);
     }
     
     if(type == Kind.TEXT)
