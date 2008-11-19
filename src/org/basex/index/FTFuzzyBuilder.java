@@ -139,13 +139,33 @@ public final class FTFuzzyBuilder extends Progress implements IndexBuilder {
         outy.writeInt(ds);
 
         // write compressed pre and pos arrays
-        byte[] val = tre.pre[p];
-        int is = Num.size(val);
-        for (int z = 4; z < is; z++) outz.write(val[z]);
+        byte[] vpre = tre.pre[p];
+        byte[] vpos = tre.pos[p];
+        int lpre = 4;
+        int lpos = 4;
+        int spre = Num.size(vpre);
+        int spos = Num.size(vpos);
+        if (data.meta.ftittr) {
+          // ftdata is stored here, with pre1, pos1, ..., preu, posu 
+          while(lpre < Num.size(vpre) && lpos < Num.size(vpos)) {
+            int z = 0;
+            while (z < Num.len(vpre, lpre)) {
+              outz.write(vpre[lpre + z++]);
+            }
+            lpre += z;
+            z = 0;
+            while (z < Num.len(vpos, lpos)) {
+              outz.write(vpos[lpos + z++]);
+            }
+            lpos += z;
+          }
+        } else {
+          // ftdata is stored here, with pre1, ..., preu in outPre and 
+          // pos1, ..., posu in outPos
+          for (int z = 4; z < spre; z++) outz.write(vpre[z]);
+          for (int z = 4; z < spos; z++) outz.write(vpos[z]);
+        }
         
-        val = tre.pos[p];
-        is = Num.size(val);
-        for (int z = 4; z < is; z++) outz.write(val[z]);
         
         dr = outz.size();
         tr = (int) outy.size();
