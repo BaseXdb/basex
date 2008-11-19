@@ -101,6 +101,7 @@ public final class PlotView extends View implements Runnable {
       public void actionPerformed(final ActionEvent e) {
         if(plotData.xAxis.setAxis((String) xCombo.getSelectedItem())) {
           plotChanged = true;
+          markingChanged = true;
           repaint();
         }
       }
@@ -110,6 +111,7 @@ public final class PlotView extends View implements Runnable {
       public void actionPerformed(final ActionEvent e) {
         if(plotData.yAxis.setAxis((String) yCombo.getSelectedItem())) {
           plotChanged = true;
+          markingChanged = true;
           repaint();
         }
       }

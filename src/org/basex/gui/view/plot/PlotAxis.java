@@ -320,7 +320,7 @@ public final class PlotAxis {
 
       // type == TEXT / CAT
     } else {
-      nrCaptions = space / (PlotView.CAPTIONWHITESPACE);
+      nrCaptions = space / (PlotView.CAPTIONWHITESPACE * 3);
       if(nrCaptions > nrCats)
         nrCaptions = nrCats;
       actlCaptionStep = 1.0d / (nrCaptions - 1);
