@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.io.File;
 import java.io.IOException;
 import org.basex.BaseX;
+import org.basex.Text;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.build.fs.metadata.AbstractExtractor;
@@ -21,7 +22,6 @@ import org.basex.core.Prop;
 import org.basex.core.proc.CreateFS;
 import org.basex.io.BufferInput;
 import org.basex.io.IO;
-import org.basex.Text;
 import org.basex.util.Array;
 import org.basex.util.Atts;
 import org.basex.util.Map;
@@ -37,34 +37,23 @@ import org.basex.util.Map;
  * </li>
  * <li>This class {@link FSParser} instantiates the needed components
  * for the import process in its {@link FSParser#parse(Builder)} method.
- * The components are:
- *  <ol>
- *    <li>the file hierarchy traversal engine ({@link FSWalker} and</li>
- *    <li>as many visitors ({@link FSVisitor}) as needed to receive
- *    events during the traversal.  In this case this class {@link FSParser}
- *    also implements the interface {@link FSVisitor} and as such is
- *    the essential one to shred/import the file hierarchy into an XML
- *    hierarchy.</li>
- *  </ol>
  * </ol>
  *
- * @see FSWalker
- * @see FSVisitor
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Alexander Holupirek
  */
-public final class FSParser extends Parser implements FSVisitor {
-  /** The current File being processed. */
-  private String guimsg = "";
+public final class FSParser extends Parser {
   /** Meta data index. */
   private final Map<AbstractExtractor> meta = new Map<AbstractExtractor>();
-  /** Cache for content indexing. */
-  private byte[] cache;
   /** Reference to the database builder. */
   private Builder builder;
+  /** The currently processed file. */
+  private File curr;
+  /** Cache for content indexing. */
+  private byte[] cache;
   /** Level counter. */
-  private int level;
-  /** Diretory size Stack. */
+  private int lvl;
+  /** Directory size Stack. */
   private final long[] sizeStack = new long[IO.MAXHEIGHT];
   /** Pre valStack. */
   private final int[] preStack = new int[IO.MAXHEIGHT];
@@ -92,56 +81,88 @@ public final class FSParser extends Parser implements FSVisitor {
     meta.add(TYPEEML, new EMLExtractor());
     meta.add(TYPEMBS, new EMLExtractor());
     meta.add(TYPEMBX, new EMLExtractor());
+    lvl = 0;
+  }
+
+  /**
+   * Main entry point for the import of a file hierarchy to BaseX.
+   * Instantiates fht engine and visitors, and starts the traversal.
+   * @param build instance passed by {@link CreateFS}.
+   * @throws IOException I/O exception
+   */
+  @Override
+  public void parse(final Builder build) throws IOException {
+    builder = build;
+    builder.encoding(Prop.ENCODING);
+
+    builder.startDoc(token(io.name()));
+    builder.startElem(token(DEEPFS), atts.reset());
     
-    level = 0;
+    final String fp = io.path();
+    for(final File f : fp.equals("/") ? File.listRoots() :
+      new File[] { new File(fp).getCanonicalFile() }) {
+      
+      preStack[lvl] = builder.startElem(DIR, atts(f));
+      sizeStack[lvl] = 0;
+      parse(f);
+      builder.endElem(DIR);
+      builder.setAttValue(preStack[lvl] + SIZEOFFSET, token(sizeStack[lvl]));
+    }
+    
+    builder.endElem(token(DEEPFS));
+    builder.endDoc();
   }
 
   /**
-   * {@inheritDoc}
+   * Visits files in a directory or steps further down.
+   * @param d the directory to be visited.
+   * @throws IOException I/O exception
    */
-  public void preTraversal(final String path, final boolean docOpen)
-      throws IOException {
-    if(docOpen) builder.startElem(token(DEEPFS), atts.reset());
-    preStack[level] = builder.startElem(DIR, atts(new File(path)));
-    sizeStack[level] = 0;
+  private void parse(final File d) throws IOException {
+    final File[] files = d.listFiles();
+    if(files == null) return;
+
+    for(final File f : files) {
+      // skip symbolic links
+      if(IO.isSymlink(f)) continue;
+
+      if(f.isDirectory()) {
+        dir(f);
+      } else {
+        file(f);
+      }
+    }
   }
 
   /**
-   * {@inheritDoc}
+   * Invoked when a directory is visited.
+   * @param f file name
+   * @throws IOException I/O exception
    */
-  public void preEvent(final File dir) throws IOException {
-    level++;
-    guimsg = dir.toString();
-    preStack[level] = builder.startElem(DIR, atts(dir));
-    sizeStack[level] = 0;
-  }  
-  
-  /**
-   * {@inheritDoc}
-   * 
-   */
-  public void postEvent() throws IOException {
+  private void dir(final File f) throws IOException {
+    preStack[++lvl] = builder.startElem(DIR, atts(f));
+    sizeStack[lvl] = 0;
+    parse(f);
     // closing tag
     builder.endElem(DIR);
 
-    //adding folder size to parent folder
-    sizeStack[level - 1] = sizeStack[level - 1] + sizeStack[level];
     // calling builder actualization
-    // take into account that stored pre value is the one of the element node,
-    // not the attributes one!
-    builder.setAttValue(preStack[level] + SIZEOFFSET, 
-        token(sizeStack[level]));
-    level--;
-  }
-  
-  /**
-   * {@inheritDoc}
-   */
-  public void regfileEvent(final File f) throws IOException {
-    // pushing file size to sizes Stack
-    sizeStack[level] += f.length();
+    // take into account that stored pre value is the one of the
+    // element node, not the attributes one!
+    final long size = sizeStack[lvl];
+    builder.setAttValue(preStack[lvl] + SIZEOFFSET, token(size));
     
-    guimsg = f.toString();
+    // add file size to parent folder
+    sizeStack[--lvl] += size;
+  }
+
+  /**
+   * Invoked when a regular file is visited.
+   * @param f file name
+   * @throws IOException I/O exception
+   */
+  private void file(final File f) throws IOException {
+    curr = f;
     builder.startElem(FILE, atts(f));
     if (f.canRead()) {
       if(Prop.fsmeta && f.getName().indexOf('.') != -1) {
@@ -175,63 +196,18 @@ public final class FSParser extends Parser implements FSVisitor {
         }
       }
     }
+
     builder.endElem(FILE);
+    // add file size to parent folder
+    sizeStack[lvl] += f.length();
   }
 
   /**
-   * {@inheritDoc}
-   */
-  public void symlinkEvent(final File link) { }
-
-  /**
-   * {@inheritDoc}
-   */
-  public void postTraversal(final boolean docClose) throws IOException {
-    builder.endElem(DIR);
-    builder.setAttValue(preStack[level] + SIZEOFFSET, token(sizeStack[level]));
-    if(docClose) builder.endElem(token(DEEPFS));
-  }
-
-  @Override
-  public String head() {
-    return Text.IMPORTPROG;
-  }
-
-  @Override
-  public String det() {
-    return guimsg;
-  }
-
-  @Override
-  public double prog() {
-    return 0;
-  }
-  
-  /**
-   * Main entry point for the import of a file hierarchy to BaseX.
-   * Instantiates fht engine and visitors, and starts the traversal.
-   * @param build instance passed by {@link CreateFS}.
-   * @throws IOException I/O exception
-   */
-  @Override
-  public void parse(final Builder build) throws IOException {
-    builder = build;
-    builder.encoding(Prop.ENCODING);
-    
-    final FSWalker f = new FSWalker();
-    f.register(this);
-    
-    builder.startDoc(token(io.name()));
-    f.fileHierarchyTraversal(io);
-    builder.endDoc();
-  }
-
-  /** Construct attributes for file and directory tags.
+   * Constructs attributes for file and directory tags.
    * @param f file name
    * @return attributes as byte[][]
    */
   private Atts atts(final File f) {
-    
     final String name = f.getName();
     final int s = name.lastIndexOf('.');
     // current time storage: minutes from 1.1.1970
@@ -245,5 +221,20 @@ public final class FSParser extends Parser implements FSVisitor {
     atts.add(SIZE, token(f.length()));
     if(time != 0) atts.add(MTIME, token(time));
     return atts;
+  }
+
+  @Override
+  public String head() {
+    return Text.IMPORTPROG;
+  }
+
+  @Override
+  public String det() {
+    return curr.toString();
+  }
+
+  @Override
+  public double prog() {
+    return 0;
   }
 }

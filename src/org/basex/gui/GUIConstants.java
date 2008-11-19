@@ -93,7 +93,7 @@ public final class GUIConstants {
     IMPORTFS, EXPORT, null, EXIT
   }, {
     COPY, PASTE, DELETE, INSERT, EDIT, null,
-    SHOWSEARCH, SHOWINFO, null, COPYPATH, SELECT, FILTER
+    SHOWSEARCH, SHOWINFO, null, COPYPATH, FILTER
   }, {
     MENUMAIN, SHOWMENU, SHOWBUTTONS, SHOWINPUT, SHOWSTATUS, null,
     MENUVIEWS, SHOWTEXT, SHOWMAP, SHOWTREE, SHOWTABLE, SHOWPLOT, null, FULL
@@ -106,8 +106,7 @@ public final class GUIConstants {
 
   /** Context menu entries. */
   public static final GUICommand[] POPUP = {
-    GOBACK, FILTER, null, COPY, PASTE, DELETE, INSERT, EDIT, null,
-    COPYPATH, SELECT
+    GOBACK, FILTER, null, COPY, PASTE, DELETE, INSERT, EDIT, null, COPYPATH
   };
 
   // CURSORS ==================================================================
@@ -234,8 +233,8 @@ public final class GUIConstants {
     color4 = new Color(col(r,  48), col(g,  50), col(b,  40));
     color5 = new Color(col(r,  56), col(g,  60), col(b,  80));
     color6 = new Color(col(r, 140), col(g, 100), col(b, 70));
-    colormarkA = new Color(col(r, 32), col(g,  160), col(b, 320), 200);
-    colormark2A = new Color(col(r, 16), col(g, 80), col(b, 160), 200);
+    colormarkA = new Color(col(r, 32), col(g,  160), col(b, 320), 100);
+    colormark2A = new Color(col(r, 16), col(g, 80), col(b, 160), 100);
     colormark1 = new Color(col(r, 16), col(g, 120), col(b, 240));
     colormark2 = new Color(col(r, 16), col(g,  80), col(b, 160));
     colormark3 = new Color(col(r, 32), col(g, 160), col(b, 320));

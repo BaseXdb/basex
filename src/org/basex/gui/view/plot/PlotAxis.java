@@ -1,6 +1,7 @@
 package org.basex.gui.view.plot;
 
 import static org.basex.util.Token.*;
+
 import org.basex.data.Data;
 import org.basex.data.StatsKey;
 import org.basex.data.StatsKey.Kind;
@@ -10,7 +11,7 @@ import org.basex.util.Set;
 
 /**
  * Axis component of the scatter plot visualization.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Lukas Kircher
  */
@@ -48,17 +49,17 @@ public final class PlotAxis {
   byte[] firstCat;
   /** The last category for text data. */
   byte[] lastCat;
-  
+
   /**
    * Constructor.
-   * @param data scatte data reference
+   * @param data plot data reference
    */
   PlotAxis(final PlotData data) {
     plotData = data;
   }
-  
+
   /**
-   * (Re)Initializes axis. 
+   * (Re)Initializes axis.
    */
   private void initialize() {
     isTag = false;
@@ -75,9 +76,9 @@ public final class PlotAxis {
     sigVal = 0;
     firstLabel = 0;
   }
-  
+
   /**
-   * Called if the user has changed the caption of the axis. If a new 
+   * Called if the user has changed the caption of the axis. If a new
    * attribute was selected the positions of the plot items are recalculated.
    * @param attribute attribute selected by the user
    * @return true if new attribute was selected
@@ -117,7 +118,7 @@ public final class PlotAxis {
       }
       vals[i] = lc(value);
     }
-    
+
     if(type == Kind.TEXT)
       textToNum(vals);
     else {
@@ -128,43 +129,36 @@ public final class PlotAxis {
     }
     vals = null;
   }
-  
+
   /**
    * TEXT data is transformed to categories, meaning each unique string forms
    * a category. The text values of the items are first sorted. The coordinate
    * for an item is then calculated as the position of the text value of this
-   * item in the sorted category set.   
+   * item in the sorted category set.
    * @param vals item values
    */
   private void textToNum(final byte[][] vals) {
-    // sort text values alphabetical (asc).
-    Set set = new Set();
-    for(int i = 0; i < vals.length; i++) {
-      set.add(vals[i]);
-    }
-    
     // get sorted indexes for values
     final int[] tmpI = IntList.createOrder(vals, false, true).finish();
     final int vl = vals.length;
     int i = 0;
-    
-    // find first non empty value
-    while(i < vl && vals[i].length == 0) {
-      co[tmpI[i]] = -1;
-      i++;
-    }
 
-    // 2 additional empty categories are added for layout reasons -> +2
-    nrCats = set.size();
+    // find first non empty value
     // empty string is treated as non existing value -> coordinate = -1
+    while(i < vl && vals[i].length == 0) co[tmpI[i++]] = -1;
+
+    // count number of unique values
+    Set set = new Set();
+    for(final byte[] v : vals) set.add(v);
+    nrCats = set.size();
     if(i > 0) nrCats--;
     set = null;
-    
+
     // get first/last category for axis caption
     firstCat = i < vl ? vals[i] : EMPTY;
     lastCat = i < vl ? vals[vl - 1] : EMPTY;
-    
-    // number of current category / position of item value in ordered 
+
+    // number of current category / position of item value in ordered
     // text set.
     int p = 0;
     while(i < vl) {
@@ -186,10 +180,11 @@ public final class PlotAxis {
       p++;
     }
   }
-  
+
   /**
    * Calculates the relative position of an item in the plot for a given value.
-   * The position for a TEXT value of an item is calculated in textToNum().
+   * The position for a TEXT value of an item is calculated in
+   * {@link #textToNum}.
    * @param value item value
    * @return relative x or y value of the item
    */
@@ -197,7 +192,7 @@ public final class PlotAxis {
     if(value.length == 0) {
       return -1;
     }
-    
+
     final double d = toDouble(value);
     final double range = max - min;
     if(range == 0)
@@ -205,7 +200,7 @@ public final class PlotAxis {
     else
       return 1 / range * (d - min);
   }
-  
+
   /**
    * Calculates relative coordinate for a given value.
    * @param value given value
@@ -214,7 +209,7 @@ public final class PlotAxis {
   double calcPosition(final double value) {
     return calcPosition(token(value));
   }
-  
+
   /**
    * Returns the value for the specified pre value.
    * @param pre pre value
@@ -234,7 +229,7 @@ public final class PlotAxis {
     }
     return EMPTY;
   }
-  
+
   /**
    * Determines the smallest and greatest occurring values for a specific item.
    * Afterwards the extremes are rounded to support a decent axis
@@ -249,10 +244,10 @@ public final class PlotAxis {
     while(i < vals.length) {
       if(vals[i].length > 0) {
         b = true;
-        double d = toDouble(vals[i]);
+        final double d = toDouble(vals[i]);
         if(d < min)
           min = d;
-        if(d > max) 
+        if(d > max)
           max = d;
       }
       i++;
@@ -276,7 +271,7 @@ public final class PlotAxis {
       final double tmax = max * fac;
       range = Math.abs(tmax - tmin);
       final double d = tmin + range * .55d;
-      
+
       pow = range < 10 ? 0 : (int) (Math.floor(Math.log10(range) + .5d)) - 1;
       final double lstep = (int) (Math.pow(10, pow));
       sigVal = d - d % lstep;
@@ -284,15 +279,15 @@ public final class PlotAxis {
       calculatedCaptionStep = lstep / fac;
       return;
     }
-    
-    final int pow = range < 10 ? 0 : 
+
+    final int pow = range < 10 ? 0 :
       (int) (Math.floor(Math.log10(range) + .5d)) - 1;
-    double lstep = (int) (Math.pow(10, pow));
+    final double lstep = (int) (Math.pow(10, pow));
     final double d = min + range * .6d;
     sigVal = d - d % lstep;
     calculatedCaptionStep = lstep;
   }
-  
+
   /**
    * Calculates axis caption depending on view width / height.
    * @param space space of view axis available for captions
@@ -317,7 +312,7 @@ public final class PlotAxis {
         actlCaptionStep *= 2;
         nrCaptions = (int) (range / actlCaptionStep);
       }
-        
+
       // find first label after minimum value
       firstLabel = sigVal;
       while(firstLabel > min + actlCaptionStep * 1.2d)

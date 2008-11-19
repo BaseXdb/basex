@@ -46,28 +46,13 @@ public final class DialogPrefs extends Dialog {
   private BaseXCheckBox javalook;
   /** Dot size in plot view. */
   private BaseXSlider dots;
-  /** Focus flag. */
-  private boolean lf;
-  /** Focus flag. */
-  private boolean foc;
-  /** Show names flag. */
-  private boolean nam;
-  /** File dialog flag. */
-  private boolean fd;
-  /** Plot dots flag. */
-  private int pd;
 
   /**
    * Default Constructor.
    * @param gui reference to main frame
    */
   public DialogPrefs(final GUI gui) {
-    super(gui, PREFSTITLE);
-    foc = GUIProp.mousefocus;
-    nam = GUIProp.shownames;
-    fd = GUIProp.simplefd;
-    lf = GUIProp.javalook;
-    pd = GUIProp.plotdots;
+    super(gui, PREFSTITLE, false);
 
     // create checkboxes
     final BaseXBack pp = new BaseXBack();
@@ -97,19 +82,19 @@ public final class DialogPrefs extends Dialog {
     pp.add(label);
 
     // checkbox for realtime mouse focus
-    javalook = new BaseXCheckBox(PREFLF, HELPLF, lf, this);
+    javalook = new BaseXCheckBox(PREFLF, HELPLF, GUIProp.javalook, this);
     pp.add(javalook);
 
     // checkbox for realtime mouse focus
-    focus = new BaseXCheckBox(PREFFOCUS, HELPFOCUS, foc, this);
+    focus = new BaseXCheckBox(PREFFOCUS, HELPFOCUS, GUIProp.mousefocus, this);
     pp.add(focus);
 
     // checkbox for simple file dialog
-    simpfd = new BaseXCheckBox(SIMPLEFD, HELPSIMPLEFD, fd, this);
+    simpfd = new BaseXCheckBox(SIMPLEFD, HELPSIMPLEFD, GUIProp.simplefd, this);
     pp.add(simpfd);
 
     // enable only if current document contains name attributes
-    names = new BaseXCheckBox(PREFNAMES, HELPNAMES, nam, this);
+    names = new BaseXCheckBox(PREFNAMES, HELPNAMES, GUIProp.shownames, this);
     final Data data = GUI.context.data();
     names.setEnabled(data != null && data.fs == null && data.nameID != 0);
     pp.add(names);
@@ -117,7 +102,7 @@ public final class DialogPrefs extends Dialog {
     // checkbox for realtime mouse focus
     p = new BaseXBack();
     p.setLayout(new TableLayout(1, 2, 6, 0));
-    dots = new BaseXSlider(-10, 10, pd, null, this);
+    dots = new BaseXSlider(-10, 10, GUIProp.plotdots, null, this);
     BaseXLayout.setWidth(dots, 150);
     p.add(new BaseXLabel(PREFDOTS));
     p.add(dots);
@@ -146,10 +131,6 @@ public final class DialogPrefs extends Dialog {
     pp.add(p);
 
     set(pp, BorderLayout.CENTER);
-
-    // create buttons
-    set(BaseXLayout.okCancel(this), BorderLayout.SOUTH);
-    
     finish(gui);
   }
   
@@ -178,29 +159,13 @@ public final class DialogPrefs extends Dialog {
 
   @Override
   public void action(final String cmd) {
+    Prop.dbpath = path.getText();
+    Prop.language = lang.getSelectedItem().toString();
     GUIProp.mousefocus = focus.isSelected();
     GUIProp.shownames = names.isSelected();
     GUIProp.simplefd = simpfd.isSelected();
     GUIProp.javalook = javalook.isSelected();
     GUIProp.plotdots = dots.value();
-    if(GUI.context.db()) View.notifyLayout();
-  }
-
-  @Override
-  public void cancel() {
-    super.cancel();
-    GUIProp.mousefocus = foc;
-    GUIProp.shownames = nam;
-    GUIProp.simplefd = fd;
-    GUIProp.javalook = lf;
-    GUIProp.plotdots = pd;
-    if(GUI.context.db()) View.notifyLayout();
-  }
-
-  @Override
-  public void close() {
-    super.close();
-    Prop.dbpath = path.getText();
-    Prop.language = lang.getSelectedItem().toString();
+    View.notifyLayout();
   }
 }

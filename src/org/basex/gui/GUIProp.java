@@ -113,6 +113,8 @@ public final class GUIProp {
 
   /** Path for creating new XML Documents. */
   public static String createpath = Prop.WORK;
+  /** Path for XQuery files. */
+  public static String xqpath = Prop.WORK;
   /** Path for importing the file system. */
   public static String fspath = Prop.WORK;
   /** Name of the filesystem database. */
@@ -146,7 +148,7 @@ public final class GUIProp {
   /** Map algorithm. */
   public static int mapalgo = 0;
   /** Map alignment by size aggregation. */
-  public static boolean mapaggr = true;
+  public static boolean mapaggr = false;
   
   /** Default path to the BaseX configuration file. */
   private static String cfg = Prop.HOME + "/.basexwin";

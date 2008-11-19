@@ -119,10 +119,9 @@ public final class BaseXText extends BaseXPanel {
       setMode(FILL.NONE);
     }
 
-    final GUICommand[] pop = edit ?
+    final GUICommand[] pop = !edit ? new GUICommand[] { new CopyCmd() } :
         new GUICommand[] { new UndoCmd(), new RedoCmd(), null, new CutCmd(),
-        new CopyCmd(), new PasteCmd(), new DelCmd(), null, new AllCmd() } :
-      new GUICommand[] { new CopyCmd(), null, new AllCmd() };
+        new CopyCmd(), new PasteCmd(), new DelCmd(), null };
     popup = new BaseXPopup(this, pop);
   }
 
@@ -754,22 +753,6 @@ public final class BaseXText extends BaseXPanel {
     @Override
     public String desc() {
       return GUIDEL;
-    }
-  }
-
-  /** Select all Command. */
-  class AllCmd extends TextCmd {
-    @Override
-    public void execute() {
-      selectAll();
-    }
-    @Override
-    public void refresh(final AbstractButton button) {
-      button.setEnabled(true);
-    }
-    @Override
-    public String desc() {
-      return GUISELECT;
     }
   }
 }

@@ -83,13 +83,9 @@ public final class FunJava extends Arr {
     try {
       result = mth.equals("new") ? constructor(arg) : method(arg);
     } catch(final Exception ex) {
-      //ex.getCause().toString()
       Err.or(FUNJAVA, info());
     }
-
-    //if(result == null) Err.or(FUNJAVA, info());
     return result == null ? Iter.EMPTY : iter(result);
-    //return iter(result);
   }
 
   /**
@@ -151,22 +147,15 @@ public final class FunJava extends Arr {
     int a = 0;
 
     for(final Class<?> par : params) {
-      //BaseX.debug("-1- " + par.getCanonicalName());
       final Type jType = type(par);
       if(jType == null) return null;
 
       final Item arg = args[s + a];
 
-      //BaseX.debug("-2- " + xq + " = Java?");
       if(jType == Type.JAVA && arg.type != Type.JAVA) return null;
-
-      //BaseX.debug("-3- " + xq + " instance of " + it.type + " ?");
-      //if(!xq.instance(it.type)) return null;
       if(!arg.type.instance(jType) && !jType.instance(arg.type)) return null;
-      //BaseX.debug("-3- " + it);
 
       final Object o = arg.java();
-      //BaseX.debug("-4- " + o.getClass() + " => " + par);
       val[a++] = o;
     }
     return val;

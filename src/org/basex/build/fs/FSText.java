@@ -167,7 +167,4 @@ public interface FSText {
   /** Email attributes. */
   byte[][] ATTRIBUTETOKENS = { token("CC"), token("User-Agent"),
       token("Organization") };
-
-  /** Error on IOException during traversal. */
-  String IOEXSKIP = " provoked an exception. We skip it. Reason: ";
 }

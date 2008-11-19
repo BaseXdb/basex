@@ -16,8 +16,7 @@ import org.basex.util.IntList;
  * Called when path could be inverted and index accessed.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
- * @author Christian Gruen
- * @autor Sebastian Gath
+ * @author Sebastian Gath
  */
 public final class FTContainsNS extends Arr {
   /** Fulltext parser. */

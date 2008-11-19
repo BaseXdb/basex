@@ -815,10 +815,6 @@ public interface Text {
   /** Command Info. */
   String GUIRTFILTERTT = lang("c_rtfiltertt");
   /** Command Info. */
-  String GUISELECT = lang("c_select");
-  /** Command Info. */
-  String GUISELECTTT = lang("c_selecttt");
-  /** Command Info. */
   String GUISHOWBUTTONS = lang("c_showbuttons");
   /** Command Info. */
   String GUISHOWBUTTONSTT = lang("c_showbuttonstt");

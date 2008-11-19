@@ -109,6 +109,7 @@ public final class DialogCreate extends Dialog {
     l.setBorder(0, 0, 0, 0);
     p1.add(l);
     dbname = new BaseXTextField(null, this);
+    dbname.setText(IO.get(GUIProp.createpath).dbname());
     dbname.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {
@@ -208,11 +209,10 @@ public final class DialogCreate extends Dialog {
       final IO file = fc.getFile();
       path.setText(file.path());
       dbname.setText(file.dbname());
-      //final int c = count(file);
-      //count.setText(CREATETITLE +
-      //    " (" + (c >= MAX ? "> " + MAX : c) + " files):");
+      GUIProp.createpath = fc.getFile().path();
+    } else {
+      GUIProp.createpath = fc.getDir();
     }
-    GUIProp.createpath = fc.getDir();
   }
 
   /**
@@ -243,7 +243,7 @@ public final class DialogCreate extends Dialog {
     final IO file = IO.get(pth);
     final boolean exists = pth.length() != 0 && file.exists();
     if(exists) {
-      GUIProp.createpath = file.getDir();
+      GUIProp.createpath = file.path();
       filter.setEnabled(file.isDir());
     }
 

@@ -85,7 +85,7 @@ public final class PlotData {
   /**
    * Refreshes item list and coordinates if the selection has changed. So far
    * only numerical data is considered for plotting.
-   * @param marked 
+   * @param marked marked flag
    */
   void refreshItems(final boolean marked) {
     final Data data = GUI.context.data();

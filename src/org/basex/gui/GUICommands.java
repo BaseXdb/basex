@@ -124,7 +124,7 @@ public enum GUICommands implements GUICommand {
       final GUI main = GUI.get();
 
       final BaseXFileChooser fc = new BaseXFileChooser(XQOPENTITLE,
-          GUIProp.createpath, main);
+          GUIProp.xqpath, main);
       fc.addFilter(IO.XQSUFFIX, CREATEXQDESC);
 
       if(fc.select(BaseXFileChooser.MODE.OPEN)) {
@@ -137,7 +137,7 @@ public enum GUICommands implements GUICommand {
               DIALOGINFO, JOptionPane.ERROR_MESSAGE);
         }
       }
-      GUIProp.createpath = fc.getDir();
+      GUIProp.xqpath = fc.getDir();
     }
   },
 
@@ -150,7 +150,7 @@ public enum GUICommands implements GUICommand {
 
       final String fn = Prop.xquery == null ? null : Prop.xquery.path();
       final BaseXFileChooser fc = new BaseXFileChooser(XQSAVETITLE,
-          fn == null ? GUIProp.createpath : fn, main);
+          fn == null ? GUIProp.xqpath : fn, main);
       fc.addFilter(IO.XQSUFFIX, CREATEXQDESC);
 
       if(fc.select(BaseXFileChooser.MODE.SAVE)) {
@@ -164,7 +164,7 @@ public enum GUICommands implements GUICommand {
               DIALOGINFO, JOptionPane.ERROR_MESSAGE);
         }
       }
-      GUIProp.createpath = fc.getDir();
+      GUIProp.xqpath = fc.getDir();
     }
   },
 
@@ -202,7 +202,7 @@ public enum GUICommands implements GUICommand {
         }
         //main.execute(Commands.EXPORT, "\"" + file + "\"");
       }
-      GUIProp.createpath = fc.getDir();
+      GUIProp.createpath = fc.getFile().path();
     }
   },
 
@@ -338,19 +338,6 @@ public enum GUICommands implements GUICommand {
       BaseXLayout.enable(button, !Prop.mainmem && nodes != null &&
         nodes.size == 1 && context.data().kind(nodes.nodes[0]) != Data.DOC &&
         nodes.data.ns.size() == 0);
-    }
-  },
-
-  /** Select current nodes. */
-  SELECT(true, GUISELECT, null, GUISELECTTT) {
-    @Override
-    public void execute() {
-      View.notifyMark(GUI.context.current().copy(), null);
-    }
-
-    @Override
-    public void refresh(final AbstractButton button) {
-      BaseXLayout.enable(button, GUI.context.current() != null);
     }
   },
 
