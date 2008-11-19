@@ -1,6 +1,5 @@
 package org.basex.query.xquery.expr;
 
-import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
 import org.basex.index.FTTokenizer;
 import java.io.IOException;
@@ -190,7 +189,7 @@ public final class FTWords extends FTExpr {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, NS, timer());
+    ser.openElement(this);
     query.plan(ser);
     ser.closeElement();
   }

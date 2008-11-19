@@ -4,7 +4,6 @@ import static org.basex.query.xpath.XPText.*;
 import static org.basex.query.xquery.path.Axis.*;
 import static org.basex.query.xquery.path.Test.NODE;
 import static org.basex.query.xquery.XQText.*;
-import static org.basex.query.xquery.XQTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
@@ -511,7 +510,7 @@ public class Path extends Arr {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, NS, timer());
+    ser.openElement(this);
     root.plan(ser);
     for(final Expr e : expr) e.plan(ser);
     ser.closeElement();

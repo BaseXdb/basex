@@ -98,7 +98,7 @@ public final class FTTokenizer extends IndexToken {
       } else if(!pa && c == '\n') {
         pa = true;
         para++;
-      } else if(Character.isLetterOrDigit(c)) {
+      } else if(c < 0x100 && Character.isLetterOrDigit(c)) {
         break;
       }
     }
@@ -109,7 +109,7 @@ public final class FTTokenizer extends IndexToken {
     // parse token
     for(; p < l; p += cl(text[p])) {
       final int c = cp(text, p);
-      if(Character.isLetterOrDigit(c)) continue;
+      if(c < 0x100 && Character.isLetterOrDigit(c)) continue;
       // [CG] parse wildcard indicators
       if(!wc || ws(c)) break;
     }

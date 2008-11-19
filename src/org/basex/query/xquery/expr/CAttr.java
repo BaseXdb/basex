@@ -87,7 +87,7 @@ public final class CAttr extends Arr {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, NS, timer());
+    ser.openElement(this);
     ser.openElement(NAME);
     atn.plan(ser);
     ser.closeElement();

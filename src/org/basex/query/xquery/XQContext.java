@@ -204,15 +204,14 @@ public final class XQContext extends QueryContext {
    */
   public Iter iter(final Expr e) throws XQException {
     checkStop();
+    return e.iter(this);
 
+    /*
     if(inf && !e.i()) {
-      e.time1();
-      final Iter ir = e.iter(this);
-      e.time2();
-      return ir;
+      return e.iter(this);
     } else {
       return e.iter(this);
-    }
+    }*/
     
     /* skip query info for items
     final Iter ir = e.iter(this);

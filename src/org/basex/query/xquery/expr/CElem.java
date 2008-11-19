@@ -208,7 +208,7 @@ public final class CElem extends Arr {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, NS, timer());
+    ser.openElement(this);
     tag.plan(ser);
     for(final Expr e : expr) e.plan(ser);
     ser.closeElement();

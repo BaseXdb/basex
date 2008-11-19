@@ -1,6 +1,5 @@
 package org.basex.query.xquery.expr;
 
-import static org.basex.query.xquery.XQTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.FTOpt;
@@ -58,7 +57,6 @@ public final class FTOptions extends FTExpr {
   public void plan(final Serializer ser) throws IOException {
     ser.startElement(this);
     opt.plan(ser);
-    ser.attribute(NS, timer());
     ser.finishElement();
     expr[0].plan(ser);
     ser.closeElement();
@@ -66,9 +64,6 @@ public final class FTOptions extends FTExpr {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append(expr != null ? expr.toString() : "FTOptions");
-    sb.append(opt.toString());
-    return sb.toString();
+    return expr[0].toString() + opt;
   }
 }

@@ -26,11 +26,8 @@ public final class PlotData {
   int[] pres;
   /** Number of items displayed in plot. */
   int size;
-
   /** Item token selected by user. */
   byte[] item = EMPTY;
-  /** Name attribute. */
-  int nameID;
 
   /**
    * Default Constructor.
@@ -38,7 +35,6 @@ public final class PlotData {
   public PlotData() {
     xAxis = new PlotAxis(this);
     yAxis = new PlotAxis(this);
-    nameID = GUI.context.data().atts.id(token("name"));
   }
 
   /**
@@ -134,7 +130,7 @@ public final class PlotData {
     final int limit = pre + data.size(pre, Data.ELEM);
     for(int p = pre; p < limit; p++) {
       final int kind = data.kind(p);
-      if(kind == Data.ATTR && data.attNameID(p) == nameID) {
+      if(kind == Data.ATTR && data.attNameID(p) == data.nameID) {
         return string(data.atom(p));
       }
     }

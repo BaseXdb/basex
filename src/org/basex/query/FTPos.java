@@ -397,10 +397,10 @@ public class FTPos extends ExprInfo {
     if(content) sb.append(" " + QueryTokens.ENTIRE + " " + QueryTokens.CONTENT);
     return sb.toString();
   }
-  /**
+  
+  /*
    * Test FTDistance.
-   */
-  public static void testWindow() {
+  private static void testWindow() {
     System.out.println("Test FTWindow: ");
     boolean e = false;
     FTPos ftpos = new FTPos();
@@ -466,8 +466,7 @@ public class FTPos extends ExprInfo {
   
   /**
    * Test FTDistance.
-   */
-  public static void testDistance() {
+  private static void testDistance() {
     System.out.println("Test FTOrdered: ");
     boolean e = false;
     FTPos ftpos = new FTPos();
@@ -539,8 +538,7 @@ public class FTPos extends ExprInfo {
   
   /**
    * Test FTContent.
-   */
-  public static void testContent() {
+  private static void testContent() {
     System.out.println("Test FTContent: ");
     boolean e = false;
     FTPos ftpos = new FTPos();
@@ -624,8 +622,7 @@ public class FTPos extends ExprInfo {
   
   /**
    * Test FTOrdered.
-   */
-  public static void testOrdered() {
+  private static void testOrdered() {
     System.out.println("Test FTOrdered: ");
     boolean e = false;
     FTPos ftpos = new FTPos();
@@ -673,17 +670,14 @@ public class FTPos extends ExprInfo {
     if (!e) System.out.println("\t no errors");
   }
 
-  
-  
   /**
    * Main test method.
    * @param args String[] 
-   */
   public static void main(final String[] args) {
     testOrdered();
     testContent();
     testDistance();
     testWindow();
   }
-
+   */
 }

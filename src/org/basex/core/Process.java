@@ -1,7 +1,6 @@
 package org.basex.core;
 
 import static org.basex.Text.*;
-
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.proc.Fs;

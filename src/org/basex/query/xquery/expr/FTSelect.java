@@ -114,7 +114,6 @@ public final class FTSelect extends FTExpr {
   public void plan(final Serializer ser) throws IOException {
     ser.startElement(this);
     pos.plan(ser);
-    ser.attribute(NS, timer());
     ser.finishElement();
     expr[0].plan(ser);
     ser.closeElement();
@@ -123,7 +122,7 @@ public final class FTSelect extends FTExpr {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    sb.append(expr);
+    sb.append(expr[0]);
     sb.append(pos);
     if(pos.dunit != null) {
       sb.append(" distance(");

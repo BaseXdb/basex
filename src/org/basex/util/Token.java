@@ -117,8 +117,7 @@ public final class Token {
    * @return result of check
    */
   public static boolean ascii(final byte[] text) {
-    final int l = text.length;
-    for(int i = 0; i < l; i++) if(text[i] < 0) return false;
+    for(final byte t : text) if(t < 0) return false;
     return true;
   }
 
@@ -175,29 +174,28 @@ public final class Token {
   }
 
   /**
-   * Returns the codepoint of the specified bytes, starting at the
-   * specified position.
-   * @param b byte array
-   * @param i character position
+   * Returns the codepoint (unicode value) of the specified token,
+   * starting at the specified position.
+   * @param t token
+   * @param p character position
    * @return current character
    */
-  public static int cp(final byte[] b, final int i) {
-    // calculate UTF8 character.
-    int l = i;
-    final int v = b[l] & 0xFF;
-    final int c = v >> 4;
-
+  public static int cp(final byte[] t, final int p) {
     // 0xxxxxxx
-    if(c < 12) return v;
+    final int v = t[p] & 0xFF;
+    if(v < 192) return v;
+
     // 110xxxxx 10xxxxxx
+    final int c = v >> 4;
+    int l = p;
     if(c == 12 || c == 13)
-      return (v & 0x1F) << 6 | (b[++l] & 0x3F);
+      return (v & 0x1F) << 6 | (t[++l] & 0x3F);
     // 1110xxxx 10xxxxxx 10xxxxxx
     if(c == 14) return (v & 0x0F) << 12 |
-      (b[++l] & 0x3F) << 6 | (b[++l] & 0x3F);
+      (t[++l] & 0x3F) << 6 | (t[++l] & 0x3F);
     // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-    return (v & 0x07) << 18 | (b[++l] & 0x3F) << 12 |
-      (b[++l] & 0x3F) << 6 | (b[++l] & 0x3F);
+    return (v & 0x07) << 18 | (t[++l] & 0x3F) << 12 |
+      (t[++l] & 0x3F) << 6 | (t[++l] & 0x3F);
   }
 
   /**
@@ -206,7 +204,7 @@ public final class Token {
    * @return character length
    */
   public static int cl(final byte v) {
-    return CHLEN[(v & 0xFF) >> 4];
+    return v >= 0 ? 1 : CHLEN[(v & 0xFF) >> 4];
   }
 
   /*** Character lengths. */
@@ -390,7 +388,7 @@ public final class Token {
   public static double toDouble(final byte[] to) {
     final int tl = to.length;
     boolean f = false;
-    for(int t : to) {
+    for(final int t : to) {
       if(t >= 0 && t <= ' ' || digit(t)) continue;
       f = t == 'e' || t == 'E' || t == '.' || t == '-';
       if(!f) return Double.NaN;
@@ -460,7 +458,7 @@ public final class Token {
     while(t < te && to[t] <= ' ') t++;
     return t < te ? Long.MIN_VALUE : m ? -v : v;
   }
-  
+
   /**
    * Converts the specified string into an integer value.
    * {@link Integer#MIN_VALUE} is returned when the input is invalid.
@@ -537,8 +535,8 @@ public final class Token {
     final int l = Math.min(tok.length, MAXLEN);
     for(int i = 0; i != l; i++) h = (h << 5) - h + tok[i];
     return h;
-  }  
-  
+  }
+
   /**
    * Compares two character arrays for equality.
    * @param tok token to be compared
@@ -562,7 +560,7 @@ public final class Token {
     return tok == tok2;
   }
 
-  
+
   /**
    * Calculates the difference of two character arrays.
    * @param tok token to be compared
@@ -588,8 +586,8 @@ public final class Token {
   public static int diff(final byte tok, final byte tok2) {
     return diff(new byte[] {tok}, new byte[] {tok2});
   }
-  
-  
+
+
   /**
    * Checks if the first token contains the second token in lowercase.
    * @param tok first token
@@ -956,7 +954,7 @@ public final class Token {
   /**
    * Converts a character to upper case.
    * Note that this method does not support unicode characters.
-   * 
+   *
    * @param ch character to be converted
    * @return converted character
    */
@@ -981,7 +979,7 @@ public final class Token {
   /**
    * Converts a character to lower case.
    * Note that this method does not support unicode characters.
-   * 
+   *
    * @param ch character to be converted
    * @return converted character
    */
@@ -991,7 +989,7 @@ public final class Token {
 
   /**
    * Removes diacritics from the specified token.
-   * Note that this method does only support ISO-8859-1.
+   * Note that this method does only support the first 256 unicode characters.
    * @param t token to be converted
    * @return converted token
    */
@@ -1000,13 +998,14 @@ public final class Token {
 
     final String s = utf8(t, 0, t.length);
     final StringBuilder sb = new StringBuilder();
-    for(int j = 0; j < s.length(); j++) {
+    final int jl = s.length();
+    for(int j = 0; j < jl; j++) {
       final char c = s.charAt(j);
       sb.append(c < 192 || c > 255 ? c : (char) NORM[c - 192]);
     }
     return token(sb.toString());
   }
-  
+
   /**
    * Returns the prefix of the specified token.
    * @param name name
@@ -1016,7 +1015,7 @@ public final class Token {
     final int i = indexOf(name, ':');
     return i == -1 ? EMPTY : substring(name, 0, i);
   }
-  
+
   /**
    * Returns the local name of the specified name.
    * @param name name

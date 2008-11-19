@@ -65,13 +65,13 @@ public final class FTFuzzyBuilder extends Progress implements IndexBuilder {
 
     if(Prop.debug) {
       Performance.gc(3);
-      BaseX.outln("- Indexed: % (%)", p, Performance.getMem());
+      BaseX.debug("- Indexed: % (%)", p, Performance.getMem());
     }
     write(data);
 
     if(Prop.debug) {
       Performance.gc(3);
-      BaseX.outln("- Written: % (%)", p, Performance.getMem());
+      BaseX.debug("- Written: % (%)", p, Performance.getMem());
     }
     return new FTFuzzy(data, data.meta.dbname);
   }

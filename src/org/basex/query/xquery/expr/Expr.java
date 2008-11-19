@@ -10,7 +10,6 @@ import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.path.Step;
 import org.basex.query.xquery.util.Err;
-import org.basex.util.Token;
 
 /**
  * Abstract Expression.
@@ -30,11 +29,6 @@ public abstract class Expr extends ExprInfo {
   public enum Return {
     /** Numeric value.    */ NUM,
   };
-
-  /** Timer. */
-  private long timer;
-  /** Cached time. */
-  private long timm;
 
   /**
    * Optimizes and compiles the expression.
@@ -88,28 +82,6 @@ public abstract class Expr extends ExprInfo {
    */
   public Type returned() {
     return null;
-  }
-
-  /**
-   * Starts time measurement.
-   */
-  public final void time1() {
-    timm = System.nanoTime();
-  }
-  
-  /**
-   * Adds measured to total time.
-   */
-  public final void time2() {
-    timer += System.nanoTime() - timm;
-  }
-
-  /**
-   * Returns measured time.
-   * @return time as token
-   */
-  protected final byte[] timer() {
-    return Token.token(timer);
   }
 
   /**

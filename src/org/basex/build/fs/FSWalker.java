@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.io.IO;

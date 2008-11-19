@@ -52,7 +52,7 @@ public final class VarCall extends Expr {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(this, VAR, var.name.str(), NS, timer());
+    ser.emptyElement(this, VAR, var.name.str());
   }
   
   @Override

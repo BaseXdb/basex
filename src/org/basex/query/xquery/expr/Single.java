@@ -1,6 +1,5 @@
 package org.basex.query.xquery.expr;
 
-import static org.basex.query.xquery.XQTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
@@ -43,7 +42,7 @@ public abstract class Single extends Expr {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, NS, timer());
+    ser.openElement(this);
     expr.plan(ser);
     ser.closeElement();
   }

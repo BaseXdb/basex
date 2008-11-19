@@ -1042,7 +1042,7 @@ public final class XMLScanner {
     return (double) input.pos() / input.length();
   }
 
-  /**
+  /*
    * Main method; used for testing purposes.
    * @param args command line arguments
   public static void main(final String[] args) {
@@ -1066,13 +1066,3 @@ public final class XMLScanner {
   }
    */
 }
-
-/* TODOS:
- *
- * - Treat tags within entities:
- * <!DOCTYPE doc [
- *    <!ENTITY e "</doc><doc>"> ]>
- * <doc>&e;</doc>
- *
- *
- */

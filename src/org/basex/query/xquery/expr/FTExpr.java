@@ -1,9 +1,6 @@
 package org.basex.query.xquery.expr;
 
-import static org.basex.query.xquery.XQTokens.*;
-
 import java.io.IOException;
-
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
@@ -33,8 +30,14 @@ public abstract class FTExpr extends Expr {
   }
 
   @Override
+  public final boolean uses(final Using u) {
+    for(final Expr e : expr) if(e.uses(u)) return true;
+    return false;
+  }
+
+  @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, NS, timer());
+    ser.openElement(this);
     for(final Expr e : expr) e.plan(ser);
     ser.closeElement();
   }

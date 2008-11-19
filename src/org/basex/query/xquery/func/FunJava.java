@@ -262,7 +262,7 @@ public final class FunJava extends Arr {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, NAM, Token.token(cls + "." + mth), NS, timer());
+    ser.openElement(this, NAM, Token.token(cls + "." + mth));
     for(final Expr arg : expr) arg.plan(ser);
     ser.closeElement();
   }

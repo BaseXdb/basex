@@ -113,7 +113,6 @@ public final class For extends ForLet {
     ser.attribute(VAR, var.name.str());
     if(pos != null) ser.attribute(POS, pos.name.str());
     if(score != null) ser.attribute(Token.token(SCORE), score.name.str());
-    ser.attribute(NS, timer());
     ser.finishElement();
     expr.plan(ser);
     ser.closeElement();

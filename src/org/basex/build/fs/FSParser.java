@@ -5,7 +5,6 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.File;
 import java.io.IOException;
-
 import org.basex.BaseX;
 import org.basex.build.Builder;
 import org.basex.build.Parser;

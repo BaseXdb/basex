@@ -328,8 +328,7 @@ public final class MapView extends View implements Runnable {
 
   /**
    * Recursively splits rectangles on one level.
-   * kind of Pivot Layout, the original one of basex
-   * 
+   * This is a kind of pivot layout.
    * 
    * @param r parent rectangle
    * @param l children array
@@ -365,9 +364,9 @@ public final class MapView extends View implements Runnable {
       // number of nodes used to calculate space
       nn = ne - ns;
       // nn / 2, pretends to be the middle of the handled list
-      // except if startingpoint in the list is not at possition 0
+      // except if starting point in the list is not at position 0
       ln = nn >> 1;
-      // pivot with integrated liststart
+      // pivot with integrated list start
       ni = ns + ln;    
         // consider number of descendants to calculate split point
       if(!GUIProp.mapsimple && !first) {
@@ -470,7 +469,7 @@ public final class MapView extends View implements Runnable {
       // calculate rectangle sizes
       final MapRect t = new MapRect(r.x, r.y, r.w, r.h, l.list[ns], r.l);
 
-      // position, with and height are calculated using splittet sizes of 
+      // position, with and height are calculated using split sizes of 
       //  former recursion level
       final int x = t.x + layout.x;
       final int y = t.y + layout.y;

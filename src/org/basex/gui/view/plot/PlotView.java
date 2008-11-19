@@ -289,28 +289,24 @@ public final class PlotView extends View implements Runnable {
         final String label = (x.length() > 16 ?
             x.substring(0, 14) + ".." : x) + " / "
             + (y.length() > 16 ? y.substring(0, 14) + ".." : y);
-        int xa = calcCoordinate(true, x1);
+        int xa = calcCoordinate(true, x1) + 15;
         int ya = calcCoordinate(false, y1) + GUIProp.plotdots;
+        int ww = getWidth();
 
-        if(name.length() > 0 && plotData.xAxis.attrID != plotData.nameID &&
-            plotData.yAxis.attrID != plotData.nameID) {
+        if(name.length() > 0 && plotData.xAxis.attrID != data.nameID &&
+            plotData.yAxis.attrID != data.nameID) {
           final int lw = BaseXLayout.width(g, label);
-          if(ya < MARGIN[0] + textH & !(xa > w - lw)) {
+          if(ya < MARGIN[0] + textH && xa < w - lw) {
             ya += 2 * textH - GUIProp.plotdots;
-            xa += 15;
           }
           if(xa > w - lw)
-            BaseXLayout.drawTooltip(g, name + ": " + label, xa, ya, 
-                getWidth(), 10);
+            BaseXLayout.drawTooltip(g, name + ": " + label, xa, ya, ww, 10);
           else {
-            BaseXLayout.drawTooltip(g, name, xa, ya - textH, 
-                getWidth(), 10);
-            BaseXLayout.drawTooltip(g, label, xa, ya, 
-                getWidth(), 10);
+            BaseXLayout.drawTooltip(g, name, xa, ya - textH, ww, 10);
+            BaseXLayout.drawTooltip(g, label, xa, ya, ww, 10);
           }
-        
         } else
-          BaseXLayout.drawTooltip(g, label, xa, ya, getWidth(), 10);
+          BaseXLayout.drawTooltip(g, label, xa, ya, ww, 10);
       }
     }
     

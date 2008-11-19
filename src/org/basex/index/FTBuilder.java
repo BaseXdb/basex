@@ -60,7 +60,7 @@ public final class FTBuilder extends Progress implements IndexBuilder {
 
     if(Prop.debug) {
       Performance.gc(3);
-      BaseX.outln("- Indexed: % (%)", p, Performance.getMem());
+      BaseX.debug("- Indexed: % (%)", p, Performance.getMem());
     }
 
     final String db = data.meta.dbname;
@@ -71,14 +71,14 @@ public final class FTBuilder extends Progress implements IndexBuilder {
 
     if(Prop.debug) {
       Performance.gc(3);
-      BaseX.outln("- Hash&Trie: % (%)", p, Performance.getMem());
+      BaseX.debug("- Hash&Trie: % (%)", p, Performance.getMem());
     }
 
     hash = null;
 
     if(Prop.debug) {
       Performance.gc(3);
-      BaseX.outln("- Compressed: % (%)", p, Performance.getMem());
+      BaseX.debug("- Compressed: % (%)", p, Performance.getMem());
     }
 
     final byte[][] tokens = index.tokens.list;
@@ -175,7 +175,7 @@ public final class FTBuilder extends Progress implements IndexBuilder {
 
     if(Prop.debug) {
       Performance.gc(3);
-      BaseX.outln("- Written: % (%)", p, Performance.getMem());
+      BaseX.debug("- Written: % (%)", p, Performance.getMem());
     }
     return new FTTrie(data, db);
   }

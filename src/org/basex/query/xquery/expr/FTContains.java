@@ -49,6 +49,11 @@ public final class FTContains extends Arr {
   }
 
   @Override
+  public Type returned() {
+    return Type.BLN;
+  }
+
+  @Override
   public Expr indexEquivalent(final XQContext ctx, final FTIndexInfo ii, 
       final Step curr) throws XQException {
     if(!(expr[0] instanceof SimpleIterStep)) return this;
@@ -85,10 +90,5 @@ public final class FTContains extends Arr {
   @Override
   public String toString() {
     return toString(" ftcontains ");
-  }
-
-  @Override
-  public Type returned() {
-    return Type.BLN;
   }
 }

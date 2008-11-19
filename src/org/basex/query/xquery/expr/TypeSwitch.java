@@ -87,7 +87,6 @@ public final class TypeSwitch extends Single {
   public void plan(final Serializer ser) throws IOException {
     ser.startElement(this);
     if(var.name != null) ser.attribute(VAR, var.name.str());
-    ser.attribute(NS, timer());
     ser.finishElement();
     for(Case c : cs) c.plan(ser);
     ts.plan(ser);
