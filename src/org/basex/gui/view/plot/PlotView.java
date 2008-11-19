@@ -85,6 +85,9 @@ public final class PlotView extends View implements Runnable {
   boolean drawSubNodes;
   /** Indicates if the buffered image for marked nodes has to be redrawn. */
   boolean markingChanged;
+  /** Indicates if a filter operation is self implied or was trigger by 
+   * another view. */
+  boolean rightClick;
   /** Bounding box which supports selection of multiple items. */
   private PlotBoundingBox selectionBox;
 
@@ -627,10 +630,11 @@ public final class PlotView extends View implements Runnable {
     if(!GUIProp.showplot) return;
     
     // all plot data is recalculated, assignments stay the same
-    plotData.refreshItems();
+    plotData.refreshItems(rightClick);
     plotData.xAxis.refreshAxis();
     plotData.yAxis.refreshAxis();
-    drawSubNodes = true;
+    drawSubNodes = !rightClick;
+    rightClick = false;
     markingChanged = true;
     plotChanged = true;
     repaint();
@@ -877,7 +881,11 @@ public final class PlotView extends View implements Runnable {
   public void mousePressed(final MouseEvent e) {
     if(working || painting) return;
     // right only button used to call popup menu 
-    if(SwingUtilities.isRightMouseButton(e)) return;
+    if(SwingUtilities.isRightMouseButton(e)) {
+      rightClick = true;
+      return;
+    }
+    if(rightClick) rightClick = false;
     mouseX = e.getX();
     mouseY = e.getY();
     focus();

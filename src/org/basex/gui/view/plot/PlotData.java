@@ -78,20 +78,22 @@ public final class PlotData {
     final byte[] b = token(newItem);
     if(eq(b, item)) return false;
     item = b;
-    refreshItems();
+    refreshItems(false);
     return true;
   }
 
   /**
    * Refreshes item list and coordinates if the selection has changed. So far
    * only numerical data is considered for plotting.
+   * @param marked 
    */
-  void refreshItems() {
+  void refreshItems(final boolean marked) {
     final Data data = GUI.context.data();
     final IntList tmpPres = new IntList();
     final int itmID = data.tagID(item);
     
-    final int[] contextPres = GUI.context.current().nodes;
+    final int[] contextPres = marked ? GUI.context.current().nodes : 
+      GUI.context.current().nodes;
     for(int i = 0; i < contextPres.length; i++) {
       int p = contextPres[i];
       final int nl = p + data.size(p, Data.ELEM);
