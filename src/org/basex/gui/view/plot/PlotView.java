@@ -59,6 +59,8 @@ public final class PlotView extends View implements Runnable {
   private BufferedImage itemImgSub;
   /** Buffered plot image. */
   private BufferedImage plotImg;
+  /** Buffered image of marked items. */
+  private BufferedImage markedImg;
   /** X coordinate of mouse pointer. */
   private int mouseX;
   /** Y coordinate of mouse pointer. */
@@ -81,6 +83,8 @@ public final class PlotView extends View implements Runnable {
   private boolean dragging;
   /** Indicates if global marked nodes should be drawn. */
   boolean drawSubNodes;
+  /** Indicates if the buffered image for marked nodes has to be redrawn. */
+  boolean markingChanged;
   /** Bounding box which supports selection of multiple items. */
   private PlotBoundingBox selectionBox;
 
@@ -144,6 +148,7 @@ public final class PlotView extends View implements Runnable {
           }
         }
         drawSubNodes = true;
+        markingChanged = true;
         repaint();
       }
     });
@@ -270,8 +275,9 @@ public final class PlotView extends View implements Runnable {
     if(plotImg == null || plotChanged) plotImg = createPlotImage();
     g.drawImage(plotImg, 0, 0, this);
 
-    // draw marked items
-    drawMarkedNodes(g);
+    // draw buffered image of marked items
+    if(markingChanged || markedImg == null) drawMarkedNodes();
+    g.drawImage(markedImg, 0, 0, this);
 
     // draw focused item
     final int f = plotData.findPre(focused);
@@ -323,16 +329,21 @@ public final class PlotView extends View implements Runnable {
       g.drawRect(selW > 0 ? x1 : x1 + selW, selH > 0 ? y1 : y1 + selH, 
           Math.abs(selW), Math.abs(selH));
     }
+    markingChanged = false;
     plotChanged = false;
     painting = false;
   }
   
   /**
    * Draws marked nodes.
-   * @param g graphics reference
    */
-  private void drawMarkedNodes(final Graphics g) {
+  private void drawMarkedNodes() {
     final Data data = GUI.context.data();
+    markedImg = new BufferedImage(getWidth(), getHeight(), 
+        Transparency.BITMASK);
+    final Graphics gi = markedImg.getGraphics();
+    ((Graphics2D) gi).setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
+        RenderingHints.VALUE_ANTIALIAS_ON);
 
     final Nodes marked = GUI.context.marked();
     if(marked.size() <= 0) return;
@@ -343,7 +354,7 @@ public final class PlotView extends View implements Runnable {
     if(!drawSubNodes) {
       while(i < m.length) {
         final int pi = plotData.findPre(m[i]);
-        if(pi > -1) drawItem(g, plotData.xAxis.co[pi], 
+        if(pi > -1) drawItem(gi, plotData.xAxis.co[pi], 
             plotData.yAxis.co[pi], false, true, false);
         i++;
       }
@@ -358,7 +369,7 @@ public final class PlotView extends View implements Runnable {
     int k = plotData.findPre(m[0]);
     
     if(k > -1) {
-      drawItem(g, plotData.xAxis.co[k], plotData.yAxis.co[k], false, 
+      drawItem(gi, plotData.xAxis.co[k], plotData.yAxis.co[k], false, 
           true, false);
       k++;
     } else {
@@ -373,11 +384,11 @@ public final class PlotView extends View implements Runnable {
       final int b = p[k];
       final int ns = data.size(a, data.kind(a)) - 1;
       if(a == b) {
-        drawItem(g, plotData.xAxis.co[k], plotData.yAxis.co[k], false, 
+        drawItem(gi, plotData.xAxis.co[k], plotData.yAxis.co[k], false, 
             true, false);
         k++;
       } else if(a + ns >= b) {
-        if(a < b) drawItem(g, plotData.xAxis.co[k], plotData.yAxis.co[k], 
+        if(a < b) drawItem(gi, plotData.xAxis.co[k], plotData.yAxis.co[k], 
             false, false, true);
         k++;
       } else {
@@ -620,6 +631,7 @@ public final class PlotView extends View implements Runnable {
     plotData.xAxis.refreshAxis();
     plotData.yAxis.refreshAxis();
     drawSubNodes = true;
+    markingChanged = true;
     plotChanged = true;
     repaint();
   }
@@ -647,6 +659,7 @@ public final class PlotView extends View implements Runnable {
       if(items.length != 0) itemCombo.setSelectedIndex(0);
 
       drawSubNodes = true;
+      markingChanged = true;
       plotChanged = true;
       repaint();
     }
@@ -670,6 +683,7 @@ public final class PlotView extends View implements Runnable {
   @Override
   protected void refreshMark() {
     drawSubNodes = true;
+    markingChanged = true;
     repaint();
   }
 
@@ -779,7 +793,7 @@ public final class PlotView extends View implements Runnable {
   
   @Override
   public void mouseDragged(final MouseEvent e) {
-    if(working || painting) return;
+    if(working || painting || e.isShiftDown()) return;
     if(dragging) {
       // to avoid significant offset between coordinates of mouse click and the
       // start coordinates of the bounding box, mouseX and mouseY are determined
@@ -847,6 +861,7 @@ public final class PlotView extends View implements Runnable {
       }
     }
     notifyMark(new Nodes(il.finish(), GUI.context.data()), this);
+    markingChanged = true;
     repaint();
   }
   
@@ -879,6 +894,7 @@ public final class PlotView extends View implements Runnable {
     final int pre = plotData.findPre(focused);
     if(pre < 0) return;
     
+    markingChanged = true;
     final IntList il = new IntList();
     // get coordinates for focused item
     final int mx = calcCoordinate(true, plotData.xAxis.co[pre]);
