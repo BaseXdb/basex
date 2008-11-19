@@ -90,12 +90,10 @@ public final class FTIntersection extends FTArrayExpr {
         }
         d = n1.getPre() - n2.getPre();
       }
-      //if (!n1.merge(n2, 0)) return new FTNode();
     }
     
     for (int i = 1; i < n.length; i++) {
       n2 = exprs[n[i]].next(ctx);
-      //n1.merge(n2, i - 1);
       n1.reset();
       n1.merge(n2, 0);
       n1.reset();
@@ -106,7 +104,6 @@ public final class FTIntersection extends FTArrayExpr {
   @Override
   public FTNode next(final XPContext ctx) {
     final FTPositionFilter tmp = ctx.ftpos;
-    //ctx.ftpos = ftpos;
     
     final FTNode n1 = calcFTAnd(pex, ctx);
 

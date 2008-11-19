@@ -482,7 +482,6 @@ public final class FTFuzzy extends Index {
 
     // check token after wildcard
     for(int t = tokww.length - posw - 2; t > 0; t--) {
-      //if (tokww[tokww.length - t] != tok2[tok2.length - t]) return false;
       if (Token.diff(tokww[tokww.length - t], tok2[tok2.length - t]) != 0) 
         return false;
     }

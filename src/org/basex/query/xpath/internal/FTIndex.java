@@ -122,7 +122,6 @@ public final class FTIndex extends FTArrayExpr {
         final FTNode n1 = i1.nextFTNode();
         final FTNode n2 = i2.nextFTNode();
         if (n1.merge(n2, w)) {
-        //if (n1.phrase(n2, w)) {
           ial.add(n1.getFTNode());
         }
       }

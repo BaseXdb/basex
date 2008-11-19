@@ -187,11 +187,9 @@ final class FTArray {
           ne[ne.length - 1] = did;
           ne[ne.length - 2] = pre.list[did].length;
 
-          //next[countNodes] = next[cn];
           next.add(ne);
           oe[1] = next.size - 1;
           next.list[cn] = oe;
-          //System.out.println("fall4");
           return next.size - 1;
         } else {
           // char1 != null && char2 != null
@@ -201,9 +199,6 @@ final class FTArray {
           final int[] one = next.list[cn];
           int[] ne = new int[5];
           ne[0] = one[0];
-/*          if (Token.lc(r2[0]) < Token.lc(r1[0]) ||
-              (Token.lc(r2[0]) == Token.lc(r1[0])
-                  && Token.uc(r2[0]) == r1[0])) { */
           if (Token.diff((byte) Token.lc(r2[0]), (byte) Token.lc(r1[0])) < 0 ||
               (Token.diff((byte) Token.lc(r2[0]), (byte) Token.lc(r1[0])) == 0
                   && Token.diff((byte) Token.uc(r2[0]), r1[0]) == 0)) {
@@ -270,23 +265,10 @@ final class FTArray {
    */
   void insertSorted(final byte[] v, final int s, final long offset) {
     count++;
-    //System.out.println("<w>" + new String(v) + "</w>");
     insertNodeSorted(0, v, s, toArray(offset));
     return;
   }
-/*
-  public static void main(String[] args) {
-    int[] t = toArray(Integer.MAX_VALUE);
-    System.out.println(t[0]);
-    long l = Integer.MAX_VALUE ;
-    l++;
-    t = toArrayNew(l);
-    System.out.println(t[0] + "," + t[1] + ":" + toLongNew(t, 0) + "=" + l);
-    l += 5000;
-    t = toArrayNew(l);
-    System.out.println(t[0] + "," + t[1] + ":" + toLongNew(t, 0) + "=" + l);
-  }
-  */
+
   /**
    * Converts a long value to a int-array.
    * The first 3 bytes are stores in int[1] and
@@ -336,7 +318,6 @@ final class FTArray {
         final int p = getPointer(cn); 
         if(Token.diff(tokens.list[next.list[next.list[cn][p]][0]][0], v[0]) 
             != 0) {
-        //if(tokens.list[next.list[next.list[cn][p]][0]][0] != v[0]) {
           // any child has an appropriate value to valueToInsert;
           // create new node and append it; save data
           int[] e;
@@ -371,9 +352,8 @@ final class FTArray {
         if(r2 != null) {
           // value of currentNode equals valueToInsert,
           // but valueToInset is longer
-          final int p = getPointer(cn); //nextL.list[cn].length - 3;
+          final int p = getPointer(cn); 
           if(p == 0 || 
-              //tokens.list[next.list[next.list[cn][p]][0]][0] != r2[0]) {
             Token.diff(
                 tokens.list[next.list[next.list[cn][p]][0]][0], r2[0]) != 0) {
             // create new node and append it, because any child from curretnNode
@@ -531,8 +511,6 @@ final class FTArray {
   private int getInsertingPosition(final int currentPosition,
       final byte toInsert) {
     int i;
-
-    //i = getInsertingPositionBinary(currentPosition, toInsert);
     if (bl) i = getInsertingPositionLinearUFBack(currentPosition, toInsert);
     else {
       if (cs) i = getInsPosLinCSUF(currentPosition, toInsert);
@@ -566,8 +544,6 @@ final class FTArray {
     if (s == i)
       return i;
     while (i < s
-//        && Token.lc(tokens.list[next.list[next.list[cn][i]][0]][0])
-//        < Token.lc(toInsert)) {
       && Token.diff(
           (byte) Token.lc(tokens.list[next.list[next.list[cn][i]][0]][0]),
           (byte) Token.lc(toInsert)) < 0) {
@@ -575,23 +551,17 @@ final class FTArray {
     }
 
     if (i < s) {
-      //if(tokens.list[next.list[next.list[cn][i]][0]][0] == toInsert) {
       if(Token.diff(
           tokens.list[next.list[next.list[cn][i]][0]][0], toInsert) == 0) {
         found = true;
         return i;
-  //    } else if(Token.lc(tokens.list[next.list[next.list[cn][i]][0]][0])
-  //        == Token.lc(toInsert)) {
       } else if(Token.diff(
           (byte) Token.lc(tokens.list[next.list[next.list[cn][i]][0]][0]),
           (byte) Token.lc(toInsert)) == 0) {
-        //if (tokens.list[next.list[next.list[cn][i]][0]][0]
-        //   == Token.uc(toInsert))
         if (Token.diff(tokens.list[next.list[next.list[cn][i]][0]][0],
             (byte) Token.uc(toInsert)) == 0)
           return i;
         if (i + 1 < s &&
-            //tokens.list[next.list[next.list[cn][i + 1]][0]][0] == toInsert) {
             Token.diff(tokens.list[next.list[next.list[cn][i + 1]][0]][0], 
                 toInsert) == 0) {
           found = true;
@@ -622,10 +592,8 @@ final class FTArray {
       while (l <= r) {
         m = l + (r - l) / 2;
         m = (m == 0) ? 1 : m;
-        //if (tokens.list[next.list[next.list[cn][m]][0]][0] < toi) l = m + 1;
         if (Token.diff(tokens.list[next.list[next.list[cn][m]][0]][0], toi) 
             < 0) l = m + 1;
-        //else if (tokens.list[next.list[next.list[cn][m]][0]][0] > toi)
         else if (
             Token.diff(tokens.list[next.list[next.list[cn][m]][0]][0], toi) > 0)
           r = m - 1;
@@ -635,7 +603,6 @@ final class FTArray {
         }
       }
       if (l < next.list[cn].length - 2
-        //&& tokens.list[next.list[next.list[cn][m]][0]][0] == toi) {
           && Token.diff(
               tokens.list[next.list[next.list[cn][m]][0]][0], toi) == 0) {
       found = true;
@@ -659,12 +626,10 @@ final class FTArray {
       return 1;
 
     while (i > s
-        //&& tokens.list[next.list[next.list[cn][i]][0]][0] > toInsert) i--;
-        && Token.diff(tokens.list[next.list[next.list[cn][i]][0]][0], 
+         && Token.diff(tokens.list[next.list[next.list[cn][i]][0]][0], 
             toInsert) > 0) i--;
     if (i > s
-        //&& tokens.list[next.list[next.list[cn][i]][0]][0] == toInsert) {
-        && Token.diff(
+         && Token.diff(
             tokens.list[next.list[next.list[cn][i]][0]][0], toInsert) == 0) {
       found = true;
       return i;
@@ -682,9 +647,7 @@ final class FTArray {
     if(b1 == null || b2 == null) return null;
 
     final int ml = (b1.length < b2.length) ? b1.length : b2.length; 
-    //final int ml = Math.min(b1.length, b2.length);
     int i = -1;
-    //while(++i < ml && b1[i] == b2[i]);
     while(++i < ml && Token.diff(b1[i], b2[i]) == 0);
     return getBytes(b1, 0, i);
   }
@@ -715,7 +678,6 @@ final class FTArray {
    */
   private int getPointer(final int cn) {
     final int[] nl = next.list[cn];
-    //return nl[nl.length - 2] >= 0 ? nl.length - 3 : nl.length - 4;
     return nl[nl.length - 1] >= 0 ? nl.length - 3 : nl.length - 4;
   }
 }

@@ -213,35 +213,22 @@ public class Path extends Arr {
         for(int p = 0; p != step.expr.length; p++) {
           if(!oldPreds.contains(p)) {
             if (ie[p] != null) newPreds[c++] = ie[p]; 
-            /*if (pred instanceof PredSimple) {
-              Expr e = ((PredSimple) pred).expr;
-              if (e instanceof FTContains) {
-                ((PredSimple) pred).expr = e.indexEquivalent(ctx, null, true);
-              }
-            }*/
-            //newPreds.add(pred);
           }
         }
         if (c == 0) newPreds = new Expr[]{}; 
         else Array.finish(newPreds, c);
         result = (new InterSect(new Expr[] {indexArg})).comp(ctx);
-        //result = new InterSect(new Expr[] { indexArg }).comp(ctx);
 
         // add rest of predicates
         if(newPreds.length != 0) result =
-          //new Filter(result, newPreds).comp(ctx);
           ctx.comp(new Pred(result, newPreds));
         
         // add match with initial nodes
-        //if(indexMatch && checkMatch(invPath)) {
         if(indexMatch) result = new IndexMatch(this, result, invPath);
 
         // add rest of location path
         if(oldPath.length != 0) result = new Path(result, oldPath);
       }
-
-      //}
-      //final Expr p = expr[0].indexEquivalent(ctx, new FTIndexInfo(), this);
     }
     
     return result;
@@ -437,15 +424,12 @@ public class Path extends Arr {
         if (expr[k] instanceof Step) {
           final Step step = (Step) expr[k];
           final Step inv = new Step(lastAxis, step.test, step.expr);
-          //final Step inv = Axis.create(lastAxis, step.test, step.expr);
           lastAxis = invertAxis(step.axis);
           el[c++] = inv;
         }
       }
       el[c++] = new Step(lastAxis, curr.test, new Expr[]{});
     }
-    //el[c++] = Axis.create(lastAxis, curr.test);
-    
     return c > 0 ? new Path(root, Array.finish(el, c)) : this;
   }
 
@@ -461,9 +445,7 @@ public class Path extends Arr {
     // add inverted pretext steps
     Axis lastAxis = invertAxis(sis.axis);
     Expr  e = new Step(lastAxis, curr.test, new Expr[]{});
-    
     return new Path(expr, new Expr[]{e});
-    //return new Path(null, new Expr[]{expr, e});
   }
 
   

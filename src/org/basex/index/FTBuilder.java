@@ -124,7 +124,6 @@ public final class FTBuilder extends Progress implements IndexBuilder {
       final int il = index.next.size;
       for (int i = 1; i < il; i++) {
         // check pointer on data needs 1 or 2 ints
-        //int lp = (next[i][next[i].length - 2] > -1) ? 0 : -1;
         int lp = (next[i][next[i].length - 1] > -1) ? 0 : -1;
         // write token size as byte
         outN.write((byte) tokens[next[i][0]].length);

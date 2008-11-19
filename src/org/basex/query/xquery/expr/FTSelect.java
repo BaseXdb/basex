@@ -12,6 +12,7 @@ import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.path.Step;
 import org.basex.query.xquery.util.Err;
+import org.basex.util.IntList;
 
 /**
  * FTSelect expression.
@@ -46,6 +47,18 @@ public final class FTSelect extends FTExpr {
     pos.init(ctx.ftitem);
 
     final Item it = ctx.iter(expr[0]).next();
+
+    if (tmp != null) {
+      final int os = tmp.term.size;
+      for (int i = 0; i < pos.term.size; i++) {
+        tmp.term.add(pos.term.list[i]);
+      }
+      IntList[] il = new IntList[pos.term.size + os];
+      System.arraycopy(pos.getPos(), 0, il, 0, pos.term.size);
+      System.arraycopy(tmp.getPos(), 0, il, pos.term.size, os);
+      tmp.setPos(il, il.length);      
+    }
+    
     ctx.ftpos = tmp;
     final double s = it.dbl();
     if(s == 0 || !posFilter(ctx)) return Dbl.iter(0);

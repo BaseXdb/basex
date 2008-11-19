@@ -64,7 +64,6 @@ public final class FTSelect extends FTArrayExpr {
       } 
       ctx.ftpos = tmp;
       return ftn;
-      //ftn = indexEval(ctx, ftn);
     }
       
     ctx.ftpos = tmp;    
@@ -79,14 +78,8 @@ public final class FTSelect extends FTArrayExpr {
   private void init(final FTNode ftn, final XPContext ctx) {
     ftpos.pos.setPos(ftn.convertPos(), ftn.p.list[0]);
     if (ftn.getToken() != null) {
-      // [SG] disk is only accessed essential cases.
-      /*if (!(ftpos.pos.ordered || ftpos.dist == null 
-          || ftpos.pos.wunit != null && ftpos.pos.wunit != FTUnit.WORDS
-          || ftpos.pos.dunit != null && ftpos.pos.dunit != FTUnit.WORDS)
-          || ftpos.pos.start || ftpos.pos.end || ftpos.pos.content) {*/
         ftpos.pos.ft.init(ctx.item.data.text(ftn.getPre()));
         ftpos.pos.term = ftpos.pos.ft.getTokenList();
-      //}
     }
   }
   
@@ -165,27 +158,6 @@ public final class FTSelect extends FTArrayExpr {
       throws QueryException {
 
     exprs[0] = exprs[0].indexEquivalent(ctx, curr, seq);
-    
-    /*
-    // to be checked... will probably disappear as soon as pre values are 
-    // processed one by one
-    if(e instanceof FTIntersection) {
-      ((FTIntersection) e).pres = true;
-    } else if(e instanceof FTUnion) {
-      ((FTUnion) e).po = true;
-    } else if(e instanceof FTUnaryNotExprs || e instanceof FTMildNotExprs) {
-      final FTArrayExpr not = e;
-      final FTArrayExpr ex = not.exprs[0];
-      final FTIntersection fti1 = new FTIntersection(not.exprs, true);
-      final FTPositionFilter ftposfil = ftpos.clone();
-
-      final FTSelect ftps = new FTSelect(fti1, ftposfil);
-      not.exprs = new FTArrayExpr[] { ex, ftps };
-      return not;
-    } else if(e instanceof FTIndex
-        && (ftpos.pos.start || ftpos.pos.end || ftpos.pos.content)) {
-      ((FTIndex) e).setFTPosFilter(ftpos);
-    } */
     return this;
   }
 

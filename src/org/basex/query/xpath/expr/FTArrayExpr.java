@@ -21,8 +21,6 @@ public abstract class FTArrayExpr extends Expr {
   protected FTArrayExpr[] exprs;
   /** Fulltext option. */
   public FTOpt fto;
-  /** Fulltext position filter. */
-  //public FTPositionFilter ftpos;
   
   /**
    * Optimizes the expression.

@@ -56,6 +56,7 @@ public final class QueryTest {
 
     Prop.ftindex = true;
     test(false);
+    test(true);
     Prop.ftindex = false;
     test(false);
     test(true);

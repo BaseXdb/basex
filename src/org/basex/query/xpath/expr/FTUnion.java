@@ -82,90 +82,12 @@ public final class FTUnion extends FTArrayExpr {
       }
     }
     
-   // if (nex.length == 0) {
       minp = -1;
       final FTNode m = exprs[pex[cp.list[0]]].next(ctx);
       for (int i = 1; i < cp.size; i++) {
         m.merge(exprs[pex[cp.list[i]]].next(ctx), 0);
       }
       return m;
- /*   } else {
-      if (minn == -1) {
-        minn = 0;
-        for (int in = 1; in < nex.length; in++) {
-          if (mn[minn] && mn[in] && exprs[nex[in]].next(ctx).getPre() < 
-              exprs[nex[minn]].next(ctx).getPre()) {
-            minn = in;
-          }
-        }
-      }
-      if (minp > -1 && minn > -1) {
-        if (minp < minn) {
-          FTNode n = exprs[pex[minp]].next(ctx);
-          minp = -1;
-          return n;
-        } else if (minp > minn) {
-          minn = -1;
-          if (more())
-          return next(ctx);
-          else return new FTNode();
-        } else {
-          minn = -1;
-          minp = -1;
-          if (more()) return next(ctx);
-          else return new FTNode();
-        }
-      } else if (minp > -1) {
-        FTNode n = exprs[pex[minp]].next(ctx);
-        minp = -1;
-        return n;
-      } else {
-        FTNode n = exprs[nex[minn]].next(ctx);
-        minn = -1;
-        return n;
-      }
-      
-    }*/
-    
-    /*
-    if (c > -1) {
-      FTNode cn = exprs[c].next(ctx);
-      if ((c == 0) ? m1 : m0) {
-        FTNode nn = exprs[(c == 0) ? 1 : 0].next(ctx);
-        if (nn.getPre() < cn.getPre()) {
-          return nn;
-        } else if (nn.getPre() == cn.getPre()) {
-          cn.merge(nn, 0);
-          c = -1;
-          return cn;
-        } else {
-          c = (c == 0) ? 1 : 0;
-          return cn;
-        }
-      } else {
-        c = -1;
-        return cn;
-      }
-    } else {
-      if (m0 && m1) {
-        final FTNode c0 = exprs[0].next(ctx);
-        final FTNode c1 = exprs[1].next(ctx);
-        if (c0.getPre() == c1.getPre()) {
-          c0.merge(c1, 0);
-          return c0;
-        } else if (c0.getPre() < c1.getPre()) {
-          c = 1;
-          return c0;
-        } else {
-          c = 0;
-          return c1;
-        }
-      } else if(m0) {
-        return exprs[0].next(ctx);
-      } else {
-        return exprs[1].next(ctx);
-      }
-    }*/
   }
   
   @Override
@@ -176,11 +98,6 @@ public final class FTUnion extends FTArrayExpr {
       final Bln it = (Bln) exprs[i].eval(ctx);
       if (!b) b = it.bool();
     }
-
-/*    for (int i : nex) {
-      exprs[i].eval(ctx);
-    }
-*/
     return Bln.get(b);
   }
   

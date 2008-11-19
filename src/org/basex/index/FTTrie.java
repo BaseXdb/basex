@@ -145,7 +145,6 @@ public final class FTTrie extends Index {
       final int size = cache.getSize(id);
       final long p = cache.getPointer(id);
       return getData(size, p);
-      //tmp = getDataFromDataArray(size, p);
     } else {
       tmp = getNodeFromTrieRecursive(0, tok, ft.cs);
     }
@@ -184,17 +183,13 @@ public final class FTTrie extends Index {
       final int td = tokTo.length - tokFrom.length;
       final int[] ne = getNodeEntry(0);
       if (hasNextNodes(ne)) {
-        //for (int i = ne[0] + 1; i < ne.length - 2; i += 2) {
         for (int i = ne[0] + 1; i < ne.length - 1; i += 2) {
           if (Token.letter(ne[i + 1]))
             return new IndexArrayIterator(extractIDsFromData(dt));
 
           if (ne[i + 1] != tokFrom[0] && ne[i + 1] != tokTo[0]) {
             if (tokTID == tokFID) {
-            //if (tokTo.length == tokFrom.length) {
               if (ne[i + 1] > tokFrom[0] && ne[i + 1] < tokTo[0]) {
-                //data = getAllNodesWithLevel(ne[i], tokFrom.length,
-                //    tokTo.length, data, false);
                 dt = getAllNodesWithLevel(ne[i], tokFID,
                     tokTID, dt, false);
               }
@@ -271,7 +266,6 @@ public final class FTTrie extends Index {
       else b = -1;
     } else {
       ne = getNodeEntry(b);
-      //data = getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]);
       ldid = did;
       dt = getDataFromDataArray(ne[ne.length - 1], ldid);
       dt = getAllNodes(b, b, dt);
@@ -288,8 +282,6 @@ public final class FTTrie extends Index {
     if (id > -1) {
       ne = getNodeEntry(id);
       ldid = did;
-      //int[][] tmp
-      //= getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]);
       final int[][] tmp = getDataFromDataArray(ne[ne.length - 1], ldid);
       dt = calculateFTOr(dt, getAllNodes(id, b, tmp));
     }
@@ -298,12 +290,9 @@ public final class FTTrie extends Index {
       if (i > 0 && idNNF[0][i] == 0 && idNNF[1][i] == 0) break;
       ne = getNodeEntry(idNNF[0][i]);
       ldid = did;
-      //if (ne.length - 3 - ne[0] / 2 >= idNNF[1][i]) {
       if (ne.length - 2 - ne[0] / 2 >= idNNF[1][i]) {
-        //for (int k = idNNF[1][i]; k < ne.length - 3 - ne[0]; k += 2)
         for (int k = idNNF[1][i]; k < ne.length - 2 - ne[0]; k += 2)
           dt = calculateFTOr(dt,
-              //getAllNodes(getDataEntry(idNNF[0][i], k), b, data));
               getAllNodes(ne[k], b, dt));
        }
     }
@@ -360,7 +349,6 @@ public final class FTTrie extends Index {
 
     if(cn != 0) {
       int i = 0;
-      //while(i < vsn.length && i < ne[0] && ne[i + 1] == vsn[i]) {
       while(i < vsn.length 
           && i < ne[0] && Token.diff((byte) ne[i + 1], vsn[i]) == 0) {
         i++;
@@ -421,7 +409,6 @@ public final class FTTrie extends Index {
 
     if(cn != 0) {
       int i = 0;
-      //while(i < vsn.length && i < ne[0] && Token.lc(ne[i + 1]) == vsn[i]) {
       while(i < vsn.length && i < ne[0] 
            && Token.diff((byte) Token.lc(ne[i + 1]), vsn[i]) == 0) {
         i++;
@@ -448,7 +435,6 @@ public final class FTTrie extends Index {
               return getNodeFromCSTrie(ne[p], vsn);
           } else {
             int[][] d = getNodeFromCSTrie(ne[p], vsn);
-            //if (Token.lc(ne[p + 3]) == vsn[0]) {
             if (Token.diff((byte) Token.lc(ne[p + 3]), vsn[0]) == 0) {
               d = calculateFTOr(d,
                   getNodeFromCSTrie(ne[p + 2], vsn));
@@ -464,14 +450,12 @@ public final class FTTrie extends Index {
       // scan successors currentNode
       final int p = getInsPosLinCSF(ne, vsn[0]);
       if(!found) {
-        //if (Token.lc(ne[p + 1]) != vsn[0])
         if (Token.diff((byte) Token.lc(ne[p + 1]), vsn[0]) != 0)
           return null;
         else
           return getNodeFromCSTrie(ne[p], vsn);
       } else {
         int[][] d = getNodeFromCSTrie(ne[p], vsn);
-        //if (Token.lc(ne[p + 3]) == vsn[0]) {
         if (Token.diff((byte) Token.lc(ne[p + 3]), vsn[0]) == 0) {
           d = calculateFTOr(d,
               getNodeFromCSTrie(ne[p + 2], vsn));
@@ -503,7 +487,6 @@ public final class FTTrie extends Index {
     if(cn != 0) {
       int i = 0;
       // read data entry from disk
-      //while(i < vsn.length && i < ne[0] && ne[i + 1] == vsn[i]) {
       while(i < vsn.length && i < ne[0] 
            && Token.eq((byte) ne[i + 1], (byte) vsn[i])) {
         i++;
@@ -513,7 +496,6 @@ public final class FTTrie extends Index {
       if(ne[0] == i) {
         if(vsn.length == i) {
           // leaf node found with appropriate value
-          //if(ne[ne[0] + 1] < 0) {
           if (hasNextNodes(ne)) {
               // node is not a leaf node
               idNN[0][c] = cn;
@@ -532,8 +514,6 @@ public final class FTTrie extends Index {
             // node not contained
             return -1;
           } else {
-            //int id = getIdOnDataArray(ne);
-            //id = getDataEntry(id, position);
             idNN[0][c] = cn;
             idNN[1][c] = position + 2; // +1
             return getNodeIdsForRQ(ne[position],
@@ -551,10 +531,8 @@ public final class FTTrie extends Index {
         // node not contained
         return -1;
       } else {
-        //int id = getIdOnDataArray(ne);
-        //id = getDataEntry(id, position);
         idNN[0][c] = cn;
-        idNN[1][c] = position + 2; // +1
+        idNN[1][c] = position + 2;
         return getNodeIdsForRQ(ne[position],
             vsn, c + 1, idNN);
       }
@@ -785,7 +763,6 @@ public final class FTTrie extends Index {
    */
   private boolean checkUBConstrainDbl(final int[] v, final int vid,
       final  int[] ub, final int ubid) {
-    //if (c < ub.length) return true;
     if (vid < ubid) return true;
 
     int i = 0;
@@ -861,15 +838,7 @@ public final class FTTrie extends Index {
    */
   private int[] getNodeEntry(final int id) {
     int sp = inS.readInt(id * 4L);
-    //System.out.println("sp as int=" + h);
-    //long sp = h < 0 ? 
-    //    (long) (h & 0X7FFFFFFF) + Integer.MAX_VALUE + 1 : h;
-    //System.out.println("sp as long=" + sp);
     int ep = inS.readInt((id + 1) * 4L);
-    //System.out.println("ep as int=" + h);
-    //final long ep = h < 0 ? 
-    //    (long) (h & 0X7FFFFFFF) + Integer.MAX_VALUE + 1 : h;
-    //System.out.println("ep as long=" + ep);
     final int[] ne = new int [(int) (ep - sp - 5L)];
     int c = 0;
     ne[c++] = inN.readBytes(sp, sp + 1L)[0];
@@ -989,7 +958,6 @@ public final class FTTrie extends Index {
    * @return boolean leaf node or inner node
    */
   private boolean hasNextNodes(final int[] ne) {
-    //return ne[0] + 1 < ne.length - 2;
     return ne[0] + 1 < ne.length - 1;
   }
 
@@ -1008,7 +976,6 @@ public final class FTTrie extends Index {
     if (cs)
       return getInsPosLinCSF(cne, toInsert);
     else return getInsertingPositionLinear(cne, toInsert);
-    //return getInsertingPositionBinary(cne, toInsert);
   }
 
   /**
@@ -1026,15 +993,12 @@ public final class FTTrie extends Index {
       final int toInsert) {
     found = false;
     int i = cne[0] + 1;
-    //int s = cne.length - 2;
     final int s = cne.length - 1;
     if (s == i)
       return i;
 
-    //while (i < s && cne[i + 1] < toInsert) i += 2;
     while (i < s && 
         Token.diff((byte) cne[i + 1], (byte) toInsert) < 0) i += 2;
-    //if (i < s && cne[i + 1] == toInsert) {
     if (i < s && Token.diff((byte) cne[i + 1], (byte) toInsert) == 0) {
       found = true;
     }
@@ -1064,25 +1028,19 @@ public final class FTTrie extends Index {
     final int s = cne.length - 1;
     if (s == i)
       return i;
-    //while (i < s && Token.lc(cne[i + 1]) < Token.lc(toInsert)) i += 2;
     while (i < s && Token.diff(
         (byte) Token.lc(cne[i + 1]), (byte) Token.lc(toInsert)) < 0) 
       i += 2;
 
     if (i < s) {
-      //if(cne[i + 1] == toInsert) {
       if(Token.diff((byte) cne[i + 1], (byte) toInsert) == 0) {
         found = true;
         return i;
-    //  } else if(Token.lc(cne[i + 1])
-    //      == Token.lc(toInsert)) {
       } else if(Token.diff((byte) Token.lc(cne[i + 1]),
           (byte) Token.lc(toInsert)) == 0) {
-        //if (cne[i + 1] == Token.uc(toInsert)) {
         if (Token.eq((byte) cne[i + 1], (byte) Token.uc(toInsert))) {
           return i;
           }
-        //if (i + 3 < s && cne[i + 3] == toInsert) {
         if (i + 3 < s && Token.diff((byte) cne[i + 3], (byte) toInsert) == 0) {
           found = true;
         }
@@ -1129,12 +1087,10 @@ public final class FTTrie extends Index {
       // save data current node
       if (ne[ne.length - 1] > 0) {
         adata = calculateFTOr(adata,
-          //getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]));
           getDataFromDataArray(ne[ne.length - 1], tdid));
       }
       if (hasNextNodes(ne)) {
         // preorder traversal through trie
-        //for (int t = ne[0] + 1; t < ne.length - 2; t += 2) {
         for (int t = ne[0] + 1; t < ne.length - 1; t += 2) {
           astericsWildCardTraversing(ne[t], null, last, 0, 0);
         }
@@ -1143,7 +1099,6 @@ public final class FTTrie extends Index {
     }
 
     // compare chars current node and ending
-    //if(ne != null) {
       // skip all unlike chars, if any suitable was found
       while(!last && i < ne[0] + 1 && ne[i] != ending[j]) i++;
 
@@ -1157,25 +1112,17 @@ public final class FTTrie extends Index {
         j++;
         last = true;
       }
-/*    }
-    else {
-      countSkippedChars = 0;
-      return;
-    }
-  */
+
     // not processed all chars from node, but all chars from
     // ending were processed or root
     if(node == 0 || j == ending.length && i < ne[0] + 1) {
       if (!hasNextNodes(ne)) {
-      //if(ne[ne[0] + 1] > 0) {
         countSkippedChars = 0;
         return;
       }
 
       //final int[] nextNodes = getNextNodes(ne);
       // preorder search in trie
-      //for(final int n : nextNodes) {
-      //for (int t = ne[0] + 1; t < ne.length - 2; t += 2) {
       for (int t = ne[0] + 1; t < ne.length - 1; t += 2) {
         astericsWildCardTraversing(ne[t], ending, false, 1, 0);
       }
@@ -1183,22 +1130,14 @@ public final class FTTrie extends Index {
       return;
     } else if(j == ending.length && i == ne[0] + 1) {
       // all chars form node and all chars from ending done
-      /*final int[][] d = getDataFromDataArray(ne, curDataEntry);
-      if(d != null) {
-        adata = CTArrayX.ftOR(adata, d);
-      }*/
       adata = calculateFTOr(adata,
-          //getDataFromDataArray(ne[ne.length - 2], ne[ne.length - 1]));
           getDataFromDataArray(ne[ne.length - 1], tdid));
 
       countSkippedChars = 0;
 
-      //final int[] nextNodes = getNextNodes(ne);
       // node has successors and is leaf node
-      //if(nextNodes != null) {
       if (hasNextNodes(ne)) {
         // preorder search in trie
-        //for (int t = ne[0] + 1; t < ne.length - 2; t += 2) {
         for (int t = ne[0] + 1; t < ne.length - 1; t += 2) {
           if(j == 1) {
             astericsWildCardTraversing(ne[t], ending, false, 0, 0);
@@ -1212,7 +1151,6 @@ public final class FTTrie extends Index {
       // still chars from node and still chars from ending left, pointer = 0 and
       // restart searching
       if (!hasNextNodes(ne)) {
-      //if(ne[ne[0] + 1] > 0) {
         countSkippedChars = 0;
         return;
       }
@@ -1225,15 +1163,11 @@ public final class FTTrie extends Index {
 
       // move pointer and go on
       if (!hasNextNodes(ne)) {
-      //if(ne[ne[0] + 1] > 0) {
         countSkippedChars = 0;
         return;
       }
 
-      //final int[] nextNodes = getNextNodes(ne);
       // preorder search in trie
-      //for(final int n : nextNodes) {
-      //for (int t = ne[0] + 1; t < ne.length - 2; t += 2) {
       for (int t = ne[0] + 1; t < ne.length - 1; t += 2) {
         // compare only first char from ending
         if(j == 1) {
@@ -1379,7 +1313,6 @@ public final class FTTrie extends Index {
               0, searchChar.length - bw.length);
         }
         d = getNodeFromTrieRecursive(0, searchChar, false);
-        //System.out.println("searchChar:" + new String(searchChar));
         // all chars from valueSearchNode are contained in trie
         if(bw != null && counter[1] != bw.length) {
           return d;
@@ -1431,12 +1364,10 @@ public final class FTTrie extends Index {
       return tmpres;
     } else {
       final int[] rne = getNodeEntry(resultNode);
-      //final long rdid = did;
       // append 1 symbol
       // not completely processed (value current node)
       if(rne[0] > counter[0] && resultNode > 0) {
         // replace wildcard with value from currentCompressedTrieNode
-        //valueSearchNode[posWildcard] = nodes[resultNode][counter[0] + 1];
         vsn[posw] = (byte) rne[counter[0] + 1];
 
         // . wildcards left
@@ -1451,7 +1382,6 @@ public final class FTTrie extends Index {
         // all chars from nodes[resultNode] are computed
         // any next values existing
         if(!hasNextNodes(rne)) {
-        //if(rne[rne[0] + 1] > 0) {
           return null;
         }
 
@@ -1459,18 +1389,10 @@ public final class FTTrie extends Index {
         aw = new byte[vsn.length - posw];
         System.arraycopy(vsn, posw + 1, aw, 1, aw.length - 1);
 
-        //final int[] nextNodes = getNextNodes(rne);
-
         // simple method call
         if(!recCall) {
-          //for (int t = rne[0] + 1; t < rne.length - 2; t += 2) {
           for (int t = rne[0] + 1; t < rne.length - 1; t += 2) {
-          //for(final int n : nextNodes) {
-            // replace first letter
-            //ne = getNodeEntry(n);
-            //aw[0] = ne[1];
             aw[0] = (byte) rne[t + 1];
-
             tmpNode = calculateFTOr(tmpNode,
                 getNodeFromTrieRecursive(rne[t], aw, false));
           }
@@ -1479,16 +1401,10 @@ public final class FTTrie extends Index {
         } else {
           // method call for .+ wildcard
           valuesFound = new byte[rne.length - 1 - rne[0] - 1];
-          //valuesFound = new byte[rne.length - 2 - rne[0] - 1];
-          //for(int i = 0; i < nextNodes.length; i++) {
-          //for (int t = rne[0] + 1; t < rne.length - 2; t += 2) {
           for (int t = rne[0] + 1; t < rne.length - 1; t += 2) {
             // replace first letter
-            //ne = getNodeEntry(nextNodes[i]);
-            aw[0] = (byte) rne[t + 1]; //ne[1];
-            //valuesFound[i] = ne[1];
+            aw[0] = (byte) rne[t + 1];
             valuesFound[t - rne[0] - 1] = (byte) rne[t + 1];
-
             tmpNode = calculateFTOr(tmpNode,
                 getNodeFromTrieRecursive(rne[t], aw, false));
           }
@@ -1592,7 +1508,6 @@ public final class FTTrie extends Index {
     if(cn != 0) {
       // not root node
       int i = 0;
-      //while(i < vsn.length && i < cne[0] && cne[i + 1] == vsn[i]) {
       while(i < vsn.length && i < cne[0] 
             && Token.diff((byte) cne[i + 1],  vsn[i]) == 0) {
         i++;
@@ -1604,11 +1519,8 @@ public final class FTTrie extends Index {
           // leafnode found with appropriate value
           if (c >= d + p + r) {
             int[][] ld = null;
-            //ld =
-            //getDataFromDataArray(cne[cne.length - 2], cne[cne.length - 1]);
             ld = getDataFromDataArray(cne[cne.length - 1], cdid);
             if (hasNextNodes(cne)) {
-              //for (int t = cne[0] + 1; t < cne.length - 2; t++) {
               for (int t = cne[0] + 1; t < cne.length - 1; t++) {
                 ld = calculateFTOr(ld, getNodeFuzzy(cne[t], null, -1,
                     new byte[]{(byte) cne[t + 1]}, d, p + 1, r, c));
@@ -1636,9 +1548,7 @@ public final class FTTrie extends Index {
           int[] ne = null;
           long tdid = -1;
           if (hasNextNodes(cne)) {
-            //for (int k = cne[0] + 1; k < cne.length - 2; k += 2) {
             for (int k = cne[0] + 1; k < cne.length - 1; k += 2) {
-              //if (c > d + p + r) {
                 if (cne[k + 1] == vsn[0]) {
                   ne = getNodeEntry(cne[k]);
                   tdid = did;
@@ -1720,9 +1630,7 @@ public final class FTTrie extends Index {
 
       byte[] b;
       if(hasNextNodes(cne)) {
-        //for (int k = cne[0] + 1; k < cne.length - 2; k += 2) {
           for (int k = cne[0] + 1; k < cne.length - 1; k += 2) {
-          //if (c > d + p + r) {
             if (cne[k + 1] == vsn[0]) {
               ne = getNodeEntry(cne[k]);
               tdid = did;

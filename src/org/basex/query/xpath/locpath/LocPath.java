@@ -132,7 +132,6 @@ public abstract class LocPath extends Expr {
         if(j == 0) {
           if(this instanceof LocPathRel || axis == Axis.PARENT) {
             invPath.steps.add(Axis.create(axis, TestNode.NODE));
-            //invPath.steps.add(Axis.get(axis, curr.test));
           } else {
             indexMatch = false;
           }
@@ -159,7 +158,6 @@ public abstract class LocPath extends Expr {
               ((PredSimple) pred).expr = e.indexEquivalent(ctx, null, true);
             }
           }
-          //newPreds.add(step.preds.get(p));
           newPreds.add(pred);
         }
       }
@@ -170,7 +168,6 @@ public abstract class LocPath extends Expr {
         new Filter(result, newPreds).comp(ctx);
 
       // add match with initial nodes
-      //if(indexMatch && checkMatch(invPath)) {
       if(indexMatch) result = new IndexMatch(this, result, invPath);
 
       // add rest of location path
@@ -178,17 +175,6 @@ public abstract class LocPath extends Expr {
     }
     return result;
   }
-
-  /*
-   * Check if the inverted path needs to be matched.
-   * @param path location path
-   * @return result of check
-  private boolean checkMatch(final LocPath path) {
-    if(path.steps.size() != 1) return true;
-    final Step step = path.steps.get(0);
-    return !step.simple(Axis.ANC) && !step.simple(Axis.ANCORSELF);
-  }
-   */
 
   @Override
   public final boolean sameAs(final Expr cmp) {

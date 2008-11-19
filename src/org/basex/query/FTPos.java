@@ -105,8 +105,8 @@ public class FTPos extends ExprInfo {
     if(!ordered || size == 1) return true;
 
     final IntList[] il = sortPositions();
-    IntList p = il[0]; // new IntList();
-    IntList pp = il[1]; // new IntList();
+    IntList p = il[0]; 
+    IntList pp = il[1]; 
     int i = 0;
     int lp;
     while (i < p.size && pp.list[i] != 0) i++;
@@ -117,22 +117,8 @@ public class FTPos extends ExprInfo {
       if (pp.list[lp] == size - 1) return true;
       i++;
     }
-    
-    
+
     return false;
-    /*
-    int c = -1;
-    int d = -1;
-    for(int i = 0; i < size; i++) {
-      for(int j = 0; j < pos[i].size; j++) {
-        d = pos[i].get(j);
-        if(c <= d) break;
-      }
-      if(c > d) return false;
-      c = d;
-    }
-    return true;
-    */
   }
 
   /**
@@ -230,8 +216,8 @@ public class FTPos extends ExprInfo {
   public boolean distance(final long mn, final long mx) {
     if(dunit == null) return true;
     final IntList[] il = sortPositions();
-    IntList p = il[0]; // new IntList();
-    IntList pp = il[1]; // new IntList();
+    IntList p = il[0]; 
+    IntList pp = il[1]; 
     
     
     boolean b = false;
@@ -243,65 +229,8 @@ public class FTPos extends ExprInfo {
       }
     }
     return b;
-
-    /*
-    int p1;
-    int p2;
-    int[] poi = new int[size];
-
-    int[] res = new int[p.size];
-    int c = 0;
-    int i = 0;
-    int lp = 0;
-    while (i < pp.size && pp.list[lp] == pp.list[i]) {
-      res[c++] = i;
-      i++;
-    }
-    while (i < pp.size) {
-      int[] tmp = new int[p.size];
-      int tc = 0;
-      lp = i;
-      while (i < pp.size && pp.list[lp] == pp.list[i]) {
-        p1 = calcPosition(p.list[i], dunit);
-        boolean o = false;
-        for(int z = 0; z < c; z++) {
-          p2 = calcPosition(p.list[res[z]], dunit);
-          final int d = Math.abs(p1 - p2) - 1;
-          if(d >= mn && d <= mx) {
-            o = true;
-            break;
-          }
-        }
-        if (o) tmp[tc++] = i;
-        i++;
-      }
-      res = tmp;
-      c = tc;
-    }
-    
-    return c > 0;
-*/
   }
-  /*
-  private boolean check(final int[][] dis, final int x, 
-    final IntList p,  final IntList pp, final BoolList bl) {
-    //if (l == size - 1) return true;
-    if(bl.all(true)) return true;
-    boolean f = false;
-    int i = x + 1;
-   
-    while (i < dis[x].length){ // && dis[x][i] != 0) {
-//      if (dis[x][i] > -1 && l == pp.list[x]) {
-      if (dis[x][i] > -1 && !bl.list[pp.list[i]]) {
-        bl.list[pp.list[x]] = true;
-        bl.list[pp.list[i]] = true;
-        f |= check(dis, i, p, pp, bl); 
-      }
-      i++;
-    }
-    return f;
-  }
-*/
+
   /**
    * Checks if each token is reached by the ftdistance query.
    * 
@@ -317,7 +246,6 @@ public class FTPos extends ExprInfo {
    */
   private boolean checkDist(final int x, final IntList p,  final IntList pp, 
       final long mn, final long mx, final BoolList bl, final boolean dist) {
-    //if (l == size - 1) return true;
     if(bl.all(true)) return true;
     boolean f = false;
     int i = x + 1;
@@ -370,24 +298,6 @@ public class FTPos extends ExprInfo {
       }
     }
     return b;
-
-    /*
-    // ...to be revised...
-    int l = -1;
-    for(int i = 0; i < size; i++) {
-      boolean o = false;
-      for(int j = 0; j < pos[i].size; j++) {
-        final int p = calcPosition(pos[i].list[j], wunit);
-        if(i == 0 || (Math.abs(p - l) - 1 < win)) {
-          o = true;
-          l = p;
-          break;
-        }
-      }
-      if(!o) return false;
-    }
-    return true;
-    */
   }
 
   /**

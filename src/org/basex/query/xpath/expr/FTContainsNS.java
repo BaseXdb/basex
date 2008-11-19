@@ -17,6 +17,7 @@ import org.basex.util.IntList;
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
+ * @autor Sebastian Gath
  */
 public final class FTContainsNS extends Arr {
   /** Fulltext parser. */

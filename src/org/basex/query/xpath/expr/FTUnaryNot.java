@@ -49,11 +49,6 @@ public final class FTUnaryNot extends FTArrayExpr {
       indexExprs[i] = exprs[i].indexEquivalent(ctx, curr, seq);
       if(indexExprs[i] == null) indexExprs[i] = exprs[i];
     }
-/*
-    // perform path step only once if all path expressions are the same
-    final Expr[] ex = XPOptimizer.getIndexExpr(indexExprs);
-    if(ex != null) return new Path(new FTNotExprs(ex),
-        ((Path) indexExprs[0]).path);*/
     return new FTUnaryNotExprs(indexExprs);
   }
   
@@ -61,7 +56,6 @@ public final class FTUnaryNot extends FTArrayExpr {
   public int indexSizes(final XPContext ctx, final Step curr, final int min) {
     if (exprs.length == 1) {
       final int nrIds = exprs[0].indexSizes(ctx, curr, min);
-      //return exprs[0].indexSizes(ctx, curr, min);
       return nrIds == 0 ? -1 : Integer.MAX_VALUE;
     }
     
