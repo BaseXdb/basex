@@ -286,7 +286,6 @@ public final class PlotView extends View implements Runnable {
     if(f > -1) {
       // determine number of overlapping nodes (plotting second)
       final int ol = getOverlappingNodes(f).length;
-      if(ol > 1) System.out.println(ol);
       if(!dragging) {
         final double x1 = plotData.xAxis.co[f];
         final double y1 = plotData.yAxis.co[f];
