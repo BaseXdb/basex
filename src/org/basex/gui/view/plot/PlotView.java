@@ -751,7 +751,7 @@ public final class PlotView extends View implements Runnable {
   /**
    * Determines all nodes lying under the mouse cursor (or the currently 
    * focused node).
-   * @param pre
+   * @param pre position of pre value in the sorted array of plotted nodes
    * @return nodes
    */
   private int[] getOverlappingNodes(final int pre) {
