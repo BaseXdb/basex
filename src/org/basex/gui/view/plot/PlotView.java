@@ -505,8 +505,8 @@ public final class PlotView extends View implements Runnable {
     } else {
       final boolean noRange = axis.max - axis.min == 0;
       // draw min and max grid line
-      drawCaptionAndGrid(g, drawX, noRange ? "" : "", 0);
-      drawCaptionAndGrid(g, drawX, noRange ? "" : "", 1);
+      drawCaptionAndGrid(g, drawX, "", 0);
+      drawCaptionAndGrid(g, drawX, "", 1);
 
       // return if insufficient plot space
       if(nrCaptions == 0) return;
@@ -516,7 +516,6 @@ public final class PlotView extends View implements Runnable {
         drawCaptionAndGrid(g, drawX, formatString(axis.min, drawX), .5d);
         return;
       }
-
       // draw captions between min and max
       double d = axis.calcPosition(axis.firstLabel);
       double f = axis.firstLabel;
