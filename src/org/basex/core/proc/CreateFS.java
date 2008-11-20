@@ -24,12 +24,12 @@ public final class CreateFS extends ACreate {
   
   @Override
   protected boolean exec() {
-    final IO f = IO.get(args[0]);
-    final String db = args[1] == null ? f.dbname() : args[1];
     Prop.chop = true;
     Prop.entity = true;
     Prop.mainmem = false;
-    return build(new FSParser(f), db);
+    // if the first argument is a slash, all directories are
+    // parsed (which includes all partitions on Windows systems)
+    return build(new FSParser(IO.get(args[0]), args[0].equals("/")), args[1]);
   }
   
   @Override

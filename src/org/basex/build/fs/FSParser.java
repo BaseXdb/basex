@@ -49,6 +49,8 @@ public final class FSParser extends Parser {
   private Builder builder;
   /** The currently processed file. */
   private File curr;
+  /** Root flag. */
+  private boolean root;
   /** Cache for content indexing. */
   private byte[] cache;
   /** Level counter. */
@@ -57,16 +59,18 @@ public final class FSParser extends Parser {
   private final long[] sizeStack = new long[IO.MAXHEIGHT];
   /** Pre valStack. */
   private final int[] preStack = new int[IO.MAXHEIGHT];
-  /** sizeAtt offset. */
+  /** Offset of the size value, as stored in {@link #atts(File, boolean)}. */
   public static final int SIZEOFFSET = 3;
 
   /**
    * Constructor.
-   * @param path the traversal starts from (enter "/" or leave empty to parse
-   * all partitions (C:, D: ...) on Windows)
+   * @param path the traversal starts from
+   * @param r root flag to parse root node or all partitions (C:, D: ...).
+   * on Windows systems. If set to true, the path reference is ignored
    */
-  public FSParser(final IO path) {
+  public FSParser(final IO path, final boolean r) {
     super(path);
+    root = r;
 
     // initialize cache for textual contents
     if(Prop.fscont) cache = new byte[Prop.fstextmax];
@@ -81,7 +85,6 @@ public final class FSParser extends Parser {
     meta.add(TYPEEML, new EMLExtractor());
     meta.add(TYPEMBS, new EMLExtractor());
     meta.add(TYPEMBX, new EMLExtractor());
-    lvl = 0;
   }
 
   /**
@@ -98,15 +101,14 @@ public final class FSParser extends Parser {
     builder.startDoc(token(io.name()));
     builder.startElem(token(DEEPFS), atts.reset());
     
-    final String fp = io.path();
-    for(final File f : fp.equals("/") ? File.listRoots() :
-      new File[] { new File(fp).getCanonicalFile() }) {
+    for(final File f : root ? File.listRoots() :
+      new File[] { new File(io.path()).getCanonicalFile() }) {
       
-      preStack[lvl] = builder.startElem(DIR, atts(f));
-      sizeStack[lvl] = 0;
+      preStack[0] = builder.startElem(DIR, atts(f, true));
+      sizeStack[0] = 0;
       parse(f);
       builder.endElem(DIR);
-      builder.setAttValue(preStack[lvl] + SIZEOFFSET, token(sizeStack[lvl]));
+      builder.setAttValue(preStack[0] + SIZEOFFSET, token(sizeStack[0]));
     }
     
     builder.endElem(token(DEEPFS));
@@ -140,10 +142,9 @@ public final class FSParser extends Parser {
    * @throws IOException I/O exception
    */
   private void dir(final File f) throws IOException {
-    preStack[++lvl] = builder.startElem(DIR, atts(f));
+    preStack[++lvl] = builder.startElem(DIR, atts(f, false));
     sizeStack[lvl] = 0;
     parse(f);
-    // closing tag
     builder.endElem(DIR);
 
     // calling builder actualization
@@ -163,7 +164,7 @@ public final class FSParser extends Parser {
    */
   private void file(final File f) throws IOException {
     curr = f;
-    builder.startElem(FILE, atts(f));
+    builder.startElem(FILE, atts(f, false));
     if (f.canRead()) {
       if(Prop.fsmeta && f.getName().indexOf('.') != -1) {
         final String name = f.getName();
@@ -205,10 +206,11 @@ public final class FSParser extends Parser {
   /**
    * Constructs attributes for file and directory tags.
    * @param f file name
+   * @param r root flag
    * @return attributes as byte[][]
    */
-  private Atts atts(final File f) {
-    final String name = f.getName();
+  private Atts atts(final File f, final boolean r) {
+    final String name = r ? f.getPath() : f.getName();
     final int s = name.lastIndexOf('.');
     // current time storage: minutes from 1.1.1970
     // (values will be smaller than 1GB and will thus be inlined in the storage)
@@ -230,7 +232,7 @@ public final class FSParser extends Parser {
 
   @Override
   public String det() {
-    return curr.toString();
+    return curr != null ? curr.toString() : "";
   }
 
   @Override

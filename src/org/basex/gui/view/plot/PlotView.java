@@ -44,7 +44,7 @@ public final class PlotView extends View implements Runnable {
   /** Plot margin: top, left, bottom, right margin. */
   private static final int[] MARGIN = new int[4];
   /** Whitespace between captions. */
-  static final int CAPTIONWHITESPACE = 20;
+  static final int CAPTIONWHITESPACE = 10;
   /** Data reference. */
   PlotData plotData;
   /** Item image. */
@@ -122,6 +122,7 @@ public final class PlotView extends View implements Runnable {
         final String item = (String) itemCombo.getSelectedItem();
         if(plotData.setItem(item)) {
           plotChanged = true;
+          markingChanged = true;
 
           final String[] keys =
             plotData.getCategories(token(item)).finishString();
@@ -179,8 +180,9 @@ public final class PlotView extends View implements Runnable {
   private BufferedImage itemImage(final boolean focus,
       final boolean marked, final boolean markedSub) {
 
-    final int size = Math.max(2,
-        GUIProp.fontsize + GUIProp.plotdots + (focus ? 2 : -2));
+    final int size = Math.max(1,
+        GUIProp.fontsize + GUIProp.plotdots + (focus ? 2 :
+          marked || markedSub ? 0 : -2));
     final BufferedImage img = new BufferedImage(size, size,
         Transparency.TRANSLUCENT);
 
@@ -210,9 +212,9 @@ public final class PlotView extends View implements Runnable {
 
     // overdraw plot background
     g.setColor(GUIConstants.color1);
-    final int noval = noValueSize();
-    g.fillRect(MARGIN[1] + noval, MARGIN[0], plotWidth - noval,
-        plotHeight - noval);
+    final int sz = sizeFactor();
+    g.fillRect(MARGIN[1] + sz, MARGIN[0], plotWidth - sz,
+        plotHeight - sz);
 
     // draw axis and grid
     drawAxis(g, true);
@@ -222,12 +224,12 @@ public final class PlotView extends View implements Runnable {
     g.setColor(GUIConstants.color6);
     final int w = getWidth();
     final int h = getHeight();
-    g.drawLine(MARGIN[1] + noval, MARGIN[0], w - MARGIN[3], MARGIN[0]);
-    g.drawLine(MARGIN[1] + noval, h - MARGIN[2] - noval, w - MARGIN[3],
-        h - MARGIN[2] - noval);
-    g.drawLine(MARGIN[1] + noval, MARGIN[0], MARGIN[1] + noval,
-        h - MARGIN[2] - noval);
-    g.drawLine(w - MARGIN[3], MARGIN[0], w - MARGIN[3], h - MARGIN[2] - noval);
+    g.drawLine(MARGIN[1] + sz, MARGIN[0], w - MARGIN[3], MARGIN[0]);
+    g.drawLine(MARGIN[1] + sz, h - MARGIN[2] - sz, w - MARGIN[3],
+        h - MARGIN[2] - sz);
+    g.drawLine(MARGIN[1] + sz, MARGIN[0], MARGIN[1] + sz,
+        h - MARGIN[2] - sz);
+    g.drawLine(w - MARGIN[3], MARGIN[0], w - MARGIN[3], h - MARGIN[2] - sz);
 
     // draw items
     g.setColor(GUIConstants.color6);
@@ -255,11 +257,11 @@ public final class PlotView extends View implements Runnable {
     plotWidth = w - (MARGIN[1] + MARGIN[3]);
     plotHeight = h - (MARGIN[0] + MARGIN[2]);
 
-    final int novalue = noValueSize();
-    if(plotWidth - novalue < 0 || plotHeight - novalue < 0) {
+    final int sz = sizeFactor();
+    if(plotWidth - sz < 0 || plotHeight - sz < 0) {
       g.setFont(GUIConstants.font);
       g.setColor(Color.black);
-      BaseXLayout.drawCenter(g, NOSPACE, w, (h + MARGIN[0]) / 2);
+      BaseXLayout.drawCenter(g, NOSPACE, w, h / 2 - MARGIN[0]);
       return;
     }
 
@@ -422,10 +424,10 @@ public final class PlotView extends View implements Runnable {
     final int w = getWidth();
     g.setColor(GUIConstants.back);
 
-    final int novalue = noValueSize();
+    final int sz = sizeFactor();
     // the painting space provided for items which lack no value
-    final int pWidth = plotWidth - novalue;
-    final int pHeight = plotHeight - novalue;
+    final int pWidth = plotWidth - sz;
+    final int pHeight = plotHeight - sz;
 
     final PlotAxis axis = drawX ? plotData.xAxis : plotData.yAxis;
     // drawing horizontal axis line
@@ -599,20 +601,18 @@ public final class PlotView extends View implements Runnable {
    * @return absolute coordinate
    */
   private int calcCoordinate(final boolean drawX, final double d) {
-    final int novalue = noValueSize();
+    final int sz = sizeFactor();
     if(drawX) {
       // items with value -1 lack a value for the specific attribute
-      if(d == -1) return (int) (MARGIN[1] + novalue * .35d);
+      if(d == -1) return (int) (MARGIN[1] + sz * .35d);
       final int width = getWidth();
-      final int xSpace = width - (MARGIN[1] + MARGIN[3]) - novalue;
-      final int x = (int) (d * xSpace);
-      return x + MARGIN[1] + novalue;
+      final int xSpace = width - (MARGIN[1] + MARGIN[3]) - sz;
+      return (int) (d * xSpace) + MARGIN[1] + sz;
     } else {
       final int height = getHeight();
-      if(d == -1) return height - MARGIN[2] - novalue / 4;
-      final int ySpace = height - (MARGIN[0] + MARGIN[2]) - novalue;
-      final int y = ySpace - (int) (d * ySpace);
-      return y + MARGIN[0];
+      if(d == -1) return height - MARGIN[2] - sz / 4;
+      final int ySpace = height - (MARGIN[0] + MARGIN[2]) - sz;
+      return ySpace - (int) (d * ySpace) + MARGIN[0];
     }
   }
 
@@ -665,12 +665,13 @@ public final class PlotView extends View implements Runnable {
     itemImgMarked = itemImage(false, true, false);
     itemImgFocused = itemImage(true, false, false);
     itemImgSub = itemImage(false, false, true);
-    final int size = noValueSize() / 2;
-    MARGIN[0] = size + 7;
-    MARGIN[1] = size * 6;
-    MARGIN[2] = 35 + size * 7;
-    MARGIN[3] = size + 3;
+    final int sz = sizeFactor() / 2;
+    MARGIN[0] = sz + 7;
+    MARGIN[1] = sz * 6;
+    MARGIN[2] = 35 + sz * 7;
+    MARGIN[3] = sz + 3;
     plotChanged = true;
+    markingChanged = true;
     repaint();
   }
 
@@ -722,12 +723,12 @@ public final class PlotView extends View implements Runnable {
       final int y = calcCoordinate(false, plotData.yAxis.co[i]);
       final int distX = Math.abs(mouseX - x);
       final int distY = Math.abs(mouseY - y);
-      final int off = noValueSize() / 4;
+      final int sz = sizeFactor() / 4;
       // if x and y distances are smaller than offset value and the
       // x and y distances combined is smaller than the actual minimal
       // distance of any item tested so far, the current item is considered
       // as a focus candidate
-      if(distX < off && distY < off) {
+      if(distX < sz && distY < sz) {
         final int currDist = distX * distY;
         if(currDist < dist) {
           dist = currDist;
@@ -745,10 +746,10 @@ public final class PlotView extends View implements Runnable {
   }
 
   /**
-   * Returns the size of the place holder for items lacking values.
+   * Returns a standardized size factor for painting the pot.
    * @return size value
    */
-  static int noValueSize() {
+  private static int sizeFactor() {
     return Math.max(2, GUIProp.fontsize * 2);
   }
 
