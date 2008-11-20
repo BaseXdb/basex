@@ -84,6 +84,9 @@ public final class PlotView extends View implements Runnable {
   /** Indicates if a filter operation is self implied or was trigger by 
    * another view. */
   boolean rightClick;
+  /** Context which is displayed in the plot after a context change which was
+   * triggered by the plot itself. */
+  private Nodes nextContext;
   /** Bounding box which supports selection of multiple items. */
   private final PlotBoundingBox selectionBox;
 
@@ -624,7 +627,10 @@ public final class PlotView extends View implements Runnable {
     if(!GUIProp.showplot) return;
 
     // all plot data is recalculated, assignments stay the same
-    plotData.refreshItems(rightClick);
+    final boolean b = nextContext != null & more;
+    plotData.refreshItems(b ? nextContext : 
+      GUI.context.current(), !more);
+    nextContext = null;
     plotData.xAxis.refreshAxis();
     plotData.yAxis.refreshAxis();
     drawSubNodes = !rightClick;
@@ -806,6 +812,7 @@ public final class PlotView extends View implements Runnable {
   @Override
   public void mouseMoved(final MouseEvent e) {
     if(working || painting) return;
+    rightClick = false;
     mouseX = e.getX();
     mouseY = e.getY();
     if(focus()) repaint();
@@ -839,7 +846,6 @@ public final class PlotView extends View implements Runnable {
       dragging = true;
       selectionBox.setStart(mouseX, mouseY);
     }
-    drawSubNodes = false;
 
     // keeps selection box on the plot inside. if mouse pointer is outside box
     // the corners of the selection box are set to the predefined values s.a.
@@ -883,6 +889,8 @@ public final class PlotView extends View implements Runnable {
       }
     }
     notifyMark(new Nodes(il.finish(), GUI.context.data()), this);
+    nextContext = GUI.context.marked();
+    drawSubNodes = false;
     markingChanged = true;
     repaint();
   }
@@ -897,12 +905,6 @@ public final class PlotView extends View implements Runnable {
   @Override
   public void mousePressed(final MouseEvent e) {
     if(working || painting) return;
-    // right only button used to call popup menu
-    if(SwingUtilities.isRightMouseButton(e)) {
-      rightClick = true;
-      return;
-    }
-    if(rightClick) markingChanged = true;
     mouseX = e.getX();
     mouseY = e.getY();
     focus();
@@ -913,6 +915,14 @@ public final class PlotView extends View implements Runnable {
       markingChanged = true;
       return;
     }
+    
+    // determine if a following context filter operation is possibly triggered 
+    // by popup menu
+    if(rightClick) {
+      rightClick = false;
+    }
+    final boolean r = SwingUtilities.isRightMouseButton(e);
+    if(r) rightClick = true;
 
     // node marking if item focused. if more than one icon is in focus range
     // all of these are marked. focus range means exact same x AND y coordinate.
@@ -922,7 +932,7 @@ public final class PlotView extends View implements Runnable {
     final int[] il = getOverlappingNodes(pre);
 
     // right mouse or shift down
-    if(e.isShiftDown()) {
+    if(e.isShiftDown() || r) {
       final Nodes marked = GUI.context.marked();
       marked.union(il);
       notifyMark(marked, this);
@@ -937,6 +947,7 @@ public final class PlotView extends View implements Runnable {
       marked.union(il);
       notifyMark(marked, this);
     }
+    nextContext = GUI.context.marked();
   }
 
   @Override

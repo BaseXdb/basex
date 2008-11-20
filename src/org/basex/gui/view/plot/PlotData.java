@@ -3,6 +3,7 @@ package org.basex.gui.view.plot;
 import static org.basex.util.Token.*;
 import java.util.Arrays;
 import org.basex.data.Data;
+import org.basex.data.Nodes;
 import org.basex.data.StatsKey.Kind;
 import org.basex.gui.GUI;
 import org.basex.index.Names;
@@ -78,22 +79,29 @@ public final class PlotData {
     final byte[] b = token(newItem);
     if(eq(b, item)) return false;
     item = b;
-    refreshItems(false);
+    refreshItems(GUI.context.current(), true);
     return true;
   }
 
   /**
    * Refreshes item list and coordinates if the selection has changed. So far
    * only numerical data is considered for plotting.
-   * @param marked marked flag
+   * @param context context to be displayed 
+   * @param sub determine descendent nodes of given context nodes
    */
-  void refreshItems(final boolean marked) {
+  void refreshItems(final Nodes context, final boolean sub) {
     final Data data = GUI.context.data();
     final IntList tmpPres = new IntList();
     final int itmID = data.tagID(item);
     
-    final int[] contextPres = marked ? GUI.context.current().nodes : 
-      GUI.context.current().nodes;
+    if(!sub) {
+      pres = context.nodes;
+      Arrays.sort(pres);
+      size = pres.length;
+      return;
+    }
+    
+    final int[] contextPres = context.nodes;
     for(int i = 0; i < contextPres.length; i++) {
       int p = contextPres[i];
       final int nl = p + data.size(p, Data.ELEM);
