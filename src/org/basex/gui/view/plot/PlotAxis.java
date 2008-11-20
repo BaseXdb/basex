@@ -303,12 +303,12 @@ public final class PlotAxis {
 
       actlCaptionStep = calculatedCaptionStep;
       nrCaptions = (int) (range / actlCaptionStep) + 1;
-      while(2 * nrCaptions * PlotView.CAPTIONWHITESPACE * 2 < space &&
+      while(2 * nrCaptions * PlotView.CAPTIONWHITESPACE * 3 < space &&
           dbl ? dbl : actlCaptionStep % 2 == 0) {
         actlCaptionStep /= 2;
         nrCaptions = (int) (range / actlCaptionStep);
       }
-      while(nrCaptions * PlotView.CAPTIONWHITESPACE * 2 > space) {
+      while(nrCaptions * PlotView.CAPTIONWHITESPACE * 3 > space) {
         actlCaptionStep *= 2;
         nrCaptions = (int) (range / actlCaptionStep);
       }
@@ -320,7 +320,7 @@ public final class PlotAxis {
 
       // type == TEXT / CAT
     } else {
-      nrCaptions = space / (PlotView.CAPTIONWHITESPACE * 3);
+      nrCaptions = space / (PlotView.CAPTIONWHITESPACE * 4);
       if(nrCaptions > nrCats)
         nrCaptions = nrCats;
       actlCaptionStep = 1.0d / (nrCaptions - 1);

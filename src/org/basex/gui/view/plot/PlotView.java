@@ -278,6 +278,8 @@ public final class PlotView extends View implements Runnable {
     // draw focused item
     final int f = plotData.findPre(focused);
     if(f > -1) {
+      // determine number of overlapping nodes (plotting second)
+      final int ol = getOverlappingNodes(f).length;
       if(!dragging) {
         final double x1 = plotData.xAxis.co[f];
         final double y1 = plotData.yAxis.co[f];
@@ -285,7 +287,8 @@ public final class PlotView extends View implements Runnable {
         // draw focused x and y value
         g.setFont(GUIConstants.font);
         final int textH = g.getFontMetrics().getHeight();
-        final String name = plotData.getName(focused);
+        final String name = plotData.getName(focused) + 
+          (ol > 1 ? ("  (" + ol + ") ") : "");
         final String x = formatString(true);
         final String y = formatString(false);
         final String label = (x.length() > 16 ?
@@ -744,6 +747,28 @@ public final class PlotView extends View implements Runnable {
     }
     return false;
   }
+  
+  /**
+   * Determines all nodes lying under the mouse cursor (or the currently 
+   * focused node).
+   * @param pre
+   * @return nodes
+   */
+  private int[] getOverlappingNodes(final int pre) {
+    final IntList il = new IntList();
+    // get coordinates for focused item
+    final int mx = calcCoordinate(true, plotData.xAxis.co[pre]);
+    final int my = calcCoordinate(false, plotData.yAxis.co[pre]);
+    for(int i = 0; i < plotData.size; i++) {
+      // get coordinates for current item
+      final int x = calcCoordinate(true, plotData.xAxis.co[i]);
+      final int y = calcCoordinate(false, plotData.yAxis.co[i]);
+      if(mx == x && my == y) {
+        il.add(plotData.pres[i]);
+      }
+    }
+    return il.finish(); 
+  }
 
   /**
    * Returns a standardized size factor for painting the pot.
@@ -866,7 +891,6 @@ public final class PlotView extends View implements Runnable {
   public void mouseReleased(final MouseEvent e) {
     if(working || painting) return;
     dragging = false;
-    notifyFocus(-1, this);
     repaint();
   }
 
@@ -894,35 +918,23 @@ public final class PlotView extends View implements Runnable {
     // all of these are marked. focus range means exact same x AND y coordinate.
     final int pre = plotData.findPre(focused);
     if(pre < 0) return;
-
     markingChanged = true;
-    final IntList il = new IntList();
-    // get coordinates for focused item
-    final int mx = calcCoordinate(true, plotData.xAxis.co[pre]);
-    final int my = calcCoordinate(false, plotData.yAxis.co[pre]);
-    for(int i = 0; i < plotData.size; i++) {
-      // get coordinates for current item
-      final int x = calcCoordinate(true, plotData.xAxis.co[i]);
-      final int y = calcCoordinate(false, plotData.yAxis.co[i]);
-      if(mx == x && my == y) {
-        il.add(plotData.pres[i]);
-      }
-    }
+    final int[] il = getOverlappingNodes(pre);
 
     // right mouse or shift down
     if(e.isShiftDown()) {
       final Nodes marked = GUI.context.marked();
-      marked.union(il.finish());
+      marked.union(il);
       notifyMark(marked, this);
       // double click
     } else if(e.getClickCount() == 2) {
       final Nodes marked = new Nodes(GUI.context.data());
-      marked.union(il.finish());
+      marked.union(il);
       notifyContext(marked, false, null);
       // simple mouse click
     } else {
       final Nodes marked = new Nodes(GUI.context.data());
-      marked.union(il.finish());
+      marked.union(il);
       notifyMark(marked, this);
     }
   }
