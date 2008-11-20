@@ -166,9 +166,9 @@ public final class GUIConstants {
   /** Dark color. */
   public static Color color6;
 
-  /** Mark color, specified alpha value. */
+  /** Mark color, custom alpha value. */
   public static Color colormarkA;
-  /** Second mark color, specified alpha value. */
+  /** Second mark color, custom alpha value. */
   public static Color colormark2A;
   /** Mark color. */
   public static Color colormark1;
