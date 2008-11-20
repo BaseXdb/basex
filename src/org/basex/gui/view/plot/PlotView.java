@@ -878,7 +878,7 @@ public final class PlotView extends View implements Runnable {
       rightClick = true;
       return;
     }
-    if(rightClick) rightClick = false;
+    if(rightClick) markingChanged = true;
     mouseX = e.getX();
     mouseY = e.getY();
     focus();
@@ -886,6 +886,7 @@ public final class PlotView extends View implements Runnable {
     if(focused == -1) {
       // a marking update is triggered with an empty node set as argument
       notifyMark(new Nodes(GUI.context.data()), this);
+      markingChanged = true;
       return;
     }
 
