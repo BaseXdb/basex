@@ -61,8 +61,6 @@ public final class ExprInfoList {
         return size - 1;
       }    
     } else if (ei instanceof FTContains) {
-      //final Expr expr = (Expr) ei;
-      //if (expr instanceof FTContains) {
         final FTContains ftc1 = (FTContains) ei;
         for (int i = 0; i < size; i++) {
           final Expr ftc = FTContains.sumUp(ftc1, 
@@ -75,36 +73,7 @@ public final class ExprInfoList {
         if(size == list.length) list = Array.extend(list);
         list[size++] = ei;
         return size - 1;
-      //}    
     }
-    
-        
-        /*  
-        if (ftc1.expr[0].sameAs(ftc2.expr[0])) {
-          // sum 
-            if (check(ftc1, ftc2)) {
-              final FTSelect fts1 = (FTSelect) ftc1.expr[1];
-              final FTSelect fts2 = (FTSelect) ftc2.expr[1];
-              if (fts2.getExpr() instanceof FTAnd) {
-                FTAnd ftand = (FTAnd) fts2.getExpr();
-                ftand.add(fts1.getExpr());
-              } else {
-                final FTAnd fta = new FTAnd(new FTArrayExpr[]{
-                  fts1.getExpr(), fts2.getExpr()});
-                fts2.setExpr(fta);
-              }
-            } else {
-              FTAnd fta = new FTAnd(new FTArrayExpr[]{
-                  (FTArrayExpr) ftc2.expr[1], (FTArrayExpr) ftc1.expr[1]});
-              final FTSelect fts 
-                = new FTSelect(fta, new FTPositionFilter(new FTPos()));
-              
-              ftc2.expr[1] = fts;
-          }
-          return i;
-        }*/
-
-    
     return -1;
   }
   

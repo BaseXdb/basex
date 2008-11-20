@@ -163,8 +163,10 @@ public final class Preds extends ExprInfo {
         ctx.compInfo(OPTTRUE);
         remove(j--);
       }
-      if (j > -1 && preds[j] instanceof PredSimple) 
+      // <SG> summing up of predicates needs more meta information
+      /*if (j > -1 && preds[j] instanceof PredSimple) 
         p.add(preds[j], true);
+        */
     }
     
     if (p.size > 0 && p.size < size) {

@@ -38,9 +38,6 @@ public final class FTTest extends AbstractTest {
       "</fttest>";
 
     queries = new Object[][] {
-        { "FTPosFilter 22", nodes(3, 37),
-          "//w [. ftcontains ('second' ftand 'third' window 3 words) " +
-          "ftand 'sentence' distance exactly 0 words]" },
           
         { "Simple 1", bool(true),
           "'abc' ftcontains 'abc'" },
@@ -98,6 +95,9 @@ public final class FTTest extends AbstractTest {
           "//fti[text() ftcontains 'adf s' or text() ftcontains 's adf']" },
         { "AndOr 6", nodes(31),
           "//fti[contains(text(), 'adf') and text() ftcontains 'adf']" },
+        { "AndOr 7", nodes(3),
+          "//*[text() ftcontains 'sentence' and text() ftcontains 'xml']" },
+
           
         { "Phrase 1", nodes(7, 9, 11),
           "//w [text() ftcontains 'xml databases']" },

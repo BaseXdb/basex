@@ -96,7 +96,7 @@ public final class FTWords extends FTArrayExpr {
     // - no stop words are specified
     // - if wildcards are specified, the fulltext index is a trie
     // - no FTTimes option is specified
-    return meta.ftcs == fto.is(FTOpt.CS) && 
+    return //meta.ftcs == fto.is(FTOpt.CS) && 
       meta.ftdc == fto.is(FTOpt.DC) && meta.ftst == fto.is(FTOpt.ST) &&
       fto.sw == null && (!fto.is(FTOpt.WC) || !meta.ftfz) &&
       occ[0] == 1  && occ[1] == Long.MAX_VALUE;

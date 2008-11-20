@@ -8,7 +8,6 @@ import org.basex.query.xpath.internal.Range;
 import org.basex.query.xpath.item.Bln;
 import org.basex.query.xpath.item.Comp;
 import org.basex.query.xpath.item.Item;
-import org.basex.query.xpath.locpath.ExprInfoList;
 import org.basex.query.xpath.locpath.LocPath;
 import org.basex.query.xpath.locpath.Step;
 import static org.basex.query.xpath.XPText.*;
@@ -58,7 +57,10 @@ public final class And extends Arr {
         System.arraycopy(expr, 0, tmp, 0, e);
         System.arraycopy(expr, e + 1, tmp, e, expr.length - e-- - 1);
         expr = tmp;
-      } else if (expr[e] instanceof Or) {
+      }
+      // <SG> check for summing up predicates
+      /*
+      else if (expr[e] instanceof Or) {
         // sum up and predicates
         final ExprInfoList eil = new ExprInfoList();
         final Or o = (Or) expr[e];
@@ -70,8 +72,8 @@ public final class And extends Arr {
           if (ex.length == 1) expr[e] = ex[0];
           else o.expr = eil.finishE();
          ctx.compInfo(OPTSUMPREDS);
-       }
-     }
+       } 
+     }*/
     }
     
     if(expr.length == 0) return Bln.TRUE;

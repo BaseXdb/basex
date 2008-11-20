@@ -56,6 +56,7 @@ public final class FTSelect extends FTArrayExpr {
       while (!seqEval()) {
         if (more()) {
           ftn = exprs[0].next(ctx);
+          if(ftn.size == 0) return new FTNode();
           init(ftn, ctx);
         } else {
           ctx.ftpos = tmp;
@@ -80,6 +81,7 @@ public final class FTSelect extends FTArrayExpr {
     if (ftn.getToken() != null) {
         ftpos.pos.ft.init(ctx.item.data.text(ftn.getPre()));
         ftpos.pos.term = ftpos.pos.ft.getTokenList();
+        
     }
   }
   

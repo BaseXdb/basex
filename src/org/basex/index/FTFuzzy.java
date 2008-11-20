@@ -7,6 +7,7 @@ import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataAccess;
+import org.basex.util.IntList;
 import org.basex.util.Levenshtein;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -226,43 +227,62 @@ public final class FTFuzzy extends Index {
    * @return  int[][] data
    */
   private IndexArrayIterator getData(final long p, final int s) {
-    if(s == 0 || p < 0) return null;
-    final int[][] dt = new int[2][s];
-    dat.cursor(p);
-
+    if(s == 0 || p < 0) return IndexArrayIterator.EMP;
+    
     if (data.meta.ftittr) {
-      for(int i = 0; i < s; i++) {
-        dt[0][i] = dat.readNum();
-        dt[1][i] = dat.readNum();
-      }
+      return new IndexArrayIterator(s) {
+        boolean f = true;
+        int lpre = -1;
+        int c = 0;
+        long pos = p;
+        FTNode n = new FTNode();
+        
+        @Override
+        public boolean more() {
+          if (c == s) return false;
+          IntList il = new IntList();
+          int pre;
+          if (f) {
+            f = false;
+            pre = dat.readNum(pos);
+            pos = dat.pos();
+          } else {
+            pre = lpre;
+          }
+          
+          f = false;
+          il.add(pre);
+          il.add(dat.readNum(pos));
+          c++;
+          while (c < s && (lpre = dat.readNum()) == pre) {
+            il.add(dat.readNum());
+            c++;
+          }
+          pos = dat.pos();
+          n = new FTNode(il.finish(), 1);
+          return true;
+        }
+        
+        @Override
+        public FTNode nextFTNodeFD() {
+          return n;
+        }
+      };
     } else {
-      for(int i = 0; i < s; i++) dt[0][i] = dat.readNum();
-      for(int i = 0; i < s; i++) dt[1][i] = dat.readNum();  
-    }
-    return new IndexArrayIterator(dt, true);
-  }
-
-
+      final int[][] dt = new int[2][s];
+      dat.cursor(p);
   
-  /**
-   * Caches the iterator values and returns an int array (temporary).
-   * @param it iterator
-   * @return array
-   */
-  private int[][] finish(final IndexIterator it) {
-    final IndexArrayIterator iat = (IndexArrayIterator) it;
-    return iat.getFTData();
-    /*
-    final int s = it.size();
-    final int[] pre = new int[s];
-    final int[] pos = new int[s];
-
-    for(int i = 0; i < s && it.more(); i++) {
-      pre[i] = it.next();      
+      if (data.meta.ftittr) {
+        for(int i = 0; i < s; i++) {
+          dt[0][i] = dat.readNum();
+          dt[1][i] = dat.readNum();
+        }
+      } else {
+        for(int i = 0; i < s; i++) dt[0][i] = dat.readNum();
+        for(int i = 0; i < s; i++) dt[1][i] = dat.readNum();  
+      }
+      return new IndexArrayIterator(dt, true);
     }
-    for(int i = 0; i < s && it.more(); i++) pos[i] = it.next();
-    return new int[][] { pre, pos };
-    */
   }
 
   /**
@@ -316,9 +336,9 @@ public final class FTFuzzy extends Index {
    * @param tok token looking for
    * @return iterator
    */
-  private IndexIterator get(final byte[] tok) {
+  private IndexArrayIterator get(final byte[] tok) {
     final long p = getPointerOnToken(tok);
-    if(p == -1) return IndexIterator.EMPTY;
+    if(p == -1) return IndexArrayIterator.EMP;
     return getData(getPointerOnData(p, tok.length), getDataSize(p, tok.length));
   }
 
@@ -340,21 +360,14 @@ public final class FTFuzzy extends Index {
 
     // get result iterator
     final IndexIterator ii = get(Token.lc(tok));
-
-    // case insensitive search..
-    if(!ft.cs) return ii;
+    if (ii == IndexIterator.EMPTY || !ft.cs) return ii;
 
     // case sensitive search
-    final int[][] ids = finish(ii);
-    //int c = 0;
-
     // check real case of each result node
     final FTTokenizer ftdb = new FTTokenizer();
     ftdb.st = ft.st;
-    final int c = csDBCheck(ids, data, ftdb, tok);
-
-    return new IndexArrayIterator(ids, c, true);
-  }
+    return csDBCheck((IndexArrayIterator) ii, data, ftdb, tok);
+ }
 
   /**
    * Performs db-access and checks real case of a token.
@@ -393,6 +406,65 @@ public final class FTFuzzy extends Index {
     return c;
   }
 
+  /**
+   * Performs db-access and checks real case of a token.
+   * @param ids full-text ids
+   * @param d Data-reference
+   * @param ftdb Fulltext Tokenizer
+   * @param tok token
+   * @return counter
+   */
+  static IndexArrayIterator csDBCheck(final IndexArrayIterator ids, 
+      final Data d, final FTTokenizer ftdb, final byte[] tok) {
+    
+    return new IndexArrayIterator(1) {
+      FTNode r;
+      int tn;
+      
+      @Override
+      public boolean more() {
+        r = new FTNode();
+        while (ids.more()) {
+          r = ids.nextFTNode();
+          ftdb.init(d.text(r.getPre()));
+          int i = 0;
+          ftdb.more();
+          // iterator text values
+          while(r.morePos()) {
+            ftdb.cs = false;
+            while (i < r.nextPos() && ftdb.more()) i++;
+            
+            // token found - match case sensitivity
+            ftdb.cs = true;
+            if(!Token.eq(tok, ftdb.get())) {
+              r.removePos();
+            }
+          }
+          if (r.hasPos()) return true;
+        }
+        return false;
+      }
+      
+      @Override
+      public FTNode nextFTNode() {
+        r.genPointer(tn);
+        r.reset();
+        return r;
+      }
+
+      @Override
+      public int next() {
+        return r.getPre();
+      }
+
+      @Override
+      public void setTokenNum(final int t) {
+        tn = t;
+      }
+    };
+  }
+
+  
   @Override
   public int nrIDs(final IndexToken index) {
     // hack, should find general solution

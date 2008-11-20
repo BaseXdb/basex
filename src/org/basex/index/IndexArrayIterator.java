@@ -23,6 +23,21 @@ public class IndexArrayIterator extends IndexIterator {
   /** Token from query. */
   private FTTokenizer[] tok;
   
+  /** Empty iterator. */
+  public static final IndexArrayIterator EMP = new IndexArrayIterator(0) {
+    @Override
+    public boolean more() { return false; };
+    @Override
+    public int next() { return 0; };
+    @Override
+    public int size() { return 0; }; 
+    @Override 
+    public FTNode nextFTNodeFD() { return new FTNode(); };
+    @Override 
+    public FTNode nextFTNode() { return new FTNode(); };
+  };
+  
+  
   /**
    * Constructor.
    * @param s size
@@ -202,6 +217,12 @@ public class IndexArrayIterator extends IndexIterator {
       public FTNode nextFTNode() {
         return r;
       }
+      @Override
+      public int next() {
+        return r.getPre();
+      }
+
+      
       @Override
       public void setTokenNum(final int t) {
         iai1.setTokenNum(t);

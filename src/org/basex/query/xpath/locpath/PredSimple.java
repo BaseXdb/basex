@@ -1,13 +1,10 @@
 package org.basex.query.xpath.locpath;
 
-import static org.basex.query.xpath.XPText.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.expr.Or;
-import org.basex.query.xpath.expr.And;
 import org.basex.query.xpath.expr.Pos;
 import org.basex.query.xpath.item.Comp;
 import org.basex.query.xpath.item.Dbl;
@@ -102,6 +99,7 @@ public final class PredSimple extends Pred {
     // number: create explicit position predicate
     if(expr instanceof Dbl) expr = Pos.create(((Dbl) expr).num(), Comp.EQ);
 
+    /* <SG> check if sum is possible
     // sum up and predicates
     if (expr instanceof And) {
       final ExprInfoList eil = new ExprInfoList();
@@ -130,7 +128,7 @@ public final class PredSimple extends Pred {
         else o.expr = eil.finishE();
        ctx.compInfo(OPTSUMPREDS);
      }
-    }
+    }*/
    
     // check position test
     final Pred pred = PredPos.create(expr);

@@ -71,7 +71,8 @@ public final class FTNode {
    * Generates pointer with value v.
    * @param v value
    */
-  private void genPointer(final int v) {
+  public void genPointer(final int v) {
+    if(p != null && p.size > 0 && p.list[0] == v) return;
     final int[] t = new int[ip.size];
     for (int i = 0; i < t.length; i++) t[i] = v;
     p = new IntList(t);
@@ -139,6 +140,23 @@ public final class FTNode {
     return ip.list[c];
   }
 
+  /**
+   * Removes current position value.
+   */
+  public void removePos() {
+    ip.remove(c);
+    if (p != null) p.remove(c);
+    c--;
+  }
+  
+  /**
+   * Checks if node has position values.
+   * @return boolean has position values
+   */
+  public boolean hasPos() {
+    return ip != null && ip.size > 1; 
+  }
+  
   /**
    * Get number of tokens from query for this node.
    * @return number of tokens
