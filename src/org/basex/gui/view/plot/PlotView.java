@@ -2,6 +2,7 @@ package org.basex.gui.view.plot;
 
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -14,11 +15,13 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
+
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
+
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.StatsKey.Kind;
@@ -627,16 +630,16 @@ public final class PlotView extends View implements Runnable {
     if(!GUIProp.showplot) return;
 
     // all plot data is recalculated, assignments stay the same
-    final boolean b = nextContext != null & more;
-    plotData.refreshItems(b ? nextContext : 
-      GUI.context.current(), !more);
-    nextContext = null;
+    plotData.refreshItems(nextContext != null && more && 
+        rightClick ? nextContext : GUI.context.current(), !more || !rightClick);
     plotData.xAxis.refreshAxis();
     plotData.yAxis.refreshAxis();
+    
+    nextContext = null;
     drawSubNodes = !rightClick;
     rightClick = false;
-    markingChanged = true;
     plotChanged = true;
+    markingChanged = true;
     repaint();
   }
 
@@ -812,7 +815,6 @@ public final class PlotView extends View implements Runnable {
   @Override
   public void mouseMoved(final MouseEvent e) {
     if(working || painting) return;
-    rightClick = false;
     mouseX = e.getX();
     mouseY = e.getY();
     if(focus()) repaint();
@@ -838,9 +840,7 @@ public final class PlotView extends View implements Runnable {
     // flag which indicates if mouse pointer is located on the plot inside.
     final boolean inBox = mouseY > tb && mouseY < bb &&
       mouseX > lb && mouseX < rb;
-      
     if(!dragging && !inBox) return;
-    
     // first time method is called when mouse dragged
     if(!dragging) {
       dragging = true;
@@ -905,39 +905,34 @@ public final class PlotView extends View implements Runnable {
   @Override
   public void mousePressed(final MouseEvent e) {
     if(working || painting) return;
+    markingChanged = true;
     mouseX = e.getX();
     mouseY = e.getY();
     focus();
-    // no item is focused. no nodes marked after mouse click
-    if(focused == -1) {
-      // a marking update is triggered with an empty node set as argument
-      notifyMark(new Nodes(GUI.context.data()), this);
-      markingChanged = true;
-      return;
-    }
-    
+
     // determine if a following context filter operation is possibly triggered 
     // by popup menu
-    if(rightClick) {
-      rightClick = false;
-    }
     final boolean r = SwingUtilities.isRightMouseButton(e);
-    if(r) rightClick = true;
+    if(r) { rightClick = true; return; }
+    // no item is focused. no nodes marked after mouse click
+    if(focused == -1) {
+      notifyMark(new Nodes(GUI.context.data()), this);
+      return;
+    }
 
     // node marking if item focused. if more than one icon is in focus range
     // all of these are marked. focus range means exact same x AND y coordinate.
     final int pre = plotData.findPre(focused);
-    if(pre < 0) return;
-    markingChanged = true;
     final int[] il = getOverlappingNodes(pre);
-
     // right mouse or shift down
-    if(e.isShiftDown() || r) {
+    if(e.isShiftDown()) {
       final Nodes marked = GUI.context.marked();
       marked.union(il);
       notifyMark(marked, this);
       // double click
     } else if(e.getClickCount() == 2) {
+      // context change also selfimplied, thus rightclick set to true
+      rightClick = true;
       final Nodes marked = new Nodes(GUI.context.data());
       marked.union(il);
       notifyContext(marked, false, null);
