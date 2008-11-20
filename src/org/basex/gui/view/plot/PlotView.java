@@ -286,6 +286,7 @@ public final class PlotView extends View implements Runnable {
     if(f > -1) {
       // determine number of overlapping nodes (plotting second)
       final int ol = getOverlappingNodes(f).length;
+      if(ol > 1) System.out.println(ol);
       if(!dragging) {
         final double x1 = plotData.xAxis.co[f];
         final double y1 = plotData.yAxis.co[f];
@@ -294,7 +295,7 @@ public final class PlotView extends View implements Runnable {
         g.setFont(GUIConstants.font);
         final int textH = g.getFontMetrics().getHeight();
         final String name = plotData.getName(focused) + 
-          (ol > 1 ? ("  (" + ol + ") ") : "");
+          (ol > 1 ? ("  (" + ol + ") ") : "bla");
         final String x = formatString(true);
         final String y = formatString(false);
         final String label = (x.length() > 16 ?
@@ -317,7 +318,8 @@ public final class PlotView extends View implements Runnable {
             BaseXLayout.drawTooltip(g, label, xa, ya, ww, 10);
           }
         } else
-          BaseXLayout.drawTooltip(g, label, xa, ya, ww, 10);
+          BaseXLayout.drawTooltip(g, (ol > 1 ? "(" + ol + ") " : "") + 
+              label, xa, ya, ww, 10);
       }
     }
 
