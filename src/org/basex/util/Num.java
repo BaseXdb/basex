@@ -27,6 +27,19 @@ public final class Num {
   }
 
   /**
+   * Creates a new number array.
+   * @param val initial value to be stored
+   * @return new number array
+   */
+  public static byte[] simpleNum(final int val) {
+    final int len = len(val);
+    final byte[] array = new byte[len];
+    add(array, val, 0, len);
+    return array;
+  }
+
+  
+  /**
    * Compresses and writes an integer value to the specified array and
    * returns the array.
    * @param array array
@@ -61,6 +74,29 @@ public final class Num {
     size(tmp, pos);
     return pos == tmp.length ? tmp : Array.finish(tmp, pos);
   }
+
+  /**
+   * Creates and returns a compressed array from the specified integer array.
+   * The number of entries specifies vs. 
+   * NO SIZEINFO IS WRITTEN!!
+   * 
+   * @param vals values to be written
+   * @param vs number of entries in vals
+   * @return new array
+   */
+  public static byte[] create(final int[] vals, final int vs) {
+    byte[] tmp = new byte[vals.length << 1];
+    int pos = 0;
+    for(int i = 0; i < vs; i++) {
+      final int len = len(vals[i]);
+      tmp = check(tmp, pos, len);
+      add(tmp, vals[i], pos, len);
+      pos += len;
+    }
+    
+    return pos == tmp.length ? tmp : Array.finish(tmp, pos);
+  }
+
   
   /**
    * Resizes the specified array by 12,5%.

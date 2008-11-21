@@ -95,10 +95,9 @@ public final class FTWords extends FTArrayExpr {
     // if the following conditions yield true, the index is accessed:
     // - case sensitivity, diacritics and stemming flag complies with index flag
     // - no stop words are specified
-    // - if wildcards are specified, the fulltext index is a trie
+    // - if wildcards are specified, the fulltext index is a trie (not cs)
     // - no FTTimes option is specified
-    return //meta.ftcs == fto.is(FTOpt.CS) && 
-    
+    return (!meta.ftcs || !fto.is(FTOpt.WC)) &&
       meta.ftdc == fto.is(FTOpt.DC) && meta.ftst == fto.is(FTOpt.ST) &&
       fto.sw == null && (!fto.is(FTOpt.WC) || !meta.ftfz 
           || Token.contains(token, '*')) &&

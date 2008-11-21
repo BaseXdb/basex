@@ -46,10 +46,7 @@ public final class FTBuilder extends Progress implements IndexBuilder {
     index = new FTArray(128, data.meta.ftcs);
     index.bl |= data.meta.filesize > 1073741824;
     if(index.bl) {
-      if (wp.cs) {
-        // bulk loader doesn't support case sensitivity
-        index.bl = false;
-      } else hash = new FTHash();
+        hash = new FTHash();
     }
 
     total = data.size;
@@ -142,16 +139,12 @@ public final class FTBuilder extends Progress implements IndexBuilder {
           outN.write5(next[i][j + 1]);
         } else {
           // write pointer on data
-          if (index.bl) {
+          //if (index.bl) {
             if (lp == 0) {
               outN.write5(next[i][j + 1]);
             } else {
               outN.write5(FTArray.toLong(next[i], next[i].length - 2));
             }
-          } else {
-            writeData(outPre, pre[next[i][next[i].length - 1]]);
-            writeData(outPre, pos[next[i][next[i].length - 1]]);
-          }
         }
         outS.writeInt(s);
         s += 1L + tokens[next[i][0]].length * 1L
@@ -162,9 +155,24 @@ public final class FTBuilder extends Progress implements IndexBuilder {
     if (!index.bl) {
       // write data
       final int il = index.pre.size;
-      for (int i = 0; i < il; i++) {
-        writeData(outPre, pre[i]);
-        writeData(outPre, pos[i]);
+      if (data.meta.ftittr) {
+        int lastpre = -1;
+        byte[] lp = new byte[]{};
+        for (int i = 0; i < il; i++) {
+          for (int j = 0; j < pre[i].length; i++) {
+            if (lastpre != pre[i][j]) {
+              lastpre = pre[i][j];
+              lp = Num.simpleNum(pre[i][j]);
+            }
+            outPre.write(lp);
+            outPre.write(Num.simpleNum(pos[i][j]));
+          }
+        }
+      } else {
+        for (int i = 0; i < il; i++) {
+          writeData(outPre, pre[i]);
+          writeData(outPre, pos[i]);
+        }
       }
     }
 
@@ -249,8 +257,8 @@ public final class FTBuilder extends Progress implements IndexBuilder {
    */
   private void writeData(final DataOutput out, final int[] d)
     throws IOException {
-    final byte[] val = Num.create(d);
-    for (int z = 4; z < val.length; z++) out.write(val[z]);
+    final byte[] val = Num.create(d, d.length);
+    for (int z = 0; z < val.length; z++) out.write(val[z]);
   }
 
   /**

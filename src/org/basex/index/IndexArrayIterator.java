@@ -178,6 +178,9 @@ public class IndexArrayIterator extends IndexIterator {
    */
   public static IndexArrayIterator merge(final IndexArrayIterator iai1, 
       final IndexArrayIterator iai2) {
+    if (iai1 == EMP) return iai2;
+    if (iai2 == EMP) return iai1;
+    
     return new IndexArrayIterator(1) {
       FTNode[] n = new FTNode[2];
       FTNode r;

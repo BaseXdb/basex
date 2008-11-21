@@ -10,6 +10,7 @@ import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataAccess;
 import org.basex.util.Array;
+import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -83,8 +84,9 @@ public final class FTTrie extends Index {
   public int nrIDs(final IndexToken ind) {
     // hack, should find general solution
     final FTTokenizer fto = (FTTokenizer) ind;
-    if (fto.fz || fto.wc ||  fto.st || fto.cs || fto.dc) return 1;
-
+    if (fto.fz || fto.wc ||  fto.st || fto.cs || cs || fto.dc) return 1;
+    
+    
     final byte[] tok = Token.lc(ind.get());
     final int id = cache.id(tok);
     if (id > 0) {
@@ -121,8 +123,9 @@ public final class FTTrie extends Index {
     }
 
     if(!cs && ft.cs) {
-      // case insensitive index create - check real case with dbdata
-      if (iai == null)  iai = getNodeFromTrieRecursive(0, Token.lc(tok), false);
+      // case insensitive index created - check real case with dbdata
+      if (iai == null)  iai = getNodeFromTrieRecursive(0, Token.lc(tok), false
+          );
       if(iai == IndexArrayIterator.EMP) return iai;
 
       // check real case of each result node
@@ -136,7 +139,7 @@ public final class FTTrie extends Index {
     // check if result was cached
     final int id = cache.id(tok);
     IndexArrayIterator tmp = IndexArrayIterator.EMP;
-    if (id > -1) {
+    if (id > 0) {
       final int size = cache.getSize(id);
       final long p = cache.getPointer(id);
       return FTFuzzy.getData(p, size, inD, data.meta);
@@ -321,8 +324,9 @@ public final class FTTrie extends Index {
       return IndexArrayIterator.EMP;
     int[] ne = null;
     if (cs) {
-      if (casesen) ne = getNodeIdFromTrieRecursive(cNode, searchNode);
-      else  return getNodeFromCSTrie(cNode, searchNode);
+      //if (casesen) ne = getNodeIdFromTrieRecursive(cNode, searchNode);
+      //else
+        return getNodeFromCSTrieNew(cNode, searchNode, casesen);
     } else if (!casesen) ne = getNodeIdFromTrieRecursive(cNode, searchNode);
 
     if (ne == null) {
@@ -390,7 +394,6 @@ public final class FTTrie extends Index {
     }
   }
 
-
   /**
    * Traverse trie and return found node for searchValue.
    * Searches case insensitive in a case sensitive trie.
@@ -398,9 +401,12 @@ public final class FTTrie extends Index {
    *
    * @param cn int
    * @param sn search nodes value
+   * @param casesen flag for casesentive search
    * @return int id on node saving the data
+   * 
    */
-  private IndexArrayIterator getNodeFromCSTrie(final int cn, final byte[] sn) {
+  private IndexArrayIterator getNodeFromCSTrieNew(final int cn, 
+      final byte[] sn, final boolean casesen) {
     byte[] vsn = sn;
     long ldid;
 
@@ -410,7 +416,7 @@ public final class FTTrie extends Index {
     if(cn != 0) {
       int i = 0;
       while(i < vsn.length && i < ne[0] 
-           && Token.diff((byte) Token.lc(ne[i + 1]), vsn[i]) == 0) {
+           && Token.diff((byte) Token.lc(ne[i + 1]), lc(vsn[i])) == 0) {
         i++;
       }
 
@@ -426,45 +432,45 @@ public final class FTTrie extends Index {
           vsn = tmp;
 
           // scan successors currentNode
-          final int p = getInsPosLinCSF(ne, vsn[0]);
+          final IntList p = getInsPosLinCSFNew(ne, vsn[0], casesen);
           if(!found) {
-            //if (Token.lc(ne[p + 1]) != vsn[0])
-            if (Token.diff((byte) Token.lc(ne[p + 1]), vsn[0]) != 0)
-              return null;
+            if (Token.diff((byte) Token.lc(ne[p.list[0] + 1]), vsn[0]) != 0)
+              return IndexArrayIterator.EMP;
             else
-              return getNodeFromCSTrie(ne[p], vsn);
+              return getNodeFromCSTrieNew(ne[p.list[0]], vsn, casesen);
           } else {
-            IndexArrayIterator d = getNodeFromCSTrie(ne[p], vsn);
-            if (Token.diff((byte) Token.lc(ne[p + 3]), vsn[0]) == 0) {
+            IndexArrayIterator d = IndexArrayIterator.EMP;
+            for (int z = 0; z < p.size; z++) {
               d = IndexArrayIterator.merge(
-                  getNodeFromCSTrie(ne[p + 2], vsn), d);
+                  getNodeFromCSTrieNew(ne[p.list[z]], vsn, casesen), d);
             }
             return d;
           }
         }
       } else {
         // node not contained
-        return null;
+        return IndexArrayIterator.EMP;
       }
     } else {
       // scan successors currentNode
-      final int p = getInsPosLinCSF(ne, vsn[0]);
+      final IntList p = getInsPosLinCSFNew(ne, vsn[0], casesen);
       if(!found) {
-        if (Token.diff((byte) Token.lc(ne[p + 1]), vsn[0]) != 0)
-          return null;
+        if (Token.diff((byte) Token.lc(ne[p.list[0] + 1]), vsn[0]) != 0)
+          return IndexArrayIterator.EMP;
         else
-          return getNodeFromCSTrie(ne[p], vsn);
+          return getNodeFromCSTrieNew(ne[p.list[0]], vsn, casesen);
       } else {
-        IndexArrayIterator d = getNodeFromCSTrie(ne[p], vsn);
-        if (Token.diff((byte) Token.lc(ne[p + 3]), vsn[0]) == 0) {
+        IndexArrayIterator d = IndexArrayIterator.EMP;
+        for (int z = 0; z < p.size; z++) {
           d = IndexArrayIterator.merge(
-              getNodeFromCSTrie(ne[p + 2], vsn), d);
+              getNodeFromCSTrieNew(ne[p.list[z]], vsn, casesen), d);
         }
         return d;
       }
     }
   }
 
+  
   /**
    * Parses the trie and backups each passed node its first/next child node
    * in idNN. If searchNode is contained, the corresponding node id is
@@ -892,9 +898,7 @@ public final class FTTrie extends Index {
    * @return inserting position
    */
   private int getInsertingPosition(final int[] cne, final int toInsert) {
-    if (cs)
-      return getInsPosLinCSF(cne, toInsert);
-    else return getInsertingPositionLinear(cne, toInsert);
+    return getInsertingPositionLinear(cne, toInsert);
   }
 
   /**
@@ -928,7 +932,7 @@ public final class FTTrie extends Index {
   /**
    * Uses linear search for finding inserting position.
    * values are order like this:
-   * a,A,b,B,r,T,s,y,Y
+   * A, B, T, Y, a, b, t, u, z
    * returns:
    * 0 if any successor exists, or 0 is inserting position
    * n here to insert
@@ -937,37 +941,38 @@ public final class FTTrie extends Index {
    *
    * @param cne current node entry
    * @param toInsert value to be inserted
+   * @param casesen flag for case sensitve search
    * @return inserting position
-   */
-  private int getInsPosLinCSF(final int[] cne,
-      final int toInsert) {
+   */  
+  private IntList getInsPosLinCSFNew(final int[] cne,
+      final int toInsert, final boolean casesen) {
     found = false;
 
     int i = cne[0] + 1;
     final int s = cne.length - 1;
-    if (s == i)
-      return i;
-    while (i < s && Token.diff(
-        (byte) Token.lc(cne[i + 1]), (byte) Token.lc(toInsert)) < 0) 
-      i += 2;
-
-    if (i < s) {
-      if(Token.diff((byte) cne[i + 1], (byte) toInsert) == 0) {
-        found = true;
-        return i;
-      } else if(Token.diff((byte) Token.lc(cne[i + 1]),
-          (byte) Token.lc(toInsert)) == 0) {
-        if (Token.eq((byte) cne[i + 1], (byte) Token.uc(toInsert))) {
-          return i;
-          }
-        if (i + 3 < s && Token.diff((byte) cne[i + 3], (byte) toInsert) == 0) {
-          found = true;
-        }
-        return i + 2;
-      }
+    IntList ial = new IntList();
+    if (s == i) {
+      ial.add(i);
+      return ial;
     }
-    return i;
+    while (i < s) {
+      if(Token.diff((byte) cne[i + 1], (byte) toInsert) == 0) {
+          found = true;
+          ial.add(i);
+          if (casesen) return ial;
+      } else if(!casesen && Token.diff((byte) Token.lc(cne[i + 1]),
+            (byte) Token.lc(toInsert)) == 0) {
+            found = true;
+            ial.add(i);
+      }
+      i += 2;
+      if (ial.size == 2) return ial;
+    }
+    
+    return ial;
   }
+
+  
 
   /** saves astericsWildCardTraversing result
   has to be re-init each time (before calling method). */
