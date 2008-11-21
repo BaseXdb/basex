@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import javax.swing.SwingUtilities;
 import org.basex.data.Data;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
@@ -87,7 +88,6 @@ public final class RealView extends View {
   protected void refreshContext(final boolean more, final boolean quick) {
     wwidth = -1;
     wheight = -1;
-    realImage = null;
     repaint();
   }
 
@@ -133,7 +133,6 @@ public final class RealView extends View {
     BaseXLayout.antiAlias(g);
     g.setColor(Color.BLACK);
     g.setFont(GUIConstants.font);
-    data.doc();
 
     /** Timer */
     final Performance perf = new Performance();
@@ -156,8 +155,8 @@ public final class RealView extends View {
           drawPrePost(g, 1, 1);
           break;
         case 3:
-          temperature(GUI.context.current().size == 0 ? 0
-              : GUI.context.current().nodes[0], g);
+          temperature(GUI.context.current().size == 0 ? 0 : 
+            GUI.context.current().nodes[0], g);
 
       }
     } else {
@@ -213,6 +212,20 @@ public final class RealView extends View {
     repaint();
   }
 
+  @Override
+  public void mouseClicked(final MouseEvent e) {
+   
+    final boolean left = SwingUtilities.isLeftMouseButton(e);
+    if(!left || focusedRealRect == null) return;
+    
+    View.notifyMark(0, this);
+    int pre = focusedRealRect.p;
+    if(e.getClickCount() > 1 && pre > -1) {
+      View.notifyContext(GUI.context.marked(), false, this);
+      refreshContext(false, false);
+    }
+  }
+
   /**Finds rectangle at cursor position.
    * @return focused rectangle
    */
@@ -249,12 +262,14 @@ public final class RealView extends View {
           //          System.out.println();
 
           focusedRealRect = r[i];
+          View.notifyFocus(r[i].p, this);
           return true;
         }
       }
 
     }
     focusedRealRect = null;
+    View.notifyFocus(-1, this);
     return false;
   }
 
