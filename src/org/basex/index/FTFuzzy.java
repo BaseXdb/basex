@@ -12,6 +12,7 @@ import org.basex.io.DataAccess;
 import org.basex.util.IntList;
 import org.basex.util.Levenshtein;
 import org.basex.util.Performance;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -176,7 +177,6 @@ public final class FTFuzzy extends Index {
     }
 
     if(i == indexsize) return null;
-    System.out.println("=> " + i);
 
     // back up last pointer on index
     lastIndex = (int) (1L + (i + 1) * 5L);
@@ -357,21 +357,23 @@ public final class FTFuzzy extends Index {
       if(k == 0) k = Math.max(1, tok.length >> 2);
       return getFuzzy(tok, k);
     }
-
+    
+    int pw = tok.length;
+    IndexArrayIterator iai = null;
     if(ft.wc) {
-      final int pw = indexOf(tok, '.');
-      if(pw != -1) return getTokenWildCard(lc(tok), pw);
+      pw = indexOf(tok, '.');
+      if(pw != -1) iai = getTokenWildCard(lc(tok), pw);
     }
 
     // get result iterator
-    final IndexIterator ii = get(lc(tok));
-    if (ii == IndexIterator.EMPTY || !ft.cs) return ii;
-
+    if (iai == null) iai = get(lc(tok));
+    if (iai == IndexArrayIterator.EMP || !ft.cs) return iai;
+    
     // case sensitive search
     // check real case of each result node
     final FTTokenizer ftdb = new FTTokenizer();
     ftdb.st = ft.st;
-    return csDBCheck((IndexArrayIterator) ii, data, ftdb, tok);
+    return csDBCheck(iai, data, ftdb, tok, pw);
  }
 
   /**
@@ -417,10 +419,11 @@ public final class FTFuzzy extends Index {
    * @param d Data-reference
    * @param ftdb Fulltext Tokenizer
    * @param token token
+   * @param pw position of wildcard
    * @return counter
    */
   static IndexArrayIterator csDBCheck(final IndexArrayIterator ids, 
-      final Data d, final FTTokenizer ftdb, final byte[] token) {
+      final Data d, final FTTokenizer ftdb, final byte[] token, final int pw) {
     
     return new IndexArrayIterator(1) {
       FTNode r;
@@ -440,9 +443,16 @@ public final class FTFuzzy extends Index {
             
             // token found - match case sensitivity
             ftdb.cs = true;
-            if(!eq(token, ftdb.get())) {
-              r.removePos();
-            }
+            //if (pw < token.length) {
+              final byte[] b = ftdb.get();
+              if (pw > b.length 
+                  || !eq(Token.substring(token, 0, pw), 
+                      Token.substring(b, 0, pw))) {
+                r.removePos();
+              }
+            //} else if(!eq(token, ftdb.get())) {
+            //  r.removePos();
+            //}
           }
           if (r.hasPos()) return true;
         }
@@ -520,7 +530,8 @@ public final class FTFuzzy extends Index {
    * @param posw position of the wildcard in tok
    * @return data found
    */
-  private IndexIterator getTokenWildCard(final byte[] tok, final int posw) {
+  private IndexArrayIterator getTokenWildCard(final byte[] tok, 
+      final int posw) {
     if (tok[posw] == '.' && tok.length > posw + 1 && tok[posw + 1] == '*') {
       int[][] b;
       IndexArrayIterator it = new IndexArrayIterator(0);

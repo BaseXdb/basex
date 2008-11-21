@@ -40,7 +40,6 @@ public final class FTTest extends AbstractTest {
       "</fttest>";
 
     queries = new Object[][] {
-        
         { "Simple 1", bool(true),
           "'abc' ftcontains 'abc'" },
         { "Simple 2", bool(true),
@@ -151,7 +150,7 @@ public final class FTTest extends AbstractTest {
           "with wildcards case sensitive]" },
         { "FTWildCard 10", nodes(5, 9, 11),
           "/fttest/co/w [text() ftcontains 'x.+' with wildcards uppercase]" },
-        { "FTWildCard 11", nodes(39, 40),
+        { "FTWildCard 11", nodes(40),
           "/fttest/wld [text() ftcontains '.*' with wildcards]" },
         { "FTWildCard 12", nodes(40),
           "/fttest/wld [text() ftcontains '.+' with wildcards]" },

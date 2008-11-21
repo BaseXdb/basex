@@ -75,7 +75,8 @@ public final class FTIndex extends FTArrayExpr {
     int w = 0;
     while(ft.more()) {
       final IndexIterator it = data.ids(ft);
-      if(it == IndexIterator.EMPTY) return Bln.FALSE;
+      if(it == IndexIterator.EMPTY || it == IndexArrayIterator.EMP) 
+        return Bln.FALSE;
       if(w == 0) {
         iat = (IndexArrayIterator) it;  
       } else {

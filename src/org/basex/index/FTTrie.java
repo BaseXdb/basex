@@ -2,6 +2,8 @@ package org.basex.index;
 
 import static org.basex.Text.*;
 import static org.basex.data.DataText.*;
+import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.Prop;
@@ -111,25 +113,26 @@ public final class FTTrie extends Index {
       return getNodeFuzzy(0, null, -1, tok, 0, 0, 0, k);
     }
 
+    IndexArrayIterator iai = null;
+    int pw = tok.length;
     if(ft.wc) {
-      final int pw = Token.indexOf(tok, '.');
-      if(pw != -1) {
-        return getNodeFromTrieWithWildCard(tok, pw);
-      }
+      pw = Token.indexOf(tok, '.');
+      if(pw != -1) iai = getNodeFromTrieWithWildCard(lc(tok), pw);
     }
 
     if(!cs && ft.cs) {
       // case insensitive index create - check real case with dbdata
-      IndexArrayIterator iai 
-        = getNodeFromTrieRecursive(0, Token.lc(tok), false);
+      if (iai == null)  iai = getNodeFromTrieRecursive(0, Token.lc(tok), false);
       if(iai == IndexArrayIterator.EMP) return iai;
 
       // check real case of each result node
       final FTTokenizer ftdb = new FTTokenizer();
       ftdb.st = ft.st;
-      return FTFuzzy.csDBCheck(iai, data, ftdb, tok);
+      return FTFuzzy.csDBCheck(iai, data, ftdb, tok, pw);
     }
 
+    if (iai != null) return iai;
+    
     // check if result was cached
     final int id = cache.id(tok);
     IndexArrayIterator tmp = IndexArrayIterator.EMP;
