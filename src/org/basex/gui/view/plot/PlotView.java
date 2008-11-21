@@ -294,7 +294,7 @@ public final class PlotView extends View implements Runnable {
         g.setFont(GUIConstants.font);
         final int textH = g.getFontMetrics().getHeight();
         final String name = plotData.getName(focused) + 
-          (ol > 1 ? ("  (" + ol + ") ") : "bla");
+          (ol > 1 ? ("  (" + ol + ") ") : "");
         final String x = formatString(true);
         final String y = formatString(false);
         final String label = (x.length() > 16 ?
