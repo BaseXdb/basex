@@ -254,6 +254,7 @@ public final class PlotView extends View implements Runnable {
       refreshInit();
       return;
     }
+    if(plotData.pres.length < 1) return;
 
     final int w = getWidth();
     final int h = getHeight();
