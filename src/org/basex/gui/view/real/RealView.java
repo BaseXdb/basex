@@ -19,7 +19,7 @@ import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 
-/**
+/*
  * This class offers a real tree view.
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Wolfgang Miller, Philipp Ziemer
@@ -85,7 +85,6 @@ public final class RealView extends View {
 
   @Override
   protected void refreshContext(final boolean more, final boolean quick) {
-    System.out.println("HI");
     repaint();
   }
 
@@ -99,7 +98,6 @@ public final class RealView extends View {
   protected void refreshInit() {
     wwidth = -1;
     wheight = -1;
-    rects = null;
     realImage = null;
     repaint();
   }
@@ -115,7 +113,6 @@ public final class RealView extends View {
 
     wwidth = -1;
     wheight = -1;
-    rects = null;
     realImage = null;
     repaint();
   }
@@ -221,7 +218,7 @@ public final class RealView extends View {
 
     if(rects == null) return false;
 
-//    final Data data = GUI.context.data();
+    //    final Data data = GUI.context.data();
     final Iterator<RealRect[]> it = rects.iterator();
 
     while(it.hasNext()) {
@@ -230,21 +227,21 @@ public final class RealView extends View {
       for(int i = 0; i < r.length; i++) {
         if(r[i].contains(mousePosX, mousePosY)) {
 
-//          final int pre = r[i].p;
-//          String s = "";
-//
-//          if(data.kind(pre) == Data.ELEM) {
-//            s = Token.string(data.tag(pre));
-//          } else {
-//            s = Token.string(data.text(pre));
-//          }
-//
-//          for(int y = 0; y < data.attSize(pre, data.kind(pre)) - 1; y++) {
-//            s = " " + Token.string(data.attName(pre + y + 1)) + "=" + "\""
-//                + Token.string(data.attValue(pre + y + 1)) + "\" ";
-//          }
-//          System.out.print(s);
-//          System.out.println();
+          //          final int pre = r[i].p;
+          //          String s = "";
+          //
+          //          if(data.kind(pre) == Data.ELEM) {
+          //            s = Token.string(data.tag(pre));
+          //          } else {
+          //            s = Token.string(data.text(pre));
+          //          }
+          //
+          //          for(int y = 0; y < data.attSize(pre, data.kind(pre)) - 1; y++) {
+          //            s = " " + Token.string(data.attName(pre + y + 1)) + "=" + "\""
+          //                + Token.string(data.attValue(pre + y + 1)) + "\" ";
+          //          }
+          //          System.out.print(s);
+          //          System.out.println();
 
           focusedRealRect = r[i];
           return true;
