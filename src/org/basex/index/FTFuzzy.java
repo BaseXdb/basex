@@ -236,6 +236,8 @@ public final class FTFuzzy extends Index {
         int c = 0;
         long pos = p;
         FTNode n = new FTNode();
+        int tn;
+        FTTokenizer[] tok = null;
         
         @Override
         public boolean more() {
@@ -264,8 +266,25 @@ public final class FTFuzzy extends Index {
         }
         
         @Override
-        public FTNode nextFTNodeFD() {
+        public FTNode nextFTNode() {
+          n.genPointer(tn);
+          if(tok != null) n.setToken(tok);
           return n;
+        }
+        
+        @Override
+        public int next() {
+          return n.getPre();
+        }        
+        
+        @Override
+        public void setTokenNum(final int t) {
+          tn = t;
+        }
+        
+        @Override
+        public void setToken(final FTTokenizer[] token) {
+          tok = token;
         }
       };
     } else {
@@ -420,6 +439,7 @@ public final class FTFuzzy extends Index {
     return new IndexArrayIterator(1) {
       FTNode r;
       int tn;
+      FTTokenizer[] tokens = null;
       
       @Override
       public boolean more() {
@@ -449,6 +469,7 @@ public final class FTFuzzy extends Index {
       public FTNode nextFTNode() {
         r.genPointer(tn);
         r.reset();
+        if (tokens != null) r.setToken(tokens);
         return r;
       }
 
@@ -460,6 +481,11 @@ public final class FTFuzzy extends Index {
       @Override
       public void setTokenNum(final int t) {
         tn = t;
+      }
+      
+      @Override
+      public void setToken(final FTTokenizer[] token) {
+        tokens = token;
       }
     };
   }

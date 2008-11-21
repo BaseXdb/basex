@@ -80,8 +80,7 @@ public final class FTSelect extends FTArrayExpr {
     ftpos.pos.setPos(ftn.convertPos(), ftn.p.list[0]);
     if (ftn.getToken() != null) {
         ftpos.pos.ft.init(ctx.item.data.text(ftn.getPre()));
-        ftpos.pos.term = ftpos.pos.ft.getTokenList();
-        
+        ftpos.pos.term = ftpos.pos.ft.getTokenList();       
     }
   }
   

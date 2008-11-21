@@ -909,6 +909,8 @@ public final class FTTrie extends Index {
         int c = 0;
         long pos = ldid;
         FTNode n = new FTNode();
+        int tn;
+        FTTokenizer[] tok = null;
         
         @Override
         public boolean more() {
@@ -937,9 +939,28 @@ public final class FTTrie extends Index {
         }
         
         @Override
-        public FTNode nextFTNodeFD() {
+        public FTNode nextFTNode() {
+          n.genPointer(tn);
+          if (tok != null) n.setToken(tok);
           return n;
         }
+        
+        @Override
+        public int next() {
+          return n.getPre();
+        }        
+
+        @Override
+        public void setTokenNum(final int t) {
+          tn = t;
+        }
+
+        @Override
+        public void setToken(final FTTokenizer[] token) {
+          tok = token;
+        }
+
+        
       };
     } else {
       return new IndexArrayIterator(getDataFromDataArray(s, ldid), true);

@@ -38,7 +38,11 @@ public final class FTTest extends AbstractTest {
       "</fttest>";
 
     queries = new Object[][] {
-          
+        { "FTPosFilter 1", nodes(3, 5, 9, 11),
+        "//w [. ftcontains 'xml' at start]" },
+
+        
+        
         { "Simple 1", bool(true),
           "'abc' ftcontains 'abc'" },
         { "Simple 2", bool(true),
