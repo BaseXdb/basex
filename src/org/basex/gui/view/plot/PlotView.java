@@ -220,8 +220,8 @@ public final class PlotView extends View implements Runnable {
         plotHeight - sz);
 
     // draw axis and grid
-    drawAxis(g, true);
-    drawAxis(g, false);
+      drawAxis(g, true);
+      drawAxis(g, false);
 
     // draw dark plot bounder
     g.setColor(GUIConstants.color6);
@@ -254,7 +254,6 @@ public final class PlotView extends View implements Runnable {
       refreshInit();
       return;
     }
-    if(plotData.pres.length < 1) return;
 
     final int w = getWidth();
     final int h = getHeight();
@@ -269,8 +268,6 @@ public final class PlotView extends View implements Runnable {
       return;
     }
 
-    painting = true;
-
     // draw buffered plot image
     if(plotImg == null || plotChanged) createPlotImage();
     g.drawImage(plotImg, 0, 0, this);
@@ -278,7 +275,9 @@ public final class PlotView extends View implements Runnable {
     // draw buffered image of marked items
     if(markingChanged || markedImg == null) createMarkedNodes();
     g.drawImage(markedImg, 0, 0, this);
+    if(plotData.pres.length < 1) return;
 
+    painting = true;
     // draw focused item
     final int f = plotData.findPre(focused);
     if(f > -1) {
@@ -450,6 +449,11 @@ public final class PlotView extends View implements Runnable {
       // drawing vertical axis line
       g.drawLine(MARGIN[1], MARGIN[0], MARGIN[1], getHeight() - MARGIN[2]);
       if(plotChanged) axis.calcCaption(pHeight);
+    }
+    if(plotData.pres.length < 1) {
+      drawCaptionAndGrid(g, drawX, "", 0);
+      drawCaptionAndGrid(g, drawX, "", 1);
+      return;
     }
 
     // getting some axis specific data
