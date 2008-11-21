@@ -51,7 +51,7 @@ public final class QueryTest {
     Prop.textindex = true;
     Prop.attrindex = true;
     Prop.ftindex = true;
-    Prop.ftfuzzy = true;
+    Prop.ftfuzzy = false;
     Prop.ftittr = true;
     Prop.chop = true;
 

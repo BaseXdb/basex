@@ -12,6 +12,7 @@ import org.basex.query.xpath.internal.FTIndex;
 import org.basex.query.xpath.item.Bln;
 import org.basex.query.xpath.item.Item;
 import org.basex.query.xpath.locpath.Step;
+import org.basex.util.Token;
 
 /**
  * Fulltext primary expression and FTTimes.
@@ -97,8 +98,10 @@ public final class FTWords extends FTArrayExpr {
     // - if wildcards are specified, the fulltext index is a trie
     // - no FTTimes option is specified
     return //meta.ftcs == fto.is(FTOpt.CS) && 
+    
       meta.ftdc == fto.is(FTOpt.DC) && meta.ftst == fto.is(FTOpt.ST) &&
-      fto.sw == null && (!fto.is(FTOpt.WC) || !meta.ftfz) &&
+      fto.sw == null && (!fto.is(FTOpt.WC) || !meta.ftfz 
+          || Token.contains(token, '*')) &&
       occ[0] == 1  && occ[1] == Long.MAX_VALUE;
   }
   

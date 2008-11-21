@@ -35,13 +35,11 @@ public final class FTTest extends AbstractTest {
       "  <atr key='value'/>" +
       "  <w>the fifth sentence. fourth sentence. " +
       "third sentence. second sentence. first sentence.</w>\n" +
+      "  <wld/>\n" +
+      "  <wld>yeah</wld>\n" +
       "</fttest>";
 
     queries = new Object[][] {
-        { "FTPosFilter 1", nodes(3, 5, 9, 11),
-        "//w [. ftcontains 'xml' at start]" },
-
-        
         
         { "Simple 1", bool(true),
           "'abc' ftcontains 'abc'" },
@@ -153,6 +151,11 @@ public final class FTTest extends AbstractTest {
           "with wildcards case sensitive]" },
         { "FTWildCard 10", nodes(5, 9, 11),
           "/fttest/co/w [text() ftcontains 'x.+' with wildcards uppercase]" },
+        { "FTWildCard 11", nodes(39, 40),
+          "/fttest/wld [text() ftcontains '.*' with wildcards]" },
+        { "FTWildCard 12", nodes(40),
+          "/fttest/wld [text() ftcontains '.+' with wildcards]" },
+  
           
         { "FTAnyAllOption 1", nodes(3, 5, 7, 9, 11),
           "/fttest/co/w [text() ftcontains 'xml' any]" },
@@ -328,8 +331,8 @@ public final class FTTest extends AbstractTest {
 
     /** TABLE REPRESENTATION
     PRE DIS SIZ ATS  NS  KIND  CONTENT
-      0   1  39   1   0  DOC   tmp
-      1   1  38   1   0  ELEM  fttest
+      0   1  42   1   0  DOC   tmp
+      1   1  41   1   0  ELEM  fttest
       2   1  11   1   0  ELEM  co
       3   1   2   1   0  ELEM  w
       4   1   1   1   0  TEXT  xml in the first sentence. second sentence.
@@ -371,6 +374,9 @@ public final class FTTest extends AbstractTest {
      37  36   2   1   0  ELEM  w
      38   1   1   1   0  TEXT  the fifth sentence. fourth sentence.
        third sentence. second sentence. first sentence.
+     39   1   1   1   0  ELEM  wld
+     40   1   2   1   0  ELEM  wld
+     41   1   1   1   0  TEXT  yeah
      */
   }
 }

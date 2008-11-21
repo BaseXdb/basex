@@ -7,6 +7,7 @@ import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.Data;
+import org.basex.data.MetaData;
 import org.basex.io.DataAccess;
 import org.basex.util.IntList;
 import org.basex.util.Levenshtein;
@@ -225,12 +226,15 @@ public final class FTFuzzy extends Index {
    *
    * @param s number of pre/pos values
    * @param p pointer on data
+   * @param da DataAccess for reading ftdata
+   * @param md MetaData 
    * @return  int[][] data
    */
-  private IndexArrayIterator getData(final long p, final int s) {
+  public static IndexArrayIterator getData(final long p, final int s, 
+      final DataAccess da, final MetaData md) {
     if(s == 0 || p < 0) return IndexArrayIterator.EMP;
     
-    if (data.meta.ftittr) {
+    if (md.ftittr) {
       return new IndexArrayIterator(s) {
         boolean f = true;
         int lpre = -1;
@@ -245,21 +249,21 @@ public final class FTFuzzy extends Index {
           int pre;
           if (f) {
             f = false;
-            pre = dat.readNum(pos);
-            pos = dat.pos();
+            pre = da.readNum(pos);
+            pos = da.pos();
           } else {
             pre = lpre;
           }
           
           f = false;
           il.add(pre);
-          il.add(dat.readNum(pos));
+          il.add(da.readNum(pos));
           c++;
-          while (c < s && (lpre = dat.readNum()) == pre) {
-            il.add(dat.readNum());
+          while (c < s && (lpre = da.readNum()) == pre) {
+            il.add(da.readNum());
             c++;
           }
-          pos = dat.pos();
+          pos = da.pos();
           n = new FTNode(il.finish(), 1);
           return true;
         }
@@ -278,9 +282,9 @@ public final class FTFuzzy extends Index {
       };
     } else {
       final int[][] dt = new int[2][s];
-      dat.cursor(p);
-      for(int i = 0; i < s; i++) dt[0][i] = dat.readNum();
-      for(int i = 0; i < s; i++) dt[1][i] = dat.readNum();  
+      da.cursor(p);
+      for(int i = 0; i < s; i++) dt[0][i] = da.readNum();
+      for(int i = 0; i < s; i++) dt[1][i] = da.readNum();  
       return new IndexArrayIterator(dt, true);
     }
   }
@@ -320,7 +324,7 @@ public final class FTFuzzy extends Index {
         if (calcEQ(to, 0, tok, e)) {
           // read data
           it = IndexArrayIterator.merge(getData(getPointerOnData(p, ts), 
-              getDataSize(p, ts)), it);
+              getDataSize(p, ts), dat, data.meta), it);
         }
         p += ts + 4L  + 5L;
      }
@@ -339,7 +343,8 @@ public final class FTFuzzy extends Index {
   private IndexArrayIterator get(final byte[] tok) {
     final long p = getPointerOnToken(tok);
     if(p == -1) return IndexArrayIterator.EMP;
-    return getData(getPointerOnData(p, tok.length), getDataSize(p, tok.length));
+    return getData(getPointerOnData(p, tok.length), getDataSize(p, tok.length),
+        dat, data.meta);
   }
 
   @Override
@@ -464,7 +469,7 @@ public final class FTFuzzy extends Index {
   public int nrIDs(final IndexToken index) {
     // hack, should find general solution
     final FTTokenizer fto = (FTTokenizer) index;
-    if(fto.fz) return 1;
+    if(fto.fz || fto.wc) return 1;
 
     // specified ft options are not checked yet...
     final byte[] tok = lc(index.get());
@@ -532,7 +537,7 @@ public final class FTFuzzy extends Index {
         if (contains(tok, posw, dtok)) {
           it = IndexArrayIterator.merge(
             getData(getPointerOnData(b[0][1], b[0][0]),
-                getDataSize(b[0][1], b[0][0])), it);
+                getDataSize(b[0][1], b[0][0]), dat, data.meta), it);
         }
         b[0][1] += b[0][0] * 1L + 9L;
       }
@@ -540,7 +545,7 @@ public final class FTFuzzy extends Index {
       if (contains(tok, posw, dtok)) {
         it = IndexArrayIterator.merge(
             getData(getPointerOnData(b[0][1], b[0][0]),
-                getDataSize(b[0][1], b[0][0])), it);
+                getDataSize(b[0][1], b[0][0]), dat, data.meta), it);
       }
       return it;
     }

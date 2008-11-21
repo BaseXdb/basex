@@ -8,7 +8,6 @@ import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataAccess;
 import org.basex.util.Array;
-import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -137,7 +136,7 @@ public final class FTTrie extends Index {
     if (id > -1) {
       final int size = cache.getSize(id);
       final long p = cache.getPointer(id);
-      return getData(size, p);
+      return FTFuzzy.getData(p, size, inD, data.meta);
     } else {
       tmp = getNodeFromTrieRecursive(0, tok, ft.cs);
     }
@@ -263,7 +262,7 @@ public final class FTTrie extends Index {
     } else {
       ne = getNodeEntry(b);
       ldid = did;
-      dt = getData(ne[ne.length - 1], ldid);
+      dt = FTFuzzy.getData(ldid, ne[ne.length - 1], inD, data.meta);
       //dt = getDataFromDataArray(ne[ne.length - 1], ldid);
       dt = getAllNodes(b, b, dt);
     }
@@ -279,7 +278,8 @@ public final class FTTrie extends Index {
     if (id > -1) {
       ne = getNodeEntry(id);
       ldid = did;
-      final IndexArrayIterator tmp = getData(ne[ne.length - 1], ldid);
+      final IndexArrayIterator tmp = 
+        FTFuzzy.getData(ldid, ne[ne.length - 1], inD, data.meta);
       dt = IndexArrayIterator.merge(getAllNodes(id, b, tmp), dt);
       //final int[][] tmp = getDataFromDataArray(ne[ne.length - 1], ldid);
       //dt = calculateFTOr(dt, getAllNodes(id, b, tmp));
@@ -330,7 +330,7 @@ public final class FTTrie extends Index {
     }
 
     final long ldid = did;
-    return getData(ne[ne.length - 1], ldid);
+    return FTFuzzy.getData(ldid, ne[ne.length - 1], inD, data.meta);
   }
 
   /**
@@ -418,7 +418,7 @@ public final class FTTrie extends Index {
         if(vsn.length == i) {
           // leaf node found with appropriate value
           ldid = did;
-          return getData(ne[ne.length - 1], ldid);
+          return FTFuzzy.getData(ldid, ne[ne.length - 1], inD, data.meta);
         } else {
           // cut valueSearchNode for value current node
           final byte[] tmp = new byte[vsn.length - i];
@@ -581,12 +581,14 @@ public final class FTTrie extends Index {
       if (vid == c + ne[0]) {
         if (checkLBConstrain(vn, vid, lb, lbid)
             && checkUBConstrain(vn, vid, ub, ubid)) {
-          dn = IndexArrayIterator.merge(getData(ne[ne.length - 1], ldid), dn);
+          dn = IndexArrayIterator.merge(
+              FTFuzzy.getData(ldid, ne[ne.length - 1], inD, data.meta), dn);
         }
       } else {
         if (checkLBConstrainDbl(vn, vid, lb, lbid)
             && checkUBConstrainDbl(vn, vid, ub, ubid)) {
-          dn = IndexArrayIterator.merge(getData(ne[ne.length - 1], ldid), dn);
+          dn = IndexArrayIterator.merge(
+              FTFuzzy.getData(ldid, ne[ne.length - 1], inD, data.meta), dn);
         }
       }
 
@@ -631,7 +633,8 @@ public final class FTTrie extends Index {
     final int[] ne = getNodeEntry(id);
     final long tdid = did;
     if(dotFound) {
-      dn = IndexArrayIterator.merge(getData(ne[ne.length - 1], tdid), dn);
+      dn = IndexArrayIterator.merge(
+          FTFuzzy.getData(tdid, ne[ne.length - 1], inD, data.meta), dn);
       if (!hasNextNodes(ne)) return dn;
       for (int i = ne[0] + 1; i < ne.length - 2; i += 2) {
         dn = IndexArrayIterator.merge(
@@ -643,7 +646,8 @@ public final class FTTrie extends Index {
     final int neID = getIndexDotNE(ne);
     if (!Token.digit(ne[1]) || neID > l2) return dn;
     if (l1 <= neID && neID <= l2)  {
-      dn = IndexArrayIterator.merge(getData(ne[ne.length - 1], tdid), dn);
+      dn = IndexArrayIterator.merge(
+          FTFuzzy.getData(tdid, ne[ne.length - 1], inD, data.meta), dn);
       if (!hasNextNodes(ne)) return dn;
       for (int i = ne[0] + 1; i < ne.length - 1; i += 2) {
         dn = IndexArrayIterator.merge(getAllNodesWithLevel(ne[i], l1 - ne[0],
@@ -785,7 +789,8 @@ public final class FTTrie extends Index {
       //int[][] newData = dt;
       final int[] ne = getNodeEntry(cn);
       final long tdid = did;
-      final IndexArrayIterator tmp = getData(ne[ne.length - 1], tdid);
+      final IndexArrayIterator tmp 
+        = FTFuzzy.getData(tdid, ne[ne.length - 1], inD, data.meta);
       //final int[][] tmp = getDataFromDataArray(ne[ne.length - 1], tdid);
       if (tmp != null) {
         //newData = calculateFTOr(dt, tmp);
@@ -862,97 +867,7 @@ public final class FTTrie extends Index {
     return r;
   }
 
-  /**
-   * Extracts data from disk and returns it in
-   * [[pre1, ..., pres], [pos1, ..., poss]] representation.
-   *
-   * @param s number of pre/pos values
-   * @param ldid pointer on data
-   * @return  int[][] data
-   */
-  private int[][] getDataFromDataArray(final int s, final long ldid) {
-    if(s == 0 || ldid < 0) return null;
-    final int[][] dt = new int[2][s];
-    dt[0][0] = inD.readNum(ldid);
-
-    if (data.meta.ftittr) {
-      dt[1][0] = inD.readNum();
-      for(int i = 1; i < s; i++) {
-        dt[0][i] = inD.readNum();
-        dt[1][i] = inD.readNum();
-      }
-    } else {
-      for(int i = 1; i < s; i++) {
-        dt[0][i] = inD.readNum();
-      }
-      
-      for(int i = 0; i < s; i++) {
-        dt[1][i] = inD.readNum();
-      }
-    }
-    return dt;
-  }
-
-  /**
-   * Read fulltext data from disk.
-   * 
-   * @param s size
-   * @param ldid pointer on data
-   * @return IndexArrayIterator
-   */
-  private IndexArrayIterator getData(final int s, final long ldid) {
-    if (s == 0 || ldid < 0) return IndexArrayIterator.EMP;
-    if (data.meta.ftittr) {
-      return new IndexArrayIterator(s) {
-        boolean f = true;
-        int lpre = -1;
-        int c = 0;
-        long pos = ldid;
-        FTNode n = new FTNode();
-        
-        @Override
-        public boolean more() {
-          if (c == s) return false;
-          IntList il = new IntList();
-          int pre;
-          if (f) {
-            f = false;
-            pre = inD.readNum(pos);
-            pos = inD.pos();
-          } else {
-            pre = lpre;
-          }
-          
-          f = false;
-          il.add(pre);
-          il.add(inD.readNum(pos));
-          c++;
-          while (c < s && (lpre = inD.readNum()) == pre) {
-            il.add(inD.readNum());
-            c++;
-          }
-          pos = inD.pos();
-          n = new FTNode(il.finish(), 1);
-          return true;
-        }
-        
-        @Override
-        public FTNode nextFTNode() {
-          n.genPointer(toknum);
-          if (tok != null) n.setToken(tok);
-          return n;
-        }
-        
-        @Override
-        public int next() {
-          return n.getPre();
-        }        
-      };
-    } else {
-      return new IndexArrayIterator(getDataFromDataArray(s, ldid), true);
-    }
-  }
-  
+   
   /**
    * Save whether a corresponding node was found in method getInsertingPosition.
    */
@@ -1093,7 +1008,7 @@ public final class FTTrie extends Index {
       // save data current node
       if (ne[ne.length - 1] > 0) {
         idata = IndexArrayIterator.merge(
-            getData(ne[ne.length - 1], tdid), idata);
+            FTFuzzy.getData(tdid, ne[ne.length - 1], inD, data.meta), idata);
       }
       if (hasNextNodes(ne)) {
         // preorder traversal through trie
@@ -1137,7 +1052,7 @@ public final class FTTrie extends Index {
     } else if(j == ending.length && i == ne[0] + 1) {
       // all chars form node and all chars from ending done
       idata = IndexArrayIterator.merge(
-          getData(ne[ne.length - 1], tdid), idata);
+          FTFuzzy.getData(tdid, ne[ne.length - 1], inD, data.meta), idata);
       
       countSkippedChars = 0;
 
@@ -1522,7 +1437,7 @@ public final class FTTrie extends Index {
           // leafnode found with appropriate value
           if (c >= d + p + r) {
             IndexArrayIterator ld = IndexArrayIterator.EMP;
-            ld = getData(cne[cne.length - 1], cdid);
+            ld = FTFuzzy.getData(cdid, cne[cne.length - 1], inD, data.meta);
             if (hasNextNodes(cne)) {
               for (int t = cne[0] + 1; t < cne.length - 1; t++) {
                 ld = IndexArrayIterator.merge(getNodeFuzzy(cne[t], null, -1,

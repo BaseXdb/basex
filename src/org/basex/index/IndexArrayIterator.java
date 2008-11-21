@@ -186,8 +186,10 @@ public class IndexArrayIterator extends IndexIterator {
       @Override
       public boolean more() {
         r = null;
-        n[0] = (c == 0 || c == -1) && iai1.more() ? iai1.nextFTNode() : null;
-        n[1] = (c == 1 || c == -1) && iai2.more() ? iai2.nextFTNode() : null;
+        n[0] = (c == 0 || c == -1) ? iai1.more() 
+            ? iai1.nextFTNode() : null : n[0];
+        n[1] = (c == 1 || c == -1) ? iai2.more() 
+            ? iai2.nextFTNode() : null : n[1];
         if (n[0] != null) {
           if (n[1] != null) {
             final int dis = n[0].getPre() - n[1].getPre();
@@ -199,6 +201,7 @@ public class IndexArrayIterator extends IndexIterator {
               c = 1;
             } else {
               n[0].merge(n[1], 0);
+              n[0].reset();
               r = n[0];
               c = -1;
             }
