@@ -19,7 +19,7 @@ import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 
-/**
+/*
  * This class offers a real tree view.
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Wolfgang Miller, Philipp Ziemer
@@ -110,7 +110,6 @@ public final class RealView extends View {
 
   @Override
   protected void refreshMark() {
-
     wwidth = -1;
     wheight = -1;
     realImage = null;
@@ -154,7 +153,8 @@ public final class RealView extends View {
           drawPrePost(g, 1, 1);
           break;
         case 3:
-          temperature(0, g);
+          temperature(GUI.context.marked().size == 0 ? 0
+              : GUI.context.marked().nodes[0], g);
 
       }
     } else {
