@@ -10,7 +10,7 @@ import org.basex.util.Token;
  */
 public abstract class IndexToken {
   /** Index types. */
-  public enum TYPE {
+  public enum Type {
     /** Attribute index. */ ATN,
     /** Tag index.       */ TAG,
     /** Text index.      */ TXT,
@@ -20,13 +20,13 @@ public abstract class IndexToken {
   /** Text. */
   public byte[] text = Token.EMPTY;
   /** Index type. */
-  public TYPE type;
+  public Type type;
 
   /**
    * Constructor.
    * @param t index type
    */
-  public IndexToken(final TYPE t) {
+  public IndexToken(final Type t) {
     type = t;
   }
   

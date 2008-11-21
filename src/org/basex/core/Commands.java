@@ -3,41 +3,37 @@ package org.basex.core;
 import static org.basex.Text.*;
 
 /**
- * This class defines the project commands.
+ * This class defines the available command-line commands.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 @SuppressWarnings("all")
 public interface Commands {
-  /** Commands. */
-  enum COMMANDS {
+  /** Command definitions. */
+  enum Cmd {
     // DATABASE COMMANDS
-    DUMMYDATABASE(), CREATE(true), OPEN(true), INFO(true), CHECK(),
+    DUMMYDATABASE(false), CREATE(true), OPEN(true), INFO(true), CHECK(false),
     CLOSE(true), LIST(true), DROP(true), OPTIMIZE(true), EXPORT(true),
     // QUERY COMMANDS
-    DUMMYQUERY(), XPATH(true), XPATHMV(false), XQUERY(true), XQUENV(),
-    FIND(true), XMARK(), CS(true), BASH(true),
+    DUMMYQUERY(false), XPATH(true), XPATHMV(false), XQUERY(true),
+    XQUENV(false), FIND(true), XMARK(false), CS(true), BASH(true),
     // UPDATE COMMANDS
-    DUMMYUPDATE(), COPY(true), DELETE(true), INSERT(true), UPDATE(true),
+    DUMMYUPDATE(false), COPY(true), DELETE(true), INSERT(true), UPDATE(true),
     // GENERAL COMMANDS
-    DUMMYGENERAL(), SET(true), HELP(true), PING(), PROMPT(), EXIT(true), QUIT(),
+    DUMMYGENERAL(false), SET(true), HELP(true), PING(false), PROMPT(false),
+    EXIT(true), QUIT(false),
     // SERVER COMMANDS
-    GETRESULT(), GETINFO(), STOP();
+    GETRESULT(false), GETINFO(false), STOP(false);
     
     /** Flag for official (public) commands. */
-    boolean official;
-
-    /** Default Constructor. */
-    private COMMANDS() {
-      this(false);
-    }
+    final boolean official;
 
     /**
      * Constructor, initializing the constants.
-     * @param o official command
+     * @param o official command flag
      */
-    private COMMANDS(final boolean o) {
+    private Cmd(final boolean o) {
       official = o;
     }
 
@@ -47,7 +43,7 @@ public interface Commands {
      * @param all show all commands (also hidden ones)
      * @return string
      */
-    public String help(final boolean detail, final boolean all) {
+    public final String help(final boolean detail, final boolean all) {
       final StringBuilder sb = new StringBuilder();
 
       final Object args = help(0);
@@ -76,27 +72,27 @@ public interface Commands {
     }
   }
   
-  /** Create Commands. */
-  enum CREATE { DATABASE, DB, MAB2, MAB, FS, XML, INDEX }
+  /** Create Command definitions. */
+  enum CmdCreate { DATABASE, DB, MAB2, MAB, FS, XML, INDEX }
   
-  /** Index Types. */
-  enum INDEX { TEXT, ATTRIBUTE, FULLTEXT }
+  /** Index Types definition. */
+  enum CmdIndex { TEXT, ATTRIBUTE, FULLTEXT }
   
-  /** Info commands. */
-  enum INFO { NULL, DATABASE, DB, INDEX, TABLE }
+  /** Info command definitions. */
+  enum CmdInfo { NULL, DATABASE, DB, INDEX, TABLE }
   
-  /** Drop commands. */
-  enum DROP { DATABASE, DB, INDEX }
+  /** Drop command definitions. */
+  enum CmdDrop { DATABASE, DB, INDEX }
   
-  /** Filesystem commands. */
-  enum FS { CAT, CD, CP, DU, EXT, EXIT, HELP, LOCATE,
+  /** Filesystem command definitions. */
+  enum CmdFS { CAT, CD, CP, DU, EXT, EXIT, HELP, LOCATE,
     L, LS, MKDIR, PWD, RM, TOUCH }
   
-  /** Insert commands. */
-  enum UPDATE { FRAGMENT, ELEMENT, TEXT, ATTRIBUTE, COMMENT, PI }
+  /** Insert command definitions. */
+  enum CmdUpdate { FRAGMENT, ELEMENT, TEXT, ATTRIBUTE, COMMENT, PI }
   
-  /** Set commands. */
-  enum SET {
+  /** Set command definitions. */
+  enum CmdSet {
     INFO, DEBUG, SERIALIZE, XMLOUTPUT, MAINMEM, CHOP,
     ENTITY, TEXTINDEX, ATTRINDEX, FTINDEX
   }

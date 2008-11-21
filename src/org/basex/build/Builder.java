@@ -56,29 +56,29 @@ public abstract class Builder extends Progress {
   private int level;
 
   /**
-   * Constructor.
+   * Default constructor.
    */
   protected Builder() {
     tags = new Names();
     atts = new Names();
   }
 
-  // abstract methods
+  // Abstract Methods ==========================================================
 
   /**
-   * Initializes the table construction.
+   * Initializes the database construction.
    * @param db name of database
    * @return builder instance
    * @throws IOException in case of parsing or writing problems
    */
-  protected abstract Builder init(String db) throws IOException;
+  public abstract Builder init(String db) throws IOException;
 
   /**
-   * Finishes the build process and returns a database instance.
+   * Finishes the build process and returns a database reference.
    * @return data database instance
    * @throws IOException in case of parsing or writing problems
    */
-  protected abstract Data finish() throws IOException;
+  public abstract Data finish() throws IOException;
 
   /**
    * Closes open references.
@@ -91,7 +91,7 @@ public abstract class Builder extends Progress {
    * @param tok the token to be added (tag name or content)
    * @throws IOException in case of parsing or writing problems 
    */
-  protected abstract void addDoc(byte[] tok) throws IOException;
+  public abstract void addDoc(byte[] tok) throws IOException;
   
   /**
    * Adds an element node to the database. This method stores a preliminary
@@ -104,7 +104,7 @@ public abstract class Builder extends Progress {
    * @param n element has namespaces
    * @throws IOException in case of parsing or writing problems 
    */
-  protected abstract void addElem(int tok, int tns, int dis, int as, boolean n)
+  public abstract void addElem(int tok, int tns, int dis, int as, boolean n)
     throws IOException;
 
   /**
@@ -115,30 +115,30 @@ public abstract class Builder extends Progress {
    * @param d distance (relative parent reference)
    * @throws IOException in case of parsing or writing problems 
    */
-  protected abstract void addAttr(int n, int s, byte[] v, int d)
+  public abstract void addAttr(int n, int s, byte[] v, int d)
     throws IOException;
 
   /**
-   * Adds a simple node to the database.
+   * Adds a text node to the database.
    * @param tok the token to be added (tag name or content)
    * @param dis distance (relative parent reference)
    * @param kind the node kind
    * @throws IOException in case of parsing or writing problems 
    */
-  protected abstract void addText(byte[] tok, int dis, byte kind)
+  public abstract void addText(byte[] tok, int dis, byte kind)
     throws IOException;
 
   /**
-   * Stores the size value to the table.
+   * Stores a size value to the specified table position.
    * @param pre pre reference
    * @param val value to be stored
    * @throws IOException in case of parsing or writing problems 
    */
-  protected abstract void setSize(int pre, int val)
+  public abstract void setSize(int pre, int val)
     throws IOException;
 
   /**
-   * Stores the size value to the table.
+   * Stores an attribute value to the specified table position.
    * @param pre pre reference
    * @param val value to be stored
    * @throws IOException in case of parsing or writing problems 
@@ -146,7 +146,7 @@ public abstract class Builder extends Progress {
   public abstract void setAttValue(int pre, byte[] val)
     throws IOException;
 
-  // Final Methods ============================================================
+  // Public Methods ============================================================
     
   /**
    * Builds the database by running the specified parser.
@@ -205,9 +205,9 @@ public abstract class Builder extends Progress {
   }
 
   /**
-   * Opens a new tag; called by the building instance.
-   * @param tag the tag to be processed
-   * @param att the tag attributes
+   * Opens a new element node.
+   * @param tag tag name
+   * @param att attributes
    * @return preValue of the created node
    * @throws IOException in case of parsing or writing problems 
    */
@@ -217,9 +217,9 @@ public abstract class Builder extends Progress {
   }
 
   /**
-   * Stores an empty tag; called by the building instance.
-   * @param tag the tag to be processed
-   * @param att the tag attributes
+   * Stores an empty element.
+   * @param tag tag name
+   * @param att attributes
    * @throws IOException in case of parsing or writing problems 
    */
   public final void emptyElem(final byte[] tag, final Atts att)
@@ -230,8 +230,8 @@ public abstract class Builder extends Progress {
   }
   
   /**
-   * Closes a tag; called by the building instance.
-   * @param tag the tag to be processed
+   * Closes an element.
+   * @param tag tag name
    * @throws IOException in case of parsing or writing problems 
    */
   public final void endElem(final byte[] tag) throws IOException {
@@ -246,9 +246,88 @@ public abstract class Builder extends Progress {
   }
 
   /**
-   * Stores an element node.
-   * @param name tag to be processed
-   * @param att attribute names and values
+   * Stores a text node.
+   * @param t text value
+   * @param w whitespace flag
+   * @throws IOException in case of parsing or writing problems 
+   */
+  public final void text(final TokenBuilder t, final boolean w)
+      throws IOException {
+
+    // checks if text appears before or after root node
+    final boolean out = !inDoc || level == 1;
+    if(!w) {
+      if(out) error(inDoc ? AFTERROOT : BEFOREROOT, parser.det());
+    } else if(t.size == 0 || out) {
+      return;
+    }
+
+    // chop whitespaces in text nodes
+    if(meta.chop) t.chop();
+    if(t.size != 0) addText(t, Data.TEXT);
+  }
+
+  /**
+   * Stores a comment.
+   * @param com comment text
+   * @throws IOException in case of parsing or writing problems 
+   */
+  public final void comment(final TokenBuilder com) throws IOException {
+    addText(com, Data.COMM);
+  }
+
+  /**
+   * Stores a processing instruction.
+   * @param pi processing instruction name and value
+   * @throws IOException in case of parsing or writing problems 
+   */
+  public final void pi(final TokenBuilder pi) throws IOException {
+    addText(pi, Data.PI);
+  }
+
+  /**
+   * Sets the document encoding.
+   * @param enc encoding
+   */
+  public final void encoding(final String enc) {
+    meta.encoding = enc.equals(UTF8) || enc.equals(UTF82) ? UTF8 : enc;
+  }
+
+  /**
+   * Convenience method for adding an element and text node.
+   * @param tag the tag to be processed
+   * @param att attributes
+   * @param txt text node
+   * @throws IOException in case of parsing or writing problems
+   */
+  public final void nodeAndText(final byte[] tag, final Atts att,
+      final byte[] txt) throws IOException {
+    startElem(tag, att);
+    text(new TokenBuilder(txt), false);
+    endElem(tag);
+  }
+
+  @Override
+  public final String tit() {
+    return parser.head();
+  }
+
+  @Override
+  public final String det() {
+    return parser.det();
+  }
+
+  @Override
+  public final double prog() {
+    return parser.prog();
+  }
+
+  // Private Methods ===========================================================
+  
+  /**
+   * Adds an element node to the storage.
+   * @param name tag name
+   * @param att attributes
    * @param open opening tag
    * @return preVal pre value of the created node
    * @throws IOException in case of parsing or writing problems 
@@ -311,28 +390,6 @@ public abstract class Builder extends Progress {
     // returning created pre value
     return preVal;
   }
-
-  /**
-   * Stores text nodes; called by the building instance.
-   * @param t the text to be processed
-   * @param w whitespace flag
-   * @throws IOException in case of parsing or writing problems 
-   */
-  public final void text(final TokenBuilder t, final boolean w)
-      throws IOException {
-
-    // checks if text appears before or after root node
-    final boolean out = !inDoc || level == 1;
-    if(!w) {
-      if(out) error(inDoc ? AFTERROOT : BEFOREROOT, parser.det());
-    } else if(t.size == 0 || out) {
-      return;
-    }
-
-    // chop whitespaces in text nodes
-    if(meta.chop) t.chop();
-    if(t.size != 0) addText(t, Data.TEXT);
-  }
   
   /**
    * Throws an error message.
@@ -345,26 +402,8 @@ public abstract class Builder extends Progress {
   }
 
   /**
-   * Stores comments; called by the building instance.
-   * @param com the comment to be processed
-   * @throws IOException in case of parsing or writing problems 
-   */
-  public final void comment(final TokenBuilder com) throws IOException {
-    addText(com, Data.COMM);
-  }
-
-  /**
-   * Stores processing instructions; called by the building instance.
-   * @param pi the processing instruction to be processed
-   * @throws IOException in case of parsing or writing problems 
-   */
-  public final void pi(final TokenBuilder pi) throws IOException {
-    addText(pi, Data.PI);
-  }
-
-  /**
-   * Adds a simple text, comment or pi to the database.
-   * @param txt the token to be added
+   * Adds a simple text, comment or processing instruction to the database.
+   * @param txt the value to be added
    * @param type the node type
    * @throws IOException in case of parsing or writing problems 
    */
@@ -378,43 +417,5 @@ public abstract class Builder extends Progress {
 
     skel.add(0, level, type);
     addText(t, level == 0 ? 1 : size - parStack[level - 1], type);
-  }
-
-  /**
-   * Sets the document encoding.
-   * @param enc encoding
-   */
-  public final void encoding(final String enc) {
-    meta.encoding = enc.equals(UTF8) || enc.equals(UTF82) ? UTF8 : enc;
-  }
-
-  /**
-   * Convenience method for adding a tag and a text node;
-   * called by the building instance.
-   * @param tag the tag to be processed
-   * @param att attributes
-   * @param txt text node
-   * @throws IOException in case of parsing or writing problems
-   */
-  public final void nodeAndText(final byte[] tag, final Atts att,
-      final byte[] txt) throws IOException {
-    startElem(tag, att);
-    text(new TokenBuilder(txt), false);
-    endElem(tag);
-  }
-
-  @Override
-  public final String tit() {
-    return parser.head();
-  }
-
-  @Override
-  public final String det() {
-    return parser.det();
-  }
-
-  @Override
-  public final double prog() {
-    return parser.prog();
   }
 }

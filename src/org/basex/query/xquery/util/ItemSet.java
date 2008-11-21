@@ -42,7 +42,7 @@ public final class ItemSet {
       final Item c = values[id];
       // double value is NaN or values are equal..
       if(nan && c.n() && Double.isNaN(c.dbl()) || CmpV.valCheck(i, c) &&
-          CmpV.COMP.EQ.e(i, c)) return false;
+          CmpV.Comp.EQ.e(i, c)) return false;
     }
 
     next[size] = bucket[p];

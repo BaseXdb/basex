@@ -7,7 +7,6 @@ import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.DataText;
-import org.basex.data.DeepData;
 import org.basex.data.DiskData;
 import org.basex.io.IO;
 
@@ -59,6 +58,6 @@ public final class Open extends Process {
    * @throws IOException exception
    */
   public static Data open(final String db) throws IOException {
-    return db.equals(DataText.DEEPFS) ? new DeepData(db) : new DiskData(db);
+    return new DiskData(db);
   }
 }

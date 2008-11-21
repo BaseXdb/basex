@@ -9,7 +9,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import org.basex.gui.GUIConstants;
-import org.basex.gui.GUIConstants.FILL;
+import org.basex.gui.GUIConstants.Fill;
 
 /**
  * DoubleSlider implementation.
@@ -74,7 +74,7 @@ public final class BaseXDSlider extends BaseXPanel {
     // choose logarithmic scaling for larger ranges
     log = Math.log(totMax) - Math.log(totMin) > 5 && totMax - totMin > 100;
     setFocusable(true);
-    setMode(FILL.NONE);
+    setMode(Fill.NONE);
 
     BaseXLayout.setHeight(this, getFont().getSize() + 9);
     BaseXLayout.setWidth(this, 200 + LABELW);
@@ -259,7 +259,7 @@ public final class BaseXDSlider extends BaseXPanel {
     final Polygon pol = new Polygon(
         new int[] { r.xs + 11, r.xs + 5, r.xs + 5, r.xs + 11 },
         new int[] { hh - 5, hh - 1, hh, hh + 5 }, 4);
-    g.setColor(focus ? GUIConstants.color6 : GUIConstants.color5);
+    g.setColor(focus ? GUIConstants.color6 : GUIConstants.COLORBUTTON);
     g.fillPolygon(pol);
     pol.xpoints = new int[] { r.xe + 5, r.xe + 12, r.xe + 12, r.xe + 5 };
     g.fillPolygon(pol);

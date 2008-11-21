@@ -12,8 +12,8 @@ import org.basex.BaseX;
 import org.basex.core.Context;
 import org.basex.core.Process;
 import org.basex.core.Prop;
-import org.basex.core.Commands.INDEX;
-import org.basex.core.Commands.UPDATE;
+import org.basex.core.Commands.CmdIndex;
+import org.basex.core.Commands.CmdUpdate;
 import org.basex.core.proc.Cs;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.Copy;
@@ -127,7 +127,7 @@ public enum GUICommands implements GUICommand {
           GUIProp.xqpath, main);
       fc.addFilter(IO.XQSUFFIX, CREATEXQDESC);
 
-      if(fc.select(BaseXFileChooser.MODE.OPEN)) {
+      if(fc.select(BaseXFileChooser.Mode.OPEN)) {
         try {
           final IO file = fc.getFile();
           main.query.setXQuery(file.content());
@@ -153,7 +153,7 @@ public enum GUICommands implements GUICommand {
           fn == null ? GUIProp.xqpath : fn, main);
       fc.addFilter(IO.XQSUFFIX, CREATEXQDESC);
 
-      if(fc.select(BaseXFileChooser.MODE.SAVE)) {
+      if(fc.select(BaseXFileChooser.Mode.SAVE)) {
         try {
           final IO file = fc.getFile();
           file.suffix(IO.XQSUFFIX);
@@ -191,7 +191,7 @@ public enum GUICommands implements GUICommand {
           GUIProp.createpath, main);
       fc.addFilter(IO.XMLSUFFIX, CREATEXMLDESC);
 
-      if(fc.select(BaseXFileChooser.MODE.SAVE)) {
+      if(fc.select(BaseXFileChooser.Mode.SAVE)) {
         final IO file = fc.getFile();
         file.suffix(IO.XMLSUFFIX);
         try {
@@ -305,7 +305,7 @@ public enum GUICommands implements GUICommand {
     public void execute() {
       final DialogInsert insert = new DialogInsert(GUI.get());
       if(insert.result == null) return;
-      final UPDATE type = UPDATE.values()[insert.kind];
+      final CmdUpdate type = CmdUpdate.values()[insert.kind];
       GUI.get().execute(new Insert(true, type, insert.result));
     }
 
@@ -327,7 +327,7 @@ public enum GUICommands implements GUICommand {
       final Nodes nodes = GUI.context.marked();
       final DialogEdit edit = new DialogEdit(GUI.get(), nodes.nodes[0]);
       if(edit.result == null) return;
-      final UPDATE type = UPDATE.values()[edit.kind];
+      final CmdUpdate type = CmdUpdate.values()[edit.kind];
       GUI.get().execute(new Update(true, type, edit.result));
     }
 
@@ -721,11 +721,11 @@ public enum GUICommands implements GUICommand {
         } else {
           Process[] proc = new Process[0];
           if(indexes[0] != meta.txtindex)
-            proc = Array.add(proc, cmd(indexes[0], INDEX.TEXT));
+            proc = Array.add(proc, cmd(indexes[0], CmdIndex.TEXT));
           if(indexes[1] != meta.atvindex)
-            proc = Array.add(proc, cmd(indexes[1], INDEX.ATTRIBUTE));
+            proc = Array.add(proc, cmd(indexes[1], CmdIndex.ATTRIBUTE));
           if(indexes[2] != meta.ftxindex)
-            proc = Array.add(proc, cmd(indexes[2], INDEX.FULLTEXT));
+            proc = Array.add(proc, cmd(indexes[2], CmdIndex.FULLTEXT));
 
           if(proc.length != 0) progress(INFOBUILD, proc);
         }
@@ -738,7 +738,7 @@ public enum GUICommands implements GUICommand {
      * @param index name of index
      * @return process
      */
-    private Process cmd(final boolean create, final INDEX index) {
+    private Process cmd(final boolean create, final CmdIndex index) {
       return create ? new CreateIndex(index) : new DropIndex(index);
     }
   },

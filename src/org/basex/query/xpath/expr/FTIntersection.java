@@ -25,7 +25,6 @@ public final class FTIntersection extends FTArrayExpr {
    * @param e operands joined with the union operator
    * @param pexpr IntList with indexes of positive expressions
    * @param nexpr IntList with indexes of negative expressions
-   * @Deprecated
    */
   public FTIntersection(final FTArrayExpr[] e, final int[] pexpr, 
       final int[] nexpr) {

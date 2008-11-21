@@ -142,7 +142,7 @@ public final class DialogPrefs extends Dialog {
   void chooseDir(final JFrame parent) {
     final BaseXFileChooser fc = new BaseXFileChooser(DIALOGFC, path.getText(),
         parent);
-    if(fc.select(BaseXFileChooser.MODE.DIR)) path.setText(fc.getDir());
+    if(fc.select(BaseXFileChooser.Mode.DIR)) path.setText(fc.getDir());
   }
   
   /**

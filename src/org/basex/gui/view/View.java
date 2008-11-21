@@ -64,7 +64,7 @@ public abstract class View extends BaseXPanel {
     addMouseWheelListener(this);
     addKeyListener(this);
     addComponentListener(this);
-    setMode(GUIConstants.FILL.DOWN);
+    setMode(GUIConstants.Fill.DOWN);
     setFocusable(true);
     view = Array.add(view, this);
   }

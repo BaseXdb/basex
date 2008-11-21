@@ -34,7 +34,7 @@ public final class Levenshtein {
     // small word - use exact search
     if(sl < 4) return Token.eq(tok, sub);
     // large word - search for substrings
-    if(sl > 30) return contains(tok, sub);
+    if(sl > 50) return contains(tok, sub);
 
     return ls(tok, 0, tok.length, sub);
   }
@@ -54,7 +54,7 @@ public final class Levenshtein {
     final int sl = sub.length;
 
     // use exact search for too short and too long values
-    if(sl < 4 || tl > 30 || sl > 30) return equals(tok, ts, tl, sub);
+    if(sl < 4 || tl > 50 || sl > 50) return equals(tok, ts, tl, sub);
 
     // skip different tokens with too different lengths
     int k = Prop.lserr;

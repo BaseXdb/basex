@@ -7,21 +7,23 @@ import java.util.Iterator;
 import org.basex.BaseX;
 
 /**
- * This is a simple container for native byte[] values (tokens).
+ * This is a simple container for tokens (byte arrays).
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public final class TokenList implements Iterable<byte[]> {
   /** Value array. */
-  public byte[][] list = new byte[8][];
+  public byte[][] list;
   /** Current array size. */
   public int size;
   
   /**
    * Default constructor.
    */
-  public TokenList() { }
+  public TokenList() {
+    list = new byte[8][];
+  }
   
   /**
    * Constructor.

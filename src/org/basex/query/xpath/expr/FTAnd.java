@@ -51,12 +51,10 @@ public final class FTAnd extends FTArrayExpr {
     if (pex.length == 1 && nex.length == 0)
       exprs[pex[0]].indexEquivalent(ctx, curr, seq);
 
-    final FTArrayExpr[] indexExprs = new FTArrayExpr[exprs.length];
     for (int i = 0; i < exprs.length; i++) {
-      indexExprs[i] = exprs[i].indexEquivalent(ctx, curr, seq);
+      exprs[i] = exprs[i].indexEquivalent(ctx, curr, seq);
     }
-
-    return new FTIntersection(indexExprs, pex, nex);
+    return new FTIntersection(exprs, pex, nex);
   }
   
   /**

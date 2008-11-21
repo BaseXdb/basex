@@ -10,7 +10,7 @@ import org.basex.build.Parser;
 import org.basex.build.xml.SAXWrapper;
 import org.basex.build.xml.XMLParser;
 import org.basex.core.Prop;
-import org.basex.core.Commands.UPDATE;
+import org.basex.core.Commands.CmdUpdate;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.io.IO;
@@ -29,7 +29,7 @@ public final class Insert extends AUpdate {
    * @param t insertion type
    * @param a arguments
    */
-  public Insert(final UPDATE t, final String... a) {
+  public Insert(final CmdUpdate t, final String... a) {
     this(false, t, a);
   }
 
@@ -39,7 +39,7 @@ public final class Insert extends AUpdate {
    * @param t insertion type
    * @param a arguments
    */
-  public Insert(final boolean g, final UPDATE t, final String... a) {
+  public Insert(final boolean g, final CmdUpdate t, final String... a) {
     super(g, t, a);
   }
 
@@ -49,7 +49,7 @@ public final class Insert extends AUpdate {
 
     // get sources from the marked node set or the specified query
     final Nodes nodes = gui ? context.marked() :
-      query(args[type == UPDATE.PI ? 3 : 2], null);
+      query(args[type == CmdUpdate.PI ? 3 : 2], null);
     if(nodes == null) return false;
 
     boolean ok = false;

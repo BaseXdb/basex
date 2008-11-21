@@ -5,7 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import org.basex.gui.GUIConstants;
-import org.basex.gui.GUIConstants.FILL;
+import org.basex.gui.GUIConstants.Fill;
 
 /**
  * Efficient Text Editor and Renderer, supporting syntax highlighting and
@@ -52,7 +52,7 @@ public final class BaseXTextRenderer extends BaseXBack {
    * @param b scrollbar reference
    */
   BaseXTextRenderer(final BaseXTextTokens t, final BaseXBar b) {
-    setMode(FILL.NONE);
+    setMode(Fill.NONE);
     setText(t);
     setFont(GUIConstants.dfont);
     bar = b;
@@ -196,7 +196,7 @@ public final class BaseXTextRenderer extends BaseXBack {
     if(y > 0 && y < h) {
       // mark error
       if(text.error()) {
-        g.setColor(GUIConstants.COLORMARK);
+        g.setColor(GUIConstants.COLORERRHIGH);
         g.fillRect(x, y - fontH + 4, wordW, fontH);
       }
   

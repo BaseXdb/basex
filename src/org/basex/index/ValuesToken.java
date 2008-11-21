@@ -13,7 +13,7 @@ public final class ValuesToken extends IndexToken {
    * @param tok token
    */
   public ValuesToken(final boolean t, final byte[] tok) {
-    super(t ? TYPE.TXT : TYPE.ATV);
+    super(t ? Type.TXT : Type.ATV);
     text = tok;
   }
 }

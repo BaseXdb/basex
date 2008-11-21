@@ -18,7 +18,7 @@ import org.basex.BaseX;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants;
-import org.basex.gui.GUIConstants.FILL;
+import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.util.Performance;
@@ -75,7 +75,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
    * @param p panels
    */
   public ViewContainer(final ViewPanel[][] p) {
-    setMode(FILL.PLAIN);
+    setMode(Fill.PLAIN);
     setLayout(new BorderLayout());
     logo = GUI.image("logo");
     panels = p;

@@ -33,7 +33,7 @@ import org.basex.util.Token;
 
 /**
  * This is a simple web server.
- * Files with an .xq suffix are evaluated as XQuery.
+ * Files with an <code>.xq</code> suffix are evaluated as XQuery.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen

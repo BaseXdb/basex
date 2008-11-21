@@ -21,7 +21,7 @@ import org.basex.io.IO;
  */
 public final class BaseXFileChooser {
   /** File Dialog Mode. */
-  public enum MODE {
+  public enum Mode {
     /** Open. */ OPEN,
     /** OpenDir.  */ OPENDIR,
     /** Save. */ SAVE,
@@ -35,7 +35,7 @@ public final class BaseXFileChooser {
   /** Simple file dialog. */
   private FileDialog fd;
   /** File mode. */
-  private MODE mode;
+  private Mode mode;
   
   /**
    * Default Constructor.
@@ -70,15 +70,15 @@ public final class BaseXFileChooser {
   
   /**
    * Selects a file or directory.
-   * @param type type defined by {@link MODE}
+   * @param type type defined by {@link Mode}
    * @return file or directory
    */
-  public boolean select(final MODE type) {
+  public boolean select(final Mode type) {
     mode = type;
     
     if(fd != null) {
-      if(type == MODE.OPENDIR) fd.setFile(" ");
-      fd.setMode(type == MODE.SAVE ? FileDialog.SAVE : FileDialog.LOAD);
+      if(type == Mode.OPENDIR) fd.setFile(" ");
+      fd.setMode(type == Mode.SAVE ? FileDialog.SAVE : FileDialog.LOAD);
       fd.setVisible(true);
       return fd.getFile() != null;
     }
@@ -102,9 +102,9 @@ public final class BaseXFileChooser {
     }
     if(state != JFileChooser.APPROVE_OPTION) return false;
 
-    if(mode == MODE.SAVE) {
+    if(mode == Mode.SAVE) {
       final IO file = getFile();
-      if(mode == MODE.SAVE && file.exists()) {
+      if(mode == Mode.SAVE && file.exists()) {
         final int i = JOptionPane.showConfirmDialog(GUI.get(),
             BaseX.info(FILEREPLACE, file.name()),
             DIALOGINFO, JOptionPane.YES_NO_OPTION);
@@ -129,7 +129,7 @@ public final class BaseXFileChooser {
    */
   public String getDir() {
     if(fd != null) return fd.getDirectory();
-    return mode == MODE.DIR ? getFile().path() :
+    return mode == Mode.DIR ? getFile().path() :
       fc.getCurrentDirectory().getPath();
   }
 

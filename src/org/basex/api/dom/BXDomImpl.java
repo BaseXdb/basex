@@ -6,7 +6,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 
 /**
- * This class provides a dom implementation instance.
+ * DOM - Implementation.
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */

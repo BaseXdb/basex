@@ -70,7 +70,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
    */
   QuerySimple(final QueryView m) {
     main = m;
-    panel = new BaseXBack(GUIConstants.FILL.NONE);
+    panel = new BaseXBack(GUIConstants.Fill.NONE);
     panel.setLayout(new TableLayout(20, 2, 10, 5));
 
     all = new BaseXTextField(null);
@@ -83,12 +83,12 @@ final class QuerySimple extends QueryPanel implements ActionListener {
       }
     });
 
-    cont = new BaseXBack(GUIConstants.FILL.NONE);
+    cont = new BaseXBack(GUIConstants.Fill.NONE);
     cont.setLayout(new BorderLayout(0, 5));
     cont.add(all, BorderLayout.NORTH);
     cont.add(panel, BorderLayout.CENTER);
 
-    final BaseXBack p = new BaseXBack(GUIConstants.FILL.NONE);
+    final BaseXBack p = new BaseXBack(GUIConstants.Fill.NONE);
     p.setLayout(new BorderLayout());
 
     initPanel();

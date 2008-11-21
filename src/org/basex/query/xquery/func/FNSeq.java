@@ -56,7 +56,7 @@ final class FNSeq extends Fun {
           final Item i = arg[0].next();
           if(i == null) return null;
           c++;
-          if(CmpV.valCheck(i, it) && CmpV.COMP.EQ.e(i, it)) return Itr.get(c);
+          if(CmpV.valCheck(i, it) && CmpV.Comp.EQ.e(i, it)) return Itr.get(c);
         }
       }
     };
@@ -210,7 +210,7 @@ final class FNSeq extends Fun {
       if(it1.n() && it2.n() && Double.isNaN(it1.dbl()) &&
           Double.isNaN(it2.dbl())) continue;
 
-      if(!CmpV.valCheck(it1, it2) || CmpV.COMP.NE.e(it1, it2)) return false;
+      if(!CmpV.valCheck(it1, it2) || CmpV.Comp.NE.e(it1, it2)) return false;
       if(!it1.node() && !it2.node()) continue;
 
       // comparing nodes

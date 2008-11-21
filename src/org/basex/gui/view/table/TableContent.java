@@ -11,7 +11,7 @@ import org.basex.gui.GUI;
 import org.basex.gui.GUIFS;
 import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants;
-import org.basex.gui.GUIConstants.FILL;
+import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXBar;
 import org.basex.gui.layout.BaseXLayout;
@@ -40,7 +40,7 @@ public final class TableContent extends BaseXBack {
   TableContent(final TableData d, final BaseXBar scr) {
     scroll = scr;
     setLayout(new BorderLayout());
-    setMode(FILL.DOWN);
+    setMode(Fill.DOWN);
     add(scroll, BorderLayout.EAST);
     tdata = d;
   }

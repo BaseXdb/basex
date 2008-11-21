@@ -2,8 +2,8 @@ package org.basex.core.proc;
 
 import org.basex.build.fs.FSParser;
 import org.basex.core.Prop;
-import org.basex.core.Commands.COMMANDS;
-import org.basex.core.Commands.CREATE;
+import org.basex.core.Commands.Cmd;
+import org.basex.core.Commands.CmdCreate;
 import org.basex.io.IO;
 
 /**
@@ -34,6 +34,6 @@ public final class CreateFS extends ACreate {
   
   @Override
   public String toString() {
-    return COMMANDS.CREATE.name() + " " + CREATE.FS + args();
+    return Cmd.CREATE.name() + " " + CmdCreate.FS + args();
   }
 }

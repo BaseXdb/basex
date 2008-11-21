@@ -92,7 +92,8 @@ public class BaseXClient {
       }
     });
     
-    if(allInfo || info) process(new Set(SET.INFO, allInfo ? ALL : ON), false);
+    if(allInfo || info)
+      process(new Set(CmdSet.INFO, allInfo ? ALL : ON), false);
 
     try {
       // replace input file with content
@@ -228,7 +229,7 @@ public class BaseXClient {
           }
         }
 
-        if(set && p.args[0].equals(SET.INFO.name())) {
+        if(set && p.args[0].equals(CmdSet.INFO.name())) {
           info = inf.contains(INFOON);
         }
       }
@@ -274,7 +275,7 @@ public class BaseXClient {
           final char c = args[a].charAt(i);
           if(c == 'c' && standalone) {
             // chop XML whitespaces while creating new database instances
-            process(new Set(SET.CHOP, ON), false);
+            process(new Set(CmdSet.CHOP, ON), false);
             ok = true;
           } else if(c == 'd') {
             // activate debug mode
@@ -282,7 +283,7 @@ public class BaseXClient {
             ok = true;
           } else if(c == 'e' && standalone) {
             // skip parsing of XML entities
-            process(new Set(SET.ENTITY, OFF), false);
+            process(new Set(CmdSet.ENTITY, OFF), false);
             ok = true;
           } else if(c == 'o') {
             // specify file for result output
@@ -355,7 +356,7 @@ public class BaseXClient {
             ok = true;
           } else if(c == 'x') {
             // activate well-formed XML output
-            process(new Set(SET.XMLOUTPUT, ON), false);
+            process(new Set(CmdSet.XMLOUTPUT, ON), false);
             ok = true;
           } else if(c == 'X') {
             // hidden option: show xml query plan
@@ -372,7 +373,7 @@ public class BaseXClient {
             ok = true;
           } else if(c == 'z') {
             // turn off result serialization
-            process(new Set(SET.SERIALIZE, OFF), false);
+            process(new Set(CmdSet.SERIALIZE, OFF), false);
             ok = true;
           } else {
             break;

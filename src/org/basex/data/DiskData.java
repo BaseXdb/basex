@@ -141,13 +141,13 @@ public final class DiskData extends Data {
     table.close();
     texts.close();
     values.close();
-    closeIndex(IndexToken.TYPE.TXT);
-    closeIndex(IndexToken.TYPE.ATV);
-    closeIndex(IndexToken.TYPE.FTX);
+    closeIndex(IndexToken.Type.TXT);
+    closeIndex(IndexToken.Type.ATV);
+    closeIndex(IndexToken.Type.FTX);
   }
 
   @Override
-  public void closeIndex(final IndexToken.TYPE index) throws IOException {
+  public void closeIndex(final IndexToken.Type index) throws IOException {
     switch(index) {
       case TXT: if(txtindex != null) txtindex.close(); break;
       case ATV: if(atvindex != null) atvindex.close(); break;
@@ -157,7 +157,7 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public void setIndex(final IndexToken.TYPE type, final Index index) {
+  public void setIndex(final IndexToken.Type type, final Index index) {
     switch(type) {
       case TXT: if(meta.txtindex) txtindex = index; break;
       case ATV: if(meta.atvindex) atvindex = index; break;

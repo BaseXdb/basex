@@ -42,7 +42,7 @@ import org.basex.core.proc.XQuery;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
-import org.basex.gui.GUIConstants.FILL;
+import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCombo;
@@ -277,8 +277,8 @@ public final class GUI extends JFrame {
 
     // create views
     query = new QueryView(null);
-    text = new TextView(FILL.DOWN, TEXTTIT, HELPTEXT);
-    help = new TextView(FILL.DOWN, HELPTIT, null);
+    text = new TextView(Fill.DOWN, TEXTTIT, HELPTEXT);
+    help = new TextView(Fill.DOWN, HELPTIT, null);
     info = new InfoView(HELPINFO);
     final ViewPanel textpanel = new ViewPanel(text, TEXTVIEW);
     final ViewPanel helppanel = new ViewPanel(help, HELPVIEW);

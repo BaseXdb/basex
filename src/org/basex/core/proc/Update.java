@@ -3,7 +3,7 @@ package org.basex.core.proc;
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
 import org.basex.core.Prop;
-import org.basex.core.Commands.UPDATE;
+import org.basex.core.Commands.CmdUpdate;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 
@@ -19,7 +19,7 @@ public final class Update extends AUpdate {
    * @param t update type
    * @param a arguments
    */
-  public Update(final UPDATE t, final String... a) {
+  public Update(final CmdUpdate t, final String... a) {
     this(false, t, a);
   }
 
@@ -29,7 +29,7 @@ public final class Update extends AUpdate {
    * @param t update type
    * @param a arguments
    */
-  public Update(final boolean g, final UPDATE t, final String... a) {
+  public Update(final boolean g, final CmdUpdate t, final String... a) {
     super(g, t, a);
   }
 
@@ -38,8 +38,8 @@ public final class Update extends AUpdate {
     final Data data = context.data();
 
     // get sources from the marked node set or the specified query
-    final Nodes nodes = gui ? context.marked() :
-      query(args[type == UPDATE.PI || type == UPDATE.ATTRIBUTE ? 2 : 1], null);
+    final Nodes nodes = gui ? context.marked() : query(args[type ==
+      CmdUpdate.PI || type == CmdUpdate.ATTRIBUTE ? 2 : 1], null);
     if(nodes == null) return false;
 
     boolean ok = false;
@@ -68,7 +68,7 @@ public final class Update extends AUpdate {
     for(int i = nodes.size - 1; i >= 0; i--) {
       final int pre = nodes.nodes[i];
       if(data.kind(pre) != Data.ATTR)
-        return error(UPDATENODE, UPDATE.values()[Data.ATTR]);
+        return error(UPDATENODE, CmdUpdate.values()[Data.ATTR]);
       // check existence of attribute
       int p = data.parent(pre, Data.ATTR);
       final int last = p + data.attSize(p, Data.ELEM);
@@ -108,7 +108,7 @@ public final class Update extends AUpdate {
     // check if nodes to be updated have the same type
     for(int i = nodes.size - 1; i >= 0; i--) {
       final int k = data.kind(nodes.nodes[i]);
-      if(k != kind) return error(UPDATENODE, UPDATE.values()[kind]);
+      if(k != kind) return error(UPDATENODE, CmdUpdate.values()[kind]);
     }
     
     // perform updates

@@ -26,7 +26,7 @@ import org.basex.core.Prop;
 import org.basex.gui.GUI;
 import org.basex.gui.GUICommand;
 import org.basex.gui.GUIConstants;
-import org.basex.gui.GUIConstants.FILL;
+import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.dialog.Dialog;
 import org.basex.util.Action;
 import org.basex.util.Array;
@@ -113,10 +113,10 @@ public final class BaseXText extends BaseXPanel {
     if(edit) {
       setBackground(Color.white);
       setBorder(new MatteBorder(1, 1, 1, 1, GUIConstants.COLORS[6]));
-      setMode(FILL.PLAIN);
+      setMode(Fill.PLAIN);
       undo = new Undo();
     } else {
-      setMode(FILL.NONE);
+      setMode(Fill.NONE);
     }
 
     final GUICommand[] pop = !edit ? new GUICommand[] { new CopyCmd() } :

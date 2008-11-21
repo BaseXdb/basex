@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.basex.BaseX;
-import org.basex.core.Commands.COMMANDS;
-import org.basex.core.Commands.INFO;
+import org.basex.core.Commands.Cmd;
+import org.basex.core.Commands.CmdInfo;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.io.IO;
@@ -92,6 +92,6 @@ public final class InfoDB extends AInfo {
   
   @Override
   public String toString() {
-    return COMMANDS.INFO.name() + " " + INFO.DB;
+    return Cmd.INFO.name() + " " + CmdInfo.DB;
   }
 }

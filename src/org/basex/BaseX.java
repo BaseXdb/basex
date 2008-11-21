@@ -10,8 +10,8 @@ import org.basex.util.TokenBuilder;
 /**
  * This is the starter class for the stand-alone console mode.
  * It overwrites the {@link BaseXClient} to allow local database
- * operations.
- * Add the '-h' option to get a list on all available command-line arguments.
+ * operations. Next, it offers some utility methods which are used
+ * throughout the project.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
@@ -40,7 +40,7 @@ public final class BaseX extends BaseXClient {
 
   /**
    * Global method, replacing all % characters
-   * (see {@link TokenBuilder#add(String, Object...)} for details.
+   * (see {@link TokenBuilder#add(Object, Object...)} for details.
    * @param str string to be extended
    * @param ext text text extensions
    * @return token
@@ -53,7 +53,7 @@ public final class BaseX extends BaseXClient {
 
   /**
    * Global method, replacing all % characters
-   * (see {@link TokenBuilder#add(String, Object...)} for details.
+   * (see {@link TokenBuilder#add(Object, Object...)} for details.
    * @param str string to be extended
    * @param ext text text extensions
    * @return extended string

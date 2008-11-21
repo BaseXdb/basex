@@ -47,13 +47,13 @@ public final class ClientProcess extends AbstractProcess {
 
   @Override
   public void output(final PrintOutput o) throws IOException {
-    send(Commands.COMMANDS.GETRESULT.name() + " " + last);
+    send(Commands.Cmd.GETRESULT.name() + " " + last);
     receive(o);
   }
 
   @Override
   public void info(final PrintOutput o) throws IOException {
-    send(Commands.COMMANDS.GETINFO.name() + " " + last);
+    send(Commands.Cmd.GETINFO.name() + " " + last);
     receive(o);
   }
 

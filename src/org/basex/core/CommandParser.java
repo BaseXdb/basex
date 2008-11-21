@@ -2,14 +2,14 @@ package org.basex.core;
 
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
-import org.basex.core.Commands.COMMANDS;
-import org.basex.core.Commands.CREATE;
-import org.basex.core.Commands.DROP;
-import org.basex.core.Commands.FS;
-import org.basex.core.Commands.INDEX;
-import org.basex.core.Commands.INFO;
-import org.basex.core.Commands.SET;
-import org.basex.core.Commands.UPDATE;
+import org.basex.core.Commands.Cmd;
+import org.basex.core.Commands.CmdCreate;
+import org.basex.core.Commands.CmdDrop;
+import org.basex.core.Commands.CmdFS;
+import org.basex.core.Commands.CmdIndex;
+import org.basex.core.Commands.CmdInfo;
+import org.basex.core.Commands.CmdSet;
+import org.basex.core.Commands.CmdUpdate;
 import org.basex.core.proc.Cs;
 import org.basex.core.proc.Check;
 import org.basex.core.proc.Close;
@@ -95,15 +95,15 @@ public final class CommandParser extends QueryParser {
 
     boolean fsmode = Prop.fsmode;
     while(true) {
-      COMMANDS cmd = null;
+      Cmd cmd = null;
       Process proc;
       if(fsmode) {
-        cmd = COMMANDS.BASH;
-        FS fs = FS.EXT;
+        cmd = Cmd.BASH;
+        CmdFS fs = CmdFS.EXT;
         String args = name(null);
         try {
-          fs = Enum.valueOf(FS.class, args.toUpperCase());
-          if(fs == Commands.FS.EXIT) fsmode = false;
+          fs = Enum.valueOf(CmdFS.class, args.toUpperCase());
+          if(fs == Commands.CmdFS.EXIT) fsmode = false;
           args = "";
         } catch(final Exception ex) {
           args += " ";
@@ -111,7 +111,7 @@ public final class CommandParser extends QueryParser {
         final String a = string(null);
         proc = new Fs(fs.name(), a == null ? args : args + a);
       } else {
-        cmd = consume(COMMANDS.class, null);
+        cmd = consume(Cmd.class, null);
         proc = parse(cmd);
         if(proc instanceof Fs) fsmode = true;
       }
@@ -128,10 +128,10 @@ public final class CommandParser extends QueryParser {
    * @return process
    * @throws QueryException query exception
    */
-  private Process parse(final COMMANDS cmd) throws QueryException {
+  private Process parse(final Cmd cmd) throws QueryException {
     switch(cmd) {
       case CREATE:
-        switch(consume(CREATE.class, cmd)) {
+        switch(consume(CmdCreate.class, cmd)) {
           case DATABASE: case DB: case XML:
             return new CreateDB(path(cmd), name(null));
           case MAB: case MAB2:
@@ -139,13 +139,13 @@ public final class CommandParser extends QueryParser {
           case FS:
             return new CreateFS(path(cmd), name(cmd));
           case INDEX:
-            return new CreateIndex(consume(INDEX.class, cmd));
+            return new CreateIndex(consume(CmdIndex.class, cmd));
         }
         break;
       case OPEN:
         return new Open(name(cmd));
       case INFO:
-        switch(consume(INFO.class, cmd)) {
+        switch(consume(CmdInfo.class, cmd)) {
           case NULL:
             return new Info();
           case DATABASE: case DB:
@@ -166,11 +166,11 @@ public final class CommandParser extends QueryParser {
       case LIST:
         return new List();
       case DROP:
-        switch(consume(DROP.class, cmd)) {
+        switch(consume(CmdDrop.class, cmd)) {
           case DATABASE: case DB:
             return new DropDB(name(null));
           case INDEX:
-            return new DropIndex(consume(INDEX.class, cmd));
+            return new DropIndex(consume(CmdIndex.class, cmd));
         }
         break;
       case OPTIMIZE:
@@ -200,7 +200,7 @@ public final class CommandParser extends QueryParser {
       case DELETE:
         return new Delete(xpath(cmd));
       case INSERT:
-        final UPDATE ins = consume(UPDATE.class, cmd);
+        final CmdUpdate ins = consume(CmdUpdate.class, cmd);
         switch(ins) {
           case FRAGMENT:
             return new Insert(ins, string(cmd, true), number(cmd), xpath(cmd));
@@ -214,7 +214,7 @@ public final class CommandParser extends QueryParser {
         }
         break;
       case UPDATE:
-        final UPDATE upd = consume(UPDATE.class, cmd);
+        final CmdUpdate upd = consume(CmdUpdate.class, cmd);
         switch(upd) {
           case ELEMENT: case TEXT: case COMMENT:
             return new Update(upd, name(cmd), xpath(cmd));
@@ -232,7 +232,7 @@ public final class CommandParser extends QueryParser {
           if(val != null) {
             if(o instanceof Boolean) {
               val = val.toUpperCase();
-              final boolean info = opt.equals(SET.INFO.name());
+              final boolean info = opt.equals(CmdSet.INFO.name());
               if(!val.equals(ON) && !val.equals(OFF) &&
                   !(info && val.equals(ALL))) {
                 final StringList sl = new StringList();
@@ -247,16 +247,16 @@ public final class CommandParser extends QueryParser {
           }
           return new Set(opt, val);
         } catch(final IllegalAccessException ex) {
-          help(list(SET.class, opt), cmd);
+          help(list(CmdSet.class, opt), cmd);
         } catch(final NoSuchFieldException ex) {
-          help(list(SET.class, opt), cmd);
+          help(list(CmdSet.class, opt), cmd);
         }
         break;
       case HELP:
         String hc = name(null);
         if(hc != null && !hc.toUpperCase().equals(ALL)) {
           qp = qm;
-          hc = consume(COMMANDS.class, cmd).toString();
+          hc = consume(Cmd.class, cmd).toString();
         }
         return new Help(hc);
       case PING:
@@ -284,7 +284,7 @@ public final class CommandParser extends QueryParser {
    * @return path
    * @throws QueryException query exception
    */
-  private String string(final COMMANDS cmd, final boolean spc)
+  private String string(final Cmd cmd, final boolean spc)
       throws QueryException {
     final StringBuilder tb = new StringBuilder();
     consumeWS();
@@ -310,7 +310,7 @@ public final class CommandParser extends QueryParser {
    * @return path
    * @throws QueryException query exception
    */
-  private String string(final COMMANDS cmd) throws QueryException {
+  private String string(final Cmd cmd) throws QueryException {
     return string(cmd, false);
   }
 
@@ -320,7 +320,7 @@ public final class CommandParser extends QueryParser {
    * @return path
    * @throws QueryException query exception
    */
-  private String path(final COMMANDS cmd) throws QueryException {
+  private String path(final Cmd cmd) throws QueryException {
     return string(cmd, true);
   }
 
@@ -330,7 +330,7 @@ public final class CommandParser extends QueryParser {
    * @return path
    * @throws QueryException query exception
    */
-  private String xpath(final COMMANDS cmd) throws QueryException {
+  private String xpath(final Cmd cmd) throws QueryException {
     consumeWS();
     final StringBuilder sb = new StringBuilder();
     if(more() && !curr(';')) {
@@ -350,7 +350,7 @@ public final class CommandParser extends QueryParser {
    * @return path
    * @throws QueryException query exception
    */
-  private String xquery(final COMMANDS cmd) throws QueryException {
+  private String xquery(final Cmd cmd) throws QueryException {
     consumeWS();
     final StringBuilder sb = new StringBuilder();
     if(more() && !curr(';')) {
@@ -370,7 +370,7 @@ public final class CommandParser extends QueryParser {
    * @return name
    * @throws QueryException query exception
    */
-  private String name(final COMMANDS cmd) throws QueryException {
+  private String name(final Cmd cmd) throws QueryException {
     consumeWS();
     final StringBuilder sb = new StringBuilder();
     while(curr('.') || curr('-') || letterOrDigit(curr())) sb.append(consume());
@@ -384,7 +384,7 @@ public final class CommandParser extends QueryParser {
    * @return name
    * @throws QueryException query exception
    */
-  private String finish(final COMMANDS cmd, final StringBuilder s)
+  private String finish(final Cmd cmd, final StringBuilder s)
       throws QueryException {
     if(s.length() != 0) return s.toString();
     if(cmd != null) help(null, cmd);
@@ -397,7 +397,7 @@ public final class CommandParser extends QueryParser {
    * @return name
    * @throws QueryException query exception
    */
-  private String number(final COMMANDS cmd) throws QueryException {
+  private String number(final Cmd cmd) throws QueryException {
     consumeWS();
     final StringBuilder tb = new StringBuilder();
     if(curr() == '-') tb.append(consume());
@@ -415,7 +415,7 @@ public final class CommandParser extends QueryParser {
    * @return index
    * @throws QueryException query exception
    */
-  private <E extends Enum<E>> E consume(final Class<E> cmp, final COMMANDS par)
+  private <E extends Enum<E>> E consume(final Class<E> cmp, final Cmd par)
       throws QueryException {
 
     final String token = name(null);
@@ -434,7 +434,7 @@ public final class CommandParser extends QueryParser {
     final byte[] name = lc(token(token));
     final Levenshtein ls = new Levenshtein();
     for(final Enum<?> e : cmp.getEnumConstants()) {
-      if(e instanceof COMMANDS && !((COMMANDS) e).official) continue;
+      if(e instanceof Cmd && !((Cmd) e).official) continue;
       final byte[] sm = lc(token(e.name()));
       if(ls.similar(name, sm)) error(alt, CMDSIMILAR, name, sm);
     }
@@ -450,10 +450,10 @@ public final class CommandParser extends QueryParser {
    * @param cmd input completions
    * @throws QueryException query exception
    */
-  private void help(final StringList alt, final COMMANDS cmd)
+  private void help(final StringList alt, final Cmd cmd)
       throws QueryException {
     
-    if(cmd == COMMANDS.BASH) throw new QueryException(
+    if(cmd == Cmd.BASH) throw new QueryException(
         org.basex.fs.Help.help(""));
     error(alt, PROCSYNTAX, cmd.help(true, true));
   }
@@ -470,7 +470,7 @@ public final class CommandParser extends QueryParser {
     final StringList list = new StringList();
     final String t = i == null ? "" : i.toUpperCase();
     for(final Enum<?> e : en.getEnumConstants()) {
-      if(e instanceof COMMANDS && !((COMMANDS) e).official) continue;
+      if(e instanceof Cmd && !((Cmd) e).official) continue;
       if(e.name().startsWith(t)) list.add(e.name().toLowerCase());
     }
     list.sort();

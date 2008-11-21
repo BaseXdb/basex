@@ -23,7 +23,7 @@ import org.basex.data.Nodes;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
-import org.basex.gui.GUIConstants.FILL;
+import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.BaseXBar;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPanel;
@@ -66,7 +66,7 @@ final class TableHeader extends BaseXPanel {
    */
   TableHeader(final TableData d, final TableView v) {
     super(HELPTABLEHEAD);
-    setMode(FILL.UP);
+    setMode(Fill.UP);
     tdata = d;
     view = v;
     BaseXLayout.setHeight(this, (GUIProp.fontsize + 8) << 1);
@@ -123,7 +123,7 @@ final class TableHeader extends BaseXPanel {
       g.setColor(Color.white);
       g.fillRect((int) x + 1, hh, (int) ce - (int) x - 2, hh - 2);
       g.drawLine((int) ce - 1, hh - 1, (int) ce - 1, h - 2);
-      g.setColor(GUIConstants.color5);
+      g.setColor(GUIConstants.COLORBUTTON);
       g.drawLine((int) ce, hh - 1, (int) ce, h - 2);
 
       // draw headers

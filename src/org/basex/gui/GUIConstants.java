@@ -125,7 +125,7 @@ public final class GUIConstants {
   public static final Cursor CURSORTEXT = new Cursor(Cursor.TEXT_CURSOR);
 
   /** Background fill options. */
-  public static enum FILL {
+  public static enum Fill {
     /** Opaque fill mode.  */ PLAIN,
     /** Transparent mode.  */ NONE,
     /** Upward gradient.   */ UP,
@@ -136,8 +136,8 @@ public final class GUIConstants {
 
   /** Error color. */
   public static final Color COLORERROR = new Color(208, 0, 0);
-  /** Error color. */
-  public static final Color COLORMARK = new Color(255, 200, 180);
+  /** Error highlight color. */
+  public static final Color COLORERRHIGH = new Color(255, 200, 180);
 
   /** Cell color. */
   public static final Color COLORCELL = new Color(224, 224, 224);
@@ -161,11 +161,9 @@ public final class GUIConstants {
   public static Color color3;
   /** Middle color. */
   public static Color color4;
-  /** Middle color. */
-  public static Color color5;
   /** Dark color. */
   public static Color color6;
-
+  
   /** Mark color, custom alpha value. */
   public static Color colormarkA;
   /** Second mark color, custom alpha value. */
@@ -178,8 +176,6 @@ public final class GUIConstants {
   public static Color colormark3;
   /** Fourth mark color. */
   public static Color colormark4;
-  /** Fifth mark color. */
-  public static Color colormark5;
   
   /** Thumbnail colors. */
   public static Color[] thumbnailcolor;
@@ -223,23 +219,21 @@ public final class GUIConstants {
     final int r = GUIProp.colorred;
     final int g = GUIProp.colorgreen;
     final int b = GUIProp.colorblue;
-
+  
     // calculate color c:
     // c = (255 - expectedColor) * 10 / factor (= GUIRED/BLUE/GUIProps.GREEN)
-    color  = new Color(col(r, 110), col(g, 150), col(b, 160), 100);
-    color1 = new Color(col(r,   8), col(g,   7), col(b,   6));
-    color2 = new Color(col(r,  24), col(g,  25), col(b,  40));
-    color3 = new Color(col(r,  32), col(g,  32), col(b,  44));
-    color4 = new Color(col(r,  48), col(g,  50), col(b,  40));
-    color5 = new Color(col(r,  56), col(g,  60), col(b,  80));
+    color = new Color(col(r, 110), col(g, 150), col(b, 160), 100);
+    color1 = new Color(col(r, 8), col(g, 7), col(b, 6));
+    color2 = new Color(col(r, 24), col(g, 25), col(b, 40));
+    color3 = new Color(col(r, 32), col(g, 32), col(b, 44));
+    color4 = new Color(col(r, 48), col(g, 50), col(b, 40));
     color6 = new Color(col(r, 140), col(g, 100), col(b, 70));
-    colormarkA = new Color(col(r, 32), col(g,  160), col(b, 320), 100);
+    colormarkA = new Color(col(r, 32), col(g, 160), col(b, 320), 100);
     colormark2A = new Color(col(r, 16), col(g, 80), col(b, 160), 100);
     colormark1 = new Color(col(r, 16), col(g, 120), col(b, 240));
-    colormark2 = new Color(col(r, 16), col(g,  80), col(b, 160));
+    colormark2 = new Color(col(r, 16), col(g, 80), col(b, 160));
     colormark3 = new Color(col(r, 32), col(g, 160), col(b, 320));
-    colormark4 = new Color(col(r,  1), col(g,  40), col(b,  80));
-    colormark5 = new Color(col(r, 20), col(g,  48), col(b,  62));
+    colormark4 = new Color(col(r, 1), col(g, 40), col(b, 80));
 
     // create color array
     for(int l = 1; l < 257; l++) {

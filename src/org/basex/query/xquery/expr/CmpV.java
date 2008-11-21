@@ -21,7 +21,7 @@ import org.basex.util.Token;
  */
 public final class CmpV extends Arr {
   /** Comparators. */
-  public enum COMP {
+  public enum Comp {
     /** Item Comparison:less or equal. */
     LE("le") {
       @Override
@@ -81,7 +81,7 @@ public final class CmpV extends Arr {
      * Constructor.
      * @param n string representation
      */
-    COMP(final String n) { name = n; }
+    Comp(final String n) { name = n; }
 
     /**
      * Evaluates the expression.
@@ -97,7 +97,7 @@ public final class CmpV extends Arr {
   }
   
   /** Comparator. */
-  private final COMP cmp;
+  private final Comp cmp;
 
   /**
    * Constructor.
@@ -105,7 +105,7 @@ public final class CmpV extends Arr {
    * @param e2 second expression
    * @param c comparator
    */
-  public CmpV(final Expr e1, final Expr e2, final COMP c) {
+  public CmpV(final Expr e1, final Expr e2, final Comp c) {
     super(e1, e2);
     cmp = c;
   }

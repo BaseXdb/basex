@@ -40,7 +40,7 @@ public final class FTOr extends FTArrayExpr {
       exprs[i] = exprs[i].comp(ctx);
     }
     return this;
-   }
+  }
 
   @Override
   public FTArrayExpr indexEquivalent(final XPContext ctx, final Step curr,
@@ -49,11 +49,10 @@ public final class FTOr extends FTArrayExpr {
     if (pex.length == 1 && seq)
       exprs[pex[0]].indexEquivalent(ctx, curr, seq);
 
-    final FTArrayExpr[] indexExprs = new FTArrayExpr[exprs.length];
     for (int i = 0; i < exprs.length; i++) {
-      indexExprs[i] = exprs[i].indexEquivalent(ctx, curr, seq);
+      exprs[i] = exprs[i].indexEquivalent(ctx, curr, seq);
     }
-    return new FTUnion(indexExprs, pex);
+    return new FTUnion(exprs, pex);
   }
 
   @Override

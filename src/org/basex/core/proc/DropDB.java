@@ -42,6 +42,6 @@ public final class DropDB extends Process {
   
   @Override
   public String toString() {
-    return COMMANDS.DROP.name() + " " + DROP.DB + args();
+    return Cmd.DROP.name() + " " + CmdDrop.DB + args();
   }
 }

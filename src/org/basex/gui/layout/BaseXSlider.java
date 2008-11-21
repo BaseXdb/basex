@@ -7,7 +7,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import org.basex.gui.GUIConstants;
-import org.basex.gui.GUIConstants.FILL;
+import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.dialog.Dialog;
 
 /**
@@ -49,7 +49,7 @@ public final class BaseXSlider extends BaseXPanel {
     max = mx;
     curr = initial;
     setFocusable(true);
-    setMode(FILL.NONE);
+    setMode(Fill.NONE);
 
     BaseXLayout.addDefaultKeys(this, listener);
     BaseXLayout.setHeight(this, getFont().getSize() + 3);

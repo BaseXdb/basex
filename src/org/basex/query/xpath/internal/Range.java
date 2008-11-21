@@ -81,7 +81,7 @@ public final class Range extends InternalExpr {
     final LocPath path = (LocPath) expr;
     final LocPath inv = path.invertPath(curr);
 
-    final boolean txt = index.type == IndexToken.TYPE.TXT;
+    final boolean txt = index.type == IndexToken.Type.TXT;
     ctx.compInfo(txt ? OPTINDEX : OPTATTINDEX);
     if(!txt) inv.steps.add(0, Axis.create(Axis.SELF, path.steps.last().test));
     return new Path(new RangeAccess(index), inv);

@@ -32,7 +32,6 @@ import org.basex.util.Token;
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
- * @author Stefan Klinger
  */
 public final class BaseXServer {
   /** Session time out in seconds. */

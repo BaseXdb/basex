@@ -1,7 +1,7 @@
 package org.basex.core.proc;
 
 import org.basex.core.Process;
-import org.basex.core.Commands.UPDATE;
+import org.basex.core.Commands.CmdUpdate;
 import org.basex.data.Data;
 import org.basex.util.Token;
 
@@ -15,7 +15,7 @@ abstract class AUpdate extends Process {
   /** GUI flag. */
   protected final boolean gui;
   /** Insert type. */
-  protected final UPDATE type;
+  protected final CmdUpdate type;
 
   /**
    * Constructor.
@@ -23,7 +23,7 @@ abstract class AUpdate extends Process {
    * @param t update type
    * @param a arguments
    */
-  AUpdate(final boolean g, final UPDATE t, final String... a) {
+  AUpdate(final boolean g, final CmdUpdate t, final String... a) {
     super(DATAREF | UPDATING, a);
     gui = g;
     type = t;

@@ -205,7 +205,7 @@ public final class DialogCreate extends Dialog {
     fc.addFilter(IO.ZIPSUFFIX, CREATEZIPDESC);
     fc.addFilter(IO.XMLSUFFIX, CREATEXMLDESC);
 
-    if(fc.select(BaseXFileChooser.MODE.OPENDIR)) {
+    if(fc.select(BaseXFileChooser.Mode.OPENDIR)) {
       final IO file = fc.getFile();
       path.setText(file.path());
       dbname.setText(file.dbname());

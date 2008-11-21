@@ -8,7 +8,6 @@ import org.basex.io.PrintOutput;
  * interpretation.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
- * @author Stefan Klinger
  * @author Christian Gruen
  */
 public abstract class AbstractProcess extends Progress {

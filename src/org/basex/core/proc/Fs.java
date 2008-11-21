@@ -6,7 +6,7 @@ import org.basex.BaseX;
 import org.basex.core.Commands;
 import org.basex.core.Process;
 import org.basex.core.Prop;
-import org.basex.core.Commands.FS;
+import org.basex.core.Commands.CmdFS;
 import org.basex.fs.FSCmd;
 import org.basex.fs.FSException;
 import org.basex.io.PrintOutput;
@@ -35,8 +35,8 @@ public final class Fs extends Process {
     if(args.length == 0) return fsmode(true);
     
     try {
-      final Commands.FS cmd = FS.valueOf(args[0]);
-      if(cmd == Commands.FS.EXIT) return fsmode(false);
+      final Commands.CmdFS cmd = CmdFS.valueOf(args[0]);
+      if(cmd == Commands.CmdFS.EXIT) return fsmode(false);
       
       // evaluate arguments...
       fs = FSCmd.get(cmd);

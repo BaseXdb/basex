@@ -42,7 +42,7 @@ public final class DialogAbout extends Dialog {
     label.setVerticalAlignment(SwingConstants.TOP);
     p.add(label, BorderLayout.WEST);
 
-    final BaseXBack pp = new BaseXBack(GUIConstants.FILL.NONE);
+    final BaseXBack pp = new BaseXBack(GUIConstants.Fill.NONE);
     pp.setLayout(new TableLayout(15, 1));
 
     label = new BaseXLabel(Text.TITLE, false, true);

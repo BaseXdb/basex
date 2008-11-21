@@ -28,8 +28,10 @@ public final class Set extends Process {
   protected boolean exec() {
     final String option = args[0];
 
-    SET s = null;
-    try { s = Enum.valueOf(SET.class, option); } catch(final Exception ex) { }
+    CmdSet s = null;
+    try {
+      s = Enum.valueOf(CmdSet.class, option);
+    } catch(final Exception ex) { }
     
     try {
       final Field f = Prop.class.getField(option.toLowerCase());
@@ -37,7 +39,7 @@ public final class Set extends Process {
       String val = args[1];
       
       if(key instanceof Boolean) {
-        if(s == SET.INFO && ALL.equals(val)) {
+        if(s == CmdSet.INFO && ALL.equals(val)) {
           Prop.allInfo = true;
           Prop.info = true;
           val = INFOON + " (" + INFOALL + ")";

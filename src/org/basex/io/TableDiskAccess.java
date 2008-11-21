@@ -9,6 +9,7 @@ import org.basex.util.Array;
  * This class stores the table on disk and reads it block-wise.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Christian Gruen
  * @author Tim Petrowsky
  */
 public final class TableDiskAccess extends TableAccess {

@@ -73,7 +73,7 @@ public final class TreeView extends View {
   public TreeView(final byte[] help) {
     super(help);
     createBoxes();
-    setMode(GUIConstants.FILL.UP);
+    setMode(GUIConstants.Fill.UP);
     setLayout(new BorderLayout());
     scroll = new BaseXBar(this);
     add(scroll, BorderLayout.EAST);

@@ -87,7 +87,7 @@ public final class DialogImportFS  extends Dialog {
       public void actionPerformed(final ActionEvent e) {
         final BaseXFileChooser fc = new BaseXFileChooser(
             DIALOGFC, path.getText(), parent);
-        if(fc.select(BaseXFileChooser.MODE.DIR)) {
+        if(fc.select(BaseXFileChooser.Mode.DIR)) {
           final IO file = fc.getFile();
           path.setText(file.path());
           dbname.setText(file.dbname());

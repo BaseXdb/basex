@@ -94,9 +94,9 @@ abstract class ACreate extends Process {
    * @throws IOException I/O exception
    */
   void index(final Data data) throws IOException {
-    if(data.meta.txtindex) buildIndex(IndexToken.TYPE.TXT, data);
-    if(data.meta.atvindex) buildIndex(IndexToken.TYPE.ATV, data);
-    if(data.meta.ftxindex) buildIndex(IndexToken.TYPE.FTX, data);
+    if(data.meta.txtindex) buildIndex(IndexToken.Type.TXT, data);
+    if(data.meta.atvindex) buildIndex(IndexToken.Type.ATV, data);
+    if(data.meta.ftxindex) buildIndex(IndexToken.Type.FTX, data);
   }
 
   /**
@@ -105,7 +105,7 @@ abstract class ACreate extends Process {
    * @param d data reference
    * @throws IOException I/O exception
    */
-  void buildIndex(final IndexToken.TYPE i, final Data d)
+  void buildIndex(final IndexToken.Type i, final Data d)
       throws IOException {
 
     switch(i) {
@@ -124,7 +124,7 @@ abstract class ACreate extends Process {
    * @param data data reference
    * @throws IOException I/O exception
    */
-  private void buildIndex(final IndexToken.TYPE index, final IndexBuilder
+  private void buildIndex(final IndexToken.Type index, final IndexBuilder
       builder, final Data data) throws IOException {
 
     final Performance pp = new Performance();

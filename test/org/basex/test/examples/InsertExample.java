@@ -1,7 +1,7 @@
 package org.basex.test.examples;
 
 import org.basex.core.*;
-import org.basex.core.Commands.UPDATE;
+import org.basex.core.Commands.CmdUpdate;
 import org.basex.core.proc.*;
 import org.basex.io.*;
 
@@ -35,7 +35,7 @@ public final class InsertExample {
     // Document to insert: input.xml
     // Position to insert: 0 = end of specified XPath target
     // Target nodes: insert after /html ...
-    new Insert(UPDATE.FRAGMENT, "input.xml", "0", "/html").
+    new Insert(CmdUpdate.FRAGMENT, "input.xml", "0", "/html").
       execute(context, out);
 
     // Serializes the database to show the result

@@ -109,7 +109,7 @@ public final class FTTrie extends Index {
     final byte[] tok = ft.get();
     if(ft.fz) {
       int k = Prop.lserr;
-      if(k == 0) k = Math.max(1, tok.length >> 2);
+      if(k == 0) k = tok.length >> 2;
       return getNodeFuzzy(0, null, -1, tok, 0, 0, 0, k);
     }
 
@@ -266,7 +266,6 @@ public final class FTTrie extends Index {
       ne = getNodeEntry(b);
       ldid = did;
       dt = FTFuzzy.getData(ldid, ne[ne.length - 1], inD, data.meta);
-      //dt = getDataFromDataArray(ne[ne.length - 1], ldid);
       dt = getAllNodes(b, b, dt);
     }
 
@@ -284,8 +283,6 @@ public final class FTTrie extends Index {
       final IndexArrayIterator tmp = 
         FTFuzzy.getData(ldid, ne[ne.length - 1], inD, data.meta);
       dt = IndexArrayIterator.merge(getAllNodes(id, b, tmp), dt);
-      //final int[][] tmp = getDataFromDataArray(ne[ne.length - 1], ldid);
-      //dt = calculateFTOr(dt, getAllNodes(id, b, tmp));
     }
 
     for (int i = 0; i < idNNF[0].length; i++) {
@@ -794,9 +791,7 @@ public final class FTTrie extends Index {
       final long tdid = did;
       final IndexArrayIterator tmp 
         = FTFuzzy.getData(tdid, ne[ne.length - 1], inD, data.meta);
-      //final int[][] tmp = getDataFromDataArray(ne[ne.length - 1], tdid);
       if (tmp != null) {
-        //newData = calculateFTOr(dt, tmp);
         newData = IndexArrayIterator.merge(dt, tmp);
       }
 
@@ -1400,7 +1395,6 @@ public final class FTTrie extends Index {
     }
   }
 
-
   /**
    * Traverse trie and return found node for searchValue; returns data
    * from node or null.
@@ -1590,110 +1584,5 @@ public final class FTTrie extends Index {
       }
       return ld;
     }
-  }
-
-  /**
-   * Builds an or-conjunction of values1 and values2.
-    * @param values1 input set
-    * @param values2 input set
-    * @return union set int[][]
-    */
-  static int[][] calculateFTOr(final int[][] values1,
-      final int[][] values2) {
-
-    int[][] val1 = values1;
-    int[][] val2 = values2;
-
-    if(val1 == null || val1[0].length == 0) return val2;
-    if(val2 == null || val2[0].length == 0) return val1;
-
-    final int[][] maxResult = new int[2][val1[0].length + val2[0].length];
-
-    // calculate maximum
-    final int max = Math.max(val1[0].length, val2[0].length);
-    if(max == val1.length) {
-      final int[][] tmp = val1;
-      val1 = val2;
-      val2 = tmp;
-    }
-
-    // process smaller set
-    int i = 0;
-    int k = 0;
-    int c = 0;
-    while(val1[0].length > i) {
-      if(k >= val2[0].length) break;
-
-      final int cmp = compareIntArrayEntry(val1[0][i], val1[1][i],
-          val2[0][k], val2[1][k]);
-      final boolean l = cmp > 0;
-      maxResult[0][c] = l ? val2[0][k] : val1[0][i];
-      maxResult[1][c] = l ? val2[1][k] : val1[1][i];
-
-      if(cmp >= 0) k++;
-      if(cmp <= 0) i++;
-      c++;
-    }
-    if(c == 0) return null;
-
-    final boolean l = k == val2[0].length && i < val1[0].length;
-    final int[] left = l ? val1[0] : val2[0];
-    final int v = left.length - (l ? i : k);
-
-    final int[][] result = new int[2][c + v];
-    // copy first values
-    System.arraycopy(maxResult[0], 0, result[0], 0, c);
-    System.arraycopy(maxResult[1], 0, result[1], 0, c);
-
-    // copy left values
-    System.arraycopy(left, l ? i : k, result[0], c, v);
-    System.arraycopy(left, l ? i : k, result[1], c, v);
-
-    return result;
-  }
-
-  /**
-   * Compares 2 int[1][2] array entries and returns.
-   *  0 for equality
-   * -1 if intArrayEntry1 < intArrayEntry2 (same id) or
-   *  1  if intArrayEntry1 > intArrayEntry2 (same id)
-   *  2  real bigger (different id)
-   * -2 real smaller (different id)
-   *
-   * @param id1 first id
-   * @param p1 first position
-   * @param id2 second id
-   * @param p2 second position
-   * @return result [0|-1|1|2|-2]
-   */
-  static int compareIntArrayEntry(final int id1, final int p1,
-      final int id2, final int p2) {
-
-    // equal ID, equal pos or data1 behind/before data2
-    if(id1 == id2) return p1 == p2 ? 0 : p1 > p2 ? 1 : -1;
-    // real bigger/smaller
-    return id1 > id2 ? 2 : -2;
-  }
-
-  /**
-   * Extracts ids out of an int[2][]-array.
-   * int[0] = ids
-   * int[1] = position values
-   * @param data data
-   * @return ids int[]
-   */
-  static int[] extractIDsFromData(final int[][] data) {
-    if(data == null || data.length == 0 || data[0] == null
-        || data[0].length == 0) return Array.NOINTS;
-
-    final int l = data[0].length;
-    final int[] ids = new int[l];
-    ids[0] = data[0][0];
-    int c = 1;
-    for(int i = 1; i < l; i++) {
-      final int j = data[0][i];
-      if(ids[c - 1] != j) ids[c++] = j;
-    }
-    return Array.finish(ids, c);
   }
 }

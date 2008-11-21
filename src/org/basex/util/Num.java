@@ -12,14 +12,6 @@ public final class Num {
   private Num() { }
   
   // STATIC METHODS ===========================================================
-  
-  /**
-   * Returns an empty number array.
-   * @return new array
-  public static byte[] newNum() {
-    return new byte[] { 0, 0, 0, 4 };
-  }
-   */
 
   /**
    * Creates a new number array.

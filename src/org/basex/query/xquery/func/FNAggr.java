@@ -42,10 +42,10 @@ final class FNAggr extends Fun {
         return Itr.iter(c);
       case MIN:
         if(arg.length == 2) checkColl(arg[1]);
-        return minmax(iter, CmpV.COMP.GT, ctx);
+        return minmax(iter, CmpV.Comp.GT, ctx);
       case MAX:
         if(arg.length == 2) checkColl(arg[1]);
-        return minmax(iter, CmpV.COMP.LT, ctx);
+        return minmax(iter, CmpV.Comp.LT, ctx);
       case SUM:
         final Iter zero = arg.length == 2 ? arg[1] : null;
         Item it = iter.next();
@@ -129,7 +129,7 @@ final class FNAggr extends Fun {
    * @return resulting item
    * @throws XQException thrown if the items can't be compared
    */
-  private Iter minmax(final Iter iter, final CmpV.COMP cmp, final XQContext ctx)
+  private Iter minmax(final Iter iter, final CmpV.Comp cmp, final XQContext ctx)
       throws XQException {
 
     Item res = iter.next();
@@ -182,7 +182,7 @@ final class FNAggr extends Fun {
    * @return resulting item
    * @throws XQException thrown if the items can't be compared
    */
-  private Iter evalStr(final Iter iter, final Item r, final CmpV.COMP cmp)
+  private Iter evalStr(final Iter iter, final Item r, final CmpV.Comp cmp)
       throws XQException {
 
     Item res = r;

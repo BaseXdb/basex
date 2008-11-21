@@ -5,8 +5,7 @@ import org.basex.io.IO;
 import org.basex.util.Atts;
 
 /**
- * This is class defines methods for parser implementations.
- * A parser is applied to create database instances.
+ * This is class defines a parser for creating databases from various sources.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
@@ -36,17 +35,17 @@ public abstract class Parser {
    * Returns a compact description of the current progress.
    * @return progress information
    */
-  public String head() { return ""; }
+  public abstract String head();
 
   /**
    * Returns detailed progress information.
    * @return position info
    */
-  public String det() { return ""; }
+  public abstract String det();
 
   /**
    * Returns a value from 0 to 1, representing the current progress.
    * @return progress information
    */
-  public double prog() { return 0; }
+  public abstract double prog();
 }

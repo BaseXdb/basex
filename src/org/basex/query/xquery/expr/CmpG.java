@@ -1,7 +1,6 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQTokens.*;
-
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
@@ -22,31 +21,31 @@ import org.basex.util.Token;
  */
 public final class CmpG extends Arr {
   /** Comparators. */
-  public enum COMP {
+  public enum Comp {
     /** General Comparison: less or equal. */
-    LE("<=", CmpV.COMP.LE),
+    LE("<=", CmpV.Comp.LE),
     /** General Comparison: less. */
-    LT("<", CmpV.COMP.LT),
+    LT("<", CmpV.Comp.LT),
     /** General Comparison: greater of equal. */
-    GE(">=", CmpV.COMP.GE),
+    GE(">=", CmpV.Comp.GE),
     /** General Comparison: greater. */
-    GT(">", CmpV.COMP.GT),
+    GT(">", CmpV.Comp.GT),
     /** General Comparison: equal. */
-    EQ("=", CmpV.COMP.EQ),
+    EQ("=", CmpV.Comp.EQ),
     /** General Comparison: not equal. */
-    NE("!=", CmpV.COMP.NE);
+    NE("!=", CmpV.Comp.NE);
 
     /** String representation. */
     public final String name;
     /** Comparator. */
-    public final CmpV.COMP cmp;
+    public final CmpV.Comp cmp;
 
     /**
      * Constructor.
      * @param n string representation
      * @param c comparator
      */
-    COMP(final String n, final CmpV.COMP c) {
+    Comp(final String n, final CmpV.Comp c) {
       name = n;
       cmp = c;
     }
@@ -56,7 +55,7 @@ public final class CmpG extends Arr {
   };
 
   /** Comparator. */
-  final COMP cmp;
+  final Comp cmp;
 
   /**
    * Constructor.
@@ -64,7 +63,7 @@ public final class CmpG extends Arr {
    * @param e2 second expression
    * @param c comparator
    */
-  public CmpG(final Expr e1, final Expr e2, final COMP c) {
+  public CmpG(final Expr e1, final Expr e2, final Comp c) {
     super(e1, e2);
     cmp = c;
   }
@@ -148,7 +147,7 @@ public final class CmpG extends Arr {
    * @return result of check
    * @throws XQException thrown if the items can't be compared
    */
-  static boolean ev(final Item a, final Item b, final CmpV.COMP c)
+  static boolean ev(final Item a, final Item b, final CmpV.Comp c)
       throws XQException {
 
     if(a.type != b.type && !a.u() && !b.u() && !(a.s() && b.s()) && 

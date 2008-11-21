@@ -12,7 +12,7 @@ import org.basex.gui.GUICommands;
 import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIToolBar;
-import org.basex.gui.GUIConstants.FILL;
+import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXSyntax;
 import org.basex.gui.layout.BaseXText;
@@ -43,7 +43,7 @@ public final class TextView extends View {
    * @param head text header
    * @param help help text
    */
-  public TextView(final FILL mode, final String head, final byte[] help) {
+  public TextView(final Fill mode, final String head, final byte[] help) {
     super(help);
     setLayout(new BorderLayout(0, 4));
     setBorder(4, 8, 8, 8);

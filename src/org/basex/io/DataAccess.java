@@ -6,7 +6,7 @@ import java.io.RandomAccessFile;
 import org.basex.util.Num;
 
 /**
- * This class allows positional read access.
+ * This class allows positional read and write access to a database file.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen

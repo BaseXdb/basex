@@ -48,10 +48,10 @@ public final class MemData extends Data {
   public void close() { }
 
   @Override
-  public void closeIndex(final IndexToken.TYPE index) { }
+  public void closeIndex(final IndexToken.Type index) { }
 
   @Override
-  public void setIndex(final IndexToken.TYPE type, final Index ind) {
+  public void setIndex(final IndexToken.Type type, final Index ind) {
     BaseX.notimplemented();
   }
 

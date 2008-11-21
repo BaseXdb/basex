@@ -20,7 +20,7 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.TableLayout;
 import org.basex.index.IndexToken;
-import org.basex.index.IndexToken.TYPE;
+import org.basex.index.IndexToken.Type;
 import org.basex.util.Token;
 
 /**
@@ -85,7 +85,7 @@ public final class DialogInfo extends Dialog {
         meta.txtindex, 0, this);
     p.add(indexes[0], BorderLayout.NORTH);
 
-    p.add(text(meta.txtindex ? data.info(IndexToken.TYPE.TXT) :
+    p.add(text(meta.txtindex ? data.info(IndexToken.Type.TXT) :
       Token.token(TXTINDEXINFO)), BorderLayout.CENTER);
     tab3.add(p);
 
@@ -96,7 +96,7 @@ public final class DialogInfo extends Dialog {
         meta.atvindex, 0, this);
     p.add(indexes[1], BorderLayout.NORTH);
     
-    p.add(text(meta.atvindex ? data.info(IndexToken.TYPE.ATV) :
+    p.add(text(meta.atvindex ? data.info(IndexToken.Type.ATV) :
       Token.token(ATTINDEXINFO)), BorderLayout.CENTER);
     tab3.add(p);
 
@@ -125,7 +125,7 @@ public final class DialogInfo extends Dialog {
         p.add(fl[f]);
       }
     } else {
-      p.add(text(data.info(IndexToken.TYPE.FTX)), BorderLayout.CENTER);
+      p.add(text(data.info(IndexToken.Type.FTX)), BorderLayout.CENTER);
     }
     tab4.add(p);
     
@@ -160,7 +160,7 @@ public final class DialogInfo extends Dialog {
     String lbl = tag ? INFOTAGINDEX : INFOATNINDEX;
     if(!data.tags.uptodate) lbl += " (" + INFOOUTOFDATED + ")";
     p.add(new BaseXLabel(lbl, false, true), BorderLayout.NORTH);
-    final TYPE index = tag ? IndexToken.TYPE.TAG : IndexToken.TYPE.ATN;
+    final Type index = tag ? IndexToken.Type.TAG : IndexToken.Type.ATN;
     p.add(text(data.info(index)), BorderLayout.CENTER);
     return p;
   }

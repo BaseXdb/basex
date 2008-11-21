@@ -28,7 +28,6 @@ import org.basex.util.Performance;
 
 /**
  * This is the starter class for the graphical frontend.
- * An initial XML document or database file can be specified as argument.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
@@ -158,7 +157,8 @@ public final class BaseXWin {
 
   /**
    * Main Method.
-   * @param args command line arguments (ignored).
+   * @param args command line arguments.
+   * An initial XML document or database file can be specified as argument.
    */
   public static void main(final String[] args) {
     new BaseXWin(args);

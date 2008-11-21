@@ -82,17 +82,17 @@ public final class CreateDB extends ACreate {
 
     final Data data = new DiskBuilder().build(p, db);
     if(data.meta.txtindex) data.setIndex(
-        IndexToken.TYPE.TXT, new ValueBuilder(true).build(data));
+        IndexToken.Type.TXT, new ValueBuilder(true).build(data));
     if(data.meta.atvindex) data.setIndex(
-        IndexToken.TYPE.ATV, new ValueBuilder(false).build(data));
+        IndexToken.Type.ATV, new ValueBuilder(false).build(data));
     if(data.meta.ftxindex) data.setIndex(
-        IndexToken.TYPE.FTX, data.meta.ftfz ?
+        IndexToken.Type.FTX, data.meta.ftfz ?
           new FTFuzzyBuilder().build(data) : new FTBuilder().build(data));
     return data;
   }
   
   @Override
   public String toString() {
-    return COMMANDS.CREATE.name() + " " + CREATE.DB + args();
+    return Cmd.CREATE.name() + " " + CmdCreate.DB + args();
   }
 }

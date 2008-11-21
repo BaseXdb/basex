@@ -2,8 +2,8 @@ package org.basex.core.proc;
 
 import static org.basex.Text.*;
 import java.io.IOException;
-import org.basex.core.Commands.COMMANDS;
-import org.basex.core.Commands.INFO;
+import org.basex.core.Commands.Cmd;
+import org.basex.core.Commands.CmdInfo;
 import org.basex.data.Data;
 import org.basex.index.IndexToken;
 import org.basex.io.PrintOutput;
@@ -25,25 +25,25 @@ public final class InfoIndex extends AInfo {
   protected void out(final PrintOutput out) throws IOException {
     final Data data = context.data();
     out.println(INFOTAGINDEX);
-    out.println(data.info(IndexToken.TYPE.TAG));
+    out.println(data.info(IndexToken.Type.TAG));
     out.println(INFOATNINDEX);
-    out.println(data.info(IndexToken.TYPE.ATN));
+    out.println(data.info(IndexToken.Type.ATN));
     if(data.meta.txtindex) {
       out.println(INFOTEXTINDEX);
-      out.println(data.info(IndexToken.TYPE.TXT));
+      out.println(data.info(IndexToken.Type.TXT));
     }
     if(data.meta.atvindex) {
       out.println(INFOATTRINDEX);
-      out.println(data.info(IndexToken.TYPE.ATV));
+      out.println(data.info(IndexToken.Type.ATV));
     }
     if(data.meta.ftxindex) {
       out.println(INFOFTINDEX);
-      out.println(data.info(IndexToken.TYPE.FTX));
+      out.println(data.info(IndexToken.Type.FTX));
     }
   }
   
   @Override
   public String toString() {
-    return COMMANDS.INFO.name() + " " + INFO.INDEX;
+    return Cmd.INFO.name() + " " + CmdInfo.INDEX;
   }
 }

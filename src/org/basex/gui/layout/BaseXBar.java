@@ -7,7 +7,7 @@ import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import javax.swing.JComponent;
 import org.basex.gui.GUIConstants;
-import org.basex.gui.GUIConstants.FILL;
+import org.basex.gui.GUIConstants.Fill;
 import org.basex.util.Action;
 import org.basex.util.Performance;
 
@@ -86,7 +86,7 @@ public final class BaseXBar extends BaseXPanel {
     addMouseListener(this);
     addKeyListener(this);
     addMouseMotionListener(this);
-    setMode(FILL.NONE);
+    setMode(Fill.NONE);
     BaseXLayout.setWidth(this, SIZE);
     ww = SIZE;
   }

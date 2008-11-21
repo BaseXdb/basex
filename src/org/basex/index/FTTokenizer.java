@@ -46,7 +46,7 @@ public final class FTTokenizer extends IndexToken {
    * Empty constructor.
    */
   public FTTokenizer() {
-    super(TYPE.FTX);
+    super(Type.FTX);
   }
 
   /**

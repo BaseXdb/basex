@@ -12,7 +12,7 @@ import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.GUIToolBar;
-import org.basex.gui.GUIConstants.FILL;
+import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXLabel;
@@ -56,7 +56,7 @@ public final class QueryView extends View {
     setLayout(new BorderLayout(0, 4));
     setBorder(4, 8, 8, 8);
 
-    back = new BaseXBack(FILL.NONE);
+    back = new BaseXBack(Fill.NONE);
     back.setLayout(new BorderLayout());
     header = new BaseXLabel(GUIConstants.QUERYVIEW, true);
     back.add(header, BorderLayout.NORTH);

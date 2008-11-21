@@ -3,10 +3,12 @@ package org.basex;
 import static org.basex.core.Commands.*;
 import static org.basex.core.Lang.*;
 import static org.basex.util.Token.*;
+import org.basex.core.Lang;
 
 /**
- * This class organizes textual information for the project classes.
- * All texts are externalized and internationalized.
+ * This class contains internationalized text strings, which are used
+ * throughout the project. If this class is called first, the Strings
+ * are initialized by the {@link Lang} class.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
@@ -154,16 +156,16 @@ public interface Text {
   String DUMMYDATABASE0 = lang("ch_dummydatabase0");
 
   /** Command help. */
-  String CREATE0 = "[" + CREATE.DB + "|" + CREATE.FS + "|" + CREATE.INDEX +
-    "] [...]";
+  String CREATE0 = "[" + CmdCreate.DB + "|" + CmdCreate.FS + "|" +
+    CmdCreate.INDEX + "] [...]";
   /** Command help. */
   String CREATE1 = lang("ch_create1");
   /** Command help. */
   String CREATE2 = lang("ch_create2") + NL + NL +
-    LI + CREATE.DB + lang("ch_file") + NL + lang("ch_create3") + NL +
-    LI + CREATE.FS + lang("ch_create4") + NL + lang("ch_create5") + NL +
-    LI + CREATE.INDEX + " [" + INDEX.TEXT + "|" + INDEX.ATTRIBUTE +
-    "|" + INDEX.FULLTEXT + "]: " + NL + lang("ch_create6");
+    LI + CmdCreate.DB + lang("ch_file") + NL + lang("ch_create3") + NL +
+    LI + CmdCreate.FS + lang("ch_create4") + NL + lang("ch_create5") + NL +
+    LI + CmdCreate.INDEX + " [" + CmdIndex.TEXT + "|" + CmdIndex.ATTRIBUTE +
+    "|" + CmdIndex.FULLTEXT + "]: " + NL + lang("ch_create6");
   /** Command help. */
   String OPEN0 = lang("ch_open0");
   /** Command help. */
@@ -171,14 +173,15 @@ public interface Text {
   /** Command help. */
   String OPEN2 = lang("ch_open2");
   /** Command help. */
-  String INFO0 = "[" + INFO.DB + "|" + INFO.INDEX + "|" + INFO.TABLE + "]?";
+  String INFO0 = "[" + CmdInfo.DB + "|" + CmdInfo.INDEX + "|" +
+    CmdInfo.TABLE + "]?";
   /** Command help. */
   String INFO1 = lang("ch_info1");
   /** Command help. */
   String INFO2 = lang("ch_info21") + NL + lang("ch_info22") + NL +
-    LI + INFO.DB + lang("ch_info23") + NL +
-    LI + INFO.INDEX + lang("ch_info24") + NL +
-    LI + INFO.TABLE + lang("ch_info25");
+    LI + CmdInfo.DB + lang("ch_info23") + NL +
+    LI + CmdInfo.INDEX + lang("ch_info24") + NL +
+    LI + CmdInfo.TABLE + lang("ch_info25");
   /** Command help. */
   String CHECK0 = lang("ch_check0");
   /** Command help. */
@@ -198,14 +201,14 @@ public interface Text {
   /** Command help. */
   String LIST2 = lang("ch_list2");
   /** Command help. */
-  String DROP0 = "[" + DROP.DB + "|" + DROP.INDEX + "] [...]";
+  String DROP0 = "[" + CmdDrop.DB + "|" + CmdDrop.INDEX + "] [...]";
   /** Command help. */
   String DROP1 = lang("ch_drop1");
   /** Command help. */
   String DROP2 = lang("ch_drop2") + NL +
-    LI + DROP.DB + lang("ch_drop21") + NL + lang("ch_drop22") + NL +
-    LI + DROP.INDEX + " [" + INDEX.TEXT + "|" + INDEX.ATTRIBUTE + "|" +
-  INDEX.FULLTEXT + "]:" + NL + lang("ch_drop23");
+    LI + CmdDrop.DB + lang("ch_drop21") + NL + lang("ch_drop22") + NL +
+    LI + CmdDrop.INDEX + " [" + CmdIndex.TEXT + "|" + CmdIndex.ATTRIBUTE + "|" +
+  CmdIndex.FULLTEXT + "]:" + NL + lang("ch_drop23");
   /** Command help. */
   String OPTIMIZE0 = "";
   /** Command help. */
@@ -282,31 +285,31 @@ public interface Text {
   String DELETE2 = lang("ch_delete2");
 
   /** Command Help. */
-  String INSERT0 = "[" + UPDATE.FRAGMENT + "|" + UPDATE.ELEMENT + "|" +
-    UPDATE.ATTRIBUTE + "|" + UPDATE.TEXT + "|" + UPDATE.COMMENT + "|" +
-    UPDATE.PI + "] [...]";
+  String INSERT0 = "[" + CmdUpdate.FRAGMENT + "|" + CmdUpdate.ELEMENT + "|" +
+    CmdUpdate.ATTRIBUTE + "|" + CmdUpdate.TEXT + "|" + CmdUpdate.COMMENT + "|" +
+    CmdUpdate.PI + "] [...]";
   /** Command Help. */
   String INSERT1 = lang("ch_insert1");
   /** Command Help. */
   String INSERT2 = lang("ch_insert2") + NL + NL +
-    LI + UPDATE.ELEMENT   + S + lang("ch_insert21") + NL +
-    LI + UPDATE.TEXT      + S + lang("ch_insert22") + NL +
-    LI + UPDATE.ATTRIBUTE + S + lang("ch_insert23") + NL +
-    LI + UPDATE.COMMENT   + S + lang("ch_insert24") + NL +
-    LI + UPDATE.PI        + S + lang("ch_insert25") + NL +
-    LI + UPDATE.FRAGMENT  + S + lang("ch_insert26");
+    LI + CmdUpdate.ELEMENT   + S + lang("ch_insert21") + NL +
+    LI + CmdUpdate.TEXT      + S + lang("ch_insert22") + NL +
+    LI + CmdUpdate.ATTRIBUTE + S + lang("ch_insert23") + NL +
+    LI + CmdUpdate.COMMENT   + S + lang("ch_insert24") + NL +
+    LI + CmdUpdate.PI        + S + lang("ch_insert25") + NL +
+    LI + CmdUpdate.FRAGMENT  + S + lang("ch_insert26");
   /** Command Help. */
-  String UPDATE0 = "[" + UPDATE.ELEMENT + "|" + UPDATE.ATTRIBUTE + "|" +
-    UPDATE.TEXT + "|" + UPDATE.COMMENT + "|" + UPDATE.PI + "] [...]";
+  String UPDATE0 = "[" + CmdUpdate.ELEMENT + "|" + CmdUpdate.ATTRIBUTE + "|" +
+    CmdUpdate.TEXT + "|" + CmdUpdate.COMMENT + "|" + CmdUpdate.PI + "] [...]";
   /** Command Help. */
   String UPDATE1 = lang("ch_update1");
   /** Command Help. */
   String UPDATE2 = lang("ch_update2") + NL + NL +
-    LI + UPDATE.ELEMENT   + S + lang("ch_update21") + NL +
-    LI + UPDATE.TEXT      + S + lang("ch_update22") + NL +
-    LI + UPDATE.ATTRIBUTE + S + lang("ch_update23") + NL +
-    LI + UPDATE.COMMENT   + S + lang("ch_update24") + NL +
-    LI + UPDATE.PI        + S + lang("ch_update25");
+    LI + CmdUpdate.ELEMENT   + S + lang("ch_update21") + NL +
+    LI + CmdUpdate.TEXT      + S + lang("ch_update22") + NL +
+    LI + CmdUpdate.ATTRIBUTE + S + lang("ch_update23") + NL +
+    LI + CmdUpdate.COMMENT   + S + lang("ch_update24") + NL +
+    LI + CmdUpdate.PI        + S + lang("ch_update25");
 
   /** Command Help. */
   String DUMMYGENERAL0 = lang("ch_dummygeneral0");
@@ -317,16 +320,16 @@ public interface Text {
   String SET1 = lang("ch_set1");
   /** Command Help. */
   String SET2 = lang("ch_set2") + NL +
-    LI + SET.INFO      + lang("ch_set21") + NL +
-    LI + SET.DEBUG     + lang("ch_set22") + NL +
-    LI + SET.SERIALIZE + lang("ch_set23") + NL +
-    LI + SET.XMLOUTPUT + lang("ch_set24") + NL +
-    LI + SET.MAINMEM   + lang("ch_set25") + NL +
-    LI + SET.CHOP      + lang("ch_set26") + NL +
-    LI + SET.ENTITY    + lang("ch_set27") + NL +
-    LI + SET.TEXTINDEX + lang("ch_set28") + NL +
-    LI + SET.ATTRINDEX + lang("ch_set29") + NL +
-    LI + SET.FTINDEX   + lang("ch_set31");
+    LI + CmdSet.INFO      + lang("ch_set21") + NL +
+    LI + CmdSet.DEBUG     + lang("ch_set22") + NL +
+    LI + CmdSet.SERIALIZE + lang("ch_set23") + NL +
+    LI + CmdSet.XMLOUTPUT + lang("ch_set24") + NL +
+    LI + CmdSet.MAINMEM   + lang("ch_set25") + NL +
+    LI + CmdSet.CHOP      + lang("ch_set26") + NL +
+    LI + CmdSet.ENTITY    + lang("ch_set27") + NL +
+    LI + CmdSet.TEXTINDEX + lang("ch_set28") + NL +
+    LI + CmdSet.ATTRINDEX + lang("ch_set29") + NL +
+    LI + CmdSet.FTINDEX   + lang("ch_set31");
 
   /** Command Help. */
   String HELP0 = "[command]?";

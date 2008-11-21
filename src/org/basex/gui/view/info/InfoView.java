@@ -8,7 +8,7 @@ import java.awt.event.MouseEvent;
 import org.basex.core.Prop;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
-import org.basex.gui.GUIConstants.FILL;
+import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
@@ -67,11 +67,11 @@ public final class InfoView extends View {
    */
   public InfoView(final byte[] help) {
     super(help);
-    setMode(FILL.UP);
+    setMode(Fill.UP);
     setBorder(8, 8, 8, 8);
     setLayout(new BorderLayout());
     
-    north = new BaseXBack(FILL.NONE);
+    north = new BaseXBack(Fill.NONE);
     north.setLayout(new BorderLayout());
     header = new BaseXLabel(INFOTIT);
     north.add(header, BorderLayout.NORTH);

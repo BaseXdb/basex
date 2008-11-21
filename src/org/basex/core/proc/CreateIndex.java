@@ -3,9 +3,9 @@ package org.basex.core.proc;
 import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.BaseX;
-import org.basex.core.Commands.COMMANDS;
-import org.basex.core.Commands.CREATE;
-import org.basex.core.Commands.INDEX;
+import org.basex.core.Commands.Cmd;
+import org.basex.core.Commands.CmdCreate;
+import org.basex.core.Commands.CmdIndex;
 import org.basex.data.Data;
 import org.basex.index.IndexToken;
 
@@ -17,13 +17,13 @@ import org.basex.index.IndexToken;
  */
 public final class CreateIndex extends ACreate {
   /** Index type. */
-  private final INDEX type;
+  private final CmdIndex type;
 
   /**
    * Constructor.
    * @param t index type
    */
-  public CreateIndex(final INDEX t) {
+  public CreateIndex(final CmdIndex t) {
     super(DATAREF);
     type = t;
   }
@@ -32,19 +32,19 @@ public final class CreateIndex extends ACreate {
   protected boolean exec() {
     try {
       final Data data = context.data();
-      IndexToken.TYPE index = null;
+      IndexToken.Type index = null;
       switch(type) {
         case TEXT:
           data.meta.txtindex = true;
-          index = IndexToken.TYPE.TXT;
+          index = IndexToken.Type.TXT;
           break;
         case ATTRIBUTE:
           data.meta.atvindex = true;
-          index = IndexToken.TYPE.ATV;
+          index = IndexToken.Type.ATV;
           break;
         case FULLTEXT:
           data.meta.ftxindex = true;
-          index = IndexToken.TYPE.FTX;
+          index = IndexToken.Type.FTX;
           break;
       }
       data.flush();
@@ -58,6 +58,6 @@ public final class CreateIndex extends ACreate {
   
   @Override
   public String toString() {
-    return COMMANDS.CREATE.name() + " " +  CREATE.INDEX + " " + type;
+    return Cmd.CREATE.name() + " " +  CmdCreate.INDEX + " " + type;
   }
 }

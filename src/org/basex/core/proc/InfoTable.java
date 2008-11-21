@@ -4,8 +4,8 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.core.Prop;
-import org.basex.core.Commands.COMMANDS;
-import org.basex.core.Commands.INFO;
+import org.basex.core.Commands.Cmd;
+import org.basex.core.Commands.CmdInfo;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.io.PrintOutput;
@@ -155,6 +155,6 @@ public final class InfoTable extends AInfo {
   
   @Override
   public String toString() {
-    return COMMANDS.INFO.name() + " " + INFO.TABLE + args();
+    return Cmd.INFO.name() + " " + CmdInfo.TABLE + args();
   }
 }

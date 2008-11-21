@@ -19,7 +19,7 @@ public final class RangeToken extends IndexToken {
    * @param mx maximum value
    */
   public RangeToken(final boolean t, final double mn, final double mx) {
-    super(t ? TYPE.TXT : TYPE.ATV);
+    super(t ? Type.TXT : Type.ATV);
     min = mn;
     max = mx;
   }

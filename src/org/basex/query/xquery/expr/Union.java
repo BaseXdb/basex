@@ -34,7 +34,7 @@ public final class Union extends Arr {
         if(!(it.node())) Err.nodes(this);
         final Nod node = (Nod) it;
         int i = -1;
-        while(++i < nb.size) if(CmpN.COMP.EQ.e(nb.list[i], node)) break;
+        while(++i < nb.size) if(CmpN.Comp.EQ.e(nb.list[i], node)) break;
         if(i == nb.size) nb.add(node);
       }
     }

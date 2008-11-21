@@ -86,7 +86,7 @@ public final class MapView extends View implements Runnable {
    */
   public MapView(final byte[] help) {
     super(help);
-    setMode(GUIConstants.FILL.NONE);
+    setMode(GUIConstants.Fill.NONE);
     popup = new BaseXPopup(this, GUIConstants.POPUP);
   }
 

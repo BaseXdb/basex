@@ -5,7 +5,7 @@ import java.awt.Graphics;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import org.basex.gui.GUIConstants;
-import org.basex.gui.GUIConstants.FILL;
+import org.basex.gui.GUIConstants.Fill;
 
 /**
  * Panel background, extending the {@link JPanel}.
@@ -15,20 +15,20 @@ import org.basex.gui.GUIConstants.FILL;
  */
 public class BaseXBack extends JPanel {
   /** Design of color gradient. */
-  private FILL mode;
+  private Fill mode;
   
   /**
    * Default Constructor.
    */
   public BaseXBack() {
-    this(FILL.PLAIN);
+    this(Fill.PLAIN);
   }
   
   /**
    * Default Constructor.
    * @param m visualization mode
    */
-  public BaseXBack(final FILL m) {
+  public BaseXBack(final Fill m) {
     setMode(m);
   }
   
@@ -36,18 +36,18 @@ public class BaseXBack extends JPanel {
    * Default Constructor.
    * @param m visualization mode
    */
-  public final void setMode(final FILL m) {
+  public final void setMode(final Fill m) {
     mode = m;
-    final boolean o = mode != FILL.NONE;
+    final boolean o = mode != Fill.NONE;
     if(isOpaque() != o) setOpaque(o);
   }
   
   @Override
   public void paintComponent(final Graphics g) {
-    if(mode == FILL.UP || mode == FILL.DOWN) {
+    if(mode == Fill.UP || mode == Fill.DOWN) {
       Color c1 = GUIConstants.color1;
       Color c2 = GUIConstants.color2;
-      if(mode == FILL.UP) { Color t = c1; c1 = c2; c2 = t; }
+      if(mode == Fill.UP) { Color t = c1; c1 = c2; c2 = t; }
       BaseXLayout.fill(g, c1, c2, 0, 0, getWidth(), getHeight());
     } else {
       super.paintComponent(g);

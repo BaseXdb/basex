@@ -28,7 +28,7 @@ public abstract class FSCmd {
    * @param cmd command
    * @return command
    */
-  public static FSCmd get(final Commands.FS cmd) {
+  public static FSCmd get(final Commands.CmdFS cmd) {
     switch(cmd) {
       case CAT:     return new Cat();
       case CD:      return new Cd();

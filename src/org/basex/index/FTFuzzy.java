@@ -156,7 +156,7 @@ public final class FTFuzzy extends Index {
   }
 
   
-  /** Saves the last pointer on the index. Used for wildcardsearch. */
+  /** Saves the last pointer on the index. Used for wildcard search. */
   private int lastIndex = -1;
 
   /**
@@ -294,43 +294,29 @@ public final class FTFuzzy extends Index {
    * of errors e.
    *
    * @param tok token looking for
-   * @param e number of errors allowed
+   * @param k number of errors allowed
    * @return int[][] data
    */
-  private IndexIterator getFuzzy(final byte[] tok, final int e) {
+  private IndexIterator getFuzzy(final byte[] tok, final int k) {
     IndexArrayIterator it = new IndexArrayIterator(0);
-    byte[] to;
 
-    int i = 0;
-    final int is = li.readBytes(0, 1L)[0];
-    int ts = li.readBytes(1L, 2L)[0];
-
-    int dif = Math.abs(tok.length - ts);
-    while (i < is && dif > e) {
-      i++;
-      ts = li.readBytes(1L + i * 5L, 1L + i * 5L + 1L)[0];
-      dif = Math.abs(tok.length - ts);
-    }
-    if (i == is) return null;
-
-    int p;
-    int pe;
-    while (i < is && dif <= e) {
-      p = li.readInt(1L + i * 5L + 1L);
-      pe = li.readInt(1L + (i + 1) * 5L + 1L);
-
-      while(p < pe) {
-        to = ti.readBytes(p, p + ts);
-        if (calcEQ(to, 0, tok, e)) {
-          // read data
-          it = IndexArrayIterator.merge(getData(getPointerOnData(p, ts), 
-              getDataSize(p, ts), dat, data.meta), it);
+    final int tl = tok.length;
+    final int e = Math.min(tp.length, tl + k);
+    int s = Math.max(1, tl - k) - 1;
+    
+    while(++s <= e) {
+      int p = tp[s];
+      if(p == -1) continue;
+      int i = s + 1;
+      int r = -1;
+      do r = tp[i++]; while(r == -1);
+      while(p < r) {
+        if (ls.similar(ti.readBytes(p, p + s), tok)) {
+          it = IndexArrayIterator.merge(getData(getPointerOnData(p, s), 
+              getDataSize(p, s), dat, data.meta), it);
         }
-        p += ts + 4L  + 5L;
-     }
-      i++;
-      ts = li.readBytes(1L + i * 5L, 1L + i * 5L + 1L)[0];
-      dif = Math.abs(tok.length - ts);
+        p += s + 9;
+      }
     }
     return it;
   }
@@ -502,25 +488,6 @@ public final class FTFuzzy extends Index {
     li.close();
     ti.close();
     dat.close();
-  }
-
-  /**
-   * Calculates the equality of tok1 and tok2, with respect to the
-   * number or error e, using the Levenshtein algorithm.
-   *
-   * @param tok1 token1 to compare
-   * @param sp start position in token
-   * @param tok2 token2 to compare
-   * @param e number of errors allowed
-   * @return boolean as result
-   */
-  private boolean calcEQ(final byte[] tok1, final int sp,
-      final byte[] tok2, final int e) {
-
-    final int df = Math.abs(tok1.length - tok2.length);
-    return df <= e && (tok1.length > tok2.length ?
-        ls.ls(tok1, sp, tok1.length, tok2, e) :
-        ls.ls(tok2, sp, tok2.length, tok1, e)) <= e;
   }
 
   /**

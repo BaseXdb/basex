@@ -3,8 +3,8 @@ package org.basex.core.proc;
 import static org.basex.Text.*;
 import org.basex.build.mediovis.MAB2Parser;
 import org.basex.core.Prop;
-import org.basex.core.Commands.COMMANDS;
-import org.basex.core.Commands.CREATE;
+import org.basex.core.Commands.Cmd;
+import org.basex.core.Commands.CmdCreate;
 import org.basex.io.IO;
 
 /**
@@ -40,6 +40,6 @@ public final class CreateMAB extends ACreate {
   
   @Override
   public String toString() {
-    return COMMANDS.CREATE.name() + " " + CREATE.MAB + args();
+    return Cmd.CREATE.name() + " " + CmdCreate.MAB + args();
   }
 }

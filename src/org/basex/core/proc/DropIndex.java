@@ -6,7 +6,7 @@ import static org.basex.data.DataText.*;
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.Process;
-import org.basex.core.Commands.INDEX;
+import org.basex.core.Commands.CmdIndex;
 import org.basex.data.Data;
 import org.basex.index.IndexToken;
 import org.basex.io.IO;
@@ -19,13 +19,13 @@ import org.basex.io.IO;
  */
 public final class DropIndex extends Process {
   /** Index type. */
-  protected final INDEX type;
+  protected final CmdIndex type;
 
   /**
    * Constructor.
    * @param t index type
    */
-  public DropIndex(final INDEX t) {
+  public DropIndex(final CmdIndex t) {
     super(DATAREF);
     type = t;
   }
@@ -36,13 +36,13 @@ public final class DropIndex extends Process {
     switch(type) {
       case TEXT:
         data.meta.txtindex = false;
-        return drop(IndexToken.TYPE.TXT, DATATXT);
+        return drop(IndexToken.Type.TXT, DATATXT);
       case ATTRIBUTE:
         data.meta.atvindex = false;
-        return drop(IndexToken.TYPE.ATV, DATAATV);
+        return drop(IndexToken.Type.ATV, DATAATV);
       case FULLTEXT:
         data.meta.ftxindex = false;
-        return drop(IndexToken.TYPE.FTX, DATAFTX);
+        return drop(IndexToken.Type.FTX, DATAFTX);
       default:
         return false;
     }
@@ -54,7 +54,7 @@ public final class DropIndex extends Process {
    * @param pat pattern
    * @return success of operation
    */
-  private boolean drop(final IndexToken.TYPE index, final String pat) {
+  private boolean drop(final IndexToken.Type index, final String pat) {
     try {
       final Data data = context.data();
       data.flush();
@@ -69,6 +69,6 @@ public final class DropIndex extends Process {
   
   @Override
   public String toString() {
-    return COMMANDS.DROP.name() + " " + DROP.INDEX + " " + type;
+    return Cmd.DROP.name() + " " + CmdDrop.INDEX + " " + type;
   }
 }

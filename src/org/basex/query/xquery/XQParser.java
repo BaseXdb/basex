@@ -951,11 +951,11 @@ public final class XQParser extends QueryParser {
     final Expr e = ftContains();
     if(e == null) return null;
 
-    for(final CmpV.COMP c : CmpV.COMP.values()) if(consumeWS(c.name))
+    for(final CmpV.Comp c : CmpV.Comp.values()) if(consumeWS(c.name))
         return new CmpV(e, check(ftContains(), CMPEXPR), c);
-    for(final CmpN.COMP c : CmpN.COMP.values()) if(consumeWS(c.name))
+    for(final CmpN.Comp c : CmpN.Comp.values()) if(consumeWS(c.name))
         return new CmpN(e, check(ftContains(), CMPEXPR), c);
-    for(final CmpG.COMP c : CmpG.COMP.values()) if(consumeWS2(c.name))
+    for(final CmpG.Comp c : CmpG.Comp.values()) if(consumeWS2(c.name))
         return new CmpG(e, check(ftContains(), CMPEXPR), c);
 
     return e;
