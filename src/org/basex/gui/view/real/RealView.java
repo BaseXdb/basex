@@ -19,7 +19,7 @@ import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 
-/*
+/**
  * This class offers a real tree view.
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Wolfgang Miller, Philipp Ziemer
@@ -236,8 +236,10 @@ public final class RealView extends View {
           //            s = Token.string(data.text(pre));
           //          }
           //
-          //          for(int y = 0; y < data.attSize(pre, data.kind(pre)) - 1; y++) {
-          //            s = " " + Token.string(data.attName(pre + y + 1)) + "=" + "\""
+          //          for(int y = 0; y < data.attSize(pre, data.kind(pre)
+          //          ) - 1; y++) {
+          //            s = " " + Token.string(data.attName(pre + y + 1)
+          //            ) + "=" + "\""
           //                + Token.string(data.attValue(pre + y + 1)) + "\" ";
           //          }
           //          System.out.print(s);
