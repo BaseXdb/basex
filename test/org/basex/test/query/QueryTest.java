@@ -20,15 +20,11 @@ import org.basex.query.xquery.XQResult;
  */
 public final class QueryTest {
   /** Database Context. */
-  private final Context context = new Context();
-  /** Extended debugging information. */
-  private String ext;
-
-  /** Test Information. */
-  static final String TESTINFO =
-    "\nUsage: Test [options]" +
-    "\n -h  show this help" +
-    "\n -v  show query information";
+  private static final Context CONTEXT = new Context();
+  /** Test instances. */
+  private static final AbstractTest[] TESTS = {
+    new SimpleTest(), new XPathMarkFTTest(), new FTTest()
+  };
 
   /**
    * Main method of the test class.
@@ -48,7 +44,7 @@ public final class QueryTest {
 
     boolean ok = true;
 
-    /* testing all kinds of combinations
+    // testing all kinds of combinations
     for(int x = 0; x < 2; x++) {
       for(int a = 0; a < 2; a++) { Prop.ftindex = a == 0;
         for(int b = 0; b < 2; b++) { Prop.ftittr = b == 0;
@@ -63,18 +59,18 @@ public final class QueryTest {
           }
         }
       }
-    }*/
+    }
     
-    // single test
+    /* single test
     Prop.ftindex = true;
     Prop.ftittr = true;
     Prop.ftfuzzy = true;
     Prop.ftst = true;
-    Prop.ftdc = false;
+    Prop.ftdc = true;
     Prop.ftcs = true;
-    ok &= test(false);
-    
-    
+    ok &= test(true);
+    */
+
     System.out.println(ok ? "All tests correct.\n" : "Wrong results...\n");
   }
 
@@ -85,11 +81,9 @@ public final class QueryTest {
    */
   private boolean test(final boolean xquery) {
     boolean ok = true;
-    ext = "";
-    ok &= test(xquery, new SimpleTest());
-    ok &= test(xquery, new XPathMarkFTTest());
-    ext = ft();
-    ok &= test(xquery, new FTTest());
+    for(final AbstractTest test : TESTS) {
+      ok &= test(xquery, test, test.details());
+    }
     return ok;
   }
 
@@ -97,13 +91,15 @@ public final class QueryTest {
    * Tests the specified instance.
    * @param xquery use xpath/xquery
    * @param test instance
+   * @param ext extended error info
    * @return true if everything went alright
    */
-  private boolean test(final boolean xquery, final AbstractTest test) {
+  private boolean test(final boolean xquery, final AbstractTest test,
+      final String ext) {
     boolean ok = true;
     final String file = test.doc.replaceAll("\\\"", "\\\\\"");
     Process proc = new CreateDB(file);
-    if(!proc.execute(context)) {
+    if(!proc.execute(CONTEXT)) {
       err(proc.info(), null);
       return false;
     }
@@ -113,9 +109,9 @@ public final class QueryTest {
       final String query = qu[correct ? 2 : 1].toString();
 
       proc = xquery ? new XQuery(query) : new XPath(query);
-      if(proc.execute(context)) {
+      if(proc.execute(CONTEXT)) {
         Result val = proc.result();
-        if(xquery) val = ((XQResult) val).xpResult(context.data());
+        if(xquery) val = ((XQResult) val).xpResult(CONTEXT.data());
 
         final Result cmp = correct ? (Result) qu[1] : null;
         if(val instanceof Nodes && cmp instanceof Nodes) {
@@ -129,32 +125,17 @@ public final class QueryTest {
           continue;
         }
       } else if(correct) {
-        err(qu[0].toString(), proc.info().replaceAll(
-            "Stopped.*\\n(\\[.*?\\] )?", ""));
+        err(qu[0].toString(), proc.info() +
+            (ext != null ? "\n  Flags: " + ext : ""));
         ok = false;
       }
     }
 
-    final String db = context.data().meta.dbname;
-    new Close().execute(context);
+    final String db = CONTEXT.data().meta.dbname;
+    new Close().execute(CONTEXT);
     DropDB.drop(db);
     return ok;
   }
-
-  /**
-   * Prints fulltext information.
-   * @return string
-   */
-  private String ft() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append("index " + Prop.ftindex + ", ");
-    sb.append("fz " + Prop.ftfuzzy + ", ");
-    sb.append("it " + Prop.ftittr + ", ");
-    sb.append("st " + Prop.ftst + ", ");
-    sb.append("dc " + Prop.ftdc + ", ");
-    sb.append("cs " + Prop.ftcs);
-    return sb.toString();
-  };
 
   /**
    * Print specified string to standard output.

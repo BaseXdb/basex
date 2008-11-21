@@ -36,7 +36,7 @@ public final class DropDB extends Process {
    * @param db database name
    * @return success of operation
    */
-  public static boolean drop(final String db) {
+  public static synchronized boolean drop(final String db) {
     return IO.dbdelete(db, null);
   }
   

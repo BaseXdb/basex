@@ -7,7 +7,6 @@ import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.Data;
-import org.basex.data.MetaData;
 import org.basex.io.DataAccess;
 import org.basex.util.IntList;
 import org.basex.util.Levenshtein;
@@ -135,7 +134,6 @@ public final class FTFuzzy extends Index {
 
   /**
    * Collects all tokens and their sizes found in the index structure.
-   * 
    * @param stats statistic reference
    */
   private void addOccurrences(final IndexStats stats) {
@@ -153,51 +151,6 @@ public final class FTFuzzy extends Index {
         while(j + 1 < tp.length && tp[++j] == -1);
       }
     }
-  }
-
-  
-  /** Saves the last pointer on the index. Used for wildcard search. */
-  private int lastIndex = -1;
-
-  /**
-   * Returns the pointer on the first token with minimum length
-   * tokl and the first pointer on the token with minimum length
-   * tokl + 1.
-   *
-   * @param tokl token length
-   * @return int[][] pointer on token
-   */
-  private int[][] getBoundPointer(final int tokl) {
-    int i = 0;
-    indexsize = li.readBytes(0, 1L)[0];
-    int ts = li.readBytes(1L, 2L)[0];
-    while(i < indexsize && tokl > ts) {
-      i++;
-      ts = li.readBytes(1L + i * 5L, 1L + i * 5L + 1L)[0];
-    }
-
-    if(i == indexsize) return null;
-
-    // back up last pointer on index
-    lastIndex = (int) (1L + (i + 1) * 5L);
-    return new int[][] {
-        // token length, pointer on the first token with this length
-        { li.readBytes(1L + i * 5L, 1L + i * 5L + 1L)[0],
-            li.readInt(1L + i * 5L + 1L) },
-        { li.readBytes(1L + (i + 1) * 5L, 1L + (i + 1) * 5L + 1L)[0],
-            li.readInt(1L + (i + 1) * 5L + 1L) } };
-  }
-
-  /**
-   * Gets next pointer on a entry in length index.
-   * @return entry from li
-   */
-  private int[] getNextBoundPointer() {
-    if ((lastIndex - 1L) / 5L + 1 == indexsize) return null;
-    lastIndex += 5L;
-
-    return new int[] {li.readBytes(lastIndex, lastIndex + 1L)[0],
-        li.readInt(lastIndex + 1L)};
   }
 
   /**
@@ -227,14 +180,14 @@ public final class FTFuzzy extends Index {
    * @param s number of pre/pos values
    * @param p pointer on data
    * @param da DataAccess for reading ftdata
-   * @param md MetaData 
+   * @param d data reference 
    * @return  int[][] data
    */
   public static IndexArrayIterator getData(final long p, final int s, 
-      final DataAccess da, final MetaData md) {
+      final DataAccess da, final Data d) {
     if(s == 0 || p < 0) return IndexArrayIterator.EMP;
     
-    if (md.ftittr) {
+    if (d.meta.ftittr) {
       return new IndexArrayIterator(s) {
         boolean f = true;
         int lpre = -1;
@@ -313,7 +266,7 @@ public final class FTFuzzy extends Index {
       while(p < r) {
         if (ls.similar(ti.readBytes(p, p + s), tok)) {
           it = IndexArrayIterator.merge(getData(getPointerOnData(p, s), 
-              getDataSize(p, s), dat, data.meta), it);
+              getDataSize(p, s), dat, data), it);
         }
         p += s + 9;
       }
@@ -330,7 +283,7 @@ public final class FTFuzzy extends Index {
     final long p = getPointerOnToken(tok);
     if(p == -1) return IndexArrayIterator.EMP;
     return getData(getPointerOnData(p, tok.length), getDataSize(p, tok.length),
-        dat, data.meta);
+        dat, data);
   }
 
   @Override
@@ -345,14 +298,17 @@ public final class FTFuzzy extends Index {
     }
     
     int pw = tok.length;
+    
+    /*
     IndexArrayIterator iai = null;
     if(ft.wc) {
       pw = indexOf(tok, '.');
       if(pw != -1) iai = getTokenWildCard(lc(tok), pw);
     }
+    */
 
     // get result iterator
-    if (iai == null) iai = get(lc(tok));
+    IndexArrayIterator iai = get(lc(tok));
     if (iai == IndexArrayIterator.EMP || !ft.cs) return iai;
     
     // case sensitive search
@@ -360,43 +316,6 @@ public final class FTFuzzy extends Index {
     final FTTokenizer ftdb = new FTTokenizer();
     ftdb.st = ft.st;
     return csDBCheck(iai, data, ftdb, tok, pw);
- }
-
-  /**
-   * Performs db-access and checks real case of a token.
-   * @param ids full-text ids
-   * @param d Data-reference
-   * @param ftdb Fulltext Tokenizer
-   * @param tok token
-   * @return counter
-   */
-  static int csDBCheck(final int[][] ids, final Data d,
-      final FTTokenizer ftdb, final byte[] tok) {
-    int c = 0;
-    for(int i = 0; i < ids[0].length;) {
-      final int id = ids[0][i];
-      ftdb.init(d.text(id));
-
-      // iterator text values
-      while(i < ids[0].length && id == ids[0][i] && ftdb.more()) {
-        // first match case insensitive value
-        ftdb.cs = false;
-        if(!eq(lc(tok), ftdb.get())) {
-          //i++;
-          continue;
-        }
-
-        // token found - match case sensitivity
-        ftdb.cs = true;
-        if(eq(tok, ftdb.get())) {
-          // overwrite original values
-          ids[0][c] = id;
-          ids[1][c++] = ids[1][i];
-        }
-        i++;
-      }
-    }
-    return c;
   }
 
   /**
@@ -490,13 +409,12 @@ public final class FTFuzzy extends Index {
     dat.close();
   }
 
-  /**
+  /*
    * Performs a wildcard search. Only one '.*' is supported.
    *
    * @param tok token containing a wildcard
    * @param posw position of the wildcard in tok
    * @return data found
-   */
   private IndexArrayIterator getTokenWildCard(final byte[] tok, 
       final int posw) {
     if (tok[posw] == '.' && tok.length > posw + 1 && tok[posw + 1] == '*') {
@@ -515,7 +433,7 @@ public final class FTFuzzy extends Index {
         if (contains(tok, posw, dtok)) {
           it = IndexArrayIterator.merge(
             getData(getPointerOnData(b[0][1], b[0][0]),
-                getDataSize(b[0][1], b[0][0]), dat, data.meta), it);
+                getDataSize(b[0][1], b[0][0]), dat, data), it);
         }
         b[0][1] += b[0][0] * 1L + 9L;
       }
@@ -523,7 +441,7 @@ public final class FTFuzzy extends Index {
       if (contains(tok, posw, dtok)) {
         it = IndexArrayIterator.merge(
             getData(getPointerOnData(b[0][1], b[0][0]),
-                getDataSize(b[0][1], b[0][0]), dat, data.meta), it);
+                getDataSize(b[0][1], b[0][0]), dat, data), it);
       }
       return it;
     }
@@ -533,7 +451,7 @@ public final class FTFuzzy extends Index {
     return null;
   }
 
-  /**
+  /*
    * Compares two character arrays for equality and
    * checks if a is contained in b.
    * Tokens abc and abcde are calculated as equal!
@@ -542,7 +460,6 @@ public final class FTFuzzy extends Index {
    * @param posw position of the wildcard in tokww
    * @param tok2 second token to be compared
    * @return true if tok2 is contained in tokww
-   */
   private static boolean contains(final byte[] tokww, final int posw,
       final byte[] tok2) {
     if (tokww.length - 2 > tok2.length) return false;
@@ -558,5 +475,47 @@ public final class FTFuzzy extends Index {
     }
 
     return true;
-    }
   }
+
+  /* Saves the last pointer on the index. Used for wildcard search.
+  private int lastIndex = -1;
+
+  /*
+   * Returns the pointer on the first token with minimum length
+   * tokl and the first pointer on the token with minimum length
+   * tokl + 1.
+   * @param tokl token length
+   * @return int[][] pointer on token
+  private int[][] getBoundPointer(final int tokl) {
+    int i = 0;
+    indexsize = li.readBytes(0, 1L)[0];
+    int ts = li.readBytes(1L, 2L)[0];
+    while(i < indexsize && tokl > ts) {
+      i++;
+      ts = li.readBytes(1L + i * 5L, 1L + i * 5L + 1L)[0];
+    }
+
+    if(i == indexsize) return null;
+
+    // back up last pointer on index
+    lastIndex = (int) (1L + (i + 1) * 5L);
+    return new int[][] {
+        // token length, pointer on the first token with this length
+        { li.readBytes(1L + i * 5L, 1L + i * 5L + 1L)[0],
+            li.readInt(1L + i * 5L + 1L) },
+        { li.readBytes(1L + (i + 1) * 5L, 1L + (i + 1) * 5L + 1L)[0],
+            li.readInt(1L + (i + 1) * 5L + 1L) } };
+  }
+
+  /*
+   * Gets next pointer on a entry in length index.
+   * @return entry from li
+  private int[] getNextBoundPointer() {
+    if ((lastIndex - 1L) / 5L + 1 == indexsize) return null;
+    lastIndex += 5L;
+
+    return new int[] {li.readBytes(lastIndex, lastIndex + 1L)[0],
+        li.readInt(lastIndex + 1L)};
+  }
+   */
+}

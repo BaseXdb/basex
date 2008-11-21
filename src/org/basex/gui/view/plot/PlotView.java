@@ -168,7 +168,7 @@ public final class PlotView extends View implements Runnable {
     box.add(xCombo);
     add(box, BorderLayout.SOUTH);
 
-    popup = new BaseXPopup(this, GUIConstants.POPUP);
+    new BaseXPopup(this, GUIConstants.POPUP);
     selectionBox = new PlotBoundingBox();
     refreshLayout();
   }

@@ -1,5 +1,7 @@
 package org.basex.test.query;
 
+import org.basex.core.Prop;
+
 /**
  * XPathMark Simple Tests.
  *
@@ -7,6 +9,18 @@ package org.basex.test.query;
  * @author Christian Gruen
  */
 public final class FTTest extends AbstractTest {
+  @Override
+  String details() {
+    final StringBuilder sb = new StringBuilder();
+    sb.append("index " + Prop.ftindex + ", ");
+    sb.append("fz " + Prop.ftfuzzy + ", ");
+    sb.append("it " + Prop.ftittr + ", ");
+    sb.append("st " + Prop.ftst + ", ");
+    sb.append("dc " + Prop.ftdc + ", ");
+    sb.append("cs " + Prop.ftcs);
+    return sb.toString();
+  }
+  
   /** Constructor. */
   FTTest() {
     doc =

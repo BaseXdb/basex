@@ -290,7 +290,8 @@ public abstract class IO {
    * @param pat file pattern
    * @return success of operation
    */
-  public static boolean dbdelete(final String db, final String pat) {
+  public static synchronized boolean dbdelete(final String db,
+      final String pat) {
     final File path = dbpath(db);
     if(!path.exists()) return false;
     for(final File sub : path.listFiles()) {

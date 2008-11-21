@@ -1,6 +1,5 @@
 package org.basex.query.xquery.path;
 
-import static org.basex.query.xpath.XPText.*;
 import static org.basex.query.xquery.path.Axis.*;
 import static org.basex.query.xquery.path.Test.NODE;
 import static org.basex.query.xquery.XQText.*;
@@ -11,11 +10,6 @@ import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Arr;
 import org.basex.query.xquery.expr.CAttr;
 import org.basex.query.xquery.expr.Expr;
-import org.basex.query.xquery.expr.FTIndexInfo;
-import org.basex.query.xquery.expr.IndexMatch;
-import org.basex.query.xquery.expr.InterSect;
-import org.basex.query.xquery.expr.Pred;
-import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.DNode;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Nod;
@@ -29,7 +23,6 @@ import org.basex.query.xquery.util.Err;
 import org.basex.query.xquery.util.NodeBuilder;
 import org.basex.query.xquery.util.SeqBuilder;
 import org.basex.util.Array;
-import org.basex.util.IntList;
 
 /**
  * Path expression.
@@ -102,135 +95,7 @@ public class Path extends Arr {
         return new SimpleIterPath(root, expr);
       }      
     }
-    Expr result = this;
-    if (FTIndexInfo.optimize && steps) {
-      // check if the available indexes can be applied
-      
-      MAIN:
-      for (int i = 0; i < expr.length; i++) {
-        final Step step = (Step) expr[i];
-        final Expr[] preds = step.expr;
-
-        // don't optimize non-invertible axes
-        if(invertAxis(step.axis) == null) continue;
-
-        // find predicate with lowest number of occurrences
-        boolean pos = false;
-        int min = Integer.MAX_VALUE;
-        int minP = -1;
-        final Expr[] ie = new Expr[preds.length];
-        final FTIndexInfo[] ftii = new FTIndexInfo[preds.length];
-        for(int p = 0; p < preds.length; p++) {
-          final Expr pred = preds[p];
-          ftii[p] = new FTIndexInfo(); 
-          ie[p] = pred.indexEquivalent(ctx, ftii[p], step);
-          final int nrIDs = ftii[p].indexSize;
-
-          // zero results - predicates will always yield false
-          if(ftii[p].indexSize == 0) {
-            ctx.compInfo(OPTLOC);
-            return Bln.FALSE; //Nod(ctx);
-          }
-
-          // remember cheapest index access
-          if(min > nrIDs) {
-            // skip step if position predicate was found before
-            if(pos) continue MAIN;
-            min = nrIDs;
-            minP = p;
-          }
-          
-          // check if position predicate is found
-          pos |= pred.uses(Using.POS) || pred.uses(Using.VAR);
-        }
-
-        // ..skip index evaluation for too large results and relative paths
-        if(minP == -1 || ftii[minP].seq) 
-          //&& this instanceof LocPathRel && min > ctx.item.data.size / 10)
-          continue;
-
-        //predicates that are optimized to use index
-        final IntList oldPreds = new IntList();
-        Expr indexArg = null;
-
-        for(int p = 0; p < preds.length; p++) {
-          if(ftii[minP].seq || p == minP && indexArg == null) {
-            oldPreds.add(p);
-            indexArg = ie[p];
-          }
-        }
-
-        if (ftii[minP].seq) continue;
-
-        // hold all steps following this step
-        final Expr[] oldPath = new Expr[expr.length - i - 1];
-        if (i + 1 < expr.length) {
-          System.arraycopy(expr, i + 1, oldPath, 0, oldPath.length);
-          Expr[] exprN = new Expr[i];
-          System.arraycopy(expr, 0, exprN, 0, exprN.length);
-          expr = exprN;
-        }
-        // hold the part of the path we want to invert.
-        // suggestion: all forward steps without predicates 
-        //             in front of the index
-        final Path invPath = new Path(root, new Expr[]{});
-
-        boolean indexMatch = true;
-        for(int j = i; j >= 0; j--) {
-          final Step curr = (Step) expr[j];
-          final Axis axis = invertAxis(curr.axis);
-          if(axis == null) break;
-
-          if(j == 0) {
-            if(axis == Axis.PARENT) {
-              Expr[] ex = new Expr[invPath.expr.length + 1];
-              System.arraycopy(invPath.expr, 0, ex, 0, invPath.expr.length);
-              ex[ex.length - 1] = new Step(axis, Test.NODE, null);
-             } else {
-              indexMatch = false;
-            }
-          } else {
-            final Step prev = (Step) expr[j - 1];
-            if(prev.expr.length != 0) break;
-            Expr[] ex = new Expr[invPath.expr.length + 1];
-            System.arraycopy(invPath.expr, 0, ex, 0, invPath.expr.length);
-            ex[ex.length - 1] = new Step(axis, prev.test, null);            
-          }
-          if (invPath.expr.length > 0) {
-            Expr[] ex = new Expr[invPath.expr.length - 1];
-            System.arraycopy(expr, 0, ex, 0, j - 1);
-            System.arraycopy(expr, j + 1, ex, j, expr.length - j - 1);
-          }
-        }
-
-        int predlength = preds.length - oldPreds.size;
-        if(indexMatch || invPath.expr.length != 0) predlength += 1;
-
-        Expr[] newPreds = new Expr[step.expr.length];
-        int c = 0;
-        if(!indexMatch && invPath.expr.length != 0) newPreds[c++] = invPath;
-        for(int p = 0; p != step.expr.length; p++) {
-          if(!oldPreds.contains(p)) {
-            if (ie[p] != null) newPreds[c++] = ie[p]; 
-          }
-        }
-        if (c == 0) newPreds = new Expr[]{}; 
-        else Array.finish(newPreds, c);
-        result = (new InterSect(new Expr[] {indexArg})).comp(ctx);
-
-        // add rest of predicates
-        if(newPreds.length != 0) result =
-          ctx.comp(new Pred(result, newPreds));
-        
-        // add match with initial nodes
-        if(indexMatch) result = new IndexMatch(this, result, invPath);
-
-        // add rest of location path
-        if(oldPath.length != 0) result = new Path(result, oldPath);
-      }
-    }
-    
-    return result;
+    return this;
   }
 
   @Override

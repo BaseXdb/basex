@@ -10,7 +10,6 @@ import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPanel;
-import org.basex.gui.layout.BaseXPopup;
 import org.basex.util.Array;
 
 /**
@@ -47,9 +46,6 @@ public abstract class View extends BaseXPanel {
   /** Current FTPointer on FTPrePos values. */
   public static int[] ftPoi; 
   
-  /** Popup reference. */
-  public BaseXPopup popup;
-
 
   /**
    * Registers the specified view.

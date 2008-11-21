@@ -1,6 +1,5 @@
 package org.basex.index;
 
-import org.basex.util.Array;
 import org.basex.util.IntArrayList;
 
 /**
@@ -37,21 +36,12 @@ public class IndexArrayIterator extends IndexIterator {
     public FTNode nextFTNode() { return new FTNode(); };
   };
   
-  
   /**
    * Constructor.
    * @param s size
    */
   public IndexArrayIterator(final int s) {
     size = s;
-  }
-
-  /**
-   * Constructor.
-   * @param res pres array
-   */
-  public IndexArrayIterator(final int[] res) {
-    this(res, res.length);
   }
 
   /**
@@ -82,7 +72,7 @@ public class IndexArrayIterator extends IndexIterator {
   public IndexArrayIterator(final int[][] res, final int s, final boolean c) {
     if (c) convertData(res[0], res[1], s);
     else {
-      ftdata = Array.finish(res, s);
+      ftdata = res;
       size = s;
     }
   }
@@ -158,8 +148,8 @@ public class IndexArrayIterator extends IndexIterator {
       System.arraycopy(r2, s, t, 1, i - s);
       ia.add(t);
     }
-    ftdata = ia.finish();
-    size = ftdata.length;
+    ftdata = ia.list;
+    size = ia.size;
   }
   
   /**
@@ -176,7 +166,7 @@ public class IndexArrayIterator extends IndexIterator {
    * @param iai2 second indexarrayiterator to merge
    * @return IndexArrayIterator
    */
-  public static IndexArrayIterator merge(final IndexArrayIterator iai1, 
+  public static IndexArrayIterator merge(final IndexArrayIterator iai1,
       final IndexArrayIterator iai2) {
     if (iai1 == EMP) return iai2;
     if (iai2 == EMP) return iai1;
@@ -227,7 +217,6 @@ public class IndexArrayIterator extends IndexIterator {
       public int next() {
         return r.getPre();
       }
-
       
       @Override
       public void setTokenNum(final int t) {

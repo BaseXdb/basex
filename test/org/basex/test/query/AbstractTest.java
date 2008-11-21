@@ -27,7 +27,14 @@ abstract class AbstractTest {
   Object[][] queries;
   
   /**
-   * Create an {@link org.basex.data.Nodes} instance
+   * This method can be overwritten to return test details, which are
+   * shown in case of an error.
+   * @return details string
+   */
+  String details() { return null; }
+  
+  /**
+   * Create an {@link Nodes} instance
    * for the specified node values.
    * @param nodes node values
    * @return node array
@@ -37,7 +44,7 @@ abstract class AbstractTest {
   }
   
   /**
-   * Create a {@link org.basex.query.xpath.item.Str} instance for the 
+   * Create a {@link Str} instance for the 
    * specified string.
    * @param str string
    * @return literal
@@ -47,7 +54,7 @@ abstract class AbstractTest {
   }
   
   /**
-   * Create a {@link org.basex.query.xpath.item.Dbl} instance for the
+   * Create a {@link Dbl} instance for the
    * specified double.
    * @param d double value
    * @return literal
@@ -57,7 +64,7 @@ abstract class AbstractTest {
   }
   
   /**
-   * Create a {@link org.basex.query.xpath.item.Bln} instance for the
+   * Create a {@link Bln} instance for the
    * specified boolean.
    * @param b boolean value
    * @return literal

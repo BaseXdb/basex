@@ -77,7 +77,7 @@ public final class TreeView extends View {
     setLayout(new BorderLayout());
     scroll = new BaseXBar(this);
     add(scroll, BorderLayout.EAST);
-    popup = new BaseXPopup(this, GUIConstants.POPUP);
+    new BaseXPopup(this, GUIConstants.POPUP);
   }
 
   @Override

@@ -6,7 +6,6 @@ import org.basex.query.FTOpt;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.iter.Iter;
-import org.basex.query.xquery.path.Step;
 
 /**
  * FTOptions expression.
@@ -45,12 +44,6 @@ public final class FTOptions extends FTExpr {
     final Iter it = ctx.iter(expr[0]);
     ctx.ftopt = tmp;
     return it;
-  }
-  
-  @Override
-  public Expr indexEquivalent(final XQContext ctx, final FTIndexInfo ii, 
-      final Step curr) throws XQException {
-    return expr[0].indexEquivalent(ctx, ii, curr);
   }
 
   @Override
