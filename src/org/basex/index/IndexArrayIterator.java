@@ -19,9 +19,9 @@ public class IndexArrayIterator extends IndexIterator {
   /** Pre and Pos values. */
   private int[][] ftdata = null;
   /** Each token in the query has a number. */
-  private int toknum = 0;
+  protected int toknum = 0;
   /** Token from query. */
-  private FTTokenizer[] tok;
+  protected FTTokenizer[] tok;
   
   /** Empty iterator. */
   public static final IndexArrayIterator EMP = new IndexArrayIterator(0) {

@@ -236,8 +236,6 @@ public final class FTFuzzy extends Index {
         int c = 0;
         long pos = p;
         FTNode n = new FTNode();
-        int tn;
-        FTTokenizer[] tok = null;
         
         @Override
         public boolean more() {
@@ -267,9 +265,7 @@ public final class FTFuzzy extends Index {
         
         @Override
         public FTNode nextFTNode() {
-          n.genPointer(tn);
-//          if (IndexArrayIterator.this.getToken() != null) 
-//            System.out.println("...");
+          n.genPointer(toknum);
           if(tok != null) n.setToken(tok);
           return n;
         }
@@ -278,16 +274,6 @@ public final class FTFuzzy extends Index {
         public int next() {
           return n.getPre();
         }        
-        
-        @Override
-        public void setTokenNum(final int t) {
-          tn = t;
-        }
-        
-        @Override
-        public void setToken(final FTTokenizer[] token) {
-          tok = token;
-        }
       };
     } else {
       final int[][] dt = new int[2][s];
@@ -432,16 +418,14 @@ public final class FTFuzzy extends Index {
    * @param ids full-text ids
    * @param d Data-reference
    * @param ftdb Fulltext Tokenizer
-   * @param tok token
+   * @param token token
    * @return counter
    */
   static IndexArrayIterator csDBCheck(final IndexArrayIterator ids, 
-      final Data d, final FTTokenizer ftdb, final byte[] tok) {
+      final Data d, final FTTokenizer ftdb, final byte[] token) {
     
     return new IndexArrayIterator(1) {
       FTNode r;
-      int tn;
-      FTTokenizer[] tokens = null;
       
       @Override
       public boolean more() {
@@ -458,7 +442,7 @@ public final class FTFuzzy extends Index {
             
             // token found - match case sensitivity
             ftdb.cs = true;
-            if(!Token.eq(tok, ftdb.get())) {
+            if(!Token.eq(token, ftdb.get())) {
               r.removePos();
             }
           }
@@ -469,25 +453,15 @@ public final class FTFuzzy extends Index {
       
       @Override
       public FTNode nextFTNode() {
-        r.genPointer(tn);
+        r.genPointer(toknum);
         r.reset();
-        if (tokens != null) r.setToken(tokens);
+        if (tok != null) r.setToken(tok);
         return r;
       }
 
       @Override
       public int next() {
         return r.getPre();
-      }
-
-      @Override
-      public void setTokenNum(final int t) {
-        tn = t;
-      }
-      
-      @Override
-      public void setToken(final FTTokenizer[] token) {
-        tokens = token;
       }
     };
   }
