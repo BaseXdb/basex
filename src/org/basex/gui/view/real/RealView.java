@@ -85,6 +85,9 @@ public final class RealView extends View {
 
   @Override
   protected void refreshContext(final boolean more, final boolean quick) {
+    wwidth = -1;
+    wheight = -1;
+    realImage = null;
     repaint();
   }
 
@@ -153,8 +156,8 @@ public final class RealView extends View {
           drawPrePost(g, 1, 1);
           break;
         case 3:
-          temperature(GUI.context.marked().size == 0 ? 0
-              : GUI.context.marked().nodes[0], g);
+          temperature(GUI.context.current().size == 0 ? 0
+              : GUI.context.current().nodes[0], g);
 
       }
     } else {
