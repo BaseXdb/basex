@@ -290,19 +290,22 @@ public final class PlotView extends View implements Runnable {
         // draw focused x and y value
         g.setFont(GUIConstants.font);
         final int textH = g.getFontMetrics().getHeight();
-        String name = plotData.getName(focused);
-        if(ol > 1) name = ol + "x: " + name + ", ...";
+        
         final String x = formatString(true);
         final String y = formatString(false);
         String label = x.length() > 16 ? x.substring(0, 14) + ".." : x;
-        if(x.length() != 0 && y.length() != 0) label += "/";
+        if(x.length() != 0 && y.length() != 0) label += " | ";
         label += y.length() > 16 ? y.substring(0, 14) + ".." : y;
         final int xa = calcCoordinate(true, x1) + 15;
         int ya = calcCoordinate(false, y1) + GUIProp.plotdots;
         final int ww = getWidth();
 
+        final byte[] nm = data.attValue(data.nameID, focused);
+        String name = nm != null ? string(nm) : "";
         if(name.length() > 0 && plotData.xAxis.attrID != data.nameID &&
             plotData.yAxis.attrID != data.nameID) {
+          
+          if(ol > 1) name = ol + "x: " + name + ", ...";
           final int lw = BaseXLayout.width(g, label);
           if(ya < MARGIN[0] + textH && xa < w - lw) {
             ya += 2 * textH - GUIProp.plotdots;
@@ -314,7 +317,8 @@ public final class PlotView extends View implements Runnable {
             BaseXLayout.drawTooltip(g, label, xa, ya, ww, 10);
           }
         } else
-          if(ol > 1) label = ol + "x: " + label + ", ..."; 
+          if(ol > 1) label = label.length() == 0 ? ol + "x" :
+            ol + "x: " + label + ", ...";
           BaseXLayout.drawTooltip(g, label, xa, ya, ww, 10);
       }
     }

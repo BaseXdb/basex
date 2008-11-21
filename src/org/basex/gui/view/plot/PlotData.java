@@ -129,21 +129,4 @@ public final class PlotData {
   int findPre(final int pre) {
     return Arrays.binarySearch(pres, pre);
   }
-  
-  /**
-   * Finds a tag name if available (@name). 
-   * @param pre pre value
-   * @return value of @name attribute for given node
-   */
-  String getName(final int pre) {
-    final Data data = GUI.context.data();
-    final int limit = pre + data.size(pre, Data.ELEM);
-    for(int p = pre; p < limit; p++) {
-      final int kind = data.kind(p);
-      if(kind == Data.ATTR && data.attNameID(p) == data.nameID) {
-        return string(data.atom(p));
-      }
-    }
-    return "";
-  }
 }
