@@ -5,15 +5,18 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Transparency;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import javax.swing.SwingUtilities;
 import org.basex.data.Data;
+import org.basex.data.Nodes;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXLayout;
+import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.View;
 import org.basex.query.ChildIterator;
 import org.basex.util.IntList;
@@ -76,12 +79,15 @@ public final class RealView extends View {
   private RealRect focusedRealRect = null;
   /** current Image of visualization. */
   private BufferedImage realImage = null;
+  
+
 
   /**
    * Default Constructor.
    */
   public RealView() {
     super(null);
+    new BaseXPopup(this, GUIConstants.POPUP);
   }
 
   @Override
@@ -133,6 +139,7 @@ public final class RealView extends View {
     BaseXLayout.antiAlias(g);
     g.setColor(Color.BLACK);
     g.setFont(GUIConstants.font);
+    
 
     /** Timer */
     final Performance perf = new Performance();
@@ -155,8 +162,8 @@ public final class RealView extends View {
           drawPrePost(g, 1, 1);
           break;
         case 3:
-          temperature(GUI.context.current().size == 0 ? 0 : 
-            GUI.context.current().nodes[0], g);
+          temperature(GUI.context.current().size == 0 ? 0 : GUI.
+              context.current().nodes[0], g);
 
       }
     } else {
@@ -214,16 +221,29 @@ public final class RealView extends View {
 
   @Override
   public void mouseClicked(final MouseEvent e) {
-   
+
     final boolean left = SwingUtilities.isLeftMouseButton(e);
-    if(!left || focusedRealRect == null) return;
-    
-    View.notifyMark(0, this);
-    int pre = focusedRealRect.p;
-    if(e.getClickCount() > 1 && pre > -1) {
-      View.notifyContext(GUI.context.marked(), false, this);
-      refreshContext(false, false);
-    }
+    final boolean right = SwingUtilities.isRightMouseButton(e);
+    if(!right && !left || focusedRealRect == null) return;
+
+    if(left) {
+      View.notifyMark(0, this);
+      int pre = focusedRealRect.p;
+      if(e.getClickCount() > 1 && pre > -1) {
+        View.notifyContext(GUI.context.marked(), false, this);
+        refreshContext(false, false);
+      }
+    } 
+  }
+
+ 
+
+  @Override
+  public void mouseWheelMoved(final MouseWheelEvent e) {
+    if(working || focused == -1) return;
+    if(e.getWheelRotation() > 0) notifyContext(new Nodes(focused, GUI.
+        context.data()), false, null);
+    else notifyHist(false);
   }
 
   /**Finds rectangle at cursor position.
