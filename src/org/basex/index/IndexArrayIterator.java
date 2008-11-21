@@ -139,6 +139,15 @@ public class IndexArrayIterator extends IndexIterator {
   }
 
   /**
+   * Get FTTokinzer.
+   * @return token FTTokenizer
+   */
+  public FTTokenizer[] getToken() {
+    return tok;
+  }
+
+  
+  /**
    * Converts the ftdata in the style:.
    * pre1, pos0, ..., posn, pre2, ....
    *

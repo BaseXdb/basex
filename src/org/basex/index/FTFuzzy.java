@@ -268,6 +268,8 @@ public final class FTFuzzy extends Index {
         @Override
         public FTNode nextFTNode() {
           n.genPointer(tn);
+//          if (IndexArrayIterator.this.getToken() != null) 
+//            System.out.println("...");
           if(tok != null) n.setToken(tok);
           return n;
         }
