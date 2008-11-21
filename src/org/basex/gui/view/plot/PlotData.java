@@ -36,6 +36,7 @@ public final class PlotData {
   public PlotData() {
     xAxis = new PlotAxis(this);
     yAxis = new PlotAxis(this);
+    pres = new int[0];
   }
 
   /**

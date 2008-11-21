@@ -663,7 +663,7 @@ public final class PlotView extends View implements Runnable {
       itemCombo.setModel(new DefaultComboBoxModel(items));
 
       // set first item and trigger assignment of axis assignments
-      if(items.length != 0) itemCombo.setSelectedIndex(0);
+      if(items.length > 0) itemCombo.setSelectedIndex(0);
 
       drawSubNodes = true;
       markingChanged = true;
