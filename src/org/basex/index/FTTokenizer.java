@@ -15,7 +15,7 @@ public final class FTTokenizer extends IndexToken {
   /** Stemming instance. */
   private final Stemming stem = new Stemming();
   /** Stemming flag. */
-  public boolean st = Prop.ftstem;
+  public boolean st = Prop.ftst;
   /** Diacritics flag. */
   public boolean dc = Prop.ftdc;
   /** Sensitivity flag. */

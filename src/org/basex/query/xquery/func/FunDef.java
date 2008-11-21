@@ -4,7 +4,7 @@ import static org.basex.query.xquery.XQTokens.*;
 import org.basex.query.xquery.item.Type;
 
 /**
- * List of all functions.
+ * Definitions of all XQuery functions.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen

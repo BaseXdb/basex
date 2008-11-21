@@ -173,7 +173,7 @@ public final class DialogCreate extends Dialog {
 
     final String[] cb = { CREATEFZ, CREATESTEM, CREATEDC, CREATECS };
     final String[] desc = { FZINDEXINFO, FTSTEMINFO, FTDCINFO, FTCSINFO };
-    final boolean[] val = { Prop.ftfuzzy, Prop.ftstem, Prop.ftdc, Prop.ftcs };
+    final boolean[] val = { Prop.ftfuzzy, Prop.ftst, Prop.ftdc, Prop.ftcs };
     for(int f = 0; f < ft.length; f++) {
       ft[f] = new BaseXCheckBox(cb[f], Token.token(desc[f]), val[f], 0, this);
       p4.add(ft[f]);
@@ -281,7 +281,7 @@ public final class DialogCreate extends Dialog {
     Prop.ftindex = ftxindex.isSelected();
     Prop.intparse = intparse.isSelected();
     Prop.ftfuzzy = ft[0].isSelected();
-    Prop.ftstem = ft[1].isSelected();
+    Prop.ftst = ft[1].isSelected();
     Prop.ftdc = ft[2].isSelected();
     Prop.ftcs = ft[3].isSelected();
   }

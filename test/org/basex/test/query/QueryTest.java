@@ -21,26 +21,20 @@ import org.basex.query.xquery.XQResult;
 public final class QueryTest {
   /** Database Context. */
   private final Context context = new Context();
+  /** Extended debugging information. */
+  private String ext;
 
   /** Test Information. */
   static final String TESTINFO =
     "\nUsage: Test [options]" +
     "\n -h  show this help" +
     "\n -v  show query information";
-  /** Verbose flag. */
-  private static boolean verbose = false;
 
   /**
    * Main method of the test class.
-   * @param args command line arguments
+   * @param args command line arguments (ignored)
    */
   public static void main(final String[] args) {
-    if(args.length == 1 && args[0].equals("-v")) {
-      verbose = true;
-    } else if(args.length > 0) {
-      System.out.println(TESTINFO);
-      return;
-    }
     new QueryTest();
   }
 
@@ -50,17 +44,38 @@ public final class QueryTest {
   private QueryTest() {
     Prop.textindex = true;
     Prop.attrindex = true;
-    Prop.ftindex = true;
-    Prop.ftfuzzy = true;
-    Prop.ftittr = true;
     Prop.chop = true;
 
+    boolean ok = true;
+
+    /* testing all kinds of combinations
+    for(int x = 0; x < 2; x++) {
+      for(int a = 0; a < 2; a++) { Prop.ftindex = a == 0;
+        for(int b = 0; b < 2; b++) { Prop.ftittr = b == 0;
+          for(int c = 0; c < 2; c++) { Prop.ftfuzzy = c == 0;
+            for(int d = 0; d < 2; d++) { Prop.ftst = d == 0;
+              for(int e = 0; e < 2; e++) { Prop.ftdc = e == 0;
+                for(int f = 0; f < 2; f++) { Prop.ftcs = f == 0;
+                  ok &= test(x != 0);
+                }
+              }
+            }
+          }
+        }
+      }
+    }*/
+    
+    // single test
     Prop.ftindex = true;
-    test(false);
-    test(true);
-    Prop.ftindex = false;
-    test(false);
-    test(true);
+    Prop.ftittr = true;
+    Prop.ftfuzzy = true;
+    Prop.ftst = true;
+    Prop.ftdc = false;
+    Prop.ftcs = true;
+    ok &= test(false);
+    
+    
+    System.out.println(ok ? "All tests correct.\n" : "Wrong results...\n");
   }
 
   /**
@@ -69,13 +84,12 @@ public final class QueryTest {
    * @return true if everything went alright
    */
   private boolean test(final boolean xquery) {
-    System.out.println("Testing " + (xquery ? "XQuery" : "XPath") +
-        " (Index " + (Prop.ftindex ? "ON" : "OFF") + ")");
     boolean ok = true;
-    //ok &= test(xquery, new SimpleTest());
-    //ok &= test(xquery, new XPathMarkFTTest());
+    ext = "";
+    ok &= test(xquery, new SimpleTest());
+    ok &= test(xquery, new XPathMarkFTTest());
+    ext = ft();
     ok &= test(xquery, new FTTest());
-    System.out.println(ok ? "All tests correct.\n" : "Wrong results...\n");
     return ok;
   }
 
@@ -87,54 +101,39 @@ public final class QueryTest {
    */
   private boolean test(final boolean xquery, final AbstractTest test) {
     boolean ok = true;
-
-    final String name = test.getClass().getSimpleName();
-    System.out.println(name + " (" + test.queries.length + " queries)...");
-    out("\nBuilding database...\n");
-
     final String file = test.doc.replaceAll("\\\"", "\\\\\"");
     Process proc = new CreateDB(file);
     if(!proc.execute(context)) {
-      err("\n", proc.info());
+      err(proc.info(), null);
       return false;
     }
 
-    out("\nRunning tests...\n");
-
     for(final Object[] qu : test.queries) {
-      out("- " + qu[0] + ": ");
       final boolean correct = qu.length == 3;
       final String query = qu[correct ? 2 : 1].toString();
 
       proc = xquery ? new XQuery(query) : new XPath(query);
       if(proc.execute(context)) {
-        Result value = proc.result();
-        if(xquery) value = ((XQResult) value).xpResult(context.data());
+        Result val = proc.result();
+        if(xquery) val = ((XQResult) val).xpResult(context.data());
 
         final Result cmp = correct ? (Result) qu[1] : null;
-        if(value instanceof Nodes && cmp instanceof Nodes) {
-          ((Nodes) cmp).data = ((Nodes) value).data;
+        if(val instanceof Nodes && cmp instanceof Nodes) {
+          ((Nodes) cmp).data = ((Nodes) val).data;
         }
-        if(!correct || !value.same(cmp)) {
-          err("\"" + query + "\":\n  Expected: " +
-              (correct ? qu[1] : "error") +
-              "\n  Found: " + value + "\n", qu[0]);
+        if(!correct || !val.same(cmp)) {
+          err(qu[0] + ": " + (xquery ? "xquery " : "xpath ") + query,
+              "  Right: " + (correct ? qu[1] : "error") + "\n  Found: " +
+              val + (ext != null ? "\n  Flags: " + ext : ""));
           ok = false;
           continue;
         }
-        out("ok\n");
-      } else {
-        final String info = proc.info().replaceAll(
-            "Stopped.*\\n(\\[.*?\\] )?", "");
-        if(correct) {
-          err(info + "\n", qu[0].toString());
-          ok = false;
-        } else {
-          out("ok (" + info + ")\n");
-        }
+      } else if(correct) {
+        err(qu[0].toString(), proc.info().replaceAll(
+            "Stopped.*\\n(\\[.*?\\] )?", ""));
+        ok = false;
       }
     }
-    out("\n");
 
     final String db = context.data().meta.dbname;
     new Close().execute(context);
@@ -143,19 +142,27 @@ public final class QueryTest {
   }
 
   /**
-   * Print specified string to standard output.
-   * @param string string to be printed
+   * Prints fulltext information.
+   * @return string
    */
-  private void out(final String string) {
-    if(verbose) System.out.print(string);
+  private String ft() {
+    final StringBuilder sb = new StringBuilder();
+    sb.append("index " + Prop.ftindex + ", ");
+    sb.append("fz " + Prop.ftfuzzy + ", ");
+    sb.append("it " + Prop.ftittr + ", ");
+    sb.append("st " + Prop.ftst + ", ");
+    sb.append("dc " + Prop.ftdc + ", ");
+    sb.append("cs " + Prop.ftcs);
+    return sb.toString();
   };
 
   /**
    * Print specified string to standard output.
-   * @param string string to be printed
-   * @param info additional info
+   * @param info short info
+   * @param detail detailed info
    */
-  private void err(final String string, final Object info) {
-    System.out.print((verbose ? "" : "- " + info + ": ") + string);
+  private void err(final String info, final String detail) {
+    System.out.println("- " + info);
+    if(detail != null) System.out.println(detail);
   };
 }

@@ -105,15 +105,16 @@ public final class Prop {
   public static boolean onthefly = false;
   /** Path for filtering XML Documents. */
   public static String createfilter = "*.*";
-  /** Flag for iterator optimized storage within ftindex. */
-  public static boolean ftittr = true;
   /** Number of index occurrences to print in the index info. */
   public static int indexocc = 10;
 
+  /** Flag for iterator optimized storage within ftindex. */
+  public static boolean ftittr = true;
   /** Flag for creating a fuzzy index. */
   public static boolean ftfuzzy = true;
+  
   /** Flag for fulltext stemming. */
-  public static boolean ftstem = false;
+  public static boolean ftst = false;
   /** Flag for fulltext case sensitivity. */
   public static boolean ftcs = false;
   /** Flag for fulltext diacritics. */

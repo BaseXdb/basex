@@ -45,7 +45,7 @@ public final class MetaData {
   /** Flag for fuzzy indexing. */
   public boolean ftfz = Prop.ftfuzzy;
   /** Flag for fulltext stemming. */
-  public boolean ftst = Prop.ftstem;
+  public boolean ftst = Prop.ftst;
   /** Flag for fulltext case sensitivity. */
   public boolean ftcs = Prop.ftcs;
   /** Flag for fulltext diacritics removal. */
