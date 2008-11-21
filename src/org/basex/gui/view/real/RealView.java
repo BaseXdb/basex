@@ -3,11 +3,12 @@ package org.basex.gui.view.real;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Transparency;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-
 import org.basex.data.Data;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
@@ -66,6 +67,14 @@ public final class RealView extends View {
   private int mousePosX = -1;
   /** current mouse position y. */
   private int mousePosY = -1;
+  /** window width. */
+  private int wwidth = -1;
+  /** window height. */
+  private int wheight = -1;
+  /** current focused rect. */
+  private RealRect focusedRealRect = null;
+  /** current Image of visualization. */
+  private BufferedImage realImage = null;
 
   /**
    * Default Constructor.
@@ -76,6 +85,7 @@ public final class RealView extends View {
 
   @Override
   protected void refreshContext(final boolean more, final boolean quick) {
+    System.out.println("HI");
     repaint();
   }
 
@@ -87,18 +97,26 @@ public final class RealView extends View {
 
   @Override
   protected void refreshInit() {
-
+    wwidth = -1;
+    wheight = -1;
+    rects = null;
+    realImage = null;
     repaint();
   }
 
   @Override
   protected void refreshLayout() {
+
     repaint();
   }
 
   @Override
   protected void refreshMark() {
 
+    wwidth = -1;
+    wheight = -1;
+    rects = null;
+    realImage = null;
     repaint();
   }
 
@@ -109,11 +127,14 @@ public final class RealView extends View {
 
   @Override
   public void paintComponent(final Graphics g) {
+
+    final Data data = GUI.context.data();
     /** Set the paint Component */
     super.paintComponent(g);
     BaseXLayout.antiAlias(g);
     g.setColor(Color.BLACK);
     g.setFont(GUIConstants.font);
+    data.doc();
 
     /** Timer */
     final Performance perf = new Performance();
@@ -126,18 +147,58 @@ public final class RealView extends View {
     pointerx = getWidth() / 2;
     pointery = topdistance;
 
-    System.out.println();
+    if(windowSizeChanged()) {
 
-    switch(3) {
-      case 1:
-        drawTree(g, 0, 0, 0, getWidth());
-        break;
-      case 2:
-        drawPrePost(g, 1, 1);
-        break;
-      case 3:
-        temperature(0, g);
+      switch(3) {
+        case 1:
+          drawTree(g, 0, 0, 0, getWidth());
+          break;
+        case 2:
+          drawPrePost(g, 1, 1);
+          break;
+        case 3:
+          temperature(0, g);
+
+      }
+    } else {
+      g.drawImage(realImage, 0, 0, getWidth(), getHeight(), this);
     }
+
+    if(focusedRealRect != null) {
+      RealRect r = focusedRealRect;
+      g.drawRect(r.x1, r.y1, r.x2 - r.x1, r.y2 - r.y1);
+
+      final int pre = r.p;
+      String s = "";
+
+      if(data.kind(pre) == Data.ELEM) {
+        s = Token.string(data.tag(pre));
+      } else {
+        s = Token.string(data.text(pre));
+      }
+
+      for(int y = 0; y < data.attSize(pre, data.kind(pre)) - 1; y++) {
+        s += " " + Token.string(data.attName(pre + y + 1)) + "=" + "\""
+            + Token.string(data.attValue(pre + y + 1)) + "\" ";
+      }
+
+      int w = BaseXLayout.width(g, s);
+
+      g.setColor(Color.WHITE);
+      g.fillRect(r.x1, r.y1 - fontHeight, w, fontHeight);
+      g.setColor(Color.BLACK);
+      g.drawString(s, r.x1, (int) (r.y1 - fontHeight / 4f));
+
+    }
+
+  }
+
+  /** creates a new translucent BufferedImage.
+   * @return new translucent BufferedImage
+   */
+  private BufferedImage createImage() {
+    return new BufferedImage(Math.max(1, getWidth()), Math.max(1, getHeight()),
+        Transparency.TRANSLUCENT);
   }
 
   @Override
@@ -149,14 +210,18 @@ public final class RealView extends View {
     mousePosY = e.getY();
     //    System.out.println("x: "+ mousePosX + "y: " + mousePosY);
     focus();
+    repaint();
   }
 
-  /** Finds rectangle at cursor position.
-   * 
+  /**Finds rectangle at cursor position.
+   * @return focused rectangle
    */
-  public void focus() {
+  public boolean focus() {
     //    int level = mousePosY / (fontHeight * 2);
-    final Data data = GUI.context.data();
+
+    if(rects == null) return false;
+
+//    final Data data = GUI.context.data();
     final Iterator<RealRect[]> it = rects.iterator();
 
     while(it.hasNext()) {
@@ -165,28 +230,30 @@ public final class RealView extends View {
       for(int i = 0; i < r.length; i++) {
         if(r[i].contains(mousePosX, mousePosY)) {
 
-          final int pre = r[i].p;
-          String s = "";
-          
-          if(data.kind(pre) == Data.ELEM) {
-            s = Token.string(data.tag(pre));
-          } else {
-            s = Token.string(data.text(pre));
-          }
-          
-          System.out.print(s + " ");
+//          final int pre = r[i].p;
+//          String s = "";
+//
+//          if(data.kind(pre) == Data.ELEM) {
+//            s = Token.string(data.tag(pre));
+//          } else {
+//            s = Token.string(data.text(pre));
+//          }
+//
+//          for(int y = 0; y < data.attSize(pre, data.kind(pre)) - 1; y++) {
+//            s = " " + Token.string(data.attName(pre + y + 1)) + "=" + "\""
+//                + Token.string(data.attValue(pre + y + 1)) + "\" ";
+//          }
+//          System.out.print(s);
+//          System.out.println();
 
-          for(int y = 0; y < data.attSize(pre, data.kind(pre)) - 1; y++) {
-            System.out.print(Token.string(data.attName(pre + y + 1)) + "="
-                + "\"" + Token.string(data.attValue(pre + y + 1)) + "\" ");
-          }
-          System.out.println();
-          break;
+          focusedRealRect = r[i];
+          return true;
         }
       }
 
     }
-
+    focusedRealRect = null;
+    return false;
   }
 
   /**
@@ -195,6 +262,9 @@ public final class RealView extends View {
    * @param g the graphics reference
    */
   private void temperature(final int root, final Graphics g) {
+    realImage = createImage();
+    Graphics rg = realImage.getGraphics();
+
     final Data data = GUI.context.data();
     rects = new ArrayList<RealRect[]>();
     int level = 0;
@@ -204,10 +274,12 @@ public final class RealView extends View {
     rectCount = 1;
     parentPos = null;
     while(parentList.size > 0) {
-      drawTemperature(g, level);
+      drawTemperature(rg, level);
       getNextNodeLine();
       level++;
     }
+
+    g.drawImage(realImage, 0, 0, getWidth(), getHeight(), this);
 
   }
 
@@ -254,12 +326,8 @@ public final class RealView extends View {
    * @param level the current level
    */
   private void drawTemperature(final Graphics g, final int level) {
-    // array with all rects of a level
-    //    System.out.print("RectCount: " + rectCount + " level " 
-    //    + level + " size :"
-    //        + parentList.size);
-    final RealRect[] tRect = new RealRect[rectCount];
 
+    final RealRect[] tRect = new RealRect[rectCount];
     final Data data = GUI.context.data();
     final int size = parentList.size;
     final HashMap<Integer, Double> temp = new HashMap<Integer, Double>();
@@ -357,6 +425,18 @@ public final class RealView extends View {
     }
     rects.add(tRect);
     parentPos = temp;
+  }
+
+  /** Returns true if window-size has changed.
+   * @return window-size has changed
+   */
+  boolean windowSizeChanged() {
+    if((wwidth > -1 && wheight > -1)
+        && (getHeight() == wheight && getWidth() == wwidth)) return false;
+
+    wheight = getHeight();
+    wwidth = getWidth();
+    return true;
   }
 
   /**
