@@ -4,6 +4,7 @@
 # Start
 launch=Launching
 wait=Please Wait
+version=Version %
 
 # Menu Commands
 m_file=File
@@ -38,8 +39,8 @@ s_paintmap=Painting
 s_ok=OK
 
 # Visualizations
-welcome1=Welcome!
-welcome2=The easiest way to get started:\nClick on "File -> New..." and choose\none of your XML documents on disk.\nNext, confirm the upcoming dialog\nwindow and check out the Help View...
+#welcome1=Version %
+#welcome2=The easiest way to get started:\nClick on "File -> New...", choose one\nof your XML documents on disk. Next,\npress OK and check out the Help View...
 text_find=Find
 no_table=No table available for this data
 no_space=Too less space
@@ -175,14 +176,14 @@ dz_reserved=Reserved Memory
 dz_used=Used Memory
 dz_help=If memory is low, please launch\nBaseX with the Java flag -Xmx<size>
 
-da_title=About
+da_title=About %
 da_license=BSD license (ISC)
 da_dev=Main Developer
 da_cont1=Team
 da_cont2=and others
 da_contact=Contact
 
-c_about=About
+c_about=About %
 c_abouttt=Displays general information on the project.
 c_close=Close
 c_closett=Closes the current database.

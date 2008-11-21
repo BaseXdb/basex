@@ -4,6 +4,7 @@
 # Start
 launch=起動中
 wait=お待ち下さい
+version=Version %
 
 # Menu Commands
 m_file=ファイル
@@ -38,8 +39,8 @@ s_paintmap=描画中
 s_ok=OK
 
 # Visualizations
-welcome1=ようこそ!
-welcome2=簡単な始め方:\n\"ファイル -> 新規...\" をクリックし\nディスク上にあるXML文書を選択します。\n次に、ダイアログウィンドウの内容を確認し、\nヘルプビューをチェックしましょう。
+#welcome1=ようこそ!
+#welcome2=簡単な始め方:\n\"ファイル -> 新規...\" をクリックし\nディスク上にあるXML文書を選択します。\n次に、ダイアログウィンドウの内容を確認し、\nヘルプビューをチェックしましょう。
 text_find=検索
 no_table=No table available for this data
 no_space=Too less space
@@ -52,44 +53,46 @@ text_tit=テキスト
 # Dialog Windows
 d_info=情報
 d_fctitle=ディレクトリの選択
-d_export=Save XML Document
+# Is this ok that the message for d_export is "Save..."? 
+#d_export=Save XML Document
+d_export=XML文書の保存
 
-dc_filter=Filter
+dc_filter=フィルター
 dc_title=XML文書の保存
-dc_name=Name of Database
+dc_name=データベースの名前
 dc_xmldesc=XML文書
 dc_zipdesc=Zip圧縮されたXML文書
 dc_gzdesc=GZip圧縮されたXML文書
 dc_xqdesc=XQueryファイル
-dc_doc=Document
-dc_coll=Collection
+dc_doc=文書
+dc_coll=コレクション
 dc_advtitle=データベースオプション
 dc_chop=空白を取り除く
 dc_intparse=内部XMLパーサーを使用
 dc_entities=実体のパース
-dc_dtd=Parse DTDs
+dc_dtd=DTDのパース
 dc_fzindex=曖昧検索を有効にする
-dc_ftstem=Stemming
-dc_ftdc=Diacritics
-dc_ftcs=Case Sensitivity
+dc_ftstem=語幹抽出
+dc_ftdc=分音符号
+dc_ftcs=大文字・小文字の区別
 dc_mainmem=メインメモリモード
 dc_chopinfo=このオプションはタグとコンテンツの間にある全ての空白を削除します。
 dc_intparseinfo=このオプションをオフにすると、Java標準のXMLパーサーが使用されます。
 dc_entitiesinfo=このオプションをオフにすると、未知の実体のパースを省略します (&...;)。
-dc_dtdinfo=Switch this option off to skip DTDs
+dc_dtdinfo=このオプションをオフにすると、DTDをスキップします。
 dc_txtinfo=XPathクエリーを高速化するためにテキストノードにインデックスが作成されます。
 dc_attinfo=XPathクエリーを高速化するために属性値にインデックスが作成されます。
 dc_ftxinfo=XPath全文検索を高速化するために全文インデックスが作成されます。
 dc_fzinfo=このオプションは曖昧検索（類似検索）を高速化します。
-dc_ftsteminfo=All tokens are stemmed before they are indexed
+dc_ftsteminfo=全ての単語（token）は語幹抽出されてからインデックス化されます。
 dc_ftcsinfo=インデックス内で大文字と小文字を区別します。
-dc_ftdcinfo=インデックスかの際に分音符号（ウムラウト、アクサン等）が考慮されます。
+dc_ftdcinfo=インデックス化の際に分音符号（ウムラウト、アクサン等）が考慮されます。
 dc_mminfo=このモードではクエリーは高速化されますが、更新は行えません。
 dc_general=一般
-dc_parse=Parsing
+dc_parse=パース
 dc_names=名前
 dc_index=インデックス
-dc_meta=Metadata
+dc_meta=メタデータ
 dc_ft=全文
 
 do_title=データベースを開く
@@ -106,7 +109,7 @@ dfs_title=ファイルシステムからインポート
 #dfs_dir=ディレクトリ
 dfs_all=全てインポートする
 dfs_allinfo=ファイルシステム全体をインポートします
-dfs_text=Directory to import
+dfs_text=インポートするディレクトリ
 dfs_text1=ファイル情報、メタデータ
 dfs_text2=ファイルの内容
 dfs_types=ファイルタイプ
@@ -117,7 +120,7 @@ dfs_ftindex=ファイルの内容にインデックスを作成する
 
 dr_title=データベースの名前を変更
 dr_exists=同じ名前のデータベースが存在します。
-dr_over=Old database will be overwritten.
+dr_over=古いデータベースは上書きされます。
 dr_invalid=不正な名前です。
 
 dd_title=データベースの削除
@@ -177,14 +180,14 @@ dz_reserved=予約メモリ量
 dz_used=メモリ使用量
 dz_help=メモリが少ない場合はBaseXを起動する際に、\nJavaのコマンドライン引数 -Xmx <サイズ> を付けて下さい。
 
-da_title=BaseXについて
+da_title=%について
 da_license=BSD license (ISC)
 da_dev=メイン開発者
 da_cont1=チーム
 da_cont2=その他の貢献者
 da_contact=Contact
 
-c_about=BaseXについて
+c_about=%について
 c_abouttt=このプロジェクトについての概要を表示します。
 c_close=閉じる
 c_closett=現在のデータベースを閉じます。
@@ -192,8 +195,8 @@ c_color=色
 c_colortt=アプリケーションの配色を変更します。
 c_copy=コピー
 c_copytt=現在選択中のXMLノードをコピーします。
-c_cppath=Copy Path
-c_cppathtt=Copies the path to the selected XML nodes.
+c_cppath=パスのコピー
+c_cppathtt=パスを選択されたXMLノードにコピーします。
 c_create=新規
 c_creatett=選択されたXML文書からデータベースを作成します。
 c_cut=カット
@@ -207,14 +210,14 @@ c_exit=終了
 c_exittt=アプリケーションを終了します。
 c_export=XMLの出力
 c_exporttt=現在のデータベースをXML文書として出力します。
-c_filter=Filter Selected
-c_filtertt=Filters the selected nodes.
+c_filter=選択中のノードのフィルター
+c_filtertt=選択されたノードをフィルターします（？）。
 c_fonts=フォント
 c_fontstt=フォントを変更します。
 c_full=全画面表示
 c_fulltt=全画面表示します。
 c_goback=戻る
-c_gobacktt=以前実行されたクエリー戻ります。
+c_gobacktt=以前実行されたクエリーに戻ります。
 c_goforward=進む
 c_goforwardtt=次のクエリーに進みます。
 c_goup=上へ
@@ -260,8 +263,8 @@ c_showstatus=ステータスバー
 c_showstatustt=ステータスバーの表示・非表示を切り替えます。
 c_showtable=テーブル
 c_showtablett=テーブルビューを表示します。
-c_showplot=Plot
-c_showplottt=Show the scatter-plot visualization.
+c_showplot=プロット
+c_showplottt=散布図（scatter-plot）を表示します。
 c_showtext=テキストビュー
 c_showtexttt=テキストビューを表示します。
 c_showtree=ツリー
@@ -279,7 +282,7 @@ proc_err='%'を実行できませんでした。
 proc_nodb=メモリー上にデータベースはありません。
 proc_nofs=Current database is no filesystem import.
 proc_mm=メインメモリモードでは（この？）コマンドは使用できません。
-proc_outmem=Out of Main Memory.\nThe following hints might help you:\n- you can increase Java's heap size with the flag -Xmx<size>\n- you can try BaseX's internal XML parser with 'set intparse on'\n- you can save memory by deactivating some indexes
+proc_outmem=メモリー不足。\n以下のヒントが役に立つかもしれません。\n- -Xmx<サイズ>を使うことで、Javaのヒープサイズを増やすことが出来ます。\n- BaseXの内部XMLパーサーに 'set intparse on' を設定してみて下さい。 \n- いくつかのインデックスを無効にすることによりメモリーを節約できます。
 
 cmd_no=Expecting command.
 cmd_unknown=不明なコマンドです '%'
@@ -311,10 +314,10 @@ pc_tbl=% にテーブルが作成されました。
 #pc_txt=% にテキストインデックスが作成されました。
 #pc_ftx=% に全文インデックスが作成されました。
 pc_filenf=ファイル "%" が見付かりませんでした。
-pc_pathnf=File or directory not found.
-pc_dbnf=Please enter a database name.
+pc_pathnf=ファイル又はディレクトリが見付かりませんでした。
+pc_dbnf=データベース名を入力してください。
 pc_err="%" をパースできませんでした。
-pc_err_deepfs=Special database deepfs is not allowed to be created manually.
+pc_err_deepfs=特殊データベース deepfs は手動で作ることを許可されていません。
 pc_pos=% (%行、%列)
 
 # Database commands
@@ -377,11 +380,8 @@ qu_tabprinted=印刷しました
 qu_tabhits=結果　　　　
 
 # Update Commands
-uc_querynodeserr=Query must yield a nodeset.
-# [KK] The word order is different in Japanese.
-# It's necessary to introduce something like %1, %2 etc.
-# [CG] As proposed by you, positions can now be added to the placeholder.
-uc_deleteinfo=%個のノードが削除されました。 in %
+uc_querynodeserr=クエリーはノードセットを返さなければいけません。
+uc_deleteinfo=%2 で %1 個のノードが削除されました。
 uc_deleteroot=ノードを削除できません。
 uc_copyroot=ルートノードの後には挿入できません。
 uc_copyinfo=%個のノードが%にコピーされました。
@@ -390,15 +390,15 @@ uc_updateinfo=%個のノードが更新されました %.
 uc_updatenode=更新するノードは%でなければいけません。.
 #uc_updateelem=更新するノードはXML要素（？element）でなければいけません。.
 #uc_updateattr=Node to be updated must be an attribute.
-uc_copytags=Target nodes must be elements.
-uc_inserttext=Cannot insert text node after/before another text node.
+uc_copytags=対象ノードはXML要素でなければいけません。
+uc_inserttext=テキストノードを別のテキストノードの前後に挿入することは出来ません。
 #uc_taginvalid=「%」は有効なタグ名ではありません。
 uc_attinvalid=「%」は有効な属性名ではありません。
 uc_attdupl=属性「%」は既に定義されています。
 uc_posinvalid=不正な位置 "%".
 uc_invalid=不正な名 "%"
 uc_txtinvalid=テキストノードを空に出来ません。
-uc_namespaces=Cannot update documents with namespaces.
+uc_namespaces=名前空間付きの文書を更新できません。
 
 # Info Strings
 info_title=データベース情報
@@ -415,7 +415,7 @@ info_doc=ソースのパス
 #info_path=パス
 info_time=タイムスタンプ
 info_mem=メインメモリの使用量
-info_nodes=Table Nodes
+info_nodes=テーブルノード
 info_height=ツリーの高さ
 info_encoding=文字コード
 #info_runs=実行回数（？）
@@ -441,10 +441,10 @@ info_ftindex=全文インデックス
 info_fzindex=曖昧
 info_outofdated=out-of-dated
 info_db=データベース情報
-info_create=Database Creation
+info_create=データベース作成
 #info_create=文書作成
 info_general=一般事項
-info_resultchop=\n...output was chopped.
+info_resultchop=\n...出力は省略されました。
 info_on=ON
 info_off=OFF
 info_error=エラー
@@ -504,8 +504,8 @@ ch_xmark2=XMarkクエリーの内部実装を実行します。 [nr] (1-20).
 ch_cs0=[query]
 ch_cs1=XPathクエリーを評価、結果を新しいコンテキストセットに（？）
 ch_cs2=指定されたXPath [query] を評価し、結果を新しい\nコンテキストセットにします。
-ch_bash1=Starts bash.
-ch_bash2=Starts the bash mode
+ch_bash1=bashの開始
+ch_bash2=bashモードを開始します。
 ch_dummyupdate0=更新コマンド:
 ch_copy0=[pos] [source],[target]
 ch_copy1=XMLノードのコピー
@@ -543,9 +543,9 @@ ch_set28=: テキストのインデックス作成
 ch_set29=: 属性値のインデックス作成
 ch_set31=: Fulltext indexing
 ch_help1=ヘルプをオンにする
-ch_help11= commands.
+ch_help11= コマンド
 ch_help2=[command] が指定された場合、指定されたコマンドに関する情報が\n 表示されます。指定しなかった場合は全てのコマンドが表示されます。\n'all' が指定された場合、隠しコマンドも共に表示されます。
-ch_exit1=Exit
+ch_exit1=終了
 
 # Help Texts
 h_filter=クエリー実行結果の表示
@@ -553,8 +553,8 @@ h_queryrt=このチェックボックスがチェックされている場合、�
 h_toxquery=現在のXPathクエリーがXQuer検索パネルにコピーされます。
 h_toxpath=検索用のGUIコンポーネントを操作する事により、内部的にXPathクエリーが作成、実行されます。このボタンを押して、XPathクエリーの表示、変更を行えます。
 h_hist=入力履歴の表示
-h_go=Executes the query.
-h_stop=Stops the current process.
+h_go=クエリーを実行します。
+h_stop=現在の操作を中止します。
 #h_exec=入力の実行
 #h_stop=このボタンを押すとデータベース構築作業を停止します。
 h_cancel=このボタンを押すとダイアログが閉じてメインウィンドウに戻ります。

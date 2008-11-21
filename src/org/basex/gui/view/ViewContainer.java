@@ -35,8 +35,8 @@ public final class ViewContainer extends BaseXBack implements Runnable {
   private static final BasicStroke STROKE = new BasicStroke(2);
   /** Thread counter. */
   private static final int[] STEPS = {
-    100, 90, 81, 72, 74, 66, 59, 52, 46, 40, 35, 30, 26, 22, 19, 16,
-    14, 12, 10, 8, 7, 6, 5, 4, 3, 2, 2, 1, 1, 1, 0, 0
+    255, 225, 202, 180, 185, 165, 147, 130, 115, 100, 87, 75, 65, 55, 47,
+    40, 35, 30, 25, 20, 17, 15, 12, 10, 7, 5, 5, 2, 2, 2, 0, 0
   };
   /** Thread counter. */
   private int count;
@@ -117,7 +117,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
   public void run() {
     Performance.sleep(1000);
     while(++count < STEPS.length - 1) {
-      Performance.sleep(20);
+      Performance.sleep(50);
       repaint();
     }
   }
@@ -129,38 +129,21 @@ public final class ViewContainer extends BaseXBack implements Runnable {
 
     final int w = getWidth();
     final int h = getHeight();
-    final int hh = Math.max(320, Math.min(700, h));
+    final int hh = Math.max(220, Math.min(700, h));
     final Insets i = getInsets();
     BaseXLayout.fill(g, GUIConstants.color1, GUIConstants.color2,
         i.left, i.top, w - i.right, h - i.bottom);
-    if(w < 150 || h < 125) return;
+    if(w < 150 || h < 160) return;
 
-    final int lw = logo.getWidth(this);
     final int lh = logo.getHeight(this);
+    final int y = (hh - lh - 60) / 2;
+    g.drawImage(logo, (w - logo.getWidth(this)) / 2, y, this);
+    if(w < 200 || h < 200) return;
 
-    int y = lh + 100;
-    StringTokenizer st = new StringTokenizer(WELCOMETEXT, NL);
-    while(st.hasMoreTokens()) { st.nextToken(); y += 20; }
-    y = (hh - y) / 2;
-
-    g.drawImage(logo, (w - lw) / 2, y, this);
-    if(w < 270 || h < 250) return;
-
-    y -= STEPS[count] * hh / 200;
-
-    BaseXLayout.antiAlias(g);
-    g.setColor(Color.black);
+    g.setColor(new Color(0, 0, 0, 255 - STEPS[count]));
     g.setFont(new Font(GUIProp.font, 0, 22));
-    y += 30 + lh + STEPS[count] * (hh - y) / 80;
-    BaseXLayout.drawCenter(g, WELCOME, w, y);
-    final int fh = 14;
-    g.setFont(new Font(GUIProp.font, 0, fh));
-
-    y += 10;
-    st = new StringTokenizer(WELCOMETEXT, NL);
-    while(st.hasMoreTokens()) {
-      BaseXLayout.drawCenter(g, st.nextToken(), w, y += fh + 4);
-    }
+    BaseXLayout.antiAlias(g);
+    BaseXLayout.drawCenter(g, VERSINFO, w, y + 30 + lh);
   }
 
   /**

@@ -4,7 +4,6 @@ import static org.basex.data.DataText.*;
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import java.util.Arrays;
 import org.basex.data.Data;
 import org.basex.io.DataAccess;
 import org.basex.util.IntList;
@@ -138,10 +137,8 @@ public final class Values extends Index {
       ids.add(pre);
       for(int d = 0; d < ds - 1; d++) ids.add(pre += idxl.readNum());
     }
-    final int[] res = ids.finish();
-    Arrays.sort(res);
-    
-    return new IndexArrayIterator(res);
+    ids.sort();
+    return new IndexArrayIterator(ids.list, ids.size);
   }
   
   /**

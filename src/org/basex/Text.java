@@ -49,6 +49,8 @@ public interface Text {
   String VERSION = "5.0";
   /** Company Info. */
   String COMPANY = "DBIS, University of Konstanz";
+  /** Version Information. */
+  String VERSINFO = BaseX.info(lang("version"), VERSION);
 
   /** BaseX GUI title. */
   String TITLE = NAME + S + VERSION;
@@ -701,7 +703,7 @@ public interface Text {
   // GUI COMMANDS =============================================================
 
   /** Command Info. */
-  String GUIABOUT = lang("c_about") + S + NAME + DOTS;
+  String GUIABOUT = BaseX.info(lang("c_about") + DOTS, NAME);
   /** Command Info. */
   String GUIABOUTTT = lang("c_abouttt");
   /** Command Info. */
@@ -913,10 +915,11 @@ public interface Text {
 
   // VISUALIZATIONS ===========================================================
 
-  /** Welcome Information. */
-  String WELCOME = lang("welcome1");
-  /** Welcome Text. */
-  String WELCOMETEXT = lang("welcome2");
+  /* Welcome Information.
+  //String WELCOME = BaseX.info(lang("welcome1"), VERSION);
+  // Welcome Text.
+  //String WELCOMETEXT = lang("welcome2");
+   */
   /** Text find information. */
   String RESULTFIND = lang("text_find") + COLS;
   /** Help String. */
@@ -1171,7 +1174,7 @@ public interface Text {
   String MEMHELP = lang("dz_help");
 
   /** About text. */
-  String ABOUTTITLE = lang("da_title") + S + NAME;
+  String ABOUTTITLE = BaseX.info(lang("da_title"), NAME);
   /** Copyright Info. */
   String COPYRIGHT = "© 2005-08 " + COMPANY;
   /** License Info. */
@@ -1179,10 +1182,10 @@ public interface Text {
   /** Developer Info. */
   String DEVELOPER = lang("da_dev") + ": Christian Grün";
   /** Contributors Info. */
-  String CONTRIBUTE1 = lang("da_cont1") +
-    ": Alexander Holupirek, Sebastian Gath,";
+  String CONTRIBUTE1 = lang("da_cont1") + ": Sebastian Gath, Lukas Kircher,";
   /** Developer Names. */
-  String CONTRIBUTE2 = "Lukas Kircher, Andreas Weiler " + lang("da_cont2");
+  String CONTRIBUTE2 = "Andreas Weiler, Alexander Holupirek " +
+    lang("da_cont2");
   /** Developer Names. */
   String CONTACT = lang("da_contact") + COLS + MAIL;
 

@@ -121,6 +121,7 @@ public final class DialogPrefs extends Dialog {
     lang.addItemListener(new ItemListener() {
       public void itemStateChanged(final ItemEvent ie) {
         creds.setText(credits(lang.getSelectedItem().toString()));
+        action(null);
       }
       
     });

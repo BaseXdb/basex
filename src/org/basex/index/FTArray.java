@@ -199,9 +199,9 @@ final class FTArray {
           final int[] one = next.list[cn];
           int[] ne = new int[5];
           ne[0] = one[0];
-          if (Token.diff((byte) Token.lc(r2[0]), (byte) Token.lc(r1[0])) < 0 ||
-              (Token.diff((byte) Token.lc(r2[0]), (byte) Token.lc(r1[0])) == 0
-                  && Token.diff((byte) Token.uc(r2[0]), r1[0]) == 0)) {
+          if (Token.diff(Token.lc(r2[0]), Token.lc(r1[0])) < 0 ||
+              (Token.diff(Token.lc(r2[0]), Token.lc(r1[0])) == 0
+                  && Token.diff(Token.uc(r2[0]), r1[0]) == 0)) {
             ne[1] = next.size;
             ne[2] = next.size + 1;
           } else {
@@ -545,8 +545,8 @@ final class FTArray {
       return i;
     while (i < s
       && Token.diff(
-          (byte) Token.lc(tokens.list[next.list[next.list[cn][i]][0]][0]),
-          (byte) Token.lc(toInsert)) < 0) {
+          Token.lc(tokens.list[next.list[next.list[cn][i]][0]][0]),
+          Token.lc(toInsert)) < 0) {
       i++;
     }
 
@@ -556,10 +556,10 @@ final class FTArray {
         found = true;
         return i;
       } else if(Token.diff(
-          (byte) Token.lc(tokens.list[next.list[next.list[cn][i]][0]][0]),
-          (byte) Token.lc(toInsert)) == 0) {
+          Token.lc(tokens.list[next.list[next.list[cn][i]][0]][0]),
+          Token.lc(toInsert)) == 0) {
         if (Token.diff(tokens.list[next.list[next.list[cn][i]][0]][0],
-            (byte) Token.uc(toInsert)) == 0)
+            Token.uc(toInsert)) == 0)
           return i;
         if (i + 1 < s &&
             Token.diff(tokens.list[next.list[next.list[cn][i + 1]][0]][0], 

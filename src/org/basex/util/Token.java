@@ -577,16 +577,15 @@ public final class Token {
   }
 
   /**
-   * Calculates the difference of two character arrays.
+   * Calculates the difference of two characters.
    * @param tok token to be compared
    * @param tok2 second token to be compared
    * @return 0 if tokens are equal, negative if first token is smaller,
    * positive if first token is bigger
    */
-  public static int diff(final byte tok, final byte tok2) {
-    return diff(new byte[] {tok}, new byte[] {tok2});
+  public static int diff(final int tok, final int tok2) {
+    return (tok & 0xFF) - (tok2 & 0xFF);
   }
-
 
   /**
    * Checks if the first token contains the second token in lowercase.

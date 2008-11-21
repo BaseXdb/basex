@@ -4,6 +4,7 @@
 # Start
 launch=Starte
 wait=Bitte Warten
+version=Version %
 
 # Menu Commands
 m_file=Datei
@@ -38,8 +39,8 @@ s_paintmap=Zeichnen
 s_ok=OK
 
 # Visualizations
-welcome1=Willkommen!
-welcome2=Eine kleine Einführung:\nKlicken Sie auf "Datei -> Neu..."\nund wählen Sie ein XML-Dokument aus.\nBestätigen Sie das folgende Dialogfenster\nund beachten Sie die Hilfe...
+#welcome1=Willkommen!
+#welcome2=Eine kleine Einführung:\nKlicken Sie auf "Datei -> Neu..."\nund wählen Sie ein XML-Dokument aus.\nBestätigen Sie das folgende Dialogfenster\nund beachten Sie die Hilfe...
 text_find=Finde
 no_table=Tabelle für aktuelle Daten nicht verfügbar
 no_space=Zu wenig Platz
@@ -175,14 +176,14 @@ dz_reserved=Reservierter Speicher
 dz_used=Genutzter Speicher
 dz_help=Der verfügbare Speicher kann mit dem Java-Flag -Xmx<size> erhöht werden.
 
-da_title=Info über
+da_title=Info über %
 da_license=BSD-Lizenz (ISC)
 da_dev=Hauptentwickler
 da_cont1=Team
 da_cont2=und andere
 da_contact=Kontakt
 
-c_about=Über
+c_about=Über %
 c_abouttt=Zeigt allgemeine Projektinfos an.
 c_close=Schließen
 c_closett=Schließt die aktuelle Datenbank.

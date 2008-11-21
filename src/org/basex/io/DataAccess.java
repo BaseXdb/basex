@@ -153,6 +153,24 @@ public final class DataAccess {
   }
 
   /**
+   * Reads a byte value from the specified position.
+   * @param p position
+   * @return integer value
+   */
+  public synchronized byte readByte(final long p) {
+    cursor(p);
+    return readByte();
+  }
+
+  /**
+   * Reads a byte value.
+   * @return integer value
+   */
+  public synchronized byte readByte() {
+    return (byte) read();
+  }
+
+  /**
    * Reads a number of bytes in range from -> to and returns them as array.
    * @param from starting position for reading
    * @param to ending position for reading

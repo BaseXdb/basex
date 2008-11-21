@@ -2,6 +2,7 @@ package org.basex.index;
 
 import static org.basex.Text.*;
 import static org.basex.data.DataText.*;
+import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.Prop;
@@ -10,7 +11,6 @@ import org.basex.io.DataAccess;
 import org.basex.util.IntList;
 import org.basex.util.Levenshtein;
 import org.basex.util.Performance;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -60,7 +60,7 @@ public final class FTFuzzy extends Index {
   /** Storing pre and pos values for each token. */
   final DataAccess dat;
   /** Token positions. */
-  final int[] tp = new int[Token.MAXLEN + 1];
+  final int[] tp = new int[MAXLEN + 1];
   /** Cache for number of hits and data reference per token. */
   private final FTTokenMap cache;
 
@@ -123,12 +123,12 @@ public final class FTFuzzy extends Index {
     // binary search
     while(l < r) {
       final int m = l + (r - l) / 2 / o * o;
-      final int c = Token.diff(ti.readBytes(m, m + tl), tok);
+      final int c = diff(ti.readBytes(m, m + tl), tok);
       if(c == 0) return m;
       else if(c < 0) l = m + o;
       else r = m - o;
     }
-    return r == l && Token.eq(ti.readBytes(l, l + tl), tok) ? l : -1;
+    return r == l && eq(ti.readBytes(l, l + tl), tok) ? l : -1;
   }
 
   /**
@@ -145,7 +145,7 @@ public final class FTFuzzy extends Index {
     
     while(p < tp[tp.length - 1]) {
       if(stats.adding(getDataSize(p, i))) stats.add(ti.readBytes(p, p + i));
-      p += i + 4L + 5L;
+      p += i + 9;
       if (p == tp[j]) {
         i = j;
         while(j + 1 < tp.length && tp[++j] == -1);
@@ -175,6 +175,7 @@ public final class FTFuzzy extends Index {
     }
 
     if(i == indexsize) return null;
+    System.out.println("=> " + i);
 
     // back up last pointer on index
     lastIndex = (int) (1L + (i + 1) * 5L);
@@ -278,16 +279,8 @@ public final class FTFuzzy extends Index {
     } else {
       final int[][] dt = new int[2][s];
       dat.cursor(p);
-  
-      if (data.meta.ftittr) {
-        for(int i = 0; i < s; i++) {
-          dt[0][i] = dat.readNum();
-          dt[1][i] = dat.readNum();
-        }
-      } else {
-        for(int i = 0; i < s; i++) dt[0][i] = dat.readNum();
-        for(int i = 0; i < s; i++) dt[1][i] = dat.readNum();  
-      }
+      for(int i = 0; i < s; i++) dt[0][i] = dat.readNum();
+      for(int i = 0; i < s; i++) dt[1][i] = dat.readNum();  
       return new IndexArrayIterator(dt, true);
     }
   }
@@ -361,12 +354,12 @@ public final class FTFuzzy extends Index {
     }
 
     if(ft.wc) {
-      final int pw = Token.indexOf(tok, '.');
-      if(pw != -1) return getTokenWildCard(Token.lc(tok), pw);
+      final int pw = indexOf(tok, '.');
+      if(pw != -1) return getTokenWildCard(lc(tok), pw);
     }
 
     // get result iterator
-    final IndexIterator ii = get(Token.lc(tok));
+    final IndexIterator ii = get(lc(tok));
     if (ii == IndexIterator.EMPTY || !ft.cs) return ii;
 
     // case sensitive search
@@ -395,14 +388,14 @@ public final class FTFuzzy extends Index {
       while(i < ids[0].length && id == ids[0][i] && ftdb.more()) {
         // first match case insensitive value
         ftdb.cs = false;
-        if(!Token.eq(Token.lc(tok), ftdb.get())) {
+        if(!eq(lc(tok), ftdb.get())) {
           //i++;
           continue;
         }
 
         // token found - match case sensitivity
         ftdb.cs = true;
-        if(Token.eq(tok, ftdb.get())) {
+        if(eq(tok, ftdb.get())) {
           // overwrite original values
           ids[0][c] = id;
           ids[1][c++] = ids[1][i];
@@ -442,7 +435,7 @@ public final class FTFuzzy extends Index {
             
             // token found - match case sensitivity
             ftdb.cs = true;
-            if(!Token.eq(token, ftdb.get())) {
+            if(!eq(token, ftdb.get())) {
               r.removePos();
             }
           }
@@ -474,7 +467,7 @@ public final class FTFuzzy extends Index {
     if(fto.fz) return 1;
 
     // specified ft options are not checked yet...
-    final byte[] tok = Token.lc(index.get());
+    final byte[] tok = lc(index.get());
     final int id = cache.id(tok);
     if(id > 0) return cache.getSize(id);
 
@@ -573,14 +566,12 @@ public final class FTFuzzy extends Index {
 
     // check token before wildcard
     for(int t = 0; t < posw; t++) {
-      //if (tokww[t] != tok2[t]) return false;
-      if (Token.diff(tokww[t], tok2[t]) != 0) return false;
+      if (tokww[t] != tok2[t]) return false;
     }
 
     // check token after wildcard
     for(int t = tokww.length - posw - 2; t > 0; t--) {
-      if (Token.diff(tokww[tokww.length - t], tok2[tok2.length - t]) != 0) 
-        return false;
+      if(tokww[tokww.length - t] != tok2[tok2.length - t]) return false;
     }
 
     return true;

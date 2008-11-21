@@ -1,5 +1,7 @@
 package org.basex.util;
 
+import java.util.Arrays;
+
 /**
  * This is a simple container for native int values.
  *
@@ -108,6 +110,12 @@ public final class IntList {
     return il;
   }
 
+  /**
+   * Sorts the int values.
+   */
+  public void sort() {
+    Arrays.sort(list, 0, size);
+  }
 
   /**
    * Sorts the array in the order of the specified token array.
