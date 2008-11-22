@@ -6,7 +6,7 @@ import org.basex.util.TokenList;
 
 /**
  * Preserves a compressed trie index structure and useful functionality.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Sebastian Gath
  */

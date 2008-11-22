@@ -5,7 +5,7 @@ import org.basex.util.Set;
 
 /**
  * This class caches sizes and pointers from fulltext results.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Sebastian Gath
  */
