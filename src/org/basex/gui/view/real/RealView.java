@@ -79,8 +79,8 @@ public final class RealView extends View {
   private RealRect focusedRealRect = null;
   /** current Image of visualization. */
   private BufferedImage realImage = null;
-  
-
+  /** current root count.  */
+  private int rootNumber = 1;
 
   /**
    * Default Constructor.
@@ -107,7 +107,6 @@ public final class RealView extends View {
   protected void refreshInit() {
     wwidth = -1;
     wheight = -1;
-    realImage = null;
     repaint();
   }
 
@@ -121,7 +120,6 @@ public final class RealView extends View {
   protected void refreshMark() {
     wwidth = -1;
     wheight = -1;
-    realImage = null;
     repaint();
   }
 
@@ -139,7 +137,6 @@ public final class RealView extends View {
     BaseXLayout.antiAlias(g);
     g.setColor(Color.BLACK);
     g.setFont(GUIConstants.font);
-    
 
     /** Timer */
     final Performance perf = new Performance();
@@ -162,13 +159,18 @@ public final class RealView extends View {
           drawPrePost(g, 1, 1);
           break;
         case 3:
-          temperature(GUI.context.current().size == 0 ? 0 : GUI.
-              context.current().nodes[0], g);
+          realImage = createImage();
+          Graphics rg = realImage.getGraphics();
+
+          for(int i = 0; i < GUI.context.current().size; i++) {
+            rootNumber = i;
+            temperature(GUI.context.current().nodes[i], rg);
+          }
 
       }
-    } else {
+    } 
       g.drawImage(realImage, 0, 0, getWidth(), getHeight(), this);
-    }
+    
 
     if(focusedRealRect != null) {
       RealRect r = focusedRealRect;
@@ -233,16 +235,14 @@ public final class RealView extends View {
         View.notifyContext(GUI.context.marked(), false, this);
         refreshContext(false, false);
       }
-    } 
+    }
   }
-
- 
 
   @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
     if(working || focused == -1) return;
-    if(e.getWheelRotation() > 0) notifyContext(new Nodes(focused, GUI.
-        context.data()), false, null);
+    if(e.getWheelRotation() > 0) notifyContext(new Nodes(focused, 
+        GUI.context.data()), false, null);
     else notifyHist(false);
   }
 
@@ -299,9 +299,6 @@ public final class RealView extends View {
    * @param g the graphics reference
    */
   private void temperature(final int root, final Graphics g) {
-    realImage = createImage();
-    Graphics rg = realImage.getGraphics();
-
     final Data data = GUI.context.data();
     rects = new ArrayList<RealRect[]>();
     int level = 0;
@@ -311,12 +308,12 @@ public final class RealView extends View {
     rectCount = 1;
     parentPos = null;
     while(parentList.size > 0) {
-      drawTemperature(rg, level);
+      drawTemperature(g, level);
       getNextNodeLine();
       level++;
     }
 
-    g.drawImage(realImage, 0, 0, getWidth(), getHeight(), this);
+    
 
   }
 
@@ -364,16 +361,18 @@ public final class RealView extends View {
    */
   private void drawTemperature(final Graphics g, final int level) {
 
+    final int numberOfRoots = GUI.context.current().nodes.length;
     final RealRect[] tRect = new RealRect[rectCount];
     final Data data = GUI.context.data();
     final int size = parentList.size;
     final HashMap<Integer, Double> temp = new HashMap<Integer, Double>();
-    double x = 0;
     final int y = 1 * level * fontHeight * 2;
-    final double width = getSize().width - 1;
+    final double width = (getSize().width - 1) / numberOfRoots;
+    double x = (int) (rootNumber * width);
     final double ratio = width / size;
     final int minSpace = 35; // minimum Space for Tags
     final boolean space = ratio > minSpace ? true : false;
+    
 
     int r = 0;
 
