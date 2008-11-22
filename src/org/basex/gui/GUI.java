@@ -372,7 +372,7 @@ public final class GUI extends JFrame {
   }
 
   /**
-   * Sets a new cursor.
+   * Sets a cursor.
    * @param c cursor to be set
    */
   public void cursor(final Cursor c) {
@@ -380,7 +380,7 @@ public final class GUI extends JFrame {
   }
 
   /**
-   * Sets a new cursor.
+   * Sets a cursor, forcing a new look if necessary.
    * @param c cursor to be set
    * @param force new cursor
    */
