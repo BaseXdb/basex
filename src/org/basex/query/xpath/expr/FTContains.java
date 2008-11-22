@@ -227,7 +227,7 @@ public final class FTContains extends Arr {
   public int indexSizes(final XPContext ctx, final Step curr, final int min) {
     // check if first expression is a location path and if fulltext index exists
     final MetaData meta = ctx.item.data.meta;
-    if(!(expr[0] instanceof LocPathRel && meta.ftxindex))
+    if(!(expr[0] instanceof LocPathRel && meta.ftxindex && !meta.ftst))
       return Integer.MAX_VALUE;
 
     // check if index can be applied
