@@ -34,8 +34,8 @@ b_search=検索
 
 # Status messages
 #s_path=パス
-s_calcmap=Mapを計算中
-s_paintmap=描画中
+#s_calcmap=Mapを計算中
+#s_paintmap=描画中
 s_ok=OK
 
 # Visualizations

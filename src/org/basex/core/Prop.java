@@ -140,11 +140,13 @@ public final class Prop {
   public static int lserr = 0;
   /** Flag for creating flat MAB2 data. */
   public static boolean mab2flat = false;
+  /** Server mode. */
+  public static boolean server = false;
 
   // WEBSERVER OPTIONS ========================================================
 
   /** PHP Path. */
-  public static String phppath = "php.exe";
+  public static String phppath = "php";
 
   // CONFIG OPTIONS ===========================================================
 

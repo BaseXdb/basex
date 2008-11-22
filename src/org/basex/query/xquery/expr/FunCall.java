@@ -12,7 +12,7 @@ import org.basex.query.xquery.util.NSLocal;
 import org.basex.util.Token;
 
 /**
- * User defined function.
+ * Function call.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen

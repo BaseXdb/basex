@@ -4,6 +4,8 @@ import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
+
+import org.basex.core.Prop;
 import org.basex.data.Serializer;
 import org.basex.query.ExprInfo;
 import org.basex.query.xquery.XQContext;
@@ -63,8 +65,8 @@ public final class Functions extends ExprInfo {
       return new Cast(args[0], seq);
     }
 
-    // check Java functions
-    if(Token.startsWith(uri, JAVAPRE)) {
+    // check Java functions - not supported in server mode
+    if(!Prop.server && Token.startsWith(uri, JAVAPRE)) {
       final String c = Token.string(Token.substring(uri, JAVAPRE.length));
       // convert dashes to upper-case initials
       final StringBuilder sb = new StringBuilder(c);

@@ -1,7 +1,6 @@
 package org.basex.gui.view.plot;
 
 import static org.basex.util.Token.*;
-
 import org.basex.data.Data;
 import org.basex.data.StatsKey;
 import org.basex.data.StatsKey.Kind;

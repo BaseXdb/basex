@@ -34,8 +34,6 @@ b_search=Suche
 
 # Status messages
 #s_path=Pfad
-s_calcmap=Berechnung
-s_paintmap=Zeichnen
 s_ok=OK
 
 # Visualizations

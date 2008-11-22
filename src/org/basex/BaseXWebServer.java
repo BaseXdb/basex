@@ -40,12 +40,12 @@ import org.basex.util.Token;
  */
 public final class BaseXWebServer {
   /** Header key. */
-  static final Pattern QUERY = Pattern.compile("GET (.*) HTTP.*");
-  /** Index file. */
+  static final Pattern QUERY = Pattern.compile("(GET|POST) (.*) HTTP.*");
+  /** Xquery suffix. */
   static final String XQSUFFIX = "xq";
-  /** Index file. */
+  /** PHP suffix. */
   static final String PHPSUFFIX = "php";
-  /** Index file. */
+  /** Index files. */
   static final String[] INDEXFILES = {
     "index." + XQSUFFIX, "index." + PHPSUFFIX, "index.html", "index.htm",
   };
@@ -88,6 +88,7 @@ public final class BaseXWebServer {
    * @param args arguments
    */
   private BaseXWebServer(final String[] args) {
+    Prop.server = true;
     try {
       if(!parseArguments(args)) return;
 
@@ -186,7 +187,7 @@ public final class BaseXWebServer {
     while((line = br.readLine()) != null) {
       if(line.length() == 0) break;
       final Matcher m = QUERY.matcher(line);
-      if(m.matches()) input = m.group(1);
+      if(m.matches()) input = m.group(2);
       stop |= line.equals("STOP");
     }
     if(stop) return new Request(0);
@@ -489,7 +490,7 @@ public final class BaseXWebServer {
         final String[] arg = fn.substring(i + 1).split("\\|");
         f = fn.substring(0, i);
         args = new String[arg.length][2];
-        for(int a = 0; a < arg.length; a++) args[a] = arg[a].split("=");
+        for(int a = 0; a < arg.length; a++) args[a] = arg[a].split("=", 2);
       }
 
       i = f.indexOf(".");

@@ -2,6 +2,7 @@ package org.basex.query.xquery.expr;
 
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
+import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 
@@ -25,6 +26,13 @@ public final class If extends Arr {
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
     return ctx.iter(ctx.iter(expr[0]).ebv().bool() ? expr[1] : expr[2]);
+  }
+
+  @Override
+  public Expr comp(final XQContext ctx) throws XQException {
+    super.comp(ctx);
+    if(!expr[0].i()) return this;
+    return expr[((Item) expr[0]).bool() ? 1 : 2];
   }
 
   @Override

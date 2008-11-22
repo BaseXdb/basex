@@ -26,8 +26,6 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
   private String status = STATUSOK;
   /** Current path. */
   private String oldStatus = STATUSOK;
-  /** Current performance info. */
-  private String perf = "";
   /** Current focus on memory. */
   boolean memfocus;
   /** Error flag. */
@@ -73,21 +71,11 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
   private void refresh(final String txt) {
     status = txt;
     oldStatus = status;
-    perf = "";
 
     final Runtime rt = Runtime.getRuntime();
     max = rt.maxMemory();
     used = rt.totalMemory() - rt.freeMemory();
     if(txt.equals(STATUSWAIT)) new Thread(this).start();
-    repaint();
-  }
-
-  /**
-   * Sets performance information text.
-   * @param info the text to be set
-   */
-  public void setPerformance(final String info) {
-    perf = info;
     repaint();
   }
 
@@ -98,7 +86,6 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
   public void setPath(final byte[] path) {
     status = path.length == 0 ? oldStatus : Token.string(path);
     error = false;
-    perf = "";
     repaint();
   }
 
@@ -118,45 +105,38 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
     final int ww = getWidth() - MEMW;
     final int hh = getHeight();
 
-    final boolean full = used * 6 / 5 > max;
-    g.setFont(getFont());
-    g.setColor(GUIConstants.color1);
-    g.fillRect(ww, 0, MEMW - 1, hh - 2);
-    g.setColor(full ? GUIConstants.colormark4 : GUIConstants.color4);
-    g.fillRect(ww + 2, 2, (int) (used * (MEMW - 7) / max), hh - 5);
-
-    g.setColor(COLORBUTTON);
+    // draw memory box
     int xe = ww + MEMW - 3;
     int ye = hh - 2;
+    g.setColor(Color.white);
+    g.fillRect(ww, 0, MEMW - 1, hh - 2);
+    g.setColor(COLORBUTTON);
     g.drawLine(ww, 0, xe, 0);
     g.drawLine(ww, 0, ww, ye);
-    g.setColor(Color.white);
-    g.drawLine(xe, 1, xe, ye);
-    g.drawLine(ww + 1, ye, xe, ye);
-    g.setColor(full ? GUIConstants.colormark3 : GUIConstants.color6);
 
+    // show current memory usage
+    final boolean full = used * 6 / 5 > max;
+    g.setColor(full ? colormark4 : color4);
+    g.fillRect(ww + 2, 2, (int) (used * (MEMW - 7) / max), hh - 5);
+
+    // print current memory usage
+    g.setFont(getFont());
     FontMetrics fm = g.getFontMetrics();
     final String mem = Performance.format(used, true);
     int fw = ww + (MEMW - 4 - fm.stringWidth(mem)) / 2;
     final int h = fm.getHeight() - 2;
+    g.setColor(full ? colormark3 : color6);
     g.drawString(mem, fw, h);
 
-    fm = g.getFontMetrics();
+    /* print performance string
     final int w = ww - fm.stringWidth(perf) - 10;
     g.setColor(Color.black);
     g.drawString(perf, w, h);
+    */
 
-    final String st = status;
-    fw = 24;
-    int i = -1;
-    final int il = st.length();
-    while(++i != il) {
-      if(fw > w) break;
-      fw += fm.charWidth(st.charAt(i));
-    }
-    g.setColor(error ? GUIConstants.COLORERROR : Color.black);
-    g.drawString(st.substring(0, i), 4, h);
-    if(fw > w) g.drawString("...", fw - 16, h);
+    // print status text
+    g.setColor(Color.black);
+    BaseXLayout.chopString(g, Token.token(status), 4, 0, fw - 24);
   }
 
   @Override
@@ -185,12 +165,12 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
     if(memfocus) GUI.get().focus(GUIStatus.this, HELPMEM);
 
     GUI.get().cursor(
-        memfocus ? GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
+        memfocus ? CURSORHAND : CURSORARROW);
   }
 
   @Override
   public void mouseExited(final MouseEvent e) {
     memfocus = false;
-    GUI.get().cursor(GUIConstants.CURSORARROW);
+    GUI.get().cursor(CURSORARROW);
   }
 }

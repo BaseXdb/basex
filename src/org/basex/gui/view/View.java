@@ -88,7 +88,6 @@ public abstract class View extends BaseXPanel {
     gui.layoutViews();
 
     // set new windows title
-    gui.status.setPerformance("");
     gui.setTitle(Text.TITLE + (db ? " - " + ctx.data().meta.dbname : ""));
   }
 

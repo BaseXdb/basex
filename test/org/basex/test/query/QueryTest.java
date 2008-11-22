@@ -25,6 +25,8 @@ public final class QueryTest {
   private static final AbstractTest[] TESTS = {
     new SimpleTest(), new XPathMarkFTTest(), new FTTest()
   };
+  /** Verbose flag. */
+  private static final boolean VERBOSE = true;
 
   /**
    * Main method of the test class.
@@ -44,7 +46,7 @@ public final class QueryTest {
 
     boolean ok = true;
 
-    /* testing all kinds of combinations 
+    // testing all kinds of combinations 
     for(int x = 0; x < 2; x++) {
       for(int a = 0; a < 2; a++) { Prop.ftindex = a == 0;
         for(int b = 0; b < 2; b++) { Prop.ftittr = b == 0;
@@ -59,9 +61,9 @@ public final class QueryTest {
           }
         }
       }
-    }*/
+    }
     
-    // single test
+    /* single test
     Prop.ftindex = true;
     Prop.ftittr = true;
     Prop.ftfuzzy = true;
@@ -69,6 +71,7 @@ public final class QueryTest {
     Prop.ftdc = false;
     Prop.ftcs = false;
     ok &= test(false);
+    */
 
     System.out.println(ok ? "All tests correct.\n" : "Wrong results...\n");
   }
@@ -108,6 +111,8 @@ public final class QueryTest {
     for(final Object[] qu : test.queries) {
       final boolean correct = qu.length == 3;
       final String query = qu[correct ? 2 : 1].toString();
+      
+      if(VERBOSE) err(query, ext);
 
       proc = xquery ? new XQuery(query) : new XPath(query);
       if(proc.execute(CONTEXT)) {

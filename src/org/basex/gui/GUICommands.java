@@ -504,7 +504,6 @@ public enum GUICommands implements GUICommand {
     @Override
     public void execute() {
       GUIProp.showmap ^= true;
-      GUI.get().status.setPerformance("");
       GUI.get().layoutViews();
     }
 

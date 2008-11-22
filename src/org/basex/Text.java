@@ -907,10 +907,6 @@ public interface Text {
 
   // STATUS BAR ===============================================================
 
-  /** Info text for calculating map. */
-  String STATUSMAP1 = lang("s_calcmap") + COLS;
-  /** Info text for painting map. */
-  String STATUSMAP2 = ", " + lang("s_paintmap") + COLS;
   /** Wait text. */
   String STATUSWAIT = lang("wait") + DOTS;
   /** Default message. */

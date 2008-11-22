@@ -59,7 +59,7 @@ public final class MapView extends View implements Runnable {
   /** Main rectangle. */
   private MapRect mainRect;
   /** Dragged rectangle. */
-  private MapRect dragRect;
+  private MapRect selBox;
   /** Flag for zooming in/out. */
   private boolean zoomIn;
   /** Zooming speed. */
@@ -265,16 +265,15 @@ public final class MapView extends View implements Runnable {
 
   /**
    * Initializes the calculation of the main TreeMap.
-   * @return performance string
    */
-  private String calc() {
+  private void calc() {
     // calculate initial rectangle
     final int w = getWidth(), h = getHeight();
     // Screenshots: int w = mainMap.getWidth(), h = mainMap.getHeight();
     final MapRect rect = new MapRect(0, 0, w, h, 0, 0);
 
     // calculate new main rectangles
-    if(painter == null) return "";
+    if(painter == null) return;
     mainRects = new ArrayList<MapRect>();
     painter.reset();
 
@@ -291,28 +290,17 @@ public final class MapView extends View implements Runnable {
     }
 
     // call recursive TreeMap algorithm
-    final Performance perf = new Performance();
     final Nodes nodes = GUI.context.current();
-    // [JH] should bee set globally, easier for developing
-    switch(GUIProp.mapalgo){
+    switch(GUIProp.mapalgo) {
       case 0: calcMap(rect, new IntList(nodes.nodes), 0, nodes.size, true); 
         break;
-      // simple form of slice and dice tremapalgorithm
+      // simple form of slice and dice tremap algorithm
       case 1: calcSliceMap(rect, new IntList(nodes.nodes), 0, nodes.size, 0);
         break;
-//    case 2: any other layout, to be implemented
-      default: calcMap(rect, new IntList(nodes.nodes), 0, nodes.size, true);
     }
-
-    // output timing information
-    final StringBuilder sb = new StringBuilder();
-    sb.append(STATUSMAP1);
-    sb.append(perf.getTimer());
 
     painter.init(mainRects);
     drawMap();
-    sb.append(STATUSMAP2);
-    sb.append(perf.getTimer());
     focus();
 
     /* Screenshots:
@@ -322,8 +310,6 @@ public final class MapView extends View implements Runnable {
     } catch(IOException e) {
       e.printStackTrace();
     }*/
-    
-    return sb.toString();
   }
 
   /**
@@ -640,11 +626,11 @@ public final class MapView extends View implements Runnable {
       }
     }
 
-    if(dragRect != null) {
+    if(selBox != null) {
       g.setColor(GUIConstants.colormark3);
-      g.drawRect(dragRect.x, dragRect.y, dragRect.w, dragRect.h);
-      g.drawRect(dragRect.x - 1, dragRect.y - 1, dragRect.w + 2,
-          dragRect.h + 2);
+      g.drawRect(selBox.x, selBox.y, selBox.w, selBox.h);
+      g.drawRect(selBox.x - 1, selBox.y - 1, selBox.w + 2,
+          selBox.h + 2);
     } else {
       // paint focused rectangle
       final int x = focusedRect.x;
@@ -666,7 +652,6 @@ public final class MapView extends View implements Runnable {
       // add interactions for current thumbnail rectangle...
       //if(focusedRect.thumb) ...
     }
-    
 
     painting = false;
   }
@@ -784,7 +769,6 @@ public final class MapView extends View implements Runnable {
   @Override
   public void mouseDragged(final MouseEvent e) {
     if(working || ++dragTol < 8) return;
-    super.mouseDragged(e);
 
     // refresh mouse focus
     int mx = mouseX;
@@ -793,28 +777,27 @@ public final class MapView extends View implements Runnable {
     int mh = e.getY() - my;
     if(mw < 0) mx -= mw = -mw;
     if(mh < 0) my -= mh = -mh;
-    dragRect = new MapRect(mx, my, mw, mh);
+    selBox = new MapRect(mx, my, mw, mh);
 
-    final Context context = GUI.context;
-    final Data data = context.data();
-    final IntList list = new IntList();
+    final Data data = GUI.context.data();
+    final IntList il = new IntList();
     int np = 0;
     for(int r = 0, rl = mainRects.size(); r < rl; r++) {
       final MapRect rect = mainRects.get(r);
       if(mainRects.get(r).p < np) continue;
-      if(dragRect.contains(rect)) {
-        list.add(rect.p);
+      if(selBox.contains(rect)) {
+        il.add(rect.p);
         np = rect.p + data.size(rect.p, data.kind(rect.p));
       }
     }
-    View.notifyMark(new Nodes(list.finish(), data), null);
+    View.notifyMark(new Nodes(il.finish(), data), null);
   }
 
   @Override
   public void mouseReleased(final MouseEvent e) {
     if(working) return;
-    if(dragRect != null) {
-      dragRect = null;
+    if(selBox != null) {
+      selBox = null;
       repaint();
     }
   }
@@ -935,7 +918,7 @@ public final class MapView extends View implements Runnable {
     focusedRect = null;
     mainMap = createImage();
     zoomMap = createImage();
-    GUI.get().status.setPerformance(calc());
+    calc();
     repaint();
   }
 }

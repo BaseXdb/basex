@@ -6,7 +6,7 @@ package org.basex.gui.view.plot;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Lukas Kircher
  */
-public class PlotBoundingBox {
+class PlotBoundingBox {
   /** X coordinate of upper left corner. */
   int x1;
   /** Y coordinate of upper left corner. */
@@ -65,5 +65,16 @@ public class PlotBoundingBox {
    */
   boolean isGrowing() {
     return growing;
+  }
+  
+  /**
+   * Verifies if the specified coordinates are inside the box.
+   * @param x x position
+   * @param y y position
+   * @return result of comparison
+   */
+  boolean contains(final int x, final int y) {
+    return (x >= x1 && x <= x2 || x >= x2 && x <= x1) &&
+      (y >= y1 && y <= y2 || y >= y2 && y <= y1);
   }
 }

@@ -404,7 +404,6 @@ public final class BaseXLayout {
    */
   public static int drawText(final Graphics g, final MapRect r,
       final byte[] s) {
-
     return drawText(g, r, s, s.length, true);
   }
 

@@ -63,6 +63,7 @@ public final class BaseXServer {
    * @param args arguments
    */
   private BaseXServer(final String[] args) {
+    Prop.server = true;
     try {
       if(!parseArguments(args)) return;
 

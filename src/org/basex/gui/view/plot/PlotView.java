@@ -828,7 +828,7 @@ public final class PlotView extends View implements Runnable {
 
   @Override
   public void mouseDragged(final MouseEvent e) {
-    if(working || painting || e.isShiftDown()) return;
+    if(working || e.isShiftDown()) return;
     if(dragging) {
       // to avoid significant offset between coordinates of mouse click and the
       // start coordinates of the bounding box, mouseX and mouseY are determined
@@ -876,7 +876,6 @@ public final class PlotView extends View implements Runnable {
         selectionBox.setEnd(mouseX, tb);
       } else
         selectionBox.setEnd(mouseX, bb);
-
       // mouse pointer position is in the plot
     } else {
       selectionBox.setEnd(mouseX, mouseY);
@@ -887,13 +886,9 @@ public final class PlotView extends View implements Runnable {
     for(int i = 0; i < plotData.size; i++) {
       final int x = calcCoordinate(true, plotData.xAxis.co[i]);
       final int y = calcCoordinate(false, plotData.yAxis.co[i]);
-      if(((x >= selectionBox.x1 && x <= selectionBox.x2) ||
-          (x <= selectionBox.x1 && x >= selectionBox.x2)) &&
-          ((y >= selectionBox.y1 && y <= selectionBox.y2) ||
-             (y <= selectionBox.y1 && y >= selectionBox.y2))) {
-        il.add(plotData.pres[i]);
-      }
+      if(selectionBox.contains(x, y)) il.add(plotData.pres[i]);
     }
+    
     notifyMark(new Nodes(il.finish(), GUI.context.data()), this);
     nextContext = GUI.context.marked();
     drawSubNodes = false;
