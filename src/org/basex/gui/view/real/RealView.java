@@ -79,8 +79,6 @@ public final class RealView extends View {
   private RealRect focusedRealRect = null;
   /** current Image of visualization. */
   private BufferedImage realImage = null;
-  /** current root count.  */
-  private int rootNumber = 1;
 
   /**
    * Default Constructor.
@@ -164,15 +162,14 @@ public final class RealView extends View {
           rects = new ArrayList<RealRect[]>();
 
           for(int i = 0; i < GUI.context.current().size; i++) {
-            rootNumber = i;
-            temperature(GUI.context.current().nodes[i], rg);
+            temperature(GUI.context.current().nodes[i], rg, i);
           }
 
       }
-    } 
-      g.drawImage(realImage, 0, 0, getWidth(), getHeight(), this);
-    
+    }
+    g.drawImage(realImage, 0, 0, getWidth(), getHeight(), this);
 
+    //highlights focused node
     if(focusedRealRect != null) {
       RealRect r = focusedRealRect;
       g.drawRect(r.x1, r.y1, r.x2 - r.x1, r.y2 - r.y1);
@@ -198,6 +195,39 @@ public final class RealView extends View {
       g.setColor(Color.BLACK);
       g.drawString(s, r.x1, (int) (r.y1 - fontHeight / 4f));
 
+    }
+    
+    //highlights marked nodes
+    if(!rects.isEmpty() && GUI.context.marked().size > 0) {
+
+      g.setColor(Color.GREEN);
+      Iterator<RealRect[]> it = rects.iterator();
+
+      while(it.hasNext()) {
+        final RealRect[] r = it.next();
+        int size = GUI.context.marked().size;
+        final int[] markedNodes = new int[size];
+        System.arraycopy(GUI.context.marked().nodes, 0, markedNodes, 0, size);
+
+        for(int i = 0; i < r.length; i++) {
+
+          for(int j = 0; j < size; j++) {
+            if(r[i].p == markedNodes[j]) {
+              
+                  g.drawRect(r[i].x1, r[i].y1, r[i].x2 - r[i].x1, 
+                      r[i].y2 - r[i].y1);
+
+              if(size < 2) {
+                return;
+              } else if(j < size - 1) {
+                markedNodes[j] = markedNodes[size - 1];
+              }
+              size--;
+            }
+          }
+        }
+
+      }
     }
 
   }
@@ -298,8 +328,10 @@ public final class RealView extends View {
    * controls the node temperature drawing.
    * @param root the root node
    * @param g the graphics reference
+   * @param rootNum number of current root
    */
-  private void temperature(final int root, final Graphics g) {
+  private void temperature(final int root, final Graphics g, 
+      final int rootNum) {
     final Data data = GUI.context.data();
     int level = 0;
     sumNodeSizeInLine = data.size;
@@ -308,7 +340,7 @@ public final class RealView extends View {
     rectCount = 1;
     parentPos = null;
     while(parentList.size > 0) {
-      drawTemperature(g, level);
+      drawTemperature(g, level, rootNum);
       getNextNodeLine();
       level++;
     }
@@ -355,8 +387,10 @@ public final class RealView extends View {
    * Draws node temperature per line.
    * @param g graphics reference
    * @param level the current level
+   * @param rootNum number of current root
    */
-  private void drawTemperature(final Graphics g, final int level) {
+  private void drawTemperature(final Graphics g, final int level,
+      final int rootNum) {
 
     final int numberOfRoots = GUI.context.current().nodes.length;
     final RealRect[] tRect = new RealRect[rectCount];
@@ -365,11 +399,10 @@ public final class RealView extends View {
     final HashMap<Integer, Double> temp = new HashMap<Integer, Double>();
     final int y = 1 * level * fontHeight * 2;
     final double width = (getSize().width - 1) / numberOfRoots;
-    double x = (int) (rootNumber * width);
+    double x = (int) (rootNum * width);
     final double ratio = width / size;
     final int minSpace = 35; // minimum Space for Tags
     final boolean space = ratio > minSpace ? true : false;
-    
 
     int r = 0;
 
