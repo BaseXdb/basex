@@ -8,7 +8,6 @@ import org.basex.query.xpath.item.Bln;
 import org.basex.query.xpath.item.Item;
 import org.basex.query.xpath.locpath.LocPath;
 import org.basex.query.xpath.locpath.Step;
-
 import static org.basex.query.xpath.XPText.*;
 
 /**
