@@ -44,7 +44,7 @@ public final class QueryTest {
 
     boolean ok = true;
 
-    /* testing all kinds of combinations
+    /* testing all kinds of combinations 
     for(int x = 0; x < 2; x++) {
       for(int a = 0; a < 2; a++) { Prop.ftindex = a == 0;
         for(int b = 0; b < 2; b++) { Prop.ftittr = b == 0;
@@ -80,9 +80,11 @@ public final class QueryTest {
    */
   private boolean test(final boolean xquery) {
     boolean ok = true;
+    
     for(final AbstractTest test : TESTS) {
       ok &= test(xquery, test, test.details());
     }
+   
     return ok;
   }
 

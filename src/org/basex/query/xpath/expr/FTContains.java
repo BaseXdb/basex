@@ -131,7 +131,7 @@ public final class FTContains extends Arr {
       } else if(expr[1] instanceof Bln) {
         if(expr[0].eval(ctx).bool()) return (Bln) expr[1];
       }
-      return Bln.TRUE;
+      //return Bln.TRUE;
     }
 
     ctx.ftitem = tmp;

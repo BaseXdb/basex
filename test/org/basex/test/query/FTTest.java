@@ -54,6 +54,10 @@ public final class FTTest extends AbstractTest {
       "</fttest>";
 
     queries = new Object[][] {
+        
+        { "Preds 1", nodes(7, 9, 11),
+        "//w[text() ftcontains 'xml'][text() ftcontains 'Databases']" },
+        
         { "Simple 1", bool(true),
           "'abc' ftcontains 'abc'" },
         { "Simple 2", bool(true),

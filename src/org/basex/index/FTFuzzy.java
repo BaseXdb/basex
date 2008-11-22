@@ -106,32 +106,44 @@ public final class FTFuzzy extends Index {
     return tb.finish();
   }
 
+
   /**
    * Determines the pointer on a token.
+   * 
+   * 
    * @param tok token looking for.
+   * @param rs right side, -1 as default
+   * @param lc flag for converting token from db to lc
    * @return int pointer
    */
-  private int getPointerOnToken(final byte[] tok) {
+  private int getPointerOnTokenCS(final byte[] tok, final int rs, 
+      final boolean lc) {
     final int tl = tok.length;
     int l = tp[tl];
     if(l == -1) return -1;
 
-    int r = -1;
+    int r = rs;
     int i = 1;
-    do r = tp[tl + i++]; while(r == -1);
+    if (r == -1) {
+      do r = tp[tl + i++]; while(r == -1); 
+    }
+    
     final int o = tl + 9;
 
     // binary search
     while(l < r) {
       final int m = l + (r - l) / 2 / o * o;
-      final int c = diff(ti.readBytes(m, m + tl), tok);
+      final int c = diff(lc ? Token.lc(ti.readBytes(m, m + tl)) 
+          : ti.readBytes(m, m + tl), tok);
       if(c == 0) return m;
       else if(c < 0) l = m + o;
       else r = m - o;
     }
-    return r == l && eq(ti.readBytes(l, l + tl), tok) ? l : -1;
+    return r == l && eq(lc ? Token.lc(ti.readBytes(l, l + tl)) 
+        : ti.readBytes(l, l + tl), tok) ? l : -1;
   }
 
+  
   /**
    * Collects all tokens and their sizes found in the index structure.
    * @param stats statistic reference
@@ -277,13 +289,38 @@ public final class FTFuzzy extends Index {
   /**
    * Get pre- and pos values, stored for token out of index.
    * @param tok token looking for
+   * @param cs flag for case sensitive search in query
    * @return iterator
    */
-  private IndexArrayIterator get(final byte[] tok) {
-    final long p = getPointerOnToken(tok);
-    if(p == -1) return IndexArrayIterator.EMP;
-    return getData(getPointerOnData(p, tok.length), getDataSize(p, tok.length),
-        dat, data);
+  private IndexArrayIterator get(final byte[] tok, final boolean cs) {
+      int p = -1; // = getPointerOnToken(tok);
+      int s;
+      IndexArrayIterator iai = IndexArrayIterator.EMP;
+      if (!data.meta.ftcs) {
+          p = getPointerOnTokenCS(Token.lc(tok), p, true);
+          if (p > -1) {
+            s = getDataSize(p, tok.length);
+            iai = getData(getPointerOnData(p, tok.length), s, dat, data);
+          }
+          return iai;
+      } 
+      
+      p = getPointerOnTokenCS(tok, p, false);
+      if (p > -1) {
+        s = getDataSize(p, tok.length);
+        iai = getData(getPointerOnData(p, tok.length), s, dat, data);
+      }
+      
+      if (!cs) {
+        p = getPointerOnTokenCS(Token.lc(tok), p, true);
+        if (p > -1) {
+          s = getDataSize(p, tok.length);
+          iai = IndexArrayIterator.merge(
+              getData(getPointerOnData(p, tok.length), s, dat, data), iai);
+        }
+      }
+ 
+      return iai;
   }
 
   @Override
@@ -308,8 +345,22 @@ public final class FTFuzzy extends Index {
     */
 
     // get result iterator
-    IndexArrayIterator iai = get(lc(tok));
-    if (iai == IndexArrayIterator.EMP || !ft.cs) return iai;
+    IndexArrayIterator iai = IndexArrayIterator.EMP;
+    if (ft.cs || data.meta.ftcs)
+      iai = get(tok, ft.cs);
+    else {
+      // check if result was cached
+      final int id = cache.id(Token.lc(tok));
+      if (id > 0) {
+        final int size = cache.getSize(id);
+        final long p = cache.getPointer(id);
+        return getData(p, size, dat, data);
+      } else {
+        iai = get(tok, ft.cs);
+      }
+    }
+    
+    if (iai == IndexArrayIterator.EMP || !ft.cs || data.meta.ftcs) return iai;
     
     // case sensitive search
     // check real case of each result node
@@ -384,17 +435,18 @@ public final class FTFuzzy extends Index {
   public int nrIDs(final IndexToken index) {
     // hack, should find general solution
     final FTTokenizer fto = (FTTokenizer) index;
-    if(fto.fz || fto.wc) return 1;
+    if(fto.fz || fto.wc || fto.cs || data.meta.ftcs) return 1;
 
     // specified ft options are not checked yet...
-    final byte[] tok = lc(index.get());
+    final byte[] tok = Token.lc(index.get());
     final int id = cache.id(tok);
     if(id > 0) return cache.getSize(id);
 
-    final long p = getPointerOnToken(tok);
+    long p = getPointerOnTokenCS(tok, -1, false);
+    
     if (p > -1) {
       final int size = getDataSize(p, tok.length);
-      cache.add(tok, size, p);
+      cache.add(tok, size, getPointerOnData(p, tok.length));
       return size;
     } else {
       cache.add(tok, 0, 0);

@@ -124,8 +124,7 @@ public final class FTTrie extends Index {
 
     if(!cs && ft.cs) {
       // case insensitive index created - check real case with dbdata
-      if (iai == null)  iai = getNodeFromTrieRecursive(0, Token.lc(tok), false
-          );
+      if (iai == null)  iai = getNodeFromTrieRecursive(0, Token.lc(tok), false);
       if(iai == IndexArrayIterator.EMP) return iai;
 
       // check real case of each result node
