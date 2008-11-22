@@ -161,6 +161,7 @@ public final class RealView extends View {
         case 3:
           realImage = createImage();
           Graphics rg = realImage.getGraphics();
+          rects = new ArrayList<RealRect[]>();
 
           for(int i = 0; i < GUI.context.current().size; i++) {
             rootNumber = i;
@@ -300,7 +301,6 @@ public final class RealView extends View {
    */
   private void temperature(final int root, final Graphics g) {
     final Data data = GUI.context.data();
-    rects = new ArrayList<RealRect[]>();
     int level = 0;
     sumNodeSizeInLine = data.size;
     parentList = new IntList();
@@ -312,9 +312,6 @@ public final class RealView extends View {
       getNextNodeLine();
       level++;
     }
-
-    
-
   }
 
   /**
