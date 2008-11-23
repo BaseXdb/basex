@@ -109,8 +109,8 @@ public interface Text {
   String SERVERSTOPPED = "Server " + lang("srv_stop");
   /** Server started. */
   String SERVERBIND = lang("srv_bind");
-  /** Slot error. */
-  String SERVERFULL = lang("srv_toomany");
+  /** Server timeout. */
+  String SERVERTIME = lang("srv_timeout");
   /** Connection error. */
   String SERVERERR = lang("srv_connect");
   /** Port error. */

@@ -2,7 +2,7 @@
 $title = "Welcome!";
 $img = "<a href='frontend.php'><img style='margin-left:25px;float:right' src='gfx/screenshot.png' border='0'/></a>";
 include("inc/header.inc");
-include("inc/logger.php.inc");
+#include("inc/logger.php.inc");
 ?>
 <p>
   BaseX is a native XML database.
@@ -49,8 +49,10 @@ It offers a bunch of new features:</p>
 <p>
 If you are working with BaseX, feel free to drop us a note at <code>info@basex.org</code>.
 <br/>
+<!--
 <a href="http://www.ipligence.com/webmaps/s/?u=cc78f4c90ba3a6a733bcd815f08557ad&color=1&a=year"><img src="http://www.ipligence.com/webmaps/m/?u=cc78f4c90ba3a6a733bcd815f08557ad&size=small&color=1&a=year" alt="ip-location" border="0" width="1" height="1"></a>
 <a href="https://sourceforge.net/project/stats/detail.php?group_id=192179&ugn=basex&type=prdownload&mode=alltime&package_id=0"><img src="gfx/BaseX.png" border="0" width="1"></a>
+-->
 </p>
 
 </div>

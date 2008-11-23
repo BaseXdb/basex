@@ -116,7 +116,7 @@ public final class Performance {
    * Sleeps the specified number of milliseconds.
    * @param ms time in milliseconds to wait
    */
-  public static void sleep(final int ms) {
+  public static void sleep(final long ms) {
     try { Thread.sleep(ms); } catch(final InterruptedException ex) { }
   }
 

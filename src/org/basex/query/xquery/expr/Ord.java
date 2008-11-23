@@ -69,7 +69,7 @@ public final class Ord {
         if(it.node()) it = Str.get(it.str());
         else if(it.n() && Double.isNaN(it.dbl())) it = null;
       }
-      seq.a(it);
+      seq.add(it);
     }
   }
 

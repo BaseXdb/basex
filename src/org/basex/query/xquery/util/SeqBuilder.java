@@ -43,7 +43,7 @@ public final class SeqBuilder {
    */
   public void add(final Iter it) throws XQException {
     Item i;
-    while((i = it.next()) != null) a(i);
+    while((i = it.next()) != null) add(i);
   }
 
   /**
@@ -51,7 +51,7 @@ public final class SeqBuilder {
    * Note that the item must be no sequence.
    * @param i entry to be added
    */
-  public void a(final Item i) {
+  public void add(final Item i) {
     if(size == item.length) resize();
     item[size++] = i;
   }

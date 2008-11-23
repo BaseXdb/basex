@@ -1,5 +1,7 @@
-<? print "<?xml version='1.0' encoding='UTF-8' ?>\n";
+<?
 $id = preg_replace('/.*\/(.*)\.php/','$1',$_SERVER[SCRIPT_NAME]);
+#$basex = "http://phobos101.inf.uni-konstanz.de/basex/";
+$basex = "";
 
 $links = array("index", "download", "documentation",
   "frontend", "publications", "contact");
@@ -37,7 +39,7 @@ if(!$title) $title = $titles[$top ? $top : $id];
   <meta name="description" content="BaseX - Processing and Visualizing XML Data"/>
   <meta name="keywords" content="BaseX,XML,XQuery,Database,Fulltext,Visualization"/>
   <meta name="robots" content="all"/>
-  <base href="http://www.inf.uni-konstanz.de/dbis/basex/"/>
+  <!--<base href="http://www.inf.uni-konstanz.de/dbis/basex/"/>-->
   <link rel="stylesheet" type="text/css" href="style.css" />
   <link rel="SHORTCUT ICON" href="gfx/BaseX.ico" type="image/ico" />
   <title>BaseX &ndash; <? print $title; ?></title>

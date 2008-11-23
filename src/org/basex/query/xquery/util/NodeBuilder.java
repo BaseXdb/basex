@@ -66,9 +66,9 @@ public final class NodeBuilder {
     
     if(sort) sort(0, size - 1);
     final SeqBuilder sq = new SeqBuilder();
-    sq.a(list[0]);
+    sq.add(list[0]);
     for(int s = 1; s < size; s++) {
-      if(!list[s].is((Nod) sq.item[sq.size - 1])) sq.a(list[s]);
+      if(!list[s].is((Nod) sq.item[sq.size - 1])) sq.add(list[s]);
     }
     return sq.finish();
   }

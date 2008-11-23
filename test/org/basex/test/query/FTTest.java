@@ -1,5 +1,6 @@
 package org.basex.test.query;
 
+import org.basex.BaseX;
 import org.basex.core.Prop;
 
 /**
@@ -12,13 +13,23 @@ public final class FTTest extends AbstractTest {
   @Override
   String details() {
     final StringBuilder sb = new StringBuilder();
-    sb.append("index " + Prop.ftindex + ", ");
-    sb.append("fz " + Prop.ftfuzzy + ", ");
-    sb.append("it " + Prop.ftittr + ", ");
-    sb.append("st " + Prop.ftst + ", ");
-    sb.append("dc " + Prop.ftdc + ", ");
-    sb.append("cs " + Prop.ftcs);
+    sb.append(set("ftindex", Prop.ftindex) + ";");
+    sb.append(set("ftfuzzy", Prop.ftfuzzy) + ";");
+    sb.append(set("ftittr", Prop.ftittr) + ";");
+    sb.append(set("ftst", Prop.ftst) + ";");
+    sb.append(set("ftdc", Prop.ftdc) + ";");
+    sb.append(set("ftcs", Prop.ftcs));
     return sb.toString();
+  }
+  
+  /**
+   * Returns a flag string.
+   * @param key key
+   * @param val value
+   * @return string
+   */
+  private String set(final String key, final boolean val) {
+    return "set " + key + " " + BaseX.flag(val);
   }
   
   /** Constructor. */

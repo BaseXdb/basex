@@ -26,7 +26,7 @@ public final class QueryTest {
     new SimpleTest(), new XPathMarkFTTest(), new FTTest()
   };
   /** Verbose flag. */
-  private static final boolean VERBOSE = true;
+  private static final boolean VERBOSE = false;
 
   /**
    * Main method of the test class.
@@ -43,10 +43,9 @@ public final class QueryTest {
     Prop.textindex = true;
     Prop.attrindex = true;
     Prop.chop = true;
-
     boolean ok = true;
 
-    // testing all kinds of combinations 
+    /* testing all kinds of combinations 
     for(int x = 0; x < 2; x++) {
       for(int a = 0; a < 2; a++) { Prop.ftindex = a == 0;
         for(int b = 0; b < 2; b++) { Prop.ftittr = b == 0;
@@ -61,17 +60,16 @@ public final class QueryTest {
           }
         }
       }
-    }
+    }*/
     
-    /* single test
+    // single test
     Prop.ftindex = true;
-    Prop.ftittr = true;
+    Prop.ftittr = false;
     Prop.ftfuzzy = true;
-    Prop.ftst = true;
+    Prop.ftst = false;
     Prop.ftdc = false;
-    Prop.ftcs = false;
+    Prop.ftcs = true;
     ok &= test(false);
-    */
 
     System.out.println(ok ? "All tests correct.\n" : "Wrong results...\n");
   }
@@ -111,8 +109,9 @@ public final class QueryTest {
     for(final Object[] qu : test.queries) {
       final boolean correct = qu.length == 3;
       final String query = qu[correct ? 2 : 1].toString();
+      final String cmd = (xquery ? "xquery " : "xpath ") + query;
       
-      if(VERBOSE) err(query, ext);
+      if(VERBOSE) err(cmd, ext);
 
       proc = xquery ? new XQuery(query) : new XPath(query);
       if(proc.execute(CONTEXT)) {
@@ -124,8 +123,8 @@ public final class QueryTest {
           ((Nodes) cmp).data = ((Nodes) val).data;
         }
         if(!correct || !val.same(cmp)) {
-          err(qu[0] + ": " + (xquery ? "xquery " : "xpath ") + query,
-              "  Right: " + (correct ? qu[1] : "error") + "\n  Found: " +
+          err(qu[0] + ": " + cmd, "  Right: " +
+              (correct ? qu[1] : "error") + "\n  Found: " +
               val + (ext != null ? "\n  Flags: " + ext : ""));
           ok = false;
           continue;

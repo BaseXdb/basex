@@ -142,6 +142,8 @@ public final class Prop {
   public static boolean mab2flat = false;
   /** Server mode. */
   public static boolean server = false;
+  /** Server timeout in seconds. */
+  public static int timeout = 10;
 
   // WEBSERVER OPTIONS ========================================================
 

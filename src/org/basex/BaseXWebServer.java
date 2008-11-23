@@ -325,10 +325,10 @@ public final class BaseXWebServer {
    * @throws Exception exception
    */
   private void eval(final Socket s, final String... exec) throws Exception {
+    final OutputStream os = s.getOutputStream();
+    
     final ProcessBuilder pb = new ProcessBuilder(exec);
     pb.redirectErrorStream(true);
-
-    final OutputStream os = s.getOutputStream();
     final InputStream is = pb.start().getInputStream();
     int i = 0;
     while((i = is.read()) != -1) os.write(i);

@@ -339,7 +339,8 @@ cs_client=Client
 # Server Info
 srv_connect=Can't communicate with the server.
 srv_port=Invalid port number
-srv_toomany=Too many requests in progress.
+#srv_toomany=Too many requests in progress.
+srv_timeout=Server timeout (% sec.).
 srv_bind=Server is running or permission was denied.
 srv_start=started.\nWaiting for requests...
 srv_stop=stopped.

@@ -95,11 +95,11 @@ public final class SeqType {
     if(occ < 2 && n != null) Err.cast(type, item);
 
     final SeqBuilder sb = new SeqBuilder();
-    sb.a(it);
+    sb.add(it);
     while(n != null) {
       ins = n.type.instance(type);
       if(!n.u() && !ins) Err.cast(type, n);
-      sb.a(check(ins ? n : type.e(n, ctx)));
+      sb.add(check(ins ? n : type.e(n, ctx)));
       n = iter.next();
     }
     return sb.finish();

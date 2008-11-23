@@ -91,7 +91,7 @@ include("inc/header.inc");
 <h2>Source Code</h2>
 The BaseX sources are available in a Subversion repository via <a href="http://sourceforge.net/projects/basex">Sourceforge</a>.
 
-<h2>Live Demo</h2>
-Here you can <a href="http://phobos101.inf.uni-konstanz.de/basex">execute XQuery</a> with BaseX.
+<h2>Online Demo</h2>
+Here you can <a href="<? print $basex; ?>eval.php">execute XQuery</a> with BaseX.
 
 <? include("inc/footer.inc"); ?>

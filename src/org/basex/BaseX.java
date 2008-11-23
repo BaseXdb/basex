@@ -80,7 +80,6 @@ public final class BaseX extends BaseXClient {
    */
   public static boolean debug(final Exception ex) {
     if(Prop.debug && ex != null) ex.printStackTrace();
-    //BaseX.errln(ex);
     return false;
   }
 

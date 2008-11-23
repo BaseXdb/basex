@@ -91,11 +91,21 @@ public class QueryException extends Exception {
   }
 
   /**
-   * Returns the error message.
+   * Returns the simple error message.
    * @return string
    */
-  public final String msg() {
+  public final String simple() {
     return super.getMessage();
+  }
+
+  /**
+   * Returns an extended error message.
+   * @return string
+   */
+  public final String extended() {
+    final StringBuilder sb = new StringBuilder();
+    if(code != null) sb.append("[" + code + "] ");
+    return sb + simple();
   }
 
   @Override
@@ -108,8 +118,6 @@ public class QueryException extends Exception {
       if(file != null) sb.append(BaseX.info(FILEINFO, file));
       sb.append(": \n");
     }
-    if(code != null) sb.append("[" + code + "] ");
-    sb.append(super.getMessage());
-    return sb.toString();
+    return sb.append(extended()).toString();
   }
 }

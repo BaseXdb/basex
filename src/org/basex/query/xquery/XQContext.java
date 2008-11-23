@@ -151,7 +151,14 @@ public final class XQContext extends QueryContext {
   @Override
   public XQResult eval(final Nodes nodes) throws XQException {
     // evaluates the query and returns the result
-    return new XQResult(this, new SeqBuilder(iter()));
+    final SeqBuilder sb = new SeqBuilder();
+    final Iter it = iter();
+    Item i;
+    while((i = it.next()) != null) {
+      checkStop();
+      sb.add(i);
+    }
+    return new XQResult(this, sb);
   }
 
   /**

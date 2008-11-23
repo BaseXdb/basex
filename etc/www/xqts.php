@@ -1,4 +1,4 @@
-<? echo '<?xml version="1.0" encoding="ISO-8859-1" ?>';
+<?
 $top = "index";
 $title = "XQuery Test Suite &ndash; Results";
 include("inc/header.inc");

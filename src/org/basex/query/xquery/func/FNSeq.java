@@ -178,7 +178,7 @@ final class FNSeq extends Fun {
     // process any other iterator...
     final SeqBuilder sb = new SeqBuilder();
     Item i;
-    while((i = iter.next()) != null) sb.a(i);
+    while((i = iter.next()) != null) sb.add(i);
     
     return new Iter() {
       int c = sb.size;

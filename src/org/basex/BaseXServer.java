@@ -1,6 +1,7 @@
 package org.basex;
 
 import static org.basex.Text.*;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -34,9 +35,6 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class BaseXServer {
-  /** Session time out in seconds. */
-  private static final long TIMEOUT = 5;
-
   /** Database Context. */
   final Context context = new Context();
   /** Flag for server activity. */
@@ -64,6 +62,18 @@ public final class BaseXServer {
    */
   private BaseXServer(final String[] args) {
     Prop.server = true;
+
+    // this thread removes old entries from the process stack
+    new Thread() {
+      @Override
+      public void run() {
+        while(running) {
+          Performance.sleep(Prop.timeout * 1000);
+          clean();
+        }
+      }
+    }.start();
+    
     try {
       if(!parseArguments(args)) return;
 
@@ -107,13 +117,14 @@ public final class BaseXServer {
       try {
         pr = new CommandParser(in).parse()[0];
       } catch(final QueryException ex) {
-        BaseX.errln(ex.getMessage());
-        send(s, 0);
+        pr = new Process(0) { };
+        pr.error(ex.extended());
+        add(new BaseXSession(sp, System.nanoTime(), pr));
+        send(s, -sp);
         return;
       }
-      final Process proc = pr;
 
-      if(proc instanceof Exit) {
+      if(pr instanceof Exit) {
         send(s, 1);
         // interrupt running processes
         for(final BaseXSession ss : sess) ss.core.stop();
@@ -122,6 +133,7 @@ public final class BaseXServer {
       }
 
       // start session thread
+      final Process proc = pr;
       new Thread() {
         @Override
         public void run() {
@@ -132,7 +144,7 @@ public final class BaseXServer {
               final int id = Math.abs(Integer.parseInt(proc.args().trim()));
               final Process c = get(id);
               if(c == null) {
-                out.print(SERVERFULL);
+                out.print(BaseX.info(SERVERTIME, Prop.timeout));
               } else if(proc instanceof GetResult) {
                 // the client requests result of the last process
                 c.output(out);
@@ -166,14 +178,22 @@ public final class BaseXServer {
    * @param bs session to be added
    */
   synchronized void add(final BaseXSession bs) {
+    clean();
+    sess.add(bs);
+  }
+
+  /**
+   * Removes obsolete or too slow processes.
+   */
+  synchronized void clean() {
     final long t = System.nanoTime();
     for(int i = 0; i < sess.size(); i++) {
-      if(t - sess.get(i).time > TIMEOUT * 1000000000L) {
+      if(t - sess.get(i).time > Prop.timeout * 1000000000L) {
         final BaseXSession s = sess.remove(sess.size() - 1);
         if(i != sess.size()) sess.set(i--, s);
+        s.stop();
       }
     }
-    sess.add(bs);
   }
 
   /**
@@ -274,6 +294,13 @@ public final class BaseXServer {
       pid = i;
       time = t;
       core = c;
+    }
+    
+    /**
+     * Stops a process.
+     */
+    void stop() {
+      core.stop();
     }
   }
 }

@@ -293,34 +293,33 @@ public final class FTFuzzy extends Index {
    * @return iterator
    */
   private IndexArrayIterator get(final byte[] tok, final boolean cs) {
-      int p = -1; // = getPointerOnToken(tok);
-      int s;
-      IndexArrayIterator iai = IndexArrayIterator.EMP;
-      if (!data.meta.ftcs) {
-          p = getPointerOnTokenCS(Token.lc(tok), p, true);
-          if (p > -1) {
-            s = getDataSize(p, tok.length);
-            iai = getData(getPointerOnData(p, tok.length), s, dat, data);
-          }
-          return iai;
-      } 
-      
-      p = getPointerOnTokenCS(tok, p, false);
-      if (p > -1) {
-        s = getDataSize(p, tok.length);
-        iai = getData(getPointerOnData(p, tok.length), s, dat, data);
-      }
-      
-      if (!cs) {
+    int p = -1; // = getPointerOnToken(tok);
+    int s;
+    IndexArrayIterator iai = IndexArrayIterator.EMP;
+    if (!data.meta.ftcs) {
         p = getPointerOnTokenCS(Token.lc(tok), p, true);
         if (p > -1) {
           s = getDataSize(p, tok.length);
-          iai = IndexArrayIterator.merge(
-              getData(getPointerOnData(p, tok.length), s, dat, data), iai);
+          iai = getData(getPointerOnData(p, tok.length), s, dat, data);
         }
+        return iai;
+    } 
+    
+    p = getPointerOnTokenCS(tok, p, false);
+    if (p > -1) {
+      s = getDataSize(p, tok.length);
+      iai = getData(getPointerOnData(p, tok.length), s, dat, data);
+    }
+    
+    if (!cs) {
+      p = getPointerOnTokenCS(Token.lc(tok), p, true);
+      if (p > -1) {
+        s = getDataSize(p, tok.length);
+        iai = IndexArrayIterator.merge(
+            getData(getPointerOnData(p, tok.length), s, dat, data), iai);
       }
- 
-      return iai;
+    }
+    return iai;
   }
 
   @Override
@@ -346,9 +345,9 @@ public final class FTFuzzy extends Index {
 
     // get result iterator
     IndexArrayIterator iai = IndexArrayIterator.EMP;
-    if (ft.cs || data.meta.ftcs)
+    if(ft.cs || data.meta.ftcs) {
       iai = get(tok, ft.cs);
-    else {
+    } else {
       // check if result was cached
       final int id = cache.id(Token.lc(tok));
       if (id > 0) {

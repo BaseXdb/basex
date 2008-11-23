@@ -339,7 +339,8 @@ cs_client=Client
 # Server Info
 srv_connect=Server ist nicht erreichbar.
 srv_port=Ungültige Port-Nummer
-srv_toomany=Zu viele Server-Anfragen.
+#srv_toomany=Zu viele Server-Anfragen.
+srv_timeout=Maximale Zeit überschritten (% Sek.).
 srv_bind=Server läuft, oder Zugriff wurde untersagt.
 srv_start=wurde gestartet.\nWartet auf Anfragen...
 srv_stop=wurde gestoppt.
