@@ -27,6 +27,8 @@ public final class QueryTest {
   };
   /** Verbose flag. */
   private static final boolean VERBOSE = false;
+  /** Test all flag. */
+  private static final boolean ALL = false;
   /** Wrong results counter. */
   private static int wrong;
 
@@ -47,32 +49,33 @@ public final class QueryTest {
     Prop.chop = true;
     boolean ok = true;
 
-    // testing all kinds of combinations 
-    for(int x = 0; x < 2; x++) {
-      for(int a = 0; a < 2; a++) { Prop.ftindex = a == 0;
-        for(int b = 0; b < 2; b++) { Prop.ftittr = b == 0;
-          for(int c = 0; c < 2; c++) { Prop.ftfuzzy = c == 0;
-            for(int d = 0; d < 2; d++) { Prop.ftst = d == 0;
-              for(int e = 0; e < 2; e++) { Prop.ftdc = e == 0;
-                for(int f = 0; f < 2; f++) { Prop.ftcs = f == 0;
-                  ok &= test(x != 0);
+    if(ALL) {
+      // testing all kinds of combinations 
+      for(int x = 0; x < 2; x++) {
+        for(int a = 0; a < 2; a++) { Prop.ftindex = a == 0;
+          for(int b = 0; b < 2; b++) { Prop.ftittr = b == 0;
+            for(int c = 0; c < 2; c++) { Prop.ftfuzzy = c == 0;
+              for(int d = 0; d < 2; d++) { Prop.ftst = d == 0;
+                for(int e = 0; e < 2; e++) { Prop.ftdc = e == 0;
+                  for(int f = 0; f < 2; f++) { Prop.ftcs = f == 0;
+                    ok &= test(x != 0);
+                  }
                 }
               }
             }
           }
         }
       }
+    } else {
+      // single test
+      Prop.ftindex = true;
+      Prop.ftfuzzy = true;
+      Prop.ftittr = true;
+      Prop.ftst = false;
+      Prop.ftdc = false;
+      Prop.ftcs = false;
+      ok &= test(false);
     }
-    
-    /* single test
-    Prop.ftindex = true;
-    Prop.ftfuzzy = true;
-    Prop.ftittr = true;
-    Prop.ftst = false;
-    Prop.ftdc = false;
-    Prop.ftcs = false;
-    ok &= test(false);
-    */
 
     System.out.println(ok ? "All tests correct.\n" :
       wrong + " Wrong results...\n");

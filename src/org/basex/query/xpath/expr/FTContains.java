@@ -8,7 +8,6 @@ import org.basex.data.Serializer;
 import org.basex.index.FTNode;
 import org.basex.index.FTTokenizer;
 import org.basex.query.FTOpt;
-import org.basex.query.FTPos;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.XPOptimizer;
@@ -19,9 +18,7 @@ import org.basex.query.xpath.locpath.LocPath;
 import org.basex.query.xpath.locpath.LocPathAbs;
 import org.basex.query.xpath.locpath.LocPathRel;
 import org.basex.query.xpath.locpath.Step;
-import org.basex.query.xpath.locpath.TestName;
 import org.basex.query.xpath.locpath.TestNode;
-import org.basex.util.IntList;
 
 /**
  * FTContains Expression; used for fulltext operations.
@@ -37,8 +34,6 @@ public final class FTContains extends Arr {
   private FTOpt opt;
   /** Result item. */
   private Item v2 = null;
-  /** Flag for initial run. */
-  private boolean f = false;
   /** Temporary result node.*/
   private FTNode ftn = null;
   /** Flag for index use. */
@@ -71,10 +66,7 @@ public final class FTContains extends Arr {
   public Expr comp(final XPContext ctx) throws QueryException {
     super.comp(ctx);
 
-    if (expr[0] instanceof LocPathAbs) {
-      iu = false;
-      return this;
-    } 
+    if(expr[0] instanceof LocPathAbs) return this;
 
     final Item i1 = expr[0] instanceof Item ? (Item) expr[0] : null;
     final Item i2 = expr[1] instanceof Item ? (Item) expr[1] : null;
@@ -89,49 +81,40 @@ public final class FTContains extends Arr {
 
   @Override
   public Item eval(final XPContext ctx) throws QueryException {
-    return ctx.iu ? evalSeq(ctx) : evalWithoutIndex(ctx);
+    return ctx.iu ? evalIndex(ctx) : evalNoIndex(ctx);
   }
 
   /**
    * Sequential evaluation - used for. 
-   *  - for not expression
+   *  - not expression
    *  - more then one predicate
    *  
    * @param ctx XPContext
    * @return resulting result
    * @throws QueryException Exception
    */
-  private Bln evalSeq(final XPContext ctx) throws QueryException {
+  private Bln evalIndex(final XPContext ctx) throws QueryException {
     final FTTokenizer tmp = ctx.ftitem;
     ctx.ftitem = ft;
 
     final Nod ns = (Nod) expr[0].eval(ctx); 
-    if (!ns.bool()) return Bln.FALSE;
+    if(!ns.bool()) return Bln.FALSE;
     
-    if (!f) {
-      v2 = ctx.eval(expr[1]);
-      f = true;
-    }
+    // evaluate index requests only once
+    if(v2 == null) v2 = ctx.eval(expr[1]);
 
     if(v2.bool()) {
-      if(expr[1] instanceof FTArrayExpr) {
-        final FTArrayExpr ftae = (FTArrayExpr) expr[1];
-        ftn = (ftn == null && ftae.more()) ? ftae.next(ctx) : ftn;
-        for(int z = 0; z < ns.size(); z++) {
-          while(ftn != null && ns.nodes[z] > ftn.getPre()) {
-            ftn = ftae.more() ? ftae.next(ctx) : null;
-          }
-          if(ftn != null) {
-            final boolean not = ftn.not;
-            if(ftn.getPre() == ns.nodes[z]) {
-              return Bln.get(!not);
-            }
-          }
+      final FTArrayExpr ftae = (FTArrayExpr) expr[1];
+      ftn = (ftn == null && ftae.more()) ? ftae.next(ctx) : ftn;
+      for(int z = 0; z < ns.size(); z++) {
+        while(ftn != null && ns.nodes[z] > ftn.getPre()) {
+          ftn = ftae.more() ? ftae.next(ctx) : null;
         }
-      } else if(expr[1] instanceof Bln) {
-        if(expr[0].eval(ctx).bool()) return (Bln) expr[1];
+        if(ftn != null) {
+          final boolean not = ftn.not;
+          if(ftn.getPre() == ns.nodes[z]) return Bln.get(!not);
+        }
       }
-      //return Bln.TRUE;
     }
 
     ctx.ftitem = tmp;
@@ -144,49 +127,32 @@ public final class FTContains extends Arr {
    * @return resulting item
    * @throws QueryException Exception
    */
-  private Bln evalWithoutIndex(final XPContext ctx) throws QueryException {
+  private Bln evalNoIndex(final XPContext ctx) throws QueryException {
     final FTTokenizer tmp = ctx.ftitem;
     ctx.ftitem = ft;
 
     final Nod c = ctx.item;
     final Item it = expr[0].eval(ctx);
     
-    if (!it.bool()) return Bln.FALSE;
-    Item res;
+    boolean found = false;
     if(it instanceof Nod) {
       ctx.item = (Nod) it;
-      res = evalNS(ctx, it);
-    } else if (it instanceof Bln) {
-      res = expr[1].eval(ctx);
+      
+      final Nod nodes = (Nod) it;
+      final Data data = nodes.data;
+      for(int n = 0; n < nodes.size; n++) {
+        ft.init(data.atom(nodes.nodes[n]));
+        found = expr[1].eval(ctx).bool();
+        if(found) break;
+      }
     } else {
-      ctx.ftitem = new FTTokenizer(it.str());
-      res = expr[1].eval(ctx);
+      ft.init(it.str());
+      found = expr[1].eval(ctx).bool();
     }
     
     ctx.ftitem = tmp;
-    ctx.item = c;  
-    return Bln.get(res.bool());
-  }
-
-  /**
-   * Performs evaluation without index access for the specified node set.
-   * @param ctx XPContext
-   * @param it item
-   * @return resulting item
-   * @throws QueryException Exception
-   */
-  private Item evalNS(final XPContext ctx, final Item it)
-      throws QueryException {
-
-    final Nod nodes = (Nod) it;
-    IntList res = new IntList();
-    final Data data = nodes.data;
-    for(int n = 0; n < nodes.size; n++) {
-      ft.init(data.atom(nodes.nodes[n]));
-      ctx.ftitem = ft;
-      if(expr[1].eval(ctx).bool()) res.add(nodes.nodes[n]);
-    }
-    return new Nod(res.finish(), ctx);
+    ctx.item = c;
+    return Bln.get(found);
   }
 
   @Override
@@ -241,92 +207,15 @@ public final class FTContains extends Arr {
     // sequential processing necessary - no index use
     if(!iu) return Integer.MAX_VALUE;
 
-    // Integer.MAX_VALUE is return if an ftnot does not occur
-    // after an ftand
+    // Integer.MAX_VALUE is returned if an ftnot does not occur after an ftand
     final int nrIDs = expr[1].indexSizes(ctx, curr, min);
     if (nrIDs == -1) expr[1] = Bln.TRUE;
     return nrIDs == -1 ? Integer.MAX_VALUE : nrIDs;
   }
-
-  /**
-   * Sum up two FTContains Expr to one.
-   * If Summing up isn't possible, return null.
-   * 
-   * @param ftc1 FTContains 1
-   * @param ftc2 FTContains 2
-   * @param and Flag for FTAnd or FTOr
-   * @return FTContains or null
-   */
-  public static Expr sumUp(final FTContains ftc1, final FTContains ftc2, 
-      final boolean and) {
-    final LocPathRel l1 = (LocPathRel) ftc1.expr[0];
-    final LocPathRel l2 = (LocPathRel) ftc2.expr[0];
-    
-    if ((l1.steps.get(0).test instanceof TestName ||
-        l1.steps.get(0).test == TestNode.TEXT)
-        && l1.steps.get(0).test.sameAs(l2.steps.get(0).test) 
-        && l1.steps.size() == 1) {
-      // sum 
-      if (check(ftc1, ftc2)) {
-        final FTSelect fts1 = (FTSelect) ftc1.expr[1];
-        final FTSelect fts2 = (FTSelect) ftc2.expr[1];
-        if (and) {
-          if (fts2.getExpr() instanceof FTAnd) {
-            FTAnd ftand = (FTAnd) fts2.getExpr();
-            ftand.add(fts1.getExpr());
-          } else {
-            final FTAnd fta = new FTAnd(new FTArrayExpr[]{
-              fts1.getExpr(), fts2.getExpr()});
-            fts2.setExpr(fta);
-          }
-          return ftc2;
-        } else {
-          if (fts2.getExpr() instanceof FTOr) {
-            FTOr ftor = (FTOr) fts2.getExpr();
-            ftor.add(fts1.getExpr());
-          } else {
-            final FTOr ftor = new FTOr(new FTArrayExpr[]{
-              fts1.getExpr(), fts2.getExpr()});
-            fts2.setExpr(ftor);
-          } 
-        }
-        //return ftc2;
-      } else {
-        FTSelect fts;
-        if (and) {
-          FTAnd fta = new FTAnd(new FTArrayExpr[]{
-              (FTArrayExpr) ftc2.expr[1], (FTArrayExpr) ftc1.expr[1]});
-          fts = new FTSelect(fta, new FTPositionFilter(new FTPos()));          
-        } else {
-          FTAnd fta = new FTAnd(new FTArrayExpr[]{
-              (FTArrayExpr) ftc2.expr[1], (FTArrayExpr) ftc1.expr[1]});
-          fts = new FTSelect(fta, new FTPositionFilter(new FTPos()));
-        }
-        ftc2.expr[1] = fts;
-      }
-      return ftc2;
-    }
-    return null;
-  }
-  
-  /**
-   * Check if two FTContains expressions could be summed up.
-   * @param ftc1 FTContains expression1 
-   * @param ftc2 FTContains expression2
-   * @return boolean result
-   */
-  private static boolean check(final FTContains ftc1, final FTContains ftc2) {
-    if (ftc1.expr[1] instanceof FTSelect && ftc2.expr[1] instanceof FTSelect) {
-      final FTSelect fts1 = (FTSelect) ftc1.expr[1];
-      final FTSelect fts2 = (FTSelect) ftc2.expr[1];
-      return fts1.checkSumUp(fts2.ftpos);
-    }
-    return false;
-  }
   
   @Override
   public String toString() {
-    return expr[0] + " ftcontainsBool" + (iu ? "_I " : " ")  + expr[1];
+    return expr[0] + " ftcontains" + (iu ? "_I " : " ")  + expr[1];
   }
 
   @Override

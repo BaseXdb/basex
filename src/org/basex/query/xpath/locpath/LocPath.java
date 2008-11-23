@@ -93,8 +93,9 @@ public abstract class LocPath extends Expr {
       final boolean seq = min == Integer.MAX_VALUE;
 
       // ..skip index evaluation for too large results and relative paths
-      if(!seq && this instanceof LocPathRel && min > ctx.item.data.size / 10)
-        continue;
+      // [SG] conflicts with the FTContains.iu flag
+      //if(!seq && this instanceof LocPathRel && min > ctx.item.data.size / 10)
+      //  continue;
 
       // predicates that are optimized to use index and results of index queries
       final IntList oldPreds = new IntList();

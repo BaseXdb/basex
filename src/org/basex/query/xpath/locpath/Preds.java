@@ -151,7 +151,7 @@ public final class Preds extends ExprInfo {
    */
   public boolean compile(final XPContext ctx) throws QueryException {
     tmp = new Nod(ctx);
-    ExprInfoList p = new ExprInfoList(size);
+    //ExprInfoList p = new ExprInfoList(size);
     
     for(int j = 0; j < size; j++) {
       preds[j] = preds[j].compile(ctx);
@@ -169,11 +169,12 @@ public final class Preds extends ExprInfo {
         */
     }
     
+    /*
     if (p.size > 0 && p.size < size) {
       preds = p.finishPS();
       size = p.size;
       ctx.compInfo(OPTSUMPREDS);
-    }
+    }*/
     
     return true;
   }

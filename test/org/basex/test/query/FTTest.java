@@ -62,12 +62,10 @@ public final class FTTest extends AbstractTest {
       "third sentence. second sentence. first sentence.</w>\n" +
       "  <wld/>\n" +
       "  <wld>yeah</wld>\n" +
+      "  <mix>A<sub/>B</mix>\n" +
       "</fttest>";
 
     queries = new Object[][] {
-        
-        { "Preds 1", nodes(7, 9, 11),
-        "//w[text() ftcontains 'xml'][text() ftcontains 'Databases']" },
         
         { "Simple 1", bool(true),
           "'abc' ftcontains 'abc'" },
@@ -86,8 +84,15 @@ public final class FTTest extends AbstractTest {
         { "Simple 8", bool(true),
           "number('100') + 23 ftcontains '123'" },
         { "Simple 9", bool(true),
-          "string(true()) ftcontains 'true'" },
+          "true() ftcontains 'true'" },
+        { "Simple 10", bool(true),
+          "false() ftcontains 'false'" },
 
+        { "Preds 1", nodes(7, 9, 11),
+          "//w[text() ftcontains 'xml'][text() ftcontains 'Databases']" },
+        { "Preds 2", nodes(7),
+          "//w[text()[. ftcontains 'have xml'] ftcontains 'Databases']" },
+        
         { "FT 1", nodes(14),
           "//w[text() ftcontains 'HELLO']" },
         { "FT 2", nodes(14),
@@ -98,6 +103,8 @@ public final class FTTest extends AbstractTest {
           "//w[  text  (   )  ftcontains  '  crap  '  ]  " },
         { "FT 5", nodes(),
           "//w[text() ftcontains 'db']" },
+        { "FT 6", nodes(42),
+          "//mix[text() ftcontains 'A']" },
 
         { "Preds 1", nodes(7, 9, 11),
           "//w[text() ftcontains 'xml'][text() ftcontains 'Databases']" },
@@ -127,7 +134,6 @@ public final class FTTest extends AbstractTest {
           "//fti[contains(text(), 'adf') and text() ftcontains 'adf']" },
         { "AndOr 7", nodes(3),
           "//*[text() ftcontains 'sentence' and text() ftcontains 'xml']" },
-
           
         { "Phrase 1", nodes(7, 9, 11),
           "//w [text() ftcontains 'xml databases']" },
@@ -359,8 +365,8 @@ public final class FTTest extends AbstractTest {
 
     /** TABLE REPRESENTATION
     PRE DIS SIZ ATS  NS  KIND  CONTENT
-      0   1  42   1   0  DOC   tmp
-      1   1  41   1   0  ELEM  fttest
+      0   1  46   1   0  DOC   tmp
+      1   1  45   1   0  ELEM  fttest
       2   1  11   1   0  ELEM  co
       3   1   2   1   0  ELEM  w
       4   1   1   1   0  TEXT  xml in the first sentence. second sentence.
@@ -405,6 +411,10 @@ public final class FTTest extends AbstractTest {
      39   1   1   1   0  ELEM  wld
      40   1   2   1   0  ELEM  wld
      41   1   1   1   0  TEXT  yeah
+     42  41   4   1   0  ELEM  mix
+     43   1   1   1   0  TEXT  A
+     44   2   1   1   0  ELEM  sub
+     45   3   1   1   0  TEXT  B
      */
   }
 }

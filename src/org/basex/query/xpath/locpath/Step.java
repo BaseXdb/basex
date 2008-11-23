@@ -106,13 +106,16 @@ public abstract class Step extends ExprInfo {
     // set leaf flag if tag in location step has no further leaf tags
     final Data data = ctx.item.data;
     test.compile(data);
+    ctx.leaf = false;
+    
     if(test instanceof TestName) {
       final TestName t = (TestName) test;
       ctx.leaf = axis != Axis.ATTR && axis != Axis.SELF && t.id >= 0 &&
         data.tags.uptodate && !data.tags.noLeaf(t.id);
     }
-    if(!preds.compile(ctx)) return false;
+    boolean pred = preds.compile(ctx);
     ctx.leaf = false;
+    if(!pred) return false;
 
     // set flags for axis optimizations
     simple = preds.size() == 0;
