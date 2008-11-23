@@ -1,7 +1,6 @@
 package org.basex.query.xpath.expr;
 
-import java.io.IOException;
-import org.basex.data.Serializer;
+import org.basex.data.MetaData;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.item.Bln;
@@ -18,8 +17,8 @@ public final class FTUnaryNot extends FTArrayExpr {
    * Constructor.
    * @param e expressions
    */
-  public FTUnaryNot(final FTArrayExpr[] e) {
-    exprs = e;
+  public FTUnaryNot(final FTArrayExpr e) {
+    exprs = new FTArrayExpr[] { e };
   }
 
   @Override
@@ -36,37 +35,26 @@ public final class FTUnaryNot extends FTArrayExpr {
     }
     return this;
   }
+
+  @Override
+  public boolean indexOptions(final MetaData meta) {
+    // [SG] temporary
+    return false;
+  }
   
   @Override
   public FTArrayExpr indexEquivalent(final XPContext ctx, final Step curr, 
-      final boolean seq)
-      throws QueryException {
+      final boolean seq) throws QueryException {
    
-    final FTArrayExpr[] indexExprs = new FTArrayExpr[exprs.length];
-    
     // find index equivalents
-    for(int i = 0; i != exprs.length; i++) {
-      indexExprs[i] = exprs[i].indexEquivalent(ctx, curr, seq);
-      if(indexExprs[i] == null) indexExprs[i] = exprs[i];
-    }
-    return new FTUnaryNotExprs(indexExprs);
+    final FTArrayExpr ex = exprs[0].indexEquivalent(ctx, curr, seq);
+    if(ex != null) exprs[0] = ex;
+    return new FTUnaryNotIter(exprs);
   }
   
   @Override
   public int indexSizes(final XPContext ctx, final Step curr, final int min) {
-    if (exprs.length == 1) {
-      final int nrIds = exprs[0].indexSizes(ctx, curr, min);
-      return nrIds == 0 ? -1 : Integer.MAX_VALUE;
-    }
-    
-    // should not happen
-    return Integer.MAX_VALUE;
-  }
-  
-  @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
-    for(Expr e : exprs) e.plan(ser);
-    ser.closeElement();
+    final int nrIds = exprs[0].indexSizes(ctx, curr, min);
+    return nrIds == 0 ? -1 : Integer.MAX_VALUE;
   }
 }

@@ -11,12 +11,12 @@ import org.basex.query.xpath.locpath.Step;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Sebastian Gath
  */
-public final class FTMildNotXP extends FTArrayExpr {
+public final class FTMildNot extends FTArrayExpr {
   /**
    * Constructor.
    * @param e expressions
    */
-  public FTMildNotXP(final FTArrayExpr[] e) {
+  public FTMildNot(final FTArrayExpr[] e) {
     exprs = e;
   }
 
@@ -49,12 +49,12 @@ public final class FTMildNotXP extends FTArrayExpr {
     // and ftcontains "a" are equivalent
 
     final FTArrayExpr[] indexExprs = new FTArrayExpr[2];
-    final FTMildNotExprs[] mne = new FTMildNotExprs[exprs.length - 1];
+    final FTMildNotIter[] mne = new FTMildNotIter[exprs.length - 1];
     final int[] pex = new int[exprs.length - 1];
     indexExprs[0] = exprs[0].indexEquivalent(ctx, curr, seq);
     for (int i = 1; i < exprs.length; i++) {
       indexExprs[1] = exprs[i].indexEquivalent(ctx, curr, seq);
-      mne[i - 1] = new FTMildNotExprs(indexExprs);
+      mne[i - 1] = new FTMildNotIter(indexExprs);
       pex[i - 1] = i - 1;
     }
     if (mne.length == 1) {

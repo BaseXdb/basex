@@ -42,6 +42,9 @@ public final class MetaData {
   public boolean atvindex = Prop.attrindex;
   /** Flag for creating a fulltext index. */
   public boolean ftxindex = Prop.ftindex;
+  
+  /** Flag for iterator optimized storage within ftindex. */
+  public boolean ftittr = Prop.ftittr;
   /** Flag for fuzzy indexing. */
   public boolean ftfz = Prop.ftfuzzy;
   /** Flag for fulltext stemming. */
@@ -50,8 +53,6 @@ public final class MetaData {
   public boolean ftcs = Prop.ftcs;
   /** Flag for fulltext diacritics removal. */
   public boolean ftdc = Prop.ftdc;
-  /** Flag for iterator optimized storage within ftindex. */
-  public boolean ftittr = Prop.ftittr;
 
   /** Flag for removed index structures. */
   public boolean newindex;

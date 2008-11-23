@@ -15,7 +15,7 @@ import org.basex.query.xpath.locpath.Step;
 
 /**
  * Fulltext primary expression and FTTimes.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Sebastian Gath
  */
@@ -44,12 +44,12 @@ public final class FTWords extends FTArrayExpr {
   public Item eval(final XPContext ctx) {
     return Bln.get(contains(ctx));
   }
-  
+
   @Override
   public FTArrayExpr comp(final XPContext ctx) {
     return this;
   }
-  
+
   /**
    * Evaluates the fulltext match.
    * @param ctx query context
@@ -57,7 +57,7 @@ public final class FTWords extends FTArrayExpr {
    */
   private boolean contains(final XPContext ctx) {
     int o = 0;
-    
+
     switch(mode) {
       case ALL:
         final int o1 = fto.contains(ctx.ftitem, ctx.ftpos.pos, token);
@@ -92,19 +92,18 @@ public final class FTWords extends FTArrayExpr {
   @Override
   public boolean indexOptions(final MetaData meta) {
     // if the following conditions yield true, the index is accessed:
-    // - case sensitivity, diacritics and stemming flag complies with index flag
+    // - case sensitivity, diacritics and stemming flag comply with index flag
     // - no stop words are specified
-    // - if wildcards are specified, the fulltext index is a trie (not cs)
+    // - if wildcards are specified, the fulltext index is a trie
     // - no FTTimes option is specified
     return meta.ftcs == fto.is(FTOpt.CS) &&
       meta.ftdc == fto.is(FTOpt.DC) && meta.ftst == fto.is(FTOpt.ST) &&
       fto.sw == null && (!fto.is(FTOpt.WC) || !meta.ftfz) &&
-      //|| Token.contains(token, '*')) &&
-      occ[0] == 1  && occ[1] == Long.MAX_VALUE;
+      occ[0] == 1 && occ[1] == Long.MAX_VALUE;
   }
-  
+
   @Override
-  public FTArrayExpr indexEquivalent(final XPContext ctx, final Step curr, 
+  public FTArrayExpr indexEquivalent(final XPContext ctx, final Step curr,
       final boolean seq) {
     return new FTIndex(token, fto);
   }
@@ -118,7 +117,7 @@ public final class FTWords extends FTArrayExpr {
     fto.sb.st = fto.is(FTOpt.ST);
     fto.sb.cs = fto.is(FTOpt.CS);
     fto.sb.dc = fto.is(FTOpt.DC);
-    
+
     int i = 0;
     while(fto.sb.more()) {
       final int n = ctx.item.data.nrIDs(fto.sb);

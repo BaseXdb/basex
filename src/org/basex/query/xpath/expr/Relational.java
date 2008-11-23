@@ -25,8 +25,6 @@ public final class Relational extends Cmp {
   public boolean sameAs(final Expr cmp) {
     if(!(cmp instanceof Relational)) return false;
     final Relational ex = (Relational) cmp;
-    if(expr[0].getClass() != ex.expr[0].getClass()) return false;
-    if(expr[1].getClass() != ex.expr[1].getClass()) return false;
     return expr[0].sameAs(ex.expr[0]) && expr[1].sameAs(ex.expr[1]);
   }
 }

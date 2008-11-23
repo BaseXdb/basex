@@ -46,9 +46,7 @@ public abstract class Arr extends Expr {
     if(cmp.getClass() != getClass()) return false;
     final Arr ex = (Arr) cmp;
     if(expr.length != ex.expr.length) return false;
-    for(final Expr e : expr) {
-      if(!e.sameAs(ex)) return false;
-    }
+    for(final Expr e : expr) if(!e.sameAs(ex)) return false;
     return true;
   }
 

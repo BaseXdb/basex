@@ -46,7 +46,6 @@ final class FTTokenMap extends Set {
   long getPointer(final int id) {
     return id != 0 ? pointers[id] : -1;
   }
-
   
   @Override
   protected void rehash() {

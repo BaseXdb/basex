@@ -87,8 +87,7 @@ public final class QueryTest {
     boolean ok = true;
     
     for(final AbstractTest test : TESTS) {
-      if(test.details() != null)
-        ok &= test(xquery, test, test.details());
+      ok &= test(xquery, test, test.details());
     }
    
     return ok;
@@ -129,8 +128,7 @@ public final class QueryTest {
           ((Nodes) cmp).data = ((Nodes) val).data;
         }
         if(!correct || !val.same(cmp)) {
-          err(qu[0] + ": " + cmd, "  Right: " +
-              (correct ? qu[1] : "error") + "\n  Found: " +
+          err(cmd, "  Right: " + (correct ? qu[1] : "error") + "\n  Found: " +
               val + (ext != null ? "\n  Flags: " + ext : ""));
           ok = false;
           wrong++;

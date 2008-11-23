@@ -14,12 +14,12 @@ import org.basex.util.IntList;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Sebastian Gath
  */
-public final class FTMildNotExprs extends FTArrayExpr {
+public final class FTMildNotIter extends FTArrayExpr {
   /**
    * Constructor.
    * @param e operands joined with the mild not operator
    */
-  public FTMildNotExprs(final FTArrayExpr[] e) {
+  public FTMildNotIter(final FTArrayExpr[] e) {
     exprs = e;
   }
 

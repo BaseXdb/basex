@@ -1,7 +1,5 @@
 package org.basex.query.xpath.expr;
 
-import java.io.IOException;
-import org.basex.data.Serializer;
 import org.basex.index.FTNode;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
@@ -15,12 +13,12 @@ import org.basex.query.xpath.item.Bln;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Sebastian Gath
  */
-public final class FTUnaryNotExprs extends FTArrayExpr {
+public final class FTUnaryNotIter extends FTArrayExpr {
   /**
    * Constructor.
    * @param e operands joined with the mild not operator
    */
-  public FTUnaryNotExprs(final FTArrayExpr[] e) {
+  public FTUnaryNotIter(final FTArrayExpr[] e) {
     exprs = e;
   }
 
@@ -31,9 +29,7 @@ public final class FTUnaryNotExprs extends FTArrayExpr {
   
   @Override
   public Bln eval(final XPContext ctx) throws QueryException {
-    final Bln b = (Bln) exprs[0].eval(ctx);
-    return b;
-    
+    return Bln.get(!exprs[0].eval(ctx).bool());
   }
   
   @Override
@@ -47,11 +43,4 @@ public final class FTUnaryNotExprs extends FTArrayExpr {
   public boolean more() {
     return exprs[0].more();
   }
- 
-   @Override
-   public void plan(final Serializer ser) throws IOException {
-     ser.openElement(this);
-     for(Expr e : exprs) e.plan(ser);
-     ser.closeElement();
-   }
 }

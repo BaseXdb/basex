@@ -192,7 +192,7 @@ public final class FTContains extends Arr {
   @Override
   public Expr indexEquivalent(final XPContext ctx, final Step curr,
       final boolean seq) throws QueryException {
-    
+
     if(!(expr[0] instanceof LocPathRel)) return this;
     final LocPath path = (LocPath) expr[0];
     
@@ -200,27 +200,24 @@ public final class FTContains extends Arr {
     final FTArrayExpr ae = (FTArrayExpr)
       (iu ? expr[1].indexEquivalent(ctx, curr, seq) : expr[1]);
       
-    Expr ex;
-    if (!seq) {
+    if(!seq) {
       // standard index evaluation
       ctx.compInfo(OPTFTINDEX);
-      ex = new FTContainsNS(expr[0], ae);
-      if (curr != null) return new Path(ex, path.invertPath(curr));
-      else return ex;
-    } else {
-      // sequential evaluation
-      if (!iu) {
-        // without index access
-        ex = new FTContains(expr[0], expr[1], opt, iu);
-      } else {
-        // with index access
-        ctx.compInfo(OPTFTINDEX);
-        ex = new FTContains(expr[0], ae, opt, iu);
-      }
-  
-      if (curr == null) return ex;
-      return new Path(ex, path);
+      final Expr ex = new FTContainsNS(expr[0], ae);
+      return curr == null ? ex : new Path(ex, path.invertPath(curr));
     }
+    
+    // sequential evaluation
+    Expr ex = null;
+    if(!iu) {
+      // without index access
+      ex = new FTContains(expr[0], expr[1], opt, iu);
+    } else {
+      // with index access
+      ctx.compInfo(OPTFTINDEX);
+      ex = new FTContains(expr[0], ae, opt, iu);
+    }
+    return curr == null ? ex : new Path(ex, path);
   }
 
   @Override
@@ -240,10 +237,9 @@ public final class FTContains extends Arr {
     // with the index options..
     iu = ((FTArrayExpr) expr[1]).indexOptions(meta);
     ctx.iu = iu;
-    if(!iu) {
-      // sequential processing necessary - no index use
-      return Integer.MAX_VALUE;
-    }
+
+    // sequential processing necessary - no index use
+    if(!iu) return Integer.MAX_VALUE;
 
     // Integer.MAX_VALUE is return if an ftnot does not occur
     // after an ftand
@@ -327,7 +323,6 @@ public final class FTContains extends Arr {
     }
     return false;
   }
-
   
   @Override
   public String toString() {

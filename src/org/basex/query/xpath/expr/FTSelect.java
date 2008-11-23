@@ -26,7 +26,6 @@ public final class FTSelect extends FTArrayExpr {
   public FTSelect(final FTArrayExpr e, final FTPositionFilter ftps) {
     exprs = new FTArrayExpr[] { e };
     ftpos = ftps;   
-    // ftopt???
   }
   
   @Override
