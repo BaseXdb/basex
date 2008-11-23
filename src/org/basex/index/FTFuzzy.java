@@ -11,7 +11,6 @@ import org.basex.io.DataAccess;
 import org.basex.util.IntList;
 import org.basex.util.Levenshtein;
 import org.basex.util.Performance;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -69,7 +68,6 @@ public final class FTFuzzy extends Index {
    * Constructor, initializing the index structure.
    * @param d data reference
    * @param db name of the database
-
    * @throws IOException IO Exception
    */
   public FTFuzzy(final Data d, final String db) throws IOException {
@@ -106,43 +104,34 @@ public final class FTFuzzy extends Index {
     return tb.finish();
   }
 
-
   /**
    * Determines the pointer on a token.
    * 
-   * 
    * @param tok token looking for.
    * @param rs right side, -1 as default
-   * @param lc flag for converting token from db to lc
    * @return int pointer
    */
-  private int getPointerOnTokenCS(final byte[] tok, final int rs, 
-      final boolean lc) {
+  private int getPointerOnToken(final byte[] tok, final int rs) {
     final int tl = tok.length;
     int l = tp[tl];
     if(l == -1) return -1;
 
     int r = rs;
     int i = 1;
-    if (r == -1) {
-      do r = tp[tl + i++]; while(r == -1); 
-    }
+    if (r == -1) do r = tp[tl + i++]; while(r == -1);
     
     final int o = tl + 9;
 
     // binary search
     while(l < r) {
       final int m = l + (r - l) / 2 / o * o;
-      final int c = diff(lc ? Token.lc(ti.readBytes(m, m + tl)) 
-          : ti.readBytes(m, m + tl), tok);
+      final int c = diff(ti.readBytes(m, m + tl), tok);
       if(c == 0) return m;
       else if(c < 0) l = m + o;
       else r = m - o;
     }
-    return r == l && eq(lc ? Token.lc(ti.readBytes(l, l + tl)) 
-        : ti.readBytes(l, l + tl), tok) ? l : -1;
+    return r == l && eq(ti.readBytes(l, l + tl), tok) ? l : -1;
   }
-
   
   /**
    * Collects all tokens and their sizes found in the index structure.
@@ -289,37 +278,12 @@ public final class FTFuzzy extends Index {
   /**
    * Get pre- and pos values, stored for token out of index.
    * @param tok token looking for
-   * @param cs flag for case sensitive search in query
    * @return iterator
    */
-  private IndexArrayIterator get(final byte[] tok, final boolean cs) {
-    int p = -1; // = getPointerOnToken(tok);
-    int s;
-    IndexArrayIterator iai = IndexArrayIterator.EMP;
-    if (!data.meta.ftcs) {
-        p = getPointerOnTokenCS(Token.lc(tok), p, true);
-        if (p > -1) {
-          s = getDataSize(p, tok.length);
-          iai = getData(getPointerOnData(p, tok.length), s, dat, data);
-        }
-        return iai;
-    } 
-    
-    p = getPointerOnTokenCS(tok, p, false);
-    if (p > -1) {
-      s = getDataSize(p, tok.length);
-      iai = getData(getPointerOnData(p, tok.length), s, dat, data);
-    }
-    
-    if (!cs) {
-      p = getPointerOnTokenCS(Token.lc(tok), p, true);
-      if (p > -1) {
-        s = getDataSize(p, tok.length);
-        iai = IndexArrayIterator.merge(
-            getData(getPointerOnData(p, tok.length), s, dat, data), iai);
-      }
-    }
-    return iai;
+  private IndexArrayIterator get(final byte[] tok) {
+    int p = getPointerOnToken(tok, -1);
+    return p > -1 ? getData(getPointerOnData(p, tok.length),
+        getDataSize(p, tok.length), dat, data) : IndexArrayIterator.EMP;
   }
 
   @Override
@@ -333,8 +297,6 @@ public final class FTFuzzy extends Index {
       return getFuzzy(tok, k);
     }
     
-    int pw = tok.length;
-    
     /*
     IndexArrayIterator iai = null;
     if(ft.wc) {
@@ -345,27 +307,16 @@ public final class FTFuzzy extends Index {
 
     // get result iterator
     IndexArrayIterator iai = IndexArrayIterator.EMP;
-    if(ft.cs || data.meta.ftcs) {
-      iai = get(tok, ft.cs);
+    // check if result was cached
+    final int id = cache.id(tok);
+    if (id > 0) {
+      final int size = cache.getSize(id);
+      final long p = cache.getPointer(id);
+      iai = getData(p, size, dat, data);
     } else {
-      // check if result was cached
-      final int id = cache.id(Token.lc(tok));
-      if (id > 0) {
-        final int size = cache.getSize(id);
-        final long p = cache.getPointer(id);
-        return getData(p, size, dat, data);
-      } else {
-        iai = get(tok, ft.cs);
-      }
+      iai = get(tok);
     }
-    
-    if (iai == IndexArrayIterator.EMP || !ft.cs || data.meta.ftcs) return iai;
-    
-    // case sensitive search
-    // check real case of each result node
-    final FTTokenizer ftdb = new FTTokenizer();
-    ftdb.st = ft.st;
-    return csDBCheck(iai, data, ftdb, tok, pw);
+    return iai;
   }
 
   /**
@@ -377,7 +328,7 @@ public final class FTFuzzy extends Index {
    * @param pw position of wildcard
    * @return counter
    */
-  static IndexArrayIterator csDBCheck(final IndexArrayIterator ids, 
+  static IndexArrayIterator csDBCheck(final IndexArrayIterator ids,
       final Data d, final FTTokenizer ftdb, final byte[] token, final int pw) {
     
     return new IndexArrayIterator(1) {
@@ -400,9 +351,8 @@ public final class FTFuzzy extends Index {
             ftdb.cs = true;
             //if (pw < token.length) {
               final byte[] b = ftdb.get();
-              if (pw > b.length 
-                  || !eq(Token.substring(token, 0, pw), 
-                      Token.substring(b, 0, pw))) {
+              if (pw > b.length  || !eq(substring(token, 0, pw),
+                  substring(b, 0, pw))) {
                 r.removePos();
               }
             //} else if(!eq(token, ftdb.get())) {
@@ -434,14 +384,14 @@ public final class FTFuzzy extends Index {
   public int nrIDs(final IndexToken index) {
     // hack, should find general solution
     final FTTokenizer fto = (FTTokenizer) index;
-    if(fto.fz || fto.wc || fto.cs || data.meta.ftcs) return 1;
+    if(fto.fz || fto.wc || fto.cs) return 1;
 
-    // specified ft options are not checked yet...
-    final byte[] tok = Token.lc(index.get());
+    // specified ft options are not considered yet
+    final byte[] tok = index.get();
     final int id = cache.id(tok);
     if(id > 0) return cache.getSize(id);
 
-    long p = getPointerOnTokenCS(tok, -1, false);
+    long p = getPointerOnToken(tok, -1);
     
     if (p > -1) {
       final int size = getDataSize(p, tok.length);

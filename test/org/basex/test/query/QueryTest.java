@@ -27,6 +27,8 @@ public final class QueryTest {
   };
   /** Verbose flag. */
   private static final boolean VERBOSE = false;
+  /** Wrong results counter. */
+  private static int wrong;
 
   /**
    * Main method of the test class.
@@ -45,7 +47,7 @@ public final class QueryTest {
     Prop.chop = true;
     boolean ok = true;
 
-    /* testing all kinds of combinations 
+    // testing all kinds of combinations 
     for(int x = 0; x < 2; x++) {
       for(int a = 0; a < 2; a++) { Prop.ftindex = a == 0;
         for(int b = 0; b < 2; b++) { Prop.ftittr = b == 0;
@@ -60,18 +62,20 @@ public final class QueryTest {
           }
         }
       }
-    }*/
+    }
     
-    // single test
+    /* single test
     Prop.ftindex = true;
-    Prop.ftittr = false;
     Prop.ftfuzzy = true;
+    Prop.ftittr = true;
     Prop.ftst = false;
     Prop.ftdc = false;
-    Prop.ftcs = true;
+    Prop.ftcs = false;
     ok &= test(false);
+    */
 
-    System.out.println(ok ? "All tests correct.\n" : "Wrong results...\n");
+    System.out.println(ok ? "All tests correct.\n" :
+      wrong + " Wrong results...\n");
   }
 
   /**
@@ -83,7 +87,8 @@ public final class QueryTest {
     boolean ok = true;
     
     for(final AbstractTest test : TESTS) {
-      ok &= test(xquery, test, test.details());
+      if(test.details() != null)
+        ok &= test(xquery, test, test.details());
     }
    
     return ok;
@@ -103,13 +108,14 @@ public final class QueryTest {
     Process proc = new CreateDB(file);
     if(!proc.execute(CONTEXT)) {
       err(proc.info(), null);
+      wrong++;
       return false;
     }
 
     for(final Object[] qu : test.queries) {
       final boolean correct = qu.length == 3;
       final String query = qu[correct ? 2 : 1].toString();
-      final String cmd = (xquery ? "xquery " : "xpath ") + query;
+      final String cmd = qu[0] + ": " + (xquery ? "xquery " : "xpath ") + query;
       
       if(VERBOSE) err(cmd, ext);
 
@@ -127,11 +133,13 @@ public final class QueryTest {
               (correct ? qu[1] : "error") + "\n  Found: " +
               val + (ext != null ? "\n  Flags: " + ext : ""));
           ok = false;
+          wrong++;
           continue;
         }
       } else if(correct) {
         err(qu[0].toString(), proc.info() +
             (ext != null ? "\n  Flags: " + ext : ""));
+        wrong++;
         ok = false;
       }
     }

@@ -125,11 +125,12 @@ public final class FTTrie extends Index {
     if(!cs && ft.cs) {
       // case insensitive index created - check real case with dbdata
       if (iai == null)  iai = getNodeFromTrieRecursive(0, Token.lc(tok), false);
-      if(iai == IndexArrayIterator.EMP) return iai;
+      if(iai.size() == 0) return iai;
 
       // check real case of each result node
       final FTTokenizer ftdb = new FTTokenizer();
       ftdb.st = ft.st;
+      ftdb.dc = ft.dc;
       return FTFuzzy.csDBCheck(iai, data, ftdb, tok, pw);
     }
 
@@ -1294,7 +1295,7 @@ public final class FTTrie extends Index {
         // . wildcards left
         IndexArrayIterator resultData = getNodeFromTrieRecursive(0, vsn, false);
         // save nodeValues for recursive method call
-        if(resultData != IndexArrayIterator.EMP && recCall) {
+        if(resultData.size() != 0 && recCall) {
           valuesFound = new byte[] {(byte) rne[counter[0] + 1]};
         }
         return resultData;

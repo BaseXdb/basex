@@ -166,7 +166,6 @@ public final class FTFuzzyBuilder extends Progress implements IndexBuilder {
           for (int z = 4; z < spos; z++) outz.write(vpos[z]);
         }
         
-        
         dr = outz.size();
         tr = (int) outy.size();
       }
@@ -174,8 +173,8 @@ public final class FTFuzzyBuilder extends Progress implements IndexBuilder {
     }
     tree = null;
 
-    outx.write(--j);
-    outx.writeInt(tr - j - 9);
+    outx.write(j);
+    outx.writeInt(tr);
 
     outx.close();
     outy.close();
