@@ -9,7 +9,7 @@ import org.basex.query.xpath.item.Dbl;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class FTPositionFilter {
+public final class FTPosFilter {
   /** Position filter. */
   public FTPos pos;
   /** Window occurrences. */
@@ -25,7 +25,7 @@ public final class FTPositionFilter {
    * Constructor.
    * @param p position filter
    */
-  public FTPositionFilter(final FTPos p) {
+  public FTPosFilter(final FTPos p) {
     pos = p;
     pos.ordered = p.ordered;
     pos.content = p.content;

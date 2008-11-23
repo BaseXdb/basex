@@ -110,7 +110,7 @@ public final class FTTokenizer extends IndexToken {
     for(; p < l; p += cl(text[p])) {
       final int c = cp(text, p);
       if(c < 0x100 && Character.isLetterOrDigit(c)) continue;
-      // [CG] parse wildcard indicators
+      // [CG] FT/parse wildcard indicators
       if(!wc || ws(c)) break;
     }
     return true;

@@ -13,12 +13,12 @@ import org.basex.query.xpath.item.Bln;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Sebastian Gath
  */
-public final class FTUnaryNotIter extends FTArrayExpr {
+public final class FTNotIter extends FTArrayExpr {
   /**
    * Constructor.
    * @param e operands joined with the mild not operator
    */
-  public FTUnaryNotIter(final FTArrayExpr[] e) {
+  public FTNotIter(final FTArrayExpr[] e) {
     exprs = e;
   }
 

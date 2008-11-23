@@ -105,6 +105,10 @@ public final class FTTest extends AbstractTest {
           "//w[text() ftcontains 'db']" },
         { "FT 6", nodes(42),
           "//mix[text() ftcontains 'A']" },
+        { "FT 7", nodes(14),
+          "//w[text() ftcontains 'hello']['A' ftcontains 'A']" },
+        { "FT 8", nodes(14),
+          "//w[text() ftcontains 'hello']['X' ftcontains 'X' with fuzzy]" },
 
         { "Preds 1", nodes(7, 9, 11),
           "//w[text() ftcontains 'xml'][text() ftcontains 'Databases']" },

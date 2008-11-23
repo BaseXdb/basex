@@ -1,5 +1,6 @@
 package org.basex.gui.view.map;
 
+import static org.basex.gui.GUIConstants.*;
 import static org.basex.Text.*;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -15,7 +16,6 @@ import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
-import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPopup;
@@ -86,8 +86,8 @@ public final class MapView extends View implements Runnable {
    */
   public MapView(final byte[] help) {
     super(help);
-    setMode(GUIConstants.Fill.NONE);
-    new BaseXPopup(this, GUIConstants.POPUP);
+    setMode(Fill.NONE);
+    new BaseXPopup(this, POPUP);
   }
 
   /**
@@ -257,7 +257,7 @@ public final class MapView extends View implements Runnable {
     focusedRect = fr;
 
     if(fr != null) GUI.get().cursor(painter.highlight(focusedRect, mouseX,
-        mouseY, false) ? GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
+        mouseY, false) ? CURSORHAND : CURSORARROW);
 
     if(newFocus) notifyFocus(focusedRect != null ? focusedRect.p : -1, this);
     return newFocus;
@@ -609,7 +609,7 @@ public final class MapView extends View implements Runnable {
     }
 
     if(GUIProp.maplayout == 0) {
-      g.setColor(GUIConstants.COLORS[32]);
+      g.setColor(COLORS[32]);
       int pre = mainRects.size();
       int par = ViewData.parent(data, focusedRect.p);
       while(--pre >= 0) {
@@ -627,7 +627,7 @@ public final class MapView extends View implements Runnable {
     }
 
     if(selBox != null) {
-      g.setColor(GUIConstants.colormark3);
+      g.setColor(colormark3);
       g.drawRect(selBox.x, selBox.y, selBox.w, selBox.h);
       g.drawRect(selBox.x - 1, selBox.y - 1, selBox.w + 2,
           selBox.h + 2);
@@ -637,13 +637,13 @@ public final class MapView extends View implements Runnable {
       final int y = focusedRect.y;
       final int w = focusedRect.w;
       final int h = focusedRect.h;
-      g.setColor(GUIConstants.color6);
+      g.setColor(color6);
       g.drawRect(x, y, w, h);
       g.drawRect(x - 1, y - 1, w + 2, h + 2);
 
       // draw tag label
       if(data.kind(focusedRect.p) == Data.ELEM) {
-        g.setFont(GUIConstants.font);
+        g.setFont(font);
         String tt = Token.string(ViewData.tag(data, focusedRect.p));
         if(tt.length() > 32) tt = tt.substring(0, 30) + DOTS;
         BaseXLayout.drawTooltip(g, tt, x, y, getWidth(), focusedRect.l + 5);
@@ -712,7 +712,7 @@ public final class MapView extends View implements Runnable {
    */
   void drawMap() {
     final Graphics g = mainMap.getGraphics();
-    g.setColor(GUIConstants.COLORS[2]);
+    g.setColor(COLORS[2]);
     BaseXLayout.antiAlias(g);
     if(mainRects != null) painter.drawRectangles(g, mainRects);
   }

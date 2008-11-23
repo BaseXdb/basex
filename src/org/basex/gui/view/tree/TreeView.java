@@ -1,5 +1,6 @@
 package org.basex.gui.view.tree;
 
+import static org.basex.gui.GUIConstants.*;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -17,7 +18,6 @@ import javax.swing.SwingUtilities;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
-import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIFS;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBar;
@@ -73,11 +73,11 @@ public final class TreeView extends View {
   public TreeView(final byte[] help) {
     super(help);
     createBoxes();
-    setMode(GUIConstants.Fill.UP);
+    setMode(Fill.UP);
     setLayout(new BorderLayout());
     scroll = new BaseXBar(this);
     add(scroll, BorderLayout.EAST);
-    new BaseXPopup(this, GUIConstants.POPUP);
+    new BaseXPopup(this, POPUP);
   }
 
   @Override
@@ -213,15 +213,15 @@ public final class TreeView extends View {
     while(mpos < marked.size && marked.nodes[mpos] < pre) mpos++;
 
     Color col = Color.black;
-    Font fnt = GUIConstants.font;
+    Font fnt = font;
     if(mpos < marked.size && marked.nodes[mpos] == pre) {
       // mark node
-      col = GUIConstants.colormark3;
-      fnt = GUIConstants.bfont;
+      col = colormark3;
+      fnt = bfont;
     }
     if(y < -lineH) return;
 
-    g.setColor(GUIConstants.color2);
+    g.setColor(color2);
     g.drawLine(2, y + boxMargin - 1, totalW - 5, y + boxMargin - 1);
 
     final boolean fs = data.fs != null;
@@ -233,7 +233,7 @@ public final class TreeView extends View {
     int p = focused;
     while(p > pre) p = ViewData.parent(data, p);
     if(pre == p) {
-      g.setColor(GUIConstants.color3);
+      g.setColor(color3);
       g.fillRect(0, y - boxW - boxMargin, totalW, lineH + 1);
     }
     int xx = x;
@@ -271,7 +271,7 @@ public final class TreeView extends View {
     BaseXLayout.chopString(g, name, xx, yy - GUIProp.fontsize, tw - xx - 10);
 
     if(focused == pre) {
-      g.setColor(GUIConstants.color6);
+      g.setColor(color6);
       g.drawRect(1, yy - boxW - boxMargin, totalW - 3, lineH + 1);
       g.drawRect(2, yy - boxW - boxMargin + 1, totalW - 5, lineH - 1);
     }
@@ -290,12 +290,12 @@ public final class TreeView extends View {
     final Data data = GUI.context.data();
     while(it.more()) {
       if(y > it.y && y <= it.y + lineH) {
-        Cursor c = GUIConstants.CURSORARROW;
+        Cursor c = CURSORARROW;
         final int kind = data.kind(it.pre);
         if(kind == Data.ELEM || kind == Data.DOC) {
           // set cursor when moving over tree boxes
           final int xx = 8 + it.level * (lineH >> 2) + lineH;
-          if(x > xx - 20 && x < xx) c = GUIConstants.CURSORHAND;
+          if(x > xx - 20 && x < xx) c = CURSORHAND;
         }
         GUI.get().cursor(c);
         notifyFocus(it.pre, this);
@@ -351,9 +351,9 @@ public final class TreeView extends View {
     Graphics2D g = emptyBox.createGraphics();
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
         RenderingHints.VALUE_ANTIALIAS_ON);
-    g.setColor(GUIConstants.color6);
+    g.setColor(color6);
     g.fillOval((boxW >> 2) - 1, (boxW >> 2) + 1, boxW >> 1, boxW >> 1);
-    g.setColor(GUIConstants.color4);
+    g.setColor(color4);
     g.fillOval((boxW >> 2) - 2, boxW >> 2, boxW >> 1, boxW >> 1);
 
     openedBox = new BufferedImage(boxW + 1, boxW + 1,
@@ -365,10 +365,10 @@ public final class TreeView extends View {
     Polygon p = new Polygon(new int[] { 0, boxW, boxW >> 1 }, new int[] {
         boxW - sp >> 1, boxW - sp >> 1, boxW }, 3);
     p.translate(0, -1);
-    g.setColor(GUIConstants.color6);
+    g.setColor(color6);
     g.fillPolygon(p);
     p.translate(-1, -1);
-    g.setColor(GUIConstants.color4);
+    g.setColor(color4);
     g.fillPolygon(p);
 
     closedBox = new BufferedImage(boxW + 1, boxW + 1,
@@ -380,10 +380,10 @@ public final class TreeView extends View {
     p = new Polygon(new int[] { boxW - sp >> 1, boxW, boxW - sp >> 1 },
         new int[] { 0, boxW >> 1, boxW }, 3);
     p.translate(-1, 1);
-    g.setColor(GUIConstants.color6);
+    g.setColor(color6);
     g.fillPolygon(p);
     p.translate(-1, -1);
-    g.setColor(GUIConstants.color4);
+    g.setColor(color4);
     g.fillPolygon(p);
   }
 
@@ -409,7 +409,7 @@ public final class TreeView extends View {
     final Nodes marked = GUI.context.marked();
     if(!left) {
       if(marked.find(pre) < 0) notifyMark(0, null);
-    } else if(getCursor() == GUIConstants.CURSORHAND) {
+    } else if(getCursor() == CURSORHAND) {
       // open/close entry
       opened[pre] ^= true;
       refreshHeight();
@@ -432,9 +432,7 @@ public final class TreeView extends View {
 
     // launch a program
     final Data data = GUI.context.data();
-    if(getCursor() == GUIConstants.CURSORHAND && data.fs != null) {
-      data.fs.launch(focused);
-    }
+    if(getCursor() == CURSORHAND && data.fs != null) data.fs.launch(focused);
   }
 
   @Override

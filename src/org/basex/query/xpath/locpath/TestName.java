@@ -50,7 +50,7 @@ public final class TestName extends Test {
     // wildcard - accept all nodes
     if(id == ALL) return true;
     
-    // [CG] add support for namespace tests
+    // [CG] XPath/add support for namespace tests
     int nm = kind == Data.ELEM ? data.tagID(pre) : data.attNameID(pre);
     return id == nm;
   }

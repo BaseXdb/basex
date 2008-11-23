@@ -1,5 +1,6 @@
 package org.basex.gui.view.table;
 
+import static org.basex.gui.GUIConstants.*;
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
 import java.awt.Color;
@@ -21,7 +22,6 @@ import javax.swing.SwingUtilities;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
-import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.BaseXBar;
@@ -95,7 +95,7 @@ final class TableHeader extends BaseXPanel {
     ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
         RenderingHints.VALUE_ANTIALIAS_ON);
 
-    g.setFont(GUIConstants.font);
+    g.setFont(font);
     g.setColor(Color.black);
     if(tdata.rows == null) {
       BaseXLayout.drawCenter(g, NOTABLE, getWidth(), getHeight() / 2);
@@ -106,7 +106,7 @@ final class TableHeader extends BaseXPanel {
     int w = getWidth();
     final int h = getHeight();
     final int hh = h >> 1;
-    g.setColor(GUIConstants.color1);
+    g.setColor(color1);
     g.drawLine(0, h - 1, w, h - 1);
 
     w -= bs;
@@ -123,12 +123,12 @@ final class TableHeader extends BaseXPanel {
       g.setColor(Color.white);
       g.fillRect((int) x + 1, hh, (int) ce - (int) x - 2, hh - 2);
       g.drawLine((int) ce - 1, hh - 1, (int) ce - 1, h - 2);
-      g.setColor(GUIConstants.COLORBUTTON);
+      g.setColor(COLORBUTTON);
       g.drawLine((int) ce, hh - 1, (int) ce, h - 2);
 
       // draw headers
       g.setColor(Color.black);
-      g.setFont(GUIConstants.bfont);
+      g.setFont(bfont);
 
       final int off = clicked ? 1 : 0;
       BaseXLayout.chopString(g, tdata.cols[n].name,
@@ -147,7 +147,7 @@ final class TableHeader extends BaseXPanel {
         box.paint(g, (int) x, hh, (int) ce - (int) x, hh);
       } else {
         g.setColor(Color.black);
-        g.setFont(GUIConstants.font);
+        g.setFont(font);
         g.drawString(tdata.cols[n].filter, (int) x + 5, h - 7);
       }
       x = ce;
@@ -157,7 +157,7 @@ final class TableHeader extends BaseXPanel {
     BaseXLayout.drawCell(g, (int) x, w + bs, 0, hh, clicked && header);
     BaseXLayout.drawCell(g, (int) x, w + bs, hh - 1, h, clicked && !header);
     g.setColor(Color.black);
-    g.setFont(GUIConstants.bfont);
+    g.setFont(bfont);
 
     int o = header && clicked ? 1 : 0;
     g.fillPolygon(new int[] { (int) x + o + 3, (int) x + o + bs - 5,
@@ -173,16 +173,16 @@ final class TableHeader extends BaseXPanel {
   public void mouseMoved(final MouseEvent e) {
     if(tdata.rows == null) return;
 
-    Cursor cursor = GUIConstants.CURSORARROW;
+    Cursor cursor = CURSORARROW;
     mouseX = e.getX();
 
     final int w = getWidth() - BaseXBar.SIZE;
     if(header(e.getY())) {
       moveC = colSep(w, mouseX);
-      if(moveC != -1) cursor = GUIConstants.CURSORMOVEH;
+      cursor = moveC != -1 ? CURSORMOVEH : CURSORHAND;
     } else {
       moveC = -1;
-      if(mouseX < w) cursor = GUIConstants.CURSORTEXT;
+      if(mouseX < w) cursor = CURSORTEXT;
       if(GUIProp.mousefocus) {
         final int col = tdata.column(w, mouseX);
         if(col != -1) filter(col);
@@ -239,7 +239,7 @@ final class TableHeader extends BaseXPanel {
   public void mouseExited(final MouseEvent e) {
     if(tdata.rows == null) return;
 
-    GUI.get().cursor(GUIConstants.CURSORARROW);
+    GUI.get().cursor(CURSORARROW);
     clickCol = -1;
   }
 
@@ -268,11 +268,11 @@ final class TableHeader extends BaseXPanel {
             chooseRoot(e);
           } else {
             // sort data in current column
-            GUI.get().cursor(GUIConstants.CURSORWAIT);
+            GUI.get().cursor(CURSORWAIT);
             tdata.asc = tdata.sortCol == clickCol ? !tdata.asc : true;
             tdata.sortCol = clickCol;
             tdata.sort();
-            GUI.get().cursor(GUIConstants.CURSORARROW, true);
+            GUI.get().cursor(CURSORARROW, true);
           }
         }
       } else {

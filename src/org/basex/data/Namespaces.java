@@ -16,9 +16,6 @@ import org.basex.util.Set;
  * @author Christian Gruen
  */
 public final class Namespaces extends Set {
-
-  // [CG] add support for updates/disallow updates for documents with namespaces
-
   /** Root node. */
   private Node root;
   /** Current node. */

@@ -1,5 +1,6 @@
 package org.basex.gui.view.plot;
 
+import static org.basex.gui.GUIConstants.*;
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
 import java.awt.BorderLayout;
@@ -23,7 +24,6 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.StatsKey.Kind;
 import org.basex.gui.GUI;
-import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXLayout;
@@ -168,7 +168,7 @@ public final class PlotView extends View implements Runnable {
     box.add(xCombo);
     add(box, BorderLayout.SOUTH);
 
-    new BaseXPopup(this, GUIConstants.POPUP);
+    new BaseXPopup(this, POPUP);
     selectionBox = new PlotBoundingBox();
     refreshLayout();
   }
@@ -193,10 +193,10 @@ public final class PlotView extends View implements Runnable {
     ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
        RenderingHints.VALUE_ANTIALIAS_ON);
 
-    Color c = GUIConstants.color;
-    if(marked) c = GUIConstants.colormarkA;
-    if(markedSub) c = GUIConstants.colormark2A;
-    if(focus) c = GUIConstants.color6;
+    Color c = color;
+    if(marked) c = colormarkA;
+    if(markedSub) c = colormark2A;
+    if(focus) c = color6;
 
     g.setColor(c);
     g.fillOval(0, 0, size, size);
@@ -214,7 +214,7 @@ public final class PlotView extends View implements Runnable {
         RenderingHints.VALUE_ANTIALIAS_ON);
 
     // overdraw plot background
-    g.setColor(GUIConstants.color1);
+    g.setColor(color1);
     final int sz = sizeFactor();
     g.fillRect(MARGIN[1] + sz, MARGIN[0], plotWidth - sz,
         plotHeight - sz);
@@ -224,7 +224,7 @@ public final class PlotView extends View implements Runnable {
       drawAxis(g, false);
 
     // draw dark plot bounder
-    g.setColor(GUIConstants.color6);
+    g.setColor(color6);
     final int w = getWidth();
     final int h = getHeight();
     g.drawLine(MARGIN[1] + sz, MARGIN[0], w - MARGIN[3], MARGIN[0]);
@@ -235,7 +235,7 @@ public final class PlotView extends View implements Runnable {
     g.drawLine(w - MARGIN[3], MARGIN[0], w - MARGIN[3], h - MARGIN[2] - sz);
 
     // draw items
-    g.setColor(GUIConstants.color6);
+    g.setColor(color6);
     for(int i = 0; i < plotData.size; i++) {
       drawItem(g, plotData.xAxis.co[i],
           plotData.yAxis.co[i], false, false, false);
@@ -262,7 +262,7 @@ public final class PlotView extends View implements Runnable {
 
     final int sz = sizeFactor();
     if(plotWidth - sz < 0 || plotHeight - sz < 0) {
-      g.setFont(GUIConstants.font);
+      g.setFont(font);
       g.setColor(Color.black);
       BaseXLayout.drawCenter(g, NOSPACE, w, h / 2 - MARGIN[0]);
       return;
@@ -288,7 +288,7 @@ public final class PlotView extends View implements Runnable {
         final double y1 = plotData.yAxis.co[f];
         drawItem(g, x1, y1, true, false, false);
         // draw focused x and y value
-        g.setFont(GUIConstants.font);
+        g.setFont(font);
         final int textH = g.getFontMetrics().getHeight();
         
         final String x = formatString(true);
@@ -325,14 +325,14 @@ public final class PlotView extends View implements Runnable {
 
     // draw selection box
     if(dragging) {
-      g.setColor(GUIConstants.back);
+      g.setColor(back);
       final int selW = selectionBox.getWidth();
       final int selH = selectionBox.getHeight();
       final int x1 = selectionBox.x1;
       final int y1 = selectionBox.y1;
       g.fillRect(selW > 0 ? x1 : x1 + selW, selH > 0 ? y1 : y1 + selH,
           Math.abs(selW), Math.abs(selH));
-      g.setColor(GUIConstants.frame);
+      g.setColor(frame);
       g.drawRect(selW > 0 ? x1 : x1 + selW, selH > 0 ? y1 : y1 + selH,
           Math.abs(selW), Math.abs(selH));
     }
@@ -433,7 +433,7 @@ public final class PlotView extends View implements Runnable {
   private void drawAxis(final Graphics g, final boolean drawX) {
     final int h = getHeight();
     final int w = getWidth();
-    g.setColor(GUIConstants.back);
+    g.setColor(back);
 
     final int sz = sizeFactor();
     // the painting space provided for items which lack no value
@@ -462,7 +462,7 @@ public final class PlotView extends View implements Runnable {
     final double step = axis.actlCaptionStep;
     final double capRange = 1.0d / (nrCaptions - 1);
 
-    g.setFont(GUIConstants.font);
+    g.setFont(font);
 
 
     // determine axis caption for TEXT / INT / DBL data
@@ -592,13 +592,13 @@ public final class PlotView extends View implements Runnable {
     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
         RenderingHints.VALUE_ANTIALIAS_ON);
     g2d.rotate(ROTATE, imgW, 0 + textH);
-    g2d.setFont(GUIConstants.font);
+    g2d.setFont(font);
     g2d.setColor(Color.black);
     g2d.drawString(cap, fs, fs);
 
     // ... after that
     // the image and the grid line are drawn beside x / y axis
-    g.setColor(GUIConstants.back);
+    g.setColor(back);
     if(drawX) {
       final int y = h - MARGIN[2];
       g.drawImage(img, pos - imgW + textH - fs, y, this);

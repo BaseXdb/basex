@@ -2,7 +2,6 @@ package org.basex.query.xpath.expr;
 
 import static org.basex.query.xpath.XPText.*;
 import java.io.IOException;
-import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.data.Serializer;
 import org.basex.index.FTNode;
@@ -97,13 +96,11 @@ public final class FTContains extends Arr {
     final FTTokenizer tmp = ctx.ftitem;
     ctx.ftitem = ft;
 
-    final Nod ns = (Nod) expr[0].eval(ctx); 
-    if(!ns.bool()) return Bln.FALSE;
-    
     // evaluate index requests only once
     if(v2 == null) v2 = ctx.eval(expr[1]);
 
     if(v2.bool()) {
+      final Nod ns = (Nod) expr[0].eval(ctx);
       final FTArrayExpr ftae = (FTArrayExpr) expr[1];
       ftn = (ftn == null && ftae.more()) ? ftae.next(ctx) : ftn;
       for(int z = 0; z < ns.size(); z++) {
@@ -138,10 +135,9 @@ public final class FTContains extends Arr {
     if(it instanceof Nod) {
       ctx.item = (Nod) it;
       
-      final Nod nodes = (Nod) it;
-      final Data data = nodes.data;
-      for(int n = 0; n < nodes.size; n++) {
-        ft.init(data.atom(nodes.nodes[n]));
+      final Nod ns = (Nod) it;
+      for(int n = 0; n < ns.size; n++) {
+        ft.init(ns.data.atom(ns.nodes[n]));
         found = expr[1].eval(ctx).bool();
         if(found) break;
       }
@@ -162,7 +158,7 @@ public final class FTContains extends Arr {
     if(!(expr[0] instanceof LocPathRel)) return this;
     final LocPath path = (LocPath) expr[0];
     
-    // all FTArrayExpr are recursively converted to for index access
+    // all expressions are recursively converted for index access
     final FTArrayExpr ae = (FTArrayExpr)
       (iu ? expr[1].indexEquivalent(ctx, curr, seq) : expr[1]);
       
@@ -172,7 +168,7 @@ public final class FTContains extends Arr {
       final Expr ex = new FTContainsNS(expr[0], ae);
       return curr == null ? ex : new Path(ex, path.invertPath(curr));
     }
-    
+
     // sequential evaluation
     Expr ex = null;
     if(!iu) {

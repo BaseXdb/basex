@@ -1,5 +1,6 @@
 package org.basex.gui.view;
 
+import static org.basex.gui.GUIConstants.*;
 import static org.basex.Text.*;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
@@ -16,8 +17,8 @@ import java.awt.Rectangle;
 import java.util.StringTokenizer;
 import org.basex.BaseX;
 import org.basex.gui.GUI;
-import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants;
+import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLayout;
@@ -91,10 +92,10 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     // build layout or use default if something goes wrong
     if(db) {
       if(!buildLayout(GUIProp.layoutopened))
-        buildLayout(GUIConstants.LAYOUTOPENED);
+        buildLayout(LAYOUTOPENED);
     } else {
       if(!buildLayout(GUIProp.layoutclosed))
-        buildLayout(GUIConstants.LAYOUTCLOSED);
+        buildLayout(LAYOUTCLOSED);
     }
   }
 
@@ -131,7 +132,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     final int h = getHeight();
     final int hh = Math.max(220, Math.min(700, h));
     final Insets i = getInsets();
-    BaseXLayout.fill(g, GUIConstants.color1, GUIConstants.color2,
+    BaseXLayout.fill(g, color1, color2,
         i.left, i.top, w - i.right, h - i.bottom);
     if(w < 150 || h < 160) return;
 
@@ -251,7 +252,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
 
   /**
    * Returns the view specified by its internal name. The view names
-   * are specified at the top of {@link GUIConstants}.
+   * are specified in the {@link GUIConstants} class.
    * @param name name of the view
    * @return found view container
    */
@@ -304,19 +305,19 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     ((Graphics2D) g).setStroke(STROKE);
 
     if(!out) {
-      g.setColor(GUIConstants.COLORS[10]);
+      g.setColor(COLORS[10]);
       g.drawRect(p.x, p.y, source.getWidth() - 1, source.getHeight() - 1);
     }
     final int ac = AlphaComposite.SRC_OVER;
     if(out) {
-      g.setColor(GUIConstants.colormark3);
+      g.setColor(colormark3);
       ((Graphics2D) g).setComposite(AlphaComposite.getInstance(ac, 0.3f));
       g.fillRect(p.x, p.y, source.getWidth(), source.getHeight());
     } else if(orient != null) {
-      g.setColor(GUIConstants.COLORS[16]);
+      g.setColor(COLORS[16]);
       g.drawRect(pos[0], pos[1], pos[2] - 1, pos[3] - 1);
       ((Graphics2D) g).setComposite(AlphaComposite.getInstance(ac, 0.3f));
-      g.setColor(GUIConstants.COLORS[8]);
+      g.setColor(COLORS[8]);
       g.fillRect(pos[0], pos[1], pos[2], pos[3]);
     }
   }

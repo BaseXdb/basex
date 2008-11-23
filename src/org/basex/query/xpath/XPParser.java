@@ -21,9 +21,9 @@ import org.basex.query.xpath.expr.FTContains;
 import org.basex.query.xpath.expr.FTMildNot;
 import org.basex.query.xpath.expr.FTOr;
 import org.basex.query.xpath.expr.FTSelect;
-import org.basex.query.xpath.expr.FTPositionFilter;
+import org.basex.query.xpath.expr.FTPosFilter;
 import org.basex.query.xpath.expr.FTWords;
-import org.basex.query.xpath.expr.FTUnaryNot;
+import org.basex.query.xpath.expr.FTNot;
 import org.basex.query.xpath.expr.Filter;
 import org.basex.query.xpath.expr.Or;
 import org.basex.query.xpath.expr.Path;
@@ -49,7 +49,6 @@ import org.basex.query.xpath.locpath.TestNode;
 import org.basex.query.xpath.locpath.TestPI;
 import org.basex.util.Array;
 import org.basex.util.Set;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -354,15 +353,17 @@ public class XPParser extends QueryParser {
       axis = Axis.DESCORSELF;
       test = TestNode.NODE;
     } else if(consume('.')) {
-      // Abbreviated Step (self or parent)
       axis = consume('.') ? Axis.PARENT : Axis.SELF;
       test = TestNode.NODE;
     } else if(consume('@')) {
       axis = Axis.ATTR;
       final String t = name();
-      test = t.length() != 0 ? new TestName(Token.token(t), false) :
+      test = t.length() != 0 ? new TestName(token(t), false) :
         consume('*') ? new TestName(false) : null;
-      if(test == null) error(NOATTNAME);
+      if(test == null) {
+        checkStep(axis, new TestName(EMPTY, false));
+        error(NOATTNAME);
+      }
     } else if(consume('*')) {
       axis = Axis.CHILD;
       test = new TestName(true);
@@ -707,7 +708,7 @@ public class XPParser extends QueryParser {
     final boolean not = consume(FTNOT);
     consumeWS();
     final FTArrayExpr e = ftPrimaryWithOptions(notnext);
-    return not ? new FTUnaryNot(e) : e;
+    return not ? new FTNot(e) : e;
   }
 
   /**
@@ -947,9 +948,9 @@ public class XPParser extends QueryParser {
    * @return FTPositionFilter ft position filter information
    * @throws QueryException parsing exception
    */
-  final FTPositionFilter ftPosFilter() throws QueryException {
+  final FTPosFilter ftPosFilter() throws QueryException {
     final FTPos pos = new FTPos();
-    final FTPositionFilter ftpos = new FTPositionFilter(pos);
+    final FTPosFilter ftpos = new FTPosFilter(pos);
 
     while(true) {
       if(consume(ORDERED)) { // FTOrdered

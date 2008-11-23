@@ -67,7 +67,7 @@ public final class Copy extends AUpdate {
         final int pre = pre(par, pos, data);
         
         // merge text nodes if necessary
-        // [CG] MergeText: might not cover all cases yet
+        // [CG] Updates/MergeText: might not cover all cases yet
         
         final int s = srcDocs[c].size - 1;
         final int up = s != 0 ? -1 :

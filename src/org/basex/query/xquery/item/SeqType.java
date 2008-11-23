@@ -118,7 +118,7 @@ public final class SeqType {
           if(!Token.eq(ext.str(), ((Nod) it).nname()))
               Err.or(XPCAST, it.type, ext);
           break;
-        // [CG] check other types, similar to {@link Test} classes
+        // [CG] XQuery/check other types, similar to {@link Test} classes
         default:
       }
       //Err.cast(type, item);

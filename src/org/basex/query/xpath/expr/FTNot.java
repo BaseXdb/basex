@@ -12,12 +12,12 @@ import org.basex.query.xpath.locpath.Step;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Sebastian Gath
  */
-public final class FTUnaryNot extends FTArrayExpr {
+public final class FTNot extends FTArrayExpr {
   /**
    * Constructor.
    * @param e expressions
    */
-  public FTUnaryNot(final FTArrayExpr e) {
+  public FTNot(final FTArrayExpr e) {
     exprs = new FTArrayExpr[] { e };
   }
 
@@ -49,7 +49,7 @@ public final class FTUnaryNot extends FTArrayExpr {
     // find index equivalents
     final FTArrayExpr ex = exprs[0].indexEquivalent(ctx, curr, seq);
     if(ex != null) exprs[0] = ex;
-    return new FTUnaryNotIter(exprs);
+    return new FTNotIter(exprs);
   }
   
   @Override

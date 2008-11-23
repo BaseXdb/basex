@@ -24,7 +24,7 @@
     <fileVersion>5.0.0.0</fileVersion>
     <txtFileVersion>BaseX 5.0</txtFileVersion>
     <fileDescription>Native XML Database</fileDescription>
-    <copyright>� University of Konstanz, 2008</copyright>
+    <copyright>(c) University of Konstanz, 2008</copyright>
     <productVersion>5.0.0.0</productVersion>
     <txtProductVersion>BaseX 5.0</txtProductVersion>
     <productName>BaseX</productName>

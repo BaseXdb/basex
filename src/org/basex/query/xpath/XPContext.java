@@ -9,7 +9,7 @@ import org.basex.index.FTTokenizer;
 import org.basex.query.QueryException;
 import org.basex.query.QueryContext;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.expr.FTPositionFilter;
+import org.basex.query.xpath.expr.FTPosFilter;
 import org.basex.query.xpath.item.Item;
 import org.basex.query.xpath.item.Nod;
 
@@ -30,8 +30,9 @@ public final class XPContext extends QueryContext {
   /** Current fulltext item. */
   public FTTokenizer ftitem;
   /** Current fulltext position filter. */
-  public FTPositionFilter ftpos;
+  public FTPosFilter ftpos;
   /** Flag for fulltext index use. */
+  // [SG] should be localized (or cached, as the other ft options)
   public boolean iu = false;
   /** Reference to the root expression. */
   private Expr root;

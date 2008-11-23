@@ -75,7 +75,7 @@ public final class FTAnd extends FTArrayExpr {
     int nmin = min;
     for (int i = 0; i < exprs.length; i++) {
       final int nrIDs = exprs[i].indexSizes(ctx, curr, min);
-      if (!(exprs[i] instanceof FTUnaryNot)) {
+      if (!(exprs[i] instanceof FTNot)) {
         i1.add(i);
         nmin = nrIDs < nmin ? nrIDs : nmin;
       } else if (nrIDs > 0) {

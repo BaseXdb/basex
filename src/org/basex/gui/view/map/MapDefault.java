@@ -1,5 +1,6 @@
 package org.basex.gui.view.map;
 
+import static org.basex.gui.GUIConstants.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
@@ -7,7 +8,6 @@ import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
-import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.ViewData;
@@ -36,9 +36,6 @@ final class MapDefault extends MapPainter {
 
     mpos = 0;
     for(int ri = 0; ri < rects.size(); ri++) {
-
-      // [CG] synchronization issues? ..rects.get(ri) is sometimes null
-      
       // get rectangle information
       final MapRect r = rects.get(ri);
       final int pre = r.p;
@@ -50,10 +47,10 @@ final class MapDefault extends MapPainter {
       final boolean full = r.w == ww && r.h == hh;
 
       // draw rectangle
-      Color color = nextMark(rects, pre, ri, rects.size());
-      final boolean mark = color != null;
+      Color col = nextMark(rects, pre, ri, rects.size());
+      final boolean mark = col != null;
 
-      g.setColor(mark ? color : GUIConstants.COLORS[lvl]);
+      g.setColor(mark ? col : COLORS[lvl]);
       if(r.w < l.x + l.w || r.h < l.y + l.h || GUIProp.maplayout < 2 ||
           ViewData.isLeaf(data, pre)) {
         g.fillRect(r.x, r.y, r.w, r.h);
@@ -66,12 +63,11 @@ final class MapDefault extends MapPainter {
       }
 
       if(!full) {
-        color = mark ? GUIConstants.colormark3 : GUIConstants.COLORS[lvl + 2];
-        g.setColor(color);
+        col = mark ? colormark3 : COLORS[lvl + 2];
+        g.setColor(col);
         g.drawRect(r.x, r.y, r.w, r.h);
-        color = mark ? GUIConstants.colormark4 :
-          GUIConstants.COLORS[Math.max(0, lvl - 2)];
-        g.setColor(color);
+        col = mark ? colormark4 : COLORS[Math.max(0, lvl - 2)];
+        g.setColor(col);
         g.drawLine(r.x + r.w, r.y, r.x + r.w, r.y + r.h);
         g.drawLine(r.x, r.y + r.h, r.x + r.w, r.y + r.h);
       }
@@ -105,11 +101,11 @@ final class MapDefault extends MapPainter {
             ViewData.path(data, pre) : ViewData.tag(data, pre);
 
       g.setColor(Color.black);
-      g.setFont(GUIConstants.font);
+      g.setFont(font);
       BaseXLayout.chopString(g, name, rect.x, rect.y, rect.w);
     } else {
-      g.setColor(GUIConstants.COLORS[Math.min(255, rect.l * 2 + 8)]);
-      g.setFont(GUIConstants.mfont);
+      g.setColor(COLORS[Math.min(255, rect.l * 2 + 8)]);
+      g.setFont(mfont);
       final byte[] text = ViewData.content(data, pre, false);
       
       final int p = BaseXLayout.centerPos(g, text, rect.w);

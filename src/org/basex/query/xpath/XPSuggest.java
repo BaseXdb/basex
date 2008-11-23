@@ -85,13 +85,14 @@ public final class XPSuggest extends XPParser {
   @Override
   void checkStep(final Axis axis, final Test test) {
     filter(true);
+    
     if(axis == null) {
       if(!stack.empty())
         stack.push(skel.desc(stack.pop(), 0, Data.ELEM, false));
       return;
     }
 
-    // [CG] check when stack is empty at this stage
+    // [CG] Suggest/check when stack is empty at this stage
     if(!stack.empty()) {
       if(axis == Axis.CHILD) {
         stack.push(skel.desc(stack.pop(), 0, Data.ELEM, false));
@@ -139,8 +140,7 @@ public final class XPSuggest extends XPParser {
     final StringList sl = new StringList();
     if(stack.empty()) return sl;
 
-    final ArrayList<Node> list = stack.peek();
-    for(final Node r : list) {
+    for(final Node r : stack.peek()) {
       final String name = Token.string(r.token(ctx.data()));
       if(name.length() != 0 && !sl.contains(name)) sl.add(name);
     }

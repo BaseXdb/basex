@@ -1,5 +1,6 @@
 package org.basex.gui.layout;
 
+import static org.basex.gui.GUIConstants.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Polygon;
@@ -8,8 +9,6 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import org.basex.gui.GUIConstants;
-import org.basex.gui.GUIConstants.Fill;
 
 /**
  * DoubleSlider implementation.
@@ -114,8 +113,7 @@ public final class BaseXDSlider extends BaseXPanel {
     center = mouX + ARROW > r.xs && mouX < r.xe;
     oldMin = encode(min);
     oldMax = encode(max);
-    setCursor(left || right ? GUIConstants.CURSORHAND :
-      GUIConstants.CURSORARROW);
+    setCursor(left || right ? CURSORHAND : CURSORARROW);
   }
 
   @Override
@@ -230,12 +228,12 @@ public final class BaseXDSlider extends BaseXPanel {
     final int hh = h / 2;
 
     final boolean focus = hasFocus();
-    g.setColor(focus ? Color.white : GUIConstants.color1);
+    g.setColor(focus ? Color.white : color1);
     g.fillRect(0, hh - 4, w, 8);
     g.setColor(Color.black);
     g.drawLine(0, hh - 4, w - 1, hh - 4);
     g.drawLine(0, hh - 4, 0, hh + 4);
-    g.setColor(GUIConstants.color3);
+    g.setColor(color3);
     g.drawLine(w - 1, hh - 4, w - 1, hh + 4);
     g.drawLine(0, hh + 4, w, hh + 4);
 
@@ -243,7 +241,7 @@ public final class BaseXDSlider extends BaseXPanel {
     BaseXLayout.drawCell(g, r.xs, r.xe + ARROW, 2, h - 2, false);
 
     if(r.xs + ARROW < r.xe) {
-      g.setColor(GUIConstants.color6);
+      g.setColor(color6);
       g.drawLine(r.xs + ARROW, 3, r.xs + ARROW, h - 4);
       g.drawLine(r.xe - 1, 3, r.xe - 1, h - 4);
       g.setColor(Color.white);
@@ -259,12 +257,12 @@ public final class BaseXDSlider extends BaseXPanel {
     final Polygon pol = new Polygon(
         new int[] { r.xs + 11, r.xs + 5, r.xs + 5, r.xs + 11 },
         new int[] { hh - 5, hh - 1, hh, hh + 5 }, 4);
-    g.setColor(focus ? GUIConstants.color6 : GUIConstants.COLORBUTTON);
+    g.setColor(focus ? color6 : COLORBUTTON);
     g.fillPolygon(pol);
     pol.xpoints = new int[] { r.xe + 5, r.xe + 12, r.xe + 12, r.xe + 5 };
     g.fillPolygon(pol);
 
-    g.setColor(focus ? Color.black : GUIConstants.COLORDARK);
+    g.setColor(focus ? Color.black : COLORDARK);
     g.drawLine(r.xs + 11, hh - 5, r.xs + 11, hh + 4);
     g.drawLine(r.xs + 11, hh - 5, r.xs + 6, hh - 1);
     g.drawLine(r.xe + 5, hh - 5, r.xe + 5, hh + 4);

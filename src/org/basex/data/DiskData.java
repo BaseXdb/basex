@@ -497,8 +497,6 @@ public final class DiskData extends Data {
       final int d = r < ta ? pre - pr : t - r;
       final int p = pre + t - ta - 1;
 
-      // [CG] include namespace references
-      
       switch(k) {
         case ELEM:
           // add element
@@ -538,7 +536,6 @@ public final class DiskData extends Data {
   private void insertElem(final int pre, final int dis,
       final byte[] tag, final int as, final int s) {
 
-    // [CG] add namespace support
     final long id = ++meta.lastid;
     final int t = tags.index(tag, null);
     table.insert(pre, new byte[] { ELEM, (byte) (t >> 8), (byte) t, (byte) as,
@@ -561,7 +558,6 @@ public final class DiskData extends Data {
     final long txt = texts.length();
     texts.writeBytes(txt, val);
 
-    // [CG] add namespace support
     table.insert(pre, new byte[] { DOC, 0, 0, (byte) (txt >> 32),
         (byte) (txt >> 24), (byte) (txt >> 16), (byte) (txt >> 8), (byte) txt,
         (byte) (s >> 24), (byte) (s >> 16), (byte) (s >> 8), (byte) s,
@@ -579,8 +575,6 @@ public final class DiskData extends Data {
    */
   private void insertText(final int pre, final int dis, final byte[] val,
       final int kind) {
-
-    // [CG] add namespace support
 
     // build and insert new entry
     final long id = ++meta.lastid;
@@ -604,8 +598,6 @@ public final class DiskData extends Data {
    */
   private void insertAttr(final int pre, final int dis, final byte[] name,
       final byte[] val) {
-
-    // [CG] add namespace support
 
     // add attribute to text storage
     final long len = values.length();

@@ -27,11 +27,9 @@ public final class Or extends Arr {
 
   @Override
   public Bln eval(final XPContext ctx) throws QueryException {
+    // [SG] to be revised.. should only be locally set
     ctx.iu = false;
-    
-    for(final Expr e : expr) 
-      if(e.eval(ctx).bool()) 
-        return Bln.TRUE;
+    for(final Expr e : expr) if(e.eval(ctx).bool()) return Bln.TRUE;
     return Bln.FALSE;
   }
 

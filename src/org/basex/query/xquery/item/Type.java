@@ -625,7 +625,7 @@ public enum Type {
     public Nod e(final Object o) {
       if(o instanceof BXElem) return ((BXElem) o).getNod();
 
-      // [CG] add complete DOM object for elements
+      // [CG] API/add complete DOM object for elements
       return new FElem(new QNm(token(((Element) o).getNodeName())),
           EMPTY, null);
     }
@@ -647,7 +647,7 @@ public enum Type {
         }
       }
         
-      // [CG] add complete DOM object for document fragments
+      // [CG] API/add complete DOM object for document fragments
       return new FDoc(new NodIter(), EMPTY);
     }
   },

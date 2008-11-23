@@ -1,5 +1,6 @@
 package org.basex.gui.view.map;
 
+import static org.basex.gui.GUIConstants.*;
 import static org.basex.build.BuildText.*;
 import static org.basex.Text.*;
 import static org.basex.util.Token.*;
@@ -17,7 +18,6 @@ import org.basex.fs.DataFS;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIFS;
 import org.basex.gui.GUIProp;
-import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewData;
@@ -75,12 +75,12 @@ final class MapFS extends MapPainter {
       final boolean full = r.w == ww && r.h == hh;
 
       // draw rectangle
-      Color color = nextMark(rects, pre, ri, rs);
-      final boolean mark = color != null;
+      Color col = nextMark(rects, pre, ri, rs);
+      final boolean mark = col != null;
 
-      if(full && isImage) color = Color.black;
-      else if(full || color == null) color = GUIConstants.COLORS[lvl];
-      g.setColor(color);
+      if(full && isImage) col = Color.black;
+      else if(full || col == null) col = COLORS[lvl];
+      g.setColor(col);
 
       if(r.w < l.x + l.w || r.h < l.y + l.h || GUIProp.maplayout < 2 ||
           ViewData.isLeaf(data, pre)) {
@@ -94,12 +94,11 @@ final class MapFS extends MapPainter {
       }
 
       if(!full) {
-        color = mark ? GUIConstants.colormark3 : GUIConstants.COLORS[lvl + 2];
-        g.setColor(color);
+        col = mark ? colormark3 : COLORS[lvl + 2];
+        g.setColor(col);
         g.drawRect(r.x, r.y, r.w, r.h);
-        color = mark ? GUIConstants.colormark4 :
-          GUIConstants.COLORS[Math.max(0, lvl - 2)];
-        g.setColor(color);
+        col = mark ? colormark4 : COLORS[Math.max(0, lvl - 2)];
+        g.setColor(col);
         g.drawLine(r.x + r.w, r.y, r.x + r.w, r.y + r.h);
         g.drawLine(r.x, r.y + r.h, r.x + r.w, r.y + r.h);
       }
@@ -131,7 +130,7 @@ final class MapFS extends MapPainter {
           }
           p += data.attSize(p, k);
         }
-        g.setFont(GUIConstants.mfont);
+        g.setFont(mfont);
         BaseXLayout.drawText(g, cr, tb.finish());
       }
     }
@@ -192,8 +191,7 @@ final class MapFS extends MapPainter {
     final int off = (16 << fullsize) + fullsize * 8;
 
     final byte[] text = tag ? name : data.text(pre);
-    g.setFont(tag ? fullsize == 1 ? GUIConstants.lfont : GUIConstants.font :
-      GUIConstants.mfont);
+    g.setFont(tag ? fullsize == 1 ? lfont : font : mfont);
 
     final Image img = file ? GUIFS.images(name, fullsize) : null;
     final int fh = g.getFontMetrics().getHeight();
@@ -214,7 +212,7 @@ final class MapFS extends MapPainter {
         final int h = BaseXLayout.calcHeight(g, rect, text);
         if(img != null) {
           if(!mark) {
-            g.setColor(GUIConstants.COLORS[rect.l + 1]);
+            g.setColor(COLORS[rect.l + 1]);
             g.fillRect(x + 1, rect.y + 1, w - 2, h - GUIProp.fontsize);
           }
           g.drawImage(img, x, rect.y + 2, view);
@@ -245,7 +243,7 @@ final class MapFS extends MapPainter {
         if(GUIFS.mime(name) == GUIFS.Type.IMAGE) return false;
 
         // Fullscreen Mode
-        g.setColor(GUIConstants.COLORS[rect.l + 2]);
+        g.setColor(COLORS[rect.l + 2]);
         g.fillRect(rect.x + 2, rect.y + 2, rect.w - 5, fh + 12);
         g.drawImage(img, rect.x + 6, rect.y + 6, view);
         rect.y += 18;
@@ -261,7 +259,7 @@ final class MapFS extends MapPainter {
         rect.w -= 10;
         final int sw = BaseXLayout.width(g, info);
         if(w + sw + 40 < rect.w) {
-          g.setColor(GUIConstants.COLORS[rect.l + 10]);
+          g.setColor(COLORS[rect.l + 10]);
           BaseXLayout.chopString(g, token(info),
               rect.x + rect.w - sw, rect.y, rect.w);
         }
@@ -293,7 +291,7 @@ final class MapFS extends MapPainter {
 
       if(!binary) {
         // approximate number of bytes that will be displayed
-        s = rect.h * rect.w / o * 4 / GUIConstants.mfwidth['A'];
+        s = rect.h * rect.w / o * 4 / mfwidth['A'];
 
         // minimize buffer size
         final File f = new File(string(path));
@@ -322,7 +320,7 @@ final class MapFS extends MapPainter {
     }
 
     // draw file contents or binary information
-    g.setFont(GUIConstants.mfont);
+    g.setFont(mfont);
     BaseXLayout.drawText(g, rect, fileBuf, (int) s, true);
     return false;
   }

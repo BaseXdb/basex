@@ -17,13 +17,13 @@ import org.basex.query.xpath.locpath.Step;
  */
 public final class FTSelect extends FTArrayExpr {
   /** FTPositionFilter. */
-  public FTPositionFilter ftpos;
+  public FTPosFilter ftpos;
   /**
    * Constructor.
    * @param e expressions
    * @param ftps FTPositionFilter
    */
-  public FTSelect(final FTArrayExpr e, final FTPositionFilter ftps) {
+  public FTSelect(final FTArrayExpr e, final FTPosFilter ftps) {
     exprs = new FTArrayExpr[] { e };
     ftpos = ftps;   
   }
@@ -45,7 +45,7 @@ public final class FTSelect extends FTArrayExpr {
   
   @Override
   public FTNode next(final XPContext ctx) {
-    final FTPositionFilter tmp = ctx.ftpos;
+    final FTPosFilter tmp = ctx.ftpos;
     ctx.ftpos = ftpos;
     FTNode ftn = exprs[0].next(ctx);
     
@@ -107,7 +107,7 @@ public final class FTSelect extends FTArrayExpr {
   
   @Override
   public Item eval(final XPContext ctx) throws QueryException {
-    final FTPositionFilter tmp = ctx.ftpos;
+    final FTPosFilter tmp = ctx.ftpos;
     ctx.ftpos = ftpos;
     ctx.ftpos.st = ctx.ftpos.pos.content || ctx.ftpos.pos.different 
       || ctx.ftpos.pos.end || ctx.ftpos.pos.ordered || ctx.ftpos.pos.same 
@@ -116,7 +116,7 @@ public final class FTSelect extends FTArrayExpr {
     ftpos.pos.init(ctx.ftitem);
     Item i = exprs[0].eval(ctx);
     ftpos.pos.setPos(ctx.ftpos.pos.getPos(), ctx.ftpos.pos.getPos().length);
-    if (!ctx.iu) i = Bln.get(i.bool() && seqEval());
+    if(!ctx.iu) i = Bln.get(i.bool() && seqEval());
     ctx.ftpos = tmp;
     if (ctx.ftpos != null) 
       ctx.ftpos.pos.setPos(ftpos.pos.getPos(), ftpos.pos.getPos().length);
@@ -169,7 +169,7 @@ public final class FTSelect extends FTArrayExpr {
    * @return int 
    */
   
-  public boolean checkSumUp(final FTPositionFilter ftpos1) {
+  public boolean checkSumUp(final FTPosFilter ftpos1) {
     return !ftpos.pos.ordered == !ftpos1.pos.ordered 
         && ftpos.window == null && ftpos1.window == null
         && ftpos.dist == null && ftpos.dist == null
@@ -183,12 +183,12 @@ public final class FTSelect extends FTArrayExpr {
   @Override
   public int indexSizes(final XPContext ctx, final Step curr, final int min) {
     
-    final FTPositionFilter tmp = ctx.ftpos;
+    final FTPosFilter tmp = ctx.ftpos;
     ctx.ftpos = ftpos;   
     final int n = exprs[0].indexSizes(ctx, curr, min);
     ctx.ftpos = tmp;
 
-    if (exprs[0] instanceof FTUnaryNot && n == 0) {
+    if (exprs[0] instanceof FTNot && n == 0) {
       // query looks like ftc ftnot "a" and "a" is not contained
       return Integer.MAX_VALUE;
     }
