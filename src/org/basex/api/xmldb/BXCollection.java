@@ -43,7 +43,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
    * @param name name of the database
    * @throws XMLDBException exception
    */
-  public BXCollection(String name) throws XMLDBException {
+  public BXCollection(final String name) throws XMLDBException {
     this(BXCollectionManagementService.create(name));
   }
 
@@ -121,7 +121,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
     throw new XMLDBException(ErrorCodes.UNKNOWN_RESOURCE_TYPE, ERR_TYPE + type);
   }
 
-  public void removeResource(Resource res) throws XMLDBException {
+  public void removeResource(final Resource res) throws XMLDBException {
     check();
 
     // resource is no relevant xml resource
@@ -177,7 +177,9 @@ public final class BXCollection implements Collection, BXXMLDBText {
     final Data data = ctx.data();
     final byte[] idd = Token.token(id);
     for(final int d : data.doc()) {
-      if(Token.eq(data.text(d), idd)) return new BXXMLResource(data, d, id, this);
+      if(Token.eq(data.text(d), idd)) {
+        return new BXXMLResource(data, d, id, this);
+      }
     }
     return null;
   }
@@ -188,6 +190,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
    * stored in the database, so it's advisable in general to specify
    * your own IDs.
    * @return id
+   * @throws XMLDBException exception
    */
   public String createId() throws XMLDBException {
     final String[] res = listResources();
@@ -218,8 +221,12 @@ public final class BXCollection implements Collection, BXXMLDBText {
 
   /**
    * Be aware what you're doing here..
+   * @param key key
+   * @param val value
+   * @throws XMLDBException exception
    */
-  public void setProperty(final String key, final String val) throws XMLDBException {
+  public void setProperty(final String key, final String val)
+      throws XMLDBException {
     check();
     try {
       final MetaData md = ctx.data().meta;
@@ -241,7 +248,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
   }
   
   /**
-   * Checks if the specified id exists in the specified id list
+   * Checks if the specified id exists in the specified id list.
    * @param list id list
    * @param id id to be found
    * @return result of check

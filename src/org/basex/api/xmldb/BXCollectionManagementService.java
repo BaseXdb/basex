@@ -1,6 +1,7 @@
 package org.basex.api.xmldb;
 
 import java.io.IOException;
+
 import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.core.Context;
@@ -16,26 +17,26 @@ import org.xmldb.api.modules.CollectionManagementService;
  * Implementation of the CollectionManagementService Interface for the
  * XMLDB:API. Note that a BaseX database has one collection at a time,
  * so creating a new collection creates a new database as well, and the
- * specified collection reference is reset every time a database is created. 
- * 
+ * specified collection reference is reset every time a database is created.
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler
  */
 public final class BXCollectionManagementService implements
     CollectionManagementService, BXXMLDBText {
-  
+
   /** Service constant. */
   static final String MANAGEMENT = "CollectionManagementService";
   /** Service constant. */
   static final String VERSION = "1.0";
   /** BXCollection col. */
   private Collection coll;
-  
+
   /**
    * Standard Constructor.
    * @param c Collection reference
    */
-  public BXCollectionManagementService(Collection c) {
+  public BXCollectionManagementService(final Collection c) {
     coll = c;
   }
 
@@ -46,14 +47,14 @@ public final class BXCollectionManagementService implements
    * @return collection
    * @throws XMLDBException exception
    */
-  public Collection createCollection(String name) throws XMLDBException {
+  public Collection createCollection(final String name) throws XMLDBException {
     coll = new BXCollection(create(name));
     return coll;
   }
 
   /**
    * Creates a new collection and returns the context.
-   * @param name
+   * @param name collection name
    * @return context
    * @throws XMLDBException exception
    */
@@ -63,7 +64,13 @@ public final class BXCollectionManagementService implements
       final Context ctx = new Context();
       final Parser p = new Parser(IO.get(name)) {
         @Override
-        public void parse(Builder build) { }
+        public void parse(final Builder build) { }
+        @Override
+        public String det() { return ""; }
+        @Override
+        public String head() { return ""; }
+        @Override
+        public double prog() { return 0; }
       };
       ctx.data(CreateDB.xml(p, name));
       return ctx;
@@ -72,7 +79,7 @@ public final class BXCollectionManagementService implements
     }
   }
 
-  public void removeCollection(String name) {
+  public void removeCollection(final String name) {
     // apply context reference to possibly close database first
     new DropDB(name).execute(((BXCollection) coll).ctx);
   }
@@ -85,7 +92,7 @@ public final class BXCollectionManagementService implements
     return VERSION;
   }
 
-  public void setCollection(Collection c) {
+  public void setCollection(final Collection c) {
     coll = c;
   }
 

@@ -368,10 +368,19 @@ public final class IterStreamReader implements XMLStreamReader {
     return false;
   }
 
+  /**
+   * Tests the validity of the specified types.
+   * @param valid input types
+   */
   private void checkType(final int... valid) {
     if(!isType(valid)) throw new IllegalStateException("Invalid Type: " + kind);
   }
 
+  /**
+   * Tests if one of the specified values matches the current kind.
+   * @param valid input types
+   * @return result of check
+   */
   private boolean isType(final int... valid) {
     for(final int v : valid) if(kind == v) return true;
     return false;
@@ -453,11 +462,19 @@ public final class IterStreamReader implements XMLStreamReader {
       finish(k, pa);
     }
 
+    /**
+     * Processes the end of an element.
+     */
     private void endElem() {
       node.set(pre[--l], Data.ELEM);
       kind = END_ELEMENT;
     }
 
+    /**
+     * Finishing step.
+     * @param k node kind
+     * @param pa parent reference
+     */
     private void finish(final int k, final int pa) {
       node.set(p, k);
       if(k == Data.ELEM) {

@@ -200,6 +200,13 @@ public class BXQStaticContext implements XQStaticContext {
     scrollable = check(mode, ARGR) == SCROLLTYPE_SCROLLABLE;
   }
 
+  /**
+   * Performs a value check.
+   * @param val input value
+   * @param msg error message
+   * @return specified input value
+   * @throws BXQException exception
+   */
   private int check(final int val, final String msg) throws BXQException {
     if(val != 1 && val != 2) throw new BXQException(ARG, msg);
     return val;

@@ -1,14 +1,15 @@
 package org.basex.api.xmldb;
 
 import static org.basex.Text.*;
+import org.basex.core.Context;
+import org.basex.core.Process;
+import org.basex.core.Prop;
+import org.basex.core.proc.Open;
+import org.basex.core.proc.Set;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.Database;
 import org.xmldb.api.base.ErrorCodes;
 import org.xmldb.api.base.XMLDBException;
-import org.basex.core.Context;
-import org.basex.core.Process;
-import org.basex.core.Prop;
-import org.basex.core.proc.*;
 
 /**
  * Implementation of the Database Interface for the XMLDB:API.
@@ -31,6 +32,12 @@ public final class BXDatabase implements Database, BXXMLDBText {
     return new Open(name).execute(ctx) ? new BXCollection(ctx) : null;
   }
 
+  /**
+   * Returns the name of a collection.
+   * @param uri input uri
+   * @return collection name
+   * @throws XMLDBException exception
+   */
   private String getCollectionName(final String uri) throws XMLDBException {
     // try to extract name of collection; otherwise, throw exception
     if(uri != null) {
@@ -44,7 +51,7 @@ public final class BXDatabase implements Database, BXXMLDBText {
     }
     throw new XMLDBException(ErrorCodes.INVALID_URI, ERR_URI + uri);
   }
-  
+
   public String getConformanceLevel() {
     return CONFORMANCE_LEVEL;
   }
@@ -61,7 +68,8 @@ public final class BXDatabase implements Database, BXXMLDBText {
     }
   }
 
-  public void setProperty(final String key, final String value) throws XMLDBException {
+  public void setProperty(final String key, final String value)
+      throws XMLDBException {
     final Process proc = new Set(key, value);
     if(!proc.execute(null)) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_PROP + key);

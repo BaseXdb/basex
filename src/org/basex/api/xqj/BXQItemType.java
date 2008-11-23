@@ -150,6 +150,11 @@ public final class BXQItemType implements XQItemType {
     return this;
   }
   
+  /**
+   * Matches the input types against the instance type. 
+   * @param types input types
+   * @throws BXQException exception
+   */
   private void check(final Type... types) throws BXQException {
     for(final Type t : types) if(type == t) return;
     throw new BXQException(TYPE);

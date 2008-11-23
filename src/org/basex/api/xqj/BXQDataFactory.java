@@ -69,6 +69,11 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     return new BXQItemType(Type.ATT, qn, it);
   }
   
+  /**
+   * Performs a type check for attribute operations.
+   * @param it input type
+   * @throws XQException exception
+   */
   private void checkAttr(final int it) throws XQException {
     if(it != XQItemType.XQBASETYPE_UNTYPED &&
         it != XQItemType.XQBASETYPE_ANYTYPE) return;

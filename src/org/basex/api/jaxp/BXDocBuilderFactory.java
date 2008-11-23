@@ -24,12 +24,12 @@ public class BXDocBuilderFactory extends DocumentBuilderFactory {
   }
 
   @Override
-  public void setAttribute(String name, Object value) {
+  public void setAttribute(final String name, final Object value) {
     BaseX.notimplemented();
   }
 
   @Override
-  public Object getAttribute(String name) {
+  public Object getAttribute(final String name) {
     BaseX.notimplemented();
     return null;
   }
@@ -41,7 +41,7 @@ public class BXDocBuilderFactory extends DocumentBuilderFactory {
   }
 
   @Override
-  public void setSchema(Schema grammar) {
+  public void setSchema(final Schema grammar) {
     BaseX.notimplemented();
   }
 
@@ -52,18 +52,18 @@ public class BXDocBuilderFactory extends DocumentBuilderFactory {
   }
 
   @Override
-  public void setXIncludeAware(boolean state) {
+  public void setXIncludeAware(final boolean state) {
     BaseX.notimplemented();
   }
 
   @Override
-  public boolean getFeature(String name) {
+  public boolean getFeature(final String name) {
     BaseX.notimplemented();
     return false;
   }
 
   @Override
-  public void setFeature(String name, boolean value) {
+  public void setFeature(final String name, final boolean value) {
     BaseX.notimplemented();
   }
   

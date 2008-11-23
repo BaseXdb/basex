@@ -68,6 +68,11 @@ public final class BXQPreparedExpression extends BXQDynamicContext
     return names;
   }
 
+  /**
+   * Returns the variable array.
+   * @return variables
+   * @throws XQException exception
+   */
   private Var[] getVariables() throws XQException {
     opened();
     final Vars vars = query.ctx.vars.getGlobal();

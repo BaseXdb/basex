@@ -195,7 +195,7 @@ public final class BXXMLResource implements XMLResource, BXXMLDBText {
     }
 
     @Override
-    public void characters(final char ac[], final int i, final int j)
+    public void characters(final char[] ac, final int i, final int j)
         throws SAXException {
       try {
         final TokenBuilder tb = new TokenBuilder();
@@ -222,7 +222,7 @@ public final class BXXMLResource implements XMLResource, BXXMLDBText {
     }
 
     @Override
-    public void ignorableWhitespace(final char ac[], final int i, final int j)
+    public void ignorableWhitespace(final char[] ac, final int i, final int j)
         throws SAXException {
       characters(ac, i, j);
     }

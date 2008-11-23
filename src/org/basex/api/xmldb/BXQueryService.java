@@ -51,7 +51,7 @@ public final class BXQueryService implements XPathQueryService, BXXMLDBText {
     else throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_NSURI + pre);
   }
 
-  public String getNamespace(String pre) {
+  public String getNamespace(final String pre) {
     return ns.get(pre == null ? "" : pre);
   }
 
