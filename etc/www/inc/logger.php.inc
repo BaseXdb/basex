@@ -8,7 +8,7 @@ if(!(preg_match("/googlebot/", $host) ||
      preg_match("/inktomisearch/", $host) ||
 		 preg_match("/phobos09/", $host))) 
 {
-    $fp = fopen("/www_io_mnt/ibh_wiki/images/basex.log", "a");
+    $fp = fopen("/www_io_mnt/gruen/bx/basex.log", "a");
     fwrite($fp, date('j.m.y, G:i')." Uhr [$addr, $host] $webpage\n");
     fclose($fp);
 }

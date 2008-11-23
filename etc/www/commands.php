@@ -1,121 +1,129 @@
-<? echo '<?xml version="1.0" encoding="ISO-8859-1" ?>';
-$subpageOf ="documentation.php";
-$webpage= basename($_SERVER['SCRIPT_NAME']);
-include("inc/header.inc");
-include("inc/nav.inc"); 
-?>
+<? $top ="documentation"; include("inc/header.inc"); ?>
 
-<!-- ===== ... ===== -->
-
-<div id="main">
-<h1>Documentation &ndash; Commands</h1>
-
-<p>Here you find the BaseX commands which you can enter in the console mode
-or in the Command text field in the GUI:</p>
-
-
-<h3>Help</h3>
 <p>
-<code>help [command]</code><br/>
-<br/>
-Get help on BaseX commands.
-If <code>[command]</code> is specified, information on the specific
-command is printed; otherwise, all commands are listed.
-If 'all' is specified, hidden commands are included.
-</p>
+Here you find the BaseX commands which you can enter in the console
+mode or in the Command text field in the GUI:</p>
 
-<h3>Create</h3>
+<a href="#bash">Bash</a> |
+<a href="#close">Close</a> |
+<a href="#copy">Copy</a> |
+<a href="#create">Create</a> |
+<a href="#cs">CS</a> |
+<a href="#delete">Delete</a> |
+<a href="#drop">Drop</a> |
+<a href="#export">Export</a> |
+<a href="#exit">Exit</a> |
+<a href="#find">Find</a> |
+<a href="#help">Help</a> |
+<a href="#info">Info</a> |
+<a href="#insert">Insert</a> |
+<a href="#list">List</a> |
+<a href="#open">Open</a> |
+<a href="#optimize">Optimize</a> |
+<a href="#set">Set</a> |
+<a href="#update">Update</a> |
+<a href="#xpath">XPath</a> |
+<a href="#xquery">XQuery</a>
+<p>&nbsp;</p>
+
+
+<h2>Database Commands</h2>
+
+<a name="create"></a><h3>Create</h3>
 <p>
-<code>create [xml|fs|index] [...]</code><br/>
-<br/>
-Create a database from XML or the filesystem, or create an index:
+<code>create [DB|FS|INDEX] [...]</code><br/><br/>
+Creates database from XML or filesystem, or creates index:
 <ul>
-<li><code>xml [file]</code>:<br/>
-Create a new database for the the XML document specified with <code>[file]</code>.<br/>
-The database will be named after the document name, excluding the suffix.
+<li><code>DB [path] [name?]</code>:<br/>
+Creates database <code>[name]</code> for the XML file or directory <code>[path]</code>.
 </li>
-<li><code>fs [database] [path]</code>:<br/>
-Create a database for the specified file <code>[path]</code>.<br/>
-The Database will be named <code>[database]</code>.</li>
-<li><code>index [text|attribute|word|fulltext]</code>:<br/>
-Create the specified index for the currently opened database.</li>
+<li><code>FS [path] [name]</code>:<br/>
+Creates filesystem database <code>[name]</code> for <code>[path]</code>.</li>
+<li><code>INDEX [TEXT|ATTRIBUTE|FULLTEXT]</code>:<br/>
+Creates the specified index.</li>
 </ul>
 </p>
 
-<h3>Open</h3>
+<a name="open"></a><h3>Open</h3>
 <p>
-<code>open [database]</code><br/>
+<code>open [database]</code>
+<br/>
 <p>
-Open the specified [database].
+Opens the specified [database].
 </p>
 
-<h3>Info</h3>
+<a name="info"></a><h3>Info</h3>
 <p>
-<code>info [database|index|table]?</code><br/>
+<code>info [DB|INDEX|TABLE]?</code><br/>
 <br/>
-Show information on the currently opened database:
+Shows information on the currently opened database:
 <ul>
-<li>no argument: show global information</li>
-<li><code>database</code>: show database information</li>
-<li><code>index</code>: show information on the existing indexes.</li>
-<li><code>table [start end | query]</code>: show the internal XML table representation for
-the specified numeric range <code>[start-end]</code>, or for the results of the
-specified <code>[query]</code></li>
+<li>no argument: shows global information</li>
+<li><code>DB</code>: shows database information</li>
+<li><code>INDEX</code>: shows index information.</li>
+<li><code>TABLE [start end] | [query]</code>: shows XML table</li>
 </ul>
 </p>
 
-<h3>Close</h3>
+<a name="close"></a><h3>Close</h3>
 <p>
-<code>close</code> <br/>
+<code>close</code>  <br/>
 <br/>
-Close the current database.
+Closes the current database.
 </p>
 
-<h3>List</h3>
+<a name="list"></a><h3>List</h3>
 <p>
-<code>list</code><br/>
+<code>list</code> <br/>
 <br/>
-List all available databases.
+Lists all available databases.
 </p>
 
-<h3>Drop</h3>
+<a name="drop"></a><h3>Drop</h3>
 <p>
-<code>drop [database|index] [...]</code><br/>
+<code>drop [DB|INDEX] [...]</code> <br/>
 <br/>
-Drop a database or an index:
+Drops a database or an index:
 <ul>
-<li><code>database [name]</code>:<br/>
-Drop the database specified with <code>[name]</code>.</li>
-<li><code>index [text|attribute|word|fulltext]</code>:<br/>
-Drop the specified index in the currently opened database.</li>
+<li><code>DB [name]</code>:<br/>
+Drops the database <code>[name]</code>.</li>
+<li><code>INDEX [TEXT|ATTRIBUTE|FULLTEXT]</code>:<br/>
+Drops the specified index.</li>
 </ul>
 </p>
 
-<h3>Export</h3>
+<a name="export"></a><h3>Export</h3>
 <p>
 <code>export [file]</code><br/>
 <br/>
-Export the current database or node set to an XML document, named <code>[file]</code>.
+Exports the current context set to an XML <code>[file]</code>.
 </p>
 
-<h3>XPath</h3>
+<a name="optimize"></a><h3>Optimize</h3>
+<p>
+<code>optimize</code><br/>
+<br/>
+Optimizes the current database structures.
+</p>
+
+<br/>
+<h2>Query Commands</h2>
+
+<a name="xpath"></a><h3>XPath</h3>
 <p>
 <code>xpath [query]</code><br/>
 <br/>
-Perform the specified XPath 1.0 <code>[query]</code> and print its result.
+Evaluates the specified XPath <code>[query]</code> and prints the result.
 </p>
 
-<h3>XQuery</h3>
+<a name="xquery"></a><h3>XQuery</h3>
 <p>
 <code>xquery [query]</code><br/>
 <br/>
-Perform the specified XQuery 1.0 <code>[query]</code> and print its result.
-The complete input is treated as XQuery, so no other commands are allowed
-in the same line. If no query is specified after the command, the query is
-created from the following inputs, finished by an empty.
+Evaluates an XQuery and prints the result.
 </p>
 
-<h3>Find</h3>
+<a name="find"></a><h3>Find</h3>
 <p>
 <code>find [query]</code><br/>
 <br/>
@@ -130,17 +138,27 @@ prefixes are supported:
 </ul>
 </p>
 
-<h3>CD</h3>
+<a name="cs"></a><h3>CS</h3>
 <p>
-<code>cd [query]</code><br/>
+<code>cs [query]</code><br/>
 <br/>
-Evaluate the <code>[query]</code> as XPath 1.0 and set the result as new 
-context set.
+Evaluates the specified XPath <code>[query]</code> and set the result
+as new context set.
 </p>
 
-<h3>Copy</h3>
+<a name="bash"></a><h3>Bash</h3>
 <p>
-<code>copy [pos] ["source"] ["target"]</code><br/>
+<code>bash</code><br/>
+<br/>
+Starts the bash mode.
+</p>
+
+<br/>
+<h2>Update Commands</h2>
+
+<a name="copy"></a><h3>Copy</h3>
+<p>
+<code>copy [pos] [source] [target]</code><br/>
 <br/>
 Copy database nodes.
 Evaluate the XPath 1.0 <code>[source]</code> query and insert the
@@ -150,7 +168,7 @@ is specified, the nodes are inserted as last child.
 The queries should be enclosed by brackets.
 </p>
 
-<h3>Delete</h3>
+<a name="delete"></a><h3>Delete</h3>
 <p>
 <code>delete ["target"]</code>
 <br/>
@@ -158,9 +176,9 @@ Delete database nodes resulting from the specified <code>[target]</code> query.
 The query should be enclosed by brackets.
 </p>
 
-<h3>Insert</h3>
+<a name="insert"></a><h3>Insert</h3>
 <p>
-<code>insert [fragment|element|attribute|text|comment|pi] [...]</code><br/>
+<code>insert [fragment|element|attribute|text|comment|pi] [...]</code> <br/>
 <br/>
 Insert database nodes.
 Insert a fragment or a specific node at the specified
@@ -182,9 +200,9 @@ Insert an XML <code>[frag]</code>.</li>
 </ul>
 </p>
 
-<h3>Update</h3>
+<a name="update"></a><h3>Update</h3>
 <p>
-<code>update [element|attribute|text|comment|pi] [...]</code><br/>
+<code>update [element|attribute|text|comment|pi] [...]</code> <br/>
 <br/>
 Update database nodes satisfying the specified <code>[target]</code> query.
 <ul>
@@ -203,9 +221,22 @@ Update the resulting processing instructions with the specified
 </ul>
 </p>
 
-<h3>Set</h3>
+<br/>
+<h2>General Commands</h2>
+
+<a name="help"></a><h3>Help</h3>
 <p>
-<code>set [option] [val]?</code><br/>
+<code>help [command]</code><br/>
+<br/>
+Get help on BaseX commands.
+If <code>[command]</code> is specified, information on the specific
+command is printed; otherwise, all commands are listed.
+If 'all' is specified, hidden commands are included.
+</p>
+
+<a name="set"></a><h3>Set</h3>
+<p>
+<code>set [option] [value?]</code> <br/>
 <br/>
 Sets global options. The currently set values can be shown with the
 <code>info</code> command. The following <code>[option]</code>s are
@@ -220,9 +251,7 @@ The following commands apply to the creation of new databases:<br/>&nbsp;
 <li><code>entity</code>: Parse XML entities.</li>
 <li><code>textindex</code>: : Index text nodes.</li>
 <li><code>attrindex</code>: : Index attribute values.</li>
-<li><code>wordindex</code>: Index all words (simplified full-text)</li>
 <li><code>ftindex</code>: Index full-text</li>
-<li><code>dbpath [path]</code>: Set a new database <code>[path]</code></li>
 </ul>
 
 The following commands apply to querying:<br/>&nbsp;
@@ -234,17 +263,13 @@ The following commands apply to querying:<br/>&nbsp;
 </ul>
 Have a look into the <a href='faq.php'>FAQ</a> to find
 more information on the available options.
-<br/>&nbsp;
 </p>
 
-<h3>Exit</h3>
+<a name="exit"></a><h3>Exit</h3>
 <p>
-<code>exit/quit </code><br/>
+<code>exit/quit </code> <br/>
 <br/>
 Leave the console mode of BaseX.
 </p>
 
-<!-- ===== ... ===== -->
-                
-<? include("inc/footer.inc"); ?> 
-
+<? include("inc/footer.inc"); ?>

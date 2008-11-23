@@ -1,77 +1,72 @@
-<?php
+<? print "<?xml version='1.0' encoding='UTF-8' ?>\n";
+$id = preg_replace('/.*\/(.*)\.php/','$1',$_SERVER[SCRIPT_NAME]);
 
-$pages = array( "index.php" => "Processing and Visualizing XML Data", 
-				"documentation.php" => "Documentation",
-				"commands.php" => "Commands",
-				"xml.php" => "Create a Database",
-				"fs.php" => "Import your Filesystem",
-				"faq.php" => "FAQ",
-				"frontend.php" => "Frontend",
-				"xpath.php" => "XPath Example",
-				"xquery.php" => "XQuery Example",
-				"download.php" => "Downloads",
-				"publications.php" => "Publications",	
-				"contact.php" => "Contact");
+$links = array("index", "download", "documentation",
+  "frontend", "publications", "contact");
 
-$title = $pages[$webpage];
+$titles = array(
+  "index" => "Home",
+  "download" => "Download",
+  "documentation" => "Documentation",
+  "frontend" => "Visual BaseX",
+  "publications" => "Publications",
+  "contact" => "Contact"
+);
 
-$header .= '
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/2001/REC-xhtml11-20010531/DTD/xhtml11-flat.dtd">
+$desc = array(
+  "index" => "What's that BaseX thing?",
+  "download" => "Get it on your own system!",
+  "documentation" => "How can I use it?",
+  "frontend" => "Have a look.",
+  "publications" => "Reports and presentations about BaseX",
+  "contact" => "Guys behind the project"
+);
+
+$pages[$top ? $top : $id] = 'selected';
+if(!$title) $title = $titles[$top ? $top : $id];
+
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Pristine 1.0, Design copyright Matt Dibb 2006, www.mdibb.net -->
+<head>
+<? print $meta; ?>
+  <meta http-equiv="Content-Language" content="en-us"/>
+  <meta name="author" content="BaseX Team"/>
+  <meta name="description" content="BaseX - Processing and Visualizing XML Data"/>
+  <meta name="keywords" content="BaseX,XML,XQuery,Database,Fulltext,Visualization"/>
+  <meta name="robots" content="all"/>
+  <base href="http://www.inf.uni-konstanz.de/dbis/basex/"/>
+  <link rel="stylesheet" type="text/css" href="style.css" />
+  <link rel="SHORTCUT ICON" href="gfx/BaseX.ico" type="image/ico" />
+  <title>BaseX &ndash; <? print $title; ?></title>
+</head>
+<body <? if($load) print "onLoad='$load'"; ?>>
+  <div id="content">
+    <div id="header">
+      <a href="index.php"><img src="gfx/BaseX.png" alt="BaseX Logo"/></a>
+      <p>Processing and Visualizing XML Data<br/>with a native XML Database</p>
+    </div>
+    <div id="body">
+    <div id='links'><p>
+<?
+foreach($links as $l) {
+	print "<span".($pages[$l] ? " class='$pages[$l]'" : "").">";
+	print "<a href='$l.php'>$titles[$l]</a></span><br/>\n";
+	print "$desc[$l]<br/><br/>\n";
+}
 
-<!--
-    
-    Pristine 1.0
-    
-    Design copyright Matt Dibb 2006
-    www.mdibb.net
+?>
+    </p></div>
+    <div id="main">
+<?
+  $fn = "inc/".($top ? $top : $id).".inc";
+  if(file_exists($fn)) {
+		include($fn);
+	} else {
+    print "$img<h1>$title</h1>\n";
+	}
 
-    Please feel free to use and modify this template for use on your site.  I
-dont mind if you use it for your personal site or a commercial site, but I do
-insist that it is not sold or given away in some "50,000 Templates!" package
-or something like that.
+?>
 
--->
-
-    <head>
-				'.$meta.'
-		    <meta http-equiv="Content-Language" content="en-us"/>
-        <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-		    <meta name="author" content="BaseX Team"/>
-		    <meta name="description" content="BaseX - Processing and Visualizing XML Data"/>
-		    <meta name="keywords" content="BaseX,XML,XQuery,Database,Fulltext,Visualization"/>
-		    <meta name="robots" content="all"/>
-        <link rel="stylesheet" type="text/css" href="style.css" />
-        <link rel="SHORTCUT ICON"
-				     href="http://www.inf.uni-konstanz.de/dbis/basex/gfx/BaseX.ico"
-						 type="image/ico" />
-				<title>BaseX - '.$title.'</title>
-    </head>
-    
-    <body>
-    
-        <div id="content"> <!-- is closed in footer.php -->
-<!--
-            <div id="search">
-                <form action="..." method="get">
-                    <p>search:&nbsp;<input type="text" />&nbsp;
-                        <input type="image" src="gfx/zoom.jpg" value="Submit" alt="Search" title="Search" />
-                    </p>
-                </form>
-            </div>
--->
-            <div id="header">
-	        <a href="index.php"><img src="gfx/BaseX.png" alt="BaseX Logo"/></a>
-                <p>Processing and Visualizing XML Data<br/>with a native XML Database</p>
-            </div>
-
-            <div id="body">
-';
-            
-            
-echo <<< EOT
-
-	$header
-
-EOT;
-?>            

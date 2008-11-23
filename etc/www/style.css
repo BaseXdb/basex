@@ -16,9 +16,9 @@ body {
 
 #header {
   margin        : 0px;
-  padding-top   : 5px;  
+  padding-top   : 5px;
   width         : 850px;
-	height        : 105px;
+        height        : 105px;
   color         : #999999;
   background    : #FFFFFF;
 }
@@ -38,8 +38,8 @@ body {
 }
 
 #header input {
-  margin-top : -17px; 
-  text-align : right;  
+  margin-top : -17px;
+  text-align : right;
 }
 
 #search {
@@ -49,7 +49,7 @@ body {
   float       : right;
   font-size   : 80%;
   color       : #999999;
-  background  : #FFFFFF;  
+  background  : #FFFFFF;
 }
 
 #body {
@@ -62,13 +62,31 @@ body {
   text-decoration : none;
 }
 
+#main a.download {
+    padding-left: 22px;
+    background: url(gfx/download.gif) no-repeat;
+    background-position:0px -2px;
+}
+
+#main a.pdf {
+    padding-left: 22px;
+    background: url(gfx/file-pdf.png) no-repeat;
+    background-position:0px 0px;
+}
+
+p.arrow{
+    padding-left: 18px;
+    background: url(gfx/arrow.png) no-repeat;
+    background-position:0px 3px;
+}
+
 table {
   margin: 0px 0px 0px 0px;
   padding: 0px 0px 0px 0px;
 }
 
 b {
-	font-weight : bold;
+        font-weight : bold;
   color       : #555555;
 }
 
@@ -126,18 +144,18 @@ dl {
 }
 
 #links .selected a {
-	  font-weight    : bold;
+          font-weight    : bold;
 }
 
 #sublinks a
 {
-	font-size   : 100%;
-	margin-left : 10px;
-}	
+        font-size   : 100%;
+        margin-left : 10px;
+}
 
 #main {
-  margin          	: 5px 5px 5px 160px;
-  padding          	: 15px 15px 15px 25px;
+  margin                  : 5px 5px 5px 160px;
+  padding                  : 15px 15px 15px 25px;
   border-left       : 1px solid #999999;
   min-height        : 380px;
 }
@@ -170,7 +188,7 @@ dl {
   font-size   : 110%;
   color       : #000;
   margin-top  : 10px;
-	font-weight : bold;
+        font-weight : bold;
   color       : #555555;
 }
 
@@ -185,23 +203,18 @@ code {
 }
 
 /* Java Beispiele*/
+.orange { color : #C75200; }
+.comment { color : #00AC00; }
+.red { color : #C51B00; }
+.blue { color : #001BC0; }
 
-.orange {
-	  color         : #E77200;
-}
-.comment {
-	  color         : #00AC00;
-}
-.red {
-	  color         : #F51B00;
-}
 /* Code wird in anderer schrift dargestellt */
 #main .docexample {
   color         : #000000;
   font-family   : Monospace, sans-serif;
   font-size     : 100%;
-  margin		: 20px 20px 20px 20px;
-	
+  margin                : 20px 20px 20px 20px;
+
 }
 .monospace {
   font-family   : Monospace, sans-serif;
@@ -218,15 +231,13 @@ code {
   display:block;height: 1px; overflow: hidden; background: #ffff80;
 }
 #main .box a {
-	  color           : #E00000;
-	  background      : #FFFFFF;
-	  text-decoration : none;
-	  background: #ffff80;
+          color           : #E00000;
+          background      : #FFFFFF;
+          text-decoration : none;
+          background: #ffff80;
 }
 
 #main .box .r1{margin: 0 5px;}
 #main .box .r2{margin: 0 3px;}
 #main .box .r3{margin: 0 2px;}
 #main .box .top .r4, .box .bottom .r4{margin: 0 1px;height: 2px;}
-
-

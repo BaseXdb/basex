@@ -1,15 +1,10 @@
-<? echo '<?xml version="1.0" encoding="ISO-8859-1" ?>';
-$webpage= "contact.php";
+<?
 include("inc/header.inc");
-include("inc/nav.inc"); 
 ?>
-
-<!-- ===== contact ===== -->
-
-<div id="main">
-<h1>Contact</h1>
-    <p>Feel free to send an email to <code>info@basex.org</code> to get more information.<br/>
-    You find further information on the project on our <a
+    <p>Feel free to send an email to <code>info@basex.org</code>
+		to get more information, or use the
+		<a href="form.php">contact form</a>.<br/>
+    You find further information on on our <a
 href="http://www.informatik.uni-konstanz.de/arbeitsgruppen/dbis/">University Site</a>.
     </p>
 
@@ -22,15 +17,18 @@ just drop an e-mail or come around.
     <p>
       If you like to work with us, maybe it is of interest for you to get some
 internal facts from your fellow students:
-    </p> 
+    </p>
 
     <ul>
-      <li>Sebastian Gath (M. Sc. Cand.) works on fulltext indexes</li>
-      <li>Lukas Kircher (B.Sc. Cand.) works on two-dimensional XML visualizations</li>
-      <li>Andreas Weiler (M. Sc. Cand.) works on DTD and XMLDB API support</li>
-      <li>Sebastian Faller (M. Sc. Cand.) works on View Schemas, Layout Views</li>
-      <li>J&ouml;rg Hauser (B.Sc. Cand.) works on TreeMap Layouts</li>
-      <li>Hannes Schwarz (M. Sc. Cand.) works on BX Filesystem Commands</li>
+      <li>Sebastian Faller (M. Sc. Cand.) works on advanced Table Views</li>
+      <li>Sebastian Gath (M. Sc. Cand.) works on XPath/XQuery Full-Text</li>
+      <li>J&ouml;rg Hauser (B.Sc. Cand.) works on efficient TreeMap Layouts</li>
+      <li>Lukas Kircher (B.Sc. Cand.) works on the Plot visualization</li>
+      <li>Wolfgang Miller (B.Sc. Cand.) works on a tree visualization</li>
+      <li>Xuan Moc (M.Sc. Cand.) works on Java NIO support</li>
+      <li>Dennis Stratmann (B.Sc. Cand.) works on XQuery pipelining</li>
+      <li>Andreas Weiler (M. Sc. Cand.) works on the XMLDB API</li>
+      <li>Philipp Ziemer (B.Sc. Cand.) works on tree visualization</li>
     </ul>
 
     <h2>Alumni</h2>
@@ -38,11 +36,5 @@ internal facts from your fellow students:
         <li>Tim Petrowsky (B.Sc.)</li>
         <li>Tobias Pflug (B.Sc.)</li>
     </ul>
-      
-</div>
-                
-<!-- ===== contact ===== -->
-                
 
 <? include("inc/footer.inc"); ?>
-

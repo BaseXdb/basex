@@ -1,27 +1,17 @@
-<? echo '<?xml version="1.0" encoding="ISO-8859-1" ?>';
-$subpageOf ="documentation.php";
-$webpage= "faq.php";
-include("inc/header.inc");
-include("inc/nav.inc"); 
-?>
+<? $top ="documentation"; include("inc/header.inc"); ?>
 
-<!-- ===== FAQ Section (should be later be generated ===== -->
-
-<div id="main">
-<h1>Documentation &ndash; FAQ</h1>
-
+<p>
 If you can't find an answer on your question, please write to<code> info@basex.org</code>.
-
+</p>
 <p>
 <b><a href="#1">1 Introduction</a></b><br/>
 <a href="#1.1">1.1 What is BaseX? </a><br/>
 <a href="#1.2">1.2 On what systems does BaseX run? </a><br/>
 <a href="#1.3">1.3 Who maintains BaseX? </a><br/>
-<a href="#1.4">1.4 What is new in BaseX 4.0? </a><br/>
-<a href="#1.5">1.5 Where to get the latest version?</a><br/>
-<a href="#1.6">1.6 Where do I find the source code?</a><br/>
-<a href="#1.7">1.7 How can I help/contribute?</a><br/>
-<a href="#1.8">1.8 I found a bug, how do I file bug report?</a><br/>
+<a href="#1.4">1.5 Where to get the latest version?</a><br/>
+<a href="#1.5">1.6 Where do I find the source code?</a><br/>
+<a href="#1.6">1.7 How can I help/contribute?</a><br/>
+<a href="#1.7">1.8 I found a bug, how do I file bug report?</a><br/>
 
 <br/><b><a href="#2">2 BaseX Console</a></b><br/>
 <a href="#2.1">2.1 How can I launch the console mode of BaseX?</a><br/>
@@ -32,10 +22,8 @@ If you can't find an answer on your question, please write to<code> info@basex.o
 <a href="#2.6">2.6 How can i display the name of attributes?</a><br/>
 
 <br/><b><a href="#3">3 BaseX GUI</a></b><br/>
-<dl>
-<dt><a href="#3.1">3.1 Views and Panels</a><br/></dt>
-<dd><a href="#3.1.1">3.1.1 How many views are there and what do they do?</a><br/>
-<dt><a href="#3.2">3.2 What is realtime filtering?</a><br/></dt>
+<a href="#3.1">3.1 Views and Panels</a><br/>
+<a href="#3.2">3.2 What is realtime filtering?</a><br/>
 <a href="#3.3">3.3 What does the Filter button exactly do?</a><br/>
 <a href="#3.4">3.4 How can I search without XPath/XQuery?</a><br/>
 <a href="#3.5">3.5 Is the Search field in the Query panel the same as the Search field right under the buttons?</a><br/>
@@ -43,19 +31,19 @@ If you can't find an answer on your question, please write to<code> info@basex.o
 <a href="#3.7">3.7 What is the Main-Memory Mode?</a><br/>
 <a href="#3.8">3.8 How can I import my file system?</a><br/>
 <a href="#3.9">3.9 How can I import my data?</a><br/>
-</dl>
 
 <br/><b><a href="#4">4 General Issues</a></b><br/>
 <a href="#4.1">4.1 What additional files (config etc.) does BaseX use and where are they?</a><br/>
 <a href="#4.2">4.2 How do you measure the performance of the queries?</a><br/>
 <a href="#4.3">4.3 What indexing techniques are available and what do they do?</a><br/>
-<a href="#4.5">4.4 Is it possible to start BaseX as a Server?</a><br/>
+<a href="#4.4">4.4 Is it possible to start BaseX as a Server?</a><br/>
 
 <br/><b><a href="#5">5 Features</a></b><br/>
 <a href="#5.1">5.1 Can I have more information on the XPath/XQuery implementations?</a><br/>
 <a href="#5.2">5.2 OK, you support several Indexes. What exactly can I use and how?</a><br/>
-<a href="#5.3">5.3 Tell me more about XQuery Full-Text. How can I use it?</a><br/>
-<a href="#5.4">5.4 How do you support XML Updates. Do you accomplish any standard?</a><br/> 
+<a href="#5.3">5.3 What about the different indexes BaseX offers: which data structures are applied?</a><br/>
+<a href="#5.4">5.4 Tell me more about XQuery Full-Text. How can I use it?</a><br/>
+<a href="#5.5">5.5 Do you support XML Updates?</a><br/>
 </p>
 
 <p><br/></p>
@@ -67,14 +55,6 @@ If you can't find an answer on your question, please write to<code> info@basex.o
 BaseX is a native XML database.  It features an XPath/XQuery implementation,
 supports updates and has a visual frontend, facilitating visual access to the
 stored data.
-<!--
-<br/>
-<li/>BaseX is an interactive and innovative exploration and editing tool for XML files or filesystems.<br/>
-<li/>BaseX provides an effective and efficient way to display XML files 
-or filesystems as normal tree, treemap or table.
-In these 3 different visualizations it's possible to explore and edit the data very easy.<br/>
-<li/>BaseX is fully implemented in Java and platform-independent.
--->
 </p>
 
 <a name="1.2"></a><h3>1.2 On what systems does BaseX run? </h3>
@@ -90,31 +70,17 @@ Debian) and OpenBSD (4.2).
 <p>
 BaseX is developed by the <a href="http://www.inf.uni-konstanz.de/dbis">Database and Information Systems Group</a> at the University of Konstanz.
 Main developer and project leader is <a href="http://www.inf.uni-konstanz.de/~gruen">Christian Gr&uuml;n</a>.
-Several <a href="contact.php">students and other group members</a> have contributed to
-the project.
-</b>
+Several <a href="contact.php">group members</a> 
+are contributing to the project.
+</p>
 
-<a name="1.4"></a><h3>1.4 What is new in BaseX 4.0? </h3>
-This version of BaseX offers many new features such as...
-<ul>
- <li> Support of <b>XQuery 1.0</b>, reaching 99.3% of the W3C XQuery Test Suite</li>
-  <li> Partial support of <b>XQuery Full-Text</b>, based on the W3C working draft</li>
-	 <li> Several <b>Indexes</b>, including a full-text index<br/>
-   (currently only applied by the XPath 1.0 implementation)</li>
-   <li> GUI interactions for <b>XML Updates</b></li>
-	 <li> A <b>Query Panel</b> has been added for entering XPath and XQuery</li>
-   <li> A <b>Table View</b> allows a flat view of regular XML documents</li>
-   <li> A <b>Help View</b> offers interactive feedback on the GUI features</li>
-   <li> A revised <b>command syntax</b> (try 'help' in the console or the GUI command mode)</li>
-</ul>
-
-<a name="1.5"></a><h3>1.5 Where to get the latest version?</h3>
+<a name="1.4"></a><h3>1.4 Where to get the latest version?</h3>
 <p>
 The latest version is found at <a href='download.php'>www.basex.org</a>
 and on the <a href="http://sourceforge.net/projects/basex">Sourceforge Project Site</a>.
 </p>
 
-<a name="1.6"></a><h3>1.6 Is there access to the source code?</h3>
+<a name="1.5"></a><h3>1.5 Is there access to the source code?</h3>
 <p>
 The BaseX sources are available in a Subversion repository via Sourceforge.
 <a href="http://sourceforge.net/projects/basex">Sourceforge Project Site</a>.
@@ -122,7 +88,7 @@ You also find them as part of the complete, zipped distribution of BaseX:
 <a href="http://sourceforge.net/projects/BaseX-Complete.zip">BaseX-Complete.zip</a>
 </p>
 
-<a name="1.7"></a><h3>1.7 How can I help/contribute?</h3>
+<a name="1.6"></a><h3>1.6 How can I help/contribute?</h3>
 <p>
 BaseX is still work in progress. So we are definitely interested in all kind
 of experiences you gain during usage. Please provide feedback, bug reports,
@@ -130,11 +96,10 @@ report about missing features, your application domain. This all can be done
 by posting to <code>info@basex.org</code>.
 </p>
 
-<a name="1.8"></a><h3>1.8 I found a bug, how do I file bug report?</h3>
+<a name="1.7"></a><h3>1.7 I found a bug, how do I file bug report?</h3>
 <p>
 There is a bug reporting system on SourceForge. Otherwise send an email to <code>info@basex.org</code>.
 </p>
-
 
 <a name="2"></a><h2>2 BaseX Console</h2>
 
@@ -143,11 +108,12 @@ There is a bug reporting system on SourceForge. Otherwise send an email to <code
 Just enter<code> java -cp BaseX.jar org.base.BaseX </code>on the command line.
 The Java option<code> -Xmx... </code>reserve more memory, and the<code> -h </code>
 flag of BaseX lists all available flags:
+</p>
 <blockquote>
 <code>
 java -Xmx512m -cp BaseX.jar org.basex.BaseX -h
 
-BaseX 4.0; DBIS, University of Konstanz
+BaseX 5.0; DBIS, University of Konstanz
 Usage: BaseX [options] [query]
   [query]    specify query file
   -c         chop whitespaces
@@ -155,30 +121,28 @@ Usage: BaseX [options] [query]
   -e         skip entity parsing
   -o [file]  specify output file
   -p         handle query file as XPath
-  -q<cmd>    send BaseX commands
+  -q         send BaseX commands
   -v/V       show (all) process info
   -x         print result as xml
   -z         skip query output
 
 </code>
 </blockquote>
-</p>
 
 <a name="2.2"></a><h3>2.2 What can I do in the console mode?</h3>
 <p>
-Type in<code> help </code> to get a list of all 
+Type in<code> help </code> to get a list of all
 <a href="commands.php">BaseX commands</a>. Several commands can
 be separated by semicolons. To evaluate commands
 without entering the console mode, you can use the
-<code>-q</code> option on the command line: 
-
-
+<code>-q</code> option on the command line:
+</p>
 <blockquote>
 <pre>
-java -jar BaseX.jar -vq "create xml input.xml; xpath /"
+java -Xmx512m -cp BaseX.jar org.basex.BaseX -vq "create xml input.xml; xpath /"
 
 Process Info ON
-Database created in 195.2 ms.
+Database 'input' created in 155.17 ms.
 &lt;html&gt;
   &lt;!-- Header --&gt;
   &lt;head id="0"&gt;
@@ -197,15 +161,15 @@ Database created in 195.2 ms.
   &lt;/body&gt;
 &lt;/html&gt;
 
-Compiling : 43.28 ms
-Evaluating: 0.15 ms
-Printing  : 10.7 ms
-Total Time: 106.64 ms
+Parsing   : 110.35 ms
+Compiling : 0.81 ms
+Evaluating: 0.05 ms
+Printing  : 2.06 ms
+Total Time: 113.35 ms
 Results   : 1 Item
 Printed   : 360 Bytes
 </pre>
 </blockquote>
-</p>
 
 <a name="2.3"></a><h3>2.3 What is XPath/XQuery?</h3>
 <ul>
@@ -213,7 +177,7 @@ Printed   : 360 Bytes
 XML document. XPath is used to navigate through elements and attributes
 in an XML document
 (<a href="http://www.w3.org/TR/xpath">XPath - W3C Website</a>).</li>
-  <li/> XQuery is a complete query language from the W3C that
+  <li> XQuery is a complete query language from the W3C that
 provides an easy way to query, transform, and integrate XML data.
 (<a href="http://www.w3.org/TR/xquery">XQuery - W3C Website</a>).</li>
 </ul>
@@ -235,23 +199,14 @@ replace tags with @name attributes.</div>
 <a name="3"></a><h2>3 BaseX GUI</h2>
 
 <a name="3.1"></a><h3>3.1 Views and Panels</h3>
-
-<a name="3.1.1"></a><h4>3.1.1 How many views are there and what do they do?</h4>
-<div>
 <div>
   <dl>
-    <dt>Query View</dt>
-    <dd>Executes XPath, XQuery and simple queries to explore the xml document.</dd>
-
-    <dt>Query Info View</dt>
-    <dd>Displays information on the compilation and evaluation of an XPath or XQuery request, including some simple profiling.</dd>
-
     <dt>Text View</dt>
     <dd>Displays query results and other textual output.</dd>
 
     <dt>Map View</dt>
     <dd>This visualization represents all data in a TreeMap. All nodes of the XML document
-		are represented as rectangles, filling the complete area.</dd>
+                are represented as rectangles, filling the complete area.</dd>
 
     <dt>Tree View</dt>
     <dd>This visualization displays all XML nodes in a usual tree view.</dd>
@@ -259,8 +214,8 @@ replace tags with @name attributes.</div>
     <dt>Table View</dt>
     <dd>This visualization displays all XML nodes in a table with rows and columns.</dd>
 
-    <dt>Help View</dt>
-    <dd>This view provides context sensitive information to use all the BaseX features.</dd>
+    <dt>Scatterplot View</dt>
+    <dd>This visualizations displays all XML nodes in a scatterplot.</dd>
   </dl>
 </div>
 
@@ -274,7 +229,7 @@ in the visualizations and can be ecplicitly filtered using the 'Filter' button.
 <a name="3.3"></a><h3>3.3 What does the Filter button exactly do?</h3>
 <div>
 After pressing this button, the visualizations display the previously highlighted
-XML nodes, omitting all the other nodes of the document. 
+XML nodes, omitting all the other nodes of the document.
 If realtime filtering is enabled, the Filter button will be disabled, and
 all results are automatically filtered.
 </div>
@@ -366,11 +321,13 @@ in the same directory. This path can't be changed by the user.</li>
 
 <a name="4.2"></a><h3>4.2 How do you measure the performance of the queries?</h3>
 <div>
-The measurements include the compilation, evaluation and printing time of a query.
-There are different ways to get the performance information:
+The measurements include parsing, compilation, evaluation and
+printing time of a query.
+There are different ways to retrieve the performance info:
 <ul>
-<li>Console: use "-v" flag as command line argument<</li>
-<li>Console Mode: enter "set info" or "set info all" in the console mode</li>
+<li>Console: use "-v" flag as command line argument</li>
+<li>Console Mode: enter <code>set info</code> or
+  <code>set info all</code" in the console mode</li>
 <li>GUI Mode: display performance results in the QueryInfo view</li>
 </ul>
 </div>
@@ -380,13 +337,14 @@ There are different ways to get the performance information:
 Indexes can speedup queries by magnitudes.
 Currently, four indexes exist:<br/>
 <ul>
-<li/> Text Index: All text nodes are indexed to speedup XPath predicates.<br/>
-<li/> Attribute Value Index: All attributes are indexed to speedup XPath predicates.<br/>
-<li/> Word Index: All terms in text nodes are indexed to speedup word based queries.<br/>
-<li/> Fulltext Index: A full-fledged fulltext index is created to speedup fulltext queries in XPath.<br/>
+<li> Text Index: All text nodes are indexed to speedup XPath predicates.</li>
+<li> Attribute Value Index: All attributes are indexed to speedup XPath predicates.</li>
+<li> Full-Text Index: A full-text index is created to speedup content based queries in XPath.</li>
 </ul>
-Note that the indexes only speedup XPath and simple user queries.
-Currently, XQuery does not make use of the indexes.<br/>
+Note that the indexes only speedup XPath and simple user queries. The
+query processor will optimize queries completely automatic whenever
+possible. Expect XQuery to make use of the indexes in the next official
+release.<br/>
 </div>
 
 <a name="4.4"></a><h3>4.4 Is it possible to start BaseX as a Server?</h3>
@@ -396,76 +354,132 @@ in a Client/Server environment:
 <blockquote>
 <div>
 <h3>Server</h3>
-To start BaseX in server mode, just type:<br/><br/>
-<code>java -cp BaseX.jar org.basex.BaseXServer</code><br/>
-<h3>Client</h3>
-To run a BaseX client, please type:<br/><br/>
-<code>java -cp BaseX.jar org.basex.BaseXClient -s server.org</code><br/><br/>
-The<code> -s </code> flag specifies the computer on which the server is running.<br/>
-To list all available flags, just add<code> -h </code>to the call, e.g.:
+To start BaseX in server mode, type in:<br/><br/>
+<code>java -cp BaseX.jar org.basex.BaseXServer</code><br/><br/>
+If BaseXServer is succesfully started this is coming up:<br/><br/>
+<code>BaseXServer 5.0 Server started.</code><br/>
+<code>Waiting for requests...</code><br/><br/>
+To list all available flags, add<code> -h </code>to the call, e.g.:
 <pre>
 java -cp BaseX.jar org.basex.BaseXServer -h
 
-BaseX 4.0; DBIS, University of Konstanz
+BaseX 5.0; DBIS, University of Konstanz
 Usage: java BaseXServer [options]
  stop     stop server
  -d       debug mode
  -h       show this help
  -p&lt;port&gt; specify server port
+ -v       verbose mode
+</pre>
+
+<h3>Client</h3>
+To run a BaseX client, please type:<br/><br/>
+<code>java -cp BaseX.jar org.basex.BaseXClient -s server.org</code><br/><br/>
+The<code> -s </code> flag specifies the computer on which the server is running.<br/>
+If BaseXClient is succesfully connected to a BaseXServer this is coming up:<br/><br/>
+<code>BaseX 5.0 [Client]</code><br/>
+<code>Try "help" to get some information.</code><br/><br/>
+To list all available flags, just add<code> -h </code>to the call, e.g.:
+<pre>
+java -cp BaseX.jar org.basex.BaseXClient -h
+
+BaseX 5.0; DBIS, University of Konstanz
+Usage: BaseXClient [options] [query]
+ -d        debug mode
+ -h        show this help
+ -o [file] specify output file
+ -p&lt;port&gt;  specify server port
+ -q&lt;cmd&gt;   send BaseX commands
+ -s&lt;name&gt;  specify server name
+ -v/V      show (all) process info
+ -x        print result as xml
+ -z        skip query output
 </pre>
 
 </div></blockquote>
 
 <a name="5"></a><h2>5 Features</h2>
 <a name="5.1"></a><h3>5.1 Can I have more information on the XPath/XQuery implementations?</h3>
-Note that, in BaseX, XPath and XQuery are based on different implementations. Whereas XPath was
-especially tuned for efficient querying, XQuery strives for a high conformity with the
-XQuery standard. As soon as our XQuery implementation includes the optimizations that have
-been applied to XPath, the XPath implementation might get obsolete. 
+In BaseX, XPath and XQuery are based on different implementations. Whereas XPath was
+especially tuned for efficient querying, XQuery strives for a high standard conformance.
+As soon as the XQuery implementation includes the optimizations that have
+been applied to XPath, the XPath implementation might get obsolete.
 
 <a name="5.2"></a><h3>5.2 OK, you support several Indexes. What exactly can I use and how?</h3>
-Text indexes allow a speedup of order of magnitudes for text-based queries. Currently, the
-indexes are only utilized by XPath queries. For example, the following query will be internally
-rewritten to access the the text index first:
+Text indexes allow a speedup of order of magnitudes for text-based queries.
+Here are some examples for queries which are rewritten for index access:
 
-<blockquote>
+<h3>Text-Based Queries:</h3>
+<ul>
+<li><code>//node()[text() = 'Usability']</code></li>
+<li><code>//div[p = 'Usability' or p = 'Testing']</code></li>
+<li><code>path/to/relevant[text() = 'Usability Testing']/and/so/on</code></li>
+</ul>
+<h3>Attribute Index:</h3>
+<ul>
+<li><code>//node()[@align = 'right']</code></li>
+<li><code>descendant::elem[@id = '1']</code></li>
+<li><code>range/query[@id &gt;= 1 and @id &lt;= 5]</code></li>
+</ul>
+<h3>Full-Text Index:</h3>
+<ul>
+<li><code>//node[text() ftcontains 'Usability']</code></li>
+<li><code>//node[text() ftcontains 'Usebiliti' with fuzzy]</code></li>
+<li><code>//book[chapter ftcontains ('web' ftor 'WWW' without stemming) ftand 'diversity'
+ case sensitive with stemming distance at most 5 words]</code></li>
+</ul>
+The full-text index is optimized to support all full-text
+features of the XQuery Full-Text recommendation.<br/><br/>
+BaseX extends the specification by offering a fuzzy match option.
+Fuzzy search is based on the Levenshtein algorithm; the longer
+query terms are, the more errors will be tolerated.
+<br/><br/>
+Default "Case Sensitivity", "Stemming" and "Diacritics" options 
+will be considered in the index creation. Consequently, all queries
+will be sped up which use the default index options.
+
+<a name="5.3"></a><h3>5.3 What about the different indexes BaseX offers: which data structures are applied?</h3>
+
 <div>
-<h3>Text-Based Query</h3>
-<code>/descendant::node[text() = 'findme']
- </code>
-</div></blockquote>
+<ul>
+<li><b>Text Index: B-Tree</b><br/>
+  Both the text and attribute index are based on a B-Tree
+	and support fast exact and range queries.</li>
+<li><b>Full-Text Index (Fuzzy Version)</b><br/>
+  The standard full-text Index is implemented as sorted array
+  structure. It is optimized for simple and fuzzy searches.</li>
+<li><b>Full-Text Index (Full Version)</b><br/>
+  A second full-text Index is implemented as a compressed trie.
+	Its needs slightly more memory than the standard full-text index,
+	but it supports more features, such as full wildcard search.
+</li>
+</ul>
+</div>
 
-<a name="5.3"></a><h3>5.3 Tell me more about XQuery Full-Text. How can I use it?</h3>
+<a name="5.4"></a><h3>5.4 Tell me more about XQuery Full-Text. How can I use it?</h3>
 
 The full-text features can be used in XPath as well as in XQuery. Again, queries will be
 evaluated much faster in XPath, and XQuery covers more features of the language specification.
-In the following, two simple examples for full-text queries are shown, based on the 
-<a href="http://www.w3.org/TR/xpath-full-text-10-use-cases/">W3C Sample Document</a>.
+The following example queries are based on the
+<a href="http://www.w3.org/TR/xpath-full-text-10-use-cases/">W3C Use Cases</a>:<br/>&nbsp;<br/>
 
-<blockquote>
-<div>
-<h3>XPath Full-Text</h3>
-Return all title tags which contain the word 'Usability':<br/><br/>
-<code>//title[text() ftcontains 'Usability']</code><br/>
-<h3>XQuery Full-Text</h3>
-Return all authors, containing 'Marigold':<br/><br/>
-<code>for   $i in //author score $s
-where $i/text() ftcontains 'Marigold'
-return &lt;hit score="{ $s }"&gt;{ $i/text() }&lt;/hit&gt;</code><br/>
-&nbsp;
-</div></blockquote>
+<b>Return all title tags which contain the word 'Usability'</b>
+<br/><br/>
+<code>  //title[text() ftcontains 'Usability']</code>
+<br/><br/>
+<b>Return all authors, containing 'Marigold'</b>
+<br/><br/>
+<code>  for    $i in //author score $s
+  where  $i/text() ftcontains 'Marigold'
+  return &lt;hit score="{ $s }"&gt;{ $i/text() }&lt;/hit&gt;</code>
+<br/><br/>
 
-<a name="5.4"></a><h3>5.4 How do you support XML Updates. Do you accomplish any standard?</h3> 
+<a name="5.5"></a><h3>5.5 Do you support XML Updates?</h3>
 BaseX provides internal commands to perform updates on XML (see also <a href="commands.php">BaseX Commands</a>).
 Moreover, the GUI provides a convenient way to perform updates on the data.
-Support of the <a href="http://www.w3.org/TR/xqupdate/">W3C XQuery Update Facility</a>
-is still on our (extensive) todo list..
+
+<br/>&nbsp;<br/>
 </div>
 
-<hr/>
-                
-
-<!-- ===== FAQ Section (should be later be generated ===== -->
-
-<br/><br/>
 <? include("inc/footer.inc"); ?>
+
