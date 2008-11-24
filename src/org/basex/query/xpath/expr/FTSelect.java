@@ -67,7 +67,7 @@ public final class FTSelect extends FTArrayExpr {
     }
       
     ctx.ftpos = tmp;    
-    return new FTNode();
+    return ftn;
   }
   
   /**

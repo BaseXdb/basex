@@ -14,6 +14,8 @@ import org.basex.query.xpath.item.Bln;
  * @author Sebastian Gath
  */
 public final class FTNotIter extends FTArrayExpr {
+  /** Flag if expression has more results. */
+  private boolean m;
   /**
    * Constructor.
    * @param e operands joined with the mild not operator
@@ -29,18 +31,20 @@ public final class FTNotIter extends FTArrayExpr {
   
   @Override
   public Bln eval(final XPContext ctx) throws QueryException {
-    return Bln.get(!exprs[0].eval(ctx).bool());
+    return Bln.get(exprs[0].eval(ctx).bool());
+    //return Bln.get(!exprs[0].eval(ctx).bool());
   }
   
   @Override
   public FTNode next(final XPContext ctx) {
-    final FTNode n = exprs[0].next(ctx); 
+    final FTNode n = m ? exprs[0].next(ctx) : new FTNode(); 
     n.not = true;
     return n; 
   }
   
   @Override 
   public boolean more() {
-    return exprs[0].more();
+    m = exprs[0].more();
+    return true;
   }
 }

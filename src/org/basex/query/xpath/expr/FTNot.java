@@ -1,6 +1,5 @@
 package org.basex.query.xpath.expr;
 
-import org.basex.data.MetaData;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.item.Bln;
@@ -36,16 +35,17 @@ public final class FTNot extends FTArrayExpr {
     return this;
   }
 
+  /*
   @Override
   public boolean indexOptions(final MetaData meta) {
     // [SG] temporary
     return false;
   }
+  */
   
   @Override
   public FTArrayExpr indexEquivalent(final XPContext ctx, final Step curr, 
       final boolean seq) throws QueryException {
-   
     // find index equivalents
     final FTArrayExpr ex = exprs[0].indexEquivalent(ctx, curr, seq);
     if(ex != null) exprs[0] = ex;

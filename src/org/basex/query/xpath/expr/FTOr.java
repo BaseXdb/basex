@@ -46,11 +46,14 @@ public final class FTOr extends FTArrayExpr {
   public FTArrayExpr indexEquivalent(final XPContext ctx, final Step curr,
       final boolean seq) throws QueryException {
 
-    if (pex.length == 1 && seq)
+    if (pex.length == 2 && seq)
       exprs[pex[0]].indexEquivalent(ctx, curr, seq);
 
     for (int i = 0; i < exprs.length; i++) {
       exprs[i] = exprs[i].indexEquivalent(ctx, curr, seq);
+    }
+    if (pex.length == 1) {
+      return exprs[pex[0]];
     }
     return new FTUnion(exprs, pex);
   }
@@ -73,6 +76,11 @@ public final class FTOr extends FTArrayExpr {
     }
 
     pex = i1.finish();
+    if (pex.length == 0) {
+      ctx.iu = false;
+      return Integer.MAX_VALUE;
+    }
+    
     return seq ? Integer.MAX_VALUE : sum > min ? min : sum;
   }
   

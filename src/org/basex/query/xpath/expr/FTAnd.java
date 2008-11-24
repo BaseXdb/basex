@@ -84,7 +84,11 @@ public final class FTAnd extends FTArrayExpr {
     }
     pex = i1.finish();
     nex = i2.finish();
-
-    return i1.size == 0 ? Integer.MAX_VALUE : nmin;
+    if (i1.size == 0) {
+      ctx.iu = false;
+      return Integer.MAX_VALUE;
+    }
+    
+    return nmin;
   }
 }

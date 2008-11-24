@@ -283,7 +283,8 @@ public final class FTNode {
 
   @Override
   public String toString() {
-    return "FTNode [Pre=" + getPre() + "; Pos="
+    if (getPre() == 0) return "FTNode[]";
+    return ("FTNode [Pre=" + getPre()) + "; Pos="
     + Array.toString(ip.finish(), 0, ip.size)
     + "; Poi=" + Array.toString(p.finish(), 0, p.size) + "]";
   }

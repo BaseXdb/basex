@@ -80,7 +80,11 @@ public final class FTContains extends Arr {
 
   @Override
   public Item eval(final XPContext ctx) throws QueryException {
-    return ctx.iu ? evalIndex(ctx) : evalNoIndex(ctx);
+    final boolean tmp  = ctx.iu;
+    ctx.iu = iu;
+    final Item r = iu ? evalIndex(ctx) : evalNoIndex(ctx);  
+    ctx.iu = tmp;
+    return r;
   }
 
   /**
@@ -95,22 +99,29 @@ public final class FTContains extends Arr {
   private Bln evalIndex(final XPContext ctx) throws QueryException {
     final FTTokenizer tmp = ctx.ftitem;
     ctx.ftitem = ft;
-
+    
     // evaluate index requests only once
     if(v2 == null) v2 = ctx.eval(expr[1]);
 
     if(v2.bool()) {
       final Nod ns = (Nod) expr[0].eval(ctx);
-      final FTArrayExpr ftae = (FTArrayExpr) expr[1];
-      ftn = (ftn == null && ftae.more()) ? ftae.next(ctx) : ftn;
-      for(int z = 0; z < ns.size(); z++) {
-        while(ftn != null && ns.nodes[z] > ftn.getPre()) {
-          ftn = ftae.more() ? ftae.next(ctx) : null;
+      if (expr[1] instanceof FTArrayExpr) {
+        final FTArrayExpr ftae = (FTArrayExpr) expr[1];
+        ftn = (ftn == null && ftae.more()) ? ftae.next(ctx) : ftn;
+        for(int z = 0; z < ns.size(); z++) {
+          while(ftn != null && ns.nodes[z] > ftn.getPre() && ftn.size > 0) {
+            ftn = ftae.more() ? ftae.next(ctx) : null;
+          }
+          if(ftn != null) {
+            final boolean not = ftn.not;
+            if(ftn.getPre() == ns.nodes[z]) {
+              ftn = null;
+              return Bln.get(!not);
+            } else if(not) return Bln.TRUE;
+          }
         }
-        if(ftn != null) {
-          final boolean not = ftn.not;
-          if(ftn.getPre() == ns.nodes[z]) return Bln.get(!not);
-        }
+      } else if (expr[1] instanceof Bln) {
+        return Bln.get(ns.bool() && ((Bln) expr[1]).bool()); 
       }
     }
 
@@ -198,6 +209,7 @@ public final class FTContains extends Arr {
     // check all ftcontains options recursively if they comply
     // with the index options..
     iu = ((FTArrayExpr) expr[1]).indexOptions(meta);
+    final boolean tmp = ctx.iu;
     ctx.iu = iu;
 
     // sequential processing necessary - no index use
@@ -205,6 +217,11 @@ public final class FTContains extends Arr {
 
     // Integer.MAX_VALUE is returned if an ftnot does not occur after an ftand
     final int nrIDs = expr[1].indexSizes(ctx, curr, min);
+    iu = ctx.iu;
+    // sequential processing necessary - no index use
+    if(!iu) return Integer.MAX_VALUE;
+
+    ctx.iu = tmp;
     if (nrIDs == -1) expr[1] = Bln.TRUE;
     return nrIDs == -1 ? Integer.MAX_VALUE : nrIDs;
   }

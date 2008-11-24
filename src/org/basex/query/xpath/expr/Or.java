@@ -112,13 +112,16 @@ public final class Or extends Arr {
       throws QueryException {
 
     final Expr[] indexExprs = new Expr[expr.length];
+    boolean ie = true;
     
     // find index equivalents
     for(int i = 0; i != expr.length; i++) {
       indexExprs[i] = expr[i].indexEquivalent(ctx, curr, seq);
-      if(indexExprs[i] == null) return null;
+      if(indexExprs[i] == null) ie = false; 
     }
 
+    if (!ie) return null;
+    
     // perform path step only once if all path expressions are the same
     final Expr[] ex = XPOptimizer.getIndexExpr(indexExprs);
     if(ex != null) return new Path(new Union(ex),

@@ -30,7 +30,6 @@ public final class And extends Arr {
   @Override
   public Bln eval(final XPContext ctx) throws QueryException {
     // [SG] to be revised.. should only be locally set
-    ctx.iu = false; 
     for(final Expr e : expr) if(!ctx.eval(e).bool()) return Bln.FALSE;
     return Bln.TRUE;
   }
@@ -145,13 +144,16 @@ public final class And extends Arr {
     final int el = expr.length;
     if(el == 0) return null;
     final Expr[] indexExprs = new Expr[el];
+    boolean ie = true;
     
     // find index equivalents
     for(int i = 0; i != el; i++) {
       indexExprs[i] = expr[i].indexEquivalent(ctx, curr, seq);
-      if(indexExprs[i] == null) return null;
+      if(indexExprs[i] == null) ie = false; 
     }
 
+    if (!ie) return null;
+    
     // perform path step only once if all path expressions are the same
     final Expr[] ex = XPOptimizer.getIndexExpr(indexExprs);
     if(ex != null) return new Path(new InterSect(ex),

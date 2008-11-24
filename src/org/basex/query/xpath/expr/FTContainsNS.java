@@ -43,6 +43,9 @@ public final class FTContainsNS extends Arr {
 
   @Override
   public Nod eval(final XPContext ctx) throws QueryException {
+    boolean iu = ctx.iu;
+    ctx.iu = true;
+
     final Item res = ctx.eval(expr[1]);
     if(!res.bool()) return new Nod(ctx);
 
@@ -58,6 +61,7 @@ public final class FTContainsNS extends Arr {
     }
     ctx.item = new Nod(il.finish(), ctx);
     ctx.ftitem = tmp;
+    ctx.iu = iu;
     return ctx.item;
   }
 

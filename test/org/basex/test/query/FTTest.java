@@ -365,6 +365,12 @@ public final class FTTest extends AbstractTest {
           "//w [text() ftcontains 'hello' ftor ftnot 'databases']" },
         { "FTUnaryNot6", nodes(3, 5, 7, 9, 11, 14, 37),
           "//w [text() ftcontains ftnot 'bier']" },
+        { "FTUnaryNot6", nodes(3, 5, 7, 9, 11, 14, 37),
+          "//w [text() ftcontains ftnot 'bier' ftand ftnot 'wein' ]" },
+        { "FTUnaryNot6", nodes(3, 5, 7, 9, 11, 14, 37),
+          "//w [text() ftcontains ftnot 'bier' ftor ftnot 'wein' ]" },
+
+          
     };
 
     /** TABLE REPRESENTATION
