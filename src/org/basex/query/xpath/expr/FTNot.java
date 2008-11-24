@@ -34,14 +34,6 @@ public final class FTNot extends FTArrayExpr {
     }
     return this;
   }
-
-  /*
-  @Override
-  public boolean indexOptions(final MetaData meta) {
-    // [SG] temporary
-    return false;
-  }
-  */
   
   @Override
   public FTArrayExpr indexEquivalent(final XPContext ctx, final Step curr, 

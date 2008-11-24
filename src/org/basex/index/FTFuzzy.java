@@ -111,7 +111,7 @@ public final class FTFuzzy extends Index {
 
     int size = 0;
     long poi = 0;
-    final long p = token(tok, -1);
+    final long p = token(tok);
     if(p > -1) {
       size = size(p, tok.length);
       poi = pointer(p, tok.length);
@@ -147,23 +147,23 @@ public final class FTFuzzy extends Index {
 
   /**
    * Determines the pointer on a token.
-   * 
    * @param tok token looking for.
-   * @param rs right side, -1 as default
    * @return int pointer
    */
-  private int token(final byte[] tok, final int rs) {
+  private int token(final byte[] tok) {
     final int tl = tok.length;
+    // left limit
     int l = tp[tl];
     if(l == -1) return -1;
 
-    int r = rs;
     int i = 1;
-    if (r == -1) do r = tp[tl + i++]; while(r == -1);
+    int r;
+    // find right limit
+    do r = tp[tl + i++]; while(r == -1);
+    int x = r;
     
-    final int o = tl + 9;
-
     // binary search
+    final int o = tl + 9;
     while(l < r) {
       final int m = l + (r - l) / 2 / o * o;
       final int c = diff(ti.readBytes(m, m + tl), tok);
@@ -171,7 +171,8 @@ public final class FTFuzzy extends Index {
       else if(c < 0) l = m + o;
       else r = m - o;
     }
-    return r == l && eq(ti.readBytes(l, l + tl), tok) ? l : -1;
+    // accept entry if pointer is inside relevant tokens
+    return r != x && l == r && eq(ti.readBytes(l, l + tl), tok) ? l : -1;
   }
   
   /**
@@ -318,7 +319,7 @@ public final class FTFuzzy extends Index {
    * @return iterator
    */
   private IndexArrayIterator get(final byte[] tok) {
-    int p = token(tok, -1);
+    int p = token(tok);
     return p > -1 ? data(pointer(p, tok.length),
         size(p, tok.length), dat, data) : IndexArrayIterator.EMP;
   }
