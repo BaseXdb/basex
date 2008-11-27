@@ -2,6 +2,8 @@ package org.basex.gui.view.map;
 
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.Text.*;
+
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.ComponentEvent;
@@ -71,7 +73,7 @@ public final class MapView extends View implements Runnable {
   private int mouseY = -1;
   /** Drag tolerance. */
   private int dragTol;
-
+  
   /** Currently focused rectangle. */
   private transient MapRect focusedRect;
 
@@ -199,6 +201,7 @@ public final class MapView extends View implements Runnable {
     calc();
 
     // calculate zooming speed (slower for large zooming scales)
+    // [JH] division by zero if rect is to slight
     zoomSpeed = (int) (Math.log(128 * getWidth() / mainRect.w) +
         Math.log(128 * getHeight() / mainRect.h));
 
@@ -291,8 +294,8 @@ public final class MapView extends View implements Runnable {
 
     // call recursive TreeMap algorithm
     final Nodes nodes = GUI.context.current();
-    switch(GUIProp.mapalgo) {
-      case 0: calcMap(rect, new IntList(nodes.nodes), 0, nodes.size, true); 
+    switch(GUIProp.mapalgo){
+      case 0: calcMap(rect, new IntList(nodes.nodes), 0, nodes.size, 0); 
         break;
       // simple form of slice and dice tremap algorithm
       case 1: calcSliceMap(rect, new IntList(nodes.nodes), 0, nodes.size, 0);
@@ -320,10 +323,11 @@ public final class MapView extends View implements Runnable {
    * @param l children array
    * @param ns start array position
    * @param ne end array position
-   * @param first first traversal
+   * @param level indicates level which is calculated
    */
   private void calcMap(final MapRect r, final IntList l, final int ns, 
-      final int ne, final boolean first) {  
+      final int ne, final int level) {
+
     // one rectangle left.. continue with this child
     if(ne - ns == 1) {
       // calculate rectangle sizes
@@ -343,7 +347,7 @@ public final class MapView extends View implements Runnable {
           !ViewData.isLeaf(GUI.context.data(), t.p)) {
         final IntList ch = children(t.p);
         if(ch.size != 0) calcMap(new MapRect(x, y, w, h, l.list[ns], r.l + 1), 
-            ch, 0, ch.size - 1, false);
+            ch, 0, ch.size - 1, level + 1);
       }
     } else {
       int nn, ln, ni;
@@ -355,7 +359,7 @@ public final class MapView extends View implements Runnable {
       // pivot with integrated list start
       ni = ns + ln;    
         // consider number of descendants to calculate split point
-      if(!GUIProp.mapsimple && !first) {
+      if(!GUIProp.mapsimple && level != 0) {
         // calculating real number of nodes of this recursion
         // nodes are pre-ordered, therefore last pre value of this level
         // subtracted by first one is the actual amount of nodes
@@ -394,10 +398,11 @@ public final class MapView extends View implements Runnable {
       // determine rectangle orientation (horizontal/vertical)
       // mapprop contains prefered alignment influence
       final int p = GUIProp.mapprop;
-      
       final boolean v = p > 4 ? r.w > r.h * (p + 4) / 8 : 
         r.w * (13 - p) / 8 > r.h;
-
+      // turn picture into one similar to slice/dice layout  
+//      v = (level % 2) == 0 ? false : true;
+      
       int xx = r.x;
       int yy = r.y;
       // casting to long doesn't do anything meaningful.
@@ -422,7 +427,7 @@ public final class MapView extends View implements Runnable {
       
       // paint both rectangles if enough space is left
       if(ww > 0 && hh > 0) calcMap(new MapRect(xx, yy, ww, hh, 0, r.l), l, ns,
-          ni, first);
+          ni, level);
       if(v) {
         xx += ww;
         ww = r.w - ww;
@@ -431,12 +436,12 @@ public final class MapView extends View implements Runnable {
         hh = r.h - hh;
       }
       if(ww > 0 && hh > 0) calcMap(new MapRect(xx, yy, ww, hh, 0, r.l), l, ni, 
-          ne, first);
+          ne, level);
     }
   }
   
   /**
-   * Splits the space using a Slize and Dice Layout.
+   * Splits the space using a Slice and Dice Layout.
    * 
    * @param r parent rectangle
    * @param l children array
@@ -468,86 +473,72 @@ public final class MapView extends View implements Runnable {
         if(ch.size >= 0) calcSliceMap(new MapRect(x, y, w, h, 
             l.list[ns], t.l + 1), ch, 0, ch.size - 1, level + 1);
       }
-    } else {
+    } else {      
       // number of nodes used to calculate rect size
-//      int nn = ne - ns;
-//      int nn = l.size - 1;
+      int nn = ne - ns;
       
-      int par = data.parent(l.list[ns], Data.ELEM);
-      long parsize = Token.toLong(data.attValue(par + FSParser.SIZEOFFSET));
+      long parsize = 1;
       
-      // print preval and its size
-//      System.out.println("pre val: " + l.list[ns] + " size: " + 
-//          Token.string(data.attValue(l.list[ns] + FSParser.SIZEOFFSET)));
-      // print pre val of parent and this size
-//      System.out.println("paret pre: " + data.parent(l.list[ns], Data.ELEM) +
-//          " und so groß: " + parsize);
+      // determine direction
+//      final boolean v = (level % 2) == 0 ? true : false;
+      final boolean v = (r.w > r.h) ? false : true;
       
-      int lines = 1;
-//      int perline = (int) Math.ceil((double) nn / lines);
-      final boolean v = (level % 2) == 0 ? true : false;
+      // setting initial proportions
       double xx = r.x;
       double yy = r.y;
+      double ww, hh;
       
-      // use ceiling for width and height of some rects to avoid white spaces
-//      int ww, hh, ceilcount;
-//      if(v) {
-//        ww = r.w / lines;
-//        hh = (int) Math.ceil((double) r.h * lines / nn);
-//      } else {
-//        ww = (int) Math.ceil((double) r.w * lines / nn);
-//        hh = r.h / lines;
-//      }
-      double hh = 0;
-      double ww = 0;
+      if(data.fs != null && GUIProp.mapaggr) {
+        int par = data.parent(l.list[ns], Data.ELEM);
+        parsize = Token.toLong(data.attValue(par + FSParser.SIZEOFFSET));
+        hh = 0;
+        ww = 0;
+      } else {
+        if(v) {
+          ww = r.w;
+          hh = (double) r.h / nn;
+        } else {
+          ww = (double) r.w / nn;
+          hh = r.h;
+        }
+      }
+      
       // calculate map for each rectangel on this level
       for(int i = 0; i < l.size - 1; i++) {
-        if(v) {
-          yy += hh;
-          double hoehe = (double) Token.toLong(data.attValue(l.list[i] + 
-              FSParser.SIZEOFFSET)) * r.h / parsize;
-//          System.out.println("hoehe double: " + hoehe + 
-//          " hoehe int: " + (int) hoehe);
-          hh = hoehe;
-          ww = r.w / lines;
-        } else {
-          xx += ww;
-          double breite = (double) Token.toLong(data.attValue(l.list[i] + 
-              FSParser.SIZEOFFSET)) * r.w / parsize;
-//          System.out.println("breiete double: " + breite + 
-//          " breite int: "+ (int) breite);
-          ww = breite;
-          hh = r.h / lines;
-        }
-        int[] liste = new int[1]; 
+        int[] liste = new int[1];
         liste[0] = l.list[i];
         
-        if(ww > 0 && hh > 0) calcSliceMap(
+        // draw map taking sizes into account
+        if(data.fs != null && GUIProp.mapaggr) {
+          if(v) {
+            yy += hh;
+            hh = (double) Token.toLong(
+                data.attValue(data.sizeID, l.list[i])) * r.h / parsize;
+            ww = r.w;
+          } else {
+            xx += ww;
+            ww = (double) Token.toLong(
+                data.attValue(data.sizeID, l.list[i])) * r.w / parsize;
+            hh = r.h;
+          }
+          if(ww > 0 && hh > 0) calcSliceMap(
             new MapRect((int) xx, (int) yy, (int) ww, (int) hh, 0, r.l), 
             new IntList(liste), 0, 1, level);
-//        else System.out.println("pre: " + l.list[i] + " ww: " + ww + 
-//        " hh: " + hh);
-        
-//        if(ww > 0 && hh > 0) {
-//          if(v) {
-//            // dividing treemap to more than one column
-//            if(i % perline == 0 && i != 0) {
-//              yy += hh;
-//              xx  = r.x;
-//            }
-//            calcSliceMap(new MapRect(xx, yy, ww, hh, 0, r.l), 
-//                new IntList(liste), 0, 1, level);
-//            xx += ww;
-//          } else {
-//            if(i % perline == 0 && i != 0) {
-//              xx += ww;
-//              yy = r.y;
-//            }
-//            calcSliceMap(new MapRect(xx, yy, ww, hh, 0, r.l), 
-//                new IntList(liste), 0, 1, level);
-//            yy += hh;
-//          }
-//        }  
+        } else {
+          if(ww > 0 && hh > 0) {
+            if(v) {
+              calcSliceMap(
+                  new MapRect((int) xx, (int) yy, (int) ww, (int) hh, 0, r.l), 
+                  new IntList(liste), 0, 1, level);
+              yy += hh;
+            } else {
+              calcSliceMap(
+                  new MapRect((int) xx, (int) yy, (int) ww, (int) hh, 0, r.l),
+                  new IntList(liste), 0, 1, level);
+              xx += ww;
+            }
+          }  
+        }
       }
     }
   }
@@ -648,9 +639,45 @@ public final class MapView extends View implements Runnable {
         if(tt.length() > 32) tt = tt.substring(0, 30) + DOTS;
         BaseXLayout.drawTooltip(g, tt, x, y, getWidth(), focusedRect.l + 5);
       }
-
       // add interactions for current thumbnail rectangle...
-      //if(focusedRect.thumb) ...
+      // if(focusedRect.thumb) ...
+      
+      // draw area round cursor position
+      if(GUIProp.mapinteraction == 1) {
+        // find out if position under cursor is out of view dimensions
+        int myx, myy;
+        if(mouseX - GUIProp.lenswidth < 0) myx = 0;
+        else if(mouseX + GUIProp.lenswidth > getWidth())
+          myx = getWidth() - (GUIProp.lenswidth << 1);
+        else myx = mouseX - GUIProp.lenswidth;
+        
+        if(mouseY - GUIProp.lensheight < 0) myy = 0;
+        else if(mouseY + GUIProp.lensheight > getHeight())
+          myy = getHeight() - (GUIProp.lensheight << 1);
+        else myy = mouseY - GUIProp.lensheight;
+        
+        // get area under cursor
+        MapRect rectToZoom = new MapRect(
+            myx + GUIProp.lenswidth - GUIProp.lensareawidth,
+            myy + GUIProp.lensheight - GUIProp.lensareaheight,
+            GUIProp.lensareawidth << 1, GUIProp.lensareaheight << 1);
+        g.setColor(Color.red);
+        g.drawRect(rectToZoom.x, rectToZoom.y, rectToZoom.w, rectToZoom.h);
+        // get rectangles to zoom in
+        int np = 0;
+        final IntList il = new IntList();
+        for(int r = 0, rl = mainRects.size(); r < rl; r++) {
+          final MapRect rect = mainRects.get(r);
+          if(mainRects.get(r).p < np) continue;
+          if(rectToZoom.contains(rect)) {
+            il.add(rect.p);
+            np = rect.p + data.size(rect.p, data.kind(rect.p));
+          }
+        }
+        // put rectangles of created list on screen
+        g.setColor(Color.black);
+        g.drawRect(myx, myy, GUIProp.lenswidth << 1, GUIProp.lensheight << 1);
+      }
     }
 
     painting = false;

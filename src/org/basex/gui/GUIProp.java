@@ -1,6 +1,7 @@
 package org.basex.gui;
 
 import org.basex.core.Prop;
+import org.basex.io.IO;
 
 /**
  * This class contains properties which are used in the GUI. They are
@@ -149,6 +150,19 @@ public final class GUIProp {
   public static int mapalgo = 0;
   /** Map alignment by size aggregation. */
   public static boolean mapaggr = false;
+  /** Maximum Map depth. */
+  public static int mapdepth = IO.MAXHEIGHT;
+  /** Choice of interacting with TreeeMap. */
+  public static int mapinteraction = 0;
+  // all values are only one half of the size
+  /** Width of focused Content. */
+  public static int lensareawidth = 50;
+  /** Width of focused Content. */
+  public static int lensareaheight = 50;
+  /** Width of Lens to be displayed. */
+  public static int lensheight = 100;
+  /** Width of Lens to be displayed. */
+  public static int lenswidth = 100;
   
   /** Default path to the BaseX configuration file. */
   private static String cfg = Prop.HOME + "/.basexwin";
