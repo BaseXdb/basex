@@ -350,23 +350,22 @@ public final class MapView extends View implements Runnable {
             ch, 0, ch.size - 1, level + 1);
       }
     } else {
-      int nn, ln, ni;
+      long nn, ln; 
+      int ni;
       // number of nodes used to calculate space
       nn = ne - ns;
       // nn / 2, pretends to be the middle of the handled list
       // except if starting point in the list is not at position 0
       ln = nn >> 1;
       // pivot with integrated list start
-      ni = ns + ln;    
+      ni = (int) (ns + ln);    
         // consider number of descendants to calculate split point
       if(!GUIProp.mapsimple && level != 0) {
         // calculating real number of nodes of this recursion
-        // nodes are pre-ordered, therefore last pre value of this level
-        // subtracted by first one is the actual amount of nodes
         nn = l.list[ne] - l.list[ns];
         
-        // pivot will be start node + 1
-        ni = ns + 1;
+        // let pivot be the first element of the list
+        ni = ns;
         
         final Data data = GUI.context.data();
         if(data.fs != null && GUIProp.mapaggr) {
@@ -382,8 +381,10 @@ public final class MapView extends View implements Runnable {
           for(; ni < ne - 1; ni++)  {
             // use file sizes to calculate breakpoint
             if(sum >= parsize / 2) break;
-            sum += Token.toLong(data.attValue(data.sizeID, par));
+            sum += Token.toLong(data.attValue(data.sizeID, l.list[ni]));
           }
+          nn = parsize;
+          ln = sum;
         } else {
           // increment pivot until left rectangle contains more or equal
           // than the half descendants or if left node is greater than half of 
@@ -391,8 +392,8 @@ public final class MapView extends View implements Runnable {
           for(; ni < ne - 1; ni++)  {
             if(l.list[ni] - l.list[ns] >= (nn >> 1)) break;
           }
+          ln = l.list[ni] - l.list[ns];
         }
-        ln = l.list[ni] - l.list[ns];
       }
 
       // determine rectangle orientation (horizontal/vertical)
@@ -400,30 +401,12 @@ public final class MapView extends View implements Runnable {
       final int p = GUIProp.mapprop;
       final boolean v = p > 4 ? r.w > r.h * (p + 4) / 8 : 
         r.w * (13 - p) / 8 > r.h;
-      // turn picture into one similar to slice/dice layout  
-//      v = (level % 2) == 0 ? false : true;
       
       int xx = r.x;
       int yy = r.y;
-      // casting to long doesn't do anything meaningful.
-      int ww = !v ? r.w : (int) ((long) r.w * ln / nn);
-      int hh =  v ? r.h : (int) ((long) r.h * ln / nn);
 
-//      only for testing the values which will be drawn
-//      slows the application down a lot, leave this if not needed
-//      int mysize = l.get(ni)-l.get(ns);
-//      int mytest = l.get(ni-1) - l.get(ns);
-//      System.out.println("ns_Pfad: " +  Token.string(
-//      ViewData.path(GUI.context.data(), l.get(ns))) + " ni_Pfad: " +  
-//      Token.string(ViewData.path(GUI.context.data(), l.get(ni))) + " ln: " + 
-//      ln + " nn/2: " + nn/2 + " ln davor: " + mytest);
-//      System.out.println("Breite: " + ww + " Höhe: " + hh + " Fläche: " + 
-//      ww*hh + " Größe: " + mysize);
-//      int mywidth = v ? r.w-ww : ww;
-//      int myheight = !v ? r.h-hh : hh;
-//      mysize = l.get(ne)-l.get(ni);
-//      System.out.println("Breite: " + mywidth + " Höhe: " + myheight + 
-//      " Fläche: " + mywidth*myheight + " Größe: " + mysize + "\n");
+      int ww = !v ? r.w : (int) (r.w * ln / nn);
+      int hh = v ? r.h : (int) (r.h * ln / nn);
       
       // paint both rectangles if enough space is left
       if(ww > 0 && hh > 0) calcMap(new MapRect(xx, yy, ww, hh, 0, r.l), l, ns,
@@ -542,7 +525,7 @@ public final class MapView extends View implements Runnable {
       }
     }
   }
-
+  
   /**
    * Returns all children of the specified node.
    * @param par parent node
