@@ -384,8 +384,9 @@ public final class PlotView extends View implements Runnable {
       k--;
     }
 
-    // context change. descendants of marked node set are
-    // also checked for intersection with plotted nodes
+    // context change (triggered by another view).
+    // descendants of marked node set are also checked for intersection 
+    // with currently plotted nodes
     while(i < m.length && k < p.length) {
       final int a = m[i];
       final int b = p[k];
@@ -465,7 +466,7 @@ public final class PlotView extends View implements Runnable {
     g.setFont(font);
 
 
-    // determine axis caption for TEXT / INT / DBL data
+    // draw axis and assignment for TEXT data
     if(type == Kind.TEXT) {
       final int nrCats = axis.nrCats;
       final double[] coSorted = Array.finish(axis.co, axis.co.length);
@@ -509,6 +510,8 @@ public final class PlotView extends View implements Runnable {
             string(axis.getValue(plotData.pres[j])), op);
       }
 
+      
+      // axis is drawn for numerical data, type INT/DBL
     } else {
       final boolean noRange = axis.max - axis.min == 0;
       // draw min and max grid line
@@ -517,6 +520,12 @@ public final class PlotView extends View implements Runnable {
 
       // return if insufficient plot space
       if(nrCaptions == 0) return;
+      
+      if(axis.log) {
+        drawCaptionAndGrid(g, drawX, formatString(axis.min, drawX), 0.0);
+        drawCaptionAndGrid(g, drawX, formatString(axis.max, drawX), 1.0);
+        return;
+      }
 
       // if min equal max, draw min in plot middle
       if(noRange) {
@@ -549,7 +558,7 @@ public final class PlotView extends View implements Runnable {
 //   * Whatever.
 //   * @param val val
 //   * @param step step
-//   * @return rounded value
+//   * @return poo.
 //   */
 //  private double roundCaption(final double val, final double step) {
 //    double d = val;

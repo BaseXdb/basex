@@ -30,24 +30,30 @@ public final class PlotAxis {
 
   /** Coordinates of items. */
   double[] co = {};
-  /** Number of captions to display. */
-  int nrCaptions;
-  /** Step for axis caption. */
-  double actlCaptionStep;
-  /** Calculated caption step, view size not considered for calculation. */
-  private double calculatedCaptionStep;
-  /** Minimum value in case selected attribute is numerical. */
-  double min;
-  /** Maximum  value in case selected attribute is numerical. */
-  double max;
-  /** Significant value for axis caption. */
-  double sigVal;
   /** First label to be drawn after minimum label. */
   double firstLabel;
   /** The first category for text data. */
   byte[] firstCat;
   /** The last category for text data. */
   byte[] lastCat;
+  /** Number of captions to display. */
+  int nrCaptions;
+  /** Step for axis caption. */
+  double actlCaptionStep;
+  /** Calculated caption step, view size not considered for calculation. */
+  private double calculatedCaptionStep;
+  /** Significant value for axis caption. */
+  double sigVal;
+  /** Minimum value in case selected attribute is numerical. */
+  double min;
+  /** Maximum  value in case selected attribute is numerical. */
+  double max;
+  /** Axis uses logarithmic scale. */
+  boolean log;
+  /** Ln of min. */
+  double logMin;
+  /** Ln of max. */
+  double logMax;
 
   /**
    * Constructor.
@@ -122,7 +128,8 @@ public final class PlotAxis {
     if(type == Kind.TEXT)
       textToNum(vals);
     else {
-      calcExtremeValues(vals);
+      extremeValues(vals);
+      prepareAxisCaption();
       // coordinates for TEXT already calculated in textToNum()
       for(int i = 0; i < vals.length; i++)
         co[i] = calcPosition(vals[i]);
@@ -193,12 +200,47 @@ public final class PlotAxis {
       return -1;
     }
 
+    double range = max - min;
+    if(range == 0) return 0.5d;
     final double d = toDouble(value);
-    final double range = max - min;
-    if(range == 0)
-      return 0.5d;
-    else
-      return 1 / range * (d - min);
+    
+    if(!log) return 1 / range * (d - min);
+
+    // calculate position on a logarithmic scale. to display negative
+    // values on a logarithmic scale, three cases are to be distinguished:
+    // 0. both extreme values are greater or equal 0
+    // 1. the minimum value is smaller 0, hence the axis is 'mirrored' at 0.
+    // 2. both extreme values are smaller 0; axis is also 'mirrored', but 
+    //    values above the max value are not displayed.
+    range = logMax - logMin;
+    
+    // case 1
+    if(min < 0 && max >= 0) {
+      // p is the range between minimum value and zero compared to the range
+      // between zero and the maximum value. (needed for mirroring, s.a.)
+      final double p = logMax > logMin ? portion(logMax, logMin) : 
+        1.0d - portion(logMin, logMax);
+      if(d == 0) return p;
+      if(d < 0) return p - (p * (1 / logMin * logx(d)));
+      
+      return 1.0d - p - ((1 / range * (logx(d) - logMin)) * 1.0d - p);
+    }
+    
+    // case 2
+    if(min < 0 && max < 0)  return 1 / range * (logx(d) - logMin);
+    
+    // case 0
+    return 1 / range * (logx(d) - logMin);
+  }
+  
+  /**
+   * Calculates the portion of p in relation to r.
+   * @param r range
+   * @param p value
+   * @return portion of p
+   */
+  private double portion(final double r, final double p) {
+    return 1.0d / Math.abs(r) * Math.abs(p);
   }
 
   /**
@@ -208,6 +250,15 @@ public final class PlotAxis {
    */
   double calcPosition(final double value) {
     return calcPosition(token(value));
+  }
+  
+  /**
+   * Calculates the base x logarithm for an absolute value.
+   * @param d value
+   * @return base x logarithm for d
+   */
+  private double logx(final double d) {
+    return d == 0 ? 0 : Math.log(Math.abs(d));
   }
 
   /**
@@ -229,14 +280,12 @@ public final class PlotAxis {
     }
     return EMPTY;
   }
-
+  
   /**
-   * Determines the smallest and greatest occurring values for a specific item.
-   * Afterwards the extremes are rounded to support a decent axis
-   * caption.
-   * @param vals item values
+   * Determines the extreme values of the current data set.
+   * @param vals values of plotted nodes
    */
-  private void calcExtremeValues(final byte[][] vals) {
+  private void extremeValues(final byte[][] vals) {
     min = Integer.MAX_VALUE;
     max = Integer.MIN_VALUE;
     int i = 0;
@@ -255,8 +304,22 @@ public final class PlotAxis {
     if(!b) {
       min = 0;
       max = 0;
+    }
+    
+    if(log) {
+      logMin = logx(min);
+      logMax = logx(max);
       return;
     }
+  }
+
+  /**
+   * Determines the smallest and greatest occurring values for a specific item.
+   * Afterwards the extremes are rounded to support a decent axis
+   * caption.
+   */
+  private void prepareAxisCaption() {
+    if(log) return;
     // range as driving force for following calculations, no matter if INT
     // or DBL ... whatsoever
     double range = Math.abs(max - min);
@@ -294,6 +357,7 @@ public final class PlotAxis {
    */
   void calcCaption(final int space) {
     if(type == Kind.DBL || type == Kind.INT) {
+      if(log) return;
       final double range = Math.abs(max - min);
       if(range == 0) {
         nrCaptions = 1;
