@@ -73,14 +73,16 @@ public class Path extends Arr {
       mergeDesc(ctx);
       checkEmpty();
       // analyze if result set can be cached - no predicates or no variables...
-      cache = true;
+      System.out.println(" *** Root *** " + root.toString());
+      cache = !root.uses(Using.VAR);
+      
       boolean noPreds = true;
-      for(final Expr ex : expr) {
+      for(final Expr step : expr) {
         // check if we have a predicate
-        if(((Step) ex).expr.length != 0) {
+        if(((Step) step).expr.length != 0) {
           noPreds = false;
           // check if we also find a variable
-          if(ex.uses(Using.VAR)) {
+          if(step.uses(Using.VAR)) {
             cache = false;
             break;
           }
@@ -88,12 +90,12 @@ public class Path extends Arr {
       }
       // no predicates, one child or descendant step...
       final Axis axis = ((Step) expr[0]).axis;
-      // if we've found a variable, cache will be true. But we can't 
+      // if we've found a variable, cache will be false. But we can't
       // handle variables in SimpleIterPath yet.
-      if(!cache && noPreds && expr.length == 1 && (axis == Axis.DESC || 
+      if(cache && noPreds && expr.length == 1 && (axis == Axis.DESC ||
           axis == Axis.DESCORSELF || axis == Axis.CHILD)) {
         return new SimpleIterPath(root, expr);
-      }      
+      }
     }
     return this;
   }
@@ -125,7 +127,7 @@ public class Path extends Arr {
    * @throws XQException evaluation exception
    */
   protected Item eval(final XQContext ctx) throws XQException {
-    // simple location step traversal...
+    // simple location step traversal...    
     if(steps) {
       final NodIter ir = new NodIter();
       iter(0, ir, ctx);

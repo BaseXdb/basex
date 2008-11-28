@@ -4,6 +4,7 @@ import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.item.Item;
+import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.NodeIter;
 
@@ -37,11 +38,14 @@ public final class SimpleIterPath extends Path {
       @Override
       public Item next() throws XQException  {
         if (first) {
+          System.out.println("*** " + ctx.query);
           ctx.item = item;
           step = (NodeIter) (ctx.iter(expr[0]));
           first = false;
         }
-        return step.next();
+        Nod it = step.next();
+        ctx.item = it;
+        return it;
       }
     };
   }
