@@ -521,8 +521,8 @@ public final class PlotView extends View implements Runnable {
       if(axis.log) {
         drawCaptionAndGrid(g, drawX, formatString(axis.min, drawX), 0.0);
         drawCaptionAndGrid(g, drawX, formatString(axis.max, drawX), 1.0);
-        if(axis.min < 0 && axis.max > 0)
-          drawCaptionAndGrid(g, drawX, formatString(0, drawX), axis.sigVal);
+        drawCaptionAndGrid(g, drawX, formatString(axis.sigVal, drawX), 
+            axis.calcPosition(axis.sigVal));
         return;
       }
       

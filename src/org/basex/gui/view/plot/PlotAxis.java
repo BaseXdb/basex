@@ -129,7 +129,7 @@ public final class PlotAxis {
       textToNum(vals);
     else {
       extremeValues(vals);
-      prepareAxisCaption();
+      prepareCaption();
       // coordinates for TEXT already calculated in textToNum()
       for(int i = 0; i < vals.length; i++)
         co[i] = calcPosition(vals[i]);
@@ -203,7 +203,6 @@ public final class PlotAxis {
     double range = max - min;
     if(range == 0) return 0.5d;
     final double d = toDouble(value);
-    
     if(!log) return 1 / range * (d - min);
 
     // calculate position on a logarithmic scale. to display negative
@@ -220,7 +219,6 @@ public final class PlotAxis {
       // to the range between zero and the maximum value. 
       // (needed for mirroring, s.a.)
       final double p = 1 / (logMin + logMax) * logMin;
-      sigVal = p;
       if(d == 0) return p;
       if(d < 0) return 1.0d - (1 - p) - (1.0d / logMin * ln(d) * p);
       
@@ -302,12 +300,9 @@ public final class PlotAxis {
   }
 
   /**
-   * Determines the smallest and greatest occurring values for a specific item.
-   * Afterwards the extremes are rounded to support a decent axis
-   * caption.
+   * Executes some calculations to support a dynamic axis labelling.
    */
-  private void prepareAxisCaption() {
-    if(log) return;
+  private void prepareCaption() {
     // range as driving force for following calculations, no matter if INT
     // or DBL ... whatsoever
     double range = Math.abs(max - min);
