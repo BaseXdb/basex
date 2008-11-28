@@ -510,7 +510,7 @@ public final class PlotView extends View implements Runnable {
             string(axis.getValue(plotData.pres[j])), op);
       }
 
-      
+
       // axis is drawn for numerical data, type INT/DBL
     } else {
       final boolean noRange = axis.max - axis.min == 0;
@@ -518,14 +518,17 @@ public final class PlotView extends View implements Runnable {
       drawCaptionAndGrid(g, drawX, "", 0);
       drawCaptionAndGrid(g, drawX, "", 1);
 
-      // return if insufficient plot space
-      if(nrCaptions == 0) return;
-      
       if(axis.log) {
         drawCaptionAndGrid(g, drawX, formatString(axis.min, drawX), 0.0);
         drawCaptionAndGrid(g, drawX, formatString(axis.max, drawX), 1.0);
+        if(axis.min < 0 && axis.max > 0)
+          drawCaptionAndGrid(g, drawX, formatString(0, drawX), axis.sigVal);
         return;
       }
+      
+      // return if insufficient plot space
+      if(nrCaptions == 0) return;
+      
 
       // if min equal max, draw min in plot middle
       if(noRange) {

@@ -208,41 +208,29 @@ public final class PlotAxis {
 
     // calculate position on a logarithmic scale. to display negative
     // values on a logarithmic scale, three cases are to be distinguished:
-    // 0. both extreme values are greater or equal 0
+    // 0. both extreme values are greater or equal 0.
     // 1. the minimum value is smaller 0, hence the axis is 'mirrored' at 0.
-    // 2. both extreme values are smaller 0; axis is also 'mirrored', but 
+    // 2. both extreme values are smaller 0; axis is also 'mirrored' and 
     //    values above the max value are not displayed.
     range = logMax - logMin;
     
     // case 1
     if(min < 0 && max >= 0) {
-      // p is the range between minimum value and zero compared to the range
-      // between zero and the maximum value. (needed for mirroring, s.a.)
-      final double p = logMax > logMin ? portion(logMax, logMin) : 
-        1.0d - portion(logMin, logMax);
+      // p is the portion of the range between minimum value and zero compared 
+      // to the range between zero and the maximum value. 
+      // (needed for mirroring, s.a.)
+      final double p = 1 / (logMin + logMax) * logMin;
+      sigVal = p;
       if(d == 0) return p;
-      if(d < 0) return p - (p * (1 / logMin * logx(d)));
+      if(d < 0) return 1.0d - (1 - p) - (1.0d / logMin * ln(d) * p);
       
-      return 1.0d - p - ((1 / range * (logx(d) - logMin)) * 1.0d - p);
+      return p + (1.0d / logMax * ln(d) * (1 - p));
     }
     
-    // case 2
-    if(min < 0 && max < 0)  return 1 / range * (logx(d) - logMin);
-    
-    // case 0
-    return 1 / range * (logx(d) - logMin);
+    // case 2 and 0
+    return 1 / range * (ln(d) - logMin);
   }
   
-  /**
-   * Calculates the portion of p in relation to r.
-   * @param r range
-   * @param p value
-   * @return portion of p
-   */
-  private double portion(final double r, final double p) {
-    return 1.0d / Math.abs(r) * Math.abs(p);
-  }
-
   /**
    * Calculates relative coordinate for a given value.
    * @param value given value
@@ -253,12 +241,12 @@ public final class PlotAxis {
   }
   
   /**
-   * Calculates the base x logarithm for an absolute value.
+   * Calculates base e logarithm for the given value.
    * @param d value
-   * @return base x logarithm for d
+   * @return base e logarithm for d
    */
-  private double logx(final double d) {
-    return d == 0 ? 0 : Math.log(Math.abs(d));
+  private double ln(final double d) {
+    return d == 0 ? 0 : Math.log1p(Math.abs(d));
   }
 
   /**
@@ -307,8 +295,8 @@ public final class PlotAxis {
     }
     
     if(log) {
-      logMin = logx(min);
-      logMax = logx(max);
+      logMin = ln(min);
+      logMax = ln(max);
       return;
     }
   }
