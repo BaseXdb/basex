@@ -97,7 +97,6 @@ public final class RealView extends View {
 
   @Override
   protected void refreshFocus() {
-
     repaint();
   }
 
@@ -160,12 +159,13 @@ public final class RealView extends View {
           realImage = createImage();
           Graphics rg = realImage.getGraphics();
           rects = new ArrayList<RealRect[]>();
-
-          for(int i = 0; i < GUI.context.current().size; i++) {
-            temperature(GUI.context.current().nodes[i], rg, i);
+          Nodes curr = GUI.context.current();
+          for(int i = 0; i < curr.size; i++) {
+            temperature(curr.nodes[i], rg, i);
           }
 
       }
+      focus();
     }
     g.drawImage(realImage, 0, 0, getWidth(), getHeight(), this);
 
@@ -196,7 +196,7 @@ public final class RealView extends View {
       g.drawString(s, r.x1, (int) (r.y1 - fontHeight / 4f));
 
     }
-    
+
     //highlights marked nodes
     if(!rects.isEmpty() && GUI.context.marked().size > 0) {
 
@@ -213,9 +213,9 @@ public final class RealView extends View {
 
           for(int j = 0; j < size; j++) {
             if(r[i].p == markedNodes[j]) {
-              
-                  g.drawRect(r[i].x1, r[i].y1, r[i].x2 - r[i].x1, 
-                      r[i].y2 - r[i].y1);
+
+              g.drawRect(r[i].x1, r[i].y1, r[i].x2 - r[i].x1, r[i].y2
+                      - r[i].y1);
 
               if(size < 2) {
                 return;
@@ -228,6 +228,7 @@ public final class RealView extends View {
         }
 
       }
+
     }
 
   }
@@ -330,8 +331,8 @@ public final class RealView extends View {
    * @param g the graphics reference
    * @param rootNum number of current root
    */
-  private void temperature(final int root, final Graphics g, 
-      final int rootNum) {
+  private void temperature(final int root, 
+      final Graphics g, final int rootNum) {
     final Data data = GUI.context.data();
     int level = 0;
     sumNodeSizeInLine = data.size;
