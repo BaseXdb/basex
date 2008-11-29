@@ -613,7 +613,7 @@ public final class MapView extends View implements Runnable {
       final int h = focusedRect.h;
       g.setColor(color6);
       g.drawRect(x, y, w, h);
-      g.drawRect(x - 1, y - 1, w + 2, h + 2);
+      g.drawRect(x + 1, y + 1, w - 2, h - 2);
 
       // draw tag label
       if(data.kind(focusedRect.p) == Data.ELEM) {
