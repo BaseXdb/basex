@@ -55,7 +55,7 @@ final class MapFS extends MapPainter {
   @Override
   void drawRectangles(final Graphics g, final ArrayList<MapRect> rects) {
     final Data data = GUI.context.data();
-    final MapRect l = view.layout;
+    final MapRect l = view.layouter.layout;
     final int ww = view.getWidth();
     final int hh = view.getHeight();
     final int min = Math.max(GUIProp.fontsize, 16);
@@ -291,7 +291,7 @@ final class MapFS extends MapPainter {
 
       if(!binary) {
         // approximate number of bytes that will be displayed
-        s = rect.h * rect.w / o * 4 / mfwidth['A'];
+        s = Math.max(0, rect.h * rect.w / o * 4 / mfwidth['A']);
 
         // minimize buffer size
         final File f = new File(string(path));

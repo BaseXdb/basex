@@ -3,8 +3,10 @@ package org.basex.gui.view.map;
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.Text.*;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
@@ -27,7 +29,6 @@ import org.basex.util.Action;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
-import org.basex.build.fs.FSParser;
 
 /**
  * This view is a TreeMap implementation.
@@ -47,12 +48,12 @@ public final class MapView extends View implements Runnable {
   /** Maximum zooming step. */
   private static final int MAXZS = ZS[ZOOMSIZE];
 
-  /** Layout rectangle. */
-  MapRect layout;
   /** Array of current rectangles. */
   private ArrayList<MapRect> mainRects;
   /** Data specific map layout. */
   private MapPainter painter;
+  /** Determines Layout Algorithm. */
+  public MapLayout layouter;
 
   /** Rectangle history. */
   private final MapRect[] rectHist = new MapRect[MAXHIST];
@@ -116,7 +117,7 @@ public final class MapView extends View implements Runnable {
         new MapDefault(this);
       mainMap = createImage();
       zoomMap = createImage();
-      calc();
+      refreshLayout();
       repaint();
     }
   }
@@ -141,7 +142,7 @@ public final class MapView extends View implements Runnable {
   @Override
   public void refreshMark() {
     if(getWidth() == 0 || mainMap == null) return;
-    drawMap();
+    drawMap(mainMap, mainRects);
     repaint();
   }
 
@@ -164,7 +165,12 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public void refreshLayout() {
-    calc();
+    // initial rectangle
+    final int w = getWidth(), h = getHeight();
+    final MapRect rect = new MapRect(0, 0, w, h, 0, 0);
+    mainRects = new ArrayList<MapRect>();
+    final Nodes nodes = GUI.context.current();
+    calc(rect, mainRects, nodes, mainMap);
     repaint();
   }
 
@@ -198,7 +204,7 @@ public final class MapView extends View implements Runnable {
     focusedRect = null;
 
     // create new context nodes
-    calc();
+    refreshLayout();
 
     // calculate zooming speed (slower for large zooming scales)
     // [JH] division by zero if rect is to slight
@@ -268,42 +274,29 @@ public final class MapView extends View implements Runnable {
 
   /**
    * Initializes the calculation of the main TreeMap.
+   * 
+   * @param rect initial space to layout rects in
+   * @param rectangles List of divided rects
+   * @param nodes Nodes to draw in the map
+   * @param map image to draw rectangles on
    */
-  private void calc() {
-    // calculate initial rectangle
-    final int w = getWidth(), h = getHeight();
-    // Screenshots: int w = mainMap.getWidth(), h = mainMap.getHeight();
-    final MapRect rect = new MapRect(0, 0, w, h, 0, 0);
+  private void calc(final MapRect rect, final ArrayList<MapRect> rectangles,
+      final Nodes nodes, final BufferedImage map) {
 
     // calculate new main rectangles
     if(painter == null) return;
-    mainRects = new ArrayList<MapRect>();
     painter.reset();
 
-    layout = null;
-    final int o = GUIProp.fontsize + 4;
-    switch(GUIProp.maplayout) {
-      case 0: layout = new MapRect(0, 0, 0, 0); break;
-      case 1: layout = new MapRect(1, 1, 2, 2); break;
-      case 2: layout = new MapRect(0, o, 0, o); break;
-      case 3: layout = new MapRect(2, o - 1, 4, o + 1); break;
-      case 4: layout = new MapRect(o >> 2, o, o >> 1, o + (o >> 2)); break;
-      case 5: layout = new MapRect(o >> 1, o, o, o + (o >> 1)); break;
-      default:
-    }
-
     // call recursive TreeMap algorithm
-    final Nodes nodes = GUI.context.current();
     switch(GUIProp.mapalgo){
-      case 0: calcMap(rect, new IntList(nodes.nodes), 0, nodes.size, 0); 
-        break;
-      // simple form of slice and dice tremap algorithm
-      case 1: calcSliceMap(rect, new IntList(nodes.nodes), 0, nodes.size, 0);
-        break;
+      case 0: layouter = new SplitLayout(); break;
+      case 1: layouter = new SliceDiceLayout(); break;
     }
 
-    painter.init(mainRects);
-    drawMap();
+    layouter.calcMap(rect, rectangles, new IntList(nodes.nodes),
+        0, nodes.size, 0);
+    painter.init(rectangles);
+    drawMap(map, rectangles);
     focus();
 
     /* Screenshots:
@@ -313,239 +306,6 @@ public final class MapView extends View implements Runnable {
     } catch(IOException e) {
       e.printStackTrace();
     }*/
-  }
-
-  /**
-   * Recursively splits rectangles on one level.
-   * This is a kind of pivot layout.
-   * 
-   * @param r parent rectangle
-   * @param l children array
-   * @param ns start array position
-   * @param ne end array position
-   * @param level indicates level which is calculated
-   */
-  private void calcMap(final MapRect r, final IntList l, final int ns, 
-      final int ne, final int level) {
-
-    // one rectangle left.. continue with this child
-    if(ne - ns == 1) {
-      // calculate rectangle sizes
-      final MapRect t = new MapRect(r.x, r.y, r.w, r.h, l.list[ns], r.l);
-      mainRects.add(t);
-
-      // position, with and height calculated using sizes of former level
-      final int x = t.x + layout.x;
-      final int y = t.y + layout.y;
-      final int w = t.w - layout.w;
-      final int h = t.h - layout.h;
-
-      // get children
-      final int o = GUIProp.fontsize + 4;
-      // skip too small rectangles and leaf nodes (= meta data in deepfs)
-      if((w >= o || h >= o) && w > 0 && h > 0 && 
-          !ViewData.isLeaf(GUI.context.data(), t.p)) {
-        final IntList ch = children(t.p);
-        if(ch.size != 0) calcMap(new MapRect(x, y, w, h, l.list[ns], r.l + 1), 
-            ch, 0, ch.size - 1, level + 1);
-      }
-    } else {
-      long nn, ln; 
-      int ni;
-      // number of nodes used to calculate space
-      nn = ne - ns;
-      // nn / 2, pretends to be the middle of the handled list
-      // except if starting point in the list is not at position 0
-      ln = nn >> 1;
-      // pivot with integrated list start
-      ni = (int) (ns + ln);    
-        // consider number of descendants to calculate split point
-      if(!GUIProp.mapsimple && level != 0) {
-        // calculating real number of nodes of this recursion
-        nn = l.list[ne] - l.list[ns];
-        
-        // let pivot be the first element of the list
-        ni = ns;
-        
-        final Data data = GUI.context.data();
-        if(data.fs != null && GUIProp.mapaggr) {
-          // parents size
-          int par = data.parent(l.list[ns], Data.ELEM);
-          long parsize = Token.toLong(data.attValue(data.sizeID, par));
-          // temporary to sum up the child sizes
-          long sum = 0;
-          
-          // increment pivot until left rectangle contains more or equal
-          // than the half descendants or if left node is greater than half of 
-          // all descendants leave with just setting it to ne - 1
-          for(; ni < ne - 1; ni++)  {
-            // use file sizes to calculate breakpoint
-            if(sum >= parsize / 2) break;
-            sum += Token.toLong(data.attValue(data.sizeID, l.list[ni]));
-          }
-          nn = parsize;
-          ln = sum;
-        } else {
-          // increment pivot until left rectangle contains more or equal
-          // than the half descendants or if left node is greater than half of 
-          // all descendants leave with just setting it to ne - 1
-          for(; ni < ne - 1; ni++)  {
-            if(l.list[ni] - l.list[ns] >= (nn >> 1)) break;
-          }
-          ln = l.list[ni] - l.list[ns];
-        }
-      }
-
-      // determine rectangle orientation (horizontal/vertical)
-      // mapprop contains prefered alignment influence
-      final int p = GUIProp.mapprop;
-      final boolean v = p > 4 ? r.w > r.h * (p + 4) / 8 : 
-        r.w * (13 - p) / 8 > r.h;
-      
-      int xx = r.x;
-      int yy = r.y;
-
-      int ww = !v ? r.w : (int) (r.w * ln / nn);
-      int hh = v ? r.h : (int) (r.h * ln / nn);
-      
-      // paint both rectangles if enough space is left
-      if(ww > 0 && hh > 0) calcMap(new MapRect(xx, yy, ww, hh, 0, r.l), l, ns,
-          ni, level);
-      if(v) {
-        xx += ww;
-        ww = r.w - ww;
-      } else {
-        yy += hh;
-        hh = r.h - hh;
-      }
-      if(ww > 0 && hh > 0) calcMap(new MapRect(xx, yy, ww, hh, 0, r.l), l, ni, 
-          ne, level);
-    }
-  }
-  
-  /**
-   * Splits the space using a Slice and Dice Layout.
-   * 
-   * @param r parent rectangle
-   * @param l children array
-   * @param ns start array position
-   * @param ne end array position
-   * @param level levelcounter to calculate direction
-   */
-  private void calcSliceMap(final MapRect r, final IntList l, final int ns, 
-      final int ne, final int level) {
-//    final int o = GUIProp.fontsize + 4;
-    final Data data = GUI.context.data();
-
-    // one rectangle left.. continue with this child
-    if(ne - ns == 1) {
-      
-      // calculate rectangle sizes
-      final MapRect t = new MapRect(r.x, r.y, r.w, r.h, l.list[ns], r.l);
-
-      // position, with and height are calculated using split sizes of 
-      //  former recursion level
-      final int x = t.x + layout.x;
-      final int y = t.y + layout.y;
-      final int w = t.w - layout.w;
-      final int h = t.h - layout.h;
-      mainRects.add(t);
-      // skip too small rectangles and leaf nodes (= meta data in deepfs)
-      if(w > 0 && h > 0 && !ViewData.isLeaf(GUI.context.data(), t.p)) {
-        final IntList ch = children(t.p);
-        if(ch.size >= 0) calcSliceMap(new MapRect(x, y, w, h, 
-            l.list[ns], t.l + 1), ch, 0, ch.size - 1, level + 1);
-      }
-    } else {      
-      // number of nodes used to calculate rect size
-      int nn = ne - ns;
-      
-      long parsize = 1;
-      
-      // determine direction
-//      final boolean v = (level % 2) == 0 ? true : false;
-      final boolean v = (r.w > r.h) ? false : true;
-      
-      // setting initial proportions
-      double xx = r.x;
-      double yy = r.y;
-      double ww, hh;
-      
-      if(data.fs != null && GUIProp.mapaggr) {
-        int par = data.parent(l.list[ns], Data.ELEM);
-        parsize = Token.toLong(data.attValue(par + FSParser.SIZEOFFSET));
-        hh = 0;
-        ww = 0;
-      } else {
-        if(v) {
-          ww = r.w;
-          hh = (double) r.h / nn;
-        } else {
-          ww = (double) r.w / nn;
-          hh = r.h;
-        }
-      }
-      
-      // calculate map for each rectangel on this level
-      for(int i = 0; i < l.size - 1; i++) {
-        int[] liste = new int[1];
-        liste[0] = l.list[i];
-        
-        // draw map taking sizes into account
-        if(data.fs != null && GUIProp.mapaggr) {
-          if(v) {
-            yy += hh;
-            hh = (double) Token.toLong(
-                data.attValue(data.sizeID, l.list[i])) * r.h / parsize;
-            ww = r.w;
-          } else {
-            xx += ww;
-            ww = (double) Token.toLong(
-                data.attValue(data.sizeID, l.list[i])) * r.w / parsize;
-            hh = r.h;
-          }
-          if(ww > 0 && hh > 0) calcSliceMap(
-            new MapRect((int) xx, (int) yy, (int) ww, (int) hh, 0, r.l), 
-            new IntList(liste), 0, 1, level);
-        } else {
-          if(ww > 0 && hh > 0) {
-            if(v) {
-              calcSliceMap(
-                  new MapRect((int) xx, (int) yy, (int) ww, (int) hh, 0, r.l), 
-                  new IntList(liste), 0, 1, level);
-              yy += hh;
-            } else {
-              calcSliceMap(
-                  new MapRect((int) xx, (int) yy, (int) ww, (int) hh, 0, r.l),
-                  new IntList(liste), 0, 1, level);
-              xx += ww;
-            }
-          }  
-        }
-      }
-    }
-  }
-  
-  /**
-   * Returns all children of the specified node.
-   * @param par parent node
-   * @return children
-   */
-  private IntList children(final int par) {
-    final IntList list = new IntList();
-    final Data data = GUI.context.data();
-
-    final int kind = data.kind(par);
-    final int last = par + data.size(par, kind);
-    int p = par + (GUIProp.mapatts ? 1 : data.attSize(par, kind));
-    while(p != last) {
-      list.add(p);
-      p += data.size(p, data.kind(p));
-    }
-
-    // paint all children
-    if(list.size != 0) list.add(p);
-    return list;
   }
 
   @Override
@@ -609,8 +369,8 @@ public final class MapView extends View implements Runnable {
       // paint focused rectangle
       final int x = focusedRect.x;
       final int y = focusedRect.y;
-      final int w = focusedRect.w;
-      final int h = focusedRect.h;
+      int w = focusedRect.w;
+      int h = focusedRect.h;
       g.setColor(color6);
       g.drawRect(x, y, w, h);
       g.drawRect(x + 1, y + 1, w - 2, h - 2);
@@ -657,9 +417,25 @@ public final class MapView extends View implements Runnable {
             np = rect.p + data.size(rect.p, data.kind(rect.p));
           }
         }
-        // put rectangles of created list on screen
+        // draw lens border
         g.setColor(Color.black);
         g.drawRect(myx, myy, GUIProp.lenswidth << 1, GUIProp.lensheight << 1);
+
+        
+        // calculate initial rectangle
+        w = GUIProp.lenswidth << 1;
+        h = GUIProp.lensheight << 1;
+        
+        final MapRect rect = new MapRect(0, 0, w, h, 0, 0);
+        ArrayList<MapRect> lensRects = new ArrayList<MapRect>();
+        
+        final Nodes nodes = new Nodes(focused, data);
+        BufferedImage bi = new BufferedImage(w, h, BufferedImage.TYPE_INT_BGR);
+        calc(rect, lensRects, nodes, bi);
+        final int ac = AlphaComposite.SRC_OVER;
+        ((Graphics2D) g).setComposite(AlphaComposite.getInstance(ac, 1.0f));
+        drawMap(bi, lensRects);
+        g.drawImage(bi, myx, myy, this);
       }
     }
 
@@ -719,12 +495,15 @@ public final class MapView extends View implements Runnable {
 
   /**
    * Creates a buffered image for the treemap.
+   * 
+   * @param map Image to draw the map on
+   * @param rects calculated rectangles
    */
-  void drawMap() {
-    final Graphics g = mainMap.getGraphics();
+  void drawMap(final BufferedImage map, final ArrayList<MapRect> rects) {
+    final Graphics g = map.getGraphics();
     g.setColor(COLORS[2]);
     BaseXLayout.antiAlias(g);
-    if(mainRects != null) painter.drawRectangles(g, mainRects);
+    if(rects != null) painter.drawRectangles(g, rects);
   }
 
   @Override
@@ -928,7 +707,6 @@ public final class MapView extends View implements Runnable {
     focusedRect = null;
     mainMap = createImage();
     zoomMap = createImage();
-    calc();
-    repaint();
+    refreshLayout();
   }
 }
