@@ -7,7 +7,7 @@ import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.item.NodeBuilder;
 import org.basex.query.xpath.item.Nod;
-import org.basex.query.xpath.locpath.Preds;
+import org.basex.query.xpath.path.Preds;
 
 /**
  * Filter Expression filtering a nodeset. This Expression is invalid for other

@@ -1,4 +1,4 @@
-package org.basex.query.xpath.locpath;
+package org.basex.query.xpath.path;
 
 import org.basex.data.Data;
 import org.basex.query.QueryException;
@@ -6,18 +6,22 @@ import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.item.NodeBuilder;
 
 /**
- * Attribute Step.
+ * Ancestor Step.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class StepAttr extends Step {
+public final class StepAnc extends Step {
   @Override
   protected void eval(final Data data, final int p, final NodeBuilder t) {
-    final int size = p + data.attSize(p, data.kind(p));
     int pre = p;
+    int kind = data.kind(pre);
 
-    while(++pre != size) test.eval(data, pre, Data.ATTR, t);
+    while(pre != 0) {
+      pre = data.parent(pre, kind);
+      kind = data.kind(pre);
+      test.eval(data, pre, kind, t);
+    }
   }
 
   @Override
@@ -25,11 +29,13 @@ public final class StepAttr extends Step {
       throws QueryException {
 
     int pos = 0;
-    final int size = p + data.attSize(p, data.kind(p));
     int pre = p;
+    int kind = data.kind(pre);
 
-    while(++pre != size) {
-      if(test.eval(data, pre, Data.ATTR) && ++pos == posPred) {
+    while(pre != 0) {
+      pre = data.parent(pre, kind);
+      kind = data.kind(pre);
+      if(test.eval(data, pre, kind) && ++pos == posPred) {
         preds.posEval(ctx, pre, result);
         return;
       }
@@ -41,11 +47,12 @@ public final class StepAttr extends Step {
       throws QueryException {
 
     final int[] pos = new int[preds.size()];
-    final int size = p + data.attSize(p, data.kind(p));
     int pre = p;
-
-    while(++pre != size) {
-      if(test.eval(data, pre, Data.ATTR)) {
+    int kind = data.kind(p);
+    while(pre != 0) {
+      pre = data.parent(pre, kind);
+      kind = data.kind(pre);
+      if(test.eval(data, pre, kind)) {
         if(!preds.earlyEval(ctx, result, pre, pos)) return;
       }
     }

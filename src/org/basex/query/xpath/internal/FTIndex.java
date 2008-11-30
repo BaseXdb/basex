@@ -12,7 +12,7 @@ import org.basex.query.FTOpt;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.FTArrayExpr;
 import org.basex.query.xpath.item.Bln;
-import org.basex.query.xpath.locpath.Step;
+import org.basex.query.xpath.path.Step;
 import org.basex.util.IntArrayList;
 
 /**

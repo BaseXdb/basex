@@ -74,7 +74,7 @@ public final class QueryTest {
       Prop.ftst = false;
       Prop.ftdc = false;
       Prop.ftcs = false;
-      ok &= test(false);
+      ok &= test(true);
     }
 
     System.out.println(ok ? "All tests correct.\n" :

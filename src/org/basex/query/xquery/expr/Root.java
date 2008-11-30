@@ -47,6 +47,11 @@ public final class Root extends Expr {
   public Type returned() {
     return Type.DOC;
   }
+
+  @Override
+  public String color() {
+    return "FFFF66";
+  }
   
   @Override
   public void plan(final Serializer ser) throws IOException {

@@ -38,7 +38,6 @@ public final class SimpleIterPath extends Path {
       @Override
       public Item next() throws XQException  {
         if (first) {
-          System.out.println("*** " + ctx.query);
           ctx.item = item;
           step = (NodeIter) (ctx.iter(expr[0]));
           first = false;

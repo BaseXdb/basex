@@ -72,8 +72,8 @@ public class Path extends Arr {
     if(steps) {
       mergeDesc(ctx);
       checkEmpty();
-      // analyze if result set can be cached - no predicates or no variables...
-      System.out.println(" *** Root *** " + root.toString());
+      // [DS] analyze if result set can be cached - no predicates/variables...
+      //System.out.println(" *** Root *** " + root.toString());
       cache = !root.uses(Using.VAR);
       
       boolean noPreds = true;
@@ -369,10 +369,8 @@ public class Path extends Arr {
   }
 
   @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    if(root != null) sb.append(root + "/");
-    return sb.append(path()).toString();
+  public final String color() {
+    return "FFCC33";
   }
 
   @Override
@@ -381,5 +379,12 @@ public class Path extends Arr {
     root.plan(ser);
     for(final Expr e : expr) e.plan(ser);
     ser.closeElement();
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    if(root != null) sb.append(root + "/");
+    return sb.append(path()).toString();
   }
 }

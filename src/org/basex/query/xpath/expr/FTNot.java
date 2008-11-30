@@ -3,7 +3,7 @@ package org.basex.query.xpath.expr;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.item.Bln;
-import org.basex.query.xpath.locpath.Step;
+import org.basex.query.xpath.path.Step;
 
 /**
  * Logical FTUnaryNot expression.

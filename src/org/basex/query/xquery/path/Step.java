@@ -132,6 +132,11 @@ public class Step extends Arr {
   }
 
   @Override
+  public final String color() {
+    return "FFFF66";
+  }
+
+  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.startElement(this);
     ser.attribute(AXIS, Token.token(axis.name));

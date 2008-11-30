@@ -8,8 +8,9 @@ import org.basex.query.xpath.internal.Range;
 import org.basex.query.xpath.item.Bln;
 import org.basex.query.xpath.item.Comp;
 import org.basex.query.xpath.item.Item;
-import org.basex.query.xpath.locpath.LocPath;
-import org.basex.query.xpath.locpath.Step;
+import org.basex.query.xpath.path.LocPath;
+import org.basex.query.xpath.path.Step;
+
 import static org.basex.query.xpath.XPText.*;
 
 /**
@@ -29,7 +30,6 @@ public final class And extends Arr {
 
   @Override
   public Bln eval(final XPContext ctx) throws QueryException {
-    // [SG] to be revised.. should only be locally set
     for(final Expr e : expr) if(!ctx.eval(e).bool()) return Bln.FALSE;
     return Bln.TRUE;
   }

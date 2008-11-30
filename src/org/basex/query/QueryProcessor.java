@@ -56,6 +56,13 @@ public abstract class QueryProcessor extends Progress {
   public final void compile(final Nodes nodes) throws QueryException {
     if(context == null) parse();
     context.compile(nodes);
+    if(Prop.dotplan) {
+      try {
+        context.planDot();
+      } catch(final Exception ex) {
+        ex.printStackTrace();
+      }
+    }
     compiled = true;
   }
 
@@ -94,7 +101,6 @@ public abstract class QueryProcessor extends Progress {
         context.info.add(QUERYPLAN + NL);
         context.planXML();
       }
-      if(Prop.dotplan) context.planDot();
     } catch(final Exception ex) {
       ex.printStackTrace();
     }

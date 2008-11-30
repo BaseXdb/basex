@@ -50,6 +50,11 @@ public final class FTContains extends Arr {
   }
 
   @Override
+  public String color() {
+    return "33CC33";
+  }
+
+  @Override
   public String toString() {
     return toString(" ftcontains ");
   }

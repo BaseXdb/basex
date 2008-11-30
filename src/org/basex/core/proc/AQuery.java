@@ -6,11 +6,8 @@ import org.basex.BaseX;
 import org.basex.core.Process;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
-import org.basex.data.DOTSerializer;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
-import org.basex.io.CachedOutput;
-import org.basex.io.IO;
 import org.basex.io.NullOutput;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
@@ -107,17 +104,6 @@ abstract class AQuery extends Process {
     }
     o.print(Prop.NL);
     if(Prop.info) outInfo(o, result.size());
-    
-    if(Prop.dotresult) {
-      final CachedOutput out = new CachedOutput();
-      result.serialize(new DOTSerializer(out));
-      IO.get(PLANDOT).write(out.finish());
-      try {
-        new ProcessBuilder(Prop.dotty, PLANDOT).start().waitFor();
-      } catch(final InterruptedException ex) {
-        throw new IOException(ex.toString());
-      }
-    }
   }
 
   /**

@@ -4,7 +4,7 @@ import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
 import org.basex.query.xpath.item.Bln;
-import org.basex.query.xpath.locpath.LocPath;
+import org.basex.query.xpath.path.LocPath;
 
 /**
  * Constructor for not() function.

@@ -1,4 +1,4 @@
-package org.basex.query.xpath.locpath;
+package org.basex.query.xpath.path;
 
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;

@@ -9,11 +9,11 @@ import org.basex.data.Skeleton;
 import org.basex.data.Skeleton.Node;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.expr.Expr;
-import org.basex.query.xpath.locpath.Axis;
-import org.basex.query.xpath.locpath.LocPath;
-import org.basex.query.xpath.locpath.Test;
-import org.basex.query.xpath.locpath.TestName;
-import org.basex.query.xpath.locpath.TestNode;
+import org.basex.query.xpath.path.Axis;
+import org.basex.query.xpath.path.LocPath;
+import org.basex.query.xpath.path.Test;
+import org.basex.query.xpath.path.TestName;
+import org.basex.query.xpath.path.TestNode;
 import org.basex.util.StringList;
 import org.basex.util.Token;
 

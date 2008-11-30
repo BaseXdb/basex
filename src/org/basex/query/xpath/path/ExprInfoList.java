@@ -1,3 +1,4 @@
+package org.basex.query.xpath.path;
 /**
 package org.basex.query.xpath.locpath;
 

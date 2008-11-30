@@ -1,4 +1,4 @@
-package org.basex.query.xpath.locpath;
+package org.basex.query.xpath.path;
 
 import org.basex.data.Data;
 import org.basex.query.QueryException;
@@ -6,27 +6,21 @@ import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.item.NodeBuilder;
 
 /**
- * Preceding Step.
+ * Ancestor-or-self Step.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class StepPrec extends Step {
+public final class StepAncOrSelf extends Step {
   @Override
   protected void eval(final Data data, final int p, final NodeBuilder t) {
     int pre = p;
-    int par = data.parent(pre, data.kind(pre));
 
-    while(--pre > 0) {
+    do {
       final int kind = data.kind(pre);
-      if(kind == Data.ATTR) continue;
-
-      if(pre == par) {
-        par = data.parent(pre, kind);
-      } else {
-        test.eval(data, pre, kind, t);
-      }
-    };
+      test.eval(data, pre, kind, t);
+      pre = data.parent(pre, kind);
+    } while(pre != -1);
   }
 
   @Override
@@ -34,20 +28,16 @@ public final class StepPrec extends Step {
       throws QueryException {
 
     int pos = 0;
-    int par = data.parent(p, data.kind(p));
     int pre = p;
-    
-    while(--pre > 0) {
-      final int kind = data.kind(pre);
-      if(kind == Data.ATTR) continue;
 
-      if(pre == par) {
-        par = data.parent(pre, kind);
-      } else if(test.eval(data, pre, kind) && ++pos == posPred) {
+    do {
+      final int kind = data.kind(pre);
+      if(test.eval(data, pre, kind) && ++pos == posPred) {
         preds.posEval(ctx, pre, result);
         return;
       }
-    };
+      pre = data.parent(pre, kind);
+    } while(pre != -1);
   }
 
   @Override
@@ -55,18 +45,14 @@ public final class StepPrec extends Step {
       throws QueryException {
 
     final int[] pos = new int[preds.size()];
-    int par = data.parent(p, data.kind(p));
     int pre = p;
 
-    while(--pre > 0) {
+    do {
       final int kind = data.kind(pre);
-      if(kind == Data.ATTR) continue;
-
-      if(pre == par) {
-        par = data.parent(pre, kind);
-      } else if(test.eval(data, pre, kind)) {
+      if(test.eval(data, pre, kind)) {
         if(!preds.earlyEval(ctx, result, pre, pos)) return;
       }
-    };
+      pre = data.parent(pre, kind);
+    } while(pre != -1);
   }
 }

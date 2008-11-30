@@ -1,4 +1,4 @@
-package org.basex.query.xpath.locpath;
+package org.basex.query.xpath.path;
 
 import static org.basex.query.xpath.XPText.*;
 import java.io.IOException;

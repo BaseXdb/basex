@@ -78,8 +78,6 @@ public final class Prop {
   public static boolean dotplan = false;
   /** Prints a XML plan. */
   public static boolean xmlplan = false;
-  /** Dots the Result. */
-  public static boolean dotresult = false;
   /** Format XQuery output. */
   public static boolean xqformat = true;
   /** Use internal XML parser. */

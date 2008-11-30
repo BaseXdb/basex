@@ -1,4 +1,4 @@
-package org.basex.query.xpath.locpath;
+package org.basex.query.xpath.path;
 
 import java.io.IOException;
 import org.basex.data.Serializer;

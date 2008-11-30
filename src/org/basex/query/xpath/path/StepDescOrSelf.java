@@ -1,4 +1,4 @@
-package org.basex.query.xpath.locpath;
+package org.basex.query.xpath.path;
 
 import org.basex.data.Data;
 import org.basex.query.QueryException;
@@ -6,19 +6,17 @@ import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.item.NodeBuilder;
 
 /**
- * Following Step.
+ * Descendant-or-self Step.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class StepFoll extends Step {
+public final class StepDescOrSelf extends Step {
   @Override
   protected void eval(final Data data, final int p, final NodeBuilder t) {
     int kind = data.kind(p);
-    if(kind == Data.ATTR) return;
-
-    final int size = data.size;
-    int pre = p + data.size(p, kind);
+    final int size = p + data.size(p, kind);
+    int pre = p;
 
     while(pre != size) {
       kind = data.kind(pre);
@@ -28,16 +26,14 @@ public final class StepFoll extends Step {
   }
 
   @Override
-  protected void pos(final XPContext ctx, final Data data, final int p)
-      throws QueryException {
+  protected void pos(final XPContext ctx, final Data data,
+      final int p) throws QueryException {
 
-    int kind = data.kind(p);
-    if(kind == Data.ATTR) return;
-    
     int pos = 0;
-    final int size = data.size;
-    int pre = p + data.size(p, kind);
-    
+    int kind = data.kind(p);
+    final int size = p + data.size(p, kind);
+    int pre = p;
+
     while(pre != size) {
       kind = data.kind(pre);
       if(test.eval(data, pre, kind) && ++pos == posPred) {
@@ -49,16 +45,14 @@ public final class StepFoll extends Step {
   }
   
   @Override
-  protected void early(final XPContext ctx, final Data data, final int p)
-      throws QueryException {
+  protected void early(final XPContext ctx, final Data data,
+      final int p) throws QueryException {
 
-    int kind = data.kind(p);
-    if(kind == Data.ATTR) return;
-    
     final int[] pos = new int[preds.size()];
-    final int size = data.size;
-    int pre = p + data.size(p, kind);
-    
+    int kind = data.kind(p);
+    final int size = p + data.size(p, kind);
+    int pre = p;
+
     while(pre != size) {
       kind = data.kind(pre);
       if(test.eval(data, pre, kind)) {

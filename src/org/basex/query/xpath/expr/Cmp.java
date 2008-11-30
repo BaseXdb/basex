@@ -11,7 +11,7 @@ import org.basex.query.xpath.item.Bln;
 import org.basex.query.xpath.item.Comp;
 import org.basex.query.xpath.item.Dbl;
 import org.basex.query.xpath.item.Item;
-import org.basex.query.xpath.locpath.LocPath;
+import org.basex.query.xpath.path.LocPath;
 import org.basex.util.Token;
 
 /**

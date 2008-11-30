@@ -13,11 +13,11 @@ import org.basex.query.xpath.XPOptimizer;
 import org.basex.query.xpath.item.Bln;
 import org.basex.query.xpath.item.Item;
 import org.basex.query.xpath.item.Nod;
-import org.basex.query.xpath.locpath.LocPath;
-import org.basex.query.xpath.locpath.LocPathAbs;
-import org.basex.query.xpath.locpath.LocPathRel;
-import org.basex.query.xpath.locpath.Step;
-import org.basex.query.xpath.locpath.TestNode;
+import org.basex.query.xpath.path.LocPath;
+import org.basex.query.xpath.path.LocPathAbs;
+import org.basex.query.xpath.path.LocPathRel;
+import org.basex.query.xpath.path.Step;
+import org.basex.query.xpath.path.TestNode;
 
 /**
  * FTContains Expression; used for fulltext operations.
@@ -177,6 +177,7 @@ public final class FTContains extends Arr {
       // standard index evaluation
       ctx.compInfo(OPTFTINDEX);
       final Expr ex = new FTContainsNS(expr[0], ae);
+      // [SG] curr always != null?
       return curr == null ? ex : new Path(ex, path.invertPath(curr));
     }
 
@@ -224,6 +225,11 @@ public final class FTContains extends Arr {
     ctx.iu = tmp;
     if (nrIDs == -1) expr[1] = Bln.TRUE;
     return nrIDs == -1 ? Integer.MAX_VALUE : nrIDs;
+  }
+
+  @Override
+  public String color() {
+    return "33CC33";
   }
   
   @Override

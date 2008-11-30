@@ -7,7 +7,7 @@ import org.basex.index.FTNode;
 import org.basex.query.FTOpt;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
-import org.basex.query.xpath.locpath.Step;
+import org.basex.query.xpath.path.Step;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -88,6 +88,11 @@ public abstract class FTArrayExpr extends Expr {
       final boolean seq)
       throws QueryException {
     return null;
+  }
+
+  @Override
+  public String color() {
+    return "66FF66";
   }
 
   @Override

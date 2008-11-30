@@ -6,8 +6,9 @@ import org.basex.query.xpath.XPOptimizer;
 import org.basex.query.xpath.internal.OneOf;
 import org.basex.query.xpath.item.Bln;
 import org.basex.query.xpath.item.Item;
-import org.basex.query.xpath.locpath.LocPath;
-import org.basex.query.xpath.locpath.Step;
+import org.basex.query.xpath.path.LocPath;
+import org.basex.query.xpath.path.Step;
+
 import static org.basex.query.xpath.XPText.*;
 
 /**
@@ -27,8 +28,6 @@ public final class Or extends Arr {
 
   @Override
   public Bln eval(final XPContext ctx) throws QueryException {
-    // [SG] to be revised.. should only be locally set
-    ctx.iu = false;
     for(final Expr e : expr) if(e.eval(ctx).bool()) return Bln.TRUE;
     return Bln.FALSE;
   }

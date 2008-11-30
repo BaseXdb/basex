@@ -65,7 +65,7 @@ public final class XQEnv extends AQuery {
       // to be removed as soon as implementation is complete...
       ex.printStackTrace();
       final String msg = ex.getMessage();
-      return error("Implementation Bug? " +  ex.getClass().getSimpleName() +
+      return error(PROCBUG + ' ' + ex.getClass().getSimpleName() +
           (msg != null ? ": " + msg : ""));
     }
     return true;

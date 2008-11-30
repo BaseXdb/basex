@@ -1,4 +1,4 @@
-package org.basex.query.xpath.locpath;
+package org.basex.query.xpath.path;
 
 import org.basex.data.Data;
 import org.basex.query.QueryException;
@@ -6,20 +6,19 @@ import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.item.NodeBuilder;
 
 /**
- * Following-sibling Step.
+ * Child Step.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class StepFollSibl extends Step {
+final class StepChild extends Step {
   @Override
   protected void eval(final Data data, final int p, final NodeBuilder t) {
     int kind = data.kind(p);
     if(kind == Data.ATTR) return;
 
-    final int par = data.parent(p, kind);
-    final int size = par + data.size(par, data.kind(par));
-    int pre = p + data.size(p, kind);
+    final int size = p + data.size(p, kind);
+    int pre = p + data.attSize(p, kind);
 
     while(pre != size) {
       kind = data.kind(pre);
@@ -35,11 +34,10 @@ public final class StepFollSibl extends Step {
     int kind = data.kind(p);
     if(kind == Data.ATTR) return;
 
-    final int par = data.parent(p, kind);
-    final int size = par + data.size(par, data.kind(par));
-    int pre = p + data.size(p, kind);
     int pos = 0;
-    
+    final int size = p + data.size(p, kind);
+    int pre = p + data.attSize(p, kind);
+
     while(pre != size) {
       kind = data.kind(pre);
       if(test.eval(data, pre, kind) && ++pos == posPred) {
@@ -58,10 +56,9 @@ public final class StepFollSibl extends Step {
     if(kind == Data.ATTR) return;
 
     final int[] pos = new int[preds.size()];
-    final int par = data.parent(p, kind);
-    final int size = par + data.size(par, data.kind(par));
-    int pre = p + data.size(p, kind);
-    
+    final int size = p + data.size(p, kind);
+    int pre = p + data.attSize(p, kind);
+
     while(pre != size) {
       kind = data.kind(pre);
       if(test.eval(data, pre, kind)) {

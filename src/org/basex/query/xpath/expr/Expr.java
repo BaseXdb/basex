@@ -4,7 +4,7 @@ import org.basex.query.ExprInfo;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.item.Item;
-import org.basex.query.xpath.locpath.Step;
+import org.basex.query.xpath.path.Step;
 
 /**
  * Common interface for all expressions.

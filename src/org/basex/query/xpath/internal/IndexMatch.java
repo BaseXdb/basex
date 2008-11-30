@@ -8,7 +8,7 @@ import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
 import org.basex.query.xpath.item.NodeBuilder;
 import org.basex.query.xpath.item.Nod;
-import org.basex.query.xpath.locpath.LocPath;
+import org.basex.query.xpath.path.LocPath;
 import org.basex.util.TokenBuilder;
 
 /**

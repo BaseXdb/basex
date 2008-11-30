@@ -143,12 +143,13 @@ public abstract class QueryContext extends Progress {
   public final void planDot() throws Exception {
     final CachedOutput out = new CachedOutput();
     final DOTSerializer ser = new DOTSerializer(out);
+    ser.open(1);
     ser.openElement(PLAN);
     plan(ser);
     ser.closeElement();
+    ser.close(1);
     
-    final IO f = IO.get(PLANDOT);
-    f.write(out.finish());
+    IO.get(PLANDOT).write(out.finish());
     new ProcessBuilder(Prop.dotty, PLANDOT).start().waitFor();
     //f.delete();
   }

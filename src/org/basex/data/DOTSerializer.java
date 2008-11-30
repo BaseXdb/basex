@@ -1,13 +1,13 @@
 package org.basex.data;
 
 import static org.basex.data.DataText.*;
+import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.query.ExprInfo;
 import org.basex.util.IntList;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -28,7 +28,7 @@ public final class DOTSerializer extends Serializer {
   /** Link entry. */
   private static final String COLITEM = "33FFFF";
   /** Link entry. */
-  private static final String COLTEXT = "9999FF";
+  private static final String COLTEXT = "6666FF";
   /** Link entry. */
   private static final String COLCOMM = "FFFF66";
   /** Link entry. */
@@ -36,6 +36,8 @@ public final class DOTSerializer extends Serializer {
   
   /** Output stream. */
   public final PrintOutput out;
+  /** Current level. */
+  private int level;
   /** Cached children. */
   private IntList[] children = new IntList[IO.MAXHEIGHT];
   /** Current color. */
@@ -62,8 +64,8 @@ public final class DOTSerializer extends Serializer {
   @Override
   public void open(final int s) throws IOException {
     out.println("digraph BaseXAlgebra {");
-    out.println("node[shape=box,style=filled,width=0.1,height=0.3];");
-    out.println("node[fontsize=12,fontname=SansSerif];");
+    out.println("node[shape=box,style=filled,width=0,height=0];");
+    //out.println("node[fontsize=16];");
     if(s != 1) openElement(RESULTS);
   }
 
@@ -108,13 +110,15 @@ public final class DOTSerializer extends Serializer {
   public void finish() throws IOException {
     final byte[] attr = tb.finish();
     if(color == null) color = attr.length == 0 ? COLELEM1 : COLELEM2;
-    print(Token.concat(tag, attr), color);
+    print(concat(tag, attr), color);
+    level++;
   }
 
   @Override
   public void close(final byte[] t) throws IOException {
-    final int c = nodes.list[tags.size];
-    final IntList il = children[tags.size];
+    if(--level < 0) return;
+    final int c = nodes.list[level];
+    final IntList il = children[level];
     for(int i = 0; i < il.size; i++) {
       out.println(BaseX.info(LINK, c, il.list[i]));
     }
@@ -123,22 +127,22 @@ public final class DOTSerializer extends Serializer {
 
   @Override
   public void text(final byte[] t) throws IOException {
-    print(Token.norm(t), COLTEXT);
+    print(norm(t), COLTEXT);
   }
 
   @Override
   public void comment(final byte[] t) throws IOException {
-    print(Token.concat(COM1, Token.norm(t), COM2), COLCOMM);
+    print(concat(COM1, norm(t), COM2), COLCOMM);
   }
 
   @Override
   public void pi(final byte[] n, final byte[] v) throws IOException {
-    print(Token.concat(PI1, n, Token.SPACE, v, PI2), COLPI);
+    print(concat(PI1, n, SPACE, v, PI2), COLPI);
   }
 
   @Override
   public void item(final byte[] t) throws IOException {
-    print(Token.norm(t), COLITEM);
+    print(norm(t), COLITEM);
   }
 
   /**
@@ -148,11 +152,11 @@ public final class DOTSerializer extends Serializer {
    * @throws IOException exception
    */
   protected void print(final byte[] t, final String col) throws IOException {
-    final byte[] text = t.length > 60 ? Token.concat(
-        Token.substring(t, 0, 60), Token.token("...")) : t;
+    final byte[] text = t.length > 60 ? concat(
+        substring(t, 0, 60), token("...")) : t;
     out.println(BaseX.info(NODE, count, text, col));
-    nodes.set(count, tags.size);
-    if(tags.size > 0) children[tags.size - 1].add(count);
+    nodes.set(count, level);
+    if(level > 0) children[level - 1].add(count);
     color = null;
     count++;
   }

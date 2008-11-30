@@ -11,7 +11,7 @@ import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.internal.FTIndex;
 import org.basex.query.xpath.item.Bln;
 import org.basex.query.xpath.item.Item;
-import org.basex.query.xpath.locpath.Step;
+import org.basex.query.xpath.path.Step;
 
 /**
  * Fulltext primary expression and FTTimes.

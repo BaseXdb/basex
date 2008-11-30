@@ -3,11 +3,11 @@ package org.basex.query.xpath;
 import static org.basex.query.xpath.XPText.OPTTEXT;
 import org.basex.query.xpath.expr.Expr;
 import org.basex.query.xpath.expr.Path;
-import org.basex.query.xpath.locpath.Axis;
-import org.basex.query.xpath.locpath.LocPath;
-import org.basex.query.xpath.locpath.Step;
-import org.basex.query.xpath.locpath.TestName;
-import org.basex.query.xpath.locpath.TestNode;
+import org.basex.query.xpath.path.Axis;
+import org.basex.query.xpath.path.LocPath;
+import org.basex.query.xpath.path.Step;
+import org.basex.query.xpath.path.TestName;
+import org.basex.query.xpath.path.TestNode;
 
 /**
  * This class assembles optimization methods for the XPath parser.

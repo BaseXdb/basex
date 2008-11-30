@@ -14,8 +14,8 @@ import org.basex.query.xpath.expr.Union;
 import org.basex.query.xpath.item.Bln;
 import org.basex.query.xpath.item.Comp;
 import org.basex.query.xpath.item.Item;
-import org.basex.query.xpath.locpath.LocPath;
-import org.basex.query.xpath.locpath.Step;
+import org.basex.query.xpath.path.LocPath;
+import org.basex.query.xpath.path.Step;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 

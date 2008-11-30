@@ -7,9 +7,10 @@ import org.basex.query.xpath.expr.Expr;
 import org.basex.query.xpath.item.Dbl;
 import org.basex.query.xpath.item.Item;
 import org.basex.query.xpath.item.Nod;
-import org.basex.query.xpath.locpath.Axis;
-import org.basex.query.xpath.locpath.LocPathAbs;
-import org.basex.query.xpath.locpath.Steps;
+import org.basex.query.xpath.path.Axis;
+import org.basex.query.xpath.path.LocPathAbs;
+import org.basex.query.xpath.path.Steps;
+
 import static org.basex.query.xpath.XPText.*;
 
 /**
