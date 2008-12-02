@@ -4,7 +4,9 @@ import java.io.IOException;
 import org.basex.data.MetaData;
 import org.basex.data.Serializer;
 import org.basex.index.FTNode;
+import org.basex.index.FTNodeIter;
 import org.basex.query.FTOpt;
+import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.path.Step;
@@ -71,6 +73,15 @@ public abstract class FTArrayExpr extends Expr {
     return new FTNode();
   }
 
+  /**
+   * Returns an itr for the results.
+   * @param ctx current context
+   * @return itr container for the results
+   */
+  @SuppressWarnings("unused")
+  public FTNodeIter iter(final QueryContext ctx) {
+    return FTNodeIter.EMPTY;
+  }
   
   @Override
   public final boolean usesPos() {

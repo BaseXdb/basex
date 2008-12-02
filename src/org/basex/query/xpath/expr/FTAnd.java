@@ -31,8 +31,6 @@ public final class FTAnd extends FTArrayExpr {
     for(final Expr e : exprs) 
       if(!ctx.eval(e).bool()) 
         return Bln.get(false);
-    
-    
     return Bln.get(true);
   }
 

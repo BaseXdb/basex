@@ -109,7 +109,9 @@ public final class Prop {
   /** Flag for iterator optimized storage within ftindex. */
   public static boolean ftittr = true;
   /** Flag for creating a fuzzy index. */
-  public static boolean ftfuzzy = true;
+  public static boolean ftfuzzy = false;
+  /** Flag for ftindex access within each predicate. */
+  public static boolean ftoptpreds = false;
   
   /** Flag for fulltext stemming. */
   public static boolean ftst = false;

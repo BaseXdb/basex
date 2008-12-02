@@ -1,6 +1,8 @@
 package org.basex.query.xpath.expr;
 
 import org.basex.index.FTNode;
+import org.basex.index.FTNodeIter;
+import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.item.Bln;
@@ -55,6 +57,14 @@ public final class FTIntersection extends FTArrayExpr {
   public boolean more() {
     if(pex.length > 0) return more(pex);
     return more(nex);
+  }
+  
+  @Override
+  public FTNodeIter iter(final QueryContext ctx) {
+    return new FTNodeIter(){
+      @Override
+      public FTNode next() { return more() ? next() : new FTNode(); }
+    };
   }
   
   /**

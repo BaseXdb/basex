@@ -37,6 +37,9 @@ public final class FTContains extends Arr {
   private FTNode ftn = null;
   /** Flag for index use. */
   private boolean iu;
+  /** Flag for index use. */
+  private boolean iut;
+  
 
   /**
    * Constructor.
@@ -168,7 +171,7 @@ public final class FTContains extends Arr {
 
     if(!(expr[0] instanceof LocPathRel)) return this;
     final LocPath path = (LocPath) expr[0];
-    
+    iu = iut;
     // all expressions are recursively converted for index access
     final FTArrayExpr ae = (FTArrayExpr)
       (iu ? expr[1].indexEquivalent(ctx, curr, seq) : expr[1]);
@@ -209,18 +212,36 @@ public final class FTContains extends Arr {
 
     // check all ftcontains options recursively if they comply
     // with the index options..
-    iu = ((FTArrayExpr) expr[1]).indexOptions(meta);
+    //iu = ((FTArrayExpr) expr[1]).indexOptions(meta);
+    iut = ((FTArrayExpr) expr[1]).indexOptions(meta);
     final boolean tmp = ctx.iu;
-    ctx.iu = iu;
+//    ctx.iu = iu;
+    ctx.iu = iut;
 
     // sequential processing necessary - no index use
-    if(!iu) return Integer.MAX_VALUE;
+    //if(!iu) return Integer.MAX_VALUE;
+    if(!iut) return Integer.MAX_VALUE;
 
     // Integer.MAX_VALUE is returned if an ftnot does not occur after an ftand
     final int nrIDs = expr[1].indexSizes(ctx, curr, min);
-    iu = ctx.iu;
+    if (!meta.ftoptpreds && nrIDs > min) {
+        // only one ftcontains predicate should use the index
+        iu = false;
+        ctx.iu = false;
+        return min;
+    }
+/*    if (nrIDs > min) {
+      // comment this, if every ftcontains pred should use the index
+      iu = false;
+      ctx.iu = false;
+      return min;
+    }
+  */  
+    //iu = ctx.iu;
+    iut = ctx.iu;
     // sequential processing necessary - no index use
-    if(!iu) return Integer.MAX_VALUE;
+    //if(!iu) return Integer.MAX_VALUE;
+    if(!iut) return Integer.MAX_VALUE;
 
     ctx.iu = tmp;
     if (nrIDs == -1) expr[1] = Bln.TRUE;

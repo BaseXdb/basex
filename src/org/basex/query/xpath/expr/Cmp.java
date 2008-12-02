@@ -52,7 +52,7 @@ public abstract class Cmp extends Arr {
     }
 
     // rewrite position predicate
-    if(expr[0] instanceof Position && expr[1] instanceof Dbl) {
+    if(expr[0] instanceof Position && expr[1] instanceof Dbl) {    
       final Expr ex = Pos.create(((Dbl) expr[1]).num(), type);
       if(ex != null) {
         ctx.compInfo(OPTPOS);

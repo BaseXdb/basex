@@ -14,9 +14,10 @@ import org.basex.util.IntList;
  * @author Sebastian Gath
  */
 public final class FTOr extends FTArrayExpr {
-  /** Saving index of expressions. */
+  /** Saving index of positive expressions. */
   private int[] pex;
-
+  /** Saving index of negative (ftnot) expressions. */
+  private int[] nex;
 
   /**
    * Constructor.
@@ -46,42 +47,45 @@ public final class FTOr extends FTArrayExpr {
   public FTArrayExpr indexEquivalent(final XPContext ctx, final Step curr,
       final boolean seq) throws QueryException {
 
-    if (pex.length == 2 && seq)
-      exprs[pex[0]].indexEquivalent(ctx, curr, seq);
+//    if (pex.length == 2 && seq)
+//    exprs[pex[0]].indexEquivalent(ctx, curr, seq);
 
     for (int i = 0; i < exprs.length; i++) {
       exprs[i] = exprs[i].indexEquivalent(ctx, curr, seq);
     }
-    if (pex.length == 1) {
-      return exprs[pex[0]];
-    }
+    
+    if (pex.length == 0) return new FTUnion(exprs, nex);
     return new FTUnion(exprs, pex);
   }
 
   @Override
   public int indexSizes(final XPContext ctx, final Step curr, final int min) {
-    final IntList i1 = new IntList();
-    boolean seq = false;
+    final IntList p = new IntList();
+    final IntList n = new IntList();
+    
     int sum = 0;
 
     for (int i = 0; i < exprs.length; i++) {
       final int nrIDs = exprs[i].indexSizes(ctx, curr, min);
       if (!(exprs[i] instanceof FTNot) && nrIDs > 0) {
-        i1.add(i);
+        p.add(i);
         sum += nrIDs;
       } else if (nrIDs > 0) {
-        i1.add(i);
-        seq = true;
+        n.add(i);
+      } else {
+        ctx.iu = false;
+        return Integer.MAX_VALUE;
       }
     }
-
-    pex = i1.finish();
-    if (pex.length == 0) {
+    nex = n.finish();
+    pex = p.finish();
+    if (pex.length == 0 || nex.length > 0 && pex.length > 0) {
       ctx.iu = false;
       return Integer.MAX_VALUE;
-    }
-    
-    return seq ? Integer.MAX_VALUE : sum > min ? min : sum;
+    } else {
+      return sum > min ? min : sum;
+    } 
+    //return seq ? Integer.MAX_VALUE : sum > min ? min : sum;
   }
   
   /**
