@@ -100,7 +100,7 @@ public final class FTContains extends Arr {
    * @throws QueryException Exception
    */
   private Bln evalIndex(final XPContext ctx) throws QueryException {
-    final FTTokenizer tmp = ctx.ftitem;
+    final FTTokenizer fti = ctx.ftitem;
     ctx.ftitem = ft;
     
     // evaluate index requests only once
@@ -120,15 +120,20 @@ public final class FTContains extends Arr {
             if(ftn.getPre() == ns.nodes[z]) {
               ftn = null;
               return Bln.get(!not);
-            } else if(not) return Bln.TRUE;
+            }
+            if(not) return Bln.TRUE;
           }
         }
-      } else if (expr[1] instanceof Bln) {
+      } else {
+        // expression can only be FTArrayExpr or boolean
         return Bln.get(ns.bool() && ((Bln) expr[1]).bool()); 
       }
     }
 
-    ctx.ftitem = tmp;
+    // [SG] ..necessary to set it back? (don't know myself ;)
+    //  otherwise, could be 'proven' by FTTests, and should probably
+    //  be set back as well before the other 'return' statements
+    ctx.ftitem = fti;
     return Bln.FALSE;
   }
 

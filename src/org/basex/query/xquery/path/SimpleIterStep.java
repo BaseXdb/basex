@@ -11,7 +11,7 @@ import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.util.Err;
 
 /**
- * Path expression.
+ * Iterative step expression.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
@@ -30,11 +30,9 @@ public final class SimpleIterStep extends Step {
   @Override
   public NodeIter iter(final XQContext ctx) throws XQException {
     final Iter iter = checkCtx(ctx);
-    final Item item = ctx.item;
 
     // no special predicate treatment?
     return new NodeIter() {
-      /** Temporary iterator. */
       NodeIter ir;
       
       @Override
@@ -42,19 +40,13 @@ public final class SimpleIterStep extends Step {
         while(true) {
           if(ir == null) {
             final Item it = iter.next();
-            if(it == null) {
-              ctx.item = item;
-              return null;
-            }
+            if(it == null) return null;
             if(!it.node()) Err.or(NODESPATH, this, it.type);
             ir = axis.init((Nod) it);
           }
           final Nod nod = ir.next();
           if(nod == null) ir = null;
-          else if(test.e(nod)) {
-            ctx.item = item;
-            return nod.finish();
-          }
+          else if(test.e(nod)) return nod.finish();
         }
       }
 

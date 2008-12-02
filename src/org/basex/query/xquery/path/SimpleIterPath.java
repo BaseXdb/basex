@@ -9,17 +9,12 @@ import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.NodeIter;
 
 /**
- * Path Expression when the axis is a descendant.
+ * Iterative path expression.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Dennis Stratmann
  */
 public final class SimpleIterPath extends Path {
-  /** Step. */
-  NodeIter step = null;
-  /** First call of class. */
-  boolean first = true;
-
   /**
    * Constructor.
    * @param r root expression
@@ -30,20 +25,31 @@ public final class SimpleIterPath extends Path {
   }
 
   @Override
-  public Iter iter(final XQContext ctx) throws XQException {
-    
+  public Iter iter(final XQContext ctx) {
     return new Iter() {
-      final Item item = ctx.iter(root).finish();  
+      // [DS] here's where the bug occurred:
+      // "first" was globally defined in this class; this is why
+      // it was always false after the first iter() call.
+      //
+      // Second - another small bug: ctx.item must be reset to
+      // the initial value after the last value has been returned
+      
+      final Item tmp = ctx.item;
+      boolean first = true;
+      NodeIter step;
+      Item item;
       
       @Override
       public Item next() throws XQException  {
-        if (first) {
+        if(first) {
+          item = ctx.iter(root).finish();
           ctx.item = item;
-          step = (NodeIter) (ctx.iter(expr[0]));
+          // expr[0] is always a SimpleIterStep, so casting is OK
+          step = (NodeIter) ctx.iter(expr[0]);
           first = false;
         }
-        Nod it = step.next();
-        ctx.item = it;
+        final Nod it = step.next();
+        ctx.item = tmp;
         return it;
       }
     };

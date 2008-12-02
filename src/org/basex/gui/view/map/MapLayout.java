@@ -7,12 +7,11 @@ import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.util.IntList;
 
-
 /**
  * Defines shared things of TreeMap Layout Algorithms.
- * 
- * @author joggele
  *
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Joerg Hauser
  */
 abstract class MapLayout {
   /** Layout rectangle. */

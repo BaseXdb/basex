@@ -68,14 +68,14 @@ public class Path extends Arr {
       expr[i] = ctx.comp(expr[i]);
       steps &= expr[i] instanceof Step;
     }
-
+    
     if(steps) {
       mergeDesc(ctx);
       checkEmpty();
-      // [DS] analyze if result set can be cached - no predicates/variables...
-      //System.out.println(" *** Root *** " + root.toString());
-      cache = !root.uses(Using.VAR);
       
+      // analyze if result set can be cached - no predicates/variables...
+      cache = !root.uses(Using.VAR);
+        
       boolean noPreds = true;
       for(final Expr step : expr) {
         // check if we have a predicate
@@ -90,8 +90,7 @@ public class Path extends Arr {
       }
       // no predicates, one child or descendant step...
       final Axis axis = ((Step) expr[0]).axis;
-      // if we've found a variable, cache will be false. But we can't
-      // handle variables in SimpleIterPath yet.
+      // if we've found a variable, cache will be false
       if(cache && noPreds && expr.length == 1 && (axis == Axis.DESC ||
           axis == Axis.DESCORSELF || axis == Axis.CHILD)) {
         return new SimpleIterPath(root, expr);

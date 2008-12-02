@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.basex.gui.view.map;
 
 import java.util.ArrayList;
@@ -14,9 +11,9 @@ import org.basex.util.Token;
 
 /**
  * Uses a SplitLayout Algorithm to divide Rectangles. First algo used in BaseX.
- * 
- * @author joggele
  *
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Joerg Hauser
  */
 public class SplitLayout extends MapLayout {
 

@@ -11,10 +11,10 @@ import org.basex.util.IntList;
 import org.basex.util.Token;
 
 /**
- * Uses simpleslice and ice Layout to split rectangles.
- * 
- * @author joggele
+ * Uses simple slice and dice layout to split rectangles.
  *
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Joerg Hauser
  */
 public class SliceDiceLayout extends MapLayout {
 

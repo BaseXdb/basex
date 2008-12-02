@@ -99,7 +99,6 @@ public class Step extends Arr {
       ni.add(nb.list, nb.size);
       nb = new NodIter();
     }
-    //ctx.item = ci;
     return ni;
   }
 
