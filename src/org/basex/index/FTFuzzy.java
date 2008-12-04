@@ -59,7 +59,7 @@ public final class FTFuzzy extends Index {
   /** Storing pre and pos values for each token. */
   private final DataAccess dat;
   /** Token positions. */
-  private final int[] tp = new int[MAXLEN + 1];
+  private final int[] tp = new int[MAXLEN + 3];
 
   /**
    * Constructor, initializing the index structure.

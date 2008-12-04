@@ -36,6 +36,8 @@ public final class PlotData {
   public PlotData() {
     xAxis = new PlotAxis(this);
     yAxis = new PlotAxis(this);
+    //xAxis.log = true;
+    //yAxis.log = true;
     pres = new int[0];
   }
 
@@ -88,7 +90,7 @@ public final class PlotData {
    * Refreshes item list and coordinates if the selection has changed. So far
    * only numerical data is considered for plotting.
    * @param context context to be displayed 
-   * @param sub determine descendent nodes of given context nodes
+   * @param sub determine descendant nodes of given context nodes
    */
   void refreshItems(final Nodes context, final boolean sub) {
     final Data data = GUI.context.data();

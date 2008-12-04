@@ -288,8 +288,8 @@ public final class GUIConstants {
    */
   public static int[] fontWidths(final Font f) {
     if(dfont == null) {
-      dfont = new Font("Monospaced", 0,
-          UIManager.getFont("TextArea.font").getSize());
+      dfont = new Font(GUIProp.monofont, 0,
+          UIManager.getFont("TextArea.font").getSize() - 1);
       dwidth  = new Container().getFontMetrics(dfont).getWidths();
     }
     if(f == font) return fwidth;
