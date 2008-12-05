@@ -518,14 +518,6 @@ public final class PlotView extends View implements Runnable {
       drawCaptionAndGrid(g, drawX, "", 0);
       drawCaptionAndGrid(g, drawX, "", 1);
 
-      if(axis.log) {
-        drawCaptionAndGrid(g, drawX, formatString(axis.min, drawX), 0.0);
-        drawCaptionAndGrid(g, drawX, formatString(axis.max, drawX), 1.0);
-        drawCaptionAndGrid(g, drawX, formatString(axis.sigVal, drawX), 
-            axis.calcPosition(axis.sigVal));
-        return;
-      }
-      
       // return if insufficient plot space
       if(nrCaptions == 0) return;
       
@@ -535,21 +527,24 @@ public final class PlotView extends View implements Runnable {
         drawCaptionAndGrid(g, drawX, formatString(axis.min, drawX), .5d);
         return;
       }
-      // draw captions between min and max
-      double d = axis.calcPosition(axis.firstLabel);
-      double f = axis.firstLabel;
+      
       int c = 0;
-      while(d < 1.0d - .25d / nrCaptions) {
-        c++;
-        drawCaptionAndGrid(g, drawX,
-            formatString(f, drawX), d);
-        d = axis.calcPosition(f + step);
-        f = f + step;
-//        if(step < .2) {
-//          // round f - java is not able to do that
-//          f = roundCaption(f, step);
-//        }
+      if(axis.log) {
+        
+      } else {
+        // draw captions between min and max
+        double d = axis.calcPosition(axis.startvalue);
+        double f = axis.startvalue;
+        while(d < 1.0d - .25d / nrCaptions) {
+          c++;
+          drawCaptionAndGrid(g, drawX,
+              formatString(f, drawX), d);
+          f = f + step;
+          d = axis.calcPosition(f);
+        }
       }
+
+      // draw min/max labels if little space available
       if(c < 2) {
         drawCaptionAndGrid(g, drawX, formatString(axis.min, drawX), 0.0);
         drawCaptionAndGrid(g, drawX, formatString(axis.max, drawX), 1.0);

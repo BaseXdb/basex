@@ -1,6 +1,7 @@
 package org.basex.gui.view.plot;
 
 import static org.basex.util.Token.*;
+
 import org.basex.data.Data;
 import org.basex.data.StatsKey;
 import org.basex.data.StatsKey.Kind;
@@ -31,7 +32,7 @@ public final class PlotAxis {
   /** Coordinates of items. */
   double[] co = {};
   /** First label to be drawn after minimum label. */
-  double firstLabel;
+  double startvalue;
   /** The first category for text data. */
   byte[] firstCat;
   /** The last category for text data. */
@@ -42,8 +43,6 @@ public final class PlotAxis {
   double actlCaptionStep;
   /** Calculated caption step, view size not considered for calculation. */
   private double calculatedCaptionStep;
-  /** Significant value for axis caption. */
-  double sigVal;
   /** Minimum value in case selected attribute is numerical. */
   double min;
   /** Maximum  value in case selected attribute is numerical. */
@@ -78,8 +77,7 @@ public final class PlotAxis {
     calculatedCaptionStep = -1;
     min = Integer.MIN_VALUE;
     max = Integer.MAX_VALUE;
-    sigVal = 0;
-    firstLabel = 0;
+    startvalue = 0;
   }
 
   /**
@@ -129,7 +127,10 @@ public final class PlotAxis {
       textToNum(vals);
     else {
       extremeValues(vals);
-      prepareCaption();
+      // calculations for axis labelling
+      if(log) prepareLogAxis();
+      else prepareLinAxis();
+      
       // coordinates for TEXT already calculated in textToNum()
       for(int i = 0; i < vals.length; i++)
         co[i] = calcPosition(vals[i]);
@@ -309,9 +310,10 @@ public final class PlotAxis {
   }
 
   /**
-   * Executes some calculations to support a dynamic axis labelling.
+   * Executes some calculations to support a dynamic axis labelling for a
+   * linear scale.
    */
-  private void prepareCaption() {
+  private void prepareLinAxis() {
     // range as driving force for following calculations, no matter if INT
     // or DBL ... whatsoever
     double range = Math.abs(max - min);
@@ -325,22 +327,25 @@ public final class PlotAxis {
       final double tmin = min * fac;
       final double tmax = max * fac;
       range = Math.abs(tmax - tmin);
-      final double d = tmin + range * .55d;
 
       pow = range < 10 ? 0 : (int) (Math.floor(Math.log10(range) + .5d)) - 1;
-      final double lstep = (int) (Math.pow(10, pow));
-      sigVal = d - d % lstep;
-      sigVal /= fac;
-      calculatedCaptionStep = lstep / fac;
+      calculatedCaptionStep = (int) (Math.pow(10, pow));
+      calculatedCaptionStep /= fac;
       return;
     }
 
     final int pow = range < 10 ? 0 :
       (int) (Math.floor(Math.log10(range) + .5d)) - 1;
-    final double lstep = (int) (Math.pow(10, pow));
-    final double d = min + range * .6d;
-    sigVal = d - d % lstep;
-    calculatedCaptionStep = lstep;
+    calculatedCaptionStep = (int) (Math.pow(10, pow));
+  }
+  
+  /**
+   * Executes some calculations to support a dynamic axis labelling for a
+   * logarithmic scale.
+   */
+  private void prepareLogAxis() {
+    // range as driving force for following calculations, no matter if INT
+    // or DBL ... whatsoever
   }
 
   /**
@@ -349,14 +354,21 @@ public final class PlotAxis {
    */
   void calcCaption(final int space) {
     if(type == Kind.DBL || type == Kind.INT) {
-      if(log) return;
       final double range = Math.abs(max - min);
       if(range == 0) {
         nrCaptions = 1;
         return;
       }
-      final boolean dbl = type == Kind.DBL;
+      
+      // labelling for logarithmic scale
+      if(log) {
+        startvalue = 0;
+        
+        return;
+      }
 
+      // labelling for linear scale
+      final boolean dbl = type == Kind.DBL;
       actlCaptionStep = calculatedCaptionStep;
       nrCaptions = (int) (range / actlCaptionStep) + 1;
       while(2 * nrCaptions * PlotView.CAPTIONWHITESPACE * 3 < space &&
@@ -368,11 +380,9 @@ public final class PlotAxis {
         actlCaptionStep *= 2;
         nrCaptions = (int) (range / actlCaptionStep);
       }
-
-      // find first label after minimum value
-      firstLabel = sigVal;
-      while(firstLabel > min + actlCaptionStep * 1.2d)
-        firstLabel -= actlCaptionStep;
+      // calculate first value to be drawn
+      startvalue = min + (actlCaptionStep - (min % actlCaptionStep));
+      if(startvalue - min < actlCaptionStep / 4) startvalue += actlCaptionStep;
 
       // type == TEXT / CAT
     } else {
