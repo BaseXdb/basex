@@ -459,7 +459,7 @@ public final class PlotView extends View implements Runnable {
 
     // getting some axis specific data
     final Kind type = axis.type;
-    final int nrCaptions = axis.nrCaptions/* > 1 ? axis.nrCaptions : 3*/;
+    final int nrCaptions = axis.nrCaptions;
     final double step = axis.actlCaptionStep;
     final double capRange = 1.0d / (nrCaptions - 1);
 
@@ -530,12 +530,29 @@ public final class PlotView extends View implements Runnable {
       
       int c = 0;
       if(axis.log) {
-        int l = (int) Math.log10(axis.startvalue);
+        int l = (int) Math.log10(axis.startvalue + 1);
+        l = l > 0 ? l : 1;
         int d = (int) Math.pow(10, l);
-        while(d < axis.max) {
+        if(d < axis.min ) d = (int) Math.pow(10, ++l);
+        while(d < axis.max && calcCoordinate(drawX, axis.calcPosition(d)) < 
+            w - MARGIN[3] - sizeFactor()) {
           drawCaptionAndGrid(g, drawX, formatString(d, drawX), 
               axis.calcPosition(d));
           d = (int) Math.pow(10, ++l);
+        }
+        if(axis.min < 0) {
+          if(properDistance(drawX, axis.min, 0) && 
+              properDistance(drawX, axis.max, 0)) 
+            drawCaptionAndGrid(g, drawX, "0", axis.calcPosition(0));
+          l = (int) Math.log10(axis.startvalue + 1);
+          l = l > 0 ? l : 1;
+          d = (int) (-1 * Math.pow(10, l));
+          while(d > axis.min && calcCoordinate(drawX, axis.calcPosition(d)) > 
+              MARGIN[1] + 0 + sizeFactor() * 2) {
+            drawCaptionAndGrid(g, drawX, formatString(d, drawX), 
+                axis.calcPosition(d));
+            d = (int) (-1 * Math.pow(10, ++l));
+          }
         }
         
       } else {
@@ -558,24 +575,13 @@ public final class PlotView extends View implements Runnable {
       }
     }
   }
-
-//  /**
-//   * Whatever.
-//   * @param val val
-//   * @param step step
-//   * @return poo.
-//   */
-//  private double roundCaption(final double val, final double step) {
-//    double d = val;
-//    final double dec = 1.0d / step;
-//    double pow = (int) (Math.floor(Math.log10(dec) + .5d) + 2);
-//    final double fac = (int) (Math.pow(10, pow));
-//    d *= fac;
-//    d = (int) d;
-//    d /= fac;
-//
-//    return d;
-//  }
+  
+  private boolean properDistance(final boolean drawX, final double a, 
+      final double b) {
+    final PlotAxis axis = drawX ? plotData.xAxis : plotData.yAxis;
+    return Math.abs(calcCoordinate(drawX, axis.calcPosition(a)) -   
+    calcCoordinate(drawX, axis.calcPosition(b))) > sizeFactor() * 2;
+  }
 
   /**
    * Draws an axis caption to the specified position.
@@ -800,7 +806,7 @@ public final class PlotView extends View implements Runnable {
   }
 
   /**
-   * Returns a standardized size factor for painting the pot.
+   * Returns a standardized size factor for painting the plot.
    * @return size value
    */
   private static int sizeFactor() {

@@ -362,8 +362,8 @@ public final class PlotAxis {
       
       // labelling for logarithmic scale
       if(log) {
-        startvalue = 0;
-        
+        startvalue = min;
+        nrCaptions = 3;
         return;
       }
 
