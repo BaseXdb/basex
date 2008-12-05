@@ -530,6 +530,13 @@ public final class PlotView extends View implements Runnable {
       
       int c = 0;
       if(axis.log) {
+        int l = (int) Math.log10(axis.startvalue);
+        int d = (int) Math.pow(10, l);
+        while(d < axis.max) {
+          drawCaptionAndGrid(g, drawX, formatString(d, drawX), 
+              axis.calcPosition(d));
+          d = (int) Math.pow(10, ++l);
+        }
         
       } else {
         // draw captions between min and max
