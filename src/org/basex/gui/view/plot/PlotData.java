@@ -11,9 +11,7 @@ import org.basex.util.IntList;
 import org.basex.util.TokenList;
 
 /**
- * An additional abstraction layer which prepares the data for the scatter plot.
- * It consists of a simple array for fast plotting and two hash maps which
- * support a fast item search after interactions.
+ * An additional layer which prepares the data for the scatter plot.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Lukas Kircher
@@ -36,8 +34,8 @@ public final class PlotData {
   public PlotData() {
     xAxis = new PlotAxis(this);
     yAxis = new PlotAxis(this);
-    //xAxis.log = true;
-    //yAxis.log = true;
+//    xAxis.log = true;
+//    yAxis.log = true;
     pres = new int[0];
   }
 
