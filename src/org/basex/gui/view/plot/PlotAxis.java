@@ -107,7 +107,6 @@ public final class PlotAxis {
    */
   void refreshAxis() {
     final Data data = GUI.context.data();
-    if(plotData.pres.length < 1) return;
     final StatsKey key = isTag ? data.tags.stat(attrID) :
       data.atts.stat(attrID);
     type = key.kind;
@@ -115,6 +114,7 @@ public final class PlotAxis {
       type = Kind.TEXT;
 
     final int[] items = plotData.pres;
+    if(items.length < 1) return;
     co = new double[items.length];
     byte[][] vals = new byte[items.length][];
     for(int i = 0; i < items.length; i++) {
