@@ -1,8 +1,9 @@
 package org.basex.gui.view.plot;
 
-import static org.basex.gui.GUIConstants.*;
 import static org.basex.Text.*;
+import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -15,11 +16,13 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
+
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
+
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.StatsKey.Kind;
@@ -31,7 +34,6 @@ import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.View;
 import org.basex.util.Array;
 import org.basex.util.IntList;
-import org.basex.util.Performance;
 
 /**
  * A scatter plot visualization of the database.
@@ -433,7 +435,7 @@ public final class PlotView extends View implements Runnable {
    * @param drawX drawn axis is x axis
    */
   private void drawAxis(final Graphics g, final boolean drawX) {
-    Performance perf = new Performance();
+//    Performance perf = new Performance();
     final int h = getHeight();
     final int w = getWidth();
     g.setColor(back);
@@ -601,7 +603,7 @@ public final class PlotView extends View implements Runnable {
         }
       }
     }
-    System.out.println(perf.getTimer());
+//    System.out.println(perf.getTimer());
   }
   
   /**
