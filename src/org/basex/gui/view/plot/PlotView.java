@@ -31,6 +31,7 @@ import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.View;
 import org.basex.util.Array;
 import org.basex.util.IntList;
+import org.basex.util.Performance;
 
 /**
  * A scatter plot visualization of the database.
@@ -432,6 +433,7 @@ public final class PlotView extends View implements Runnable {
    * @param drawX drawn axis is x axis
    */
   private void drawAxis(final Graphics g, final boolean drawX) {
+    Performance perf = new Performance();
     final int h = getHeight();
     final int w = getWidth();
     g.setColor(back);
@@ -529,32 +531,58 @@ public final class PlotView extends View implements Runnable {
       }
       
       int c = 0;
+      
+      // draw logarithmic scale
       if(axis.log) {
-        int l = (int) Math.log10(axis.startvalue + 1);
-        l = l > 0 ? l : 1;
-        int d = (int) Math.pow(10, l);
-        if(d < axis.min ) d = (int) Math.pow(10, ++l);
-        while(d < axis.max && calcCoordinate(drawX, axis.calcPosition(d)) < 
-            w - MARGIN[3] - sizeFactor()) {
-          drawCaptionAndGrid(g, drawX, formatString(d, drawX), 
-              axis.calcPosition(d));
-          d = (int) Math.pow(10, ++l);
-        }
-        if(axis.min < 0) {
-          if(properDistance(drawX, axis.min, 0) && 
-              properDistance(drawX, axis.max, 0)) 
-            drawCaptionAndGrid(g, drawX, "0", axis.calcPosition(0));
-          l = (int) Math.log10(axis.startvalue + 1);
-          l = l > 0 ? l : 1;
-          d = (int) (-1 * Math.pow(10, l));
-          while(d > axis.min && calcCoordinate(drawX, axis.calcPosition(d)) > 
-              MARGIN[1] + 0 + sizeFactor() * 2) {
-            drawCaptionAndGrid(g, drawX, formatString(d, drawX), 
-                axis.calcPosition(d));
-            d = (int) (-1 * Math.pow(10, ++l));
+        int l = (int) (Math.log10(Math.abs(axis.min)));
+        l = l > 0 ? l : 1; 
+        double a = axis.min;
+        double b = 0;
+        final boolean neg = axis.min < 0;
+        // draw labels <= 0
+        if(neg) {
+          b = (int) (-1 * Math.pow(10, l));
+          while(adequateDistance(drawX, b, axis.max) && b > axis.min) {
+            if(adequateDistance(drawX, a, b) && b < axis.max)
+              // ------------------ insteps
+              drawCaptionAndGrid(g, drawX, 
+                  formatString(b, drawX), axis.calcPosition(b));
+            a = b;
+            l--;
+            if(l == 0) {
+              b = 0;
+              // ------------------ insteps ?????
+              if(axis.max > 0 && adequateDistance(drawX, a, b))
+                drawCaptionAndGrid(g, drawX, 
+                    formatString(b, drawX), axis.calcPosition(b));
+              break;
+            }
+            b = (int) (-1 * Math.pow(10, l));
           }
         }
         
+        // draw labels >= 0, logarithmic crap
+        if(neg) {
+          a = 0;
+          l++;
+        } else {
+          a = axis.min;
+          l = (int) (Math.log10(Math.abs(axis.min)));
+          l = l > 0 ? l : 0;
+        }
+        b = (int) (Math.pow(10, l));
+        b = b > 0 ? b : 0;
+        while(adequateDistance(drawX, b, axis.max) && b < axis.max) {
+          if(adequateDistance(drawX, a, b) && b > axis.min)
+            // ------------------ insteps
+            drawCaptionAndGrid(g, drawX, formatString(b, drawX), 
+                axis.calcPosition(b));
+          a = b;
+          l++;
+          b = (int) (Math.pow(10, l));
+        }
+        
+      // draw linear scale
       } else {
         // draw captions between min and max
         double d = axis.calcPosition(axis.startvalue);
@@ -566,14 +594,14 @@ public final class PlotView extends View implements Runnable {
           f = f + step;
           d = axis.calcPosition(f);
         }
-      }
-
-      // draw min/max labels if little space available
-      if(c < 2) {
-        drawCaptionAndGrid(g, drawX, formatString(axis.min, drawX), 0.0);
-        drawCaptionAndGrid(g, drawX, formatString(axis.max, drawX), 1.0);
+        // draw min/max labels if little space available
+        if(c < 2) {
+          drawCaptionAndGrid(g, drawX, formatString(axis.min, drawX), 0.0);
+          drawCaptionAndGrid(g, drawX, formatString(axis.max, drawX), 1.0);
+        }
       }
     }
+    System.out.println(perf.getTimer());
   }
   
   /**
@@ -583,11 +611,11 @@ public final class PlotView extends View implements Runnable {
    * @param b second point
    * @return a and b have adequate distance
    */
-  private boolean properDistance(final boolean drawX, final double a, 
+  private boolean adequateDistance(final boolean drawX, final double a, 
       final double b) {
     final PlotAxis axis = drawX ? plotData.xAxis : plotData.yAxis;
     return Math.abs(calcCoordinate(drawX, axis.calcPosition(a)) -   
-    calcCoordinate(drawX, axis.calcPosition(b))) > sizeFactor() * 2;
+    calcCoordinate(drawX, axis.calcPosition(b))) > sizeFactor() * 1.5;
   }
 
   /**
