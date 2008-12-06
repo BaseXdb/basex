@@ -576,6 +576,13 @@ public final class PlotView extends View implements Runnable {
     }
   }
   
+  /**
+   * Determines if two points on the axis have an adequate distance.
+   * @param drawX drawX
+   * @param a first point
+   * @param b second point
+   * @return a and b have adequate distance
+   */
   private boolean properDistance(final boolean drawX, final double a, 
       final double b) {
     final PlotAxis axis = drawX ? plotData.xAxis : plotData.yAxis;
