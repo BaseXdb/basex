@@ -158,8 +158,14 @@ public abstract class LocPath extends Expr {
             if (e instanceof FTContains) {
               ((PredSimple) pred).expr = e.indexEquivalent(ctx, null, true);
             }
+            newPreds.add(pred);
+          } else if (pred instanceof PredPos) {
+            invPath.steps.get(invPath.steps.size() - 1).
+              addPosPred((PredPos) pred);
+          } else {
+            newPreds.add(pred);
           }
-          newPreds.add(pred);
+          
         }
       }
       result = new InterSect(new Expr[] { indexArg }).comp(ctx);
@@ -167,9 +173,11 @@ public abstract class LocPath extends Expr {
       // add rest of predicates
       if(newPreds.size() != 0) result =
         new Filter(result, newPreds).comp(ctx);
+//        new Filter(result, newPreds).comp(ctx); old
 
       // add match with initial nodes
       if(indexMatch) result = new IndexMatch(this, result, invPath);
+//      if(indexMatch) result = new IndexMatch(this, result, invPath); old
 
       // add rest of location path
       if(oldPath.steps.size() != 0) result = new Path(result, oldPath);

@@ -144,6 +144,16 @@ public abstract class Step extends ExprInfo {
   }
 
   /**
+   * Limit evaluation of predicates to first hit when only existence
+   * of path has to be checked...
+   * @param pp PredPos 
+   */
+  final void addPosPred(final PredPos pp) {
+    preds.add(pp);
+  }
+
+  
+  /**
    * Checks if this is a simple axis (node test, no predicates).
    * @param ax axis to be checked
    * @return result of check
