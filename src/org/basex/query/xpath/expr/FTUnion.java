@@ -3,6 +3,8 @@ package org.basex.query.xpath.expr;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.index.FTNode;
+import org.basex.index.FTNodeIter;
+import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.item.Bln;
@@ -62,7 +64,7 @@ public final class FTUnion extends FTArrayExpr {
   private int minp = -1;
   
   @Override
-  public FTNode next(final XPContext ctx) {
+  public FTNode next(final QueryContext ctx) {
     if (minp == -1) {
       minp = 0;
       while(!mp[minp]) minp++;
@@ -89,6 +91,16 @@ public final class FTUnion extends FTArrayExpr {
       }
       return m;
   }
+  
+  @Override
+  public FTNodeIter iter(final QueryContext ctx) {
+    return new FTNodeIter(){
+      @Override
+      public FTNode next() { return FTUnion.this.more() 
+        ? FTUnion.this.next(ctx) : new FTNode(); }
+    };
+  }
+
   
   @Override
   public Bln eval(final XPContext ctx) throws QueryException {

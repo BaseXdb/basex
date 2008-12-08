@@ -1,20 +1,20 @@
-package org.basex.query.xpath.internal;
+package org.basex.query.xquery.expr;
 
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.index.FTNode;
-import org.basex.index.FTNodeIter;
+
 import org.basex.index.FTTokenizer;
 import org.basex.index.IndexArrayIterator;
 import org.basex.index.IndexIterator;
-import org.basex.query.FTOpt;
-import org.basex.query.QueryContext;
-import org.basex.query.xpath.XPContext;
-import org.basex.query.xpath.expr.FTArrayExpr;
-import org.basex.query.xpath.item.Bln;
-import org.basex.query.xpath.path.Step;
+import org.basex.query.FTOpt.FTMode;
+import org.basex.query.xquery.XQContext;
+import org.basex.query.xquery.item.DNode;
+import org.basex.query.xquery.item.FTNodeItem;
+import org.basex.query.xquery.iter.FTNodeIter;
+import org.basex.query.xquery.iter.Iter;
 import org.basex.util.IntArrayList;
 
 /**
@@ -24,52 +24,50 @@ import org.basex.util.IntArrayList;
  * @author Sebastian Gath
  * @author Christian Gruen
  */
-public final class FTIndex extends FTArrayExpr {
-  /** Token. */
-  final byte[] token;
-  /** FullText options. */
-  private FTOpt opt;
+public final class FTIndex extends FTExpr {
+  /** Fulltext token. */
+  public byte[] tok;
+  /** Minimum and maximum occurrences. */
+  final Expr[] occ;
+  /** Search mode. */
+  final FTMode mode;
   /** Collection for the index results. */
-  private IndexArrayIterator iat = null;
+  public IndexArrayIterator iat = null;
+  /** Data reference. */
+  public Data data;
   
   /**
    * Constructor.
-   * @param tok index token
-   * @param o FTOption for index token
+   * @param t token
+   * @param m search mode
+   * @param o occurrences
    */
-  public FTIndex(final byte[] tok, final FTOpt o) {
-    exprs = new FTArrayExpr[] {};
-    token = tok;
-    opt = o;
+  public FTIndex(final byte[] t, final FTMode m, final Expr[] o) {
+    tok = t;
+    mode = m;
+    occ = o;
   }
 
-  @Override
-  public FTArrayExpr indexEquivalent(final XPContext ctx, final Step curr, 
-      final boolean seq) {
-    return this;
-  }
 
-  @Override
-  public Bln eval(final XPContext ctx) {
-    final Data data = ctx.item.data;
+  /**
+   * Evaluate index access.
+   * 
+   * @param ctx current context
+   * @return boolean
+   */
+  public boolean eval(final XQContext ctx) {
+    data = ((DNode) ctx.item).data;
 
     final FTTokenizer ft = new FTTokenizer();
-    ft.init(token);
-    ft.st = opt.is(FTOpt.ST);
-    ft.dc = opt.is(FTOpt.DC);
-    ft.lc = opt.is(FTOpt.LC);
-    ft.uc = opt.is(FTOpt.UC);
-    ft.cs = opt.is(FTOpt.CS);
-    ft.wc = opt.is(FTOpt.WC);
-    ft.fz = opt.is(FTOpt.FZ);
-    ft.lp = ctx.ftpos.lp;
+    ft.init(tok);
+    ft.lp = true;
     
     // check if all terms return a result at all... if not, skip node retrieval
     // (has still to be checked, maybe ft options cause troubles here)
     // ideal solution for phrases would be to process small results first
     // and end up with the largest ones.. but this seems tiresome
     while(ft.more()) {
-      if(data.nrIDs(ft) == 0) return Bln.FALSE;
+      if(data.nrIDs(ft) == 0) return false;
       ctx.checkStop();
     }
     
@@ -77,45 +75,37 @@ public final class FTIndex extends FTArrayExpr {
     int w = 0;
     while(ft.more()) {
       final IndexIterator it = data.ids(ft);
-      if(it.size() == 0) return Bln.FALSE;
+      if(it.size() == 0) return false;
 
       if(w == 0) {
         iat = (IndexArrayIterator) it;  
       } else {
         iat = phrase(iat, (IndexArrayIterator) it, w);
-        if (iat.size() == 0) return Bln.FALSE;
+        if (iat.size() == 0) return false;
       }
       w++;
     }
     
     if (iat.size() > 0) {
-      if (ctx.ftpos.st) iat.setToken(new FTTokenizer[]{ft});
+      iat.setToken(new FTTokenizer[]{ft});
       iat.setTokenNum(++ctx.ftcount);
-      return Bln.TRUE;
+      return true;
     }
     
-    return Bln.FALSE;
+    return false;
   }
 
   @Override
-  public boolean more() {
-    return iat.more();
-  }
-  
-  @Override
-  public FTNode next(final QueryContext ctx) {
-    return iat.nextFTNode();
-  }
-  
-  @Override
-  public FTNodeIter iter(final QueryContext ctx) {
+  public Iter iter(final XQContext ctx) {
     return new FTNodeIter(){
       @Override
-      public FTNode next() { return FTIndex.this.more() 
-        ? FTIndex.this.next(ctx) : new FTNode(); }
+      public FTNodeItem next() { 
+        if (iat == null && !eval(ctx)) return new FTNodeItem();
+        return iat.more() ? new FTNodeItem(iat.nextFTNode(), data) : 
+          new FTNodeItem(new FTNode(), data); 
+      }
     };
   }
-
 
   /**
    * Joins the specified iterators and returns its result.
@@ -144,19 +134,14 @@ public final class FTIndex extends FTArrayExpr {
   }
 
   @Override
-  public int indexSizes(final XPContext ctx, final Step curr, final int min) {
-    return 1;
-  }
-
-  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
-    ser.text(token);
+    ser.text(tok);
     ser.closeElement();
   }
 
   @Override
   public String toString() {
-    return BaseX.info("%(\"%\")", name(), token);
+    return BaseX.info("%(\"%\")", name(), tok);
   }
 }

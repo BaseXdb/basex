@@ -1,6 +1,9 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQText.*;
+
+import org.basex.index.FTIndexAcsbl;
+import org.basex.index.FTIndexEq;
 import org.basex.query.ExprInfo;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
@@ -72,6 +75,32 @@ public abstract class Expr extends ExprInfo {
   public boolean uses(final Using use) {
     return true;
   }
+  
+  /**
+   * Checks an index could be used for query evalutaion.
+   *
+   * @param ctx current context
+   * @param ia FTIndexAcsbl
+   * @throws XQException Exception
+   */
+  @SuppressWarnings("unused")
+  public void indexAccessible(final XQContext ctx, final FTIndexAcsbl ia) 
+    throws XQException {
+  }
+  
+  /**
+   * Returns an equivalent expression which accesses an index structure. 
+   * 
+   * @param ctx current context
+   * @param ieq FTIndexEq 
+   * @return Equivalent index-expression or null
+   */
+  @SuppressWarnings("unused")
+  public Expr indexEquivalent(final XQContext ctx, 
+      final FTIndexEq ieq) {
+    return this;
+  }
+
 
   /**
    * Indicates if an expression returns the specified type.

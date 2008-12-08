@@ -111,6 +111,20 @@ public class Step extends Arr {
     return axis == ax && test == Test.NODE && expr.length == 0;
   }
   
+  /**
+   * Checks if the specified location step has suitable index axes.
+   * @return true result of check
+   */
+  public final boolean checkAxes() {
+    return //expr != null || 
+       axis != Axis.ANC &&
+       axis != Axis.ANCORSELF && axis != Axis.DESC &&
+       axis != Axis.SELF && axis != Axis.DESCORSELF &&
+       axis != Axis.CHILD && axis != Axis.PARENT;
+  }
+
+
+  
   @Override
   public boolean uses(final Using u) {
     switch(u) {

@@ -45,8 +45,6 @@ public final class FTMildNot extends FTArrayExpr {
 
     // assumption 1: ftcontains "a" not in "a b" not in "a c"
     // and ftcontains "a" not in "a b" ftand "a" not in "a c" are equivalent
-    // assumption 2: ftcontains "a" not in ftnot ***
-    // and ftcontains "a" are equivalent
 
     final FTArrayExpr[] indexExprs = new FTArrayExpr[2];
     final FTMildNotIter[] mne = new FTMildNotIter[exprs.length - 1];

@@ -1,5 +1,7 @@
 package org.basex.query.xquery.expr;
 
+import org.basex.index.FTIndexAcsbl;
+import org.basex.index.FTIndexEq;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Dbl;
@@ -29,4 +31,20 @@ public final class FTNot extends FTExpr {
   public String toString() {
     return "ftnot " + expr[0];
   }
+  
+  @Override
+  public void indexAccessible(final XQContext ctx, final FTIndexAcsbl ia) 
+    throws XQException {
+    ia.ftnot = true;
+    // in case of ftand ftnot seq could be set false in FTAnd
+    ia.seq = true;
+    expr[0].indexAccessible(ctx, ia);
+    ia.indexSize = Integer.MAX_VALUE;
+  }
+
+  @Override
+  public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq) {
+    return new FTNotIndex((FTExpr) expr[0].indexEquivalent(ctx, ieq));
+  }
+
 }

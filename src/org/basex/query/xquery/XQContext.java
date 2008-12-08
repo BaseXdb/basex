@@ -63,6 +63,8 @@ public final class XQContext extends QueryContext {
   public FTOpt ftopt = new FTOpt();
   /** Current fulltext position filter. */
   public FTPos ftpos;
+  /** Count nuber of FTIndex. */
+  public int ftcount = 0;
 
   /** Current Date. */
   public Dat date;

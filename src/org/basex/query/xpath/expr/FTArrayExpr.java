@@ -62,17 +62,18 @@ public abstract class FTArrayExpr extends Expr {
   public boolean pos() {
     return true;
   }
-  
+
   /**
    * Returns the next ftquery result.
    * @param ctx current context
    * @return FTNode container for the next result
    */
   @SuppressWarnings("unused")
-  public FTNode next(final XPContext ctx) {
+  public FTNode next(final QueryContext ctx) {
     return new FTNode();
   }
 
+  
   /**
    * Returns an itr for the results.
    * @param ctx current context

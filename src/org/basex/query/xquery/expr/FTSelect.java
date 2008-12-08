@@ -3,7 +3,10 @@ package org.basex.query.xquery.expr;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import java.io.IOException;
+
 import org.basex.data.Serializer;
+import org.basex.index.FTIndexAcsbl;
+import org.basex.index.FTIndexEq;
 import org.basex.query.FTPos;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
@@ -103,6 +106,19 @@ public final class FTSelect extends FTExpr {
     return super.comp(ctx);
   }
 
+  @Override
+  public void indexAccessible(final XQContext ctx, final FTIndexAcsbl ia) 
+  throws XQException {
+    
+    expr[0].indexAccessible(ctx, ia);
+  }
+  
+  @Override
+  public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq) {
+    return new FTSelectIndex((FTExpr) 
+        expr[0].indexEquivalent(ctx, ieq), pos, weight);    
+  }
+  
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.startElement(this);

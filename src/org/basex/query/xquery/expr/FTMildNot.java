@@ -1,10 +1,13 @@
 package org.basex.query.xquery.expr;
 
+import org.basex.index.FTIndexAcsbl;
+import org.basex.index.FTIndexEq;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Dbl;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.iter.Iter;
+import org.basex.util.IntList;
 
 /**
  * FTMildnot expression.
@@ -34,5 +37,49 @@ public final class FTMildNot extends FTExpr {
   @Override
   public String toString() {
     return toString(" not in ");
+  }
+  
+  @Override
+  public void indexAccessible(final XQContext ctx, final FTIndexAcsbl ia)
+      throws XQException {
+    final int mmin = ia.indexSize;
+    IntList il = new IntList(expr.length - 1);
+    for (int i = 1; i < expr.length; i++) {
+      expr[i].indexAccessible(ctx, ia);
+      if (!ia.io) return;
+      if (ia.indexSize > 0) il.add(i);
+    }
+    
+    if(il.size < expr.length - 1) {
+      FTExpr[] e = new FTExpr[il.size + 1];
+      e[0] = expr[0];
+      int c = 1;
+      for (int i = 0; i < il.size; i++) e[c++] = expr[il.list[i]];
+      expr = e;
+    }
+    expr[0].indexAccessible(ctx, ia);
+    ia.indexSize = mmin < ia.indexSize ? mmin : ia.indexSize;
+  }
+  
+  @Override
+  public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq) {
+    if (expr.length == 1) return expr[0].indexEquivalent(ctx, ieq);
+    
+    // assumption 1: ftcontains "a" not in "a b" not in "a c"
+    // and ftcontains "a" not in "a b" ftand "a" not in "a c" are equivalent
+    
+    final FTExpr[] ie = new FTExpr[2];
+    final FTMildNotIndex[] mne = new FTMildNotIndex[expr.length - 1];
+    final int[] pex = new int[expr.length - 1];
+    ie[0] = (FTExpr) expr[0].indexEquivalent(ctx, ieq);
+    for (int i = 1; i < expr.length; i++) {
+      ie[1] = (FTExpr) expr[i].indexEquivalent(ctx, ieq);
+      mne[i - 1] = new FTMildNotIndex(ie);
+      pex[i - 1] = i - 1;
+    }
+    if (mne.length == 1) {
+      return mne[0];
+    }
+    return new FTIntersection(pex, new int[]{}, mne);
   }
 }

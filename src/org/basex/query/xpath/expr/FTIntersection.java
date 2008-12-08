@@ -63,7 +63,8 @@ public final class FTIntersection extends FTArrayExpr {
   public FTNodeIter iter(final QueryContext ctx) {
     return new FTNodeIter(){
       @Override
-      public FTNode next() { return more() ? next() : new FTNode(); }
+      public FTNode next() { return FTIntersection.this.more() 
+        ? FTIntersection.this.next(ctx) : new FTNode(); }
     };
   }
   
@@ -73,7 +74,7 @@ public final class FTIntersection extends FTArrayExpr {
    * @param ctx XPContext
    * @return FTNode as resultnode
    */
-  private FTNode calcFTAnd(final int[] n, final XPContext ctx) {
+  private FTNode calcFTAnd(final int[] n, final QueryContext ctx) {
     if (n.length == 0) return  new FTNode();
     else if (n.length == 1) return exprs[n[0]].next(ctx);
     
@@ -111,9 +112,7 @@ public final class FTIntersection extends FTArrayExpr {
   }
 
   @Override
-  public FTNode next(final XPContext ctx) {
-    final FTPosFilter tmp = ctx.ftpos;
-    
+  public FTNode next(final QueryContext ctx) {
     final FTNode n1 = calcFTAnd(pex, ctx);
 
     if (n1 != null && n1.size > 0) {
@@ -138,11 +137,9 @@ public final class FTIntersection extends FTArrayExpr {
           } else return new FTNode();
         }
       }
-      ctx.ftpos = tmp;
       return n1;
     }
     final FTNode n2 = calcFTAnd(nex, ctx);  
-    ctx.ftpos = tmp;
     return n2;
   }
   

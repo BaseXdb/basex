@@ -1,6 +1,7 @@
 package org.basex.query.xquery.expr;
 
 import java.io.IOException;
+
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
@@ -46,7 +47,19 @@ public abstract class FTExpr extends Expr {
     for(final Expr e : expr) e.plan(ser);
     ser.closeElement();
   }
-
+ 
+  /**
+   * Verifies if the fulltext query options comply with the index defaults.
+   * Check where this method is overwritten to get more info.
+   * @param meta meta data
+   * @return result of check
+   */
+/*  public boolean indexOptions(final MetaData meta) {
+    for(final FTExpr e : expr) if(!e.indexOptions(meta)) return false;
+    return true;
+  }
+*/
+  
   /**
    * Prints the array with the specified separator.
    * @param sep separator

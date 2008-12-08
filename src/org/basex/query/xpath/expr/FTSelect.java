@@ -2,6 +2,7 @@ package org.basex.query.xpath.expr;
 
 import org.basex.data.MetaData;
 import org.basex.index.FTNode;
+import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.item.Bln;
@@ -44,7 +45,8 @@ public final class FTSelect extends FTArrayExpr {
   }
   
   @Override
-  public FTNode next(final XPContext ctx) {
+  public FTNode next(final QueryContext xpc) {
+    final XPContext ctx = (XPContext) xpc;
     final FTPosFilter tmp = ctx.ftpos;
     ctx.ftpos = ftpos;
     FTNode ftn = exprs[0].next(ctx);
@@ -64,8 +66,7 @@ public final class FTSelect extends FTArrayExpr {
       } 
       ctx.ftpos = tmp;
       return ftn;
-    }
-      
+    }    
     ctx.ftpos = tmp;    
     return ftn;
   }

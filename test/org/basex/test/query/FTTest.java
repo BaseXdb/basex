@@ -66,6 +66,9 @@ public final class FTTest extends AbstractTest {
       "</fttest>";
 
     queries = new Object[][] {
+        { "FTUnaryNot3", nodes(3, 5, 9, 11),
+          "//w [text() ftcontains 'xml' ftand ftnot 'databases' " +
+            "case sensitive]" },
         
         { "Simple 1", bool(true),
           "'abc' ftcontains 'abc'" },
@@ -369,6 +372,8 @@ public final class FTTest extends AbstractTest {
           "//w [text() ftcontains ftnot 'bier' ftand ftnot 'wein' ]" },
         { "FTUnaryNot8", nodes(3, 5, 7, 9, 11, 14, 37),
           "//w [text() ftcontains ftnot 'bier' ftor ftnot 'wein' ]" },
+        { "FTUnaryNot9", nodes(14, 37),
+          "//w [text() ftcontains ftnot 'xml' ftand ftnot 'databeses' ]" },
     };
 
     /** TABLE REPRESENTATION

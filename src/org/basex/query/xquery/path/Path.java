@@ -5,11 +5,14 @@ import static org.basex.query.xquery.path.Test.NODE;
 import static org.basex.query.xquery.XQText.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
+import org.basex.index.FTIndexAcsbl;
+import org.basex.index.FTIndexEq;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Arr;
 import org.basex.query.xquery.expr.CAttr;
 import org.basex.query.xquery.expr.Expr;
+import org.basex.query.xquery.expr.FTContains;
 import org.basex.query.xquery.item.DNode;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Nod;
@@ -95,6 +98,39 @@ public class Path extends Arr {
           axis == Axis.DESCORSELF || axis == Axis.CHILD)) {
         return new SimpleIterPath(root, expr);
       }
+      final Step s = (Step) expr[0]; 
+      /**/
+      if (s.expr != null && s.expr.length == 1 && s.expr[0] 
+        instanceof FTContains) {
+        // query looks like //* [text() ftcontains A] only one pred is specified
+        final FTContains ftc = (FTContains) s.expr[0];
+        FTIndexAcsbl ia = new FTIndexAcsbl();
+        ftc.indexAccessible(ctx, ia);
+        if (ia.io && ia.iu) {
+          // replace expressions for index access
+          final FTIndexEq ieq = new FTIndexEq(s, ia.seq);
+          final Expr ie = ftc.indexEquivalent(ctx, ieq);
+          if (ia.indexSize == 0) {
+            if (ia.ftnot) {
+              // all nodes are results 
+              s.expr[0] = ftc.expr[0];
+              return this;
+            } else {
+              // any node is a result
+              return Seq.EMPTY;
+            }
+          }
+          if (ia.seq) {
+            // do not invert path
+            s.expr[0] = ie;
+          } else {
+              // invert Path
+              return ie;
+              // this, ie, invpath
+              //return new IndexMatch(root, ie, null);
+          }
+        }        
+      } /**/
     }
     return this;
   }
