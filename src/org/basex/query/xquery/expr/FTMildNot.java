@@ -1,7 +1,6 @@
 package org.basex.query.xquery.expr;
 
 import org.basex.index.FTIndexAcsbl;
-import org.basex.index.FTIndexEq;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Dbl;

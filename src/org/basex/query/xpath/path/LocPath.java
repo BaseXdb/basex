@@ -173,11 +173,9 @@ public abstract class LocPath extends Expr {
       // add rest of predicates
       if(newPreds.size() != 0) result =
         new Filter(result, newPreds).comp(ctx);
-//        new Filter(result, newPreds).comp(ctx); old
 
       // add match with initial nodes
       if(indexMatch) result = new IndexMatch(this, result, invPath);
-//      if(indexMatch) result = new IndexMatch(this, result, invPath); old
 
       // add rest of location path
       if(oldPath.steps.size() != 0) result = new Path(result, oldPath);

@@ -179,8 +179,6 @@ final class MapImages {
       }
       j = (j == 0 ? MAXNR : j) - 1;
     }
-    // [CG] very temporary 
-    //map.drawMap(mainMap, mainRects);
     map.repaint();
   }
 

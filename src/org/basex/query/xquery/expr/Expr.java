@@ -3,7 +3,6 @@ package org.basex.query.xquery.expr;
 import static org.basex.query.xquery.XQText.*;
 
 import org.basex.index.FTIndexAcsbl;
-import org.basex.index.FTIndexEq;
 import org.basex.query.ExprInfo;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;

@@ -1,4 +1,4 @@
-package org.basex.index;
+package org.basex.query.xquery.expr;
 
 import org.basex.query.xquery.path.Step;
 
@@ -17,12 +17,6 @@ public class FTIndexEq {
   public boolean seq;
   /** Current Step. */
   public Step curr;
-
-  /**
-   * Constructor.
-   */
-  public FTIndexEq() {     
-  }
   
   /**
    * Constructor.

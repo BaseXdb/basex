@@ -4,7 +4,6 @@ import static org.basex.query.xpath.XPText.*;
 
 import org.basex.data.Data;
 import org.basex.index.FTIndexAcsbl;
-import org.basex.index.FTIndexEq;
 import org.basex.index.FTTokenizer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
@@ -31,14 +30,6 @@ public final class FTContains extends Arr {
   public final FTTokenizer ft = new FTTokenizer();
   /** Flag for index use. */
   private boolean iu;
-  /** Iterator for path results. */
-  private NodeIter v1 = null;
-  /** Iterator for index results. */
-  private Iter v2 = null;
-  /** Temp container for a result. */
-  private FTNodeItem ftn = null;
-
-  
   
   /**
    * Constructor.
@@ -68,58 +59,59 @@ public final class FTContains extends Arr {
   /**
    * Processing without using the index.
    * @param ctx context
-   * @return Iter with results
-   * @throws XQException Exception
+   * @return iterator with results
    */
-  public Iter iterIndex(final XQContext ctx) throws XQException {    
-    // [CG] why couldn't I create a new iter obejct like this:
-    // IterStep there is a problem with ctx.iter(expr[0]).evb()
-    //  return new Iter() {
+  public Iter iterIndex(final XQContext ctx) {
+    
+    // [SG] iterator variables must be locally defined; otherwise, they will
+    //   have value assigned which refer to another call of this method
+
+    return new Iter() {
+      /** Iterator for path results. */
+      NodeIter v1;
       
-/*      @Override 
+      @Override
       public Item next() throws XQException {
- */
-      //if(v1 == null) 
+        if(v1 != null) return null;
+        
         v1 = (NodeIter) ctx.iter(expr[0]);
         final FTTokenizer tmp = ctx.ftitem;
         ctx.ftitem = ft;
         
-        if(v2 == null) v2 = ctx.iter(expr[1]);
+        final FTNodeIter fti = (FTNodeIter) ctx.iter(expr[1]);
+        FTNodeItem ftn = fti.next();
         
-        if(v2 != FTNodeIter.NONE) {
-          final FTNodeIter fti = (FTNodeIter) v2;
-          ftn = (ftn == null) ? fti.next() : ftn;
-          DNode n;
-          while((n = (DNode) v1.next()) != null) {
-            while (ftn != null && ftn.ftn.size > 0 
-                && n.pre > ftn.ftn.getPre()) {
-              ftn = fti.next();
+        DNode n;
+        while((n = (DNode) v1.next()) != null) {
+          while (ftn != null && ftn.ftn.size > 0 && n.pre > ftn.ftn.getPre()) {
+            ftn = fti.next();
+          }
+          if(ftn != null) {
+            final boolean not = ftn.ftn.not;
+            if(ftn.ftn.getPre() == n.pre) {
+              ftn = null;
+              ctx.ftitem = tmp;
+              return new Bln(!not, n.score());
             }
-            if(ftn != null) {
-              final boolean not = ftn.ftn.not;
-              if(ftn.ftn.getPre() == n.pre) {
-                ftn = null;
-                ctx.ftitem = tmp;
-                return new Bln(!not, n.score()).iter();
-              } else if(not) {
-                ctx.ftitem = tmp;
-                return new Bln(true, n.score()).iter();
-              }
+            if(not) {
+              ctx.ftitem = tmp;
+              return new Bln(true, n.score());
             }
           }
         }
         ctx.ftitem = tmp;
-        return new Bln(false, 0).iter();
+        return Bln.FALSE;
+      }
+    };
   }
   
   /**
    * Processing without using the index.
    * @param ctx context
-   * @return Iter with results
+   * @return iterator with results
    * @throws XQException Exception
    */
-  public Iter iterWithOutIndex(final XQContext ctx) 
-    throws XQException {    
+  public Iter iterWithOutIndex(final XQContext ctx) throws XQException {
     final Iter iter = ctx.iter(expr[0]);
     final FTTokenizer tmp = ctx.ftitem;
 
@@ -167,19 +159,17 @@ public final class FTContains extends Arr {
     final SimpleIterStep sis = (SimpleIterStep) expr[0];
     final Expr ae = expr[1].indexEquivalent(ctx, ieq);
       
-    Expr ex;
+    ctx.compInfo(OPTFTINDEX);
+
     if (!ieq.seq) {
       // standard index evaluation
-      ctx.compInfo(OPTFTINDEX);
-      ex = new FTContainsIndex(ft, expr[0], ae);
+      Expr ex = new FTContainsIndex(ft, expr[0], ae);
       return Path.invertSIStep(sis, ieq.curr, ex);
-    } else {
-      // sequential evaluation
-      // with index access
-      ctx.compInfo(OPTFTINDEX);
-      ex = new FTContains(true, expr[0], ae);
-      return ex;
     }
+    
+    // sequential evaluation
+    // with index access
+    return new FTContains(true, expr[0], ae);
   }
   
   @Override

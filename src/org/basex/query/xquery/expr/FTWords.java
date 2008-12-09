@@ -5,7 +5,6 @@ import java.io.IOException;
 
 import org.basex.data.Serializer;
 import org.basex.index.FTIndexAcsbl;
-import org.basex.index.FTIndexEq;
 import org.basex.query.FTOpt.FTMode;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
