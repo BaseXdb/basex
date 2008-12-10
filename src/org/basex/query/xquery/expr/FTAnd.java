@@ -64,8 +64,8 @@ public final class FTAnd extends FTExpr {
     }
     pex = i1.finish();
     nex = i2.finish();
-    ia.seq = i1.size == 0;
-    ia.indexSize = nmin;
+    ia.seq = i1.size == 0 || ia.seq;
+    ia.indexSize = i1.size > 0 ? nmin : Integer.MAX_VALUE;
   }
   
   @Override
@@ -76,6 +76,17 @@ public final class FTAnd extends FTExpr {
     for (int i = 0; i < expr.length; i++) {
       expr[i] = (FTExpr) expr[i].indexEquivalent(ctx, ieq);
     }
+    
+    if (pex.length == 0) {
+      // !A FTAnd !B = !(a ftor b)
+      for (int i = 0; i < nex.length; i++) {
+        expr[nex[i]] = expr[nex[i]].expr[0];
+      }
+      final FTUnion fta = new FTUnion(nex, false, expr);
+      final FTNotIndex ftn = new FTNotIndex(fta);
+      return ftn; 
+    }
+
     return new FTIntersection(pex, nex, expr);
 
   }

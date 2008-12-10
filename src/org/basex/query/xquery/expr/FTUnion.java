@@ -22,19 +22,22 @@ public final class FTUnion extends FTExpr {
   private int minp = -1;
   /** Saving index of positive expressions. */
   private int[] pex;
-
+  /** Flag if one result was a ftnot. */
+  private boolean not = false;
   
   /**
    * Constructor.
    * @param posex pointer on expression
+   * @param ftnot flag for ftnot expression
    * @param e expression list
+   * 
    */
-  public FTUnion(final int[] posex, final FTExpr... e) {
+  public FTUnion(final int[] posex, final boolean ftnot, final FTExpr... e) {
     super(e);
     pex = posex;
     mp = new FTNodeItem[pex.length];
     cp = new IntList(pex);
- 
+    not = ftnot;
   }
 
   @Override
@@ -42,8 +45,11 @@ public final class FTUnion extends FTExpr {
     return new FTNodeIter(){
       @Override
       public FTNodeItem next() throws XQException { 
-        return FTUnion.this.more(ctx) 
-        ? FTUnion.this.next() : new FTNodeItem(); }
+        if (FTUnion.this.more(ctx)) 
+        return FTUnion.this.next();
+        else 
+          return FTUnion.this.next();
+        }
     };
   }
   
@@ -77,13 +83,12 @@ public final class FTUnion extends FTExpr {
   public FTNodeItem next() {
     if (minp == -1) {
       minp = 0;
-      while(mp[minp].ftn.size == 0) minp++;
-      cp.set(minp, 0);
+      while(minp < mp.length && mp[minp].ftn.size == 0) minp++;
+      if (minp < mp.length) cp.set(minp, 0);
       for (int ip = minp + 1; ip < pex.length; ip++) {       
         if (mp[ip].ftn.size > 0) { 
           final FTNodeItem n1 = mp[pex[ip]];
           final FTNodeItem n2 = mp[pex[minp]];
-          
           if (n1.ftn.getPre() < n2.ftn.getPre()) {
             minp = ip;
             cp.set(ip, 0);
@@ -94,12 +99,17 @@ public final class FTUnion extends FTExpr {
       }
     }
     
-      minp = -1;
-      final FTNodeItem m = mp[pex[cp.list[0]]];
-      for (int i = 1; i < cp.size; i++) {
-        m.merge(mp[pex[cp.list[i]]], 0);
-      }
-      return m;
+    minp = -1;
+    final FTNodeItem m = mp[pex[cp.list[0]]];
+    for (int i = 1; i < cp.size; i++) {
+      m.merge(mp[pex[cp.list[i]]], 0);
+      // in case of ftor !"a" ftor "b" "a b" is result
+      m.ftn.not = false;
+    }
+    
+    // ftnot causes to set this flag (seq. index mode)
+    if (m.ftn.size == 0) m.ftn.not = not;
+    return m;
   }
 
   @Override

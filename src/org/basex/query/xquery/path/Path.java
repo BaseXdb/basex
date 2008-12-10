@@ -121,7 +121,7 @@ public class Path extends Arr {
               FTIndexAcsbl ia = new FTIndexAcsbl();
               s.expr[j].indexAccessible(ctx, ia);
               if (ia.io && ia.iu) {
-                if (min > ia.indexSize) {
+                if (min >= ia.indexSize) {
                   min = ia.indexSize;
                   iacs = ia;
                   minp = j;

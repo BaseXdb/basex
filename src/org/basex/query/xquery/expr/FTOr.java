@@ -53,6 +53,7 @@ public final class FTOr extends FTExpr {
     int sum = 0;
 
     for (int i = 0; i < expr.length; i++) {
+      ia.ftnot = false;
       expr[i].indexAccessible(ctx, ia);
       if (!ia.io) return;
       if (!ia.ftnot && ia.indexSize > 0) {
@@ -70,10 +71,12 @@ public final class FTOr extends FTExpr {
     }
     nex = n.finish();
     pex = p.finish();
-    
-    // [SG] think about index use for ftor ftnot
-    if (pex.length == 0 || nex.length > 0 && pex.length > 0) {
-      ia.iu = false;
+
+    if (pex.length == 0 && nex.length > 0) {
+      ia.seq = true;
+      ia.indexSize = Integer.MAX_VALUE;
+    } else if (nex.length > 0 && pex.length > 0) {
+      ia.seq = true;
       ia.indexSize = Integer.MAX_VALUE;
     } else {
       ia.indexSize = sum > min ? min : sum;
@@ -86,8 +89,30 @@ public final class FTOr extends FTExpr {
       expr[i] = (FTExpr) expr[i].indexEquivalent(ctx, ieq);
     }
     
-    if (pex.length == 0) return new FTUnion(nex, expr);
-    return new FTUnion(pex, expr);
+    if (pex.length == 0) {
+      // !A FTOR !B = !(a ftand b)
+      for (int i = 0; i < nex.length; i++) {
+        expr[nex[i]] = expr[nex[i]].expr[0];
+      }
+      final FTIntersection fta = new FTIntersection(pex, nex, expr);
+      final FTNotIndex ftn = new FTNotIndex(fta);
+      return ftn; 
+    }
 
+    if (pex.length == 0) return new FTUnion(nex, true, expr);
+    else if (nex.length == 0) return new FTUnion(pex, true, expr);
+    else if (pex.length == 1 && nex.length == 0) return expr[pex[0]]; 
+    else return new FTUnion(gen(), true, expr);
+
+  }
+  
+  /**
+   * Generate sequenz for nex.length > 0 && pex.length > 0.
+   * @return sequenz
+   */
+  private int[] gen() {
+    final int[] r = new int[expr.length];
+    for (int i = 0; i < expr.length; i++) r[i] = i;
+    return r;
   }
 }

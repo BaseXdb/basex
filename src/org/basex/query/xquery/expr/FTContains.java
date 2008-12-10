@@ -32,6 +32,11 @@ public final class FTContains extends Arr {
   public final FTTokenizer ft = new FTTokenizer();
   /** Flag for index use. */
   private boolean iu;
+  /** NodeIter for Path Expression. */
+  public NodeIter v1;
+  /** Current FTNodeItem. */
+  public FTNodeItem ftn;
+
   
   /**
    * Constructor.
@@ -57,57 +62,51 @@ public final class FTContains extends Arr {
     expr[0] = XQOptimizer.addText(expr[0], ctx);
     return this;
   }
-  
+
   @Override
   public Iter iter(final XQContext ctx) throws XQException {    
-    if (iu) return iterIndex(ctx); 
-    return iterWithOutIndex(ctx);
-  }
+    if (!iu) return iterWithOutIndex(ctx);
+    return iterIndex(ctx);
+   }
+
+
   
   /**
    * Processing without using the index.
    * @param ctx context
    * @return iterator with results
+   * @throws XQException Exception
    */
-  public Iter iterIndex(final XQContext ctx) {
-    return new Iter() {
-      /** Iterator for path results. */
-      NodeIter v1;
-      
-      @Override
-      public Item next() throws XQException {
-        if(v1 != null) return null;
+  public Iter iterIndex(final XQContext ctx) throws XQException {
+    v1 = (NodeIter) ctx.iter(expr[0]);
+    final FTTokenizer tmp = ctx.ftitem;
+    ctx.ftitem = ft;
         
-        v1 = (NodeIter) ctx.iter(expr[0]);
-        final FTTokenizer tmp = ctx.ftitem;
-        ctx.ftitem = ft;
-        
-        final FTNodeIter fti = (FTNodeIter) ctx.iter(expr[1]);
-        FTNodeItem ftn = fti.next();
-        
-        DNode n;
-        while((n = (DNode) v1.next()) != null) {
-          while (ftn != null && ftn.ftn.size > 0 && n.pre > ftn.ftn.getPre()) {
-            ftn = fti.next();
+    final FTNodeIter fti = (FTNodeIter) ctx.iter(expr[1]);
+    if (ftn == null) 
+      ftn = fti.next();
+    
+      DNode n;
+      while((n = (DNode) v1.next()) != null) {
+        while (ftn != null && ftn.ftn.size > 0 && n.pre > ftn.ftn.getPre()) {
+          ftn = fti.next();
+        }
+        if(ftn != null) {
+          final boolean not = ftn.ftn.not;
+          if(ftn.ftn.getPre() == n.pre) {
+            ftn = null;
+            ctx.ftitem = tmp;
+            return new Bln(!not, n.score()).iter();
           }
-          if(ftn != null) {
-            final boolean not = ftn.ftn.not;
-            if(ftn.ftn.getPre() == n.pre) {
-              ftn = null;
-              ctx.ftitem = tmp;
-              return new Bln(!not, n.score());
-            }
-            if(not) {
-              ctx.ftitem = tmp;
-              return new Bln(true, n.score());
-            }
+          if(not) {
+            ctx.ftitem = tmp;
+            return new Bln(true, n.score()).iter();
           }
         }
-        ctx.ftitem = tmp;
-        return Bln.FALSE;
       }
-    };
-  }
+      ctx.ftitem = tmp;
+      return new Bln(false, 0).iter();
+    }
   
   /**
    * Processing without using the index.
@@ -203,6 +202,6 @@ public final class FTContains extends Arr {
 
   @Override
   public String toString() {
-    return toString(" ftcontains ");
+    return toString(" ftcontainsS" + (iu ? "I " : " "));
   }
 }
