@@ -95,6 +95,7 @@ public final class FTIndex extends FTExpr {
     return false;
   }
 
+  /*
   @Override
   public Iter iter(final XQContext ctx) {
     return new FTNodeIter(){
@@ -106,7 +107,21 @@ public final class FTIndex extends FTExpr {
       }
     };
   }
-
+*/
+  @Override
+  public Iter iter(final XQContext ctx) {
+    return new FTNodeIter(){
+      @Override
+      public FTNodeItem next() { 
+        if (iat == null && !evalIter(ctx)) return new FTNodeItem();
+        return iat.more() ? new FTNodeItem(
+            iat.nextFTNode(), data) : 
+          new FTNodeItem(new FTNode(), data); 
+      }
+    };
+  }
+  
+  
   /**
    * Joins the specified iterators and returns its result.
    * @param i1 IndexArrayIterator1
@@ -133,6 +148,44 @@ public final class FTIndex extends FTExpr {
     return new IndexArrayIterator(ial.list, ial.size, false);
   }
 
+ 
+  /**
+   * Evaluate index access.
+   * 
+   * @param ctx current context
+   * @return boolean
+   */
+  public boolean evalIter(final XQContext ctx) {
+      data = ((DNode) ctx.item).data;
+      final FTTokenizer ft = new FTTokenizer();
+      ft.init(tok);
+      ft.lp = true;
+      while(ft.more()) {
+        if(data.nrIDs(ft) == 0) return false;
+        ctx.checkStop();
+      }
+      ft.init();
+      int w = 0;
+      while(ft.more()) {
+        final IndexIterator it = data.ids(ft);
+        if(w == 0) {
+          iat = (IndexArrayIterator) it;  
+        } else {
+          iat = IndexArrayIterator.and(iat, (IndexArrayIterator) it, w);
+        }
+        w++;
+      }
+      
+      if (iat != null && iat.size() > 0) {
+        iat.setToken(new FTTokenizer[]{ft});
+        iat.setTokenNum(++ctx.ftcount);
+        return true;
+      }
+      return false;
+  }
+
+  
+  
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);

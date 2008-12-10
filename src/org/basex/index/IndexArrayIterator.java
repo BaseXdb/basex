@@ -161,13 +161,25 @@ public class IndexArrayIterator extends IndexIterator {
   }
   
   /**
-   * Merge to indexarrayiterator.
+   * Merges two indexarrayiterator.
    * @param iai1 first indexarrayiterator to merge
    * @param iai2 second indexarrayiterator to merge
    * @return IndexArrayIterator
    */
   public static IndexArrayIterator merge(final IndexArrayIterator iai1,
       final IndexArrayIterator iai2) {
+    return IndexArrayIterator.merge(iai1, iai2, 0);
+  }
+  
+  /**
+   * Merges two indexarrayiterator.
+   * @param iai1 first indexarrayiterator to merge
+   * @param iai2 second indexarrayiterator to merge
+   * @param w distance between two pos values
+   * @return IndexArrayIterator
+   */
+  public static IndexArrayIterator merge(final IndexArrayIterator iai1,
+      final IndexArrayIterator iai2, final int w) {
     if (iai1 == EMP) return iai2;
     if (iai2 == EMP) return iai1;
     
@@ -193,7 +205,7 @@ public class IndexArrayIterator extends IndexIterator {
               r = n[1];
               c = 1;
             } else {
-              n[0].merge(n[1], 0);
+              n[0].merge(n[1], w);
               n[0].reset();
               r = n[0];
               c = -1;
@@ -223,6 +235,82 @@ public class IndexArrayIterator extends IndexIterator {
         iai1.setTokenNum(t);
         iai2.setTokenNum(t);
       }
+      
+      @Override
+      public void setToken(final FTTokenizer[] token) {
+        iai1.setToken(token);
+        iai2.setToken(token);
+      }
     };
   }
+  
+  /**
+   * Merges two indexarrayiterator.
+   * @param iai1 first indexarrayiterator to merge
+   * @param iai2 second indexarrayiterator to merge
+   * @param w distance between two pos values
+   * @return IndexArrayIterator
+   */
+  public static IndexArrayIterator and(final IndexArrayIterator iai1,
+      final IndexArrayIterator iai2, final int w) {
+    if (iai1 == EMP) return iai2;
+    if (iai2 == EMP) return iai1;
+    
+    return new IndexArrayIterator(1) {
+        FTNode[] n = new FTNode[2];
+        FTNode r;
+        int c = -1;
+        
+        @Override
+        public boolean more() {
+          r = null;
+          n[0] = (c == 0 || c == -1) ? iai1.more() 
+              ? iai1.nextFTNode() : null : n[0];
+          n[1] = (c == 1 || c == -1) ? iai2.more() 
+              ? iai2.nextFTNode() : null : n[1];
+          if (n[0] != null && n[1] != null) {
+              final int dis = n[0].getPre() - n[1].getPre();
+              if (dis < 0) {
+                c = 0;
+                return more();
+              } else if (dis > 0) {
+                c = 1;
+                return more();
+              } else {
+                c = -1;
+                if (n[0].merge(n[1], w)) {
+                  n[0].reset();
+                  r = n[0];
+                  return true;
+                } else {
+                  return more();
+                }
+              }
+            }         
+            return false;
+          }
+        
+          @Override
+          public FTNode nextFTNode() {
+            return r;
+          }
+          @Override
+          public int next() {
+            return r.getPre();
+          }
+          
+          @Override
+          public void setTokenNum(final int t) {
+            iai1.setTokenNum(t);
+            iai2.setTokenNum(t);
+          }
+          
+          @Override
+          public void setToken(final FTTokenizer[] token) {
+            iai1.setToken(token);
+            iai2.setToken(token);
+          }
+        };
+      }
+   
 }
