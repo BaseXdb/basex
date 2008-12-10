@@ -43,4 +43,14 @@ public class FTIndexAcsbl {
     indexSize = indSize;
     io = indOpt;
   }
+  
+  /**
+   * Init values.
+   */
+  public void init() {
+    set(false, Integer.MAX_VALUE, false);
+    data = null;
+    ftnot = false;
+    seq = false;
+  }
 }

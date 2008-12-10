@@ -120,10 +120,8 @@ public final class FTIntersection extends FTExpr {
         }
         if (d != 0) return n1;
         else {
-          //if (more(ctx)) {
             nod2 = null;
             return next(ctx);
-          //} else return new FTNodeItem();
         }
       }
       return n1;

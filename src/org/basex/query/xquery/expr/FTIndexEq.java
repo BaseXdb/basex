@@ -17,7 +17,8 @@ public class FTIndexEq {
   public boolean seq;
   /** Current Step. */
   public Step curr;
-  
+  /** Flag for adding a filter. */ 
+  public boolean addFilter = true;
   /**
    * Constructor.
    * @param c current step

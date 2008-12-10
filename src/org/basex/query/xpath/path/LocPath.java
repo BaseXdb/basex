@@ -159,7 +159,7 @@ public abstract class LocPath extends Expr {
               ((PredSimple) pred).expr = e.indexEquivalent(ctx, null, true);
             }
             newPreds.add(pred);
-          } else if (pred instanceof PredPos) {
+          } else if (pred instanceof PredPos && invPath.steps.size() > 0) {
             invPath.steps.get(invPath.steps.size() - 1).
               addPosPred((PredPos) pred);
           } else {

@@ -1,22 +1,24 @@
 package org.basex.query.xquery.expr;
 
-import static org.basex.query.xpath.XPText.*;
-
 import org.basex.data.Data;
 import org.basex.index.FTIndexAcsbl;
 import org.basex.index.FTTokenizer;
+import org.basex.query.xpath.XPText;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
+import org.basex.query.xquery.XQOptimizer;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.DNode;
 import org.basex.query.xquery.item.FTNodeItem;
 import org.basex.query.xquery.item.Item;
+import org.basex.query.xquery.item.Str;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.FTNodeIter;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.path.Path;
 import org.basex.query.xquery.path.SimpleIterStep;
+import org.basex.query.xquery.path.Step;
 import org.basex.query.xquery.util.Scoring;
 
 /**
@@ -49,6 +51,12 @@ public final class FTContains extends Arr {
     iu = indexuse;
   }
   
+  @Override
+  public Expr comp(final XQContext ctx) throws XQException {
+    super.comp(ctx);
+    expr[0] = XQOptimizer.addText(expr[0], ctx);
+    return this;
+  }
   
   @Override
   public Iter iter(final XQContext ctx) throws XQException {    
@@ -62,10 +70,6 @@ public final class FTContains extends Arr {
    * @return iterator with results
    */
   public Iter iterIndex(final XQContext ctx) {
-    
-    // [SG] iterator variables must be locally defined; otherwise, they will
-    //   have value assigned which refer to another call of this method
-
     return new Iter() {
       /** Iterator for path results. */
       NodeIter v1;
@@ -130,46 +134,61 @@ public final class FTContains extends Arr {
   @Override
   public void indexAccessible(final XQContext ctx, 
       final FTIndexAcsbl ia) throws XQException {
+    //ia.set(false, Integer.MAX_VALUE, false);
+    ia.init();
+    
     if (!(ctx.item instanceof DNode)) return;
-
     // check if index exists
     final Data data = ((DNode) ctx.item).data;
-    if(!(expr[0] instanceof SimpleIterStep && data.meta.ftxindex && 
-        !data.meta.ftst && expr[1] instanceof FTExpr)) {
-      ia.set(false, -1, false);
+    if(!(data.meta.ftxindex && !data.meta.ftst && expr[1] instanceof FTExpr)) 
       return;
-    }
     
     // check if index can be applied
-    final SimpleIterStep path = (SimpleIterStep) expr[0];
-    final boolean text = path.test.type == Type.TXT && path.expr.length == 0;
-    if(!text) { // || !path.checkAxes()) {
-      ia.set(false, -1, false);
-      return;
-    }
-    ia.data = data;
+    Step s = null;
+    if (expr[0] instanceof Path) {
+      final Path path = (Path) expr[0];
+      if(path.expr != null && path.expr.length == 1 
+          && path.root instanceof Step 
+          && !(path.expr[0] instanceof Str)) s = (Step) path.expr[0];
+    } else if(expr[0] instanceof Step) {
+      s = (Step) expr[0];
+    } else return;
     
+    if (s == null) return;
+    final boolean text = s.test.type == Type.TXT && 
+      (s.expr == null || s.expr.length == 0);
+    if(!text) return;
+    ia.data = data;
     expr[1].indexAccessible(ctx, ia);    
   }
   
   @Override
   public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq) {
-
-    if(!(expr[0] instanceof SimpleIterStep)) return this;
-    final SimpleIterStep sis = (SimpleIterStep) expr[0];
+    Step s = null;
+    final boolean p = expr[0] instanceof Path;
+    if (p) {
+      s = (Step) ((Path) expr[0]).expr[0];
+      
+    } else if (expr[0] instanceof SimpleIterStep) {
+      s = (Step) expr[0];
+    } else return this;
+    
     final Expr ae = expr[1].indexEquivalent(ctx, ieq);
       
-    ctx.compInfo(OPTFTINDEX);
-
+    ctx.compInfo(XPText.OPTFTINDEX);
+    Expr ex;
     if (!ieq.seq) {
       // standard index evaluation
-      Expr ex = new FTContainsIndex(ft, expr[0], ae);
-      return Path.invertSIStep(sis, ieq.curr, ex);
+      ex = new FTContainsIndex(ft, expr[0], ae);
+      if (p) {
+        final Path pa = (Path) expr[0];
+        return pa.invertPathNew(ieq.curr, ex);
+      } else return Path.invertStep(s, ieq.curr, ex);
+    } else {
+      // sequential evaluation with index access
+      ex = new FTContains(true, expr[0], ae);
+      return ex;
     }
-    
-    // sequential evaluation
-    // with index access
-    return new FTContains(true, expr[0], ae);
   }
   
   @Override

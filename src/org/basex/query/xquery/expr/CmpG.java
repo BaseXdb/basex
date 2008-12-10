@@ -1,15 +1,28 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQTokens.*;
+import org.basex.query.xpath.XPText;
 import java.io.IOException;
+
+import org.basex.data.Data;
 import org.basex.data.Serializer;
+import org.basex.index.FTIndexAcsbl;
+import org.basex.index.IndexToken;
+import org.basex.index.ValuesToken;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
+import org.basex.query.xquery.XQOptimizer;
 import org.basex.query.xquery.item.Bln;
+import org.basex.query.xquery.item.DNode;
 import org.basex.query.xquery.item.Item;
+import org.basex.query.xquery.item.Str;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
+import org.basex.query.xquery.path.Axis;
+import org.basex.query.xquery.path.Path;
+import org.basex.query.xquery.path.SimpleIterStep;
+import org.basex.query.xquery.path.Step;
 import org.basex.query.xquery.util.Err;
 import org.basex.util.Token;
 
@@ -54,6 +67,8 @@ public final class CmpG extends Arr {
     public String toString() { return name; }
   };
 
+  /** Index type. */
+  private IndexToken index;
   /** Comparator. */
   final Comp cmp;
 
@@ -75,6 +90,7 @@ public final class CmpG extends Arr {
     final Expr e1 = expr[0];
     final Expr e2 = expr[1];
     if(e1.e() || e2.e()) return Bln.FALSE;
+    expr[0] = XQOptimizer.addText(expr[0], ctx);
     if(!e1.i() || !e2.i()) return this;
     return Bln.get(ev((Item) expr[0], (Item) expr[1], cmp.cmp));
   }
@@ -154,6 +170,70 @@ public final class CmpG extends Arr {
         !(a.n() && b.n())) Err.cmp(a, b);
     return c.e(a, b);
   }
+
+  @Override
+  public void indexAccessible(final XQContext ctx, final FTIndexAcsbl ia) {
+    ia.iu = false;
+    ia.io = true;
+    // check if first expression is no location path
+    if (!(expr[0] instanceof SimpleIterStep)) return;
+    /*&& ((SimpleIterStep) expr[0]).test.type == Type.TXT || 
+         ((SimpleIterStep) expr[0]).test.type == Type.ATT
+      )) return;
+      */
+    // check which index can be applied
+    
+    index = indexable(ctx, expr[1]);
+    if (index == null) return;
+    ia.iu = true;
+    ia.indexSize = ((DNode) ctx.item).data.nrIDs(index);
+  }
+
+  /**
+   * Checks if the path is indexable.
+   * @param ctx query context
+   * @param exp expression which must be a literal
+   * @return result of check
+   */
+  public IndexToken indexable(final XQContext ctx, final Expr exp) {
+    if(!(exp instanceof Str)) return null;
+    if (ctx.item instanceof DNode) {
+      final Data data = ((DNode) ctx.item).data;
+      final boolean txt = data.meta.txtindex && cmp == CmpG.Comp.EQ;
+      final boolean atv = data.meta.atvindex && cmp == CmpG.Comp.EQ;
+      final Step step = (Step) expr[0];
+      final boolean text = txt && step.test.type == Type.TXT && 
+        (step.expr == null || step.expr.length == 0);
+      final boolean attr = !text && atv && step.simpleName(Axis.ATTR, true);
+      return text || attr ?
+          new ValuesToken(text, ((Str) exp).str()) : null;
+    }
+    return null;
+  }
+
+  
+  @Override
+  public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq) {
+    // no index access possible - return self reference
+    if(index == null) return this;
+    final SimpleIterStep sis = (SimpleIterStep) expr[0];
+    final boolean txt = index.type == IndexToken.Type.TXT;
+    ctx.compInfo(txt ? XPText.OPTINDEX : XPText.OPTATTINDEX);
+    
+    final Path p = Path.invertStep(sis, ieq.curr, new IndexAccess(index));
+    if (!txt) {
+      ieq.addFilter = false;
+      if (p.expr != null && p.expr.length > 0) {
+        Expr[] ex = new Expr[p.expr.length + 1];
+        System.arraycopy(p.expr, 0, ex, 1, p.expr.length);
+        p.expr = ex;
+      } else 
+        p.expr = new Expr[1];
+      p.expr[0] = new Step(Axis.SELF, sis.test, new Expr[]{});
+    }
+    return p;
+  }
+
   
   @Override
   public Type returned() {

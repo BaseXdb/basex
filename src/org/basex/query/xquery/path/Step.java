@@ -4,9 +4,12 @@ import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.query.xquery.XQText.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
+import org.basex.index.FTIndexAcsbl;
+import org.basex.query.xquery.expr.FTIndexEq;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Arr;
+import org.basex.query.xquery.expr.CmpG;
 import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.func.Fun;
 import org.basex.query.xquery.func.FunDef;
@@ -112,6 +115,18 @@ public class Step extends Arr {
   }
   
   /**
+   * Checks if this is a simple name axis (no predicates).
+   * @param ax axis to be checked
+   * @param name name reference needed
+   * @return name id or {@link Integer#MIN_VALUE} if test was negative
+   */
+  public boolean simpleName(final Axis ax, final boolean name) {
+    return axis == ax && (expr == null || expr.length == 0) && 
+      (name ? test.kind == Test.Kind.NAME : true);
+  }
+
+  
+  /**
    * Checks if the specified location step has suitable index axes.
    * @return true result of check
    */
@@ -165,6 +180,20 @@ public class Step extends Arr {
   }
 
   @Override
+  public void indexAccessible(final XQContext ctx, final FTIndexAcsbl ia) 
+  throws XQException {
+    if (expr.length == 1  && expr[0] instanceof CmpG) 
+      expr[0].indexAccessible(ctx, ia);
+  }
+ 
+  @Override
+  public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq) {
+    if (expr.length == 1  && expr[0] instanceof CmpG)
+      return expr[0].indexEquivalent(ctx, ieq);
+    return this;
+  }
+  
+  @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("");
     if(test == Test.NODE) {
@@ -177,4 +206,6 @@ public class Step extends Arr {
     for(final Expr e : expr) sb.append("[" + e + "]");
     return sb.toString();
   }
+  
+  
 }

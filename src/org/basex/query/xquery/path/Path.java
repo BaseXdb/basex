@@ -4,20 +4,28 @@ import static org.basex.query.xquery.path.Axis.*;
 import static org.basex.query.xquery.path.Test.NODE;
 import static org.basex.query.xquery.XQText.*;
 import java.io.IOException;
+
+import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.index.FTIndexAcsbl;
+import org.basex.index.IndexToken;
+import org.basex.index.ValuesToken;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Arr;
 import org.basex.query.xquery.expr.CAttr;
+import org.basex.query.xquery.expr.CmpG;
 import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.expr.FTContains;
+import org.basex.query.xquery.expr.Filter;
+import org.basex.query.xquery.expr.Root;
 import org.basex.query.xquery.expr.FTIndexEq;
 import org.basex.query.xquery.item.DNode;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.QNm;
 import org.basex.query.xquery.item.Seq;
+import org.basex.query.xquery.item.Str;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.NodIter;
@@ -26,6 +34,8 @@ import org.basex.query.xquery.util.Err;
 import org.basex.query.xquery.util.NodeBuilder;
 import org.basex.query.xquery.util.SeqBuilder;
 import org.basex.util.Array;
+
+
 
 /**
  * Path expression.
@@ -60,7 +70,7 @@ public class Path extends Arr {
   public Expr comp(final XQContext ctx) throws XQException {
     root = ctx.comp(root);
     Expr e = root;
-
+    
     if(expr[0] instanceof Step) {
       final Step s = (Step) expr[0];
       if(e instanceof DNode && (s.axis == ATTR || s.axis == PARENT ||
@@ -99,43 +109,64 @@ public class Path extends Arr {
           axis == Axis.DESCORSELF || axis == Axis.CHILD)) {
         return new SimpleIterPath(root, expr);
       }
-      final Step s = (Step) expr[0]; 
-      /**/
       
-      if (s.expr != null && s.expr.length == 1 && s.expr[0] 
-        instanceof FTContains) {
-        // query looks like //* [text() ftcontains A] only one pred is specified
-        final FTContains ftc = (FTContains) s.expr[0];
-        final FTIndexAcsbl ia = new FTIndexAcsbl();
-        ftc.indexAccessible(ctx, ia);
-        if (ia.io && ia.iu) {
-          // replace expressions for index access
-          final FTIndexEq ieq = new FTIndexEq(s, ia.seq);
-          final Expr ie = ftc.indexEquivalent(ctx, ieq);
+      if (expr.length == 1 && checkAxes() && isAbsPath()) {
+        for (int i = 0; i < expr.length; i++) {
+          final Step s = (Step) expr[i];
+          FTIndexAcsbl iacs = null;
+          int minp = 0;
+          int min = Integer.MAX_VALUE;
           
-          if (ia.indexSize == 0) {
-            if (ia.ftnot) {
-              // all nodes are results 
-              s.expr[0] = ftc.expr[0];
-              return this;
+          for (int j = 0; j < s.expr.length; j++) {
+              FTIndexAcsbl ia = new FTIndexAcsbl();
+              s.expr[j].indexAccessible(ctx, ia);
+              if (ia.io && ia.iu) {
+                if (min > ia.indexSize) {
+                  min = ia.indexSize;
+                  iacs = ia;
+                  minp = j;
+                }
+              }
+          }
+          
+          
+          if (iacs != null && iacs.io && iacs.iu) {
+            // replace expressions for index access
+            final FTIndexEq ieq = new FTIndexEq(s, iacs.seq);
+            Expr ie = s.expr[minp].indexEquivalent(ctx, ieq);
+            if (iacs.indexSize == 0) {
+              if (iacs.ftnot) {
+                // all nodes are results 
+                s.expr[0] = ((FTContains) s.expr[minp]).expr[0];
+                return this;                
+              } else {
+                // any node is a result
+                return Seq.EMPTY;                
+              }
+            }
+            if (iacs.seq) {
+              // do not invert path
+              s.expr[0] = ie;
             } else {
-              // any node is a result
-              return Seq.EMPTY;
+              // invert Path
+              //Path InvPath = new Path();
+              Expr result = ie; // = new InterSect(new Expr[] { ie }).comp(ctx);
+              // add rest of predicates
+              final Expr[] newPreds = new Expr[s.expr.length - 1];
+              int c = 0;
+              for(int p = 0; p != s.expr.length; p++)  
+                if (p != minp) newPreds[c++] = s.expr[p];
+              
+              if(newPreds.length > 0 && ieq.addFilter) result =
+                new Filter(ie, newPreds).comp(ctx);
+              
+              return result;
             }
           }
-          if (ia.seq) {
-            // do not invert path
-            s.expr[0] = ie;
-          } else {
-            // invert Path
-            return ie;
-            // this, ie, invpath
-            //return new IndexMatch(root, ie, null);
-          }
-        }        
+        }
       }
     }
-    return this;
+    return this;  
   }
 
   @Override
@@ -319,7 +350,7 @@ public class Path extends Arr {
     
     // add inverted pretext steps
     Axis lastAxis;
-    int k = expr.length;
+    int k = expr.length - 1;
     
     while(k > -1 && !(expr[k] instanceof Step)) k--;
     if (k > -1) {
@@ -331,20 +362,51 @@ public class Path extends Arr {
           lastAxis = invertAxis(step.axis);
           el[c++] = inv;
         }
+        k--;
       }
       el[c++] = new Step(lastAxis, curr.test, new Expr[]{});
     }
     return c > 0 ? new Path(root, Array.finish(el, c)) : this;
   }
 
+  
   /**
-   * Inverts a path.
-   * @param sis SimpleIterStep
+   * Inverts a location path.
+   * @param curr current location step
+   * @param r new root node
+   * @return inverted path
+   */
+  public final Path invertPathNew(final Step curr, final Expr r) {
+    // hold the steps to the end of the inverted path
+    final Expr[] e = new Expr[expr.length + 1];
+    int c = 0;
+    
+    
+    // add inverted pretext steps
+    Axis lastAxis = invertAxis(((Step) expr[expr.length - 1]).axis);
+    for(int k = expr.length - 1; k >= 0; k--) {
+      final Step step = (Step) expr[k];
+      Step inv;
+      if (k == 0) {
+        inv = (Step) root;
+        inv = new Step(lastAxis, inv.test, new Expr[]{});
+      } else inv = new Step(lastAxis, step.test, step.expr);
+      lastAxis = invertAxis(step.axis);
+      e[c++] = inv;
+    } 
+    e[c++] = new Step(lastAxis, curr.test, new Expr[]{});
+    
+    return new Path(r, e);
+  }
+
+  /**
+   * Inverts a step.
+   * @param sis Step
    * @param curr current location step
    * @param expr Expression
    * @return inverted path
    */
-  public static Path invertSIStep(final SimpleIterStep sis, final Step curr,
+  public static Path invertStep(final Step sis, final Step curr,
       final Expr expr) {
     // add inverted pretext steps
     Axis lastAxis = invertAxis(sis.axis);
@@ -353,6 +415,22 @@ public class Path extends Arr {
   }
 
   
+  /**
+   * Checks if the specified location step has suitable index axes.
+   * @return true result of check
+   */
+  public final boolean checkAxes() {
+    for(int s = 0; s < expr.length - 1; s++) {
+      final Step curr = (Step) expr[s];
+      // not the last text step
+      if(curr.expr != null && curr.expr.length != 0 || curr.axis != Axis.ANC &&
+         curr.axis != Axis.ANCORSELF && curr.axis != Axis.DESC &&
+         curr.axis != Axis.SELF && curr.axis != Axis.DESCORSELF &&
+         curr.axis != Axis.CHILD && curr.axis != Axis.PARENT) return false;
+    }
+    return true;
+  }
+
   
   /**
    * Inverts an XPath axis.
@@ -392,7 +470,43 @@ public class Path extends Arr {
   protected void warning(final Expr s) throws XQException {
     Err.or(COMPSELF, s);
   }
+  
+  /**
+   * Checks if the path is indexable.
+   * @param ctx query context
+   * @param exp expression which must be a literal
+   * @param cmp comparator
+   * @return result of check
+   */
+  public final IndexToken indexable(final XQContext ctx, final Expr exp,
+      final CmpG.Comp cmp) {
+    
+    if(!(isAbsPath() && exp instanceof Str)) return null;
 
+    if (ctx.item instanceof DNode) {
+      final Data data = ((DNode) ctx.item).data;
+      final boolean txt = data.meta.txtindex && cmp == CmpG.Comp.EQ;
+      final boolean atv = data.meta.atvindex && cmp == CmpG.Comp.EQ;
+      final Step step = (Step) expr[expr.length - 1];
+      final boolean text = txt && step.test.type == Type.TXT && 
+        (step.expr == null || step.expr.length == 0);
+      final boolean attr = !text && atv && step.simple(Axis.ATTR);
+      return text || attr && checkAxes() ?
+          new ValuesToken(text, ((Str) exp).str()) : null;
+    }
+    return null;
+  }
+
+
+  /**
+   * Check if current path is absolut.
+   * 
+   * @return boolean abspath
+   */
+  public boolean isAbsPath() {
+    return root instanceof Root || root instanceof DNode;
+  }
+  
   /**
    * Returns a string representation of the path.
    * @return path as string

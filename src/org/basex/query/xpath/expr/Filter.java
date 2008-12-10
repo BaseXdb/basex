@@ -36,7 +36,6 @@ public final class Filter extends Expr {
   public Nod eval(final XPContext ctx) throws QueryException {
     final Nod nodes = (Nod) ctx.eval(expr);
     final NodeBuilder input = new NodeBuilder(nodes.nodes);
-    // new NodeBuilder(nodes.nodes, nodes.ftidpos, nodes.ftpointer);
     final NodeBuilder result = new NodeBuilder();
     preds.eval(ctx, input, result);
     return new Nod(result.finish(), ctx);
