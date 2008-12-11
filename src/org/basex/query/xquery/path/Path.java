@@ -111,6 +111,7 @@ public class Path extends Arr {
       }
       
       if (expr.length == 1 && checkAxes() && isAbsPath()) {
+      //if (checkAxes() && isAbsPath()) {
         for (int i = 0; i < expr.length; i++) {
           final Step s = (Step) expr[i];
           FTIndexAcsbl iacs = null;
@@ -149,18 +150,40 @@ public class Path extends Arr {
               s.expr[0] = ie;
             } else {
               // invert Path
-              //Path InvPath = new Path();
-              Expr result = ie; // = new InterSect(new Expr[] { ie }).comp(ctx);
+              Path result = (Path) ie; 
+              
               // add rest of predicates
               final Expr[] newPreds = new Expr[s.expr.length - 1];
               int c = 0;
               for(int p = 0; p != s.expr.length; p++)  
                 if (p != minp) newPreds[c++] = s.expr[p];
               
-              if(newPreds.length > 0 && ieq.addFilter) result =
-                new Filter(ie, newPreds).comp(ctx);
+              // invert path before index step
+              for (int j = i; j > 0; j--) {
+                final Step curr = (Step) expr[j];
+                final Axis a = invertAxis(curr.axis);
+                if(a == null) break;
+                if(j == 0) {
+                  if(this.isAbsPath() || a == Axis.PARENT) {
+                    result.addStep(new Step(a, Test.NODE, new Expr[]{}));
+                  } 
+                } else {
+                  final Step prev = (Step) expr[j - 1];
+                  if(prev.expr.length != 0) break;
+                  final Step step = (Step) result.expr[result.expr.length - 1];
+                  
+                  final Expr[] tmp = new Expr[step.expr.length + 1];
+                  System.arraycopy(step.expr, 0, tmp, 0, tmp.length - 1);
+                  tmp[tmp.length - 1] = new Step(a, prev.test, new Expr[]{}); 
+                  step.expr = tmp;
+                }
+                //remove(j);
+              }
               
-              return result;
+              if(newPreds.length > 0 && ieq.addFilter) ie =
+                new Filter(result, newPreds).comp(ctx);
+              else ie = result;
+              return ie;
             }
           }
         }
@@ -189,6 +212,29 @@ public class Path extends Arr {
     return res.iter();
   }
 
+  /**
+   * Add Step.
+   * @param s Step to add
+   */
+  public void addStep(final Step s) {
+    Expr[] e = new Expr[expr.length + 1];
+    System.arraycopy(expr, 0, e, 0, expr.length);
+    e[expr.length] = s;
+    expr = e;
+  }
+  
+  /**
+   * Remove expression.
+   * @param j point on expression
+   */
+  public void remove(final int j) {
+    Expr[] ex = new Expr[expr.length - 1];
+    if (j > 0) System.arraycopy(expr, 0, ex, 0, j - 1);
+    if (j < expr.length - 1) 
+      System.arraycopy(expr, j + 1, ex, j, expr.length - j);
+    expr = ex;
+  }
+  
   /**
    * Evaluates the location path.
    * @param ctx query context
