@@ -1,12 +1,12 @@
 package org.basex.query.xquery.expr;
 
+import org.basex.query.xquery.XQExprList;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Scoring;
-import org.basex.util.Array;
 
 /**
  * And expression.
@@ -25,16 +25,21 @@ public final class And extends Arr {
 
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
-    int el = expr.length;
-    for(int e = 0; e < el; e++) {
+    //int el = expr.length;
+    XQExprList exli = new XQExprList(expr.length);
+    for(int e = 0; e < expr.length; e++) {
       expr[e] = ctx.comp(expr[e]);
-      if(!expr[e].i()) continue;
+      if(!expr[e].i()) {
+        exli.add(expr[e], true, ctx);
+        continue;
+      }
       if(!((Item) expr[e]).bool()) return Bln.FALSE;
-      Array.move(expr, e + 1, -1, --el - e);
-      --e;
+      //Array.move(expr, e + 1, -1, --el - e);
+      //--e;
     }
-    return el == expr.length ? this : el == 0 ?  Bln.TRUE :
-      new And(Array.finish(expr, el));
+    
+    return exli.size == expr.length ? this : exli.size == 0 ?  Bln.TRUE :
+      exli.singel() ? exli.list[0] : new And(exli.finishXQ());
   }
 
   @Override

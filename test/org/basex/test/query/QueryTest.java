@@ -73,8 +73,8 @@ public final class QueryTest {
       Prop.ftittr = true;
       Prop.ftst = false;
       Prop.ftdc = false;
-      Prop.ftcs = true;
-      ok &= test(false);
+      Prop.ftcs = false;
+      ok &= test(true);
     }
 
     System.out.println(ok ? "All tests correct.\n" :
@@ -90,7 +90,7 @@ public final class QueryTest {
     boolean ok = true;
     
     for(final AbstractTest test : TESTS) {
-     if (test == TESTS[2]) 
+     //if (test == TESTS[2]) 
        ok &= test(xquery, test, test.details());
     }
    

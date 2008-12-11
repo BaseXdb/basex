@@ -451,6 +451,21 @@ public class Path extends Arr {
     }
   }
 
+  /**
+   * Check if theres anything to sum up.
+   * @param d Data
+   * @return boolean sum up
+   */
+  public boolean sumUp(final Data d) {
+    if (expr.length == 1 && expr[0] instanceof Step 
+        && root instanceof SimpleIterStep) {
+      final SimpleIterStep sis = (SimpleIterStep) root;
+      return sis.sumUp() && sis.test.kind == Test.Kind.NAME &&
+        d.skel.desc(sis.test.name.str(), false, false).size == 0;
+    }
+    return false;
+  }
+  
   
   @Override
   public boolean uses(final Using u) {

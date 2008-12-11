@@ -19,6 +19,8 @@ import org.basex.query.xquery.path.Test;
  * @author Christian Gruen
  */
 public final class XQOptimizer {
+  /** Flag for optimizing AndOr expression.*/
+  public static boolean optAndOr = false;
   /** Private constructor, preventing class instantiation. */
   private XQOptimizer() { }
   

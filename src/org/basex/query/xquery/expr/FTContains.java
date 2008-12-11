@@ -55,6 +55,15 @@ public final class FTContains extends Arr {
     super(ex);
     iu = indexuse;
   }
+
+  /**
+   * Check if theres anything to sum up.
+   * @param d data
+   * @return boolean sum up
+   */
+  public boolean sumUp(final Data d) {
+    return expr[0] instanceof Path && ((Path) expr[0]).sumUp(d);
+  }
   
   @Override
   public Expr comp(final XQContext ctx) throws XQException {

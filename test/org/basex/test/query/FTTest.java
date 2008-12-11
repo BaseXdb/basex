@@ -66,9 +66,8 @@ public final class FTTest extends AbstractTest {
       "</fttest>";
 
     queries = new Object[][] {
-        { "FTUnaryNot3", nodes(3, 5, 9, 11),
-          "//w [text() ftcontains 'xml' ftand ftnot 'databases' " +
-            "case sensitive]" },
+        { "FTAndOr 4", nodes(7, 9, 11, 14),
+        "//w [text() ftcontains 'xml' ftand 'databases'  ftor 'hello' ]" },
         
         { "Simple 1", bool(true),
           "'abc' ftcontains 'abc'" },
