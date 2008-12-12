@@ -207,5 +207,15 @@ public class Step extends Arr {
     return sb.toString();
   }
   
+  /**
+   * Add expression to step.
+   * @param e expr to add
+   */
+  public void addExpr(final Expr e) {
+    final Expr[] tmp = new Expr[expr.length + 1];
+    System.arraycopy(expr, 0, tmp, 0, tmp.length - 1);
+    tmp[tmp.length - 1] = e; 
+    expr = tmp;
+  }
   
 }

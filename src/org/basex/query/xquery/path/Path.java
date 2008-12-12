@@ -157,26 +157,23 @@ public class Path extends Arr {
               int c = 0;
               for(int p = 0; p != s.expr.length; p++)  
                 if (p != minp) newPreds[c++] = s.expr[p];
-              
               // invert path before index step
-              for (int j = i; j > 0; j--) {
+              for (int j = i; j >= 0; j--) {
                 final Step curr = (Step) expr[j];
                 final Axis a = invertAxis(curr.axis);
                 if(a == null) break;
                 if(j == 0) {
                   if(this.isAbsPath() || a == Axis.PARENT) {
-                    result.addStep(new Step(a, Test.NODE, new Expr[]{}));
+                    final Step step = (Step) 
+                      result.expr[result.expr.length - 1];
+                    step.addExpr(new Step(a, Test.NODE, new Expr[]{}));
                   } 
                 } else {
                   final Step prev = (Step) expr[j - 1];
                   if(prev.expr.length != 0) break;
                   final Step step = (Step) result.expr[result.expr.length - 1];
-                  
-                  final Expr[] tmp = new Expr[step.expr.length + 1];
-                  System.arraycopy(step.expr, 0, tmp, 0, tmp.length - 1);
-                  tmp[tmp.length - 1] = new Step(a, prev.test, new Expr[]{}); 
-                  step.expr = tmp;
-                }
+                  step.addExpr(new Step(a, prev.test, new Expr[]{}));
+               }
                 //remove(j);
               }
               
