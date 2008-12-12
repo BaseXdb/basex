@@ -4,7 +4,6 @@ import static org.basex.query.xquery.path.Axis.*;
 import static org.basex.query.xquery.path.Test.NODE;
 import static org.basex.query.xquery.XQText.*;
 import java.io.IOException;
-
 import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.index.FTIndexAcsbl;
@@ -34,8 +33,6 @@ import org.basex.query.xquery.util.Err;
 import org.basex.query.xquery.util.NodeBuilder;
 import org.basex.query.xquery.util.SeqBuilder;
 import org.basex.util.Array;
-
-
 
 /**
  * Path expression.
@@ -118,16 +115,16 @@ public class Path extends Arr {
           int minp = 0;
           int min = Integer.MAX_VALUE;
           
-          for (int j = 0; j < s.expr.length; j++) {
-              FTIndexAcsbl ia = new FTIndexAcsbl();
-              s.expr[j].indexAccessible(ctx, ia);
-              if (ia.io && ia.iu) {
-                if (min >= ia.indexSize) {
-                  min = ia.indexSize;
-                  iacs = ia;
-                  minp = j;
-                }
+          for(int j = 0; j < s.expr.length; j++) {
+            FTIndexAcsbl ia = new FTIndexAcsbl();
+            s.expr[j].indexAccessible(ctx, ia);
+            if(ia.io && ia.iu) {
+              if(min >= ia.indexSize) {
+                min = ia.indexSize;
+                iacs = ia;
+                minp = j;
               }
+            }
           }
           
           
@@ -135,14 +132,14 @@ public class Path extends Arr {
             // replace expressions for index access
             final FTIndexEq ieq = new FTIndexEq(s, iacs.seq);
             Expr ie = s.expr[minp].indexEquivalent(ctx, ieq);
-            if (iacs.indexSize == 0) {
-              if (iacs.ftnot) {
+            if(iacs.indexSize == 0) {
+              if(iacs.ftnot) {
                 // all nodes are results 
                 s.expr[0] = ((FTContains) s.expr[minp]).expr[0];
-                return this;                
+                return this;
               } else {
                 // any node is a result
-                return Seq.EMPTY;                
+                return Seq.EMPTY;
               }
             }
             if (iacs.seq) {
@@ -159,18 +156,22 @@ public class Path extends Arr {
                 if (p != minp) newPreds[c++] = s.expr[p];
               // invert path before index step
               for (int j = i; j >= 0; j--) {
+                // [CG] casting?
                 final Step curr = (Step) expr[j];
                 final Axis a = invertAxis(curr.axis);
                 if(a == null) break;
                 if(j == 0) {
                   if(this.isAbsPath() || a == Axis.PARENT) {
+                    // [CG] casting?
                     final Step step = (Step) 
                       result.expr[result.expr.length - 1];
                     step.addExpr(new Step(a, Test.NODE, new Expr[]{}));
                   } 
                 } else {
+                  // [CG] casting?
                   final Step prev = (Step) expr[j - 1];
                   if(prev.expr.length != 0) break;
+                  // [CG] casting?
                   final Step step = (Step) result.expr[result.expr.length - 1];
                   step.addExpr(new Step(a, prev.test, new Expr[]{}));
                }
@@ -495,7 +496,7 @@ public class Path extends Arr {
   }
 
   /**
-   * Check if theres anything to sum up.
+   * Checks if there is anything to sum up.
    * @param d Data
    * @return boolean sum up
    */
@@ -508,7 +509,6 @@ public class Path extends Arr {
     }
     return false;
   }
-  
   
   @Override
   public boolean uses(final Using u) {
@@ -557,9 +557,8 @@ public class Path extends Arr {
 
 
   /**
-   * Check if current path is absolut.
-   * 
-   * @return boolean abspath
+   * Checks if current path is absolute.
+   * @return result of check
    */
   public boolean isAbsPath() {
     return root instanceof Root || root instanceof DNode;

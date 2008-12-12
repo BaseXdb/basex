@@ -10,10 +10,10 @@ import org.basex.query.xquery.path.Path;
 import org.basex.util.Array;
 
 /**
- * This is a simple container for native int values.
+ * This is a simple container for XQuery expressions.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
- * @author Christian Gruen
+ * @author Sebastian Gath
  */
 public final class XQExprList {
   /** Value array. */
@@ -22,13 +22,6 @@ public final class XQExprList {
   private boolean[] su;
   /** Current array size. */
   public int size;
-
-  /**
-   * Default constructor.
-   */
-  public XQExprList() {
-    this(8);
-  }
   
   /**
    * Constructor, specifying an initial list size.
@@ -97,11 +90,10 @@ public final class XQExprList {
   }
   
   /**
-   * Check if there is only one expression contained.
-   * @return boolean single
+   * Checks if there is only one expression contained.
+   * @return result of check
    */
-  public boolean singel() {
+  public boolean single() {
     return size == 1;
   }
-  
 }

@@ -57,7 +57,7 @@ public final class FTContains extends Arr {
   }
 
   /**
-   * Check if theres anything to sum up.
+   * Checks if there is anything to sum up.
    * @param d data
    * @return boolean sum up
    */
@@ -77,11 +77,9 @@ public final class FTContains extends Arr {
     if (!iu) return iterWithOutIndex(ctx);
     return iterIndex(ctx);
    }
-
-
   
   /**
-   * Processing without using the index.
+   * Evaluates the operator by accessing the index.
    * @param ctx context
    * @return iterator with results
    * @throws XQException Exception
@@ -95,30 +93,30 @@ public final class FTContains extends Arr {
     if (ftn == null) 
       ftn = fti.next();
     
-      DNode n;
+    DNode n;
       while((n = (DNode) v1.next()) != null) {
-        while (ftn != null && ftn.ftn.size > 0 && n.pre > ftn.ftn.getPre()) {
-          ftn = fti.next();
+      while(ftn != null && ftn.ftn.size > 0 && n.pre > ftn.ftn.getPre()) {
+        ftn = fti.next();
+      }
+      if(ftn != null) {
+        final boolean not = ftn.ftn.not;
+        if(ftn.ftn.getPre() == n.pre) {
+          ftn = null;
+          ctx.ftitem = tmp;
+          return new Bln(!not, n.score()).iter();
         }
-        if(ftn != null) {
-          final boolean not = ftn.ftn.not;
-          if(ftn.ftn.getPre() == n.pre) {
-            ftn = null;
-            ctx.ftitem = tmp;
-            return new Bln(!not, n.score()).iter();
-          }
-          if(not) {
-            ctx.ftitem = tmp;
-            return new Bln(true, n.score()).iter();
-          }
+        if(not) {
+          ctx.ftitem = tmp;
+          return new Bln(true, n.score()).iter();
         }
       }
-      ctx.ftitem = tmp;
-      return new Bln(false, 0).iter();
     }
+    ctx.ftitem = tmp;
+    return Bln.FALSE.iter();
+  }
   
   /**
-   * Processing without using the index.
+   * Evaluates the operator without using the index.
    * @param ctx context
    * @return iterator with results
    * @throws XQException Exception

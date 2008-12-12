@@ -39,7 +39,7 @@ public final class Or extends Arr {
     }
     
     return exli.size == expr.length ? this : exli.size == 0 ?  Bln.FALSE :
-      exli.singel() ? exli.list[0] : new Or(exli.finishXQ());
+      new Or(exli.finishXQ());
   }
   
   @Override

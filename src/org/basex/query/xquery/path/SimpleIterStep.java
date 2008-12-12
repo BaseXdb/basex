@@ -58,12 +58,10 @@ public final class SimpleIterStep extends Step {
   }
 
   /**
-   * Check if theres anything to sum up.
+   * Checks if there is anything to sum up.
    * @return boolean sum up
    */
   public boolean sumUp() {
-    return axis == Axis.CHILD && test instanceof NameTest
-      && expr.length == 0;
+    return axis == Axis.CHILD && test instanceof NameTest && expr.length == 0;
   }
-  
 }

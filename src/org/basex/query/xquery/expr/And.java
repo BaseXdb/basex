@@ -39,7 +39,7 @@ public final class And extends Arr {
     }
     
     return exli.size == expr.length ? this : exli.size == 0 ?  Bln.TRUE :
-      exli.singel() ? exli.list[0] : new And(exli.finishXQ());
+      new And(exli.finishXQ());
   }
 
   @Override
