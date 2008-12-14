@@ -8,7 +8,7 @@ import org.basex.api.dom.BXDoc;
 import org.basex.api.jaxp.BXPath;
 import org.basex.core.proc.Check;
 import org.basex.data.Data;
-import org.basex.query.xquery.item.DNode;
+import org.basex.query.xquery.item.DBNode;
 import org.basex.util.Performance;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -55,7 +55,7 @@ public final class JAXPTest {
     }
     try {
       final Data d = Check.check(XMLFILE);
-      final Node n = new BXDoc(new DNode(d, 0));
+      final Node n = new BXDoc(new DBNode(d, 0));
       final Object o = xpath.evaluate(QUERY, n, type);
       System.out.println(o + (o != null ? ": " + o.getClass() : ""));
       System.out.println(p.getTimer());

@@ -12,7 +12,7 @@ import org.basex.query.QueryException;
 import org.basex.query.xpath.XPathProcessor;
 import org.basex.query.xpath.item.Item;
 import org.basex.query.xpath.item.Nod;
-import org.basex.query.xquery.item.DNode;
+import org.basex.query.xquery.item.DBNode;
 import org.basex.util.Token;
 import org.xml.sax.InputSource;
 
@@ -88,7 +88,7 @@ public class XPathExprImpl implements XPathExpression {
       if(nodes.size == 0) return null;
       final Data data = nodes.data;
       return res == XPathConstants.NODESET ? new BXNList(nodes) :
-        new DNode(data, nodes.nodes[0]).java();
+        new DBNode(data, nodes.nodes[0]).java();
     }
 
     if(nodes != null) nodes.size = 1;

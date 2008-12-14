@@ -10,7 +10,7 @@ import org.basex.data.Data;
 import org.basex.data.Result;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
-import org.basex.query.xquery.item.DNode;
+import org.basex.query.xquery.item.DBNode;
 import org.basex.util.TokenBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -100,7 +100,7 @@ public final class BXXMLResource implements XMLResource, BXXMLDBText {
         final CachedOutput out = new CachedOutput();
         final XMLSerializer ser = new XMLSerializer(out);
         if(data != null) {
-          new DNode(data, pos).serialize(ser);
+          new DBNode(data, pos).serialize(ser);
         } else if(result != null) {
           result.serialize(ser, pos);
         } else {
@@ -140,7 +140,7 @@ public final class BXXMLResource implements XMLResource, BXXMLDBText {
   }
 
   public Node getContentAsDOM() {
-    if(!(content instanceof Node)) content = new BXDoc(new DNode(data, pos));
+    if(!(content instanceof Node)) content = new BXDoc(new DBNode(data, pos));
     return (Node) content;
   }
 

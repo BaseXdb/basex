@@ -12,7 +12,7 @@ import org.basex.BaseX;
 import org.basex.api.jaxp.NSContextImpl;
 import org.basex.data.Data;
 import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.item.DNode;
+import org.basex.query.xquery.item.DBNode;
 import org.basex.query.xquery.item.FNode;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Nod;
@@ -288,7 +288,7 @@ public final class IterStreamReader implements XMLStreamReader {
       }
       if(read == null) {
         item = result.next();
-        if(item instanceof DNode) {
+        if(item instanceof DBNode) {
           read = new DNodeReader();
         } else if(item instanceof FNode) {
           read = new FNodeReader();
@@ -415,10 +415,10 @@ public final class IterStreamReader implements XMLStreamReader {
     abstract void next();
   }
 
-  /** Reader for traversing {@link DNode} instances. */
+  /** Reader for traversing {@link DBNode} instances. */
   final class DNodeReader extends NodeReader {
     /** Node reference. */
-    private final DNode node;
+    private final DBNode node;
     /** Data size. */
     private final int s;
     /** Parent stack. */
@@ -432,7 +432,7 @@ public final class IterStreamReader implements XMLStreamReader {
 
     /** Constructor. */
     DNodeReader() {
-      node = ((DNode) item).copy();
+      node = ((DBNode) item).copy();
       item = node;
       p = node.pre;
       int k = node.data.kind(p);

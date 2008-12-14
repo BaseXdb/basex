@@ -11,7 +11,7 @@ import org.basex.api.dom.BXDomImpl;
 import org.basex.build.MemBuilder;
 import org.basex.build.xml.SAXWrapper;
 import org.basex.data.Data;
-import org.basex.query.xquery.item.DNode;
+import org.basex.query.xquery.item.DBNode;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.xml.sax.EntityResolver;
@@ -70,7 +70,7 @@ public class BXDocBuilder extends DocumentBuilder {
     final String id = is.getSystemId();
     final Data data = new MemBuilder().build(
         new SAXWrapper(source), id == null ? "tmp" : id);
-    return new BXDoc(new DNode(data, 0));
+    return new BXDoc(new DBNode(data, 0));
   }
 
   @Override

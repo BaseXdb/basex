@@ -22,7 +22,7 @@ import org.basex.io.IOContent;
 import org.basex.query.QueryException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.func.FunJava;
-import org.basex.query.xquery.item.DNode;
+import org.basex.query.xquery.item.DBNode;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Type;
 import org.basex.util.Token;
@@ -188,7 +188,7 @@ abstract class BXQAbstract {
    * @return document node
    * @throws XQException exception
    */
-  protected final DNode createDB(final Source s, final XQItemType it)
+  protected final DBNode createDB(final Source s, final XQItemType it)
       throws XQException {
 
     valid(s, Source.class);
@@ -211,7 +211,7 @@ abstract class BXQAbstract {
    * @return document node
    * @throws XQException exception
    */
-  protected final DNode createDB(final InputStream is) throws XQException {
+  protected final DBNode createDB(final InputStream is) throws XQException {
     opened();
     valid(is, InputStream.class);
     try {
@@ -227,7 +227,7 @@ abstract class BXQAbstract {
    * @return document node
    * @throws XQException exception
    */
-  protected final DNode createDB(final Reader r) throws XQException {
+  protected final DBNode createDB(final Reader r) throws XQException {
     opened();
     valid(r, Reader.class);
     try {
@@ -243,7 +243,7 @@ abstract class BXQAbstract {
    * @return document node
    * @throws XQException exception
    */
-  protected final DNode createDB(final XMLReader r) throws XQException {
+  protected final DBNode createDB(final XMLReader r) throws XQException {
     opened();
     valid(r, XMLReader.class);
     try {
@@ -259,7 +259,7 @@ abstract class BXQAbstract {
    * @return document node
    * @throws XQException exception
    */
-  protected final DNode createDB(final XMLStreamReader sr) throws XQException {
+  protected final DBNode createDB(final XMLStreamReader sr) throws XQException {
     opened();
     valid(sr, XMLStreamReader.class);
     try {
@@ -275,7 +275,7 @@ abstract class BXQAbstract {
    * @return document node
    * @throws BXQException exception
    */
-  protected final DNode createDB(final IO io) throws BXQException {
+  protected final DBNode createDB(final IO io) throws BXQException {
     try {
       return checkDB(CreateDB.xml(io, TMP));
     } catch(final IOException ex) {
@@ -289,9 +289,9 @@ abstract class BXQAbstract {
    * @return document node
    * @throws BXQException exception
    */
-  private DNode checkDB(final Data d) throws BXQException {
+  private DBNode checkDB(final Data d) throws BXQException {
     valid(d, Data.class);
-    return new DNode(d, 0);
+    return new DBNode(d, 0);
   }
 
   /**
