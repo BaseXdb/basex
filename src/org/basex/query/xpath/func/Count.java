@@ -1,5 +1,6 @@
 package org.basex.query.xpath.func;
 
+import static org.basex.query.xpath.XPText.*;
 import org.basex.index.Names;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
@@ -10,8 +11,6 @@ import org.basex.query.xpath.item.Nod;
 import org.basex.query.xpath.path.Axis;
 import org.basex.query.xpath.path.LocPathAbs;
 import org.basex.query.xpath.path.Steps;
-
-import static org.basex.query.xpath.XPText.*;
 
 /**
  * Constructor for count() function.

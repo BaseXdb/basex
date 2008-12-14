@@ -6,8 +6,7 @@ import org.basex.data.Serializer;
 import org.basex.util.Token;
 
 /**
- * PI Node.
- * 
+ * PI Node Fragment.
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
@@ -16,7 +15,7 @@ public final class FPI extends FNode {
   public final QNm name;
   /** PI value. */
   private final byte[] val;
-  
+
   /**
    * Constructor.
    * @param n name
@@ -34,17 +33,17 @@ public final class FPI extends FNode {
   public byte[] str() {
     return val;
   }
-  
+
   @Override
   public QNm qname() {
     return name;
   }
-  
+
   @Override
   public byte[] nname() {
     return name.str();
   }
-  
+
   @Override
   public void serialize(final Serializer ser) throws IOException {
     ser.pi(name.str(), val);

@@ -1,6 +1,6 @@
 package org.basex.query.xpath;
 
-import static org.basex.query.xpath.XPText.OPTTEXT;
+import static org.basex.query.xpath.XPText.*;
 import org.basex.query.xpath.expr.Expr;
 import org.basex.query.xpath.expr.Path;
 import org.basex.query.xpath.path.Axis;

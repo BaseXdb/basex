@@ -1,7 +1,6 @@
 package org.basex.query.xpath.expr;
 
 import org.basex.index.FTNode;
-import org.basex.index.FTNodeIter;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
@@ -19,7 +18,7 @@ public final class FTIntersection extends FTArrayExpr {
   private int[] pex;
   /** Saving index of negative expressions (FTNot). */
   private int[] nex;
-  /** Temp FTNode.  */
+  /** Temporary FTNode.  */
   private FTNode nod2;
   
   /**
@@ -37,7 +36,7 @@ public final class FTIntersection extends FTArrayExpr {
   
   /**
    * Checks if more values are available.
-   * @param n pointer on exprs
+   * @param n pointer on expressions
    * @return boolean
    */
   private boolean more(final int[] n) {
@@ -59,20 +58,11 @@ public final class FTIntersection extends FTArrayExpr {
     return more(nex);
   }
   
-  @Override
-  public FTNodeIter iter(final QueryContext ctx) {
-    return new FTNodeIter(){
-      @Override
-      public FTNode next() { return FTIntersection.this.more() 
-        ? FTIntersection.this.next(ctx) : new FTNode(); }
-    };
-  }
-  
   /**
    * Calculates FTAnd for the node n and the current node.
    * @param n FTNode
    * @param ctx XPContext
-   * @return FTNode as resultnode
+   * @return FTNode as result node
    */
   private FTNode calcFTAnd(final int[] n, final QueryContext ctx) {
     if (n.length == 0) return  new FTNode();
@@ -145,16 +135,15 @@ public final class FTIntersection extends FTArrayExpr {
   
   @Override
   public Bln eval(final XPContext ctx) throws QueryException {
-    
     // check each positive expression
-    for (int i : pex) {
+    for(final int i : pex) {
       final Bln it = (Bln) exprs[i].eval(ctx);
-      if (!it.bool()) return it;
+      if(!it.bool()) return it;
     }
     
-    for (int i : nex) {
+    for(final int i : nex) {
       final Bln it = (Bln) exprs[i].eval(ctx);
-      if (!it.bool()) return it;
+      if(!it.bool()) return it;
     }
   
     return Bln.TRUE;

@@ -61,7 +61,7 @@ public abstract class LocPath extends Expr {
       final Preds preds = step.preds;
 
       // don't optimize non-invertible axes
-      if(invertAxis(step.axis) == null) continue;
+      if(step.axis.invert() == null) continue;
 
       // find predicate with lowest number of occurrences
       boolean pos = false;
@@ -127,7 +127,7 @@ public abstract class LocPath extends Expr {
       boolean indexMatch = true;
       for(int j = i; j >= 0; j--) {
         final Step curr = steps.get(j);
-        final Axis axis = invertAxis(curr.axis);
+        final Axis axis = curr.axis.invert();
         if(axis == null) break;
 
         if(j == 0) {
@@ -263,34 +263,15 @@ public abstract class LocPath extends Expr {
     final Steps stps = steps;
 
     // add inverted pretext steps
-    Axis lastAxis = invertAxis(stps.last().axis);
+    Axis lastAxis = stps.last().axis.invert();
     for(int k = stps.size() - 2; k >= 0; k--) {
       final Step step = stps.get(k);
       final Step inv = Axis.create(lastAxis, step.test, step.preds);
-      lastAxis = invertAxis(step.axis);
+      lastAxis = step.axis.invert();
       path.steps.add(inv);
     }
     path.steps.add(Axis.create(lastAxis, curr.test));
     return path;
-  }
-
-  /**
-   * Inverts an XPath axis.
-   * @param axis axis to be inverted.
-   * @return inverted axis
-   */
-  private static Axis invertAxis(final Axis axis) {
-    switch(axis) {
-      case ANC:        return Axis.DESC;
-      case ANCORSELF:  return Axis.DESCORSELF;
-      case ATTR:
-      case CHILD:      return Axis.PARENT;
-      case DESC:       return Axis.ANC;
-      case DESCORSELF: return Axis.ANCORSELF;
-      case PARENT:     return Axis.CHILD;
-      case SELF:       return Axis.SELF;
-      default:         return null;
-    }
   }
 
   @Override

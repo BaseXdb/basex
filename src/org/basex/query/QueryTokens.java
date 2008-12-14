@@ -1,7 +1,6 @@
 package org.basex.query;
 
 import static org.basex.util.Token.*;
-import org.basex.core.Prop;
 
 /**
  * This class contains common tokens for the query implementations.
@@ -133,19 +132,11 @@ public interface QueryTokens {
   /** Skip flag for the syntax highlighter. */
   String SKIP = null;
 
-  /** Parser token. */
-  String DBLCOLON = "::";
-  /** Parser token. */
-  String QUOTE = "quote";
   /** Default language. */
   byte[] EN = token("en");
 
   /** Position info. */
   String STOPPED = "Stopped at ";
-  /** Position info. */
-  String POSINFO = STOPPED + "line %, column %:" + Prop.NL;
-  /** Position info. */
-  String POSFILEINFO = STOPPED + "line %, column % in %:" + Prop.NL;
   /** Position info. */
   String LINEINFO = "line %";
   /** Position info. */
@@ -156,7 +147,6 @@ public interface QueryTokens {
   String FOUND = ", found \"%\"";
   
   /** Parsing exception. */
-  String UNENTITY = "Undefined entity \"%\".";
-  /** Parsing exception. */
   String INVENTITY = "Invalid entity \"%\".";
+
 }

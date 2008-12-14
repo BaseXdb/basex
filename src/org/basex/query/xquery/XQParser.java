@@ -71,9 +71,10 @@ import org.basex.query.xquery.item.Str;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.item.Uri;
 import org.basex.query.xquery.path.Axis;
+import org.basex.query.xquery.path.AxisPath;
 import org.basex.query.xquery.path.KindTest;
+import org.basex.query.xquery.path.MixedPath;
 import org.basex.query.xquery.path.NameTest;
-import org.basex.query.xquery.path.Path;
 import org.basex.query.xquery.path.Step;
 import org.basex.query.xquery.path.Test;
 import org.basex.query.xquery.util.Err;
@@ -191,11 +192,6 @@ public final class XQParser extends QueryParser {
 
       if(end && more()) {
         if(alter != null) error();
-        if(ctx.root instanceof Step) {
-          final Step step = (Step) ctx.root;
-          if(step.axis == Axis.CHILD && step.test instanceof NameTest)
-            Err.or(QUERYSTEP, step);
-        }
         Err.or(QUERYEND, rest());
       }
       ctx.fun.check();
@@ -1203,21 +1199,41 @@ public final class XQParser extends QueryParser {
     }
 
     final boolean slash = consume('/');
-    if(!slash && s == 0) return ex;
+    final boolean step = ex instanceof Step;
+    if(!slash && s == 0 && !step) return ex;
 
     Expr[] list = {};
-    if(s == 2) list = add(list, new Step(Axis.DESCORSELF, Test.NODE,
-        new Expr[0]));
-    if(s != 0) list = add(list, ex);
+    if(s == 2) list = add(list, descOrSelf());
+    
+    final Expr root = s > 0 ? new Root() : !step ? ex : null;
+    if(root != ex) list = add(list, ex);
 
     if(slash) {
       do {
-        if(consume('/')) list = add(list, new Step(Axis.DESCORSELF,
-            Test.NODE, new Expr[0]));
-        list = add(list, check(step(), PATHMISS));
+        if(consume('/')) list = add(list, descOrSelf());
+        Expr st = check(step(), PATHMISS);
+        if(!(st instanceof Context)) list = add(list, st);
       } while(consume('/'));
     }
-    return new Path(s > 0 ? new Root() : ex, list);
+    
+    if(list.length == 0) return root;
+    
+    // check if all steps are axis steps
+    boolean axes = true;
+    final Step[] tmp = new Step[list.length];
+    for(int l = 0; l < list.length; l++) {
+      axes &= list[l] instanceof Step;
+      if(axes) tmp[l] = (Step) list[l];
+    }
+    return axes ? new AxisPath(root, tmp) : new MixedPath(root, list);
+  }
+
+  /**
+   * Returns a standard descendant-or-self::node() step.
+   * @return step
+   */
+  private Step descOrSelf() {
+    return Step.get(Axis.DESCORSELF, Test.NODE);
   }
 
   /**
@@ -1269,7 +1285,7 @@ public final class XQParser extends QueryParser {
       pred = add(pred, expr());
       check(BR2);
     }
-    return new Step(ax, test, pred);
+    return Step.get(ax, test, pred);
   }
 
   /**

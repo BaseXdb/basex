@@ -74,7 +74,7 @@ public final class IterStep extends Step {
               }
               return null;
             }
-            if(!it.node()) Err.or(NODESPATH, this, it.type);
+            if(!it.node()) Err.or(NODESPATH, IterStep.this, it.type);
             ir = axis.init((Nod) it);
           }
           nod = ir.next();
@@ -84,7 +84,7 @@ public final class IterStep extends Step {
               boolean add = true;
 
               ctx.item = nod;
-              final Item i = ctx.iter(expr[0]).ebv();
+              final Item i = ctx.iter(pred[0]).ebv();
               
               if(i.n() ? i.dbl() == ctx.pos : i.bool()) {
                 // assign score value
@@ -109,11 +109,6 @@ public final class IterStep extends Step {
           }
         }
       } 
-
-      @Override
-      public String toString() {
-        return IterStep.this.toString();
-      }
     };
   }
 }

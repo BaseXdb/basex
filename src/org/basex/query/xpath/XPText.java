@@ -1,6 +1,7 @@
 package org.basex.query.xpath;
 
 import org.basex.core.Prop;
+import static org.basex.util.Token.*;
 
 /**
  * This class assembles textual information of the XPath package.
@@ -110,18 +111,20 @@ public interface XPText {
   /** Evaluation Exception. */
   String INVALIDPRE = "'%' is no valid pre value.";
   
-  /** Attribute name. */
-  String TYPE = "type";
+  /** Parser token. */
+  String DBLCOLON = "::";
+  /** Parser token. */
+  String QUOTE = "quote";
+
+  /** Type. */
+  byte[] TYPE = token("type");
   /** Minimum . */
   String MIN = "min";
   /** Attribute name. */
   String MAX = "max";
+
   // XPath Optimizer ==========================================================
 
-  /** Optimization info. */
-  String OPTCALC = "Pre-evaluating expression";
-  /** Optimization info. */
-  String OPTCMP = "Pre-evaluating constant comparison";
   /** Optimization info. */
   String OPTFUNC = "Pre-evaluating %";
   /** Optimization info. */
@@ -174,8 +177,6 @@ public interface XPText {
   String OPTTEXT = "Adding text() step";
   /** Optimization info. */
   String OPTPOS = "Rewriting position predicate";
-  /** Optimization info. */
-  String OPTSUMPREDS = "Summing up same predicates for fulltext search";
 
   /** Evaluation info. */
   String EVALSKIP = "rest of output skipped...";

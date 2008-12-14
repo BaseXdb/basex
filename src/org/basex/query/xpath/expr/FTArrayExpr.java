@@ -73,17 +73,21 @@ public abstract class FTArrayExpr extends Expr {
     return new FTNode();
   }
 
-  
   /**
-   * Returns an itr for the results.
+   * Returns an iterator for the results.
    * @param ctx current context
-   * @return itr container for the results
+   * @return container for the results
    */
   @SuppressWarnings("unused")
   public FTNodeIter iter(final QueryContext ctx) {
-    return FTNodeIter.EMPTY;
+    return new FTNodeIter(){
+      @Override
+      public FTNode next() {
+        return more() ? FTArrayExpr.this.next(ctx) : new FTNode();
+      }
+    };
   }
-  
+
   @Override
   public final boolean usesPos() {
     return false;

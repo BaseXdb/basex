@@ -1,6 +1,7 @@
 package org.basex.query.xquery.expr;
 
-import org.basex.index.FTIndexAcsbl;
+import org.basex.query.xquery.FTIndexAcsbl;
+import org.basex.query.xquery.FTIndexEq;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Dbl;
@@ -50,26 +51,28 @@ public final class FTAnd extends FTExpr {
       throws XQException {
     final IntList i1 = new IntList();
     final IntList i2 = new IntList();
-    int nmin = ia.indexSize;
+    int nmin = ia.is;
     for (int i = 0; i < expr.length; i++) {
       expr[i].indexAccessible(ctx, ia);
       if (!ia.io) return;
       
       if (!(expr[i] instanceof FTNot)) {
         i1.add(i);
-        nmin = ia.indexSize < nmin ? ia.indexSize : nmin;
-      } else if (ia.indexSize > 0) {
+        nmin = ia.is < nmin ? ia.is : nmin;
+      } else if (ia.is > 0) {
         i2.add(i);
       }
     }
     pex = i1.finish();
     nex = i2.finish();
     ia.seq = i1.size == 0 || ia.seq;
-    ia.indexSize = i1.size > 0 ? nmin : Integer.MAX_VALUE;
+    ia.is = i1.size > 0 ? nmin : Integer.MAX_VALUE;
   }
   
   @Override
-  public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq) {
+  public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq)
+      throws XQException {
+
     if (pex.length == 1 && nex.length == 0)
       expr[pex[0]].indexEquivalent(ctx, ieq);
 

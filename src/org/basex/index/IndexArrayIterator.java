@@ -161,9 +161,9 @@ public class IndexArrayIterator extends IndexIterator {
   }
   
   /**
-   * Merges two indexarrayiterator.
-   * @param iai1 first indexarrayiterator to merge
-   * @param iai2 second indexarrayiterator to merge
+   * Merges two index array iterators.
+   * @param iai1 first index array iterator to merge
+   * @param iai2 second index array iterator to merge
    * @return IndexArrayIterator
    */
   public static IndexArrayIterator merge(final IndexArrayIterator iai1,
@@ -172,9 +172,9 @@ public class IndexArrayIterator extends IndexIterator {
   }
   
   /**
-   * Merges two indexarrayiterator.
-   * @param iai1 first indexarrayiterator to merge
-   * @param iai2 second indexarrayiterator to merge
+   * Merges two index array iterators.
+   * @param iai1 first index array iterator to merge
+   * @param iai2 second index array iterator to merge
    * @param w distance between two pos values
    * @return IndexArrayIterator
    */
@@ -225,6 +225,7 @@ public class IndexArrayIterator extends IndexIterator {
       public FTNode nextFTNode() {
         return r;
       }
+
       @Override
       public int next() {
         return r.getPre();
@@ -245,9 +246,9 @@ public class IndexArrayIterator extends IndexIterator {
   }
   
   /**
-   * Merges two indexarrayiterator.
-   * @param iai1 first indexarrayiterator to merge
-   * @param iai2 second indexarrayiterator to merge
+   * Merges two index array iterators.
+   * @param iai1 first index array iterator to merge
+   * @param iai2 second index array iterator to merge
    * @param w distance between two pos values
    * @return IndexArrayIterator
    */
@@ -257,60 +258,60 @@ public class IndexArrayIterator extends IndexIterator {
     if (iai2 == EMP) return iai1;
     
     return new IndexArrayIterator(1) {
-        FTNode[] n = new FTNode[2];
-        FTNode r;
-        int c = -1;
-        
-        @Override
-        public boolean more() {
-          r = null;
-          n[0] = (c == 0 || c == -1) ? iai1.more() 
-              ? iai1.nextFTNode() : null : n[0];
-          n[1] = (c == 1 || c == -1) ? iai2.more() 
-              ? iai2.nextFTNode() : null : n[1];
-          if (n[0] != null && n[1] != null) {
-              final int dis = n[0].getPre() - n[1].getPre();
-              if (dis < 0) {
-                c = 0;
-                return more();
-              } else if (dis > 0) {
-                c = 1;
-                return more();
-              } else {
-                c = -1;
-                if (n[0].merge(n[1], w)) {
-                  n[0].reset();
-                  r = n[0];
-                  return true;
-                } else {
-                  return more();
-                }
-              }
-            }         
-            return false;
+      FTNode[] n = new FTNode[2];
+      FTNode r;
+      int c = -1;
+      
+      @Override
+      public boolean more() {
+        r = null;
+        n[0] = (c == 0 || c == -1) ? iai1.more() 
+            ? iai1.nextFTNode() : null : n[0];
+        n[1] = (c == 1 || c == -1) ? iai2.more() 
+            ? iai2.nextFTNode() : null : n[1];
+        if (n[0] != null && n[1] != null) {
+          final int dis = n[0].getPre() - n[1].getPre();
+          if (dis < 0) {
+            c = 0;
+            return more();
+          } else if (dis > 0) {
+            c = 1;
+            return more();
+          } else {
+            c = -1;
+            if (n[0].merge(n[1], w)) {
+              n[0].reset();
+              r = n[0];
+              return true;
+            } else {
+              return more();
+            }
           }
-        
-          @Override
-          public FTNode nextFTNode() {
-            return r;
-          }
-          @Override
-          public int next() {
-            return r.getPre();
-          }
-          
-          @Override
-          public void setTokenNum(final int t) {
-            iai1.setTokenNum(t);
-            iai2.setTokenNum(t);
-          }
-          
-          @Override
-          public void setToken(final FTTokenizer[] token) {
-            iai1.setToken(token);
-            iai2.setToken(token);
-          }
-        };
+        }         
+        return false;
       }
-   
+    
+      @Override
+      public FTNode nextFTNode() {
+        return r;
+      }
+      
+      @Override
+      public int next() {
+        return r.getPre();
+      }
+      
+      @Override
+      public void setTokenNum(final int t) {
+        iai1.setTokenNum(t);
+        iai2.setTokenNum(t);
+      }
+      
+      @Override
+      public void setToken(final FTTokenizer[] token) {
+        iai1.setToken(token);
+        iai2.setToken(token);
+      }
+    };
+  }
 }

@@ -13,7 +13,7 @@ import org.basex.util.IntList;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class FTUnion extends FTExpr {
+final class FTUnion extends FTExpr {
   /** Cache for one of the nodes. */
   private IntList cp;
   /** Flag is set, if ith expression has any result. */
@@ -23,7 +23,7 @@ public final class FTUnion extends FTExpr {
   /** Saving index of positive expressions. */
   private int[] pex;
   /** Flag if one result was a ftnot. */
-  private boolean not = false;
+  private boolean not;
   
   /**
    * Constructor.
@@ -32,7 +32,7 @@ public final class FTUnion extends FTExpr {
    * @param e expression list
    * 
    */
-  public FTUnion(final int[] posex, final boolean ftnot, final FTExpr... e) {
+  FTUnion(final int[] posex, final boolean ftnot, final FTExpr... e) {
     super(e);
     pex = posex;
     mp = new FTNodeItem[pex.length];
@@ -45,21 +45,18 @@ public final class FTUnion extends FTExpr {
     return new FTNodeIter(){
       @Override
       public FTNodeItem next() throws XQException { 
-        if (FTUnion.this.more(ctx)) 
-        return FTUnion.this.next();
-        else 
-          return FTUnion.this.next();
-        }
+        return FTUnion.this.next(ctx);
+      }
     };
   }
   
   /**
-   * Checks if more results exist.
-   * @param ctx current context
-   * @return boolean
-   * @throws XQException Exception
+   * Get next result.
+   * @param ctx query context
+   * @return next result
+   * @throws XQException query exception
    */
-  public boolean more(final XQContext ctx) throws XQException {
+  FTNodeItem next(final XQContext ctx) throws XQException {
     boolean b = false;
     if (cp.size > 0) {
       for (int i = 0; i < cp.size; i++) {
@@ -70,17 +67,9 @@ public final class FTUnion extends FTExpr {
       cp.reset();
     }
     if (!b) {
-      for (FTNodeItem c : mp) if(c.ftn.size > 0) return true;
+      for (final FTNodeItem c : mp) if(c.ftn.size > 0) break;
     }
-    return b;
-  }
-  
-  /**
-   * Get next result.
-   * 
-   * @return next result
-   */
-  public FTNodeItem next() {
+    
     if (minp == -1) {
       minp = 0;
       while(minp < mp.length && mp[minp].ftn.size == 0) minp++;
@@ -93,7 +82,7 @@ public final class FTUnion extends FTExpr {
             minp = ip;
             cp.set(ip, 0);
           } else if (n1.ftn.getPre() == n2.ftn.getPre()) {
-              cp.add(ip);
+            cp.add(ip);
           }
         } 
       }
@@ -116,5 +105,4 @@ public final class FTUnion extends FTExpr {
   public String toString() {
     return toString(" ftunion ");
   }
-  
-  }
+}

@@ -25,21 +25,17 @@ public final class Or extends Arr {
 
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
-    //int el = expr.length;
-    XQExprList exli = new XQExprList(expr.length);
-    for(int e = 0; e < expr.length; e++) {
-      expr[e] = ctx.comp(expr[e]);
-      if(!expr[e].i()) {
-        exli.add(expr[e], false, ctx);
-        continue;
+    final XQExprList exli = new XQExprList(expr.length);
+    for(final Expr e : expr) {
+      final Expr ex = ctx.comp(e);
+      if(!ex.i()) {
+        exli.add(ex);
+      } else if(((Item) ex).bool()) {
+        // atomic items can be pre-evaluated
+        return Bln.TRUE;
       }
-      if(((Item) expr[e]).bool()) return Bln.TRUE;
-      //Array.move(expr, e + 1, -1, --el - e);
-      //--e;
     }
-    
-    return exli.size == expr.length ? this : exli.size == 0 ?  Bln.FALSE :
-      new Or(exli.finishXQ());
+    return exli.size == 0 ? Bln.FALSE : new Or(exli.finish());
   }
   
   @Override
@@ -55,7 +51,7 @@ public final class Or extends Arr {
         found = true;
       }
     }
-    return (d == 0 ? Bln.get(found) : new Bln(true, d)).iter();
+    return (d == 0 ? Bln.get(found) : Bln.get(d)).iter();
   }
 
   @Override

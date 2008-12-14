@@ -1,7 +1,6 @@
 package org.basex.query.xpath.expr;
 
 import org.basex.index.FTNode;
-import org.basex.index.FTNodeIter;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
@@ -29,19 +28,10 @@ public final class FTMildNotIter extends FTArrayExpr {
   public boolean more() {
     return exprs[0].more();
   }
-
-  @Override
-  public FTNodeIter iter(final QueryContext ctx) {
-    return new FTNodeIter(){
-      @Override
-      public FTNode next() { return FTMildNotIter.this.more() 
-        ? FTMildNotIter.this.next(ctx) : new FTNode(); }
-    };
-  }
-
   
   /** Result node from expression 1. */
   FTNode n1 = null;
+
   @Override
   public FTNode next(final QueryContext ctx) {
     final FTNode n0 = exprs[0].next(ctx);

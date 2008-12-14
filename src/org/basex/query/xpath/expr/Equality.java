@@ -1,5 +1,6 @@
 package org.basex.query.xpath.expr;
 
+import static org.basex.query.xpath.XPText.*;
 import org.basex.index.IndexToken;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.internal.IndexAccess;
@@ -8,8 +9,6 @@ import org.basex.query.xpath.item.Item;
 import org.basex.query.xpath.path.Axis;
 import org.basex.query.xpath.path.LocPath;
 import org.basex.query.xpath.path.Step;
-
-import static org.basex.query.xpath.XPText.*;
 
 /**
  * Equality Expression, evaluating comparisons.

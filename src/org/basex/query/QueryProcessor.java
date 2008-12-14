@@ -5,7 +5,6 @@ import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
-import org.basex.query.xpath.item.Nod;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -64,20 +63,6 @@ public abstract class QueryProcessor extends Progress {
       }
     }
     compiled = true;
-  }
-
-  /**
-   * Parses the specified query and returns the result nodes.
-   * @param nodes node context
-   * @return result of query
-   * @throws QueryException query exception
-   */
-  public final Nodes queryNodes(final Nodes nodes) throws QueryException {
-    final Result res = query(nodes);
-    if(!(res instanceof Nod)) throw new QueryException(QUERYNODESERR);
-
-    final Nod ns = (Nod) res;
-    return new Nodes(ns.nodes, ns.data);
   }
 
   /**

@@ -47,7 +47,7 @@ public abstract class Cmp extends Arr {
 
     // pre-evaluate constant comparison
     if(i1 != null && i2 != null) {
-      ctx.compInfo(OPTCMP);
+      ctx.compInfo(OPTFUNC, type);
       return Bln.get(type.eval((Item) expr[0], (Item) expr[1]));
     }
 
@@ -89,7 +89,7 @@ public abstract class Cmp extends Arr {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, Token.token(TYPE), Token.token(type.toString()));
+    ser.openElement(this, TYPE, Token.token(type.toString()));
     expr[0].plan(ser);
     expr[1].plan(ser);
     ser.closeElement();

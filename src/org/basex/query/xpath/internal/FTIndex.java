@@ -5,7 +5,6 @@ import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.index.FTNode;
-import org.basex.index.FTNodeIter;
 import org.basex.index.FTTokenizer;
 import org.basex.index.IndexArrayIterator;
 import org.basex.index.IndexIterator;
@@ -106,16 +105,6 @@ public final class FTIndex extends FTArrayExpr {
   public FTNode next(final QueryContext ctx) {
     return iat.nextFTNode();
   }
-  
-  @Override
-  public FTNodeIter iter(final QueryContext ctx) {
-    return new FTNodeIter(){
-      @Override
-      public FTNode next() { return FTIndex.this.more() 
-        ? FTIndex.this.next(ctx) : new FTNode(); }
-    };
-  }
-
 
   /**
    * Joins the specified iterators and returns its result.

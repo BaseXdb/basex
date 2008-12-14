@@ -79,7 +79,7 @@ public final class FTNode {
   }
 
   /**
-   * Getter for the prevalue.
+   * Getter for the pre value.
    * @return pre value
    */
   public int getPre() {
@@ -118,18 +118,13 @@ public final class FTNode {
   }
 
   /**
-   * Convert all tokens to one byte[].
-   *
-   * @return byte[] tokens
-   * 
+   * Returns the length of all tokens.
+   * @return length
    */
-  public byte[] getTokens() {
-    StringBuffer sb = new StringBuffer();
-    for (int i = 0; i < tok.length; i++) {
-      sb.append(tok[i].text);
-      if (i < tok.length - 1) sb.append(" ");
-    }
-    return sb.toString().getBytes();
+  public int getLength() {
+    int l = -1;
+    for(int i = 0; i < tok.length; i++) l += tok[i].text.length + 1;
+    return l;
   }
   
   /**

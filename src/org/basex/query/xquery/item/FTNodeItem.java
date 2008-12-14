@@ -10,20 +10,17 @@ import org.basex.query.xquery.util.Scoring;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Sebastian Gath
  */
-public class FTNodeItem extends Item {
+public final class FTNodeItem extends Item {
   /** FTNode object. */
-  public FTNode ftn;
+  public final FTNode ftn;
   /** Data. **/
-  public Data data;
-  /** Double value. */
-  private double d = -1;
+  public final Data data;
   
   /**
    * Constructor.
    */
   public FTNodeItem() {
-    super(Type.FTN);
-    ftn = new FTNode();
+    this(new FTNode(), null);
   }
 
   /**
@@ -35,6 +32,7 @@ public class FTNodeItem extends Item {
     super(Type.FTN);
     ftn = ftnode;
     data = dat;
+    score = -1;
   }
 
   @Override
@@ -42,16 +40,12 @@ public class FTNodeItem extends Item {
     return i instanceof FTNodeItem && 
       ((FTNodeItem) i).ftn.getPre() == ftn.getPre();
   }
-  @Override
-  public String toString() {
-    return ftn.toString();
-  }
   
   @Override 
   public double dbl() {
-    d = d == -1 ? ftn.size > 0 ? 
-        Scoring.word(ftn.p.size - 1, ftn.getTokens().length) : 0 : d;
-    return d;
+    if(score == -1)
+      score = ftn.size > 0 ? Scoring.word(ftn.p.size - 1, ftn.getLength()) : 0;
+    return score;
   }
   
   /**
@@ -59,29 +53,32 @@ public class FTNodeItem extends Item {
    * @param dbl new double values. 
    */
   public void setDbl(final double dbl) {
-    d = dbl;
+    score = dbl;
   }
   
   /**
    * Convert the current object to a DNode.
-   * 
    * @return DNode 
    */
-  public DNode getDNode() {
-    if (ftn.size == 0) return null; 
-    final DNode dn = new DNode(data, ftn.getPre(), null, Type.TXT);
+  public DBNode dbNode() {
+    if(ftn.size == 0) return null;
+    final DBNode dn = new DBNode(data, ftn.getPre(), null, Type.TXT);
     dn.parent();
     return dn;
   }
 
   /**
    * Merge current item with an other FTNodeItem.
-   * 
    * @param i1 other FTNodeItem
    * @param w number of words
    */
   public void merge(final FTNodeItem i1, final int w) {
     ftn.merge(i1.ftn, w);
-    d = Scoring.and(d, i1.d);
+    score = Scoring.and(score, i1.score);
+  }
+
+  @Override
+  public String toString() {
+    return ftn.toString();
   }
 }

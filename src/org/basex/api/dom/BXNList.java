@@ -1,7 +1,7 @@
 package org.basex.api.dom;
 
 import org.basex.query.xpath.item.Nod;
-import org.basex.query.xquery.item.DNode;
+import org.basex.query.xquery.item.DBNode;
 import org.basex.query.xquery.util.NodeBuilder;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -39,7 +39,7 @@ public class BXNList implements NodeList {
     if(xquery != null) {
       if(i < xquery.size) n = xquery.list[i];
     } else {
-      if(i < xpath.size) n = new DNode(xpath.data, xpath.nodes[i]);
+      if(i < xpath.size) n = new DBNode(xpath.data, xpath.nodes[i]);
     }
     return n != null ? n.java() : null;
   }

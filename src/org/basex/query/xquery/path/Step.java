@@ -4,12 +4,8 @@ import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.query.xquery.XQText.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
-import org.basex.index.FTIndexAcsbl;
-import org.basex.query.xquery.expr.FTIndexEq;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.expr.Arr;
-import org.basex.query.xquery.expr.CmpG;
 import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.func.Fun;
 import org.basex.query.xquery.func.FunDef;
@@ -21,6 +17,7 @@ import org.basex.query.xquery.iter.NodIter;
 import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.util.Err;
 import org.basex.query.xquery.util.Scoring;
+import org.basex.util.Array;
 import org.basex.util.Token;
 
 /**
@@ -29,11 +26,34 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class Step extends Arr {
+public class Step extends Expr {
   /** Axis. */
   public Axis axis;
   /** Node test. */
   public Test test;
+  /** Predicates. */
+  public Expr[] pred;
+
+  /**
+   * This method creates an expression for steps without predicates.
+   * @param a axis
+   * @param t node test
+   * @return step
+   */
+  public static Step get(final Axis a, final Test t) {
+    return new SimpleIterStep(a, t);
+  }
+
+  /**
+   * This method creates an expression for steps with predicates.
+   * @param a axis
+   * @param t node test
+   * @param p predicates
+   * @return step
+   */
+  public static Step get(final Axis a, final Test t, final Expr[] p) {
+    return p.length == 0 ? get(a, t) : new Step(a, t, p);
+  }
 
   /**
    * Constructor.
@@ -41,26 +61,34 @@ public class Step extends Arr {
    * @param t node test
    * @param p predicates
    */
-  public Step(final Axis a, final Test t, final Expr[] p) {
-    super(p);
+  protected Step(final Axis a, final Test t, final Expr[] p) {
     axis = a;
     test = t;
+    pred = p;
   }
-  
-  @Override
-  public Expr comp(final XQContext ctx) throws XQException {
-    super.comp(ctx);
 
-    // No predicates.. use simple evaluation
-    if(expr.length == 0) return new SimpleIterStep(axis, test, expr);
+  @Override
+  public Step comp(final XQContext ctx) throws XQException {
+    for(int p = 0; p != pred.length; p++) {
+      pred[p] = ctx.comp(pred[p]);
+      if(pred[p].i()) {
+        final Item it = (Item) pred[p];
+        if(it.n() || !it.bool()) continue;
+        Array.move(pred, p + 1, -1, pred.length - p-- - 1);
+        pred = Array.finish(pred, pred.length - 1);
+      }
+    }
+
+    // No predicates.. evaluate via simple iterator
+    if(pred.length == 0) return get(axis, test);
     // LAST
-    final boolean last = expr[0] instanceof Fun &&
-      ((Fun) expr[0]).func == FunDef.LAST;
+    final boolean last = pred[0] instanceof Fun &&
+      ((Fun) pred[0]).func == FunDef.LAST;
     // Numeric value
-    final boolean num = expr[0].i() && ((Item) expr[0]).n();
+    final boolean num = pred[0].i() && ((Item) pred[0]).n();
     // Multiple Predicates or POS
-    return expr.length > 1 || (!last && !num && uses(Using.POS)) ? this :
-      new IterStep(axis, test, expr, last, num);
+    return pred.length > 1 || (!last && !num && uses(Using.POS)) ? this :
+      new IterStep(axis, test, pred, last, num);
   }
 
   @Override
@@ -83,7 +111,7 @@ public class Step extends Arr {
       }
 
       // evaluates predicates
-      for(final Expr p : expr) {
+      for(final Expr p : pred) {
         ctx.size = nb.size;
         ctx.pos = 1;
         int c = 0;
@@ -110,48 +138,32 @@ public class Step extends Arr {
    * @param ax axis to be checked
    * @return result of check
    */
-  public boolean simple(final Axis ax) {
-    return axis == ax && test == Test.NODE && expr.length == 0;
+  boolean simple(final Axis ax) {
+    return axis == ax && test == Test.NODE && pred.length == 0;
   }
   
   /**
    * Checks if this is a simple name axis (no predicates).
    * @param ax axis to be checked
    * @param name name reference needed
-   * @return name id or {@link Integer#MIN_VALUE} if test was negative
+   * @return result of check
    */
   public boolean simpleName(final Axis ax, final boolean name) {
-    return axis == ax && (expr == null || expr.length == 0) && 
-      (name ? test.kind == Test.Kind.NAME : true);
+    return axis == ax && pred.length == 0 && 
+      (!name || test.kind == Test.Kind.NAME);
   }
 
-  
-  /**
-   * Checks if the specified location step has suitable index axes.
-   * @return true result of check
-   */
-  public final boolean checkAxes() {
-    return //expr != null || 
-       axis != Axis.ANC &&
-       axis != Axis.ANCORSELF && axis != Axis.DESC &&
-       axis != Axis.SELF && axis != Axis.DESCORSELF &&
-       axis != Axis.CHILD && axis != Axis.PARENT;
-  }
-
-
-  
   @Override
   public boolean uses(final Using u) {
-    switch(u) {
-      case POS:
-        for(final Expr e : expr) {
-          final Type t = e.returned();
-          if(t == null || t.num || e.uses(u)) return true;
-        }
-        return super.uses(u);
-      default:
-        return super.uses(u);
+    for(final Expr p : pred) if(p.uses(u)) return true;
+    
+    if(u == Using.POS) {
+      for(final Expr p : pred) {
+        final Type t = p.returned();
+        if(t == null || t.num) return true;
+      }
     }
+    return false;
   }
 
   @Override
@@ -170,27 +182,13 @@ public class Step extends Arr {
     ser.attribute(AXIS, Token.token(axis.name));
     ser.attribute(TEST, Token.token(test.toString()));
 
-    if(expr.length != 0) {
+    if(pred.length != 0) {
       ser.finishElement();
-      for(Expr e : expr) e.plan(ser);
+      for(Expr p : pred) p.plan(ser);
       ser.closeElement();
     } else {
       ser.emptyElement();
     }
-  }
-
-  @Override
-  public void indexAccessible(final XQContext ctx, final FTIndexAcsbl ia) 
-  throws XQException {
-    if (expr.length == 1  && expr[0] instanceof CmpG) 
-      expr[0].indexAccessible(ctx, ia);
-  }
- 
-  @Override
-  public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq) {
-    if (expr.length == 1  && expr[0] instanceof CmpG)
-      return expr[0].indexEquivalent(ctx, ieq);
-    return this;
   }
   
   @Override
@@ -203,19 +201,15 @@ public class Step extends Arr {
     if(axis == Axis.ATTR) sb.append("@");
     else if(axis != Axis.CHILD) sb.append(axis + "::");
     sb.append(test);
-    for(final Expr e : expr) sb.append("[" + e + "]");
+    for(final Expr e : pred) sb.append("[" + e + "]");
     return sb.toString();
   }
   
   /**
-   * Add expression to step.
-   * @param e expr to add
+   * Adds a predicate to the step.
+   * @param p predicate to be added
    */
-  public void addExpr(final Expr e) {
-    final Expr[] tmp = new Expr[expr.length + 1];
-    System.arraycopy(expr, 0, tmp, 0, tmp.length - 1);
-    tmp[tmp.length - 1] = e; 
-    expr = tmp;
+  public void addPred(final Expr p) {
+    pred = Array.add(pred, p);
   }
-  
 }

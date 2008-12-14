@@ -19,7 +19,7 @@ import org.basex.query.xquery.expr.Cast;
 import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.expr.List;
 import org.basex.query.xquery.expr.VarCall;
-import org.basex.query.xquery.item.DNode;
+import org.basex.query.xquery.item.DBNode;
 import org.basex.query.xquery.item.Dat;
 import org.basex.query.xquery.item.Dtm;
 import org.basex.query.xquery.item.Item;
@@ -87,7 +87,7 @@ public final class XQContext extends QueryContext {
   /** List of loaded modules. */
   StringList modLoaded = new StringList();
   /** Used documents. */
-  DNode[] docs = new DNode[0];
+  DBNode[] docs = new DBNode[0];
   /** Collections. */
   NodIter[] collect = new NodIter[0];
   /** Collection names. */
@@ -119,15 +119,15 @@ public final class XQContext extends QueryContext {
     try {
       // cache the initial context nodes
       if(nodes != null) {
-        docs = new DNode[nodes.size];
+        docs = new DBNode[nodes.size];
         for(int d = 0; d < docs.length; d++) {
-          docs[d] = new DNode(nodes.data, nodes.nodes[d]);
+          docs[d] = new DBNode(nodes.data, nodes.nodes[d]);
         }
         item = Seq.get(docs, docs.length);
         
         // add collection instances
         final NodIter col = new NodIter();
-        for(final DNode doc : docs) col.add(doc);
+        for(final DBNode doc : docs) col.add(doc);
         collect = Array.add(collect, col);
         collName = Array.add(collName, token(nodes.data.meta.dbname));
       }
@@ -260,23 +260,23 @@ public final class XQContext extends QueryContext {
    * @return database instance
    * @throws XQException evaluation exception
    */
-  public DNode doc(final byte[] db) throws XQException {
+  public DBNode doc(final byte[] db) throws XQException {
     if(contains(db, '<') || contains(db, '>')) Err.or(INVDOC, db);
 
     // check if the collections contain the document
     for(final NodIter ni : collect) {
       for(int n = 0; n < ni.size; n++) {
-        if(eq(db, ni.list[n].base())) return (DNode) ni.list[n];
+        if(eq(db, ni.list[n].base())) return (DBNode) ni.list[n];
       }
     }
 
     // check if the database has already been opened
     String dbname = string(db);
-    for(final DNode d : docs) if(d.data.meta.dbname.equals(dbname)) return d;
+    for(final DBNode d : docs) if(d.data.meta.dbname.equals(dbname)) return d;
 
     // check if the document has already been opened
     final IO bxw = IO.get(string(db));
-    for(final DNode d : docs) if(d.data.meta.file.eq(bxw)) return d;
+    for(final DBNode d : docs) if(d.data.meta.file.eq(bxw)) return d;
 
     // get database instance
     Data data = null;
@@ -290,7 +290,7 @@ public final class XQContext extends QueryContext {
 
     // add document to array
     final int dl = docs.length;
-    docs = Array.add(docs, new DNode(data, 0));
+    docs = Array.add(docs, new DBNode(data, 0));
     return docs[dl];
   }
 
@@ -326,11 +326,11 @@ public final class XQContext extends QueryContext {
    * Adds database documents as a collection.
    * @param db database reference
    */
-  private void addDocs(final DNode db) {
+  private void addDocs(final DBNode db) {
     final NodIter col = new NodIter();
     final Data data = db.data;
     for(int p = 0; p < data.size;) {
-      col.add(new DNode(data, p));
+      col.add(new DBNode(data, p));
       p += data.size(p, data.kind(p));
     }
     addColl(col, token(data.meta.dbname));

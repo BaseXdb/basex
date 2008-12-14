@@ -4,17 +4,17 @@ import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.iter.NodeIter;
 
 /**
- * XPath Axes Enumeration.
+ * XPath Axes.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public enum Axis {
-  // ...order is important for parsing the Query;
+  // ...order is important here for parsing the Query;
   // axes with longer names are parsed first
   
   /** Ancestor-or-self axis. */
-  ANCORSELF("ancestor-or-self") {
+  ANCORSELF("ancestor-or-self", false, true) {
     @Override
     public NodeIter init(final Nod n) {
       return n.ancOrSelf();
@@ -22,7 +22,7 @@ public enum Axis {
   },
   
   /** Ancestor axis. */
-  ANC("ancestor") {
+  ANC("ancestor", false, true) {
     @Override
     public NodeIter init(final Nod n) {
       return n.anc();
@@ -30,7 +30,7 @@ public enum Axis {
   },
   
   /** Attribute axis. */
-  ATTR("attribute") {
+  ATTR("attribute", true, false) {
     @Override
     public NodeIter init(final Nod n) {
       return n.attr();
@@ -38,7 +38,7 @@ public enum Axis {
   },
   
   /** Child Axis. */
-  CHILD("child") {
+  CHILD("child", true, true) {
     @Override
     public NodeIter init(final Nod n) {
       return n.child();
@@ -46,7 +46,7 @@ public enum Axis {
   },
   
   /** Descendant-or-self axis. */
-  DESCORSELF("descendant-or-self") {
+  DESCORSELF("descendant-or-self", true, true) {
     @Override
     public NodeIter init(final Nod n) {
       return n.descOrSelf();
@@ -54,7 +54,7 @@ public enum Axis {
   },
   
   /** Descendant axis. */
-  DESC("descendant") {
+  DESC("descendant", true, true) {
     @Override
     public NodeIter init(final Nod n) {
       return n.desc();
@@ -62,7 +62,7 @@ public enum Axis {
   },
   
   /** Following-Sibling axis. */
-  FOLLSIBL("following-sibling") {
+  FOLLSIBL("following-sibling", false, false) {
     @Override
     public NodeIter init(final Nod n) {
       return n.follSibl();
@@ -70,7 +70,7 @@ public enum Axis {
   },
   
   /** Following axis. */
-  FOLL("following") {
+  FOLL("following", false, false) {
     @Override
     public NodeIter init(final Nod n) {
       return n.foll();
@@ -78,7 +78,7 @@ public enum Axis {
   },
   
   /** Parent axis. */
-  PARENT("parent") {
+  PARENT("parent", false, true) {
     @Override
     public NodeIter init(final Nod n) {
       return n.par();
@@ -86,7 +86,7 @@ public enum Axis {
   },
   
   /** Preceding-Sibling axis. */
-  PRECSIBL("preceding-sibling") {
+  PRECSIBL("preceding-sibling", false, false) {
     @Override
     public NodeIter init(final Nod n) {
       return n.precSibl();
@@ -94,7 +94,7 @@ public enum Axis {
   },
   
   /** Preceding axis. */
-  PREC("preceding") {
+  PREC("preceding", false, false) {
     @Override
     public NodeIter init(final Nod n) {
       return n.prec();
@@ -102,7 +102,7 @@ public enum Axis {
   },
 
   /** Step axis. */
-  SELF("self") {
+  SELF("self", true, true) {
     @Override
     public NodeIter init(final Nod n) {
       return n.self();
@@ -111,13 +111,21 @@ public enum Axis {
 
   /** Axis string. */
   public final String name;
+  /** Descendant axis flag. */
+  public final boolean down;
+  /** Vertical axis flag. */
+  public final boolean vert;
 
   /**
-   * Constructor, initializing the enum constants.
+   * Constructor.
    * @param n axis string
+   * @param d descendant flag
+   * @param v vertical flag
    */
-  Axis(final String n) {
+  Axis(final String n, final boolean d, final boolean v) {
     name = n;
+    down = d;
+    vert = v;
   }
 
   /**
@@ -130,5 +138,27 @@ public enum Axis {
   @Override
   public String toString() {
     return name;
+  }
+  
+  /**
+   * Inverts the axis.
+   * @return inverted axis
+   */
+  Axis invert() {
+    switch(this) {
+      case ANC:        return Axis.DESC;
+      case ANCORSELF:  return Axis.DESCORSELF;
+      case ATTR:
+      case CHILD:      return Axis.PARENT;
+      case DESC:       return Axis.ANC;
+      case DESCORSELF: return Axis.ANCORSELF;
+      case FOLLSIBL:   return Axis.PRECSIBL;
+      case FOLL:       return Axis.PREC;
+      case PARENT:     return Axis.CHILD;
+      case PRECSIBL:   return Axis.FOLLSIBL;
+      case PREC:       return Axis.FOLL;
+      case SELF:       return Axis.SELF;
+      default:         return null;
+    }
   }
 }

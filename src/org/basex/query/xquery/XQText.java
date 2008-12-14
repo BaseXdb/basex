@@ -158,8 +158,6 @@ public interface XQText {
   /** XPST0003: Parsing exception. */
   Object[] QUERYEND = { XPST, 3, "Unexpected end of query: '%'." };
   /** XPST0003: Parsing exception. */
-  Object[] QUERYSTEP = { XPST, 3, "Unexpected tokens after %." };
-  /** XPST0003: Parsing exception. */
   Object[] CMPEXPR = { XPST, 3, "Comparison is incomplete." };
   /** XPST0003: Parsing exception. */
   Object[] NOTAGNAME = { XPST, 3, "Expecting tag name." };

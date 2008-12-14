@@ -162,14 +162,11 @@ public final class FTSelect extends FTArrayExpr {
     return this;
   }
 
-  
-  /**
+  /*
    * Checks if FTContains Expr could be summed up.
    * 
    * @param ftpos1 FTPositionFilter second expr
    * @return int 
-   */
-  
   public boolean checkSumUp(final FTPosFilter ftpos1) {
     return !ftpos.pos.ordered == !ftpos1.pos.ordered 
         && ftpos.window == null && ftpos1.window == null
@@ -179,6 +176,7 @@ public final class FTSelect extends FTArrayExpr {
         && ftpos.pos.start == ftpos1.pos.start
         && ftpos.pos.end == ftpos1.pos.end;
   }
+   */
   
   
   @Override

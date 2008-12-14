@@ -3,7 +3,6 @@ package org.basex.query.xpath.expr;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.index.FTNode;
-import org.basex.index.FTNodeIter;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
@@ -31,7 +30,7 @@ public final class FTUnion extends FTArrayExpr {
   /**
    * Constructor.
    * @param e operands joined with the union operator
-   * @param posex pointer on exprs with positiv values
+   * @param posex pointer on expressions with positive values
    */
   public FTUnion(final FTArrayExpr[] e, final int[] posex) {
     exprs = e;
@@ -84,32 +83,19 @@ public final class FTUnion extends FTArrayExpr {
       }
     }
     
-      minp = -1;
-      final FTNode m = exprs[pex[cp.list[0]]].next(ctx);
-      for (int i = 1; i < cp.size; i++) {
-        m.merge(exprs[pex[cp.list[i]]].next(ctx), 0);
-      }
-      return m;
+    minp = -1;
+    final FTNode m = exprs[pex[cp.list[0]]].next(ctx);
+    for (int i = 1; i < cp.size; i++) {
+      m.merge(exprs[pex[cp.list[i]]].next(ctx), 0);
+    }
+    return m;
   }
-  
-  @Override
-  public FTNodeIter iter(final QueryContext ctx) {
-    return new FTNodeIter(){
-      @Override
-      public FTNode next() { return FTUnion.this.more() 
-        ? FTUnion.this.next(ctx) : new FTNode(); }
-    };
-  }
-
   
   @Override
   public Bln eval(final XPContext ctx) throws QueryException {
     boolean b = false;
     // check each positive expression
-    for (int i : pex) {
-      final Bln it = (Bln) exprs[i].eval(ctx);
-      if (!b) b = it.bool();
-    }
+    for(final int i : pex) b |= ((Bln) exprs[i].eval(ctx)).bool();
     return Bln.get(b);
   }
   

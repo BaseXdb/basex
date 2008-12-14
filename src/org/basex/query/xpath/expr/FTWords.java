@@ -91,15 +91,7 @@ public final class FTWords extends FTArrayExpr {
 
   @Override
   public boolean indexOptions(final MetaData meta) {
-    // if the following conditions yield true, the index is accessed:
-    // - case sensitivity, diacritics and stemming flag comply with index flag
-    // - no stop words are specified
-    // - if wildcards are specified, the fulltext index is a trie
-    // - no FTTimes option is specified
-    return meta.ftcs == fto.is(FTOpt.CS) &&
-      meta.ftdc == fto.is(FTOpt.DC) && meta.ftst == fto.is(FTOpt.ST) &&
-      fto.sw == null && (!fto.is(FTOpt.WC) || !meta.ftfz) &&
-      occ[0] == 1 && occ[1] == Long.MAX_VALUE;
+    return fto.indexAccessible(meta) && occ[0] == 1 && occ[1] == Long.MAX_VALUE;
   }
 
   @Override

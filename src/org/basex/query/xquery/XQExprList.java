@@ -1,12 +1,6 @@
 package org.basex.query.xquery;
 
 import org.basex.query.xquery.expr.Expr;
-import org.basex.query.xquery.expr.FTAnd;
-import org.basex.query.xquery.expr.FTContains;
-import org.basex.query.xquery.expr.FTExpr;
-import org.basex.query.xquery.expr.FTOr;
-import org.basex.query.xquery.item.DNode;
-import org.basex.query.xquery.path.Path;
 import org.basex.util.Array;
 
 /**
@@ -35,15 +29,17 @@ public final class XQExprList {
   /**
    * Adds next value.
    * @param v value to be added
-   * @param a flag for and expression
-   * @param ctx current context
    */
-  public void add(final Expr v, final boolean a, final XQContext ctx) {
+  public void add(final Expr v) {
+    boolean b = false;
+    
+    /* [SG] string comparison of paths looks suspicious to me..
+    
     boolean b = false;
     if (XQOptimizer.optAndOr && 
-        v instanceof FTContains && ctx.item instanceof DNode) {
+        v instanceof FTContains && ctx.item instanceof DBNode) {
       final FTContains ftc = (FTContains) v;
-      b = ftc.sumUp(((DNode) ctx.item).data); 
+      b = ftc.sumUp(((DBNode) ctx.item).data); 
       if (b) {
         for (int i = 0; i < size; i++) {
           if (su[i]) {
@@ -73,6 +69,8 @@ public final class XQExprList {
         }
       }
     }
+    */
+    
     if(size == list.length) {
       list = Array.extend(list);
       su = Array.extend(su);
@@ -85,15 +83,7 @@ public final class XQExprList {
    * Finishes the int array.
    * @return int array
    */
-  public Expr[] finishXQ() {
+  public Expr[] finish() {
     return size == list.length ? list : Array.finish(list, size);   
-  }
-  
-  /**
-   * Checks if there is only one expression contained.
-   * @return result of check
-   */
-  public boolean single() {
-    return size == 1;
   }
 }

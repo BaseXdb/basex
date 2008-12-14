@@ -28,7 +28,7 @@ public final class QueryTest {
   /** Verbose flag. */
   private static final boolean VERBOSE = false;
   /** Test all flag. */
-  private static final boolean ALL = false;
+  private static final boolean ALL = true;
   /** Wrong results counter. */
   private static int wrong;
 
@@ -90,10 +90,9 @@ public final class QueryTest {
     boolean ok = true;
     
     for(final AbstractTest test : TESTS) {
-     //if (test == TESTS[2]) 
+     if (test == TESTS[2]) 
        ok &= test(xquery, test, test.details());
     }
-   
     return ok;
   }
 

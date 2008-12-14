@@ -17,7 +17,7 @@ import org.basex.util.Atts;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class DNode extends Nod {
+public final class DBNode extends Nod {
   /** Node Types. */
   private static final Type[] TYPES = {
     Type.DOC, Type.ELM, Type.TXT, Type.ATT, Type.COM, Type.PI
@@ -36,7 +36,7 @@ public final class DNode extends Nod {
    * @param d data reference
    * @param p pre value
    */
-  public DNode(final Data d, final int p) {
+  public DBNode(final Data d, final int p) {
     this(d, p, null, TYPES[d.kind(p)]);
   }
 
@@ -47,7 +47,7 @@ public final class DNode extends Nod {
    * @param r parent reference
    * @param t node type
    */
-  public DNode(final Data d, final int p, final Nod r, final Type t) {
+  public DBNode(final Data d, final int p, final Nod r, final Type t) {
     super(t);
     data = d;
     pre = p;
@@ -154,28 +154,28 @@ public final class DNode extends Nod {
   @Override
   public boolean is(final Nod nod) {
     if(nod == this) return true;
-    if(!(nod instanceof DNode)) return false;
-    return data == ((DNode) nod).data && pre == ((DNode) nod).pre;
+    if(!(nod instanceof DBNode)) return false;
+    return data == ((DBNode) nod).data && pre == ((DBNode) nod).pre;
   }
 
   @Override
   public int diff(final Nod nod) {
-    if(!(nod instanceof DNode) || data != ((DNode) nod).data)
+    if(!(nod instanceof DBNode) || data != ((DBNode) nod).data)
       return id - nod.id;
-    return pre - ((DNode) nod).pre;
+    return pre - ((DBNode) nod).pre;
   }
 
   @Override
-  public DNode copy() {
+  public DBNode copy() {
     // par.finish() ?..
-    final DNode node = new DNode(data, pre, par, type);
+    final DBNode node = new DBNode(data, pre, par, type);
     node.root = root;
     node.score(score());
     return node;
   }
 
   @Override
-  public DNode finish() {
+  public DBNode finish() {
     return copy();
   }
 
@@ -186,7 +186,7 @@ public final class DNode extends Nod {
     
     // check if parent constructor exists; if not, include document root node
     if(p == (root != null ? 0 : -1)) return root;
-    final DNode node = copy();
+    final DBNode node = copy();
     node.set(p, data.kind(p));
     return node;
   }
@@ -201,7 +201,7 @@ public final class DNode extends Nod {
   public NodeIter attr() {
     return new NodeIter() {
       /** Temporary node. */
-      private final DNode node = copy();
+      private final DBNode node = copy();
       /** Current pre value. */
       private int p = pre + 1;
       /** Current size value. */
@@ -220,7 +220,7 @@ public final class DNode extends Nod {
   public NodeMore child() {
     return new NodeMore() {
       /** Temporary node. */
-      private final DNode node = copy();
+      private final DBNode node = copy();
       /** First call. */
       private boolean more;
       /** Current pre value. */
@@ -254,7 +254,7 @@ public final class DNode extends Nod {
   public NodeIter desc() {
     return new NodeIter() {
       /** Temporary node. */
-      private final DNode node = copy();
+      private final DBNode node = copy();
       /** Current pre value. */
       private int p = pre + data.attSize(pre, data.kind(pre));
       /** Current size value. */
@@ -275,7 +275,7 @@ public final class DNode extends Nod {
   public NodeIter descOrSelf() {
     return new NodeIter() {
       /** Temporary node. */
-      private final DNode node = copy();
+      private final DBNode node = copy();
       /** Current pre value. */
       private int p = pre;
       /** Current size value. */
@@ -294,6 +294,6 @@ public final class DNode extends Nod {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(this, PRE, token(pre));
+    ser.emptyElement(this, NAM, token(data.meta.file.name()), PRE, token(pre));
   }
 }

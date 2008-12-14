@@ -1,11 +1,11 @@
 package org.basex.query.xpath.func;
 
+import static org.basex.query.xpath.XPText.*;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
 import org.basex.query.xpath.item.Item;
 import org.basex.query.xpath.item.Dbl;
-import static org.basex.query.xpath.XPText.*;
 
 /**
  * Constructor for ceiling() function.

@@ -88,10 +88,6 @@ public class FLWR extends Single {
           }
         }
       }
-      @Override
-      public String toString() {
-        return FLWR.this.toString();
-      }
     };
   }
 

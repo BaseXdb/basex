@@ -4,9 +4,7 @@ import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.iter.Iter;
-import org.basex.query.xquery.iter.NodeIter;
 
 /**
  * Iterative path expression.
@@ -14,41 +12,29 @@ import org.basex.query.xquery.iter.NodeIter;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Dennis Stratmann
  */
-public final class SimpleIterPath extends Path {
+public final class SimpleIterPath extends AxisPath {
   /**
    * Constructor.
    * @param r root expression
-   * @param p expression list
+   * @param s location steps
    */
-  public SimpleIterPath(final Expr r, final Expr[] p) {
-    super(r, p);
+  public SimpleIterPath(final Expr r, final Step[] s) {
+    super(r, s);
   }
 
   @Override
   public Iter iter(final XQContext ctx) {
     return new Iter() {
-      // [DS] here's where the bug occurred:
-      // "first" was globally defined in this class; this is why
-      // it was always false after the first iter() call.
-      //
-      // Second - another small bug: ctx.item must be reset to
-      // the initial value after the last value has been returned
-      
       final Item tmp = ctx.item;
-      boolean first = true;
-      NodeIter step;
-      Item item;
+      Iter s;
       
       @Override
       public Item next() throws XQException  {
-        if(first) {
-          item = ctx.iter(root).finish();
-          ctx.item = item;
-          // expr[0] is always a SimpleIterStep, so casting is OK
-          step = (NodeIter) ctx.iter(expr[0]);
-          first = false;
+        if(s == null) {
+          ctx.item = ctx.iter(root).finish();
+          s = ctx.iter(step[0]);
         }
-        final Nod it = step.next();
+        final Item it = s.next();
         ctx.item = tmp;
         return it;
       }

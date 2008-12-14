@@ -3,13 +3,11 @@ package org.basex.query.xquery.func;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.item.Type.*;
 import org.basex.BaseX;
-import org.basex.data.Data;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Calc;
 import org.basex.query.xquery.expr.CmpV;
 import org.basex.query.xquery.expr.Expr;
-import org.basex.query.xquery.item.DNode;
 import org.basex.query.xquery.item.Date;
 import org.basex.query.xquery.item.Dbl;
 import org.basex.query.xquery.item.Item;
@@ -17,11 +15,6 @@ import org.basex.query.xquery.item.Itr;
 import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
-import org.basex.query.xquery.path.Axis;
-import org.basex.query.xquery.path.NameTest;
-import org.basex.query.xquery.path.Path;
-import org.basex.query.xquery.path.Step;
-import org.basex.query.xquery.path.Test;
 import org.basex.query.xquery.util.Err;
 
 /**
@@ -65,9 +58,9 @@ final class FNAggr extends Fun {
       case AVG:
         return args[0].e() ? Seq.EMPTY : this;
       case COUNT:
-        if(args[0].i()) return Itr.get(1);
+        return args[0].i() ? Itr.get(1) : this;
 
-        // just a dirty sample to show which steps are necessary here...        
+        /* a dirty sample to show which steps are necessary here...        
         if(!(args[0] instanceof Path)) return this;
         final Path path = (Path) args[0];
         if(path.expr.length != 1) return this;
@@ -88,13 +81,12 @@ final class FNAggr extends Fun {
         final byte[] nm = ((NameTest) s.test).ln;
         final int id = data.tagID(nm);
         final int c = data.tags.counter(id);
-        return Itr.get(c);
+        return Itr.get(c);*/
       default:
         return this;
     }
   }
   
-
   /**
    * Sums up the specified item(s).
    * @param iter iterator

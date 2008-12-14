@@ -185,7 +185,7 @@ public final class FTContains extends Arr {
       // standard index evaluation
       ctx.compInfo(OPTFTINDEX);
       final Expr ex = new FTContainsNS(expr[0], ae);
-      // [SG] curr always != null?
+      // [SG] can curr be 'null' here?
       return curr == null ? ex : new Path(ex, path.invertPath(curr));
     }
 

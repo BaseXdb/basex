@@ -5,7 +5,7 @@ import org.basex.data.Serializer;
 import org.basex.util.Token;
 
 /**
- * Comment Node.
+ * Comment Node Fragment.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen

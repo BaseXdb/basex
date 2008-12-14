@@ -373,6 +373,8 @@ public final class FTTest extends AbstractTest {
           "//w [text() ftcontains ftnot 'bier' ftor ftnot 'wein' ]" },
         { "FTUnaryNot9", nodes(14, 37),
           "//w [text() ftcontains ftnot 'xml' ftand ftnot 'databeses' ]" },
+        { "FTUnaryNot10", nodes(40),
+          "//* [text() ftcontains ftnot (ftnot 'yeah') ]" },
     };
 
     /** TABLE REPRESENTATION

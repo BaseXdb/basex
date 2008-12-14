@@ -66,7 +66,7 @@ public abstract class W3CTS {
   /** Test Suite Identifier. */
   private final String testid;
   /** Path to the XQuery Test Suite. */
-  private final String path;
+  private String path;
 
   /** Query Path. */
   private String queries;
@@ -156,6 +156,8 @@ public abstract class W3CTS {
       if(arg.equals("-r")) {
         reporting = true;
         currTime = true;
+      } else if(arg.startsWith("-p")) {
+        path = arg.substring(2);
       } else if(arg.equals("-t")) {
         currTime = true;
       } else if(arg.equals("-v")) {
@@ -167,6 +169,7 @@ public abstract class W3CTS {
         BaseX.outln("\nBaseX vs. XQuery Test Suite\n" +
             " [pat] perform only tests with the specified pattern\n" +
             " -h show this help\n" +
+            " -p change path\n" +
             " -r create report\n" +
             " -v verbose output");
         return;
@@ -248,7 +251,7 @@ public abstract class W3CTS {
     bw.write("Conformance (w/Empty Results): ");
     bw.write(pc(ok, total) + " / " + pc(ok + ok2, total) + Prop.NL);
     bw.write("Wrong Results / Errors: " + err + " / " + err2 + Prop.NL);
-    bw.write("Total Time: " + time + Prop.NL + Prop.NL);
+    //bw.write("Total Time: " + time + Prop.NL + Prop.NL);
     bw.write("WRONG =========================================================");
     bw.write(Prop.NL + Prop.NL + logErr + Prop.NL);
     bw.write("WRONG (ERRORS) ================================================");

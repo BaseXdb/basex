@@ -1,7 +1,12 @@
 package org.basex.query.xpath;
 
+import static org.basex.Text.*;
+
+import org.basex.data.Nodes;
+import org.basex.data.Result;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
+import org.basex.query.xpath.item.Nod;
 
 /**
  * XPath Processor, containing the XPath parser.
@@ -24,5 +29,19 @@ public final class XPathProcessor extends QueryProcessor {
   @Override
   public XPContext create() throws QueryException {
     return new XPParser(query).parse();
+  }
+
+  /**
+   * Parses the specified query and returns the result nodes.
+   * @param nodes node context
+   * @return result of query
+   * @throws QueryException query exception
+   */
+  public Nodes queryNodes(final Nodes nodes) throws QueryException {
+    final Result res = query(nodes);
+    if(!(res instanceof Nod)) throw new QueryException(QUERYNODESERR);
+
+    final Nod ns = (Nod) res;
+    return new Nodes(ns.nodes, ns.data);
   }
 }

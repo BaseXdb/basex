@@ -20,7 +20,7 @@ public final class NodeBuilder {
   /** Sort flag. */
   private boolean sort;
   /** Ordered node addition. */
-  private boolean ordered;
+  private final boolean ordered;
 
   /**
    * Constructor.
@@ -163,8 +163,8 @@ public final class NodeBuilder {
    */
   private int m(final int a, final int b, final int c) {
     return list[a].diff(list[b]) < 0 ?
-        (list[b].diff(list[c]) < 0 ? b : list[a].diff(list[c]) < 0 ? c : a) :
-        (list[b].diff(list[c]) > 0 ? b : list[a].diff(list[c]) > 0 ? c : a);
+      (list[b].diff(list[c]) < 0 ? b : list[a].diff(list[c]) < 0 ? c : a) :
+       list[b].diff(list[c]) > 0 ? b : list[a].diff(list[c]) > 0 ? c : a;
   }
 
   /**

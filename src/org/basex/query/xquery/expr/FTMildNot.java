@@ -1,6 +1,7 @@
 package org.basex.query.xquery.expr;
 
-import org.basex.index.FTIndexAcsbl;
+import org.basex.query.xquery.FTIndexAcsbl;
+import org.basex.query.xquery.FTIndexEq;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Dbl;
@@ -41,12 +42,12 @@ public final class FTMildNot extends FTExpr {
   @Override
   public void indexAccessible(final XQContext ctx, final FTIndexAcsbl ia)
       throws XQException {
-    final int mmin = ia.indexSize;
+    final int mmin = ia.is;
     IntList il = new IntList(expr.length - 1);
     for (int i = 1; i < expr.length; i++) {
       expr[i].indexAccessible(ctx, ia);
       if (!ia.io) return;
-      if (ia.indexSize > 0) il.add(i);
+      if (ia.is > 0) il.add(i);
     }
     
     if(il.size < expr.length - 1) {
@@ -57,11 +58,13 @@ public final class FTMildNot extends FTExpr {
       expr = e;
     }
     expr[0].indexAccessible(ctx, ia);
-    ia.indexSize = mmin < ia.indexSize ? mmin : ia.indexSize;
+    ia.is = mmin < ia.is ? mmin : ia.is;
   }
   
   @Override
-  public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq) {
+  public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq)
+    throws XQException {
+
     if (expr.length == 1) return expr[0].indexEquivalent(ctx, ieq);
     
     // assumption 1: ftcontains "a" not in "a b" not in "a c"

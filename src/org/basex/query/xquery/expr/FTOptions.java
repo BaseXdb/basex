@@ -1,11 +1,10 @@
 package org.basex.query.xquery.expr;
 
 import java.io.IOException;
-
-import org.basex.data.MetaData;
 import org.basex.data.Serializer;
-import org.basex.index.FTIndexAcsbl;
 import org.basex.query.FTOpt;
+import org.basex.query.xquery.FTIndexAcsbl;
+import org.basex.query.xquery.FTIndexEq;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.iter.Iter;
@@ -51,15 +50,10 @@ public final class FTOptions extends FTExpr {
 
   @Override
   public void indexAccessible(final XQContext ctx, final FTIndexAcsbl ia) 
-    throws XQException {
-    // if the following conditions yield true, the index is accessed:
-    // - case sensitivity, diacritics and stemming flag comply with index flag
-    // - no stop words are specified
-    // - if wildcards are specified, the fulltext index is a trie
-    final MetaData meta = ia.data.meta;
-    ia.io = meta.ftcs == opt.is(FTOpt.CS) &&
-    meta.ftdc == opt.is(FTOpt.DC) && meta.ftst == opt.is(FTOpt.ST) &&
-    opt.sw == null && (!opt.is(FTOpt.WC) || !meta.ftfz);
+      throws XQException {
+    
+    ia.io &= opt.indexAccessible(ia.data.meta);
+    
     final FTOpt tmp = ctx.ftopt;
     ctx.ftopt = opt;
     expr[0].indexAccessible(ctx, ia);
@@ -67,10 +61,11 @@ public final class FTOptions extends FTExpr {
   }
 
   @Override
-  public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq) {
+  public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq)
+    throws XQException {
+
     return new FTOptions((FTExpr) expr[0].indexEquivalent(ctx, ieq), opt);
   }
-
   
   @Override
   public void plan(final Serializer ser) throws IOException {

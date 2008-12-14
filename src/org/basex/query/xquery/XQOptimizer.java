@@ -1,16 +1,13 @@
 package org.basex.query.xquery;
 
-import org.basex.query.xpath.XPText;
 import org.basex.query.xquery.expr.Expr;
-import org.basex.query.xquery.item.DNode;
+import org.basex.query.xquery.item.DBNode;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.path.Axis;
+import org.basex.query.xquery.path.AxisPath;
 import org.basex.query.xquery.path.KindTest;
-import org.basex.query.xquery.path.Path;
 import org.basex.query.xquery.path.Step;
 import org.basex.query.xquery.path.Test;
-
-
 
 /**
  * This class assembles optimization methods for the XQuery parser.
@@ -23,7 +20,6 @@ public final class XQOptimizer {
   public static boolean optAndOr = false;
   /** Private constructor, preventing class instantiation. */
   private XQOptimizer() { }
-  
 
   /**
    * Adds a text step to the specified path.
@@ -34,20 +30,17 @@ public final class XQOptimizer {
   public static Expr addText(final Expr ex, final XQContext ctx) {
     if(!(ex instanceof Step)) return ex;
     final Step step = (Step) ex;
-    if (step.expr != null && step.expr.length > 0) return ex;
+    if(step.pred != null && step.pred.length > 0) return ex;
     
-    if((step.axis == Axis.DESC ||
-        step.axis == Axis.SELF ||
-        step.axis == Axis.DESCORSELF ||
-        step.axis == Axis.CHILD) &&
-        step.test.kind  != Test.Kind.NAME &&
-        step.test.type != Type.TXT &&
-        ((DNode) ctx.item).data.tags.uptodate) {
-      final Step s = new Step(Axis.CHILD, 
-          new KindTest(Type.TXT), new Expr[]{});
-      final Path p = new Path(ex, new Expr[]{s});
-      ctx.compInfo(XPText.OPTTEXT);
-      return p;
+    if(1 == 1) return ex;
+
+    /* [SG] should be revised; not all necessary tests are included,
+     *   ctx.item can refer to another database, ... */
+    if(step.axis.down && step.test.kind != Test.Kind.NAME &&
+        step.test.type != Type.TXT && ((DBNode) ctx.item).data.tags.uptodate) {
+
+      final Step s = Step.get(Axis.CHILD, new KindTest(Type.TXT));
+      return new AxisPath(ex, new Step[] { s });
     }
     return ex;
   }

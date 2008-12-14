@@ -2,6 +2,7 @@ package org.basex.query;
 
 import static org.basex.util.Token.*;
 import java.io.IOException;
+import org.basex.data.MetaData;
 import org.basex.data.Serializer;
 import org.basex.index.FTTokenizer;
 import org.basex.util.IntList;
@@ -158,7 +159,6 @@ public final class FTOpt extends ExprInfo {
 
   /**
    * Merge to FTOpts.
-   * 
    * @param ftopt1 FTOpt to merge
    */
   public void merge(final FTOpt ftopt1) {
@@ -170,6 +170,20 @@ public final class FTOpt extends ExprInfo {
         set[i] |= ftopt1.set[i];
       }
     }
+  }
+
+  /**
+   * Checks if an index can be used for query evaluation.
+   * @param meta meta data reference
+   * @return result of check
+   */
+  public boolean indexAccessible(final MetaData meta) {
+    /* if the following conditions are valid, the method returns true:
+     - case sensitivity, diacritics and stemming flags comply with index
+     - no stop words are specified
+     - if wildcards are specified, the fulltext index is a trie */
+    return meta.ftcs == is(FTOpt.CS) && meta.ftdc == is(FTOpt.DC) &&
+      meta.ftst == is(FTOpt.ST) && sw == null && (!is(FTOpt.WC) || !meta.ftfz);
   }
   
   @Override

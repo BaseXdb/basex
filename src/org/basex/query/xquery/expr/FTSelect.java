@@ -5,8 +5,9 @@ import static org.basex.query.xquery.XQTokens.*;
 import java.io.IOException;
 
 import org.basex.data.Serializer;
-import org.basex.index.FTIndexAcsbl;
 import org.basex.query.FTPos;
+import org.basex.query.xquery.FTIndexAcsbl;
+import org.basex.query.xquery.FTIndexEq;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Dbl;
@@ -113,9 +114,11 @@ public final class FTSelect extends FTExpr {
   }
   
   @Override
-  public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq) {
+  public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq)
+    throws XQException {
+
     return new FTSelectIndex((FTExpr) 
-        expr[0].indexEquivalent(ctx, ieq), pos, weight);    
+        expr[0].indexEquivalent(ctx, ieq), pos, weight);
   }
   
   @Override

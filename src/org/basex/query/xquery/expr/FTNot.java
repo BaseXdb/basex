@@ -1,6 +1,7 @@
 package org.basex.query.xquery.expr;
 
-import org.basex.index.FTIndexAcsbl;
+import org.basex.query.xquery.FTIndexAcsbl;
+import org.basex.query.xquery.FTIndexEq;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Dbl;
@@ -34,15 +35,21 @@ public final class FTNot extends FTExpr {
   @Override
   public void indexAccessible(final XQContext ctx, final FTIndexAcsbl ia) 
     throws XQException {
+    
+    // [SG] what happens if two ftnot occur.. text() ftnot (ftnot 'word')).. ?
+    //   would it make sense to invert the ftnot flag?
     ia.ftnot = true;
+    
     // in case of ftand ftnot seq could be set false in FTAnd
     ia.seq = true;
     expr[0].indexAccessible(ctx, ia);
-    ia.indexSize = Integer.MAX_VALUE;
+    ia.is = Integer.MAX_VALUE;
   }
 
   @Override
-  public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq) {
+  public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq)
+    throws XQException {
+
     return new FTNotIndex((FTExpr) expr[0].indexEquivalent(ctx, ieq));
   }
 

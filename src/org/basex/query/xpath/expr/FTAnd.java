@@ -28,9 +28,7 @@ public final class FTAnd extends FTArrayExpr {
 
   @Override
   public Bln eval(final XPContext ctx) throws QueryException {
-    for(final Expr e : exprs) 
-      if(!ctx.eval(e).bool()) 
-        return Bln.get(false);
+    for(final Expr e : exprs) if(!ctx.eval(e).bool()) return Bln.get(false);
     return Bln.get(true);
   }
 

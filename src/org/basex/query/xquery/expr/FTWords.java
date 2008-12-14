@@ -4,8 +4,9 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 
 import org.basex.data.Serializer;
-import org.basex.index.FTIndexAcsbl;
 import org.basex.query.FTOpt.FTMode;
+import org.basex.query.xquery.FTIndexAcsbl;
+import org.basex.query.xquery.FTIndexEq;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Dbl;
@@ -23,13 +24,13 @@ import org.basex.util.TokenBuilder;
  */
 public final class FTWords extends FTExpr {
   /** Expression list. */
-  public Expr query;
+  private Expr query;
   /** Minimum and maximum occurrences. */
-  final Expr[] occ;
+  private final Expr[] occ;
   /** Search mode. */
-  final FTMode mode;
+  private final FTMode mode;
   /** Fulltext token. */
-  byte[] tok;
+  private byte[] tok;
 
   /**
    * Constructor.
@@ -125,36 +126,27 @@ public final class FTWords extends FTExpr {
   @Override
   public void indexAccessible(final XQContext ctx, final FTIndexAcsbl ia) 
     throws XQException {
-    // if the following conditions yield true, the index is accessed:
-    // - no FTTimes option is specified
-    ia.io = ia.io && 
-    checkItr(ctx.iter(occ[0])) == 1 && 
-    checkItr(ctx.iter(occ[1])) == Long.MAX_VALUE;
 
-    if (!ia.io) return;
+    // if the following conditions yield true, the index is accessed:
+    // - no FTTimes option is specified and query is a simple String item
+    ia.io &= occ[0].i() && ((Item) occ[0]).itr() == 1 &&
+             occ[1].i() && ((Item) occ[1]).itr() == Long.MAX_VALUE &&
+             query instanceof Str;
+    if(!ia.io) return;
     
-    if (query instanceof Str) {
-      tok = ((Str) query).str();
-      ctx.ftopt.sb.text = tok;
-      int i = Integer.MAX_VALUE;
-      // index size is incorrect for phrases
-      while(ctx.ftopt.sb.more()) { // fto.sb.more()) {
-        final int n = ia.data.nrIDs(ctx.ftopt.sb); //(fto.sb);
-        if(n == 0) ia.indexSize = 0;
-        i = Math.min(i, n);
-      }
-      ia.indexSize = i;
-      ia.iu = true;
-    } else {
-      ia.io = false;
+    tok = ((Str) query).str();
+    ctx.ftopt.sb.text = tok;
+    // index size is incorrect for phrases
+    while(ia.is != 0 && ctx.ftopt.sb.more()) {
+      ia.is = Math.min(ia.is, ia.data.nrIDs(ctx.ftopt.sb));
     }
+    ia.iu = true;
   }
 
   @Override
   public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq) {
-    return new FTIndex(tok, mode, occ);
+    return new FTIndex(ieq.data, tok);
   }
-
   
   @Override
   public void plan(final Serializer ser) throws IOException {

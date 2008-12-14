@@ -133,7 +133,7 @@ public final class GUIProp {
   public static final boolean SKIP = true;
 
   /** Anti-aliasing type. Supported variants:
-   * LCD_HRGB / LCD_HBGR / LCD_VRGB / LCD_VBGR / GASP */
+   *  LCD_HRGB / LCD_HBGR / LCD_VRGB / LCD_VBGR / GASP */
   public static String fontaa = "GASP";
 
   /** Flag for displaying the menu in the GUI window. */

@@ -21,17 +21,15 @@ public final class SimpleIterStep extends Step {
    * Constructor.
    * @param a axis
    * @param t node test
-   * @param p predicates
    */
-  public SimpleIterStep(final Axis a, final Test t, final Expr[] p) {
-    super(a, t, p);
+  public SimpleIterStep(final Axis a, final Test t) {
+    super(a, t, new Expr[] {});
   }
   
   @Override
   public NodeIter iter(final XQContext ctx) throws XQException {
     final Iter iter = checkCtx(ctx);
 
-    // no special predicate treatment?
     return new NodeIter() {
       NodeIter ir;
       
@@ -41,7 +39,7 @@ public final class SimpleIterStep extends Step {
           if(ir == null) {
             final Item it = iter.next();
             if(it == null) return null;
-            if(!it.node()) Err.or(NODESPATH, this, it.type);
+            if(!it.node()) Err.or(NODESPATH, SimpleIterStep.this, it.type);
             ir = axis.init((Nod) it);
           }
           final Nod nod = ir.next();
@@ -49,19 +47,14 @@ public final class SimpleIterStep extends Step {
           else if(test.e(nod)) return nod.finish();
         }
       }
-
-      @Override
-      public String toString() {
-        return SimpleIterStep.this.toString();
-      }
     };
   }
 
   /**
    * Checks if there is anything to sum up.
    * @return boolean sum up
-   */
   public boolean sumUp() {
-    return axis == Axis.CHILD && test instanceof NameTest && expr.length == 0;
+    return axis == Axis.CHILD && test instanceof NameTest && pred.length == 0;
   }
+   */
 }

@@ -292,6 +292,7 @@ public abstract class IO {
    */
   public static synchronized boolean dbdelete(final String db,
       final String pat) {
+    
     final File path = dbpath(db);
     if(!path.exists()) return false;
     for(final File sub : path.listFiles()) {

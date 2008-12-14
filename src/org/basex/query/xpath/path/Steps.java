@@ -1,12 +1,12 @@
 package org.basex.query.xpath.path;
 
+import static org.basex.query.xpath.XPText.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.item.Nod;
 import org.basex.util.Array;
-import static org.basex.query.xpath.XPText.*;
 
 /**
  * Location Steps.

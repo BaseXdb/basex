@@ -12,7 +12,7 @@ import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 
 /**
- * Element Node.
+ * Element Node Fragment.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen

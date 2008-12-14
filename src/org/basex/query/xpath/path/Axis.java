@@ -1,10 +1,9 @@
 package org.basex.query.xpath.path;
 
 /**
- * Defined Axes in XPath.
+ * XPath Axes.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
- * @author Tim Petrowsky
  * @author Christian Gruen
  */
 public enum Axis {
@@ -26,7 +25,7 @@ public enum Axis {
   final String name;
 
   /**
-   * Constructor, initializing the enum constants.
+   * Constructor.
    * @param n axis string
    */
   Axis(final String n) {
@@ -84,6 +83,28 @@ public enum Axis {
     } catch(final Exception e) {
       e.printStackTrace();
       return null;
+    }
+  }
+  
+  /**
+   * Inverts the axis.
+   * @return inverted axis
+   */
+  Axis invert() {
+    switch(this) {
+      case ANC:        return Axis.DESC;
+      case ANCORSELF:  return Axis.DESCORSELF;
+      case ATTR:
+      case CHILD:      return Axis.PARENT;
+      case DESC:       return Axis.ANC;
+      case DESCORSELF: return Axis.ANCORSELF;
+      case FOLLSIBL:   return Axis.PRECSIBL;
+      case FOLL:       return Axis.PREC;
+      case PARENT:     return Axis.CHILD;
+      case PRECSIBL:   return Axis.FOLLSIBL;
+      case PREC:       return Axis.FOLL;
+      case SELF:       return Axis.SELF;
+      default:         return null;
     }
   }
 }

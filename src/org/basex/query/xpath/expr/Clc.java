@@ -36,7 +36,7 @@ public final class Clc extends Arr {
     super.comp(ctx);
 
     if(expr[0] instanceof Item && expr[1] instanceof Item) {
-      ctx.compInfo(OPTCALC);
+      ctx.compInfo(OPTFUNC, calc);
       final double d1 = ((Item) expr[0]).num();
       final double d2 = ((Item) expr[1]).num();
       return new Dbl(calc.eval(d1, d2));
@@ -56,7 +56,7 @@ public final class Clc extends Arr {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, Token.token(TYPE), Token.token(calc.name));
+    ser.openElement(this, TYPE, Token.token(calc.name));
     expr[0].plan(ser);
     expr[1].plan(ser);
     ser.closeElement();

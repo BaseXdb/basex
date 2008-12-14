@@ -1,7 +1,7 @@
 package org.basex.query.xpath.func;
 
-import static org.basex.Text.*;
 import static org.basex.query.xpath.XPText.*;
+import static org.basex.Text.*;
 import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;

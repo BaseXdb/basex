@@ -1,29 +1,26 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQTokens.*;
-import org.basex.query.xpath.XPText;
 import java.io.IOException;
-
-import org.basex.data.Data;
 import org.basex.data.Serializer;
-import org.basex.index.FTIndexAcsbl;
 import org.basex.index.IndexToken;
 import org.basex.index.ValuesToken;
+import org.basex.query.xquery.FTIndexAcsbl;
+import org.basex.query.xquery.FTIndexEq;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQOptimizer;
 import org.basex.query.xquery.item.Bln;
-import org.basex.query.xquery.item.DNode;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Str;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
 import org.basex.query.xquery.path.Axis;
-import org.basex.query.xquery.path.Path;
-import org.basex.query.xquery.path.SimpleIterStep;
+import org.basex.query.xquery.path.AxisPath;
 import org.basex.query.xquery.path.Step;
 import org.basex.query.xquery.util.Err;
+import org.basex.util.Array;
 import org.basex.util.Token;
 
 /**
@@ -100,6 +97,7 @@ public final class CmpG extends Arr {
     return new Iter() {
       /** Iterator flag. */
       private boolean more;
+      
       @Override
       public Item next() throws XQException {
         if(!(more ^= true)) return null;
@@ -109,10 +107,6 @@ public final class CmpG extends Arr {
         final boolean i2 = e2.i();
         return Bln.get(i1 && i2 ? ev((Item) e1, (Item) e2, cmp.cmp) :
           i2 ? ev(ctx.iter(e1), (Item) e2) : ev(ctx.iter(e1), ctx.iter(e2)));
-      }
-      @Override
-      public String toString() {
-        return CmpG.this.toString();
       }
     };
   }
@@ -173,67 +167,58 @@ public final class CmpG extends Arr {
 
   @Override
   public void indexAccessible(final XQContext ctx, final FTIndexAcsbl ia) {
-    ia.iu = false;
-    ia.io = true;
-    // check if first expression is no location path
-    if (!(expr[0] instanceof SimpleIterStep)) return;
-    /*&& ((SimpleIterStep) expr[0]).test.type == Type.TXT || 
-         ((SimpleIterStep) expr[0]).test.type == Type.ATT
-      )) return;
-      */
-    // check which index can be applied
+    // accept only location path, string and equality expressions
+    final Step s = indexStep(expr);
+    if(s == null || !(expr[1] instanceof Str) || cmp != CmpG.Comp.EQ) return;
+
+    final boolean text = ia.data.meta.txtindex && s.test.type == Type.TXT;
+    final boolean attr = !text && ia.data.meta.atvindex &&
+      s.simpleName(Axis.ATTR, true);
     
-    index = indexable(ctx, expr[1]);
-    if (index == null) return;
+    // no text or attribute index applicable
+    if(!text && !attr) return;
+
+    index = new ValuesToken(text, ((Str) expr[1]).str());
     ia.iu = true;
-    ia.indexSize = ((DNode) ctx.item).data.nrIDs(index);
+    ia.is = ia.data.nrIDs(index);
   }
-
-  /**
-   * Checks if the path is indexable.
-   * @param ctx query context
-   * @param exp expression which must be a literal
-   * @return result of check
-   */
-  public IndexToken indexable(final XQContext ctx, final Expr exp) {
-    if(!(exp instanceof Str)) return null;
-    if (ctx.item instanceof DNode) {
-      final Data data = ((DNode) ctx.item).data;
-      final boolean txt = data.meta.txtindex && cmp == CmpG.Comp.EQ;
-      final boolean atv = data.meta.atvindex && cmp == CmpG.Comp.EQ;
-      final Step step = (Step) expr[0];
-      final boolean text = txt && step.test.type == Type.TXT && 
-        (step.expr == null || step.expr.length == 0);
-      final boolean attr = !text && atv && step.simpleName(Axis.ATTR, true);
-      return text || attr ?
-          new ValuesToken(text, ((Str) exp).str()) : null;
-    }
-    return null;
-  }
-
   
   @Override
   public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq) {
-    // no index access possible - return self reference
-    if(index == null) return this;
-    final SimpleIterStep sis = (SimpleIterStep) expr[0];
     final boolean txt = index.type == IndexToken.Type.TXT;
-    ctx.compInfo(txt ? XPText.OPTINDEX : XPText.OPTATTINDEX);
-    
-    final Path p = Path.invertStep(sis, ieq.curr, new IndexAccess(index));
-    if (!txt) {
-      ieq.addFilter = false;
-      if (p.expr != null && p.expr.length > 0) {
-        Expr[] ex = new Expr[p.expr.length + 1];
-        System.arraycopy(p.expr, 0, ex, 1, p.expr.length);
-        p.expr = ex;
-      } else 
-        p.expr = new Expr[1];
-      p.expr[0] = new Step(Axis.SELF, sis.test, new Expr[]{});
+
+    // standard index evaluation; first expression will always be an axis path
+    final Expr ex = new IndexAccess(ieq.data, index);
+    final AxisPath orig = (AxisPath) expr[0];
+    final AxisPath path = orig.invertPath(ex, ieq.curr);
+
+    if(!txt) {
+      // add attribute step
+      final Step step = orig.step[0];
+      Step[] steps = { Step.get(Axis.SELF, step.test) };
+      for(final Step s : path.step) steps = Array.add(steps, s);
+      path.step = steps;
     }
-    return p;
+    return path;
   }
 
+  /**
+   * Returns the indexable index step or null.
+   * @param expr expression arguments
+   * @return result of check
+   */
+  public static Step indexStep(final Expr[] expr) {
+    // check if index can be applied
+    if(!(expr[0] instanceof AxisPath)) return null;
+    
+    // accept only single axis steps as first expression
+    final AxisPath path = (AxisPath) expr[0];
+    if(path.root != null || path.step.length != 1) return null;
+
+    // step must not contain predicates
+    final Step s = path.step[0];
+    return s.pred.length != 0 ? null : s;
+  }
   
   @Override
   public Type returned() {

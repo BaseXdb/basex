@@ -10,7 +10,7 @@ import org.basex.query.xpath.item.Bln;
 import org.basex.query.xpath.item.Dbl;
 import org.basex.query.xpath.item.NodeBuilder;
 import org.basex.query.xpath.item.Str;
-import org.basex.query.xquery.item.DNode;
+import org.basex.query.xquery.item.DBNode;
 import org.basex.query.xquery.item.FNode;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Type;
@@ -109,16 +109,16 @@ public final class XQResult implements Result {
       for(int i = 0; i < seq.size; i++) {
         final Item it = seq.item[i];
         if(!it.node()) return this;
-        if(it instanceof DNode) {
-          if(((DNode) it).data != data) return this;
-          nb.add(((DNode) it).pre);
+        if(it instanceof DBNode) {
+          if(((DBNode) it).data != data) return this;
+          nb.add(((DBNode) it).pre);
         } else {
           final FNode node = (FNode) it;
           final NodeIter ch = node.child();
           Item c;
           while((c = ch.next()) != null) {
-            if(c instanceof DNode && ((DNode) c).data == data)
-              nb.add(((DNode) c).pre);
+            if(c instanceof DBNode && ((DBNode) c).data == data)
+              nb.add(((DBNode) c).pre);
           }
         }
       }

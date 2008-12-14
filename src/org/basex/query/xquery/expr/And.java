@@ -17,29 +17,25 @@ import org.basex.query.xquery.util.Scoring;
 public final class And extends Arr {
   /**
    * Constructor.
-   * @param l expression list
+   * @param e expression list
    */
-  public And(final Expr[] l) {
-    super(l);
+  public And(final Expr[] e) {
+    super(e);
   }
 
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
-    //int el = expr.length;
-    XQExprList exli = new XQExprList(expr.length);
-    for(int e = 0; e < expr.length; e++) {
-      expr[e] = ctx.comp(expr[e]);
-      if(!expr[e].i()) {
-        exli.add(expr[e], true, ctx);
-        continue;
+    final XQExprList exli = new XQExprList(expr.length);
+    for(final Expr e : expr) {
+      final Expr ex = ctx.comp(e);
+      if(!ex.i()) {
+        exli.add(ex);
+      } else if(!((Item) ex).bool()) {
+        // atomic items can be pre-evaluated
+        return Bln.FALSE;
       }
-      if(!((Item) expr[e]).bool()) return Bln.FALSE;
-      //Array.move(expr, e + 1, -1, --el - e);
-      //--e;
     }
-    
-    return exli.size == expr.length ? this : exli.size == 0 ?  Bln.TRUE :
-      new And(exli.finishXQ());
+    return exli.size == 0 ? Bln.TRUE : new And(exli.finish());
   }
 
   @Override
@@ -50,7 +46,7 @@ public final class And extends Arr {
       if(!it.bool()) return Bln.FALSE.iter();
       d = Scoring.and(d, it.score());
     }
-    return (d == 0 ? Bln.TRUE : new Bln(true, d)).iter();
+    return (d == 0 ? Bln.TRUE : Bln.get(d)).iter();
   }
 
   @Override

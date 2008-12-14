@@ -25,10 +25,19 @@ public final class Bln extends Item {
    * @param b boolean value
    * @param s score value
    */
-  public Bln(final boolean b, final double s) {
+  private Bln(final boolean b, final double s) {
     super(Type.BLN);
     val = b;
     score = s;
+  }
+
+  /**
+   * Constructor, adding a full-text score.
+   * @param s score value
+   * @return item
+   */
+  public static Bln get(final double s) {
+    return s == 0 ? Bln.FALSE : new Bln(true, s);
   }
 
   /**

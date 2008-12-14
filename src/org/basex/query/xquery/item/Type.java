@@ -654,7 +654,7 @@ public enum Type {
         try {
           final DOCWrapper p = new DOCWrapper((Document) o, "tmp");
           final Data data = new MemBuilder().build(p, "tmp");
-          return new DNode(data, 0);
+          return new DBNode(data, 0);
         } catch(final IOException ex) {
           throw new XQException(UNDOC, ex.getMessage());
         }

@@ -1,6 +1,7 @@
 package org.basex.query.xquery.expr;
 
-import org.basex.index.FTIndexAcsbl;
+import org.basex.query.xquery.FTIndexAcsbl;
+import org.basex.query.xquery.FTIndexEq;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Dbl;
@@ -49,22 +50,22 @@ public final class FTOr extends FTExpr {
       throws XQException {
     final IntList p = new IntList();
     final IntList n = new IntList();
-    int min = ia.indexSize;
+    int min = ia.is;
     int sum = 0;
 
     for (int i = 0; i < expr.length; i++) {
       ia.ftnot = false;
       expr[i].indexAccessible(ctx, ia);
       if (!ia.io) return;
-      if (!ia.ftnot && ia.indexSize > 0) {
+      if (!ia.ftnot && ia.is > 0) {
         p.add(i);
-        sum += ia.indexSize;
+        sum += ia.is;
       } else if (ia.ftnot) {
-        if (ia.indexSize > 0) n.add(i);
+        if (ia.is > 0) n.add(i);
         else {
           ia.iu = false;
           ia.seq = true;
-          ia.indexSize = Integer.MAX_VALUE;
+          ia.is = Integer.MAX_VALUE;
           return;
         }
       }
@@ -74,17 +75,19 @@ public final class FTOr extends FTExpr {
 
     if (pex.length == 0 && nex.length > 0) {
       ia.seq = true;
-      ia.indexSize = Integer.MAX_VALUE;
+      ia.is = Integer.MAX_VALUE;
     } else if (nex.length > 0 && pex.length > 0) {
       ia.seq = true;
-      ia.indexSize = Integer.MAX_VALUE;
+      ia.is = Integer.MAX_VALUE;
     } else {
-      ia.indexSize = sum > min ? min : sum;
+      ia.is = sum > min ? min : sum;
     } 
   }
   
   @Override
-  public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq) {
+  public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq)
+    throws XQException {
+
     for (int i = 0; i < expr.length; i++) {
       expr[i] = (FTExpr) expr[i].indexEquivalent(ctx, ieq);
     }
