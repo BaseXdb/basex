@@ -122,8 +122,9 @@ public final class FTSelect extends FTExpr {
   throws XQException {
     
     expr[0].indexAccessible(ctx, ia);
-    // index could only be used, if there is no ftselection specified
-    ia.iu = ia.iu && !(ia.ftnot == initial());
+    // index could only be used, if there is no ftselection specified 
+    // before an ftnot
+    if (ia.ftnot) ia.iu &= initial();
   }
   
   @Override
