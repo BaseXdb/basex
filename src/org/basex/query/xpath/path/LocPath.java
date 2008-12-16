@@ -282,6 +282,7 @@ public abstract class LocPath extends Expr {
    * @return boolean 
    */
   public boolean singlePath(final XPContext ctx) {
+    boolean f = false;
     for (int i = 0; i < steps.size(); i++) {
       final Step s = steps.get(i);
       if (s instanceof StepChild) {
@@ -289,7 +290,8 @@ public abstract class LocPath extends Expr {
           TestName tn = (TestName) s.test;
           if (ctx.item.data.skel.desc(tn.name, false, false).size != 0) 
             return false;
-        } else if (s.test == TestNode.TEXT) return true;
+          else f = true;
+        } else if (s.test == TestNode.TEXT) return f;
       } else return false;
     }
     return false;
