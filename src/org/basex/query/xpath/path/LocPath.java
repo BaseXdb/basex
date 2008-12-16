@@ -17,6 +17,7 @@ import org.basex.query.xpath.item.Comp;
 import org.basex.query.xpath.item.Nod;
 import org.basex.query.xpath.item.Str;
 import org.basex.util.IntList;
+
 import static org.basex.query.xpath.XPText.*;
 
 /**
@@ -93,8 +94,7 @@ public abstract class LocPath extends Expr {
       final boolean seq = min == Integer.MAX_VALUE;
 
       // ..skip index evaluation for too large results and relative paths
-      // [SG] conflicts with the FTContains.iu flag
-      //if(!seq && this instanceof LocPathRel && min > ctx.item.data.size / 10)
+      //if(this instanceof LocPathRel && min > ctx.item.data.size / 10)
       //  continue;
 
       // predicates that are optimized to use index and results of index queries
@@ -156,6 +156,7 @@ public abstract class LocPath extends Expr {
           if (pred instanceof PredSimple) {
             Expr e = ((PredSimple) pred).expr;
             if (e instanceof FTContains) {
+              // curr = null indicates that there should be no path inverting
               ((PredSimple) pred).expr = e.indexEquivalent(ctx, null, true);
             }
             newPreds.add(pred);
@@ -274,6 +275,26 @@ public abstract class LocPath extends Expr {
     return path;
   }
 
+  /**
+   * Check if path has only single results.
+   * 
+   * @param ctx current context
+   * @return boolean 
+   */
+  public boolean singlePath(final XPContext ctx) {
+    for (int i = 0; i < steps.size(); i++) {
+      final Step s = steps.get(i);
+      if (s instanceof StepChild) {
+        if (s.test instanceof TestName) {
+          TestName tn = (TestName) s.test;
+          if (ctx.item.data.skel.desc(tn.name, false, false).size != 0) 
+            return false;
+        } else if (s.test == TestNode.TEXT) return true;
+      } else return false;
+    }
+    return false;
+  }
+  
   @Override
   public final void plan(final Serializer ser) throws IOException {
     ser.openElement(this);

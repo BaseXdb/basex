@@ -4,6 +4,7 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 
 import org.basex.data.Serializer;
+import org.basex.query.FTOpt;
 import org.basex.query.FTOpt.FTMode;
 import org.basex.query.xquery.FTIndexAcsbl;
 import org.basex.query.xquery.FTIndexEq;
@@ -136,6 +137,11 @@ public final class FTWords extends FTExpr {
     
     tok = ((Str) query).str();
     ctx.ftopt.sb.text = tok;
+    ctx.ftopt.sb.lc = ctx.ftopt.is(FTOpt.LC);
+    ctx.ftopt.sb.uc = ctx.ftopt.is(FTOpt.UC);
+    ctx.ftopt.sb.fz = ctx.ftopt.is(FTOpt.FZ);
+    ctx.ftopt.sb.wc = ctx.ftopt.is(FTOpt.WC);
+    ctx.ftopt.sb.cs = ctx.ftopt.is(FTOpt.CS);
     // index size is incorrect for phrases
     while(ia.is != 0 && ctx.ftopt.sb.more()) {
       ia.is = Math.min(ia.is, ia.data.nrIDs(ctx.ftopt.sb));

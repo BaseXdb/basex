@@ -39,7 +39,7 @@ public final class FTNotIter extends FTArrayExpr {
   @Override
   public FTNode next(final QueryContext ctx) {
     final FTNode n = m ? exprs[0].next(ctx) : new FTNode(); 
-    n.not = true;
+    n.not = !n.not;
     return n; 
   }
   

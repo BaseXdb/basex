@@ -41,6 +41,17 @@ public final class FTSelect extends FTExpr {
     super(e);
     pos = u;
   }
+  
+  /**
+   * Check if FTSelect is initial.
+   * There are no further options set, beside the default ones.
+   * Used for FTNot expression.
+   * 
+   * @return boolean initial
+   */
+  public boolean initial() {
+    return window == null && dist == null && pos.valid();
+  }
 
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
@@ -111,6 +122,8 @@ public final class FTSelect extends FTExpr {
   throws XQException {
     
     expr[0].indexAccessible(ctx, ia);
+    // index could only be used, if there is no ftselection specified
+    ia.iu = ia.iu && !(ia.ftnot == initial());
   }
   
   @Override

@@ -6,10 +6,12 @@ import org.basex.data.Serializer;
 import org.basex.query.ExprInfo;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
+import org.basex.query.xpath.XPText;
 import org.basex.query.xpath.expr.Expr;
 import org.basex.query.xpath.item.Nod;
 import org.basex.query.xpath.item.NodeBuilder;
 import org.basex.util.Array;
+import org.basex.util.ExprList;
 
 /**
  * Location Steps.
@@ -151,7 +153,7 @@ public final class Preds extends ExprInfo {
    */
   public boolean compile(final XPContext ctx) throws QueryException {
     tmp = new Nod(ctx);
-    //ExprInfoList p = new ExprInfoList(size);
+    ExprList p = new ExprList(size);
     
     for(int j = 0; j < size; j++) {
       preds[j] = preds[j].compile(ctx);
@@ -163,18 +165,16 @@ public final class Preds extends ExprInfo {
         ctx.compInfo(OPTTRUE);
         remove(j--);
       }
-      // <SG> summing up of predicates needs more meta information
-      /*if (j > -1 && preds[j] instanceof PredSimple) 
-        p.add(preds[j], true);
-        */
+      if (j > -1 && preds[j] instanceof PredSimple) 
+        p.addPS(preds[j], ctx);        
     }
     
-    /*
+    
     if (p.size > 0 && p.size < size) {
       preds = p.finishPS();
       size = p.size;
-      ctx.compInfo(OPTSUMPREDS);
-    }*/
+      ctx.compInfo(XPText.OPTPREDS);
+    }
     
     return true;
   }

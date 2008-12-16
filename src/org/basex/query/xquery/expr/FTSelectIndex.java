@@ -49,19 +49,19 @@ public final class FTSelectIndex extends FTExpr {
         ctx.ftpos = pos;
         pos.init(ctx.ftitem);
         FTNodeItem it = (FTNodeItem) ctx.iter(expr[0]).next();
-        
-        if (it.ftn.size > 0) {
-          init(it);
-          while (!posFilter(ctx)) {
-            it = (FTNodeItem) ctx.iter(expr[0]).next();
-            if(it.ftn.size == 0) {
-              ctx.ftpos = tmp;
-              return it;
-            }
+        if (tmp != null) {
+          if (it.ftn.size > 0) {
             init(it);
-          } 
-        }    
-
+            while (!posFilter(ctx)) {
+              it = (FTNodeItem) ctx.iter(expr[0]).next();
+              if(it.ftn.size == 0) {
+                ctx.ftpos = tmp;
+                return it;
+              }
+              init(it);
+            } 
+          }    
+        }
         // calculate weight
         final double d = checkDbl(ctx.iter(weight));
         if(d < 0 || d > 1000) Err.or(FTWEIGHT, d);

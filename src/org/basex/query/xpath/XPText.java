@@ -177,7 +177,10 @@ public interface XPText {
   String OPTTEXT = "Adding text() step";
   /** Optimization info. */
   String OPTPOS = "Rewriting position predicate";
+  /** Optimization info. */
+  String OPTPREDS = "Rewriting predicate";
 
+  
   /** Evaluation info. */
   String EVALSKIP = "rest of output skipped...";
 }

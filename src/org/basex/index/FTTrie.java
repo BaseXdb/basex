@@ -75,8 +75,7 @@ public final class FTTrie extends Index {
     // skip count of queries which stretch over multiple index entries
     final FTTokenizer fto = (FTTokenizer) ind;
     if(fto.fz || fto.wc) return 1;
-
-    final byte[] tok = ind.get();
+    final byte[] tok = fto.get();
     final int id = cache.id(tok);
     if(id > 0) return cache.getSize(id);
 

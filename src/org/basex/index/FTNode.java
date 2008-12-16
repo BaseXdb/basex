@@ -60,7 +60,7 @@ public final class FTNode {
    * Constructor.
    * @param prevalue pre value of the current node
    */
-  FTNode(final int prevalue) {
+  public FTNode(final int prevalue) {
     pre = prevalue;
     ip = new IntList();
     ip.add(prevalue);

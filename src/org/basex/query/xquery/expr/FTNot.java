@@ -36,9 +36,9 @@ public final class FTNot extends FTExpr {
   public void indexAccessible(final XQContext ctx, final FTIndexAcsbl ia) 
     throws XQException {
     
-    // [SG] what happens if two ftnot occur.. text() ftnot (ftnot 'word')).. ?
-    //   would it make sense to invert the ftnot flag?
-    ia.ftnot = true;
+    // [CG] what happens if two ftnot occur.. text() ftnot (ftnot 'word')).. ?
+    //   could be optimized to text() 'word'
+    ia.ftnot = !ia.ftnot;
     
     // in case of ftand ftnot seq could be set false in FTAnd
     ia.seq = true;
@@ -49,8 +49,7 @@ public final class FTNot extends FTExpr {
   @Override
   public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq)
     throws XQException {
-
     return new FTNotIndex((FTExpr) expr[0].indexEquivalent(ctx, ieq));
-  }
+   }
 
 }

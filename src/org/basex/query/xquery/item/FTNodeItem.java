@@ -44,7 +44,8 @@ public final class FTNodeItem extends Item {
   @Override 
   public double dbl() {
     if(score == -1)
-      score = ftn.size > 0 ? Scoring.word(ftn.p.size - 1, ftn.getLength()) : 0;
+      score = ftn.size > 0 ? ftn.getToken() != null ? 
+          Scoring.word(ftn.p.size - 1, ftn.getLength()) : 1 : 0;
     return score;
   }
   

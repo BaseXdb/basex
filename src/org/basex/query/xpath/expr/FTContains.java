@@ -119,20 +119,22 @@ public final class FTContains extends Arr {
             final boolean not = ftn.not;
             if(ftn.getPre() == ns.nodes[z]) {
               ftn = null;
+              ctx.ftitem = fti;
               return Bln.get(!not);
             }
-            if(not) return Bln.TRUE;
+            if(not) {
+              ctx.ftitem = fti;
+              return Bln.TRUE;
+            }
           }
         }
       } else {
+        final Bln b = Bln.get(ns.bool() && ((Bln) expr[1]).bool());
+        ctx.ftitem = fti;
         // expression can only be FTArrayExpr or boolean
-        return Bln.get(ns.bool() && ((Bln) expr[1]).bool()); 
+        return b; 
       }
     }
-
-    // [SG] ..necessary to set it back? (don't know myself ;)
-    //  otherwise, could be 'proven' by FTTests, and should probably
-    //  be set back as well before the other 'return' statements
     ctx.ftitem = fti;
     return Bln.FALSE;
   }
@@ -185,7 +187,6 @@ public final class FTContains extends Arr {
       // standard index evaluation
       ctx.compInfo(OPTFTINDEX);
       final Expr ex = new FTContainsNS(expr[0], ae);
-      // [SG] can curr be 'null' here?
       return curr == null ? ex : new Path(ex, path.invertPath(curr));
     }
 

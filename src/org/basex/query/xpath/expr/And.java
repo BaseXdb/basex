@@ -4,6 +4,7 @@ import static org.basex.query.xpath.XPText.*;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.XPOptimizer;
+import org.basex.query.xpath.XPText;
 import org.basex.query.xpath.internal.AllOf;
 import org.basex.query.xpath.internal.Range;
 import org.basex.query.xpath.item.Bln;
@@ -11,6 +12,7 @@ import org.basex.query.xpath.item.Comp;
 import org.basex.query.xpath.item.Item;
 import org.basex.query.xpath.path.LocPath;
 import org.basex.query.xpath.path.Step;
+import org.basex.util.ExprList;
 
 /**
  * And expression.
@@ -36,7 +38,7 @@ public final class And extends Arr {
   @Override
   public Expr comp(final XPContext ctx) throws QueryException {
     super.comp(ctx);
-    
+    final ExprList eil0 = new ExprList();
     for(int e = 0; e != expr.length; e++) {
       // check if we can add a position predicate to match only the first title
       if(expr[e] instanceof LocPath) {
@@ -48,31 +50,32 @@ public final class And extends Arr {
           ctx.compInfo(OPTAND1);
           return Bln.FALSE;
         }
-
+        
         // remove element from and expression that is always true
         ctx.compInfo(OPTAND2);
         final Expr[] tmp = new Expr[expr.length - 1];
         System.arraycopy(expr, 0, tmp, 0, e);
         System.arraycopy(expr, e + 1, tmp, e, expr.length - e-- - 1);
         expr = tmp;
-      }
-      // <SG> check for summing up predicates
-      /*
-      else if (expr[e] instanceof Or) {
+      } else if (expr[e] instanceof Or) {
         // sum up and predicates
-        final ExprInfoList eil = new ExprInfoList();
+        final ExprList eil = new ExprList();
         final Or o = (Or) expr[e];
         for (int j = 0; j < o.expr.length; j++)
-          eil.add(o.expr[j], true);
+          eil.add(o.expr[j], ctx, false);
 
         if (eil.size > 0 && eil.size < o.expr.length) {
           Expr[] ex = eil.finishE();
           if (ex.length == 1) expr[e] = ex[0];
           else o.expr = eil.finishE();
-         ctx.compInfo(OPTSUMPREDS);
+          ctx.compInfo(XPText.OPTPREDS);
        } 
-     }*/
+     } 
+      eil0.add(expr[e], ctx, true);
     }
+    
+    if (eil0.size < expr.length)
+      expr = eil0.finishE();
     
     if(expr.length == 0) return Bln.TRUE;
     if(expr.length == 1) return expr[0];

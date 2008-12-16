@@ -43,7 +43,8 @@ public final class SeqBuilder {
    */
   public void add(final Iter it) throws XQException {
     Item i;
-    while((i = it.next()) != null) add(i);
+    while((i = it.next()) != null) 
+      add(i);
   }
 
   /**

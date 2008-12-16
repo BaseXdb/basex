@@ -7,6 +7,7 @@ import org.basex.data.Serializer;
 import org.basex.index.FTNode;
 import org.basex.index.FTTokenizer;
 import org.basex.index.IndexArrayIterator;
+import org.basex.query.FTOpt;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.FTNodeItem;
 import org.basex.query.xquery.iter.FTNodeIter;
@@ -26,7 +27,9 @@ public final class FTIndex extends FTExpr {
   public final Data data;
   /** Index iterator. */
   public IndexArrayIterator iat;
-  
+  /** FTOpt for index access. */
+  public FTOpt fto;
+
   /**
    * Constructor.
    * @param d data reference
@@ -36,9 +39,10 @@ public final class FTIndex extends FTExpr {
     data = d;
     tok = t;
   }
-
+  
   @Override
   public Iter iter(final XQContext ctx) {
+    fto = ctx.ftopt;
     return new FTNodeIter() {
       @Override
       public FTNodeItem next() { 
@@ -54,6 +58,11 @@ public final class FTIndex extends FTExpr {
       private boolean evalIter() {
         final FTTokenizer ft = new FTTokenizer();
         ft.init(tok);
+        ft.lc = FTIndex.this.fto.is(FTOpt.LC);
+        ft.uc = FTIndex.this.fto.is(FTOpt.UC);
+        ft.cs = FTIndex.this.fto.is(FTOpt.CS);
+        ft.wc = FTIndex.this.fto.is(FTOpt.WC);
+        ft.fz = FTIndex.this.fto.is(FTOpt.FZ);
         ft.lp = true;
         while(ft.more()) {
           if(data.nrIDs(ft) == 0) return false;

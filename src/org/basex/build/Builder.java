@@ -414,7 +414,6 @@ public abstract class Builder extends Progress {
     
     // text node processing for statistics 
     if(type == Data.TEXT) tags.index(tagStack[level - 1], t);
-
     skel.add(0, level, type);
     addText(t, level == 0 ? 1 : size - parStack[level - 1], type);
   }

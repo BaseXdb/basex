@@ -66,8 +66,10 @@ public final class FTTest extends AbstractTest {
       "</fttest>";
 
     queries = new Object[][] {
-        { "FTAndOr 4", nodes(7, 9, 11, 14),
-        "//w [text() ftcontains 'xml' ftand 'databases'  ftor 'hello' ]" },
+        {"FTWildCard 7", nodes(14),
+    "/fttest/wc/w [text() ftcontains '.*' with wildcards]" },
+  { "FTWildCard 8", nodes(14),
+    "/fttest/wc/w [text() ftcontains '.+' with wildcards]" },
         
         { "Simple 1", bool(true),
           "'abc' ftcontains 'abc'" },
@@ -89,7 +91,7 @@ public final class FTTest extends AbstractTest {
           "true() ftcontains 'true'" },
         { "Simple 10", bool(true),
           "false() ftcontains 'false'" },
-
+          
         { "Preds 1", nodes(7, 9, 11),
           "//w[text() ftcontains 'xml'][text() ftcontains 'Databases']" },
         { "Preds 2", nodes(7),
