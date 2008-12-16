@@ -137,6 +137,11 @@ public final class Var extends ExprInfo implements Cloneable {
   }
 
   @Override
+  public String color() {
+    return "66CC66";
+  }
+
+  @Override
   public String toString() {
     final TokenBuilder sb = new TokenBuilder("$");
     sb.add(name.str());

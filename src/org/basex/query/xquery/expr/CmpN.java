@@ -101,6 +101,11 @@ public final class CmpN extends Arr {
   }
 
   @Override
+  public String color() {
+    return "FF9966";
+  }
+
+  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this, TYPE, Token.token(cmp.name));
     for(final Expr e : expr) e.plan(ser);

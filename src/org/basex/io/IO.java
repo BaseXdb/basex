@@ -335,14 +335,4 @@ public abstract class IO {
     }
     return pre + path.replace('\\', '/');
   }
-
-  /**
-   * Determines if the specified file is a symbolic link.
-   * @param f file to be tested.
-   * @return true for a symbolic link
-   * @throws IOException I/O exception
-   */
-  public static boolean isSymlink(final File f) throws IOException {
-    return !f.getPath().equals(f.getCanonicalPath());
-  }
 }

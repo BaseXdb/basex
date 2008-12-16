@@ -142,6 +142,8 @@ public final class FTTest extends AbstractTest {
           "//fti[contains(text(), 'adf') and text() ftcontains 'adf']" },
         { "AndOr 7", nodes(3),
           "//*[text() ftcontains 'sentence' and text() ftcontains 'xml']" },
+        { "AndOr 8", nodes(42),
+          "//mix[text() ftcontains 'A'][text() ftcontains 'B']" },
           
         { "Phrase 1", nodes(7, 9, 11),
           "//w [text() ftcontains 'xml databases']" },

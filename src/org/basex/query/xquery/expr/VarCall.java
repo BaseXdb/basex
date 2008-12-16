@@ -54,6 +54,11 @@ public final class VarCall extends Expr {
   public void plan(final Serializer ser) throws IOException {
     ser.emptyElement(this, VAR, var.name.str());
   }
+
+  @Override
+  public String color() {
+    return "66DDAA";
+  }
   
   @Override
   public String info() {

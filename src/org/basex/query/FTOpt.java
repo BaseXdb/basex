@@ -183,8 +183,7 @@ public final class FTOpt extends ExprInfo {
      - no stop words are specified
      - if wildcards are specified, the fulltext index is a trie */
     return meta.ftcs == is(FTOpt.CS) && meta.ftdc == is(FTOpt.DC) &&
-      !meta.ftst && !is(FTOpt.ST) && sw == null 
-      && (!is(FTOpt.WC) || !meta.ftfz);
+      meta.ftst == is(FTOpt.ST) && sw == null && (!is(FTOpt.WC) || !meta.ftfz);
   }
   
   @Override

@@ -6,7 +6,6 @@ import org.basex.data.Serializer;
 import org.basex.query.ExprInfo;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
-import org.basex.query.xpath.XPText;
 import org.basex.query.xpath.expr.Expr;
 import org.basex.query.xpath.item.Nod;
 import org.basex.query.xpath.item.NodeBuilder;
@@ -173,7 +172,7 @@ public final class Preds extends ExprInfo {
     if (p.size > 0 && p.size < size) {
       preds = p.finishPS();
       size = p.size;
-      ctx.compInfo(XPText.OPTPREDS);
+      ctx.compInfo(OPTPREDS);
     }
     
     return true;

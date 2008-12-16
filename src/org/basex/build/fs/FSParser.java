@@ -88,8 +88,8 @@ public final class FSParser extends Parser {
   }
 
   /**
-   * Main entry point for the import of a file hierarchy to BaseX.
-   * Instantiates fht engine and visitors, and starts the traversal.
+   * Main entry point for the import of a file hierarchy.
+   * Instantiates the engine and starts the traversal.
    * @param build instance passed by {@link CreateFS}.
    * @throws IOException I/O exception
    */
@@ -125,14 +125,27 @@ public final class FSParser extends Parser {
     if(files == null) return;
 
     for(final File f : files) {
-      // skip symbolic links
-      if(IO.isSymlink(f)) continue;
+      if(!valid(f)) continue;
 
       if(f.isDirectory()) {
         dir(f);
       } else {
         file(f);
       }
+    }
+  }
+
+  /**
+   * Determines if the specified file is valid and no symbolic link.
+   * @param f file to be tested.
+   * @return true for a symbolic link
+   */
+  private static boolean valid(final File f) {
+    try {
+      return f.getPath().equals(f.getCanonicalPath());
+    } catch(final Exception ex) {
+      BaseX.debug(f + ": " + ex.getMessage());
+      return false;
     }
   }
 

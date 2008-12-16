@@ -92,6 +92,11 @@ public class FLWR extends Single {
   }
 
   @Override
+  public String color() {
+    return "66FF66";
+  }
+
+  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this, EVAL, ITER);
     for(final ForLet f : fl) f.plan(ser);

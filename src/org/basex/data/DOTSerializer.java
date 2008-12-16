@@ -26,9 +26,9 @@ public final class DOTSerializer extends Serializer {
   /** Link entry. */
   private static final String COLELEM2 = "E0E0E0";
   /** Link entry. */
-  private static final String COLITEM = "33FFFF";
+  private static final String COLITEM = "66CCCC";
   /** Link entry. */
-  private static final String COLTEXT = "6666FF";
+  private static final String COLTEXT = "9999FF";
   /** Link entry. */
   private static final String COLCOMM = "FFFF66";
   /** Link entry. */
@@ -65,7 +65,7 @@ public final class DOTSerializer extends Serializer {
   public void open(final int s) throws IOException {
     out.println("digraph BaseXAlgebra {");
     out.println("node[shape=box,style=filled,width=0,height=0];");
-    //out.println("node[fontsize=16];");
+    out.println("node[fontsize=14,fontname=Tahoma];");
     if(s != 1) openElement(RESULTS);
   }
 
@@ -93,11 +93,10 @@ public final class DOTSerializer extends Serializer {
 
   @Override
   public void attribute(final byte[] n, final byte[] v) {
-    tb.add("\\n");
+    tb.add(tb.size == 0 ? "\\n" : ", ");
     tb.add(n);
-    tb.add("='");
+    tb.add(":");
     tb.add(v);
-    tb.add("'");
   }
 
   @Override

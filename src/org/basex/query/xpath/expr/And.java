@@ -4,7 +4,6 @@ import static org.basex.query.xpath.XPText.*;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.XPOptimizer;
-import org.basex.query.xpath.XPText;
 import org.basex.query.xpath.internal.AllOf;
 import org.basex.query.xpath.internal.Range;
 import org.basex.query.xpath.item.Bln;
@@ -68,7 +67,7 @@ public final class And extends Arr {
           Expr[] ex = eil.finishE();
           if (ex.length == 1) expr[e] = ex[0];
           else o.expr = eil.finishE();
-          ctx.compInfo(XPText.OPTPREDS);
+          ctx.compInfo(OPTPREDS);
        } 
      } 
       eil0.add(expr[e], ctx, true);

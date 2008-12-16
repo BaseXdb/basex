@@ -28,7 +28,7 @@ public final class QueryTest {
   /** Verbose flag. */
   private static final boolean VERBOSE = false;
   /** Test all flag. */
-  private static final boolean ALL = false;
+  private static final boolean ALL = true;
   /** Wrong results counter. */
   private static int wrong;
 

@@ -37,7 +37,7 @@ public final class JPGExtractor extends EXIFExtractor {
       try {
         if(b == 0xE1) skip = scanEXIF(in, skip, f.getName());
       } catch(final IOException ex) {
-        BaseX.debug(f.toString() + ": " + ex.getMessage());
+        BaseX.debug(f + ": " + ex.getMessage());
         exif.clear();
       }
       skip(in, skip);

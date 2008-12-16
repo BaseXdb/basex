@@ -1,6 +1,5 @@
 package org.basex.util;
 
-
 import org.basex.query.ExprInfo;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
