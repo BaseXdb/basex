@@ -37,7 +37,7 @@ public final class FTIndex extends FTArrayExpr {
    * @param o FTOption for index token
    */
   public FTIndex(final byte[] tok, final FTOpt o) {
-    exprs = new FTArrayExpr[] {};
+    super();
     token = tok;
     opt = o;
   }

@@ -20,7 +20,7 @@ public final class If extends Arr {
    * @param s else clause
    */
   public If(final Expr e, final Expr t, final Expr s) {
-    super(new Expr[] { e, t, s });
+    super(e, t, s);
   }
   
   @Override

@@ -1,6 +1,5 @@
 package org.basex.query.xpath.expr;
 
-
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.item.Bln;
@@ -23,8 +22,8 @@ public final class FTOr extends FTArrayExpr {
    * Constructor.
    * @param e expressions
    */
-  public FTOr(final FTArrayExpr[] e) {
-    exprs = e;
+  public FTOr(final FTArrayExpr... e) {
+    super(e);
   }
 
   @Override
@@ -87,16 +86,4 @@ public final class FTOr extends FTArrayExpr {
     } 
     //return seq ? Integer.MAX_VALUE : sum > min ? min : sum;
   }
-  
-  /**
-   * Add Expr to list.
-   * @param ex new Expr
-   */
-  public void add(final FTArrayExpr ex) {
-    FTArrayExpr[] ne = new FTArrayExpr[exprs.length + 1];
-    System.arraycopy(exprs, 0, ne, 0, exprs.length);
-    ne[exprs.length] = ex;
-    exprs = ne;
-  }
-
 }

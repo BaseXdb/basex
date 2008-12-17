@@ -38,7 +38,7 @@ public final class PredPos extends Pred {
    * @param e expression to be tested
    * @return comparator
    */
-  static Pred create(final Expr e) {
+  static Pred get(final Expr e) {
     if(!(e instanceof Pos)) return null;
     final int mn = ((Pos) e).min;
     final int mx = ((Pos) e).max;

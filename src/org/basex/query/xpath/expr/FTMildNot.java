@@ -16,8 +16,8 @@ public final class FTMildNot extends FTArrayExpr {
    * Constructor.
    * @param e expressions
    */
-  public FTMildNot(final FTArrayExpr[] e) {
-    exprs = e;
+  public FTMildNot(final FTArrayExpr... e) {
+    super(e);
   }
 
   @Override

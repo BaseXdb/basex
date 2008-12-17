@@ -2,6 +2,7 @@ package org.basex.query.xpath.expr;
 
 import static org.basex.query.xpath.XPText.*;
 import org.basex.query.QueryException;
+import org.basex.query.xpath.ExprList;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.XPOptimizer;
 import org.basex.query.xpath.internal.OneOf;
@@ -9,7 +10,6 @@ import org.basex.query.xpath.item.Bln;
 import org.basex.query.xpath.item.Item;
 import org.basex.query.xpath.path.LocPath;
 import org.basex.query.xpath.path.Step;
-import org.basex.util.ExprList;
 
 /**
  * Or expression.
@@ -126,8 +126,7 @@ public final class Or extends Arr {
     
     // perform path step only once if all path expressions are the same
     final Expr[] ex = XPOptimizer.getIndexExpr(indexExprs);
-    if(ex != null) return new Path(new Union(ex),
-        ((Path) indexExprs[0]).expr[1]);
+    if(ex != null) return new Path(new Union(ex), ((Path) indexExprs[0]).path);
 
     ctx.compInfo(OPTOR4);
     return new Union(indexExprs);

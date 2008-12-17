@@ -21,8 +21,8 @@ public final class FTNotIter extends FTArrayExpr {
    * Constructor.
    * @param e operands joined with the mild not operator
    */
-  public FTNotIter(final FTArrayExpr[] e) {
-    exprs = e;
+  public FTNotIter(final FTArrayExpr... e) {
+    super(e);
   }
 
   @Override

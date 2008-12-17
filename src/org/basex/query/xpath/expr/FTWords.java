@@ -34,7 +34,7 @@ public final class FTWords extends FTArrayExpr {
    * @param o occurrences
    */
   public FTWords(final byte[] t, final FTMode m, final long[] o) {
-    exprs = new FTArrayExpr[] {};
+    super();
     token = t;
     mode = m;
     occ = o;

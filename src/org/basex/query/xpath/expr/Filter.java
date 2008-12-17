@@ -43,7 +43,7 @@ public final class Filter extends Expr {
 
   @Override
   public boolean usesSize() {
-    return expr.usesSize() || preds.usesSetSize();
+    return expr.usesSize() || preds.usesSize();
   }
   
   @Override

@@ -2,6 +2,7 @@ package org.basex.query.xpath.expr;
 
 import static org.basex.query.xpath.XPText.*;
 import org.basex.query.QueryException;
+import org.basex.query.xpath.ExprList;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.XPOptimizer;
 import org.basex.query.xpath.internal.AllOf;
@@ -11,7 +12,6 @@ import org.basex.query.xpath.item.Comp;
 import org.basex.query.xpath.item.Item;
 import org.basex.query.xpath.path.LocPath;
 import org.basex.query.xpath.path.Step;
-import org.basex.util.ExprList;
 
 /**
  * And expression.
@@ -158,7 +158,7 @@ public final class And extends Arr {
     // perform path step only once if all path expressions are the same
     final Expr[] ex = XPOptimizer.getIndexExpr(indexExprs);
     if(ex != null) return new Path(new InterSect(ex),
-        ((Path) indexExprs[0]).expr[1]);
+        ((Path) indexExprs[0]).path);
 
     ctx.compInfo(OPTAND4);
     return new InterSect(indexExprs).comp(ctx);

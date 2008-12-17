@@ -21,21 +21,13 @@ public final class Pos extends Expr {
   public int min;
   /** Maximum value. */
   public int max;
-  
-  /**
-   * Constructor.
-   * @param p position
-   */
-  public Pos(final int p) {
-    this(p, p);
-  }
 
   /**
    * Constructor.
    * @param mn minimum
    * @param mx maximum
    */
-  public Pos(final int mn, final int mx) {
+  Pos(final int mn, final int mx) {
     min = mn;
     max = mx;
   }
@@ -47,7 +39,7 @@ public final class Pos extends Expr {
    * @param mx maximum
    * @return predicate
    */
-  private static Expr create(final double mn, final double mx) {
+  private static Expr get(final double mn, final double mx) {
     return mx < mn ? Bln.FALSE : new Pos((int) mn, (int) mx);
   }
   
@@ -58,15 +50,15 @@ public final class Pos extends Expr {
    * @param type comparison type
    * @return predicate
    */
-  public static Expr create(final double val, final Comp type) {
+  public static Expr get(final double val, final Comp type) {
     if(type == Comp.EQ) {
       if(val != (int) val || val < 1) return Bln.FALSE;
-      return create(val, val);
+      return get(val, val);
     }
-    if(type == Comp.GT) return create(val + 1, Integer.MAX_VALUE);
-    if(type == Comp.GE) return create(Math.ceil(val), Integer.MAX_VALUE);
-    if(type == Comp.LT) return create(1, Math.ceil(val) - 1);
-    if(type == Comp.LE) return create(1, val);
+    if(type == Comp.GT) return get(val + 1, Integer.MAX_VALUE);
+    if(type == Comp.GE) return get(Math.ceil(val), Integer.MAX_VALUE);
+    if(type == Comp.LT) return get(1, Math.ceil(val) - 1);
+    if(type == Comp.LE) return get(1, val);
     return null;
   }
 

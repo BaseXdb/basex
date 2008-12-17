@@ -17,7 +17,7 @@ public final class FTNot extends FTArrayExpr {
    * @param e expressions
    */
   public FTNot(final FTArrayExpr e) {
-    exprs = new FTArrayExpr[] { e };
+    super(e);
   }
 
   @Override

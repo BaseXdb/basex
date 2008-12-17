@@ -61,7 +61,7 @@ public class Step extends Expr {
    * @param t node test
    * @param p predicates
    */
-  protected Step(final Axis a, final Test t, final Expr[] p) {
+  protected Step(final Axis a, final Test t, final Expr... p) {
     axis = a;
     test = t;
     pred = p;

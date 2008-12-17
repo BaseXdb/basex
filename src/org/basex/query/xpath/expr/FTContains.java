@@ -26,15 +26,19 @@ import org.basex.query.xpath.path.TestNode;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class FTContains extends Arr {
+public final class FTContains extends Expr {
   /** Fulltext parser. */
   private final FTTokenizer ft = new FTTokenizer();
+  /** Content expression. */
+  public Expr cont;
+  /** FullText query. */
+  public FTArrayExpr query;
   /** FullText options. */
   private FTOpt opt;
-  /** Result item. */
-  private Item v2 = null;
+  /** Cached index results. */
+  private Item cache;
   /** Temporary result node.*/
-  private FTNode ftn = null;
+  private FTNode ftn;
   /** Flag for index use. */
   private boolean iu;
   /** Flag for index use. */
@@ -47,7 +51,8 @@ public final class FTContains extends Arr {
    * @param e2 second expression to compare with first
    */
   public FTContains(final Expr e1, final FTArrayExpr e2) {
-    super(e1, e2);
+    cont = e1;
+    query = e2;
   }
 
   /**
@@ -57,27 +62,27 @@ public final class FTContains extends Arr {
    * @param o fulltext options
    * @param indexuse flag for index use
    */
-  public FTContains(final Expr e1, final Expr e2, final FTOpt o,
+  public FTContains(final Expr e1, final FTArrayExpr e2, final FTOpt o,
       final boolean indexuse) {
-    super(e1, e2);
+    this(e1, e2);
     opt = o;
     iu = indexuse;
   }
   
   @Override
   public Expr comp(final XPContext ctx) throws QueryException {
-    super.comp(ctx);
+    cont = cont.comp(ctx);
+    query = query.comp(ctx);
 
-    if(expr[0] instanceof LocPathAbs) return this;
+    if(cont instanceof LocPathAbs) return this;
 
-    final Item i1 = expr[0] instanceof Item ? (Item) expr[0] : null;
-    final Item i2 = expr[1] instanceof Item ? (Item) expr[1] : null;
-    if(i1 != null && i1.size() == 0 || i2 != null && i2.size() == 0) {
+    final Item i1 = cont instanceof Item ? (Item) cont : null;
+    if(i1 != null && i1.size() == 0) {
       ctx.compInfo(OPTEQ1);
       return Bln.FALSE;
     }
 
-    XPOptimizer.addText(expr[0], ctx);
+    XPOptimizer.addText(cont, ctx);
     return this;
   }
 
@@ -104,16 +109,20 @@ public final class FTContains extends Arr {
     ctx.ftitem = ft;
     
     // evaluate index requests only once
-    if(v2 == null) v2 = ctx.eval(expr[1]);
+    if(cache == null) cache = ctx.eval(query);
 
-    if(v2.bool()) {
-      final Nod ns = (Nod) expr[0].eval(ctx);
-      if (expr[1] instanceof FTArrayExpr) {
-        final FTArrayExpr ftae = (FTArrayExpr) expr[1];
-        ftn = (ftn == null && ftae.more()) ? ftae.next(ctx) : ftn;
+    if(cache.bool()) {
+      final Nod ns = (Nod) cont.eval(ctx);
+      // treat special boolean case
+      if (query instanceof FTBool) {
+        final Bln b = Bln.get(ns.bool() && query.eval(ctx).bool());
+        ctx.ftitem = fti;
+        return b; 
+      } else {
+        ftn = (ftn == null && query.more()) ? query.next(ctx) : ftn;
         for(int z = 0; z < ns.size(); z++) {
           while(ftn != null && ns.nodes[z] > ftn.getPre() && ftn.size > 0) {
-            ftn = ftae.more() ? ftae.next(ctx) : null;
+            ftn = query.more() ? query.next(ctx) : null;
           }
           if(ftn != null) {
             final boolean not = ftn.not;
@@ -128,11 +137,6 @@ public final class FTContains extends Arr {
             }
           }
         }
-      } else {
-        final Bln b = Bln.get(ns.bool() && ((Bln) expr[1]).bool());
-        ctx.ftitem = fti;
-        // expression can only be FTArrayExpr or boolean
-        return b; 
       }
     }
     ctx.ftitem = fti;
@@ -150,7 +154,7 @@ public final class FTContains extends Arr {
     ctx.ftitem = ft;
 
     final Nod c = ctx.item;
-    final Item it = expr[0].eval(ctx);
+    final Item it = cont.eval(ctx);
     
     boolean found = false;
     if(it instanceof Nod) {
@@ -159,12 +163,12 @@ public final class FTContains extends Arr {
       final Nod ns = (Nod) it;
       for(int n = 0; n < ns.size; n++) {
         ft.init(ns.data.atom(ns.nodes[n]));
-        found = expr[1].eval(ctx).bool();
+        found = query.eval(ctx).bool();
         if(found) break;
       }
     } else {
       ft.init(it.str());
-      found = expr[1].eval(ctx).bool();
+      found = query.eval(ctx).bool();
     }
     
     ctx.ftitem = tmp;
@@ -176,17 +180,16 @@ public final class FTContains extends Arr {
   public Expr indexEquivalent(final XPContext ctx, final Step curr,
       final boolean seq) throws QueryException {
 
-    if(!(expr[0] instanceof LocPathRel)) return this;
-    final LocPath path = (LocPath) expr[0];
+    if(!(cont instanceof LocPathRel)) return this;
+    final LocPath path = (LocPath) cont;
     iu = iut;
     // all expressions are recursively converted for index access
-    final FTArrayExpr ae = (FTArrayExpr)
-      (iu ? expr[1].indexEquivalent(ctx, curr, seq) : expr[1]);
+    final FTArrayExpr ae = iu ? query.indexEquivalent(ctx, curr, seq) : query;
       
     if(!seq) {
       // standard index evaluation
       ctx.compInfo(OPTFTINDEX);
-      final Expr ex = new FTContainsNS(expr[0], ae);
+      final Expr ex = new FTContainsNS(cont, ae);
       return curr == null ? ex : new Path(ex, path.invertPath(curr));
     }
 
@@ -194,11 +197,11 @@ public final class FTContains extends Arr {
     Expr ex = null;
     if(!iu) {
       // without index access
-      ex = new FTContains(expr[0], expr[1], opt, iu);
+      ex = new FTContains(cont, query, opt, iu);
     } else {
       // with index access
       ctx.compInfo(OPTFTINDEX);
-      ex = new FTContains(expr[0], ae, opt, iu);
+      ex = new FTContains(cont, ae, opt, iu);
     }
     return curr == null ? ex : new Path(ex, path);
   }
@@ -207,51 +210,49 @@ public final class FTContains extends Arr {
   public int indexSizes(final XPContext ctx, final Step curr, final int min) {
     // check if first expression is a location path and if fulltext index exists
     final MetaData meta = ctx.item.data.meta;
-    if(!(expr[0] instanceof LocPathRel && meta.ftxindex && !meta.ftst))
+    if(!(cont instanceof LocPathRel && meta.ftxindex && !meta.ftst))
       return Integer.MAX_VALUE;
 
     // check if index can be applied
-    final LocPath path = (LocPathRel) expr[0];
+    final LocPath path = (LocPathRel) cont;
     final Step step = path.steps.last();
     final boolean text = step.test == TestNode.TEXT && step.preds.size() == 0;
     if(!text || !path.checkAxes()) return Integer.MAX_VALUE;
 
     // check all ftcontains options recursively if they comply
     // with the index options..
-    //iu = ((FTArrayExpr) expr[1]).indexOptions(meta);
-    iut = ((FTArrayExpr) expr[1]).indexOptions(meta);
+    iut = query.indexOptions(meta);
     final boolean tmp = ctx.iu;
-//    ctx.iu = iu;
     ctx.iu = iut;
 
     // sequential processing necessary - no index use
-    //if(!iu) return Integer.MAX_VALUE;
     if(!iut) return Integer.MAX_VALUE;
 
     // Integer.MAX_VALUE is returned if an ftnot does not occur after an ftand
-    final int nrIDs = expr[1].indexSizes(ctx, curr, min);
+    final int nrIDs = query.indexSizes(ctx, curr, min);
     if (!meta.ftoptpreds && nrIDs > min) {
         // only one ftcontains predicate should use the index
         iu = false;
         ctx.iu = false;
         return min;
     }
-/*    if (nrIDs > min) {
-      // comment this, if every ftcontains pred should use the index
-      iu = false;
-      ctx.iu = false;
-      return min;
-    }
-  */  
-    //iu = ctx.iu;
     iut = ctx.iu;
     // sequential processing necessary - no index use
-    //if(!iu) return Integer.MAX_VALUE;
     if(!iut) return Integer.MAX_VALUE;
 
     ctx.iu = tmp;
-    if (nrIDs == -1) expr[1] = Bln.TRUE;
+    if (nrIDs == -1) query = new FTBool(true);
     return nrIDs == -1 ? Integer.MAX_VALUE : nrIDs;
+  }
+
+  @Override
+  public boolean usesSize() {
+    return cont.usesSize();
+  }
+
+  @Override
+  public boolean usesPos() {
+    return cont.usesPos();
   }
 
   @Override
@@ -261,14 +262,14 @@ public final class FTContains extends Arr {
   
   @Override
   public String toString() {
-    return expr[0] + " ftcontains" + (iu ? "_I " : " ")  + expr[1];
+    return cont + " ftcontains" + (iu ? "_I " : " ")  + query;
   }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
-    expr[0].plan(ser);
-    expr[1].plan(ser);
+    cont.plan(ser);
+    query.plan(ser);
     ser.closeElement();
   }
 }

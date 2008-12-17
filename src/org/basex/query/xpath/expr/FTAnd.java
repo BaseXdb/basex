@@ -22,14 +22,14 @@ public final class FTAnd extends FTArrayExpr {
    * Constructor.
    * @param e expressions
    */
-  public FTAnd(final FTArrayExpr[] e) {
-    exprs = e;
+  public FTAnd(final FTArrayExpr... e) {
+    super(e);
   }
 
   @Override
   public Bln eval(final XPContext ctx) throws QueryException {
-    for(final Expr e : exprs) if(!ctx.eval(e).bool()) return Bln.get(false);
-    return Bln.get(true);
+    for(final Expr e : exprs) if(!ctx.eval(e).bool()) return Bln.FALSE;
+    return Bln.TRUE;
   }
 
   @Override
@@ -51,17 +51,6 @@ public final class FTAnd extends FTArrayExpr {
       exprs[i] = exprs[i].indexEquivalent(ctx, curr, seq);
     }
     return new FTIntersection(exprs, pex, nex);
-  }
-  
-  /**
-   * Add Expr to list.
-   * @param ex new Expr
-   */
-  public void add(final FTArrayExpr ex) {
-    FTArrayExpr[] ne = new FTArrayExpr[exprs.length + 1];
-    System.arraycopy(exprs, 0, ne, 0, exprs.length);
-    ne[exprs.length] = ex;
-    exprs = ne;
   }
 
   @Override

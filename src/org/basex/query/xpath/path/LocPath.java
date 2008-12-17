@@ -169,7 +169,7 @@ public abstract class LocPath extends Expr {
           
         }
       }
-      result = new InterSect(new Expr[] { indexArg }).comp(ctx);
+      result = new InterSect(indexArg).comp(ctx);
 
       // add rest of predicates
       if(newPreds.size() != 0) result =
@@ -276,8 +276,7 @@ public abstract class LocPath extends Expr {
   }
 
   /**
-   * Check if path has only single results.
-   * 
+   * Checks if the path has only single results.
    * @param ctx current context
    * @return boolean 
    */
@@ -285,6 +284,7 @@ public abstract class LocPath extends Expr {
     boolean f = false;
     for (int i = 0; i < steps.size(); i++) {
       final Step s = steps.get(i);
+      
       if (s instanceof StepChild) {
         if (s.test instanceof TestName) {
           TestName tn = (TestName) s.test;

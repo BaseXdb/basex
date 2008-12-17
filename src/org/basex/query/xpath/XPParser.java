@@ -111,7 +111,7 @@ public class XPParser extends QueryParser {
     if(!consume(OR)) return e;
 
     Expr[] list = { e };
-    do list = add(list, and()); while(consume(OR));
+    do list = Array.add(list, and()); while(consume(OR));
     return new Or(list);
   }
 
@@ -126,7 +126,7 @@ public class XPParser extends QueryParser {
     if(!consume(AND)) return e;
 
     Expr[] list = { e };
-    do list = add(list, equality()); while(consume(AND));
+    do list = Array.add(list, equality()); while(consume(AND));
     return new And(list);
   }
 
@@ -253,7 +253,7 @@ public class XPParser extends QueryParser {
     if(!consume('|')) return e;
 
     Expr[] list = { nodeCheck(e) };
-    do list = add(list, nodeCheck(path())); while(consume('|'));
+    do list = Array.add(list, nodeCheck(path())); while(consume('|'));
     return new Union(list);
   }
 
@@ -570,7 +570,7 @@ public class XPParser extends QueryParser {
         return XPathContext.get().getFunction(token(func), list);
       }
       if(list.length != 0 && !consume(',')) error(UNFINISHEDFUNC);
-      list = add(list, or());
+      list = Array.add(list, or());
     }
     error(UNFINISHEDFUNC);
     return null;
@@ -657,7 +657,7 @@ public class XPParser extends QueryParser {
     //if(consume(FTNOT)) error(FTNOTEXC);
 
     FTArrayExpr[] list = { e };
-    do list = add(list, ftAnd()); while(consume(FTOR));
+    do list = Array.add(list, ftAnd()); while(consume(FTOR));
     return new FTOr(list);
   }
 
@@ -671,7 +671,7 @@ public class XPParser extends QueryParser {
     if(!consume(FTAND)) return e;
 
     FTArrayExpr[] list = { e };
-    do list = add(list, ftMildNot()); while(consume(FTAND));
+    do list = Array.add(list, ftMildNot()); while(consume(FTAND));
     return new FTAnd(list);
   }
 
@@ -692,7 +692,7 @@ public class XPParser extends QueryParser {
       consumeWS();
       if(consume(FTNOT)) error(FTMILDNOT); //FTNOTEXC);
       notnext[FTTIMES] = true;
-      list = add(list, ftUnaryNot(notnext));
+      list = Array.add(list, ftUnaryNot(notnext));
     } while(consume(NOT));
     return new FTMildNot(list);
   }
@@ -720,8 +720,7 @@ public class XPParser extends QueryParser {
   final FTArrayExpr ftPrimaryWithOptions(final boolean[] notnext)
   throws QueryException {
     final FTArrayExpr e = ftPrimary(notnext);
-    e.fto = new FTOpt();
-    ftMatchOption(e.fto);
+    e.fto = ftMatchOption();
     return e;
   }
 
@@ -764,11 +763,12 @@ public class XPParser extends QueryParser {
 
   /**
    * Parses an FTMatchOption.
-   * @param opt container for fulltext options
+   * @return container for fulltext options
    * @throws QueryException parsing exception
    */
-  final void ftMatchOption(final FTOpt opt) throws QueryException {
-      while(true) {
+  final FTOpt ftMatchOption() throws QueryException {
+    final FTOpt opt = new FTOpt();
+    while(true) {
       consumeWS();
       if(consume(LOWERCASE)) {
         opt.set(FTOpt.CS, true);
@@ -868,6 +868,7 @@ public class XPParser extends QueryParser {
         break;
       }
     }
+    return opt;
   }
 
   /**
@@ -1021,25 +1022,5 @@ public class XPParser extends QueryParser {
     if(consume(PARAGRAPH)) return FTUnit.PARAGRAPHS;
     error("sentece or paragraph expected.");
     return null;
-  }
-
-  /**
-   * Adds an expression to the specified array.
-   * @param a input array
-   * @param e new expression
-   * @return new array
-   */
-  static Expr[] add(final Expr[] a, final Expr e) {
-    return Array.add(a, e);
-  }
-
-  /**
-   * Adds a fulltext expression to the specified array.
-   * @param a input array
-   * @param e new expression
-   * @return new array
-   */
-  static FTArrayExpr[] add(final FTArrayExpr[] a, final FTArrayExpr e) {
-    return Array.add(a, e);
   }
 }

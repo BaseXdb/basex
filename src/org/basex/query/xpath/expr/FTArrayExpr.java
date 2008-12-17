@@ -10,6 +10,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.path.Step;
+import org.basex.util.Array;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -23,6 +24,14 @@ public abstract class FTArrayExpr extends Expr {
   protected FTArrayExpr[] exprs;
   /** Fulltext option. */
   public FTOpt fto;
+
+  /**
+   * Constructor.
+   * @param ex expression array
+   */
+  public FTArrayExpr(final FTArrayExpr... ex) {
+    exprs = ex;
+  }
   
   /**
    * Optimizes the expression.
@@ -61,6 +70,14 @@ public abstract class FTArrayExpr extends Expr {
    */
   public boolean pos() {
     return true;
+  }
+  
+  /**
+   * Adds an expression to the expression list.
+   * @param ex new expression
+   */
+  public void add(final FTArrayExpr ex) {
+    exprs = Array.add(exprs, ex);
   }
 
   /**

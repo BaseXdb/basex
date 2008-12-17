@@ -5,12 +5,12 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.ExprInfo;
 import org.basex.query.QueryException;
+import org.basex.query.xpath.ExprList;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.expr.Expr;
 import org.basex.query.xpath.item.Nod;
 import org.basex.query.xpath.item.NodeBuilder;
 import org.basex.util.Array;
-import org.basex.util.ExprList;
 
 /**
  * Location Steps.
@@ -152,8 +152,8 @@ public final class Preds extends ExprInfo {
    */
   public boolean compile(final XPContext ctx) throws QueryException {
     tmp = new Nod(ctx);
-    ExprList p = new ExprList(size);
-    
+
+    // handle always true/false predicates
     for(int j = 0; j < size; j++) {
       preds[j] = preds[j].compile(ctx);
       if(preds[j].alwaysFalse()) {
@@ -164,12 +164,13 @@ public final class Preds extends ExprInfo {
         ctx.compInfo(OPTTRUE);
         remove(j--);
       }
-      if (j > -1 && preds[j] instanceof PredSimple) 
-        p.addPS(preds[j], ctx);        
     }
-    
-    
-    if (p.size > 0 && p.size < size) {
+
+    // throw together similar expressions
+    final ExprList p = new ExprList();
+    for(int j = 0; j < size; j++) p.addPS(preds[j], ctx);
+
+    if(p.size != size) {
       preds = p.finishPS();
       size = p.size;
       ctx.compInfo(OPTPREDS);
@@ -191,7 +192,7 @@ public final class Preds extends ExprInfo {
    * Checks whether the predicates make use of the size parameter.
    * @return whether node set size is used
    */
-  public boolean usesSetSize() {
+  public boolean usesSize() {
     for(int s = 0; s < size; s++) if(preds[s].usesSize()) return true;
     return false;
   }

@@ -20,8 +20,8 @@ public final class FTMildNotIter extends FTArrayExpr {
    * Constructor.
    * @param e operands joined with the mild not operator
    */
-  public FTMildNotIter(final FTArrayExpr[] e) {
-    exprs = e;
+  public FTMildNotIter(final FTArrayExpr... e) {
+    super(e);
   }
 
   @Override

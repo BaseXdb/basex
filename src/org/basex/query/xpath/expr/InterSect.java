@@ -16,7 +16,7 @@ public final class InterSect extends Arr {
    * Constructor.
    * @param e operands expression
    */
-  public InterSect(final Expr[] e) {
+  public InterSect(final Expr... e) {
     super(e);
   }
 

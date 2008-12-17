@@ -3,7 +3,6 @@ package org.basex.query.xquery.path;
 import static org.basex.query.xquery.XQText.*;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.iter.Iter;
@@ -23,7 +22,7 @@ public final class SimpleIterStep extends Step {
    * @param t node test
    */
   public SimpleIterStep(final Axis a, final Test t) {
-    super(a, t, new Expr[] {});
+    super(a, t);
   }
   
   @Override

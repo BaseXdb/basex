@@ -23,8 +23,8 @@ public final class FTUnion extends FTArrayExpr {
    * Constructor.
    * @param e operands joined with the union operator
    */
-  public FTUnion(final FTArrayExpr[] e) {
-    exprs = e;
+  public FTUnion(final FTArrayExpr... e) {
+    super(e);
   }
 
   /**
@@ -33,7 +33,7 @@ public final class FTUnion extends FTArrayExpr {
    * @param posex pointer on expressions with positive values
    */
   public FTUnion(final FTArrayExpr[] e, final int[] posex) {
-    exprs = e;
+    this(e);
     pex = posex;
     mp = new boolean[pex.length];
     cp = new IntList(pex);

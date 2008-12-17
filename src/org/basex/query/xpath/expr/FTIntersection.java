@@ -29,7 +29,7 @@ public final class FTIntersection extends FTArrayExpr {
    */
   public FTIntersection(final FTArrayExpr[] e, final int[] pexpr, 
       final int[] nexpr) {
-    exprs = e;
+    super(e);
     pex = pexpr;
     nex = nexpr;
   }

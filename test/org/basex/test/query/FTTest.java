@@ -67,9 +67,9 @@ public final class FTTest extends AbstractTest {
 
     queries = new Object[][] {
         {"FTWildCard 7", nodes(14),
-    "/fttest/wc/w [text() ftcontains '.*' with wildcards]" },
-  { "FTWildCard 8", nodes(14),
-    "/fttest/wc/w [text() ftcontains '.+' with wildcards]" },
+          "/fttest/wc/w [text() ftcontains '.*' with wildcards]" },
+        { "FTWildCard 8", nodes(14),
+          "/fttest/wc/w [text() ftcontains '.+' with wildcards]" },
         
         { "Simple 1", bool(true),
           "'abc' ftcontains 'abc'" },
@@ -92,11 +92,6 @@ public final class FTTest extends AbstractTest {
         { "Simple 10", bool(true),
           "false() ftcontains 'false'" },
           
-        { "Preds 1", nodes(7, 9, 11),
-          "//w[text() ftcontains 'xml'][text() ftcontains 'Databases']" },
-        { "Preds 2", nodes(7),
-          "//w[text()[. ftcontains 'have xml'] ftcontains 'Databases']" },
-        
         { "FT 1", nodes(14),
           "//w[text() ftcontains 'HELLO']" },
         { "FT 2", nodes(14),
@@ -126,7 +121,15 @@ public final class FTTest extends AbstractTest {
           "//*[text() ftcontains 'have'][text() ftcontains 'xml']" },
         { "Preds 6", nodes(13),
           "//*[*/text() ftcontains 'hello'][*/text() = 'hello']" },
-
+        { "Preds 7", nodes(7),
+          "//w[text()[. ftcontains 'have xml'] ftcontains 'Databases']" },
+        { "Preds 8", nodes(5),
+          "/descendant::w[text() ftcontains 'xml'][2]" },
+        { "Preds 9", nodes(3),
+          "//w[text() ftcontains 'xml'][1]" },
+        { "Preds 10", nodes(5),
+          "//w[text() ftcontains 'xml'][2]" },
+          
         { "AndOr 1", nodes(7, 9, 11),
           "//w[text() ftcontains 'xml' and text() ftcontains 'databases']" },
         { "AndOr 2", nodes(2),
@@ -199,7 +202,6 @@ public final class FTTest extends AbstractTest {
           "/fttest/wld [text() ftcontains '.*' with wildcards]" },
         { "FTWildCard 12", nodes(40),
           "/fttest/wld [text() ftcontains '.+' with wildcards]" },
-  
           
         { "FTAnyAllOption 1", nodes(3, 5, 7, 9, 11),
           "/fttest/co/w [text() ftcontains 'xml' any]" },
