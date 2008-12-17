@@ -46,7 +46,7 @@ public final class ExprList {
     boolean s = false;
     if(v instanceof PredSimple && ((PredSimple) v).expr instanceof FTContains) {
       final FTContains ft = (FTContains) ((PredSimple) v).expr;
-      s = ft.cont instanceof LocPath ? ((LocPath) ft.cont).singlePath(ctx) : s;
+      if(ft.cont instanceof LocPath) s = ((LocPath) ft.cont).singlePath(ctx);
       if(s) {
         for(int i = 0; i < size; i++) {
           if(!su[i]) continue;
@@ -82,7 +82,7 @@ public final class ExprList {
     boolean s = false;
     if(v instanceof FTContains) {
       final FTContains ft = (FTContains) v;
-      s = ft.cont instanceof LocPath ? ((LocPath) ft.cont).singlePath(ctx) : s;
+      if(ft.cont instanceof LocPath) s = ((LocPath) ft.cont).singlePath(ctx);
       if(s) {
         for(int i = 0; i < size; i++) {
           if(!su[i]) continue;

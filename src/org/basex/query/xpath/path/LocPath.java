@@ -12,7 +12,6 @@ import org.basex.query.xpath.expr.FTContains;
 import org.basex.query.xpath.expr.Filter;
 import org.basex.query.xpath.expr.InterSect;
 import org.basex.query.xpath.expr.Path;
-import org.basex.query.xpath.internal.IndexMatch;
 import org.basex.query.xpath.item.Comp;
 import org.basex.query.xpath.item.Nod;
 import org.basex.query.xpath.item.Str;
@@ -53,9 +52,10 @@ public abstract class LocPath extends Expr {
     // merge descendant and child steps
     steps.mergeDescendant(ctx);
 
+    // skip relative location paths
     if(this instanceof LocPathRel) return this;
     
-    // ignore paths with position predicates
+    // skip paths with position predicates
     for(int i = 0; i < steps.size(); i++) {
       final Preds preds = steps.get(i).preds;
       for(int p = 0; p < preds.size(); p++) {
@@ -70,9 +70,6 @@ public abstract class LocPath extends Expr {
     for(int i = 0; i < steps.size(); i++) {
       final Step step = steps.get(i);
       final Preds preds = step.preds;
-
-      // don't optimize non-invertible axes
-      if(step.axis.invert() == null) continue;
 
       // find predicate with lowest number of occurrences
       boolean pos = false;
@@ -112,60 +109,46 @@ public abstract class LocPath extends Expr {
       Expr indexArg = null;
 
       for(int p = 0; p < preds.size(); p++) {
-        final Pred pred = preds.get(p);
-
         if(seq || p == minP && indexArg == null) {
           oldPreds.add(p);
-          indexArg = pred.indexEquivalent(ctx, step, seq);
+          indexArg = preds.get(p).indexEquivalent(ctx, step, seq);
         }
       }
-
-      if (seq) continue;
+      if(seq) continue;
 
       // hold all steps following this step
       final LocPath oldPath = new LocPathRel();
       for(final int j = i + 1; j < steps.size();) {
-        final Step oldStep = steps.get(j);
-        steps.remove(j);
-        oldPath.steps.add(oldStep);
+        oldPath.steps.add(steps.remove(j));
       }
 
       // hold the part of the path we want to invert.
       // suggestion: all forward steps without predicates in front of the index
-      final LocPath invPath = new LocPathRel();
+      final LocPath inv = new LocPathRel();
 
-      boolean indexMatch = true;
       for(int j = i; j >= 0; j--) {
-        final Step curr = steps.get(j);
-        final Axis axis = curr.axis.invert();
-        if(axis == null) break;
+        final Axis a = steps.get(j).axis.invert();
+        if(a == null) break;
 
         if(j == 0) {
-          if(this instanceof LocPathRel || axis == Axis.PARENT) {
-            invPath.steps.add(Axis.create(axis, TestNode.NODE));
-          } else {
-            indexMatch = false;
-          }
+          if(a == Axis.PARENT) inv.steps.add(Axis.create(a, TestNode.DOC));
         } else {
           final Step prev = steps.get(j - 1);
           if(prev.preds.size() != 0) break;
-          invPath.steps.add(Axis.create(axis, prev.test));
+          inv.steps.add(Axis.create(a, prev.test));
         }
         steps.remove(j);
       }
 
-      int predlength = preds.size() - oldPreds.size;
-      if(indexMatch || invPath.steps.size() != 0) predlength += 1;
-
       final Preds newPreds = new Preds();
-      if(!indexMatch && invPath.steps.size() != 0) newPreds.add(invPath);
+      if(inv.steps.size() != 0) newPreds.add(inv);
 
       for(int p = 0; p != step.preds.size(); p++) {
         if(!oldPreds.contains(p)) {
           final Pred pred = step.preds.get(p);
-          if (pred instanceof PredSimple) {
+          if(pred instanceof PredSimple) {
             final Expr e = ((PredSimple) pred).expr;
-            if (e instanceof FTContains) {
+            if(e instanceof FTContains) {
               // curr = null indicates that there should be no path inverting
               ((PredSimple) pred).expr = e.indexEquivalent(ctx, null, true);
             }
@@ -177,9 +160,6 @@ public abstract class LocPath extends Expr {
 
       // add rest of predicates
       if(newPreds.size() != 0) result = new Filter(result, newPreds).comp(ctx);
-
-      // add match with initial nodes
-      if(indexMatch) result = new IndexMatch(this, result, invPath);
 
       // add rest of location path
       if(oldPath.steps.size() != 0) result = new Path(result, oldPath);
@@ -295,7 +275,9 @@ public abstract class LocPath extends Expr {
           final TestName tn = (TestName) s.test;
           if(data.skel.desc(tn.name, false, false).size != 0) return false;
           else f = true;
-        } else if(s.test == TestNode.TEXT) return f;
+        } else if(s.test == TestNode.TEXT) {
+          return f;
+        }
       } else return false;
     }
     return false;

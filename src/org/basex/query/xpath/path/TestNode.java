@@ -24,6 +24,19 @@ public abstract class TestNode extends Test {
     }
   };
 
+  /** doc() kind. */
+  public static final TestNode DOC = new TestNode() {
+    @Override
+    public boolean eval(final Data data, final int pre, final int kind) {
+      return kind == Data.DOC;
+    }
+
+    @Override
+    public String toString() {
+      return QueryTokens.DOC + "()";
+    }
+  };
+
   /** text() kind. */
   public static final TestNode TEXT = new TestNode() {
     @Override

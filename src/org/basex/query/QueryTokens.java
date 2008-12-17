@@ -34,6 +34,8 @@ public interface QueryTokens {
   String DIFFERENT = "different";
   /** Parser token. */
   String DISTANCE = "distance";
+  /** Parser token. */ 
+  String DOC = "doc";
   /** Parser token. */
   String END = "end";
   /** Parser token. */

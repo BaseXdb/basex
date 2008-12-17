@@ -73,7 +73,7 @@ public final class Skeleton {
    * @param n name reference
    * @param l current level
    * @param k node kind
-   * @param tl length of text in bytes (0) for nontext nodes
+   * @param tl length of text in bytes (0 for non-text nodes)
    */
   public void add(final int n, final int l, final byte k, final int tl) {
     if(root == null) {
@@ -81,13 +81,9 @@ public final class Skeleton {
       stack[0] = root;
     } else {
       stack[l] = stack[l - 1].get(n, k, tl);
-      if (k == Data.TEXT) {
-        root.tl += tl;
-      }
-      
+      root.tl += tl;
     }
   }
-
   
   /**
    * Finishes the structure.
@@ -100,7 +96,7 @@ public final class Skeleton {
   }
 
   /**
-   * Return descendant tags and attributes for the specified start key.
+   * Returns descendant tags and attributes for the specified start key.
    * @param k input key
    * @param d if false, return only children
    * @param o true/false: sort by occurrence/lexicographically
@@ -137,7 +133,7 @@ public final class Skeleton {
   }
   
   /**
-   * Return descendant tags and attributes for the specified descendant path.
+   * Returns descendant tags and attributes for the specified descendant path.
    * @param in input steps
    * @param d if false, return only children
    * @param o true/false: sort by occurrence/lexicographically
@@ -216,10 +212,7 @@ public final class Skeleton {
      * @param k node kind
      */
     Node(final int t, final byte k) {
-      ch = new Node[0];
-      count = 1;
-      name = (short) t;
-      kind = k;
+      this(t, k, 0);
     }
 
     /**
@@ -280,7 +273,6 @@ public final class Skeleton {
       return n;
     }
 
-    
     /**
      * Finishes the tree structure.
      * @param out output stream
@@ -292,7 +284,6 @@ public final class Skeleton {
       out.writeNum(count);
       out.writeNum(ch.length);
       out.writeNum(tl);
-      
       for(final Node c : ch) c.finish(out);
     }
 
@@ -302,8 +293,7 @@ public final class Skeleton {
      */
     public void desc(final ArrayList<Node> nodes) {
       nodes.add(this);
-      for(final Node n : ch)
-        n.desc(nodes);
+      for(final Node n : ch) n.desc(nodes);
     }
 
     /**
@@ -324,7 +314,7 @@ public final class Skeleton {
 
     @Override
     public String toString() {
-      return "Node[" + kind + ", " + name + ", " + ch.length 
+      return "Node[" + kind + ", " + name + ", " + ch.length
         + " Children, " + tl + "]";
     }
   }

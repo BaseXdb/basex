@@ -77,9 +77,12 @@ public final class Steps {
   /**
    * Removes the specified step.
    * @param s step index
+   * @return removed step
    */
-  public void remove(final int s) {
+  public Step remove(final int s) {
+    final Step st = steps[s];
     Array.move(steps, s + 1, -1, --size - s);
+    return st;
   }
   
   /**

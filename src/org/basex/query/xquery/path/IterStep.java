@@ -22,6 +22,7 @@ public final class IterStep extends Step {
   boolean lastFlag;
   /** Flag is set to true if predicate has a numeric value. */
   boolean numFlag;
+
   /**
    * Constructor.
    * @param a axis
@@ -36,7 +37,6 @@ public final class IterStep extends Step {
     lastFlag = last;
     numFlag = num;
   }
-  
 
   @Override
   public NodeIter iter(final XQContext ctx) throws XQException {
@@ -85,7 +85,6 @@ public final class IterStep extends Step {
 
               ctx.item = nod;
               final Item i = ctx.iter(pred[0]).ebv();
-              
               if(i.n() ? i.dbl() == ctx.pos : i.bool()) {
                 // assign score value
                 nod.score(i.score());

@@ -210,8 +210,7 @@ public final class FTContains extends Expr {
   public int indexSizes(final XPContext ctx, final Step curr, final int min) {
     // check if first expression is a location path and if fulltext index exists
     final MetaData meta = ctx.item.data.meta;
-    if(!(cont instanceof LocPathRel && meta.ftxindex && !meta.ftst))
-      return Integer.MAX_VALUE;
+    if(!(cont instanceof LocPathRel && meta.ftxindex)) return Integer.MAX_VALUE;
 
     // check if index can be applied
     final LocPath path = (LocPathRel) cont;
@@ -236,10 +235,10 @@ public final class FTContains extends Expr {
     System.out.println("avgT=" + avgT + " ld=" + ld);
     */
     if(!meta.ftoptpreds && nrIDs > min) {
-        // only one ftcontains predicate should use the index
-        iu = false;
-        ctx.iu = false;
-        return min;
+      // only one ftcontains predicate should use the index
+      iu = false;
+      ctx.iu = false;
+      return min;
     }
 
     iut = ctx.iu;

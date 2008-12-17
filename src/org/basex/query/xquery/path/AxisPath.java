@@ -140,8 +140,6 @@ public class AxisPath extends Path {
         // do not invert path
         stp.pred[minp] = ie;
       } else {
-        // invert Path - can be safely cast
-        final AxisPath res = (AxisPath) ie; 
         Step[] inv = {};
         
         // add remaining predicates
@@ -157,9 +155,7 @@ public class AxisPath extends Path {
           if(a == null) break;
           
           if(j == 0) {
-            //if(a == Axis.PARENT) inv = Array.add(inv, Step.get(a, Test.NODE));
-            if(a == Axis.PARENT) 
-              inv = Array.add(inv, Step.get(a, Test.ROOTNODE));
+            if(a == Axis.PARENT) inv = Array.add(inv, Step.get(a, Test.DOC));
           } else {
             final Step prev = step[j - 1];
             if(prev.pred.length != 0) break;
@@ -168,6 +164,9 @@ public class AxisPath extends Path {
         }
 
         // add predicates to check remaining path
+        // invert Path - can be safely cast
+        final AxisPath res = (AxisPath) ie; 
+        
         if(inv.length != 0) {
           res.step[res.step.length - 1].addPred(new AxisPath(null, inv));
         }

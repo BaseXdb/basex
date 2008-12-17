@@ -34,15 +34,15 @@ public abstract class Test {
     }
   };
 
-  /** Static node test. */
-  public static final Test ROOTNODE = new Test() {
+  /** Static document node test. */
+  public static final Test DOC = new Test() {
     @Override
     public boolean e(final Nod tmp) {
-      return tmp.parent() == null;
+      return tmp.type == Type.DOC;
     }
     @Override
     public String toString() {
-      return "root()";
+      return "doc()";
     }
   };
 
