@@ -160,7 +160,7 @@ public abstract class LocPath extends Expr {
               ((PredSimple) pred).expr = e.indexEquivalent(ctx, null, true);
             }
             newPreds.add(pred);
-          } else if (pred instanceof PredPos && invPath.steps.size() > 0) {
+         } else if (pred instanceof PredPos && invPath.steps.size() > 0) {
             invPath.steps.get(invPath.steps.size() - 1).
               addPosPred((PredPos) pred);
           } else {
@@ -295,6 +295,27 @@ public abstract class LocPath extends Expr {
       } else return false;
     }
     return false;
+  }
+  
+  /**
+   * Get average text length for this path.
+   * @param ctx current context
+   * @return avg text legnth
+   */
+  public double avgTextLength(final XPContext ctx) {
+    if (steps.size() == 1 && steps.get(0).test == TestNode.TEXT)
+      return ctx.item.data.skel.tl(null);
+    else if (steps.size() == 2) {
+      Step s = steps.get(0);
+      double avg = -1;
+      if (s instanceof StepChild && s.test instanceof TestName) {
+          TestName tn = (TestName) s.test;
+          avg = ctx.item.data.skel.tl(tn.name); 
+      } 
+      s = steps.get(1);
+      if (s.test == TestNode.TEXT) return avg;      
+    }
+    return -1;
   }
   
   @Override

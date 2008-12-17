@@ -65,14 +65,30 @@ public final class Skeleton {
    * @param k node kind
    */
   public void add(final int n, final int l, final byte k) {
+    add(n, l, k, 0);
+  }
+
+  /**
+   * Opens an element.
+   * @param n name reference
+   * @param l current level
+   * @param k node kind
+   * @param tl length of text in bytes (0) for nontext nodes
+   */
+  public void add(final int n, final int l, final byte k, final int tl) {
     if(root == null) {
       root = new Node(n, k);
       stack[0] = root;
     } else {
-      stack[l] = stack[l - 1].get(n, k);
+      stack[l] = stack[l - 1].get(n, k, tl);
+      if (k == Data.TEXT) {
+        root.tl += tl;
+      }
+      
     }
   }
 
+  
   /**
    * Finishes the structure.
    * @param out output stream
@@ -96,6 +112,30 @@ public final class Skeleton {
     return desc(tl, d, o);
   }
 
+  /**
+   * Returns avg. textlength of a textnode in bytes.
+   * @param k tag element
+   * @return avg. textlength of a textnode in bytes
+   */
+  public double tl(final byte[] k) {
+    // return tl of document
+    if (k == null) return root.tl / root.count;
+    // follow the specified descendant/child steps
+    ArrayList<Node> n = new ArrayList<Node>();
+    n.add(root);
+    n = desc(n, 0, Data.DOC, true);
+    
+    final int id = data.tagID(k);
+    n = desc(n, id, Data.ELEM, false);
+    double avg = 0;
+    int c = 0;
+    for(final Node r : n) if (r.kind == Data.TEXT) {
+      avg += r.tl / r.count;
+      c++;
+    }
+    return avg / c;
+  }
+  
   /**
    * Return descendant tags and attributes for the specified descendant path.
    * @param in input steps
@@ -167,6 +207,8 @@ public final class Skeleton {
     public int count;
     /** Children. */
     public Node[] ch;
+    /** Length of text. */
+    public int tl;
 
     /**
      * Default Constructor.
@@ -181,6 +223,20 @@ public final class Skeleton {
     }
 
     /**
+     * Default Constructor.
+     * @param t tag
+     * @param k node kind
+     * @param l text length
+     */
+    Node(final int t, final byte k, final int l) {
+      ch = new Node[0];
+      count = 1;
+      name = (short) t;
+      kind = k;
+      tl = l;
+    }
+
+    /**
      * Constructor, specifying an input stream.
      * @param in input stream
      * @throws IOException I/O exception
@@ -190,6 +246,7 @@ public final class Skeleton {
       kind = in.readByte();
       count = in.readNum();
       ch = new Node[in.readNum()];
+      tl = in.readNum();
       for(int i = 0; i < ch.length; i++) ch[i] = new Node(in);
     }
 
@@ -200,17 +257,30 @@ public final class Skeleton {
      * @return node reference
      */
     Node get(final int t, final byte k) {
+      return get(t, k, 0);
+    }
+
+    /**
+     * Returns a node reference for the specified tag.
+     * @param t tag
+     * @param k node kind
+     * @param l text length
+     * @return node reference
+     */
+    Node get(final int t, final byte k, final int l) {
       for(final Node c : ch) {
         if(c.kind == k && c.name == t) {
           c.count++;
+          c.tl += l; 
           return c;
         }
       }
-      final Node n = new Node(t, k);
+      final Node n = new Node(t, k, l);
       ch = Array.add(ch, n);
       return n;
     }
 
+    
     /**
      * Finishes the tree structure.
      * @param out output stream
@@ -221,6 +291,8 @@ public final class Skeleton {
       out.write1(kind);
       out.writeNum(count);
       out.writeNum(ch.length);
+      out.writeNum(tl);
+      
       for(final Node c : ch) c.finish(out);
     }
 
@@ -252,7 +324,8 @@ public final class Skeleton {
 
     @Override
     public String toString() {
-      return "Node[" + kind + ", " + name + ", " + ch.length + " Children]";
+      return "Node[" + kind + ", " + name + ", " + ch.length 
+        + " Children, " + tl + "]";
     }
   }
 }
