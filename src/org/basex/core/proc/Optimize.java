@@ -41,7 +41,6 @@ public final class Optimize extends ACreate {
    */
   private boolean stats(final Data data) {
     // refresh statistics
-    data.meta.newindex = false;
     data.skel.init();
     data.tags.init();
     data.atts.init();
@@ -59,14 +58,14 @@ public final class Optimize extends ACreate {
 
       if(kind == Data.ELEM) {
         final int id = data.tagID(pre);
-        data.tags.index(data.tags.key(id), null);
+        data.tags.index(data.tags.key(id), null, true);
         tagStack[l] = id;
         parStack[l] = pre;
         if(h < ++l) h = l;
         data.skel.add(id, l, kind);
       } else if(kind == Data.ATTR) {
         final int id = data.attNameID(pre);
-        data.atts.index(data.atts.key(id), data.attValue(pre));
+        data.atts.index(data.atts.key(id), data.attValue(pre), true);
         data.skel.add(id, l + 1, kind);
       } else if(kind == Data.TEXT || kind == Data.DOC) {
         if(l > 0) data.tags.index(tagStack[l - 1], data.text(pre));
@@ -74,6 +73,7 @@ public final class Optimize extends ACreate {
       }
     }
     data.meta.height = h;
+    data.meta.uptodate = true;
 
     try {
       index(data);

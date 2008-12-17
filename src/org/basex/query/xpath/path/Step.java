@@ -52,14 +52,14 @@ public abstract class Step extends ExprInfo {
 
     // choose the evaluation plan
     if(simple) {
-      for(int n : nodes) eval(data, n, result);
+      for(final int n : nodes) eval(data, n, result);
     } else if(posPred != 0) {
-      for(int n : nodes) pos(ctx, data, n);
+      for(final int n : nodes) pos(ctx, data, n);
     } else if(early) {
-      for(int n : nodes) early(ctx, data, n);
+      for(final int n : nodes) early(ctx, data, n);
     } else {
       tmp.reset();
-      for(int n : nodes) {
+      for(final int n : nodes) {
         eval(data, n, tmp);
         preds.eval(ctx, tmp, result);
       }
@@ -68,7 +68,7 @@ public abstract class Step extends ExprInfo {
   }
 
   /**
-   * Standard evaluation which does not skips predicate evaluation.
+   * Standard evaluation with predicate evaluation.
    * @param d data reference
    * @param p pre value
    * @param t node set
@@ -111,9 +111,9 @@ public abstract class Step extends ExprInfo {
     if(test instanceof TestName) {
       final TestName t = (TestName) test;
       ctx.leaf = axis != Axis.ATTR && axis != Axis.SELF && t.id >= 0 &&
-        data.tags.uptodate && !data.tags.noLeaf(t.id);
+        data.meta.uptodate && !data.tags.noLeaf(t.id);
     }
-    boolean pred = preds.compile(ctx);
+    final boolean pred = preds.compile(ctx);
     ctx.leaf = false;
     if(!pred) return false;
 

@@ -1,6 +1,7 @@
 package org.basex.gui.dialog;
 
 import static org.basex.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -38,6 +39,8 @@ public final class DialogInfo extends Dialog {
   private BaseXLabel[] fl = new BaseXLabel[4];
   /** Editable fulltext options. */
   private boolean ftedit;
+  /** Button panel. */
+  private BaseXBack buttons;
   /** Optimize flag. */
   public boolean opt;
 
@@ -138,9 +141,10 @@ public final class DialogInfo extends Dialog {
 
     set(tabs, BorderLayout.CENTER);
 
-    set(BaseXLayout.newButtons(this, true,
+    buttons = BaseXLayout.newButtons(this, true,
         new String[] { BUTTONOPT, BUTTONOK, BUTTONCANCEL },
-        new byte[][] { HELPOPT, HELPOK, HELPCANCEL }), BorderLayout.SOUTH);
+        new byte[][] { HELPOPT, HELPOK, HELPCANCEL });
+    set(buttons, BorderLayout.SOUTH);
 
     action(null);
     setResizable(true);
@@ -158,7 +162,7 @@ public final class DialogInfo extends Dialog {
     final BaseXBack p = new BaseXBack();
     p.setLayout(new BorderLayout());
     String lbl = tag ? INFOTAGINDEX : INFOATNINDEX;
-    if(!data.tags.uptodate) lbl += " (" + INFOOUTOFDATED + ")";
+    if(!data.meta.uptodate) lbl += " (" + INFOOUTOFDATED + ")";
     p.add(new BaseXLabel(lbl, false, true), BorderLayout.NORTH);
     final Type index = tag ? IndexToken.Type.TAG : IndexToken.Type.ATN;
     p.add(text(data.info(index)), BorderLayout.CENTER);
@@ -196,12 +200,15 @@ public final class DialogInfo extends Dialog {
       opt = true;
       close();
     }
-    if(!ftedit) return;
-    final boolean ftx = indexes[2].isSelected();
-    for(int f = 0; f < ft.length; f++) {
-      ft[f].setEnabled(ftx);
-      fl[f].setEnabled(ftx);
+    if(ftedit) {
+      final boolean ftx = indexes[2].isSelected();
+      for(int f = 0; f < ft.length; f++) {
+        ft[f].setEnabled(ftx);
+        fl[f].setEnabled(ftx);
+      }
     }
+    final Data data = GUI.context.data();
+    BaseXLayout.enableOK(buttons, BUTTONOPT, !data.meta.uptodate);
   }
 
   @Override

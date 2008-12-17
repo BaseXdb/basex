@@ -100,7 +100,7 @@ public final class DialogOpen extends Dialog {
     pp.add(p, BorderLayout.SOUTH);
 
     set(pp, BorderLayout.EAST);
-    setInfo();
+    action(null);
     finish(parent);
   }
 
@@ -139,7 +139,9 @@ public final class DialogOpen extends Dialog {
       }
     } else {
       ok = setInfo();
-      BaseXLayout.enableOK(buttons, ok);
+      BaseXLayout.enableOK(buttons, BUTTONOPEN, ok);
+      BaseXLayout.enableOK(buttons, BUTTONRENAME, ok);
+      BaseXLayout.enableOK(buttons, BUTTONDROP, ok);
     }
   }
 
@@ -152,7 +154,7 @@ public final class DialogOpen extends Dialog {
    * Refreshes the database information panel.
    * @return true if the current choice is valid. 
    */
-  boolean setInfo() {
+  private boolean setInfo() {
     final String db = choice.getValue().trim();
     if(db.length() == 0) return false;
 
@@ -172,7 +174,6 @@ public final class DialogOpen extends Dialog {
       detail.setText(Token.token(ex.getMessage()));
       ok = false;
     }
-    BaseXLayout.enableOK(buttons, ok);
     return ok;
   }
 }

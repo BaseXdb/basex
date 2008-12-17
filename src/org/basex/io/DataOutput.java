@@ -92,7 +92,7 @@ public final class DataOutput extends OutputStream {
    * @param array array to be written
    * @throws IOException in case of write errors
    */
-  public void writeBooleans(final boolean[] array) throws IOException {
+  public void writeBools(final boolean[] array) throws IOException {
     writeNum(array.length);
     for(final boolean a : array) writeBool(a);
   }

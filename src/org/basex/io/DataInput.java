@@ -79,7 +79,7 @@ public final class DataInput extends BufferInput {
    * @return boolean array
    * @throws IOException IO Exception
    */
-  public boolean[] readBooleans() throws IOException {
+  public boolean[] readBools() throws IOException {
     final int l = readNum();
     final boolean[] array = new boolean[l];
     for(int i = 0; i < l; i++) array[i] = readBool();

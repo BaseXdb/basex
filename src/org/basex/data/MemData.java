@@ -257,8 +257,6 @@ public final class MemData extends Data {
    * @param val value to be stored
    */
   public void setAttValue(final int pre, final byte[] val) {
-//    int i = attIndex(val);
-//    System.out.println(Token.string(((MemValues) atvindex).token(i)));
     val1[pre] = val1[pre] & 0xFFFFFF0000000000L | attIndex(val);
   }
 

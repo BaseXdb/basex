@@ -37,7 +37,7 @@ public final class XQOptimizer {
     /* [SG] should be revised; not all necessary tests are included,
      *   ctx.item can refer to another database, ... */
     if(step.axis.down && step.test.kind != Test.Kind.NAME &&
-        step.test.type != Type.TXT && ((DBNode) ctx.item).data.tags.uptodate) {
+        step.test.type != Type.TXT && ((DBNode) ctx.item).data.meta.uptodate) {
 
       final Step s = Step.get(Axis.CHILD, new KindTest(Type.TXT));
       return new AxisPath(ex, new Step[] { s });

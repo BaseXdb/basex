@@ -230,10 +230,12 @@ public final class FTContains extends Expr {
 
     // Integer.MAX_VALUE is returned if an ftnot does not occur after an ftand
     final int nrIDs = query.indexSizes(ctx, curr, min);
+    /*
     final double avgT = path.avgTextLength(ctx);
     final double ld = ctx.item.data.skel.tl(null);
     System.out.println("avgT=" + avgT + " ld=" + ld);
-    if (!meta.ftoptpreds && nrIDs > min) {
+    */
+    if(!meta.ftoptpreds && nrIDs > min) {
         // only one ftcontains predicate should use the index
         iu = false;
         ctx.iu = false;

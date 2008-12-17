@@ -41,8 +41,7 @@ public final class RangeAccess extends InternalExpr {
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.emptyElement(this, TYPE, Token.token(ind.type.toString()),
-        Token.token(MIN), Token.token(ind.min),
-        Token.token(MAX), Token.token(ind.max));
+        MIN, Token.token(ind.min), MAX, Token.token(ind.max));
   }
 
   @Override

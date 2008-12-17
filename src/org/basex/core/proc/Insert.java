@@ -91,7 +91,7 @@ public final class Insert extends AUpdate {
     }
 
     // perform updates
-    data.update();
+    data.meta.update();
     for(int i = nodes.size - 1; i >= 0; i--) {
       final int par = nodes.nodes[i];
       data.insert(par + data.attSize(par, data.kind(par)), par, n, v);
@@ -127,7 +127,7 @@ public final class Insert extends AUpdate {
     }*/
 
     // insert temporary instance of document
-    data.update();
+    data.meta.update();
     for(int i = nodes.size - 1; i >= 0; i--) {
       final int par = nodes.nodes[i];
       data.insert(pre(par, pos, data), par, tmp);
@@ -163,7 +163,7 @@ public final class Insert extends AUpdate {
     }
 
     // perform updates
-    data.update();
+    data.meta.update();
     for(int i = nodes.size - 1; i >= 0; i--) {
       final int par = nodes.nodes[i];
       final int pre = pre(par, pos, data);

@@ -53,6 +53,16 @@ public abstract class LocPath extends Expr {
     // merge descendant and child steps
     steps.mergeDescendant(ctx);
 
+    if(this instanceof LocPathRel) return this;
+    
+    // ignore paths with position predicates
+    for(int i = 0; i < steps.size(); i++) {
+      final Preds preds = steps.get(i).preds;
+      for(int p = 0; p < preds.size(); p++) {
+        if(preds.get(p) instanceof PredPos) return this;
+      }
+    }
+    
     // check if the available indexes can be applied
     Expr result = this;
 
@@ -152,28 +162,21 @@ public abstract class LocPath extends Expr {
 
       for(int p = 0; p != step.preds.size(); p++) {
         if(!oldPreds.contains(p)) {
-          Pred pred = step.preds.get(p);
+          final Pred pred = step.preds.get(p);
           if (pred instanceof PredSimple) {
-            Expr e = ((PredSimple) pred).expr;
+            final Expr e = ((PredSimple) pred).expr;
             if (e instanceof FTContains) {
               // curr = null indicates that there should be no path inverting
               ((PredSimple) pred).expr = e.indexEquivalent(ctx, null, true);
             }
-            newPreds.add(pred);
-         } else if (pred instanceof PredPos && invPath.steps.size() > 0) {
-            invPath.steps.get(invPath.steps.size() - 1).
-              addPosPred((PredPos) pred);
-          } else {
-            newPreds.add(pred);
           }
-          
+          newPreds.add(pred);
         }
       }
       result = new InterSect(indexArg).comp(ctx);
 
       // add rest of predicates
-      if(newPreds.size() != 0) result =
-        new Filter(result, newPreds).comp(ctx);
+      if(newPreds.size() != 0) result = new Filter(result, newPreds).comp(ctx);
 
       // add match with initial nodes
       if(indexMatch) result = new IndexMatch(this, result, invPath);
@@ -281,17 +284,18 @@ public abstract class LocPath extends Expr {
    * @return boolean 
    */
   public boolean singlePath(final XPContext ctx) {
+    final Data data = ctx.item.data;
+    if(!data.meta.uptodate) return false;
+    
     boolean f = false;
-    for (int i = 0; i < steps.size(); i++) {
+    for(int i = 0; i < steps.size(); i++) {
       final Step s = steps.get(i);
-      
-      if (s instanceof StepChild) {
-        if (s.test instanceof TestName) {
-          TestName tn = (TestName) s.test;
-          if (ctx.item.data.skel.desc(tn.name, false, false).size != 0) 
-            return false;
+      if(s instanceof StepChild) {
+        if(s.test instanceof TestName) {
+          final TestName tn = (TestName) s.test;
+          if(data.skel.desc(tn.name, false, false).size != 0) return false;
           else f = true;
-        } else if (s.test == TestNode.TEXT) return f;
+        } else if(s.test == TestNode.TEXT) return f;
       } else return false;
     }
     return false;

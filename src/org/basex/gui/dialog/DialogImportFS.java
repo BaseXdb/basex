@@ -210,7 +210,7 @@ public final class DialogImportFS  extends Dialog {
     final boolean err = inf.trim().length() != 0;
     info.setText(inf);
     info.setIcon(err ? img != null ? img : GUI.icon("error") : null);
-    BaseXLayout.enableOK(buttons, ok);
+    BaseXLayout.enableOK(buttons, BUTTONOK, ok);
   }
   
   @Override

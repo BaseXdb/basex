@@ -85,22 +85,22 @@ public final class BaseXLayout {
   }
 
   /**
-   * Enables/disables the OK button in the specified panel.
+   * Enables/disables a button in the specified panel.
    * @param panel button panel
+   * @param label button label
    * @param enabled enabled/disabled
    */
-  public static void enableOK(final JComponent panel, final boolean enabled) {
+  public static void enableOK(final JComponent panel, final String label,
+      final boolean enabled) {
     final Component[] jc = panel.getComponents();
     for(final Component c : jc) {
       if(!(c instanceof JComponent)) {
         continue;
       } else if(!(c instanceof BaseXButton)) {
-        enableOK((JComponent) c, enabled);
+        enableOK((JComponent) c, label, enabled);
       } else {
         final BaseXButton b = (BaseXButton) c;
-        final String text = b.getText();
-        if(!text.equals(BUTTONCANCEL) && !text.equals(BUTTONDROP))
-          enable(b, enabled);
+        if(b.getText().equals(label)) enable(b, enabled);
       }
     }
   }

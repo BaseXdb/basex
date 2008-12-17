@@ -65,9 +65,7 @@ abstract class AQuery extends Process {
       // convert query Nod to visualization node set
       if(result instanceof Nod) {
         final Nod ns = (Nod) result;
-        final Nodes nodes = new Nodes(ns.nodes, ns.data);
-        //nodes.setFTData(ns.ftidpos, ns.ftpointer);
-        result = nodes;
+        result = new Nodes(ns.nodes, ns.data);
       }
       // dump some query info
       if(Prop.info) {

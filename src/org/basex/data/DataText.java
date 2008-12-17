@@ -15,7 +15,7 @@ public interface DataText {
 
   /** Database version; if it's modified, old database instances can't
    * be parsed anymore. */
-  String STORAGE = "4.13";
+  String STORAGE = "5.01";
   /** Index version; if it's modified, old indexes can't
    * be parsed anymore. */
   String ISTORAGE = "3";
@@ -52,17 +52,17 @@ public interface DataText {
   String DBFTXINDEX = "FTXINDEX";
   /** Fuzzy indexing. */
   String DBFZINDEX = "FZINDEX";
-  /** Fuzzy indexing. */
-  String DBFCOMPRESS = "FCOMPRESS";
   /** Fulltext stemming. */
   String DBFTSTEM = "FTSTEM";
   /** Fulltext case sensitivity. */
   String DBFTCS = "FTCS";
   /** Fulltext diacritics removal. */
   String DBFTDC = "FTDC";
+  /** Up-to-date flag. */
+  String DBUPTODATE = "UPTODATE";
   /** Last (highest) id. */
   String DBLASTID = "LASTID";
-  
+
   // TAGS/ATTRIBUTE NAMES ====================================================
 
   /** DeepFS tag. */

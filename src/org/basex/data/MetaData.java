@@ -57,7 +57,7 @@ public final class MetaData {
   public boolean ftoptpreds = Prop.ftoptpreds;
 
   /** Flag for removed index structures. */
-  public boolean newindex;
+  public boolean uptodate = true;
   /** Last (highest) id assigned to a node. */
   public int lastid = -1;
 
@@ -108,7 +108,7 @@ public final class MetaData {
     txtindex = false;
     atvindex = false;
     ftxindex = false;
-    newindex = true;
+    uptodate = false;
   }
 
   /**
@@ -144,6 +144,7 @@ public final class MetaData {
       else if(k.equals(DBFTCS))     ftcs     = toBool(v);
       else if(k.equals(DBFTDC))     ftdc     = toBool(v);
       else if(k.equals(DBTIME))     time     = Token.toLong(v);
+      else if(k.equals(DBUPTODATE)) uptodate = toBool(v);
       else if(k.equals(DBLASTID))   lastid   = Token.toInt(v);
     }
 
@@ -172,11 +173,11 @@ public final class MetaData {
     writeInfo(out, DBSTORAGE,  STORAGE);
     writeInfo(out, IDBSTORAGE, ISTORAGE);
     writeInfo(out, DBFNAME,    file.path());
-    writeInfo(out, DBFSIZE,    Long.toString(filesize));
-    writeInfo(out, DBNDOCS,    Integer.toString(ndocs));
+    writeInfo(out, DBFSIZE,    filesize);
+    writeInfo(out, DBNDOCS,    ndocs);
     writeInfo(out, DBENCODING, encoding);
-    writeInfo(out, DBHEIGHT,   Integer.toString(height));
-    writeInfo(out, DBSIZE,     Integer.toString(siz));
+    writeInfo(out, DBHEIGHT,   height);
+    writeInfo(out, DBSIZE,     siz);
     writeInfo(out, DBCHOPPED,  chop);
     writeInfo(out, DBENTITY,   entity);
     writeInfo(out, DBTXTINDEX, txtindex);
@@ -186,13 +187,14 @@ public final class MetaData {
     writeInfo(out, DBFTSTEM,   ftst);
     writeInfo(out, DBFTCS,     ftcs);
     writeInfo(out, DBFTDC,     ftdc);
-    writeInfo(out, DBTIME,     Long.toString(time));
-    writeInfo(out, DBLASTID,   Integer.toString(lastid));
+    writeInfo(out, DBTIME,     time);
+    writeInfo(out, DBUPTODATE, uptodate);
+    writeInfo(out, DBLASTID,   lastid);
     out.writeString("");
   }
 
   /**
-   * Writes a single property.
+   * Writes a boolean property to the specified output.
    * @param out output stream
    * @param k key
    * @param prop property to write
@@ -200,12 +202,23 @@ public final class MetaData {
    */
   private void writeInfo(final DataOutput out, final String k,
       final boolean prop) throws IOException {
-    out.writeString(k);
-    out.writeString(prop ? "1" : "0");
+    writeInfo(out, k, prop ? "1" : "0");
   }
 
   /**
-   * Writes a single property.
+   * Writes a numeric property to the specified output.
+   * @param out output stream
+   * @param k key
+   * @param v value
+   * @throws IOException in case the info could not be written
+   */
+  private void writeInfo(final DataOutput out, final String k,
+      final long v) throws IOException {
+    writeInfo(out, k, Long.toString(v));
+  }
+
+  /**
+   * Writes a string property to the specified output.
    * @param out output stream
    * @param k key
    * @param v value

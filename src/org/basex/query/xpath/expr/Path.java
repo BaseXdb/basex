@@ -40,8 +40,6 @@ public final class Path extends Expr {
     final Nod local = ctx.item;
     ctx.item = (Nod) val;
     final Nod ns = (Nod) ctx.eval(path);
-    /*ns.ftidpos = ctx.local.ftidpos;
-    ns.ftpointer = ctx.local.ftpointer;*/
     ctx.item = local;
     return ns;
   }
@@ -59,6 +57,7 @@ public final class Path extends Expr {
   @Override
   public Expr comp(final XPContext ctx) throws QueryException {
     expr = expr.comp(ctx);
+    path = (LocPath) path.comp(ctx);
     return this;
   }
 

@@ -79,7 +79,7 @@ public final class Update extends AUpdate {
     }
     
     // perform updates
-    data.update();
+    data.meta.update();
     for(int i = nodes.size - 1; i >= 0; i--) data.update(nodes.nodes[i], n, v);
     return true;
   }
@@ -112,7 +112,7 @@ public final class Update extends AUpdate {
     }
     
     // perform updates
-    data.update();
+    data.meta.update();
     for(int i = nodes.size - 1; i >= 0; i--) data.update(nodes.nodes[i], v);
     return true;
   }

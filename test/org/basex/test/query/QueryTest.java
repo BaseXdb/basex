@@ -74,7 +74,7 @@ public final class QueryTest {
       Prop.ftst = false;
       Prop.ftdc = false;
       Prop.ftcs = false;
-      ok &= test(true);
+      ok &= test(false);
     }
 
     System.out.println(ok ? "All tests correct.\n" :
@@ -90,7 +90,7 @@ public final class QueryTest {
     boolean ok = true;
     
     for(final AbstractTest test : TESTS) {
-     if (test == TESTS[2]) 
+     //if (test == TESTS[2]) 
        ok &= test(xquery, test, test.details());
     }
     return ok;
@@ -106,8 +106,9 @@ public final class QueryTest {
   private boolean test(final boolean xquery, final AbstractTest test,
       final String ext) {
     boolean ok = true;
+    final String name = test.getClass().getSimpleName();
     final String file = test.doc.replaceAll("\\\"", "\\\\\"");
-    Process proc = new CreateDB(file);
+    Process proc = new CreateDB(file, name);
     if(!proc.execute(CONTEXT)) {
       err(proc.info(), null);
       wrong++;
@@ -145,9 +146,8 @@ public final class QueryTest {
       }
     }
 
-    final String db = CONTEXT.data().meta.dbname;
     new Close().execute(CONTEXT);
-    DropDB.drop(db);
+    DropDB.drop(name);
     return ok;
   }
 

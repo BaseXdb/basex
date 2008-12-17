@@ -414,13 +414,4 @@ public abstract class Data  {
    * @param d data instance to copy from
    */
   public abstract void insert(int pre, int par, Data d);
-  
-  /**
-   * Notifies meta structures of an update.
-   */
-  public final void update() {
-    meta.update();
-    tags.uptodate = false;
-    atts.uptodate = false;
-  }
 }

@@ -1,6 +1,5 @@
 package org.basex.query.xpath;
 
-import org.basex.core.Prop;
 import static org.basex.util.Token.*;
 
 /**
@@ -10,25 +9,17 @@ import static org.basex.util.Token.*;
  * @author Christian Gruen
  */
 public interface XPText {
-  /** Position info. */
-  String POSINFO = "Stopped at line %, column %:" + Prop.NL;
 
   // XPath Parser =============================================================
 
   /** Parsing exception. */
-  String QUERYDATA = "Please create database first.";
-  /** Parsing exception. */
   String QUERYEND = "Unexpected end of query: \"%\".";
-  /** Parsing exception. */
-  String NOTEXTLEFT = "Expected \"%\", but no characters left.";
   /** Parsing exception. */
   String WRONGTEXT = "Expected \"%\", but \"%\" found.";
   /** Parsing exception. */
   String NOLOCSTEP = "Location step expected.";
   /** Parsing exception. */
   String NOATTNAME = "Attribute name expected.";
-  /** Parsing exception. */
-  String INVALIDLOCSTEP = "Invalid location step.";
   /** Parsing exception. */
   String PIBRACKETS = "Missing brackets for processing-instruction.";
   /** Parsing exception. */
@@ -44,21 +35,13 @@ public interface XPText {
   /** Parsing exception. */
   String UNKNOWNAXIS = "Unknown axis \"%\".";
   /** Parsing exception. */
-  String UNKNOWNCOMP = "Unknown comparison operator \"%\".";
-  /** Parsing exception. */
   String NOPARENTHESIS = "Missing parenthesis.";
-  /** Parsing exception. */
-  String NOVARNAME = "Variable name expected.";
   /** Parsing exception. */
   String UNFINISHEDPRED = "Unfinished predicate.";
   /** Parsing exception. */
   String UNFINISHEDFUNC = "Unfinished function call.";
   /** Parsing exception. */
   String UNEXPECTEDEND = "Unexpected end of expression.";
-  /** Parsing exception. */
-  String UNKNOWNTOKEN = "Cannot recognize token: \"%\".";
-  /** Parsing exception. */
-  String UNKNOWNVAR = "Unknown variable $%.";
   /** Parsing exception. */
   String UNKNOWNFUNC = "Unknown function %(...).";
   /** Parsing Exception. */
@@ -67,8 +50,6 @@ public interface XPText {
   String FUNCEXCEPTION = "Cannot instantiate function %(...).";
   /** Parsing Exception. */
   String NONODESET = "NodeSet expected; found: %";
-  /** Parsing Exception. */
-  String FTNOTEXC = "\"ftnot\" may only appear as right operand of \"ftand\".";
   /** Parsing Exception. */
   String FTCASE = "Case sensitivity flag expected (sensitive/insensitive).";
   /** Parsing Exception. */
@@ -87,25 +68,15 @@ public interface XPText {
   String FTLANG = "Language '%' not supported.";
   /** Parsing Exception. */
   String FTMILDNOT = "\"ftnot\" or \"fttimes\" may not appear as " +
-  "right operand of \"ftmildnot\".";
+    "right operand of \"ftmildnot\".";
   
   /** Evaluation exception. */
   String NODATA = "No data available.";
 
-  /** Parsing exception. */
-  String NOFT =
-    "Please create a fulltext index or use XQuery for using 'ftcontains'.";
-  /** Evaluation Exception. */
-  String NSSUPPORT = "Namespaces not supported yet.";
   /** Evaluation Exception. */
   String INVALIDPOS = "Invalid use of position().";
   /** Evaluation Exception. */
-  String UNKNOWNREL = "Unknown Relational Operator.";
-  /** Evaluation Exception. */
   String FUNCARGS = "Invalid function arguments; % expected";
-  /** Evaluation Exception. */
-  String INDEXEXC = "No index available or case insensitive search active. " +
-      "Cannot use index() (TO BE FIXED)";
   /** Evaluation Exception. */
   String LASTEXC = "Invalid use of last().";
   /** Evaluation Exception. */
@@ -119,9 +90,9 @@ public interface XPText {
   /** Type. */
   byte[] TYPE = token("type");
   /** Minimum . */
-  String MIN = "min";
+  byte[] MIN = token("min");
   /** Attribute name. */
-  String MAX = "max";
+  byte[] MAX = token("max");
 
   // XPath Optimizer ==========================================================
 
@@ -179,7 +150,6 @@ public interface XPText {
   String OPTPOS = "Rewriting position predicate";
   /** Optimization info. */
   String OPTPREDS = "Rewriting predicate";
-
   
   /** Evaluation info. */
   String EVALSKIP = "rest of output skipped...";

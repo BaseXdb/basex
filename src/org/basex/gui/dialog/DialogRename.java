@@ -1,6 +1,7 @@
 package org.basex.gui.dialog;
 
 import static org.basex.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -41,7 +42,6 @@ public final class DialogRename extends Dialog {
     super(parent, RENAMETITLE);
     old = dbname;
 
-    buttons = BaseXLayout.okCancel(this);
     info = new BaseXLabel(" ");
     info.setForeground(GUIConstants.COLORERROR);
 
@@ -59,6 +59,7 @@ public final class DialogRename extends Dialog {
     final BaseXBack p = new BaseXBack();
     p.setLayout(new BorderLayout());
 
+    buttons = BaseXLayout.okCancel(this);
     p.add(buttons, BorderLayout.EAST);
     set(p, BorderLayout.SOUTH);
 
@@ -75,7 +76,7 @@ public final class DialogRename extends Dialog {
       if(!ok && nm.length() != 0) inf = RENAMEINVALID;
     }
     info.setText(inf);
-    BaseXLayout.enableOK(buttons, ok);
+    BaseXLayout.enableOK(buttons, BUTTONOK, ok);
   }
 
 

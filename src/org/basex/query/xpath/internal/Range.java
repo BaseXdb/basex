@@ -128,23 +128,24 @@ public final class Range extends InternalExpr {
   private StatsKey getKey(final LocPathRel path, final Data data,
       final boolean text) {
     
+    // statistics are not up-to-date
+    if(!data.meta.uptodate) return null;
+    
     final int st = path.steps.size();
     if(text) {
-      if(st == 1 || !data.tags.uptodate) return null;
+      if(st == 1) return null;
       final Step step = path.steps.get(st - 2);
       if(!(step.test instanceof TestName)) return null;
       return data.tags.stat(((TestName) step.test).id);
     }
     
     final int id = path.steps.last().simpleName(Axis.ATTR, true);
-    if(id == Integer.MIN_VALUE || !data.atts.uptodate) return null;
-    return data.atts.stat(id);
+    return id == Integer.MIN_VALUE ? null : data.atts.stat(id);
   }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, Token.token(MIN), Token.token(min),
-        Token.token(MAX), Token.token(max));
+    ser.openElement(this, MIN, Token.token(min), MAX, Token.token(max));
     expr.plan(ser);
     ser.closeElement();
   }

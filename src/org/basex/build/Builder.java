@@ -345,7 +345,7 @@ public abstract class Builder extends Progress {
     }
 
     // get tag reference
-    final int tid = tags.index(tag, null);
+    final int tid = tags.index(tag, null, true);
     skel.add(tid, level, Data.ELEM);
     // remember tag id and parent reference
     tagStack[level] = tid;
@@ -369,7 +369,7 @@ public abstract class Builder extends Progress {
     // create numeric attribute references
     for(int a = 0; a < al; a++) {
       final byte[] av = att.val[a];
-      final int an = atts.index(att.key[a], av);
+      final int an = atts.index(att.key[a], av, true);
       final int ans = ns.get(att.key[a]);
       skel.add(an, level + 1, Data.ATTR);
       addAttr(an, ans, av, a + 1);

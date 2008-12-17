@@ -1,6 +1,7 @@
 package org.basex.gui.dialog;
 
 import static org.basex.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -265,7 +266,7 @@ public final class DialogCreate extends Dialog {
     final boolean err = inf.trim().length() != 0;
     info.setText(inf);
     info.setIcon(err ? img != null ? img : GUI.icon("error") : null);
-    BaseXLayout.enableOK(buttons, ok);
+    BaseXLayout.enableOK(buttons, BUTTONOK, ok);
   }
 
   @Override

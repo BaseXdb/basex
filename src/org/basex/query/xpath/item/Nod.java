@@ -29,12 +29,6 @@ public final class Nod extends Item {
   public int currPos;
   /** Current node set size. */
   public int currSize;
-
-  /* FTIdPos array.
-  public int[][] ftidpos;
-  /* Pointer for FTQueries - each idpos has a pointer at 
-   * its search string position in the xpath query.
-  public int[] ftpointer;*/
   
   /**
    * Constructor, creating a new node set from the specified node ids.
@@ -46,22 +40,6 @@ public final class Nod extends Item {
     nodes = ids;
     size = ids.length;
   }
-
-  /*
-   * Constructor, creating a new node set from the specified node ids.
-   * @param ids node ids
-   * @param ctx query context
-   * @param ftIds ids and pos values for fulltext queries
-   * @param ftPointer Pointer for ftIds
-  public NodeSet(final int[] ids, final XPContext ctx, 
-      final int[][] ftIds, final int[] ftPointer) {
-    data = ctx.local.data;
-    nodes = ids;
-    size = ids.length;
-    ftidpos = ftIds;
-    ftpointer = ftPointer;
-  }
-   */
   
   /**
    * Constructor, creating an empty node set.

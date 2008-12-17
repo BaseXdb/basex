@@ -6,6 +6,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+
 import javax.swing.JFrame;
 import org.basex.core.Prop;
 import org.basex.data.Data;
@@ -63,6 +66,10 @@ public final class DialogPrefs extends Dialog {
     p.setLayout(new TableLayout(1, 2, 6, 0));
     
     path = new BaseXTextField(Prop.dbpath, HELPDBPATH, this);
+    path.addKeyListener(new KeyAdapter() {
+      @Override
+      public void keyReleased(final KeyEvent e) { action(null); }
+    });
     
     final BaseXButton button = new BaseXButton(BUTTONBROWSE, HELPBROWSE, this);
     button.addActionListener(new ActionListener() {
