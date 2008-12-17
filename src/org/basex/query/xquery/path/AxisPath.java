@@ -157,7 +157,9 @@ public class AxisPath extends Path {
           if(a == null) break;
           
           if(j == 0) {
-            if(a == Axis.PARENT) inv = Array.add(inv, Step.get(a, Test.NODE));
+            //if(a == Axis.PARENT) inv = Array.add(inv, Step.get(a, Test.NODE));
+            if(a == Axis.PARENT) 
+              inv = Array.add(inv, Step.get(a, Test.ROOTNODE));
           } else {
             final Step prev = step[j - 1];
             if(prev.pred.length != 0) break;
@@ -311,6 +313,7 @@ public class AxisPath extends Path {
   private void warning(final Step s) throws XQException {
     Err.or(COMPSELF, s);
   }
+  
   
   /**
    * Inverts a location path.

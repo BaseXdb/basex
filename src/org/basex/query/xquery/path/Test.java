@@ -33,6 +33,19 @@ public abstract class Test {
       return "node()";
     }
   };
+
+  /** Static node test. */
+  public static final Test ROOTNODE = new Test() {
+    @Override
+    public boolean e(final Nod tmp) {
+      return tmp.parent() == null;
+    }
+    @Override
+    public String toString() {
+      return "root()";
+    }
+  };
+
   /** Name test. */
   public QNm name;
   /** Node test. */

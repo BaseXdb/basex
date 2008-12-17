@@ -3,6 +3,7 @@ package org.basex.query.xquery.path;
 import static org.basex.query.xquery.XQText.*;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
+import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.iter.Iter;
@@ -43,7 +44,23 @@ public final class SimpleIterStep extends Step {
           }
           final Nod nod = ir.next();
           if(nod == null) ir = null;
-          else if(test.e(nod)) return nod.finish();
+          else if(test.e(nod)) {
+            // check preds
+            final Item tmp = ctx.item;
+            ctx.item = nod;
+            for(final Expr p : pred) {
+              final Item i = ctx.iter(p).ebv();
+              if(i.n() ? i.dbl() == ctx.pos : i.bool()) {
+                // assign score value
+                nod.score(i.score());
+              } else {
+                ir = null;
+                break;
+              }
+            }
+            ctx.item = tmp;
+            if (ir != null) return nod.finish();
+          }
         }
       }
     };
