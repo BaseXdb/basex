@@ -44,6 +44,12 @@ public final class SimpleIterStep extends Step {
           }
           final Nod nod = ir.next();
           if(nod == null) ir = null;
+          
+          /* [SG], [DS] originally, SimpleIterStep was supposed to contain no
+           predicates, so this code is subject to further checks..
+           alternatively, a Step/IterStep instance could be created
+           for steps with predicates. */
+
           else if(test.e(nod)) {
             // check preds
             final Item tmp = ctx.item;

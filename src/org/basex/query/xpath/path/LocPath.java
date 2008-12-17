@@ -56,10 +56,10 @@ public abstract class LocPath extends Expr {
     if(this instanceof LocPathRel) return this;
     
     // skip paths with position predicates
-    for(int i = 0; i < steps.size(); i++) {
-      final Preds preds = steps.get(i).preds;
-      for(int p = 0; p < preds.size(); p++) {
-        if(preds.get(p) instanceof PredPos) return this;
+    for(final Step s : steps) {
+      final Preds preds = s.preds;
+      for(final Pred p : preds) {
+        if(p instanceof PredPos) return this;
       }
     }
     
@@ -225,13 +225,12 @@ public abstract class LocPath extends Expr {
    * @return true result of check
    */
   public final boolean checkAxes() {
-    for(int s = 0; s < steps.size() - 1; s++) {
-      final Step curr = steps.get(s);
+    for(final Step s : steps) {
       // not the last text step
-      if(curr.preds.size() != 0 || curr.axis != Axis.ANC &&
-         curr.axis != Axis.ANCORSELF && curr.axis != Axis.DESC &&
-         curr.axis != Axis.SELF && curr.axis != Axis.DESCORSELF &&
-         curr.axis != Axis.CHILD && curr.axis != Axis.PARENT) return false;
+      if(s.preds.size() != 0 || s.axis != Axis.ANC &&
+         s.axis != Axis.ANCORSELF && s.axis != Axis.DESC &&
+         s.axis != Axis.SELF && s.axis != Axis.DESCORSELF &&
+         s.axis != Axis.CHILD && s.axis != Axis.PARENT) return false;
     }
     return true;
   }
@@ -266,10 +265,16 @@ public abstract class LocPath extends Expr {
   public boolean singlePath(final XPContext ctx) {
     final Data data = ctx.item.data;
     if(!data.meta.uptodate) return false;
+
+    if(1 == 1) return false;
     
+    /* [SG] does probably not include all possible cases yet. elements with
+     *   the same tag name can occur several times and with different
+     *   properties. i'll try to find an example. moreover, i have moved
+     *   the Skeleton Nodes into an extra file, so it might be easier to
+     *   directly work on the skeleton nodes. */
     boolean f = false;
-    for(int i = 0; i < steps.size(); i++) {
-      final Step s = steps.get(i);
+    for(final Step s : steps) {
       if(s instanceof StepChild) {
         if(s.test instanceof TestName) {
           final TestName tn = (TestName) s.test;
@@ -286,7 +291,7 @@ public abstract class LocPath extends Expr {
   /**
    * Get average text length for this path.
    * @param ctx current context
-   * @return avg text legnth
+   * @return average text length
    */
   public double avgTextLength(final XPContext ctx) {
     if (steps.size() == 1 && steps.get(0).test == TestNode.TEXT)
@@ -295,8 +300,8 @@ public abstract class LocPath extends Expr {
       Step s = steps.get(0);
       double avg = -1;
       if (s instanceof StepChild && s.test instanceof TestName) {
-          TestName tn = (TestName) s.test;
-          avg = ctx.item.data.skel.tl(tn.name); 
+        final TestName tn = (TestName) s.test;
+        avg = ctx.item.data.skel.tl(tn.name); 
       } 
       s = steps.get(1);
       if (s.test == TestNode.TEXT) return avg;      

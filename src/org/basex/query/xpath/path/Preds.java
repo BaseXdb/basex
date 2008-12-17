@@ -2,6 +2,9 @@ package org.basex.query.xpath.path;
 
 import static org.basex.query.xpath.XPText.*;
 import java.io.IOException;
+import java.util.Iterator;
+
+import org.basex.BaseX;
 import org.basex.data.Serializer;
 import org.basex.query.ExprInfo;
 import org.basex.query.QueryException;
@@ -18,13 +21,13 @@ import org.basex.util.Array;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Preds extends ExprInfo {
+public final class Preds extends ExprInfo implements Iterable<Pred> {
   /** Steps array. */
-  private Pred[] preds = new Pred[1];
+  Pred[] preds = new Pred[1];
   /** Number of steps. */
-  private int size;
+  int size;
   /** Temporary node set. */
-  private Nod tmp;
+  Nod tmp;
   
   /**
    * Returns the number of location steps.
@@ -225,5 +228,14 @@ public final class Preds extends ExprInfo {
     final StringBuilder sb = new StringBuilder();
     for(int s = 0; s < size; s++) sb.append(preds[s].toString());
     return sb.toString();
+  }
+
+  public Iterator<Pred> iterator() {
+    return new Iterator<Pred>() {
+      private int c = -1;
+      public boolean hasNext() { return ++c < size; }
+      public Pred next() { return preds[c]; }
+      public void remove() { BaseX.notimplemented(); }
+    };
   }
 }

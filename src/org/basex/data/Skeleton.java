@@ -1,13 +1,11 @@
 package org.basex.data;
 
-import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
-import org.basex.util.Array;
 import org.basex.util.IntList;
 import org.basex.util.TokenList;
 
@@ -20,9 +18,9 @@ public final class Skeleton {
   /** Data reference. */
   private Data data;
   /** Parent stack. */
-  private Node[] stack;
+  private SkelNode[] stack;
   /** Root node. */
-  private Node root;
+  private SkelNode root;
 
   /**
    * Default Constructor.
@@ -35,7 +33,7 @@ public final class Skeleton {
    * Initializes the data structures.
    */
   public void init() {
-    stack = new Node[IO.MAXHEIGHT];
+    stack = new SkelNode[IO.MAXHEIGHT];
     root = null;
   }
 
@@ -46,7 +44,7 @@ public final class Skeleton {
    * @throws IOException I/O exception
    */
   public Skeleton(final Data d, final DataInput in) throws IOException {
-    if(in.readBool()) root = new Node(in);
+    if(in.readBool()) root = new SkelNode(in);
     data = d;
   }
 
@@ -54,7 +52,7 @@ public final class Skeleton {
    * Returns the skeleton root.
    * @return root
    */
-  public Node root() {
+  public SkelNode root() {
     return root;
   }
 
@@ -77,7 +75,7 @@ public final class Skeleton {
    */
   public void add(final int n, final int l, final byte k, final int tl) {
     if(root == null) {
-      root = new Node(n, k);
+      root = new SkelNode(n, k);
       stack[0] = root;
     } else {
       stack[l] = stack[l - 1].get(n, k, tl);
@@ -117,7 +115,7 @@ public final class Skeleton {
     // return tl of document
     if (k == null) return root.tl / root.count;
     // follow the specified descendant/child steps
-    ArrayList<Node> n = new ArrayList<Node>();
+    ArrayList<SkelNode> n = new ArrayList<SkelNode>();
     n.add(root);
     n = desc(n, 0, Data.DOC, true);
     
@@ -125,7 +123,7 @@ public final class Skeleton {
     n = desc(n, id, Data.ELEM, false);
     double avg = 0;
     int c = 0;
-    for(final Node r : n) if (r.kind == Data.TEXT) {
+    for(final SkelNode r : n) if (r.kind == Data.TEXT) {
       avg += r.tl / r.count;
       c++;
     }
@@ -142,7 +140,7 @@ public final class Skeleton {
   public TokenList desc(final TokenList in, final boolean d, final boolean o) {
     if(root == null) return new TokenList();
     // follow the specified descendant/child steps
-    ArrayList<Node> n = new ArrayList<Node>();
+    ArrayList<SkelNode> n = new ArrayList<SkelNode>();
     n.add(root);
     n = desc(n, 0, Data.DOC, true);
 
@@ -155,13 +153,13 @@ public final class Skeleton {
 
     // sort by number of occurrences
     final TokenList tmp = new TokenList();
-    for(final Node r : n) tmp.add(token(r.count));
+    for(final SkelNode r : n) tmp.add(token(r.count));
     final IntList occ = IntList.createOrder(tmp.finish(), true, false);
 
     // remove non-text/attribute nodes
     final TokenList out = new TokenList();
     for(int i = 0; i < n.size(); i++) {
-      final Node r = n.get(o ? occ.list[i] : i);
+      final SkelNode r = n.get(o ? occ.list[i] : i);
       final byte[] name = r.token(data);
       if(name.length != 0 && !out.contains(name) && !contains(name, '(')) {
         out.add(name);
@@ -179,143 +177,17 @@ public final class Skeleton {
    * @param desc if false, return only children
    * @return descendant nodes
    */
-  public ArrayList<Node> desc(final ArrayList<Node> in, final int t,
+  public ArrayList<SkelNode> desc(final ArrayList<SkelNode> in, final int t,
       final int k, final boolean desc) {
 
-    final ArrayList<Node> out = new ArrayList<Node>();
-    for(final Node n : in) {
+    final ArrayList<SkelNode> out = new ArrayList<SkelNode>();
+    for(final SkelNode n : in) {
       if(t != 0 && (n.name != t || n.kind != k)) continue;
-      for(final Node c : n.ch) {
+      for(final SkelNode c : n.ch) {
         if(desc) c.desc(out);
         else out.add(c);
       }
     }
     return out;
-  }
-
-  /** Skeleton node. */
-  public static final class Node {
-    /** Tag/attribute name reference. */
-    public final short name;
-    /** Node kind. */
-    public final byte kind;
-    /** Tag counter. */
-    public int count;
-    /** Children. */
-    public Node[] ch;
-    /** Length of text. */
-    public int tl;
-
-    /**
-     * Default Constructor.
-     * @param t tag
-     * @param k node kind
-     */
-    Node(final int t, final byte k) {
-      this(t, k, 0);
-    }
-
-    /**
-     * Default Constructor.
-     * @param t tag
-     * @param k node kind
-     * @param l text length
-     */
-    Node(final int t, final byte k, final int l) {
-      ch = new Node[0];
-      count = 1;
-      name = (short) t;
-      kind = k;
-      tl = l;
-    }
-
-    /**
-     * Constructor, specifying an input stream.
-     * @param in input stream
-     * @throws IOException I/O exception
-     */
-    Node(final DataInput in) throws IOException {
-      name = (short) in.readNum();
-      kind = in.readByte();
-      count = in.readNum();
-      ch = new Node[in.readNum()];
-      tl = in.readNum();
-      for(int i = 0; i < ch.length; i++) ch[i] = new Node(in);
-    }
-
-    /**
-     * Returns a node reference for the specified tag.
-     * @param t tag
-     * @param k node kind
-     * @return node reference
-     */
-    Node get(final int t, final byte k) {
-      return get(t, k, 0);
-    }
-
-    /**
-     * Returns a node reference for the specified tag.
-     * @param t tag
-     * @param k node kind
-     * @param l text length
-     * @return node reference
-     */
-    Node get(final int t, final byte k, final int l) {
-      for(final Node c : ch) {
-        if(c.kind == k && c.name == t) {
-          c.count++;
-          c.tl += l; 
-          return c;
-        }
-      }
-      final Node n = new Node(t, k, l);
-      ch = Array.add(ch, n);
-      return n;
-    }
-
-    /**
-     * Finishes the tree structure.
-     * @param out output stream
-     * @throws IOException I/O exception
-     */
-    void finish(final DataOutput out) throws IOException {
-      out.writeNum(name);
-      out.write1(kind);
-      out.writeNum(count);
-      out.writeNum(ch.length);
-      out.writeNum(tl);
-      for(final Node c : ch) c.finish(out);
-    }
-
-    /**
-     * Recursively adds the node and its descendants to the specified list.
-     * @param nodes node list
-     */
-    public void desc(final ArrayList<Node> nodes) {
-      nodes.add(this);
-      for(final Node n : ch) n.desc(nodes);
-    }
-
-    /**
-     * Returns a readable representation of this node.
-     * @param data data reference
-     * @return completions
-     */
-    public byte[] token(final Data data) {
-      switch(kind) {
-        case Data.ELEM: return data.tags.key(name);
-        case Data.ATTR: return concat(ATT, data.atts.key(name));
-        case Data.TEXT: return TEXT;
-        case Data.COMM: return COMM;
-        case Data.PI:   return PI;
-        default:        return EMPTY;
-      }
-    }
-
-    @Override
-    public String toString() {
-      return "Node[" + kind + ", " + name + ", " + ch.length
-        + " Children, " + tl + "]";
-    }
   }
 }

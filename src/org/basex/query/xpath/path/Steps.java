@@ -2,6 +2,9 @@ package org.basex.query.xpath.path;
 
 import static org.basex.query.xpath.XPText.*;
 import java.io.IOException;
+import java.util.Iterator;
+
+import org.basex.BaseX;
 import org.basex.data.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPContext;
@@ -14,11 +17,11 @@ import org.basex.util.Array;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Steps {
+public final class Steps implements Iterable<Step> {
   /** Steps array. */
-  private Step[] steps = new Step[4];
+  Step[] steps = new Step[4];
   /** Number of steps. */
-  private int size;
+  int size;
   
   /**
    * Returns the number of location steps.
@@ -171,9 +174,8 @@ public final class Steps {
         ctx.compInfo(OPTNAME, ((TestName) step.test).name);
         return true;
       }
-      final Preds pred = step.preds;
-      for(int p = 0; p < pred.size(); p++) {
-        if(pred.get(p).posPred() == -1) {
+      for(final Pred p : step.preds) {
+        if(p.posPred() == -1) {
           ctx.compInfo(OPTPOSPRED2);
           return true;
         }
@@ -196,5 +198,14 @@ public final class Steps {
    */
   public void plan(final Serializer ser) throws IOException {
     for(int s = 0; s < size; s++) steps[s].plan(ser);
+  }
+
+  public Iterator<Step> iterator() {
+    return new Iterator<Step>() {
+      private int c = -1;
+      public boolean hasNext() { return ++c < size; }
+      public Step next() { return steps[c]; }
+      public void remove() { BaseX.notimplemented(); }
+    };
   }
 }

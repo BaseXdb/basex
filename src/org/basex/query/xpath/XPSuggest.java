@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.Stack;
 import org.basex.core.Context;
 import org.basex.data.Data;
+import org.basex.data.SkelNode;
 import org.basex.data.Skeleton;
-import org.basex.data.Skeleton.Node;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.expr.Expr;
 import org.basex.query.xpath.path.Axis;
@@ -28,7 +28,7 @@ public final class XPSuggest extends XPParser {
   /** Context. */
   private Context ctx;
   /** Current skeleton nodes. */
-  private Stack<ArrayList<Node>> stack = new Stack<ArrayList<Node>>();
+  private Stack<ArrayList<SkelNode>> stack = new Stack<ArrayList<SkelNode>>();
   /** Skeleton reference. */
   private Skeleton skel;
   /** Last axis. */
@@ -49,7 +49,7 @@ public final class XPSuggest extends XPParser {
 
   @Override
   LocPath absLocPath(final LocPath path) throws QueryException {
-    final ArrayList<Node> list = new ArrayList<Node>();
+    final ArrayList<SkelNode> list = new ArrayList<SkelNode>();
     list.add(skel.root());
     stack.push(list);
     final LocPath lp = super.absLocPath(path);
@@ -59,10 +59,10 @@ public final class XPSuggest extends XPParser {
 
   @Override
   LocPath relLocPath(final LocPath path) throws QueryException {
-    ArrayList<Node> list = null;
+    ArrayList<SkelNode> list = null;
     if(stack.size() == 0) {
       if(!ctx.root()) return super.relLocPath(path);
-      list = new ArrayList<Node>();
+      list = new ArrayList<SkelNode>();
       list.add(skel.root());
     } else {
       list = skel.desc(stack.peek(), 0, Data.ELEM, false);
@@ -117,9 +117,9 @@ public final class XPSuggest extends XPParser {
     if(finish && ltest == TestNode.NODE) return;
     final byte[] tn = entry(laxis, ltest);
     if(tn == null) return;
-    final ArrayList<Node> list = stack.peek();
+    final ArrayList<SkelNode> list = stack.peek();
     for(int c = list.size() - 1; c >= 0; c--) {
-      final Node n = list.get(c);
+      final SkelNode n = list.get(c);
       if(n.kind == Data.ELEM && tn == TestName.ALLNODES) continue;
 
       final byte[] t = n.token(ctx.data());
@@ -140,7 +140,7 @@ public final class XPSuggest extends XPParser {
     final StringList sl = new StringList();
     if(stack.empty()) return sl;
 
-    for(final Node r : stack.peek()) {
+    for(final SkelNode r : stack.peek()) {
       final String name = Token.string(r.token(ctx.data()));
       if(name.length() != 0 && !sl.contains(name)) sl.add(name);
     }

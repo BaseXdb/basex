@@ -56,15 +56,6 @@ public class FTContains extends Arr {
     return Bln.get(d).iter();
   }
 
-  /*
-   * Checks if there is anything to sum up.
-   * @param d data
-   * @return boolean sum up
-  public boolean sumUp(final Data d) {
-    return expr[0] instanceof AxisPath && ((AxisPath) expr[0]).sumUp(d);
-  }
-   */
-
   @Override
   public void indexAccessible(final XQContext ctx, final FTIndexAcsbl ia)
       throws XQException {

@@ -92,7 +92,6 @@ public final class FTSelect extends FTArrayExpr {
     return exprs[0];
   }
   
-  
   /**
    * Setter expr.
    * @param e FTArrayExpr
@@ -140,8 +139,6 @@ public final class FTSelect extends FTArrayExpr {
       final long c = (long) ftpos.window.num();
       if(!ftpos.pos.window(c)) return false;
     }
-  
-    
     return true;
   }
 
@@ -161,23 +158,6 @@ public final class FTSelect extends FTArrayExpr {
     exprs[0] = exprs[0].indexEquivalent(ctx, curr, seq);
     return this;
   }
-
-  /*
-   * Checks if FTContains Expr could be summed up.
-   * 
-   * @param ftpos1 FTPositionFilter second expr
-   * @return int 
-  public boolean checkSumUp(final FTPosFilter ftpos1) {
-    return !ftpos.pos.ordered == !ftpos1.pos.ordered 
-        && ftpos.window == null && ftpos1.window == null
-        && ftpos.dist == null && ftpos.dist == null
-        && ftpos.pos.sdunit == null && ftpos1.pos.sdunit == null
-        && ftpos.pos.content == ftpos1.pos.content
-        && ftpos.pos.start == ftpos1.pos.start
-        && ftpos.pos.end == ftpos1.pos.end;
-  }
-   */
-  
   
   @Override
   public int indexSizes(final XPContext ctx, final Step curr, final int min) {

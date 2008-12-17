@@ -124,9 +124,7 @@ public abstract class Step extends ExprInfo {
       if(posPred == -1) return false;
     }
     early = true;
-    for(int p = 0; p < preds.size(); p++)
-      early = early && !preds.get(p).usesSize();
-
+    for(final Pred p : preds) early = early && !p.usesSize();
     return true;
   }
 
@@ -179,10 +177,7 @@ public abstract class Step extends ExprInfo {
    * @return false if no Position predicate
    */
   final boolean hasPosPreds() {
-    for(int p = 0; p < preds.size(); p++) {
-      final Pred pred = preds.get(p);
-      if(pred.posPred() > 0 || pred.usesPos()) return true;
-    }
+    for(final Pred p : preds) if(p.posPred() > 0 || p.usesPos()) return true;
     return false;
   }
 
@@ -212,8 +207,7 @@ public abstract class Step extends ExprInfo {
       if(!(this instanceof StepChild)) sb.append(axis.name + "::");
       sb.append(test);
     }
-    for(int p = 0; p < preds.size(); p++)
-      sb.append(preds.get(p));
+    for(final Pred p : preds) sb.append(p);
     return sb.toString();
   }
 
