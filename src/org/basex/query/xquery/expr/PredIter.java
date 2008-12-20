@@ -13,23 +13,23 @@ import org.basex.query.xquery.iter.Iter;
  */
 public final class PredIter extends Pred {
   /** Flag is set to true if predicate has last function. */
-  boolean lastFlag;
+  boolean last;
   /** Flag is set to true if predicate has a numeric value. */
-  boolean numFlag;
+  boolean num;
 
   /**
    * Constructor.
-   * @param r Root Expression
-   * @param e Expression List
-   * @param last lastFlag is true if predicate has a last function
-   * @param num numberFlag is true if predicate has a numeric value
+   * @param r root expression
+   * @param p predicates
+   * @param l true if predicate has a last function
+   * @param n true if predicate has a numeric value
    */
-  public PredIter(final Expr r, final Expr[] e,
-      final boolean last, final boolean num) {
+  public PredIter(final Expr r, final Expr[] p,
+      final boolean l, final boolean n) {
 
-    super(r, e);
-    lastFlag = last;
-    numFlag = num;
+    super(r, p);
+    last = l;
+    num = n;
   }
 
   @Override
@@ -38,8 +38,6 @@ public final class PredIter extends Pred {
       final Iter iter = ctx.iter(root);
       final Item ci = ctx.item;
       final int cp = ctx.pos;
-
-      Item i;
       boolean first = true;
       boolean finished = false;
 
@@ -56,25 +54,25 @@ public final class PredIter extends Pred {
           ctx.pos = 1;
         }
 
+        Item i;
         while((i = iter.next()) != null) {
           ctx.item = i;
-          i = ctx.iter(expr[0]).ebv();
+          i = ctx.iter(pred[0]).ebv();
 
           final boolean found = i.n() ? i.dbl() == ctx.pos : i.bool();
           ctx.pos++;
           
           if(found) {
-            // if item is numeric it will be returned and the rest of expr
-            // will be skipped. next call of next() will return null.
+            // if item is numeric, the rest of expr will be skipped
             ctx.item.score(i.score());
-            if(numFlag) finished = true;
+            if(num) finished = true;
             return ctx.item;
           }
         }
 
         // returns the last item.
         // next call of next() will return null.
-        if(lastFlag) {
+        if(last) {
           finished = true;
           return ctx.item;
         }

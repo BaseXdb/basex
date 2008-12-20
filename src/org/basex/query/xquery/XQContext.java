@@ -110,6 +110,8 @@ public final class XQContext extends QueryContext {
   public boolean ordered = false;
   /** Construction mode (currently ignored). */
   public boolean construct = false;
+  /** Revalidation Mode (currently ignored). */
+  public int revalidate = 0;
 
   /** Reference to the root expression. */
   Expr root;

@@ -40,6 +40,8 @@ public interface XQTokens {
   /** Parser token. */
   String DECLARE = "declare";
   /** Parser token. */
+  String DELETE = "delete";
+  /** Parser token. */
   String DESCENDING = "descending";
   /** Parser token. */
   String DIV = "div";
@@ -88,6 +90,8 @@ public interface XQTokens {
   /** Parser token. */
   String NSPACE = "namespace";
   /** Parser token. */
+  String NODES = "nodes";
+  /** Parser token. */
   String NOINHERIT = "no-inherit";
   /** Parser token. */
   String NOPRESERVE = "no-preserve";
@@ -104,11 +108,15 @@ public interface XQTokens {
   /** Parser token. */
   String RETURN = "return";
   /** Parser token. */
+  String REVALIDATION = "revalidation";
+  /** Parser token. */
   String SATISFIES = "satisfies";
   /** Parser token. */
   String SCHEMA = "schema";
   /** Parser token. */
   String SCORE = "score";
+  /** Parser token. */
+  String SKIP = "skip";
   /** Parser token. */
   String SOME = "some";
   /** Parser token. */
@@ -141,7 +149,7 @@ public interface XQTokens {
   String XQUERY = "xquery";
 
   /** Skip flag for the syntax highlighter. */
-  String SKIP = null;
+  String IGNORE = null;
 
   /** Parser token. */
   String ASSIGN = ":=";

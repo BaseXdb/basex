@@ -103,8 +103,8 @@ public class BaseXClient {
       }
 
       if(query != null) {
-        if(xpath) process(new XPath(query), info);
-        else process(new XQuery(query), info);
+        if(xpath) process(new XPath(query), info || Prop.xmlplan);
+        else process(new XQuery(query), info || Prop.xmlplan);
       } else if(commands != null) {
         process(commands);
         quit(true);
@@ -222,7 +222,7 @@ public class BaseXClient {
           if(!ok) {
             error(null, inf);
           } else {
-            if(info || console) {
+            if(v || console) {
               BaseX.outln(inf);
               if(console) BaseX.outln();
             }
@@ -281,9 +281,21 @@ public class BaseXClient {
             // activate debug mode
             Prop.debug = true;
             ok = true;
+          } else if(c == 'D' && standalone) {
+            // hidden option: show dot query graph
+            Prop.dotplan = true;
+            ok = true;
           } else if(c == 'e' && standalone) {
             // skip parsing of XML entities
             process(new Set(CmdSet.ENTITY, OFF), false);
+            ok = true;
+          } else if(c == 'm' && standalone) {
+            // hidden option: activate main memory mode
+            Prop.mainmem = true;
+            ok = true;
+          } else if(c == 'M' && standalone) {
+            // hidden option: activate on-the-fly parsing
+            Prop.onthefly = true;
             ok = true;
           } else if(c == 'o') {
             // specify file for result output
@@ -310,11 +322,6 @@ public class BaseXClient {
             port = p;
             i = args[a].length();
             ok = true;
-          /*} else if(c == 'p') {
-            // switch to XPath parser
-            xpath = true;
-            ok = true;
-          */
           } else if(c == 'q') {
             // send BaseX commands
             console = false;
@@ -361,15 +368,6 @@ public class BaseXClient {
           } else if(c == 'X') {
             // hidden option: show xml query plan
             Prop.xmlplan = true;
-            info = true;
-            ok = true;
-          } else if(c == 'y' && standalone) {
-            // hidden option: activate main memory mode
-            Prop.mainmem = true;
-            ok = true;
-          } else if(c == 'Y' && standalone) {
-            // hidden option: activate on-the-fly parsing
-            Prop.onthefly = true;
             ok = true;
           } else if(c == 'z') {
             // turn off result serialization

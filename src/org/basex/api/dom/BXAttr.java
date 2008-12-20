@@ -7,7 +7,6 @@ import org.basex.query.xquery.util.NodeBuilder;
 import org.basex.util.Token;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.TypeInfo;
@@ -79,11 +78,6 @@ public final class BXAttr extends BXNode implements Attr {
 
   public TypeInfo getSchemaTypeInfo() {
     BaseX.notimplemented();
-    return null;
-  }
-
-  @Override
-  public NamedNodeMap getAttributes() {
     return null;
   }
 

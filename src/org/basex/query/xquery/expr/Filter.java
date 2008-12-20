@@ -10,7 +10,7 @@ import org.basex.query.xquery.iter.Iter;
 
 /**
  * Filter Expression filtering a nodeset. This Expression is invalid for other
- * types as nodesets.
+ * types as node sets.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Sebastian Gath
@@ -53,14 +53,10 @@ public final class Filter extends Expr {
     };
   }
   
- 
-  
-  
   @Override
   public boolean uses(final Using use) {
     return expr.uses(use);
   }
-
   
   @Override
   public Expr comp(final XQContext ctx) throws XQException {

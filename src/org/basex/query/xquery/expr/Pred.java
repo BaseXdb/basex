@@ -10,7 +10,8 @@ import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
-import org.basex.util.Token;
+import org.basex.util.Array;
+import org.basex.util.TokenBuilder;
 
 /**
  * Predicate expression.
@@ -18,32 +19,45 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class Pred extends Arr {
+public class Pred extends Expr {
+  /** Predicates. */
+  public Expr[] pred;
   /** Expression. */
   Expr root;
 
   /**
    * Constructor.
    * @param r expression
-   * @param e predicates
+   * @param p predicates
    */
-  public Pred(final Expr r, final Expr[] e) {
-    super(e);
+  public Pred(final Expr r, final Expr[] p) {
     root = r;
+    pred = p;
   }
 
   @Override
   public final Expr comp(final XQContext ctx) throws XQException {
     root = ctx.comp(root);
-    super.comp(ctx);
-    // LAST
-    final boolean last = expr[0] instanceof Fun &&
-      ((Fun) expr[0]).func == FunDef.LAST;
+    for(int p = 0; p != pred.length; p++) {
+      pred[p] = ctx.comp(pred[p]);
+      if(pred[p].i()) {
+        final Item it = (Item) pred[p];
+        if(it.n() || !it.bool()) continue;
+        Array.move(pred, p + 1, -1, pred.length - p-- - 1);
+        pred = Array.finish(pred, pred.length - 1);
+      }
+    }
+    if(pred.length == 0) return root;
+
+    // Last flag
+    final boolean last = pred[0] instanceof Fun &&
+      ((Fun) pred[0]).func == FunDef.LAST;
     // Numeric value
-    final boolean num = expr[0].i() && ((Item) expr[0]).n();
+    final boolean num = pred[0].i() && ((Item) pred[0]).n();
     // Multiple Predicates or POS
-    return expr.length > 1 || (!last && !num && uses(Using.POS)) ? this :
-      new PredIter(root, expr, last, num);
+    if(pred.length > 1 || (!last && !num && uses(Using.POS))) return this;
+    // Use iterative evaluation
+    return new PredIter(root, pred, last, num);
   }  
 
   @Override
@@ -59,7 +73,7 @@ public class Pred extends Arr {
     while((i = iter.next()) != null) sb.add(i);
 
     // evaluates predicates
-    for(final Expr p : expr) {
+    for(final Expr p : pred) {
       ctx.size = sb.size;
       ctx.pos = 1;
       int c = 0;
@@ -80,33 +94,34 @@ public class Pred extends Arr {
   
   @Override
   public final boolean uses(final Using u) {
-    switch(u) {
-      case POS:
-        for(final Expr e : expr) {
-          final Type t = e.returned();
-          if(t == null || t.num || e.uses(u)) return true;
-        }
-        return super.uses(u);
-      default:
-        return super.uses(u);
+    for(final Expr p : pred) if(p.uses(u)) return true;
+    
+    if(u == Using.POS) {
+      for(final Expr p : pred) {
+        final Type t = p.returned();
+        if(t == null || t.num) return true;
+      }
     }
+    return false;
   }
 
   @Override
-  public final String toString() {
-    return Token.string(name()) + "(" + root + ", " + toString(", ") + ")";
-  }
-
-  @Override
-  public final String info() {
-    return "Predicate";
+  public final String color() {
+    return "FFFF66";
   }
 
   @Override
   public final void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     root.plan(ser);
-    for(final Expr e : expr) e.plan(ser);
+    for(final Expr e : pred) e.plan(ser);
     ser.closeElement();
+  }
+
+  @Override
+  public final String toString() {
+    final TokenBuilder tb = new TokenBuilder(name()).add("(" + root + "[");
+    for(int p = 0; p < pred.length; p++) tb.add((p != 0 ? ", " : "") + pred[p]);
+    return tb.add("]").toString();
   }
 }

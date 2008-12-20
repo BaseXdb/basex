@@ -53,7 +53,7 @@ public final class XQEnv extends AQuery {
         eval += per.getTime();
       }
       if(Prop.info) {
-        info(qu.getInfo());
+        info(qu.info());
         info(NL + QUERYPARSE + Performance.getTimer(pars, Prop.runs));
         info(NL + QUERYCOMPILE + Performance.getTimer(comp, Prop.runs));
         info(NL + QUERYEVALUATE + Performance.getTimer(eval, Prop.runs));

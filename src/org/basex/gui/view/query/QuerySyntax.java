@@ -37,12 +37,12 @@ public final class QuerySyntax extends BaseXSyntax {
   static {
     try {
       for(final Field f : XQTokens.class.getFields()) {
-        if(f.getName().equals("SKIP")) break;
+        if(f.getName().equals("IGNORE")) break;
         final String s = (String) f.get(null);
         for(String ss : s.split("-")) keys.add(ss);
       }
       for(final Field f : QueryTokens.class.getFields()) {
-        if(f.getName().equals("SKIP")) break;
+        if(f.getName().equals("IGNORE")) break;
         final String s = (String) f.get(null);
         for(String ss : s.split("-")) keys.add(ss);
       }

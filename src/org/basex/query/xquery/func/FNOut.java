@@ -10,6 +10,7 @@ import org.basex.query.xquery.item.QNm;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Err;
+import org.basex.query.xquery.util.SeqBuilder;
 import org.basex.util.Token;
 
 /**
@@ -27,7 +28,7 @@ final class FNOut extends Fun {
         String code = FOER;
         Object num = 0;
         String msg = FUNERR1;
-        
+
         if(al != 0) {
           final Item it = arg[0].atomic(this, true);
           if(it == null) {
@@ -38,11 +39,15 @@ final class FNOut extends Fun {
           }
           if(al > 1) {
             msg = Token.string(checkStr(arg[1]));
-            if(al > 2) msg += " (" + Token.string(checkStr(arg[2])) + ")";
           }
         }
-        Err.or(new Object[] { code, num, msg});
-        return null;
+        try {
+          Err.or(new Object[] { code, num, msg });
+        } catch(final XQException ex) {
+          if(al > 2) ex.item = new SeqBuilder(arg[2]).finish();
+          throw ex;
+        }
+        BaseX.notexpected(); return null;
       case TRACE:
         msg = Token.string(checkStr(arg[1])) + ": " + arg[0];
         ctx.evalInfo(msg);

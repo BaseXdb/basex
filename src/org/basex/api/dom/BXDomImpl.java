@@ -34,13 +34,12 @@ public final class BXDomImpl implements DOMImplementation {
     return null;
   }
 
-  public Object getFeature(final String feature, final String version) {
+  public Object getFeature(final String f, final String v) {
     return null;
   }
 
   public boolean hasFeature(final String f, final String v) {
-    if(f == null) return false;
-    return f.equalsIgnoreCase("XML") && (v == null || v.equals("") ||
-      v.equals("1.0") || v.equals("1.0") || v.equals("3.0"));
+    return "XML".equalsIgnoreCase(f) && (v == null || v.equals("") ||
+        v.equals("1.0") || v.equals("1.0") || v.equals("3.0"));
   }
 }

@@ -1,13 +1,17 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
+
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.Process;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
+import org.basex.data.DOTSerializer;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
+import org.basex.io.CachedOutput;
+import org.basex.io.IO;
 import org.basex.io.NullOutput;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
@@ -67,9 +71,24 @@ abstract class AQuery extends Process {
         final Nod ns = (Nod) result;
         result = new Nodes(ns.nodes, ns.data);
       }
+      // show dot plan
+      if(Prop.dotplan) {
+        final CachedOutput out = new CachedOutput();
+        qu.plan(new DOTSerializer(out));
+        IO.get(PLANDOT).write(out.finish());
+        new ProcessBuilder(Prop.dotty, PLANDOT).start().waitFor();
+        //f.delete();
+      }
+      // dump query plan
+      if(Prop.xmlplan) {
+        final CachedOutput out = new CachedOutput();
+        qu.plan(new XMLSerializer(out, false, true));
+        info(QUERYPLAN + NL);
+        info(out.toString() + NL);
+      }
       // dump some query info
       if(Prop.info) {
-        info(qu.getInfo());
+        info(NL + qu.info());
         info(QUERYPARSE + Performance.getTimer(pars, Prop.runs) + NL);
         info(QUERYCOMPILE + Performance.getTimer(comp, Prop.runs) + NL);
         info(QUERYEVALUATE + Performance.getTimer(eval, Prop.runs) + NL);

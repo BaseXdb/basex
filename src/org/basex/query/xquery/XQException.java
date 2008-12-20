@@ -2,6 +2,8 @@ package org.basex.query.xquery;
 
 import org.basex.core.Prop;
 import org.basex.query.QueryException;
+import org.basex.query.xquery.item.Item;
+import org.basex.query.xquery.item.Seq;
 import org.basex.util.StringList;
 
 /**
@@ -11,6 +13,9 @@ import org.basex.util.StringList;
  * @author Christian Gruen
  */
 public final class XQException extends QueryException {
+  /** Error items. */
+  public Item item = Seq.EMPTY;
+  
   /**
    * Empty constructor; used for interrupting a query.
    */

@@ -2,10 +2,8 @@ package org.basex.gui.dialog;
 
 import static org.basex.Text.*;
 import static org.basex.data.DataText.*;
-
 import java.awt.BorderLayout;
 import java.awt.Font;
-import java.io.File;
 import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -138,42 +136,30 @@ public final class DialogOpen extends Dialog {
         choice.requestFocusInWindow();
       }
     } else {
-      ok = setInfo();
+      final String db = choice.getValue().trim();
+      ok = db.length() != 0 && IO.dbpath(db).exists();
+      if(ok) doc.setText(db);
+      BaseXLayout.enableOK(buttons, BUTTONDROP, ok);
+
+      if(ok) {
+        try {
+          final DataInput in = new DataInput(db, DATAINFO);
+          final MetaData meta = new MetaData(db);
+          final int size = meta.read(in);
+          in.close();
+          detail.setText(InfoDB.db(meta, size, false, true));
+        } catch(final IOException ex) {
+          detail.setText(Token.token(ex.getMessage()));
+          ok = false;
+        }
+      }
       BaseXLayout.enableOK(buttons, BUTTONOPEN, ok);
       BaseXLayout.enableOK(buttons, BUTTONRENAME, ok);
-      BaseXLayout.enableOK(buttons, BUTTONDROP, ok);
     }
   }
 
   @Override
   public void close() {
     if(ok) dispose();
-  }
-
-  /**
-   * Refreshes the database information panel.
-   * @return true if the current choice is valid. 
-   */
-  private boolean setInfo() {
-    final String db = choice.getValue().trim();
-    if(db.length() == 0) return false;
-
-    // read the database version
-    final File dir = IO.dbpath(db);
-    if(!dir.exists()) return false;
-    doc.setText(db);
-
-    try {
-      ok = true;
-      final DataInput in = new DataInput(db, DATAINFO);
-      final MetaData meta = new MetaData(db);
-      final int size = meta.read(in);
-      in.close();
-      detail.setText(InfoDB.db(meta, size, false, true));
-    } catch(final IOException ex) {
-      detail.setText(Token.token(ex.getMessage()));
-      ok = false;
-    }
-    return ok;
   }
 }

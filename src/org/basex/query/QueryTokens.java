@@ -132,7 +132,7 @@ public interface QueryTokens {
   // ERROR INFORMATION =======================================================
   
   /** Skip flag for the syntax highlighter. */
-  String SKIP = null;
+  String IGNORE = null;
 
   /** Default language. */
   byte[] EN = token("en");

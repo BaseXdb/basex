@@ -65,7 +65,7 @@ public final class DOTSerializer extends Serializer {
   public void open(final int s) throws IOException {
     out.println("digraph BaseXAlgebra {");
     out.println("node[shape=box,style=filled,width=0,height=0];");
-    out.println("node[fontsize=14,fontname=Tahoma];");
+    //out.println("node[fontsize=14,fontname=Tahoma];");
     if(s != 1) openElement(RESULTS);
   }
 

@@ -1,10 +1,12 @@
 package org.basex.query.xquery.expr;
 
+import java.io.IOException;
+
+import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.item.Str;
+import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.iter.Iter;
-import org.basex.query.xquery.util.Var;
 
 /**
  * Project specific try/catch expression.
@@ -12,48 +14,62 @@ import org.basex.query.xquery.util.Var;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Try extends Arr {
-  /** Variable. */
-  private final Var var1;
-  /** Variable. */
-  private final Var var2;
+public final class Try extends Expr {
+  /** Expression. */
+  Expr exp;
+  /** Catches. */
+  Catch[] ctch;
 
   /**
    * Constructor.
-   * @param tr try expression
-   * @param ct catch expression
-   * @param v1 first variable
-   * @param v2 second variable
+   * @param t try expression
+   * @param c catch expressions
    */
-  public Try(final Expr tr, final Expr ct, final Var v1, final Var v2) {
-    super(tr, ct);
-    var1 = v1;
-    var2 = v2;
+  public Try(final Expr t, final Catch[] c) {
+    exp = t;
+    ctch = c;
   }
 
   @Override
-  public Expr comp(final XQContext ctx) {
+  public Expr comp(final XQContext ctx) throws XQException {
+    exp = ctx.comp(exp);
+    for(int c = 0; c < ctch.length; c++) ctch[c] = (Catch) ctch[c].comp(ctx);
     return this;
   }
 
   @Override
-  public Iter iter(final XQContext ctx) throws XQException {
-    try {
-      return ctx.iter(expr[0]);
-    } catch(final XQException e) {
-      final int s = ctx.vars.size();
-      if(var1 != null) ctx.vars.add(var1.item(Str.get(e.simple()), ctx));
-      if(var2 != null) ctx.vars.add(var2.item(Str.get(e.code()), ctx));
-      final Iter iter = ctx.iter(expr[1]);
-      ctx.vars.reset(s);
-      return iter;
-    } catch(final Exception e) {
-      return Str.ZERO.iter();
-    }
+  public Iter iter(final XQContext ctx) {
+    return new Iter() {
+      Iter it;
+
+      @Override
+      public Item next() throws XQException {
+        try {
+          if(it == null) it = ctx.iter(exp);
+          return it.next();
+        } catch(final XQException ex) {
+          for(int c = 0; c < ctch.length; c++) {
+            it = ctch[c].iter(ctx, ex);
+            if(it != null) return it.next();
+          }
+          throw ex;
+        }
+      }
+    };
+  }
+
+  @Override
+  public void plan(final Serializer ser) throws IOException {
+    ser.openElement(this);
+    exp.plan(ser);
+    for(final Catch c : ctch) c.plan(ser);
+    ser.closeElement();
   }
 
   @Override
   public String toString() {
-    return "try { " + expr[0] + " } catch { " + expr[1] + "}";
+    final StringBuilder sb = new StringBuilder("try { " + exp + "}");
+    for(final Catch c : ctch) sb.append(" " + c);
+    return sb.toString();
   }
 }

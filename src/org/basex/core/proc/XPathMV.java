@@ -117,7 +117,7 @@ public final class XPathMV extends AQuery {
         fini += per.getTime();
       }
       if(Prop.info) {
-        info(qu.getInfo());
+        info(qu.info());
         info(QUERYPARSE + Performance.getTimer(pars, Prop.runs) + NL);
         info(QUERYCOMPILE + Performance.getTimer(comp, Prop.runs) + NL);
         info(QUERYEVALUATE + Performance.getTimer(eval, Prop.runs) + NL);

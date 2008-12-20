@@ -3,14 +3,10 @@ package org.basex.query;
 import static org.basex.Text.*;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
-import org.basex.data.DOTSerializer;
 import org.basex.data.Nodes;
-import org.basex.data.XMLSerializer;
 import org.basex.data.Result;
 import org.basex.data.Serializer;
 import org.basex.io.IO;
-import org.basex.io.CachedOutput;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -21,8 +17,6 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public abstract class QueryContext extends Progress {
-  /** Query Info: Plan. */
-  public static final byte[] PLAN = Token.token("QueryPlan");
   /** Reference to the query file. */
   public IO file = Prop.xquery;
   /** Query string. */
@@ -119,38 +113,5 @@ public abstract class QueryContext extends Progress {
   @Override
   public final double prog() {
     return 0;
-  }
-  
-  /**
-   * Prints the plan to the specified file.
-   * @throws Exception exception
-   */
-  public final void planXML() throws Exception {
-    final CachedOutput out = new CachedOutput();
-    final XMLSerializer ser = new XMLSerializer(out, true, true);
-    ser.openElement(PLAN);
-    plan(ser);
-    ser.closeElement();
-    out.print(NL);
-    info.add(out.finish());
-    //IO.get(fn).write(out.finish());
-  }
-  
-  /**
-   * Shows the dot output via dotty.
-   * @throws Exception exception
-   */
-  public final void planDot() throws Exception {
-    final CachedOutput out = new CachedOutput();
-    final DOTSerializer ser = new DOTSerializer(out);
-    ser.open(1);
-    ser.openElement(PLAN);
-    plan(ser);
-    ser.closeElement();
-    ser.close(1);
-    
-    IO.get(PLANDOT).write(out.finish());
-    new ProcessBuilder(Prop.dotty, PLANDOT).start().waitFor();
-    //f.delete();
   }
 }

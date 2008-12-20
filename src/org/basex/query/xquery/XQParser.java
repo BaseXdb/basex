@@ -22,6 +22,7 @@ import org.basex.query.xquery.expr.Calc;
 import org.basex.query.xquery.expr.Case;
 import org.basex.query.xquery.expr.Cast;
 import org.basex.query.xquery.expr.Castable;
+import org.basex.query.xquery.expr.Catch;
 import org.basex.query.xquery.expr.Clc;
 import org.basex.query.xquery.expr.CmpG;
 import org.basex.query.xquery.expr.CmpN;
@@ -121,6 +122,8 @@ public final class XQParser extends QueryParser {
   private boolean declSpaces;
   /** Declaration flag. */
   private boolean declOrder;
+  /** Declaration flag. */
+  private boolean declReval;
   /** Declaration flag. */
   private boolean declGreat;
   /** Declaration flag. */
@@ -288,6 +291,8 @@ public final class XQParser extends QueryParser {
           constructionDecl();
         } else if(consumeWS(ORDERING)) {
           orderingModeDecl();
+        } else if(consumeWS(REVALIDATION)) {
+          revalidationDecl();
         } else if(consumeWS(COPYNS)) {
           copyNamespacesDecl();
         } else if(consumeWS(NSPACE)) {
@@ -350,6 +355,17 @@ public final class XQParser extends QueryParser {
     name.uri = Uri.uri(stringLiteral());
     if(ctx.ns.find(name.ln()) != null) Err.or(DUPLNSDECL, name);
     ctx.ns.add(name);
+  }
+
+  /**
+   * [UP141] Parses a RevalidationDecl.
+   * @throws XQException xquery exception
+   */
+  private void revalidationDecl() throws XQException {
+    if(declReval) Err.or(DUPLREVAL);
+    ctx.revalidate = consumeWS2(STRICT) ? 0 : consumeWS2(LAX) ? 1 :
+        consumeWS2(SKIP) ? 2 : -1;
+    Err.or(UPIMPL);
   }
 
   /**
@@ -661,45 +677,18 @@ public final class XQParser extends QueryParser {
   }
 
   /**
-   * [ 32-0] Parses an ExprSingle (try/catch clause).
-   * @return query expression
-   * @throws XQException xquery exception
-   */
-  private Expr single() throws XQException {
-    if(!consumeWS2(TRY)) return single2();
-
-    final Expr tr = enclosed(NOENCLEXPR);
-    check(CATCH);
-    check(PAR1);
-    final int s = ctx.vars.size();
-    Var var1 = null;
-    Var var2 = null;
-    if(curr() == '$') {
-      var1 = new Var(varName());
-      ctx.vars.add(var1);
-      if(consumeWS2(COMMA)) {
-        var2 = new Var(varName());
-        if(var1.name.eq(var2.name)) Err.or(VARDEFINED, var2);
-        ctx.vars.add(var2);
-      }
-    }
-    check(PAR2);
-    final Expr ct = enclosed(NOENCLEXPR);
-    ctx.vars.reset(s);
-    return new Try(tr, ct, var1, var2);
-  }
-
-  /**
    * [ 32] Parses an ExprSingle.
    * @return query expression
    * @throws XQException xquery exception
    */
-  private Expr single2() throws XQException {
+  private Expr single() throws XQException {
     alter = null;
     Expr e = flwor();
     if(e == null) e = quantified();
     if(e == null) e = typeswitch();
     if(e == null) e = iff();
+    if(e == null) e = tryCatch();
+    if(e == null) e = deletee();
     if(e == null) e = or();
     return e;
   }
@@ -1990,6 +1979,58 @@ public final class XQParser extends QueryParser {
   }
 
   /**
+   * [11-169] Parses a TryClause.
+   * @return query expression
+   * @throws XQException xquery exception
+   */
+  private Expr tryCatch() throws XQException {
+    if(!consumeWS2(TRY)) return null;
+
+    final Expr tr = enclosed(NOENCLEXPR);
+    check(CATCH);
+    
+    Catch[] ct = {};
+    do {
+      QNm[] codes = {};
+      do {
+        consumeWS();
+        if(XMLToken.isXMLLetter(curr())) {
+          codes = Array.add(codes, new QNm(qName(QNAMEINV)));
+        } else {
+          check("*");
+          codes = Array.add(codes, null);
+        }
+      } while(consume(PIPE));
+      
+      Var var1 = null;
+      Var var2 = null;
+      Var var3 = null;
+      final int s = ctx.vars.size();
+      if(consumeWS2(PAR1)) {
+        var1 = new Var(varName());
+        ctx.vars.add(var1);
+        if(consumeWS2(COMMA)) {
+          var2 = new Var(varName());
+          if(var1.name.eq(var2.name)) Err.or(VARDEFINED, var2);
+          ctx.vars.add(var2);
+          if(consumeWS2(COMMA)) {
+            var3 = new Var(varName());
+            if(var1.name.eq(var3.name) || var2.name.eq(var3.name))
+              Err.or(VARDEFINED, var3);
+            ctx.vars.add(var3);
+          }
+        }
+        check(PAR2);
+      }
+      final Expr ex = enclosed(NOENCLEXPR);
+      ctx.vars.reset(s);
+      ct = Array.add(ct, new Catch(ex, codes, var1, var2, var3));
+    } while(consume(CATCH));
+    
+    return new Try(tr, ct);
+  }
+
+  /**
    * [FT144] Parses an FTSelection.
    * [FT157] Parses an FTPosFilter.
    * @return query expression
@@ -2303,6 +2344,23 @@ public final class XQParser extends QueryParser {
     if(ftRange() != null) check(LEVELS);
   }
 
+  /**
+   * [UP140] Parses a DeleteExpression.
+   * @return query expression
+   * @throws XQException xquery exception
+   */
+  private Expr deletee() throws XQException {
+    final int p = qp;
+    if(!consumeWS(DELETE)) return null;
+    if(!consumeWS(NODES) && !consumeWS(NODE)) {
+      qp = p;
+      return null;
+    }
+    Expr expr = single();
+    Err.or(UPIMPL);
+    return expr;
+  }
+  
   /**
    * Parses an NCName.
    * @param err optional error message

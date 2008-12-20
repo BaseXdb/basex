@@ -117,7 +117,9 @@
             <property name="severity" value="ignore"/>
         </module>
         <module name="EmptyForInitializerPad"/>
-        <module name="ThrowsCount"/>
+        <module name="ThrowsCount">
+            <property name="max" value="2"/>
+        </module>
         <module name="MutableException">
             <property name="severity" value="ignore"/>
         </module>

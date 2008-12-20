@@ -148,7 +148,10 @@ public final class MetaData {
       else if(k.equals(DBLASTID))   lastid   = Token.toInt(v);
     }
 
-    if(!storage.equals(STORAGE)) throw new BuildException(DBUPDATE, storage);
+    if(!storage.equals(STORAGE)) {
+      in.close();
+      throw new BuildException(DBUPDATE, storage);
+    }
     if(!istorage.equals(ISTORAGE)) update();
     return size;
   }

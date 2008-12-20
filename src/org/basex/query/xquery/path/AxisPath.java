@@ -125,7 +125,6 @@ public class AxisPath extends Path {
       // no index access possible; skip remaining tests
       if(iacs == null || !iacs.io || !iacs.iu) continue;
 
-      // [SG] seems to cause some troubles
       if(iacs.is == 0 && iacs.ftnot) {
         // no result, not operator... accept all results
         stp.pred[minp] = Bln.TRUE;

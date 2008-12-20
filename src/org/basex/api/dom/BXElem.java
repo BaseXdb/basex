@@ -7,6 +7,7 @@ import org.basex.query.xquery.iter.NodeIter;
 import org.basex.util.Token;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.TypeInfo;
 
@@ -33,6 +34,11 @@ public final class BXElem extends BXNode implements Element {
   @Override
   public String getLocalName() {
     return getNodeName();
+  }
+
+  @Override
+  public NamedNodeMap getAttributes() {
+    return new BXNNode(finish(node.attr()));
   }
 
   public String getAttribute(final String name) {

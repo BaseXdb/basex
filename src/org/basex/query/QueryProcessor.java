@@ -5,6 +5,8 @@ import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
+import org.basex.data.Serializer;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -16,6 +18,8 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public abstract class QueryProcessor extends Progress {
+  /** Query Info: Plan. */
+  private static final byte[] PLAN = Token.token("QueryPlan");
   /** Initial node set. */
   public String query;
   /** Expression context. */
@@ -55,13 +59,6 @@ public abstract class QueryProcessor extends Progress {
   public final void compile(final Nodes nodes) throws QueryException {
     if(context == null) parse();
     context.compile(nodes);
-    if(Prop.dotplan) {
-      try {
-        context.planDot();
-      } catch(final Exception ex) {
-        ex.printStackTrace();
-      }
-    }
     compiled = true;
   }
 
@@ -80,16 +77,7 @@ public abstract class QueryProcessor extends Progress {
    * Returns query background information.
    * @return background information
    */
-  public final String getInfo() {
-    try {
-      if(Prop.xmlplan) {
-        context.info.add(QUERYPLAN + NL);
-        context.planXML();
-      }
-    } catch(final Exception ex) {
-      ex.printStackTrace();
-    }
-    
+  public final String info() {
     final TokenBuilder tb = new TokenBuilder(context.info());
     if(Prop.allInfo) {
       tb.add(NL + QUERYSTRING);
@@ -97,6 +85,19 @@ public abstract class QueryProcessor extends Progress {
       tb.add(NL);
     }
     return tb.toString();
+  }
+  
+  /**
+   * Returns the query plan in the dot notation.
+   * @param ser serializer
+   * @throws Exception exception
+   */
+  public final void plan(final Serializer ser) throws Exception {
+    ser.open(1);
+    ser.openElement(PLAN);
+    context.plan(ser);
+    ser.closeElement();
+    ser.close(1);
   }
   
   @Override

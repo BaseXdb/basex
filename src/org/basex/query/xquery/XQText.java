@@ -24,6 +24,7 @@ public interface XQText {
   /** XPTY Error type. */ String XPTY = "XPTY";
   /** XQDY Error type. */ String XQDY = "XQDY";
   /** XQST Error type. */ String XQST = "XQST";
+  /** XQUS Error type. */ String XUST = "XQUS";
   /** XQTY Error type. */ String XQTY = "XQTY";
 
   /** FOAR0001: Evaluation exception. */
@@ -191,6 +192,8 @@ public interface XQText {
   Object[] TAGWRONG = { XPST, 3, "Start and end tag are different (%/%)." };
   /** XPST0003: Parsing exception. */
   Object[] PIWRONG = { XPST, 3, "Invalid processing-instruction." };
+  /** XPST0003: Parsing exception. */
+  Object[] NSWRONG = { XPST, 3, "Invalid namespace construction." };
   /** XPST0003: Parsing exception. */
   Object[] NOENCLEXPR = { XPST, 3, "Expecting valid expression after \"{\"." };
   /** XPST0003: Parsing exception. */
@@ -373,6 +376,8 @@ public interface XQText {
   /** XQDY0074: Evaluation exception. */
   Object[] INVAL = { XQDY, 74, "Invalid name: \"%\"" };
 
+  /** XQST0000: Parsing exception. */
+  Object[] XQ11IMPL = { XQST, 0, "XQuery 1.1 Feature not implemented." };
   /** XQST0009: Parsing exception. */
   Object[] IMPLSCHEMA = { XQST, 9, "Schema import not supported." };
   /** XQST0022: Parsing exception. */
@@ -460,6 +465,11 @@ public interface XQText {
   /** XQTY0024: Parsing exception. */
   Object[] NOATTALL = { XQTY, 24, 
       "Attributes must directly follow element nodes." };
+
+  /** XUST0000: Parsing exception. */
+  Object[] UPIMPL = { XUST, 0, "XQuery Update not implemented." };
+  /** XUST0003: Parsing exception. */
+  Object[] DUPLREVAL = { XUST, 3, "Duplicate 'revalidation' declaration." };
 
   // OPTIMIZATIONS
 

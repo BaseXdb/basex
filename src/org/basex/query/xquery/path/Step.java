@@ -152,6 +152,14 @@ public class Step extends Expr {
     return axis == ax && pred.length == 0 && 
       (!name || test.kind == Test.Kind.NAME);
   }
+  
+  /**
+   * Adds a predicate to the step.
+   * @param p predicate to be added
+   */
+  public void addPred(final Expr p) {
+    pred = Array.add(pred, p);
+  }
 
   @Override
   public boolean uses(final Using u) {
@@ -203,13 +211,5 @@ public class Step extends Expr {
     sb.append(test);
     for(final Expr e : pred) sb.append("[" + e + "]");
     return sb.toString();
-  }
-  
-  /**
-   * Adds a predicate to the step.
-   * @param p predicate to be added
-   */
-  public void addPred(final Expr p) {
-    pred = Array.add(pred, p);
   }
 }

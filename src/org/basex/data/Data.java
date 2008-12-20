@@ -332,9 +332,17 @@ public abstract class Data  {
    * @return atomized value
    */
   public final byte[] atom(final int pre) {
-    final int k = kind(pre);
-    return k == TEXT || k == COMM || k == PI ? text(pre) : 
-           k == ATTR ? attValue(pre) : atm(pre);
+    switch(kind(pre)) {
+      case TEXT: case COMM:
+        return text(pre);
+      case ATTR:
+        return attValue(pre);
+      case PI:
+        final byte[] txt = text(pre);
+        return substring(txt, indexOf(txt, ' ') + 1);
+      default:
+        return atm(pre);
+    }
   }
 
   /**
@@ -344,9 +352,17 @@ public abstract class Data  {
    * @return atomized value
    */
   public final double atomNum(final int pre) {
-    final int k = kind(pre);
-    return k == TEXT || k == COMM || k == PI ? textNum(pre) : 
-           k == ATTR ? attNum(pre) : toDouble(atm(pre));
+    switch(kind(pre)) {
+      case TEXT: case COMM:
+        return textNum(pre);
+      case ATTR:
+        return attNum(pre);
+      case PI:
+        final byte[] txt = text(pre);
+        return toDouble(substring(txt, indexOf(txt, ' ') + 1));
+      default:
+        return toDouble(atm(pre));
+    }
   }
 
   /**

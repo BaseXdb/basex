@@ -88,7 +88,7 @@ public abstract class BXNode implements Node {
   }
 
   public NamedNodeMap getAttributes() {
-    return new BXNNode(finish(node.attr()));
+    return null;
   }
 
   public final String getBaseURI() {
@@ -273,7 +273,8 @@ public abstract class BXNode implements Node {
     try {
       Nod n = null;
       while((n = iter.next()) != null) {
-        if(nm == null || eq(nm, n.nname())) nb.add(n.copy());
+        if(n.type == Type.ELM && (nm == null || eq(nm, n.nname())))
+          nb.add(n.copy());
       }
     } catch(final XQException ex) {
       BaseX.notexpected();
@@ -309,6 +310,7 @@ public abstract class BXNode implements Node {
    * Throws a DOM modification exception.
    */
   public final void error() {
-    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR, null);
+    throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
+        "DOM implementation is read-only.");
   }
 }

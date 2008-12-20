@@ -18,7 +18,7 @@ public abstract class ExprInfo {
    * @return result of check
    */
   public String color() {
-    return "E0E0E0";
+    return null;
   }
   
   /**

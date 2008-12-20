@@ -2,7 +2,6 @@ package org.basex.api.dom;
 
 import static org.basex.util.Token.*;
 import org.basex.BaseX;
-import org.basex.io.IO;
 import org.basex.query.xquery.item.FAttr;
 import org.basex.query.xquery.item.FComm;
 import org.basex.query.xquery.item.FDoc;
@@ -102,8 +101,13 @@ public final class BXDoc extends BXNode implements Document {
   }
 
   public Element getDocumentElement() {
-    final QNm name = new QNm(token(IO.get(string(node.base())).dbname()));
-    return new BXElem(new FElem(name, node.base(), node));
+    final NodeList list = getChildNodes();
+    for(int l = 0; l < list.getLength(); l++) {
+      final Node n = list.item(l);
+      if(n.getNodeType() == Node.ELEMENT_NODE) return (Element) n;
+    }
+    BaseX.notexpected();
+    return null;
   }
 
   public String getDocumentURI() {

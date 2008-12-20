@@ -54,6 +54,13 @@ public final class CachedOutput extends PrintOutput {
     }
     return Array.finish(buf, size);
   }
+  
+  /**
+   * Resets the output buffer.
+   */
+  public void reset() {
+    size = 0;
+  }
 
   @Override
   public boolean finished() {
