@@ -29,8 +29,8 @@ public final class Contains extends Func {
   public Bln eval(final XPContext ctx) throws QueryException {
     final Item[] v = evalArgs(ctx);
     // don't evaluate empty node sets
-    final int s1 = v[0].size();
-    final int s2 = v[1].size();
+    final long s1 = v[0].size();
+    final long s2 = v[1].size();
     if(s1 == 0 || s2 == 0) return Bln.FALSE;
     if(v[0] instanceof Nod && s2 == 1) {
       final Nod nodes = (Nod) v[0];

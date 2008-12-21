@@ -20,14 +20,6 @@ public abstract class ExprInfo {
   public String color() {
     return null;
   }
-  
-  /**
-   * Recursively sends the abstract syntax of this expression to the
-   * specified serializer.
-   * @param ser serializer
-   * @throws IOException exception
-   */
-  public abstract void plan(Serializer ser) throws IOException;
 
   /**
    * Returns a string description of the expression. Contrary to the
@@ -46,6 +38,14 @@ public abstract class ExprInfo {
   public byte[] name() {
     return Token.token(getClass().getSimpleName());
   }
+  
+  /**
+   * Recursively sends the abstract syntax of this expression to the
+   * specified serializer.
+   * @param ser serializer
+   * @throws IOException exception
+   */
+  public abstract void plan(Serializer ser) throws IOException;
 
   @Override
   public abstract String toString();

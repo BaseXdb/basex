@@ -120,7 +120,7 @@ public final class FTBuilder extends Progress implements IndexBuilder {
       final int il = index.next.size;
       for (int i = 1; i < il; i++) {
         // check pointer on data needs 1 or 2 ints
-        int lp = (next[i][next[i].length - 1] > -1) ? 0 : -1;
+        final int lp = next[i][next[i].length - 1] > -1 ? 0 : -1;
         // write token size as byte
         outN.write((byte) tokens[next[i][0]].length);
         // write token
@@ -158,7 +158,7 @@ public final class FTBuilder extends Progress implements IndexBuilder {
         int lastpre = -1;
         byte[] lp = new byte[]{};
         for (int i = 0; i < il; i++) {
-          for (int j = 0; j < pre[i].length; i++) {
+          for (final int j = 0; j < pre[i].length; i++) {
             if (lastpre != pre[i][j]) {
               lastpre = pre[i][j];
               lp = Num.simpleNum(pre[i][j]);
@@ -185,16 +185,6 @@ public final class FTBuilder extends Progress implements IndexBuilder {
       BaseX.debug("- Written: % (%)", p, Performance.getMem());
     }
     return new FTTrie(data, db);
-  }
-  
-  /**
-   * Converts an int-array to a long value.
-   * @param i int-array with the long value
-   * @param p position to read from
-   * @return long value
-   */
-  public static long toLong(final int[] i, final int p) {
-    return ((long) -i[p] << 31) | i[p + 1];
   }
 
   /**
@@ -252,12 +242,11 @@ public final class FTBuilder extends Progress implements IndexBuilder {
    *
    * @param out DataOutput  stream for the data
    * @param d data to write
-   * @throws IOException File not found
+   * @throws IOException I/O exception
    */
   private void writeData(final DataOutput out, final int[] d)
     throws IOException {
-    final byte[] val = Num.create(d, d.length);
-    for (int z = 0; z < val.length; z++) out.write(val[z]);
+    for(final byte b : Num.create(d)) out.write(b);
   }
 
   /**

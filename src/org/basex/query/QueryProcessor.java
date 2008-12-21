@@ -25,7 +25,7 @@ public abstract class QueryProcessor extends Progress {
   /** Expression context. */
   protected QueryContext context;
   /** Compilation flag. */
-  private boolean compiled;
+  protected boolean compiled;
 
   /**
    * Default Constructor.

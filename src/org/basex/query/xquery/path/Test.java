@@ -59,6 +59,5 @@ public abstract class Test {
    * @return result of check
    * @throws XQException evaluation exception
    */
-  public abstract boolean e(final Nod tmp)
-      throws XQException;
+  public abstract boolean e(final Nod tmp) throws XQException;
 }

@@ -20,11 +20,6 @@ public final class Nodes implements Result {
   public Data data;
   /** Number of stored nodes. */
   public int size;
-
-  /* Fulltext data (pre values and positions).
-  public int[][] ftpos;
-  /** Fulltext pointer values, linking pre values and query strings.
-  public int[] ftpoin;*/
   
   /**
    * Node Set constructor.
@@ -148,20 +143,8 @@ public final class Nodes implements Result {
     while(a != al) c.add(ai[a++]);
     return c.finish();
   }
-  
-  /**
-   * Setter for FTData. Used for visualization purpose.
-   * 
-   * @param ftprepos pre values and position values
-   * @param ftpointer pointer for pre values
-  public void setFTData(final int[][] ftprepos, final int[] ftpointer) {
-    ftpos = ftprepos;
-    ftpoin = ftpointer;
-  }
-   */
 
-  /** {@inheritDoc} */
-  public int size() {
+  public long size() {
     return size;
   }
   
@@ -173,7 +156,6 @@ public final class Nodes implements Result {
     return new Nodes(nodes, data);
   }
   
-  /** {@inheritDoc} */
   public boolean same(final Result v) {
     if(!(v instanceof Nodes) || v.size() != size) return false;
 
@@ -183,7 +165,6 @@ public final class Nodes implements Result {
     return true;
   }
 
-  /** {@inheritDoc} */
   public void serialize(final Serializer ser) throws IOException {
     ser.open(size);
     for(int c = 0; c < size; c++) {
@@ -193,7 +174,6 @@ public final class Nodes implements Result {
     ser.close(size);
   }
 
-  /** {@inheritDoc} */
   public void serialize(final Serializer ser, final int n) throws IOException {
     ser.openResult();
     ser.node(data, nodes[n]);

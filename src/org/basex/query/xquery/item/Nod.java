@@ -59,7 +59,7 @@ public abstract class Nod extends Item {
   }
 
   @Override
-  public final double dbl() throws XQException {
+  public double dbl() throws XQException {
     return Dbl.parse(str());
   }
 

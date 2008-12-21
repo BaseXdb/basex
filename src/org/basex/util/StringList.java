@@ -44,13 +44,6 @@ public final class StringList implements Iterable<String> {
   }
 
   /**
-   * Resets the integer list.
-   */
-  public void reset() {
-    size = 0;
-  }
-
-  /**
    * Sorts the strings.
    */
   public void sort() {

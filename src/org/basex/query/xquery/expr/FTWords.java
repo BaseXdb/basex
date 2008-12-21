@@ -56,13 +56,13 @@ public final class FTWords extends FTExpr {
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
     final int len = contains(ctx);
-    return Dbl.iter(len == 0 ? 0 : Scoring.word(ctx.ftitem.size(), len));
+    return Dbl.iter(len == 0 ? 0 : Scoring.word(len, ctx.ftitem.size()));
   }
 
   /**
    * Evaluates the fulltext match.
    * @param ctx query context
-   * @return result of matching
+   * @return length value, used for scoring
    * @throws XQException xquery exception
    */
   private int contains(final XQContext ctx) throws XQException {
@@ -79,7 +79,7 @@ public final class FTWords extends FTExpr {
           final byte[] txt = i.str();
           final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftpos, txt);
           if(oc == 0) return 0;
-          len += txt.length * oc;
+          len += txt.length;
           o += oc / ctx.ftopt.sb.count();
         }
         break;
@@ -88,7 +88,7 @@ public final class FTWords extends FTExpr {
           for(final byte[] txt : split(i.str(), ' ')) {
             final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftpos, txt);
             if(oc == 0) return 0;
-            len += txt.length * oc;
+            len += txt.length;
             o += oc;
           }
         }
@@ -97,7 +97,7 @@ public final class FTWords extends FTExpr {
         while((i = iter.next()) != null) {
           final byte[] txt = i.str();
           final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftpos, txt);
-          len += txt.length * oc;
+          len += txt.length;
           o += oc / ctx.ftopt.sb.count();
         }
         break;
@@ -105,7 +105,7 @@ public final class FTWords extends FTExpr {
         while((i = iter.next()) != null) {
           for(final byte[] txt : split(i.str(), ' ')) {
             final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftpos, txt);
-            len += txt.length * oc;
+            len += txt.length;
             o += oc;
           }
         }
@@ -117,7 +117,7 @@ public final class FTWords extends FTExpr {
           txt.add(i.str());
         }
         final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftpos, txt.finish());
-        len += txt.size * oc;
+        len += txt.size;
         o += oc / ctx.ftopt.sb.count();
         break;
     }

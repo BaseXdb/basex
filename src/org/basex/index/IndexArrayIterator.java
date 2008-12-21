@@ -31,8 +31,6 @@ public class IndexArrayIterator extends IndexIterator {
     @Override
     public int size() { return 0; }; 
     @Override 
-    public FTNode nextFTNodeFD() { return new FTNode(); };
-    @Override 
     public FTNode nextFTNode() { return new FTNode(); };
   };
   
@@ -46,7 +44,7 @@ public class IndexArrayIterator extends IndexIterator {
 
   /**
    * Constructor.
-   * @param res pres array
+   * @param res pre array
    * @param s number of results
    */
   public IndexArrayIterator(final int[] res, final int s) {
@@ -56,16 +54,16 @@ public class IndexArrayIterator extends IndexIterator {
 
   /**
    * Constructor.
-   * @param res pres array
+   * @param res pre array
    * @param c Flag for data converting
    */
   public IndexArrayIterator(final int[][] res, final boolean c) {
-    this (res, res[0].length, c);
+    this(res, res[0].length, c);
   }
 
   /**
    * Constructor.
-   * @param res pres array
+   * @param res pre array
    * @param s size
    * @param c Flag for data converting
    */
@@ -86,21 +84,14 @@ public class IndexArrayIterator extends IndexIterator {
   public int next() {
     return pres != null ? pres[d] : ftdata[d][0];
   }
-
-  @Override
-  public FTNode nextFTNodeFD() {
-    return new FTNode();
-  }
   
   /**
    * Get next FTNode.
    * @return FTNode next FTNode
    */
   public FTNode nextFTNode() {
-    if (d == size) return new FTNode();
-    final FTNode n = pres != null ? new FTNode(pres[d])
-      : (ftdata == null ? nextFTNodeFD() : 
-        new FTNode(ftdata[d], toknum));
+    final FTNode n = pres != null ? new FTNode(pres[d]) :
+      ftdata == null ? new FTNode() : new FTNode(ftdata[d], toknum);
     if(tok != null) n.setToken(tok);
     return n;
   }
@@ -153,14 +144,6 @@ public class IndexArrayIterator extends IndexIterator {
   }
   
   /**
-   * Get all FTData from index.
-   * @return int[][] ftdata
-   */
-  public int[][] getFTData() {
-    return ftdata;
-  }
-  
-  /**
    * Merges two index array iterators.
    * @param iai1 first index array iterator to merge
    * @param iai2 second index array iterator to merge
@@ -178,7 +161,7 @@ public class IndexArrayIterator extends IndexIterator {
    * @param w distance between two pos values
    * @return IndexArrayIterator
    */
-  public static IndexArrayIterator merge(final IndexArrayIterator iai1,
+  private static IndexArrayIterator merge(final IndexArrayIterator iai1,
       final IndexArrayIterator iai2, final int w) {
     if (iai1 == EMP) return iai2;
     if (iai2 == EMP) return iai1;
@@ -191,9 +174,9 @@ public class IndexArrayIterator extends IndexIterator {
       @Override
       public boolean more() {
         r = null;
-        n[0] = (c == 0 || c == -1) ? iai1.more() 
+        n[0] = c == 0 || c == -1 ? iai1.more() 
             ? iai1.nextFTNode() : null : n[0];
-        n[1] = (c == 1 || c == -1) ? iai2.more() 
+        n[1] = c == 1 || c == -1 ? iai2.more() 
             ? iai2.nextFTNode() : null : n[1];
         if (n[0] != null) {
           if (n[1] != null) {
@@ -265,9 +248,9 @@ public class IndexArrayIterator extends IndexIterator {
       @Override
       public boolean more() {
         r = null;
-        n[0] = (c == 0 || c == -1) ? iai1.more() 
+        n[0] = c == 0 || c == -1 ? iai1.more() 
             ? iai1.nextFTNode() : null : n[0];
-        n[1] = (c == 1 || c == -1) ? iai2.more() 
+        n[1] = c == 1 || c == -1 ? iai2.more() 
             ? iai2.nextFTNode() : null : n[1];
         if (n[0] != null && n[1] != null) {
           final int dis = n[0].getPre() - n[1].getPre();
@@ -314,4 +297,12 @@ public class IndexArrayIterator extends IndexIterator {
       }
     };
   }
+  
+  /**
+   * Get all FTData from index.
+   * @return int[][] ftdata
+  public int[][] getFTData() {
+    return ftdata;
+  }
+   */
 }

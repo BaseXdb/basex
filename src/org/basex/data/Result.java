@@ -13,7 +13,7 @@ public interface Result {
    * Number of values, stored in the result instance.
    * @return number of values
    */
-  int size();
+  long size();
 
   /**
    * Compares values for equality.

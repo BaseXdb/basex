@@ -36,8 +36,7 @@ public final class FTNot extends FTExpr {
   public void indexAccessible(final XQContext ctx, final FTIndexAcsbl ia) 
     throws XQException {
     
-    ia.ftnot = !ia.ftnot;
-    
+    ia.ftnot ^= true;
     // in case of ftand ftnot seq could be set false in FTAnd
     ia.seq = true;
     expr[0].indexAccessible(ctx, ia);

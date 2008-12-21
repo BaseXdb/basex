@@ -56,7 +56,7 @@ public class FLWR extends Single {
     return new Iter() {
       private Iter[] iter;
       private Iter ir;
-      private int p = 0;
+      private int p;
 
       @Override
       public Item next() throws XQException {
@@ -74,17 +74,12 @@ public class FLWR extends Single {
             while(iter[p].next().bool()) {
               if(p + 1 != fl.length) {
                 p++;
-              } else {
-                if(where == null || ctx.iter(where).ebv().bool()) {
-                  ir = ctx.iter(expr);
-                  break;
-                }
+              } else if(where == null || ctx.iter(where).ebv().bool()) {
+                ir = ctx.iter(expr);
+                break;
               }
             }
-            if(ir == null) {
-              if(p == 0) return null;
-              --p;
-            }
+            if(ir == null && p-- == 0) return null;
           }
         }
       }
@@ -105,6 +100,7 @@ public class FLWR extends Single {
       where.plan(ser);
       ser.closeElement();
     }
+    if(order != null) order.plan(ser);
     ser.openElement(RET);
     expr.plan(ser);
     ser.closeElement();
@@ -116,6 +112,7 @@ public class FLWR extends Single {
     final StringBuilder sb = new StringBuilder();
     for(int i = 0; i != fl.length; i++) sb.append((i != 0 ? " " : "") + fl[i]);
     if(where != null) sb.append(" where " + where);
+    if(order != null) sb.append(order);
     return sb.append(" return " + expr).toString();
   }
 }

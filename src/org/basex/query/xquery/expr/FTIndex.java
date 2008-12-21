@@ -22,13 +22,11 @@ import org.basex.query.xquery.iter.Iter;
  */
 public final class FTIndex extends FTExpr {
   /** Fulltext token. */
-  public final byte[] tok;
+  final byte[] tok;
   /** Data reference. */
-  public final Data data;
+  final Data data;
   /** Index iterator. */
-  public IndexArrayIterator iat;
-  /** FTOpt for index access. */
-  public FTOpt fto;
+  IndexArrayIterator iat;
 
   /**
    * Constructor.
@@ -42,13 +40,17 @@ public final class FTIndex extends FTExpr {
   
   @Override
   public Iter iter(final XQContext ctx) {
-    fto = ctx.ftopt;
     return new FTNodeIter() {
+      public final FTOpt fto = ctx.ftopt;
+
       @Override
       public FTNodeItem next() { 
-        if (iat == null && !evalIter()) return new FTNodeItem();
-        return iat.more() ? new FTNodeItem(
-          iat.nextFTNode(), data) : new FTNodeItem(new FTNode(), data);
+        if(iat == null && !evalIter()) {
+          //System.out.println("?");
+          return new FTNodeItem();
+        }
+        return new FTNodeItem(iat.more() ? iat.nextFTNode() :
+          new FTNode(), data);
       }
 
       /**
@@ -58,11 +60,11 @@ public final class FTIndex extends FTExpr {
       private boolean evalIter() {
         final FTTokenizer ft = new FTTokenizer();
         ft.init(tok);
-        ft.lc = FTIndex.this.fto.is(FTOpt.LC);
-        ft.uc = FTIndex.this.fto.is(FTOpt.UC);
-        ft.cs = FTIndex.this.fto.is(FTOpt.CS);
-        ft.wc = FTIndex.this.fto.is(FTOpt.WC);
-        ft.fz = FTIndex.this.fto.is(FTOpt.FZ);
+        ft.lc = fto.is(FTOpt.LC);
+        ft.uc = fto.is(FTOpt.UC);
+        ft.cs = fto.is(FTOpt.CS);
+        ft.wc = fto.is(FTOpt.WC);
+        ft.fz = fto.is(FTOpt.FZ);
         ft.lp = true;
         while(ft.more()) {
           if(data.nrIDs(ft) == 0) return false;

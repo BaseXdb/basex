@@ -9,8 +9,8 @@ import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Itr;
 import org.basex.query.xquery.item.Str;
 import org.basex.query.xquery.iter.Iter;
+import org.basex.query.xquery.iter.SeqIter;
 import org.basex.query.xquery.util.Err;
-import org.basex.query.xquery.util.SeqBuilder;
 
 /**
  * Single order specifier.
@@ -20,7 +20,7 @@ import org.basex.query.xquery.util.SeqBuilder;
  */
 public final class Ord {
   /** Order expression. */
-  private SeqBuilder seq;
+  private SeqIter seq;
   /** Order expression. */
   private Expr expr;
   /** Ascending/descending order. */
@@ -40,7 +40,7 @@ public final class Ord {
    * @param l least empty order
    */
   public Ord(final Expr e, final boolean d, final boolean l) {
-    seq = new SeqBuilder();
+    seq = new SeqIter();
     expr = e;
     desc = d;
     lst = l;
@@ -77,7 +77,7 @@ public final class Ord {
    * Resets the built sequence.
    */
   public void finish() {
-    if(seq != null) seq = new SeqBuilder();
+    if(seq != null) seq = new SeqIter();
   }
 
   /**

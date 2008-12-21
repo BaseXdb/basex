@@ -68,7 +68,7 @@ public final class BaseXServer {
       @Override
       public void run() {
         while(running) {
-          Performance.sleep(Prop.timeout * 1000);
+          Performance.sleep(Prop.timeout * 1000L);
           clean();
         }
       }

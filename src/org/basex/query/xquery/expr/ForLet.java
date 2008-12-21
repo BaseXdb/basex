@@ -1,5 +1,7 @@
 package org.basex.query.xquery.expr;
 
+import org.basex.query.xquery.XQContext;
+import org.basex.query.xquery.iter.ResetIter;
 import org.basex.query.xquery.util.Var;
 
 /**
@@ -18,4 +20,7 @@ public abstract class ForLet extends Expr {
   public String color() {
     return "66CC66";
   }
+  
+  @Override
+  public abstract ResetIter iter(final XQContext ctx);
 }

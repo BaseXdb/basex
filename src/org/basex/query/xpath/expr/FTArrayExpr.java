@@ -4,7 +4,6 @@ import java.io.IOException;
 import org.basex.data.MetaData;
 import org.basex.data.Serializer;
 import org.basex.index.FTNode;
-import org.basex.index.FTNodeIter;
 import org.basex.query.FTOpt;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -65,14 +64,6 @@ public abstract class FTArrayExpr extends Expr {
   }
   
   /**
-   * Checks whether the result of the expression is negative.
-   * @return boolean
-   */
-  public boolean pos() {
-    return true;
-  }
-  
-  /**
    * Adds an expression to the expression list.
    * @param ex new expression
    */
@@ -90,21 +81,6 @@ public abstract class FTArrayExpr extends Expr {
     return new FTNode();
   }
 
-  /**
-   * Returns an iterator for the results.
-   * @param ctx current context
-   * @return container for the results
-   */
-  @SuppressWarnings("unused")
-  public FTNodeIter iter(final QueryContext ctx) {
-    return new FTNodeIter(){
-      @Override
-      public FTNode next() {
-        return more() ? FTArrayExpr.this.next(ctx) : new FTNode();
-      }
-    };
-  }
-
   @Override
   public final boolean usesPos() {
     return false;
@@ -118,8 +94,7 @@ public abstract class FTArrayExpr extends Expr {
   @Override
   @SuppressWarnings("unused")
   public FTArrayExpr indexEquivalent(final XPContext ctx, final Step step, 
-      final boolean seq)
-      throws QueryException {
+      final boolean seq) throws QueryException {
     return null;
   }
 

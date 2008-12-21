@@ -88,7 +88,6 @@ public final class MemData extends Data {
       case TEXT:
       case COMM:
       case PI:
-        return (int) (val2[pre] >> 32);
       case ATTR:
         return (int) (val2[pre] >> 32);
       default:
@@ -159,15 +158,6 @@ public final class MemData extends Data {
   @Override
   public int attLen(final int pre) {
     return attValue(pre).length;
-  }
-
-  /**
-   * Returns the index value for the specified attribute value id.
-   * @param id index id
-   * @return value
-   */
-  public byte[] attToken(final int id) {
-    return ((MemValues) atvindex).token(id);
   }
 
   /**

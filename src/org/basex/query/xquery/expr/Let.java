@@ -9,6 +9,7 @@ import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Dbl;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.iter.Iter;
+import org.basex.query.xquery.iter.ResetIter;
 import org.basex.query.xquery.util.Scoring;
 import org.basex.query.xquery.util.Var;
 import org.basex.util.Token;
@@ -45,10 +46,10 @@ public final class Let extends ForLet {
   }
 
   @Override
-  public Iter iter(final XQContext ctx) {
+  public ResetIter iter(final XQContext ctx) {
     final Var v = var.clone();
 
-    return new Iter() {
+    return new ResetIter() {
       /** Iterator flag. */
       private boolean more;
       /** Variable stack size. */

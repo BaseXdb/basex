@@ -46,16 +46,6 @@ public final class IntList {
     if(size == list.length) list = Array.extend(list);
     list[size++] = v;
   }
-
-  /**
-   * Remove a value.
-   * @param i index of the value to be remove
-   */
-  public void remove(final int i) {
-    System.arraycopy(list, i + 1, list, i, size - i - 1);
-    size--;
-  }
-
   
   /**
    * Sets a value at the specified position.
@@ -93,7 +83,6 @@ public final class IntList {
     size = 0;
   }
   
-
   /**
    * Sorts the specified tokens and returns an {@link IntList} instance
    * with the sort order of all tokens.

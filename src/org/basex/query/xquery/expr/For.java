@@ -12,6 +12,7 @@ import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Itr;
 import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.iter.Iter;
+import org.basex.query.xquery.iter.ResetIter;
 import org.basex.query.xquery.util.Scoring;
 import org.basex.query.xquery.util.Var;
 import org.basex.util.Token;
@@ -56,12 +57,12 @@ public final class For extends ForLet {
   }
 
   @Override
-  public Iter iter(final XQContext ctx) {
+  public ResetIter iter(final XQContext ctx) {
     final Var v = var.clone();
     final Var p = pos != null ? pos.clone() : null;
     final Var sc = score != null ? score.clone() : null;
     
-    return new Iter() {
+    return new ResetIter() {
       /** Iterator flag. */
       private boolean more;
       /** Variable stack size. */

@@ -232,7 +232,6 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     panel.add(slider, pos);
   }
 
-  /** {@inheritDoc} */
   public void actionPerformed(final ActionEvent e) {
     if(e == null) {
       if(GUIProp.execrt) query(false);

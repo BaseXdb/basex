@@ -17,7 +17,7 @@ import org.basex.query.xquery.iter.Iter;
  */
 public final class FTContainsSIndex extends FTContains {
   /** Current FTNodeItem. */
-  public FTNodeItem ftn;
+  FTNodeItem ftn;
   
   /**
    * Constructor.
@@ -34,8 +34,7 @@ public final class FTContainsSIndex extends FTContains {
     ctx.ftitem = ft;
         
     final FTNodeIter fti = (FTNodeIter) ctx.iter(expr[1]);
-    if(ftn == null) 
-      ftn = fti.next();
+    if(ftn == null) ftn = fti.next();
 
     double d = 0;
     DBNode n;
@@ -61,40 +60,7 @@ public final class FTContainsSIndex extends FTContains {
     ctx.ftitem = tmp;
     return Bln.get(d).iter();
   }
-  /*
-  @Override
-  public Iter iter(final XQContext ctx) throws XQException {    
-    final Iter ir = ctx.iter(expr[0]);
-    final FTTokenizer tmp = ctx.ftitem;
-    ctx.ftitem = ft;
-        
-    final FTNodeIter fti = (FTNodeIter) ctx.iter(expr[1]);
-    if(ftn == null) ftn = fti.next();
 
-    double d = 0;
-    DBNode n;
-    while((n = (DBNode) ir.next()) != null) {
-      n.score(1);
-      while(ftn != null && ftn.ftn.size > 0 && n.pre > ftn.ftn.getPre()) {
-        ftn = fti.next();
-      }
-      if(ftn != null) {
-        final boolean not = ftn.ftn.not;
-        if(ftn.ftn.getPre() == n.pre) {
-          ftn = null;
-          d = not ? 0 : n.score();
-          break;
-        }
-        if(not) {
-          d = n.score();
-          break;
-        }
-      }
-    }
-    ctx.ftitem = tmp;
-    return Bln.get(d).iter();
-  }
-*/
   @Override
   public String toString() {
     return toString(" ftcontainsSI ");

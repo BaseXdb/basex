@@ -6,7 +6,6 @@ import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Context;
 import org.basex.query.xquery.expr.Expr;
-import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.iter.Iter;
 
 /**
@@ -36,14 +35,6 @@ public abstract class Path extends Expr {
 
   @Override
   public abstract Iter iter(final XQContext ctx) throws XQException;
-  
-  /**
-   * Evaluates the location path.
-   * @param ctx query context
-   * @return resulting item
-   * @throws XQException evaluation exception
-   */
-  protected abstract Item eval(final XQContext ctx) throws XQException;
   
   /**
    * Indicates if an expression uses the specified type.

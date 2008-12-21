@@ -37,11 +37,6 @@ public final class FTSelect extends FTArrayExpr {
       exprs[i] = exprs[i].comp(ctx);
     }
     return this;
-   }
-
-  @Override 
-  public boolean pos() {
-    return exprs[0].pos();
   }
   
   @Override
@@ -82,22 +77,6 @@ public final class FTSelect extends FTArrayExpr {
         ftpos.pos.ft.init(ctx.item.data.text(ftn.getPre()));
         ftpos.pos.term = ftpos.pos.ft.getTokenList();       
     }
-  }
-  
-  /**
-   * Getter for expr.
-   * @return expr FTArrayExpr
-   */
-  public FTArrayExpr getExpr() {
-    return exprs[0];
-  }
-  
-  /**
-   * Setter expr.
-   * @param e FTArrayExpr
-   */
-  public void setExpr(final FTArrayExpr e) {
-    exprs[0] = e;
   }
 
   @Override

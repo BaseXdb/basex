@@ -6,6 +6,7 @@ import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.iter.Iter;
+import org.basex.query.xquery.iter.ResetIter;
 
 /**
  * Some/Every Satisfier Clause.
@@ -15,7 +16,7 @@ import org.basex.query.xquery.iter.Iter;
  */
 public final class Satisfy extends Single {
   /** For/Let expressions. */
-  private final ForLet[] fl;
+  private final For[] fl;
   /** Every flag. */
   private final boolean every;
 
@@ -36,15 +37,16 @@ public final class Satisfy extends Single {
     for(int f = 0; f != fl.length; f++) {
       final Expr e = ctx.comp(fl[f]);
       if(e.e()) return Bln.get(every);
-      fl[f] = (ForLet) e;
+      fl[f] = (For) e;
     }
     return super.comp(ctx);
   }
 
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
-    final Iter[] iter = new Iter[fl.length];
-    for(int f = 0; f < fl.length; f++) iter[f] = ctx.iter(fl[f]);
+    final ResetIter[] iter = new ResetIter[fl.length];
+    // casting is safe, but should be removed
+    for(int f = 0; f < fl.length; f++) iter[f] = (ResetIter) ctx.iter(fl[f]);
     return Bln.get(iter(ctx, iter, 0)).iter();
   }
 
@@ -56,7 +58,7 @@ public final class Satisfy extends Single {
    * @return satisfied flag
    * @throws XQException evaluation exception
    */
-  private boolean iter(final XQContext ctx, final Iter[] it, final int p)
+  private boolean iter(final XQContext ctx, final ResetIter[] it, final int p)
     throws XQException {
 
     final boolean last = p + 1 == fl.length;
@@ -64,7 +66,7 @@ public final class Satisfy extends Single {
       final boolean res = last ? ctx.iter(expr).ebv().bool() :
         iter(ctx, it, p + 1);
       if(res ^ every) {
-        for(int l = 0; l < fl.length; l++) it[l].reset();
+        for(final ResetIter ri : it) ri.reset();
         return res;
       }
     }
@@ -74,17 +76,14 @@ public final class Satisfy extends Single {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(every ? "every " : "some ");
-    for(int i = 0; i < fl.length; i++) {
-      if(i != 0) sb.append(", ");
-      sb.append(fl[i]);
-    }
+    for(int i = 0; i < fl.length; i++) sb.append((i != 0 ? ", " : "") + fl[i]);
     return sb.append(" satisfies " + expr).toString();
   }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
-    for(ForLet f : fl) f.plan(ser);
+    for(final Expr f : fl) f.plan(ser);
     expr.plan(ser);
     ser.closeElement();
   }

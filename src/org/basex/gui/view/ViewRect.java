@@ -1,14 +1,12 @@
-package org.basex.gui.view.map;
+package org.basex.gui.view;
 
 /**
- * Single Treemap Rectangle.
+ * View Rectangle.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class MapRect implements Cloneable {
-  /** Rectangle pre value. */
-  public int p;
+public final class ViewRect implements Cloneable {
   /** X position. */
   public int x;
   /** Y position. */
@@ -17,12 +15,20 @@ public final class MapRect implements Cloneable {
   public int w;
   /** Height. */
   public int h;
+  /** Rectangle pre value. */
+  public int pre;
   /** Level. */
-  int l;
+  public int level;
   /** File Type. */
-  int type = -1;
+  public int type = -1;
   /** Thumbnail view. */
-  boolean thumb;
+  public boolean thumb;
+  
+  /**
+   * Default constructor.
+   */
+  public ViewRect() {
+  }
   
   /**
    * Simple rectangle constructor.
@@ -31,7 +37,7 @@ public final class MapRect implements Cloneable {
    * @param ww width
    * @param hh height
    */
-  public MapRect(final int xx, final int yy, final int ww, final int hh) {
+  public ViewRect(final int xx, final int yy, final int ww, final int hh) {
     x = xx;
     y = yy;
     w = ww;
@@ -45,14 +51,14 @@ public final class MapRect implements Cloneable {
    * @param yy y position
    * @param ww width
    * @param hh height
-   * @param i0 rectangle id
-   * @param ll level
+   * @param p rectangle pre value
+   * @param l level
    */
-  MapRect(final int xx, final int yy, final int ww, final int hh,
-      final int i0, final int ll) {
+  public ViewRect(final int xx, final int yy, final int ww, final int hh,
+      final int p, final int l) {
     this(xx, yy, ww, hh);
-    p = i0;
-    l = ll;
+    pre = p;
+    level = l;
   }
   
   /**
@@ -61,8 +67,9 @@ public final class MapRect implements Cloneable {
    * @param yy y position
    * @return result of comparison
    */
-  boolean contains(final int xx, final int yy) {
-    return xx >= x && yy >= y && xx <= x + w && yy <= y + h;
+  public boolean contains(final int xx, final int yy) {
+    return (xx >= x && xx <= x + w || xx >= x + w && xx <= x) &&
+      (yy >= y && yy <= y + h || yy >= y + h && yy <= y);
   }
 
   /**
@@ -70,14 +77,14 @@ public final class MapRect implements Cloneable {
    * @param r rectangle
    * @return result of comparison
    */
-  boolean contains(final MapRect r) {
+  public boolean contains(final ViewRect r) {
     return r.x >= x && r.y >= y && r.x + r.w <= x + w && r.y + r.h <= y + h;
   }
 
   @Override
-  protected MapRect clone() {
+  public ViewRect clone() {
     try {
-      return (MapRect) super.clone();
+      return (ViewRect) super.clone();
     } catch(final CloneNotSupportedException e) {
       return null;
     }
@@ -85,7 +92,7 @@ public final class MapRect implements Cloneable {
   
   @Override
   public String toString() {
-    return "Rect[x=" + x + ",y=" + y + ",h=" + h + ",w=" + w + ",h=" + h +
-      ",id=" + p + ",level=" + l + ']';
+    return "ViewRect[x=" + x + ",y=" + y + ",h=" + h + ",w=" + w +
+      ",h=" + h + ",pre=" + pre + ",level=" + level + ']';
   }
 }

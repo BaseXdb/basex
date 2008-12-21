@@ -1,13 +1,12 @@
 package org.basex.query.xquery.iter;
 
 import static org.basex.query.xquery.XQText.*;
-import org.basex.BaseX;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Item;
+import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.util.Err;
-import org.basex.query.xquery.util.SeqBuilder;
 
 /**
  * Iterator interface.
@@ -34,13 +33,6 @@ public abstract class Iter {
   public abstract Item next() throws XQException;
 
   /**
-   * Resets the iterator; can be optionally implemented.
-   */
-  public void reset() {
-    BaseX.notexpected();
-  }
-
-  /**
    * Returns the number of entries. Warning: -1 is returned if the number
    * cannot be evaluated, so each method has to check and react on the
    * returned value.
@@ -51,12 +43,24 @@ public abstract class Iter {
   }
 
   /**
-   * Returns a sequence from all iterator values.
+   * Returns a sequence from all iterator values. Should be called before
+   * {@link #next}.
    * @return sequence
    * @throws XQException evaluation exception
    */
   public Item finish() throws XQException {
-    return new SeqBuilder(this).finish();
+    Item[] item = new Item[1];
+    Item i;
+    int s = 0;
+    while((i = next()) != null) {
+      if(s == item.length) {
+        final Item[] tmp = new Item[s << 2];
+        System.arraycopy(item, 0, tmp, 0, s);
+        item = tmp;
+      }
+      item[s++] = i;
+    }
+    return Seq.get(item, s);
   }
 
   /**
@@ -114,7 +118,7 @@ public abstract class Iter {
    * @param expr expression
    * @throws XQException evaluation exception
    */
-  public static void seqErr(final Item i1, final Item i2, final Item i3,
+  private static void seqErr(final Item i1, final Item i2, final Item i3,
       final Expr expr) throws XQException {
     Err.or(XPSEQ, "(" + i1 + "," + i2 + (i3 != null ? ",..." : "") + ")",
         expr.info());

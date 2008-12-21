@@ -33,7 +33,7 @@ public final class Scoring {
    * @return result
    */
   public static double word(final int tl, final double l) {
-    return 1 / Math.log(LOG + tl / l);
+    return Math.min(1, Math.log(1 + LOG * tl / l));
   }
 
   /**

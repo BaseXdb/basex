@@ -38,14 +38,6 @@ public final class Dbl extends Item {
     num = n;
   }
 
-  /**
-   * Constructor.
-   * @param n number to be represented.
-   */
-  public Dbl(final byte[] n) {
-    num = Token.toDouble(n);
-  }
-
   @Override
   public Dbl eval(final XPContext ctx) {
     return this;

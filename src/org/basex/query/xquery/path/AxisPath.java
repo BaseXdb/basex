@@ -17,7 +17,6 @@ import org.basex.query.xquery.item.DBNode;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.QNm;
-import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.NodIter;
@@ -93,7 +92,7 @@ public class AxisPath extends Path {
       if(root instanceof DBNode) dbnode = (DBNode) root;
       // root expressions make only sense if an initial context item was set.
       // currently, this is always a database node, so the cast is safe.
-      if(root instanceof Root) dbnode = (DBNode) root.iter(ctx).next();
+      if(root instanceof Root) dbnode = (DBNode) ctx.iter(root).next();
     }
     cache &= dbnode != null;
     
@@ -185,8 +184,9 @@ public class AxisPath extends Path {
   public Iter iter(final XQContext ctx) throws XQException {
     final Item it = root != null ? ctx.iter(root).finish() : ctx.item;
 
-    if(cache && citem != null && litem == it && it.type == Type.DOC)
+    if(cache && citem != null && litem == it && it.type == Type.DOC) {
       return citem.iter();
+    }
 
     litem = it;
     final Item c = ctx.item;
@@ -200,14 +200,16 @@ public class AxisPath extends Path {
     return citem.iter();
   }
   
-  @Override
+  /**
+   * Evaluates the location path.
+   * @param ctx query context
+   * @return resulting item
+   * @throws XQException evaluation exception
+   */
   protected Item eval(final XQContext ctx) throws XQException {
     // simple location step traversal...
     final NodIter ir = new NodIter();
     iter(0, ir, ctx);
-
-    if(ir.size == 0) return Seq.EMPTY;
-    if(ir.size == 1) return ir.list[0];
 
     final NodeBuilder nb = new NodeBuilder(false);
     Nod it;
@@ -331,7 +333,7 @@ public class AxisPath extends Path {
       lastAxis = inv.axis.invert();
       e[c++] = inv;
     } 
-    e[c++] = Step.get(lastAxis, curr.test);
+    e[c] = Step.get(lastAxis, curr.test);
     return new AxisPath(r, e);
   }
 

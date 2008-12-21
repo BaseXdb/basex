@@ -114,27 +114,26 @@ public final class FTContains extends Expr {
     if(cache.bool()) {
       final Nod ns = (Nod) cont.eval(ctx);
       // treat special boolean case
-      if (query instanceof FTBool) {
+      if(query instanceof FTBool) {
         final Bln b = Bln.get(ns.bool() && query.eval(ctx).bool());
         ctx.ftitem = fti;
         return b; 
-      } else {
-        ftn = (ftn == null && query.more()) ? query.next(ctx) : ftn;
-        for(int z = 0; z < ns.size(); z++) {
-          while(ftn != null && ns.nodes[z] > ftn.getPre() && ftn.size > 0) {
-            ftn = query.more() ? query.next(ctx) : null;
+      }
+      ftn = (ftn == null && query.more()) ? query.next(ctx) : ftn;
+      for(int z = 0; z < ns.size(); z++) {
+        while(ftn != null && ns.nodes[z] > ftn.getPre() && ftn.size > 0) {
+          ftn = query.more() ? query.next(ctx) : null;
+        }
+        if(ftn != null) {
+          final boolean not = ftn.not;
+          if(ftn.getPre() == ns.nodes[z]) {
+            ftn = null;
+            ctx.ftitem = fti;
+            return Bln.get(!not);
           }
-          if(ftn != null) {
-            final boolean not = ftn.not;
-            if(ftn.getPre() == ns.nodes[z]) {
-              ftn = null;
-              ctx.ftitem = fti;
-              return Bln.get(!not);
-            }
-            if(not) {
-              ctx.ftitem = fti;
-              return Bln.TRUE;
-            }
+          if(not) {
+            ctx.ftitem = fti;
+            return Bln.TRUE;
           }
         }
       }

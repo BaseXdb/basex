@@ -100,16 +100,6 @@ public abstract class IO {
   }
 
   /**
-   * Returns if this is a directory instance.
-   * @return result of check
-   * @throws IOException I/O exception
-   */
-  @SuppressWarnings("unused")
-  public boolean isSymLink() throws IOException {
-    return false;
-  }
-
-  /**
    * Returns the directory of this path.
    * @return result of check
    */

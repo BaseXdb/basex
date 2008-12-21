@@ -10,6 +10,7 @@ import org.basex.data.Nodes;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
+import org.basex.gui.view.ViewRect;
 import org.basex.gui.view.ViewData;
 
 /**
@@ -28,9 +29,9 @@ final class MapDefault extends MapPainter {
   }
 
   @Override
-  void drawRectangles(final Graphics g, final ArrayList<MapRect> rects) {
+  void drawRectangles(final Graphics g, final ArrayList<ViewRect> rects) {
     // some additions to set up borders
-    final MapRect l = view.layouter.layout;
+    final ViewRect l = view.layouter.layout;
     final int ww = view.getWidth();
     final int hh = view.getWidth();
     final Data data = GUI.context.data();
@@ -38,11 +39,11 @@ final class MapDefault extends MapPainter {
     mpos = 0;
     for(int ri = 0; ri < rects.size(); ri++) {
       // get rectangle information
-      final MapRect r = rects.get(ri);
-      final int pre = r.p;
+      final ViewRect r = rects.get(ri);
+      final int pre = r.pre;
       
       // level 1: next context node, set marker pointer to 0
-      final int lvl = r.l;
+      final int lvl = r.level;
       if(lvl == 0) mpos = 0;
 
       final boolean full = r.w == ww && r.h == hh;
@@ -86,10 +87,10 @@ final class MapDefault extends MapPainter {
    * @param rect rectangle
    * @return if the current rectangle is shown as thumbnail
    */
-  boolean drawRectangle(final Graphics g, final MapRect rect) {
+  boolean drawRectangle(final Graphics g, final ViewRect rect) {
     rect.x += 3;
     rect.w -= 3;
-    final int pre = rect.p;
+    final int pre = rect.pre;
     final Context context = GUI.context;
     final Data data = context.data();
     final Nodes current = context.current();
@@ -105,7 +106,7 @@ final class MapDefault extends MapPainter {
       g.setFont(font);
       BaseXLayout.chopString(g, name, rect.x, rect.y, rect.w);
     } else {
-      g.setColor(COLORS[Math.min(255, rect.l * 2 + 8)]);
+      g.setColor(COLORS[Math.min(255, rect.level * 2 + 8)]);
       g.setFont(mfont);
       final byte[] text = ViewData.content(data, pre, false);
       
@@ -127,13 +128,13 @@ final class MapDefault extends MapPainter {
   }
 
   @Override
-  boolean highlight(final MapRect rect, final int mx, final int my,
+  boolean highlight(final ViewRect rect, final int mx, final int my,
       final boolean click) {
     return false;
   }
 
   @Override
-  void init(final ArrayList<MapRect> rects) {
+  void init(final ArrayList<ViewRect> rects) {
   }
 
   @Override

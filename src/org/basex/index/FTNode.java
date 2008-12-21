@@ -24,7 +24,7 @@ public final class FTNode {
   public boolean not;
   /** List for tokens from query. */
   private FTTokenizer[] tok;
-  /** Number of stored values.. */
+  /** Number of stored values. */
   public int size;
 
   /**
@@ -60,7 +60,7 @@ public final class FTNode {
    * Constructor.
    * @param prevalue pre value of the current node
    */
-  public FTNode(final int prevalue) {
+  FTNode(final int prevalue) {
     pre = prevalue;
     ip = new IntList();
     ip.add(prevalue);
@@ -71,7 +71,7 @@ public final class FTNode {
    * Generates pointer with value v.
    * @param v value
    */
-  public void genPointer(final int v) {
+  void genPointer(final int v) {
     if(p != null && p.size > 0 && p.list[0] == v) return;
     final int[] t = new int[ip.size];
     for (int i = 0; i < t.length; i++) t[i] = v;
@@ -116,16 +116,6 @@ public final class FTNode {
   public FTTokenizer[] getToken() {
     return tok;
   }
-
-  /**
-   * Returns the length of all tokens.
-   * @return length
-   */
-  public int getLength() {
-    int l = -1;
-    for(int i = 0; i < tok.length; i++) l += tok[i].text.length + 1;
-    return l;
-  }
   
   /**
    * Get next pos value.
@@ -133,23 +123,6 @@ public final class FTNode {
    */
   public int nextPos() {
     return ip.list[c];
-  }
-
-  /**
-   * Removes current position value.
-   */
-  public void removePos() {
-    ip.remove(c);
-    if (p != null) p.remove(c);
-    c--;
-  }
-  
-  /**
-   * Checks if node has position values.
-   * @return boolean has position values
-   */
-  public boolean hasPos() {
-    return ip != null && ip.size > 1; 
   }
   
   /**
@@ -212,14 +185,14 @@ public final class FTNode {
     }
     
     if (tok != null && n.tok != null) {
-        FTTokenizer[] ntok = new FTTokenizer[tok.length + n.tok.length];
+        final FTTokenizer[] ntok = new FTTokenizer[tok.length + n.tok.length];
         Array.copy(tok, ntok, 0);
         Array.copy(n.tok, ntok, tok.length);
     } else {
       tok = null;
     }   
     
-    p = (p != null) ? new IntList(pn.finish()) : null;
+    p = p != null ? new IntList(pn.finish()) : null;
     return ip.size > 1;
   }
 
@@ -279,8 +252,38 @@ public final class FTNode {
   @Override
   public String toString() {
     if (getPre() == 0) return "FTNode[]";
-    return ("FTNode [Pre=" + getPre()) + "; Pos="
-    + Array.toString(ip.finish(), 0, ip.size)
-    + "; Poi=" + Array.toString(p.finish(), 0, p.size) + "]";
+    return "FTNode [Pre=" + getPre() + "; Pos="
+    + toString(ip.finish(), 0, ip.size)
+    + "; Poi=" + toString(p.finish(), 0, p.size) + "]";
   }
+  
+  /**
+   * Converts an int-array to string.
+   * @param sp index of first int value
+   * @param a array with values
+   * @param ep index of last int value
+   * @return a as string
+   */
+  private static String toString(final int[] a, final int sp, final int ep) {
+    final StringBuilder sb = new StringBuilder('[');
+    for(int s = sp; s < ep; s++) sb.append((s != sp ? "," : "") + a[s]);
+    return sb.toString();
+  }
+
+  /**
+   * Removes current position value.
+  public void removePos() {
+    ip.remove(c);
+    if (p != null) p.remove(c);
+    c--;
+  }
+   */
+  
+  /**
+   * Checks if node has position values.
+   * @return boolean has position values
+  public boolean hasPos() {
+    return ip != null && ip.size > 1; 
+  }
+   */
 }

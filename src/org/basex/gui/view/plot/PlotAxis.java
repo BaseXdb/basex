@@ -127,7 +127,7 @@ public final class PlotAxis {
       textToNum(vals);
     else {
       extremeValues(vals);
-      // calculations for axis labelling
+      // calculations for axis labeling
       if(log) prepareLogAxis();
       else prepareLinAxis();
       
@@ -135,7 +135,6 @@ public final class PlotAxis {
       for(int i = 0; i < vals.length; i++)
         co[i] = calcPosition(vals[i]);
     }
-    vals = null;
   }
 
   /**
@@ -160,7 +159,6 @@ public final class PlotAxis {
     for(final byte[] v : vals) set.add(v);
     nrCats = set.size();
     if(i > 0) nrCats--;
-    set = null;
 
     // get first/last category for axis caption
     firstCat = i < vl ? vals[i] : EMPTY;
@@ -175,9 +173,8 @@ public final class PlotAxis {
       // l: highest index in sorted array for value b
       int l = i;
       // determining highest index of value/category b
-      while(l < vl && eq(vals[l], b)) {
-        l++;
-      }
+      while(l < vl && eq(vals[l], b)) l++;
+
       // calculating positions for all items with value b in current category.
       while(i < l) {
         // centering items if only a single category exists (.5d)
@@ -310,7 +307,7 @@ public final class PlotAxis {
   }
 
   /**
-   * Executes some calculations to support a dynamic axis labelling for a
+   * Executes some calculations to support a dynamic axis labeling for a
    * linear scale.
    */
   private void prepareLinAxis() {
@@ -360,14 +357,14 @@ public final class PlotAxis {
         return;
       }
       
-      // labelling for logarithmic scale
+      // labeling for logarithmic scale
       if(log) {
         startvalue = min;
         nrCaptions = 3;
         return;
       }
 
-      // labelling for linear scale
+      // labeling for linear scale
       final boolean dbl = type == Kind.DBL;
       actlCaptionStep = calculatedCaptionStep;
       nrCaptions = (int) (range / actlCaptionStep) + 1;

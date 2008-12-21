@@ -25,8 +25,8 @@ import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.dialog.Dialog;
+import org.basex.gui.view.ViewRect;
 import org.basex.gui.view.View;
-import org.basex.gui.view.map.MapRect;
 import org.basex.util.Performance;
 
 /**
@@ -390,7 +390,7 @@ public final class BaseXLayout {
    * @param s text to be drawn
    * @return last height that was occupied
    */
-  public static int calcHeight(final Graphics g, final MapRect r,
+  public static int calcHeight(final Graphics g, final ViewRect r,
       final byte[] s) {
     return drawText(g, r, s, s.length, false);
   }
@@ -402,7 +402,7 @@ public final class BaseXLayout {
    * @param s text to be drawn
    * @return last height that was occupied
    */
-  public static int drawText(final Graphics g, final MapRect r,
+  public static int drawText(final Graphics g, final ViewRect r,
       final byte[] s) {
     return drawText(g, r, s, s.length, true);
   }
@@ -416,7 +416,7 @@ public final class BaseXLayout {
    * @param draw draw text (otherwise: just calculate space)
    * @return last height that was occupied
    */
-  public static int drawText(final Graphics g, final MapRect r,
+  public static int drawText(final Graphics g, final ViewRect r,
       final byte[] s, final int m, final boolean draw) {
 
     // limit string to given space
@@ -441,7 +441,7 @@ public final class BaseXLayout {
       int l = i;
       for(int n = i; n < j; n += cl(s[n])) {
         if(draw && k > -1 && k < ft[0].length &&
-            i == ft[1][k] && r.p == ft[0][k]) {
+            i == ft[1][k] && r.pre == ft[0][k]) {
            k++;
            c = true;
         }
@@ -495,7 +495,7 @@ public final class BaseXLayout {
    * @param r rectangle
    * @param s text to be drawn
    */
-  public static void drawThumbnails(final Graphics g, final MapRect r,
+  public static void drawThumbnails(final Graphics g, final ViewRect r,
       final byte[] s) {
 
     final double xx = r.x;
@@ -519,7 +519,7 @@ public final class BaseXLayout {
 
     // including i == s.length in loop to draw last string...
     for(int i = 0; i <= s.length; i++) {
-      if(k > -1 && k < ft[0].length && i == ft[1][k] && r.p == ft[0][k]) {
+      if(k > -1 && k < ft[0].length && i == ft[1][k] && r.pre == ft[0][k]) {
          k++;
          c = true;
       }

@@ -4,6 +4,7 @@ import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.iter.NodIter;
+import org.basex.query.xquery.iter.SeqIter;
 import org.basex.util.Array;
 
 /**
@@ -64,13 +65,13 @@ public final class NodeBuilder {
   public Item finish() {
     if(size < 2 || ordered) return Seq.get(list, size);
     
-    if(sort) sort(0, size - 1);
-    final SeqBuilder sq = new SeqBuilder();
-    sq.add(list[0]);
+    if(sort) sort(0, size);
+    final SeqIter iter = new SeqIter();
+    iter.add(list[0]);
     for(int s = 1; s < size; s++) {
-      if(!list[s].is((Nod) sq.item[sq.size - 1])) sq.add(list[s]);
+      if(!list[s].is((Nod) iter.item[iter.size - 1])) iter.add(list[s]);
     }
-    return sq.finish();
+    return iter.finish();
   }
 
   /**
@@ -78,11 +79,11 @@ public final class NodeBuilder {
    * @return result
    */
   public NodIter iter() {
-    if(ordered) new NodIter(list, size);
+    if(size < 2 || ordered) return new NodIter(list, size);
     
-    if(sort && size > 1) sort(0, size);
+    if(sort) sort(0, size);
     final NodIter iter = new NodIter();
-    if(size != 0) iter.add(list[0]);
+    iter.add(list[0]);
     for(int s = 1; s < size; s++) {
       if(!list[s].is(iter.list[iter.size - 1])) iter.add(list[s]);
     }

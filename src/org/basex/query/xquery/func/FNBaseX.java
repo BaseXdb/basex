@@ -39,7 +39,7 @@ final class FNBaseX extends Fun {
   private Iter eval(final Iter[] arg) throws XQException {
     final XQContext ct = new XQContext();
     new XQParser(ct).parse(string(checkStr(arg[0])));
-    return ct.compile(null).eval(null).item().iter();
+    return ct.compile(null).iter();
   }
 
   /**

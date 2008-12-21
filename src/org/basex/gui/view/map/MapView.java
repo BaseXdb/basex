@@ -23,6 +23,7 @@ import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPopup;
+import org.basex.gui.view.ViewRect;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewData;
 import org.basex.util.Action;
@@ -49,20 +50,20 @@ public final class MapView extends View implements Runnable {
   private static final int MAXZS = ZS[ZOOMSIZE];
 
   /** Array of current rectangles. */
-  private ArrayList<MapRect> mainRects;
+  private ArrayList<ViewRect> mainRects;
   /** Data specific map layout. */
   private MapPainter painter;
   /** Determines Layout Algorithm. */
   public MapLayout layouter;
 
   /** Rectangle history. */
-  private final MapRect[] rectHist = new MapRect[MAXHIST];
+  private final ViewRect[] rectHist = new ViewRect[MAXHIST];
   /** Current zooming Step (set to 0 when no zooming takes place). */
   private int zoomStep;
   /** Main rectangle. */
-  private MapRect mainRect;
+  private ViewRect mainRect;
   /** Dragged rectangle. */
-  private MapRect selBox;
+  private ViewRect selBox;
   /** Flag for zooming in/out. */
   private boolean zoomIn;
   /** Zooming speed. */
@@ -76,7 +77,7 @@ public final class MapView extends View implements Runnable {
   private int dragTol;
   
   /** Currently focused rectangle. */
-  private transient MapRect focusedRect;
+  private transient ViewRect focusedRect;
 
   /** TreeMap. */
   private BufferedImage mainMap;
@@ -127,11 +128,11 @@ public final class MapView extends View implements Runnable {
     if(mainRects == null || working) return;
     if(focused == -1 && focusedRect != null) focusedRect = null;
 
-    final MapRect m = focusedRect;
+    final ViewRect m = focusedRect;
     for(int mi = 0, ms = mainRects.size(); mi < ms; mi++) {
-      final MapRect rect = mainRects.get(mi);
-      if(focused == rect.p || mi + 1 < ms &&
-          focused < mainRects.get(mi + 1).p) {
+      final ViewRect rect = mainRects.get(mi);
+      if(focused == rect.pre || mi + 1 < ms &&
+          focused < mainRects.get(mi + 1).pre) {
         focusedRect = rect;
         break;
       }
@@ -156,9 +157,9 @@ public final class MapView extends View implements Runnable {
     // use simple zooming animation for result node filtering
     final Nodes context = GUI.context.current();
     final boolean page = !more && rectHist[hist + 1] != null &&
-      rectHist[hist + 1].p == 0 || more && (context.size != 1 ||
-          focusedRect == null || context.nodes[0] != focusedRect.p);
-    if(page) focusedRect = new MapRect(0, 0, getWidth(), 1);
+      rectHist[hist + 1].pre == 0 || more && (context.size != 1 ||
+          focusedRect == null || context.nodes[0] != focusedRect.pre);
+    if(page) focusedRect = new ViewRect(0, 0, getWidth(), 1);
 
     zoom(more, quick);
   }
@@ -167,8 +168,8 @@ public final class MapView extends View implements Runnable {
   public void refreshLayout() {
     // initial rectangle
     final int w = getWidth(), h = getHeight();
-    final MapRect rect = new MapRect(0, 0, w, h, 0, 0);
-    mainRects = new ArrayList<MapRect>();
+    final ViewRect rect = new ViewRect(0, 0, w, h, 0, 0);
+    mainRects = new ArrayList<ViewRect>();
     final Nodes nodes = GUI.context.current();
     calc(rect, mainRects, nodes, mainMap);
     repaint();
@@ -195,7 +196,7 @@ public final class MapView extends View implements Runnable {
     } else {
       mainRect = rectHist[hist + 1];
     }
-    if(mainRect == null) mainRect = new MapRect(0, 0, getWidth(), getHeight());
+    if(mainRect == null) mainRect = new ViewRect(0, 0, getWidth(), getHeight());
 
     // reset data & start zooming
     final BufferedImage tmpMap = zoomMap;
@@ -255,11 +256,11 @@ public final class MapView extends View implements Runnable {
      * focused rectangle can be found by simply parsing the array backward. */
     int r = mainRects.size();
     while(--r >= 0) {
-      final MapRect rect = mainRects.get(r);
+      final ViewRect rect = mainRects.get(r);
       if(rect.contains(mouseX, mouseY)) break;
     }
     // don't focus top rectangles
-    final MapRect fr = r >= 0 ? mainRects.get(r) : null;
+    final ViewRect fr = r >= 0 ? mainRects.get(r) : null;
 
     // find focused rectangle
     final boolean newFocus = focusedRect != fr || fr != null && fr.thumb;
@@ -268,7 +269,7 @@ public final class MapView extends View implements Runnable {
     if(fr != null) GUI.get().cursor(painter.highlight(focusedRect, mouseX,
         mouseY, false) ? CURSORHAND : CURSORARROW);
 
-    if(newFocus) notifyFocus(focusedRect != null ? focusedRect.p : -1, this);
+    if(newFocus) notifyFocus(focusedRect != null ? focusedRect.pre : -1, this);
     return newFocus;
   }
 
@@ -280,7 +281,7 @@ public final class MapView extends View implements Runnable {
    * @param nodes Nodes to draw in the map
    * @param map image to draw rectangles on
    */
-  private void calc(final MapRect rect, final ArrayList<MapRect> rectangles,
+  private void calc(final ViewRect rect, final ArrayList<ViewRect> rectangles,
       final Nodes nodes, final BufferedImage map) {
 
     // calculate new main rectangles
@@ -345,10 +346,10 @@ public final class MapView extends View implements Runnable {
     if(GUIProp.maplayout == 0) {
       g.setColor(COLORS[32]);
       int pre = mainRects.size();
-      int par = ViewData.parent(data, focusedRect.p);
+      int par = ViewData.parent(data, focusedRect.pre);
       while(--pre >= 0) {
-        final MapRect rect = mainRects.get(pre);
-        if(rect.p == par) {
+        final ViewRect rect = mainRects.get(pre);
+        if(rect.pre == par) {
           final int x = rect.x;
           final int y = rect.y;
           final int w = rect.w;
@@ -376,11 +377,11 @@ public final class MapView extends View implements Runnable {
       g.drawRect(x + 1, y + 1, w - 2, h - 2);
 
       // draw tag label
-      if(data.kind(focusedRect.p) == Data.ELEM) {
+      if(data.kind(focusedRect.pre) == Data.ELEM) {
         g.setFont(font);
-        String tt = Token.string(ViewData.tag(data, focusedRect.p));
+        String tt = Token.string(ViewData.tag(data, focusedRect.pre));
         if(tt.length() > 32) tt = tt.substring(0, 30) + DOTS;
-        BaseXLayout.drawTooltip(g, tt, x, y, getWidth(), focusedRect.l + 5);
+        BaseXLayout.drawTooltip(g, tt, x, y, getWidth(), focusedRect.level + 5);
       }
       // add interactions for current thumbnail rectangle...
       // if(focusedRect.thumb) ...
@@ -400,7 +401,7 @@ public final class MapView extends View implements Runnable {
         else myy = mouseY - GUIProp.lensheight;
         
         // get area under cursor
-        MapRect rectToZoom = new MapRect(
+        ViewRect rectToZoom = new ViewRect(
             myx + GUIProp.lenswidth - GUIProp.lensareawidth,
             myy + GUIProp.lensheight - GUIProp.lensareaheight,
             GUIProp.lensareawidth << 1, GUIProp.lensareaheight << 1);
@@ -410,11 +411,11 @@ public final class MapView extends View implements Runnable {
         int np = 0;
         final IntList il = new IntList();
         for(int r = 0, rl = mainRects.size(); r < rl; r++) {
-          final MapRect rect = mainRects.get(r);
-          if(mainRects.get(r).p < np) continue;
+          final ViewRect rect = mainRects.get(r);
+          if(mainRects.get(r).pre < np) continue;
           if(rectToZoom.contains(rect)) {
-            il.add(rect.p);
-            np = rect.p + data.size(rect.p, data.kind(rect.p));
+            il.add(rect.pre);
+            np = rect.pre + data.size(rect.pre, data.kind(rect.pre));
           }
         }
         // draw lens border
@@ -426,8 +427,8 @@ public final class MapView extends View implements Runnable {
         w = GUIProp.lenswidth << 1;
         h = GUIProp.lensheight << 1;
         
-        final MapRect rect = new MapRect(0, 0, w, h, 0, 0);
-        ArrayList<MapRect> lensRects = new ArrayList<MapRect>();
+        final ViewRect rect = new ViewRect(0, 0, w, h, 0, 0);
+        ArrayList<ViewRect> lensRects = new ArrayList<ViewRect>();
         
         final Nodes nodes = new Nodes(focused, data);
         BufferedImage bi = new BufferedImage(w, h, BufferedImage.TYPE_INT_BGR);
@@ -450,7 +451,7 @@ public final class MapView extends View implements Runnable {
    */
   private void drawImage(final Graphics g, final Image img, final int zi) {
     if(img == null) return;
-    final MapRect r = new MapRect(0, 0, getWidth(), getHeight());
+    final ViewRect r = new ViewRect(0, 0, getWidth(), getHeight());
     zoom(r, zi);
     g.drawImage(img, r.x, r.y, r.x + r.w, r.y + r.h, 0, 0,
         getWidth(), getHeight(), this);
@@ -461,7 +462,7 @@ public final class MapView extends View implements Runnable {
    * @param r rectangle to be zoomed
    * @param zs zooming step
    */
-  private void zoom(final MapRect r, final int zs) {
+  private void zoom(final ViewRect r, final int zs) {
     int xs = r.x;
     int ys = r.y;
     int xe = xs + r.w;
@@ -470,7 +471,7 @@ public final class MapView extends View implements Runnable {
     // calculate zooming rectangle
     // get window size
     if(zs != 0) {
-      final MapRect zr = mainRect;
+      final ViewRect zr = mainRect;
       final int tw = getWidth();
       final int th = getHeight();
       if(zs > 0) {
@@ -499,7 +500,7 @@ public final class MapView extends View implements Runnable {
    * @param map Image to draw the map on
    * @param rects calculated rectangles
    */
-  void drawMap(final BufferedImage map, final ArrayList<MapRect> rects) {
+  void drawMap(final BufferedImage map, final ArrayList<ViewRect> rects) {
     final Graphics g = map.getGraphics();
     g.setColor(COLORS[2]);
     BaseXLayout.antiAlias(g);
@@ -566,17 +567,17 @@ public final class MapView extends View implements Runnable {
     int mh = e.getY() - my;
     if(mw < 0) mx -= mw = -mw;
     if(mh < 0) my -= mh = -mh;
-    selBox = new MapRect(mx, my, mw, mh);
+    selBox = new ViewRect(mx, my, mw, mh);
 
     final Data data = GUI.context.data();
     final IntList il = new IntList();
     int np = 0;
     for(int r = 0, rl = mainRects.size(); r < rl; r++) {
-      final MapRect rect = mainRects.get(r);
-      if(mainRects.get(r).p < np) continue;
+      final ViewRect rect = mainRects.get(r);
+      if(mainRects.get(r).pre < np) continue;
       if(selBox.contains(rect)) {
-        il.add(rect.p);
-        np = rect.p + data.size(rect.p, data.kind(rect.p));
+        il.add(rect.pre);
+        np = rect.pre + data.size(rect.pre, data.kind(rect.pre));
       }
     }
     View.notifyMark(new Nodes(il.finish(), data), null);

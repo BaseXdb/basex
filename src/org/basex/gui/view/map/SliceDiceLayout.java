@@ -6,6 +6,7 @@ import org.basex.build.fs.FSParser;
 import org.basex.data.Data;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
+import org.basex.gui.view.ViewRect;
 import org.basex.gui.view.ViewData;
 import org.basex.util.IntList;
 import org.basex.util.Token;
@@ -19,7 +20,7 @@ import org.basex.util.Token;
 public class SliceDiceLayout extends MapLayout {
 
   @Override
-  void calcMap(final MapRect r, final ArrayList<MapRect> mainRects, 
+  void calcMap(final ViewRect r, final ArrayList<ViewRect> mainRects, 
       final IntList l, final int ns, final int ne, final int level) {
     final Data data = GUI.context.data();
 
@@ -27,7 +28,7 @@ public class SliceDiceLayout extends MapLayout {
     if(ne - ns == 1) {
       
       // calculate rectangle sizes
-      final MapRect t = new MapRect(r.x, r.y, r.w, r.h, l.list[ns], r.l);
+      final ViewRect t = new ViewRect(r.x, r.y, r.w, r.h, l.list[ns], r.level);
 
       // position, with and height are calculated using split sizes of 
       //  former recursion level
@@ -37,10 +38,10 @@ public class SliceDiceLayout extends MapLayout {
       final int h = t.h - layout.h;
       mainRects.add(t);
       // skip too small rectangles and leaf nodes (= meta data in deepfs)
-      if(w > 0 && h > 0 && !ViewData.isLeaf(GUI.context.data(), t.p)) {
-        final IntList ch = children(t.p);
-        if(ch.size >= 0) calcMap(new MapRect(x, y, w, h, 
-            l.list[ns], t.l + 1), mainRects, ch, 0, ch.size - 1, level + 1);
+      if(w > 0 && h > 0 && !ViewData.isLeaf(GUI.context.data(), t.pre)) {
+        final IntList ch = children(t.pre);
+        if(ch.size >= 0) calcMap(new ViewRect(x, y, w, h, 
+            l.list[ns], t.level + 1), mainRects, ch, 0, ch.size - 1, level + 1);
       }
     } else {      
       // number of nodes used to calculate rect size
@@ -91,19 +92,17 @@ public class SliceDiceLayout extends MapLayout {
             hh = r.h;
           }
           if(ww > 0 && hh > 0) calcMap(
-            new MapRect((int) xx, (int) yy, (int) ww, (int) hh, 0, r.l), 
+            new ViewRect((int) xx, (int) yy, (int) ww, (int) hh, 0, r.level), 
             mainRects, new IntList(liste), 0, 1, level);
         } else {
           if(ww > 0 && hh > 0) {
             if(v) {
-              calcMap(
-                  new MapRect((int) xx, (int) yy, (int) ww, (int) hh, 0, r.l), 
-                  mainRects, new IntList(liste), 0, 1, level);
+              calcMap(new ViewRect((int) xx, (int) yy, (int) ww, (int) hh, 0,
+                  r.level), mainRects, new IntList(liste), 0, 1, level);
               yy += hh;
             } else {
-              calcMap(
-                  new MapRect((int) xx, (int) yy, (int) ww, (int) hh, 0, r.l),
-                  mainRects, new IntList(liste), 0, 1, level);
+              calcMap(new ViewRect((int) xx, (int) yy, (int) ww, (int) hh, 0,
+                  r.level), mainRects, new IntList(liste), 0, 1, level);
               xx += ww;
             }
           }  

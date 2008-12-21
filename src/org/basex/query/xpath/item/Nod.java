@@ -22,7 +22,7 @@ public final class Nod extends Item {
   public int[] nodes;
   /** Data reference.. */
   public Data data;
-  /** Number of stored values.. */
+  /** Number of stored values. */
   public int size;
 
   /** Current node set position. */
@@ -79,7 +79,7 @@ public final class Nod extends Item {
   }
 
   @Override
-  public int size() {
+  public long size() {
     return size;
   }
   

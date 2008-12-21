@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.basex.data.Data;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
+import org.basex.gui.view.ViewRect;
 import org.basex.gui.view.ViewData;
 import org.basex.util.IntList;
 import org.basex.util.Token;
@@ -18,12 +19,12 @@ import org.basex.util.Token;
 public class SplitLayout extends MapLayout {
 
   @Override
-  void calcMap(final MapRect r, final ArrayList<MapRect> mainRects,
+  void calcMap(final ViewRect r, final ArrayList<ViewRect> mainRects,
       final IntList l, final int ns, final int ne, final int level) {
     // one rectangle left.. continue with this child
     if(ne - ns == 1) {
       // calculate rectangle sizes
-      final MapRect t = new MapRect(r.x, r.y, r.w, r.h, l.list[ns], r.l);
+      final ViewRect t = new ViewRect(r.x, r.y, r.w, r.h, l.list[ns], r.level);
       mainRects.add(t);
 
       // position, with and height calculated using sizes of former level
@@ -34,10 +35,10 @@ public class SplitLayout extends MapLayout {
 
       // skip too small rectangles and leaf nodes (= meta data in deepfs)
       if((w >= o || h >= o) && w > 0 && h > 0 && 
-          !ViewData.isLeaf(GUI.context.data(), t.p)) {
-        final IntList ch = children(t.p);
-        if(ch.size != 0) calcMap(new MapRect(x, y, w, h, l.list[ns], r.l + 1), 
-            mainRects, ch, 0, ch.size - 1, level + 1);
+          !ViewData.isLeaf(GUI.context.data(), t.pre)) {
+        final IntList ch = children(t.pre);
+        if(ch.size != 0) calcMap(new ViewRect(x, y, w, h, l.list[ns],
+            r.level + 1), mainRects, ch, 0, ch.size - 1, level + 1);
       }
     } else {
       long nn, ln; 
@@ -99,7 +100,7 @@ public class SplitLayout extends MapLayout {
       int hh = v ? r.h : (int) (r.h * ln / nn);
       
       // paint both rectangles if enough space is left
-      if(ww > 0 && hh > 0) calcMap(new MapRect(xx, yy, ww, hh, 0, r.l),
+      if(ww > 0 && hh > 0) calcMap(new ViewRect(xx, yy, ww, hh, 0, r.level),
           mainRects, l, ns, ni, level);
       if(v) {
         xx += ww;
@@ -108,7 +109,7 @@ public class SplitLayout extends MapLayout {
         yy += hh;
         hh = r.h - hh;
       }
-      if(ww > 0 && hh > 0) calcMap(new MapRect(xx, yy, ww, hh, 0, r.l),
+      if(ww > 0 && hh > 0) calcMap(new ViewRect(xx, yy, ww, hh, 0, r.level),
           mainRects, l, ni, ne, level);
     }
   }

@@ -391,31 +391,4 @@ public final class Array {
       final int l) {
     System.arraycopy(ar, pos, ar, pos + off, l);
   }
-  
-  /**
-   * Converts an int-array to string.
-   * @param sp index of first int value
-   * @param a array with values
-   * @param ep index of last int value
-   * @return a as string
-   */
-  public static String toString(final int[] a, final int sp, final int ep) {
-    final StringBuilder sb = new StringBuilder('[');
-    for(int s = sp; s < ep; s++) sb.append((s != sp ? "," : "") + a[s]);
-    return sb.toString();
-  }
-
-  /**
-   * Converts an byte-array to string.
-   * @param sp index of first int value
-   * @param a array with values
-   * @param ep index of last int value
-   * @return a as string
-   */
-  public static String toString(final byte[] a, final int sp, final int ep) {
-    final StringBuilder sb = new StringBuilder('[');
-    for(int s = sp; s < ep; s++) sb.append((s != sp ? "," : "") + a[s]);
-    return sb.toString();
-  }
-
 }

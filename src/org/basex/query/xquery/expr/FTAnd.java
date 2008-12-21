@@ -89,18 +89,6 @@ public final class FTAnd extends FTExpr {
       final FTNotIndex ftn = new FTNotIndex(fta);
       return ftn; 
     }
-
     return new FTIntersection(pex, nex, expr);
-  }
-  
-  /**
-   * Add Expr to list.
-   * @param ex new Expr
-   */
-  public void add(final FTExpr ex) {
-    FTExpr[] ne = new FTExpr[expr.length + 1];
-    System.arraycopy(expr, 0, ne, 0, expr.length);
-    ne[expr.length] = ex;
-    expr = ne;
   }
 }

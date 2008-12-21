@@ -123,9 +123,7 @@ public final class FTIndex extends FTArrayExpr {
       if(d == 0) {
         final FTNode n1 = i1.nextFTNode();
         final FTNode n2 = i2.nextFTNode();
-        if (n1.merge(n2, w)) {
-          ial.add(n1.getFTNode());
-        }
+        if(n1.merge(n2, w)) ial.add(n1.getFTNode());
       }
       if(d <= 0 && !i1.more() || d >= 0 && !i2.more()) break;
     }

@@ -1,7 +1,6 @@
 package org.basex.query.xquery.func;
 
 import static org.basex.query.xquery.XQText.*;
-
 import org.basex.BaseX;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
@@ -9,8 +8,8 @@ import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.QNm;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
+import org.basex.query.xquery.iter.SeqIter;
 import org.basex.query.xquery.util.Err;
-import org.basex.query.xquery.util.SeqBuilder;
 import org.basex.util.Token;
 
 /**
@@ -44,7 +43,7 @@ final class FNOut extends Fun {
         try {
           Err.or(new Object[] { code, num, msg });
         } catch(final XQException ex) {
-          if(al > 2) ex.item = new SeqBuilder(arg[2]).finish();
+          if(al > 2) ex.item = new SeqIter(arg[2]).finish();
           throw ex;
         }
         BaseX.notexpected(); return null;

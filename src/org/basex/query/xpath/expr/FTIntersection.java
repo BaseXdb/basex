@@ -40,22 +40,13 @@ public final class FTIntersection extends FTArrayExpr {
    * @return boolean
    */
   private boolean more(final int[] n) {
-    for (int i : n) if (!exprs[i].more()) {
-      return false;
-    }
+    for(int i : n) if(!exprs[i].more()) return false;
     return true;
-  }
-  
-  @Override 
-  public boolean pos() {
-    for (FTArrayExpr i : exprs) if (i.pos()) return true;
-    return false;
   }
 
   @Override
   public boolean more() {
-    if(pex.length > 0) return more(pex);
-    return more(nex);
+    return pex.length > 0 ? more(pex) : more(nex);
   }
   
   /**

@@ -1,7 +1,6 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
-
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.core.Process;
@@ -16,7 +15,6 @@ import org.basex.io.NullOutput;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
-import org.basex.query.xpath.item.Nod;
 import org.basex.util.Performance;
 
 /**
@@ -65,11 +63,6 @@ abstract class AQuery extends Process {
         comp += per.getTime();
         result = qu.query(nodes);
         eval += per.getTime();
-      }
-      // convert query Nod to visualization node set
-      if(result instanceof Nod) {
-        final Nod ns = (Nod) result;
-        result = new Nodes(ns.nodes, ns.data);
       }
       // show dot plan
       if(Prop.dotplan) {
@@ -128,7 +121,7 @@ abstract class AQuery extends Process {
    * @param out output stream
    * @param hits information
    */
-  protected final void outInfo(final PrintOutput out, final int hits) {
+  protected final void outInfo(final PrintOutput out, final long hits) {
     info(QUERYPRINT + per.getTimer(Prop.runs) + NL);
     info(QUERYTOTAL + perf.getTimer(Prop.runs) + NL);
     info(QUERYHITS + hits + " " + (hits == 1 ? VALHIT : VALHITS) + NL);

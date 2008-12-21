@@ -15,14 +15,6 @@ public class KindTest extends Test {
   /**
    * Constructor.
    * @param t node type
-   */
-  public KindTest(final Type t) {
-    type = t;
-  }
-
-  /**
-   * Constructor.
-   * @param t node type
    * @param ext type extension
    */
   public KindTest(final Type t, final QNm ext) {

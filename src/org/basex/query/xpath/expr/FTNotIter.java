@@ -17,6 +17,7 @@ import org.basex.query.xpath.item.Bln;
 public final class FTNotIter extends FTArrayExpr {
   /** Flag if expression has more results. */
   private boolean m;
+
   /**
    * Constructor.
    * @param e operands joined with the mild not operator
@@ -24,16 +25,10 @@ public final class FTNotIter extends FTArrayExpr {
   public FTNotIter(final FTArrayExpr... e) {
     super(e);
   }
-
-  @Override
-  public boolean pos() {
-    return false;
-  }
   
   @Override
   public Bln eval(final XPContext ctx) throws QueryException {
     return Bln.get(exprs[0].eval(ctx).bool());
-    //return Bln.get(!exprs[0].eval(ctx).bool());
   }
   
   @Override

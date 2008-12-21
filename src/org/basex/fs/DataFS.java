@@ -212,13 +212,11 @@ public final class DataFS {
    */
   public int[] children(final int pre, final String path) {
     String f = path;
-    int p = pre;
-
+    
     final int sl = path.lastIndexOf('/');
     if(sl != -1) {
       f = path.substring(sl + 1);
-      p = goTo(pre, path.substring(0, sl));
-      if(p == -1) return Array.NOINTS;
+      if(goTo(pre, path.substring(0, sl)) == -1) return Array.NOINTS;
     }
     f = regex(f);
     

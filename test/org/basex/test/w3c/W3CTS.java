@@ -23,14 +23,12 @@ import org.basex.core.Prop;
 import org.basex.core.proc.Check;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.data.Result;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPathProcessor;
 import org.basex.query.xquery.XQContext;
-import org.basex.query.xquery.XQResult;
 import org.basex.query.xquery.XQTokens;
 import org.basex.query.xquery.XQueryProcessor;
 import org.basex.query.xquery.expr.Expr;
@@ -318,7 +316,7 @@ public abstract class W3CTS {
 
     String output = "";
     String error = null;
-    Result res = null;
+    Item item = null;
 
     final TokenBuilder files = new TokenBuilder();
     try {
@@ -346,8 +344,9 @@ public abstract class W3CTS {
       }
 
       final CachedOutput out = new CachedOutput();
-      res = xq.query(context.current());
-      res.serialize(new XMLSerializer(out));
+      item = xq.iter(context.current()).finish();
+      item.serialize(new XMLSerializer(out));
+
       output = norm(out.finish());
     } catch(final QueryException ex) {
       error = ex.getMessage();
@@ -447,8 +446,7 @@ public abstract class W3CTS {
           logErr.append(chop(output));
           logErr.append(Prop.NL);
           logErr.append(Prop.NL);
-          final Item it = ((XQResult) res).item();
-          final boolean nodes = it instanceof Nod && it.type != Type.TXT;
+          final boolean nodes = item instanceof Nod && item.type != Type.TXT;
           addLog(pth, outname + (nodes ? IO.XMLSUFFIX : IO.TXTSUFFIX), output);
         }
         if(reporting) logFile.append("fail");
@@ -460,8 +458,7 @@ public abstract class W3CTS {
           logOK.append(chop(output));
           logOK.append(Prop.NL);
           logOK.append(Prop.NL);
-          final Item it = ((XQResult) res).item();
-          final boolean nodes = it instanceof Nod && it.type != Type.TXT;
+          final boolean nodes = item instanceof Nod && item.type != Type.TXT;
           addLog(pth, outname + (nodes ? IO.XMLSUFFIX : IO.TXTSUFFIX), output);
         }
         if(reporting) {
@@ -593,10 +590,10 @@ public abstract class W3CTS {
     for(int c = 0; c < nod.size; c++) {
       final String file = pth + string(data.atom(nod.nodes[c])) + ".xq";
       final String in = read(IO.get(queries + file));
-      final XQueryProcessor qu = new XQueryProcessor(in);
-      final XQResult result = (XQResult) qu.query(null);
+      final XQueryProcessor xq = new XQueryProcessor(in);
+      final Item item = xq.iter(null).finish();
       final Var v = new Var(new QNm(data.atom(var.nodes[c])));
-      ctx.vars.addGlobal(v.item(result.item(), ctx));
+      ctx.vars.addGlobal(v.item(item, ctx));
     }
   }
 

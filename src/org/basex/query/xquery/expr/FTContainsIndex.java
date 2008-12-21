@@ -3,7 +3,6 @@ package org.basex.query.xquery.expr;
 import org.basex.index.FTTokenizer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.item.FTNodeItem;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
@@ -34,7 +33,7 @@ public final class FTContainsIndex extends FTContains {
         ctx.ftitem = ft;
         final Item it = ctx.iter(expr[0]).next();
         ctx.ftitem = tmp;
-        return it.dbl() == 0 ? null : ((FTNodeItem) it).dbNode();
+        return it.score() == 0 ? null : it;
       }
     };
   }

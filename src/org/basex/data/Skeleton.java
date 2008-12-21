@@ -113,7 +113,7 @@ public final class Skeleton {
    */
   public double tl(final byte[] k) {
     // return tl of document
-    if (k == null) return root.tl / root.count;
+    if (k == null) return (double) root.tl / root.count;
     // follow the specified descendant/child steps
     ArrayList<SkelNode> n = new ArrayList<SkelNode>();
     n.add(root);
@@ -124,7 +124,7 @@ public final class Skeleton {
     double avg = 0;
     int c = 0;
     for(final SkelNode r : n) if (r.kind == Data.TEXT) {
-      avg += r.tl / r.count;
+      avg += (double) r.tl / r.count;
       c++;
     }
     return avg / c;

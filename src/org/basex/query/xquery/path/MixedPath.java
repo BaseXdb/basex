@@ -10,9 +10,9 @@ import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
+import org.basex.query.xquery.iter.SeqIter;
 import org.basex.query.xquery.util.Err;
 import org.basex.query.xquery.util.NodeBuilder;
-import org.basex.query.xquery.util.SeqBuilder;
 
 /**
  * Path expression.
@@ -55,12 +55,17 @@ public class MixedPath extends Path {
     return i.iter();
   }
   
-  @Override
+  /**
+   * Evaluates the location path.
+   * @param ctx query context
+   * @return resulting item
+   * @throws XQException evaluation exception
+   */
   protected Item eval(final XQContext ctx) throws XQException {
     // simple location step traversal...
     Item it = ctx.item;
     for(final Expr s : step) {
-      final SeqBuilder sb = new SeqBuilder();
+      final SeqIter sb = new SeqIter();
       final Iter ir = it.iter();
       ctx.size = it.size();
       ctx.pos = 1;

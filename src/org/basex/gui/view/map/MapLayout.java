@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.basex.data.Data;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
+import org.basex.gui.view.ViewRect;
 import org.basex.util.IntList;
 
 /**
@@ -15,7 +16,7 @@ import org.basex.util.IntList;
  */
 abstract class MapLayout {
   /** Layout rectangle. */
-  MapRect layout;
+  ViewRect layout;
   /** Font size. */
   final int o = GUIProp.fontsize + 4;
   
@@ -24,23 +25,22 @@ abstract class MapLayout {
    */
   MapLayout() {
     switch(GUIProp.maplayout) {
-      case 0: layout = new MapRect(0, 0, 0, 0); break;
-      case 1: layout = new MapRect(1, 1, 2, 2); break;
-      case 2: layout = new MapRect(0, o, 0, o); break;
-      case 3: layout = new MapRect(2, o - 1, 4, o + 1); break;
-      case 4: layout = new MapRect(o >> 2, o, o >> 1, o + (o >> 2)); break;
-      case 5: layout = new MapRect(o >> 1, o, o, o + (o >> 1)); break;
+      case 0: layout = new ViewRect(0, 0, 0, 0); break;
+      case 1: layout = new ViewRect(1, 1, 2, 2); break;
+      case 2: layout = new ViewRect(0, o, 0, o); break;
+      case 3: layout = new ViewRect(2, o - 1, 4, o + 1); break;
+      case 4: layout = new ViewRect(o >> 2, o, o >> 1, o + (o >> 2)); break;
+      case 5: layout = new ViewRect(o >> 1, o, o, o + (o >> 1)); break;
       default:
     }
   }
 
-  /**
-   * calculates the average aspect Ratios of rectangles given in the List.
+  /*
+   * Calculates the average aspect Ratios of rectangles given in the List.
    * 
    * @param rects Array of rectangles
    * @return average aspect ratio
-   */
-  double aspectRatio(final ArrayList<MapRect> rects) {
+  double aspectRatio(final ArrayList<ViewRect> rects) {
     double aar = 0.0;
     for(int i = 0; i < rects.size(); i++) {
       aar += rects.get(i).x < rects.get(i).y ? rects.get(i).y / rects.get(i).x :
@@ -48,6 +48,7 @@ abstract class MapLayout {
     }
     return aar / rects.size();
   }
+   */
   
   /**
    * Returns all children of the specified node.
@@ -81,7 +82,7 @@ abstract class MapLayout {
    * @param level indicates level which is calculated
    * @param mainRects stores already layouted rects
    */
-  abstract void calcMap(final MapRect r, ArrayList<MapRect> mainRects,
+  abstract void calcMap(final ViewRect r, ArrayList<ViewRect> mainRects,
       final IntList l, final int ns, final int ne, final int level);
   
 }

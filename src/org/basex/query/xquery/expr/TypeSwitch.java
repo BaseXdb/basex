@@ -9,7 +9,6 @@ import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
-import org.basex.query.xquery.util.SeqBuilder;
 import org.basex.query.xquery.util.Var;
 
 /**
@@ -48,10 +47,11 @@ public final class TypeSwitch extends Single {
   
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
-    final SeqBuilder seq = new SeqBuilder(ctx.iter(ts));
+    final SeqIter seq = new SeqIter(ctx.iter(ts));
     
     final int s = ctx.vars.size();
     for(final Case l : cs) {
+      seq.reset();
       final Iter iter = l.iter(ctx, seq);
       if(iter != null) return iter;
     }

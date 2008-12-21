@@ -107,7 +107,6 @@ public final class FTSelect extends FTExpr {
   
   @Override
   public FTExpr comp(final XQContext ctx) throws XQException {
-    if(weight == null) Err.or(INCOMPLETE);
     weight = ctx.comp(weight);
     if(weight.i()) {
       final Item wg = (Item) weight;
@@ -119,9 +118,10 @@ public final class FTSelect extends FTExpr {
 
   @Override
   public void indexAccessible(final XQContext ctx, final FTIndexAcsbl ia) 
-  throws XQException {
+      throws XQException {
     
     expr[0].indexAccessible(ctx, ia);
+    
     // index could only be used, if there is no ftselection specified 
     // before an ftnot
     if (ia.ftnot) ia.iu &= initial();

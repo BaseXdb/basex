@@ -56,47 +56,24 @@ public final class Num {
   }
 
   /**
-   * Creates and returns a compressed array from the specified integer array.
-   * The first value in the specified array denotes the number of entries.
+   * Creates and returns a compressed array from the specified integer array,
+   * omitting the size value.
+   * 
    * @param vals values to be written
    * @return new array
    */
   public static byte[] create(final int[] vals) {
-    byte[] tmp = new byte[vals.length << 1];
-    final int vs = vals[0];
-    int pos = 4;
-    for(int i = 1; i <= vs; i++) {
-      final int len = len(vals[i]);
-      tmp = check(tmp, pos, len);
-      add(tmp, vals[i], pos, len);
-      pos += len;
-    }
-    size(tmp, pos);
-    return pos == tmp.length ? tmp : Array.finish(tmp, pos);
-  }
-
-  /**
-   * Creates and returns a compressed array from the specified integer array.
-   * The number of entries specifies vs. 
-   * NO SIZEINFO IS WRITTEN!!
-   * 
-   * @param vals values to be written
-   * @param vs number of entries in vals
-   * @return new array
-   */
-  public static byte[] create(final int[] vals, final int vs) {
-    byte[] tmp = new byte[vals.length << 1];
+    final int vl = vals.length;
+    byte[] tmp = new byte[vl << 1];
     int pos = 0;
-    for(int i = 0; i < vs; i++) {
+    for(int i = 0; i < vl; i++) {
       final int len = len(vals[i]);
       tmp = check(tmp, pos, len);
       add(tmp, vals[i], pos, len);
       pos += len;
     }
-    
     return pos == tmp.length ? tmp : Array.finish(tmp, pos);
   }
-
   
   /**
    * Resizes the specified array by 12,5%.

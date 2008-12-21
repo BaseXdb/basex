@@ -23,9 +23,9 @@ public final class IOFile extends IO {
   /** File reference. */
   private final File file;
   /** File length. */
-  protected long len;
+  long len;
   /** Zip entry. */
-  protected ZipEntry zip;
+  ZipEntry zip;
 
 
   /**
@@ -52,11 +52,6 @@ public final class IOFile extends IO {
   @Override
   public boolean isDir() {
     return file.isDirectory();
-  }
-
-  @Override
-  public boolean isSymLink() throws IOException {
-    return !path.equals(file.getCanonicalPath());
   }
 
   @Override

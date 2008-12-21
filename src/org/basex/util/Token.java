@@ -551,17 +551,6 @@ public final class Token {
   }
 
   /**
-   * Compares two character arrays for equality.
-   * @param tok token to be compared
-   * @param tok2 second token to be compared
-   * @return true if the arrays are equal
-   */
-  public static boolean eq(final byte tok, final byte tok2) {
-    return tok == tok2;
-  }
-
-
-  /**
    * Calculates the difference of two character arrays.
    * @param tok token to be compared
    * @param tok2 second token to be compared
@@ -833,22 +822,6 @@ public final class Token {
   public static byte[] delete(final byte[] t, final int c) {
     final TokenBuilder sb = new TokenBuilder(t.length);
     for(final byte b : t) if(b != c) sb.add(b);
-    return sb.finish();
-  }
-
-  /**
-   * Deletes the specified characters out of the token.
-   * @param t token to be checked
-   * @param c characters to be removed
-   * @return new instance
-   */
-  public static byte[] delete(final byte[] t, final byte[] c) {
-    final TokenBuilder sb = new TokenBuilder(t.length);
-    int i = indexOf(t, c);
-    for(int b = 0; b < t.length;) {
-      if(i == b) i = indexOf(t, c, b += c.length);
-      else sb.add(t[b++]);
-    }
     return sb.finish();
   }
 

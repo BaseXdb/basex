@@ -88,7 +88,6 @@ public class SAX2Data extends DefaultHandler implements LexicalHandler {
     }
   }
 
-  /** {@inheritDoc} */
   public void comment(final char[] ch, final int s, final int l)
       throws SAXException {
 

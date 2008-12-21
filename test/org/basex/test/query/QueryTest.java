@@ -10,7 +10,15 @@ import org.basex.core.proc.XPath;
 import org.basex.core.proc.XQuery;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
-import org.basex.query.xquery.XQResult;
+import org.basex.query.xpath.item.Bln;
+import org.basex.query.xpath.item.Dbl;
+import org.basex.query.xpath.item.NodeBuilder;
+import org.basex.query.xpath.item.Str;
+import org.basex.query.xquery.XQException;
+import org.basex.query.xquery.item.DBNode;
+import org.basex.query.xquery.item.Item;
+import org.basex.query.xquery.item.Type;
+import org.basex.query.xquery.iter.SeqIter;
 
 /**
  * XPath Test class.
@@ -125,7 +133,8 @@ public final class QueryTest {
       proc = xquery ? new XQuery(query) : new XPath(query);
       if(proc.execute(CONTEXT)) {
         Result val = proc.result();
-        if(xquery) val = ((XQResult) val).xpResult(CONTEXT.data());
+        // convert XQuery result to XPath items
+        if(val instanceof SeqIter) val = xpath((SeqIter) val);
 
         final Result cmp = correct ? (Result) qu[1] : null;
         if(val instanceof Nodes && cmp instanceof Nodes) {
@@ -149,6 +158,29 @@ public final class QueryTest {
     new Close().execute(CONTEXT);
     DropDB.drop(name);
     return ok;
+  }
+  
+  /**
+   * Converts the specified XQuery result to an XPath representation.
+   * @param val iterator
+   * @return xpath item
+   */
+  private Result xpath(final SeqIter val) {
+    try {
+      if(val.size == 1) {
+        final Item it = val.item[0];
+        if(it.type == Type.BLN) return Bln.get(it.bool());
+        if(it.n()) return new Dbl(it.dbl());
+        if(it.s()) return new Str(it.str());
+      }
+    
+      final NodeBuilder nb = new NodeBuilder();
+      for(int i = 0; i < val.size; i++) nb.add(((DBNode) val.item[i]).pre);
+      return new Nodes(nb.finish(), CONTEXT.data());
+    } catch(final XQException ex) {
+      ex.printStackTrace();
+      return null;
+    }
   }
 
   /**

@@ -3,6 +3,7 @@ package org.basex.query.xquery.expr;
 import static org.basex.query.xquery.XQTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
+import org.basex.query.ExprInfo;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Item;
@@ -15,7 +16,7 @@ import org.basex.query.xquery.iter.SeqIter;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Order {
+public final class Order extends ExprInfo {
   /** Sort list. */
   Ord[] ord;
   
@@ -231,22 +232,18 @@ public final class Order {
   }
 
   @Override
+  public void plan(final Serializer ser) throws IOException {
+    ser.openElement(ORDER, EVAL, ITER);
+    for(int o = 0; o != ord.length - 1; o++) ord[o].plan(ser);
+    ser.closeElement();
+  }
+
+  @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(" order by ");
     for(int l = 0; l != ord.length - 1; l++) {
       sb.append((l != 0 ? ", " : "") + ord[l]);
     }
     return sb.toString();
-  }
-
-  /**
-   * Serializes the abstract syntax tree.
-   * @param ser serializer
-   * @throws IOException exception
-   */
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(ORDER, EVAL, ITER);
-    for(int o = 0; o != ord.length - 1; o++) ord[o].plan(ser);
-    ser.closeElement();
   }
 }

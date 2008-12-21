@@ -19,7 +19,7 @@ import org.basex.io.IO;
  */
 public final class DropIndex extends Process {
   /** Index type. */
-  protected final CmdIndex type;
+  final CmdIndex type;
 
   /**
    * Constructor.

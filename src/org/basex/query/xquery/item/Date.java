@@ -42,14 +42,6 @@ public abstract class Date extends Item {
       BaseX.notexpected();
     }
   }
-  
-  /**
-   * Constructor.
-   * @param typ data type
-   */
-  protected Date(final Type typ) {
-    super(typ);
-  }
 
   /**
    * Constructor.

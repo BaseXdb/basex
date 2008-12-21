@@ -114,7 +114,6 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     else GUIProp.layoutopened = lay;
   }
 
-  /** {@inheritDoc} */
   public void run() {
     Performance.sleep(1000);
     while(++count < STEPS.length - 1) {

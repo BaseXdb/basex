@@ -187,8 +187,6 @@ public abstract class Item extends Expr {
       @Override
       public long size() { return 1; }
       @Override
-      public void reset() { more = false; }
-      @Override
       public String toString() { return Item.this.toString(); }
     };
   }

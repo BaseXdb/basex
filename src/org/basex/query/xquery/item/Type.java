@@ -65,19 +65,6 @@ public enum Type {
       return Str.get(o);
     }
   },
-
-  /** String type. */
-  FTN("fulltextnode", AAT, XSURI, false, false, true, false) {
-    @Override
-    public Str e(final Item it, final XQContext ctx) {
-      return Str.get(it.str());
-    }
-    @Override
-    public Str e(final Object o) {
-      return Str.get(o);
-    }
-  },
-  
   
   /** Normalized String type. */
   NST("normalizedString", STR, XSURI, false, false, true, false) {

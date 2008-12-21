@@ -1,10 +1,11 @@
 package org.basex.query.xquery.iter;
 
+import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Nod;
+import org.basex.query.xquery.item.Seq;
 
 /**
  * Simple node Iterator, ignoring duplicates.
- *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
@@ -43,15 +44,6 @@ public final class NodIter extends NodeIter {
   }
 
   /**
-   * Adds several items.
-   * @param i item array
-   * @param s number of items to be added
-   */
-  public void add(final Nod[] i, final int s) {
-    for(int n = 0; n < s; n++) add(i[n]);
-  }
-
-  /**
    * Resizes the sequence array.
    */
   private void resize() {
@@ -59,20 +51,20 @@ public final class NodIter extends NodeIter {
     System.arraycopy(list, 0, tmp, 0, size);
     list = tmp;
   }
-  
+
   @Override
   public Nod next() {
     return ++pos < size ? list[pos] : null;
   }
-  
+
   @Override
   public long size() {
     return size;
   }
 
   @Override
-  public void reset() {
-    pos = -1;
+  public Item finish() {
+    return Seq.get(list, size);
   }
 
   @Override

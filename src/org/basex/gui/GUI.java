@@ -477,17 +477,11 @@ public final class GUI extends JFrame {
         proc = null;
         return false;
       }
-
       if(pr.updating()) View.working = false;
-      final Result result = pr.result();
-      final Nodes nodes = result instanceof Nodes ? (Nodes) result : null;
 
-      /* convert xquery result to a flat nodeset
-       * solve problems with TextView first
-      if(result instanceof XQResult) {
-        final Nodes nod = ((XQResult) result).nodes(data);
-        if(nod != null) result = nod;
-      }*/
+      // try to convert xquery result to nodeset
+      Result result = pr.result();
+      final Nodes nodes = result instanceof Nodes ? (Nodes) result : null;
 
       // cached resulting text output
       final String inf = pr.info();
@@ -691,7 +685,7 @@ public final class GUI extends JFrame {
    * Sets hits information.
    * @param n number of hits
    */
-  public void setHits(final int n) {
+  public void setHits(final long n) {
     hits.setText(n + " " + HITS);
   }
 

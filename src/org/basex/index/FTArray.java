@@ -236,7 +236,7 @@ final class FTArray {
       }
     }  else {
       // abort recursion
-      // no intersection between current node an valuetoinsert
+      // no intersection between current node an value to insert
       final int[] ne = new int[3];
       ne[0] = tokens.size;
       tokens.add(v);
@@ -429,7 +429,7 @@ final class FTArray {
       }
     }  else {
       // abort recursion
-      // no intersection between current node an valuetoinsert
+      // no intersection between current node a value to insert
       final int[] ne = new int[2 + offset.length]; 
       ne[0] = tokens.size;
       tokens.add(v);
@@ -447,7 +447,7 @@ final class FTArray {
   /**
    * Indexes the specified token.
    *
-   * @param token token to be indexex
+   * @param token token to be indexed
    * @param id pre value of the token
    * @param tokenStart position value token start
    */
@@ -492,7 +492,6 @@ final class FTArray {
     }
   }
 
-
   /**
    * Save whether a corresponding node was found in method
    * getInsertingPosition.
@@ -506,18 +505,14 @@ final class FTArray {
    *
    * @param currentPosition int
    * @param toInsert byte
-   * @return int Position als zeiger auf das nodeArray
+   * @return pointer to the node array
    */
   private int getInsertingPosition(final int currentPosition,
       final byte toInsert) {
-    int i;
-    if (bl) i = getInsertingPositionLinearUFBack(currentPosition, toInsert);
-    else {
-      if (cs) i = getInsPosLinCSUF(currentPosition, toInsert);
-      else
-        i = getInsertingPositionBinaryUF(currentPosition, toInsert);
-    }
-    return i;
+
+    if (bl) return getInsertingPositionLinearUFBack(currentPosition, toInsert);
+    if (cs) return getInsPosLinCSUF(currentPosition, toInsert);
+    return getInsertingPositionBinaryUF(currentPosition, toInsert);
   }
 
   /**
@@ -582,7 +577,7 @@ final class FTArray {
 
    * @param cn current node
    * @param toi char to insert
-   * @return inserting poition
+   * @return inserting position
    */
   private int getInsertingPositionBinaryUF(final int cn, final byte toi) {
     found = false;
@@ -602,9 +597,8 @@ final class FTArray {
           return m;
         }
       }
-      if (l < next.list[cn].length - 2
-          && Token.diff(
-              tokens.list[next.list[next.list[cn][m]][0]][0], toi) == 0) {
+      if (l < next.list[cn].length - 2 && Token.diff(
+          tokens.list[next.list[next.list[cn][m]][0]][0], toi) == 0) {
       found = true;
       return l + 1;
     }
@@ -612,7 +606,7 @@ final class FTArray {
   }
 
   /**
-   * Performces the linear search backwards - used for bulkloading.
+   * Performs the linear search backwards - used for bulk loading.
    * @param cn current node
    * @param toInsert byte to insert
    * @return index of inserting position

@@ -43,13 +43,6 @@ public final class BoolList {
   public boolean[] finish() {
     return size == list.length ? list : Array.finish(list, size);
   }
-
-  /**
-   * Resets the integer list.
-   */
-  public void reset() {
-    size = 0;
-  }
   
   /**
    * Checks if all values are b.

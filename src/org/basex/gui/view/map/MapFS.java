@@ -19,6 +19,7 @@ import org.basex.gui.GUI;
 import org.basex.gui.GUIFS;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
+import org.basex.gui.view.ViewRect;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewData;
 import org.basex.io.BufferInput;
@@ -53,9 +54,9 @@ final class MapFS extends MapPainter {
   }
 
   @Override
-  void drawRectangles(final Graphics g, final ArrayList<MapRect> rects) {
+  void drawRectangles(final Graphics g, final ArrayList<ViewRect> rects) {
     final Data data = GUI.context.data();
-    final MapRect l = view.layouter.layout;
+    final ViewRect l = view.layouter.layout;
     final int ww = view.getWidth();
     final int hh = view.getHeight();
     final int min = Math.max(GUIProp.fontsize, 16);
@@ -64,14 +65,14 @@ final class MapFS extends MapPainter {
     final int rs = rects.size();
     for(int ri = 0; ri < rs; ri++) {
       // get rectangle information
-      final MapRect r = rects.get(ri);
-      final int pre = r.p;
+      final ViewRect r = rects.get(ri);
+      final int pre = r.pre;
 
       // level 1: next context node, set marker pointer to 0
-      final int lvl = r.l;
+      final int lvl = r.level;
       if(lvl == 0) mpos = 0;
 
-      final boolean isImage = GUIFS.mime(fs.name(r.p)) == GUIFS.Type.IMAGE;
+      final boolean isImage = GUIFS.mime(fs.name(r.pre)) == GUIFS.Type.IMAGE;
       final boolean full = r.w == ww && r.h == hh;
 
       // draw rectangle
@@ -106,7 +107,7 @@ final class MapFS extends MapPainter {
       // skip drawing of string when left space is too small
       if(r.w < min || r.h < min) continue;
 
-      final MapRect cr = r.clone();
+      final ViewRect cr = r.clone();
       if(drawRectangle(g, cr, mark)) {
         cr.x += 4;
         cr.w -= 8;
@@ -143,13 +144,13 @@ final class MapFS extends MapPainter {
    * @param mark selection flag
    * @return meta data flag
    */
-  boolean drawRectangle(final Graphics g, final MapRect rect,
+  boolean drawRectangle(final Graphics g, final ViewRect rect,
       final boolean mark) {
 
     final Context context = GUI.context;
     final Data data = context.data();
     final int o = GUIProp.fontsize;
-    final int pre = rect.p;
+    final int pre = rect.pre;
     final int kind = data.kind(pre);
     final boolean tag = kind == Data.ELEM || kind == Data.DOC;
     final boolean file = fs.isFile(pre);
@@ -212,7 +213,7 @@ final class MapFS extends MapPainter {
         final int h = BaseXLayout.calcHeight(g, rect, text);
         if(img != null) {
           if(!mark) {
-            g.setColor(COLORS[rect.l + 1]);
+            g.setColor(COLORS[rect.level + 1]);
             g.fillRect(x + 1, rect.y + 1, w - 2, h - GUIProp.fontsize);
           }
           g.drawImage(img, x, rect.y + 2, view);
@@ -243,7 +244,7 @@ final class MapFS extends MapPainter {
         if(GUIFS.mime(name) == GUIFS.Type.IMAGE) return false;
 
         // Fullscreen Mode
-        g.setColor(COLORS[rect.l + 2]);
+        g.setColor(COLORS[rect.level + 2]);
         g.fillRect(rect.x + 2, rect.y + 2, rect.w - 5, fh + 12);
         g.drawImage(img, rect.x + 6, rect.y + 6, view);
         rect.y += 18;
@@ -259,7 +260,7 @@ final class MapFS extends MapPainter {
         rect.w -= 10;
         final int sw = BaseXLayout.width(g, info);
         if(w + sw + 40 < rect.w) {
-          g.setColor(COLORS[rect.l + 10]);
+          g.setColor(COLORS[rect.level + 10]);
           BaseXLayout.chopString(g, token(info),
               rect.x + rect.w - sw, rect.y, rect.w);
         }
@@ -326,27 +327,27 @@ final class MapFS extends MapPainter {
   }
 
   @Override
-  boolean highlight(final MapRect r, final int mx, final int my,
+  boolean highlight(final ViewRect r, final int mx, final int my,
       final boolean click) {
 
     final boolean active = r.w >= 16 && r.h >= 16 && my - r.y < 16 &&
-      mx - r.x < 16 && fs.isFile(r.p) &&
-      GUIFS.mime(fs.name(r.p)) != GUIFS.Type.IMAGE;
+      mx - r.x < 16 && fs.isFile(r.pre) &&
+      GUIFS.mime(fs.name(r.pre)) != GUIFS.Type.IMAGE;
 
     if(active && click) fs.launch(View.focused);
     return active;
   }
 
   @Override
-  void init(final ArrayList<MapRect> rects) {
+  void init(final ArrayList<ViewRect> rects) {
     final int off = Math.max(GUIProp.fontsize, 16);
-    for(final MapRect r : rects) {
-      if(r.w > off && r.h > off && fs.isFile(r.p)) {
-        final byte[] name = fs.name(r.p);
+    for(final ViewRect r : rects) {
+      if(r.w > off && r.h > off && fs.isFile(r.pre)) {
+        final byte[] name = fs.name(r.pre);
         if(r.type == -1) r.type = GUIFS.type(name);
         if(GUIFS.mime(name) == GUIFS.Type.IMAGE) {
           final int o = PICOFFSET << 1;
-          images.add(r.p, r.w - o, r.h - o);
+          images.add(r.pre, r.w - o, r.h - o);
         }
       }
     }

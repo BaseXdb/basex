@@ -127,7 +127,7 @@ public class Step extends Expr {
         }
         nb.size = c;
       }
-      ni.add(nb.list, nb.size);
+      for(int n = 0; n < nb.size; n++) ni.add(nb.list[n]);
       nb = new NodIter();
     }
     return ni;

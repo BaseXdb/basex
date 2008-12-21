@@ -5,8 +5,8 @@ import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.iter.Iter;
+import org.basex.query.xquery.iter.SeqIter;
 import org.basex.query.xquery.util.Err;
-import org.basex.query.xquery.util.SeqBuilder;
 import org.basex.util.Token;
 
 /**
@@ -94,7 +94,7 @@ public final class SeqType {
     Item n = iter.next();
     if(occ < 2 && n != null) Err.cast(type, item);
 
-    final SeqBuilder sb = new SeqBuilder();
+    final SeqIter sb = new SeqIter();
     sb.add(it);
     while(n != null) {
       ins = n.type.instance(type);

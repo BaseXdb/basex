@@ -121,17 +121,14 @@ public abstract class Item extends Expr implements Result {
   @Override
   public abstract String toString();
 
-  /** {@inheritDoc} */
-  public int size() {
+  public long size() {
     return 1;
   }
 
-  /** {@inheritDoc} */
   public final boolean same(final Result v) {
     return v instanceof Item && eq((Item) v);
   }
   
-  /** {@inheritDoc} */
   public void serialize(final Serializer ser) throws IOException {
     ser.open(1);
     ser.openResult();
@@ -140,7 +137,6 @@ public abstract class Item extends Expr implements Result {
     ser.close(1);
   }
   
-  /** {@inheritDoc} */
   public void serialize(final Serializer ser, final int n) throws IOException {
     ser.item(str());
   }

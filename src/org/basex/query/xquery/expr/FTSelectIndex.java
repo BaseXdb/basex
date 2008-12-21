@@ -42,17 +42,18 @@ public final class FTSelectIndex extends FTExpr {
 
   @Override
   public Iter iter(final XQContext ctx) {
+    final FTPos tmp = ctx.ftpos;
+
     return new FTNodeIter() {
       @Override
       public FTNodeItem next() throws XQException {
-        final FTPos tmp = ctx.ftpos;
         ctx.ftpos = pos;
         pos.init(ctx.ftitem);
         FTNodeItem it = (FTNodeItem) ctx.iter(expr[0]).next();
         if (tmp != null) {
           if (it.ftn.size > 0) {
             init(it);
-            while (!posFilter(ctx)) {
+            while (!posFilter()) {
               it = (FTNodeItem) ctx.iter(expr[0]).next();
               if(it.ftn.size == 0) {
                 ctx.ftpos = tmp;
@@ -65,48 +66,46 @@ public final class FTSelectIndex extends FTExpr {
         // calculate weight
         final double d = checkDbl(ctx.iter(weight));
         if(d < 0 || d > 1000) Err.or(FTWEIGHT, d);
-        if (d != -1) it.setDbl(it.dbl() * d);
+        if (d != -1) it.score(it.score() * d);
 
         ctx.ftpos = tmp;
         return it;
       }
+
+      /**
+       * Init FTPos for next seqEval with index use.
+       * @param it current FTNode 
+       */
+      void init(final FTNodeItem it) {
+        pos.setPos(it.ftn.convertPos(), it.ftn.p.list[0]);
+        if (it.ftn.getToken() != null) {
+          pos.ft.init(it.data.text(it.ftn.getPre()));
+          pos.term = pos.ft.getTokenList();
+        }
+      }
+      
+      /**
+       * Evaluates the position filters.
+       * @return result of check
+       * @throws XQException query exception
+       */
+      boolean posFilter() throws XQException {
+        if(!pos.valid()) return false;
+
+        // ...distance?
+        if(pos.dunit != null) {
+          final long mn = checkItr(ctx.iter(dist[0]));
+          final long mx = checkItr(ctx.iter(dist[1]));
+          if(!pos.distance(mn, mx)) return false;
+        }
+        // ...window?
+        if(pos.wunit != null) {
+          final long c = checkItr(ctx.iter(window));
+          if(!pos.window(c)) return false;
+        }
+        return true;
+      }
     };
-  }
-
-  /**
-   * Init FTPos for next seqEval with index use.
-   * @param it current FTNode 
-   */
-  public void init(final FTNodeItem it) {
-    pos.setPos(it.ftn.convertPos(), it.ftn.p.list[0]);
-    if (it.ftn.getToken() != null) {
-      pos.ft.init(it.data.text(it.ftn.getPre()));
-      pos.term = pos.ft.getTokenList();
-    }
-  }
-
-  
-  /**
-   * Evaluates the position filters.
-   * @param ctx query context
-   * @return result of check
-   * @throws XQException query exception
-   */
-  public boolean posFilter(final XQContext ctx) throws XQException {
-    if(!pos.valid()) return false;
-
-    // ...distance?
-    if(pos.dunit != null) {
-      final long mn = checkItr(ctx.iter(dist[0]));
-      final long mx = checkItr(ctx.iter(dist[1]));
-      if(!pos.distance(mn, mx)) return false;
-    }
-    // ...window?
-    if(pos.wunit != null) {
-      final long c = checkItr(ctx.iter(window));
-      if(!pos.window(c)) return false;
-    }
-    return true;
   }
 
   @Override

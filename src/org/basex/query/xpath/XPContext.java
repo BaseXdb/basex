@@ -60,7 +60,14 @@ public final class XPContext extends QueryContext {
   public Result eval(final Nodes nodes) throws QueryException {
     evalTime = System.nanoTime();
     item = new Nod(nodes.nodes, nodes.data);
-    return eval(root);
+    Result it = eval(root);
+    
+    // return standard node set
+    if(it instanceof Nod) {
+      final Nod ns = (Nod) it;
+      it = new Nodes(ns.nodes, ns.data);
+    }
+    return it;
   }
   
   @Override

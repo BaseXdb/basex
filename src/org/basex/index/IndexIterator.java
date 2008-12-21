@@ -15,8 +15,6 @@ public abstract class IndexIterator {
     public int next() { return 0; };
     @Override
     public int size() { return 0; }; 
-    @Override 
-    public FTNode nextFTNodeFD() { return new FTNode(); };
   };
 
   /**
@@ -36,10 +34,4 @@ public abstract class IndexIterator {
    * @return size
    */
   public abstract int size();
-  
-  /**
-   * Returns the next result as FTNode object.
-   * @return next FTNode
-   */
-  public abstract FTNode nextFTNodeFD(); 
 }

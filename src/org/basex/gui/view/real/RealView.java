@@ -18,6 +18,7 @@ import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.View;
+import org.basex.gui.view.ViewRect;
 import org.basex.query.ChildIterator;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
@@ -64,7 +65,7 @@ public final class RealView extends View {
   /** array with position of the parent node. */
   private HashMap<Integer, Double> parentPos = null;
   /** array of current rectangles. */
-  private ArrayList<RealRect[]> rects = null;
+  private ArrayList<ViewRect[]> rects = null;
   /** nodes in current line. */
   private int rectCount = 0;
   /** current mouse position x. */
@@ -76,7 +77,7 @@ public final class RealView extends View {
   /** window height. */
   private int wheight = -1;
   /** current focused rect. */
-  private RealRect focusedRealRect = null;
+  private ViewRect focusedRect = null;
   /** current Image of visualization. */
   private BufferedImage realImage = null;
 
@@ -158,7 +159,7 @@ public final class RealView extends View {
         case 3:
           realImage = createImage();
           Graphics rg = realImage.getGraphics();
-          rects = new ArrayList<RealRect[]>();
+          rects = new ArrayList<ViewRect[]>();
           Nodes curr = GUI.context.current();
           for(int i = 0; i < curr.size; i++) {
             temperature(curr.nodes[i], rg, i);
@@ -170,11 +171,11 @@ public final class RealView extends View {
     g.drawImage(realImage, 0, 0, getWidth(), getHeight(), this);
 
     //highlights focused node
-    if(focusedRealRect != null) {
-      RealRect r = focusedRealRect;
-      g.drawRect(r.x1, r.y1, r.x2 - r.x1, r.y2 - r.y1);
+    if(focusedRect != null) {
+      ViewRect r = focusedRect;
+      g.drawRect(r.x, r.y, r.w, r.h);
 
-      final int pre = r.p;
+      final int pre = r.pre;
       String s = "";
 
       if(data.kind(pre) == Data.ELEM) {
@@ -191,9 +192,9 @@ public final class RealView extends View {
       int w = BaseXLayout.width(g, s);
 
       g.setColor(Color.WHITE);
-      g.fillRect(r.x1, r.y1 - fontHeight, w, fontHeight);
+      g.fillRect(r.x, r.y - fontHeight, w, fontHeight);
       g.setColor(Color.BLACK);
-      g.drawString(s, r.x1, (int) (r.y1 - fontHeight / 4f));
+      g.drawString(s, r.x, (int) (r.y - fontHeight / 4f));
 
     }
 
@@ -201,10 +202,10 @@ public final class RealView extends View {
     if(!rects.isEmpty() && GUI.context.marked().size > 0) {
 
       g.setColor(Color.GREEN);
-      Iterator<RealRect[]> it = rects.iterator();
+      Iterator<ViewRect[]> it = rects.iterator();
 
       while(it.hasNext()) {
-        final RealRect[] r = it.next();
+        final ViewRect[] r = it.next();
         int size = GUI.context.marked().size;
         final int[] markedNodes = new int[size];
         System.arraycopy(GUI.context.marked().nodes, 0, markedNodes, 0, size);
@@ -212,10 +213,9 @@ public final class RealView extends View {
         for(int i = 0; i < r.length; i++) {
 
           for(int j = 0; j < size; j++) {
-            if(r[i].p == markedNodes[j]) {
+            if(r[i].pre == markedNodes[j]) {
 
-              g.drawRect(r[i].x1, r[i].y1, r[i].x2 - r[i].x1, r[i].y2
-                      - r[i].y1);
+              g.drawRect(r[i].x, r[i].y, r[i].w, r[i].h);
 
               if(size < 2) {
                 return;
@@ -258,11 +258,11 @@ public final class RealView extends View {
 
     final boolean left = SwingUtilities.isLeftMouseButton(e);
     final boolean right = SwingUtilities.isRightMouseButton(e);
-    if(!right && !left || focusedRealRect == null) return;
+    if(!right && !left || focusedRect == null) return;
 
     if(left) {
       View.notifyMark(0, this);
-      int pre = focusedRealRect.p;
+      int pre = focusedRect.pre;
       if(e.getClickCount() > 1 && pre > -1) {
         View.notifyContext(GUI.context.marked(), false, this);
         refreshContext(false, false);
@@ -287,10 +287,10 @@ public final class RealView extends View {
     if(rects == null) return false;
 
     //    final Data data = GUI.context.data();
-    final Iterator<RealRect[]> it = rects.iterator();
+    final Iterator<ViewRect[]> it = rects.iterator();
 
     while(it.hasNext()) {
-      final RealRect[] r = it.next();
+      final ViewRect[] r = it.next();
 
       for(int i = 0; i < r.length; i++) {
         if(r[i].contains(mousePosX, mousePosY)) {
@@ -313,14 +313,14 @@ public final class RealView extends View {
           //          System.out.print(s);
           //          System.out.println();
 
-          focusedRealRect = r[i];
-          View.notifyFocus(r[i].p, this);
+          focusedRect = r[i];
+          View.notifyFocus(r[i].pre, this);
           return true;
         }
       }
 
     }
-    focusedRealRect = null;
+    focusedRect = null;
     View.notifyFocus(-1, this);
     return false;
   }
@@ -394,7 +394,7 @@ public final class RealView extends View {
       final int rootNum) {
 
     final int numberOfRoots = GUI.context.current().nodes.length;
-    final RealRect[] tRect = new RealRect[rectCount];
+    final ViewRect[] tRect = new ViewRect[rectCount];
     final Data data = GUI.context.data();
     final int size = parentList.size;
     final HashMap<Integer, Double> temp = new HashMap<Integer, Double>();
@@ -425,7 +425,7 @@ public final class RealView extends View {
       final int h = fontHeight; //rectangle height
 
       //g.drawRect((int) x, y, l, h);
-      tRect[r++] = new RealRect(pre, (int) x, y, (int) x + l, y + h);
+      tRect[r++] = new ViewRect((int) x, y, l, h, pre, 0);
 
       int c = (int) Math.rint(255 * nodePercent * 40);
       c = c > 255 ? 255 : c;

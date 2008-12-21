@@ -2,10 +2,8 @@ package org.basex.query.xquery.expr;
 
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
-import org.basex.query.xquery.util.SeqBuilder;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -27,20 +25,14 @@ public final class List extends Arr {
   public Expr comp(final XQContext ctx) throws XQException {
     super.comp(ctx);
     for(final Expr e : expr) if(!e.i() && !e.e()) return this;
-
     // all values are items - return simple sequence
-    final SeqBuilder seq = new SeqBuilder();
-    for(final Expr e : expr) seq.add(ctx.iter(e));
-    return seq.finish();
+    return iter(ctx).finish();
   }
 
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
     final SeqIter seq = new SeqIter();
-    for(final Expr e : expr) {
-      if(e.i()) seq.add((Item) e);
-      else seq.add(ctx.iter(e));
-    }
+    for(final Expr e : expr) seq.add(ctx.iter(e));
     return seq;
   }
 

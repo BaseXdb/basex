@@ -96,6 +96,14 @@ public class FTPos extends ExprInfo {
     return ordered() && content() && same() && different();
   }
 
+  /**
+   * Checks if the standard options are used.
+   * @return result of check
+  public boolean standard() {
+    return !ordered && !start && !end && !content && wunit == null &&
+      dunit == null;
+  }
+   */
 
   /**
    * Checks if the position values are ordered.
@@ -117,7 +125,6 @@ public class FTPos extends ExprInfo {
       if (pp.list[lp] == size - 1) return true;
       i++;
     }
-
     return false;
   }
 
@@ -233,7 +240,6 @@ public class FTPos extends ExprInfo {
 
   /**
    * Checks if each token is reached by the ftdistance query.
-   * 
    * @param x current posvalue
    * @param p pos list
    * @param pp pointer list

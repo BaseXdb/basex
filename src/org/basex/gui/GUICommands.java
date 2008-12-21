@@ -830,24 +830,18 @@ public enum GUICommands implements GUICommand {
     help = h;
   }
 
-  /** {@inheritDoc} */
   public abstract void execute();
 
-  /** {@inheritDoc} */
   public void refresh(final AbstractButton button) {
     BaseXLayout.enable(button, !data || GUI.context.db());
   }
 
-  /** {@inheritDoc} */
   public boolean checked() { return false; }
 
-  /** {@inheritDoc} */
   public String help() { return help; }
 
-  /** {@inheritDoc} */
   public String desc() { return entry; }
 
-  /** {@inheritDoc} */
   public String key() { return key; }
 
   // =========================================================================

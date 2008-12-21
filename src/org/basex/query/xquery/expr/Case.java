@@ -7,7 +7,7 @@ import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
-import org.basex.query.xquery.util.SeqBuilder;
+import org.basex.query.xquery.iter.SeqIter;
 import org.basex.query.xquery.util.Var;
 
 /**
@@ -48,8 +48,8 @@ public final class Case extends Single {
    * @return resulting item
    * @throws XQException evaluation exception
    */
-  Iter iter(final XQContext ctx, final SeqBuilder seq) throws XQException {
-    if(!var.type.instance(seq.iter())) return null;
+  Iter iter(final XQContext ctx, final SeqIter seq) throws XQException {
+    if(!var.type.instance(seq)) return null;
     if(var.name == null) return ctx.iter(expr);
 
     final int s = ctx.vars.size();

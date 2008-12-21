@@ -35,7 +35,7 @@ public final class DTd extends Dur {
    */
   public DTd(final int shift) {
     super(Type.DTD);
-    sc = BigDecimal.valueOf(shift * 60);
+    sc = BigDecimal.valueOf(shift * 60L);
   }
 
   /**

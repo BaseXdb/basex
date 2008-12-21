@@ -86,7 +86,6 @@ final class FTIntersection extends FTExpr {
       final FTNodeItem n2 = calcFTAnd(cn, ctx, false);
       return n2;
     }
-
     return new FTNodeItem();
   }
 

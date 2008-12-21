@@ -12,8 +12,8 @@ import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.iter.RangeIter;
+import org.basex.query.xquery.iter.SeqIter;
 import org.basex.query.xquery.util.ItemSet;
-import org.basex.query.xquery.util.SeqBuilder;
 import org.basex.util.Token;
 
 /**
@@ -176,11 +176,8 @@ final class FNSeq extends Fun {
     }
     
     // process any other iterator...
-    final SeqBuilder sb = new SeqBuilder();
-    Item i;
-    while((i = iter.next()) != null) sb.add(i);
-    
     return new Iter() {
+      final SeqIter sb = new SeqIter(iter);
       int c = sb.size;
 
       @Override

@@ -90,16 +90,6 @@ public class BufferInput {
    * @param buf input buffer
    * @throws IOException IO Exception
    */
-  public BufferInput(final String file, final byte[] buf) throws IOException {
-    this(new File(file), buf);
-  }
-
-  /**
-   * Initializes the file reader.
-   * @param file the file to be read
-   * @param buf input buffer
-   * @throws IOException IO Exception
-   */
   public BufferInput(final File file, final byte[] buf) throws IOException {
     this(new FileInputStream(file), buf);
   }

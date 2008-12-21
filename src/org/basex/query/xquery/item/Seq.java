@@ -101,6 +101,15 @@ public class Seq extends Item {
   }
 
   @Override
+  public void serialize(final Serializer ser) throws IOException {
+    for(int i = 0; i < size; i++) {
+      ser.openResult();
+      val[i].serialize(ser);
+      ser.closeResult();
+    }
+  }
+
+  @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("(");
     for(int v = 0; v != size; v++) {

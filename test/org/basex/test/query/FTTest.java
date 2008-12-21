@@ -246,6 +246,10 @@ public final class FTTest extends AbstractTest {
         { "FTAndOr 6", nodes(31, 33),
           "//fti [text() ftcontains 'adfad' ftand 'wordt' ftand 'ook' " +
           "ftand 'wel' ftand 'een' ftand 's']" },
+        { "FTAndOr 7", nodes(),
+          "//* [text() ftcontains 'databases' ftand 'db']" },
+        { "FTAndOr 8", nodes(),
+          "//* [text() ftcontains ('databases' ftand 'db') with stemming]" },
 
         { "FTStemming 1", nodes(7, 9, 11),
           "//w [text() ftcontains 'xml database' with stemming]" },
@@ -284,7 +288,7 @@ public final class FTTest extends AbstractTest {
           "//atr [@key ftcontains 'value']" },
 
         { "FTPosFilter 1", nodes(3, 5, 9, 11),
-          "//w [. ftcontains 'xml' at start]" },
+          "//w [text() ftcontains 'xml' at start]" },
         { "FTPosFilter 2", nodes(),
           "//w [. ftcontains 'databases' at start]" },
         { "FTPosFilter 3", nodes(9, 11),
@@ -304,11 +308,11 @@ public final class FTTest extends AbstractTest {
         { "FTPosFilter 10", nodes(7, 9, 11),
           "//w [. ftcontains 'xml' ftand 'databases' at end]" },
         { "FTPosFilter 11", nodes(14),
-          "//w [. ftcontains 'hello' entire content]" },
+          "//w [text() ftcontains 'hello' entire content]" },
         { "FTPosFilter 12", nodes(9, 11),
           "//w [. ftcontains 'xml databases' entire content]" },
         { "FTPosFilter 13", nodes(3),
-          "//w [. ftcontains 'the' ftand 'fourth' " +
+          "//w [text() ftcontains 'the' ftand 'fourth' " +
           "distance exactly 2 sentences]" },
         { "FTPosFilter 14", nodes(3, 37),
           "//w [. ftcontains 'first' ftand 'second' ftand 'third' " +
@@ -337,7 +341,7 @@ public final class FTTest extends AbstractTest {
           "//w [. ftcontains ('second' ftand 'third' window 3 words) " +
           "ftand 'sentence' distance exactly 0 words]" },
         { "FTPosFilter 23", nodes(3),
-          "//w [. ftcontains ('second' ftand 'third' window 3 words) " +
+          "//w [text() ftcontains ('second' ftand 'third' window 3 words) " +
           "ftand 'sentence' distance exactly 0 words ordered]" },
         { "FTPosFilter 24", nodes(37),
           "//w [. ftcontains 'third' ftand 'second' " +
@@ -349,7 +353,7 @@ public final class FTTest extends AbstractTest {
         { "FTScope 1", nodes(25, 27, 29, 31, 33),
           "//fti [. ftcontains 'wordt ook' same sentence]" },
         { "FTScope 2", nodes(27, 29, 33),
-          "//fti [. ftcontains 'wordt' ftand 'ook' same sentence]" },
+          "//fti [text() ftcontains 'wordt' ftand 'ook' same sentence]" },
         { "FTScope 3", nodes(25, 31),
           "//fti [. ftcontains 'wordt' ftand 'ook' different sentence]" },
         { "FTScope 4", nodes(25, 27, 29, 33),

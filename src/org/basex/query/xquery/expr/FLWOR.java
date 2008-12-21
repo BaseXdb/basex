@@ -1,8 +1,5 @@
 package org.basex.query.xquery.expr;
 
-import static org.basex.query.xquery.XQTokens.*;
-import java.io.IOException;
-import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.iter.Iter;
@@ -44,7 +41,7 @@ public final class FLWOR extends FLWR {
    * @param p variable position
    * @throws XQException evaluation exception
    */
-  void iter(final XQContext ctx, final SeqIter seq,
+  private void iter(final XQContext ctx, final SeqIter seq,
       final Iter[] it, final int p) throws XQException {
 
     final boolean more = p + 1 != fl.length;
@@ -58,35 +55,5 @@ public final class FLWOR extends FLWR {
         }
       }
     }
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    for(int i = 0; i != fl.length; i++) sb.append((i != 0 ? " " : "") + fl[i]);
-    if(where != null) sb.append(" where " + where);
-    sb.append(order);
-    return sb.append(" return " + expr).toString();
-  }
-
-  @Override
-  public String info() {
-    return "FLWOR expression";
-  }
-
-  @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, EVAL, ITER);
-    for(final ForLet f : fl) f.plan(ser);
-    if(where != null) {
-      ser.openElement(WHR);
-      where.plan(ser);
-      ser.closeElement();
-    }
-    order.plan(ser);
-    ser.openElement(RET);
-    expr.plan(ser);
-    ser.closeElement();
-    ser.closeElement();
   }
 }

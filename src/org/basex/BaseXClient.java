@@ -45,8 +45,6 @@ public class BaseXClient {
   private boolean allInfo;
   /** XPath file. */
   private String query;
-  /** XQuery file. */
-  private boolean xpath;
   /** Output file for XPath queries. */
   protected String output;
   /** User query. */
@@ -103,8 +101,7 @@ public class BaseXClient {
       }
 
       if(query != null) {
-        if(xpath) process(new XPath(query), info || Prop.xmlplan);
-        else process(new XQuery(query), info || Prop.xmlplan);
+        process(new XQuery(query), info || Prop.xmlplan);
       } else if(commands != null) {
         process(commands);
         quit(true);
@@ -173,7 +170,8 @@ public class BaseXClient {
     try {
       for(final Process p : new CommandParser(in).parse()) {
         if(p instanceof Exit) return false;
-        if(!process(p, info)) break;
+        boolean qu = p instanceof XPath || p instanceof XQuery;
+        if(!process(p, info || qu && Prop.xmlplan)) break;
       }
     } catch(final QueryException ex) {
       error(ex, ex.getMessage());

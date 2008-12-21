@@ -1,9 +1,11 @@
 package org.basex.query.xquery;
 
+import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.query.QueryProcessor;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.xquery.iter.Iter;
 
 /**
  * This is the main class of the XQuery Processor.
@@ -46,6 +48,17 @@ public final class XQueryProcessor extends QueryProcessor {
    */
   public void parse(final String in) throws QueryException {
     new XQParser(ctx).parse(in);
+  }
+  
+  /**
+   * Returns a result iterator.
+   * @param nodes node input
+   * @return result iterator
+   * @throws QueryException query exception
+   */
+  public Iter iter(final Nodes nodes) throws QueryException {
+    if(!compiled) compile(nodes);
+    return ctx.iter();
   }
 
   /**

@@ -147,8 +147,7 @@ public final class FTOpt extends ExprInfo {
       if(f) {
         if(il == null) il = new IntList();
         // each word position has to be saved for phrases
-        for (int i = 0; i < sb.pos; i++)
-          il.add(tpos + i);
+        for(int i = 0; i < sb.pos; i++) il.add(tpos + i);
       }
       tk.p = tp;
     }

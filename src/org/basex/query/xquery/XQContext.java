@@ -9,6 +9,7 @@ import org.basex.core.Prop;
 import org.basex.core.proc.Check;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
+import org.basex.data.Result;
 import org.basex.data.Serializer;
 import org.basex.index.FTTokenizer;
 import org.basex.io.IO;
@@ -28,12 +29,13 @@ import org.basex.query.xquery.item.Tim;
 import org.basex.query.xquery.item.Uri;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.NodIter;
+import org.basex.query.xquery.iter.SeqIter;
 import org.basex.query.xquery.util.Err;
 import org.basex.query.xquery.util.Functions;
 import org.basex.query.xquery.util.NSLocal;
-import org.basex.query.xquery.util.SeqBuilder;
 import org.basex.query.xquery.util.Variables;
 import org.basex.util.Array;
+import org.basex.util.IntList;
 import org.basex.util.StringList;
 
 /**
@@ -63,7 +65,7 @@ public final class XQContext extends QueryContext {
   public FTOpt ftopt = new FTOpt();
   /** Current fulltext position filter. */
   public FTPos ftpos;
-  /** Count nuber of FTIndex. */
+  /** Count number of FTIndex. */
   public int ftcount = 0;
 
   /** Current Date. */
@@ -153,16 +155,38 @@ public final class XQContext extends QueryContext {
   }
 
   @Override
-  public XQResult eval(final Nodes nodes) throws XQException {
-    // evaluates the query and returns the result
-    final SeqBuilder sb = new SeqBuilder();
+  public Result eval(final Nodes nodes) throws XQException {
+    // evaluates the query
     final Iter it = iter();
+    final SeqIter ir = new SeqIter(this);
     Item i;
+    
+    // check if all results belong to the database of the input context
+    if(nodes != null) {
+      final Data data = nodes.data;
+      final IntList pre = new IntList();
+      
+      while((i = it.next()) != null) {
+        checkStop();
+        if(!(i instanceof DBNode)) break;
+        final DBNode n = (DBNode) i;
+        if(n.data != data) break;
+        pre.add(((DBNode) i).pre);
+      }
+      
+      // completed... return standard nodeset
+      if(i == null) return new Nodes(pre.finish(), data);
+      // add standard nodes
+      for(int p = 0; p < pre.size; p++) ir.add(new DBNode(data, pre.list[p]));
+      ir.add(i);
+    }
+
+    // use standard iterator
     while((i = it.next()) != null) {
       checkStop();
-      sb.add(i);
+      ir.add(i);
     }
-    return new XQResult(this, sb);
+    return ir;
   }
 
   /**
@@ -216,24 +240,6 @@ public final class XQContext extends QueryContext {
   public Iter iter(final Expr e) throws XQException {
     checkStop();
     return e.iter(this);
-
-    /*
-    if(inf && !e.i()) {
-      return e.iter(this);
-    } else {
-      return e.iter(this);
-    }*/
-    
-    /* skip query info for items
-    final Iter ir = e.iter(this);
-    if(inf && !e.i()) {
-      final double t = ((System.nanoTime() - evalTime) / 10000) / 100d;
-      evalInfo(t + MS + ": " + e.getClass().getSimpleName() + ": " + e);
-      inf = ++cc < MAXDUMP;
-      if(!inf) evalInfo(EVALSKIP);
-    }
-    return ir;
-    */
   }
 
   /**

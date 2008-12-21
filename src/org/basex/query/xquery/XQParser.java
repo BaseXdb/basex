@@ -1300,8 +1300,7 @@ public final class XQParser extends QueryParser {
           }
           final byte[] ext = tok.finish();
           final QNm qn = checkTest(type, ext);
-          if(type == Type.NOD) return Test.NODE;
-          return new KindTest(type, qn);
+          return type == Type.NOD ? Test.NODE : new KindTest(type, qn);
         }
       } else {
         // name test "pre:tag"

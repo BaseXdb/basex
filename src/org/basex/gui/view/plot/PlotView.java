@@ -32,6 +32,7 @@ import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.View;
+import org.basex.gui.view.ViewRect;
 import org.basex.util.Array;
 import org.basex.util.IntList;
 
@@ -91,7 +92,7 @@ public final class PlotView extends View implements Runnable {
    * triggered by the plot itself. */
   private Nodes nextContext;
   /** Bounding box which supports selection of multiple items. */
-  private final PlotBoundingBox selectionBox;
+  private final ViewRect selectionBox;
 
   /**
    * Default Constructor.
@@ -172,7 +173,7 @@ public final class PlotView extends View implements Runnable {
     add(box, BorderLayout.SOUTH);
 
     new BaseXPopup(this, POPUP);
-    selectionBox = new PlotBoundingBox();
+    selectionBox = new ViewRect();
     refreshLayout();
   }
 
@@ -329,10 +330,10 @@ public final class PlotView extends View implements Runnable {
     // draw selection box
     if(dragging) {
       g.setColor(back);
-      final int selW = selectionBox.getWidth();
-      final int selH = selectionBox.getHeight();
-      final int x1 = selectionBox.x1;
-      final int y1 = selectionBox.y1;
+      final int selW = selectionBox.w;
+      final int selH = selectionBox.h;
+      final int x1 = selectionBox.x;
+      final int y1 = selectionBox.y;
       g.fillRect(selW > 0 ? x1 : x1 + selW, selH > 0 ? y1 : y1 + selH,
           Math.abs(selW), Math.abs(selH));
       g.setColor(frame);
@@ -907,42 +908,49 @@ public final class PlotView extends View implements Runnable {
     // first time method is called when mouse dragged
     if(!dragging) {
       dragging = true;
-      selectionBox.setStart(mouseX, mouseY);
+      selectionBox.x = mouseX;
+      selectionBox.y = mouseY;
     }
 
     // keeps selection box on the plot inside. if mouse pointer is outside box
     // the corners of the selection box are set to the predefined values s.a.
+    int x = mouseX;
+    int y = mouseY;
     if(!inBox) {
       if(mouseX < lb) {
         if(mouseY > bb) {
-          selectionBox.setEnd(lb, bb);
+          x = lb;
+          y = bb;
         } else if(mouseY < tb) {
-          selectionBox.setEnd(lb, tb);
+          x = lb;
+          y = tb;
         } else {
-          selectionBox.setEnd(lb, mouseY);
+          x = lb;
         }
       } else if(mouseX > rb) {
         if(mouseY > bb) {
-          selectionBox.setEnd(rb, bb);
+          x = rb;
+          y = bb;
         } else if(mouseY < tb) {
-          selectionBox.setEnd(rb, tb);
+          x = rb;
+          y = tb;
         } else {
-          selectionBox.setEnd(rb, mouseY);
+          x = rb;
         }
       } else if(mouseY < tb) {
-        selectionBox.setEnd(mouseX, tb);
-      } else
-        selectionBox.setEnd(mouseX, bb);
-      // mouse pointer position is in the plot
-    } else {
-      selectionBox.setEnd(mouseX, mouseY);
+        y = tb;
+      } else {
+        y = bb;
+      }
     }
+    selectionBox.w = x - selectionBox.x;
+    selectionBox.h = y - selectionBox.y;
 
     // searches for items located in the selection box
     final IntList il = new IntList();
     for(int i = 0; i < plotData.size; i++) {
-      final int x = calcCoordinate(true, plotData.xAxis.co[i]);
-      final int y = calcCoordinate(false, plotData.yAxis.co[i]);
+      x = calcCoordinate(true, plotData.xAxis.co[i]);
+      y = calcCoordinate(false, plotData.yAxis.co[i]);
       if(selectionBox.contains(x, y)) il.add(plotData.pres[i]);
     }
     

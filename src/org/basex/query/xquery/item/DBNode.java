@@ -17,19 +17,27 @@ import org.basex.util.Atts;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class DBNode extends Nod {
+public class DBNode extends Nod {
   /** Node Types. */
   private static final Type[] TYPES = {
     Type.DOC, Type.ELM, Type.TXT, Type.ATT, Type.COM, Type.PI
   };
+  /** Data reference. */
+  public final Data data;
   /** Root node (constructor). */
   public Nod root;
   /** Namespaces. */
   private Atts nsp;
-  /** Data reference. */
-  public Data data;
   /** Pre value. */
   public int pre;
+
+  /**
+   * Constructor.
+   */
+  public DBNode() {
+    super(Type.TXT);
+    data = null;
+  }
 
   /**
    * Constructor.

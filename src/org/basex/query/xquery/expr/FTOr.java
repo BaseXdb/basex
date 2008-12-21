@@ -110,19 +110,8 @@ public final class FTOr extends FTExpr {
   }
   
   /**
-   * Add Expr to list.
-   * @param ex new Expr
-   */
-  public void add(final FTExpr ex) {
-    FTExpr[] ne = new FTExpr[expr.length + 1];
-    System.arraycopy(expr, 0, ne, 0, expr.length);
-    ne[expr.length] = ex;
-    expr = ne;
-  }
-  
-  /**
-   * Generate sequenz for nex.length > 0 && pex.length > 0.
-   * @return sequenz
+   * Generate sequence for nex.length > 0 && pex.length > 0.
+   * @return sequence
    */
   private int[] gen() {
     final int[] r = new int[expr.length];

@@ -1,7 +1,12 @@
 package org.basex.query.xquery.iter;
 
+import java.io.IOException;
+import org.basex.data.Result;
+import org.basex.data.Serializer;
+import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Item;
+import org.basex.query.xquery.item.Seq;
 
 /**
  * Sequence Iterator.
@@ -9,7 +14,9 @@ import org.basex.query.xquery.item.Item;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class SeqIter extends Iter {
+public final class SeqIter extends ResetIter implements Result {
+  /** Query context. */
+  private XQContext ctx;
   /** Items. */
   public Item[] item;
   /** Size. */
@@ -22,6 +29,15 @@ public final class SeqIter extends Iter {
    */
   public SeqIter() {
     item = new Item[1];
+  }
+
+  /**
+   * Constructor, specifying the query context.
+   * @param c query context
+   */
+  public SeqIter(final XQContext c) {
+    this();
+    ctx = c;
   }
 
   /**
@@ -60,16 +76,8 @@ public final class SeqIter extends Iter {
    * @throws XQException evaluation exception
    */
   public void add(final Iter iter) throws XQException {
-    if(iter.size() == 1) {
-      add(iter.next());
-      return;
-    }
-    
     Item i;
-    while((i = iter.next()) != null) {
-      final Iter it = i.iter();
-      while((i = it.next()) != null) add(i);
-    }
+    while((i = iter.next()) != null) add(i);
   }
 
   /**
@@ -89,6 +97,37 @@ public final class SeqIter extends Iter {
     System.arraycopy(item, 0, tmp, 0, size);
     item = tmp;
   }
+
+  public boolean same(final Result v) {
+    if(!(v instanceof SeqIter)) return false;
+
+    final SeqIter sb = (SeqIter) v;
+    if(size != sb.size) return false;
+    try {
+      for(int i = 0; i < size; i++) {
+        if(item[i].type != sb.item[i].type ||
+          !item[i].eq(sb.item[i])) return false;
+      }
+    } catch(final XQException e) {
+      return false;
+    }
+    return true;
+  }
+
+  public void serialize(final Serializer ser) throws IOException {
+    ser.open(size);
+    for(int i = 0; i < size; i++) {
+      if(ser.finished()) break;
+      serialize(ser, i);
+    }
+    ser.close(size);
+  }
+
+  public void serialize(final Serializer ser, final int n) throws IOException {
+    ser.openResult();
+    ctx.serialize(ser, item[n]);
+    ser.closeResult();
+  }
   
   @Override
   public Item next() {
@@ -103,6 +142,11 @@ public final class SeqIter extends Iter {
   @Override
   public long size() {
     return size;
+  }
+
+  @Override
+  public Item finish() {
+    return Seq.get(item, size);
   }
 
   @Override

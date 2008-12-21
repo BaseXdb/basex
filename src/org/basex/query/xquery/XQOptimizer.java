@@ -39,7 +39,7 @@ public final class XQOptimizer {
     if(step.axis.down && step.test.kind != Test.Kind.NAME &&
         step.test.type != Type.TXT && ((DBNode) ctx.item).data.meta.uptodate) {
 
-      final Step s = Step.get(Axis.CHILD, new KindTest(Type.TXT));
+      final Step s = Step.get(Axis.CHILD, new KindTest(Type.TXT, null));
       return new AxisPath(ex, new Step[] { s });
     }
     return ex;
