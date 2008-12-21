@@ -32,7 +32,6 @@ import org.basex.query.xquery.item.Str;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
-import org.basex.query.xquery.util.SeqBuilder;
 import org.basex.query.xquery.util.Var;
 import org.basex.util.Action;
 import org.basex.util.Token;
@@ -154,7 +153,7 @@ abstract class BXQDynamicContext extends BXQAbstract
     
     valid(s, XQSequence.class);
     try {
-      bind(qn, new SeqBuilder(((BXQSequence) s).result).finish(), null);
+      bind(qn, (((BXQSequence) s).result).finish(), null);
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }      
