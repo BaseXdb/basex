@@ -32,12 +32,17 @@ public final class FTSelectIndex extends FTExpr {
    * Constructor.
    * @param e expression
    * @param u fulltext selections
-   * @param w weight
+   * @param win window
+   * @param wei weight
+   * @param d distanz
    */
-  public FTSelectIndex(final FTExpr e, final FTPos u, final Expr w) {
+  public FTSelectIndex(final FTExpr e, final FTPos u, final Expr win, 
+      final Expr wei, final Expr[] d) {
     super(e);
     pos = u;
-    weight = w;
+    window = win;
+    weight = wei;
+    dist = d;
   }
 
   @Override
@@ -50,7 +55,7 @@ public final class FTSelectIndex extends FTExpr {
         ctx.ftpos = pos;
         pos.init(ctx.ftitem);
         FTNodeItem it = (FTNodeItem) ctx.iter(expr[0]).next();
-        if (tmp != null) {
+        if (ctx.ftpos != null) {
           if (it.ftn.size > 0) {
             init(it);
             while (!posFilter()) {

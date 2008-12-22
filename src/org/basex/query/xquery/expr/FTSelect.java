@@ -132,7 +132,7 @@ public final class FTSelect extends FTExpr {
     throws XQException {
 
     return new FTSelectIndex((FTExpr) 
-        expr[0].indexEquivalent(ctx, ieq), pos, weight);
+        expr[0].indexEquivalent(ctx, ieq), pos, window, weight, dist);
   }
   
   @Override
