@@ -78,6 +78,9 @@ public final class Prop {
   public static boolean dotplan = false;
   /** Prints a XML plan. */
   public static boolean xmlplan = false;
+  /** Creates the query plan before or after compilation. */
+  public static boolean compplan = true;
+  
   /** Format XQuery output. */
   public static boolean xqformat = true;
   /** Use internal XML parser. */
@@ -143,7 +146,7 @@ public final class Prop {
   /** Server mode. */
   public static boolean server = false;
   /** Server timeout in seconds. */
-  public static int timeout = 10;
+  public static int timeout = 100;
 
   // WEBSERVER OPTIONS ========================================================
 

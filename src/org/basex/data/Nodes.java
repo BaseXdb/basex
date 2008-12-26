@@ -1,14 +1,17 @@
 package org.basex.data;
 
 import java.io.IOException;
+import java.util.Arrays;
+
 import org.basex.BaseX;
 import org.basex.core.Context;
 import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
 
 /**
- * This is a container for context nodes. Instances of this class are stored
- * in the {@link Context} class to reference the currently used nodes.
+ * This class stores node references of a database in an ascending order.
+ * Instances of this class are used in the {@link Context} class to
+ * reference the currently used nodes.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
@@ -56,12 +59,8 @@ public final class Nodes implements Result {
    * @param p pre value
    * @return true if the node was found
    */
-  public int find(final int p) {
-    for(int s = 0; s < size; s++) {
-      if(nodes[s] == p) return s;
-      if(nodes[s] > p) return -s - 1;
-    }
-    return -size - 1;
+  public boolean contains(final int p) {
+    return Arrays.binarySearch(nodes, p) >= 0;
   }
 
   /**
@@ -70,7 +69,7 @@ public final class Nodes implements Result {
    */
   public void toggle(final int p) {
     final int[] n = new int[] { p };
-    nodes = find(p) < 0 ? union(nodes, n) : except(nodes, n);
+    nodes = contains(p) ? except(nodes, n) : union(nodes, n);
     size = nodes.length;
   }
   

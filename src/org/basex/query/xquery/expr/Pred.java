@@ -7,11 +7,11 @@ import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.func.Fun;
 import org.basex.query.xquery.func.FunDef;
 import org.basex.query.xquery.item.Item;
+import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
 import org.basex.util.Array;
-import org.basex.util.TokenBuilder;
 
 /**
  * Predicate expression.
@@ -42,7 +42,8 @@ public class Pred extends Expr {
       pred[p] = ctx.comp(pred[p]);
       if(pred[p].i()) {
         final Item it = (Item) pred[p];
-        if(it.n() || !it.bool()) continue;
+        if(!it.bool()) return Seq.EMPTY;
+        if(it.n()) continue;
         Array.move(pred, p + 1, -1, pred.length - p-- - 1);
         pred = Array.finish(pred, pred.length - 1);
       }
@@ -55,7 +56,7 @@ public class Pred extends Expr {
     // Numeric value
     final boolean num = pred[0].i() && ((Item) pred[0]).n();
     // Multiple Predicates or POS
-    if(pred.length > 1 || (!last && !num && uses(Using.POS))) return this;
+    if(pred.length > 1 || !last && !num && uses(Using.POS)) return this;
     // Use iterative evaluation
     return new PredIter(root, pred, last, num);
   }  
@@ -120,8 +121,8 @@ public class Pred extends Expr {
 
   @Override
   public final String toString() {
-    final TokenBuilder tb = new TokenBuilder(name()).add("(" + root + "[");
-    for(int p = 0; p < pred.length; p++) tb.add((p != 0 ? ", " : "") + pred[p]);
-    return tb.add("]").toString();
+    final StringBuilder sb = new StringBuilder(root.toString());
+    for(final Expr e : pred) sb.append("[" + e + "]");
+    return sb.toString();
   }
 }

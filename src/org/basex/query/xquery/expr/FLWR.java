@@ -1,13 +1,11 @@
 package org.basex.query.xquery.expr;
 
-import static org.basex.query.xquery.XQTokens.*;
-import java.io.IOException;
-import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.iter.Iter;
+import org.basex.util.Array;
 
 /**
  * FLWR Clause.
@@ -15,13 +13,7 @@ import org.basex.query.xquery.iter.Iter;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class FLWR extends Single {
-  /** For/Let expressions. */
-  protected final ForLet[] fl;
-  /** Order Expressions. */
-  protected Order order;
-  /** Where Expression. */
-  protected Expr where;
+public final class FLWR extends FLWOR {
 
   /**
    * Constructor.
@@ -30,29 +22,31 @@ public class FLWR extends Single {
    * @param r return expression
    */
   public FLWR(final ForLet[] f, final Expr w, final Expr r) {
-    super(r);
-    fl = f;
-    where = w;
+    super(f, w, null, r);
   }
 
   @Override
-  public final Expr comp(final XQContext ctx) throws XQException {
-    final int vs = ctx.vars.size();
+  public Expr comp(final XQContext ctx) throws XQException {
+    final Expr ex = super.comp(ctx);
+    if(ex != this) return ex;
+    
+    // remove let clauses with static contents
     for(int f = 0; f != fl.length; f++) {
-      final Expr e = ctx.comp(fl[f]);
-      if(e.e()) return Seq.EMPTY;
-      fl[f] = (ForLet) e;
+      if(fl[f].var.expr != null) fl = Array.delete(fl, f--);
     }
-    if(where != null) where = ctx.comp(where);
-    if(order != null) order.comp(ctx);
-    expr = ctx.comp(expr);
-    ctx.vars.reset(vs);
+  
+    // no clauses left: simplify expression
+    if(fl.length == 0) {
+      // no where clause - pass on return clause
+      if(where == null) return expr;
+      // replace FLWR with IF clause
+      return new If(where, expr, Seq.EMPTY);      
+    }
     return this;
   }
 
   @Override
-  @SuppressWarnings("unused")
-  public Iter iter(final XQContext ctx) throws XQException {
+  public Iter iter(final XQContext ctx) {
     return new Iter() {
       private Iter[] iter;
       private Iter ir;
@@ -84,35 +78,5 @@ public class FLWR extends Single {
         }
       }
     };
-  }
-
-  @Override
-  public String color() {
-    return "66FF66";
-  }
-
-  @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, EVAL, ITER);
-    for(final ForLet f : fl) f.plan(ser);
-    if(where != null) {
-      ser.openElement(WHR);
-      where.plan(ser);
-      ser.closeElement();
-    }
-    if(order != null) order.plan(ser);
-    ser.openElement(RET);
-    expr.plan(ser);
-    ser.closeElement();
-    ser.closeElement();
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    for(int i = 0; i != fl.length; i++) sb.append((i != 0 ? " " : "") + fl[i]);
-    if(where != null) sb.append(" where " + where);
-    if(order != null) sb.append(order);
-    return sb.append(" return " + expr).toString();
   }
 }

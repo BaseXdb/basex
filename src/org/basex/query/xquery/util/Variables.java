@@ -2,6 +2,7 @@ package org.basex.query.xquery.util;
 
 import java.io.IOException;
 import org.basex.data.Serializer;
+import org.basex.query.ExprInfo;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 
@@ -11,7 +12,7 @@ import org.basex.query.xquery.XQContext;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Variables {
+public final class Variables extends ExprInfo {
   /** Global variables. */
   private final Vars global = new Vars();
   /** Local variables. */
@@ -23,7 +24,6 @@ public final class Variables {
    */
   public void addGlobal(final Var v) {
     global.add(v);
-    v.global = true;
   }
   
   /**
@@ -61,7 +61,7 @@ public final class Variables {
   }
 
   /**
-   * Sets the number of local variables.
+   * Resets the number of local variables.
    * @param s number of variables to be set
    */
   public void reset(final int s) {
@@ -69,7 +69,7 @@ public final class Variables {
   }
   
   /**
-   * Compiles the functions.
+   * Compiles the variables.
    * @param ctx xquery context
    * @throws XQException xquery exception
    */
@@ -82,11 +82,7 @@ public final class Variables {
     return local.toString();
   }
 
-  /**
-   * Serializes the variables.
-   * @param ser serializer
-   * @throws IOException exception
-   */
+  @Override
   public void plan(final Serializer ser) throws IOException {
     global.plan(ser);
   }

@@ -248,7 +248,6 @@ public final class RealView extends View {
     // refresh mouse focus
     mousePosX = e.getX();
     mousePosY = e.getY();
-    //    System.out.println("x: "+ mousePosX + "y: " + mousePosY);
     focus();
     repaint();
   }
@@ -294,25 +293,6 @@ public final class RealView extends View {
 
       for(int i = 0; i < r.length; i++) {
         if(r[i].contains(mousePosX, mousePosY)) {
-
-          //          final int pre = r[i].p;
-          //          String s = "";
-          //
-          //          if(data.kind(pre) == Data.ELEM) {
-          //            s = Token.string(data.tag(pre));
-          //          } else {
-          //            s = Token.string(data.text(pre));
-          //          }
-          //
-          //          for(int y = 0; y < data.attSize(pre, data.kind(pre)
-          //          ) - 1; y++) {
-          //            s = " " + Token.string(data.attName(pre + y + 1)
-          //            ) + "=" + "\""
-          //                + Token.string(data.attValue(pre + y + 1)) + "\" ";
-          //          }
-          //          System.out.print(s);
-          //          System.out.println();
-
           focusedRect = r[i];
           View.notifyFocus(r[i].pre, this);
           return true;

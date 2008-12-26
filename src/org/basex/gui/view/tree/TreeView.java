@@ -408,7 +408,7 @@ public final class TreeView extends View {
     // add or remove marked node
     final Nodes marked = GUI.context.marked();
     if(!left) {
-      if(marked.find(pre) < 0) notifyMark(0, null);
+      if(marked.contains(pre)) notifyMark(0, null);
     } else if(getCursor() == CURSORHAND) {
       // open/close entry
       opened[pre] ^= true;
@@ -421,7 +421,7 @@ public final class TreeView extends View {
     } else if(e.isControlDown()) {
       notifyMark(2, null);
     } else {
-      if(marked.find(pre) < 0) notifyMark(0, null);
+      if(!marked.contains(pre)) notifyMark(0, null);
     }
   }
 

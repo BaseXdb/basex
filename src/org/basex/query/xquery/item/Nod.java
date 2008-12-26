@@ -141,7 +141,8 @@ public abstract class Nod extends Item {
   }
 
   /**
-   * Returns a final node representation.
+   * Returns a final node representation. This method should be called as
+   * soon as a node is passed on as result node.
    * @return node
    */
   public Nod finish() {

@@ -160,7 +160,7 @@ public final class XQContext extends QueryContext {
     final Iter it = iter();
     final SeqIter ir = new SeqIter(this);
     Item i;
-    
+
     // check if all results belong to the database of the input context
     if(nodes != null) {
       final Data data = nodes.data;
@@ -225,7 +225,7 @@ public final class XQContext extends QueryContext {
   public Expr comp(final Expr e) throws XQException {
     final Expr ex = e.comp(this);
     if(inf && ex != e && !(e instanceof VarCall) && !(e instanceof Cast) &&
-        !(e instanceof List) && !(ex.getClass().getName().contains("Iter"))) {
+        !(e instanceof List) && !ex.getClass().getName().contains("Iter")) {
       compInfo(OPTSIMPLE, e, ex);
     }
     return ex;

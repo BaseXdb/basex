@@ -330,27 +330,27 @@ public interface XQText {
   Object[] NAMEWRONG = { XPTY, 4, "Invalid value for name: \"%\"." };
   
   /** Example for a Date format. */
-  String XPDATE = "2000-12-31";
+  String XDATE = "2000-12-31";
   /** Example for a Time format. */
-  String XPTIME = "23:59:59";
+  String XTIME = "23:59:59";
   /** Example for a DateTime format. */
-  String XPDTM = XPDATE  + "T" + XPTIME;
+  String XDTM = XDATE  + "T" + XTIME;
   /** Example for a DayTimeDuration format. */
-  String XPDTD = "P23DT12M34S";
+  String XDTD = "P23DT12M34S";
   /** Example for a YearMonthDuration format. */
-  String XPYMD = "P2000Y12M";
+  String XYMD = "P2000Y12M";
   /** Example for a Duration format. */
-  String XPDURR = "P2000Y12MT23H12M34S";
+  String XDURR = "P2000Y12MT23H12M34S";
   /** Example for a YearMonth format. */
-  String XPYMO = "2000-12";
+  String XYMO = "2000-12";
   /** Example for a Year format. */
-  String XPYEA = "2000";
+  String XYEA = "2000";
   /** Example for a MonthDay format. */
-  String XPMDA = "--12-31";
+  String XMDA = "--12-31";
   /** Example for a Day format. */
-  String XPDAY = "---31";
+  String XDAY = "---31";
   /** Example for a Month format. */
-  String XPMON = "--12";
+  String XMON = "--12";
 
   /** XPTY0018: Typing exception. */
   Object[] EVALNODESVALS = { XPTY, 18,
@@ -376,8 +376,6 @@ public interface XQText {
   /** XQDY0074: Evaluation exception. */
   Object[] INVAL = { XQDY, 74, "Invalid name: \"%\"" };
 
-  /** XQST0000: Parsing exception. */
-  Object[] XQ11IMPL = { XQST, 0, "XQuery 1.1 Feature not implemented." };
   /** XQST0009: Parsing exception. */
   Object[] IMPLSCHEMA = { XQST, 9, "Schema import not supported." };
   /** XQST0022: Parsing exception. */

@@ -32,7 +32,7 @@ public final class SimpleIterStep extends Step {
 
     return new NodeIter() {
       NodeIter ir;
-      
+
       @Override
       public Nod next() throws XQException {
         while(true) {
@@ -44,39 +44,15 @@ public final class SimpleIterStep extends Step {
           }
           final Nod nod = ir.next();
           if(nod == null) ir = null;
-          
-          /* [SG], [DS] originally, SimpleIterStep was supposed to contain no
-           predicates, so this code is subject to further checks..
-           alternatively, a Step/IterStep instance could be created
-           for steps with predicates. */
-
-          else if(test.e(nod)) {
-            // check preds
-            final Item tmp = ctx.item;
-            ctx.item = nod;
-            for(final Expr p : pred) {
-              final Item i = ctx.iter(p).ebv();
-              if(i.n() ? i.dbl() == ctx.pos : i.bool()) {
-                // assign score value
-                nod.score(i.score());
-              } else {
-                ir = null;
-                break;
-              }
-            }
-            ctx.item = tmp;
-            if (ir != null) return nod.finish();
-          }
+          else if(test.e(nod)) return nod.finish();
         }
       }
     };
   }
-
-  /**
-   * Checks if there is anything to sum up.
-   * @return boolean sum up
-  public boolean sumUp() {
-    return axis == Axis.CHILD && test instanceof NameTest && pred.length == 0;
+  
+  @Override
+  public Step addPred(final Expr p) {
+    super.addPred(p);
+    return get(axis, test, pred);
   }
-   */
 }

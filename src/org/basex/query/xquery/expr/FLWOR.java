@@ -1,7 +1,12 @@
 package org.basex.query.xquery.expr;
 
+import static org.basex.query.xquery.XQTokens.*;
+import java.io.IOException;
+import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
+import org.basex.query.xquery.item.Item;
+import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
 
@@ -11,7 +16,14 @@ import org.basex.query.xquery.iter.SeqIter;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class FLWOR extends FLWR {
+public class FLWOR extends Single {
+  /** For/Let expressions. */
+  protected ForLet[] fl;
+  /** Order Expressions. */
+  protected Order order;
+  /** Where Expression. */
+  protected Expr where;
+
   /**
    * Constructor.
    * @param f variable inputs
@@ -20,8 +32,42 @@ public final class FLWOR extends FLWR {
    * @param r return expression
    */
   public FLWOR(final ForLet[] f, final Expr w, final Order o, final Expr r) {
-    super(f, w, r);
+    super(r);
+    fl = f;
+    where = w;
     order = o;
+  }
+
+  @Override
+  public Expr comp(final XQContext ctx) throws XQException {
+    final int vs = ctx.vars.size();
+    
+    for(int f = 0; f != fl.length; f++) {
+      final Expr e = ctx.comp(fl[f]);
+      if(e.e()) {
+        ctx.vars.reset(vs);
+        return Seq.EMPTY;
+      }
+      fl[f] = (ForLet) e;
+    }
+    
+    if(where != null) {
+      where = ctx.comp(where);
+      if(where.i()) {
+        // test is always false: no results
+        if(!((Item) where).bool()) {
+          ctx.vars.reset(vs);
+          return Seq.EMPTY;
+        }
+        // always true: test can be skipped
+        where = null;
+      }
+    }
+
+    if(order != null) order.comp(ctx);
+    expr = ctx.comp(expr);
+    ctx.vars.reset(vs);
+    return this;
   }
 
   @Override
@@ -55,5 +101,35 @@ public final class FLWOR extends FLWR {
         }
       }
     }
+  }
+
+  @Override
+  public String color() {
+    return "66FF66";
+  }
+
+  @Override
+  public void plan(final Serializer ser) throws IOException {
+    ser.openElement(this, EVAL, ITER);
+    for(final ForLet f : fl) f.plan(ser);
+    if(where != null) {
+      ser.openElement(WHR);
+      where.plan(ser);
+      ser.closeElement();
+    }
+    if(order != null) order.plan(ser);
+    ser.openElement(RET);
+    expr.plan(ser);
+    ser.closeElement();
+    ser.closeElement();
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    for(int i = 0; i != fl.length; i++) sb.append((i != 0 ? " " : "") + fl[i]);
+    if(where != null) sb.append(" where " + where);
+    if(order != null) sb.append(order);
+    return sb.append(" return " + expr).toString();
   }
 }

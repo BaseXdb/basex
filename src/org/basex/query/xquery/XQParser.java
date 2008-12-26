@@ -585,6 +585,7 @@ public final class XQParser extends QueryParser {
       if(ext == null) {
         ctx.vars.addGlobal(var);
       } else if(type != null) {
+        // variable has been bound before parsing the query
         ext.type = type;
         ext.item = ext.check(ext.item, ctx);
       }

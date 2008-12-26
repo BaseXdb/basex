@@ -192,14 +192,15 @@ public final class TableView extends View implements Runnable {
         if(it.col == c) {
           View.notifyFocus(it.pre, this);
           content.repaint();
+          break;
         }
       }
     }
     final String str = content.focusedString;
     final Data data = GUI.context.data();
     GUI.get().cursor(valid && (str != null &&
-        str.length() <= Token.MAXLEN || data.fs != null && tdata.mouseX < 20) ?
-        GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
+      str.length() <= Token.MAXLEN || data.fs != null && tdata.mouseX < 20) ?
+      GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
   }
 
   @Override

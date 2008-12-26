@@ -36,11 +36,11 @@ public final class Dtm extends Date {
    * @throws XQException evaluation exception
    */
   public Dtm(final byte[] dt) throws XQException {
-    super(Type.DTM, dt, XPDTM);
+    super(Type.DTM, dt, XDTM);
     final int i = Token.indexOf(dt, 'T');
-    if(i == -1) Err.date(type, XPDTM);
-    date(Token.substring(dt, 0, i), XPDTM);
-    time(Token.substring(dt, i + 1), XPDTM);
+    if(i == -1) Err.date(type, XDTM);
+    date(Token.substring(dt, 0, i), XDTM);
+    time(Token.substring(dt, i + 1), XDTM);
   }
 
   /**
@@ -48,7 +48,7 @@ public final class Dtm extends Date {
    * @param tm time in milliseconds
    * @throws XQException evaluation exception
    */
-  public Dtm(final Dec tm) throws XQException {
+  Dtm(final Dec tm) throws XQException {
     this(Token.token(DATE.format(new java.util.Date(tm.itr()))));
   }
 

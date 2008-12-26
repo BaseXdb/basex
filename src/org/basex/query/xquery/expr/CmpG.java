@@ -173,7 +173,7 @@ public final class CmpG extends Arr {
 
     final boolean text = ia.data.meta.txtindex && s.test.type == Type.TXT;
     final boolean attr = !text && ia.data.meta.atvindex &&
-      s.simpleName(Axis.ATTR, true);
+      s.simpleName(Axis.ATTR);
     
     // no text or attribute index applicable
     if(!text && !attr) return;

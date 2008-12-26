@@ -544,7 +544,7 @@ public final class MapView extends View implements Runnable {
     final Nodes marked = GUI.context.marked();
     if(!left) {
       // right mouse button
-      if(marked.find(pre) < 0) notifyMark(0, null);
+      if(!marked.contains(pre)) notifyMark(0, null);
     } else if(e.getClickCount() == 2) {
       if(mainRects.size() != 1) notifyContext(marked, false, null);
     } else if(e.isShiftDown()) {
@@ -552,7 +552,7 @@ public final class MapView extends View implements Runnable {
     } else if(e.isControlDown()) {
       notifyMark(2, null);
     } else {
-      if(marked.find(pre) < 0) notifyMark(0, null);
+      if(!marked.contains(pre)) notifyMark(0, null);
     }
   }
 

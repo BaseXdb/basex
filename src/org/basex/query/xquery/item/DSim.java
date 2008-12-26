@@ -16,11 +16,11 @@ import org.basex.util.Token;
  */
 public final class DSim extends Date {
   /** Date pattern. */
-  static final Type[] TYPES = {
+  private static final Type[] TYPES = {
     Type.YEA, Type.YMO, Type.MON, Type.MDA, Type.DAY,
   };
   /** Date patterns. */
-  static final Pattern[] PATTERNS = {
+  private static final Pattern[] PATTERNS = {
     Pattern.compile("(-?)([0-9]{4})" + ZONE),
     Pattern.compile("(-?)([0-9]{4})-([0-9]{2})" + ZONE),
     Pattern.compile("--([0-9]{2})" + ZONE),
@@ -28,16 +28,16 @@ public final class DSim extends Date {
     Pattern.compile("---([0-9]{2})" + ZONE)
   };
   /** Date pattern. */
-  static final String[] EXAMPLES = { XPYEA, XPYMO, XPMON, XPMDA, XPDAY };
+  private static final String[] EXAMPLES = { XYEA, XYMO, XMON, XMDA, XDAY };
   /** Date zones. */
-  static final int[] ZONES = { 3, 4, 2, 3, 2 };
+  private static final int[] ZONES = { 3, 4, 2, 3, 2 };
   
   /**
    * Constructor.
    * @param d date
    * @param t data type
    */
-  public DSim(final Date d, final Type t) {
+  DSim(final Date d, final Type t) {
     super(t, d);
     if(t != Type.YEA && t != Type.YMO) xc.setYear(UNDEF);
     if(t != Type.MON && t != Type.YMO && t != Type.MDA) xc.setMonth(UNDEF);
@@ -52,7 +52,7 @@ public final class DSim extends Date {
    * @param t data type
    * @throws XQException evaluation exception
    */
-  public DSim(final byte[] d, final Type t) throws XQException {
+  DSim(final byte[] d, final Type t) throws XQException {
     super(t, d, EXAMPLES[type(t)]);
 
     final int i = type(t);

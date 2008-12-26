@@ -49,9 +49,11 @@ public abstract class Iter {
    * @throws XQException evaluation exception
    */
   public Item finish() throws XQException {
-    Item[] item = new Item[1];
-    Item i;
-    int s = 0;
+    Item i = next();
+    if(i == null) return Seq.EMPTY;
+    
+    Item[] item = { i };
+    int s = 1;
     while((i = next()) != null) {
       if(s == item.length) {
         final Item[] tmp = new Item[s << 2];

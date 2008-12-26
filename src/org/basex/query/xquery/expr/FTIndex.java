@@ -46,7 +46,6 @@ public final class FTIndex extends FTExpr {
       @Override
       public FTNodeItem next() { 
         if(iat == null && !evalIter()) {
-          //System.out.println("?");
           return new FTNodeItem();
         }
         return new FTNodeItem(iat.more() ? iat.nextFTNode() :

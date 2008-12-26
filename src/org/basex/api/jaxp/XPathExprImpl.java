@@ -14,7 +14,6 @@ import org.basex.query.xpath.item.Item;
 import org.basex.query.xpath.item.Nod;
 import org.basex.query.xquery.item.DBNode;
 import org.basex.util.Token;
-import org.w3c.dom.xpath.XPathException;
 import org.xml.sax.InputSource;
 
 /**
@@ -96,6 +95,6 @@ public class XPathExprImpl implements XPathExpression {
     if(res == XPathConstants.STRING) return Token.string(item.str());
     if(res == XPathConstants.BOOLEAN) return Boolean.valueOf(item.bool());
     
-    throw new XPathException(XPathException.TYPE_ERR, "Invalid type: " + res);
+    throw new XPathExpressionException("Invalid type: " + res);
   }
 }

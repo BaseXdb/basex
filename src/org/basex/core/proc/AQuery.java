@@ -19,7 +19,6 @@ import org.basex.util.Performance;
 
 /**
  * Abstract class for database queries.
- * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
@@ -32,7 +31,7 @@ abstract class AQuery extends Process {
    * @param p command properties
    * @param a arguments
    */
-  public AQuery(final int p, final String... a) {
+  protected AQuery(final int p, final String... a) {
     super(p, a);
   }
 
@@ -59,26 +58,14 @@ abstract class AQuery extends Process {
 
         qu.parse();
         pars += per.getTime();
+        plan(qu, false);
         qu.compile(nodes);
+        plan(qu, true);
         comp += per.getTime();
         result = qu.query(nodes);
         eval += per.getTime();
       }
-      // show dot plan
-      if(Prop.dotplan) {
-        final CachedOutput out = new CachedOutput();
-        qu.plan(new DOTSerializer(out));
-        IO.get(PLANDOT).write(out.finish());
-        new ProcessBuilder(Prop.dotty, PLANDOT).start().waitFor();
-        //f.delete();
-      }
-      // dump query plan
-      if(Prop.xmlplan) {
-        final CachedOutput out = new CachedOutput();
-        qu.plan(new XMLSerializer(out, false, true));
-        info(QUERYPLAN + NL);
-        info(out.toString() + NL);
-      }
+
       // dump some query info
       if(Prop.info) {
         info(NL + qu.info());
@@ -105,12 +92,12 @@ abstract class AQuery extends Process {
    * @throws IOException exception
    */
   protected void out(final PrintOutput o, final boolean p) throws IOException {
-    final XMLSerializer ser = new XMLSerializer(Prop.serialize ? o :
-      new NullOutput(), Prop.xmloutput, p);
+    final XMLSerializer ser = new XMLSerializer(Prop.serialize ? o
+        : new NullOutput(), Prop.xmloutput, p);
 
     for(int i = 0; i < Prop.runs; i++) {
-      result.serialize(i == 0 ? ser : new XMLSerializer(
-          new NullOutput(!Prop.serialize), Prop.xmloutput, Prop.xqformat));
+      result.serialize(i == 0 ? ser : new XMLSerializer(new NullOutput(
+          !Prop.serialize), Prop.xmloutput, Prop.xqformat));
     }
     o.print(Prop.NL);
     if(Prop.info) outInfo(o, result.size());
@@ -127,5 +114,33 @@ abstract class AQuery extends Process {
     info(QUERYHITS + hits + " " + (hits == 1 ? VALHIT : VALHITS) + NL);
     info(QUERYPRINTED + Performance.format(out.size()));
     //info(QUERYMEM, Performance.getMem() + NL);
+  }
+  
+  /**
+   * Creates query plans.
+   * @param qu query reference
+   * @param c compiled flag
+   * @throws Exception exception
+   */
+  private void plan(final QueryProcessor qu, final boolean c) throws Exception {
+    if(c != Prop.compplan) return;
+    
+    // show dot plan
+    if(Prop.dotplan) {
+      final CachedOutput out = new CachedOutput();
+      qu.plan(new DOTSerializer(out));
+      IO.get(PLANDOT).write(out.finish());
+      new ProcessBuilder(Prop.dotty, PLANDOT).start().waitFor();
+      //f.delete();
+    }
+    // dump query plan
+    if(Prop.xmlplan) {
+      final CachedOutput out = new CachedOutput();
+      qu.plan(new XMLSerializer(out, false, true));
+      info(QUERYPLAN + NL);
+      info(out.toString() + NL);
+    }
+    // reset timer
+    per.getTime();
   }
 }

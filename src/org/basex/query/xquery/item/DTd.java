@@ -24,7 +24,7 @@ public final class DTd extends Dur {
    * Constructor.
    * @param d duration item
    */
-  public DTd(final Dur d) {
+  DTd(final Dur d) {
     super(Type.DTD);
     sc = d.sc == null ? BigDecimal.valueOf(0) : d.sc;
   }
@@ -83,13 +83,13 @@ public final class DTd extends Dur {
    * @param v value
    * @throws XQException evaluation exception
    */
-  public DTd(final byte[] v) throws XQException {
+  DTd(final byte[] v) throws XQException {
     super(Type.DTD);
     
     final String val = Token.string(v).trim();
     final Matcher mt = DUR.matcher(val);
     if(!mt.matches() || val.endsWith("P") || val.endsWith("T"))
-      Err.date(type, XPDTD);
+      Err.date(type, XDTD);
     final long d = mt.group(2) != null ? Token.toInt(mt.group(3)) : 0;
     final long h = mt.group(5) != null ? Token.toInt(mt.group(6)) : 0;
     final long n = mt.group(7) != null ? Token.toInt(mt.group(8)) : 0;

@@ -604,7 +604,6 @@ public final class PlotView extends View implements Runnable {
         }
       }
     }
-//    System.out.println(perf.getTimer());
   }
   
   /**

@@ -23,7 +23,7 @@ public final class YMd extends Dur {
    * Constructor.
    * @param it duration item
    */
-  public YMd(final Dur it) {
+  YMd(final Dur it) {
     super(Type.YMD);
     mon = it.mon;
   }
@@ -58,11 +58,11 @@ public final class YMd extends Dur {
    * @param v value
    * @throws XQException evaluation exception
    */
-  public YMd(final byte[] v) throws XQException {
+  YMd(final byte[] v) throws XQException {
     super(Type.YMD);
     final String val = Token.string(v).trim();
     final Matcher mt = DUR.matcher(val);
-    if(!mt.matches() || val.endsWith("P")) Err.date(type, XPYMD);
+    if(!mt.matches() || val.endsWith("P")) Err.date(type, XYMD);
 
     final int y = mt.group(2) != null ? Token.toInt(mt.group(3)) : 0;
     final int m = mt.group(4) != null ? Token.toInt(mt.group(5)) : 0;

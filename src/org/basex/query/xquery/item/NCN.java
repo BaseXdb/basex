@@ -18,26 +18,8 @@ public final class NCN extends Str {
    * @throws XQException evaluation exception
    */
   public NCN(final byte[] v) throws XQException {
-    this(v, Type.NCN);
-  }
+    super(Token.norm(v), Type.NCN);
 
-  /**
-   * Constructor.
-   * @param v value
-   * @param t data type
-   * @throws XQException evaluation exception
-   */
-  public NCN(final byte[] v, final Type t) throws XQException {
-    super(Token.norm(v), t);
-    check(val);
-  }
-
-  /**
-   * Checks the validity of the specified name.
-   * @param v name to be checked
-   * @throws XQException if name is invalid
-   */
-  private static void check(final byte[] v) throws XQException {
     if(v.length == 0) Err.or(XPNAME);
     int i = -1;
     while(++i != v.length) {

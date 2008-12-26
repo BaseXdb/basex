@@ -165,7 +165,7 @@ public abstract class Expr extends ExprInfo {
    * @return item if everything is ok
    * @throws XQException evaluation exception
    */
-  protected final Iter checkCtx(final XQContext ctx) throws XQException {
+  public final Iter checkCtx(final XQContext ctx) throws XQException {
     final Item it = ctx.item;
     if(it == null) Err.or(XPNOCTX, this);
     return it.iter();

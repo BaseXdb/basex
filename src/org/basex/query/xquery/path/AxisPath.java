@@ -166,7 +166,8 @@ public class AxisPath extends Path {
         final AxisPath res = (AxisPath) ie; 
         
         if(inv.length != 0) {
-          res.step[res.step.length - 1].addPred(new AxisPath(null, inv));
+          res.step[res.step.length - 1] =
+            res.step[res.step.length - 1].addPred(new AxisPath(null, inv));
         }
         
         // add remaining steps
@@ -284,8 +285,7 @@ public class AxisPath extends Path {
         if(s1.test == NODE) continue;
 
         if(s0.axis == ATTR) warning(s1);
-        if(s0.test.type == Type.TXT && s1.test.type != Type.TXT)
-          warning(s1);
+        if(s0.test.type == Type.TXT && s1.test.type != Type.TXT) warning(s1);
 
         final QNm n1 = s1.test.name;
         final QNm n0 = s0.test.name;
@@ -296,11 +296,9 @@ public class AxisPath extends Path {
         if(s1.test == NODE) continue;
         if(s0.axis == ATTR) warning(s1);
 
-        if(s0.test.type == Type.TXT && s1.test.type != Type.TXT)
-          warning(s1);
+        if(s0.test.type == Type.TXT && s1.test.type != Type.TXT) warning(s1);
       } else if(s1.axis == DESC || s1.axis == CHILD) {
-        if(s0.axis == ATTR || s0.test.type == Type.TXT)
-          warning(s1);
+        if(s0.axis == ATTR || s0.test.type == Type.TXT) warning(s1);
       }
     }
   }
@@ -313,8 +311,7 @@ public class AxisPath extends Path {
   private void warning(final Step s) throws XQException {
     Err.or(COMPSELF, s);
   }
-  
-  
+
   /**
    * Inverts a location path.
    * @param r new root node
@@ -336,20 +333,6 @@ public class AxisPath extends Path {
     e[c] = Step.get(lastAxis, curr.test);
     return new AxisPath(r, e);
   }
-
-  /*
-   * Checks if there is anything to sum up.
-   * @param d Data
-   * @return boolean sum up
-  public boolean sumUp(final Data d) {
-    if (step.length == 1 && root instanceof SimpleIterStep) {
-      final SimpleIterStep sis = (SimpleIterStep) root;
-      return sis.sumUp() && sis.test.kind == Test.Kind.NAME &&
-        d.skel.desc(sis.test.name.str(), false, false).size == 0;
-    }
-    return false;
-  }
-   */
   
   @Override
   public boolean uses(final Using u) {

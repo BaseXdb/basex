@@ -38,7 +38,7 @@ public final class Dat extends Date {
    * @throws XQException evaluation exception
    */
   public Dat(final byte[] d) throws XQException {
-    super(Type.DAT, d, XPDATE);
-    date(d, XPDATE);
+    super(Type.DAT, d, XDATE);
+    date(d, XDATE);
   }
 }

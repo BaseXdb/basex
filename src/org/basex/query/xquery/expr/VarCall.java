@@ -31,11 +31,13 @@ public final class VarCall extends Expr {
   public VarCall(final Var v) {
     var = v;
   }
-  
+
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
     var = ctx.vars.get(var);
-    if(!var.global) return this;
+    if(var.expr == null) return this;
+    
+    // pre-assign static variables
     final NSLocal lc = ctx.ns;
     ctx.ns = lc.copy();
     if(ctx.nsElem.length != 0) ctx.ns.add(new QNm(EMPTY, Uri.uri(ctx.nsElem)));

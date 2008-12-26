@@ -14,7 +14,7 @@ public final class Tim extends Date {
    * Constructor.
    * @param d date
    */
-  public Tim(final Date d) {
+  Tim(final Date d) {
     super(Type.TIM, d);
     xc.setYear(UNDEF);
     xc.setMonth(UNDEF);
@@ -39,7 +39,7 @@ public final class Tim extends Date {
    * @throws XQException evaluation exception
    */
   public Tim(final byte[] tim) throws XQException {
-    super(Type.TIM, tim, XPTIME);
-    time(tim, XPTIME);
+    super(Type.TIM, tim, XTIME);
+    time(tim, XTIME);
   }
 }

@@ -113,7 +113,7 @@ public final class QNm extends Item {
    * @return result of check
    */
   public boolean eq(final QNm n) {
-    return Token.eq(ln(), n.ln()) && uri.eq(n.uri);
+    return n == this || Token.eq(ln(), n.ln()) && uri.eq(n.uri);
   }
 
   @Override

@@ -25,13 +25,14 @@ public final class If extends Arr {
   
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
-    return ctx.iter(ctx.iter(expr[0]).ebv().bool() ? expr[1] : expr[2]);
+    return ctx.iter(expr[ctx.iter(expr[0]).ebv().bool() ? 1 : 2]);
   }
 
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
     super.comp(ctx);
     if(!expr[0].i()) return this;
+    // static result: return then or else branch
     return expr[((Item) expr[0]).bool() ? 1 : 2];
   }
 

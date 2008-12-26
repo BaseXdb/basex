@@ -17,13 +17,8 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public class Dur extends Item {
-  /** Decimal double output. */
-  protected static final java.text.DecimalFormat DD =
-    new java.text.DecimalFormat("#####0.0########", LOC);
   /** Seconds per day. */
   protected static final long DAYSECONDS = 86400;
-  /** Seconds per day. */
-  protected static final long MONTHSECONDS = 2678400;
   /** Date pattern. */
   private static final Pattern DUR = Pattern.compile(
       "(-?)P(([0-9]+)Y)?(([0-9]+)M)?(([0-9]+)D)?" +
@@ -82,7 +77,7 @@ public class Dur extends Item {
     final String val = string(v).trim();
     final Matcher mt = DUR.matcher(val);
     if(!mt.matches() || val.endsWith("P") || val.endsWith("T"))
-      Err.date(type, XPDURR);
+      Err.date(type, XDURR);
     final int y = mt.group(2) != null ? toInt(mt.group(3)) : 0;
     final int m = mt.group(4) != null ? toInt(mt.group(5)) : 0;
     final long d = mt.group(6) != null ? toInt(mt.group(7)) : 0;

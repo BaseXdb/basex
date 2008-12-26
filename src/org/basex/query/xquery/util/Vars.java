@@ -6,6 +6,7 @@ import org.basex.data.Serializer;
 import org.basex.query.ExprInfo;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
+import org.basex.util.Array;
 
 /**
  * Variables.
@@ -15,7 +16,7 @@ import org.basex.query.xquery.XQContext;
  */
 public final class Vars extends ExprInfo {
   /** Variable expressions. */
-  public Var[] vars = new Var[2];
+  public Var[] vars = new Var[8];
   /** Number of stored variables. */
   public int size;
 
@@ -24,17 +25,8 @@ public final class Vars extends ExprInfo {
    * @param v variable
    */
   void add(final Var v) {
-    if(size == vars.length) resize();
+    if(size == vars.length) vars = Array.extend(vars);
     vars[size++] = v;
-  }
-
-  /**
-   * Resizes the sequence array.
-   */
-  private void resize() {
-    final Var[] tmp = new Var[size << 1];
-    System.arraycopy(vars, 0, tmp, 0, size);
-    vars = tmp;
   }
 
   /**

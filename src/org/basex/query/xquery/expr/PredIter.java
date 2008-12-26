@@ -13,9 +13,9 @@ import org.basex.query.xquery.iter.Iter;
  */
 public final class PredIter extends Pred {
   /** Flag is set to true if predicate has last function. */
-  boolean last;
+  final boolean last;
   /** Flag is set to true if predicate has a numeric value. */
-  boolean num;
+  final boolean num;
 
   /**
    * Constructor.
@@ -33,48 +33,45 @@ public final class PredIter extends Pred {
   }
 
   @Override
-  public Iter iter(final XQContext ctx) throws XQException {
+  public Iter iter(final XQContext ctx) {
     return new Iter() {
-      final Iter iter = ctx.iter(root);
-      final Item ci = ctx.item;
-      final int cp = ctx.pos;
-      boolean first = true;
-      boolean finished = false;
+      boolean more = true;
+      Iter iter;
+      Item ci;
+      int cp;
 
       @Override
       public Item next() throws XQException {
-        if(finished) {
-          ctx.item = ci;
-          ctx.pos = cp;
-          return null;
-        }
-
-        if(first) {
-          first = false;
-          ctx.pos = 1;
-        }
-
-        Item i;
-        while((i = iter.next()) != null) {
-          ctx.item = i;
-          i = ctx.iter(pred[0]).ebv();
-
-          final boolean found = i.n() ? i.dbl() == ctx.pos : i.bool();
-          ctx.pos++;
-          
-          if(found) {
-            // if item is numeric, the rest of expr will be skipped
-            ctx.item.score(i.score());
-            if(num) finished = true;
+        if(more) {
+          if(iter == null) {
+            iter = ctx.iter(root);
+            ci = ctx.item;
+            cp = ctx.pos;
+            ctx.pos = 1;
+          }
+  
+          Item i;
+          while((i = iter.next()) != null) {
+            ctx.item = i;
+            i = ctx.iter(pred[0]).ebv();
+  
+            final boolean found = i.n() ? i.dbl() == ctx.pos : i.bool();
+            ctx.pos++;
+            
+            if(found) {
+              // if item is numeric, the rest of expr will be skipped
+              ctx.item.score(i.score());
+              if(num) more = false;
+              return ctx.item;
+            }
+          }
+  
+          // returns the last item.
+          // next call of next() will return null.
+          if(last) {
+            more = false;
             return ctx.item;
           }
-        }
-
-        // returns the last item.
-        // next call of next() will return null.
-        if(last) {
-          finished = true;
-          return ctx.item;
         }
 
         ctx.item = ci;

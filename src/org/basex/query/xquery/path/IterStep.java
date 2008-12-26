@@ -19,94 +19,85 @@ import org.basex.query.xquery.util.Err;
  */
 public final class IterStep extends Step {
   /** Flag is set to true if predicate has last function. */
-  boolean lastFlag;
+  final boolean last;
   /** Flag is set to true if predicate has a numeric value. */
-  boolean numFlag;
+  final boolean num;
 
   /**
    * Constructor.
    * @param a axis
    * @param t node test
    * @param p predicates
-   * @param last lastFlag is true if predicate has a last function
-   * @param num numberFlag is true if predicate has a numeric value
+   * @param l lastFlag is true if predicate has a last function
+   * @param n numberFlag is true if predicate has a numeric value
    */
   public IterStep(final Axis a, final Test t, final Expr[] p, 
-      final boolean last, final boolean num) {
+      final boolean l, final boolean n) {
     super(a, t, p);
-    lastFlag = last;
-    numFlag = num;
+    last = l;
+    num = n;
   }
 
   @Override
-  public NodeIter iter(final XQContext ctx) throws XQException {
-    final Item ci = ctx.item;
-    final int cp = ctx.pos;
-    final Iter iter = checkCtx(ctx);
-
-    // no special predicate treatment?
+  public NodeIter iter(final XQContext ctx) {
     return new NodeIter() {
-      /** Temporary iterator. */
+      final Item ci = ctx.item;
+      final int cp = ctx.pos;
+      boolean more = true;
       NodeIter ir;
-      boolean first = true;
-      boolean finished = false;
-      Nod nod;
-      Nod temp;
+      Iter iter;
       
       @Override
       public Nod next() throws XQException {
-        if(finished) return null;
-        
-        if(first) {
-          first = false;
-          ctx.pos = 1;
-        }
-        
-        while(true) {
-          if(ir == null) {
-            final Item it = iter.next();
-            if(it == null) {
-              ctx.item = ci;
-              ctx.pos = cp;
-              if(lastFlag && temp != null) {
-                finished = true;
-                return temp;
-              }
-              return null;
-            }
-            if(!it.node()) Err.or(NODESPATH, IterStep.this, it.type);
-            ir = axis.init((Nod) it);
+        if(more) {
+          if(iter == null) {
+            iter = checkCtx(ctx);
+            ctx.pos = 1;
           }
-          nod = ir.next();
-          if(nod != null) {
-            if(test.e(nod)) {
-              // evaluates predicates
-              boolean add = true;
-
-              ctx.item = nod;
-              final Item i = ctx.iter(pred[0]).ebv();
-              if(i.n() ? i.dbl() == ctx.pos : i.bool()) {
-                // assign score value
-                nod.score(i.score());
-              } else {
-                add = false;
-              }
-              temp = lastFlag ? nod.finish() : null;
-              ctx.pos++;
-
-              if(add) {
+          
+          Nod temp = null;
+          while(true) {
+            if(ir == null) {
+              final Item i = iter.next();
+              if(i == null) {
                 ctx.item = ci;
-                if(numFlag) {
-                  finished = true;
+                ctx.pos = cp;
+                if(temp != null) {
+                  more = false;
+                  return temp;
+                }
+                return null;
+              }
+              if(!i.node()) Err.or(NODESPATH, IterStep.this, i.type);
+              ir = axis.init((Nod) i);
+            }
+            
+            final Nod nod = ir.next();
+            if(nod != null) {
+              if(test.e(nod)) {
+                // evaluates predicates
+                ctx.item = nod;
+                final Item i = ctx.iter(pred[0]).ebv();
+  
+                final boolean found = i.n() ? i.dbl() == ctx.pos : i.bool();
+                ctx.pos++;
+                
+                if(found) {
+                  // assign score value
+                  nod.score(i.score());
+                  if(num) more = false;
+                  ctx.item = ci;
                   return nod.finish();
                 }
-                return nod.finish();
+                // remember last node
+                if(last) temp = nod.finish();
               }
+            } else {
+              ir = null;
             }
-          } else {
-            ir = null;
           }
         }
+        return null;
       } 
     };
   }

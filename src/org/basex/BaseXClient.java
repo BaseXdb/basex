@@ -264,8 +264,6 @@ public class BaseXClient {
       if(!args[a].startsWith("-")) {
         console = false;
         query = args[a];
-        Prop.onthefly = true;
-        Prop.mainmem = true;
         ok = true;
       } else {
         for(int i = 1; i < args[a].length(); i++) {

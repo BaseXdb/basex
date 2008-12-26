@@ -87,7 +87,7 @@ public class Step extends Expr {
     // Numeric value
     final boolean num = pred[0].i() && ((Item) pred[0]).n();
     // Multiple Predicates or POS
-    return pred.length > 1 || (!last && !num && uses(Using.POS)) ? this :
+    return pred.length > 1 || !last && !num && uses(Using.POS) ? this :
       new IterStep(axis, test, pred, last, num);
   }
 
@@ -99,7 +99,7 @@ public class Step extends Expr {
     NodIter nb = new NodIter();
     Item it;
     while((it = iter.next()) != null) {
-      if(!it.node()) Err.or(NODESPATH, this, it.type);
+      if(!it.node()) Err.or(NODESPATH, Step.this, it.type);
       final NodeIter ir = axis.init((Nod) it);
       Nod nod;
       while((nod = ir.next()) != null) {
@@ -138,31 +138,31 @@ public class Step extends Expr {
    * @param ax axis to be checked
    * @return result of check
    */
-  boolean simple(final Axis ax) {
+  final boolean simple(final Axis ax) {
     return axis == ax && test == Test.NODE && pred.length == 0;
   }
   
   /**
    * Checks if this is a simple name axis (no predicates).
    * @param ax axis to be checked
-   * @param name name reference needed
    * @return result of check
    */
-  public boolean simpleName(final Axis ax, final boolean name) {
-    return axis == ax && pred.length == 0 && 
-      (!name || test.kind == Test.Kind.NAME);
+  public final boolean simpleName(final Axis ax) {
+    return axis == ax && pred.length == 0 && test.kind == Test.Kind.NAME;
   }
   
   /**
    * Adds a predicate to the step.
    * @param p predicate to be added
+   * @return resulting step instance
    */
-  public void addPred(final Expr p) {
+  public Step addPred(final Expr p) {
     pred = Array.add(pred, p);
+    return this;
   }
 
   @Override
-  public boolean uses(final Using u) {
+  public final boolean uses(final Using u) {
     for(final Expr p : pred) if(p.uses(u)) return true;
     
     if(u == Using.POS) {
@@ -185,14 +185,14 @@ public class Step extends Expr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
+  public final void plan(final Serializer ser) throws IOException {
     ser.startElement(this);
     ser.attribute(AXIS, Token.token(axis.name));
     ser.attribute(TEST, Token.token(test.toString()));
 
     if(pred.length != 0) {
       ser.finishElement();
-      for(Expr p : pred) p.plan(ser);
+      for(final Expr p : pred) p.plan(ser);
       ser.closeElement();
     } else {
       ser.emptyElement();
@@ -200,7 +200,7 @@ public class Step extends Expr {
   }
   
   @Override
-  public String toString() {
+  public final String toString() {
     final StringBuilder sb = new StringBuilder("");
     if(test == Test.NODE) {
       if(axis == Axis.PARENT) return "..";

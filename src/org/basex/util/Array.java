@@ -391,4 +391,16 @@ public final class Array {
       final int l) {
     System.arraycopy(ar, pos, ar, pos + off, l);
   }
+
+  /**
+   * Removes an array entry at the specified position.
+   * @param ar array to be resized
+   * @param p position
+   * @param <T> array type
+   * @return array
+   */
+  public static <T> T[] delete(final T[] ar, final int p) {
+    move(ar, p + 1, -1, ar.length - p - 1);
+    return finish(ar, ar.length - 1);
+  }
 }
