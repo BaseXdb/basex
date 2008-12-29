@@ -148,7 +148,7 @@ public abstract class LocPath extends Expr {
           final Pred pred = step.preds.get(p);
           if(pred instanceof PredSimple) {
             final Expr e = ((PredSimple) pred).expr;
-            if(e instanceof FTContains) {
+            if(ctx.item.data.meta.ftoptpreds  && e instanceof FTContains) {
               // curr = null indicates that there should be no path inverting
               ((PredSimple) pred).expr = e.indexEquivalent(ctx, null, true);
             }
@@ -291,12 +291,12 @@ public abstract class LocPath extends Expr {
    * @param ctx current context
    * @return average text length
    */
-  public double avgTextLength(final XPContext ctx) {
+  public double[] textLength(final XPContext ctx) {
     if (steps.size() == 1 && steps.get(0).test == TestNode.TEXT)
       return ctx.item.data.skel.tl(null);
     else if (steps.size() == 2) {
       Step s = steps.get(0);
-      double avg = -1;
+      double[] avg = null;
       if (s instanceof StepChild && s.test instanceof TestName) {
         final TestName tn = (TestName) s.test;
         avg = ctx.item.data.skel.tl(tn.name); 
@@ -304,7 +304,7 @@ public abstract class LocPath extends Expr {
       s = steps.get(1);
       if (s.test == TestNode.TEXT) return avg;      
     }
-    return -1;
+    return null;
   }
   
   @Override

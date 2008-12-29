@@ -3,6 +3,7 @@ package org.basex.gui.layout;
 import static org.basex.Text.*;
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -26,7 +27,9 @@ import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.dialog.Dialog;
 import org.basex.gui.view.ViewRect;
-import org.basex.gui.view.View;
+import org.basex.index.FTTokenizer;
+import org.basex.util.Array;
+import org.basex.util.IntList;
 import org.basex.util.Performance;
 
 /**
@@ -404,7 +407,7 @@ public final class BaseXLayout {
    */
   public static int drawText(final Graphics g, final ViewRect r,
       final byte[] s) {
-    return drawText(g, r, s, s.length, true);
+    return drawTextNew(g, r, s, s.length, true);
   }
 
   /**
@@ -429,22 +432,15 @@ public final class BaseXLayout {
     int yy = r.y + fh;
     int ww = r.w;
     final Color textc = g.getColor();
-    boolean c = false;
 
     // get index on first pre value
-    final int[][] ft = View.ftPos;
-    //int k = ft != null && ft.length != 0 ? Array.firstIndexOf(r.p, ft[0]) :-1;
-    int k = -1; // ft highlighting currently disabled...
+    int count = 0;
+    int pp = 0;
     
     do {
       int sw = 0;
       int l = i;
       for(int n = i; n < j; n += cl(s[n])) {
-        if(draw && k > -1 && k < ft[0].length &&
-            i == ft[1][k] && r.pre == ft[0][k]) {
-           k++;
-           c = true;
-        }
         sw += width(g, cw, cp(s, n));
         if(sw >= ww) {
           j = Math.max(i + 1, l);
@@ -465,15 +461,13 @@ public final class BaseXLayout {
       }
       // draw string
       if(draw) {
-        // draw word
-        if(c && k > -1)  {
-          g.setColor(View.ftPoi != null ? thumbnailcolor[View.ftPoi[k]] :
-            COLORERROR);
-          c = ww == r.w;
-        } else {
+          if (r.pos != null && pp < r.pos.length && count == r.pos[pp]) {
+            pp++;
+            g.setColor(COLORERROR);
+          } else 
           g.setColor(textc);
-        }
         g.drawString(string(s, i, j - i), xx, yy);
+        count++;
       }
       if(ww < ws) ww = r.w;
       if(ww == r.w) {
@@ -489,19 +483,127 @@ public final class BaseXLayout {
     return yy - r.y;
   }
 
+  
+  /**
+   * Draws a text.
+   * @param g graphics reference
+   * @param r rectangle
+   * @param s text to be drawn
+   * @param m length of text
+   * @param draw draw text (otherwise: just calculate space)
+   * @return last height that was occupied
+   */
+  public static int drawTextNew(final Graphics g, final ViewRect r,
+      final byte[] s, final int m, final boolean draw) {
+
+    // limit string to given space
+    final int[] cw = fontWidths(g.getFont());
+    final int fh = (int) (1.2 * GUIProp.fontsize);
+    int xx = r.x;
+    int yy = r.y + fh;
+    int ww = r.w;
+    final Color textc = g.getColor();
+    byte[] tmp;
+    if (s.length > m) {
+      tmp = new byte[m];
+      System.arraycopy(s, 0, tmp, 0, m);
+    } else tmp = s;
+    final FTTokenizer ftt = new FTTokenizer(tmp);
+    
+    // get index on first pre value
+    int count = 0;
+    int pp = 0;
+    
+    int ll = 0;
+    int cp = 0;
+    final int we = width(g, cw, ' ');
+    while(ftt.more()) {
+      if (cp < ftt.para) {
+        cp = ftt.para;
+        xx = r.x;
+        yy += fh;
+        ll = 0;
+        if (yy >= r.y + r.h)
+          return yy - r.y;        
+      }
+
+      final byte[] tok = ftt.get();
+      int wl = 0;
+      for (byte b : tok) wl += width(g, cw, b);
+      if (ll + wl + we >= ww) { 
+        xx = r.x;
+        yy += fh;
+        ll = 0;
+        if (yy >= r.y + r.h)
+          return yy - r.y;
+      }
+      if(draw) {
+        if (r.pos != null && pp < r.pos.length && count == r.pos[pp]) {
+          pp++;
+          g.setColor(thumbnailcolor[r.poi[pp]]);
+        } else g.setColor(textc);
+        g.drawString(new String(tok), xx + ll, yy);
+        count++;
+      }
+      ll += wl + we;
+    }
+    
+    return yy - r.y;
+  }
+
   /**
    * Draws a text using thumbnail visualization.
+   * Calculates the needed space and chooses an abstraction level.
+   * Token/Sentence/Paragraphs
+   * 
    * @param g graphics reference
    * @param r rectangle
    * @param s text to be drawn
    */
   public static void drawThumbnails(final Graphics g, final ViewRect r,
       final byte[] s) {
-
+    final double f = 0.25 * GUIProp.fontsize;
+    // thumbnail height
+    final int fh = (int) Math.max(1, 0.5 * GUIProp.fontsize);
+    // empty line height
+    final int lh = (int) Math.max(1, 0.35 * GUIProp.fontsize);
+    int nl = (int) (s.length * f / r.w);
+    if (nl * fh + (nl - 1) * lh < r.h * 0.8) 
+      drawThumbnailsToken(g, r, s);
+    else {
+      final FTTokenizer ftt = new FTTokenizer(s);
+      final int[] c = ftt.countSenPar();
+      nl = (int) ((s.length - c[0]) * f / r.w);
+      if (nl * fh + (nl - 1 + c[2]) * lh < r.h) {
+        // choose sentence as abstraction level
+        drawThumbnailsSentence(g, r, s, true);
+        return;
+      }
+      nl = (int) ((s.length - c[0] - c[1]) * f / r.w);
+      if (nl * fh + (nl - 1 + c[2]) * lh < r.h) {
+        // choose paragraph as abstraction level
+        drawThumbnailsSentence(g, r, s, false);
+        return;
+      }
+      if (r.pos != null) drawTextinContext(g, r, s);
+      else drawThumbnailsSentence(g, r, s, false);
+    }
+  }
+  
+  /**
+   * Draws a text using thumbnail visualization.
+   * @param g graphics reference
+   * @param r rectangle
+   * @param s text to be drawn
+   */
+  public static void drawThumbnailsToken(final Graphics g, final ViewRect r,
+      final byte[] s) {
     final double xx = r.x;
     final double ww = r.w;
     final double f = 0.25 * GUIProp.fontsize;
+    // thumbnail height
     final int fh = (int) Math.max(1, 0.5 * GUIProp.fontsize);
+    // empty line height
     final int lh = (int) Math.max(1, 0.8 * GUIProp.fontsize);
     final double ys = r.y + 3;
     double yy = ys;
@@ -509,56 +611,278 @@ public final class BaseXLayout {
     int wl = 0; // word length
     int ll = 0; // line length
 
-    // get index on first pre value
-    final int[][] ft = View.ftPos;
-    //int k = ft != null && ft.length != 0 ? Array.firstIndexOf(r.p, ft[0]) :-1;
-    int k = -1; // ft highlighting currently disabled...
-
+    final FTTokenizer ftt = new FTTokenizer(s);
     final Color textc = g.getColor();
-    boolean c = false;
+    int count = 0;
+    int pp = 0;
+    int cs = 0;
+    int cp = 0;
+    int ftts;
 
-    // including i == s.length in loop to draw last string...
-    for(int i = 0; i <= s.length; i++) {
-      if(k > -1 && k < ft[0].length && i == ft[1][k] && r.pre == ft[0][k]) {
-         k++;
-         c = true;
-      }
+    while(ftt.more()) {
+      if (cs < ftt.sent) cs = ftt.sent;
+      if (cp < ftt.para) {
+        yy += lh;
+        ll = 0;
+        cp = ftt.para;
+      } 
 
-      if(i == s.length || ws(s[i])) {
-        // check if rectangle fits in line and if it's not the first word
-        if(f * (ll + wl) > ww && ll != 0) {
-          yy += lh;
-          ll = 0;
-        }
-        if(yy + lh >= r.y + r.h) return;
+      ftts = ftt.s;
+      wl = ftt.p - ftts;
+      // check if rectangle fits in line
+      if (f * (ll + wl) > ww) {
+        yy += lh;
+        ll = 0;
+      } 
+      
+      if(yy + lh >= r.y + r.h) return;
+      // draw word
+      if (r.pos != null && pp < r.pos.length && count == r.pos[pp]) {
+        pp++;
+        g.setColor(thumbnailcolor[r.poi[pp]]);
+      } else 
+        g.setColor(textc);
 
-        // draw word
-        if(c && k > -1)  {
-          g.setColor(View.ftPoi != null ? thumbnailcolor[View.ftPoi[k]] :
-            COLORERROR);
-          c = false;
-        } else {
-          g.setColor(textc);
-        }
+      final int xw = (int) Math.min(ww - f * ll - 4, f * wl);
+      g.fillRect((int) (xx + f * ll), (int) yy, xw, fh);
+      ll += wl;
+      count++;
+      ll++;
+      wl = 0;
+    } 
+  }
+  
+  /**
+   * Draws a text using thumbnail visualization.
+   * @param g graphics reference
+   * @param r rectangle
+   * @param s text to be drawn
+   * @param sen flag for sentence or paragraphe 
+   */
+  public static void drawThumbnailsSentence(final Graphics g, final ViewRect r,
+      final byte[] s, final boolean sen) {
+    final double xx = r.x;
+    final double ww = r.w;
+    final double f = 0.25 * GUIProp.fontsize;
+    // thumbnail height
+    final int fh = (int) Math.max(1, 0.5 * GUIProp.fontsize);
+    // empty line height
+    final int lh = (int) Math.max(1, 0.8 * GUIProp.fontsize);
+    final double ys = r.y + 3;
+    double yy = ys;
 
-        final int xw = (int) Math.min(ww - f * ll - 4, f * wl);
-        g.fillRect((int) (xx + f * ll), (int) yy, xw, fh);
-        ll += wl;
+    int wl = 0; // word length
+    int ll = 0; // line length
 
-        if (i < s.length && s[i] == '\n' || ll + 1 >= ww) {
-          yy += lh;
-          ll = 0;
-        } else {
+    final FTTokenizer ftt = new FTTokenizer(s);
+    final Color textc = g.getColor();
+    int count = -1;
+    int pp = 0;
+    int cp = 0;
+    int cs = 0;
+
+    while(ftt.more()) {
+      count++;
+      wl = ftt.p - ftt.s;
+      
+      if (cs < ftt.sent && sen || cs < ftt.para && !sen) {
+        // new sentence
+        if (sen) {
           ll++;
+          cs = ftt.sent;
         }
-        wl = 0;
-      } else {
-        // add to current word length
-        wl += cl(s[i]);
+        if (cp < ftt.para) {
+          cp = ftt.para;
+          yy += lh;
+          ll = 0;
+        }
+      } 
+      
+      if (r.pos != null) {
+        while ((cs == ftt.sent && sen || cs == ftt.para && !sen) && 
+            (r.pos == null || pp < r.pos.length && count < r.pos[pp]) 
+            && ftt.more()) {
+          wl += ftt.p - ftt.s;
+          count++;
+        }
       }
-    }
+
+      // check if rectangle fits in line
+      if (f * (ll + wl) > ww) {
+        // split sentences, that don't fit in the line
+        final int fp = (int) (ww - f * ll - 4) / (int) f;
+        if (fp <= 1) {
+          yy += lh;
+          ll = 0;
+        } else {
+          final int sp = wl - fp;
+          // draw first part of the sentence
+          g.fillRect((int) (xx + f * ll), (int) yy, (int) ((fp - 1) * f), fh);
+          ll += fp - 1;
+          // color last rect of first part of the word black
+          g.setColor(new Color(0, 0, 0));
+          g.fillRect((int) (xx + f * ll), (int) yy, (int) f, fh);
+          g.setColor(textc);
+          if(yy + lh >= r.y + r.h) return;
+          yy += lh;
+          ll = 0;
+          // color first rec of second part of the word black
+          g.setColor(new Color(0, 0, 0));
+          g.fillRect((int) xx, (int) yy, (int) f, fh);
+          g.setColor(textc);
+          wl = sp;
+          ll = 1;
+        } 
+          // count number of lines in-between
+          while (f * wl > r.w) {
+            g.fillRect((int) (xx + f), (int) yy, (int) (r.w - f * 2 - 4), fh);
+            
+            // color last rec of the current line black
+            g.setColor(new Color(0, 0, 0));
+            g.fillRect((int) (r.x + r.w  - f - 4), (int) yy, (int) f, fh);
+            wl -= r.w / f;
+            if(yy + lh >= r.y + r.h) return;
+            yy += lh;
+            
+            // color first rec of second part of the word black
+            g.fillRect((int) xx, (int) yy, (int) f, fh);
+            g.setColor(textc);            
+          }
+          
+          // draw second part of the sentence
+          if(yy + lh >= r.y + r.h) return;
+          g.fillRect((int) (xx + f * ll), (int) yy, (int) f * wl, fh);
+          ll += wl;
+        //}
+      } else {
+        g.fillRect((int) (xx + f * ll), (int) yy, (int) f * wl, fh);        
+        ll += wl;
+      }
+      
+      if (r.pos != null && pp < r.pos.length && count == r.pos[pp]) {
+        // color next token
+        pp++;
+        g.setColor(thumbnailcolor[r.poi[pp]]);
+        wl = ftt.p - ftt.s;
+        if (f * ll + f * wl > r.w) {
+          yy += lh;
+          ll = 0;
+        }
+        g.fillRect((int) (xx + f * ll), (int) yy, (int) f * wl, fh);
+        ll += wl;
+        g.setColor(textc);
+      }
+    } 
   }
 
+
+
+  /**
+   * Draws a text token within its context.
+   * @param g graphics reference
+   * @param r rectangle
+   * @param s text to be drawn
+   */
+  public static void drawTextinContext(final Graphics g, final ViewRect r,
+      final byte[] s) {
+
+    // limit string to given space
+    final int[] cw = fontWidths(g.getFont());
+    final int fh = (int) (1.2 * GUIProp.fontsize);
+    int xx = r.x;
+    int yy = r.y + fh;
+    final Color textc = g.getColor();
+
+    int count = 0;
+    int pp = 0;
+    int sw = 0;
+    IntList poic = new IntList();
+    byte[] token;
+    final int wd = width(g, cw, '.');
+    final int we = width(g, cw, ' ');
+    final String e = new String(" ");
+    final String d = new String(".");
+    FTTokenizer ftt = new FTTokenizer(s);
+    while(ftt.more()) {
+      if (r.pos != null && pp < r.pos.length && count == r.pos[pp]) {
+        sw += sw == 0 ? we + wd * 2 : we + wd;
+        if (sw > r.w) {
+          yy += fh;
+          xx = r.x;
+          sw = 2 * we;
+          if (yy >= r.y + r.h) return;
+        }
+        g.drawString(sw == we + wd * 2 ? d + d + e : d + e, xx, yy);
+        xx = r.x + sw;
+          
+        byte[] tok = ftt.get();
+        for (byte b : tok)
+          sw += width(g, cw, b);
+        if (sw > r.w) {
+          yy += fh;
+          xx = r.x;
+          sw = 2 * we;
+          if (yy >= r.y + r.h) return;
+        }
+        pp++;
+        g.setColor(thumbnailcolor[r.poi[pp]]);
+        g.drawString(new String(tok), xx, yy);
+        g.setColor(textc);
+        if(!poic.contains(r.poi[pp])) poic.add(r.poi[pp]);
+        xx = r.x + sw;
+        token = new byte[0];
+        int k = 0;
+        while (k < 2 && ftt.more()) {
+          count++;
+          if (r.pos != null && pp < r.pos.length && count == r.pos[pp]) {
+            pp++;
+            g.setColor(thumbnailcolor[r.poi[pp]]);
+            if(!poic.contains(r.poi[pp])) poic.add(r.poi[pp]);
+          } else g.setColor(textc);
+          sw += we;
+          if (sw > r.w) {
+            yy += fh;
+            xx = r.x;
+            sw = 2 * we;
+            if (yy >= r.y + r.h) return;
+          }
+          tok = ftt.get();
+          for (byte b : tok)
+            sw += width(g, cw, b);
+          if (sw > r.w) {
+            yy += fh;
+            xx = r.x;
+            sw = 2 * we;
+            if (yy >= r.y + r.h) return;
+          }
+          token = Array.add(token, Array.add(new byte[]{' '}, tok));
+          k++;
+        }
+        sw += we + wd;
+        if (sw > r.w) {
+          yy += fh;
+          xx = r.x;
+          sw = 2 * we;
+          if (yy >= r.y + r.h) return;
+        }
+        g.drawString(new String(token) + e + d, xx, yy);
+        xx = r.x + sw;
+        
+        if (r.poi != null && r.poi[0] == poic.size) {
+          g.drawString(d, xx, yy);
+          yy += fh;
+          xx = r.x;
+          sw = 0;
+          poic = new IntList();
+        }
+        if (yy >= r.y + r.h) return;
+        
+      }
+      count++;
+    }
+  }
+  
+  
   /**
    * Returns the width of the specified text.
    * Cached font widths are used to speed up calculation.

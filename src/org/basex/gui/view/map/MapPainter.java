@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
+import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
@@ -40,18 +41,32 @@ abstract class MapPainter {
   Color nextMark(final ArrayList<ViewRect> rects, final int pre, final int ri,
       final int rs) {
 
+    final Data data = GUI.context.data();
     final Nodes marked = GUI.context.marked();
     // checks if the current node is a queried context node
     while(mpos < marked.size && marked.nodes[mpos] < pre) mpos++;
     if(mpos < marked.size) {
       if(marked.nodes[mpos] == pre) {
+        if (marked.pos != null && marked.poi != null 
+            && rects.size() > ri + 1) { 
+          if (data.size(pre, data.kind(pre)) == 2 && 
+              data.kind(rects.get(ri + 1).pre) == Data.TEXT) { 
+            rects.get(ri + 1).pos = marked.pos[mpos];
+            rects.get(ri + 1).poi = marked.poi[mpos];
+          }
+        }
         // mark node
         return GUIConstants.colormark1;
       } else if(ri + 1 < rs && marked.nodes[mpos] < rects.get(ri + 1).pre) {
         // mark ancestor of invisible node
         return GUIConstants.colormark2;
-      }
+      } 
     }
+    if (rects.size() > ri + 1) {
+      rects.get(ri + 1).pos = null;
+      rects.get(ri + 1).poi = null;
+    }
+//    rects.get(ri).pos = null;
     return null;
   }
 

@@ -85,7 +85,24 @@ public final class FTNode {
   public int getPre() {
     return ip != null ? ip.list[0] : pre;
   }
+  
+  /**
+   * Get all position values.
+   * @return pre/pos values
+   */
+  public int[] getPos() {
+    return ip.finish(0);
+  }
 
+  /**
+   * Get all position pointer values.
+   * @return pre/pos values
+   */
+  public int[] getPoi() {
+    return p.finish();
+  }
+
+  
   /**
    * Test is any pos value is remaining.
    * @return boolean

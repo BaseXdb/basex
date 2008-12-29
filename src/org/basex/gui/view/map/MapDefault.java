@@ -47,7 +47,7 @@ final class MapDefault extends MapPainter {
       if(lvl == 0) mpos = 0;
 
       final boolean full = r.w == ww && r.h == hh;
-
+      
       // draw rectangle
       Color col = nextMark(rects, pre, ri, rects.size());
       final boolean mark = col != null;

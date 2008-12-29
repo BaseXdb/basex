@@ -65,7 +65,7 @@ public final class XPContext extends QueryContext {
     // return standard node set
     if(it instanceof Nod) {
       final Nod ns = (Nod) it;
-      it = new Nodes(ns.nodes, ns.data);
+      it = new Nodes(ns.nodes, ns.data, ns.pos, ns.poi);
     }
     return it;
   }

@@ -23,6 +23,10 @@ public final class ViewRect implements Cloneable {
   public int type = -1;
   /** Thumbnail view. */
   public boolean thumb;
+  /** Fulltext position values. */
+  public int[] pos;
+  /** Fulltext pointer values. */
+  public int[] poi;
   
   /**
    * Default constructor.

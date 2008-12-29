@@ -111,9 +111,9 @@ public final class Skeleton {
    * @param k tag element
    * @return avg. textlength of a textnode in bytes
    */
-  public double tl(final byte[] k) {
+  public double[] tl(final byte[] k) {
     // return tl of document
-    if (k == null) return (double) root.tl / root.count;
+    if (k == null) return new double[] {root.tl, root.count};
     // follow the specified descendant/child steps
     ArrayList<SkelNode> n = new ArrayList<SkelNode>();
     n.add(root);
@@ -121,13 +121,14 @@ public final class Skeleton {
     
     final int id = data.tagID(k);
     n = desc(n, id, Data.ELEM, false);
-    double avg = 0;
-    int c = 0;
+    double sum = 0;
+    double c = 0;
     for(final SkelNode r : n) if (r.kind == Data.TEXT) {
-      avg += (double) r.tl / r.count;
-      c++;
+      sum += r.tl; 
+      c += r.count;
     }
-    return avg / c;
+    return new double[]{sum, c};
+    //return avg / c;
   }
   
   /**

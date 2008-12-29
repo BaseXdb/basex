@@ -22,11 +22,12 @@ public final class InterSect extends Arr {
 
   @Override
   public Nod eval(final XPContext ctx) throws QueryException {
-    int[] result = ((Nod) (ctx.eval(expr[0]))).nodes;
+    final Nod n = (Nod) (ctx.eval(expr[0]));
+    int[] result = n.nodes;
     for(int i = 1; i != expr.length; i++) {
       result = Nodes.intersect(((Nod) (ctx.eval(expr[i]))).nodes, result);
     }
-    return new Nod(result, ctx);
+    return expr.length != 1 ? new Nod(result, ctx) : n;
   }
 
   @Override

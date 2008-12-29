@@ -23,6 +23,10 @@ public final class Nodes implements Result {
   public Data data;
   /** Number of stored nodes. */
   public int size;
+  /** Fulltext position values. */
+  public int[][] pos;
+  /** Fulltext position pointer. */
+  public int[][] poi;
   
   /**
    * Node Set constructor.
@@ -47,11 +51,26 @@ public final class Nodes implements Result {
    * @param d data reference
    */
   public Nodes(final int[] n, final Data d) {
+    this (n, d, null, null);
+  }
+
+  /**
+   * Node Set constructor.
+   * @param n node set
+   * @param d data reference
+   * @param po ftpos values
+   * @param pi fulltext position pointer
+   */
+  public Nodes(final int[] n, final Data d, final int[][] po, 
+      final int[][] pi) {
     if(d == null) BaseX.notexpected("No data available");
     nodes = n;
     size = n.length;
     data = d;
+    pos = po;
+    poi = pi;
   }
+
   
   /**
    * Returns the position of the specified node or the negative value - 1 of

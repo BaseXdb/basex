@@ -16,7 +16,12 @@ public final class NodeBuilder {
   public int size;
   /** Sorting flag. */
   private boolean sort;
-
+  /** FTPos values. */
+  public int[][] pos;
+  /** FTPointer values. */
+  public int[][] poi;
+  
+  
   /**
    * Constructor, creating an empty node set.
    */
@@ -36,8 +41,26 @@ public final class NodeBuilder {
       nodes = ids;
       size = ids.length;
     }
+    pos = null;
   }
-  
+
+  /**
+   * Constructor, creating a new node set from the specified node ids.
+   * @param ids node ids
+   * @param p ftpos values
+   */
+ /* public NodeBuilder(final int[] ids, final int[][] p) {
+    if(ids.length == 0) {
+      size = 0;
+      nodes = new int[1];
+    } else {
+      nodes = ids;
+      size = ids.length;
+    }
+    pos = p;
+  }
+
+  */
   /**
    * Adds a pre value to the node set.
    * @param pre value to be added.
@@ -51,7 +74,54 @@ public final class NodeBuilder {
     }
     nodes[size++] = pre;
   }
+  
+  /**
+   * Adds position and pointer values.
+   * 
+   * @param ps ftposition values
+   * @param pi ftpointer values
+   */
+  public void addPosPoiToLastPre(final int[] ps, final int[] pi) {
+    if (pos == null) {
+      pos = new int[1][];
+      pos[0] = ps;
+      poi = new int[1][];
+      poi[0] = pi;
+    } else {
+      if (size - 1 == pos.length) pos = Array.extend(pos);
+      if (size - 1 == poi.length) poi = Array.extend(poi);
+      poi[size - 1] = pi;
+    }
+  }
 
+  /**
+   * Adds a pre value to the node set.
+   * @param pre value to be added.
+   * @param po posvalues for pre values
+   * @param pi pointer for pre values
+   * 
+   */
+  public void add(final int pre, final int[] po, final int[] pi) {
+    if(size == nodes.length) {
+      nodes = Array.extend(nodes);
+      pos = Array.extend(pos);
+      poi = Array.extend(poi);
+    }
+    if(!sort && size != 0) {
+      final int d = pre - nodes[size - 1];
+      if(d == 0) {
+        pos[size - 1] = Array.merge(pos[size - 1], po);
+        poi[size - 1] = Array.merge(poi[size - 1], pi);
+        return;
+      }
+      sort = d <= 0;
+    }
+    nodes[size++] = pre;
+    pos[size - 1] = po;
+    poi[size - 1] = pi;
+  }
+
+  
   /**
    * Adds a node set.
    * @param build node set to be added.
@@ -62,13 +132,27 @@ public final class NodeBuilder {
     if(sl == 0) return;
 
     if(sl == 1) {
-      add(set[0]);
+      if(build.pos != null) add(set[0], build.pos[0], build.poi[0]); 
+      else add(set[0]);
     } else {
       final int s = size + sl;
       int t = nodes.length;
       while(t <= s) t <<= 1;
-      if(t != nodes.length) nodes = Array.resize(nodes, size, t);
+      if(t != nodes.length) {
+        nodes = Array.resize(nodes, size, t);
+        if (pos != null && build.pos != null) pos = Array.resize(pos, size, t);
+        if (poi != null && build.poi != null) poi = Array.resize(poi, size, t);
+      }
       System.arraycopy(set, 0, nodes, size, sl);
+      if (pos != null) {
+        if (build.pos != null)
+          System.arraycopy(build.pos, 0, pos, size, sl);
+      } else pos = build.pos;
+      if (poi != null) {
+        if (build.poi != null)
+          System.arraycopy(build.poi, 0, poi, size, sl);
+      } else poi = build.poi;
+
       size = s;
       sort = true;
     }
@@ -97,5 +181,23 @@ public final class NodeBuilder {
       sort = false;
     }
     return Array.finish(nodes, size);
+  }
+  
+  /**
+   * Finish ftposition values.
+   * @return ftposition array
+   */
+  public int[][] finishPos() {
+    if (sort) return null;
+    return Array.finish(pos, size);
+  }
+  
+  /**
+   * Finish ftposition pointer values.
+   * @return ftposition pointer array
+   */
+  public int[][] finishPoi() {
+    if (sort) return null;
+    return Array.finish(poi, size);
   }
 }

@@ -12,8 +12,10 @@ import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.CAttr;
 import org.basex.query.xquery.expr.Expr;
+import org.basex.query.xquery.expr.For;
 import org.basex.query.xquery.expr.Pred;
 import org.basex.query.xquery.expr.Root;
+import org.basex.query.xquery.expr.VarCall;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.DBNode;
 import org.basex.query.xquery.item.Item;
@@ -25,6 +27,7 @@ import org.basex.query.xquery.iter.NodIter;
 import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.util.Err;
 import org.basex.query.xquery.util.NodeBuilder;
+import org.basex.query.xquery.util.Var;
 import org.basex.util.Array;
 
 /**
@@ -266,6 +269,25 @@ public class AxisPath extends Path {
   }
 
   /**
+   * Converts each step into a For-Loops.
+   * 
+   * @param var variable
+   * @param pos position variable
+   * @param score score variable 
+   * @return array with for expression
+   * @throws XQException Exception
+   */
+  public For[] convSteps(final Var var, final Var pos, final Var score) 
+    throws XQException {
+    For[] f = new For[step.length];
+    final VarCall vc = new VarCall(var);
+    for (int i = 0; i < step.length; i++) {
+      f[i] = new For(new AxisPath(vc, new Step[]{step[i]}), var, pos, score);
+    }
+    return f;
+  }
+  
+  /**
    * Merges superfluous descendant-or-self steps.
    * This method implies that all expressions are location steps.
    * @param ctx query context
@@ -373,6 +395,38 @@ public class AxisPath extends Path {
       ctx.compInfo(OPTTEXT, this);
     }
   }
+
+  /**
+   * Get all VarCall expressions.
+   * @return VarCall[]
+   */
+  public VarCall[] getVarCalls() { 
+    VarCall[] v = new VarCall[0];
+    if (root != null && root instanceof VarCall) 
+      v = Array.add(v, (VarCall) root);
+    return v;
+  }
+  
+  /**
+   * Remove all VarCall expression specified.
+   */
+  public void removeVarCall() { 
+    if (root != null && root instanceof VarCall) 
+      root = null;   
+  }
+  /*
+   * Checks if there is anything to sum up.
+   * @param d Data
+   * @return boolean sum up
+  public boolean sumUp(final Data d) {
+    if (step.length == 1 && root instanceof SimpleIterStep) {
+      final SimpleIterStep sis = (SimpleIterStep) root;
+      return sis.sumUp() && sis.test.kind == Test.Kind.NAME &&
+        d.skel.desc(sis.test.name.str(), false, false).size == 0;
+    }
+    return false;
+  }
+   */
   
   @Override
   public boolean uses(final Using u) {

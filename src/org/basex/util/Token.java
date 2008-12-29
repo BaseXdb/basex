@@ -767,7 +767,25 @@ public final class Token {
     for(int i = 0; i < tl; i++) if(tok[i] < 0 || tok[i] > ' ') return false;
     return true;
   }
+  
+  /**
+   * Checks if c is a punctuation mark.
+   * @param c token
+   * @return true if c is a punctuation mark
+   */
+  public static boolean pm(final byte c) {
+    return c == '.' || c == '!' || c == '?';
+  }
 
+  /**
+   * Checks if c is a new line.
+   * @param c token
+   * @return true if c is a new line
+   */
+  public static boolean nl(final byte c) {
+    return c == '\n';
+  }
+  
   /**
    * Replaces the specified character and returns the result token.
    * @param t token to be checked

@@ -172,7 +172,7 @@ public final class Num {
    * @param v integer value
    * @return value length
    */
-  private static int len(final int v) {
+  public static int len(final int v) {
     return v < 0 || v > 0x3FFFFFFF ? 5 : v > 0x3FFF ? 4 : v > 0x3F ? 2 : 1;
   }
 

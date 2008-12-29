@@ -135,6 +135,37 @@ public final class Array {
 
   /**
    * Resizes an array and adds an entry at the end.
+   * @param a1 array to be resized
+   * @param a2 entry to be added
+   * @return finished array
+   */
+  public static int[] merge(final int[] a1, final int[] a2) {
+    if(a1 == null) return a2;
+    if(a2 == null) return a1;
+    final int[] tmp = new int[a1.length + a2.length];
+    int i1 = 0, i2 = 0, c = 0;
+    while (i1 < a1.length && i2 < a2.length) {
+      final int d = a1[i1] - a2[i2];
+      if (d == 0) {
+        tmp[c++] = a1[i1++];
+        i2++;
+      } else if (d < 0) tmp[c++] = a1[i1++];
+      else tmp[c++] = a2[i2++];
+    }
+    if (i1 < a1.length) {
+      System.arraycopy(a1, i1, tmp, c, a1.length - i1);
+      c += a1.length - i1;
+    }
+    if (i2 < a2.length) {
+      System.arraycopy(a2, i2, tmp, c, a2.length - i2);
+      c += a2.length - i2;
+    }
+    return finish(tmp, c);
+  }
+
+  
+  /**
+   * Resizes an array and adds an entry at the end.
    * @param ar array to be resized
    * @param e entry to be added
    * @param <T> array type
@@ -147,6 +178,36 @@ public final class Array {
     return t;
   }
 
+  /**
+   * Resizes an array and adds an entries at the end.
+   * @param ar array to be resized
+   * @param e entries to be added
+   * @param <T> array type
+   * @return array
+   */
+  public static <T> T[] add(final T[] ar, final T[] e) {
+    final int s = ar.length;
+    final T[] t = resize(ar, s, s + e.length);
+    System.arraycopy(e, 0, t, s, e.length);
+    return t;
+  }
+
+  /**
+   * Resizes an array and adds an entries at the end.
+   * @param ar array to be resized
+   * @param e entries to be added
+   * @return array
+   */
+  public static byte[] add(final byte[] ar, final byte[] e) {
+    final int s = ar.length;
+    final byte[] t = resize(ar, s, s + e.length);
+    System.arraycopy(e, 0, t, s, e.length);
+    return t;
+  }
+
+
+  
+  
   /**
    * Optimizes the array size.
    * @param ar array to be resized

@@ -49,10 +49,18 @@ public abstract class Step extends ExprInfo {
     result.reset();
     final Data data = ctx.item.data;
     final int[] nodes = ctx.item.nodes;
-
+    final int[][] pos = ctx.item.pos;
+    final int[][] poi = ctx.item.poi;
+    
     // choose the evaluation plan
     if(simple) {
-      for(final int n : nodes) eval(data, n, result);
+      for(int i = 0; i < nodes.length; i++) {
+        final int size = result.size;
+        eval(data, nodes[i], result);
+        if (size < result.size && pos != null) {
+          result.addPosPoiToLastPre(pos[i], poi[i]);
+        }
+      }
     } else if(posPred != 0) {
       for(final int n : nodes) pos(ctx, data, n);
     } else if(early) {
@@ -64,7 +72,10 @@ public abstract class Step extends ExprInfo {
         preds.eval(ctx, tmp, result);
       }
     }
-    return new Nod(result.finish(), ctx);
+    
+    return result.pos != null && result.poi != null ? 
+        new Nod(result.finish(), result.finishPos(), result.finishPoi(), ctx) : 
+          new Nod(result.finish(), ctx);
   }
 
   /**

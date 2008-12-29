@@ -225,6 +225,32 @@ public final class CmpG extends Arr {
   }
 
   /**
+   * Collect all VarCall expressions.
+   * @return VarCall[]
+   */
+  public VarCall[] getVarCalls() {
+    VarCall[] v = new VarCall[0];
+    for (int i = 0; i < expr.length; i++) {
+      if (expr[i] instanceof AxisPath) {
+        v = Array.add(v, ((AxisPath) expr[i]).getVarCalls());
+      }
+    }
+    return v;
+  }
+  
+  /**
+   * Remove all varcall expressions vc.
+   */
+  public void removeVarCall() {
+    for (int i = 0; i < expr.length; i++) {
+      if (expr[i] instanceof AxisPath) {
+        ((AxisPath) expr[i]).removeVarCall();
+      }
+    }
+    
+  }
+  
+  /**
    * Returns the indexable index step or null.
    * @param expr expression arguments
    * @return result of check

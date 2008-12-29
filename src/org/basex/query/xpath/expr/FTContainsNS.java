@@ -9,6 +9,7 @@ import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.XPOptimizer;
 import org.basex.query.xpath.item.Item;
 import org.basex.query.xpath.item.Nod;
+import org.basex.util.IntArrayList;
 import org.basex.util.IntList;
 
 /**
@@ -54,12 +55,16 @@ public final class FTContainsNS extends Arr {
     
     final FTArrayExpr ftae = (FTArrayExpr) expr[1];
     final IntList il = new IntList();
+    final IntArrayList poi = new IntArrayList();
+    final IntArrayList pos = new IntArrayList();
     while (ftae.more()) {
       ftn = ftae.next(ctx);
       if (ftn.size == 0) break;
       il.add(ftn.getPre());
+      pos.add(ftn.getPos());
+      poi.add(ftn.getPoi());
     }
-    ctx.item = new Nod(il.finish(), ctx);
+    ctx.item = new Nod(il.finish(), pos.finish(), poi.finish(), ctx);
     ctx.ftitem = tmp;
     ctx.iu = iu;
     return ctx.item;

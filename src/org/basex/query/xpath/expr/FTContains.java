@@ -228,14 +228,19 @@ public final class FTContains extends Expr {
 
     // Integer.MAX_VALUE is returned if an ftnot does not occur after an ftand
     final int nrIDs = query.indexSizes(ctx, curr, min);
-    /*
-    final double avgT = path.avgTextLength(ctx);
-    final double ld = ctx.item.data.skel.tl(null);
-    System.out.println("avgT=" + avgT + " ld=" + ld);
-    */
+     
+   /* final double[] atl = path.textLength(ctx);
+    if (atl != null) {
+      final int ic = nrIDs * (Num.len(ctx.item.data.size) 
+      + Num.len((int) (atl[0] / (atl[1] * 3))));
+      System.out.println("arl[0]:" + atl[0] + " atl[1]:" + atl[1] 
+      + " nrIds:" + nrIDs + " avg:" + (atl[0]/atl[1]));
+      System.out.println(atl[0] + "<" + ic);
+    }*/
+    
     if(!meta.ftoptpreds && nrIDs > min) {
       // only one ftcontains predicate should use the index
-      iu = false;
+      iut = false;
       ctx.iu = false;
       return min;
     }

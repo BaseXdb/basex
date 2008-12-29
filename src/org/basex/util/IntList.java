@@ -77,6 +77,19 @@ public final class IntList {
   }
 
   /**
+   * Finishes the int array.
+   * @param p pointer of first value to copy
+   * @return int array
+   */
+  public int[] finish(final int p) {
+    final int[] tmp = new int[size - p - 1];
+    if (tmp.length > 0)
+      System.arraycopy(list, p + 1, tmp, 0, tmp.length);
+    return tmp;
+  }
+
+  
+  /**
    * Resets the integer list.
    */
   public void reset() {

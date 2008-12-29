@@ -137,6 +137,30 @@ public final class FTTokenizer extends IndexToken {
   }
 
   /**
+   * Count number of tokens, sentences and paragraphs.
+   * 
+   * @return int[3]
+   */
+  public int[] countSenPar() {
+    int lass = 0;
+    int lasp = 0;
+    int[] c = new int[3]; 
+    init();
+    while(more()) {
+      c[0]++;
+      if (sent != lass) {
+        c[1]++;
+        lass = sent;
+      }
+      if (para != lasp) {
+        c[2]++;
+        lasp = para;
+      }
+    }
+    return c;
+  }
+  
+  /**
    * Returns the text size.
    * @return size
    */

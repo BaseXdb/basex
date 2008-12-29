@@ -46,6 +46,17 @@ public final class VarCall extends Expr {
     return it;
   }
   
+  /**
+   * Checks VarCall Expression for equality.
+   * @param v Var
+   * @return boolean eq
+   */
+  public boolean eq(final Var v) {
+    return //var.global == v.global 
+    var.name.eq(v.name) 
+    && var.type == v.type;
+  }
+  
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
     var = ctx.vars.get(var);
