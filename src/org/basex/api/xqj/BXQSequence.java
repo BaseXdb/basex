@@ -1,6 +1,8 @@
 package org.basex.api.xqj;
 
 import static org.basex.api.xqj.BXQText.*;
+
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URI;
@@ -179,11 +181,15 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
     if(!next && !next()) return "";
     
     final CachedOutput out = new CachedOutput();
-    final XMLSerializer ser = new XMLSerializer(out);
-    do {
-      final BXQItem  item = item();
-      item.serialize(item.it, ctx, ser);
-    } while(next());
+    try {
+      final XMLSerializer ser = new XMLSerializer(out);
+      do {
+        final BXQItem  item = item();
+        item.serialize(item.it, ctx, ser);
+      } while(next());
+    } catch(final IOException ex) {
+      throw new BXQException(ex);
+    }
     return out.toString();
   }
 
@@ -294,11 +300,15 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
       writeSequence(((StreamResult) res).getWriter(), null);
     } else if(res instanceof SAXResult) {
       // SAXResult.. serialize result to underlying parser
-      final SAXSerializer ser = new SAXSerializer(null);
-      final SAXResult sax = (SAXResult) res;
-      ser.setContentHandler(sax.getHandler());
-      ser.setLexicalHandler(sax.getLexicalHandler());
-      while(next()) serialize(item().it, ctx, ser);
+      try {
+        final SAXSerializer ser = new SAXSerializer(null);
+        final SAXResult sax = (SAXResult) res;
+        ser.setContentHandler(sax.getHandler());
+        ser.setLexicalHandler(sax.getLexicalHandler());
+        while(next()) serialize(item().it, ctx, ser);
+      } catch(final IOException ex) {
+        throw new BXQException(ex);
+      }
     } else {
       BaseX.notimplemented();
     }

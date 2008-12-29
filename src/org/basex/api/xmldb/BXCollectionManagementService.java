@@ -1,13 +1,6 @@
 package org.basex.api.xmldb;
 
-import java.io.IOException;
-
-import org.basex.build.Builder;
-import org.basex.build.Parser;
-import org.basex.core.Context;
-import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.DropDB;
-import org.basex.io.IO;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.ErrorCodes;
 import org.xmldb.api.base.XMLDBException;
@@ -30,14 +23,14 @@ public final class BXCollectionManagementService implements
   /** Service constant. */
   static final String VERSION = "1.0";
   /** BXCollection col. */
-  private Collection coll;
+  private BXCollection coll;
 
   /**
    * Standard Constructor.
    * @param c Collection reference
    */
   public BXCollectionManagementService(final Collection c) {
-    coll = c;
+    coll = (BXCollection) c;
   }
 
   /**
@@ -48,40 +41,12 @@ public final class BXCollectionManagementService implements
    * @throws XMLDBException exception
    */
   public Collection createCollection(final String name) throws XMLDBException {
-    coll = new BXCollection(create(name));
-    return coll;
-  }
-
-  /**
-   * Creates a new collection and returns the context.
-   * @param name collection name
-   * @return context
-   * @throws XMLDBException exception
-   */
-  public static Context create(final String name) throws XMLDBException {
-    // Creates a new database context
-    try {
-      final Context ctx = new Context();
-      final Parser p = new Parser(IO.get(name)) {
-        @Override
-        public void parse(final Builder build) { }
-        @Override
-        public String det() { return ""; }
-        @Override
-        public String head() { return ""; }
-        @Override
-        public double prog() { return 0; }
-      };
-      ctx.data(CreateDB.xml(p, name));
-      return ctx;
-    } catch(final IOException ex) {
-      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
-    }
+    return new BXCollection(name);
   }
 
   public void removeCollection(final String name) {
     // apply context reference to possibly close database first
-    new DropDB(name).execute(((BXCollection) coll).ctx);
+    new DropDB(name).execute(coll.ctx);
   }
 
   public String getName() {
@@ -93,7 +58,7 @@ public final class BXCollectionManagementService implements
   }
 
   public void setCollection(final Collection c) {
-    coll = c;
+    coll = (BXCollection) c;
   }
 
   public String getProperty(final String nm) {

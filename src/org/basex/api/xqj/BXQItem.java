@@ -157,7 +157,13 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
    * @throws XQException exception
    */
   private void serialize(final OutputStream os) throws XQException {
-    serialize(it, ctx, new XMLSerializer(new PrintOutput(os)));
+    try {
+      final XMLSerializer ser = new XMLSerializer(new PrintOutput(os));
+      serialize(it, ctx, ser);
+      ser.close();
+    } catch(final IOException ex) {
+      throw new BXQException(ex);
+    }
   }
 
   public void writeItem(final Writer ow, final Properties props)
@@ -178,7 +184,13 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
   private String serialize() throws XQException {
     opened();
     final CachedOutput co = new CachedOutput();
-    serialize(it, ctx, new XMLSerializer(co));
+    try {
+      final XMLSerializer ser = new XMLSerializer(co);
+      serialize(it, ctx, ser);
+      ser.close();
+    } catch(final IOException ex) {
+      throw new BXQException(ex);
+    }
     return co.toString();
   }
 
@@ -192,10 +204,14 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
       writeItem(((StreamResult) result).getWriter(), null);
     } else if(result instanceof SAXResult) {
       // SAXResult.. serialize result to underlying parser
-      final SAXSerializer ser = new SAXSerializer(null);
-      final ContentHandler h = ((SAXResult) result).getHandler();
-      ser.setContentHandler(h);
-      serialize(it, ctx, ser);
+      try {
+        final SAXSerializer ser = new SAXSerializer(null);
+        ser.setContentHandler(((SAXResult) result).getHandler());
+        serialize(it, ctx, ser);
+        ser.close();
+      } catch(final IOException ex) {
+        throw new BXQException(ex);
+      }
     } else {
       BaseX.notimplemented();
     }

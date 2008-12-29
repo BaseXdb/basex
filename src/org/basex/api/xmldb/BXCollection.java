@@ -9,14 +9,17 @@ import org.xmldb.api.base.*;
 import org.xmldb.api.modules.BinaryResource;
 import org.xmldb.api.modules.XMLResource;
 import org.basex.BaseX;
+import org.basex.build.Builder;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.build.xml.DOCWrapper;
 import org.basex.build.xml.DirParser;
 import org.basex.core.Context;
 import org.basex.core.proc.Close;
+import org.basex.core.proc.CreateDB;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
+import org.basex.io.IO;
 import org.basex.io.IOContent;
 import org.basex.util.StringList;
 import org.basex.util.Token;
@@ -44,7 +47,22 @@ public final class BXCollection implements Collection, BXXMLDBText {
    * @throws XMLDBException exception
    */
   public BXCollection(final String name) throws XMLDBException {
-    this(BXCollectionManagementService.create(name));
+    try {
+      ctx = new Context();
+      final Parser p = new Parser(IO.get(name)) {
+        @Override
+        public void parse(final Builder build) { }
+        @Override
+        public String det() { return ""; }
+        @Override
+        public String head() { return ""; }
+        @Override
+        public double prog() { return 0; }
+      };
+      ctx.data(CreateDB.xml(p, name));
+    } catch(final IOException ex) {
+      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
+    }
   }
 
   public String getName() {
@@ -163,7 +181,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
     // insert document
     try {
       final Data data = ctx.data();
-      data.insert(data.size, -1, new MemBuilder().build(p, id));
+      data.insert(data.meta.size, -1, new MemBuilder().build(p, id));
       data.flush();
     } catch(final IOException ex) {
       BaseX.debug(ex);

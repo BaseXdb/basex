@@ -52,15 +52,14 @@ public final class BXResourceSet implements ResourceSet, BXXMLDBText {
 
   public Resource getMembersAsResource() throws XMLDBException {
     final CachedOutput out = new CachedOutput();
-    final XMLSerializer ser = new XMLSerializer(out);
     try {
-      ser.open(res.size());
+      final XMLSerializer ser = new XMLSerializer(out);
       for(final Resource r : getIterator()) {
         ser.openResult();
         out.print(r.getContent().toString());
-        out.close();
+        ser.closeResult();
       }
-      ser.close(res.size());
+      ser.close();
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
     }

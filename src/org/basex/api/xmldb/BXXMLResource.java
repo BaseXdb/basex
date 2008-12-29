@@ -169,9 +169,13 @@ public final class BXXMLResource implements XMLResource, BXXMLDBText {
     }
   }
 
-  public ContentHandler setContentAsSAX() {
-    // ..might be replaced by a custom SAX Content Handler in future.
-    return new BXSAXContentHandler(this);
+  public ContentHandler setContentAsSAX() throws XMLDBException {
+    try {
+      // ..might be replaced by a custom SAX Content Handler in future.
+      return new BXSAXContentHandler(this);
+    } catch(final IOException e) {
+      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, e.getMessage());
+    }
   }
 
   /** SAX Parser. */
@@ -188,8 +192,9 @@ public final class BXXMLResource implements XMLResource, BXXMLDBText {
     /**
      * Standard Constructor.
      * @param r resource
+     * @throws IOException exception
      */
-    BXSAXContentHandler(final BXXMLResource r) {
+    BXSAXContentHandler(final BXXMLResource r) throws IOException {
       xml = new XMLSerializer(out);
       res = r;
     }
@@ -242,12 +247,11 @@ public final class BXXMLResource implements XMLResource, BXXMLDBText {
         final Attributes attributes) throws SAXException {
 
       try {
-        xml.startElement(token(s2));
+        xml.openElement(token(s2));
         for(int i = 0; i < attributes.getLength(); i++) xml.attribute(
             token(attributes.getQName(i)), token(attributes.getValue(i)));
         for(final String k : ns.keySet()) xml.attribute(
             concat(XMLNS, token(k)), token(ns.get(k)));
-        xml.finishElement();
       } catch(final IOException ex)  {
         throw new SAXException(ex);
       }

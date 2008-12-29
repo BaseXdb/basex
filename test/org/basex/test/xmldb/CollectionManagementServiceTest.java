@@ -1,5 +1,6 @@
 package org.basex.test.xmldb;
 
+import org.basex.api.xmldb.BXCollectionManagementService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,11 +24,11 @@ public class CollectionManagementServiceTest extends TestCase {
   /** Test document. */
   static final String TEST = "test";
   /** Collection. */
-  private static Database db;
+  private Database db;
   /** Collection. */
-  private static Collection coll;
+  private Collection coll;
   /** Resource. */
-  private static CollectionManagementService serv;
+  private CollectionManagementService serv;
 
   @Before
   @Override
@@ -85,4 +86,3 @@ public class CollectionManagementServiceTest extends TestCase {
     // nothing serious to test...
   }
 }
-
