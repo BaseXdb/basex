@@ -6,12 +6,20 @@ import org.basex.query.xquery.item.QNm;
 import org.basex.query.xquery.item.Type;
 
 /**
- * XQuery Node Tests.
+ * XQuery Kind Test.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class KindTest extends Test {
+public final class KindTest extends Test {
+  /**
+   * Constructor.
+   * @param t node type
+   */
+  public KindTest(final Type t) {
+    this(t, null);
+  }
+
   /**
    * Constructor.
    * @param t node type
@@ -23,8 +31,8 @@ public class KindTest extends Test {
   }
   
   @Override
-  public boolean e(final Nod tmp) throws XQException {
-    return tmp.type != type ? false : name == null || tmp.qname(qname).eq(name);
+  public boolean eval(final Nod n) throws XQException {
+    return n.type != type ? false : name == null || n.qname(tmpq).eq(name);
   }
 
   @Override

@@ -32,7 +32,7 @@ public final class Range extends Arr {
     
     final long l1 = checkItr(i1);
     final long l2 = checkItr(i2);
-    return l2 < l1 ? Iter.EMPTY : l2 == l1 ? Itr.iter(l1) :
+    return l2 < l1 ? Iter.EMPTY : l2 == l1 ? Itr.get(l1).iter() :
       new RangeIter(l1, l2);
   }
 

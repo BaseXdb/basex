@@ -42,9 +42,9 @@ public final class SimpleIterStep extends Step {
             if(!it.node()) Err.or(NODESPATH, SimpleIterStep.this, it.type);
             ir = axis.init((Nod) it);
           }
-          final Nod nod = ir.next();
-          if(nod == null) ir = null;
-          else if(test.e(nod)) return nod.finish();
+          final Nod n = ir.next();
+          if(n == null) ir = null;
+          else if(test.eval(n)) return n.finish();
         }
       }
     };

@@ -57,7 +57,7 @@ public final class FTFuzzyBuilder extends Progress implements IndexBuilder {
   public FTFuzzy build(final Data data) throws IOException {
     final Performance p = new Performance();
 
-    total = data.size;
+    total = data.meta.size;
     for(id = 0; id < total; id++) {
       checkStop();
       if(data.kind(id) == Data.TEXT) index(data.text(id));

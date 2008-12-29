@@ -2,7 +2,6 @@ package org.basex.query.xpath.expr;
 
 import static org.basex.query.xpath.XPText.*;
 import org.basex.query.QueryException;
-import org.basex.query.xpath.ExprList;
 import org.basex.query.xpath.XPContext;
 import org.basex.query.xpath.XPOptimizer;
 import org.basex.query.xpath.internal.OneOf;
@@ -10,6 +9,7 @@ import org.basex.query.xpath.item.Bln;
 import org.basex.query.xpath.item.Item;
 import org.basex.query.xpath.path.LocPath;
 import org.basex.query.xpath.path.Step;
+import org.basex.util.Array;
 
 /**
  * Or expression.
@@ -35,7 +35,7 @@ public final class Or extends Arr {
   @Override
   public Expr comp(final XPContext ctx) throws QueryException {
     super.comp(ctx);
-    final ExprList eil0 = new ExprList();
+
     for(int i = 0; i != expr.length; i++) {
       // check if we can simplify a location path
       if(expr[i] instanceof LocPath) {
@@ -44,36 +44,15 @@ public final class Or extends Arr {
         // simplify operand
         if(((Item) expr[i]).bool()) {
           // this expression is always true
-          ctx.compInfo(OPTOR1);
+          ctx.compInfo(OPTTRUE);
           return Bln.TRUE;
         }
 
         // remove element from or expression that is always false
-        ctx.compInfo(OPTOR2);
-        final Expr[] tmp = new Expr[expr.length - 1];
-        System.arraycopy(expr, 0, tmp, 0, i);
-        System.arraycopy(expr, i + 1, tmp, i, expr.length - i-- - 1);
-        expr = tmp;
-      } else if (expr[i] instanceof And) {
-        // sum up and predicates
-        final ExprList eil = new ExprList();
-        final And o = (And) expr[i];
-        for (int j = 0; j < o.expr.length; j++)
-          eil.add(o.expr[j], ctx, true);
-
-        if (eil.size > 0 && eil.size < o.expr.length) {
-          Expr[] e = eil.finishE();
-          if (e.length == 1) expr[i] = e[0];
-          o.expr = eil.finishE();
-         ctx.compInfo(OPTPREDS);
-       }
-     }
-      eil0.add(expr[i], ctx, false);
+        ctx.compInfo(OPTFALSE);
+        expr = Array.delete(expr, i--);
+      }
     }
-    
-    if (eil0.size < expr.length)
-      expr = eil0.finishE();
-    
     if(expr.length == 0) return Bln.FALSE;
     if(expr.length == 1) return expr[0];
     

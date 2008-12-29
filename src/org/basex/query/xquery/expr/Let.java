@@ -35,13 +35,13 @@ public final class Let extends ForLet {
     expr = e;
     var = v;
     score = s;
-    if(s) var.item(Dbl.ZERO, null);
+    if(s) var.bind(Dbl.ZERO, null);
   }
 
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
     expr = ctx.comp(expr);
-    if(!score && expr.i()) var.item((Item) expr, ctx);
+    if(!score && expr.i()) var.bind((Item) expr, ctx);
     ctx.vars.add(var);
     return this;
   }
@@ -51,39 +51,40 @@ public final class Let extends ForLet {
     final Var v = var.clone();
 
     return new ResetIter() {
-      /** Iterator flag. */
-      private boolean more;
       /** Variable stack size. */
       private int vs;
+      /** Iterator flag. */
+      private boolean more;
 
       @Override
       public Bln next() throws XQException {
         if(!more) {
           vs = ctx.vars.size();
-          final Iter iter = ctx.iter(expr);
+          final Iter ir = ctx.iter(expr);
           Item it;
           if(score) {
             // assign average score value
             double s = 0;
             int c = 0;
-            while((it = iter.next()) != null) {
+            while((it = ir.next()) != null) {
               s += it.score();
               c++;
             }
             it = Dbl.get(Scoring.finish(s / c));
           } else {
-            it = iter.finish();
+            it = ir.finish();
           }
-          ctx.vars.add(v.item(it, ctx));
+          ctx.vars.add(v.bind(it, ctx));
+          more = true;
         } else {
-          ctx.vars.reset(vs);
+          reset();
         }
-        more ^= true;
         return Bln.get(more);
       }
       
       @Override
       public void reset() {
+        ctx.vars.reset(vs);
         more = false;
       }
     };
@@ -91,13 +92,12 @@ public final class Let extends ForLet {
   
   @Override
   public String toString() {
-    return LET + " " + var + " := " + expr;
+    return LET + " " + var + " " + ASSIGN + " " + expr;
   }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, score ? Token.token(SCORE) : VAR,
-        var.name.str());
+    ser.openElement(this, score ? Token.token(SCORE) : VAR, var.name.str());
     expr.plan(ser);
     ser.closeElement();
   }

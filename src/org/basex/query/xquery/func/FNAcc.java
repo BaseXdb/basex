@@ -1,7 +1,6 @@
 package org.basex.query.xquery.func;
 
 import static org.basex.util.Token.*;
-
 import org.basex.BaseX;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
@@ -27,31 +26,25 @@ final class FNAcc extends Fun {
  
     switch(func) {
       case POS:
-        return Itr.iter(ctx.pos);
+        return Itr.get(ctx.pos).iter();
       case LAST:
-        return Itr.iter(ctx.size);
+        return Itr.get(ctx.size).iter();
       case STRING:
         Item it = iter.atomic(this, true);
         return it == null ? Str.ZERO.iter() : it.s() && !it.u() ? it.iter() :
-          Str.iter(it.str());
+          Str.get(it.str()).iter();
       case NUMBER:
         it = iter.next();
-        if(it == null || iter.next() != null || it.type == Type.URI ||
-            !it.s() && !it.n() && !it.u()) return Dbl.iter(Double.NaN);
-        if(it.type == Type.DBL) return it.iter();
-        try {
-          return Dbl.iter(it.dbl());
-        } catch(final XQException e) {
-          return Dbl.iter(Double.NaN);
-        }
+        return (it == null || iter.next() != null ? Dbl.NAN :
+          number(it)).iter();
       case URIQNAME:
         it = iter.atomic(this, true);
         if(it == null) return Iter.EMPTY;
         return ((QNm) check(it, Type.QNM)).uri.iter();
       case STRLEN:
-        return Itr.iter(len(checkStr(iter)));
+        return Itr.get(len(checkStr(iter))).iter();
       case NORM:
-        return Str.iter(norm(checkStr(iter)));
+        return Str.get(norm(checkStr(iter))).iter();
       default:
         BaseX.notexpected(func); return null;
     }
@@ -66,11 +59,25 @@ final class FNAcc extends Fun {
       case STRING:
         return it != null && it.s() && !it.u() ? it : this;
       case NUMBER:
-        if(args[0].e()) return Dbl.NAN;
-        return it instanceof Dbl ? it : this;
+        return args[0].e() ? Dbl.NAN : it != null ? number(it) : this;
       default:
         return this;
     }
+  }
+  
+  /**
+   * Converts the specified item to a double.
+   * @param it input item
+   * @return double iterator
+   */
+  private Item number(final Item it) {
+    if(it.type == Type.DBL) return it;
+
+    try {
+      if(it.type != Type.URI && (it.s() || it.n() || it.u()))
+        return Dbl.get(it.dbl());
+    } catch(final XQException e) { }
+    return Dbl.get(Double.NaN);
   }
 
   @Override

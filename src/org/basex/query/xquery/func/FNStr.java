@@ -39,7 +39,7 @@ final class FNStr extends Fun {
         Item it2 = arg[1].atomic(this, true);
         if(it1 == null || it2 == null) return Iter.EMPTY;
         final int d = diff(checkStr(it1), checkStr(it2));
-        return Itr.iter(Math.max(-1, Math.min(1, d)));
+        return Itr.get(Math.max(-1, Math.min(1, d))).iter();
       case CODEPNT:
         it1 = iter.atomic(this, true);
         it2 = arg[1].atomic(this, true);
@@ -52,24 +52,24 @@ final class FNStr extends Fun {
       case NORMUNI:
         return normuni(arg);
       case UPPER:
-        return Str.iter(uc(checkStr(iter)));
+        return Str.get(uc(checkStr(iter))).iter();
       case LOWER:
-        return Str.iter(lc(checkStr(iter)));
+        return Str.get(lc(checkStr(iter))).iter();
       case TRANS:
         return trans(arg);
       case ENCURI:
-        return Str.iter(uri(checkStr(iter), false));
+        return Str.get(uri(checkStr(iter), false)).iter();
       case IRIURI:
-        return Str.iter(uri(checkStr(iter), true));
+        return Str.get(uri(checkStr(iter), true)).iter();
       case ESCURI:
-        return Str.iter(esc(checkStr(iter)));
+        return Str.get(esc(checkStr(iter))).iter();
       case CONCAT:
         final TokenBuilder tb = new TokenBuilder();
         for(final Iter a : arg) {
           final Item it = a.atomic(this, true);
           if(it != null) tb.add(it.str());
         }
-        return Str.iter(tb.finish());
+        return Str.get(tb.finish()).iter();
       case CONTAINS:
         if(arg.length == 3) checkColl(arg[2]);
         Item it = arg[1].atomic(this, true);
@@ -90,13 +90,13 @@ final class FNStr extends Fun {
         final byte[] str = checkStr(iter);
         final byte[] sa = checkStr(arg[1]);
         int pa = indexOf(str, sa);
-        return pa != -1 ? Str.iter(substring(str, pa + sa.length)) :
-          Str.ZERO.iter();
+        return (pa != -1 ? Str.get(substring(str, pa + sa.length)) :
+          Str.ZERO).iter();
       case SUBBEFORE:
         if(arg.length == 3) checkColl(arg[2]);
         final byte[] sb = checkStr(iter);
         final int pb = indexOf(sb, checkStr(arg[1]));
-        return pb > 0 ? Str.iter(substring(sb, 0, pb)) : Str.ZERO.iter();
+        return (pb > 0 ? Str.get(substring(sb, 0, pb)) : Str.ZERO).iter();
       default:
         BaseX.notexpected(func); return null;
     }
@@ -116,7 +116,7 @@ final class FNStr extends Fun {
       if(!XMLToken.valid(n)) Err.or(INVCODE, i, this);
       tb.addUTF(n);
     }
-    return Str.iter(tb.finish());
+    return Str.get(tb.finish()).iter();
   }
 
   /**
@@ -156,8 +156,8 @@ final class FNStr extends Fun {
     }
     e = Math.min(l, end ? s + e : Integer.MAX_VALUE);
     if(s >= e) return Str.ZERO.iter();
-    if(ascii(str)) return Str.iter(substring(str, s, e));
-    if(s == 0 && e == str.length) return Str.iter(str);
+    if(ascii(str)) return Str.get(substring(str, s, e)).iter();
+    if(s == 0 && e == str.length) return Str.get(str).iter();
 
     int ss = s;
     int ee = e;
@@ -167,7 +167,7 @@ final class FNStr extends Fun {
       if(p == e) ee = l;
     }
     if(p == e) ee = l;
-    return Str.iter(Array.create(str, ss, ee - ss));
+    return Str.get(Array.create(str, ss, ee - ss)).iter();
   }
 
   /**
@@ -180,9 +180,9 @@ final class FNStr extends Fun {
     final byte[] str = checkStr(arg[0]);
     final byte[] sea = checkStr(arg[1].atomic(this, false));
     final byte[] rep = checkStr(arg[2].atomic(this, false));
-    return Str.iter(ascii(str) && ascii(sea) && ascii(rep) ?
-        translate(str, sea, rep) : token(Pattern.compile(string(sea),
-            Pattern.LITERAL).matcher(string(str)).replaceAll(string(rep))));
+    return Str.get(ascii(str) && ascii(sea) && ascii(rep) ?
+      translate(str, sea, rep) : token(Pattern.compile(string(sea),
+      Pattern.LITERAL).matcher(string(str)).replaceAll(string(rep)))).iter();
   }
 
   /**
@@ -203,7 +203,7 @@ final class FNStr extends Fun {
       c++;
     }
     final byte[] v = tb.finish();
-    return Str.iter(c == 0 ? v : substring(v, 0, v.length - sep.length));
+    return Str.get(c == 0 ? v : substring(v, 0, v.length - sep.length)).iter();
   }
 
   /** Normalization types. */
@@ -241,7 +241,7 @@ final class FNStr extends Fun {
       norm = Norm.C;
     }
     // [CG] XQuery/normalize-unicode
-    return Str.iter(str);
+    return Str.get(str).iter();
   }
 
   /** Reserved characters. */

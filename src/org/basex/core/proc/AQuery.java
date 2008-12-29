@@ -58,9 +58,9 @@ abstract class AQuery extends Process {
 
         qu.parse();
         pars += per.getTime();
-        plan(qu, false);
+        if(i == 0) plan(qu, false);
         qu.compile(nodes);
-        plan(qu, true);
+        if(i == 0) plan(qu, true);
         comp += per.getTime();
         result = qu.query(nodes);
         eval += per.getTime();
@@ -76,7 +76,8 @@ abstract class AQuery extends Process {
       return true;
     } catch(final QueryException ex) {
       BaseX.debug(ex);
-      return error(ex.getMessage());
+      info(ex.getMessage());
+      return false;
     } catch(final ProgressException ex) {
       return false;
     } catch(final Exception ex) {
@@ -92,14 +93,15 @@ abstract class AQuery extends Process {
    * @throws IOException exception
    */
   protected void out(final PrintOutput o, final boolean p) throws IOException {
-    final XMLSerializer ser = new XMLSerializer(Prop.serialize ? o
-        : new NullOutput(), Prop.xmloutput, p);
+    XMLSerializer ser = new XMLSerializer(Prop.serialize ? o :
+      new NullOutput(), Prop.xmloutput, p);
 
     for(int i = 0; i < Prop.runs; i++) {
-      result.serialize(i == 0 ? ser : new XMLSerializer(new NullOutput(
-          !Prop.serialize), Prop.xmloutput, Prop.xqformat));
+      if(i != 0) ser = new XMLSerializer(new NullOutput(!Prop.serialize),
+          Prop.xmloutput, Prop.xqformat);
+      result.serialize(ser);
+      ser.close();
     }
-    o.print(Prop.NL);
     if(Prop.info) outInfo(o, result.size());
   }
 
@@ -113,7 +115,7 @@ abstract class AQuery extends Process {
     info(QUERYTOTAL + perf.getTimer(Prop.runs) + NL);
     info(QUERYHITS + hits + " " + (hits == 1 ? VALHIT : VALHITS) + NL);
     info(QUERYPRINTED + Performance.format(out.size()));
-    //info(QUERYMEM, Performance.getMem() + NL);
+    //info(QUERYMEM, Performance.getMem());
   }
   
   /**
@@ -128,7 +130,9 @@ abstract class AQuery extends Process {
     // show dot plan
     if(Prop.dotplan) {
       final CachedOutput out = new CachedOutput();
-      qu.plan(new DOTSerializer(out));
+      final DOTSerializer ser = new DOTSerializer(out);
+      qu.plan(ser);
+      ser.close();
       IO.get(PLANDOT).write(out.finish());
       new ProcessBuilder(Prop.dotty, PLANDOT).start().waitFor();
       //f.delete();
@@ -137,7 +141,7 @@ abstract class AQuery extends Process {
     if(Prop.xmlplan) {
       final CachedOutput out = new CachedOutput();
       qu.plan(new XMLSerializer(out, false, true));
-      info(QUERYPLAN + NL);
+      info(NL + QUERYPLAN + NL);
       info(out.toString() + NL);
     }
     // reset timer

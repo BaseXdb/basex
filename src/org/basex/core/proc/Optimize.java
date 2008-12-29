@@ -50,7 +50,7 @@ public final class Optimize extends ACreate {
     int h = 0;
     int l = 0;
 
-    size = data.size;
+    size = data.meta.size;
     for(pre = 0; pre < size; pre++) {
       final byte kind = (byte) data.kind(pre);
       final int par = data.parent(pre, kind);

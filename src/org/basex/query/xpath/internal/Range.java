@@ -115,7 +115,7 @@ public final class Range extends InternalExpr {
 
     // if index can be applied, assume data size / 10 as costs
     return key.kind != StatsKey.Kind.DBL && key.kind !=
-      StatsKey.Kind.INT ? Integer.MAX_VALUE : data.size / 10;
+      StatsKey.Kind.INT ? Integer.MAX_VALUE : data.meta.size / 10;
   }
   
   /**

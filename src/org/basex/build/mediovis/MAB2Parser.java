@@ -9,9 +9,9 @@ import org.basex.build.BuildException;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.core.Prop;
+import org.basex.io.DataAccess;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
-import org.basex.io.RandomAccess;
 import org.basex.util.Array;
 import org.basex.util.Map;
 import org.basex.util.TokenMap;
@@ -47,7 +47,7 @@ public final class MAB2Parser extends Parser {
   /** Builder listener. */
   private Builder builder;
   /** MAB2 input. */
-  private RandomAccess input;
+  private DataAccess input;
 
   /** Temporary build data. */
   private final byte[][] sig = new byte[500][];
@@ -122,13 +122,13 @@ public final class MAB2Parser extends Parser {
     index(genres, dir + "/genres.dat");
 
     // find maximum mediovis id
-    for(int i = 1; i < mvids.size; i++) {
+    for(int i = 1; i <= mvids.size(); i++) {
       final int id = Token.toInt(mvids.value(i));
       if(maxid < id) maxid = id;
     }
 
     // create input reference
-    input = new RandomAccess(io.path());
+    input = new DataAccess(io.path());
 
     // check beginning of input file
     if(input.read() != '#' || input.read() != '#' || input.read() != '#') {
@@ -172,13 +172,12 @@ public final class MAB2Parser extends Parser {
     }
 
     if(Prop.debug) {
-      BaseX.err("\nParse Offsets (%): %/%\n", ids.size, p.getTimer(),
+      BaseX.err("\nParse Offsets (%): %/%\n", ids.size(), p.getTimer(),
           Performance.getMem());
     }
 
     // create all titles
-    final int is = ids.size;
-    for(i = 1; i < is; i++) {
+    for(i = 1; i <= ids.size(); i++) {
       final MAB2Entry entry = ids.value(i);
       final long pos = entry.pos;
       // check if top entry exists...
@@ -200,7 +199,7 @@ public final class MAB2Parser extends Parser {
 
     // write the mediovis ids back to disk
     final PrintOutput out = new PrintOutput(dir + "/mvids.dat");
-    for(i = 1; i < mvids.size; i++) {
+    for(i = 1; i <= mvids.size(); i++) {
       out.print(mvids.key(i));
       out.print('\t');
       out.println(mvids.value(i));
@@ -212,9 +211,8 @@ public final class MAB2Parser extends Parser {
    * Returns the next id.
    * @param in input stream
    * @return id
-   * @throws IOException I/O exception
    */
-  private byte[] id(final RandomAccess in) throws IOException {
+  private byte[] id(final DataAccess in) {
     while(in.more()) {
       if(in.read() != '\n') continue;
       final int n = in.read();
@@ -230,9 +228,8 @@ public final class MAB2Parser extends Parser {
    * Returns the next parent id.
    * @param in input stream
    * @return id
-   * @throws IOException I/O exception
    */
-  private byte[] par(final RandomAccess in) throws IOException {
+  private byte[] par(final DataAccess in) {
     while(in.more()) {
       if(in.read() != '\n') continue;
       final int b1 = in.read();
@@ -247,9 +244,8 @@ public final class MAB2Parser extends Parser {
    * Returns the next text.
    * @param in input stream
    * @return next text
-   * @throws IOException I/O exception
    */
-  private byte[] text(final RandomAccess in) throws IOException {
+  private byte[] text(final DataAccess in) {
     in.read();
     int l = 0;
     int b;
@@ -265,11 +261,8 @@ public final class MAB2Parser extends Parser {
    * @param in input stream
    * @param delim delimiter
    * @return byte array
-   * @throws IOException I/O exception
    */
-  private byte[] find(final RandomAccess in, final byte delim)
-      throws IOException {
-
+  private byte[] find(final DataAccess in, final byte delim) {
     buffer.reset();
     while(in.more()) {
       final int c = in.read();
@@ -289,7 +282,7 @@ public final class MAB2Parser extends Parser {
    * @return last title
    * @throws IOException I/O exception
    */
-  private byte[] addEntry(final RandomAccess in, final long pos, final int sub,
+  private byte[] addEntry(final DataAccess in, final long pos, final int sub,
       final byte[] last) throws IOException {
 
     mvID = null;
@@ -591,7 +584,7 @@ public final class MAB2Parser extends Parser {
    */
   private void index(final TokenMap hash, final String fn) {
     try {
-      final RandomAccess in = new RandomAccess(fn);
+      final DataAccess in = new DataAccess(fn);
       while(true) {
         final byte[] key = find(in, (byte) '\t');
         final byte[] val = find(in, (byte) '\n');

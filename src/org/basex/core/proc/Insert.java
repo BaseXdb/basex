@@ -159,7 +159,7 @@ public final class Insert extends AUpdate {
       final int k = data.kind(nodes.nodes[i]);
       if(k == Data.TEXT) return error(COPYTAGS);
       if(k == Data.DOC && (kind == Data.TEXT || kind == Data.ELEM &&
-          data.size > 1)) return error(COPYROOT);
+          data.meta.size > 1)) return error(COPYROOT);
     }
 
     // perform updates

@@ -16,10 +16,7 @@ import org.basex.io.IO;
 import org.basex.query.FTOpt;
 import org.basex.query.FTPos;
 import org.basex.query.QueryContext;
-import org.basex.query.xquery.expr.Cast;
 import org.basex.query.xquery.expr.Expr;
-import org.basex.query.xquery.expr.List;
-import org.basex.query.xquery.expr.VarCall;
 import org.basex.query.xquery.item.DBNode;
 import org.basex.query.xquery.item.Dat;
 import org.basex.query.xquery.item.Dtm;
@@ -223,12 +220,7 @@ public final class XQContext extends QueryContext {
    * @throws XQException evaluation exception
    */
   public Expr comp(final Expr e) throws XQException {
-    final Expr ex = e.comp(this);
-    if(inf && ex != e && !(e instanceof VarCall) && !(e instanceof Cast) &&
-        !(e instanceof List) && !ex.getClass().getName().contains("Iter")) {
-      compInfo(OPTSIMPLE, e, ex);
-    }
-    return ex;
+    return e.comp(this);
   }
 
   /**
@@ -265,10 +257,11 @@ public final class XQContext extends QueryContext {
   /**
    * Adds a database instance or returns an existing one.
    * @param db database name or file path
+   * @param coll collection flag
    * @return database instance
    * @throws XQException evaluation exception
    */
-  public DBNode doc(final byte[] db) throws XQException {
+  public DBNode doc(final byte[] db, final boolean coll) throws XQException {
     if(contains(db, '<') || contains(db, '>')) Err.or(INVDOC, db);
 
     // check if the collections contain the document
@@ -288,13 +281,17 @@ public final class XQContext extends QueryContext {
 
     // get database instance
     Data data = null;
-    try { data = Check.check(dbname); } catch(final IOException ex) { }
-
-    if(data == null && file != null) {
-      dbname = file.merge(bxw).path();
-      try { data = Check.check(dbname); } catch(final IOException ex) { }
+    String msg = bxw.toString();
+    try {
+      data = Check.check(dbname);
+    } catch(final IOException ex) {
+      msg = ex.getMessage();
+      if(file != null) {
+        try { data = Check.check(file.merge(bxw).path());
+        } catch(final IOException e) { msg = e.getMessage(); }
+      }
     }
-    if(data == null) Err.or(NODOC, bxw);
+    if(data == null) Err.or(coll ? NOCOLL : NODOC, msg);
 
     // add document to array
     final int dl = docs.length;
@@ -324,7 +321,7 @@ public final class XQContext extends QueryContext {
     int c = -1;
     final int cl = collName.length;
     while(true) {
-      if(++c == cl) addDocs(doc(coll));
+      if(++c == cl) addDocs(doc(coll, true));
       else if(!eq(collName[c], coll)) continue;
       return new NodIter(collect[c].list, collect[c].size);
     }
@@ -337,7 +334,7 @@ public final class XQContext extends QueryContext {
   private void addDocs(final DBNode db) {
     final NodIter col = new NodIter();
     final Data data = db.data;
-    for(int p = 0; p < data.size;) {
+    for(int p = 0; p < data.meta.size;) {
       col.add(new DBNode(data, p));
       p += data.size(p, data.kind(p));
     }

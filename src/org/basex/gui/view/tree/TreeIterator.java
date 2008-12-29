@@ -117,7 +117,7 @@ final class TreeIterator {
     if(open == null) return false;
 
     pre += open[pre] ? fs ? data.attSize(pre, kind) : 1 : data.size(pre, kind);
-    while(pre != data.size) {
+    while(pre != data.meta.size) {
       kind = data.kind(pre);
       final int p = data.parent(pre, kind);
       // search current root

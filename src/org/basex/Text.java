@@ -250,12 +250,6 @@ public interface Text {
   /** Command Help. */
   String FIND2 = lang("ch_find2");
   /** Command Help. */
-  String XMARK0 = "[nr]";
-  /** Command Help. */
-  String XMARK1 = lang("ch_xmark1");
-  /** Command Help. */
-  String XMARK2 = lang("ch_xmark2");
-  /** Command Help. */
   String CS0 = lang("ch_cs0");
   /** Command Help. */
   String CS1 = lang("ch_cs1");
@@ -393,8 +387,6 @@ public interface Text {
 
   /** Database Closed. */
   String PINGINFO = lang("cmd_ping") + NL;
-  /** XMark Error. */
-  String XMARKWHICH = lang("cmd_xmark");
 
   // CREATE COMMAND ===========================================================
 

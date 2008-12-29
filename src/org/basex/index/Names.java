@@ -147,7 +147,7 @@ public final class Names extends Set {
   public byte[] info() {
     final byte[][] tl = new byte[size][];
     int len = 0;
-    for(int i = 0; i < size; i++) {
+    for(int i = 1; i < size; i++) {
       if(len < keys[i].length) len = keys[i].length;
       tl[i] = Token.token(counter[i]);
     }

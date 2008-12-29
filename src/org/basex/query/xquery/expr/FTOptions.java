@@ -69,9 +69,8 @@ public final class FTOptions extends FTExpr {
   
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.startElement(this);
+    ser.openElement(this);
     opt.plan(ser);
-    ser.finishElement();
     expr[0].plan(ser);
     ser.closeElement();
   }

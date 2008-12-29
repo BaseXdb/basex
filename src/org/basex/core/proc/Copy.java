@@ -69,7 +69,7 @@ public final class Copy extends AUpdate {
         // merge text nodes if necessary
         // [CG] Updates/MergeText: might not cover all cases yet
         
-        final int s = srcDocs[c].size - 1;
+        final int s = srcDocs[c].meta.size - 1;
         final int up = s != 0 ? -1 :
           Insert.checkText(data, pre, par, srcDocs[c].kind(s));
         if(up != -1) {

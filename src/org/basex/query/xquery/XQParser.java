@@ -243,7 +243,7 @@ public final class XQParser extends QueryParser {
     prolog2();
     if(declColl) {
       final byte[] coll = ctx.baseURI.resolve(ctx.collation).str();
-      if(!eq(URLCOLL, coll)) Err.or(NOCOLL, coll);
+      if(!eq(URLCOLL, coll)) Err.or(COLLWHICH, coll);
     }
     return expr();
   }
@@ -592,7 +592,7 @@ public final class XQParser extends QueryParser {
     } else {
       if(ext != null) Err.or(VARDEFINE, var);
       check(ASSIGN);
-      ctx.vars.addGlobal(var.expr(check(single(), VARMISSING), ctx));
+      ctx.vars.addGlobal(var.bind(check(single(), VARMISSING), ctx));
     }
   }
 
@@ -1201,7 +1201,7 @@ public final class XQParser extends QueryParser {
     if(slash) {
       do {
         if(consume('/')) list = add(list, descOrSelf());
-        Expr st = check(step(), PATHMISS);
+        final Expr st = check(step(), PATHMISS);
         if(!(st instanceof Context)) list = add(list, st);
       } while(consume('/'));
     }
@@ -1258,7 +1258,7 @@ public final class XQParser extends QueryParser {
           alter = NOLOCSTEP;
           ap = qp;
           ax = a;
-          test = test(false);
+          test = test(a == Axis.ATTR);
           break;
         }
       }
@@ -1307,26 +1307,27 @@ public final class XQParser extends QueryParser {
         // name test "pre:tag"
         if(contains(name, ':')) {
           skipWS();
-          return new NameTest(new QNm(name, ctx), NameTest.Kind.STD);
+          return new NameTest(new QNm(name, ctx), NameTest.Kind.STD, att);
         }
         // name test "tag"
         if(!consume(':')) {
           skipWS();
-          return att ? new NameTest(new QNm(name), NameTest.Kind.NAME) :
-            new NameTest(new QNm(name, Uri.uri(ctx.nsElem)), NameTest.Kind.STD);
+          return att ? new NameTest(new QNm(name), NameTest.Kind.NAME, att) :
+            new NameTest(new QNm(name, Uri.uri(ctx.nsElem)),
+                NameTest.Kind.STD, att);
         }
         // name test "pre:*"
         if(consume('*')) {
           final QNm nm = new QNm(EMPTY);
           nm.uri = Uri.uri(ctx.ns.uri(name));
-          return new NameTest(nm, NameTest.Kind.NS);
+          return new NameTest(nm, NameTest.Kind.NS, att);
         }
       }
     } else if(consume('*')) {
       // name test "*"
-      if(!consume(':')) return new NameTest();
+      if(!consume(':')) return new NameTest(att);
       // name test "*:tag"
-      return new NameTest(new QNm(qName(null)), NameTest.Kind.NAME);
+      return new NameTest(new QNm(qName(null)), NameTest.Kind.NAME, att);
     }
     qp = p;
     return null;
@@ -2356,7 +2357,7 @@ public final class XQParser extends QueryParser {
       qp = p;
       return null;
     }
-    Expr expr = single();
+    final Expr expr = single();
     Err.or(UPIMPL);
     return expr;
   }
@@ -2490,8 +2491,8 @@ public final class XQParser extends QueryParser {
     final boolean ok = consumeWS2(t);
     final int q = qp;
     final int c = curr();
-    final boolean ok2 = skipWS() || (!XMLToken.isFirstLetter(t.charAt(0)) ||
-        !XMLToken.isXMLLetterOrDigit(c) && c != '-');
+    final boolean ok2 = skipWS() || !XMLToken.isFirstLetter(t.charAt(0)) ||
+        !XMLToken.isXMLLetterOrDigit(c) && c != '-';
     qp = ok2 ? q : p;
     return ok && ok2;
   }

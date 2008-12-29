@@ -47,7 +47,7 @@ public final class Unary extends Single {
     if(it == null) return Iter.EMPTY;
     if(!it.u() && !it.n()) Err.num(info(), it);
     final double d = it.dbl();
-    return it.u() ? Dbl.iter(minus ? -d : d) : unary(it).iter();
+    return (it.u() ? Dbl.get(minus ? -d : d) : unary(it)).iter();
   }
 
   /**

@@ -203,18 +203,12 @@ public abstract class Step extends ExprInfo {
 
   @Override
   public final void plan(final Serializer ser) throws IOException {
-    ser.startElement(this);
-    ser.attribute(Token.token("test"), Token.token(test.toString()));
+    ser.openElement(this, Token.token("test"), Token.token(test.toString()));
     if(simple) ser.attribute(Token.token("simple"), Token.TRUE);
     else if(early) ser.attribute(Token.token("early"), Token.TRUE);
     else if(posPred != 0) ser.attribute(Token.token("pos"), Token.TRUE);
-    if(preds.size() != 0) {
-      ser.finishElement();
-      preds.plan(ser);
-      ser.closeElement();
-    } else {
-      ser.emptyElement();
-    }
+    preds.plan(ser);
+    ser.closeElement();
   }
 
   @Override

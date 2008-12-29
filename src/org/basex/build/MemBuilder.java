@@ -43,28 +43,24 @@ public final class MemBuilder extends Builder {
   @Override
   public void addDoc(final byte[] tok) {
     data.addDoc(tok, 0);
-    size = data.size;
   }
 
   @Override
   public void addElem(final int tok, final int s, final int dis,
       final int a, final boolean n) throws IOException {
     data.addElem(tok, s, dis, a, a, n);
-    size = data.size;
-    if(size < 0) throw new IOException(LIMITRANGE);
+    if(data.meta.size < 0) throw new IOException(LIMITRANGE);
   }
 
   @Override
   public void addAttr(final int n, final int s, final byte[] v,
       final int d) {
     data.addAtt(n, s, v, d);
-    size = data.size;
   }
 
   @Override
   public void addText(final byte[] tok, final int par, final byte kind) {
     data.addText(tok, par, kind);
-    size = data.size;
   }
 
   @Override

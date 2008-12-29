@@ -312,7 +312,7 @@ public final class MapView extends View implements Runnable {
   @Override
   public void paintComponent(final Graphics g) {
     final Data data = GUI.context.data();
-    if(data == null || data.size == 0) {
+    if(data == null || data.meta.size == 0) {
       super.paintComponent(g);
       return;
     }
@@ -611,7 +611,7 @@ public final class MapView extends View implements Runnable {
 
     final Context context = GUI.context;
     final Data data = context.data();
-    final int size = data.size;
+    final int size = data.meta.size;
     final Nodes current = context.current();
 
     if(key == KeyEvent.VK_R) {

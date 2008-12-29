@@ -35,8 +35,8 @@ public final class Cast extends Single {
   public Expr comp(final XQContext ctx) throws XQException {
     super.comp(ctx);
     if(!expr.i()) return this;
-    
-    ctx.compInfo(OPTCAST, expr);
+
+    ctx.compInfo(OPTPRE, this);
     return seq.cast(iter(expr), this, ctx);
   }
 
@@ -47,12 +47,12 @@ public final class Cast extends Single {
 
   @Override
   public String toString() {
-    return BaseX.info("%(%)", seq, expr);
+    return BaseX.info("% cast as %", expr, seq);
   }
 
   @Override
   public String info() {
-    return seq.type + " cast";
+    return seq.type + " " + CAST;
   }
 
   @Override

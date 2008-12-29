@@ -74,7 +74,7 @@ public final class IterStep extends Step {
             
             final Nod nod = ir.next();
             if(nod != null) {
-              if(test.e(nod)) {
+              if(test.eval(nod)) {
                 // evaluates predicates
                 ctx.item = nod;
                 final Item i = ctx.iter(pred[0]).ebv();

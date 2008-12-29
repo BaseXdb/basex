@@ -157,13 +157,10 @@ public final class XPathMV extends AQuery {
     final int size = res.size;
 
     // write root tag
-    ser.open(maxhits);
-    ser.startElement(MAB2.ROOT);
+    ser.openElement(MAB2.ROOT);
     ser.attribute(MAB2.HITS, Token.token(maxhits));
     ser.attribute(MAB2.MAX, Token.token(size));
     //ser.attribute(MAB2.APPROX, Token.token(approx));
-    if(maxhits == 0) ser.emptyElement();
-    else ser.finishElement();
 
     // loop through titles
     for(int i = 0; i < maxhits; i++) {
@@ -179,7 +176,7 @@ public final class XPathMV extends AQuery {
       // print medium
       final int par = medium.list[0];
       int pp = par + data.attSize(par, data.kind(par));
-      while(pp != data.size) {
+      while(pp != data.meta.size) {
         if(data.tagID(pp) == medid) break;
         pp = ser.node(data, pp);
       }

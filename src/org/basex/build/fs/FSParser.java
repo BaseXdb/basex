@@ -43,6 +43,8 @@ import org.basex.util.Map;
  * @author Alexander Holupirek
  */
 public final class FSParser extends Parser {
+  /** Offset of the size value, as stored in {@link #atts(File, boolean)}. */
+  public static final int SIZEOFFSET = 3;
   /** Meta data index. */
   private final Map<AbstractExtractor> meta = new Map<AbstractExtractor>();
   /** Reference to the database builder. */
@@ -57,10 +59,8 @@ public final class FSParser extends Parser {
   private int lvl;
   /** Directory size Stack. */
   private final long[] sizeStack = new long[IO.MAXHEIGHT];
-  /** Pre valStack. */
+  /** Pre value stack. */
   private final int[] preStack = new int[IO.MAXHEIGHT];
-  /** Offset of the size value, as stored in {@link #atts(File, boolean)}. */
-  public static final int SIZEOFFSET = 3;
 
   /**
    * Constructor.

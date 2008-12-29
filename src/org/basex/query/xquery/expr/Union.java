@@ -31,7 +31,7 @@ public final class Union extends Arr {
       final Iter iter = ctx.iter(e);
       Item it;
       while((it = iter.next()) != null) {
-        if(!(it.node())) Err.nodes(this);
+        if(!it.node()) Err.nodes(this);
         final Nod node = (Nod) it;
         int i = -1;
         while(++i < nb.size) if(CmpN.Comp.EQ.e(nb.list[i], node)) break;
@@ -43,6 +43,6 @@ public final class Union extends Arr {
   
   @Override
   public String toString() {
-    return toString(" | ");
+    return "(" + toString(" | ") + ")";
   }
 }

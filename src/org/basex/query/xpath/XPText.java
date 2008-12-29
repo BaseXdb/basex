@@ -99,13 +99,13 @@ public interface XPText {
   /** Optimization info. */
   String OPTFUNC = "Pre-evaluating %";
   /** Optimization info. */
+  String OPTTRUE = "Removing always true expression";
+  /** Optimization info. */
+  String OPTFALSE = "Removing always false expression";
+  /** Optimization info. */
   String OPTLOC = "Removing location path with no results";
   /** Optimization info. */
   String OPTNAME = "Removing unknown tag/attribute \"%\"";
-  /** Optimization info. */
-  String OPTAND1 = "Removing always false AND expression";
-  /** Optimization info. */
-  String OPTAND2 = "Removing always true operand in AND expression";
   /** Optimization info. */
   String OPTAND4 = "Replacing AND expression by index access";
   /** Optimization info. */
@@ -117,10 +117,6 @@ public interface XPText {
   /** Optimization info. */
   String OPTRANGE = "Replacing AND by RANGE expression";
   /** Optimization info. */
-  String OPTOR1 = "Removing always true OR expression";
-  /** Optimization info. */
-  String OPTOR2 = "Removing always false operand in OR expression";
-  /** Optimization info. */
   String OPTOR4 = "Replacing OR expression by index access";
   /** Optimization info. */
   String OPTOR5 = "Replacing OR by ONEOF expression";
@@ -128,8 +124,6 @@ public interface XPText {
   String OPTEQ1 = "Removing comparison for empty nodeset";
   /** Optimization info. */
   String OPTSELF = "Removing superfluous self axes";
-  /** Optimization info. */
-  String OPTTRUE = "Removing always true predicate";
   /** Optimization info. */
   String OPTPOSPRED1 = "Adding position predicate to evaluate only first node";
   /** Optimization info. */
@@ -150,7 +144,7 @@ public interface XPText {
   String OPTPOS = "Rewriting position predicate";
   /** Optimization info. */
   String OPTPREDS = "Rewriting predicate";
-  
+
   /** Evaluation info. */
   String EVALSKIP = "rest of output skipped...";
 }

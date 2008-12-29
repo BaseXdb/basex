@@ -8,7 +8,6 @@ import java.util.Date;
 import org.basex.BaseX;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdInfo;
-import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
@@ -34,20 +33,18 @@ public final class InfoDB extends AInfo {
 
   @Override
   protected void out(final PrintOutput out) throws IOException {
-    final Data data = context.data();
-    out.print(db(data.meta, data.size, true, true));
+    out.print(db(context.data().meta, true, true));
   }
   
   /**
    * Creates a database information string.
    * @param meta meta data
-   * @param size database size
    * @param header add header flag
    * @param index add index information
    * @return info string
    */
-  public static byte[] db(final MetaData meta, final int size,
-      final boolean header, final boolean index) {
+  public static byte[] db(final MetaData meta, final boolean header,
+      final boolean index) {
     
     final File dir = IO.dbpath(meta.dbname);
     long len = 0;
@@ -65,7 +62,7 @@ public final class InfoDB extends AInfo {
     }
     format(tb, INFODBSIZE, Performance.format(len), header, l);
     format(tb, INFOENCODING, meta.encoding, header, l);
-    format(tb, INFONODES, Integer.toString(size), header, l);
+    format(tb, INFONODES, Integer.toString(meta.size), header, l);
     format(tb, INFOHEIGHT, Integer.toString(meta.height), header, l);
     
     tb.add(NL + INFOCREATE + NL);

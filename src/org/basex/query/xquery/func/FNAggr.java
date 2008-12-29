@@ -32,7 +32,7 @@ final class FNAggr extends Fun {
       case COUNT:
         long c = iter.size();
         if(c == -1) do ++c; while(iter.next() != null);
-        return Itr.iter(c);
+        return Itr.get(c).iter();
       case MIN:
         if(arg.length == 2) checkColl(arg[1]);
         return minmax(iter, CmpV.Comp.GT, ctx);
@@ -58,7 +58,10 @@ final class FNAggr extends Fun {
       case AVG:
         return args[0].e() ? Seq.EMPTY : this;
       case COUNT:
-        return args[0].i() ? Itr.get(1) : this;
+        if(args[0].e()) return Itr.get(0);
+        if(args[0].i()) return Itr.get(1);
+        if(args[0] instanceof Seq) return Itr.get(((Seq) args[0]).size());
+        return this;
 
         /* a dirty sample to show which steps are necessary here...        
         if(!(args[0] instanceof Path)) return this;

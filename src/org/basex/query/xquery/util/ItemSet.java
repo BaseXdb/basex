@@ -6,8 +6,7 @@ import org.basex.query.xquery.item.Item;
 import org.basex.util.Array;
 
 /**
- * Scoring class, assembling all scoring calculations.
- * Current scoring is very simple and mainly used for testing.
+ * Set for quickly indexing items.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen

@@ -33,7 +33,7 @@ public final class Nodes extends Func {
   @Override
   public Nod eval(final XPContext ctx) throws QueryException {
     final Data data = ctx.item.data;
-    final int size = data.size;
+    final int size = data.meta.size;
     final NodeBuilder tmp = new NodeBuilder();
 
     final Item arg = evalArgs(ctx)[0];

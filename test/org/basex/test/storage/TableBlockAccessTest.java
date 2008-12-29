@@ -47,12 +47,12 @@ public final class TableBlockAccessTest {
 
   /**
    * Load the JUnitTest database.
-   * @throws Exception in case of probs
+   * @throws Exception in case of problems
    */
   @Before
   public void setUp() throws Exception {
     final XMLParser parser = new XMLParser(IO.get(TESTFILE));
-    size = new DiskBuilder().build(parser, DBNAME).size;
+    size = new DiskBuilder().build(parser, DBNAME).meta.size;
     tba = new TableDiskAccess(DBNAME, DATATBL);
     final int bytecount = size * (1 << IO.NODEPOWER);
     storage = new byte[bytecount];
@@ -79,10 +79,10 @@ public final class TableBlockAccessTest {
   }
 
   /**
-   * Compare old entrys with new entries.
+   * Compare old with new entries.
    * @param startNodeNumber first old entry to compare
    * @param currentNodeNumber first new entry to compare
-   * @param count number of entrys to compare
+   * @param count number of entries to compare
    */
   private void assertEntrysEqual(final int startNodeNumber,
       final int currentNodeNumber, final int count) {

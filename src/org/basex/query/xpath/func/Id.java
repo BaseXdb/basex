@@ -65,7 +65,7 @@ public final class Id extends Func {
           if(data.attNameID(i) == id) tmp.add(data.parent(i, data.kind(i)));
         }
       } else {
-        final int size = data.size;
+        final int size = data.meta.size;
         int pre = 0;
         while(pre != size) {
           final byte[] att = data.attValue(id, pre);

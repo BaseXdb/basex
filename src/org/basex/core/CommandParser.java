@@ -40,7 +40,6 @@ import org.basex.core.proc.Ping;
 import org.basex.core.proc.Prompt;
 import org.basex.core.proc.Set;
 import org.basex.core.proc.Update;
-import org.basex.core.proc.XMark;
 import org.basex.core.proc.XPath;
 import org.basex.core.proc.XPathMV;
 import org.basex.core.proc.XQEnv;
@@ -187,8 +186,6 @@ public final class CommandParser extends QueryParser {
         return new XQEnv(xquery(null));
       case FIND:
         return new Find(string(cmd));
-      case XMARK:
-        return new XMark(number(cmd));
       case CS:
         return new Cs(xpath(null));
       case COPY:

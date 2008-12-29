@@ -27,11 +27,11 @@ public final class FTMildNot extends FTExpr {
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
     final Item it = ctx.iter(expr[0]).next();
-    if(!it.bool()) return Dbl.iter(0);
+    if(!it.bool()) return Dbl.ZERO.iter();
     
     boolean f = false;
     for(int i = 1; i < expr.length; i++) f |= ctx.iter(expr[i]).next().bool();
-    return !f || ctx.ftpos.mildNot() ? it.iter() : Dbl.iter(0);
+    return !f || ctx.ftpos.mildNot() ? it.iter() : Dbl.ZERO.iter();
   }
 
   @Override

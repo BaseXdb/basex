@@ -35,10 +35,10 @@ public final class FTAnd extends FTExpr {
     double d = 0;
     for(final Expr e : expr) {
       final Item it = ctx.iter(e).next();
-      if(!it.bool()) return Dbl.iter(0);
+      if(!it.bool()) return Dbl.ZERO.iter();
       d = Scoring.and(d, it.dbl());
     }
-    return Dbl.iter(d);
+    return Dbl.get(d).iter();
   }
 
   @Override

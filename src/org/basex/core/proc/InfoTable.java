@@ -44,7 +44,7 @@ public final class InfoTable extends AInfo {
       for(final int n : nodes) table(out, data, n);
     } else {
       int ps = 0;
-      int pe = data.size;
+      int pe = data.meta.size;
 
       if(args[0] != null) {
         if(args[1] != null) {
@@ -71,10 +71,10 @@ public final class InfoTable extends AInfo {
       final int s, final int e) throws IOException {
     
     final int ps = Math.max(0, s);
-    final int pe = Math.min(data.size, e);
+    final int pe = Math.min(data.meta.size, e);
     tableHeader(out, data);
     for(int p = ps; p < pe; p++) table(out, data, p);
-    data.ns.print(out, numDigits(data.size) + 1);
+    data.ns.print(out, numDigits(data.meta.size) + 1);
   }
 
   /**
@@ -86,7 +86,7 @@ public final class InfoTable extends AInfo {
   private static void tableHeader(final PrintOutput out, final Data data)
       throws IOException {
     // write table header
-    final int len = Math.max(2, numDigits(data.size));
+    final int len = Math.max(2, numDigits(data.meta.size));
     format(out, token(TABLEPRE), len + 1);
     format(out, token(TABLEDIST), len + 2);
     format(out, token(TABLESIZE), len + 2);
@@ -106,7 +106,7 @@ public final class InfoTable extends AInfo {
   private static void table(final PrintOutput out, final Data data,
       final int p) throws IOException {
     
-    final int len = Math.max(2, numDigits(data.size));
+    final int len = Math.max(2, numDigits(data.meta.size));
     format(out, p, len + 1);
     final int k = data.kind(p);
     format(out, p - data.parent(p, k), len + 2);

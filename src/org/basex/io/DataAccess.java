@@ -50,6 +50,15 @@ public final class DataAccess {
    * @param f the file to be read
    * @throws IOException IO Exception
    */
+  public DataAccess(final String f) throws IOException {
+    this(new File(f));
+  }
+
+  /**
+   * Constructor, initializing the file reader.
+   * @param f the file to be read
+   * @throws IOException IO Exception
+   */
   public DataAccess(final File f) throws IOException {
     file = new RandomAccessFile(f, "rw");
     file.read(buffer[0]);
@@ -257,6 +266,14 @@ public final class DataAccess {
       off = 0;
     }
     return buffer[c][off++] & 0xFF;
+  }
+
+  /**
+   * Checks if more bytes can be read.
+   * @return result of check
+   */
+  public synchronized boolean more() {
+    return pos() < len;
   }
 
   /**

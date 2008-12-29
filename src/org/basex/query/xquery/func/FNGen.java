@@ -38,13 +38,13 @@ final class FNGen extends Fun {
         it = iter.next();
         if(it == null) return Iter.EMPTY;
         if(it.type == Type.DOC) return it.iter();
-        return ctx.doc(checkStr(it)).iter();
+        return ctx.doc(checkStr(it), false).iter();
       case DOCAVAIL:
         it = iter.next();
         if(it == null) return Bln.FALSE.iter();
         final byte[] file = checkStr(it);
         try {
-          ctx.doc(file);
+          ctx.doc(file, false);
           return Bln.TRUE.iter();
         } catch(final XQException e) {
           return Bln.FALSE.iter();
@@ -61,8 +61,7 @@ final class FNGen extends Fun {
     if(func == FunDef.DOC) {
       if(!args[0].i()) return this;
       final Item it = (Item) args[0];
-      if(it.type == Type.DOC) return it;
-      return ctx.doc(checkStr(it));
+      return it.type == Type.DOC ? it : ctx.doc(checkStr(it), false);
     }
     return this;
   }

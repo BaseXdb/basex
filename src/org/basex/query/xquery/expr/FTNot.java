@@ -24,7 +24,7 @@ public final class FTNot extends FTExpr {
 
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
-    return Dbl.iter(ctx.iter(expr[0]).next().bool() ? 0 : 1);
+    return Dbl.get(ctx.iter(expr[0]).next().bool() ? 0 : 1).iter();
   }
 
   @Override

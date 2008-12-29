@@ -39,8 +39,6 @@ public abstract class Builder extends Progress {
 
   /** Parser instance. */
   protected Parser parser;
-  /** Table size. */
-  public int size;
   /** Element counter. */
   public int elms;
 
@@ -162,10 +160,10 @@ public abstract class Builder extends Progress {
     // add document node and parse document
     parser.parse(this);
     
-    meta.lastid = size;
-    if(size == 0) {
+    meta.lastid = meta.size;
+    if(meta.size == 0) {
       addDoc(utf8(token("empty"), Prop.ENCODING));
-      setSize(0, size);
+      setSize(0, meta.size);
     }
     return finish();
   }
@@ -176,7 +174,7 @@ public abstract class Builder extends Progress {
    * @throws IOException in case of parsing or writing problems 
    */
   public final void startDoc(final byte[] doc) throws IOException {
-    parStack[level++] = size;
+    parStack[level++] = meta.size;
     skel.add(0, level, Data.DOC);
     addDoc(utf8(doc, Prop.ENCODING));
   }
@@ -187,7 +185,7 @@ public abstract class Builder extends Progress {
    */
   public final void endDoc() throws IOException {
     final int pre = parStack[--level];
-    setSize(pre, size - pre);
+    setSize(pre, meta.size - pre);
     meta.ndocs++;
     inDoc = false;
     if(Prop.debug) BaseX.err("\n");
@@ -241,7 +239,7 @@ public abstract class Builder extends Progress {
       error(CLOSINGTAG, parser.det(), t, tags.key(tagStack[level]));
 
     final int pre = parStack[level];
-    setSize(pre, size - pre);
+    setSize(pre, meta.size - pre);
     ns.close(pre);
   }
 
@@ -329,7 +327,7 @@ public abstract class Builder extends Progress {
    * @param name tag name
    * @param att attributes
    * @param open opening tag
-   * @return preVal pre value of the created node
+   * @return pre value of the created node
    * @throws IOException in case of parsing or writing problems 
    */
   private int addElem(final byte[] name, final Atts att,
@@ -349,15 +347,15 @@ public abstract class Builder extends Progress {
     skel.add(tid, level, Data.ELEM);
     // remember tag id and parent reference
     tagStack[level] = tid;
-    parStack[level] = size;
-    // storing pre value to return to caller
-    int preVal = size;
+    parStack[level] = meta.size;
+    // cache pre value
+    final int pre = meta.size;
 
     // store namespaces
-    final boolean n = ns.open(size);
+    final boolean n = ns.open(meta.size);
 
     // add node
-    final int dis = level != 0 ? size - parStack[level - 1] : 1;
+    final int dis = level != 0 ? meta.size - parStack[level - 1] : 1;
     final int al = att.size;
     
     // get namespaces reference
@@ -379,7 +377,7 @@ public abstract class Builder extends Progress {
       if(meta.height < ++level) meta.height = level;
       nsStack[level] = nsStack[level - 1];
     }
-    if(size != 1) inDoc = true;
+    if(meta.size != 1) inDoc = true;
 
     if(Prop.debug) {
       if(++elms % 500000 == 0) BaseX.err(" " + elms + "\n");
@@ -387,10 +385,9 @@ public abstract class Builder extends Progress {
       else if(elms % 10000 == 0) BaseX.err(".");
     }
 
-    // returning created pre value
-    return preVal;
+    return pre;
   }
-  
+
   /**
    * Throws an error message.
    * @param m message
@@ -415,6 +412,6 @@ public abstract class Builder extends Progress {
     // text node processing for statistics 
     if(type == Data.TEXT) tags.index(tagStack[level - 1], t);
     skel.add(0, level, type, t.length);
-    addText(t, level == 0 ? 1 : size - parStack[level - 1], type);
+    addText(t, level == 0 ? 1 : meta.size - parStack[level - 1], type);
   }
 }

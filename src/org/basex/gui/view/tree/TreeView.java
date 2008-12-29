@@ -98,8 +98,8 @@ public final class TreeView extends View {
    */
   private void refreshOpenedNodes() {
     final Data data = GUI.context.data();
-    opened = new boolean[data.size];
-    final int is = data.size;
+    opened = new boolean[data.meta.size];
+    final int is = data.meta.size;
     for(int pre = 0; pre < is; pre++) {
       opened[pre] = data.parent(pre, data.kind(pre)) <= 0;
     }
@@ -148,7 +148,8 @@ public final class TreeView extends View {
   public void refreshUpdate() {
     if(opened == null) return;
     final Data data = GUI.context.data();
-    if(opened.length < data.size) opened = Array.finish(opened, data.size);
+    if(opened.length < data.meta.size)
+      opened = Array.finish(opened, data.meta.size);
 
     startY = 0;
     scroll.pos(0);
@@ -473,7 +474,7 @@ public final class TreeView extends View {
       final boolean open = key == KeyEvent.VK_RIGHT;
       if(e.isShiftDown()) {
         opened[focusPre] = open;
-        final int s = data.size;
+        final int s = data.meta.size;
         for(int pre = focusPre + (fs ? data.attSize(focusPre, kind) : 1);
           pre != s && data.parent(pre, data.kind(pre)) >= focusPre;
           pre += fs ? data.attSize(pre, kind) : 1) {
@@ -496,17 +497,17 @@ public final class TreeView extends View {
     }
     
     if(key == KeyEvent.VK_DOWN) {
-      focus = Math.min(data.size - 1, focus + 1);
+      focus = Math.min(data.meta.size - 1, focus + 1);
     } else if(key == KeyEvent.VK_UP) {
       focus = Math.max(0, focus - 1);
     } else if(key == KeyEvent.VK_PAGE_DOWN) {
-      focus = Math.min(data.size - 1, focus + getHeight() / lineH);
+      focus = Math.min(data.meta.size - 1, focus + getHeight() / lineH);
     } else if(key == KeyEvent.VK_PAGE_UP) {
       focus = Math.max(0, focus - getHeight() / lineH);
     } else if(key == KeyEvent.VK_HOME) {
       focus = 0;
     } else if(key == KeyEvent.VK_END) {
-      focus = data.size - 1;
+      focus = data.meta.size - 1;
     }
     if(focus == focusedPos) return;
 

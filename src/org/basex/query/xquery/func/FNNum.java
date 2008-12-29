@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import org.basex.BaseX;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
+import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.item.Dbl;
 import org.basex.query.xquery.item.Dec;
 import org.basex.query.xquery.item.Flt;
@@ -26,6 +27,27 @@ final class FNNum extends Fun {
     final Iter iter = arg[0];
     final Item it = iter.atomic(this, true);
     if(it == null) return Iter.EMPTY;
+    return item(it, arg.length == 2 ? arg[1] : null).iter();
+  }
+  
+  @Override
+  public Expr c(final XQContext ctx) throws XQException {
+    if(args[0].e()) return args[0];
+    for(final Expr a : args) if(!a.i()) return this;
+
+    final Item it = (Item) args[0];
+    final Iter arg = args.length == 2 ? ((Item) args[1]).iter() : null;
+    return item(it, arg);
+  }
+
+  /**
+   * Evaluates the numeric function.
+   * @param it input item
+   * @param arg optional argument
+   * @return result
+   * @throws XQException query exception
+   */
+  private Item item(final Item it, final Iter arg) throws XQException {
     if(!it.u() && !it.n()) Err.num(info(), it);
     final double d = it.dbl();
     switch(func) {
@@ -33,7 +55,7 @@ final class FNNum extends Fun {
       case CEIL:   return num(it, d, Math.ceil(d));
       case FLOOR:  return num(it, d, Math.floor(d));
       case RND:    return num(it, d, Math.rint(d));
-      case RNDHLF: return rnd(it, d, arg.length == 2 ? arg[1] : null);
+      case RNDHLF: return rnd(it, d, arg);
       default: BaseX.notexpected(func); return null;
     }
   }
@@ -44,16 +66,16 @@ final class FNNum extends Fun {
    * @return absolute item
    * @throws XQException evaluation exception
    */
-  private Iter abs(final Item it) throws XQException {
+  private Item abs(final Item it) throws XQException {
     final double d = it.dbl();
     final boolean s = d > 0d || 1 / d > 0;
 
     switch(it.type) {
-      case DBL: return s ? it.iter() : Dbl.iter(Math.abs(it.dbl()));
-      case FLT: return s ? it.iter() : Flt.iter(Math.abs(it.flt()));
-      case DEC: return s ? it.iter() : Dec.iter(it.dec().abs());
-      case ITR: return s ? it.iter() : Itr.iter(Math.abs(it.itr()));
-      default:  return Itr.iter(Math.abs(it.itr()));
+      case DBL: return s ? it : Dbl.get(Math.abs(it.dbl()));
+      case FLT: return s ? it : Flt.get(Math.abs(it.flt()));
+      case DEC: return s ? it : Dec.get(it.dec().abs());
+      case ITR: return s ? it : Itr.get(Math.abs(it.itr()));
+      default:  return Itr.get(Math.abs(it.itr()));
     }
   }
 
@@ -64,15 +86,15 @@ final class FNNum extends Fun {
    * @param d calculated double value
    * @return numeric item
    */
-  private Iter num(final Item it, final double n, final double d) {
+  private Item num(final Item it, final double n, final double d) {
     final Item i = it.u() ? Dbl.get(n) : it;
-    if(n == d) return i.iter();
+    if(n == d) return i;
 
     switch(it.type) {
-      case DEC: return Dec.iter(d);
-      case DBL: return Dbl.iter(d);
-      case FLT: return Flt.iter((float) d);
-      default:  return Itr.iter((long) d);
+      case DEC: return Dec.get(d);
+      case DBL: return Dbl.get(d);
+      case FLT: return Flt.get((float) d);
+      default:  return Itr.get((long) d);
     }
   }
 
@@ -84,12 +106,12 @@ final class FNNum extends Fun {
    * @return rounded item
    * @throws XQException evaluation exception
    */
-  private Iter rnd(final Item it, final double n, final Iter pr)
+  private Item rnd(final Item it, final double n, final Iter pr)
       throws XQException {
 
     final int pp = pr == null ? 0 : (int) checkItr(pr);
     if(it.type == Type.DEC && pp >= 0) {
-      return Dec.iter(it.dec().setScale(pp, BigDecimal.ROUND_HALF_EVEN));
+      return Dec.get(it.dec().setScale(pp, BigDecimal.ROUND_HALF_EVEN));
     }
 
     final double p = p(pp);

@@ -152,8 +152,9 @@ public final class TokenBuilder {
    * If a digit is found after %, it is interpreted as insertion position.
    * @param str query information
    * @param ext text text extensions
+   * @return instance
    */
-  public void add(final Object str, final Object... ext) {
+  public TokenBuilder add(final Object str, final Object... ext) {
     final byte[] t = str == null ? NULL : str instanceof byte[] ?
         (byte[]) str : token(str.toString());
 
@@ -169,6 +170,7 @@ public final class TokenBuilder {
         add(o instanceof byte[] ? (byte[]) o : o == null ? NULL : o.toString());
       }
     }
+    return this;
   }
   
   /**

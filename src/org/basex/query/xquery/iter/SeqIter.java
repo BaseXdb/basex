@@ -54,20 +54,20 @@ public final class SeqIter extends ResetIter implements Result {
    * Constructor.
    * @param it item array
    * @param s size
-   * @return iterator
    */
-  public static Iter get(final Item[] it, final int s) {
-    return s == 0 ? Iter.EMPTY : new SeqIter(it, s);
+  private SeqIter(final Item[] it, final int s) {
+    item = it;
+    size = s;
   }
 
   /**
    * Constructor.
    * @param it item array
    * @param s size
+   * @return iterator
    */
-  private SeqIter(final Item[] it, final int s) {
-    item = it;
-    size = s;
+  public static Iter get(final Item[] it, final int s) {
+    return s == 0 ? Iter.EMPTY : new SeqIter(it, s);
   }
 
   /**
@@ -108,19 +108,14 @@ public final class SeqIter extends ResetIter implements Result {
         if(item[i].type != sb.item[i].type ||
           !item[i].eq(sb.item[i])) return false;
       }
+      return true;
     } catch(final XQException e) {
       return false;
     }
-    return true;
   }
 
   public void serialize(final Serializer ser) throws IOException {
-    ser.open(size);
-    for(int i = 0; i < size; i++) {
-      if(ser.finished()) break;
-      serialize(ser, i);
-    }
-    ser.close(size);
+    for(int c = 0; c < size && !ser.finished(); c++) serialize(ser, c);
   }
 
   public void serialize(final Serializer ser, final int n) throws IOException {

@@ -35,7 +35,7 @@ public final class AllOf extends InternalExpr {
   /**
    * Constructor.
    * @param p location path
-   * @param v second expression to compare with first
+   * @param v expressions to be compared
    * @param c comparator
    */
   public AllOf(final LocPath p, final Item[] v, final Comp c) {

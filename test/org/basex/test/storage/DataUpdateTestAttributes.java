@@ -19,11 +19,11 @@ public final class DataUpdateTestAttributes extends DataUpdateTest {
   @Test
   public void testUpdateAttribute() throws Exception {
     data.update(7, token("name"), token("junit"));
-    assertEquals(size, data.size);
+    assertEquals(size, data.meta.size);
     assertByteArraysEqual(token("name"), data.attName(7));
     assertByteArraysEqual(token("junit"), data.attValue(7));
     reload();
-    assertEquals(size, data.size);
+    assertEquals(size, data.meta.size);
     assertByteArraysEqual(token("name"), data.attName(7));
     assertByteArraysEqual(token("junit"), data.attValue(7));
   }
@@ -35,10 +35,10 @@ public final class DataUpdateTestAttributes extends DataUpdateTest {
   @Test
   public void testUpdateAttribute2() throws Exception {
     data.update(8, token("id"), token("junit"));
-    assertEquals(size, data.size);
+    assertEquals(size, data.meta.size);
     assertByteArraysEqual(token("junit"), data.attValue(8));
     reload();
-    assertEquals(size, data.size);
+    assertEquals(size, data.meta.size);
     assertByteArraysEqual(token("junit"), data.attValue(8));
   }
 
@@ -50,7 +50,7 @@ public final class DataUpdateTestAttributes extends DataUpdateTest {
   public void testAddAttribute() throws Exception {
     final long nextid = data.meta.lastid;
     data.insert(9, 6, token("foo"), token("junit"));
-    assertEquals(size + 1, data.size);
+    assertEquals(size + 1, data.meta.size);
     assertEquals(size + 1, data.size(0, Data.DOC));
     assertEquals((int) Data.ATTR, data.kind(9));
     assertEquals(6, data.parent(9, Data.ATTR));
@@ -61,7 +61,7 @@ public final class DataUpdateTestAttributes extends DataUpdateTest {
     assertByteArraysEqual(token("foo"), data.attName(9));
     assertByteArraysEqual(token("junit"), data.attValue(9));
     reload();
-    assertEquals(size + 1, data.size);
+    assertEquals(size + 1, data.meta.size);
     assertEquals(size + 1, data.size(0, Data.DOC));
     assertEquals((int) Data.ATTR, data.kind(9));
     assertEquals(6, data.parent(9, Data.ATTR));

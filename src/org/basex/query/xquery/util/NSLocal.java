@@ -16,7 +16,7 @@ import org.basex.util.Atts;
  */
 public final class NSLocal {
   /** Namespaces. */
-  public Atts atts = new Atts();
+  public Atts ns = new Atts();
   /** Number of default namespaces. */
   private int def;
 
@@ -30,7 +30,7 @@ public final class NSLocal {
     if(eq(ln, XML) || eq(ln, XMLNS)) Err.or(NSDEF, name);
     final byte[] uri = name.uri.str();
     if(eq(XMLURI, uri)) Err.or(NOXMLNS, name);
-    atts.add(ln, uri);
+    ns.add(ln, uri);
   }
 
   /**
@@ -39,8 +39,8 @@ public final class NSLocal {
    */
   public void delete(final QNm name) {
     final byte[] ln = name.ln();
-    for(int s = atts.size - 1; s >= 0; s--) {
-      if(eq(ln, atts.key[s])) atts.delete(s);
+    for(int s = ns.size - 1; s >= 0; s--) {
+      if(eq(ln, ns.key[s])) ns.delete(s);
     }
   }
   
@@ -74,8 +74,8 @@ public final class NSLocal {
    * @return uri or null value
    */
   public byte[] find(final byte[] pre) {
-    for(int s = atts.size - 1; s >= 0; s--) {
-      if(eq(atts.key[s], pre)) return atts.val[s];
+    for(int s = ns.size - 1; s >= 0; s--) {
+      if(eq(ns.key[s], pre)) return ns.val[s];
     }
     return null;
   }
@@ -86,8 +86,8 @@ public final class NSLocal {
    * @return prefix
    */
   public byte[] prefix(final byte[] uri) {
-    for(int s = atts.size - 1; s >= 0; s--) {
-      if(eq(atts.val[s], uri)) return atts.key[s];
+    for(int s = ns.size - 1; s >= 0; s--) {
+      if(eq(ns.val[s], uri)) return ns.key[s];
     }
     return NSGlobal.prefix(uri);
   }
@@ -97,8 +97,8 @@ public final class NSLocal {
    * @param elem default element namespace
    */
   public void finish(final byte[] elem) {
-    if(elem.length != 0) atts.add(EMPTY, elem);
-    def = atts.size;
+    if(elem.length != 0) ns.add(EMPTY, elem);
+    def = ns.size;
   }
   
   /**
@@ -107,7 +107,7 @@ public final class NSLocal {
    */
   public NSLocal copy() {
     final NSLocal local = new NSLocal();
-    for(int i = 0; i < def; i++) local.atts.add(atts.key[i], atts.val[i]);
+    for(int i = 0; i < def; i++) local.ns.add(ns.key[i], ns.val[i]);
     return local;
   }
 
@@ -116,7 +116,7 @@ public final class NSLocal {
    * @return namespaces
    */
   public int size() {
-    return atts.size;
+    return ns.size;
   }
 
   /**
@@ -124,6 +124,6 @@ public final class NSLocal {
    * @param s namespaces
    */
   public void size(final int s) {
-    atts.size = s;
+    ns.size = s;
   }
 }

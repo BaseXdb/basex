@@ -20,7 +20,7 @@ public final class DataUpdateTestTags extends DataUpdateTest {
   public void testInsertTagAsOnly1() throws Exception {
     final long nextid = data.meta.lastid;
     insertTag(3, 0, JUNIT, Data.ELEM);
-    assertEquals(size + 1, data.size);
+    assertEquals(size + 1, data.meta.size);
     assertEquals(3, data.parent(4, Data.ELEM));
     assertEquals((int) Data.ATTR, data.kind(9));
     assertEquals((int) Data.ELEM, data.kind(5));
@@ -29,7 +29,7 @@ public final class DataUpdateTestTags extends DataUpdateTest {
     assertEquals(nextid + 1, data.meta.lastid);
     assertByteArraysEqual(JUNIT, data.tag(4));
     reload();
-    assertEquals(size + 1, data.size);
+    assertEquals(size + 1, data.meta.size);
     assertEquals(3, data.parent(4, Data.ELEM));
     assertEquals((int) Data.ATTR, data.kind(9));
     assertEquals(1, data.parent(5, Data.ELEM));
@@ -46,7 +46,7 @@ public final class DataUpdateTestTags extends DataUpdateTest {
   public void testInsertTagAsOnly2() throws Exception {
     final long nextid = data.meta.lastid;
     insertTag(3, 1, JUNIT, Data.ELEM);
-    assertEquals(size + 1, data.size);
+    assertEquals(size + 1, data.meta.size);
     assertEquals(3, data.parent(4, Data.ELEM));
     assertEquals((int) Data.ATTR, data.kind(9));
     assertEquals((int) Data.ELEM, data.kind(5));
@@ -55,7 +55,7 @@ public final class DataUpdateTestTags extends DataUpdateTest {
     assertEquals(nextid + 1, data.meta.lastid);
     assertByteArraysEqual(JUNIT, data.tag(4));
     reload();
-    assertEquals(size + 1, data.size);
+    assertEquals(size + 1, data.meta.size);
     assertEquals(3, data.parent(4, Data.ELEM));
     assertEquals((int) Data.ATTR, data.kind(9));
     assertEquals(1, data.parent(5, Data.ELEM));
@@ -72,7 +72,7 @@ public final class DataUpdateTestTags extends DataUpdateTest {
   public void testInsertTagAsOnly3() throws Exception {
     final long nextid = data.meta.lastid;
     insertTag(3, 2, JUNIT, Data.ELEM);
-    assertEquals(size + 1, data.size);
+    assertEquals(size + 1, data.meta.size);
     assertEquals(3, data.parent(4, Data.ELEM));
     assertEquals((int) Data.ATTR, data.kind(9));
     assertEquals((int) Data.ELEM, data.kind(5));
@@ -81,7 +81,7 @@ public final class DataUpdateTestTags extends DataUpdateTest {
     assertEquals(nextid + 1, data.meta.lastid);
     assertByteArraysEqual(JUNIT, data.tag(4));
     reload();
-    assertEquals(size + 1, data.size);
+    assertEquals(size + 1, data.meta.size);
     assertEquals(3, data.parent(4, Data.ELEM));
     assertEquals((int) Data.ATTR, data.kind(9));
     assertEquals(1, data.parent(5, Data.ELEM));
@@ -98,7 +98,7 @@ public final class DataUpdateTestTags extends DataUpdateTest {
   public void testInsertTagAfterAttsAsFirst() throws Exception {
     final long nextid = data.meta.lastid;
     insertTag(6, 1, JUNIT, Data.ELEM);
-    assertEquals(size + 1, data.size);
+    assertEquals(size + 1, data.meta.size);
     assertEquals((int) Data.ELEM, data.kind(9));
     assertEquals(6, data.parent(9, Data.ELEM));
     assertByteArraysEqual(JUNIT, data.tag(9));
@@ -106,7 +106,7 @@ public final class DataUpdateTestTags extends DataUpdateTest {
     assertEquals(4, data.parent(12, Data.ELEM));
     assertEquals(nextid + 1, data.meta.lastid);
     reload();
-    assertEquals(size + 1, data.size);
+    assertEquals(size + 1, data.meta.size);
     assertEquals((int) Data.ELEM, data.kind(9));
     assertEquals(6, data.parent(9, Data.ELEM));
     assertByteArraysEqual(JUNIT, data.tag(9));
@@ -123,7 +123,7 @@ public final class DataUpdateTestTags extends DataUpdateTest {
   public void testInsertTagAfterAttsAsSecond() throws Exception {
     final long nextid = data.meta.lastid;
     insertTag(6, 2, JUNIT, Data.ELEM);
-    assertEquals(size + 1, data.size);
+    assertEquals(size + 1, data.meta.size);
     assertEquals((int) Data.ELEM, data.kind(9));
     assertByteArraysEqual(JUNIT, data.tag(11));
     assertEquals(6, data.parent(11, Data.ELEM));
@@ -132,7 +132,7 @@ public final class DataUpdateTestTags extends DataUpdateTest {
     assertEquals(nextid + 1, data.meta.lastid);
 
     reload();
-    assertEquals(size + 1, data.size);
+    assertEquals(size + 1, data.meta.size);
     assertEquals((int) Data.ELEM, data.kind(9));
     assertByteArraysEqual(JUNIT, data.tag(11));
     assertEquals(6, data.parent(11, Data.ELEM));
@@ -149,7 +149,7 @@ public final class DataUpdateTestTags extends DataUpdateTest {
   public void testInsertTagAfterAttsAsLast() throws Exception {
     final long nextid = data.meta.lastid;
     insertTag(6, 0, JUNIT, Data.ELEM);
-    assertEquals(size + 1, data.size);
+    assertEquals(size + 1, data.meta.size);
     assertEquals((int) Data.ELEM, data.kind(9));
     assertByteArraysEqual(JUNIT, data.tag(11));
     assertEquals(6, data.parent(11, Data.ELEM));
@@ -157,7 +157,7 @@ public final class DataUpdateTestTags extends DataUpdateTest {
     assertEquals(4, data.parent(12, Data.ELEM));
     assertEquals(nextid + 1, data.meta.lastid);
     reload();
-    assertEquals(size + 1, data.size);
+    assertEquals(size + 1, data.meta.size);
     assertEquals((int) Data.ELEM, data.kind(9));
     assertByteArraysEqual(JUNIT, data.tag(11));
     assertEquals(6, data.parent(11, Data.ELEM));

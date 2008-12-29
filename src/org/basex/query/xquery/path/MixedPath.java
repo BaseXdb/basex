@@ -37,7 +37,10 @@ public class MixedPath extends Path {
 
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
-    for(int i = 0; i != step.length; i++) step[i] = ctx.comp(step[i]);
+    for(int i = 0; i != step.length; i++) {
+      step[i] = ctx.comp(step[i]);
+      if(step[i].e()) return step[i];
+    }
     return super.comp(ctx);
   }
 

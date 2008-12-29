@@ -30,7 +30,7 @@ public final class InterSect extends Arr {
     Iter iter = ctx.iter(expr[0]);
     Item it;
     while((it = iter.next()) != null) {
-      if(!(it.node())) Err.nodes(this);
+      if(!it.node()) Err.nodes(this);
       seq.add((Nod) it);
     }
 
@@ -38,7 +38,7 @@ public final class InterSect extends Arr {
       final NodeBuilder res = new NodeBuilder(false);
       iter = ctx.iter(expr[e]);
       while((it = iter.next()) != null) {
-        if(!(it.node())) Err.nodes(this);
+        if(!it.node()) Err.nodes(this);
         final Nod node = (Nod) it;
         for(int s = 0; s < seq.size; s++) {
           if(CmpN.Comp.EQ.e(seq.list[s], node)) {
@@ -54,6 +54,6 @@ public final class InterSect extends Arr {
 
   @Override
   public String toString() {
-    return toString(" & ");
+    return "(" + toString(" & ") + ")";
   }
 }

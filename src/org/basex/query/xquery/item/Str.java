@@ -2,7 +2,6 @@ package org.basex.query.xquery.item;
 
 import java.math.BigDecimal;
 import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.iter.Iter;
 import org.basex.util.Token;
 
 /**
@@ -63,21 +62,6 @@ public class Str extends Item {
    */
   public static Str get(final Object v) {
     return get(Token.token(v.toString()));
-  }
-
-  /**
-   * Returns an iterator.
-   * @param v value
-   * @return item
-   */
-  public static Iter iter(final byte[] v) {
-    return new Iter() {
-      boolean more;
-      @Override
-      public Item next() { return (more ^= true) ? get(v) : null; }
-      @Override
-      public String toString() { return Token.string(v); }
-    };
   }
 
   @Override

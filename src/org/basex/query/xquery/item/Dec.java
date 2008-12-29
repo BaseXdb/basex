@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Err;
 
 /**
@@ -58,27 +57,12 @@ public final class Dec extends Num {
   }
 
   /**
-   * Returns an iterator.
-   * @param v double value
-   * @return iterator
+   * Constructor.
+   * @param d big decimal value
+   * @return value
    */
-  public static Iter iter(final BigDecimal v) {
-    return new Iter() {
-      boolean more;
-      @Override
-      public Item next() { return (more ^= true) ? get(v) : null; }
-      @Override
-      public String toString() { return string(get(v).str()); }
-    };
-  }
-
-  /**
-   * Returns an iterator.
-   * @param d double value
-   * @return iterator
-   */
-  public static Iter iter(final double d) {
-    return iter(BigDecimal.valueOf(d));
+  public static Dec get(final double d) {
+    return get(BigDecimal.valueOf(d));
   }
 
   @Override

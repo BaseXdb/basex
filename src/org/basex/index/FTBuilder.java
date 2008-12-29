@@ -48,7 +48,7 @@ public final class FTBuilder extends Progress implements IndexBuilder {
         hash = new FTHash();
     }
 
-    total = data.size;
+    total = data.meta.size;
     for(id = 0; id < total; id++) {
       checkStop();
       if(data.kind(id) == Data.TEXT) index(data.text(id));

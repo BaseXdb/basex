@@ -7,7 +7,6 @@ import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
 import org.basex.query.xquery.util.Err;
@@ -53,15 +52,15 @@ public final class FNSimple extends Fun {
   @Override
   public Expr c(final XQContext ctx) throws XQException {
     final Item it = args.length != 0 && args[0].i() ? (Item) args[0] : null;
-    final boolean em = args.length != 0 && args[0] == Seq.EMPTY;
+    final boolean e = args.length != 0 && args[0].e();
     
     switch(func) {
       case TRUE:    return Bln.TRUE;
       case FALSE:   return Bln.FALSE;
-      case EMPTY:   return it != null ? Bln.FALSE : em ? Bln.TRUE : this;
-      case EXISTS:  return it != null ? Bln.TRUE : em ? Bln.FALSE : this;
+      case EMPTY:   return it != null ? Bln.FALSE : e ? Bln.TRUE : this;
+      case EXISTS:  return it != null ? Bln.TRUE : e ? Bln.FALSE : this;
       case BOOL:
-        return it != null ? Bln.get(it.bool()) : em ? Bln.FALSE : this;
+        return it != null ? Bln.get(it.bool()) : e ? Bln.FALSE : this;
       case NOT:
         if(it != null) return Bln.get(!it.bool());
         if(args[0] instanceof Fun) {
@@ -74,7 +73,7 @@ public final class FNSimple extends Fun {
           }
         }
         return this;
-      case ZEROONE: return em || it != null ? args[0] : this;
+      case ZEROONE: return e || it != null ? args[0] : this;
       case EXONE:   return it != null ? args[0] : this;
       case ONEMORE: return it != null ? args[0] : this;
       case UNORDER: return args[0];

@@ -14,9 +14,7 @@ import org.basex.query.xquery.iter.Iter;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Try extends Expr {
-  /** Expression. */
-  Expr exp;
+public final class Try extends Single {
   /** Catches. */
   Catch[] ctch;
 
@@ -26,15 +24,14 @@ public final class Try extends Expr {
    * @param c catch expressions
    */
   public Try(final Expr t, final Catch[] c) {
-    exp = t;
+    super(t);
     ctch = c;
   }
 
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
-    exp = ctx.comp(exp);
     for(int c = 0; c < ctch.length; c++) ctch[c] = (Catch) ctch[c].comp(ctx);
-    return this;
+    return super.comp(ctx);
   }
 
   @Override
@@ -45,7 +42,7 @@ public final class Try extends Expr {
       @Override
       public Item next() throws XQException {
         try {
-          if(it == null) it = ctx.iter(exp);
+          if(it == null) it = ctx.iter(expr);
           return it.next();
         } catch(final XQException ex) {
           for(int c = 0; c < ctch.length; c++) {
@@ -61,14 +58,14 @@ public final class Try extends Expr {
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
-    exp.plan(ser);
+    expr.plan(ser);
     for(final Catch c : ctch) c.plan(ser);
     ser.closeElement();
   }
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("try { " + exp + "}");
+    final StringBuilder sb = new StringBuilder("try { " + expr + "}");
     for(final Catch c : ctch) sb.append(" " + c);
     return sb.toString();
   }

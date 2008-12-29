@@ -74,7 +74,7 @@ final class FNPat extends Fun {
     try {
       final String res = p.matcher(Token.string(val)).replaceAll(
           Token.string(rep));
-      return Str.iter(Token.token(res));
+      return Str.get(Token.token(res)).iter();
     } catch(final Exception ex) {
       final String m = ex.getMessage();
       if(m.contains("No group")) Err.or(REGROUP);

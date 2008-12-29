@@ -4,7 +4,6 @@ import static org.basex.util.Token.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.iter.Iter;
 import org.basex.util.Token;
 
 /**
@@ -48,21 +47,6 @@ public class Itr extends Num {
    */
   public static Itr get(final long v) {
     return v >= 0 && v <= 9 ? NUM[(int) v] : new Itr(v);
-  }
-
-  /**
-   * Returns an iterator.
-   * @param v value
-   * @return item
-   */
-  public static Iter iter(final long v) {
-    return new Iter() {
-      boolean more;
-      @Override
-      public Item next() { return (more ^= true) ? get(v) : null; }
-      @Override
-      public String toString() { return Token.string(Token.token(v)); }
-    };
   }
 
   @Override

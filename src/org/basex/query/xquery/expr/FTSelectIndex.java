@@ -34,7 +34,7 @@ public final class FTSelectIndex extends FTExpr {
    * @param u fulltext selections
    * @param win window
    * @param wei weight
-   * @param d distanz
+   * @param d distance
    */
   public FTSelectIndex(final FTExpr e, final FTPos u, final Expr win, 
       final Expr wei, final Expr[] d) {
@@ -115,9 +115,8 @@ public final class FTSelectIndex extends FTExpr {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.startElement(this);
+    ser.openElement(this);
     pos.plan(ser);
-    ser.finishElement();
     expr[0].plan(ser);
     ser.closeElement();
   }

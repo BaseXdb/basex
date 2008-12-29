@@ -42,7 +42,7 @@ public final class IndexAccess extends InternalExpr {
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this, TYPE, Token.token(ind.type.toString()));
-    ser.item(ind.get());
+    ser.text(ind.get());
     ser.closeElement();
   }
 

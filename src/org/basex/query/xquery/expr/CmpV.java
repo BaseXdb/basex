@@ -1,5 +1,6 @@
 package org.basex.query.xquery.expr;
 
+import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
@@ -116,14 +117,12 @@ public final class CmpV extends Arr {
 
     final Expr e1 = expr[0];
     final Expr e2 = expr[1];
-    final boolean e = e1.e() || e2.e();
-    if(e) return Seq.EMPTY;
-    if(!e1.i() || !e2.i()) return this;
-
-    final Item i1 = (Item) expr[0];
-    final Item i2 = (Item) expr[1];
-    if(!valCheck(i1, i2)) Err.cmp(i1, i2);
-    return Bln.get(cmp.e(i1, i2));
+    
+    Expr e = this;
+    if(e1.i() && e2.i()) e = ev((Item) expr[0], (Item) expr[1]);
+    else if(e1.e() || e2.e()) e = Seq.EMPTY;
+    if(e != this) ctx.compInfo(OPTSIMPLE, this, e);
+    return e;
   }
 
   @Override
@@ -132,9 +131,19 @@ public final class CmpV extends Arr {
     if(a == null) return Iter.EMPTY;
     final Item b = ctx.atomic(expr[1], this, true);
     if(b == null) return Iter.EMPTY;
+    return ev(a, b).iter();
+  }
 
+  /**
+   * Performs the comparison.
+   * @param a first item
+   * @param b second item
+   * @return result of check
+   * @throws XQException evaluation exception
+   */
+  private Bln ev(final Item a, final Item b) throws XQException {
     if(!valCheck(a, b)) Err.cmp(a, b);
-    return Bln.get(cmp.e(a, b)).iter();
+    return Bln.get(cmp.e(a, b));
   }
 
   /**

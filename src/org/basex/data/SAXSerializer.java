@@ -31,9 +31,11 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   /**
    * Constructor.
    * @param res result
+   * @throws IOException exception
    */
-  public SAXSerializer(final Result res) {
+  public SAXSerializer(final Result res) throws IOException {
     result = res;
+    openElement(RESULTS);
   }
 
   /* Implements XMLReader method. */
@@ -127,15 +129,8 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   private AttributesImpl atts;
 
   @Override
-  public void open(final int s) throws IOException {
-    startElement(RESULTS);
-    if(s == 0) emptyElement();
-    else finishElement();
-  }
-
-  @Override
-  public void close(final int s) throws IOException {
-    if(s != 0) closeElement();
+  public void close() throws IOException {
+    closeElement();
   }
 
   @Override
@@ -191,6 +186,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
 
   @Override
   public void text(final byte[] b) throws IOException {
+    finishElement();
     final char[] c = Token.string(b).toCharArray();
     try {
       content.characters(c, 0, c.length);
@@ -201,6 +197,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
 
   @Override
   public void comment(final byte[] t) throws IOException {
+    finishElement();
     try {
       final char[] c = Token.string(t).toCharArray();
       if(lexical != null) lexical.comment(c, 0, t.length);
@@ -211,6 +208,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
 
   @Override
   public void pi(final byte[] n, final byte[] v) throws IOException {
+    finishElement();
     try {
       content.processingInstruction(Token.string(n), Token.string(v));
     } catch(final SAXException ex) {
@@ -220,6 +218,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
 
   @Override
   public void item(final byte[] b) throws IOException {
+    finishElement();
     throw new IOException("Can't serialize atomic items.");
   }
 }

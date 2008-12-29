@@ -142,15 +142,17 @@ public final class DialogOpen extends Dialog {
       BaseXLayout.enableOK(buttons, BUTTONDROP, ok);
 
       if(ok) {
+        DataInput in = null;
         try {
-          final DataInput in = new DataInput(db, DATAINFO);
+          in = new DataInput(db, DATAINFO);
           final MetaData meta = new MetaData(db);
-          final int size = meta.read(in);
-          in.close();
-          detail.setText(InfoDB.db(meta, size, false, true));
+          meta.read(in);
+          detail.setText(InfoDB.db(meta, false, true));
         } catch(final IOException ex) {
           detail.setText(Token.token(ex.getMessage()));
           ok = false;
+        } finally {
+          try { if(in != null) in.close(); } catch(final IOException e) { }
         }
       }
       BaseXLayout.enableOK(buttons, BUTTONOPEN, ok);

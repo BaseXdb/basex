@@ -282,7 +282,6 @@ cmd_no=Expecting command.
 cmd_unknown=Unknown command '%'
 cmd_similar=did you mean '%'?
 cmd_ping=Connection successful.
-cmd_xmark=XMark queries are limited from 1-20.
 
 # Help Commands
 help_short=try 'help'
@@ -307,7 +306,7 @@ pc_tbl=Table created in %.
 #pc_att=Attributes indexed in %.
 #pc_txt=Texts indexed in %.
 #pc_ftx=Fulltext indexed in %.
-pc_filenf=Sorry, file "%" was not found.
+pc_filenf=File or directory "%" not found.
 pc_pathnf=File or directory not found.
 pc_dbnf=Please enter a database name.
 pc_err="%" could not be parsed.
@@ -488,8 +487,7 @@ ch_xquery2=Evaluates an XQuery and prints the result.
 ch_find0=[query]
 ch_find1=Evaluate a keyword query.
 ch_find2=The following modifiers can be used:\n =  : looks for exact text nodes"\n @= : looks for exact attributes\n @  : looks for attributes
-ch_xmark1=Launch XMark query
-ch_xmark2=Launches the internal implementation of XMark query [nr] (1-20).
+
 # Help Texts
 ch_cs0=[query]
 ch_cs1=Evaluate XPath query and set result as new context set.

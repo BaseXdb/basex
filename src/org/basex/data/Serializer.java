@@ -2,7 +2,6 @@ package org.basex.data;
 
 import static org.basex.util.Token.*;
 import java.io.IOException;
-
 import org.basex.io.IO;
 import org.basex.query.ExprInfo;
 import org.basex.util.Atts;
@@ -21,22 +20,16 @@ public abstract class Serializer {
   public TokenList tags = new TokenList();
   /** Current default namespace. */
   public byte[] dn = EMPTY;
+  /** Flag for opened tag. */
+  protected boolean inTag;
 
   // === abstract methods =====================================================
 
   /**
-   * Initializes the serializer.
-   * @param s number of results
-   * @throws IOException exception
-   */
-  public abstract void open(final int s) throws IOException;
-
-  /**
    * Finishes the serializer.
-   * @param s number of results
    * @throws IOException exception
    */
-  public abstract void close(final int s) throws IOException;
+  public abstract void close() throws IOException;
 
   /**
    * Starts a result.
@@ -117,25 +110,6 @@ public abstract class Serializer {
   protected abstract void close(final byte[] t) throws IOException;
 
   // === implemented methods ==================================================
-  
-  /**
-   * Starts a new element node.
-   * @param expr expression info
-   * @throws IOException exception
-   */
-  public final void startElement(final ExprInfo expr) throws IOException {
-    startElement(name(expr));
-  }
-
-  /**
-   * Starts a new element node.
-   * @param t tag
-   * @throws IOException exception
-   */
-  public final void startElement(final byte[] t) throws IOException {
-    tags.add(t);
-    start(t);
-  }
 
   /**
    * Opens an element.
@@ -145,9 +119,7 @@ public abstract class Serializer {
    */
   public final void openElement(final ExprInfo expr, final byte[]... a)
       throws IOException {
-    startElement(name(expr));
-    for(int i = 0; i < a.length; i += 2) attribute(a[i], a[i + 1]);
-    finishElement();
+    openElement(name(expr), a);
   }
 
   /**
@@ -158,9 +130,11 @@ public abstract class Serializer {
    */
   public final void openElement(final byte[] t, final byte[]... a)
       throws IOException {
-    startElement(t);
-    for(int i = 0; i < a.length; i += 2) attribute(a[i], a[i + 1]);
     finishElement();
+    tags.add(t);
+    inTag = true;
+    start(t);
+    for(int i = 0; i < a.length; i += 2) attribute(a[i], a[i + 1]);
   }
 
   /**
@@ -183,37 +157,9 @@ public abstract class Serializer {
    */
   public final void emptyElement(final ExprInfo expr, final byte[]... a)
       throws IOException {
-    emptyElement(name(expr), a);
-  }
-
-  /**
-   * Opens and closes an empty element.
-   * @param t tag
-   * @param a attributes
-   * @throws IOException exception
-   */
-  public final void emptyElement(final byte[] t, final byte[]... a)
-      throws IOException {
-    startElement(t);
+    openElement(name(expr));
     for(int i = 0; i < a.length; i += 2) attribute(a[i], a[i + 1]);
-    emptyElement();
-  }
-
-  /**
-   * Finishes a new element node.
-   * @throws IOException exception
-   */
-  public final void emptyElement() throws IOException {
-    tags.size--;
-    empty();
-  }
-
-  /**
-   * Finishes a new element node.
-   * @throws IOException exception
-   */
-  public final void finishElement() throws IOException {
-    finish();
+    closeElement();
   }
 
   /**
@@ -221,23 +167,13 @@ public abstract class Serializer {
    * @throws IOException exception
    */
   public final void closeElement() throws IOException {
-    close(tags.list[--tags.size]);
-  }
-
-  /**
-   * Serializes a processing instruction.
-   * @param c content
-   * @throws IOException exception
-   */
-  public final void pi(final byte[] c) throws IOException {
-    byte[] n = c;
-    byte[] v = EMPTY;
-    final int i = indexOf(n, ' ');
-    if(i != -1) {
-      v = substring(n, i + 1);
-      n = substring(n, 0, i);
+    if(inTag) {
+      inTag = false;
+      tags.size--;
+      empty();
+    } else {
+      close(tags.list[--tags.size]);
     }
-    pi(n, v);
   }
 
   /**
@@ -252,9 +188,21 @@ public abstract class Serializer {
    * Returns the name of the specified expression.
    * @param expr expression
    * @return name
+   * @throws IOException exception
    */
-  protected byte[] name(final ExprInfo expr) {
+  @SuppressWarnings("unused")
+  protected byte[] name(final ExprInfo expr) throws IOException {
     return expr.name();
+  }
+
+  /**
+   * Finishes a new element node.
+   * @throws IOException exception
+   */
+  protected final void finishElement() throws IOException {
+    if(!inTag) return;
+    inTag = false;
+    finish();
   }
 
   /**
@@ -276,9 +224,7 @@ public abstract class Serializer {
     final int s = pre + data.size(pre, data.kind(p));
 
     // loop through all table entries
-    while(p < s) {
-      if(finished()) return s;
-
+    while(p < s && !finished()) {
       int k = data.kind(p);
       final int pa = data.parent(p, k);
 
@@ -297,15 +243,21 @@ public abstract class Serializer {
       } else if(k == Data.ATTR) {
         attribute(data.attName(p), data.attValue(p++));
       } else if(k == Data.PI) {
-        pi(data.text(p++));
+        byte[] n = data.text(p++);
+        byte[] v = EMPTY;
+        final int i = indexOf(n, ' ');
+        if(i != -1) {
+          v = substring(n, i + 1);
+          n = substring(n, 0, i);
+        }
+        pi(n, v);
       } else {
         // add element node
         final byte[] name = data.tag(p);
-        startElement(name);
+        openElement(name);
 
         nsp.reset();
 
-        final int ps = p + data.size(p, k);
         final int as = p + data.attSize(p, k);
         int pp = p;
 
@@ -332,19 +284,12 @@ public abstract class Serializer {
 
         // serialize attributes
         while(++p != as) attribute(data.attName(p), data.attValue(p));
-
-        // check if this is an empty tag
-        if(as == ps) {
-          emptyElement();
-        } else {
-          finishElement();
-          parent[l++] = pa;
-        }
+        parent[l++] = pa;
       }
     }
     // process nodes that remain in the stack
     while(--l >= 0) closeElement();
-    return p;
+    return s;
   }
 
   /**

@@ -170,7 +170,7 @@ public class BaseXClient {
     try {
       for(final Process p : new CommandParser(in).parse()) {
         if(p instanceof Exit) return false;
-        boolean qu = p instanceof XPath || p instanceof XQuery;
+        final boolean qu = p instanceof XPath || p instanceof XQuery;
         if(!process(p, info || qu && Prop.xmlplan)) break;
       }
     } catch(final QueryException ex) {
@@ -219,11 +219,9 @@ public class BaseXClient {
         if(!ok || inf.length() != 0) {
           if(!ok) {
             error(null, inf);
-          } else {
-            if(v || console) {
-              BaseX.outln(inf);
-              if(console) BaseX.outln();
-            }
+          } else if(v || console) {
+            BaseX.outln(inf);
+            //if(console) BaseX.outln();
           }
         }
 

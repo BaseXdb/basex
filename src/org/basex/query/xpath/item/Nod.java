@@ -85,12 +85,7 @@ public final class Nod extends Item {
   
   @Override
   public void serialize(final Serializer ser) throws IOException {
-    ser.open(size);
-    for(int c = 0; c < size; c++) {
-      if(ser.finished()) break;
-      serialize(ser, c);
-    }
-    ser.close(size);
+    for(int c = 0; c < size && !ser.finished(); c++) serialize(ser, c);
   }
 
   @Override

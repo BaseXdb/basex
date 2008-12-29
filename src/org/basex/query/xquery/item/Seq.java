@@ -22,10 +22,6 @@ public class Seq extends Item {
   public static final Seq EMPTY = new Seq() {
     @Override
     public Iter iter() { return Iter.EMPTY; }
-    @Override
-    public void plan(final Serializer ser) throws IOException {
-      ser.emptyElement(Token.token("sequence"), SIZE, Token.ZERO);
-    }
   };
   /** Item array. */
   public Item[] val;

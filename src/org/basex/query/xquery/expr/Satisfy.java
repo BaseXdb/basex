@@ -1,5 +1,7 @@
 package org.basex.query.xquery.expr;
 
+import static org.basex.query.xquery.XQText.*;
+import static org.basex.query.xquery.XQTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQException;
@@ -36,7 +38,10 @@ public final class Satisfy extends Single {
   public Expr comp(final XQContext ctx) throws XQException {
     for(int f = 0; f != fl.length; f++) {
       final Expr e = ctx.comp(fl[f]);
-      if(e.e()) return Bln.get(every);
+      if(e.e()) {
+        ctx.compInfo(every ? OPTTRUE : OPTFALSE, fl[f]);
+        return Bln.get(every);
+      }
       fl[f] = (For) e;
     }
     return super.comp(ctx);
@@ -63,11 +68,9 @@ public final class Satisfy extends Single {
 
     final boolean last = p + 1 == fl.length;
     while(it[p].next().bool()) {
-      final boolean res = last ? ctx.iter(expr).ebv().bool() :
-        iter(ctx, it, p + 1);
-      if(res ^ every) {
+      if(every ^ (last ? ctx.iter(expr).ebv().bool() : iter(ctx, it, p + 1))) {
         for(final ResetIter ri : it) ri.reset();
-        return res;
+        return !every;
       }
     }
     return every;
@@ -75,9 +78,9 @@ public final class Satisfy extends Single {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(every ? "every " : "some ");
-    for(int i = 0; i < fl.length; i++) sb.append((i != 0 ? ", " : "") + fl[i]);
-    return sb.append(" satisfies " + expr).toString();
+    final StringBuilder sb = new StringBuilder(every ? EVERY : SOME);
+    for(int i = 0; i < fl.length; i++) sb.append(" " + fl[i]);
+    return sb.append(" " + SATISFIES + " " + expr).toString();
   }
 
   @Override

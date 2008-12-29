@@ -23,7 +23,7 @@ public final class IOFile extends IO {
   /** File reference. */
   private final File file;
   /** File length. */
-  long len;
+  private long len;
   /** Zip entry. */
   ZipEntry zip;
 

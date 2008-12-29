@@ -37,7 +37,7 @@ public final class FTOr extends FTExpr {
       final Item it = ctx.iter(e).next();
       if(it.bool()) d = Scoring.or(d, it.dbl());
     }
-    return Dbl.iter(d);
+    return Dbl.get(d).iter();
   }
 
   @Override

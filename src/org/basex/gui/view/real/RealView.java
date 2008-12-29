@@ -315,7 +315,7 @@ public final class RealView extends View {
       final Graphics g, final int rootNum) {
     final Data data = GUI.context.data();
     int level = 0;
-    sumNodeSizeInLine = data.size;
+    sumNodeSizeInLine = data.meta.size;
     parentList = new IntList();
     parentList.add(root);
     rectCount = 1;

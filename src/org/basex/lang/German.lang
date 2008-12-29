@@ -282,7 +282,6 @@ cmd_no=Befehl erwartet.
 cmd_unknown=Unbekannter Befehl "%"
 cmd_similar=Alternative: "%"
 cmd_ping=Verbindung erfolgreich.
-cmd_xmark=XMark-Anfrage muss zwischen 1 und 20 liegen.
 
 # Help Commands
 help_short="help" hilft weiter
@@ -491,8 +490,6 @@ ch_xquery2=Führt eine XQuery-[Anfrage] aus und zeigt das Ergebnis an.
 ch_find0=[Anfrage]
 ch_find1=Ausführung einer Schlüsselwort-Anfrage.
 ch_find2=Die folgenden Modifikatoren sind erlaubt:\n =  : sucht nach exakten Textknoten\n @= : sucht nach exakten Attributen\n @  : sucht nach Attributen
-ch_xmark1=Ausführung einer XMark-Anfrage
-ch_xmark2=Führt die interne Implementierung der\nXMark-Anfrage [nr] (1-20) aus.
 ch_cs0=[query]
 ch_cs1=Ausführung einer XPath-Anfrage und Wechsel zu neuem Kontextset.
 ch_cs2=Führt die angegebene XPath-[Anfrage] aus und\nsetzt das Ergebnis als neues Kontextset.

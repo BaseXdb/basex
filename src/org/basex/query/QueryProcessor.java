@@ -93,11 +93,9 @@ public abstract class QueryProcessor extends Progress {
    * @throws Exception exception
    */
   public final void plan(final Serializer ser) throws Exception {
-    ser.open(1);
     ser.openElement(PLAN);
     context.plan(ser);
     ser.closeElement();
-    ser.close(1);
   }
   
   @Override

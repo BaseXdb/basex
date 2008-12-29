@@ -1,5 +1,7 @@
 package org.basex.query.xquery.expr;
 
+import static org.basex.query.xquery.XQText.*;
+
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Item;
@@ -32,15 +34,18 @@ public final class FLWR extends FLWOR {
     
     // remove let clauses with static contents
     for(int f = 0; f != fl.length; f++) {
-      if(fl[f].var.expr != null) fl = Array.delete(fl, f--);
+      if(fl[f].var.expr != null) {
+        ctx.compInfo(OPTSTAT, fl[f]);
+        fl = Array.delete(fl, f--);
+      }
     }
   
     // no clauses left: simplify expression
     if(fl.length == 0) {
-      // no where clause - pass on return clause
-      if(where == null) return expr;
-      // replace FLWR with IF clause
-      return new If(where, expr, Seq.EMPTY);      
+      // replace FLWR with IF clause or pass on return clause
+      if(where != null) expr = new If(where, expr, Seq.EMPTY);
+      ctx.compInfo(OPTSIMPLE, this, expr);
+      return expr;
     }
     return this;
   }

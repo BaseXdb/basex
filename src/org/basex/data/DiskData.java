@@ -83,29 +83,36 @@ public final class DiskData extends Data {
    * @throws IOException IO Exception
    */
   public DiskData(final String db, final boolean index) throws IOException {
-    final DataInput in = new DataInput(db, DATAINFO);
-    meta = new MetaData(db);
-    size = meta.read(in);
-
-    // read indexes
-    tags = new Names(in);
-    atts = new Names(in);
-    skel = new Skeleton(this, in);
-    ns = new Namespaces(in);
-
-    // main memory mode.. keep table in memory
-    table = Prop.mainmem ? new TableMemAccess(db, DATATBL, size) :
-      new TableDiskAccess(db, DATATBL);
-    texts = new DataAccess(db, DATATXT);
-    values = new DataAccess(db, DATAATV);
-
-    if(index) {
-      if(meta.txtindex) txtindex = new Values(this, db, true);
-      if(meta.atvindex) atvindex = new Values(this, db, false);
-      if(meta.ftxindex) ftxindex =
-        meta.ftfz ? new FTFuzzy(this, db) : new FTTrie(this, db);
+    DataInput in = null;
+    try {
+      in = new DataInput(db, DATAINFO);
+      meta = new MetaData(db);
+      meta.read(in);
+  
+      // read indexes
+      tags = new Names(in);
+      atts = new Names(in);
+      skel = new Skeleton(this, in);
+      ns = new Namespaces(in);
+  
+      // main memory mode.. keep table in memory
+      table = Prop.mainmem ? new TableMemAccess(db, DATATBL, meta.size) :
+        new TableDiskAccess(db, DATATBL);
+      texts = new DataAccess(db, DATATXT);
+      values = new DataAccess(db, DATAATV);
+  
+      if(index) {
+        if(meta.txtindex) txtindex = new Values(this, db, true);
+        if(meta.atvindex) atvindex = new Values(this, db, false);
+        if(meta.ftxindex) ftxindex =
+          meta.ftfz ? new FTFuzzy(this, db) : new FTTrie(this, db);
+      }
+      initNames();
+    } catch(final IOException ex) {
+      throw ex;
+    } finally {
+      try { if(in != null) in.close(); } catch(final IOException e) { }
     }
-    initNames();
   }
 
   @Override
@@ -116,7 +123,7 @@ public final class DiskData extends Data {
       values.flush();
       // write meta data...
       final DataOutput out = new DataOutput(meta.dbname, DATAINFO);
-      meta.finish(out, size);
+      meta.finish(out);
       tags.finish(out);
       atts.finish(out);
       skel.finish(out);
@@ -174,7 +181,7 @@ public final class DiskData extends Data {
   @Override
   public int pre(final int id) {
     // find pre value in table
-    for(int p = id; p < size; p++) if(id == id(p)) return p;
+    for(int p = id; p < meta.size; p++) if(id == id(p)) return p;
     for(int p = 0; p < id; p++) if(id == id(p)) return p;
     // id not found
     return -1;
@@ -412,11 +419,11 @@ public final class DiskData extends Data {
 
     // delete node from table structure and reduce document size
     table.delete(pre, s);
-    size -= s;
+    meta.size -= s;
 
     // database cannot be empty; instead, an empty root node is kept
-    if(size == 0) {
-      size = 1;
+    if(meta.size == 0) {
+      meta.size = 1;
       size(0, DOC);
     }
     updateDist(pre, -s);
@@ -449,7 +456,7 @@ public final class DiskData extends Data {
    */
   private void updateDist(final int pre, final int s) {
     int p = pre;
-    while(p < size) {
+    while(p < meta.size) {
       final int k = kind(p);
       dist(p, k, dist(p, k) + s);
       p += size(p, kind(p));
@@ -542,7 +549,7 @@ public final class DiskData extends Data {
         (byte) (dis >> 24), (byte) (dis >> 16), (byte) (dis >> 8), (byte) dis, 
         (byte) (s >> 24), (byte) (s >> 16), (byte) (s >> 8), (byte) s,
         (byte) (id >> 24), (byte) (id >> 16), (byte) (id >> 8), (byte) id });
-    size++;
+    meta.size++;
   }
 
   /**
@@ -562,7 +569,7 @@ public final class DiskData extends Data {
         (byte) (txt >> 24), (byte) (txt >> 16), (byte) (txt >> 8), (byte) txt,
         (byte) (s >> 24), (byte) (s >> 16), (byte) (s >> 8), (byte) s,
         (byte) (id >> 24), (byte) (id >> 16), (byte) (id >> 8), (byte) id });
-    size++;
+    meta.size++;
   }
 
   /**
@@ -585,7 +592,7 @@ public final class DiskData extends Data {
         (byte) (txt >> 24), (byte) (txt >> 16), (byte) (txt >> 8), (byte) txt,
         (byte) (dis >> 24), (byte) (dis >> 16), (byte) (dis >> 8), (byte) dis,
         (byte) (id >> 24), (byte) (id >> 16), (byte) (id >> 8), (byte) id });
-    size++;
+    meta.size++;
   }
 
   /**
@@ -610,7 +617,7 @@ public final class DiskData extends Data {
         (byte) (len >> 32), (byte) (len >> 24), (byte) (len >> 16),
         (byte) (len >> 8), (byte) len, 0, 0, 0, (byte) dis,
         (byte) (id >> 24), (byte) (id >> 16), (byte) (id >> 8), (byte) id });
-    size++;
+    meta.size++;
   }
 
   /**

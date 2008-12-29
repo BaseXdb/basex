@@ -166,7 +166,7 @@ public final class MemData extends Data {
    * @return index reference
    */
   protected int attIndex(final byte[] t) {
-    return ((MemValues) atvindex).index(t, size);
+    return ((MemValues) atvindex).index(t, meta.size);
   }
 
   /**
@@ -175,7 +175,7 @@ public final class MemData extends Data {
    * @return index reference
    */
   protected int textIndex(final byte[] t) {
-    return ((MemValues) txtindex).index(t, size);
+    return ((MemValues) txtindex).index(t, meta.size);
   }
 
   /**
@@ -185,8 +185,8 @@ public final class MemData extends Data {
    */
   public void addDoc(final byte[] t, final long s) {
     check();
-    val1[size] = ((long) DOC << 56) + textIndex(t);
-    val2[size++] = (s << 32) + size;
+    val1[meta.size] = ((long) DOC << 56) + textIndex(t);
+    val2[meta.size++] = (s << 32) + meta.size;
   }
 
   /**
@@ -202,9 +202,9 @@ public final class MemData extends Data {
       final long s, final boolean ne) {
 
     check();
-    val1[size] = ((long) ELEM << 56) + (n << 52) + (ne ? 1L << 51 : 0)
+    val1[meta.size] = ((long) ELEM << 56) + (n << 52) + (ne ? 1L << 51 : 0)
         + (t << 40) + (a << 32) + d;
-    val2[size++] = (s << 32) + size;
+    val2[meta.size++] = (s << 32) + meta.size;
   }
 
   /**
@@ -216,8 +216,8 @@ public final class MemData extends Data {
    */
   public void addAtt(final long t, final long n, final byte[] v, final long d) {
     check();
-    val1[size] = ((long) ATTR << 56) + (n << 52) + (t << 40) + attIndex(v);
-    val2[size++] = (d << 32) + size;
+    val1[meta.size] = ((long) ATTR << 56) + (n << 52) + (t << 40) + attIndex(v);
+    val2[meta.size++] = (d << 32) + meta.size;
   }
 
   /**
@@ -228,8 +228,8 @@ public final class MemData extends Data {
    */
   public void addText(final byte[] t, final long d, final long k) {
     check();
-    val1[size] = (k << 56) + textIndex(t);
-    val2[size++] = (d << 32) + size;
+    val1[meta.size] = (k << 56) + textIndex(t);
+    val2[meta.size++] = (d << 32) + meta.size;
   }
 
   /**
@@ -254,7 +254,7 @@ public final class MemData extends Data {
    * Checks the array sizes.
    */
   private void check() {
-    if(size == val1.length) {
+    if(meta.size == val1.length) {
       val1 = Array.extend(val1);
       val2 = Array.extend(val2);
     }

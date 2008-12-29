@@ -17,7 +17,7 @@ public final class StepFoll extends Step {
     int kind = data.kind(p);
     if(kind == Data.ATTR) return;
 
-    final int size = data.size;
+    final int size = data.meta.size;
     int pre = p + data.size(p, kind);
 
     while(pre != size) {
@@ -35,7 +35,7 @@ public final class StepFoll extends Step {
     if(kind == Data.ATTR) return;
     
     int pos = 0;
-    final int size = data.size;
+    final int size = data.meta.size;
     int pre = p + data.size(p, kind);
     
     while(pre != size) {
@@ -56,7 +56,7 @@ public final class StepFoll extends Step {
     if(kind == Data.ATTR) return;
     
     final int[] pos = new int[preds.size()];
-    final int size = data.size;
+    final int size = data.meta.size;
     int pre = p + data.size(p, kind);
     
     while(pre != size) {

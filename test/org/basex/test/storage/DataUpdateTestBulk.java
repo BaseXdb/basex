@@ -80,7 +80,7 @@ public final class DataUpdateTestBulk extends DataUpdateTest {
   @Test
   public void testBulkInsertSmall() {
     insert(6, 2, Copy.copy(insertData, 3));
-    assertEquals(size + 4, data.size);
+    assertEquals(size + 4, data.meta.size);
     assertNodesDeepEqual(insertData, 3, data, 11);
     assertParentEqual(11, 13, data);
   }
@@ -91,7 +91,7 @@ public final class DataUpdateTestBulk extends DataUpdateTest {
   @Test
   public void testBulkInsertLarge() {
     insert(6, 2, Copy.copy(insertData, 5));
-    assertEquals(size + 2, data.size);
+    assertEquals(size + 2, data.meta.size);
     assertNodesDeepEqual(insertData, 5, data, 11);
     assertParentEqual(21, 22, data);
   }

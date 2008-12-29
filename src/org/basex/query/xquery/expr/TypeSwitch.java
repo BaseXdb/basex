@@ -23,7 +23,7 @@ public final class TypeSwitch extends Single {
   /** Expression list. */
   public Case[] cs;
   /** Variable. */
-  private Var var;
+  private final Var var;
   
   /**
    * Constructor.
@@ -55,7 +55,7 @@ public final class TypeSwitch extends Single {
       final Iter iter = l.iter(ctx, seq);
       if(iter != null) return iter;
     }
-    if(var.name != null) ctx.vars.add(var.item(seq.finish(), ctx));
+    if(var.name != null) ctx.vars.add(var.bind(seq.finish(), ctx));
     final SeqIter sb = new SeqIter(ctx.iter(expr));
     ctx.vars.reset(s);
     return sb;
@@ -85,10 +85,9 @@ public final class TypeSwitch extends Single {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.startElement(this);
+    ser.openElement(this);
     if(var.name != null) ser.attribute(VAR, var.name.str());
-    ser.finishElement();
-    for(Case c : cs) c.plan(ser);
+    for(final Case c : cs) c.plan(ser);
     ts.plan(ser);
     expr.plan(ser);
     ser.closeElement();

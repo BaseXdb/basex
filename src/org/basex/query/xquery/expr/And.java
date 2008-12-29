@@ -1,12 +1,13 @@
 package org.basex.query.xquery.expr;
 
-import org.basex.query.xquery.XQExprList;
+import static org.basex.query.xquery.XQText.*;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Scoring;
+import org.basex.util.Array;
 
 /**
  * And expression.
@@ -25,17 +26,18 @@ public final class And extends Arr {
 
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
-    final XQExprList exli = new XQExprList(expr.length);
-    for(final Expr e : expr) {
-      final Expr ex = ctx.comp(e);
-      if(!ex.i()) {
-        exli.add(ex);
-      } else if(!((Item) ex).bool()) {
+    for(int e = 0; e < expr.length; e++) {
+      expr[e] = ctx.comp(expr[e]);
+      if(!expr[e].i()) continue;
+      if(!((Item) expr[e]).bool()) {
         // atomic items can be pre-evaluated
+        ctx.compInfo(OPTFALSE, expr[e]);
         return Bln.FALSE;
       }
+      ctx.compInfo(OPTTRUE, expr[e]);
+      expr = Array.delete(expr, e--);
     }
-    return exli.size == 0 ? Bln.TRUE : new And(exli.finish());
+    return expr.length == 0 ? Bln.TRUE : this;
   }
 
   @Override

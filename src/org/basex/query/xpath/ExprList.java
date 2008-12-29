@@ -1,10 +1,8 @@
 package org.basex.query.xpath;
 
 import org.basex.query.ExprInfo;
-import org.basex.query.xpath.expr.Expr;
 import org.basex.query.xpath.expr.FTAnd;
 import org.basex.query.xpath.expr.FTContains;
-import org.basex.query.xpath.expr.FTOr;
 import org.basex.query.xpath.path.LocPath;
 import org.basex.query.xpath.path.Pred;
 import org.basex.query.xpath.path.PredSimple;
@@ -66,50 +64,6 @@ public final class ExprList {
     list[size] = v;
     su[size++] = s;
   }
-
-  /**
-   * Adds next value.
-   * @param v value to be added
-   * @param ctx current context
-   * @param and flag for and expression
-   */
-  public void add(final Expr v, final XPContext ctx, final boolean and) {
-    if(size == list.length) {
-      list = Array.extend(list);
-      su = Array.extend(su);
-    }
-    
-    boolean s = false;
-    if(v instanceof FTContains) {
-      final FTContains ft = (FTContains) v;
-      if(ft.cont instanceof LocPath) s = ((LocPath) ft.cont).singlePath(ctx);
-      if(s) {
-        for(int i = 0; i < size; i++) {
-          if(!su[i]) continue;
-
-          final FTContains ftc1 = (FTContains) list[i];
-          if(ft.cont.sameAs(ftc1.cont)) {
-            if(and) {
-              if(ftc1.query instanceof FTAnd) {
-                ftc1.query.add(ft.query);
-              } else {
-                ftc1.query = new FTAnd(ftc1.query, ft.query);
-              }
-            } else {
-              if(ftc1.query instanceof FTOr) {
-                ftc1.query.add(ft.query);
-              } else {
-                ftc1.query = new FTOr(ftc1.query, ft.query);
-              }
-            }
-            return;
-          }
-        }
-      }
-    }
-    list[size] = v;
-    su[size++] = s;
-  }
   
   /**
    * Finishes the predicate array.
@@ -119,15 +73,5 @@ public final class ExprList {
     final Pred[] pr = new Pred[size];
     for(int i = 0; i < size; i++) pr[i] = (PredSimple) list[i];
     return pr; 
-  }
-  
-  /**
-   * Finishes the expression array.
-   * @return array
-   */
-  public Expr[] finishE() {
-    final Expr[] e = new Expr[size];
-    for(int i = 0; i < size; i++) e[i] = (Expr) list[i];
-    return e; 
   }
 }

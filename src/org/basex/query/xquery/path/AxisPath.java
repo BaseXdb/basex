@@ -4,6 +4,7 @@ import static org.basex.query.xquery.path.Axis.*;
 import static org.basex.query.xquery.path.Test.NODE;
 import static org.basex.query.xquery.XQText.*;
 import java.io.IOException;
+import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.FTIndexAcsbl;
 import org.basex.query.xquery.FTIndexEq;
@@ -11,6 +12,7 @@ import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.CAttr;
 import org.basex.query.xquery.expr.Expr;
+import org.basex.query.xquery.expr.Pred;
 import org.basex.query.xquery.expr.Root;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.DBNode;
@@ -54,12 +56,39 @@ public class AxisPath extends Path {
 
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
-    // step optimizations will always return step instances
-    for(int i = 0; i != step.length; i++) step[i] = (Step) ctx.comp(step[i]);
     super.comp(ctx);
     
-    mergeDesc(ctx);
+    final Item ci = ctx.item;
+    if(root != null) {
+      if(root instanceof Root) {
+        if(ctx.item != null) ctx.item = ctx.iter(root).next();
+      } else {
+        ctx.item = null;
+        if(root.i()) ctx.item = (Item) root;
+      }
+    }
+    final Expr e = c(ctx);
+    ctx.item = ci;
+    return e;
+  }    
+  
+  /**
+   * Compiles the location path.
+   * @param ctx query context
+   * @return optimized Expression
+   * @throws XQException exception
+   */
+  private Expr c(final XQContext ctx) throws XQException {
     checkEmpty();
+    
+    // step optimizations will always return step instances
+    for(int i = 0; i != step.length; i++) {
+      final Expr e = ctx.comp(step[i]);
+      if(!(e instanceof Step)) return e;
+      step[i] = (Step) e;
+    }
+    
+    mergeDesc(ctx);
 
     // analyze if result set can be cached - no predicates/variables...
     cache = root != null && !root.uses(Using.VAR);
@@ -83,35 +112,27 @@ public class AxisPath extends Path {
     
     // no predicates, one downward step... choose iterative evaluation
     final Axis axis = step[0].axis;
-    if(noPreds && step.length == 1 && axis.down)
+    if(noPreds && step.length == 1 && axis.down) {
       return new SimpleIterPath(root, step);
-
-    // check if the root expression yields an absolute document node
-    DBNode dbnode = null;
-    if(root != null) {
-      if(root instanceof DBNode) dbnode = (DBNode) root;
-      // root expressions make only sense if an initial context item was set.
-      // currently, this is always a database node, so the cast is safe.
-      if(root instanceof Root) dbnode = (DBNode) ctx.iter(root).next();
     }
-    cache &= dbnode != null;
-    
-    // no root node, which could allow index access
-    if(!cache) return this;
 
+    // check if the context item is set to a document node
+    if(!(ctx.item instanceof DBNode)) return this;
+    final DBNode db = (DBNode) ctx.item;
+    
     // skip position predicates and horizontal axes
     for(final Step s : step) if(s.uses(Using.POS) || !s.axis.vert) return this;
 
     // loop through all steps
-    Expr result = this;
+    AxisPath result = this;
     for(int i = 0; i < step.length; i++) {
       // find cheapest index access
       final Step stp = step[i];
       FTIndexAcsbl iacs = null;
       int minp = 0;
-      
+
       for(int p = 0; p < stp.pred.length; p++) {
-        final FTIndexAcsbl ia = new FTIndexAcsbl(dbnode.data);
+        final FTIndexAcsbl ia = new FTIndexAcsbl(db.data);
         stp.pred[p].indexAccessible(ctx, ia);
         if(ia.io && ia.iu) {
           if(iacs == null || iacs.is > ia.is) {
@@ -153,7 +174,8 @@ public class AxisPath extends Path {
           if(a == null) break;
           
           if(j == 0) {
-            if(a == Axis.PARENT) inv = Array.add(inv, Step.get(a, Test.DOC));
+            if(a == Axis.PARENT) inv = Array.add(inv, Step.get(a,
+                new KindTest(Type.DOC)));
           } else {
             final Step prev = step[j - 1];
             if(prev.pred.length != 0) break;
@@ -162,7 +184,7 @@ public class AxisPath extends Path {
         }
 
         // add predicates to check remaining path
-        // invert Path - can be safely cast
+        // invert path - cast is safe
         final AxisPath res = (AxisPath) ie; 
         
         if(inv.length != 0) {
@@ -320,18 +342,36 @@ public class AxisPath extends Path {
    */
   public final AxisPath invertPath(final Expr r, final Step curr) {
     // hold the steps to the end of the inverted path
-    final Step[] e = new Step[step.length];
-    int c = 0;    
+    int s = step.length;
+    final Step[] e = new Step[s--];
+    // add predicates of last step to new root node
+    Expr rt = step[s].pred.length != 0 ? new Pred(r, step[s].pred) : r;
     
-    // add inverted pretext steps
-    Axis lastAxis = step[step.length - 1].axis.invert();
-    for(int k = step.length - 2; k >= 0; k--) {
-      final Step inv = Step.get(lastAxis, step[k].test, step[k].pred);
-      lastAxis = inv.axis.invert();
-      e[c++] = inv;
+    // add inverted steps in a backward manner
+    int c = 0;    
+    while(--s >= 0) {
+      e[c++] = Step.get(step[s + 1].axis.invert(), step[s].test, step[s].pred);
     } 
-    e[c] = Step.get(lastAxis, curr.test);
-    return new AxisPath(r, e);
+    e[c] = Step.get(step[s + 1].axis.invert(), curr.test);
+    return new AxisPath(rt, e);
+  }
+
+  /**
+   * Adds a text step to the specified path.
+   * @param ctx query context
+   */
+  public void addText(final XQContext ctx) {
+    final Step s = step[step.length - 1];
+    if(s.pred.length > 0 || !s.axis.down || s.test.kind != Test.Kind.NAME ||
+        !(ctx.item instanceof DBNode)) return;
+    
+    final Data data = ((DBNode) ctx.item).data;
+    final byte[] name = s.test.name.ln();
+    
+    if(data.meta.uptodate && !data.tags.noLeaf(data.tags.id(name))) {
+      step = Array.add(step, Step.get(Axis.CHILD, new KindTest(Type.TXT)));
+      ctx.compInfo(OPTTEXT, this);
+    }
   }
   
   @Override
@@ -342,6 +382,17 @@ public class AxisPath extends Path {
   @Override
   public Type returned() {
     return Type.NOD;
+  }
+
+  @Override
+  public boolean sameAs(final Expr cmp) {
+    if(!(cmp instanceof AxisPath)) return false;
+    final AxisPath ap = (AxisPath) cmp;
+    if(step.length != ap.step.length) return false;
+    for(int s = 0; s < step.length; s++) {
+      if(!step[s].sameAs(ap.step[s])) return false;
+    }
+    return true;
   }
 
   @Override

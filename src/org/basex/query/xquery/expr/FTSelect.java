@@ -74,12 +74,12 @@ public final class FTSelect extends FTExpr {
     
     ctx.ftpos = tmp;
     final double s = it.dbl();
-    if(s == 0 || !posFilter(ctx)) return Dbl.iter(0);
+    if(s == 0 || !posFilter(ctx)) return Dbl.ZERO.iter();
 
     // calculate weight
     final double d = checkDbl(ctx.iter(weight));
     if(d < 0 || d > 1000) Err.or(FTWEIGHT, d);
-    return d != 1 ? Dbl.iter(s * d) : it.iter();
+    return (d != 1 ? Dbl.get(s * d) : it).iter();
   }
 
   /**
@@ -137,9 +137,8 @@ public final class FTSelect extends FTExpr {
   
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.startElement(this);
+    ser.openElement(this);
     pos.plan(ser);
-    ser.finishElement();
     expr[0].plan(ser);
     ser.closeElement();
   }

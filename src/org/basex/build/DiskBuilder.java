@@ -71,7 +71,7 @@ public final class DiskBuilder extends Builder {
     // close files
     final String db = meta.dbname;
     final DataOutput out = new DataOutput(meta.dbname, DATAINFO);
-    meta.finish(out, size);
+    meta.finish(out);
     tags.finish(out);
     atts.finish(out);
     skel.finish(out);
@@ -115,7 +115,7 @@ public final class DiskBuilder extends Builder {
     tout.write(0);
     tout.write5(inline(txt, true));
     tout.writeInt(0);
-    tout.writeInt(size++);
+    tout.writeInt(meta.size++);
   }
   
   @Override
@@ -127,8 +127,8 @@ public final class DiskBuilder extends Builder {
     tout.write(as);
     tout.writeInt(dis);
     tout.writeInt(as);
-    tout.writeInt(size++);
-    if(size < 0) throw new IOException(LIMITRANGE);
+    tout.writeInt(meta.size++);
+    if(meta.size < 0) throw new IOException(LIMITRANGE);
   }
 
   @Override
@@ -139,7 +139,7 @@ public final class DiskBuilder extends Builder {
     tout.write2(t + (s << 12));
     tout.write5(inline(txt, false));
     tout.writeInt(dis);
-    tout.writeInt(size++);
+    tout.writeInt(meta.size++);
   }
 
   @Override
@@ -151,7 +151,7 @@ public final class DiskBuilder extends Builder {
     tout.write(0);
     tout.write5(inline(txt, true));
     tout.writeInt(dis);
-    tout.writeInt(size++);
+    tout.writeInt(meta.size++);
   }
 
   /**

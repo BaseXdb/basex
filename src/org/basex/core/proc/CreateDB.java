@@ -4,6 +4,8 @@ import static org.basex.Text.*;
 import static org.basex.core.Commands.*;
 import java.io.IOException;
 import javax.xml.transform.sax.SAXSource;
+
+import org.basex.build.BuildException;
 import org.basex.build.DiskBuilder;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
@@ -56,6 +58,7 @@ public final class CreateDB extends ACreate {
    * @throws IOException exception
    */
   public static Data xml(final IO io, final String db) throws IOException {
+    if(!io.exists()) throw new BuildException(FILEWHICH, io.path());
     return xml(new DirParser(io), db);
   }
 

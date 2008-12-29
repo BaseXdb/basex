@@ -130,11 +130,9 @@ public abstract class Item extends Expr implements Result {
   }
   
   public void serialize(final Serializer ser) throws IOException {
-    ser.open(1);
     ser.openResult();
     ser.item(str());
     ser.closeResult();
-    ser.close(1);
   }
   
   public void serialize(final Serializer ser, final int n) throws IOException {

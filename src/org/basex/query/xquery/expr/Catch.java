@@ -1,8 +1,6 @@
 package org.basex.query.xquery.expr;
 
-import java.io.IOException;
 import org.basex.BaseX;
-import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.QNm;
@@ -17,17 +15,15 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Catch extends Expr {
-  /** Variable. */
-  private Expr expr;
+public final class Catch extends Single {
   /** Variable. */
   private final Var var1;
   /** Variable. */
   private final Var var2;
   /** Variable. */
   private final Var var3;
-  /** Variable. */
-  private QNm[] codes;
+  /** Supported codes. */
+  private final QNm[] codes;
 
   /**
    * Constructor.
@@ -37,18 +33,13 @@ public final class Catch extends Expr {
    * @param v2 second variable
    * @param v3 third variable
    */
-  public Catch(final Expr ct, final QNm[] c, final Var v1,
-      final Var v2, final Var v3) {
-    expr = ct;
+  public Catch(final Expr ct, final QNm[] c, final Var v1, final Var v2,
+      final Var v3) {
+    super(ct);
     codes = c;
     var1 = v1;
     var2 = v2;
     var3 = v3;
-  }
-
-  @Override
-  public Expr comp(final XQContext ctx) {
-    return this;
   }
 
   @Override
@@ -71,9 +62,9 @@ public final class Catch extends Expr {
     if(!find(code)) return null;
     
     final int s = ctx.vars.size();
-    if(var1 != null) ctx.vars.add(var1.item(new QNm(code), ctx));
-    if(var2 != null) ctx.vars.add(var2.item(Str.get(e.simple()), ctx));
-    if(var3 != null) ctx.vars.add(var3.item(e.item, ctx));
+    if(var1 != null) ctx.vars.add(var1.bind(new QNm(code), ctx));
+    if(var2 != null) ctx.vars.add(var2.bind(Str.get(e.simple()), ctx));
+    if(var3 != null) ctx.vars.add(var3.bind(e.item, ctx));
     final Iter iter = ctx.iter(expr);
     ctx.vars.reset(s);
     return iter;
@@ -85,19 +76,12 @@ public final class Catch extends Expr {
    * @return result of check
    */
   private boolean find(final byte[] err) {
-    for(QNm c : codes) if(c == null || Token.eq(c.ln(), err)) return true;
+    for(final QNm c : codes) if(c == null || Token.eq(c.ln(), err)) return true;
     return false;
   }
 
   @Override
   public String toString() {
     return "catch { " + expr + "}";
-  }
-
-  @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
-    expr.plan(ser);
-    ser.closeElement();
   }
 }

@@ -43,7 +43,7 @@ public final class For extends ForLet {
     var = v;
     pos = p;
     score = s;
-    if(score != null) score.item(Dbl.ZERO, null);
+    if(score != null) score.bind(Dbl.ZERO, null);
   }
 
   @Override
@@ -51,10 +51,7 @@ public final class For extends ForLet {
     expr = ctx.comp(expr);
     // empty sequence - empty loop
     if(expr.e()) return Seq.EMPTY;
-
-    if(pos == null && score == null && expr.i()) {
-      var.item((Item) expr, ctx);
-    }
+    if(pos == null && score == null && expr.i()) var.bind(expr, ctx);
 
     ctx.vars.add(var);
     if(pos != null) ctx.vars.add(pos);
@@ -66,45 +63,42 @@ public final class For extends ForLet {
   public ResetIter iter(final XQContext ctx) {
     final Var v = var.clone();
     final Var p = pos != null ? pos.clone() : null;
-    final Var sc = score != null ? score.clone() : null;
+    final Var s = score != null ? score.clone() : null;
     
     return new ResetIter() {
-      /** Iterator flag. */
-      private boolean more;
       /** Variable stack size. */
       private int vs;
       /** Iterator flag. */
-      private Iter iter;
+      private Iter ir;
       /** Counter. */
       private int c;
       
       @Override
       public Bln next() throws XQException {
-        if(!more) {
+        if(ir == null) {
           vs = ctx.vars.size();
-          iter = ctx.iter(expr);
+          ir = ctx.iter(expr);
           ctx.vars.add(v);
           if(p != null) ctx.vars.add(p);
-          if(sc != null) ctx.vars.add(sc);
-          c = 0;
+          if(s != null) ctx.vars.add(s);
         }
 
-        final Item it = iter.next();
-        more = it != null;
-        if(more) {
-          v.item(it, ctx);
-          if(p != null) p.item(Itr.get(++c), ctx);
-          // assign score value
-          if(sc != null) sc.item(Dbl.get(Scoring.finish(it.score())), ctx);
+        final Item it = ir.next();
+        if(it != null) {
+          v.bind(it, ctx);
+          if(p != null) p.bind(Itr.get(++c), ctx);
+          if(s != null) s.bind(Dbl.get(Scoring.finish(it.score())), ctx);
         } else {
-          ctx.vars.reset(vs);
+          reset();
         }
-        return Bln.get(more);
+        return Bln.get(ir != null);
       }
 
       @Override
       public void reset() {
-        more = false;
+        ctx.vars.reset(vs);
+        ir = null;
+        c = 0;
       }
     };
   }
@@ -116,11 +110,9 @@ public final class For extends ForLet {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.startElement(this);
-    ser.attribute(VAR, var.name.str());
+    ser.openElement(this, VAR, var.name.str());
     if(pos != null) ser.attribute(POS, pos.name.str());
     if(score != null) ser.attribute(Token.token(SCORE), score.name.str());
-    ser.finishElement();
     expr.plan(ser);
     ser.closeElement();
   }

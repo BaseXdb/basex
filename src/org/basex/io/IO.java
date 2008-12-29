@@ -282,15 +282,16 @@ public abstract class IO {
    */
   public static synchronized boolean dbdelete(final String db,
       final String pat) {
-    
+
     final File path = dbpath(db);
     if(!path.exists()) return false;
+    
+    boolean ok = true;
     for(final File sub : path.listFiles()) {
-      if((pat == null || sub.getName().matches(pat)) && !sub.delete()) {
-        return false;
-      }
+      if(pat == null || sub.getName().matches(pat)) ok &= sub.delete();
     }
-    return pat == null ? path.delete() : true;
+    if(pat == null) ok &= path.delete();
+    return ok;
   }
 
   /**

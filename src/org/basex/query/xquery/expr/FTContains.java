@@ -1,11 +1,12 @@
 package org.basex.query.xquery.expr;
 
+import static org.basex.query.xquery.XQText.*;
+
 import org.basex.index.FTTokenizer;
 import org.basex.query.xquery.FTIndexAcsbl;
 import org.basex.query.xquery.FTIndexEq;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.XQOptimizer;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Type;
@@ -35,7 +36,16 @@ public class FTContains extends Arr {
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
     super.comp(ctx);
-    expr[0] = XQOptimizer.addText(expr[0], ctx);
+    
+    final Expr e1 = expr[0];
+    final Expr e2 = expr[1];
+    if(e1 instanceof AxisPath) ((AxisPath) e1).addText(ctx);
+    
+    if(e1.e() || e2.e()) {
+      ctx.compInfo(OPTSIMPLE, this, Bln.FALSE);
+      return Bln.FALSE;
+    }
+
     return this;
   }
 
@@ -76,8 +86,9 @@ public class FTContains extends Arr {
     if(ieq.seq) return new FTContainsSIndex(expr[0], ae);
 
     // standard index evaluation; first expression will always be an axis path
-    final Expr ex = new FTContainsIndex(ae, ft);
-    return ((AxisPath) expr[0]).invertPath(ex, ieq.curr);
+    ctx.compInfo(OPTFTXINDEX);
+    final Expr root = new FTContainsIndex(ae, ft);
+    return ((AxisPath) expr[0]).invertPath(root, ieq.curr);
   }
   
   @Override

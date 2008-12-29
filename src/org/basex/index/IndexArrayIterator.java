@@ -297,12 +297,4 @@ public class IndexArrayIterator extends IndexIterator {
       }
     };
   }
-  
-  /**
-   * Get all FTData from index.
-   * @return int[][] ftdata
-  public int[][] getFTData() {
-    return ftdata;
-  }
-   */
 }

@@ -270,9 +270,7 @@ public abstract class LocPath extends Expr {
     
     /* [SG] does probably not include all possible cases yet. elements with
      *   the same tag name can occur several times and with different
-     *   properties. i'll try to find an example. moreover, i have moved
-     *   the Skeleton Nodes into an extra file, so it might be easier to
-     *   directly work on the skeleton nodes. */
+     *   properties. */
     boolean f = false;
     for(final Step s : steps) {
       if(s instanceof StepChild) {

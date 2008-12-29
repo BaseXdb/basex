@@ -288,7 +288,6 @@ cmd_no=Expecting command.
 cmd_unknown=不明なコマンドです '%'
 cmd_similar='%' の間違いではないですか。
 cmd_ping=接続に成功しました。
-cmd_xmark=XMarkクエリーは1から20に限定されています。
 
 # Help Commands
 help_short=try 'help'
@@ -500,8 +499,6 @@ ch_xquery2=XQueryを評価し、結果を表示します
 ch_find0=[query]
 ch_find1=キーワードクエリーの評価
 ch_find2=以下の修飾子が使えます。:\n =  : 完全に一致するテキストノードを検索します\n @= : 完全に一致する属性を検索します。\n @  : 属性を検索します。
-ch_xmark1=XMarkクエリーを実行
-ch_xmark2=XMarkクエリーの内部実装を実行します。 [nr] (1-20).
 ch_cs0=[query]
 ch_cs1=XPathクエリーを評価、結果を新しいコンテキストセットに（？）
 ch_cs2=指定されたXPath [query] を評価し、結果を新しい\nコンテキストセットにします。

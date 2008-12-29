@@ -5,14 +5,14 @@ import org.basex.io.IO;
 import org.basex.util.Atts;
 
 /**
- * This is class defines a parser for creating databases from various sources.
+ * This class defines a parser for creating databases from various sources.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public abstract class Parser {
   /** Temporary attribute array. */
-  public final Atts atts = new Atts();
+  protected final Atts atts = new Atts();
   /** Input file. */
   public IO io;
 
@@ -20,7 +20,7 @@ public abstract class Parser {
    * Constructor.
    * @param f file reference.
    */
-  public Parser(final IO f) {
+  protected Parser(final IO f) {
     io = f;
   }
 

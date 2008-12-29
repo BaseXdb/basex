@@ -47,7 +47,7 @@ final class FNBaseX extends Fun {
    * @return iterator
    */
   private Iter random() {
-    return Dbl.iter(Math.random());
+    return Dbl.get(Math.random()).iter();
     /*
     Iter iter = arg[0];
     long s = iter.size();
@@ -82,6 +82,6 @@ final class FNBaseX extends Fun {
    */
   private Iter filename(final XQContext ctx) {
     return ctx.file == null ? Str.ZERO.iter() :
-      Str.iter(token(ctx.file.name()));
+      Str.get(token(ctx.file.name())).iter();
   }
 }

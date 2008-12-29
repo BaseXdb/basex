@@ -38,8 +38,6 @@ public abstract class Data  {
 
   /** Meta data. */
   public MetaData meta;
-  /** Table size. */
-  public int size;
   /** Tag index. */
   public Names tags;
   /** Attribute name index. */
@@ -321,7 +319,7 @@ public abstract class Data  {
    */
   public final int[] doc() {
     final IntList il = new IntList();
-    for(int i = 0; i < size; i += size(i, Data.DOC)) il.add(i);
+    for(int i = 0; i < meta.size; i += size(i, Data.DOC)) il.add(i);
     return il.finish();
   }
 

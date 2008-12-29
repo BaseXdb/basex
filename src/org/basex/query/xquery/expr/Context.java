@@ -29,6 +29,11 @@ public final class Context extends Expr {
   }
 
   @Override
+  public boolean sameAs(final Expr cmp) {
+    return cmp instanceof Context;
+  }
+
+  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.emptyElement(this);
   }

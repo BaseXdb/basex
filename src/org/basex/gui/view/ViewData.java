@@ -1,7 +1,8 @@
 package org.basex.gui.view;
 
+import static org.basex.data.DataText.*;
+import static org.basex.util.Token.*;
 import org.basex.data.Data;
-import org.basex.data.XMLSerializer;
 import org.basex.gui.GUIProp;
 import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
@@ -32,7 +33,7 @@ public final class ViewData {
     if(data.fs != null && data.fs.isFile(pre)) return true;
 
     final int last = pre + (GUIProp.mapatts ? 1 : data.attSize(pre, kind));
-    return last == data.size || data.parent(pre, kind) >=
+    return last == data.meta.size || data.parent(pre, kind) >=
       data.parent(last, data.kind(last));
   }
 
@@ -74,7 +75,22 @@ public final class ViewData {
    * @return name
    */
   public static byte[] content(final Data data, final int p, final boolean s) {
-    return XMLSerializer.content(data, p, s);
+    final int kind = data.kind(p);
+    if(kind == Data.ELEM) return data.tag(p);
+    if(kind == Data.DOC)  return data.text(p);
+    if(kind == Data.TEXT) return s ? TEXT : data.text(p);
+    if(kind == Data.COMM) return s ? COMM : concat(COM1, data.text(p), COM2);
+    if(kind == Data.PI)   return s ? PI : concat(PI1, data.text(p), PI2);
+
+    final TokenBuilder tb = new TokenBuilder();
+    tb.add(ATT);
+    tb.add(data.attName(p));
+    if(!s) {
+      tb.add(ATT1);
+      tb.add(data.attValue(p));
+      tb.add(ATT2);
+    }
+    return tb.finish();
   }
 
   /**

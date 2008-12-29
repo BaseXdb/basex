@@ -346,7 +346,7 @@ public abstract class W3CTS {
       final CachedOutput out = new CachedOutput();
       item = xq.iter(context.current()).finish();
       item.serialize(new XMLSerializer(out));
-
+      
       output = norm(out.finish());
     } catch(final QueryException ex) {
       error = ex.getMessage();
@@ -557,19 +557,19 @@ public abstract class W3CTS {
       if(src == null) {
         // assign collection
         final NodIter col = new NodIter();
-        for(final byte[] cl : colls.get(string(nm))) col.add(ctx.doc(cl));
+        for(final byte[] cl : colls.get(string(nm))) col.add(ctx.doc(cl, true));
         ctx.addColl(col, nm);
 
         if(var != null) {
           final Var v = new Var(new QNm(data.atom(var.nodes[c])));
-          ctx.vars.addGlobal(v.item(Uri.uri(nm), ctx));
+          ctx.vars.addGlobal(v.bind(Uri.uri(nm), ctx));
         }
       } else {
         // assign document
         final Fun fun = FNIndex.get().get(token("doc"), XQTokens.FNURI,
             new Expr[] { Str.get(src) });
         final Var v = new Var(new QNm(data.atom(var.nodes[c])));
-        ctx.vars.addGlobal(v.expr(fun, ctx));
+        ctx.vars.addGlobal(v.bind(fun, ctx));
       }
     }
     return tb.finish();
@@ -593,7 +593,7 @@ public abstract class W3CTS {
       final XQueryProcessor xq = new XQueryProcessor(in);
       final Item item = xq.iter(null).finish();
       final Var v = new Var(new QNm(data.atom(var.nodes[c])));
-      ctx.vars.addGlobal(v.item(item, ctx));
+      ctx.vars.addGlobal(v.bind(item, ctx));
     }
   }
 

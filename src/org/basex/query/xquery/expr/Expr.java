@@ -1,7 +1,6 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQText.*;
-
 import org.basex.query.ExprInfo;
 import org.basex.query.xquery.FTIndexAcsbl;
 import org.basex.query.xquery.FTIndexEq;
@@ -108,6 +107,16 @@ public abstract class Expr extends ExprInfo {
    */
   public Type returned() {
     return null;
+  }
+
+  /**
+   * Checks the current and specified expression for equality.
+   * @param cmp expression to be compared
+   * @return result of check
+   */
+  @SuppressWarnings("unused")
+  public boolean sameAs(final Expr cmp) {
+    return false;
   }
 
   /**

@@ -1,9 +1,12 @@
 package org.basex.query.xquery.expr;
 
+import static org.basex.query.xquery.XQText.*;
+
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
+import org.basex.query.xquery.expr.CmpG.Comp;
 import org.basex.query.xquery.func.Fun;
 import org.basex.query.xquery.func.FunDef;
 import org.basex.query.xquery.item.Item;
@@ -23,7 +26,7 @@ public class Pred extends Expr {
   /** Predicates. */
   public Expr[] pred;
   /** Expression. */
-  Expr root;
+  public Expr root;
 
   /**
    * Constructor.
@@ -38,16 +41,10 @@ public class Pred extends Expr {
   @Override
   public final Expr comp(final XQContext ctx) throws XQException {
     root = ctx.comp(root);
-    for(int p = 0; p != pred.length; p++) {
-      pred[p] = ctx.comp(pred[p]);
-      if(pred[p].i()) {
-        final Item it = (Item) pred[p];
-        if(!it.bool()) return Seq.EMPTY;
-        if(it.n()) continue;
-        Array.move(pred, p + 1, -1, pred.length - p-- - 1);
-        pred = Array.finish(pred, pred.length - 1);
-      }
-    }
+    pred = comp(pred, ctx);
+    if(pred == null) return Seq.EMPTY;
+
+    // No predicates.. return root
     if(pred.length == 0) return root;
 
     // Last flag
@@ -60,6 +57,46 @@ public class Pred extends Expr {
     // Use iterative evaluation
     return new PredIter(root, pred, last, num);
   }  
+
+  /**
+   * Compiles the specified predicates.
+   * @param pred predicates
+   * @param ctx context
+   * @return compiled predicates or null if predicates are always false
+   * @throws XQException query exception
+   */
+  public static Expr[] comp(final Expr[] pred, final XQContext ctx)
+      throws XQException {
+    
+    Expr[] expr = {};
+    for(final Expr p : pred) {
+      Expr ex = ctx.comp(p);
+      if(ex instanceof CmpG) {
+        final CmpG cmp = (CmpG) ex;
+        if(cmp.expr[0] instanceof Fun && ((Fun) cmp.expr[0]).func == FunDef.POS
+            && cmp.expr[1].i()) {
+          final Item i2 = (Item) cmp.expr[1];
+          if(cmp.cmp == Comp.EQ && i2.n()) {
+            ctx.compInfo(OPTSIMPLE, cmp, i2);
+            ex = i2;
+          }
+        }
+      }
+      if(ex.i()) {
+        final Item it = (Item) ex;
+        if(!it.bool()) {
+          ctx.compInfo(OPTFALSE, it);
+          return null;
+        }
+        if(!it.n()) {
+          ctx.compInfo(OPTTRUE, it);
+          continue;
+        }
+      }
+      expr = Array.add(expr, ex);
+    }
+    return expr;
+  }
 
   @Override
   public Iter iter(final XQContext ctx) throws XQException {

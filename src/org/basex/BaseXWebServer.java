@@ -281,7 +281,7 @@ public final class BaseXWebServer {
       for(final String[] arg : req.args) {
         final Var v = new Var(new QNm(Token.token(arg[0])));
         final String val = arg.length == 2 ? arg[1] : "";
-        xq.ctx.vars.addGlobal(v.item(Str.get(val), null));
+        xq.ctx.vars.addGlobal(v.bind(Str.get(val), null));
       }
       xq.query(null).serialize(new XMLSerializer(out));
     } catch(final Exception ex) {

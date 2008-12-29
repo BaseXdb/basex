@@ -58,7 +58,7 @@ public final class Var extends ExprInfo implements Cloneable {
    * @throws XQException xquery exception
    */
   public void comp(final XQContext ctx) throws XQException {
-    if(expr != null) expr(ctx.comp(expr), ctx);
+    if(expr != null) bind(ctx.comp(expr), ctx);
   }
 
   /**
@@ -68,9 +68,9 @@ public final class Var extends ExprInfo implements Cloneable {
    * @return self reference
    * @throws XQException evaluation exception
    */
-  public Var expr(final Expr e, final XQContext ctx) throws XQException {
+  public Var bind(final Expr e, final XQContext ctx) throws XQException {
     expr = e;
-    return e.i() ? item((Item) e, ctx) : this;
+    return e.i() ? bind((Item) e, ctx) : this;
   }
 
   /**
@@ -80,7 +80,7 @@ public final class Var extends ExprInfo implements Cloneable {
    * @return self reference
    * @throws XQException evaluation exception
    */
-  public Var item(final Item it, final XQContext ctx) throws XQException {
+  public Var bind(final Item it, final XQContext ctx) throws XQException {
     expr = it;
     item = check(it, ctx);
     return this;
@@ -141,24 +141,18 @@ public final class Var extends ExprInfo implements Cloneable {
 
   @Override
   public String toString() {
-    final TokenBuilder sb = new TokenBuilder("$");
+    final TokenBuilder sb = new TokenBuilder(DOLLAR);
     sb.add(name.str());
     if(type != null) sb.add(" as " + type);
-    if(item != null) sb.add(" = " + item);
-    else if(expr != null) sb.add(" = " + expr);
+    //if(item != null) sb.add(" = " + item);
+    //else if(expr != null) sb.add(" = " + expr);
     return sb.toString();
   }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.startElement(this);
-    ser.attribute(NAM, name.str());
-    if(expr == null) {
-      ser.emptyElement();
-    } else {
-      ser.finishElement();
-      expr.plan(ser);
-      ser.closeElement();
-    }
+    ser.openElement(this, NAM, name.str());
+    if(expr != null) expr.plan(ser);
+    ser.closeElement();
   }
 }

@@ -56,7 +56,7 @@ public final class FTWords extends FTExpr {
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
     final int len = contains(ctx);
-    return Dbl.iter(len == 0 ? 0 : Scoring.word(len, ctx.ftitem.size()));
+    return Dbl.get(len == 0 ? 0 : Scoring.word(len, ctx.ftitem.size())).iter();
   }
 
   /**

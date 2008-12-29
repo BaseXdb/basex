@@ -1,5 +1,6 @@
 package org.basex.query.xquery.expr;
 
+import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
@@ -46,7 +47,8 @@ public class FLWOR extends Single {
       final Expr e = ctx.comp(fl[f]);
       if(e.e()) {
         ctx.vars.reset(vs);
-        return Seq.EMPTY;
+        ctx.compInfo(OPTSIMPLE, fl[f], e);
+        return e;
       }
       fl[f] = (ForLet) e;
     }
@@ -56,10 +58,12 @@ public class FLWOR extends Single {
       if(where.i()) {
         // test is always false: no results
         if(!((Item) where).bool()) {
+          ctx.compInfo(OPTFALSE, where);
           ctx.vars.reset(vs);
           return Seq.EMPTY;
         }
         // always true: test can be skipped
+        ctx.compInfo(OPTTRUE, where);
         where = null;
       }
     }

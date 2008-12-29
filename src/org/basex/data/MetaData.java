@@ -58,6 +58,8 @@ public final class MetaData {
 
   /** Flag for removed index structures. */
   public boolean uptodate = true;
+  /** Table size. */
+  public int size;
   /** Last (highest) id assigned to a node. */
   public int lastid = -1;
 
@@ -79,9 +81,10 @@ public final class MetaData {
     // true is returned if path and database name are equal and if the db exists
     if(path.equals(db) && IO.dbpath(db).exists()) return true;
 
+    DataInput in = null;
     try {
       // match filename of database instance
-      final DataInput in = new DataInput(db, DATAINFO);
+      in = new DataInput(db, DATAINFO);
       String str = "", k;
       IO f = null;
       long t = 0;
@@ -91,12 +94,13 @@ public final class MetaData {
         else if(k.equals(DBFNAME)) f = IO.get(v);
         else if(k.equals(DBTIME)) t = Token.toLong(v);
       }
-      in.close();
       return f != null && f.path().equals(path) && f.date() == t &&
         STORAGE.equals(str);
     } catch(final IOException ex) {
       BaseX.debug(ex);
       return false;
+    } finally {
+      try { if(in != null) in.close(); } catch(final IOException e) { }
     }
   }
 
@@ -114,12 +118,10 @@ public final class MetaData {
   /**
    * Opens the metadata for the current database and returns the table size.
    * @param in input stream
-   * @return table size
    * @throws IOException I/O Exception
    */
-  public int read(final DataInput in) throws IOException {
+  public void read(final DataInput in) throws IOException {
     String storage = "", istorage = "";
-    int size = 0;
     while(true) {
       final String k = in.readString();
       if(k.length() == 0) break;
@@ -148,12 +150,8 @@ public final class MetaData {
       else if(k.equals(DBLASTID))   lastid   = Token.toInt(v);
     }
 
-    if(!storage.equals(STORAGE)) {
-      in.close();
-      throw new BuildException(DBUPDATE, storage);
-    }
+    if(!storage.equals(STORAGE)) throw new BuildException(DBUPDATE, storage);
     if(!istorage.equals(ISTORAGE)) update();
-    return size;
   }
 
   /**
@@ -168,11 +166,9 @@ public final class MetaData {
   /**
    * Writes the database to the specified path.
    * @param out output stream
-   * @param siz current database size
    * @throws IOException IO Exception
    */
-  public synchronized void finish(final DataOutput out, final int siz)
-      throws IOException {
+  public synchronized void finish(final DataOutput out) throws IOException {
     writeInfo(out, DBSTORAGE,  STORAGE);
     writeInfo(out, IDBSTORAGE, ISTORAGE);
     writeInfo(out, DBFNAME,    file.path());
@@ -180,7 +176,7 @@ public final class MetaData {
     writeInfo(out, DBNDOCS,    ndocs);
     writeInfo(out, DBENCODING, encoding);
     writeInfo(out, DBHEIGHT,   height);
-    writeInfo(out, DBSIZE,     siz);
+    writeInfo(out, DBSIZE,     size);
     writeInfo(out, DBCHOPPED,  chop);
     writeInfo(out, DBENTITY,   entity);
     writeInfo(out, DBTXTINDEX, txtindex);

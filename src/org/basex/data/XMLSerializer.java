@@ -4,7 +4,6 @@ import static org.basex.util.Token.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
 import org.basex.io.PrintOutput;
-import org.basex.util.TokenBuilder;
 
 /**
  * This is an interface for serializing XML results.
@@ -28,8 +27,9 @@ public final class XMLSerializer extends Serializer {
   /**
    * Constructor.
    * @param o output stream
+   * @throws IOException exception
    */
-  public XMLSerializer(final PrintOutput o) {
+  public XMLSerializer(final PrintOutput o) throws IOException {
     this(o, false, false);
   }
 
@@ -38,28 +38,23 @@ public final class XMLSerializer extends Serializer {
    * @param o output stream
    * @param x xml output 
    * @param p pretty printing
+   * @throws IOException exception
    */
-  public XMLSerializer(final PrintOutput o, final boolean x, 
-      final boolean p) {
+  public XMLSerializer(final PrintOutput o, final boolean x, final boolean p)
+      throws IOException {
     out = o;
     xml = x;
     pretty = p;
-  }
-  
-  @Override
-  public void open(final int size) throws IOException {
     if(xml) {
       // [CG] XML/Serialize: allow different encodings (incl. original one)
       out.println("<?xml version='1.0' encoding='" + UTF8 + "' ?>");
-      startElement(RESULTS);
-      if(size == 0) emptyElement();
-      else finishElement();
+      openElement(RESULTS);
     }
   }
-
+  
   @Override
-  public void close(final int s) throws IOException {
-    if(xml && s != 0) closeElement();
+  public void close() throws IOException {
+    if(xml) closeElement();
   }
 
   @Override
@@ -70,14 +65,6 @@ public final class XMLSerializer extends Serializer {
   @Override
   public void closeResult() throws IOException {
     if(xml) closeElement();
-  }
-
-  @Override
-  protected void start(final byte[] t) throws IOException {
-    if(indent) indent(false);
-    out.print(ELEM1);
-    out.print(t);
-    indent = pretty;
   }
 
   @Override
@@ -99,28 +86,10 @@ public final class XMLSerializer extends Serializer {
     }
     out.print(ATT2);
   }
-  
-  @Override
-  protected void empty() throws IOException {
-    out.print(ELEM4);
-  }
-
-  @Override
-  protected void finish() throws IOException {
-    out.print(ELEM2);
-  }
-
-  @Override
-  protected void close(final byte[] t) throws IOException {
-    if(indent) indent(true);
-    out.print(ELEM3);
-    out.print(t);
-    out.print(ELEM2);
-    indent = pretty;
-  }
 
   @Override
   public void text(final byte[] b) throws IOException {
+    finishElement();
     for(final byte ch : b) {
       switch(ch) {
         case '&': out.print(E_AMP); break;
@@ -135,6 +104,7 @@ public final class XMLSerializer extends Serializer {
 
   @Override
   public void comment(final byte[] n) throws IOException {
+    finishElement();
     if(indent) indent(false);
     out.print(COM1);
     out.print(n);
@@ -143,6 +113,7 @@ public final class XMLSerializer extends Serializer {
 
   @Override
   public void pi(final byte[] n, final byte[] v) throws IOException {
+    finishElement();
     if(indent) indent(false);
     out.print(PI1);
     out.print(n);
@@ -153,6 +124,7 @@ public final class XMLSerializer extends Serializer {
 
   @Override
   public void item(final byte[] b) throws IOException {
+    finishElement();
     if(indent) out.print(' ');
     for(int l = 0; l < b.length; l++) {
       final byte ch = b[l];
@@ -181,45 +153,41 @@ public final class XMLSerializer extends Serializer {
     return out.finished();
   }
 
+  @Override
+  protected void start(final byte[] t) throws IOException {
+    if(indent) indent(false);
+    out.print(ELEM1);
+    out.print(t);
+    indent = pretty;
+  }
+  
+  @Override
+  protected void empty() throws IOException {
+    out.print(ELEM4);
+  }
+
+  @Override
+  protected void finish() throws IOException {
+    out.print(ELEM2);
+  }
+
+  @Override
+  protected void close(final byte[] t) throws IOException {
+    if(indent) indent(true);
+    out.print(ELEM3);
+    out.print(t);
+    out.print(ELEM2);
+    indent = pretty;
+  }
+
   /**
    * Prints the text declaration to the output stream.
    * @param close close flag
    * @throws IOException in case of problems with the PrintOutput
    */
-  public void indent(final boolean close) throws IOException {
+  private void indent(final boolean close) throws IOException {
     out.println();
     final int s = tags.size + (close ? 1 : 0);
     for(int l = 1; l < s; l++) out.print(INDENT);
-  }
-  
-  /**
-   * Returns the content of the current node.
-   * @param data data reference
-   * @param p pre value
-   * @param s short representation
-   * @return string representation
-   */
-  public static byte[] content(final Data data, final int p, final boolean s) {
-    final int kind = data.kind(p);
-    if(kind == Data.ELEM) {
-      return data.tag(p);
-    } else if(kind == Data.DOC) {
-      return data.text(p);
-    } else if(kind == Data.TEXT) {
-      return s ? TEXT : data.text(p);
-    } else if(kind == Data.COMM) {
-      return s ? COMM : concat(COM1, data.text(p), COM2);
-    } else if(kind == Data.PI) {
-      return s ? PI : concat(PI1, data.text(p), PI2);
-    }
-    final TokenBuilder tb = new TokenBuilder();
-    tb.add(ATT);
-    tb.add(data.attName(p));
-    if(!s) {
-      tb.add(ATT1);
-      tb.add(data.attValue(p));
-      tb.add(ATT2);
-    }
-    return tb.finish();
   }
 }

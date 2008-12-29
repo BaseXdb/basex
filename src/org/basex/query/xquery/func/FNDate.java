@@ -68,8 +68,8 @@ final class FNDate extends Fun {
    * @return time.
    */
   private Iter yea(final Item it) {
-    return Itr.iter(it instanceof Dur ? ((Dur) it).yea() :
-      ((Date) it).xc.getYear());
+    return Itr.get(it instanceof Dur ? ((Dur) it).yea() :
+      ((Date) it).xc.getYear()).iter();
   }
 
   /**
@@ -78,8 +78,8 @@ final class FNDate extends Fun {
    * @return time.
    */
   private Iter mon(final Item it) {
-    return Itr.iter(it instanceof Dur ? ((Dur) it).mon() :
-      ((Date) it).xc.getMonth());
+    return Itr.get(it instanceof Dur ? ((Dur) it).mon() :
+      ((Date) it).xc.getMonth()).iter();
   }
 
   /**
@@ -88,8 +88,8 @@ final class FNDate extends Fun {
    * @return time.
    */
   private Iter day(final Item it) {
-    return Itr.iter(it instanceof Dur ? (int) ((Dur) it).day() :
-      ((Date) it).xc.getDay());
+    return Itr.get(it instanceof Dur ? (int) ((Dur) it).day() :
+      ((Date) it).xc.getDay()).iter();
   }
 
   /**
@@ -98,8 +98,8 @@ final class FNDate extends Fun {
    * @return time.
    */
   private Iter hou(final Item it) {
-    return Itr.iter(it instanceof Dur ? (int) ((Dur) it).hou() :
-      ((Date) it).xc.getHour());
+    return Itr.get(it instanceof Dur ? (int) ((Dur) it).hou() :
+      ((Date) it).xc.getHour()).iter();
   }
 
   /**
@@ -108,8 +108,8 @@ final class FNDate extends Fun {
    * @return time.
    */
   private Iter min(final Item it) {
-    return Itr.iter(it instanceof Dur ? ((Dur) it).min() :
-      ((Date) it).xc.getMinute());
+    return Itr.get(it instanceof Dur ? ((Dur) it).min() :
+      ((Date) it).xc.getMinute()).iter();
   }
 
   /**
@@ -118,10 +118,10 @@ final class FNDate extends Fun {
    * @return time.
    */
   private Iter sec(final Item it) {
-    if(it instanceof Dur) return Dec.iter(((Dur) it).sec().doubleValue());
+    if(it instanceof Dur) return Dec.get(((Dur) it).sec().doubleValue()).iter();
     final int s = ((Date) it).xc.getSecond();
     final BigDecimal d = ((Date) it).xc.getFractionalSecond();
-    return Dec.iter(s + (d != null ? d.doubleValue() : 0));
+    return Dec.get(s + (d != null ? d.doubleValue() : 0)).iter();
   }
 
   /**

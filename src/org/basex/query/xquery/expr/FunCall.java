@@ -40,7 +40,7 @@ public final class FunCall extends Arr {
     // add function variables
     final Func func = ctx.fun.get(id);
     for(int a = 0; a < func.args.length; a++) {
-      ctx.vars.add(func.args[a].item(ctx.iter(expr[a]).finish(), ctx).clone());
+      ctx.vars.add(func.args[a].bind(ctx.iter(expr[a]).finish(), ctx).clone());
     }
 
     // evaluate function and reset variable scope

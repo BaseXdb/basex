@@ -17,7 +17,7 @@ public class Set {
   /** Hash table buckets. */
   protected int[] bucket;
   /** Hash entries. Actual hash size is <code>size - 1</code>. */
-  public int size;
+  protected int size;
 
   /**
    * Empty Constructor.

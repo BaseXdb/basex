@@ -88,7 +88,7 @@ public final class FElem extends FNode {
   @Override
   public void serialize(final Serializer ser) throws IOException {
     final byte[] tag = name.str();
-    ser.startElement(tag);
+    ser.openElement(tag);
     
     // serialize top level namespace definitions
     final int s = ser.ns.size;
@@ -160,13 +160,9 @@ public final class FElem extends FNode {
     }
 
     // serialize children
-    if(children.size == 0) {
-      ser.emptyElement();
-    } else {
-      ser.finishElement();
-      for(int n = 0; n < children.size; n++) children.list[n].serialize(ser);
-      ser.closeElement();
-    }
+    for(int n = 0; n < children.size; n++) children.list[n].serialize(ser);
+    ser.closeElement();
+
     // reset namespace pointer
     ser.ns.size = s;
     ser.dn = dn;

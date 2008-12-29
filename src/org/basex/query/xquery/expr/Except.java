@@ -49,6 +49,6 @@ public final class Except extends Arr {
 
   @Override
   public String toString() {
-    return toString(" except ");
+    return "(" + toString(" except ") + ")";
   }
 }

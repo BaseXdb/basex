@@ -7,10 +7,12 @@ import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Expr;
+import org.basex.query.xquery.expr.Pred;
 import org.basex.query.xquery.func.Fun;
 import org.basex.query.xquery.func.FunDef;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Nod;
+import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.NodIter;
@@ -68,29 +70,24 @@ public class Step extends Expr {
   }
 
   @Override
-  public Step comp(final XQContext ctx) throws XQException {
-    for(int p = 0; p != pred.length; p++) {
-      pred[p] = ctx.comp(pred[p]);
-      if(pred[p].i()) {
-        final Item it = (Item) pred[p];
-        if(it.n() || !it.bool()) continue;
-        Array.move(pred, p + 1, -1, pred.length - p-- - 1);
-        pred = Array.finish(pred, pred.length - 1);
-      }
-    }
+  public Expr comp(final XQContext ctx) throws XQException {
+    pred = Pred.comp(pred, ctx);
+    if(pred == null || !test.comp(ctx)) return Seq.EMPTY;
 
     // No predicates.. evaluate via simple iterator
     if(pred.length == 0) return get(axis, test);
-    // LAST
+    
+    // Last flag
     final boolean last = pred[0] instanceof Fun &&
       ((Fun) pred[0]).func == FunDef.LAST;
     // Numeric value
     final boolean num = pred[0].i() && ((Item) pred[0]).n();
     // Multiple Predicates or POS
-    return pred.length > 1 || !last && !num && uses(Using.POS) ? this :
-      new IterStep(axis, test, pred, last, num);
+    if(pred.length > 1 || !last && !num && uses(Using.POS)) return this;
+    // Use iterative evaluation
+    return new IterStep(axis, test, pred, last, num);
   }
-
+  
   @Override
   public NodeIter iter(final XQContext ctx) throws XQException {
     final Iter iter = checkCtx(ctx);
@@ -103,7 +100,7 @@ public class Step extends Expr {
       final NodeIter ir = axis.init((Nod) it);
       Nod nod;
       while((nod = ir.next()) != null) {
-        if(test.e(nod)) {
+        if(test.eval(nod)) {
           nod = nod.finish();
           nod.score(Scoring.step(it.score()));
           nb.add(nod);
@@ -180,23 +177,29 @@ public class Step extends Expr {
   }
 
   @Override
+  public boolean sameAs(final Expr cmp) {
+    if(!(cmp instanceof Step)) return false;
+    final Step st = (Step) cmp;
+    if(pred.length != st.pred.length || axis != st.axis ||
+        !test.sameAs(st.test)) return false;
+    for(int s = 0; s < pred.length; s++) {
+      if(!pred[s].sameAs(st.pred[s])) return false;
+    }
+    return true;
+  }
+
+  @Override
   public final String color() {
     return "FFFF66";
   }
 
   @Override
   public final void plan(final Serializer ser) throws IOException {
-    ser.startElement(this);
+    ser.openElement(this);
     ser.attribute(AXIS, Token.token(axis.name));
     ser.attribute(TEST, Token.token(test.toString()));
-
-    if(pred.length != 0) {
-      ser.finishElement();
-      for(final Expr p : pred) p.plan(ser);
-      ser.closeElement();
-    } else {
-      ser.emptyElement();
-    }
+    for(final Expr p : pred) p.plan(ser);
+    ser.closeElement();
   }
   
   @Override

@@ -50,7 +50,7 @@ public abstract class DataUpdateTest {
   @SuppressWarnings("unused")
   public void setUp() throws Exception {
     data = CreateDB.xml(IO.get(TESTFILE), dbname);
-    size = data.size;
+    size = data.meta.size;
   }
   
   /**
@@ -90,8 +90,8 @@ public abstract class DataUpdateTest {
    */
   @Test
   public void testSize() throws Exception {
-    assertEquals("Unexpected size!", size, data.size);
+    assertEquals("Unexpected size!", size, data.meta.size);
     reload();
-    assertEquals("Unexpected size!", size, data.size);
+    assertEquals("Unexpected size!", size, data.meta.size);
   }
 }

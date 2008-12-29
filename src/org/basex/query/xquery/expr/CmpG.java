@@ -1,5 +1,6 @@
 package org.basex.query.xquery.expr;
 
+import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
@@ -9,12 +10,13 @@ import org.basex.query.xquery.FTIndexAcsbl;
 import org.basex.query.xquery.FTIndexEq;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.XQOptimizer;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Item;
+import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.item.Str;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
+import org.basex.query.xquery.iter.ResetIter;
 import org.basex.query.xquery.iter.SeqIter;
 import org.basex.query.xquery.path.Axis;
 import org.basex.query.xquery.path.AxisPath;
@@ -64,10 +66,10 @@ public final class CmpG extends Arr {
     public String toString() { return name; }
   };
 
-  /** Index type. */
-  private IndexToken index;
   /** Comparator. */
-  final Comp cmp;
+  public final Comp cmp;
+  /** Index type. */
+  private IndexToken[] index = {};
 
   /**
    * Constructor.
@@ -86,66 +88,69 @@ public final class CmpG extends Arr {
 
     final Expr e1 = expr[0];
     final Expr e2 = expr[1];
-    if(e1.e() || e2.e()) return Bln.FALSE;
-    expr[0] = XQOptimizer.addText(expr[0], ctx);
-    if(!e1.i() || !e2.i()) return this;
-    return Bln.get(ev((Item) expr[0], (Item) expr[1], cmp.cmp));
+    if(e1 instanceof AxisPath) ((AxisPath) e1).addText(ctx);
+
+    Expr e = this;
+    if(e1.i() && e2.i()) e = Bln.get(ev((Item) e1, (Item) e2, cmp.cmp));
+    else if(e1.e() || e2.e()) e = Bln.FALSE;
+    if(e != this) ctx.compInfo(OPTSIMPLE, this, e);
+    return e;
   }
 
   @Override
-  public Iter iter(final XQContext ctx) {
-    return new Iter() {
-      /** Iterator flag. */
-      private boolean more;
-      
-      @Override
-      public Item next() throws XQException {
-        if(!(more ^= true)) return null;
-        final Expr e1 = expr[0];
-        final Expr e2 = expr[1];
-        final boolean i1 = e1.i();
-        final boolean i2 = e2.i();
-        return Bln.get(i1 && i2 ? ev((Item) e1, (Item) e2, cmp.cmp) :
-          i2 ? ev(ctx.iter(e1), (Item) e2) : ev(ctx.iter(e1), ctx.iter(e2)));
-      }
-    };
+  public Iter iter(final XQContext ctx) throws XQException {
+    return Bln.get(ev(ctx)).iter();
   }
 
   /**
-   * Performs a general comparison on the specified iterators and comparator.
-   * @param ir1 first iterator
-   * @param ir2 second iterator
+   * Evaluates the comparison operator.
+   * @param ctx query context
    * @return result of check
    * @throws XQException evaluation exception
    */
-  boolean ev(final Iter ir1, final Iter ir2) throws XQException {
-    if(ir1.size() == 0 || ir2.size() == 0) return false;
+  private boolean ev(final XQContext ctx) throws XQException {
+    final Iter ir1 = ctx.iter(expr[0]);
+    // skip empty result
+    if(ir1.size() == 0) return false;
+    final boolean s1 = ir1.size() == 1;
     
+    // evaluate single items
+    if(s1 && expr[1].i()) return ev(ir1.next(), (Item) expr[1], cmp.cmp);
+    final Iter ir2 = ctx.iter(expr[1]);
+    // skip empty result
+    if(ir2.size() == 0) return false;
+    final boolean s2 = ir2.size() == 1;
+    
+    // evaluate single items
+    if(s1 && s2) return ev(ir1.next(), ir2.next(), cmp.cmp);
+
+    // evaluate iterator and single item
     Item it1, it2;
-    final SeqIter seq = new SeqIter();
-    if((it1 = ir1.next()) != null) {
-      while((it2 = ir2.next()) != null) {
-        if(ev(it1, it2, cmp.cmp)) return true;
-        seq.add(it2);
+    if(s2) {
+      it2 = ir2.next();
+      while((it1 = ir1.next()) != null) if(ev(it1, it2, cmp.cmp)) return true;
+      return false;
+    }
+    
+    // evaluate two iterators
+    final ResetIter ir;
+    if(ir2 instanceof ResetIter) {
+      ir = (ResetIter) ir2;
+    } else {
+      // cache items for next comparisons
+      final SeqIter seq = new SeqIter();
+      if((it1 = ir1.next()) != null) {
+        while((it2 = ir2.next()) != null) {
+          if(ev(it1, it2, cmp.cmp)) return true;
+          seq.add(it2);
+        }
       }
+      ir = seq;
     }
     while((it1 = ir1.next()) != null) {
-      seq.reset();
-      while((it2 = seq.next()) != null) if(ev(it1, it2, cmp.cmp)) return true;
+      ir.reset();
+      while((it2 = ir.next()) != null) if(ev(it1, it2, cmp.cmp)) return true;
     }
-    return false;
-  }
-
-  /**
-   * Performs a general comparison on the specified iterator and item.
-   * @param ir iterator
-   * @param it item
-   * @return result of check
-   * @throws XQException evaluation exception
-   */
-  boolean ev(final Iter ir, final Item it) throws XQException {
-    Item i;
-    while((i = ir.next()) != null) if(ev(i, it, cmp.cmp)) return true;
     return false;
   }
 
@@ -166,10 +171,13 @@ public final class CmpG extends Arr {
   }
 
   @Override
-  public void indexAccessible(final XQContext ctx, final FTIndexAcsbl ia) {
+  public void indexAccessible(final XQContext ctx, final FTIndexAcsbl ia)
+      throws XQException {
+
     // accept only location path, string and equality expressions
     final Step s = indexStep(expr);
-    if(s == null || !(expr[1] instanceof Str) || cmp != CmpG.Comp.EQ) return;
+    if(s == null || cmp != Comp.EQ || !(expr[1] instanceof Str) &&
+        !(expr[1] instanceof Seq)) return;
 
     final boolean text = ia.data.meta.txtindex && s.test.type == Type.TXT;
     final boolean attr = !text && ia.data.meta.atvindex &&
@@ -178,21 +186,35 @@ public final class CmpG extends Arr {
     // no text or attribute index applicable
     if(!text && !attr) return;
 
-    index = new ValuesToken(text, ((Str) expr[1]).str());
+    // loop through all strings
+    final Iter ir = expr[1].iter(ctx);
+    Item i;
+    while((i = ir.next()) != null) {
+      if(!(i instanceof Str)) return;
+      final ValuesToken vt = new ValuesToken(text, i.str());
+      ia.is = Math.max(ia.data.nrIDs(vt), ia.is);
+      index = Array.add(index, vt);
+    }
     ia.iu = true;
-    ia.is = ia.data.nrIDs(index);
   }
   
   @Override
   public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq) {
-    final boolean txt = index.type == IndexToken.Type.TXT;
-
-    // standard index evaluation; first expression will always be an axis path
-    final Expr ex = new IndexAccess(ieq.data, index);
+    // create index access expressions
+    final int il = index.length;
+    final Expr[] ia = new IndexAccess[il];
+    for(int i = 0; i < il; i++) ia[i] = new IndexAccess(ieq.data, index[i]);
+    
+    // more than one string - merge index results
+    final Expr root = il == 1 ? ia[0] : new Union(ia);
+    
     final AxisPath orig = (AxisPath) expr[0];
-    final AxisPath path = orig.invertPath(ex, ieq.curr);
+    final AxisPath path = orig.invertPath(root, ieq.curr);
 
-    if(!txt) {
+    if(index[0].type == IndexToken.Type.TXT) {
+      ctx.compInfo(OPTTXTINDEX);
+    } else {
+      ctx.compInfo(OPTATVINDEX);
       // add attribute step
       final Step step = orig.step[0];
       Step[] steps = { Step.get(Axis.SELF, step.test) };
@@ -207,17 +229,25 @@ public final class CmpG extends Arr {
    * @param expr expression arguments
    * @return result of check
    */
-  public static Step indexStep(final Expr[] expr) {
+  static Step indexStep(final Expr[] expr) {
     // check if index can be applied
     if(!(expr[0] instanceof AxisPath)) return null;
     
     // accept only single axis steps as first expression
     final AxisPath path = (AxisPath) expr[0];
-    if(path.root != null || path.step.length != 1) return null;
+    if(path.root != null) return null;
+    //if(path.root != null || path.step.length != 1) return null;
 
     // step must not contain predicates
-    final Step s = path.step[0];
-    return s.pred.length != 0 ? null : s;
+    return path.step[path.step.length - 1];
+  }
+  
+  /**
+   * Checks if this expression has a path and a string as arguments.
+   * @return result of check
+   */
+  boolean standard() {
+    return expr[0] instanceof AxisPath && expr[1] instanceof Str;
   }
   
   @Override

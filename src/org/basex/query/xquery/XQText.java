@@ -51,11 +51,13 @@ public interface XQText {
   /** FODC0002: Evaluation exception. */
   Object[] UNDOC = { FODC, 2, "Document node could not be created (%)." };
   /** FODC0002: Evaluation exception. */
-  Object[] NODOC = { FODC, 2, "Document \"%\" could not be loaded." };
-  /** FODC0004: Evaluation exception. */
   Object[] COLLINV = { FODC, 2, "Collection name \"%\" is invalid." };
-  /** FODC0004: Evaluation exception. */
+  /** FODC0002: Evaluation exception. */
   Object[] COLLDEF = { FODC, 2, "No default collection found." };
+  /** FODC0002: Evaluation exception. */
+  Object[] NODOC = { FODC, 2, "%" };
+  /** FODC0004: Evaluation exception. */
+  Object[] NOCOLL = { FODC, 4, "%" };
   /** FODC0005: Evaluation exception. */
   Object[] INVDOC = { FODC, 5, "Invalid file path: \"%\"." };
 
@@ -392,7 +394,7 @@ public interface XQText {
   /** XQST0038: Parsing exception. */
   Object[] DUPLCOLL = { XQST, 38, "Duplicate 'collation' declaration." };
   /** XQST0076: Parsing exception. */
-  Object[] NOCOLL = { XQST, 38, "Unknown collation \"%\"." };
+  Object[] COLLWHICH = { XQST, 38, "Unknown collation \"%\"." };
   /** XQST0039: Parsing exception. */
   Object[] FUNCDUPL = { XQST, 39, "Duplicate function argument %." };
   /** XQST0040: Parsing exception. */
@@ -472,11 +474,31 @@ public interface XQText {
   // OPTIMIZATIONS
 
   /** Compiler info. */
-  String OPTSIMPLE = "% => %";
-  /** Compiler info. */
   String OPTCAST = "Casting %";
   /** Compiler info. */
   String OPTDESC = "Merging descendant-or-self step(s)";
+  /** Compiler info. */
+  String OPTPRE = "Pre-evaluating %";
+  /** Compiler info. */
+  String OPTFALSE = "Removing always false expression: %";
+  /** Compiler info. */
+  String OPTTRUE = "Removing always true expression: %";
+  /** Compiler info. */
+  String OPTTEXT = "Adding text() step";
+  /** Compiler info. */
+  String OPTSIMPLE = "Simplifying: % => %";
+  /** Compiler info. */
+  String OPTSTAT = "Removing static assignments: %";
+  /** Optimization info. */
+  String OPTRED = "Merging redundant location paths";
+  /** Optimization info. */
+  String OPTNAME = "Removing unknown tag/attribute \"%\"";
+  /** Optimization info. */
+  String OPTTXTINDEX = "Applying text index";
+  /** Optimization info. */
+  String OPTATVINDEX = "Applying attribute index";
+  /** Optimization info. */
+  String OPTFTXINDEX = "Applying fulltext index";
 
   /** Evaluation info. */
   String EVALSKIP = "rest of output skipped...";

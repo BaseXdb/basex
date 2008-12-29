@@ -57,11 +57,11 @@ public final class FNNode extends Fun {
       case NAME:
         if(empty) return Str.ZERO.iter();
         qname = checkNode(it).qname();
-        return qname != null ? Str.iter(qname.str()) : Str.ZERO.iter();
+        return (qname != null ? Str.get(qname.str()) : Str.ZERO).iter();
       case LOCNAME:
         if(empty) return Str.ZERO.iter();
         qname = checkNode(it).qname();
-        return qname != null ? Str.iter(qname.ln()) : Str.ZERO.iter();
+        return (qname != null ? Str.get(qname.ln()) : Str.ZERO).iter();
       case NSURI:
         if(empty || it.type == Type.PI) return Uri.EMPTY.iter();
         Nod node = checkNode(it);

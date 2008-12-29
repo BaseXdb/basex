@@ -1,5 +1,7 @@
 package org.basex.query.xquery.expr;
 
+import static org.basex.query.xquery.XQText.*;
+
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Item;
@@ -33,7 +35,9 @@ public final class If extends Arr {
     super.comp(ctx);
     if(!expr[0].i()) return this;
     // static result: return then or else branch
-    return expr[((Item) expr[0]).bool() ? 1 : 2];
+    final Expr e = expr[((Item) expr[0]).bool() ? 1 : 2];
+    ctx.compInfo(OPTSIMPLE, this, e);
+    return e;
   }
 
   @Override

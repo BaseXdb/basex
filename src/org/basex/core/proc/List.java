@@ -41,14 +41,17 @@ public final class List extends Process {
       o.println("--------------------------------------------");
       for(final String name : list) {
         o.print(Token.token(name), ml);
+        DataInput in = null;
         try {
-          final DataInput in = new DataInput(name, DATAINFO);
+          in = new DataInput(name, DATAINFO);
           final MetaData md = new MetaData(name);
           md.read(in);
           in.close();
           o.println(md.file.toString());
         } catch(final IOException ex) {
           o.println(INFODBERR);
+        } finally {
+          try { if(in != null) in.close(); } catch(final IOException e) { }
         }
       }
       o.print(t.finish());
