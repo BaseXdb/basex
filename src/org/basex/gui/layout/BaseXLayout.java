@@ -756,7 +756,7 @@ public final class BaseXLayout {
         //}
       } else {
         g.fillRect((int) (xx + f * ll), (int) yy, (int) f * wl, fh);        
-        ll += wl;
+        ll += wl;          
       }
       
       if (r.pos != null && pp < r.pos.length && count == r.pos[pp]) {
@@ -771,7 +771,7 @@ public final class BaseXLayout {
         g.fillRect((int) (xx + f * ll), (int) yy, (int) f * wl, fh);
         ll += wl;
         g.setColor(textc);
-      }
+      } 
     } 
   }
 
@@ -797,7 +797,6 @@ public final class BaseXLayout {
     int pp = 0;
     int sw = 0;
     IntList poic = new IntList();
-    byte[] token;
     final int wd = width(g, cw, '.');
     final int we = width(g, cw, ' ');
     final String e = new String(" ");
@@ -815,24 +814,40 @@ public final class BaseXLayout {
         g.drawString(sw == we + wd * 2 ? d + d + e : d + e, xx, yy);
         xx = r.x + sw;
           
-        byte[] tok = ftt.get();
-        for (byte b : tok)
-          sw += width(g, cw, b);
-        if (sw > r.w) {
-          yy += fh;
-          xx = r.x;
-          sw = 2 * we;
-          if (yy >= r.y + r.h) return;
+        byte[] tok = new byte[0];
+        byte[] t = null;
+        int c = 0;
+        while(pp + c + 1 < r.poi.length && 
+            r.poi[pp + 1] == r.poi[pp + c + 1] && 
+            r.pos[pp] == r.pos[pp + c] - c) {
+          if(t != null) {
+            ftt.more();
+            count++;
+          }
+          t = ftt.get();
+          for (byte b : t)
+            sw += width(g, cw, b);
+          sw += we;
+          if (sw > r.w) {
+            yy += fh;
+            xx = r.x;
+            sw = 2 * we;
+            if (yy >= r.y + r.h) return;
+          }
+          tok = Array.add(tok, Array.add(t, new byte[]{' '}));
+          c++;          
         }
-        pp++;
+        sw -= we;
+        pp  = pp + c;
         g.setColor(thumbnailcolor[r.poi[pp]]);
         g.drawString(new String(tok), xx, yy);
         g.setColor(textc);
         if(!poic.contains(r.poi[pp])) poic.add(r.poi[pp]);
         xx = r.x + sw;
-        token = new byte[0];
         int k = 0;
+        int ll;
         while (k < 2 && ftt.more()) {
+          ll = sw;
           count++;
           if (r.pos != null && pp < r.pos.length && count == r.pos[pp]) {
             pp++;
@@ -855,7 +870,9 @@ public final class BaseXLayout {
             sw = 2 * we;
             if (yy >= r.y + r.h) return;
           }
-          token = Array.add(token, Array.add(new byte[]{' '}, tok));
+          g.drawString(e + new String(tok), xx, yy);
+          g.setColor(textc);
+          xx += sw - ll;
           k++;
         }
         sw += we + wd;
@@ -865,7 +882,7 @@ public final class BaseXLayout {
           sw = 2 * we;
           if (yy >= r.y + r.h) return;
         }
-        g.drawString(new String(token) + e + d, xx, yy);
+        g.drawString(e + d, xx, yy);
         xx = r.x + sw;
         
         if (r.poi != null && r.poi[0] == poic.size) {
