@@ -652,6 +652,7 @@ public final class BaseXLayout {
     } 
   }
   
+  
   /**
    * Draws a text using thumbnail visualization.
    * @param g graphics reference
@@ -680,48 +681,36 @@ public final class BaseXLayout {
     int pp = 0;
     int cp = 0;
     int cs = 0;
-
-    while(ftt.more()) {
-      count++;
-      wl = ftt.p - ftt.s;
-      
-      if (cs < ftt.sent && sen || cs < ftt.para && !sen) {
-        // new sentence
-        if (sen) {
-          ll++;
-          cs = ftt.sent;
-        }
-        if (cp < ftt.para) {
-          cp = ftt.para;
-          yy += lh;
-          ll = 0;
-        }
-      } 
-      
-      if (r.pos != null) {
-        while ((cs == ftt.sent && sen || cs == ftt.para && !sen) && 
-            (r.pos == null || pp < r.pos.length && count < r.pos[pp]) 
-            && ftt.more()) {
-          wl += ftt.p - ftt.s;
-          count++;
-        }
+    boolean m = ftt.more();
+    int lastl = 0;
+    
+    while (m) {
+      while (ll + wl < ww && m &&
+          (cs == ftt.sent && sen || cp == ftt.para && !sen) && 
+          (r.pos == null || (pp < r.pos.length && count < r.pos[pp]) 
+              || pp == r.pos.length)) {
+        lastl = (int) ((ftt.p - ftt.s) * f);
+        wl += lastl;
+        
+        count++;
+        m = ftt.more();
+        if (!m) break;        
       }
-
-      // check if rectangle fits in line
-      if (f * (ll + wl) > ww) {
-        // split sentences, that don't fit in the line
-        final int fp = (int) (ww - f * ll - 4) / (int) f;
-        if (fp <= 1) {
+      
+      // doesn't fit in line
+      if (ll + wl > ww) { 
+        final int fp = (int) (ww - ll);
+        if (fp <= f) {
           yy += lh;
           ll = 0;
         } else {
           final int sp = wl - fp;
           // draw first part of the sentence
-          g.fillRect((int) (xx + f * ll), (int) yy, (int) ((fp - 1) * f), fh);
-          ll += fp - 1;
+          g.fillRect((int) (xx + ll), (int) yy, (int) (fp - f), fh);
+          ll += fp - f;
           // color last rect of first part of the word black
           g.setColor(new Color(0, 0, 0));
-          g.fillRect((int) (xx + f * ll), (int) yy, (int) f, fh);
+          g.fillRect((int) (xx + ll), (int) yy, (int) f, fh);
           g.setColor(textc);
           if(yy + lh >= r.y + r.h) return;
           yy += lh;
@@ -731,48 +720,45 @@ public final class BaseXLayout {
           g.fillRect((int) xx, (int) yy, (int) f, fh);
           g.setColor(textc);
           wl = sp;
-          ll = 1;
+          ll = (int) f;
         } 
-          // count number of lines in-between
-          while (f * wl > r.w) {
-            g.fillRect((int) (xx + f), (int) yy, (int) (r.w - f * 2 - 4), fh);
-            
-            // color last rec of the current line black
-            g.setColor(new Color(0, 0, 0));
-            g.fillRect((int) (r.x + r.w  - f - 4), (int) yy, (int) f, fh);
-            wl -= r.w / f;
-            if(yy + lh >= r.y + r.h) return;
-            yy += lh;
-            
-            // color first rec of second part of the word black
-            g.fillRect((int) xx, (int) yy, (int) f, fh);
-            g.setColor(textc);            
-          }
-          
-          // draw second part of the sentence
-          if(yy + lh >= r.y + r.h) return;
-          g.fillRect((int) (xx + f * ll), (int) yy, (int) f * wl, fh);
-          ll += wl;
-        //}
-      } else {
-        g.fillRect((int) (xx + f * ll), (int) yy, (int) f * wl, fh);        
-        ll += wl;          
       }
       
+      // color thumbnail because of fulltext hint
       if (r.pos != null && pp < r.pos.length && count == r.pos[pp]) {
-        // color next token
+        if (lastl > 0) {
+          g.fillRect((int) (xx + ll), (int) yy, wl - lastl, fh);
+          ll += wl - lastl;
+          wl = lastl;
+        }
+        
         pp++;
         g.setColor(thumbnailcolor[r.poi[pp]]);
-        wl = ftt.p - ftt.s;
-        if (f * ll + f * wl > r.w) {
+      } 
+      
+      if (wl + ll < ww) {
+        g.fillRect((int) (xx + ll), (int) yy, wl, fh);
+        g.setColor(textc);
+        ll += wl;
+        wl = 0;
+      }
+      
+      // begin new line / new sentence
+      if (cs < ftt.sent && sen || cp < ftt.para && !sen) {
+        // new sentence
+        if (sen) {
+          ll += f;
+          cs = ftt.sent;
+        }
+        if (cp < ftt.para) {
+          cp = ftt.para;
           yy += lh;
+          wl = 0;
           ll = 0;
         }
-        g.fillRect((int) (xx + f * ll), (int) yy, (int) f * wl, fh);
-        ll += wl;
-        g.setColor(textc);
-      } 
-    } 
+      }
+      
+    }
   }
 
 
