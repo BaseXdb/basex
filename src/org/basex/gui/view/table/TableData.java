@@ -85,7 +85,7 @@ final class TableData {
       int c = 0;
       for(final byte[] kk : data.skel.desc(k, true, false)) {
         final Names index = !startsWith(kk, '@') ? data.tags : data.atts;
-        if(!index.noLeaf(index.id(delete(kk, '@')))) c++;
+        if(index.stat(index.id(delete(kk, '@'))).leaf) c++;
       }
       if(c > 1) roots.add(k);
     }
@@ -124,7 +124,7 @@ final class TableData {
         final boolean elem = !startsWith(k, '@');
         final byte[] key = delete(k, '@');
         final Names index = elem ? data.tags : data.atts;
-        if(!index.noLeaf(index.id(key))) addCol(key, elem);
+        if(index.stat(index.id(key)).leaf) addCol(key, elem);
       }
     }
     context(true);

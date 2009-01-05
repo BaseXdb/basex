@@ -62,6 +62,6 @@ public final class CText extends Single {
 
   @Override
   public String info() {
-    return "Text constructor";
+    return "text constructor";
   }
 }

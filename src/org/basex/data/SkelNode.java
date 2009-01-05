@@ -23,7 +23,7 @@ public final class SkelNode {
   /** Children. */
   public SkelNode[] ch;
   /** Length of text. */
-  public int tl;
+  public double tl;
 
   /**
    * Default Constructor.
@@ -58,7 +58,7 @@ public final class SkelNode {
     kind = in.readByte();
     count = in.readNum();
     ch = new SkelNode[in.readNum()];
-    tl = in.readNum();
+    tl = in.readDouble();
     for(int i = 0; i < ch.length; i++) ch[i] = new SkelNode(in);
   }
 
@@ -102,7 +102,7 @@ public final class SkelNode {
     out.write1(kind);
     out.writeNum(count);
     out.writeNum(ch.length);
-    out.writeNum(tl);
+    out.writeDouble(tl);
     for(final SkelNode c : ch) c.finish(out);
   }
 

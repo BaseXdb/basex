@@ -1,11 +1,10 @@
 package org.basex.query.xquery.func;
 
 import static org.basex.util.Token.*;
-
 import org.basex.BaseX;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.XQParser;
+import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Dbl;
 import org.basex.query.xquery.item.Item;
@@ -29,6 +28,14 @@ final class FNBaseX extends Fun {
       default: BaseX.notexpected(func); return null;
     }
   }
+  
+  @Override
+  public Expr c(final XQContext ctx) {
+    switch(func) {
+      case CONTAINSLC: return args[0].e() ? Bln.FALSE : this;
+      default:         return this;
+    }
+  }
 
   /**
    * Performs the eval function.
@@ -38,8 +45,9 @@ final class FNBaseX extends Fun {
    */
   private Iter eval(final Iter[] arg) throws XQException {
     final XQContext ct = new XQContext();
-    new XQParser(ct).parse(string(checkStr(arg[0])));
-    return ct.compile(null).iter();
+    ct.parse(string(checkStr(arg[0])));
+    ct.compile(null);
+    return ct.iter();
   }
 
   /**

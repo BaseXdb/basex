@@ -92,8 +92,6 @@ public final class XQContext extends QueryContext {
   /** Collection names. */
   byte[][] collName = new byte[0][];
 
-  /** Default fulltext options. */
-  final FTOpt ftoptions = new FTOpt();
   /** Default boundary-space. */
   public boolean spaces = false;
   /** Empty Order mode. */
@@ -113,10 +111,30 @@ public final class XQContext extends QueryContext {
   public int revalidate = 0;
 
   /** Reference to the root expression. */
-  Expr root;
+  private Expr root;
+
+  /**
+   * Parses the specified query.
+   * @param q input query
+   * @throws XQException xquery exception
+   */
+  public void parse(final String q) throws XQException {
+    query = q;
+    root = new XQParser(this).parse(q, file, null);
+  }
+
+  /**
+   * Parses the specified module.
+   * @param q input query
+   * @throws XQException xquery exception
+   */
+  public void module(final String q) throws XQException {
+    query = q;
+    new XQParser(this).parse(q, file, Uri.EMPTY);
+  }
 
   @Override
-  public XQContext compile(final Nodes nodes) throws XQException {
+  public void compile(final Nodes nodes) throws XQException {
     try {
       // cache the initial context nodes
       if(nodes != null) {
@@ -138,16 +156,13 @@ public final class XQContext extends QueryContext {
       if(inf) compInfo(QUERYCOMP);
       fun.comp(this);
       vars.comp(this);
-      ftopt = ftoptions;
       root = comp(root);
       if(inf) compInfo(QUERYRESULT + "%", root);
 
       evalTime = System.nanoTime();
-      return this;
     } catch(final StackOverflowError e) {
       if(Prop.debug) e.printStackTrace();
       Err.or(XPSTACK);
-      return null;
     }
   }
 
@@ -214,10 +229,10 @@ public final class XQContext extends QueryContext {
   }
   
   /**
-   * Evaluates the specified expression and returns an iterator.
-   * @param e expression to be evaluated
+   * Compiles the specified expression and returns an iterator.
+   * @param e expression to be compiled
    * @return iterator
-   * @throws XQException evaluation exception
+   * @throws XQException query exception
    */
   public Expr comp(final Expr e) throws XQException {
     return e.comp(this);
@@ -227,31 +242,11 @@ public final class XQContext extends QueryContext {
    * Evaluates the specified expression and returns an iterator.
    * @param e expression to be evaluated
    * @return iterator
-   * @throws XQException evaluation exception
+   * @throws XQException query exception
    */
   public Iter iter(final Expr e) throws XQException {
     checkStop();
     return e.iter(this);
-  }
-
-  /**
-   * Returns the specified expression as an item. Empty sequences are
-   * handled by the empty flag.
-   * @param expr expression to be evaluated
-   * @param call calling expression
-   * @param empty if set to true, empty sequences are returned as null.
-   * Otherwise, an error is thrown
-   * @return iterator
-   * @throws XQException evaluation exception
-   */
-  public Item atomic(final Expr expr, final Expr call, final boolean empty)
-      throws XQException {
-
-    if(expr.e()) {
-      if(!empty) Err.empty(call);
-      return null;
-    }
-    return expr.i() ? (Item) expr : iter(expr).atomic(call, empty);
   }
 
   /**

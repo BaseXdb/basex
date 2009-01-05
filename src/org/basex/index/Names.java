@@ -1,7 +1,6 @@
 package org.basex.index;
 
 import static org.basex.Text.*;
-
 import java.io.IOException;
 import org.basex.data.StatsKey;
 import org.basex.io.DataInput;
@@ -21,10 +20,6 @@ import org.basex.util.TokenBuilder;
  * @author Lukas Kircher
  */
 public final class Names extends Set {
-  /** Number of token occurrences. */
-  private int[] counter;
-  /** Flag referencing non-leaves. */
-  private boolean[] noleaf;
   /** Statistic information. */
   private StatsKey[] stat;
 
@@ -32,8 +27,6 @@ public final class Names extends Set {
    * Empty Constructor.
    */
   public Names() {
-    counter = new int[CAP];
-    noleaf = new boolean[CAP];
     stat = new StatsKey[CAP];
   }
 
@@ -46,8 +39,6 @@ public final class Names extends Set {
     keys = in.readBytesArray();
     next = in.readNums();
     bucket = in.readNums();
-    counter = in.readNums();
-    noleaf = in.readBools();
     size = in.readNum();
     stat = new StatsKey[next.length];
     for(int s = 1; s < size; s++) stat[s] = new StatsKey(in);
@@ -57,10 +48,7 @@ public final class Names extends Set {
    * Initializes the statistics.
    */
   public void init() {
-    for(int i = 1; i < size; i++) {
-      stat[i] = new StatsKey();
-      counter[i] = 0;
-    }
+    for(int i = 1; i < size; i++) stat[i] = new StatsKey();
   }
 
   /**
@@ -72,10 +60,10 @@ public final class Names extends Set {
    */
   public int index(final byte[] k, final byte[] v, final boolean st) {
     final int i = Math.abs(add(k));
-    if(stat[i] == null) stat[i] = new StatsKey();
     if(st) {
-      counter[i]++;
-      stat[i].add(v);
+      if(stat[i] == null) stat[i] = new StatsKey();
+      if(v != null) stat[i].add(v);
+      stat[i].counter++;
     }
     return i;
   }
@@ -98,28 +86,8 @@ public final class Names extends Set {
     out.writeBytesArray(keys);
     out.writeNums(next);
     out.writeNums(bucket);
-    out.writeNums(counter);
-    out.writeBools(noleaf);
     out.writeNum(size);
     for(int s = 1; s < size; s++) stat[s].finish(out);
-  }
-
-  /**
-   * Returns the tag counter (number of indexed keys).
-   * @param id token id
-   * @return tag counter
-   */
-  public int counter(final int id) {
-    return counter[id];
-  }
-
-  /**
-   * Sets node flag for the specified id.
-   * @param id token id
-   * @param l node flag
-   */
-  public void noleaf(final int id, final boolean l) {
-    noleaf[id] = l;
   }
 
   /**
@@ -132,24 +100,16 @@ public final class Names extends Set {
   }
 
   /**
-   * Returns node flag for the specified id.
-   * @param id token id
-   * @return the indexed token
-   */
-  public boolean noLeaf(final int id) {
-    return noleaf[id];
-  }
-
-  /**
    * Returns index information.
    * @return statistics string
    */
   public byte[] info() {
     final byte[][] tl = new byte[size][];
     int len = 0;
+    tl[0] = Token.EMPTY;
     for(int i = 1; i < size; i++) {
       if(len < keys[i].length) len = keys[i].length;
-      tl[i] = Token.token(counter[i]);
+      tl[i] = Token.token(stat[i].counter);
     }
     len += 2;
 
@@ -161,14 +121,12 @@ public final class Names extends Set {
     tb.add(IDXENTRIES + (size - 1) + NL);
     for(int i = 0; i < size - 1; i++) {
       final int s = ids.list[i];
-      if(counter[s] == 0) continue;
+      if(stat[s] == null) continue;
       final byte[] key = keys[s];
       tb.add("  ");
       tb.add(key);
       for(int j = 0; j < len - key.length; j++) tb.add(' ');
-      tb.add(counter[s] + "x" + stat[s]);
-      if(!noleaf[s]) tb.add(", leaf");
-      tb.add(NL);
+      tb.add(stat[s] + NL);
     }
     return tb.finish();
   }
@@ -176,8 +134,6 @@ public final class Names extends Set {
   @Override
   protected void rehash() {
     super.rehash();
-    counter = Array.extend(counter);
-    noleaf = Array.extend(noleaf);
     stat = Array.extend(stat);
   }
 }

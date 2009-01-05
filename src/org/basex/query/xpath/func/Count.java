@@ -59,14 +59,14 @@ public final class Count extends Func {
         // return number of descendant tags
         final int n1 = steps.get(0).simpleName(Axis.DESC, true);
         if(n1 == Integer.MIN_VALUE) return this;
-        num = tags.counter(n1);
+        num = tags.stat(n1).counter;
       } else {
         // return number of descendant tags, excluding the root node
         final int n1 = steps.get(0).simpleName(Axis.CHILD, true);
         if(n1 == Integer.MIN_VALUE) return this;
         final int n2 = steps.get(1).simpleName(Axis.DESC, true);
         if(n2 == Integer.MIN_VALUE) return this;
-        num = tags.counter(n2) - (n1 == n2 ? 1 : 0);
+        num = tags.stat(n2).counter - (n1 == n2 ? 1 : 0);
       }
       ctx.compInfo(OPTFUNC, desc);
       return new Dbl(num);

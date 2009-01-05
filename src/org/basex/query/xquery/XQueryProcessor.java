@@ -5,6 +5,7 @@ import org.basex.io.IO;
 import org.basex.query.QueryProcessor;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.iter.Iter;
 
 /**
@@ -47,7 +48,17 @@ public final class XQueryProcessor extends QueryProcessor {
    * @throws QueryException query exception
    */
   public void parse(final String in) throws QueryException {
-    new XQParser(ctx).parse(in);
+    ctx.parse(in);
+  }
+  
+  /**
+   * Returns a result iterator.
+   * @param nodes node input
+   * @return result iterator
+   * @throws QueryException query exception
+   */
+  public Item eval(final Nodes nodes) throws QueryException {
+    return iter(nodes).finish();
   }
   
   /**

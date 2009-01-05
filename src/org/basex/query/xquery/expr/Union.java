@@ -1,5 +1,6 @@
 package org.basex.query.xquery.expr;
 
+import static org.basex.query.xquery.XQText.*;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Item;
@@ -7,6 +8,7 @@ import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Err;
 import org.basex.query.xquery.util.NodeBuilder;
+import org.basex.util.Array;
 
 /**
  * Union Expression.
@@ -39,6 +41,18 @@ public final class Union extends Arr {
       }
     }
     return nb.iter();
+  }
+
+  @Override
+  public Expr comp(final XQContext ctx) throws XQException {
+    super.comp(ctx);
+    for(int e = 0; e != expr.length; e++) {
+      if(expr[e].e()) {
+        ctx.compInfo(OPTEMPTY, this);
+        expr = Array.delete(expr, e--);
+      }
+    }
+    return this;
   }
   
   @Override

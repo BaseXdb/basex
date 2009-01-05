@@ -119,7 +119,7 @@ public final class CmpV extends Arr {
     final Expr e2 = expr[1];
     
     Expr e = this;
-    if(e1.i() && e2.i()) e = ev((Item) expr[0], (Item) expr[1]);
+    if(e1.i() && e2.i()) e = eval((Item) expr[0], (Item) expr[1]);
     else if(e1.e() || e2.e()) e = Seq.EMPTY;
     if(e != this) ctx.compInfo(OPTSIMPLE, this, e);
     return e;
@@ -127,11 +127,11 @@ public final class CmpV extends Arr {
 
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
-    final Item a = ctx.atomic(expr[0], this, true);
+    final Item a = atomic(ctx, expr[0], true);
     if(a == null) return Iter.EMPTY;
-    final Item b = ctx.atomic(expr[1], this, true);
+    final Item b = atomic(ctx, expr[1], true);
     if(b == null) return Iter.EMPTY;
-    return ev(a, b).iter();
+    return eval(a, b).iter();
   }
 
   /**
@@ -141,7 +141,7 @@ public final class CmpV extends Arr {
    * @return result of check
    * @throws XQException evaluation exception
    */
-  private Bln ev(final Item a, final Item b) throws XQException {
+  private Bln eval(final Item a, final Item b) throws XQException {
     if(!valCheck(a, b)) Err.cmp(a, b);
     return Bln.get(cmp.e(a, b));
   }

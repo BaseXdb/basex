@@ -53,6 +53,15 @@ public final class DataInput extends BufferInput {
   }
 
   /**
+   * Reads a double from the input stream.
+   * @return byte array
+   * @throws IOException IO Exception
+   */
+  public double readDouble() throws IOException {
+    return Token.toDouble(readBytes());
+  }
+
+  /**
    * Reads an integer array from the input stream.
    * @return integer array
    * @throws IOException IO Exception

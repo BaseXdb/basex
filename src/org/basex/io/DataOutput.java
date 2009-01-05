@@ -89,6 +89,16 @@ public final class DataOutput extends OutputStream {
 
   /**
    * Writes the specified array to the output stream.
+   * @param num array to be written
+   * @return number of written bytes
+   * @throws IOException in case of write errors
+   */
+  public int writeDouble(final double num) throws IOException {
+    return writeBytes(Token.token(num));
+  }
+
+  /**
+   * Writes the specified array to the output stream.
    * @param array array to be written
    * @throws IOException in case of write errors
    */

@@ -48,9 +48,9 @@ public final class Clc extends Arr {
 
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
-    final Item a = ctx.atomic(expr[0], this, true);
+    final Item a = atomic(ctx, expr[0], true);
     if(a == null) return Iter.EMPTY;
-    final Item b = ctx.atomic(expr[1], this, true);
+    final Item b = atomic(ctx, expr[1], true);
     if(b == null) return Iter.EMPTY;
     return calc.ev(a, b).iter();
   }

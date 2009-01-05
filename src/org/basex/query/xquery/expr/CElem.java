@@ -51,8 +51,20 @@ public final class CElem extends Arr {
     addNS(ctx);
     super.comp(ctx);
     tag = ctx.comp(tag);
+    if(tag.e()) Err.empty(this);
     ctx.ns.size(s);
     return this;
+  }
+  
+  /**
+   * Adds namespaces to the current context.
+   * @param ctx query context
+   * @throws XQException query exception
+   */
+  void addNS(final XQContext ctx) throws XQException {
+    for(int n = nsp.size - 1; n >= 0; n--) {
+      ctx.ns.add(new QNm(concat(XMLNSC, nsp.key[n]), Uri.uri(nsp.val[n])));
+    }
   }
 
   @Override
@@ -72,18 +84,7 @@ public final class CElem extends Arr {
 
   @Override
   public String info() {
-    return "Element constructor";
-  }
-  
-  /**
-   * Adds namespaces to the current context.
-   * @param ctx query context
-   * @throws XQException query exception
-   */
-  void addNS(final XQContext ctx) throws XQException {
-    for(int n = nsp.size - 1; n >= 0; n--) {
-      ctx.ns.add(new QNm(concat(XMLNSC, nsp.key[n]), Uri.uri(nsp.val[n])));
-    }
+    return "element constructor";
   }
 
   /** Construction helper class. */
@@ -106,8 +107,7 @@ public final class CElem extends Arr {
      * @return element
      */
     Iter construct(final XQContext ctx) throws XQException {
-      final Item it = ctx.atomic(tag, CElem.this, false);
-      
+      final Item it = atomic(ctx, tag, false);
       final int s = ctx.ns.size();
       addNS(ctx);
 

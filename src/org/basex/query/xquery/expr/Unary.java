@@ -1,5 +1,6 @@
 package org.basex.query.xquery.expr;
 
+import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
@@ -23,7 +24,7 @@ import org.basex.util.Token;
  */
 public final class Unary extends Single {
   /** Minus flag. */
-  private boolean minus;
+  private final boolean minus;
 
   /**
    * Constructor.
@@ -38,16 +39,20 @@ public final class Unary extends Single {
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
     super.comp(ctx);
-    return expr.i() && ((Item) expr).n() ? unary((Item) expr) : this;
+    if(expr.e()) {
+      ctx.compInfo(OPTSIMPLE, this, expr);
+      return expr;
+    }
+    return expr.i() && ((Item) expr).n() ? eval((Item) expr) : this;
   }
   
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
-    final Item it = ctx.atomic(expr, this, true);
+    final Item it = atomic(ctx, expr, true);
     if(it == null) return Iter.EMPTY;
     if(!it.u() && !it.n()) Err.num(info(), it);
     final double d = it.dbl();
-    return (it.u() ? Dbl.get(minus ? -d : d) : unary(it)).iter();
+    return (it.u() ? Dbl.get(minus ? -d : d) : eval(it)).iter();
   }
 
   /**
@@ -56,7 +61,7 @@ public final class Unary extends Single {
    * @return resulting item
    * @throws XQException xquery exception
    */
-  private Item unary(final Item it) throws XQException {
+  private Item eval(final Item it) throws XQException {
     if(!minus) return it;
     
     switch(it.type) {

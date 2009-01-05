@@ -142,38 +142,18 @@ public final class XQParser extends QueryParser {
   /**
    * Parses the specified query.
    * @param q input query
-   * @throws XQException xquery exception
-   */
-  public void parse(final String q) throws XQException {
-    ctx.query = q;
-    parse(q, ctx.file, null);
-  }
-
-  /**
-   * Parses the specified module.
-   * @param q input query
-   * @throws XQException xquery exception
-   */
-  public void module(final String q) throws XQException {
-    ctx.query = q;
-    parse(q, ctx.file, Uri.EMPTY);
-  }
-
-  /**
-   * Parses the specified query.
-   * @param q input query
    * @param f optional input file
    * @param u module uri
+   * @return resulting expression
    * @throws XQException xquery exception
    */
-  public void parse(final String q, final IO f, final Uri u)
-      throws XQException {
+  Expr parse(final String q, final IO f, final Uri u) throws XQException {
     init(q);
     file = f;
     if(!more()) Err.or(QUERYEMPTY);
     final int v = valid();
     if(v != -1) Err.or(QUERYINV, v);
-    parse(u, true);
+    return parse(u, true);
   }
 
   /**
@@ -181,14 +161,16 @@ public final class XQParser extends QueryParser {
    * [  1] Parses a Module.
    * @param u module uri
    * @param end if true, input must be completely evaluated
+   * @return resulting expression
    * @throws XQException xquery exception
    */
-  public void parse(final Uri u, final boolean end) throws XQException {
+  public Expr parse(final Uri u, final boolean end) throws XQException {
     try {
       versionDecl();
+      Expr ex = null;
       if(u == null) {
-        ctx.root = mainModule();
-        if(ctx.root == null) if(alter != null) error(); else Err.or(EXPREMPTY);
+        ex = mainModule();
+        if(ex == null) if(alter != null) error(); else Err.or(EXPREMPTY);
       } else {
         moduleDecl(u);
       }
@@ -199,6 +181,7 @@ public final class XQParser extends QueryParser {
       }
       ctx.fun.check();
       ctx.ns.finish(ctx.nsElem);
+      return ex;
     } catch(final XQException ex) {
       mark();
       ex.pos(this);

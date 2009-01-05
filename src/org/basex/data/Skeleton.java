@@ -107,13 +107,13 @@ public final class Skeleton {
   }
 
   /**
-   * Returns avg. textlength of a textnode in bytes.
+   * Returns average text length of a text node in bytes.
    * @param k tag element
-   * @return avg. textlength of a textnode in bytes
+   * @return average text length of a text node in bytes
    */
   public double[] tl(final byte[] k) {
-    // return tl of document
-    if (k == null) return new double[] {root.tl, root.count};
+    if(k == null) return new double[] { root.tl, root.count };
+    
     // follow the specified descendant/child steps
     ArrayList<SkelNode> n = new ArrayList<SkelNode>();
     n.add(root);
@@ -127,8 +127,7 @@ public final class Skeleton {
       sum += r.tl; 
       c += r.count;
     }
-    return new double[]{sum, c};
-    //return avg / c;
+    return new double[] { sum, c };
   }
   
   /**

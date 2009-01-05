@@ -1,5 +1,6 @@
 package org.basex.query.xquery.expr;
 
+import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import java.io.IOException;
 import org.basex.BaseX;
@@ -29,6 +30,15 @@ public final class Instance extends Single {
   public Instance(final Expr e, final SeqType s) {
     super(e);
     seq = s;
+  }
+
+  @Override
+  public Expr comp(final XQContext ctx) throws XQException {
+    super.comp(ctx);
+    if(!expr.i()) return this;
+
+    ctx.compInfo(OPTPRE, this);
+    return Bln.get(seq.instance(iter(expr)));
   }
   
   @Override

@@ -121,7 +121,7 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Returns an iterator for an item expression.
-   * Note that the input must be an {@link Item} instance.
+   * Note that the input expression must be an {@link Item} instance.
    * @param expr expression
    * @return iterator
    */
@@ -178,5 +178,20 @@ public abstract class Expr extends ExprInfo {
     final Item it = ctx.item;
     if(it == null) Err.or(XPNOCTX, this);
     return it.iter();
+  }
+
+  /**
+   * Returns the specified expression as an atomic item.
+   * Empty sequences are handled by the empty flag.
+   * @param ctx xquery context
+   * @param ex expression
+   * @param e if set to true, empty sequences are returned as null.
+   * Otherwise, an error is thrown
+   * @return iterator
+   * @throws XQException query exception
+   */
+  protected Item atomic(final XQContext ctx, final Expr ex, final boolean e)
+      throws XQException {
+    return i() ? (Item) ex : ctx.iter(ex).atomic(this, e);
   }
 }

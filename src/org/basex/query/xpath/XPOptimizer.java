@@ -59,9 +59,9 @@ public final class XPOptimizer {
         step.axis == Axis.DESCORSELF ||
         step.axis == Axis.CHILD) &&
         step.test instanceof TestName &&
-        ((TestName) step.test).id != TestName.ALL &&
+        ((TestName) step.test).id > 0 &&
         ctx.item.data.meta.uptodate &&
-        !ctx.item.data.tags.noLeaf(((TestName) step.test).id)) {
+        ctx.item.data.tags.stat(((TestName) step.test).id).leaf) {
       path.steps.add(Axis.create(Axis.CHILD, TestNode.TEXT));
       ctx.compInfo(OPTTEXT);
     }

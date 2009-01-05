@@ -1,5 +1,6 @@
 package org.basex.query.xquery.expr;
 
+import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
@@ -8,6 +9,7 @@ import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Nod;
+import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Err;
@@ -84,10 +86,20 @@ public final class CmpN extends Arr {
   }
 
   @Override
+  public Expr comp(final XQContext ctx) throws XQException {
+    super.comp(ctx);
+    if(expr[0].e() || expr[1].e()) {
+      ctx.compInfo(OPTSIMPLE, this, Seq.EMPTY);
+      return Seq.EMPTY;
+    }
+    return this;
+  }
+
+  @Override
   public Iter iter(final XQContext ctx) throws XQException {
-    final Item a = ctx.atomic(expr[0], this, true);
+    final Item a = atomic(ctx, expr[0], true);
     if(a == null) return Iter.EMPTY;
-    final Item b = ctx.atomic(expr[1], this, true);
+    final Item b = atomic(ctx, expr[1], true);
     if(b == null) return Iter.EMPTY;
 
     if(!a.node()) Err.type(info(), Type.NOD, a);

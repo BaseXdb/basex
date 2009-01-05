@@ -77,6 +77,6 @@ public final class CDoc extends Single {
 
   @Override
   public String info() {
-    return "Document constructor";
+    return "document constructor";
   }
 }

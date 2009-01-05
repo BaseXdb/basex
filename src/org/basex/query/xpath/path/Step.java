@@ -121,8 +121,8 @@ public abstract class Step extends ExprInfo {
     
     if(test instanceof TestName) {
       final TestName t = (TestName) test;
-      ctx.leaf = axis != Axis.ATTR && axis != Axis.SELF && t.id >= 0 &&
-        data.meta.uptodate && !data.tags.noLeaf(t.id);
+      ctx.leaf = axis != Axis.ATTR && axis != Axis.SELF && t.id > 0 &&
+        data.meta.uptodate && data.tags.stat(t.id).leaf;
     }
     final boolean pred = preds.compile(ctx);
     ctx.leaf = false;

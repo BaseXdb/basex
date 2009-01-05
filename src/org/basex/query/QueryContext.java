@@ -41,10 +41,9 @@ public abstract class QueryContext extends Progress {
   /**
    * Optimizes the expression.
    * @param nodes node context
-   * @return query context
    * @throws QueryException query exception
    */
-  protected abstract QueryContext compile(Nodes nodes) throws QueryException;
+  protected abstract void compile(Nodes nodes) throws QueryException;
   
   /**
    * Evaluates the expression with the specified context set.

@@ -45,12 +45,13 @@ public final class CAttr extends Arr {
   public Expr comp(final XQContext ctx) throws XQException {
     super.comp(ctx);
     atn = ctx.comp(atn);
+    if(atn.e()) Err.empty(this);
     return this;
   }
 
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
-    final QNm name = name(ctx, ctx.atomic(atn, this, false));
+    final QNm name = name(ctx, atomic(ctx, atn, false));
     final byte[] pre = name.pre();
     final byte[] ln = name.ln();
     if(comp && (eq(name.str(), XMLNS) || eq(pre, XMLNS))) Err.or(NSATTCONS);
@@ -99,7 +100,7 @@ public final class CAttr extends Arr {
 
   @Override
   public String info() {
-    return "Attribute constructor";
+    return "attribute constructor";
   }
 
   @Override

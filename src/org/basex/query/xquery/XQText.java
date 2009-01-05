@@ -499,6 +499,8 @@ public interface XQText {
   String OPTATVINDEX = "Applying attribute index";
   /** Optimization info. */
   String OPTFTXINDEX = "Applying fulltext index";
+  /** Optimization info. */
+  String OPTEMPTY = "Removing empty result in \"%\"";
 
   /** Evaluation info. */
   String EVALSKIP = "rest of output skipped...";

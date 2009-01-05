@@ -16,6 +16,8 @@ import org.basex.BaseX;
 public final class Token {
   /** Maximum length for hash calculation and index terms. */
   public static final int MAXLEN = 64;
+  /** Maximum number of categories in statistics. */
+  public static final int MAXCATS = 50;
 
   /** XML Token. */
   public static final byte[] XML = token("xml");

@@ -344,7 +344,7 @@ public abstract class W3CTS {
       }
 
       final CachedOutput out = new CachedOutput();
-      item = xq.iter(context.current()).finish();
+      item = xq.eval(context.current());
       item.serialize(new XMLSerializer(out));
       
       output = norm(out.finish());
@@ -591,7 +591,7 @@ public abstract class W3CTS {
       final String file = pth + string(data.atom(nod.nodes[c])) + ".xq";
       final String in = read(IO.get(queries + file));
       final XQueryProcessor xq = new XQueryProcessor(in);
-      final Item item = xq.iter(null).finish();
+      final Item item = xq.eval(null);
       final Var v = new Var(new QNm(data.atom(var.nodes[c])));
       ctx.vars.addGlobal(v.bind(item, ctx));
     }

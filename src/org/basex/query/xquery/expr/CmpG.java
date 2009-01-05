@@ -91,7 +91,7 @@ public final class CmpG extends Arr {
     if(e1 instanceof AxisPath) ((AxisPath) e1).addText(ctx);
 
     Expr e = this;
-    if(e1.i() && e2.i()) e = Bln.get(ev((Item) e1, (Item) e2, cmp.cmp));
+    if(e1.i() && e2.i()) e = Bln.get(eval((Item) e1, (Item) e2, cmp.cmp));
     else if(e1.e() || e2.e()) e = Bln.FALSE;
     if(e != this) ctx.compInfo(OPTSIMPLE, this, e);
     return e;
@@ -99,7 +99,7 @@ public final class CmpG extends Arr {
 
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
-    return Bln.get(ev(ctx)).iter();
+    return Bln.get(eval(ctx)).iter();
   }
 
   /**
@@ -108,27 +108,27 @@ public final class CmpG extends Arr {
    * @return result of check
    * @throws XQException evaluation exception
    */
-  private boolean ev(final XQContext ctx) throws XQException {
+  private boolean eval(final XQContext ctx) throws XQException {
     final Iter ir1 = ctx.iter(expr[0]);
     // skip empty result
     if(ir1.size() == 0) return false;
     final boolean s1 = ir1.size() == 1;
     
     // evaluate single items
-    if(s1 && expr[1].i()) return ev(ir1.next(), (Item) expr[1], cmp.cmp);
+    if(s1 && expr[1].i()) return eval(ir1.next(), (Item) expr[1], cmp.cmp);
     final Iter ir2 = ctx.iter(expr[1]);
     // skip empty result
     if(ir2.size() == 0) return false;
     final boolean s2 = ir2.size() == 1;
     
     // evaluate single items
-    if(s1 && s2) return ev(ir1.next(), ir2.next(), cmp.cmp);
+    if(s1 && s2) return eval(ir1.next(), ir2.next(), cmp.cmp);
 
     // evaluate iterator and single item
     Item it1, it2;
     if(s2) {
       it2 = ir2.next();
-      while((it1 = ir1.next()) != null) if(ev(it1, it2, cmp.cmp)) return true;
+      while((it1 = ir1.next()) != null) if(eval(it1, it2, cmp.cmp)) return true;
       return false;
     }
     
@@ -141,7 +141,7 @@ public final class CmpG extends Arr {
       final SeqIter seq = new SeqIter();
       if((it1 = ir1.next()) != null) {
         while((it2 = ir2.next()) != null) {
-          if(ev(it1, it2, cmp.cmp)) return true;
+          if(eval(it1, it2, cmp.cmp)) return true;
           seq.add(it2);
         }
       }
@@ -149,7 +149,7 @@ public final class CmpG extends Arr {
     }
     while((it1 = ir1.next()) != null) {
       ir.reset();
-      while((it2 = ir.next()) != null) if(ev(it1, it2, cmp.cmp)) return true;
+      while((it2 = ir.next()) != null) if(eval(it1, it2, cmp.cmp)) return true;
     }
     return false;
   }
@@ -162,7 +162,7 @@ public final class CmpG extends Arr {
    * @return result of check
    * @throws XQException thrown if the items can't be compared
    */
-  static boolean ev(final Item a, final Item b, final CmpV.Comp c)
+  static boolean eval(final Item a, final Item b, final CmpV.Comp c)
       throws XQException {
 
     if(a.type != b.type && !a.u() && !b.u() && !(a.s() && b.s()) && 

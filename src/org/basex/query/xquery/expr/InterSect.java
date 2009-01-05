@@ -1,9 +1,12 @@
 package org.basex.query.xquery.expr;
 
+import static org.basex.query.xquery.XQText.*;
+
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Nod;
+import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Err;
 import org.basex.query.xquery.util.NodeBuilder;
@@ -50,6 +53,18 @@ public final class InterSect extends Arr {
       seq = res;
     }
     return seq.iter();
+  }
+
+  @Override
+  public Expr comp(final XQContext ctx) throws XQException {
+    super.comp(ctx);
+    for(final Expr e : expr) {
+      if(e.e()) {
+        ctx.compInfo(OPTSIMPLE, this, e);
+        return Seq.EMPTY;
+      }
+    }
+    return this;
   }
 
   @Override

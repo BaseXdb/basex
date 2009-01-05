@@ -32,9 +32,17 @@ public final class CPI extends Arr {
     super(n, v);
   }
 
+
+  @Override
+  public Expr comp(final XQContext ctx) throws XQException {
+    super.comp(ctx);
+    if(expr[0].e()) Err.empty(this);
+    return this;
+  }
+
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
-    final Item it = ctx.atomic(expr[0], this, false);
+    final Item it = atomic(ctx, expr[0], false);
     if(!it.u() && !it.s() && it.type != Type.QNM) Err.or(CPIWRONG, it.type, it);
 
     final byte[] nm = Token.trim(it.str());

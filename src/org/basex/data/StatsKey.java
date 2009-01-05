@@ -7,14 +7,13 @@ import org.basex.io.DataOutput;
 import org.basex.util.Set;
 
 /**
- * This class contains statistics for the tag or attribute name of a document.
+ * This class provides statistics for a tag or attribute name
+ * and its contents.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
 public final class StatsKey {
-  /** Maximum number of categories. */
-  private static final int MAXCATS = 50;
   /** Kind of Contents. */
   public enum Kind {
     /** Text.     */ TEXT,
@@ -31,6 +30,12 @@ public final class StatsKey {
   public double min;
   /** Maximum value. */
   public double max;
+  /** Average text-length. */
+  public double len;
+  /** Number of occurrences. */
+  public int counter;
+  /** Leaf node flag. */
+  public boolean leaf;
   
   /**
    * Default Constructor.
@@ -40,6 +45,7 @@ public final class StatsKey {
     kind = Kind.INT;
     min = Double.MAX_VALUE;
     max = Double.MIN_VALUE;
+    leaf = true;
   }
   
   /**
@@ -49,14 +55,18 @@ public final class StatsKey {
    */
   public StatsKey(final DataInput in) throws IOException {
     kind = Kind.values()[in.readNum()];
+    
     if(kind == Kind.INT || kind == Kind.DBL) {
-      min = toDouble(in.readBytes());
-      max = toDouble(in.readBytes());
+      min = in.readDouble();
+      max = in.readDouble();
     } else if(kind == Kind.CAT) {
       cats = new Set();
       final int cl = in.readNum();
       for(int i = 0; i < cl; i++) cats.add(in.readBytes());
     }
+    counter = in.readNum();
+    leaf = in.readBool();
+    len = in.readDouble();
   }
 
   /**
@@ -69,13 +79,16 @@ public final class StatsKey {
     
     out.writeNum(kind.ordinal());
     if(kind == Kind.INT || kind == Kind.DBL) {
-      out.writeBytes(token(min));
-      out.writeBytes(token(max));
+      out.writeDouble(min);
+      out.writeDouble(max);
     } else if(kind == Kind.CAT) {
       final int cl = cats.size();
       out.writeNum(cl);
       for(int i = 1; i <= cl; i++) out.writeBytes(cats.key(i));
     }
+    out.writeNum(counter);
+    out.writeBool(leaf);
+    out.writeDouble(len);
   }
   
   /**
@@ -87,8 +100,11 @@ public final class StatsKey {
    * @param val value to be added
    */
   public void add(final byte[] val) {
-    if(val == null || val.length == 0 || kind == Kind.TEXT || ws(val)) return;
-    
+    final int vl = val.length;
+    len = counter == 0 ? vl : (len * (counter - 1) + vl) / counter;
+
+    if(vl == 0 || kind == Kind.TEXT || ws(val)) return;
+
     if(cats != null && cats.size() < MAXCATS) {
       if(val.length > MAXLEN) {
         kind = Kind.TEXT;
@@ -124,12 +140,26 @@ public final class StatsKey {
 
   @Override
   public String toString() {
+    final StringBuilder sb = new StringBuilder(counter + "x");
     switch(kind) {
-      case CAT:  return ", " + cats.size() + " values";
-      case DBL:  return ", numeric(" + min + " - " + max + ")";
-      case INT:  return ", numeric(" + (int) min + " - " + (int) max + ")";
-      case TEXT: return ", strings";
-      default: return "";
+      case CAT:
+        sb.append(", " + cats.size() + " values");
+        break;
+      case DBL:
+        sb.append(", numeric(" + min + " - " + max + ")");
+        break;
+      case INT:
+        sb.append(", numeric(" + (int) min + " - " + (int) max + ")");
+        break;
+      case TEXT:
+        sb.append(", strings");
+        break;
+      default:
+        break;
     }
+    final double avg = (int) (len * 100) / 100d;
+    if(len != 0) sb.append(", " + avg + " avg. chars");
+    if(leaf) sb.append(", leaf");
+    return sb.toString();
   }
 }

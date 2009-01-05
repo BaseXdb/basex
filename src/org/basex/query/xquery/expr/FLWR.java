@@ -1,17 +1,16 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQText.*;
-
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.DBNode;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.iter.Iter;
+import org.basex.util.Array;
 import org.basex.query.xquery.path.AxisPath;
 import org.basex.query.xquery.path.Step;
 import org.basex.query.xquery.util.Var;
-import org.basex.util.Array;
 
 /**
  * FLWR Clause.
@@ -52,9 +51,8 @@ public final class FLWR extends FLWOR {
       return expr;
     }
     //final boolean n = normalize(ctx);
-     
     return this;
-    //return n ?  optimize(null, false) : this;
+    //return n ? optimize(null, false) : this;
   }
 
   @Override
@@ -186,6 +184,7 @@ public final class FLWR extends FLWOR {
     }
     return expr instanceof FLWR ? ((FLWR) expr).optimize(apt, true) : apt;
   }
+  
   @Override
   public String color() {
     return "66FF66";

@@ -336,15 +336,10 @@ public abstract class Builder extends Progress {
     // convert tag to utf8
     final byte[] tag = utf8(name, meta.encoding);
 
-    // set leaf node information in index and add tag and atts to statistics 
-    if(level != 0) {
-      if(level == 1 && inDoc) error(MOREROOTS, parser.det(), tag);
-      tags.noleaf(tagStack[level - 1], true);
-    }
-
     // get tag reference
     final int tid = tags.index(tag, null, true);
     skel.add(tid, level, Data.ELEM);
+    
     // remember tag id and parent reference
     tagStack[level] = tid;
     parStack[level] = meta.size;
@@ -371,6 +366,15 @@ public abstract class Builder extends Progress {
       final int ans = ns.get(att.key[a]);
       skel.add(an, level + 1, Data.ATTR);
       addAttr(an, ans, av, a + 1);
+    }
+
+    // set leaf node information in index and add tag and atts to statistics 
+    if(level != 0) {
+      if(level == 1) {
+        if(inDoc) error(MOREROOTS, parser.det(), tag);
+      } else {
+        tags.stat(tagStack[level - 1]).leaf = false;
+      }
     }
 
     if(open) {

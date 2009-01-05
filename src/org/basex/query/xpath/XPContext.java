@@ -47,13 +47,12 @@ public final class XPContext extends QueryContext {
   }
 
   @Override
-  public XPContext compile(final Nodes n) throws QueryException {
+  public void compile(final Nodes n) throws QueryException {
     inf = Prop.allInfo;
     if(inf) compInfo(QUERYCOMP);
     item = n != null ? new Nod(n.nodes, n.data) : null;
     root = root.comp(this);
     if(inf) compInfo(QUERYRESULT + "%", root);
-    return this;
   }
 
   @Override

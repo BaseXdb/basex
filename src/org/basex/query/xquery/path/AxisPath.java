@@ -6,6 +6,7 @@ import static org.basex.query.xquery.XQText.*;
 import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
+import org.basex.data.StatsKey;
 import org.basex.query.xquery.FTIndexAcsbl;
 import org.basex.query.xquery.FTIndexEq;
 import org.basex.query.xquery.XQContext;
@@ -389,8 +390,9 @@ public class AxisPath extends Path {
     
     final Data data = ((DBNode) ctx.item).data;
     final byte[] name = s.test.name.ln();
+    final StatsKey stats = data.tags.stat(data.tags.id(name));
     
-    if(data.meta.uptodate && !data.tags.noLeaf(data.tags.id(name))) {
+    if(data.meta.uptodate && stats != null && stats.leaf) {
       step = Array.add(step, Step.get(Axis.CHILD, new KindTest(Type.TXT)));
       ctx.compInfo(OPTTEXT, this);
     }
@@ -414,19 +416,6 @@ public class AxisPath extends Path {
     if (root != null && root instanceof VarCall) 
       root = null;   
   }
-  /*
-   * Checks if there is anything to sum up.
-   * @param d Data
-   * @return boolean sum up
-  public boolean sumUp(final Data d) {
-    if (step.length == 1 && root instanceof SimpleIterStep) {
-      final SimpleIterStep sis = (SimpleIterStep) root;
-      return sis.sumUp() && sis.test.kind == Test.Kind.NAME &&
-        d.skel.desc(sis.test.name.str(), false, false).size == 0;
-    }
-    return false;
-  }
-   */
   
   @Override
   public boolean uses(final Using u) {
