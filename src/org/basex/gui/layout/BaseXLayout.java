@@ -685,7 +685,7 @@ public final class BaseXLayout {
     int lastl = 0;
     
     while (m) {
-      while (ll + wl < ww && m &&
+      while (ll + wl < ww &&
           (cs == ftt.sent && sen || cp == ftt.para && !sen) && 
           (r.pos == null || (pp < r.pos.length && count < r.pos[pp]) 
               || pp == r.pos.length)) {
@@ -698,7 +698,7 @@ public final class BaseXLayout {
       }
       
       // doesn't fit in line
-      if (ll + wl > ww) { 
+      if (ll + wl >= ww) { 
         final int fp = (int) (ww - ll);
         if (fp <= f) {
           yy += lh;
