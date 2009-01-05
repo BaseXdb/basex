@@ -227,7 +227,8 @@ abstract class BXQDynamicContext extends BXQAbstract
         }.delay(sc.timeout * 1000);
       }
       query.create();
-      Iter iter = ctx.compile(null).iter();
+      ctx.compile(null);
+      Iter iter = ctx.iter();
       if(sc.scrollable && !(iter instanceof SeqIter)) iter = new SeqIter(iter);
       return new BXQSequence(iter, ctx, this, (BXQConnection) par);
     } catch(final QueryException ex) {
