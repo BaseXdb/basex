@@ -1,6 +1,7 @@
 package org.basex.query.xquery;
 
 import org.basex.data.Data;
+import org.basex.query.xquery.path.Step;
 
 /**
  * Container for all information needed to determine whether an index is 
@@ -9,9 +10,12 @@ import org.basex.data.Data;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Sebastian Gath
  */
-public final class FTIndexAcsbl {
+public final class IndexContext {
   /** Data reference. */
   public final Data data;
+  /** Index Step. */
+  public final Step step;
+  
   /** Flag for index use. */
   public boolean iu;
   /** Flag for index options. */
@@ -26,8 +30,10 @@ public final class FTIndexAcsbl {
   /**
    * Constructor.
    * @param d data reference
+   * @param s index step
    */
-  public FTIndexAcsbl(final Data d) {
+  public IndexContext(final Data d, final Step s) {
     data = d;
+    step = s;
   }
 }

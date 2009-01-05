@@ -121,7 +121,7 @@ public final class CmpV extends Arr {
     Expr e = this;
     if(e1.i() && e2.i()) e = eval((Item) expr[0], (Item) expr[1]);
     else if(e1.e() || e2.e()) e = Seq.EMPTY;
-    if(e != this) ctx.compInfo(OPTSIMPLE, this, e);
+    if(e != this) ctx.compInfo(OPTPRE, this);
     return e;
   }
 

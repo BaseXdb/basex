@@ -98,16 +98,6 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
-   * Writes the specified array to the output stream.
-   * @param array array to be written
-   * @throws IOException in case of write errors
-   */
-  public void writeBools(final boolean[] array) throws IOException {
-    writeNum(array.length);
-    for(final boolean a : array) writeBool(a);
-  }
-
-  /**
    * Writes the specified array to the output stream; null references
    * are replaced with an empty array.
    * @param array array to be written

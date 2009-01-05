@@ -1,10 +1,13 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQText.*;
+
+import org.basex.query.xquery.IndexContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Item;
+import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
 import org.basex.query.xquery.util.Scoring;
@@ -81,6 +84,31 @@ public final class Or extends Arr {
       }
     }
     return (d == 0 ? Bln.get(found) : Bln.get(d)).iter();
+  }
+
+  @Override
+  public void indexAccessible(final XQContext ctx, final IndexContext ic)
+      throws XQException {
+    
+    for(final Expr e : expr) {
+      e.indexAccessible(ctx, ic);
+      if(!ic.iu) return;
+    }
+  }
+
+  @Override
+  public Expr indexEquivalent(final XQContext ctx, final IndexContext ic)
+      throws XQException {
+
+    for(int e = 0; e < expr.length; e++) {
+      expr[e] = expr[e].indexEquivalent(ctx, ic);
+    }
+    return new Union(expr);
+  }
+  
+  @Override
+  public Type returned() {
+    return Type.BLN;
   }
 
   @Override

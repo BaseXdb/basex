@@ -1,10 +1,8 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQText.*;
-
 import org.basex.index.FTTokenizer;
-import org.basex.query.xquery.FTIndexAcsbl;
-import org.basex.query.xquery.FTIndexEq;
+import org.basex.query.xquery.IndexContext;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Bln;
@@ -67,28 +65,29 @@ public class FTContains extends Arr {
   }
 
   @Override
-  public void indexAccessible(final XQContext ctx, final FTIndexAcsbl ia)
+  public void indexAccessible(final XQContext ctx, final IndexContext ic)
       throws XQException {
 
     // return if step is no text node, or if no index is available
     final Step s = CmpG.indexStep(expr);
-    if(s == null || s.test.type != Type.TXT || !ia.data.meta.ftxindex) return;
+    if(s == null || s.test.type != Type.TXT || !ic.data.meta.ftxindex) return;
     
-    expr[1].indexAccessible(ctx, ia);
+    ic.iu = false;
+    expr[1].indexAccessible(ctx, ic);
   }
   
   @Override
-  public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq)
+  public Expr indexEquivalent(final XQContext ctx, final IndexContext ic)
     throws XQException {
 
-    final Expr ae = expr[1].indexEquivalent(ctx, ieq);
+    final Expr ae = expr[1].indexEquivalent(ctx, ic);
     // sequential evaluation with index access
-    if(ieq.seq) return new FTContainsSIndex(expr[0], ae);
+    if(ic.seq) return new FTContainsSIndex(expr[0], ae);
 
     // standard index evaluation; first expression will always be an axis path
     ctx.compInfo(OPTFTXINDEX);
     final Expr root = new FTContainsIndex(ae, ft);
-    return ((AxisPath) expr[0]).invertPath(root, ieq.curr);
+    return ((AxisPath) expr[0]).invertPath(root, ic.step);
   }
   
   @Override

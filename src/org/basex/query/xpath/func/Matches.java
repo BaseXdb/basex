@@ -38,7 +38,7 @@ public final class Matches extends Func {
     final long s2 = v[1].size();
     if(s1 == 0 || s2 == 0) return Bln.FALSE;
 
-    final String pat = Token.string(v[1].str());
+    final String pat = ".*" + Token.string(v[1].str()) + ".*";
     if(v[0] instanceof Nod && s2 == 1) {
       final Nod nodes = (Nod) v[0];
       final Data data = nodes.data;

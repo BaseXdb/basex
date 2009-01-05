@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import org.basex.BaseX;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
+import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Itr;
@@ -99,6 +100,21 @@ final class FNStr extends Fun {
         return (pb > 0 ? Str.get(substring(sb, 0, pb)) : Str.ZERO).iter();
       default:
         BaseX.notexpected(func); return null;
+    }
+  }
+
+  @Override
+  public Expr c(final XQContext ctx) throws XQException {
+    switch(func) {
+      case CONTAINS:
+        final byte[] i = args[1].i() ? checkStr((Item) args[1]) : null;
+        // query string is empty; return true
+        if(args[1].e() || i != null && i.length == 0) return Bln.TRUE;
+        // input string is empty; return false
+        if(args[0].e() && i != null && i.length != 0) return Bln.FALSE;
+        return this;
+      default:
+        return this;
     }
   }
 

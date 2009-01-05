@@ -473,21 +473,21 @@ public interface XQText {
 
   // OPTIMIZATIONS
 
-  /** Compiler info. */
+  /** Optimization info. */
   String OPTCAST = "Casting %";
-  /** Compiler info. */
+  /** Optimization info. */
   String OPTDESC = "Merging descendant-or-self step(s)";
-  /** Compiler info. */
+  /** Optimization info. */
   String OPTPRE = "Pre-evaluating %";
-  /** Compiler info. */
+  /** Optimization info. */
   String OPTFALSE = "Removing always false expression: %";
-  /** Compiler info. */
+  /** Optimization info. */
   String OPTTRUE = "Removing always true expression: %";
-  /** Compiler info. */
+  /** Optimization info. */
   String OPTTEXT = "Adding text() step";
-  /** Compiler info. */
+  /** Optimization info. */
   String OPTSIMPLE = "Simplifying: % => %";
-  /** Compiler info. */
+  /** Optimization info. */
   String OPTSTAT = "Removing static assignments: %";
   /** Optimization info. */
   String OPTRED = "Merging redundant location paths";
@@ -501,7 +501,8 @@ public interface XQText {
   String OPTFTXINDEX = "Applying fulltext index";
   /** Optimization info. */
   String OPTEMPTY = "Removing empty result in \"%\"";
-
-  /** Evaluation info. */
-  String EVALSKIP = "rest of output skipped...";
+  /** Optimization info. */
+  String OPTPOS = "Adding position predicate";
+  /** Optimization info. */
+  String OPTNOINDEX = "Removing path with no index results";
 }

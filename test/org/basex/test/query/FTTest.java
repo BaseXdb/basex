@@ -63,6 +63,7 @@ public final class FTTest extends AbstractTest {
       "  <wld/>\n" +
       "  <wld>yeah</wld>\n" +
       "  <mix>A<sub/>B</mix>\n" +
+      "  <mix>B<sub/>A</mix>\n" +
       "</fttest>";
 
     queries = new Object[][] {
@@ -102,7 +103,7 @@ public final class FTTest extends AbstractTest {
           "//w[  text  (   )  ftcontains  '  crap  '  ]  " },
         { "FT 5", nodes(),
           "//w[text() ftcontains 'db']" },
-        { "FT 6", nodes(42),
+        { "FT 6", nodes(42, 46),
           "//mix[text() ftcontains 'A']" },
         { "FT 7", nodes(14),
           "//w[text() ftcontains 'hello']['A' ftcontains 'A']" },
@@ -131,6 +132,8 @@ public final class FTTest extends AbstractTest {
           "//w[text() ftcontains 'xml'][2]" },
         { "Preds 11", nodes(14),
           "//wc/w[text() ftcontains 'hello']" },
+        { "Preds 12", nodes(46),
+          "//mix[text()[1] ftcontains 'B']" },
           
         { "AndOr 1", nodes(7, 9, 11),
           "//w[text() ftcontains 'xml' and text() ftcontains 'databases']" },
@@ -147,7 +150,7 @@ public final class FTTest extends AbstractTest {
           "//fti[contains(text(), 'adf') and text() ftcontains 'adf']" },
         { "AndOr 7", nodes(3),
           "//*[text() ftcontains 'sentence' and text() ftcontains 'xml']" },
-        { "AndOr 8", nodes(42),
+        { "AndOr 8", nodes(42, 46),
           "//mix[text() ftcontains 'A'][text() ftcontains 'B']" },
           
         { "Phrase 1", nodes(7, 9, 11),

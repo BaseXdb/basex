@@ -1198,7 +1198,7 @@ public final class XQParser extends QueryParser {
       axes &= list[l] instanceof Step;
       if(axes) tmp[l] = (Step) list[l];
     }
-    return axes ? new AxisPath(root, tmp) : new MixedPath(root, list);
+    return axes ? AxisPath.get(root, tmp) : new MixedPath(root, list);
   }
 
   /**

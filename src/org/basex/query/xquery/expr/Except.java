@@ -40,7 +40,7 @@ public final class Except extends Arr {
         if(!(it.node())) Err.nodes(this);
         final Nod node = (Nod) it;
         for(int s = 0; s < nodes.size; s++) {
-          if(CmpN.Comp.EQ.e(nodes.list[s], node)) nodes.del(s--);
+          if(CmpN.Comp.EQ.e(nodes.list[s], node)) nodes.delete(s--);
         }
       }
     }

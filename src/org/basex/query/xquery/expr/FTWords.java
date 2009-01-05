@@ -2,12 +2,11 @@ package org.basex.query.xquery.expr;
 
 import static org.basex.util.Token.*;
 import java.io.IOException;
-
 import org.basex.data.Serializer;
+import org.basex.index.FTTokenizer;
 import org.basex.query.FTOpt;
 import org.basex.query.FTOpt.FTMode;
-import org.basex.query.xquery.FTIndexAcsbl;
-import org.basex.query.xquery.FTIndexEq;
+import org.basex.query.xquery.IndexContext;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Dbl;
@@ -125,33 +124,32 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public void indexAccessible(final XQContext ctx, final FTIndexAcsbl ia) 
+  public void indexAccessible(final XQContext ctx, final IndexContext ic) 
     throws XQException {
 
     // if the following conditions yield true, the index is accessed:
     // - no FTTimes option is specified and query is a simple String item
-    ia.io &= occ[0].i() && ((Item) occ[0]).itr() == 1 &&
+    ic.io &= occ[0].i() && ((Item) occ[0]).itr() == 1 &&
              occ[1].i() && ((Item) occ[1]).itr() == Long.MAX_VALUE &&
              query instanceof Str;
-    if(!ia.io) return;
+    if(!ic.io) return;
     
     tok = ((Str) query).str();
-    ctx.ftopt.sb.text = tok;
-    ctx.ftopt.sb.lc = ctx.ftopt.is(FTOpt.LC);
-    ctx.ftopt.sb.uc = ctx.ftopt.is(FTOpt.UC);
-    ctx.ftopt.sb.fz = ctx.ftopt.is(FTOpt.FZ);
-    ctx.ftopt.sb.wc = ctx.ftopt.is(FTOpt.WC);
-    ctx.ftopt.sb.cs = ctx.ftopt.is(FTOpt.CS);
+    final FTTokenizer sb = ctx.ftopt.sb;
+    sb.text = tok;
+    sb.lc = ctx.ftopt.is(FTOpt.LC);
+    sb.uc = ctx.ftopt.is(FTOpt.UC);
+    sb.fz = ctx.ftopt.is(FTOpt.FZ);
+    sb.wc = ctx.ftopt.is(FTOpt.WC);
+    sb.cs = ctx.ftopt.is(FTOpt.CS);
     // index size is incorrect for phrases
-    while(ia.is != 0 && ctx.ftopt.sb.more()) {
-      ia.is = Math.min(ia.is, ia.data.nrIDs(ctx.ftopt.sb));
-    }
-    ia.iu = true;
+    while(ic.is != 0 && sb.more()) ic.is = Math.min(ic.is, ic.data.nrIDs(sb));
+    ic.iu = true;
   }
 
   @Override
-  public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq) {
-    return new FTIndex(ieq.data, tok);
+  public Expr indexEquivalent(final XQContext ctx, final IndexContext ic) {
+    return new FTIndex(ic.data, tok);
   }
   
   @Override

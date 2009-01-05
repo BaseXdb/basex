@@ -1,9 +1,9 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQText.*;
+import org.basex.BaseX;
 import org.basex.query.ExprInfo;
-import org.basex.query.xquery.FTIndexAcsbl;
-import org.basex.query.xquery.FTIndexEq;
+import org.basex.query.xquery.IndexContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Item;
@@ -64,9 +64,10 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Indicates if an expression uses the specified type.
-   * Called by the compiler to check if expressions can be reformulated.
-   * true is returned by default.
+   * Indicates if an expression uses the specified type. Called by the
+   * compiler to check if sub expressions have specific properties.
+   * <code>true</code> is returned by default and thus assumed as "worst-case",
+   * as all expression which do not overwrite this method will return true.
    * @param use using flag
    * @return result of check
    */
@@ -77,26 +78,29 @@ public abstract class Expr extends ExprInfo {
   
   /**
    * Checks if an index can be used for query evaluation.
-   * @param ctx current context
-   * @param ia FTIndexAcsbl
+   * @param ctx query context
+   * @param ic index context
    * @throws XQException Exception
    */
   @SuppressWarnings("unused")
-  public void indexAccessible(final XQContext ctx, final FTIndexAcsbl ia)
+  public void indexAccessible(final XQContext ctx, final IndexContext ic)
     throws XQException {
   }
   
   /**
    * Returns an equivalent expression which accesses an index structure. 
-   * @param ctx current context
-   * @param ieq FTIndexEq 
+   * Must be called if {@link #indexAccessible} is implemented for an
+   * expression.
+   * @param ctx query context
+   * @param ic index context
    * @return Equivalent index-expression or null
    * @throws XQException Exception
    */
   @SuppressWarnings("unused")
-  public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq)
+  public Expr indexEquivalent(final XQContext ctx, final IndexContext ic)
       throws XQException {
-    return this;
+    BaseX.notexpected();
+    return null;
   }
 
   /**

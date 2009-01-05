@@ -1,7 +1,6 @@
 package org.basex.query.xquery.expr;
 
-import org.basex.query.xquery.FTIndexAcsbl;
-import org.basex.query.xquery.FTIndexEq;
+import org.basex.query.xquery.IndexContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Dbl;
@@ -46,26 +45,26 @@ public final class FTOr extends FTExpr {
   }
   
   @Override
-  public void indexAccessible(final XQContext ctx, final FTIndexAcsbl ia)
+  public void indexAccessible(final XQContext ctx, final IndexContext ic)
       throws XQException {
     final IntList p = new IntList();
     final IntList n = new IntList();
-    int min = ia.is;
+    int min = ic.is;
     int sum = 0;
 
     for (int i = 0; i < expr.length; i++) {
-      ia.ftnot = false;
-      expr[i].indexAccessible(ctx, ia);
-      if (!ia.io) return;
-      if (!ia.ftnot && ia.is > 0) {
+      ic.ftnot = false;
+      expr[i].indexAccessible(ctx, ic);
+      if (!ic.io) return;
+      if (!ic.ftnot && ic.is > 0) {
         p.add(i);
-        sum += ia.is;
-      } else if (ia.ftnot) {
-        if (ia.is > 0) n.add(i);
+        sum += ic.is;
+      } else if (ic.ftnot) {
+        if (ic.is > 0) n.add(i);
         else {
-          ia.iu = false;
-          ia.seq = true;
-          ia.is = Integer.MAX_VALUE;
+          ic.iu = false;
+          ic.seq = true;
+          ic.is = Integer.MAX_VALUE;
           return;
         }
       }
@@ -74,22 +73,22 @@ public final class FTOr extends FTExpr {
     pex = p.finish();
 
     if (pex.length == 0 && nex.length > 0) {
-      ia.seq = true;
-      ia.is = Integer.MAX_VALUE;
+      ic.seq = true;
+      ic.is = Integer.MAX_VALUE;
     } else if (nex.length > 0 && pex.length > 0) {
-      ia.seq = true;
-      ia.is = Integer.MAX_VALUE;
+      ic.seq = true;
+      ic.is = Integer.MAX_VALUE;
     } else {
-      ia.is = sum > min ? min : sum;
+      ic.is = sum > min ? min : sum;
     } 
   }
   
   @Override
-  public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq)
+  public Expr indexEquivalent(final XQContext ctx, final IndexContext ic)
     throws XQException {
 
     for (int i = 0; i < expr.length; i++) {
-      expr[i] = (FTExpr) expr[i].indexEquivalent(ctx, ieq);
+      expr[i] = (FTExpr) expr[i].indexEquivalent(ctx, ic);
     }
     
     if (pex.length == 0) {

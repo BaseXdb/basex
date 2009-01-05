@@ -3,11 +3,9 @@ package org.basex.query.xquery.expr;
 import static org.basex.query.xquery.XQText.*;
 import static org.basex.query.xquery.XQTokens.*;
 import java.io.IOException;
-
 import org.basex.data.Serializer;
 import org.basex.query.FTPos;
-import org.basex.query.xquery.FTIndexAcsbl;
-import org.basex.query.xquery.FTIndexEq;
+import org.basex.query.xquery.IndexContext;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Dbl;
@@ -117,22 +115,22 @@ public final class FTSelect extends FTExpr {
   }
 
   @Override
-  public void indexAccessible(final XQContext ctx, final FTIndexAcsbl ia) 
+  public void indexAccessible(final XQContext ctx, final IndexContext ic) 
       throws XQException {
     
-    expr[0].indexAccessible(ctx, ia);
+    expr[0].indexAccessible(ctx, ic);
     
     // index could only be used, if there is no ftselection specified 
     // before an ftnot
-    if (ia.ftnot) ia.iu &= initial();
+    if (ic.ftnot) ic.iu &= initial();
   }
   
   @Override
-  public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq)
+  public Expr indexEquivalent(final XQContext ctx, final IndexContext ic)
     throws XQException {
 
     return new FTSelectIndex((FTExpr) 
-        expr[0].indexEquivalent(ctx, ieq), pos, window, weight, dist);
+        expr[0].indexEquivalent(ctx, ic), pos, window, weight, dist);
   }
   
   @Override

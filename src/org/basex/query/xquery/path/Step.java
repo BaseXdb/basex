@@ -7,10 +7,11 @@ import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Expr;
-import org.basex.query.xquery.expr.Pred;
+import org.basex.query.xquery.expr.Preds;
 import org.basex.query.xquery.func.Fun;
 import org.basex.query.xquery.func.FunDef;
 import org.basex.query.xquery.item.Item;
+import org.basex.query.xquery.item.Itr;
 import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.item.Type;
@@ -28,16 +29,14 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class Step extends Expr {
+public class Step extends Preds {
   /** Axis. */
   public Axis axis;
   /** Node test. */
   public Test test;
-  /** Predicates. */
-  public Expr[] pred;
 
   /**
-   * This method creates an expression for steps without predicates.
+   * This method creates a step without predicates.
    * @param a axis
    * @param t node test
    * @return step
@@ -47,7 +46,7 @@ public class Step extends Expr {
   }
 
   /**
-   * This method creates an expression for steps with predicates.
+   * This method creates a step instance.
    * @param a axis
    * @param t node test
    * @param p predicates
@@ -64,15 +63,15 @@ public class Step extends Expr {
    * @param p predicates
    */
   protected Step(final Axis a, final Test t, final Expr... p) {
+    super(p);
     axis = a;
     test = t;
-    pred = p;
   }
 
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
-    pred = Pred.comp(pred, ctx);
-    if(pred == null || !test.comp(ctx)) return Seq.EMPTY;
+    final Expr e = super.comp(ctx);
+    if(e != this || !test.comp(ctx)) return Seq.EMPTY;
 
     // No predicates.. evaluate via simple iterator
     if(pred.length == 0) return get(axis, test);
@@ -153,22 +152,18 @@ public class Step extends Expr {
    * @param p predicate to be added
    * @return resulting step instance
    */
-  public Step addPred(final Expr p) {
+  public final Step addPred(final Expr p) {
     pred = Array.add(pred, p);
-    return this;
+    return get(axis, test, pred);
   }
 
-  @Override
-  public final boolean uses(final Using u) {
-    for(final Expr p : pred) if(p.uses(u)) return true;
-    
-    if(u == Using.POS) {
-      for(final Expr p : pred) {
-        final Type t = p.returned();
-        if(t == null || t.num) return true;
-      }
-    }
-    return false;
+  /**
+   * Adds a position predicate to the step.
+   * @return resulting step instance or null
+   */
+  final Step addPos() {
+    return axis == Axis.PARENT || axis == Axis.SELF || pred.length != 0 ?
+        null : addPred(Itr.get(1));
   }
 
   @Override
@@ -189,30 +184,27 @@ public class Step extends Expr {
   }
 
   @Override
-  public final String color() {
-    return "FFFF66";
-  }
-
-  @Override
   public final void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     ser.attribute(AXIS, Token.token(axis.name));
     ser.attribute(TEST, Token.token(test.toString()));
-    for(final Expr p : pred) p.plan(ser);
+    super.plan(ser);
     ser.closeElement();
   }
   
   @Override
   public final String toString() {
-    final StringBuilder sb = new StringBuilder("");
+    final StringBuilder sb = new StringBuilder();
     if(test == Test.NODE) {
-      if(axis == Axis.PARENT) return "..";
-      if(axis == Axis.SELF) return ".";
+      if(axis == Axis.PARENT) sb.append("..");
+      if(axis == Axis.SELF) sb.append(".");
     }
-    if(axis == Axis.ATTR) sb.append("@");
-    else if(axis != Axis.CHILD) sb.append(axis + "::");
-    sb.append(test);
-    for(final Expr e : pred) sb.append("[" + e + "]");
+    if(sb.length() == 0) {
+      if(axis == Axis.ATTR) sb.append("@");
+      else if(axis != Axis.CHILD) sb.append(axis + "::");
+      sb.append(test);
+    }
+    sb.append(super.toString());
     return sb.toString();
   }
 }

@@ -63,7 +63,7 @@ final class FNAggr extends Fun {
         if(args[0] instanceof Seq) return Itr.get(((Seq) args[0]).size());
         return this;
 
-        /* a dirty sample to show which steps are necessary here...        
+        /* a dirty sample for optimizing location path counts...
         if(!(args[0] instanceof Path)) return this;
         final Path path = (Path) args[0];
         if(path.expr.length != 1) return this;

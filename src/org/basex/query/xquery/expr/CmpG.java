@@ -6,8 +6,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.index.IndexToken;
 import org.basex.index.ValuesToken;
-import org.basex.query.xquery.FTIndexAcsbl;
-import org.basex.query.xquery.FTIndexEq;
+import org.basex.query.xquery.IndexContext;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Bln;
@@ -93,7 +92,7 @@ public final class CmpG extends Arr {
     Expr e = this;
     if(e1.i() && e2.i()) e = Bln.get(eval((Item) e1, (Item) e2, cmp.cmp));
     else if(e1.e() || e2.e()) e = Bln.FALSE;
-    if(e != this) ctx.compInfo(OPTSIMPLE, this, e);
+    if(e != this) ctx.compInfo(OPTPRE, this);
     return e;
   }
 
@@ -171,16 +170,18 @@ public final class CmpG extends Arr {
   }
 
   @Override
-  public void indexAccessible(final XQContext ctx, final FTIndexAcsbl ia)
+  public void indexAccessible(final XQContext ctx, final IndexContext ic)
       throws XQException {
+
+    ic.iu = false;
 
     // accept only location path, string and equality expressions
     final Step s = indexStep(expr);
     if(s == null || cmp != Comp.EQ || !(expr[1] instanceof Str) &&
         !(expr[1] instanceof Seq)) return;
 
-    final boolean text = ia.data.meta.txtindex && s.test.type == Type.TXT;
-    final boolean attr = !text && ia.data.meta.atvindex &&
+    final boolean text = ic.data.meta.txtindex && s.test.type == Type.TXT;
+    final boolean attr = !text && ic.data.meta.atvindex &&
       s.simpleName(Axis.ATTR);
     
     // no text or attribute index applicable
@@ -192,24 +193,24 @@ public final class CmpG extends Arr {
     while((i = ir.next()) != null) {
       if(!(i instanceof Str)) return;
       final ValuesToken vt = new ValuesToken(text, i.str());
-      ia.is = Math.max(ia.data.nrIDs(vt), ia.is);
+      ic.is = Math.min(ic.data.nrIDs(vt), ic.is);
       index = Array.add(index, vt);
     }
-    ia.iu = true;
+    ic.iu = true;
   }
   
   @Override
-  public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq) {
+  public AxisPath indexEquivalent(final XQContext ctx, final IndexContext ic) {
     // create index access expressions
     final int il = index.length;
     final Expr[] ia = new IndexAccess[il];
-    for(int i = 0; i < il; i++) ia[i] = new IndexAccess(ieq.data, index[i]);
+    for(int i = 0; i < il; i++) ia[i] = new IndexAccess(ic.data, index[i]);
     
     // more than one string - merge index results
     final Expr root = il == 1 ? ia[0] : new Union(ia);
     
     final AxisPath orig = (AxisPath) expr[0];
-    final AxisPath path = orig.invertPath(root, ieq.curr);
+    final AxisPath path = orig.invertPath(root, ic.step);
 
     if(index[0].type == IndexToken.Type.TXT) {
       ctx.compInfo(OPTTXTINDEX);

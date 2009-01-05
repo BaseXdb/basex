@@ -3,8 +3,7 @@ package org.basex.query.xquery.expr;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.FTOpt;
-import org.basex.query.xquery.FTIndexAcsbl;
-import org.basex.query.xquery.FTIndexEq;
+import org.basex.query.xquery.IndexContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.iter.Iter;
@@ -49,22 +48,22 @@ public final class FTOptions extends FTExpr {
   }
 
   @Override
-  public void indexAccessible(final XQContext ctx, final FTIndexAcsbl ia) 
+  public void indexAccessible(final XQContext ctx, final IndexContext ic) 
       throws XQException {
     
-    ia.io &= opt.indexAccessible(ia.data.meta);
+    ic.io &= opt.indexAccessible(ic.data.meta);
     
     final FTOpt tmp = ctx.ftopt;
     ctx.ftopt = opt;
-    expr[0].indexAccessible(ctx, ia);
+    expr[0].indexAccessible(ctx, ic);
     ctx.ftopt = tmp;
   }
 
   @Override
-  public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq)
-    throws XQException {
+  public Expr indexEquivalent(final XQContext ctx, final IndexContext ic)
+      throws XQException {
 
-    return new FTOptions((FTExpr) expr[0].indexEquivalent(ctx, ieq), opt);
+    return new FTOptions((FTExpr) expr[0].indexEquivalent(ctx, ic), opt);
   }
   
   @Override

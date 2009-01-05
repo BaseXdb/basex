@@ -109,17 +109,7 @@ public interface XPText {
   /** Optimization info. */
   String OPTAND4 = "Replacing AND expression by index access";
   /** Optimization info. */
-  String OPTAND5 = "Replacing AND by ALLOF expression";
-  /** Optimization info. */
-  String OPTALLOF = "Replacing ALLOF expression by index access";
-  /** Optimization info. */
-  String OPTONEOF = "Replacing ONEOF expression by index access";
-  /** Optimization info. */
-  String OPTRANGE = "Replacing AND by RANGE expression";
-  /** Optimization info. */
   String OPTOR4 = "Replacing OR expression by index access";
-  /** Optimization info. */
-  String OPTOR5 = "Replacing OR by ONEOF expression";
   /** Optimization info. */
   String OPTEQ1 = "Removing comparison for empty nodeset";
   /** Optimization info. */
@@ -141,10 +131,23 @@ public interface XPText {
   /** Optimization info. */
   String OPTTEXT = "Adding text() step";
   /** Optimization info. */
-  String OPTPOS = "Rewriting position predicate";
-  /** Optimization info. */
   String OPTPREDS = "Rewriting predicate";
 
+  // The following optimizations may not be covered by XQuery yet...
+
+  /** Optimization info. */
+  String OPTAND5 = "Replacing AND by ALLOF expression";
+  /** Optimization info. */
+  String OPTOR5 = "Replacing OR by ONEOF expression";
+  /** Optimization info. */
+  String OPTALLOF = "Replacing ALLOF expression by index access";
+  /** Optimization info. */
+  String OPTONEOF = "Replacing ONEOF expression by index access";
+  /** Optimization info. */
+  String OPTRANGE = "Replacing AND by RANGE expression";
+  /** Optimization info. */
+  String OPTPOS = "Rewriting position predicate";
+  
   /** Evaluation info. */
   String EVALSKIP = "rest of output skipped...";
 }

@@ -7,8 +7,7 @@ import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.data.StatsKey;
-import org.basex.query.xquery.FTIndexAcsbl;
-import org.basex.query.xquery.FTIndexEq;
+import org.basex.query.xquery.IndexContext;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.CAttr;
@@ -22,6 +21,7 @@ import org.basex.query.xquery.item.DBNode;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.QNm;
+import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.NodIter;
@@ -53,9 +53,36 @@ public class AxisPath extends Path {
    * @param r root expression; can be null
    * @param s location steps; will at least have one entry
    */
-  public AxisPath(final Expr r, final Step[] s) {
+  protected AxisPath(final Expr r, final Step... s) {
     super(r);
     step = s;
+  }
+
+  /**
+   * Constructor.
+   * @param r root expression; can be null
+   * @param st location steps; will at least have one entry
+   * @return class instance
+   */
+  public static final AxisPath get(final Expr r, final Step... st) {
+    // check if steps have predicates
+    return iterable(r, st) ? new SimpleIterPath(r, st) : new AxisPath(r, st);
+  }
+
+  /**
+   * Checks if the specified path components are iterable.
+   * @param r root expression; can be null
+   * @param st location steps; will at least have one entry
+   * @return result of check
+   */
+  public static final boolean iterable(final Expr r, final Step... st) {
+    /* Conditions for an iterable location path:
+     * - one downward location step
+     * - no predicates
+     * - no variable in root expression
+     */
+    return st.length == 1 && st[0].axis.down && st[0].pred.length == 0 &&
+      (r == null || !r.uses(Using.VAR));
   }
 
   @Override
@@ -91,35 +118,24 @@ public class AxisPath extends Path {
       if(!(e instanceof Step)) return e;
       step[i] = (Step) e;
     }
-    
     mergeDesc(ctx);
-
+    
+    // no predicates, one downward step... choose iterative evaluation
+    if(iterable(root, step)) return new SimpleIterPath(root, step);
+    
     // analyze if result set can be cached - no predicates/variables...
     cache = root != null && !root.uses(Using.VAR);
       
     // check if steps have predicates
-    boolean noPreds = true;
     for(final Step s : step) {
-      // check if we have a predicate
-      if(s.pred.length != 0) {
-        noPreds = false;
-        // check if we also find a variable
-        if(s.uses(Using.VAR)) {
-          cache = false;
-          break;
-        }
+      // check if we have a predicate and if we find a variable
+      if(s.pred.length != 0 && s.uses(Using.VAR)) {
+        // no caching - skip other steps
+        cache = false;
+        return this;
       }
     }
     
-    // no caching - leave compilation
-    if(!cache) return this;
-    
-    // no predicates, one downward step... choose iterative evaluation
-    final Axis axis = step[0].axis;
-    if(noPreds && step.length == 1 && axis.down) {
-      return new SimpleIterPath(root, step);
-    }
-
     // check if the context item is set to a document node
     if(!(ctx.item instanceof DBNode)) return this;
     final DBNode db = (DBNode) ctx.item;
@@ -128,44 +144,47 @@ public class AxisPath extends Path {
     for(final Step s : step) if(s.uses(Using.POS) || !s.axis.vert) return this;
 
     // loop through all steps
-    AxisPath result = this;
     for(int i = 0; i < step.length; i++) {
       // find cheapest index access
       final Step stp = step[i];
-      FTIndexAcsbl iacs = null;
+      IndexContext ictx = null;
       int minp = 0;
 
       for(int p = 0; p < stp.pred.length; p++) {
-        final FTIndexAcsbl ia = new FTIndexAcsbl(db.data);
-        stp.pred[p].indexAccessible(ctx, ia);
-        if(ia.io && ia.iu) {
-          if(iacs == null || iacs.is > ia.is) {
-            iacs = ia;
+        final IndexContext ic = new IndexContext(db.data, stp);
+        stp.pred[p].indexAccessible(ctx, ic);
+        if(ic.io && ic.iu) {
+          if(ictx == null || ictx.is > ic.is) {
+            ictx = ic;
             minp = p;
           }
         }
       }
 
       // no index access possible; skip remaining tests
-      if(iacs == null || !iacs.io || !iacs.iu) continue;
-
-      if(iacs.is == 0 && iacs.ftnot) {
-        // no result, not operator... accept all results
-        stp.pred[minp] = Bln.TRUE;
-        continue;
+      if(ictx == null || !ictx.io || !ictx.iu) continue;
+      
+      // no results...
+      if(ictx.is == 0) {
+        if(ictx.ftnot) {
+          // not operator... accept all results
+          stp.pred[minp] = Bln.TRUE;
+          continue;
+        }
+        ctx.compInfo(OPTNOINDEX, this);
+        return Seq.EMPTY;
       }
 
       // replace expressions for index access
-      final FTIndexEq ieq = new FTIndexEq(iacs, stp);
-      final Expr ie = stp.pred[minp].indexEquivalent(ctx, ieq);
-      
-      if(iacs.seq) {
+      final Expr ie = stp.pred[minp].indexEquivalent(ctx, ictx);
+
+      if(ictx.seq) {
         // do not invert path
         stp.pred[minp] = ie;
       } else {
         Step[] inv = {};
         
-        // add remaining predicates
+        // collect remaining predicates
         final Expr[] newPreds = new Expr[stp.pred.length - 1];
         int c = 0;
         for(int p = 0; p != stp.pred.length; p++) {
@@ -186,25 +205,36 @@ public class AxisPath extends Path {
             inv = Array.add(inv, Step.get(a, prev.test));
           }
         }
+        final boolean add = inv.length != 0 || newPreds.length != 0;
 
-        // add predicates to check remaining path
-        // invert path - cast is safe
-        final AxisPath res = (AxisPath) ie; 
-        
-        if(inv.length != 0) {
-          res.step[res.step.length - 1] =
-            res.step[res.step.length - 1].addPred(new AxisPath(null, inv));
+        // create resulting expression
+        AxisPath result = null;
+        if(ie instanceof AxisPath) {
+          result = (AxisPath) ie;
+        } else if(add || i + 1 < step.length) {
+          result = add ? new AxisPath(ie, Step.get(Axis.SELF, Test.NODE)) :
+            new AxisPath(ie);
+        } else {
+          return ie;
         }
-        
+
+        // add remaining predicates to last step
+        final int sl = result.step.length - 1;
+        for(int p = 0; p < newPreds.length; p++) {
+          result.step[sl] = result.step[sl].addPred(newPreds[p]);
+        }
+        // add inverted path as predicate to last step
+        if(inv.length != 0) {
+          result.step[sl] = result.step[sl].addPred(new AxisPath(null, inv));
+        }
         // add remaining steps
         for(int j = i + 1; j < step.length; j++) {
-          res.step = Array.add(res.step, step[j]);
+          result.step = Array.add(result.step, step[j]);
         }
-        result = res;
         break;
       }
     }
-    return result;
+    return this;
   }
 
   @Override
@@ -399,6 +429,20 @@ public class AxisPath extends Path {
   }
 
   /**
+   * Adds a position predicate to the last step.
+   * @return resulting path instance
+   */
+  public final AxisPath addPos() {
+    Step s = null;
+    if(step.length != 0) {
+      s = step[step.length - 1].addPos();
+      if(s != null) step[step.length - 1] = s;
+    }
+    if(s == null) return null;
+    return this instanceof SimpleIterPath ? new AxisPath(root, step) : this;
+  }
+
+  /**
    * Get all VarCall expressions.
    * @return VarCall[]
    */
@@ -419,7 +463,9 @@ public class AxisPath extends Path {
   
   @Override
   public boolean uses(final Using u) {
-    return super.uses(u, step);
+    // recursive position tests irrelevant for POS test?
+    //return u == Using.VAR && uses(u, step);
+    return uses(u, step);
   }
 
   @Override

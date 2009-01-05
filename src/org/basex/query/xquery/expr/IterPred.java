@@ -11,7 +11,7 @@ import org.basex.query.xquery.iter.Iter;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Dennis Stratmann
  */
-public final class PredIter extends Pred {
+public final class IterPred extends Pred {
   /** Flag is set to true if predicate has last function. */
   final boolean last;
   /** Flag is set to true if predicate has a numeric value. */
@@ -24,7 +24,7 @@ public final class PredIter extends Pred {
    * @param l true if predicate has a last function
    * @param n true if predicate has a numeric value
    */
-  public PredIter(final Expr r, final Expr[] p,
+  public IterPred(final Expr r, final Expr[] p,
       final boolean l, final boolean n) {
 
     super(r, p);

@@ -18,7 +18,7 @@ public final class SimpleIterPath extends AxisPath {
    * @param r root expression
    * @param s location steps
    */
-  public SimpleIterPath(final Expr r, final Step[] s) {
+  public SimpleIterPath(final Expr r, final Step... s) {
     super(r, s);
   }
 
@@ -31,7 +31,7 @@ public final class SimpleIterPath extends AxisPath {
       @Override
       public Item next() throws XQException  {
         if(s == null) {
-          ctx.item = ctx.iter(root).finish();
+          if(root != null) ctx.item = ctx.iter(root).finish();
           s = ctx.iter(step[0]);
         }
         final Item it = s.next();

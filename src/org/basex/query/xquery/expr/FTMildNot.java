@@ -1,7 +1,6 @@
 package org.basex.query.xquery.expr;
 
-import org.basex.query.xquery.FTIndexAcsbl;
-import org.basex.query.xquery.FTIndexEq;
+import org.basex.query.xquery.IndexContext;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Dbl;
@@ -40,14 +39,15 @@ public final class FTMildNot extends FTExpr {
   }
   
   @Override
-  public void indexAccessible(final XQContext ctx, final FTIndexAcsbl ia)
+  public void indexAccessible(final XQContext ctx, final IndexContext ic)
       throws XQException {
-    final int mmin = ia.is;
+    
+    final int mmin = ic.is;
     IntList il = new IntList(expr.length - 1);
     for (int i = 1; i < expr.length; i++) {
-      expr[i].indexAccessible(ctx, ia);
-      if (!ia.io) return;
-      if (ia.is > 0) il.add(i);
+      expr[i].indexAccessible(ctx, ic);
+      if (!ic.io) return;
+      if (ic.is > 0) il.add(i);
     }
     
     if(il.size < expr.length - 1) {
@@ -57,15 +57,15 @@ public final class FTMildNot extends FTExpr {
       for (int i = 0; i < il.size; i++) e[c++] = expr[il.list[i]];
       expr = e;
     }
-    expr[0].indexAccessible(ctx, ia);
-    ia.is = mmin < ia.is ? mmin : ia.is;
+    expr[0].indexAccessible(ctx, ic);
+    ic.is = mmin < ic.is ? mmin : ic.is;
   }
   
   @Override
-  public Expr indexEquivalent(final XQContext ctx, final FTIndexEq ieq)
+  public Expr indexEquivalent(final XQContext ctx, final IndexContext ic)
     throws XQException {
 
-    if (expr.length == 1) return expr[0].indexEquivalent(ctx, ieq);
+    if (expr.length == 1) return expr[0].indexEquivalent(ctx, ic);
     
     // assumption 1: ftcontains "a" not in "a b" not in "a c"
     // and ftcontains "a" not in "a b" ftand "a" not in "a c" are equivalent
@@ -73,9 +73,9 @@ public final class FTMildNot extends FTExpr {
     final FTExpr[] ie = new FTExpr[2];
     final FTMildNotIndex[] mne = new FTMildNotIndex[expr.length - 1];
     final int[] pex = new int[expr.length - 1];
-    ie[0] = (FTExpr) expr[0].indexEquivalent(ctx, ieq);
+    ie[0] = (FTExpr) expr[0].indexEquivalent(ctx, ic);
     for (int i = 1; i < expr.length; i++) {
-      ie[1] = (FTExpr) expr[i].indexEquivalent(ctx, ieq);
+      ie[1] = (FTExpr) expr[i].indexEquivalent(ctx, ic);
       mne[i - 1] = new FTMildNotIndex(ie);
       pex[i - 1] = i - 1;
     }

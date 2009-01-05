@@ -770,11 +770,10 @@ public final class Token {
     return true;
   }
   
-  /**
+  /*
    * Checks if c is a punctuation mark.
    * @param c token
    * @return true if c is a punctuation mark
-   */
   public static boolean pm(final byte c) {
     return c == '.' || c == '!' || c == '?';
   }
@@ -783,10 +782,10 @@ public final class Token {
    * Checks if c is a new line.
    * @param c token
    * @return true if c is a new line
-   */
   public static boolean nl(final byte c) {
     return c == '\n';
   }
+  */
   
   /**
    * Replaces the specified character and returns the result token.

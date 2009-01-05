@@ -43,7 +43,7 @@ public abstract class Path extends Expr {
    * @return result of check
    */
   protected boolean uses(final Using u, final Expr[] step) {
-    for(final Expr e : step) if(e.uses(u)) return true;
+    for(final Expr s : step) if(s.uses(u)) return true;
     return root != null && root.uses(u);
   }
 

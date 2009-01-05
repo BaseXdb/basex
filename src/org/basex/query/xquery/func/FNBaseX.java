@@ -30,11 +30,15 @@ final class FNBaseX extends Fun {
   }
   
   @Override
-  public Expr c(final XQContext ctx) {
-    switch(func) {
-      case CONTAINSLC: return args[0].e() ? Bln.FALSE : this;
-      default:         return this;
+  public Expr c(final XQContext ctx) throws XQException {
+    if(func == FunDef.CONTAINSLC) {
+      final byte[] i = args[1].i() ? checkStr((Item) args[1]) : null;
+      // query string is empty; return true
+      if(args[1].e() || i != null && i.length == 0) return Bln.TRUE;
+      // input string is empty; return false
+      if(args[0].e() && i != null && i.length != 0) return Bln.FALSE;
     }
+    return this;
   }
 
   /**

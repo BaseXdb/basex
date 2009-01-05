@@ -84,18 +84,6 @@ public final class DataInput extends BufferInput {
   }
 
   /**
-   * Reads a boolean array from the input stream.
-   * @return boolean array
-   * @throws IOException IO Exception
-   */
-  public boolean[] readBools() throws IOException {
-    final int l = readNum();
-    final boolean[] array = new boolean[l];
-    for(int i = 0; i < l; i++) array[i] = readBool();
-    return array;
-  }
-
-  /**
    * Reads a double byte array from the input stream.
    * @return double array
    * @throws IOException IO Exception

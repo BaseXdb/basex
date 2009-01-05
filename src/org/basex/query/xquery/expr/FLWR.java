@@ -96,7 +96,7 @@ public final class FLWR extends FLWOR {
    * @return boolean true, if anything was normalized
    * @throws XQException Exception
    */
-  public boolean normalize() throws XQException {
+  boolean normalize() throws XQException {
     boolean n = false;
       ForLet[] tmp = new ForLet[0];
       Step last = null;
@@ -163,7 +163,7 @@ public final class FLWR extends FLWOR {
    * @param ret flag for existing return clause
    * @return Optimized Expression
    */
-  public AxisPath optimize(final AxisPath ap, final boolean ret) {
+  AxisPath optimize(final AxisPath ap, final boolean ret) {
     Step[] s = new Step[0];
     Expr r = null;
     for (int i = 0; i < fl.length; i++) {
@@ -178,7 +178,7 @@ public final class FLWR extends FLWOR {
     }
     AxisPath apt = ap;
     if (apt == null) {
-      apt = new AxisPath(r, s);
+      apt = AxisPath.get(r, s);
     } else {
       apt.step = Array.add(apt.step, s);
     }

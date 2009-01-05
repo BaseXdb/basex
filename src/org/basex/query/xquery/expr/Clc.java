@@ -42,7 +42,7 @@ public final class Clc extends Arr {
     Expr e = this;
     if(e1.i() && e2.i()) e = calc.ev((Item) e1, (Item) e2);
     if(e1.e() || e2.e()) e = Seq.EMPTY;
-    if(e != this) ctx.compInfo(OPTSIMPLE, this, e);
+    if(e != this) ctx.compInfo(OPTPRE, this);
     return e;
   }
 

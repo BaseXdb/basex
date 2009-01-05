@@ -1,0 +1,946 @@
+JAVA PROFILE 1.0.1, created Mon Jan 05 16:00:15 2009
+
+Header for -agentlib:hprof (or -Xrunhprof) ASCII Output (JDK 5.0 JVMTI based)
+
+@(#)jvm.hprof.txt	1.5 06/01/28
+
+ Copyright (c) 2006 Sun Microsystems, Inc. All  Rights Reserved.
+
+WARNING!  This file format is under development, and is subject to
+change without notice.
+
+This file contains the following types of records:
+
+THREAD START
+THREAD END      mark the lifetime of Java threads
+
+TRACE           represents a Java stack trace.  Each trace consists
+                of a series of stack frames.  Other records refer to
+                TRACEs to identify (1) where object allocations have
+                taken place, (2) the frames in which GC roots were
+                found, and (3) frequently executed methods.
+
+HEAP DUMP       is a complete snapshot of all live objects in the Java
+                heap.  Following distinctions are made:
+
+                ROOT    root set as determined by GC
+                CLS     classes 
+                OBJ     instances
+                ARR     arrays
+
+SITES           is a sorted list of allocation sites.  This identifies
+                the most heavily allocated object types, and the TRACE
+                at which those allocations occurred.
+
+CPU SAMPLES     is a statistical profile of program execution.  The VM
+                periodically samples all running threads, and assigns
+                a quantum to active TRACEs in those threads.  Entries
+                in this record are TRACEs ranked by the percentage of
+                total quanta they consumed; top-ranked TRACEs are
+                typically hot spots in the program.
+
+CPU TIME        is a profile of program execution obtained by measuring
+                the time spent in individual methods (excluding the time
+                spent in callees), as well as by counting the number of
+                times each method is called. Entries in this record are
+                TRACEs ranked by the percentage of total CPU time. The
+                "count" field indicates the number of times each TRACE 
+                is invoked.
+
+MONITOR TIME    is a profile of monitor contention obtained by measuring
+                the time spent by a thread waiting to enter a monitor.
+                Entries in this record are TRACEs ranked by the percentage
+                of total monitor contention time and a brief description
+                of the monitor.  The "count" field indicates the number of 
+                times the monitor was contended at that TRACE.
+
+MONITOR DUMP    is a complete snapshot of all the monitors and threads in 
+                the System.
+
+HEAP DUMP, SITES, CPU SAMPLES|TIME and MONITOR DUMP|TIME records are generated 
+at program exit.  They can also be obtained during program execution by typing 
+Ctrl-\ (on Solaris) or by typing Ctrl-Break (on Win32).
+
+--------
+
+THREAD START (obj=5000013b, id = 200001, name="main", group="main")
+THREAD START (obj=5000013b, id = 200004, name="Java2D Disposer", group="system")
+THREAD START (obj=5000013b, id = 200005, name="AWT-Shutdown", group="main")
+THREAD START (obj=5000013b, id = 200006, name="AWT-Windows", group="main")
+THREAD START (obj=5000047c, id = 200007, name="AWT-EventQueue-0", group="main")
+THREAD END (id = 200001)
+THREAD START (obj=5000013b, id = 200008, name="DestroyJavaVM", group="main")
+THREAD START (obj=5000013b, id = 200009, name="Image Fetcher 0", group="main")
+THREAD START (obj=5000013b, id = 200010, name="Image Fetcher 1", group="main")
+THREAD START (obj=5000013b, id = 200011, name="pool-6-thread-1", group="main")
+THREAD START (obj=5000013b, id = 200012, name="Image Fetcher 2", group="main")
+THREAD START (obj=5000013b, id = 200013, name="TimerQueue", group="system")
+THREAD START (obj=5000013b, id = 200014, name="pool-8-thread-1", group="main")
+THREAD START (obj=5000013b, id = 200015, name="pool-9-thread-1", group="main")
+THREAD START (obj=5000013b, id = 200016, name="pool-10-thread-1", group="main")
+THREAD START (obj=5000013b, id = 200017, name="pool-11-thread-1", group="main")
+THREAD START (obj=5000013b, id = 200018, name="pool-12-thread-1", group="main")
+THREAD START (obj=5000013b, id = 200019, name="pool-13-thread-1", group="main")
+THREAD START (obj=5000013b, id = 200020, name="pool-14-thread-1", group="main")
+THREAD START (obj=5000013b, id = 200021, name="pool-15-thread-1", group="main")
+THREAD START (obj=5000013b, id = 200022, name="pool-16-thread-1", group="main")
+THREAD END (id = 200010)
+THREAD END (id = 200009)
+THREAD END (id = 200012)
+THREAD START (obj=5000013b, id = 200024, name="SIGINT handler", group="system")
+THREAD START (obj=5000013b, id = 200025, name="Thread-2", group="system")
+THREAD END (id = 200025)
+THREAD START (obj=5000091f, id = 200026, name="Thread-0", group="main")
+THREAD END (id = 200026)
+THREAD START (obj=5000013b, id = 200027, name="Thread-1", group="system")
+THREAD END (id = 200006)
+THREAD END (id = 200027)
+THREAD END (id = 200024)
+THREAD END (id = 200002)
+TRACE 300234:
+	sun.awt.windows.WToolkit.eventLoop(<Unknown Source>:Unknown line)
+	sun.awt.windows.WToolkit.run(<Unknown Source>:Unknown line)
+	java.lang.Thread.run(<Unknown Source>:Unknown line)
+TRACE 301085:
+	org.basex.gui.layout.BaseXLayout.drawThumbnailsSentence(BaseXLayout.java:687)
+	org.basex.gui.layout.BaseXLayout.drawThumbnails(BaseXLayout.java:589)
+	org.basex.gui.view.map.MapDefault.drawRectangle(MapDefault.java:122)
+	org.basex.gui.view.map.MapDefault.drawRectangles(MapDefault.java:80)
+TRACE 300896:
+	sun.font.FileFont.getGlyphImage(<Unknown Source>:Unknown line)
+	sun.font.FileFontStrike.getGlyphImagePtr(<Unknown Source>:Unknown line)
+	sun.font.FileFontStrike.getGlyphAdvance(<Unknown Source>:Unknown line)
+	sun.font.FileFontStrike.getGlyphAdvance(<Unknown Source>:Unknown line)
+TRACE 301037:
+	org.basex.gui.layout.BaseXTextTokens.nextWord(BaseXTextTokens.java:87)
+	org.basex.gui.layout.BaseXTextRenderer.more(BaseXTextRenderer.java:150)
+	org.basex.gui.layout.BaseXTextRenderer.calc(BaseXTextRenderer.java:104)
+	org.basex.gui.layout.BaseXText$2.run(BaseXText.java:648)
+TRACE 300028:
+	java.lang.ClassLoader.defineClass1(<Unknown Source>:Unknown line)
+	java.lang.ClassLoader.defineClass(<Unknown Source>:Unknown line)
+	java.security.SecureClassLoader.defineClass(<Unknown Source>:Unknown line)
+	java.net.URLClassLoader.defineClass(<Unknown Source>:Unknown line)
+TRACE 301045:
+	org.basex.util.Token.string(Token.java:93)
+	org.basex.gui.layout.BaseXTextTokens.nextWord(BaseXTextTokens.java:87)
+	org.basex.gui.layout.BaseXTextRenderer.more(BaseXTextRenderer.java:150)
+	org.basex.gui.layout.BaseXTextRenderer.calc(BaseXTextRenderer.java:104)
+TRACE 301041:
+	java.io.RandomAccessFile.readBytes(<Unknown Source>:Unknown line)
+	java.io.RandomAccessFile.read(<Unknown Source>:Unknown line)
+	org.basex.io.DataAccess.readBlock(DataAccess.java:241)
+	org.basex.io.DataAccess.cursor(DataAccess.java:229)
+TRACE 300029:
+	java.lang.ClassLoader.findBootstrapClass(<Unknown Source>:Unknown line)
+	java.lang.ClassLoader.findBootstrapClass0(<Unknown Source>:Unknown line)
+	java.lang.ClassLoader.loadClass(<Unknown Source>:Unknown line)
+	java.lang.ClassLoader.loadClass(<Unknown Source>:Unknown line)
+TRACE 301058:
+	org.basex.gui.layout.BaseXTextRenderer.calc(BaseXTextRenderer.java:104)
+	org.basex.gui.layout.BaseXText$2.run(BaseXText.java:648)
+	java.awt.event.InvocationEvent.dispatch(<Unknown Source>:Unknown line)
+	java.awt.EventQueue.dispatchEvent(<Unknown Source>:Unknown line)
+TRACE 301044:
+	org.basex.gui.layout.BaseXTextRenderer.more(BaseXTextRenderer.java:153)
+	org.basex.gui.layout.BaseXTextRenderer.calc(BaseXTextRenderer.java:104)
+	org.basex.gui.layout.BaseXText$2.run(BaseXText.java:648)
+	java.awt.event.InvocationEvent.dispatch(<Unknown Source>:Unknown line)
+TRACE 301039:
+	org.basex.gui.layout.BaseXTextRenderer.more(BaseXTextRenderer.java:161)
+	org.basex.gui.layout.BaseXTextRenderer.calc(BaseXTextRenderer.java:104)
+	org.basex.gui.layout.BaseXText$2.run(BaseXText.java:648)
+	java.awt.event.InvocationEvent.dispatch(<Unknown Source>:Unknown line)
+TRACE 301038:
+	org.basex.util.Token.string(Token.java:92)
+	org.basex.gui.layout.BaseXTextTokens.nextWord(BaseXTextTokens.java:87)
+	org.basex.gui.layout.BaseXTextRenderer.more(BaseXTextRenderer.java:150)
+	org.basex.gui.layout.BaseXTextRenderer.calc(BaseXTextRenderer.java:104)
+TRACE 301059:
+	org.basex.util.Token.letterOrDigit(Token.java:928)
+	org.basex.gui.layout.BaseXTextTokens.sep(BaseXTextTokens.java:96)
+	org.basex.gui.layout.BaseXTextTokens.moreWords(BaseXTextTokens.java:76)
+	org.basex.gui.layout.BaseXTextRenderer.more(BaseXTextRenderer.java:147)
+TRACE 301032:
+	org.basex.data.XMLSerializer.text(XMLSerializer.java:99)
+	org.basex.data.Serializer.node(Serializer.java:240)
+	org.basex.data.Nodes.serialize(Nodes.java:192)
+	org.basex.data.Nodes.serialize(Nodes.java:187)
+TRACE 300751:
+	java.io.WinNTFileSystem.getBooleanAttributes(<Unknown Source>:Unknown line)
+	java.io.File.exists(<Unknown Source>:Unknown line)
+	sun.misc.URLClassPath$FileLoader.getResource(<Unknown Source>:Unknown line)
+	sun.misc.URLClassPath.getResource(<Unknown Source>:Unknown line)
+TRACE 301056:
+	org.basex.gui.layout.BaseXTextTokens.moreWords(BaseXTextTokens.java:70)
+	org.basex.gui.layout.BaseXTextRenderer.more(BaseXTextRenderer.java:147)
+	org.basex.gui.layout.BaseXTextRenderer.calc(BaseXTextRenderer.java:104)
+	org.basex.gui.layout.BaseXText$2.run(BaseXText.java:648)
+TRACE 300561:
+	java.io.FileInputStream.readBytes(<Unknown Source>:Unknown line)
+	java.io.FileInputStream.read(<Unknown Source>:Unknown line)
+	sun.misc.Resource.getBytes(<Unknown Source>:Unknown line)
+	java.net.URLClassLoader.defineClass(<Unknown Source>:Unknown line)
+TRACE 301077:
+	org.basex.util.Token.containslc(Token.java:597)
+	org.basex.query.xpath.func.ContainsLC.eval(ContainsLC.java:46)
+	org.basex.query.xpath.func.ContainsLC.eval(ContainsLC.java:1)
+	org.basex.query.xpath.XPContext.eval(XPContext.java:87)
+TRACE 301046:
+	org.basex.util.Token.letterOrDigit(Token.java:928)
+	org.basex.gui.layout.BaseXTextTokens.sep(BaseXTextTokens.java:96)
+	org.basex.gui.layout.BaseXTextTokens.moreWords(BaseXTextTokens.java:72)
+	org.basex.gui.layout.BaseXTextRenderer.more(BaseXTextRenderer.java:147)
+TRACE 301033:
+	org.basex.io.DataAccess.readToken(DataAccess.java:127)
+	org.basex.data.DiskData.txt(DiskData.java:270)
+	org.basex.data.DiskData.text(DiskData.java:254)
+	org.basex.data.Serializer.node(Serializer.java:240)
+TRACE 300053:
+	java.lang.ClassLoader$NativeLibrary.load(<Unknown Source>:Unknown line)
+	java.lang.ClassLoader.loadLibrary0(<Unknown Source>:Unknown line)
+	java.lang.ClassLoader.loadLibrary(<Unknown Source>:Unknown line)
+	java.lang.Runtime.loadLibrary0(<Unknown Source>:Unknown line)
+TRACE 301067:
+	org.basex.data.XMLSerializer.text(XMLSerializer.java:93)
+	org.basex.data.Serializer.node(Serializer.java:240)
+	org.basex.data.Nodes.serialize(Nodes.java:192)
+	org.basex.data.Nodes.serialize(Nodes.java:187)
+TRACE 301069:
+	org.basex.gui.layout.BaseXTextTokens.moreWords(BaseXTextTokens.java:74)
+	org.basex.gui.layout.BaseXTextRenderer.more(BaseXTextRenderer.java:147)
+	org.basex.gui.layout.BaseXTextRenderer.calc(BaseXTextRenderer.java:104)
+	org.basex.gui.layout.BaseXText$2.run(BaseXText.java:648)
+TRACE 301016:
+	sun.java2d.loops.FillRect.FillRect(<Unknown Source>:Unknown line)
+	sun.java2d.pipe.LoopPipe.fillRect(<Unknown Source>:Unknown line)
+	sun.java2d.pipe.ValidatePipe.fillRect(<Unknown Source>:Unknown line)
+	sun.java2d.SunGraphics2D.fillRect(<Unknown Source>:Unknown line)
+TRACE 301015:
+	sun.java2d.loops.FillRect.FillRect(<Unknown Source>:Unknown line)
+	sun.java2d.pipe.LoopPipe.fillRect(<Unknown Source>:Unknown line)
+	sun.java2d.SunGraphics2D.fillRect(<Unknown Source>:Unknown line)
+	org.basex.gui.layout.BaseXLayout.fill(BaseXLayout.java:239)
+TRACE 301040:
+	org.basex.gui.layout.BaseXTextRenderer.calc(BaseXTextRenderer.java:104)
+	org.basex.gui.layout.BaseXText$2.run(BaseXText.java:648)
+	java.awt.event.InvocationEvent.dispatch(<Unknown Source>:Unknown line)
+	java.awt.EventQueue.dispatchEvent(<Unknown Source>:Unknown line)
+TRACE 301090:
+	java.lang.Shutdown.halt0(<Unknown Source>:Unknown line)
+	java.lang.Shutdown.halt(<Unknown Source>:Unknown line)
+	java.lang.Shutdown.exit(<Unknown Source>:Unknown line)
+	java.lang.Terminator$1.handle(<Unknown Source>:Unknown line)
+TRACE 301006:
+	sun.java2d.windows.GDIBlitLoops.nativeBlit(<Unknown Source>:Unknown line)
+	sun.java2d.windows.GDIBlitLoops.Blit(<Unknown Source>:Unknown line)
+	sun.java2d.pipe.DrawImage.blitSurfaceData(<Unknown Source>:Unknown line)
+	sun.java2d.pipe.DrawImage.renderImageCopy(<Unknown Source>:Unknown line)
+TRACE 300894:
+	java.awt.MediaTracker.setDone(<Unknown Source>:Unknown line)
+	java.awt.MediaEntry.setStatus(<Unknown Source>:Unknown line)
+	java.awt.ImageMediaEntry.imageUpdate(<Unknown Source>:Unknown line)
+	sun.awt.image.ImageWatched$WeakLink.newInfo(<Unknown Source>:Unknown line)
+TRACE 301078:
+	org.basex.gui.layout.BaseXTextTokens.moreWords(BaseXTextTokens.java:75)
+	org.basex.gui.layout.BaseXTextRenderer.more(BaseXTextRenderer.java:147)
+	org.basex.gui.layout.BaseXTextRenderer.calc(BaseXTextRenderer.java:104)
+	org.basex.gui.layout.BaseXText$2.run(BaseXText.java:648)
+TRACE 300887:
+	sun.font.FileFontStrike._getGlyphImageFromWindows(<Unknown Source>:Unknown line)
+	sun.font.FileFontStrike.getGlyphImageFromWindows(<Unknown Source>:Unknown line)
+	sun.font.FileFontStrike.getGlyphImageFromNative(<Unknown Source>:Unknown line)
+	sun.font.FileFontStrike.getGlyphImagePtr(<Unknown Source>:Unknown line)
+TRACE 301043:
+	org.basex.gui.layout.BaseXText.setText(BaseXText.java:147)
+	org.basex.gui.view.text.TextView.setText(TextView.java:131)
+	org.basex.gui.view.text.TextView.refreshDoc(TextView.java:107)
+	org.basex.gui.view.text.TextView.refreshMark(TextView.java:82)
+TRACE 300757:
+	java.lang.System.arraycopy(<Unknown Source>:Unknown line)
+	java.io.BufferedInputStream.read1(<Unknown Source>:Unknown line)
+	java.io.BufferedInputStream.read(<Unknown Source>:Unknown line)
+	sun.awt.image.PNGImageDecoder.produceImage(<Unknown Source>:Unknown line)
+TRACE 300663:
+	sun.font.FontManager.populateFontFileNameMap(<Unknown Source>:Unknown line)
+	sun.font.FontManager.getFullNameToFileMap(<Unknown Source>:Unknown line)
+	sun.font.FontManager.findFontFromPlatform(<Unknown Source>:Unknown line)
+	sun.font.FontManager.findFont2D(<Unknown Source>:Unknown line)
+TRACE 301083:
+	org.basex.index.FTTokenizer.countSenPar(FTTokenizer.java:149)
+	org.basex.gui.layout.BaseXLayout.drawThumbnails(BaseXLayout.java:575)
+	org.basex.gui.view.map.MapDefault.drawRectangle(MapDefault.java:122)
+	org.basex.gui.view.map.MapDefault.drawRectangles(MapDefault.java:80)
+TRACE 301068:
+	sun.java2d.loops.DrawGlyphList.DrawGlyphList(<Unknown Source>:Unknown line)
+	sun.java2d.pipe.SolidTextRenderer.drawGlyphList(<Unknown Source>:Unknown line)
+	sun.java2d.pipe.GlyphListPipe.drawString(<Unknown Source>:Unknown line)
+	sun.java2d.SunGraphics2D.drawString(<Unknown Source>:Unknown line)
+TRACE 301047:
+	java.awt.image.DataBufferInt.<init>(<Unknown Source>:Unknown line)
+	java.awt.image.Raster.createPackedRaster(<Unknown Source>:Unknown line)
+	java.awt.image.DirectColorModel.createCompatibleWritableRaster(<Unknown Source>:Unknown line)
+	java.awt.image.BufferedImage.<init>(<Unknown Source>:Unknown line)
+TRACE 301049:
+	sun.font.FileFont.getGlyphImage(<Unknown Source>:Unknown line)
+	sun.font.FileFontStrike.getGlyphImagePtrs(<Unknown Source>:Unknown line)
+	sun.font.GlyphList.mapChars(<Unknown Source>:Unknown line)
+	sun.font.GlyphList.setFromString(<Unknown Source>:Unknown line)
+TRACE 301048:
+	java.lang.System.identityHashCode(<Unknown Source>:Unknown line)
+	java.util.IdentityHashMap.hash(<Unknown Source>:Unknown line)
+	java.util.IdentityHashMap.put(<Unknown Source>:Unknown line)
+	javax.swing.RepaintManager.addDirtyRegion0(<Unknown Source>:Unknown line)
+TRACE 301050:
+	java.io.RandomAccessFile.readBytes(<Unknown Source>:Unknown line)
+	java.io.RandomAccessFile.read(<Unknown Source>:Unknown line)
+	org.basex.io.TableDiskAccess.readBlock(TableDiskAccess.java:124)
+	org.basex.io.TableDiskAccess.cursor(TableDiskAccess.java:106)
+TRACE 301054:
+	org.basex.gui.view.map.MapView.focus(MapView.java:258)
+	org.basex.gui.view.map.MapView.calc(MapView.java:301)
+	org.basex.gui.view.map.MapView.refreshLayout(MapView.java:174)
+	org.basex.gui.view.map.MapView.componentResized(MapView.java:711)
+TRACE 300034:
+	org.basex.BaseXWin.waitPanel(BaseXWin.java:132)
+	org.basex.BaseXWin.<init>(BaseXWin.java:50)
+	org.basex.BaseXWin.main(BaseXWin.java:164)
+TRACE 301055:
+	sun.font.FontDesignMetrics.charWidth(<Unknown Source>:Unknown line)
+	org.basex.gui.layout.BaseXTextRenderer.charW(BaseXTextRenderer.java:301)
+	org.basex.gui.layout.BaseXTextRenderer.more(BaseXTextRenderer.java:161)
+	org.basex.gui.layout.BaseXTextRenderer.calc(BaseXTextRenderer.java:104)
+TRACE 301057:
+	sun.java2d.loops.Blit.Blit(<Unknown Source>:Unknown line)
+	sun.java2d.pipe.DrawImage.blitSurfaceData(<Unknown Source>:Unknown line)
+	sun.java2d.pipe.DrawImage.renderImageCopy(<Unknown Source>:Unknown line)
+	sun.java2d.pipe.DrawImage.copyImage(<Unknown Source>:Unknown line)
+TRACE 301042:
+	java.nio.CharBuffer.<init>(<Unknown Source>:Unknown line)
+	java.nio.HeapCharBuffer.<init>(<Unknown Source>:Unknown line)
+	java.nio.CharBuffer.wrap(<Unknown Source>:Unknown line)
+	java.nio.CharBuffer.wrap(<Unknown Source>:Unknown line)
+TRACE 301060:
+	org.basex.util.Token.string(Token.java:97)
+	org.basex.gui.layout.BaseXTextTokens.nextWord(BaseXTextTokens.java:87)
+	org.basex.gui.layout.BaseXTextRenderer.more(BaseXTextRenderer.java:150)
+	org.basex.gui.layout.BaseXTextRenderer.calc(BaseXTextRenderer.java:104)
+TRACE 301061:
+	java.lang.Thread.currentThread(<Unknown Source>:Unknown line)
+	javax.swing.text.AbstractDocument.writeLock(<Unknown Source>:Unknown line)
+	javax.swing.text.AbstractDocument.replace(<Unknown Source>:Unknown line)
+	javax.swing.text.JTextComponent.replaceSelection(<Unknown Source>:Unknown line)
+TRACE 301062:
+	sun.dc.pr.PathFiller.endPath(<Unknown Source>:Unknown line)
+	sun.dc.pr.Rasterizer.endPath(<Unknown Source>:Unknown line)
+	sun.java2d.pipe.DuctusRenderer.createShapeRasterizer(<Unknown Source>:Unknown line)
+	sun.java2d.pipe.DuctusShapeRenderer.renderPath(<Unknown Source>:Unknown line)
+TRACE 301063:
+	org.basex.query.xpath.XPParser.step(XPParser.java:377)
+	org.basex.query.xpath.XPParser.absLocPath(XPParser.java:316)
+	org.basex.query.xpath.XPParser.locPath(XPParser.java:303)
+	org.basex.query.xpath.XPParser.path(XPParser.java:270)
+TRACE 301064:
+	org.basex.gui.layout.BaseXLayout.fill(BaseXLayout.java:233)
+	org.basex.gui.layout.BaseXLayout.drawCell(BaseXLayout.java:267)
+	org.basex.gui.layout.BaseXBar.drawButton(BaseXBar.java:175)
+	org.basex.gui.layout.BaseXBar.paintComponent(BaseXBar.java:155)
+TRACE 301035:
+	org.basex.gui.layout.BaseXTextRenderer.calc(BaseXTextRenderer.java:104)
+	org.basex.gui.layout.BaseXText$2.run(BaseXText.java:648)
+	java.awt.event.InvocationEvent.dispatch(<Unknown Source>:Unknown line)
+	java.awt.EventQueue.dispatchEvent(<Unknown Source>:Unknown line)
+TRACE 301034:
+	org.basex.gui.layout.BaseXText.setText(BaseXText.java:147)
+	org.basex.gui.view.text.TextView.setText(TextView.java:131)
+	org.basex.gui.view.text.TextView.refreshDoc(TextView.java:107)
+	org.basex.gui.view.text.TextView.refreshInit(TextView.java:72)
+TRACE 301065:
+	java.lang.ClassLoader.defineClass(<Unknown Source>:Unknown line)
+	java.security.SecureClassLoader.defineClass(<Unknown Source>:Unknown line)
+	java.net.URLClassLoader.defineClass(<Unknown Source>:Unknown line)
+	java.net.URLClassLoader.access$000(<Unknown Source>:Unknown line)
+TRACE 301066:
+	org.basex.query.xpath.func.ContainsLC.eval(ContainsLC.java:46)
+	org.basex.query.xpath.func.ContainsLC.eval(ContainsLC.java:1)
+	org.basex.query.xpath.XPContext.eval(XPContext.java:87)
+	org.basex.query.xpath.path.PredSimple.eval(PredSimple.java:64)
+TRACE 301070:
+	java.nio.charset.CharsetDecoder.implReset(<Unknown Source>:Unknown line)
+	java.nio.charset.CharsetDecoder.reset(<Unknown Source>:Unknown line)
+	java.lang.StringCoding$StringDecoder.decode(<Unknown Source>:Unknown line)
+	java.lang.StringCoding.decode(<Unknown Source>:Unknown line)
+TRACE 301031:
+	org.basex.data.Serializer.node(Serializer.java:256)
+	org.basex.data.Nodes.serialize(Nodes.java:192)
+	org.basex.data.Nodes.serialize(Nodes.java:187)
+	org.basex.gui.view.text.TextView.refreshDoc(TextView.java:105)
+TRACE 301029:
+	org.basex.data.DiskData.<init>(DiskData.java:105)
+	org.basex.data.DiskData.<init>(DiskData.java:76)
+	org.basex.core.proc.Open.open(Open.java:61)
+	org.basex.core.proc.Open.exec(Open.java:39)
+TRACE 301028:
+	java.awt.Color.testColorValueRange(<Unknown Source>:Unknown line)
+	java.awt.Color.<init>(<Unknown Source>:Unknown line)
+	java.awt.Color.<init>(<Unknown Source>:Unknown line)
+	org.basex.gui.layout.BaseXLayout.fill(BaseXLayout.java:238)
+TRACE 301027:
+	java.net.URLStreamHandler.toExternalForm(<Unknown Source>:Unknown line)
+	java.net.URL.toExternalForm(<Unknown Source>:Unknown line)
+	java.net.URL.toString(<Unknown Source>:Unknown line)
+	java.lang.ClassLoader.defineClassSourceLocation(<Unknown Source>:Unknown line)
+TRACE 301026:
+	sun.java2d.loops.MaskBlit.MaskBlit(<Unknown Source>:Unknown line)
+	sun.java2d.loops.Blit$GeneralMaskBlit.Blit(<Unknown Source>:Unknown line)
+	sun.java2d.pipe.DrawImage.blitSurfaceData(<Unknown Source>:Unknown line)
+	sun.java2d.pipe.DrawImage.renderImageCopy(<Unknown Source>:Unknown line)
+TRACE 301025:
+	sun.net.www.ParseUtil.encodePath(<Unknown Source>:Unknown line)
+	sun.misc.URLClassPath$FileLoader.getResource(<Unknown Source>:Unknown line)
+	sun.misc.URLClassPath.getResource(<Unknown Source>:Unknown line)
+	java.net.URLClassLoader$1.run(<Unknown Source>:Unknown line)
+TRACE 301024:
+	sun.awt.image.PixelConverter$Xrgb.rgbToPixel(<Unknown Source>:Unknown line)
+	sun.java2d.loops.SurfaceType.pixelFor(<Unknown Source>:Unknown line)
+	sun.java2d.SurfaceData.pixelFor(<Unknown Source>:Unknown line)
+	sun.java2d.SunGraphics2D.validateColor(<Unknown Source>:Unknown line)
+TRACE 301022:
+	sun.awt.windows.WGlobalCursorManager.setCursor(<Unknown Source>:Unknown line)
+	sun.awt.GlobalCursorManager._updateCursor(<Unknown Source>:Unknown line)
+	sun.awt.GlobalCursorManager.updateCursorImmediately(<Unknown Source>:Unknown line)
+	sun.awt.windows.WComponentPeer.updateCursorImmediately(<Unknown Source>:Unknown line)
+TRACE 301021:
+	sun.awt.windows.WInputMethod.createNativeContext(<Unknown Source>:Unknown line)
+	sun.awt.windows.WInputMethod.<init>(<Unknown Source>:Unknown line)
+	sun.awt.windows.WInputMethodDescriptor.createInputMethod(<Unknown Source>:Unknown line)
+	sun.awt.im.InputContext.getInputMethodInstance(<Unknown Source>:Unknown line)
+TRACE 301019:
+	java.util.Locale.toLowerCase(<Unknown Source>:Unknown line)
+	java.util.Locale.convertOldISOCodes(<Unknown Source>:Unknown line)
+	java.util.Locale.<init>(<Unknown Source>:Unknown line)
+	sun.awt.windows.WInputMethod.getNativeLocale(<Unknown Source>:Unknown line)
+TRACE 301017:
+	sun.awt.windows.WDialogPeer.endModal(<Unknown Source>:Unknown line)
+	sun.awt.windows.WDialogPeer.hide(<Unknown Source>:Unknown line)
+	java.awt.Component.hide(<Unknown Source>:Unknown line)
+	java.awt.Window.hide(<Unknown Source>:Unknown line)
+TRACE 301071:
+	sun.java2d.pipe.DuctusRenderer.createShapeRasterizer(<Unknown Source>:Unknown line)
+	sun.java2d.pipe.DuctusShapeRenderer.renderPath(<Unknown Source>:Unknown line)
+	sun.java2d.pipe.DuctusShapeRenderer.fill(<Unknown Source>:Unknown line)
+	sun.java2d.pipe.PixelToShapeConverter.fillPolygon(<Unknown Source>:Unknown line)
+TRACE 301072:
+	sun.java2d.loops.DrawLine.DrawLine(<Unknown Source>:Unknown line)
+	sun.java2d.pipe.LoopPipe.drawLine(<Unknown Source>:Unknown line)
+	sun.java2d.SunGraphics2D.drawLine(<Unknown Source>:Unknown line)
+	org.basex.gui.view.ViewMover.paintComponent(ViewMover.java:52)
+TRACE 301073:
+	javax.swing.border.EtchedBorder.paintBorder(<Unknown Source>:Unknown line)
+	javax.swing.border.CompoundBorder.paintBorder(<Unknown Source>:Unknown line)
+	javax.swing.JComponent.paintBorder(<Unknown Source>:Unknown line)
+	javax.swing.JComponent.paint(<Unknown Source>:Unknown line)
+TRACE 301013:
+	sun.java2d.loops.DrawGlyphListLCD.DrawGlyphListLCD(<Unknown Source>:Unknown line)
+	sun.java2d.pipe.LCDTextRenderer.drawGlyphList(<Unknown Source>:Unknown line)
+	sun.java2d.pipe.GlyphListPipe.drawString(<Unknown Source>:Unknown line)
+	sun.java2d.pipe.ValidatePipe.drawString(<Unknown Source>:Unknown line)
+TRACE 301012:
+	sun.font.FontManager.getFont2D(<Unknown Source>:Unknown line)
+	sun.java2d.SunGraphics2D.checkFontInfo(<Unknown Source>:Unknown line)
+	sun.java2d.SunGraphics2D.getFontInfo(<Unknown Source>:Unknown line)
+	sun.java2d.pipe.GlyphListPipe.drawString(<Unknown Source>:Unknown line)
+TRACE 301011:
+	java.awt.image.BufferedImage.getWidth(<Unknown Source>:Unknown line)
+	sun.awt.image.BufImgSurfaceData.getBounds(<Unknown Source>:Unknown line)
+	sun.java2d.SunGraphics2D.<init>(<Unknown Source>:Unknown line)
+	sun.awt.image.SunVolatileImage.createGraphics(<Unknown Source>:Unknown line)
+TRACE 301010:
+	sun.awt.image.BufImgSurfaceData.initRaster(<Unknown Source>:Unknown line)
+	sun.awt.image.BufImgSurfaceData.createDataIC(<Unknown Source>:Unknown line)
+	sun.awt.image.BufImgSurfaceData.createData(<Unknown Source>:Unknown line)
+	sun.awt.image.VolatileSurfaceManager.getBackupSurface(<Unknown Source>:Unknown line)
+TRACE 301007:
+	java.io.WinNTFileSystem.list(<Unknown Source>:Unknown line)
+	java.io.File.list(<Unknown Source>:Unknown line)
+	java.io.File.listFiles(<Unknown Source>:Unknown line)
+	org.basex.core.proc.InfoDB.db(InfoDB.java:51)
+TRACE 301074:
+	java.awt.EventQueue.postEventPrivate(<Unknown Source>:Unknown line)
+	java.awt.EventQueue.postEvent(<Unknown Source>:Unknown line)
+	javax.swing.SystemEventQueueUtilities.queueComponentWorkRequest(<Unknown Source>:Unknown line)
+	javax.swing.SystemEventQueueUtilities.queueComponentWorkRequest(<Unknown Source>:Unknown line)
+TRACE 301005:
+	javax.swing.text.GapContent$MarkData.getOffset(<Unknown Source>:Unknown line)
+	javax.swing.text.GapContent$StickyPosition.getOffset(<Unknown Source>:Unknown line)
+	javax.swing.text.AbstractDocument$LeafElement.getStartOffset(<Unknown Source>:Unknown line)
+	javax.swing.text.AbstractDocument$BranchElement.getElementIndex(<Unknown Source>:Unknown line)
+TRACE 301001:
+	java.util.LinkedList$ListItr.previous(<Unknown Source>:Unknown line)
+	javax.swing.LayoutComparator.compare(<Unknown Source>:Unknown line)
+	java.util.Arrays.mergeSort(<Unknown Source>:Unknown line)
+	java.util.Arrays.sort(<Unknown Source>:Unknown line)
+TRACE 300999:
+	java.lang.System.identityHashCode(<Unknown Source>:Unknown line)
+	sun.awt.SunHints$Value.hashCode(<Unknown Source>:Unknown line)
+	java.awt.font.FontRenderContext.hashCode(<Unknown Source>:Unknown line)
+	sun.font.FontDesignMetrics$MetricsKey.init(<Unknown Source>:Unknown line)
+TRACE 300992:
+	sun.awt.windows.WDialogPeer.showModal(<Unknown Source>:Unknown line)
+	sun.awt.windows.WDialogPeer.realShow(<Unknown Source>:Unknown line)
+	sun.awt.windows.WWindowPeer.show(<Unknown Source>:Unknown line)
+	java.awt.Dialog.conditionalShow(<Unknown Source>:Unknown line)
+TRACE 300990:
+	java.lang.Object.hashCode(Object.java:Unknown line)
+	java.util.Hashtable.put(<Unknown Source>:Unknown line)
+	sun.java2d.Disposer.addReference(<Unknown Source>:Unknown line)
+	sun.font.StrikeCache$SoftDisposerRef.<init>(<Unknown Source>:Unknown line)
+TRACE 300985:
+	javax.swing.text.DefaultCaret$Handler.insertUpdate(<Unknown Source>:Unknown line)
+	javax.swing.text.AbstractDocument.fireInsertUpdate(<Unknown Source>:Unknown line)
+	javax.swing.text.AbstractDocument.handleInsertString(<Unknown Source>:Unknown line)
+	javax.swing.text.AbstractDocument.insertString(<Unknown Source>:Unknown line)
+TRACE 300965:
+	sun.awt.image.PNGImageDecoder.produceImage(<Unknown Source>:Unknown line)
+	sun.awt.image.InputStreamImageSource.doFetch(<Unknown Source>:Unknown line)
+	sun.awt.image.ImageFetcher.fetchloop(<Unknown Source>:Unknown line)
+	sun.awt.image.ImageFetcher.run(<Unknown Source>:Unknown line)
+TRACE 300959:
+	java.lang.Object.clone(Object.java:Unknown line)
+	sun.java2d.SunGraphics2D.clone(<Unknown Source>:Unknown line)
+	sun.java2d.SunGraphics2D.create(<Unknown Source>:Unknown line)
+	javax.swing.JComponent.paint(<Unknown Source>:Unknown line)
+TRACE 300957:
+	java.awt.image.DataBufferInt.<init>(<Unknown Source>:Unknown line)
+	java.awt.image.Raster.createPackedRaster(<Unknown Source>:Unknown line)
+	java.awt.image.DirectColorModel.createCompatibleWritableRaster(<Unknown Source>:Unknown line)
+	sun.awt.image.SunVolatileImage.getBackupImage(<Unknown Source>:Unknown line)
+TRACE 300084:
+	java.awt.Component.<clinit>(<Unknown Source>:Unknown line)
+	org.basex.BaseXWin.waitPanel(BaseXWin.java:132)
+	org.basex.BaseXWin.<init>(BaseXWin.java:50)
+	org.basex.BaseXWin.main(BaseXWin.java:164)
+TRACE 300953:
+	javax.swing.SystemEventQueueUtilities.removeRunnableCanvas(<Unknown Source>:Unknown line)
+	javax.swing.JRootPane.removeNotify(<Unknown Source>:Unknown line)
+	java.awt.Container.removeNotify(<Unknown Source>:Unknown line)
+	java.awt.Window.removeNotify(<Unknown Source>:Unknown line)
+TRACE 300947:
+	sun.awt.windows.WWindowPeer.setFocusableWindow(<Unknown Source>:Unknown line)
+	sun.awt.windows.WWindowPeer.updateFocusableWindowState(<Unknown Source>:Unknown line)
+	sun.awt.windows.WWindowPeer.show(<Unknown Source>:Unknown line)
+	java.awt.Component.show(<Unknown Source>:Unknown line)
+TRACE 300944:
+	javax.swing.plaf.basic.BasicMenuUI$Handler.propertyChange(<Unknown Source>:Unknown line)
+	java.beans.PropertyChangeSupport.firePropertyChange(<Unknown Source>:Unknown line)
+	java.beans.PropertyChangeSupport.firePropertyChange(<Unknown Source>:Unknown line)
+	java.awt.Component.firePropertyChange(<Unknown Source>:Unknown line)
+TRACE 300941:
+	javax.swing.UIDefaults.getColor(<Unknown Source>:Unknown line)
+	javax.swing.UIManager.getColor(<Unknown Source>:Unknown line)
+	javax.swing.plaf.basic.BasicMenuItemUI.installDefaults(<Unknown Source>:Unknown line)
+	javax.swing.plaf.basic.BasicMenuItemUI.installUI(<Unknown Source>:Unknown line)
+TRACE 300937:
+	java.lang.Object.getClass(Object.java:Unknown line)
+	java.awt.Component.checkCoalescing(<Unknown Source>:Unknown line)
+	java.awt.Component.<init>(<Unknown Source>:Unknown line)
+	java.awt.Container.<init>(<Unknown Source>:Unknown line)
+TRACE 300936:
+	java.awt.KeyboardFocusManager.getCurrentKeyboardFocusManager(<Unknown Source>:Unknown line)
+	java.awt.KeyboardFocusManager.getCurrentKeyboardFocusManager(<Unknown Source>:Unknown line)
+	java.awt.Component.hasFocus(<Unknown Source>:Unknown line)
+	java.awt.Component.isFocusOwner(<Unknown Source>:Unknown line)
+TRACE 300925:
+	org.basex.gui.GUI.<init>(GUI.java:282)
+	org.basex.gui.GUI.get(GUI.java:133)
+	org.basex.BaseXWin$1.run(BaseXWin.java:60)
+	java.awt.event.InvocationEvent.dispatch(<Unknown Source>:Unknown line)
+TRACE 300924:
+	java.util.regex.Pattern$Single.isSatisfiedBy(<Unknown Source>:Unknown line)
+	java.util.regex.Pattern$BmpCharProperty.match(<Unknown Source>:Unknown line)
+	java.util.regex.Pattern$Start.match(<Unknown Source>:Unknown line)
+	java.util.regex.Matcher.search(<Unknown Source>:Unknown line)
+TRACE 300923:
+	java.math.BigDecimal.<clinit>(<Unknown Source>:Unknown line)
+	org.basex.query.xquery.item.Type$23.<init>(Type.java:320)
+	org.basex.query.xquery.item.Type.<clinit>(Type.java:318)
+	org.basex.query.xquery.func.FunDef.<clinit>(FunDef.java:17)
+TRACE 300918:
+	org.basex.query.xquery.func.FunDef.<clinit>(FunDef.java:17)
+	org.basex.gui.view.query.QuerySyntax.<clinit>(QuerySyntax.java:49)
+	org.basex.gui.view.query.QueryArea.<init>(QueryArea.java:56)
+	org.basex.gui.view.query.QueryView.<init>(QueryView.java:78)
+TRACE 300917:
+	java.util.SubList.listIterator(<Unknown Source>:Unknown line)
+	java.util.AbstractList.listIterator(<Unknown Source>:Unknown line)
+	java.util.SubList.iterator(<Unknown Source>:Unknown line)
+	java.util.AbstractCollection.toArray(<Unknown Source>:Unknown line)
+TRACE 300915:
+	java.util.HashMap.<init>(<Unknown Source>:Unknown line)
+	sun.font.Font2D.<init>(<Unknown Source>:Unknown line)
+	sun.font.PhysicalFont.<init>(<Unknown Source>:Unknown line)
+	sun.font.FileFont.<init>(<Unknown Source>:Unknown line)
+TRACE 300900:
+	java.util.concurrent.Executors.newSingleThreadScheduledExecutor(<Unknown Source>:Unknown line)
+	org.basex.util.Action.<init>(Action.java:18)
+	org.basex.gui.view.query.QueryArea$1.<init>(QueryArea.java:177)
+	org.basex.gui.view.query.QueryArea.<init>(QueryArea.java:177)
+TRACE 300897:
+	sun.nio.ch.FileChannelImpl.position0(<Unknown Source>:Unknown line)
+	sun.nio.ch.FileChannelImpl.position(<Unknown Source>:Unknown line)
+	sun.font.TrueTypeFont.readBlock(<Unknown Source>:Unknown line)
+	sun.font.FileFont.getGlyphImage(<Unknown Source>:Unknown line)
+TRACE 301075:
+	java.io.RandomAccessFile.seek(<Unknown Source>:Unknown line)
+	org.basex.io.DataAccess.readBlock(DataAccess.java:240)
+	org.basex.io.DataAccess.cursor(DataAccess.java:229)
+	org.basex.io.DataAccess.nextBlock(DataAccess.java:212)
+TRACE 301076:
+	org.basex.query.xpath.item.Str.str(Str.java:43)
+	org.basex.query.xpath.func.ContainsLC.eval(ContainsLC.java:41)
+	org.basex.query.xpath.func.ContainsLC.eval(ContainsLC.java:1)
+	org.basex.query.xpath.XPContext.eval(XPContext.java:87)
+TRACE 300893:
+	org.basex.gui.GUI.<init>(GUI.java:269)
+	org.basex.gui.GUI.get(GUI.java:133)
+	org.basex.BaseXWin$1.run(BaseXWin.java:60)
+	java.awt.event.InvocationEvent.dispatch(<Unknown Source>:Unknown line)
+TRACE 300891:
+	java.lang.AbstractStringBuilder.<init>(<Unknown Source>:Unknown line)
+	java.lang.StringBuilder.<init>(<Unknown Source>:Unknown line)
+	com.sun.java.swing.plaf.windows.XPStyle$Skin.<init>(<Unknown Source>:Unknown line)
+	com.sun.java.swing.plaf.windows.XPStyle.getBorder(<Unknown Source>:Unknown line)
+TRACE 301079:
+	sun.dc.pr.PathFiller.closedSubpath(<Unknown Source>:Unknown line)
+	sun.dc.pr.Rasterizer.closedSubpath(<Unknown Source>:Unknown line)
+	sun.java2d.pipe.DuctusRenderer.createShapeRasterizer(<Unknown Source>:Unknown line)
+	sun.java2d.pipe.DuctusShapeRenderer.renderPath(<Unknown Source>:Unknown line)
+TRACE 300870:
+	javax.swing.text.GapContent.createPosition(<Unknown Source>:Unknown line)
+	javax.swing.text.AbstractDocument.createPosition(<Unknown Source>:Unknown line)
+	javax.swing.text.AbstractDocument$LeafElement.<init>(<Unknown Source>:Unknown line)
+	javax.swing.text.AbstractDocument$BidiElement.<init>(<Unknown Source>:Unknown line)
+TRACE 300829:
+	javax.swing.text.DefaultEditorKit.<clinit>(<Unknown Source>:Unknown line)
+	javax.swing.plaf.basic.BasicTextUI.<clinit>(<Unknown Source>:Unknown line)
+	java.lang.Class.forName0(<Unknown Source>:Unknown line)
+	java.lang.Class.forName(<Unknown Source>:Unknown line)
+TRACE 300790:
+	com.sun.java.swing.plaf.windows.WindowsScrollBarUI.createIncreaseButton(<Unknown Source>:Unknown line)
+	javax.swing.plaf.basic.BasicScrollBarUI.installComponents(<Unknown Source>:Unknown line)
+	javax.swing.plaf.basic.BasicScrollBarUI.installUI(<Unknown Source>:Unknown line)
+	javax.swing.JComponent.setUI(<Unknown Source>:Unknown line)
+TRACE 301080:
+	org.basex.util.Token.containslc(Token.java:595)
+	org.basex.query.xpath.func.ContainsLC.eval(ContainsLC.java:46)
+	org.basex.query.xpath.func.ContainsLC.eval(ContainsLC.java:1)
+	org.basex.query.xpath.XPContext.eval(XPContext.java:87)
+TRACE 300754:
+	sun.awt.image.ImageFetcher.add(<Unknown Source>:Unknown line)
+	sun.awt.image.InputStreamImageSource.startProduction(<Unknown Source>:Unknown line)
+	sun.awt.image.InputStreamImageSource.addConsumer(<Unknown Source>:Unknown line)
+	sun.awt.image.InputStreamImageSource.startProduction(<Unknown Source>:Unknown line)
+TRACE 301081:
+	javax.swing.plaf.basic.BasicButtonListener.loadActionMap(<Unknown Source>:Unknown line)
+	sun.reflect.NativeMethodAccessorImpl.invoke0(<Unknown Source>:Unknown line)
+	sun.reflect.NativeMethodAccessorImpl.invoke(<Unknown Source>:Unknown line)
+	sun.reflect.DelegatingMethodAccessorImpl.invoke(<Unknown Source>:Unknown line)
+TRACE 300740:
+	java.lang.Thread.setPriority0(<Unknown Source>:Unknown line)
+	java.lang.Thread.setPriority(<Unknown Source>:Unknown line)
+	sun.awt.image.ImageDecoder.headerComplete(<Unknown Source>:Unknown line)
+	sun.awt.image.PNGImageDecoder.produceImage(<Unknown Source>:Unknown line)
+TRACE 300723:
+	java.lang.Thread.currentThread(<Unknown Source>:Unknown line)
+	javax.swing.UIManager.getLAFState(<Unknown Source>:Unknown line)
+	javax.swing.UIManager.maybeInitialize(<Unknown Source>:Unknown line)
+	javax.swing.UIManager.getDefaults(<Unknown Source>:Unknown line)
+TRACE 300686:
+	com.sun.java.swing.plaf.windows.WindowsMenuUI.createMouseInputListener(<Unknown Source>:Unknown line)
+	javax.swing.plaf.basic.BasicMenuItemUI.installListeners(<Unknown Source>:Unknown line)
+	javax.swing.plaf.basic.BasicMenuUI.installListeners(<Unknown Source>:Unknown line)
+	javax.swing.plaf.basic.BasicMenuItemUI.installUI(<Unknown Source>:Unknown line)
+TRACE 300669:
+	java.lang.Thread.currentThread(<Unknown Source>:Unknown line)
+	java.lang.Thread.interrupted(<Unknown Source>:Unknown line)
+	sun.misc.Resource.getBytes(<Unknown Source>:Unknown line)
+	java.net.URLClassLoader.defineClass(<Unknown Source>:Unknown line)
+TRACE 300666:
+	java.util.ArrayList.contains(<Unknown Source>:Unknown line)
+	sun.font.FontManager.resolveWindowsFonts(<Unknown Source>:Unknown line)
+	sun.font.FontManager.getFullNameToFileMap(<Unknown Source>:Unknown line)
+	sun.font.FontManager.findFontFromPlatform(<Unknown Source>:Unknown line)
+TRACE 300664:
+	java.lang.AbstractStringBuilder.<init>(<Unknown Source>:Unknown line)
+	java.lang.StringBuilder.<init>(<Unknown Source>:Unknown line)
+	java.util.Locale.toString(<Unknown Source>:Unknown line)
+	sun.font.FontManager.getLCIDFromLocale(<Unknown Source>:Unknown line)
+TRACE 301082:
+	org.basex.gui.layout.BaseXLayout.drawThumbnails(BaseXLayout.java:574)
+	org.basex.gui.view.map.MapDefault.drawRectangle(MapDefault.java:122)
+	org.basex.gui.view.map.MapDefault.drawRectangles(MapDefault.java:80)
+	org.basex.gui.view.map.MapView.drawMap(MapView.java:507)
+TRACE 300117:
+	java.lang.Class.getDeclaredFields0(<Unknown Source>:Unknown line)
+	java.lang.Class.privateGetDeclaredFields(<Unknown Source>:Unknown line)
+	java.lang.Class.getDeclaredField(<Unknown Source>:Unknown line)
+	sun.awt.windows.WToolkit$5.run(<Unknown Source>:Unknown line)
+TRACE 300649:
+	java.security.AccessController.doPrivileged(<Unknown Source>:Unknown line)
+	java.lang.ClassLoader.loadLibrary0(<Unknown Source>:Unknown line)
+	java.lang.ClassLoader.loadLibrary(<Unknown Source>:Unknown line)
+	java.lang.Runtime.loadLibrary0(<Unknown Source>:Unknown line)
+TRACE 300605:
+	sun.misc.Unsafe.getObjectVolatile(<Unknown Source>:Unknown line)
+	sun.reflect.UnsafeQualifiedStaticObjectFieldAccessorImpl.get(<Unknown Source>:Unknown line)
+	java.lang.reflect.Field.get(<Unknown Source>:Unknown line)
+	javax.swing.plaf.basic.BasicLookAndFeel.loadSystemColors(<Unknown Source>:Unknown line)
+TRACE 300562:
+	org.basex.gui.GUICommands.<clinit>(GUICommands.java:521)
+	org.basex.gui.GUIConstants.<clinit>(GUIConstants.java:77)
+	org.basex.BaseXWin.<init>(BaseXWin.java:53)
+	org.basex.BaseXWin.main(BaseXWin.java:164)
+TRACE 301084:
+	org.basex.gui.layout.BaseXLayout.drawThumbnailsSentence(BaseXLayout.java:747)
+	org.basex.gui.layout.BaseXLayout.drawThumbnails(BaseXLayout.java:589)
+	org.basex.gui.view.map.MapDefault.drawRectangle(MapDefault.java:122)
+	org.basex.gui.view.map.MapDefault.drawRectangles(MapDefault.java:80)
+TRACE 300555:
+	sun.font.GlyphList.setFromString(<Unknown Source>:Unknown line)
+	sun.java2d.pipe.GlyphListPipe.drawString(<Unknown Source>:Unknown line)
+	sun.java2d.pipe.ValidatePipe.drawString(<Unknown Source>:Unknown line)
+	sun.java2d.SunGraphics2D.drawString(<Unknown Source>:Unknown line)
+TRACE 301087:
+	sun.awt.windows.WToolkit.shutdown(<Unknown Source>:Unknown line)
+	sun.awt.windows.WToolkit.access$200(<Unknown Source>:Unknown line)
+	sun.awt.windows.WToolkit$3.run(<Unknown Source>:Unknown line)
+	java.lang.Thread.run(<Unknown Source>:Unknown line)
+TRACE 300525:
+	java.awt.im.InputContext.getInstance(<Unknown Source>:Unknown line)
+	java.awt.Window.getInputContext(<Unknown Source>:Unknown line)
+	java.awt.Component.dispatchEventImpl(<Unknown Source>:Unknown line)
+	java.awt.Container.dispatchEventImpl(<Unknown Source>:Unknown line)
+TRACE 300513:
+	sun.awt.windows.WComponentPeer.nativeHandleEvent(<Unknown Source>:Unknown line)
+	sun.awt.windows.WComponentPeer.handleEvent(<Unknown Source>:Unknown line)
+	sun.awt.windows.WWindowPeer.handleEvent(<Unknown Source>:Unknown line)
+	java.awt.Component.dispatchEventImpl(<Unknown Source>:Unknown line)
+TRACE 300512:
+	sun.awt.windows.WComponentPeer.pShow(<Unknown Source>:Unknown line)
+	sun.awt.windows.WComponentPeer.show(<Unknown Source>:Unknown line)
+	sun.awt.windows.WWindowPeer.realShow(<Unknown Source>:Unknown line)
+	sun.awt.windows.WWindowPeer.show(<Unknown Source>:Unknown line)
+TRACE 300497:
+	sun.font.FontDesignMetrics.getMetrics(<Unknown Source>:Unknown line)
+	sun.swing.SwingUtilities2.getFontMetrics(<Unknown Source>:Unknown line)
+	javax.swing.JComponent.getFontMetrics(<Unknown Source>:Unknown line)
+	javax.swing.plaf.basic.BasicLabelUI.getPreferredSize(<Unknown Source>:Unknown line)
+TRACE 300443:
+	sun.awt.windows.WToolkit.getFontPeer(<Unknown Source>:Unknown line)
+	java.awt.Font.getPeer_NoClientCode(<Unknown Source>:Unknown line)
+	java.awt.Font.getPeer(<Unknown Source>:Unknown line)
+	sun.awt.windows.WComponentPeer._setFont(<Unknown Source>:Unknown line)
+TRACE 300425:
+	sun.java2d.loops.GraphicsPrimitiveMgr.<clinit>(<Unknown Source>:Unknown line)
+	sun.java2d.loops.Blit.<clinit>(<Unknown Source>:Unknown line)
+	sun.java2d.windows.GDIWindowSurfaceData.<clinit>(<Unknown Source>:Unknown line)
+	sun.awt.Win32GraphicsConfig.createSurfaceData(<Unknown Source>:Unknown line)
+TRACE 300399:
+	java.lang.Class.forName0(<Unknown Source>:Unknown line)
+	java.lang.Class.forName(<Unknown Source>:Unknown line)
+	java.net.URLConnection.lookupContentHandlerClassFor(<Unknown Source>:Unknown line)
+	java.net.URLConnection.getContentHandler(<Unknown Source>:Unknown line)
+TRACE 300356:
+	java.util.TimeZone.getSystemTimeZoneID(<Unknown Source>:Unknown line)
+	java.util.TimeZone.setDefaultZone(<Unknown Source>:Unknown line)
+	java.util.TimeZone.getDefaultRef(<Unknown Source>:Unknown line)
+	java.util.TimeZone.getDefault(<Unknown Source>:Unknown line)
+TRACE 300340:
+	org.basex.Text.<clinit>(Text.java:55)
+	org.basex.BaseXWin.waitPanel(BaseXWin.java:141)
+	org.basex.BaseXWin.<init>(BaseXWin.java:50)
+	org.basex.BaseXWin.main(BaseXWin.java:164)
+TRACE 300308:
+	sun.misc.Launcher.getBootstrapClassPath(<Unknown Source>:Unknown line)
+	java.lang.ClassLoader.getBootstrapClassPath(<Unknown Source>:Unknown line)
+	java.lang.ClassLoader.getBootstrapResource(<Unknown Source>:Unknown line)
+	java.lang.ClassLoader.getResource(<Unknown Source>:Unknown line)
+TRACE 300281:
+	javax.swing.plaf.metal.MetalLookAndFeel.initComponentDefaults(<Unknown Source>:Unknown line)
+	javax.swing.plaf.basic.BasicLookAndFeel.getDefaults(<Unknown Source>:Unknown line)
+	javax.swing.plaf.metal.MetalLookAndFeel.getDefaults(<Unknown Source>:Unknown line)
+	javax.swing.UIManager.setLookAndFeel(<Unknown Source>:Unknown line)
+TRACE 300253:
+	java.util.HashMap.newEntryIterator(<Unknown Source>:Unknown line)
+	java.util.HashMap$EntrySet.iterator(<Unknown Source>:Unknown line)
+	java.util.HashMap.putAllForCreate(<Unknown Source>:Unknown line)
+	java.util.HashMap.clone(<Unknown Source>:Unknown line)
+TRACE 301014:
+	sun.java2d.loops.FillRect.FillRect(<Unknown Source>:Unknown line)
+	sun.java2d.pipe.LoopPipe.fillRect(<Unknown Source>:Unknown line)
+	sun.java2d.SunGraphics2D.fillRect(<Unknown Source>:Unknown line)
+	sun.java2d.SunGraphics2D.clearRect(<Unknown Source>:Unknown line)
+TRACE 300233:
+	javax.swing.JFrame.frameInit(<Unknown Source>:Unknown line)
+	javax.swing.JFrame.<init>(<Unknown Source>:Unknown line)
+	org.basex.BaseXWin.waitPanel(BaseXWin.java:132)
+	org.basex.BaseXWin.<init>(BaseXWin.java:50)
+TRACE 300211:
+	sun.awt.SunToolkit$1.run(<Unknown Source>:Unknown line)
+	sun.awt.SunToolkit.<init>(<Unknown Source>:Unknown line)
+	sun.awt.windows.WToolkit.<init>(<Unknown Source>:Unknown line)
+	sun.reflect.NativeConstructorAccessorImpl.newInstance0(<Unknown Source>:Unknown line)
+TRACE 300181:
+	sun.font.FontManager.initIDs(<Unknown Source>:Unknown line)
+	sun.font.FontManager.access$000(<Unknown Source>:Unknown line)
+	sun.font.FontManager$1.run(<Unknown Source>:Unknown line)
+	java.security.AccessController.doPrivileged(<Unknown Source>:Unknown line)
+TRACE 300152:
+	sun.java2d.SurfaceData.<clinit>(<Unknown Source>:Unknown line)
+	sun.awt.windows.WToolkit.initIDs(<Unknown Source>:Unknown line)
+	sun.awt.windows.WToolkit.<clinit>(<Unknown Source>:Unknown line)
+	sun.awt.Win32GraphicsEnvironment.<clinit>(<Unknown Source>:Unknown line)
+CPU SAMPLES BEGIN (total = 2585) Mon Jan 05 16:00:30 2009
+rank   self  accum   count trace method
+   1 52.53% 52.53%    1358 300234 sun.awt.windows.WToolkit.eventLoop
+   2 38.22% 90.75%     988 301085 org.basex.gui.layout.BaseXLayout.drawThumbnailsSentence
+   3  0.85% 91.61%      22 300896 sun.font.FileFont.getGlyphImage
+   4  0.50% 92.11%      13 301037 org.basex.gui.layout.BaseXTextTokens.nextWord
+   5  0.31% 92.42%       8 300028 java.lang.ClassLoader.defineClass1
+   6  0.27% 92.69%       7 301045 org.basex.util.Token.string
+   7  0.19% 92.88%       5 301041 java.io.RandomAccessFile.readBytes
+   8  0.15% 93.04%       4 300029 java.lang.ClassLoader.findBootstrapClass
+   9  0.15% 93.19%       4 301058 org.basex.gui.layout.BaseXTextRenderer.calc
+  10  0.15% 93.35%       4 301044 org.basex.gui.layout.BaseXTextRenderer.more
+  11  0.15% 93.50%       4 301039 org.basex.gui.layout.BaseXTextRenderer.more
+  12  0.15% 93.66%       4 301038 org.basex.util.Token.string
+  13  0.15% 93.81%       4 301059 org.basex.util.Token.letterOrDigit
+  14  0.15% 93.97%       4 301032 org.basex.data.XMLSerializer.text
+  15  0.12% 94.08%       3 300751 java.io.WinNTFileSystem.getBooleanAttributes
+  16  0.12% 94.20%       3 301056 org.basex.gui.layout.BaseXTextTokens.moreWords
+  17  0.12% 94.31%       3 300561 java.io.FileInputStream.readBytes
+  18  0.12% 94.43%       3 301077 org.basex.util.Token.containslc
+  19  0.12% 94.55%       3 301046 org.basex.util.Token.letterOrDigit
+  20  0.12% 94.66%       3 301033 org.basex.io.DataAccess.readToken
+  21  0.08% 94.74%       2 300053 java.lang.ClassLoader$NativeLibrary.load
+  22  0.08% 94.82%       2 301067 org.basex.data.XMLSerializer.text
+  23  0.08% 94.89%       2 301069 org.basex.gui.layout.BaseXTextTokens.moreWords
+  24  0.08% 94.97%       2 301016 sun.java2d.loops.FillRect.FillRect
+  25  0.08% 95.05%       2 301015 sun.java2d.loops.FillRect.FillRect
+  26  0.08% 95.13%       2 301040 org.basex.gui.layout.BaseXTextRenderer.calc
+  27  0.08% 95.20%       2 301090 java.lang.Shutdown.halt0
+  28  0.08% 95.28%       2 301006 sun.java2d.windows.GDIBlitLoops.nativeBlit
+  29  0.08% 95.36%       2 300894 java.awt.MediaTracker.setDone
+  30  0.08% 95.44%       2 301078 org.basex.gui.layout.BaseXTextTokens.moreWords
+  31  0.08% 95.51%       2 300887 sun.font.FileFontStrike._getGlyphImageFromWindows
+  32  0.08% 95.59%       2 301043 org.basex.gui.layout.BaseXText.setText
+  33  0.08% 95.67%       2 300757 java.lang.System.arraycopy
+  34  0.08% 95.74%       2 300663 sun.font.FontManager.populateFontFileNameMap
+  35  0.08% 95.82%       2 301083 org.basex.index.FTTokenizer.countSenPar
+  36  0.08% 95.90%       2 301068 sun.java2d.loops.DrawGlyphList.DrawGlyphList
+  37  0.08% 95.98%       2 301047 java.awt.image.DataBufferInt.<init>
+  38  0.04% 96.02%       1 301049 sun.font.FileFont.getGlyphImage
+  39  0.04% 96.05%       1 301048 java.lang.System.identityHashCode
+  40  0.04% 96.09%       1 301050 java.io.RandomAccessFile.readBytes
+  41  0.04% 96.13%       1 301054 org.basex.gui.view.map.MapView.focus
+  42  0.04% 96.17%       1 300034 org.basex.BaseXWin.waitPanel
+  43  0.04% 96.21%       1 301055 sun.font.FontDesignMetrics.charWidth
+  44  0.04% 96.25%       1 301057 sun.java2d.loops.Blit.Blit
+  45  0.04% 96.29%       1 301042 java.nio.CharBuffer.<init>
+  46  0.04% 96.32%       1 301060 org.basex.util.Token.string
+  47  0.04% 96.36%       1 301061 java.lang.Thread.currentThread
+  48  0.04% 96.40%       1 301062 sun.dc.pr.PathFiller.endPath
+  49  0.04% 96.44%       1 301063 org.basex.query.xpath.XPParser.step
+  50  0.04% 96.48%       1 301064 org.basex.gui.layout.BaseXLayout.fill
+  51  0.04% 96.52%       1 301035 org.basex.gui.layout.BaseXTextRenderer.calc
+  52  0.04% 96.56%       1 301034 org.basex.gui.layout.BaseXText.setText
+  53  0.04% 96.60%       1 301065 java.lang.ClassLoader.defineClass
+  54  0.04% 96.63%       1 301066 org.basex.query.xpath.func.ContainsLC.eval
+  55  0.04% 96.67%       1 301070 java.nio.charset.CharsetDecoder.implReset
+  56  0.04% 96.71%       1 301031 org.basex.data.Serializer.node
+  57  0.04% 96.75%       1 301029 org.basex.data.DiskData.<init>
+  58  0.04% 96.79%       1 301028 java.awt.Color.testColorValueRange
+  59  0.04% 96.83%       1 301027 java.net.URLStreamHandler.toExternalForm
+  60  0.04% 96.87%       1 301026 sun.java2d.loops.MaskBlit.MaskBlit
+  61  0.04% 96.91%       1 301025 sun.net.www.ParseUtil.encodePath
+  62  0.04% 96.94%       1 301024 sun.awt.image.PixelConverter$Xrgb.rgbToPixel
+  63  0.04% 96.98%       1 301022 sun.awt.windows.WGlobalCursorManager.setCursor
+  64  0.04% 97.02%       1 301021 sun.awt.windows.WInputMethod.createNativeContext
+  65  0.04% 97.06%       1 301019 java.util.Locale.toLowerCase
+  66  0.04% 97.10%       1 301017 sun.awt.windows.WDialogPeer.endModal
+  67  0.04% 97.14%       1 301071 sun.java2d.pipe.DuctusRenderer.createShapeRasterizer
+  68  0.04% 97.18%       1 301072 sun.java2d.loops.DrawLine.DrawLine
+  69  0.04% 97.21%       1 301073 javax.swing.border.EtchedBorder.paintBorder
+  70  0.04% 97.25%       1 301013 sun.java2d.loops.DrawGlyphListLCD.DrawGlyphListLCD
+  71  0.04% 97.29%       1 301012 sun.font.FontManager.getFont2D
+  72  0.04% 97.33%       1 301011 java.awt.image.BufferedImage.getWidth
+  73  0.04% 97.37%       1 301010 sun.awt.image.BufImgSurfaceData.initRaster
+  74  0.04% 97.41%       1 301007 java.io.WinNTFileSystem.list
+  75  0.04% 97.45%       1 301074 java.awt.EventQueue.postEventPrivate
+  76  0.04% 97.49%       1 301005 javax.swing.text.GapContent$MarkData.getOffset
+  77  0.04% 97.52%       1 301001 java.util.LinkedList$ListItr.previous
+  78  0.04% 97.56%       1 300999 java.lang.System.identityHashCode
+  79  0.04% 97.60%       1 300992 sun.awt.windows.WDialogPeer.showModal
+  80  0.04% 97.64%       1 300990 java.lang.Object.hashCode
+  81  0.04% 97.68%       1 300985 javax.swing.text.DefaultCaret$Handler.insertUpdate
+  82  0.04% 97.72%       1 300965 sun.awt.image.PNGImageDecoder.produceImage
+  83  0.04% 97.76%       1 300959 java.lang.Object.clone
+  84  0.04% 97.79%       1 300957 java.awt.image.DataBufferInt.<init>
+  85  0.04% 97.83%       1 300084 java.awt.Component.<clinit>
+  86  0.04% 97.87%       1 300953 javax.swing.SystemEventQueueUtilities.removeRunnableCanvas
+  87  0.04% 97.91%       1 300947 sun.awt.windows.WWindowPeer.setFocusableWindow
+  88  0.04% 97.95%       1 300944 javax.swing.plaf.basic.BasicMenuUI$Handler.propertyChange
+  89  0.04% 97.99%       1 300941 javax.swing.UIDefaults.getColor
+  90  0.04% 98.03%       1 300937 java.lang.Object.getClass
+  91  0.04% 98.07%       1 300936 java.awt.KeyboardFocusManager.getCurrentKeyboardFocusManager
+  92  0.04% 98.10%       1 300925 org.basex.gui.GUI.<init>
+  93  0.04% 98.14%       1 300924 java.util.regex.Pattern$Single.isSatisfiedBy
+  94  0.04% 98.18%       1 300923 java.math.BigDecimal.<clinit>
+  95  0.04% 98.22%       1 300918 org.basex.query.xquery.func.FunDef.<clinit>
+  96  0.04% 98.26%       1 300917 java.util.SubList.listIterator
+  97  0.04% 98.30%       1 300915 java.util.HashMap.<init>
+  98  0.04% 98.34%       1 300900 java.util.concurrent.Executors.newSingleThreadScheduledExecutor
+  99  0.04% 98.38%       1 300897 sun.nio.ch.FileChannelImpl.position0
+ 100  0.04% 98.41%       1 301075 java.io.RandomAccessFile.seek
+ 101  0.04% 98.45%       1 301076 org.basex.query.xpath.item.Str.str
+ 102  0.04% 98.49%       1 300893 org.basex.gui.GUI.<init>
+ 103  0.04% 98.53%       1 300891 java.lang.AbstractStringBuilder.<init>
+ 104  0.04% 98.57%       1 301079 sun.dc.pr.PathFiller.closedSubpath
+ 105  0.04% 98.61%       1 300870 javax.swing.text.GapContent.createPosition
+ 106  0.04% 98.65%       1 300829 javax.swing.text.DefaultEditorKit.<clinit>
+ 107  0.04% 98.68%       1 300790 com.sun.java.swing.plaf.windows.WindowsScrollBarUI.createIncreaseButton
+ 108  0.04% 98.72%       1 301080 org.basex.util.Token.containslc
+ 109  0.04% 98.76%       1 300754 sun.awt.image.ImageFetcher.add
+ 110  0.04% 98.80%       1 301081 javax.swing.plaf.basic.BasicButtonListener.loadActionMap
+ 111  0.04% 98.84%       1 300740 java.lang.Thread.setPriority0
+ 112  0.04% 98.88%       1 300723 java.lang.Thread.currentThread
+ 113  0.04% 98.92%       1 300686 com.sun.java.swing.plaf.windows.WindowsMenuUI.createMouseInputListener
+ 114  0.04% 98.96%       1 300669 java.lang.Thread.currentThread
+ 115  0.04% 98.99%       1 300666 java.util.ArrayList.contains
+ 116  0.04% 99.03%       1 300664 java.lang.AbstractStringBuilder.<init>
+ 117  0.04% 99.07%       1 301082 org.basex.gui.layout.BaseXLayout.drawThumbnails
+ 118  0.04% 99.11%       1 300117 java.lang.Class.getDeclaredFields0
+ 119  0.04% 99.15%       1 300649 java.security.AccessController.doPrivileged
+ 120  0.04% 99.19%       1 300605 sun.misc.Unsafe.getObjectVolatile
+ 121  0.04% 99.23%       1 300562 org.basex.gui.GUICommands.<clinit>
+ 122  0.04% 99.26%       1 301084 org.basex.gui.layout.BaseXLayout.drawThumbnailsSentence
+ 123  0.04% 99.30%       1 300555 sun.font.GlyphList.setFromString
+ 124  0.04% 99.34%       1 301087 sun.awt.windows.WToolkit.shutdown
+ 125  0.04% 99.38%       1 300525 java.awt.im.InputContext.getInstance
+ 126  0.04% 99.42%       1 300513 sun.awt.windows.WComponentPeer.nativeHandleEvent
+ 127  0.04% 99.46%       1 300512 sun.awt.windows.WComponentPeer.pShow
+ 128  0.04% 99.50%       1 300497 sun.font.FontDesignMetrics.getMetrics
+ 129  0.04% 99.54%       1 300443 sun.awt.windows.WToolkit.getFontPeer
+ 130  0.04% 99.57%       1 300425 sun.java2d.loops.GraphicsPrimitiveMgr.<clinit>
+ 131  0.04% 99.61%       1 300399 java.lang.Class.forName0
+ 132  0.04% 99.65%       1 300356 java.util.TimeZone.getSystemTimeZoneID
+ 133  0.04% 99.69%       1 300340 org.basex.Text.<clinit>
+ 134  0.04% 99.73%       1 300308 sun.misc.Launcher.getBootstrapClassPath
+ 135  0.04% 99.77%       1 300281 javax.swing.plaf.metal.MetalLookAndFeel.initComponentDefaults
+ 136  0.04% 99.81%       1 300253 java.util.HashMap.newEntryIterator
+ 137  0.04% 99.85%       1 301014 sun.java2d.loops.FillRect.FillRect
+ 138  0.04% 99.88%       1 300233 javax.swing.JFrame.frameInit
+ 139  0.04% 99.92%       1 300211 sun.awt.SunToolkit$1.run
+ 140  0.04% 99.96%       1 300181 sun.font.FontManager.initIDs
+ 141  0.04% 100.00%       1 300152 sun.java2d.SurfaceData.<clinit>
+CPU SAMPLES END

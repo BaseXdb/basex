@@ -35,7 +35,7 @@ public final class NodeBuilder {
    * Deletes a value at the specified position.
    * @param pos deletion position
    */
-  public void del(final int pos) {
+  public void delete(final int pos) {
     Array.move(list, pos + 1, -1, --size - pos);
   }
 
