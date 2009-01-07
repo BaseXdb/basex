@@ -125,16 +125,28 @@ public class AxisPath extends Path {
     
     // analyze if result set can be cached - no predicates/variables...
     cache = root != null && !root.uses(Using.VAR);
-      
+    
+    // check if steps have only child Axis'
+    boolean childAxis = true;
+    // check if steps have no predicates
+    boolean noPreds = true;
     // check if steps have predicates
     for(final Step s : step) {
+      // check if steps are only child steps
+      if (s.axis != Axis.CHILD) childAxis = false;
       // check if we have a predicate and if we find a variable
-      if(s.pred.length != 0 && s.uses(Using.VAR)) {
-        // no caching - skip other steps
-        cache = false;
-        return this;
+      if(s.pred.length != 0) {
+        noPreds = false;
+        if (s.uses(Using.VAR)) {
+          // no caching - skip other steps
+          cache = false;
+          return this;
+        }
       }
     }
+    
+    // no predicates, only child steps... choose iterative evaluation
+    if(noPreds && childAxis) return new ChildIterPath(root, step);
     
     // check if the context item is set to a document node
     if(!(ctx.item instanceof DBNode)) return this;
