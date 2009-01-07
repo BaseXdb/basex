@@ -4,6 +4,7 @@ import static org.basex.util.Token.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
 import org.basex.io.PrintOutput;
+import org.basex.util.Token;
 
 /**
  * This is an interface for serializing XML results.
@@ -102,6 +103,40 @@ public final class XMLSerializer extends Serializer {
     indent = false;
   }
 
+  @Override
+  public void text(final byte[] b, final int[] pos, final int[] poi) 
+  throws IOException {
+    finishElement();
+    int c = 0, pp = 0;
+    boolean w = true;
+    boolean lod;
+    for(final byte ch : b) {
+      lod = Token.letterOrDigit(ch);
+      switch(ch) {
+        case '&': out.print(E_AMP); break;
+        case '>': out.print(E_GT); break;
+        case '<': out.print(E_LT); break;
+        case 0xD: out.print(E_CR); break;
+        default :
+          if (lod && pp < pos.length && c == pos[pp]) {
+            // write fulltext pointer in front of the token
+            // used for coloring the token
+            pp++;
+            out.write('&');
+            out.write((byte) poi[pp]);
+            out.write('&');
+          }
+          out.write(ch);
+      }
+      if (!lod) {
+        if (w) c++;
+        w = false;
+      } else w = true;
+    }
+    indent = false;
+  }
+
+  
   @Override
   public void comment(final byte[] n) throws IOException {
     finishElement();

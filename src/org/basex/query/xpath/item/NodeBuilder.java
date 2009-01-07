@@ -91,6 +91,7 @@ public final class NodeBuilder {
       if (size - 1 == pos.length) pos = Array.extend(pos);
       if (size - 1 == poi.length) poi = Array.extend(poi);
       poi[size - 1] = pi;
+      pos[size - 1] = ps;
     }
   }
 

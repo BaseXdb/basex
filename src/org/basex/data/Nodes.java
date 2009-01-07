@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import org.basex.BaseX;
 import org.basex.core.Context;
+import org.basex.util.Array;
 import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
 
@@ -179,7 +180,12 @@ public final class Nodes implements Result {
 
     final Nodes n = (Nodes) v;
     if(data != n.data) return false;
-    for(int c = 0; c < size; c++) if(n.nodes[c] != nodes[c]) return false;
+    final boolean ftd1 = n.poi != null && n.pos != null;
+    final boolean ftd2 = pos != null && poi != null;
+    for(int c = 0; c < size; c++) 
+      if(n.nodes[c] != nodes[c] || ftd1 != ftd2 
+          || (ftd1 && !Array.eq(n.poi[c], poi[c]) 
+          && !Array.eq(n.pos[c], pos[c]))) return false;
     return true;
   }
 
@@ -189,7 +195,8 @@ public final class Nodes implements Result {
 
   public void serialize(final Serializer ser, final int n) throws IOException {
     ser.openResult();
-    ser.node(data, nodes[n]);
+    ser.node(data, nodes[n], pos != null ? pos[n] : null, 
+        poi != null ? poi[n] : null);
     ser.closeResult();
   }
 

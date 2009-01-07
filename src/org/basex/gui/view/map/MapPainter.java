@@ -49,7 +49,8 @@ abstract class MapPainter {
       if(marked.nodes[mpos] == pre) {
         if (marked.pos != null && marked.poi != null 
             && rects.size() > ri + 1) { 
-          if (data.size(pre, data.kind(pre)) == 2 && 
+          if (rects.size() > ri + 1 
+              && data.size(pre, data.kind(pre)) == 2 && 
               data.kind(rects.get(ri + 1).pre) == Data.TEXT) { 
             rects.get(ri + 1).pos = marked.pos[mpos];
             rects.get(ri + 1).poi = marked.poi[mpos];

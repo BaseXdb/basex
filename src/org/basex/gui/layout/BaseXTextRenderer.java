@@ -190,7 +190,8 @@ public final class BaseXTextRenderer extends BaseXBack {
    * @param g graphics reference
    */
   private void write(final Graphics g) {
-    final Color col = isEnabled() ? syntax.getColor(word) : Color.gray;
+    Color col = isEnabled() ? syntax.getColor(word) : Color.gray;
+    if (col == Color.black) col = text.getColor();
 
     // return if current text is not visible.
     if(y > 0 && y < h) {

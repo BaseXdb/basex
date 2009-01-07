@@ -1,5 +1,8 @@
 package org.basex.gui.layout;
 
+import static org.basex.gui.GUIConstants.*;
+import java.awt.Color;
+
 import org.basex.util.Array;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -17,6 +20,8 @@ final class BaseXTextTokens {
   byte[] text = Token.EMPTY;
   /** Text length. */
   int size;
+  /** Current color for the text. */
+  Color col = Color.black;
 
   /** Current start position. */
   private int ps;
@@ -62,21 +67,32 @@ final class BaseXTextTokens {
    * @return true if the text has more words
    */
   boolean moreWords() {
+    col = Color.black;
     // quit if text has ended
     if(pe >= size) return false;
     ps = pe;
 
     // find next token boundary
-    int ch = Token.cp(text, ps);
-    pe += Token.cl(text[ps]);
-    if(sep(ch)) return true;
+    final int tl = Token.cl(text[ps]);
+    if(sep()) {
+      pe += tl;
+      return true;
+    }
+    pe += tl;
     
     while(pe < size) {
-      ch = Token.cp(text, pe);
-      if(sep(ch)) break;
+      if(sep()) break;
       pe += Token.cl(text[pe]);
-    };
+    }
     return true;
+  }
+  
+  /**
+   * Get color of current text.
+   * @return currect text color
+   */
+  public Color getColor() {
+    return col;
   }
 
   /**
@@ -87,13 +103,22 @@ final class BaseXTextTokens {
     return Token.string(text, ps, pe - ps);
   }
 
+  
   /**
    * Returns the current character type.
-   * @param c character to be checked
    * @return true for a delimiter character
    */
-  private boolean sep(final int c) {
-    return !Token.letterOrDigit(c);
+  private boolean sep() {
+    if (Token.letterOrDigit(text[pe])) return false;
+    if (pe < size - 4 && text[pe] == '&' && text[pe + 2] == '&') {
+      pe += Token.cl(text[pe]);
+      col = text[pe] < thumbnailcolor.length ? 
+          thumbnailcolor[text[pe]] : Color.black;
+      pe += Token.cl(text[pe]);
+      pe += Token.cl(text[pe]);
+      ps = pe;
+      return pe < size ? sep() : true;
+    } else return true;    
   }
 
   /**

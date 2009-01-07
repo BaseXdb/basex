@@ -428,6 +428,20 @@ public final class Array {
     System.arraycopy(src, 0, trg, s, src.length);
   }
 
+  
+  /**
+   * Checks two int arrays for equality.
+   * @param i1 int array
+   * @param i2 int array
+   * @return boolean
+   */
+  public static boolean eq(final int[] i1, final int[] i2) {
+    if (i1.length != i2.length) return false;    
+    for(int i = 0; i < i1.length; i++) 
+      if (i1[i] != i2[i]) return false;    
+    return true;    
+  }
+  
   /**
    * Creates a new array from the source array and with the specified length.
    * @param src source array
