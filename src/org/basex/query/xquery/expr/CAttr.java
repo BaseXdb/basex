@@ -44,7 +44,7 @@ public final class CAttr extends Arr {
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
     super.comp(ctx);
-    atn = ctx.comp(atn);
+    atn = atn.comp(ctx);
     if(atn.e()) Err.empty(this);
     return this;
   }

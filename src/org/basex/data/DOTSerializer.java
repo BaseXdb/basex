@@ -17,6 +17,8 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class DOTSerializer extends Serializer {
+  /** Compact flag. */
+  public static final boolean COMPACT = false;
   /** Node entry. */
   private static final String NODE = "node% [label=\"%\" color=\"#%\"];";
   /** Link entry. */
@@ -62,7 +64,7 @@ public final class DOTSerializer extends Serializer {
 
     out.println("digraph BaseXAlgebra {");
     out.println("node[shape=box,style=filled,width=0,height=0];");
-    //out.println("node[fontsize=14,fontname=Tahoma];");
+    out.println("node[fontsize=14,fontname=Tahoma];");
   }
 
   @Override
@@ -84,7 +86,7 @@ public final class DOTSerializer extends Serializer {
 
   @Override
   public void attribute(final byte[] n, final byte[] v) {
-    tb.add(tb.size == 0 ? "\\n" : ", ");
+    tb.add(!COMPACT || tb.size == 0 ? "\\n" : ", ");
     tb.add(n);
     tb.add(":");
     tb.add(v);

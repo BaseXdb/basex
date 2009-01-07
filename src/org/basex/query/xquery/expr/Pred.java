@@ -34,7 +34,7 @@ public class Pred extends Preds {
   @Override
   public final Expr comp(final XQContext ctx) throws XQException {
     if(super.comp(ctx) != this) return Seq.EMPTY;
-    root = ctx.comp(root);
+    root = root.comp(ctx);
 
     // No predicates.. return root
     if(pred.length == 0) return root;

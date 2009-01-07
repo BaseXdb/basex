@@ -28,7 +28,7 @@ public abstract class Path extends Expr {
 
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
-    if(root != null) root = ctx.comp(root);
+    if(root != null) root = root.comp(ctx);
     if(root instanceof Context) root = null;
     return this;
   }

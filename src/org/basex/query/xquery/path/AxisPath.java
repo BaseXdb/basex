@@ -66,23 +66,34 @@ public class AxisPath extends Path {
    */
   public static final AxisPath get(final Expr r, final Step... st) {
     // check if steps have predicates
-    return iterable(r, st) ? new SimpleIterPath(r, st) : new AxisPath(r, st);
+    final AxisPath iter = iterator(r, st);
+    return iter != null ? iter : new AxisPath(r, st);
   }
 
   /**
-   * Checks if the specified path components are iterable.
+   * If possible, creates an iterator expression. Otherwise, returns null
    * @param r root expression; can be null
    * @param st location steps; will at least have one entry
    * @return result of check
    */
-  public static final boolean iterable(final Expr r, final Step... st) {
-    /* Conditions for an iterable location path:
-     * - one downward location step
-     * - no predicates
-     * - no variable in root expression
-     */
-    return st.length == 1 && st[0].axis.down && st[0].pred.length == 0 &&
-      (r == null || !r.uses(Using.VAR));
+  public static final AxisPath iterator(final Expr r, final Step... st) {
+    // variables in root expression or predicates not supported yet..
+    boolean preds = false;
+    for(final Step s : st) preds |= s.pred.length != 0;
+    if(r != null && r.uses(Using.VAR) || preds) return null;
+    
+    // Simple iterator: one downward location step
+    if(st.length == 1 && st[0].axis.down) return new SimpleIterPath(r, st);
+    
+    /* Child iterator: [...]
+    // check if all steps are child steps
+    boolean children = true;
+    for(final Step s : st) children &= s.axis == Axis.CHILD;
+    if(children) return new ChildIterPath(r, st);
+    */
+
+    // return null if no iterator could be created
+    return null;
   }
 
   @Override
@@ -114,39 +125,28 @@ public class AxisPath extends Path {
     
     // step optimizations will always return step instances
     for(int i = 0; i != step.length; i++) {
-      final Expr e = ctx.comp(step[i]);
+      final Expr e = step[i].comp(ctx);
       if(!(e instanceof Step)) return e;
       step[i] = (Step) e;
     }
     mergeDesc(ctx);
     
-    // no predicates, one downward step... choose iterative evaluation
-    if(iterable(root, step)) return new SimpleIterPath(root, step);
+    // if applicable, return iterator
+    final AxisPath ap = iterator(root, step);
+    if(ap != null) return ap;
     
     // analyze if result set can be cached - no predicates/variables...
     cache = root != null && !root.uses(Using.VAR);
     
-    // check if steps have only child Axis'
-    boolean childAxis = true;
-    // check if steps have no predicates
-    boolean noPreds = true;
     // check if steps have predicates
     for(final Step s : step) {
-      // check if steps are only child steps
-      if (s.axis != Axis.CHILD) childAxis = false;
       // check if we have a predicate and if we find a variable
-      if(s.pred.length != 0) {
-        noPreds = false;
-        if (s.uses(Using.VAR)) {
-          // no caching - skip other steps
-          cache = false;
-          return this;
-        }
+      if(s.pred.length != 0 && s.uses(Using.VAR)) {
+        // no caching - skip other steps
+        cache = false;
+        return this;
       }
     }
-    
-    // no predicates, only child steps... choose iterative evaluation
-    if(noPreds && childAxis) return new ChildIterPath(root, step);
     
     // check if the context item is set to a document node
     if(!(ctx.item instanceof DBNode)) return this;
@@ -442,16 +442,15 @@ public class AxisPath extends Path {
 
   /**
    * Adds a position predicate to the last step.
+   * @param ctx query context
    * @return resulting path instance
    */
-  public final AxisPath addPos() {
-    Step s = null;
+  public final AxisPath addPos(final XQContext ctx) {
     if(step.length != 0) {
-      s = step[step.length - 1].addPos();
-      if(s != null) step[step.length - 1] = s;
+      step[step.length - 1] = step[step.length - 1].addPos(ctx);
+      return get(root, step);
     }
-    if(s == null) return null;
-    return this instanceof SimpleIterPath ? new AxisPath(root, step) : this;
+    return this;
   }
 
   /**

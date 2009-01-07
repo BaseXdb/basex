@@ -40,7 +40,7 @@ public final class Let extends ForLet {
 
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
-    expr = ctx.comp(expr);
+    expr = expr.comp(ctx);
     if(!score && expr.i()) var.bind((Item) expr, ctx);
     ctx.vars.add(var);
     return this;

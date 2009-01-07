@@ -156,7 +156,7 @@ public final class CmpV extends Arr {
     return a.type == b.type || a.n() && b.n() || (a.u() || a.s()) &&
       (b.s() || b.u()) || a.d() && b.d();
   }
-  
+
   @Override
   public Type returned() {
     return Type.BLN;

@@ -3,14 +3,16 @@ package org.basex.query.xquery.path;
 import static org.basex.query.xquery.XQText.*;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
+import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Nod;
+import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.util.Err;
 
 /**
- * Iterative step expression.
+ * Iterative step expression without predicates.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
@@ -23,6 +25,11 @@ public final class SimpleIterStep extends Step {
    */
   public SimpleIterStep(final Axis a, final Test t) {
     super(a, t);
+  }
+
+  @Override
+  public Expr comp(final XQContext ctx) throws XQException {
+    return !test.comp(ctx) ? Seq.EMPTY : this;
   }
   
   @Override

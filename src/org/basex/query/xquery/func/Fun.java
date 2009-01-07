@@ -28,7 +28,7 @@ public abstract class Fun extends Expr {
 
   @Override
   public final Expr comp(final XQContext ctx) throws XQException {
-    for(int a = 0; a < args.length; a++) args[a] = ctx.comp(args[a]);
+    for(int a = 0; a < args.length; a++) args[a] = args[a].comp(ctx);
     final Expr e = c(ctx);
     if(e != this) ctx.compInfo(OPTPRE, this, e);
     return e;

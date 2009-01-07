@@ -2,6 +2,7 @@ package org.basex.query.xquery.expr;
 
 import java.io.IOException;
 import org.basex.data.Serializer;
+import org.basex.query.xquery.IndexContext;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Type;
@@ -26,7 +27,7 @@ public abstract class Arr extends Expr {
 
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
-    for(int e = 0; e != expr.length; e++) expr[e] = ctx.comp(expr[e]);
+    for(int e = 0; e != expr.length; e++) expr[e] = expr[e].comp(ctx);
     return this;
   }
 
@@ -39,6 +40,16 @@ public abstract class Arr extends Expr {
   @Override
   public Type returned() {
     return null;
+  }
+
+  @Override
+  public Expr indexEquivalent(final XQContext ctx, final IndexContext ic)
+      throws XQException {
+
+    for(int e = 0; e < expr.length; e++) {
+      expr[e] = expr[e].indexEquivalent(ctx, ic);
+    }
+    return this;
   }
 
   /**

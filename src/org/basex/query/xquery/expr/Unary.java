@@ -40,7 +40,7 @@ public final class Unary extends Single {
   public Expr comp(final XQContext ctx) throws XQException {
     super.comp(ctx);
     if(expr.e()) {
-      ctx.compInfo(OPTSIMPLE, this, expr);
+      ctx.compInfo(OPTPRE, this);
       return expr;
     }
     return expr.i() && ((Item) expr).n() ? eval((Item) expr) : this;

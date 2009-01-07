@@ -146,7 +146,7 @@ public final class Prop {
   /** Server mode. */
   public static boolean server = false;
   /** Server timeout in seconds. */
-  public static int timeout = 100;
+  public static int timeout = 3600;
 
   // WEBSERVER OPTIONS ========================================================
 

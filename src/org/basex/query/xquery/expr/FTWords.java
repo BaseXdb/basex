@@ -46,9 +46,9 @@ public final class FTWords extends FTExpr {
 
   @Override
   public FTExpr comp(final XQContext ctx) throws XQException {
-    occ[0] = ctx.comp(occ[0]);
-    occ[1] = ctx.comp(occ[1]);
-    query = ctx.comp(query);
+    occ[0] = occ[0].comp(ctx);
+    occ[1] = occ[1].comp(ctx);
+    query = query.comp(ctx);
     return this;
   }
 

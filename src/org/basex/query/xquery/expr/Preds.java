@@ -10,7 +10,6 @@ import org.basex.query.xquery.func.Fun;
 import org.basex.query.xquery.func.FunDef;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Type;
-import org.basex.query.xquery.path.AxisPath;
 import org.basex.query.xquery.path.Step;
 import org.basex.util.Array;
 
@@ -35,9 +34,8 @@ public abstract class Preds extends Expr {
 
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
-    Expr[] expr = {};
-    for(final Expr p : pred) {
-      Expr ex = ctx.comp(p);
+    for(int p = 0; p < pred.length; p++) {
+      Expr ex = addPos(ctx, pred[p].comp(ctx));
       if(ex instanceof CmpG) {
         final CmpG cmp = (CmpG) ex;
         if(cmp.expr[0] instanceof Fun && ((Fun) cmp.expr[0]).func == FunDef.POS
@@ -49,6 +47,8 @@ public abstract class Preds extends Expr {
           }
         }
       }
+      pred[p] = ex;
+
       if(ex.i()) {
         final Item it = (Item) ex;
         if(!it.bool()) {
@@ -57,20 +57,11 @@ public abstract class Preds extends Expr {
         }
         if(!it.n()) {
           ctx.compInfo(OPTTRUE, it);
+          pred = Array.delete(pred, p--);
           continue;
         }
       }
-      
-      if(ex instanceof AxisPath) {
-        final AxisPath ap = ((AxisPath) ex).addPos();
-        if(ap != null) {
-          ex = ap;
-          ctx.compInfo(OPTPOS);
-        }
-      }
-      expr = Array.add(expr, ex);
     }
-    pred = expr;
     return this;
   }
   

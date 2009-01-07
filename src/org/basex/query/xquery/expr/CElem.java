@@ -50,7 +50,7 @@ public final class CElem extends Arr {
     final int s = ctx.ns.size();
     addNS(ctx);
     super.comp(ctx);
-    tag = ctx.comp(tag);
+    tag = tag.comp(ctx);
     if(tag.e()) Err.empty(this);
     ctx.ns.size(s);
     return this;

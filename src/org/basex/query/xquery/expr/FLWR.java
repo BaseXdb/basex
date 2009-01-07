@@ -38,7 +38,7 @@ public final class FLWR extends FLWOR {
     // remove let clauses with static contents
     for(int f = 0; f != fl.length; f++) {
       if(fl[f].var.expr != null) {
-        ctx.compInfo(OPTSTAT, fl[f]);
+        ctx.compInfo(OPTSTAT, fl[f].var);
         fl = Array.delete(fl, f--);
       }
     }
@@ -47,7 +47,7 @@ public final class FLWR extends FLWOR {
     if(fl.length == 0) {
       // replace FLWR with IF clause or pass on return clause
       if(where != null) expr = new If(where, expr, Seq.EMPTY);
-      ctx.compInfo(OPTSIMPLE, this, expr);
+      ctx.compInfo(OPTFLWOR);
       return expr;
     }
     //final boolean n = normalize(ctx);

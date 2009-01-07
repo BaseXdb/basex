@@ -1,7 +1,6 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQText.*;
-
 import org.basex.query.xquery.IndexContext;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
@@ -9,7 +8,6 @@ import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
-import org.basex.query.xquery.path.AxisPath;
 import org.basex.query.xquery.util.Scoring;
 import org.basex.util.Array;
 
@@ -30,27 +28,22 @@ public final class And extends Arr {
 
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
+    super.comp(ctx);
     for(int e = 0; e < expr.length; e++) {
-      Expr ex = ctx.comp(expr[e]);
-      if(ex instanceof AxisPath) {
-        final AxisPath ap = ((AxisPath) ex).addPos();
-        if(ap != null) {
-          ex = ap;
-          ctx.compInfo(OPTPOS);
-        }
-      }
-      expr[e] = ex;
-      if(!ex.i()) continue;
+      expr[e] = addPos(ctx, expr[e]);
+      if(!expr[e].i()) continue;
       
-      if(!((Item) ex).bool()) {
+      if(!((Item) expr[e]).bool()) {
         // atomic items can be pre-evaluated
-        ctx.compInfo(OPTFALSE, ex);
+        ctx.compInfo(OPTFALSE, expr[e]);
         return Bln.FALSE;
       }
-      ctx.compInfo(OPTTRUE, ex);
+      ctx.compInfo(OPTTRUE, expr[e]);
       expr = Array.delete(expr, e--);
+      if(expr.length == 0) return Bln.TRUE;
     }
-    return expr.length == 0 ? Bln.TRUE : this;
+    
+    return this;
   }
 
   @Override

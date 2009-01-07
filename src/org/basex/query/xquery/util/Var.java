@@ -58,7 +58,7 @@ public final class Var extends ExprInfo implements Cloneable {
    * @throws XQException xquery exception
    */
   public void comp(final XQContext ctx) throws XQException {
-    if(expr != null) bind(ctx.comp(expr), ctx);
+    if(expr != null) bind(expr.comp(ctx), ctx);
   }
 
   /**

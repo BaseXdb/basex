@@ -44,17 +44,17 @@ public class FLWOR extends Single {
     final int vs = ctx.vars.size();
     
     for(int f = 0; f != fl.length; f++) {
-      final Expr e = ctx.comp(fl[f]);
+      final Expr e = fl[f].comp(ctx);
       if(e.e()) {
         ctx.vars.reset(vs);
-        ctx.compInfo(OPTSIMPLE, fl[f], e);
+        ctx.compInfo(OPTFLWOR);
         return e;
       }
       fl[f] = (ForLet) e;
     }
     
     if(where != null) {
-      where = ctx.comp(where);
+      where = where.comp(ctx);
       if(where.i()) {
         // test is always false: no results
         if(!((Item) where).bool()) {
@@ -69,7 +69,7 @@ public class FLWOR extends Single {
     }
 
     if(order != null) order.comp(ctx);
-    expr = ctx.comp(expr);
+    expr = expr.comp(ctx);
     ctx.vars.reset(vs);
     return this;
   }

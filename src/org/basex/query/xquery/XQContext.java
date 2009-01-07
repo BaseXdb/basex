@@ -156,7 +156,7 @@ public final class XQContext extends QueryContext {
       if(inf) compInfo(QUERYCOMP);
       fun.comp(this);
       vars.comp(this);
-      root = comp(root);
+      root = root.comp(this);
       if(inf) compInfo(QUERYRESULT + "%", root);
 
       evalTime = System.nanoTime();
@@ -226,16 +226,6 @@ public final class XQContext extends QueryContext {
     vars.plan(ser);
     fun.plan(ser);
     root.plan(ser);
-  }
-  
-  /**
-   * Compiles the specified expression and returns an iterator.
-   * @param e expression to be compiled
-   * @return iterator
-   * @throws XQException query exception
-   */
-  public Expr comp(final Expr e) throws XQException {
-    return e.comp(this);
   }
 
   /**

@@ -26,7 +26,7 @@ public abstract class Single extends Expr {
 
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
-    expr = ctx.comp(expr);
+    expr = expr.comp(ctx);
     return this;
   }
 

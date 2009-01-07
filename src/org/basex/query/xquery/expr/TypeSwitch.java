@@ -41,7 +41,7 @@ public final class TypeSwitch extends Single {
 
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
-    ts = ctx.comp(ts);
+    ts = ts.comp(ctx);
     return this;
   }
   

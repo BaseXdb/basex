@@ -48,7 +48,7 @@ public final class For extends ForLet {
 
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
-    expr = ctx.comp(expr);
+    expr = expr.comp(ctx);
     // empty sequence - empty loop
     if(expr.e()) return Seq.EMPTY;
     if(pos == null && score == null && expr.i()) var.bind(expr, ctx);

@@ -105,7 +105,7 @@ public final class FTSelect extends FTExpr {
   
   @Override
   public FTExpr comp(final XQContext ctx) throws XQException {
-    weight = ctx.comp(weight);
+    weight = weight.comp(ctx);
     if(weight.i()) {
       final Item wg = (Item) weight;
       if(!wg.n()) Err.or(XPTYPENUM, WEIGHT, weight);

@@ -26,7 +26,7 @@ public abstract class FTExpr extends Expr {
 
   @Override
   public FTExpr comp(final XQContext ctx) throws XQException {
-    for(int e = 0; e != expr.length; e++) expr[e] = (FTExpr) ctx.comp(expr[e]);
+    for(int e = 0; e != expr.length; e++) expr[e] = expr[e].comp(ctx);
     return this;
   }
 

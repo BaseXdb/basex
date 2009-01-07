@@ -488,7 +488,9 @@ public interface XQText {
   /** Optimization info. */
   String OPTSIMPLE = "Simplifying: % => %";
   /** Optimization info. */
-  String OPTSTAT = "Removing static assignments: %";
+  String OPTFLWOR = "Simplifying FLWOR expression";
+  /** Optimization info. */
+  String OPTSTAT = "Dissolve variable %";
   /** Optimization info. */
   String OPTRED = "Merging redundant location paths";
   /** Optimization info. */

@@ -50,13 +50,12 @@ public final class And extends Arr {
           return Bln.FALSE;
         }
         
-        // remove element from and expression that is always true
+        // remove expression that is always true
         ctx.compInfo(OPTTRUE);
         expr = Array.delete(expr, e--);
       }
     }
     if(expr.length == 0) return Bln.TRUE;
-    if(expr.length == 1) return expr[0];
 
     // merge several position tests to a single one
     Pos pos = new Pos(Integer.MIN_VALUE, Integer.MAX_VALUE);

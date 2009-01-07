@@ -30,7 +30,7 @@ public final class Range extends Arr {
   public Expr comp(final XQContext ctx) throws XQException {
     super.comp(ctx);
     if(expr[0].e() || expr[1].e()) {
-      ctx.compInfo(OPTSIMPLE, this, Seq.EMPTY);
+      ctx.compInfo(OPTPRE, this);
       return Seq.EMPTY;
     }
     return this;

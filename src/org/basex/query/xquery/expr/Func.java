@@ -45,7 +45,7 @@ public final class Func extends ExprInfo {
   public void comp(final XQContext ctx) throws XQException {
     final int s = ctx.vars.size();
     for(int a = 0; a < args.length; a++) ctx.vars.add(args[a]);
-    expr = ctx.comp(expr);
+    expr = expr.comp(ctx);
     ctx.vars.reset(s);
   }
 

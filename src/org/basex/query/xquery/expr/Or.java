@@ -30,9 +30,11 @@ public final class Or extends Arr {
 
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
+    super.comp(ctx);
     for(int e = 0; e < expr.length; e++) {
-      expr[e] = ctx.comp(expr[e]);
+      expr[e] = addPos(ctx, expr[e]);
       if(!expr[e].i()) continue;
+
       if(((Item) expr[e]).bool()) {
         // atomic items can be pre-evaluated
         ctx.compInfo(OPTTRUE, expr[e]);
@@ -40,16 +42,17 @@ public final class Or extends Arr {
       }
       ctx.compInfo(OPTFALSE, expr[e]);
       expr = Array.delete(expr, e--);
+      if(expr.length == 0) return Bln.FALSE;
     }
-    return expr.length == 0 ? Bln.FALSE : oneOf(ctx);
+    return cmpG(ctx);
   }
   
   /**
-   * Creates a comparison operator for several or operations, if possible.
+   * If possible, converts the expressions to a comparison operator.
    * @param ctx query context
    * @return expression
    */
-  private Expr oneOf(final XQContext ctx) {
+  private Expr cmpG(final XQContext ctx) {
     if(!(expr[0] instanceof CmpG)) return this;
 
     final CmpG e1 = (CmpG) expr[0];

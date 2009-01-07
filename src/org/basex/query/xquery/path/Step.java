@@ -2,6 +2,7 @@ package org.basex.query.xquery.path;
 
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.query.xquery.XQText.*;
+
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
@@ -159,11 +160,15 @@ public class Step extends Preds {
 
   /**
    * Adds a position predicate to the step.
+   * @param ctx query context
    * @return resulting step instance or null
    */
-  final Step addPos() {
-    return axis == Axis.PARENT || axis == Axis.SELF || pred.length != 0 ?
-        null : addPred(Itr.get(1));
+  final Step addPos(final XQContext ctx) {
+    if(axis != Axis.PARENT && axis != Axis.SELF && pred.length == 0) {
+      ctx.compInfo(OPTPOS);
+      return addPred(Itr.get(1));
+    }
+    return this;
   }
 
   @Override

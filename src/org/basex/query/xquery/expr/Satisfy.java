@@ -37,7 +37,7 @@ public final class Satisfy extends Single {
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
     for(int f = 0; f != fl.length; f++) {
-      final Expr e = ctx.comp(fl[f]);
+      final Expr e = fl[f].comp(ctx);
       if(e.e()) {
         ctx.compInfo(every ? OPTTRUE : OPTFALSE, fl[f]);
         return Bln.get(every);
