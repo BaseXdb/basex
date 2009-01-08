@@ -52,12 +52,6 @@ public final class BXCollection implements Collection, BXXMLDBText {
       final Parser p = new Parser(IO.get(name)) {
         @Override
         public void parse(final Builder build) { }
-        @Override
-        public String det() { return ""; }
-        @Override
-        public String head() { return ""; }
-        @Override
-        public double prog() { return 0; }
       };
       ctx.data(CreateDB.xml(p, name));
     } catch(final IOException ex) {
