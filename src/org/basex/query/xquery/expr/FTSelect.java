@@ -53,7 +53,7 @@ public final class FTSelect extends FTExpr {
 
   @Override
   public FTNodeIter iter(final XQContext ctx) throws XQException {
-    final FTPos tmp = ctx.ftpos;
+    FTPos tmp = ctx.ftpos;
     ctx.ftpos = pos;
     pos.init(ctx.ftitem);
 
@@ -68,7 +68,12 @@ public final class FTSelect extends FTExpr {
       System.arraycopy(pos.getPos(), 0, il, 0, pos.term.size);
       System.arraycopy(tmp.getPos(), 0, il, pos.term.size, os);
       tmp.setPos(il, il.length);      
-    }
+    } /*else {
+      tmp = new FTPos();
+      tmp.term = pos.term;
+      final IntList[] il = pos.getPos();
+      tmp.setPos(il, il.length);
+    } */
     
     ctx.ftpos = tmp;
     final double s = it.score();

@@ -241,6 +241,7 @@ public final class FTNode {
    * @return IntList[]
    */
   public IntList[] convertPos() {
+    if (p == null) return new IntList[0];
     final IntList[] il = new IntList[p.list[0]];
     for (int k = 0; k < il.length; k++) il[k] = new IntList();
     c = 0;

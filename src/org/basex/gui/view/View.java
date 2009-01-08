@@ -179,7 +179,9 @@ public abstract class View extends BaseXPanel {
 
     final GUI gui = GUI.get();
     final Context context = GUI.context;
-    final Nodes n = new Nodes(context.data());
+    // [SG] find general solution - works only for zooming of the parent axis
+    final Nodes n = nodes.getAllMarked(context.marked()); 
+    // new Nodes(context.data());
 
     if(!quick) {
       final String input = gui.input.getText();
