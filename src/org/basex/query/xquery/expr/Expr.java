@@ -12,6 +12,7 @@ import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.path.AxisPath;
 import org.basex.query.xquery.util.Err;
+import org.basex.query.xquery.util.Var;
 
 /**
  * Abstract Expression.
@@ -22,15 +23,6 @@ import org.basex.query.xquery.util.Err;
 public abstract class Expr extends ExprInfo {
   /** Undefined value. */
   protected static final int UNDEF = Integer.MIN_VALUE;
-  /** Used types, evaluated by the compiler. */
-  public enum Using {
-    /** Context position. */ POS,
-    /** Variable.         */ VAR
-  };
-  /** Return types, evaluated by the compiler. */
-  public enum Return {
-    /** Numeric value.    */ NUM,
-  };
 
   /**
    * Optimizes and compiles the expression.
@@ -65,16 +57,36 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Indicates if an expression uses the specified type. Called by the
-   * compiler to check if sub expressions have specific properties.
-   * <code>true</code> is returned by default and thus assumed as "worst-case",
-   * as all expression which do not overwrite this method will return true.
-   * @param use using flag
+   * Indicates if an expression accesses the position of a context item.
+   * Called by the compiler to perform certain optimizations.
+   * <code>true</code> is returned by default and thus assumed as "worst-case".
+   * @return result of check
+   */
+  public boolean usesPos() {
+    return true;
+  }
+
+  /**
+   * Indicates if an expression uses the specified variables. If the argument
+   * is <code>null</code>, it is checked if any variable is used.
+   * Called by the compiler to perform certain optimizations.
+   * <code>true</code> is returned by default and thus assumed as "worst-case".
+   * @param v variable to be checked
    * @return result of check
    */
   @SuppressWarnings("unused")
-  public boolean uses(final Using use) {
+  public boolean usesVar(final Var v) {
     return true;
+  }
+
+  /**
+   * Indicates the return type of an expression.
+   * Called by the compiler to check if expressions can be reformulated.
+   * null is returned by default.
+   * @return result of check
+   */
+  public Type returned() {
+    return null;
   }
   
   /**
@@ -105,16 +117,6 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Indicates if an expression returns the specified type.
-   * Called by the compiler to check if expressions can be reformulated.
-   * null is returned by default.
-   * @return result of check
-   */
-  public Type returned() {
-    return null;
-  }
-
-  /**
    * Checks the current and specified expression for equality.
    * @param cmp expression to be compared
    * @return result of check
@@ -122,16 +124,6 @@ public abstract class Expr extends ExprInfo {
   @SuppressWarnings("unused")
   public boolean sameAs(final Expr cmp) {
     return false;
-  }
-
-  /**
-   * Returns an iterator for an item expression.
-   * Note that the input expression must be an {@link Item} instance.
-   * @param expr expression
-   * @return iterator
-   */
-  protected final Iter iter(final Expr expr) {
-    return ((Item) expr).iter();
   }
 
   /**

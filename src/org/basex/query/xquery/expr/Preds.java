@@ -11,6 +11,7 @@ import org.basex.query.xquery.func.FunDef;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.path.Step;
+import org.basex.query.xquery.util.Var;
 import org.basex.util.Array;
 
 /**
@@ -66,15 +67,17 @@ public abstract class Preds extends Expr {
   }
   
   @Override
-  public final boolean uses(final Using u) {
-    for(final Expr p : pred) if(p.uses(u)) return true;
-    
-    if(u == Using.POS) {
-      for(final Expr p : pred) {
-        final Type t = p.returned();
-        if(t == null || t.num) return true;
-      }
+  public final boolean usesPos() {
+    for(final Expr p : pred) {
+      final Type t = p.returned();
+      if(t == null || t.num || p.usesPos()) return true;
     }
+    return false;
+  }
+
+  @Override
+  public boolean usesVar(final Var v) {
+    for(final Expr p : pred) if(p.usesVar(v)) return true;
     return false;
   }
 

@@ -114,6 +114,15 @@ public final class Var extends ExprInfo implements Cloneable {
   }
   
   /**
+   * Compares the variables for name equality.
+   * @param v variable
+   * @return result of check
+   */
+  public boolean eq(final Var v) {
+    return v == this || v.name.eq(name);
+  }
+  
+  /**
    * Checks the variable type.
    * @param it input item
    * @param ctx query context

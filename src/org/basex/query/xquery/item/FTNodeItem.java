@@ -12,15 +12,24 @@ import org.basex.query.xquery.util.Scoring;
  */
 public final class FTNodeItem extends DBNode {
   /** FTNode object. */
-  public final FTNode ftn;
-  
+  private static final FTNodeItem ZERO = new FTNodeItem(0);
+  /** FTNode object. */
+  public FTNode ftn;
+
   /**
    * Constructor.
    */
   public FTNodeItem() {
-    super();
     ftn = new FTNode();
     score = -1;
+  }
+
+  /**
+   * Constructor.
+   * @param s score value
+   */
+  public FTNodeItem(final double s) {
+    score = s;
   }
 
   /**
@@ -33,7 +42,16 @@ public final class FTNodeItem extends DBNode {
     ftn = ftnode;
     score = -1;
   }
-  
+
+  /**
+   * Constructor.
+   * @param s score value
+   * @return instance
+   */
+  public static FTNodeItem get(final double s) {
+    return s == 0 ? ZERO : new FTNodeItem(s);
+  }
+
   @Override 
   public double score() {
     // [SG] old scoring routine was returning irritating results..

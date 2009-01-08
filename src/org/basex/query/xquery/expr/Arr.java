@@ -6,6 +6,7 @@ import org.basex.query.xquery.IndexContext;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Type;
+import org.basex.query.xquery.util.Var;
 
 /**
  * Abstract array expression.
@@ -32,8 +33,14 @@ public abstract class Arr extends Expr {
   }
 
   @Override
-  public boolean uses(final Using u) {
-    for(final Expr e : expr) if(e.uses(u)) return true;
+  public boolean usesPos() {
+    for(final Expr e : expr) if(e.usesPos()) return true;
+    return false;
+  }
+
+  @Override
+  public boolean usesVar(final Var v) {
+    for(final Expr e : expr) if(e.usesVar(v)) return true;
     return false;
   }
 

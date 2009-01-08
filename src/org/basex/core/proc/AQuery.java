@@ -76,10 +76,9 @@ abstract class AQuery extends Process {
       return true;
     } catch(final QueryException ex) {
       BaseX.debug(ex);
-      info(ex.getMessage());
-      return false;
+      return error(ex.getMessage());
     } catch(final ProgressException ex) {
-      return false;
+      return error("");
     } catch(final Exception ex) {
       ex.printStackTrace();
       return error(BaseX.bug(ex.getClass().getSimpleName()));

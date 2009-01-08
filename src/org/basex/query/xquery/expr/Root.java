@@ -1,8 +1,6 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQText.*;
-import java.io.IOException;
-import org.basex.data.Serializer;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Item;
@@ -18,12 +16,7 @@ import org.basex.query.xquery.util.Err;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Root extends Expr {
-  @Override
-  public Expr comp(final XQContext ctx) {
-    return this;
-  }
-  
+public final class Root extends Simple {
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
     final Iter iter = checkCtx(ctx);;
@@ -39,23 +32,13 @@ public final class Root extends Expr {
   }
 
   @Override
-  public boolean uses(final Using use) {
-    return false;
-  }
-
-  @Override
   public Type returned() {
     return Type.DOC;
   }
 
   @Override
-  public String color() {
-    return "FFFF66";
-  }
-  
-  @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(this);
+  public boolean sameAs(final Expr cmp) {
+    return cmp instanceof Root;
   }
 
   @Override

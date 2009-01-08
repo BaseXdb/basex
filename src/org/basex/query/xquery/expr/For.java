@@ -35,15 +35,12 @@ public final class For extends ForLet {
    * @param v variable
    * @param p positional variable
    * @param s score variable
-   * @throws XQException xquery exception
    */
-  public For(final Expr e, final Var v, final Var p, final Var s)
-      throws XQException {
+  public For(final Expr e, final Var v, final Var p, final Var s) {
     expr = e;
     var = v;
     pos = p;
     score = s;
-    if(score != null) score.bind(Dbl.ZERO, null);
   }
 
   @Override
@@ -103,6 +100,12 @@ public final class For extends ForLet {
     };
   }
 
+  @Override
+  public boolean usesVar(final Var v) {
+    return super.usesVar(v) || (score == null || !v.eq(score)) &&
+      (pos == null || !v.eq(pos));
+  }
+  
   @Override
   public String toString() {
     return FOR + " " + var + " " + IN + " " + expr;

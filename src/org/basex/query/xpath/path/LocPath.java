@@ -16,7 +16,6 @@ import org.basex.query.xpath.item.Comp;
 import org.basex.query.xpath.item.Nod;
 import org.basex.query.xpath.item.Str;
 import org.basex.util.IntList;
-
 import static org.basex.query.xpath.XPText.*;
 
 /**

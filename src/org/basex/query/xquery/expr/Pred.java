@@ -45,7 +45,7 @@ public class Pred extends Preds {
     // Numeric value
     final boolean num = pred[0].i() && ((Item) pred[0]).n();
     // Multiple Predicates or POS
-    if(pred.length > 1 || !last && !num && uses(Using.POS)) return this;
+    if(pred.length > 1 || !last && !num && usesPos()) return this;
     // Use iterative evaluation
     return new IterPred(root, pred, last, num);
   }  

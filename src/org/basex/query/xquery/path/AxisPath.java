@@ -80,7 +80,7 @@ public class AxisPath extends Path {
     // variables in root expression or predicates not supported yet..
     boolean preds = false;
     for(final Step s : st) preds |= s.pred.length != 0;
-    if(r != null && r.uses(Using.VAR) || preds) return null;
+    if(r != null && r.usesVar(null) || preds) return null;
     
     // Simple iterator: one downward location step
     if(st.length == 1 && st[0].axis.down) return new SimpleIterPath(r, st);
@@ -136,12 +136,12 @@ public class AxisPath extends Path {
     if(ap != null) return ap;
     
     // analyze if result set can be cached - no predicates/variables...
-    cache = root != null && !root.uses(Using.VAR);
+    cache = root != null && !root.usesVar(null);
     
     // check if steps have predicates
     for(final Step s : step) {
       // check if we have a predicate and if we find a variable
-      if(s.pred.length != 0 && s.uses(Using.VAR)) {
+      if(s.pred.length != 0 && s.usesVar(null)) {
         // no caching - skip other steps
         cache = false;
         return this;
@@ -153,7 +153,7 @@ public class AxisPath extends Path {
     final DBNode db = (DBNode) ctx.item;
     
     // skip position predicates and horizontal axes
-    for(final Step s : step) if(s.uses(Using.POS) || !s.axis.vert) return this;
+    for(final Step s : step) if(s.usesPos() || !s.axis.vert) return this;
 
     // loop through all steps
     for(int i = 0; i < step.length; i++) {
@@ -243,7 +243,7 @@ public class AxisPath extends Path {
         for(int j = i + 1; j < step.length; j++) {
           result.step = Array.add(result.step, step[j]);
         }
-        break;
+        return result;
       }
     }
     return this;
@@ -318,10 +318,8 @@ public class AxisPath extends Path {
    * @param pos position variable
    * @param score score variable 
    * @return array with for expression
-   * @throws XQException Exception
    */
-  public For[] convSteps(final Var var, final Var pos, final Var score) 
-    throws XQException {
+  public For[] convSteps(final Var var, final Var pos, final Var score) {
     For[] f = new For[step.length];
     final VarCall vc = new VarCall(var);
     for (int i = 0; i < step.length; i++) {
@@ -340,7 +338,7 @@ public class AxisPath extends Path {
     for(int l = 1; l < ll; l++) {
       if(!step[l - 1].simple(DESCORSELF)) continue;
       final Step next = step[l];
-      if(next.axis == CHILD && !next.uses(Using.POS)) {
+      if(next.axis == CHILD && !next.usesPos()) {
         Array.move(step, l, -1, ll-- - l);
         next.axis = DESC;
       }
@@ -473,10 +471,14 @@ public class AxisPath extends Path {
   }
   
   @Override
-  public boolean uses(final Using u) {
-    // recursive position tests irrelevant for POS test?
-    //return u == Using.VAR && uses(u, step);
-    return uses(u, step);
+  public boolean usesPos() {
+    // recursive position tests necessary? if not, return false
+    return usesPos(step);
+  }
+
+  @Override
+  public boolean usesVar(final Var v) {
+    return usesVar(v, step);
   }
 
   @Override

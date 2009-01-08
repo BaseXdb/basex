@@ -3,8 +3,7 @@ package org.basex.query.xquery.expr;
 import org.basex.query.xquery.IndexContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
-import org.basex.query.xquery.item.Dbl;
-import org.basex.query.xquery.iter.Iter;
+import org.basex.query.xquery.iter.FTNodeIter;
 
 /**
  * FTUnaryNot expression.
@@ -22,8 +21,8 @@ public final class FTNot extends FTExpr {
   }
 
   @Override
-  public Iter iter(final XQContext ctx) throws XQException {
-    return Dbl.get(ctx.iter(expr[0]).next().bool() ? 0 : 1).iter();
+  public FTNodeIter iter(final XQContext ctx) throws XQException {
+    return score(expr[0].iter(ctx).next().score() == 0 ? 1 : 0);
   }
 
   @Override
@@ -43,8 +42,8 @@ public final class FTNot extends FTExpr {
   }
 
   @Override
-  public Expr indexEquivalent(final XQContext ctx, final IndexContext ic)
+  public FTExpr indexEquivalent(final XQContext ctx, final IndexContext ic)
     throws XQException {
-    return new FTNotIndex((FTExpr) expr[0].indexEquivalent(ctx, ic));
+    return new FTNotIndex(expr[0].indexEquivalent(ctx, ic));
   }
 }

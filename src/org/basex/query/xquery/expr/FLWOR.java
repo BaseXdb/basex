@@ -10,6 +10,7 @@ import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
+import org.basex.query.xquery.util.Var;
 
 /**
  * FLWOR Clause.
@@ -20,10 +21,10 @@ import org.basex.query.xquery.iter.SeqIter;
 public class FLWOR extends Single {
   /** For/Let expressions. */
   protected ForLet[] fl;
-  /** Order Expressions. */
-  protected Order order;
   /** Where Expression. */
   protected Expr where;
+  /** Order Expressions. */
+  protected Order order;
 
   /**
    * Constructor.
@@ -108,12 +109,19 @@ public class FLWOR extends Single {
   }
 
   @Override
-  public String color() {
+  public final boolean usesVar(final Var v) {
+    for(final ForLet f : fl) if(f.usesVar(v)) return true;
+    return super.usesVar(v) || where != null && where.usesVar(v) ||
+      order != null && order.usesVar(v);
+  }
+
+  @Override
+  public final String color() {
     return "66FF66";
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
+  public final void plan(final Serializer ser) throws IOException {
     ser.openElement(this, EVAL, ITER);
     for(final ForLet f : fl) f.plan(ser);
     if(where != null) {
@@ -129,7 +137,7 @@ public class FLWOR extends Single {
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     final StringBuilder sb = new StringBuilder();
     for(int i = 0; i != fl.length; i++) sb.append((i != 0 ? " " : "") + fl[i]);
     if(where != null) sb.append(" where " + where);

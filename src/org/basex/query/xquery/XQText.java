@@ -502,7 +502,7 @@ public interface XQText {
   /** Optimization info. */
   String OPTFTXINDEX = "Applying fulltext index";
   /** Optimization info. */
-  String OPTEMPTY = "Removing empty result in \"%\"";
+  String OPTEMPTY = "Removing empty sequences.";
   /** Optimization info. */
   String OPTPOS = "Adding position predicate";
   /** Optimization info. */

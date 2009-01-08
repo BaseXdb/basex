@@ -68,7 +68,7 @@ public final class XPContext extends QueryContext {
     }
     return it;
   }
-  
+
   @Override
   public void plan(final Serializer ser) throws Exception {
     root.plan(ser);

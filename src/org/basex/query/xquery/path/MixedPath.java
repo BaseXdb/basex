@@ -13,6 +13,7 @@ import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
 import org.basex.query.xquery.util.Err;
 import org.basex.query.xquery.util.NodeBuilder;
+import org.basex.query.xquery.util.Var;
 
 /**
  * Path expression.
@@ -101,8 +102,13 @@ public class MixedPath extends Path {
   }
   
   @Override
-  public boolean uses(final Using u) {
-    return super.uses(u, step);
+  public boolean usesPos() {
+    return usesPos(step);
+  }
+
+  @Override
+  public boolean usesVar(final Var v) {
+    return usesVar(v, step);
   }
 
   @Override

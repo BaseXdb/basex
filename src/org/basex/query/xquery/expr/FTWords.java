@@ -9,9 +9,9 @@ import org.basex.query.FTOpt.FTMode;
 import org.basex.query.xquery.IndexContext;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.item.Dbl;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Str;
+import org.basex.query.xquery.iter.FTNodeIter;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Scoring;
 import org.basex.util.TokenBuilder;
@@ -53,9 +53,9 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public Iter iter(final XQContext ctx) throws XQException {
+  public FTNodeIter iter(final XQContext ctx) throws XQException {
     final int len = contains(ctx);
-    return Dbl.get(len == 0 ? 0 : Scoring.word(len, ctx.ftitem.size())).iter();
+    return score(len == 0 ? 0 : Scoring.word(len, ctx.ftitem.size()));
   }
 
   /**
@@ -142,13 +142,14 @@ public final class FTWords extends FTExpr {
     sb.fz = ctx.ftopt.is(FTOpt.FZ);
     sb.wc = ctx.ftopt.is(FTOpt.WC);
     sb.cs = ctx.ftopt.is(FTOpt.CS);
+    
     // index size is incorrect for phrases
     while(ic.is != 0 && sb.more()) ic.is = Math.min(ic.is, ic.data.nrIDs(sb));
     ic.iu = true;
   }
 
   @Override
-  public Expr indexEquivalent(final XQContext ctx, final IndexContext ic) {
+  public FTExpr indexEquivalent(final XQContext ctx, final IndexContext ic) {
     return new FTIndex(ic.data, tok);
   }
   

@@ -8,9 +8,9 @@ import org.basex.query.FTPos;
 import org.basex.query.xquery.IndexContext;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.item.Dbl;
+import org.basex.query.xquery.item.FTNodeItem;
 import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.iter.Iter;
+import org.basex.query.xquery.iter.FTNodeIter;
 import org.basex.query.xquery.util.Err;
 import org.basex.util.IntList;
 
@@ -52,32 +52,33 @@ public final class FTSelect extends FTExpr {
   }
 
   @Override
-  public Iter iter(final XQContext ctx) throws XQException {
+  public FTNodeIter iter(final XQContext ctx) throws XQException {
     final FTPos tmp = ctx.ftpos;
     ctx.ftpos = pos;
     pos.init(ctx.ftitem);
 
-    final Item it = ctx.iter(expr[0]).next();
+    final FTNodeItem it = expr[0].iter(ctx).next();
 
-    if (tmp != null) {
+    if(tmp != null) {
       final int os = tmp.term.size;
       for (int i = 0; i < pos.term.size; i++) {
         tmp.term.add(pos.term.list[i]);
       }
-      IntList[] il = new IntList[pos.term.size + os];
+      final IntList[] il = new IntList[pos.term.size + os];
       System.arraycopy(pos.getPos(), 0, il, 0, pos.term.size);
       System.arraycopy(tmp.getPos(), 0, il, pos.term.size, os);
       tmp.setPos(il, il.length);      
     }
     
     ctx.ftpos = tmp;
-    final double s = it.dbl();
-    if(s == 0 || !posFilter(ctx)) return Dbl.ZERO.iter();
+    final double s = it.score();
+    if(s == 0 || !posFilter(ctx)) return score(0);
 
     // calculate weight
     final double d = checkDbl(ctx.iter(weight));
     if(d < 0 || d > 1000) Err.or(FTWEIGHT, d);
-    return (d != 1 ? Dbl.get(s * d) : it).iter();
+    //return score(d != 1 ? Dbl.get(s * d) : it);
+    return score(s * d);
   }
 
   /**
@@ -126,11 +127,11 @@ public final class FTSelect extends FTExpr {
   }
   
   @Override
-  public Expr indexEquivalent(final XQContext ctx, final IndexContext ic)
+  public FTExpr indexEquivalent(final XQContext ctx, final IndexContext ic)
     throws XQException {
 
-    return new FTSelectIndex((FTExpr) 
-        expr[0].indexEquivalent(ctx, ic), pos, window, weight, dist);
+    return new FTSelectIndex(expr[0].indexEquivalent(ctx, ic),
+        pos, window, weight, dist);
   }
   
   @Override

@@ -605,7 +605,7 @@ public final class XQParser extends QueryParser {
 
     check(PAR1);
     skipWS();
-    Var[] args = new Var[0];
+    Var[] args = {};
     final int s = ctx.vars.size();
     while(curr() == '$') {
       final QNm arg = varName();
@@ -808,7 +808,7 @@ public final class XQParser extends QueryParser {
     if(!some && !consumeWS(EVERY, DOLLAR, NOSOME)) return null;
 
     final int s = ctx.vars.size();
-    For[] fl = new For[0];
+    For[] fl = {};
     do {
       final Var var = new Var(varName(), consumeWS(AS) ? sequenceType() : null);
       check(IN);
@@ -835,7 +835,7 @@ public final class XQParser extends QueryParser {
     final Expr e = check(expr(), NOTYPESWITCH);
     check(PAR2);
 
-    Case[] list = new Case[0];
+    Case[] cases = {};
     while(consumeWS(CASE)) {
       final int s = ctx.vars.size();
       skipWS();
@@ -848,22 +848,22 @@ public final class XQParser extends QueryParser {
       if(name != null) ctx.vars.add(var);
       check(RETURN);
       final Expr ret = check(single(), NOTYPESWITCH);
-      list = Array.add(list, new Case(var, ret));
+      cases = Array.add(cases, new Case(var, ret));
       ctx.vars.reset(s);
     }
-    if(list.length == 0) Err.or(NOTYPESWITCH);
+    if(cases.length == 0) Err.or(NOTYPESWITCH);
 
     check(DEFAULT);
     skipWS();
     final int s = ctx.vars.size();
     final QNm name = curr() == '$' ? varName() : null;
-    final Var var = new Var(name, null);
-    if(name != null) ctx.vars.add(var);
+    final Var var = name != null ? new Var(name, null) : null;
+    if(var != null) ctx.vars.add(var);
     check(RETURN);
 
     final Expr ret = check(single(), NOTYPESWITCH);
     ctx.vars.reset(s);
-    return new TypeSwitch(e, list, var, ret);
+    return new TypeSwitch(e, cases, var, ret);
   }
 
   /**

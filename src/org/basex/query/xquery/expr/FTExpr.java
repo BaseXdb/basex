@@ -1,10 +1,14 @@
 package org.basex.query.xquery.expr;
 
 import java.io.IOException;
-
+import org.basex.BaseX;
 import org.basex.data.Serializer;
+import org.basex.query.xquery.IndexContext;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
+import org.basex.query.xquery.item.FTNodeItem;
+import org.basex.query.xquery.iter.FTNodeIter;
+import org.basex.query.xquery.util.Var;
 
 /**
  * This class defines is an abstract class for full-text expressions.
@@ -31,9 +35,26 @@ public abstract class FTExpr extends Expr {
   }
 
   @Override
-  public final boolean uses(final Using u) {
-    for(final Expr e : expr) if(e.uses(u)) return true;
+  public abstract FTNodeIter iter(final XQContext ctx) throws XQException;
+
+  @Override
+  public boolean usesPos() {
+    for(final FTExpr e : expr) if(e.usesPos()) return true;
     return false;
+  }
+
+  @Override
+  public boolean usesVar(final Var v) {
+    for(final FTExpr e : expr) if(e.usesVar(v)) return true;
+    return false;
+  }
+
+  @Override
+  @SuppressWarnings("unused")
+  public FTExpr indexEquivalent(final XQContext ctx, final IndexContext ic)
+      throws XQException {
+    BaseX.notexpected();
+    return null;
   }
 
   @Override
@@ -44,7 +65,7 @@ public abstract class FTExpr extends Expr {
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
-    for(final Expr e : expr) e.plan(ser);
+    for(final FTExpr e : expr) e.plan(ser);
     ser.closeElement();
   }
   
@@ -59,5 +80,26 @@ public abstract class FTExpr extends Expr {
       sb.append((e != 0 ? sep.toString() : "") + expr[e]);
     }
     return sb.toString();
+  }
+  
+  /**
+   * Returns a scoring iterator.
+   * @param s scoring
+   * @return iterator
+   */
+  protected FTNodeIter score(final double s) {
+    return new FTNodeIter() {
+      private boolean more;
+      @Override
+      public FTNodeItem next() {
+        more ^= true;
+        if(!more) return null;
+        final FTNodeItem ftn = new FTNodeItem();
+        ftn.score(s);
+        return ftn;
+      }
+      @Override
+      public long size() { return 1; }
+    };
   }
 }

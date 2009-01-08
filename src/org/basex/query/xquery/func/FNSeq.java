@@ -177,13 +177,13 @@ final class FNSeq extends Fun {
     
     // process any other iterator...
     return new Iter() {
-      final SeqIter sb = new SeqIter(iter);
-      int c = sb.size;
+      final SeqIter si = SeqIter.get(iter);
+      int c = si.size;
 
       @Override
-      public long size() { return sb.size; }
+      public long size() { return si.size; }
       @Override
-      public Item next() { return --c < 0 ? null : sb.item[c]; }
+      public Item next() { return --c < 0 ? null : si.item[c]; }
     };
   }
 

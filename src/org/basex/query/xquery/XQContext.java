@@ -81,12 +81,15 @@ public final class XQContext extends QueryContext {
   /** Default collation. */
   public Uri collation = Uri.uri(URLCOLL);
 
+  /** Used documents. */
+  public DBNode[] docs = new DBNode[0];
+  /** Initial number of documents. */
+  public int rootDocs;
+
   /** List of modules. */
   StringList modules = new StringList();
   /** List of loaded modules. */
   StringList modLoaded = new StringList();
-  /** Used documents. */
-  DBNode[] docs = new DBNode[0];
   /** Collections. */
   NodIter[] collect = new NodIter[0];
   /** Collection names. */
@@ -138,7 +141,8 @@ public final class XQContext extends QueryContext {
     try {
       // cache the initial context nodes
       if(nodes != null) {
-        docs = new DBNode[nodes.size];
+        rootDocs = nodes.size;
+        docs = new DBNode[rootDocs];
         for(int d = 0; d < docs.length; d++) {
           docs[d] = new DBNode(nodes.data, nodes.nodes[d]);
         }
@@ -188,7 +192,8 @@ public final class XQContext extends QueryContext {
       
       // completed... return standard nodeset
       if(i == null) return new Nodes(pre.finish(), data);
-      // add standard nodes
+      
+      // add nodes to standard iterator
       for(int p = 0; p < pre.size; p++) ir.add(new DBNode(data, pre.list[p]));
       ir.add(i);
     }

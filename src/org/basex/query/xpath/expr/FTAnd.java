@@ -34,9 +34,7 @@ public final class FTAnd extends FTArrayExpr {
 
   @Override
   public FTArrayExpr comp(final XPContext ctx) throws QueryException {
-    for(int i = 0; i != exprs.length; i++) {
-      exprs[i] = exprs[i].comp(ctx);
-    }
+    for(int i = 0; i != exprs.length; i++) exprs[i] = exprs[i].comp(ctx);
     return this;
   }
 

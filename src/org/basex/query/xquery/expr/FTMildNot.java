@@ -3,9 +3,8 @@ package org.basex.query.xquery.expr;
 import org.basex.query.xquery.IndexContext;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.item.Dbl;
 import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.iter.Iter;
+import org.basex.query.xquery.iter.FTNodeIter;
 import org.basex.util.IntList;
 
 /**
@@ -24,13 +23,14 @@ public final class FTMildNot extends FTExpr {
   }
 
   @Override
-  public Iter iter(final XQContext ctx) throws XQException {
-    final Item it = ctx.iter(expr[0]).next();
-    if(!it.bool()) return Dbl.ZERO.iter();
+  public FTNodeIter iter(final XQContext ctx) throws XQException {
+    final Item it = expr[0].iter(ctx).next();
+    if(it.score() == 0) return score(0);
     
     boolean f = false;
-    for(int i = 1; i < expr.length; i++) f |= ctx.iter(expr[i]).next().bool();
-    return !f || ctx.ftpos.mildNot() ? it.iter() : Dbl.ZERO.iter();
+    for(int i = 1; i < expr.length; i++)
+      f |= expr[1].iter(ctx).next().score() != 0;
+    return score(!f || ctx.ftpos.mildNot() ? it.score() : 0);
   }
 
   @Override
@@ -62,7 +62,7 @@ public final class FTMildNot extends FTExpr {
   }
   
   @Override
-  public Expr indexEquivalent(final XQContext ctx, final IndexContext ic)
+  public FTExpr indexEquivalent(final XQContext ctx, final IndexContext ic)
     throws XQException {
 
     if (expr.length == 1) return expr[0].indexEquivalent(ctx, ic);
@@ -73,9 +73,9 @@ public final class FTMildNot extends FTExpr {
     final FTExpr[] ie = new FTExpr[2];
     final FTMildNotIndex[] mne = new FTMildNotIndex[expr.length - 1];
     final int[] pex = new int[expr.length - 1];
-    ie[0] = (FTExpr) expr[0].indexEquivalent(ctx, ic);
+    ie[0] = expr[0].indexEquivalent(ctx, ic);
     for (int i = 1; i < expr.length; i++) {
-      ie[1] = (FTExpr) expr[i].indexEquivalent(ctx, ic);
+      ie[1] = expr[i].indexEquivalent(ctx, ic);
       mne[i - 1] = new FTMildNotIndex(ie);
       pex[i - 1] = i - 1;
     }

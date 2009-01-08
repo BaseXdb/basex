@@ -9,6 +9,7 @@ import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
+import org.basex.query.xquery.util.Var;
 
 /**
  * Order by expression.
@@ -34,7 +35,7 @@ public final class Order extends ExprInfo {
    * @throws XQException evaluation exception
    */
   public void comp(final XQContext ctx) throws XQException {
-    for(int l = 0; l < ord.length; l++) ord[l].comp(ctx);
+    for(final Ord o : ord) o.comp(ctx);
   }
 
   /**
@@ -85,7 +86,17 @@ public final class Order extends ExprInfo {
       }
     };
   }
-  
+
+  /**
+   * Variables test.
+   * @param v variable to be checked
+   * @return result of check
+   */
+  public boolean usesVar(final Var v) {
+    for(final Ord o : ord) if(o.usesVar(v)) return true;
+    return false;
+  }
+
   /**
    * Recursively sorts the specified items via QuickSort.
    * @param o order array

@@ -48,7 +48,7 @@ public final class Names extends Set {
    * Initializes the statistics.
    */
   public void init() {
-    for(int i = 1; i < size; i++) stat[i] = new StatsKey();
+    for(int s = 1; s < size; s++) stat[s] = new StatsKey();
   }
 
   /**
@@ -59,13 +59,13 @@ public final class Names extends Set {
    * @return name id
    */
   public int index(final byte[] k, final byte[] v, final boolean st) {
-    final int i = Math.abs(add(k));
+    final int s = Math.abs(add(k));
     if(st) {
-      if(stat[i] == null) stat[i] = new StatsKey();
-      if(v != null) stat[i].add(v);
-      stat[i].counter++;
+      if(stat[s] == null) stat[s] = new StatsKey();
+      if(v != null) stat[s].add(v);
+      stat[s].counter++;
     }
-    return i;
+    return s;
   }
 
   /**
@@ -87,7 +87,10 @@ public final class Names extends Set {
     out.writeNums(next);
     out.writeNums(bucket);
     out.writeNum(size);
-    for(int s = 1; s < size; s++) stat[s].finish(out);
+    for(int s = 1; s < size; s++) {
+      if(stat[s] == null) stat[s] = new StatsKey();
+      stat[s].finish(out);
+    }
   }
 
   /**

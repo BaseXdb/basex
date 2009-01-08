@@ -35,6 +35,7 @@ public final class MemData extends Data {
     val2 = new long[cap];
     txtindex = new MemValues();
     atvindex = new MemValues();
+    meta = new MetaData("");
     tags = tag;
     atts = att;
     ns = n;

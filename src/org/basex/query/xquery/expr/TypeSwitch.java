@@ -30,7 +30,7 @@ public final class TypeSwitch extends Single {
    * @param t typeswitch expression
    * @param c case expressions
    * @param v variable
-   * @param r return expression
+   * @param r default return expression
    */
   public TypeSwitch(final Expr t, final Case[] c, final Var v, final Expr r) {
     super(r);
@@ -47,25 +47,28 @@ public final class TypeSwitch extends Single {
   
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
-    final SeqIter seq = new SeqIter(ctx.iter(ts));
+    final SeqIter seq = SeqIter.get(ctx.iter(ts));
     
     final int s = ctx.vars.size();
-    for(final Case l : cs) {
+    for(final Case c : cs) {
       seq.reset();
-      final Iter iter = l.iter(ctx, seq);
+      final Iter iter = c.iter(ctx, seq);
       if(iter != null) return iter;
     }
-    if(var.name != null) ctx.vars.add(var.bind(seq.finish(), ctx));
-    final SeqIter sb = new SeqIter(ctx.iter(expr));
+    if(var != null) ctx.vars.add(var.bind(seq.finish(), ctx));
+    final SeqIter sb = SeqIter.get(ctx.iter(expr));
     ctx.vars.reset(s);
     return sb;
   }
 
   @Override
-  public boolean uses(final Using u) {
-    return true;
+  public boolean usesVar(final Var v) {
+    if(v == null) return true;
+    if(var != null && v.eq(var)) return false;
+    for(final Case c : cs) if(c.usesVar(v)) return true;
+    return false;
   }
-
+  
   @Override
   public Type returned() {
     final Type t = cs[0].returned();
@@ -86,7 +89,7 @@ public final class TypeSwitch extends Single {
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
-    if(var.name != null) ser.attribute(VAR, var.name.str());
+    if(var != null) ser.attribute(VAR, var.name.str());
     for(final Case c : cs) c.plan(ser);
     ts.plan(ser);
     expr.plan(ser);

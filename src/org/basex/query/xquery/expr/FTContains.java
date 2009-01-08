@@ -1,6 +1,8 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQText.*;
+import java.io.IOException;
+import org.basex.data.Serializer;
 import org.basex.index.FTTokenizer;
 import org.basex.query.xquery.IndexContext;
 import org.basex.query.xquery.XQContext;
@@ -12,6 +14,7 @@ import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.path.AxisPath;
 import org.basex.query.xquery.path.Step;
 import org.basex.query.xquery.util.Scoring;
+import org.basex.query.xquery.util.Var;
 
 /**
  * FTContains expression.
@@ -19,37 +22,39 @@ import org.basex.query.xquery.util.Scoring;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class FTContains extends Arr {
+public class FTContains extends Expr {
+  /** Expression. */
+  public Expr expr;
+  /** Fulltext expression. */
+  public FTExpr ftexpr;
   /** Fulltext parser. */
   public FTTokenizer ft = new FTTokenizer();
   
   /**
    * Constructor.
-   * @param ex contains, select and optional ignore expression
+   * @param e expression
+   * @param fte fulltext expression
    */
-  public FTContains(final Expr... ex) {
-    super(ex);
+  public FTContains(final Expr e, final FTExpr fte) {
+    expr = e;
+    ftexpr = fte;
   }
   
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
-    super.comp(ctx);
+    expr = expr.comp(ctx);
+    ftexpr = ftexpr.comp(ctx);
+    if(expr instanceof AxisPath) ((AxisPath) expr).addText(ctx);
     
-    final Expr e1 = expr[0];
-    final Expr e2 = expr[1];
-    if(e1 instanceof AxisPath) ((AxisPath) e1).addText(ctx);
-    
-    if(e1.e() || e2.e()) {
-      ctx.compInfo(OPTSIMPLE, this, Bln.FALSE);
-      return Bln.FALSE;
-    }
-
-    return this;
+    Expr e = this;
+    if(expr.e()) e = Bln.FALSE;
+    if(e != this) ctx.compInfo(OPTPRE, this);
+    return e;
   }
 
   @Override
   public Iter iter(final XQContext ctx) throws XQException {    
-    final Iter iter = ctx.iter(expr[0]);
+    final Iter iter = expr.iter(ctx);
     final FTTokenizer tmp = ctx.ftitem;
 
     double d = 0;
@@ -57,8 +62,7 @@ public class FTContains extends Arr {
     ctx.ftitem = ft;
     while((i = iter.next()) != null) {
       ft.init(i.str());
-      final Item it = ctx.iter(expr[1]).next();
-      d = Scoring.and(d, it.dbl());
+      d = Scoring.and(d, ftexpr.iter(ctx).next().score());
     }
     ctx.ftitem = tmp;
     return Bln.get(d).iter();
@@ -73,23 +77,33 @@ public class FTContains extends Arr {
     if(s == null || s.test.type != Type.TXT || !ic.data.meta.ftxindex) return;
     
     ic.iu = false;
-    expr[1].indexAccessible(ctx, ic);
+    ftexpr.indexAccessible(ctx, ic);
   }
   
   @Override
   public Expr indexEquivalent(final XQContext ctx, final IndexContext ic)
     throws XQException {
 
-    final Expr ae = expr[1].indexEquivalent(ctx, ic);
+    final FTExpr ae = ftexpr.indexEquivalent(ctx, ic);
     // sequential evaluation with index access
-    if(ic.seq) return new FTContainsSIndex(expr[0], ae);
+    if(ic.seq) return new FTContainsSIndex(expr, ae);
 
     // standard index evaluation; first expression will always be an axis path
     ctx.compInfo(OPTFTXINDEX);
     final Expr root = new FTContainsIndex(ae, ft);
-    return ((AxisPath) expr[0]).invertPath(root, ic.step);
+    return ((AxisPath) expr).invertPath(root, ic.step);
   }
   
+  @Override
+  public boolean usesPos() {
+    return expr.usesPos() || ftexpr.usesPos();
+  }
+
+  @Override
+  public boolean usesVar(final Var v) {
+    return expr.usesVar(v) || ftexpr.usesVar(v);
+  }
+
   @Override
   public Type returned() {
     return Type.BLN;
@@ -102,6 +116,14 @@ public class FTContains extends Arr {
 
   @Override
   public String toString() {
-    return toString(" ftcontains ");
+    return expr + " ftcontains " + ftexpr;
+  }
+
+  @Override
+  public void plan(final Serializer ser) throws IOException {
+    ser.openElement(this);
+    expr.plan(ser);
+    ftexpr.plan(ser);
+    ser.closeElement();
   }
 }

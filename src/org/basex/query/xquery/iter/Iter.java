@@ -16,11 +16,13 @@ import org.basex.query.xquery.util.Err;
  */
 public abstract class Iter {
   /** Empty iterator. */
-  public static final Iter EMPTY = new Iter() {
+  public static final Iter EMPTY = new ResetIter() {
     @Override
     public Item next() { return null; }
     @Override
     public long size() { return 0; }
+    @Override
+    public void reset() { }
     @Override
     public String toString() { return "()"; }
   };

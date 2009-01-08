@@ -11,6 +11,7 @@ import org.basex.query.xquery.item.Str;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
 import org.basex.query.xquery.util.Err;
+import org.basex.query.xquery.util.Var;
 
 /**
  * Single order specifier.
@@ -87,6 +88,15 @@ public final class Ord {
    */
   public Item item(final int i) {
     return seq == null ? Itr.get(i) : seq.item[i];
+  }
+
+  /**
+   * Variables test.
+   * @param v variable to be checked
+   * @return result of check
+   */
+  public boolean usesVar(final Var v) {
+    return expr.usesVar(v);
   }
   
   @Override

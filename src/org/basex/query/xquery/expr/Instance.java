@@ -8,6 +8,7 @@ import org.basex.data.Serializer;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Bln;
+import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.SeqType;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.util.Token;
@@ -38,7 +39,7 @@ public final class Instance extends Single {
     if(!expr.i()) return this;
 
     ctx.compInfo(OPTPRE, this);
-    return Bln.get(seq.instance(iter(expr)));
+    return Bln.get(seq.instance(((Item) expr).iter()));
   }
   
   @Override

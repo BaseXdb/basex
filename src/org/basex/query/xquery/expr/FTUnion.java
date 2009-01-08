@@ -4,7 +4,6 @@ import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.FTNodeItem;
 import org.basex.query.xquery.iter.FTNodeIter;
-import org.basex.query.xquery.iter.Iter;
 import org.basex.util.IntList;
 
 /**
@@ -15,15 +14,15 @@ import org.basex.util.IntList;
  */
 final class FTUnion extends FTExpr {
   /** Cache for one of the nodes. */
-  private IntList cp;
+  private final IntList cp;
   /** Flag is set, if ith expression has any result. */
-  private FTNodeItem[] mp;
+  private final FTNodeItem[] mp;
   /** Pointer on the positive expression with the lowest pre-values.*/
   private int minp = -1;
   /** Saving index of positive expressions. */
-  private int[] pex;
+  private final int[] pex;
   /** Flag if one result was a ftnot. */
-  private boolean not;
+  private final boolean not;
   
   /**
    * Constructor.
@@ -41,7 +40,7 @@ final class FTUnion extends FTExpr {
   }
 
   @Override
-  public Iter iter(final XQContext ctx) {
+  public FTNodeIter iter(final XQContext ctx) {
     return new FTNodeIter(){
       @Override
       public FTNodeItem next() throws XQException { 
@@ -60,8 +59,7 @@ final class FTUnion extends FTExpr {
     boolean b = false;
     if (cp.size > 0) {
       for (int i = 0; i < cp.size; i++) {
-        mp[pex[cp.list[i]]] = (FTNodeItem) 
-        ctx.iter(expr[pex[cp.list[i]]]).next();
+        mp[pex[cp.list[i]]] = expr[pex[cp.list[i]]].iter(ctx).next();
         if (!b) b = mp[i].ftn.size > 0;
       }
       cp.reset();
@@ -75,7 +73,7 @@ final class FTUnion extends FTExpr {
       while(minp < mp.length && mp[minp].ftn.size == 0) minp++;
       if (minp < mp.length) cp.set(minp, 0);
       for (int ip = minp + 1; ip < pex.length; ip++) {       
-        if (mp[ip].ftn.size > 0) { 
+        if (mp[ip].ftn.size > 0) {
           final FTNodeItem n1 = mp[pex[ip]];
           final FTNodeItem n2 = mp[pex[minp]];
           if (n1.ftn.getPre() < n2.ftn.getPre()) {

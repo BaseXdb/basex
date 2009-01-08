@@ -7,6 +7,7 @@ import org.basex.BaseX;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
+import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.SeqType;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.util.Token;
@@ -37,7 +38,7 @@ public final class Cast extends Single {
     if(!expr.i()) return this;
 
     ctx.compInfo(OPTPRE, this);
-    return seq.cast(iter(expr), this, ctx);
+    return seq.cast(((Item) expr).iter(), this, ctx);
   }
 
   @Override

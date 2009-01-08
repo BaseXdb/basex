@@ -12,6 +12,7 @@ import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Err;
+import org.basex.query.xquery.util.Var;
 import org.basex.util.Token;
 
 /**
@@ -64,8 +65,14 @@ public abstract class Fun extends Expr {
     throws XQException;
 
   @Override
-  public boolean uses(final Using u) {
-    for(final Expr arg : args) if(arg.uses(u)) return true;
+  public boolean usesPos() {
+    for(final Expr a : args) if(a.usesPos()) return true;
+    return false;
+  }
+
+  @Override
+  public boolean usesVar(final Var v) {
+    for(final Expr a : args) if(a.usesVar(v)) return true;
     return false;
   }
   

@@ -81,8 +81,7 @@ final class FNAcc extends Fun {
   }
 
   @Override
-  public boolean uses(final Using u) {
-    return u == Using.POS && (func == FunDef.POS || func == FunDef.LAST) ?
-      true : super.uses(u);
+  public boolean usesPos() {
+    return func == FunDef.POS || func == FunDef.LAST || super.usesPos();
   }
 }

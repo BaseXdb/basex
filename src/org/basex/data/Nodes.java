@@ -2,7 +2,6 @@ package org.basex.data;
 
 import java.io.IOException;
 import java.util.Arrays;
-
 import org.basex.BaseX;
 import org.basex.core.Context;
 import org.basex.util.Array;
@@ -167,14 +166,6 @@ public final class Nodes implements Result {
     return size;
   }
   
-  /**
-   * Returns a copy of the node set.
-   * @return copy
-   */
-  public Nodes copy() {
-    return new Nodes(nodes, data);
-  }
-  
   public boolean same(final Result v) {
     if(!(v instanceof Nodes) || v.size() != size) return false;
 
@@ -183,6 +174,7 @@ public final class Nodes implements Result {
     final boolean ftd1 = n.poi != null && n.pos != null;
     final boolean ftd2 = pos != null && poi != null;
     for(int c = 0; c < size; c++) 
+      //if(n.nodes[c] != nodes[c]) return false; 
       if(n.nodes[c] != nodes[c] || ftd1 != ftd2 
           || (ftd1 && !Array.eq(n.poi[c], poi[c]) 
           && !Array.eq(n.pos[c], pos[c]))) return false;

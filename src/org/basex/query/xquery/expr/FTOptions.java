@@ -6,7 +6,7 @@ import org.basex.query.FTOpt;
 import org.basex.query.xquery.IndexContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
-import org.basex.query.xquery.iter.Iter;
+import org.basex.query.xquery.iter.FTNodeIter;
 
 /**
  * FTOptions expression.
@@ -39,12 +39,12 @@ public final class FTOptions extends FTExpr {
   }
 
   @Override
-  public Iter iter(final XQContext ctx) throws XQException {
+  public FTNodeIter iter(final XQContext ctx) throws XQException {
     final FTOpt tmp = ctx.ftopt;
     ctx.ftopt = opt;
-    final Iter it = ctx.iter(expr[0]);
+    final FTNodeIter ir = expr[0].iter(ctx);
     ctx.ftopt = tmp;
-    return it;
+    return ir;
   }
 
   @Override
@@ -52,7 +52,6 @@ public final class FTOptions extends FTExpr {
       throws XQException {
     
     ic.io &= opt.indexAccessible(ic.data.meta);
-    
     final FTOpt tmp = ctx.ftopt;
     ctx.ftopt = opt;
     expr[0].indexAccessible(ctx, ic);
@@ -60,10 +59,10 @@ public final class FTOptions extends FTExpr {
   }
 
   @Override
-  public Expr indexEquivalent(final XQContext ctx, final IndexContext ic)
+  public FTExpr indexEquivalent(final XQContext ctx, final IndexContext ic)
       throws XQException {
 
-    return new FTOptions((FTExpr) expr[0].indexEquivalent(ctx, ic), opt);
+    return new FTOptions(expr[0].indexEquivalent(ctx, ic), opt);
   }
   
   @Override

@@ -100,7 +100,6 @@ final class FTIntersection extends FTExpr {
   private FTNodeItem calcFTAnd(final FTNodeItem[] n, final XQContext ctx,
       final boolean p) throws XQException {
     if (n.length == 0) return  new FTNodeItem();
-//    else if (n.length == 1) return (FTNodeItem) ctx.iter(expr[n[0]]).next();
     else if (n.length == 1) return n[0];
 
     FTNodeItem n1 = n[0];
@@ -144,7 +143,7 @@ final class FTIntersection extends FTExpr {
    */
   private boolean moreN(final XQContext ctx) throws XQException {
     for (int i = 0; i < cn.length; i++) {
-      cn[i] = (FTNodeItem) ctx.iter(expr[nex[i]]).next();
+      cn[i] = expr[nex[i]].iter(ctx).next();
       if (cn[i].ftn.size == 0) return false;
     }
     return true;
@@ -158,7 +157,7 @@ final class FTIntersection extends FTExpr {
    */
   private boolean moreP(final XQContext ctx) throws XQException {
     for (int i = 0; i < cp.length; i++) {
-      cp[i] = (FTNodeItem) ctx.iter(expr[pex[i]]).next();
+      cp[i] = expr[pex[i]].iter(ctx).next();
       if (cp[i].ftn.size == 0) return false;
     }
     return true;
@@ -176,8 +175,8 @@ final class FTIntersection extends FTExpr {
   private FTNodeItem more(final FTNodeItem[] n, final int i, final boolean p,
       final XQContext ctx) throws XQException {
     //final FTNodeItem tmp = n[i];
-    if (p) n[i] = (FTNodeItem) ctx.iter(expr[pex[i]]).next();
-    else n[i] = (FTNodeItem) ctx.iter(expr[nex[i]]).next();
+    if (p) n[i] = expr[pex[i]].iter(ctx).next();
+    else n[i] = expr[nex[i]].iter(ctx).next();
     return n[i]; //tmp;
   }
 

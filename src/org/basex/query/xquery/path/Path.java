@@ -7,6 +7,7 @@ import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Context;
 import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.iter.Iter;
+import org.basex.query.xquery.util.Var;
 
 /**
  * Path expression.
@@ -37,14 +38,24 @@ public abstract class Path extends Expr {
   public abstract Iter iter(final XQContext ctx) throws XQException;
   
   /**
-   * Indicates if an expression uses the specified type.
-   * @param u using flag
+   * Position test.
    * @param step step array
    * @return result of check
    */
-  protected boolean uses(final Using u, final Expr[] step) {
-    for(final Expr s : step) if(s.uses(u)) return true;
-    return root != null && root.uses(u);
+  protected boolean usesPos(final Expr[] step) {
+    for(final Expr s : step) if(s.usesPos()) return true;
+    return root != null && root.usesPos();
+  }
+
+  /**
+   * Variables test.
+   * @param v variable to be checked
+   * @param step step array
+   * @return result of check
+   */
+  protected boolean usesVar(final Var v, final Expr[] step) {
+    for(final Expr s : step) if(s.usesVar(v)) return true;
+    return root != null && root.usesVar(v);
   }
 
   @Override

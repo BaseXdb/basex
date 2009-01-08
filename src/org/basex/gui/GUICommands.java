@@ -222,7 +222,8 @@ public enum GUICommands implements GUICommand {
     @Override
     public void execute() {
       final Context context = GUI.context;
-      context.copy(context.marked().copy());
+      final Nodes nodes = context.marked();
+      context.copy(new Nodes(nodes.nodes, nodes.data));
     }
 
     @Override

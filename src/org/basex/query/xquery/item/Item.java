@@ -11,6 +11,7 @@ import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Err;
 import org.basex.query.xquery.util.Scoring;
+import org.basex.query.xquery.util.Var;
 import org.basex.util.Token;
 
 /**
@@ -250,7 +251,12 @@ public abstract class Item extends Expr {
   }
 
   @Override
-  public boolean uses(final Using u) {
+  public boolean usesPos() {
+    return false;
+  }
+
+  @Override
+  public boolean usesVar(final Var v) {
     return false;
   }
   

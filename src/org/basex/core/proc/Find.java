@@ -7,8 +7,7 @@ import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.io.PrintOutput;
-import org.basex.query.xpath.XPathProcessor;
-import org.basex.query.xpath.func.ContainsLC;
+import org.basex.query.xquery.XQueryProcessor;
 import org.basex.util.Array;
 import org.basex.util.BoolList;
 import org.basex.util.StringList;
@@ -35,7 +34,7 @@ public final class Find extends AQuery {
   @Override
   protected boolean exec() {
     final String query = args[0] == null ? "" : args[0];
-    return query(XPathProcessor.class, find(query, context, false));
+    return query(XQueryProcessor.class, find(query, context, false));
   }
 
   @Override
@@ -78,7 +77,7 @@ public final class Find extends AQuery {
         preds += "[text() ~> \"" + term.substring(1) + "\"]";
       } else if(term.startsWith("@")) {
         if(term.length() == 1) continue;
-        preds += "[" + ContainsLC.NAME + "(@*, \"" + term.substring(1) + "\")]";
+        preds += "[basex:containslc(@*, \"" + term.substring(1) + "\")]";
         term = term.substring(1);
         if(XMLToken.isName(Token.token(term))) {
           // attribute exists.. add location path
@@ -88,14 +87,14 @@ public final class Find extends AQuery {
         if(data.meta.ftxindex) {
           preds += "[text() ftcontains \"" + term + "\"]";
         } else {
-          preds += "[" + ContainsLC.NAME + "(text(), \"" + term + "\")]";
+          preds += "[basex:containslc(text(), \"" + term + "\")]";
         }
         if(XMLToken.isName(Token.token(term))) {
           // tag exists.. add location path
           pre += (r ? "/" : "") + "descendant::" + term + " | ";
         }
         // name attribute exists...
-        pre += "//*[" + ContainsLC.NAME + "(@name, \"" + term + "\")] | ";
+        pre += "//*[basex:containslc(@name, \"" + term + "\")] | ";
       }
     }
     if(pre.length() == 0 && preds.length() == 0) return root ? "/" : ".";
@@ -192,7 +191,7 @@ public final class Find extends AQuery {
       if(exact) {
         xpath.add(pred + operator + t);
       } else {
-        xpath.add(ContainsLC.NAME + "(" + pred + ", " + t + ")");
+        xpath.add("basex:containslc(" + pred + ", " + t + ")");
       }
       xpath.add(']');
 
@@ -243,8 +242,7 @@ public final class Find extends AQuery {
         if(term.length == 0) continue;
         tb.add("[");
         if(fs && i == 1) {
-          tb.add(ContainsLC.NAME);
-          tb.add("(@name, \"");
+          tb.add("basex:containslc(@name, \"");
           tb.add(term);
           tb.add("\")");
         } else {

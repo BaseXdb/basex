@@ -82,9 +82,12 @@ final class FNBaseX extends Fun {
    */
   private Iter contains(final Iter[] arg) throws XQException {
     if(arg.length == 3) checkColl(arg[2]);
-    final Item it = arg[1].atomic(this, true);
-    return it == null ? Bln.TRUE.iter() :
-      Bln.get(containslc(checkStr(arg[0]), checkStr(it))).iter();
+    final byte[] qu = checkStr(arg[1]);
+    Item it;
+    while((it = arg[0].next()) != null) {
+      if(containslc(checkStr(it), qu)) return Bln.TRUE.iter();
+    }
+    return Bln.FALSE.iter();
   }
 
   /**

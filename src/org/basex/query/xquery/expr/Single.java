@@ -5,6 +5,7 @@ import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Type;
+import org.basex.query.xquery.util.Var;
 
 /**
  * Abstract single expression.
@@ -31,10 +32,15 @@ public abstract class Single extends Expr {
   }
 
   @Override
-  public boolean uses(final Using u) {
-    return expr.uses(u);
+  public boolean usesPos() {
+    return expr.usesPos();
   }
 
+  @Override
+  public boolean usesVar(final Var v) {
+    return expr.usesVar(v);
+  }
+  
   @Override
   public Type returned() {
     return null;

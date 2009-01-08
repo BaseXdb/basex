@@ -41,6 +41,12 @@ public final class Case extends Single {
     return null;
   }
 
+  @Override
+  public boolean usesVar(final Var v) {
+    // new variable creates a new context
+    return v == null || !v.eq(var) && super.usesVar(v);
+  }
+  
   /**
    * Evaluates the given sequence.
    * @param ctx query context

@@ -1,8 +1,12 @@
 package org.basex.query.xquery.expr;
 
+import java.io.IOException;
+
+import org.basex.data.Serializer;
 import org.basex.index.FTTokenizer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
+import org.basex.query.xquery.item.FTNodeItem;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
@@ -19,8 +23,8 @@ public final class FTContainsIndex extends FTContains {
    * @param ftt FTTokenizer
    * @param ex contains, select and optional ignore expression
    */
-  FTContainsIndex(final Expr ex, final FTTokenizer ftt) {
-    super(ex);
+  FTContainsIndex(final FTExpr ex, final FTTokenizer ftt) {
+    super(null, ex);
     ft = ftt;
   }
 
@@ -31,7 +35,7 @@ public final class FTContainsIndex extends FTContains {
       public Item next() throws XQException {
         final FTTokenizer tmp = ctx.ftitem;
         ctx.ftitem = ft;
-        final Item it = ctx.iter(expr[0]).next();
+        final FTNodeItem it = ftexpr.iter(ctx).next();
         ctx.ftitem = tmp;
         return it.score() == 0 ? null : it;
       }
@@ -45,6 +49,13 @@ public final class FTContainsIndex extends FTContains {
 
   @Override
   public String toString() {
-    return "FTContainsIndex(" + expr[0] + ")";
+    return "FTContainsIndex(" + ftexpr + ")";
+  }
+
+  @Override
+  public void plan(final Serializer ser) throws IOException {
+    ser.openElement(this);
+    ftexpr.plan(ser);
+    ser.closeElement();
   }
 }

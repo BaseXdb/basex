@@ -2,14 +2,12 @@ package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQText.*;
 import java.io.IOException;
-
 import org.basex.data.Serializer;
 import org.basex.query.FTPos;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.FTNodeItem;
 import org.basex.query.xquery.iter.FTNodeIter;
-import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Err;
 
 /**
@@ -46,7 +44,7 @@ public final class FTSelectIndex extends FTExpr {
   }
 
   @Override
-  public Iter iter(final XQContext ctx) {
+  public FTNodeIter iter(final XQContext ctx) {
     final FTPos tmp = ctx.ftpos;
 
     return new FTNodeIter() {
@@ -54,12 +52,12 @@ public final class FTSelectIndex extends FTExpr {
       public FTNodeItem next() throws XQException {
         ctx.ftpos = pos;
         pos.init(ctx.ftitem);
-        FTNodeItem it = (FTNodeItem) ctx.iter(expr[0]).next();
+        FTNodeItem it = expr[0].iter(ctx).next();
         if (ctx.ftpos != null) {
           if (it.ftn.size > 0) {
             init(it);
             while (!posFilter()) {
-              it = (FTNodeItem) ctx.iter(expr[0]).next();
+              it = expr[0].iter(ctx).next();
               if(it.ftn.size == 0) {
                 ctx.ftpos = tmp;
                 return it;

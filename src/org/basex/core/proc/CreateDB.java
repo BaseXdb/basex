@@ -4,7 +4,6 @@ import static org.basex.Text.*;
 import static org.basex.core.Commands.*;
 import java.io.IOException;
 import javax.xml.transform.sax.SAXSource;
-
 import org.basex.build.BuildException;
 import org.basex.build.DiskBuilder;
 import org.basex.build.MemBuilder;

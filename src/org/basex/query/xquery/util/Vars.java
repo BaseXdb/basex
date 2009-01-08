@@ -35,9 +35,7 @@ public final class Vars extends ExprInfo {
    * @return variable
    */
   public Var get(final Var v) {
-    for(int s = size - 1; s >= 0; s--) {
-      if(v == vars[s] || v.name.eq(vars[s].name)) return vars[s];
-    }
+    for(int s = size - 1; s >= 0; s--) if(v.eq(vars[s])) return vars[s];
     return null;
   }
 

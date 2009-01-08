@@ -3,7 +3,6 @@ package org.basex.gui.layout;
 import static org.basex.Text.*;
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;

@@ -83,7 +83,7 @@ public class Step extends Preds {
     // Numeric value
     final boolean num = pred[0].i() && ((Item) pred[0]).n();
     // Multiple Predicates or POS
-    if(pred.length > 1 || !last && !num && uses(Using.POS)) return this;
+    if(pred.length > 1 || !last && !num && usesPos()) return this;
     // Use iterative evaluation
     return new IterStep(axis, test, pred, last, num);
   }

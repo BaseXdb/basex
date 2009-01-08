@@ -176,7 +176,7 @@ public final class CmpG extends Arr {
     ic.iu = false;
 
     // accept only location path, string and equality expressions
-    final Step s = indexStep(expr);
+    final Step s = indexStep(expr[0]);
     if(s == null || cmp != Comp.EQ || !(expr[1] instanceof Str) &&
         !(expr[1] instanceof Seq)) return;
 
@@ -256,12 +256,12 @@ public final class CmpG extends Arr {
    * @param expr expression arguments
    * @return result of check
    */
-  static Step indexStep(final Expr[] expr) {
+  static Step indexStep(final Expr expr) {
     // check if index can be applied
-    if(!(expr[0] instanceof AxisPath)) return null;
+    if(!(expr instanceof AxisPath)) return null;
     
     // accept only single axis steps as first expression
-    final AxisPath path = (AxisPath) expr[0];
+    final AxisPath path = (AxisPath) expr;
     if(path.root != null) return null;
     //if(path.root != null || path.step.length != 1) return null;
 

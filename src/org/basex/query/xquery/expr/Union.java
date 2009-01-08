@@ -28,16 +28,12 @@ public final class Union extends Arr {
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
     final NodeBuilder nb = new NodeBuilder(false);
-
     for(final Expr e : expr) {
       final Iter iter = ctx.iter(e);
       Item it;
       while((it = iter.next()) != null) {
         if(!it.node()) Err.nodes(this);
-        final Nod node = (Nod) it;
-        int i = -1;
-        while(++i < nb.size) if(CmpN.Comp.EQ.e(nb.list[i], node)) break;
-        if(i == nb.size) nb.add(node);
+        nb.add((Nod) it);
       }
     }
     return nb.iter();
@@ -46,12 +42,11 @@ public final class Union extends Arr {
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
     super.comp(ctx);
+    final int el = expr.length;
     for(int e = 0; e != expr.length; e++) {
-      if(expr[e].e()) {
-        ctx.compInfo(OPTEMPTY, this);
-        expr = Array.delete(expr, e--);
-      }
+      if(expr[e].e()) expr = Array.delete(expr, e--);
     }
+    if(el != expr.length) ctx.compInfo(OPTEMPTY);
     return this;
   }
   

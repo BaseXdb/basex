@@ -11,7 +11,6 @@ import org.basex.query.FTOpt;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.FTNodeItem;
 import org.basex.query.xquery.iter.FTNodeIter;
-import org.basex.query.xquery.iter.Iter;
 
 /**
  * This expression retrieves the ids of indexed fulltext terms.
@@ -39,7 +38,7 @@ public final class FTIndex extends FTExpr {
   }
   
   @Override
-  public Iter iter(final XQContext ctx) {
+  public FTNodeIter iter(final XQContext ctx) {
     return new FTNodeIter() {
       public final FTOpt fto = ctx.ftopt;
 
@@ -54,7 +53,7 @@ public final class FTIndex extends FTExpr {
 
       /**
        * Evaluates the index access.
-       * @return boolean
+       * @return true if result was found
        */
       private boolean evalIter() {
         final FTTokenizer ft = new FTTokenizer();

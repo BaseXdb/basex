@@ -5,7 +5,6 @@ import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.FTNodeItem;
 import org.basex.query.xquery.iter.FTNodeIter;
-import org.basex.query.xquery.iter.Iter;
 import org.basex.util.IntList;
 
 /**
@@ -29,13 +28,12 @@ public final class FTMildNotIndex extends FTExpr {
   }
   
   @Override
-  public Iter iter(final XQContext ctx) {
+  public FTNodeIter iter(final XQContext ctx) {
     return new FTNodeIter(){
       @Override
       public FTNodeItem next() throws XQException { 
-        //final FTNodeItem n0 = (FTNodeItem) ctx.iter(expr[0]).next();
-        n0 = (n0 == null) ? (FTNodeItem) ctx.iter(expr[0]).next() : n0;
-        n1 = (n1 == null) ? (FTNodeItem) ctx.iter(expr[1]).next() : n1;
+        n0 = (n0 == null) ? expr[0].iter(ctx).next() : n0;
+        n1 = (n1 == null) ? expr[1].iter(ctx).next() : n1;
         if (n1.ftn.size == 0 || n0.ftn.size == 0) {
           final FTNodeItem tmp = n0;
           n0 = null;

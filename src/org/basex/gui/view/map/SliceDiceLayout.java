@@ -1,7 +1,6 @@
 package org.basex.gui.view.map;
 
 import java.util.ArrayList;
-
 import org.basex.build.fs.FSParser;
 import org.basex.data.Data;
 import org.basex.gui.GUI;

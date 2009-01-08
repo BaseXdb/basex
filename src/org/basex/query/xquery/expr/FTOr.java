@@ -3,9 +3,8 @@ package org.basex.query.xquery.expr;
 import org.basex.query.xquery.IndexContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
-import org.basex.query.xquery.item.Dbl;
-import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.iter.Iter;
+import org.basex.query.xquery.item.FTNodeItem;
+import org.basex.query.xquery.iter.FTNodeIter;
 import org.basex.query.xquery.util.Scoring;
 import org.basex.util.IntList;
 
@@ -30,13 +29,14 @@ public final class FTOr extends FTExpr {
   }
 
   @Override
-  public Iter iter(final XQContext ctx) throws XQException {
+  public FTNodeIter iter(final XQContext ctx) throws XQException {
     double d = 0;
-    for(final Expr e : expr) {
-      final Item it = ctx.iter(e).next();
-      if(it.bool()) d = Scoring.or(d, it.dbl());
+    for(final FTExpr e : expr) {
+      final FTNodeItem it = e.iter(ctx).next();
+      final double s = it.score();
+      if(s != 0) d = Scoring.or(d, s);
     }
-    return Dbl.get(d).iter();
+    return score(d);
   }
 
   @Override
@@ -49,7 +49,7 @@ public final class FTOr extends FTExpr {
       throws XQException {
     final IntList p = new IntList();
     final IntList n = new IntList();
-    int min = ic.is;
+    final int min = ic.is;
     int sum = 0;
 
     for (int i = 0; i < expr.length; i++) {
@@ -84,11 +84,11 @@ public final class FTOr extends FTExpr {
   }
   
   @Override
-  public Expr indexEquivalent(final XQContext ctx, final IndexContext ic)
+  public FTExpr indexEquivalent(final XQContext ctx, final IndexContext ic)
     throws XQException {
 
     for (int i = 0; i < expr.length; i++) {
-      expr[i] = (FTExpr) expr[i].indexEquivalent(ctx, ic);
+      expr[i] = expr[i].indexEquivalent(ctx, ic);
     }
     
     if (pex.length == 0) {

@@ -346,7 +346,7 @@ public abstract class W3CTS {
       final CachedOutput out = new CachedOutput();
       item = xq.eval(context.current());
       item.serialize(new XMLSerializer(out));
-      
+
       output = norm(out.finish());
     } catch(final QueryException ex) {
       error = ex.getMessage();

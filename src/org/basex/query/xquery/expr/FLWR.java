@@ -19,7 +19,6 @@ import org.basex.query.xquery.util.Var;
  * @author Christian Gruen
  */
 public final class FLWR extends FLWOR {
-
   /**
    * Constructor.
    * @param f variable inputs
@@ -94,9 +93,8 @@ public final class FLWR extends FLWOR {
    * Normalize Expressions. 
    * Tries to resolve expressions nested For Loops.
    * @return boolean true, if anything was normalized
-   * @throws XQException Exception
    */
-  boolean normalize() throws XQException {
+  boolean normalize() {
     boolean n = false;
       ForLet[] tmp = new ForLet[0];
       Step last = null;
@@ -183,10 +181,5 @@ public final class FLWR extends FLWOR {
       apt.step = Array.add(apt.step, s);
     }
     return expr instanceof FLWR ? ((FLWR) expr).optimize(apt, true) : apt;
-  }
-  
-  @Override
-  public String color() {
-    return "66FF66";
   }
 }

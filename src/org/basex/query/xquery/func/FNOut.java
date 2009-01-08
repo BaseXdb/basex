@@ -43,7 +43,7 @@ final class FNOut extends Fun {
         try {
           Err.or(new Object[] { code, num, msg });
         } catch(final XQException ex) {
-          if(al > 2) ex.item = new SeqIter(arg[2]).finish();
+          if(al > 2) ex.item = SeqIter.get(arg[2]).finish();
           throw ex;
         }
         BaseX.notexpected(); return null;

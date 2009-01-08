@@ -62,6 +62,16 @@ public final class SeqIter extends ResetIter implements Result {
 
   /**
    * Constructor.
+   * @param iter iterator
+   * @return iterator
+   * @throws XQException evaluation exception
+   */
+  public static SeqIter get(final Iter iter) throws XQException {
+    return iter instanceof SeqIter ? (SeqIter) iter : new SeqIter(iter);
+  }
+
+  /**
+   * Constructor.
    * @param it item array
    * @param s size
    * @return iterator
@@ -116,6 +126,11 @@ public final class SeqIter extends ResetIter implements Result {
 
   public void serialize(final Serializer ser) throws IOException {
     for(int c = 0; c < size && !ser.finished(); c++) serialize(ser, c);
+
+    // close temporary database references (data can only be serialized once)
+    for(int d = ctx.rootDocs; d < ctx.docs.length; d++) {
+      ctx.docs[d].data.close();
+    }
   }
 
   public void serialize(final Serializer ser, final int n) throws IOException {

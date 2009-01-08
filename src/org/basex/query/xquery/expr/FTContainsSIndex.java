@@ -21,19 +21,20 @@ public final class FTContainsSIndex extends FTContains {
   
   /**
    * Constructor.
-   * @param ex contains, select and optional ignore expression
+   * @param e contains, select and optional ignore expression
+   * @param fte fulltext expression
    */
-  FTContainsSIndex(final Expr... ex) {
-    super(ex);
+  public FTContainsSIndex(final Expr e, final FTExpr fte) {
+    super(e, fte);
   }
 
   @Override
   public Iter iter(final XQContext ctx) throws XQException {    
-    final Iter ir = ctx.iter(expr[0]);
+    final Iter ir = expr.iter(ctx);
     final FTTokenizer tmp = ctx.ftitem;
     ctx.ftitem = ft;
         
-    final FTNodeIter fti = (FTNodeIter) ctx.iter(expr[1]);
+    final FTNodeIter fti = ftexpr.iter(ctx);
     if(ftn == null) ftn = fti.next();
 
     double d = 0;
@@ -63,6 +64,6 @@ public final class FTContainsSIndex extends FTContains {
 
   @Override
   public String toString() {
-    return toString(" ftcontainsSI ");
+    return expr + " ftcontainsSI " + ftexpr;
   }
 }

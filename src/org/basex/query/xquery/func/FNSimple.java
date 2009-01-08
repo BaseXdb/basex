@@ -39,7 +39,7 @@ public final class FNSimple extends Fun {
         if(it == null || iter.next() != null) Err.or(EXONE);
         return it.iter();
       case ONEMORE:
-        final SeqIter seq = new SeqIter(iter);
+        final SeqIter seq = SeqIter.get(iter);
         if(seq.size < 1) Err.or(ONEMORE);
         return seq;
       case UNORDER:

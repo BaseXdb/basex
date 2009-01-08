@@ -402,7 +402,7 @@ public final class GUI extends JFrame {
       if(in.length() > i) {
         try {
           for(final Process p : new CommandParser(in.substring(i)).parse()) {
-            if(!exec(p)) break;
+            if(!exec(p, true)) break;
           }
         } catch(final QueryException ex) {
           final boolean db = context.db();
@@ -414,8 +414,14 @@ public final class GUI extends JFrame {
         }
       }
     } else {
-      execute(new XPath(GUIProp.searchmode == 1 ? in :
-        Find.find(in, context, GUIProp.filterrt)));
+      if(View.working) return;
+      new Action() {
+        public void run() {
+          if(GUIProp.searchmode == 1) exec(new XPath(in), true);
+          exec(new XQuery(Find.find(in, context, GUIProp.filterrt)), true);
+        }
+      }.execute();
+      
     }
   }
   
@@ -426,7 +432,7 @@ public final class GUI extends JFrame {
   public void execute(final Process pr) {
     if(View.working) return;
     new Action() {
-      public void run() { exec(pr); }
+      public void run() { exec(pr, false); }
     }.execute();
   }
   
@@ -434,7 +440,6 @@ public final class GUI extends JFrame {
   private int threadID;
   /** Current process. */
   private Process proc;
-
 
   /**
    * Stops the current process.
@@ -444,14 +449,14 @@ public final class GUI extends JFrame {
     cursor(CURSORARROW, true);
     proc = null;
   }
-
   
   /**
    * Launches the specified process.
    * @param pr process to be launched
+   * @param main call from the main window
    * @return success flag
    */
-  public boolean exec(final Process pr) {
+  public boolean exec(final Process pr, final boolean main) {
     final int thread = ++threadID;
 
     // wait when command is still running
@@ -473,6 +478,7 @@ public final class GUI extends JFrame {
 
       // execute command
       final boolean ok = pr.execute(context);
+
       if(!ok && pr.info().length() == 0) {
         proc = null;
         return false;
@@ -500,8 +506,8 @@ public final class GUI extends JFrame {
       }
 
       // check if query feedback was processed in the query view
-      final boolean feedback = data != null && GUIProp.showquery &&
-        query.info(pr instanceof XQuery ? inf : null, ok);
+      final boolean feedback = main || data != null &&
+        GUIProp.showquery && query.info(pr instanceof XQuery ? inf : null, ok);
 
       if(!ok) {
         // show error info

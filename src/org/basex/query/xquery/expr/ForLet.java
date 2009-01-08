@@ -17,7 +17,12 @@ public abstract class ForLet extends Expr {
   protected Var var;
 
   @Override
-  public String color() {
+  public boolean usesVar(final Var v) {
+    return v == null || !v.eq(var);
+  }
+  
+  @Override
+  public final String color() {
     return "66CC66";
   }
   
