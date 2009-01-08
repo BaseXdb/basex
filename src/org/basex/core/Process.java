@@ -9,7 +9,7 @@ import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
-import org.basex.query.xpath.XPathProcessor;
+import org.basex.query.xquery.XQueryProcessor;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 
@@ -171,7 +171,7 @@ public abstract class Process extends AbstractProcess {
   }
 
   /**
-   * Performs the specified XPath query.
+   * Performs the specified XQuery.
    * @param q query to be performed
    * @param err if this string is specified, it is thrown if the results
    * don't yield element nodes
@@ -179,7 +179,7 @@ public abstract class Process extends AbstractProcess {
    */
   protected final Nodes query(final String q, final String err) {
     try {
-      final XPathProcessor qu = new XPathProcessor(q == null ? "" : q);
+      final XQueryProcessor qu = new XQueryProcessor(q == null ? "" : q);
       progress(qu);
       final Nodes nodes = qu.queryNodes(context.current());
       // check if all result nodes are tags

@@ -35,17 +35,23 @@ public abstract class Parser {
    * Returns a compact description of the current progress.
    * @return progress information
    */
-  public abstract String head();
+  public String head() {
+    return "";
+  }
 
   /**
    * Returns detailed progress information.
    * @return position info
    */
-  public abstract String det();
+  public String det() {
+    return "";
+  }
 
   /**
    * Returns a value from 0 to 1, representing the current progress.
    * @return progress information
    */
-  public abstract double prog();
+  public double prog() {
+    return 0;
+  }
 }

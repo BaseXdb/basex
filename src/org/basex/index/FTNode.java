@@ -4,7 +4,7 @@ import org.basex.util.Array;
 import org.basex.util.IntList;
 
 /**
- * XPath Value representing a full-text Node.
+ * Full-text Node.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Sebastian Gath
@@ -15,7 +15,7 @@ public final class FTNode {
   /** Pre value of the current node. */
   private int pre;
   /** Pointer for idpos - each idpos has a pointer at
-   * its search string position in the xpath query.
+   * its search string position in the query.
    * poi[0] = max. max pointer value in poi */
   public IntList p;
   /** Counter for pos values. */

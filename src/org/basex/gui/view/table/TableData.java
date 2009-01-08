@@ -4,7 +4,7 @@ import static org.basex.util.Token.*;
 import org.basex.build.fs.FSText;
 import org.basex.core.Context;
 import org.basex.core.proc.Find;
-import org.basex.core.proc.XPath;
+import org.basex.core.proc.XQuery;
 import org.basex.data.Data;
 import org.basex.data.DataText;
 import org.basex.data.Nodes;
@@ -339,11 +339,11 @@ final class TableData {
       names.add(col.name);
       elems.add(col.elem);
     }
-    final String xpath = Find.findTable(filters, names, elems,
+    final String query = Find.findTable(filters, names, elems,
         data.tags.key(root), data, GUIProp.filterrt || r);
-    if(xpath.equals(last)) return;
-    last = xpath;
-    GUI.get().execute(new XPath(xpath.length() != 0 ? xpath : "/"));
+    if(query.equals(last)) return;
+    last = query;
+    GUI.get().execute(new XQuery(query.length() != 0 ? query : "/"));
   }
 
   /**

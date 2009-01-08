@@ -36,7 +36,7 @@ public abstract class Preds extends Expr {
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
     for(int p = 0; p < pred.length; p++) {
-      Expr ex = addPos(ctx, pred[p].comp(ctx));
+      Expr ex = pred[p].comp(ctx);
       if(ex instanceof CmpG) {
         final CmpG cmp = (CmpG) ex;
         if(cmp.expr[0] instanceof Fun && ((Fun) cmp.expr[0]).func == FunDef.POS

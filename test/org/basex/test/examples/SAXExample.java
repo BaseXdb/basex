@@ -45,9 +45,9 @@ public final class SAXExample extends DefaultHandler {
     new Check(XMLFILE).execute(ctx, null);
     
     // create query instance
-    final QueryProcessor xpath = new XQueryProcessor(QUERY);
+    final QueryProcessor query = new XQueryProcessor(QUERY);
     // execute query
-    final Result result = xpath.query(ctx.current());
+    final Result result = query.query(ctx.current());
 
     // create XML reader
     final XMLReader reader = new SAXSerializer(result);

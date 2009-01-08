@@ -1,6 +1,7 @@
 package org.basex.query;
 
 import static org.basex.Text.*;
+
 import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.data.Nodes;
@@ -71,6 +72,18 @@ public abstract class QueryProcessor extends Progress {
   public final Result query(final Nodes n) throws QueryException {
     if(!compiled) compile(n);
     return context.eval(n);
+  }
+
+  /**
+   * Parses the specified query and returns the result nodes.
+   * @param nodes node context
+   * @return result of query
+   * @throws QueryException query exception
+   */
+  public final Nodes queryNodes(final Nodes nodes) throws QueryException {
+    final Result res = query(nodes);
+    if(!(res instanceof Nodes)) throw new QueryException(QUERYNODESERR);
+    return (Nodes) res;
   }
   
   /**

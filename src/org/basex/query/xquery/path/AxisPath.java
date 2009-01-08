@@ -163,6 +163,8 @@ public class AxisPath extends Path {
       int minp = 0;
 
       for(int p = 0; p < stp.pred.length; p++) {
+        //System.out.println(stp.pred[p] + ": " + stp.pred[p].usesPos());
+        
         final IndexContext ic = new IndexContext(db.data, stp);
         stp.pred[p].indexAccessible(ctx, ic);
         if(ic.io && ic.iu) {
@@ -472,7 +474,6 @@ public class AxisPath extends Path {
   
   @Override
   public boolean usesPos() {
-    // recursive position tests necessary? if not, return false
     return usesPos(step);
   }
 

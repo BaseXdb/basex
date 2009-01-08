@@ -33,13 +33,13 @@ public final class InsertExample {
     // Inserts another document into the currently opened database
     // Type of insertion: fragment
     // Document to insert: input.xml
-    // Position to insert: 0 = end of specified XPath target
+    // Position to insert: 0 = end of specified XQuery target
     // Target nodes: insert after /html ...
     new Insert(CmdUpdate.FRAGMENT, "input.xml", "0", "/html").
       execute(context, out);
 
     // Serializes the database to show the result
-    new XPath("/").execute(context, out);
+    new XQuery("/").execute(context, out);
 
     // Closes the output stream
     out.close();

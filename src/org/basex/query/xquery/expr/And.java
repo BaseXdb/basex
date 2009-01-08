@@ -30,7 +30,6 @@ public final class And extends Arr {
   public Expr comp(final XQContext ctx) throws XQException {
     super.comp(ctx);
     for(int e = 0; e < expr.length; e++) {
-      expr[e] = addPos(ctx, expr[e]);
       if(!expr[e].i()) continue;
       
       if(!((Item) expr[e]).bool()) {

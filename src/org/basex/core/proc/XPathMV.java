@@ -11,9 +11,8 @@ import org.basex.data.XMLSerializer;
 import org.basex.io.NullOutput;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
-import org.basex.query.QueryProcessor;
-import org.basex.query.xpath.XPathProcessor;
 import org.basex.query.xpath.item.Nod;
+import org.basex.query.xquery.XQueryProcessor;
 import org.basex.util.Array;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
@@ -60,10 +59,10 @@ public final class XPathMV extends AQuery {
     long eval = 0;
     long fini = 0;
 
-    QueryProcessor qu = null;
+    XQueryProcessor qu = null;
     try {
       for(int i = 0; i < Prop.runs; i++) {
-        qu = new XPathProcessor(query);
+        qu = new XQueryProcessor(query);
         final Nodes nodes = context.current();
         progress(qu);
 
@@ -99,7 +98,7 @@ public final class XPathMV extends AQuery {
         ids = new IDSet();
         
         for(int n = 0; n < size; n++) {
-          // superordinate title found?
+          // super-ordinate title found?
           int pre = data.parent(pres[n], data.kind(pres[n]));
           final boolean s = data.tagID(pre) == medid;
           if(!s) pre = pres[n];

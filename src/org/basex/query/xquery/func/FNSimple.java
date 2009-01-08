@@ -60,13 +60,10 @@ public final class FNSimple extends Fun {
       case FALSE:
         return Bln.FALSE;
       case EMPTY:
-        args[0] = addPos(ctx, args[0]);
         return it != null ? Bln.FALSE : e ? Bln.TRUE : this;
       case EXISTS:
-        args[0] = addPos(ctx, args[0]);
         return it != null ? Bln.TRUE : e ? Bln.FALSE : this;
       case BOOL:
-        args[0] = addPos(ctx, args[0]);
         return it != null ? Bln.get(it.bool()) : e ? Bln.FALSE : this;
       case NOT:
         if(it != null) return Bln.get(!it.bool());
@@ -79,7 +76,6 @@ public final class FNSimple extends Fun {
             return f;
           }
         }
-        args[0] = addPos(ctx, args[0]);
         return this;
       case ZEROONE: return e || it != null ? args[0] : this;
       case EXONE:   return it != null ? args[0] : this;

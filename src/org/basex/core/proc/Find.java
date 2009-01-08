@@ -43,11 +43,11 @@ public final class Find extends AQuery {
   }
 
   /**
-   * Creates an XPath representation for the specified query.
+   * Creates an XQuery representation for the specified query.
    * @param query query
    * @param ctx context reference
    * @param root root flag
-   * @return XPath query
+   * @return query
    */
   public static String find(final String query, final Context ctx,
       final boolean root) {
@@ -103,11 +103,11 @@ public final class Find extends AQuery {
   }
 
   /**
-   * Creates an XPath representation for the specified file system query.
+   * Creates an XQuery representation for the specified file system query.
    * @param term query terms
    * @param context context
    * @param root root flag
-   * @return XPath
+   * @return query
    */
   private static String findFS(final String term, final Context context,
       final boolean root) {
@@ -216,14 +216,14 @@ public final class Find extends AQuery {
   }
 
   /**
-   * Creates an XPath representation for the specified table query.
+   * Creates an XQuery representation for the specified table query.
    * @param filter filter terms
    * @param cols filter columns
    * @param elem element flag
    * @param tag root tag
    * @param data data reference
    * @param root root flag
-   * @return XPath xpath expression
+   * @return query
    */
   public static String findTable(final StringList filter, final TokenList cols,
       final BoolList elem, final byte[] tag, final Data data,

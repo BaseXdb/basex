@@ -16,7 +16,7 @@ public class BXNList implements NodeList {
   /** XQuery node set. */
   protected NodeBuilder xquery;
   /** XPath node set. */
-  protected Nod xpath;
+  protected Nod nodes;
   
   /**
    * Constructor.
@@ -31,7 +31,7 @@ public class BXNList implements NodeList {
    * @param ns node set
    */
   public BXNList(final Nod ns) {
-    xpath = ns;
+    nodes = ns;
   }
   
   public final Node item(final int i) {
@@ -39,12 +39,12 @@ public class BXNList implements NodeList {
     if(xquery != null) {
       if(i < xquery.size) n = xquery.list[i];
     } else {
-      if(i < xpath.size) n = new DBNode(xpath.data, xpath.nodes[i]);
+      if(i < nodes.size) n = new DBNode(nodes.data, nodes.nodes[i]);
     }
     return n != null ? n.java() : null;
   }
 
   public final int getLength() {
-    return xquery != null ? xquery.size : xpath.size;
+    return xquery != null ? xquery.size : nodes.size;
   }
 }

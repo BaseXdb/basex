@@ -10,7 +10,7 @@ import org.basex.core.proc.Close;
 import org.basex.core.proc.CreateDB;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.query.xpath.XPathProcessor;
+import org.basex.query.xquery.XQueryProcessor;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -77,7 +77,7 @@ public final class XMLTS {
     BaseX.outln("\nXML Conformance Tests\n");
     BaseX.outln("file = (expected result) -> BaseX result");
 
-    for(final int t : nodes("//TEST", root).nodes) {
+    for(final int t : nodes("//*:TEST", root).nodes) {
       final Nodes srcRoot = new Nodes(t, data);
       final String uri = text("@URI", srcRoot);
       final boolean valid = text("@TYPE", srcRoot).equals("valid");
@@ -113,22 +113,7 @@ public final class XMLTS {
   }
 
   /**
-   * Returns the resulting query nodes.
-   * Adds a "ts:" prefix due to the missing XPath namespaces support.
-   * @param qu query
-   * @param root root node
-   * @return attribute value
-   * @throws Exception exception
-   */
-  private Nodes nodes(final String qu, final Nodes root) throws Exception {
-    final Nodes n = new XPathProcessor(qu).queryNodes(root);
-    return n.size != 0 || qu.startsWith("@") ? n :
-      new XPathProcessor("ts:" + qu).queryNodes(root);
-  }
-
-  /**
    * Returns the resulting query text (text node or attribute value).
-   * Adds a "ts:" prefix due to the missing XPath namespaces support.
    * @param qu query
    * @param root root node
    * @return attribute value
@@ -142,5 +127,16 @@ public final class XMLTS {
       sb.add(data.atom(n.nodes[i]));
     }
     return sb.toString();
+  }
+
+  /**
+   * Returns the resulting query nodes.
+   * @param qu query
+   * @param root root node
+   * @return attribute value
+   * @throws Exception exception
+   */
+  private Nodes nodes(final String qu, final Nodes root) throws Exception {
+    return new XQueryProcessor(qu).queryNodes(root);
   }
 }

@@ -11,7 +11,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import org.basex.core.proc.Find;
-import org.basex.core.proc.XPath;
+import org.basex.core.proc.XQuery;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.StatsKey;
@@ -29,7 +29,6 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.index.Names;
-import org.basex.query.xpath.func.ContainsLC;
 import org.basex.util.StringList;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -47,7 +46,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
   /** Exact search pattern. */
   private static final String PATEX = "[% = \"%\"]";
   /** Substring search pattern. */
-  private static final String PATSUB = "[" + ContainsLC.NAME + "(%, \"%\")]";
+  private static final String PATSUB = "[basex:containslc(%, \"%\")]";
   /** Numeric search pattern. */
   private static final String PATNUM = "[% >= % and % <= %]";
   /** Simple search pattern. */
@@ -365,7 +364,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     last = qu;
     BaseXLayout.enable(copy, last.length() != 0);
     BaseXLayout.enable(stop, true);
-    GUI.get().execute(new XPath(qu));
+    GUI.get().execute(new XQuery(qu));
   }
 
   @Override

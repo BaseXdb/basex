@@ -10,7 +10,6 @@ import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
-import org.basex.query.xquery.path.AxisPath;
 import org.basex.query.xquery.util.Err;
 import org.basex.query.xquery.util.Var;
 
@@ -190,15 +189,5 @@ public abstract class Expr extends ExprInfo {
   protected Item atomic(final XQContext ctx, final Expr ex, final boolean e)
       throws XQException {
     return i() ? (Item) ex : ctx.iter(ex).atomic(this, e);
-  }
-
-  /**
-   * If possible, adds a position predicate to the specified expression.
-   * @param ex expression
-   * @param ctx query context
-   * @return resulting expression
-   */
-  protected final Expr addPos(final XQContext ctx, final Expr ex) {
-    return ex instanceof AxisPath ? ((AxisPath) ex).addPos(ctx) : ex;
   }
 }

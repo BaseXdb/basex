@@ -562,21 +562,6 @@ public final class MAB2Parser extends Parser {
     return text1 == null ? text2 : concat(text1, token(". "), text2);
   }
 
-  @Override
-  public String head() {
-    return "Convert MAB2 data...";
-  }
-
-  @Override
-  public String det() {
-    return "Converting...";
-  }
-
-  @Override
-  public double prog() {
-    return 0;
-  }
-
   /**
    * Fills the specified hash with the file input.
    * @param hash hash to be filled.

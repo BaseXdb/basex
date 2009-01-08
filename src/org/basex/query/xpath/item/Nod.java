@@ -105,7 +105,6 @@ public final class Nod extends Item {
     pos = p;
     poi = po;
   }
-
   
   /**
    * Sets a single node.

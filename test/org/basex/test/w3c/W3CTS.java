@@ -27,7 +27,6 @@ import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
-import org.basex.query.xpath.XPathProcessor;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQTokens;
 import org.basex.query.xquery.XQueryProcessor;
@@ -192,10 +191,10 @@ public abstract class W3CTS {
 
     final Nodes root = new Nodes(0, data);
     BaseX.outln("\nBaseX vs. XQuery Test Suite " +
-        text("/test-suite/@version", root));
+        text("/*:test-suite/@version", root));
 
     BaseX.outln("\nCaching Sources...");
-    for(final int s : nodes("//source", root).nodes) {
+    for(final int s : nodes("//*:source", root).nodes) {
       final Nodes srcRoot = new Nodes(s, data);
       final String source = (path +
           text("@FileName", srcRoot)).replace('\\', '/');
@@ -203,7 +202,7 @@ public abstract class W3CTS {
     }
 
     BaseX.outln("Caching Modules...");
-    for(final int s : nodes("//module", root).nodes) {
+    for(final int s : nodes("//*:module", root).nodes) {
       final Nodes srcRoot = new Nodes(s, data);
       final String module = (path +
           text("@FileName", srcRoot)).replace('\\', '/');
@@ -211,12 +210,12 @@ public abstract class W3CTS {
     }
 
     BaseX.outln("Caching Collections...");
-    for(final int c : nodes("//collection", root).nodes) {
+    for(final int c : nodes("//*:collection", root).nodes) {
       final Nodes nodes = new Nodes(c, data);
       final String cname = text("@ID", nodes);
 
       final TokenList dl = new TokenList();
-      final Nodes doc = nodes("input-document", nodes);
+      final Nodes doc = nodes("*:input-document", nodes);
       for(int d = 0; d < doc.size; d++) {
         dl.add(token(sources + string(data.atom(doc.nodes[d])) + IO.XMLSUFFIX));
       }
@@ -229,7 +228,7 @@ public abstract class W3CTS {
     }
 
     BaseX.out("Parsing Queries");
-    final Nodes nodes = nodes("//test-case | //ts:test-case", root);
+    final Nodes nodes = nodes("//*:test-case", root);
     for(int t = 0; t < nodes.size; t++) {
       if(!parse(new Nodes(nodes.nodes[t], data))) break;
       if(t % 1000 == 0) BaseX.out(".");
@@ -300,7 +299,7 @@ public abstract class W3CTS {
   private boolean parse(final Nodes root) throws Exception {
     final String pth = text("@FilePath", root);
     final String outname = text("@name", root);
-    String inname = text("query/@name", root);
+    String inname = text("*:query/@name", root);
     if(inname == null) inname = outname;
     if(verbose) BaseX.outln(inname);
 
@@ -323,21 +322,21 @@ public abstract class W3CTS {
       final Context context = new Context();
 
       final XQueryProcessor xq = new XQueryProcessor(in, file);
-      final Nodes cont = nodes("contextItem", root);
+      final Nodes cont = nodes("*:contextItem", root);
       if(cont.size != 0) new Check(sources + string(data.atom(cont.nodes[0])) +
           IO.XMLSUFFIX).execute(context, null);
 
       final XQContext ctx = xq.ctx;
-      files.add(file(nodes("input-file", root),
-          nodes("input-file/@variable", root), ctx));
-      files.add(file(nodes("input-URI", root),
-          nodes("input-URI/@variable", root), ctx));
-      files.add(file(nodes("defaultCollection", root), null, ctx));
+      files.add(file(nodes("*:input-file", root),
+          nodes("*:input-file/@variable", root), ctx));
+      files.add(file(nodes("*:input-URI", root),
+          nodes("*:input-URI/@variable", root), ctx));
+      files.add(file(nodes("*:defaultCollection", root), null, ctx));
 
-      var(nodes("input-query/@name", root),
-          nodes("input-query/@variable", root), pth, ctx);
+      var(nodes("*:input-query/@name", root),
+          nodes("*:input-query/@variable", root), pth, ctx);
 
-      for(final int p : nodes("module", root).nodes) {
+      for(final int p : nodes("*:module", root).nodes) {
         final String ns = text("@namespace", new Nodes(p, data));
         final String f = modules.get(string(data.atom(p))) + ".xq";
         xq.module(ns, f);
@@ -369,8 +368,8 @@ public abstract class W3CTS {
       error = bw.toString();
     }
 
-    final Nodes outFiles = nodes("output-file/text()", root);
-    final Nodes cmpFiles = nodes("output-file/@compare", root);
+    final Nodes outFiles = nodes("*:output-file/text()", root);
+    final Nodes cmpFiles = nodes("*:output-file/@compare", root);
     final StringBuilder tb = new StringBuilder();
     for(int o = 0; o < outFiles.size; o++) {
       if(o != 0) tb.append(DELIM);
@@ -379,7 +378,7 @@ public abstract class W3CTS {
       tb.append(exp.exists() ? read(exp) : ("Not Found: " + exp));
     }
     String result = tb.toString();
-    String expError = text("expected-error/text()", root);
+    String expError = text("*:expected-error/text()", root);
 
     final StringBuilder log = new StringBuilder(pth + inname + ".xq");
     if(files.size != 0) {
@@ -632,7 +631,6 @@ public abstract class W3CTS {
 
   /**
    * Returns the resulting query text (text node or attribute value).
-   * Adds a "ts:" prefix due to the missing XPath namespaces support.
    * @param qu query
    * @param root root node
    * @return attribute value
@@ -650,16 +648,13 @@ public abstract class W3CTS {
 
   /**
    * Returns the resulting query nodes.
-   * Adds a "ts:" prefix due to the missing XPath namespaces support.
    * @param qu query
    * @param root root node
    * @return attribute value
    * @throws Exception exception
    */
   private Nodes nodes(final String qu, final Nodes root) throws Exception {
-    final Nodes n = new XPathProcessor(qu).queryNodes(root);
-    return n.size != 0 || qu.startsWith("@") ? n :
-      new XPathProcessor("ts:" + qu).queryNodes(root);
+    return new XQueryProcessor(qu).queryNodes(root);
   }
 
   /**
