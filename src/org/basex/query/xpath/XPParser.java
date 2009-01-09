@@ -377,6 +377,7 @@ public class XPParser extends QueryParser {
     final Preds preds = new Preds();
     consumeWS();
     while(curr('[')) {
+      checkStep(axis, test);
       preds.add(pred());
       consumeWS();
     }
