@@ -52,6 +52,7 @@ cleanup.use_this_for_non_static_method_access_only_if_necessary=true
 cleanup_profile=_EclipseModified
 cleanup_settings_version=2
 eclipse.preferences.version=1
+formatter_profile=_BaseX Formatter Profile
 formatter_settings_version=11
 org.eclipse.jdt.ui.ignorelowercasenames=true
 org.eclipse.jdt.ui.importorder=java;javax;org;com;
