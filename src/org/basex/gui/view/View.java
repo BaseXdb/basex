@@ -41,10 +41,6 @@ public abstract class View extends BaseXPanel {
   
   /** Currently focused node (pre value). */
   public static int focused = -1;
-  /** Current FTPrePos values. */
-  public static int[][] ftPos;
-  /** Current FTPointer on FTPrePos values. */
-  public static int[] ftPoi; 
   
 
   /**
@@ -77,8 +73,6 @@ public abstract class View extends BaseXPanel {
     }
     
     focused = -1;
-    ftPos = null;
-    ftPoi = null;
     hist = 0;
     maxhist = 0;
     for(final View v : view) v.refreshInit();
@@ -180,8 +174,7 @@ public abstract class View extends BaseXPanel {
     final GUI gui = GUI.get();
     final Context context = GUI.context;
     // [SG] find general solution - works only for zooming of the parent axis
-    final Nodes n = nodes.getAllMarked(context.marked()); 
-    // new Nodes(context.data());
+    final Nodes n = new Nodes(context.data());
 
     if(!quick) {
       final String input = gui.input.getText();

@@ -138,15 +138,28 @@ public final class FTTokenizer extends IndexToken {
 
   /**
    * Count number of tokens, sentences and paragraphs.
+   * [0] number of tokens
+   * [1] number of sentences
+   * [2] number of paragraphs
+   * [3] number of lines needed 
    * 
+   * @param ww width of a line in bytes
    * @return int[3]
    */
-  public int[] countSenPar() {
+  public int[] countSenPar(final int ww) {
     int lass = 0;
     int lasp = 0;
-    int[] c = new int[3]; 
+    int lw = 0; // width of a line
+    
+    int[] c = new int[4]; 
     init();
     while(more()) {
+      if (lw + p - s + 1 < ww) lw += p - s + 1;
+      else {
+        c[3]++;
+        lw = 0;
+      }
+      
       c[0]++;
       if (sent != lass) {
         c[1]++;
@@ -155,11 +168,14 @@ public final class FTTokenizer extends IndexToken {
       if (para != lasp) {
         c[2]++;
         lasp = para;
+        lw = 0;
+        c[3]++;
       }
     }
+    c[3]++;
     return c;
   }
-  
+ 
   /**
    * Returns the text size.
    * @return size

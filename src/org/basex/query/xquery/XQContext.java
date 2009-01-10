@@ -64,7 +64,7 @@ public final class XQContext extends QueryContext {
   public FTPos ftpos;
   /** Count number of FTIndex. */
   public int ftcount = 0;
-
+  
   /** Current Date. */
   public Dat date;
   /** Current DateTime. */

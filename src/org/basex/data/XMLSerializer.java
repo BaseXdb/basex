@@ -121,10 +121,10 @@ public final class XMLSerializer extends Serializer {
           if (lod && pp < pos.length && c == pos[pp]) {
             // write fulltext pointer in front of the token
             // used for coloring the token
-            pp++;
             out.write('&');
             out.write((byte) poi[pp]);
             out.write('&');
+            pp++;
           }
           out.write(ch);
       }

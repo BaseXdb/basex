@@ -4,10 +4,13 @@ import static org.basex.query.xquery.XQText.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.index.FTTokenizer;
+import org.basex.query.FTPos;
 import org.basex.query.xquery.IndexContext;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
+import org.basex.query.xquery.XQFTVisData;
 import org.basex.query.xquery.item.Bln;
+import org.basex.query.xquery.item.DBNode;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
@@ -15,6 +18,7 @@ import org.basex.query.xquery.path.AxisPath;
 import org.basex.query.xquery.path.Step;
 import org.basex.query.xquery.util.Scoring;
 import org.basex.query.xquery.util.Var;
+import org.basex.util.IntList;
 
 /**
  * FTContains expression.
@@ -56,7 +60,8 @@ public class FTContains extends Expr {
   public Iter iter(final XQContext ctx) throws XQException {    
     final Iter iter = expr.iter(ctx);
     final FTTokenizer tmp = ctx.ftitem;
-
+    final FTPos tmp2 = ctx.ftpos;
+    
     double d = 0;
     Item i;
     ctx.ftitem = ft;
@@ -64,6 +69,14 @@ public class FTContains extends Expr {
       ft.init(i.str());
       d = Scoring.and(d, ftexpr.iter(ctx).next().score());
     }
+    
+    if (ctx.ftpos != null) {
+      final IntList[] pos = ctx.ftpos.getPos();
+      if (pos.length > 0 && ctx.item instanceof DBNode) 
+        XQFTVisData.addConvSeqData(pos, ((DBNode) (ctx.item)).pre);
+    }
+    
+    ctx.ftpos = tmp2;
     ctx.ftitem = tmp;
     return Bln.get(d).iter();
   }

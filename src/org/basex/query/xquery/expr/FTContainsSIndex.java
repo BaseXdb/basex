@@ -3,12 +3,12 @@ package org.basex.query.xquery.expr;
 import org.basex.index.FTTokenizer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
+import org.basex.query.xquery.XQFTVisData;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.DBNode;
 import org.basex.query.xquery.item.FTNodeItem;
 import org.basex.query.xquery.iter.FTNodeIter;
 import org.basex.query.xquery.iter.Iter;
-import org.basex.util.IntList;
 
 /**
  * Sequential FTContains expression with index access.
@@ -60,10 +60,11 @@ public final class FTContainsSIndex extends FTContains {
       }
     }
     ctx.ftitem = tmp;
-    if (Bln.get(d).bool() && ftn != null && ctx.ftpos != null) {
-      final IntList[] pos =  ftn.ftn.convertPos();
-      ctx.ftpos.setPos(ftn.ftn.convertPos(), pos.length);
-    }
+
+    if (Bln.get(d).bool() && ftn != null && ctx.ftpos != null &&
+        ftn.ftn.ip != null && ftn.ftn.p !=  null)  
+        XQFTVisData.add(ftn.ftn.ip.finish(), ftn.ftn.p.finish());
+    
     return Bln.get(d).iter();
   }
 

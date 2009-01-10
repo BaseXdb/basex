@@ -24,10 +24,6 @@ public final class Nod extends Item {
   public Data data;
   /** Number of stored values. */
   public int size;
-  /** Position values correspond to nodes. */
-  public int[][] pos;
-  /** Pointer values correspond to nodes. */
-  public int[][] poi;
 
   /** Current node set position. */
   public int currPos;
@@ -43,25 +39,7 @@ public final class Nod extends Item {
     data = ctx.item.data;
     nodes = ids;
     size = ids.length;
-    pos = null;
   }
-
-  /**
-   * Constructor, creating a new node set from the specified node ids.
-   * @param ids node ids
-   * @param p position values
-   * @param po postion pointer values
-   * @param ctx query context
-   */
-  public Nod(final int[] ids, final int[][] p, final int[][] po, 
-      final XPContext ctx) {
-    data = ctx.item.data;
-    nodes = ids;
-    size = ids.length;
-    pos = p;
-    poi = po;
-  }
-
   
   /**
    * Constructor, creating an empty node set.
@@ -88,25 +66,9 @@ public final class Nod extends Item {
     nodes = ids;
     size = ids.length;
     data = d;
-    pos = null;
   }
 
-  /**
-   * Constructor, creating a new node set from the specified node ids.
-   * @param ids node ids
-   * @param p position values
-   * @param po position pointer values
-   * @param d data reference
-   */
-  public Nod(final int[] ids, final int[][] p, final int[][] po, final Data d) {
-    nodes = ids;
-    size = ids.length;
-    data = d;
-    pos = p;
-    poi = po;
-  }
-  
-  /**
+ /**
    * Sets a single node.
    * @param pre node to be set.
    */

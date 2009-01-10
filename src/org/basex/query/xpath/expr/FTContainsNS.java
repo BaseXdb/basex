@@ -64,7 +64,7 @@ public final class FTContainsNS extends Arr {
       pos.add(ftn.getPos());
       poi.add(ftn.getPoi());
     }
-    ctx.item = new Nod(il.finish(), pos.finish(), poi.finish(), ctx);
+    ctx.item = new Nod(il.finish(), ctx);
     ctx.ftitem = tmp;
     ctx.iu = iu;
     return ctx.item;

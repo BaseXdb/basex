@@ -37,7 +37,6 @@ import org.basex.core.Context;
 import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.core.proc.Find;
-import org.basex.core.proc.XPath;
 import org.basex.core.proc.XQuery;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
@@ -417,7 +416,7 @@ public final class GUI extends JFrame {
       if(View.working) return;
       new Action() {
         public void run() {
-          if(GUIProp.searchmode == 1) exec(new XPath(in), true);
+          if(GUIProp.searchmode == 1) //exec(new XPath(in), true);
           exec(new XQuery(Find.find(in, context, GUIProp.filterrt)), true);
         }
       }.execute();

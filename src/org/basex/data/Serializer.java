@@ -4,6 +4,7 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.io.IO;
 import org.basex.query.ExprInfo;
+import org.basex.query.xquery.XQFTVisData;
 import org.basex.util.Atts;
 import org.basex.util.TokenList;
 
@@ -214,7 +215,7 @@ public abstract class Serializer {
     inTag = false;
     finish();
   }
-
+  
   /**
    * Serializes a node of the specified data reference.
    * @param data data reference
@@ -223,20 +224,6 @@ public abstract class Serializer {
    * @throws IOException exception
    */
   public final int node(final Data data, final int pre) throws IOException {
-    return node(data, pre, null, null); 
-  }
-  
-  /**
-   * Serializes a node of the specified data reference.
-   * @param data data reference
-   * @param pre pre value to start from
-   * @param pos int[] fulltext position values
-   * @param poi int[] fulltext pointer values
-   * @return last pre value
-   * @throws IOException exception
-   */
-  public final int node(final Data data, final int pre, final int[] pos, 
-      final int[] poi) throws IOException {
     /** Namespaces. */
     final Atts nsp = new Atts();
     /** Parent Stack. */
@@ -261,7 +248,9 @@ public abstract class Serializer {
       if(k == Data.DOC) {
         p++;
       } else if(k == Data.TEXT) {
-        if (pos != null && poi != null) text(data.text(p++), pos, poi);
+        final int[][] ftd = XQFTVisData.get(p);
+        if (ftd != null) 
+          text(data.text(p++), ftd[0], ftd[1]);
         else text(data.text(p++));
       } else if(k == Data.COMM) {
         comment(data.text(p++));

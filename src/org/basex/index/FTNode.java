@@ -11,7 +11,7 @@ import org.basex.util.IntList;
  */
 public final class FTNode {
   /** Fulltext data for a node. */
-  private IntList ip;
+  public IntList ip;
   /** Pre value of the current node. */
   private int pre;
   /** Pointer for idpos - each idpos has a pointer at

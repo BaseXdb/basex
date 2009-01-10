@@ -7,6 +7,7 @@ import org.basex.core.Prop;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.data.Serializer;
+import org.basex.query.xquery.XQFTVisData;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -70,6 +71,9 @@ public abstract class QueryProcessor extends Progress {
    * @throws QueryException query exception
    */
   public final Result query(final Nodes n) throws QueryException {
+    // [CG] maybe theres an other spot, where we could place this job
+    XQFTVisData.init();
+
     if(!compiled) compile(n);
     return context.eval(n);
   }

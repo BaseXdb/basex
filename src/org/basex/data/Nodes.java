@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import org.basex.BaseX;
 import org.basex.core.Context;
-import org.basex.util.Array;
-import org.basex.util.IntArrayList;
 import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
 
@@ -24,10 +22,6 @@ public final class Nodes implements Result {
   public Data data;
   /** Number of stored nodes. */
   public int size;
-  /** Fulltext position values. */
-  public int[][] pos;
-  /** Fulltext position pointer. */
-  public int[][] poi;
   
   /**
    * Node Set constructor.
@@ -52,24 +46,10 @@ public final class Nodes implements Result {
    * @param d data reference
    */
   public Nodes(final int[] n, final Data d) {
-    this (n, d, null, null);
-  }
-
-  /**
-   * Node Set constructor.
-   * @param n node set
-   * @param d data reference
-   * @param po ftpos values
-   * @param pi fulltext position pointer
-   */
-  public Nodes(final int[] n, final Data d, final int[][] po, 
-      final int[][] pi) {
-    if(d == null) BaseX.notexpected("No data available");
+     if(d == null) BaseX.notexpected("No data available");
     nodes = n;
     size = n.length;
     data = d;
-    pos = po;
-    poi = pi;
   }
 
   
@@ -141,37 +121,6 @@ public final class Nodes implements Result {
     }
     return c.finish();
   }
-
-  /**
-   * Get all marked nodes out of marked, which are in the current nodes.
-   * 
-   * @param marked marked nodes
-   * @return all marked nodes from this object
-   */
-  public Nodes getAllMarked(final Nodes marked) {
-    if (marked == null) return null;
-    if (nodes == null || nodes.length == 0) return marked;
-    final IntList pre = new IntList();
-    final IntArrayList posi = new IntArrayList();
-    final IntArrayList poin = new IntArrayList();
-    int n0 = 0, n1 = 0;
-    while (n0 < nodes.length && n1 < marked.nodes.length) {
-      if (nodes[n0] < marked.nodes[n1]) {
-        n0++;
-      } else if (nodes[n0] > marked.nodes[n1]) {
-        n1++;
-      } else {
-        pre.add(marked.nodes[n1]);
-        posi.add(marked.pos[n1]);
-        poin.add(marked.poi[n1++]);
-        n0++;
-      }
-    }
-    
-    return new Nodes(pre.finish(), marked.data, posi.finish(), poin.finish());
-    
-    
-  }
   
   /**
    * Subtracts the second from the first array.
@@ -205,14 +154,8 @@ public final class Nodes implements Result {
     final Nodes n = (Nodes) v;
     if(data != n.data) 
       return false;
-    final boolean ftd1 = n.poi != null && n.pos != null;
-    final boolean ftd2 = pos != null && poi != null;
     for(int c = 0; c < size; c++) 
-      //if(n.nodes[c] != nodes[c]) return false; 
-      if(n.nodes[c] != nodes[c] || ftd1 != ftd2 
-          || (ftd1 && !Array.eq(n.poi[c], poi[c]) 
-          && !Array.eq(n.pos[c], pos[c]))) 
-        return false;
+      if(n.nodes[c] != nodes[c]) return false; 
     return true;
   }
 
@@ -222,8 +165,7 @@ public final class Nodes implements Result {
 
   public void serialize(final Serializer ser, final int n) throws IOException {
     ser.openResult();
-    ser.node(data, nodes[n], pos != null ? pos[n] : null, 
-        poi != null ? poi[n] : null);
+    ser.node(data, nodes[n]);
     ser.closeResult();
   }
 

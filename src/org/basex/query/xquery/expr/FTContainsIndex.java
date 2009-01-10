@@ -6,11 +6,11 @@ import org.basex.data.Serializer;
 import org.basex.index.FTTokenizer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
+import org.basex.query.xquery.XQFTVisData;
 import org.basex.query.xquery.item.FTNodeItem;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
-import org.basex.util.IntList;
 
 /**
  * FTContains expression with index access.
@@ -38,9 +38,9 @@ public final class FTContainsIndex extends FTContains {
         ctx.ftitem = ft;
         final FTNodeItem it = ftexpr.iter(ctx).next();
         ctx.ftitem = tmp;
-        final IntList[] pos =  it.ftn.convertPos();
-        if (ctx.ftpos != null) 
-          ctx.ftpos.setPos(it.ftn.convertPos(), pos.length);
+        if (it.ftn.ip != null && it.ftn.p !=  null) { 
+          XQFTVisData.add(it.ftn.ip.finish(), it.ftn.p.finish());
+        }
         return it.score() == 0 ? null : it;
       }
     };

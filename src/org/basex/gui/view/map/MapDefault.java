@@ -12,6 +12,7 @@ import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.ViewRect;
 import org.basex.gui.view.ViewData;
+import org.basex.query.xquery.XQFTVisData;
 
 /**
  * Adds default paint operations to TreeMap.
@@ -51,7 +52,15 @@ final class MapDefault extends MapPainter {
       // draw rectangle
       Color col = nextMark(rects, pre, ri, rects.size());
       final boolean mark = col != null;
-
+      final int[][] ftd = XQFTVisData.get(pre);
+      if (ftd != null) {
+        r.pos = ftd[0];
+        r.poi = ftd[1];
+      } else {
+        r.pos = null;
+        r.poi = null;
+      }      
+      
       g.setColor(mark ? col : COLORS[lvl]);
       if(r.w < l.x + l.w || r.h < l.y + l.h || GUIProp.maplayout < 2 ||
           ViewData.isLeaf(data, pre)) {
@@ -76,7 +85,6 @@ final class MapDefault extends MapPainter {
 
       // skip drawing of string when left space is too small
       if(r.w < GUIProp.fontsize || r.h < GUIProp.fontsize) continue;
-
       r.thumb = drawRectangle(g, r.clone());
     }
   }
@@ -111,6 +119,7 @@ final class MapDefault extends MapPainter {
       final byte[] text = ViewData.content(data, pre, false);
       
       final int p = BaseXLayout.centerPos(g, text, rect.w);
+      
       if(p != -1) {
         rect.x += p;
         rect.y += (rect.h - GUIProp.fontsize) / 2 - 1;

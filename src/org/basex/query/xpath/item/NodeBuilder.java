@@ -75,27 +75,7 @@ public final class NodeBuilder {
     nodes[size++] = pre;
   }
   
-  /**
-   * Adds position and pointer values.
-   * 
-   * @param ps ftposition values
-   * @param pi ftpointer values
-   */
-  public void addPosPoiToLastPre(final int[] ps, final int[] pi) {
-    if (pos == null) {
-      pos = new int[1][];
-      pos[0] = ps;
-      poi = new int[1][];
-      poi[0] = pi;
-    } else {
-      if (size - 1 == pos.length) pos = Array.extend(pos);
-      if (size - 1 == poi.length) poi = Array.extend(poi);
-      poi[size - 1] = pi;
-      pos[size - 1] = ps;
-    }
-  }
-
-  /**
+   /**
    * Adds a pre value to the node set.
    * @param pre value to be added.
    * @param po posvalues for pre values
