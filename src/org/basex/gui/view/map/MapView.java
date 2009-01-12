@@ -125,7 +125,7 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public void refreshFocus() {
-    if(mainRects == null || working) return;
+    if(mainRects == null || updating) return;
     if(focused == -1 && focusedRect != null) focusedRect = null;
 
     final ViewRect m = focusedRect;
@@ -186,7 +186,7 @@ public final class MapView extends View implements Runnable {
    * @param quick context switch (no animation)
    */
   private void zoom(final boolean more, final boolean quick) {
-    working = !quick;
+    updating = !quick;
     zoomIn = more;
 
     // choose zooming rectangle
@@ -213,7 +213,7 @@ public final class MapView extends View implements Runnable {
         Math.log(128 * getHeight() / mainRect.h));
 
     if(quick) {
-      working = false;
+      updating = false;
       focus();
       repaint();
     } else {
@@ -239,7 +239,7 @@ public final class MapView extends View implements Runnable {
 
     // remove old rectangle and repaint map
     zoomStep = 0;
-    working = false;
+    updating = false;
     focus();
     repaint();
   }
@@ -249,7 +249,7 @@ public final class MapView extends View implements Runnable {
    * @return focused rectangle
    */
   private boolean focus() {
-    if(working || mainRects == null) return false;
+    if(updating || mainRects == null) return false;
 
     /* Loop through all rectangles. As the rectangles are sorted by pre
      * order and small rectangles are descendants of bigger ones, the
@@ -509,7 +509,7 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public void mouseMoved(final MouseEvent e) {
-    if(working) return;
+    if(updating) return;
     super.mouseMoved(e);
     // refresh mouse focus
     mouseX = e.getX();
@@ -519,7 +519,7 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public void mouseClicked(final MouseEvent e) {
-    if(working) return;
+    if(updating) return;
     final boolean left = SwingUtilities.isLeftMouseButton(e);
     if(!left || focusedRect == null) return;
 
@@ -529,7 +529,7 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public void mousePressed(final MouseEvent e) {
-    if(working) return;
+    if(updating) return;
     super.mousePressed(e);
     mouseX = e.getX();
     mouseY = e.getY();
@@ -558,7 +558,7 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public void mouseDragged(final MouseEvent e) {
-    if(working || ++dragTol < 8) return;
+    if(updating || ++dragTol < 8) return;
 
     // refresh mouse focus
     int mx = mouseX;
@@ -585,7 +585,7 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public void mouseReleased(final MouseEvent e) {
-    if(working) return;
+    if(updating) return;
     if(selBox != null) {
       selBox = null;
       repaint();
@@ -594,7 +594,7 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
-    if(working || focused == -1) return;
+    if(updating || focused == -1) return;
     if(e.getWheelRotation() > 0) notifyContext(
         new Nodes(focused, GUI.context.data()), false, null);
     else notifyHist(false);
@@ -603,7 +603,7 @@ public final class MapView extends View implements Runnable {
   @Override
   public void keyPressed(final KeyEvent e) {
     super.keyPressed(e);
-    if(working) return;
+    if(updating) return;
     if(mainRects == null || e.isControlDown() || e.isAltDown()) return;
 
     final int key = e.getKeyCode();
@@ -693,7 +693,7 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public void keyTyped(final KeyEvent e) {
-    if(working) return;
+    if(updating) return;
     super.keyTyped(e);
     final char ch = e.getKeyChar();
     if(ch == '|') {
@@ -704,7 +704,7 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public void componentResized(final ComponentEvent e) {
-    if(working) return;
+    if(updating) return;
     focusedRect = null;
     mainMap = createImage();
     zoomMap = createImage();

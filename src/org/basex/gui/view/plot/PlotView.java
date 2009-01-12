@@ -3,7 +3,6 @@ package org.basex.gui.view.plot;
 import static org.basex.Text.*;
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -16,21 +15,22 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
-
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
-
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.StatsKey.Kind;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
+import org.basex.gui.layout.BaseXBack;
+import org.basex.gui.layout.BaseXCheckBox;
 import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPopup;
+import org.basex.gui.layout.BaseXSlider;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewRect;
 import org.basex.util.Array;
@@ -79,6 +79,13 @@ public final class PlotView extends View implements Runnable {
   BaseXCombo yCombo;
   /** Item selector combo. */
   BaseXCombo itemCombo;
+  /** Logarithmic display. */
+  BaseXCheckBox xLog;
+  /** Logarithmic display. */
+  BaseXCheckBox yLog;
+  /** Dot size in plot view. */
+  BaseXSlider dots;
+  
   /** Flag for mouse dragging actions. */
   private boolean dragging;
   /** Indicates if global marked nodes should be drawn. */
@@ -102,7 +109,42 @@ public final class PlotView extends View implements Runnable {
     super(hlp);
     setLayout(new BorderLayout());
     setBorder(5, 5, 5, 5);
-    final Box box = new Box(BoxLayout.X_AXIS);
+
+    final BaseXBack panel = new BaseXBack(Fill.NONE);
+    panel.setLayout(new BorderLayout());
+
+    Box box = new Box(BoxLayout.X_AXIS);
+    xLog = new BaseXCheckBox(PLOTLOG, null, false, null);
+    xLog.setSelected(GUIProp.plotxlog);
+    xLog.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent e) {
+        GUIProp.plotxlog ^= true;
+        refreshUpdate();
+      }
+    });
+    dots = new BaseXSlider(new ActionListener() {
+      public void actionPerformed(final ActionEvent e) {
+        GUIProp.plotdots = dots.value();
+        refreshLayout();
+      }
+    }, -10, 10, GUIProp.plotdots);
+    BaseXLayout.setWidth(dots, 40);
+    yLog = new BaseXCheckBox(PLOTLOG, null, false, null);
+    yLog.setSelected(GUIProp.plotylog);
+    yLog.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent e) {
+        GUIProp.plotylog ^= true;
+        refreshUpdate();
+      }
+    });
+    box.add(yLog);
+    box.add(Box.createHorizontalGlue());
+    box.add(dots);
+    box.add(Box.createHorizontalGlue());
+    box.add(xLog);
+    panel.add(box, BorderLayout.NORTH);
+    
+    box = new Box(BoxLayout.X_AXIS);
     xCombo = new BaseXCombo();
     xCombo.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
@@ -170,7 +212,8 @@ public final class PlotView extends View implements Runnable {
     box.add(new JLabel("X"));
     box.add(Box.createHorizontalStrut(3));
     box.add(xCombo);
-    add(box, BorderLayout.SOUTH);
+    panel.add(box, BorderLayout.SOUTH);
+    add(panel, BorderLayout.SOUTH);
 
     new BaseXPopup(this, POPUP);
     selectionBox = new ViewRect();
@@ -450,11 +493,19 @@ public final class PlotView extends View implements Runnable {
     // drawing horizontal axis line
     if(drawX) {
       g.drawLine(MARGIN[1], h - MARGIN[2], w - MARGIN[3], h - MARGIN[2]);
-      if(plotChanged) axis.calcCaption(pWidth);
+      if(plotChanged) {
+        axis.calcCaption(pWidth);
+        final Kind kind = plotData.xAxis.type;
+        xLog.setEnabled(kind == Kind.DBL || kind == Kind.INT);
+      }
     } else {
       // drawing vertical axis line
       g.drawLine(MARGIN[1], MARGIN[0], MARGIN[1], getHeight() - MARGIN[2]);
-      if(plotChanged) axis.calcCaption(pHeight);
+      if(plotChanged) {
+        axis.calcCaption(pHeight);
+        final Kind kind = plotData.yAxis.type;
+        yLog.setEnabled(kind == Kind.DBL || kind == Kind.INT);
+      }
     }
     if(plotData.pres.length < 1) {
       drawCaptionAndGrid(g, drawX, "", 0);
@@ -695,7 +746,9 @@ public final class PlotView extends View implements Runnable {
     // all plot data is recalculated, assignments stay the same
     plotData.refreshItems(nextContext != null && more && 
         rightClick ? nextContext : GUI.context.current(), !more || !rightClick);
+    plotData.xAxis.log = GUIProp.plotxlog;
     plotData.xAxis.refreshAxis();
+    plotData.yAxis.log = GUIProp.plotylog;
     plotData.yAxis.refreshAxis();
     
     nextContext = null;
@@ -743,7 +796,7 @@ public final class PlotView extends View implements Runnable {
     final int sz = sizeFactor() / 2;
     MARGIN[0] = sz + 7;
     MARGIN[1] = sz * 6;
-    MARGIN[2] = 35 + sz * 7;
+    MARGIN[2] = 55 + sz * 7;
     MARGIN[3] = sz + 3;
     plotChanged = true;
     markingChanged = true;
@@ -877,7 +930,7 @@ public final class PlotView extends View implements Runnable {
 
   @Override
   public void mouseMoved(final MouseEvent e) {
-    if(working || painting) return;
+    if(updating || painting) return;
     mouseX = e.getX();
     mouseY = e.getY();
     if(focus()) repaint();
@@ -885,7 +938,7 @@ public final class PlotView extends View implements Runnable {
 
   @Override
   public void mouseDragged(final MouseEvent e) {
-    if(working || e.isShiftDown()) return;
+    if(updating || e.isShiftDown()) return;
     if(dragging) {
       // to avoid significant offset between coordinates of mouse click and the
       // start coordinates of the bounding box, mouseX and mouseY are determined
@@ -962,14 +1015,14 @@ public final class PlotView extends View implements Runnable {
 
   @Override
   public void mouseReleased(final MouseEvent e) {
-    if(working || painting) return;
+    if(updating || painting) return;
     dragging = false;
     repaint();
   }
 
   @Override
   public void mousePressed(final MouseEvent e) {
-    if(working || painting) return;
+    if(updating || painting) return;
     markingChanged = true;
     mouseX = e.getX();
     mouseY = e.getY();
@@ -1014,6 +1067,6 @@ public final class PlotView extends View implements Runnable {
   public void componentResized(final ComponentEvent e) {
     markingChanged = true;
     plotChanged = true;
-    if(!working) repaint();
+    if(!updating) repaint();
   }
 }

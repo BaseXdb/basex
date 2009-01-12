@@ -37,7 +37,7 @@ public abstract class View extends BaseXPanel {
   /** Painting flag. */
   public static boolean painting;
   /** Working flag. */
-  public static boolean working;
+  public static boolean updating;
   
   /** Currently focused node (pre value). */
   public static int focused = -1;
@@ -297,26 +297,26 @@ public abstract class View extends BaseXPanel {
 
   @Override
   public void mouseEntered(final MouseEvent e) {
-    if(working) return;
+    if(updating) return;
     GUI.get().checkFocus(this);
   }
 
   @Override
   public void mouseExited(final MouseEvent e) {
-    if(working) return;
+    if(updating) return;
     GUI.get().cursor(GUIConstants.CURSORARROW);
   }
 
   @Override
   public void mousePressed(final MouseEvent e) {
-    if(working) return;
+    if(updating) return;
     requestFocusInWindow();
   }
 
   @Override
   public void keyPressed(final KeyEvent e) {
     super.keyPressed(e);
-    if(working) return;
+    if(updating) return;
     final boolean ctrl = e.isControlDown();
     final boolean shift = e.isShiftDown();
     final int key = e.getKeyCode();

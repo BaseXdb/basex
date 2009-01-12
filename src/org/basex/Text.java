@@ -906,11 +906,6 @@ public interface Text {
 
   // VISUALIZATIONS ===========================================================
 
-  /* Welcome Information.
-  //String WELCOME = BaseX.info(lang("welcome1"), VERSION);
-  // Welcome Text.
-  //String WELCOMETEXT = lang("welcome2");
-   */
   /** Text find information. */
   String RESULTFIND = lang("text_find") + COLS;
   /** Help String. */
@@ -927,6 +922,8 @@ public interface Text {
   String HELPTIT = lang("help_tit");
   /** Help title. */
   String TEXTTIT = lang("text_tit");
+  /** Plot visualization. */
+  String PLOTLOG = "log";
 
   // DIALOG WINDOWS ===========================================================
 
@@ -1092,8 +1089,6 @@ public interface Text {
   String SIMPLEFD = lang("dp_simplefd");
   /** Name display flag. */
   String PREFNAMES = lang("dp_names");
-  /** Dot size in plot view. */
-  String PREFDOTS = lang("dp_dots") + COL;
   /** Language preference. */
   String PREFLANG = lang("dp_lang");
 

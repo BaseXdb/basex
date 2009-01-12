@@ -130,7 +130,6 @@ dp_lf=Verwende Java Look & Feel (nach Neustart)
 dp_focus=Echtzeit Maus-Fokus
 dp_simplefd=Einfacher Datei-Dialog
 dp_names=Ersetze Tags durch @name-Attribute
-dp_dots=Punkte in Plotansicht
 dp_lang=Sprache (nach Neustart)
 
 dn_title=Neue Daten einfügen

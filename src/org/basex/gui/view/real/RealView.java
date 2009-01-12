@@ -243,7 +243,7 @@ public final class RealView extends View {
 
   @Override
   public void mouseMoved(final MouseEvent e) {
-    if(working) return;
+    if(updating) return;
     super.mouseMoved(e);
     // refresh mouse focus
     mousePosX = e.getX();
@@ -271,7 +271,7 @@ public final class RealView extends View {
 
   @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
-    if(working || focused == -1) return;
+    if(updating || focused == -1) return;
     if(e.getWheelRotation() > 0) notifyContext(new Nodes(focused, 
         GUI.context.data()), false, null);
     else notifyHist(false);

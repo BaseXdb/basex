@@ -39,6 +39,7 @@ public final class BaseXCheckBox extends JCheckBox {
 
     super(label, sel);
     setMargin(new Insets(0, 0, dist, 0));
+    setOpaque(false);
     BaseXLayout.addHelp(this, hlp);
     if(hlp != null) setToolTipText(Token.string(hlp));
     if(list == null) return;

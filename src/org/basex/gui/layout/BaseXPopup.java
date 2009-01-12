@@ -34,7 +34,7 @@ public final class BaseXPopup extends JPopupMenu {
     comp.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseReleased(final MouseEvent e) {
-        if(!View.working && SwingUtilities.isRightMouseButton(e))
+        if(!View.updating && SwingUtilities.isRightMouseButton(e))
           show(e.getComponent(), e.getX() - 10, e.getY() - 15);
       }
     });
@@ -42,7 +42,7 @@ public final class BaseXPopup extends JPopupMenu {
       @Override
       public void keyPressed(final KeyEvent e) {
         final int key = e.getKeyCode();
-        if(!View.working && key == KeyEvent.VK_CONTEXT_MENU) {
+        if(!View.updating && key == KeyEvent.VK_CONTEXT_MENU) {
           show(e.getComponent(), 10, 10);
         }
       }
@@ -55,7 +55,7 @@ public final class BaseXPopup extends JPopupMenu {
         final JMenuItem item = add(c.desc());
         item.addActionListener(new ActionListener() {
           public void actionPerformed(final ActionEvent e) {
-            if(!View.working) c.execute();
+            if(!View.updating) c.execute();
           }
         });
         item.setMnemonic(c.desc().charAt(0));

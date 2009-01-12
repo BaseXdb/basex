@@ -101,6 +101,10 @@ public final class GUIProp {
   public static int mapprop = 4;
   /** Dot sizes in plot. */
   public static int plotdots = 0;
+  /** Logarithmic plot. */
+  public static boolean plotxlog;
+  /** Logarithmic plot. */
+  public static boolean plotylog;
   
   /** Dialog location. */
   public static int[] maplayoutloc = { 100, 100 };

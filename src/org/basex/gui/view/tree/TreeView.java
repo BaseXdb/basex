@@ -390,7 +390,7 @@ public final class TreeView extends View {
 
   @Override
   public void mouseMoved(final MouseEvent e) {
-    if(working) return;
+    if(updating) return;
     super.mouseMoved(e);
     // set new focus
     focus(e.getX(), e.getY());
@@ -399,7 +399,7 @@ public final class TreeView extends View {
   @Override
   public void mousePressed(final MouseEvent e) {
     super.mousePressed(e);
-    if(working || opened == null) return;
+    if(updating || opened == null) return;
 
     if(!focus(e.getX(), e.getY())) return;
 
@@ -428,7 +428,7 @@ public final class TreeView extends View {
 
   @Override
   public void mouseClicked(final MouseEvent e) {
-    if(!SwingUtilities.isLeftMouseButton(e) || working || opened == null)
+    if(!SwingUtilities.isLeftMouseButton(e) || updating || opened == null)
       return;
 
     // launch a program
@@ -439,7 +439,7 @@ public final class TreeView extends View {
   @Override
   public void mouseDragged(final MouseEvent e) {
     final boolean left = SwingUtilities.isLeftMouseButton(e);
-    if(!left || working || opened == null) return;
+    if(!left || updating || opened == null) return;
     super.mouseDragged(e);
 
     // marks currently focused node
@@ -448,7 +448,7 @@ public final class TreeView extends View {
 
   @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
-    if(working) return;
+    if(updating) return;
     scroll.pos(scroll.pos() + e.getUnitsToScroll() * 20);
     repaint();
   }
@@ -456,7 +456,7 @@ public final class TreeView extends View {
   @Override
   public void keyPressed(final KeyEvent e) {
     super.keyPressed(e);
-    if(working || opened == null) return;
+    if(updating || opened == null) return;
 
     int focus = focusedPos == -1 ? 0 : focusedPos;
     if(focused == -1) focused = 0;

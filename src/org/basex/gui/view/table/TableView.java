@@ -82,7 +82,7 @@ public final class TableView extends View implements Runnable {
       findFocus();
       repaint();
     } else {
-      working = true;
+      updating = true;
       new Thread(this).start();
     }
   }
@@ -135,7 +135,7 @@ public final class TableView extends View implements Runnable {
       repaint();
       Performance.sleep(25);
     }
-    working = false;
+    updating = false;
     findFocus();
   }
   

@@ -8,7 +8,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-
 import javax.swing.JFrame;
 import org.basex.core.Prop;
 import org.basex.data.Data;
@@ -21,7 +20,6 @@ import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.layout.BaseXSlider;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.gui.view.View;
@@ -47,8 +45,6 @@ public final class DialogPrefs extends Dialog {
   private BaseXCheckBox simpfd;
   /** Simple file dialog checkbox. */
   private BaseXCheckBox javalook;
-  /** Dot size in plot view. */
-  private BaseXSlider dots;
 
   /**
    * Default Constructor.
@@ -68,7 +64,9 @@ public final class DialogPrefs extends Dialog {
     path = new BaseXTextField(Prop.dbpath, HELPDBPATH, this);
     path.addKeyListener(new KeyAdapter() {
       @Override
-      public void keyReleased(final KeyEvent e) { action(null); }
+      public void keyReleased(final KeyEvent e) {
+        action(null);
+      }
     });
     
     final BaseXButton button = new BaseXButton(BUTTONBROWSE, HELPBROWSE, this);
@@ -106,18 +104,8 @@ public final class DialogPrefs extends Dialog {
     names.setEnabled(data != null && data.fs == null && data.nameID != 0);
     pp.add(names);
 
-    // checkbox for realtime mouse focus
-    p = new BaseXBack();
-    p.setLayout(new TableLayout(1, 2, 6, 0));
-    dots = new BaseXSlider(-10, 10, GUIProp.plotdots, null, this);
-    BaseXLayout.setWidth(dots, 150);
-    p.add(new BaseXLabel(PREFDOTS));
-    p.add(dots);
-    pp.add(p);
-
     // checkbox for simple file dialog
     label = new BaseXLabel(PREFLANG, true, true);
-    label.setBorder(16, 0, 8, 0);
     pp.add(label);
 
     p = new BaseXBack();
@@ -173,7 +161,6 @@ public final class DialogPrefs extends Dialog {
     GUIProp.shownames = names.isSelected();
     GUIProp.simplefd = simpfd.isSelected();
     GUIProp.javalook = javalook.isSelected();
-    GUIProp.plotdots = dots.value();
     View.notifyLayout();
   }
 }

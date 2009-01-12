@@ -39,7 +39,7 @@ public abstract class BaseXPanel extends BaseXBack implements MouseListener,
   public void mouseDragged(final MouseEvent e) { }
 
   public void keyPressed(final KeyEvent e) {
-    if(View.working || !e.isAltDown()) return;
+    if(View.updating || !e.isAltDown()) return;
     
     final int key = e.getKeyCode();
     if(key == KeyEvent.VK_LEFT) {
@@ -54,7 +54,7 @@ public abstract class BaseXPanel extends BaseXBack implements MouseListener,
   }
 
   public void keyTyped(final KeyEvent e) {
-    if(View.working || !e.isControlDown()) return;
+    if(View.updating || !e.isControlDown()) return;
     final char key = e.getKeyChar();
     if(key == '+' || key == '-' || key == '=') {
       GUIProp.fontsize = Math.max(1, GUIProp.fontsize + (key == '-' ? -1 : 1));

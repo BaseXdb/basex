@@ -2,6 +2,7 @@ package org.basex.gui.layout;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
@@ -20,7 +21,10 @@ public final class BaseXSlider extends BaseXPanel {
   /** Slider width. */
   private static final double SLIDERW = 20;
   /** Listener. */
-  private Dialog listener;
+  private Dialog dl;
+  /** Listener. */
+  private ActionListener al;
+  
   /** Minimum slider value. */
   private int min;
   /** Maximum slider value. */
@@ -31,27 +35,51 @@ public final class BaseXSlider extends BaseXPanel {
   private int oldCurr = -1;
   /** Mouse position for dragging operations. */
   private int mouseX;
-  
+
   /**
    * Constructor.
    * @param mn min value
    * @param mx max value
-   * @param initial initial value
-   * @param hlp help text
+   * @param i initial value
    * @param list listener
    */
-  public BaseXSlider(final int mn, final int mx,
-      final int initial, final byte[] hlp, final Dialog list) {
+  public BaseXSlider(final ActionListener list, final int mn, final int mx,
+      final int i) {
+    this(mn, mx, i, null);
+    al = list;
+  }
 
-    super(hlp);
-    listener = list;
+  /**
+   * Constructor.
+   * @param mn min value
+   * @param mx max value
+   * @param i initial value
+   * @param h help text
+   * @param list listener
+   */
+  public BaseXSlider(final int mn, final int mx, final int i,
+      final byte[] h, final Dialog list) {
+
+    this(mn, mx, i, h);
+    dl = list;
+    BaseXLayout.addDefaultKeys(this, dl);
+  }
+
+  /**
+   * Constructor.
+   * @param mn min value
+   * @param mx max value
+   * @param i initial value
+   * @param h help text
+   */
+  private BaseXSlider(final int mn, final int mx, final int i, final byte[] h) {
+    super(h);
     min = mn;
     max = mx;
-    curr = initial;
+    curr = i;
     setFocusable(true);
     setMode(Fill.NONE);
 
-    BaseXLayout.addDefaultKeys(this, listener);
     BaseXLayout.setHeight(this, getFont().getSize() + 3);
 
     addFocusListener(new FocusAdapter() {
@@ -109,7 +137,8 @@ public final class BaseXSlider extends BaseXPanel {
     final double prop = (max - min) * (mouseX - e.getX()) /
       (getWidth() - SLIDERW);
     curr = Math.max(min, Math.min(max, (int) (oldCurr - prop)));
-    listener.action(null);
+    if(dl != null) dl.action(null);
+    else al.actionPerformed(null);
     repaint();
   }
   
@@ -131,7 +160,8 @@ public final class BaseXSlider extends BaseXPanel {
       curr = max;
     }
     if(curr != old) {
-      listener.action(null);
+      if(dl != null) dl.action(null);
+      else al.actionPerformed(null);
       repaint();
     }
   }
@@ -154,7 +184,7 @@ public final class BaseXSlider extends BaseXPanel {
     g.drawLine(0, hh + 2, w, hh + 2);
     
     final double x = (curr - min) * (w - SLIDERW) / (max - min);
-    BaseXLayout.drawCell(g, (int) x, (int) (x + SLIDERW), 2, h - 2,
+    BaseXLayout.drawCell(g, (int) x, (int) (x + SLIDERW), hh - 5, hh + 5,
         oldCurr != -1);
   }
 }

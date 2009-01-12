@@ -413,25 +413,30 @@ public final class GUI extends JFrame {
         }
       }
     } else {
-      if(View.working) return;
-      new Action() {
-        public void run() {
-          if(GUIProp.searchmode == 1) //exec(new XPath(in), true);
-          exec(new XQuery(Find.find(in, context, GUIProp.filterrt)), true);
-        }
-      }.execute();
-      
+      execute(new XQuery(GUIProp.searchmode == 1 ? in :
+        Find.find(in, context, GUIProp.filterrt)), true);
     }
   }
   
   /**
-   * Launches the specified process in a thread.
+   * Launches the specified process in a thread. The process is ignored
+   * if an update operation takes place.
    * @param pr process to be launched
    */
   public void execute(final Process pr) {
-    if(View.working) return;
+    execute(pr, false);
+  }
+  
+  /**
+   * Launches the specified process in a thread. The process is ignored
+   * if an update operation takes place.
+   * @param pr process to be launched
+   * @param main call from main window
+   */
+  void execute(final Process pr, final boolean main) {
+    if(View.updating) return;
     new Action() {
-      public void run() { exec(pr, false); }
+      public void run() { exec(pr, main); }
     }.execute();
   }
   
@@ -455,7 +460,7 @@ public final class GUI extends JFrame {
    * @param main call from the main window
    * @return success flag
    */
-  public boolean exec(final Process pr, final boolean main) {
+  boolean exec(final Process pr, final boolean main) {
     final int thread = ++threadID;
 
     // wait when command is still running
@@ -467,7 +472,7 @@ public final class GUI extends JFrame {
 
     cursor(CURSORWAIT);
     try {
-      if(pr.updating()) View.working = true;
+      if(pr.updating()) View.updating = true;
 
       // cache some variables before executing the command
       final Performance perf = new Performance();
@@ -482,7 +487,7 @@ public final class GUI extends JFrame {
         proc = null;
         return false;
       }
-      if(pr.updating()) View.working = false;
+      if(pr.updating()) View.updating = false;
 
       // try to convert xquery result to nodeset
       Result result = pr.result();
