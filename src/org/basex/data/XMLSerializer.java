@@ -142,6 +142,7 @@ public final class XMLSerializer extends Serializer {
         default :
           out.write(b[wl]);
       }
+      wl++;
     }
     indent = false;
   }
