@@ -72,7 +72,7 @@ public abstract class QueryProcessor extends Progress {
    */
   public final Result query(final Nodes n) throws QueryException {
     // [CG] maybe theres an other spot, where we could place this job
-    XQFTVisData.init();
+    XQFTVisData.init(true);
 
     if(!compiled) compile(n);
     return context.eval(n);

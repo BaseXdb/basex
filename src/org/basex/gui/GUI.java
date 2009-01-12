@@ -61,6 +61,7 @@ import org.basex.gui.view.text.TextView;
 import org.basex.gui.view.tree.TreeView;
 import org.basex.io.CachedOutput;
 import org.basex.query.QueryException;
+import org.basex.query.xquery.XQFTVisData;
 import org.basex.util.Action;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -329,6 +330,8 @@ public final class GUI extends JFrame {
         views.run();
       }
     }.execute();
+    
+    XQFTVisData.gui = true;
   }
 
   /**

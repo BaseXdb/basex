@@ -3,6 +3,8 @@ package org.basex.data;
 import static org.basex.util.Token.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
+
+import org.basex.index.FTTokenizer;
 import org.basex.io.PrintOutput;
 import org.basex.util.Token;
 
@@ -107,35 +109,42 @@ public final class XMLSerializer extends Serializer {
   public void text(final byte[] b, final int[] pos, final int[] poi) 
   throws IOException {
     finishElement();
-    int c = 0, pp = 0;
-    boolean w = true;
-    boolean lod;
-    for(final byte ch : b) {
-      lod = Token.letterOrDigit(ch);
-      switch(ch) {
+    int c = -1, pp = 0, wl = 0;
+    FTTokenizer ftt = new FTTokenizer(b);
+    ftt.wc = true;
+    while(ftt.more()) {
+      c++;
+      for (int i = wl; i < ftt.p; i++) {
+        switch(b[i]) {
+          case '&': out.print(E_AMP); break;
+          case '>': out.print(E_GT); break;
+          case '<': out.print(E_LT); break;
+          case 0xD: out.print(E_CR); break;
+          default :
+            if (Token.letterOrDigit(b[i]) && pp < pos.length && c == pos[pp]) {
+              // write fulltext pointer in front of the token
+              // used for coloring the token
+              out.print(new byte[]{'&', (byte) poi[pp], '&'});
+              pp++;
+            }
+            out.write(b[i]);
+        }
+      }
+      wl = ftt.p;
+    }
+    
+    while (wl < b.length) {
+      switch(b[wl]) {
         case '&': out.print(E_AMP); break;
         case '>': out.print(E_GT); break;
         case '<': out.print(E_LT); break;
         case 0xD: out.print(E_CR); break;
         default :
-          if (lod && pp < pos.length && c == pos[pp]) {
-            // write fulltext pointer in front of the token
-            // used for coloring the token
-            out.write('&');
-            out.write((byte) poi[pp]);
-            out.write('&');
-            pp++;
-          }
-          out.write(ch);
+          out.write(b[wl]);
       }
-      if (!lod) {
-        if (w) c++;
-        w = false;
-      } else w = true;
     }
     indent = false;
   }
-
   
   @Override
   public void comment(final byte[] n) throws IOException {

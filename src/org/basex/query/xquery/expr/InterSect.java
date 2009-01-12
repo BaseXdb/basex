@@ -4,12 +4,15 @@ import static org.basex.query.xquery.XQText.*;
 
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
+import org.basex.query.xquery.XQFTVisData;
+import org.basex.query.xquery.item.DBNode;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Err;
 import org.basex.query.xquery.util.NodeBuilder;
+import org.basex.util.IntList;
 
 /**
  * Intersect expression.
@@ -36,7 +39,8 @@ public final class InterSect extends Arr {
       if(!it.node()) Err.nodes(this);
       seq.add((Nod) it);
     }
-
+    
+    IntList il = new IntList();
     for(int e = 1; e != expr.length; e++) {
       final NodeBuilder res = new NodeBuilder(false);
       iter = ctx.iter(expr[e]);
@@ -46,10 +50,14 @@ public final class InterSect extends Arr {
         for(int s = 0; s < seq.size; s++) {
           if(CmpN.Comp.EQ.e(seq.list[s], node)) {
             res.add(node);
+            if (it instanceof DBNode) il.add(((DBNode) it).pre + 1);            
             break;
-          }
+          } 
         }
       }
+      if (res.size == 0) XQFTVisData.init(false);
+      else XQFTVisData.keep(il.finish());
+      
       seq = res;
     }
     return seq.iter();

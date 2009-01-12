@@ -528,7 +528,10 @@ public final class BaseXLayout {
 
       final byte[] tok = ftt.get();
       int wl = 0;
-      for (byte b : tok) wl += width(g, cw, b);
+      
+      for(int n = 0; n < tok.length; n += cl(tok[n])) 
+        wl += width(g, cw, cp(tok, n));
+//      for (byte b : tok) wl += width(g, cw, cp(s, n));
       if (ll + wl + we >= ww) { 
         xx = r.x;
         yy += fh;

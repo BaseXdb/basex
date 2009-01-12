@@ -67,13 +67,10 @@ public final class FTSelect extends FTExpr {
       final IntList[] il = new IntList[pos.term.size + os];
       System.arraycopy(pos.getPos(), 0, il, 0, pos.term.size);
       System.arraycopy(tmp.getPos(), 0, il, pos.term.size, os);
-      tmp.setPos(il, il.length);      
-    } /*else {
-      tmp = new FTPos();
-      tmp.term = pos.term;
-      final IntList[] il = pos.getPos();
       tmp.setPos(il, il.length);
-    } */
+      ctx.ftd = il;
+    } else ctx.ftd = pos.getPos();
+     
     
     ctx.ftpos = tmp;
     final double s = it.score();

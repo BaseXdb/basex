@@ -4,7 +4,6 @@ import static org.basex.query.xquery.XQText.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.index.FTTokenizer;
-import org.basex.query.FTPos;
 import org.basex.query.xquery.IndexContext;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
@@ -33,6 +32,8 @@ public class FTContains extends Expr {
   public FTExpr ftexpr;
   /** Fulltext parser. */
   public FTTokenizer ft = new FTTokenizer();
+  /** Flag for first evaluation.*/
+  private int div = 0;
   
   /**
    * Constructor.
@@ -58,9 +59,12 @@ public class FTContains extends Expr {
 
   @Override
   public Iter iter(final XQContext ctx) throws XQException {    
+    if (div == 0) 
+      div = ++ctx.ftcount;
+
     final Iter iter = expr.iter(ctx);
     final FTTokenizer tmp = ctx.ftitem;
-    final FTPos tmp2 = ctx.ftpos;
+    final IntList[] ftd = ctx.ftd;
     
     double d = 0;
     Item i;
@@ -70,14 +74,12 @@ public class FTContains extends Expr {
       d = Scoring.and(d, ftexpr.iter(ctx).next().score());
     }
     
-    if (ctx.ftpos != null) {
-      final IntList[] pos = ctx.ftpos.getPos();
-      if (pos.length > 0 && ctx.item instanceof DBNode) 
-        XQFTVisData.addConvSeqData(pos, ((DBNode) (ctx.item)).pre);
-    }
+    if (Bln.get(d).bool() && ctx.item instanceof DBNode && ctx.ftd != null) 
+      XQFTVisData.addConvSeqData(ctx.ftd, ((DBNode) ctx.item).pre + 1, 
+          div);      
     
-    ctx.ftpos = tmp2;
     ctx.ftitem = tmp;
+    ctx.ftd = ftd;
     return Bln.get(d).iter();
   }
 

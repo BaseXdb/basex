@@ -97,7 +97,8 @@ public final class FTWords extends FTExpr {
           final byte[] txt = i.str();
           final int oc = ctx.ftopt.contains(ctx.ftitem, ctx.ftpos, txt);
           len += txt.length;
-          o += oc / ctx.ftopt.sb.count();
+          final int count = ctx.ftopt.sb.count(); 
+          o += count == 0 ? 0 : oc / count;
         }
         break;
       case ANYWORD:

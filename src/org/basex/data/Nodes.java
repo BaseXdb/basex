@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import org.basex.BaseX;
 import org.basex.core.Context;
+import org.basex.query.xquery.XQFTVisData;
 import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
 
@@ -156,7 +157,7 @@ public final class Nodes implements Result {
       return false;
     for(int c = 0; c < size; c++) 
       if(n.nodes[c] != nodes[c]) return false; 
-    return true;
+    return XQFTVisData.same();
   }
 
   public void serialize(final Serializer ser) throws IOException {
