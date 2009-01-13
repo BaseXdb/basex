@@ -138,14 +138,13 @@ public class DeepBase implements IDeepFuse {
       debug("[DeepBase.getattr]", "found " + nodes.size);
       if(nodes.size > 0) {
         int pre = nodes.nodes[0];
-        debug("[DeepBase.getattr]", "pre " + pre);
-        debug("[DeepBase.getattr]", "id " + data.id(pre));
+        debug("[DeepBase.getattr]", "pre " + pre + "id " + data.id(pre));
+        return data.id(pre);
       }
-
     } catch(QueryException e) {
       e.printStackTrace();
     }
-    return 13;
+    return -1;
   }
 
   /**
