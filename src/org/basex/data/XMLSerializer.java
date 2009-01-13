@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import org.basex.index.FTTokenizer;
 import org.basex.io.PrintOutput;
+import org.basex.query.xquery.XQFTVisData;
 import org.basex.util.Token;
 
 /**
@@ -111,7 +112,6 @@ public final class XMLSerializer extends Serializer {
     finishElement();
     int c = -1, pp = 0, wl = 0;
     FTTokenizer ftt = new FTTokenizer(b);
-    ftt.wc = true;
     while(ftt.more()) {
       c++;
       for (int i = wl; i < ftt.p; i++) {
@@ -124,10 +124,9 @@ public final class XMLSerializer extends Serializer {
             if (Token.letterOrDigit(b[i]) && pp < pos.length && c == pos[pp]) {
               // write fulltext pointer in front of the token
               // used for coloring the token
-              out.print(new byte[]{'&', (byte) poi[pp], '&'});
-              pp++;
+              XQFTVisData.addTextPos(out.size(), poi[pp++]);
             }
-            out.write(b[i]);
+          out.write(b[i]);
         }
       }
       wl = ftt.p;

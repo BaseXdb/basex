@@ -3,6 +3,7 @@ package org.basex.gui.layout;
 import static org.basex.gui.GUIConstants.*;
 import java.awt.Color;
 
+import org.basex.query.xquery.XQFTVisData;
 import org.basex.util.Array;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -68,7 +69,7 @@ final class BaseXTextTokens {
    */
   boolean moreWords() {
     col = Color.black;
-    // quit if text has ended
+  /*  // quit if text has ended
     if(pe >= size) return false;
     ps = pe;
 
@@ -85,6 +86,22 @@ final class BaseXTextTokens {
       pe += Token.cl(text[pe]);
     }
     return true;
+    */
+    // quit if text has ended
+    if(pe >= size) return false;
+    ps = pe;
+
+    // find next token boundary
+    int ch = Token.cp(text, ps);
+    pe += Token.cl(text[ps]);
+    if(sep(ch)) return true;
+    
+    while(pe < size) {
+      ch = Token.cp(text, pe);
+      if(sep(ch)) break;
+      pe += Token.cl(text[pe]);
+    };
+    return true;
   }
   
   /**
@@ -97,28 +114,25 @@ final class BaseXTextTokens {
 
   /**
    * Returns the next token.
+   * @param w boolean flag if text is written
    * @return next token
    */
-  String nextWord() {
+  String nextWord(final boolean w) {
+    if (w) {
+      final int c = XQFTVisData.getTextCol(ps); 
+      col = c == -1 ? Color.black : thumbnailcolor[c];
+    }
     return Token.string(text, ps, pe - ps);
   }
 
   
   /**
    * Returns the current character type.
+   * @param c char
    * @return true for a delimiter character
    */
-  private boolean sep() {
-    if (Token.letterOrDigit(text[pe])) return false;
-    if (pe < size - 4 && text[pe] == '&' && text[pe + 2] == '&') {
-      pe += Token.cl(text[pe]);
-      col = text[pe] < thumbnailcolor.length ? 
-          thumbnailcolor[text[pe]] : Color.black;
-      pe += Token.cl(text[pe]);
-      pe += Token.cl(text[pe]);
-      ps = pe;
-      return pe < size ? sep() : true;
-    } else return true;    
+  private boolean sep(final int c) {
+    return !Token.letterOrDigit(c);
   }
 
   /**

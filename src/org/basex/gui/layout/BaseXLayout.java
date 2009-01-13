@@ -44,6 +44,8 @@ public final class BaseXLayout {
     new SimpleDateFormat("dd.MM.yyyy hh:mm");
   /** Private constructor. */
   private BaseXLayout() { }
+  /** Count number of digit/char bytes. */
+  private static int cchars = 0;
 
   /**
    * Creates a OK and CANCEL button.
@@ -577,57 +579,80 @@ public final class BaseXLayout {
     
     double ff = ffmax, ffh = ffhmax, flh = flhmax;
     double fmi = ff * GUIProp.fontsize;
-    int lhmi = (int) Math.max(1, ffh * GUIProp.fontsize);
-    int fhmi = (int) Math.max(1, (flh + ffh) * GUIProp.fontsize);
+    int lhmi = (int) Math.max(3, ffh * GUIProp.fontsize);
+    int fhmi = (int) Math.max(6, (flh + ffh) * GUIProp.fontsize);
     int h = r.h; 
-
-    double f;
+    final double fac = Math.exp(Math.log(s.length) * 0.97) / s.length;
+    double f = ff * GUIProp.fontsize;
     int fh, lh;
-      while (al < 4) {
-        ff *= 0.95;
-        f = ff * GUIProp.fontsize;
-        ffh *= 0.95;
-        fh = (int) Math.max(1, ffh * GUIProp.fontsize);
-        flh *= 0.95;
-        lh = (int) Math.max(1, (flh + ffh) * GUIProp.fontsize);
-        sw = Math.max(f * 0.5, ffmin * GUIProp.fontsize);
+  
+    while (al < 4) {
+      ff *= fac; //0.97;
+      f = ff * GUIProp.fontsize;
+      ffh *= fac;
+      fh = (int) Math.max(1, ffh * GUIProp.fontsize);
+      flh *= fac;
+      lh = (int) Math.max(1, (flh + ffh) * GUIProp.fontsize);
+      sw = Math.max(f * 0.5, ffmin * GUIProp.fontsize);
+      switch(al) {
+        case 0: 
+          h = drawThumbnailsToken(g, r, s, f, fh, lh, sw, false);
+          break;
+        case 1: 
+          h = drawThumbnailsSentence(g, r, s, true, f, fh, lh, sw, false); 
+          break;
+        case 2: 
+          h = drawThumbnailsSentence(g, r, s, false, f, fh, lh, sw, false);  
+      }
+      
+      if (ff < ffmin) {
+        if ((cchars * ffmin * GUIProp.fontsize  / r.w) * (fh + 1) > r.h) {
+          drawThumbnailsSentenceComp(g, r, s, 
+              ffmin * GUIProp.fontsize, fh, true);
+          return;
+        }         
+
+        al++;
+        fmi = f;
+        fhmi = fh;
+        lhmi = lh;
+        ff = ffmax;
+        ffh = ffhmax;
+        flh = flhmax;
+      } else if (h < r.h) {
+        // thumbnail fits in rec
         switch(al) {
           case 0: 
-            h = drawThumbnailsToken(g, r, s, f, fh, lh, sw, false); 
-            break;
+            drawThumbnailsToken(g, r, s, f, fh, lh, sw, true); 
+            return;
           case 1: 
-            h = drawThumbnailsSentence(g, r, s, true, f, fh, lh, sw, false); 
-            break;
+            drawThumbnailsSentence(g, r, s, true, f, fh, lh, sw, true); 
+            return;
           case 2: 
-            h = drawThumbnailsSentence(g, r, s, false, f, fh, lh, sw, false);  
+            drawThumbnailsSentence(g, r, s, false, f, fh, lh, sw, true); 
+            return;
         }
-
-        if (ff < ffmin) {
-          al++;
-          fmi = f;
-          fhmi = fh;
-          lhmi = lh;
-          ff = ffmax;
-          ffh = ffhmax;
-          flh = flhmax;
-        } else if (h < r.h) {
-          // thumbnail fits in rec
-          switch(al) {
-            case 0: 
-              drawThumbnailsToken(g, r, s, f, fh, lh, sw, true); 
-              return;
-            case 1: 
-              drawThumbnailsSentence(g, r, s, true, f, fh, lh, sw, true); 
-              return;
-            case 2: 
-              drawThumbnailsSentence(g, r, s, false, f, fh, lh, sw, true); 
-              return;
-          }
-        } else if (al > 2) {
-          drawThumbnailsSentence(g, r, s, false, fmi, fhmi, lhmi, sw, true); 
-          return;
+      } else if (al > 2) {
+        // reduce space between each line further
+        f = ffmin * GUIProp.fontsize;
+        while (h >= r.h && flh + ffh >= 1)  {
+          flh *= 0.97;
+          lhmi = (int) Math.max(1, (flh + ffh) * GUIProp.fontsize);
+          h = drawThumbnailsSentence(g, r, s, false, f, fhmi, lhmi, sw, 
+              false);
         }
+        
+        if (h < r.h) {
+          if (lhmi < fhmi) lhmi = fhmi;
+          drawThumbnailsSentence(g, r, s, false, f, fhmi, lhmi, sw, true);
+        } else {
+          drawThumbnailsSentenceComp(g, r, s, f, fhmi, true);
+        }
+        return;
       }
+    }
+    drawThumbnailsSentence(g, r, s, false, fmi, fhmi, lhmi, 
+        Math.max(f * 0.5, ffmin * GUIProp.fontsize), true);
   }
   
   /**
@@ -661,6 +686,7 @@ public final class BaseXLayout {
     int cs = 0;
     int cp = 0;
     int ftts;
+    cchars = 0;
 
     while(ftt.more()) {
       if (cs < ftt.sent) cs = ftt.sent;
@@ -672,13 +698,14 @@ public final class BaseXLayout {
 
       ftts = ftt.s;
       wl = ftt.p - ftts;
+      cchars += wl;
       // check if rectangle fits in line
       if (f * (ll + wl) > ww) {
         yy += lh;
         ll = 0;
       } 
       
-      if(yy + lh >= r.y + r.h) return yy + lh - r.y;
+//      if(yy + lh >= r.y + r.h) return yy + lh - r.y;
       if (draw) {
         // draw word
         if (r.pos != null && pp < r.pos.length && count == r.pos[pp]) {
@@ -725,7 +752,7 @@ public final class BaseXLayout {
     int ll = 0; // line length
 
     final FTTokenizer ftt = new FTTokenizer(s);
-    final Color textc = g.getColor();
+    final Color textc = sen && fh == lh ? g.getColor() : GUIConstants.COLORS[6];
     int count = -1;
     int pp = 0;
     int cp = 0;
@@ -750,12 +777,13 @@ public final class BaseXLayout {
       if (ll + wl >= ww) { 
         final int fp = (int) (ww - ll);
         if (fp <= f) {
-          if(yy + lh  + 3 >= r.y + r.h) return yy + lh - r.y;
+//          if(yy + lh  + 3 >= r.y + r.h) return yy + lh + 3 - r.y;
           yy += lh;
           ll = 0;
         } else {
           final int sp = wl - fp;
           // draw first part of the sentence
+          g.setColor(textc);
           if (draw) g.fillRect((int) (xx + ll), yy, (int) (fp - f), fh);
           ll += fp - f;
           // color last rect of first part of the word black
@@ -764,7 +792,7 @@ public final class BaseXLayout {
             g.fillRect((int) (xx + ll), yy, (int) f, fh);
             g.setColor(textc);
           }
-          if(yy + lh + 3 >= r.y + r.h) return yy + lh - r.y;
+//          if(yy + lh + 3 >= r.y + r.h) return yy + lh + 3 - r.y;
           yy += lh;
           ll = 0;
           // color first rec of second part of the word black
@@ -807,7 +835,7 @@ public final class BaseXLayout {
         }
         if (cp < ftt.para) {
           cp = ftt.para;
-          if(yy + lh + 3 >= r.y + r.h) return yy + lh - r.y;
+//          if(yy + lh + 3 >= r.y + r.h) return yy + lh + 3 - r.y;
           yy += lh;
           wl = 0;
           ll = 0;
@@ -817,7 +845,85 @@ public final class BaseXLayout {
     return yy - r.y;
   }
 
+  /**
+   * Draws a text using thumbnail visualization. Each sentence within
+   * a fulltext hit will be colored. This is a very compact and efficente
+   * visualization for large textnodes.
+   * 
+   * @param g graphics reference
+   * @param r rectangle
+   * @param s text to be drawn
+   * @param f length of a thumbnailtoken
+   * @param fh higth of a thumbnailtoken
+   * @param draw boolean for drawing (used for calculating the higth)
+   * @return used high   
+   */
+  public static int drawThumbnailsSentenceComp(final Graphics g, 
+      final ViewRect r, final byte[] s, final double f, final int fh, 
+      final boolean draw) {
+    final int xx = r.x;
+    final int ww = r.w;
+    int yy = r.y + 3;
+    int wl = 0; // word length
+    int ll = 0; // line length
 
+    final FTTokenizer ftt = new FTTokenizer(s);
+    final Color textc = GUIConstants.COLORS[7];
+    g.setColor(textc);
+    int count = -1;
+    int pp = 0;
+    int cs = 0;
+    IntList col;
+    int cc;
+    boolean m = ftt.more();
+    
+    while (m) {
+      col = new IntList();
+      cc = 0;
+      while (cs == ftt.sent && 
+          (r.pos == null || (pp < r.pos.length && count < r.pos[pp]) 
+              || pp == r.pos.length)) {
+        wl += (int) ((ftt.p - ftt.s) * f); 
+        count++;
+        if (draw && r.pos != null && pp < r.pos.length && count == r.pos[pp])  
+          col.add(r.poi[pp++]);    
+        m = ftt.more();
+        if (!m) break;
+      }
+      cs++;
+      
+      int l = 0;
+      while (l < wl) {
+        int tw = col.size == 0 ? wl : (wl / col.size) + 1;
+        while (ll + tw > ww) {
+          if (draw) {
+            if (col.size > 0) g.setColor(thumbnailcolor[col.list[cc]]); 
+            g.fillRect(xx + ll, yy, ww - ll, fh);
+          }
+          l += ww - ll;
+          tw -= ww - ll;
+          ll = 0;
+          yy += fh + 1;
+          if (yy + 3 >= r.y + r.h) return yy - r.y; 
+        }
+        if (draw) {
+          if (col.size > 0) 
+            g.setColor(thumbnailcolor[col.list[cc]]);
+          
+          g.fillRect(xx + ll, yy, tw, fh);
+          g.setColor(textc);
+        }
+        ll += tw;
+        l += tw;
+        if (col.size > 0) cc++;
+      }
+      wl = 0;
+    }    
+    return yy - r.y;
+  }
+
+  
+  
 
   /**
    * Draws a text token within its context.

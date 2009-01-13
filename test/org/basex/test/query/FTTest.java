@@ -67,10 +67,9 @@ public final class FTTest extends AbstractTest {
       "</fttest>";
 
     queries = new Object[][] {
-        {"FTWildCard 7", nodes(14),
-          "/fttest/wc/w [text() ftcontains '.*' with wildcards]" },
-        { "FTWildCard 8", nodes(14),
-          "/fttest/wc/w [text() ftcontains '.+' with wildcards]" },
+        { "FTPosFilter 23", nodes(3),
+          "//w [text() ftcontains ('second' ftand 'third' window 3 words) " +
+          "ftand 'sentence' distance exactly 0 words ordered]" },
         
         { "Simple 1", bool(true),
           "'abc' ftcontains 'abc'" },

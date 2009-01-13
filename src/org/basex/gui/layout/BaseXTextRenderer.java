@@ -101,7 +101,7 @@ public final class BaseXTextRenderer extends BaseXBack {
     h = Integer.MAX_VALUE;
     final Graphics g = getGraphics();
     init(g, 0);
-    while(more(g)) next();
+    while(more(g, false)) next();
     h = getHeight() + fontH;
     bar.height(y + off);
   }
@@ -115,7 +115,7 @@ public final class BaseXTextRenderer extends BaseXBack {
     h = Integer.MAX_VALUE;
     final Graphics g = getGraphics();
     init(g, 0);
-    while(more(g) && !text.edited()) next();
+    while(more(g, false) && !text.edited()) next();
     h = hh;
     return y - fontH;
   }
@@ -129,7 +129,7 @@ public final class BaseXTextRenderer extends BaseXBack {
     BaseXLayout.antiAlias(g);
 
     init(g, pos);
-    while(more(g)) write(g);
+    while(more(g, true)) write(g);
 
     if(cursor && text.cursor() == text.size) {
       g.setColor(Color.black);
@@ -140,14 +140,15 @@ public final class BaseXTextRenderer extends BaseXBack {
   /**
    * Checks if the text has more words to print.
    * @param g graphics reference
+   * @param write flag for real text writing
    * @return true if the text has more words
    */
-  private boolean more(final Graphics g) {
+  private boolean more(final Graphics g, final boolean write) {
     // no more words found; quit
     if(!text.moreWords()) return false;
 
     wordW = 0;
-    word = text.nextWord();
+    word = text.nextWord(write);
 
     // calculate word width
     for(int c = 0; c < word.length(); c++) {
@@ -263,7 +264,7 @@ public final class BaseXTextRenderer extends BaseXBack {
           break;
         }
         // end of text - skip last characters
-        if(!more(g)) {
+        if(!more(g, false)) {
           while(text.more()) text.next();
           break;
         }

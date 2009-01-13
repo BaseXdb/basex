@@ -27,6 +27,13 @@ public final class XQFTVisData {
   /** Pointer values for the pos values.*/
   public static int[][] poi = new int[1][];
 
+  /** Real position list for text. */
+  private static IntList tpos = new IntList();
+  /** Corresponding color for the real position list for text. */
+  private static IntList tcol = new IntList();
+  /** Counter of the passed tcol values. */
+  private static int tc = 0;
+  
   /** Number of pre values. */
   private static int osize = 0;
   /** Prevalues and its posvalues. */
@@ -53,6 +60,9 @@ public final class XQFTVisData {
       osize = size;
       oprepos = prepos;
       opoi = poi; 
+      tpos = new IntList();
+      tcol = new IntList();
+      tc = 0;
     }
     size = 0;
     prepos = new int[1][];
@@ -289,4 +299,30 @@ public final class XQFTVisData {
 
     return true;
   }
+  
+  /**
+   * Add a text positiona and color value.
+   * Used to color text in the textview.
+   * 
+   * @param pos int real position value of the token
+   * @param col int color 
+   */
+  public static void addTextPos(final int pos, final int col) {
+    tpos.add(pos);
+    tcol.add(col);    
+  }
+  
+  /**
+   * Get real text position and color for a token.
+   * Used to color text in the textview.
+   * 
+   * @param pos int real position value of the token
+   * @return col int color
+   */
+  public static int getTextCol(final int pos) {
+    if (tpos.size > 0 && tc < tcol.size && tpos.list[tc] == pos) 
+      return tcol.list[tc++];
+    else return -1;
+  }
+
 }
