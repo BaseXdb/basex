@@ -16,54 +16,43 @@ import org.basex.util.IntList;
  * @author Christian Gruen
  * @author Sebastian Gath
  */
-
 public final class XQFTVisData {
   /** Flag for GUI. */
-  public static boolean gui = false;
+  public boolean gui = false;
   /** Number of pre values. */
-  public static int size = 0;
-  /** Prevalues and its posvalues. */
-  public static int[][] prepos = new int[1][];
+  public int size = 0;
+  /** Pre values and its pos values. */
+  public int[][] prepos = new int[1][];
   /** Pointer values for the pos values.*/
-  public static int[][] poi = new int[1][];
+  public int[][] poi = new int[1][];
 
   /** Real position list for text. */
-  private static IntList tpos = new IntList();
+  private IntList tpos = new IntList();
   /** Corresponding color for the real position list for text. */
-  private static IntList tcol = new IntList();
+  private IntList tcol = new IntList();
   /** Counter of the passed tcol values. */
-  private static int tc = 0;
+  private int tc = 0;
   
   /** Number of pre values. */
-  private static int osize = 0;
-  /** Prevalues and its posvalues. */
-  private static int[][] oprepos = new int[1][];
+  private int osize = 0;
+  /** Pre values and its pos values. */
+  private int[][] oprepos = new int[1][];
   /** Pointer values for the pos values.*/
-  private static int[][] opoi = new int[1][];
+  private int[][] opoi = new int[1][];
 
-  
   /**
    * Constructor.
+   * @param o old data
    */
-  private XQFTVisData() {
-    if(gui) init(true);
-  }
-  
-  /**
-   * Init container for new results.
-   * 
-   * @param bu boolean backup last result
-   */
-  public static void init(final boolean bu) {
-    if(!gui) return;
-    if (bu) {
-      osize = size;
-      oprepos = prepos;
-      opoi = poi; 
-      tpos = new IntList();
-      tcol = new IntList();
-      tc = 0;
+  public XQFTVisData(final XQFTVisData o) {
+    if(o != null) {
+      osize = o.size;
+      oprepos = o.prepos;
+      opoi = o.poi;
     }
+    tpos = new IntList();
+    tcol = new IntList();
+    tc = 0;
     size = 0;
     prepos = new int[1][];
     poi = new int[1][];
@@ -76,7 +65,7 @@ public final class XQFTVisData {
    * @param pp int[] pre and positions
    * @param p int[] pointer
    */
-  public static void add(final int[] pp, final int[] p) {
+  public void add(final int[] pp, final int[] p) {
     if (!gui || pp == null || p == null) return;
     if (size + 1 > prepos.length) {
       prepos = Array.extend(prepos);
@@ -104,7 +93,7 @@ public final class XQFTVisData {
    * @param pp int[] pre and position values
    * @param p int[] pointer values
    */
-  private static void add(final int i, final int[] pp, final int[] p) {
+  private void add(final int i, final int[] pp, final int[] p) {
     if(prepos[i][0] == pp[0]) {
       // check if equal or merge
       if (Array.eq(pp, prepos[i]) && Array.eq(p, poi[i])) return;
@@ -138,7 +127,7 @@ public final class XQFTVisData {
   }
 
   /**
-   * Get fulltextdata from the containser.
+   * Get fulltext data from the container.
    * If no data is stored for a pre value,
    * null is returned.
    * int[0] : [pos0, ..., posn]
@@ -147,7 +136,7 @@ public final class XQFTVisData {
    * @param pre int pre value
    * @return int[2][n] fulltext data or null
    */
-  public static int[][] get(final int pre) {
+  public int[][] get(final int pre) {
     if (!gui || size == 0) return null;
     int l = 0, r = size;
     // binary search
@@ -169,7 +158,7 @@ public final class XQFTVisData {
    * @param i pointer on the data
    * @return int[2][n] fulltext data or null
    */
-  private static int[][] getFTData(final int i) {
+  private int[][] getFTData(final int i) {
     final int[][] r = new int[2][prepos[i].length - 1];
     System.arraycopy(prepos[i], 1, r[0], 0, r[0].length);
     System.arraycopy(poi[i], 1, r[1], 0, r[1].length);
@@ -180,9 +169,9 @@ public final class XQFTVisData {
    * Keeps all ftdata specified in pres.
    * All other ftdata is deleted.
    * 
-   * @param pres int[] prevalues to keep
+   * @param pres int[] pre values to keep
    */
-  public static void keep(final int[] pres) {
+  public void keep(final int[] pres) {
     if(!gui || size == 0 || pres == null) return;
     final int[][] tpp = new int[pres.length][];
     final int[][] tp = new int[pres.length][];
@@ -204,7 +193,7 @@ public final class XQFTVisData {
    * 
    * @param pre int pre value
    */
-  public static void remove(final int pre) {
+  public void remove(final int pre) {
     if (!gui || size == 0) return;
     int l = 0, r = size;
     // binary search
@@ -223,9 +212,9 @@ public final class XQFTVisData {
   
   /**
    * Remove ftdata for this node.
-   * @param i pointer on node enty
+   * @param i pointer on node entry
    */
-  private static void removeFTData(final int i) {
+  private void removeFTData(final int i) {
     System.out.println(size);
     System.arraycopy(prepos, i, prepos, i, size - i - 1);
     System.arraycopy(poi, i, poi, i, size - i - 1);
@@ -233,13 +222,13 @@ public final class XQFTVisData {
   }
   
   /**
-   * Converts data from sequential ftcontanins processing.
+   * Converts data from sequential ftcontains processing.
    * 
    * @param d IntList[] ftcontains data
    * @param pre int pre value
    * @param div int div to add for each pointer
    */
-  public static void addConvSeqData(final IntList[] d, final int pre, 
+  public void addConvSeqData(final IntList[] d, final int pre, 
       final int div) {
     if (!gui  || d.length == 0) return;
     
@@ -289,7 +278,7 @@ public final class XQFTVisData {
    * Compares current and last ftdata for equality.
    * @return boolean same()
    */
-  public static boolean same() {
+  public boolean same() {
     if (!gui) return true;
     if (osize != size) return false;
     for (int i = 0; i < osize; i++) {
@@ -301,25 +290,25 @@ public final class XQFTVisData {
   }
   
   /**
-   * Add a text positiona and color value.
-   * Used to color text in the textview.
+   * Add a text position and color value.
+   * Used to color text in the text view.
    * 
    * @param pos int real position value of the token
    * @param col int color 
    */
-  public static void addTextPos(final int pos, final int col) {
+  public void addTextPos(final int pos, final int col) {
     tpos.add(pos);
     tcol.add(col);    
   }
   
   /**
    * Get real text position and color for a token.
-   * Used to color text in the textview.
+   * Used to color text in the text view.
    * 
    * @param pos int real position value of the token
    * @return col int color
    */
-  public static int getTextCol(final int pos) {
+  public int getTextCol(final int pos) {
     if (tpos.size > 0 && tc < tcol.size && tpos.list[tc] == pos) 
       return tcol.list[tc++];
     else return -1;

@@ -57,6 +57,8 @@ public final class XQContext extends QueryContext {
   public int size;
 
   /** Current fulltext item. */
+  public XQFTVisData ftdata;
+  /** Current fulltext item. */
   public FTTokenizer ftitem;
   /** Current fulltext options. */
   public FTOpt ftopt = new FTOpt();
@@ -174,6 +176,9 @@ public final class XQContext extends QueryContext {
 
   @Override
   public Result eval(final Nodes nodes) throws XQException {
+    // add fulltext container reference
+    if(nodes != null) ftdata = nodes.ftdata;
+    
     // evaluates the query
     final Iter it = iter();
     final SeqIter ir = new SeqIter(this);
@@ -192,8 +197,12 @@ public final class XQContext extends QueryContext {
         pre.add(((DBNode) i).pre);
       }
       
-      // completed... return standard nodeset
-      if(i == null) return new Nodes(pre.finish(), data);
+      // completed... return standard nodeset with fulltext positions
+      if(i == null) {
+        final Nodes n = new Nodes(pre.finish(), data);
+        n.ftdata = ftdata;
+        return n;
+      }
       
       // add nodes to standard iterator
       for(int p = 0; p < pre.size; p++) ir.add(new DBNode(data, pre.list[p]));

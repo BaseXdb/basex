@@ -65,10 +65,11 @@ public abstract class Serializer {
    * @param b text bytes
    * @param pos int[] fulltext position values
    * @param poi int[] fulltext pointer values
+   * @param ft fulltext data
    * @throws IOException exception
    */
-  public abstract void text(final byte[] b, final int[] pos, final int[] poi) 
-  throws IOException;
+  public abstract void text(final byte[] b, final int[] pos, final int[] poi,
+      final XQFTVisData ft) throws IOException;
 
   /**
    * Serializes a comment.
@@ -215,7 +216,7 @@ public abstract class Serializer {
     inTag = false;
     finish();
   }
-  
+
   /**
    * Serializes a node of the specified data reference.
    * @param data data reference
@@ -224,6 +225,19 @@ public abstract class Serializer {
    * @throws IOException exception
    */
   public final int node(final Data data, final int pre) throws IOException {
+    return node(data, pre, null);
+  }
+
+  /**
+   * Serializes a node of the specified data reference.
+   * @param data data reference
+   * @param pre pre value to start from
+   * @param ft fulltext data
+   * @return last pre value
+   * @throws IOException exception
+   */
+  public final int node(final Data data, final int pre,
+      final XQFTVisData ft) throws IOException {
     /** Namespaces. */
     final Atts nsp = new Atts();
     /** Parent Stack. */
@@ -248,9 +262,8 @@ public abstract class Serializer {
       if(k == Data.DOC) {
         p++;
       } else if(k == Data.TEXT) {
-        final int[][] ftd = XQFTVisData.get(p);
-        if (ftd != null) 
-          text(data.text(p++), ftd[0], ftd[1]);
+        final int[][] ftd = ft != null ? ft.get(p) : null;
+        if(ftd != null) text(data.text(p++), ftd[0], ftd[1], ft);
         else text(data.text(p++));
       } else if(k == Data.COMM) {
         comment(data.text(p++));

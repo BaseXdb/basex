@@ -1,12 +1,10 @@
 package org.basex.query.xquery.expr;
 
 import java.io.IOException;
-
 import org.basex.data.Serializer;
 import org.basex.index.FTTokenizer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.XQFTVisData;
 import org.basex.query.xquery.item.FTNodeItem;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Type;
@@ -38,8 +36,8 @@ public final class FTContainsIndex extends FTContains {
         ctx.ftitem = ft;
         final FTNodeItem it = ftexpr.iter(ctx).next();
         ctx.ftitem = tmp;
-        if (it.ftn.ip != null && it.ftn.p !=  null) { 
-          XQFTVisData.add(it.ftn.ip.finish(), it.ftn.p.finish());
+        if (it.ftn.ip != null && it.ftn.p !=  null) {
+          ctx.ftdata.add(it.ftn.ip.finish(), it.ftn.p.finish());
         }
         return it.score() == 0 ? null : it;
       }

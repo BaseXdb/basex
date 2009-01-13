@@ -23,6 +23,8 @@ public final class Nodes implements Result {
   public Data data;
   /** Number of stored nodes. */
   public int size;
+  /** Fulltext data. */
+  public XQFTVisData ftdata;
   
   /**
    * Node Set constructor.
@@ -52,7 +54,6 @@ public final class Nodes implements Result {
     size = n.length;
     data = d;
   }
-
   
   /**
    * Returns the position of the specified node or the negative value - 1 of
@@ -149,15 +150,11 @@ public final class Nodes implements Result {
   }
   
   public boolean same(final Result v) {
-    if(!(v instanceof Nodes) || v.size() != size) 
-      return false;
-
+    if(!(v instanceof Nodes) || v.size() != size) return false;
     final Nodes n = (Nodes) v;
-    if(data != n.data) 
-      return false;
-    for(int c = 0; c < size; c++) 
-      if(n.nodes[c] != nodes[c]) return false; 
-    return XQFTVisData.same();
+    if(data != n.data) return false;
+    for(int c = 0; c < size; c++) if(n.nodes[c] != nodes[c]) return false;
+    return ftdata == null || ftdata.same();
   }
 
   public void serialize(final Serializer ser) throws IOException {
@@ -166,7 +163,7 @@ public final class Nodes implements Result {
 
   public void serialize(final Serializer ser, final int n) throws IOException {
     ser.openResult();
-    ser.node(data, nodes[n]);
+    ser.node(data, nodes[n], ftdata);
     ser.closeResult();
   }
 

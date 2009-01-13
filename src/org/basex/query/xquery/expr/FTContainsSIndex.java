@@ -3,7 +3,6 @@ package org.basex.query.xquery.expr;
 import org.basex.index.FTTokenizer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.XQFTVisData;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.DBNode;
 import org.basex.query.xquery.item.FTNodeItem;
@@ -63,7 +62,7 @@ public final class FTContainsSIndex extends FTContains {
 
     if (Bln.get(d).bool() && ftn != null && ctx.ftpos != null &&
         ftn.ftn.ip != null && ftn.ftn.p !=  null)  
-        XQFTVisData.add(ftn.ftn.ip.finish(), ftn.ftn.p.finish());
+      ctx.ftdata.add(ftn.ftn.ip.finish(), ftn.ftn.p.finish());
     
     return Bln.get(d).iter();
   }

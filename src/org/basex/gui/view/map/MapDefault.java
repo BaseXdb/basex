@@ -52,7 +52,8 @@ final class MapDefault extends MapPainter {
       // draw rectangle
       Color col = nextMark(rects, pre, ri, rects.size());
       final boolean mark = col != null;
-      final int[][] ftd = XQFTVisData.get(pre);
+      final XQFTVisData ft = GUI.context.marked().ftdata;
+      final int[][] ftd = ft != null ? ft.get(pre) : null;
       if (ftd != null) {
         r.pos = ftd[0];
         r.poi = ftd[1];

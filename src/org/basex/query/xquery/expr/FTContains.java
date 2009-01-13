@@ -7,7 +7,6 @@ import org.basex.index.FTTokenizer;
 import org.basex.query.xquery.IndexContext;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.XQFTVisData;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.DBNode;
 import org.basex.query.xquery.item.Item;
@@ -75,8 +74,7 @@ public class FTContains extends Expr {
     }
     
     if (Bln.get(d).bool() && ctx.item instanceof DBNode && ctx.ftd != null) 
-      XQFTVisData.addConvSeqData(ctx.ftd, ((DBNode) ctx.item).pre + 1, 
-          div);      
+      ctx.ftdata.addConvSeqData(ctx.ftd, ((DBNode) ctx.item).pre + 1, div);
     
     ctx.ftitem = tmp;
     ctx.ftd = ftd;

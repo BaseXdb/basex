@@ -94,56 +94,46 @@ public final class XMLSerializer extends Serializer {
   @Override
   public void text(final byte[] b) throws IOException {
     finishElement();
-    for(final byte ch : b) {
-      switch(ch) {
-        case '&': out.print(E_AMP); break;
-        case '>': out.print(E_GT); break;
-        case '<': out.print(E_LT); break;
-        case 0xD: out.print(E_CR); break;
-        default : out.write(ch);
-      }
-    }
+    for(final byte ch : b) ch(ch);
     indent = false;
   }
 
   @Override
-  public void text(final byte[] b, final int[] pos, final int[] poi) 
-  throws IOException {
+  public void text(final byte[] b, final int[] pos, final int[] poi,
+      final XQFTVisData ft) throws IOException {
     finishElement();
     int c = -1, pp = 0, wl = 0;
     FTTokenizer ftt = new FTTokenizer(b);
     while(ftt.more()) {
       c++;
       for (int i = wl; i < ftt.p; i++) {
-        switch(b[i]) {
-          case '&': out.print(E_AMP); break;
-          case '>': out.print(E_GT); break;
-          case '<': out.print(E_LT); break;
-          case 0xD: out.print(E_CR); break;
-          default :
-            if (Token.letterOrDigit(b[i]) && pp < pos.length && c == pos[pp]) {
-              // write fulltext pointer in front of the token
-              // used for coloring the token
-              XQFTVisData.addTextPos(out.size(), poi[pp++]);
-            }
-          out.write(b[i]);
+        if (Token.letterOrDigit(b[i]) && pp < pos.length && c == pos[pp]) {
+          // write fulltext pointer in front of the token
+          // used for coloring the token
+          ft.addTextPos(out.size(), poi[pp++]);
         }
+        ch(b[i]);
       }
       wl = ftt.p;
     }
     
-    while (wl < b.length) {
-      switch(b[wl]) {
-        case '&': out.print(E_AMP); break;
-        case '>': out.print(E_GT); break;
-        case '<': out.print(E_LT); break;
-        case 0xD: out.print(E_CR); break;
-        default :
-          out.write(b[wl]);
-      }
-      wl++;
-    }
+    while (wl < b.length) ch(b[wl++]);
     indent = false;
+  }
+  
+  /**
+   * Prints a single character.
+   * @param b character to be printed
+   * @throws IOException exception
+   */
+  private void ch(final byte b) throws IOException {
+    switch(b) {
+      case '&': out.print(E_AMP); break;
+      case '>': out.print(E_GT); break;
+      case '<': out.print(E_LT); break;
+      case 0xD: out.print(E_CR); break;
+      default : out.write(b);
+    }
   }
   
   @Override

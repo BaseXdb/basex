@@ -4,7 +4,6 @@ import static org.basex.query.xquery.XQText.*;
 import org.basex.query.xquery.IndexContext;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.XQFTVisData;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.DBNode;
 import org.basex.query.xquery.item.Item;
@@ -53,14 +52,14 @@ public final class And extends Arr {
     for(final Expr e : expr) {
       final Item it = ctx.iter(e).ebv();
       if(!it.bool()) {
-        XQFTVisData.remove(((DBNode) ctx.item).pre + 1);
+        if(ctx.ftdata != null) ctx.ftdata.remove(((DBNode) ctx.item).pre + 1);
         return Bln.FALSE.iter();
       }
       d = Scoring.and(d, it.score());
     }
     
-    if (!Bln.get(d).bool() && ctx.item instanceof DBNode) 
-      XQFTVisData.remove(((DBNode) ctx.item).pre + 1);
+    if (!Bln.get(d).bool() && ctx.item instanceof DBNode && ctx.ftdata != null) 
+      ctx.ftdata.remove(((DBNode) ctx.item).pre + 1);
     
     return (d == 0 ? Bln.TRUE : Bln.get(d)).iter();
   }

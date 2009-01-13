@@ -330,8 +330,6 @@ public final class GUI extends JFrame {
         views.run();
       }
     }.execute();
-    
-    XQFTVisData.gui = true;
   }
 
   /**
@@ -416,6 +414,7 @@ public final class GUI extends JFrame {
         }
       }
     } else {
+      context.current().ftdata = new XQFTVisData(context.current().ftdata);
       execute(new XQuery(GUIProp.searchmode == 1 ? in :
         Find.find(in, context, GUIProp.filterrt)), true);
     }
@@ -493,7 +492,7 @@ public final class GUI extends JFrame {
       if(pr.updating()) View.updating = false;
 
       // try to convert xquery result to nodeset
-      Result result = pr.result();
+      final Result result = pr.result();
       final Nodes nodes = result instanceof Nodes ? (Nodes) result : null;
 
       // cached resulting text output

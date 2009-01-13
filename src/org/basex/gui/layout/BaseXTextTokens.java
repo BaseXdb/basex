@@ -3,6 +3,8 @@ package org.basex.gui.layout;
 import static org.basex.gui.GUIConstants.*;
 import java.awt.Color;
 
+import org.basex.data.Nodes;
+import org.basex.gui.GUI;
 import org.basex.query.xquery.XQFTVisData;
 import org.basex.util.Array;
 import org.basex.util.Token;
@@ -106,7 +108,7 @@ final class BaseXTextTokens {
   
   /**
    * Get color of current text.
-   * @return currect text color
+   * @return current text color
    */
   public Color getColor() {
     return col;
@@ -119,7 +121,9 @@ final class BaseXTextTokens {
    */
   String nextWord(final boolean w) {
     if (w) {
-      final int c = XQFTVisData.getTextCol(ps); 
+      final Nodes nodes = GUI.context.marked();
+      final XQFTVisData ftdata = nodes != null ? nodes.ftdata : null;
+      final int c = ftdata != null ? ftdata.getTextCol(ps) : -1;
       col = c == -1 ? Color.black : thumbnailcolor[c];
     }
     return Token.string(text, ps, pe - ps);
