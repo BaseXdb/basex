@@ -34,8 +34,6 @@ public final class PlotData {
   public PlotData() {
     xAxis = new PlotAxis(this);
     yAxis = new PlotAxis(this);
-    //xAxis.log = true;
-    //yAxis.log = true;
     pres = new int[0];
   }
 

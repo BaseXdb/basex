@@ -671,7 +671,7 @@ public enum GUICommands implements GUICommand {
   MAPLAYOUT(true, GUIMAPLAYOUT, "% L", GUIMAPLAYOUTTT) {
     @Override
     public void execute() {
-      DialogMapLayout.get(GUI.get()).setVisible(true);
+      new DialogMapLayout(GUI.get());
     }
   },
 

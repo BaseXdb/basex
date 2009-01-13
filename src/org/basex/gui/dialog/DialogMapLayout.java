@@ -32,24 +32,12 @@ public final class DialogMapLayout extends Dialog {
   private BaseXCheckBox atts;
   /** Temporary reference to the old map layout. */
   private final BaseXLabel propLabel;
-  /** Singleton instance. */
-  private static Dialog instance;
-
-  /**
-   * Returns singleton instance.
-   * @param parent parent frame
-   * @return class instance
-   */
-  public static Dialog get(final JFrame parent) {
-    if(instance == null) instance = new DialogMapLayout(parent);
-    return instance;
-  }
   
   /**
    * Default constructor.
    * @param parent parent frame
    */
-  private DialogMapLayout(final JFrame parent) {
+  public DialogMapLayout(final JFrame parent) {
     super(parent, MAPLAYOUTTITLE, false);
     
     final BaseXBack p = new BaseXBack();
@@ -67,7 +55,6 @@ public final class DialogMapLayout extends Dialog {
     p.add(simple);
     atts = new BaseXCheckBox(MAPATTS, HELPMAPATTS,
         GUIProp.mapatts, this);
-    // [JH] doesn't take data change in one session into affect
     if(GUI.context.data().fs != null) {
       atts.setEnabled(false);
     }

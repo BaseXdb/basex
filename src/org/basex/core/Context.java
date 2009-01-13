@@ -46,6 +46,9 @@ public final class Context {
    */
   public boolean root() {
     if(current == null) return true;
+    if(Prop.fsmode) {
+      return current.size == 1 && current.nodes[0] == DataFS.ROOTDIR;
+    }
     for(final int n : current.nodes) if(data.kind(n) != Data.DOC) return false;
     return true;
   }

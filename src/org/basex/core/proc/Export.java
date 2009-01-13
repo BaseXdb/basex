@@ -32,9 +32,12 @@ public final class Export extends Process {
   protected boolean exec() {
     try {
       final PrintOutput out = new PrintOutput(args[0]);
-      final Nodes current = context.current();
+      Nodes current = context.current();
       final boolean root = context.root();
-      if(root) out.println(BaseX.info(DOCDECL, Token.UTF8));
+      if(root) {
+        out.println(BaseX.info(DOCDECL, Token.UTF8));
+        if(Prop.fsmode) current = new Nodes(0, current.data);
+      }
       current.serialize(new XMLSerializer(out, !root, current.data.meta.chop));
       out.close();
 

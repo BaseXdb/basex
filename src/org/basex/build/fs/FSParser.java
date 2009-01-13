@@ -53,8 +53,6 @@ public final class FSParser extends Parser {
   private File curr;
   /** Root flag. */
   private boolean root;
-  /** Cache for content indexing. */
-  private byte[] cache;
   /** Level counter. */
   private int lvl;
   /** Directory size Stack. */
@@ -71,9 +69,6 @@ public final class FSParser extends Parser {
   public FSParser(final IO path, final boolean r) {
     super(path);
     root = r;
-
-    // initialize cache for textual contents
-    if(Prop.fscont) cache = new byte[Prop.fstextmax];
 
     meta.add(TYPEGIF, new GIFExtractor());
     meta.add(TYPEPNG, new PNGExtractor());
@@ -196,16 +191,19 @@ public final class FSParser extends Parser {
 
       // import textual content
       if(Prop.fscont && f.isFile()) {
-        final int size = BufferInput.read(f, cache);
-        int s = -1;
-        while(++s < size) {
-          final byte b = cache[s];
+        // initialize cache for textual contents
+        final int l = (int) Math.min(f.length(), Prop.fstextmax);
+        final byte[] cc = new byte[l];
+        BufferInput.read(f, cc);
+        int c = -1;
+        while(++c < l) {
+          final byte b = cc[c];
           if(b >= 0 && b < ' ' && !ws(b)) break;
         }
-        if(s == size) {
-          while(--s >= 0 && cache[s] <= 0x20 && cache[s] >= 0);
-          if(++s != 0) {
-            builder.nodeAndText(CONTENT, atts.reset(), Array.finish(cache, s));
+        if(c == l) {
+          while(--c >= 0 && cc[c] <= 0x20 && cc[c] >= 0);
+          if(++c != 0) {
+            builder.nodeAndText(CONTENT, atts.reset(), Array.finish(cc, c));
           }
         }
       }

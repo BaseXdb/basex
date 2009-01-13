@@ -48,7 +48,7 @@ abstract class MapLayout {
    * @return average aspect ratio
    */
   public static double aspectRatio(final ArrayList<ViewRect> r) {
-    if (r.isEmpty()) return 99999999999d;
+    if (r.isEmpty()) return Double.MAX_VALUE;
     double ar = 0;
     
     for(int i = 0; i < r.size(); i++) {
