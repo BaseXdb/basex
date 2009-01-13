@@ -209,6 +209,7 @@ public final class FTNode {
       tok = null;
     }   
     
+    c = 0;
     p = p != null ? new IntList(pn.finish()) : null;
     return ip.size > 1;
   }

@@ -873,28 +873,38 @@ public final class BaseXLayout {
     int count = -1;
     int pp = 0;
     int cs = 0;
+    int tl;
     IntList col;
+    IntList tokl;
     int cc;
     boolean m = ftt.more();
     
     while (m) {
       col = new IntList();
+      tokl = new IntList();
+      tokl.add(0);
       cc = 0;
       while (cs == ftt.sent && 
           (r.pos == null || (pp < r.pos.length && count < r.pos[pp]) 
               || pp == r.pos.length)) {
-        wl += (int) ((ftt.p - ftt.s) * f); 
+        tl = (int) ((ftt.p - ftt.s) * f);
+        wl += tl; 
         count++;
-        if (draw && r.pos != null && pp < r.pos.length && count == r.pos[pp])  
-          col.add(r.poi[pp++]);    
+        if (draw && r.pos != null && pp < r.pos.length 
+            && count == r.pos[pp]) {  
+          col.add(r.poi[pp++]);
+          tokl.add(tl);
+          tokl.list[0] += tl;
+        }
         m = ftt.more();
         if (!m) break;
       }
       cs++;
       
       int l = 0;
+      int[] sizes = getThumbnailLength(tokl, wl);
       while (l < wl) {
-        int tw = col.size == 0 ? wl : (wl / col.size) + 1;
+        int tw = sizes[cc]; //col.size == 0 ? wl : (wl / col.size) + 1;
         while (ll + tw > ww) {
           if (draw) {
             if (col.size > 0) g.setColor(thumbnailcolor[col.list[cc]]); 
@@ -922,7 +932,19 @@ public final class BaseXLayout {
     return yy - r.y;
   }
 
-  
+  /**
+   * Calculates the length of a thumbnail.
+   * @param il IntList with tokens length
+   * @param wl total length of the thumbnail
+   * @return int[] length
+   */
+  private static int[] getThumbnailLength(final IntList il, final int wl) {
+    if (il.size == 1) return new int[] {wl};
+    int[] i = new int[il.size - 1];
+    for (int j = 0; j < i.length; j++) 
+      i[j] = (il.list[j + 1] * wl / il.list[0]) + 1;  
+    return i;
+  }
   
 
   /**

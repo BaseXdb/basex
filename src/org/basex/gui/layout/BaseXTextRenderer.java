@@ -264,7 +264,7 @@ public final class BaseXTextRenderer extends BaseXBack {
           break;
         }
         // end of text - skip last characters
-        if(!more(g, false)) {
+        if(!more(g, true)) {
           while(text.more()) text.next();
           break;
         }

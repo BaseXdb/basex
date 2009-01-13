@@ -64,17 +64,18 @@ public class FTContains extends Expr {
     final Iter iter = expr.iter(ctx);
     final FTTokenizer tmp = ctx.ftitem;
     final IntList[] ftd = ctx.ftd;
-    
+    int pre = -1;
     double d = 0;
     Item i;
     ctx.ftitem = ft;
     while((i = iter.next()) != null) {
       ft.init(i.str());
       d = Scoring.and(d, ftexpr.iter(ctx).next().score());
+      if (i instanceof DBNode) pre = ((DBNode) i).pre; 
     }
     
-    if (Bln.get(d).bool() && ctx.item instanceof DBNode && ctx.ftd != null) 
-      ctx.ftdata.addConvSeqData(ctx.ftd, ((DBNode) ctx.item).pre + 1, div);
+    if (Bln.get(d).bool() && pre > -1 && ctx.ftd != null) 
+      ctx.ftdata.addConvSeqData(ctx.ftd, pre, div);      
     
     ctx.ftitem = tmp;
     ctx.ftd = ftd;

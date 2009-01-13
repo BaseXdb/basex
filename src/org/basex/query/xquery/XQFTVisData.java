@@ -30,8 +30,6 @@ public final class XQFTVisData {
   private IntList tpos = new IntList();
   /** Corresponding color for the real position list for text. */
   private IntList tcol = new IntList();
-  /** Counter of the passed tcol values. */
-  private int tc = 0;
   
   /** Number of pre values. */
   private int osize = 0;
@@ -40,7 +38,7 @@ public final class XQFTVisData {
   /** Pointer values for the pos values.*/
   private int[][] opoi = new int[1][];
 
-  /**
+/**
    * Constructor.
    * @param o old data
    */
@@ -52,10 +50,24 @@ public final class XQFTVisData {
     }
     tpos = new IntList();
     tcol = new IntList();
-    tc = 0;
     size = 0;
     prepos = new int[1][];
     poi = new int[1][];
+  }
+
+  /**
+   * Constructor.
+   */
+  public XQFTVisData() {
+    if(gui) initT();
+  }
+  
+  /**
+   * Init container for textview.
+   */
+  public void initT() {
+    tpos = new IntList();
+    tcol = new IntList();
   }
   
   /**
@@ -309,9 +321,19 @@ public final class XQFTVisData {
    * @return col int color
    */
   public int getTextCol(final int pos) {
-    if (tpos.size > 0 && tc < tcol.size && tpos.list[tc] == pos) 
-      return tcol.list[tc++];
-    else return -1;
+    int tc = 0;
+    while (tpos.size > 0 && tc < tcol.size && tpos.list[tc] < pos) tc++; 
+    return tpos.size > 0 && tpos.list[tc] == pos ? tcol.list[tc++] : -1;  
   }
 
+  /*
+  public static String toString(final int[] p) {
+    if (p == null) return new String("[null]");
+    StringBuffer sb = new StringBuffer();
+    sb.append("[" + p[0]);
+    for (int i = 1; i < p.length; i++) sb.append(", " + p[i]);
+    sb.append("]");
+    return sb.toString();
+  }
+  */
 }
