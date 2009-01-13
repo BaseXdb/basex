@@ -292,6 +292,8 @@ public final class MapView extends View implements Runnable {
     switch(GUIProp.mapalgo){
       case 0: layouter = new SplitLayout(); break;
       case 1: layouter = new SliceDiceLayout(); break;
+      case 2: layouter = new SquarifiedLayout(); break;
+      case 3: layouter = new StripLayout(); break;
     }
 
     layouter.calcMap(rect, rectangles, new IntList(nodes.nodes),

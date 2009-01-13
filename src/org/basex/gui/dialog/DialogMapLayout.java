@@ -3,6 +3,8 @@ package org.basex.gui.dialog;
 import static org.basex.Text.*;
 import java.awt.BorderLayout;
 import javax.swing.JFrame;
+
+import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXCheckBox;
@@ -65,6 +67,10 @@ public final class DialogMapLayout extends Dialog {
     p.add(simple);
     atts = new BaseXCheckBox(MAPATTS, HELPMAPATTS,
         GUIProp.mapatts, this);
+    // [JH] doesn't take data change in one session into affect
+    if(GUI.context.data().fs != null) {
+      atts.setEnabled(false);
+    }
     p.add(atts);
 
     // create slider

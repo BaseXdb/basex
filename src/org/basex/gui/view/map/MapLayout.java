@@ -16,6 +16,10 @@ import org.basex.util.IntList;
 abstract class MapLayout {
   /** Layout rectangle. */
   ViewRect layout;
+  /** List of layed out rects. */
+  // [JH] use this list instead of the given one of MapView to provide central
+  // access to analysis data
+  ArrayList<ViewRect> rectangles;
   /** Font size. */
   final int o = GUIProp.fontsize + 4;
   
@@ -33,24 +37,69 @@ abstract class MapLayout {
       default:
     }
   }
-
-  /*
+  
+  /**
    * Calculates the average aspect Ratios of rectangles given in the List.
    * 
-   * @param rects Array of rectangles
+   * [JH] average aspect ratio as introduced by shneiderman is only for leaf
+   * nodes. here any nodes are used to compute it ....
+   * 
+   * @param r Array of rectangles
    * @return average aspect ratio
-  double aspectRatio(final ArrayList<ViewRect> rects) {
-    double aar = 0.0;
-    for(int i = 0; i < rects.size(); i++) {
-      aar += rects.get(i).x < rects.get(i).y ? rects.get(i).y / rects.get(i).x :
-        rects.get(i).x / rects.get(i).y;
+   */
+  public static double aspectRatio(final ArrayList<ViewRect> r) {
+    if (r.isEmpty()) return 99999999999d;
+    double ar = 0;
+    
+    for(int i = 0; i < r.size(); i++) {
+      if (r.get(i).w != 0 && r.get(i).h != 0) {
+        if (r.get(i).w > r.get(i).h) {
+          ar += r.get(i).w / r.get(i).h;
+        } else {
+          ar += r.get(i).h / r.get(i).w;
+        }
+      }
     }
-    return aar / rects.size();
+    return ar / r.size();
   }
+  
+  // [JH] some metrics to implement
+  
+  /**
+   * Sorts Rectangles of a given List.
+   * @param nodes 
+   * @return sorted
    */
   
   /**
+   * Calculates the average distance.
+   * 
+   * @param nodes
+   * @return average distance
+   */
+  
+  /**
+   * Calculates the layout change distance. Comparison of the changes in two 
+   * layouts.
+   * 
+   * @param one
+   * @param two
+   */
+  
+  /**
+   * Returns the number of rectangles painted.
+   * 
+   * [JH] will work only if nodes are stored in here
+   * 
+   * @return nr of rects
+   */
+  /*public int getRectNumber() {
+    return rectangles.size();
+  }*/
+  
+  /**
    * Returns all children of the specified node.
+   * 
    * @param par parent node
    * @return children
    */
@@ -72,14 +121,21 @@ abstract class MapLayout {
   }
   
   /**
+   * Handles inserting rectangles into a strip.
+   * used by squarified, spiral, striplayout
+   * 
+   * definition of direction is neeeded
+   */
+  
+  /**
    * Recursively splits rectangles.
    * 
    * @param r parent rectangle
+   * @param mainRects stores already layouted rects
    * @param l children array
    * @param ns start array position
    * @param ne end array position
    * @param level indicates level which is calculated
-   * @param mainRects stores already layouted rects
    */
   abstract void calcMap(final ViewRect r, ArrayList<ViewRect> mainRects,
       final IntList l, final int ns, final int ne, final int level);
