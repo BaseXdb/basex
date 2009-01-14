@@ -61,7 +61,7 @@ public final class DataAccessMMA {
     long tmplen = len;
     int i = 0;
     // (int) Math.ceil(len / BUFFERSIZE) + 1;
-    int numberofwindows = (int) (len - 1 + BUFFERSIZE)/BUFFERSIZE;
+    int numberofwindows = (int) (len - 1 + BUFFERSIZE) / BUFFERSIZE;
     mbytebuffer = new MappedByteBuffer[numberofwindows];
     while(tmplen > BUFFERSIZE) {
       mbytebuffer[i] = rwChannel.map(FileChannel.MapMode.READ_WRITE, 
@@ -212,11 +212,17 @@ public final class DataAccessMMA {
   public synchronized void cursor(final long p) {
     // select buffer window
     // selector = (int) Math.ceil(p / BUFFERSIZE);
-    selector = (int) (p - 1 + BUFFERSIZE)/BUFFERSIZE;
+    selector = (int) (p - 1 + BUFFERSIZE) / BUFFERSIZE;
     // calculate offset
     off = (int) p % BUFFERSIZE; //(int) (p & BUFFERSIZE);
     // set pointer
-    mbytebuffer[selector].position(off);
+    try {
+      mbytebuffer[selector].position(off);
+    }  catch (Exception e) {
+//      System.out.println(e);
+//      System.out.println(BUFFERSIZE);
+//      System.out.println(off);
+    }
   }
 
   /**
