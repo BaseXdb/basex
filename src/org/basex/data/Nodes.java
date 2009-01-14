@@ -163,7 +163,7 @@ public final class Nodes implements Result {
 
   public void serialize(final Serializer ser, final int n) throws IOException {
     ser.openResult();
-//    ftdata.initT();
+    ftdata.initT();
     ser.node(data, nodes[n], ftdata);
     ser.closeResult();
   }

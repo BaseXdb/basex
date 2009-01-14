@@ -18,7 +18,8 @@ import org.basex.util.IntList;
  */
 public final class XQFTVisData {
   /** Flag for GUI. */
-  public boolean gui = false;
+  // [SG] find solution for console mode
+  public boolean gui = true;
   /** Number of pre values. */
   public int size = 0;
   /** Pre values and its pos values. */
