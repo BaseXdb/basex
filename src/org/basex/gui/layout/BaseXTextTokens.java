@@ -38,6 +38,8 @@ final class BaseXTextTokens {
   private int me = -1;
   /** Start of an error mark. */
   private int es = -1;
+  /** Flag for coloring tokens in the text view. */
+  public boolean cft = false;
 
   /**
    * Constructor.
@@ -120,7 +122,7 @@ final class BaseXTextTokens {
    * @return next token
    */
   String nextWord(final boolean w) {
-    if (w) {
+    if (cft && w) {
       final Nodes nodes = GUI.context.marked();
       final XQFTVisData ftdata = nodes != null ? nodes.ftdata : null;
       final int c = ftdata != null ? ftdata.getTextCol(ps) : -1;

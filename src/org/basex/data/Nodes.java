@@ -158,12 +158,12 @@ public final class Nodes implements Result {
   }
 
   public void serialize(final Serializer ser) throws IOException {
+    ftdata.initT();
     for(int c = 0; c < size && !ser.finished(); c++) serialize(ser, c);
   }
 
   public void serialize(final Serializer ser, final int n) throws IOException {
     ser.openResult();
-    ftdata.initT();
     ser.node(data, nodes[n], ftdata);
     ser.closeResult();
   }

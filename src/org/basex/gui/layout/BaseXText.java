@@ -54,7 +54,7 @@ public final class BaseXText extends BaseXPanel {
   final boolean editable;
   /** Popup Menu. */
   final BaseXPopup popup;
-
+  
   /**
    * Default constructor.
    * @param help help text
@@ -69,7 +69,18 @@ public final class BaseXText extends BaseXPanel {
    * @param help help text
    */
   public BaseXText(final byte[] help, final boolean edit) {
-    this(help, edit, null);
+    this(help, edit, null, false);
+  }
+
+  /**
+   * Default constructor.
+   * @param edit editable flag
+   * @param help help text
+   * @param ftd highlight ftdata tokens flag
+   */
+  public BaseXText(final byte[] help, final boolean edit, 
+      final boolean ftd) {
+    this(help, edit, null, ftd);
   }
 
   /**
@@ -79,6 +90,18 @@ public final class BaseXText extends BaseXPanel {
    * @param list reference to the dialog listener
    */
   public BaseXText(final byte[] help, final boolean edit, final Dialog list) {
+    this(help, edit, list, false);
+  }
+  
+  /**
+   * Default constructor.
+   * @param help help text
+   * @param edit editable flag
+   * @param list reference to the dialog listener
+   * @param ftd highlight ftdata tokens flag
+   */
+  public BaseXText(final byte[] help, final boolean edit, final Dialog list, 
+      final boolean ftd) {
     super(help);
     setFocusable(true);
 
@@ -89,6 +112,7 @@ public final class BaseXText extends BaseXPanel {
     addMouseListener(this);
     addKeyListener(this);
     editable = edit;
+    text.cft = ftd;
 
     addFocusListener(new FocusAdapter() {
       @Override
@@ -122,7 +146,7 @@ public final class BaseXText extends BaseXPanel {
     final GUICommand[] pop = !edit ? new GUICommand[] { new CopyCmd() } :
         new GUICommand[] { new UndoCmd(), new RedoCmd(), null, new CutCmd(),
         new CopyCmd(), new PasteCmd(), new DelCmd(), null };
-    popup = new BaseXPopup(this, pop);
+    popup = new BaseXPopup(this, pop);    
   }
 
   /**

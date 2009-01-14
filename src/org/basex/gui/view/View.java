@@ -173,8 +173,10 @@ public abstract class View extends BaseXPanel {
 
     final GUI gui = GUI.get();
     final Context context = GUI.context;
-    // [SG] find general solution - works only for zooming of the parent axis
+    // [SG] find general solution
     final Nodes n = new Nodes(context.data());
+    n.ftdata = context.marked().ftdata == null ? 
+        context.current().ftdata : context.marked().ftdata;
 
     if(!quick) {
       final String input = gui.input.getText();

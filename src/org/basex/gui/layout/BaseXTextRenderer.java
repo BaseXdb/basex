@@ -63,7 +63,9 @@ public final class BaseXTextRenderer extends BaseXBack {
    * @param t text to be drawn
    */
   void setText(final BaseXTextTokens t) {
+    if (t != null && text != null) t.cft = text.cft;
     text = t;
+    
   }
 
   @Override

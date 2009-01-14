@@ -49,7 +49,7 @@ public final class TextView extends View {
     setBorder(4, 8, 8, 8);
     setMode(mode);
     
-    area = new BaseXText(help, false);
+    area = new BaseXText(help, false, true);
     add(area, BorderLayout.CENTER);
     
     header = new BaseXLabel(head, true);
