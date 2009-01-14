@@ -16,10 +16,6 @@ import org.basex.util.IntList;
 abstract class MapLayout {
   /** Layout rectangle. */
   ViewRect layout;
-  /** List of layed out rects. */
-  // [JH] use this list instead of the given one of MapView to provide central
-  // access to analysis data
-  ArrayList<ViewRect> rectangles;
   /** Font size. */
   final int o = GUIProp.fontsize + 4;
   
@@ -47,7 +43,7 @@ abstract class MapLayout {
    * @param r Array of rectangles
    * @return average aspect ratio
    */
-  public static double aspectRatio(final ArrayList<ViewRect> r) {
+  public static double allRatio(final ArrayList<ViewRect> r) {
     if (r.isEmpty()) return Double.MAX_VALUE;
     double ar = 0;
     
