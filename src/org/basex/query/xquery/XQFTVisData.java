@@ -324,7 +324,8 @@ public final class XQFTVisData {
   public int getTextCol(final int pos) {
     int tc = 0;
     while (tpos.size > 0 && tc < tcol.size && tpos.list[tc] < pos) tc++; 
-    return tpos.size > 0 && tpos.list[tc] == pos ? tcol.list[tc++] : -1;  
+    return tpos.size > 0 && tc < tpos.list.length && 
+      tpos.list[tc] == pos ? tcol.list[tc++] : -1;  
   }
 
   /*
