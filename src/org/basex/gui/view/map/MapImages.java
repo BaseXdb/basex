@@ -8,8 +8,6 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import org.basex.BaseX;
 import org.basex.data.Data;
-import org.basex.gui.GUI;
-import org.basex.gui.view.View;
 import org.basex.util.Action;
 import org.basex.util.Token;
 
@@ -23,7 +21,7 @@ final class MapImages {
   /** Maximum number of cached images. */
   private static final int MAXNR = 5000;
   /** Reference to the treemap panel. */
-  MapView map;
+  MapView view;
   /** Image cache. */
   BufferedImage[] imgs = new BufferedImage[MAXNR];
   /** Maximum image size. */
@@ -48,7 +46,7 @@ final class MapImages {
    * @param panel reference to the treemap
    */
   MapImages(final MapView panel) {
-    map = panel;
+    view = panel;
   }
 
   /**
@@ -111,7 +109,7 @@ final class MapImages {
 
         try {
           // database closed - quit
-          final Data data = GUI.context.data();
+          final Data data = view.gui.context.data();
           if(data == null) {
             loaderC = 0;
             return;
@@ -146,7 +144,7 @@ final class MapImages {
           imgs[ic] = image;
           imgmax[ic] = min >= 1;
 
-          if((loaderC & 5) == 0 && !View.painting) paint();
+          if((loaderC & 5) == 0 && !view.gui.painting) paint();
         } catch(final IOException ex) {
           BaseX.debug(ex);
         }
@@ -161,7 +159,7 @@ final class MapImages {
    */
   void paint() {
     // determine maximum cache size, depending on window size
-    final Dimension size = GUI.get().getSize();
+    final Dimension size = view.gui.getSize();
     final Runtime rt = Runtime.getRuntime();
     final long max = Math.max(size.width * size.height * 10L,
         rt.maxMemory() / 5);
@@ -179,7 +177,7 @@ final class MapImages {
       }
       j = (j == 0 ? MAXNR : j) - 1;
     }
-    map.repaint();
+    view.repaint();
   }
 
   /**

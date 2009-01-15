@@ -1,8 +1,6 @@
 package org.basex.gui.view;
 
-import static org.basex.gui.GUIConstants.*;
 import java.awt.BorderLayout;
-import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 
@@ -24,7 +22,7 @@ public final class ViewPanel extends BaseXBack implements ViewLayout {
    */
   public ViewPanel(final View v, final String name) {
     setLayout(new BorderLayout());
-    add(new ViewMover(), BorderLayout.NORTH);
+    add(new ViewMover(v.gui), BorderLayout.NORTH);
     add(v, BorderLayout.CENTER);
     view = v;
     view.setName(name);
@@ -34,49 +32,31 @@ public final class ViewPanel extends BaseXBack implements ViewLayout {
    * Sets the visibility of the view layout.
    */
   public void setVisibility() {
-    final boolean db = GUI.context.db();
-    final String name = view.getName();
-    if(name.equals(MAPVIEW))        setVisible(GUIProp.showmap);
-    else if(name.equals(TREEVIEW))  setVisible(GUIProp.showtree);
-    else if(name.equals(TABLEVIEW)) setVisible(GUIProp.showtable);
-    else if(name.equals(INFOVIEW))  setVisible(GUIProp.showinfo);
-    else if(name.equals(QUERYVIEW)) setVisible(GUIProp.showquery);
-    else if(name.equals(REALVIEW))  setVisible(GUIProp.showreal);
-    else if(name.equals(PLOTVIEW))  setVisible(GUIProp.showplot);
-    else if(name.equals(HELPVIEW))  setVisible(db ?
-        GUIProp.showhelp : GUIProp.showstarthelp);
-    else if(name.equals(TEXTVIEW))  setVisible(db ?
-        GUIProp.showtext : GUIProp.showstarttext);
+    try {
+      setVisible(GUIProp.class.getField(prop()).getBoolean(null));
+    } catch(final Exception ex) {
+      ex.printStackTrace();
+    }
   }
 
   /**
    * Makes the view invisible.
    */
-  public void remove() {
-    final boolean db = GUI.context.db();
-    final String name = view.getName();
-    if(name.equals(MAPVIEW)) {
-      GUIProp.showmap = false;
-    } else if(name.equals(TREEVIEW)) {
-      GUIProp.showtree = false;
-    } else if(name.equals(TABLEVIEW)) {
-      GUIProp.showtable = false;
-    } else if(name.equals(INFOVIEW)) {
-      GUIProp.showinfo = false;
-    } else if(name.equals(QUERYVIEW)) {
-      GUIProp.showquery = false;
-    } else if(name.equals(REALVIEW)) {
-      GUIProp.showreal = false;
-    } else if(name.equals(PLOTVIEW)) {
-      GUIProp.showplot = false;
-    } else if(name.equals(TEXTVIEW)) {
-      if(db) GUIProp.showtext = false;
-      else GUIProp.showstarttext = false;
-    } else if(name.equals(HELPVIEW)) {
-      if(db) GUIProp.showhelp = false;
-      else GUIProp.showstarthelp = false;
+  public void delete() {
+    try {
+      GUIProp.class.getField(prop()).setBoolean(null, false);
+      view.gui.layoutViews();
+    } catch(final Exception ex) {
+      ex.printStackTrace();
     }
-    GUI.get().layoutViews();
+  }
+
+  /**
+   * Returns the name of the view property.
+   * @return property
+   */
+  public String prop() {
+    return "show" + (view.gui.context.db() ? "" : "start") + view;
   }
 
   /**
@@ -84,7 +64,7 @@ public final class ViewPanel extends BaseXBack implements ViewLayout {
    * @param panel panel to be compared
    * @return result of check
    */
-  public boolean remove(final ViewPanel panel) {
+  public boolean delete(final ViewPanel panel) {
     return this == panel;
   }
 

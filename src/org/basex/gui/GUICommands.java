@@ -43,7 +43,6 @@ import org.basex.gui.dialog.DialogPrefs;
 import org.basex.gui.dialog.DialogProgress;
 import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.view.View;
 import org.basex.gui.view.ViewData;
 import org.basex.io.IO;
 import org.basex.util.Action;
@@ -65,34 +64,28 @@ public enum GUICommands implements GUICommand {
   /** Create database. */
   CREATE(false, GUICREATE, "% N", GUICREATETT) {
     @Override
-    public void execute() {
+    public void execute(final GUI gui) {
       // open file chooser for XML creation
-      final DialogCreate dialog = new DialogCreate(GUI.get());
+      final DialogCreate dialog = new DialogCreate(gui);
       if(!dialog.ok()) return;
       final String in = dialog.path();
       final String db = dialog.dbname();
-      progress(PROGCREATE, new Process[] { new CreateDB(in, db) });
+      progress(gui, PROGCREATE, new Process[] { new CreateDB(in, db) });
     }
   },
 
   /** Open database. */
   OPEN(false, GUIOPEN, "% O", GUIOPENTT) {
     @Override
-    public void execute() {
-      final GUI main = GUI.get();
-      final DialogOpen dialog = new DialogOpen(main, false);
+    public void execute(final GUI gui) {
+      final DialogOpen dialog = new DialogOpen(gui, false);
       if(dialog.ok()) {
-        final String db = dialog.db();
-        if(db == null) return;
-        if(IO.dbpath(db).exists()) {
-          new Close().execute(GUI.context);
-          View.notifyInit();
-        }
-        main.execute(new Open(db));
+        if(new Close().execute(gui.context)) gui.notify.init();
+        gui.execute(new Open(dialog.db()));
       } else if(dialog.nodb()) {
-        if(JOptionPane.showConfirmDialog(GUI.get(), NODBQUESTION, DIALOGINFO,
+        if(JOptionPane.showConfirmDialog(gui, NODBQUESTION, DIALOGINFO,
             JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
-          CREATE.execute();
+          CREATE.execute(gui);
       }
     }
   },
@@ -100,9 +93,9 @@ public enum GUICommands implements GUICommand {
   /** Drop database. */
   DROP(false, GUIDROP, null, GUIDROPTT) {
     @Override
-    public void execute() {
-      if(new DialogOpen(GUI.get(), true).nodb()) {
-        JOptionPane.showMessageDialog(GUI.get(), INFONODB, DIALOGINFO,
+    public void execute(final GUI gui) {
+      if(new DialogOpen(gui, true).nodb()) {
+        JOptionPane.showMessageDialog(gui, INFONODB, DIALOGINFO,
             JOptionPane.INFORMATION_MESSAGE);
       }
     }
@@ -111,29 +104,27 @@ public enum GUICommands implements GUICommand {
   /** Reset database. */
   CLOSE(true, GUICLOSE, "% W", GUICLOSETT) {
     @Override
-    public void execute() {
-      GUI.get().execute(new Close());
+    public void execute(final GUI gui) {
+      gui.execute(new Close());
     }
   },
 
   /** Open XQuery. */
   XQOPEN(true, GUIXQOPEN, "% R", GUIXQOPENTT) {
     @Override
-    public void execute() {
+    public void execute(final GUI gui) {
       // open file chooser for XML creation
-      final GUI main = GUI.get();
-
       final BaseXFileChooser fc = new BaseXFileChooser(XQOPENTITLE,
-          GUIProp.xqpath, main);
+          GUIProp.xqpath, gui);
       fc.addFilter(IO.XQSUFFIX, CREATEXQDESC);
 
       if(fc.select(BaseXFileChooser.Mode.OPEN)) {
         try {
           final IO file = fc.getFile();
-          main.query.setXQuery(file.content());
+          gui.query.setXQuery(file.content());
           Prop.xquery = file;
         } catch(final IOException ex) {
-          JOptionPane.showMessageDialog(main, XQOPERROR,
+          JOptionPane.showMessageDialog(gui, XQOPERROR,
               DIALOGINFO, JOptionPane.ERROR_MESSAGE);
         }
       }
@@ -144,23 +135,21 @@ public enum GUICommands implements GUICommand {
   /** Save XQuery. */
   XQSAVE(true, GUIXQSAVE, "% S", GUIXQSAVETT) {
     @Override
-    public void execute() {
+    public void execute(final GUI gui) {
       // open file chooser for XML creation
-      final GUI main = GUI.get();
-
       final String fn = Prop.xquery == null ? null : Prop.xquery.path();
       final BaseXFileChooser fc = new BaseXFileChooser(XQSAVETITLE,
-          fn == null ? GUIProp.xqpath : fn, main);
+          fn == null ? GUIProp.xqpath : fn, gui);
       fc.addFilter(IO.XQSUFFIX, CREATEXQDESC);
 
       if(fc.select(BaseXFileChooser.Mode.SAVE)) {
         try {
           final IO file = fc.getFile();
           file.suffix(IO.XQSUFFIX);
-          file.write(main.query.getXQuery());
+          file.write(gui.query.getXQuery());
           Prop.xquery = file;
         } catch(final IOException ex) {
-          JOptionPane.showMessageDialog(main, XQSAVERROR,
+          JOptionPane.showMessageDialog(gui, XQSAVERROR,
               DIALOGINFO, JOptionPane.ERROR_MESSAGE);
         }
       }
@@ -171,33 +160,30 @@ public enum GUICommands implements GUICommand {
   /** Import filesystem. */
   IMPORTFS(false, GUIIMPORTFS, null, GUIIMPORTFSTT) {
     @Override
-    public void execute() {
-      final GUI main = GUI.get();
-      if(!new DialogImportFS(main).ok()) return;
+    public void execute(final GUI gui) {
+      if(!new DialogImportFS(gui).ok()) return;
       final String p = GUIProp.fsall ? "/" : GUIProp.fspath.replace('\\', '/');
       final String name = GUIProp.importfsname;
-      progress(IMPORTFSTITLE, new Process[] { new CreateFS(p, name) });
+      progress(gui, IMPORTFSTITLE, new Process[] { new CreateFS(p, name) });
     }
   },
 
   /** Export document. */
   EXPORT(true, GUIEXPORT, "% E", GUIEXPORTTT) {
     @Override
-    public void execute() {
+    public void execute(final GUI gui) {
       // open file chooser for XML creation
-      final GUI main = GUI.get();
-
       final BaseXFileChooser fc = new BaseXFileChooser(EXPORTTITLE,
-          GUIProp.createpath, main);
+          GUIProp.createpath, gui);
       fc.addFilter(IO.XMLSUFFIX, CREATEXMLDESC);
 
       if(fc.select(BaseXFileChooser.Mode.SAVE)) {
         final IO file = fc.getFile();
         file.suffix(IO.XMLSUFFIX);
         try {
-          file.write(main.text.getText());
+          file.write(gui.text.getText());
         } catch(final IOException ex) {
-          JOptionPane.showMessageDialog(main, XQSAVERROR,
+          JOptionPane.showMessageDialog(gui, XQSAVERROR,
               DIALOGINFO, JOptionPane.ERROR_MESSAGE);
         }
         //main.execute(Commands.EXPORT, "\"" + file + "\"");
@@ -209,27 +195,26 @@ public enum GUICommands implements GUICommand {
   /** Exit BaseX. */
   EXIT(false, GUIEXIT, null, GUIEXITTT) {
     @Override
-    public void execute() {
-      GUI.get().quit();
+    public void execute(final GUI gui) {
+      gui.quit();
     }
   },
-
 
   /* EDIT COMMANDS */
 
   /** Copy the currently marked nodes. */
   COPY(true, GUICOPY, "% C", GUICOPYTT) {
     @Override
-    public void execute() {
-      final Context context = GUI.context;
+    public void execute(final GUI gui) {
+      final Context context = gui.context;
       final Nodes nodes = context.marked();
       context.copy(new Nodes(nodes.nodes, nodes.data));
     }
 
     @Override
-    public void refresh(final AbstractButton button) {
+    public void refresh(final GUI gui, final AbstractButton button) {
       // disallow copy of empty node set or root node
-      final Nodes nodes = GUI.context.marked();
+      final Nodes nodes = gui.context.marked();
       BaseXLayout.enable(button, !Prop.mainmem && nodes != null &&
           nodes.size != 0 && (nodes.size != 1 || nodes.nodes[0] != 0));
     }
@@ -238,18 +223,18 @@ public enum GUICommands implements GUICommand {
   /** Copy the current path. */
   COPYPATH(true, GUICPPATH, "% shift C", GUICPPATHTT) {
     @Override
-    public void execute() {
-      final int pre = GUI.context.marked().nodes[0];
-      final byte[] txt = ViewData.path(GUI.context.data(), pre);
+    public void execute(final GUI gui) {
+      final int pre = gui.context.marked().nodes[0];
+      final byte[] txt = ViewData.path(gui.context.data(), pre);
       // copy path to clipboard
       final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
       clip.setContents(new StringSelection(Token.string(txt)), null);
     }
 
     @Override
-    public void refresh(final AbstractButton button) {
+    public void refresh(final GUI gui, final AbstractButton button) {
       // disallow copy of empty node set or root node
-      final Nodes marked = GUI.context.marked();
+      final Nodes marked = gui.context.marked();
       BaseXLayout.enable(button, marked != null && marked.size != 0);
     }
   },
@@ -257,13 +242,13 @@ public enum GUICommands implements GUICommand {
   /** Paste the copied nodes. */
   PASTE(true, GUIPASTE, "% V", GUIPASTETT) {
     @Override
-    public void execute() {
-      GUI.get().execute(new Copy(true, "0"));
+    public void execute(final GUI gui) {
+      gui.execute(new Copy("0"));
     }
 
     @Override
-    public void refresh(final AbstractButton button) {
-      final Context context = GUI.context;
+    public void refresh(final GUI gui, final AbstractButton button) {
+      final Context context = gui.context;
       // disallow copy of empty node set or root node
       final Nodes nodes = context.marked();
       boolean s = !Prop.mainmem && context.copied() != null && nodes != null &&
@@ -285,16 +270,16 @@ public enum GUICommands implements GUICommand {
   /** Delete the currently marked nodes. */
   DELETE(true, GUIDELETE, "DELETE", GUIDELETETT) {
     @Override
-    public void execute() {
-      if(JOptionPane.showConfirmDialog(GUI.get(), DELETECONF, DELETETITLE,
+    public void execute(final GUI gui) {
+      if(JOptionPane.showConfirmDialog(gui, DELETECONF, DELETETITLE,
           JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
-        GUI.get().execute(new Delete());
+        gui.execute(new Delete());
     }
 
     @Override
-    public void refresh(final AbstractButton button) {
+    public void refresh(final GUI gui, final AbstractButton button) {
       // disallow deletion of empty node set or root node
-      final Nodes n = GUI.context.marked();
+      final Nodes n = gui.context.marked();
       BaseXLayout.enable(button, !Prop.mainmem && n != null && n.size != 0 &&
           n.data.ns.size() == 0);
     }
@@ -303,16 +288,16 @@ public enum GUICommands implements GUICommand {
   /** Insert new nodes. */
   INSERT(true, GUIINSERT, "F7", GUIINSERTTT) {
     @Override
-    public void execute() {
-      final DialogInsert insert = new DialogInsert(GUI.get());
+    public void execute(final GUI gui) {
+      final DialogInsert insert = new DialogInsert(gui);
       if(insert.result == null) return;
       final CmdUpdate type = CmdUpdate.values()[insert.kind];
-      GUI.get().execute(new Insert(true, type, insert.result));
+      gui.execute(new Insert(type, insert.result));
     }
 
     @Override
-    public void refresh(final AbstractButton button) {
-      final Context context = GUI.context;
+    public void refresh(final GUI gui, final AbstractButton button) {
+      final Context context = gui.context;
       final Nodes nodes = context.marked();
       final Data d = context.data();
       BaseXLayout.enable(button, !Prop.mainmem && nodes != null &&
@@ -324,17 +309,17 @@ public enum GUICommands implements GUICommand {
   /** Copy the currently marked nodes. */
   EDIT(true, GUIEDIT, "F2", GUIEDITTT) {
     @Override
-    public void execute() {
-      final Nodes nodes = GUI.context.marked();
-      final DialogEdit edit = new DialogEdit(GUI.get(), nodes.nodes[0]);
+    public void execute(final GUI gui) {
+      final Nodes nodes = gui.context.marked();
+      final DialogEdit edit = new DialogEdit(gui, nodes.nodes[0]);
       if(edit.result == null) return;
       final CmdUpdate type = CmdUpdate.values()[edit.kind];
-      GUI.get().execute(new Update(true, type, edit.result));
+      gui.execute(new Update(type, edit.result));
     }
 
     @Override
-    public void refresh(final AbstractButton button) {
-      final Context context = GUI.context;
+    public void refresh(final GUI gui, final AbstractButton button) {
+      final Context context = gui.context;
       final Nodes nodes = context.marked();
       BaseXLayout.enable(button, !Prop.mainmem && nodes != null &&
         nodes.size == 1 && context.data().kind(nodes.nodes[0]) != Data.DOC &&
@@ -345,20 +330,20 @@ public enum GUICommands implements GUICommand {
   /** Filter currently marked nodes. */
   FILTER(true, GUIFILTER, null, GUIFILTERTT) {
     @Override
-    public void execute() {
-      final Context context = GUI.context;
+    public void execute(final GUI gui) {
+      final Context context = gui.context;
       Nodes marked = context.marked();
       if(marked.size == 0) {
-        final int pre = View.focused;
+        final int pre = gui.focused;
         if(pre == -1) return;
         marked = new Nodes(pre, context.data());
       }
-      View.notifyContext(marked, false, null);
+      gui.notify.context(marked, false, null);
     }
 
     @Override
-    public void refresh(final AbstractButton button) {
-      final Nodes marked = GUI.context.marked();
+    public void refresh(final GUI gui, final AbstractButton button) {
+      final Nodes marked = gui.context.marked();
       BaseXLayout.enable(button, marked != null && marked.size != 0);
     }
   },
@@ -366,14 +351,14 @@ public enum GUICommands implements GUICommand {
   /** Show search. */
   SHOWSEARCH(true, GUISHOWSEARCH, "% F", GUISHOWSEARCHTT) {
     @Override
-    public void execute() {
+    public void execute(final GUI gui) {
       GUIProp.showquery ^= true;
-      GUI.get().layoutViews();
+      gui.layoutViews();
     }
 
     @Override
-    public void refresh(final AbstractButton button) {
-      super.refresh(button);
+    public void refresh(final GUI gui, final AbstractButton button) {
+      super.refresh(gui, button);
       BaseXLayout.select(button, GUIProp.showquery);
     }
 
@@ -384,14 +369,14 @@ public enum GUICommands implements GUICommand {
   /** Show info. */
   SHOWINFO(true, GUISHOWINFO, "% G", GUISHOWINFOTT) {
     @Override
-    public void execute() {
+    public void execute(final GUI gui) {
       GUIProp.showinfo ^= true;
-      GUI.get().layoutViews();
+      gui.layoutViews();
     }
 
     @Override
-    public void refresh(final AbstractButton button) {
-      super.refresh(button);
+    public void refresh(final GUI gui, final AbstractButton button) {
+      super.refresh(gui, button);
       BaseXLayout.select(button, GUIProp.showinfo);
     }
 
@@ -405,15 +390,14 @@ public enum GUICommands implements GUICommand {
   /** Show menu. */
   SHOWMENU(false, GUISHOWMENU, null, GUISHOWMENUTT) {
     @Override
-    public void execute() {
+    public void execute(final GUI gui) {
       GUIProp.showmenu ^= true;
-      final GUI main = GUI.get();
-      main.updateControl(main.menu, GUIProp.showmenu, BorderLayout.NORTH);
+      gui.updateControl(gui.menu, GUIProp.showmenu, BorderLayout.NORTH);
     }
 
     @Override
-    public void refresh(final AbstractButton button) {
-      super.refresh(button);
+    public void refresh(final GUI gui, final AbstractButton button) {
+      super.refresh(gui, button);
       BaseXLayout.select(button, GUIProp.showmenu);
     }
 
@@ -424,16 +408,14 @@ public enum GUICommands implements GUICommand {
   /** Show buttons. */
   SHOWBUTTONS(false, GUISHOWBUTTONS, null, GUISHOWBUTTONSTT) {
     @Override
-    public void execute() {
+    public void execute(final GUI gui) {
       GUIProp.showbuttons ^= true;
-      final GUI main = GUI.get();
-      main.updateControl(main.buttons, GUIProp.showbuttons,
-          BorderLayout.CENTER);
+      gui.updateControl(gui.buttons, GUIProp.showbuttons, BorderLayout.CENTER);
     }
 
     @Override
-    public void refresh(final AbstractButton button) {
-      super.refresh(button);
+    public void refresh(final GUI gui, final AbstractButton button) {
+      super.refresh(gui, button);
       BaseXLayout.select(button, GUIProp.showbuttons);
     }
 
@@ -444,15 +426,14 @@ public enum GUICommands implements GUICommand {
   /** Show Input Field. */
   SHOWINPUT(false, GUISHOWINPUT, null, GUISHOWINPUTTT) {
     @Override
-    public void execute() {
+    public void execute(final GUI gui) {
       GUIProp.showinput ^= true;
-      final GUI main = GUI.get();
-      main.updateControl(main.nav, GUIProp.showinput, BorderLayout.SOUTH);
+      gui.updateControl(gui.nav, GUIProp.showinput, BorderLayout.SOUTH);
     }
 
     @Override
-    public void refresh(final AbstractButton button) {
-      super.refresh(button);
+    public void refresh(final GUI gui, final AbstractButton button) {
+      super.refresh(gui, button);
       BaseXLayout.select(button, GUIProp.showinput);
     }
 
@@ -463,16 +444,14 @@ public enum GUICommands implements GUICommand {
   /** Show Status Bar. */
   SHOWSTATUS(false, GUISHOWSTATUS, null, GUISHOWSTATUSTT) {
     @Override
-    public void execute() {
+    public void execute(final GUI gui) {
       GUIProp.showstatus ^= true;
-      final GUI main = GUI.get();
-      main.updateControl(main.status, GUIProp.showstatus,
-          BorderLayout.SOUTH);
+      gui.updateControl(gui.status, GUIProp.showstatus, BorderLayout.SOUTH);
     }
 
     @Override
-    public void refresh(final AbstractButton button) {
-      super.refresh(button);
+    public void refresh(final GUI gui, final AbstractButton button) {
+      super.refresh(gui, button);
       BaseXLayout.select(button, GUIProp.showstatus);
     }
 
@@ -483,16 +462,16 @@ public enum GUICommands implements GUICommand {
   /** Show Text View. */
   SHOWTEXT(false, GUISHOWTEXT, "% 1", GUISHOWTEXTTT) {
     @Override
-    public void execute() {
-      if(!GUI.context.db()) GUIProp.showstarttext ^= true;
+    public void execute(final GUI gui) {
+      if(!gui.context.db()) GUIProp.showstarttext ^= true;
       else GUIProp.showtext ^= true;
-      GUI.get().layoutViews();
+      gui.layoutViews();
     }
 
     @Override
-    public void refresh(final AbstractButton button) {
-      super.refresh(button);
-      BaseXLayout.select(button, GUI.context.db() ? GUIProp.showtext :
+    public void refresh(final GUI gui, final AbstractButton button) {
+      super.refresh(gui, button);
+      BaseXLayout.select(button, gui.context.db() ? GUIProp.showtext :
         GUIProp.showstarttext);
     }
 
@@ -503,14 +482,14 @@ public enum GUICommands implements GUICommand {
   /** Show map. */
   SHOWMAP(true, GUISHOWMAP, "% 2", GUISHOWMAPTT) {
     @Override
-    public void execute() {
+    public void execute(final GUI gui) {
       GUIProp.showmap ^= true;
-      GUI.get().layoutViews();
+      gui.layoutViews();
     }
 
     @Override
-    public void refresh(final AbstractButton button) {
-      super.refresh(button);
+    public void refresh(final GUI gui, final AbstractButton button) {
+      super.refresh(gui, button);
       BaseXLayout.select(button, GUIProp.showmap);
     }
 
@@ -519,17 +498,17 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Show Tree View. */
-  SHOWTREE(true, GUISHOWTREE, "% 3", GUISHOWTREETT) {
+  SHOWFOLDER(true, GUISHOWFOLDER, "% 3", GUISHOWFOLDERTT) {
     @Override
-    public void execute() {
-      GUIProp.showtree ^= true;
-      GUI.get().layoutViews();
+    public void execute(final GUI gui) {
+      GUIProp.showfolder ^= true;
+      gui.layoutViews();
     }
 
     @Override
-    public void refresh(final AbstractButton button) {
-      super.refresh(button);
-      BaseXLayout.select(button, GUIProp.showtree);
+    public void refresh(final GUI gui, final AbstractButton button) {
+      super.refresh(gui, button);
+      BaseXLayout.select(button, GUIProp.showfolder);
     }
 
     @Override
@@ -539,14 +518,14 @@ public enum GUICommands implements GUICommand {
   /** Show Table View. */
   SHOWTABLE(true, GUISHOWTABLE, "% 4", GUISHOWTABLETT) {
     @Override
-    public void execute() {
+    public void execute(final GUI gui) {
       GUIProp.showtable ^= true;
-      GUI.get().layoutViews();
+      gui.layoutViews();
     }
 
     @Override
-    public void refresh(final AbstractButton button) {
-      super.refresh(button);
+    public void refresh(final GUI gui, final AbstractButton button) {
+      super.refresh(gui, button);
       BaseXLayout.select(button, GUIProp.showtable);
     }
 
@@ -557,14 +536,14 @@ public enum GUICommands implements GUICommand {
   /** Show Plot View. */
   SHOWPLOT(true, GUISHOWPLOT, "% 5", GUISHOWPLOTTT) {
     @Override
-    public void execute() {
+    public void execute(final GUI gui) {
       GUIProp.showplot ^= true;
-      GUI.get().layoutViews();
+      gui.layoutViews();
     }
 
     @Override
-    public void refresh(final AbstractButton button) {
-      super.refresh(button);
+    public void refresh(final GUI gui, final AbstractButton button) {
+      super.refresh(gui, button);
       BaseXLayout.select(button, GUIProp.showplot);
     }
 
@@ -575,13 +554,13 @@ public enum GUICommands implements GUICommand {
   /** Fullscreen mode. */
   FULL(false, GUIFULL, "F11", GUIFULLTT) {
     @Override
-    public void execute() {
-      GUI.get().fullscreen();
+    public void execute(final GUI gui) {
+      gui.fullscreen();
     }
 
     @Override
-    public void refresh(final AbstractButton button) {
-      super.refresh(button);
+    public void refresh(final GUI gui, final AbstractButton button) {
+      super.refresh(gui, button);
       BaseXLayout.select(button, GUIProp.fullscreen);
     }
 
@@ -594,17 +573,15 @@ public enum GUICommands implements GUICommand {
   /** Realtime filtering on/off. */
   RTEXEC(true, GUIRTEXEC, null, GUIRTEXECTT) {
     @Override
-    public void execute() {
-      final GUI gui = GUI.get();
-
+    public void execute(final GUI gui) {
       GUIProp.execrt ^= true;
       gui.refreshControls();
-      View.notifyLayout();
+      gui.notify.layout();
     }
 
     @Override
-    public void refresh(final AbstractButton button) {
-      super.refresh(button);
+    public void refresh(final GUI gui, final AbstractButton button) {
+      super.refresh(gui, button);
       BaseXLayout.select(button, GUIProp.execrt);
     }
 
@@ -615,35 +592,33 @@ public enum GUICommands implements GUICommand {
   /** Realtime filtering on/off. */
   RTFILTER(true, GUIRTFILTER, null, GUIRTFILTERTT) {
     @Override
-    public void execute() {
-      final GUI gui = GUI.get();
-
+    public void execute(final GUI gui) {
       GUIProp.filterrt ^= true;
       gui.refreshControls();
-      View.notifyLayout();
+      gui.notify.layout();
 
-      final Context context = GUI.context;
+      final Context context = gui.context;
       final boolean root = context.root();
 
       if(!GUIProp.filterrt) {
         if(!root) {
-          View.notifyContext(new Nodes(0, context.data()), true, null);
-          View.notifyMark(context.current(), null);
+          gui.notify.context(new Nodes(0, context.data()), true, null);
+          gui.notify.mark(context.current(), null);
         }
       } else {
         if(root) {
-          View.notifyMark(new Nodes(context.data()), null);
+          gui.notify.mark(new Nodes(context.data()), null);
         } else {
           final Nodes mark = context.marked();
           context.marked(new Nodes(context.data()));
-          View.notifyContext(mark, true, null);
+          gui.notify.context(mark, true, null);
         }
       }
     }
 
     @Override
-    public void refresh(final AbstractButton button) {
-      super.refresh(button);
+    public void refresh(final GUI gui, final AbstractButton button) {
+      super.refresh(gui, button);
       BaseXLayout.select(button, GUIProp.filterrt);
     }
 
@@ -654,32 +629,32 @@ public enum GUICommands implements GUICommand {
   /** Color schema. */
   COLOR(false, GUICOLOR, null, GUICOLORTT) {
     @Override
-    public void execute() {
-      DialogColors.get(GUI.get()).setVisible(true);
+    public void execute(final GUI gui) {
+      new DialogColors(gui);
     }
   },
 
   /** Change fonts. */
   FONTS(false, GUIFONTS, null, GUIFONTSTT) {
     @Override
-    public void execute() {
-      DialogFontChooser.get(GUI.get()).setVisible(true);
+    public void execute(final GUI gui) {
+      new DialogFontChooser(gui);
     }
   },
 
   /** Map layout. */
   MAPLAYOUT(true, GUIMAPLAYOUT, "% L", GUIMAPLAYOUTTT) {
     @Override
-    public void execute() {
-      new DialogMapLayout(GUI.get());
+    public void execute(final GUI gui) {
+      new DialogMapLayout(gui);
     }
   },
 
   /** Database path. */
   PREFS(false, GUIPREFS, "% P", GUIPREFSTT) {
     @Override
-    public void execute() {
-      new DialogPrefs(GUI.get());
+    public void execute(final GUI gui) {
+      new DialogPrefs(gui);
     }
   },
 
@@ -688,16 +663,16 @@ public enum GUICommands implements GUICommand {
   /** Show Help. */
   SHOWHELP(false, GUISHOWHELP, "F1", GUISHOWHELPTT) {
     @Override
-    public void execute() {
-      if(!GUI.context.db()) GUIProp.showstarthelp ^= true;
+    public void execute(final GUI gui) {
+      if(!gui.context.db()) GUIProp.showstarthelp ^= true;
       else GUIProp.showhelp ^= true;
-      GUI.get().layoutViews();
+      gui.layoutViews();
     }
 
     @Override
-    public void refresh(final AbstractButton button) {
-      super.refresh(button);
-      BaseXLayout.select(button, GUI.context.db() ? GUIProp.showhelp :
+    public void refresh(final GUI gui, final AbstractButton button) {
+      super.refresh(gui, button);
+      BaseXLayout.select(button, gui.context.db() ? GUIProp.showhelp :
         GUIProp.showstarthelp);
     }
 
@@ -708,16 +683,16 @@ public enum GUICommands implements GUICommand {
   /** Show Database info. */
   INFO(true, GUIINFO, "% I", GUIINFOTT) {
     @Override
-    public void execute() {
-      final DialogInfo info = new DialogInfo(GUI.get());
+    public void execute(final GUI gui) {
+      final DialogInfo info = new DialogInfo(gui);
       if(info.ok()) {
-        final MetaData meta = GUI.context.data().meta;
+        final MetaData meta = gui.context.data().meta;
         final boolean[] indexes = info.indexes();
         if(info.opt) {
           meta.txtindex = indexes[0];
           meta.atvindex = indexes[1];
           meta.ftxindex = indexes[2];
-          progress(INFOOPT, new Process[] { new Optimize() });
+          progress(gui, INFOOPT, new Process[] { new Optimize() });
         } else {
           Process[] proc = new Process[0];
           if(indexes[0] != meta.txtindex)
@@ -727,7 +702,7 @@ public enum GUICommands implements GUICommand {
           if(indexes[2] != meta.ftxindex)
             proc = Array.add(proc, cmd(indexes[2], CmdIndex.FULLTEXT));
 
-          if(proc.length != 0) progress(INFOBUILD, proc);
+          if(proc.length != 0) progress(gui, INFOBUILD, proc);
         }
       }
     }
@@ -746,8 +721,8 @@ public enum GUICommands implements GUICommand {
   /** Show about information. */
   ABOUT(false, GUIABOUT, null, GUIABOUTTT) {
     @Override
-    public void execute() {
-      new DialogAbout(GUI.get());
+    public void execute(final GUI gui) {
+      new DialogAbout(gui);
     }
   },
 
@@ -756,55 +731,53 @@ public enum GUICommands implements GUICommand {
   /** Go one step back. */
   GOBACK(true, GUIGOBACK, "alt LEFT", GUIGOBACKTT) {
     @Override
-    public void execute() {
-      View.notifyHist(false);
+    public void execute(final GUI gui) {
+      gui.notify.hist(false);
     }
 
     @Override
-    public void refresh(final AbstractButton button) {
-      final int h = View.hist;
-      final boolean enabled = h > 0;
-      BaseXLayout.enable(button, enabled);
-      final String tt = enabled ? View.QUERYHIST[h - 1] : "";
-      button.setToolTipText(enabled && tt.length() == 0 ? GUIGOBACKTT : tt);
+    public void refresh(final GUI gui, final AbstractButton button) {
+      final String tt = gui.notify.tooltip(true);
+      final boolean en = tt != null;
+      BaseXLayout.enable(button, en);
+      button.setToolTipText(en && tt.length() == 0 ? GUIGOBACKTT : tt);
     }
   },
 
   /** Go one step forward. */
   GOFORWARD(true, GUIGOFORWARD, "alt RIGHT", GUIGOFORWARDTT) {
     @Override
-    public void execute() {
-      View.notifyHist(true);
+    public void execute(final GUI gui) {
+      gui.notify.hist(true);
     }
 
     @Override
-    public void refresh(final AbstractButton button) {
-      final int h = View.hist;
-      final boolean enabled = h < View.maxhist;
-      BaseXLayout.enable(button, enabled);
-      final String tt = enabled ? View.QUERYHIST[h + 1] : "";
-      button.setToolTipText(enabled && tt.length() == 0 ? GUIGOFORWARDTT : tt);
+    public void refresh(final GUI gui, final AbstractButton button) {
+      final String tt = gui.notify.tooltip(false);
+      final boolean en = tt != null;
+      BaseXLayout.enable(button, en);
+      button.setToolTipText(en && tt.length() == 0 ? GUIGOFORWARDTT : tt);
     }
   },
 
   /** Go one level up. */
   GOUP(true, GUIGOUP, "alt UP", GUIGOUPTT) {
     @Override
-    public void execute() {
-      GUI.get().execute(new Cs(".."));
+    public void execute(final GUI gui) {
+      gui.execute(new Cs(".."));
     }
 
     @Override
-    public void refresh(final AbstractButton button) {
-      BaseXLayout.enable(button, !GUI.context.root());
+    public void refresh(final GUI gui, final AbstractButton button) {
+      BaseXLayout.enable(button, !gui.context.root());
     }
   },
 
   /** Go to root node. */
   ROOT(true, GUIROOT, "alt HOME", GUIROOTTT) {
     @Override
-    public void execute() {
-      GUI.get().execute(new Cs("/"));
+    public void execute(final GUI gui) {
+      gui.execute(new Cs("/"));
     }
   };
 
@@ -831,10 +804,10 @@ public enum GUICommands implements GUICommand {
     help = h;
   }
 
-  public abstract void execute();
+  public abstract void execute(final GUI gui);
 
-  public void refresh(final AbstractButton button) {
-    BaseXLayout.enable(button, !data || GUI.context.db());
+  public void refresh(final GUI gui, final AbstractButton button) {
+    BaseXLayout.enable(button, !data || gui.context.db());
   }
 
   public boolean checked() { return false; }
@@ -849,12 +822,11 @@ public enum GUICommands implements GUICommand {
 
   /**
    * Performs a process, showing a progress dialog.
-   * @param title dialog title
+   * @param gui reference to the main window
+   * @param t dialog title
    * @param procs processes
    */
-  static void progress(final String title, final Process[] procs) {
-    final GUI main = GUI.get();
-
+  static void progress(final GUI gui, final String t, final Process[] procs) {
     // start database creation thread
     new Action() {
       public void run() {
@@ -865,29 +837,29 @@ public enum GUICommands implements GUICommand {
           final boolean op = proc instanceof Optimize;
 
           if(!ci && !di && !op) {
-            new Close().execute(GUI.context);
-            View.notifyInit();
+            new Close().execute(gui.context);
+            gui.notify.init();
           }
           Performance.sleep(100);
           final DialogProgress wait = new DialogProgress(
-              main, title, !fs, !op, proc);
+              gui, t, !fs, !op, proc);
 
           // execute process
           final Performance perf = new Performance();
-          final boolean ok = proc.execute(GUI.context);
+          final boolean ok = proc.execute(gui.context);
           wait.dispose();
 
           // return user information
           if(ok) {
-            main.status.setText(BaseX.info(PROCTIME, perf.getTimer()));
-            if(op) JOptionPane.showMessageDialog(main, INFOOPTIM,
+            gui.status.setText(BaseX.info(PROCTIME, perf.getTimer()));
+            if(op) JOptionPane.showMessageDialog(gui, INFOOPTIM,
                 DIALOGINFO, JOptionPane.INFORMATION_MESSAGE);
           } else {
-            JOptionPane.showMessageDialog(main, proc.info(),
+            JOptionPane.showMessageDialog(gui, proc.info(),
                 DIALOGINFO, JOptionPane.WARNING_MESSAGE);
           }
           // initialize views
-          if(!ci && !di) View.notifyInit();
+          if(!ci && !di) gui.notify.init();
         }
       }
     }.execute();

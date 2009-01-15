@@ -50,6 +50,8 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     /** South orientation. */ SOUTH
   };
 
+  /** Reference to main window. */
+  private final GUI gui;
   /** States if component was moved out of the window. */
   private boolean out;
   /** View Layout. */
@@ -73,13 +75,15 @@ public final class ViewContainer extends BaseXBack implements Runnable {
 
   /**
    * Constructor.
+   * @param main reference to the main window
    * @param p panels
    */
-  public ViewContainer(final ViewPanel[][] p) {
+  public ViewContainer(final GUI main, final ViewPanel[][] p) {
     setMode(Fill.PLAIN);
     setLayout(new BorderLayout());
     logo = GUI.image("logo");
     panels = p;
+    gui = main;
   }
 
   /**
@@ -91,11 +95,9 @@ public final class ViewContainer extends BaseXBack implements Runnable {
 
     // build layout or use default if something goes wrong
     if(db) {
-      if(!buildLayout(GUIProp.layoutopened))
-        buildLayout(LAYOUTOPENED);
+      if(!buildLayout(GUIProp.layoutopened)) buildLayout(LAYOUTOPEN);
     } else {
-      if(!buildLayout(GUIProp.layoutclosed))
-        buildLayout(LAYOUTCLOSED);
+      if(!buildLayout(GUIProp.layoutclosed)) buildLayout(LAYOUTCLOSE);
     }
   }
 
@@ -125,7 +127,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
-    if(GUI.context.db()) return;
+    if(gui.context.db()) return;
 
     final int w = getWidth();
     final int h = getHeight();
@@ -165,9 +167,9 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     if(source == null) return;
 
     if(out) {
-      source.remove();
+      source.delete();
     } else if(orient != null) {
-      if(layout.remove(source) && !(layout.comp[0] instanceof ViewPanel))
+      if(layout.delete(source) && !(layout.comp[0] instanceof ViewPanel))
         layout = (ViewAlignment) layout.comp[0];
 
       if(target == null) layout = addView(layout);
@@ -427,17 +429,11 @@ public final class ViewContainer extends BaseXBack implements Runnable {
           nv++;
         }
       }
-      if(nv < views.length) {
-        BaseX.debug("ViewContainer.buildLayout: Views are missing in " +
-            "layout (\"" + cnstr + "\").");
-        return false;
-      }
+      if(nv == views.length) return true;
+      BaseX.errln("Missing Views: " + cnstr);
     } catch(final Exception e) {
-      BaseX.debug("ViewContainer.buildLayout: could not build layout " +
-          '(' + cnstr + ')');
-      e.printStackTrace();
-      return false;
+      BaseX.errln("Could not build layout: " + cnstr);
     }
-    return true;
+    return false;
   }
 }

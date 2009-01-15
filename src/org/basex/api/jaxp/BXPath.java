@@ -16,12 +16,12 @@ import org.xml.sax.InputSource;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class BXPath implements XPath {
+public final class BXPath implements XPath {
   /** Variables. */
   private XPathVariableResolver variables;
   /** Functions. */
   private XPathFunctionResolver functions;
-  
+
   public void reset() { }
 
   public void setXPathVariableResolver(final XPathVariableResolver var) {

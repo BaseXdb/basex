@@ -13,7 +13,7 @@ import org.w3c.dom.DocumentType;
 public final class BXDomImpl implements DOMImplementation {
   /** Singleton instance. */
   private static final BXDomImpl INSTANCE = new BXDomImpl();
-  
+
   /**
    * Returns the only instance of this class.
    * @return instance
@@ -21,7 +21,7 @@ public final class BXDomImpl implements DOMImplementation {
   public static BXDomImpl get() {
     return INSTANCE;
   }
-  
+
   public Document createDocument(final String nsURI, final String qn,
       final DocumentType doctype) {
     BaseX.notimplemented();

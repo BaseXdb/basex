@@ -4,10 +4,7 @@ import java.awt.Component;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import javax.swing.JComboBox;
-import org.basex.gui.GUI;
 import org.basex.gui.dialog.Dialog;
 
 /**
@@ -21,8 +18,6 @@ public final class BaseXCombo extends JComboBox {
   private static final int MAX = 30;
   /** Last Input. */
   String last = "";
-  /** Button help. */
-  byte[] help;
 
   /**
    * Default Constructor.
@@ -37,7 +32,8 @@ public final class BaseXCombo extends JComboBox {
    * @param e editable combobox
    * @param hlp help text
    */
-  public BaseXCombo(final String[] choice, final byte[] hlp, final boolean e) {
+  public BaseXCombo(final String[] choice, final byte[] hlp,
+      final boolean e) {
     this(choice, hlp, e, null);
   }
 
@@ -48,21 +44,15 @@ public final class BaseXCombo extends JComboBox {
    * @param edit editable combobox
    * @param list action listener
    */
-  public BaseXCombo(final String[] choice, final byte[] hlp, final boolean edit,
-      final Dialog list) {
+  public BaseXCombo(final String[] choice, final byte[] hlp,
+      final boolean edit, final Dialog list) {
     
     super(choice);
     setMaximumRowCount(edit ? 5 : 10);
     BaseXLayout.addDefaultKeys(this, list);
-    help = hlp;
 
     final Component comp = edit ? getEditor().getEditorComponent() : this; 
-    comp.addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseEntered(final MouseEvent e) {
-        GUI.get().focus(e.getComponent(), help);
-      }
-    });
+    BaseXLayout.addHelp(comp, hlp);
     if(!edit) return;
     
     setEditable(true);
@@ -110,24 +100,6 @@ public final class BaseXCombo extends JComboBox {
     last = txt;
     getEditor().setItem(txt);
   }
-
-  /*
-   * Returns all texts.
-   * @return text
-  public String[] history() {
-    final String[] items = new String[getItemCount()];
-    for(int i = 0; i < items.length; i++) items[i] = getItemAt(i).toString();
-    return items;
-  }
-
-  /*
-   * Sets texts.
-   * @param txt texts to be set
-  public void history(final String[] txt) {
-    removeAllItems();
-    for(int i = 0; i < txt.length; i++) addItem(txt[i]);
-  }
-   */
   
   @Override
   public void addKeyListener(final KeyListener l) {

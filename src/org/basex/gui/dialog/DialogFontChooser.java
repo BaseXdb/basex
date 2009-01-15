@@ -5,14 +5,14 @@ import java.awt.BorderLayout;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.JFrame;
 import javax.swing.border.EmptyBorder;
+import org.basex.gui.GUI;
+import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXCheckBox;
 import org.basex.gui.layout.BaseXListChooser;
 import org.basex.gui.layout.TableLayout;
-import org.basex.gui.view.View;
 
 /**
  * Dialog window for changing the used fonts.
@@ -31,26 +31,13 @@ public final class DialogFontChooser extends Dialog {
   private BaseXListChooser size;
   /** Anti-Aliasing mode. */
   private BaseXCheckBox aalias;
-  /** Singleton instance. */
-  private static DialogFontChooser instance;
-
-  /**
-   * Returns singleton instance.
-   * @param parent parent frame
-   * @return class instance
-   */
-  public static Dialog get(final JFrame parent) {
-    if(instance == null) instance = new DialogFontChooser(parent);
-    instance.size.setValue(Integer.toString(GUIProp.fontsize));
-    return instance;
-  }
   
   /**
    * Default Constructor.
-   * @param parent parent frame
+   * @param main reference to the main window
    */
-  private DialogFontChooser(final JFrame parent) {
-    super(parent, FONTTITLE, false);
+  public DialogFontChooser(final GUI main) {
+    super(main, FONTTITLE, false);
     
     final String[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().
       getAvailableFontFamilyNames();
@@ -87,19 +74,19 @@ public final class DialogFontChooser extends Dialog {
     });
     set(aalias, BorderLayout.SOUTH);
 
-    finish(parent, GUIProp.fontsloc);
+    finish(GUIProp.fontsloc);
     font.focus();
   }
 
   @Override
   public void action(final String cmd) {
-    if(!isVisible()) return;
     GUIProp.font = font.getValue();
     GUIProp.monofont = font2.getValue();
     GUIProp.fonttype = type.getIndex();
     GUIProp.fontsize = size.getNum();
     GUIProp.fontalias = aalias.isSelected();
-    View.notifyLayout();
+    GUIConstants.initFonts();
+    gui.notify.layout();
   }
 
   @Override

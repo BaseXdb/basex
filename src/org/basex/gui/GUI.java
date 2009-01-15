@@ -3,7 +3,6 @@ package org.basex.gui;
 import static org.basex.Text.*;
 import static org.basex.gui.GUIConstants.*;
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -48,9 +47,10 @@ import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.TableLayout;
-import org.basex.gui.view.View;
 import org.basex.gui.view.ViewContainer;
+import org.basex.gui.view.ViewNotifier;
 import org.basex.gui.view.ViewPanel;
+import org.basex.gui.view.folder.FolderView;
 import org.basex.gui.view.info.InfoView;
 import org.basex.gui.view.map.MapView;
 import org.basex.gui.view.plot.PlotView;
@@ -58,10 +58,8 @@ import org.basex.gui.view.query.QueryView;
 import org.basex.gui.view.real.RealView;
 import org.basex.gui.view.table.TableView;
 import org.basex.gui.view.text.TextView;
-import org.basex.gui.view.tree.TreeView;
 import org.basex.io.CachedOutput;
 import org.basex.query.QueryException;
-import org.basex.query.xquery.XQFTVisData;
 import org.basex.util.Action;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -76,9 +74,9 @@ import org.basex.util.TokenBuilder;
  */
 public final class GUI extends JFrame {
   /** Database Context. */
-  public static Context context = new Context();
-  /** Singleton Instance. */
-  private static GUI instance;
+  public final Context context = new Context();
+  /** View Manager. */
+  public final ViewNotifier notify;
 
   /** Status line. */
   public final GUIStatus status;
@@ -88,9 +86,20 @@ public final class GUI extends JFrame {
   public final GUIInput input;
   /** Filter button. */
   public final BaseXButton filter;
-  /** History button. */
-  public final BaseXButton hist;
 
+  /** Help view. */
+  public final TextView help;
+  /** Text view. */
+  final TextView text;
+  /** Info view. */
+  final InfoView info;
+  /** Search view. */
+  final QueryView query;
+
+  /** History button. */
+  final BaseXButton hist;
+  /** Current input Mode. */
+  final BaseXCombo mode;
   /** Top panel. */
   final BaseXBack top;
   /** Result panel. */
@@ -100,22 +109,8 @@ public final class GUI extends JFrame {
   /** Query panel. */
   final BaseXBack nav;
 
-  /** Search view. */
-  public final QueryView query;
-  /** Text view. */
-  public final TextView text;
-  /** Info view. */
-  public final InfoView info;
-  /** Help view. */
-  public final TextView help;
-
-  /** Current input Mode. */
-  final BaseXCombo mode;
   /** Execution Button. */
-  final BaseXButton go;
-  /** Fullscreen Window. */
-  private JFrame fullscr;
-
+  private final BaseXButton go;
   /** Control panel. */
   private final BaseXBack control;
   /** Results label. */
@@ -124,23 +119,21 @@ public final class GUI extends JFrame {
   private final GUIToolBar toolbar;
   /** Menu panel height. */
   private int menuHeight;
+  /** Fullscreen Window. */
+  private JFrame fullscr;
 
-  /**
-   * Singleton Constructor.
-   * @return window reference
-   */
-  public static GUI get() {
-    if(instance == null) instance = new GUI();
-    return instance;
-  }
+  /** Painting flag. */
+  public boolean painting;
+  /** Working flag. */
+  public boolean updating;
+  /** Currently focused node (pre value). */
+  public int focused = -1;
 
   /**
    * Default Constructor.
    */
-  private GUI() {
+  public GUI() {
     setTitle(Text.TITLE);
-
-    // set program icon
     setIconImage(image("icon"));
 
     // set window size
@@ -164,14 +157,14 @@ public final class GUI extends JFrame {
     control.setBorder(0, 0, 0, 1);
 
     // add menu bar
-    menu = new GUIMenu();
+    menu = new GUIMenu(this);
     if(GUIProp.showmenu) setJMenuBar(menu);
 
     final Font fnt = new Font(GUIProp.font, 1, 15);
 
     buttons = new BaseXBack();
     buttons.setLayout(new BorderLayout());
-    toolbar = new GUIToolBar(TOOLBAR);
+    toolbar = new GUIToolBar(TOOLBAR, this);
     buttons.add(toolbar, BorderLayout.WEST);
 
     hits = new BaseXLabel(" ");
@@ -189,8 +182,8 @@ public final class GUI extends JFrame {
     nav.setLayout(new BorderLayout(5, 0));
     nav.setBorder(2, 2, 0, 2);
 
-    mode = new BaseXCombo(new String[] {
-        BUTTONSEARCH, BUTTONXPATH, BUTTONCMD }, HELPMODE, false);
+    mode = new BaseXCombo(new String[] { BUTTONSEARCH, BUTTONXPATH, BUTTONCMD },
+        HELPMODE, false);
     mode.setSelectedIndex(2);
 
     mode.addActionListener(new ActionListener() {
@@ -257,7 +250,7 @@ public final class GUI extends JFrame {
       }
     });
 
-    filter = GUIToolBar.newButton(GUICommands.FILTER);
+    filter = GUIToolBar.newButton(GUICommands.FILTER, this);
     filter.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
@@ -276,35 +269,35 @@ public final class GUI extends JFrame {
     top.add(control, BorderLayout.NORTH);
 
     // create views
-    query = new QueryView(null);
-    text = new TextView(Fill.DOWN, TEXTTIT, HELPTEXT);
-    help = new TextView(Fill.DOWN, HELPTIT, null);
-    info = new InfoView(HELPINFO);
+    notify = new ViewNotifier(this);
+    query = new QueryView(notify, null);
+    text = new TextView(notify, Fill.DOWN, TEXTTIT, HELPTEXT);
+    help = new TextView(notify, Fill.DOWN, HELPTIT, null);
+    info = new InfoView(notify, HELPINFO);
     final ViewPanel textpanel = new ViewPanel(text, TEXTVIEW);
     final ViewPanel helppanel = new ViewPanel(help, HELPVIEW);
 
     // create panels for closed and opened database mode
-    final ViewPanel[][] panels = { {
-      textpanel, helppanel }, {
-        new ViewPanel(new TreeView(HELPTREE), TREEVIEW),
-        new ViewPanel(new RealView(), REALVIEW),
-        new ViewPanel(new PlotView(null), PLOTVIEW),
-        new ViewPanel(new TableView(HELPTABLE), TABLEVIEW),
-        new ViewPanel(new MapView(HELPMAP), MAPVIEW),
+    final ViewPanel[][] panels = {
+      { textpanel, helppanel },
+      { new ViewPanel(new FolderView(notify, HELPFOLDER), FOLDERVIEW),
+        new ViewPanel(new RealView(notify, null), REALVIEW),
+        new ViewPanel(new PlotView(notify, null), PLOTVIEW),
+        new ViewPanel(new TableView(notify, HELPTABLE), TABLEVIEW),
+        new ViewPanel(new MapView(notify, HELPMAP), MAPVIEW),
         new ViewPanel(query, QUERYVIEW),
         new ViewPanel(info, INFOVIEW),
-        helppanel,
-        textpanel
+        helppanel, textpanel
       }
     };
-    views = new ViewContainer(panels);
+    views = new ViewContainer(this, panels);
     views.setViews(false);
 
     top.add(views, BorderLayout.CENTER);
     setContentBorder();
 
     // add status bar
-    status = new GUIStatus();
+    status = new GUIStatus(this);
     if(GUIProp.showstatus) top.add(status, BorderLayout.SOUTH);
 
     setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -342,13 +335,13 @@ public final class GUI extends JFrame {
 
     // browse back/forward
     if(code == KeyEvent.VK_LEFT) {
-      GUICommands.GOBACK.execute();
+      GUICommands.GOBACK.execute(this);
     } else if(code == KeyEvent.VK_RIGHT) {
-      GUICommands.GOFORWARD.execute();
+      GUICommands.GOFORWARD.execute(this);
     } else if(code == KeyEvent.VK_UP) {
-      GUICommands.GOUP.execute();
+      GUICommands.GOUP.execute(this);
     } else if(code == KeyEvent.VK_HOME) {
-      GUICommands.ROOT.execute();
+      GUICommands.ROOT.execute(this);
     }
   }
 
@@ -407,19 +400,17 @@ public final class GUI extends JFrame {
         } catch(final QueryException ex) {
           final boolean db = context.db();
           if(!GUIProp.showstarttext && !db || !GUIProp.showtext && db) {
-            GUICommands.SHOWTEXT.execute();
+            GUICommands.SHOWTEXT.execute(this);
           }
-          final byte[] inf = new TokenBuilder(ex.getMessage()).finish();
-          text.setText(inf, inf.length, false);
+          text.setText(new TokenBuilder(ex.getMessage()).finish());
         }
       }
     } else {
-      context.current().ftdata = new XQFTVisData(context.current().ftdata);
       execute(new XQuery(GUIProp.searchmode == 1 ? in :
         Find.find(in, context, GUIProp.filterrt)), true);
     }
   }
-  
+
   /**
    * Launches the specified process in a thread. The process is ignored
    * if an update operation takes place.
@@ -428,7 +419,7 @@ public final class GUI extends JFrame {
   public void execute(final Process pr) {
     execute(pr, false);
   }
-  
+
   /**
    * Launches the specified process in a thread. The process is ignored
    * if an update operation takes place.
@@ -436,12 +427,12 @@ public final class GUI extends JFrame {
    * @param main call from main window
    */
   void execute(final Process pr, final boolean main) {
-    if(View.updating) return;
+    if(updating) return;
     new Action() {
       public void run() { exec(pr, main); }
     }.execute();
   }
-  
+
   /** Thread counter. */
   private int threadID;
   /** Current process. */
@@ -455,7 +446,7 @@ public final class GUI extends JFrame {
     cursor(CURSORARROW, true);
     proc = null;
   }
-  
+
   /**
    * Launches the specified process.
    * @param pr process to be launched
@@ -474,7 +465,7 @@ public final class GUI extends JFrame {
 
     cursor(CURSORWAIT);
     try {
-      if(pr.updating()) View.updating = true;
+      if(pr.updating()) updating = true;
 
       // cache some variables before executing the command
       final Performance perf = new Performance();
@@ -489,7 +480,7 @@ public final class GUI extends JFrame {
         proc = null;
         return false;
       }
-      if(pr.updating()) View.updating = false;
+      if(pr.updating()) updating = false;
 
       // try to convert xquery result to nodeset
       final Result result = pr.result();
@@ -498,17 +489,18 @@ public final class GUI extends JFrame {
       // cached resulting text output
       final String inf = pr.info();
 
-      if(ok && pr.printing() && nodes == null) {
+      // treat TextView different to other views
+      if(ok && pr.printing()) {
         if(!GUIProp.showstarttext && data == null ||
            !GUIProp.showtext && data != null) {
-          GUICommands.SHOWTEXT.execute();
+          GUICommands.SHOWTEXT.execute(this);
         }
         // retrieve text result
         final CachedOutput out = new CachedOutput(TextView.MAX);
         if(ok) pr.output(out);
         else out.println(inf);
         out.addInfo();
-        text.setText(out.buffer(), out.size(), false);
+        text.setText(out, nodes);
       }
 
       // check if query feedback was processed in the query view
@@ -529,25 +521,20 @@ public final class GUI extends JFrame {
       Nodes marked = context.marked();
       if(ndata != data) {
         // database reference has changed - notify views
-        View.notifyInit();
+        notify.init();
       } else if(pr.updating()) {
         // update command
-        View.notifyUpdate();
+        notify.update();
       } else if(result != null) {
         if(context.current() != current || GUIProp.filterrt) {
           // refresh context
           if(nodes != null) {
-            /*
-            if(GUIProp.filterrt) {
-            View.ftPos = nodes.ftpos;
-            View.ftPoi = nodes.ftpoin;
-            }*/
-            View.notifyContext((Nodes) result, GUIProp.filterrt, null);
+            notify.context((Nodes) result, GUIProp.filterrt, null);
           }
         } else if(marked != null) {
           // refresh highlight
           if(nodes != null) {
-            // use query result 
+            // use query result
             marked = nodes;
           } else if(marked.size != 0) {
             // remove old highlight
@@ -555,8 +542,7 @@ public final class GUI extends JFrame {
           }
           // highlights have changed.. refresh views
           if(!marked.same(context.marked())) {
-            // View.ftPoi = marked.ftpoin;
-            View.notifyMark(marked, null);
+            notify.mark(marked, null);
           }
           if(thread != threadID) {
             proc = null;
@@ -564,7 +550,7 @@ public final class GUI extends JFrame {
           }
         }
       }
-      
+
       // show number of hits
       setHits(result == null ? 0 : result.size());
 
@@ -574,7 +560,7 @@ public final class GUI extends JFrame {
 
       // show status info
       status.setText(BaseX.info(PROCTIME, time));
-      
+
     } catch(final Exception ex) {
       // unexpected error
       ex.printStackTrace();
@@ -611,7 +597,7 @@ public final class GUI extends JFrame {
   public void updateLayout() {
     init();
     repaint();
-    View.notifyLayout();
+    notify.layout();
   }
 
   /**
@@ -702,29 +688,6 @@ public final class GUI extends JFrame {
   }
 
   /**
-   * Focuses the specified component if the input field is not focused.
-   * @param comp component to be focused
-   */
-  public void checkFocus(final JComponent comp) {
-    if(GUIProp.mousefocus) comp.requestFocusInWindow();
-  }
-
-  /**
-   * Displays some help in the help view.
-   * @param comp component reference
-   * @param txt text to be shown
-   */
-  public void focus(final Component comp, final byte[] txt) {
-    if(txt != null) {
-      final boolean db = context.db();
-      if(!db && GUIProp.showstarthelp || db && GUIProp.showhelp)
-        help.setText(txt, txt.length, true);
-    }
-    if(GUIProp.mousefocus && comp != null && comp.isEnabled())
-      comp.requestFocusInWindow();
-  }
-
-  /**
    * Returns the specified image as icon.
    * @param name name of icon
    * @return icon
@@ -736,7 +699,7 @@ public final class GUI extends JFrame {
   /** Cached images. */
   private static final HashMap<String, Image> IMAGES =
     new HashMap<String, Image>();
-  
+
   /**
    * Returns the specified image.
    * @param name name of image
@@ -775,7 +738,7 @@ public final class GUI extends JFrame {
    */
   public void fullscreen(final boolean full) {
     if(full ^ fullscr == null) {
-      if(!GUIProp.showmenu) GUICommands.SHOWMENU.execute();
+      if(!GUIProp.showmenu) GUICommands.SHOWMENU.execute(this);
       return;
     }
 

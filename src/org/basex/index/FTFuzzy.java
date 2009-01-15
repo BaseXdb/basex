@@ -47,7 +47,7 @@ public final class FTFuzzy extends Index {
   private final Levenshtein ls = new Levenshtein();
   /** Cache for number of hits and data reference per token. */
   private final FTTokenMap cache = new FTTokenMap();
-  
+
   /** Values file. */
   private final Data data;
   /** Index storing each unique token length and pointer
@@ -131,7 +131,7 @@ public final class FTFuzzy extends Index {
       if(k == 0) k = Math.max(1, tok.length >> 2);
       return fuzzy(tok, k);
     }
-    
+
     // return cached or new result
     final int id = cache.id(tok);
     return id == 0 ? get(tok) :
@@ -161,7 +161,7 @@ public final class FTFuzzy extends Index {
     // find right limit
     do r = tp[tl + i++]; while(r == -1);
     int x = r;
-    
+
     // binary search
     final int o = tl + 9;
     while(l < r) {
@@ -174,7 +174,7 @@ public final class FTFuzzy extends Index {
     // accept entry if pointer is inside relevant tokens
     return r != x && l == r && eq(ti.readBytes(l, l + tl), tok) ? l : -1;
   }
-  
+
   /**
    * Collects all tokens and their sizes found in the index structure.
    * @param stats statistic reference
@@ -185,7 +185,7 @@ public final class FTFuzzy extends Index {
     int p = tp[i];
     int j = i + 1;
     while(j < tp.length && tp[j] == -1) j++;
-    
+
     while(p < tp[tp.length - 1]) {
       if(stats.adding(size(p, i))) stats.add(ti.readBytes(p, p + i));
       p += i + 9;
@@ -223,28 +223,28 @@ public final class FTFuzzy extends Index {
    * @param s number of pre/pos values
    * @param p pointer on data
    * @param da DataAccess for reading ftdata
-   * @param d data reference 
+   * @param d data reference
    * @return int[][] data
    */
-  static IndexArrayIterator data(final long p, final int s, 
+  static IndexArrayIterator data(final long p, final int s,
       final DataAccess da, final Data d) {
     if(s == 0 || p < 0) return IndexArrayIterator.EMP;
-    
+
     if(!d.meta.ftittr) {
       final int[][] dt = new int[2][s];
       da.cursor(p);
       for(int i = 0; i < s; i++) dt[0][i] = da.readNum();
-      for(int i = 0; i < s; i++) dt[1][i] = da.readNum();  
+      for(int i = 0; i < s; i++) dt[1][i] = da.readNum();
       return new IndexArrayIterator(dt, true);
     }
-    
+
     return new IndexArrayIterator(s) {
       boolean f = true;
       int lpre = -1;
       int c = 0;
       long pos = p;
       FTNode n = new FTNode();
-      
+
       @Override
       public boolean more() {
         if (c == s) return false;
@@ -257,7 +257,7 @@ public final class FTFuzzy extends Index {
         } else {
           pre = lpre;
         }
-        
+
         f = false;
         il.add(pre);
         il.add(da.readNum(pos));
@@ -266,18 +266,18 @@ public final class FTFuzzy extends Index {
         n = new FTNode(il.finish(), 1);
         return true;
       }
-      
+
       @Override
       public FTNode nextFTNode() {
         n.genPointer(toknum);
         if(tok != null) n.setToken(tok);
         return n;
       }
-      
+
       @Override
       public int next() {
         return n.getPre();
-      }        
+      }
     };
   }
 
@@ -295,7 +295,7 @@ public final class FTFuzzy extends Index {
     final int tl = tok.length;
     final int e = Math.min(tp.length, tl + k);
     int s = Math.max(1, tl - k) - 1;
-    
+
     while(++s <= e) {
       int p = tp[s];
       if(p == -1) continue;
@@ -304,7 +304,7 @@ public final class FTFuzzy extends Index {
       do r = tp[i++]; while(r == -1);
       while(p < r) {
         if (ls.similar(ti.readBytes(p, p + s), tok)) {
-          it = IndexArrayIterator.merge(data(pointer(p, s), 
+          it = IndexArrayIterator.merge(data(pointer(p, s),
               size(p, s), dat, data), it);
         }
         p += s + 9;
@@ -334,10 +334,10 @@ public final class FTFuzzy extends Index {
    * @return counter
   static IndexArrayIterator csDBCheck(final IndexArrayIterator ids,
       final Data d, final FTTokenizer ftdb, final byte[] token, final int pw) {
-    
+
     return new IndexArrayIterator(1) {
       FTNode r;
-      
+
       @Override
       public boolean more() {
         r = new FTNode();
@@ -350,7 +350,7 @@ public final class FTFuzzy extends Index {
           while(r.morePos()) {
             ftdb.cs = false;
             while (i < r.nextPos() && ftdb.more()) i++;
-            
+
             // token found - match case sensitivity
             ftdb.cs = true;
             //if (pw < token.length) {
@@ -367,7 +367,7 @@ public final class FTFuzzy extends Index {
         }
         return false;
       }
-      
+
       @Override
       public FTNode nextFTNode() {
         r.genPointer(toknum);
@@ -389,7 +389,7 @@ public final class FTFuzzy extends Index {
    * @param tok token containing a wildcard
    * @param posw position of the wildcard in tok
    * @return data found
-  private IndexArrayIterator getTokenWildCard(final byte[] tok, 
+  private IndexArrayIterator getTokenWildCard(final byte[] tok,
       final int posw) {
     if (tok[posw] == '.' && tok.length > posw + 1 && tok[posw + 1] == '*') {
       int[][] b;

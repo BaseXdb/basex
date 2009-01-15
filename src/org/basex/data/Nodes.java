@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import org.basex.BaseX;
 import org.basex.core.Context;
-import org.basex.query.xquery.XQFTVisData;
+import org.basex.core.Prop;
 import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
 
@@ -23,8 +23,8 @@ public final class Nodes implements Result {
   public Data data;
   /** Number of stored nodes. */
   public int size;
-  /** Fulltext data. */
-  public XQFTVisData ftdata;
+  /** Fulltext position data. */
+  public FTPosData ftpos;
   
   /**
    * Node Set constructor.
@@ -32,6 +32,15 @@ public final class Nodes implements Result {
    */
   public Nodes(final Data d) {
     this(new int[] { }, d);
+  }
+  
+  /**
+   * Node Set constructor.
+   * @param d data reference
+   * @param ft ft position data
+   */
+  public Nodes(final Data d, final FTPosData ft) {
+    this(new int[] { }, d, ft);
   }
 
   /**
@@ -49,10 +58,21 @@ public final class Nodes implements Result {
    * @param d data reference
    */
   public Nodes(final int[] n, final Data d) {
-     if(d == null) BaseX.notexpected("No data available");
+    this(n, d, Prop.gui ? new FTPosData() : null);
+  }
+
+  /**
+   * Node Set constructor.
+   * @param n node set
+   * @param d data reference
+   * @param ft ft position data
+   */
+  public Nodes(final int[] n, final Data d, final FTPosData ft) {
+    if(d == null) BaseX.notexpected("No data available");
     nodes = n;
     size = n.length;
     data = d;
+    ftpos = ft;
   }
   
   /**
@@ -154,17 +174,17 @@ public final class Nodes implements Result {
     final Nodes n = (Nodes) v;
     if(data != n.data) return false;
     for(int c = 0; c < size; c++) if(n.nodes[c] != nodes[c]) return false;
-    return ftdata == null || ftdata.same();
+    return ftpos == null || ftpos.same(n.ftpos);
   }
 
   public void serialize(final Serializer ser) throws IOException {
-    ftdata.initT();
+    if(ftpos != null) ftpos.serialize();
     for(int c = 0; c < size && !ser.finished(); c++) serialize(ser, c);
   }
 
   public void serialize(final Serializer ser, final int n) throws IOException {
     ser.openResult();
-    ser.node(data, nodes[n], ftdata);
+    ser.node(data, nodes[n], ftpos);
     ser.closeResult();
   }
 

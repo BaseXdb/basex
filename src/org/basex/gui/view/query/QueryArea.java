@@ -52,7 +52,7 @@ public final class QueryArea extends QueryPanel {
    */
   QueryArea(final QueryView view) {
     main = view;
-    area = new BaseXText(HELPQUERYMODE);
+    area = new BaseXText(view.gui, HELPQUERYMODE);
     area.setSyntax(new QuerySyntax());
     area.addKeyListener(new KeyAdapter() {
       @Override
@@ -94,6 +94,8 @@ public final class QueryArea extends QueryPanel {
     south.add(stop);
     south.add(Box.createHorizontalStrut(1));
     south.add(go);
+    south.add(Box.createHorizontalStrut(1));
+    south.add(filter);
 
     okIcon = GUI.icon("ok");
     errIcon = GUI.icon("error");
@@ -113,20 +115,15 @@ public final class QueryArea extends QueryPanel {
   public void finish() { }
 
   @Override
-  void refresh() {
-    BaseXLayout.enable(go, !GUIProp.execrt);
-  }
-
-  @Override
   void query(final boolean force) {
-    String xquery = Token.string(area.getText());
-    if(force || !xquery.equals(last)) {
-      last = xquery;
-      final String xq = xquery.trim();
+    String qu = Token.string(area.getText());
+    if(force || !qu.equals(last)) {
+      last = qu;
+      final String xq = qu.trim();
       if(xq.startsWith("module namespace ")) return;
-      if(xq.length() == 0) xquery = ".";
+      if(xq.length() == 0) qu = ".";
       BaseXLayout.enable(stop, true);
-      GUI.get().execute(new XQuery(xquery));
+      main.gui.execute(new XQuery(qu));
     }
   }
   

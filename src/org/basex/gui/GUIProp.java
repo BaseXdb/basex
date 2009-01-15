@@ -53,9 +53,9 @@ public final class GUIProp {
   public static boolean showstatus = true;
 
   /** GUI Layout. */
-  public static String layoutclosed = GUIConstants.LAYOUTCLOSED;
+  public static String layoutclosed = GUIConstants.LAYOUTCLOSE;
   /** GUI Layout. */
-  public static String layoutopened = GUIConstants.LAYOUTOPENED;
+  public static String layoutopened = GUIConstants.LAYOUTOPEN;
 
   /** Flag for activated info view. */
   public static boolean showinfo = false;
@@ -66,7 +66,7 @@ public final class GUIProp {
   /** Flag for activated result view. */
   public static boolean showtext = true;
   /** Flag for activated tree view. */
-  public static boolean showtree = false;
+  public static boolean showfolder = false;
   /** Flag for activated search view. */
   public static boolean showquery = false;
   /** Flag for activated help view. */

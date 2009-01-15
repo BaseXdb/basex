@@ -1,11 +1,9 @@
 package org.basex.gui.view.plot;
 
 import static org.basex.util.Token.*;
-
 import org.basex.data.Data;
 import org.basex.data.StatsKey;
 import org.basex.data.StatsKey.Kind;
-import org.basex.gui.GUI;
 import org.basex.util.IntList;
 import org.basex.util.Set;
 
@@ -92,7 +90,7 @@ public final class PlotAxis {
     byte[] b = token(attribute);
     isTag = !contains(b, '@');
     b = delete(b, '@');
-    final Data data = GUI.context.data();
+    final Data data = plotData.context.data();
     attrID = isTag ? data.tags.id(b) : data.atts.id(b);
     refreshAxis();
     return true;
@@ -104,7 +102,7 @@ public final class PlotAxis {
    * is of kind TEXT, it is treated as INT.
    */
   void refreshAxis() {
-    final Data data = GUI.context.data();
+    final Data data = plotData.context.data();
     final StatsKey key = isTag ? data.tags.stat(attrID) :
       data.atts.stat(attrID);
     type = key.kind;
@@ -130,7 +128,7 @@ public final class PlotAxis {
       // calculations for axis labeling
       if(log) prepareLogAxis();
       else prepareLinAxis();
-      
+
       // coordinates for TEXT already calculated in textToNum()
       for(int i = 0; i < vals.length; i++)
         co[i] = calcPosition(vals[i]);
@@ -207,35 +205,35 @@ public final class PlotAxis {
     // values on a logarithmic scale, three cases are to be distinguished:
     // 0. both extreme values are greater or equal 0.
     // 1. the minimum value is smaller 0, hence the axis is 'mirrored' at 0.
-    // 2. both extreme values are smaller 0; axis is also 'mirrored' and 
+    // 2. both extreme values are smaller 0; axis is also 'mirrored' and
     //    values above the max value are not displayed.
-    
+
     // special case: deepfs @mtime. trying to get a better distribution for
     // newer files. the newest file gets the lowest value (max - d + min) but is
-    // still displayed on the right end of the plot. 
-    final Data data = GUI.context.data();
+    // still displayed on the right end of the plot.
+    final Data data = plotData.context.data();
     if(data.fs != null && eq(data.atts.key(attrID), token("mtime"))) {
       range = ln(max - min);
       return 1 - (1 / range * (ln(max - d)));
     }
-    
+
     range = logMax - logMin;
     // case 1
     if(min < 0 && max >= 0) {
-      // p is the portion of the range between minimum value and zero compared 
-      // to the range between zero and the maximum value. 
+      // p is the portion of the range between minimum value and zero compared
+      // to the range between zero and the maximum value.
       // (needed for mirroring, s.a.)
       final double p = 1 / (logMin + logMax) * logMin;
       if(d == 0) return p;
       if(d < 0) return 1.0d - (1 - p) - (1.0d / logMin * ln(d) * p);
-      
+
       return p + (1.0d / logMax * ln(d) * (1 - p));
     }
-    
+
     // case 2 and 0
     return 1 / range * (ln(d) - logMin);
   }
-  
+
   /**
    * Calculates relative coordinate for a given value.
    * @param value given value
@@ -244,7 +242,7 @@ public final class PlotAxis {
   double calcPosition(final double value) {
     return calcPosition(token(value));
   }
-  
+
   /**
    * Calculates base e logarithm for the given value.
    * @param d value
@@ -260,7 +258,7 @@ public final class PlotAxis {
    * @return item value
    */
   byte[] getValue(final int pre) {
-    final Data data = GUI.context.data();
+    final Data data = plotData.context.data();
     final int limit = pre + data.size(pre, Data.ELEM);
     for(int p = pre; p < limit; p++) {
       final int kind = data.kind(p);
@@ -273,7 +271,7 @@ public final class PlotAxis {
     }
     return EMPTY;
   }
-  
+
   /**
    * Determines the extreme values of the current data set.
    * @param vals values of plotted nodes
@@ -298,7 +296,7 @@ public final class PlotAxis {
       min = 0;
       max = 0;
     }
-    
+
     if(log) {
       logMin = ln(min);
       logMax = ln(max);
@@ -335,7 +333,7 @@ public final class PlotAxis {
       (int) (Math.floor(Math.log10(range) + .5d)) - 1;
     calculatedCaptionStep = (int) (Math.pow(10, pow));
   }
-  
+
   /**
    * Executes some calculations to support a dynamic axis labelling for a
    * logarithmic scale.
@@ -356,7 +354,7 @@ public final class PlotAxis {
         nrCaptions = 1;
         return;
       }
-      
+
       // labeling for logarithmic scale
       if(log) {
         startvalue = min;

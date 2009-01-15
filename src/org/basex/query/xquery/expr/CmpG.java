@@ -9,6 +9,8 @@ import org.basex.index.ValuesToken;
 import org.basex.query.xquery.IndexContext;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
+import org.basex.query.xquery.func.Fun;
+import org.basex.query.xquery.func.FunDef;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Seq;
@@ -90,8 +92,13 @@ public final class CmpG extends Arr {
     if(e1 instanceof AxisPath) ((AxisPath) e1).addText(ctx);
 
     Expr e = this;
-    if(e1.i() && e2.i()) e = Bln.get(eval((Item) e1, (Item) e2, cmp.cmp));
-    else if(e1.e() || e2.e()) e = Bln.FALSE;
+    if(e1.i() && e2.i()) {
+      e = Bln.get(eval((Item) e1, (Item) e2, cmp.cmp));
+    } else if(e1.e() || e2.e()) {
+      e = Bln.FALSE;
+    } else if(e1 instanceof Fun && ((Fun) e1).func == FunDef.POS) {
+      e = Pos.get(this, cmp, e2);
+    }
     if(e != this) ctx.compInfo(OPTPRE, this);
     return e;
   }

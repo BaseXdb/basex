@@ -37,9 +37,10 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
 
   /**
    * Constructor.
+   * @param main reference to the main window
    */
-  public GUIStatus() {
-    super(Token.token("Status Bar"));
+  public GUIStatus(final GUI main) {
+    super(main, null);
     BaseXLayout.setHeight(this, getFont().getSize() + 6);
     addKeyListener(this);
     addMouseListener(this);
@@ -154,7 +155,7 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
           + MEMRESERVED + Performance.format(occ, true) + Prop.NL + MEMUSED
           + Performance.format(used, true) + Prop.NL + Prop.NL + MEMHELP;
 
-      JOptionPane.showMessageDialog(GUI.get(), inf, MEMTITLE,
+      JOptionPane.showMessageDialog(gui, inf, MEMTITLE,
           JOptionPane.INFORMATION_MESSAGE);
     }
   }
@@ -162,15 +163,13 @@ public final class GUIStatus extends BaseXPanel implements Runnable {
   @Override
   public void mouseMoved(final MouseEvent e) {
     memfocus = e.getX() > getWidth() - MEMW;
-    if(memfocus) GUI.get().focus(GUIStatus.this, HELPMEM);
-
-    GUI.get().cursor(
-        memfocus ? CURSORHAND : CURSORARROW);
+    if(memfocus) BaseXLayout.help(this, HELPMEM);
+    gui.cursor(memfocus ? CURSORHAND : CURSORARROW);
   }
 
   @Override
   public void mouseExited(final MouseEvent e) {
     memfocus = false;
-    GUI.get().cursor(CURSORARROW);
+    gui.cursor(CURSORARROW);
   }
 }

@@ -78,7 +78,7 @@ public final class FTTokenizer extends IndexToken {
   }
 
   /**
-   * Checks if more tokens are to be returned. 
+   * Checks if more tokens are to be returned.
    * @return result of check
    */
   public boolean more() {
@@ -115,7 +115,7 @@ public final class FTTokenizer extends IndexToken {
     }
     return true;
   }
-  
+
   @Override
   public byte[] get() {
     byte[] n = substring(text, s, p);
@@ -141,8 +141,8 @@ public final class FTTokenizer extends IndexToken {
    * [0] number of tokens
    * [1] number of sentences
    * [2] number of paragraphs
-   * [3] number of lines needed 
-   * 
+   * [3] number of lines needed
+   *
    * @param ww width of a line in bytes
    * @return int[3]
    */
@@ -150,8 +150,8 @@ public final class FTTokenizer extends IndexToken {
     int lass = 0;
     int lasp = 0;
     int lw = 0; // width of a line
-    
-    int[] c = new int[4]; 
+
+    int[] c = new int[4];
     init();
     while(more()) {
       if (lw + p - s + 1 < ww) lw += p - s + 1;
@@ -159,7 +159,7 @@ public final class FTTokenizer extends IndexToken {
         c[3]++;
         lw = 0;
       }
-      
+
       c[0]++;
       if (sent != lass) {
         c[1]++;
@@ -175,7 +175,7 @@ public final class FTTokenizer extends IndexToken {
     c[3]++;
     return c;
   }
- 
+
   /**
    * Returns the text size.
    * @return size

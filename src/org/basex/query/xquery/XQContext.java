@@ -8,6 +8,7 @@ import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.core.proc.Check;
 import org.basex.data.Data;
+import org.basex.data.FTPosData;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.data.Serializer;
@@ -57,7 +58,7 @@ public final class XQContext extends QueryContext {
   public int size;
 
   /** Current fulltext item. */
-  public XQFTVisData ftdata;
+  public FTPosData ftdata;
   /** Current fulltext item. */
   public FTTokenizer ftitem;
   /** Current fulltext options. */
@@ -177,7 +178,7 @@ public final class XQContext extends QueryContext {
   @Override
   public Result eval(final Nodes nodes) throws XQException {
     // add fulltext container reference
-    if(nodes != null) ftdata = nodes.ftdata;
+    if(nodes != null && nodes.ftpos != null) ftdata = new FTPosData();
     
     // evaluates the query
     final Iter it = iter();
@@ -200,7 +201,7 @@ public final class XQContext extends QueryContext {
       // completed... return standard nodeset with fulltext positions
       if(i == null) {
         final Nodes n = new Nodes(pre.finish(), data);
-        n.ftdata = ftdata;
+        n.ftpos = ftdata;
         return n;
       }
       

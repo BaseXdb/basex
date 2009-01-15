@@ -26,11 +26,16 @@ import static org.basex.gui.GUIConstants.*;
 public final class GUIMenu extends JMenuBar {
   /** Referenced menu items. */
   private final JMenuItem[] items;
+  /** Reference to main window. */
+  protected final GUI gui;
 
   /**
    * Initializes the menu bar.
+   * @param main reference to the main window
    */
-  public GUIMenu() {
+  public GUIMenu(final GUI main) {
+    gui = main;
+    
     final String sm = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ==
       Event.META_MASK ? "meta" : "ctrl";
     
@@ -66,7 +71,7 @@ public final class GUIMenu extends JMenuBar {
                 new JCheckBoxMenuItem(cmd.desc()) : new JMenuItem(cmd.desc());
             item.addActionListener(new ActionListener() {
               public void actionPerformed(final ActionEvent e) {
-                cmd.execute();
+                cmd.execute(gui);
               }
             });
             item.setMnemonic(cmd.desc().charAt(0));
@@ -95,7 +100,7 @@ public final class GUIMenu extends JMenuBar {
       for(int j = 0; j < MENUITEMS[i].length; j++) {
         final Object item = MENUITEMS[i][j];
         if(!(item instanceof GUICommand)) continue;
-        ((GUICommand) item).refresh(items[c++]);
+        ((GUICommand) item).refresh(gui, items[c++]);
       }
     }
   }

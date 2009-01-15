@@ -1,14 +1,12 @@
 package org.basex.gui.dialog;
 
 import static org.basex.Text.*;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
 import org.basex.core.Prop;
@@ -57,10 +55,10 @@ public final class DialogImportFS  extends Dialog {
 
   /**
    * Default Constructor.
-   * @param parent parent frame
+   * @param main reference to the main window
    */
-  public DialogImportFS(final JFrame parent) {
-    super(parent, IMPORTFSTITLE);
+  public DialogImportFS(final GUI main) {
+    super(main, IMPORTFSTITLE);
 
     // create panels
     final BaseXBack p1 = new BaseXBack();
@@ -86,7 +84,7 @@ public final class DialogImportFS  extends Dialog {
     button.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         final BaseXFileChooser fc = new BaseXFileChooser(
-            DIALOGFC, path.getText(), parent);
+            DIALOGFC, path.getText(), main);
         if(fc.select(BaseXFileChooser.Mode.DIR)) {
           final IO file = fc.getFile();
           path.setText(file.path());
@@ -172,7 +170,7 @@ public final class DialogImportFS  extends Dialog {
     buttons = BaseXLayout.okCancel(this);
     set(buttons, BorderLayout.SOUTH);
     action(null);
-    finish(parent);
+    finish();
   }
 
   @Override

@@ -1,6 +1,8 @@
 package org.basex.query.xquery.iter;
 
 import static org.basex.query.xquery.XQText.*;
+
+import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.item.Bln;
@@ -80,6 +82,17 @@ public abstract class Iter {
     if(it == null) return Bln.FALSE;
     if(!it.node() && next() != null) Err.or(FUNSEQ, this);
     return it;
+  }
+
+  /**
+   * Performs a predicate test and returns the item if test was successful.
+   * @param ctx query context
+   * @return item
+   * @throws XQException evaluation exception
+   */
+  public final Item test(final XQContext ctx) throws XQException {
+    final Item it = ebv();
+    return (it.n() ? it.dbl() == ctx.pos : it.bool()) ? it : null;
   }
 
   /**

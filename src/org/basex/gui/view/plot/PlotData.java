@@ -2,10 +2,10 @@ package org.basex.gui.view.plot;
 
 import static org.basex.util.Token.*;
 import java.util.Arrays;
+import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.StatsKey.Kind;
-import org.basex.gui.GUI;
 import org.basex.index.Names;
 import org.basex.util.IntList;
 import org.basex.util.TokenList;
@@ -17,6 +17,8 @@ import org.basex.util.TokenList;
  * @author Lukas Kircher
  */
 public final class PlotData {
+  /** Context reference. */
+  final Context context;
   /** The x axis of the plot. */
   final PlotAxis xAxis;
   /** The y axis of the plot. */
@@ -30,11 +32,13 @@ public final class PlotData {
 
   /**
    * Default Constructor.
+   * @param ctx context reference
    */
-  public PlotData() {
+  public PlotData(final Context ctx) {
     xAxis = new PlotAxis(this);
     yAxis = new PlotAxis(this);
     pres = new int[0];
+    context = ctx;
   }
 
   /**
@@ -43,7 +47,7 @@ public final class PlotData {
    * @return key array
    */
   TokenList getItems() {
-    final Data data = GUI.context.data();
+    final Data data = context.data();
     final TokenList tl = new TokenList();
     for(final byte[] k : data.skel.desc(EMPTY, true, true)) {
       if(getCategories(k).size > 1) tl.add(k);
@@ -57,7 +61,7 @@ public final class PlotData {
    * @return key array
    */
   TokenList getCategories(final byte[] it) {
-    final Data data = GUI.context.data();
+    final Data data = context.data();
     final TokenList tl = new TokenList();
     for(final byte[] k : data.skel.desc(it, true, false)) {
       final Names index = startsWith(k, '@') ? data.atts : data.tags;
@@ -78,29 +82,29 @@ public final class PlotData {
     final byte[] b = token(newItem);
     if(eq(b, item)) return false;
     item = b;
-    refreshItems(GUI.context.current(), true);
+    refreshItems(context.current(), true);
     return true;
   }
 
   /**
    * Refreshes item list and coordinates if the selection has changed. So far
    * only numerical data is considered for plotting.
-   * @param context context to be displayed 
+   * @param ctx context to be displayed
    * @param sub determine descendant nodes of given context nodes
    */
-  void refreshItems(final Nodes context, final boolean sub) {
-    final Data data = GUI.context.data();
+  void refreshItems(final Nodes ctx, final boolean sub) {
+    final Data data = context.data();
     final IntList tmpPres = new IntList();
     final int itmID = data.tagID(item);
     
     if(!sub) {
-      pres = context.nodes;
+      pres = ctx.nodes;
       Arrays.sort(pres);
       size = pres.length;
       return;
     }
     
-    final int[] contextPres = context.nodes;
+    final int[] contextPres = ctx.nodes;
     for(int i = 0; i < contextPres.length; i++) {
       int p = contextPres[i];
       final int nl = p + data.size(p, Data.ELEM);

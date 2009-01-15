@@ -157,7 +157,7 @@ public final class FTOpt extends ExprInfo {
   }
 
   /**
-   * Merge to FTOpts.
+   * Merges two FTOpts.
    * @param ftopt1 FTOpt to merge
    */
   public void merge(final FTOpt ftopt1) {

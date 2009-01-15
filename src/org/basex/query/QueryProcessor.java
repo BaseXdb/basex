@@ -91,11 +91,7 @@ public abstract class QueryProcessor extends Progress {
    */
   public final String info() {
     final TokenBuilder tb = new TokenBuilder(context.info());
-    if(Prop.allInfo) {
-      tb.add(NL + QUERYSTRING);
-      tb.add(query);
-      tb.add(NL);
-    }
+    if(Prop.allInfo) tb.add(NL + QUERYSTRING + query + NL);
     return tb.toString();
   }
   

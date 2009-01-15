@@ -40,7 +40,7 @@ public final class BXDoc extends BXNode implements Document {
   public BXDoc(final Nod n) {
     super(n);
   }
-  
+
   @Override
   public Document getOwnerDocument() {
     return null;

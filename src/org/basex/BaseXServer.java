@@ -72,7 +72,7 @@ public final class BaseXServer {
         }
       }
     }.start();
-    
+
     try {
       if(!parseArguments(args)) return;
 
@@ -273,7 +273,7 @@ public final class BaseXServer {
     if(!ok) BaseX.errln(SERVERINFO);
     return ok;
   }
-  
+
   /** Simple session class. */
   class BaseXSession {
     /** Process id. */
@@ -282,7 +282,7 @@ public final class BaseXServer {
     long time;
     /** Process. */
     Process core;
-    
+
     /**
      * Constructor.
      * @param i process id
@@ -294,7 +294,7 @@ public final class BaseXServer {
       time = t;
       core = c;
     }
-    
+
     /**
      * Stops a process.
      */

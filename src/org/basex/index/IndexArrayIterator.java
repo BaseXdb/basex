@@ -21,7 +21,7 @@ public class IndexArrayIterator extends IndexIterator {
   protected int toknum = 0;
   /** Token from query. */
   protected FTTokenizer[] tok;
-  
+
   /** Empty iterator. */
   public static final IndexArrayIterator EMP = new IndexArrayIterator(0) {
     @Override
@@ -29,11 +29,11 @@ public class IndexArrayIterator extends IndexIterator {
     @Override
     public int next() { return 0; };
     @Override
-    public int size() { return 0; }; 
-    @Override 
+    public int size() { return 0; };
+    @Override
     public FTNode nextFTNode() { return new FTNode(); };
   };
-  
+
   /**
    * Constructor.
    * @param s size
@@ -84,7 +84,7 @@ public class IndexArrayIterator extends IndexIterator {
   public int next() {
     return pres != null ? pres[d] : ftdata[d][0];
   }
-  
+
   /**
    * Get next FTNode.
    * @return FTNode next FTNode
@@ -142,7 +142,7 @@ public class IndexArrayIterator extends IndexIterator {
     ftdata = ia.list;
     size = ia.size;
   }
-  
+
   /**
    * Merges two index array iterators.
    * @param iai1 first index array iterator to merge
@@ -153,7 +153,7 @@ public class IndexArrayIterator extends IndexIterator {
       final IndexArrayIterator iai2) {
     return IndexArrayIterator.merge(iai1, iai2, 0);
   }
-  
+
   /**
    * Merges two index array iterators.
    * @param iai1 first index array iterator to merge
@@ -165,18 +165,18 @@ public class IndexArrayIterator extends IndexIterator {
       final IndexArrayIterator iai2, final int w) {
     if (iai1 == EMP) return iai2;
     if (iai2 == EMP) return iai1;
-    
+
     return new IndexArrayIterator(1) {
       FTNode[] n = new FTNode[2];
       FTNode r;
       int c = -1;
-      
+
       @Override
       public boolean more() {
         r = null;
-        n[0] = c == 0 || c == -1 ? iai1.more() 
+        n[0] = c == 0 || c == -1 ? iai1.more()
             ? iai1.nextFTNode() : null : n[0];
-        n[1] = c == 1 || c == -1 ? iai2.more() 
+        n[1] = c == 1 || c == -1 ? iai2.more()
             ? iai2.nextFTNode() : null : n[1];
         if (n[0] != null) {
           if (n[1] != null) {
@@ -203,7 +203,7 @@ public class IndexArrayIterator extends IndexIterator {
         }
         return r != null;
       }
-      
+
       @Override
       public FTNode nextFTNode() {
         return r;
@@ -213,13 +213,13 @@ public class IndexArrayIterator extends IndexIterator {
       public int next() {
         return r.getPre();
       }
-      
+
       @Override
       public void setTokenNum(final int t) {
         iai1.setTokenNum(t);
         iai2.setTokenNum(t);
       }
-      
+
       @Override
       public void setToken(final FTTokenizer[] token) {
         iai1.setToken(token);
@@ -227,7 +227,7 @@ public class IndexArrayIterator extends IndexIterator {
       }
     };
   }
-  
+
   /**
    * Merges two index array iterators.
    * @param iai1 first index array iterator to merge
@@ -239,18 +239,18 @@ public class IndexArrayIterator extends IndexIterator {
       final IndexArrayIterator iai2, final int w) {
     if (iai1 == EMP) return iai2;
     if (iai2 == EMP) return iai1;
-    
+
     return new IndexArrayIterator(1) {
       FTNode[] n = new FTNode[2];
       FTNode r;
       int c = -1;
-      
+
       @Override
       public boolean more() {
         r = null;
-        n[0] = c == 0 || c == -1 ? iai1.more() 
+        n[0] = c == 0 || c == -1 ? iai1.more()
             ? iai1.nextFTNode() : null : n[0];
-        n[1] = c == 1 || c == -1 ? iai2.more() 
+        n[1] = c == 1 || c == -1 ? iai2.more()
             ? iai2.nextFTNode() : null : n[1];
         if (n[0] != null && n[1] != null) {
           final int dis = n[0].getPre() - n[1].getPre();
@@ -270,26 +270,26 @@ public class IndexArrayIterator extends IndexIterator {
               return more();
             }
           }
-        }         
+        }
         return false;
       }
-    
+
       @Override
       public FTNode nextFTNode() {
         return r;
       }
-      
+
       @Override
       public int next() {
         return r.getPre();
       }
-      
+
       @Override
       public void setTokenNum(final int t) {
         iai1.setTokenNum(t);
         iai2.setTokenNum(t);
       }
-      
+
       @Override
       public void setToken(final FTTokenizer[] token) {
         iai1.setToken(token);

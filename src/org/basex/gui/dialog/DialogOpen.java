@@ -5,7 +5,6 @@ import static org.basex.data.DataText.*;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.io.IOException;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -45,11 +44,11 @@ public final class DialogOpen extends Dialog {
 
   /**
    * Default Constructor.
-   * @param parent parent frame
+   * @param main reference to the main window
    * @param drop show drop dialog
    */
-  public DialogOpen(final JFrame parent, final boolean drop) {
-    super(parent, drop ? DROPTITLE : OPENTITLE);
+  public DialogOpen(final GUI main, final boolean drop) {
+    super(main, drop ? DROPTITLE : OPENTITLE);
 
     // create database chooser
     final StringList db = List.list();
@@ -69,7 +68,7 @@ public final class DialogOpen extends Dialog {
     doc.setBorder(0, 0, 5, 0);
     info.add(doc, BorderLayout.NORTH);
 
-    detail = new BaseXText(HELPOPENINFO, false, this);
+    detail = new BaseXText(gui, HELPOPENINFO, false, this);
     detail.setBorder(new EmptyBorder(5, 5, 5, 5));
     detail.setFocusable(false);
 
@@ -99,7 +98,7 @@ public final class DialogOpen extends Dialog {
 
     set(pp, BorderLayout.EAST);
     action(null);
-    finish(parent);
+    finish();
   }
 
   /**
@@ -122,7 +121,7 @@ public final class DialogOpen extends Dialog {
   @Override
   public void action(final String cmd) {
     if(BUTTONRENAME.equals(cmd)) {
-      new DialogRename(GUI.get(), choice.getValue());
+      new DialogRename(gui, choice.getValue());
       choice.setData(List.list().finish());
     } else if(BUTTONOPEN.equals(cmd)) {
       close();

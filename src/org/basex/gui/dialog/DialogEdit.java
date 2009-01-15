@@ -44,18 +44,18 @@ public final class DialogEdit extends Dialog {
 
   /**
    * Default Constructor.
-   * @param gui reference to main frame
+   * @param main reference to main frame
    * @param p pre value
    */
-  public DialogEdit(final GUI gui, final int p) {
-    super(gui, EDITTITLE);
+  public DialogEdit(final GUI main, final int p) {
+    super(main, EDITTITLE);
     pre = p;
 
     // create checkboxes
     final BaseXBack pp = new BaseXBack();
     pp.setLayout(new BorderLayout());
 
-    final Context context = GUI.context;
+    final Context context = gui.context;
     final Data data = context.data();
     kind = data.kind(pre);
 
@@ -70,7 +70,7 @@ public final class DialogEdit extends Dialog {
       pp.add(input, BorderLayout.CENTER);
     } else if(kind == Data.TEXT || kind == Data.COMM) {
       setResizable(true);
-      input3 = new BaseXText(null, true, this);
+      input3 = new BaseXText(gui, null, true, this);
       input3.setText(data.text(pre));
       input3.setPreferredSize(new Dimension(400, 200));
       old1 = Token.string(input3.getText());
@@ -90,7 +90,7 @@ public final class DialogEdit extends Dialog {
       input = new BaseXTextField(Token.string(atts[0]), null, this);
       old1 = input.getText();
       b.add(input);
-      input2 = new BaseXText(null);
+      input2 = new BaseXText(gui, null);
       input2.setText(atts[1]);
       old2 = Token.string(atts[1]);
       b.add(input2);
@@ -103,7 +103,7 @@ public final class DialogEdit extends Dialog {
     // create buttons
     buttons = BaseXLayout.okCancel(this);
     set(buttons, BorderLayout.SOUTH);
-    finish(gui);
+    finish();
   }
 
   @Override

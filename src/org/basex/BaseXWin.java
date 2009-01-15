@@ -44,20 +44,20 @@ public final class BaseXWin {
 
     // read properties
     Prop.read();
+    Prop.gui = true;
     GUIProp.read();
 
     // show waiting panel and wait some time to allow repainting
     final JFrame wait = waitPanel();
     Performance.sleep(50);
-    
     GUIConstants.init();
-    
+
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         // initialize look and feel
         init();
         // open main window
-        GUI.get();
+        final GUI gui = new GUI();
 
         // open specified document or database
         if(args.length != 0) {
@@ -65,7 +65,7 @@ public final class BaseXWin {
           if(db.endsWith(IO.BASEXSUFFIX)) {
             db = db.replaceAll("^.*/(.*)/.*", "$1");
           }
-          GUI.get().execute(new Check(db));
+          gui.execute(new Check(db));
         }
         // close wait panel
         wait.dispose();
@@ -96,12 +96,12 @@ public final class BaseXWin {
           if(v instanceof Font) def.put(k, ((Font) v).deriveFont(0));
         }
       }
-      
+
       // delay tooltip disappearance
       ToolTipManager.sharedInstance().setDismissDelay(20000);
       // refresh views when windows are resized
       Toolkit.getDefaultToolkit().setDynamicLayout(true);
-      
+
       /*
       for(java.lang.reflect.Field f : java.awt.SystemColor.class.getFields()) {
         final Object o = f.get(null);

@@ -163,7 +163,7 @@ public final class Array {
     return finish(tmp, c);
   }
 
-  
+
   /**
    * Resizes an array and adds an entry at the end.
    * @param ar array to be resized
@@ -205,9 +205,6 @@ public final class Array {
     return t;
   }
 
-
-  
-  
   /**
    * Optimizes the array size.
    * @param ar array to be resized
@@ -440,7 +437,7 @@ public final class Array {
     for(int i = 0; i < il; i++) if(i1[i] != i2[i]) return false;
     return true;
   }
-  
+
   /**
    * Creates a new array from the source array and with the specified length.
    * @param src source array

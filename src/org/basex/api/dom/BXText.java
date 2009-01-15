@@ -18,7 +18,7 @@ public class BXText extends BXChar implements Text {
   public BXText(final Nod n) {
     super(n);
   }
-  
+
   public String getWholeText() {
     return getNodeValue();
   }

@@ -18,7 +18,7 @@ import org.basex.util.TokenList;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class FTPos extends ExprInfo {
+public final class FTPos extends ExprInfo {
   /** Units. */
   public enum FTUnit {
     /** Word unit. */      WORDS,
@@ -366,7 +366,7 @@ public class FTPos extends ExprInfo {
   }
   
   /**
-   * Get position values.
+   * Gets position values.
    * @return IntList pos values
    */
   public IntList[] getPos() {

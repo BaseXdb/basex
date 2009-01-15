@@ -54,7 +54,7 @@ public interface Text {
   /** Version Information. */
   String VERSINFO = BaseX.info(lang("version"), VERSION);
 
-  /** BaseX GUI title. */
+  /** BaseX title and version. */
   String TITLE = NAME + S + VERSION;
   /** BaseX Text. */
   String CONSOLEINFO = TITLE + "; " + COMPANY;
@@ -580,7 +580,7 @@ public interface Text {
   /** Process information. */
   String INFOWAIT = lang("wait");
   /** Title of Information Dialog. */
-  String INFOTITLE = lang("info_title");
+  String INFOTITLE = lang("info_head");
   /** Index information. */
   String INFOINDEX = lang("info_index");
   /** Index information. */
@@ -856,9 +856,9 @@ public interface Text {
   /** Command Info. */
   String GUISHOWTEXTTT = lang("c_showtexttt");
   /** Command Info. */
-  String GUISHOWTREE = lang("c_showtree");
+  String GUISHOWFOLDER = lang("c_showfolder");
   /** Command Info. */
-  String GUISHOWTREETT = lang("c_showtreett");
+  String GUISHOWFOLDERTT = lang("c_showfoldertt");
   /** Command Info. */
   String GUIUNDO = lang("c_undo");
   /** Command Info. */
@@ -893,7 +893,7 @@ public interface Text {
   /** Button text for browsing files/directories. */
   String BUTTONBROWSE = lang("b_browse") + DOTS;
   /** XQuery copy Button. */
-  String BUTTONTOXPATH = ">> XQuery";
+  String BUTTONTOXQUERY = ">> XQuery";
   /** Text field mode - Search Modes. */
   String[] SEARCHMODE = { "XQuery", lang("b_simple") };
 
@@ -915,13 +915,15 @@ public interface Text {
   /** Binary file. */
   byte[] MAPBINARY = token(lang("map_binary"));
   /** Query Info title. */
-  String INFOTIT = lang("info_tit");
+  String INFOTIT = lang("info_title");
   /** No Query info. */
   String INFONO = lang("info_no");
+  /** Query title. */
+  String QUERYTIT = lang("query_title");
   /** Help title. */
-  String HELPTIT = lang("help_tit");
+  String HELPTIT = lang("help_title");
   /** Help title. */
-  String TEXTTIT = lang("text_tit");
+  String TEXTTIT = lang("text_title");
   /** Plot visualization. */
   String PLOTLOG = "log";
 
@@ -1115,7 +1117,7 @@ public interface Text {
 
   /** Update texts. */
   String[] KINDS = { "root", "element", "text", "attribute", "comment", "pi" };
-  
+
   /** Dialog title for choosing a font. */
   String FONTTITLE = lang("df_title");
   /** Anti-Aliasing information. */
@@ -1266,7 +1268,7 @@ public interface Text {
   /** Help String. */
   byte[] HELPMAP = token(lang("h_map"));
   /** Help String. */
-  byte[] HELPTREE = token(lang("h_tree"));
+  byte[] HELPFOLDER = token(lang("h_folder"));
   /** Help String. */
   byte[] HELPTABLE = token(lang("h_table"));
   /** Help String. */

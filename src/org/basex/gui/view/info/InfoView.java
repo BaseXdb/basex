@@ -14,6 +14,7 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.view.View;
+import org.basex.gui.view.ViewNotifier;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.StringList;
@@ -63,10 +64,11 @@ public final class InfoView extends View {
 
   /**
    * Default constructor.
+   * @param man view manager
    * @param help help text
    */
-  public InfoView(final byte[] help) {
-    super(help);
+  public InfoView(final ViewNotifier man, final byte[] help) {
+    super(man, help);
     setMode(Fill.UP);
     setBorder(8, 8, 8, 8);
     setLayout(new BorderLayout());
@@ -80,7 +82,7 @@ public final class InfoView extends View {
     north.add(timer, BorderLayout.SOUTH);
     add(north, BorderLayout.NORTH);
 
-    area = new BaseXText(help, false);
+    area = new BaseXText(gui, help, false);
     add(area, BorderLayout.CENTER);
     refreshLayout();
   }

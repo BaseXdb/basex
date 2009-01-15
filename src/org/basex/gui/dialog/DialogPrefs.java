@@ -8,7 +8,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import javax.swing.JFrame;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.gui.GUI;
@@ -22,7 +21,6 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
-import org.basex.gui.view.View;
 
 /**
  * Dialog window for changing some project's preferences.
@@ -48,10 +46,10 @@ public final class DialogPrefs extends Dialog {
 
   /**
    * Default Constructor.
-   * @param gui reference to main frame
+   * @param main reference to the main window
    */
-  public DialogPrefs(final GUI gui) {
-    super(gui, PREFSTITLE, false);
+  public DialogPrefs(final GUI main) {
+    super(main, PREFSTITLE, false);
 
     // create checkboxes
     final BaseXBack pp = new BaseXBack();
@@ -72,7 +70,7 @@ public final class DialogPrefs extends Dialog {
     final BaseXButton button = new BaseXButton(BUTTONBROWSE, HELPBROWSE, this);
     button.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        chooseDir(gui);
+        chooseDir();
       }
     });
     
@@ -100,7 +98,7 @@ public final class DialogPrefs extends Dialog {
 
     // enable only if current document contains name attributes
     names = new BaseXCheckBox(PREFNAMES, HELPNAMES, GUIProp.shownames, this);
-    final Data data = GUI.context.data();
+    final Data data = gui.context.data();
     names.setEnabled(data != null && data.fs == null && data.nameID != 0);
     pp.add(names);
 
@@ -127,16 +125,15 @@ public final class DialogPrefs extends Dialog {
     pp.add(p);
 
     set(pp, BorderLayout.CENTER);
-    finish(gui);
+    finish();
   }
   
   /**
    * Opens the directory chooser and sets the new path.
-   * @param parent parent reference
    */
-  void chooseDir(final JFrame parent) {
-    final BaseXFileChooser fc = new BaseXFileChooser(DIALOGFC, path.getText(),
-        parent);
+  void chooseDir() {
+    final BaseXFileChooser fc = new BaseXFileChooser(DIALOGFC,
+        path.getText(), gui);
     if(fc.select(BaseXFileChooser.Mode.DIR)) path.setText(fc.getDir());
   }
   
@@ -161,6 +158,6 @@ public final class DialogPrefs extends Dialog {
     GUIProp.shownames = names.isSelected();
     GUIProp.simplefd = simpfd.isSelected();
     GUIProp.javalook = javalook.isSelected();
-    View.notifyLayout();
+    gui.notify.layout();
   }
 }

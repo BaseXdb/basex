@@ -4,7 +4,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.LayoutManager;
-import javax.swing.JComponent;
 
 /**
  * Project specific Split panel implementation.
@@ -56,14 +55,14 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
 
   /**
    * Reacts on splitter drags.
-   * @param c splitter
+   * @param sep separator
    * @param p current position
    */
-  public void drag(final JComponent c, final double p) {
+  public void drag(final BaseXSplitSep sep, final double p) {
     final Component[] m = getComponents();
     final int r = s.length;
     int q = 0;
-    for(int n = 0; n < r - 1; n++) if(m[(n << 1) + 1] == c) q = n + 1;
+    for(int n = 0; n < r - 1; n++) if(m[(n << 1) + 1] == sep) q = n + 1;
     final double v = (d - p) / (l ? getWidth() : getHeight());
     for(int i = 0; i < q; i++) if(t[i] - v / q < .0001) return;
     for(int i = q; i < r; i++) if(t[i] + v / (r - q) < .0001) return;

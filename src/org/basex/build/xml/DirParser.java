@@ -41,7 +41,7 @@ public final class DirParser extends Parser {
   }
   
   /**
-   * Parse the specified file or parser its children.
+   * Parses the specified file or parser its children.
    * @param b builder
    * @param path file path
    * @throws IOException I/O exception

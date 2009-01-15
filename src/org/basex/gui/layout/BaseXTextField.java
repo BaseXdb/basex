@@ -5,7 +5,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JTextField;
-import org.basex.gui.GUI;
 import org.basex.gui.dialog.Dialog;
 
 /**
@@ -55,7 +54,7 @@ public class BaseXTextField extends JTextField {
     addMouseListener(new MouseAdapter() {
       @Override
       public void mouseEntered(final MouseEvent e) {
-        GUI.get().focus(e.getComponent(), help);
+        BaseXLayout.help(e.getComponent(), help);
       }
     });
     addKeyListener(new KeyAdapter() {

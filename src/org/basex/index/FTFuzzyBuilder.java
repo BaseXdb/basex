@@ -15,7 +15,7 @@ import org.basex.util.Token;
 /**
  * This class builds an index for text contents, optimized for fuzzy search,
  * in an ordered table.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Sebastian Gath
  * @author Christian Gruen
@@ -75,7 +75,7 @@ public final class FTFuzzyBuilder extends Progress implements IndexBuilder {
     }
     return new FTFuzzy(data, data.meta.dbname);
   }
- 
+
   /**
    * Extracts and indexes words from the specified byte array.
    * @param tok token to be extracted and indexed
@@ -127,7 +127,7 @@ public final class FTFuzzyBuilder extends Progress implements IndexBuilder {
       tre.init();
       while(tre.more()) {
         final int p = tre.next();
-        
+
          // write token value
         final byte[] key = tre.key();
         for(int x = 0; x != j; x++) outy.write(key[x]);
@@ -146,7 +146,7 @@ public final class FTFuzzyBuilder extends Progress implements IndexBuilder {
         int spre = Num.size(vpre);
         int spos = Num.size(vpos);
         if (data.meta.ftittr) {
-          // ftdata is stored here, with pre1, pos1, ..., preu, posu 
+          // ftdata is stored here, with pre1, pos1, ..., preu, posu
           while(lpre < Num.size(vpre) && lpos < Num.size(vpos)) {
             int z = 0;
             while (z < Num.len(vpre, lpre)) {
@@ -160,12 +160,12 @@ public final class FTFuzzyBuilder extends Progress implements IndexBuilder {
             lpos += z;
           }
         } else {
-          // ftdata is stored here, with pre1, ..., preu in outPre and 
+          // ftdata is stored here, with pre1, ..., preu in outPre and
           // pos1, ..., posu in outPos
           for (int z = 4; z < spre; z++) outz.write(vpre[z]);
           for (int z = 4; z < spos; z++) outz.write(vpos[z]);
         }
-        
+
         dr = outz.size();
         tr = (int) outy.size();
       }

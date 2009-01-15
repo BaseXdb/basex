@@ -12,20 +12,16 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 abstract class AUpdate extends Process {
-  /** GUI flag. */
-  protected final boolean gui;
   /** Insert type. */
   protected final CmdUpdate type;
 
   /**
    * Constructor.
-   * @param g gui flag
    * @param t update type
    * @param a arguments
    */
-  AUpdate(final boolean g, final CmdUpdate t, final String... a) {
+  AUpdate(final CmdUpdate t, final String... a) {
     super(DATAREF | UPDATING, a);
-    gui = g;
     type = t;
   }
 

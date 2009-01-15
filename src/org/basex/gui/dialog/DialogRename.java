@@ -4,8 +4,8 @@ import static org.basex.Text.*;
 import java.awt.BorderLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import javax.swing.JFrame;
 import org.basex.core.proc.List;
+import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLabel;
@@ -34,11 +34,11 @@ public final class DialogRename extends Dialog {
 
   /**
    * Default Constructor.
-   * @param parent parent frame
+   * @param main reference to the main window
    * @param dbname name of database
    */
-  public DialogRename(final JFrame parent, final String dbname) {
-    super(parent, RENAMETITLE);
+  public DialogRename(final GUI main, final String dbname) {
+    super(main, RENAMETITLE);
     old = dbname;
 
     info = new BaseXLabel(" ");
@@ -62,7 +62,7 @@ public final class DialogRename extends Dialog {
     p.add(buttons, BorderLayout.EAST);
     set(p, BorderLayout.SOUTH);
 
-    finish(parent);
+    finish();
   }
 
   @Override

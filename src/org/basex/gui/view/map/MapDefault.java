@@ -7,12 +7,10 @@ import java.util.ArrayList;
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.ViewRect;
 import org.basex.gui.view.ViewData;
-import org.basex.query.xquery.XQFTVisData;
 
 /**
  * Adds default paint operations to TreeMap.
@@ -35,7 +33,7 @@ final class MapDefault extends MapPainter {
     final ViewRect l = view.layouter.layout;
     final int ww = view.getWidth();
     final int hh = view.getWidth();
-    final Data data = GUI.context.data();
+    final Data data = view.gui.context.data();
 
     mpos = 0;
     for(int ri = 0; ri < rects.size(); ri++) {
@@ -52,8 +50,7 @@ final class MapDefault extends MapPainter {
       // draw rectangle
       Color col = nextMark(rects, pre, ri, rects.size());
       final boolean mark = col != null;
-      final XQFTVisData ft = GUI.context.marked().ftdata;
-      final int[][] ftd = ft != null ? ft.get(pre) : null;
+      final int[][] ftd = view.gui.context.marked().ftpos.get(pre);
       if (ftd != null) {
         r.pos = ftd[0];
         r.poi = ftd[1];
@@ -100,7 +97,7 @@ final class MapDefault extends MapPainter {
     rect.x += 3;
     rect.w -= 3;
     final int pre = rect.pre;
-    final Context context = GUI.context;
+    final Context context = view.gui.context;
     final Data data = context.data();
     final Nodes current = context.current();
     final int kind = data.kind(pre);
@@ -124,12 +121,12 @@ final class MapDefault extends MapPainter {
       if(p != -1) {
         rect.x += p;
         rect.y += (rect.h - GUIProp.fontsize) / 2 - 1;
-        BaseXLayout.drawText(g, rect, text);
+        MapRenderer.drawText(g, rect, text);
       } else {
-        if(BaseXLayout.calcHeight(g, rect, text) < rect.h) {
-          BaseXLayout.drawText(g, rect, text);
+        if(MapRenderer.calcHeight(g, rect, text) < rect.h) {
+          MapRenderer.drawText(g, rect, text);
         } else {
-          BaseXLayout.drawThumbnails(g, rect, text);
+          MapRenderer.drawThumbnails(g, rect, text);
           return true;
         }
       }

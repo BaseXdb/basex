@@ -4,7 +4,12 @@ import static org.basex.Text.*;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import org.basex.data.Nodes;
 import org.basex.gui.GUI;
+import org.basex.gui.GUICommands;
+import org.basex.gui.GUIProp;
+import org.basex.gui.GUIToolBar;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXLayout;
 
@@ -21,17 +26,25 @@ abstract class QueryPanel {
   BaseXButton go;
   /** Execute Button. */
   BaseXButton stop;
+  /** Filter button. */
+  BaseXButton filter;
   /** Last Query. */
   String last = "";
 
   /** Initializes the panel. */
   abstract void init();
-  /** Refreshes the panel. */
-  abstract void refresh();
     /** Closes the panel. */
   abstract void finish();
   /** Reacts on the GUI termination. */
   abstract void quit();
+
+  /** Refreshes the panel. */
+  void refresh() {
+    BaseXLayout.enable(go, !GUIProp.execrt);
+    final Nodes marked = main.gui.context.marked();
+    if(marked == null) return;
+    BaseXLayout.enable(filter, !GUIProp.filterrt && marked.size != 0);
+  }
 
   /**
    * Initializes components which are equal in all panels.
@@ -43,7 +56,7 @@ abstract class QueryPanel {
     stop.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         BaseXLayout.enable(stop, false);
-        GUI.get().stop();
+        main.gui.stop();
       }
     });
     BaseXLayout.enable(stop, false);
@@ -56,6 +69,9 @@ abstract class QueryPanel {
         query(true);
       }
     });
+    
+    filter = GUIToolBar.newButton(GUICommands.FILTER, main.gui);
+    filter.addKeyListener(main);
   }
 
   /**

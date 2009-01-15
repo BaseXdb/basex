@@ -3,9 +3,7 @@ package org.basex.gui.layout;
 import static org.basex.gui.GUIConstants.*;
 import java.awt.Color;
 
-import org.basex.data.Nodes;
-import org.basex.gui.GUI;
-import org.basex.query.xquery.XQFTVisData;
+import org.basex.data.FTPosData;
 import org.basex.util.Array;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -39,7 +37,7 @@ final class BaseXTextTokens {
   /** Start of an error mark. */
   private int es = -1;
   /** Flag for coloring tokens in the text view. */
-  public boolean cft = false;
+  private FTPosData ftdata;
 
   /**
    * Constructor.
@@ -55,8 +53,19 @@ final class BaseXTextTokens {
    * @param s buffer size
    */
   BaseXTextTokens(final byte[] t, final int s) {
+    this(t, s, null);
+  }
+
+  /**
+   * Constructor.
+   * @param t text
+   * @param s buffer size
+   * @param ft fulltext data
+   */
+  BaseXTextTokens(final byte[] t, final int s, final FTPosData ft) {
     text = t;
     size = s;
+    ftdata = ft;
   }
 
   /**
@@ -122,10 +131,8 @@ final class BaseXTextTokens {
    * @return next token
    */
   String nextWord(final boolean w) {
-    if (cft && w) {
-      final Nodes nodes = GUI.context.marked();
-      final XQFTVisData ftdata = nodes != null ? nodes.ftdata : null;
-      final int c = ftdata != null ? ftdata.getTextCol(ps) : -1;
+    if(ftdata != null && w) {
+      final int c = ftdata.getTextCol(ps);
       col = c == -1 ? Color.black : thumbnailcolor[c];
     }
     return Token.string(text, ps, pe - ps);

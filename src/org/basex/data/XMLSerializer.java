@@ -6,7 +6,6 @@ import java.io.IOException;
 
 import org.basex.index.FTTokenizer;
 import org.basex.io.PrintOutput;
-import org.basex.query.xquery.XQFTVisData;
 import org.basex.util.Token;
 
 /**
@@ -40,7 +39,7 @@ public final class XMLSerializer extends Serializer {
   /**
    * Constructor.
    * @param o output stream
-   * @param x xml output 
+   * @param x xml output
    * @param p pretty printing
    * @throws IOException exception
    */
@@ -55,7 +54,7 @@ public final class XMLSerializer extends Serializer {
       openElement(RESULTS);
     }
   }
-  
+
   @Override
   public void close() throws IOException {
     if(xml) closeElement();
@@ -99,28 +98,29 @@ public final class XMLSerializer extends Serializer {
   }
 
   @Override
-  public void text(final byte[] b, final int[] pos, final int[] poi,
-      final XQFTVisData ft) throws IOException {
+  public void text(final byte[] b, final FTPosData ft, final int[][] ftd)
+      throws IOException {
+
     finishElement();
     int c = -1, pp = 0, wl = 0;
     FTTokenizer ftt = new FTTokenizer(b);
     while(ftt.more()) {
       c++;
-      for (int i = wl; i < ftt.p; i++) {
-        if (Token.letterOrDigit(b[i]) && pp < pos.length && c == pos[pp]) {
+      for(int i = wl; i < ftt.p; i++) {
+        if(Token.letterOrDigit(b[i]) && pp < ftd[0].length && c == ftd[0][pp]) {
           // write fulltext pointer in front of the token
           // used for coloring the token
-          ft.addTextPos(out.size(), poi[pp++]);
+          ft.addTextPos(out.size(), ftd[1][pp++]);
         }
         ch(b[i]);
       }
       wl = ftt.p;
     }
-    
+
     while (wl < b.length) ch(b[wl++]);
     indent = false;
   }
-  
+
   /**
    * Prints a single character.
    * @param b character to be printed
@@ -135,7 +135,7 @@ public final class XMLSerializer extends Serializer {
       default : out.write(b);
     }
   }
-  
+
   @Override
   public void comment(final byte[] n) throws IOException {
     finishElement();
@@ -194,7 +194,7 @@ public final class XMLSerializer extends Serializer {
     out.print(t);
     indent = pretty;
   }
-  
+
   @Override
   protected void empty() throws IOException {
     out.print(ELEM4);

@@ -3,7 +3,6 @@ package org.basex.query.xquery.expr;
 import static org.basex.query.xquery.XQText.*;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.XQFTVisData;
 import org.basex.query.xquery.item.DBNode;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Nod;
@@ -54,8 +53,10 @@ public final class InterSect extends Arr {
           } 
         }
       }
-      if(res.size == 0) ctx.ftdata = new XQFTVisData(null);
-      else ctx.ftdata.keep(il.finish());
+      if(ctx.ftdata != null) {
+        if(res.size == 0) ctx.ftdata.init();
+        else ctx.ftdata.keep(il.finish());
+      }
       
       seq = res;
     }

@@ -11,15 +11,17 @@ import javax.swing.AbstractButton;
 public interface GUICommand {
   /**
    * Executes the command.
+   * @param gui reference to the main window
    */
-  void execute();
+  void execute(final GUI gui);
 
   /**
    * Enables or disables the specified button,
    * depending on the command properties.
+   * @param gui reference to the main window
    * @param button button to be modified
    */
-  void refresh(final AbstractButton button);
+  void refresh(final GUI gui, final AbstractButton button);
 
   /**
    * Returns if this command includes a menu checkbox.

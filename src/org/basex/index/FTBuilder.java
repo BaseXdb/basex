@@ -14,7 +14,7 @@ import org.basex.util.Token;
 
 /**
  * This class builds an index for text contents in a compressed trie.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Sebastian Gath
  * @author Christian Gruen
@@ -39,7 +39,7 @@ public final class FTBuilder extends Progress implements IndexBuilder {
    */
   public FTTrie build(final Data data) throws IOException {
     final Performance p = new Performance();
-    
+
     wp.cs = data.meta.ftcs;
     int s = 0;
     index = new FTArray(128, data.meta.ftcs);
@@ -193,28 +193,28 @@ public final class FTBuilder extends Progress implements IndexBuilder {
    * @param ittr boolean itterator optimated storage
    * @throws IOException IOEXception
    */
-  private void bulkLoad(final DataOutput outPre, 
+  private void bulkLoad(final DataOutput outPre,
       final boolean ittr)  throws IOException {
     hash.init();
     long cpre;
     int ds, p, lpre, lpos, spre, spos;
     byte[] tok, vpre, vpos;
-    
+
     while(hash.more()) {
       p = hash.next();
       tok = hash.key();
       ds = hash.ns[p];
       cpre = outPre.size();
-      
+
       vpre = hash.pre[p];
       vpos = hash.pos[p];
       lpre = 4;
       lpos = 4;
       spre = Num.size(vpre);
       spos = Num.size(vpos);
-      
+
       if (ittr) {
-        // ftdata is stored here, with pre1, pos1, ..., preu, posu 
+        // ftdata is stored here, with pre1, pos1, ..., preu, posu
         while(lpre < Num.size(vpre) && lpos < Num.size(vpos)) {
           int z = 0;
           while (z < Num.len(vpre, lpre)) {
@@ -228,7 +228,7 @@ public final class FTBuilder extends Progress implements IndexBuilder {
           lpos += z;
         }
       } else {
-        // ftdata is stored here, with pre1, ..., preu in outPre and 
+        // ftdata is stored here, with pre1, ..., preu in outPre and
         // pos1, ..., posu in outPos
         for (int z = 4; z < spre; z++) outPre.write(vpre[z]);
         for (int z = 4; z < spos; z++) outPre.write(vpos[z]);

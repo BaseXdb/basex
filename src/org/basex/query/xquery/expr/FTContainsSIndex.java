@@ -61,7 +61,7 @@ public final class FTContainsSIndex extends FTContains {
     ctx.ftitem = tmp;
 
     if (Bln.get(d).bool() && ftn != null && ctx.ftpos != null &&
-        ftn.ftn.ip != null && ftn.ftn.p !=  null)  
+        ftn.ftn.ip != null && ftn.ftn.p !=  null && ctx.ftdata != null)
       ctx.ftdata.add(ftn.ftn.ip.finish(), ftn.ftn.p.finish());
     
     return Bln.get(d).iter();

@@ -13,13 +13,9 @@ import javax.swing.BoxLayout;
 import org.basex.core.proc.Find;
 import org.basex.core.proc.XQuery;
 import org.basex.data.Data;
-import org.basex.data.Nodes;
 import org.basex.data.StatsKey;
-import org.basex.gui.GUI;
-import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
-import org.basex.gui.GUIToolBar;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCombo;
@@ -46,7 +42,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
   /** Exact search pattern. */
   private static final String PATEX = "[% = \"%\"]";
   /** Substring search pattern. */
-  private static final String PATSUB = "[basex:containslc(%, \"%\")]";
+  private static final String PATSUB = "[% ftcontains \"%\"]";
   /** Numeric search pattern. */
   private static final String PATNUM = "[% >= % and % <= %]";
   /** Simple search pattern. */
@@ -58,8 +54,6 @@ final class QuerySimple extends QueryPanel implements ActionListener {
   BaseXBack panel;
   /** Query field. */
   BaseXTextField all;
-  /** Filter button. */
-  BaseXButton filter;
   /** Copy to XQuery button. */
   BaseXButton copy;
 
@@ -92,10 +86,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
 
     initPanel();
 
-    filter = GUIToolBar.newButton(GUICommands.FILTER);
-    filter.addKeyListener(main);
-
-    copy = new BaseXButton(BUTTONTOXPATH, HELPTOXPATH);
+    copy = new BaseXButton(BUTTONTOXQUERY, HELPTOXPATH);
     copy.addKeyListener(main);
     copy.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
@@ -131,17 +122,14 @@ final class QuerySimple extends QueryPanel implements ActionListener {
    */
   private void create() {
     panel.removeAll();
-    addKeys(GUI.context.data());
+    addKeys(main.gui.context.data());
   }
 
   @Override
   void refresh() {
-    final Nodes marked = GUI.context.marked();
-    if(marked == null) return;
-    BaseXLayout.enable(filter, !GUIProp.filterrt && marked.size != 0);
-    BaseXLayout.enable(go, !GUIProp.execrt);
-
-    all.help(GUI.context.data().fs != null ? HELPSEARCHFS : HELPSEARCHXML);
+    super.refresh();
+    
+    all.help(main.gui.context.data().fs != null ? HELPSEARCHFS : HELPSEARCHXML);
     if(GUIProp.showquery && panel.getComponentCount() == 0) {
       create();
       main.revalidate();
@@ -159,18 +147,18 @@ final class QuerySimple extends QueryPanel implements ActionListener {
    * @param pos position
    */
   void addInput(final int pos) {
-    final BaseXTextField text = new BaseXTextField(HELPCATINPUT, null);
-    BaseXLayout.setWidth(text, COMPW);
-    BaseXLayout.setHeight(text, text.getFont().getSize() + 11);
-    text.setMargin(new Insets(0, 0, 0, 10));
-    text.addKeyListener(new KeyAdapter() {
+    final BaseXTextField txt = new BaseXTextField(HELPCATINPUT, null);
+    BaseXLayout.setWidth(txt, COMPW);
+    BaseXLayout.setHeight(txt, txt.getFont().getSize() + 11);
+    txt.setMargin(new Insets(0, 0, 0, 10));
+    txt.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {
         if(GUIProp.execrt) query(false);
       }
     });
-    text.addKeyListener(main);
-    panel.add(text, pos);
+    txt.addKeyListener(main);
+    panel.add(txt, pos);
   }
 
   /**
@@ -191,10 +179,10 @@ final class QuerySimple extends QueryPanel implements ActionListener {
     if(tmp.size == 0) return;
 
     final String[] keys = entries(tmp.finish());
-    final BaseXCombo combo = new BaseXCombo(keys, HELPSEARCHCAT, false);
-    combo.addActionListener(this);
-    combo.addKeyListener(main);
-    panel.add(combo);
+    final BaseXCombo cm = new BaseXCombo(keys, HELPSEARCHCAT, false);
+    cm.addActionListener(this);
+    cm.addKeyListener(main);
+    panel.add(cm);
     panel.add(new BaseXLabel(""));
   }
 
@@ -204,11 +192,11 @@ final class QuerySimple extends QueryPanel implements ActionListener {
    * @param pos position
    */
   void addCombo(final String[] values, final int pos) {
-    final BaseXCombo combo = new BaseXCombo(values, HELPCAT, false);
-    BaseXLayout.setWidth(combo, COMPW);
-    combo.addActionListener(this);
-    combo.addKeyListener(main);
-    panel.add(combo, pos);
+    final BaseXCombo cm = new BaseXCombo(values, HELPCAT, false);
+    BaseXLayout.setWidth(cm, COMPW);
+    cm.addActionListener(this);
+    cm.addKeyListener(main);
+    panel.add(cm, pos);
   }
 
   /**
@@ -222,13 +210,13 @@ final class QuerySimple extends QueryPanel implements ActionListener {
    */
   void addSlider(final double min, final double max, final int pos,
       final boolean kb, final boolean date, final boolean itr) {
-    final BaseXDSlider slider = new BaseXDSlider(min, max, HELPDS, this);
-    BaseXLayout.setWidth(slider, COMPW + BaseXDSlider.LABELW);
-    slider.kb = kb;
-    slider.date = date;
-    slider.itr = itr;
-    slider.addKeyListener(main);
-    panel.add(slider, pos);
+    final BaseXDSlider sl = new BaseXDSlider(main.gui, min, max, HELPDS, this);
+    BaseXLayout.setWidth(sl, COMPW + BaseXDSlider.LABELW);
+    sl.kb = kb;
+    sl.date = date;
+    sl.itr = itr;
+    sl.addKeyListener(main);
+    panel.add(sl, pos);
   }
 
   public void actionPerformed(final ActionEvent e) {
@@ -249,7 +237,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
       final BaseXCombo combo = (BaseXCombo) source;
       panel.remove(cp + 1);
 
-      final Data data = GUI.context.data();
+      final Data data = main.gui.context.data();
       final boolean selected = combo.getSelectedIndex() != 0;
       if(selected) {
         final String item = combo.getSelectedItem().toString();
@@ -293,7 +281,7 @@ final class QuerySimple extends QueryPanel implements ActionListener {
   @Override
   void query(final boolean force) {
     final TokenBuilder tb = new TokenBuilder();
-    final Data data = GUI.context.data();
+    final Data data = main.gui.context.data();
 
     final int cs = panel.getComponentCount();
     for(int c = 0; c < cs; c += 2) {
@@ -347,24 +335,24 @@ final class QuerySimple extends QueryPanel implements ActionListener {
 
     String qu = tb.toString();
     if(qu.length() != 0) {
-      if(!GUIProp.filterrt && !GUI.context.root()) qu = "." + qu;
+      if(!GUIProp.filterrt && !main.gui.context.root()) qu = "." + qu;
     }
 
     String simple = all.getText().trim();
     if(simple.length() != 0) {
-      simple = Find.find(simple, GUI.context, GUIProp.filterrt);
+      simple = Find.find(simple, main.gui.context, GUIProp.filterrt);
       qu = qu.length() != 0 ? simple + " | " + qu : simple;
     }
 
     if(qu.length() == 0) {
-      qu = GUIProp.filterrt || GUI.context.root() ? "/" : ".";
+      qu = GUIProp.filterrt || main.gui.context.root() ? "/" : ".";
     }
     
     if(!force && last.equals(qu)) return;
     last = qu;
     BaseXLayout.enable(copy, last.length() != 0);
     BaseXLayout.enable(stop, true);
-    GUI.get().execute(new XQuery(qu));
+    main.gui.execute(new XQuery(qu));
   }
 
   @Override

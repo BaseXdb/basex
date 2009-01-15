@@ -2,15 +2,10 @@ package org.basex.gui.view;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import org.basex.Text;
-import org.basex.core.Context;
-import org.basex.data.Nodes;
-import org.basex.gui.GUI;
 import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
-import org.basex.gui.layout.BaseXLayout;
+import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXPanel;
-import org.basex.util.Array;
 
 /**
  * View observer pattern. All inheriting classes are attached to the
@@ -20,37 +15,13 @@ import org.basex.util.Array;
  * @author Christian Gruen
  */
 public abstract class View extends BaseXPanel {
-  /** Maximum history size. */
-  public static final int MAXHIST = 20;
-  /** Zoomed rectangle history. */
-  public static final Nodes[] MARKHIST = new Nodes[MAXHIST];
-  /** Zoomed rectangle history. */
-  public static final Nodes[] NODEHIST = new Nodes[MAXHIST];
-  /** Command history. */
-  public static final String[] QUERYHIST = new String[MAXHIST];
-  /** Attached views. */
-  private static View[] view = new View[0];
-  /** History pointer. */
-  public static int hist;
-  /** Maximum history value. */
-  public static int maxhist;
-  /** Painting flag. */
-  public static boolean painting;
-  /** Working flag. */
-  public static boolean updating;
-  
-  /** Currently focused node (pre value). */
-  public static int focused = -1;
-  
-
   /**
    * Registers the specified view.
+   * @param man view manager
    * @param hlp help text
    */
-  protected View(final byte[] hlp) {
-    super(hlp);
-    
-    if(GUIConstants.font == null) notifyLayout();
+  protected View(final ViewNotifier man, final byte[] hlp) {
+    super(man.gui, hlp);
     addMouseListener(this);
     addMouseMotionListener(this);
     addMouseWheelListener(this);
@@ -58,211 +29,8 @@ public abstract class View extends BaseXPanel {
     addComponentListener(this);
     setMode(GUIConstants.Fill.DOWN);
     setFocusable(true);
-    view = Array.add(view, this);
+    man.add(this);
   }
-
-  /**
-   * Notifies all views of a data reference change.
-   */
-  public static void notifyInit() {
-    final Context ctx = GUI.context;
-    final boolean db = ctx.db();
-    if(db) {
-      NODEHIST[0] = ctx.current();
-      MARKHIST[0] = new Nodes(ctx.data());
-    }
-    
-    focused = -1;
-    hist = 0;
-    maxhist = 0;
-    for(final View v : view) v.refreshInit();
-
-    final GUI gui = GUI.get();
-    gui.views.setViews(db);
-    gui.layoutViews();
-
-    // set new windows title
-    gui.setTitle(Text.TITLE + (db ? " - " + ctx.data().meta.dbname : ""));
-  }
-
-  /**
-   * Notifies all views of a focus change.
-   * @param pre focused pre value
-   * @param vw the calling view
-   */
-  public static void notifyFocus(final int pre, final View vw) {
-    if(focused == pre) return;
-    focused = pre;
-    for(final View v : view) if(v != vw && v.isValid()) v.refreshFocus();
-    if(pre != -1) GUI.get().status.setPath(
-        ViewData.path(GUI.context.data(), pre));
-  }
-
-  /**
-   * Notifies all views of a selection change.
-   * @param mark marked nodes
-   * @param vw the calling view
-   */
-  public static void notifyMark(final Nodes mark, final View vw) {
-    final Context context = GUI.context;
-    context.marked(mark);
-    for(final View v : view) if(v != vw && v.isValid()) v.refreshMark();
-    final GUI gui = GUI.get();
-    BaseXLayout.enable(gui.filter, context.marked().size != 0);
-    gui.refreshControls();
-  }
-
-  /**
-   * Notifies all views of a selection change. The mode flag
-   * determines what happens:
-   * <li>0: set currently focused node as marked node</li>
-   * <li>1: add currently focused node</li>
-   * <li>2: toggle currently focused node</li>
-   * @param mode mark mode
-   * @param vw the calling view
-   */
-  public static void notifyMark(final int mode, final View vw) {
-    if(focused == -1) return;
-
-    final Context context = GUI.context;
-    Nodes nodes = context.marked();
-    if(mode == 0) {
-      nodes = new Nodes(focused, context.data());
-    } else if(mode == 1) {
-      nodes.union(new int[] { focused });
-    } else {
-      nodes.toggle(focused);
-    }
-    notifyMark(nodes, vw);
-  }
-
-  /**
-   * Moves around in the internal history and notifies all views of
-   * a context change.
-   * @param forward move forward or backward
-   */
-  public static void notifyHist(final boolean forward) {
-    // browse back/forward
-    String query = "";
-    if(forward) {
-      if(hist == maxhist) return;
-      query = QUERYHIST[++hist];
-    } else {
-      if(hist == 0) return;
-      MARKHIST[hist] = GUI.context.marked();
-      query = QUERYHIST[--hist];
-    }
-
-    init(GUI.context, NODEHIST[hist], MARKHIST[hist]);
-
-    final GUI gui = GUI.get();
-    gui.input.setText(query);
-    for(final View v : view) v.refreshContext(forward, false);
-    gui.refreshControls();
-  }
-
-  /**
-   * Notifies all views of a context change.
-   * @param nodes new context set
-   * @param quick quick switch
-   * @param vw the calling view
-   */
-  public static void notifyContext(final Nodes nodes, final boolean quick,
-      final View vw) {
-    if(nodes.size == 0) return;
-
-    final GUI gui = GUI.get();
-    final Context context = GUI.context;
-    // [SG] find general solution
-    final Nodes n = new Nodes(context.data());
-    n.ftdata = context.marked().ftdata == null ? 
-        context.current().ftdata : context.marked().ftdata;
-
-    if(!quick) {
-      final String input = gui.input.getText();
-
-      // add new entry
-      checkHist();
-      QUERYHIST[hist] = input;
-      MARKHIST[hist] = context.marked();
-      NODEHIST[++hist] = nodes;
-      QUERYHIST[hist] = input;
-      MARKHIST[hist] = n;
-      maxhist = hist;
-    } else {
-      // check if current node set has already been cached
-      if(!NODEHIST[hist].same(context.current())) {
-        checkHist();
-        // add new entry
-        QUERYHIST[hist] = "";
-        MARKHIST[hist] = new Nodes(context.data());
-        NODEHIST[++hist] = context.current();
-        maxhist = hist;
-      }
-    }
-    init(context, nodes, n);
-    
-    for(final View v : view) if(v != vw) v.refreshContext(true, quick);
-    gui.refreshControls();
-  }
-  
-  /**
-   * Checks the history data arrays.
-   */
-  private static void checkHist() {
-    final int hl = QUERYHIST.length;
-    if(hist + 1 == hl) {
-      Array.move(QUERYHIST, 1, 0, hl - 1);
-      Array.move(NODEHIST, 1, 0, hl - 1);
-      Array.move(MARKHIST, 1, 0, hl - 1);
-      hist--;
-    }
-  }
-
-  /**
-   * Notifies all views of a context switch without storing
-   * nodes in the history.
-   * @param nodes new context nodes
-   */
-  public static void notifySwitch(final Nodes nodes) {
-    if(nodes.size == 0) return;
-    final Context context = GUI.context;
-    init(context, nodes, new Nodes(context.data()));
-    for(final View v : view) v.refreshContext(true, true);
-    GUI.get().refreshControls();
-  }
-
-  /**
-   * Notifies all views of updates in the data structure.
-   */
-  public static void notifyUpdate() {
-    hist = 0;
-    maxhist = 0;
-    for(final View v : view) if(v.isValid()) v.refreshUpdate();
-    GUI.get().refreshControls();
-  }
-
-  /**
-   * Notifies all views of layout changes.
-   */
-  public static void notifyLayout() {
-    GUIConstants.initFonts();
-    if(GUI.context.db()) for(final View v : view) v.refreshLayout();
-  }
-
-  /**
-   * Initializes the current context and marked node set.
-   * @param ctx context reference
-   * @param curr context set
-   * @param mark marked nodes
-   */
-  private static void init(final Context ctx, final Nodes curr,
-      final Nodes mark) {
-    ctx.current(curr);
-    ctx.marked(mark);
-    focused = -1;
-  }
-
 
   /**
    * Called when the data reference has changed.
@@ -299,38 +67,35 @@ public abstract class View extends BaseXPanel {
 
   @Override
   public void mouseEntered(final MouseEvent e) {
-    if(updating) return;
-    GUI.get().checkFocus(this);
+    if(!gui.updating && GUIProp.mousefocus) requestFocusInWindow();
   }
 
   @Override
   public void mouseExited(final MouseEvent e) {
-    if(updating) return;
-    GUI.get().cursor(GUIConstants.CURSORARROW);
+    if(!gui.updating) gui.cursor(GUIConstants.CURSORARROW);
   }
 
   @Override
   public void mousePressed(final MouseEvent e) {
-    if(updating) return;
-    requestFocusInWindow();
+    if(!gui.updating) requestFocusInWindow();
   }
 
   @Override
   public void keyPressed(final KeyEvent e) {
     super.keyPressed(e);
-    if(updating) return;
+    if(gui.updating) return;
     final boolean ctrl = e.isControlDown();
     final boolean shift = e.isShiftDown();
     final int key = e.getKeyCode();
 
     if(key == KeyEvent.VK_ESCAPE) {
-      GUI.get().fullscreen(false);
+      gui.fullscreen(false);
     } else if(key == KeyEvent.VK_ENTER) {
-      GUICommands.FILTER.execute();
+      GUICommands.FILTER.execute(gui);
     } else if(key == KeyEvent.VK_SPACE) {
-      notifyMark(ctrl ? 2 : shift ? 1 : 0, null);
+      gui.notify.mark(ctrl ? 2 : shift ? 1 : 0, null);
     } else if(key == KeyEvent.VK_BACK_SPACE) {
-      GUICommands.GOBACK.execute();
+      GUICommands.GOBACK.execute(gui);
     }
   }
 

@@ -18,7 +18,7 @@ public abstract class Action implements Runnable {
     Executors.newSingleThreadScheduledExecutor();
   /** Running thread reference. */
   private ScheduledFuture<?> sf;
-  
+
   /**
    * Creates a new action thread.
    */

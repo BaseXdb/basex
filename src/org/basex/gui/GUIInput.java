@@ -24,6 +24,8 @@ import org.basex.util.StringList;
  * @author Christian Gruen
  */
 public final class GUIInput extends BaseXTextField {
+  /** Reference to main window. */
+  private final GUI gui;
   /** BasicComboPopup Menu. */
   ComboPopup pop;
   /** JComboBox. */
@@ -33,10 +35,12 @@ public final class GUIInput extends BaseXTextField {
 
   /**
    * Default Constructor.
-   * @param m main window reference
+   * @param main main window reference
    */
-  public GUIInput(final GUI m) {
+  public GUIInput(final GUI main) {
     super(null);
+    gui = main;
+    
     final Font f = getFont();
     setFont(f.deriveFont((float) f.getSize() + 2));
 
@@ -51,7 +55,7 @@ public final class GUIInput extends BaseXTextField {
     addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
-        m.checkKeys(e);
+        main.checkKeys(e);
 
         final int count = box.getItemCount();
         final int c = e.getKeyCode();
@@ -65,7 +69,7 @@ public final class GUIInput extends BaseXTextField {
             final StringList sl = new StringList();
             sl.add(txt);
 
-            final int i = !GUI.context.db() ? 2 : GUIProp.searchmode;
+            final int i = !main.context.db() ? 2 : GUIProp.searchmode;
             final String[] hs = i == 0 ? GUIProp.search : i == 1 ?
                 GUIProp.xpath : GUIProp.commands;
             for(int p = 0; p < hs.length && sl.size < 10; p++) {
@@ -76,7 +80,7 @@ public final class GUIInput extends BaseXTextField {
             else GUIProp.commands = sl.finish();
 
             // evaluate the input
-            m.execute();
+            main.execute();
           }
           return;
         }
@@ -114,7 +118,7 @@ public final class GUIInput extends BaseXTextField {
         if(!enter) showPopup();
 
         // skip commands
-        if(GUIProp.execrt && !cmdMode()) m.execute();
+        if(GUIProp.execrt && !cmdMode()) main.execute();
       }
     });
   }
@@ -131,7 +135,7 @@ public final class GUIInput extends BaseXTextField {
    * @return result of check
    */
   protected boolean cmdMode() {
-    return GUIProp.searchmode == 2 || !GUI.context.db() ||
+    return GUIProp.searchmode == 2 || !gui.context.db() ||
       getText().startsWith("!");
   }
 
@@ -173,7 +177,7 @@ public final class GUIInput extends BaseXTextField {
     try {
       pre = excl ? "!" : "";
       final String suf = getText().substring(pre.length());
-      new CommandParser(suf, GUI.context).parse();
+      new CommandParser(suf, gui.context).parse();
     } catch(final QueryException ex) {
       sl = ex.complete();
       pre = query.substring(0, ex.col() - (excl ? 0 : 1));
@@ -188,7 +192,7 @@ public final class GUIInput extends BaseXTextField {
   private void xpathPopup(final String query) {
     StringList sl = null;
     try {
-      final XPSuggest parser = new XPSuggest(query, GUI.context);
+      final XPSuggest parser = new XPSuggest(query, gui.context);
       parser.parse();
       sl = parser.complete();
       pre = query.substring(0, xPos(query) + 1);

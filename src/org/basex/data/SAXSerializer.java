@@ -3,7 +3,6 @@ package org.basex.data;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
 import org.basex.BaseX;
-import org.basex.query.xquery.XQFTVisData;
 import org.basex.util.Token;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.DTDHandler;
@@ -197,8 +196,8 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  public void text(final byte[] b, final int[] pos, final int[] poi,
-      final XQFTVisData ft) throws IOException {
+  public void text(final byte[] b, final FTPosData ft, final int[][] ftd)
+      throws IOException {
     text(b);
   }
 

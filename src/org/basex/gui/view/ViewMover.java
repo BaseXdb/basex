@@ -8,6 +8,8 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
+
+import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXPanel;
 
@@ -27,9 +29,10 @@ public final class ViewMover extends BaseXPanel {
   
   /**
    * Constructor.
+   * @param main reference to the main window
    */
-  public ViewMover() {
-    super(HELPMOVER);
+  public ViewMover(final GUI main) {
+    super(main, HELPMOVER);
     setPreferredSize(new Dimension((int) getPreferredSize().getWidth(), SIZE));
     addKeyListener(this);
     addMouseListener(this);

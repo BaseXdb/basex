@@ -30,17 +30,7 @@ public final class Insert extends AUpdate {
    * @param a arguments
    */
   public Insert(final CmdUpdate t, final String... a) {
-    this(false, t, a);
-  }
-
-  /**
-   * Constructor for GUI updates.
-   * @param g gui flag
-   * @param t insertion type
-   * @param a arguments
-   */
-  public Insert(final boolean g, final CmdUpdate t, final String... a) {
-    super(g, t, a);
+    super(t, a);
   }
 
   @Override
@@ -48,7 +38,7 @@ public final class Insert extends AUpdate {
     final Data data = context.data();
 
     // get sources from the marked node set or the specified query
-    final Nodes nodes = gui ? context.marked() :
+    final Nodes nodes = Prop.gui ? context.marked() :
       query(args[type == CmdUpdate.PI ? 3 : 2], null);
     if(nodes == null) return false;
 
@@ -106,7 +96,7 @@ public final class Insert extends AUpdate {
    * @return success flag
    */
   private boolean frag(final Data data, final Nodes nodes) {
-    final int pos = gui ? 0 : Token.toInt(args[1]);
+    final int pos = Prop.gui ? 0 : Token.toInt(args[1]);
     if(pos < 0) return error(POSINVALID, args[1]);
     
     Data tmp;
@@ -154,7 +144,7 @@ public final class Insert extends AUpdate {
     }
 
     // check correctness of query
-    final int pos = gui ? 0 : toInt(args[pi ? 2 : 1]);
+    final int pos = Prop.gui ? 0 : toInt(args[pi ? 2 : 1]);
     for(int i = nodes.size - 1; i >= 0; i--) {
       final int k = data.kind(nodes.nodes[i]);
       if(k == Data.TEXT) return error(COPYTAGS);

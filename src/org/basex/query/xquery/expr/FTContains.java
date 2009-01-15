@@ -74,7 +74,7 @@ public class FTContains extends Expr {
       if (i instanceof DBNode) pre = ((DBNode) i).pre; 
     }
     
-    if (Bln.get(d).bool() && pre > -1 && ctx.ftd != null) 
+    if (Bln.get(d).bool() && pre > -1 && ctx.ftd != null && ctx.ftdata != null) 
       ctx.ftdata.addConvSeqData(ctx.ftd, pre, div);      
     
     ctx.ftitem = tmp;

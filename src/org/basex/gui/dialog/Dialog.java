@@ -6,7 +6,7 @@ import java.awt.Container;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
+import org.basex.gui.GUI;
 import org.basex.gui.layout.BaseXBack;
 
 /**
@@ -16,6 +16,8 @@ import org.basex.gui.layout.BaseXBack;
  * @author Christian Gruen
  */
 public abstract class Dialog extends JDialog {
+  /** Reference to main window. */
+  protected final GUI gui;
   /** Remembers if the window was correctly closed. */
   protected boolean ok;
   /** Reference to the root panel. */
@@ -23,21 +25,22 @@ public abstract class Dialog extends JDialog {
 
   /**
    * Default Constructor.
-   * @param parent parent frame
+   * @param main reference to main window
    * @param title dialog title
    */
-  public Dialog(final JFrame parent, final String title) {
-    this(parent, title, true);
+  public Dialog(final GUI main, final String title) {
+    this(main, title, true);
   }
   
   /**
    * Default Constructor.
-   * @param parent parent frame
+   * @param main reference to the main window
    * @param title dialog title
    * @param modal modal flag
    */
-  public Dialog(final JFrame parent, final String title, final boolean modal) {
-    super(parent, title, modal);
+  public Dialog(final GUI main, final String title, final boolean modal) {
+    super(main, title, modal);
+    gui = main;
     panel = new BaseXBack();
     panel.setBorder(10, 10, 10, 10);
     panel.setLayout(new BorderLayout());
@@ -55,30 +58,28 @@ public abstract class Dialog extends JDialog {
   /**
    * Adds a component.
    * @param comp component to be added
-   * @param constr layout constraints
+   * @param pos layout position
    */
-  public final void set(final Component comp, final Object constr) {
-    panel.add(comp, constr);
+  public final void set(final Component comp, final String pos) {
+    panel.add(comp, pos);
   }
 
   /**
    * Finishes dialog layout.
-   * @param parent parent frame
    */
-  public final void finish(final JFrame parent) {
-    finish(parent, null);
+  public final void finish() {
+    finish(null);
   }
 
   /**
    * Finishes dialog layout and sets the dialog to the specified
    * position relative to the main window.
-   * @param parent parent frame
    * @param loc dialog location
    */
-  public final void finish(final JFrame parent, final int[] loc) {
+  public final void finish(final int[] loc) {
     pack();
-    if(loc == null) setLocationRelativeTo(parent);
-    else setLocation(parent.getX() + loc[0], parent.getY() + loc[1]);
+    if(loc == null) setLocationRelativeTo(gui);
+    else setLocation(gui.getX() + loc[0], gui.getY() + loc[1]);
     setVisible(true);
   }
 

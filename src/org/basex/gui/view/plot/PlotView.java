@@ -23,7 +23,6 @@ import javax.swing.SwingUtilities;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.StatsKey.Kind;
-import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXCheckBox;
@@ -32,6 +31,7 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.layout.BaseXSlider;
 import org.basex.gui.view.View;
+import org.basex.gui.view.ViewNotifier;
 import org.basex.gui.view.ViewRect;
 import org.basex.util.Array;
 import org.basex.util.IntList;
@@ -85,14 +85,14 @@ public final class PlotView extends View implements Runnable {
   BaseXCheckBox yLog;
   /** Dot size in plot view. */
   BaseXSlider dots;
-  
+
   /** Flag for mouse dragging actions. */
   private boolean dragging;
   /** Indicates if global marked nodes should be drawn. */
   boolean drawSubNodes;
   /** Indicates if the buffered image for marked nodes has to be redrawn. */
   boolean markingChanged;
-  /** Indicates if a filter operation is self implied or was trigger by 
+  /** Indicates if a filter operation is self implied or was trigger by
    * another view. */
   boolean rightClick;
   /** Context which is displayed in the plot after a context change which was
@@ -103,10 +103,11 @@ public final class PlotView extends View implements Runnable {
 
   /**
    * Default Constructor.
+   * @param man view manager
    * @param hlp help text
    */
-  public PlotView(final byte[] hlp) {
-    super(hlp);
+  public PlotView(final ViewNotifier man, final byte[] hlp) {
+    super(man, hlp);
     setLayout(new BorderLayout());
     setBorder(5, 5, 5, 5);
 
@@ -122,7 +123,7 @@ public final class PlotView extends View implements Runnable {
         refreshUpdate();
       }
     });
-    dots = new BaseXSlider(new ActionListener() {
+    dots = new BaseXSlider(gui, new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         GUIProp.plotdots = dots.value();
         refreshLayout();
@@ -143,7 +144,7 @@ public final class PlotView extends View implements Runnable {
     box.add(Box.createHorizontalGlue());
     box.add(xLog);
     panel.add(box, BorderLayout.NORTH);
-    
+
     box = new Box(BoxLayout.X_AXIS);
     xCombo = new BaseXCombo();
     xCombo.addActionListener(new ActionListener() {
@@ -291,7 +292,7 @@ public final class PlotView extends View implements Runnable {
 
   @Override
   public void paintComponent(final Graphics g) {
-    final Data data = GUI.context.data();
+    final Data data = gui.context.data();
     if(data == null) return;
 
     super.paintComponent(g);
@@ -324,9 +325,9 @@ public final class PlotView extends View implements Runnable {
     g.drawImage(markedImg, 0, 0, this);
     if(plotData.pres.length < 1) return;
 
-    painting = true;
+    gui.painting = true;
     // draw focused item
-    final int f = plotData.findPre(focused);
+    final int f = plotData.findPre(gui.focused);
     if(f > -1) {
       // determine number of overlapping nodes (plotting second)
       final int ol = getOverlappingNodes(f).length;
@@ -337,7 +338,7 @@ public final class PlotView extends View implements Runnable {
         // draw focused x and y value
         g.setFont(font);
         final int textH = g.getFontMetrics().getHeight();
-        
+
         final String x = formatString(true);
         final String y = formatString(false);
         String label = x.length() > 16 ? x.substring(0, 14) + ".." : x;
@@ -347,11 +348,11 @@ public final class PlotView extends View implements Runnable {
         int ya = calcCoordinate(false, y1) + GUIProp.plotdots;
         final int ww = getWidth();
 
-        final byte[] nm = data.attValue(data.nameID, focused);
+        final byte[] nm = data.attValue(data.nameID, gui.focused);
         String name = nm != null ? string(nm) : "";
         if(name.length() > 0 && plotData.xAxis.attrID != data.nameID &&
             plotData.yAxis.attrID != data.nameID) {
-          
+
           if(ol > 1) name = ol + "x: " + name + ", ...";
           final int lw = BaseXLayout.width(g, label);
           if(ya < MARGIN[0] + textH && xa < w - lw) {
@@ -385,21 +386,21 @@ public final class PlotView extends View implements Runnable {
     }
     markingChanged = false;
     plotChanged = false;
-    painting = false;
+    gui.painting = false;
   }
 
   /**
    * Draws marked nodes.
    */
   private void createMarkedNodes() {
-    final Data data = GUI.context.data();
+    final Data data = gui.context.data();
     markedImg = new BufferedImage(getWidth(), getHeight(),
         Transparency.BITMASK);
     final Graphics gi = markedImg.getGraphics();
     ((Graphics2D) gi).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
         RenderingHints.VALUE_ANTIALIAS_ON);
 
-    final Nodes marked = GUI.context.marked();
+    final Nodes marked = gui.context.marked();
     if(marked.size() <= 0) return;
     final int[] m = Array.finish(marked.nodes, marked.nodes.length);
     int i = 0;
@@ -432,7 +433,7 @@ public final class PlotView extends View implements Runnable {
     }
 
     // context change (triggered by another view).
-    // descendants of marked node set are also checked for intersection 
+    // descendants of marked node set are also checked for intersection
     // with currently plotted nodes
     while(i < m.length && k < p.length) {
       final int a = m[i];
@@ -576,20 +577,20 @@ public final class PlotView extends View implements Runnable {
 
       // return if insufficient plot space
       if(nrCaptions == 0) return;
-      
+
 
       // if min equal max, draw min in plot middle
       if(noRange) {
         drawCaptionAndGrid(g, drawX, formatString(axis.min, drawX), .5d);
         return;
       }
-      
+
       int c = 0;
-      
+
       // draw logarithmic scale
       if(axis.log) {
         int l = (int) (Math.log10(Math.abs(axis.min)));
-        l = l > 0 ? l : 1; 
+        l = l > 0 ? l : 1;
         double a = axis.min;
         double b = 0;
         final boolean neg = axis.min < 0;
@@ -599,7 +600,7 @@ public final class PlotView extends View implements Runnable {
           while(adequateDistance(drawX, b, axis.max) && b > axis.min) {
             if(adequateDistance(drawX, a, b) && b < axis.max)
               // ------------------ insteps
-              drawCaptionAndGrid(g, drawX, 
+              drawCaptionAndGrid(g, drawX,
                   formatString(b, drawX), axis.calcPosition(b));
             a = b;
             l--;
@@ -607,14 +608,14 @@ public final class PlotView extends View implements Runnable {
               b = 0;
               // ------------------ insteps ?????
               if(axis.max > 0 && adequateDistance(drawX, a, b))
-                drawCaptionAndGrid(g, drawX, 
+                drawCaptionAndGrid(g, drawX,
                     formatString(b, drawX), axis.calcPosition(b));
               break;
             }
             b = (int) (-1 * Math.pow(10, l));
           }
         }
-        
+
         // draw labels >= 0, logarithmic crap
         if(neg) {
           a = 0;
@@ -629,13 +630,13 @@ public final class PlotView extends View implements Runnable {
         while(adequateDistance(drawX, b, axis.max) && b < axis.max) {
           if(adequateDistance(drawX, a, b) && b > axis.min)
             // ------------------ insteps
-            drawCaptionAndGrid(g, drawX, formatString(b, drawX), 
+            drawCaptionAndGrid(g, drawX, formatString(b, drawX),
                 axis.calcPosition(b));
           a = b;
           l++;
           b = (int) (Math.pow(10, l));
         }
-        
+
       // draw linear scale
       } else {
         // draw captions between min and max
@@ -656,7 +657,7 @@ public final class PlotView extends View implements Runnable {
       }
     }
   }
-  
+
   /**
    * Determines if two points on the axis have an adequate distance.
    * @param drawX drawX
@@ -664,10 +665,10 @@ public final class PlotView extends View implements Runnable {
    * @param b second point
    * @return a and b have adequate distance
    */
-  private boolean adequateDistance(final boolean drawX, final double a, 
+  private boolean adequateDistance(final boolean drawX, final double a,
       final double b) {
     final PlotAxis axis = drawX ? plotData.xAxis : plotData.yAxis;
-    return Math.abs(calcCoordinate(drawX, axis.calcPosition(a)) -   
+    return Math.abs(calcCoordinate(drawX, axis.calcPosition(a)) -
     calcCoordinate(drawX, axis.calcPosition(b))) > sizeFactor() * 1.5;
   }
 
@@ -744,13 +745,13 @@ public final class PlotView extends View implements Runnable {
     if(!GUIProp.showplot) return;
 
     // all plot data is recalculated, assignments stay the same
-    plotData.refreshItems(nextContext != null && more && 
-        rightClick ? nextContext : GUI.context.current(), !more || !rightClick);
+    plotData.refreshItems(nextContext != null && more && rightClick ?
+        nextContext : gui.context.current(), !more || !rightClick);
     plotData.xAxis.log = GUIProp.plotxlog;
     plotData.xAxis.refreshAxis();
     plotData.yAxis.log = GUIProp.plotylog;
     plotData.yAxis.refreshAxis();
-    
+
     nextContext = null;
     drawSubNodes = !rightClick;
     rightClick = false;
@@ -768,11 +769,11 @@ public final class PlotView extends View implements Runnable {
   protected void refreshInit() {
     plotData = null;
 
-    final Data data = GUI.context.data();
+    final Data data = gui.context.data();
     if(data != null) {
       if(!GUIProp.showplot) return;
 
-      plotData = new PlotData();
+      plotData = new PlotData(gui.context);
 
       final String[] items = plotData.getItems().finishString();
       itemCombo.setModel(new DefaultComboBoxModel(items));
@@ -827,7 +828,7 @@ public final class PlotView extends View implements Runnable {
    */
   private boolean focus() {
     final int size =  itemImg.getWidth() / 2;
-    int focusedPre = focused;
+    int focusedPre = gui.focused;
     // if mouse pointer is outside of the plot the focused item is set to -1,
     // focus may be refreshed, if necessary
     if(mouseX < MARGIN[1] ||
@@ -837,7 +838,7 @@ public final class PlotView extends View implements Runnable {
       if(focusedPre == -1) {
         return false;
       }
-      notifyFocus(-1, this);
+      gui.notify.focus(-1, this);
       return true;
     }
 
@@ -866,15 +867,15 @@ public final class PlotView extends View implements Runnable {
     }
 
     // if the focus changed, views are refreshed
-    if(focusedPre != focused) {
-      notifyFocus(focusedPre, this);
+    if(focusedPre != gui.focused) {
+      gui.notify.focus(focusedPre, this);
       return true;
     }
     return false;
   }
-  
+
   /**
-   * Determines all nodes lying under the mouse cursor (or the currently 
+   * Determines all nodes lying under the mouse cursor (or the currently
    * focused node).
    * @param pre position of pre value in the sorted array of plotted nodes
    * @return nodes
@@ -892,7 +893,7 @@ public final class PlotView extends View implements Runnable {
         il.add(plotData.pres[i]);
       }
     }
-    return il.finish(); 
+    return il.finish();
   }
 
   /**
@@ -910,7 +911,7 @@ public final class PlotView extends View implements Runnable {
    */
   private String formatString(final boolean drawX) {
     final PlotAxis axis = drawX ? plotData.xAxis : plotData.yAxis;
-    final byte[] val = axis.getValue(focused);
+    final byte[] val = axis.getValue(gui.focused);
     if(val.length == 0) return "";
     return axis.type == Kind.TEXT || axis.type == Kind.CAT ? string(val) :
       formatString(toDouble(val), drawX);
@@ -930,7 +931,7 @@ public final class PlotView extends View implements Runnable {
 
   @Override
   public void mouseMoved(final MouseEvent e) {
-    if(updating || painting) return;
+    if(gui.updating || gui.painting) return;
     mouseX = e.getX();
     mouseY = e.getY();
     if(focus()) repaint();
@@ -938,7 +939,7 @@ public final class PlotView extends View implements Runnable {
 
   @Override
   public void mouseDragged(final MouseEvent e) {
-    if(updating || e.isShiftDown()) return;
+    if(gui.updating || e.isShiftDown()) return;
     if(dragging) {
       // to avoid significant offset between coordinates of mouse click and the
       // start coordinates of the bounding box, mouseX and mouseY are determined
@@ -1005,9 +1006,9 @@ public final class PlotView extends View implements Runnable {
       y = calcCoordinate(false, plotData.yAxis.co[i]);
       if(selectionBox.contains(x, y)) il.add(plotData.pres[i]);
     }
-    
-    notifyMark(new Nodes(il.finish(), GUI.context.data()), this);
-    nextContext = GUI.context.marked();
+
+    gui.notify.mark(new Nodes(il.finish(), gui.context.data()), this);
+    nextContext = gui.context.marked();
     drawSubNodes = false;
     markingChanged = true;
     repaint();
@@ -1015,58 +1016,58 @@ public final class PlotView extends View implements Runnable {
 
   @Override
   public void mouseReleased(final MouseEvent e) {
-    if(updating || painting) return;
+    if(gui.updating || gui.painting) return;
     dragging = false;
     repaint();
   }
 
   @Override
   public void mousePressed(final MouseEvent e) {
-    if(updating || painting) return;
+    if(gui.updating || gui.painting) return;
     markingChanged = true;
     mouseX = e.getX();
     mouseY = e.getY();
     focus();
 
-    // determine if a following context filter operation is possibly triggered 
+    // determine if a following context filter operation is possibly triggered
     // by popup menu
     final boolean r = SwingUtilities.isRightMouseButton(e);
     if(r) { rightClick = true; return; }
     // no item is focused. no nodes marked after mouse click
-    if(focused == -1) {
-      notifyMark(new Nodes(GUI.context.data()), this);
+    if(gui.focused == -1) {
+      gui.notify.mark(new Nodes(gui.context.data()), this);
       return;
     }
 
     // node marking if item focused. if more than one icon is in focus range
     // all of these are marked. focus range means exact same x AND y coordinate.
-    final int pre = plotData.findPre(focused);
+    final int pre = plotData.findPre(gui.focused);
     final int[] il = getOverlappingNodes(pre);
     // right mouse or shift down
     if(e.isShiftDown()) {
-      final Nodes marked = GUI.context.marked();
+      final Nodes marked = gui.context.marked();
       marked.union(il);
-      notifyMark(marked, this);
+      gui.notify.mark(marked, this);
       // double click
     } else if(e.getClickCount() == 2) {
-      // context change also selfimplied, thus rightclick set to true
+      // context change also self implied, thus right click set to true
       rightClick = true;
-      final Nodes marked = new Nodes(GUI.context.data());
+      final Nodes marked = new Nodes(gui.context.data());
       marked.union(il);
-      notifyContext(marked, false, null);
+      gui.notify.context(marked, false, null);
       // simple mouse click
     } else {
-      final Nodes marked = new Nodes(GUI.context.data());
+      final Nodes marked = new Nodes(gui.context.data());
       marked.union(il);
-      notifyMark(marked, this);
+      gui.notify.mark(marked, this);
     }
-    nextContext = GUI.context.marked();
+    nextContext = gui.context.marked();
   }
 
   @Override
   public void componentResized(final ComponentEvent e) {
     markingChanged = true;
     plotChanged = true;
-    if(!updating) repaint();
+    if(!gui.updating) repaint();
   }
 }

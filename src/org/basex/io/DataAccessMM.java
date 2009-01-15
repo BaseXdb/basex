@@ -60,7 +60,7 @@ public final class DataAccessMM {
       mbytebuffer = rwChannel.map(FileChannel.MapMode.READ_WRITE, 0, len);
       off = 0;
     } else {
-      mbytebuffer = rwChannel.map(FileChannel.MapMode.READ_WRITE, 
+      mbytebuffer = rwChannel.map(FileChannel.MapMode.READ_WRITE,
           0, BUFFERSIZE);
     }
     // secure persisting changes
@@ -176,7 +176,7 @@ public final class DataAccessMM {
    * @return byte array
    * @throws IOException if read went wrong
    */
-  public synchronized byte[] readBytes(final long from, final long to) 
+  public synchronized byte[] readBytes(final long from, final long to)
   throws IOException {
     final byte[] array = new byte[(int) (to - from)];
     cursor(from);
@@ -191,13 +191,13 @@ public final class DataAccessMM {
    * @param v byte array to be appended
    * @throws IOException if setting curser went wrong
    */
-  public synchronized void writeBytes(final long p, final byte[] v) 
+  public synchronized void writeBytes(final long p, final byte[] v)
   throws IOException {
     cursor(p);
     writeNum(v.length);
     mbytebuffer.put(v);
   }
-  
+
   // private methods...
 
   /**
@@ -208,17 +208,17 @@ public final class DataAccessMM {
   private synchronized void moveWindow(final long p) throws IOException {
     // check if mapped buffer exceeds remaining file length
     if((len - p) < BUFFERSIZE) {
-      mbytebuffer = rwChannel.map(FileChannel.MapMode.READ_WRITE, 
+      mbytebuffer = rwChannel.map(FileChannel.MapMode.READ_WRITE,
           p, len - p + 1);
     } else {
-      mbytebuffer = rwChannel.map(FileChannel.MapMode.READ_WRITE, 
+      mbytebuffer = rwChannel.map(FileChannel.MapMode.READ_WRITE,
           p, BUFFERSIZE);
     }
     // position starts at 0
     off = p - 1;
     mbytebuffer.position(0);
   }
-  
+
   /**
    * Sets the disk cursor.
    * @param p read position
@@ -230,7 +230,7 @@ public final class DataAccessMM {
       moveWindow(p);
       mbytebuffer.position(0);
     } else {
-      // don't move window. Just set new position 
+      // don't move window. Just set new position
       mbytebuffer.position((int) (p - off));
     }
   }
@@ -283,7 +283,7 @@ public final class DataAccessMM {
   public synchronized int readInt() throws IOException {
     return (read() << 24) + (read() << 16) + (read() << 8) + read();
   }
-  
+
   /**
    * Append a value to the file and return it's offset.
    * @param v number to be appended

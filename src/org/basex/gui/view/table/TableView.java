@@ -7,15 +7,16 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import javax.swing.SwingUtilities;
 import org.basex.core.Context;
+import org.basex.core.proc.XQuery;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXBar;
 import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewData;
+import org.basex.gui.view.ViewNotifier;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -34,7 +35,7 @@ public final class TableView extends View implements Runnable {
   /** Current zoom step. */
   private int zoomstep;
   /** Table data. */
-  private TableData tdata = new TableData();
+  final TableData tdata;
 
   /** Table header. */
   private TableHeader header;
@@ -45,12 +46,14 @@ public final class TableView extends View implements Runnable {
 
   /**
    * Default constructor.
+   * @param man view manager
    * @param help help text
    */
-  public TableView(final byte[] help) {
-    super(help);
+  public TableView(final ViewNotifier man, final byte[] help) {
+    super(man, help);
+    tdata = new TableData(gui.context);
     setLayout(new BorderLayout());
-    header = new TableHeader(tdata, this);
+    header = new TableHeader(this);
     add(header, BorderLayout.NORTH);
     scroll = new BaseXBar(this);
     content = new TableContent(tdata, scroll);
@@ -63,7 +66,7 @@ public final class TableView extends View implements Runnable {
     tdata.rootRows = null;
     tdata.rows = null;
 
-    final Data data = GUI.context.data();
+    final Data data = gui.context.data();
     if(!GUIProp.showtable || data == null) return;
     tdata.init(data);
     refreshContext(true, false);
@@ -82,7 +85,7 @@ public final class TableView extends View implements Runnable {
       findFocus();
       repaint();
     } else {
-      updating = true;
+      gui.updating = true;
       new Thread(this).start();
     }
   }
@@ -97,7 +100,7 @@ public final class TableView extends View implements Runnable {
   public void refreshMark() {
     if(!GUIProp.showtable || tdata.rows == null) return;
 
-    final Context context = GUI.context;
+    final Context context = gui.context;
     final Nodes marked = context.marked();
     if(marked.size != 0) {
       final int p = tdata.getRoot(context.data(), marked.nodes[0]);
@@ -135,7 +138,7 @@ public final class TableView extends View implements Runnable {
       repaint();
       Performance.sleep(25);
     }
-    updating = false;
+    gui.updating = false;
     findFocus();
   }
   
@@ -184,40 +187,41 @@ public final class TableView extends View implements Runnable {
     
     if(valid) {
       final int pre = tdata.rows.list[l];
-      final Context context = GUI.context;
+      final Context context = gui.context;
       final TableIterator it = new TableIterator(context.data(), tdata);
       final int c = tdata.column(getWidth() - BaseXBar.SIZE, tdata.mouseX);
       it.init(pre);
       while(it.more()) {
         if(it.col == c) {
-          View.notifyFocus(it.pre, this);
+          gui.notify.focus(it.pre, this);
           content.repaint();
           break;
         }
       }
     }
     final String str = content.focusedString;
-    final Data data = GUI.context.data();
-    GUI.get().cursor(valid && (str != null &&
+    final Data data = gui.context.data();
+    gui.cursor(valid && (str != null &&
       str.length() <= Token.MAXLEN || data.fs != null && tdata.mouseX < 20) ?
       GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
   }
 
   @Override
   public void mouseExited(final MouseEvent e) {
-    GUI.get().cursor(GUIConstants.CURSORARROW);
-    View.notifyFocus(-1, null);
+    gui.cursor(GUIConstants.CURSORARROW);
+    gui.notify.focus(-1, null);
   }
   
   @Override
   public void mousePressed(final MouseEvent e) {
     super.mousePressed(e);
-    final Data data = GUI.context.data();
+    final Context context = gui.context;
+    final Data data = context.data();
     if(tdata.rows == null || data.fs != null && tdata.mouseX < 20) return;
     
     if(e.getY() < header.getHeight()) return;
     
-    final int pre = focused;
+    final int pre = gui.focused;
     if(SwingUtilities.isLeftMouseButton(e)) {
       if(e.getClickCount() == 1) {
         final String str = content.focusedString;
@@ -225,24 +229,24 @@ public final class TableView extends View implements Runnable {
         if(!e.isShiftDown()) tdata.resetFilter();
         final int c = tdata.column(getWidth() - BaseXBar.SIZE, e.getX());
         tdata.cols[c].filter = str;
-        tdata.find();
+        final String query = tdata.find();
+        if(query != null) gui.execute(new XQuery(query));
         repaint();
       } else {
-        Nodes nodes = GUI.context.marked();
+        Nodes nodes = context.marked();
         if(getCursor() == GUIConstants.CURSORARROW) {
           nodes = new Nodes(tdata.getRoot(nodes.data, pre), nodes.data);
         }
-        View.notifyContext(nodes, false, null);
+        gui.notify.context(nodes, false, null);
       }
     } else {
       if(pre != -1) {
-        final Context context = GUI.context;
         final TableIterator it = new TableIterator(context.data(), tdata);
         final int c = tdata.column(getWidth() - BaseXBar.SIZE, e.getX());
         it.init(pre);
         while(it.more()) {
           if(it.col == c) {
-            notifyMark(new Nodes(it.pre, context.data()), null);
+            gui.notify.mark(new Nodes(it.pre, context.data()), null);
             return;
           }
         }
@@ -252,10 +256,9 @@ public final class TableView extends View implements Runnable {
   
   @Override
   public void mouseClicked(final MouseEvent e) {
-    final Data data = GUI.context.data();
-    
+    final Data data = gui.context.data();
     if(data.fs != null && tdata.mouseX < 20) {
-      data.fs.launch(ViewData.parent(data, focused));
+      data.fs.launch(ViewData.parent(data, gui.focused));
     }
   }
   
@@ -276,7 +279,7 @@ public final class TableView extends View implements Runnable {
     final int key = e.getKeyCode();
     
     final int lines = (getHeight() - header.getHeight()) / tdata.rowH;
-    final int oldPre = tdata.getRoot(GUI.context.data(), focused);
+    final int oldPre = tdata.getRoot(gui.context.data(), gui.focused);
     int pre = oldPre;
     
     final IntList rows = tdata.rows;
@@ -296,7 +299,7 @@ public final class TableView extends View implements Runnable {
     
     if(pre != oldPre) {
       setPos(pre);
-      notifyFocus(pre, null);
+      gui.notify.focus(pre, null);
     }
   }
 }

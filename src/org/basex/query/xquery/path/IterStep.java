@@ -5,6 +5,7 @@ import static org.basex.query.xquery.XQText.*;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Expr;
+import org.basex.query.xquery.expr.Pos;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.iter.Iter;
@@ -20,22 +21,22 @@ import org.basex.query.xquery.util.Err;
 public final class IterStep extends Step {
   /** Flag is set to true if predicate has last function. */
   final boolean last;
-  /** Flag is set to true if predicate has a numeric value. */
-  final boolean num;
+  /** Optional position predicate. */
+  final Pos pos;
 
   /**
    * Constructor.
    * @param a axis
    * @param t node test
    * @param p predicates
+   * @param ps position predicate
    * @param l lastFlag is true if predicate has a last function
-   * @param n numberFlag is true if predicate has a numeric value
    */
   public IterStep(final Axis a, final Test t, final Expr[] p, 
-      final boolean l, final boolean n) {
+      final Pos ps, final boolean l) {
     super(a, t, p);
     last = l;
-    num = n;
+    pos = ps;
   }
 
   @Override
@@ -77,18 +78,17 @@ public final class IterStep extends Step {
               if(test.eval(nod)) {
                 // evaluates predicates
                 ctx.item = nod;
-                final Item i = ctx.iter(pred[0]).ebv();
-  
-                final boolean found = i.n() ? i.dbl() == ctx.pos : i.bool();
+                final Item i = ctx.iter(pred[0]).test(ctx);
                 ctx.pos++;
                 
-                if(found) {
+                if(i != null) {
                   // assign score value
                   nod.score(i.score());
-                  if(num) more = false;
                   ctx.item = ci;
                   return nod.finish();
                 }
+                // no more results are to be expected
+                if(pos != null && !pos.more(ctx)) ir = null;
                 // remember last node
                 if(last) temp = nod.finish();
               }

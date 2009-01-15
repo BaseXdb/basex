@@ -15,7 +15,6 @@ import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXBar;
 import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.view.View;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -29,6 +28,8 @@ public final class TableContent extends BaseXBack {
   private final BaseXBar scroll;
   /** View reference. */
   private final TableData tdata;
+  /** GUI reference. */
+  private final GUI gui;
   /** Currently focused string. */
   String focusedString;
 
@@ -43,6 +44,7 @@ public final class TableContent extends BaseXBack {
     setMode(Fill.DOWN);
     add(scroll, BorderLayout.EAST);
     tdata = d;
+    gui = scr.gui;
   }
 
   @Override
@@ -52,7 +54,7 @@ public final class TableContent extends BaseXBack {
     // skip if view is unavailable
     if(tdata.rows == null) return;
 
-    View.painting = true;
+    gui.painting = true;
 
     BaseXLayout.antiAlias(g);
     g.setFont(GUIConstants.font);
@@ -60,10 +62,10 @@ public final class TableContent extends BaseXBack {
     final int w = getWidth() - scroll.getWidth();
     final int h = getHeight();
 
-    final Context context = GUI.context;
+    final Context context = tdata.context;
     final Data data = context.data();
-    final int rfocus = tdata.getRoot(data, View.focused);
-    final int focus = View.focused;
+    final int rfocus = tdata.getRoot(data, gui.focused);
+    final int focus = gui.focused;
     int mpos = 0;
 
     final int nCols = tdata.cols.length;
@@ -184,7 +186,7 @@ public final class TableContent extends BaseXBack {
         }
       }
     }
-    View.painting = false;
+    gui.painting = false;
   }
 }
 

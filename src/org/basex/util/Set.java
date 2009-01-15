@@ -29,7 +29,6 @@ public class Set {
     size = 1;
   }
 
-  
   /**
    * Indexes the specified key.
    * @param key key

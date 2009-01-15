@@ -109,7 +109,7 @@ public final class MP3Extractor extends AbstractExtractor {
   byte[] content = new byte[8];
 
   /**
-   * Read a single byte from buffered input stream (mp3 file).
+   * Reads a single byte from buffered input stream (mp3 file).
    * @return int, the read byte.
    * @exception IOException in case of premature EOF or IO Error.
    */

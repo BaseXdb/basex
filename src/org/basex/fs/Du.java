@@ -50,7 +50,7 @@ public final class Du extends FSCmd {
   /**
    * The du utility displays the file system block usage for each file
    * argument and for each directory in the file hierarchy rooted in each
-   * directory argument.  If no file is specified, the block usage of the 
+   * directory argument.  If no file is specified, the block usage of the
    * hierarchy rooted in the current directory is displayed.
    *
    * @param nodes pre values of the nodes to print

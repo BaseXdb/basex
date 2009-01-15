@@ -75,13 +75,13 @@ final class ViewAlignment implements ViewLayout {
   }
 
   /**
-   * Removes the specified panel.
+   * Deletes the specified panel.
    * @param panel panel to be removed
    * @return true if only one view is left in the current level
    */
-  public boolean remove(final ViewPanel panel) {
+  public boolean delete(final ViewPanel panel) {
     for(int o = 0; o < comp.length; o++) {
-      if(comp[o].remove(panel)) {
+      if(comp[o].delete(panel)) {
         if(comp[o] instanceof ViewPanel) {
           remove(o--);
         } else {

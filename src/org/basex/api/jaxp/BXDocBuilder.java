@@ -25,7 +25,7 @@ import org.xml.sax.XMLReader;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class BXDocBuilder extends DocumentBuilder {
+public final class BXDocBuilder extends DocumentBuilder {
   /** Parser instance. */
   private SAXParserFactory factory;
   /** Parser instance. */
@@ -42,7 +42,7 @@ public class BXDocBuilder extends DocumentBuilder {
     factory.setValidating(false);
     parser = factory.newSAXParser().getXMLReader();
   }
-  
+
   @Override
   public DOMImplementation getDOMImplementation() {
     return BXDomImpl.get();

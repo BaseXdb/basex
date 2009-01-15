@@ -326,7 +326,7 @@ public final class BaseXWebServer {
    */
   private void eval(final Socket s, final String... exec) throws Exception {
     final OutputStream os = s.getOutputStream();
-    
+
     final ProcessBuilder pb = new ProcessBuilder(exec);
     pb.redirectErrorStream(true);
     final InputStream is = pb.start().getInputStream();

@@ -25,7 +25,7 @@ public final class BXElem extends BXNode implements Element {
   public BXElem(final Nod n) {
     super(n);
   }
-  
+
   @Override
   public String getNodeName() {
     return Token.string(node.nname());

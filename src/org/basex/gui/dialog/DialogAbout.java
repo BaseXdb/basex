@@ -4,7 +4,6 @@ import static org.basex.Text.*;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import javax.swing.Box;
-import javax.swing.JFrame;
 import javax.swing.SwingConstants;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -26,10 +25,10 @@ import org.basex.gui.layout.TableLayout;
 public final class DialogAbout extends Dialog {
   /**
    * Default Constructor.
-   * @param parent parent frame
+   * @param main reference to the main window
    */
-  public DialogAbout(final JFrame parent) {
-    super(parent, ABOUTTITLE, true);
+  public DialogAbout(final GUI main) {
+    super(main, ABOUTTITLE, true);
 
     BaseXBack p = new BaseXBack();
     p.setBackground(Color.white);
@@ -65,6 +64,6 @@ public final class DialogAbout extends Dialog {
     p.add(new BaseXButton(BUTTONOK, null, this), BorderLayout.EAST);
     add(p, BorderLayout.EAST);
 
-    finish(parent, null);
+    finish(null);
   }
 }

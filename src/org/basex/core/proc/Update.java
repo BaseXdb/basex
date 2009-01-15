@@ -20,17 +20,7 @@ public final class Update extends AUpdate {
    * @param a arguments
    */
   public Update(final CmdUpdate t, final String... a) {
-    this(false, t, a);
-  }
-
-  /**
-   * Constructor for GUI updates.
-   * @param g gui flag
-   * @param t update type
-   * @param a arguments
-   */
-  public Update(final boolean g, final CmdUpdate t, final String... a) {
-    super(g, t, a);
+    super(t, a);
   }
 
   @Override
@@ -38,7 +28,7 @@ public final class Update extends AUpdate {
     final Data data = context.data();
 
     // get sources from the marked node set or the specified query
-    final Nodes nodes = gui ? context.marked() : query(args[type ==
+    final Nodes nodes = Prop.gui ? context.marked() : query(args[type ==
       CmdUpdate.PI || type == CmdUpdate.ATTRIBUTE ? 2 : 1], null);
     if(nodes == null) return false;
 

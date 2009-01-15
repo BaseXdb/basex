@@ -1,4 +1,4 @@
-package org.basex.gui.view.tree;
+package org.basex.gui.view.folder;
 
 import static org.basex.gui.GUIConstants.*;
 import java.awt.BorderLayout;
@@ -17,7 +17,6 @@ import java.awt.image.BufferedImage;
 import javax.swing.SwingUtilities;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.gui.GUI;
 import org.basex.gui.GUIFS;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBar;
@@ -25,22 +24,23 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewData;
+import org.basex.gui.view.ViewNotifier;
 import org.basex.util.Array;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 
 /**
- * This view offers a tree visualization of the database contents.
+ * This view offers a folder visualization of the database contents.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class TreeView extends View {
+public final class FolderView extends View {
   /** References closed nodes. */
   boolean[] opened;
   /** Line Height. */
   int lineH;
-  /** Focused tree position. */
+  /** Focused folder position. */
   int focusedPos;
 
   /** Closed Box. */
@@ -59,7 +59,7 @@ public final class TreeView extends View {
   private int totalW;
   /** Start y value. */
   private int startY;
-  /** Total tree Height. */
+  /** Total height. */
   private int treeH;
   /** Box Size. */
   private int boxW;
@@ -68,10 +68,11 @@ public final class TreeView extends View {
 
   /**
    * Default Constructor.
+   * @param man view manager
    * @param help help text
    */
-  public TreeView(final byte[] help) {
-    super(help);
+  public FolderView(final ViewNotifier man, final byte[] help) {
+    super(man, help);
     createBoxes();
     setMode(Fill.UP);
     setLayout(new BorderLayout());
@@ -84,9 +85,9 @@ public final class TreeView extends View {
   public void refreshInit() {
     scroll.pos(0);
 
-    if(!GUI.context.db()) {
+    if(!gui.context.db()) {
       opened = null;
-    } else if(GUIProp.showtree) {
+    } else if(GUIProp.showfolder) {
       refreshOpenedNodes();
       refreshHeight();
       repaint();
@@ -97,7 +98,7 @@ public final class TreeView extends View {
    * Refreshes opened nodes.
    */
   private void refreshOpenedNodes() {
-    final Data data = GUI.context.data();
+    final Data data = gui.context.data();
     opened = new boolean[data.meta.size];
     final int is = data.meta.size;
     for(int pre = 0; pre < is; pre++) {
@@ -112,11 +113,11 @@ public final class TreeView extends View {
 
   @Override
   public void refreshMark() {
-    final int pre = focused;
+    final int pre = gui.focused;
     if(pre == -1) return;
 
     // jump to the currently marked node
-    final Data data = GUI.context.data();
+    final Data data = gui.context.data();
     final int par = data.parent(pre, data.kind(pre));
     // open node if it's not visible
     jumpTo(pre, par != -1 && !opened[par]);
@@ -125,12 +126,12 @@ public final class TreeView extends View {
 
   @Override
   public void refreshContext(final boolean more, final boolean quick) {
-    if(!GUIProp.showtree) return;
+    if(!GUIProp.showfolder) return;
 
     startY = 0;
     scroll.pos(0);
 
-    if(more) jumpTo(GUI.context.current().nodes[0], true);
+    if(more) jumpTo(gui.context.current().nodes[0], true);
     refreshHeight();
     repaint();
   }
@@ -147,14 +148,14 @@ public final class TreeView extends View {
   @Override
   public void refreshUpdate() {
     if(opened == null) return;
-    final Data data = GUI.context.data();
+    final Data data = gui.context.data();
     if(opened.length < data.meta.size)
       opened = Array.finish(opened, data.meta.size);
 
     startY = 0;
     scroll.pos(0);
 
-    final Nodes marked = GUI.context.marked();
+    final Nodes marked = gui.context.marked();
     if(marked.size != 0) jumpTo(marked.nodes[0], true);
     refreshHeight();
     repaint();
@@ -166,7 +167,7 @@ public final class TreeView extends View {
   void refreshHeight() {
     if(opened == null) return;
 
-    treeH = new TreeIterator(this).height();
+    treeH = new FolderIterator(this).height();
     scroll.height(treeH + 5);
   }
 
@@ -181,20 +182,20 @@ public final class TreeView extends View {
     if(opened == null) return;
     BaseXLayout.antiAlias(g);
 
-    painting = true;
+    gui.painting = true;
     startY = -scroll.pos();
     totalW = getWidth() - (treeH > getHeight() ? scroll.getWidth() : 0);
 
     mpos = 0;
-    final TreeIterator it = new TreeIterator(this, startY + 5, getHeight());
-    final Data data = GUI.context.data();
+    final FolderIterator it = new FolderIterator(this, startY + 5, getHeight());
+    final Data data = gui.context.data();
     while(it.more()) {
       final int kind = data.kind(it.pre);
       final boolean elem = kind == Data.ELEM || kind == Data.DOC;
       final int x = 8 + it.level * (lineH >> 2) + (elem ? lineH : boxW);
       drawString(g, it.pre, x, it.y + boxW);
     }
-    painting = false;
+    gui.painting = false;
   }
 
   /**
@@ -205,8 +206,8 @@ public final class TreeView extends View {
    * @param y vertical coordinate
    */
   void drawString(final Graphics g, final int pre, final int x, final int y) {
-    final Data data = GUI.context.data();
-    final Nodes marked = GUI.context.marked();
+    final Data data = gui.context.data();
+    final Nodes marked = gui.context.marked();
 
     final int kind = data.kind(pre);
     final boolean elem = kind == Data.ELEM || kind == Data.DOC;
@@ -231,7 +232,7 @@ public final class TreeView extends View {
     final byte[] name = file || dir ? ViewData.tag(data, pre) :
       ViewData.content(data, pre, false);
 
-    int p = focused;
+    int p = gui.focused;
     while(p > pre) p = ViewData.parent(data, p);
     if(pre == p) {
       g.setColor(color3);
@@ -271,7 +272,7 @@ public final class TreeView extends View {
     }
     BaseXLayout.chopString(g, name, xx, yy - GUIProp.fontsize, tw - xx - 10);
 
-    if(focused == pre) {
+    if(gui.focused == pre) {
       g.setColor(color6);
       g.drawRect(1, yy - boxW - boxMargin, totalW - 3, lineH + 1);
       g.drawRect(2, yy - boxW - boxMargin + 1, totalW - 5, lineH - 1);
@@ -287,8 +288,8 @@ public final class TreeView extends View {
   private boolean focus(final int x, final int y) {
     if(opened == null) return false;
 
-    final TreeIterator it = new TreeIterator(this, startY + 3, getHeight());
-    final Data data = GUI.context.data();
+    final FolderIterator it = new FolderIterator(this, startY + 3, getHeight());
+    final Data data = gui.context.data();
     while(it.more()) {
       if(y > it.y && y <= it.y + lineH) {
         Cursor c = CURSORARROW;
@@ -298,8 +299,8 @@ public final class TreeView extends View {
           final int xx = 8 + it.level * (lineH >> 2) + lineH;
           if(x > xx - 20 && x < xx) c = CURSORHAND;
         }
-        GUI.get().cursor(c);
-        notifyFocus(it.pre, this);
+        gui.cursor(c);
+        gui.notify.focus(it.pre, this);
         repaint();
         return true;
       }
@@ -313,19 +314,19 @@ public final class TreeView extends View {
    * @param open opened folder
    */
   void jumpTo(final int pre, final boolean open) {
-    if(getWidth() == 0 || !GUIProp.showtree) return;
+    if(getWidth() == 0 || !GUIProp.showfolder) return;
 
     if(open) {
       int p = pre;
       while(p > 0) {
         opened[p] = true;
-        p = ViewData.parent(GUI.context.data(), p);
+        p = ViewData.parent(gui.context.data(), p);
       }
       refreshHeight();
     }
 
     // find specified pre value
-    final TreeIterator it = new TreeIterator(this);
+    final FolderIterator it = new FolderIterator(this);
     while(it.more() && pre != it.pre);
 
     // set new vertical position
@@ -390,7 +391,7 @@ public final class TreeView extends View {
 
   @Override
   public void mouseMoved(final MouseEvent e) {
-    if(updating) return;
+    if(gui.updating) return;
     super.mouseMoved(e);
     // set new focus
     focus(e.getX(), e.getY());
@@ -399,56 +400,57 @@ public final class TreeView extends View {
   @Override
   public void mousePressed(final MouseEvent e) {
     super.mousePressed(e);
-    if(updating || opened == null) return;
+    if(gui.updating || opened == null) return;
 
     if(!focus(e.getX(), e.getY())) return;
 
     final boolean left = SwingUtilities.isLeftMouseButton(e);
-    final int pre = focused;
+    final int pre = gui.focused;
 
     // add or remove marked node
-    final Nodes marked = GUI.context.marked();
+    final Nodes marked = gui.context.marked();
     if(!left) {
-      if(marked.contains(pre)) notifyMark(0, null);
+      if(marked.contains(pre)) gui.notify.mark(0, null);
     } else if(getCursor() == CURSORHAND) {
       // open/close entry
       opened[pre] ^= true;
       refreshHeight();
       repaint();
     } else if(e.getClickCount() == 2) {
-      notifyContext(marked, false, null);
+      gui.notify.context(marked, false, null);
     } else if(e.isShiftDown()) {
-      notifyMark(1, null);
+      gui.notify.mark(1, null);
     } else if(e.isControlDown()) {
-      notifyMark(2, null);
+      gui.notify.mark(2, null);
     } else {
-      if(!marked.contains(pre)) notifyMark(0, null);
+      if(!marked.contains(pre)) gui.notify.mark(0, null);
     }
   }
 
   @Override
   public void mouseClicked(final MouseEvent e) {
-    if(!SwingUtilities.isLeftMouseButton(e) || updating || opened == null)
+    if(!SwingUtilities.isLeftMouseButton(e) || gui.updating || opened == null)
       return;
 
     // launch a program
-    final Data data = GUI.context.data();
-    if(getCursor() == CURSORHAND && data.fs != null) data.fs.launch(focused);
+    final Data data = gui.context.data();
+    if(getCursor() == CURSORHAND && data.fs != null)
+      data.fs.launch(gui.focused);
   }
 
   @Override
   public void mouseDragged(final MouseEvent e) {
     final boolean left = SwingUtilities.isLeftMouseButton(e);
-    if(!left || updating || opened == null) return;
+    if(!left || gui.updating || opened == null) return;
     super.mouseDragged(e);
 
     // marks currently focused node
-    if(focus(e.getX(), e.getY())) notifyMark(1, null);
+    if(focus(e.getX(), e.getY())) gui.notify.mark(1, null);
   }
 
   @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
-    if(updating) return;
+    if(gui.updating) return;
     scroll.pos(scroll.pos() + e.getUnitsToScroll() * 20);
     repaint();
   }
@@ -456,19 +458,19 @@ public final class TreeView extends View {
   @Override
   public void keyPressed(final KeyEvent e) {
     super.keyPressed(e);
-    if(updating || opened == null) return;
+    if(gui.updating || opened == null) return;
 
     int focus = focusedPos == -1 ? 0 : focusedPos;
-    if(focused == -1) focused = 0;
-    final int focusPre = focused;
-    final Data data = GUI.context.data();
+    if(gui.focused == -1) gui.focused = 0;
+    final int focusPre = gui.focused;
+    final Data data = gui.context.data();
     int kind = data.kind(focusPre);
     int key = e.getKeyCode();
 
     final boolean fs = data.fs != null;
     if(e.isShiftDown() && key == KeyEvent.VK_ENTER && focusPre != -1) {
       // launch file
-      if(fs) data.fs.launch(focused);
+      if(fs) data.fs.launch(gui.focused);
     } else if(key == KeyEvent.VK_RIGHT || key == KeyEvent.VK_LEFT) {
       // open/close subtree
       final boolean open = key == KeyEvent.VK_RIGHT;
@@ -512,14 +514,14 @@ public final class TreeView extends View {
     if(focus == focusedPos) return;
 
     // calculate new tree position
-    focused = -1;
-    final Nodes curr = GUI.context.current();
+    gui.focused = -1;
+    final Nodes curr = gui.context.current();
     int pre = curr.nodes[0];
-    final TreeIterator it = new TreeIterator(this);
+    final FolderIterator it = new FolderIterator(this);
     while(it.more() && focus-- != 0) pre = it.pre;
 
     if(pre == curr.nodes[0] && key == KeyEvent.VK_DOWN) pre++;
-    notifyFocus(pre, this);
+    gui.notify.focus(pre, this);
     jumpTo(pre, false);
     repaint();
   }

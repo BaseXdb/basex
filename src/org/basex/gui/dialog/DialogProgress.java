@@ -5,10 +5,10 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.JFrame;
 import javax.swing.JProgressBar;
 import javax.swing.Timer;
 import org.basex.core.Progress;
+import org.basex.gui.GUI;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXLabel;
@@ -34,15 +34,15 @@ public final class DialogProgress extends Dialog implements ActionListener {
 
   /**
    * Default Constructor.
-   * @param par parent frame
+   * @param main reference to the main window
    * @param msg waiting message.
    * @param pb showing a progress bar
    * @param cnc cancel flag
    * @param prg progress reference
    */
-  public DialogProgress(final JFrame par, final String msg,
+  public DialogProgress(final GUI main, final String msg,
       final boolean pb, final boolean cnc, final Progress prg) {
-    super(par, msg, false);
+    super(main, msg, false);
 
     info = new BaseXLabel(" ", true, true);
     set(info, BorderLayout.NORTH);
@@ -59,11 +59,10 @@ public final class DialogProgress extends Dialog implements ActionListener {
     final BaseXBack p = new BaseXBack();
     p.setLayout(new BorderLayout());
     p.setBorder(10, 0, 0, 0);
-    if(cnc) {
-      p.add(new BaseXButton(BUTTONCANCEL, HELPSTOP, this), BorderLayout.EAST);
-    }
+    if(cnc) p.add(new BaseXButton(BUTTONCANCEL, HELPSTOP, this),
+        BorderLayout.EAST);
     set(p, BorderLayout.SOUTH);
-    finish(par);
+    finish();
     
     prog = prg;
     timer.start();

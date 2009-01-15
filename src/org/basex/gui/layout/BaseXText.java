@@ -23,6 +23,7 @@ import javax.swing.Timer;
 import javax.swing.border.MatteBorder;
 import org.basex.BaseX;
 import org.basex.core.Prop;
+import org.basex.data.FTPosData;
 import org.basex.gui.GUI;
 import org.basex.gui.GUICommand;
 import org.basex.gui.GUIConstants;
@@ -57,52 +58,33 @@ public final class BaseXText extends BaseXPanel {
   
   /**
    * Default constructor.
+   * @param main reference to the main window
    * @param help help text
    */
-  public BaseXText(final byte[] help) {
-    this(help, true, null);
+  public BaseXText(final GUI main, final byte[] help) {
+    this(main, help, true, null);
   }
 
   /**
    * Default constructor.
+   * @param main reference to the main window
    * @param edit editable flag
    * @param help help text
    */
-  public BaseXText(final byte[] help, final boolean edit) {
-    this(help, edit, null, false);
+  public BaseXText(final GUI main, final byte[] help, final boolean edit) {
+    this(main, help, edit, null);
   }
 
   /**
    * Default constructor.
-   * @param edit editable flag
-   * @param help help text
-   * @param ftd highlight ftdata tokens flag
-   */
-  public BaseXText(final byte[] help, final boolean edit, 
-      final boolean ftd) {
-    this(help, edit, null, ftd);
-  }
-
-  /**
-   * Default constructor.
+   * @param main reference to the main window
    * @param help help text
    * @param edit editable flag
    * @param list reference to the dialog listener
    */
-  public BaseXText(final byte[] help, final boolean edit, final Dialog list) {
-    this(help, edit, list, false);
-  }
-  
-  /**
-   * Default constructor.
-   * @param help help text
-   * @param edit editable flag
-   * @param list reference to the dialog listener
-   * @param ftd highlight ftdata tokens flag
-   */
-  public BaseXText(final byte[] help, final boolean edit, final Dialog list, 
-      final boolean ftd) {
-    super(help);
+  public BaseXText(final GUI main, final byte[] help, final boolean edit,
+      final Dialog list) {
+    super(main, help);
     setFocusable(true);
 
     BaseXLayout.addDefaultKeys(this, list);
@@ -112,7 +94,6 @@ public final class BaseXText extends BaseXPanel {
     addMouseListener(this);
     addKeyListener(this);
     editable = edit;
-    text.cft = ftd;
 
     addFocusListener(new FocusAdapter() {
       @Override
@@ -163,6 +144,16 @@ public final class BaseXText extends BaseXPanel {
    * @param s text size
    */
   public void setText(final byte[] t, final int s) {
+    setText(t, s, null);
+  }
+
+  /**
+   * Sets the output text.
+   * @param t output text
+   * @param s text size
+   * @param ftdata reference
+   */
+  public void setText(final byte[] t, final int s, final FTPosData ftdata) {
     // remove 0x0Ds (carriage return) and compare old with new string
     int ns = 0;
     final int ts = text.size;
@@ -176,7 +167,7 @@ public final class BaseXText extends BaseXPanel {
 
     // new text is different...
     if(!eq) {
-      text = new BaseXTextTokens(t, ns);
+      text = new BaseXTextTokens(t, ns, ftdata);
       rend.setText(text);
       scroll.pos(0);
     }
@@ -260,12 +251,12 @@ public final class BaseXText extends BaseXPanel {
 
   @Override
   public void mouseEntered(final MouseEvent e) {
-    GUI.get().cursor(GUIConstants.CURSORTEXT);
+    gui.cursor(GUIConstants.CURSORTEXT);
   }
 
   @Override
   public void mouseExited(final MouseEvent e) {
-    GUI.get().cursor(GUIConstants.CURSORARROW);
+    gui.cursor(GUIConstants.CURSORARROW);
   }
 
   @Override
@@ -675,11 +666,11 @@ public final class BaseXText extends BaseXPanel {
   };
 
   /** Text Command. */
-  class TextCmd implements GUICommand {
-    public void execute() { cut(); }
-    public void refresh(final AbstractButton button) { }
+  abstract class TextCmd implements GUICommand {
+    public abstract void execute(final GUI main);
+    public abstract void refresh(final GUI main, final AbstractButton button);
     public boolean checked() { return false; }
-    public String desc() { return null; }
+    public abstract String desc();
     public String help() { return null; }
     public String key() { return null; }
   }
@@ -687,11 +678,11 @@ public final class BaseXText extends BaseXPanel {
   /** Undo Command. */
   class UndoCmd extends TextCmd {
     @Override
-    public void execute() {
+    public void execute(final GUI main) {
       undo();
     }
     @Override
-    public void refresh(final AbstractButton button) {
+    public void refresh(final GUI main, final AbstractButton button) {
       button.setEnabled(!undo.first());
     }
     @Override
@@ -703,11 +694,11 @@ public final class BaseXText extends BaseXPanel {
   /** Redo Command. */
   class RedoCmd extends TextCmd {
     @Override
-    public void execute() {
+    public void execute(final GUI main) {
       redo();
     }
     @Override
-    public void refresh(final AbstractButton button) {
+    public void refresh(final GUI main, final AbstractButton button) {
       button.setEnabled(!undo.last());
     }
     @Override
@@ -719,11 +710,11 @@ public final class BaseXText extends BaseXPanel {
   /** Cut Command. */
   class CutCmd extends TextCmd {
     @Override
-    public void execute() {
+    public void execute(final GUI main) {
       cut();
     }
     @Override
-    public void refresh(final AbstractButton button) {
+    public void refresh(final GUI main, final AbstractButton button) {
       button.setEnabled(text.start() != -1);
     }
     @Override
@@ -735,11 +726,11 @@ public final class BaseXText extends BaseXPanel {
   /** Cut Command. */
   class CopyCmd extends TextCmd {
     @Override
-    public void execute() {
+    public void execute(final GUI main) {
       copy();
     }
     @Override
-    public void refresh(final AbstractButton button) {
+    public void refresh(final GUI main, final AbstractButton button) {
       button.setEnabled(text.start() != -1);
     }
     @Override
@@ -751,11 +742,11 @@ public final class BaseXText extends BaseXPanel {
   /** Paste Command. */
   class PasteCmd extends TextCmd {
     @Override
-    public void execute() {
+    public void execute(final GUI main) {
       paste();
     }
     @Override
-    public void refresh(final AbstractButton button) {
+    public void refresh(final GUI main, final AbstractButton button) {
       button.setEnabled(clip() != null);
     }
     @Override
@@ -767,11 +758,11 @@ public final class BaseXText extends BaseXPanel {
   /** Delete Command. */
   class DelCmd extends TextCmd {
     @Override
-    public void execute() {
+    public void execute(final GUI main) {
       text.delete();
     }
     @Override
-    public void refresh(final AbstractButton button) {
+    public void refresh(final GUI main, final AbstractButton button) {
       button.setEnabled(text.start() != -1);
     }
     @Override

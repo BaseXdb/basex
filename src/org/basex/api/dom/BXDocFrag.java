@@ -9,7 +9,7 @@ import org.w3c.dom.DocumentFragment;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class BXDocFrag extends BXNode implements DocumentFragment {
+public final class BXDocFrag extends BXNode implements DocumentFragment {
   /**
    * Constructor.
    * @param n node reference

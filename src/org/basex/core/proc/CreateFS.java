@@ -16,7 +16,7 @@ public final class CreateFS extends ACreate {
   /**
    * Constructor.
    * @param path filesystem path
-   * @param name name of database 
+   * @param name name of database
    */
   public CreateFS(final String path, final String name) {
     super(STANDARD, path, name);

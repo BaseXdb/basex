@@ -2,7 +2,7 @@ package org.basex.util;
 
 /**
  * This class stores strings in a history.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
@@ -17,14 +17,14 @@ public final class Undo {
   private int max;
   /** History position. */
   private int pos;
-  
+
   /**
    * Constructor.
    */
   public Undo() {
     hist[0] = Token.EMPTY;
   }
-  
+
   /**
    * Returns the previous string.
    * @return previous string
@@ -32,7 +32,7 @@ public final class Undo {
   public boolean first() {
     return pos == 0;
   }
-  
+
   /**
    * Returns the previous string.
    * @return previous string
@@ -40,7 +40,7 @@ public final class Undo {
   public boolean last() {
     return pos == max;
   }
-  
+
   /**
    * Returns the previous string.
    * @return previous string
@@ -48,7 +48,7 @@ public final class Undo {
   public byte[] prev() {
     return hist[pos == 0 ? pos : --pos];
   }
-  
+
   /**
    * Returns the next string.
    * @return previous string
@@ -64,7 +64,7 @@ public final class Undo {
   public int cursor() {
     return cur[pos];
   }
-  
+
   /**
    * Stores a string in the history. 
    * @param str string to be stored

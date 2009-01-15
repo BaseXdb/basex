@@ -7,7 +7,6 @@ import org.basex.BaseX;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.query.ExprInfo;
-import org.basex.query.xquery.XQFTVisData;
 import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
 
@@ -126,8 +125,8 @@ public final class DOTSerializer extends Serializer {
   }
   
   @Override
-  public void text(final byte[] b, final int[] pos, final int[] poi,
-      final XQFTVisData ft) throws IOException {
+  public void text(final byte[] b, final FTPosData ft, final int[][] ftd)
+      throws IOException {
     text(b);
   }
 

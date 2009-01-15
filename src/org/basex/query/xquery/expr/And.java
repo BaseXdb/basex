@@ -43,7 +43,10 @@ public final class And extends Arr {
       if(expr.length == 0) return Bln.TRUE;
     }
     
-    return this;
+    if(expr.length == 2 && expr[0] instanceof Pos  && expr[1] instanceof Pos) {
+      return ((Pos) expr[0]).intersect((Pos) expr[1]);
+    }
+    return expr.length == 1 && expr[0].returned() == Type.BLN ? expr[0] : this;
   }
 
   @Override
@@ -58,7 +61,7 @@ public final class And extends Arr {
       d = Scoring.and(d, it.score());
     }
     
-    if (!Bln.get(d).bool() && ctx.item instanceof DBNode && ctx.ftdata != null) 
+    if (ctx.ftdata != null && !Bln.get(d).bool() && ctx.item instanceof DBNode)
       ctx.ftdata.remove(((DBNode) ctx.item).pre + 1);
     
     return (d == 0 ? Bln.TRUE : Bln.get(d)).iter();

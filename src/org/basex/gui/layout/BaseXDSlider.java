@@ -9,6 +9,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import org.basex.gui.GUI;
 
 /**
  * DoubleSlider implementation.
@@ -56,15 +57,16 @@ public final class BaseXDSlider extends BaseXPanel {
 
   /**
    * Constructor.
+   * @param main reference to the main window
    * @param mn min value
    * @param mx max value
    * @param hlp help text
    * @param list listener
    */
-  public BaseXDSlider(final double mn, final double mx,
+  public BaseXDSlider(final GUI main, final double mn, final double mx,
       final byte[] hlp, final ActionListener list) {
 
-    super(hlp);
+    super(main, hlp);
     listener = list;
     totMin = mn;
     totMax = mx;

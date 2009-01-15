@@ -7,7 +7,6 @@ import javax.swing.BoxLayout;
 import org.basex.BaseX;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
-import org.basex.gui.GUI;
 import org.basex.gui.GUICommands;
 import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants;
@@ -18,6 +17,7 @@ import org.basex.gui.layout.BaseXSyntax;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.view.View;
+import org.basex.gui.view.ViewNotifier;
 import org.basex.io.CachedOutput;
 import org.basex.util.Token;
 
@@ -36,24 +36,28 @@ public final class TextView extends View {
   private final BaseXLabel header;
   /** Open button. */
   private BaseXButton export;
+  /** Painted flag. */
+  private boolean refreshed;
   
   /**
    * Default constructor.
+   * @param man view manager
    * @param mode panel design
    * @param head text header
    * @param help help text
    */
-  public TextView(final Fill mode, final String head, final byte[] help) {
-    super(help);
+  public TextView(final ViewNotifier man, final Fill mode, final String head,
+      final byte[] help) {
+    super(man, help);
     setLayout(new BorderLayout(0, 4));
     setBorder(4, 8, 8, 8);
     setMode(mode);
     
-    area = new BaseXText(help, false, true);
+    area = new BaseXText(gui, help, false);
     add(area, BorderLayout.CENTER);
     
     header = new BaseXLabel(head, true);
-    export = GUIToolBar.newButton(GUICommands.EXPORT);
+    export = GUIToolBar.newButton(GUICommands.EXPORT, gui);
 
     final Box box = new Box(BoxLayout.X_AXIS);
     box.add(header);
@@ -69,42 +73,43 @@ public final class TextView extends View {
   @Override
   public void refreshInit() {
     area.setCaret(0);
-    refreshDoc(GUI.context.current());
+    refreshText(gui.context.current());
   }
 
   @Override
   public void refreshFocus() {
-    repaint();
   }
 
   @Override
   public void refreshMark() {
-    refreshDoc(GUI.context.marked());
+    // skip refresh if text display has already been refreshed
+    if(refreshed) refreshed = false;
+    else refreshText(gui.context.marked());
   }
 
   @Override
   public void refreshContext(final boolean more, final boolean quick) {
-    refreshDoc(GUI.context.current());
+    refreshText(gui.context.current());
   }
 
   /**
    * Refreshes the doc display.
    * @param nodes nodes to display
    */
-  private void refreshDoc(final Nodes nodes) {
+  private void refreshText(final Nodes nodes) {
     if(!GUIProp.showtext || !header.getText().equals(TEXTTIT)) return;
 
-    if(!GUI.context.db() || nodes.size == 0) {
-      setText(Token.EMPTY, 0, true);
+    if(!gui.context.db()) {
+      setText(Token.EMPTY);
       return;
     }
     
     try {
       final CachedOutput out = new CachedOutput(MAX);
-      final boolean chop = GUI.context.data().meta.chop;
-      nodes.serialize(new XMLSerializer(out, false, chop));
+      nodes.serialize(new XMLSerializer(out, false, nodes.data.meta.chop));
       out.addInfo();
-      setText(out.buffer(), out.size(), false);
+      setText(out, nodes);
+      refreshed = false;
     } catch(final Exception ex) {
       BaseX.debug(ex);
     }
@@ -123,13 +128,22 @@ public final class TextView extends View {
 
   /**
    * Sets the output text.
-   * @param txt text
-   * @param s size
-   * @param inf info flag
+   * @param out output cache
+   * @param nodes nodes reference
    */
-  public void setText(final byte[] txt, final int s, final boolean inf) {
-    area.setText(txt, s);
-    area.setSyntax(inf ? BaseXSyntax.SIMPLE : new XMLSyntax());
+  public void setText(final CachedOutput out, final Nodes nodes) {
+    area.setSyntax(new XMLSyntax());
+    area.setText(out.buffer(), out.size(), nodes != null ? nodes.ftpos : null);
+    refreshed = true;
+  }
+
+  /**
+   * Sets the output text.
+   * @param txt text
+   */
+  public void setText(final byte[] txt) {
+    area.setSyntax(BaseXSyntax.SIMPLE);
+    area.setText(txt, txt.length);
   }
 
   /**

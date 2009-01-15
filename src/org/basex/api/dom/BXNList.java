@@ -17,7 +17,7 @@ public class BXNList implements NodeList {
   protected NodeBuilder xquery;
   /** XPath node set. */
   protected Nod nodes;
-  
+
   /**
    * Constructor.
    * @param nb nodes
@@ -25,7 +25,7 @@ public class BXNList implements NodeList {
   public BXNList(final NodeBuilder nb) {
     xquery = nb;
   }
-  
+
   /**
    * Constructor.
    * @param ns node set
@@ -33,7 +33,7 @@ public class BXNList implements NodeList {
   public BXNList(final Nod ns) {
     nodes = ns;
   }
-  
+
   public final Node item(final int i) {
     org.basex.query.xquery.item.Nod n = null;
     if(xquery != null) {

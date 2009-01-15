@@ -1,19 +1,17 @@
-package org.basex.gui.view.tree;
+package org.basex.gui.view.folder;
 
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.gui.GUI;
-import org.basex.gui.view.View;
 
 /**
- * This is an iterator for the tree nodes.
+ * This is an iterator for the folder nodes.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-final class TreeIterator {
+final class FolderIterator {
   /** Tree visualization reference. */
-  private final TreeView view;
+  private final FolderView view;
 
   /** Current y position. */
   int y;
@@ -41,7 +39,7 @@ final class TreeIterator {
    * Default Constructor.
    * @param v view reference
    */
-  TreeIterator(final TreeView v) {
+  FolderIterator(final FolderView v) {
     this(v, 0, 0x7FFFFFFF);
   }
 
@@ -51,7 +49,7 @@ final class TreeIterator {
    * @param yy start y value
    * @param h panel height
    */
-  TreeIterator(final TreeView v, final int yy, final int h) {
+  FolderIterator(final FolderView v, final int yy, final int h) {
     height = h;
     view = v;
     view.focusedPos = -1;
@@ -59,8 +57,8 @@ final class TreeIterator {
   }
 
   /**
-   * Returns the total tree height.
-   * @return tree height
+   * Returns the total view height.
+   * @return view height
    */
   int height() {
     while(more());
@@ -75,13 +73,13 @@ final class TreeIterator {
     if(view.opened == null) return false;
     if(!found) {
       view.focusedPos++;
-      found = pre == View.focused;
+      found = pre == view.gui.focused;
     }
     if(mode == 0) return moreCS();
     y += view.lineH;
     if(y > height) return false;
 
-    final Data data = GUI.context.data();
+    final Data data = view.gui.context.data();
     if(data == null) return false;
     final int kind = data.kind(pre);
     return mode == 2 || (kind == Data.ELEM || kind == Data.DOC) &&
@@ -93,7 +91,7 @@ final class TreeIterator {
    * @return true for more data
    */
   boolean moreCS() {
-    final Nodes current = GUI.context.current();
+    final Nodes current = view.gui.context.current();
     if(current == null || ++cp >= current.size) return false;
     par = current.nodes[cp];
     pre = par;

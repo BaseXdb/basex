@@ -23,37 +23,37 @@ public final class GUIConstants {
    * The following steps are necessary to add a new view
    * (the implementation of the existing views might help you):
    *
-   * - define a new name for your view (no spaces; e.g. "Flup")
+   * - define a unique name for your view in lower case (e.g. "flup")
    * - add a string for your view, as shown below
-   * - add the string in the LAYOUTOPENED below
-   * - add a new ViewPanel instance for your view in the GUI class constructor
+   * - add the string in the LAYOUTOPEN string below
+   * - add a new ViewPanel instance for your view in the GUI class
    *
    * Add some more code to allow switching on/off your view:
    *
-   * - add a boolean visibility flag in the GUIProp class (e.g. "showflup")
-   * - add a corresponding line in the ViewPanel.setVisibility() method
+   * - add a boolean visibility flag with the view name included
+   *   in the GUIProp class (e.g. "showflup")
    * - add a corresponding command in the GUICommands class and in
    *   MENUITEMS below
    */
   
   /** Internal name of the Map View. */
-  public static final String MAPVIEW = "Map";
+  public static final String MAPVIEW = "map";
   /** Internal name of the Tree View. */
-  public static final String TREEVIEW = "Tree";
+  public static final String FOLDERVIEW = "folder";
   /** Internal name of the Text View. */
-  public static final String TEXTVIEW = "Text";
+  public static final String TEXTVIEW = "text";
   /** Internal name of the Table View. */
-  public static final String TABLEVIEW = "Table";
+  public static final String TABLEVIEW = "table";
   /** Internal name of the Info View. */
-  public static final String INFOVIEW = "Query Info";
+  public static final String INFOVIEW = "info";
   /** Internal name of the Search View. */
-  public static final String QUERYVIEW = "Query";
+  public static final String QUERYVIEW = "query";
   /** Internal name of the Help View. */
-  public static final String HELPVIEW = "Help";
+  public static final String HELPVIEW = "help";
   /** Internal name of the Real Tree View. */
-  public static final String REALVIEW = "Real";
+  public static final String REALVIEW = "real";
   /** Internal name of the Plot View. */
-  public static final String PLOTVIEW = "Plot";
+  public static final String PLOTVIEW = "plot";
   
    /**
    * Default GUI Layout. The layout is formatted as follows:
@@ -62,12 +62,12 @@ public final class GUIConstants {
    * separated with spaces, and all views must be specified in this layout.
    * This layout is displayed as soon as a database is opened.
    */
-  public static final String LAYOUTOPENED = "H V " + QUERYVIEW + " " + TREEVIEW
+  public static final String LAYOUTOPEN = "H V " + QUERYVIEW + " " + FOLDERVIEW
       + " " + TEXTVIEW + " " + HELPVIEW + " - V " + MAPVIEW + " " + TABLEVIEW
       + " " + INFOVIEW + " " + PLOTVIEW + " " + REALVIEW + " - -";
 
   /** This layout is shown when no database is opened. */
-  public static final String LAYOUTCLOSED = "V " + TEXTVIEW + " " + HELPVIEW
+  public static final String LAYOUTCLOSE = "V " + TEXTVIEW + " " + HELPVIEW
       + " -";
 
   // TOOLBAR ==================================================================
@@ -75,7 +75,7 @@ public final class GUIConstants {
   /** Toolbar entries, containing the button commands. */
   public static final GUICommand[] TOOLBAR = {
     GOBACK, GOUP, GOFORWARD, ROOT, null, CREATE, OPEN, null,
-      SHOWSEARCH, SHOWINFO, null, SHOWTEXT, SHOWMAP, SHOWTREE,
+      SHOWSEARCH, SHOWINFO, null, SHOWTEXT, SHOWMAP, SHOWFOLDER,
       SHOWTABLE, SHOWPLOT, null, SHOWHELP, INFO
   };
 
@@ -96,7 +96,7 @@ public final class GUIConstants {
     SHOWSEARCH, SHOWINFO, null, COPYPATH, FILTER
   }, {
     MENUMAIN, SHOWMENU, SHOWBUTTONS, SHOWINPUT, SHOWSTATUS, null,
-    MENUVIEWS, SHOWTEXT, SHOWMAP, SHOWTREE, SHOWTABLE, SHOWPLOT, null, FULL
+    MENUVIEWS, SHOWTEXT, SHOWMAP, SHOWFOLDER, SHOWTABLE, SHOWPLOT, null, FULL
   }, {
     MENUINTER, RTEXEC, RTFILTER, null,
     MENULAYOUT, COLOR, FONTS, MAPLAYOUT, null, PREFS
@@ -254,6 +254,7 @@ public final class GUIConstants {
         new Color(64, 64, 255), new Color(224, 0, 96), new Color(128, 128, 128),
         new Color(240, 240, 0)
     };
+    initFonts();
   }
 
   /**

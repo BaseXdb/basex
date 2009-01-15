@@ -37,7 +37,7 @@ public abstract class BXNode implements Node {
   };
   /** Data reference. */
   protected final Nod node;
-  
+
   /**
    * Constructor.
    * @param n node reference
@@ -98,7 +98,7 @@ public abstract class BXNode implements Node {
   public NodeList getChildNodes() {
     return new BXNList(finish(node.child()));
   }
-  
+
   public Node getFirstChild() {
     try {
       return finish(node.child().next());
@@ -255,12 +255,12 @@ public abstract class BXNode implements Node {
     error();
     return null;
   }
-  
+
   @Override
   public final String toString() {
     return "[" + getNodeName() + ": " + getNodeValue() + "]";
   }
-  
+
   /**
    * Returns all nodes with the given tag name.
    * @param tag tag name

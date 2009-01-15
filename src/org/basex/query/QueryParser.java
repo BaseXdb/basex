@@ -74,7 +74,7 @@ public class QueryParser {
   }
 
   /**
-   * Remember the current position.
+   * Remembers the current position.
    */
   public void mark() {
     qm = qp;
@@ -153,7 +153,7 @@ public class QueryParser {
   }
 
   /**
-   * Parse and convert entities.
+   * Parses and convert entities.
    * @param tb token builder
    * @return error string or null
    */

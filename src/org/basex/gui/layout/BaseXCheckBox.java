@@ -21,8 +21,8 @@ public final class BaseXCheckBox extends JCheckBox {
    * @param sel initial selection state
    * @param list reference to the dialog listener
    */
-  public BaseXCheckBox(final String label, final byte[] hlp, final boolean sel,
-      final Dialog list) {
+  public BaseXCheckBox(final String label, final byte[] hlp,
+      final boolean sel, final Dialog list) {
     this(label, hlp, sel, 5, list);
   }
 
@@ -34,8 +34,8 @@ public final class BaseXCheckBox extends JCheckBox {
    * @param dist distance to next component
    * @param list reference to the dialog listener
    */
-  public BaseXCheckBox(final String label, final byte[] hlp, final boolean sel,
-      final int dist, final Dialog list) {
+  public BaseXCheckBox(final String label, final byte[] hlp,
+      final boolean sel, final int dist, final Dialog list) {
 
     super(label, sel);
     setMargin(new Insets(0, 0, dist, 0));

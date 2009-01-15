@@ -38,17 +38,17 @@ public class Pred extends Preds {
 
     // No predicates.. return root
     if(pred.length == 0) return root;
+    final Expr p = pred[0];
 
+    // Position predicate
+    final Pos pos = p instanceof Pos ? (Pos) p : null;
     // Last flag
-    final boolean last = pred[0] instanceof Fun &&
-      ((Fun) pred[0]).func == FunDef.LAST;
-    // Numeric value
-    final boolean num = pred[0].i() && ((Item) pred[0]).n();
+    final boolean last = p instanceof Fun && ((Fun) p).func == FunDef.LAST;
     // Multiple Predicates or POS
-    if(pred.length > 1 || !last && !num && usesPos()) return this;
+    if(pred.length > 1 || !last && pos == null && usesPos()) return this;
     // Use iterative evaluation
-    return new IterPred(root, pred, last, num);
-  }  
+    return new IterPred(root, pred, pos, last);
+  }
 
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
@@ -69,8 +69,7 @@ public class Pred extends Preds {
       int c = 0;
       for(int s = 0; s < sb.size; s++) {
         ctx.item = sb.item[s];
-        i = ctx.iter(p).ebv();
-        if(i.n() ? i.dbl() == ctx.pos : i.bool()) sb.item[c++] = sb.item[s];
+        if(ctx.iter(p).test(ctx) != null) sb.item[c++] = sb.item[s];
         ctx.pos++;
       }
       sb.size = c;

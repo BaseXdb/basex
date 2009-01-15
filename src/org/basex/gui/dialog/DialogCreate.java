@@ -1,14 +1,12 @@
 package org.basex.gui.dialog;
 
 import static org.basex.Text.*;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import org.basex.core.Prop;
 import org.basex.core.proc.List;
@@ -65,10 +63,10 @@ public final class DialogCreate extends Dialog {
 
   /**
    * Default Constructor.
-   * @param parent parent frame
+   * @param main reference to the main window
    */
-  public DialogCreate(final JFrame parent) {
-    super(parent, CREATEADVTITLE);
+  public DialogCreate(final GUI main) {
+    super(main, CREATEADVTITLE);
 
     // create panels
     final BaseXBack p1 = new BaseXBack();
@@ -97,10 +95,11 @@ public final class DialogCreate extends Dialog {
     BaseXLayout.setWidth(filter, 54);
     p.add(filter);
 
-    final BaseXButton button = new BaseXButton(BUTTONBROWSE, HELPBROWSE, this);
+    final BaseXButton button = new BaseXButton(BUTTONBROWSE,
+        HELPBROWSE, this);
     button.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        choose(parent);
+        choose();
       }
     });
     p.add(button);
@@ -129,21 +128,21 @@ public final class DialogCreate extends Dialog {
     p2.setLayout(new TableLayout(9, 1));
     p2.setBorder(8, 8, 8, 8);
 
-    intparse = new BaseXCheckBox(CREATEINTPARSE,
-        Token.token(INTPARSEINFO), Prop.intparse, 0, this);
+    intparse = new BaseXCheckBox(CREATEINTPARSE, Token.token(INTPARSEINFO),
+        Prop.intparse, 0, this);
     p2.add(intparse);
     p2.add(new BaseXLabel(INTPARSEINFO, true));
 
-    entities = new BaseXCheckBox(CREATEENTITIES,
-        Token.token(ENTITIESINFO), Prop.entity, 0, this);
+    entities = new BaseXCheckBox(CREATEENTITIES, Token.token(ENTITIESINFO),
+        Prop.entity, 0, this);
     p2.add(entities);
 
-    dtd = new BaseXCheckBox(CREATEDTD,
-        Token.token(DTDINFO), Prop.entity, 12, this);
+    dtd = new BaseXCheckBox(CREATEDTD, Token.token(DTDINFO),
+        Prop.entity, 12, this);
     p2.add(dtd);
 
-    chop = new BaseXCheckBox(CREATECHOP,
-        Token.token(CHOPPINGINFO), Prop.chop, 0, this);
+    chop = new BaseXCheckBox(CREATECHOP, Token.token(CHOPPINGINFO),
+        Prop.chop, 0, this);
     p2.add(chop);
     p2.add(new BaseXLabel(CHOPPINGINFO, true));
 
@@ -152,13 +151,13 @@ public final class DialogCreate extends Dialog {
     p3.setLayout(new TableLayout(10, 1, 0, 0));
     p3.setBorder(8, 8, 8, 8);
 
-    txtindex = new BaseXCheckBox(INFOTEXTINDEX,
-        Token.token(TXTINDEXINFO), Prop.textindex, 0, this);
+    txtindex = new BaseXCheckBox(INFOTEXTINDEX, Token.token(TXTINDEXINFO),
+        Prop.textindex, 0, this);
     p3.add(txtindex);
     p3.add(new BaseXLabel(TXTINDEXINFO, true));
 
-    atvindex = new BaseXCheckBox(INFOATTRINDEX,
-        Token.token(ATTINDEXINFO), Prop.attrindex, 0, this);
+    atvindex = new BaseXCheckBox(INFOATTRINDEX, Token.token(ATTINDEXINFO),
+        Prop.attrindex, 0, this);
     p3.add(atvindex);
     p3.add(new BaseXLabel(ATTINDEXINFO, true));
 
@@ -167,8 +166,8 @@ public final class DialogCreate extends Dialog {
     p4.setLayout(new TableLayout(10, 1, 0, 0));
     p4.setBorder(8, 8, 8, 8);
 
-    ftxindex = new BaseXCheckBox(INFOFTINDEX,
-        Token.token(FTINDEXINFO), Prop.ftindex, 0, this);
+    ftxindex = new BaseXCheckBox(INFOFTINDEX, Token.token(FTINDEXINFO),
+        Prop.ftindex, 0, this);
     p4.add(ftxindex);
     p4.add(new BaseXLabel(FTINDEXINFO, true));
 
@@ -192,16 +191,15 @@ public final class DialogCreate extends Dialog {
     buttons = BaseXLayout.okCancel(this);
     set(buttons, BorderLayout.SOUTH);
     action(null);
-    finish(parent);
+    finish();
   }
 
   /**
    * Choose an XML document or directory.
-   * @param parent parent reference
    */
-  public void choose(final JFrame parent) {
+  public void choose() {
     final BaseXFileChooser fc = new BaseXFileChooser(CREATETITLE,
-        GUIProp.createpath, parent);
+        GUIProp.createpath, gui);
     fc.addFilter(IO.GZSUFFIX, CREATEGZDESC);
     fc.addFilter(IO.ZIPSUFFIX, CREATEZIPDESC);
     fc.addFilter(IO.XMLSUFFIX, CREATEXMLDESC);

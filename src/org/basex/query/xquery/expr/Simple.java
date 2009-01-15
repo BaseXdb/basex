@@ -18,12 +18,12 @@ public abstract class Simple extends Expr {
   }
   
   @Override
-  public final boolean usesPos() {
+  public boolean usesPos() {
     return false;
   }
 
   @Override
-  public boolean usesVar(final Var v) {
+  public final boolean usesVar(final Var v) {
     return false;
   }
   
@@ -33,7 +33,7 @@ public abstract class Simple extends Expr {
   }
   
   @Override
-  public final void plan(final Serializer ser) throws IOException {
+  public void plan(final Serializer ser) throws IOException {
     ser.emptyElement(this);
   }
 }

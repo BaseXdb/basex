@@ -16,52 +16,55 @@ import org.basex.util.Token;
  */
 public final class GUIToolBar extends JToolBar {
   /** Toolbar commands. */
-  private final GUICommand[] toolbar;
+  private final GUICommand[] cmd;
+  /** Reference to main window. */
+  protected final GUI gui;
   
   /**
    * Default Constructor.
    * @param tb toolbar commands
+   * @param main reference to the main window
    */
-  public GUIToolBar(final GUICommand[] tb) {
+  public GUIToolBar(final GUICommand[] tb, final GUI main) {
     super();
     setFloatable(false);
-    toolbar = tb;
+    cmd = tb;
+    gui = main;
 
-    for(final GUICommand cmd : toolbar) {
-      if(cmd == null) {
+    for(final GUICommand c : cmd) {
+      if(c == null) {
         addSeparator();
       } else {
-        final BaseXButton button = newButton(cmd);
+        final BaseXButton button = newButton(c, gui);
         button.setFocusable(false);
         add(button);
       }
     }
-    refresh();
   }
 
   /**
    * Refresh buttons.
    */
   public void refresh() {
-    for(int b = 0; b < toolbar.length; b++) {
-      if(toolbar[b] == null) continue;
-      toolbar[b].refresh((BaseXButton) getComponent(b));
+    for(int b = 0; b < cmd.length; b++) {
+      if(cmd[b] != null) cmd[b].refresh(gui, (BaseXButton) getComponent(b));
     }
   }
 
   /**
    * Creates a new button.
    * @param cmd command
+   * @param gui reference to main window
    * @return button
    */
-  public static BaseXButton newButton(final GUICommand cmd) {
+  public static BaseXButton newButton(final GUICommand cmd, final GUI gui) {
     // the image equals the 'cmd-' prefix and the command in lower case
     final ImageIcon icon = GUI.icon("cmd-" + cmd.toString().toLowerCase());
     final String info = cmd.help();
     final BaseXButton button = new BaseXButton(icon, Token.token(info));
     button.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        cmd.execute();
+        cmd.execute(gui);
       }
     });
     button.trim();

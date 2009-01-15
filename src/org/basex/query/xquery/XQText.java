@@ -165,6 +165,8 @@ public interface XQText {
   /** XPST0003: Parsing exception. */
   Object[] NOTAGNAME = { XPST, 3, "Expecting tag name." };
   /** XPST0003: Parsing exception. */
+  Object[] NOATTNAME = { XPST, 3, "Expecting attribute name." };
+  /** XPST0003: Parsing exception. */
   Object[] NOLOCSTEP = { XPST, 3, "Incomplete location step." };
   /** XPST0003: Parsing exception. */
   Object[] NOEXPR = { XPST, 3, "Expecting expression." };

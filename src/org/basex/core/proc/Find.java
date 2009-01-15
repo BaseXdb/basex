@@ -77,24 +77,20 @@ public final class Find extends AQuery {
         preds += "[text() ~> \"" + term.substring(1) + "\"]";
       } else if(term.startsWith("@")) {
         if(term.length() == 1) continue;
-        preds += "[basex:containslc(@*, \"" + term.substring(1) + "\")]";
+        preds += "[@* ftcontains \"" + term.substring(1) + "\"]";
         term = term.substring(1);
         if(XMLToken.isName(Token.token(term))) {
           // attribute exists.. add location path
           pre += (r ? "" : ".") + "//@" + term + " | ";
         }
       } else {
-        if(data.meta.ftxindex) {
-          preds += "[text() ftcontains \"" + term + "\"]";
-        } else {
-          preds += "[basex:containslc(text(), \"" + term + "\")]";
-        }
+        preds += "[text() ftcontains \"" + term + "\"]";
         if(XMLToken.isName(Token.token(term))) {
-          // tag exists.. add location path
+          // add location path for tag
           pre += (r ? "/" : "") + "descendant::" + term + " | ";
         }
         // name attribute exists...
-        pre += "//*[basex:containslc(@name, \"" + term + "\")] | ";
+        pre += "//*[@name ftcontains \"" + term + "\"] | ";
       }
     }
     if(pre.length() == 0 && preds.length() == 0) return root ? "/" : ".";
@@ -191,7 +187,7 @@ public final class Find extends AQuery {
       if(exact) {
         xpath.add(pred + operator + t);
       } else {
-        xpath.add("basex:containslc(" + pred + ", " + t + ")");
+        xpath.add(pred + " ftcontains " + t);
       }
       xpath.add(']');
 
@@ -204,12 +200,7 @@ public final class Find extends AQuery {
       if(!r) xpath.add(".");
       xpath.add("//file");
       for(final String t : split(query)) {
-        xpath.add("[");
-        final String pred = ".//text()";
-        if(data.meta.ftxindex) {
-          xpath.add(pred + " ftcontains \"" + t + "\"");
-        }
-        xpath.add("]");
+        xpath.add("[.//text() ftcontains \"" + t + "\"]");
       }
     }
     return xpath.toString();
@@ -242,9 +233,7 @@ public final class Find extends AQuery {
         if(term.length == 0) continue;
         tb.add("[");
         if(fs && i == 1) {
-          tb.add("basex:containslc(@name, \"");
-          tb.add(term);
-          tb.add("\")");
+          tb.add("@name ftcontains \"" + term + "\"");
         } else {
           final boolean elm = elem.list[i];
           tb.add(elm ? ".//" : "@");

@@ -269,6 +269,12 @@ public interface XQTokens {
   byte[] TEST = token("test");
   /** Query Plan. */
   byte[] PREDS = token("Preds");
+  /** Minimum . */
+  byte[] MIN = token("min");
+  /** Attribute name. */
+  byte[] MAX = token("max");
+  /** Minimum . */
+  byte[] INF = token("inf");
   /** Query Plan. */
   String ARG = "arg";
 }

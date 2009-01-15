@@ -20,7 +20,7 @@ public final class IntList {
   public IntList() {
     this(8);
   }
-  
+
   /**
    * Constructor, specifying an initial list size.
    * @param is initial size of the list
@@ -28,7 +28,7 @@ public final class IntList {
   public IntList(final int is) {
     list = new int[is];
   }
-  
+
   /**
    * Constructor, specifying an initial array.
    * @param v initial list values
@@ -46,7 +46,7 @@ public final class IntList {
     if(size == list.length) list = Array.extend(list);
     list[size++] = v;
   }
-  
+
   /**
    * Sets a value at the specified position.
    * @param v value to be added
@@ -67,7 +67,7 @@ public final class IntList {
     for(int i = 0; i < size; i++) if(list[i] == v) return true;
     return false;
   }
-  
+
   /**
    * Finishes the int array.
    * @return int array
@@ -88,14 +88,13 @@ public final class IntList {
     return tmp;
   }
 
-  
   /**
    * Resets the integer list.
    */
   public void reset() {
     size = 0;
   }
-  
+
   /**
    * Sorts the specified tokens and returns an {@link IntList} instance
    * with the sort order of all tokens.
@@ -216,7 +215,7 @@ public final class IntList {
   private int d(final byte[] a, final byte[] b) {
     return a == null ? b == null ? 0 : -1 : b == null ? 1 : Token.diff(a, b);
   }
-    
+
   /**
    * Swaps two array values.
    * @param a first offset

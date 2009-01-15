@@ -14,22 +14,20 @@ import org.basex.query.xquery.iter.Iter;
 public final class IterPred extends Pred {
   /** Flag is set to true if predicate has last function. */
   final boolean last;
-  /** Flag is set to true if predicate has a numeric value. */
-  final boolean num;
+  /** Optional position predicate. */
+  final Pos pos;
 
   /**
    * Constructor.
    * @param r root expression
    * @param p predicates
+   * @param ps position predicate
    * @param l true if predicate has a last function
-   * @param n true if predicate has a numeric value
    */
-  public IterPred(final Expr r, final Expr[] p,
-      final boolean l, final boolean n) {
-
+  public IterPred(final Expr r, final Expr[] p, final Pos ps, final boolean l) {
     super(r, p);
     last = l;
-    num = n;
+    pos = ps;
   }
 
   @Override
@@ -53,17 +51,16 @@ public final class IterPred extends Pred {
           Item i;
           while((i = iter.next()) != null) {
             ctx.item = i;
-            i = ctx.iter(pred[0]).ebv();
-  
-            final boolean found = i.n() ? i.dbl() == ctx.pos : i.bool();
+            i = ctx.iter(pred[0]).test(ctx);
             ctx.pos++;
             
-            if(found) {
+            if(i != null) {
               // if item is numeric, the rest of expr will be skipped
               ctx.item.score(i.score());
-              if(num) more = false;
               return ctx.item;
             }
+            // no more results are to be expected
+            if(pos != null && !pos.more(ctx)) break;
           }
   
           // returns the last item.

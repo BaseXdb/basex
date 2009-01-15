@@ -4,12 +4,10 @@ import static org.basex.util.Token.*;
 import org.basex.build.fs.FSText;
 import org.basex.core.Context;
 import org.basex.core.proc.Find;
-import org.basex.core.proc.XQuery;
 import org.basex.data.Data;
 import org.basex.data.DataText;
 import org.basex.data.Nodes;
 import org.basex.data.StatsKey.Kind;
-import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.index.Names;
 import org.basex.util.Array;
@@ -33,6 +31,8 @@ final class TableData {
   /** Maximum number for sorting data. */
   private static final byte[] MAXNUM = token(Double.MAX_VALUE);
 
+  /** Context reference. */
+  final Context context;
   /** Root nodes. */
   TokenList roots;
   /** Rows of the main table. */
@@ -73,6 +73,14 @@ final class TableData {
     double hwidth;
     /** Column filter. */
     String filter = "";
+  }
+
+  /**
+   * Initializes the table data.
+   * @param ctx context
+   */
+  TableData(final Context ctx) {
+    context = ctx;
   }
 
   /**
@@ -137,7 +145,7 @@ final class TableData {
   void context(final boolean create) {
     if(cols.length == 0) return;
     
-    final Nodes n = GUI.context.current();
+    final Nodes n = context.current();
     final boolean r = n.size == 1 && n.nodes[0] < 2;
     if(!create && r) {
       rows = rootRows;
@@ -155,7 +163,7 @@ final class TableData {
    * @param elem element flag
    */
   private void addCol(final byte[] name, final boolean elem) {
-    final Data data = GUI.context.data();
+    final Data data = context.data();
     final int id = elem ? data.tagID(name) : data.attNameID(name);
     if(id == 0) return;
     final TableCol col = new TableCol();
@@ -169,7 +177,6 @@ final class TableData {
    * Creates the row list for the specified nodes.
    */
   void createRows() {
-    final Context context = GUI.context;
     final Data data = context.data();
     final int[] n = context.current().nodes;
 
@@ -199,7 +206,7 @@ final class TableData {
   void calcWidths() {
     if(cols.length == 0) return;
 
-    final Data data = GUI.context.data();
+    final Data data = context.data();
     final int cs = cols.length;
 
     // scan first MAXROWS root tags
@@ -259,7 +266,7 @@ final class TableData {
     final int c = cols[sortCol].id;
     final boolean e = cols[sortCol].elem;
 
-    final Data data = GUI.context.data();
+    final Data data = context.data();
     final Names index = e ? data.tags : data.atts;
     final Kind kind = index.stat(c).kind;
     final boolean num = kind == Kind.INT || kind == Kind.DBL;
@@ -327,9 +334,10 @@ final class TableData {
 
   /**
    * Builds an XPath query and executes a search for the filtered terms.
+   * @return query
    */
-  void find() {
-    final Data data = GUI.context.data();
+  String find() {
+    final Data data = context.data();
     final boolean r = rows == rootRows;
     final StringList filters = new StringList();
     final TokenList names = new TokenList();
@@ -341,9 +349,9 @@ final class TableData {
     }
     final String query = Find.findTable(filters, names, elems,
         data.tags.key(root), data, GUIProp.filterrt || r);
-    if(query.equals(last)) return;
+    if(query.equals(last)) return null;
     last = query;
-    GUI.get().execute(new XQuery(query.length() != 0 ? query : "/"));
+    return query.length() != 0 ? query : "/";
   }
 
   /**

@@ -143,10 +143,14 @@ public final class Prop {
   public static int lserr = 0;
   /** Flag for creating flat MAB2 data. */
   public static boolean mab2flat = false;
-  /** Server mode. */
-  public static boolean server = false;
+
   /** Server timeout in seconds. */
   public static int timeout = 3600;
+
+  /** Server mode (shouldn't be overwritten by property file). */
+  public static boolean server = false;
+  /** GUI mode (shouldn't be overwritten by property file). */
+  public static boolean gui = false;
 
   // WEBSERVER OPTIONS ========================================================
 
@@ -198,20 +202,19 @@ public final class Prop {
         if(line.length() == 0 || line.charAt(0) == '#') continue;
         final int d = line.indexOf('=');
         if(d < 0) {
-          BaseX.debug("Can't guess what \"%\" means in \"%\"", line, filename);
+          BaseX.errln("Can't guess what \"%\" means in \"%\"", line, filename);
           continue;
         }
         final String key = line.substring(0, d).trim().toLowerCase();
         final String val = line.substring(d + 1).trim();
 
         if(!assign(fields, key, val)) {
-          BaseX.debug("\"%\" ignored in \"%\"", line, filename);
+          BaseX.errln("\"%\" ignored in \"%\"", line, filename);
         }
       }
       br.close();
     } catch(final Exception ex) {
-      BaseX.debug("% could not be read.", filename);
-      ex.printStackTrace();
+      BaseX.errln("% could not be read.", filename);
     }
   }
 
@@ -260,7 +263,7 @@ public final class Prop {
         } else if(t.equals("int[]")) {
           ((int[]) f.get(null))[num] = Integer.parseInt(value);
         } else {
-          BaseX.debug("Can't write property \"%\".", f);
+          BaseX.errln("Can't write property \"%\".", f);
         }
         return true;
       }
@@ -326,7 +329,7 @@ public final class Prop {
       bw.write(NL + PROPUSER + NL + user);
       bw.close();
     } catch(final Exception ex) {
-      BaseX.debug("% could not be written.", filename);
+      BaseX.errln("% could not be written.", filename);
       ex.printStackTrace();
     }
   }

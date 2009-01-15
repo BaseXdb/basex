@@ -22,7 +22,7 @@ import org.basex.query.xquery.util.Var;
  * @author Christian Gruen
  * @author Sebastian Gath
  */
-public class MixedPath extends Path {
+public final class MixedPath extends Path {
   /** Expression list. */
   private final Expr[] step;
 

@@ -2,7 +2,6 @@ package org.basex.gui.dialog;
 
 import static org.basex.Text.*;
 import java.awt.BorderLayout;
-import javax.swing.JFrame;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
@@ -26,25 +25,13 @@ public final class DialogColors extends Dialog {
   private BaseXSlider sliderGreen;
   /** Slider reference. */
   private BaseXSlider sliderBlue;
-  /** Singleton instance. */
-  private static Dialog instance;
-
-  /**
-   * Returns singleton instance.
-   * @param parent parent frame
-   * @return class instance
-   */
-  public static Dialog get(final JFrame parent) {
-    if(instance == null) instance = new DialogColors(parent);
-    return instance;
-  }
 
   /**
    * Default constructor.
-   * @param parent parent frame
+   * @param main reference to the main window
    */
-  private DialogColors(final JFrame parent) {
-    super(parent, SCHEMATITLE, false);
+  public DialogColors(final GUI main) {
+    super(main, SCHEMATITLE, false);
 
     final BaseXBack p = new BaseXBack();
     p.setLayout(new TableLayout(3, 2, 16, 8));
@@ -62,7 +49,7 @@ public final class DialogColors extends Dialog {
     p.add(sliderBlue);
     
     set(p, BorderLayout.CENTER);
-    finish(parent, GUIProp.colorsloc);
+    finish(GUIProp.colorsloc);
   }
 
   /**
@@ -71,7 +58,7 @@ public final class DialogColors extends Dialog {
    * @return slider reference
    */
   private BaseXSlider newSlider(final int v) {
-    final BaseXSlider slider = new BaseXSlider(
+    final BaseXSlider slider = new BaseXSlider(gui,
         0, MAXCOLOR, MAXCOLOR - v, HELPCOLORS, this);
     BaseXLayout.setWidth(slider, 150);
     return slider;

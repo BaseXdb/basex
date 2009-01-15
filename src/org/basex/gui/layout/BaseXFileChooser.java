@@ -1,11 +1,9 @@
 package org.basex.gui.layout;
 
 import static org.basex.Text.*;
-import java.awt.Component;
 import java.awt.FileDialog;
 import java.io.File;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import org.basex.BaseX;
@@ -28,8 +26,8 @@ public final class BaseXFileChooser {
     /** Dir.  */ DIR
   }
   
-  /** Parent component. */
-  private Component parent;
+  /** Reference to main window. */
+  private GUI gui;
   /** Swing file chooser. */
   private JFileChooser fc; 
   /** Simple file dialog. */
@@ -41,20 +39,20 @@ public final class BaseXFileChooser {
    * Default Constructor.
    * @param title dialog title
    * @param path initial path
-   * @param par parent reference
+   * @param main reference to main window
    */
   public BaseXFileChooser(final String title, final String path,
-      final JFrame par) {
+      final GUI main) {
     
     if(GUIProp.simplefd) {
-      fd = new FileDialog(par, title);
+      fd = new FileDialog(main, title);
       fd.setDirectory(path);
     } else {
       fc = new JFileChooser(path);
       final File file = new File(path);
       if(!file.isDirectory()) fc.setSelectedFile(file);
       fc.setDialogTitle(title);
-      parent = par;
+      gui = main;
     }
   }
   
@@ -86,18 +84,18 @@ public final class BaseXFileChooser {
     int state = 0;
     switch(type) {
       case OPEN:
-        state = fc.showOpenDialog(parent);
+        state = fc.showOpenDialog(gui);
         break;
       case OPENDIR:
         fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-        state = fc.showOpenDialog(parent);
+        state = fc.showOpenDialog(gui);
         break;
       case SAVE:
-        state = fc.showSaveDialog(parent);
+        state = fc.showSaveDialog(gui);
         break;
       case DIR:
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        state = fc.showDialog(parent, null);
+        state = fc.showDialog(gui, null);
         break;
     }
     if(state != JFileChooser.APPROVE_OPTION) return false;
@@ -105,7 +103,7 @@ public final class BaseXFileChooser {
     if(mode == Mode.SAVE) {
       final IO file = getFile();
       if(mode == Mode.SAVE && file.exists()) {
-        final int i = JOptionPane.showConfirmDialog(GUI.get(),
+        final int i = JOptionPane.showConfirmDialog(gui,
             BaseX.info(FILEREPLACE, file.name()),
             DIALOGINFO, JOptionPane.YES_NO_OPTION);
         if(i == JOptionPane.NO_OPTION) return false;

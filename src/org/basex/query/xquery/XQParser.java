@@ -1234,6 +1234,7 @@ public final class XQParser extends QueryParser {
     } else if(consume('@')) {
       ax = Axis.ATTR;
       test = test(true);
+      if(test == null) Err.or(NOATTNAME);
     } else {
       for(final Axis a : Axis.values()) {
         if(consumeWS(a.name, COL2, NOLOCSTEP)) {

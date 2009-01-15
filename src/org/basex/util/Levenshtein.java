@@ -158,7 +158,7 @@ public final class Levenshtein {
   public boolean ftChar(final byte ch) {
     return Token.letterOrDigit(ft(ch));
   }
-  
+
   /**
    * Returns a lowercase ASCII character of the specified fulltext character.
    * Note that this method does not support unicode characters.

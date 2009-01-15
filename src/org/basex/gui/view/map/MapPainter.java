@@ -3,9 +3,7 @@ package org.basex.gui.view.map;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
-
 import org.basex.data.Nodes;
-import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.view.ViewRect;
 
@@ -39,7 +37,7 @@ abstract class MapPainter {
    */
   Color nextMark(final ArrayList<ViewRect> rects, final int pre, final int ri,
       final int rs) {
-    final Nodes marked = GUI.context.marked();
+    final Nodes marked = view.gui.context.marked();
     // checks if the current node is a queried context node
     while(mpos < marked.size && marked.nodes[mpos] < pre) mpos++;
     if(mpos < marked.size) {

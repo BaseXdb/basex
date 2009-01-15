@@ -21,13 +21,11 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.SwingUtilities;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.BaseXBar;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPanel;
-import org.basex.gui.view.View;
 import org.basex.gui.view.table.TableData.TableCol;
 
 /**
@@ -61,13 +59,12 @@ final class TableHeader extends BaseXPanel {
 
   /**
    * Constructor.
-   * @param d table data
    * @param v view reference
    */
-  TableHeader(final TableData d, final TableView v) {
-    super(HELPTABLEHEAD);
+  TableHeader(final TableView v) {
+    super(v.gui, HELPTABLEHEAD);
     setMode(Fill.UP);
-    tdata = d;
+    tdata = v.tdata;
     view = v;
     BaseXLayout.setHeight(this, (GUIProp.fontsize + 8) << 1);
     addMouseListener(this);
@@ -188,7 +185,7 @@ final class TableHeader extends BaseXPanel {
         if(col != -1) filter(col);
       }
     }
-    GUI.get().cursor(cursor);
+    view.gui.cursor(cursor);
   }
 
   /**
@@ -239,7 +236,7 @@ final class TableHeader extends BaseXPanel {
   public void mouseExited(final MouseEvent e) {
     if(tdata.rows == null) return;
 
-    GUI.get().cursor(CURSORARROW);
+    view.gui.cursor(CURSORARROW);
     clickCol = -1;
   }
 
@@ -268,11 +265,11 @@ final class TableHeader extends BaseXPanel {
             chooseRoot(e);
           } else {
             // sort data in current column
-            GUI.get().cursor(CURSORWAIT);
+            view.gui.cursor(CURSORWAIT);
             tdata.asc = tdata.sortCol == clickCol ? !tdata.asc : true;
             tdata.sortCol = clickCol;
             tdata.sort();
-            GUI.get().cursor(CURSORARROW, true);
+            view.gui.cursor(CURSORARROW, true);
           }
         }
       } else {
@@ -297,7 +294,7 @@ final class TableHeader extends BaseXPanel {
   private void chooseRoot(final MouseEvent e) {
     if(tdata.roots.size == 0) return;
 
-    final Data data = GUI.context.data();
+    final Data data = view.gui.context.data();
     final JPopupMenu popup = new JPopupMenu("Items");
     final byte[] root = data.tags.key(tdata.root);
     for(final byte[] en : tdata.roots) {
@@ -389,7 +386,7 @@ final class TableHeader extends BaseXPanel {
     super.keyPressed(e);
     if(tdata.roots.size == 0) return;
 
-    GUI.get().checkKeys(e);
+    view.gui.checkKeys(e);
     shift = e.isShiftDown();
     alt = e.isAltDown();
     if(box == null && alt || inputCol == -1) return;
@@ -398,8 +395,8 @@ final class TableHeader extends BaseXPanel {
     if(c == KeyEvent.VK_ENTER) {
       box.stop();
       inputCol = -1;
-      final Nodes marked = GUI.context.marked();
-      if(marked.size != 0) View.notifyContext(marked, false, null);
+      final Nodes marked = view.gui.context.marked();
+      if(marked.size != 0) view.gui.notify.context(marked, false, null);
     } else if(c == KeyEvent.VK_TAB) {
       if(box != null) {
         tdata.cols[inputCol].filter = box.text;

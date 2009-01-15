@@ -27,7 +27,7 @@ public final class FTNotIndex extends FTExpr {
       @Override
       public FTNodeItem next() throws XQException {
         final FTNodeItem ftni = expr[0].iter(ctx).next();
-        ftni.ftn.not = !ftni.ftn.not;
+        ftni.ftn.not ^= true;
         return ftni;
       }
     };

@@ -17,14 +17,14 @@ public final class TokenList implements Iterable<byte[]> {
   public byte[][] list;
   /** Current array size. */
   public int size;
-  
+
   /**
    * Default constructor.
    */
   public TokenList() {
     list = new byte[8][];
   }
-  
+
   /**
    * Constructor.
    * @param is initial size of the list
@@ -32,7 +32,7 @@ public final class TokenList implements Iterable<byte[]> {
   public TokenList(final int is) {
     list = new byte[is][];
   }
-  
+
   /**
    * Adds next value.
    * @param v value to be added
@@ -41,7 +41,7 @@ public final class TokenList implements Iterable<byte[]> {
     if(size == list.length) list = Array.extend(list);
     list[size++] = v;
   }
-  
+
   /**
    * Checks if the specified token is found in the list.
    * @param v token to be checked
@@ -51,7 +51,7 @@ public final class TokenList implements Iterable<byte[]> {
     for(int i = 0; i < size; i++) if(Token.eq(list[i], v)) return true;
     return false;
   }
-  
+
   /**
    * Finishes the array.
    * @return array

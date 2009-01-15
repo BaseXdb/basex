@@ -428,7 +428,7 @@ public class AxisPath extends Path {
   public void addText(final XQContext ctx) {
     final Step s = step[step.length - 1];
     if(s.pred.length > 0 || !s.axis.down || s.test.kind != Test.Kind.NAME ||
-        !(ctx.item instanceof DBNode)) return;
+        s.test.type == Type.ATT || !(ctx.item instanceof DBNode)) return;
     
     final Data data = ((DBNode) ctx.item).data;
     final byte[] name = s.test.name.ln();

@@ -12,7 +12,7 @@ import org.xml.sax.SAXException;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class BXDocBuilderFactory extends DocumentBuilderFactory {
+public final class BXDocBuilderFactory extends DocumentBuilderFactory {
   @Override
   public DocumentBuilder newDocumentBuilder()
       throws ParserConfigurationException {
@@ -66,7 +66,7 @@ public class BXDocBuilderFactory extends DocumentBuilderFactory {
   public void setFeature(final String name, final boolean value) {
     BaseX.notimplemented();
   }
-  
+
   // doesn't overwrite its ancestor method..
   public static DocumentBuilderFactory newInstance() {
     return new BXDocBuilderFactory();

@@ -11,7 +11,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class IndexStats {
+public final class IndexStats {
   /** Minimum occurrences. */
   private int[] occMin;
   /** Maximum occurrences. */

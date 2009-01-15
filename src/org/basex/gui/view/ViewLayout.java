@@ -31,7 +31,7 @@ interface ViewLayout {
    * @param panel panel to be removed
    * @return true if panel was removed
    */
-  boolean remove(ViewPanel panel);
+  boolean delete(ViewPanel panel);
 
   /**
    * Adds a layout to the specified panel.

@@ -8,6 +8,7 @@ import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Expr;
+import org.basex.query.xquery.expr.Pos;
 import org.basex.query.xquery.expr.Preds;
 import org.basex.query.xquery.func.Fun;
 import org.basex.query.xquery.func.FunDef;
@@ -76,16 +77,16 @@ public class Step extends Preds {
 
     // No predicates.. evaluate via simple iterator
     if(pred.length == 0) return get(axis, test);
+    final Expr p = pred[0];
     
+    // Position predicate
+    final Pos pos = p instanceof Pos ? (Pos) p : null;
     // Last flag
-    final boolean last = pred[0] instanceof Fun &&
-      ((Fun) pred[0]).func == FunDef.LAST;
-    // Numeric value
-    final boolean num = pred[0].i() && ((Item) pred[0]).n();
+    final boolean last = p instanceof Fun && ((Fun) p).func == FunDef.LAST;
     // Multiple Predicates or POS
-    if(pred.length > 1 || !last && !num && usesPos()) return this;
+    if(pred.length > 1 || !last && pos == null && usesPos()) return this;
     // Use iterative evaluation
-    return new IterStep(axis, test, pred, last, num);
+    return new IterStep(axis, test, pred, pos, last);
   }
   
   @Override
@@ -114,8 +115,8 @@ public class Step extends Preds {
         int c = 0;
         for(int s = 0; s < nb.size; s++) {
           ctx.item = nb.list[s];
-          final Item i = ctx.iter(p).ebv();
-          if(i.n() ? i.dbl() == ctx.pos : i.bool()) {
+          final Item i = ctx.iter(p).test(ctx);
+          if(i != null) {
             // assign score value
             nb.list[s].score(i.score());
             nb.list[c++] = nb.list[s];

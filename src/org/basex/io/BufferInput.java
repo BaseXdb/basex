@@ -184,7 +184,7 @@ public class BufferInput {
   }
 
   /**
-   * Returns the next character, 0 if all bytes have been read or 
+   * Returns the next character, 0 if all bytes have been read or
    * a negative character value -1 if the read byte is invalid.
    * @return next character
    * @throws IOException I/O exception

@@ -18,7 +18,7 @@ public final class BXPI extends BXNode implements ProcessingInstruction {
   public BXPI(final Nod n) {
     super(n);
   }
-  
+
   @Override
   public String getNodeValue() {
     return Token.string(node.str());

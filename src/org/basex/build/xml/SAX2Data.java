@@ -13,8 +13,11 @@ import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * SAX Parser wrapper.
+ * 
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Christian Gruen
  */
-public class SAX2Data extends DefaultHandler implements LexicalHandler {
+public final class SAX2Data extends DefaultHandler implements LexicalHandler {
   /** Temporary attribute array. */
   final Atts atts = new Atts();
   /** Builder reference. */

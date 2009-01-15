@@ -6,7 +6,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.ButtonGroup;
-import javax.swing.JFrame;
+import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLabel;
@@ -40,10 +40,10 @@ public final class DialogInsert extends Dialog {
 
   /**
    * Default Constructor.
-   * @param parent parent frame
+   * @param main reference to the main window
    */
-  public DialogInsert(final JFrame parent) {
-    super(parent, INSERTTITLE);
+  public DialogInsert(final GUI main) {
+    super(main, INSERTTITLE);
 
     final BaseXBack pp = new BaseXBack();
     pp.setLayout(new BorderLayout());
@@ -60,7 +60,7 @@ public final class DialogInsert extends Dialog {
     input = new BaseXTextField(null);
     BaseXLayout.setWidth(input, 320);
 
-    input2 = new BaseXText(null);
+    input2 = new BaseXText(gui, null);
     input2.setFont(GUIConstants.mfont);
     input2.setPreferredSize(new Dimension(400, 200));
     input2.setEnabled(false);
@@ -102,7 +102,7 @@ public final class DialogInsert extends Dialog {
 
     buttons = BaseXLayout.okCancel(this);
     set(buttons, BorderLayout.SOUTH);
-    finish(parent);
+    finish();
   }
 
   @Override

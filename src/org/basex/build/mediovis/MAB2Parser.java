@@ -257,7 +257,7 @@ public final class MAB2Parser extends Parser {
   private static final byte[] CACHE = new byte[16];
 
   /**
-   * Get all characters up to specified character.
+   * Gets all characters up to specified character.
    * @param in input stream
    * @param delim delimiter
    * @return byte array

@@ -46,7 +46,7 @@ public final class Stemming {
     ts = 0;
     te = str.length;
     word();
-    
+
     final byte[] word = new byte[te - ts];
     System.arraycopy(tok, ts, word, 0, te - ts);
     return word;

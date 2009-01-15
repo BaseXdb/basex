@@ -13,7 +13,7 @@ public final class Atts {
   public byte[][] val = new byte[1][];
   /** Current array size. */
   public int size;
-  
+
   /**
    * Sets the specified value.
    * @param k key to be added
@@ -25,7 +25,7 @@ public final class Atts {
     add(k, v);
     return this;
   }
-  
+
   /**
    * Adds next value.
    * @param k key to be added
@@ -41,7 +41,7 @@ public final class Atts {
     val[size++] = v;
     return this;
   }
-  
+
   /**
    * Deletes the specified entry.
    * @param i entry to be deleted
@@ -50,7 +50,7 @@ public final class Atts {
     Array.move(key, i + 1, -1, --size - i);
     Array.move(val, i + 1, -1, size - i);
   }
-  
+
   /**
    * Adds the specified values if the key is new.
    * @param k key to be checked
@@ -62,7 +62,7 @@ public final class Atts {
     if(a) add(k, v);
     return a;
   }
-  
+
   /**
    * Returns the reference for the specified key.
    * @param k key to be found

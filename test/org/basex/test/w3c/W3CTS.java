@@ -185,7 +185,8 @@ public abstract class W3CTS {
     final Performance perf = new Performance();
     final Context context = new Context();
     Prop.xqformat = false;
-
+    Prop.mainmem = true;
+    
     new Check(path + input).execute(context, null);
     data = context.data();
 

@@ -15,12 +15,10 @@ import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.fs.DataFS;
-import org.basex.gui.GUI;
 import org.basex.gui.GUIFS;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.ViewRect;
-import org.basex.gui.view.View;
 import org.basex.gui.view.ViewData;
 import org.basex.io.BufferInput;
 import org.basex.util.Performance;
@@ -55,7 +53,7 @@ final class MapFS extends MapPainter {
 
   @Override
   void drawRectangles(final Graphics g, final ArrayList<ViewRect> rects) {
-    final Data data = GUI.context.data();
+    final Data data = view.gui.context.data();
     final ViewRect l = view.layouter.layout;
     final int ww = view.getWidth();
     final int hh = view.getHeight();
@@ -132,7 +130,7 @@ final class MapFS extends MapPainter {
           p += data.attSize(p, k);
         }
         g.setFont(mfont);
-        BaseXLayout.drawText(g, cr, tb.finish());
+        MapRenderer.drawText(g, cr, tb.finish());
       }
     }
   }
@@ -147,7 +145,7 @@ final class MapFS extends MapPainter {
   boolean drawRectangle(final Graphics g, final ViewRect rect,
       final boolean mark) {
 
-    final Context context = GUI.context;
+    final Context context = view.gui.context;
     final Data data = context.data();
     final int o = GUIProp.fontsize;
     final int pre = rect.pre;
@@ -210,7 +208,7 @@ final class MapFS extends MapPainter {
           rect.w -= off;
         }
 
-        final int h = BaseXLayout.calcHeight(g, rect, text);
+        final int h = MapRenderer.calcHeight(g, rect, text);
         if(img != null) {
           if(!mark) {
             g.setColor(COLORS[rect.level + 1]);
@@ -220,7 +218,7 @@ final class MapFS extends MapPainter {
         }
 
         g.setColor(Color.black);
-        BaseXLayout.drawText(g, rect, text);
+        MapRenderer.drawText(g, rect, text);
         if(h == GUIProp.fontsize && img != null) {
           final long size = toLong(fs.size(pre));
           final byte[] info = token(Performance.format(size, false));
@@ -273,7 +271,7 @@ final class MapFS extends MapPainter {
         rect.w -= 24;
         rect.h -= 24;
         g.setColor(Color.black);
-        BaseXLayout.drawText(g, rect, data.text(pre));
+        MapRenderer.drawText(g, rect, data.text(pre));
       }
     }
     if(!file || rect.w < (o << 1) || rect.h < (o << 1)) return false;
@@ -322,7 +320,7 @@ final class MapFS extends MapPainter {
 
     // draw file contents or binary information
     g.setFont(mfont);
-    BaseXLayout.drawText(g, rect, fileBuf, (int) s, true);
+    MapRenderer.drawText(g, rect, fileBuf, (int) s, true);
     return false;
   }
 
@@ -334,7 +332,7 @@ final class MapFS extends MapPainter {
       mx - r.x < 16 && fs.isFile(r.pre) &&
       GUIFS.mime(fs.name(r.pre)) != GUIFS.Type.IMAGE;
 
-    if(active && click) fs.launch(View.focused);
+    if(active && click) fs.launch(view.gui.focused);
     return active;
   }
 

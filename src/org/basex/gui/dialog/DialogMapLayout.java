@@ -2,8 +2,6 @@ package org.basex.gui.dialog;
 
 import static org.basex.Text.*;
 import java.awt.BorderLayout;
-import javax.swing.JFrame;
-
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
@@ -13,7 +11,6 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXListChooser;
 import org.basex.gui.layout.BaseXSlider;
 import org.basex.gui.layout.TableLayout;
-import org.basex.gui.view.View;
 
 /**
  * Dialog window for specifying the TreeMap layout.
@@ -35,10 +32,10 @@ public final class DialogMapLayout extends Dialog {
   
   /**
    * Default constructor.
-   * @param parent parent frame
+   * @param main reference to the main window
    */
-  public DialogMapLayout(final JFrame parent) {
-    super(parent, MAPLAYOUTTITLE, false);
+  public DialogMapLayout(final GUI main) {
+    super(main, MAPLAYOUTTITLE, false);
     
     final BaseXBack p = new BaseXBack();
     p.setLayout(new TableLayout(6, 1, 0, 5));
@@ -53,9 +50,8 @@ public final class DialogMapLayout extends Dialog {
     simple = new BaseXCheckBox(MAPSIMPLE, HELPMAPSIMPLE,
         GUIProp.mapsimple, 0, this);
     p.add(simple);
-    atts = new BaseXCheckBox(MAPATTS, HELPMAPATTS,
-        GUIProp.mapatts, this);
-    if(GUI.context.data().fs != null) {
+    atts = new BaseXCheckBox(MAPATTS, HELPMAPATTS, GUIProp.mapatts, this);
+    if(gui.context.data().fs != null) {
       atts.setEnabled(false);
     }
     p.add(atts);
@@ -63,12 +59,12 @@ public final class DialogMapLayout extends Dialog {
     // create slider
     propLabel = new BaseXLabel(MAPPROP);
     p.add(propLabel);
-    prop = new BaseXSlider(-234, 248, GUIProp.mapprop, HELPMAPALIGN, this);
+    prop = new BaseXSlider(gui, -234, 248, GUIProp.mapprop, HELPMAPALIGN, this);
     BaseXLayout.setWidth(prop, p.getPreferredSize().width);
     p.add(prop);
     set(p, BorderLayout.CENTER);
 
-    finish(parent, GUIProp.maplayoutloc);
+    finish(GUIProp.maplayoutloc);
     action(null);
   }
 
@@ -81,7 +77,7 @@ public final class DialogMapLayout extends Dialog {
     GUIProp.mapatts = atts.isSelected();
     propLabel.setText(MAPPROP + " " + (prp > 2 && prp < 7 ? "Centered" :
       prp < 3 ? "Vertical" : "Horizontal"));
-    View.notifyLayout();
+    gui.notify.layout();
   }
 
   @Override

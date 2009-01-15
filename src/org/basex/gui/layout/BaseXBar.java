@@ -5,7 +5,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
-import javax.swing.JComponent;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.util.Action;
@@ -34,7 +33,7 @@ public final class BaseXBar extends BaseXPanel {
   /** Flag reporting if the scrollbar animation is running. */
   boolean animated;
   /** Reference to the scrolled component. */
-  JComponent comp;
+  BaseXPanel comp;
   /** Scrollbar width. */
   int ww;
   /** Scrollbar height. */
@@ -69,7 +68,7 @@ public final class BaseXBar extends BaseXPanel {
    * if the component is completely displayed.
    * @param cmp reference to the scrolled component
    */
-  public BaseXBar(final JComponent cmp) {
+  public BaseXBar(final BaseXPanel cmp) {
     this(cmp, false);
   }
 
@@ -79,8 +78,8 @@ public final class BaseXBar extends BaseXPanel {
    * @param vis states if scrollbar is always visible or hidden when
    * the displayed content needs no scrollbar.
    */
-  public BaseXBar(final JComponent cmp, final boolean vis) {
-    super(null);
+  public BaseXBar(final BaseXPanel cmp, final boolean vis) {
+    super(cmp.gui, null);
     comp = cmp;
     visible = vis;
     addMouseListener(this);

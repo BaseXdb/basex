@@ -36,7 +36,7 @@ public final class FTContainsIndex extends FTContains {
         ctx.ftitem = ft;
         final FTNodeItem it = ftexpr.iter(ctx).next();
         ctx.ftitem = tmp;
-        if (it.ftn.ip != null && it.ftn.p !=  null) {
+        if (it.ftn.ip != null && it.ftn.p !=  null && ctx.ftdata != null) {
           ctx.ftdata.add(it.ftn.ip.finish(), it.ftn.p.finish());
         }
         return it.score() == 0 ? null : it;

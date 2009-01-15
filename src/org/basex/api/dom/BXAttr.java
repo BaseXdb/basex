@@ -49,12 +49,12 @@ public final class BXAttr extends BXNode implements Attr {
   public Node getNextSibling() {
     return null;
   }
-  
+
   @Override
   public Node getPreviousSibling() {
     return null;
   }
-  
+
   @Override
   public Node getParentNode() {
     return null;

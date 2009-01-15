@@ -20,16 +20,7 @@ public final class Copy extends AUpdate {
    * @param a arguments
    */
   public Copy(final String... a) {
-    this(false, a);
-  }
-
-  /**
-   * Constructor for GUI updates.
-   * @param g gui flag
-   * @param a arguments
-   */
-  public Copy(final boolean g, final String... a) {
-    super(g, null, a);
+    super(null, a);
   }
   
   @Override
@@ -40,7 +31,7 @@ public final class Copy extends AUpdate {
 
     Nodes src;
     Nodes trg;
-    if(gui) {
+    if(Prop.gui) {
       src = context.copied();
       trg = context.marked();
       context.copy(null);
@@ -56,7 +47,7 @@ public final class Copy extends AUpdate {
     final Data[] srcDocs = new Data[src.size];
     for(int c = 0; c < size; c++) srcDocs[c] = copy(src.data, src.nodes[c]);
 
-    final IntList marked = gui ? new IntList() : null;
+    final IntList marked = Prop.gui ? new IntList() : null;
     int copied = 0;
 
     for(int n = trg.size - 1; n >= 0; n--) {
@@ -74,16 +65,16 @@ public final class Copy extends AUpdate {
           Insert.checkText(data, pre, par, srcDocs[c].kind(s));
         if(up != -1) {
           data.update(up, Token.concat(data.text(up), srcDocs[c].text(s)));
-          if(gui && !marked.contains(up)) marked.add(up);
+          if(Prop.gui && !marked.contains(up)) marked.add(up);
         } else {
           data.insert(pre, par, srcDocs[c]);
-          if(gui) marked.add(pre);
+          if(Prop.gui) marked.add(pre);
         }
       }
       copied += size;
     }
     
-    if(gui) {
+    if(Prop.gui) {
       if(context.current().size > 1 || 
           context.current().nodes[0] == src.nodes[0]) {
         context.current(new Nodes(0, data));

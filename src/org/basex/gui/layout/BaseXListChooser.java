@@ -10,8 +10,6 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.event.MouseInputAdapter;
-
-import org.basex.gui.GUI;
 import org.basex.gui.dialog.Dialog;
 import org.basex.util.Token;
 
@@ -137,7 +135,7 @@ public final class BaseXListChooser extends BaseXBack {
     final MouseInputAdapter mouse = new MouseInputAdapter() {
       @Override
       public void mouseEntered(final MouseEvent e) {
-        GUI.get().focus(text, help);
+        BaseXLayout.help(text, help);
       }
       @Override
       public void mousePressed(final MouseEvent e) {

@@ -4,6 +4,7 @@ import java.awt.Container;
 import java.awt.Image;
 import java.awt.MediaTracker;
 import java.awt.Toolkit;
+
 import org.basex.util.Token;
 
 /**
@@ -217,9 +218,9 @@ public final class GUIFS {
     desc = new String[MAPSIZE];
     size = 1;
 
-    final Container comp = GUI.get();
-    final MediaTracker tracker = new MediaTracker(comp);
-    final Toolkit tk = comp.getToolkit();
+    final Container cont = new Container();
+    final MediaTracker tracker = new MediaTracker(cont);
+    final Toolkit tk = cont.getToolkit();
 
     try {
       int i = 0;

@@ -11,7 +11,7 @@ import org.basex.util.GetOpts;
  * Defines common methods for file system commands.
  * The implementing class names are supposed to equal the command names
  * (case sensitivity doesn't matter)
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Hannes Schwarz - Hannes.Schwarz@gmail.com
  */
@@ -22,7 +22,7 @@ public abstract class FSCmd {
   protected DataFS fs;
   /** Current dir. */
   protected int curPre;
-  
+
   /**
    * Returns an instance for the specified command.
    * @param cmd command
@@ -56,18 +56,18 @@ public abstract class FSCmd {
     fs = context.data().fs;
     curPre = ctx.current().nodes[0];
   }
-  
+
   /**
    * Checks the command line arguments.
    * @param args command line arguments
    * @throws FSException file system exception
    */
   public abstract void args(final String args) throws FSException;
-  
+
   /**
    * Executes the command..
    * @param out output stream
-   * @throws IOException in case of problems with the PrintOutput 
+   * @throws IOException in case of problems with the PrintOutput
    */
   public abstract void exec(final PrintOutput out) throws IOException;
 
@@ -128,7 +128,7 @@ public abstract class FSCmd {
     if(nodes.length == 0) error(path, 2);
     return nodes;
   }
-  
+
   /**
    * Creates a filesystem exception.
    * @param arg exception message
@@ -138,7 +138,7 @@ public abstract class FSCmd {
   final void error(final Object arg, final int error) throws FSException {
     throw new FSException(name(), arg, error);
   }
-  
+
   /**
    * Creates a warning.
    * @param out output stream

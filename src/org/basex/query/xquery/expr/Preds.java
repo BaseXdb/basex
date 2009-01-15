@@ -5,9 +5,6 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.expr.CmpG.Comp;
-import org.basex.query.xquery.func.Fun;
-import org.basex.query.xquery.func.FunDef;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.path.Step;
@@ -37,30 +34,18 @@ public abstract class Preds extends Expr {
   public Expr comp(final XQContext ctx) throws XQException {
     for(int p = 0; p < pred.length; p++) {
       Expr ex = pred[p].comp(ctx);
-      if(ex instanceof CmpG) {
-        final CmpG cmp = (CmpG) ex;
-        if(cmp.expr[0] instanceof Fun && ((Fun) cmp.expr[0]).func == FunDef.POS
-            && cmp.expr[1].i()) {
-          final Item i2 = (Item) cmp.expr[1];
-          if(cmp.cmp == Comp.EQ && i2.n()) {
-            ctx.compInfo(OPTSIMPLE, cmp, i2);
-            ex = i2;
-          }
-        }
-      }
-      pred[p] = ex;
-
+      ex = Pos.get(ex, CmpG.Comp.EQ, ex);
+      
       if(ex.i()) {
-        final Item it = (Item) ex;
-        if(!it.bool()) {
-          ctx.compInfo(OPTFALSE, it);
+        if(((Item) ex).bool()) {
+          ctx.compInfo(OPTTRUE, ex);
+          pred = Array.delete(pred, p--);
+        } else {
+          ctx.compInfo(OPTFALSE, ex);
           return null;
         }
-        if(!it.n()) {
-          ctx.compInfo(OPTTRUE, it);
-          pred = Array.delete(pred, p--);
-          continue;
-        }
+      } else {
+        pred[p] = ex;
       }
     }
     return this;

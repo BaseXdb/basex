@@ -1,7 +1,6 @@
 package org.basex.gui.dialog;
 
 import static org.basex.Text.*;
-
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -46,18 +45,18 @@ public final class DialogInfo extends Dialog {
 
   /**
    * Default Constructor.
-   * @param gui reference to main frame
+   * @param main reference to the main window
    */
-  public DialogInfo(final GUI gui) {
-    super(gui, INFOTITLE);
-    
+  public DialogInfo(final GUI main) {
+    super(main, INFOTITLE);
+
     // first tab
     final BaseXBack tab1 = new BaseXBack();
     tab1.setBorder(new CompoundBorder(new EtchedBorder(),
         new EmptyBorder(8, 8, 8, 8)));
     tab1.setLayout(new BorderLayout());
 
-    final Data data = GUI.context.data();
+    final Data data = gui.context.data();
     final MetaData meta = data.meta;
 
     final BaseXLabel doc = new BaseXLabel(meta.dbname);
@@ -84,8 +83,8 @@ public final class DialogInfo extends Dialog {
     BaseXBack p = new BaseXBack();
     p.setLayout(new BorderLayout());
 
-    indexes[0] = new BaseXCheckBox(INFOTEXTINDEX, Token.token(TXTINDEXINFO),
-        meta.txtindex, 0, this);
+    indexes[0] = new BaseXCheckBox(INFOTEXTINDEX,
+        Token.token(TXTINDEXINFO), meta.txtindex, 0, this);
     p.add(indexes[0], BorderLayout.NORTH);
 
     p.add(text(meta.txtindex ? data.info(IndexToken.Type.TXT) :
@@ -95,10 +94,10 @@ public final class DialogInfo extends Dialog {
     p = new BaseXBack();
     p.setLayout(new BorderLayout());
 
-    indexes[1] = new BaseXCheckBox(INFOATTRINDEX, Token.token(ATTINDEXINFO),
-        meta.atvindex, 0, this);
+    indexes[1] = new BaseXCheckBox(INFOATTRINDEX,
+        Token.token(ATTINDEXINFO), meta.atvindex, 0, this);
     p.add(indexes[1], BorderLayout.NORTH);
-    
+
     p.add(text(meta.atvindex ? data.info(IndexToken.Type.ATV) :
       Token.token(ATTINDEXINFO)), BorderLayout.CENTER);
     tab3.add(p);
@@ -109,9 +108,9 @@ public final class DialogInfo extends Dialog {
     tab4.setBorder(8, 8, 8, 8);
 
     ftedit = !meta.ftxindex;
-    indexes[2] = new BaseXCheckBox(INFOFTINDEX, Token.token(FTINDEXINFO),
-        meta.ftxindex, 0, this);
-    
+    indexes[2] = new BaseXCheckBox(INFOFTINDEX,
+        Token.token(FTINDEXINFO), meta.ftxindex, 0, this);
+
     p = new BaseXBack();
     p.setLayout(ftedit ? new TableLayout(10, 1) : new BorderLayout());
     p.add(indexes[2], BorderLayout.NORTH);
@@ -131,7 +130,7 @@ public final class DialogInfo extends Dialog {
       p.add(text(data.info(IndexToken.Type.FTX)), BorderLayout.CENTER);
     }
     tab4.add(p);
-    
+
     final JTabbedPane tabs = new JTabbedPane();
     BaseXLayout.addDefaultKeys(tabs, this);
     tabs.addTab(GENERALINFO, tab1);
@@ -149,12 +148,12 @@ public final class DialogInfo extends Dialog {
     action(null);
     setResizable(true);
     setMinimumSize(getPreferredSize());
-    finish(gui);
+    finish();
   }
 
   /**
    * Adds an index panel.
-   * @param tag tag/attribute flag 
+   * @param tag tag/attribute flag
    * @param data data reference
    * @return panel
    */
@@ -168,14 +167,14 @@ public final class DialogInfo extends Dialog {
     p.add(text(data.info(index)), BorderLayout.CENTER);
     return p;
   }
-  
+
   /**
    * Returns a text box.
    * @param txt contents
    * @return text box
    */
   private BaseXText text(final byte[] txt) {
-    final BaseXText text = new BaseXText(null, false, this);
+    final BaseXText text = new BaseXText(gui, null, false, this);
     text.setBorder(new EmptyBorder(5, 5, 5, 5));
     text.setText(txt);
     text.setFocusable(false);
@@ -192,11 +191,10 @@ public final class DialogInfo extends Dialog {
     for(int i = 0; i < indexes.length; i++) in[i] = indexes[i].isSelected();
     return in;
   }
-  
+
   @Override
   public void action(final String cmd) {
     if(BUTTONOPT.equals(cmd)) {
-      //GUI.get().execute(Commands.OPTIMIZE);
       opt = true;
       close();
     }
@@ -207,14 +205,14 @@ public final class DialogInfo extends Dialog {
         fl[f].setEnabled(ftx);
       }
     }
-    final Data data = GUI.context.data();
+    final Data data = gui.context.data();
     BaseXLayout.enableOK(buttons, BUTTONOPT, !data.meta.uptodate);
   }
 
   @Override
   public void close() {
     super.close();
-    final Data data = GUI.context.data();
+    final Data data = gui.context.data();
     final MetaData meta = data.meta;
     if(!ftedit) return;
     meta.ftfz = ft[0].isSelected();

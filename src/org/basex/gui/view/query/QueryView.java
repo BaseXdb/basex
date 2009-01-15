@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import org.basex.gui.GUI;
 import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
@@ -18,6 +17,7 @@ import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.View;
+import org.basex.gui.view.ViewNotifier;
 import org.basex.util.Token;
 
 /**
@@ -36,10 +36,10 @@ public final class QueryView extends View {
 
   /** Input mode buttons. */
   private final BaseXButton[] input = new BaseXButton[NPANELS];
-  /** Current query panel. */
+  /** Current search panel. */
   private QueryPanel search;
   /** Header string. */
-  final BaseXLabel header;
+  private final BaseXLabel header;
   /** Button box. */
   private final BaseXBack back;
   /** Open button. */
@@ -49,28 +49,27 @@ public final class QueryView extends View {
 
   /**
    * Default constructor.
+   * @param man view manager
    * @param help help text
    */
-  public QueryView(final byte[] help) {
-    super(help);
+  public QueryView(final ViewNotifier man, final byte[] help) {
+    super(man, help);
     setLayout(new BorderLayout(0, 4));
     setBorder(4, 8, 8, 8);
 
     back = new BaseXBack(Fill.NONE);
     back.setLayout(new BorderLayout());
-    header = new BaseXLabel(GUIConstants.QUERYVIEW, true);
+    header = new BaseXLabel(QUERYTIT, true);
     back.add(header, BorderLayout.NORTH);
 
     final Box box = new Box(BoxLayout.X_AXIS);
-    //box.setBorder(new EmptyBorder(0, 0, 0, 0));
-    
     for(int i = 0; i < NPANELS; i++) {
       final int m = i;
       input[i] = new BaseXButton(SEARCHMODE[i], HELPSEARCH[i]);
       input[i].addActionListener(new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
           mode = m;
-          refreshLayout();
+          update();
         }
       });
       box.add(input[i]);
@@ -78,24 +77,23 @@ public final class QueryView extends View {
       panels[i] = i == 0 ? new QueryArea(this) : new QuerySimple(this);
     }
 
-    open = GUIToolBar.newButton(GUICommands.XQOPEN);
-    save = GUIToolBar.newButton(GUICommands.XQSAVE);
+    open = GUIToolBar.newButton(GUICommands.XQOPEN, gui);
+    save = GUIToolBar.newButton(GUICommands.XQSAVE, gui);
     box.add(Box.createHorizontalGlue());
     box.add(open);
     box.add(Box.createHorizontalStrut(1));
     box.add(save);
 
     back.add(box, BorderLayout.CENTER);
-
     refresh();
   }
 
   @Override
   public void refreshInit() {
-    if(!GUI.context.db()) {
+    if(!gui.context.db()) {
       for(int i = 0; i < NPANELS; i++) panels[i].finish();
     } else {
-      refreshLayout();
+      update();
     }
   }
 
@@ -111,12 +109,17 @@ public final class QueryView extends View {
   public void refreshContext(final boolean more, final boolean quick) { }
 
   @Override
-  public void refreshUpdate() {
-    refreshLayout();
-  }
+  public void refreshUpdate() { }
 
   @Override
   public void refreshLayout() {
+    refresh();
+  }
+
+  /**
+   * Updates the query panels.
+   */
+  public void update() {
     for(int i = 0; i < NPANELS; i++) BaseXLayout.select(input[i], mode == i);
     removeAll();
     add(back, BorderLayout.NORTH);
@@ -168,7 +171,7 @@ public final class QueryView extends View {
   public void setXQuery(final byte[] xq) {
     panels[0].last = Token.string(xq);
     mode = 0;
-    refreshLayout();
+    update();
   }
 
   /**
@@ -177,5 +180,10 @@ public final class QueryView extends View {
    */
   public byte[] getXQuery() {
     return Token.token(panels[0].last);
+  }
+  
+  @Override
+  public boolean isValid() {
+    return GUIProp.showquery;
   }
 }

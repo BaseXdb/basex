@@ -43,6 +43,10 @@ public final class Or extends Arr {
       expr = Array.delete(expr, e--);
       if(expr.length == 0) return Bln.FALSE;
     }
+    
+    if(expr.length == 2 && expr[0] instanceof Pos  && expr[1] instanceof Pos) {
+      return ((Pos) expr[0]).union((Pos) expr[1]);
+    }
     return cmpG(ctx);
   }
   

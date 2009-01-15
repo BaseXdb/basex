@@ -89,7 +89,7 @@ public class BaseXClient {
         context.close();
       }
     });
-    
+
     if(allInfo || info)
       process(new Set(CmdSet.INFO, allInfo ? ALL : ON), false);
 
@@ -129,7 +129,7 @@ public class BaseXClient {
         while((in = input(INPUTCONT)).length() != 0) input += " " + in;
       }
     } while(input != null && process(input));
-    
+
     quit(input == null);
   }
 

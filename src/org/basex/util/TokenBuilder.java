@@ -16,14 +16,14 @@ public final class TokenBuilder {
   public boolean ent;
   /** Character array. */
   public byte[] chars;
-  
+
   /**
    * Empty constructor.
    */
   public TokenBuilder() {
     this(8);
   }
-  
+
   /**
    * Constructor, specifying an initial array size.
    * @param i size
@@ -31,24 +31,24 @@ public final class TokenBuilder {
   public TokenBuilder(final int i) {
     chars = new byte[i];
   }
-  
+
   /**
    * Constructor, specifying an initial string.
    * @param str initial string
    */
-  public TokenBuilder(final String str) { 
+  public TokenBuilder(final String str) {
     this(token(str));
   }
-  
+
   /**
    * Constructor, specifying an initial array.
    * @param str initial string
    */
-  public TokenBuilder(final byte[] str) { 
+  public TokenBuilder(final byte[] str) {
     chars = str;
     size = str.length;
   }
-  
+
   /**
    * Resets the token buffer.
    */
@@ -172,7 +172,7 @@ public final class TokenBuilder {
     }
     return this;
   }
-  
+
   /**
    * Chops leading and trailing whitespaces.
    */
