@@ -195,9 +195,9 @@ public final class MemData extends Data {
    * @param t tag
    * @param n namespace
    * @param d distance
+   * @param a number of attributes (+ 1)
+   * @param s node size (+ 1)
    * @param ne element has namespaces
-   * @param a number of attributes
-   * @param s node size
    */
   public void addElem(final long t, final long n, final long d, final long a,
       final long s, final boolean ne) {

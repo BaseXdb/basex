@@ -489,43 +489,44 @@ public final class DiskData extends Data {
 
   @Override
   public void insert(final int pre, final int par, final Data dt) {
-    
+
     // reference to root tag
-    final int pr = par > 0 ? par : -1;
-    final int ta = dt.kind(0) == DOC && pr > 0 ? 1 : 0;
-    final int ts = dt.size(ta, dt.kind(ta));
-    final int tb = ta + ts;
+    final int pr = par;
+    // first source node to be copied; if input is a document, skip first node
+    final int sa = dt.kind(0) == DOC && pr > 0 ? 1 : 0;
+    // number of nodes to be inserted
+    final int ss = dt.size(sa, dt.kind(sa));
     
-    // add all single nodes
-    for(int t = ta; t < tb; t++) {
-      final int k = dt.kind(t);
-      final int r = dt.parent(t, k);
+    // copy database entries
+    for(int s = sa; s < sa + ss; s++) {
+      final int k = dt.kind(s);
+      final int r = dt.parent(s, k);
       // recalculate distance for top nodes
-      final int d = r < ta ? pre - pr : t - r;
-      final int p = pre + t - ta - 1;
+      final int d = r < sa ? pre - pr : s - r;
+      final int p = pre + s - sa - 1;
 
       switch(k) {
         case ELEM:
           // add element
-          insertElem(p, d, dt.tag(t), dt.attSize(t, k), dt.size(t, k));
+          insertElem(p, d, dt.tag(s), dt.attSize(s, k), dt.size(s, k));
           break;
         case DOC:
           // add document
-          insertDoc(p, dt.size(t, k), dt.text(t));
+          insertDoc(p, dt.size(s, k), dt.text(s));
           break;
         case TEXT:
         case COMM:
         case PI:
           // add text
-          insertText(p, d, dt.text(t), k);
+          insertText(p, d, dt.text(s), k);
           break;
         case ATTR:
           // add attribute
-          insertAttr(p, d, dt.attName(t), dt.attValue(t));
+          insertAttr(p, d, dt.attName(s), dt.attValue(s));
           break;
       }
     }
-    updateTable(pre, pr, ts);
+    updateTable(pre, par, ss);
     
     // delete old empty root node
     if(size(0, DOC) == 1) delete(0);
@@ -540,8 +541,8 @@ public final class DiskData extends Data {
    * @param as number of attributes
    * @param s node size
    */
-  private void insertElem(final int pre, final int dis,
-      final byte[] tag, final int as, final int s) {
+  private void insertElem(final int pre, final int dis, final byte[] tag,
+      final int as, final int s) {
 
     final long id = ++meta.lastid;
     final int t = tags.index(tag, null, true);

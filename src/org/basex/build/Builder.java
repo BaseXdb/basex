@@ -162,7 +162,7 @@ public abstract class Builder extends Progress {
 
     meta.lastid = meta.size;
     if(meta.size == 0) {
-      addDoc(utf8(token("empty"), Prop.ENCODING));
+      addDoc(utf8(token(db), Prop.ENCODING));
       setSize(0, meta.size);
     }
     return finish();
