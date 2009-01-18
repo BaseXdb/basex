@@ -76,6 +76,7 @@ public final class DialogColors extends Dialog {
   @Override
   public void close() {
     close(GUIProp.colorsloc);
+    GUIProp.write();
   }
 
   @Override

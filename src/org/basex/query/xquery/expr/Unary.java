@@ -73,7 +73,7 @@ public final class Unary extends Single {
   }
 
   @Override
-  public Type returned() {
+  public Type returned(final XQContext ctx) {
     return Type.DBL;
   }
   

@@ -68,12 +68,19 @@ public final class TypeSwitch extends Single {
     for(final Case c : cs) if(c.usesVar(v)) return true;
     return false;
   }
+
+  @Override
+  public Expr removeVar(final Var v) {
+    if(var != null && v.eq(var)) return this;
+    for(int c = 0; c < cs.length; c++) cs[c] = cs[c].removeVar(v);
+    return this;
+  }
   
   @Override
-  public Type returned() {
-    final Type t = cs[0].returned();
-    for(int l = 1; l < cs.length; l++) if(t != cs[l].returned()) return null;
-    return t == ts.returned() ? t : null;
+  public Type returned(final XQContext ctx) {
+    final Type t = cs[0].returned(ctx);
+    for(int l = 1; l < cs.length; l++) if(t != cs[l].returned(ctx)) return null;
+    return t == ts.returned(ctx) ? t : null;
   }
 
   @Override

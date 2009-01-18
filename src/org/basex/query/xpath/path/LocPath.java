@@ -285,11 +285,10 @@ public abstract class LocPath extends Expr {
     return false;
   }
   
-  /**
+  /*
    * Get average text length for this path.
    * @param ctx current context
    * @return average text length
-   */
   public double[] textLength(final XPContext ctx) {
     if (steps.size() == 1 && steps.get(0).test == TestNode.TEXT)
       return ctx.item.data.skel.tl(null);
@@ -305,6 +304,7 @@ public abstract class LocPath extends Expr {
     }
     return null;
   }
+   */
   
   @Override
   public final void plan(final Serializer ser) throws IOException {

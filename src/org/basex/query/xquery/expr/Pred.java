@@ -45,7 +45,7 @@ public class Pred extends Preds {
     // Last flag
     final boolean last = p instanceof Fun && ((Fun) p).func == FunDef.LAST;
     // Multiple Predicates or POS
-    if(pred.length > 1 || !last && pos == null && usesPos()) return this;
+    if(pred.length > 1 || !last && pos == null && usesPos(ctx)) return this;
     // Use iterative evaluation
     return new IterPred(root, pred, pos, last);
   }

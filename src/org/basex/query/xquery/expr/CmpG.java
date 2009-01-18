@@ -36,17 +36,35 @@ public final class CmpG extends Arr {
   /** Comparators. */
   public enum Comp {
     /** General Comparison: less or equal. */
-    LE("<=", CmpV.Comp.LE),
+    LE("<=", CmpV.Comp.LE) {
+      @Override
+      public Comp invert() { return Comp.GE; }
+    },
     /** General Comparison: less. */
-    LT("<", CmpV.Comp.LT),
+    LT("<", CmpV.Comp.LT) {
+      @Override
+      public Comp invert() { return Comp.GT; }
+    },
     /** General Comparison: greater of equal. */
-    GE(">=", CmpV.Comp.GE),
+    GE(">=", CmpV.Comp.GE) {
+      @Override
+      public Comp invert() { return Comp.LE; }
+    },
     /** General Comparison: greater. */
-    GT(">", CmpV.Comp.GT),
+    GT(">", CmpV.Comp.GT) {
+      @Override
+      public Comp invert() { return Comp.LT; }
+    },
     /** General Comparison: equal. */
-    EQ("=", CmpV.Comp.EQ),
+    EQ("=", CmpV.Comp.EQ) {
+      @Override
+      public Comp invert() { return Comp.EQ; }
+    },
     /** General Comparison: not equal. */
-    NE("!=", CmpV.Comp.NE);
+    NE("!=", CmpV.Comp.NE) {
+      @Override
+      public Comp invert() { return Comp.NE; }
+    };
 
     /** String representation. */
     public final String name;
@@ -63,12 +81,18 @@ public final class CmpG extends Arr {
       cmp = c;
     }
     
+    /**
+     * Inverts the comparator.
+     * @return inverted comparator
+     */
+    public abstract Comp invert();
+    
     @Override
     public String toString() { return name; }
   };
 
   /** Comparator. */
-  public final Comp cmp;
+  public Comp cmp;
   /** Index type. */
   private IndexToken[] index = {};
 
@@ -86,10 +110,16 @@ public final class CmpG extends Arr {
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
     super.comp(ctx);
+    for(int e = 0; e != expr.length; e++) expr[e] = expr[e].addText(ctx);
 
+    if(expr[0].i() && expr[1] instanceof AxisPath) {
+      final Expr tmp = expr[0];
+      expr[0] = expr[1];
+      expr[1] = tmp;
+      cmp = cmp.invert();
+    }
     final Expr e1 = expr[0];
     final Expr e2 = expr[1];
-    if(e1 instanceof AxisPath) ((AxisPath) e1).addText(ctx);
 
     Expr e = this;
     if(e1.i() && e2.i()) {
@@ -97,7 +127,10 @@ public final class CmpG extends Arr {
     } else if(e1.e() || e2.e()) {
       e = Bln.FALSE;
     } else if(e1 instanceof Fun && ((Fun) e1).func == FunDef.POS) {
-      e = Pos.get(this, cmp, e2);
+      e = Pos.get(this, cmp.cmp, e2);
+    } else if(standard(true)) {
+      e = CmpR.get(this);
+      if(e == null) e = this;
     }
     if(e != this) ctx.compInfo(OPTPRE, this);
     return e;
@@ -231,32 +264,6 @@ public final class CmpG extends Arr {
     }
     return path;
   }
-
-  /**
-   * Collect all VarCall expressions.
-   * @return VarCall[]
-   */
-  public VarCall[] getVarCalls() {
-    VarCall[] v = new VarCall[0];
-    for (int i = 0; i < expr.length; i++) {
-      if (expr[i] instanceof AxisPath) {
-        v = Array.add(v, ((AxisPath) expr[i]).getVarCalls());
-      }
-    }
-    return v;
-  }
-  
-  /**
-   * Remove all varcall expressions vc.
-   */
-  public void removeVarCall() {
-    for (int i = 0; i < expr.length; i++) {
-      if (expr[i] instanceof AxisPath) {
-        ((AxisPath) expr[i]).removeVarCall();
-      }
-    }
-    
-  }
   
   /**
    * Returns the indexable index step or null.
@@ -276,16 +283,8 @@ public final class CmpG extends Arr {
     return path.step[path.step.length - 1];
   }
   
-  /**
-   * Checks if this expression has a path and a string as arguments.
-   * @return result of check
-   */
-  boolean standard() {
-    return expr[0] instanceof AxisPath && expr[1] instanceof Str;
-  }
-  
   @Override
-  public Type returned() {
+  public Type returned(final XQContext ctx) {
     return Type.BLN;
   }
 

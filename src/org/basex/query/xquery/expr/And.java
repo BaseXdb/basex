@@ -42,11 +42,35 @@ public final class And extends Arr {
       expr = Array.delete(expr, e--);
       if(expr.length == 0) return Bln.TRUE;
     }
-    
-    if(expr.length == 2 && expr[0] instanceof Pos  && expr[1] instanceof Pos) {
-      return ((Pos) expr[0]).intersect((Pos) expr[1]);
+
+    // merge predicates if possible
+    Expr[] ex = {};
+    Pos ps = null;
+    CmpR cr = null;
+    for(final Expr e : expr) {
+      Expr tmp = null;
+      if(e instanceof Pos) {
+        // merge position predicates
+        tmp = ps == null ? e : ps.intersect((Pos) e);
+        if(!(tmp instanceof Pos)) return tmp;
+        ps = (Pos) tmp;
+      } else if(e instanceof CmpR) {
+        // merge comparisons
+        tmp = cr == null ? e : cr.intersect((CmpR) e);
+        if(tmp instanceof CmpR) {
+          cr = (CmpR) tmp;
+        } else if(tmp != null) {
+          return tmp;
+        }
+      }
+      if(tmp == null) ex = Array.add(ex, e);
     }
-    return expr.length == 1 && expr[0].returned() == Type.BLN ? expr[0] : this;
+
+    expr = ex;
+    if(ps != null) expr = Array.add(expr, ps);
+    if(cr != null) expr = Array.add(expr, cr);
+    return expr.length == 1 && expr[0].returned(ctx) == Type.BLN ?
+        expr[0] : this;
   }
 
   @Override
@@ -68,7 +92,7 @@ public final class And extends Arr {
   }
   
   @Override
-  public Type returned() {
+  public Type returned(final XQContext ctx) {
     return Type.BLN;
   }
 

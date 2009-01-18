@@ -63,12 +63,12 @@ public final class CPI extends Arr {
   }
 
   @Override
-  public String toString() {
-    return "<?" + expr[0] + ' ' + expr[1] + "?>";
+  public String info() {
+    return "PI constructor";
   }
 
   @Override
-  public String info() {
-    return "PI constructor";
+  public String toString() {
+    return "<?" + expr[0] + ' ' + expr[1] + "?>";
   }
 }

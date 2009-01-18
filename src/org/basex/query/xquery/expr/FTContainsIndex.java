@@ -45,7 +45,7 @@ public final class FTContainsIndex extends FTContains {
   }
 
   @Override
-  public Type returned() {
+  public Type returned(final XQContext ctx) {
     return Type.NOD;
   }
 

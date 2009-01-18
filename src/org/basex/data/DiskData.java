@@ -136,7 +136,8 @@ public final class DiskData extends Data {
 
   @Override
   public synchronized void close() throws IOException {
-    flush();
+    // [CG] check if this is enough
+    if(!meta.uptodate) flush();
     cls();
   }
 
@@ -490,10 +491,8 @@ public final class DiskData extends Data {
   @Override
   public void insert(final int pre, final int par, final Data dt) {
 
-    // reference to root tag
-    final int pr = par;
     // first source node to be copied; if input is a document, skip first node
-    final int sa = dt.kind(0) == DOC && pr > 0 ? 1 : 0;
+    final int sa = dt.kind(0) == DOC && par > 0 ? 1 : 0;
     // number of nodes to be inserted
     final int ss = dt.size(sa, dt.kind(sa));
     
@@ -501,8 +500,8 @@ public final class DiskData extends Data {
     for(int s = sa; s < sa + ss; s++) {
       final int k = dt.kind(s);
       final int r = dt.parent(s, k);
-      // recalculate distance for top nodes
-      final int d = r < sa ? pre - pr : s - r;
+      // recalculate distance for root nodes
+      final int d = r < sa ? pre - par : s - r;
       final int p = pre + s - sa - 1;
 
       switch(k) {

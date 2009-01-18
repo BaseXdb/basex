@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.expr.CmpG.Comp;
+import org.basex.query.xquery.expr.CmpV.Comp;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Type;
@@ -111,12 +111,12 @@ public final class Pos extends Simple {
   }
   
   @Override
-  public boolean usesPos() {
+  public boolean usesPos(final XQContext ctx) {
     return true;
   }
   
   @Override
-  public Type returned() {
+  public Type returned(final XQContext ctx) {
     return Type.BLN;
   }
 

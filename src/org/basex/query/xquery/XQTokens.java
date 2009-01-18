@@ -275,6 +275,7 @@ public interface XQTokens {
   byte[] MAX = token("max");
   /** Minimum . */
   byte[] INF = token("inf");
+  
   /** Query Plan. */
   String ARG = "arg";
 }

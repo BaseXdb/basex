@@ -42,8 +42,8 @@ public final class List extends Arr {
     for(int v = 0; v != expr.length; v++) {
       sb.add((v != 0 ? ", " : "") + expr[v]);
       if(sb.size > 15 && v + 1 != expr.length) {
-        sb.add(", ...");
-        break;
+        //sb.add(", ...");
+        //break;
       }
     }
     return sb.add(')').toString();

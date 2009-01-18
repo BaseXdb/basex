@@ -108,7 +108,7 @@ public final class CmpN extends Arr {
   }
   
   @Override
-  public Type returned() {
+  public Type returned(final XQContext ctx) {
     return Type.BLN;
   }
 

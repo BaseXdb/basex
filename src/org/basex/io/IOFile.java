@@ -23,7 +23,7 @@ public final class IOFile extends IO {
   /** File reference. */
   private final File file;
   /** File length. */
-  private long len;
+  private long len = -1;
   /** Zip entry. */
   ZipEntry zip;
 
@@ -35,7 +35,6 @@ public final class IOFile extends IO {
   public IOFile(final String f) {
     file = new File(f);
     path = file.getAbsolutePath().replace('\\', '/');
-    len = file.length();
   }
 
   @Override
@@ -61,6 +60,7 @@ public final class IOFile extends IO {
 
   @Override
   public long length() {
+    if(len == -1) len = file.length();
     return len;
   }
 

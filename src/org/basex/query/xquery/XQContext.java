@@ -56,6 +56,8 @@ public final class XQContext extends QueryContext {
   public int pos;
   /** Current context size. */
   public int size;
+  /** Current leaf flag. */
+  public boolean leaf;
 
   /** Current fulltext item. */
   public FTPosData ftdata;

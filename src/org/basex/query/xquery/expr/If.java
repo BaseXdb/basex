@@ -41,9 +41,9 @@ public final class If extends Arr {
   }
 
   @Override
-  public Type returned() {
-    final Type t1 = expr[1].returned();
-    return t1 == expr[2].returned() ? t1 : null;
+  public Type returned(final XQContext ctx) {
+    final Type t1 = expr[1].returned(ctx);
+    return t1 == expr[2].returned(ctx) ? t1 : null;
   }
 
   @Override

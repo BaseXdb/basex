@@ -492,7 +492,9 @@ public interface XQText {
   /** Optimization info. */
   String OPTFLWOR = "Simplifying FLWOR expression";
   /** Optimization info. */
-  String OPTSTAT = "Dissolve variable %";
+  String OPTWHERE = "Converting where clause to predicate";
+  /** Optimization info. */
+  String OPTSTAT = "Removing variable %";
   /** Optimization info. */
   String OPTRED = "Merging redundant location paths";
   /** Optimization info. */
@@ -503,6 +505,8 @@ public interface XQText {
   String OPTATVINDEX = "Applying attribute index";
   /** Optimization info. */
   String OPTFTXINDEX = "Applying fulltext index";
+  /** Optimization info. */
+  String OPTRNGINDEX = "Applying range index";
   /** Optimization info. */
   String OPTEMPTY = "Removing empty sequences.";
   /** Optimization info. */

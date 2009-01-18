@@ -1,6 +1,8 @@
 package org.basex.query.xquery.item;
 
 import java.math.BigDecimal;
+
+import org.basex.BaseX;
 import org.basex.api.dom.BXAttr;
 import org.basex.api.dom.BXComm;
 import org.basex.api.dom.BXDoc;
@@ -8,6 +10,7 @@ import org.basex.api.dom.BXElem;
 import org.basex.api.dom.BXNode;
 import org.basex.api.dom.BXPI;
 import org.basex.api.dom.BXText;
+import org.basex.data.Data;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.iter.NodIter;
 import org.basex.query.xquery.iter.NodeIter;
@@ -414,6 +417,23 @@ public abstract class Nod extends Item {
     while((ch = children.next()) != null) {
       nodes.add(ch.finish());
       addDesc(ch.child(), nodes);
+    }
+  }
+
+  /**
+   * Returns a database kind for the specified node type.
+   * @param t node type
+   * @return node kind
+   */
+  public static int kind(final Type t) {
+    switch(t) {
+      case DOC: return Data.DOC;
+      case ELM: return Data.ELEM;
+      case TXT: return Data.TEXT;
+      case ATT: return Data.ATTR;
+      case COM: return Data.COMM;
+      case PI : return Data.PI;
+      default : BaseX.notexpected(); return -1;
     }
   }
 

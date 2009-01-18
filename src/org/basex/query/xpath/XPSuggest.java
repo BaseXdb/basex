@@ -50,7 +50,7 @@ public final class XPSuggest extends XPParser {
   @Override
   LocPath absLocPath(final LocPath path) throws QueryException {
     final ArrayList<SkelNode> list = new ArrayList<SkelNode>();
-    list.add(skel.root());
+    list.add(skel.root);
     stack.push(list);
     final LocPath lp = super.absLocPath(path);
     filter(false);
@@ -63,7 +63,7 @@ public final class XPSuggest extends XPParser {
     if(stack.size() == 0) {
       if(!ctx.root()) return super.relLocPath(path);
       list = new ArrayList<SkelNode>();
-      list.add(skel.root());
+      list.add(skel.root);
     } else {
       list = skel.desc(stack.peek(), 0, Data.ELEM, false);
     }

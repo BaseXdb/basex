@@ -132,6 +132,8 @@ public interface XPText {
   String OPTTEXT = "Adding text() step";
   /** Optimization info. */
   String OPTPREDS = "Rewriting predicate";
+  /** Optimization info. */
+  String OPTPOS = "Rewriting position predicate";
 
   // The following optimizations may not be covered by XQuery yet...
 
@@ -145,8 +147,6 @@ public interface XPText {
   String OPTONEOF = "Replacing ONEOF expression by index access";
   /** Optimization info. */
   String OPTRANGE = "Replacing AND by RANGE expression";
-  /** Optimization info. */
-  String OPTPOS = "Rewriting position predicate";
   
   /** Evaluation info. */
   String EVALSKIP = "rest of output skipped...";

@@ -23,16 +23,27 @@ public final class Root extends Simple {
     final SeqIter ir = new SeqIter();
     Item i;
     while((i = iter.next()) != null) {
-      if(!i.node()) Err.or(CTXNODE, this);
-      Nod n = (Nod) i;
-      while(n.parent() != null) n = n.parent();
+      final Nod n = root(i);
+      if(n == null) Err.or(CTXNODE, this);
       ir.add(n);
     }
     return ir;
   }
+  
+  /**
+   * Returns the root node of the specified item.
+   * @param i input node
+   * @return root node
+   */
+  public Nod root(final Item i) {
+    if(!i.node()) return null;
+    Nod n = (Nod) i;
+    while(n.parent() != null) n = n.parent();
+    return n;
+  }
 
   @Override
-  public Type returned() {
+  public Type returned(final XQContext ctx) {
     return Type.DOC;
   }
 

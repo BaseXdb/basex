@@ -105,8 +105,7 @@ public final class CAttr extends Arr {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("attribute " + atn + " { ");
-    sb.append(toString(", "));
-    return sb.append(" }").toString();
+    return new StringBuilder("attribute ").append(atn).append(" { ").
+      append(toString(", ")).append(" }").toString();
   }
 }

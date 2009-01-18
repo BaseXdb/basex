@@ -34,7 +34,7 @@ public abstract class Preds extends Expr {
   public Expr comp(final XQContext ctx) throws XQException {
     for(int p = 0; p < pred.length; p++) {
       Expr ex = pred[p].comp(ctx);
-      ex = Pos.get(ex, CmpG.Comp.EQ, ex);
+      ex = Pos.get(ex, CmpV.Comp.EQ, ex);
       
       if(ex.i()) {
         if(((Item) ex).bool()) {
@@ -52,10 +52,10 @@ public abstract class Preds extends Expr {
   }
   
   @Override
-  public final boolean usesPos() {
+  public boolean usesPos(final XQContext ctx) {
     for(final Expr p : pred) {
-      final Type t = p.returned();
-      if(t == null || t.num || p.usesPos()) return true;
+      final Type t = p.returned(ctx);
+      if(t == null || t.num || p.usesPos(ctx)) return true;
     }
     return false;
   }
@@ -64,6 +64,12 @@ public abstract class Preds extends Expr {
   public boolean usesVar(final Var v) {
     for(final Expr p : pred) if(p.usesVar(v)) return true;
     return false;
+  }
+
+  @Override
+  public Expr removeVar(final Var v) {
+    for(int p = 0; p < pred.length; p++) pred[p] = pred[p].removeVar(v);
+    return this;
   }
 
   @Override

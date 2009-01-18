@@ -3,6 +3,8 @@ package org.basex.data;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
+
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
@@ -20,7 +22,7 @@ public final class Skeleton {
   /** Parent stack. */
   private SkelNode[] stack;
   /** Root node. */
-  private SkelNode root;
+  public SkelNode root;
 
   /**
    * Default Constructor.
@@ -46,14 +48,6 @@ public final class Skeleton {
   public Skeleton(final Data d, final DataInput in) throws IOException {
     if(in.readBool()) root = new SkelNode(in);
     data = d;
-  }
-
-  /**
-   * Returns the skeleton root.
-   * @return root
-   */
-  public SkelNode root() {
-    return root;
   }
 
   /**
@@ -110,7 +104,6 @@ public final class Skeleton {
    * Returns average text length of a text node in bytes.
    * @param k tag element
    * @return average text length of a text node in bytes
-   */
   public double[] tl(final byte[] k) {
     if(k == null) return new double[] { root.tl, root.count };
     
@@ -129,6 +122,7 @@ public final class Skeleton {
     }
     return new double[] { sum, c };
   }
+   */
   
   /**
    * Returns descendant tags and attributes for the specified descendant path.
@@ -170,7 +164,25 @@ public final class Skeleton {
   }
 
   /**
-   * Returns the descendant for the specified nodes.
+   * Returns the specified nodes.
+   * @param in input node
+   * @param out output nodes
+   * @param t name reference
+   * @param k node kind
+   * @param desc if false, return only children
+   */
+  public void desc(final SkelNode in, final HashSet<SkelNode> out,
+      final int t, final int k, final boolean desc) {
+
+    for(SkelNode n : in.ch) {
+      if(desc) desc(n, out, t, k, desc);
+      if(k == -1 && n.kind != Data.ATTR || k == n.kind &&
+          (t == 0 || t == n.name)) out.add(n);
+    }
+  }
+
+  /**
+   * Returns the descendants of the specified nodes.
    * @param in input nodes
    * @param t name reference
    * @param k node kind

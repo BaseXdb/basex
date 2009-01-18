@@ -92,6 +92,7 @@ public final class DialogFontChooser extends Dialog {
   @Override
   public void close() {
     close(GUIProp.fontsloc);
+    GUIProp.write();
   }
 
   @Override

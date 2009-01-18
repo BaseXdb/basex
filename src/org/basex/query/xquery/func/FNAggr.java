@@ -15,6 +15,7 @@ import org.basex.query.xquery.item.Itr;
 import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
+import org.basex.query.xquery.path.AxisPath;
 import org.basex.query.xquery.util.Err;
 
 /**
@@ -23,7 +24,7 @@ import org.basex.query.xquery.util.Err;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-final class FNAggr extends Fun {
+public final class FNAggr extends Fun {
   @Override
   public Iter iter(final XQContext ctx, final Iter[] arg) throws XQException {
     final Iter iter = arg[0];
@@ -34,11 +35,9 @@ final class FNAggr extends Fun {
         if(c == -1) do ++c; while(iter.next() != null);
         return Itr.get(c).iter();
       case MIN:
-        if(arg.length == 2) checkColl(arg[1]);
-        return minmax(iter, CmpV.Comp.GT, ctx);
+        return minmax(arg, CmpV.Comp.GT, ctx);
       case MAX:
-        if(arg.length == 2) checkColl(arg[1]);
-        return minmax(iter, CmpV.Comp.LT, ctx);
+        return minmax(arg, CmpV.Comp.LT, ctx);
       case SUM:
         final Iter zero = arg.length == 2 ? arg[1] : null;
         Item it = iter.next();
@@ -58,38 +57,26 @@ final class FNAggr extends Fun {
       case AVG:
         return args[0].e() ? Seq.EMPTY : this;
       case COUNT:
-        if(args[0].e()) return Itr.get(0);
-        if(args[0].i()) return Itr.get(1);
-        if(args[0] instanceof Seq) return Itr.get(((Seq) args[0]).size());
-        return this;
-
-        /* a dirty sample for optimizing location path counts...
-        if(!(args[0] instanceof Path)) return this;
-        final Path path = (Path) args[0];
-        if(path.expr.length != 1) return this;
-        if(!(path.expr[0] instanceof Step)) return this;
-        final Step s = (Step) path.expr[0];
-        if(s.axis != Axis.DESC) return this;
-        // could also be something else (NAME, ...)..
-        if(s.test.kind != Test.Kind.STD) return this;
-
-        // might not be the current context set...
-        if(ctx.item == null) return this;
-        if(ctx.item.type != Type.DOC) return this;
-        if(!(ctx.item instanceof DNode)) return this;
-        final Data data = ((DNode) ctx.item).data;
-        if(!data.tags.uptodate) return this;
-        
-        //if(!(ctx.item instanceof DNode)) return this;
-        final byte[] nm = ((NameTest) s.test).ln;
-        final int id = data.tagID(nm);
-        final int c = data.tags.counter(id);
-        return Itr.get(c);*/
+        final int c = count(args[0], ctx);
+        return c >= 0 ? Itr.get(c) : this;
       default:
         return this;
     }
   }
   
+  /**
+   * Counts the number of expected results for the specified expression.
+   * @param arg argument
+   * @param ctx query context
+   * @return number of results
+   */
+  public static int count(final Expr arg, final XQContext ctx) {
+    if(arg.e()) return 0;
+    if(arg.i()) return 1;
+    if(arg instanceof Seq) return ((Seq) arg).size();
+    return arg instanceof AxisPath ? ((AxisPath) arg).count(ctx) : -1;
+  }
+
   /**
    * Sums up the specified item(s).
    * @param iter iterator
@@ -118,14 +105,17 @@ final class FNAggr extends Fun {
 
   /**
    * Returns a minimum or maximum item.
-   * @param iter input iterator
+   * @param arg arguments
    * @param cmp comparator
    * @param ctx xquery context
    * @return resulting item
    * @throws XQException thrown if the items can't be compared
    */
-  private Iter minmax(final Iter iter, final CmpV.Comp cmp, final XQContext ctx)
-      throws XQException {
+  private Iter minmax(final Iter[] arg, final CmpV.Comp cmp,
+      final XQContext ctx) throws XQException {
+
+    final Iter iter = arg[0];
+    if(arg.length == 2) checkColl(arg[1]);
 
     Item res = iter.next();
     if(res == null) return Iter.EMPTY;

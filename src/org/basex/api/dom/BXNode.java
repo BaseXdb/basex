@@ -59,15 +59,7 @@ public abstract class BXNode implements Node {
    * @return node kind
    */
   protected int kind() {
-    switch(node.type) {
-      case DOC: return Data.DOC;
-      case ELM: return Data.ELEM;
-      case TXT: return Data.TEXT;
-      case ATT: return Data.ATTR;
-      case COM: return Data.COMM;
-      case PI : return Data.PI;
-      default : BaseX.notexpected(); return -1;
-    }
+    return Nod.kind(node.type);
   }
 
   public String getNodeValue() {

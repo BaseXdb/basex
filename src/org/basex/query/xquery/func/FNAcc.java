@@ -81,7 +81,7 @@ final class FNAcc extends Fun {
   }
 
   @Override
-  public boolean usesPos() {
-    return func == FunDef.POS || func == FunDef.LAST || super.usesPos();
+  public boolean usesPos(final XQContext ctx) {
+    return func == FunDef.POS || func == FunDef.LAST || super.usesPos(ctx);
   }
 }

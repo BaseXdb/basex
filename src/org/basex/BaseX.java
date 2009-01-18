@@ -163,6 +163,6 @@ public final class BaseX extends BaseXClient {
   public static String bug(final Object... ext) {
     final TokenBuilder sb = new TokenBuilder(PROCBUG);
     if(ext.length != 0) sb.add(" (%)", ext);
-    return sb.add('.').add(PROCBUG).toString();
+    return sb.toString();
   }
 }

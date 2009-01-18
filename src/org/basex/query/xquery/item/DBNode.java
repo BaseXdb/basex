@@ -89,23 +89,6 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public String toString() {
-    switch(type) {
-      case ATT:
-        return type + "(" + string(data.attName(pre)) + "=\"" +
-        string(data.attValue(pre)) + "\")";
-      case DOC:
-        return type + "(\"" + data.meta.file + "\")";
-      case ELM:
-        return type + "(" + string(data.tag(pre)) + "/" + pre + ")";
-      default:
-        String str = string(str());
-        if(str.length() > 20) str = str.substring(0, 20) + "...";
-        return type + "(" + str + ")";
-    }
-  }
-
-  @Override
   public byte[] nname() {
     switch(type) {
       case ELM:
@@ -332,5 +315,22 @@ public class DBNode extends Nod {
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.emptyElement(this, NAM, token(data.meta.file.name()), PRE, token(pre));
+  }
+
+  @Override
+  public String toString() {
+    switch(type) {
+      case ATT:
+        return type + "{" + string(data.attName(pre)) + "=\"" +
+        string(data.attValue(pre)) + "\"}";
+      case DOC:
+        return type + "{(\"" + data.meta.file + "\"}";
+      case ELM:
+        return type + "{" + string(data.tag(pre)) + "," + pre + "}";
+      default:
+        String str = string(str());
+        if(str.length() > 20) str = str.substring(0, 20) + "...";
+        return type + "{" + str + "}";
+    }
   }
 }

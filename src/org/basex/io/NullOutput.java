@@ -20,7 +20,7 @@ public final class NullOutput extends PrintOutput {
 
   /**
    * Constructor.
-   * @param s if set to true, streaming is canceled in an early stage.
+   * @param s if set to true, streaming is canceled as soon as possible.
    */
   public NullOutput(final boolean s) {
     skip = s;

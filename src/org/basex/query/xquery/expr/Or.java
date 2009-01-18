@@ -59,7 +59,7 @@ public final class Or extends Arr {
     if(!(expr[0] instanceof CmpG)) return this;
 
     final CmpG e1 = (CmpG) expr[0];
-    if(!e1.standard()) return this;
+    if(!e1.standard(false)) return this;
 
     final SeqIter ir = new SeqIter();
     ir.add((Item) (e1.expr[1]));
@@ -67,7 +67,7 @@ public final class Or extends Arr {
     for(int e = 1; e != expr.length; e++) {
       if(!(expr[e] instanceof CmpG)) return this;
       final CmpG e2 = (CmpG) expr[e];
-      if(!e2.standard() || e1.cmp != e2.cmp ||
+      if(!e2.standard(false) || e1.cmp != e2.cmp ||
          !e1.expr[0].sameAs(e2.expr[0])) return this;
       ir.add((Item) (e2.expr[1]));
     }
@@ -113,7 +113,7 @@ public final class Or extends Arr {
   }
   
   @Override
-  public Type returned() {
+  public Type returned(final XQContext ctx) {
     return Type.BLN;
   }
 

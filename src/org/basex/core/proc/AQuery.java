@@ -102,6 +102,7 @@ abstract class AQuery extends Process {
       ser.close();
     }
     if(Prop.info) outInfo(o, result.size());
+    result.close();
   }
 
   /**

@@ -46,6 +46,12 @@ public final class Case extends Single {
     // new variable creates a new context
     return v == null || !v.eq(var) && super.usesVar(v);
   }
+
+  @Override
+  public Case removeVar(final Var v) {
+    if(!v.eq(var)) expr = expr.removeVar(v);
+    return this;
+  }
   
   /**
    * Evaluates the given sequence.
@@ -66,8 +72,8 @@ public final class Case extends Single {
   }
 
   @Override
-  public Type returned() {
-    return expr.returned();
+  public Type returned(final XQContext ctx) {
+    return expr.returned(ctx);
   }
 
   @Override

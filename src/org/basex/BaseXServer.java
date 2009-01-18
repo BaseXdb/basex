@@ -62,20 +62,20 @@ public final class BaseXServer {
   private BaseXServer(final String[] args) {
     Prop.server = true;
 
-    // this thread removes old entries from the process stack
+    if(!parseArguments(args)) return;
+
+    // this thread cleans the process stack
     new Thread() {
       @Override
       public void run() {
         while(running) {
-          Performance.sleep(Prop.timeout * 1000L);
+          Performance.sleep(2500L);
           clean();
         }
       }
     }.start();
 
     try {
-      if(!parseArguments(args)) return;
-
       final ServerSocket server = new ServerSocket(Prop.port);
       BaseX.outln(SERVERSTART);
       while(running) serve(server);

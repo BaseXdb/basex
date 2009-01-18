@@ -5,7 +5,9 @@ import org.basex.data.Serializer;
 import org.basex.query.xquery.IndexContext;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.item.Type;
+import org.basex.query.xquery.item.Item;
+import org.basex.query.xquery.item.Str;
+import org.basex.query.xquery.path.AxisPath;
 import org.basex.query.xquery.util.Var;
 
 /**
@@ -33,8 +35,8 @@ public abstract class Arr extends Expr {
   }
 
   @Override
-  public boolean usesPos() {
-    for(final Expr e : expr) if(e.usesPos()) return true;
+  public boolean usesPos(final XQContext ctx) {
+    for(final Expr e : expr) if(e.usesPos(ctx)) return true;
     return false;
   }
 
@@ -45,8 +47,9 @@ public abstract class Arr extends Expr {
   }
 
   @Override
-  public Type returned() {
-    return null;
+  public Expr removeVar(final Var v) {
+    for(int e = 0; e != expr.length; e++) expr[e] = expr[e].removeVar(v);
+    return this;
   }
 
   @Override
@@ -57,6 +60,16 @@ public abstract class Arr extends Expr {
       expr[e] = expr[e].indexEquivalent(ctx, ic);
     }
     return this;
+  }
+  
+  /**
+   * Checks if this expression has a path and an item as arguments.
+   * @param num number flag
+   * @return result of check
+   */
+  final boolean standard(final boolean num) {
+    return expr.length == 2  && expr[0] instanceof AxisPath && expr[1].i() &&
+      (num ? ((Item) expr[1]).n() : expr[1] instanceof Str);
   }
 
   /**

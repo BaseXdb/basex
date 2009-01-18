@@ -4,8 +4,10 @@ import static org.basex.query.xquery.path.Axis.*;
 import static org.basex.query.xquery.path.Test.NODE;
 import static org.basex.query.xquery.XQText.*;
 import java.io.IOException;
+import java.util.HashSet;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
+import org.basex.data.SkelNode;
 import org.basex.data.StatsKey;
 import org.basex.query.xquery.IndexContext;
 import org.basex.query.xquery.XQContext;
@@ -99,21 +101,22 @@ public class AxisPath extends Path {
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
     super.comp(ctx);
+
+    // merge two axis paths
+    if(root instanceof AxisPath) {
+      Step[] st = ((AxisPath) root).step;
+      root = ((AxisPath) root).root;
+      for(final Step s : step) st = Array.add(st, s);
+      step = st;
+    }
     
     final Item ci = ctx.item;
-    if(root != null) {
-      if(root instanceof Root) {
-        if(ctx.item != null) ctx.item = ctx.iter(root).next();
-      } else {
-        ctx.item = null;
-        if(root.i()) ctx.item = (Item) root;
-      }
-    }
+    setRoot(ctx);
     final Expr e = c(ctx);
     ctx.item = ci;
     return e;
   }    
-  
+
   /**
    * Compiles the location path.
    * @param ctx query context
@@ -153,7 +156,7 @@ public class AxisPath extends Path {
     final DBNode db = (DBNode) ctx.item;
     
     // skip position predicates and horizontal axes
-    for(final Step s : step) if(s.usesPos() || !s.axis.vert) return this;
+    for(final Step s : step) if(s.usesPos(ctx) || !s.axis.vert) return this;
 
     // loop through all steps
     for(int i = 0; i < step.length; i++) {
@@ -163,8 +166,6 @@ public class AxisPath extends Path {
       int minp = 0;
 
       for(int p = 0; p < stp.pred.length; p++) {
-        //System.out.println(stp.pred[p] + ": " + stp.pred[p].usesPos());
-        
         final IndexContext ic = new IndexContext(db.data, stp);
         stp.pred[p].indexAccessible(ctx, ic);
         if(ic.io && ic.iu) {
@@ -312,7 +313,51 @@ public class AxisPath extends Path {
       }
     }
   }
+  
+  /**
+   * Sets the root node as context item.
+   * @param ctx query context
+   */
+  public void setRoot(final XQContext ctx) {
+    if(root != null) {
+      if(root instanceof Root) {
+        if(ctx.item != null) ctx.item = ((Root) root).root(ctx.item);
+      } else {
+        ctx.item = null;
+        if(root.i()) ctx.item = (Item) root;
+      }
+    }
+  }
+  
+  /**
+   * Calculates the number of result nodes, using the skeleton.
+   * @param ctx query context
+   * @return number of results
+   */
+  public int count(final XQContext ctx) {
+    final Item ci = ctx.item;
+    int res = -1;
+    setRoot(ctx);
 
+    if(ctx.item instanceof DBNode && ((DBNode) ctx.item).pre == 0) {
+      final Data data = ((DBNode) ctx.item).data;
+      if(data.meta.uptodate && data.ns.size() == 0) {
+        HashSet<SkelNode> nodes = new HashSet<SkelNode>();
+        nodes.add(data.skel.root);
+        
+        for(final Step s : step) {
+          res = -1;
+          nodes = s.count(nodes, data);
+          if(nodes == null) break;
+          res = 0;
+          for(final SkelNode sn : nodes) res += sn.count;
+        }
+      }
+    }
+    ctx.item = ci;
+    return res;
+  }
+  
   /**
    * Converts each step into a For-Loops.
    * 
@@ -340,7 +385,7 @@ public class AxisPath extends Path {
     for(int l = 1; l < ll; l++) {
       if(!step[l - 1].simple(DESCORSELF)) continue;
       final Step next = step[l];
-      if(next.axis == CHILD && !next.usesPos()) {
+      if(next.axis == CHILD && !next.usesPos(ctx)) {
         Array.move(step, l, -1, ll-- - l);
         next.axis = DESC;
       }
@@ -421,23 +466,20 @@ public class AxisPath extends Path {
     return new AxisPath(rt, e);
   }
 
-  /**
-   * Adds a text step to the specified path.
-   * @param ctx query context
-   */
-  public void addText(final XQContext ctx) {
+  @Override
+  public Expr addText(final XQContext ctx) {
     final Step s = step[step.length - 1];
     if(s.pred.length > 0 || !s.axis.down || s.test.kind != Test.Kind.NAME ||
-        s.test.type == Type.ATT || !(ctx.item instanceof DBNode)) return;
+        s.test.type == Type.ATT || !(ctx.item instanceof DBNode)) return this;
     
     final Data data = ((DBNode) ctx.item).data;
-    final byte[] name = s.test.name.ln();
-    final StatsKey stats = data.tags.stat(data.tags.id(name));
+    final StatsKey stats = data.tags.stat(data.tags.id(s.test.name.ln()));
     
     if(data.meta.uptodate && stats != null && stats.leaf) {
       step = Array.add(step, Step.get(Axis.CHILD, new KindTest(Type.TXT)));
       ctx.compInfo(OPTTEXT, this);
     }
+    return this;
   }
 
   /**
@@ -446,35 +488,23 @@ public class AxisPath extends Path {
    * @return resulting path instance
    */
   public final AxisPath addPos(final XQContext ctx) {
-    if(step.length != 0) {
-      step[step.length - 1] = step[step.length - 1].addPos(ctx);
-      return get(root, step);
-    }
-    return this;
+    step[step.length - 1] = step[step.length - 1].addPos(ctx);
+    return get(root, step);
   }
 
   /**
-   * Get all VarCall expressions.
-   * @return VarCall[]
+   * Adds a predicate to the last step.
+   * @param pred predicate to be added
+   * @return resulting path instance
    */
-  public VarCall[] getVarCalls() { 
-    VarCall[] v = new VarCall[0];
-    if (root != null && root instanceof VarCall) 
-      v = Array.add(v, (VarCall) root);
-    return v;
+  public final AxisPath addPred(final Expr pred) {
+    step[step.length - 1] = step[step.length - 1].addPred(pred);
+    return get(root, step);
   }
-  
-  /**
-   * Remove all VarCall expression specified.
-   */
-  public void removeVarCall() { 
-    if (root != null && root instanceof VarCall) 
-      root = null;   
-  }
-  
+
   @Override
-  public boolean usesPos() {
-    return usesPos(step);
+  public boolean usesPos(final XQContext ctx) {
+    return usesPos(step, ctx);
   }
 
   @Override
@@ -483,8 +513,14 @@ public class AxisPath extends Path {
   }
 
   @Override
-  public Type returned() {
-    return Type.NOD;
+  public Expr removeVar(final Var v) {
+    for(int s = 0; s != step.length; s++) step[s] = step[s].removeVar(v);
+    return super.removeVar(v);
+  }
+
+  @Override
+  public Type returned(final XQContext ctx) {
+    return count(ctx) == 1 ? Type.NOD : null;
   }
 
   @Override

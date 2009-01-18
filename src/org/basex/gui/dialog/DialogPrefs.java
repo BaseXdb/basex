@@ -160,4 +160,11 @@ public final class DialogPrefs extends Dialog {
     GUIProp.javalook = javalook.isSelected();
     gui.notify.layout();
   }
+  
+  @Override
+  public void cancel() {
+    super.cancel();
+    GUIProp.write();
+    Prop.write();
+  }
 }

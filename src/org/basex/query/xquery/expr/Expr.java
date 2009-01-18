@@ -59,9 +59,11 @@ public abstract class Expr extends ExprInfo {
    * Indicates if an expression accesses the position of a context item.
    * Called by the compiler to perform certain optimizations.
    * <code>true</code> is returned by default and thus assumed as "worst-case".
+   * @param ctx query context
    * @return result of check
    */
-  public boolean usesPos() {
+  @SuppressWarnings("unused")
+  public boolean usesPos(final XQContext ctx) {
     return true;
   }
 
@@ -79,12 +81,24 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
+   * Removes the specified variable in a sub expression.
+   * @param v variable to be removed
+   * @return expression with removed variable
+   */
+  @SuppressWarnings("unused")
+  public Expr removeVar(final Var v) {
+    return this;
+  }
+
+  /**
    * Indicates the return type of an expression.
    * Called by the compiler to check if expressions can be reformulated.
    * null is returned by default.
+   * @param ctx query context
    * @return result of check
    */
-  public Type returned() {
+  @SuppressWarnings("unused")
+  public Type returned(final XQContext ctx) {
     return null;
   }
   
@@ -189,5 +203,15 @@ public abstract class Expr extends ExprInfo {
   protected Item atomic(final XQContext ctx, final Expr ex, final boolean e)
       throws XQException {
     return i() ? (Item) ex : ctx.iter(ex).atomic(this, e);
+  }
+
+  /**
+   * Adds a text to an expression.
+   * @param ctx query context
+   * @return expression
+   */
+  @SuppressWarnings("unused")
+  public Expr addText(final XQContext ctx) {
+    return this;
   }
 }

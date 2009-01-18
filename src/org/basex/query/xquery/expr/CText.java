@@ -54,14 +54,14 @@ public final class CText extends Single {
       more = true;
     }
   }
-  
-  @Override
-  public String toString() {
-    return "text { " + expr + " }";
-  }
 
   @Override
   public String info() {
     return "text constructor";
+  }
+  
+  @Override
+  public String toString() {
+    return "text { " + expr + " }";
   }
 }

@@ -83,6 +83,7 @@ public final class DialogMapLayout extends Dialog {
   @Override
   public void close() {
     close(GUIProp.maplayoutloc);
+    GUIProp.write();
   }
 
   @Override

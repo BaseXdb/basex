@@ -3,14 +3,10 @@ package org.basex.query.xquery.expr;
 import static org.basex.query.xquery.XQText.*;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.item.DBNode;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.util.Array;
-import org.basex.query.xquery.path.AxisPath;
-import org.basex.query.xquery.path.Step;
-import org.basex.query.xquery.util.Var;
 
 /**
  * FLWR Clause.
@@ -49,9 +45,17 @@ public final class FLWR extends FLWOR {
       ctx.compInfo(OPTFLWOR);
       return expr;
     }
-    //final boolean n = normalize(ctx);
+
+    /* [CG] convert where clause to predicate; check open issues
+    final ForLet f = fl[fl.length - 1];
+    if(where != null && f.expr instanceof AxisPath) {
+      if(where.usesVar(f.var)) {
+        ctx.compInfo(OPTWHERE);
+        f.expr = ((AxisPath) f.expr).addPred(where.removeVar(f.var));
+        where = null;
+      }
+    }*/
     return this;
-    //return n ? optimize(null, false) : this;
   }
 
   @Override
@@ -89,11 +93,10 @@ public final class FLWR extends FLWOR {
     };
   }
 
-  /**
+  /*
    * Normalize Expressions. 
    * Tries to resolve expressions nested For Loops.
    * @return boolean true, if anything was normalized
-   */
   boolean normalize() {
     boolean n = false;
       ForLet[] tmp = new ForLet[0];
@@ -155,12 +158,11 @@ public final class FLWR extends FLWOR {
       return n;
   }
   
-  /**
+  /*
    * Optimize normalized expressions.
    * @param ap AxisPath
    * @param ret flag for existing return clause
    * @return Optimized Expression
-   */
   AxisPath optimize(final AxisPath ap, final boolean ret) {
     Step[] s = new Step[0];
     Expr r = null;
@@ -182,4 +184,5 @@ public final class FLWR extends FLWOR {
     }
     return expr instanceof FLWR ? ((FLWR) expr).optimize(apt, true) : apt;
   }
+   */
 }

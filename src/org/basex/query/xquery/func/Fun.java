@@ -65,8 +65,8 @@ public abstract class Fun extends Expr {
     throws XQException;
 
   @Override
-  public boolean usesPos() {
-    for(final Expr a : args) if(a.usesPos()) return true;
+  public boolean usesPos(final XQContext ctx) {
+    for(final Expr a : args) if(a.usesPos(ctx)) return true;
     return false;
   }
 
@@ -75,9 +75,15 @@ public abstract class Fun extends Expr {
     for(final Expr a : args) if(a.usesVar(v)) return true;
     return false;
   }
+
+  @Override
+  public Expr removeVar(final Var v) {
+    for(int e = 0; e != args.length; e++) args[e] = args[e].removeVar(v);
+    return this;
+  }
   
   @Override
-  public final Type returned() {
+  public Type returned(final XQContext ctx) {
     return func.ret;
   }
 

@@ -20,6 +20,12 @@ public abstract class ForLet extends Expr {
   public boolean usesVar(final Var v) {
     return v == null || !v.eq(var);
   }
+
+  @Override
+  public Expr removeVar(final Var v) {
+    if(!var.eq(v)) expr = expr.removeVar(v);
+    return this;
+  }
   
   @Override
   public final String color() {

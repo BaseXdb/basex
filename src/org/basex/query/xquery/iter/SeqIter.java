@@ -5,6 +5,7 @@ import org.basex.data.Result;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
+import org.basex.query.xquery.item.DBNode;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Seq;
 
@@ -126,17 +127,18 @@ public final class SeqIter extends ResetIter implements Result {
 
   public void serialize(final Serializer ser) throws IOException {
     for(int c = 0; c < size && !ser.finished(); c++) serialize(ser, c);
-
-    // close temporary database references (data can only be serialized once)
-    for(int d = ctx.rootDocs; d < ctx.docs.length; d++) {
-      ctx.docs[d].data.close();
-    }
   }
 
   public void serialize(final Serializer ser, final int n) throws IOException {
     ser.openResult();
     ctx.serialize(ser, item[n]);
     ser.closeResult();
+  }
+  
+  public void close() throws IOException {
+    // close temporary database references
+    final DBNode[] docs = ctx.docs;
+    for(int d = ctx.rootDocs; d < docs.length; d++) docs[d].data.close();
   }
   
   @Override

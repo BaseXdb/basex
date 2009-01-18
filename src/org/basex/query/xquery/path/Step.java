@@ -2,9 +2,11 @@ package org.basex.query.xquery.path;
 
 import static org.basex.query.xquery.XQTokens.*;
 import static org.basex.query.xquery.XQText.*;
-
 import java.io.IOException;
+import java.util.HashSet;
+import org.basex.data.Data;
 import org.basex.data.Serializer;
+import org.basex.data.SkelNode;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Expr;
@@ -12,6 +14,7 @@ import org.basex.query.xquery.expr.Pos;
 import org.basex.query.xquery.expr.Preds;
 import org.basex.query.xquery.func.Fun;
 import org.basex.query.xquery.func.FunDef;
+import org.basex.query.xquery.item.DBNode;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Itr;
 import org.basex.query.xquery.item.Nod;
@@ -20,8 +23,10 @@ import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.NodIter;
 import org.basex.query.xquery.iter.NodeIter;
+import org.basex.query.xquery.path.Test.Kind;
 import org.basex.query.xquery.util.Err;
 import org.basex.query.xquery.util.Scoring;
+import org.basex.query.xquery.util.Var;
 import org.basex.util.Array;
 import org.basex.util.Token;
 
@@ -72,8 +77,17 @@ public class Step extends Preds {
 
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
+    if(!test.comp(ctx)) return Seq.EMPTY;
+    
+    if(ctx.item instanceof DBNode && test.kind == Kind.NAME) {
+      final Data data = ((DBNode) ctx.item).data;
+      ctx.leaf = axis.down && data.meta.uptodate && data.ns.size() == 0 &&
+        data.tags.stat(data.tagID(((NameTest) test).ln)).leaf;
+    }
     final Expr e = super.comp(ctx);
-    if(e != this || !test.comp(ctx)) return Seq.EMPTY;
+    ctx.leaf = false;
+
+    if(e != this) return Seq.EMPTY;
 
     // No predicates.. evaluate via simple iterator
     if(pred.length == 0) return get(axis, test);
@@ -84,7 +98,7 @@ public class Step extends Preds {
     // Last flag
     final boolean last = p instanceof Fun && ((Fun) p).func == FunDef.LAST;
     // Multiple Predicates or POS
-    if(pred.length > 1 || !last && pos == null && usesPos()) return this;
+    if(pred.length > 1 || !last && pos == null && usesPos(ctx)) return this;
     // Use iterative evaluation
     return new IterStep(axis, test, pred, pos, last);
   }
@@ -148,6 +162,39 @@ public class Step extends Preds {
   public final boolean simpleName(final Axis ax) {
     return axis == ax && pred.length == 0 && test.kind == Test.Kind.NAME;
   }
+
+  /**
+   * Counts a single location step.
+   * @param nodes input nodes
+   * @param data data reference
+   * @return node array
+   */
+  public HashSet<SkelNode> count(final HashSet<SkelNode> nodes,
+      final Data data) {
+
+    if(pred.length != 0) return null;
+    int kind = -1;
+    byte[] n = null;
+    int name = 0;
+
+    if(test.type != null) {
+      kind = Nod.kind(test.type);
+      if(kind == Data.PI) return null;
+
+      if(test.kind == Kind.NAME) n = ((NameTest) test).ln;
+      if(n == null && test.kind != null && test.kind != Kind.ALL) return null;
+      name = n == null ? 0 : kind == Data.ELEM ? data.tagID(n) :
+        kind == Data.ATTR ? data.attNameID(n) : 0;
+    }
+    final boolean desc = axis == Axis.DESC;
+    if(!desc && axis != Axis.CHILD) return null;
+    
+    final HashSet<SkelNode> out = new HashSet<SkelNode>();
+    for(final SkelNode sn : nodes) {
+      data.skel.desc(sn, out, name, kind, desc);
+    }
+    return out;
+  }
   
   /**
    * Adds a predicate to the step.
@@ -173,8 +220,14 @@ public class Step extends Preds {
   }
 
   @Override
-  public Type returned() {
-    return Type.NOD;
+  public Step removeVar(final Var v) {
+    for(int p = 0; p < pred.length; p++) pred[p] = pred[p].removeVar(v);
+    return this;
+  }
+
+  @Override
+  public Type returned(final XQContext ctx) {
+    return null;
   }
 
   @Override
@@ -183,8 +236,8 @@ public class Step extends Preds {
     final Step st = (Step) cmp;
     if(pred.length != st.pred.length || axis != st.axis ||
         !test.sameAs(st.test)) return false;
-    for(int s = 0; s < pred.length; s++) {
-      if(!pred[s].sameAs(st.pred[s])) return false;
+    for(int p = 0; p < pred.length; p++) {
+      if(!pred[p].sameAs(st.pred[p])) return false;
     }
     return true;
   }

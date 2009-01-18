@@ -2,6 +2,8 @@ package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQText.*;
 import java.io.IOException;
+
+import org.basex.BaseX;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
@@ -19,7 +21,7 @@ import org.basex.query.xquery.util.Var;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Ord {
+public final class Ord extends Simple {
   /** Order expression. */
   private SeqIter seq;
   /** Order expression. */
@@ -47,13 +49,16 @@ public final class Ord {
     lst = l;
   }
   
-  /**
-   * Compiles the expression to be sorted.
-   * @param ctx query context
-   * @throws XQException query exception
-   */
-  public void comp(final XQContext ctx) throws XQException {
+  @Override
+  public Expr comp(final XQContext ctx) throws XQException {
     if(expr != null) expr = expr.comp(ctx);
+    return this;
+  }
+
+  @Override
+  public Iter iter(final XQContext ctx) {
+    BaseX.notexpected();
+    return null;
   }
 
   /**
@@ -90,13 +95,20 @@ public final class Ord {
     return seq == null ? Itr.get(i) : seq.item[i];
   }
 
-  /**
-   * Variables test.
-   * @param v variable to be checked
-   * @return result of check
-   */
+  @Override
   public boolean usesVar(final Var v) {
     return expr.usesVar(v);
+  }
+
+  @Override
+  public Ord removeVar(final Var v) {
+    expr = expr.removeVar(v);
+    return this;
+  }
+
+  @Override
+  public void plan(final Serializer ser) throws IOException {
+    expr.plan(ser);
   }
   
   @Override
@@ -106,14 +118,5 @@ public final class Ord {
     if(desc) sb.append(" ascending");
     if(!lst) sb.append(" empty greatest");
     return sb.toString();
-  }
-
-  /**
-   * Serializes the abstract syntax tree.
-   * @param ser serializer
-   * @throws IOException exception
-   */
-  public void plan(final Serializer ser) throws IOException {
-    expr.plan(ser);
   }
 }

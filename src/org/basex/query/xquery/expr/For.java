@@ -11,6 +11,7 @@ import org.basex.query.xquery.item.Dbl;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Itr;
 import org.basex.query.xquery.item.Seq;
+import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.ResetIter;
 import org.basex.query.xquery.util.Scoring;
@@ -48,7 +49,10 @@ public final class For extends ForLet {
     expr = expr.comp(ctx);
     // empty sequence - empty loop
     if(expr.e()) return Seq.EMPTY;
-    if(pos == null && score == null && expr.i()) var.bind(expr, ctx);
+
+    // [CG] extend to arbitrary types
+    if(pos == null && score == null && (expr.returned(ctx) == Type.NOD ||
+        expr.i())) var.bind(expr, ctx);
 
     ctx.vars.add(var);
     if(pos != null) ctx.vars.add(pos);
@@ -104,6 +108,12 @@ public final class For extends ForLet {
   public boolean usesVar(final Var v) {
     return super.usesVar(v) || (score == null || !v.eq(score)) &&
       (pos == null || !v.eq(pos));
+  }
+
+  @Override
+  public Expr removeVar(final Var v) {
+    return !var.eq(v) && (score == null || !v.eq(score)) &&
+        (pos == null && !v.eq(pos)) ? super.removeVar(v) : this;
   }
   
   @Override

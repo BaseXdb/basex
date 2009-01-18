@@ -169,6 +169,7 @@ public final class XMLParser extends Parser {
 
   @Override
   public String det() {
+    System.out.println("!!");
     return scanner.det();
   }
 

@@ -3,6 +3,7 @@ package org.basex.query.xquery.expr;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
+import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.util.Var;
 
 /**
@@ -13,22 +14,23 @@ import org.basex.query.xquery.util.Var;
  */
 public abstract class Simple extends Expr {
   @Override
-  public final Expr comp(final XQContext ctx) {
+  @SuppressWarnings("unused")
+  public Expr comp(final XQContext ctx) throws XQException {
     return this;
   }
   
   @Override
-  public boolean usesPos() {
+  public boolean usesPos(final XQContext ctx) {
     return false;
   }
 
   @Override
-  public final boolean usesVar(final Var v) {
+  public boolean usesVar(final Var v) {
     return false;
   }
   
   @Override
-  public final String color() {
+  public String color() {
     return "FFFF66";
   }
   

@@ -18,6 +18,7 @@ import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.NodIter;
 import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.util.Err;
+import org.basex.query.xquery.util.Var;
 import org.basex.util.Atts;
 import org.basex.util.TokenBuilder;
 
@@ -70,21 +71,6 @@ public final class CElem extends Arr {
   @Override
   public Iter iter(final XQContext ctx) throws XQException {
     return new Constr().construct(ctx);
-  }
-  
-  @Override
-  public Type returned() {
-    return Type.ELM;
-  }
-
-  @Override
-  public String toString() {
-    return "elem { " + tag + "... }";
-  }
-
-  @Override
-  public String info() {
-    return "element constructor";
   }
 
   /** Construction helper class. */
@@ -205,6 +191,22 @@ public final class CElem extends Arr {
       return true;
     }
   }
+  
+  @Override
+  public Type returned(final XQContext ctx) {
+    return Type.ELM;
+  }
+
+  @Override
+  public boolean usesVar(final Var v) {
+    return tag.usesVar(v) || super.usesVar(v);
+  }
+
+  @Override
+  public Expr removeVar(final Var v) {
+    tag = tag.removeVar(v);
+    return super.removeVar(v);
+  }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
@@ -212,5 +214,17 @@ public final class CElem extends Arr {
     tag.plan(ser);
     for(final Expr e : expr) e.plan(ser);
     ser.closeElement();
+  }
+
+  @Override
+  public String info() {
+    return "element constructor";
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder("elem { " + tag);
+    for(final Expr e : expr) sb.append(", " + e);
+    return sb.append(" }").toString();
   }
 }

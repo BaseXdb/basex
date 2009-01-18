@@ -103,8 +103,7 @@ public final class Values extends Index {
     final double max = tok.max;
 
     final int mx = (long) max == max ? token(max).length : 0;  
-    final boolean sl = (long) max == max && (long) min == min && 
-      token(min).length == mx;
+    final boolean sl = mx != 0 && (long) min == min && token(min).length == mx;
     
     final IntList ids = new IntList();
     boolean found = false;
@@ -116,18 +115,16 @@ public final class Values extends Index {
       if(!found) {
         found = v == v;
         if(!found || v < min || v > max) continue;
+      } else if(v == v) {
+        // skip if if min, max and the current value have the same length
+        // and if current value is larger
+        if(sl && (text ? data.textLen(pre) : data.attLen(pre)) == mx &&
+            v > max) break;
+        if(v < min || v > max) continue;
       } else {
-        if(v == v) {
-          // skip if if min, max and the current value have the same length
-          // and if current value is larger
-          if(sl && (text ? data.textLen(pre) : data.attLen(pre)) == mx &&
-              v > max) break;
-          if(v < min || v > max) continue;
-        } else {
-          // skip if all numbers have been parsed
-          if((text ? data.text(pre) : data.attValue(pre))[0] > '9') break;
-          continue;
-        }
+        // skip if all numbers have been parsed
+        if((text ? data.text(pre) : data.attValue(pre))[0] > '9') break;
+        continue;
       }
 
       ids.add(pre);

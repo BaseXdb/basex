@@ -56,9 +56,10 @@ public class FLWOR extends Single {
     
     if(where != null) {
       where = where.comp(ctx);
-      if(where.i()) {
+      final boolean e = where.e();
+      if(e || where.i()) {
         // test is always false: no results
-        if(!((Item) where).bool()) {
+        if(e || !((Item) where).bool()) {
           ctx.compInfo(OPTFALSE, where);
           ctx.vars.reset(vs);
           return Seq.EMPTY;
@@ -71,6 +72,7 @@ public class FLWOR extends Single {
 
     if(order != null) order.comp(ctx);
     expr = expr.comp(ctx);
+    
     ctx.vars.reset(vs);
     return this;
   }
@@ -113,6 +115,14 @@ public class FLWOR extends Single {
     for(final ForLet f : fl) if(f.usesVar(v)) return true;
     return super.usesVar(v) || where != null && where.usesVar(v) ||
       order != null && order.usesVar(v);
+  }
+
+  @Override
+  public Expr removeVar(final Var v) {
+    for(final ForLet f : fl) if(f.usesVar(v)) return this;
+    if(where != null) where = where.removeVar(v);
+    if(order != null) order = order.removeVar(v);
+    return super.removeVar(v);
   }
 
   @Override

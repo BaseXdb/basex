@@ -40,11 +40,12 @@ public abstract class Path extends Expr {
   /**
    * Position test.
    * @param step step array
+   * @param ctx query context
    * @return result of check
    */
-  protected boolean usesPos(final Expr[] step) {
-    for(final Expr s : step) if(s.usesPos()) return true;
-    return root != null && root.usesPos();
+  protected boolean usesPos(final Expr[] step, final XQContext ctx) {
+    for(final Expr s : step) if(s.usesPos(ctx)) return true;
+    return root != null && root.usesPos(ctx);
   }
 
   /**
@@ -56,6 +57,13 @@ public abstract class Path extends Expr {
   protected boolean usesVar(final Var v, final Expr[] step) {
     for(final Expr s : step) if(s.usesVar(v)) return true;
     return root != null && root.usesVar(v);
+  }
+
+  @Override
+  public Expr removeVar(final Var v) {
+    if(root != null) root = root.removeVar(v);
+    if(root instanceof Context) root = null;
+    return this;
   }
 
   @Override

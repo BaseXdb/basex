@@ -102,8 +102,8 @@ public final class MixedPath extends Path {
   }
   
   @Override
-  public boolean usesPos() {
-    return usesPos(step);
+  public boolean usesPos(final XQContext ctx) {
+    return usesPos(step, ctx);
   }
 
   @Override
@@ -112,8 +112,14 @@ public final class MixedPath extends Path {
   }
 
   @Override
-  public Type returned() {
-    return step[step.length - 1].returned();
+  public Expr removeVar(final Var v) {
+    for(int s = 0; s != step.length; s++) step[s] = step[s].removeVar(v);
+    return super.removeVar(v);
+  }
+
+  @Override
+  public Type returned(final XQContext ctx) {
+    return step[step.length - 1].returned(ctx);
   }
 
   @Override

@@ -5,6 +5,7 @@ import static org.basex.query.xquery.XQText.*;
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.data.Serializer;
+import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
@@ -104,6 +105,18 @@ public class Seq extends Item {
       ser.closeResult();
     }
   }
+  
+  @Override
+  public Type returned(final XQContext ctx) {
+    return null;
+  }
+
+  @Override
+  public void plan(final Serializer ser) throws IOException {
+    ser.openElement(Token.token("sequence"), SIZE, Token.token(size));
+    for(int v = 0; v != Math.min(size, 5); v++) val[v].plan(ser);
+    ser.closeElement();
+  }
 
   @Override
   public String toString() {
@@ -116,12 +129,5 @@ public class Seq extends Item {
       }
     }
     return sb.append(")").toString();
-  }
-
-  @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(Token.token("sequence"), SIZE, Token.token(size));
-    for(int v = 0; v != Math.min(size, 5); v++) val[v].plan(ser);
-    ser.closeElement();
   }
 }

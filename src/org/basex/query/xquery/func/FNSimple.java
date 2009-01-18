@@ -78,8 +78,8 @@ public final class FNSimple extends Fun {
         }
         return this;
       case ZEROONE: return e || it != null ? args[0] : this;
-      case EXONE:   return it != null ? args[0] : this;
-      case ONEMORE: return it != null ? args[0] : this;
+      case EXONE:   return it != null ? it : this;
+      case ONEMORE: return it != null ? it : this;
       case UNORDER: return args[0];
       default:      return this;
     }

@@ -32,17 +32,23 @@ public abstract class Single extends Expr {
   }
 
   @Override
-  public boolean usesPos() {
-    return expr.usesPos();
+  public boolean usesPos(final XQContext ctx) {
+    return expr.usesPos(ctx);
   }
 
   @Override
   public boolean usesVar(final Var v) {
     return expr.usesVar(v);
   }
+
+  @Override
+  public Expr removeVar(final Var v) {
+    expr = expr.removeVar(v);
+    return this;
+  }
   
   @Override
-  public Type returned() {
+  public Type returned(final XQContext ctx) {
     return null;
   }
 

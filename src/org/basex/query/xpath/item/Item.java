@@ -138,4 +138,6 @@ public abstract class Item extends Expr implements Result {
   public void serialize(final Serializer ser, final int n) throws IOException {
     ser.item(str());
   }
+  
+  public void close() { }
 }

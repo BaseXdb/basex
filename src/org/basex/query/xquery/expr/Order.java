@@ -2,8 +2,8 @@ package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQTokens.*;
 import java.io.IOException;
+import org.basex.BaseX;
 import org.basex.data.Serializer;
-import org.basex.query.ExprInfo;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Item;
@@ -17,7 +17,7 @@ import org.basex.query.xquery.util.Var;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Order extends ExprInfo {
+public final class Order extends Simple {
   /** Sort list. */
   Ord[] ord;
   
@@ -29,13 +29,16 @@ public final class Order extends ExprInfo {
     ord = e;
   }
   
-  /**
-   * Compiles the expressions to be sorted.
-   * @param ctx query context
-   * @throws XQException evaluation exception
-   */
-  public void comp(final XQContext ctx) throws XQException {
+  @Override
+  public Expr comp(final XQContext ctx) throws XQException {
     for(final Ord o : ord) o.comp(ctx);
+    return this;
+  }
+
+  @Override
+  public Iter iter(final XQContext ctx) {
+    BaseX.notexpected();
+    return null;
   }
 
   /**
@@ -44,7 +47,7 @@ public final class Order extends ExprInfo {
    * @throws XQException evaluation exception
    */
   public void add(final XQContext ctx) throws XQException {
-    for(final Ord l : ord) l.add(ctx);
+    for(final Ord o : ord) o.add(ctx);
   }
 
   /**
@@ -87,14 +90,16 @@ public final class Order extends ExprInfo {
     };
   }
 
-  /**
-   * Variables test.
-   * @param v variable to be checked
-   * @return result of check
-   */
+  @Override
   public boolean usesVar(final Var v) {
     for(final Ord o : ord) if(o.usesVar(v)) return true;
     return false;
+  }
+
+  @Override
+  public Order removeVar(final Var v) {
+    for(int o = 0; o < ord.length; o++) ord[o] = ord[o].removeVar(v);
+    return this;
   }
 
   /**

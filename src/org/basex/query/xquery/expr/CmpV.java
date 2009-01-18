@@ -6,11 +6,14 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
+import org.basex.query.xquery.func.Fun;
+import org.basex.query.xquery.func.FunDef;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
+import org.basex.query.xquery.path.AxisPath;
 import org.basex.query.xquery.util.Err;
 import org.basex.util.Token;
 
@@ -30,6 +33,8 @@ public final class CmpV extends Arr {
         final int v = a.diff(b);
         return v != UNDEF && v <= 0;
       }
+      @Override
+      public Comp invert() { return GE; }
     },
 
     /** Item Comparison:less. */
@@ -39,6 +44,8 @@ public final class CmpV extends Arr {
         final int v = a.diff(b);
         return v != UNDEF && v < 0;
       }
+      @Override
+      public Comp invert() { return GT; }
     },
 
     /** Item Comparison:greater of equal. */
@@ -48,6 +55,8 @@ public final class CmpV extends Arr {
         final int v = a.diff(b);
         return v != UNDEF && v >= 0;
       }
+      @Override
+      public Comp invert() { return LE; }
     },
 
     /** Item Comparison:greater. */
@@ -57,6 +66,8 @@ public final class CmpV extends Arr {
         final int v = a.diff(b);
         return v != UNDEF && v > 0;
       }
+      @Override
+      public Comp invert() { return LT; }
     },
 
     /** Item Comparison:equal. */
@@ -65,6 +76,8 @@ public final class CmpV extends Arr {
       public boolean e(final Item a, final Item b) throws XQException {
         return a.eq(b);
       }
+      @Override
+      public Comp invert() { return EQ; }
     },
 
     /** Item Comparison:not equal. */
@@ -73,6 +86,8 @@ public final class CmpV extends Arr {
       public boolean e(final Item a, final Item b) throws XQException {
         return !a.eq(b);
       }
+      @Override
+      public Comp invert() { return NE; }
     };
 
     /** String representation. */
@@ -92,13 +107,19 @@ public final class CmpV extends Arr {
      * @throws XQException evaluation exception
      */
     public abstract boolean e(Item a, Item b) throws XQException;
+    
+    /**
+     * Inverts the comparator.
+     * @return inverted comparator
+     */
+    public abstract Comp invert();
 
     @Override
     public String toString() { return name; }
   }
   
   /** Comparator. */
-  private final Comp cmp;
+  public Comp cmp;
 
   /**
    * Constructor.
@@ -114,13 +135,25 @@ public final class CmpV extends Arr {
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
     super.comp(ctx);
+    for(int e = 0; e != expr.length; e++) expr[e] = expr[e].addText(ctx);
 
+    if(expr[0].i() && expr[1] instanceof AxisPath) {
+      final Expr tmp = expr[0];
+      expr[0] = expr[1];
+      expr[1] = tmp;
+      cmp = cmp.invert();
+    }
     final Expr e1 = expr[0];
     final Expr e2 = expr[1];
     
     Expr e = this;
-    if(e1.i() && e2.i()) e = eval((Item) expr[0], (Item) expr[1]);
-    else if(e1.e() || e2.e()) e = Seq.EMPTY;
+    if(e1.i() && e2.i()) {
+      e = eval((Item) expr[0], (Item) expr[1]);
+    } else if(e1.e() || e2.e()) {
+      e = Seq.EMPTY;
+    } else if(e1 instanceof Fun && ((Fun) e1).func == FunDef.POS) {
+      e = Pos.get(this, cmp, e2);
+    }
     if(e != this) ctx.compInfo(OPTPRE, this);
     return e;
   }
@@ -158,7 +191,7 @@ public final class CmpV extends Arr {
   }
 
   @Override
-  public Type returned() {
+  public Type returned(final XQContext ctx) {
     return Type.BLN;
   }
 

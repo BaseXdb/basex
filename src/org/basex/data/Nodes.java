@@ -187,6 +187,8 @@ public final class Nodes implements Result {
     ser.node(data, nodes[n], ftpos);
     ser.closeResult();
   }
+  
+  public void close() { }
 
   @Override
   public String toString() {

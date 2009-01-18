@@ -102,7 +102,7 @@ public class Set {
    * Returns number of entries.
    * @return number of entries.
    */
-  public final int size() {
+  public int size() {
     return size - 1;
   }
 

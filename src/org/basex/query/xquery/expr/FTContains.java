@@ -46,9 +46,8 @@ public class FTContains extends Expr {
   
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
-    expr = expr.comp(ctx);
+    expr = expr.comp(ctx).addText(ctx);
     ftexpr = ftexpr.comp(ctx);
-    if(expr instanceof AxisPath) ((AxisPath) expr).addText(ctx);
     
     Expr e = this;
     if(expr.e()) e = Bln.FALSE;
@@ -109,8 +108,8 @@ public class FTContains extends Expr {
   }
   
   @Override
-  public boolean usesPos() {
-    return expr.usesPos() || ftexpr.usesPos();
+  public boolean usesPos(final XQContext ctx) {
+    return expr.usesPos(ctx) || ftexpr.usesPos(ctx);
   }
 
   @Override
@@ -119,7 +118,14 @@ public class FTContains extends Expr {
   }
 
   @Override
-  public Type returned() {
+  public Expr removeVar(final Var v) {
+    expr = expr.removeVar(v);
+    ftexpr = ftexpr.removeVar(v);
+    return this;
+  }
+
+  @Override
+  public Type returned(final XQContext ctx) {
     return Type.BLN;
   }
 

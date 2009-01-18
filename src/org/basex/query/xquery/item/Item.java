@@ -251,7 +251,7 @@ public abstract class Item extends Expr {
   }
 
   @Override
-  public boolean usesPos() {
+  public boolean usesPos(final XQContext ctx) {
     return false;
   }
 
@@ -261,7 +261,7 @@ public abstract class Item extends Expr {
   }
   
   @Override
-  public Type returned() {
+  public Type returned(final XQContext ctx) {
     return type;
   }
 
