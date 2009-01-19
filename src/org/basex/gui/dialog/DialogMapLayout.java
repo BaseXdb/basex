@@ -107,7 +107,6 @@ public final class DialogMapLayout extends Dialog {
     propLabel.setText(MAPPROP + " " + (prp > 2 && prp < 7 ? "Centered" :
       prp < 3 ? "Vertical" : "Horizontal"));
     gui.notify.layout();
-    System.out.println(GUIProp.mapalgo);
   }
 
   @Override
