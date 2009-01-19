@@ -71,7 +71,7 @@ public final class SquarifiedLayout extends MapLayout {
             }
 
             // if ar has increased discard tmp and add row
-            if(allRatio(tmp) > allRatio(row)) {
+            if(lineRatio(tmp) > lineRatio(row)) {
               // add rects of row using recursion
               for(int i = 0; i < row.size(); i++) {
                 IntList newl = new IntList(1);
@@ -121,7 +121,7 @@ public final class SquarifiedLayout extends MapLayout {
             }
 
             // if ar has increased discard tmp and add row
-            if(allRatio(tmp) > allRatio(row)) {
+            if(lineRatio(tmp) > lineRatio(row)) {
               // add rects of row using recursion
               for(int i = 0; i < row.size(); i++) {
                 IntList newl = new IntList(1);

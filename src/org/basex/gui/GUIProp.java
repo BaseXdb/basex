@@ -93,6 +93,8 @@ public final class GUIProp {
 
   /** Flag for using a simple map layout. */
   public static boolean mapsimple = false;
+  /** Flag for computing additional mapinfos. */
+  public static boolean mapinfo = false;
   /** Show attributes in treemap. */
   public static boolean mapatts = false;
   /** Treemap Layout. */
@@ -108,6 +110,8 @@ public final class GUIProp {
   
   /** Dialog location. */
   public static int[] maplayoutloc = { 100, 100 };
+  /** Dialog location. */
+  public static int[] mapinfoloc = { 100, 100 };
   /** Dialog location. */
   public static int[] fontsloc = { 100, 100 };
   /** Dialog location. */
@@ -155,6 +159,8 @@ public final class GUIProp {
   public static int mapalgo = 0;
   /** Map alignment by size aggregation. */
   public static boolean mapaggr = false;
+  /** size <-> number of child weightening in (0;100). */
+  public static int sizeP = 50;
   /** Maximum Map depth. */
   public static int mapdepth = IO.MAXHEIGHT;
   /** Choice of interacting with TreeeMap. */

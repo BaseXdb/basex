@@ -1149,6 +1149,10 @@ public interface Text {
       lang("dm_choice1"), lang("dm_choice2"), lang("dm_choice3"),
       lang("dm_choice4"), lang("dm_choice5"), lang("dm_choice6")
   };
+  /** Dialog title for treemap info. */
+  String MAPINFOTITLE = lang("dmi_title");
+  /** Mapinfo checkbox. */
+  String MAPINFO = lang("dmi_info");
 
   /** Title of Memory Dialog. */
   String MEMTITLE = lang("dz_title");
@@ -1231,6 +1235,8 @@ public interface Text {
   byte[] HELPFSMAX = token(lang("h_fsmax"));
   /** Help String. */
   byte[] HELPMAPSIMPLE = token(lang("h_mapsimple"));
+  /** Help String. */
+  byte[] HELPMAPINFO = token(lang("h_mapinfo"));
   /** Help String. */
   byte[] HELPMAPATTS = token(lang("h_mapatts"));
   /** Help String. */

@@ -3,8 +3,10 @@ package org.basex.gui.view.map;
 import java.util.ArrayList;
 import org.basex.data.Data;
 import org.basex.gui.GUIProp;
+import org.basex.gui.view.ViewData;
 import org.basex.gui.view.ViewRect;
 import org.basex.util.IntList;
+import org.basex.util.Token;
 
 /**
  * Defines shared things of TreeMap Layout Algorithms.
@@ -15,10 +17,6 @@ import org.basex.util.IntList;
 abstract class MapLayout {
   /** Layout rectangle. */
   ViewRect layout;
-  /** List of laid out rectangles. */
-  // [JH] use this list instead of the given one of MapView to provide central
-  // access to analysis data
-  ArrayList<ViewRect> rectangles;
   /** Font size. */
   final int o = GUIProp.fontsize + 4;
 
@@ -40,13 +38,10 @@ abstract class MapLayout {
   /**
    * Calculates the average aspect Ratios of rectangles given in the List.
    *
-   * [JH] average aspect ratio as introduced by shneiderman is only for leaf
-   * nodes. here any nodes are used to compute it ....
-   *
    * @param r Array of rectangles
    * @return average aspect ratio
    */
-  public static double allRatio(final ArrayList<ViewRect> r) {
+  public static double lineRatio(final ArrayList<ViewRect> r) {
     if (r.isEmpty()) return Double.MAX_VALUE;
     double ar = 0;
 
@@ -62,39 +57,75 @@ abstract class MapLayout {
     return ar / r.size();
   }
 
-  // [JH] some metrics to implement
+  /**
+   * Computes average aspect ratio of a rectangle list as specified by 
+   * Shneiderman (checks only leafnodes).
+   * 
+   * @param r arrraylist of rects
+   * @param data Gui data reference
+   * @return aar 
+   */
+  public static double aar(final ArrayList<ViewRect> r, final Data data) {
+    double aar = 0;
 
+    for(int i = 0; i < r.size(); i++) {
+      ViewRect curr = r.get(i);
+      if (ViewData.isLeaf(data, curr.pre) && curr.w != 0 && curr.h != 0) {
+        if (curr.w > curr.h) {
+          aar += curr.w / curr.h;
+        } else {
+          aar += curr.h / curr.w;
+        }
+      }
+    }
+    return aar / r.size();
+  }
+  
   /**
    * Sorts Rectangles of a given List.
+   * 
    * @param nodes
    * @return sorted
    */
 
   /**
-   * Calculates the average distance.
+   * Calculates the average distance of two maplayouts using the euclidean 
+   * distance of each rect in the first and the second rectlist.
+   * 
+   * [JH] how to handle rects available in one of the lists not included in 
+   * the other one?
    *
-   * @param nodes
+   * @param first array of view rectangles
+   * @param second array of view rectangles
    * @return average distance
    */
+  public static double averageDistanceChange(final ArrayList<ViewRect> first, 
+      final ArrayList<ViewRect> second) {
+    double aDist = 0.0;
+    int length = Math.min(first.size(), second.size());
+    int x1, x2, y1, y2;
 
-  /**
-   * Calculates the layout change distance. Comparison of the changes in two
-   * layouts.
-   *
-   * @param one
-   * @param two
-   */
+    for (int i = 0; i < length; i++) {
+      if(first.get(i).pre == second.get(i).pre) {
+        x1 = first.get(i).x + first.get(i).w >> 1;
+        x2 = second.get(i).x + second.get(i).w >> 1;
+        y1 = first.get(i).y + first.get(i).h >> 1;
+        y2 = second.get(i).y + second.get(i).h >> 1;
+        aDist += ((x1 - x2) ^ 2 + (y1 - y2) ^ 2) ^ (1 / 2);
+      }
+    }
+    return aDist / length;
+  }
 
   /**
    * Returns the number of rectangles painted.
    *
-   * [JH] will work only if nodes are stored in here
-   *
-   * @return nr of rects
+   * @param rectangles array of painted rects
+   * @return nr of rects in the list
    */
-  /*public int getRectNumber() {
+  public int getRectNumber(final ArrayList<ViewRect> rectangles) {
     return rectangles.size();
-  }*/
+  }
 
   /**
    * Returns all children of the specified node.
@@ -102,7 +133,7 @@ abstract class MapLayout {
    * @param par parent node
    * @return children
    */
-  protected IntList children(final Data data, final int par) {
+  protected static IntList children(final Data data, final int par) {
     final IntList list = new IntList();
 
     final int kind = data.kind(par);
@@ -119,12 +150,50 @@ abstract class MapLayout {
   }
 
   /**
-   * Handles inserting rectangles into a strip.
-   * used by squarified, spiral, strip layout
-   *
-   * definition of direction is needed
+   * Calculates the percentual weight to use.
+   * uses gui prop slider (size_p) to define size by any attributes (for now
+   * use mixture of size and number of children) 
+   * weight = size_p * size + (1 - size_p) * |childs| whereas size_p in [0;1]
+   * 
+   * [JH] should be possible to replace size and childs by any other
+   * numerical attributes in future.
+   * 
+   * [JH] implement
+   * 
+   * @param rect pre val of rect
+   * @param par comparison rectangles
+   * @param data Data reference
+   * @return weight in context
    */
-
+  public static double calcWeight(final int rect, final int par, 
+      final Data data) {
+    double weight;
+    // get size of one node
+    long size = Token.toLong(data.attValue(data.sizeID, rect));
+    // parents size
+    long sSize = Token.toLong(data.attValue(data.sizeID, par));
+    // call weightening function
+    weight = calcWeight((int) size, children(data, rect).size,
+        (int) sSize, children(data, par).size);
+    return weight;
+  }
+  
+  /**
+   * Computes weight with given values for each value using GUIprop.sizeP.
+   * weight = sizeP * size + (1 - sizeP) * |childs| whereas sizeP in (0;100)
+   * 
+   * @param size one nodes size
+   * @param childs one nodes number of childs
+   * @param sSize compare to more nodes size
+   * @param sChilds compare to more nodes number of childs
+   * @return weight
+   */
+  public static double calcWeight(final int size, final int childs,
+      final int sSize, final int sChilds) {
+    return (GUIProp.sizeP * size / sSize) + 
+    (100 - GUIProp.sizeP * childs / sChilds);
+  }
+  
   /**
    * Recursively splits rectangles.
    * @param data data reference
