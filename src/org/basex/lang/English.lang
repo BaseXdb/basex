@@ -166,6 +166,9 @@ dm_choice4=Title, minimum Borders
 dm_choice5=Title, small Borders
 dm_choice6=Title, large Borders
 
+dmi_title=Map Information
+dmi_info=show additional Mapinformation
+
 dz_title=Memory Usage
 dz_total=Total Memory
 dz_reserved=Reserved Memory
@@ -559,6 +562,7 @@ h_mapsimple=If this checkbox is turned on, a simpler algorithm will be used to c
 h_mapatts= If this checkbox is turned on, attributes are shown inside the TreeMap.
 h_maplayout=Here you can modify the layout algorithm which is used in the Map visualization. The changes can be immediately seen if a database is opened.
 h_mapalign=Here you can modify the alignment of the rectangles in the Map visualization. The changes can be immediately seen if a database is opened.
+h_mapinfo=Here you can enable or disaple calculation of additional map information.
 h_drop=Choose the button to drop the currently chosen database.
 h_dropdb=Choose the database you want to drop.
 h_lf=The look & feel of the application can be changed with this option.

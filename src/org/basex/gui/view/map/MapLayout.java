@@ -158,8 +158,6 @@ abstract class MapLayout {
    * [JH] should be possible to replace size and childs by any other
    * numerical attributes in future.
    * 
-   * [JH] implement
-   * 
    * @param rect pre val of rect
    * @param par comparison rectangles
    * @param data Data reference
@@ -168,7 +166,7 @@ abstract class MapLayout {
   public static double calcWeight(final int rect, final int par, 
       final Data data) {
     double weight;
-    // get size of one node
+    // get size of the node
     long size = Token.toLong(data.attValue(data.sizeID, rect));
     // parents size
     long sSize = Token.toLong(data.attValue(data.sizeID, par));
