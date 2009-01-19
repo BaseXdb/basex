@@ -51,6 +51,8 @@ public final class MapView extends View implements Runnable {
 
   /** Array of current rectangles. */
   private ArrayList<ViewRect> mainRects;
+  /** Rectangles before layout-change. */
+//  private ArrayList<ViewRect> oldRects;
   /** Data specific map layout. */
   private MapPainter painter;
   /** Determines Layout Algorithm. */

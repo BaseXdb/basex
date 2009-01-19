@@ -58,7 +58,6 @@ public final class StripLayout extends MapLayout {
       double height = 0;
       while(ni < ne) {
         // height of current strip
-        /*if(ni != ne) {*/
           height = (l.list[ni + 1] - l.list[start]) * hh / nn;
           ArrayList<ViewRect> tmp = new ArrayList<ViewRect>();
           // create temporary row including current rectangle

@@ -25,6 +25,8 @@ import org.basex.gui.layout.TableLayout;
 public final class DialogMapInfo extends Dialog {
   /** show information. */
   private BaseXCheckBox info;
+  /** average aspect ratios. */
+//  private BaseXLabel aar1, aar2;
   
   /**
    * Default constructor.
@@ -38,8 +40,8 @@ public final class DialogMapInfo extends Dialog {
     // create checkbox
     info = new BaseXCheckBox(MAPINFOTOGGLE, HELPMAPINFO,
         GUIProp.mapinfo, 0, this);
-    p.add(info);
-    set(p, BorderLayout.CENTER);
+    
+    set(info, BorderLayout.CENTER);
     finish(GUIProp.mapinfoloc);
     action(null);
   }

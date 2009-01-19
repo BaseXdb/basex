@@ -165,6 +165,7 @@ dm_choice3=Title, no Borders
 dm_choice4=Title, minimum Borders
 dm_choice5=Title, small Borders
 dm_choice6=Title, large Borders
+dm_algo=layout-algorithm
 
 dmi_title=Map Information
 dmi_info=show additional Mapinformation

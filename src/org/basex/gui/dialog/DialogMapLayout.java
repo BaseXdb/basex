@@ -1,11 +1,16 @@
 package org.basex.gui.dialog;
 
 import static org.basex.Text.*;
+
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXCheckBox;
+import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXListChooser;
@@ -27,6 +32,8 @@ public final class DialogMapLayout extends Dialog {
   private BaseXCheckBox simple;
   /** Show attributes. */
   private BaseXCheckBox atts;
+  /** Select Layoutalgo. */
+  BaseXCombo propalgo;
   /** Temporary reference to the old map layout. */
   private final BaseXLabel propLabel;
   
@@ -38,6 +45,7 @@ public final class DialogMapLayout extends Dialog {
     super(main, MAPLAYOUTTITLE, false);
     
     final BaseXBack p = new BaseXBack();
+    // [JH] if line 87 is enabled 7 rows are needed
     p.setLayout(new TableLayout(6, 1, 0, 5));
 
     // create list
@@ -55,7 +63,27 @@ public final class DialogMapLayout extends Dialog {
       atts.setEnabled(false);
     }
     p.add(atts);
+    
+    // create drop down
+    BaseXBack tmpback = new BaseXBack();
+    tmpback.setLayout(new TableLayout(1, 2, 3, 5));
+    BaseXLabel label = new BaseXLabel(MAPPROPALGO);
+    tmpback.add(label);
+    propalgo = new BaseXCombo(new String[] {"SplitLayout", 
+        "SliceAndDice Layout", "SquarifiedLayout", "StripLayout"}, HELPMODE, 
+        false);
+    propalgo.setSelectedIndex(GUIProp.mapalgo);
 
+    propalgo.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent e) {
+        final int s = propalgo.getSelectedIndex();
+        if(s == GUIProp.mapalgo || !propalgo.isEnabled()) return;
+        action(null);
+      }
+    });
+    tmpback.add(propalgo);
+//    p.add(tmpback);
+    
     // create slider
     propLabel = new BaseXLabel(MAPPROP);
     p.add(propLabel);
@@ -73,11 +101,13 @@ public final class DialogMapLayout extends Dialog {
     GUIProp.maplayout = choice.getIndex();
     final int prp = prop.value();
     GUIProp.mapprop = prp;
+    GUIProp.mapalgo = propalgo.getSelectedIndex();
     GUIProp.mapsimple = simple.isSelected();
     GUIProp.mapatts = atts.isSelected();
     propLabel.setText(MAPPROP + " " + (prp > 2 && prp < 7 ? "Centered" :
       prp < 3 ? "Vertical" : "Horizontal"));
     gui.notify.layout();
+    System.out.println(GUIProp.mapalgo);
   }
 
   @Override

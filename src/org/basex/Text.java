@@ -1148,6 +1148,8 @@ public interface Text {
   String MAPATTS = lang("dm_atts");
   /** Layout information. */
   String MAPPROP = lang("dm_prop") + COL;
+  /** Map layout-algorithm. */
+  String MAPPROPALGO = lang("dm_algo") + COL;
   /** Predefined number of layouts. */
   String[] MAPLAYOUTCHOICE = {
       lang("dm_choice1"), lang("dm_choice2"), lang("dm_choice3"),

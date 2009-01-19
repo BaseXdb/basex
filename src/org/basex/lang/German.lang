@@ -167,6 +167,7 @@ dm_choice3=Titel, keine Ränder
 dm_choice4=Titel, minimale Ränder
 dm_choice5=Titel, kleine Ränder
 dm_choice6=Titel, große Ränder
+dm_algo=Layoutalgorithmus
 
 dmi_title=Map Information
 dmi_info=zusätzliche Mapinformationen anzeigen
