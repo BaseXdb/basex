@@ -112,4 +112,9 @@ public final class SplitLayout extends MapLayout {
           r.level), mainRects, l, ni, ne, level);
     }
   }
+
+  @Override
+  String getType() {
+    return "SplitLayout";
+  }
 }

@@ -108,4 +108,9 @@ public final class SliceDiceLayout extends MapLayout {
       }
     }
   }
+
+  @Override
+  String getType() {
+    return "SliceAndDice Layout";
+  }
 }

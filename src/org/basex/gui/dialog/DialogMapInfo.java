@@ -2,6 +2,8 @@ package org.basex.gui.dialog;
 
 import static org.basex.Text.*;
 
+import java.awt.BorderLayout;
+
 //import java.awt.BorderLayout;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
@@ -13,6 +15,9 @@ import org.basex.gui.layout.TableLayout;
 
 /**
  * Dialog window for additional TreeMap information.
+ * 
+ * [JH] needs some more labels for average aspect ratio, distance change, 
+ * number of drawn nodes, time needed, readability, ... if checkbox is enabled
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
@@ -27,15 +32,14 @@ public final class DialogMapInfo extends Dialog {
    */
   public DialogMapInfo(final GUI main) {
     super(main, MAPINFOTITLE, false);
-    
     final BaseXBack p = new BaseXBack();
-    p.setLayout(new TableLayout(6, 1, 0, 5));
-
+    p.setLayout(new TableLayout(6, 2, 0, 5));
+    this.setResizable(true);
     // create checkbox
-    info = new BaseXCheckBox(MAPINFO, HELPMAPINFO,
+    info = new BaseXCheckBox(MAPINFOTOGGLE, HELPMAPINFO,
         GUIProp.mapinfo, 0, this);
     p.add(info);
-    
+    set(p, BorderLayout.CENTER);
     finish(GUIProp.mapinfoloc);
     action(null);
   }

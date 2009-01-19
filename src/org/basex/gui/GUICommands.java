@@ -37,6 +37,7 @@ import org.basex.gui.dialog.DialogFontChooser;
 import org.basex.gui.dialog.DialogImportFS;
 import org.basex.gui.dialog.DialogInfo;
 import org.basex.gui.dialog.DialogInsert;
+import org.basex.gui.dialog.DialogMapInfo;
 import org.basex.gui.dialog.DialogMapLayout;
 import org.basex.gui.dialog.DialogOpen;
 import org.basex.gui.dialog.DialogPrefs;
@@ -647,6 +648,14 @@ public enum GUICommands implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       new DialogMapLayout(gui);
+    }
+  },
+  
+  /** Mapinfo. */
+  MAPINFO(true, GUIMAPINFO, "", GUIMAPINFOTT){
+    @Override
+    public void execute(final GUI gui) {
+      new DialogMapInfo(gui);
     }
   },
 

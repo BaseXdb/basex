@@ -20,7 +20,7 @@ import org.basex.gui.layout.TableLayout;
  */
 public final class DialogMapLayout extends Dialog {
   /** Map layouts. */
-  private BaseXListChooser choice;
+  private BaseXListChooser choice;  
   /** Layout slider. */
   private BaseXSlider prop;
   /** Simple layout. */
@@ -42,7 +42,7 @@ public final class DialogMapLayout extends Dialog {
 
     // create list
     choice = new BaseXListChooser(this, MAPLAYOUTCHOICE, HELPMAPLAYOUT);
-    choice.setSize(200, 110);
+    choice.setSize(500, 300);
     choice.setIndex(GUIProp.maplayout);
     p.add(choice);
 

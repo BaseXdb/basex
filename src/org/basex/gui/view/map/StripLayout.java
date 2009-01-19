@@ -105,4 +105,9 @@ public final class StripLayout extends MapLayout {
       }
     }
   }
+
+  @Override
+  String getType() {
+    return "StripLayout";
+  }
 }

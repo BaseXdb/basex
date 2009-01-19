@@ -205,4 +205,10 @@ abstract class MapLayout {
   abstract void calcMap(final Data data, final ViewRect r,
       ArrayList<ViewRect> mainRects, final IntList l, final int ns,
       final int ne, final int level);
+  
+  /**
+   * Finding out which kind of Maplayout we are using right now.
+   * @return name Of Layoutalgorithm
+   */
+  abstract String getType();
 }

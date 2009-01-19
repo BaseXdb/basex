@@ -155,4 +155,9 @@ public final class SquarifiedLayout extends MapLayout {
       }
     }
   }
+
+  @Override
+  String getType() {
+    return "SquarifiedLayout";
+  }
 }

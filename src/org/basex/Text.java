@@ -786,6 +786,10 @@ public interface Text {
   /** Command Info. */
   String GUIMAPLAYOUTTT = lang("c_maplayouttt");
   /** Command Info. */
+  String GUIMAPINFO = lang("c_mapinfo");
+  /** Command Info. */
+  String GUIMAPINFOTT = lang("c_mapinfott");
+  /** Command Info. */
   String GUIOPEN = lang("c_open") + DOTS;
   /** Command Info. */
   String GUIOPENTT = lang("c_opentt");
@@ -1152,7 +1156,7 @@ public interface Text {
   /** Dialog title for treemap info. */
   String MAPINFOTITLE = lang("dmi_title");
   /** Mapinfo checkbox. */
-  String MAPINFO = lang("dmi_info");
+  String MAPINFOTOGGLE = lang("dmi_info");
 
   /** Title of Memory Dialog. */
   String MEMTITLE = lang("dz_title");
