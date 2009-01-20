@@ -58,11 +58,12 @@ public final class DataAccessMM {
     len = file.length();
     if(len <= BUFFERSIZE) {
       mbytebuffer = rwChannel.map(FileChannel.MapMode.READ_WRITE, 0, len);
-      off = 0;
     } else {
       mbytebuffer = rwChannel.map(FileChannel.MapMode.READ_WRITE,
           0, BUFFERSIZE);
     }
+    // init offset
+    off = 0;
     // secure persisting changes
     mbytebuffer.force();
   }
@@ -87,9 +88,8 @@ public final class DataAccessMM {
    * Reads an 5-byte value from the specified file offset.
    * @param p position
    * @return long value
-   * @throws IOException if setting cursor went wrong
    */
-  public synchronized long read5(final long p) throws IOException {
+  public synchronized long read5(final long p) {
     cursor(p);
     return ((long) read() << 32) + ((long) read() << 24) +
       (read() << 16) + (read() << 8) + read();
@@ -99,9 +99,8 @@ public final class DataAccessMM {
    * Reads a {@link Num} value from disk.
    * @param p text position
    * @return read num
-   * @throws IOException if setting curser went wrong
    */
-  public synchronized int readNum(final long p) throws IOException {
+  public synchronized int readNum(final long p) {
     cursor(p);
     return readNum();
   }
@@ -110,9 +109,8 @@ public final class DataAccessMM {
    * Reads a token from disk.
    * @param p text position
    * @return text as byte array
-   * @throws IOException if setting curser went wrong
    */
-  public synchronized byte[] readToken(final long p) throws IOException {
+  public synchronized byte[] readToken(final long p) {
     cursor(p);
     int l = readNum();
     final byte[] b = new byte[l];
@@ -142,9 +140,8 @@ public final class DataAccessMM {
    * Reads an integer value from the specified position.
    * @param p position
    * @return integer value
-   * @throws IOException if setting curser went wrong
    */
-  public synchronized int readInt(final long p) throws IOException {
+  public synchronized int readInt(final long p) {
     cursor(p);
     return readInt();
   }
@@ -153,9 +150,8 @@ public final class DataAccessMM {
    * Reads a byte value from the specified position.
    * @param p position
    * @return integer value
-   * @throws IOException if setting curser went wrong
    */
-  public synchronized byte readByte(final long p) throws IOException {
+  public synchronized byte readByte(final long p) {
     cursor(p);
     return readByte();
   }
@@ -163,9 +159,8 @@ public final class DataAccessMM {
   /**
    * Reads a byte value.
    * @return integer value
-   * @throws IOException if read went wrong
    */
-  public synchronized byte readByte() throws IOException {
+  public synchronized byte readByte() {
     return (byte) read();
   }
 
@@ -174,10 +169,8 @@ public final class DataAccessMM {
    * @param from starting position for reading
    * @param to ending position for reading
    * @return byte array
-   * @throws IOException if read went wrong
    */
-  public synchronized byte[] readBytes(final long from, final long to)
-  throws IOException {
+  public synchronized byte[] readBytes(final long from, final long to) {
     final byte[] array = new byte[(int) (to - from)];
     cursor(from);
     // can array size exceed remaining buffer size???
@@ -189,10 +182,8 @@ public final class DataAccessMM {
    * Append a value to the file and return it's offset.
    * @param p write position
    * @param v byte array to be appended
-   * @throws IOException if setting curser went wrong
    */
-  public synchronized void writeBytes(final long p, final byte[] v)
-  throws IOException {
+  public synchronized void writeBytes(final long p, final byte[] v) {
     cursor(p);
     writeNum(v.length);
     mbytebuffer.put(v);
@@ -203,28 +194,29 @@ public final class DataAccessMM {
   /**
    * Moves reading window. Sets new offset and resets position.
    * @param p new position
-   * @throws IOException if mapping went wrong
    */
-  private synchronized void moveWindow(final long p) throws IOException {
-    // check if mapped buffer exceeds remaining file length
-    if((len - p) < BUFFERSIZE) {
-      mbytebuffer = rwChannel.map(FileChannel.MapMode.READ_WRITE,
-          p, len - p + 1);
-    } else {
-      mbytebuffer = rwChannel.map(FileChannel.MapMode.READ_WRITE,
-          p, BUFFERSIZE);
+  private synchronized void moveWindow(final long p) {
+    try {
+      // check if mapped buffer exceeds remaining file length
+      if((len - p) < BUFFERSIZE) {
+        mbytebuffer = rwChannel.map(FileChannel.MapMode.READ_WRITE, 
+            len - p, BUFFERSIZE);
+        off = len - p - 1;
+      } else {
+        mbytebuffer = rwChannel.map(FileChannel.MapMode.READ_WRITE, 
+            p, BUFFERSIZE);
+        off = p;
+      }
+    } catch(IOException e) {
+      e.printStackTrace();
     }
-    // position starts at 0
-    off = p - 1;
-    mbytebuffer.position(0);
   }
 
   /**
    * Sets the disk cursor.
    * @param p read position
-   * @throws IOException if moving window went wrong
    */
-  public synchronized void cursor(final long p) throws IOException {
+  public synchronized void cursor(final long p) {
     // check if window have to be moved forward or backward
     if(p > (off + BUFFERSIZE) || p < off) {
       moveWindow(p);
@@ -238,9 +230,8 @@ public final class DataAccessMM {
   /**
    * Reads the next byte.
    * @return next byte
-   * @throws IOException if moving window went wrong
    */
-  public synchronized int read() throws IOException {
+  public synchronized int read() {
     if(mbytebuffer.position() == BUFFERSIZE) {
       moveWindow(off + BUFFERSIZE);
     }
@@ -258,9 +249,8 @@ public final class DataAccessMM {
   /**
    * Reads the next compressed number and returns it as integer.
    * @return next integer
-   * @throws IOException if read went wrong
    */
-  public synchronized int readNum() throws IOException {
+  public synchronized int readNum() {
     final int v = read();
     switch(v & 0xC0) {
     case 0:
@@ -278,18 +268,16 @@ public final class DataAccessMM {
    * Reads an integer value from the specified position
    * (without cursor correction).
    * @return integer value
-   * @throws IOException if read went wrong
    */
-  public synchronized int readInt() throws IOException {
+  public synchronized int readInt() {
     return (read() << 24) + (read() << 16) + (read() << 8) + read();
   }
 
   /**
    * Append a value to the file and return it's offset.
    * @param v number to be appended
-   * @throws IOException if write went wrong
    */
-  private synchronized void writeNum(final int v) throws IOException {
+  private synchronized void writeNum(final int v) {
     if(v < 0 || v > 0x3FFFFFFF) {
       write(0xC0); write(v >>> 24); write(v >>> 16); write(v >>>  8); write(v);
     } else if(v > 0x3FFF) {
@@ -305,9 +293,8 @@ public final class DataAccessMM {
   /**
    * Writes the next byte.
    * @param b byte to be written
-   * @throws IOException if write went wrong
    */
-  private synchronized void write(final int b) throws IOException {
+  private synchronized void write(final int b) {
     if(mbytebuffer.remaining() == 0) {
       moveWindow(off + BUFFERSIZE);
     }

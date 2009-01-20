@@ -29,6 +29,8 @@ public final class DataAccessMMA {
   private int selector;
   /** Offset. */
   private int off;
+  /** Window array size. */
+  private int numberofwindows;
 
   /**
    * Constructor, initializing the file reader.
@@ -61,7 +63,7 @@ public final class DataAccessMMA {
     long tmplen = len;
     int i = 0;
     // (int) Math.ceil(len / BUFFERSIZE) + 1;
-    int numberofwindows = (int) (len - 1 + BUFFERSIZE) / BUFFERSIZE;
+    numberofwindows = (int) (len - 1 + BUFFERSIZE) / BUFFERSIZE;
     mbytebuffer = new MappedByteBuffer[numberofwindows];
     while(tmplen > BUFFERSIZE) {
       mbytebuffer[i] = rwChannel.map(FileChannel.MapMode.READ_WRITE, 
@@ -212,16 +214,21 @@ public final class DataAccessMMA {
   public synchronized void cursor(final long p) {
     // select buffer window
     // selector = (int) Math.ceil(p / BUFFERSIZE);
-    selector = (int) (p - 1 + BUFFERSIZE) / BUFFERSIZE;
+    selector = (int) (p + BUFFERSIZE) / BUFFERSIZE - 1;
     // calculate offset
     off = (int) p % BUFFERSIZE; //(int) (p & BUFFERSIZE);
     // set pointer
     try {
       mbytebuffer[selector].position(off);
     }  catch (Exception e) {
-//      System.out.println(e);
-//      System.out.println(BUFFERSIZE);
-//      System.out.println(off);
+      System.out.println(numberofwindows);
+      System.out.println(selector);
+      System.out.println(p);
+      System.out.println(length());
+      System.out.println(e);
+      System.out.println(BUFFERSIZE);
+      System.out.println(off);
+      System.out.println("**********");
     }
   }
 
@@ -299,8 +306,13 @@ public final class DataAccessMMA {
     if(mbytebuffer[selector].remaining() == 0) {
       // next buffer window
       selector++;
-      mbytebuffer[selector].position(0);
-      off = 0;
+      // check if array 
+      if(selector == numberofwindows) {
+        
+      } else {
+        mbytebuffer[selector].position(0);
+        off = 0;
+      }
     }
     mbytebuffer[selector].put((byte) b);
 //    mbytebuffer[selector].force();
