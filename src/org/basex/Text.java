@@ -1148,13 +1148,21 @@ public interface Text {
   String MAPATTS = lang("dm_atts");
   /** Layout information. */
   String MAPPROP = lang("dm_prop") + COL;
-  /** Map layout-algorithm. */
-  String MAPPROPALGO = lang("dm_algo") + COL;
   /** Predefined number of layouts. */
   String[] MAPLAYOUTCHOICE = {
       lang("dm_choice1"), lang("dm_choice2"), lang("dm_choice3"),
       lang("dm_choice4"), lang("dm_choice5"), lang("dm_choice6")
   };
+  /** Map layout-algorithm. */
+  String MAPPROPALGO = lang("dm_algo") + COL;
+  /** Size depending on... */
+  String MAPSIZE = lang("dm_size");
+  /** Size depending on... */
+  String MAPBOTH = lang("dm_size_both");
+  /** Size depending on... */
+  String MAPCHILDREN = lang("dm_size_childs");
+  /** Size depending on... */
+  String MAPFSSIZE = lang("dm_size_fssize");
   /** Dialog title for treemap info. */
   String MAPINFOTITLE = lang("dmi_title");
   /** Mapinfo checkbox. */
@@ -1249,6 +1257,8 @@ public interface Text {
   byte[] HELPMAPLAYOUT = token(lang("h_maplayout"));
   /** Help String. */
   byte[] HELPMAPALIGN = token(lang("h_mapalign"));
+  /** HelpString. */
+  byte[] HELPMAPSIZE = token(lang("h_mapsize"));
   /** Help String. */
   byte[] HELPDROP = token(lang("h_drop"));
   /** Help String. */

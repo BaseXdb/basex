@@ -97,6 +97,8 @@ public final class GUIProp {
   public static boolean mapinfo = false;
   /** Show attributes in treemap. */
   public static boolean mapatts = false;
+  /** size <-> number of child weightening in (0;100). */
+  public static int sizeP = 50;
   /** Treemap Layout. */
   public static int maplayout = 0;
   /** Treemap Proportion. */
@@ -159,8 +161,6 @@ public final class GUIProp {
   public static int mapalgo = 0;
   /** Map alignment by size aggregation. */
   public static boolean mapaggr = false;
-  /** size <-> number of child weightening in (0;100). */
-  public static int sizeP = 50;
   /** Maximum Map depth. */
   public static int mapdepth = IO.MAXHEIGHT;
   /** Choice of interacting with TreeeMap. */

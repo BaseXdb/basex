@@ -56,6 +56,7 @@ public final class SliceDiceLayout extends MapLayout {
       double yy = r.y;
       double ww, hh;
 
+      // use filesize to calculate rect sizes
       if(data.fs != null && GUIProp.mapaggr) {
         int par = data.parent(l.list[ns], Data.ELEM);
         parsize = Token.toLong(data.attValue(par + FSParser.SIZEOFFSET));

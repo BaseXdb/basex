@@ -28,6 +28,8 @@ public final class DialogMapLayout extends Dialog {
   private BaseXListChooser choice;  
   /** Layout slider. */
   private BaseXSlider prop;
+  /** Layout slider. */
+  private BaseXSlider sizeSlider;
   /** Simple layout. */
   private BaseXCheckBox simple;
   /** Show attributes. */
@@ -36,6 +38,8 @@ public final class DialogMapLayout extends Dialog {
   BaseXCombo propalgo;
   /** Temporary reference to the old map layout. */
   private final BaseXLabel propLabel;
+  /** Size slider label. */
+  private final BaseXLabel sizeLabel;
   
   /**
    * Default constructor.
@@ -92,6 +96,13 @@ public final class DialogMapLayout extends Dialog {
     p.add(prop);
     set(p, BorderLayout.CENTER);
 
+    sizeLabel = new BaseXLabel(MAPSIZE);
+//    p.add(sizeLabel);
+    sizeSlider = new BaseXSlider(gui, 0, 100, GUIProp.sizeP, HELPMAPSIZE, this);
+    BaseXLayout.setWidth(sizeSlider, p.getPreferredSize().width);
+//    p.add(sizeSlider);
+    set(p, BorderLayout.CENTER);
+    
     finish(GUIProp.maplayoutloc);
     action(null);
   }
@@ -106,6 +117,10 @@ public final class DialogMapLayout extends Dialog {
     GUIProp.mapatts = atts.isSelected();
     propLabel.setText(MAPPROP + " " + (prp > 2 && prp < 7 ? "Centered" :
       prp < 3 ? "Vertical" : "Horizontal"));
+    final int sizeprp = sizeSlider.value();
+    sizeLabel.setText(MAPSIZE + " " + (sizeprp > 45 && sizeprp < 55 ? 
+      MAPBOTH :
+      sizeprp < 45 ?  MAPCHILDREN  : MAPFSSIZE));
     gui.notify.layout();
   }
 
