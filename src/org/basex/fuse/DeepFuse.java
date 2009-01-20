@@ -1,4 +1,4 @@
-package org.deepfs;
+package org.basex.fuse;
 
 /**
  * Interface to filesystem in userspace framework.
@@ -6,22 +6,83 @@ package org.deepfs;
  * @author Workgroup DBIS, University of Konstanz 2008, ISC License
  * @author Alexander Holupirek
  */
-public interface IDeepFuse {
+public abstract class DeepFuse {
 
+  /** File element. */
+  public static final byte[] FILE = "file".getBytes();
+
+  /** Directory element. */
+  public static final byte[] DIR = "dir".getBytes();
+
+  /** Name attribute. */
+  public static final byte[] NAME = "name".getBytes();
+
+  /** Type of file mask. (sys/stat.h) */
+  public static final int S_IFMT = 0170000;
+
+  /** Type of directory. (sys/stat.h) */
+  public static final int S_IFDIR = 0040000;
+
+  /** Regular file type. */
+  public static final int S_IFREG = 0100000;
+
+  /**
+   * Check file mode for type directory.
+   * @param mode of file
+   * @return true if directory type, false otherwise
+   */
+  protected boolean isDir(final int mode) {
+    return (mode & S_IFMT) == S_IFDIR;
+  }
+
+  /**
+   * Check file mode for regular file type.
+   * @param mode of file
+   * @return true for regular file, false otherwise
+   */
+  protected boolean isFile(final int mode) {
+    return (mode & S_IFMT) == S_IFREG;
+  }
+  
+  /**
+   * Get path to parent directory of a file, i.e., chop the file name (if any)
+   * and return the path prefix. A directory path is returned as is.
+   * @param path to file
+   * @param mode of file
+   * @return parent directory of file
+   */
+  protected String chopFilename(final String path, final int mode) {
+    if(isDir(mode)) return path;
+
+    int lastSlash = path.lastIndexOf('/');
+    return lastSlash == 0 ? "/" : path.substring(0, lastSlash - 1);
+  }
+
+  /**
+   * Get file name of a regular file.
+   * @param path to file
+   * @param mode of file
+   * @return true for regular file, false otherwise
+   */
+  protected String getName(final String path, final int mode) {
+    if(!isFile(mode)) return "";
+    return path.substring(path.lastIndexOf('/') + 1, path.length());
+  }
+  
   /**
    * Get file attributes.
    * 
    * @param path to the file the stat information is requested for
    * @return int id of node/inode of the requested file
    */
-   int getattr(final String path);
+  public abstract int getattr(final String path);
 
   /**
    * Read the target of a symbolic link.
    * @param path to the link
    * @return String link target
    */
-   String readlink(final String path);
+  public abstract String readlink(final String path);
 
   /**
    * Create a file node.
@@ -38,7 +99,7 @@ public interface IDeepFuse {
    * @return zero on success, or -1 if an error occurred (in which case, errno
    *         is set appropriately).
    */
-    int mknod(final String path, final int mode, final int dev);
+  public abstract int mknod(final String path, final int mode, final int dev);
 
   /**
    * Create a directory.
@@ -48,7 +109,7 @@ public interface IDeepFuse {
    * @return zero on success, or -1 if an error occurred (in which case, errno
    *         is set appropriately).
    */
-    int mkdir(final String path, final int mode);
+  public abstract int mkdir(final String path, final int mode);
 
   /**
    * Remove a file.
@@ -57,7 +118,7 @@ public interface IDeepFuse {
    * @return zero on success, or -1 if an error occurred (in which case, errno
    *         is set appropriately).
    */
-    int unlink(final String path);
+  public abstract int unlink(final String path);
 
   /**
    * Remove a directory file.
@@ -66,7 +127,7 @@ public interface IDeepFuse {
    * @return zero on success, or -1 if an error occurred (in which case, errno
    *         is set appropriately).
    */
-    int rmdir(final String path);
+  public abstract int rmdir(final String path);
 
   /**
    * Make symbolic link to a file.
@@ -76,7 +137,7 @@ public interface IDeepFuse {
    * @return zero on success, or -1 if an error occurred (in which case, errno
    *         is set appropriately).
    */
-    int symlink(final String from, final String to);
+  public abstract int symlink(final String from, final String to);
 
   /**
    * Rename a file.
@@ -86,7 +147,7 @@ public interface IDeepFuse {
    * @return zero on success, or -1 if an error occurred (in which case, errno
    *         is set appropriately).
    */
-    int rename(final String from, final String to);
+  public abstract int rename(final String from, final String to);
 
   /**
    * Create a hard link to a file.
@@ -96,7 +157,7 @@ public interface IDeepFuse {
    * @return zero on success, or -1 if an error occurred (in which case, errno
    *         is set appropriately).
    */
-    int link(final String name1, final String name2);
+  public abstract int link(final String name1, final String name2);
 
   /**
    * Change the permission bits of a file.
@@ -105,7 +166,7 @@ public interface IDeepFuse {
    * @param mode permissions to be set
    * @return zero on success, or -1 if an error occurred
    */
-    int chmod(final String path, final int mode);
+  public abstract int chmod(final String path, final int mode);
 
   /**
    * Change the owner and group of a file.
@@ -115,7 +176,7 @@ public interface IDeepFuse {
    * @param group gid
    * @return zero on success, or -1 if an error occurred
    */
-    int chown(final String path, final int owner, final int group);
+  public abstract int chown(final String path, final int owner, final int group);
 
   /**
    * Change the size of a file.
@@ -124,7 +185,7 @@ public interface IDeepFuse {
    * @param off size to be set
    * @return zero on success, or -1 if an error occurred
    */
-    int truncate(final String path, final long off);
+  public abstract int truncate(final String path, final long off);
 
   /**
    * File open operation.
@@ -132,7 +193,7 @@ public interface IDeepFuse {
    * @param path name of the file
    * @return zero on success, or -1 if an error occurred
    */
-    int open(final String path);
+  public abstract int open(final String path);
 
   /**
    * Read data from an open file.
@@ -142,7 +203,7 @@ public interface IDeepFuse {
    * @param offset from which to read
    * @return zero on success, or -1 if an error occurred
    */
-   byte[] read(final String path, int length, int offset);
+  public abstract byte[] read(final String path, int length, int offset);
 
   /**
    * Write data to an open file.
@@ -153,7 +214,7 @@ public interface IDeepFuse {
    * @param data buffer from which to write
    * @return zero on success, or -1 if an error occurred
    */
-    int write(final String path, int length, int offset, byte[] data);
+  public abstract int write(final String path, int length, int offset, byte[] data);
 
   /**
    * Get file system statistics.
@@ -161,7 +222,7 @@ public interface IDeepFuse {
    * @param path name of the file
    * @return zero on success, or -1 if an error occurred
    */
-    int statfs(final String path);
+  public abstract int statfs(final String path);
 
   /**
    * Possibly flush cached data.
@@ -171,7 +232,7 @@ public interface IDeepFuse {
    * @param path name of the file
    * @return zero on success, or -1 if an error occurred
    */
-    int flush(final String path);
+  public abstract int flush(final String path);
 
   /**
    * Release an open file.
@@ -179,21 +240,21 @@ public interface IDeepFuse {
    * @param path name of the file
    * @return zero on success, or -1 if an error occurred
    */
-    int release(final String path);
+  public abstract int release(final String path);
 
   /**
    * Synchronize file contents.
    * @param path name of the file
    * @return zero on success, or -1 if an error occurred
    */
-    int fsync(final String path);
+  public abstract int fsync(final String path);
 
   /**
    * Set extended attributes.
    * @param path name of the file
    * @return zero on success, or -1 if an error occurred
    */
-    int setxattr(final String path);
+  public abstract int setxattr(final String path);
 
   /**
    * Get extended attributes.
@@ -201,7 +262,7 @@ public interface IDeepFuse {
    * @param path name of the file
    * @return zero on success, or -1 if an error occurred
    */
-    int getxattr(final String path);
+  public abstract int getxattr(final String path);
 
   /**
    * List extended attributes.
@@ -209,7 +270,7 @@ public interface IDeepFuse {
    * @param path name of the file
    * @return zero on success, or -1 if an error occurred
    */
-    int listxattr(final String path);
+  public abstract int listxattr(final String path);
 
   /**
    * Remove extended attributes.
@@ -217,7 +278,7 @@ public interface IDeepFuse {
    * @param path name of the file
    * @return zero on success, or -1 if an error occurred
    */
-    int removexattr(final String path);
+  public abstract int removexattr(final String path);
 
   /**
    * Open directory.
@@ -225,14 +286,14 @@ public interface IDeepFuse {
    * @param path name of the file
    * @return zero on success, or -1 if an error occurred
    */
-    int opendir(final String path);
+  public abstract int opendir(final String path);
 
   /**
    * Read directory.
    * @param path name of the file
    * @return zero on success, or -1 if an error occurred
    */
-    int readdir(final String path);
+  public abstract int readdir(final String path);
 
   /**
    * Release directory.
@@ -240,7 +301,7 @@ public interface IDeepFuse {
    * @param path name of the file
    * @return zero on success, or -1 if an error occurred
    */
-    int releasedir(final String path);
+  public abstract int releasedir(final String path);
 
   /**
    * Synchronize directory contents.
@@ -248,14 +309,14 @@ public interface IDeepFuse {
    * @param path name of the file
    * @return zero on success, or -1 if an error occurred
    */
-    int fsyncdir(final String path);
+  public abstract int fsyncdir(final String path);
 
   /**
    * Initialize filesystem.
    * 
    * @return zero on success, or -1 if an error occurred
    */
-    int init();
+  public abstract int init();
 
   /**
    * Clean up filesystem.
@@ -263,7 +324,7 @@ public interface IDeepFuse {
    * Called on filesystem exit.
    * @return zero on success, or -1 if an error occurred
    */
-    int destroy();
+  public abstract int destroy();
 
   /**
    * Check file access permissions.
@@ -272,15 +333,16 @@ public interface IDeepFuse {
    * @param mode permission to check
    * @return zero on success, or -1 if an error occurred
    */
-    int access(final String path, final int mode);
+  public abstract int access(final String path, final int mode);
 
   /**
    * Create and open a file.
    * 
    * @param path for the file to be created
+   * @param mode of file (directory, regular file ..., permission bits)
    * @return int id of newly created file or -1 on failure
    */
-    int create(final String path);
+  public abstract int create(final String path, final int mode);
 
   /**
    * Change the size of an open file.
@@ -289,7 +351,7 @@ public interface IDeepFuse {
    * @param off new file size
    * @return zero on success, or -1 if an error occurred
    */
-    int ftruncate(final String path, long off);
+  public abstract int ftruncate(final String path, long off);
 
   /**
    * Get attributes from an open file.
@@ -299,7 +361,7 @@ public interface IDeepFuse {
    * @param path name of the file
    * @return zero on success, or -1 if an error occurred
    */
-    int fgetattr(final String path);
+  public abstract int fgetattr(final String path);
 
   /**
    * Perform POSIX file locking operation.
@@ -308,7 +370,7 @@ public interface IDeepFuse {
    * @param cmd locking command id
    * @return zero on success, or -1 if an error occurred
    */
-    int lock(final String path, final int cmd);
+  public abstract int lock(final String path, final int cmd);
 
   /**
    * Change the access and modification times of a file with nanosecond
@@ -317,7 +379,7 @@ public interface IDeepFuse {
    * @param path name of the file
    * @return zero on success, or -1 if an error occurred
    */
-    int utimens(final String path);
+  public abstract int utimens(final String path);
 
   /**
    * Map block index within file to block index within device.
@@ -327,5 +389,5 @@ public interface IDeepFuse {
    * @param idx block index
    * @return zero on success, or -1 if an error occurred
    */
-    int bmap(final String path, final long blocksize, final long idx);
+  public abstract int bmap(final String path, final long blocksize, final long idx);
 }

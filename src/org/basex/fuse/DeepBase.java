@@ -3,18 +3,15 @@ package org.basex.fuse;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.basex.build.Builder;
-import org.basex.build.Parser;
-import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.Open;
 import org.basex.data.Data;
+import org.basex.data.MemData;
 import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.xpath.XPathProcessor;
-import org.deepfs.IDeepFuse;
 
 /**
  * BaseX as filesystem in userspace implementation.
@@ -23,7 +20,7 @@ import org.deepfs.IDeepFuse;
  * @author Alexander Holupirek
  * @author Christian Gruen
  */
-public class DeepBase implements IDeepFuse {
+public class DeepBase extends DeepFuse {
 
   /** Filesystem database name. */
   private static final String DBNAME = "deepbase";
@@ -53,26 +50,22 @@ public class DeepBase implements IDeepFuse {
    * Initialization.
    */
   private void startup() {
-    debug("[DeepBase.startup]", "");
-    Prop.read();
     try {
+      debug("[DeepBase.startup]", "");
+      Prop.read();
       data = Open.open(DBNAME);
       root = new Nodes(0, data);
     } catch(FileNotFoundException e) {
       try {
-        Context ctx = new Context();
-        final Parser p = new Parser(IO.get(DBNAME)) {
-          @Override
-          public void parse(final Builder build) { /* empty */}
-        };
-        ctx.data(CreateDB.xml(p, DBNAME));
-        data = Open.open(DBNAME);
-        root = new Nodes(0, data);
-      } catch(final IOException ex) {
-        e.printStackTrace();
+        data = CreateDB.xml(IO.get("deepfs.xml"), DBNAME);
+        startup();
+      } catch(IOException ex) {
+        ex.printStackTrace();
+        System.exit(1);
       }
     } catch(IOException e) {
       e.printStackTrace();
+      System.exit(1);
     }
   }
 
@@ -85,27 +78,27 @@ public class DeepBase implements IDeepFuse {
   private String xpath(final String path) {
     final StringBuilder qb = new StringBuilder();
     final StringBuilder eb = new StringBuilder();
-    qb.append("/deepfs");
+    qb.append("/deepfuse");
+    if(path.equals("/")) return qb.toString();
     for(int i = 0; i < path.length(); i++) {
       final char c = path.charAt(i);
       if(c == '/') {
-        if(i == 0) {
-          qb.append("/dir/");
-        } else {
-          if(eb.length() != 0) {
-            qb.append("dir[@name = \"" + eb + "\"]");
-            eb.setLength(0);
-          }
-          qb.append(c);
+        if(eb.length() != 0) {
+          qb.append("dir[@name = \"" + eb + "\"]");
+          eb.setLength(0);
         }
+        qb.append(c);
+
       } else {
         eb.append(c);
       }
     }
     if(eb.length() != 0) qb.append("*[@name = \"" + eb + "\"]");
 
-    final String qu = qb.toString();
-    return qu.endsWith("/") ? qu.substring(0, qu.length() - 1) : qu;
+    String qu = qb.toString();
+    qu = qu.endsWith("/") ? qu.substring(0, qu.length() - 1) : qu;
+    System.err.printf("%25s xpath: %s\n", "[DeepBase.xpath]", qu);
+    return qu;
   }
 
   /**
@@ -129,6 +122,7 @@ public class DeepBase implements IDeepFuse {
    * @param path filesystem pathname the id is requested for
    * @return int node id or -1 on failure
    */
+  @Override
   public int getattr(final String path) {
     debug("[DeepBase.getattr]", path);
     try {
@@ -143,6 +137,7 @@ public class DeepBase implements IDeepFuse {
       }
     } catch(QueryException e) {
       e.printStackTrace();
+      System.exit(2);
     }
     return -1;
   }
@@ -151,180 +146,239 @@ public class DeepBase implements IDeepFuse {
    * Create a new regular file.
    * 
    * @param path to the file to be created
+   * @param mode of file (directory, regular file ..., permission bits)
    * @return id of the newly created file or -1 on failure
    */
-  public int create(final String path) {
-    System.err.printf("%25s path '%s'\n", "[DeepBase.create]", path);
-    return -1;
+  @Override
+  public int create(final String path, final int mode) {
+    try {
+      System.err.printf("%25s path '%s' mode %o\n", "[DeepBase.create]", path,
+          mode);
+
+      if(isDir(mode)) return -1;
+      // construct regular file entry.
+      MemData m = new MemData(2, data.tags, data.atts, data.ns, data.skel);
+      int tagID = data.tags.index(FILE, null, false);
+      int tagID2 = data.atts.index(NAME, null, false);
+      m.addElem(tagID, 0, 1, 1, 2, false);
+      m.addAtt(tagID2, 0, getName(path, mode).getBytes(), 1);
+      // Get pre value of directory to insert.
+      Nodes pnode = query(xpath(chopFilename(path, mode)));
+      if(pnode.size != 1) return -1;
+      int ppre = pnode.nodes[0];
+      int pid = data.id(ppre);
+      int ipre = ppre + 2; // skip name attr and insert there.
+      debug("[DeepBase.create]", "ppre " + ppre + " id " + pid);
+      data.insert(ipre, 1, m);
+      data.flush();
+      return data.id(ipre);
+    } catch(QueryException e) {
+      e.printStackTrace();
+      return -1;
+    }
   }
 
+  @Override
   public int access(final String path, final int mode) {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public int bmap(final String path, final long blocksize, final long idx) {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public int chmod(final String path, final int mode) {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public int chown(final String path, final int owner, final int group) {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public int destroy() {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public int fgetattr(final String path) {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public int flush(final String path) {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public int fsync(final String path) {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public int fsyncdir(final String path) {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public int ftruncate(final String path, final long off) {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public int getxattr(final String path) {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public int init() {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public int link(final String name1, final String name2) {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public int listxattr(final String path) {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public int lock(final String path, final int cmd) {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public int mkdir(final String path, final int mode) {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public int mknod(final String path, final int mode, final int dev) {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public int open(final String path) {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public int opendir(final String path) {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public byte[] read(final String path, final int length, final int offset) {
     // TODO Auto-generated method stub
     return null;
   }
 
+  @Override
   public int readdir(final String path) {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public String readlink(final String path) {
     // TODO Auto-generated method stub
     return null;
   }
 
+  @Override
   public int release(final String path) {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public int releasedir(final String path) {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public int removexattr(final String path) {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public int rename(final String from, final String to) {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public int rmdir(final String path) {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public int setxattr(final String path) {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public int statfs(final String path) {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public int symlink(final String from, final String to) {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public int truncate(final String path, final long off) {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public int unlink(final String path) {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public int utimens(final String path) {
     // TODO Auto-generated method stub
     return 0;
   }
 
+  @Override
   public int write(final String path, final int length, final int offset,
-      final byte[] databuf) {
+      final byte[] data1) {
     // TODO Auto-generated method stub
     return 0;
   }
