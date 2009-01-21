@@ -87,9 +87,9 @@ public final class SliceDiceLayout extends MapLayout {
           int childs = l.list[i + 1] - l.list[i];
           double weight = calcWeight(size, childs, parsize, parchilds, data);
           
-          if(Double.isNaN(weight)) System.out.println("[" + l.list[i] + "]"
-              + "(" + size + ";" + childs + "/" + parsize + ";" + parchilds + 
-              ")" + weight);
+//          if(Double.isNaN(weight)) System.out.println("[" + l.list[i] + "]"
+//              + "(" + size + ";" + childs + "/" + parsize + ";" + parchilds + 
+//              ")" + weight);
           if(v) {
             yy += hh;
               // old calculation
