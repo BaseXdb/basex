@@ -46,10 +46,15 @@ public final class SliceDiceLayout extends MapLayout {
       int nn = ne - ns;
 
       long parsize = 1;
-
+      int par;
+      par = data.parent(l.list[ns], Data.ELEM);
+      int parchilds;
+//      parchilds = children(data, par).size;
+      parchilds = l.list[ne] - l.list[ns];
+      
       // determine direction
-//      final boolean v = (level % 2) == 0 ? true : false;
-      final boolean v = (r.w > r.h) ? false : true;
+      final boolean v = (level % 2) == 0 ? true : false;
+//      final boolean v = (r.w > r.h) ? false : true;
 
       // setting initial proportions
       double xx = r.x;
@@ -58,7 +63,6 @@ public final class SliceDiceLayout extends MapLayout {
 
       // use filesize to calculate rect sizes
       if(data.fs != null && GUIProp.mapaggr) {
-        int par = data.parent(l.list[ns], Data.ELEM);
         parsize = Token.toLong(data.attValue(par + FSParser.SIZEOFFSET));
         hh = 0;
         ww = 0;
@@ -76,18 +80,27 @@ public final class SliceDiceLayout extends MapLayout {
       for(int i = 0; i < l.size - 1; i++) {
         int[] liste = new int[1];
         liste[0] = l.list[i];
-
+        
         // draw map taking sizes into account
         if(data.fs != null && GUIProp.mapaggr) {
+          long size = Token.toLong(data.attValue(data.sizeID, l.list[i]));
+          int childs = l.list[i + 1] - l.list[i];
+          double weight = calcWeight(size, childs, parsize, parchilds, data);
+          
+          if(Double.isNaN(weight)) System.out.println("[" + l.list[i] + "]"
+              + "(" + size + ";" + childs + "/" + parsize + ";" + parchilds + 
+              ")" + weight);
           if(v) {
             yy += hh;
-            hh = (double) Token.toLong(
-                data.attValue(data.sizeID, l.list[i])) * r.h / parsize;
+              // old calculation
+//            hh = (double) size * r.h / parsize;
+            hh = weight * r.h;
             ww = r.w;
           } else {
             xx += ww;
-            ww = (double) Token.toLong(
-                data.attValue(data.sizeID, l.list[i])) * r.w / parsize;
+            // old calculation
+//            ww = (double) size * r.w / parsize;
+            ww = weight * r.w;
             hh = r.h;
           }
           if(ww > 0 && hh > 0) calcMap(data,

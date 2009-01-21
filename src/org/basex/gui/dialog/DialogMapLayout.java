@@ -49,8 +49,8 @@ public final class DialogMapLayout extends Dialog {
     super(main, MAPLAYOUTTITLE, false);
     
     final BaseXBack p = new BaseXBack();
-    // [JH] if line 87 is enabled 7 rows are needed
-    p.setLayout(new TableLayout(6, 1, 0, 5));
+    // [JH] complete layout
+    p.setLayout(new TableLayout(9, 1, 0, 5));
 
     // create list
     choice = new BaseXListChooser(this, MAPLAYOUTCHOICE, HELPMAPLAYOUT);
@@ -86,8 +86,9 @@ public final class DialogMapLayout extends Dialog {
       }
     });
     tmpback.add(propalgo);
-//    p.add(tmpback);
-    
+    if(GUIProp.algchanger) {
+      p.add(tmpback);
+    }
     // create slider
     propLabel = new BaseXLabel(MAPPROP);
     p.add(propLabel);
@@ -95,12 +96,15 @@ public final class DialogMapLayout extends Dialog {
     BaseXLayout.setWidth(prop, p.getPreferredSize().width);
     p.add(prop);
     set(p, BorderLayout.CENTER);
-
     sizeLabel = new BaseXLabel(MAPSIZE);
-//    p.add(sizeLabel);
-    sizeSlider = new BaseXSlider(gui, 0, 100, GUIProp.sizeP, HELPMAPSIZE, this);
+    sizeSlider = new BaseXSlider(gui, 0, 100, GUIProp.sizep, HELPMAPSIZE, this);
     BaseXLayout.setWidth(sizeSlider, p.getPreferredSize().width);
-//    p.add(sizeSlider);
+    
+    // add slider only to dialog if we are using fs data
+    if(gui.context.data().fs != null && GUIProp.fsslider) {
+      p.add(sizeLabel);
+      p.add(sizeSlider);
+    }
     set(p, BorderLayout.CENTER);
     
     finish(GUIProp.maplayoutloc);
@@ -118,6 +122,7 @@ public final class DialogMapLayout extends Dialog {
     propLabel.setText(MAPPROP + " " + (prp > 2 && prp < 7 ? "Centered" :
       prp < 3 ? "Vertical" : "Horizontal"));
     final int sizeprp = sizeSlider.value();
+    GUIProp.sizep = sizeprp;
     sizeLabel.setText(MAPSIZE + " " + (sizeprp > 45 && sizeprp < 55 ? 
       MAPBOTH :
       sizeprp < 45 ?  MAPCHILDREN  : MAPFSSIZE));

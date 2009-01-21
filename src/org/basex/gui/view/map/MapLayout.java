@@ -171,25 +171,31 @@ abstract class MapLayout {
     // parents size
     long sSize = Token.toLong(data.attValue(data.sizeID, par));
     // call weightening function
-    weight = calcWeight((int) size, children(data, rect).size,
-        (int) sSize, children(data, par).size);
+    weight = calcWeight(size, children(data, rect).size, 
+        sSize, children(data, par).size, data);
     return weight;
   }
   
   /**
-   * Computes weight with given values for each value using GUIprop.sizeP.
-   * weight = sizeP * size + (1 - sizeP) * |childs| whereas sizeP in (0;100)
+   * Computes weight with given values for each value using GUIprop.sizep.
+   * weight = sizep/100 * size + (1 - sizep/100) * |childs|
+   * whereas sizep in (0;100)
    * 
    * @param size one nodes size
    * @param childs one nodes number of childs
    * @param sSize compare to more nodes size
    * @param sChilds compare to more nodes number of childs
+   * @param data context
    * @return weight
    */
-  public static double calcWeight(final int size, final int childs,
-      final int sSize, final int sChilds) {
-    return (GUIProp.sizeP * size / sSize) + 
-    (100 - GUIProp.sizeP * childs / sChilds);
+  public static double calcWeight(final long size, final int childs,
+      final long sSize, final int sChilds, final Data data) {
+    // if its not a filesystem, set sliderval for calc only to nr of childs
+    double sizeP = data.fs != null ? (double) GUIProp.sizep : 100d;
+    long dadSize = (size == 0 && sSize == 0) ? 1 : sSize;
+    
+    return ((sizeP / 100) * ((double) size / dadSize)) + 
+    ((1 - sizeP / 100) * ((double) childs / sChilds));
   }
   
   /**
@@ -207,7 +213,7 @@ abstract class MapLayout {
       final int ne, final int level);
   
   /**
-   * Finding out which kind of Maplayout we are using right now.
+   * Find out which kind of Maplayout is used right now.
    * @return name Of Layoutalgorithm
    */
   abstract String getType();
