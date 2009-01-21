@@ -201,9 +201,6 @@ public final class MemData extends Data {
    */
   public void addElem(final long t, final long n, final long d, final long a,
       final long s, final boolean ne) {
-
-    System.out.println("AS:" + a);
-    
     check();
     val1[meta.size] = ((long) ELEM << 56) + (n << 52) + (ne ? 1L << 51 : 0)
         + (t << 40) + (a << 32) + d;

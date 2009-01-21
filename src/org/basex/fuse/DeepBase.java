@@ -11,7 +11,7 @@ import org.basex.data.MemData;
 import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
-import org.basex.query.xpath.XPathProcessor;
+import org.basex.query.xquery.XQueryProcessor;
 
 /**
  * BaseX as filesystem in userspace implementation.
@@ -22,14 +22,14 @@ import org.basex.query.xpath.XPathProcessor;
  */
 public class DeepBase extends DeepFuse {
 
+  /** Debug flag. */
+  private static boolean debug = true;
+
   /** Filesystem database name. */
   private static final String DBNAME = "deepbase";
 
   /** Filesystem data reference. */
   private Data data;
-
-  /** Reference to root node. */
-  private Nodes root;
 
   /** Default constructor. */
   public DeepBase() {
@@ -42,8 +42,12 @@ public class DeepBase extends DeepFuse {
    * @param m method name
    * @param s debug msg
    */
-  private void debug(final String m, final String s) {
-    System.err.printf("%25s %s\n", m, s);
+  private void debug(final String m, final String... s) {
+    if(!debug) return;
+    System.err.printf("%25s", m);
+    for(final String x : s)
+      System.err.printf(" %s", x);
+    System.err.printf("\n");
   }
 
   /**
@@ -51,10 +55,9 @@ public class DeepBase extends DeepFuse {
    */
   private void startup() {
     try {
-      debug("[DeepBase.startup]", "");
+      debug("[DeepBase.startup]");
       Prop.read();
       data = Open.open(DBNAME);
-      root = new Nodes(0, data);
     } catch(FileNotFoundException e) {
       try {
         data = CreateDB.xml(IO.get("deepfs.xml"), DBNAME);
@@ -97,19 +100,33 @@ public class DeepBase extends DeepFuse {
 
     String qu = qb.toString();
     qu = qu.endsWith("/") ? qu.substring(0, qu.length() - 1) : qu;
-    System.err.printf("%25s xpath: %s\n", "[DeepBase.xpath]", qu);
+    debug("[DeepBase.xpath]", "xpath: ", qu);
     return qu;
   }
 
   /**
-   * Performs an XPath query and returns the resulting node set.
+   * Performs an XPath/XQuery query and returns the resulting node set.
    * 
-   * @param xpath query
+   * @param xq query
    * @return result nodes
    * @throws QueryException on failure
    */
-  private Nodes query(final String xpath) throws QueryException {
-    return new XPathProcessor(xpath).queryNodes(root);
+  private Nodes query(final String xq) throws QueryException {
+    return new XQueryProcessor(xq).queryNodes(new Nodes(0, data));
+  }
+
+  /**
+   * Performs an XPath/XQuery query and returns the resulting node set.
+   * 
+   * @param xq query
+   * @return result nodes
+   * @throws QueryException on failure
+   */
+  private Nodes queryOne(final String xq) throws QueryException {
+    Nodes n = new XQueryProcessor(xq).queryNodes(new Nodes(0, data));
+    if(n.size != 1) throw new QueryException("Expected exactly one match for "
+        + xq);
+    return n;
   }
 
   /**
@@ -126,9 +143,7 @@ public class DeepBase extends DeepFuse {
   public int getattr(final String path) {
     debug("[DeepBase.getattr]", path);
     try {
-      String xp = xpath(path);
-      debug("[DeepBase.getattr]", "xpath " + xp);
-      final Nodes nodes = query(xp);
+      final Nodes nodes = query(xpath(path));
       debug("[DeepBase.getattr]", "found " + nodes.size);
       if(nodes.size > 0) {
         int pre = nodes.nodes[0];
@@ -137,7 +152,6 @@ public class DeepBase extends DeepFuse {
       }
     } catch(QueryException e) {
       e.printStackTrace();
-      System.exit(2);
     }
     return -1;
   }
@@ -152,30 +166,62 @@ public class DeepBase extends DeepFuse {
   @Override
   public int create(final String path, final int mode) {
     try {
-      System.err.printf("%25s path '%s' mode %o\n", "[DeepBase.create]", path,
-          mode);
+      debug("[DeepBase.create]", "path " + path, "mode "
+          + Integer.toOctalString(mode));
 
       if(isDir(mode)) return -1;
       // construct regular file entry.
       MemData m = new MemData(2, data.tags, data.atts, data.ns, data.skel);
       int tagID = data.tags.index(FILE, null, false);
       int tagID2 = data.atts.index(NAME, null, false);
-      m.addElem(tagID, 0, 1, 1, 2, false);
+      m.addElem(tagID, 0, 1, 2, 2, false);
       m.addAtt(tagID2, 0, getName(path, mode).getBytes(), 1);
       // Get pre value of directory to insert.
-      Nodes pnode = query(xpath(chopFilename(path, mode)));
-      if(pnode.size != 1) return -1;
+      Nodes pnode = queryOne(xpath(chopFilename(path, mode)));
       int ppre = pnode.nodes[0];
+      int psize = data.size(ppre, data.kind(ppre));
       int pid = data.id(ppre);
-      int ipre = ppre + 2; // skip name attr and insert there.
+      int ipre = ppre + psize - 2; // skip back (over atts) to ELEM file
+      int iid = data.id(ipre);
       debug("[DeepBase.create]", "ppre " + ppre + " id " + pid);
       data.insert(ipre, 1, m);
       data.flush();
-      return data.id(ipre);
+      debug("[DeepBase.create]", "ipre " + ipre + " id " + iid);
+      return iid;
     } catch(QueryException e) {
       e.printStackTrace();
       return -1;
     }
+  }
+
+  @Override
+  public int init() {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  @Override
+  public int destroy() {
+    try {
+      debug("[DeepBase.destroy]");
+      data.close();
+    } catch(IOException e) {
+      e.printStackTrace();
+    }
+    return 0;
+  }
+
+  @Override
+  public int unlink(final String path) {
+    try {
+      Nodes n = queryOne(xpath(path));
+      data.delete(n.nodes[0]);
+      data.flush();
+    } catch(QueryException e) {
+      e.printStackTrace();
+      return -1;
+    }
+    return 0;
   }
 
   @Override
@@ -198,12 +244,6 @@ public class DeepBase extends DeepFuse {
 
   @Override
   public int chown(final String path, final int owner, final int group) {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-
-  @Override
-  public int destroy() {
     // TODO Auto-generated method stub
     return 0;
   }
@@ -240,12 +280,6 @@ public class DeepBase extends DeepFuse {
 
   @Override
   public int getxattr(final String path) {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-
-  @Override
-  public int init() {
     // TODO Auto-generated method stub
     return 0;
   }
@@ -360,12 +394,6 @@ public class DeepBase extends DeepFuse {
 
   @Override
   public int truncate(final String path, final long off) {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-
-  @Override
-  public int unlink(final String path) {
     // TODO Auto-generated method stub
     return 0;
   }

@@ -43,7 +43,7 @@ public abstract class DeepFuse {
   protected boolean isFile(final int mode) {
     return (mode & S_IFMT) == S_IFREG;
   }
-  
+
   /**
    * Get path to parent directory of a file, i.e., chop the file name (if any)
    * and return the path prefix. A directory path is returned as is.
@@ -68,7 +68,7 @@ public abstract class DeepFuse {
     if(!isFile(mode)) return "";
     return path.substring(path.lastIndexOf('/') + 1, path.length());
   }
-  
+
   /**
    * Get file attributes.
    * 
@@ -172,11 +172,11 @@ public abstract class DeepFuse {
    * Change the owner and group of a file.
    * 
    * @param path name of the file
-   * @param owner uid
-   * @param group gid
+   * @param uid owner
+   * @param gid group
    * @return zero on success, or -1 if an error occurred
    */
-  public abstract int chown(final String path, final int owner, final int group);
+  public abstract int chown(final String path, final int uid, final int gid);
 
   /**
    * Change the size of a file.
@@ -214,7 +214,8 @@ public abstract class DeepFuse {
    * @param data buffer from which to write
    * @return zero on success, or -1 if an error occurred
    */
-  public abstract int write(final String path, int length, int offset, byte[] data);
+  public abstract int write(final String path, int length, int offset,
+      byte[] data);
 
   /**
    * Get file system statistics.
@@ -389,5 +390,6 @@ public abstract class DeepFuse {
    * @param idx block index
    * @return zero on success, or -1 if an error occurred
    */
-  public abstract int bmap(final String path, final long blocksize, final long idx);
+  public abstract int bmap(final String path, final long blocksize,
+      final long idx);
 }
