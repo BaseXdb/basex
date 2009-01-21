@@ -38,6 +38,7 @@ import org.basex.core.Prop;
 import org.basex.core.proc.Find;
 import org.basex.core.proc.XQuery;
 import org.basex.data.Data;
+import org.basex.data.Namespaces;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.gui.GUIConstants.Fill;
@@ -362,6 +363,7 @@ public final class GUI extends JFrame {
     Prop.write();
     GUIProp.write();
     dispose();
+    System.exit(0);
   }
 
   /**
@@ -386,8 +388,8 @@ public final class GUI extends JFrame {
    * Queries the current input, depending on the current input mode.
    */
   protected void execute() {
+    String in = input.getText();
     final boolean cmd = GUIProp.searchmode == 2 || !context.db();
-    final String in = input.getText();
 
     if(cmd || in.startsWith("!")) {
       // run as command: command mode or exclamation mark as first character
@@ -406,8 +408,16 @@ public final class GUI extends JFrame {
         }
       }
     } else {
-      execute(new XQuery(GUIProp.searchmode == 1 ? in :
-        Find.find(in, context, GUIProp.filterrt)), true);
+      if(GUIProp.searchmode == 1 || in.startsWith("/")) {
+        // check and add default namespace
+        final Namespaces ns = context.data().ns;
+        final int def = ns.get(Token.EMPTY, 0);
+        if(def != 0) in = "declare default element namespace \"" +
+          Token.string(ns.key(def)) + "\"; " + in;
+      } else {
+        in = Find.find(in, context, GUIProp.filterrt);
+      }
+      execute(new XQuery(in), true);
     }
   }
 

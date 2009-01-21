@@ -58,6 +58,8 @@ public final class MetaData {
 
   /** Flag for removed index structures. */
   public boolean uptodate = true;
+  /** Flag for out-of-dates indexes. */
+  public boolean oldindex;
   /** Table size. */
   public int size;
   /** Last (highest) id assigned to a node. */
@@ -151,7 +153,10 @@ public final class MetaData {
     }
 
     if(!storage.equals(STORAGE)) throw new BuildException(DBUPDATE, storage);
-    if(!istorage.equals(ISTORAGE)) update();
+    if(!istorage.equals(ISTORAGE)) {
+      oldindex = true;
+      update();
+    }
   }
 
   /**

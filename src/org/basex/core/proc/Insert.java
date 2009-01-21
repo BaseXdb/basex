@@ -73,9 +73,9 @@ public final class Insert extends AUpdate {
       final int kind = data.kind(par);
       if(kind != Data.ELEM) return error(COPYTAGS);
 
-      // check uniqueness of attribute
+      // check uniqueness of attribute names
       final int last = par + data.attSize(par, kind);
-      for(int p = par; p < last; p++) {
+      for(int p = par + 1; p < last; p++) {
         if(att == data.attNameID(p)) return error(ATTDUPL, n);
       }
     }

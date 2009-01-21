@@ -39,7 +39,7 @@ public final class Open extends Process {
       final Data data = open(db);
       context.data(data);
       if(Prop.info) {
-        if(!data.meta.uptodate) info(INDUPDATE + NL);
+        if(!data.meta.oldindex) info(INDUPDATE + NL);
         info(DBOPENED, perf.getTimer());
       }
       return true;

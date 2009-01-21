@@ -75,7 +75,7 @@ public final class InfoDB extends AInfo {
     
     if(index) {
       tb.add(NL + INFOINDEX + NL);
-      if(!meta.uptodate) {
+      if(!meta.oldindex) {
         tb.add(" " + INDUPDATE + NL);
       } else {
         format(tb, INFOTEXTINDEX, BaseX.flag(meta.txtindex), true, 0);

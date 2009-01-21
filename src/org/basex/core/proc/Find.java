@@ -69,6 +69,7 @@ public final class Find extends AQuery {
     String preds = "";
     final String tag = "*";
     for(String term : terms) {
+      final byte[] token = Token.token(term);
       if(term.startsWith("@=")) {
         preds += "[@* = \"" + term.substring(2) + "\"]";
       } else if(term.startsWith("=")) {
@@ -79,22 +80,21 @@ public final class Find extends AQuery {
         if(term.length() == 1) continue;
         preds += "[@* ftcontains \"" + term.substring(1) + "\"]";
         term = term.substring(1);
-        if(XMLToken.isName(Token.token(term))) {
+        if(XMLToken.isName(token)) {
           // attribute exists.. add location path
           pre += (r ? "" : ".") + "//@" + term + " | ";
         }
       } else {
         preds += "[text() ftcontains \"" + term + "\"]";
-        if(XMLToken.isName(Token.token(term))) {
+        if(XMLToken.isName(token) && data.tagID(token) != 0) {
           // add location path for tag
-          pre += (r ? "/" : "") + "descendant::" + term + " | ";
+          pre += (r ? "/" : "") + "descendant::*:" + term + " | ";
         }
         // name attribute exists...
         pre += "//*[@name ftcontains \"" + term + "\"] | ";
       }
     }
     if(pre.length() == 0 && preds.length() == 0) return root ? "/" : ".";
-    
     return pre + (r ? "/" : "") + "descendant-or-self::" + tag + preds;
   }
 

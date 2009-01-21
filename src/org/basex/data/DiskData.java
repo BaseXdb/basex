@@ -501,6 +501,7 @@ public final class DiskData extends Data {
       final int k = dt.kind(s);
       final int r = dt.parent(s, k);
       // recalculate distance for root nodes
+      // [CG] Updates/Insert: test collections
       final int d = r < sa ? pre - par : s - r;
       final int p = pre + s - sa - 1;
 
