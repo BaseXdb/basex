@@ -1,11 +1,12 @@
 package org.basex.api.xmldb;
 
+import static org.basex.util.Token.*;
 import java.util.HashMap;
 import org.basex.data.Nodes;
 import org.basex.query.QueryException;
-import org.basex.query.QueryProcessor;
-import org.basex.query.xpath.XPathProcessor;
 import org.basex.query.xquery.XQueryProcessor;
+import org.basex.query.xquery.item.QNm;
+import org.basex.query.xquery.item.Uri;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.ErrorCodes;
 import org.xmldb.api.base.ResourceSet;
@@ -88,15 +89,16 @@ public final class BXQueryService implements XPathQueryService, BXXMLDBText {
     
     try {
       // creates a query instance
-      final QueryProcessor proc = name.equals(XPATH) ?
-          new XPathProcessor(query) : new XQueryProcessor(query);
+      final XQueryProcessor proc = new XQueryProcessor(query);
 
-      // [CG] consider namespaces
-
+      // add default namespaces
+      for(final String n : ns.keySet()) {
+        final QNm name = new QNm(token(n), Uri.uri(token(ns.get(n))));
+        proc.ctx.ns.add(name);
+      }
       // perform query and return result
       return new BXResourceSet(proc.query(nodes), coll);
     } catch(final QueryException ex) {
-      
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
     }
   }
