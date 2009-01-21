@@ -70,7 +70,7 @@ public class FTContains extends Expr {
     while((i = iter.next()) != null) {
       ft.init(i.str());
       d = Scoring.and(d, ftexpr.iter(ctx).next().score());
-      if (i instanceof DBNode) pre = ((DBNode) i).pre; 
+      if(i instanceof DBNode) pre = ((DBNode) i).pre;
     }
     
     if (Bln.get(d).bool() && pre > -1 && ctx.ftd != null && ctx.ftdata != null) 

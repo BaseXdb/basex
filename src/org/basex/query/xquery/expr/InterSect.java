@@ -48,7 +48,7 @@ public final class InterSect extends Arr {
         for(int s = 0; s < seq.size; s++) {
           if(CmpN.Comp.EQ.e(seq.list[s], node)) {
             res.add(node);
-            if (it instanceof DBNode) il.add(((DBNode) it).pre + 1);            
+            if(it instanceof DBNode) il.add(((DBNode) it).pre + 1);
             break;
           } 
         }

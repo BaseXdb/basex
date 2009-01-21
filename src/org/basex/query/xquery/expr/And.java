@@ -85,8 +85,9 @@ public final class And extends Arr {
       d = Scoring.and(d, it.score());
     }
     
-    if (ctx.ftdata != null && !Bln.get(d).bool() && ctx.item instanceof DBNode)
-      ctx.ftdata.remove(((DBNode) ctx.item).pre + 1);
+    final DBNode db = ctx.dbroot();
+    if(db != null && ctx.ftdata != null && !Bln.get(d).bool())
+      ctx.ftdata.remove(db.pre + 1);
     
     return (d == 0 ? Bln.TRUE : Bln.get(d)).iter();
   }

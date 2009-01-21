@@ -191,6 +191,16 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
+   * Returns the database root as expression or null.
+   * @return database root or null
+  public DBNode dbroot() {
+    if(!(this instanceof DBNode)) return null;
+    final DBNode db = (DBNode) this;
+    return db.type == Type.DOC ? db : null;
+  }
+   */
+
+  /**
    * Returns the specified expression as an atomic item.
    * Empty sequences are handled by the empty flag.
    * @param ctx xquery context

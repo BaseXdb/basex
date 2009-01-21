@@ -2,7 +2,6 @@ package org.basex.query.xquery.path;
 
 import static org.basex.util.Token.*;
 import static org.basex.query.xquery.XQText.*;
-import org.basex.data.Data;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.DBNode;
@@ -67,20 +66,20 @@ public final class NameTest extends Test {
       if(name != null && name.uri == Uri.EMPTY) {
         name.uri = Uri.uri(ctx.ns.uri(name.pre()));
       }
-    } else if(ctx.item instanceof DBNode) {
-      // check existence of namespaces in input document
-      final Data data = ((DBNode) ctx.item).data; 
+    } else {
+      final DBNode db = ctx.dbroot();
+      if(db == null) return true;
       
-      if(ctx.nsElem.length == 0 && data.ns.size() == 0) {
+      // check existence of namespaces in input document
+      if(ctx.nsElem.length == 0 && db.data.ns.size() == 0) {
         // no namespaces - check only name
         if(kind == Kind.STD && !name.ns()) kind = Kind.NAME;
         
         // pre-evaluate unknown tag/attribute names
-        if(kind == Kind.NAME) {
-          if((type == Type.ELM ? data.tagID(ln) : data.attNameID(ln)) == 0) {
+        if(kind == Kind.NAME && (type == Type.ELM ? db.data.tagID(ln) :
+          db.data.attNameID(ln)) == 0) {
             ctx.compInfo(OPTNAME, ln);
             return false;
-          }
         }
       }
     }

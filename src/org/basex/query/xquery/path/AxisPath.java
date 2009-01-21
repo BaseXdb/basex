@@ -5,7 +5,6 @@ import static org.basex.query.xquery.path.Test.NODE;
 import static org.basex.query.xquery.XQText.*;
 import java.io.IOException;
 import java.util.HashSet;
-import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.data.SkelNode;
 import org.basex.data.StatsKey;
@@ -150,10 +149,10 @@ public class AxisPath extends Path {
         return this;
       }
     }
-    
+
     // check if the context item is set to a document node
-    if(!(ctx.item instanceof DBNode)) return this;
-    final DBNode db = (DBNode) ctx.item;
+    final DBNode db = ctx.dbroot();
+    if(db == null) return this;
     
     // skip position predicates and horizontal axes
     for(final Step s : step) if(s.usesPos(ctx) || !s.axis.vert) return this;
@@ -339,15 +338,15 @@ public class AxisPath extends Path {
     int res = -1;
     setRoot(ctx);
 
-    if(ctx.item instanceof DBNode && ((DBNode) ctx.item).pre == 0) {
-      final Data data = ((DBNode) ctx.item).data;
-      if(data.meta.uptodate && data.ns.size() == 0) {
+    final DBNode db = ctx.dbroot();
+    if(db != null) {
+      if(db.data.meta.uptodate && db.data.ns.size() == 0) {
         HashSet<SkelNode> nodes = new HashSet<SkelNode>();
-        nodes.add(data.skel.root);
+        nodes.add(db.data.skel.root);
         
         for(final Step s : step) {
           res = -1;
-          nodes = s.count(nodes, data);
+          nodes = s.count(nodes, db.data);
           if(nodes == null) break;
           res = 0;
           for(final SkelNode sn : nodes) res += sn.count;
@@ -404,9 +403,9 @@ public class AxisPath extends Path {
     final int ll = step.length;
     if(ll > 0) {
       final Step s = step[0];
-      if(root instanceof DBNode && (s.axis == ATTR || s.axis == PARENT ||
-          s.axis == SELF && s.test != NODE) || root instanceof CAttr &&
-          s.axis == CHILD) warning(s);
+      if(root instanceof DBNode && ((DBNode) root).type == Type.DOC &&
+        (s.axis == ATTR || s.axis == PARENT || s.axis == SELF && s.test != NODE)
+        || root instanceof CAttr && s.axis == CHILD) warning(s);
     }
 
     for(int l = 1; l < ll; l++) {
@@ -470,12 +469,13 @@ public class AxisPath extends Path {
   public Expr addText(final XQContext ctx) {
     final Step s = step[step.length - 1];
     if(s.pred.length > 0 || !s.axis.down || s.test.kind != Test.Kind.NAME ||
-        s.test.type == Type.ATT || !(ctx.item instanceof DBNode)) return this;
+        s.test.type == Type.ATT) return this;
     
-    final Data data = ((DBNode) ctx.item).data;
-    final StatsKey stats = data.tags.stat(data.tags.id(s.test.name.ln()));
+    final DBNode db = ctx.dbroot();
+    if(db == null) return this;
+    final StatsKey stats = db.data.tags.stat(db.data.tags.id(s.test.name.ln()));
     
-    if(data.meta.uptodate && stats != null && stats.leaf) {
+    if(db.data.meta.uptodate && stats != null && stats.leaf) {
       step = Array.add(step, Step.get(Axis.CHILD, new KindTest(Type.TXT)));
       ctx.compInfo(OPTTEXT, this);
     }

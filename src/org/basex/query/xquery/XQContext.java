@@ -24,6 +24,7 @@ import org.basex.query.xquery.item.Dtm;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.item.Tim;
+import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.item.Uri;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.NodIter;
@@ -353,6 +354,16 @@ public final class XQContext extends QueryContext {
   public void addColl(final NodIter nod, final byte[] name) {
     collect = Array.add(collect, nod);
     collName = Array.add(collName, name);
+  }
+
+  /**
+   * Returns the database root as expression or null.
+   * @return database root or null
+   */
+  public DBNode dbroot() {
+    if(!(item instanceof DBNode)) return null;
+    final DBNode db = (DBNode) item;
+    return db.type == Type.DOC ? db : null;
   }
 
   @Override

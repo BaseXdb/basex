@@ -79,10 +79,10 @@ public class Step extends Preds {
   public Expr comp(final XQContext ctx) throws XQException {
     if(!test.comp(ctx)) return Seq.EMPTY;
     
-    if(ctx.item instanceof DBNode && test.kind == Kind.NAME) {
-      final Data data = ((DBNode) ctx.item).data;
-      ctx.leaf = axis.down && data.meta.uptodate && data.ns.size() == 0 &&
-        data.tags.stat(data.tagID(((NameTest) test).ln)).leaf;
+    final DBNode db = ctx.dbroot();
+    if(db != null && test.kind == Kind.NAME) {
+      ctx.leaf = axis.down && db.data.meta.uptodate && db.data.ns.size() == 0 &&
+      db.data.tags.stat(db.data.tagID(((NameTest) test).ln)).leaf;
     }
     final Expr e = super.comp(ctx);
     ctx.leaf = false;

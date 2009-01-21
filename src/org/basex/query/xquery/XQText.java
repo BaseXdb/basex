@@ -494,7 +494,7 @@ public interface XQText {
   /** Optimization info. */
   String OPTWHERE = "Converting where clause to predicate";
   /** Optimization info. */
-  String OPTSTAT = "Removing variable %";
+  String OPTVAR = "Removing variable %";
   /** Optimization info. */
   String OPTRED = "Merging redundant location paths";
   /** Optimization info. */

@@ -33,7 +33,7 @@ public final class FLWR extends FLWOR {
     // remove let clauses with static contents
     for(int f = 0; f != fl.length; f++) {
       if(fl[f].var.expr != null) {
-        ctx.compInfo(OPTSTAT, fl[f].var);
+        ctx.compInfo(OPTVAR, fl[f].var);
         fl = Array.delete(fl, f--);
       }
     }
@@ -48,7 +48,7 @@ public final class FLWR extends FLWOR {
 
     /* [CG] convert where clause to predicate; check open issues
     final ForLet f = fl[fl.length - 1];
-    if(where != null && f.expr instanceof AxisPath) {
+    if(where != null && f instanceof For && f.expr instanceof AxisPath) {
       if(where.usesVar(f.var)) {
         ctx.compInfo(OPTWHERE);
         f.expr = ((AxisPath) f.expr).addPred(where.removeVar(f.var));
@@ -167,7 +167,8 @@ public final class FLWR extends FLWOR {
     Step[] s = new Step[0];
     Expr r = null;
     for (int i = 0; i < fl.length; i++) {
-      if (!ret && fl[i].expr instanceof DBNode) {
+      final DBNode db = fl[i].expr.dbroot();
+      if (!ret && db != null) {
         r = fl[i].expr;
       } else if (fl[i].expr instanceof AxisPath) {
         final AxisPath t = (AxisPath) fl[i].expr;

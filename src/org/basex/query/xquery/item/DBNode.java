@@ -324,7 +324,7 @@ public class DBNode extends Nod {
         return type + "{" + string(data.attName(pre)) + "=\"" +
         string(data.attValue(pre)) + "\"}";
       case DOC:
-        return type + "{(\"" + data.meta.file + "\"}";
+        return type + "{\"" + data.meta.dbname + "\"}";
       case ELM:
         return type + "{" + string(data.tag(pre)) + "," + pre + "}";
       default:
