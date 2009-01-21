@@ -191,12 +191,44 @@ abstract class MapLayout {
   public static double calcWeight(final long size, final int childs,
       final long sSize, final int sChilds, final Data data) {
     // if its not a filesystem, set sliderval for calc only to nr of childs
-    double sizeP = data.fs != null ? (double) GUIProp.sizep : 100d;
+    double sizeP = data.fs != null ? (double) GUIProp.sizep : 0d;
     long dadSize = (size == 0 && sSize == 0) ? 1 : sSize;
     
     return ((sizeP / 100) * ((double) size / dadSize)) + 
     ((1 - sizeP / 100) * ((double) childs / sChilds));
   }
+  
+  /**
+   * One rectangle left, add it and continue with its children.
+   * @param data data reference
+   * @param r parent rectangle
+   * @param mainRects stores already layout rectangles
+   * @param l children array
+   * @param ns start array position
+   * @param level indicates level which is calculated
+   */
+  protected void putRect(final Data data, final ViewRect r,
+      final ArrayList<ViewRect> mainRects, final IntList l, final int ns,
+      final int level) {
+    // calculate rectangle sizes
+    final ViewRect t = new ViewRect(r.x, r.y, r.w, r.h, l.list[ns], r.level);
+    mainRects.add(t);
+
+    // position, with and height calculated using sizes of former level
+    final int x = t.x + layout.x;
+    final int y = t.y + layout.y;
+    final int w = t.w - layout.w;
+    final int h = t.h - layout.h;
+
+    // skip too small rectangles and leaf nodes (= meta data in deepfs)
+    if((w >= o || h >= o) && w > 0 && h > 0 &&
+        !ViewData.isLeaf(data, t.pre)) {
+      final IntList ch = children(data, t.pre);
+      if(ch.size != 0) calcMap(data, new ViewRect(x, y, w, h, l.list[ns],
+          r.level + 1), mainRects, ch, 0, ch.size - 1, level + 1);
+    }
+  }
+  
   
   /**
    * Recursively splits rectangles.

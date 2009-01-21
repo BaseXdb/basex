@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import org.basex.data.Data;
 import org.basex.gui.GUIProp;
 import org.basex.gui.view.ViewRect;
-import org.basex.gui.view.ViewData;
+//import org.basex.gui.view.ViewData;
 import org.basex.util.IntList;
 import org.basex.util.Token;
 
@@ -23,6 +23,9 @@ public final class SplitLayout extends MapLayout {
 
     // one rectangle left.. continue with this child
     if(ne - ns == 1) {
+      putRect(data, r, mainRects, l, ns, level);
+      
+      /* replaced by putRect()
       // calculate rectangle sizes
       final ViewRect t = new ViewRect(r.x, r.y, r.w, r.h, l.list[ns], r.level);
       mainRects.add(t);
@@ -39,7 +42,7 @@ public final class SplitLayout extends MapLayout {
         final IntList ch = children(data, t.pre);
         if(ch.size != 0) calcMap(data, new ViewRect(x, y, w, h, l.list[ns],
             r.level + 1), mainRects, ch, 0, ch.size - 1, level + 1);
-      }
+      }*/
     } else {
       long nn, ln;
       int ni;

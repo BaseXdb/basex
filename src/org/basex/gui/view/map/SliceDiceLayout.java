@@ -5,7 +5,7 @@ import org.basex.build.fs.FSParser;
 import org.basex.data.Data;
 import org.basex.gui.GUIProp;
 import org.basex.gui.view.ViewRect;
-import org.basex.gui.view.ViewData;
+//import org.basex.gui.view.ViewData;
 import org.basex.util.IntList;
 import org.basex.util.Token;
 
@@ -24,7 +24,9 @@ public final class SliceDiceLayout extends MapLayout {
 
     // one rectangle left.. continue with this child
     if(ne - ns == 1) {
-
+      putRect(data, r, mainRects, l, ns, level);
+      
+      /* replaced by putRect()
       // calculate rectangle sizes
       final ViewRect t = new ViewRect(r.x, r.y, r.w, r.h, l.list[ns], r.level);
 
@@ -40,7 +42,7 @@ public final class SliceDiceLayout extends MapLayout {
         final IntList ch = children(data, t.pre);
         if(ch.size >= 0) calcMap(data, new ViewRect(x, y, w, h,
             l.list[ns], t.level + 1), mainRects, ch, 0, ch.size - 1, level + 1);
-      }
+      }*/
     } else {
       // number of nodes used to calculate rect size
       int nn = ne - ns;
@@ -63,9 +65,12 @@ public final class SliceDiceLayout extends MapLayout {
 
       // use filesize to calculate rect sizes
       if(data.fs != null && GUIProp.mapaggr) {
-        parsize = Token.toLong(data.attValue(par + FSParser.SIZEOFFSET));
+        parsize = data.fs != null ? 
+            Token.toLong(data.attValue(par + FSParser.SIZEOFFSET)) : 0;
         hh = 0;
         ww = 0;
+      // [JH] remove this and use number of childs if not a fs
+      // problems occur while zooming into to thin rectangles
       } else {
         if(v) {
           ww = r.w;
@@ -82,8 +87,10 @@ public final class SliceDiceLayout extends MapLayout {
         liste[0] = l.list[i];
         
         // draw map taking sizes into account
+        // [JH] remove else statement
         if(data.fs != null && GUIProp.mapaggr) {
-          long size = Token.toLong(data.attValue(data.sizeID, l.list[i]));
+          long size = data.fs != null ? 
+              Token.toLong(data.attValue(data.sizeID, l.list[i])) : 0;
           int childs = l.list[i + 1] - l.list[i];
           double weight = calcWeight(size, childs, parsize, parchilds, data);
           
