@@ -55,6 +55,7 @@ public abstract class Preds extends Expr {
   public boolean usesPos(final XQContext ctx) {
     for(final Expr p : pred) {
       final Type t = p.returned(ctx);
+      // assuming worst case: return type is unknown -> could be integer
       if(t == null || t.num || p.usesPos(ctx)) return true;
     }
     return false;

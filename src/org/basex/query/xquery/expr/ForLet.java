@@ -6,7 +6,7 @@ import org.basex.query.xquery.util.Var;
 
 /**
  * Abstract For/Let Clause.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
@@ -17,21 +17,30 @@ public abstract class ForLet extends Expr {
   protected Var var;
 
   @Override
-  public boolean usesVar(final Var v) {
-    return v == null || !v.eq(var);
+  public final boolean usesVar(final Var v) {
+    return v == null || expr.usesVar(v);
   }
 
   @Override
-  public Expr removeVar(final Var v) {
-    if(!var.eq(v)) expr = expr.removeVar(v);
+  public final Expr removeVar(final Var v) {
+    expr = expr.removeVar(v);
     return this;
   }
-  
+
+  /**
+   * Checks if the specified is not shadowed by another variable.
+   * @param v variable to be checked
+   * @return result of check
+   */
+  public boolean shadows(final Var v) {
+    return !v.visible(var);
+  }
+
   @Override
   public final String color() {
     return "66CC66";
   }
-  
+
   @Override
   public abstract ResetIter iter(final XQContext ctx);
 }

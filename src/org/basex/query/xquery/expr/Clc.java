@@ -63,12 +63,12 @@ public final class Clc extends Arr {
   }
 
   @Override
-  public String toString() {
-    return toString(" " + calc.name + " ");
+  public String info() {
+    return "'" + calc.name + "' expression";
   }
 
   @Override
-  public String info() {
-    return "'" + calc.name + "' expression";
+  public String toString() {
+    return toString(" " + calc.name + " ");
   }
 }

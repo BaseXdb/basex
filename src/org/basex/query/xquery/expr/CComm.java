@@ -1,13 +1,13 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQText.*;
+import static org.basex.util.Token.*;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.FComm;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Err;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -41,19 +41,19 @@ public final class CComm extends Single {
       more = true;
     }
     final byte[] atom = tb.finish();
-    if(Token.contains(atom, DASHES) || Token.startsWith(atom, '-') ||
-        Token.endsWith(atom, '-')) Err.or(COMINVALID, atom);
+    if(contains(atom, DASHES) || startsWith(atom, '-') || endsWith(atom, '-'))
+      Err.or(COMINVALID, atom);
 
     return new FComm(atom, null).iter();
-  }
-
-  @Override
-  public String toString() {
-    return "comment {" + expr + "}";
   }
   
   @Override
   public String info() {
     return "Comment constructor";
+  }
+
+  @Override
+  public String toString() {
+    return "comment {" + expr + "}";
   }
 }

@@ -157,7 +157,7 @@ public final class CmpR extends Single {
   
   @Override
   public AxisPath indexEquivalent(final XQContext ctx, final IndexContext ic) {
-    final Expr root = new IndexRange(ic.data, rt);
+    final Expr root = new IndexAccess(ic.data, rt);
     
     final AxisPath orig = (AxisPath) expr;
     final AxisPath path = orig.invertPath(root, ic.step);

@@ -41,10 +41,10 @@ public final class List extends Arr {
     final TokenBuilder sb = new TokenBuilder(name()).add('(');
     for(int v = 0; v != expr.length; v++) {
       sb.add((v != 0 ? ", " : "") + expr[v]);
-      if(sb.size > 15 && v + 1 != expr.length) {
-        //sb.add(", ...");
-        //break;
-      }
+      /*if(sb.size > 15 && v + 1 != expr.length) {
+        sb.add(", ...");
+        break;
+      }*/
     }
     return sb.add(')').toString();
   }

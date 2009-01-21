@@ -228,6 +228,8 @@ public class BaseXClient {
         if(set && p.args[0].equals(CmdSet.INFO.name())) {
           info = inf.contains(INFOON);
         }
+      } else if(console && !(p instanceof Prompt)) {
+        BaseX.outln();
       }
       return ok;
     } catch(final FileNotFoundException ex) {

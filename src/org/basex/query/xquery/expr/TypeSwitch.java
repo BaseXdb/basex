@@ -62,17 +62,24 @@ public final class TypeSwitch extends Single {
   }
 
   @Override
+  public boolean usesPos(final XQContext ctx) {
+    for(final Case c : cs) if(c.usesPos(ctx)) return true;
+    return ts.usesPos(ctx);
+  }
+
+  @Override
   public boolean usesVar(final Var v) {
     if(v == null) return true;
-    if(var != null && v.eq(var)) return false;
+    if(!v.visible(var)) return false;
     for(final Case c : cs) if(c.usesVar(v)) return true;
-    return false;
+    return ts.usesVar(v);
   }
 
   @Override
   public Expr removeVar(final Var v) {
-    if(var != null && v.eq(var)) return this;
+    if(!v.visible(var)) return this;
     for(int c = 0; c < cs.length; c++) cs[c] = cs[c].removeVar(v);
+    ts = ts.removeVar(v);
     return this;
   }
   

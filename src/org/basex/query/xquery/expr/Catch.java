@@ -81,6 +81,18 @@ public final class Catch extends Single {
   }
 
   @Override
+  public boolean usesVar(final Var v) {
+    return v == null || v.visible(var1) && v.visible(var2) &&
+      v.visible(var3) && super.usesVar(v);
+  }
+
+  @Override
+  public Expr removeVar(final Var v) {
+    return v.visible(var1) && v.visible(var2) && v.visible(var3) ?
+      super.removeVar(v) : this;
+  }
+
+  @Override
   public String toString() {
     return "catch { " + expr + "}";
   }

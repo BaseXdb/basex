@@ -123,6 +123,15 @@ public final class Var extends ExprInfo implements Cloneable {
   }
   
   /**
+   * Checks if the variable is not shadowed by the variable.
+   * @param v variable
+   * @return result of check
+   */
+  public boolean visible(final Var v) {
+    return v == null || !v.name.eq(name);
+  }
+  
+  /**
    * Checks the variable type.
    * @param it input item
    * @param ctx query context

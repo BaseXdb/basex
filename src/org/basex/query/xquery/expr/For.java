@@ -103,17 +103,10 @@ public final class For extends ForLet {
       }
     };
   }
-
+  
   @Override
-  public boolean usesVar(final Var v) {
-    return super.usesVar(v) || (score == null || !v.eq(score)) &&
-      (pos == null || !v.eq(pos));
-  }
-
-  @Override
-  public Expr removeVar(final Var v) {
-    return !var.eq(v) && (score == null || !v.eq(score)) &&
-        (pos == null && !v.eq(pos)) ? super.removeVar(v) : this;
+  public boolean shadows(final Var v) {
+    return super.shadows(var) || !v.visible(pos) || !v.visible(score);
   }
   
   @Override

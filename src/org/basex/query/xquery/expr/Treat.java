@@ -66,14 +66,14 @@ public final class Treat extends Single {
   }
 
   @Override
-  public String toString() {
-    return expr + " castable?";
-  }
-
-  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this, TYPE, Token.token(seq.toString()));
     expr.plan(ser);
     ser.closeElement();
+  }
+
+  @Override
+  public String toString() {
+    return expr + " castable?";
   }
 }

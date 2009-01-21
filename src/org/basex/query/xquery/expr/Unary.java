@@ -74,12 +74,7 @@ public final class Unary extends Single {
 
   @Override
   public Type returned(final XQContext ctx) {
-    return Type.DBL;
-  }
-  
-  @Override
-  public String toString() {
-    return "-" + expr;
+    return null;
   }
 
   @Override
@@ -87,5 +82,10 @@ public final class Unary extends Single {
     ser.openElement(this, NEGATE, Token.token(minus));
     expr.plan(ser);
     ser.closeElement();
+  }
+  
+  @Override
+  public String toString() {
+    return "-" + expr;
   }
 }

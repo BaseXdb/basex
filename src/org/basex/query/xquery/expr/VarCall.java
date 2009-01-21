@@ -64,6 +64,11 @@ public final class VarCall extends Expr {
   }
 
   @Override
+  public boolean usesPos(final XQContext ctx) {
+    return super.usesPos(ctx);
+  }
+
+  @Override
   public boolean usesVar(final Var v) {
     return v == null || var.eq(v);
   }

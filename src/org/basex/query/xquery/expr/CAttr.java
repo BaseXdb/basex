@@ -14,6 +14,7 @@ import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.item.Uri;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Err;
+import org.basex.query.xquery.util.Var;
 import org.basex.util.TokenBuilder;
 import org.basex.util.XMLToken;
 
@@ -84,6 +85,17 @@ public final class CAttr extends Arr {
 
     if(name.uri == Uri.EMPTY) name.uri = Uri.uri(ctx.ns.uri(name.pre()));
     return name;
+  }
+
+  @Override
+  public boolean usesVar(final Var v) {
+    return atn.usesVar(v) || super.usesVar(v);
+  }
+
+  @Override
+  public Expr removeVar(final Var v) {
+    atn = atn.removeVar(v);
+    return super.removeVar(v);
   }
 
   @Override

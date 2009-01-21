@@ -38,7 +38,7 @@ public final class InterSect extends Arr {
       seq.add((Nod) it);
     }
     
-    IntList il = new IntList();
+    final IntList il = ctx.ftdata != null ? new IntList() : null;
     for(int e = 1; e != expr.length; e++) {
       final NodeBuilder res = new NodeBuilder(false);
       iter = ctx.iter(expr[e]);
@@ -48,7 +48,8 @@ public final class InterSect extends Arr {
         for(int s = 0; s < seq.size; s++) {
           if(CmpN.Comp.EQ.e(seq.list[s], node)) {
             res.add(node);
-            if(it instanceof DBNode) il.add(((DBNode) it).pre + 1);
+            if(il != null && it instanceof DBNode)
+              il.add(((DBNode) it).pre + 1);
             break;
           } 
         }
@@ -57,7 +58,6 @@ public final class InterSect extends Arr {
         if(res.size == 0) ctx.ftdata.init();
         else ctx.ftdata.keep(il.finish());
       }
-      
       seq = res;
     }
     return seq.iter();

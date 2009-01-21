@@ -47,8 +47,10 @@ public final class Cast extends Single {
   }
 
   @Override
-  public String toString() {
-    return BaseX.info("% cast as %", expr, seq);
+  public void plan(final Serializer ser) throws IOException {
+    ser.openElement(this, TYPE, Token.token(seq.toString()));
+    expr.plan(ser);
+    ser.closeElement();
   }
 
   @Override
@@ -57,9 +59,7 @@ public final class Cast extends Single {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, TYPE, Token.token(seq.toString()));
-    expr.plan(ser);
-    ser.closeElement();
+  public String toString() {
+    return BaseX.info("% cast as %", expr, seq);
   }
 }

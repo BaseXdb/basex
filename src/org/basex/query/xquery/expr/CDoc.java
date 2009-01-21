@@ -71,12 +71,12 @@ public final class CDoc extends Single {
   }
 
   @Override
-  public String toString() {
-    return Token.string(name()) + "(" + expr + ")";
+  public String info() {
+    return "document constructor";
   }
 
   @Override
-  public String info() {
-    return "document constructor";
+  public String toString() {
+    return Token.string(name()) + "(" + expr + ")";
   }
 }

@@ -17,7 +17,7 @@ import org.basex.query.xquery.util.Var;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Order extends Simple {
+public final class Order extends Expr {
   /** Sort list. */
   Ord[] ord;
   
@@ -88,6 +88,12 @@ public final class Order extends Simple {
         return Order.this.toString();
       }
     };
+  }
+
+  @Override
+  public boolean usesPos(final XQContext ctx) {
+    for(final Ord o : ord) if(o.usesPos(ctx)) return true;
+    return false;
   }
 
   @Override

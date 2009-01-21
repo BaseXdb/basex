@@ -9,6 +9,7 @@ import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.ResetIter;
+import org.basex.query.xquery.util.Var;
 
 /**
  * Some/Every Satisfier Clause.
@@ -77,10 +78,22 @@ public final class Satisfy extends Single {
   }
 
   @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder(every ? EVERY : SOME);
-    for(int i = 0; i < fl.length; i++) sb.append(" " + fl[i]);
-    return sb.append(" " + SATISFIES + " " + expr).toString();
+  public boolean usesVar(final Var v) {
+    if(v == null) return true;
+    for(final ForLet f : fl) {
+      if(f.usesVar(v)) return true;
+      if(f.shadows(v)) return false;
+    }
+    return super.usesVar(v);
+  }
+
+  @Override
+  public Expr removeVar(final Var v) {
+    for(final ForLet f : fl) {
+      f.removeVar(v);
+      if(f.shadows(v)) return this;
+    }
+    return super.removeVar(v);
   }
 
   @Override
@@ -89,5 +102,12 @@ public final class Satisfy extends Single {
     for(final Expr f : fl) f.plan(ser);
     expr.plan(ser);
     ser.closeElement();
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder(every ? EVERY : SOME);
+    for(int i = 0; i < fl.length; i++) sb.append(" " + fl[i]);
+    return sb.append(" " + SATISFIES + " " + expr).toString();
   }
 }

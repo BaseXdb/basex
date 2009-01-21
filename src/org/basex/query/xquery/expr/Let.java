@@ -95,16 +95,16 @@ public final class Let extends ForLet {
       }
     };
   }
-  
-  @Override
-  public String toString() {
-    return LET + " " + var + " " + ASSIGN + " " + expr;
-  }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this, score ? Token.token(SCORE) : VAR, var.name.str());
     expr.plan(ser);
     ser.closeElement();
+  }
+  
+  @Override
+  public String toString() {
+    return LET + " " + var + " " + ASSIGN + " " + expr;
   }
 }

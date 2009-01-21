@@ -38,19 +38,19 @@ public abstract class FTExpr extends Expr {
   public abstract FTNodeIter iter(final XQContext ctx) throws XQException;
 
   @Override
-  public boolean usesPos(final XQContext ctx) {
+  public final boolean usesPos(final XQContext ctx) {
     for(final FTExpr e : expr) if(e.usesPos(ctx)) return true;
     return false;
   }
 
   @Override
-  public boolean usesVar(final Var v) {
+  public final boolean usesVar(final Var v) {
     for(final FTExpr e : expr) if(e.usesVar(v)) return true;
     return false;
   }
 
   @Override
-  public FTExpr removeVar(final Var v) {
+  public final FTExpr removeVar(final Var v) {
     for(int e = 0; e != expr.length; e++) expr[e] = expr[e].removeVar(v);
     return this;
   }
@@ -64,7 +64,7 @@ public abstract class FTExpr extends Expr {
   }
 
   @Override
-  public String color() {
+  public final String color() {
     return "66FF66";
   }
 
@@ -93,7 +93,7 @@ public abstract class FTExpr extends Expr {
    * @param s scoring
    * @return iterator
    */
-  protected FTNodeIter score(final double s) {
+  protected final FTNodeIter score(final double s) {
     return new FTNodeIter() {
       private boolean more;
       @Override

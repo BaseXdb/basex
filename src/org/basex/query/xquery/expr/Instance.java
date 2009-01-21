@@ -46,16 +46,16 @@ public final class Instance extends Single {
   public Iter iter(final XQContext ctx) throws XQException {
     return Bln.get(seq.instance(ctx.iter(expr))).iter();
   }
-  
-  @Override
-  public String toString() {
-    return BaseX.info("% instance of %", expr, seq);
-  }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this, TYPE, Token.token(seq.toString()));
     expr.plan(ser);
     ser.closeElement();
+  }
+  
+  @Override
+  public String toString() {
+    return BaseX.info("% instance of %", expr, seq);
   }
 }

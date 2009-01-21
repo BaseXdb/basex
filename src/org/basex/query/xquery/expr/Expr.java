@@ -67,6 +67,9 @@ public abstract class Expr extends ExprInfo {
     return true;
   }
 
+  //public abstract boolean usesVarr(final Var v);
+  //public abstract boolean removeVarr(final Var v);
+
   /**
    * Indicates if an expression uses the specified variables. If the argument
    * is <code>null</code>, it is checked if any variable is used.
@@ -189,16 +192,6 @@ public abstract class Expr extends ExprInfo {
     if(it == null) Err.or(XPNOCTX, this);
     return it.iter();
   }
-
-  /**
-   * Returns the database root as expression or null.
-   * @return database root or null
-  public DBNode dbroot() {
-    if(!(this instanceof DBNode)) return null;
-    final DBNode db = (DBNode) this;
-    return db.type == Type.DOC ? db : null;
-  }
-   */
 
   /**
    * Returns the specified expression as an atomic item.

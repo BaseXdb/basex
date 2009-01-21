@@ -21,7 +21,7 @@ import org.basex.query.xquery.util.Var;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Ord extends Simple {
+public final class Ord extends Expr {
   /** Order expression. */
   private SeqIter seq;
   /** Order expression. */
@@ -96,13 +96,18 @@ public final class Ord extends Simple {
   }
 
   @Override
+  public boolean usesPos(final XQContext ctx) {
+    return expr != null && expr.usesPos(ctx);
+  }
+
+  @Override
   public boolean usesVar(final Var v) {
-    return expr.usesVar(v);
+    return expr == null || expr.usesVar(v);
   }
 
   @Override
   public Ord removeVar(final Var v) {
-    expr = expr.removeVar(v);
+    if(expr != null) expr = expr.removeVar(v);
     return this;
   }
 

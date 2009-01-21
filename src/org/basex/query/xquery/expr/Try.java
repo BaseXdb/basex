@@ -7,6 +7,7 @@ import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.iter.Iter;
+import org.basex.query.xquery.util.Var;
 
 /**
  * Project specific try/catch expression.
@@ -16,7 +17,7 @@ import org.basex.query.xquery.iter.Iter;
  */
 public final class Try extends Single {
   /** Catches. */
-  Catch[] ctch;
+  final Catch[] ctch;
 
   /**
    * Constructor.
@@ -53,6 +54,24 @@ public final class Try extends Single {
         }
       }
     };
+  }
+
+  @Override
+  public boolean usesPos(final XQContext ctx) {
+    for(final Catch c : ctch) if(c.usesPos(ctx)) return true;
+    return super.usesPos(ctx);
+  }
+
+  @Override
+  public boolean usesVar(final Var v) {
+    for(final Catch c : ctch) if(c.usesVar(v)) return true;
+    return super.usesVar(v);
+  }
+
+  @Override
+  public Expr removeVar(final Var v) {
+    for(final Catch c : ctch) c.removeVar(v);
+    return super.removeVar(v);
   }
 
   @Override
