@@ -99,7 +99,7 @@ public class DeepBase extends DeepFuse {
 
     String qu = qb.toString();
     qu = qu.endsWith("/") ? qu.substring(0, qu.length() - 1) : qu;
-    debug("[DeepBase.xpath]", "xpath: ", qu);
+    debug("[DeepBase.xpath]", "xpath: '" + qu + "'");
     return qu;
   }
 
@@ -124,7 +124,7 @@ public class DeepBase extends DeepFuse {
   private Nodes queryOne(final String xq) throws QueryException {
     Nodes n = new QueryProcessor(xq).queryNodes(new Nodes(0, data));
     if(n.size != 1) throw new QueryException("Expected exactly one match for "
-        + xq);
+        + xq + " but got " + n.size);
     return n;
   }
 
@@ -142,11 +142,11 @@ public class DeepBase extends DeepFuse {
   public int getattr(final String path) {
     debug("[DeepBase.getattr]", path);
     try {
-      final Nodes nodes = query(xpath(path));
-      debug("[DeepBase.getattr]", "found " + nodes.size);
-      if(nodes.size > 0) {
-        int pre = nodes.nodes[0];
-        debug("[DeepBase.getattr]", "pre " + pre + "id " + data.id(pre));
+      final Nodes n = query(xpath(path));
+      debug("[DeepBase.getattr]", "found " + n.size);
+      if(n.size > 0) {
+        int pre = n.nodes[0];
+        debug("[DeepBase.getattr]", "pre " + pre + " id " + data.id(pre));
         return data.id(pre);
       }
     } catch(QueryException e) {
@@ -178,13 +178,13 @@ public class DeepBase extends DeepFuse {
       // Get pre value of directory to insert.
       Nodes pnode = queryOne(xpath(chopFilename(path, mode)));
       int ppre = pnode.nodes[0];
-      int psize = data.size(ppre, data.kind(ppre));
       int pid = data.id(ppre);
-      int ipre = ppre + psize - 2; // skip back (over atts) to ELEM file
-      int iid = data.id(ipre);
+      int ipre = ppre + 2;
       debug("[DeepBase.create]", "ppre " + ppre + " id " + pid);
       data.insert(ipre, 1, m);
       data.flush();
+      data.meta.update();
+      int iid = data.id(ipre);
       debug("[DeepBase.create]", "ipre " + ipre + " id " + iid);
       return iid;
     } catch(QueryException e) {
@@ -213,6 +213,7 @@ public class DeepBase extends DeepFuse {
   @Override
   public int unlink(final String path) {
     try {
+      debug("[DeepBase.unlink] " + path);
       Nodes n = queryOne(xpath(path));
       data.delete(n.nodes[0]);
       data.flush();
