@@ -18,8 +18,8 @@ import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXText;
+import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.xquery.XQContext;
 import org.basex.util.Action;
 import org.basex.util.Token;
 
@@ -63,7 +63,7 @@ public final class QueryArea extends QueryPanel {
           query(false);
         } else {
           try {
-            final XQContext ctx = new XQContext();
+            final QueryContext ctx = new QueryContext();
             if(mod) ctx.module(xq);
             else ctx.parse(xq);
             info("", true);

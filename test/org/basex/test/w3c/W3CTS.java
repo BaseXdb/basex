@@ -26,21 +26,21 @@ import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
 import org.basex.io.IO;
+import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.xquery.XQContext;
-import org.basex.query.xquery.XQTokens;
-import org.basex.query.xquery.XQueryProcessor;
-import org.basex.query.xquery.expr.Expr;
-import org.basex.query.xquery.func.FNIndex;
-import org.basex.query.xquery.func.Fun;
-import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Nod;
-import org.basex.query.xquery.item.QNm;
-import org.basex.query.xquery.item.Str;
-import org.basex.query.xquery.item.Type;
-import org.basex.query.xquery.item.Uri;
-import org.basex.query.xquery.iter.NodIter;
-import org.basex.query.xquery.util.Var;
+import org.basex.query.QueryProcessor;
+import org.basex.query.QueryTokens;
+import org.basex.query.expr.Expr;
+import org.basex.query.func.FNIndex;
+import org.basex.query.func.Fun;
+import org.basex.query.item.Item;
+import org.basex.query.item.Nod;
+import org.basex.query.item.QNm;
+import org.basex.query.item.Str;
+import org.basex.query.item.Type;
+import org.basex.query.item.Uri;
+import org.basex.query.iter.NodIter;
+import org.basex.query.util.Var;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
@@ -322,12 +322,12 @@ public abstract class W3CTS {
     try {
       final Context context = new Context();
 
-      final XQueryProcessor xq = new XQueryProcessor(in, file);
+      final QueryProcessor xq = new QueryProcessor(in, file);
       final Nodes cont = nodes("*:contextItem", root);
       if(cont.size != 0) new Check(sources + string(data.atom(cont.nodes[0])) +
           IO.XMLSUFFIX).execute(context, null);
 
-      final XQContext ctx = xq.ctx;
+      final QueryContext ctx = xq.ctx;
       files.add(file(nodes("*:input-file", root),
           nodes("*:input-file/@variable", root), ctx));
       files.add(file(nodes("*:input-URI", root),
@@ -545,7 +545,7 @@ public abstract class W3CTS {
    * @throws QueryException query exception
    */
   private byte[] file(final Nodes nod, final Nodes var,
-      final XQContext ctx) throws QueryException {
+      final QueryContext ctx) throws QueryException {
 
     final TokenBuilder tb = new TokenBuilder();
     for(int c = 0; c < nod.size; c++) {
@@ -566,7 +566,7 @@ public abstract class W3CTS {
         }
       } else {
         // assign document
-        final Fun fun = FNIndex.get().get(token("doc"), XQTokens.FNURI,
+        final Fun fun = FNIndex.get().get(token("doc"), QueryTokens.FNURI,
             new Expr[] { Str.get(src) });
         final Var v = new Var(new QNm(data.atom(var.nodes[c])));
         ctx.vars.addGlobal(v.bind(fun, ctx));
@@ -585,12 +585,12 @@ public abstract class W3CTS {
    * @throws Exception exception
    */
   private void var(final Nodes nod, final Nodes var, final String pth,
-      final XQContext ctx) throws Exception {
+      final QueryContext ctx) throws Exception {
 
     for(int c = 0; c < nod.size; c++) {
       final String file = pth + string(data.atom(nod.nodes[c])) + ".xq";
       final String in = read(IO.get(queries + file));
-      final XQueryProcessor xq = new XQueryProcessor(in);
+      final QueryProcessor xq = new QueryProcessor(in);
       final Item item = xq.eval(null);
       final Var v = new Var(new QNm(data.atom(var.nodes[c])));
       ctx.vars.addGlobal(v.bind(item, ctx));
@@ -655,7 +655,7 @@ public abstract class W3CTS {
    * @throws Exception exception
    */
   private Nodes nodes(final String qu, final Nodes root) throws Exception {
-    return new XQueryProcessor(qu).queryNodes(root);
+    return new QueryProcessor(qu).queryNodes(root);
   }
 
   /**

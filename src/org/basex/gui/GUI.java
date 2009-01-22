@@ -183,8 +183,8 @@ public final class GUI extends JFrame {
     nav.setLayout(new BorderLayout(5, 0));
     nav.setBorder(2, 2, 0, 2);
 
-    mode = new BaseXCombo(new String[] { BUTTONSEARCH, BUTTONXPATH, BUTTONCMD },
-        HELPMODE, false);
+    mode = new BaseXCombo(new String[] {
+        BUTTONSEARCH, BUTTONXQUERY, BUTTONCMD }, HELPMODE, false);
     mode.setSelectedIndex(2);
 
     mode.addActionListener(new ActionListener() {
@@ -220,8 +220,8 @@ public final class GUI extends JFrame {
           }
         };
         final int i = !context.db() ? 2 : GUIProp.searchmode;
-        final String[] hs = i == 0 ? GUIProp.search : i == 1 ?  GUIProp.xpath :
-          GUIProp.commands;
+        final String[] hs = i == 0 ? GUIProp.search : i == 1 ?
+            GUIProp.xquery : GUIProp.commands;
         for(final String en : hs) {
           final JMenuItem jmi = new JMenuItem(en);
           jmi.addActionListener(al);
@@ -658,7 +658,7 @@ public final class GUI extends JFrame {
     menu.refresh();
 
     final int i = !context.db() ? 2 : GUIProp.searchmode;
-    final String[] hs = i == 0 ? GUIProp.search : i == 1 ? GUIProp.xpath :
+    final String[] hs = i == 0 ? GUIProp.search : i == 1 ? GUIProp.xquery :
       GUIProp.commands;
     hist.setEnabled(hs.length != 0);
   }

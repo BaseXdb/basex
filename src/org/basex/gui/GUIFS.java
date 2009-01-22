@@ -4,7 +4,6 @@ import java.awt.Container;
 import java.awt.Image;
 import java.awt.MediaTracker;
 import java.awt.Toolkit;
-
 import org.basex.util.Token;
 
 /**

@@ -6,19 +6,9 @@ import org.basex.core.Prop;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.DropDB;
-import org.basex.core.proc.XPath;
 import org.basex.core.proc.XQuery;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
-import org.basex.query.xpath.item.Bln;
-import org.basex.query.xpath.item.Dbl;
-import org.basex.query.xpath.item.NodeBuilder;
-import org.basex.query.xpath.item.Str;
-import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.item.DBNode;
-import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Type;
-import org.basex.query.xquery.iter.SeqIter;
 
 /**
  * XPath Test class.
@@ -31,12 +21,12 @@ public final class QueryTest {
   private static final Context CONTEXT = new Context();
   /** Test instances. */
   private static final AbstractTest[] TESTS = {
-    new SimpleTest(), new XPathMarkFTTest(), new FTTest()
+    new FTTest()
   };
   /** Verbose flag. */
   private static final boolean VERBOSE = false;
   /** Test all flag. */
-  private static final boolean ALL = true;
+  private static final boolean ALL = false;
   /** Wrong results counter. */
   private static int wrong;
 
@@ -59,15 +49,13 @@ public final class QueryTest {
 
     if(ALL) {
       // testing all kinds of combinations 
-      for(int x = 0; x < 2; x++) {
-        for(int a = 0; a < 2; a++) { Prop.ftindex = a == 0;
-          for(int b = 0; b < 2; b++) { Prop.ftittr = b == 0;
-            for(int c = 0; c < 2; c++) { Prop.ftfuzzy = c == 0;
-              for(int d = 0; d < 2; d++) { Prop.ftst = d == 0;
-                for(int e = 0; e < 2; e++) { Prop.ftdc = e == 0;
-                  for(int f = 0; f < 2; f++) { Prop.ftcs = f == 0;
-                    ok &= test(x != 0);
-                  }
+      for(int a = 0; a < 2; a++) { Prop.ftindex = a == 0;
+        for(int b = 0; b < 2; b++) { Prop.ftittr = b == 0;
+          for(int c = 0; c < 2; c++) { Prop.ftfuzzy = c == 0;
+            for(int d = 0; d < 2; d++) { Prop.ftst = d == 0;
+              for(int e = 0; e < 2; e++) { Prop.ftdc = e == 0;
+                for(int f = 0; f < 2; f++) { Prop.ftcs = f == 0;
+                  ok &= test();
                 }
               }
             }
@@ -82,7 +70,7 @@ public final class QueryTest {
       Prop.ftst = false;
       Prop.ftdc = false;
       Prop.ftcs = false;
-      ok &= test(true);
+      ok &= test();
     }
 
     System.out.println(ok ? "All tests correct.\n" :
@@ -91,28 +79,25 @@ public final class QueryTest {
 
   /**
    * Tests the specified query implementation.
-   * @param xquery use xpath/xquery
    * @return true if everything went alright
    */
-  private boolean test(final boolean xquery) {
+  private boolean test() {
     boolean ok = true;
     
     for(final AbstractTest test : TESTS) {
      //if (test == TESTS[2]) 
-       ok &= test(xquery, test, test.details());
+       ok &= test(test, test.details());
     }
     return ok;
   }
 
   /**
    * Tests the specified instance.
-   * @param xquery use xpath/xquery
    * @param test instance
    * @param ext extended error info
    * @return true if everything went alright
    */
-  private boolean test(final boolean xquery, final AbstractTest test,
-      final String ext) {
+  private boolean test(final AbstractTest test, final String ext) {
     boolean ok = true;
     final String name = test.getClass().getSimpleName();
     final String file = test.doc.replaceAll("\\\"", "\\\\\"");
@@ -126,16 +111,13 @@ public final class QueryTest {
     for(final Object[] qu : test.queries) {
       final boolean correct = qu.length == 3;
       final String query = qu[correct ? 2 : 1].toString();
-      final String cmd = qu[0] + ": " + (xquery ? "xquery " : "xpath ") + query;
+      final String cmd = qu[0] + ": " + query;
       
       if(VERBOSE) err(cmd, ext);
 
-      proc = xquery ? new XQuery(query) : new XPath(query);
+      proc = new XQuery(query);
       if(proc.execute(CONTEXT)) {
         Result val = proc.result();
-        // convert XQuery result to XPath items
-        if(val instanceof SeqIter) val = xpath((SeqIter) val);
-
         final Result cmp = correct ? (Result) qu[1] : null;
         if(val instanceof Nodes && cmp instanceof Nodes) {
           ((Nodes) cmp).data = ((Nodes) val).data;
@@ -158,29 +140,6 @@ public final class QueryTest {
     new Close().execute(CONTEXT);
     DropDB.drop(name);
     return ok;
-  }
-  
-  /**
-   * Converts the specified XQuery result to an XPath representation.
-   * @param val iterator
-   * @return xpath item
-   */
-  private Result xpath(final SeqIter val) {
-    try {
-      if(val.size == 1) {
-        final Item it = val.item[0];
-        if(it.type == Type.BLN) return Bln.get(it.bool());
-        if(it.n()) return new Dbl(it.dbl());
-        if(it.s()) return new Str(it.str());
-      }
-    
-      final NodeBuilder nb = new NodeBuilder();
-      for(int i = 0; i < val.size; i++) nb.add(((DBNode) val.item[i]).pre);
-      return new Nodes(nb.finish(), CONTEXT.data());
-    } catch(final XQException ex) {
-      ex.printStackTrace();
-      return null;
-    }
   }
 
   /**

@@ -3,7 +3,6 @@ package org.basex.core.proc;
 import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.io.PrintOutput;
-import org.basex.query.xquery.XQueryProcessor;
 
 /**
  * Evaluates the 'xquery' command.
@@ -22,7 +21,7 @@ public final class XQuery extends AQuery {
 
   @Override
   protected boolean exec() {
-    return query(XQueryProcessor.class, args[0] == null ? "" : args[0]);
+    return query(args[0] == null ? "" : args[0]);
   }
 
   @Override

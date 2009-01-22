@@ -6,9 +6,11 @@ import org.basex.data.Namespaces;
 import org.basex.data.Nodes;
 import org.basex.data.Skeleton;
 import org.basex.index.Names;
-import org.basex.query.xpath.item.Bln;
-import org.basex.query.xpath.item.Dbl;
-import org.basex.query.xpath.item.Str;
+import org.basex.query.item.Bln;
+import org.basex.query.item.Dec;
+import org.basex.query.item.Itr;
+import org.basex.query.item.Str;
+import org.basex.query.iter.SeqIter;
 import org.basex.util.Token;
 
 /**
@@ -34,8 +36,7 @@ abstract class AbstractTest {
   String details() { return null; }
   
   /**
-   * Create an {@link Nodes} instance
-   * for the specified node values.
+   * Create a container for the specified node values.
    * @param nodes node values
    * @return node array
    */
@@ -44,32 +45,38 @@ abstract class AbstractTest {
   }
   
   /**
-   * Create a {@link Str} instance for the 
-   * specified string.
+   * Create an iterator for the specified string.
    * @param str string
    * @return literal
    */
-  static Str string(final String str) {
-    return new Str(Token.token(str));
+  static SeqIter string(final String str) {
+    return new SeqIter(Str.get(Token.token(str)));
   }
   
   /**
-   * Create a {@link Dbl} instance for the
-   * specified double.
+   * Create an iterator for the specified double.
    * @param d double value
    * @return literal
    */
-  static Dbl num(final double d) {
-    return new Dbl(d);
+  static SeqIter itr(final long d) {
+    return new SeqIter(Itr.get(d));
   }
   
   /**
-   * Create a {@link Bln} instance for the
-   * specified boolean.
+   * Create an iterator for the specified double.
+   * @param d double value
+   * @return literal
+   */
+  static SeqIter dec(final double d) {
+    return new SeqIter(Dec.get(d));
+  }
+  
+  /**
+   * Create an iterator for the specified boolean.
    * @param b boolean value
    * @return literal
    */
-  static Bln bool(final boolean b) {
-    return Bln.get(b);
+  static SeqIter bool(final boolean b) {
+    return new SeqIter(Bln.get(b));
   }
 }

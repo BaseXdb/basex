@@ -1,6 +1,6 @@
 package org.basex.api.dom;
 
-import org.basex.query.xquery.item.Nod;
+import org.basex.query.item.Nod;
 import org.basex.util.Token;
 import org.w3c.dom.Text;
 

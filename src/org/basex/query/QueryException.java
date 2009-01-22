@@ -2,7 +2,11 @@ package org.basex.query;
 
 import static org.basex.query.QueryTokens.*;
 import org.basex.BaseX;
+import org.basex.core.Prop;
 import org.basex.io.IO;
+import org.basex.query.item.Item;
+import org.basex.query.item.Seq;
+import org.basex.util.InputParser;
 import org.basex.util.StringList;
 
 /**
@@ -12,6 +16,9 @@ import org.basex.util.StringList;
  * @author Christian Gruen
  */
 public class QueryException extends Exception {
+  /** Error items. */
+  public Item item = Seq.EMPTY;
+
   /** File reference. */
   protected IO file;
   /** Possible completions. */
@@ -30,6 +37,36 @@ public class QueryException extends Exception {
    */
   public QueryException(final Object s, final Object... e) {
     super(BaseX.info(s, e));
+  }
+  
+  /**
+   * Empty constructor; used for interrupting a query.
+   */
+  public QueryException() {
+    this("");
+  }
+
+  /**
+   * Constructor.
+   * @param s xquery error
+   * @param e error arguments
+   */
+  public QueryException(final Object[] s, final Object... e) {
+    this(s[2], e);
+  }
+
+  /**
+   * Constructor.
+   * @param sl code completion list
+   * @param s xquery error
+   * @param e error arguments
+   */
+  public QueryException(final StringList sl, final Object[] s,
+      final Object... e) {
+    this(s, e);
+    complete = sl;
+    if(!Prop.xqerrcode) return;
+    code = s[1] == null ? s[0].toString() : String.format("%s%04d", s[0], s[1]);
   }
 
   /**
@@ -68,7 +105,7 @@ public class QueryException extends Exception {
    * Sets the error position.
    * @param parser parser
    */
-  public final void pos(final QueryParser parser) {
+  public final void pos(final InputParser parser) {
     if(line != 0 || parser == null) return;
     file = parser.file;
     line = 1;
@@ -84,7 +121,7 @@ public class QueryException extends Exception {
    * @param qp query parser
    * @param comp completions
    */
-  public final void complete(final QueryParser qp, final StringList comp) {
+  public final void complete(final InputParser qp, final StringList comp) {
     complete = comp;
     qp.qm++;
     pos(qp);

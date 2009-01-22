@@ -40,17 +40,14 @@ import org.basex.core.proc.Ping;
 import org.basex.core.proc.Prompt;
 import org.basex.core.proc.Set;
 import org.basex.core.proc.Update;
-import org.basex.core.proc.XPath;
-import org.basex.core.proc.XPathMV;
+import org.basex.core.proc.XQueryMV;
 import org.basex.core.proc.XQEnv;
 import org.basex.core.proc.XQuery;
+import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryParser;
-import org.basex.query.xpath.XPParser;
-import org.basex.query.xpath.XPSuggest;
-import org.basex.query.xquery.XQContext;
-import org.basex.query.xquery.XQParser;
 import org.basex.util.Array;
+import org.basex.util.InputParser;
 import org.basex.util.Levenshtein;
 import org.basex.util.StringList;
 
@@ -61,7 +58,7 @@ import org.basex.util.StringList;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class CommandParser extends QueryParser {
+public final class CommandParser extends InputParser {
   /** Context. */
   public Context ctx;
   
@@ -154,7 +151,7 @@ public final class CommandParser extends QueryParser {
           case TABLE:
             String arg1 = number(null);
             final String arg2 = arg1 != null ? number(null) : null;
-            if(arg1 == null) arg1 = xpath(null);
+            if(arg1 == null) arg1 = xquery(null);
             return new InfoTable(arg1, arg2);
         }
         break;
@@ -176,48 +173,46 @@ public final class CommandParser extends QueryParser {
         return new Optimize();
       case EXPORT:
         return new Export(path(cmd));
-      case XPATH:
-        return new XPath(xpath(null));
-      case XPATHMV:
-        return new XPathMV(number(cmd), number(cmd), xpath(cmd));
       case XQUERY:
         return new XQuery(xquery(cmd));
+      case XQUERYMV:
+        return new XQueryMV(number(cmd), number(cmd), xquery(cmd));
       case XQUENV:
         return new XQEnv(xquery(null));
       case FIND:
         return new Find(string(cmd));
       case CS:
-        return new Cs(xpath(null));
+        return new Cs(xquery(null));
       case COPY:
         final String num = number(cmd);
-        final String xp1 = xpath(cmd);
+        final String xp1 = xquery(cmd);
         consume(',');
-        final String xp2 = xpath(cmd);
+        final String xp2 = xquery(cmd);
         return new Copy(num, xp1, xp2);
       case DELETE:
-        return new Delete(xpath(cmd));
+        return new Delete(xquery(cmd));
       case INSERT:
         final CmdUpdate ins = consume(CmdUpdate.class, cmd);
         switch(ins) {
           case FRAGMENT:
-            return new Insert(ins, string(cmd, true), number(cmd), xpath(cmd));
+            return new Insert(ins, string(cmd, true), number(cmd), xquery(cmd));
           case ELEMENT: case TEXT: case COMMENT:
-            return new Insert(ins, name(cmd), number(cmd), xpath(cmd));
+            return new Insert(ins, name(cmd), number(cmd), xquery(cmd));
           case PI:
             return new Insert(ins, name(cmd), name(cmd), number(cmd),
-                xpath(cmd));
+                xquery(cmd));
           case ATTRIBUTE:
-            return new Insert(ins, name(cmd), name(cmd), xpath(cmd));
+            return new Insert(ins, name(cmd), name(cmd), xquery(cmd));
         }
         break;
       case UPDATE:
         final CmdUpdate upd = consume(CmdUpdate.class, cmd);
         switch(upd) {
           case ELEMENT: case TEXT: case COMMENT:
-            return new Update(upd, name(cmd), xpath(cmd));
+            return new Update(upd, name(cmd), xquery(cmd));
           case PI:
           case ATTRIBUTE:
-            return new Update(upd, name(cmd), name(cmd), xpath(cmd));
+            return new Update(upd, name(cmd), name(cmd), xquery(cmd));
           default:
         }
         break;
@@ -322,26 +317,6 @@ public final class CommandParser extends QueryParser {
   }
 
   /**
-   * Parses and returns an xpath expression (prototype).
-   * @param cmd referring command; if specified, the result mustn't be empty
-   * @return path
-   * @throws QueryException query exception
-   */
-  private String xpath(final Cmd cmd) throws QueryException {
-    consumeWS();
-    final StringBuilder sb = new StringBuilder();
-    if(more() && !curr(';')) {
-      final XPParser p = ctx != null ? new XPSuggest(qu, ctx) :
-        new XPParser(qu);
-      p.qp = qp;
-      p.parse(false);
-      sb.append(qu.substring(qp, p.qp));
-      qp = p.qp;
-    }
-    return finish(cmd, sb);
-  }
-
-  /**
    * Parses and returns an xquery expression (prototype).
    * @param cmd referring command; if specified, the result mustn't be empty
    * @return path
@@ -351,7 +326,7 @@ public final class CommandParser extends QueryParser {
     consumeWS();
     final StringBuilder sb = new StringBuilder();
     if(more() && !curr(';')) {
-      final XQParser p = new XQParser(new XQContext());
+      final QueryParser p = new QueryParser(new QueryContext());
       p.init(qu);
       p.qp = qp;
       p.parse(null, false);

@@ -1,5 +1,6 @@
 package org.basex.api.jaxp;
 
+import java.io.IOException;
 import javax.xml.namespace.QName;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -8,12 +9,13 @@ import org.basex.api.dom.BXNList;
 import org.basex.core.Context;
 import org.basex.core.proc.Check;
 import org.basex.data.Data;
+import org.basex.data.Nodes;
+import org.basex.data.Result;
+import org.basex.data.XMLSerializer;
+import org.basex.io.CachedOutput;
 import org.basex.query.QueryException;
-import org.basex.query.xpath.XPathProcessor;
-import org.basex.query.xpath.item.Item;
-import org.basex.query.xpath.item.Nod;
-import org.basex.query.xquery.item.DBNode;
-import org.basex.util.Token;
+import org.basex.query.QueryProcessor;
+import org.basex.query.item.DBNode;
 import org.xml.sax.InputSource;
 
 /**
@@ -26,14 +28,14 @@ public final class XPathExprImpl implements XPathExpression {
   /** Query context. */
   private final Context context = new Context();
   /** Query context. */
-  private final XPathProcessor xproc;
+  private final QueryProcessor xproc;
 
   /**
    * Constructor.
    * @param expr query expression
    */
   public XPathExprImpl(final String expr) {
-    xproc = new XPathProcessor(expr);
+    xproc = new QueryProcessor(expr);
   }
 
   public String evaluate(final Object item) throws XPathExpressionException {
@@ -62,9 +64,9 @@ public final class XPathExprImpl implements XPathExpression {
    * @return result
    * @throws XPathExpressionException xpath exception
    */
-  private Item eval() throws XPathExpressionException {
+  private Result eval() throws XPathExpressionException {
     try {
-      return (Item) xproc.query(context.current());
+      return xproc.query(context.current());
     } catch(final QueryException ex) {
       throw new XPathExpressionException(ex);
     }
@@ -77,10 +79,10 @@ public final class XPathExprImpl implements XPathExpression {
    * @return result
    * @throws XPathExpressionException xpath exception
    */
-  private Object finish(final Item item, final QName res)
+  private Object finish(final Result item, final QName res)
       throws XPathExpressionException {
 
-    final Nod nodes = item instanceof Nod ? (Nod) item : null;
+    final Nodes nodes = item instanceof Nodes ? (Nodes) item : null;
     if(res == XPathConstants.NODESET || res == XPathConstants.NODE) {
       if(nodes == null) throw new XPathExpressionException(
           "Result can't be cast to a nodeset");
@@ -91,9 +93,16 @@ public final class XPathExprImpl implements XPathExpression {
         new DBNode(data, nodes.nodes[0]).java();
     }
 
-    if(res == XPathConstants.NUMBER) return Double.valueOf(item.num());
-    if(res == XPathConstants.STRING) return Token.string(item.str());
-    if(res == XPathConstants.BOOLEAN) return Boolean.valueOf(item.bool());
-    throw new XPathExpressionException("Invalid type: " + res);
+    try {
+      CachedOutput out = new CachedOutput();
+      item.serialize(new XMLSerializer(out));
+      String val = out.toString();
+      if(res == XPathConstants.NUMBER) return Double.valueOf(val);
+      if(res == XPathConstants.STRING) return val;
+      if(res == XPathConstants.BOOLEAN) return Boolean.valueOf(val);
+      throw new XPathExpressionException("Invalid type: " + res);
+    } catch(final IOException ex) {
+      throw new XPathExpressionException(ex);
+    }
   }
 }

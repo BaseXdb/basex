@@ -1,9 +1,9 @@
 package org.basex.api.dom;
 
 import org.basex.BaseX;
-import org.basex.query.xquery.item.FTxt;
-import org.basex.query.xquery.item.Nod;
-import org.basex.query.xquery.util.NodeBuilder;
+import org.basex.query.item.FTxt;
+import org.basex.query.item.Nod;
+import org.basex.query.util.NodeBuilder;
 import org.basex.util.Token;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;

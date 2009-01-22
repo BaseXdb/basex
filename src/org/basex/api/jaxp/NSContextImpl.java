@@ -4,7 +4,7 @@ import static org.basex.util.Token.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import javax.xml.namespace.NamespaceContext;
-import org.basex.query.xquery.util.NSLocal;
+import org.basex.query.util.NSLocal;
 
 /**
  * This class provides access to namespace context.

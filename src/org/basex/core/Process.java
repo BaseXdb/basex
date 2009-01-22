@@ -9,7 +9,7 @@ import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
-import org.basex.query.xquery.XQueryProcessor;
+import org.basex.query.QueryProcessor;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 
@@ -179,7 +179,7 @@ public abstract class Process extends AbstractProcess {
    */
   protected final Nodes query(final String q, final String err) {
     try {
-      final XQueryProcessor qu = new XQueryProcessor(q == null ? "" : q);
+      final QueryProcessor qu = new QueryProcessor(q == null ? "" : q);
       progress(qu);
       final Nodes nodes = qu.queryNodes(context.current());
       // check if all result nodes are tags

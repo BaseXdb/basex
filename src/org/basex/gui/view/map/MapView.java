@@ -2,7 +2,6 @@ package org.basex.gui.view.map;
 
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.Text.*;
-
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics;

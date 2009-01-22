@@ -5,7 +5,7 @@ import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.data.Nodes;
 import org.basex.query.QueryException;
-import org.basex.query.xquery.XQueryProcessor;
+import org.basex.query.QueryProcessor;
 import org.basex.util.Performance;
 
 /**
@@ -16,7 +16,7 @@ import org.basex.util.Performance;
  */
 public final class XQEnv extends AQuery {
   /** Static XQuery instance. */
-  private static XQueryProcessor qu = new XQueryProcessor("");
+  private static QueryProcessor qu = new QueryProcessor("");
 
   /**
    * Constructor.
@@ -37,7 +37,7 @@ public final class XQEnv extends AQuery {
     try {
       for(int i = 0; i < Prop.runs; i++) {
         if(query == null) {
-          qu = new XQueryProcessor(null);
+          qu = new QueryProcessor(null);
           query = "()";
         }
   

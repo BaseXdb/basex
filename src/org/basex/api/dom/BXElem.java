@@ -1,9 +1,9 @@
 package org.basex.api.dom;
 
 import org.basex.BaseX;
-import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.item.Nod;
-import org.basex.query.xquery.iter.NodeIter;
+import org.basex.query.QueryException;
+import org.basex.query.item.Nod;
+import org.basex.query.iter.NodeIter;
 import org.basex.util.Token;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
@@ -146,7 +146,7 @@ public final class BXElem extends BXNode implements Element {
       while((n = iter.next()) != null) {
         if(Token.eq(nm, n.nname())) return n;
       }
-    } catch(final XQException ex) {
+    } catch(final QueryException ex) {
       BaseX.notexpected();
     }
     return null;

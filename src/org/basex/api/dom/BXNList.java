@@ -1,8 +1,9 @@
 package org.basex.api.dom;
 
-import org.basex.query.xpath.item.Nod;
-import org.basex.query.xquery.item.DBNode;
-import org.basex.query.xquery.util.NodeBuilder;
+import org.basex.data.Nodes;
+import org.basex.query.item.DBNode;
+import org.basex.query.item.Nod;
+import org.basex.query.util.NodeBuilder;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -15,8 +16,8 @@ import org.w3c.dom.NodeList;
 public class BXNList implements NodeList {
   /** XQuery node set. */
   protected NodeBuilder xquery;
-  /** XPath node set. */
-  protected Nod nodes;
+  /** XQuery node set. */
+  protected Nodes nodes;
 
   /**
    * Constructor.
@@ -28,14 +29,14 @@ public class BXNList implements NodeList {
 
   /**
    * Constructor.
-   * @param ns node set
+   * @param n nodes
    */
-  public BXNList(final Nod ns) {
-    nodes = ns;
+  public BXNList(final Nodes n) {
+    nodes = n;
   }
 
   public final Node item(final int i) {
-    org.basex.query.xquery.item.Nod n = null;
+    Nod n = null;
     if(xquery != null) {
       if(i < xquery.size) n = xquery.list[i];
     } else {

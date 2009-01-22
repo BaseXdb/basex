@@ -4,11 +4,11 @@ import static org.basex.util.Token.*;
 import org.basex.BaseX;
 import org.basex.data.Data;
 import org.basex.io.IO;
-import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.item.Nod;
-import org.basex.query.xquery.item.Type;
-import org.basex.query.xquery.iter.NodeIter;
-import org.basex.query.xquery.util.NodeBuilder;
+import org.basex.query.QueryException;
+import org.basex.query.item.Nod;
+import org.basex.query.item.Type;
+import org.basex.query.iter.NodeIter;
+import org.basex.query.util.NodeBuilder;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -94,7 +94,7 @@ public abstract class BXNode implements Node {
   public Node getFirstChild() {
     try {
       return finish(node.child().next());
-    } catch(final XQException ex) {
+    } catch(final QueryException ex) {
       BaseX.notexpected();
       return null;
     }
@@ -106,7 +106,7 @@ public abstract class BXNode implements Node {
       final NodeIter it = node.child();
       Nod t = null;
       while((t = it.next()) != null) n = t;
-    } catch(final XQException ex) {
+    } catch(final QueryException ex) {
       BaseX.notexpected();
     }
     return finish(n);
@@ -119,7 +119,7 @@ public abstract class BXNode implements Node {
   public Node getNextSibling() {
     try {
       return finish(node.follSibl().next());
-    } catch(final XQException ex) {
+    } catch(final QueryException ex) {
       BaseX.notexpected();
       return null;
     }
@@ -128,7 +128,7 @@ public abstract class BXNode implements Node {
   public Node getPreviousSibling() {
     try {
       return finish(node.precSibl().next());
-    } catch(final XQException ex) {
+    } catch(final QueryException ex) {
       BaseX.notexpected();
       return null;
     }
@@ -268,7 +268,7 @@ public abstract class BXNode implements Node {
         if(n.type == Type.ELM && (nm == null || eq(nm, n.nname())))
           nb.add(n.copy());
       }
-    } catch(final XQException ex) {
+    } catch(final QueryException ex) {
       BaseX.notexpected();
     }
     return new BXNList(nb);
@@ -284,7 +284,7 @@ public abstract class BXNode implements Node {
     try {
       Nod n = null;
       while((n = it.next()) != null) nb.add(n.copy());
-    } catch(final XQException ex) {
+    } catch(final QueryException ex) {
       BaseX.notexpected();
     }
     return nb;

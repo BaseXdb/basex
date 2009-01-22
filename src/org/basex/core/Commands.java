@@ -16,7 +16,7 @@ public interface Commands {
     DUMMYDATABASE(false), CREATE(true), OPEN(true), INFO(true), CHECK(false),
     CLOSE(true), LIST(true), DROP(true), OPTIMIZE(true), EXPORT(true),
     // QUERY COMMANDS
-    DUMMYQUERY(false), XPATH(true), XPATHMV(false), XQUERY(true),
+    DUMMYQUERY(false), XQUERY(true), XQUERYMV(false),
     XQUENV(false), FIND(true), CS(true), BASH(true),
     // UPDATE COMMANDS
     DUMMYUPDATE(false), COPY(true), DELETE(true), INSERT(true), UPDATE(true),

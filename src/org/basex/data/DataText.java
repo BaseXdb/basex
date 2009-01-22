@@ -1,7 +1,6 @@
 package org.basex.data;
 
 import static org.basex.util.Token.*;
-
 import org.basex.core.Prop;
 
 /**

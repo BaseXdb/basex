@@ -37,13 +37,10 @@ abstract class AQuery extends Process {
 
   /**
    * Returns a new query instance.
-   * @param cls query class
    * @param query query
    * @return query instance
    */
-  protected final boolean query(final Class<? extends QueryProcessor> cls,
-      final String query) {
-
+  protected final boolean query(final String query) {
     long pars = 0;
     long comp = 0;
     long eval = 0;
@@ -51,8 +48,7 @@ abstract class AQuery extends Process {
     QueryProcessor qu = null;
     try {
       for(int i = 0; i < Prop.runs; i++) {
-        qu = cls.getConstructor(new Class[] { String.class }).newInstance(
-            new Object[] { query == null ? "" : query });
+        qu = new QueryProcessor(query == null ? "" : query);
         final Nodes nodes = context.current();
         progress(qu);
 

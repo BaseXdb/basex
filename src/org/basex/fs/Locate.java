@@ -4,7 +4,7 @@ import java.io.IOException;
 import org.basex.data.Nodes;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
-import org.basex.query.xquery.XQueryProcessor;
+import org.basex.query.QueryProcessor;
 import org.basex.util.GetOpts;
 import org.basex.util.IntList;
 import org.basex.util.Token;
@@ -139,7 +139,7 @@ public final class Locate extends FSCmd {
     }
 
     // include limit in query
-    final XQueryProcessor qu = new XQueryProcessor(
+    final QueryProcessor qu = new QueryProcessor(
         "(/descendant-or-self::*" + query + ")[position() <= " + limit + "]");
     
     try {

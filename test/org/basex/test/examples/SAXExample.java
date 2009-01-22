@@ -5,7 +5,6 @@ import org.basex.core.proc.Check;
 import org.basex.data.Result;
 import org.basex.data.SAXSerializer;
 import org.basex.query.QueryProcessor;
-import org.basex.query.xquery.XQueryProcessor;
 import org.xml.sax.Attributes;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
@@ -45,7 +44,7 @@ public final class SAXExample extends DefaultHandler {
     new Check(XMLFILE).execute(ctx, null);
     
     // create query instance
-    final QueryProcessor query = new XQueryProcessor(QUERY);
+    final QueryProcessor query = new QueryProcessor(QUERY);
     // execute query
     final Result result = query.query(ctx.current());
 

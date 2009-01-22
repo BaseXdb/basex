@@ -6,6 +6,8 @@ import org.basex.core.Prop;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.data.Serializer;
+import org.basex.io.IO;
+import org.basex.query.item.Item;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -17,15 +19,17 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public abstract class QueryProcessor extends Progress {
+public final class QueryProcessor extends Progress {
   /** Query Info: Plan. */
   private static final byte[] PLAN = Token.token("QueryPlan");
+  /** Expression context. */
+  public final QueryContext ctx = new QueryContext();
   /** Initial node set. */
   public String query;
-  /** Expression context. */
-  protected QueryContext context;
+  /** Parsed flag. */
+  private boolean parsed;
   /** Compilation flag. */
-  protected boolean compiled;
+  private boolean compiled;
 
   /**
    * Default Constructor.
@@ -33,6 +37,17 @@ public abstract class QueryProcessor extends Progress {
    */
   public QueryProcessor(final String q) {
     query = q;
+    progress(ctx);
+  }
+  
+  /**
+   * XQuery Constructor.
+   * @param qu query
+   * @param f query file reference
+   */
+  public QueryProcessor(final String qu, final IO f) {
+    this(qu);
+    ctx.file = f;
   }
 
   /**
@@ -40,26 +55,30 @@ public abstract class QueryProcessor extends Progress {
    * @throws QueryException query exception
    */
   public void parse() throws QueryException {
-    context = create();
-    progress(context);
+    if(!parsed) ctx.parse(query);
+    parsed = true;
   }
-
-  /**
-   * Parses the specified query and returns the query context.
-   * @return query expression
-   * @throws QueryException query exception
-   */
-  protected abstract QueryContext create() throws QueryException;
   
   /**
    * Compiles the query.
    * @param nodes node context
    * @throws QueryException query exception
    */
-  public final void compile(final Nodes nodes) throws QueryException {
-    if(context == null) parse();
-    context.compile(nodes);
+  public void compile(final Nodes nodes) throws QueryException {
+    parse();
+    if(!compiled) ctx.compile(nodes);
     compiled = true;
+  }
+  
+  /**
+   * Returns a result iterator.
+   * @param nodes node input
+   * @return result iterator
+   * @throws QueryException query exception
+   */
+  public Item eval(final Nodes nodes) throws QueryException {
+    compile(nodes);
+    return ctx.iter().finish();
   }
 
   /**
@@ -68,9 +87,9 @@ public abstract class QueryProcessor extends Progress {
    * @return result of query
    * @throws QueryException query exception
    */
-  public final Result query(final Nodes n) throws QueryException {
-    if(!compiled) compile(n);
-    return context.eval(n);
+  public Result query(final Nodes n) throws QueryException {
+    compile(n);
+    return ctx.eval(n);
   }
 
   /**
@@ -79,18 +98,36 @@ public abstract class QueryProcessor extends Progress {
    * @return result of query
    * @throws QueryException query exception
    */
-  public final Nodes queryNodes(final Nodes nodes) throws QueryException {
+  public Nodes queryNodes(final Nodes nodes) throws QueryException {
     final Result res = query(nodes);
     if(!(res instanceof Nodes)) throw new QueryException(QUERYNODESERR);
     return (Nodes) res;
+  }
+
+  /**
+   * Adds a module reference.
+   * @param ns module namespace
+   * @param file file name
+   */
+  public void module(final String ns, final String file) {
+    ctx.modules.add(ns);
+    ctx.modules.add(file);
+  }
+  
+  /**
+   * Sets a new query. Should be called before parsing the query.
+   * @param qu query
+   */
+  public void setQuery(final String qu) {
+    query = qu;;
   }
   
   /**
    * Returns query background information.
    * @return background information
    */
-  public final String info() {
-    final TokenBuilder tb = new TokenBuilder(context.info());
+  public String info() {
+    final TokenBuilder tb = new TokenBuilder(ctx.info());
     if(Prop.allInfo) tb.add(NL + QUERYSTRING + query + NL);
     return tb.toString();
   }
@@ -100,24 +137,24 @@ public abstract class QueryProcessor extends Progress {
    * @param ser serializer
    * @throws Exception exception
    */
-  public final void plan(final Serializer ser) throws Exception {
+  public void plan(final Serializer ser) throws Exception {
     ser.openElement(PLAN);
-    context.plan(ser);
+    ctx.plan(ser);
     ser.closeElement();
   }
   
   @Override
-  public final String tit() {
+  public String tit() {
     return QUERYEVAL;
   }
 
   @Override
-  public final String det() {
+  public String det() {
     return QUERYEVAL;
   }
 
   @Override
-  public final double prog() {
+  public double prog() {
     return 0;
   }
 }

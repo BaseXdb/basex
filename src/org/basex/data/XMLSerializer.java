@@ -3,7 +3,6 @@ package org.basex.data;
 import static org.basex.util.Token.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
-
 import org.basex.index.FTTokenizer;
 import org.basex.io.PrintOutput;
 import org.basex.util.Token;

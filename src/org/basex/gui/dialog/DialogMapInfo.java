@@ -1,16 +1,11 @@
 package org.basex.gui.dialog;
 
 import static org.basex.Text.*;
-
 import java.awt.BorderLayout;
-
-//import java.awt.BorderLayout;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXCheckBox;
-//import org.basex.gui.layout.BaseXLabel;
-//import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.TableLayout;
 
 /**

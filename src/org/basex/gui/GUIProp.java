@@ -80,7 +80,7 @@ public final class GUIProp {
 
   // LAYOUT & INPUT OPTIONS ===================================================
 
-  /** Current input mode in global text field (Search, XPath, Command). */
+  /** Current input mode in global text field (Search, XQuery, Command). */
   public static int searchmode = 0;
   /** Focus follows mouse. */
   public static boolean mousefocus = false;
@@ -130,10 +130,10 @@ public final class GUIProp {
 
   /** Last entered BaseX commands. */
   public static String[] commands = new String[0];
-  /** Last entered BaseX commands. */
+  /** Last entered keysowrd searches. */
   public static String[] search = new String[0];
-  /** Last entered XPath queries. */
-  public static String[] xpath = new String[0];
+  /** Last entered XQueries queries. */
+  public static String[] xquery = new String[0];
 
   // CONFIG OPTIONS ===========================================================
 

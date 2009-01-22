@@ -2,7 +2,6 @@ package org.basex.gui.layout;
 
 import static org.basex.gui.GUIConstants.*;
 import java.awt.Color;
-
 import org.basex.data.FTPosData;
 import org.basex.util.Array;
 import org.basex.util.Token;

@@ -14,7 +14,6 @@ import org.basex.core.Prop;
 import org.basex.core.proc.Exit;
 import org.basex.core.proc.Prompt;
 import org.basex.core.proc.Set;
-import org.basex.core.proc.XPath;
 import org.basex.core.proc.XQuery;
 import org.basex.io.IO;
 import org.basex.io.CachedOutput;
@@ -43,9 +42,9 @@ public class BaseXClient {
   private boolean info;
   /** Flag for showing detailed info on command processing. */
   private boolean allInfo;
-  /** XPath file. */
+  /** XQuery file. */
   private String query;
-  /** Output file for XPath queries. */
+  /** Output file for queries. */
   protected String output;
   /** User query. */
   private String commands;
@@ -170,7 +169,7 @@ public class BaseXClient {
     try {
       for(final Process p : new CommandParser(in).parse()) {
         if(p instanceof Exit) return false;
-        final boolean qu = p instanceof XPath || p instanceof XQuery;
+        final boolean qu = p instanceof XQuery;
         if(!process(p, info || qu && Prop.xmlplan)) break;
       }
     } catch(final QueryException ex) {

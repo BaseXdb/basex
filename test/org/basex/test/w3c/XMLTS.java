@@ -10,7 +10,7 @@ import org.basex.core.proc.Close;
 import org.basex.core.proc.CreateDB;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.query.xquery.XQueryProcessor;
+import org.basex.query.QueryProcessor;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -137,6 +137,6 @@ public final class XMLTS {
    * @throws Exception exception
    */
   private Nodes nodes(final String qu, final Nodes root) throws Exception {
-    return new XQueryProcessor(qu).queryNodes(root);
+    return new QueryProcessor(qu).queryNodes(root);
   }
 }

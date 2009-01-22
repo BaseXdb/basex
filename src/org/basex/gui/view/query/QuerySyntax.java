@@ -6,8 +6,7 @@ import java.util.HashSet;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXSyntax;
 import org.basex.query.QueryTokens;
-import org.basex.query.xquery.XQTokens;
-import org.basex.query.xquery.func.FunDef;
+import org.basex.query.func.FunDef;
 import org.basex.util.XMLToken;
 
 /**
@@ -36,11 +35,6 @@ public final class QuerySyntax extends BaseXSyntax {
   // initialize xquery keys
   static {
     try {
-      for(final Field f : XQTokens.class.getFields()) {
-        if(f.getName().equals("IGNORE")) break;
-        final String s = (String) f.get(null);
-        for(String ss : s.split("-")) keys.add(ss);
-      }
       for(final Field f : QueryTokens.class.getFields()) {
         if(f.getName().equals("IGNORE")) break;
         final String s = (String) f.get(null);

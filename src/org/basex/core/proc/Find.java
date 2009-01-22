@@ -7,7 +7,6 @@ import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.io.PrintOutput;
-import org.basex.query.xquery.XQueryProcessor;
 import org.basex.util.Array;
 import org.basex.util.BoolList;
 import org.basex.util.StringList;
@@ -34,7 +33,7 @@ public final class Find extends AQuery {
   @Override
   protected boolean exec() {
     final String query = args[0] == null ? "" : args[0];
-    return query(XQueryProcessor.class, find(query, context, false));
+    return query(find(query, context, false));
   }
 
   @Override

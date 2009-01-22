@@ -1,10 +1,8 @@
 package org.basex.gui.view.query;
 
 import static org.basex.Text.*;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
 import org.basex.gui.GUICommands;

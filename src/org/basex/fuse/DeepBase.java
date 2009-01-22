@@ -2,7 +2,6 @@ package org.basex.fuse;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
 import org.basex.core.Prop;
 import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.Open;
@@ -11,7 +10,7 @@ import org.basex.data.MemData;
 import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
-import org.basex.query.xquery.XQueryProcessor;
+import org.basex.query.QueryProcessor;
 
 /**
  * BaseX as filesystem in userspace implementation.
@@ -105,25 +104,25 @@ public class DeepBase extends DeepFuse {
   }
 
   /**
-   * Performs an XPath/XQuery query and returns the resulting node set.
+   * Performs an XQuery query and returns the resulting node set.
    * 
    * @param xq query
    * @return result nodes
    * @throws QueryException on failure
    */
   private Nodes query(final String xq) throws QueryException {
-    return new XQueryProcessor(xq).queryNodes(new Nodes(0, data));
+    return new QueryProcessor(xq).queryNodes(new Nodes(0, data));
   }
 
   /**
-   * Performs an XPath/XQuery query and returns the resulting node set.
+   * Performs an XQuery query and returns the resulting node set.
    * 
    * @param xq query
    * @return result nodes
    * @throws QueryException on failure
    */
   private Nodes queryOne(final String xq) throws QueryException {
-    Nodes n = new XQueryProcessor(xq).queryNodes(new Nodes(0, data));
+    Nodes n = new QueryProcessor(xq).queryNodes(new Nodes(0, data));
     if(n.size != 1) throw new QueryException("Expected exactly one match for "
         + xq);
     return n;

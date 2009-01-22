@@ -10,7 +10,7 @@ import org.basex.core.Context;
 import org.basex.core.Process;
 import org.basex.core.Prop;
 import org.basex.core.proc.Open;
-import org.basex.core.proc.XPathMV;
+import org.basex.core.proc.XQueryMV;
 import org.basex.io.NullOutput;
 
 /**
@@ -100,7 +100,7 @@ public final class MVTest {
       query.append("[position() <= " + MAX + "]");
 
       // process query
-      final Process proc = new XPathMV(Integer.toString(MAX),
+      final Process proc = new XQueryMV(Integer.toString(MAX),
           Integer.toString(SUB), query.toString());
 
       if(!proc.execute(context)) {

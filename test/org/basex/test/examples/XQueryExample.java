@@ -5,7 +5,6 @@ import org.basex.core.proc.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.xquery.*;
 
 /**
  * This class serves as an example for executing XQuery requests.
@@ -47,7 +46,7 @@ public final class XQueryExample {
     System.out.println("Second example:");
 
     // Creates a query instance
-    QueryProcessor xquery = new XQueryProcessor(QUERY);
+    QueryProcessor xquery = new QueryProcessor(QUERY);
 
     // Executes the query; no initial context set is specified (null)
     Result result = xquery.query(null);

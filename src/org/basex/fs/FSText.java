@@ -86,7 +86,7 @@ public interface FSText {
     "-c         Suppress output; instead print a count of matching file names",
     "-l number  Limit output to number of file names and exit",
     "-V number  1 = use locate with direct access to the data table",
-    "           2 = use XPath (no wildcards atm)"
+    "           2 = use XQuery (no wildcards atm)"
   };
   
   /** Help text. */

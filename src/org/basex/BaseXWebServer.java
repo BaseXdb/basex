@@ -22,11 +22,11 @@ import org.basex.data.XMLSerializer;
 import org.basex.io.BufferedOutput;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
-import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.XQueryProcessor;
-import org.basex.query.xquery.item.QNm;
-import org.basex.query.xquery.item.Str;
-import org.basex.query.xquery.util.Var;
+import org.basex.query.QueryException;
+import org.basex.query.QueryProcessor;
+import org.basex.query.item.QNm;
+import org.basex.query.item.Str;
+import org.basex.query.util.Var;
 import org.basex.util.Action;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -72,8 +72,8 @@ public final class BaseXWebServer {
   boolean cache = false;
 
   /** XQuery Cache. */
-  final HashMap<String, XQueryProcessor> map =
-    new HashMap<String, XQueryProcessor>();
+  final HashMap<String, QueryProcessor> map =
+    new HashMap<String, QueryProcessor>();
 
   /**
    * Main method.
@@ -261,7 +261,7 @@ public final class BaseXWebServer {
     out.println(DOCTYPE);
 
     try {
-      XQueryProcessor xq = null;
+      QueryProcessor xq = null;
 
       // cache compiled query or create new one
       if(cache) {
@@ -269,12 +269,12 @@ public final class BaseXWebServer {
         xq = map.get(key);
         if(xq == null) {
           final String query = Token.string(req.file.content());
-          xq = new XQueryProcessor(query, req.file);
+          xq = new QueryProcessor(query, req.file);
           map.put(key, xq);
         }
       } else {
         final String query = Token.string(req.file.content());
-        xq = new XQueryProcessor(query, req.file);
+        xq = new QueryProcessor(query, req.file);
       }
 
       // assign parameters to the xquery processor
@@ -287,7 +287,7 @@ public final class BaseXWebServer {
     } catch(final Exception ex) {
       if(ex instanceof IOException) {
         out.println(SERVERERR);
-      } else if(ex instanceof XQException) {
+      } else if(ex instanceof QueryException) {
         out.println(HEADER + "<pre><font color='red'>" +
             ex.getMessage() + "</font></pre>" + FOOTER);
       } else {

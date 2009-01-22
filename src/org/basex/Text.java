@@ -232,11 +232,11 @@ public interface Text {
   /** Command help. */
   String XPATH2 = lang("ch_xpath2");
   /** Command help. */
-  String XPATHMV0 = lang("ch_xpathmv0");
+  String XQUERYMV0 = lang("ch_xquerymv0");
   /** Command help. */
-  String XPATHMV1 = lang("ch_xpathmv1");
+  String XQUERYMV1 = lang("ch_xquerymv1");
   /** Command help. */
-  String XPATHMV2 = lang("ch_xpathmv2");
+  String XQUERYMV2 = lang("ch_xquerymv2");
   /** Command Help. */
   String XQUERY0 = lang("ch_xquery0");
   /** Command Help. */
@@ -881,7 +881,7 @@ public interface Text {
   /** Input field. */
   String BUTTONCMD = lang("b_cmd");
   /** Input field. */
-  String BUTTONXPATH = lang("b_xpath");
+  String BUTTONXQUERY = lang("b_xquery");
   /** Button text for confirming actions. */
   String BUTTONOK = lang("b_ok");
   /** Button text for confirming actions. */

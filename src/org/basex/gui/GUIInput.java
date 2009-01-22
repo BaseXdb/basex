@@ -13,11 +13,10 @@ import org.basex.core.CommandParser;
 import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.query.QueryException;
-import org.basex.query.xpath.XPSuggest;
 import org.basex.util.StringList;
 
 /**
- * This class offers a text field for XPath input.
+ * This class offers a text field for keyword and XQuery input.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Andreas Weiler
@@ -71,12 +70,12 @@ public final class GUIInput extends BaseXTextField {
 
             final int i = !main.context.db() ? 2 : GUIProp.searchmode;
             final String[] hs = i == 0 ? GUIProp.search : i == 1 ?
-                GUIProp.xpath : GUIProp.commands;
+                GUIProp.xquery : GUIProp.commands;
             for(int p = 0; p < hs.length && sl.size < 10; p++) {
               if(!hs[p].equals(txt)) sl.add(hs[p]);
             }
             if(i == 0) GUIProp.search = sl.finish();
-            else if(i == 1) GUIProp.xpath = sl.finish();
+            else if(i == 1) GUIProp.xquery = sl.finish();
             else GUIProp.commands = sl.finish();
 
             // evaluate the input
@@ -161,10 +160,12 @@ public final class GUIInput extends BaseXTextField {
     final String query = getText();
     if(cmdMode()) {
       cmdPopup(query);
-    } else if(GUIProp.searchmode == 1 ||
+    }
+    /*else if(GUIProp.searchmode == 1 ||
         GUIProp.searchmode == 0 && query.startsWith("/")) {
       xpathPopup(query);
     }
+    */
   }
 
   /**
@@ -188,7 +189,6 @@ public final class GUIInput extends BaseXTextField {
   /**
    * Shows the xpath popup menu.
    * @param query query input
-   */
   private void xpathPopup(final String query) {
     StringList sl = null;
     try {
@@ -202,12 +202,12 @@ public final class GUIInput extends BaseXTextField {
     }
     createCombo(sl);
   }
+   */
   
   /**
    * Returns an xpath completion position (temporary).
    * @param query input query
    * @return position
-   */
   private int xPos(final String query) {
     for(int q = query.length() - 1; q >= 0; q--) {
       final int c = query.charAt(q);
@@ -215,6 +215,7 @@ public final class GUIInput extends BaseXTextField {
     }
     return -1;
   }
+   */
 
   /**
    * Creates and shows the combo box.

@@ -333,7 +333,7 @@ final class TableData {
   }
 
   /**
-   * Builds an XPath query and executes a search for the filtered terms.
+   * Builds and returns an XQuery for the filtered terms.
    * @return query
    */
   String find() {
