@@ -87,12 +87,11 @@ public class AxisPath extends Path {
     // Simple iterator: one downward location step
     if(st.length == 1 && st[0].axis.down) return new SimpleIterPath(r, st);
     
-    /* Child iterator: [...]
+    // Child iterator: [...]
     // check if all steps are child steps
     boolean children = true;
     for(final Step s : st) children &= s.axis == Axis.CHILD;
     if(children) return new ChildIterPath(r, st);
-    */
 
     // return null if no iterator could be created
     return null;

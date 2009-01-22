@@ -1,7 +1,6 @@
 package org.basex.query.path;
 
 import static org.basex.query.QueryText.*;
-
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -31,46 +30,53 @@ public final class ChildIterPath extends AxisPath {
       final Item c = ctx.item;
       final int cs = ctx.size;
       final int cp = ctx.pos;
-      boolean firstTime = true;
-      Iter iter;
-      int stepCount = 0;
-      Item it;
+      private Iter[] iter;
+      private Iter ir;
+      private Item item;
+      private int p;
 
       @Override
       public Item next() throws QueryException {
+
+        // first call of method
+        if(iter == null) {
+          item = root != null ? ctx.iter(root).finish() : ctx.item;
+          ctx.item = item;
+          iter = new Iter[step.length];
+          iter[0] = ctx.iter(step[0]);
+          //for(int f = 0; f < step.length; f++) iter[f] = ctx.iter(step[f]);
+          ctx.size = item.size();
+          ctx.pos = 1;
+        }
+
         while(true) {
-          // first call of method
-          if(firstTime) {
-            it = root != null ? ctx.iter(root).finish() : ctx.item;
-            ctx.item = it;            
-            firstTime = false;
-          }
-
-          // if it is a new step
-          if(iter == null) {
-            iter = ctx.iter(step[stepCount]);
-            ctx.size = it.size();
-            ctx.pos = 1;
-          }
-
-          final Item i = iter.next();
-          if(i == null) {
-            // if it is the end of all steps
-            if (stepCount == step.length - 1) {
+          if(ir != null) {
+            final Item i = ir.next();
+            if(i != null) {
+              if(!i.node()) Err.or(NODESPATH, this, i.type);
+              ctx.item = i;
+              ctx.pos++;
+              return i;
+            }
+            ir = null;
+          } else {
+            while((item = iter[p].next()) != null) {
+              if(p + 1 < step.length) {
+                p++;
+                ctx.pos = 1;
+                ctx.item = item;
+                iter[p] = ctx.iter(step[p]);
+              } else {
+                ir = iter[p];
+                break;
+              }
+            }
+            if(ir == null && p-- == 0) {
               ctx.item = c;
               ctx.size = cs;
               ctx.pos = cp;
               return null;
             }
-            // prepare for next step
-            stepCount++;
-            iter = null;
-          } else {
-            if(!i.node()) Err.or(NODESPATH, this, i.type);
-            // dosen't check yet if results are only nodes or only atomic values
-            ctx.item = i;
-            ctx.pos++;
-            return i;
           }
         }
       }

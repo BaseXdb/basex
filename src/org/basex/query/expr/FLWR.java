@@ -47,7 +47,7 @@ public final class FLWR extends FLWOR {
       return where != null ? new If(where, expr, Seq.EMPTY) : expr;
     }
 
-    /* add where clause as predicate to last for clause
+    /* [CG] add where clause as predicate to last for clause
     if(fl[fl.length - 1] instanceof For) {
       final For f = (For) fl[fl.length - 1];
       if(where != null && f.pos == null && f.score == null &&
