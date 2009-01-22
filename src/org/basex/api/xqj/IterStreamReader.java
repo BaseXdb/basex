@@ -11,17 +11,17 @@ import javax.xml.stream.XMLStreamReader;
 import org.basex.BaseX;
 import org.basex.api.jaxp.NSContextImpl;
 import org.basex.data.Data;
-import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.item.DBNode;
-import org.basex.query.xquery.item.FNode;
-import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Nod;
-import org.basex.query.xquery.item.QNm;
-import org.basex.query.xquery.item.Type;
-import org.basex.query.xquery.iter.Iter;
-import org.basex.query.xquery.iter.NodeIter;
-import org.basex.query.xquery.util.NSLocal;
-import org.basex.query.xquery.util.NodeBuilder;
+import org.basex.query.QueryException;
+import org.basex.query.item.DBNode;
+import org.basex.query.item.FNode;
+import org.basex.query.item.Item;
+import org.basex.query.item.Nod;
+import org.basex.query.item.QNm;
+import org.basex.query.item.Type;
+import org.basex.query.iter.Iter;
+import org.basex.query.iter.NodeIter;
+import org.basex.query.util.NSLocal;
+import org.basex.query.util.NodeBuilder;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -126,7 +126,7 @@ public final class IterStreamReader implements XMLStreamReader {
         if(it == null) return;
         atts.add(it);
       }
-    } catch(final XQException ex) {
+    } catch(final QueryException ex) {
       ex.printStackTrace();
     }
   }
@@ -296,7 +296,7 @@ public final class IterStreamReader implements XMLStreamReader {
           type();
         }
       }
-    } catch(final XQException ex) {
+    } catch(final QueryException ex) {
       throw new XMLStreamException(ex);
     }
     return item != null;
@@ -515,7 +515,7 @@ public final class IterStreamReader implements XMLStreamReader {
           item = node[l];
           kind = END_ELEMENT;
         }
-      } catch(XQException e) {
+      } catch(QueryException e) {
         BaseX.notexpected();
       }
       return true;

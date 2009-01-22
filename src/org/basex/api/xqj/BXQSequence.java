@@ -21,10 +21,11 @@ import org.basex.BaseX;
 import org.basex.data.SAXSerializer;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
-import org.basex.query.xquery.XQContext;
-import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.iter.Iter;
-import org.basex.query.xquery.iter.SeqIter;
+import org.basex.query.QueryContext;
+import org.basex.query.QueryException;
+import org.basex.query.item.Item;
+import org.basex.query.iter.Iter;
+import org.basex.query.iter.SeqIter;
 import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
 
@@ -38,7 +39,7 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
   /** Result iterator. */
   final Iter result;
   /** Query context. */
-  private final XQContext ctx;
+  private final QueryContext ctx;
   /** Current result. */
   private BXQItem it;
   /** Iterator position. */
@@ -57,7 +58,7 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
    * @throws XQException xquery exception
    */
   public BXQSequence(final Iter item, final BXQAbstract c) throws XQException {
-    this(item, new XQContext(), c, null);
+    this(item, new QueryContext(), c, null);
   }
 
   /**
@@ -68,7 +69,7 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
    * @param cn connection
    * @throws XQException xquery exception
    */
-  public BXQSequence(final Iter item, final XQContext context,
+  public BXQSequence(final Iter item, final QueryContext context,
       final BXQAbstract c, final BXQConnection cn) throws XQException {
     super(c);
     result = item;
@@ -247,7 +248,7 @@ public final class BXQSequence extends BXQAbstract implements XQResultSequence {
       it = new BXQItem(i, this, ctx, conn);
       if(!next) pos = -1;
       return next;
-    } catch(final org.basex.query.xquery.XQException ex) {
+    } catch(final QueryException ex) {
       throw new BXQException(ex);
     }
   }

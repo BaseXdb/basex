@@ -9,9 +9,9 @@ import javax.xml.xquery.XQResultSequence;
 import javax.xml.xquery.XQSequenceType;
 import javax.xml.xquery.XQStaticContext;
 import org.basex.query.QueryException;
-import org.basex.query.xquery.item.QNm;
-import org.basex.query.xquery.util.Var;
-import org.basex.query.xquery.util.Vars;
+import org.basex.query.item.QNm;
+import org.basex.query.util.Var;
+import org.basex.query.util.Vars;
 import org.basex.util.Array;
 
 /**
@@ -35,7 +35,7 @@ public final class BXQPreparedExpression extends BXQDynamicContext
     super(input, s, c);
     
     try {
-      query.create();
+      query.parse();
     } catch(final QueryException ex) {
       throw new XQQueryException(ex.getMessage(), new QName(ex.code()), 
           ex.line(), ex.col(), -1);

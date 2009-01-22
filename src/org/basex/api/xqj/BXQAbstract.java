@@ -19,12 +19,12 @@ import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
+import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.xquery.XQContext;
-import org.basex.query.xquery.func.FunJava;
-import org.basex.query.xquery.item.DBNode;
-import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Type;
+import org.basex.query.func.FunJava;
+import org.basex.query.item.DBNode;
+import org.basex.query.item.Item;
+import org.basex.query.item.Type;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.xml.sax.InputSource;
@@ -301,7 +301,7 @@ abstract class BXQAbstract {
    * @param ser serializer
    * @throws XQException exception
    */
-  protected void serialize(final Item it, final XQContext ctx,
+  protected void serialize(final Item it, final QueryContext ctx,
       final Serializer ser) throws XQException {
     opened();
     try {

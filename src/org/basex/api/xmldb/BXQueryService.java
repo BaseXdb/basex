@@ -4,9 +4,9 @@ import static org.basex.util.Token.*;
 import java.util.HashMap;
 import org.basex.data.Nodes;
 import org.basex.query.QueryException;
-import org.basex.query.xquery.XQueryProcessor;
-import org.basex.query.xquery.item.QNm;
-import org.basex.query.xquery.item.Uri;
+import org.basex.query.QueryProcessor;
+import org.basex.query.item.QNm;
+import org.basex.query.item.Uri;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.ErrorCodes;
 import org.xmldb.api.base.ResourceSet;
@@ -89,7 +89,7 @@ public final class BXQueryService implements XPathQueryService, BXXMLDBText {
     
     try {
       // creates a query instance
-      final XQueryProcessor proc = new XQueryProcessor(query);
+      final QueryProcessor proc = new QueryProcessor(query);
 
       // add default namespaces
       for(final String n : ns.keySet()) {

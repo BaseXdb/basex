@@ -54,7 +54,6 @@ package org.xmldb.api;
  */
 
 import org.xmldb.api.base.*;
-
 import java.util.*;
 
 /**

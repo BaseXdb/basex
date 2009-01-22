@@ -10,7 +10,7 @@ import org.basex.data.Data;
 import org.basex.data.Result;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
-import org.basex.query.xquery.item.DBNode;
+import org.basex.query.item.DBNode;
 import org.basex.util.TokenBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;

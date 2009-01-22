@@ -18,21 +18,21 @@ import javax.xml.xquery.XQResultSequence;
 import javax.xml.xquery.XQSequence;
 import org.basex.core.ProgressException;
 import org.basex.io.IOContent;
+import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.xquery.XQContext;
-import org.basex.query.xquery.XQueryProcessor;
-import org.basex.query.xquery.item.Bln;
-import org.basex.query.xquery.item.Dbl;
-import org.basex.query.xquery.item.Dec;
-import org.basex.query.xquery.item.Flt;
-import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Itr;
-import org.basex.query.xquery.item.QNm;
-import org.basex.query.xquery.item.Str;
-import org.basex.query.xquery.item.Type;
-import org.basex.query.xquery.iter.Iter;
-import org.basex.query.xquery.iter.SeqIter;
-import org.basex.query.xquery.util.Var;
+import org.basex.query.QueryProcessor;
+import org.basex.query.item.Bln;
+import org.basex.query.item.Dbl;
+import org.basex.query.item.Dec;
+import org.basex.query.item.Flt;
+import org.basex.query.item.Item;
+import org.basex.query.item.Itr;
+import org.basex.query.item.QNm;
+import org.basex.query.item.Str;
+import org.basex.query.item.Type;
+import org.basex.query.iter.Iter;
+import org.basex.query.iter.SeqIter;
+import org.basex.query.util.Var;
 import org.basex.util.Action;
 import org.basex.util.Token;
 import org.w3c.dom.Node;
@@ -50,7 +50,7 @@ abstract class BXQDynamicContext extends BXQAbstract
   /** Context. */
   protected final BXQStaticContext sc;
   /** Query processor. */
-  protected final XQueryProcessor query;
+  protected final QueryProcessor query;
   /** Time zone. */
   private TimeZone zone;
 
@@ -63,7 +63,7 @@ abstract class BXQDynamicContext extends BXQAbstract
   protected BXQDynamicContext(final String in, final BXQStaticContext s,
       final BXQConnection c) {
     super(c);
-    query = new XQueryProcessor(in);
+    query = new QueryProcessor(in);
     sc = s;
   }
   
@@ -215,7 +215,7 @@ abstract class BXQDynamicContext extends BXQAbstract
    */
   protected XQResultSequence execute() throws XQException {
     opened();
-    final XQContext ctx = query.ctx;
+    final QueryContext ctx = query.ctx;
     ctx.ns = sc.ctx.ns;
     
     try {
@@ -226,7 +226,7 @@ abstract class BXQDynamicContext extends BXQAbstract
           }
         }.delay(sc.timeout * 1000);
       }
-      query.create();
+      query.parse();
       ctx.compile(null);
       Iter iter = ctx.iter();
       if(sc.scrollable) iter = SeqIter.get(iter);

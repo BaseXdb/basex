@@ -8,7 +8,7 @@ import org.basex.api.dom.BXDoc;
 import org.basex.api.jaxp.BXPath;
 import org.basex.core.proc.Check;
 import org.basex.data.Data;
-import org.basex.query.xquery.item.DBNode;
+import org.basex.query.item.DBNode;
 import org.basex.util.Performance;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;

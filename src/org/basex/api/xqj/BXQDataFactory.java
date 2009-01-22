@@ -17,13 +17,14 @@ import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQSequence;
 import javax.xml.xquery.XQSequenceType;
 import org.basex.io.IOContent;
-import org.basex.query.xquery.item.Bln;
-import org.basex.query.xquery.item.Dbl;
-import org.basex.query.xquery.item.Flt;
-import org.basex.query.xquery.item.Itr;
-import org.basex.query.xquery.item.Str;
-import org.basex.query.xquery.item.Type;
-import org.basex.query.xquery.iter.SeqIter;
+import org.basex.query.QueryException;
+import org.basex.query.item.Bln;
+import org.basex.query.item.Dbl;
+import org.basex.query.item.Flt;
+import org.basex.query.item.Itr;
+import org.basex.query.item.Str;
+import org.basex.query.item.Type;
+import org.basex.query.iter.SeqIter;
 import org.basex.util.Token;
 import org.w3c.dom.Node;
 import org.xml.sax.XMLReader;
@@ -127,7 +128,7 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     try {
       final Type type = ((BXQItemType) v.getItemType()).getType();
       return new BXQItem(type.e(((BXQItem) v).it, null));
-    } catch(org.basex.query.xquery.XQException ex) {
+    } catch(final QueryException ex) {
       throw new BXQException(ex);
     }
   }
@@ -138,7 +139,7 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     try {
       final Str val = Str.get(valid(v, String.class));
       return new BXQItem(check(Type.STR, it).e(val, null));
-    } catch(org.basex.query.xquery.XQException ex) {
+    } catch(final QueryException ex) {
       throw new BXQException(ex);
     }
   }
@@ -242,7 +243,7 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     try {
       final Str val = Str.get(valid(v, String.class));
       return new BXQItem(check(Type.STR, it).e(val, null));
-    } catch(org.basex.query.xquery.XQException ex) {
+    } catch(final QueryException ex) {
       throw new BXQException(ex);
     }
   }
@@ -291,7 +292,7 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     try {
       final SeqIter it = new SeqIter(((BXQSequence) seq).result);
       return new BXQSequence(it, this);
-    } catch(org.basex.query.xquery.XQException ex) {
+    } catch(final QueryException ex) {
       throw new BXQException(ex);
     }
   }
@@ -328,7 +329,7 @@ public class BXQDataFactory extends BXQAbstract implements XQDataFactory {
       throws XQException {
     try {
       return new BXQItem(check(e, t).e(Itr.get(v), null));
-    } catch(org.basex.query.xquery.XQException ex) {
+    } catch(final QueryException ex) {
       throw new BXQException(ex);
     }
   }

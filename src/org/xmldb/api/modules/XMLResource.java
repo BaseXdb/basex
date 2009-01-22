@@ -53,7 +53,6 @@ package org.xmldb.api.modules;
  * on the XML:DB Initiative, please see <http://www.xmldb.org/>.
  */
 import org.xmldb.api.base.*;
-
 import org.w3c.dom.*;
 import org.xml.sax.*;
 

@@ -20,14 +20,15 @@ import org.basex.data.SAXSerializer;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
 import org.basex.io.PrintOutput;
-import org.basex.query.xquery.XQContext;
-import org.basex.query.xquery.item.Bln;
-import org.basex.query.xquery.item.Dbl;
-import org.basex.query.xquery.item.Flt;
-import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Nod;
-import org.basex.query.xquery.item.Type;
-import org.basex.query.xquery.iter.SeqIter;
+import org.basex.query.QueryContext;
+import org.basex.query.QueryException;
+import org.basex.query.item.Bln;
+import org.basex.query.item.Dbl;
+import org.basex.query.item.Flt;
+import org.basex.query.item.Item;
+import org.basex.query.item.Nod;
+import org.basex.query.item.Type;
+import org.basex.query.iter.SeqIter;
 import org.basex.util.Token;
 import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
@@ -42,7 +43,7 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
   /** Connection. */
   private final XQConnection conn;
   /** Query context. */
-  private final XQContext ctx;
+  private final QueryContext ctx;
   /** Item. */
   Item it;
 
@@ -51,7 +52,7 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
    * @param item item
    */
   public BXQItem(final Item item) {
-    this(item, null, new XQContext(), null);
+    this(item, null, new QueryContext(), null);
   }
 
   /**
@@ -62,7 +63,7 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
    * @param connection connection reference
    */
   public BXQItem(final Item item, final BXQAbstract c,
-      final XQContext context, final BXQConnection connection) {
+      final QueryContext context, final BXQConnection connection) {
     super(c);
     conn = connection;
     ctx = context;
@@ -249,7 +250,7 @@ public final class BXQItem extends BXQAbstract implements XQResultItem {
       final double d = it.dbl();
       if(!it.n() || d != (long) d) throw new BXQException(NUM, d);
       return type.e(it, null).itr();
-    } catch(final org.basex.query.xquery.XQException ex) {
+    } catch(final QueryException ex) {
       throw new BXQException(ex);
     }
   }

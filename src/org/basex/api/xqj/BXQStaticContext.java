@@ -6,9 +6,10 @@ import static org.basex.util.Token.*;
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQStaticContext;
-import org.basex.query.xquery.XQContext;
-import org.basex.query.xquery.item.QNm;
-import org.basex.query.xquery.item.Uri;
+import org.basex.query.QueryContext;
+import org.basex.query.QueryException;
+import org.basex.query.item.QNm;
+import org.basex.query.item.Uri;
 import org.basex.util.Atts;
 
 /**
@@ -19,7 +20,7 @@ import org.basex.util.Atts;
  */
 public class BXQStaticContext implements XQStaticContext {
   /** Namespaces. */
-  XQContext ctx = new XQContext();
+  QueryContext ctx = new QueryContext();
   /** Context item type. */
   XQItemType type;
   /** Forward flag. */
@@ -41,7 +42,7 @@ public class BXQStaticContext implements XQStaticContext {
       final QNm name = new QNm(token(prefix), Uri.uri(token(uri)));
       if(uri.length() != 0) ctx.ns.add(name);
       else ctx.ns.delete(name);
-    } catch(final org.basex.query.xquery.XQException ex) {
+    } catch(final QueryException ex) {
       throw new BXQException(ex);
     }
   }
