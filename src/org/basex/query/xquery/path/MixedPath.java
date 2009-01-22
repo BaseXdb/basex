@@ -6,9 +6,9 @@ import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.Expr;
+import org.basex.query.xquery.expr.Return;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Nod;
-import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
 import org.basex.query.xquery.util.Err;
@@ -118,7 +118,7 @@ public final class MixedPath extends Path {
   }
 
   @Override
-  public Type returned(final XQContext ctx) {
+  public Return returned(final XQContext ctx) {
     return step[step.length - 1].returned(ctx);
   }
 

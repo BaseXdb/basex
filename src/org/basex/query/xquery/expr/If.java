@@ -1,11 +1,9 @@
 package org.basex.query.xquery.expr;
 
 import static org.basex.query.xquery.XQText.*;
-
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 
 /**
@@ -41,9 +39,9 @@ public final class If extends Arr {
   }
 
   @Override
-  public Type returned(final XQContext ctx) {
-    final Type t1 = expr[1].returned(ctx);
-    return t1 == expr[2].returned(ctx) ? t1 : null;
+  public Return returned(final XQContext ctx) {
+    final Return ret = expr[1].returned(ctx);
+    return ret == expr[2].returned(ctx) ? ret : Return.SEQ;
   }
 
   @Override

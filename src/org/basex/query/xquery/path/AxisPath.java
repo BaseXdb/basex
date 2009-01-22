@@ -15,6 +15,7 @@ import org.basex.query.xquery.expr.CAttr;
 import org.basex.query.xquery.expr.Expr;
 import org.basex.query.xquery.expr.For;
 import org.basex.query.xquery.expr.Pred;
+import org.basex.query.xquery.expr.Return;
 import org.basex.query.xquery.expr.Root;
 import org.basex.query.xquery.expr.VarCall;
 import org.basex.query.xquery.item.Bln;
@@ -108,7 +109,8 @@ public class AxisPath extends Path {
       for(final Step s : step) st = Array.add(st, s);
       step = st;
     }
-    
+    checkEmpty();
+
     final Item ci = ctx.item;
     setRoot(ctx);
     final Expr e = c(ctx);
@@ -123,8 +125,6 @@ public class AxisPath extends Path {
    * @throws XQException exception
    */
   private Expr c(final XQContext ctx) throws XQException {
-    checkEmpty();
-    
     // step optimizations will always return step instances
     for(int i = 0; i != step.length; i++) {
       final Expr e = step[i].comp(ctx);
@@ -514,13 +514,13 @@ public class AxisPath extends Path {
 
   @Override
   public Expr removeVar(final Var v) {
-    for(int s = 0; s != step.length; s++) step[s] = step[s].removeVar(v);
+    for(int s = 0; s != step.length; s++) step[s].removeVar(v);
     return super.removeVar(v);
   }
 
   @Override
-  public Type returned(final XQContext ctx) {
-    return count(ctx) == 1 ? Type.NOD : null;
+  public Return returned(final XQContext ctx) {
+    return count(ctx) == 1 ? Return.NOD : Return.NODSEQ;
   }
 
   @Override

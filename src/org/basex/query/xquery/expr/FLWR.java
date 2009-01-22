@@ -6,7 +6,7 @@ import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.iter.Iter;
-import org.basex.query.xquery.path.AxisPath;
+import org.basex.query.xquery.util.Var;
 import org.basex.util.Array;
 
 /**
@@ -45,18 +45,29 @@ public final class FLWR extends FLWOR {
       ctx.compInfo(OPTFLWOR);
       return where != null ? new If(where, expr, Seq.EMPTY) : expr;
     }
-    
-    // convert where clause to predicate
-    final ForLet f = fl[fl.length - 1];
-    final boolean pos = f instanceof For && ((For) f).pos != null;
-    final boolean score = f instanceof For && ((For) f).score != null;
 
-    if(where != null && !pos && !score && f instanceof For &&
-        f.expr instanceof AxisPath) {
-      ctx.compInfo(OPTWHERE);
-      f.expr = ((AxisPath) f.expr).addPred(where.removeVar(f.var));
-      where = null;
-      return comp(ctx);
+    /* add where clause as predicate to last for clause
+    if(fl[fl.length - 1] instanceof For) {
+      final For f = (For) fl[fl.length - 1];
+      if(where != null && f.pos == null && f.score == null &&
+          f.expr instanceof AxisPath) {
+        final Return t = where.returned(ctx);
+        if(t != Return.MAYBE && t != Return.NUM) {
+          ctx.compInfo(OPTWHERE);
+          f.expr = ((AxisPath) f.expr).addPred(where.removeVar(f.var));
+          where = null;
+          return comp(ctx);
+        }
+      }
+    }*/
+    
+    // simplify simple return expression
+    if(where == null && fl.length == 1 && expr instanceof VarCall) {
+      final Var v = ((VarCall) expr).var;
+      if(v.type == null && fl[0].var.eq(v)) {
+        ctx.compInfo(OPTFLWOR);
+        return fl[0].expr.comp(ctx);
+      }
     }
     return this;
   }

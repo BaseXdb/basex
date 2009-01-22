@@ -125,8 +125,8 @@ public class FTContains extends Expr {
   }
 
   @Override
-  public Type returned(final XQContext ctx) {
-    return Type.BLN;
+  public Return returned(final XQContext ctx) {
+    return Return.BLN;
   }
 
   @Override

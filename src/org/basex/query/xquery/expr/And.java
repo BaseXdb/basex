@@ -7,7 +7,6 @@ import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.DBNode;
 import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Scoring;
 import org.basex.util.Array;
@@ -69,7 +68,7 @@ public final class And extends Arr {
     expr = ex;
     if(ps != null) expr = Array.add(expr, ps);
     if(cr != null) expr = Array.add(expr, cr);
-    return expr.length == 1 && expr[0].returned(ctx) == Type.BLN ?
+    return expr.length == 1 && expr[0].returned(ctx) == Return.BLN ?
         expr[0] : this;
   }
 
@@ -93,8 +92,8 @@ public final class And extends Arr {
   }
   
   @Override
-  public Type returned(final XQContext ctx) {
-    return Type.BLN;
+  public Return returned(final XQContext ctx) {
+    return Return.BLN;
   }
 
   @Override

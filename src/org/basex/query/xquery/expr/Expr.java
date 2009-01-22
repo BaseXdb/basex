@@ -67,9 +67,6 @@ public abstract class Expr extends ExprInfo {
     return true;
   }
 
-  //public abstract boolean usesVarr(final Var v);
-  //public abstract boolean removeVarr(final Var v);
-
   /**
    * Indicates if an expression uses the specified variables. If the argument
    * is <code>null</code>, it is checked if any variable is used.
@@ -101,8 +98,8 @@ public abstract class Expr extends ExprInfo {
    * @return result of check
    */
   @SuppressWarnings("unused")
-  public Type returned(final XQContext ctx) {
-    return null;
+  public Return returned(final XQContext ctx) {
+    return Return.SEQ;
   }
   
   /**

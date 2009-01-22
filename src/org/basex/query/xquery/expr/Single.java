@@ -4,7 +4,6 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
-import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.util.Var;
 
 /**
@@ -45,11 +44,6 @@ public abstract class Single extends Expr {
   public Expr removeVar(final Var v) {
     expr = expr.removeVar(v);
     return this;
-  }
-  
-  @Override
-  public Type returned(final XQContext ctx) {
-    return null;
   }
 
   @Override

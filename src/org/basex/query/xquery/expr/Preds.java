@@ -6,7 +6,6 @@ import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.path.Step;
 import org.basex.query.xquery.util.Var;
 import org.basex.util.Array;
@@ -32,6 +31,9 @@ public abstract class Preds extends Expr {
 
   @Override
   public Expr comp(final XQContext ctx) throws XQException {
+    final Item ci = ctx.item;
+    ctx.item = null;
+
     for(int p = 0; p < pred.length; p++) {
       Expr ex = pred[p].comp(ctx);
       ex = Pos.get(ex, CmpV.Comp.EQ, ex);
@@ -42,21 +44,21 @@ public abstract class Preds extends Expr {
           pred = Array.delete(pred, p--);
         } else {
           ctx.compInfo(OPTFALSE, ex);
+          ctx.item = ci;
           return null;
         }
       } else {
         pred[p] = ex;
       }
     }
+    ctx.item = ci;
     return this;
   }
   
   @Override
   public boolean usesPos(final XQContext ctx) {
     for(final Expr p : pred) {
-      final Type t = p.returned(ctx);
-      // assuming worst case: return type is unknown -> could be integer
-      if(t == null || t.num || p.usesPos(ctx)) return true;
+      if(p.returned(ctx).num || p.usesPos(ctx)) return true;
     }
     return false;
   }

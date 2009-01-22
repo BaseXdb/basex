@@ -61,7 +61,7 @@ public abstract class Arr extends Expr {
     }
     return this;
   }
-  
+
   /**
    * Checks if this expression has a path and an item as arguments.
    * @param num number flag

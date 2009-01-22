@@ -85,6 +85,6 @@ public final class IndexAccess extends Simple {
       tb.add(ind.get());
       tb.add('"');
     }
-    return tb.toString();
+    return tb.add(")").toString();
   }
 }

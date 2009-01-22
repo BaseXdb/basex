@@ -7,7 +7,6 @@ import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.item.FTNodeItem;
 import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 
 /**
@@ -42,11 +41,6 @@ public final class FTContainsIndex extends FTContains {
         return it.score() == 0 ? null : it;
       }
     };
-  }
-
-  @Override
-  public Type returned(final XQContext ctx) {
-    return Type.NOD;
   }
 
   @Override

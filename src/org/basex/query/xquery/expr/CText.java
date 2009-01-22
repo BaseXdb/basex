@@ -54,6 +54,11 @@ public final class CText extends Single {
       more = true;
     }
   }
+  
+  @Override
+  public Return returned(final XQContext ctx) {
+    return Return.NOD;
+  }
 
   @Override
   public String info() {

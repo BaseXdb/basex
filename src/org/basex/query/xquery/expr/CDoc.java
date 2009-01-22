@@ -69,6 +69,11 @@ public final class CDoc extends Single {
     for(int n = 0; n < nodes.size; n++) nodes.list[n].parent(doc);
     return doc.iter();
   }
+  
+  @Override
+  public Return returned(final XQContext ctx) {
+    return Return.NOD;
+  }
 
   @Override
   public String info() {

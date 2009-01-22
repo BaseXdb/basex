@@ -109,6 +109,11 @@ public final class CAttr extends Arr {
     ser.closeElement();
     ser.closeElement();
   }
+  
+  @Override
+  public Return returned(final XQContext ctx) {
+    return Return.NOD;
+  }
 
   @Override
   public String info() {

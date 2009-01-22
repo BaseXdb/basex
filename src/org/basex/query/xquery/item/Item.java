@@ -8,6 +8,7 @@ import org.basex.data.Serializer;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.expr.Expr;
+import org.basex.query.xquery.expr.Return;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Err;
 import org.basex.query.xquery.util.Scoring;
@@ -224,7 +225,7 @@ public abstract class Item extends Expr {
    * Sets a new score value.
    * @param s score value
    */
-  public void score(final double s) {
+  public final void score(final double s) {
     score = s;
   }
 
@@ -251,18 +252,19 @@ public abstract class Item extends Expr {
   }
 
   @Override
-  public boolean usesPos(final XQContext ctx) {
+  public final boolean usesPos(final XQContext ctx) {
     return false;
   }
 
   @Override
-  public boolean usesVar(final Var v) {
+  public final boolean usesVar(final Var v) {
     return false;
   }
   
   @Override
-  public Type returned(final XQContext ctx) {
-    return type;
+  public Return returned(final XQContext ctx) {
+    return type.num ? Return.NUM : type.node() ? Return.NOD :
+      type == Type.STR ? Return.STR : Return.NONUM;
   }
 
   @Override

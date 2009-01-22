@@ -19,7 +19,7 @@ import org.basex.util.Token;
  */
 public final class FunCall extends Arr {
   /** Function id reference. */
-  public int id;
+  private final int id;
 
   /**
    * Function constructor.

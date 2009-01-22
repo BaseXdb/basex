@@ -7,6 +7,7 @@ import org.basex.BaseX;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.XQException;
+import org.basex.query.xquery.expr.Return;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
 import org.basex.query.xquery.util.Err;
@@ -107,8 +108,8 @@ public class Seq extends Item {
   }
   
   @Override
-  public Type returned(final XQContext ctx) {
-    return null;
+  public Return returned(final XQContext ctx) {
+    return Return.SEQ;
   }
 
   @Override

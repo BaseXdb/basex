@@ -48,6 +48,11 @@ public final class CComm extends Single {
   }
   
   @Override
+  public Return returned(final XQContext ctx) {
+    return Return.NOD;
+  }
+  
+  @Override
   public String info() {
     return "Comment constructor";
   }

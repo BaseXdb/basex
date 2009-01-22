@@ -19,14 +19,12 @@ import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Itr;
 import org.basex.query.xquery.item.Nod;
 import org.basex.query.xquery.item.Seq;
-import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.NodIter;
 import org.basex.query.xquery.iter.NodeIter;
 import org.basex.query.xquery.path.Test.Kind;
 import org.basex.query.xquery.util.Err;
 import org.basex.query.xquery.util.Scoring;
-import org.basex.query.xquery.util.Var;
 import org.basex.util.Array;
 import org.basex.util.Token;
 
@@ -217,17 +215,6 @@ public class Step extends Preds {
       return addPred(Itr.get(1));
     }
     return this;
-  }
-
-  @Override
-  public Step removeVar(final Var v) {
-    for(int p = 0; p < pred.length; p++) pred[p] = pred[p].removeVar(v);
-    return this;
-  }
-
-  @Override
-  public Type returned(final XQContext ctx) {
-    return null;
   }
 
   @Override

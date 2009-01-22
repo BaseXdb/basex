@@ -11,7 +11,6 @@ import org.basex.query.xquery.item.Dec;
 import org.basex.query.xquery.item.Flt;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Itr;
-import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Err;
 import org.basex.util.Token;
@@ -70,11 +69,6 @@ public final class Unary extends Single {
       case DEC: return Dec.get(it.dec().negate());
       default:  return Itr.get(-it.itr());
     }
-  }
-
-  @Override
-  public Type returned(final XQContext ctx) {
-    return null;
   }
 
   @Override

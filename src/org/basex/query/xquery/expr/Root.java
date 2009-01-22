@@ -5,7 +5,6 @@ import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Nod;
-import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
 import org.basex.query.xquery.util.Err;
@@ -43,8 +42,8 @@ public final class Root extends Simple {
   }
 
   @Override
-  public Type returned(final XQContext ctx) {
-    return Type.DOC;
+  public Return returned(final XQContext ctx) {
+    return Return.NOD;
   }
 
   @Override

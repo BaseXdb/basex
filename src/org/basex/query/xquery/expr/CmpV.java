@@ -11,7 +11,6 @@ import org.basex.query.xquery.func.FunDef;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Seq;
-import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.path.AxisPath;
 import org.basex.query.xquery.util.Err;
@@ -191,8 +190,8 @@ public final class CmpV extends Arr {
   }
 
   @Override
-  public Type returned(final XQContext ctx) {
-    return Type.BLN;
+  public Return returned(final XQContext ctx) {
+    return Return.BLN;
   }
 
   @Override

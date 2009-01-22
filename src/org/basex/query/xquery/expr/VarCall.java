@@ -6,7 +6,6 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
-import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.QNm;
 import org.basex.query.xquery.item.Uri;
 import org.basex.query.xquery.iter.Iter;
@@ -42,9 +41,16 @@ public final class VarCall extends Expr {
     if(ctx.nsElem.length != 0) ctx.ns.add(new QNm(EMPTY, Uri.uri(ctx.nsElem)));
     //final Expr it = lc.size() != 0 || ctx.nsElem.length != 0 || var.type !=
     //  null || var.expr instanceof FunCall ? var.item(ctx) : var.expr;
-    final Item it = var.item(ctx);
+    //final Expr e = var.expr.usesVar(null) ? var.expr : var.item(ctx);
+    
+    // decide which variables are pre-evaluated
+    Expr e = var.expr;
+    if(e.returned(ctx).node) {
+      e = var.item(ctx);
+    }
+    
     ctx.ns = lc;
-    return it;
+    return e;
   }
 
   /**
@@ -65,7 +71,7 @@ public final class VarCall extends Expr {
 
   @Override
   public boolean usesPos(final XQContext ctx) {
-    return super.usesPos(ctx);
+    return var.expr == null || var.expr.usesPos(ctx);
   }
 
   @Override

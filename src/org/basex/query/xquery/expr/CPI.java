@@ -61,6 +61,11 @@ public final class CPI extends Arr {
 
     return new FPI(new QNm(nm), v, null).iter();
   }
+  
+  @Override
+  public Return returned(final XQContext ctx) {
+    return Return.NOD;
+  }
 
   @Override
   public String info() {

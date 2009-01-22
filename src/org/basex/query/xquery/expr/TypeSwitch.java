@@ -6,7 +6,6 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.XQContext;
-import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
 import org.basex.query.xquery.util.Var;
@@ -84,10 +83,12 @@ public final class TypeSwitch extends Single {
   }
   
   @Override
-  public Type returned(final XQContext ctx) {
-    final Type t = cs[0].returned(ctx);
-    for(int l = 1; l < cs.length; l++) if(t != cs[l].returned(ctx)) return null;
-    return t == ts.returned(ctx) ? t : null;
+  public Return returned(final XQContext ctx) {
+    final Return t = cs[0].returned(ctx);
+    for(int l = 1; l < cs.length; l++) {
+      if(t != cs[l].returned(ctx)) return Return.SEQ;
+    }
+    return t == ts.returned(ctx) ? t : Return.SEQ;
   }
 
   @Override

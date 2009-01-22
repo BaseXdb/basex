@@ -8,7 +8,6 @@ import org.basex.query.xquery.XQContext;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Dbl;
 import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.ResetIter;
 import org.basex.query.xquery.util.Scoring;
@@ -43,10 +42,7 @@ public final class Let extends ForLet {
   public Expr comp(final XQContext ctx) throws XQException {
     expr = expr.comp(ctx);
 
-    if(!score) {
-      // [CG] extend to arbitrary types
-      if(expr.returned(ctx) == Type.NOD || expr.i()) var.bind(expr, ctx);
-    }
+    if(!score && expr.returned(ctx).single) var.bind(expr, ctx);
     
     ctx.vars.add(var);
     return this;

@@ -10,6 +10,7 @@ import org.basex.query.xquery.item.Item;
 import org.basex.query.xquery.item.Seq;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.iter.SeqIter;
+import org.basex.query.xquery.util.Var;
 
 /**
  * Predicate expression.
@@ -79,6 +80,23 @@ public class Pred extends Preds {
     ctx.size = cs;
     ctx.pos = cp;
     return sb;
+  }
+  
+  @Override
+  public boolean usesPos(final XQContext ctx) {
+    return root.usesPos(ctx) || super.usesPos(ctx);
+  }
+
+  @Override
+  public boolean usesVar(final Var v) {
+    return root.usesVar(v) || super.usesVar(v);
+  }
+
+  @Override
+  public Expr removeVar(final Var v) {
+    root = root.removeVar(v);
+    for(int p = 0; p < pred.length; p++) pred[p] = pred[p].removeVar(v);
+    return this;
   }
 
   @Override

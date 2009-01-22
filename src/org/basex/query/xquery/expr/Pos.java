@@ -9,7 +9,6 @@ import org.basex.query.xquery.XQException;
 import org.basex.query.xquery.expr.CmpV.Comp;
 import org.basex.query.xquery.item.Bln;
 import org.basex.query.xquery.item.Item;
-import org.basex.query.xquery.item.Type;
 import org.basex.query.xquery.iter.Iter;
 import org.basex.query.xquery.util.Err;
 import org.basex.util.Token;
@@ -116,8 +115,8 @@ public final class Pos extends Simple {
   }
   
   @Override
-  public Type returned(final XQContext ctx) {
-    return Type.BLN;
+  public Return returned(final XQContext ctx) {
+    return Return.BLN;
   }
 
   @Override

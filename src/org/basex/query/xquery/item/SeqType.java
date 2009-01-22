@@ -35,6 +35,16 @@ public final class SeqType {
   }
 
   /**
+   * Constructor.
+   * @param t sequence type
+   * @param o occurrences
+   */
+  public SeqType(final Type t, final int o) {
+    type = t;
+    occ = o;
+  }
+
+  /**
    * Checks the instance of the specified iterator.
    * @param iter iteration to be checked
    * @return result of check

@@ -193,8 +193,8 @@ public final class CElem extends Arr {
   }
   
   @Override
-  public Type returned(final XQContext ctx) {
-    return Type.ELM;
+  public Return returned(final XQContext ctx) {
+    return Return.NOD;
   }
 
   @Override
