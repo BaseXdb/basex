@@ -123,7 +123,7 @@ abstract class MapLayout {
    * @param rectangles array of painted rects
    * @return nr of rects in the list
    */
-  public int getRectNumber(final ArrayList<ViewRect> rectangles) {
+  public int getNumberRects(final ArrayList<ViewRect> rectangles) {
     return rectangles.size();
   }
 
@@ -192,6 +192,7 @@ abstract class MapLayout {
       final long sSize, final int sChilds, final Data data) {
     // if its not a filesystem, set sliderval for calc only to nr of childs
     double sizeP = data.fs != null ? (double) GUIProp.sizep : 0d;
+    if (sSize == 0) sizeP = 0d;
     long dadSize = (size == 0 && sSize == 0) ? 1 : sSize;
     
     return ((sizeP / 100) * ((double) size / dadSize)) + 
