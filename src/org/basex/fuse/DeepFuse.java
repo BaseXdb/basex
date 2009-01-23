@@ -291,10 +291,11 @@ public abstract class DeepFuse {
 
   /**
    * Read directory.
-   * @param path name of the file
-   * @return zero on success, or -1 if an error occurred
+   * @param path name of the directory to read
+   * @param offset of directory entry requested
+   * @return name of directory entry or null on failure
    */
-  public abstract int readdir(final String path);
+  public abstract String readdir(final String path, final int offset);
 
   /**
    * Release directory.

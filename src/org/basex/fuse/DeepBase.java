@@ -2,12 +2,14 @@ package org.basex.fuse;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
 import org.basex.core.Prop;
 import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.Open;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.data.Nodes;
+import org.basex.data.Result;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
@@ -72,12 +74,12 @@ public class DeepBase extends DeepFuse {
   }
 
   /**
-   * Converts the file path into an XPath query.
+   * Converts a pathname to an DeepFS XPath expression. 
    * 
-   * @param path file path
+   * @param path name
    * @return xpath query
    */
-  private String xpath(final String path) {
+  private String pn2xp(final String path) {
     final StringBuilder qb = new StringBuilder();
     final StringBuilder eb = new StringBuilder();
     qb.append("/deepfuse");
@@ -99,7 +101,7 @@ public class DeepBase extends DeepFuse {
 
     String qu = qb.toString();
     qu = qu.endsWith("/") ? qu.substring(0, qu.length() - 1) : qu;
-    debug("[DeepBase.xpath]", "xpath: '" + qu + "'");
+    debug("[DeepBase.pn2xp]", "'" + qu + "'");
     return qu;
   }
 
@@ -142,7 +144,7 @@ public class DeepBase extends DeepFuse {
   public int getattr(final String path) {
     debug("[DeepBase.getattr]", path);
     try {
-      final Nodes n = query(xpath(path));
+      final Nodes n = query(pn2xp(path));
       debug("[DeepBase.getattr]", "found " + n.size);
       if(n.size > 0) {
         int pre = n.nodes[0];
@@ -176,7 +178,7 @@ public class DeepBase extends DeepFuse {
       m.addElem(tagID, 0, 1, 2, 2, false);
       m.addAtt(tagID2, 0, getName(path, mode).getBytes(), 1);
       // Get pre value of directory to insert.
-      Nodes pnode = queryOne(xpath(chopFilename(path, mode)));
+      Nodes pnode = queryOne(pn2xp(chopFilename(path, mode)));
       int ppre = pnode.nodes[0];
       int pid = data.id(ppre);
       int ipre = ppre + 2;
@@ -214,7 +216,7 @@ public class DeepBase extends DeepFuse {
   public int unlink(final String path) {
     try {
       debug("[DeepBase.unlink] " + path);
-      Nodes n = queryOne(xpath(path));
+      Nodes n = queryOne(pn2xp(path));
       data.delete(n.nodes[0]);
       data.flush();
     } catch(QueryException e) {
@@ -322,7 +324,20 @@ public class DeepBase extends DeepFuse {
 
   @Override
   public int opendir(final String path) {
-    // TODO Auto-generated method stub
+    debug("[DeepBase.opendir]", "path: " + path);
+    try {
+      QueryProcessor x = new QueryProcessor("count(" + pn2xp(path)
+          + "/child::*)");
+      debug("[DeepBase.opendir]", "query: " + x.query);
+      Result r = x.query(new Nodes(0, data));
+      debug("[DeepBase.opendir]", "#dirs: " + r.toString());
+      String s = r.toString();
+      String t = s.substring(1, s.length() - 1);
+      debug("[DeepBase.opendir]", t);
+      return new Integer(t).intValue();
+    } catch(QueryException e) {
+      e.printStackTrace();
+    }
     return 0;
   }
 
@@ -333,9 +348,26 @@ public class DeepBase extends DeepFuse {
   }
 
   @Override
-  public int readdir(final String path) {
-    // TODO Auto-generated method stub
-    return 0;
+  public String readdir(final String path, final int offset) {
+    debug("[DeepBase.readdir]", "path: " + path + " offset: " + offset);
+    StringBuilder sb = new StringBuilder();
+    sb.append("data(");
+    sb.append(pn2xp(path));
+    sb.append("/child::*[");
+    sb.append(offset);
+    sb.append("]/@name)");
+    try {
+      QueryProcessor x = new QueryProcessor(sb.toString());
+      Result r = x.query(new Nodes(0, data));
+      debug("[DeepBase.readdir]", sb.toString());
+      String s = r.toString();
+      String t = s.substring(2, s.length() - 2);
+      debug("[DeepBase.readdir]", t);
+      return t;
+    } catch(QueryException e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 
   @Override
