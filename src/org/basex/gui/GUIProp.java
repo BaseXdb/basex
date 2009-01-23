@@ -1,7 +1,6 @@
 package org.basex.gui;
 
 import org.basex.core.Prop;
-import org.basex.io.IO;
 
 /**
  * This class contains properties which are used in the GUI. They are
@@ -161,8 +160,6 @@ public final class GUIProp {
   public static boolean mapaggr = false;
   /** number of child <-> size weightening in (0;100). */
   public static int sizep = 50;
-  /** Maximum Map depth. */
-  public static int mapdepth = IO.MAXHEIGHT;
   /** Choice of interacting with TreeeMap. */
   public static int mapinteraction = 0;
   /** Temporary size slider enable disable. */

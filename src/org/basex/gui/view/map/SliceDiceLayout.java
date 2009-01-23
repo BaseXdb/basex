@@ -29,7 +29,7 @@ public final class SliceDiceLayout extends MapLayout {
 
       long parsize = 1;
       int par;
-      par = data.parent(l.list[ns], Data.ELEM);
+      par = data.parent(l.list[ns], data.kind(l.list[ns]));
       int parchilds = l.list[ne] - l.list[ns];
       
       // determine direction
