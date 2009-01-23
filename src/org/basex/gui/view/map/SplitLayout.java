@@ -1,6 +1,7 @@
 package org.basex.gui.view.map;
 
 import java.util.ArrayList;
+
 import org.basex.data.Data;
 import org.basex.gui.GUIProp;
 import org.basex.gui.view.ViewRect;
@@ -22,75 +23,33 @@ public final class SplitLayout extends MapLayout {
       final int ns, final int ne, final int level) {
 
     // one rectangle left.. continue with this child
-    if(ne - ns == 1) {
+    if(ne - ns <= 1) {
       putRect(data, r, mainRects, l, ns, level);
-      
-      /* replaced by putRect()
-      // calculate rectangle sizes
-      final ViewRect t = new ViewRect(r.x, r.y, r.w, r.h, l.list[ns], r.level);
-      mainRects.add(t);
-
-      // position, with and height calculated using sizes of former level
-      final int x = t.x + layout.x;
-      final int y = t.y + layout.y;
-      final int w = t.w - layout.w;
-      final int h = t.h - layout.h;
-
-      // skip too small rectangles and leaf nodes (= meta data in deepfs)
-      if((w >= o || h >= o) && w > 0 && h > 0 &&
-          !ViewData.isLeaf(data, t.pre)) {
-        final IntList ch = children(data, t.pre);
-        if(ch.size != 0) calcMap(data, new ViewRect(x, y, w, h, l.list[ns],
-            r.level + 1), mainRects, ch, 0, ch.size - 1, level + 1);
-      }*/
     } else {
-      long nn, ln;
-      int ni;
-      // number of nodes used to calculate space
-      nn = ne - ns;
-      // nn / 2, pretends to be the middle of the handled list
-      // except if starting point in the list is not at position 0
-      ln = nn >> 1;
-      // pivot with integrated list start
-      ni = (int) (ns + ln);
-        // consider number of descendants to calculate split point
-      if(!GUIProp.mapsimple && level != 0) {
-        // calculating real number of nodes of this recursion
-        nn = l.list[ne] - l.list[ns];
+      double weight = 0;
+      int ni = ns;
+  
+      // parents size
+      int par = data.parent(l.list[ns], Data.ELEM);
+      long parsize = data.fs != null ?
+          Token.toLong(data.attValue(data.sizeID, par)) : 0;
+      int parchilds = l.list[ne] - l.list[ni];
+      if(parsize == 0) parsize = l.list[ne] - l.list[ns];
+      weight = 0;
 
-        // let pivot be the first element of the list
-        ni = ns;
-
-        if(data.fs != null && GUIProp.mapaggr) {
-          // parents size
-          int par = data.parent(l.list[ns], Data.ELEM);
-          long parsize = Token.toLong(data.attValue(data.sizeID, par));
-          // temporary to sum up the child sizes
-          long sum = 0;
-
-          // increment pivot until left rectangle contains more or equal
-          // than the half descendants or if left node is greater than half of
-          // all descendants leave with just setting it to ne - 1
-          for(; ni < ne - 1; ni++)  {
-            // use file sizes to calculate breakpoint
-            if(sum >= parsize / 2) break;
-            sum += Token.toLong(data.attValue(data.sizeID, l.list[ni]));
-          }
-          nn = parsize;
-          ln = sum;
-        } else {
-          // increment pivot until left rectangle contains more or equal
-          // than the half descendants or if left node is greater than half of
-          // all descendants leave with just setting it to ne - 1
-          for(; ni < ne - 1; ni++)  {
-            if(l.list[ni] - l.list[ns] >= (nn >> 1)) break;
-          }
-          ln = l.list[ni] - l.list[ns];
-        }
+      // increment pivot until left rectangle contains more or equal
+      // than half the weight or leave with just setting it to ne - 1
+      for(; ni < ne - 1; ni++)  {
+        long size = data.fs != null ? 
+            Token.toLong(data.attValue(data.sizeID, l.list[ni])) : 0;
+        int childs = l.list[ni + 1] - l.list[ni];
+        if(weight >= 0.5) break;
+        weight += calcWeight(size, childs, parsize, parchilds, data);
       }
 
       // determine rectangle orientation (horizontal/vertical)
       // mapprop contains preferred alignment influence
+      // [JH] alignment should always be centered....
       final int p = GUIProp.mapprop;
       final boolean v = p > 4 ? r.w > r.h * (p + 4) / 8 :
         r.w * (13 - p) / 8 > r.h;
@@ -98,8 +57,9 @@ public final class SplitLayout extends MapLayout {
       int xx = r.x;
       int yy = r.y;
 
-      int ww = !v ? r.w : (int) (r.w * ln / nn);
-      int hh = v ? r.h : (int) (r.h * ln / nn);
+      // needs to be replaced by something like this
+      int ww = !v ? r.w : (int) (r.w * weight);
+      int hh = v ? r.h : (int) (r.h * weight);
 
       // paint both rectangles if enough space is left
       if(ww > 0 && hh > 0) calcMap(data, new ViewRect(xx, yy, ww, hh, 0,

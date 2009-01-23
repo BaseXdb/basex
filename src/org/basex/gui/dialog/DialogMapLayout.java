@@ -29,7 +29,7 @@ public final class DialogMapLayout extends Dialog {
   /** Layout slider. */
   private BaseXSlider sizeSlider;
   /** Simple layout. */
-  private BaseXCheckBox simple;
+//  private BaseXCheckBox simple;
   /** Show attributes. */
   private BaseXCheckBox atts;
   /** Select Layoutalgo. */
@@ -52,14 +52,14 @@ public final class DialogMapLayout extends Dialog {
 
     // create list
     choice = new BaseXListChooser(this, MAPLAYOUTCHOICE, HELPMAPLAYOUT);
-    choice.setSize(500, 300);
+    choice.setSize(500, 200);
     choice.setIndex(GUIProp.maplayout);
     p.add(choice);
 
     // create checkbox
-    simple = new BaseXCheckBox(MAPSIMPLE, HELPMAPSIMPLE,
-        GUIProp.mapsimple, 0, this);
-    p.add(simple);
+//    simple = new BaseXCheckBox(MAPSIMPLE, HELPMAPSIMPLE,
+//        GUIProp.mapsimple, 0, this);
+//    p.add(simple);
     atts = new BaseXCheckBox(MAPATTS, HELPMAPATTS, GUIProp.mapatts, this);
     if(gui.context.data().fs != null) {
       atts.setEnabled(false);
@@ -115,7 +115,7 @@ public final class DialogMapLayout extends Dialog {
     final int prp = prop.value();
     GUIProp.mapprop = prp;
     GUIProp.mapalgo = propalgo.getSelectedIndex();
-    GUIProp.mapsimple = simple.isSelected();
+//    GUIProp.mapsimple = simple.isSelected();
     GUIProp.mapatts = atts.isSelected();
     propLabel.setText(MAPPROP + " " + (prp > 2 && prp < 7 ? "Centered" :
       prp < 3 ? "Vertical" : "Horizontal"));

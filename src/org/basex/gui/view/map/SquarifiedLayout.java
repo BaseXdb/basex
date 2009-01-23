@@ -18,27 +18,10 @@ public final class SquarifiedLayout extends MapLayout {
   void calcMap(final Data data, final ViewRect r,
       final ArrayList<ViewRect> mainRects, final IntList l,
       final int ns, final int ne, final int level) {
-    // one rectangle left.. continue with this child
+    // one rectangle left...
     if(ne - ns == 1) {
       putRect(data, r, mainRects, l, ns, level);
-      
-      /* replaced by putRect()
-      // calculate rectangle sizes
-      final ViewRect t = new ViewRect(r.x, r.y, r.w, r.h, l.list[ns], r.level);
-
-      // position, with and height are calculated using split sizes of
-      //  former recursion level
-      final int x = t.x + layout.x;
-      final int y = t.y + layout.y;
-      final int w = t.w - layout.w;
-      final int h = t.h - layout.h;
-      mainRects.add(t);
-      // skip too small rectangles and leaf nodes (= meta data in deepfs)
-      if(w > 0 && h > 0 && !ViewData.isLeaf(data, t.pre)) {
-        final IntList ch = children(data, t.pre);
-        if(ch.size >= 0) calcMap(data, new ViewRect(x, y, w, h,
-            l.list[ns], t.level + 1), mainRects, ch, 0, ch.size - 1, level + 1);
-      }*/
+    // subdivide list
     } else {
       // number of nodes used to calculate rect size
       int nn = l.list[ne] - l.list[ns];

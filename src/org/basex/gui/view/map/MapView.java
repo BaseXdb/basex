@@ -18,7 +18,9 @@ import javax.swing.SwingUtilities;
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
+import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
+import org.basex.gui.dialog.DialogMapInfo;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.ViewNotifier;
@@ -70,6 +72,8 @@ public final class MapView extends View implements Runnable {
   /** Zooming speed. */
   private int zoomSpeed;
 
+  /** Info Dialog. */
+  private static DialogMapInfo mapInfo;
   /** Horizontal mouse position. */
   private int mouseX = -1;
   /** Vertical mouse position. */
@@ -94,6 +98,16 @@ public final class MapView extends View implements Runnable {
     super(man, help);
     setMode(Fill.NONE);
     new BaseXPopup(this, POPUP);
+    
+  }
+  
+  /**
+   * Start info dialog.
+   * @param gui reference to main window
+   */
+  public static void info(final GUI gui) {
+    mapInfo = new DialogMapInfo(gui);
+    mapInfo.repaint();
   }
 
   /**

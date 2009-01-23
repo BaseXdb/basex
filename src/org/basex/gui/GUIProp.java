@@ -168,7 +168,7 @@ public final class GUIProp {
   /** Temporary size slider enable disable. */
   public static boolean fsslider = false;
   /** Temporary enable/disable drop down algochooser. */
-  public static boolean algchanger = true;
+  public static boolean algchanger = false;
   // all values are only one half of the size
   /** Width of focused Content. */
   public static int lensareawidth = 50;
