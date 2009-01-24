@@ -145,6 +145,7 @@ public final class DataFS {
    * @param size to set
    */
   public void size(final int pre, final byte[] size) {
+    data.meta.update();
     data.update(pre + 3, SIZE, size);
   }
 
@@ -163,6 +164,7 @@ public final class DataFS {
    * @param mtime to set
    */
   public void time(final int pre, final byte[] mtime) {
+    data.meta.update();
     data.update(pre + 4, MTIME, mtime);
   }
   
@@ -331,6 +333,7 @@ public final class DataFS {
     md.addAtt(suffID, 0, suffix, 2);
     md.addAtt(data.sizeID, 0, size, 3);
     md.addAtt(timeID, 0, mtime, 4);
+    data.meta.update();
     data.insert(pre, parent, md);
   }
 

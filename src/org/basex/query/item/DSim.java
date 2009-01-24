@@ -1,7 +1,6 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.basex.BaseX;

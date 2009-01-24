@@ -28,11 +28,9 @@ public final class DialogMapLayout extends Dialog {
   private BaseXSlider prop;
   /** Layout slider. */
   private BaseXSlider sizeSlider;
-  /** Simple layout. */
-//  private BaseXCheckBox simple;
   /** Show attributes. */
   private BaseXCheckBox atts;
-  /** Select Layoutalgo. */
+  /** Select layout algorithm. */
   BaseXCombo propalgo;
   /** Temporary reference to the old map layout. */
   private final BaseXLabel propLabel;
@@ -46,32 +44,28 @@ public final class DialogMapLayout extends Dialog {
   public DialogMapLayout(final GUI main) {
     super(main, MAPLAYOUTTITLE, false);
     
+    final boolean fs = gui.context.data().fs != null;
+    
     final BaseXBack p = new BaseXBack();
     // [JH] complete layout
     p.setLayout(new TableLayout(9, 1, 0, 5));
 
     // create list
     choice = new BaseXListChooser(this, MAPLAYOUTCHOICE, HELPMAPLAYOUT);
-    choice.setSize(200, 110);
+    choice.setSize(220, 110);
     choice.setIndex(GUIProp.maplayout);
     p.add(choice);
 
-    final boolean fs = gui.context.data().fs != null;
-    
     // create checkbox
-//    simple = new BaseXCheckBox(MAPSIMPLE, HELPMAPSIMPLE,
-//        GUIProp.mapsimple, 0, this);
-//    p.add(simple);
     atts = new BaseXCheckBox(MAPATTS, HELPMAPATTS, GUIProp.mapatts, this);
-    if(fs) atts.setEnabled(false);
-    p.add(atts);
+    if(!fs) p.add(atts);
     
     // create drop down
     BaseXBack tmpback = new BaseXBack();
     tmpback.setLayout(new TableLayout(1, 2, 3, 5));
     BaseXLabel label = new BaseXLabel(MAPPROPALGO);
     tmpback.add(label);
-    propalgo = new BaseXCombo(new String[] {"SplitLayout", 
+    propalgo = new BaseXCombo(new String[] { "SplitLayout",
         "SliceAndDice Layout", "SquarifiedLayout", "StripLayout"}, HELPMODE, 
         false);
     propalgo.setSelectedIndex(GUIProp.mapalgo);
@@ -114,15 +108,13 @@ public final class DialogMapLayout extends Dialog {
     final int prp = prop.value();
     GUIProp.mapprop = prp;
     GUIProp.mapalgo = propalgo.getSelectedIndex();
-//    GUIProp.mapsimple = simple.isSelected();
     GUIProp.mapatts = atts.isSelected();
     propLabel.setText(MAPPROP + " " + (prp > 2 && prp < 7 ? "Centered" :
       prp < 3 ? "Vertical" : "Horizontal"));
     final int sizeprp = sizeSlider.value();
     GUIProp.sizep = sizeprp;
     sizeLabel.setText(MAPSIZE + " " + (sizeprp > 45 && sizeprp < 55 ? 
-      MAPBOTH :
-      sizeprp < 45 ?  MAPCHILDREN  : MAPFSSIZE));
+      MAPBOTH : sizeprp < 45 ?  MAPCHILDREN  : MAPFSSIZE));
     gui.notify.layout();
   }
 

@@ -90,9 +90,7 @@ public final class GUIProp {
   /** Flag for Java look and feel. */
   public static boolean javalook = false;
 
-  /** Flag for using a simple map layout. */
-  public static boolean mapsimple = false;
-  /** Flag for computing additional mapinfos. */
+  /** Flag for computing additional map infos. */
   public static boolean mapinfo = false;
   /** Show attributes in treemap. */
   public static boolean mapatts = false;
@@ -100,6 +98,11 @@ public final class GUIProp {
   public static int maplayout = 0;
   /** Treemap Proportion. */
   public static int mapprop = 4;
+  /** Map algorithm. */
+  public static int mapalgo = 0;
+  /** number of child <-> size weightening in (0;100). */
+  public static int sizep = 50;
+
   /** Dot sizes in plot. */
   public static int plotdots = 0;
   /** Logarithmic plot. */
@@ -154,12 +157,10 @@ public final class GUIProp {
   public static boolean showstarthelp = false;
   /** Fullscreen flag. */
   static boolean fullscreen = false;
-  /** Map algorithm. */
-  public static int mapalgo = 0;
+
   /** Map alignment by size aggregation. */
   public static boolean mapaggr = false;
-  /** number of child <-> size weightening in (0;100). */
-  public static int sizep = 50;
+  
   /** Choice of interacting with TreeeMap. */
   public static int mapinteraction = 0;
   // all values are only one half of the size

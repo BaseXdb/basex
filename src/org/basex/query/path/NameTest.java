@@ -2,7 +2,6 @@ package org.basex.query.path;
 
 import static org.basex.util.Token.*;
 import static org.basex.query.QueryText.*;
-
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;

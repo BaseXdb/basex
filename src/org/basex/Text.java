@@ -1248,8 +1248,6 @@ public interface Text {
   /** Help String. */
   byte[] HELPFSMAX = token(lang("h_fsmax"));
   /** Help String. */
-  byte[] HELPMAPSIMPLE = token(lang("h_mapsimple"));
-  /** Help String. */
   byte[] HELPMAPINFO = token(lang("h_mapinfo"));
   /** Help String. */
   byte[] HELPMAPATTS = token(lang("h_mapatts"));

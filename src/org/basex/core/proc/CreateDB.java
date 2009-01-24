@@ -10,7 +10,6 @@ import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.build.xml.DirParser;
 import org.basex.build.xml.SAXWrapper;
-import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.index.FTBuilder;
 import org.basex.index.FTFuzzyBuilder;
@@ -64,24 +63,27 @@ public final class CreateDB extends ACreate {
   /**
    * Creates and returns a database from the specified SAX source.
    * @param s sax source
+   * @param db database name
    * @return database instance
    * @throws IOException exception
    */
-  public static Data xml(final SAXSource s) throws IOException {
-    return xml(new SAXWrapper(s), "tmp");
+  public static Data xml(final SAXSource s, final String db)
+      throws IOException {
+    return xml(new SAXWrapper(s), db);
   }
 
   /**
    * Creates and returns a database for the specified XML document.
    * If building fails, an empty reference is returned.
    * @param p xml parser
-   * @param db name of the database to be created
+   * @param db name of the database to be created; if db is <code>null</code>,
+   * a main memory instance is created
    * @return database instance
    * @throws IOException exception
    */
   public static Data xml(final Parser p, final String db) throws IOException {
-    if(Prop.onthefly) return new MemBuilder().build(p, db);
-
+    if(db == null) return new MemBuilder().build(p, "");
+    
     final Data data = new DiskBuilder().build(p, db);
     if(data.meta.txtindex) data.setIndex(
         IndexToken.Type.TXT, new ValueBuilder(true).build(data));

@@ -1,11 +1,9 @@
 package org.basex.gui.view.map;
 
 import java.util.ArrayList;
-
 import org.basex.data.Data;
 import org.basex.gui.GUIProp;
 import org.basex.gui.view.ViewRect;
-//import org.basex.gui.view.ViewData;
 import org.basex.util.IntList;
 import org.basex.util.Token;
 

@@ -565,7 +565,6 @@ h_fsall=If this checkbox is chosen, the whole file system will be parsed.
 h_meta=By choosing this checkbox, meta-data will be extracted from numerous file types. Meta-data includes e.g. the dimensions of images, ID3 tags of MP3 files or contents of email files.
 h_cont=The textual contents of files can be included in the database by choosing this checkbox. If the contents are included, they can be searched via XPath or XQuery.
 h_fsmax=Here you can choose a size limit for the included text files.
-h_mapsimple=If this checkbox is turned on, a simpler algorithm will be used to calculate the TreeMap.
 h_mapatts= If this checkbox is turned on, attributes are shown inside the TreeMap.
 h_maplayout=Here you can modify the layout algorithm which is used in the Map visualization. The changes can be immediately seen if a database is opened.
 h_mapalign=Here you can modify the alignment of the rectangles in the Map visualization. The changes can be immediately seen if a database is opened.
