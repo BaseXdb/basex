@@ -98,7 +98,6 @@ public final class MapView extends View implements Runnable {
     super(man, help);
     setMode(Fill.NONE);
     new BaseXPopup(this, POPUP);
-    
   }
   
   /**

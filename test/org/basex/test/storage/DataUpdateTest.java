@@ -37,6 +37,7 @@ public abstract class DataUpdateTest {
    */
   @BeforeClass
   public static final void setUpBeforeClass() {
+    Prop.read();
     Prop.textindex = false;
     Prop.attrindex = false;
     Prop.chop = true;
@@ -50,6 +51,7 @@ public abstract class DataUpdateTest {
   @SuppressWarnings("unused")
   public void setUp() throws Exception {
     data = CreateDB.xml(IO.get(TESTFILE), dbname);
+    data.meta.update();
     size = data.meta.size;
   }
   

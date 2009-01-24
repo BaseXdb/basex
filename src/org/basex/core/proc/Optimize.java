@@ -76,6 +76,8 @@ public final class Optimize extends ACreate {
     data.meta.uptodate = true;
 
     try {
+      data.meta.txtindex = true;
+      data.meta.atvindex = true;
       index(data);
     } catch(final IOException e) {
       BaseX.debug(e);

@@ -52,18 +52,18 @@ public final class DialogMapLayout extends Dialog {
 
     // create list
     choice = new BaseXListChooser(this, MAPLAYOUTCHOICE, HELPMAPLAYOUT);
-    choice.setSize(500, 200);
+    choice.setSize(200, 110);
     choice.setIndex(GUIProp.maplayout);
     p.add(choice);
 
+    final boolean fs = gui.context.data().fs != null;
+    
     // create checkbox
 //    simple = new BaseXCheckBox(MAPSIMPLE, HELPMAPSIMPLE,
 //        GUIProp.mapsimple, 0, this);
 //    p.add(simple);
     atts = new BaseXCheckBox(MAPATTS, HELPMAPATTS, GUIProp.mapatts, this);
-    if(gui.context.data().fs != null) {
-      atts.setEnabled(false);
-    }
+    if(fs) atts.setEnabled(false);
     p.add(atts);
     
     // create drop down
@@ -84,9 +84,8 @@ public final class DialogMapLayout extends Dialog {
       }
     });
     tmpback.add(propalgo);
-    if(GUIProp.algchanger) {
-      p.add(tmpback);
-    }
+    p.add(tmpback);
+
     // create slider
     propLabel = new BaseXLabel(MAPPROP);
     p.add(propLabel);
@@ -99,7 +98,7 @@ public final class DialogMapLayout extends Dialog {
     BaseXLayout.setWidth(sizeSlider, p.getPreferredSize().width);
     
     // add slider only to dialog if we are using fs data
-    if(gui.context.data().fs != null && GUIProp.fsslider) {
+    if(fs) {
       p.add(sizeLabel);
       p.add(sizeSlider);
     }

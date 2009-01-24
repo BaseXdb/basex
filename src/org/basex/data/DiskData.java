@@ -136,7 +136,6 @@ public final class DiskData extends Data {
 
   @Override
   public synchronized void close() throws IOException {
-    // [CG] check if this is enough
     if(!meta.uptodate) flush();
     cls();
   }

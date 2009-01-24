@@ -138,7 +138,8 @@ abstract class MapLayout {
 
     final int kind = data.kind(par);
     final int last = par + data.size(par, kind);
-    int p = par + (GUIProp.mapatts ? 1 : data.attSize(par, kind));
+    final boolean atts = GUIProp.mapatts && data.fs == null;
+    int p = par + (atts ? 1 : data.attSize(par, kind));
     while(p != last) {
       list.add(p);
       p += data.size(p, data.kind(p));

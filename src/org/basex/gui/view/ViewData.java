@@ -32,7 +32,8 @@ public final class ViewData {
     if(kind == Data.ATTR) return true;
     if(data.fs != null && data.fs.isFile(pre)) return true;
 
-    final int last = pre + (GUIProp.mapatts ? 1 : data.attSize(pre, kind));
+    final boolean atts = GUIProp.mapatts && data.fs == null;
+    final int last = pre + (atts ? 1 : data.attSize(pre, kind));
     return last == data.meta.size || data.parent(pre, kind) >=
       data.parent(last, data.kind(last));
   }
