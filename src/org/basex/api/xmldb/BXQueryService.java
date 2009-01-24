@@ -9,7 +9,6 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Uri;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.ErrorCodes;
-import org.xmldb.api.base.ResourceSet;
 import org.xmldb.api.base.XMLDBException;
 import org.xmldb.api.modules.XPathQueryService;
 
@@ -64,14 +63,14 @@ public final class BXQueryService implements XPathQueryService, BXXMLDBText {
     ns.clear();
   }
 
-  public ResourceSet query(final String query) throws XMLDBException {
+  public BXResourceSet query(final String query) throws XMLDBException {
     return query(coll.ctx.current(), query);
   }
 
-  public ResourceSet queryResource(final String id, final String query)
+  public BXResourceSet queryResource(final String id, final String query)
       throws XMLDBException {
 
-    final BXXMLResource xml = (BXXMLResource) coll.getResource(id);
+    final BXXMLResource xml = coll.getResource(id);
     if(xml != null) return query(new Nodes(xml.pos, xml.data), query);
     // throw exception if id was not found...
     throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_RES + id);
@@ -84,7 +83,7 @@ public final class BXQueryService implements XPathQueryService, BXXMLDBText {
    * @return resource set
    * @throws XMLDBException exception
    */
-  private ResourceSet query(final Nodes nodes, final String query)
+  private BXResourceSet query(final Nodes nodes, final String query)
       throws XMLDBException {
     
     try {
@@ -93,8 +92,7 @@ public final class BXQueryService implements XPathQueryService, BXXMLDBText {
 
       // add default namespaces
       for(final String n : ns.keySet()) {
-        final QNm name = new QNm(token(n), Uri.uri(token(ns.get(n))));
-        proc.ctx.ns.add(name);
+        proc.ctx.ns.add(new QNm(token(n), Uri.uri(token(ns.get(n)))));
       }
       // perform query and return result
       return new BXResourceSet(proc.query(nodes), coll);

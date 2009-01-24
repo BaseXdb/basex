@@ -9,8 +9,6 @@ package org.basex.api.xqj;
 public interface BXQText {
   /** Java XQuery API version. */
   String VERSION = "1.0";
-  /** Temporary database instance (skip?). */
-  String TMP = "tmp";
 
   /** Error Message. */
   String CLOSED = " has been closed.";

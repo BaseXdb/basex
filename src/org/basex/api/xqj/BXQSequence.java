@@ -1,7 +1,6 @@
 package org.basex.api.xqj;
 
 import static org.basex.api.xqj.BXQText.*;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;

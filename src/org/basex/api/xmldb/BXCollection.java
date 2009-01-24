@@ -113,11 +113,12 @@ public final class BXCollection implements Collection, BXXMLDBText {
   public String[] listResources() throws XMLDBException {
     check();
     final StringList sl = new StringList();
-    for(int d : ctx.data().doc()) sl.add(Token.string(ctx.data().text(d)));
+    final Data data = ctx.data();
+    for(int d : data.doc()) sl.add(Token.string(data.text(d)));
     return sl.finish();
   }
 
-  public Resource createResource(final String id, final String type)
+  public BXXMLResource createResource(final String id, final String type)
       throws XMLDBException {
 
     check();
@@ -145,8 +146,9 @@ public final class BXCollection implements Collection, BXXMLDBText {
         ErrorCodes.NO_SUCH_RESOURCE, ERR_UNKNOWN + data.meta.dbname);
 
     // find correct value and remove the node
-    ctx.data().delete(((BXXMLResource) getResource(del.getId())).pos);
-    ctx.data().flush();
+    data.meta.update();
+    data.delete(getResource(del.getId()).pos);
+    data.flush();
   }
 
   public void storeResource(final Resource res) throws XMLDBException {
@@ -175,15 +177,17 @@ public final class BXCollection implements Collection, BXXMLDBText {
     // insert document
     try {
       final Data data = ctx.data();
+      data.meta.update();
       data.insert(data.meta.size, -1, new MemBuilder().build(p, id));
       data.flush();
+      ctx.flush();
     } catch(final IOException ex) {
       BaseX.debug(ex);
       throw new XMLDBException(ErrorCodes.INVALID_RESOURCE, ex.getMessage());
     }
   }
 
-  public Resource getResource(final String id) throws XMLDBException {
+  public BXXMLResource getResource(final String id) throws XMLDBException {
     check();
     if(id == null) return null;
     final Data data = ctx.data();

@@ -37,6 +37,9 @@ import org.xml.sax.XMLReader;
  * @author Christian Gruen
  */
 abstract class BXQAbstract {
+  /** Name of database instance. Open Issue: creating a main memory vs.
+   * persistent database (currently: TMP is null -> main-memory based). */
+  private static final String TMP = null;
   /** Closed flag. */
   protected boolean closed;
   /** Parent closer. */
@@ -215,7 +218,7 @@ abstract class BXQAbstract {
     opened();
     valid(is, InputStream.class);
     try {
-      return checkDB(CreateDB.xml(new SAXSource(new InputSource(is))));
+      return checkDB(CreateDB.xml(new SAXSource(new InputSource(is)), TMP));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
@@ -231,7 +234,7 @@ abstract class BXQAbstract {
     opened();
     valid(r, Reader.class);
     try {
-      return checkDB(CreateDB.xml(new SAXSource(new InputSource(r))));
+      return checkDB(CreateDB.xml(new SAXSource(new InputSource(r)), TMP));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
@@ -247,7 +250,7 @@ abstract class BXQAbstract {
     opened();
     valid(r, XMLReader.class);
     try {
-      return checkDB(CreateDB.xml(new SAXSource(r, null)));
+      return checkDB(CreateDB.xml(new SAXSource(r, null), TMP));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
@@ -270,7 +273,7 @@ abstract class BXQAbstract {
   }
 
   /**
-   * Creates a database instance from the specified byte array.
+   * Creates a database instance from the specified io instance.
    * @param io io reference
    * @return document node
    * @throws BXQException exception
