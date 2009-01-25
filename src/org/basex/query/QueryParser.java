@@ -92,7 +92,7 @@ import org.basex.util.XMLToken;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class QueryParser extends InputParser {
+public class QueryParser extends InputParser {
   /** Resulting XQuery expression. */
   private final QueryContext ctx;
   /** Temporary token builder. */
