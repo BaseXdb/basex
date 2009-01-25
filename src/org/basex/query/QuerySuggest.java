@@ -55,7 +55,7 @@ public class QuerySuggest extends QueryParser {
     while(stack.size() != s) stack.pop();
     return expr;
   }
-
+  */
   @Override
   void checkStep(final Axis axis, final Test test) {
     filter(true);
@@ -80,7 +80,7 @@ public class QuerySuggest extends QueryParser {
     }
     laxis = axis;
     ltest = test;
-  }*/
+  }
 
   /**
    * Filters the current steps.

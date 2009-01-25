@@ -2579,6 +2579,14 @@ public class QueryParser extends InputParser {
     ctx.fun.funError((QNm) alter[0]);
     Err.or(FUNCUNKNOWN, ((QNm) alter[0]).str());
   }
+  
+  /**
+   * Performs optional step checks.
+   * @param axis axis
+   * @param test test
+   */
+  @SuppressWarnings("unused")
+  void checkStep(final Axis axis, final Test test) { }
 
   /**
    * Adds an expression to the specified array.
