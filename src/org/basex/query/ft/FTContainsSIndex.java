@@ -1,8 +1,9 @@
-package org.basex.query.expr;
+package org.basex.query.ft;
 
 import org.basex.index.FTTokenizer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FTNodeItem;

@@ -1,8 +1,7 @@
-package org.basex.query.expr;
+package org.basex.query.ft;
 
 import java.io.IOException;
 import org.basex.data.Serializer;
-import org.basex.query.FTOpt;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -16,7 +15,7 @@ import org.basex.query.iter.FTNodeIter;
  */
 public final class FTOptions extends FTExpr {
   /** FTOptions. */
-  public FTOpt opt;
+  private final FTOpt opt;
 
   /**
    * Constructor.

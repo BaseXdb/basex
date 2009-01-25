@@ -5,6 +5,8 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
+import java.util.HashMap;
+
 import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.core.proc.Check;
@@ -16,11 +18,12 @@ import org.basex.data.Serializer;
 import org.basex.index.FTTokenizer;
 import org.basex.io.IO;
 import org.basex.query.expr.Expr;
+import org.basex.query.ft.FTOpt;
+import org.basex.query.ft.FTPos;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Dat;
 import org.basex.query.item.Dtm;
 import org.basex.query.item.Item;
-import org.basex.query.item.Seq;
 import org.basex.query.item.Tim;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
@@ -44,6 +47,8 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class QueryContext extends Progress {
+  /** Cached stop word files. */
+  public HashMap<String, String> stop;
   /** Reference to the query file. */
   public IO file = Prop.xquery;
   /** Query string. */
@@ -129,17 +134,17 @@ public final class QueryContext extends Progress {
   /** Empty Order mode. */
   public boolean orderGreatest = false;
 
-  /** Default encoding (currently ignored). */
+  /** Default encoding. */
   public byte[] encoding = token(Prop.ENCODING);
-  /** Preserve Namespaces (currently ignored). */
+  /** Preserve Namespaces. */
   public boolean nsPreserve = true;
-  /** Inherit Namespaces (currently ignored). */
+  /** Inherit Namespaces. */
   public boolean nsInherit = true;
-  /** Ordering mode (currently ignored). */
+  /** Ordering mode. */
   public boolean ordered = false;
-  /** Construction mode (currently ignored). */
+  /** Construction mode. */
   public boolean construct = false;
-  /** Revalidation Mode (currently ignored). */
+  /** Revalidation Mode. */
   public int revalidate = 0;
 
   /** Reference to the root expression. */
@@ -167,25 +172,34 @@ public final class QueryContext extends Progress {
 
   /**
    * Optimizes the expression.
-   * @param nodes node context
+   * @param nodes initial node set
    * @throws QueryException query exception
    */
   public void compile(final Nodes nodes) throws QueryException {
     try {
       // cache the initial context nodes
       if(nodes != null) {
-        rootDocs = nodes.size;
-        docs = new DBNode[rootDocs];
+        // create document nodes
+        final Data data = nodes.data;
+        docs = new DBNode[nodes.size];
         for(int d = 0; d < docs.length; d++) {
-          docs[d] = new DBNode(nodes.data, nodes.nodes[d]);
+          int p = nodes.nodes[d];
+          if(data.kind(p) == Data.DOC) docs[rootDocs++] = new DBNode(data, p);
         }
-        item = Seq.get(docs, docs.length);
+        docs = Array.finish(docs, rootDocs);
+
+        // create initial context item
+        final SeqIter si = new SeqIter();
+        for(int d = 0; d < nodes.size; d++) {
+          si.add(new DBNode(data, nodes.nodes[d]));
+        }
+        item = si.finish();
         
         // add collection instances
         final NodIter col = new NodIter();
         for(final DBNode doc : docs) col.add(doc);
         collect = Array.add(collect, col);
-        collName = Array.add(collName, token(nodes.data.meta.dbname));
+        collName = Array.add(collName, token(data.meta.dbname));
       }
 
       // evaluates the query and returns the result
@@ -205,7 +219,7 @@ public final class QueryContext extends Progress {
   
   /**
    * Evaluates the expression with the specified context set.
-   * @param nodes initial context set
+   * @param nodes initial node set
    * @return resulting value
    * @throws QueryException query exception
    */

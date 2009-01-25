@@ -98,13 +98,14 @@ public abstract class W3CTS {
   private boolean verbose;
 
   /** Cached source files. */
-  private final HashMap<String, String> srcFiles =
-    new HashMap<String, String>();
+  private final HashMap<String, String> srcs = new HashMap<String, String>();
   /** Cached module files. */
-  private final HashMap<String, String> modules = new HashMap<String, String>();
+  private final HashMap<String, String> mods = new HashMap<String, String>();
   /** Cached collections. */
   private final HashMap<String, byte[][]> colls =
     new HashMap<String, byte[][]>();
+  /** Cached stop word files. */
+  private final HashMap<String, String> stop = new HashMap<String, String>();
 
   /** OK log. */
   private final StringBuilder logOK = new StringBuilder();
@@ -184,8 +185,6 @@ public abstract class W3CTS {
 
     final Performance perf = new Performance();
     final Context context = new Context();
-    Prop.xqformat = false;
-    Prop.mainmem = true;
     
     new Check(path + input).execute(context, null);
     data = context.data();
@@ -197,17 +196,15 @@ public abstract class W3CTS {
     BaseX.outln("\nCaching Sources...");
     for(final int s : nodes("//*:source", root).nodes) {
       final Nodes srcRoot = new Nodes(s, data);
-      final String source = (path +
-          text("@FileName", srcRoot)).replace('\\', '/');
-      srcFiles.put(text("@ID", srcRoot), source);
+      final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');
+      srcs.put(text("@ID", srcRoot), val);
     }
 
     BaseX.outln("Caching Modules...");
     for(final int s : nodes("//*:module", root).nodes) {
       final Nodes srcRoot = new Nodes(s, data);
-      final String module = (path +
-          text("@FileName", srcRoot)).replace('\\', '/');
-      modules.put(text("@ID", srcRoot), module);
+      final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');
+      mods.put(text("@ID", srcRoot), val);
     }
 
     BaseX.outln("Caching Collections...");
@@ -221,6 +218,13 @@ public abstract class W3CTS {
         dl.add(token(sources + string(data.atom(doc.nodes[d])) + IO.XMLSUFFIX));
       }
       colls.put(cname, dl.finish());
+    }
+
+    BaseX.outln("Caching Stopwords...");
+    for(final int s : nodes("//*:stopwords", root).nodes) {
+      final Nodes srcRoot = new Nodes(s, data);
+      final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');
+      stop.put(text("@uri", srcRoot), val);
     }
 
     if(reporting) {
@@ -323,11 +327,14 @@ public abstract class W3CTS {
       final Context context = new Context();
 
       final QueryProcessor xq = new QueryProcessor(in, file);
-      final Nodes cont = nodes("*:contextItem", root);
+      
+      Nodes cont = nodes("*:contextItem", root);
       if(cont.size != 0) new Check(sources + string(data.atom(cont.nodes[0])) +
           IO.XMLSUFFIX).execute(context, null);
 
       final QueryContext ctx = xq.ctx;
+      ctx.stop = stop;
+      
       files.add(file(nodes("*:input-file", root),
           nodes("*:input-file/@variable", root), ctx));
       files.add(file(nodes("*:input-URI", root),
@@ -339,7 +346,7 @@ public abstract class W3CTS {
 
       for(final int p : nodes("*:module", root).nodes) {
         final String ns = text("@namespace", new Nodes(p, data));
-        final String f = modules.get(string(data.atom(p))) + ".xq";
+        final String f = mods.get(string(data.atom(p))) + ".xq";
         xq.module(ns, f);
       }
 
@@ -550,7 +557,7 @@ public abstract class W3CTS {
     final TokenBuilder tb = new TokenBuilder();
     for(int c = 0; c < nod.size; c++) {
       final byte[] nm = data.atom(nod.nodes[c]);
-      final String src = srcFiles.get(string(nm));
+      final String src = srcs.get(string(nm));
       if(tb.size != 0) tb.add(", ");
       tb.add(nm);
 

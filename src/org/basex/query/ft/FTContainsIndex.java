@@ -1,4 +1,4 @@
-package org.basex.query.expr;
+package org.basex.query.ft;
 
 import java.io.IOException;
 import org.basex.data.Serializer;
@@ -44,14 +44,14 @@ public final class FTContainsIndex extends FTContains {
   }
 
   @Override
-  public String toString() {
-    return "FTContainsIndex(" + ftexpr + ")";
-  }
-
-  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     ftexpr.plan(ser);
     ser.closeElement();
+  }
+
+  @Override
+  public String toString() {
+    return "FTContainsIndex(" + ftexpr + ")";
   }
 }

@@ -9,6 +9,7 @@ import org.basex.core.proc.DropDB;
 import org.basex.core.proc.XQuery;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
+import org.basex.util.Performance;
 
 /**
  * XPath Test class.
@@ -42,6 +43,7 @@ public final class QueryTest {
    * Constructor.
    */
   private QueryTest() {
+    Performance p = new Performance();
     Prop.textindex = true;
     Prop.attrindex = true;
     Prop.chop = true;
@@ -64,7 +66,7 @@ public final class QueryTest {
       }
     } else {
       // single test
-      Prop.ftindex = true;
+      Prop.ftindex = false;
       Prop.ftfuzzy = false;
       Prop.ftittr = true;
       Prop.ftst = false;
@@ -73,8 +75,8 @@ public final class QueryTest {
       ok &= test();
     }
 
-    System.out.println(ok ? "All tests correct.\n" :
-      wrong + " Wrong results...\n");
+    System.out.println(ok ? "All tests correct." : wrong + " Wrong results...");
+    System.out.println("Time: " + p);
   }
 
   /**

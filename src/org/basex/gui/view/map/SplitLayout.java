@@ -27,12 +27,6 @@ public final class SplitLayout extends MapLayout {
       double weight = 0;
       int ni = ns;
 
-      /*/ debugging...
-      for(int i = 0; i < l.size; i++) {
-        int v = l.list[ns];
-        System.out.println(i + ": " + v + ", Kind: " + data.kind(v));
-      }*/
-      
       // parents size
       int par = data.parent(l.list[ns], data.kind(l.list[ns]));
       long parsize = data.fs != null ?

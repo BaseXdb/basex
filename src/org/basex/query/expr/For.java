@@ -1,5 +1,6 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
@@ -50,7 +51,10 @@ public final class For extends ForLet {
 
     // bind variable if single value is returned and if no variables are used
     if(pos == null && score == null && expr.returned(ctx).single &&
-        !expr.usesVar(null)) var.bind(expr, ctx);
+        !expr.usesVar(null)) {
+      ctx.compInfo(OPTBIND, var);
+      var.bind(expr, ctx);
+    }
 
     ctx.vars.add(var);
     if(pos != null) ctx.vars.add(pos);

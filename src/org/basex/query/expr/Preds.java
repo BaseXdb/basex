@@ -33,7 +33,7 @@ public abstract class Preds extends Expr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     final Item ci = ctx.item;
-    ctx.item = null;
+    //ctx.item = null;
 
     for(int p = 0; p < pred.length; p++) {
       Expr ex = pred[p].comp(ctx);
@@ -52,6 +52,7 @@ public abstract class Preds extends Expr {
         pred[p] = ex;
       }
     }
+
     ctx.item = ci;
     return this;
   }

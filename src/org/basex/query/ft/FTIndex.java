@@ -1,4 +1,4 @@
-package org.basex.query.expr;
+package org.basex.query.ft;
 
 import java.io.IOException;
 import org.basex.BaseX;
@@ -7,7 +7,6 @@ import org.basex.data.Serializer;
 import org.basex.index.FTNode;
 import org.basex.index.FTTokenizer;
 import org.basex.index.IndexArrayIterator;
-import org.basex.query.FTOpt;
 import org.basex.query.QueryContext;
 import org.basex.query.item.FTNodeItem;
 import org.basex.query.iter.FTNodeIter;

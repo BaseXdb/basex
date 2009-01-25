@@ -1,4 +1,4 @@
-package org.basex.query.expr;
+package org.basex.query.ft;
 
 import static org.basex.query.QueryText.*;
 
@@ -8,6 +8,9 @@ import org.basex.index.FTTokenizer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.CmpG;
+import org.basex.query.expr.Expr;
+import org.basex.query.expr.Return;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
@@ -96,8 +99,10 @@ public class FTContains extends Expr {
   
   @Override
   public Expr indexEquivalent(final QueryContext ctx, final IndexContext ic)
-    throws QueryException {
+      throws QueryException {
 
+    if(!ic.data.meta.ftxindex) return this;
+    
     final FTExpr ae = ftexpr.indexEquivalent(ctx, ic);
     // sequential evaluation with index access
     if(ic.seq) return new FTContainsSIndex(expr, ae);

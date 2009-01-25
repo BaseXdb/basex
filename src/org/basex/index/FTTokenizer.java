@@ -3,6 +3,7 @@ package org.basex.index;
 import static org.basex.util.Token.*;
 import org.basex.core.Prop;
 import org.basex.util.Stemming;
+import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 
 /**
@@ -90,7 +91,7 @@ public final class FTTokenizer extends IndexToken {
     boolean pa = false;
     for(; p < l; p += cl(text[p])) {
       final int c = cp(text, p);
-      if(c == '.' && wc) break;
+      if(wc && c == '.') break;
 
       if(!sn && (c == '.' || c == '!' || c == '?')) {
         sn = true;
@@ -119,6 +120,7 @@ public final class FTTokenizer extends IndexToken {
   @Override
   public byte[] get() {
     byte[] n = substring(text, s, p);
+    if(wc) n = wc(n);
     if(!dc) n = dc(n);
     if(uc) n = uc(n);
     if(lc || !cs) n = lc(n);
@@ -174,6 +176,28 @@ public final class FTTokenizer extends IndexToken {
     }
     c[3]++;
     return c;
+  }
+  
+  /**
+   * Returns a wildcard token.
+   * @param n input token
+   * @return resulting token
+   */
+  private byte[] wc(final byte[] n) {
+    if(!contains(n, '\\')) return n;
+    final TokenBuilder tb = new TokenBuilder();
+    boolean bs = false;
+    for(byte c : n) {
+      if(c == '\\') {
+        bs = true;
+      } else if(bs) {
+        if(Character.isLetterOrDigit(c)) tb.add(c);
+        bs = false;
+      } else {
+        tb.add(c);
+      }
+    }
+    return tb.finish();
   }
 
   /**

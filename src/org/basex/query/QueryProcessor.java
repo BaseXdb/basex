@@ -72,7 +72,7 @@ public final class QueryProcessor extends Progress {
   
   /**
    * Returns a result iterator.
-   * @param nodes node input
+   * @param nodes initial node set
    * @return result iterator
    * @throws QueryException query exception
    */
@@ -83,13 +83,13 @@ public final class QueryProcessor extends Progress {
 
   /**
    * Parses the specified query and returns the result.
-   * @param n node context
+   * @param nodes initial node set
    * @return result of query
    * @throws QueryException query exception
    */
-  public Result query(final Nodes n) throws QueryException {
-    compile(n);
-    return ctx.eval(n);
+  public Result query(final Nodes nodes) throws QueryException {
+    compile(nodes);
+    return ctx.eval(nodes);
   }
 
   /**

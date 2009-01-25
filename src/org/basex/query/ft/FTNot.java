@@ -1,4 +1,4 @@
-package org.basex.query.expr;
+package org.basex.query.ft;
 
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
@@ -45,5 +45,10 @@ public final class FTNot extends FTExpr {
   public FTExpr indexEquivalent(final QueryContext ctx, final IndexContext ic)
     throws QueryException {
     return new FTNotIndex(expr[0].indexEquivalent(ctx, ic));
+  }
+
+  @Override
+  public boolean usesExclude() {
+    return true;
   }
 }

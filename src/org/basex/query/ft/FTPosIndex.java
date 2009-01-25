@@ -1,10 +1,8 @@
-package org.basex.query.expr;
+package org.basex.query.ft;
 
 import static org.basex.query.QueryText.*;
-
 import java.io.IOException;
 import org.basex.data.Serializer;
-import org.basex.query.FTPos;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.FTNodeItem;
@@ -17,31 +15,18 @@ import org.basex.query.util.Err;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class FTSelectIndex extends FTExpr {
+public final class FTPosIndex extends FTExpr {
   /** Position filter. */
   public FTPos pos;
-  /** Window. */
-  public Expr window;
-  /** Distance occurrences. */
-  public Expr[] dist;
-  /** Weight. */
-  public Expr weight;
 
   /**
    * Constructor.
    * @param e expression
-   * @param u fulltext selections
-   * @param win window
-   * @param wei weight
-   * @param d distance
+   * @param p fulltext selections
    */
-  public FTSelectIndex(final FTExpr e, final FTPos u, final Expr win, 
-      final Expr wei, final Expr[] d) {
+  public FTPosIndex(final FTExpr e, final FTPos p) {
     super(e);
-    pos = u;
-    window = win;
-    weight = wei;
-    dist = d;
+    pos = p;
   }
 
   @Override
@@ -57,7 +42,7 @@ public final class FTSelectIndex extends FTExpr {
         if (ctx.ftpos != null) {
           if (it.ftn.size > 0) {
             init(it);
-            while (!posFilter()) {
+            while(!pos.filter(ctx)) {
               it = expr[0].iter(ctx).next();
               if(it.ftn.size == 0) {
                 ctx.ftpos = tmp;
@@ -68,7 +53,7 @@ public final class FTSelectIndex extends FTExpr {
           }    
         }
         // calculate weight
-        final double d = checkDbl(ctx.iter(weight));
+        final double d = checkDbl(ctx.iter(pos.weight));
         if(d < 0 || d > 1000) Err.or(FTWEIGHT, d);
         if (d != -1) it.score(it.score() * d);
 
@@ -87,28 +72,6 @@ public final class FTSelectIndex extends FTExpr {
           pos.term = pos.ft.getTokenList();
         }
       }
-      
-      /**
-       * Evaluates the position filters.
-       * @return result of check
-       * @throws QueryException query exception
-       */
-      boolean posFilter() throws QueryException {
-        if(!pos.valid()) return false;
-
-        // ...distance?
-        if(pos.dunit != null) {
-          final long mn = checkItr(ctx.iter(dist[0]));
-          final long mx = checkItr(ctx.iter(dist[1]));
-          if(!pos.distance(mn, mx)) return false;
-        }
-        // ...window?
-        if(pos.wunit != null) {
-          final long c = checkItr(ctx.iter(window));
-          if(!pos.window(c)) return false;
-        }
-        return true;
-      }
     };
   }
 
@@ -122,16 +85,6 @@ public final class FTSelectIndex extends FTExpr {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append(expr[0]);
-    sb.append(pos);
-    if(pos.dunit != null) {
-      sb.append(" distance(");
-      sb.append(dist[0]);
-      sb.append(",");
-      sb.append(dist[1]);
-      sb.append(")");
-    }
-    return sb.toString();
+    return expr[0].toString();
   }
 }

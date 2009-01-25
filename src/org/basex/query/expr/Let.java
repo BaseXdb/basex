@@ -1,5 +1,6 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
@@ -29,20 +30,22 @@ public final class Let extends ForLet {
    * @param e variable input
    * @param v variable
    * @param s score flag
-   * @throws QueryException xquery exception
    */
-  public Let(final Expr e, final Var v, final boolean s) throws QueryException {
+  public Let(final Expr e, final Var v, final boolean s) {
     expr = e;
     var = v;
     score = s;
-    if(s) var.bind(Dbl.ZERO, null);
   }
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     expr = expr.comp(ctx);
+    
     // bind variable if no variables are used
-    if(!score && !expr.usesVar(null)) var.bind(expr, ctx);
+    if(!score && !expr.usesVar(null)) {
+      ctx.compInfo(OPTBIND, var);
+      var.bind(expr, ctx);
+    }
     ctx.vars.add(var);
     return this;
   }

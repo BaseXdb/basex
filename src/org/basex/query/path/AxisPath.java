@@ -181,7 +181,7 @@ public class AxisPath extends Path {
 
       // no index access possible; skip remaining tests
       if(ictx == null || !ictx.io || !ictx.iu) continue;
-      
+
       // no results...
       if(ictx.is == 0) {
         if(ictx.ftnot) {

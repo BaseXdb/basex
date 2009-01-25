@@ -1,10 +1,12 @@
-package org.basex.query.expr;
+package org.basex.query.ft;
 
+import static org.basex.query.QueryText.*;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.iter.FTNodeIter;
+import org.basex.query.util.Err;
 import org.basex.util.IntList;
 
 /**
@@ -17,9 +19,11 @@ public final class FTMildNot extends FTExpr {
   /**
    * Constructor.
    * @param l expression list
+   * @throws QueryException query exception
    */
-  public FTMildNot(final FTExpr... l) {
+  public FTMildNot(final FTExpr... l) throws QueryException {
     super(l);
+    if(usesExclude()) Err.or(FTMILD);
   }
 
   @Override

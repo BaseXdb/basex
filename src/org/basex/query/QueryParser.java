@@ -5,8 +5,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.io.IO;
-import org.basex.query.FTOpt.FTMode;
-import org.basex.query.FTPos.FTUnit;
 import org.basex.query.expr.And;
 import org.basex.query.expr.CAttr;
 import org.basex.query.expr.CComm;
@@ -28,15 +26,6 @@ import org.basex.query.expr.Except;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.FLWOR;
 import org.basex.query.expr.FLWR;
-import org.basex.query.expr.FTAnd;
-import org.basex.query.expr.FTContains;
-import org.basex.query.expr.FTExpr;
-import org.basex.query.expr.FTMildNot;
-import org.basex.query.expr.FTNot;
-import org.basex.query.expr.FTOptions;
-import org.basex.query.expr.FTOr;
-import org.basex.query.expr.FTSelect;
-import org.basex.query.expr.FTWords;
 import org.basex.query.expr.For;
 import org.basex.query.expr.ForLet;
 import org.basex.query.expr.Func;
@@ -58,6 +47,18 @@ import org.basex.query.expr.TypeSwitch;
 import org.basex.query.expr.Unary;
 import org.basex.query.expr.Union;
 import org.basex.query.expr.VarCall;
+import org.basex.query.ft.FTAnd;
+import org.basex.query.ft.FTContains;
+import org.basex.query.ft.FTExpr;
+import org.basex.query.ft.FTMildNot;
+import org.basex.query.ft.FTNot;
+import org.basex.query.ft.FTOpt;
+import org.basex.query.ft.FTOptions;
+import org.basex.query.ft.FTOr;
+import org.basex.query.ft.FTPos;
+import org.basex.query.ft.FTWords;
+import org.basex.query.ft.FTOpt.FTMode;
+import org.basex.query.ft.FTPos.FTUnit;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Dec;
 import org.basex.query.item.Itr;
@@ -138,6 +139,7 @@ public final class QueryParser extends InputParser {
 
   /**
    * Parses the specified query.
+   * If <code>uri != null</code>, the query is treated as a module
    * @param q input query
    * @param f optional input file
    * @param u module uri
@@ -155,6 +157,7 @@ public final class QueryParser extends InputParser {
 
   /**
    * Parses the specified query.
+   * If <code>uri != null</code>, the query is treated as a module
    * [  1] Parses a Module.
    * @param u module uri
    * @param end if true, input must be completely evaluated
@@ -2015,39 +2018,42 @@ public final class QueryParser extends InputParser {
   /**
    * [FT144] Parses an FTSelection.
    * [FT157] Parses an FTPosFilter.
+   * [FT158] Parses an FTOrder.
+   * [FT159] Parses an FTWindow. 
+   * [FT160] Parses an FTDistance. 
+   * [FT162] Parses an FTScope.
+   * [FT164] Parses an FTContent.
    * @return query expression
    * @throws QueryException xquery exception
    */
   private FTExpr ftSelection() throws QueryException {
-    final FTExpr e = ftOr();
-    final FTPos pos = new FTPos();
-    final FTSelect sel = new FTSelect(e, pos);
+    final FTPos sel = new FTPos(ftOr());
 
     while(true) {
       if(consumeWS(ORDERED)) {
-        pos.ordered = true;
+        sel.ordered = true;
       } else if(consumeWS(WINDOW)) {
         sel.window = additive();
-        pos.wunit = ftUnit();
+        sel.wunit = ftUnit();
       } else if(consumeWS(DISTANCE)) {
         sel.dist = ftRange();
         if(sel.dist == null) Err.or(FTRANGE);
-        pos.dunit = ftUnit();
+        sel.dunit = ftUnit();
       } else if(consumeWS(AT)) {
-        pos.start = consumeWS(START);
-        if(!pos.start) pos.end = consumeWS(END);
-        if(!pos.start && !pos.end) Err.or(INCOMPLETE);
+        sel.start = consumeWS(START);
+        if(!sel.start) sel.end = consumeWS(END);
+        if(!sel.start && !sel.end) Err.or(INCOMPLETE);
       } else if(consumeWS(ENTIRE)) {
         check(CONTENT);
-        pos.content = true;
+        sel.content = true;
       } else {
         final boolean same = consumeWS(SAME);
         final boolean diff = !same && consumeWS(DIFFERENT);
         if(!same && !diff) break;
-        pos.same = same;
-        pos.different = diff;
-        if(consumeWS(SENTENCE)) pos.sdunit = FTUnit.SENTENCES;
-        else if(consumeWS(PARAGRAPH)) pos.sdunit = FTUnit.PARAGRAPHS;
+        sel.same = same;
+        sel.different = diff;
+        if(consumeWS(SENTENCE)) sel.sdunit = FTUnit.SEN;
+        else if(consumeWS(PARAGRAPH)) sel.sdunit = FTUnit.PAR;
         else Err.or(INCOMPLETE);
       }
     }
@@ -2161,7 +2167,7 @@ public final class QueryParser extends InputParser {
     }
 
     // FTTimes
-    Expr[] occ = { Itr.get(1), Itr.get(Long.MAX_VALUE) };
+    Expr[] occ = null;
     if(consumeWS(OCCURS)) {
       occ = ftRange();
       if(occ == null) Err.or(FTRANGE);
@@ -2204,9 +2210,9 @@ public final class QueryParser extends InputParser {
    * @throws QueryException xquery exception
    */
   private FTUnit ftUnit() throws QueryException {
-    if(consumeWS(WORDS)) return FTUnit.WORDS;
-    if(consumeWS(SENTENCES)) return FTUnit.SENTENCES;
-    if(consumeWS(PARAGRAPHS)) return FTUnit.PARAGRAPHS;
+    if(consumeWS(WORDS)) return FTUnit.WRD;
+    if(consumeWS(SENTENCES)) return FTUnit.SEN;
+    if(consumeWS(PARAGRAPHS)) return FTUnit.PAR;
     Err.or(INCOMPLETE);
     return null;
   }
@@ -2279,11 +2285,15 @@ public final class QueryParser extends InputParser {
             } while(consumeWS2(COMMA));
             check(PAR2);
           } else if(consumeWS2(AT)) {
-            IO fl = IO.get(string(stringLiteral()));
+            String fn = string(stringLiteral());
+            if(ctx.stop != null) fn = ctx.stop.get(fn);
+            
+            IO fl = IO.get(fn);
             if(!fl.exists() && ctx.file != null) {
               fl = file.merge(fl);
               if(!fl.exists()) Err.or(NOSTOPFILE, fl);
             }
+            
             try {
               for(final byte[] sl : split(norm(fl.content()), ' ')) {
                 if(except) opt.sw.delete(sl);

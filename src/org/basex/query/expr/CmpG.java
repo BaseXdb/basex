@@ -240,9 +240,11 @@ public final class CmpG extends Arr {
   }
   
   @Override
-  public AxisPath indexEquivalent(final QueryContext ctx,
+  public Expr indexEquivalent(final QueryContext ctx,
       final IndexContext ic) {
 
+    if(index.length == 0) return this;
+    
     // create index access expressions
     final int il = index.length;
     final Expr[] ia = new IndexAccess[il];
@@ -272,7 +274,7 @@ public final class CmpG extends Arr {
    * @param expr expression arguments
    * @return result of check
    */
-  static Step indexStep(final Expr expr) {
+  public static Step indexStep(final Expr expr) {
     // check if index can be applied
     if(!(expr instanceof AxisPath)) return null;
     

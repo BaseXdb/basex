@@ -147,7 +147,7 @@ public abstract class Expr extends ExprInfo {
    * @return item
    * @throws QueryException evaluation exception
    */
-  protected final double checkDbl(final Iter iter) throws QueryException {
+  public final double checkDbl(final Iter iter) throws QueryException {
     final Item it = iter.atomic(this, true);
     if(it == null) Err.or(XPEMPTYNUM, info());
     if(!it.u() && !it.n()) Err.num(info(), it);

@@ -125,6 +125,8 @@ public interface QueryText {
 
   /** FTDY0016: Evaluation exception. */
   Object[] FTWEIGHT = { FTDY, 16, "Invalid weight: %." };
+  /** FTDY0017: Evaluation exception. */
+  Object[] FTMILD = { FTDY, 17, "Invalid mild not selection." };
 
   /** FTST0000: Parsing exception. */
   Object[] FTTHES = { FTST, 0, "Thesaurus not supported yet." };
@@ -513,4 +515,6 @@ public interface QueryText {
   String OPTPOS = "Adding position predicate";
   /** Optimization info. */
   String OPTNOINDEX = "Removing path with no index results";
+  /** Optimization info. */
+  String OPTBIND = "Bind static variable %";
 }

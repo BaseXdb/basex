@@ -90,7 +90,7 @@ public final class Find extends AQuery {
           pre += (r ? "/" : "") + "descendant::*:" + term + " | ";
         }
         // name attribute exists...
-        pre += "//*[@name ftcontains \"" + term + "\"] | ";
+        pre += "descendant-or-self::*[@name ftcontains \"" + term + "\"] | ";
       }
     }
     if(pre.length() == 0 && preds.length() == 0) return root ? "/" : ".";

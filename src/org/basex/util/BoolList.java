@@ -28,12 +28,32 @@ public final class BoolList {
   }
 
   /**
+   * Returns the value at the specified position.
+   * @param p position
+   * @return value
+   */
+  public boolean get(final int p) {
+    return list[p];
+  }
+
+  /**
    * Adds next value.
    * @param v value to be added
    */
   public void add(final boolean v) {
     if(size == list.length) list = Array.extend(list);
     list[size++] = v;
+  }
+
+  /**
+   * Sets a value at the specified position.
+   * @param v value to be added
+   * @param p position
+   */
+  public void set(final boolean v, final int p) {
+    while(p >= list.length) list = Array.extend(list);
+    list[p] = v;
+    size = Math.max(size, p + 1);
   }
 
   /**

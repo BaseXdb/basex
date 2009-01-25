@@ -1,10 +1,12 @@
-package org.basex.query;
+package org.basex.query.ft;
 
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.data.MetaData;
 import org.basex.data.Serializer;
 import org.basex.index.FTTokenizer;
+import org.basex.query.ExprInfo;
+import org.basex.query.QueryTokens;
 import org.basex.util.IntList;
 import org.basex.util.Levenshtein;
 import org.basex.util.Set;
@@ -99,7 +101,8 @@ public final class FTOpt extends ExprInfo {
    * @param sub query token
    * @return number of occurrences
    */
-  public int contains(final FTTokenizer tk, final FTPos pos, final byte[] sub) {
+  public int contains(final FTTokenizer tk, final FTPos pos,
+      final byte[] sub) {
     if(sub.length == 0) return 0;
 
     tk.st = is(ST);

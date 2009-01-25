@@ -1,14 +1,14 @@
-package org.basex.query.expr;
+package org.basex.query.ft;
 
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.index.FTTokenizer;
-import org.basex.query.FTOpt;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.FTOpt.FTMode;
+import org.basex.query.expr.Expr;
+import org.basex.query.ft.FTOpt.FTMode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.iter.FTNodeIter;
@@ -46,8 +46,9 @@ public final class FTWords extends FTExpr {
 
   @Override
   public FTExpr comp(final QueryContext ctx) throws QueryException {
-    occ[0] = occ[0].comp(ctx);
-    occ[1] = occ[1].comp(ctx);
+    if(occ != null) {
+      for(int o = 0; o < occ.length; o++) occ[o] = occ[o].comp(ctx);
+    }
     query = query.comp(ctx);
     return this;
   }
@@ -66,8 +67,6 @@ public final class FTWords extends FTExpr {
    */
   private int contains(final QueryContext ctx) throws QueryException {
     final Iter iter = ctx.iter(query);
-    final long mn = checkItr(ctx.iter(occ[0]));
-    final long mx = checkItr(ctx.iter(occ[1]));
     int len = 0;
     int o = 0;
     Item i;
@@ -121,18 +120,21 @@ public final class FTWords extends FTExpr {
         o += oc / ctx.ftopt.sb.count();
         break;
     }
+
+    long mn = 1;
+    long mx = Long.MAX_VALUE;
+    if(occ != null) {
+      mn = checkItr(ctx.iter(occ[0]));
+      mx = checkItr(ctx.iter(occ[1]));
+    }
     return o < mn || o > mx ? 0 : Math.max(1, len);
   }
 
   @Override
-  public void indexAccessible(final QueryContext ctx, final IndexContext ic) 
-    throws QueryException {
-
+  public void indexAccessible(final QueryContext ctx, final IndexContext ic) {
     // if the following conditions yield true, the index is accessed:
     // - no FTTimes option is specified and query is a simple String item
-    ic.io &= occ[0].i() && ((Item) occ[0]).itr() == 1 &&
-             occ[1].i() && ((Item) occ[1]).itr() == Long.MAX_VALUE &&
-             query instanceof Str;
+    ic.io &= occ == null && query instanceof Str;
     if(!ic.io) return;
     
     tok = ((Str) query).str();
@@ -164,5 +166,10 @@ public final class FTWords extends FTExpr {
   @Override
   public String toString() {
     return query.toString();
+  }
+
+  @Override
+  public boolean usesExclude() {
+    return occ != null;
   }
 }
