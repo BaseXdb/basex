@@ -90,10 +90,10 @@ public class FTContains extends Expr {
       throws QueryException {
 
     // return if step is no text node, or if no index is available
+    ic.iu = false;
     final Step s = CmpG.indexStep(expr);
     if(s == null || s.test.type != Type.TXT || !ic.data.meta.ftxindex) return;
     
-    ic.iu = false;
     ftexpr.indexAccessible(ctx, ic);
   }
   

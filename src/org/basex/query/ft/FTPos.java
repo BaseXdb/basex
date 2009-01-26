@@ -324,12 +324,9 @@ public final class FTPos extends FTExpr {
    */
   private boolean checkDist(final long mn, final long mx, final boolean dst) {
     final IntList[] il = sortPositions();
-    final IntList p = il[0];
-    final IntList pp = il[1];
-
-    for(int z = 0; z < pp.size; z++) {
-      final BoolList bl = new BoolList(size);
-      if(checkDist(z, p, pp, mn, mx, bl, dst)) return true;
+    for(int z = 0; z < il[1].size; z++) {
+      if(checkDist(z, il[0], il[1], mn, mx, new BoolList(size), dst))
+        return true;
     }
     return false;
   }
