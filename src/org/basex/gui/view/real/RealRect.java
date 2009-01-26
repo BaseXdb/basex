@@ -3,8 +3,10 @@ package org.basex.gui.view.real;
 import org.basex.gui.view.ViewRect;
 
 /**
- * @author nofix
- *
+ * extends ViewRect, used for RealView.
+ * 
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Woflgang Miller, Philipp Ziemer
  */
 public class RealRect extends ViewRect{
   
