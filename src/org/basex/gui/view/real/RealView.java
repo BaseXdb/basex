@@ -34,11 +34,11 @@ public final class RealView extends View {
   /** the sum of all size values of a node line. */
   private int sumNodeSizeInLine = 0;
   /** the list of all parent nodes of a node line. */
-  private IntList parentList = null;
+  private int[] parentList = null;
   /** array with position of the parent node. */
   private HashMap<Integer, Double> parentPos = null;
   /** array of current rectangles. */
-  private ArrayList<ViewRect[]> rects = null;
+  private ArrayList<RealRect[]> rects = null;
   /** nodes in current line. */
   private int rectCount = 0;
   /** current mouse position x. */
@@ -121,7 +121,7 @@ public final class RealView extends View {
 
       realImage = createImage();
       Graphics rg = realImage.getGraphics();
-      rects = new ArrayList<ViewRect[]>();
+      rects = new ArrayList<RealRect[]>();
       Nodes curr = gui.context.current();
       for(int i = 0; i < curr.size; i++) {
         temperature(curr.nodes[i], rg, i);
@@ -163,7 +163,7 @@ public final class RealView extends View {
     if(!rects.isEmpty() && gui.context.marked().size > 0) {
 
       g.setColor(Color.GREEN);
-      Iterator<ViewRect[]> it = rects.iterator();
+      Iterator<RealRect[]> it = rects.iterator();
 
       while(it.hasNext()) {
         final ViewRect[] r = it.next();
@@ -250,7 +250,7 @@ public final class RealView extends View {
     if(rects == null) return false;
 
     // final Data data = gui.context.data();
-    final Iterator<ViewRect[]> it = rects.iterator();
+    final Iterator<RealRect[]> it = rects.iterator();
 
     while(it.hasNext()) {
       final ViewRect[] r = it.next();
@@ -280,11 +280,12 @@ public final class RealView extends View {
     final Data data = gui.context.data();
     int level = 0;
     sumNodeSizeInLine = data.meta.size;
-    parentList = new IntList();
-    parentList.add(root);
+    parentList = new int[1];
+    parentList[0] = root;
     rectCount = 1;
     parentPos = null;
-    while(parentList.size > 0) {
+    
+    while(parentList.length > 0) {
       drawTemperature(g, level, rootNum);
       getNextNodeLine();
       level++;
@@ -296,13 +297,13 @@ public final class RealView extends View {
    */
   private void getNextNodeLine() {
     final Data data = gui.context.data();
-    final int l = parentList.size;
+    final int l = parentList.length;
     final IntList temp = new IntList();
     int sumNodeSize = 0;
     int rCount = 0; // counts nodes
 
     for(int i = 0; i < l; i++) {
-      final int p = parentList.list[i];
+      final int p = parentList[i];
 
       if(p == -1) {
         continue;
@@ -324,7 +325,7 @@ public final class RealView extends View {
       }
     }
     rectCount = rCount;
-    parentList = temp;
+    parentList = temp.finish();
     sumNodeSizeInLine = sumNodeSize;
   }
 
@@ -338,9 +339,9 @@ public final class RealView extends View {
       final int rootNum) {
 
     final int numberOfRoots = gui.context.current().nodes.length;
-    final ViewRect[] tRect = new ViewRect[rectCount];
+    final RealRect[] tRect = new RealRect[rectCount];
     final Data data = gui.context.data();
-    final int size = parentList.size;
+    final int size = parentList.length;
     final HashMap<Integer, Double> temp = new HashMap<Integer, Double>();
     final int y = 1 * level * fontHeight * 2;
     final double width = (getSize().width - 1) / numberOfRoots;
@@ -352,7 +353,7 @@ public final class RealView extends View {
     int r = 0;
 
     for(int i = 0; i < size; i++) {
-      final int pre = parentList.list[i];
+      final int pre = parentList[i];
 
       if(pre == -1) {
         x += ratio;
@@ -369,7 +370,7 @@ public final class RealView extends View {
       final int h = fontHeight; // rectangle height
 
       // g.drawRect((int) x, y, l, h);
-      tRect[r++] = new ViewRect((int) x, y, l, h, pre, 0);
+      tRect[r++] = new RealRect((int) x, y, l, h, pre, 0);
 
       int c = (int) Math.rint(255 * nodePercent * 40);
       c = c > 255 ? 255 : c;
