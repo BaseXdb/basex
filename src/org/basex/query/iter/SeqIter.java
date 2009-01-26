@@ -55,7 +55,7 @@ public final class SeqIter extends ResetIter implements Result {
    * @param iter iterator
    * @throws QueryException evaluation exception
    */
-  public SeqIter(final Iter iter) throws QueryException {
+  private SeqIter(final Iter iter) throws QueryException {
     item = new Item[1];
     add(iter);
   }
@@ -172,7 +172,8 @@ public final class SeqIter extends ResetIter implements Result {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("(");
+    final StringBuilder sb = new StringBuilder();
+    if(size != 1) sb.append("(");
     for(int v = 0; v != size; v++) {
       sb.append((v != 0 ? ", " : "") + item[v]);
       if(sb.length() > 15 && v + 1 != size) {
@@ -180,6 +181,7 @@ public final class SeqIter extends ResetIter implements Result {
         break;
       }
     }
-    return sb.append(")").toString();
+    if(size != 1) sb.append(")");
+    return sb.toString();
   }
 }

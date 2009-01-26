@@ -7,8 +7,8 @@ import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.NodIter;
 import org.basex.query.util.Err;
-import org.basex.query.util.NodeBuilder;
 import org.basex.util.Array;
 
 /**
@@ -28,16 +28,16 @@ public final class Union extends Arr {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final NodeBuilder nb = new NodeBuilder(false);
+    final NodIter ni = new NodIter(false);
     for(final Expr e : expr) {
       final Iter iter = ctx.iter(e);
       Item it;
       while((it = iter.next()) != null) {
         if(!it.node()) Err.nodes(this);
-        nb.add((Nod) it);
+        ni.add((Nod) it);
       }
     }
-    return nb.iter();
+    return ni;
   }
 
   @Override

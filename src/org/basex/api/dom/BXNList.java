@@ -3,7 +3,7 @@ package org.basex.api.dom;
 import org.basex.data.Nodes;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
-import org.basex.query.util.NodeBuilder;
+import org.basex.query.iter.NodIter;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -15,7 +15,7 @@ import org.w3c.dom.NodeList;
  */
 public class BXNList implements NodeList {
   /** XQuery node set. */
-  protected NodeBuilder xquery;
+  protected NodIter xquery;
   /** XQuery node set. */
   protected Nodes nodes;
 
@@ -23,8 +23,9 @@ public class BXNList implements NodeList {
    * Constructor.
    * @param nb nodes
    */
-  public BXNList(final NodeBuilder nb) {
+  public BXNList(final NodIter nb) {
     xquery = nb;
+    xquery.sort(true);
   }
 
   /**

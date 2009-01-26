@@ -325,12 +325,12 @@ public abstract class W3CTS {
     final TokenBuilder files = new TokenBuilder();
     try {
       final Context context = new Context();
-
+      final CachedOutput out = new CachedOutput();
       final QueryProcessor xq = new QueryProcessor(in, file);
       
       Nodes cont = nodes("*:contextItem", root);
       if(cont.size != 0) new Check(sources + string(data.atom(cont.nodes[0])) +
-          IO.XMLSUFFIX).execute(context, null);
+          IO.XMLSUFFIX).execute(context, out);
 
       final QueryContext ctx = xq.ctx;
       ctx.stop = stop;
@@ -350,11 +350,16 @@ public abstract class W3CTS {
         xq.module(ns, f);
       }
 
-      final CachedOutput out = new CachedOutput();
+      //Prop.info = true;
+      //Prop.allInfo = true;
+      
+      // evaluate and serialize query
       item = xq.eval(context.current());
       item.serialize(new XMLSerializer(out));
-
       output = norm(out.finish());
+      
+      //System.out.println(xq.ctx.info());
+
     } catch(final QueryException ex) {
       error = ex.getMessage();
       if(error.startsWith("Stopped at")) {

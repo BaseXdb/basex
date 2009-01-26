@@ -3,7 +3,7 @@ package org.basex.api.dom;
 import org.basex.BaseX;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.Nod;
-import org.basex.query.util.NodeBuilder;
+import org.basex.query.iter.NodIter;
 import org.basex.util.Token;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
@@ -94,7 +94,7 @@ public final class BXAttr extends BXNode implements Attr {
   @Override
   // TestCase "hc_attrchildnodes1" ...correct?
   public NodeList getChildNodes() {
-    final NodeBuilder nb = new NodeBuilder(true);
+    final NodIter nb = new NodIter();
     nb.add(new FTxt(node.str(), node));
     return new BXNList(nb);
   }

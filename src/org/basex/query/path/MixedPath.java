@@ -1,7 +1,6 @@
 package org.basex.query.path;
 
 import static org.basex.query.QueryText.*;
-
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -11,9 +10,9 @@ import org.basex.query.expr.Return;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.NodIter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Err;
-import org.basex.query.util.NodeBuilder;
 import org.basex.query.util.Var;
 
 /**
@@ -89,7 +88,7 @@ public final class MixedPath extends Path {
     Item i = ir.next();
     if(i != null) {
       if(i.node()) {
-        final NodeBuilder nb = new NodeBuilder(false);
+        final NodIter nb = new NodIter(false);
         nb.add((Nod) i);
         while((i = ir.next()) != null) {
           if(!i.node()) Err.or(EVALNODESVALS);

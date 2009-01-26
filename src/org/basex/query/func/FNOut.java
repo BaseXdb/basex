@@ -1,7 +1,6 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
-
 import org.basex.BaseX;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -50,10 +49,11 @@ final class FNOut extends Fun {
         }
         BaseX.notexpected(); return null;
       case TRACE:
-        msg = Token.string(checkStr(arg[1])) + ": " + arg[0];
+        final SeqIter si = SeqIter.get(arg[0]);
+        msg = Token.string(checkStr(arg[1])) + " " + si;
         ctx.evalInfo(msg);
         //BaseX.outln(msg);
-        return arg[0];
+        return si;
       default:
         BaseX.notexpected(func); return null;
     }

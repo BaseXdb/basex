@@ -29,7 +29,6 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.util.Err;
-import org.basex.query.util.NodeBuilder;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
 
@@ -46,7 +45,7 @@ public class AxisPath extends Path {
   /** Flag for result caching. */
   private boolean cache;
   /** Cached result. */
-  private Item citem;
+  private NodIter citem;
   /** Last visited item. */
   private Item litem;
 
@@ -265,31 +264,20 @@ public class AxisPath extends Path {
       final int cs = ctx.size;
       final int cp = ctx.pos;
       ctx.item = it;
-      citem = eval(ctx);
+      
+      citem = new NodIter();
+      iter(0, citem, ctx);
+      citem.sort(true);
+
       ctx.item = c;
       ctx.size = cs;
       ctx.pos = cp;
+    } else {
+      citem.reset();
     }
-    return citem.iter();
+    return citem;
   }
   
-  /**
-   * Evaluates the location path.
-   * @param ctx query context
-   * @return resulting item
-   * @throws QueryException evaluation exception
-   */
-  protected Item eval(final QueryContext ctx) throws QueryException {
-    // simple location step traversal...
-    final NodIter ir = new NodIter();
-    iter(0, ir, ctx);
-
-    final NodeBuilder nb = new NodeBuilder(false);
-    Nod it;
-    while((it = ir.next()) != null) nb.add(it);
-    return nb.finish();
-  }
-
   /**
    * Recursive step iterator.
    * @param l current step

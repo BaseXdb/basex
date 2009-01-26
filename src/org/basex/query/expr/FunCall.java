@@ -72,6 +72,6 @@ public final class FunCall extends Arr {
 
   @Override
   public String toString() {
-    return func != null ? func.toString() : "FunCall(" + id + ")";
+    return "FunCall(" + id + ")";
   }
 }

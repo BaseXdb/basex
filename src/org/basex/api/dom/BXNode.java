@@ -7,8 +7,8 @@ import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Type;
+import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
-import org.basex.query.util.NodeBuilder;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -259,7 +259,7 @@ public abstract class BXNode implements Node {
    * @return nodes
    */
   protected final NodeList getElements(final String tag) {
-    final NodeBuilder nb = new NodeBuilder(true);
+    final NodIter nb = new NodIter();
     final NodeIter iter = node.desc();
     final byte[] nm = tag.equals("*") ? null : token(tag);
     try {
@@ -279,8 +279,8 @@ public abstract class BXNode implements Node {
    * @param it node iterator
    * @return node builder
    */
-  protected static final NodeBuilder finish(final NodeIter it) {
-    final NodeBuilder nb = new NodeBuilder(true);
+  protected static final NodIter finish(final NodeIter it) {
+    final NodIter nb = new NodIter();
     try {
       Nod n = null;
       while((n = it.next()) != null) nb.add(n.copy());

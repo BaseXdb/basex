@@ -5,8 +5,8 @@ import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.NodIter;
 import org.basex.query.util.Err;
-import org.basex.query.util.NodeBuilder;
 
 /**
  * Except Expression.
@@ -25,13 +25,12 @@ public final class Except extends Arr {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final NodeBuilder nodes = new NodeBuilder(false);
-
+    final NodIter ni = new NodIter(false);
     Iter iter = ctx.iter(expr[0]);
     Item it;
     while((it = iter.next()) != null) {
       if(!(it.node())) Err.nodes(this);
-      nodes.add((Nod) it);
+      ni.add((Nod) it);
     }
 
     for(int e = 1; e != expr.length; e++) {
@@ -39,12 +38,12 @@ public final class Except extends Arr {
       while((it = iter.next()) != null) {
         if(!(it.node())) Err.nodes(this);
         final Nod node = (Nod) it;
-        for(int s = 0; s < nodes.size; s++) {
-          if(CmpN.Comp.EQ.e(nodes.list[s], node)) nodes.delete(s--);
+        for(int s = 0; s < ni.size; s++) {
+          if(CmpN.Comp.EQ.e(ni.list[s], node)) ni.delete(s--);
         }
       }
     }
-    return nodes.iter();
+    return ni;
   }
 
   @Override

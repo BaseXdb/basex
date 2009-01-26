@@ -395,11 +395,11 @@ public final class QueryContext extends Progress {
    * @return collection
    * @throws QueryException evaluation exception
    */
-  public NodIter coll(final byte[] coll) throws QueryException {
+  public Iter coll(final byte[] coll) throws QueryException {
     // no collection specified.. return default collection/current context set
     if(coll == null) {
       if(collName.length == 0) Err.or(COLLDEF);
-      return new NodIter(collect[0].list, collect[0].size);
+      return SeqIter.get(collect[0].list, collect[0].size);
     }
 
     // invalid collection reference
@@ -413,7 +413,7 @@ public final class QueryContext extends Progress {
     while(true) {
       if(++c == cl) addDocs(doc(coll, true));
       else if(!eq(collName[c], coll)) continue;
-      return new NodIter(collect[c].list, collect[c].size);
+      return SeqIter.get(collect[c].list, collect[c].size);
     }
   }
 

@@ -1,7 +1,7 @@
 package org.basex.api.dom;
 
 import org.basex.BaseX;
-import org.basex.query.util.NodeBuilder;
+import org.basex.query.iter.NodIter;
 import org.basex.util.Token;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -17,7 +17,7 @@ public final class BXNNode extends BXNList implements NamedNodeMap {
    * Constructor.
    * @param nb nodes
    */
-  public BXNNode(final NodeBuilder nb) {
+  public BXNNode(final NodIter nb) {
     super(nb);
   }
 

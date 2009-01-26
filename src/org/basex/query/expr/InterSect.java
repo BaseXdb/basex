@@ -9,8 +9,8 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Seq;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.NodIter;
 import org.basex.query.util.Err;
-import org.basex.query.util.NodeBuilder;
 import org.basex.util.IntList;
 
 /**
@@ -30,7 +30,7 @@ public final class InterSect extends Arr {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    NodeBuilder seq = new NodeBuilder(false);
+    NodIter seq = new NodIter(false);
 
     Iter iter = ctx.iter(expr[0]);
     Item it;
@@ -41,7 +41,7 @@ public final class InterSect extends Arr {
     
     final IntList il = ctx.ftdata != null ? new IntList() : null;
     for(int e = 1; e != expr.length; e++) {
-      final NodeBuilder res = new NodeBuilder(false);
+      final NodIter res = new NodIter(false);
       iter = ctx.iter(expr[e]);
       while((it = iter.next()) != null) {
         if(!it.node()) Err.nodes(this);
@@ -61,7 +61,7 @@ public final class InterSect extends Arr {
       }
       seq = res;
     }
-    return seq.iter();
+    return seq;
   }
 
   @Override

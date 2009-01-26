@@ -6,8 +6,8 @@ import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.NodIter;
 import org.basex.query.util.Err;
-import org.basex.query.util.NodeBuilder;
 
 /**
  * Root node.
@@ -19,14 +19,14 @@ public final class Root extends Simple {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Iter iter = checkCtx(ctx);;
-    final NodeBuilder ir = new NodeBuilder(false);
+    final NodIter ni = new NodIter();
     Item i;
     while((i = iter.next()) != null) {
       final Nod n = root(i);
       if(n == null) Err.or(CTXNODE, this);
-      ir.add(n);
+      ni.add(n);
     }
-    return ir.iter();
+    return ni;
   }
   
   /**

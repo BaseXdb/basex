@@ -11,9 +11,9 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.util.Err;
-import org.basex.query.util.NodeBuilder;
 import org.basex.util.TokenList;
 
 /**
@@ -47,9 +47,9 @@ final class FNId extends Fun {
    * @throws QueryException xquery exception
    */
   private Iter id(final Iter it, final Nod node) throws QueryException {
-    final NodeBuilder nb = new NodeBuilder(false);
+    final NodIter nb = new NodIter(false);
     add(ids(it), nb, node);
-    return nb.iter();
+    return nb;
   }
 
   /**
@@ -60,9 +60,9 @@ final class FNId extends Fun {
    * @throws QueryException xquery exception
    */
   private Iter idref(final Iter it, final Nod node) throws QueryException {
-    final NodeBuilder nb = new NodeBuilder(false);
+    final NodIter nb = new NodIter(false);
     addRef(ids(it), nb, node);
-    return nb.iter();
+    return nb;
   }
 
   /**
@@ -111,7 +111,7 @@ final class FNId extends Fun {
    * @param nod node
    * @throws QueryException evaluation exception
    */
-  private void add(final byte[][] ids, final NodeBuilder nb,
+  private void add(final byte[][] ids, final NodIter nb,
       final Nod nod) throws QueryException {
 
     final NodeIter ni = nod.attr();
@@ -135,7 +135,7 @@ final class FNId extends Fun {
    * @param nod node
    * @throws QueryException evaluation exception
    */
-  private void addRef(final byte[][] ids, final NodeBuilder nb,
+  private void addRef(final byte[][] ids, final NodIter nb,
       final Nod nod) throws QueryException {
 
     final NodeIter ni = nod.attr();
