@@ -19,9 +19,9 @@ import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.util.NSLocal;
-import org.basex.query.util.NodeBuilder;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -47,7 +47,7 @@ public final class IterStreamReader implements XMLStreamReader {
   /** Node iterator. */
   private NodeReader read;
   /** Attributes. */
-  private NodeBuilder atts;
+  private NodIter atts;
 
   /**
    * Constructor.
@@ -118,7 +118,7 @@ public final class IterStreamReader implements XMLStreamReader {
   private void getAttributes() {
     if(atts != null) return;
     checkType(START_ELEMENT, ATTRIBUTE);
-    atts = new NodeBuilder(true);
+    atts = new NodIter();
     final NodeIter iter = ((Nod) item).attr();
     try {
       while(true) {
