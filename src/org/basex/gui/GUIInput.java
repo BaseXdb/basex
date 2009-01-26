@@ -12,7 +12,9 @@ import javax.swing.plaf.basic.BasicComboPopup;
 import org.basex.core.CommandParser;
 import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXTextField;
+import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QuerySuggest;
 import org.basex.util.StringList;
 
 /**
@@ -160,12 +162,10 @@ public final class GUIInput extends BaseXTextField {
     final String query = getText();
     if(cmdMode()) {
       cmdPopup(query);
-    }
-    /*else if(GUIProp.searchmode == 1 ||
+    }/* else if(GUIProp.searchmode == 1 ||
         GUIProp.searchmode == 0 && query.startsWith("/")) {
-      xpathPopup(query);
-    }
-    */
+      queryPopup(query);
+    }*/
   }
 
   /**
@@ -189,11 +189,14 @@ public final class GUIInput extends BaseXTextField {
   /**
    * Shows the xpath popup menu.
    * @param query query input
-  private void xpathPopup(final String query) {
+   */
+  @SuppressWarnings("unused")
+  private void queryPopup(final String query) {
     StringList sl = null;
     try {
-      final XPSuggest parser = new XPSuggest(query, gui.context);
-      parser.parse();
+      final QuerySuggest parser = new QuerySuggest(new QueryContext());
+      parser.init(query);
+      parser.parse(null, true);
       sl = parser.complete();
       pre = query.substring(0, xPos(query) + 1);
     } catch(final QueryException ex) {
@@ -202,12 +205,13 @@ public final class GUIInput extends BaseXTextField {
     }
     createCombo(sl);
   }
-   */
   
   /**
    * Returns an xpath completion position (temporary).
    * @param query input query
    * @return position
+   */
+  @SuppressWarnings("unused")
   private int xPos(final String query) {
     for(int q = query.length() - 1; q >= 0; q--) {
       final int c = query.charAt(q);
@@ -215,7 +219,6 @@ public final class GUIInput extends BaseXTextField {
     }
     return -1;
   }
-   */
 
   /**
    * Creates and shows the combo box.

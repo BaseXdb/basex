@@ -1164,7 +1164,7 @@ public class QueryParser extends InputParser {
    */
   private Expr path() throws QueryException {
     final int s = consume('/') ? consume('/') ? 2 : 1 : 0;
-
+    //checkStep(Axis.DESCORSELF, test(false));
     final Expr ex = step();
     if(ex == null) {
       if(s > 1) Err.or(PATHMISS);

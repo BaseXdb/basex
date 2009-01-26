@@ -3,10 +3,13 @@ package org.basex.query;
 import java.util.ArrayList;
 import java.util.Stack;
 import org.basex.core.Context;
+import org.basex.data.Data;
 import org.basex.data.SkelNode;
 import org.basex.data.Skeleton;
 import org.basex.query.path.Axis;
 import org.basex.query.path.Test;
+import org.basex.util.StringList;
+import org.basex.util.Token;
 
 /**
  * This class analyzes the current path and gives suggestions for code
@@ -34,24 +37,11 @@ public class QuerySuggest extends QueryParser {
   public QuerySuggest(final QueryContext c) {
     super(c);
   }
-  
-  /*
-  @Override
-  Expr path() throws QueryException {
-    
-  }
 
-  @Override
-  Expr pred() throws QueryException {
-    final int s = stack.size();
-    final Expr expr = super.pred();
-    while(stack.size() != s) stack.pop();
-    return expr;
-  }
   @Override
   void checkStep(final Axis axis, final Test test) {
     filter(true);
-    
+    System.out.println("Axis: " + axis + "TEST: " + test);
     if(axis == null) {
       if(!stack.empty())
         stack.push(skel.desc(stack.pop(), 0, Data.ELEM, false));
@@ -77,6 +67,7 @@ public class QuerySuggest extends QueryParser {
   /**
    * Filters the current steps.
    * @param finish finish flag
+   */
   private void filter(final boolean finish) {
     if(laxis == null) return;
     if(finish && ltest == Test.NODE) return;
@@ -100,6 +91,7 @@ public class QuerySuggest extends QueryParser {
   /**
    * Returns the code completions.
    * @return completions
+   */
   public StringList complete() {
     final StringList sl = new StringList();
     if(stack.empty()) return sl;
@@ -112,22 +104,25 @@ public class QuerySuggest extends QueryParser {
     return sl;
   }
   
+  
   /**
    * Returns a node entry.
    * @param a axis
    * @param t text
    * @return completions
+   */
+  @SuppressWarnings("unused")
   private byte[] entry(final Axis a, final Test t) {
-    /*if(t == TestNode.TEXT) return TEXT;
+    /*if(t == Type.TEXT) return TEXT;
     if(t == TestNode.COMM) return COMM;
     if(t == TestNode.PI) return PI;
     if(t instanceof TestName) {
       final byte[] name = ((TestName) t).name;
       return a == Axis.ATTR ? Token.concat(ATT, name) : name;
-    }
+    }*/
     return Token.EMPTY;
   }
-
+  /*
   @Override
   Expr error(final String err, final Object... arg) throws QueryException {
     final QueryException qe = new QueryException(err, arg);
