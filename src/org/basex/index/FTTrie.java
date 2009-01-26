@@ -666,14 +666,13 @@ public final class FTTrie extends Index {
         if(vsn.length == i) {
           // leaf node found with appropriate value
           if (c < d + p + r) return IndexArrayIterator.EMP;
-
+          
           IndexArrayIterator ld = IndexArrayIterator.EMP;
           ld = FTFuzzy.data(cdid, cne[cne.length - 1], inD, data);
           if (hasNextNodes(cne)) {
-            for (int t = cne[0] + 1; t < cne.length - 1; t++) {
+            for (int t = cne[0] + 1; t < cne.length - 1; t += 2) {
               ld = IndexArrayIterator.merge(fuzzy(cne[t], null, -1,
                   new byte[]{(byte) cne[t + 1]}, d, p + 1, r, c), ld);
-              t++;
             }
           }
           return ld;
@@ -685,7 +684,8 @@ public final class FTTrie extends Index {
           // delete char
           b = new byte[vsn.length - 1];
           System.arraycopy(vsn, 0, b, 0, i);
-          ld = fuzzy(cn, cne, cdid, b, d + 1, p, r, c);
+          ld = IndexArrayIterator.merge(
+              fuzzy(cn, cne, cdid, b, d + 1, p, r, c), ld);
         }
 
         // cut valueSearchNode for value current node
@@ -740,7 +740,7 @@ public final class FTTrie extends Index {
       
       IndexArrayIterator ld = IndexArrayIterator.EMP;
 
-      if(c <= d + p + r) {
+      if(c > d + p + r) {
         // paste char
         byte[] b = new byte[vsn.length + 1];
         System.arraycopy(vsn, 0, b, 0, i);

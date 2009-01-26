@@ -188,7 +188,8 @@ public final class FTPos extends FTExpr {
   boolean mildNot() {
     for(int i = 1; i < pos.length; i++) {
       for(int j = 0; j < pos[i].size; j++) {
-        if(pos[0].contains(pos[i].list[j])) return false;
+        if(pos[0].contains(pos[i].list[j])) 
+          return pos[0].list[pos[0].size - 1] > pos[i].list[j]; //false
       }
     }
     return true;
@@ -246,6 +247,7 @@ public final class FTPos extends FTExpr {
       for(int i = 0; i < size; i++) {
         l += new FTTokenizer(term.list[i]).count();
       }
+      l = pos.length == 1 ? 1 : l;
       for(int i = 0; i < size; i++) {
         boolean o = false;
         final int ts = pos[i].size;
@@ -259,6 +261,7 @@ public final class FTPos extends FTExpr {
         if(!o) return false;
         if(o) break;
       }
+       
     }
     return true;
   }
