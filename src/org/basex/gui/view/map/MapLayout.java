@@ -231,6 +231,50 @@ abstract class MapLayout {
     }
   }
   
+  /**
+   * Splits and adds rectangles uniformly distributed.
+   * @param data reference
+   * @param r rectangles to lay out in
+   * @param mainRects rect array reference
+   * @param l list of rectangles to lay out
+   * @param ns starting point
+   * @param ne ending
+   * @param level on which the nodes are
+   * @param v vertically???
+   * 
+   */
+  protected void splitUniformly(final Data data, final ViewRect r,
+      final ArrayList<ViewRect> mainRects, final IntList l,
+      final int ns, final int ne, final int level, final boolean v) {
+    long nn, ln;
+    int ni;
+    // number of nodes used to calculate space
+    nn = ne - ns;
+    // nn / 2, pretends to be the middle of the handled list
+    // except if starting point in the list is not at position 0
+    ln = nn >> 1;
+    // pivot with integrated list start
+    ni = (int) (ns + ln);
+    
+    int xx = r.x;
+    int yy = r.y;
+
+    int ww = !v ? r.w : (int) (r.w * ln / nn);
+    int hh = v ? r.h : (int) (r.h * ln / nn);
+
+    // paint both rectangles if enough space is left
+    if(ww > 0 && hh > 0) calcMap(data, new ViewRect(xx, yy, ww, hh, 0,
+        r.level), mainRects, l, ns, ni, level);
+    if(v) {
+      xx += ww;
+      ww = r.w - ww;
+    } else {
+      yy += hh;
+      hh = r.h - hh;
+    }
+    if(ww > 0 && hh > 0) calcMap(data, new ViewRect(xx, yy, ww, hh, 0,
+        r.level), mainRects, l, ni, ne, level);
+  }
   
   /**
    * Recursively splits rectangles.

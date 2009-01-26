@@ -23,80 +23,86 @@ public final class SliceDiceLayout extends MapLayout {
     // one rectangle left.. continue with this child
     if(ne - ns == 1) {
       putRect(data, r, mainRects, l, ns, level);
-    } else {
-      // number of nodes used to calculate rect size
-      int nn = ne - ns;
-
-      long parsize = 1;
-      int par;
-      par = data.parent(l.list[ns], data.kind(l.list[ns]));
-      int parchilds = l.list[ne] - l.list[ns];
-      
+    } else {        
       // determine direction
       final boolean v = (level % 2) == 0 ? true : false;
 //      final boolean v = (r.w > r.h) ? false : true;
-
-      // setting initial proportions
-      double xx = r.x;
-      double yy = r.y;
-      double ww, hh;
-
-      // use filesize to calculate rect sizes
-      if(data.fs != null && GUIProp.mapaggr) {
-        parsize = data.fs != null ? 
-            Token.toLong(data.attValue(data.sizeID, par)) : 0;
-        hh = 0;
-        ww = 0;
-      // [JH] remove this and use number of childs if not a fs
-      // problems occur while zooming into to thin rectangles
+      // some more nodes have to be positioned on the first level
+      if(level == 0) {
+        splitUniformly(data, r, mainRects, l, ns, ne, level, v);
       } else {
-        if(v) {
-          ww = r.w;
-          hh = (double) r.h / nn;
-        } else {
-          ww = (double) r.w / nn;
-          hh = r.h;
-        }
-      }
-
-      // calculate map for each rectangel on this level
-      for(int i = 0; i < l.size - 1; i++) {
-        int[] liste = new int[1];
-        liste[0] = l.list[i];
-        
-        // draw map taking sizes into account
-        // [JH] remove else statement
+        // number of nodes used to calculate rect size
+        int nn = ne - ns;
+  
+        long parsize = 1;
+        int par;
+        par = data.parent(l.list[ns], data.kind(l.list[ns]));
+        int parchilds = l.list[ne] - l.list[ns];
+  
+        // setting initial proportions
+        double xx = r.x;
+        double yy = r.y;
+        double ww, hh;
+  
+        // use filesize to calculate rect sizes
         if(data.fs != null && GUIProp.mapaggr) {
-          long size = data.fs != null ? 
-              Token.toLong(data.attValue(data.sizeID, l.list[i])) : 0;
-          int childs = l.list[i + 1] - l.list[i];
-          double weight = calcWeight(size, childs, parsize, parchilds, data);
-          
-//          if(Double.isNaN(weight)) System.out.println("[" + l.list[i] + "]"
-//              + "(" + size + ";" + childs + "/" + parsize + ";" + parchilds + 
-//              ")" + weight);
+          parsize = data.fs != null ? 
+              Token.toLong(data.attValue(data.sizeID, par)) : 0;
+          hh = 0;
+          ww = 0;
+        // [JH] remove this and use number of childs if not a fs
+        // problems occur while zooming into to thin rectangles
+        } else {
           if(v) {
-            yy += hh;
-            hh = weight * r.h;
             ww = r.w;
+            hh = (double) r.h / nn;
           } else {
-            xx += ww;
-            ww = weight * r.w;
+            ww = (double) r.w / nn;
             hh = r.h;
           }
-          if(ww > 0 && hh > 0) calcMap(data,
-            new ViewRect((int) xx, (int) yy, (int) ww, (int) hh, 0, r.level),
-            mainRects, new IntList(liste), 0, 1, level);
-        } else {
-          if(ww > 0 && hh > 0) {
+        }
+  
+        // calculate map for each rectangel on this level
+        for(int i = 0; i < l.size - 1; i++) {
+          int[] liste = new int[1];
+          liste[0] = l.list[i];
+          
+          // draw map taking sizes into account
+          // [JH] remove else statement
+          if(data.fs != null && GUIProp.mapaggr) {
+            long size = data.fs != null ? 
+                Token.toLong(data.attValue(data.sizeID, l.list[i])) : 0;
+            int childs = l.list[i + 1] - l.list[i];
+            double weight = calcWeight(size, childs, parsize, parchilds, data);
+            
+  //          if(Double.isNaN(weight)) System.out.println("[" + l.list[i] + "]"
+  //              + "(" + size + ";" + childs + "/" + parsize + ";" 
+//            + parchilds + ")" + weight);
             if(v) {
-              calcMap(data, new ViewRect((int) xx, (int) yy, (int) ww, (int) hh,
-                0, r.level), mainRects, new IntList(liste), 0, 1, level);
               yy += hh;
+              hh = weight * r.h;
+              ww = r.w;
             } else {
-              calcMap(data, new ViewRect((int) xx, (int) yy, (int) ww, (int) hh,
-                0, r.level), mainRects, new IntList(liste), 0, 1, level);
               xx += ww;
+              ww = weight * r.w;
+              hh = r.h;
+            }
+            if(ww > 0 && hh > 0) calcMap(data,
+              new ViewRect((int) xx, (int) yy, (int) ww, (int) hh, 0, r.level),
+              mainRects, new IntList(liste), 0, 1, level);
+          } else {
+            if(ww > 0 && hh > 0) {
+              if(v) {
+                calcMap(data, new ViewRect((int) xx, (int) yy, (int) ww, 
+                  (int) hh, 0, r.level), mainRects, 
+                  new IntList(liste), 0, 1, level);
+                yy += hh;
+              } else {
+                calcMap(data, new ViewRect((int) xx, (int) yy, (int) ww, 
+                  (int) hh, 0, r.level), mainRects, 
+                  new IntList(liste), 0, 1, level);
+                xx += ww;
+              }
             }
           }
         }

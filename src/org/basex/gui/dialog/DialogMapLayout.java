@@ -23,17 +23,13 @@ import org.basex.gui.layout.TableLayout;
  */
 public final class DialogMapLayout extends Dialog {
   /** Map layouts. */
-  private BaseXListChooser choice;  
-  /** Layout slider. */
-  private BaseXSlider prop;
+  private BaseXListChooser choice;
   /** Layout slider. */
   private BaseXSlider sizeSlider;
   /** Show attributes. */
   private BaseXCheckBox atts;
   /** Select layout algorithm. */
   BaseXCombo propalgo;
-  /** Temporary reference to the old map layout. */
-  private final BaseXLabel propLabel;
   /** Size slider label. */
   private final BaseXLabel sizeLabel;
   
@@ -66,8 +62,8 @@ public final class DialogMapLayout extends Dialog {
     BaseXLabel label = new BaseXLabel(MAPPROPALGO);
     tmpback.add(label);
     propalgo = new BaseXCombo(new String[] { "SplitLayout",
-        "SliceAndDice Layout", "SquarifiedLayout", "StripLayout"}, HELPMODE, 
-        false);
+        "SliceAndDice Layout", "SquarifiedLayout", "StripLayout"}, 
+        HELPMODE, false);
     propalgo.setSelectedIndex(GUIProp.mapalgo);
 
     propalgo.addActionListener(new ActionListener() {
@@ -81,12 +77,6 @@ public final class DialogMapLayout extends Dialog {
     p.add(tmpback);
 
     // create slider
-    propLabel = new BaseXLabel(MAPPROP);
-    p.add(propLabel);
-    prop = new BaseXSlider(gui, -234, 248, GUIProp.mapprop, HELPMAPALIGN, this);
-    BaseXLayout.setWidth(prop, p.getPreferredSize().width);
-    p.add(prop);
-    set(p, BorderLayout.CENTER);
     sizeLabel = new BaseXLabel(MAPSIZE);
     sizeSlider = new BaseXSlider(gui, 0, 100, GUIProp.sizep, HELPMAPSIZE, this);
     BaseXLayout.setWidth(sizeSlider, p.getPreferredSize().width);
@@ -105,12 +95,8 @@ public final class DialogMapLayout extends Dialog {
   @Override
   public void action(final String cmd) {
     GUIProp.maplayout = choice.getIndex();
-    final int prp = prop.value();
-    GUIProp.mapprop = prp;
     GUIProp.mapalgo = propalgo.getSelectedIndex();
     GUIProp.mapatts = atts.isSelected();
-    propLabel.setText(MAPPROP + " " + (prp > 2 && prp < 7 ? "Centered" :
-      prp < 3 ? "Vertical" : "Horizontal"));
     final int sizeprp = sizeSlider.value();
     GUIProp.sizep = sizeprp;
     sizeLabel.setText(MAPSIZE + " " + (sizeprp > 45 && sizeprp < 55 ? 

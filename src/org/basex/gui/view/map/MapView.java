@@ -314,6 +314,7 @@ public final class MapView extends View implements Runnable {
       case 1: layouter = new SliceDiceLayout(); break;
       case 2: layouter = new SquarifiedLayout(); break;
       case 3: layouter = new StripLayout(); break;
+      default: layouter = new SplitLayout(); break;
     }
 
     layouter.calcMap(nodes.data, rect, rectangles, new IntList(nodes.nodes),
