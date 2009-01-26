@@ -93,7 +93,7 @@ public final class QueryContext extends Progress {
   /** Current fulltext options. */
   public FTOpt ftopt = new FTOpt();
   /** Current fulltext position filter. */
-  public FTPos ftpos;
+  public FTPos ftpos = new FTPos(null);
   /** Count number of FTIndex. */
   public int ftcount = 0;
   /** Temporary place for ftdata. */

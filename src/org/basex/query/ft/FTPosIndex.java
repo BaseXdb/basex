@@ -53,9 +53,11 @@ public final class FTPosIndex extends FTExpr {
           }    
         }
         // calculate weight
-        final double d = checkDbl(ctx.iter(pos.weight));
-        if(d < 0 || d > 1000) Err.or(FTWEIGHT, d);
-        if (d != -1) it.score(it.score() * d);
+        if(pos.weight != null) {
+          final double d = checkDbl(ctx.iter(pos.weight));
+          if(d < 0 || d > 1000) Err.or(FTWEIGHT, d);
+          if (d != -1) it.score(it.score() * d);
+        }
 
         ctx.ftpos = tmp;
         return it;

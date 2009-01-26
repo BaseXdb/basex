@@ -50,7 +50,6 @@ public final class FTOptions extends FTExpr {
   public void indexAccessible(final QueryContext ctx, final IndexContext ic) 
       throws QueryException {
     
-    ic.io &= opt.indexAccessible(ic.data.meta);
     final FTOpt tmp = ctx.ftopt;
     ctx.ftopt = opt;
     expr[0].indexAccessible(ctx, ic);

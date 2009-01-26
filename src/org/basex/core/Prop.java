@@ -112,9 +112,7 @@ public final class Prop {
   /** Flag for iterator optimized storage within ftindex. */
   public static boolean ftittr = true;
   /** Flag for creating a fuzzy index. */
-  public static boolean ftfuzzy = false;
-  /** Flag for ftindex access within each predicate. */
-  public static boolean ftoptpreds = false;
+  public static boolean ftfuzzy = true;
   
   /** Flag for fulltext stemming. */
   public static boolean ftst = false;
@@ -125,8 +123,6 @@ public final class Prop {
 
   /** Flow for showing the XQuery error code. */
   public static boolean xqerrcode = true;
-  /** Fulltext details. */
-  public static boolean ftdetails = true;
   /** Last XQuery file. */
   public static IO xquery;
 

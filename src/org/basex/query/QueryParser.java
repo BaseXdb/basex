@@ -2027,7 +2027,8 @@ public class QueryParser extends InputParser {
    * @throws QueryException xquery exception
    */
   private FTExpr ftSelection() throws QueryException {
-    final FTPos sel = new FTPos(ftOr());
+    final FTExpr expr = ftOr();
+    final FTPos sel = new FTPos(expr);
 
     while(true) {
       if(consumeWS(ORDERED)) {
@@ -2057,9 +2058,8 @@ public class QueryParser extends InputParser {
         else Err.or(INCOMPLETE);
       }
     }
-
-    sel.weight = consumeWS(WEIGHT) ? range() : Dbl.ONE;
-    return sel;
+    if(consumeWS(WEIGHT)) sel.weight = range();
+    return sel.standard() ? expr : sel;
   }
 
   /**
@@ -2113,7 +2113,7 @@ public class QueryParser extends InputParser {
    */
   private FTExpr ftUnaryNot() throws QueryException {
     final boolean not = consumeWS(FTNOT);
-    final FTOptions e = ftPrimaryWithOptions();
+    final FTExpr e = ftPrimaryWithOptions();
     return not ? new FTNot(e) : e;
   }
 
@@ -2122,11 +2122,13 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException xquery exception
    */
-  private FTOptions ftPrimaryWithOptions() throws QueryException {
-    final FTOpt opt = new FTOpt();
-    final FTOptions ftopt = new FTOptions(ftPrimary(), opt);
-    while(ftMatchOption(opt));
-    return ftopt;
+  private FTExpr ftPrimaryWithOptions() throws QueryException {
+    final FTExpr expr = ftPrimary();
+    final FTOpt fto = new FTOpt();
+    // skip options if none were specified...
+    boolean found = false;
+    while(ftMatchOption(fto)) found = true;
+    return found ? new FTOptions(expr, fto) : expr;
   }
 
   /**

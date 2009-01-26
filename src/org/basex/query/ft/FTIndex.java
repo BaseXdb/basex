@@ -55,13 +55,7 @@ public final class FTIndex extends FTExpr {
        * @return true if result was found
        */
       private boolean evalIter() {
-        final FTTokenizer ft = new FTTokenizer();
-        ft.init(tok);
-        ft.lc = fto.is(FTOpt.LC);
-        ft.uc = fto.is(FTOpt.UC);
-        ft.cs = fto.is(FTOpt.CS);
-        ft.wc = fto.is(FTOpt.WC);
-        ft.fz = fto.is(FTOpt.FZ);
+        final FTTokenizer ft = new FTTokenizer(tok, fto);
         ft.lp = true;
         while(ft.more()) {
           if(data.nrIDs(ft) == 0) return false;

@@ -3,16 +3,10 @@ package org.basex.query;
 import java.util.ArrayList;
 import java.util.Stack;
 import org.basex.core.Context;
-import org.basex.data.Data;
 import org.basex.data.SkelNode;
 import org.basex.data.Skeleton;
-import org.basex.query.expr.Expr;
 import org.basex.query.path.Axis;
-import org.basex.query.path.Path;
 import org.basex.query.path.Test;
-import org.basex.query.path.NameTest;
-import org.basex.util.StringList;
-import org.basex.util.Token;
 
 /**
  * This class analyzes the current path and gives suggestions for code
@@ -22,17 +16,16 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public class QuerySuggest extends QueryParser {
-  
-  /** Context. */
-  private Context ctx;
+    /** Context. */
+  Context ctx;
   /** Current skeleton nodes. */
-  private Stack<ArrayList<SkelNode>> stack = new Stack<ArrayList<SkelNode>>();
+  Stack<ArrayList<SkelNode>> stack = new Stack<ArrayList<SkelNode>>();
   /** Skeleton reference. */
-  private Skeleton skel;
+  Skeleton skel;
   /** Last axis. */
-  private Axis laxis;
+  Axis laxis;
   /** Last test. */
-  private Test ltest;
+  Test ltest;
   
   /**
    * Constructor.
@@ -55,7 +48,6 @@ public class QuerySuggest extends QueryParser {
     while(stack.size() != s) stack.pop();
     return expr;
   }
-  */
   @Override
   void checkStep(final Axis axis, final Test test) {
     filter(true);
@@ -85,7 +77,6 @@ public class QuerySuggest extends QueryParser {
   /**
    * Filters the current steps.
    * @param finish finish flag
-   */
   private void filter(final boolean finish) {
     if(laxis == null) return;
     if(finish && ltest == Test.NODE) return;
@@ -109,7 +100,6 @@ public class QuerySuggest extends QueryParser {
   /**
    * Returns the code completions.
    * @return completions
-   */
   public StringList complete() {
     final StringList sl = new StringList();
     if(stack.empty()) return sl;
@@ -127,7 +117,6 @@ public class QuerySuggest extends QueryParser {
    * @param a axis
    * @param t text
    * @return completions
-   */
   private byte[] entry(final Axis a, final Test t) {
     /*if(t == TestNode.TEXT) return TEXT;
     if(t == TestNode.COMM) return COMM;
@@ -143,7 +132,8 @@ public class QuerySuggest extends QueryParser {
   Expr error(final String err, final Object... arg) throws QueryException {
     final QueryException qe = new QueryException(err, arg);
     qe.complete(this, complete());
-    throw qe;*/
+    throw qe;
     return null;
   }
+  */
 }

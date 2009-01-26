@@ -67,10 +67,6 @@ public final class FTTest extends AbstractTest {
       "</fttest>";
 
     queries = new Object[][] {
-        { "FTPosFilter 23", nodes(3),
-          "//w [text() ftcontains ('second' ftand 'third' window 3 words) " +
-          "ftand 'sentence' distance exactly 0 words ordered]" },
-        
         { "Simple 1", bool(true),
           "'abc' ftcontains 'abc'" },
         { "Simple 2", bool(true),
@@ -210,7 +206,14 @@ public final class FTTest extends AbstractTest {
           "/fttest/wld [text() ftcontains '.*' with wildcards]" },
         { "FTWildCard 12", nodes(40),
           "/fttest/wld [text() ftcontains '.+' with wildcards]" },
-          
+
+        { "FTFuzzy 1", nodes(7, 9, 11),
+          "//* [text() ftcontains 'Database' with fuzzy]" },
+        { "FTFuzzy 2", nodes(7, 9, 11),
+          "//* [text() ftcontains 'Databaze' with fuzzy]" },
+        { "FTFuzzy 3", nodes(),
+          "//* [text() ftcontains 'Databasing' with fuzzy]" },
+
         { "FTAnyAllOption 1", nodes(3, 5, 7, 9, 11),
           "/fttest/co/w [text() ftcontains 'xml' any]" },
         { "FTAnyAllOption 2", nodes(3, 5, 7, 9, 11),
@@ -254,15 +257,13 @@ public final class FTTest extends AbstractTest {
           "ftand 'wel' ftand 'een' ftand 's']" },
         { "FTAndOr 7", nodes(),
           "//* [text() ftcontains 'databases' ftand 'db']" },
-        { "FTAndOr 8", nodes(),
-          "//* [text() ftcontains ('databases' ftand 'db') with stemming]" },
 
         { "FTStemming 1", nodes(7, 9, 11),
           "//w [text() ftcontains 'xml database' with stemming]" },
         { "FTStemming 2", nodes(),
           "//w [text() ftcontains 'xml database' without stemming]" },
         { "FTStemming 3", nodes(7, 9, 11),
-          "//w [text() ftcontains 'xml' ftand 'database' with stemming]" },
+          "//w [text() ftcontains 'xml' ftand 'databasing' with stemming]" },
         { "FTStemming 4", nodes(7, 9, 11, 14),
           "//w [text() ftcontains 'hello' ftor 'database' with stemming]" },
         { "FTStemming 5", nodes(3, 5, 14, 37),
@@ -384,6 +385,8 @@ public final class FTTest extends AbstractTest {
           "'a' ftcontains 'a' not in 'a'" },
         { "FTMildNot 5", bool(true),
           "'a b' ftcontains 'a b' not in 'a'" },
+        { "FTMildNot 6", bool(true),
+          "'a b a' ftcontains 'a' not in 'a b'" },
         
         { "FTUnaryNot 1", nodes(14, 37),
           "//w [text() ftcontains ftnot 'xml']" },

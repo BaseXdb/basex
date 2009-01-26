@@ -61,7 +61,7 @@ public final class FTOpt extends ExprInfo {
   public final FTTokenizer sb = new FTTokenizer();
 
   /**
-   * Compiles the fulltext options, inheriting the parent.options.
+   * Compiles the fulltext options, inheriting the parent options.
    * @param opt parent fulltext options
    */
   public void compile(final FTOpt opt) {
@@ -101,8 +101,7 @@ public final class FTOpt extends ExprInfo {
    * @param sub query token
    * @return number of occurrences
    */
-  public int contains(final FTTokenizer tk, final FTPos pos,
-      final byte[] sub) {
+  public int contains(final FTTokenizer tk, final FTPos pos, final byte[] sub) {
     if(sub.length == 0) return 0;
 
     tk.st = is(ST);
@@ -155,8 +154,9 @@ public final class FTOpt extends ExprInfo {
       tk.p = tp;
     }
 
-    if(il != null) pos.add(sub, il);
-    return il == null ? 0 : il.size;
+    if(il == null) return 0;
+    pos.add(sub, il);
+    return il.size;
   }
 
   /**

@@ -27,7 +27,7 @@ public final class QueryTest {
   /** Verbose flag. */
   private static final boolean VERBOSE = false;
   /** Test all flag. */
-  private static final boolean ALL = false;
+  private static final boolean ALL = true;
   /** Wrong results counter. */
   private static int wrong;
 
@@ -67,7 +67,7 @@ public final class QueryTest {
     } else {
       // single test
       Prop.ftindex = false;
-      Prop.ftfuzzy = false;
+      Prop.ftfuzzy = true;
       Prop.ftittr = true;
       Prop.ftst = false;
       Prop.ftdc = false;

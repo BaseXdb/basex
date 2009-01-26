@@ -2,6 +2,7 @@ package org.basex.index;
 
 import static org.basex.util.Token.*;
 import org.basex.core.Prop;
+import org.basex.query.ft.FTOpt;
 import org.basex.util.Stemming;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
@@ -42,6 +43,8 @@ public final class FTTokenizer extends IndexToken {
   public int p;
   /** Character start position. */
   public int s;
+  /** Number of tokens. */
+  public int count = -1;
 
   /**
    * Empty constructor.
@@ -60,10 +63,25 @@ public final class FTTokenizer extends IndexToken {
   }
 
   /**
+   * Constructor.
+   * @param txt text
+   * @param fto fulltext options
+   */
+  public FTTokenizer(final byte[] txt, final FTOpt fto) {
+    this(txt);
+    lc = fto.is(FTOpt.LC);
+    uc = fto.is(FTOpt.UC);
+    cs = fto.is(FTOpt.CS);
+    wc = fto.is(FTOpt.WC);
+    fz = fto.is(FTOpt.FZ);
+  }
+
+  /**
    * Sets the text.
    * @param txt text
    */
   public void init(final byte[] txt) {
+    if(text != txt) count = -1;
     text = txt;
     init();
   }
@@ -99,7 +117,8 @@ public final class FTTokenizer extends IndexToken {
       } else if(!pa && c == '\n') {
         pa = true;
         para++;
-      } else if(c < 0x100 && Character.isLetterOrDigit(c)) {
+      } else if(c >= '0' && (letterOrDigit(c)  ||
+          Character.isLetterOrDigit(c))) {
         break;
       }
     }
@@ -110,20 +129,22 @@ public final class FTTokenizer extends IndexToken {
     // parse token
     for(; p < l; p += cl(text[p])) {
       final int c = cp(text, p);
-      if(c < 0x100 && Character.isLetterOrDigit(c)) continue;
-      // [CG] FT/parse wildcard indicators
-      if(!wc || ws(c)) break;
+      if(c < '0' || !letterOrDigit(c) && !Character.isLetterOrDigit(c)) {
+        // [CG] FT/parse wildcard indicators
+        if(!wc || ws(c)) break;
+      }
     }
     return true;
   }
-
+  
   @Override
   public byte[] get() {
     byte[] n = substring(text, s, p);
+    final boolean a = ascii(n);
     if(wc) n = wc(n);
-    if(!dc) n = dc(n);
-    if(uc) n = uc(n);
-    if(lc || !cs) n = lc(n);
+    if(!dc) n = dia(n, a);
+    if(uc) n = upper(n, a);
+    if(lc || !cs) n = lower(n, a);
     if(st) n = stem.word(n);
     return n;
   }
@@ -133,9 +154,12 @@ public final class FTTokenizer extends IndexToken {
    * @return number of tokens
    */
   public int count() {
-    init();
-    while(more());
-    return pos;
+    if(count == -1) {
+      init();
+      while(more());
+      count = pos;
+    }
+    return count;
   }
 
   /**
@@ -176,6 +200,49 @@ public final class FTTokenizer extends IndexToken {
     }
     c[3]++;
     return c;
+  }
+
+  /**
+   * Removes diacritics from the specified token.
+   * Note that this method does only support the first 256 unicode characters.
+   * @param t token to be converted
+   * @param ascii ascii flag
+   * @return converted token
+   */
+  public static byte[] dia(final byte[] t, final boolean ascii) {
+    if(ascii) return t;
+    final String s = utf8(t, 0, t.length);
+    final StringBuilder sb = new StringBuilder();
+    final int jl = s.length();
+    for(int j = 0; j < jl; j++) {
+      final char c = s.charAt(j);
+      sb.append(c < 192 || c > 255 ? c : (char) NORM[c - 192]);
+    }
+    return token(sb.toString());
+  }
+
+  /**
+   * Converts the specified token to upper case.
+   * @param t token to be converted
+   * @param a ascii flag
+   * @return the converted token
+   */
+  public static byte[] upper(final byte[] t, final boolean a) {
+    if(!a) return token(string(t).toUpperCase());
+    for(int i = 0; i < t.length; i++) t[i] = (byte) uc(t[i]);
+    return t;
+  }
+
+  /**
+   * Converts the specified token to lower case.
+   * @param t token to be converted
+   * @param a ascii flag
+   * @return the converted token
+   */
+  public static byte[] lower(final byte[] t, final boolean a) {
+    if(!a) return token(string(t).toLowerCase());
+    for(int i = 0; i < t.length; i++) t[i] = (byte) lc(t[i]);
+    return t;
   }
   
   /**

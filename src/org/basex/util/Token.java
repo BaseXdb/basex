@@ -104,7 +104,7 @@ public final class Token {
    * @param l length
    * @return result of check
    */
-  private static String utf8(final byte[] text, final int s, final int l) {
+  public static String utf8(final byte[] text, final int s, final int l) {
     try {
       return new String(text, s, l, UTF8);
     } catch(final Exception ex) {
@@ -884,7 +884,7 @@ public final class Token {
 
   /**
    * Checks if the specified character is a letter.
-   * Note that this method does not support unicode characters.
+   * This method does not support unicode characters.
    * @param c the letter to be checked
    * @return result of comparison
    */
@@ -903,7 +903,7 @@ public final class Token {
 
   /**
    * Checks if the specified character is a letter or digit.
-   * Note that this method does not support unicode characters.
+   * This method does not support unicode characters.
    * @param c the letter to be checked
    * @return result of comparison
    */
@@ -927,7 +927,7 @@ public final class Token {
 
   /**
    * Converts a character to upper case.
-   * Note that this method does not support unicode characters.
+   * This method does not support unicode characters.
    *
    * @param ch character to be converted
    * @return converted character
@@ -952,32 +952,13 @@ public final class Token {
 
   /**
    * Converts a character to lower case.
-   * Note that this method does not support unicode characters.
+   * This method does not support unicode characters.
    *
    * @param ch character to be converted
    * @return converted character
    */
   public static int lc(final int ch) {
     return ch < 'A' || ch > 'Z' ? ch : ch | 0x20;
-  }
-
-  /**
-   * Removes diacritics from the specified token.
-   * Note that this method does only support the first 256 unicode characters.
-   * @param t token to be converted
-   * @return converted token
-   */
-  public static byte[] dc(final byte[] t) {
-    if(ascii(t)) return t;
-
-    final String s = utf8(t, 0, t.length);
-    final StringBuilder sb = new StringBuilder();
-    final int jl = s.length();
-    for(int j = 0; j < jl; j++) {
-      final char c = s.charAt(j);
-      sb.append(c < 192 || c > 255 ? c : (char) NORM[c - 192]);
-    }
-    return token(sb.toString());
   }
 
   /**
@@ -998,6 +979,16 @@ public final class Token {
   public static byte[] ln(final byte[] name) {
     final int i = indexOf(name, ':');
     return i == -1 ? name : substring(name, i + 1);
+  }
+
+  /**
+   * Returns a lowercase ASCII character of the specified fulltext character.
+   * Note that this method does not support unicode characters.
+   * @param ch character to be converted
+   * @return converted character
+   */
+  public static int norm(final int ch) {
+    return Token.lc(ch < 0 && ch > -64 ? Token.NORM[ch + 64] : ch);
   }
 
   /**

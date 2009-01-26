@@ -23,11 +23,11 @@ import org.basex.gui.layout.TableLayout;
  */
 public final class DialogMapLayout extends Dialog {
   /** Map layouts. */
-  private BaseXListChooser choice;
+  private final BaseXListChooser choice;
   /** Layout slider. */
-  private BaseXSlider sizeSlider;
+  private final BaseXSlider sizeSlider;
   /** Show attributes. */
-  private BaseXCheckBox atts;
+  private final BaseXCheckBox atts;
   /** Select layout algorithm. */
   BaseXCombo propalgo;
   /** Size slider label. */
@@ -40,30 +40,24 @@ public final class DialogMapLayout extends Dialog {
   public DialogMapLayout(final GUI main) {
     super(main, MAPLAYOUTTITLE, false);
     
-    final boolean fs = gui.context.data().fs != null;
-    
     final BaseXBack p = new BaseXBack();
     // [JH] complete layout
-    p.setLayout(new TableLayout(9, 1, 0, 5));
+    p.setLayout(new TableLayout(4, 1, 0, 5));
 
     // create list
     choice = new BaseXListChooser(this, MAPLAYOUTCHOICE, HELPMAPLAYOUT);
-    choice.setSize(220, 110);
+    choice.setSize(210, 110);
     choice.setIndex(GUIProp.maplayout);
     p.add(choice);
-
-    // create checkbox
-    atts = new BaseXCheckBox(MAPATTS, HELPMAPATTS, GUIProp.mapatts, this);
-    if(!fs) p.add(atts);
     
     // create drop down
-    BaseXBack tmpback = new BaseXBack();
+    final BaseXBack tmpback = new BaseXBack();
     tmpback.setLayout(new TableLayout(1, 2, 3, 5));
-    BaseXLabel label = new BaseXLabel(MAPPROPALGO);
+    final BaseXLabel label = new BaseXLabel(MAPPROPALGO);
     tmpback.add(label);
     propalgo = new BaseXCombo(new String[] { "SplitLayout",
         "SliceAndDice Layout", "SquarifiedLayout", "StripLayout"}, 
-        HELPMODE, false);
+        HELPMODE, false, this);
     propalgo.setSelectedIndex(GUIProp.mapalgo);
 
     propalgo.addActionListener(new ActionListener() {
@@ -82,10 +76,16 @@ public final class DialogMapLayout extends Dialog {
     BaseXLayout.setWidth(sizeSlider, p.getPreferredSize().width);
     
     // add slider only to dialog if we are using fs data
+    final boolean fs = gui.context.data().fs != null;
     if(fs) {
       p.add(sizeLabel);
       p.add(sizeSlider);
     }
+
+    // create checkbox
+    atts = new BaseXCheckBox(MAPATTS, HELPMAPATTS, GUIProp.mapatts, this);
+    if(!fs) p.add(atts);
+
     set(p, BorderLayout.CENTER);
     
     finish(GUIProp.maplayoutloc);

@@ -28,15 +28,6 @@ public final class BoolList {
   }
 
   /**
-   * Returns the value at the specified position.
-   * @param p position
-   * @return value
-   */
-  public boolean get(final int p) {
-    return list[p];
-  }
-
-  /**
    * Adds next value.
    * @param v value to be added
    */
@@ -70,8 +61,7 @@ public final class BoolList {
    * @return boolean all b
    */
   public boolean all(final boolean b) {
-    for (boolean bl : list) if(!bl && b) return false;
+    for(final boolean bl : list) if(!bl && b) return false;
     return true;
   }
-  
 }
