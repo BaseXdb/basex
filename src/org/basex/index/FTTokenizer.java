@@ -3,6 +3,7 @@ package org.basex.index;
 import static org.basex.util.Token.*;
 import org.basex.core.Prop;
 import org.basex.query.ft.FTOpt;
+import org.basex.util.IntList;
 import org.basex.util.Stemming;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
@@ -202,6 +203,43 @@ public final class FTTokenizer extends IndexToken {
     return c;
   }
 
+  /**
+   * Get fulltext info out of text.
+   * int[0]: token info, each length of each token
+   * int[1]: sentence info, length of each sentence
+   * int[2]: praragraph info, length of each paragraph
+   * 
+   * @return int[3][] array with info
+   */
+  public int[][] getInfo() {
+    IntList[] il = new IntList[]{new IntList(), new IntList(), new IntList()};
+    int lass = 0;
+    int lasp = 0;
+    int sl = 0;
+    int pl = 0;
+    while (more()) {
+      if (sent != lass) {
+        if (sl > 0) il[1].add(sl);
+        lass = sent;
+        sl = 0;
+      }      
+      if (para != lasp) {
+        if (pl > 0) il[2].add(pl);
+        lasp = para;
+        pl = 0;
+      }
+
+      sl += p - s;
+      pl += p - s;
+      il[0].add(p - s);
+    }
+
+    if (sent != lass && sl > 0) il[1].add(sl);
+    if (pl > 0) il[2].add(pl);
+        
+    return new int[][]{il[0].finish(), il[1].finish(), il[2].finish()};
+  }
+  
   /**
    * Removes diacritics from the specified token.
    * Note that this method does only support the first 256 unicode characters.

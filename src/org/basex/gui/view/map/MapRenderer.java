@@ -9,7 +9,6 @@ import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.ViewRect;
 import org.basex.index.FTTokenizer;
-import org.basex.util.IntList;
 
 /**
  * This class assembles utility methods for painting rectangle contents.
@@ -191,6 +190,8 @@ final class MapRenderer {
     return yy - r.y;
   }
 
+
+  
   /**
    * Draws a text using thumbnail visualization.
    * Calculates the needed space and chooses an abstraction level.
@@ -202,7 +203,6 @@ final class MapRenderer {
    */
   static void drawThumbnails(final Graphics g, final ViewRect r,
       final byte[] s) {
-    int al = 0;
     // thumbnail width
     final double ffmax = 0.25;
     final double ffmin = 0.14;
@@ -212,44 +212,40 @@ final class MapRenderer {
     final double flhmax = 0.3; //0.8;
     // space width
     double sw;
-
+    
     double ff = ffmax, ffh = ffhmax, flh = flhmax;
-    double fmi = ff * GUIProp.fontsize;
     int lhmi = (int) Math.max(3, ffh * GUIProp.fontsize);
     int fhmi = (int) Math.max(6, (flh + ffh) * GUIProp.fontsize);
     int h = r.h;
     final double fac = Math.exp(Math.log(s.length) * 0.97) / s.length;
     double f = ff * GUIProp.fontsize;
-    int fh, lh;
-
-    while (al < 4) {
+    int fh, lh, al = 0;
+    FTTokenizer ftt = new FTTokenizer(s);
+    final int[][] data = ftt.getInfo();
+    
+    while(al < 4) {
       ff *= fac; //0.97;
       f = ff * GUIProp.fontsize;
       ffh *= fac;
       fh = (int) Math.max(1, ffh * GUIProp.fontsize);
-      flh *= fac;
+      flh *= fac * fac;
       lh = (int) Math.max(1, (flh + ffh) * GUIProp.fontsize);
-      sw = Math.max(f * 0.5, ffmin * GUIProp.fontsize);
+      sw = f; //Math.max(f * 0.5, 1.5);
       switch(al) {
         case 0:
-          h = drawThumbnailsToken(g, r, s, f, fh, lh, sw, false);
+          h = drawThumbnailsToken(g, r, data, f, fh, lh, f, false);
           break;
         case 1:
-          h = drawThumbnailsSentence(g, r, s, true, f, fh, lh, sw, false);
+          h = drawThumbnailsSentence(g, r, data, true, f, fh, lh, sw, false);
           break;
         case 2:
-          h = drawThumbnailsSentence(g, r, s, false, f, fh, lh, sw, false);
+          h = drawThumbnailsSentence(g, r, data, false, f, fh, lh, sw, false);
+          break;
       }
-
+      
       if (ff < ffmin) {
-        if ((cchars * ffmin * GUIProp.fontsize  / r.w) * (fh + 1) > r.h) {
-          drawThumbnailsSentenceComp(g, r, s,
-              ffmin * GUIProp.fontsize, fh, true);
-          return;
-        }
-
+        // chance al
         al++;
-        fmi = f;
         fhmi = fh;
         lhmi = lh;
         ff = ffmax;
@@ -259,43 +255,33 @@ final class MapRenderer {
         // thumbnail fits in rec
         switch(al) {
           case 0:
-            drawThumbnailsToken(g, r, s, f, fh, lh, sw, true);
+            drawThumbnailsToken(g, r, data, f, fh, lh, f, true);
             return;
           case 1:
-            drawThumbnailsSentence(g, r, s, true, f, fh, lh, sw, true);
+            drawThumbnailsSentence(g, r, data, true, f, fh, lh, sw, true);
             return;
           case 2:
-            drawThumbnailsSentence(g, r, s, false, f, fh, lh, sw, true);
+            drawThumbnailsSentence(g, r, data, false, f, fh, lh, sw, true);
             return;
         }
-      } else if (al > 2) {
-        // reduce space between each line further
-        f = ffmin * GUIProp.fontsize;
-        while (h >= r.h && flh + ffh >= 1)  {
-          flh *= 0.97;
-          lhmi = (int) Math.max(1, (flh + ffh) * GUIProp.fontsize);
-          h = drawThumbnailsSentence(g, r, s, false, f, fhmi, lhmi, sw,
-              false);
-        }
-
-        if (h < r.h) {
-          if (lhmi < fhmi) lhmi = fhmi;
-          drawThumbnailsSentence(g, r, s, false, f, fhmi, lhmi, sw, true);
-        } else {
-          drawThumbnailsSentenceComp(g, r, s, f, fhmi, true);
-        }
-        return;
-      }
+      } 
     }
-    drawThumbnailsSentence(g, r, s, false, fmi, fhmi, lhmi,
-        Math.max(f * 0.5, ffmin * GUIProp.fontsize), true);
+    
+    int sum = data[1].length + data[2][0];
+    for (int i = 1; i < data[2].length; i++) sum += data[2][i];
+    int nl = (r.h - 3) / lhmi;
+    double fnew = (double) (nl * r.w) / (double) sum;
+    drawThumbnailsSentence(g, r, data, false, fnew, fhmi, lhmi, 
+        Math.max(1.5, fnew), true);
+    
   }
-
+  
+  
   /**
    * Draws a text using thumbnail visualization.
    * @param g graphics reference
    * @param r rectangle
-   * @param s text to be drawn
+   * @param data fulltext to be drawn
    * @param f length of a thumbnailtoken
    * @param fh higth of a thumbnailtoken
    * @param lh higth of an empty line
@@ -304,7 +290,7 @@ final class MapRenderer {
    * @return higths
    */
   private static int drawThumbnailsToken(final Graphics g, final ViewRect r,
-      final byte[] s, final double f, final int fh, final int lh,
+      final int[][] data, final double f, final int fh, final int lh,
       final double sw, final boolean draw) {
     final double xx = r.x;
     final double ww = r.w;
@@ -313,34 +299,26 @@ final class MapRenderer {
 
     int wl = 0; // word length
     int ll = 0; // line length
-
-    final FTTokenizer ftt = new FTTokenizer(s);
-    final Color textc = g.getColor();
+    
+    final Color textc = draw ? GUIConstants.COLORS[6] : null; //g.getColor();
     int count = 0;
     int pp = 0;
-    int cs = 0;
-    int cp = 0;
-    int ftts;
+    int sl = 0, pl = 0;
+    int psl = 0, ppl = 0;
     cchars = 0;
 
-    while(ftt.more()) {
-      if (cs < ftt.sent) cs = ftt.sent;
-      if (cp < ftt.para) {
-        yy += lh;
-        ll = 0;
-        cp = ftt.para;
-      }
-
-      ftts = ftt.s;
-      wl = ftt.p - ftts;
-      cchars += wl;
+    for (int i = 0; i < data[0].length; i++) {
+      wl = (int) (data[0][i] * f);
+      sl += data[0][i];
+      pl += data[0][i];
+      cchars += data[0][i];
       // check if rectangle fits in line
-      if (f * (ll + wl) > ww) {
+      if (ll + wl + 
+          sw * ((psl < data[1].length && pl == data[1][psl]) ? 1 : 0) > ww) {
         yy += lh;
         ll = 0;
       }
 
-//      if(yy + lh >= r.y + r.h) return yy + lh - r.y;
       if (draw) {
         // draw word
         if (r.pos != null && pp < r.pos.length && count == r.pos[pp]) {
@@ -348,24 +326,43 @@ final class MapRenderer {
           pp++;
         } else
           g.setColor(textc);
-
-        final int xw = (int) Math.min(ww - f * ll - 4, f * wl);
-        g.fillRect((int) (xx + f * ll), yy, xw, fh);
+          g.fillRect((int) (xx + ll), yy, wl, fh);
       }
       ll += wl;
       count++;
-      ll += sw; //f * 0.5;
+
+      if (draw && psl < data[1].length && sl == data[1][psl]) {
+        // new sentence, draw dot
+        g.setColor(Color.black);
+        g.fillRect((int) (xx + ll), yy, (int) sw, fh);
+        ll += sw;
+        g.setColor(textc);
+        psl++;
+        sl = 0;
+      }
+
+      ll += sw;
       wl = 0;
+
+      
+      if (ppl < data[2].length && pl == data[2][ppl]) {
+        // new paragraph
+        yy += lh;
+        ll = 0;
+        ppl++;
+        pl = 0;
+      }
     }
-    return yy - r.y;
+    return yy - r.y + 3;
   }
 
-
+  
+  
   /**
    * Draws a text using thumbnail visualization.
    * @param g graphics reference
    * @param r rectangle
-   * @param s text to be drawn
+   * @param data fulltext to be drawn
    * @param sen flag for sentence or paragraphe
    * @param f length of a thumbnailtoken
    * @param fh higth of a thumbnailtoken
@@ -375,69 +372,59 @@ final class MapRenderer {
    * @return higths
    */
   private static int drawThumbnailsSentence(final Graphics g,
-      final ViewRect r, final byte[] s, final boolean sen,
+      final ViewRect r, final int[][] data, final boolean sen,
       final double f, final int fh, final int lh,
       final double sw, final boolean draw) {
     final double xx = r.x;
     final double ww = r.w;
     final int ys = r.y + 3;
     int yy = ys;
-
+    
     int wl = 0; // word length
     int ll = 0; // line length
 
-    final FTTokenizer ftt = new FTTokenizer(s);
-    final Color textc = sen && fh == lh ? g.getColor() : GUIConstants.COLORS[6];
+    final Color textc = GUIConstants.COLORS[6];
+    g.setColor(textc);
+    int lastl = 0;
     int count = -1;
     int pp = 0;
-    int cp = 0;
-    int cs = 0;
-    boolean m = ftt.more();
-    int lastl = 0;
-
-    while (m) {
-      while (ll + wl < ww &&
-          (cs == ftt.sent && sen || cp == ftt.para && !sen) &&
+    int sl = 0, pl = 0;
+    int psl = 0, ppl = 0;
+    
+    int i = 0;
+    while (i < data[0].length) {
+      final int io = i;
+      while (ll + wl < ww && i < data[0].length && 
+          psl < data[1].length && ppl < data[2].length &&
+          data[1][psl] > sl && data[2][ppl] > pl &&
           (r.pos == null || (pp < r.pos.length && count < r.pos[pp])
               || pp == r.pos.length)) {
-        lastl = (int) ((ftt.p - ftt.s) * f);
+        sl += data[0][i];
+        pl += data[0][i];
+        lastl = (int) (data[0][i] * f);
         wl += lastl;
-
         count++;
-        m = ftt.more();
-        if (!m) break;
+        if (i < data[0].length) i++;
+        else break;
       }
+      if (io == i) i++;
 
       // doesn't fit in line
       if (ll + wl >= ww) {
         final int fp = (int) (ww - ll);
         if (fp <= f) {
-//          if(yy + lh  + 3 >= r.y + r.h) return yy + lh + 3 - r.y;
           yy += lh;
           ll = 0;
         } else {
           final int sp = wl - fp;
           // draw first part of the sentence
-          g.setColor(textc);
-          if (draw) g.fillRect((int) (xx + ll), yy, (int) (fp - f), fh);
-          ll += fp - f;
-          // color last rect of first part of the word black
           if (draw) {
-            g.setColor(new Color(0, 0, 0));
-            g.fillRect((int) (xx + ll), yy, (int) f, fh);
             g.setColor(textc);
+            g.fillRect((int) (xx + ll), yy, fp, fh);
           }
-//          if(yy + lh + 3 >= r.y + r.h) return yy + lh + 3 - r.y;
           yy += lh;
           ll = 0;
-          // color first rec of second part of the word black
-          if (draw) {
-            g.setColor(new Color(0, 0, 0));
-            g.fillRect((int) xx, yy, (int) f, fh);
-            g.setColor(textc);
-          }
           wl = sp;
-          ll = (int) f;
         }
       }
 
@@ -459,126 +446,38 @@ final class MapRenderer {
         }
         ll += wl;
         wl = 0;
+      } 
+
+      // new sentence
+      if (psl < data[1].length && data[1][psl] == sl) {
+        if (ll + sw >= ww) {
+          yy += lh;
+          ll = 0;
+        }
+
+        if (draw) {
+          g.setColor(Color.black);
+          g.fillRect((int) (xx + ll), yy, (int) sw, fh);
+          g.setColor(textc);
+        }
+        ll += sw; //f;
+        sl = 0;
+        psl++;
       }
 
-      // begin new line / new sentence
-      if (cs < ftt.sent && sen || cp < ftt.para && !sen) {
-        // new sentence
+      // new paragraph
+      if (ppl < data[2].length && data[2][ppl] == pl) {
+        pl = 0;
+        ppl++;
         if (sen) {
-          ll += sw; //f;
-          cs = ftt.sent;
-        }
-        if (cp < ftt.para) {
-          cp = ftt.para;
-//          if(yy + lh + 3 >= r.y + r.h) return yy + lh + 3 - r.y;
           yy += lh;
           wl = 0;
           ll = 0;
         }
       }
     }
-    return yy - r.y;
-  }
-
-  /**
-   * Draws a text using thumbnail visualization. Each sentence within
-   * a fulltext hit will be colored. This is a very compact and efficente
-   * visualization for large textnodes.
-   *
-   * @param g graphics reference
-   * @param r rectangle
-   * @param s text to be drawn
-   * @param f length of a thumbnailtoken
-   * @param fh higth of a thumbnailtoken
-   * @param draw boolean for drawing (used for calculating the higth)
-   * @return used high
-   */
-  private static int drawThumbnailsSentenceComp(final Graphics g,
-      final ViewRect r, final byte[] s, final double f, final int fh,
-      final boolean draw) {
-    final int xx = r.x;
-    final int ww = r.w;
-    int yy = r.y + 3;
-    int wl = 0; // word length
-    int ll = 0; // line length
-
-    final FTTokenizer ftt = new FTTokenizer(s);
-    final Color textc = GUIConstants.COLORS[7];
-    g.setColor(textc);
-    int count = -1;
-    int pp = 0;
-    int cs = 0;
-    int tl;
-    IntList col;
-    IntList tokl;
-    int cc;
-    boolean m = ftt.more();
-
-    while (m) {
-      col = new IntList();
-      tokl = new IntList();
-      tokl.add(0);
-      cc = 0;
-      while (cs == ftt.sent &&
-          (r.pos == null || (pp < r.pos.length && count < r.pos[pp])
-              || pp == r.pos.length)) {
-        tl = (int) ((ftt.p - ftt.s) * f);
-        wl += tl;
-        count++;
-        if (draw && r.pos != null && pp < r.pos.length
-            && count == r.pos[pp]) {
-          col.add(r.poi[pp++]);
-          tokl.add(tl);
-          tokl.list[0] += tl;
-        }
-        m = ftt.more();
-        if (!m) break;
-      }
-      cs++;
-
-      int l = 0;
-      int[] sizes = getThumbnailLength(tokl, wl);
-      while (l < wl) {
-        int tw = sizes[cc]; //col.size == 0 ? wl : (wl / col.size) + 1;
-        while (ll + tw > ww) {
-          if (draw) {
-            if (col.size > 0) g.setColor(thumbnailcolor[col.list[cc]]);
-            g.fillRect(xx + ll, yy, ww - ll, fh);
-          }
-          l += ww - ll;
-          tw -= ww - ll;
-          ll = 0;
-          yy += fh + 1;
-          if (yy + 3 >= r.y + r.h) return yy - r.y;
-        }
-        if (draw) {
-          if (col.size > 0)
-            g.setColor(thumbnailcolor[col.list[cc]]);
-
-          g.fillRect(xx + ll, yy, tw, fh);
-          g.setColor(textc);
-        }
-        ll += tw;
-        l += tw;
-        if (col.size > 0) cc++;
-      }
-      wl = 0;
-    }
-    return yy - r.y;
-  }
-
-  /**
-   * Calculates the length of a thumbnail.
-   * @param il IntList with tokens length
-   * @param wl total length of the thumbnail
-   * @return int[] length
-   */
-  private static int[] getThumbnailLength(final IntList il, final int wl) {
-    if (il.size == 1) return new int[] {wl};
-    int[] i = new int[il.size - 1];
-    for (int j = 0; j < i.length; j++)
-      i[j] = (il.list[j + 1] * wl / il.list[0]) + 1;
-    return i;
+    
+    return yy - r.y + 3;
   }
 
   /**
