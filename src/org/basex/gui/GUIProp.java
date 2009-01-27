@@ -95,7 +95,7 @@ public final class GUIProp {
   /** Show attributes in treemap. */
   public static boolean mapatts = false;
   /** Treemap Layout. */
-  public static int maplayout = 0;
+  public static int maplayout = 3;
   /** Treemap Proportion. */
   public static int mapprop = 4;
   /** Map algorithm. */

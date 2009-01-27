@@ -2059,7 +2059,7 @@ public class QueryParser extends InputParser {
       }
     }
     if(consumeWS(WEIGHT)) sel.weight = range();
-    return sel.standard() ? expr : sel;
+    return sel;
   }
 
   /**

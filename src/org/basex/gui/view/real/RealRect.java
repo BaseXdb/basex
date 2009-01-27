@@ -6,9 +6,9 @@ import org.basex.gui.view.ViewRect;
  * extends ViewRect, used for RealView.
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
- * @author Woflgang Miller, Philipp Ziemer
+ * @author Wolfgang Miller, Philipp Ziemer
  */
-public class RealRect extends ViewRect{
+public class RealRect extends ViewRect {
   
   /** mPre array with multi pre values. */
   public int[] mPre = null;

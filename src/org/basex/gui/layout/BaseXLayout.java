@@ -111,7 +111,7 @@ public final class BaseXLayout {
     if(GUIProp.mousefocus) cont.requestFocusInWindow();
     final GUI gui = gui(cont);
     final boolean db = gui.context.db();
-    if(help != null && !db && GUIProp.showstarthelp || db && GUIProp.showhelp)
+    if(help != null && (!db && GUIProp.showstarthelp || db && GUIProp.showhelp))
       gui.help.setText(help);
   }
   

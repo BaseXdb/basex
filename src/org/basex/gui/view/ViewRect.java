@@ -6,7 +6,7 @@ package org.basex.gui.view;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class ViewRect implements Cloneable {
+public class ViewRect implements Cloneable {
   /** X position. */
   public int x;
   /** Y position. */
