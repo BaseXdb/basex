@@ -83,7 +83,14 @@ final class MapDefault extends MapPainter {
 
       // skip drawing of string when left space is too small
       if(r.w < GUIProp.fontsize || r.h < GUIProp.fontsize) continue;
-      r.thumb = drawRectangle(g, r.clone());
+      final ViewRect tvr = r.clone();
+      r.thumb = drawRectangle(g, tvr);
+      r.thumbal = tvr.thumbal;
+      r.thumbf = tvr.thumbf;
+      r.thumbfh = tvr.thumbfh;
+      r.thumblh = tvr.thumblh;
+      r.poi = tvr.poi;
+      r.pos = tvr.pos;
     }
   }
 

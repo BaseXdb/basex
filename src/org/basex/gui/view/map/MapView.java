@@ -27,6 +27,7 @@ import org.basex.gui.view.ViewNotifier;
 import org.basex.gui.view.ViewRect;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewData;
+import org.basex.index.FTTokenizer;
 import org.basex.util.Action;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
@@ -280,7 +281,7 @@ public final class MapView extends View implements Runnable {
     }
     // don't focus top rectangles
     final ViewRect fr = r >= 0 ? mainRects.get(r) : null;
-
+    
     // find focused rectangle
     final boolean newFocus = focusedRect != fr || fr != null && fr.thumb;
     focusedRect = fr;
@@ -288,8 +289,11 @@ public final class MapView extends View implements Runnable {
     if(fr != null) gui.cursor(painter.highlight(focusedRect, mouseX,
         mouseY, false) ? CURSORHAND : CURSORARROW);
 
-    if(newFocus) gui.notify.focus(
+    if(newFocus) {
+      gui.notify.focus(
         focusedRect != null ? focusedRect.pre : -1, this);
+    }
+    
     return newFocus;
   }
 
@@ -408,6 +412,25 @@ public final class MapView extends View implements Runnable {
       }
       // add interactions for current thumbnail rectangle...
       // if(focusedRect.thumb) ...
+      
+      if (focusedRect.thumb) {
+        final byte[] text = ViewData.content(gui.context.data(), 
+            focusedRect.pre, false);
+        final FTTokenizer ftt = new FTTokenizer(text);
+        final int[][] d = ftt.getInfo();
+        
+        switch(focusedRect.thumbal) {
+          case 0 :
+            MapRenderer.drawThumbnailsToken(g, focusedRect, d, 
+                false, mouseX, mouseY);
+            MapRenderer.drawToolTip(getGraphics(), mouseX, mouseY);            
+          //case 1 :
+          //case 2 :
+          //default :
+        }
+      }
+
+      
       
       // draw area round cursor position
       if(GUIProp.mapinteraction == 1) {

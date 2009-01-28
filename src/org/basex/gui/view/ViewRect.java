@@ -27,7 +27,14 @@ public class ViewRect implements Cloneable {
   public int[] pos;
   /** Fulltext pointer values. */
   public int[] poi;
-  
+  /** Abstraction level for thumbnail. */
+  public int thumbal;
+  /** Hight of a thumbnail uni.*/
+  public int thumbfh;
+  /** Hight of an empty line.*/ 
+  public int thumblh;
+  /** Width of a thumbnail unit. */
+  public double thumbf;
   /**
    * Default constructor.
    */

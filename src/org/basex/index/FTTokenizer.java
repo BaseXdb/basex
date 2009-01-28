@@ -212,12 +212,14 @@ public final class FTTokenizer extends IndexToken {
    * @return int[3][] array with info
    */
   public int[][] getInfo() {
-    IntList[] il = new IntList[]{new IntList(), new IntList(), new IntList()};
+    IntList[] il = new IntList[]{new IntList(), new IntList(), 
+        new IntList(), new IntList()};
     int lass = 0;
     int lasp = 0;
     int sl = 0;
     int pl = 0;
     while (more()) {
+      il[3].add(get());
       if (sent != lass) {
         if (sl > 0) il[1].add(sl);
         lass = sent;
@@ -237,7 +239,8 @@ public final class FTTokenizer extends IndexToken {
     if (sent != lass && sl > 0) il[1].add(sl);
     if (pl > 0) il[2].add(pl);
         
-    return new int[][]{il[0].finish(), il[1].finish(), il[2].finish()};
+    return new int[][]{il[0].finish(), il[1].finish(), 
+        il[2].finish(), il[3].finish()};
   }
   
   /**

@@ -104,14 +104,16 @@ public final class FTPos extends FTExpr {
     ctx.ftpos = tmp;
 
     if(tmp != null) {
-      final int os = tmp.term.size;
+    /*  final int os = tmp.term.size;
       for(int i = 0; i < term.size; i++) tmp.term.add(term.list[i]);
 
       final IntList[] il = new IntList[term.size + os];
       System.arraycopy(pos, 0, il, 0, term.size);
       System.arraycopy(tmp.pos, 0, il, term.size, os);
       tmp.setPos(il, il.length);
-      ctx.ftd = il;
+      ctx.ftd = il;*/
+      tmp.setPos(pos, pos.length);
+      ctx.ftd = pos;
     } else {
       ctx.ftd = pos;
     }
