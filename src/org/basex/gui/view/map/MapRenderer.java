@@ -291,9 +291,9 @@ final class MapRenderer {
         }
       } 
     }
-    int sum = data[1].length + data[2][0];
+    int sum = data[2][0];
     for (int i = 1; i < data[2].length; i++) sum += data[2][i];
-    int nl = (r.h - 3) / lhmi;
+    int nl = (r.h - 3) / lhmi + 1;
     double fnew = (double) (nl * r.w) / (double) sum;
     r.thumbf = fnew;
     r.thumbfh = fhmi;
@@ -338,11 +338,12 @@ final class MapRenderer {
       sl += data[0][i];
       pl += data[0][i];
       cchars += data[0][i];
-      // check if rectangle fits in line
+      // check if rectangle fits in line - don't split token and dot
       if (ll + wl + r.thumbf * ((psl < data[1].length 
           && pl == data[1][psl]) ? 1 : 0) >= ww) {
         yy += r.thumblh;
         ll = 0;
+        ml = 0;
         if (wl >= ww) return r.h + 3;
       }
 
@@ -358,7 +359,7 @@ final class MapRenderer {
       
       // check if cursor is inside the rect
       if (x > 0 && y > 0 
-          && (inRect((int) (xx + ll), yy, wl, r.thumbfh, x, y) || ml > 0)) {
+          && (inRect((int) (xx + ll) + 1, yy, wl, r.thumbfh, x, y) || ml > 0)) {
         ml = ml == 0 ? Math.max(
             (int) (ww - ll) / GUIProp.fontsize + 2, data[0][i] + 2) : ml;
         final byte[] tok = new byte[data[0][i] + 2 < ml ? data[0][i] : ml];
@@ -389,23 +390,25 @@ final class MapRenderer {
       ll += wl;
       count++;
 
-      if (draw && psl < data[1].length && sl == data[1][psl]) {
+      if (psl < data[1].length && sl == data[1][psl]) {
         // new sentence, draw dot
-        g.setColor(Color.black);
-        g.fillRect((int) (xx + ll), yy, (int) r.thumbf, r.thumbfh); //sw, fh);
-        ll += r.thumbf; //sw;
-        g.setColor(textc);
+        if (draw) {
+          g.setColor(Color.black);
+          g.fillRect((int) (xx + ll), yy, (int) r.thumbf, r.thumbfh);
+          g.setColor(textc);
+        }
+        ll += r.thumbf;         
         psl++;
         sl = 0;
       }
 
-      ll += r.thumbf; //sw;
+      ll += r.thumbf;
       wl = 0;
 
       
       if (ppl < data[2].length && pl == data[2][ppl]) {
         // new paragraph
-        yy += r.thumblh; //lh;
+        yy += r.thumblh;
         ll = 0;
         ppl++;
         pl = 0;

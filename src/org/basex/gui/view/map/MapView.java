@@ -418,7 +418,8 @@ public final class MapView extends View implements Runnable {
             focusedRect.pre, false);
         final FTTokenizer ftt = new FTTokenizer(text);
         final int[][] d = ftt.getInfo();
-        
+        focusedRect.x += 3;
+        focusedRect.w -= 3;
         switch(focusedRect.thumbal) {
           case 0 :
             MapRenderer.drawThumbnailsToken(g, focusedRect, d, 
@@ -428,6 +429,8 @@ public final class MapView extends View implements Runnable {
           //case 2 :
           //default :
         }
+        focusedRect.x -= 3;
+        focusedRect.w += 3;
       }
 
       
