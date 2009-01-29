@@ -183,12 +183,12 @@ public final class QueryContext extends Progress {
         final Data data = nodes.data;
         docs = new DBNode[nodes.size];
         for(int d = 0; d < docs.length; d++) {
-          int p = nodes.nodes[d];
+          final int p = nodes.nodes[d];
           if(data.kind(p) == Data.DOC) docs[rootDocs++] = new DBNode(data, p);
         }
         docs = Array.finish(docs, rootDocs);
 
-        // create initial context item
+        // create initial context items
         final SeqIter si = new SeqIter();
         for(int d = 0; d < nodes.size; d++) {
           si.add(new DBNode(data, nodes.nodes[d]));
@@ -362,7 +362,7 @@ public final class QueryContext extends Progress {
     }
 
     // check if the database has already been opened
-    String dbname = string(db);
+    final String dbname = string(db);
     for(final DBNode d : docs) if(d.data.meta.dbname.equals(dbname)) return d;
 
     // check if the document has already been opened

@@ -54,9 +54,10 @@ public abstract class Path extends Expr {
    * @param step step array
    * @return result of check
    */
-  protected boolean usesVar(final Var v, final Expr[] step) {
-    for(final Expr s : step) if(s.usesVar(v)) return true;
-    return root != null && root.usesVar(v);
+  protected int usesVar(final Var v, final Expr[] step) {
+    int c = 0;
+    for(final Expr s : step) c += s.countVar(v);
+    return c + (root != null ? root.countVar(v) : 0);
   }
 
   @Override

@@ -51,7 +51,7 @@ public final class For extends ForLet {
 
     // bind variable if single value is returned and if no variables are used
     if(pos == null && score == null && expr.returned(ctx).single &&
-        !expr.usesVar(null)) {
+        expr.countVar(null) == 0) {
       ctx.compInfo(OPTBIND, var);
       var.bind(expr, ctx);
     }

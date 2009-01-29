@@ -217,8 +217,8 @@ public final class CmpG extends Arr {
 
     // accept only location path, string and equality expressions
     final Step s = indexStep(expr[0]);
-    if(s == null || cmp != Comp.EQ || !(expr[1] instanceof Str) &&
-        !(expr[1] instanceof Seq)) return;
+    if(s == null || cmp != Comp.EQ || !(expr[1] instanceof Str ||
+        expr[1] instanceof VarCall) && !(expr[1] instanceof Seq)) return;
 
     final boolean text = ic.data.meta.txtindex && s.test.type == Type.TXT;
     final boolean attr = !text && ic.data.meta.atvindex &&

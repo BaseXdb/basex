@@ -101,8 +101,8 @@ public final class Ord extends Expr {
   }
 
   @Override
-  public boolean usesVar(final Var v) {
-    return expr == null || expr.usesVar(v);
+  public int countVar(final Var v) {
+    return expr == null ? 1 : expr.countVar(v);
   }
 
   @Override

@@ -69,16 +69,17 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Indicates if an expression uses the specified variables. If the argument
-   * is <code>null</code>, it is checked if any variable is used.
+   * Counts how often a variable is used by an expression and its children.
+   * If the argument is <code>null</code>, all variables are counted.
    * Called by the compiler to perform certain optimizations.
-   * <code>true</code> is returned by default and thus assumed as "worst-case".
+   * {@link Integer#MAX_VALUE} is returned by default and thus
+   * assumed as "worst-case".
    * @param v variable to be checked
    * @return result of check
    */
   @SuppressWarnings("unused")
-  public boolean usesVar(final Var v) {
-    return true;
+  public int countVar(final Var v) {
+    return Integer.MAX_VALUE;
   }
 
   /**

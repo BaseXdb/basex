@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
@@ -48,19 +47,22 @@ public final class FLWR extends FLWOR {
     }
 
     /* [CG] add where clause as predicate to last for clause
-    if(fl[fl.length - 1] instanceof For) {
+     * and remove variable calls.
+     * Problem: where ....[$i = ...] -> ....[. = ...]
+    if(fl[fl.length - 1] instanceof For || fl.length == 1) {
       final For f = (For) fl[fl.length - 1];
       if(where != null && f.pos == null && f.score == null &&
           f.expr instanceof AxisPath) {
         final Return t = where.returned(ctx);
-        if(t != Return.MAYBE && t != Return.NUM) {
+        if(!t.num) {
           ctx.compInfo(OPTWHERE);
           f.expr = ((AxisPath) f.expr).addPred(where.removeVar(f.var));
           where = null;
           return comp(ctx);
         }
       }
-    }*/
+    }
+     */
     
     // simplify simple return expression
     if(where == null && fl.length == 1 && expr instanceof VarCall) {

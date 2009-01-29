@@ -500,11 +500,7 @@ public final class GUI extends JFrame {
       final String inf = pr.info();
 
       // treat TextView different to other views
-      if(ok && pr.printing()) {
-        if(!GUIProp.showstarttext && data == null ||
-           !GUIProp.showtext && data != null) {
-          GUICommands.SHOWTEXT.execute(this);
-        }
+      if(ok && pr.printing() && text.isValid()) {
         // retrieve text result
         final CachedOutput out = new CachedOutput(TextView.MAX);
         if(ok) pr.output(out);

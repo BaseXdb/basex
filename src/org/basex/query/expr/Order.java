@@ -97,9 +97,10 @@ public final class Order extends Expr {
   }
 
   @Override
-  public boolean usesVar(final Var v) {
-    for(final Ord o : ord) if(o.usesVar(v)) return true;
-    return false;
+  public int countVar(final Var v) {
+    int c = 0;
+    for(final Ord o : ord) c += o.countVar(v);
+    return c;
   }
 
   @Override

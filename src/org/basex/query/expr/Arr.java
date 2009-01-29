@@ -41,9 +41,10 @@ public abstract class Arr extends Expr {
   }
 
   @Override
-  public boolean usesVar(final Var v) {
-    for(final Expr e : expr) if(e.usesVar(v)) return true;
-    return false;
+  public int countVar(final Var v) {
+    int c = 0;
+    for(final Expr e : expr) c += e.countVar(v);
+    return c;
   }
 
   @Override

@@ -66,9 +66,10 @@ public abstract class Preds extends Expr {
   }
 
   @Override
-  public boolean usesVar(final Var v) {
-    for(final Expr p : pred) if(p.usesVar(v)) return true;
-    return false;
+  public int countVar(final Var v) {
+    int c = 0;
+    for(final Expr p : pred) c += p.countVar(v);
+    return c;
   }
 
   @Override

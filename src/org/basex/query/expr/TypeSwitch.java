@@ -66,11 +66,12 @@ public final class TypeSwitch extends Single {
   }
 
   @Override
-  public boolean usesVar(final Var v) {
-    if(v == null) return true;
-    if(!v.visible(var)) return false;
-    for(final Case c : cs) if(c.usesVar(v)) return true;
-    return ts.usesVar(v);
+  public int countVar(final Var v) {
+    if(v == null) return 1;
+    if(!v.visible(var)) return 0;
+    int c = 0;
+    for(final Case s : cs) c += s.countVar(v);
+    return c + ts.countVar(v);
   }
 
   @Override

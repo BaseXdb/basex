@@ -15,6 +15,7 @@ public final class NodIter extends NodeIter {
   public Nod[] list;
   /** Size. */
   public int size;
+
   /** Iterator. */
   private int pos = -1;
   /** Sort flag. */
@@ -47,6 +48,11 @@ public final class NodIter extends NodeIter {
     this(true);
     list = l;
     size = s;
+  }
+  
+  @Override
+  public boolean ordered() {
+    return ordered;
   }
 
   /**

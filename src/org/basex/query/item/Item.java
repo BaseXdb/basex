@@ -258,8 +258,8 @@ public abstract class Item extends Expr {
   }
 
   @Override
-  public final boolean usesVar(final Var v) {
-    return false;
+  public final int countVar(final Var v) {
+    return 0;
   }
   
   @Override

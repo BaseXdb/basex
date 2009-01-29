@@ -90,8 +90,8 @@ public final class CAttr extends Arr {
   }
 
   @Override
-  public boolean usesVar(final Var v) {
-    return atn.usesVar(v) || super.usesVar(v);
+  public int countVar(final Var v) {
+    return atn.countVar(v) + super.countVar(v);
   }
 
   @Override

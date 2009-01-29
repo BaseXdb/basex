@@ -350,15 +350,15 @@ public abstract class W3CTS {
         xq.module(ns, f);
       }
 
-      //Prop.info = true;
-      //Prop.allInfo = true;
+      Prop.info = true;
+      Prop.allInfo = true;
       
       // evaluate and serialize query
       item = xq.eval(context.current());
       item.serialize(new XMLSerializer(out));
       output = norm(out.finish());
       
-      //System.out.println(xq.ctx.info());
+      System.out.println(xq.ctx.info());
 
     } catch(final QueryException ex) {
       error = ex.getMessage();

@@ -46,9 +46,10 @@ public abstract class FTExpr extends Expr {
   }
 
   @Override
-  public final boolean usesVar(final Var v) {
-    for(final FTExpr e : expr) if(e.usesVar(v)) return true;
-    return false;
+  public final int countVar(final Var v) {
+    int c = 0;
+    for(final FTExpr e : expr) c += e.countVar(v);
+    return c;
   }
 
   @Override

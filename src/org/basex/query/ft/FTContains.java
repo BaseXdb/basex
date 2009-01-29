@@ -119,8 +119,8 @@ public class FTContains extends Expr {
   }
 
   @Override
-  public boolean usesVar(final Var v) {
-    return expr.usesVar(v) || ftexpr.usesVar(v);
+  public int countVar(final Var v) {
+    return expr.countVar(v) + ftexpr.countVar(v);
   }
 
   @Override

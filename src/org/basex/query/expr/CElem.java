@@ -200,8 +200,8 @@ public final class CElem extends Arr {
   }
 
   @Override
-  public boolean usesVar(final Var v) {
-    return tag.usesVar(v) || super.usesVar(v);
+  public int countVar(final Var v) {
+    return tag.countVar(v) + super.countVar(v);
   }
 
   @Override

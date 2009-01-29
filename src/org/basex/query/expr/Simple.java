@@ -25,8 +25,8 @@ public abstract class Simple extends Expr {
   }
 
   @Override
-  public boolean usesVar(final Var v) {
-    return false;
+  public int countVar(final Var v) {
+    return 0;
   }
   
   @Override

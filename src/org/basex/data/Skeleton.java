@@ -45,7 +45,7 @@ public final class Skeleton {
    * @throws IOException I/O exception
    */
   public Skeleton(final Data d, final DataInput in) throws IOException {
-    if(in.readBool()) root = new SkelNode(in);
+    if(in.readBool()) root = new SkelNode(in, null);
     data = d;
   }
 
@@ -68,7 +68,7 @@ public final class Skeleton {
    */
   public void add(final int n, final int l, final byte k, final int tl) {
     if(root == null) {
-      root = new SkelNode(n, k);
+      root = new SkelNode(n, k, null);
       stack[0] = root;
     } else {
       stack[l] = stack[l - 1].get(n, k, tl);
@@ -98,30 +98,6 @@ public final class Skeleton {
     if(k.length != 0) tl.add(k);
     return desc(tl, d, o);
   }
-
-  /**
-   * Returns average text length of a text node in bytes.
-   * @param k tag element
-   * @return average text length of a text node in bytes
-  public double[] tl(final byte[] k) {
-    if(k == null) return new double[] { root.tl, root.count };
-    
-    // follow the specified descendant/child steps
-    ArrayList<SkelNode> n = new ArrayList<SkelNode>();
-    n.add(root);
-    n = desc(n, 0, Data.DOC, true);
-    
-    final int id = data.tagID(k);
-    n = desc(n, id, Data.ELEM, false);
-    double sum = 0;
-    double c = 0;
-    for(final SkelNode r : n) if (r.kind == Data.TEXT) {
-      sum += r.tl; 
-      c += r.count;
-    }
-    return new double[] { sum, c };
-  }
-   */
   
   /**
    * Returns descendant tags and attributes for the specified descendant path.

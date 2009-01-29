@@ -107,7 +107,7 @@ public final class MixedPath extends Path {
   }
 
   @Override
-  public boolean usesVar(final Var v) {
+  public int countVar(final Var v) {
     return usesVar(v, step);
   }
 

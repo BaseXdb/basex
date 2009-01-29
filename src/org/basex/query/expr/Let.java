@@ -42,7 +42,7 @@ public final class Let extends ForLet {
     expr = expr.comp(ctx);
     
     // bind variable if no variables are used
-    if(!score && !expr.usesVar(null)) {
+    if(!score && expr.countVar(null) == 0) {
       ctx.compInfo(OPTBIND, var);
       var.bind(expr, ctx);
     }

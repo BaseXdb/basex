@@ -40,12 +40,15 @@ public final class VarCall extends Expr {
     ctx.ns = lc.copy();
     if(ctx.nsElem.length != 0) ctx.ns.add(new QNm(EMPTY, Uri.uri(ctx.nsElem)));
 
-    // [CG] decide which variables are pre-evaluated
-    // ctx.nsElem.length != 0 / var.expr.usesVar(null) ?
+    /* Choose variables to be pre-evaluated.
+     * If a variable is pre-evaluated, it may not be subject to further
+     * optimizations (IndexAceess, count, ...). On the other hand, multiple
+     * evaluations of the same expression can be avoided here.
+     */
     Expr e = var.expr;
-    if(lc.size() != 0 || var.type != null || e instanceof CAttr ||
-        e instanceof CElem || e instanceof CPI || e instanceof CComm ||
-        e instanceof CText || e instanceof FunCall) {
+    if(ctx.nsElem.length != 0 || lc.size() != 0 || var.type != null ||
+        e instanceof CAttr || e instanceof CElem || e instanceof CPI ||
+        e instanceof CComm || e instanceof CText || e instanceof FunCall) {
       e = var.item(ctx);
     }
     
@@ -54,12 +57,11 @@ public final class VarCall extends Expr {
   }
 
   /**
-   * Checks VarCall Expression for equality.
+   * Checks expression for equality.
    * @param v variable
    * @return result of check
    */
   public boolean eq(final Var v) {
-    //var.global == v.global
     return var.name.eq(v.name) && var.type == v.type;
   }
 
@@ -71,12 +73,12 @@ public final class VarCall extends Expr {
 
   @Override
   public boolean usesPos(final QueryContext ctx) {
-    return var.expr == null || var.expr.usesPos(ctx);
+    return var.expr != null && var.expr.usesPos(ctx);
   }
 
   @Override
-  public boolean usesVar(final Var v) {
-    return v == null || var.eq(v);
+  public int countVar(final Var v) {
+    return v == null || var.eq(v) ? 1 : 0;
   }
 
   @Override

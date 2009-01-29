@@ -73,7 +73,7 @@ final class FNSeq extends Fun {
     if(arg.length == 2) checkColl(arg[1]);
     
     return new Iter() {
-      ItemSet map = new ItemSet();
+      final ItemSet map = new ItemSet();
 
       @Override
       public Item next() throws QueryException {
@@ -82,7 +82,6 @@ final class FNSeq extends Fun {
           i = FNGen.atom(i);
           if(map.index(i)) return i;
         }
-        map = null;
         return null;
       }
     };

@@ -112,14 +112,16 @@ public class FLWOR extends Single {
   }
 
   @Override
-  public final boolean usesVar(final Var v) {
-    if(v == null) return true;
+  public final int countVar(final Var v) {
+    if(v == null) return 1;
+    int c = 0;
     for(final ForLet f : fl) {
-      if(f.usesVar(v)) return true;
-      if(f.shadows(v)) return false;
+      c += f.countVar(v);
+      if(f.shadows(v)) return c;
     }
-    return where != null && where.usesVar(v) || order != null &&
-      order.usesVar(v) || super.usesVar(v);
+    if(where != null) c += where.countVar(v);
+    if(order != null) c += order.countVar(v);
+    return c + super.countVar(v);
   }
 
   @Override

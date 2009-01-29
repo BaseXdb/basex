@@ -20,6 +20,8 @@ public final class SkelNode {
   public final byte kind;
   /** Tag counter. */
   public int count;
+  /** Parent. */
+  public SkelNode par;
   /** Children. */
   public SkelNode[] ch;
   /** Length of text. */
@@ -29,9 +31,10 @@ public final class SkelNode {
    * Default Constructor.
    * @param t tag
    * @param k node kind
+   * @param p parent node
    */
-  SkelNode(final int t, final byte k) {
-    this(t, k, 0);
+  SkelNode(final int t, final byte k, final SkelNode p) {
+    this(t, k, 0, p);
   }
 
   /**
@@ -39,37 +42,31 @@ public final class SkelNode {
    * @param t tag
    * @param k node kind
    * @param l text length
+   * @param p parent node
    */
-  SkelNode(final int t, final byte k, final int l) {
+  SkelNode(final int t, final byte k, final int l, final SkelNode p) {
     ch = new SkelNode[0];
     count = 1;
     name = (short) t;
     kind = k;
     tl = l;
+    par = p;
   }
 
   /**
    * Constructor, specifying an input stream.
    * @param in input stream
+   * @param p parent node
    * @throws IOException I/O exception
    */
-  SkelNode(final DataInput in) throws IOException {
+  SkelNode(final DataInput in, final SkelNode p) throws IOException {
     name = (short) in.readNum();
     kind = in.readByte();
     count = in.readNum();
     ch = new SkelNode[in.readNum()];
     tl = in.readDouble();
-    for(int i = 0; i < ch.length; i++) ch[i] = new SkelNode(in);
-  }
-
-  /**
-   * Returns a node reference for the specified tag.
-   * @param t tag
-   * @param k node kind
-   * @return node reference
-   */
-  SkelNode get(final int t, final byte k) {
-    return get(t, k, 0);
+    par = p;
+    for(int i = 0; i < ch.length; i++) ch[i] = new SkelNode(in, this);
   }
 
   /**
@@ -87,7 +84,7 @@ public final class SkelNode {
         return c;
       }
     }
-    final SkelNode n = new SkelNode(t, k, l);
+    final SkelNode n = new SkelNode(t, k, l, this);
     ch = Array.add(ch, n);
     return n;
   }

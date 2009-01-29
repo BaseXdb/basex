@@ -260,31 +260,6 @@ public class DBNode extends Nod {
       }
     };
   }
-  
-  /*
-  public NodeIter desc() {
-    return new NodeIter() {
-      /** Temporary node.
-      private final DBNode node = copy();
-      /** Current pre value.
-      private int p = pre;
-      /** Current size value.
-      private final int s = pre + data.size(pre, data.kind(pre));
-
-      @Override
-      public Nod next() {
-        while(++p != s) {
-          final int k = data.kind(p);
-          if(k != Data.ATTR) {
-            node.set(p, k);
-            return node;
-          }
-        }
-        return null;
-      }
-    };
-  }
-   */
 
   @Override
   public NodeIter descOrSelf() {

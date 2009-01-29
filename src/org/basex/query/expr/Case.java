@@ -40,8 +40,8 @@ public final class Case extends Single {
   }
 
   @Override
-  public boolean usesVar(final Var v) {
-    return v == null || v.visible(var) && super.usesVar(v);
+  public int countVar(final Var v) {
+    return v == null ? 1 : v.visible(var) ? super.countVar(v) : 0;
   }
 
   @Override

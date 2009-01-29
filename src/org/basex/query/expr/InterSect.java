@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
+import org.basex.data.FTPosData;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
@@ -30,37 +31,61 @@ public final class InterSect extends Arr {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
+    final Iter[] iter = new Iter[expr.length];
+    boolean order = true;
+    for(int e = 0; e != expr.length; e++) {
+      iter[e] = ctx.iter(expr[e]);
+      order &= iter[e].ordered();
+    }
+    final FTPosData ftd = ctx.ftdata;
+    return order ? eval(iter, ftd) : eval(iter, ftd);
+  }
+  
+  /**
+   * Evaluates the iterators.
+   * @param iter iterators
+   * @param ftd ft position data
+   * @return resulting iterator
+   * @throws QueryException query exception
+   */
+  private NodIter eval(final Iter[] iter, final FTPosData ftd)
+      throws QueryException {
+
     NodIter seq = new NodIter(false);
 
-    Iter iter = ctx.iter(expr[0]);
     Item it;
-    while((it = iter.next()) != null) {
+    while((it = iter[0].next()) != null) {
       if(!it.node()) Err.nodes(this);
       seq.add((Nod) it);
     }
     
-    final IntList il = ctx.ftdata != null ? new IntList() : null;
     for(int e = 1; e != expr.length; e++) {
       final NodIter res = new NodIter(false);
-      iter = ctx.iter(expr[e]);
-      while((it = iter.next()) != null) {
+      final Iter ir = iter[e];
+      while((it = ir.next()) != null) {
         if(!it.node()) Err.nodes(this);
         final Nod node = (Nod) it;
-        for(int s = 0; s < seq.size; s++) {
-          if(CmpN.Comp.EQ.e(seq.list[s], node)) {
+        for(int s = 0; s < seq.size(); s++) {
+          if(seq.list[s].is(node)) {
             res.add(node);
-            if(il != null && it instanceof DBNode)
-              il.add(((DBNode) it).pre + 1);
             break;
           } 
         }
       }
-      if(ctx.ftdata != null) {
-        if(res.size == 0) ctx.ftdata.init();
-        else ctx.ftdata.keep(il.finish());
-      }
       seq = res;
     }
+    
+    // update visualization data
+    if(ftd != null) {
+      final IntList il = new IntList();
+      for(int i = 0; i < seq.size(); i++) {
+        it = seq.list[i];
+        if(it instanceof DBNode) il.add(((DBNode) it).pre + 1);
+      }
+      if(il.size == 0) ftd.init();
+      else ftd.keep(il.finish());
+    }
+
     return seq;
   }
 

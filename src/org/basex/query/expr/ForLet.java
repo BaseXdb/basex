@@ -17,8 +17,8 @@ public abstract class ForLet extends Expr {
   protected Var var;
 
   @Override
-  public final boolean usesVar(final Var v) {
-    return v == null || expr.usesVar(v);
+  public final int countVar(final Var v) {
+    return v == null ? 1 : expr.countVar(v);
   }
 
   @Override

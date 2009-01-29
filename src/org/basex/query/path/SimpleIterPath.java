@@ -38,6 +38,12 @@ public final class SimpleIterPath extends AxisPath {
         ctx.item = tmp;
         return it;
       }
+      
+      @Override
+      public boolean ordered() {
+        // results will always be ordered..
+        return true;
+      }
     };
   }
 }

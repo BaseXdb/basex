@@ -73,9 +73,10 @@ public abstract class Fun extends Expr {
   }
 
   @Override
-  public boolean usesVar(final Var v) {
-    for(final Expr a : args) if(a.usesVar(v)) return true;
-    return false;
+  public int countVar(final Var v) {
+    int c = 0;
+    for(final Expr a : args) c += a.countVar(v);
+    return c;
   }
 
   @Override

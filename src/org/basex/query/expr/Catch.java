@@ -81,9 +81,9 @@ public final class Catch extends Single {
   }
 
   @Override
-  public boolean usesVar(final Var v) {
-    return v == null || v.visible(var1) && v.visible(var2) &&
-      v.visible(var3) && super.usesVar(v);
+  public int countVar(final Var v) {
+    return v == null ? 1 : v.visible(var1) && v.visible(var2) &&
+      v.visible(var3) ? super.countVar(v) : 0;
   }
 
   @Override

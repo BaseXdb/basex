@@ -36,8 +36,8 @@ public abstract class Single extends Expr {
   }
 
   @Override
-  public boolean usesVar(final Var v) {
-    return expr.usesVar(v);
+  public int countVar(final Var v) {
+    return expr.countVar(v);
   }
 
   @Override

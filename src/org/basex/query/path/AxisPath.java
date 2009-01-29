@@ -4,7 +4,9 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.path.Axis.*;
 import static org.basex.query.path.Test.NODE;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.data.SkelNode;
 import org.basex.data.StatsKey;
@@ -28,9 +30,11 @@ import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
+import org.basex.query.path.Test.Kind;
 import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
+import org.basex.util.TokenList;
 
 /**
  * Axis Path expression.
@@ -67,34 +71,33 @@ public class AxisPath extends Path {
    */
   public static final AxisPath get(final Expr r, final Step... st) {
     // check if steps have predicates
-    final AxisPath iter = iterator(r, st);
-    return iter != null ? iter : new AxisPath(r, st);
+    boolean pred = false;
+    for(final Step s : st) pred |= s.pred.length != 0;
+    return new AxisPath(r, st).iterator(pred);
   }
 
   /**
-   * If possible, creates an iterator expression. Otherwise, returns null
-   * @param r root expression; can be null
-   * @param st location steps; will at least have one entry
-   * @return result of check
+   * If possible, converts this path expression to a path iterator.
+   * @param pred predicate flag
+   * @return resulting operator
    */
-  public static final AxisPath iterator(final Expr r, final Step... st) {
+  public final AxisPath iterator(final boolean pred) {
     // variables in root expression or predicates not supported yet..
-    boolean preds = false;
-    for(final Step s : st) preds |= s.pred.length != 0;
-    if(r != null && r.usesVar(null) || preds) return null;
-    
+    if(pred || root != null && root.countVar(null) != 0 || pred) return this;
+
     // Simple iterator: one downward location step
-    if(st.length == 1 && st[0].axis.down) return new SimpleIterPath(r, st);
-    
+    if(step.length == 1 && step[0].axis.down)
+      return new SimpleIterPath(root, step);
+
     /* Child iterator: [...]
     // check if all steps are child steps
     boolean children = true;
-    for(final Step s : st) children &= s.axis == Axis.CHILD;
-    if(children) return new ChildIterPath(r, st);
+    for(final Step s : step) children &= s.axis == Axis.CHILD;
+    if(children) return new ChildIterPath(root, step);
     */
 
     // return null if no iterator could be created
-    return null;
+    return this;
   }
 
   @Override
@@ -115,7 +118,7 @@ public class AxisPath extends Path {
     final Expr e = c(ctx);
     ctx.item = ci;
     return e;
-  }    
+  }
 
   /**
    * Compiles the location path.
@@ -131,21 +134,14 @@ public class AxisPath extends Path {
       step[i] = (Step) e;
     }
     mergeDesc(ctx);
-    
-    // if applicable, return iterator
-    final AxisPath ap = iterator(root, step);
-    if(ap != null) return ap;
-    
-    // analyze if result set can be cached - no predicates/variables...
-    cache = root != null && !root.usesVar(null);
-    
+
     // check if steps have predicates
     boolean preds = false;
     for(final Step s : step) {
       // check if we have a predicate
       if(s.pred.length != 0) {
         preds = true;
-        if(s.usesVar(null)) {
+        if(s.countVar(null) != 0) {
           // no caching possible - skip other steps
           cache = false;
           return this;
@@ -153,9 +149,80 @@ public class AxisPath extends Path {
       }
     }
 
+    // analyze if result set can be cached - no predicates/variables...
+    cache = root != null && root.countVar(null) == 0;
+
     // check if the context item is set to a document node
     final DBNode db = ctx.dbroot();
-    if(!preds || db == null) return this;
+    if(db != null) {
+      final Data data = db.data;
+
+      // check index access
+      Expr e = index(ctx, data);
+      if(e != this) return e;
+  
+      // check children path rewriting
+      if(!preds) {
+        e = children(ctx, data);
+        if(e != this) return e;
+      }
+    }
+
+    // if applicable, return iterator
+    return iterator(preds);
+  }
+
+  /**
+   * If possible, converts a descendant step to several child steps.
+   * @param ctx query context
+   * @param data data reference
+   * @return path
+   */
+  private AxisPath children(final QueryContext ctx, final Data data) {
+    // convert single descendant step to child steps
+    if(!data.meta.uptodate || data.ns.size() != 0 || step.length != 1 ||
+        step[0].axis != Axis.DESC || step[0].test.kind != Kind.NAME)
+      return this;
+
+    ArrayList<SkelNode> n = new ArrayList<SkelNode>();
+    n.add(data.skel.root);
+    int name = data.tagID(step[0].test.name.ln());
+    
+    int c = 0;
+    SkelNode node = null;
+    for(final SkelNode sn : data.skel.desc(n, 0, Data.DOC, true)) {
+      if(sn.kind == Data.ELEM && name == sn.name) {
+        node = sn;
+        c++;
+      }
+    }
+    
+    if(c == 1) {
+      final TokenList tl = new TokenList();
+      while(node.par != null) {
+        tl.add(data.tags.key(node.name));
+        node = node.par;
+      }
+      final Step[] steps = new Step[tl.size];
+      for(int t = 0; t < tl.size; t++) steps[t] = new Step(Axis.CHILD,
+          new NameTest(new QNm(tl.list[tl.size - t - 1]), Kind.NAME, false));
+
+      final AxisPath path = get(root, steps);
+      ctx.compInfo(OPTCHILD, this);
+      return path;
+    }
+    return this;
+  }
+
+  /**
+   * Check if the path expression can be replaced with an index access.
+   * @param ctx query context
+   * @param data data reference
+   * @return resulting expression
+   * @throws QueryException query exception
+   */
+  private Expr index(final QueryContext ctx, final Data data)
+      throws QueryException {
     
     // skip position predicates and horizontal axes
     for(final Step s : step) if(s.usesPos(ctx) || !s.axis.vert) return this;
@@ -168,7 +235,7 @@ public class AxisPath extends Path {
       int minp = 0;
 
       for(int p = 0; p < stp.pred.length; p++) {
-        final IndexContext ic = new IndexContext(db.data, stp);
+        final IndexContext ic = new IndexContext(data, stp);
         stp.pred[p].indexAccessible(ctx, ic);
         if(ic.io && ic.iu) {
           if(ictx == null || ictx.is > ic.is) {
@@ -200,19 +267,19 @@ public class AxisPath extends Path {
         stp.pred[minp] = ie;
       } else {
         Step[] inv = {};
-        
+
         // collect remaining predicates
         final Expr[] newPreds = new Expr[stp.pred.length - 1];
         int c = 0;
         for(int p = 0; p != stp.pred.length; p++) {
           if(p != minp) newPreds[c++] = stp.pred[p];
         }
-        
+
         // invert path before index step
         for(int j = i; j >= 0; j--) {
           final Axis a = step[j].axis.invert();
           if(a == null) break;
-          
+
           if(j == 0) {
             if(a == Axis.PARENT) inv = Array.add(inv, Step.get(a,
                 new KindTest(Type.DOC)));
@@ -264,7 +331,7 @@ public class AxisPath extends Path {
       final int cs = ctx.size;
       final int cp = ctx.pos;
       ctx.item = it;
-      
+
       citem = new NodIter();
       iter(0, citem, ctx);
       citem.sort(true);
@@ -277,7 +344,7 @@ public class AxisPath extends Path {
     }
     return citem;
   }
-  
+
   /**
    * Recursive step iterator.
    * @param l current step
@@ -302,7 +369,7 @@ public class AxisPath extends Path {
       }
     }
   }
-  
+
   /**
    * Sets the root node as context item.
    * @param ctx query context
@@ -317,7 +384,7 @@ public class AxisPath extends Path {
       }
     }
   }
-  
+
   /**
    * Calculates the number of result nodes, using the skeleton.
    * @param ctx query context
@@ -333,7 +400,7 @@ public class AxisPath extends Path {
       if(db.data.meta.uptodate && db.data.ns.size() == 0) {
         HashSet<SkelNode> nodes = new HashSet<SkelNode>();
         nodes.add(db.data.skel.root);
-        
+
         for(final Step s : step) {
           res = -1;
           nodes = s.count(nodes, db.data);
@@ -346,13 +413,13 @@ public class AxisPath extends Path {
     ctx.item = ci;
     return res;
   }
-  
+
   /**
    * Converts each step into a For-Loops.
-   * 
+   *
    * @param var variable
    * @param pos position variable
-   * @param score score variable 
+   * @param score score variable
    * @return array with for expression
    */
   public For[] convSteps(final Var var, final Var pos, final Var score) {
@@ -363,7 +430,7 @@ public class AxisPath extends Path {
     }
     return f;
   }
-  
+
   /**
    * Merges superfluous descendant-or-self steps.
    * This method implies that all expressions are location steps.
@@ -445,12 +512,12 @@ public class AxisPath extends Path {
     final Step[] e = new Step[s--];
     // add predicates of last step to new root node
     Expr rt = step[s].pred.length != 0 ? new Pred(r, step[s].pred) : r;
-    
+
     // add inverted steps in a backward manner
-    int c = 0;    
+    int c = 0;
     while(--s >= 0) {
       e[c++] = Step.get(step[s + 1].axis.invert(), step[s].test, step[s].pred);
-    } 
+    }
     e[c] = Step.get(step[s + 1].axis.invert(), curr.test);
     return new AxisPath(rt, e);
   }
@@ -460,11 +527,11 @@ public class AxisPath extends Path {
     final Step s = step[step.length - 1];
     if(s.pred.length > 0 || !s.axis.down || s.test.kind != Test.Kind.NAME ||
         s.test.type == Type.ATT) return this;
-    
+
     final DBNode db = ctx.dbroot();
     if(db == null) return this;
     final StatsKey stats = db.data.tags.stat(db.data.tags.id(s.test.name.ln()));
-    
+
     if(db.data.meta.uptodate && stats != null && stats.leaf) {
       step = Array.add(step, Step.get(Axis.CHILD, new KindTest(Type.TXT)));
       ctx.compInfo(OPTTEXT, this);
@@ -498,7 +565,7 @@ public class AxisPath extends Path {
   }
 
   @Override
-  public boolean usesVar(final Var v) {
+  public int countVar(final Var v) {
     return usesVar(v, step);
   }
 

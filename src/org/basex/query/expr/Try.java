@@ -62,9 +62,10 @@ public final class Try extends Single {
   }
 
   @Override
-  public boolean usesVar(final Var v) {
-    for(final Catch c : ctch) if(c.usesVar(v)) return true;
-    return super.usesVar(v);
+  public int countVar(final Var v) {
+    int c = 0;
+    for(final Catch t : ctch) c += t.countVar(v);
+    return c + super.countVar(v);
   }
 
   @Override

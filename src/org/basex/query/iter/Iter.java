@@ -35,6 +35,14 @@ public abstract class Iter {
    * @throws QueryException evaluation exception
    */
   public abstract Item next() throws QueryException;
+  
+  /**
+   * Returns true if the sequence is ordered. False is returned as default.
+   * @return result of check
+   */
+  public boolean ordered() {
+    return false;
+  }
 
   /**
    * Returns the number of entries. Warning: -1 is returned if the number

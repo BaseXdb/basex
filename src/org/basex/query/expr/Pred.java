@@ -88,8 +88,8 @@ public class Pred extends Preds {
   }
 
   @Override
-  public boolean usesVar(final Var v) {
-    return root.usesVar(v) || super.usesVar(v);
+  public int countVar(final Var v) {
+    return root.countVar(v) + super.countVar(v);
   }
 
   @Override
