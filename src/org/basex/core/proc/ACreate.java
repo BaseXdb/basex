@@ -1,9 +1,12 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
 import org.basex.BaseX;
+import org.basex.build.BDBBuilder;
 import org.basex.build.Builder;
 import org.basex.build.DiskBuilder;
 import org.basex.build.MemBuilder;
@@ -53,10 +56,14 @@ abstract class ACreate extends Process {
         context.data(builder.build(p, db));
       } else {
         if(db.equals(DataText.DEEPFS)) return error(CREATENODEEPDB);
-  
+
         context.close();
         final Performance pp = new Performance();
-        builder = new DiskBuilder();
+        if(db.endsWith(DataText.BDBSUF)) {
+          builder = new BDBBuilder();
+        } else {
+          builder = new DiskBuilder();
+        }
         progress(builder);
         final Data data = builder.build(p, db);
         if(Prop.allInfo) info(CREATETABLE + NL, pp.getTimer());

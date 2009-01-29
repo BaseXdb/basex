@@ -1,11 +1,12 @@
 package org.basex.data;
 
 import static org.basex.util.Token.*;
+
 import org.basex.core.Prop;
 
 /**
  * This class assembles texts which are used in the data classes.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
@@ -172,5 +173,8 @@ public interface DataText {
   // DEEPFS STRINGS ===========================================================
   /** Name of the current deepfs shared library. */
   String DEEPLIB = "deepstorage";
-}
 
+  // BERKELEY DB STRINGS ======================================================
+  /** Suffix for berkeley db databases. */
+  String BDBSUF = "_bdb";
+}

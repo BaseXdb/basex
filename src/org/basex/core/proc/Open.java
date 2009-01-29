@@ -1,10 +1,13 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
+
 import java.io.IOException;
+
 import org.basex.BaseX;
 import org.basex.core.Process;
 import org.basex.core.Prop;
+import org.basex.data.BDBData;
 import org.basex.data.Data;
 import org.basex.data.DataText;
 import org.basex.data.DiskData;
@@ -12,7 +15,7 @@ import org.basex.io.IO;
 
 /**
  * Opens an existing database.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
@@ -24,7 +27,7 @@ public final class Open extends Process {
   public Open(final String name) {
     super(STANDARD, name);
   }
-  
+
   @Override
   protected boolean exec() {
     final String db = args[0].replaceAll("(.*)\\..*", "$1");
@@ -33,7 +36,7 @@ public final class Open extends Process {
 
     // close old database
     context.close();
-    
+
     try {
       // open new database instance
       final Data data = open(db);
@@ -58,6 +61,10 @@ public final class Open extends Process {
    * @throws IOException exception
    */
   public static Data open(final String db) throws IOException {
-    return new DiskData(db);
+    if(db.endsWith(DataText.BDBSUF)) {
+      return new BDBData(db);
+    } else {
+      return new DiskData(db);
+    }
   }
 }
