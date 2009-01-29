@@ -37,7 +37,7 @@ public final class BaseXWin {
    * Constructor.
    * @param args command-line arguments
    */
-  private BaseXWin(final String[] args) {
+  protected BaseXWin(final String[] args) {
     // some mac issues
     System.setProperty("apple.laf.useScreenMenuBar", "true");
     System.setProperty("com.apple.mrj.application.apple.menu.about.name", NAME);

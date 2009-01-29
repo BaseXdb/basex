@@ -420,11 +420,12 @@ public final class MapView extends View implements Runnable {
         final int[][] d = ftt.getInfo();
         focusedRect.x += 3;
         focusedRect.w -= 3;
+        g.setColor(Color.black);
         switch(focusedRect.thumbal) {
           case 0 :
             MapRenderer.drawThumbnailsToken(g, focusedRect, d, 
                 false, mouseX, mouseY);
-            MapRenderer.drawToolTip(getGraphics(), mouseX, mouseY);            
+            MapRenderer.drawToolTip(g, mouseX, mouseY);            
           //case 1 :
           //case 2 :
           //default :

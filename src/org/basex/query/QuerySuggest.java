@@ -6,7 +6,9 @@ import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.SkelNode;
 import org.basex.data.Skeleton;
+import org.basex.query.item.Type;
 import org.basex.query.path.Axis;
+import org.basex.query.path.NameTest;
 import org.basex.query.path.Test;
 import org.basex.util.StringList;
 import org.basex.util.Token;
@@ -109,11 +111,21 @@ public class QuerySuggest extends QueryParser {
    * Returns a node entry.
    * @param a axis
    * @param t text
-   * @return completions
+   * @return completion
    */
   @SuppressWarnings("unused")
   private byte[] entry(final Axis a, final Test t) {
-    /*if(t == Type.TEXT) return TEXT;
+    if(t.type == Type.COM) {
+      //...
+    }
+    if(t instanceof NameTest) {
+      if(t.type == Type.ELM) {
+        
+      } else if(t.type == Type.ATT) {
+        
+      }
+    }
+      /*if(t == Type.TEXT) return TEXT;
     if(t == TestNode.COMM) return COMM;
     if(t == TestNode.PI) return PI;
     if(t instanceof TestName) {

@@ -4,9 +4,7 @@ import static org.basex.Text.*;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
 import org.basex.BaseX;
-import org.basex.build.BDBBuilder;
 import org.basex.build.Builder;
 import org.basex.build.DiskBuilder;
 import org.basex.build.MemBuilder;
@@ -60,7 +58,9 @@ abstract class ACreate extends Process {
         context.close();
         final Performance pp = new Performance();
         if(db.endsWith(DataText.BDBSUF)) {
-          builder = new BDBBuilder();
+          final Class<?> cls = Class.forName("org.basex.build.BDBBuilder");
+          builder = (Builder) cls.newInstance();
+          //builder = new BDBBuilder();
         } else {
           builder = new DiskBuilder();
         }

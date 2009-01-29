@@ -1,13 +1,10 @@
 package org.basex.core.proc;
 
 import static org.basex.Text.*;
-
 import java.io.IOException;
-
 import org.basex.BaseX;
 import org.basex.core.Process;
 import org.basex.core.Prop;
-import org.basex.data.BDBData;
 import org.basex.data.Data;
 import org.basex.data.DataText;
 import org.basex.data.DiskData;
@@ -62,9 +59,13 @@ public final class Open extends Process {
    */
   public static Data open(final String db) throws IOException {
     if(db.endsWith(DataText.BDBSUF)) {
-      return new BDBData(db);
-    } else {
-      return new DiskData(db);
+      try {
+        return (Data) Class.forName("org.basex.build.BDBData").getConstructor(
+            new Class[] { String.class }).newInstance(db);
+      } catch(final Exception e) {
+        e.printStackTrace();
+      }
     }
+    return new DiskData(db);
   }
 }

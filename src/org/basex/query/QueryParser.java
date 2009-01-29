@@ -146,7 +146,8 @@ public class QueryParser extends InputParser {
    * @return resulting expression
    * @throws QueryException xquery exception
    */
-  Expr parse(final String q, final IO f, final Uri u) throws QueryException {
+  public Expr parse(final String q, final IO f, final Uri u)
+      throws QueryException {
     init(q);
     file = f;
     if(!more()) Err.or(QUERYEMPTY);

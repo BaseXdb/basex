@@ -195,8 +195,7 @@ public final class GUIInput extends BaseXTextField {
     StringList sl = null;
     try {
       final QuerySuggest parser = new QuerySuggest(new QueryContext());
-      parser.init(query);
-      parser.parse(null, true);
+      parser.parse(query, null, null);
       sl = parser.complete();
       pre = query.substring(0, xPos(query) + 1);
     } catch(final QueryException ex) {

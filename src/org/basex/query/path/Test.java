@@ -34,9 +34,9 @@ public abstract class Test {
   public Type type;
 
   /** Name test. */
-  protected QNm name;
+  public QNm name;
   /** Temporary QName instance. */
-  protected QNm tmpq = new QNm();
+  public QNm tmpq = new QNm();
   
   /**
    * Optimizes and compiles the expression.
