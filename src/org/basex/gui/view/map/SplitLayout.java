@@ -31,11 +31,12 @@ public final class SplitLayout extends MapLayout {
         double weight = 0;
         int ni = ns;
 
-        // parents size
-        int par = data.parent(l.list[ns], data.kind(l.list[ns]));
-        long parsize = data.fs != null ?
-            Token.toLong(data.attValue(data.sizeID, par)) : 0;
-        //[JH] quick and dirty fix only
+        // sometimes it is not the whole size of the parent node. simply sum
+        // the sizes of the nodes in the list
+//        int par = data.parent(l.list[ns], data.kind(l.list[ns]));
+//        long parsize = data.fs != null ?
+//        Token.toLong(data.attValue(data.sizeID, par)) : 0;
+        long parsize = data.fs != null ? addSizes(l, ni, ne, data) : 0;
         int parchilds = l.list[ne] - l.list[ni];
         if(parsize == 0) parsize = l.list[ne] - l.list[ns];
         weight = 0;

@@ -201,6 +201,23 @@ abstract class MapLayout {
   }
   
   /**
+   * Adds all the sizes attribute of the nodes in the given list.
+   * @param l list of nodes
+   * @param start at element
+   * @param end here
+   * @param data take this data kontext
+   * @return sum of the size attribute
+   */
+  public static long addSizes(final IntList l, final int start, final int end, 
+      final Data data) {
+    long sum = 0;
+    for (int i = start; i < end; i++) {
+      sum += Token.toLong(data.attValue(data.sizeID, l.list[i]));
+    }
+    return sum;
+  }
+  
+  /**
    * One rectangle left, add it and continue with its children.
    * @param data data reference
    * @param r parent rectangle
