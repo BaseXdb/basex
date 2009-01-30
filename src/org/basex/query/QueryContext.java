@@ -18,6 +18,7 @@ import org.basex.data.Serializer;
 import org.basex.index.FTTokenizer;
 import org.basex.io.IO;
 import org.basex.query.expr.Expr;
+import org.basex.query.expr.Root;
 import org.basex.query.ft.FTOpt;
 import org.basex.query.ft.FTPos;
 import org.basex.query.item.DBNode;
@@ -30,6 +31,7 @@ import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.SeqIter;
+import org.basex.query.path.AxisPath;
 import org.basex.query.util.Err;
 import org.basex.query.util.Functions;
 import org.basex.query.util.NSLocal;
@@ -116,7 +118,7 @@ public final class QueryContext extends Progress {
   public Uri collation = Uri.uri(URLCOLL);
 
   /** Used documents. */
-  public DBNode[] docs = new DBNode[0];
+  public DBNode[] docs;
   /** Initial number of documents. */
   public int rootDocs;
 
@@ -177,21 +179,27 @@ public final class QueryContext extends Progress {
    */
   public void compile(final Nodes nodes) throws QueryException {
     try {
+      final int s = nodes != null ? nodes.size : 0;
+      docs = new DBNode[s];
+      
       // cache the initial context nodes
-      if(nodes != null) {
+      if(s != 0) {
         // create document nodes
         final Data data = nodes.data;
-        docs = new DBNode[nodes.size];
         for(int d = 0; d < docs.length; d++) {
           final int p = nodes.nodes[d];
           if(data.kind(p) == Data.DOC) docs[rootDocs++] = new DBNode(data, p);
         }
+        if(rootDocs == 0) docs[rootDocs++] = new DBNode(data, 0);
         docs = Array.finish(docs, rootDocs);
 
-        // create initial context items
         final SeqIter si = new SeqIter();
-        for(int d = 0; d < nodes.size; d++) {
-          si.add(new DBNode(data, nodes.nodes[d]));
+        if(root instanceof AxisPath && ((AxisPath) root).root instanceof Root) {
+          // query starts with root node - add document nodes
+          for(final DBNode d : docs) si.add(d);
+        } else {
+          // otherwise, add all context items
+          for(int d = 0; d < s; d++) si.add(new DBNode(data, nodes.nodes[d]));
         }
         item = si.finish();
         

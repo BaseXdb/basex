@@ -109,6 +109,7 @@ public final class BaseXLayout {
    */
   public static void help(final Component cont, final byte[] help) {
     if(GUIProp.mousefocus) cont.requestFocusInWindow();
+    if(GUIProp.fullscreen) return;
     final GUI gui = gui(cont);
     final boolean db = gui.context.db();
     if(help != null && (!db && GUIProp.showstarthelp || db && GUIProp.showhelp))

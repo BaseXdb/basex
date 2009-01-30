@@ -130,11 +130,11 @@ public final class GUIProp {
   /** Flag for importing complete file system hierarchy. */
   public static boolean fsall = false;
 
-  /** Last entered BaseX commands. */
+  /** Last command inputs. */
   public static String[] commands = new String[0];
-  /** Last entered keysowrd searches. */
+  /** Last keyword inputs. */
   public static String[] search = new String[0];
-  /** Last entered XQueries queries. */
+  /** Last XQuery inputs. */
   public static String[] xquery = new String[0];
 
   // CONFIG OPTIONS ===========================================================
@@ -156,12 +156,10 @@ public final class GUIProp {
   /** Flag for activated help view after starting.  */
   public static boolean showstarthelp = false;
   /** Fullscreen flag. */
-  static boolean fullscreen = false;
+  public static boolean fullscreen = false;
 
   /** Map alignment by size aggregation. */
   public static boolean mapaggr = false;
-  /** Mapsimple. */
-  public static boolean mapsimple =  false;
   /** Choice of interacting with TreeeMap. */
   public static int mapinteraction = 0;
   // all values are only one half of the size

@@ -19,7 +19,7 @@ public final class Root extends Simple {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Iter iter = checkCtx(ctx);;
-    final NodIter ni = new NodIter();
+    final NodIter ni = new NodIter(false);
     Item i;
     while((i = iter.next()) != null) {
       final Nod n = root(i);

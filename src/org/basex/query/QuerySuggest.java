@@ -48,7 +48,7 @@ public class QuerySuggest extends QueryParser {
   @Override
   void checkStep(final Axis axis, final Test test) {
     filter(true);
-    System.out.println("Axis: " + axis + "TEST: " + test);
+    //System.out.println("Axis: " + axis + "TEST: " + test);
     if(axis == null) {
       if(!stack.empty())
         stack.push(skel.desc(stack.pop(), 0, Data.ELEM, false));

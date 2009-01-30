@@ -24,12 +24,6 @@ public final class FTPosData {
   /** Number of pre values. */
   private int size;
 
-  /** Real position list for text.
-  private IntList tpos = new IntList();
-  /** Corresponding color for the real position list for text.
-  private IntList tcol = new IntList();
-   */
-
   /**
    * Initializes position arrays.
    */
@@ -38,14 +32,6 @@ public final class FTPosData {
     poi = new int[1][];
     size = 0;
   }
-
-  /**
-   * Initializes container for serialization.
-  public void serialize() {
-    tpos = new IntList();
-    tcol = new IntList();
-  }
-   */
 
   /**
    * Add a node.
