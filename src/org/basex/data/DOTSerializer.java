@@ -125,8 +125,7 @@ public final class DOTSerializer extends Serializer {
   }
   
   @Override
-  public void text(final byte[] b, final FTPosData ft, final int[][] ftd)
-      throws IOException {
+  public void text(final byte[] b, final int[][] ftd) throws IOException {
     text(b);
   }
 

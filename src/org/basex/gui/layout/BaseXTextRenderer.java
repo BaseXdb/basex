@@ -20,6 +20,10 @@ public final class BaseXTextRenderer extends BaseXBack {
   private int fontH;
   /** Character widths. */
   private int[] fwidth = GUIConstants.mfwidth;
+  /** Color. */
+  private Color col;
+  /** Color highlighting flag. */
+  private boolean high;
 
   /** Vertical start position. */
   private BaseXBar bar;
@@ -86,6 +90,7 @@ public final class BaseXTextRenderer extends BaseXBack {
    */
   private void init(final Graphics g, final int pos) {
     if(g != null) g.setFont(font);
+    col = Color.black;
     syntax.init();
     text.init();
     x = off;
@@ -100,7 +105,7 @@ public final class BaseXTextRenderer extends BaseXBack {
     h = Integer.MAX_VALUE;
     final Graphics g = getGraphics();
     init(g, 0);
-    while(more(g, false)) next();
+    while(more(g)) next();
     h = getHeight() + fontH;
     bar.height(y + off);
   }
@@ -114,7 +119,7 @@ public final class BaseXTextRenderer extends BaseXBack {
     h = Integer.MAX_VALUE;
     final Graphics g = getGraphics();
     init(g, 0);
-    while(more(g, false) && !text.edited()) next();
+    while(more(g) && !text.edited()) next();
     h = hh;
     return y - fontH;
   }
@@ -126,28 +131,22 @@ public final class BaseXTextRenderer extends BaseXBack {
    */
   void write(final Graphics g, final int pos) {
     BaseXLayout.antiAlias(g);
-
     init(g, pos);
-    while(more(g, true)) write(g);
-
-    if(cursor && text.cursor() == text.size) {
-      g.setColor(Color.black);
-      g.drawLine(x, y - fontH + 4, x, y + 3);
-    }
+    while(more(g)) write(g);
+    if(cursor && text.cursor() == text.size) cursor(g, x);
   }
 
   /**
    * Checks if the text has more words to print.
    * @param g graphics reference
-   * @param write flag for real text writing
    * @return true if the text has more words
    */
-  private boolean more(final Graphics g, final boolean write) {
+  private boolean more(final Graphics g) {
     // no more words found; quit
     if(!text.moreWords()) return false;
 
     wordW = 0;
-    word = text.nextWord(write);
+    word = text.nextWord();
 
     // calculate word width
     for(int c = 0; c < word.length(); c++) {
@@ -190,11 +189,20 @@ public final class BaseXTextRenderer extends BaseXBack {
    * @param g graphics reference
    */
   private void write(final Graphics g) {
-    Color col = isEnabled() ? syntax.getColor(word) : Color.gray;
-    if (col == Color.black) col = text.getColor();
-
-    // return if current text is not visible.
+    final int ch = word.charAt(0);
+    
+    if(high) {
+      high = false;
+    } else {
+      col = isEnabled() ? syntax.getColor(word) : Color.gray;
+    }
+    
     if(y > 0 && y < h) {
+      if(ch >= 0x10 && ch < 0x20) {
+        col = GUIConstants.COLORFT[ch - 0x10];
+        high = true;
+      }
+
       // mark error
       if(text.error()) {
         g.setColor(GUIConstants.COLORERRHIGH);
@@ -218,7 +226,6 @@ public final class BaseXTextRenderer extends BaseXBack {
       }
 
       // don't write whitespaces
-      final int ch = word.length() > 0 ? word.charAt(0) : 0;
       if(ch > ' ') {
         g.setColor(col);
         g.drawString(word, x, y);
@@ -231,8 +238,7 @@ public final class BaseXTextRenderer extends BaseXBack {
         xx = x;
         for(int c = 0; c < word.length(); c++) {
           if(text.cursor() == text.pos() + c) {
-            g.setColor(Color.black);
-            g.drawLine(xx, y - fontH + 4, xx, y + 3);
+            cursor(g, xx);
             break;
           }
           xx += charW(g, word.charAt(c));
@@ -240,6 +246,16 @@ public final class BaseXTextRenderer extends BaseXBack {
       }
     }
     next();
+  }
+  
+  /**
+   * Paint the text cursor.
+   * @param g graphics reference
+   * @param xx x position
+   */
+  private void cursor(final Graphics g, final int xx) {
+    g.setColor(Color.black);
+    g.drawLine(xx, y - fontH + 4, xx, y + 3);
   }
 
   /**
@@ -263,7 +279,7 @@ public final class BaseXTextRenderer extends BaseXBack {
           break;
         }
         // end of text - skip last characters
-        if(!more(g, true)) {
+        if(!more(g)) {
           while(text.more()) text.next();
           break;
         }

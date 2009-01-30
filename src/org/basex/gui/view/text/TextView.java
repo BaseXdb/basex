@@ -108,7 +108,7 @@ public final class TextView extends View {
       final CachedOutput out = new CachedOutput(MAX);
       nodes.serialize(new XMLSerializer(out, false, nodes.data.meta.chop));
       out.addInfo();
-      setText(out, nodes);
+      setText(out);
       refreshed = false;
     } catch(final Exception ex) {
       BaseX.debug(ex);
@@ -129,11 +129,10 @@ public final class TextView extends View {
   /**
    * Sets the output text.
    * @param out output cache
-   * @param nodes nodes reference
    */
-  public void setText(final CachedOutput out, final Nodes nodes) {
+  public void setText(final CachedOutput out) {
     area.setSyntax(new XMLSyntax());
-    area.setText(out.buffer(), out.size(), nodes != null ? nodes.ftpos : null);
+    area.setText(out.buffer(), out.size());
     refreshed = true;
   }
 

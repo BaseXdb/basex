@@ -1,8 +1,6 @@
 package org.basex.gui.layout;
 
-import static org.basex.gui.GUIConstants.*;
-import java.awt.Color;
-import org.basex.data.FTPosData;
+import org.basex.Text;
 import org.basex.util.Array;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -20,8 +18,6 @@ final class BaseXTextTokens {
   byte[] text = Token.EMPTY;
   /** Text length. */
   int size;
-  /** Current color for the text. */
-  Color col = Color.black;
 
   /** Current start position. */
   private int ps;
@@ -35,8 +31,6 @@ final class BaseXTextTokens {
   private int me = -1;
   /** Start of an error mark. */
   private int es = -1;
-  /** Flag for coloring tokens in the text view. */
-  private FTPosData ftdata;
 
   /**
    * Constructor.
@@ -52,19 +46,8 @@ final class BaseXTextTokens {
    * @param s buffer size
    */
   BaseXTextTokens(final byte[] t, final int s) {
-    this(t, s, null);
-  }
-
-  /**
-   * Constructor.
-   * @param t text
-   * @param s buffer size
-   * @param ft fulltext data
-   */
-  BaseXTextTokens(final byte[] t, final int s, final FTPosData ft) {
     text = t;
     size = s;
-    ftdata = ft;
   }
 
   /**
@@ -80,25 +63,6 @@ final class BaseXTextTokens {
    * @return true if the text has more words
    */
   boolean moreWords() {
-    col = Color.black;
-  /*  // quit if text has ended
-    if(pe >= size) return false;
-    ps = pe;
-
-    // find next token boundary
-    final int tl = Token.cl(text[ps]);
-    if(sep()) {
-      pe += tl;
-      return true;
-    }
-    pe += tl;
-    
-    while(pe < size) {
-      if(sep()) break;
-      pe += Token.cl(text[pe]);
-    }
-    return true;
-    */
     // quit if text has ended
     if(pe >= size) return false;
     ps = pe;
@@ -117,26 +81,12 @@ final class BaseXTextTokens {
   }
   
   /**
-   * Get color of current text.
-   * @return current text color
-   */
-  public Color getColor() {
-    return col;
-  }
-
-  /**
    * Returns the next token.
-   * @param w boolean flag if text is written
    * @return next token
    */
-  String nextWord(final boolean w) {
-    if(ftdata != null && w) {
-      final int c = ftdata.getTextCol(ps);
-      col = c == -1 ? Color.black : thumbnailcolor[c];
-    }
+  String nextWord() {
     return Token.string(text, ps, pe - ps);
   }
-
   
   /**
    * Returns the current character type.
@@ -348,7 +298,13 @@ final class BaseXTextTokens {
    */
   String copy() {
     if(ms == -1) return "";
-    return Token.string(text, ms < me ? ms : me, ms < me ? me - ms : ms - me);
+    final TokenBuilder tb = new TokenBuilder();
+    for(int s = ms < me ? ms : me, e = ms < me ? me : ms; s < e; s++) {
+      final byte t = text[s];
+      if(t == 0x0A) tb.add(Text.NL);
+      else if(t < 0x10 || t >= 0x20) tb.add(t);
+    }
+    return tb.toString();
   }
 
   // ERROR MARK ===============================================================

@@ -80,6 +80,10 @@ public class QuerySuggest extends QueryParser {
     if(finish && ltest == Test.NODE) return;
     final byte[] tn = entry(laxis, ltest);
     if(tn == null) return;
+    
+    // [AW] temporarily added to skip Exception after input of "//*["
+    if(stack.empty()) return;
+    
     final ArrayList<SkelNode> list = stack.peek();
     for(int c = list.size() - 1; c >= 0; c--) {
       final SkelNode n = list.get(c);
@@ -128,8 +132,8 @@ public class QuerySuggest extends QueryParser {
     if (t.type == Type.PI) {
       return PI;
     }
-    if(t instanceof NameTest) {
-      final byte[] name = ((NameTest) t).name.ln();
+    if(t instanceof NameTest && t.name != null) {
+      final byte[] name = t.name.ln();
       return a == Axis.ATTR ? Token.concat(ATT, name) : name;
     }
     return Token.EMPTY;

@@ -196,8 +196,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  public void text(final byte[] b, final FTPosData ft, final int[][] ftd)
-      throws IOException {
+  public void text(final byte[] b, final int[][] ftd) throws IOException {
     text(b);
   }
 

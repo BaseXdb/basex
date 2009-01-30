@@ -24,10 +24,11 @@ public final class FTPosData {
   /** Number of pre values. */
   private int size;
 
-  /** Real position list for text. */
+  /** Real position list for text.
   private IntList tpos = new IntList();
-  /** Corresponding color for the real position list for text. */
+  /** Corresponding color for the real position list for text.
   private IntList tcol = new IntList();
+   */
 
   /**
    * Initializes position arrays.
@@ -40,11 +41,11 @@ public final class FTPosData {
 
   /**
    * Initializes container for serialization.
-   */
   public void serialize() {
     tpos = new IntList();
     tcol = new IntList();
   }
+   */
 
   /**
    * Add a node.
@@ -271,41 +272,4 @@ public final class FTPosData {
     }
     return true;
   }
-
-  /**
-   * Adds a text position and color value.
-   * Used to color text in the text view.
-   *
-   * @param pos int real position value of the token
-   * @param col int color
-   */
-  public void addTextPos(final int pos, final int col) {
-    tpos.add(pos);
-    tcol.add(col);
-  }
-
-  /**
-   * Gets real text position and color for a token.
-   * Used to color text in the text view.
-   *
-   * @param pos int real position value of the token
-   * @return col int color
-   */
-  public int getTextCol(final int pos) {
-    int tc = 0;
-    while (tpos.size > 0 && tc < tcol.size && tpos.list[tc] < pos) tc++;
-    return tpos.size > 0 && tc < tpos.list.length && 
-      tpos.list[tc] == pos ? tcol.list[tc++] : -1;
-  }
-
-  /*
-  public static String toString(final int[] p) {
-    if (p == null) return new String("[null]");
-    StringBuffer sb = new StringBuffer();
-    sb.append("[" + p[0]);
-    for (int i = 1; i < p.length; i++) sb.append(", " + p[i]);
-    sb.append("]");
-    return sb.toString();
-  }
-  */
 }

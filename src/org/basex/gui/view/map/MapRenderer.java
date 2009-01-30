@@ -203,7 +203,7 @@ final class MapRenderer {
       }
       if(draw) {
         if (r.pos != null && pp < r.pos.length && count == r.pos[pp]) {
-          g.setColor(thumbnailcolor[r.poi[pp]]);
+          g.setColor(COLORFT[r.poi[pp]]);
           pp++;
         } else g.setColor(textc);
         g.drawString(new String(tok), xx + ll, yy);
@@ -351,7 +351,7 @@ final class MapRenderer {
       if (draw) {
         // draw word
         if (r.pos != null && pp < r.pos.length && count == r.pos[pp]) {
-          g.setColor(thumbnailcolor[r.poi[pp]]);
+          g.setColor(COLORFT[r.poi[pp]]);
           pp++;
         } else
           g.setColor(textc);
@@ -471,7 +471,7 @@ final class MapRenderer {
       wl = 0;
       for (int i = 0; i < tl.size; i++) {
         if (ttcol.list[i] > -1) {
-          g.setColor(thumbnailcolor[ttcol.list[i]]);
+          g.setColor(COLORFT[ttcol.list[i]]);
           g.drawString(new String(tl.list[i]), xx + wl, yy);
           g.setColor(Color.black);
           for(int n = 0; n < tl.list[i].length; n += cl(tl.list[i][n]))
@@ -656,7 +656,7 @@ final class MapRenderer {
           ll += wl - lastl;
           wl = lastl;
         }
-        if (draw) g.setColor(thumbnailcolor[r.poi[pp]]);
+        if (draw) g.setColor(COLORFT[r.poi[pp]]);
         pp++;
       }
 

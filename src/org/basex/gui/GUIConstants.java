@@ -147,6 +147,14 @@ public final class GUIConstants {
   /** Background color. */
   public static final Color COLORDARK = new Color(64, 64, 64);
 
+  /** Colors of full-text hits. */
+  public static final Color[] COLORFT = new Color[] {
+    new Color(224, 64, 64), new Color(0, 224, 0), new Color(255, 128, 0), 
+    new Color(224, 0, 224), new Color(0, 192, 192), new Color(96, 0, 224), 
+    new Color(64, 64, 255), new Color(224, 0, 96), new Color(128, 128, 128),
+    new Color(240, 240, 0)
+  };
+
   /** Transparent background color. */
   public static Color back;
   /** Transparent frame color. */
@@ -178,9 +186,6 @@ public final class GUIConstants {
   /** Fourth mark color. */
   public static Color colormark4;
   
-  /** Thumbnail colors. */
-  public static Color[] thumbnailcolor;
-
   /** Cached treemap colors. */
   public static final Color[] COLORS = new Color[IO.MAXHEIGHT];
 
@@ -248,13 +253,6 @@ public final class GUIConstants {
     back = new Color(c.getRed(), c.getGreen(), c.getBlue(),  40);
     frame = new Color(c.getRed(), c.getGreen(), c.getBlue(),  100);
     
-    // create thumbnail colors
-    thumbnailcolor = new Color[] {
-        new Color(224, 64, 64), new Color(0, 224, 0), new Color(255, 128, 0), 
-        new Color(224, 0, 224), new Color(0, 192, 192), new Color(96, 0, 224), 
-        new Color(64, 64, 255), new Color(224, 0, 96), new Color(128, 128, 128),
-        new Color(240, 240, 0)
-    };
     initFonts();
   }
 

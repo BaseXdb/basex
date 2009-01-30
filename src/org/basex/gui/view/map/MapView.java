@@ -436,7 +436,7 @@ public final class MapView extends View implements Runnable {
             MapRenderer.drawThumbnailsSentenceToolTip(focusedRect, d, false, 
                 Math.max(1.5, focusedRect.thumbf), mouseX, mouseY);
         }
-        MapRenderer.drawToolTip(getGraphics(), mouseX, mouseY, focusedRect);
+        MapRenderer.drawToolTip(g, mouseX, mouseY, focusedRect);
         focusedRect.x -= 3;
         focusedRect.w += 3;
       }

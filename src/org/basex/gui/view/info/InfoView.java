@@ -190,7 +190,7 @@ public final class InfoView extends View {
       tb.add(line);
       tb.add((byte) 0x0A);
     }
-    tb.add((byte) 0x0b);
+    tb.add((byte) 0x0B);
   }
 
   /**
@@ -205,8 +205,8 @@ public final class InfoView extends View {
     tb.add(head);
     tb.add((byte) 0x03);
     tb.add(txt);
-    tb.add((byte) 0x0a);
-    tb.add((byte) 0x0b);
+    tb.add((byte) 0x0A);
+    tb.add((byte) 0x0B);
   }
 
   @Override

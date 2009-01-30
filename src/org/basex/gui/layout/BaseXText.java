@@ -23,7 +23,6 @@ import javax.swing.Timer;
 import javax.swing.border.MatteBorder;
 import org.basex.BaseX;
 import org.basex.core.Prop;
-import org.basex.data.FTPosData;
 import org.basex.gui.GUI;
 import org.basex.gui.GUICommand;
 import org.basex.gui.GUIConstants;
@@ -144,16 +143,6 @@ public final class BaseXText extends BaseXPanel {
    * @param s text size
    */
   public void setText(final byte[] t, final int s) {
-    setText(t, s, null);
-  }
-
-  /**
-   * Sets the output text.
-   * @param t output text
-   * @param s text size
-   * @param ftdata reference
-   */
-  public void setText(final byte[] t, final int s, final FTPosData ftdata) {
     // remove 0x0Ds (carriage return) and compare old with new string
     int ns = 0;
     final int ts = text.size;
@@ -167,7 +156,7 @@ public final class BaseXText extends BaseXPanel {
 
     // new text is different...
     if(!eq) {
-      text = new BaseXTextTokens(t, ns, ftdata);
+      text = new BaseXTextTokens(t, ns);
       rend.setText(text);
       scroll.pos(0);
     }

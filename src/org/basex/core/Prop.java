@@ -158,7 +158,7 @@ public final class Prop {
   /** Property information. */
   private static final String PROPHEADER = "# BaseX Property File." + NL
       + "# This here will be overwritten every time, but" + NL
-      + "# you can set fix options at the end of the file." + NL;
+      + "# you can set your own options at the end of the file." + NL;
   /** Property information. */
   private static final String PROPUSER = "# User defined section";
 

@@ -506,7 +506,7 @@ public final class GUI extends JFrame {
         if(ok) pr.output(out);
         else out.println(inf);
         out.addInfo();
-        text.setText(out, nodes);
+        text.setText(out);
       }
 
       // check if query feedback was processed in the query view

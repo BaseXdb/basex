@@ -97,9 +97,7 @@ public final class XMLSerializer extends Serializer {
   }
 
   @Override
-  public void text(final byte[] b, final FTPosData ft, final int[][] ftd)
-      throws IOException {
-
+  public void text(final byte[] b, final int[][] ftd) throws IOException {
     finishElement();
     int c = -1, pp = 0, wl = 0;
     FTTokenizer ftt = new FTTokenizer(b);
@@ -109,7 +107,7 @@ public final class XMLSerializer extends Serializer {
         if(Token.letterOrDigit(b[i]) && pp < ftd[0].length && c == ftd[0][pp]) {
           // write fulltext pointer in front of the token
           // used for coloring the token
-          ft.addTextPos(out.size(), ftd[1][pp++]);
+          out.write(0x10 + (ftd[1][pp++] & 0x0F));
         }
         ch(b[i]);
       }
