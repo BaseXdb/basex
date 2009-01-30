@@ -5,6 +5,7 @@ import org.basex.data.Data;
 //import org.basex.gui.view.ViewData;
 import org.basex.gui.view.ViewRect;
 import org.basex.util.IntList;
+import org.basex.util.Token;
 
 /**
  * Uses a StripLayout Algorithm to divide Rectangles.
@@ -25,6 +26,7 @@ public final class StripLayout extends MapLayout {
     } else {
       // number of nodes used to calculate rect size
       int nn = l.list[ne] - l.list[ns];
+      long parsize = addSizes(l, ns, ne, data);
       int ni = ns;
       // running start holding first element of current row
       int start = ns;
@@ -39,42 +41,48 @@ public final class StripLayout extends MapLayout {
       double height = 0;
       while(ni < ne) {
         // height of current strip
-          height = (l.list[ni + 1] - l.list[start]) * hh / nn;
-          ArrayList<ViewRect> tmp = new ArrayList<ViewRect>();
-          // create temporary row including current rectangle
-          double x = xx;
-          for(int i = start; i <= ni; i++) {
-            double w = (l.list[i + 1] - l.list[i]) * ww /
-              (l.list[ni + 1] - l.list[start]);
-            tmp.add(new ViewRect((int) x, (int) yy, (int) w, (int) height,
-                l.list[i], level));
-            x += w;
-          }
+        long size = addSizes(l, start, ni + 1, data);
+        int childs = l.list[ni + 1] - l.list[start];
+        double weight = calcWeight(size, childs, parsize, nn, data);
+        height = weight * hh;
+        
+        ArrayList<ViewRect> tmp = new ArrayList<ViewRect>();
+        // create temporary row including current rectangle
+        double x = xx;
+        for(int i = start; i <= ni; i++) {
+          long tmpsize = Token.toLong(data.attValue(data.sizeID, l.list[i]));
+          double w = calcWeight(tmpsize, l.list[i + 1] - l.list[i], 
+              size, childs, data) * ww;
+          tmp.add(new ViewRect((int) x, (int) yy, (int) w, (int) height,
+              l.list[i], level));
+          x += w;
+        }
 
-          // if ar has increased discard tmp and add row
-          if(lineRatio(tmp) > lineRatio(row)) {
-            // add rects of row using recursion
-            for(int i = 0; i < row.size(); i++) {
-              IntList newl = new IntList(1);
-              newl.add(row.get(i).pre);
-              calcMap(data, row.get(i), mainRects, newl, 0, 1, level);
-            }
-            // preparing for new line to lay out
-            hh -= row.get(0).h;
-            yy += row.get(0).h;
-            tmp.clear();
-            row.clear();
-            start = ni;
-            nn = l.list[ne] - l.list[start];
-            // sometimes there has to be one rectangles to fill the left space
-            if(ne == ni + 1) {
-              row.add(new ViewRect((int) xx, (int) yy, (int) ww, (int) hh,
-                  l.list[ni], level));
-              break;
-            }
+        // if ar has increased discard tmp and add row
+        if(lineRatio(tmp) > lineRatio(row)) {
+          // add rects of row using recursion
+          for(int i = 0; i < row.size(); i++) {
+            IntList newl = new IntList(1);
+            newl.add(row.get(i).pre);
+            calcMap(data, row.get(i), mainRects, newl, 0, 1, level);
           }
-          row = tmp;
-          ni++;
+          // preparing for new line to lay out
+          hh -= row.get(0).h;
+          yy += row.get(0).h;
+          tmp.clear();
+          row.clear();
+          start = ni;
+          nn = l.list[ne] - l.list[start];
+          parsize = addSizes(l, start, ne, data);
+          // sometimes there has to be one rectangles to fill the left space
+          if(ne == ni + 1) {
+            row.add(new ViewRect((int) xx, (int) yy, (int) ww, (int) hh,
+                l.list[ni], level));
+            break;
+          }
+        }
+        row = tmp;
+        ni++;
       }
 
       // adding remaining rectangles
