@@ -410,8 +410,6 @@ public final class MapView extends View implements Runnable {
         if(tt.length() > 32) tt = tt.substring(0, 30) + DOTS;
         BaseXLayout.drawTooltip(g, tt, x, y, getWidth(), focusedRect.level + 5);
       }
-      // add interactions for current thumbnail rectangle...
-      // if(focusedRect.thumb) ...
       
       if (focusedRect.thumb) {
         final byte[] text = ViewData.content(gui.context.data(), 
@@ -425,11 +423,20 @@ public final class MapView extends View implements Runnable {
           case 0 :
             MapRenderer.drawThumbnailsToken(g, focusedRect, d, 
                 false, mouseX, mouseY);
-            MapRenderer.drawToolTip(g, mouseX, mouseY);            
-          //case 1 :
-          //case 2 :
-          //default :
+            break;
+          case 1 :
+            MapRenderer.drawThumbnailsSentenceToolTip(focusedRect, d, true, 
+                focusedRect.thumbf, mouseX, mouseY);
+            break;
+          case 2 :
+            MapRenderer.drawThumbnailsSentenceToolTip(focusedRect, d, false, 
+                focusedRect.thumbf, mouseX, mouseY);
+            break;
+          default :
+            MapRenderer.drawThumbnailsSentenceToolTip(focusedRect, d, false, 
+                Math.max(1.5, focusedRect.thumbf), mouseX, mouseY);
         }
+        MapRenderer.drawToolTip(getGraphics(), mouseX, mouseY, focusedRect);
         focusedRect.x -= 3;
         focusedRect.w += 3;
       }

@@ -9,6 +9,7 @@ import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.ViewRect;
 import org.basex.index.FTTokenizer;
+import org.basex.util.Array;
 import org.basex.util.IntList;
 import org.basex.util.TokenList;
 
@@ -293,7 +294,7 @@ final class MapRenderer {
     }
     int sum = data[2][0];
     for (int i = 1; i < data[2].length; i++) sum += data[2][i];
-    int nl = (r.h - 3) / lhmi + 1;
+    int nl = (r.h - 6) / lhmi + 1;
     double fnew = (double) (nl * r.w) / (double) sum;
     r.thumbf = fnew;
     r.thumbfh = fhmi;
@@ -360,8 +361,7 @@ final class MapRenderer {
       // check if cursor is inside the rect
       if (x > 0 && y > 0 
           && (inRect((int) (xx + ll) + 1, yy, wl, r.thumbfh, x, y) || ml > 0)) {
-        ml = ml == 0 ? Math.max(
-            (int) (ww - ll) / GUIProp.fontsize + 2, data[0][i] + 2) : ml;
+        ml = ml == 0 ? getTooltipLength((int) ww) : ml;
         final byte[] tok = new byte[data[0][i] + 2 < ml ? data[0][i] : ml];
         int k = 0;
         for (; k < tok.length - (data[0][i] + 2 < ml ? 0 : 2); k++)
@@ -400,6 +400,7 @@ final class MapRenderer {
         ll += r.thumbf;         
         psl++;
         sl = 0;
+        ml = 0;
       }
 
       ll += r.thumbf;
@@ -416,7 +417,16 @@ final class MapRenderer {
     }
     return yy - r.y + 3;
   }
-
+  
+  /**
+   * Get tooltip length.
+   * @param ww int width
+   * @return tooltip length
+   */
+  private static int getTooltipLength(final int ww) {
+    return (ww / (GUIProp.fontsize)) + 2;
+  }
+  
   /**
    * Checks if cursor is inside the rect. 
    * 
@@ -438,26 +448,134 @@ final class MapRenderer {
    * @param g graphics reference
    * @param x x-value 
    * @param y y-value
+   * @param r ViewRect 
    */
-  public static void drawToolTip(final Graphics g, final int x, final int y) {
+  public static void drawToolTip(final Graphics g, final int x, final int y, 
+      final ViewRect r) {
     if (tl != null && tl.size > 0) {
       final int[] cw = fontWidths(g.getFont());
       final int sw = BaseXLayout.width(g, cw, ' ');
       int wl = 0;
       for (int i = 0; i < tl.size; i++) {
+        for(int n = 0; n < tl.list[i].length; n += cl(tl.list[i][n]))
+          wl += BaseXLayout.width(g, cw, cp(tl.list[i], n));
+        wl += sw;
+      }
+      final int xx = x + 10 + wl  >= r.w ? r.w - wl : x + 10;
+      final int yy = r.y + r.h - 3 > y + 28 ? y + 28 : y - r.thumblh * 2;
+
+      g.setColor(Color.white);
+      g.fillRect(xx - 1, yy - GUIProp.fontsize - 1, wl + 1, 
+          GUIProp.fontsize + 4);
+      g.setColor(Color.black);
+      wl = 0;
+      for (int i = 0; i < tl.size; i++) {
         if (ttcol.list[i] > -1) {
-          final Color c = g.getColor();
           g.setColor(thumbnailcolor[ttcol.list[i]]);
-          g.drawString(new String(tl.list[i]), x + wl, y);
-          g.setColor(c);
+          g.drawString(new String(tl.list[i]), xx + wl, yy);
+          g.setColor(Color.black);
           for(int n = 0; n < tl.list[i].length; n += cl(tl.list[i][n]))
             wl += BaseXLayout.width(g, cw, cp(tl.list[i], n));          
         } else {
-          g.drawString(new String(tl.list[i]), x + wl, y);
+          g.drawString(new String(tl.list[i]), xx + wl, yy);
           for(int n = 0; n < tl.list[i].length; n += cl(tl.list[i][n]))
             wl += BaseXLayout.width(g, cw, cp(tl.list[i], n));
         }
         wl += sw;
+      }
+    }
+  }
+  
+  /**
+   * Draws a text using thumbnail visualization.
+   * @param r rectangle
+   * @param data fulltext to be drawn
+   * @param sen flag for sentence or paragraphe
+   * @param sw length of a space
+   * @param x mouseX
+   * @param y mouseY
+   */
+  public static void drawThumbnailsSentenceToolTip(final ViewRect r,
+      final int[][] data, final boolean sen, final double sw, 
+      final int x, final int y) {
+    final double ww = r.w;
+    int yy = r.y + 3;
+    
+    int wl = 0; // word length
+    int ll = 0; // line length
+    
+    int psl = 0, ppl = 0, pl = 0, sl = 0, cc = 0;
+    int pp = 0;
+    tl = new TokenList();
+    ttcol = new IntList();
+    boolean ir;
+    for (int i = 0; i < data[0].length; i++) {
+      ir = false;
+      wl = (int) (data[0][i] * r.thumbf);
+      pl += data[0][i];
+      sl += data[0][i];
+      cc += data[0][i];
+      
+      if (ll + wl >= ww) {
+        ir = inRect(r.x + ll, yy, wl - ll, r.thumbfh, x, y);
+        ll = wl - (int) (ww - ll);
+        yy += r.thumblh;
+        ir |= inRect(r.x, yy, ll, r.thumbfh, x, y);        
+      } else {
+        ir |= inRect(r.x + ll, yy, wl, r.thumbfh, x, y);
+        ll += wl;
+      }
+      
+      if (ir) {
+        final int ttl = getTooltipLength(r.w);
+        int c = 0, j = 0;
+        cc = cc - data[0][i];
+        while (c < ttl && i + j < data[0].length) {
+          final byte[] tok = new byte[data[0][i + j]];
+          int k = 0;
+          for (; k < tok.length && c++ < ttl; k++)
+            tok[k] = (byte) data[3][cc + k];
+          
+          cc += k;
+          if (k < tok.length) {
+            tok[k] = '.';
+            tok[k + 1 < tok.length ? k + 1 : k - 1] = '.';
+            tl.add(Array.finish(tok, k + 2));
+          } else tl.add(tok);
+          
+          if (r.pos != null) { 
+            while(pp < r.pos.length && i + j > r.pos[pp]) pp++;
+            if (pp < r.pos.length && i + j == r.pos[pp]) {
+              ttcol.add(r.poi[pp]);
+              pp++;
+            } else ttcol.add(-1);
+          } else ttcol.add(-1);
+          c++;
+          j++;
+        }
+        return;
+      }
+      // new sentence
+      if (psl < data[1].length && data[1][psl] == sl) {
+        if (ll + sw >= ww) {
+          yy += r.thumblh; 
+          ll = 0;
+        }
+
+        ll += sw; 
+        sl = 0;
+        psl++;
+      }
+
+      // new paragraph
+      if (ppl < data[2].length && data[2][ppl] == pl) {
+        pl = 0;
+        ppl++;
+        if (sen) {
+          yy += r.thumblh;
+          wl = 0;
+          ll = 0;
+        }
       }
     }
   }
@@ -493,16 +611,18 @@ final class MapRenderer {
     int psl = 0, ppl = 0;
     
     int i = 0;
+    tl = new TokenList();
     while (i < data[0].length) {
       final int io = i;
       while (ll + wl < ww && i < data[0].length && 
-          psl < data[1].length && ppl < data[2].length &&
-          data[1][psl] > sl && data[2][ppl] > pl &&
+          ppl < data[2].length && data[2][ppl] > pl &&
+          (psl < data[1].length && data[1][psl] > sl ||
+          psl >= data[1].length) &&
           (r.pos == null || (pp < r.pos.length && count < r.pos[pp])
               || pp == r.pos.length)) {
         sl += data[0][i];
         pl += data[0][i];
-        lastl = (int) (data[0][i] * r.thumbf); //f);
+        lastl = (int) (data[0][i] * r.thumbf);
         wl += lastl;
         count++;
         if (i < data[0].length) i++;
@@ -578,7 +698,7 @@ final class MapRenderer {
       }
     }
     
-    return yy - r.y + 3;
+    return yy - r.y;
   }
 
   /**
