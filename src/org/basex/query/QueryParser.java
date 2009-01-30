@@ -1165,7 +1165,6 @@ public class QueryParser extends InputParser {
    */
   private Expr path() throws QueryException {
     final int s = consume('/') ? consume('/') ? 2 : 1 : 0;
-    //checkStep(Axis.DESCORSELF, test(false));
     final Expr ex = step();
     if(ex == null) {
       if(s > 1) Err.or(PATHMISS);
@@ -1235,6 +1234,7 @@ public class QueryParser extends InputParser {
     } else if(consume('@')) {
       ax = Axis.ATTR;
       test = test(true);
+      checkStep(ax, test);
       if(test == null) Err.or(NOATTNAME);
     } else {
       for(final Axis a : Axis.values()) {
@@ -1244,6 +1244,7 @@ public class QueryParser extends InputParser {
           ap = qp;
           ax = a;
           test = test(a == Axis.ATTR);
+          checkStep(ax, test);
           break;
         }
       }
@@ -1251,6 +1252,7 @@ public class QueryParser extends InputParser {
     if(ax == null) {
       ax = Axis.CHILD;
       test = test(false);
+      checkStep(ax, test);
       if(test != null && test.type == Type.ATT) ax = Axis.ATTR;
     }
     if(test == null) return null;

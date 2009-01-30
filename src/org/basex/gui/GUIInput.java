@@ -162,10 +162,10 @@ public final class GUIInput extends BaseXTextField {
     final String query = getText();
     if(cmdMode()) {
       cmdPopup(query);
-    }/* else if(GUIProp.searchmode == 1 ||
+    } else if(GUIProp.searchmode == 1 ||
         GUIProp.searchmode == 0 && query.startsWith("/")) {
       queryPopup(query);
-    }*/
+    }
   }
 
   /**
@@ -190,11 +190,11 @@ public final class GUIInput extends BaseXTextField {
    * Shows the xpath popup menu.
    * @param query query input
    */
-  @SuppressWarnings("unused")
   private void queryPopup(final String query) {
     StringList sl = null;
     try {
-      final QuerySuggest parser = new QuerySuggest(new QueryContext());
+      final QuerySuggest parser = new QuerySuggest(new QueryContext(),
+          gui.context);
       parser.parse(query, null, null);
       sl = parser.complete();
       pre = query.substring(0, xPos(query) + 1);
@@ -210,7 +210,6 @@ public final class GUIInput extends BaseXTextField {
    * @param query input query
    * @return position
    */
-  @SuppressWarnings("unused")
   private int xPos(final String query) {
     for(int q = query.length() - 1; q >= 0; q--) {
       final int c = query.charAt(q);

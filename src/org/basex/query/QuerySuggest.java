@@ -1,5 +1,7 @@
 package org.basex.query;
 
+import static org.basex.data.DataText.*;
+
 import java.util.ArrayList;
 import java.util.Stack;
 import org.basex.core.Context;
@@ -35,9 +37,12 @@ public class QuerySuggest extends QueryParser {
   /**
    * Constructor.
    * @param c QueryContext
+   * @param context Context
    */
-  public QuerySuggest(final QueryContext c) {
+  public QuerySuggest(final QueryContext c, final Context context) {
     super(c);
+    ctx = context;
+    skel = ctx.data().skel;
   }
 
   @Override
@@ -113,25 +118,20 @@ public class QuerySuggest extends QueryParser {
    * @param t text
    * @return completion
    */
-  @SuppressWarnings("unused")
   private byte[] entry(final Axis a, final Test t) {
+    if (t.type == Type.TXT) {
+      return TEXT;
+    }
     if(t.type == Type.COM) {
-      //...
+      return COMM;
+    }
+    if (t.type == Type.PI) {
+      return PI;
     }
     if(t instanceof NameTest) {
-      if(t.type == Type.ELM) {
-        
-      } else if(t.type == Type.ATT) {
-        
-      }
-    }
-      /*if(t == Type.TEXT) return TEXT;
-    if(t == TestNode.COMM) return COMM;
-    if(t == TestNode.PI) return PI;
-    if(t instanceof TestName) {
-      final byte[] name = ((TestName) t).name;
+      final byte[] name = ((NameTest) t).name.ln();
       return a == Axis.ATTR ? Token.concat(ATT, name) : name;
-    }*/
+    }
     return Token.EMPTY;
   }
   /*
