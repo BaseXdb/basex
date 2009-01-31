@@ -561,17 +561,22 @@ public class QueryParser extends InputParser {
     final QNm name = varName();
     if(module != null && !name.uri.eq(module.uri)) Err.or(MODNS, name);
 
-    final SeqType type = consumeWS(AS) ? sequenceType() : null;
-    final Var var = new Var(name, type);
+    final SeqType typ = consumeWS(AS) ? sequenceType() : null;
+    final Var var = new Var(name, true, typ);
     final Var ext = ctx.vars.get(var);
 
     if(consumeWS2(EXTERNAL)) {
       if(ext == null) {
         ctx.vars.addGlobal(var);
-      } else if(type != null) {
-        // variable has been bound before parsing the query
-        ext.type = type;
-        ext.item = ext.check(ext.item, ctx);
+      } else {
+        if(ext.expr == null || typ != null && ext.item == null) {
+          Err.or(VARDEFINE, var);
+        }
+        // a variable has been bound before the query has been parsed...
+        if(typ != null) {
+          ext.type = typ;
+          ext.item(ctx);
+        }
       }
     } else {
       if(ext != null) Err.or(VARDEFINE, var);
@@ -611,7 +616,7 @@ public class QueryParser extends InputParser {
     while(curr() == '$') {
       final QNm arg = varName();
       final SeqType argType = consumeWS(AS) ? sequenceType() : null;
-      final Var var = new Var(arg, argType);
+      final Var var = new Var(arg, true, argType);
       ctx.vars.add(var);
 
       for(final Var v : args) if(v.name.eq(arg)) Err.or(FUNCDUPL, arg);
@@ -623,7 +628,7 @@ public class QueryParser extends InputParser {
     check(PAR2);
 
     final SeqType type = consumeWS(AS) ? sequenceType() : null;
-    final Func func = new Func(new Var(name, type), args, true);
+    final Func func = new Func(new Var(name, true, type), args, true);
 
     ctx.fun.add(func);
     if(!consumeWS(EXTERNAL)) func.expr = enclosed(NOFUNBODY);
@@ -745,10 +750,12 @@ public class QueryParser extends InputParser {
 
         final QNm name = varName();
         final SeqType type = !score && consumeWS(AS) ? sequenceType() : null;
-        final Var var = new Var(name, type);
+        final Var var = new Var(name, false, type);
 
-        final Var at = fr && consumeWS(AT) ? new Var(varName()) : null;
-        final Var sc = fr && consumeWS(SCORE) ? new Var(varName()) : null;
+        final Var at = fr && consumeWS(AT) ?
+            new Var(varName(), false) : null;
+        final Var sc = fr && consumeWS(SCORE) ?
+            new Var(varName(), false) : null;
 
         check(fr ? IN : ASSIGN);
         final Expr e = check(single(), VARMISSING);
@@ -811,7 +818,8 @@ public class QueryParser extends InputParser {
     final int s = ctx.vars.size();
     For[] fl = {};
     do {
-      final Var var = new Var(varName(), consumeWS(AS) ? sequenceType() : null);
+      final Var var = new Var(varName(), false,
+          consumeWS(AS) ? sequenceType() : null);
       check(IN);
       final Expr e = check(single(), NOSOME);
       ctx.vars.add(var);
@@ -845,7 +853,7 @@ public class QueryParser extends InputParser {
         name = varName();
         check(AS);
       }
-      final Var var = new Var(name, sequenceType());
+      final Var var = new Var(name, false, sequenceType());
       if(name != null) ctx.vars.add(var);
       check(RETURN);
       final Expr ret = check(single(), NOTYPESWITCH);
@@ -858,7 +866,7 @@ public class QueryParser extends InputParser {
     skipWS();
     final int s = ctx.vars.size();
     final QNm name = curr() == '$' ? varName() : null;
-    final Var var = name != null ? new Var(name, null) : null;
+    final Var var = name != null ? new Var(name, false, null) : null;
     if(var != null) ctx.vars.add(var);
     check(RETURN);
 
@@ -1360,7 +1368,7 @@ public class QueryParser extends InputParser {
     if(quote(c)) return new Str(stringLiteral(), true);
     // variables
     if(c == '$') {
-      final Var var = new Var(varName());
+      final Var var = new Var(varName(), false);
       if(ctx.vars.get(var) == null) Err.or(VARNOTDEFINED, var);
       return new VarCall(var);
     }
@@ -1738,7 +1746,7 @@ public class QueryParser extends InputParser {
   private Expr compDocConstructor() throws QueryException {
     if(!consumeWS2(BRACE1)) return null;
     final Expr e = check(expr(), NODOCCONS);
-    consumeWS2(BRACE2);
+    check(BRACE2);
     return new CDoc(e);
   }
 
@@ -1810,7 +1818,7 @@ public class QueryParser extends InputParser {
   private Expr compCommentConstructor() throws QueryException {
     if(!consumeWS2(BRACE1)) return null;
     final Expr e = check(expr(), NOCOMCONS);
-    consumeWS2(BRACE2);
+    check(BRACE2);
     return new CComm(e);
   }
 
@@ -1995,14 +2003,14 @@ public class QueryParser extends InputParser {
       Var var3 = null;
       final int s = ctx.vars.size();
       if(consumeWS2(PAR1)) {
-        var1 = new Var(varName());
+        var1 = new Var(varName(), false);
         ctx.vars.add(var1);
         if(consumeWS2(COMMA)) {
-          var2 = new Var(varName());
+          var2 = new Var(varName(), false);
           if(var1.name.eq(var2.name)) Err.or(VARDEFINED, var2);
           ctx.vars.add(var2);
           if(consumeWS2(COMMA)) {
-            var3 = new Var(varName());
+            var3 = new Var(varName(), false);
             if(var1.name.eq(var3.name) || var2.name.eq(var3.name))
               Err.or(VARDEFINED, var3);
             ctx.vars.add(var3);

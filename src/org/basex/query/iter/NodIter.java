@@ -82,11 +82,10 @@ public final class NodIter extends NodeIter {
     list = tmp;
   }
 
-  /**
-   * Resets the iterator.
-   */
-  public void reset() {
+  @Override
+  public boolean reset() {
     pos = -1;
+    return true;
   }
 
   @Override
@@ -96,7 +95,12 @@ public final class NodIter extends NodeIter {
   }
 
   @Override
-  public long size() {
+  public Item get(final long i) {
+    return i < size ? list[(int) i] : null;
+  }
+
+  @Override
+  public int size() {
     return size;
   }
 

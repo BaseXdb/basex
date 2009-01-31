@@ -5,6 +5,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.util.Err;
@@ -23,8 +24,8 @@ public final class Root extends Simple {
     Item i;
     while((i = iter.next()) != null) {
       final Nod n = root(i);
-      if(n == null) Err.or(CTXNODE, this);
-      ni.add(n);
+      if(n == null || n.type != Type.DOC) Err.or(CTXNODE, this);
+     ni.add(n);
     }
     return ni;
   }
@@ -37,8 +38,11 @@ public final class Root extends Simple {
   public Nod root(final Item i) {
     if(!i.node()) return null;
     Nod n = (Nod) i;
-    while(n.parent() != null) n = n.parent();
-    return n;
+    while(true) {
+      final Nod p = n.parent();
+      if(p == null) return n;
+      n = p;
+    }
   }
 
   @Override

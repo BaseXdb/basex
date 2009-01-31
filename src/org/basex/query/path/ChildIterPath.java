@@ -28,8 +28,8 @@ public final class ChildIterPath extends AxisPath {
   public Iter iter(final QueryContext ctx) {
     return new Iter() {
       final Item c = ctx.item;
-      final int cs = ctx.size;
-      final int cp = ctx.pos;
+      final long cs = ctx.size;
+      final long cp = ctx.pos;
       private Iter[] iter;
       private Iter ir;
       private Item item;
@@ -45,7 +45,7 @@ public final class ChildIterPath extends AxisPath {
           iter = new Iter[step.length];
           iter[0] = ctx.iter(step[0]);
           //for(int f = 0; f < step.length; f++) iter[f] = ctx.iter(step[f]);
-          ctx.size = item.size();
+          ctx.size = item.size(ctx);
           ctx.pos = 1;
         }
 

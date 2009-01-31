@@ -49,8 +49,7 @@ public final class CDoc extends Single {
           text.reset();
         }
         if(it.type == Type.DOC) {
-          final NodeIter ni = ((Nod) it).child();
-          if(ni.next() != null) nodes.add(((Nod) it).copy());
+          add(nodes, (Nod) it);
         } else {
           nodes.add(((Nod) it).copy());
         }
@@ -69,6 +68,18 @@ public final class CDoc extends Single {
     final FDoc doc = new FDoc(nodes, base);
     for(int n = 0; n < nodes.size; n++) nodes.list[n].parent(doc);
     return doc.iter();
+  }
+  
+  /**
+   * Recursively adds children of a document node.
+   * @param nodes node container
+   * @param doc document node
+   * @throws QueryException query exception
+   */
+  private void add(final NodIter nodes, final Nod doc) throws QueryException {
+    final NodeIter ni = doc.child();
+    Nod it;
+    while((it = ni.next()) != null) nodes.add(it.copy());
   }
   
   @Override

@@ -59,7 +59,7 @@ public final class FunCall extends Arr {
 
   @Override
   public Return returned(final QueryContext ctx) {
-    return func.returned(ctx);
+    return func != null ? func.returned(ctx) : super.returned(ctx);
   }
 
   @Override

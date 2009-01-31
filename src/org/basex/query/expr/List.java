@@ -37,6 +37,17 @@ public final class List extends Arr {
   }
 
   @Override
+  public long size(final QueryContext ctx) throws QueryException {
+    long s = 0;
+    for(final Expr e : expr) {
+      final long c = e.size(ctx);
+      if(c == -1) return -1;
+      s += c;
+    }
+    return s;
+  }
+
+  @Override
   public String toString() {
     final TokenBuilder sb = new TokenBuilder(name()).add('(');
     for(int v = 0; v != expr.length; v++) {

@@ -2,7 +2,6 @@ package org.basex.query.path;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
-
 import java.io.IOException;
 import java.util.HashSet;
 import org.basex.data.Data;
@@ -16,7 +15,6 @@ import org.basex.query.expr.Preds;
 import org.basex.query.expr.Return;
 import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
-import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.Nod;
@@ -80,13 +78,13 @@ public class Step extends Preds {
   public Expr comp(final QueryContext ctx) throws QueryException {
     if(!test.comp(ctx)) return Seq.EMPTY;
     
-    final DBNode db = ctx.dbroot();
+    final Data data = ctx.data();
     ctx.leaf = false;
-    if(db != null && test.kind == Kind.NAME) {
+    if(data != null && test.kind == Kind.NAME) {
       final byte[] ln = ((NameTest) test).ln;
       final boolean att = test.type == Type.ATT;
-      ctx.leaf = axis.down && db.data.meta.uptodate && db.data.ns.size() == 0 &&
-        db.data.tags.stat(att ? db.data.attNameID(ln) : db.data.tagID(ln)).leaf;
+      ctx.leaf = axis.down && data.meta.uptodate && data.ns.size() == 0 &&
+        data.tags.stat(att ? data.attNameID(ln) : data.tagID(ln)).leaf;
     }
     final Expr e = super.comp(ctx);
     ctx.leaf = false;

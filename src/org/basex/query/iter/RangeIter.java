@@ -38,18 +38,23 @@ public final class RangeIter extends Iter {
   }
 
   @Override
-  public long size() {
-    return Math.abs(max - min);
+  public int size() {
+    return (int) Math.abs(max - min);
   }
 
-  /**
-   * Reverses the iterator.
-   */
-  public void reverse() {
+  @Override
+  public Item get(final long i) {
+    return asc ? min + i >= max ? null : Itr.get(min + i) :
+                 min - i <= max ? null : Itr.get(min - i);
+  }
+
+  @Override
+  public boolean reverse() {
     pos = max;
     max = min + (asc ? -1 : 1);
     min = pos + (asc ? -1 : 1);
     asc ^= true;
+    return true;
   }
 
   @Override

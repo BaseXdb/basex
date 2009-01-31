@@ -17,7 +17,6 @@ import org.basex.query.item.Seq;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ResetIter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.path.Axis;
 import org.basex.query.path.AxisPath;
@@ -155,7 +154,7 @@ public final class CmpG extends Arr {
     
     // evaluate single items
     if(s1 && expr[1].i()) return eval(ir1.next(), (Item) expr[1], cmp.cmp);
-    final Iter ir2 = ctx.iter(expr[1]);
+    Iter ir2 = ctx.iter(expr[1]);
     // skip empty result
     if(ir2.size() == 0) return false;
     final boolean s2 = ir2.size() == 1;
@@ -172,10 +171,7 @@ public final class CmpG extends Arr {
     }
     
     // evaluate two iterators
-    final ResetIter ir;
-    if(ir2 instanceof ResetIter) {
-      ir = (ResetIter) ir2;
-    } else {
+    if(!ir2.reset()) {
       // cache items for next comparisons
       final SeqIter seq = new SeqIter();
       if((it1 = ir1.next()) != null) {
@@ -184,11 +180,12 @@ public final class CmpG extends Arr {
           seq.add(it2);
         }
       }
-      ir = seq;
+      ir2 = seq;
     }
+
     while((it1 = ir1.next()) != null) {
-      ir.reset();
-      while((it2 = ir.next()) != null) if(eval(it1, it2, cmp.cmp)) return true;
+      ir2.reset();
+      while((it2 = ir2.next()) != null) if(eval(it1, it2, cmp.cmp)) return true;
     }
     return false;
   }

@@ -9,6 +9,7 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Return;
 import org.basex.query.item.FTNodeItem;
+import org.basex.query.item.Item;
 import org.basex.query.iter.FTNodeIter;
 import org.basex.query.util.Var;
 
@@ -105,15 +106,17 @@ public abstract class FTExpr extends Expr {
     return new FTNodeIter() {
       private boolean more;
       @Override
-      public FTNodeItem next() {
-        more ^= true;
-        if(!more) return null;
+      public FTNodeItem next() { return (more ^= true) ? item() : null; }
+      @Override
+      public int size() { return 1; }
+      @Override
+      public Item get(final long i) { return i == 0 ? item() : null; }
+
+      private FTNodeItem item() {
         final FTNodeItem ftn = new FTNodeItem();
         ftn.score(s);
         return ftn;
       }
-      @Override
-      public long size() { return 1; }
     };
   }
 

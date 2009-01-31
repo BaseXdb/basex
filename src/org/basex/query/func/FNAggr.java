@@ -15,7 +15,6 @@ import org.basex.query.item.Itr;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
-import org.basex.query.path.AxisPath;
 import org.basex.query.util.Err;
 
 /**
@@ -32,7 +31,7 @@ public final class FNAggr extends Fun {
 
     switch(func) {
       case COUNT:
-        long c = iter.size();
+        int c = iter.size();
         if(c == -1) do ++c; while(iter.next() != null);
         return Itr.get(c).iter();
       case MIN:
@@ -53,29 +52,16 @@ public final class FNAggr extends Fun {
   }
 
   @Override
-  public Expr c(final QueryContext ctx) {
+  public Expr c(final QueryContext ctx) throws QueryException {
     switch(func) {
       case AVG:
         return args[0].e() ? Seq.EMPTY : this;
       case COUNT:
-        final int c = count(args[0], ctx);
+        final long c = args[0].size(ctx);
         return c >= 0 ? Itr.get(c) : this;
       default:
         return this;
     }
-  }
-  
-  /**
-   * Counts the number of expected results for the specified expression.
-   * @param arg argument
-   * @param ctx query context
-   * @return number of results
-   */
-  public static int count(final Expr arg, final QueryContext ctx) {
-    if(arg.e()) return 0;
-    if(arg.i()) return 1;
-    if(arg instanceof Seq) return ((Seq) arg).size();
-    return arg instanceof AxisPath ? ((AxisPath) arg).count(ctx) : -1;
   }
 
   /**

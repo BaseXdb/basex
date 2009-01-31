@@ -54,7 +54,7 @@ final class FNNum extends Fun {
       case ABS:    return abs(it);
       case CEIL:   return num(it, d, Math.ceil(d));
       case FLOOR:  return num(it, d, Math.floor(d));
-      case RND:    return num(it, d, Math.rint(d));
+      case RND:    return rnd(it);
       case RNDHLF: return rnd(it, d, arg);
       default: BaseX.notexpected(func); return null;
     }
@@ -80,22 +80,20 @@ final class FNNum extends Fun {
   }
 
   /**
-   * Returns a numeric result with the correct data type.
+   * Returns a rounded item.
    * @param it input item
-   * @param n input double value
-   * @param d calculated double value
-   * @return numeric item
+   * @return absolute item
+   * @throws QueryException evaluation exception
    */
-  private Item num(final Item it, final double n, final double d) {
-    final Item i = it.u() ? Dbl.get(n) : it;
-    if(n == d) return i;
-
-    switch(it.type) {
-      case DEC: return Dec.get(d);
-      case DBL: return Dbl.get(d);
-      case FLT: return Flt.get((float) d);
-      default:  return Itr.get((long) d);
+  private Item rnd(final Item it) throws QueryException {
+    final double d = it.dbl();
+    if(it.type != Type.DEC) {
+      return num(it, d, d == d && d != 0 && d >= Long.MIN_VALUE &&
+          d < Long.MAX_VALUE ? d >= -.5d && d < 0 ? -0d : Math.round(d) : d);
     }
+    final BigDecimal bd = it.dec();
+    return Dec.get(bd.setScale(0, bd.signum() > 0 ? BigDecimal.ROUND_HALF_UP :
+      BigDecimal.ROUND_HALF_DOWN));
   }
 
   /**
@@ -119,6 +117,25 @@ final class FNNum extends Fun {
     if(p == 1 && (d % 2 == .5 || d % 2 == -1.5)) d -= .5;
     else d = Math.floor(d * p + .5) / p;
     return num(it, n, d);
+  }
+
+  /**
+   * Returns a numeric result with the correct data type.
+   * @param it input item
+   * @param n input double value
+   * @param d calculated double value
+   * @return numeric item
+   */
+  private Item num(final Item it, final double n, final double d) {
+    final Item i = it.u() ? Dbl.get(n) : it;
+    if(n == d) return i;
+
+    switch(it.type) {
+      case DEC: return Dec.get(d);
+      case DBL: return Dbl.get(d);
+      case FLT: return Flt.get((float) d);
+      default:  return Itr.get((long) d);
+    }
   }
 
   /**

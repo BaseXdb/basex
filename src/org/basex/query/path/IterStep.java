@@ -43,7 +43,7 @@ public final class IterStep extends Step {
   public NodeIter iter(final QueryContext ctx) {
     return new NodeIter() {
       final Item ci = ctx.item;
-      final int cp = ctx.pos;
+      final long cp = ctx.pos;
       boolean more = true;
       NodeIter ir;
       Iter iter;

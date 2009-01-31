@@ -57,6 +57,17 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
+   * Returns the sequence size or 1.
+   * @param ctx query context
+   * @return result of check
+   * @throws QueryException Exception
+   */
+  @SuppressWarnings("unused")
+  public long size(final QueryContext ctx) throws QueryException {
+    return -1;
+  }
+
+  /**
    * Indicates if an expression accesses the position of a context item.
    * Called by the compiler to perform certain optimizations.
    * <code>true</code> is returned by default and thus assumed as "worst-case".

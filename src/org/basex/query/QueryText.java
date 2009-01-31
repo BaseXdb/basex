@@ -48,6 +48,8 @@ public interface QueryText {
   /** FOCH0003: Evaluation exception. */
   Object[] NORMUNI = { FOCH, 3, "Unsupported normalization form (%)." };
 
+  /** FODC0001: Evaluation exception. */
+  Object[] IDDOC = { FODC, 1, "Root must be a document node." };
   /** FODC0002: Evaluation exception. */
   Object[] UNDOC = { FODC, 2, "Document node could not be created (%)." };
   /** FODC0002: Evaluation exception. */
@@ -145,7 +147,7 @@ public interface QueryText {
   Object[] CTXNODE = { XPDY, 50, "Context item must be a node." };
   /** XPDY0050: Evaluation exception. */
   Object[] NOTREAT = { XPDY, 50, "%: % expected, % found." };
-  /** XPTY0004: Evaluation exception. */
+  /** XPDY0050: Evaluation exception. */
   Object[] NOTREATS = { XPDY, 50, "%: % expected, sequence found." };
 
   /** XPST0003: Parsing exception. */

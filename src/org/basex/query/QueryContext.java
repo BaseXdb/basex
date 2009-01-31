@@ -26,7 +26,6 @@ import org.basex.query.item.Dat;
 import org.basex.query.item.Dtm;
 import org.basex.query.item.Item;
 import org.basex.query.item.Tim;
-import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
@@ -82,9 +81,9 @@ public final class QueryContext extends Progress {
   /** Current context. */
   public Item item;
   /** Current context position. */
-  public int pos;
+  public long pos;
   /** Current context size. */
-  public int size;
+  public long size;
   /** Current leaf flag. */
   public boolean leaf;
 
@@ -118,7 +117,7 @@ public final class QueryContext extends Progress {
   public Uri collation = Uri.uri(URLCOLL);
 
   /** Used documents. */
-  public DBNode[] docs;
+  public DBNode[] docs = {};
   /** Initial number of documents. */
   public int rootDocs;
 
@@ -179,19 +178,18 @@ public final class QueryContext extends Progress {
    */
   public void compile(final Nodes nodes) throws QueryException {
     try {
-      final int s = nodes != null ? nodes.size : 0;
-      docs = new DBNode[s];
-      
       // cache the initial context nodes
+      final int s = nodes != null ? nodes.size : 0;
       if(s != 0) {
         // create document nodes
         final Data data = nodes.data;
-        for(int d = 0; d < docs.length; d++) {
+        docs = new DBNode[s];
+        for(int d = 0; d < s; d++) {
           final int p = nodes.nodes[d];
           if(data.kind(p) == Data.DOC) docs[rootDocs++] = new DBNode(data, p);
         }
         if(rootDocs == 0) docs[rootDocs++] = new DBNode(data, 0);
-        docs = Array.finish(docs, rootDocs);
+        if(rootDocs != docs.length) docs = Array.finish(docs, rootDocs);
 
         final SeqIter si = new SeqIter();
         if(root instanceof AxisPath && ((AxisPath) root).root instanceof Root) {
@@ -204,10 +202,9 @@ public final class QueryContext extends Progress {
         item = si.finish();
         
         // add collection instances
-        final NodIter col = new NodIter();
-        for(final DBNode doc : docs) col.add(doc);
-        collect = Array.add(collect, col);
-        collName = Array.add(collName, token(data.meta.dbname));
+        final NodIter ni = new NodIter();
+        for(final DBNode d : docs) ni.add(d);
+        addColl(ni, token(data.meta.dbname));
       }
 
       // evaluates the query and returns the result
@@ -224,7 +221,7 @@ public final class QueryContext extends Progress {
       Err.or(XPSTACK);
     }
   }
-  
+
   /**
    * Evaluates the expression with the specified context set.
    * @param nodes initial node set
@@ -441,11 +438,11 @@ public final class QueryContext extends Progress {
 
   /**
    * Adds a collection.
-   * @param nod collection nodes
+   * @param ni collection nodes
    * @param name name
    */
-  public void addColl(final NodIter nod, final byte[] name) {
-    collect = Array.add(collect, nod);
+  public void addColl(final NodIter ni, final byte[] name) {
+    collect = Array.add(collect, ni);
     collName = Array.add(collName, name);
   }
 
@@ -453,10 +450,8 @@ public final class QueryContext extends Progress {
    * Returns the database root as expression or null.
    * @return database root or null
    */
-  public DBNode dbroot() {
-    if(!(item instanceof DBNode)) return null;
-    final DBNode db = (DBNode) item;
-    return db.type == Type.DOC ? db : null;
+  public Data data() {
+    return item instanceof DBNode ? ((DBNode) item).data : null;
   }
 
   /**

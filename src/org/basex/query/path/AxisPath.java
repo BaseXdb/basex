@@ -153,16 +153,15 @@ public class AxisPath extends Path {
     cache = root != null && root.countVar(null) == 0;
 
     // check if the context item is set to a document node
-    final DBNode db = ctx.dbroot();
-    if(db != null) {
-      final Data data = db.data;
-
+    final Data data = ctx.data();
+    if(data != null && ctx.item.type == Type.DOC) {
       // check index access
       Expr e = index(ctx, data);
       if(e != this) return e;
   
       // check children path rewriting
       if(!preds) {
+        //System.out.println(db);
         e = children(ctx, data);
         if(e != this) return e;
       }
@@ -184,9 +183,9 @@ public class AxisPath extends Path {
         step[0].axis != Axis.DESC || step[0].test.kind != Kind.NAME)
       return this;
 
-    ArrayList<SkelNode> n = new ArrayList<SkelNode>();
+    final ArrayList<SkelNode> n = new ArrayList<SkelNode>();
     n.add(data.skel.root);
-    int name = data.tagID(step[0].test.name.ln());
+    final int name = data.tagID(step[0].test.name.ln());
     
     int c = 0;
     SkelNode node = null;
@@ -304,8 +303,8 @@ public class AxisPath extends Path {
 
         // add remaining predicates to last step
         final int sl = result.step.length - 1;
-        for(int p = 0; p < newPreds.length; p++) {
-          result.step[sl] = result.step[sl].addPred(newPreds[p]);
+        for(final Expr np : newPreds) {
+          result.step[sl] = result.step[sl].addPred(np);
         }
         // add inverted path as predicate to last step
         if(inv.length != 0) {
@@ -328,8 +327,8 @@ public class AxisPath extends Path {
     if(!cache || citem == null || litem != it || it.type != Type.DOC) {
       litem = it;
       final Item c = ctx.item;
-      final int cs = ctx.size;
-      final int cp = ctx.pos;
+      final long cs = ctx.size;
+      final long cp = ctx.pos;
       ctx.item = it;
 
       citem = new NodIter();
@@ -385,25 +384,21 @@ public class AxisPath extends Path {
     }
   }
 
-  /**
-   * Calculates the number of result nodes, using the skeleton.
-   * @param ctx query context
-   * @return number of results
-   */
-  public int count(final QueryContext ctx) {
+  @Override
+  public long size(final QueryContext ctx) {
     final Item ci = ctx.item;
-    int res = -1;
+    long res = -1;
     setRoot(ctx);
 
-    final DBNode db = ctx.dbroot();
-    if(db != null) {
-      if(db.data.meta.uptodate && db.data.ns.size() == 0) {
+    final Data data = ctx.data();
+    if(data != null) {
+      if(data.meta.uptodate && data.ns.size() == 0) {
         HashSet<SkelNode> nodes = new HashSet<SkelNode>();
-        nodes.add(db.data.skel.root);
+        nodes.add(data.skel.root);
 
         for(final Step s : step) {
           res = -1;
-          nodes = s.count(nodes, db.data);
+          nodes = s.count(nodes, data);
           if(nodes == null) break;
           res = 0;
           for(final SkelNode sn : nodes) res += sn.count;
@@ -423,7 +418,7 @@ public class AxisPath extends Path {
    * @return array with for expression
    */
   public For[] convSteps(final Var var, final Var pos, final Var score) {
-    For[] f = new For[step.length];
+    final For[] f = new For[step.length];
     final VarCall vc = new VarCall(var);
     for (int i = 0; i < step.length; i++) {
       f[i] = new For(new AxisPath(vc, new Step[]{step[i]}), var, pos, score);
@@ -511,7 +506,7 @@ public class AxisPath extends Path {
     int s = step.length;
     final Step[] e = new Step[s--];
     // add predicates of last step to new root node
-    Expr rt = step[s].pred.length != 0 ? new Pred(r, step[s].pred) : r;
+    final Expr rt = step[s].pred.length != 0 ? new Pred(r, step[s].pred) : r;
 
     // add inverted steps in a backward manner
     int c = 0;
@@ -528,11 +523,11 @@ public class AxisPath extends Path {
     if(s.pred.length > 0 || !s.axis.down || s.test.kind != Test.Kind.NAME ||
         s.test.type == Type.ATT) return this;
 
-    final DBNode db = ctx.dbroot();
-    if(db == null) return this;
-    final StatsKey stats = db.data.tags.stat(db.data.tags.id(s.test.name.ln()));
+    final Data data = ctx.data();
+    if(data == null) return this;
+    final StatsKey stats = data.tags.stat(data.tags.id(s.test.name.ln()));
 
-    if(db.data.meta.uptodate && stats != null && stats.leaf) {
+    if(data.meta.uptodate && stats != null && stats.leaf) {
       step = Array.add(step, Step.get(Axis.CHILD, new KindTest(Type.TXT)));
       ctx.compInfo(OPTTEXT, this);
     }
@@ -577,7 +572,7 @@ public class AxisPath extends Path {
 
   @Override
   public Return returned(final QueryContext ctx) {
-    return count(ctx) == 1 ? Return.NOD : Return.NODSEQ;
+    return size(ctx) == 1 ? Return.NOD : Return.NODSEQ;
   }
 
   @Override

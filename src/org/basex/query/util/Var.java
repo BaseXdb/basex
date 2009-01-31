@@ -5,10 +5,10 @@ import static org.basex.query.QueryText.*;
 
 import java.io.IOException;
 import org.basex.data.Serializer;
-import org.basex.query.ExprInfo;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
+import org.basex.query.expr.Return;
 import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
@@ -23,9 +23,13 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Var extends ExprInfo implements Cloneable {
+public final class Var extends Expr implements Cloneable {
+  /** Return type. */
+  public Return ret = Return.SEQ;
+  /** Global flag. */
+  public final boolean global;
   /** Variable name. */
-  public QNm name;
+  public final QNm name;
   /** Data type. */
   public SeqType type;
   /** Variable expressions. */
@@ -36,30 +40,30 @@ public final class Var extends ExprInfo implements Cloneable {
   /**
    * Constructor.
    * @param n variable name
+   * @param g global flag
    */
-  public Var(final QNm n) {
+  public Var(final QNm n, final boolean g) {
     name = n;
+    global = g;
   }
 
   /**
    * Constructor.
    * @param n variable name
+   * @param g global flag
    * @param t data type
    */
-  public Var(final QNm n, final SeqType t) {
-    name = n;
+  public Var(final QNm n, final boolean g, final SeqType t) {
+    this(n, g);
     type = t;
   }
   
-  /**
-   * Compiles the variable.
-   * @param ctx xquery context
-   * @throws QueryException xquery exception
-   */
-  public void comp(final QueryContext ctx) throws QueryException {
+  @Override
+  public Expr comp(final QueryContext ctx) throws QueryException {
     if(expr != null) bind(expr.comp(ctx), ctx);
+    return this;
   }
-
+  
   /**
    * Binds the specified expression to the variable.
    * @param e expression to be set
@@ -74,23 +78,18 @@ public final class Var extends ExprInfo implements Cloneable {
 
   /**
    * Binds the specified item to the variable.
-   * @param it item to be set
+   * @param e item to be set
    * @param ctx query context
    * @return self reference
    * @throws QueryException evaluation exception
    */
-  public Var bind(final Item it, final QueryContext ctx) throws QueryException {
-    expr = it;
-    item = check(it, ctx);
+  public Var bind(final Item e, final QueryContext ctx) throws QueryException {
+    expr = e;
+    item = check(e, ctx);
     return this;
   }
   
-  /**
-   * Evaluates the variable.
-   * @param ctx query context
-   * @return iterator
-   * @throws QueryException query exception
-   */
+  @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     return item(ctx).iter();
   }
@@ -141,7 +140,14 @@ public final class Var extends ExprInfo implements Cloneable {
       throws QueryException {
 
     if(it.type == Type.STR) ((Str) it).direct = false;
-    return type == null ? it : type.cast(it, ctx);
+    if(type == null) return it;
+    
+    if(!global) {
+      if(type.occ < 2 && !it.type.instance(type.type))
+        Err.or(XPINVCAST, it.type, type, it);
+    }
+    
+    return type.cast(it, ctx);
   }
 
   @Override
@@ -154,8 +160,20 @@ public final class Var extends ExprInfo implements Cloneable {
   }
 
   @Override
+  public Return returned(final QueryContext ctx) {
+    return expr != null ? expr.returned(ctx) : ret;
+  }
+
+  @Override
   public String color() {
     return "66CC66";
+  }
+
+  @Override
+  public void plan(final Serializer ser) throws IOException {
+    ser.openElement(this, NAM, name.str());
+    if(expr != null) expr.plan(ser);
+    ser.closeElement();
   }
 
   @Override
@@ -166,12 +184,5 @@ public final class Var extends ExprInfo implements Cloneable {
     //if(item != null) sb.add(" = " + item);
     //else if(expr != null) sb.add(" = " + expr);
     return sb.toString();
-  }
-
-  @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, NAM, name.str());
-    if(expr != null) expr.plan(ser);
-    ser.closeElement();
   }
 }

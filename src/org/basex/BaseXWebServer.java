@@ -279,7 +279,7 @@ public final class BaseXWebServer {
 
       // assign parameters to the xquery processor
       for(final String[] arg : req.args) {
-        final Var v = new Var(new QNm(Token.token(arg[0])));
+        final Var v = new Var(new QNm(Token.token(arg[0])), true);
         final String val = arg.length == 2 ? arg[1] : "";
         xq.ctx.vars.addGlobal(v.bind(Str.get(val), null));
       }

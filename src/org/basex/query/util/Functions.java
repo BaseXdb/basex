@@ -104,8 +104,8 @@ public final class Functions extends ExprInfo {
     }
 
     if(Type.find(name, true) == null) {
-      final Func f = new Func(new Var(name), new Var[args.length], false);
-      return new FunCall(add(f), args);
+      return new FunCall(add(new Func(new Var(name, false),
+          new Var[args.length], false)), args);
     }
     return null;
   }

@@ -496,6 +496,7 @@ public final class BaseXText extends BaseXPanel {
       ch == KeyEvent.VK_ESCAPE) return;
 
     text.pos(text.cursor());
+
     if(ch == KeyEvent.VK_BACK_SPACE) {
       if(text.start() == -1) {
         if(text.pos() == 0) return;
@@ -510,11 +511,13 @@ public final class BaseXText extends BaseXPanel {
       }
       down = false;
     } else if(ch == KeyEvent.VK_DELETE) {
-      final boolean ld = Character.isLetterOrDigit(text.curr());
-      text.delete();
-      if(ctrl) {
-        while(text.pos() < text.size &&
-            ld == Character.isLetterOrDigit(text.curr())) text.delete();
+      if(text.pos() != text.size) {
+        final boolean ld = Character.isLetterOrDigit(text.curr());
+        text.delete();
+        if(ctrl) {
+          while(text.pos() < text.size &&
+              ld == Character.isLetterOrDigit(text.curr())) text.delete();
+        }
       }
     } else {
       if(ctrl) return;

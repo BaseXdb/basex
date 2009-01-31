@@ -12,7 +12,6 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.Seq;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ResetIter;
 import org.basex.query.util.Scoring;
 import org.basex.query.util.Var;
 import org.basex.util.Token;
@@ -54,21 +53,32 @@ public final class For extends ForLet {
         expr.countVar(null) == 0) {
       ctx.compInfo(OPTBIND, var);
       var.bind(expr, ctx);
+    } else {
+      final Return ret = expr.returned(ctx);
+      if     (ret == Return.NUMSEQ)   var.ret = Return.NUM;
+      else if(ret == Return.NONUMSEQ) var.ret = Return.NONUM;
+      else if(ret == Return.NODSEQ)   var.ret = Return.NOD;
     }
-
     ctx.vars.add(var);
-    if(pos != null) ctx.vars.add(pos);
-    if(score != null) ctx.vars.add(score);
+
+    if(pos != null) {
+      ctx.vars.add(pos);
+      pos.ret = Return.NUM;
+    }
+    if(score != null) {
+      ctx.vars.add(score);
+      score.ret = Return.NUM;
+    }
     return this;
   }
 
   @Override
-  public ResetIter iter(final QueryContext ctx) {
+  public Iter iter(final QueryContext ctx) {
     final Var v = var.clone();
     final Var p = pos != null ? pos.clone() : null;
     final Var s = score != null ? score.clone() : null;
     
-    return new ResetIter() {
+    return new Iter() {
       /** Variable stack size. */
       private int vs;
       /** Iterator flag. */
@@ -98,10 +108,11 @@ public final class For extends ForLet {
       }
 
       @Override
-      public void reset() {
+      public boolean reset() {
         ctx.vars.reset(vs);
         ir = null;
         c = 0;
+        return true;
       }
     };
   }

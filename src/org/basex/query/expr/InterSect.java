@@ -80,6 +80,7 @@ public final class InterSect extends Arr {
       final IntList il = new IntList();
       for(int i = 0; i < seq.size(); i++) {
         it = seq.list[i];
+        // [SG] pre + 1  will cause troubles for some documents..
         if(it instanceof DBNode) il.add(((DBNode) it).pre + 1);
       }
       if(il.size == 0) ftd.init();

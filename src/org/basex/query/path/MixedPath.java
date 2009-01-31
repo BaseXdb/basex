@@ -49,8 +49,8 @@ public final class MixedPath extends Path {
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Item it = root != null ? ctx.iter(root).finish() : ctx.item;
     final Item c = ctx.item;
-    final int cs = ctx.size;
-    final int cp = ctx.pos;
+    final long cs = ctx.size;
+    final long cp = ctx.pos;
     ctx.item = it;
     final Item i = eval(ctx);
     ctx.item = c;
@@ -69,34 +69,32 @@ public final class MixedPath extends Path {
     // simple location step traversal...
     Item it = ctx.item;
     for(final Expr s : step) {
-      final SeqIter sb = new SeqIter();
+      final SeqIter si = new SeqIter();
       final Iter ir = it.iter();
-      ctx.size = it.size();
+      ctx.size = it.size(ctx);
       ctx.pos = 1;
       Item i;
       while((i = ir.next()) != null) {
         if(!i.node()) Err.or(NODESPATH, this, i.type);
         ctx.item = i;
-        sb.add(ctx.iter(s));
+        si.add(ctx.iter(s));
         ctx.pos++;
       }
-      it = sb.finish();
-    }
 
-    // either nodes or atomic items are allowed in a result set, but not both
-    final Iter ir = it.iter();
-    Item i = ir.next();
-    if(i != null) {
-      if(i.node()) {
-        final NodIter nb = new NodIter(false);
-        nb.add((Nod) i);
-        while((i = ir.next()) != null) {
+      // either nodes or atomic items are allowed in a result set, but not both
+      if(si.size() != 0 && si.get(0).node()) {
+        final NodIter ni = new NodIter(false);
+        while((i = si.next()) != null) {
           if(!i.node()) Err.or(EVALNODESVALS);
-          nb.add((Nod) i);
+          ni.add((Nod) i);
         }
-        return nb.finish();
+        it = ni.finish();
+      } else {
+        while((i = si.next()) != null) {
+          if(i.node()) Err.or(EVALNODESVALS);
+        }
+        it = si.finish();
       }
-      while((i = ir.next()) != null) if(i.node()) Err.or(EVALNODESVALS);
     }
     return it;
   }

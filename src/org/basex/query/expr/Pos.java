@@ -22,9 +22,9 @@ import org.basex.util.Token;
  */
 public final class Pos extends Simple {
   /** Minimum position. */
-  public long min;
+  long min;
   /** Maximum position. */
-  public long max;
+  long max;
   
   /**
    * Constructor.
@@ -43,6 +43,7 @@ public final class Pos extends Simple {
    * @return expression
    */
   public static Expr get(final long mn, final long mx) {
+    // suppose that positions always fit in int values..
     return mn > mx || mx < 1 ? Bln.FALSE : mn <= 1 && mx == Long.MAX_VALUE ?
       Bln.TRUE : new Pos(mn, mx);
   }
@@ -65,7 +66,7 @@ public final class Pos extends Simple {
       final long p = it.itr();
       final boolean ex = p == it.dbl();
       switch(cmp) {
-        case EQ: return ex ? get(p, p) : Bln.FALSE;
+        case EQ: return ex ? Pos.get(p, p) : Bln.FALSE;
         case GE: return get(ex ? p : p + 1, Long.MAX_VALUE);
         case GT: return get(p + 1, Long.MAX_VALUE);
         case LE: return get(1, p);

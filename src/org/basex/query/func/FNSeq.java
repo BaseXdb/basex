@@ -11,7 +11,6 @@ import org.basex.query.item.Nod;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeIter;
-import org.basex.query.iter.RangeIter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.util.ItemSet;
 import org.basex.util.Token;
@@ -114,7 +113,7 @@ final class FNSeq extends Fun {
   }
 
   /**
-   * Removes an Item at a specified position in a sequence.
+   * Removes an item at a specified position in a sequence.
    * @param arg arguments
    * @return iterator without Item
    * @throws QueryException evaluation exception
@@ -146,7 +145,16 @@ final class FNSeq extends Fun {
     final long e = arg.length > 2 ? s + Math.round(checkDbl(arg[2])) :
       Long.MAX_VALUE;
     
-    return new Iter() {
+    return arg[0].size() != -1 ? new Iter() {
+      // directly access specified items
+      long c = Math.max(1, s);
+
+      @Override
+      public Item next() {
+        return c < e ? arg[0].get(c++ - 1) : null;
+      }
+    } : new Iter() {
+      // run through all items
       long c = 0;
 
       @Override
@@ -169,21 +177,20 @@ final class FNSeq extends Fun {
   private Iter reverse(final Iter[] arg) throws QueryException {
     final Iter iter = arg[0];
     
-    // process numeric iterator...
-    if(iter instanceof RangeIter) {
-      ((RangeIter) iter).reverse();
-      return iter;
-    }
+    // process reversable iterator...
+    if(iter.reverse()) return iter;
     
     // process any other iterator...
     return new Iter() {
-      final SeqIter si = SeqIter.get(iter);
-      int c = si.size;
+      final Iter si = iter.size() != -1 ? iter : SeqIter.get(iter);
+      long c = si.size();
 
       @Override
-      public long size() { return si.size; }
+      public int size() { return si.size(); }
       @Override
-      public Item next() { return --c < 0 ? null : si.item[c]; }
+      public Item get(final long i) { return si.get(si.size() - i - 1); }
+      @Override
+      public Item next() { return --c < 0 ? null : si.get(c); }
     };
   }
 
@@ -217,10 +224,14 @@ final class FNSeq extends Fun {
 
       Nod n1 = null, n2 = null;
       // explicit non-short-circuit..
-      while((n1 = niter1.next()) != null & (n2 = niter2.next()) != null) {
+      //while((n1 = niter1.next()) != null & (n2 = niter2.next()) != null) {
+      while(true) {
+        n1 = nextDeep(niter1);
+        n2 = nextDeep(niter2);
+        if(n1 == null && n2 == null || n1 == null ^ n2 == null) break;
         if(n1.type != n2.type) return false;
-        if((n1.type == Type.ELM || n1.type == Type.PI) &&
-          !n1.qname().eq(n2.qname())) return false;
+        
+        if(n1.type == Type.ELM && !n1.qname().eq(n2.qname())) return false;
 
         if(n1.type == Type.ATT) {
           if(!n1.qname().eq(n2.qname()) || !Token.eq(n1.str(), n2.str()))
@@ -253,5 +264,18 @@ final class FNSeq extends Fun {
       if(n1 != n2) return false;
     }
     return it1 == it2;
+  }
+  
+  /**
+   * Returns the next node for deep comparison.
+   * @param iter iterator
+   * @return node
+   * @throws QueryException query exception
+   */
+  private Nod nextDeep(final NodeIter iter) throws QueryException {
+    while(true) {
+      final Nod n = iter.next();
+      if(n == null || n.type != Type.COM && n.type != Type.PI) return n;
+    }
   }
 }

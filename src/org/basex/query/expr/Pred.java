@@ -36,7 +36,7 @@ public class Pred extends Preds {
   public final Expr comp(final QueryContext ctx) throws QueryException {
     if(super.comp(ctx) != this) return Seq.EMPTY;
     root = root.comp(ctx);
-
+    
     // No predicates.. return root
     if(pred.length == 0) return root;
     final Expr p = pred[0];
@@ -53,10 +53,19 @@ public class Pred extends Preds {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
+    // quick evaluation of variable counters (array[$pos] ...)
+    if(pred.length == 1 && pred[0] instanceof VarCall) {
+      final Item it = pred[0].iter(ctx).ebv();
+      if(it.n()) {
+        final long l = it.itr();
+        return new IterPred(root, pred, (Pos) Pos.get(l, l), false).iter(ctx);
+      }
+    }
+    
     final Iter iter = ctx.iter(root);
     final Item ci = ctx.item;
-    final int cs = ctx.size;
-    final int cp = ctx.pos;
+    final long cs = ctx.size;
+    final long cp = ctx.pos;
     
     // cache results to support last() function
     final SeqIter sb = new SeqIter();

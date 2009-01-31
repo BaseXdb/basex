@@ -31,7 +31,10 @@ public final class FDoc extends FNode {
   @Override
   public byte[] str() {
     final TokenBuilder tb = new TokenBuilder();
-    for(int c = 0; c < children.size; c++) tb.add(children.list[c].str());
+    for(int c = 0; c < children.size; c++) {
+      final Nod n = children.list[c];
+      if(n.type != Type.COM && n.type != Type.PI) tb.add(n.str());
+    }
     return tb.finish();
   }
 

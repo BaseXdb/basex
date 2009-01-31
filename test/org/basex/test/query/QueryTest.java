@@ -22,7 +22,7 @@ public final class QueryTest {
   private static final Context CONTEXT = new Context();
   /** Test instances. */
   private static final AbstractTest[] TESTS = {
-    new FTTest()
+    new SimpleTest(), new XPathMarkFTTest(), new FTTest()
   };
   /** Verbose flag. */
   private static final boolean VERBOSE = false;

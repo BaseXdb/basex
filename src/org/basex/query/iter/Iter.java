@@ -18,13 +18,17 @@ import org.basex.query.util.Err;
  */
 public abstract class Iter {
   /** Empty iterator. */
-  public static final Iter EMPTY = new ResetIter() {
+  public static final Iter EMPTY = new Iter() {
     @Override
     public Item next() { return null; }
     @Override
-    public long size() { return 0; }
+    public Item finish() { return Seq.EMPTY; }
     @Override
-    public void reset() { }
+    public boolean ordered() { return true; }
+    @Override
+    public int size() { return 0; }
+    @Override
+    public boolean reset() { return true; }
     @Override
     public String toString() { return "()"; }
   };
@@ -45,18 +49,47 @@ public abstract class Iter {
   }
 
   /**
-   * Returns the number of entries. Warning: -1 is returned if the number
-   * cannot be evaluated, so each method has to check and react on the
-   * returned value.
+   * Returns the specified item. Note: null is returned if the
+   * item cannot be retrieved, so the returned value has to be checked.
+   * @param i value offset
+   * @return specified item
+   */
+  @SuppressWarnings("unused")
+  public Item get(final long i) {
+    return null;
+  }
+
+  /**
+   * Returns the number of entries. Note: -1 is returned if the
+   * number cannot be retrieved, so the returned value has to be checked.
+   * If this method is implemented, {@link #get} has to be implemented as well.
    * @return number of entries
    */
-  public long size() {
+  public int size() {
     return -1;
   }
 
   /**
-   * Returns a sequence from all iterator values. Should be called before
-   * {@link #next}.
+   * Resets the iterator and returns true. Note: false is returned if the
+   * iterator cannot be reset, so the returned value has to be checked.
+   * @return true if operator could be reset
+   */
+  public boolean reset() {
+    return false;
+  }
+
+  /**
+   * Reverses the iterator and returns true. Note: false is returned if the
+   * iterator cannot be reset, so the returned value has to be checked.
+   * @return true if operator could be reversed
+   */
+  public boolean reverse() {
+    return false;
+  }
+
+  /**
+   * Returns a sequence from all iterator values.
+   * Should be called before {@link #next}.
    * @return sequence
    * @throws QueryException evaluation exception
    */
@@ -115,14 +148,7 @@ public abstract class Iter {
       throws QueryException {
     
     final long s = size();
-    if(s != -1) {
-      if(s == 1) return next();
-      if(s == 0) {
-        if(!empty) Err.empty(expr);
-        return null;
-      }
-      seqErr(next(), next(), next(), expr);
-    }
+    if(s == 1) return next();
 
     final Item it = next();
     if(it == null) {
@@ -131,21 +157,8 @@ public abstract class Iter {
     }
 
     final Item n = next();
-    if(n != null) seqErr(it, n, next(), expr);
+    if(n != null) Err.or(XPSEQ, "(" + it + "," + n +
+        (next() != null ? ",..." : "") + ")", expr.info());
     return it;
-  }
-  
-  /**
-   * Throws a sequence error.
-   * @param i1 first item
-   * @param i2 first item
-   * @param i3 first item
-   * @param expr expression
-   * @throws QueryException evaluation exception
-   */
-  private static void seqErr(final Item i1, final Item i2, final Item i3,
-      final Expr expr) throws QueryException {
-    Err.or(XPSEQ, "(" + i1 + "," + i2 + (i3 != null ? ",..." : "") + ")",
-        expr.info());
   }
 }

@@ -47,10 +47,9 @@ public final class VarCall extends Expr {
      */
     Expr e = var.expr;
     if(ctx.nsElem.length != 0 || lc.size() != 0 || var.type != null ||
-        e instanceof CAttr || e instanceof CElem || e instanceof CPI ||
-        e instanceof CComm || e instanceof CText || e instanceof FunCall) {
-      e = var.item(ctx);
-    }
+        var.global || e instanceof CAttr || e instanceof CElem ||
+        e instanceof CPI || e instanceof CComm || e instanceof CText ||
+        e instanceof FunCall) e = var.item(ctx);
     
     ctx.ns = lc;
     return e;
@@ -88,7 +87,7 @@ public final class VarCall extends Expr {
 
   @Override
   public Return returned(final QueryContext ctx) {
-    return var.expr == null ? Return.SEQ : var.expr.returned(ctx);
+    return var.returned(ctx);
   }
 
   @Override

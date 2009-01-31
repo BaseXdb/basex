@@ -165,7 +165,7 @@ public final class Nodes implements Result {
     return c.finish();
   }
 
-  public long size() {
+  public int size() {
     return size;
   }
   

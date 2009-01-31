@@ -7,6 +7,7 @@ import org.basex.BaseX;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
+import org.basex.query.item.FNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Type;
@@ -48,7 +49,7 @@ final class FNId extends Fun {
    */
   private Iter id(final Iter it, final Nod node) throws QueryException {
     final NodIter nb = new NodIter(false);
-    add(ids(it), nb, node);
+    add(ids(it), nb, checkRoot(node));
     return nb;
   }
 
@@ -61,7 +62,7 @@ final class FNId extends Fun {
    */
   private Iter idref(final Iter it, final Nod node) throws QueryException {
     final NodIter nb = new NodIter(false);
-    addRef(ids(it), nb, node);
+    addRef(ids(it), nb, checkRoot(node));
     return nb;
   }
 
@@ -150,5 +151,22 @@ final class FNId extends Fun {
     }
     final NodeIter ch = nod.child();
     while((att = ch.next()) != null) addRef(ids, nb, att.finish());
+  }
+  
+  /**
+   * Checks if the specified node has a document node as root.
+   * @param nod input node
+   * @return specified node
+   * @throws QueryException query exception
+   */
+  private Nod checkRoot(final Nod nod) throws QueryException {
+    if(nod instanceof FNode) {
+      Nod n = nod;
+      while(n.type != Type.DOC) {
+        n = n.parent();
+        if(n == null) Err.or(IDDOC);
+      }
+    }
+    return nod;
   }
 }

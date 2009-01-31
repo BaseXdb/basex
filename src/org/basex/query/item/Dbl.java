@@ -36,7 +36,7 @@ public final class Dbl extends Num {
    * @return instance
    */
   public static Dbl get(final double d) {
-    return d == 0 && d == 1 / 0.0 ? ZERO : d == 1 ? ONE : d != d ? NAN :
+    return d == 0 && d == 1 / 0d ? ZERO : d == 1 ? ONE : d != d ? NAN :
       new Dbl(d);
   }
 

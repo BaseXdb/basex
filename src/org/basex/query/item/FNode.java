@@ -25,6 +25,35 @@ public abstract class FNode extends Nod {
   protected FNode(final Type t) {
     super(t);
   }
+
+  @Override
+  public boolean is(final Nod nod) {
+    return id == nod.id;
+  }
+
+  @Override
+  public final int diff(final Nod nod) {
+    if(id != nod.id) {
+      Nod n = this;
+      while(n != null) {
+        Nod p = n.parent();
+        if(p == nod) return 1;
+        n = p;
+      }
+      n = nod;
+      while(n != null) {
+        Nod p = n.parent();
+        if(p == this) return -1;
+        n = p;
+      }
+    }
+    return id - nod.id;
+  }
+
+  @Override
+  public Nod parent() {
+    return par;
+  }
   
   @Override
   public final NodeIter attr() {

@@ -15,7 +15,7 @@ import org.basex.query.item.Seq;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class SeqIter extends ResetIter implements Result {
+public final class SeqIter extends Iter implements Result {
   /** Query context. */
   private QueryContext ctx;
   /** Items. */
@@ -56,7 +56,7 @@ public final class SeqIter extends ResetIter implements Result {
    * @throws QueryException evaluation exception
    */
   private SeqIter(final Iter iter) throws QueryException {
-    item = new Item[1];
+    this();
     add(iter);
   }
 
@@ -156,13 +156,19 @@ public final class SeqIter extends ResetIter implements Result {
   }
 
   @Override
-  public void reset() {
+  public boolean reset() {
     pos = -1;
+    return true;
   }
 
   @Override
-  public long size() {
+  public int size() {
     return size;
+  }
+
+  @Override
+  public Item get(final long i) {
+    return i < size ? item[(int) i] : null;
   }
 
   @Override

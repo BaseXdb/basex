@@ -49,7 +49,7 @@ final class FNOut extends Fun {
         }
         BaseX.notexpected(); return null;
       case TRACE:
-        final SeqIter si = SeqIter.get(arg[0]);
+        final Iter si = SeqIter.get(arg[0]);
         msg = Token.string(checkStr(arg[1])) + " " + si;
         ctx.evalInfo(msg);
         //BaseX.outln(msg);

@@ -1,7 +1,7 @@
 package org.basex.query.expr;
 
 import org.basex.query.QueryContext;
-import org.basex.query.iter.ResetIter;
+import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 
 /**
@@ -47,5 +47,5 @@ public abstract class ForLet extends Expr {
   }
 
   @Override
-  public abstract ResetIter iter(final QueryContext ctx);
+  public abstract Iter iter(final QueryContext ctx);
 }

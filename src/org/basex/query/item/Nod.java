@@ -129,18 +129,14 @@ public abstract class Nod extends Item {
    * @param nod node to be compared
    * @return result of check
    */
-  public boolean is(final Nod nod) {
-    return id == nod.id;
-  }
+  public abstract boolean is(final Nod nod);
 
   /**
    * Compares two nodes for their unique order.
    * @param nod node to be compared
    * @return result of check
    */
-  public int diff(final Nod nod) {
-    return id - nod.id;
-  }
+  public abstract int diff(final Nod nod);
 
   /**
    * Returns a final node representation. This method should be called as
@@ -155,9 +151,7 @@ public abstract class Nod extends Item {
    * Returns the parent node.
    * @return parent node
    */
-  public Nod parent() {
-    return par;
-  }
+  public abstract Nod parent();
 
   /**
    * Sets the parent node.

@@ -33,6 +33,10 @@ public final class Range extends Arr {
       ctx.compInfo(OPTPRE, this);
       return Seq.EMPTY;
     }
+    if(expr[0].i() && expr[1].i()) {
+      final long[] v = range(expr);
+      if(v[0] == v[1]) return Itr.get(v[0]);
+    }
     return this;
   }
 
@@ -43,10 +47,28 @@ public final class Range extends Arr {
     final Item i2 = atomic(ctx, expr[1], true);
     if(i2 == null) return Iter.EMPTY;
     
-    final long l1 = checkItr(i1);
-    final long l2 = checkItr(i2);
-    return l2 < l1 ? Iter.EMPTY : l1 == l2 ? Itr.get(l1).iter() :
-      new RangeIter(l1, l2);
+    final long[] v = range(i1, i2);
+    return v[0] > v[1] ? Iter.EMPTY : v[0] == v[1] ? Itr.get(v[0]).iter() :
+      new RangeIter(v[0], v[1]);
+  }
+
+  @Override
+  public long size(final QueryContext ctx) throws QueryException {
+    if(expr[0].i() && expr[1].i()) {
+      final long[] v = range(expr);
+      if(v[1] >= v[0]) return v[1] - v[0] + 1;
+    }
+    return -1;
+  }
+
+  /**
+   * Returns the start and end value of the range operator.
+   * @param e range operands
+   * @return value array
+   * @throws QueryException Exception
+   */
+  private long[] range(final Expr... e) throws QueryException {
+    return new long[] { checkItr((Item) e[0]), checkItr((Item) e[1]) };
   }
 
   @Override

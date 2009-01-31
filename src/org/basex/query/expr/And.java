@@ -75,21 +75,18 @@ public final class And extends Arr {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    double d = 0;
+    double s = 0;
     for(final Expr e : expr) {
       final Item it = ctx.iter(e).ebv();
       if(!it.bool()) {
+        // [SG] pre + 1  will cause troubles for some documents..
         if(ctx.ftdata != null) ctx.ftdata.remove(((DBNode) ctx.item).pre + 1);
         return Bln.FALSE.iter();
       }
-      d = Scoring.and(d, it.score());
+      s = Scoring.and(s, it.score());
     }
-    
-    final DBNode db = ctx.dbroot();
-    if(db != null && ctx.ftdata != null && !Bln.get(d).bool())
-      ctx.ftdata.remove(db.pre + 1);
-    
-    return (d == 0 ? Bln.TRUE : Bln.get(d)).iter();
+    // no scoring - return default boolean
+    return (s == 0 ? Bln.TRUE : Bln.get(s)).iter();
   }
   
   @Override

@@ -4,6 +4,8 @@ import static org.basex.Text.*;
 import static org.basex.core.Commands.*;
 import java.io.IOException;
 import javax.xml.transform.sax.SAXSource;
+
+import org.basex.BaseX;
 import org.basex.build.BuildException;
 import org.basex.build.DiskBuilder;
 import org.basex.build.MemBuilder;
@@ -84,15 +86,25 @@ public final class CreateDB extends ACreate {
   public static Data xml(final Parser p, final String db) throws IOException {
     if(db == null) return new MemBuilder().build(p, "");
     
-    final Data data = new DiskBuilder().build(p, db);
-    if(data.meta.txtindex) data.setIndex(
-        IndexToken.Type.TXT, new ValueBuilder(true).build(data));
-    if(data.meta.atvindex) data.setIndex(
-        IndexToken.Type.ATV, new ValueBuilder(false).build(data));
-    if(data.meta.ftxindex) data.setIndex(
-        IndexToken.Type.FTX, data.meta.ftfz ?
-          new FTFuzzyBuilder().build(data) : new FTBuilder().build(data));
-    return data;
+    final DiskBuilder builder = new DiskBuilder();
+    try {
+      final Data data = builder.build(p, db);
+      if(data.meta.txtindex) data.setIndex(IndexToken.Type.TXT,
+        new ValueBuilder(true).build(data));
+      if(data.meta.atvindex) data.setIndex(IndexToken.Type.ATV,
+        new ValueBuilder(false).build(data));
+      if(data.meta.ftxindex) data.setIndex(IndexToken.Type.FTX, data.meta.ftfz ?
+        new FTFuzzyBuilder().build(data) : new FTBuilder().build(data));
+      return data;
+    } catch(final IOException ex) {
+      try {
+        builder.close();
+      } catch(final IOException e) {
+        BaseX.debug(e);
+      }
+      DropDB.drop(db);
+      throw ex;
+    }
   }
   
   @Override

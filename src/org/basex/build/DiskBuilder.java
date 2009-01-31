@@ -98,6 +98,7 @@ public final class DiskBuilder extends Builder {
   
   @Override
   public void close() throws IOException {
+    if(tout == null) return;
     tout.close();
     tout = null;
     xout.close();

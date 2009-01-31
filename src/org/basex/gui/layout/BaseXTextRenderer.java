@@ -56,8 +56,8 @@ public final class BaseXTextRenderer extends BaseXBack {
    */
   BaseXTextRenderer(final BaseXTextTokens t, final BaseXBar b) {
     setMode(GUIConstants.Fill.NONE);
-    setText(t);
     setFont(GUIConstants.dfont);
+    text = t;
     bar = b;
   }
 

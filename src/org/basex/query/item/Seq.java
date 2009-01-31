@@ -2,7 +2,6 @@ package org.basex.query.item;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
-
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.data.Serializer;
@@ -27,9 +26,9 @@ public class Seq extends Item {
     public Iter iter() { return Iter.EMPTY; }
   };
   /** Item array. */
-  public Item[] val;
+  private Item[] val;
   /** Number of entries. */
-  public int size;
+  private int size;
 
   /**
    * Constructor.
@@ -65,7 +64,7 @@ public class Seq extends Item {
   }
 
   @Override
-  public int size() {
+  public long size(final QueryContext ctx) {
     return size;
   }
 

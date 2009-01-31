@@ -10,7 +10,6 @@ import org.basex.query.item.Bln;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ResetIter;
 import org.basex.query.util.Scoring;
 import org.basex.query.util.Var;
 import org.basex.util.Token;
@@ -42,19 +41,22 @@ public final class Let extends ForLet {
     expr = expr.comp(ctx);
     
     // bind variable if no variables are used
-    if(!score && expr.countVar(null) == 0) {
+    if(!score && expr.countVar(null) == 0 && !(expr instanceof Context)) {
       ctx.compInfo(OPTBIND, var);
       var.bind(expr, ctx);
+    } else {
+      var.ret = expr.returned(ctx);
     }
+
     ctx.vars.add(var);
     return this;
   }
 
   @Override
-  public ResetIter iter(final QueryContext ctx) {
+  public Iter iter(final QueryContext ctx) {
     final Var v = var.clone();
 
-    return new ResetIter() {
+    return new Iter() {
       /** Variable stack size. */
       private int vs;
       /** Iterator flag. */
@@ -87,9 +89,10 @@ public final class Let extends ForLet {
       }
       
       @Override
-      public void reset() {
+      public boolean reset() {
         ctx.vars.reset(vs);
         more = false;
+        return true;
       }
     };
   }

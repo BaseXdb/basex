@@ -567,7 +567,10 @@ public enum Type {
   URI("anyURI", AAT, XSURI, false, false, true, false) {
     @Override
     public Item e(final Item it, final QueryContext ctx) throws QueryException {
-      return it.s() ? Uri.uri(it.str()) : error(it);
+      if(!it.s()) error(it);
+      final Uri u = Uri.uri(it.str());
+      if(!u.valid()) Err.or(FUNCAST, this, it);
+      return u;
     }
     @Override
     public Item e(final Object o) {
@@ -582,7 +585,7 @@ public enum Type {
       if(it.type != STR) error(it);
       final byte[] s = trim(it.str());
       if(s.length == 0) Err.or(QNMINV, s);
-      // tiresome test to disallow "xs:QName(xs:string(...))"
+      // test to disallow "xs:QName(xs:string(...))"
       if(!((Str) it).direct) Err.cast(this, it);
       return new QNm(s, ctx);
     }
