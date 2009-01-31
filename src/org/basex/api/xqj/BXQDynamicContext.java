@@ -192,7 +192,7 @@ abstract class BXQDynamicContext extends BXQAbstract
     valid(var, QName.class);
 
     final QNm name = new QNm(Token.token(var.getLocalPart()));
-    Var v = new Var(name);
+    Var v = new Var(name, true);
     if(this instanceof BXQPreparedExpression) {
       v = query.ctx.vars.get(v);
       if(v == null) throw new BXQException(VAR, var);
