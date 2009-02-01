@@ -11,6 +11,7 @@ import org.basex.data.Skeleton;
 import org.basex.query.item.Type;
 import org.basex.query.path.Axis;
 import org.basex.query.path.NameTest;
+import org.basex.query.path.Path;
 import org.basex.query.path.Test;
 import org.basex.util.StringList;
 import org.basex.util.Token;
@@ -44,6 +45,41 @@ public class QuerySuggest extends QueryParser {
     ctx = context;
     skel = ctx.data().skel;
   }
+  
+  @Override
+  Path absPath(final Path path) throws QueryException {
+    final ArrayList<SkelNode> list = new ArrayList<SkelNode>();
+    list.add(skel.root);
+    stack.push(list);
+    final Path lp = super.absPath(path);
+    filter(false);
+    return lp;
+  }
+  
+  @Override
+  Path relPath(final Path path) throws QueryException {
+    ArrayList<SkelNode> list = null;
+    if(stack.size() == 0) {
+      if(!ctx.root()) return super.relPath(path);
+      list = new ArrayList<SkelNode>();
+      list.add(skel.root);
+    } else {
+      list = skel.desc(stack.peek(), 0, Data.ELEM, false);
+    }
+    stack.push(list);
+    final Path lp = super.relPath(path);
+    filter(false);
+    return lp;
+  }
+  
+  /*
+  @Override
+  Expr pred() throws QueryException {
+    final int s = stack.size();
+    final Expr expr = super.pred();
+    while(stack.size() != s) stack.pop();
+    return expr;
+  }*/
 
   @Override
   void checkStep(final Axis axis, final Test test) {
@@ -114,7 +150,6 @@ public class QuerySuggest extends QueryParser {
     sl.sort();
     return sl;
   }
-  
   
   /**
    * Returns a node entry.

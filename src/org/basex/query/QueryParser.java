@@ -73,6 +73,7 @@ import org.basex.query.path.AxisPath;
 import org.basex.query.path.KindTest;
 import org.basex.query.path.MixedPath;
 import org.basex.query.path.NameTest;
+import org.basex.query.path.Path;
 import org.basex.query.path.Step;
 import org.basex.query.path.Test;
 import org.basex.query.util.Err;
@@ -2600,6 +2601,36 @@ public class QueryParser extends InputParser {
    */
   @SuppressWarnings("unused")
   void checkStep(final Axis axis, final Test test) { }
+  
+  /**
+   * Parses an AbsolutePath.
+   * @param path Path
+   * @throws QueryException queryException
+   * @return Path 
+   */
+  @SuppressWarnings("unused")
+  Path absPath(final Path path) throws QueryException {
+    boolean more = false;
+    while(consume('/')) {
+      final Step step = (Step) step();
+      if(step == null) {
+        if(more) error();
+        break;
+      }
+      //path.
+      more = true;
+    }
+    return path;
+  }
+  
+  /**
+   * Parses an RelativePath.
+   * @param path Path
+   * @throws QueryException queryException
+   * @return Path 
+   */
+  @SuppressWarnings("unused")
+  Path relPath(final Path path) throws QueryException { return null; }
 
   /**
    * Adds an expression to the specified array.
