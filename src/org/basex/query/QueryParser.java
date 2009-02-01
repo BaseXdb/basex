@@ -73,7 +73,6 @@ import org.basex.query.path.AxisPath;
 import org.basex.query.path.KindTest;
 import org.basex.query.path.MixedPath;
 import org.basex.query.path.NameTest;
-import org.basex.query.path.Path;
 import org.basex.query.path.Step;
 import org.basex.query.path.Test;
 import org.basex.query.util.Err;
@@ -1172,7 +1171,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException xquery exception
    */
-  private Expr path() throws QueryException {
+  public Expr path() throws QueryException {
     final int s = consume('/') ? consume('/') ? 2 : 1 : 0;
     final Expr ex = step();
     if(ex == null) {
@@ -1214,7 +1213,7 @@ public class QueryParser extends InputParser {
    * Returns a standard descendant-or-self::node() step.
    * @return step
    */
-  private Step descOrSelf() {
+  protected Step descOrSelf() {
     return Step.get(Axis.DESCORSELF, Test.NODE);
   }
 
@@ -1223,7 +1222,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException xquery exception
    */
-  private Expr step() throws QueryException {
+  protected Expr step() throws QueryException {
     final Expr e = filter();
     return e != null ? e : axis();
   }
@@ -2434,7 +2433,7 @@ public class QueryParser extends InputParser {
    * @return expression
    * @throws QueryException xquery exception
    */
-  private Expr check(final Expr expr, final Object[] err)
+  protected Expr check(final Expr expr, final Object[] err)
       throws QueryException {
     if(expr == null) Err.or(err);
     return expr;
@@ -2601,43 +2600,6 @@ public class QueryParser extends InputParser {
    */
   @SuppressWarnings("unused")
   void checkStep(final Axis axis, final Test test) { }
-  
-  /**
-   * Parses an AbsolutePath.
-   * @param path Path
-   * @throws QueryException queryException
-   * @return Path 
-   */
-  @SuppressWarnings("unused")
-  Path absPath(final Path path) throws QueryException {
-    boolean more = false;
-    while(consume('/')) {
-      final Step step = (Step) step();
-      if(step == null) {
-        if(more) error();
-        break;
-      }
-      //path.steps.add(step);
-      more = true;
-    }
-    return path;
-  }
-  
-  /**
-   * Parses an RelativePath.
-   * @param path Path
-   * @throws QueryException queryException
-   * @return Path 
-   */
-  @SuppressWarnings("unused")
-  Path relPath(final Path path) throws QueryException {
-    do {
-      final Step step = (Step) step();
-      if(step == null) error();
-      //path.steps.add(step);
-    } while(consume('/'));
-    return path;
-  }
 
   /**
    * Adds an expression to the specified array.
@@ -2646,7 +2608,7 @@ public class QueryParser extends InputParser {
    * @return new array
    * @throws QueryException xquery exception
    */
-  private static Expr[] add(final Expr[] ar, final Expr e)
+  protected static Expr[] add(final Expr[] ar, final Expr e)
       throws QueryException {
     if(e == null) Err.or(INCOMPLETE);
     final int size = ar.length;

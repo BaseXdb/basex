@@ -1,6 +1,7 @@
 package org.basex.query;
 
 import static org.basex.data.DataText.*;
+import static org.basex.query.QueryText.*;
 
 import java.util.ArrayList;
 import java.util.Stack;
@@ -8,11 +9,16 @@ import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.SkelNode;
 import org.basex.data.Skeleton;
+import org.basex.query.expr.Expr;
+import org.basex.query.expr.Root;
 import org.basex.query.item.Type;
 import org.basex.query.path.Axis;
+import org.basex.query.path.AxisPath;
+import org.basex.query.path.MixedPath;
 import org.basex.query.path.NameTest;
-import org.basex.query.path.Path;
+import org.basex.query.path.Step;
 import org.basex.query.path.Test;
+import org.basex.query.util.Err;
 import org.basex.util.StringList;
 import org.basex.util.Token;
 
@@ -46,40 +52,50 @@ public class QuerySuggest extends QueryParser {
     skel = ctx.data().skel;
   }
   
+  /**
+   * [ 68] Parses a PathExpr.
+   * [ 69] Parses a RelativePathExpr.
+   * @return query expression
+   * @throws QueryException xquery exception
+   */
   @Override
-  Path absPath(final Path path) throws QueryException {
-    final ArrayList<SkelNode> list = new ArrayList<SkelNode>();
-    list.add(skel.root);
-    stack.push(list);
-    final Path lp = super.absPath(path);
-    filter(false);
-    return lp;
-  }
-  
-  @Override
-  Path relPath(final Path path) throws QueryException {
-    ArrayList<SkelNode> list = null;
-    if(stack.size() == 0) {
-      if(!ctx.root()) return super.relPath(path);
-      list = new ArrayList<SkelNode>();
-      list.add(skel.root);
-    } else {
-      list = skel.desc(stack.peek(), 0, Data.ELEM, false);
+  public Expr path() throws QueryException {
+    final int s = consume('/') ? consume('/') ? 2 : 1 : 0;
+    final Expr ex = step();
+    if(ex == null) {
+      if(s > 1) Err.or(PATHMISS);
+      return s == 0 ? null : new Root();
     }
-    stack.push(list);
-    final Path lp = super.relPath(path);
-    filter(false);
-    return lp;
+
+    final boolean slash = consume('/');
+    final boolean step = ex instanceof Step;
+    if(!slash && s == 0 && !step) return ex;
+
+    Expr[] list = {};
+    if(s == 2) list = add(list, descOrSelf());
+    
+    final Expr root = s > 0 ? new Root() : !step ? ex : null;
+    if(root != ex) list = add(list, ex);
+
+    if(slash) {
+      do {
+        if(consume('/')) list = add(list, descOrSelf());
+        final Expr st = check(step(), PATHMISS);
+        if(!(st instanceof org.basex.query.expr.Context)) list = add(list, st);
+      } while(consume('/'));
+    }
+    
+    if(list.length == 0) return root;
+    
+    // check if all steps are axis steps
+    boolean axes = true;
+    final Step[] tmp = new Step[list.length];
+    for(int l = 0; l < list.length; l++) {
+      axes &= list[l] instanceof Step;
+      if(axes) tmp[l] = (Step) list[l];
+    }
+    return axes ? AxisPath.get(root, tmp) : new MixedPath(root, list);
   }
-  
-  /*
-  @Override
-  Expr pred() throws QueryException {
-    final int s = stack.size();
-    final Expr expr = super.pred();
-    while(stack.size() != s) stack.pop();
-    return expr;
-  }*/
 
   @Override
   void checkStep(final Axis axis, final Test test) {
