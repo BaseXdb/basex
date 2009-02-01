@@ -2,7 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
-import org.basex.BaseX;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -18,6 +17,8 @@ import org.basex.query.util.Var;
  * @author Christian Gruen
  */
 public final class Order extends Expr {
+  /** Sequence to be sorted. */
+  SeqIter sq;
   /** Sort list. */
   Ord[] ord;
   
@@ -37,25 +38,6 @@ public final class Order extends Expr {
 
   @Override
   public Iter iter(final QueryContext ctx) {
-    BaseX.notexpected();
-    return null;
-  }
-
-  /**
-   * Adds the items to be sorted.
-   * @param ctx query context
-   * @throws QueryException evaluation exception
-   */
-  public void add(final QueryContext ctx) throws QueryException {
-    for(final Ord o : ord) o.add(ctx);
-  }
-
-  /**
-   * Returns an array with the item order.
-   * @param sq temporary sequence
-   * @return resulting, ordered item
-   */
-  public Iter iter(final SeqIter sq) {
     return new Iter() {
       final int e = sq.size;
       int[] order;
@@ -88,6 +70,15 @@ public final class Order extends Expr {
         return Order.this.toString();
       }
     };
+  }
+
+  /**
+   * Adds the items to be sorted.
+   * @param ctx query context
+   * @throws QueryException evaluation exception
+   */
+  public void add(final QueryContext ctx) throws QueryException {
+    for(final Ord o : ord) o.add(ctx);
   }
 
   @Override

@@ -165,7 +165,7 @@ public final class Functions extends ExprInfo {
 
   /**
    * Compiles the functions.
-   * @param ctx xquery context
+   * @param ctx query context
    * @throws QueryException xquery exception
    */
   public void comp(final QueryContext ctx) throws QueryException {

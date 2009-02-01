@@ -10,6 +10,7 @@ import org.basex.query.path.Axis;
 import org.basex.query.path.AxisPath;
 import org.basex.query.path.KindTest;
 import org.basex.query.path.Step;
+import org.basex.query.util.Var;
 
 /**
  * Context Item.
@@ -34,6 +35,11 @@ public final class Context extends Simple {
   @Override
   public boolean sameAs(final Expr cmp) {
     return cmp instanceof Context;
+  }
+
+  @Override
+  public int countVar(final Var v) {
+    return v == null ? 1 : 0;
   }
   
   @Override

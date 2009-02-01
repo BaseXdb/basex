@@ -32,7 +32,7 @@ public final class CDoc extends Single {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
+  public Item atomic(final QueryContext ctx) throws QueryException {
     final NodIter nodes = new NodIter();
     final Iter iter = ctx.iter(expr);
     final byte[] base = Token.EMPTY;
@@ -67,7 +67,7 @@ public final class CDoc extends Single {
 
     final FDoc doc = new FDoc(nodes, base);
     for(int n = 0; n < nodes.size; n++) nodes.list[n].parent(doc);
-    return doc.iter();
+    return doc;
   }
   
   /**

@@ -1,6 +1,5 @@
 package org.basex.query.expr;
 
-import org.basex.BaseX;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.QNm;
@@ -42,12 +41,6 @@ public final class Catch extends Single {
     var3 = v3;
   }
 
-  @Override
-  public Iter iter(final QueryContext ctx) {
-    BaseX.notexpected();
-    return null;
-  }
-
   /**
    * Catch iterator.
    * @param ctx query context
@@ -64,7 +57,7 @@ public final class Catch extends Single {
     final int s = ctx.vars.size();
     if(var1 != null) ctx.vars.add(var1.bind(new QNm(code), ctx));
     if(var2 != null) ctx.vars.add(var2.bind(Str.get(e.simple()), ctx));
-    if(var3 != null) ctx.vars.add(var3.bind(e.item, ctx));
+    if(var3 != null) ctx.vars.add(var3.bind(e.iter.finish(), ctx));
     final Iter iter = ctx.iter(expr);
     ctx.vars.reset(s);
     return iter;

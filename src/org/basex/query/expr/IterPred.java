@@ -73,7 +73,7 @@ public final class IterPred extends Pred {
               // set context item and position
               ctx.item = it;
               ctx.pos = p++;
-              final Item i = ctx.iter(pred[0]).test(ctx);
+              final Item i = pred[0].test(ctx);
               if(i != null) {
                 // item accepted.. adopt scoring value
                 it.score(i.score());

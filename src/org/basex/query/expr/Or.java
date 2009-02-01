@@ -1,13 +1,11 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
-import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Scoring;
 import org.basex.util.Array;
@@ -74,23 +72,23 @@ public final class Or extends Arr {
     ctx.compInfo(OPTRED);
     return new CmpG(e1.expr[0], ir.finish(), e1.cmp);
   }
-  
+
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
+  public Item atomic(final QueryContext ctx) throws QueryException {
     double d = 0;
     boolean found = false;
     for(final Expr e : expr) {
-      final Item it = ctx.iter(e).ebv();
+      final Item it = e.ebv(ctx);
       if(it.bool()) {
         final double s = it.score();
-        if(s == 0) return Bln.TRUE.iter();
+        if(s == 0) return Bln.TRUE;
         d = Scoring.or(d, s);
         found = true;
       }
     }
-    return (d == 0 ? Bln.get(found) : Bln.get(d)).iter();
+    return d == 0 ? Bln.get(found) : Bln.get(d);
   }
-
+  
   @Override
   public void indexAccessible(final QueryContext ctx, final IndexContext ic)
       throws QueryException {

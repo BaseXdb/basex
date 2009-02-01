@@ -552,7 +552,7 @@ public abstract class W3CTS {
    * Initializes the input files, specified by the context nodes.
    * @param nod variables
    * @param var documents
-   * @param ctx xquery context
+   * @param ctx query context
    * @return string with input files
    * @throws QueryException query exception
    */
@@ -593,7 +593,7 @@ public abstract class W3CTS {
    * @param nod variables
    * @param var documents
    * @param pth file path
-   * @param ctx xquery context
+   * @param ctx query context
    * @throws Exception exception
    */
   private void var(final Nodes nod, final Nodes var, final String pth,

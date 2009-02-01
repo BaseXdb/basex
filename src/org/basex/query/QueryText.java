@@ -306,7 +306,9 @@ public interface QueryText {
   /** XPTY0004: Typing exception. */
   Object[] XPSORT = { XPTY, 4, "No sequences allowed as sort keys." };
   /** XPTY0004: Typing exception. */
-  Object[] XPSEQ = { XPTY, 4, "No sequence % allowed in %." };
+  Object[] XPSEQ = { XPTY, 4, "No sequence % allowed here." };
+  /** XPTY0004: Typing exception. */
+  Object[] XPEMPTY = { XPTY, 4, "Empty sequence not allowed here." };
   /** XPTY0004: Typing exception. */
   Object[] XPINVCAST = { XPTY, 4, "Invalid cast from % to %: %." };
   /** XPTY0004: Typing exception. */
@@ -318,8 +320,6 @@ public interface QueryText {
   /** XPTY0004: Typing exception. */
   Object[] XPEMPTYNUM =
     { XPTY, 4, "%: number expected, empty sequence found." };
-  /** XPTY0004: Typing exception. */
-  Object[] XPEMPTY = { XPTY, 4, "Empty sequence not allowed in %." };
   /** XPTY0004: Typing exception. */
   Object[] XPDUR = { XPTY, 4, "%: duration expected, % found." };
   /** XPTY0004: Typing Exception. */

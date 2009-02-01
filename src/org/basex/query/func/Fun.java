@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
-
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -39,7 +38,7 @@ public abstract class Fun extends Expr {
 
   /**
    * Compiles the function.
-   * @param ctx xquery context
+   * @param ctx query context
    * @return evaluated item
    * @throws QueryException evaluation exception
    */
@@ -58,7 +57,7 @@ public abstract class Fun extends Expr {
 
   /**
    * Evaluates the function.
-   * @param ctx xquery context
+   * @param ctx query context
    * @param arg evaluated arguments
    * @return evaluated item
    * @throws QueryException evaluation exception
@@ -98,6 +97,7 @@ public abstract class Fun extends Expr {
    * @throws QueryException evaluation exception
    */
   protected final Item check(final Item i, final Type t) throws QueryException {
+    if(i == null) Err.empty(this);
     if(i.type != t) Err.type(info(), t, i);
     return i;
   }
@@ -123,7 +123,7 @@ public abstract class Fun extends Expr {
    * @throws QueryException evaluation exception
    */
   protected final byte[] checkStr(final Iter iter) throws QueryException {
-    return checkStr(iter.atomic(this, true));
+    return checkStr(iter.atomic());
   }
 
   /**
@@ -144,7 +144,8 @@ public abstract class Fun extends Expr {
    * @throws QueryException evaluation exception
    */
   protected final void checkColl(final Iter col) throws QueryException {
-    final Item it = col.atomic(this, false);
+    final Item it = col.atomic();
+    if(it == null) Err.empty(this);
     if(!it.s() || !Token.eq(URLCOLL, it.str())) Err.or(IMPLCOL, col);
   }
 

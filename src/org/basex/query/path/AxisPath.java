@@ -14,6 +14,7 @@ import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.CAttr;
+import org.basex.query.expr.Context;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.For;
 import org.basex.query.expr.Pred;
@@ -103,6 +104,7 @@ public class AxisPath extends Path {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
+    if(root instanceof Context) root = null;
 
     // merge two axis paths
     if(root instanceof AxisPath) {

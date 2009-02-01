@@ -2,7 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
-
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -10,7 +9,6 @@ import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
-import org.basex.query.iter.Iter;
 import org.basex.util.Token;
 
 /**
@@ -21,7 +19,7 @@ import org.basex.util.Token;
  */
 public final class Castable extends Single {
   /** Instance. */
-  final SeqType seq;
+  private final SeqType seq;
 
   /**
    * Constructor.
@@ -37,25 +35,16 @@ public final class Castable extends Single {
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
     if(!expr.i()) return this;
-    final Bln ok = eval(ctx, ((Item) expr).iter());
+    final Item ok = atomic(ctx);
     ctx.compInfo(ok == Bln.TRUE ? OPTTRUE : OPTFALSE, this);
     return ok;
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    return eval(ctx, ctx.iter(expr)).iter();
-  }
-
-  /**
-   * Evaluates the cast expression.
-   * @param ctx query context
-   * @param iter iterator
-   * @return result of cast
-   */
-  private Bln eval(final QueryContext ctx, final Iter iter) {
+  public Bln atomic(final QueryContext ctx) {
     try {
-      seq.cast(iter, this, ctx);
+      final Item it = expr.atomic(ctx);
+      seq.cast(it, this, ctx);
       return Bln.TRUE;
     } catch(final QueryException e) {
       return Bln.FALSE;

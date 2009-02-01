@@ -4,7 +4,6 @@ import static org.basex.Text.*;
 import java.io.IOException;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
-import org.basex.util.GetOpts;
 import org.basex.util.Token;
 
 /**
@@ -26,7 +25,7 @@ public final class Cat extends FSCmd {
   @Override
   public void args(final String args) throws FSException {
     // get all Options
-    final GetOpts g = new GetOpts(args, "bn");
+    final FSParser g = new FSParser(args, "bn");
     while(g.more()) {
       final int ch = checkOpt(g);
       switch (ch) {

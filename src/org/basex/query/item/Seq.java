@@ -53,7 +53,7 @@ public class Seq extends Item {
    * @param s size
    */
   private Seq(final Item[] v, final int s) {
-    this();
+    super(Type.SEQ);
     val = v;
     size = s;
   }
@@ -84,6 +84,11 @@ public class Seq extends Item {
   @Override
   public Iter iter() {
     return SeqIter.get(val, size);
+  }
+
+  @Override
+  public Item atomic(final QueryContext ctx) throws QueryException {
+    return iter().atomic();
   }
 
   @Override

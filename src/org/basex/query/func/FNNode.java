@@ -22,8 +22,7 @@ public final class FNNode extends Fun {
   @Override
   public Iter iter(final QueryContext ctx, final Iter[] arg)
       throws QueryException {
-    final Iter iter = arg.length == 0 ? checkCtx(ctx) : arg[0];
-    final Item it = iter.atomic(this, true);
+    final Item it = (arg.length == 0 ? checkCtx(ctx) : arg[0]).atomic();
     final boolean empty = it == null;
 
     switch(func) {

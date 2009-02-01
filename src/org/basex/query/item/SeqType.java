@@ -63,19 +63,21 @@ public final class SeqType {
   }
 
   /**
-   * Casts the specified iterator item.
-   * @param iter iterator
+   * Casts the specified item.
+   * @param it item
    * @param expr expression reference
-   * @param ctx xquery context
+   * @param ctx query context
    * @return resulting item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
-  public Item cast(final Iter iter, final Expr expr, final QueryContext ctx)
+  public Item cast(final Item it, final Expr expr, final QueryContext ctx)
       throws QueryException {
 
-    final Item it = iter.atomic(expr, occ != 0);
-    if(it == null) return Seq.EMPTY;
-    // tiresome test to disallow "xs:QName(xs:string(...))"
+    if(it == null) {
+      if(occ == 0) Err.empty(expr);
+      return null;
+    }
+    // test to disallow "xs:QName(xs:string(...))"
     if(it.type == type) {
       if(it.type == Type.STR) ((Str) it).direct = false;
       return it;
@@ -86,9 +88,9 @@ public final class SeqType {
   /**
    * Casts the specified item.
    * @param item item to be cast
-   * @param ctx xquery context
+   * @param ctx query context
    * @return resulting item
-   * @throws QueryException evaluation exception
+   * @throws QueryException query exception
    */
   public Item cast(final Item item, final QueryContext ctx)
       throws QueryException {
@@ -97,7 +99,7 @@ public final class SeqType {
     Item it = iter.next();
     if(it == null) {
       if(type == Type.EMP || occ % 2 != 0) return Seq.EMPTY;
-      Err.cast(type, Seq.EMPTY);
+      Err.cast(type, item);
     }
 
     boolean ins = it.type.instance(type);

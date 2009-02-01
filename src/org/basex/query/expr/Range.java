@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
@@ -42,12 +41,12 @@ public final class Range extends Arr {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final Item i1 = atomic(ctx, expr[0], true);
-    if(i1 == null) return Iter.EMPTY;
-    final Item i2 = atomic(ctx, expr[1], true);
-    if(i2 == null) return Iter.EMPTY;
+    final Item a = expr[0].atomic(ctx);
+    if(a == null) return Iter.EMPTY;
+    final Item b = expr[1].atomic(ctx);
+    if(b == null) return Iter.EMPTY;
     
-    final long[] v = range(i1, i2);
+    final long[] v = range(a, b);
     return v[0] > v[1] ? Iter.EMPTY : v[0] == v[1] ? Itr.get(v[0]).iter() :
       new RangeIter(v[0], v[1]);
   }

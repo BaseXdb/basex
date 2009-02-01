@@ -1,7 +1,6 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
-
 import java.math.BigDecimal;
 import java.util.Calendar;
 import org.basex.BaseX;
@@ -30,7 +29,7 @@ final class FNDate extends Fun {
   @Override
   public Iter iter(final QueryContext ctx, final Iter[] arg)
       throws QueryException {
-    final Item it = arg[0].atomic(this, true);
+    final Item it = arg[0].atomic();
     if(it == null) return Iter.EMPTY;
 
     switch(func) {
@@ -140,7 +139,7 @@ final class FNDate extends Fun {
    * If it's an untyped item, the specified type is returned.
    * @param it item to be checked
    * @param t target type
-   * @param ctx xquery context
+   * @param ctx query context
    * @return date
    * @throws QueryException evaluation exception
    */
@@ -206,7 +205,7 @@ final class FNDate extends Fun {
    * @throws QueryException evaluation exception
    */
   private Iter dattim(final Item date, final Iter zon) throws QueryException {
-    final Item tm = zon.atomic(this, true);
+    final Item tm = zon.atomic();
     if(tm == null) return Iter.EMPTY;
 
     final Item d = date.u() ? new Dat(date.str()) : date;

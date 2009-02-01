@@ -24,8 +24,8 @@ final class FNNum extends Fun {
   @Override
   public Iter iter(final QueryContext ctx, final Iter[] arg)
       throws QueryException {
-    final Iter iter = arg[0];
-    final Item it = iter.atomic(this, true);
+
+    final Item it = arg[0].atomic();
     if(it == null) return Iter.EMPTY;
     return item(it, arg.length == 2 ? arg[1] : null).iter();
   }

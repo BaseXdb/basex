@@ -1,7 +1,6 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.basex.BaseX;
@@ -63,7 +62,8 @@ final class FNPat extends Fun {
   private Iter replace(final byte[] val, final Iter[] arg)
       throws QueryException {
 
-    final Item repl = arg[2].atomic(this, false);
+    final Item repl = arg[2].atomic();
+    if(repl == null) Err.empty(this);
 
     final byte[] rep = checkStr(repl);
     for(int i = 0; i < rep.length; i++) {
@@ -121,12 +121,14 @@ final class FNPat extends Fun {
       throws QueryException {
 
     // process modifiers
-    final Item pat = pattern.atomic(this, false);
+    final Item pat = pattern.atomic();
+    if(pat == null) Err.empty(this);
 
     byte[] pt = checkStr(pat);
     int m = Pattern.UNIX_LINES;
     if(mod != null) {
-      final Item md = mod.atomic(this, false);
+      final Item md = mod.atomic();
+      if(md == null) Err.empty(this);
       for(final byte b : checkStr(md)) {
         if(b == 'i') m |= Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
         else if(b == 'm') m |= Pattern.MULTILINE;

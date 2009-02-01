@@ -27,8 +27,7 @@ final class FNId extends Fun {
   @Override
   public Iter iter(final QueryContext ctx, final Iter[] arg)
       throws QueryException {
-    final Iter iter = arg.length == 1 ? checkCtx(ctx) : arg[1];
-    final Item it = iter.atomic(this, true);
+    final Item it = (arg.length == 1 ? checkCtx(ctx) : arg[1]).atomic();
     if(it == null) Err.or(XPEMPTYPE, info(), Type.NOD);
 
     final Nod node = checkNode(it);

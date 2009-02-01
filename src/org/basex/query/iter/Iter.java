@@ -1,11 +1,7 @@
 package org.basex.query.iter;
 
 import static org.basex.query.QueryText.*;
-
-import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.util.Err;
@@ -111,54 +107,21 @@ public abstract class Iter {
   }
 
   /**
-   * Checks if the iterator can be dissolved into an effective boolean value.
-   * If not, returns an error. If yes, returns the first value - which can be
-   * also be e.g. an integer, which is later evaluated as position predicate.
-   * Must be called before {@link #next} was called.
-   * @return item
-   * @throws QueryException evaluation exception
-   */
-  public final Item ebv() throws QueryException {
-    final Item it = next();
-    if(it == null) return Bln.FALSE;
-    if(!it.node() && next() != null) Err.or(FUNSEQ, this);
-    return it;
-  }
-
-  /**
-   * Performs a predicate test and returns the item if test was successful.
-   * @param ctx query context
-   * @return item
-   * @throws QueryException evaluation exception
-   */
-  public final Item test(final QueryContext ctx) throws QueryException {
-    final Item it = ebv();
-    return (it.n() ? it.dbl() == ctx.pos : it.bool()) ? it : null;
-  }
-
-  /**
    * Checks if the specified iterator contains a single item.
    * Returns null, the first item or an exception.
-   * @param expr calling expression
-   * @param empty allow empty sequences
    * @return item
    * @throws QueryException evaluation exception
    */
-  public final Item atomic(final Expr expr, final boolean empty)
-      throws QueryException {
-    
+  public final Item atomic() throws QueryException {
     final long s = size();
     if(s == 1) return next();
 
     final Item it = next();
-    if(it == null) {
-      if(!empty) Err.empty(expr);
-      return null;
-    }
+    if(it == null) return null;
 
     final Item n = next();
     if(n != null) Err.or(XPSEQ, "(" + it + "," + n +
-        (next() != null ? ",..." : "") + ")", expr.info());
+        (next() != null ? ",..." : "") + ")");
     return it;
   }
 }

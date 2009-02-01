@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
-import org.basex.BaseX;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.iter.Iter;
@@ -34,12 +33,6 @@ public final class Case extends Single {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) {
-    BaseX.notexpected();
-    return null;
-  }
-
-  @Override
   public int countVar(final Var v) {
     return v == null ? 1 : v.visible(var) ? super.countVar(v) : 0;
   }
@@ -63,9 +56,9 @@ public final class Case extends Single {
 
     final int s = ctx.vars.size();
     ctx.vars.add(var.bind(seq.finish(), ctx));
-    final Iter sb = ctx.iter(expr);
+    final Iter ir = ctx.iter(expr);
     ctx.vars.reset(s);
-    return sb;
+    return ir;
   }
 
   @Override

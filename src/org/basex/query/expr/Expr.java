@@ -7,6 +7,7 @@ import org.basex.query.ExprInfo;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Type;
@@ -34,11 +35,54 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Evaluates the expression and returns an iterator on the resulting items.
+   * If this method is not overwritten, {@link #atomic} must be implemented.
    * @param ctx query context
    * @return resulting item
    * @throws QueryException evaluation exception
    */
-  public abstract Iter iter(final QueryContext ctx) throws QueryException;
+  public Iter iter(final QueryContext ctx) throws QueryException {
+    final Item it = atomic(ctx);
+    return it != null ? it.iter() : Iter.EMPTY;
+  }
+
+  /**
+   * Evaluates the expression and returns the resulting item or
+   * a null reference.
+   * If this method is not overwritten, {@link #iter} must be implemented.
+   * @param ctx query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  public Item atomic(final QueryContext ctx) throws QueryException {
+    return iter(ctx).atomic();
+  }
+
+  /**
+   * Checks if the iterator can be dissolved into an effective boolean value.
+   * If not, returns an error. If yes, returns the first value - which can be
+   * also be e.g. an integer, which is later evaluated as position predicate.
+   * @param ctx query context
+   * @return item
+   * @throws QueryException query exception
+   */
+  public final Item ebv(final QueryContext ctx) throws QueryException {
+    final Iter ir = iter(ctx);
+    final Item it = ir.next();
+    if(it == null) return Bln.FALSE;
+    if(!it.node() && ir.next() != null) Err.or(FUNSEQ, this);
+    return it;
+  }
+
+  /**
+   * Performs a predicate test and returns the item if test was successful.
+   * @param ctx query context
+   * @return item
+   * @throws QueryException evaluation exception
+   */
+  public final Item test(final QueryContext ctx) throws QueryException {
+    final Item it = ebv(ctx);
+    return (it.n() ? it.dbl() == ctx.pos : it.bool()) ? it : null;
+  }
 
   /**
    * Checks if this is an item.
@@ -160,7 +204,7 @@ public abstract class Expr extends ExprInfo {
    * @throws QueryException evaluation exception
    */
   public final double checkDbl(final Iter iter) throws QueryException {
-    final Item it = iter.atomic(this, true);
+    final Item it = iter.atomic();
     if(it == null) Err.or(XPEMPTYNUM, info());
     if(!it.u() && !it.n()) Err.num(info(), it);
     return it.dbl();
@@ -186,14 +230,14 @@ public abstract class Expr extends ExprInfo {
    * @throws QueryException evaluation exception
    */
   protected final long checkItr(final Iter iter) throws QueryException {
-    final Item it = iter.atomic(this, true);
+    final Item it = iter.atomic();
     if(it == null) Err.or(XPEMPTYPE, info(), Type.ITR);
     return checkItr(it);
   }
 
   /**
    * Throws an exception if the context item is not set.
-   * @param ctx xquery context
+   * @param ctx query context
    * @return item if everything is ok
    * @throws QueryException evaluation exception
    */
@@ -201,21 +245,6 @@ public abstract class Expr extends ExprInfo {
     final Item it = ctx.item;
     if(it == null) Err.or(XPNOCTX, this);
     return it.iter();
-  }
-
-  /**
-   * Returns the specified expression as an atomic item.
-   * Empty sequences are handled by the empty flag.
-   * @param ctx xquery context
-   * @param ex expression
-   * @param e if set to true, empty sequences are returned as null.
-   * Otherwise, an error is thrown
-   * @return iterator
-   * @throws QueryException query exception
-   */
-  protected Item atomic(final QueryContext ctx, final Expr ex, final boolean e)
-      throws QueryException {
-    return i() ? (Item) ex : ctx.iter(ex).atomic(this, e);
   }
 
   /**

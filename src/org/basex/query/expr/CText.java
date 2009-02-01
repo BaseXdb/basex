@@ -13,7 +13,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class CText extends Single {
+public final class CText extends CFrag {
   /**
    * Constructor.
    * @param t text
@@ -23,10 +23,10 @@ public final class CText extends Single {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    final Iter iter = ctx.iter(expr);
+  public Item atomic(final QueryContext ctx) throws QueryException {
+    final Iter iter = ctx.iter(expr[0]);
     Item it = iter.next();
-    if(it == null) return Iter.EMPTY;
+    if(it == null) return null;
 
     final TokenBuilder tb = new TokenBuilder();
     boolean more = false;
@@ -35,7 +35,7 @@ public final class CText extends Single {
       tb.add(it.str());
       more = true;
     } while((it = iter.next()) != null);
-    return new FTxt(tb.finish(), null).iter();
+    return new FTxt(tb.finish(), null);
   }
 
   /**
@@ -54,11 +54,6 @@ public final class CText extends Single {
       more = true;
     }
   }
-  
-  @Override
-  public Return returned(final QueryContext ctx) {
-    return Return.NOD;
-  }
 
   @Override
   public String info() {
@@ -67,6 +62,6 @@ public final class CText extends Single {
   
   @Override
   public String toString() {
-    return "text { " + expr + " }";
+    return "text" + super.toString();
   }
 }

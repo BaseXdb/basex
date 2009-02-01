@@ -8,7 +8,6 @@ import java.util.Date;
 import org.basex.io.PrintOutput;
 import org.basex.util.Array;
 import org.basex.util.BoolList;
-import org.basex.util.GetOpts;
 import org.basex.util.IntList;
 import org.basex.util.Token;
 import org.basex.util.TokenList;
@@ -53,7 +52,7 @@ public final class Ls extends FSCmd {
   @Override
   public void args(final String args) throws FSException {
     // get all Options
-    final GetOpts g = new GetOpts(args, "ahlrRSt");
+    final FSParser g = new FSParser(args, "ahlrRSt");
     while(g.more()) {
       final int ch = checkOpt(g);
       switch(ch) {

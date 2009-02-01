@@ -2,7 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
-
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -12,7 +11,6 @@ import org.basex.query.item.Dec;
 import org.basex.query.item.Flt;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
-import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.Token;
 
@@ -43,29 +41,20 @@ public final class Unary extends Single {
       ctx.compInfo(OPTPRE, this);
       return expr;
     }
-    return expr.i() && ((Item) expr).n() ? eval((Item) expr) : this;
+    return expr.i() ? atomic(ctx) : this;
   }
   
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    final Item it = atomic(ctx, expr, true);
-    if(it == null) return Iter.EMPTY;
+  public Item atomic(final QueryContext ctx) throws QueryException {
+    final Item it = expr.atomic(ctx);
+    if(it == null) return null;
     if(!it.u() && !it.n()) Err.num(info(), it);
     final double d = it.dbl();
-    return (it.u() ? Dbl.get(minus ? -d : d) : eval(it)).iter();
-  }
-
-  /**
-   * Returns the result of the unary expression.
-   * @param it input item
-   * @return resulting item
-   * @throws QueryException xquery exception
-   */
-  private Item eval(final Item it) throws QueryException {
-    if(!minus) return it;
+    if(it.u()) return Dbl.get(minus ? -d : d);
     
+    if(!minus) return it;
     switch(it.type) {
-      case DBL: return Dbl.get(-it.dbl());
+      case DBL: return Dbl.get(-d);
       case FLT: return Flt.get(-it.flt());
       case DEC: return Dec.get(it.dec().negate());
       default:  return Itr.get(-it.itr());
@@ -81,6 +70,6 @@ public final class Unary extends Single {
   
   @Override
   public String toString() {
-    return "-" + expr;
+    return (minus ? "-" : "") + expr;
   }
 }

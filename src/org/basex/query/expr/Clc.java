@@ -2,14 +2,12 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
-
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
-import org.basex.query.iter.Iter;
 import org.basex.util.Token;
 
 /**
@@ -41,19 +39,19 @@ public final class Clc extends Arr {
     final Expr e2 = expr[1];
     
     Expr e = this;
-    if(e1.i() && e2.i()) e = calc.ev((Item) e1, (Item) e2);
+    if(e1.i() && e2.i()) e = atomic(ctx);
     if(e1.e() || e2.e()) e = Seq.EMPTY;
     if(e != this) ctx.compInfo(OPTPRE, this);
     return e;
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    final Item a = atomic(ctx, expr[0], true);
-    if(a == null) return Iter.EMPTY;
-    final Item b = atomic(ctx, expr[1], true);
-    if(b == null) return Iter.EMPTY;
-    return calc.ev(a, b).iter();
+  public Item atomic(final QueryContext ctx) throws QueryException {
+    final Item a = expr[0].atomic(ctx);
+    if(a == null) return null;
+    final Item b = expr[1].atomic(ctx);
+    if(b == null) return null;
+    return calc.ev(a, b);
   }
 
   @Override

@@ -5,7 +5,6 @@ import org.basex.BaseX;
 import org.basex.core.Commands;
 import org.basex.core.Context;
 import org.basex.io.PrintOutput;
-import org.basex.util.GetOpts;
 
 /**
  * Defines common methods for file system commands.
@@ -77,8 +76,8 @@ public abstract class FSCmd {
    * @return option parser
    * @throws FSException file system exception
    */
-  final GetOpts defaultOpts(final String args) throws FSException {
-    final GetOpts g = new GetOpts(args, "");
+  final FSParser defaultOpts(final String args) throws FSException {
+    final FSParser g = new FSParser(args, "");
     while(g.more()) checkOpt(g);
     return g;
   }
@@ -90,7 +89,7 @@ public abstract class FSCmd {
    * @return specified argument
    * @throws FSException file system exception
    */
-  final int checkOpt(final GetOpts g) throws FSException {
+  final int checkOpt(final FSParser g) throws FSException {
     final int c = g.next();
     if(c == ':') error(g.getPath(), 99);
     if(c == 0) help();

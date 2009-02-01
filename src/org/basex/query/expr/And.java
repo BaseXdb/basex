@@ -1,14 +1,12 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
-import org.basex.query.iter.Iter;
 import org.basex.query.util.Scoring;
 import org.basex.util.Array;
 
@@ -74,19 +72,19 @@ public final class And extends Arr {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
+  public Bln atomic(final QueryContext ctx) throws QueryException {
     double s = 0;
     for(final Expr e : expr) {
-      final Item it = ctx.iter(e).ebv();
+      final Item it = e.ebv(ctx);
       if(!it.bool()) {
         // [SG] pre + 1  will cause troubles for some documents..
         if(ctx.ftdata != null) ctx.ftdata.remove(((DBNode) ctx.item).pre + 1);
-        return Bln.FALSE.iter();
+        return Bln.FALSE;
       }
       s = Scoring.and(s, it.score());
     }
     // no scoring - return default boolean
-    return (s == 0 ? Bln.TRUE : Bln.get(s)).iter();
+    return s == 0 ? Bln.TRUE : Bln.get(s);
   }
   
   @Override

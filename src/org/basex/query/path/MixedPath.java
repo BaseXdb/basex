@@ -31,7 +31,7 @@ public final class MixedPath extends Path {
    * @param r root expression; can be null
    * @param s location steps; will at least have one entry
    */
-  public MixedPath(final Expr r, final Expr[] s) {
+  public MixedPath(final Expr r, final Expr... s) {
     super(r);
     step = s;
   }

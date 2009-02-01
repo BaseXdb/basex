@@ -92,17 +92,7 @@ public final class CmpR extends Single {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    return Bln.get(eval(ctx)).iter();
-  }
-
-  /**
-   * Evaluates the comparison operator.
-   * @param ctx query context
-   * @return result of check
-   * @throws QueryException evaluation exception
-   */
-  private boolean eval(final QueryContext ctx) throws QueryException {
+  public Item atomic(final QueryContext ctx) throws QueryException {
     final Iter ir = ctx.iter(expr);
 
     // evaluate iterator
@@ -113,9 +103,9 @@ public final class CmpR extends Single {
       final double d = it.dbl();
       mn |= mni ? d >= min : d > min;
       mx |= mxi ? d <= max : d < max;
-      if(mn && mx) return true;
+      if(mn && mx) return Bln.TRUE;
     }
-    return false;
+    return Bln.FALSE;
   }
 
   /**

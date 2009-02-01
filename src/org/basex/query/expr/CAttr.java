@@ -12,7 +12,6 @@ import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
-import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import org.basex.util.TokenBuilder;
@@ -24,7 +23,7 @@ import org.basex.util.XMLToken;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class CAttr extends Arr {
+public final class CAttr extends CFrag {
   /** Tag name. */
   private Expr atn;
   /** Computed constructor. */
@@ -46,13 +45,14 @@ public final class CAttr extends Arr {
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
     atn = atn.comp(ctx);
-    if(atn.e()) Err.empty(this);
     return this;
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    final QNm name = name(ctx, atomic(ctx, atn, false));
+  public Item atomic(final QueryContext ctx) throws QueryException {
+    final Item it = atn.atomic(ctx);
+    if(it == null) Err.empty(this);
+    final QNm name = name(ctx, it);
     final byte[] pre = name.pre();
     final byte[] ln = name.ln();
     if(comp && (eq(name.str(), XMLNS) || eq(pre, XMLNS))) Err.or(NSATTCONS);
@@ -62,7 +62,7 @@ public final class CAttr extends Arr {
     byte[] val = tb.finish();
     if(eq(pre, XML) && eq(ln, ID)) val = norm(val);
 
-    return new FAttr(name, val, null).iter();
+    return new FAttr(name, val, null);
   }
 
   /**
@@ -113,18 +113,12 @@ public final class CAttr extends Arr {
   }
   
   @Override
-  public Return returned(final QueryContext ctx) {
-    return Return.NOD;
-  }
-
-  @Override
   public String info() {
     return "attribute constructor";
   }
 
   @Override
   public String toString() {
-    return new StringBuilder("attribute ").append(atn).append(" { ").
-      append(toString(", ")).append(" }").toString();
+    return "attribute" + atn + super.toString();
   }
 }

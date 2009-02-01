@@ -1,4 +1,6 @@
-package org.basex.util;
+package org.basex.fs;
+
+import org.basex.util.StringList;
 
 /**
  * This class splits the input String into its arguments and checks if
@@ -8,7 +10,7 @@ package org.basex.util;
  * @author Hannes Schwarz - Hannes.Schwarz@gmail.com
  * @version 0.1
  */
-public final class GetOpts {
+public final class FSParser {
   /** Arguments found. */
   private final StringList foundArgs;
   /** Arguments passed to the program. */
@@ -35,7 +37,7 @@ public final class GetOpts {
    * @param options A String containing a description of the
    *                  valid options
    */
-  public GetOpts(final String arguments, final String options) {
+  public FSParser(final String arguments, final String options) {
     args = arguments.split(" ");
     optString = options;
     multipleOptIndex = 1;

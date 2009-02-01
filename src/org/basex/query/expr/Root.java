@@ -25,7 +25,7 @@ public final class Root extends Simple {
     while((i = iter.next()) != null) {
       final Nod n = root(i);
       if(n == null || n.type != Type.DOC) Err.or(CTXNODE, this);
-     ni.add(n);
+      ni.add(n);
     }
     return ni;
   }

@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.FPI;
@@ -20,7 +19,7 @@ import org.basex.util.XMLToken;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class CPI extends Arr {
+public final class CPI extends CFrag {
   /** Closing processing instruction. */
   private static final byte[] CLOSE = { '?', '>' };
 
@@ -33,7 +32,6 @@ public final class CPI extends Arr {
     super(n, v);
   }
 
-
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
@@ -42,8 +40,9 @@ public final class CPI extends Arr {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    final Item it = atomic(ctx, expr[0], false);
+  public Item atomic(final QueryContext ctx) throws QueryException {
+    final Item it = expr[0].atomic(ctx);
+    if(it == null) Err.empty(this);
     if(!it.u() && !it.s() && it.type != Type.QNM) Err.or(CPIWRONG, it.type, it);
 
     final byte[] nm = Token.trim(it.str());
@@ -60,12 +59,7 @@ public final class CPI extends Arr {
     v = Token.substring(v, i);
     if(Token.contains(v, CLOSE)) Err.or(CPICONT, v);
 
-    return new FPI(new QNm(nm), v, null).iter();
-  }
-  
-  @Override
-  public Return returned(final QueryContext ctx) {
-    return Return.NOD;
+    return new FPI(new QNm(nm), v, null);
   }
 
   @Override
@@ -75,6 +69,6 @@ public final class CPI extends Arr {
 
   @Override
   public String toString() {
-    return "<?" + expr[0] + ' ' + expr[1] + "?>";
+    return "processing-instruction" + super.toString();
   }
 }

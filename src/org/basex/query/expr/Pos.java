@@ -2,7 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
-
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -10,7 +9,6 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.CmpV.Comp;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
-import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.Token;
 
@@ -76,30 +74,11 @@ public final class Pos extends Simple {
     }
     return expr;
   }
-
-  /**
-   * Creates an intersection of the existing and the specified position
-   * expressions.
-   * @param pos second position expression
-   * @return resulting expression
-   */
-  public Expr intersect(final Pos pos) {
-    return get(Math.max(min, pos.min), Math.min(max, pos.max));
-  }
-
-  /**
-   * Creates a union of the existing and the specified position expressions.
-   * @param pos second position expression
-   * @return resulting expression
-   */
-  public Expr union(final Pos pos) {
-    return get(Math.min(min, pos.min), Math.max(max, pos.max));
-  }
   
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
+  public Bln atomic(final QueryContext ctx) throws QueryException {
     if(ctx.item == null) Err.or(XPNOCTX, this);
-    return Bln.get(ctx.pos >= min && ctx.pos <= max).iter();
+    return Bln.get(ctx.pos >= min && ctx.pos <= max);
   }
 
   /**
@@ -109,6 +88,25 @@ public final class Pos extends Simple {
    */
   public boolean more(final QueryContext ctx) {
     return ctx.pos <= max;
+  }
+
+  /**
+   * Creates an intersection of the existing and the specified position
+   * expressions.
+   * @param pos second position expression
+   * @return resulting expression
+   */
+  Expr intersect(final Pos pos) {
+    return get(Math.max(min, pos.min), Math.min(max, pos.max));
+  }
+
+  /**
+   * Creates a union of the existing and the specified position expressions.
+   * @param pos second position expression
+   * @return resulting expression
+   */
+  Expr union(final Pos pos) {
+    return get(Math.min(min, pos.min), Math.max(max, pos.max));
   }
   
   @Override

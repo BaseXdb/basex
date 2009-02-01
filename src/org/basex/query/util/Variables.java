@@ -70,7 +70,7 @@ public final class Variables extends ExprInfo {
   
   /**
    * Compiles the variables.
-   * @param ctx xquery context
+   * @param ctx query context
    * @throws QueryException xquery exception
    */
   public void comp(final QueryContext ctx) throws QueryException {

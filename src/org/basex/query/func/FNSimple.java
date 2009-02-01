@@ -27,8 +27,9 @@ public final class FNSimple extends Fun {
     switch(func) {
       case TRUE:    return Bln.TRUE.iter();
       case FALSE:   return Bln.FALSE.iter();
-      case BOOL:    return Bln.get(iter.ebv().bool()).iter();
-      case NOT:     return Bln.get(!iter.ebv().bool()).iter();
+      // [CG] arguments are currently evaluated twice here
+      case BOOL:    return Bln.get(ebv(iter)).iter();
+      case NOT:     return Bln.get(!ebv(iter)).iter();
       case EMPTY:   return Bln.get(iter.next() == null).iter();
       case EXISTS:  return Bln.get(iter.next() != null).iter();
       case ZEROONE:
@@ -50,7 +51,7 @@ public final class FNSimple extends Fun {
         BaseX.notexpected(func); return null;
     }
   }
-
+  
   @Override
   public Expr c(final QueryContext ctx) throws QueryException {
     final Item it = args.length != 0 && args[0].i() ? (Item) args[0] : null;
@@ -85,5 +86,18 @@ public final class FNSimple extends Fun {
       case UNORDER: return args[0];
       default:      return this;
     }
+  }
+  
+  /**
+   * Creates the existential boolean value from the specified iterator. 
+   * @param ir iterator
+   * @return result
+   * @throws QueryException query exception
+   */
+  private boolean ebv(final Iter ir) throws QueryException {
+    final Item it = ir.next();
+    if(it == null) return false;
+    if(!it.node() && ir.next() != null) Err.or(FUNSEQ, this);
+    return it.bool();
   }
 }

@@ -31,15 +31,15 @@ final class FNAcc extends Fun {
       case LAST:
         return Itr.get(ctx.size).iter();
       case STRING:
-        Item it = iter.atomic(this, true);
-        return it == null ? Str.ZERO.iter() : it.s() && !it.u() ? it.iter() :
-          Str.get(it.str()).iter();
+        Item it = iter.atomic();
+        return (it == null ? Str.ZERO : it.s() && !it.u() ? it :
+          Str.get(it.str())).iter();
       case NUMBER:
         it = iter.next();
         return (it == null || iter.next() != null ? Dbl.NAN :
           number(it)).iter();
       case URIQNAME:
-        it = iter.atomic(this, true);
+        it = iter.atomic();
         if(it == null) return Iter.EMPTY;
         return ((QNm) check(it, Type.QNM)).uri.iter();
       case STRLEN:

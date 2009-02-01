@@ -47,9 +47,8 @@ public final class VarCall extends Expr {
      */
     Expr e = var.expr;
     if(ctx.nsElem.length != 0 || lc.size() != 0 || var.type != null ||
-        var.global || e instanceof CAttr || e instanceof CElem ||
-        e instanceof CPI || e instanceof CComm || e instanceof CText ||
-        e instanceof FunCall) e = var.item(ctx);
+        var.global || e instanceof CFrag || e instanceof FunCall)
+      e = var.item(ctx);
     
     ctx.ns = lc;
     return e;

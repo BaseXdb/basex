@@ -40,8 +40,9 @@ public final class Let extends ForLet {
   public Expr comp(final QueryContext ctx) throws QueryException {
     expr = expr.comp(ctx);
     
-    // bind variable if no variables are used
-    if(!score && expr.countVar(null) == 0 && !(expr instanceof Context)) {
+    // bind variable if no variables are used and if expression is no
+    // constructor and no context
+    if(!score && expr.countVar(null) == 0 && !(expr instanceof CFrag)) {
       ctx.compInfo(OPTBIND, var);
       var.bind(expr, ctx);
     } else {

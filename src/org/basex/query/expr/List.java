@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.util.TokenBuilder;
@@ -12,12 +13,12 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class List extends Arr {
+public class List extends Arr {
   /**
    * Constructor.
    * @param l expression list
    */
-  public List(final Expr[] l) {
+  public List(final Expr... l) {
     super(l);
   }
 
@@ -25,15 +26,32 @@ public final class List extends Arr {
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
     for(final Expr e : expr) if(!e.i() && !e.e()) return this;
-    // all values are items - return simple sequence
-    return iter(ctx).finish();
+
+    // return simple sequence if all values are items
+    final SeqIter seq = new SeqIter();
+    for(final Expr e : expr) seq.add(ctx.iter(e));
+    return seq.finish();
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    final SeqIter seq = new SeqIter();
-    for(final Expr e : expr) seq.add(ctx.iter(e));
-    return seq;
+  public Iter iter(final QueryContext ctx) {
+    return new Iter() {
+      Iter ir = null;
+      int e = 0;
+      
+      @Override
+      public Item next() throws QueryException {
+        while(true) {
+          if(ir == null) {
+            if(e == expr.length) return null;
+            ir = ctx.iter(expr[e++]);
+          }
+          final Item it = ir.next();
+          if(it != null) return it;
+          ir = null;
+        }
+      }
+    };
   }
 
   @Override
@@ -49,7 +67,7 @@ public final class List extends Arr {
 
   @Override
   public String toString() {
-    final TokenBuilder sb = new TokenBuilder(name()).add('(');
+    final TokenBuilder sb = new TokenBuilder("(");
     for(int v = 0; v != expr.length; v++) {
       sb.add((v != 0 ? ", " : "") + expr[v]);
       /*if(sb.size > 15 && v + 1 != expr.length) {

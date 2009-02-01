@@ -75,7 +75,8 @@ public final class FunJava extends Arr {
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Item[] arg = new Item[expr.length];
     for(int a = 0; a < expr.length; a++) {
-      arg[a] = ctx.iter(expr[a]).atomic(this, false);
+      arg[a] = expr[a].atomic(ctx);
+      if(arg[a] == null) Err.empty(this);
     }
 
     Object result = null;

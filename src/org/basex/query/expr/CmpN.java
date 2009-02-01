@@ -2,7 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
-
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -12,7 +11,6 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Type;
-import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.Token;
 
@@ -71,7 +69,6 @@ public final class CmpN extends Arr {
     public String toString() { return name; }
   }
 
-  
   /** Comparator. */
   private final Comp cmp;
 
@@ -97,15 +94,15 @@ public final class CmpN extends Arr {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    final Item a = atomic(ctx, expr[0], true);
-    if(a == null) return Iter.EMPTY;
-    final Item b = atomic(ctx, expr[1], true);
-    if(b == null) return Iter.EMPTY;
-
+  public Bln atomic(final QueryContext ctx) throws QueryException {
+    final Item a = expr[0].atomic(ctx);
+    if(a == null) return null;
+    final Item b = expr[1].atomic(ctx);
+    if(b == null) return null;
+    
     if(!a.node()) Err.type(info(), Type.NOD, a);
     if(!b.node()) Err.type(info(), Type.NOD, b);
-    return Bln.get(cmp.e(a, b)).iter();
+    return Bln.get(cmp.e(a, b));
   }
   
   @Override

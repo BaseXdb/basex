@@ -3,7 +3,6 @@ package org.basex.fs;
 import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.io.PrintOutput;
-import org.basex.util.GetOpts;
 import org.basex.util.IntList;
 import org.basex.util.StringList;
 import org.basex.util.Token;
@@ -24,7 +23,7 @@ public final class Cp extends FSCmd {
   @Override
   public void args(final String args) throws FSException {
     // get all Options
-    final GetOpts g = new GetOpts(args, "R");
+    final FSParser g = new FSParser(args, "R");
     while(g.more()) {
       final int ch = checkOpt(g);
       switch (ch) {

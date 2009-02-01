@@ -1185,7 +1185,7 @@ public class QueryParser extends InputParser {
 
     Expr[] list = {};
     if(s == 2) list = add(list, descOrSelf());
-    
+
     final Expr root = s > 0 ? new Root() : !step ? ex : null;
     if(root != ex) list = add(list, ex);
 
@@ -1196,9 +1196,8 @@ public class QueryParser extends InputParser {
         if(!(st instanceof Context)) list = add(list, st);
       } while(consume('/'));
     }
-    
-    if(list.length == 0) return root;
-    
+    if(list.length == 0) return new MixedPath(root, new Context());
+
     // check if all steps are axis steps
     boolean axes = true;
     final Step[] tmp = new Step[list.length];
@@ -1984,7 +1983,7 @@ public class QueryParser extends InputParser {
 
     final Expr tr = enclosed(NOENCLEXPR);
     check(CATCH);
-    
+
     Catch[] ct = {};
     do {
       QNm[] codes = {};
@@ -1997,7 +1996,7 @@ public class QueryParser extends InputParser {
           codes = Array.add(codes, null);
         }
       } while(consume(PIPE));
-      
+
       Var var1 = null;
       Var var2 = null;
       Var var3 = null;
@@ -2022,7 +2021,7 @@ public class QueryParser extends InputParser {
       ctx.vars.reset(s);
       ct = Array.add(ct, new Catch(ex, codes, var1, var2, var3));
     } while(consume(CATCH));
-    
+
     return new Try(tr, ct);
   }
 
@@ -2030,8 +2029,8 @@ public class QueryParser extends InputParser {
    * [FT144] Parses an FTSelection.
    * [FT157] Parses an FTPosFilter.
    * [FT158] Parses an FTOrder.
-   * [FT159] Parses an FTWindow. 
-   * [FT160] Parses an FTDistance. 
+   * [FT159] Parses an FTWindow.
+   * [FT160] Parses an FTDistance.
    * [FT162] Parses an FTScope.
    * [FT164] Parses an FTContent.
    * @return query expression
@@ -2300,13 +2299,13 @@ public class QueryParser extends InputParser {
           } else if(consumeWS2(AT)) {
             String fn = string(stringLiteral());
             if(ctx.stop != null) fn = ctx.stop.get(fn);
-            
+
             IO fl = IO.get(fn);
             if(!fl.exists() && ctx.file != null) {
               fl = file.merge(fl);
               if(!fl.exists()) Err.or(NOSTOPFILE, fl);
             }
-            
+
             try {
               for(final byte[] sl : split(norm(fl.content()), ' ')) {
                 if(except) opt.sw.delete(sl);
@@ -2365,7 +2364,7 @@ public class QueryParser extends InputParser {
     Err.or(UPIMPL);
     return expr;
   }
-  
+
   /**
    * Parses an NCName.
    * @param err optional error message
@@ -2592,7 +2591,7 @@ public class QueryParser extends InputParser {
     ctx.fun.funError((QNm) alter[0]);
     Err.or(FUNCUNKNOWN, ((QNm) alter[0]).str());
   }
-  
+
   /**
    * Performs optional step checks.
    * @param axis axis

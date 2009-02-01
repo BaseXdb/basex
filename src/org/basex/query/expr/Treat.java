@@ -59,10 +59,6 @@ public final class Treat extends Single {
         i = iter.next();
         return ii;
       }
-      @Override
-      public String toString() {
-        return Treat.this.toString();
-      }
     };
   }
 

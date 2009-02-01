@@ -1,9 +1,7 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-
 import java.io.IOException;
-import org.basex.BaseX;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -55,18 +53,12 @@ public final class Ord extends Expr {
     return this;
   }
 
-  @Override
-  public Iter iter(final QueryContext ctx) {
-    BaseX.notexpected();
-    return null;
-  }
-
   /**
    * Adds an item to be sorted.
    * @param ctx query context
    * @throws QueryException query exception
    */
-  public void add(final QueryContext ctx) throws QueryException {
+  void add(final QueryContext ctx) throws QueryException {
     if(seq != null) {
       final Iter iter = ctx.iter(expr);
       Item it = iter.next();
@@ -82,7 +74,7 @@ public final class Ord extends Expr {
   /**
    * Resets the built sequence.
    */
-  public void finish() {
+  void finish() {
     if(seq != null) seq = new SeqIter();
   }
 
@@ -91,7 +83,7 @@ public final class Ord extends Expr {
    * @param i item index
    * @return item
    */
-  public Item item(final int i) {
+  Item item(final int i) {
     return seq == null ? Itr.get(i) : seq.item[i];
   }
 

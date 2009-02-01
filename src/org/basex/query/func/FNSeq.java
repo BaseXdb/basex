@@ -12,6 +12,7 @@ import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.SeqIter;
+import org.basex.query.util.Err;
 import org.basex.query.util.ItemSet;
 import org.basex.util.Token;
 
@@ -44,7 +45,8 @@ final class FNSeq extends Fun {
    * @throws QueryException evaluation exception
    */
   private Iter indexOf(final Iter[] arg) throws QueryException {
-    final Item it = arg[1].atomic(this, false);
+    final Item it = arg[1].atomic();
+    if(it == null) Err.empty(this);
     if(arg.length == 3) checkColl(arg[2]);
 
     return new Iter() {

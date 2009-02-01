@@ -3,7 +3,6 @@ package org.basex.fs;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.io.PrintOutput;
-import org.basex.util.GetOpts;
 
 /**
  * Performs a du command.
@@ -24,7 +23,7 @@ public final class Du extends FSCmd {
   @Override
   public void args(final String args) throws FSException {
     // get all Options
-    final GetOpts g = new GetOpts(args, "ahs");
+    final FSParser g = new FSParser(args, "ahs");
     while(g.more()) {
       final int ch = checkOpt(g);
       switch (ch) {

@@ -28,7 +28,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class CElem extends Arr {
+public final class CElem extends CFrag {
   /** Namespaces. */
   final Atts nsp;
   /** Tag name. */
@@ -69,8 +69,8 @@ public final class CElem extends Arr {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    return new Constr().construct(ctx);
+  public Item atomic(final QueryContext ctx) throws QueryException {
+    return new Constr().atomic(ctx);
   }
 
   /** Construction helper class. */
@@ -88,12 +88,13 @@ public final class CElem extends Arr {
 
     /**
      * Constructs the element node.
-     * @param ctx xquery context
+     * @param ctx query context
      * @throws QueryException xquery exception
      * @return element
      */
-    Iter construct(final QueryContext ctx) throws QueryException {
-      final Item it = atomic(ctx, tag, false);
+    Item atomic(final QueryContext ctx) throws QueryException {
+      final Item it = tag.atomic(ctx);
+      if(it == null) Err.empty(CElem.this);
       final int s = ctx.ns.size();
       addNS(ctx);
 
@@ -118,13 +119,13 @@ public final class CElem extends Arr {
       for(int n = 0; n < children.size; n++) children.list[n].parent(node);
       for(int n = 0; n < ats.size; n++) ats.list[n].parent(node);
       ctx.ns.size(s);
-      return node.iter();
+      return node;
     }
 
     /**
      * Recursively adds nodes to the element arrays. Recursion is necessary
      * as documents are resolved to their child nodes.
-     * @param ctx xquery context
+     * @param ctx query context
      * @param it current item
      * @return true if item was added
      * @throws QueryException xquery exception
@@ -193,11 +194,6 @@ public final class CElem extends Arr {
       return true;
     }
   }
-  
-  @Override
-  public Return returned(final QueryContext ctx) {
-    return Return.NOD;
-  }
 
   @Override
   public int countVar(final Var v) {
@@ -225,8 +221,6 @@ public final class CElem extends Arr {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("elem { " + tag);
-    for(final Expr e : expr) sb.append(", " + e);
-    return sb.append(" }").toString();
+    return "elem " + tag + super.toString();
   }
 }

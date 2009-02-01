@@ -94,7 +94,7 @@ public final class FNAggr extends Fun {
    * Returns a minimum or maximum item.
    * @param arg arguments
    * @param cmp comparator
-   * @param ctx xquery context
+   * @param ctx query context
    * @return resulting item
    * @throws QueryException thrown if the items can't be compared
    */

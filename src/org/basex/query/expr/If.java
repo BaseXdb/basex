@@ -26,7 +26,7 @@ public final class If extends Arr {
   
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    return ctx.iter(expr[ctx.iter(expr[0]).ebv().bool() ? 1 : 2]);
+    return ctx.iter(expr[expr[0].ebv(ctx).bool() ? 1 : 2]);
   }
 
   @Override

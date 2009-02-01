@@ -37,14 +37,14 @@ final class FNStr extends Fun {
         return str2cp(iter);
       case COMPARE:
         if(arg.length == 3) checkColl(arg[2]);
-        Item it1 = iter.atomic(this, true);
-        Item it2 = arg[1].atomic(this, true);
+        Item it1 = iter.atomic();
+        Item it2 = arg[1].atomic();
         if(it1 == null || it2 == null) return Iter.EMPTY;
         final int d = diff(checkStr(it1), checkStr(it2));
         return Itr.get(Math.max(-1, Math.min(1, d))).iter();
       case CODEPNT:
-        it1 = iter.atomic(this, true);
-        it2 = arg[1].atomic(this, true);
+        it1 = iter.atomic();
+        it2 = arg[1].atomic();
         if(it1 == null || it2 == null) return Iter.EMPTY;
         return Bln.get(eq(checkStr(it1), checkStr(it2))).iter();
       case STRJOIN:
@@ -68,23 +68,23 @@ final class FNStr extends Fun {
       case CONCAT:
         final TokenBuilder tb = new TokenBuilder();
         for(final Iter a : arg) {
-          final Item it = a.atomic(this, true);
+          final Item it = a.atomic();
           if(it != null) tb.add(it.str());
         }
         return Str.get(tb.finish()).iter();
       case CONTAINS:
         if(arg.length == 3) checkColl(arg[2]);
-        Item it = arg[1].atomic(this, true);
+        Item it = arg[1].atomic();
         if(it == null) return Bln.TRUE.iter();
         return Bln.get(contains(checkStr(iter), checkStr(it))).iter();
       case STARTS:
         if(arg.length == 3) checkColl(arg[2]);
-        it = arg[1].atomic(this, true);
+        it = arg[1].atomic();
         if(it == null) return Bln.TRUE.iter();
         return Bln.get(startsWith(checkStr(iter), checkStr(it))).iter();
       case ENDS:
         if(arg.length == 3) checkColl(arg[2]);
-        it = arg[1].atomic(this, true);
+        it = arg[1].atomic();
         if(it == null) return Bln.TRUE.iter();
         return Bln.get(endsWith(checkStr(iter), checkStr(it))).iter();
       case SUBAFTER:
@@ -143,7 +143,7 @@ final class FNStr extends Fun {
    * @throws QueryException query exception
    */
   private Iter str2cp(final Iter iter) throws QueryException {
-    final Item it = iter.atomic(this, true);
+    final Item it = iter.atomic();
     if(it == null) return Iter.EMPTY;
     final byte[] s = checkStr(it);
 
@@ -195,8 +195,12 @@ final class FNStr extends Fun {
    */
   private Iter trans(final Iter[] arg) throws QueryException {
     final byte[] str = checkStr(arg[0]);
-    final byte[] sea = checkStr(arg[1].atomic(this, false));
-    final byte[] rep = checkStr(arg[2].atomic(this, false));
+    final Item is = arg[1].atomic();
+    if(is == null) Err.empty(this);    
+    final byte[] sea = checkStr(is);
+    final Item ir = arg[2].atomic();
+    if(ir == null) Err.empty(this);    
+    final byte[] rep = checkStr(ir);
     return Str.get(ascii(str) && ascii(sea) && ascii(rep) ?
       translate(str, sea, rep) : token(Pattern.compile(string(sea),
       Pattern.LITERAL).matcher(string(str)).replaceAll(string(rep)))).iter();
@@ -209,7 +213,9 @@ final class FNStr extends Fun {
    * @throws QueryException xquery exception
    */
   private Iter strjoin(final Iter[] arg) throws QueryException {
-    final byte[] sep = checkStr(arg[1].atomic(this, false));
+    final Item is = arg[1].atomic();
+    if(is == null) Err.empty(this);    
+    final byte[] sep = checkStr(is);
     final TokenBuilder tb = new TokenBuilder();
     final Iter iter = arg[0];
     int c = 0;

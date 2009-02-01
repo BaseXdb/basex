@@ -85,11 +85,11 @@ public final class Err {
   
   /**
    * Throws a empty sequence exception.
-   * @param ex expression
+   * @param e calling expression
    * @throws QueryException evaluation exception
    */
-  public static void empty(final Expr ex) throws QueryException {
-    or(XPEMPTY, ex.info());
+  public static void empty(final Expr e) throws QueryException {
+    or(XPEMPTY, e.info());
   }
 
   /**

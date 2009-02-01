@@ -30,7 +30,7 @@ final class FNOut extends Fun {
         String msg = FUNERR1;
 
         if(al != 0) {
-          final Item it = arg[0].atomic(this, true);
+          final Item it = arg[0].atomic();
           if(it == null) {
             if(al == 1) Err.empty(this);
           } else {
@@ -44,7 +44,7 @@ final class FNOut extends Fun {
         try {
           Err.or(new Object[] { code, num, msg });
         } catch(final QueryException ex) {
-          if(al > 2) ex.item = SeqIter.get(arg[2]).finish();
+          if(al > 2) ex.iter = SeqIter.get(arg[2]);
           throw ex;
         }
         BaseX.notexpected(); return null;

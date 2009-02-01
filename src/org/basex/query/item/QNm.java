@@ -44,7 +44,7 @@ public final class QNm extends Item {
   /**
    * Constructor.
    * @param n name
-   * @param ctx xquery context
+   * @param ctx query context
    * @throws QueryException query exception
    */
   public QNm(final byte[] n, final QueryContext ctx) throws QueryException {

@@ -4,8 +4,7 @@ import static org.basex.query.QueryTokens.*;
 import org.basex.BaseX;
 import org.basex.core.Prop;
 import org.basex.io.IO;
-import org.basex.query.item.Item;
-import org.basex.query.item.Seq;
+import org.basex.query.iter.Iter;
 import org.basex.util.InputParser;
 import org.basex.util.StringList;
 
@@ -17,7 +16,7 @@ import org.basex.util.StringList;
  */
 public class QueryException extends Exception {
   /** Error items. */
-  public Item item = Seq.EMPTY;
+  public Iter iter = Iter.EMPTY;
 
   /** File reference. */
   protected IO file;

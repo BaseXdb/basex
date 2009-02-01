@@ -1,11 +1,13 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.NSLocal;
+import org.basex.util.Token;
 
 /**
  * Function call.
@@ -53,21 +55,20 @@ public final class FunCall extends Arr {
   }
 
   @Override
-  public String info() {
-    return "Function";
-  }
-
-  @Override
   public Return returned(final QueryContext ctx) {
     return func != null ? func.returned(ctx) : super.returned(ctx);
   }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
+    ser.openElement(this, ID, Token.token(id));
     for(final Expr e : expr) e.plan(ser);
-    func.plan(ser);
     ser.closeElement();
+  }
+
+  @Override
+  public String info() {
+    return "Function";
   }
 
   @Override

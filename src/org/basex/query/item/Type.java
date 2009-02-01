@@ -680,7 +680,10 @@ public enum Type {
     }
   },
 
-  /** Virtual sequence type. */
+  /** Sequence type. */
+  SEQ("sequence", null, EMPTY, false, false, false, false),
+
+  /** Empty sequence type. */
   EMP("empty-sequence", null, EMPTY, false, false, false, false),
 
   /** Java type. */
@@ -704,7 +707,7 @@ public enum Type {
   /**
    * Constructs a new item from the specified item.
    * @param it item to be converted
-   * @param ctx xquery context
+   * @param ctx query context
    * @return new item
    * @throws QueryException evaluation exception
    */

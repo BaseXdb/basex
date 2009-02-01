@@ -196,6 +196,12 @@ public abstract class Item extends Expr {
     };
   }
 
+  @Override
+  @SuppressWarnings("unused")
+  public Item atomic(final QueryContext ctx) throws QueryException {
+    return this;
+  }
+
   /**
    * Checks the items for equality.
    * @param it item to be compared.

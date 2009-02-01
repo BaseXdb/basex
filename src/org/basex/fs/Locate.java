@@ -5,7 +5,6 @@ import org.basex.data.Nodes;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
-import org.basex.util.GetOpts;
 import org.basex.util.IntList;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -31,7 +30,7 @@ public final class Locate extends FSCmd {
   @Override
   public void args(final String args) throws FSException {
     // get all Options
-    final GetOpts g = new GetOpts(args, "cl:V:");
+    final FSParser g = new FSParser(args, "cl:V:");
     while(g.more()) {
       final int ch = checkOpt(g);
       switch (ch) {

@@ -54,9 +54,9 @@ public final class TypeSwitch extends Single {
       if(iter != null) return iter;
     }
     if(var != null) ctx.vars.add(var.bind(seq.finish(), ctx));
-    final SeqIter sb = SeqIter.get(ctx.iter(expr));
+    final SeqIter si = SeqIter.get(ctx.iter(expr));
     ctx.vars.reset(s);
-    return sb;
+    return si;
   }
 
   @Override

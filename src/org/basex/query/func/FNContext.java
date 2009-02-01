@@ -39,7 +39,7 @@ final class FNContext extends Fun {
 
   /**
    * Returns the current Date.
-   * @param ctx xquery context
+   * @param ctx query context
    * @return current date
    * @throws QueryException xquery exception
    */
@@ -55,7 +55,7 @@ final class FNContext extends Fun {
 
   /**
    * Returns the current DateTime.
-   * @param ctx xquery context
+   * @param ctx query context
    * @return current date
    * @throws QueryException xquery exception
    */
@@ -72,7 +72,7 @@ final class FNContext extends Fun {
 
   /**
    * Returns the current DateTime.
-   * @param ctx xquery context
+   * @param ctx query context
    * @return current date
    * @throws QueryException xquery exception
    */

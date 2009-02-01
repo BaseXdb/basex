@@ -85,7 +85,7 @@ public final class Var extends Expr implements Cloneable {
    */
   public Var bind(final Item e, final QueryContext ctx) throws QueryException {
     expr = e;
-    item = check(e, ctx);
+    item = cast(e, ctx);
     return this;
   }
   
@@ -105,7 +105,7 @@ public final class Var extends Expr implements Cloneable {
       if(expr == null) Err.or(VAREMPTY, this);
       final Item it = ctx.item;
       ctx.item = null;
-      item = check(ctx.iter(expr).finish(), ctx);
+      item = cast(ctx.iter(expr).finish(), ctx);
       ctx.item = it;
     }
     return item;
@@ -130,13 +130,13 @@ public final class Var extends Expr implements Cloneable {
   }
   
   /**
-   * Checks the variable type.
+   * Casts the specified item or checks its type.
    * @param it input item
    * @param ctx query context
    * @return cast item
    * @throws QueryException query exception
    */
-  public Item check(final Item it, final QueryContext ctx)
+  private Item cast(final Item it, final QueryContext ctx)
       throws QueryException {
 
     if(it.type == Type.STR) ((Str) it).direct = false;

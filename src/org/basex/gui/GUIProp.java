@@ -158,8 +158,6 @@ public final class GUIProp {
   /** Fullscreen flag. */
   public static boolean fullscreen = false;
 
-  /** Map alignment by size aggregation. */
-  public static boolean mapaggr = false;
   /** Choice of interacting with TreeeMap. */
   public static int mapinteraction = 0;
   // all values are only one half of the size

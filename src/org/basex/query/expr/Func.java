@@ -6,7 +6,6 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
-import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -48,13 +47,13 @@ public final class Func extends Single {
   }
   
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
+  public Item atomic(final QueryContext ctx) throws QueryException {
     // evaluate function and reset variable scope
-    final Item it = ctx.item;
+    final Item ci = ctx.item;
     ctx.item = null;
     final Item i = ctx.iter(expr).finish();
-    ctx.item = it;
-    return (var.type != null ? var.type.cast(i, ctx) : i).iter();
+    ctx.item = ci;
+    return var.type != null ? var.type.cast(i, ctx) : i;
   }
 
   @Override

@@ -31,14 +31,16 @@ final class FNQName extends Fun {
       throws QueryException {
     switch(func) {
       case RESQNAME:
-        Item it = arg[0].atomic(this, true);
-        return it == null ? Iter.EMPTY :
-          resolve(ctx, it, arg[1].atomic(this, false));
+        Item it = arg[0].atomic();
+        if(it == null) return Iter.EMPTY;
+        Item re = arg[1].atomic();
+        if(re == null) Err.empty(this);
+        return resolve(ctx, it, re);
       case QNAME:
-        it = arg[0].atomic(this, true);
+        it = arg[0].atomic();
         final Uri uri = Uri.uri(it == null ? EMPTY :
           check(it, Type.STR).str());
-        it = arg[1].atomic(this, true);
+        it = arg[1].atomic();
         it = it == null ? Str.ZERO : check(it, Type.STR);
         final byte[] str = it.str();
         if(!XMLToken.isQName(str)) Err.value(Type.QNM, it);
@@ -46,16 +48,16 @@ final class FNQName extends Fun {
         if(nm.ns() && uri == Uri.EMPTY) Err.value(Type.URI, uri);
         return nm.iter();
       case LOCNAMEQNAME:
-        it = arg[0].atomic(this, true);
+        it = arg[0].atomic();
         if(it == null) return Iter.EMPTY;
         return new NCN(((QNm) check(it, Type.QNM)).ln()).iter();
       case PREQNAME:
-        it = arg[0].atomic(this, true);
+        it = arg[0].atomic();
         if(it == null) return Iter.EMPTY;
         nm = (QNm) check(it, Type.QNM);
         return !nm.ns() ? Iter.EMPTY : new NCN(nm.pre()).iter();
       case NSURIPRE:
-        it = check(arg[1].atomic(this, false), Type.ELM);
+        it = check(arg[1].atomic(), Type.ELM);
         final byte[] pre = checkStr(arg[0]);
         if(pre.length == 0) return Uri.uri(ctx.nsElem).iter();
         final Atts at = ((Nod) it).ns();
@@ -64,15 +66,15 @@ final class FNQName extends Fun {
         }
         return Iter.EMPTY;
       case INSCOPE:
-        return inscope(ctx, (Nod) check(arg[0].atomic(this, false), Type.ELM));
+        return inscope(ctx, (Nod) check(arg[0].atomic(), Type.ELM));
       case RESURI:
-        it = arg[0].atomic(this, true);
+        it = arg[0].atomic();
         if(it == null) return Iter.EMPTY;
         final Uri rel = Uri.uri(checkStr(it));
         if(!rel.valid()) Err.or(URIINV, it);
 
         final Uri base = arg.length == 1 ? ctx.baseURI :
-          Uri.uri(checkStr(arg[1].atomic(this, false)));
+          Uri.uri(checkStr(arg[1].atomic()));
         if(!base.valid()) Err.or(URIINV, base);
 
         return base.resolve(rel).iter();

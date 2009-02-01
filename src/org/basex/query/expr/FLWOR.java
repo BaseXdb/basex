@@ -2,7 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
-
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -84,7 +83,8 @@ public class FLWOR extends Single {
     final Iter[] iter = new Iter[fl.length];
     for(int f = 0; f < fl.length; f++) iter[f] = ctx.iter(fl[f]);
     iter(ctx, seq, iter, 0);
-    return order.iter(seq);
+    order.sq = seq;
+    return order.iter(ctx);
   }
 
   /**
@@ -103,7 +103,7 @@ public class FLWOR extends Single {
       if(more) {
         iter(ctx, seq, it, p + 1);
       } else {
-        if(where == null || ctx.iter(where).ebv().bool()) {
+        if(where == null || where.ebv(ctx).bool()) {
           order.add(ctx);
           seq.add(ctx.iter(expr).finish());
         }

@@ -55,7 +55,7 @@ public class Pred extends Preds {
   public Iter iter(final QueryContext ctx) throws QueryException {
     // quick evaluation of variable counters (array[$pos] ...)
     if(pred.length == 1 && pred[0] instanceof VarCall) {
-      final Item it = pred[0].iter(ctx).ebv();
+      final Item it = pred[0].ebv(ctx);
       if(it.n()) {
         final long l = it.itr();
         return new IterPred(root, pred, (Pos) Pos.get(l, l), false).iter(ctx);
@@ -68,27 +68,27 @@ public class Pred extends Preds {
     final long cp = ctx.pos;
     
     // cache results to support last() function
-    final SeqIter sb = new SeqIter();
+    final SeqIter si = new SeqIter();
     Item i;
-    while((i = iter.next()) != null) sb.add(i);
+    while((i = iter.next()) != null) si.add(i);
 
     // evaluates predicates
     for(final Expr p : pred) {
-      ctx.size = sb.size;
+      ctx.size = si.size;
       ctx.pos = 1;
       int c = 0;
-      for(int s = 0; s < sb.size; s++) {
-        ctx.item = sb.item[s];
-        if(ctx.iter(p).test(ctx) != null) sb.item[c++] = sb.item[s];
+      for(int s = 0; s < si.size; s++) {
+        ctx.item = si.item[s];
+        if(p.test(ctx) != null) si.item[c++] = si.item[s];
         ctx.pos++;
       }
-      sb.size = c;
+      si.size = c;
     }
 
     ctx.item = ci;
     ctx.size = cs;
     ctx.pos = cp;
-    return sb;
+    return si;
   }
   
   @Override

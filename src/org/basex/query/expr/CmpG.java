@@ -136,38 +136,30 @@ public final class CmpG extends Arr {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    return Bln.get(eval(ctx)).iter();
-  }
-
-  /**
-   * Evaluates the comparison operator.
-   * @param ctx query context
-   * @return result of check
-   * @throws QueryException evaluation exception
-   */
-  private boolean eval(final QueryContext ctx) throws QueryException {
+  public Bln atomic(final QueryContext ctx) throws QueryException {
     final Iter ir1 = ctx.iter(expr[0]);
     // skip empty result
-    if(ir1.size() == 0) return false;
+    if(ir1.size() == 0) return Bln.FALSE;
     final boolean s1 = ir1.size() == 1;
     
     // evaluate single items
-    if(s1 && expr[1].i()) return eval(ir1.next(), (Item) expr[1], cmp.cmp);
+    if(s1 && expr[1].i())
+      return Bln.get(eval(ir1.next(), (Item) expr[1], cmp.cmp));
     Iter ir2 = ctx.iter(expr[1]);
     // skip empty result
-    if(ir2.size() == 0) return false;
+    if(ir2.size() == 0) return Bln.FALSE;
     final boolean s2 = ir2.size() == 1;
     
     // evaluate single items
-    if(s1 && s2) return eval(ir1.next(), ir2.next(), cmp.cmp);
+    if(s1 && s2) return Bln.get(eval(ir1.next(), ir2.next(), cmp.cmp));
 
     // evaluate iterator and single item
     Item it1, it2;
     if(s2) {
       it2 = ir2.next();
-      while((it1 = ir1.next()) != null) if(eval(it1, it2, cmp.cmp)) return true;
-      return false;
+      while((it1 = ir1.next()) != null)
+        if(eval(it1, it2, cmp.cmp)) return Bln.TRUE;
+      return Bln.FALSE;
     }
     
     // evaluate two iterators
@@ -176,7 +168,7 @@ public final class CmpG extends Arr {
       final SeqIter seq = new SeqIter();
       if((it1 = ir1.next()) != null) {
         while((it2 = ir2.next()) != null) {
-          if(eval(it1, it2, cmp.cmp)) return true;
+          if(eval(it1, it2, cmp.cmp)) return Bln.TRUE;
           seq.add(it2);
         }
       }
@@ -185,9 +177,10 @@ public final class CmpG extends Arr {
 
     while((it1 = ir1.next()) != null) {
       ir2.reset();
-      while((it2 = ir2.next()) != null) if(eval(it1, it2, cmp.cmp)) return true;
+      while((it2 = ir2.next()) != null)
+        if(eval(it1, it2, cmp.cmp)) return Bln.TRUE;
     }
-    return false;
+    return Bln.FALSE;
   }
 
   /**

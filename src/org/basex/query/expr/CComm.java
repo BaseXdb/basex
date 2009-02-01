@@ -17,7 +17,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class CComm extends Single {
+public final class CComm extends CFrag {
   /** Two Dashes. */
   private static final byte[] DASHES = { '-', '-' };
   
@@ -30,8 +30,8 @@ public final class CComm extends Single {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    final Iter iter = ctx.iter(expr);
+  public Item atomic(final QueryContext ctx) throws QueryException {
+    final Iter iter = ctx.iter(expr[0]);
 
     final TokenBuilder tb = new TokenBuilder();
     boolean more = false;
@@ -45,12 +45,7 @@ public final class CComm extends Single {
     if(contains(atom, DASHES) || startsWith(atom, '-') || endsWith(atom, '-'))
       Err.or(COMINVALID, atom);
 
-    return new FComm(atom, null).iter();
-  }
-  
-  @Override
-  public Return returned(final QueryContext ctx) {
-    return Return.NOD;
+    return new FComm(atom, null);
   }
   
   @Override
@@ -60,6 +55,6 @@ public final class CComm extends Single {
 
   @Override
   public String toString() {
-    return "comment {" + expr + "}";
+    return "comment" + super.toString();
   }
 }

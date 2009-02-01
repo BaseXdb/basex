@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-
 import org.basex.data.FTPosData;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -27,6 +26,18 @@ public final class InterSect extends Arr {
    */
   public InterSect(final Expr[] l) {
     super(l);
+  }
+
+  @Override
+  public Expr comp(final QueryContext ctx) throws QueryException {
+    super.comp(ctx);
+    for(final Expr e : expr) {
+      if(e.e()) {
+        ctx.compInfo(OPTSIMPLE, this, e);
+        return Seq.EMPTY;
+      }
+    }
+    return this;
   }
 
   @Override
@@ -88,18 +99,6 @@ public final class InterSect extends Arr {
     }
 
     return seq;
-  }
-
-  @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    super.comp(ctx);
-    for(final Expr e : expr) {
-      if(e.e()) {
-        ctx.compInfo(OPTSIMPLE, this, e);
-        return Seq.EMPTY;
-      }
-    }
-    return this;
   }
 
   @Override
