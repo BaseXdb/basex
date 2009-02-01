@@ -2617,7 +2617,7 @@ public class QueryParser extends InputParser {
         if(more) error();
         break;
       }
-      //path.
+      //path.steps.add(step);
       more = true;
     }
     return path;
@@ -2630,7 +2630,14 @@ public class QueryParser extends InputParser {
    * @return Path 
    */
   @SuppressWarnings("unused")
-  Path relPath(final Path path) throws QueryException { return null; }
+  Path relPath(final Path path) throws QueryException {
+    do {
+      final Step step = (Step) step();
+      if(step == null) error();
+      //path.steps.add(step);
+    } while(consume('/'));
+    return path;
+  }
 
   /**
    * Adds an expression to the specified array.
