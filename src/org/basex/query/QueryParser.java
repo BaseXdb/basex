@@ -1241,7 +1241,6 @@ public class QueryParser extends InputParser {
     } else if(consume('@')) {
       ax = Axis.ATTR;
       test = test(true);
-      checkStep(ax, test);
       if(test == null) Err.or(NOATTNAME);
     } else {
       for(final Axis a : Axis.values()) {
@@ -1251,7 +1250,6 @@ public class QueryParser extends InputParser {
           ap = qp;
           ax = a;
           test = test(a == Axis.ATTR);
-          checkStep(ax, test);
           break;
         }
       }
@@ -1259,7 +1257,6 @@ public class QueryParser extends InputParser {
     if(ax == null) {
       ax = Axis.CHILD;
       test = test(false);
-      checkStep(ax, test);
       if(test != null && test.type == Type.ATT) ax = Axis.ATTR;
     }
     if(test == null) return null;
@@ -1280,7 +1277,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException xquery exception
    */
-  private Test test(final boolean att) throws QueryException {
+  protected Test test(final boolean att) throws QueryException {
     final int p = qp;
     final char ch = curr();
     if(XMLToken.isXMLLetter(ch)) {

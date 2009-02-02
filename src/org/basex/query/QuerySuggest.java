@@ -63,6 +63,13 @@ public class QuerySuggest extends QueryParser {
     final int s = consume('/') ? consume('/') ? 2 : 1 : 0;
     final Expr ex = step();
     if(ex == null) {
+      if (s == 1) {
+        absPather("root");
+        checkStep(Axis.CHILD, test(false));
+      } else if (s == 2) {
+        absPather("root");
+        checkStep(Axis.DESC, test(false));
+      }
       if(s > 1) Err.or(PATHMISS);
       return s == 0 ? null : new Root();
     }
@@ -96,11 +103,22 @@ public class QuerySuggest extends QueryParser {
     }
     return axes ? AxisPath.get(root, tmp) : new MixedPath(root, list);
   }
+  
+  /**
+   * Adds Nodes to the Path.
+   * @param name Name of the test
+   */
+  void absPather(final String name) {
+    if (name.equals("root")) {
+      final ArrayList<SkelNode> list = new ArrayList<SkelNode>();
+      list.add(skel.root);
+      stack.push(list);
+    }
+  }
 
   @Override
   void checkStep(final Axis axis, final Test test) {
     filter(true);
-    //System.out.println("Axis: " + axis + "TEST: " + test);
     if(axis == null) {
       if(!stack.empty())
         stack.push(skel.desc(stack.pop(), 0, Data.ELEM, false));
@@ -158,7 +176,6 @@ public class QuerySuggest extends QueryParser {
   public StringList complete() {
     final StringList sl = new StringList();
     if(stack.empty()) return sl;
-
     for(final SkelNode r : stack.peek()) {
       final String name = Token.string(r.token(ctx.data()));
       if(name.length() != 0 && !sl.contains(name)) sl.add(name);
