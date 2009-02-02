@@ -126,8 +126,8 @@ abstract class MapLayout {
    * @param par parent node
    * @return children
    */
-  protected static IntList children(final Data data, final int par) {
-    final IntList list = new IntList();
+  protected static MapList children(final Data data, final int par) {
+    final MapList list = new MapList();
 
     final int kind = data.kind(par);
     final int last = par + data.size(par, kind);
@@ -235,7 +235,7 @@ abstract class MapLayout {
     // skip too small rectangles and leaf nodes (= meta data in deepfs)
     if((w >= o || h >= o) && w > 0 && h > 0 &&
         !ViewData.isLeaf(data, t.pre)) {
-      final IntList ch = children(data, t.pre);
+      final MapList ch = children(data, t.pre);
       if(ch.size != 0) calcMap(data, new ViewRect(x, y, w, h, l.list[ns],
           r.level + 1), mainRects, ch, 0, ch.size - 1, level + 1);
     }
@@ -254,7 +254,7 @@ abstract class MapLayout {
    * 
    */
   protected void splitUniformly(final Data data, final ViewRect r,
-      final ArrayList<ViewRect> mainRects, final IntList l,
+      final ArrayList<ViewRect> mainRects, final MapList l,
       final int ns, final int ne, final int level, final boolean v) {
     long nn, ln;
     int ni;
@@ -297,7 +297,7 @@ abstract class MapLayout {
    * @param level indicates level which is calculated
    */
   abstract void calcMap(final Data data, final ViewRect r,
-      ArrayList<ViewRect> mainRects, final IntList l, final int ns,
+      ArrayList<ViewRect> mainRects, final MapList l, final int ns,
       final int ne, final int level);
   
   /**

@@ -8,7 +8,7 @@ import java.util.Arrays;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class IntList {
+public class IntList {
   /** Value array. */
   public int[] list;
   /** Current array size. */

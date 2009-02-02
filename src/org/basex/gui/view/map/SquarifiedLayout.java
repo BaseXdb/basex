@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import org.basex.data.Data;
 //import org.basex.gui.view.ViewData;
 import org.basex.gui.view.ViewRect;
-import org.basex.util.IntList;
+//import org.basex.util.IntList;
 import org.basex.util.Token;
 
 /**
@@ -17,7 +17,7 @@ public final class SquarifiedLayout extends MapLayout {
 
   @Override
   void calcMap(final Data data, final ViewRect r,
-      final ArrayList<ViewRect> mainRects, final IntList l,
+      final ArrayList<ViewRect> mainRects, final MapList l,
       final int ns, final int ne, final int level) {
     // one rectangle left...
     if(ne - ns <= 1) {
@@ -71,7 +71,7 @@ public final class SquarifiedLayout extends MapLayout {
             if(lineRatio(tmp) > lineRatio(row)) {
               // add rects of row using recursion
               for(int i = 0; i < row.size(); i++) {
-                IntList newl = new IntList(1);
+                MapList newl = new MapList(1);
                 newl.add(row.get(i).pre);
                 calcMap(data, row.get(i), mainRects, newl, 0, 1, level);
               }
@@ -96,7 +96,7 @@ public final class SquarifiedLayout extends MapLayout {
   
           // adding remaining rectangles
           for(int i = 0; i < row.size(); i++) {
-            IntList newl = new IntList(1);
+            MapList newl = new MapList(1);
             newl.add(row.get(i).pre);
             calcMap(data, row.get(i), mainRects, newl, 0, 1, level);
           }
@@ -127,7 +127,7 @@ public final class SquarifiedLayout extends MapLayout {
             if(lineRatio(tmp) > lineRatio(row)) {
               // add rects of row using recursion
               for(int i = 0; i < row.size(); i++) {
-                IntList newl = new IntList(1);
+                MapList newl = new MapList(1);
                 newl.add(row.get(i).pre);
                 calcMap(data, row.get(i), mainRects, newl, 0, 1, level);
               }
@@ -152,7 +152,7 @@ public final class SquarifiedLayout extends MapLayout {
   
           // adding remaining rectangles
           for(int i = 0; i < row.size(); i++) {
-            IntList newl = new IntList(1);
+            MapList newl = new MapList(1);
             newl.add(row.get(i).pre);
             calcMap(data, row.get(i), mainRects, newl, 0, 1, level);
           }

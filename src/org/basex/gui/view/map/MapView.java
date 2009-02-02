@@ -134,7 +134,7 @@ public final class MapView extends View implements Runnable {
         new MapDefault(this);
       mainMap = createImage();
       zoomMap = createImage();
-//      refreshLayout();
+      refreshLayout();
       repaint();
     }
   }
@@ -322,7 +322,7 @@ public final class MapView extends View implements Runnable {
       default: layouter = new SplitLayout(); break;
     }
 
-    layouter.calcMap(nodes.data, rect, rectangles, new IntList(nodes.nodes),
+    layouter.calcMap(nodes.data, rect, rectangles, new MapList(nodes.nodes),
         0, nodes.size, 0);
     painter.init(rectangles);
     drawMap(map, rectangles);
