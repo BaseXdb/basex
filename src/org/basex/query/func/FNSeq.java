@@ -1,6 +1,5 @@
 package org.basex.query.func;
 
-import org.basex.BaseX;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.CmpV;
@@ -24,38 +23,48 @@ import org.basex.util.Token;
  */
 final class FNSeq extends Fun {
   @Override
-  public Iter iter(final QueryContext ctx, final Iter[] arg)
-      throws QueryException {
+  public Iter iter(final QueryContext ctx) throws QueryException {
+    final Iter[] arg = new Iter[args.length];
+    for(int a = 0; a < args.length; a++) arg[a] = ctx.iter(args[a]);
+
     switch(func) {
-      case INDEXOF:  return indexOf(arg);
-      case DISTINCT: return distinct(arg);
-      case INSBEF:   return insbef(arg);
-      case REVERSE:  return reverse(arg);
-      case REMOVE:   return remove(arg);
-      case SUBSEQ:   return subseq(arg);
-      case DEEPEQ:   return Bln.get(deep(arg)).iter();
-      default: BaseX.notexpected(func); return null;
+      case INDEXOF:  return indexOf(ctx);
+      case DISTINCT: return distinct(ctx);
+      case INSBEF:   return insbef(ctx);
+      case REVERSE:  return reverse(ctx);
+      case REMOVE:   return remove(ctx);
+      case SUBSEQ:   return subseq(ctx);
+      default:       return super.iter(ctx);
+    }
+  }
+
+  @Override
+  public Item atomic(final QueryContext ctx) throws QueryException {
+    switch(func) {
+      case DEEPEQ:   return Bln.get(deep(ctx));
+      default:       return super.atomic(ctx);
     }
   }
 
   /**
    * Looks for the index of an specified input item.
-   * @param arg arguments
+   * @param ctx query context
    * @return position(s) of item
    * @throws QueryException evaluation exception
    */
-  private Iter indexOf(final Iter[] arg) throws QueryException {
-    final Item it = arg[1].atomic();
+  private Iter indexOf(final QueryContext ctx) throws QueryException {
+    final Item it = args[1].atomic(ctx);
     if(it == null) Err.empty(this);
-    if(arg.length == 3) checkColl(arg[2]);
-
+    if(args.length == 3) checkColl(args[2], ctx);
+    
     return new Iter() {
+      final Iter iter = args[0].iter(ctx);
       int c = 0;
 
       @Override
       public Item next() throws QueryException {
         while(true) {
-          final Item i = arg[0].next();
+          final Item i = iter.next();
           if(i == null) return null;
           c++;
           if(CmpV.valCheck(i, it) && CmpV.Comp.EQ.e(i, it)) return Itr.get(c);
@@ -66,20 +75,21 @@ final class FNSeq extends Fun {
 
   /**
    * Looks for distinct values in the sequence.
-   * @param arg arguments
+   * @param ctx query context
    * @return distinct iterator
    * @throws QueryException evaluation exception
    */
-  private Iter distinct(final Iter[] arg) throws QueryException {
-    if(arg.length == 2) checkColl(arg[1]);
+  private Iter distinct(final QueryContext ctx) throws QueryException {
+    if(args.length == 2) checkColl(args[1], ctx);
     
     return new Iter() {
+      final Iter iter = args[0].iter(ctx);
       final ItemSet map = new ItemSet();
 
       @Override
       public Item next() throws QueryException {
         Item i;
-        while((i = arg[0].next()) != null) {
+        while((i = iter.next()) != null) {
           i = FNGen.atom(i);
           if(map.index(i)) return i;
         }
@@ -90,22 +100,23 @@ final class FNSeq extends Fun {
 
   /**
    * Inserts items before the specified position.
-   * @param arg arguments
+   * @param ctx query context
    * @return iterator
    * @throws QueryException evaluation exception
    */
-  private Iter insbef(final Iter[] arg) throws QueryException {
-    final long pos = Math.max(1, checkItr(arg[1]));
-    
+  private Iter insbef(final QueryContext ctx) throws QueryException {
     return new Iter() {
+      final long pos = Math.max(1, checkItr(args[1], ctx));
+      final Iter iter = args[0].iter(ctx);
+      final Iter ins = args[2].iter(ctx);
       long p = pos;
       boolean last;
 
       @Override
       public Item next() throws QueryException {
-        if(last) return p > 0 ? arg[2].next() : null;
+        if(last) return p > 0 ? ins.next() : null;
         final boolean sub = p == 0 || --p == 0;
-        final Item i = arg[sub ? 2 : 0].next();
+        final Item i = (sub ? ins : iter).next();
         if(i != null) return i;
         if(sub) --p;
         else last = true;
@@ -116,20 +127,20 @@ final class FNSeq extends Fun {
 
   /**
    * Removes an item at a specified position in a sequence.
-   * @param arg arguments
+   * @param ctx query context
    * @return iterator without Item
    * @throws QueryException evaluation exception
    */
-  private Iter remove(final Iter[] arg) throws QueryException {
-    final long pos = checkItr(arg[1]);
-
+  private Iter remove(final QueryContext ctx) throws QueryException {
     return new Iter() {
+      final long pos = checkItr(args[1], ctx);
+      final Iter iter = args[0].iter(ctx);
       long c = 0;
 
       @Override
       public Item next() throws QueryException {
         Item i;
-        while((i = arg[0].next()) != null) if(++c != pos) return i;
+        while((i = iter.next()) != null) if(++c != pos) return i;
         return null;
       }
     };
@@ -138,22 +149,23 @@ final class FNSeq extends Fun {
   /**
    * Creates a subsequence out of a sequence, starting with start and
    * ending with end.
-   * @param arg arguments
+   * @param ctx query context
    * @return subsequence
    * @throws QueryException evaluation exception
    */
-  private Iter subseq(final Iter[] arg) throws QueryException {
-    final long s = Math.round(checkDbl(arg[1]));
-    final long e = arg.length > 2 ? s + Math.round(checkDbl(arg[2])) :
+  private Iter subseq(final QueryContext ctx) throws QueryException {
+    final long s = Math.round(checkDbl(args[1], ctx));
+    final long e = args.length > 2 ? s + Math.round(checkDbl(args[2], ctx)) :
       Long.MAX_VALUE;
     
-    return arg[0].size() != -1 ? new Iter() {
+    final Iter iter = ctx.iter(args[0]);
+    return iter.size() != -1 ? new Iter() {
       // directly access specified items
       long c = Math.max(1, s);
 
       @Override
       public Item next() {
-        return c < e ? arg[0].get(c++ - 1) : null;
+        return c < e ? iter.get(c++ - 1) : null;
       }
     } : new Iter() {
       // run through all items
@@ -162,7 +174,7 @@ final class FNSeq extends Fun {
       @Override
       public Item next() throws QueryException {
         while(true) {
-          final Item i = arg[0].next();
+          final Item i = iter.next();
           if(i == null || ++c >= e) return null;
           if(c >= s) return i;
         }
@@ -172,12 +184,12 @@ final class FNSeq extends Fun {
 
   /**
    * Reverses a sequence.
-   * @param arg arguments
+   * @param ctx query context
    * @return iterator
    * @throws QueryException evaluation exception
    */
-  private Iter reverse(final Iter[] arg) throws QueryException {
-    final Iter iter = arg[0];
+  private Iter reverse(final QueryContext ctx) throws QueryException {
+    final Iter iter = ctx.iter(args[0]);
     
     // process reversable iterator...
     if(iter.reverse()) return iter;
@@ -196,18 +208,17 @@ final class FNSeq extends Fun {
     };
   }
 
-
   /**
    * Checks items for deep equality.
-   * @param arg arguments
+   * @param ctx query context
    * @return result of check
    * @throws QueryException evaluation exception
    */
-  private boolean deep(final Iter[] arg) throws QueryException {
-    if(arg.length == 3) checkColl(arg[2]);
+  private boolean deep(final QueryContext ctx) throws QueryException {
+    if(args.length == 3) checkColl(args[2], ctx);
 
-    final Iter iter1 = arg[0];
-    final Iter iter2 = arg[1];
+    final Iter iter1 = ctx.iter(args[0]);
+    final Iter iter2 = ctx.iter(args[1]);
 
     Item it1 = null;
     Item it2 = null;
@@ -226,7 +237,6 @@ final class FNSeq extends Fun {
 
       Nod n1 = null, n2 = null;
       // explicit non-short-circuit..
-      //while((n1 = niter1.next()) != null & (n2 = niter2.next()) != null) {
       while(true) {
         n1 = nextDeep(niter1);
         n2 = nextDeep(niter2);

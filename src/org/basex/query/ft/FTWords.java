@@ -133,8 +133,8 @@ public final class FTWords extends FTExpr {
     long mn = 1;
     long mx = Long.MAX_VALUE;
     if(occ != null) {
-      mn = checkItr(ctx.iter(occ[0]));
-      mx = checkItr(ctx.iter(occ[1]));
+      mn = checkItr(occ[0], ctx);
+      mn = checkItr(occ[1], ctx);
     }
     return o < mn || o > mx ? 0 : Math.max(1, len);
   }

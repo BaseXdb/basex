@@ -54,7 +54,17 @@ public abstract class Expr extends ExprInfo {
    * @throws QueryException query exception
    */
   public Item atomic(final QueryContext ctx) throws QueryException {
-    return iter(ctx).atomic();
+    final Iter ir = iter(ctx);
+    final long s = ir.size();
+    if(s == 1) return ir.next();
+
+    final Item it = ir.next();
+    if(it == null) return null;
+
+    final Item n = ir.next();
+    if(n != null) Err.or(XPSEQ, "(" + it + "," + n +
+        (ir.next() != null ? ",..." : "") + ")");
+    return it;
   }
 
   /**
@@ -65,11 +75,11 @@ public abstract class Expr extends ExprInfo {
    * @return item
    * @throws QueryException query exception
    */
-  public final Item ebv(final QueryContext ctx) throws QueryException {
+  public Item ebv(final QueryContext ctx) throws QueryException {
     final Iter ir = iter(ctx);
     final Item it = ir.next();
     if(it == null) return Bln.FALSE;
-    if(!it.node() && ir.next() != null) Err.or(FUNSEQ, this);
+    if(!it.node() && ir.next() != null) Err.or(CONDTYPE, this);
     return it;
   }
 
@@ -79,7 +89,7 @@ public abstract class Expr extends ExprInfo {
    * @return item
    * @throws QueryException evaluation exception
    */
-  public final Item test(final QueryContext ctx) throws QueryException {
+  public Item test(final QueryContext ctx) throws QueryException {
     final Item it = ebv(ctx);
     return (it.n() ? it.dbl() == ctx.pos : it.bool()) ? it : null;
   }
@@ -197,17 +207,36 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Checks if the specified iterator is a number.
+   * Checks if the specified expression yields a string.
    * Returns a token representation or an exception.
-   * @param iter iterator to be checked
+   * @param e expression to be checked
+   * @param ctx query context
    * @return item
    * @throws QueryException evaluation exception
    */
-  public final double checkDbl(final Iter iter) throws QueryException {
-    final Item it = iter.atomic();
+  public final double checkDbl(final Expr e, final QueryContext ctx)
+      throws QueryException {
+
+    final Item it = e.atomic(ctx);
     if(it == null) Err.or(XPEMPTYNUM, info());
     if(!it.u() && !it.n()) Err.num(info(), it);
     return it.dbl();
+  }
+
+  /**
+   * Checks if the specified expression is an integer.
+   * Returns a token representation or an exception.
+   * @param e expression to be checked
+   * @param ctx query context
+   * @return item
+   * @throws QueryException evaluation exception
+   */
+  public final long checkItr(final Expr e, final QueryContext ctx)
+      throws QueryException {
+
+    final Item it = e.atomic(ctx);
+    if(it == null) Err.or(XPEMPTYPE, info(), Type.ITR);
+    return checkItr(it);
   }
 
   /**
@@ -223,28 +252,15 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Checks if the specified iterator is a number.
-   * Returns a token representation or an exception.
-   * @param iter iterator to be checked
-   * @return item
-   * @throws QueryException evaluation exception
-   */
-  protected final long checkItr(final Iter iter) throws QueryException {
-    final Item it = iter.atomic();
-    if(it == null) Err.or(XPEMPTYPE, info(), Type.ITR);
-    return checkItr(it);
-  }
-
-  /**
    * Throws an exception if the context item is not set.
    * @param ctx query context
    * @return item if everything is ok
    * @throws QueryException evaluation exception
    */
-  public final Iter checkCtx(final QueryContext ctx) throws QueryException {
+  public final Item checkCtx(final QueryContext ctx) throws QueryException {
     final Item it = ctx.item;
     if(it == null) Err.or(XPNOCTX, this);
-    return it.iter();
+    return it;
   }
 
   /**

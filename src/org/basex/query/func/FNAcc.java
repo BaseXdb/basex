@@ -1,7 +1,6 @@
 package org.basex.query.func;
 
 import static org.basex.util.Token.*;
-import org.basex.BaseX;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -21,46 +20,45 @@ import org.basex.query.iter.Iter;
  */
 final class FNAcc extends Fun {
   @Override
-  public Iter iter(final QueryContext ctx, final Iter[] arg)
-      throws QueryException {
-    final Iter iter = arg.length == 0 ? checkCtx(ctx) : arg[0];
- 
+  public Item atomic(final QueryContext ctx) throws QueryException {
+    final Expr e = args.length != 0 ? args[0] : checkCtx(ctx);
+
     switch(func) {
       case POS:
-        return Itr.get(ctx.pos).iter();
+        return Itr.get(ctx.pos);
       case LAST:
-        return Itr.get(ctx.size).iter();
+        return Itr.get(ctx.size);
       case STRING:
-        Item it = iter.atomic();
-        return (it == null ? Str.ZERO : it.s() && !it.u() ? it :
-          Str.get(it.str())).iter();
+        Item it = e.atomic(ctx);
+        return it == null ? Str.ZERO : it.s() && !it.u() ? it :
+          Str.get(it.str());
       case NUMBER:
-        it = iter.next();
-        return (it == null || iter.next() != null ? Dbl.NAN :
-          number(it)).iter();
-      case URIQNAME:
-        it = iter.atomic();
-        if(it == null) return Iter.EMPTY;
-        return ((QNm) check(it, Type.QNM)).uri.iter();
+        final Iter ir = ctx.iter(e);
+        it = ir.next();
+        return it == null || ir.next() != null ? Dbl.NAN : number(it);
       case STRLEN:
-        return Itr.get(len(checkStr(iter))).iter();
+        return Itr.get(len(checkStr(e, ctx)));
       case NORM:
-        return Str.get(norm(checkStr(iter))).iter();
+        return Str.get(norm(checkStr(e, ctx)));
+      case URIQNAME:
+        it = e.atomic(ctx);
+        if(it == null) return null;
+        return ((QNm) check(it, Type.QNM)).uri;
       default:
-        BaseX.notexpected(func); return null;
+        return super.atomic(ctx);
     }
   }
-
+  
   @Override
-  public Expr c(final QueryContext ctx) {
+  public Expr c(final QueryContext ctx) throws QueryException {
     if(args.length == 0) return this;
     final Item it = args[0].i() ? (Item) args[0] : null;
     
     switch(func) {
       case STRING:
-        return it != null && it.s() && !it.u() ? it : this;
+        return it != null ? atomic(ctx) : this;
       case NUMBER:
-        return args[0].e() ? Dbl.NAN : it != null ? number(it) : this;
+        return args[0].e() || it != null ? atomic(ctx) : this;
       default:
         return this;
     }
@@ -78,6 +76,7 @@ final class FNAcc extends Fun {
       if(it.type != Type.URI && (it.s() || it.n() || it.u()))
         return Dbl.get(it.dbl());
     } catch(final QueryException e) { }
+
     return Dbl.get(Double.NaN);
   }
 

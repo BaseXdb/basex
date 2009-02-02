@@ -18,7 +18,7 @@ public final class XMLToken {
    * @param ch the letter to be checked
    * @return result of comparison
    */
-  public static boolean valid(final int ch) {
+  public static boolean valid(final long ch) {
     return ch >= 0x20 && ch <= 0xD7FF || ch == 0xA || ch == 0x9 || ch == 0xD ||
       ch >= 0xE000 && ch <= 0xFFFD || ch >= 0x10000 && ch <= 0x10ffff;
   }

@@ -8,6 +8,7 @@ import org.basex.data.Serializer;
 import org.basex.io.IO;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.NodeMore;
+import org.basex.query.util.Err;
 import org.basex.query.util.NSGlobal;
 import org.basex.util.Atts;
 
@@ -303,9 +304,7 @@ public class DBNode extends Nod {
       case ELM:
         return type + "{" + string(data.tag(pre)) + "," + pre + "}";
       default:
-        String str = string(str());
-        if(str.length() > 20) str = str.substring(0, 20) + "...";
-        return type + "{" + str + "}";
+        return type + "{" + Err.chop(str()) + "}";
     }
   }
 }

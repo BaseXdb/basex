@@ -1,7 +1,6 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
-import org.basex.BaseX;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
@@ -20,17 +19,16 @@ import org.basex.util.Token;
  */
 final class FNOut extends Fun {
   @Override
-  public Iter iter(final QueryContext ctx, final Iter[] arg)
-      throws QueryException {
+  public Iter iter(final QueryContext ctx) throws QueryException {
     switch(func) {
       case ERROR:
-        final int al = arg.length;
+        final int al = args.length;
         String code = FOER;
         Object num = 0;
         String msg = FUNERR1;
 
         if(al != 0) {
-          final Item it = arg[0].atomic();
+          final Item it = args[0].atomic(ctx);
           if(it == null) {
             if(al == 1) Err.empty(this);
           } else {
@@ -38,24 +36,24 @@ final class FNOut extends Fun {
             num = null;
           }
           if(al > 1) {
-            msg = Token.string(checkStr(arg[1]));
+            msg = Token.string(checkStr(args[1], ctx));
           }
         }
         try {
           Err.or(new Object[] { code, num, msg });
+          return null;
         } catch(final QueryException ex) {
-          if(al > 2) ex.iter = SeqIter.get(arg[2]);
+          if(al > 2) ex.iter = args[2].iter(ctx);
           throw ex;
         }
-        BaseX.notexpected(); return null;
       case TRACE:
-        final Iter si = SeqIter.get(arg[0]);
-        msg = Token.string(checkStr(arg[1])) + " " + si;
+        final Iter si = SeqIter.get(args[0].iter(ctx));
+        msg = Token.string(checkStr(args[1], ctx)) + " " + si;
         ctx.evalInfo(msg);
         //BaseX.outln(msg);
         return si;
       default:
-        BaseX.notexpected(func); return null;
+        return super.iter(ctx);
     }
   }
 }

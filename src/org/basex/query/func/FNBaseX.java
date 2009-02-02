@@ -1,7 +1,6 @@
 package org.basex.query.func;
 
 import static org.basex.util.Token.*;
-import org.basex.BaseX;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -19,17 +18,26 @@ import org.basex.query.iter.Iter;
  */
 final class FNBaseX extends Fun {
   @Override
-  public Iter iter(final QueryContext ctx, final Iter[] arg)
-      throws QueryException {
+  public Iter iter(final QueryContext ctx) throws QueryException {
+    final Iter[] arg = new Iter[args.length];
+    for(int a = 0; a < args.length; a++) arg[a] = ctx.iter(args[a]);
+
     switch(func) {
-      case EVAL:       return eval(arg);
-      case RANDOM:     return random();
-      case CONTAINSLC: return contains(arg);
-      case FILENAME:   return filename(ctx);
-      default: BaseX.notexpected(func); return null;
+      case EVAL: return eval(ctx);
+      default:   return super.iter(ctx);
     }
   }
-  
+
+  @Override
+  public Item atomic(final QueryContext ctx) throws QueryException {
+    switch(func) {
+      case CONTAINSLC: return contains(ctx);
+      case FILENAME:   return filename(ctx);
+      case RANDOM:     return random();
+      default: return super.atomic(ctx);
+    }
+  }
+
   @Override
   public Expr c(final QueryContext ctx) throws QueryException {
     if(func == FunDef.CONTAINSLC) {
@@ -44,51 +52,39 @@ final class FNBaseX extends Fun {
 
   /**
    * Performs the eval function.
-   * @param arg arguments
+   * @param ctx query context
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter eval(final Iter[] arg) throws QueryException {
-    final QueryContext ct = new QueryContext();
-    ct.parse(string(checkStr(arg[0])));
-    ct.compile(null);
-    return ct.iter();
+  private Iter eval(final QueryContext ctx) throws QueryException {
+    final QueryContext qt = new QueryContext();
+    qt.parse(string(checkStr(args[0], ctx)));
+    qt.compile(null);
+    return qt.iter();
   }
 
   /**
    * Performs the random function.
    * @return iterator
    */
-  private Iter random() {
-    return Dbl.get(Math.random()).iter();
-    /*
-    Iter iter = arg[0];
-    long s = iter.size();
-    if(s == -1) {
-      iter = new SeqIter(iter);
-      s = iter.size();
-    }
-    Item i = null;
-    long r = (long) (Math.random() * s);
-    while(r-- != 0) i = iter.next();
-    return i.iter();
-    */
+  private Item random() {
+    return Dbl.get(Math.random());
   }
 
   /**
    * Performs the contains lower case function.
-   * @param arg arguments
+   * @param ctx query context
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter contains(final Iter[] arg) throws QueryException {
-    if(arg.length == 3) checkColl(arg[2]);
-    final byte[] qu = checkStr(arg[1]);
+  private Item contains(final QueryContext ctx) throws QueryException {
+    final byte[] qu = checkStr(args[1], ctx);
+    final Iter iter = ctx.iter(args[0]);
     Item it;
-    while((it = arg[0].next()) != null) {
-      if(containslc(checkStr(it), qu)) return Bln.TRUE.iter();
+    while((it = iter.next()) != null) {
+      if(containslc(checkStr(it), qu)) return Bln.TRUE;
     }
-    return Bln.FALSE.iter();
+    return Bln.FALSE;
   }
 
   /**
@@ -96,8 +92,7 @@ final class FNBaseX extends Fun {
    * @param ctx query context
    * @return iterator
    */
-  private Iter filename(final QueryContext ctx) {
-    return ctx.file == null ? Str.ZERO.iter() :
-      Str.get(token(ctx.file.name())).iter();
+  private Item filename(final QueryContext ctx) {
+    return ctx.file == null ? Str.ZERO : Str.get(token(ctx.file.name()));
   }
 }

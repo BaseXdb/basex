@@ -107,7 +107,7 @@ public class Step extends Preds {
   
   @Override
   public NodeIter iter(final QueryContext ctx) throws QueryException {
-    final Iter iter = checkCtx(ctx);
+    final Iter iter = checkCtx(ctx).iter();
 
     final NodIter ni = new NodIter();
     NodIter nb = new NodIter();

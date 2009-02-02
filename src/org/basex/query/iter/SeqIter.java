@@ -76,8 +76,8 @@ public final class SeqIter extends Iter implements Result {
    * @return iterator
    * @throws QueryException evaluation exception
    */
-  public static SeqIter get(final Iter iter) throws QueryException {
-    return iter instanceof SeqIter ? (SeqIter) iter : new SeqIter(iter);
+  public static Iter get(final Iter iter) throws QueryException {
+    return iter instanceof SeqIter ? iter : new SeqIter(iter);
   }
 
   /**

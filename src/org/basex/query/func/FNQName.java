@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
-import org.basex.BaseX;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
@@ -27,59 +26,60 @@ import org.basex.util.XMLToken;
  */
 final class FNQName extends Fun {
   @Override
-  public Iter iter(final QueryContext ctx, final Iter[] arg)
-      throws QueryException {
+  public Iter iter(final QueryContext ctx) throws QueryException {
+    switch(func) {
+      case INSCOPE:
+        return inscope(ctx, (Nod) check(args[0].atomic(ctx), Type.ELM));
+      default:
+        return super.iter(ctx);
+    }
+  }
+
+  @Override
+  public Item atomic(final QueryContext ctx) throws QueryException {
+    // functions have 1 or 2 arguments...
+    final Item it = args[0].atomic(ctx);
+    final Item it2 = args.length == 2 ? args[1].atomic(ctx) : null;
+
     switch(func) {
       case RESQNAME:
-        Item it = arg[0].atomic();
-        if(it == null) return Iter.EMPTY;
-        Item re = arg[1].atomic();
-        if(re == null) Err.empty(this);
-        return resolve(ctx, it, re);
+        if(it == null) return null;
+        if(it2 == null) Err.empty(this);
+        return resolve(ctx, it, it2);
       case QNAME:
-        it = arg[0].atomic();
         final Uri uri = Uri.uri(it == null ? EMPTY :
           check(it, Type.STR).str());
-        it = arg[1].atomic();
-        it = it == null ? Str.ZERO : check(it, Type.STR);
-        final byte[] str = it.str();
-        if(!XMLToken.isQName(str)) Err.value(Type.QNM, it);
+        final Item it3 = it2 == null ? Str.ZERO : check(it2, Type.STR);
+        final byte[] str = it3.str();
+        if(!XMLToken.isQName(str)) Err.value(Type.QNM, it3);
         QNm nm = new QNm(str, uri);
         if(nm.ns() && uri == Uri.EMPTY) Err.value(Type.URI, uri);
-        return nm.iter();
+        return nm;
       case LOCNAMEQNAME:
-        it = arg[0].atomic();
-        if(it == null) return Iter.EMPTY;
-        return new NCN(((QNm) check(it, Type.QNM)).ln()).iter();
+        if(it == null) return null;
+        return new NCN(((QNm) check(it, Type.QNM)).ln());
       case PREQNAME:
-        it = arg[0].atomic();
-        if(it == null) return Iter.EMPTY;
+        if(it == null) return null;
         nm = (QNm) check(it, Type.QNM);
-        return !nm.ns() ? Iter.EMPTY : new NCN(nm.pre()).iter();
+        return !nm.ns() ? null : new NCN(nm.pre());
       case NSURIPRE:
-        it = check(arg[1].atomic(), Type.ELM);
-        final byte[] pre = checkStr(arg[0]);
-        if(pre.length == 0) return Uri.uri(ctx.nsElem).iter();
-        final Atts at = ((Nod) it).ns();
+        final byte[] pre = checkStr(it);
+        if(pre.length == 0) return Uri.uri(ctx.nsElem);
+        final Atts at = ((Nod) check(it2, Type.ELM)).ns();
         for(int a = 0; a < at.size; a++) {
-          if(eq(pre, at.key[a])) return Uri.uri(at.val[a]).iter();
+          if(eq(pre, at.key[a])) return Uri.uri(at.val[a]);
         }
-        return Iter.EMPTY;
-      case INSCOPE:
-        return inscope(ctx, (Nod) check(arg[0].atomic(), Type.ELM));
+        return null;
       case RESURI:
-        it = arg[0].atomic();
-        if(it == null) return Iter.EMPTY;
+        if(it == null) return null;
         final Uri rel = Uri.uri(checkStr(it));
         if(!rel.valid()) Err.or(URIINV, it);
 
-        final Uri base = arg.length == 1 ? ctx.baseURI :
-          Uri.uri(checkStr(arg[1].atomic()));
+        final Uri base = it2 == null ? ctx.baseURI : Uri.uri(checkStr(it2));
         if(!base.valid()) Err.or(URIINV, base);
-
-        return base.resolve(rel).iter();
+        return base.resolve(rel);
       default:
-        BaseX.notexpected(func); return null;
+        return super.atomic(ctx);
     }
   }
 
@@ -91,7 +91,7 @@ final class FNQName extends Fun {
    * @return prefix sequence
    * @throws QueryException query exception
    */
-  private Iter resolve(final QueryContext ctx, final Item q, final Item it)
+  private Item resolve(final QueryContext ctx, final Item q, final Item it)
       throws QueryException {
 
     final byte[] name = trim(checkStr(q));
@@ -101,7 +101,7 @@ final class FNQName extends Fun {
     final byte[] pre = nm.pre();
     Nod n = (Nod) check(it, Type.ELM);
     nm.uri = n.qname().uri;
-    if(nm.uri != Uri.EMPTY) return nm.iter();
+    if(nm.uri != Uri.EMPTY) return nm;
 
     while(n != null) {
       final Atts at = n.ns();
@@ -109,13 +109,13 @@ final class FNQName extends Fun {
       final int i = at.get(pre);
       if(i != -1) {
         nm.uri = Uri.uri(at.val[i]);
-        return nm.iter();
+        return nm;
       }
       n = n.parent();
     }
     if(pre.length != 0) Err.or(NSDECL, pre);
     nm.uri = Uri.uri(ctx.nsElem);
-    return nm.iter();
+    return nm;
   }
 
   /**
@@ -140,6 +140,7 @@ final class FNQName extends Fun {
       }
       n = n.parent();
     } while(n != null && ctx.nsInherit);
+
     
     final SeqIter seq = new SeqIter();
     for(final byte[] t : tl) seq.add(Str.get(t));

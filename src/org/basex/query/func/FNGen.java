@@ -1,6 +1,5 @@
 package org.basex.query.func;
 
-import org.basex.BaseX;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -10,7 +9,6 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Err;
 
 /**
@@ -21,37 +19,41 @@ import org.basex.query.util.Err;
  */
 final class FNGen extends Fun {
   @Override
-  public Iter iter(final QueryContext ctx, final Iter[] arg)
-      throws QueryException {
-    final Iter iter = arg.length != 0 ? arg[0] : null;
-
+  public Iter iter(final QueryContext ctx) throws QueryException {
     switch(func) {
       case DATA:
-        final SeqIter seq = new SeqIter();
-        Item it;
-        while((it = iter.next()) != null) seq.add(atom(it));
-        return seq;
+        return data(ctx.iter(args[0]));
       case COLLECT:
-        it = iter != null ? iter.next() : null;
+        final Iter iter = args.length != 0 ? ctx.iter(args[0]) : null;
+        final Item it = iter != null ? iter.next() : null;
         if(iter != null && it == null) Err.empty(this);
         return ctx.coll(iter == null ? null : checkStr(it));
+      default:
+        return super.iter(ctx);
+    }
+  }
+
+  @Override
+  public Item atomic(final QueryContext ctx) throws QueryException {
+    final Iter iter = ctx.iter(args[0]);
+
+    switch(func) {
       case DOC:
-        it = iter.next();
-        if(it == null) return Iter.EMPTY;
-        if(it.type == Type.DOC) return it.iter();
-        return ctx.doc(checkStr(it), false).iter();
+        Item it = iter.next();
+        return it == null ? null : it.type == Type.DOC ? it :
+          ctx.doc(checkStr(it), false);
       case DOCAVAIL:
         it = iter.next();
-        if(it == null) return Bln.FALSE.iter();
-        final byte[] file = checkStr(it);
-        try {
-          ctx.doc(file, false);
-          return Bln.TRUE.iter();
-        } catch(final QueryException e) {
-          return Bln.FALSE.iter();
+        if(it != null) {
+          final byte[] file = checkStr(it);
+          try {
+            ctx.doc(file, false);
+            return Bln.TRUE;
+          } catch(final QueryException e) { }
         }
+        return Bln.FALSE;
       default:
-        BaseX.notexpected(func); return null;
+        return super.atomic(ctx);
     }
   }
 
@@ -67,6 +69,21 @@ final class FNGen extends Fun {
     return this;
   }
 
+  /**
+   * Performs the data function.
+   * @param iter iterator.
+   * @return resulting iterator
+   */
+  private Iter data(final Iter iter) {
+    return new Iter() {
+      @Override
+      public Item next() throws QueryException {
+        final Item it = iter.next();
+        return it != null ? atom(it) : null;
+      }
+    };
+  }
+  
   /**
    * Atomizes the specified item.
    * @param it input item

@@ -7,6 +7,7 @@ import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.Type;
 import org.basex.util.StringList;
+import org.basex.util.Token;
 
 /**
  * This class is supposed to support a consistent error output.
@@ -130,8 +131,17 @@ public final class Err {
    * @throws QueryException evaluation exception
    */
   public static void cast(final Type t, final Item it) throws QueryException {
-    String str = it.toString();
-    if(str.length() > 30) str = str.substring(0, 30) + "...";
-    or(XPINVCAST, it.type, t, str);
+    or(XPINVCAST, it.type, t, chop(it));
+  }
+  
+  /**
+   * Chops the specified input and returns the string.
+   * @param val input value
+   * @return chopped string
+   */
+  public static String chop(final Object val) {
+    final String str = val instanceof byte[] ? Token.string((byte[]) val) :
+      val.toString();
+    return str.length() > 30 ? str.substring(0, 30) + "..." : str;
   }
 }

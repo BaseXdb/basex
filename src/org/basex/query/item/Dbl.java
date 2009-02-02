@@ -11,7 +11,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Dbl extends Num {
+public final class Dbl extends Item {
   /** Zero value. */
   public static final Dbl ZERO = new Dbl(0);
   /** Zero value. */

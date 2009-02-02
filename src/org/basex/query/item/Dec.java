@@ -13,7 +13,7 @@ import org.basex.query.util.Err;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Dec extends Num {
+public final class Dec extends Item {
   /** Zero value. */
   public static final Dec ZERO = new Dec(BigDecimal.ZERO);
   /** Decimal value. */

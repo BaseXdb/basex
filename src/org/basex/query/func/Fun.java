@@ -11,7 +11,6 @@ import org.basex.query.expr.Return;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Type;
-import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import org.basex.util.Token;
@@ -23,10 +22,10 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public abstract class Fun extends Expr {
-  /** Function results. */
-  public Expr[] args;
   /** Function description. */
   public FunDef func;
+  /** Function results. */
+  protected Expr[] args;
 
   @Override
   public final Expr comp(final QueryContext ctx) throws QueryException {
@@ -46,24 +45,6 @@ public abstract class Fun extends Expr {
   public Expr c(final QueryContext ctx) throws QueryException {
     return this;
   }
-
-  @Override
-  public final Iter iter(final QueryContext ctx) throws QueryException {
-    /** Function arguments. */
-    final Iter[] arg = new Iter[args.length];
-    for(int a = 0; a < args.length; a++) arg[a] = ctx.iter(args[a]);
-    return iter(ctx, arg);
-  }
-
-  /**
-   * Evaluates the function.
-   * @param ctx query context
-   * @param arg evaluated arguments
-   * @return evaluated item
-   * @throws QueryException evaluation exception
-   */
-  public abstract Iter iter(final QueryContext ctx, final Iter[] arg)
-    throws QueryException;
 
   @Override
   public boolean usesPos(final QueryContext ctx) {
@@ -103,6 +84,19 @@ public abstract class Fun extends Expr {
   }
 
   /**
+   * Checks if the specified expression yields a string.
+   * Returns a token representation or an exception.
+   * @param e expression to be checked
+   * @param ctx query context
+   * @return item
+   * @throws QueryException evaluation exception
+   */
+  protected final byte[] checkStr(final Expr e, final QueryContext ctx)
+      throws QueryException {
+    return checkStr(e.atomic(ctx));
+  }
+
+  /**
    * Checks if the specified item is a string.
    * Returns a token representation or an exception.
    * @param it item to be checked
@@ -113,17 +107,6 @@ public abstract class Fun extends Expr {
     if(it == null) return Token.EMPTY;
     if(!it.s() && !it.u()) Err.type(info(), Type.STR, it);
     return it.str();
-  }
-
-  /**
-   * Checks if the specified iterator is a string.
-   * Returns a token representation or an exception.
-   * @param iter iterator to be checked
-   * @return item
-   * @throws QueryException evaluation exception
-   */
-  protected final byte[] checkStr(final Iter iter) throws QueryException {
-    return checkStr(iter.atomic());
   }
 
   /**
@@ -140,13 +123,16 @@ public abstract class Fun extends Expr {
 
   /**
    * Checks if the specified collation is supported.
-   * @param col collation
+   * @param e expression to be checked
+   * @param ctx query context
    * @throws QueryException evaluation exception
    */
-  protected final void checkColl(final Iter col) throws QueryException {
-    final Item it = col.atomic();
+  protected final void checkColl(final Expr e, final QueryContext ctx)
+      throws QueryException {
+
+    final Item it = e.atomic(ctx);
     if(it == null) Err.empty(this);
-    if(!it.s() || !Token.eq(URLCOLL, it.str())) Err.or(IMPLCOL, col);
+    if(!it.s() || !Token.eq(URLCOLL, it.str())) Err.or(IMPLCOL, e);
   }
 
   @Override

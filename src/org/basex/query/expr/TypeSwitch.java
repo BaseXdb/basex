@@ -45,7 +45,7 @@ public final class TypeSwitch extends Single {
   
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final SeqIter seq = SeqIter.get(ctx.iter(ts));
+    final Iter seq = SeqIter.get(ctx.iter(ts));
     
     final int s = ctx.vars.size();
     for(final Case c : cs) {
@@ -54,7 +54,7 @@ public final class TypeSwitch extends Single {
       if(iter != null) return iter;
     }
     if(var != null) ctx.vars.add(var.bind(seq.finish(), ctx));
-    final SeqIter si = SeqIter.get(ctx.iter(expr));
+    final Iter si = SeqIter.get(ctx.iter(expr));
     ctx.vars.reset(s);
     return si;
   }

@@ -122,7 +122,7 @@ public final class FTPos extends FTExpr {
     if(s == 0 || !filter(ctx)) return score(0);
 
     // calculate weight
-    final double d = weight != null ? checkDbl(ctx.iter(weight)) : 1;
+    final double d = weight != null ? checkDbl(weight, ctx) : 1;
     if(d < 0 || d > 1000) Err.or(FTWEIGHT, d);
     return score(s * d);
   }
@@ -138,13 +138,13 @@ public final class FTPos extends FTExpr {
 
     // ...distance?
     if(dunit != null) {
-      final long mn = checkItr(ctx.iter(dist[0]));
-      final long mx = checkItr(ctx.iter(dist[1]));
+      final long mn = checkItr(dist[0], ctx);
+      final long mx = checkItr(dist[1], ctx);
       if(!checkDist(mn, mx, true)) return false;
     }
     // ...window?
     if(wunit != null) {
-      final long w = checkItr(ctx.iter(window));
+      final long w = checkItr(window, ctx);
       if(!checkDist(1, w, false)) return false;
     }
     return true;

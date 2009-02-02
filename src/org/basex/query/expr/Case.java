@@ -4,7 +4,6 @@ import static org.basex.query.QueryTokens.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Var;
 
 /**
@@ -50,7 +49,7 @@ public final class Case extends Single {
    * @return resulting item
    * @throws QueryException evaluation exception
    */
-  Iter iter(final QueryContext ctx, final SeqIter seq) throws QueryException {
+  Iter iter(final QueryContext ctx, final Iter seq) throws QueryException {
     if(!var.type.instance(seq)) return null;
     if(var.name == null) return ctx.iter(expr);
 

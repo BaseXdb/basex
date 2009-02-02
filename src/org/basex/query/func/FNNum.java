@@ -1,7 +1,6 @@
 package org.basex.query.func;
 
 import java.math.BigDecimal;
-import org.basex.BaseX;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -10,8 +9,8 @@ import org.basex.query.item.Dec;
 import org.basex.query.item.Flt;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
+import org.basex.query.item.Seq;
 import org.basex.query.item.Type;
-import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 
 /**
@@ -22,32 +21,10 @@ import org.basex.query.util.Err;
  */
 final class FNNum extends Fun {
   @Override
-  public Iter iter(final QueryContext ctx, final Iter[] arg)
-      throws QueryException {
+  public Item atomic(final QueryContext ctx) throws QueryException {
+    final Item it = args[0].atomic(ctx);
+    if(it == null) return null;
 
-    final Item it = arg[0].atomic();
-    if(it == null) return Iter.EMPTY;
-    return item(it, arg.length == 2 ? arg[1] : null).iter();
-  }
-  
-  @Override
-  public Expr c(final QueryContext ctx) throws QueryException {
-    if(args[0].e()) return args[0];
-    for(final Expr a : args) if(!a.i()) return this;
-
-    final Item it = (Item) args[0];
-    final Iter arg = args.length == 2 ? ((Item) args[1]).iter() : null;
-    return item(it, arg);
-  }
-
-  /**
-   * Evaluates the numeric function.
-   * @param it input item
-   * @param arg optional argument
-   * @return result
-   * @throws QueryException query exception
-   */
-  private Item item(final Item it, final Iter arg) throws QueryException {
     if(!it.u() && !it.n()) Err.num(info(), it);
     final double d = it.dbl();
     switch(func) {
@@ -55,9 +32,17 @@ final class FNNum extends Fun {
       case CEIL:   return num(it, d, Math.ceil(d));
       case FLOOR:  return num(it, d, Math.floor(d));
       case RND:    return rnd(it);
-      case RNDHLF: return rnd(it, d, arg);
-      default: BaseX.notexpected(func); return null;
+      case RNDHLF: return rnd(it, d, ctx);
+      default:     return super.atomic(ctx);
     }
+  }
+
+  @Override
+  public Expr c(final QueryContext ctx) throws QueryException {
+    if(args[0].e()) return args[0];
+    for(final Expr a : args) if(!a.i()) return this;
+    final Item it = atomic(ctx);
+    return it == null ? Seq.EMPTY : it;
   }
 
   /**
@@ -100,14 +85,14 @@ final class FNNum extends Fun {
    * Returns a rounded item.
    * @param it input item
    * @param n input double value
-   * @param pr precision
+   * @param ctx query context
    * @return rounded item
    * @throws QueryException evaluation exception
    */
-  private Item rnd(final Item it, final double n, final Iter pr)
+  private Item rnd(final Item it, final double n, final QueryContext ctx)
       throws QueryException {
 
-    final int pp = pr == null ? 0 : (int) checkItr(pr);
+    final int pp = args.length == 1 ? 0 : (int) checkItr(args[1], ctx);
     if(it.type == Type.DEC && pp >= 0) {
       return Dec.get(it.dec().setScale(pp, BigDecimal.ROUND_HALF_EVEN));
     }

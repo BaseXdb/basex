@@ -42,6 +42,46 @@ public abstract class Item extends Expr {
   }
 
   @Override
+  public Iter iter(final QueryContext ctx) {
+    return iter();
+  }
+
+  /**
+   * Returns an item iterator.
+   * @return iterator
+   */
+  public Iter iter() {
+    return new Iter() {
+      private boolean more;
+      @Override
+      public Item next() { return (more ^= true) ? Item.this : null; }
+      @Override
+      public int size() { return 1; }
+      @Override
+      public Item get(final long i) { return i == 0 ? Item.this : null; }
+      @Override
+      public String toString() { return Item.this.toString(); }
+    };
+  }
+
+  @Override
+  @SuppressWarnings("unused")
+  public Item atomic(final QueryContext ctx) throws QueryException {
+    return this;
+  }
+
+  @Override
+  @SuppressWarnings("unused")
+  public Item ebv(final QueryContext ctx) throws QueryException {
+    return this;
+  }
+
+  @Override
+  public Item test(final QueryContext ctx) throws QueryException {
+    return bool() ? this : null;
+  }
+
+  @Override
   public boolean i() {
     return true;
   }
@@ -173,35 +213,6 @@ public abstract class Item extends Expr {
     return 0;
   }
 
-  @Override
-  public Iter iter(final QueryContext ctx) {
-    return iter();
-  }
-
-  /**
-   * Returns an item iterator.
-   * @return iterator
-   */
-  public Iter iter() {
-    return new Iter() {
-      private boolean more;
-      @Override
-      public Item next() { return (more ^= true) ? Item.this : null; }
-      @Override
-      public int size() { return 1; }
-      @Override
-      public Item get(final long i) { return i == 0 ? Item.this : null; }
-      @Override
-      public String toString() { return Item.this.toString(); }
-    };
-  }
-
-  @Override
-  @SuppressWarnings("unused")
-  public Item atomic(final QueryContext ctx) throws QueryException {
-    return this;
-  }
-
   /**
    * Checks the items for equality.
    * @param it item to be compared.
@@ -244,10 +255,7 @@ public abstract class Item extends Expr {
    * @throws QueryException evaluation exception
    */
   public final void castErr(final Object val) throws QueryException {
-    String str = val instanceof byte[] ? Token.string((byte[]) val) :
-      val.toString();
-    if(str.length() > 30) str = str.substring(0, 30) + "...";
-    Err.or(FUNCAST, type, str);
+    Err.or(FUNCAST, type, Err.chop(val));
   }
 
   /**

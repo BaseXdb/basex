@@ -3,7 +3,6 @@ package org.basex.query.func;
 import static org.basex.query.QueryText.*;
 import java.math.BigDecimal;
 import java.util.Calendar;
-import org.basex.BaseX;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.DTd;
@@ -16,7 +15,6 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.Tim;
 import org.basex.query.item.Type;
-import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 
 /**
@@ -27,38 +25,40 @@ import org.basex.query.util.Err;
  */
 final class FNDate extends Fun {
   @Override
-  public Iter iter(final QueryContext ctx, final Iter[] arg)
-      throws QueryException {
-    final Item it = arg[0].atomic();
-    if(it == null) return Iter.EMPTY;
+  public Item atomic(final QueryContext ctx) throws QueryException {
+    // functions have 1 or 2 arguments...
+    final Item it = args[0].atomic(ctx);
+    if(it == null) return null;
+    final boolean d = args.length == 2;
+    final Item zon = d ? args[1].atomic(ctx) : null;
 
     switch(func) {
-      case YEADUR: return yea(checkDur(it));
-      case YEADTM: return yea(checkDate(it, Type.DTM, ctx));
-      case YEADAT: return yea(checkDate(it, Type.DAT, ctx));
-      case MONDUR: return mon(checkDur(it));
-      case MONDTM: return mon(checkDate(it, Type.DTM, ctx));
-      case MONDAT: return mon(checkDate(it, Type.DAT, ctx));
-      case DAYDUR: return day(checkDur(it));
-      case DAYDTM: return day(checkDate(it, Type.DTM, ctx));
-      case DAYDAT: return day(checkDate(it, Type.DAT, ctx));
-      case HOUDUR: return hou(checkDur(it));
-      case HOUDTM: return hou(checkDate(it, Type.DTM, ctx));
-      case HOUTIM: return hou(checkDate(it, Type.TIM, ctx));
-      case MINDUR: return min(checkDur(it));
-      case MINDTM: return min(checkDate(it, Type.DTM, ctx));
-      case MINTIM: return min(checkDate(it, Type.TIM, ctx));
-      case SECDUR: return sec(checkDur(it));
-      case SECDTM: return sec(checkDate(it, Type.DTM, ctx));
-      case SECTIM: return sec(checkDate(it, Type.TIM, ctx));
-      case ZONDTM: return zon(checkDate(it, Type.DTM, ctx));
-      case ZONDAT: return zon(checkDate(it, Type.DAT, ctx));
-      case ZONTIM: return zon(checkDate(it, Type.TIM, ctx));
-      case DATZON: return datzon(it, arg.length == 1 ? null : arg[1]);
-      case DTMZON: return dtmzon(it, arg.length == 1 ? null : arg[1]);
-      case TIMZON: return timzon(it, arg.length == 1 ? null : arg[1]);
-      case DATETIME: return dattim(it, arg[1]);
-      default: BaseX.notexpected(func); return null;
+      case YEADUR:   return yea(checkDur(it));
+      case YEADTM:   return yea(checkDate(it, Type.DTM, ctx));
+      case YEADAT:   return yea(checkDate(it, Type.DAT, ctx));
+      case MONDUR:   return mon(checkDur(it));
+      case MONDTM:   return mon(checkDate(it, Type.DTM, ctx));
+      case MONDAT:   return mon(checkDate(it, Type.DAT, ctx));
+      case DAYDUR:   return day(checkDur(it));
+      case DAYDTM:   return day(checkDate(it, Type.DTM, ctx));
+      case DAYDAT:   return day(checkDate(it, Type.DAT, ctx));
+      case HOUDUR:   return hou(checkDur(it));
+      case HOUDTM:   return hou(checkDate(it, Type.DTM, ctx));
+      case HOUTIM:   return hou(checkDate(it, Type.TIM, ctx));
+      case MINDUR:   return min(checkDur(it));
+      case MINDTM:   return min(checkDate(it, Type.DTM, ctx));
+      case MINTIM:   return min(checkDate(it, Type.TIM, ctx));
+      case SECDUR:   return sec(checkDur(it));
+      case SECDTM:   return sec(checkDate(it, Type.DTM, ctx));
+      case SECTIM:   return sec(checkDate(it, Type.TIM, ctx));
+      case ZONDTM:   return zon(checkDate(it, Type.DTM, ctx));
+      case ZONDAT:   return zon(checkDate(it, Type.DAT, ctx));
+      case ZONTIM:   return zon(checkDate(it, Type.TIM, ctx));
+      case DATZON:   return datzon(it, zon, d);
+      case DTMZON:   return dtmzon(it, zon, d);
+      case TIMZON:   return timzon(it, zon, d);
+      case DATETIME: return dattim(it, zon);
+      default:       return super.atomic(ctx);
     }
   }
 
@@ -67,9 +67,9 @@ final class FNDate extends Fun {
    * @param it date
    * @return time.
    */
-  private Iter yea(final Item it) {
+  private Item yea(final Item it) {
     return Itr.get(it instanceof Dur ? ((Dur) it).yea() :
-      ((Date) it).xc.getYear()).iter();
+      ((Date) it).xc.getYear());
   }
 
   /**
@@ -77,9 +77,9 @@ final class FNDate extends Fun {
    * @param it date
    * @return time.
    */
-  private Iter mon(final Item it) {
+  private Item mon(final Item it) {
     return Itr.get(it instanceof Dur ? ((Dur) it).mon() :
-      ((Date) it).xc.getMonth()).iter();
+      ((Date) it).xc.getMonth());
   }
 
   /**
@@ -87,9 +87,9 @@ final class FNDate extends Fun {
    * @param it date
    * @return time.
    */
-  private Iter day(final Item it) {
+  private Item day(final Item it) {
     return Itr.get(it instanceof Dur ? (int) ((Dur) it).day() :
-      ((Date) it).xc.getDay()).iter();
+      ((Date) it).xc.getDay());
   }
 
   /**
@@ -97,9 +97,9 @@ final class FNDate extends Fun {
    * @param it date
    * @return time.
    */
-  private Iter hou(final Item it) {
+  private Item hou(final Item it) {
     return Itr.get(it instanceof Dur ? (int) ((Dur) it).hou() :
-      ((Date) it).xc.getHour()).iter();
+      ((Date) it).xc.getHour());
   }
 
   /**
@@ -107,9 +107,9 @@ final class FNDate extends Fun {
    * @param it date
    * @return time.
    */
-  private Iter min(final Item it) {
+  private Item min(final Item it) {
     return Itr.get(it instanceof Dur ? ((Dur) it).min() :
-      ((Date) it).xc.getMinute()).iter();
+      ((Date) it).xc.getMinute());
   }
 
   /**
@@ -117,11 +117,11 @@ final class FNDate extends Fun {
    * @param it date
    * @return time.
    */
-  private Iter sec(final Item it) {
-    if(it instanceof Dur) return Dec.get(((Dur) it).sec().doubleValue()).iter();
+  private Item sec(final Item it) {
+    if(it instanceof Dur) return Dec.get(((Dur) it).sec().doubleValue());
     final int s = ((Date) it).xc.getSecond();
     final BigDecimal d = ((Date) it).xc.getFractionalSecond();
-    return Dec.get(s + (d != null ? d.doubleValue() : 0)).iter();
+    return Dec.get(s + (d != null ? d.doubleValue() : 0));
   }
 
   /**
@@ -129,9 +129,9 @@ final class FNDate extends Fun {
    * @param it input item
    * @return timezone
    */
-  private Iter zon(final Item it) {
+  private Item zon(final Item it) {
     final int z = ((Date) it).xc.getTimezone();
-    return z == UNDEF ? Iter.EMPTY : new DTd(z).iter();
+    return z == UNDEF ? null : new DTd(z);
   }
 
   /**
@@ -165,48 +165,56 @@ final class FNDate extends Fun {
    * Adjusts the Date to the time zone.
    * @param it item to be checked
    * @param zon timezone
+   * @param d zone was defined
    * @return duration
    * @throws QueryException evaluation exception
    */
-  private Iter datzon(final Item it, final Iter zon) throws QueryException {
+  private Item datzon(final Item it, final Item zon, final boolean d)
+      throws QueryException {
+
     final Item i = it.u() ? new Dat(it.str()) : check(it, Type.DAT);
-    return adjust((Date) i, zon).iter();
+    return adjust((Date) i, zon, d);
   }
 
   /**
    * Adjusts the DateTime to the time zone.
    * @param it item to be checked
    * @param zon timezone
+   * @param d zone was defined
    * @return duration
    * @throws QueryException evaluation exception
    */
-  private Iter dtmzon(final Item it, final Iter zon) throws QueryException {
+  private Item dtmzon(final Item it, final Item zon, final boolean d)
+      throws QueryException {
+    
     final Item i = it.u() ? new Dtm(it.str()) : check(it, Type.DTM);
-    return adjust((Date) i, zon).iter();
+    return adjust((Date) i, zon, d);
   }
 
   /**
    * Adjusts the Time to the time zone.
    * @param it item to be checked
    * @param zon timezone
+   * @param d zone was defined
    * @return duration
    * @throws QueryException evaluation exception
    */
-  private Iter timzon(final Item it, final Iter zon) throws QueryException {
+  private Item timzon(final Item it, final Item zon, final boolean d)
+      throws QueryException {
+
     final Item i = it.u() ? new Tim(it.str()) : check(it, Type.TIM);
-    return adjust((Date) i, zon).iter();
+    return adjust((Date) i, zon, d);
   }
 
   /**
    * Returns a DateTime.
    * @param date item to be checked
-   * @param zon time zone
+   * @param tm time zone
    * @return duration
    * @throws QueryException evaluation exception
    */
-  private Iter dattim(final Item date, final Iter zon) throws QueryException {
-    final Item tm = zon.atomic();
-    if(tm == null) return Iter.EMPTY;
+  private Item dattim(final Item date, final Item tm) throws QueryException {
+    if(tm == null) return null;
 
     final Item d = date.u() ? new Dat(date.str()) : date;
     final Item t = tm.u() ? new Tim(tm.str()) : tm;
@@ -223,19 +231,21 @@ final class FNDate extends Fun {
     } else if(dtm.xc.getTimezone() != zone && zone != UNDEF) {
       Err.or(FUNZONE, dtm, tim);
     }
-    return dtm.iter();
+    return dtm;
   }
 
   /**
    * Adjusts the timezone.
    * @param date input date
-   * @param z timezone
+   * @param zon timezone
+   * @param d zone was specified
    * @return adjusted date
    * @throws QueryException evaluation exception
    */
-  private Date adjust(final Date date, final Iter z) throws QueryException {
-    final Item zon = z != null ? z.next() : null;
-    if(z != null && zon == null) {
+  private Date adjust(final Date date, final Item zon, final boolean d)
+      throws QueryException {
+
+    if(d && zon == null) {
       date.xc.setTimezone(UNDEF);
       return date;
     }

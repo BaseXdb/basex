@@ -1,10 +1,8 @@
 package org.basex.query.iter;
 
-import static org.basex.query.QueryText.*;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
-import org.basex.query.util.Err;
 
 /**
  * Iterator interface.
@@ -25,8 +23,6 @@ public abstract class Iter {
     public int size() { return 0; }
     @Override
     public boolean reset() { return true; }
-    @Override
-    public String toString() { return "()"; }
   };
   
   /**
@@ -104,24 +100,5 @@ public abstract class Iter {
       item[s++] = i;
     }
     return Seq.get(item, s);
-  }
-
-  /**
-   * Checks if the specified iterator contains a single item.
-   * Returns null, the first item or an exception.
-   * @return item
-   * @throws QueryException evaluation exception
-   */
-  public final Item atomic() throws QueryException {
-    final long s = size();
-    if(s == 1) return next();
-
-    final Item it = next();
-    if(it == null) return null;
-
-    final Item n = next();
-    if(n != null) Err.or(XPSEQ, "(" + it + "," + n +
-        (next() != null ? ",..." : "") + ")");
-    return it;
   }
 }

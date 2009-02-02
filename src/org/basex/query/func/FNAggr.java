@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.item.Type.*;
-import org.basex.BaseX;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Calc;
@@ -25,29 +24,27 @@ import org.basex.query.util.Err;
  */
 public final class FNAggr extends Fun {
   @Override
-  public Iter iter(final QueryContext ctx, final Iter[] arg)
-      throws QueryException {
-    final Iter iter = arg[0];
+  public Item atomic(final QueryContext ctx) throws QueryException {
+    final Iter iter = ctx.iter(args[0]);
 
     switch(func) {
       case COUNT:
         int c = iter.size();
         if(c == -1) do ++c; while(iter.next() != null);
-        return Itr.get(c).iter();
+        return Itr.get(c);
       case MIN:
-        return minmax(arg, CmpV.Comp.GT, ctx);
+        return minmax(iter, CmpV.Comp.GT, ctx);
       case MAX:
-        return minmax(arg, CmpV.Comp.LT, ctx);
+        return minmax(iter, CmpV.Comp.LT, ctx);
       case SUM:
-        final Iter zero = arg.length == 2 ? arg[1] : null;
         Item it = iter.next();
-        return it == null ? zero != null ? zero : Itr.ZERO.iter() :
-          sum(iter, it, false);
+        return it != null ? sum(iter, it, false) :
+          args.length == 2 ? args[1].atomic(ctx) : Itr.ZERO;
       case AVG:
         it = iter.next();
-        return it == null ? Iter.EMPTY : sum(iter, it, true);
+        return it == null ? null : sum(iter, it, true);
       default:
-        BaseX.notexpected(func); return null;
+        return super.atomic(ctx);
     }
   }
 
@@ -72,7 +69,7 @@ public final class FNAggr extends Fun {
    * @return summed up item.
    * @throws QueryException thrown if the items can't be compared
    */
-  private Iter sum(final Iter iter, final Item it, final boolean avg)
+  private Item sum(final Iter iter, final Item it, final boolean avg)
       throws QueryException {
     Item res = it.u() ? Dbl.get(it.str()) : it;
     if(!res.n() && !res.d()) Err.or(FUNNUMDUR, this, res.type);
@@ -87,41 +84,40 @@ public final class FNAggr extends Fun {
       res = Calc.PLUS.ev(res, i);
       c++;
     }
-    return avg ? Calc.DIV.ev(res, Itr.get(c)).iter() : res.iter();
+    return avg ? Calc.DIV.ev(res, Itr.get(c)) : res;
   }
 
   /**
    * Returns a minimum or maximum item.
-   * @param arg arguments
+   * @param iter1 first argument
    * @param cmp comparator
    * @param ctx query context
    * @return resulting item
    * @throws QueryException thrown if the items can't be compared
    */
-  private Iter minmax(final Iter[] arg, final CmpV.Comp cmp,
+  private Item minmax(final Iter iter1, final CmpV.Comp cmp,
       final QueryContext ctx) throws QueryException {
 
-    final Iter iter = arg[0];
-    if(arg.length == 2) checkColl(arg[1]);
+    if(args.length == 2) checkColl(args[1], ctx);
 
-    Item res = iter.next();
-    if(res == null) return Iter.EMPTY;
+    Item res = iter1.next();
+    if(res == null) return null;
 
     cmp.e(res, res);
     if(!res.u() && res.s() || res instanceof Date)
-      return evalStr(iter, res, cmp);
+      return evalStr(iter1, res, cmp);
 
     Type t = res.u() ? DBL : res.type;
     if(res.type != t) res = t.e(res, ctx);
 
     Item it;
-    while((it = iter.next()) != null) {
+    while((it = iter1.next()) != null) {
       t = type(res, it);
       final double d = it.dbl();
       if(d != d || cmp.e(res, it)) res = it;
       if(res.type != t) res = t.e(res, ctx);
     }
-    return res.iter();
+    return res;
   }
 
   /**
@@ -154,7 +150,7 @@ public final class FNAggr extends Fun {
    * @return resulting item
    * @throws QueryException thrown if the items can't be compared
    */
-  private Iter evalStr(final Iter iter, final Item r, final CmpV.Comp cmp)
+  private Item evalStr(final Iter iter, final Item r, final CmpV.Comp cmp)
       throws QueryException {
 
     Item res = r;
@@ -163,6 +159,6 @@ public final class FNAggr extends Fun {
       if(it.type != res.type) Err.or(FUNCMP, info(), res.type, it.type);
       if(cmp.e(res, it)) res = it;
     }
-    return res.iter();
+    return res;
   }
 }

@@ -19,7 +19,7 @@ import org.basex.query.util.Err;
 public final class Root extends Simple {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final Iter iter = checkCtx(ctx);;
+    final Iter iter = checkCtx(ctx).iter();
     final NodIter ni = new NodIter(false);
     Item i;
     while((i = iter.next()) != null) {

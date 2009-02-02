@@ -11,7 +11,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class Flt extends Num {
+public final class Flt extends Item {
   /** Zero value. */
   public static final Flt ZERO = new Flt(0);
   /** Data. */

@@ -3,9 +3,9 @@ package org.basex.query.func;
 import static org.basex.query.QueryText.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.basex.BaseX;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
@@ -28,41 +28,47 @@ final class FNPat extends Fun {
   static final Pattern CLSEX = Pattern.compile(".*?\\[(.*?)-\\[(.*?)\\]");
 
   @Override
-  public Iter iter(final QueryContext ctx, final Iter[] arg)
-      throws QueryException {
-    final byte[] val = checkStr(arg[0]);
-
+  public Iter iter(final QueryContext ctx) throws QueryException {
     switch(func) {
-      case MATCH:   return match(val, arg);
-      case REPLACE: return replace(val, arg);
-      case TOKEN:   return token(val, arg);
-      default:      BaseX.notexpected(func); return null;
+      case TOKEN:   return token(checkStr(args[0], ctx), ctx);
+      default:      return super.iter(ctx);
+    }
+  }
+
+  @Override
+  public Item atomic(final QueryContext ctx) throws QueryException {
+    switch(func) {
+      case MATCH:   return match(checkStr(args[0], ctx), ctx);
+      case REPLACE: return replace(checkStr(args[0], ctx), ctx);
+      default:      return super.atomic(ctx);
     }
   }
 
   /**
    * Evaluates the match function.
    * @param val input value
-   * @param arg all items
+   * @param ctx query context
    * @return function result
    * @throws QueryException xquery exception
    */
-  private Iter match(final byte[] val, final Iter[] arg) throws QueryException {
-    final Pattern p = pattern(arg[1], arg.length == 3 ? arg[2] : null);
-    return Bln.get(p.matcher(Token.string(val)).find()).iter();
+  private Item match(final byte[] val, final QueryContext ctx)
+      throws QueryException {
+
+    final Pattern p = pattern(args[1], args.length == 3 ? args[2] : null, ctx);
+    return Bln.get(p.matcher(Token.string(val)).find());
   }
 
   /**
    * Evaluates the replace function.
    * @param val input value
-   * @param arg all items
+   * @param ctx query context
    * @return function result
    * @throws QueryException xquery exception
    */
-  private Iter replace(final byte[] val, final Iter[] arg)
+  private Item replace(final byte[] val, final QueryContext ctx)
       throws QueryException {
 
-    final Item repl = arg[2].atomic();
+    final Item repl = args[2].atomic(ctx);
     if(repl == null) Err.empty(this);
 
     final byte[] rep = checkStr(repl);
@@ -73,11 +79,10 @@ final class FNPat extends Fun {
         i++;
       }
     }
-    final Pattern p = pattern(arg[1], arg.length == 4 ? arg[3] : null);
+    final Pattern p = pattern(args[1], args.length == 4 ? args[3] : null, ctx);
     try {
-      final String res = p.matcher(Token.string(val)).replaceAll(
-          Token.string(rep));
-      return Str.get(Token.token(res)).iter();
+      return Str.get(Token.token(p.matcher(
+          Token.string(val)).replaceAll(Token.string(rep))));
     } catch(final Exception ex) {
       final String m = ex.getMessage();
       if(m.contains("No group")) Err.or(REGROUP);
@@ -89,13 +94,14 @@ final class FNPat extends Fun {
   /**
    * Evaluates the tokenize function.
    * @param val input value
-   * @param arg all items
+   * @param ctx query context
    * @return function result
    * @throws QueryException xquery exception
    */
-  private Iter token(final byte[] val, final Iter[] arg) throws QueryException {
-    final Pattern p = pattern(arg[1], arg.length == 3 ? arg[2] : null);
+  private Iter token(final byte[] val, final QueryContext ctx)
+      throws QueryException {
 
+    final Pattern p = pattern(args[1], args.length == 3 ? args[2] : null, ctx);
     final SeqIter sb = new SeqIter();
     final String str = Token.string(val);
     if(str.length() != 0) {
@@ -114,20 +120,21 @@ final class FNPat extends Fun {
    * Checks the regular expression modifiers.
    * @param pattern pattern
    * @param mod modifier item
+   * @param ctx query context
    * @return modified pattern
    * @throws QueryException evaluation exception
    */
-  private Pattern pattern(final Iter pattern, final Iter mod)
-      throws QueryException {
+  private Pattern pattern(final Expr pattern, final Expr mod,
+      final QueryContext ctx) throws QueryException {
 
     // process modifiers
-    final Item pat = pattern.atomic();
+    final Item pat = pattern.atomic(ctx);
     if(pat == null) Err.empty(this);
 
     byte[] pt = checkStr(pat);
     int m = Pattern.UNIX_LINES;
     if(mod != null) {
-      final Item md = mod.atomic();
+      final Item md = mod.atomic(ctx);
       if(md == null) Err.empty(this);
       for(final byte b : checkStr(md)) {
         if(b == 'i') m |= Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;

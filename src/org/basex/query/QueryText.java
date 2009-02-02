@@ -42,7 +42,7 @@ public interface QueryText {
   Object[] DATECALC = { FOCA, 5, "Invalid % calculation (%)." };
 
   /** FOCH0001: Evaluation exception. */
-  Object[] INVCODE = { FOCH, 1, "Codepoint '%' invalid in %." };
+  Object[] INVCODE = { FOCH, 1, "Invalid codepoint '%'." };
   /** FOCH0002: Evaluation exception. */
   Object[] IMPLCOL = { FOCH, 2, "Unknown collation %." };
   /** FOCH0003: Evaluation exception. */
@@ -98,11 +98,9 @@ public interface QueryText {
   /** FORG0006: Evaluation exception. */
   Object[] FUNCMP = { FORG, 6, "%: % expected, % found." };
   /** FORG0006: Evaluation exception. */
-  Object[] CONDTYPE = { FORG, 6, "%(%) not allowed as condition type." };
+  Object[] CONDTYPE = { FORG, 6, "% not allowed as condition type." };
   /** FORG0006: Evaluation exception. */
   Object[] FUNNUMDUR = { FORG, 6, "%: number or duration expected, % found." };
-  /** FORG0006: Evaluation exception. */
-  Object[] FUNSEQ = { FORG, 6, "Sequence % not allowed as condition type." };
   /** FORG0006: Evaluation exception. */
   Object[] FUNNUM = { FORG, 6, "%: number expected, % found." };
   /** FORG0006: Evaluation exception. */

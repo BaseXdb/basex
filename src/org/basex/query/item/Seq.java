@@ -2,6 +2,7 @@ package org.basex.query.item;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
+
 import java.io.IOException;
 import org.basex.BaseX;
 import org.basex.data.Serializer;
@@ -24,7 +25,14 @@ public class Seq extends Item {
   public static final Seq EMPTY = new Seq() {
     @Override
     public Iter iter() { return Iter.EMPTY; }
+    @Override
+    public Item atomic(final QueryContext ctx) { return null; }
+    @Override
+    public Item ebv(final QueryContext ctx) { return Bln.FALSE; }
+    @Override
+    public Item test(final QueryContext ctx) { return null; }
   };
+
   /** Item array. */
   private Item[] val;
   /** Number of entries. */
@@ -69,26 +77,25 @@ public class Seq extends Item {
   }
 
   @Override
-  public byte[] str() {
-    if(size == 0) return Token.EMPTY;
-    BaseX.notexpected();
-    return null;
-  }
-
-  @Override
-  public boolean bool() throws QueryException {
-    if(size != 0 && !val[0].node()) Err.or(FUNSEQ, this);
-    return size != 0;
-  }
-
-  @Override
   public Iter iter() {
     return SeqIter.get(val, size);
   }
 
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
-    return iter().atomic();
+    Err.or(XPSEQ, this);
+    return null;
+  }
+
+  @Override
+  public Item ebv(final QueryContext ctx) throws QueryException {
+    if(!val[0].node()) Err.or(CONDTYPE, this);
+    return val[0];
+  }
+
+  @Override
+  public Item test(final QueryContext ctx) throws QueryException {
+    return ebv(ctx);
   }
 
   @Override

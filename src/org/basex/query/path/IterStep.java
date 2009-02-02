@@ -52,7 +52,7 @@ public final class IterStep extends Step {
       public Nod next() throws QueryException {
         if(more) {
           if(iter == null) {
-            iter = checkCtx(ctx);
+            iter = checkCtx(ctx).iter();
             ctx.pos = 1;
           }
           

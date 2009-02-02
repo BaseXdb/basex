@@ -3,7 +3,6 @@ package org.basex.query.func;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import org.basex.BaseX;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.DTd;
@@ -23,17 +22,18 @@ import org.basex.util.Token;
  */
 final class FNContext extends Fun {
   @Override
-  public Iter iter(final QueryContext ctx, final Iter[] arg)
-      throws QueryException {
+  public Item atomic(final QueryContext ctx) throws QueryException {
+    final Iter[] arg = new Iter[args.length];
+    for(int a = 0; a < args.length; a++) arg[a] = ctx.iter(args[a]);
+
     switch(func) {
-      case CURRDATE:  return currDate(ctx).iter();
-      case CURRDTM:   return currDTM(ctx).iter();
-      case CURRTIME:  return currTIM(ctx).iter();
-      case IMPLZONE:  return implZone().iter();
-      case COLLAT:    return ctx.baseURI.resolve(ctx.collation).iter();
-      case STBASEURI: return ctx.baseURI != Uri.EMPTY ? ctx.baseURI.iter() :
-        Iter.EMPTY;
-      default: BaseX.notexpected(func); return null;
+      case CURRDATE:  return currDate(ctx);
+      case CURRDTM:   return currDTM(ctx);
+      case CURRTIME:  return currTIM(ctx);
+      case IMPLZONE:  return implZone();
+      case COLLAT:    return ctx.baseURI.resolve(ctx.collation);
+      case STBASEURI: return ctx.baseURI != Uri.EMPTY ? ctx.baseURI : null;
+      default: return super.atomic(ctx);
     }
   }
 

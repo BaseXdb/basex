@@ -408,10 +408,8 @@ public final class QueryContext extends Progress {
     }
 
     // invalid collection reference
-    if(contains(coll, '<') || contains(coll, '\\')) {
-      Err.or(COLLINV, coll.length > 20 ? 
-          concat(substring(coll, 0 , 20), token("...")) : coll);
-    }
+    if(contains(coll, '<') || contains(coll, '\\'))
+      Err.or(COLLINV, Err.chop(coll));
 
     int c = -1;
     final int cl = collName.length;

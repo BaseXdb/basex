@@ -34,7 +34,7 @@ public final class SimpleIterStep extends Step {
   
   @Override
   public NodeIter iter(final QueryContext ctx) throws QueryException {
-    final Iter iter = checkCtx(ctx);
+    final Iter iter = checkCtx(ctx).iter();
 
     return new NodeIter() {
       NodeIter ir;

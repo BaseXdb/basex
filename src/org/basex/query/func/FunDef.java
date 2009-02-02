@@ -196,11 +196,11 @@ public enum FunDef {
   /** XQuery function. */
   QNAME(FNURI, FNQName.class, 2, 2, "QName(uri, name)", NONUM),
   /** XQuery function. */
+  PREQNAME(FNURI, FNQName.class, 1, 1, "prefix-from-QName(qname)", NONUMSEQ),
+  /** XQuery function. */
   RESQNAME(FNURI, FNQName.class, 2, 2, "resolve-QName(item, base)", NONUMSEQ),
   /** XQuery function. */
   RESURI(FNURI, FNQName.class, 1, 2, "resolve-uri(name, elem?)", NONUMSEQ),
-  /** XQuery function. */
-  PREQNAME(FNURI, FNQName.class, 1, 1, "prefix-from-QName(qname)", NONUMSEQ),
 
   /* FNSeq functions. */
   
@@ -222,13 +222,13 @@ public enum FunDef {
   /* FNSimple functions. */
   
   /** XQuery function. */
-  BOOL(FNURI, FNSimple.class, 1, 1, "boolean(item)", BLN),
-  /** XQuery function. */
-  NOT(FNURI, FNSimple.class, 1, 1, "not(item)", BLN),
-  /** XQuery function. */
   FALSE(FNURI, FNSimple.class, 0, 0, "false()", BLN),
   /** XQuery function. */
   TRUE(FNURI, FNSimple.class, 0, 0, "true()", BLN),
+  /** XQuery function. */
+  BOOL(FNURI, FNSimple.class, 1, 1, "boolean(item)", BLN),
+  /** XQuery function. */
+  NOT(FNURI, FNSimple.class, 1, 1, "not(item)", BLN),
   /** XQuery function. */
   EMPTY(FNURI, FNSimple.class, 1, 1, "empty(item)", BLN),
   /** XQuery function. */
@@ -289,7 +289,7 @@ public enum FunDef {
   /** Project specific function - returns a random number. */
   RANDOM(BXURI, FNBaseX.class, 1, 1, "random()", NUM),
   /** XQuery function - allows a case insensitive substring search. */
-  CONTAINSLC(BXURI, FNBaseX.class, 2, 3, "containslc(item, item)", BLN),
+  CONTAINSLC(BXURI, FNBaseX.class, 2, 2, "containslc(item, item)", BLN),
   /** XQuery function - returns the name of the query file. */
   FILENAME(BXURI, FNBaseX.class, 0, 0, "filename()", STR);
   

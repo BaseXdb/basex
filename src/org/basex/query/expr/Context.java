@@ -21,7 +21,7 @@ import org.basex.query.util.Var;
 public final class Context extends Simple {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    return checkCtx(ctx);
+    return checkCtx(ctx).iter();
   }
 
   @Override

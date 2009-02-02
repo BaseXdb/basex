@@ -13,7 +13,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public class Itr extends Num {
+public class Itr extends Item {
   /** Zero value. */
   public static final Itr ZERO = new Itr(0);
   /** Constant values. */

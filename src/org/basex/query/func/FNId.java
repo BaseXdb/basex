@@ -3,7 +3,6 @@ package org.basex.query.func;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
-import org.basex.BaseX;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
@@ -25,17 +24,18 @@ import org.basex.util.TokenList;
  */
 final class FNId extends Fun {
   @Override
-  public Iter iter(final QueryContext ctx, final Iter[] arg)
-      throws QueryException {
-    final Item it = (arg.length == 1 ? checkCtx(ctx) : arg[1]).atomic();
+  public Iter iter(final QueryContext ctx) throws QueryException {
+    // functions have 1 or 2 arguments...
+    final Item it = args.length == 2 ? args[1].atomic(ctx) :
+      checkCtx(ctx).atomic(ctx);
     if(it == null) Err.or(XPEMPTYPE, info(), Type.NOD);
 
     final Nod node = checkNode(it);
     switch(func) {
-      case ID:    return id(arg[0], node);
-      case IDREF: return idref(arg[0], node);
-      case LANG:  return lang(arg[0], node);
-      default:    BaseX.notexpected(func); return null;
+      case ID:    return id(ctx.iter(args[0]), node);
+      case IDREF: return idref(ctx.iter(args[0]), node);
+      case LANG:  return lang(lc(checkStr(args[0], ctx)), node);
+      default:    return super.iter(ctx);
     }
   }
 
@@ -67,13 +67,12 @@ final class FNId extends Fun {
 
   /**
    * Returns the result of the language function.
-   * @param it item ids to be found
+   * @param lang language to be found
    * @param node attribute
    * @return resulting node list
    * @throws QueryException xquery exception
    */
-  private Iter lang(final Iter it, final Nod node) throws QueryException {
-    final byte[] lang = lc(checkStr(it));
+  private Iter lang(final byte[] lang, final Nod node) throws QueryException {
     Nod n = node;
     while(n != null) {
       final NodeIter atts = n.attr();

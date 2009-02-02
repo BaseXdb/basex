@@ -3,7 +3,6 @@ package org.basex.query.func;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.util.regex.Pattern;
-import org.basex.BaseX;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -12,7 +11,6 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Err;
 import org.basex.util.Array;
 import org.basex.util.TokenBuilder;
@@ -26,81 +24,90 @@ import org.basex.util.XMLToken;
  */
 final class FNStr extends Fun {
   @Override
-  public Iter iter(final QueryContext ctx, final Iter[] arg)
-      throws QueryException {
-    final Iter iter = arg[0];
+  public Iter iter(final QueryContext ctx) throws QueryException {
+    final Expr e = args[0];
+
+    switch(func) {
+      case STCODE:
+        return str2cp(e.atomic(ctx));
+      default:
+        return super.iter(ctx);
+    }
+  }
+
+  @Override
+  public Item atomic(final QueryContext ctx) throws QueryException {
+    final Expr e = args[0];
 
     switch(func) {
       case CODESTR:
-        return cp2str(iter);
-      case STCODE:
-        return str2cp(iter);
+        return cp2str(e.iter(ctx));
       case COMPARE:
-        if(arg.length == 3) checkColl(arg[2]);
-        Item it1 = iter.atomic();
-        Item it2 = arg[1].atomic();
-        if(it1 == null || it2 == null) return Iter.EMPTY;
+        if(args.length == 3) checkColl(args[2], ctx);
+        Item it1 = e.atomic(ctx);
+        Item it2 = args[1].atomic(ctx);
+        if(it1 == null || it2 == null) return null;
         final int d = diff(checkStr(it1), checkStr(it2));
-        return Itr.get(Math.max(-1, Math.min(1, d))).iter();
+        return Itr.get(Math.max(-1, Math.min(1, d)));
       case CODEPNT:
-        it1 = iter.atomic();
-        it2 = arg[1].atomic();
-        if(it1 == null || it2 == null) return Iter.EMPTY;
-        return Bln.get(eq(checkStr(it1), checkStr(it2))).iter();
+        it1 = e.atomic(ctx);
+        it2 = args[1].atomic(ctx);
+        if(it1 == null || it2 == null) return null;
+        return Bln.get(eq(checkStr(it1), checkStr(it2)));
       case STRJOIN:
-        return strjoin(arg);
+        return strjoin(ctx);
       case SUBSTR:
-        return substr(arg);
+        return substr(ctx);
       case NORMUNI:
-        return normuni(arg);
+        return normuni(ctx);
       case UPPER:
-        return Str.get(uc(checkStr(iter))).iter();
+        return Str.get(uc(checkStr(e, ctx)));
       case LOWER:
-        return Str.get(lc(checkStr(iter))).iter();
+        return Str.get(lc(checkStr(e, ctx)));
       case TRANS:
-        return trans(arg);
+        return trans(ctx);
       case ENCURI:
-        return Str.get(uri(checkStr(iter), false)).iter();
+        return Str.get(uri(checkStr(e, ctx), false));
       case IRIURI:
-        return Str.get(uri(checkStr(iter), true)).iter();
+        return Str.get(uri(checkStr(e, ctx), true));
       case ESCURI:
-        return Str.get(esc(checkStr(iter))).iter();
+        return Str.get(esc(checkStr(e, ctx)));
       case CONCAT:
         final TokenBuilder tb = new TokenBuilder();
-        for(final Iter a : arg) {
-          final Item it = a.atomic();
+        for(final Expr a : args) {
+          final Item it = a.atomic(ctx);
           if(it != null) tb.add(it.str());
         }
-        return Str.get(tb.finish()).iter();
+        return Str.get(tb.finish());
       case CONTAINS:
-        if(arg.length == 3) checkColl(arg[2]);
-        Item it = arg[1].atomic();
-        if(it == null) return Bln.TRUE.iter();
-        return Bln.get(contains(checkStr(iter), checkStr(it))).iter();
+        if(args.length == 3) checkColl(args[2], ctx);
+        Item it = args[1].atomic(ctx);
+        if(it == null) return Bln.TRUE;
+        return Bln.get(contains(checkStr(e, ctx), checkStr(it)));
       case STARTS:
-        if(arg.length == 3) checkColl(arg[2]);
-        it = arg[1].atomic();
-        if(it == null) return Bln.TRUE.iter();
-        return Bln.get(startsWith(checkStr(iter), checkStr(it))).iter();
+        if(args.length == 3) checkColl(args[2], ctx);
+        it = args[1].atomic(ctx);
+        if(it == null) return Bln.TRUE;
+        return Bln.get(startsWith(checkStr(e, ctx), checkStr(it)));
       case ENDS:
-        if(arg.length == 3) checkColl(arg[2]);
-        it = arg[1].atomic();
-        if(it == null) return Bln.TRUE.iter();
-        return Bln.get(endsWith(checkStr(iter), checkStr(it))).iter();
+        if(args.length == 3) checkColl(args[2], ctx);
+        it = args[1].atomic(ctx);
+        if(it == null) return Bln.TRUE;
+        return Bln.get(endsWith(checkStr(e, ctx), checkStr(it)));
       case SUBAFTER:
-        if(arg.length == 3) checkColl(arg[2]);
-        final byte[] str = checkStr(iter);
-        final byte[] sa = checkStr(arg[1]);
+        if(args.length == 3) checkColl(args[2], ctx);
+        final byte[] str = checkStr(e, ctx);
+        final byte[] sa = checkStr(args[1], ctx);
         int pa = indexOf(str, sa);
-        return (pa != -1 ? Str.get(substring(str, pa + sa.length)) :
-          Str.ZERO).iter();
+        return pa != -1 ? Str.get(substring(str, pa + sa.length)) :
+          Str.ZERO;
       case SUBBEFORE:
-        if(arg.length == 3) checkColl(arg[2]);
-        final byte[] sb = checkStr(iter);
-        final int pb = indexOf(sb, checkStr(arg[1]));
-        return (pb > 0 ? Str.get(substring(sb, 0, pb)) : Str.ZERO).iter();
+        if(args.length == 3) checkColl(args[2], ctx);
+        final byte[] sb = checkStr(e, ctx);
+        final int pb = indexOf(sb, checkStr(args[1], ctx));
+        return pb > 0 ? Str.get(substring(sb, 0, pb)) : Str.ZERO;
       default:
-        BaseX.notexpected(func); return null;
+        return super.atomic(ctx);
     }
   }
 
@@ -125,56 +132,62 @@ final class FNStr extends Fun {
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter cp2str(final Iter iter) throws QueryException {
+  private Item cp2str(final Iter iter) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
     Item i;
     while((i = iter.next()) != null) {
-      final int n = (int) checkItr(i);
-      if(!XMLToken.valid(n)) Err.or(INVCODE, i, this);
-      tb.addUTF(n);
+      final long n = checkItr(i);
+      if(!XMLToken.valid(n)) Err.or(INVCODE, i);
+      tb.addUTF((int) n);
     }
-    return Str.get(tb.finish()).iter();
+    return Str.get(tb.finish());
   }
 
   /**
    * Converts a string to codepoints.
-   * @param iter iterator
+   * @param it item
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter str2cp(final Iter iter) throws QueryException {
-    final Item it = iter.atomic();
+  private Iter str2cp(final Item it) throws QueryException {
     if(it == null) return Iter.EMPTY;
     final byte[] s = checkStr(it);
 
-    final SeqIter seq = new SeqIter();
-    for(int l = 0; l < s.length; l += cl(s[l])) seq.add(Itr.get(cp(s, l)));
-    return seq;
+    return new Iter() {
+      int l = 0;
+      @Override
+      public Item next() {
+        if(l == s.length) return null;
+        final int i = cp(s, l);
+        l += cl(s[l]);
+        return Itr.get(i);
+      }
+    };
   }
 
   /**
    * Returns a substring.
-   * @param arg arguments
+   * @param ctx query context
    * @return iterator
    * @throws QueryException xquery exception
    */
-  private Iter substr(final Iter[] arg) throws QueryException {
+  private Item substr(final QueryContext ctx) throws QueryException {
     // normalize positions
-    final double ds = checkDbl(arg[1]);
-    final byte[] str = checkStr(arg[0]);
-    final boolean end = arg.length == 3;
+    final double ds = checkDbl(args[1], ctx);
+    final byte[] str = checkStr(args[0], ctx);
+    final boolean end = args.length == 3;
     int l = len(str);
-    if(ds != ds) return Str.ZERO.iter();
+    if(ds != ds) return Str.ZERO;
     int s = (int) Math.floor(ds - .5);
-    int e = end ? (int) Math.floor(checkDbl(arg[2]) + .5) : l;
+    int e = end ? (int) Math.floor(checkDbl(args[2], ctx) + .5) : l;
     if(s < 0) {
       e += s;
       s = 0;
     }
     e = Math.min(l, end ? s + e : Integer.MAX_VALUE);
-    if(s >= e) return Str.ZERO.iter();
-    if(ascii(str)) return Str.get(substring(str, s, e)).iter();
-    if(s == 0 && e == str.length) return Str.get(str).iter();
+    if(s >= e) return Str.ZERO;
+    if(ascii(str)) return Str.get(substring(str, s, e));
+    if(s == 0 && e == str.length) return Str.get(str);
 
     int ss = s;
     int ee = e;
@@ -184,40 +197,41 @@ final class FNStr extends Fun {
       if(p == e) ee = l;
     }
     if(p == e) ee = l;
-    return Str.get(Array.create(str, ss, ee - ss)).iter();
+    return Str.get(Array.create(str, ss, ee - ss));
   }
 
   /**
    * Returns a translated string.
-   * @param arg arguments
+   * @param ctx query context
    * @return string
    * @throws QueryException xquery exception
    */
-  private Iter trans(final Iter[] arg) throws QueryException {
-    final byte[] str = checkStr(arg[0]);
-    final Item is = arg[1].atomic();
+  private Item trans(final QueryContext ctx) throws QueryException {
+    final byte[] str = checkStr(args[0], ctx);
+    final Item is = args[1].atomic(ctx);
     if(is == null) Err.empty(this);    
     final byte[] sea = checkStr(is);
-    final Item ir = arg[2].atomic();
+    final Item ir = args[2].atomic(ctx);
     if(ir == null) Err.empty(this);    
     final byte[] rep = checkStr(ir);
     return Str.get(ascii(str) && ascii(sea) && ascii(rep) ?
       translate(str, sea, rep) : token(Pattern.compile(string(sea),
-      Pattern.LITERAL).matcher(string(str)).replaceAll(string(rep)))).iter();
+      Pattern.LITERAL).matcher(string(str)).replaceAll(string(rep))));
   }
 
   /**
-   * Returns a translated string.
-   * @param arg arguments
+   * Returns a string join.
+   * @param ctx query context
    * @return iterator
    * @throws QueryException xquery exception
    */
-  private Iter strjoin(final Iter[] arg) throws QueryException {
-    final Item is = arg[1].atomic();
+  private Item strjoin(final QueryContext ctx) throws QueryException {
+    final Item is = args[1].atomic(ctx);
     if(is == null) Err.empty(this);    
     final byte[] sep = checkStr(is);
+
     final TokenBuilder tb = new TokenBuilder();
-    final Iter iter = arg[0];
+    final Iter iter = args[0].iter(ctx);
     int c = 0;
     Item i;
     while((i = iter.next()) != null) {
@@ -226,7 +240,7 @@ final class FNStr extends Fun {
       c++;
     }
     final byte[] v = tb.finish();
-    return Str.get(c == 0 ? v : substring(v, 0, v.length - sep.length)).iter();
+    return Str.get(c == 0 ? v : substring(v, 0, v.length - sep.length));
   }
 
   /** Normalization types. */
@@ -249,22 +263,22 @@ final class FNStr extends Fun {
 
   /**
    * Returns normalized unicode.
-   * @param arg arguments
+   * @param ctx query context
    * @return string
    * @throws QueryException xquery exception
    */
-  private Iter normuni(final Iter[] arg) throws QueryException {
-    final byte[] str = checkStr(arg[0]);
+  private Item normuni(final QueryContext ctx) throws QueryException {
+    final byte[] str = checkStr(args[0], ctx);
     Norm norm = null;
-    if(arg.length == 2) {
-      final byte[] n = uc(trim(checkStr(arg[1])));
+    if(args.length == 2) {
+      final byte[] n = uc(trim(checkStr(args[1], ctx)));
       for(final Norm f : Norm.values()) if(eq(f.name, n)) norm = f;
       if(norm == null) Err.or(NORMUNI, n);
     } else {
       norm = Norm.C;
     }
     // [CG] XQuery/normalize-unicode
-    return Str.get(str).iter();
+    return Str.get(str);
   }
 
   /** Reserved characters. */
