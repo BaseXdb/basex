@@ -36,7 +36,7 @@ public final class SquarifiedLayout extends MapLayout {
         int start = ns;
   
         // determine direction
-        final boolean v = r.w > r.h;
+        final boolean v = r.w < r.h;
   
         // setting initial proportions
         double xx = r.x;
@@ -82,7 +82,7 @@ public final class SquarifiedLayout extends MapLayout {
               row.clear();
               start = ni;
               nn = l.list[ne] - l.list[start];
-              parsize =  data.fs != null ? addSizes(l, start, ne, data) : 0;
+              parsize = data.fs != null ? addSizes(l, start, ne, data) : 0;
               // sometimes there has to be one rectangles to fill the left space
               if(ne == ni + 1) {
                 row.add(new ViewRect((int) xx, (int) yy, (int) ww, (int) hh,
@@ -138,7 +138,7 @@ public final class SquarifiedLayout extends MapLayout {
               row.clear();
               start = ni;
               nn = l.list[ne] - l.list[start];
-              parsize =  data.fs != null ? addSizes(l, start, ne, data) : 0;
+              parsize = data.fs != null ? addSizes(l, start, ne, data) : 0;
               // sometimes there has to be one rectangles to fill the left space
               if(ne == ni + 1) {
                 row.add(new ViewRect((int) xx, (int) yy, (int) ww, (int) hh,

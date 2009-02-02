@@ -134,7 +134,7 @@ public final class MapView extends View implements Runnable {
         new MapDefault(this);
       mainMap = createImage();
       zoomMap = createImage();
-      refreshLayout();
+//      refreshLayout();
       repaint();
     }
   }
@@ -318,6 +318,7 @@ public final class MapView extends View implements Runnable {
       case 1: layouter = new SliceDiceLayout(); break;
       case 2: layouter = new SquarifiedLayout(); break;
       case 3: layouter = new StripLayout(); break;
+      case 4: layouter = new SquarifiedTestLayout(); break;
       default: layouter = new SplitLayout(); break;
     }
 

@@ -80,14 +80,6 @@ abstract class MapLayout {
     }
     return aar / r.size();
   }
-  
-  /**
-   * Sorts Rectangles of a given List.
-   * 
-   * @param nodes
-   * @return sorted
-   */
-  
 
   /**
    * Calculates the average distance of two maplayouts using the euclidean 

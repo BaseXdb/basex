@@ -36,7 +36,7 @@ public final class DialogMapInfo extends Dialog {
     info = new BaseXCheckBox(MAPINFOTOGGLE, HELPMAPINFO,
         GUIProp.mapinfo, 0, this);
     
-    set(info, BorderLayout.CENTER);
+    set(info, BorderLayout.NORTH);
     finish(GUIProp.mapinfoloc);
     action(null);
   }
