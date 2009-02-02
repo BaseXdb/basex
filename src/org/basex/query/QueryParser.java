@@ -2596,6 +2596,17 @@ public class QueryParser extends InputParser {
    */
   @SuppressWarnings("unused")
   void checkStep(final Axis axis, final Test test) { }
+  
+  /**
+   * Throws the specified error.
+   * @param err error to be thrown
+   * @param arg error arguments
+   * @throws QueryException parse exception
+   */
+  @SuppressWarnings("unused")
+  void error(final Object[] err, final Object... arg) throws QueryException {
+    throw new QueryException(err, arg);
+  }
 
   /**
    * Adds an expression to the specified array.

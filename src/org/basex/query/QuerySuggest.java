@@ -18,7 +18,6 @@ import org.basex.query.path.MixedPath;
 import org.basex.query.path.NameTest;
 import org.basex.query.path.Step;
 import org.basex.query.path.Test;
-import org.basex.query.util.Err;
 import org.basex.util.StringList;
 import org.basex.util.Token;
 
@@ -70,7 +69,7 @@ public class QuerySuggest extends QueryParser {
         absPather("root");
         checkStep(Axis.DESC, test(false));
       }
-      if(s > 1) Err.or(PATHMISS);
+      if(s > 1) error(PATHMISS);
       return s == 0 ? null : new Root();
     }
 
@@ -206,13 +205,11 @@ public class QuerySuggest extends QueryParser {
     }
     return Token.EMPTY;
   }
-  /*
+  
   @Override
-  Expr error(final String err, final Object... arg) throws QueryException {
+  void error(final Object[] err, final Object... arg) throws QueryException {
     final QueryException qe = new QueryException(err, arg);
     qe.complete(this, complete());
     throw qe;
-    return null;
   }
-  */
 }
