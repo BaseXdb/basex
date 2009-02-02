@@ -427,17 +427,19 @@ public final class MapView extends View implements Runnable {
             break;
           case 1 :
             MapRenderer.drawThumbnailsSentenceToolTip(focusedRect, d, true, 
-                focusedRect.thumbf, mouseX, mouseY);
+                focusedRect.thumbf, mouseX, mouseY, getWidth(), g);
             break;
           case 2 :
             MapRenderer.drawThumbnailsSentenceToolTip(focusedRect, d, false, 
-                focusedRect.thumbf, mouseX, mouseY);
+                focusedRect.thumbf, mouseX, mouseY, getWidth(), g);
             break;
           default :
             MapRenderer.drawThumbnailsSentenceToolTip(focusedRect, d, false, 
-                Math.max(1.5, focusedRect.thumbf), mouseX, mouseY);
+                Math.max(1.5, focusedRect.thumbf), mouseX, mouseY, 
+                getWidth(), g);
         }
-        MapRenderer.drawToolTip(g, mouseX, mouseY, focusedRect);
+        MapRenderer.drawToolTip(g, mouseX, mouseY, getX(), getY(), 
+            getHeight(), getWidth());
         focusedRect.x -= 3;
         focusedRect.w += 3;
       }
