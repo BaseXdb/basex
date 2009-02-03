@@ -2,6 +2,7 @@ package org.basex.query;
 
 import static org.basex.data.DataText.*;
 import static org.basex.query.QueryText.*;
+import static org.basex.query.QueryTokens.*;
 
 import java.util.ArrayList;
 import java.util.Stack;
@@ -18,6 +19,7 @@ import org.basex.query.path.MixedPath;
 import org.basex.query.path.NameTest;
 import org.basex.query.path.Step;
 import org.basex.query.path.Test;
+import org.basex.query.util.Err;
 import org.basex.util.StringList;
 import org.basex.util.Token;
 
@@ -51,24 +53,11 @@ public class QuerySuggest extends QueryParser {
     skel = ctx.data().skel;
   }
   
-  /**
-   * [ 68] Parses a PathExpr.
-   * [ 69] Parses a RelativePathExpr.
-   * @return query expression
-   * @throws QueryException xquery exception
-   */
   @Override
   public Expr path() throws QueryException {
     final int s = consume('/') ? consume('/') ? 2 : 1 : 0;
-    final Expr ex = step();
+    final Expr ex = step(s);
     if(ex == null) {
-      if (s == 1) {
-        absPather("root");
-        checkStep(Axis.CHILD, test(false));
-      } else if (s == 2) {
-        absPather("root");
-        checkStep(Axis.DESC, test(false));
-      }
       if(s > 1) error(PATHMISS);
       return s == 0 ? null : new Root();
     }
@@ -86,7 +75,7 @@ public class QuerySuggest extends QueryParser {
     if(slash) {
       do {
         if(consume('/')) list = add(list, descOrSelf());
-        final Expr st = check(step(), PATHMISS);
+        final Expr st = check(step(0), PATHMISS);
         if(!(st instanceof org.basex.query.expr.Context)) list = add(list, st);
       } while(consume('/'));
     }
@@ -101,6 +90,52 @@ public class QuerySuggest extends QueryParser {
       if(axes) tmp[l] = (Step) list[l];
     }
     return axes ? AxisPath.get(root, tmp) : new MixedPath(root, list);
+  }
+  
+  @Override
+  Step axis(final int s) throws QueryException {
+    if (s == 1) {
+      absPather("root");
+      checkStep(Axis.CHILD, test(false));
+    } else if (s == 2) {
+      absPather("root");
+      checkStep(Axis.DESC, test(false));
+    }
+    Axis ax = null;
+    Test test = null;
+
+    if(consumeWS2(DOT2)) {
+      ax = Axis.PARENT;
+      test = Test.NODE;
+    } else if(consume('@')) {
+      ax = Axis.ATTR;
+      test = test(true);
+      if(test == null) Err.or(NOATTNAME);
+    } else {
+      for(final Axis a : Axis.values()) {
+        if(consumeWS(a.name, COL2, NOLOCSTEP)) {
+          consumeWS2(COL2);
+          alter = NOLOCSTEP;
+          ap = qp;
+          ax = a;
+          test = test(a == Axis.ATTR);
+          break;
+        }
+      }
+    }
+    if(ax == null) {
+      ax = Axis.CHILD;
+      test = test(false);
+      if(test != null && test.type == Type.ATT) ax = Axis.ATTR;
+    }
+    if(test == null) return null;
+
+    Expr[] pred = {};
+    while(consumeWS2(BR1)) {
+      pred = add(pred, expr());
+      check(BR2);
+    }
+    return Step.get(ax, test, pred);
   }
   
   /**
@@ -191,13 +226,13 @@ public class QuerySuggest extends QueryParser {
    */
   private byte[] entry(final Axis a, final Test t) {
     if (t.type == Type.TXT) {
-      return TEXT;
+      return org.basex.data.DataText.TEXT;
     }
     if(t.type == Type.COM) {
-      return COMM;
+      return org.basex.data.DataText.COMM;
     }
     if (t.type == Type.PI) {
-      return PI;
+      return org.basex.data.DataText.PI;
     }
     if(t instanceof NameTest && t.name != null) {
       final byte[] name = t.name.ln();

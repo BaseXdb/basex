@@ -104,9 +104,9 @@ public class QueryParser extends InputParser {
   private QNm module;
 
   /** Alternative error output. */
-  private Object[] alter;
+  protected Object[] alter;
   /** Alternative position. */
-  private int ap;
+  protected int ap;
 
   /** Declaration flag. */
   private boolean declElem;
@@ -653,7 +653,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException xquery exception
    */
-  private Expr expr() throws QueryException {
+  protected Expr expr() throws QueryException {
     final Expr e = single();
     if(e == null) {
       if(more()) return null;
@@ -1173,7 +1173,7 @@ public class QueryParser extends InputParser {
    */
   public Expr path() throws QueryException {
     final int s = consume('/') ? consume('/') ? 2 : 1 : 0;
-    final Expr ex = step();
+    final Expr ex = step(s);
     if(ex == null) {
       if(s > 1) Err.or(PATHMISS);
       return s == 0 ? null : new Root();
@@ -1192,7 +1192,7 @@ public class QueryParser extends InputParser {
     if(slash) {
       do {
         if(consume('/')) list = add(list, descOrSelf());
-        final Expr st = check(step(), PATHMISS);
+        final Expr st = check(step(0), PATHMISS);
         if(!(st instanceof Context)) list = add(list, st);
       } while(consume('/'));
     }
@@ -1218,20 +1218,23 @@ public class QueryParser extends InputParser {
 
   /**
    * [ 70] Parses a StepExpr.
+   * @param s int
    * @return query expression
    * @throws QueryException xquery exception
    */
-  protected Expr step() throws QueryException {
+  protected Expr step(final int s) throws QueryException {
     final Expr e = filter();
-    return e != null ? e : axis();
+    return e != null ? e : axis(s);
   }
 
   /**
    * [ 71] Parses an AxisStep.
+   * @param s int
    * @return query expression
    * @throws QueryException xquery exception
    */
-  private Step axis() throws QueryException {
+  @SuppressWarnings("unused")
+  Step axis(final int s) throws QueryException {
     Axis ax = null;
     Test test = null;
 
@@ -2452,7 +2455,7 @@ public class QueryParser extends InputParser {
    * @param s string to be found.
    * @throws QueryException xquery exception
    */
-  private void check(final String s) throws QueryException {
+  protected void check(final String s) throws QueryException {
     if(!consumeWS2(s)) Err.or(list(s), WRONGCHAR, s, found());
   }
 
@@ -2506,7 +2509,7 @@ public class QueryParser extends InputParser {
    * @return result of check
    * @throws QueryException xquery exception
    */
-  private boolean consumeWS(final String s1, final String s2,
+  protected boolean consumeWS(final String s1, final String s2,
       final Object[] expr) throws QueryException {
     final int p = qp;
     if(!consumeWS(s1)) return false;
@@ -2524,7 +2527,7 @@ public class QueryParser extends InputParser {
    * @return true if string was found
    * @throws QueryException xquery exception
    */
-  private boolean consumeWS2(final String str) throws QueryException {
+  protected boolean consumeWS2(final String str) throws QueryException {
     skipWS();
     return consume(str);
   }
