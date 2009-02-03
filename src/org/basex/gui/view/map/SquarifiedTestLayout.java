@@ -32,8 +32,8 @@ public final class SquarifiedTestLayout extends MapLayout {
         int nn = l.list[ne] - l.list[ns];
         long parsize = data.fs != null ? addSizes(l, ns, ne, data) : 0;
         int ni = ns;
-//        l.makeWeight(parsize, nn, data);
-//        l.sort();
+        l.makeWeight(parsize, nn, data);
+        l.sort();
         // running start holding first element of current row
         int start = ns;
   
@@ -94,7 +94,6 @@ public final class SquarifiedTestLayout extends MapLayout {
             }
             row = tmp;
             ni++;
-            System.out.println(ni + ";" + ne);
           }
   
           // adding remaining rectangles
@@ -151,7 +150,6 @@ public final class SquarifiedTestLayout extends MapLayout {
             }
             row = tmp;
             ni++;
-            System.out.println(ni + ";" + ne);
           }
   
           // adding remaining rectangles

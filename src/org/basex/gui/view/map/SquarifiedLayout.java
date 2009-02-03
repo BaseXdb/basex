@@ -51,6 +51,12 @@ public final class SquarifiedLayout extends MapLayout {
             // height of current strip
             long size = data.fs != null ? addSizes(l, start, ni + 1, data) : 0;
             int childs = l.list[ni + 1] - l.list[start];
+            childs = 0;
+            size = 0;
+            for(int i = start; i < ni + 1; i++) {
+              childs += l.nrchilds[i];
+              size += l.sizes[i];
+            }
             double weight = calcWeight(size, childs, parsize, nn, data);
             height = weight * hh;
             
@@ -60,7 +66,7 @@ public final class SquarifiedLayout extends MapLayout {
             for(int i = start; i <= ni; i++) {
               long rectsize = data.fs != null ? 
                   Token.toLong(data.attValue(data.sizeID, l.list[i])) : 0;
-              double w = calcWeight(rectsize, l.list[i + 1] - l.list[i], 
+              double w = calcWeight(rectsize, l.nrchilds[i], 
                   size, childs, data) * ww;
               tmp.add(new ViewRect((int) x, (int) yy, (int) w, (int) height,
                   l.list[i], level));
@@ -107,6 +113,12 @@ public final class SquarifiedLayout extends MapLayout {
             // height of current strip
             long size = data.fs != null ? addSizes(l, start, ni + 1, data) : 0;
             int childs = l.list[ni + 1] - l.list[start];
+            childs = 0;
+            size = 0;
+            for(int i = start; i < ni + 1; i++) {
+              childs += l.nrchilds[i];
+              size += l.sizes[i];
+            }
             double weight = calcWeight(size, childs, parsize, nn, data);
             width = weight * ww;
             
@@ -116,7 +128,7 @@ public final class SquarifiedLayout extends MapLayout {
             for(int i = start; i <= ni; i++) {
               long tmpsize = data.fs != null ? 
                   Token.toLong(data.attValue(data.sizeID, l.list[i])) : 0;
-              double h = calcWeight(tmpsize, l.list[i + 1] - l.list[i], 
+              double h = calcWeight(tmpsize, l.nrchilds[i], 
                   size, childs, data) * hh;
               tmp.add(new ViewRect((int) xx, (int) y, (int) width, (int) h,
                   l.list[i], level));
