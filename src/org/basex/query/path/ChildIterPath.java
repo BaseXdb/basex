@@ -27,6 +27,61 @@ public final class ChildIterPath extends AxisPath {
   @Override
   public Iter iter(final QueryContext ctx) {
     return new Iter() {
+      Iter[] iter = null;
+      boolean init = true;
+      int p = 0;
+      Iter ri = null;
+      
+      final Item c = ctx.item;
+      final long cs = ctx.size;
+      final long cp = ctx.pos;
+      
+      @Override
+      public Item next() throws QueryException {
+        if (init) {
+          init = false;
+          if (root != null)
+            ri = ri == null ? (ri = ctx.iter(root)) : ri;
+          ctx.item  = root != null ? ri.next() : ctx.item;
+          iter = new Iter[step.length];
+          ctx.pos = 0;
+          ctx.size = 1;
+        }
+        
+        if (p == step.length - 1) {
+          final Item i = iter[p].next();
+          if (i != null) {
+            if(!i.node()) Err.or(NODESPATH, this, i.type);
+            return i;
+          } else p--;
+          return next();
+        } else if (p > -1) {
+          if (iter[p] == null) iter[p] = ctx.iter(step[p]);
+          ctx.item = iter[p].next();
+          if (ctx.item == null) {
+            p--;
+            return next();
+          }
+          p++;
+          iter[p] = ctx.iter(step[p]);
+          return next();
+        }
+        
+        ctx.item = c;
+        ctx.size = cs;
+        ctx.pos = cp;
+        return null;
+      }
+      @Override
+      public boolean ordered() {
+        // results will always be ordered..
+        return true;
+      }
+    };
+  /*
+  @Override
+  public Iter iter(final QueryContext ctx) {
+    return new Iter() {
       final Item c = ctx.item;
       final long cs = ctx.size;
       final long cp = ctx.pos;
@@ -80,6 +135,6 @@ public final class ChildIterPath extends AxisPath {
           }
         }
       }
-    };
+    };*/
   }
 }

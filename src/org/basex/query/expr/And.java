@@ -78,7 +78,8 @@ public final class And extends Arr {
       final Item it = e.ebv(ctx);
       if(!it.bool()) {
         // [SG] pre + 1  will cause troubles for some documents..
-        if(ctx.ftdata != null) ctx.ftdata.remove(((DBNode) ctx.item).pre + 1);
+        if(ctx.ftdata != null && ctx.item != null) 
+          ctx.ftdata.remove(((DBNode) ctx.item).pre + 1);
         return Bln.FALSE;
       }
       s = Scoring.and(s, it.score());

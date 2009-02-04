@@ -90,13 +90,17 @@ public class AxisPath extends Path {
     if(step.length == 1 && step[0].axis.down)
       return new SimpleIterPath(root, step);
 
-    /* Child iterator: [...]
     // check if all steps are child steps
     boolean children = true;
     for(final Step s : step) children &= s.axis == Axis.CHILD;
-    if(children) return new ChildIterPath(root, step);
-    */
-
+    if(children) 
+      return new ChildIterPath(root, step);
+    
+ /*   boolean parents = true;
+    for(final Step s : step) parents &= s.axis == Axis.PARENT;
+    if(parents) 
+      return new ParentIterPath(root, step);
+*/
     // return null if no iterator could be created
     return this;
   }
