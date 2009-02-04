@@ -1,6 +1,5 @@
 package org.basex.gui.layout;
 
-import org.basex.Text;
 import org.basex.util.Array;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -301,8 +300,7 @@ final class BaseXTextTokens {
     final TokenBuilder tb = new TokenBuilder();
     for(int s = ms < me ? ms : me, e = ms < me ? me : ms; s < e; s++) {
       final byte t = text[s];
-      if(t == 0x0A) tb.add(Text.NL);
-      else if(t < 0x10 || t >= 0x20) tb.add(t);
+      if(t < 0 || t == 0x0A || t == 0x09 || t >= ' ') tb.add(t);
     }
     return tb.toString();
   }

@@ -607,12 +607,12 @@ public final class BaseXText extends BaseXPanel {
     // copy selection to clipboard
     final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
     final Transferable t = clip.getContents(null);
-    try {
-      if(t != null && t.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+    if(t != null && t.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+      try {
         return (String) t.getTransferData(DataFlavor.stringFlavor);
+      } catch(final Exception ex) {
+        BaseX.debug(ex);
       }
-    } catch(final Exception ex) {
-      BaseX.debug(ex);
     }
     return null;
   }

@@ -28,7 +28,6 @@ public abstract class Nod extends Item {
   /** Parent node. */
   protected Nod par;
   /** Unique node id. */
-  // [CG] XQuery/unique node id: might not be sufficient
   protected int id;
 
   /**

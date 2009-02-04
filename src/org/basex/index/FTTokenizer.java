@@ -164,52 +164,12 @@ public final class FTTokenizer extends IndexToken {
   }
 
   /**
-   * Count number of tokens, sentences and paragraphs.
-   * [0] number of tokens
-   * [1] number of sentences
-   * [2] number of paragraphs
-   * [3] number of lines needed
-   *
-   * @param ww width of a line in bytes
-   * @return int[3]
-   */
-  public int[] countSenPar(final int ww) {
-    int lass = 0;
-    int lasp = 0;
-    int lw = 0; // width of a line
-
-    int[] c = new int[4];
-    init();
-    while(more()) {
-      if (lw + p - s + 1 < ww) lw += p - s + 1;
-      else {
-        c[3]++;
-        lw = 0;
-      }
-
-      c[0]++;
-      if (sent != lass) {
-        c[1]++;
-        lass = sent;
-      }
-      if (para != lasp) {
-        c[2]++;
-        lasp = para;
-        lw = 0;
-        c[3]++;
-      }
-    }
-    c[3]++;
-    return c;
-  }
-
-  /**
-   * Get fulltext info out of text.
+   * Gets fulltext info out of text.
    * int[0]: token info, each length of each token
    * int[1]: sentence info, length of each sentence
-   * int[2]: praragraph info, length of each paragraph
-   * 
-   * @return int[3][] array with info
+   * int[2]: paragraph info, length of each paragraph
+   * int[3][] array with info
+   * @return int arrays
    */
   public int[][] getInfo() {
     IntList[] il = new IntList[]{new IntList(), new IntList(), 
@@ -250,7 +210,7 @@ public final class FTTokenizer extends IndexToken {
    * @param ascii ascii flag
    * @return converted token
    */
-  public static byte[] dia(final byte[] t, final boolean ascii) {
+  private static byte[] dia(final byte[] t, final boolean ascii) {
     if(ascii) return t;
     final String s = utf8(t, 0, t.length);
     final StringBuilder sb = new StringBuilder();
@@ -268,7 +228,7 @@ public final class FTTokenizer extends IndexToken {
    * @param a ascii flag
    * @return the converted token
    */
-  public static byte[] upper(final byte[] t, final boolean a) {
+  private static byte[] upper(final byte[] t, final boolean a) {
     if(!a) return token(string(t).toUpperCase());
     for(int i = 0; i < t.length; i++) t[i] = (byte) uc(t[i]);
     return t;
@@ -280,7 +240,7 @@ public final class FTTokenizer extends IndexToken {
    * @param a ascii flag
    * @return the converted token
    */
-  public static byte[] lower(final byte[] t, final boolean a) {
+  private static byte[] lower(final byte[] t, final boolean a) {
     if(!a) return token(string(t).toLowerCase());
     for(int i = 0; i < t.length; i++) t[i] = (byte) lc(t[i]);
     return t;
@@ -291,7 +251,7 @@ public final class FTTokenizer extends IndexToken {
    * @param n input token
    * @return resulting token
    */
-  private byte[] wc(final byte[] n) {
+  private static byte[] wc(final byte[] n) {
     if(!contains(n, '\\')) return n;
     final TokenBuilder tb = new TokenBuilder();
     boolean bs = false;
