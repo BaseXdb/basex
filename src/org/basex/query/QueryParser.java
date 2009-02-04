@@ -1173,7 +1173,8 @@ public class QueryParser extends InputParser {
    */
   public Expr path() throws QueryException {
     final int s = consume('/') ? consume('/') ? 2 : 1 : 0;
-    final Expr ex = step(s);
+    absPath(s);
+    final Expr ex = step();
     if(ex == null) {
       if(s > 1) error(PATHMISS);
       return s == 0 ? null : new Root();
@@ -1192,7 +1193,7 @@ public class QueryParser extends InputParser {
     if(slash) {
       do {
         if(consume('/')) list = add(list, descOrSelf());
-        final Expr st = check(step(0), PATHMISS);
+        final Expr st = check(step(), PATHMISS);
         if(!(st instanceof Context)) list = add(list, st);
       } while(consume('/'));
     }
@@ -1218,26 +1219,22 @@ public class QueryParser extends InputParser {
 
   /**
    * [ 70] Parses a StepExpr.
-   * @param s int
    * @return query expression
    * @throws QueryException xquery exception
    */
-  protected Expr step(final int s) throws QueryException {
+  protected Expr step() throws QueryException {
     final Expr e = filter();
-    return e != null ? e : axis(s);
+    return e != null ? e : axis();
   }
 
   /**
    * [ 71] Parses an AxisStep.
-   * @param s int
    * @return query expression
    * @throws QueryException xquery exception
    */
-  @SuppressWarnings("unused")
-  Step axis(final int s) throws QueryException {
+  Step axis() throws QueryException {
     Axis ax = null;
     Test test = null;
-    absPath(s);
     if(consumeWS2(DOT2)) {
       ax = Axis.PARENT;
       test = Test.NODE;
