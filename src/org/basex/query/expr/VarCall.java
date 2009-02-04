@@ -47,9 +47,9 @@ public final class VarCall extends Expr {
      */
     Expr e = var.expr;
     if(ctx.nsElem.length != 0 || lc.size() != 0 || var.type != null ||
-        var.global || e instanceof CFrag || e instanceof FunCall)
+        var.global || e instanceof CFrag || e instanceof FunCall) {
       e = var.item(ctx);
-    
+    }
     ctx.ns = lc;
     return e;
   }

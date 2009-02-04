@@ -245,7 +245,6 @@ public enum GUICommands implements GUICommand {
   PASTE(true, GUIPASTE, "% V", GUIPASTETT) {
     @Override
     public void execute(final GUI gui) {
-      System.out.println("PASTED");
       gui.execute(new Copy("0"));
     }
 

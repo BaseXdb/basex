@@ -720,7 +720,6 @@ final class MapRenderer {
           yy += r.thumblh;
           wl = 0;
           ll = 0;
-          System.out.println("n");
         }
       }
     }

@@ -189,8 +189,8 @@ public final class FElem extends FNode {
   public String toString() {
     final StringBuilder sb = new StringBuilder("<");
     sb.append(string(name.str()));
-    if(children.size != 0) sb.append("...");
-    return sb.append(">").toString();
+    if(atts.size != 0 || nsp.size != 0 || children.size != 0) sb.append("...");
+    return sb.append("/>").toString();
   }
 
   @Override

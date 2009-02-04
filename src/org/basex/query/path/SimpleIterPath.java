@@ -25,11 +25,11 @@ public final class SimpleIterPath extends AxisPath {
   @Override
   public Iter iter(final QueryContext ctx) {
     return new Iter() {
-      final Item tmp = ctx.item;
       Iter s;
       
       @Override
       public Item next() throws QueryException {
+        final Item tmp = ctx.item;
         if(s == null) {
           if(root != null) ctx.item = ctx.iter(root).finish();
           s = ctx.iter(step[0]);

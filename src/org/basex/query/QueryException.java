@@ -37,13 +37,6 @@ public class QueryException extends Exception {
   public QueryException(final Object s, final Object... e) {
     super(BaseX.info(s, e));
   }
-  
-  /**
-   * Empty constructor; used for interrupting a query.
-   */
-  public QueryException() {
-    this("");
-  }
 
   /**
    * Constructor.
@@ -52,18 +45,6 @@ public class QueryException extends Exception {
    */
   public QueryException(final Object[] s, final Object... e) {
     this(s[2], e);
-  }
-
-  /**
-   * Constructor.
-   * @param sl code completion list
-   * @param s xquery error
-   * @param e error arguments
-   */
-  public QueryException(final StringList sl, final Object[] s,
-      final Object... e) {
-    this(s, e);
-    complete = sl;
     if(!Prop.xqerrcode) return;
     code = s[1] == null ? s[0].toString() : String.format("%s%04d", s[0], s[1]);
   }

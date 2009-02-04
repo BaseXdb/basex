@@ -1,12 +1,10 @@
 package org.basex.query.util;
 
 import static org.basex.query.QueryText.*;
-
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.Type;
-import org.basex.util.StringList;
 import org.basex.util.Token;
 
 /**
@@ -27,19 +25,7 @@ public final class Err {
    */
   public static void or(final Object[] err, final Object... x)
       throws QueryException {
-    or(null, err, x);
-  }
-
-  /**
-   * Throws an exception.
-   * @param list code completion list
-   * @param err error message
-   * @param x extended info
-   * @throws QueryException evaluation exception
-   */
-  public static void or(final StringList list, final Object[] err,
-      final Object... x) throws QueryException {
-    throw new QueryException(list, err, x);
+    throw new QueryException(err, x);
   }
 
   /**

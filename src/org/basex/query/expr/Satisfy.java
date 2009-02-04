@@ -7,7 +7,6 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
-import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 
@@ -49,7 +48,7 @@ public final class Satisfy extends Single {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx) throws QueryException {
+  public Bln atomic(final QueryContext ctx) throws QueryException {
     final Iter[] iter = new Iter[fl.length];
     // casting is safe, but should be removed
     for(int f = 0; f < fl.length; f++) iter[f] = ctx.iter(fl[f]);
@@ -95,6 +94,11 @@ public final class Satisfy extends Single {
       if(f.shadows(v)) return this;
     }
     return super.removeVar(v);
+  }
+
+  @Override
+  public Return returned(final QueryContext ctx) {
+    return Return.BLN;
   }
 
   @Override

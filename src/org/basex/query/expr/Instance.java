@@ -8,7 +8,6 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
-import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.util.Token;
 
@@ -41,8 +40,13 @@ public final class Instance extends Single {
   }
   
   @Override
-  public Item atomic(final QueryContext ctx) throws QueryException {
+  public Bln atomic(final QueryContext ctx) throws QueryException {
     return Bln.get(seq.instance(expr.iter(ctx)));
+  }
+
+  @Override
+  public Return returned(final QueryContext ctx) {
+    return Return.BLN;
   }
 
   @Override

@@ -62,8 +62,8 @@ public abstract class Expr extends ExprInfo {
     if(it == null) return null;
 
     final Item n = ir.next();
-    if(n != null) Err.or(XPSEQ, "(" + it + "," + n +
-        (ir.next() != null ? ",..." : "") + ")");
+    if(n != null) Err.or(XPSEQ, "(" + it + ", " + n +
+        (ir.next() != null ? ", ..." : "") + ")");
     return it;
   }
 

@@ -47,11 +47,6 @@ public abstract class Single extends Expr {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
-    return expr.returned(ctx);
-  }
-
-  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     expr.plan(ser);

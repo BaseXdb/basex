@@ -141,6 +141,11 @@ public class FLWOR extends Single {
   }
 
   @Override
+  public Return returned(final QueryContext ctx) {
+    return Return.SEQ;
+  }
+
+  @Override
   public final void plan(final Serializer ser) throws IOException {
     ser.openElement(this, EVAL, ITER);
     for(final ForLet f : fl) f.plan(ser);

@@ -34,6 +34,7 @@ public abstract class FNode extends Nod {
   @Override
   public final int diff(final Nod nod) {
     // [CG] XQuery/ID: check all cases
+    
     if(id != nod.id) {
       Nod n = this;
       while(n != null) {

@@ -187,7 +187,6 @@ public final class FTPosData {
    * @param i pointer on node entry
    */
   private void removeFTData(final int i) {
-    System.out.println(size);
     System.arraycopy(prepos, i, prepos, i, size - i - 1);
     System.arraycopy(poi, i, poi, i, size - i - 1);
     size--;

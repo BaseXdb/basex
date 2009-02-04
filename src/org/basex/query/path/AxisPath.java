@@ -167,7 +167,6 @@ public class AxisPath extends Path {
   
       // check children path rewriting
       if(!preds) {
-        //System.out.println(db);
         e = children(ctx, data);
         if(e != this) return e;
       }
@@ -209,7 +208,7 @@ public class AxisPath extends Path {
         node = node.par;
       }
       final Step[] steps = new Step[tl.size];
-      for(int t = 0; t < tl.size; t++) steps[t] = new Step(Axis.CHILD,
+      for(int t = 0; t < tl.size; t++) steps[t] = Step.get(Axis.CHILD,
           new NameTest(new QNm(tl.list[tl.size - t - 1]), Kind.NAME, false));
 
       final AxisPath path = get(root, steps);

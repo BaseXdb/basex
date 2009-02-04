@@ -62,6 +62,11 @@ public final class Unary extends Single {
   }
 
   @Override
+  public Return returned(final QueryContext ctx) {
+    return Return.NUM;
+  }
+
+  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this, NEGATE, Token.token(minus));
     expr.plan(ser);

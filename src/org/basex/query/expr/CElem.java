@@ -52,7 +52,6 @@ public final class CElem extends CFrag {
     addNS(ctx);
     super.comp(ctx);
     tag = tag.comp(ctx);
-    if(tag.e()) Err.empty(this);
     ctx.ns.size(s);
     return this;
   }

@@ -79,7 +79,7 @@ public final class Prop {
   /** Prints a XML plan. */
   public static boolean xmlplan = false;
   /** Creates the query plan before or after compilation. */
-  public static boolean compplan = false;
+  public static boolean compplan = true;
   
   /** Format XQuery output. */
   public static boolean xqformat = true;

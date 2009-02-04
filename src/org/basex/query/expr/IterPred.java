@@ -80,6 +80,7 @@ public final class IterPred extends Pred {
                 break;
               }
             }
+
             // returns the last item
             if(last) it = ctx.item;
           }
