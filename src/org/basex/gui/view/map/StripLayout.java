@@ -56,11 +56,12 @@ public final class StripLayout extends MapLayout {
           for(int i = start; i <= ni; i++) {
             long tmpsize = data.fs != null ?
                 Token.toLong(data.attValue(data.sizeID, l.list[i])) : 0;
-            double w = calcWeight(tmpsize, l.list[i + 1] - l.list[i], 
-                size, childs, data) * ww;
+            double w = i == ni ? xx + ww - x : 
+              calcWeight(tmpsize, l.list[i + 1] - l.list[i], size, childs, data)
+              * ww;
             tmp.add(new ViewRect((int) x, (int) yy, (int) w, (int) height,
                 l.list[i], level));
-            x += w;
+            x += (int) w;
           }
   
           // if ar has increased discard tmp and add row

@@ -44,9 +44,6 @@ public final class SliceDiceLayout extends MapLayout {
   
         // calculate map for each rectangel on this level
         for(int i = 0; i < l.size - 1; i++) {
-          int[] liste = new int[1];
-          liste[0] = l.list[i];
-          
           // draw map taking sizes into account
           long size = data.fs != null ? 
               Token.toLong(data.attValue(data.sizeID, l.list[i])) : 0;
@@ -62,6 +59,9 @@ public final class SliceDiceLayout extends MapLayout {
             ww = weight * r.w;
             hh = r.h;
           }
+          
+          int[] liste = new int[1];
+          liste[0] = l.list[i];
           if(ww > 0 && hh > 0) calcMap(data,
             new ViewRect((int) xx, (int) yy, (int) ww, (int) hh, 0, r.level),
             mainRects, new MapList(liste), 0, 1, level);

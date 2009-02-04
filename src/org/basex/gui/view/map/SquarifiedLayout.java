@@ -25,14 +25,16 @@ public final class SquarifiedLayout extends MapLayout {
       if(level == 0) {
         splitUniformly(data, r, mainRects, l, ns, ne, level, r.w > r.h);
       } else {
-        // number of nodes used to calculate rect size
+        // init number of childs ans sizes
         l.initChilds(data);
         int nn = 0;
+        // number of nodes on this level
         for(int i = 0; i <= ne; i++) {
           nn += l.nrchilds[i];
         }
         long parsize = data.fs != null ? addSizes(l, ns, ne, data) : 0;
         int ni = ns;
+        // init weights of nodes and sort
         l.initWeights(parsize, nn, data);
         l.sort();
         // running start holding first element of current row
@@ -67,11 +69,11 @@ public final class SquarifiedLayout extends MapLayout {
             // create temporary row including current rectangle
             double x = xx;
             for(int i = start; i <= ni; i++) {
-              double w = calcWeight(l.sizes[i], l.nrchilds[i],
-                  size, childs, data) * ww;
+              double w = i == ni ? xx + ww - x : 
+                calcWeight(l.sizes[i], l.nrchilds[i], size, childs, data) * ww;
               tmp.add(new ViewRect((int) x, (int) yy, (int) w, (int) height,
                   l.list[i], level));
-              x += w;
+              x += (int) w;
             }
   
             // if ar has increased discard tmp and add row
@@ -130,11 +132,11 @@ public final class SquarifiedLayout extends MapLayout {
             // create temporary row including current rectangle
             double y = yy;
             for(int i = start; i <= ni; i++) {
-              double h = calcWeight(l.sizes[i], l.nrchilds[i], 
-                  size, childs, data) * hh;
+              double h = i == ni ? yy + hh - y : 
+                calcWeight(l.sizes[i], l.nrchilds[i], size, childs, data) * hh;
               tmp.add(new ViewRect((int) xx, (int) y, (int) width, (int) h,
                   l.list[i], level));
-              y += h;
+              y += (int) h;
             }
   
             // if ar has increased discard tmp and add row
