@@ -56,8 +56,7 @@ public final class DialogMapLayout extends Dialog {
     final BaseXLabel label = new BaseXLabel(MAPPROPALGO);
     tmpback.add(label);
     propalgo = new BaseXCombo(new String[] { "SplitLayout",
-        "SliceAndDice Layout", "SquarifiedLayout", "StripLayout", 
-        "SquarifiedTest"}, 
+        "SliceAndDice Layout", "SquarifiedLayout", "StripLayout"}, 
         HELPMODE, false, this);
     propalgo.setSelectedIndex(GUIProp.mapalgo);
 

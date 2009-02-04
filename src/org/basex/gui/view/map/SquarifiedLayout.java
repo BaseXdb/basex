@@ -2,10 +2,7 @@ package org.basex.gui.view.map;
 
 import java.util.ArrayList;
 import org.basex.data.Data;
-//import org.basex.gui.view.ViewData;
 import org.basex.gui.view.ViewRect;
-//import org.basex.util.IntList;
-import org.basex.util.Token;
 
 /**
  * Uses a Squarified Algorithm to divide Rectangles.
@@ -14,7 +11,7 @@ import org.basex.util.Token;
  * @author Joerg Hauser
  */
 public final class SquarifiedLayout extends MapLayout {
-
+  
   @Override
   void calcMap(final Data data, final ViewRect r,
       final ArrayList<ViewRect> mainRects, final MapList l,
@@ -29,9 +26,15 @@ public final class SquarifiedLayout extends MapLayout {
         splitUniformly(data, r, mainRects, l, ns, ne, level, r.w > r.h);
       } else {
         // number of nodes used to calculate rect size
-        int nn = l.list[ne] - l.list[ns];
+        l.initChilds(data);
+        int nn = 0;
+        for(int i = 0; i <= ne; i++) {
+          nn += l.nrchilds[i];
+        }
         long parsize = data.fs != null ? addSizes(l, ns, ne, data) : 0;
         int ni = ns;
+        l.initWeights(parsize, nn, data);
+        l.sort();
         // running start holding first element of current row
         int start = ns;
   
@@ -49,13 +52,13 @@ public final class SquarifiedLayout extends MapLayout {
           double height = 0;
           while(ni < ne) {
             // height of current strip
-            long size = data.fs != null ? addSizes(l, start, ni + 1, data) : 0;
-            int childs = l.list[ni + 1] - l.list[start];
-            childs = 0;
-            size = 0;
-            for(int i = start; i < ni + 1; i++) {
-              childs += l.nrchilds[i];
+            long size = 0;
+            for(int i = start; i <= ni; i++) {
               size += l.sizes[i];
+            }
+            int childs = 0;
+            for(int i = start; i <= ni; i++) {
+              childs += l.nrchilds[i];
             }
             double weight = calcWeight(size, childs, parsize, nn, data);
             height = weight * hh;
@@ -64,9 +67,7 @@ public final class SquarifiedLayout extends MapLayout {
             // create temporary row including current rectangle
             double x = xx;
             for(int i = start; i <= ni; i++) {
-              long rectsize = data.fs != null ? 
-                  Token.toLong(data.attValue(data.sizeID, l.list[i])) : 0;
-              double w = calcWeight(rectsize, l.nrchilds[i], 
+              double w = calcWeight(l.sizes[i], l.nrchilds[i],
                   size, childs, data) * ww;
               tmp.add(new ViewRect((int) x, (int) yy, (int) w, (int) height,
                   l.list[i], level));
@@ -87,8 +88,11 @@ public final class SquarifiedLayout extends MapLayout {
               tmp.clear();
               row.clear();
               start = ni;
-              nn = l.list[ne] - l.list[start];
-              parsize = data.fs != null ? addSizes(l, start, ne, data) : 0;
+              nn = 0;
+              for(int i = start; i <= ne; i++) {
+                nn += l.nrchilds[i];
+              }
+              parsize =  data.fs != null ? addSizes(l, start, ne, data) : 0;
               // sometimes there has to be one rectangles to fill the left space
               if(ne == ni + 1) {
                 row.add(new ViewRect((int) xx, (int) yy, (int) ww, (int) hh,
@@ -111,13 +115,13 @@ public final class SquarifiedLayout extends MapLayout {
           double width = 0;
           while(ni < ne) {
             // height of current strip
-            long size = data.fs != null ? addSizes(l, start, ni + 1, data) : 0;
-            int childs = l.list[ni + 1] - l.list[start];
-            childs = 0;
-            size = 0;
-            for(int i = start; i < ni + 1; i++) {
-              childs += l.nrchilds[i];
+            long size = 0;
+            for(int i = start; i <= ni; i++) {
               size += l.sizes[i];
+            }
+            int childs = 0;
+            for(int i = start; i <= ni; i++) {
+              childs += l.nrchilds[i];
             }
             double weight = calcWeight(size, childs, parsize, nn, data);
             width = weight * ww;
@@ -126,9 +130,7 @@ public final class SquarifiedLayout extends MapLayout {
             // create temporary row including current rectangle
             double y = yy;
             for(int i = start; i <= ni; i++) {
-              long tmpsize = data.fs != null ? 
-                  Token.toLong(data.attValue(data.sizeID, l.list[i])) : 0;
-              double h = calcWeight(tmpsize, l.nrchilds[i], 
+              double h = calcWeight(l.sizes[i], l.nrchilds[i], 
                   size, childs, data) * hh;
               tmp.add(new ViewRect((int) xx, (int) y, (int) width, (int) h,
                   l.list[i], level));
@@ -149,8 +151,11 @@ public final class SquarifiedLayout extends MapLayout {
               tmp.clear();
               row.clear();
               start = ni;
-              nn = l.list[ne] - l.list[start];
-              parsize = data.fs != null ? addSizes(l, start, ne, data) : 0;
+              nn = 0;
+              for(int i = start; i <= ne; i++) {
+                nn += l.nrchilds[i];
+              }
+              parsize =  data.fs != null ? addSizes(l, start, ne, data) : 0;
               // sometimes there has to be one rectangles to fill the left space
               if(ne == ni + 1) {
                 row.add(new ViewRect((int) xx, (int) yy, (int) ww, (int) hh,
@@ -176,5 +181,5 @@ public final class SquarifiedLayout extends MapLayout {
   @Override
   String getType() {
     return "SquarifiedLayout";
-  }
+  } 
 }

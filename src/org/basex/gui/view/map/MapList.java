@@ -58,6 +58,15 @@ public class MapList extends IntList{
           double wtmp = weights[i];
           weights[i] = weights[i + 1];
           weights[i + 1] = wtmp;
+          // switch sizes
+          long stmp = sizes[i];
+          sizes[i] = sizes[i + 1];
+          sizes[i + 1] = stmp;
+          // switch number of childs
+          int ctmp = nrchilds[i];
+          nrchilds[i] = nrchilds[i + 1];
+          nrchilds[i + 1] = ctmp;
+          
           switched = true;
         }
       }
@@ -71,9 +80,23 @@ public class MapList extends IntList{
    * @param parchilds reference number of nodes
    * @param data reference
    */
-  public void makeWeight(final long parsize, final int parchilds,
+  public void initWeights(final long parsize, final int parchilds,
       final Data data) {
     weights = new double[list.length];
+
+    for(int i = 0; i < size - 1; i++) {
+      weights[i] = MapLayout.calcWeight(sizes[i], nrchilds[i], parsize,
+          parchilds, data);
+//      System.out.println(list[i] + ":" + sizes[i] + ";" + nrchilds[i] + 
+//          ";" + weights[i]);
+    }
+  }
+  
+  /**
+   * Inits the sizes and number of childs of each nodes in this list.
+   * @param data reference
+   */
+  public void initChilds(final Data data) {
     nrchilds = new int[list.length];
     sizes = new long[list.length];
 
@@ -81,10 +104,6 @@ public class MapList extends IntList{
       sizes[i] = data.fs != null ? 
           Token.toLong(data.attValue(data.sizeID, list[i])) : 0;
       nrchilds[i] = list[i + 1] - list[i];
-      weights[i] = MapLayout.calcWeight(sizes[i], nrchilds[i], parsize,
-          parchilds, data);
-//      System.out.println(list[i] + ":" + sizes[i] + ";" + nrchilds[i] + 
-//          ";" + weights[i]);
     }
   }
 }
