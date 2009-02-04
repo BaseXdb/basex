@@ -1175,7 +1175,7 @@ public class QueryParser extends InputParser {
     final int s = consume('/') ? consume('/') ? 2 : 1 : 0;
     final Expr ex = step(s);
     if(ex == null) {
-      if(s > 1) Err.or(PATHMISS);
+      if(s > 1) error(PATHMISS);
       return s == 0 ? null : new Root();
     }
 
