@@ -1237,7 +1237,7 @@ public class QueryParser extends InputParser {
   Step axis(final int s) throws QueryException {
     Axis ax = null;
     Test test = null;
-    absPather(s);
+    absPath(s);
     if(consumeWS2(DOT2)) {
       ax = Axis.PARENT;
       test = Test.NODE;
@@ -2606,7 +2606,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException parse Exception
    */
   @SuppressWarnings("unused")
-  void absPather(final int s) throws QueryException { }
+  void absPath(final int s) throws QueryException { }
   
   /**
    * Throws the specified error.

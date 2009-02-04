@@ -46,15 +46,15 @@ public class QuerySuggest extends QueryParser {
   }
 
   @Override
-  void absPather(final int s) throws QueryException {
+  void absPath(final int s) {
     if (s > 0) {
       final ArrayList<SkelNode> list = new ArrayList<SkelNode>();
       list.add(skel.root);
       stack.push(list);
       if (s == 1) {
-        checkStep(Axis.CHILD, test(false));
+        checkStep(Axis.CHILD, null);
       } else if (s == 2) {
-        checkStep(Axis.DESC, test(false));
+        checkStep(Axis.DESCORSELF, Test.NODE);
       }
     }
   }
