@@ -39,18 +39,16 @@ public final class IndexAccess extends Simple {
   @Override
   public Iter iter(final QueryContext ctx) {
     return new Iter() {
-      IndexIterator it;
+      final IndexIterator it = data.ids(ind);
       
       @Override
       public Item next() {
-        if(it == null) it = data.ids(ind);
-        
-        if(it.more()) {
-          ctx.item = new DBNode(data, it.next());
-        } else {
-          ctx.item = null;
-        }
+        ctx.item = it.more() ? new DBNode(data, it.next()) : null;
         return ctx.item;
+      }
+      @Override
+      public boolean ordered() {
+        return true;
       }
     };
   }

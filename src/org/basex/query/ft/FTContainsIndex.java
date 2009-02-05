@@ -5,6 +5,7 @@ import org.basex.data.Serializer;
 import org.basex.index.FTTokenizer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Expr;
 import org.basex.query.item.FTNodeItem;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
@@ -15,15 +16,25 @@ import org.basex.query.iter.Iter;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Christian Gruen
  */
-public final class FTContainsIndex extends FTContains {
+public final class FTContainsIndex extends Expr {
+  /** Fulltext expression. */
+  FTExpr ftexpr;
+  /** Fulltext parser. */
+  FTTokenizer ft = new FTTokenizer();
+
   /**
    * Constructor.
    * @param ftt FTTokenizer
    * @param ex contains, select and optional ignore expression
    */
   FTContainsIndex(final FTExpr ex, final FTTokenizer ftt) {
-    super(null, ex);
+    ftexpr = ex;
     ft = ftt;
+  }
+  
+  @Override
+  public Expr comp(final QueryContext ctx) {
+    return this;
   }
 
   @Override

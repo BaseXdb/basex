@@ -60,7 +60,7 @@ public class FTContains extends Expr {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {    
+  public Bln atomic(final QueryContext ctx) throws QueryException {    
     if (div == 0) 
       div = ++ctx.ftcount;
 
@@ -82,7 +82,7 @@ public class FTContains extends Expr {
     
     ctx.ftitem = tmp;
     ctx.ftd = ftd;
-    return Bln.get(d).iter();
+    return Bln.get(d);
   }
 
   @Override

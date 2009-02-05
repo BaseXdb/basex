@@ -30,7 +30,7 @@ public final class FTContainsSIndex extends FTContains {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {    
+  public Bln atomic(final QueryContext ctx) throws QueryException {    
     final Iter ir = expr.iter(ctx);
     final FTTokenizer tmp = ctx.ftitem;
     ctx.ftitem = ft;
@@ -65,7 +65,7 @@ public final class FTContainsSIndex extends FTContains {
         ftn.ftn.ip != null && ftn.ftn.p !=  null && ctx.ftdata != null)
       ctx.ftdata.add(ftn.ftn.ip.finish(), ftn.ftn.p.finish());
     
-    return Bln.get(d).iter();
+    return Bln.get(d);
   }
 
   @Override

@@ -230,9 +230,7 @@ public final class CmpG extends Arr {
   }
   
   @Override
-  public Expr indexEquivalent(final QueryContext ctx,
-      final IndexContext ic) {
-
+  public Expr indexEquivalent(final QueryContext ctx, final IndexContext ic) {
     if(index.length == 0) return this;
     
     // create index access expressions

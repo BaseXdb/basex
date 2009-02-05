@@ -38,6 +38,7 @@ public final class SimpleIterStep extends Step {
 
     return new NodeIter() {
       NodeIter ir;
+      Nod nod;
 
       @Override
       public Nod next() throws QueryException {
@@ -49,8 +50,12 @@ public final class SimpleIterStep extends Step {
             ir = axis.init((Nod) it);
           }
           final Nod n = ir.next();
-          if(n == null) ir = null;
-          else if(test.eval(n)) return n.finish();
+          if(n == null) {
+            ir = null;
+          } else if((nod == null || !n.is(nod)) && test.eval(n)) {
+            nod = n.finish();
+            return nod;
+          }
         }
       }
     };

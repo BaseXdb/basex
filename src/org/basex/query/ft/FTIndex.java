@@ -49,6 +49,10 @@ public final class FTIndex extends FTExpr {
         return new FTNodeItem(iat.more() ? iat.nextFTNode() :
           new FTNode(), data);
       }
+      @Override
+      public boolean ordered() {
+        return true;
+      }
 
       /**
        * Evaluates the index access.

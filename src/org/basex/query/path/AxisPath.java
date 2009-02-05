@@ -84,23 +84,19 @@ public class AxisPath extends Path {
    */
   public final AxisPath iterator(final boolean pred) {
     // variables in root expression or predicates not supported yet..
-    if(pred || root != null && root.countVar(null) != 0 || pred) return this;
+    if(pred || root != null && root.countVar(null) != 0) return this;
 
     // Simple iterator: one downward location step
     if(step.length == 1 && step[0].axis.down)
-      return new SimpleIterPath(root, step);
+      return new SingleIterPath(root, step);
 
     // check if all steps are child steps
     boolean children = true;
-    for(final Step s : step) children &= s.axis == Axis.CHILD;
-    if(children) 
-      return new ChildIterPath(root, step);
-    
- /*   boolean parents = true;
-    for(final Step s : step) parents &= s.axis == Axis.PARENT;
-    if(parents) 
-      return new ParentIterPath(root, step);
-*/
+    for(final Step s : step)
+      children &= s.axis == Axis.CHILD;
+      //children &= s.axis == Axis.CHILD || s.axis == Axis.PARENT;
+    if(children) return new SimpleIterPath(root, step);
+
     // return null if no iterator could be created
     return this;
   }
@@ -319,7 +315,7 @@ public class AxisPath extends Path {
         for(int j = i + 1; j < step.length; j++) {
           result.step = Array.add(result.step, step[j]);
         }
-        return result;
+        return result.comp(ctx);
       }
     }
     return this;
